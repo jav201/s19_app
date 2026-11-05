@@ -22,6 +22,13 @@ from typing import TYPE_CHECKING, Optional
 
 import pytest
 
+pytest_plugins = ["pytester"]
+
+from tests.support.timing import (  # noqa: E402
+    pytest_runtest_makereport,
+    pytest_terminal_summary,
+)
+
 if TYPE_CHECKING:
     from s19_app.tui.changes import ChangeDocument
     from s19_app.tui.models import LoadedFile
@@ -1027,6 +1034,11 @@ def make_deeply_nested_unified_file(path: Path, *, depth: int = 120_000) -> Path
 #: inside canonical report bytes (LLR-054.4/055.3 canonical form).
 RUN_ROOT_TOKEN = b"<RUN-ROOT>"
 
+#: Placeholder a report golden holds in place of the tool version
+#: (batch-101 Inc 2, US-TST-5): canonicalization puts the package's
+#: version, as ``s19_app.version`` gives it at call time, in its place.
+TOOL_VERSION_TOKEN = b"<TOOL-VERSION>"
+
 #: A run-root path span: the token plus its path remainder, stopping at the
 #: delimiters the reports place around paths (whitespace, backtick, quote,
 #: pipe, closing paren/bracket) — separator normalization applies ONLY
@@ -1040,8 +1052,11 @@ def canonical_report_bytes(raw: bytes, run_root: Optional[Path] = None) -> bytes
         Map report bytes to the canonical form of the LLR-054.4/055.3
         byte-identity pin: platform newline translation undone (CRLF -> LF),
         every spelling of the per-run pytest tmp root replaced by
-        ``<RUN-ROOT>``, and path separators normalized to ``/`` ONLY inside
-        run-root path spans — content bytes are never rewritten. The single
+        ``<RUN-ROOT>``, path separators normalized to ``/`` ONLY inside
+        run-root path spans, and the golden's ``TOOL_VERSION_TOKEN``
+        (``<TOOL-VERSION>``) replaced by ``s19_app.version.__version__`` read
+        at call time — other content bytes are never rewritten, and a
+        produced report holds no token, so its printed version is kept. The single
         shared home for the report byte-identity canonical form (batch-41
         consolidated the two former ``_canonical_report_bytes`` copies in
         ``tests/test_before_after_report.py`` and
@@ -1052,7 +1067,7 @@ def canonical_report_bytes(raw: bytes, run_root: Optional[Path] = None) -> bytes
             report, or a stored golden).
         run_root (Optional[Path]): The per-run root whose spellings are
             tokenized; ``None`` for stored goldens (already tokenized at
-            capture time — only the CRLF undo applies).
+            capture time — the CRLF undo and the version token apply).
 
     Returns:
         bytes: The canonical byte form compared by the byte-identity ATs.
@@ -1064,6 +1079,8 @@ def canonical_report_bytes(raw: bytes, run_root: Optional[Path] = None) -> bytes
     Dependencies:
         Uses:
             - RUN_ROOT_TOKEN
+            - TOOL_VERSION_TOKEN
+            - s19_app.version.__version__
         Used by:
             - tests/test_before_after_report.py (AT-054b)
             - tests/test_tui_report_seam.py (AT-055b)
@@ -1083,6 +1100,9 @@ def canonical_report_bytes(raw: bytes, run_root: Optional[Path] = None) -> bytes
     )
     if run_root is not None:
         _assert_no_host_path_residue(data, run_root)
+    from s19_app.version import __version__ as _tool_version
+
+    data = data.replace(TOOL_VERSION_TOKEN, _tool_version.encode("utf-8"))
     return data
 
 

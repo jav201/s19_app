@@ -1,0 +1,39 @@
+== E5 mutant 020 ==
+== date: 2026-11-02T14:04:50Z ==
+s19_app: <HOME>\AppData\Local\Temp\s19m2\wt\s19_app\__init__.py
+F.                                                                       [100%]
+================================== FAILURES ===================================
+_________ test_r_tst_020_021_shared_helpers_delegate_to_the_one_wait __________
+
+    def test_r_tst_020_021_shared_helpers_delegate_to_the_one_wait() -> None:
+        from tests.support import suite_census
+    
+        shapes = suite_census.shared_wait_bodies(TESTS_ROOT)
+        by_func = {}
+        for key, shape in shapes.items():
+            func = key.replace("\\", "/").split("::")[-1]
+            by_func.setdefault(func, []).append((key, shape))
+        assert set(by_func) == {
+            "settled",
+            "wait_for",
+            "read_load_result_panel",
+            "dismiss_load_result_panel",
+            "save_case01_project",
+            "append_variant",
+        }, f"census must cover exactly the 7 shared functions: {sorted(by_func)}"
+        assert len(by_func["wait_for"]) == 2, "the two wait_for helpers must be separate"
+        wait_until_calls = 0
+        for func, entries in by_func.items():
+            for key, shape in entries:
+>               assert _shape_range_loops(shape) == 0, (
+                    f"{key}: a range(...)-counted pause loop is left"
+                )
+E               AssertionError: tests/support/b100_projects.py::wait_for: a range(...)-counted pause loop is left
+E               assert 1 == 0
+E                +  where 1 = _shape_range_loops((1, ()))
+
+tests\test_suite_hygiene.py:888: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_suite_hygiene.py::test_r_tst_020_021_shared_helpers_delegate_to_the_one_wait
+1 failed, 1 passed in 0.68s
+pytest exit: 1

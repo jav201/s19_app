@@ -1,0 +1,72 @@
+== E5 mutant 023 ==
+== date: 2026-11-02T14:05:37Z ==
+s19_app: <HOME>\AppData\Local\Temp\s19m2\wt\s19_app\__init__.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______________ test_r_tst_023_shared_wait_signatures_are_kept ________________
+
+    def test_r_tst_023_shared_wait_signatures_are_kept() -> None:
+        from tests import b97_probes
+        from tests.support import b100_load_dialog
+        from tests.support import b100_projects
+    
+        def _check_wait_signature(fn, positional, defaults, timeout_default=60.0):
+            sig = inspect.signature(fn)
+            params = list(sig.parameters.values())
+            ordered = [
+                p
+                for p in params
+                if p.kind in (inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD)
+            ]
+            assert [p.name for p in ordered] == positional, f"{fn.__name__}: {ordered}"
+            for name, value in defaults.items():
+                assert sig.parameters[name].default == value, (
+                    f"{fn.__name__}: default of {name} changed"
+                )
+            timeout = sig.parameters.get("timeout")
+            assert timeout is not None and timeout.kind is inspect.Parameter.KEYWORD_ONLY, (
+                f"{fn.__name__}: keyword-only timeout missing"
+            )
+            assert timeout.default == timeout_default
+    
+        _check_wait_signature(
+            b97_probes.settled, ["pilot", "predicate", "description", "attempts"], {"attempts": 60}
+        )
+        _check_wait_signature(
+            b100_load_dialog.wait_for,
+            ["pilot", "predicate", "description", "attempts"],
+            {"attempts": 400},
+        )
+>       _check_wait_signature(
+            b100_projects.wait_for,
+            ["pilot", "predicate", "description", "attempts"],
+            {"attempts": 400},
+        )
+
+tests\test_suite_hygiene.py:968: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+fn = <function wait_for at 0x000001DDE65AE660>
+positional = ['pilot', 'predicate', 'description', 'attempts']
+defaults = {'attempts': 400}, timeout_default = 60.0
+
+    def _check_wait_signature(fn, positional, defaults, timeout_default=60.0):
+        sig = inspect.signature(fn)
+        params = list(sig.parameters.values())
+        ordered = [
+            p
+            for p in params
+            if p.kind in (inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD)
+        ]
+>       assert [p.name for p in ordered] == positional, f"{fn.__name__}: {ordered}"
+E       AssertionError: wait_for: [<Parameter "pilot">, <Parameter "predicate">, <Parameter "description: 'str'">]
+E       assert ['pilot', 'pr...'description'] == ['pilot', 'pr...', 'attempts']
+E         
+E         Right contains one more item: 'attempts'
+E         Use -v to get more diff
+
+tests\test_suite_hygiene.py:949: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_suite_hygiene.py::test_r_tst_023_shared_wait_signatures_are_kept
+1 failed in 0.66s
+pytest exit: 1

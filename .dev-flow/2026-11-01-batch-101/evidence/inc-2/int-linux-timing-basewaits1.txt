@@ -1,0 +1,1435 @@
+# batch-101 Inc 2 E4 integration — LAN Linux host, serial timing measurement (basewaits1)
+# tree: origin/main + Inc 2 diff, with tests/b97_probes.py, tests/support/b100_load_dialog.py, tests/support/b100_projects.py restored to base (head instrumentation, base waits); -m serial_timing --ignore=tests/test_suite_hygiene.py
+# command: pytest -p no:cacheprovider --basetemp <OUT>/bt-<run> -rs --durations=0 -vv <selection>  (serial, no xdist; timeout 1800)
+# env: PYTHONDONTWRITEBYTECODE=1 PYTHONUTF8=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. NO_COLOR unset; Python 3.11.18, pytest 9.2.0; host otherwise idle
+# order run: base1, head1, base2, head2, basewaits1, basewaits2
+
+(above: shared-wait modules at base; empty = identical to base)
+<HOME>/work/s19_app/s19_app/__init__.py
+ 03:26:40 up 10:10,  2 users,  load average: 0.51, 0.93, 0.83
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0 -- /data/miniconda3/envs/s19ci/bin/python
+rootdir: <HOME>/work/s19_app
+configfile: pyproject.toml
+plugins: platformdirs-4.14.3, xdist-3.8.0
+collecting ... collected 5276 items / 5217 deselected / 59 selected
+
+tests/test_a2l_alignment_sizing.py::test_at120_oversized_alignment_layout_clamps_to_none PASSED [  1%]
+tests/test_a2l_alignment_sizing.py::test_tc149_dos_clamp_includes_padding PASSED [  3%]
+tests/test_a2l_inline_axis_length.py::test_tc138_dos_clamp_pure_arithmetic PASSED [  5%]
+tests/test_a2l_inline_axis_length.py::test_at111_oversized_axis_clamps_to_none PASSED [  6%]
+tests/test_a2l_multiline_headers.py::test_at101_megabyte_unterminated_block_is_linear PASSED [  8%]
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[variant-append] PASSED [ 10%]
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync] PASSED [ 11%]
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[a2l-sync] PASSED [ 13%]
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-back] PASSED [ 15%]
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-project] PASSED [ 16%]
+tests/test_b100_busy.py::test_at_b100_17_worker_load_of_an_8_mib_s19_by_keys PASSED [ 18%]
+tests/test_b100_document.py::test_tc_b100_28_document_finding_is_kept_first_beside_a_full_batch PASSED [ 20%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[1001-entries] PASSED [ 22%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[20000-entries] PASSED [ 23%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[5000-digit-integer] PASSED [ 25%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[bare-entries-is-5] PASSED [ 27%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-1MiB] PASSED [ 28%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-under-entries] PASSED [ 30%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[empty-entries] PASSED [ 32%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-is-5] PASSED [ 33%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-long-string] PASSED [ 35%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-wide-object] PASSED [ 37%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[exactly-1000-entries] PASSED [ 38%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[not-utf8] PASSED [ 40%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-byte-over-1MiB] PASSED [ 42%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-entry] PASSED [ 44%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[truncated] PASSED [ 45%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[v1-document] PASSED [ 47%]
+tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[20000-entries] PASSED [ 49%]
+tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[5000-digit-integer] PASSED [ 50%]
+tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[brackets-1MiB] PASSED [ 52%]
+tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[batch] PASSED [ 54%]
+tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[files] PASSED [ 55%]
+tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[declared_regions] PASSED [ 57%]
+tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[gathered] PASSED [ 59%]
+tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[derived_from] PASSED [ 61%]
+tests/test_b100_project_check.py::test_tc_b100_24_assignments_75_by_1000_is_one_issue_fast PASSED [ 62%]
+tests/test_b100_project_check.py::test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second PASSED [ 64%]
+tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read PASSED [ 66%]
+tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent PASSED [ 67%]
+tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked PASSED [ 69%]
+tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling FAILED [ 71%]
+tests/test_b100_project_check.py::test_tc_b100_61_r2_2_legitimate_manifest_inside_every_cap_is_checked_whole PASSED [ 72%]
+tests/test_b100_project_check.py::test_tc_b100_61_sec7_r2_2_one_serialize_checks_each_name_once PASSED [ 74%]
+tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_junction_loop_costs_one_failure SKIPPED [ 76%]
+tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded PASSED [ 77%]
+tests/test_b100_project_homes.py::test_tc_b100_31_junction_cycle_ends SKIPPED [ 79%]
+tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10000 saved] PASSED [ 81%]
+tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10001 refused] PASSED [ 83%]
+tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_is_a_150ms_debounce PASSED [ 84%]
+tests/test_b100_save_dialog.py::test_tc_b100_65_session_decided_once_per_open_case06 PASSED [ 86%]
+tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_at_most_three_of_twenty_keystrokes PASSED [ 88%]
+tests/test_b100_save_dialog.py::test_tc_b100_65_emitting_4mib_image_recomputes_fast PASSED [ 89%]
+tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second PASSED [ 91%]
+tests/test_compare_engine.py::test_large_image_perf PASSED               [ 93%]
+tests/test_tui_app.py::test_build_mac_view_cache_scales_under_load PASSED [ 94%]
+tests/test_tui_app.py::test_end_to_end_load_pipeline_under_budget PASSED [ 96%]
+tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[s19_first] PASSED [ 98%]
+tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[mac_first] PASSED [100%]
+
+=================================== FAILURES ===================================
+______ test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling ______
+
+tmp_path = PosixPath('<OUT>/bt-hyb1/test_tc_b100_61_sec6_5_distinc0')
+
+    @pytest.mark.serial_timing
+    def test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling(tmp_path: Path) -> None:
+        """Inc 7 corrective pass 2 (R2-2), the folder ceiling's worst case: 3 x
+        1 000 entries each under its own real folder, 1 000 ``files`` records
+        and 1 000 ``derived_from`` records with distinct bases (the most folder
+        and file checks the caps allow). Folder checks stop at
+        ``MANIFEST_FOLDER_CHECK_CAP`` (1 000); the 2 000 entries past it are skipped
+        unchecked and counted in one row (never silently); read, Load + panel
+        and the variant append's re-read each stay under 1 s."""
+    
+        def _folders(project_dir: Path) -> None:
+            for name in hostile.distinct_folder_names():
+                (project_dir / name).mkdir()
+                (project_dir / name / "x.json").write_text("{}", encoding="utf-8")
+    
+        scene = _sec6_5_filesystem_scene(tmp_path, hostile.distinct_folders_at_cap(), setup=_folders)
+>       _assert_sec6_5_bounded(scene)
+
+tests/test_b100_project_check.py:1160: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+scene = {'read': 0.13209408800321398, 'load': 0.30528493599558715, 'painted': 1.1127844440052286, 'rows': 103, ...}
+
+    def _assert_sec6_5_bounded(scene: dict) -> None:
+        timings = {key: scene[key] for key in ("read", "load", "painted", "appended")}
+        print("SEC6-5 timings (s):", {key: round(value, 3) for key, value in timings.items()})
+        assert scene["read"] < report_margin("sec6_5 read", scene["read"], timing_bound(1.0)), timings
+        assert scene["load"] is not None and scene["load"] < report_margin(
+            "sec6_5 load", scene["load"], timing_bound(1.0)
+        ), timings
+>       assert scene["painted"] < report_margin(
+            "sec6_5 painted", scene["painted"], timing_bound(1.0)
+        ), timings
+E       AssertionError: {'read': 0.13209408800321398, 'load': 0.30528493599558715, 'painted': 1.1127844440052286, 'appended': 0.8805173590008053}
+E       assert 1.1127844440052286 < 1.0
+E        +  where 1.0 = report_margin('sec6_5 painted', 1.1127844440052286, 1.0)
+E        +    where 1.0 = timing_bound(1.0)
+
+tests/test_b100_project_check.py:993: AssertionError
+----------------------------- Captured stdout call -----------------------------
+SEC6-5 timings (s): {'read': 0.132, 'load': 0.305, 'painted': 1.113, 'appended': 0.881}
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2943 App initialized. base_dir=<OUT>/bt-hyb1/test_tc_b100_61_sec6_5_distinc0/app workarea=<OUT>/bt-hyb1/test_tc_b100_61_sec6_5_distinc0/app/.s19tool/workarea
+INFO     s19tui:app.py:7957 Workarea refreshed. files=0
+INFO     s19tui:app.py:16202 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:8104 Load project action triggered.
+INFO     s19tui:app.py:15054 Load phase boundary: modal_dismiss_scheduled kind=project value='P'
+WARNING  s19tui:app.py:13515 Project P: manifest damaged 2000 more recorded entries (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: missing f0.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f1.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f2.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f3.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f4.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f5.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f6.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f7.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f8.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f9.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f10.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f11.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f12.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f13.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f14.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f15.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f16.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f17.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f18.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f19.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f20.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f21.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f22.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f23.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f24.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f25.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f26.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f27.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f28.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f29.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f30.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f31.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f32.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f33.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f34.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f35.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f36.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f37.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f38.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f39.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f40.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f41.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f42.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f43.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f44.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f45.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f46.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f47.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f48.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f49.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f50.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f51.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f52.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f53.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f54.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f55.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f56.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f57.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f58.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f59.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f60.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f61.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f62.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f63.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f64.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f65.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f66.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f67.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f68.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f69.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f70.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f71.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f72.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f73.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f74.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f75.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f76.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f77.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f78.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f79.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f80.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f81.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f82.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f83.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f84.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f85.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f86.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f87.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f88.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f89.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f90.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f91.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f92.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f93.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f94.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f95.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f96.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f97.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f98.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f99.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f100.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f101.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f102.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f103.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f104.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f105.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f106.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f107.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f108.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f109.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f110.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f111.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f112.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f113.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f114.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f115.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f116.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f117.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f118.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f119.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f120.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f121.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f122.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f123.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f124.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f125.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f126.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f127.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f128.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f129.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f130.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f131.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f132.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f133.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f134.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f135.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f136.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f137.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f138.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f139.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f140.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f141.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f142.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f143.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f144.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f145.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f146.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f147.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f148.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f149.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f150.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f151.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f152.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f153.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f154.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f155.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f156.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f157.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f158.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f159.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f160.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f161.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f162.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f163.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f164.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f165.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f166.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f167.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f168.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f169.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f170.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f171.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f172.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f173.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f174.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f175.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f176.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f177.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f178.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f179.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f180.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f181.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f182.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f183.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f184.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f185.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f186.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f187.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f188.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f189.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f190.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f191.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f192.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f193.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f194.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f195.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f196.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f197.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f198.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f199.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f200.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f201.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f202.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f203.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f204.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f205.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f206.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f207.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f208.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f209.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f210.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f211.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f212.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f213.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f214.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f215.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f216.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f217.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f218.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f219.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f220.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f221.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f222.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f223.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f224.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f225.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f226.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f227.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f228.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f229.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f230.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f231.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f232.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f233.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f234.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f235.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f236.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f237.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f238.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f239.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f240.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f241.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f242.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f243.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f244.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f245.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f246.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f247.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f248.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f249.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f250.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f251.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f252.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f253.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f254.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f255.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f256.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f257.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f258.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f259.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f260.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f261.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f262.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f263.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f264.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f265.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f266.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f267.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f268.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f269.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f270.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f271.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f272.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f273.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f274.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f275.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f276.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f277.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f278.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f279.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f280.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f281.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f282.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f283.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f284.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f285.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f286.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f287.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f288.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f289.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f290.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f291.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f292.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f293.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f294.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f295.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f296.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f297.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f298.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f299.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f300.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f301.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f302.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f303.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f304.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f305.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f306.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f307.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f308.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f309.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f310.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f311.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f312.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f313.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f314.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f315.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f316.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f317.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f318.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f319.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f320.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f321.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f322.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f323.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f324.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f325.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f326.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f327.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f328.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f329.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f330.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f331.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f332.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f333.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f334.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f335.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f336.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f337.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f338.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f339.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f340.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f341.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f342.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f343.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f344.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f345.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f346.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f347.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f348.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f349.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f350.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f351.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f352.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f353.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f354.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f355.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f356.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f357.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f358.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f359.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f360.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f361.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f362.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f363.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f364.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f365.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f366.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f367.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f368.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f369.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f370.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f371.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f372.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f373.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f374.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f375.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f376.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f377.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f378.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f379.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f380.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f381.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f382.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f383.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f384.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f385.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f386.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f387.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f388.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f389.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f390.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f391.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f392.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f393.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f394.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f395.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f396.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f397.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f398.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f399.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f400.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f401.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f402.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f403.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f404.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f405.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f406.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f407.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f408.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f409.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f410.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f411.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f412.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f413.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f414.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f415.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f416.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f417.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f418.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f419.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f420.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f421.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f422.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f423.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f424.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f425.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f426.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f427.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f428.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f429.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f430.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f431.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f432.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f433.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f434.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f435.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f436.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f437.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f438.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f439.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f440.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f441.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f442.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f443.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f444.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f445.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f446.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f447.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f448.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f449.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f450.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f451.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f452.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f453.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f454.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f455.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f456.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f457.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f458.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f459.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f460.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f461.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f462.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f463.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f464.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f465.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f466.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f467.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f468.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f469.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f470.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f471.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f472.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f473.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f474.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f475.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f476.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f477.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f478.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f479.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f480.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f481.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f482.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f483.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f484.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f485.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f486.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f487.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f488.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f489.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f490.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f491.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f492.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f493.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f494.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f495.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f496.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f497.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f498.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f499.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f500.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f501.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f502.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f503.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f504.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f505.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f506.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f507.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f508.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f509.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f510.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f511.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f512.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f513.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f514.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f515.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f516.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f517.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f518.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f519.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f520.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f521.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f522.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f523.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f524.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f525.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f526.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f527.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f528.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f529.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f530.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f531.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f532.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f533.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f534.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f535.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f536.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f537.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f538.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f539.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f540.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f541.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f542.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f543.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f544.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f545.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f546.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f547.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f548.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f549.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f550.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f551.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f552.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f553.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f554.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f555.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f556.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f557.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f558.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f559.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f560.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f561.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f562.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f563.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f564.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f565.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f566.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f567.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f568.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f569.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f570.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f571.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f572.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f573.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f574.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f575.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f576.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f577.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f578.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f579.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f580.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f581.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f582.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f583.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f584.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f585.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f586.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f587.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f588.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f589.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f590.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f591.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f592.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f593.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f594.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f595.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f596.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f597.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f598.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f599.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f600.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f601.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f602.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f603.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f604.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f605.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f606.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f607.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f608.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f609.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f610.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f611.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f612.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f613.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f614.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f615.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f616.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f617.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f618.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f619.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f620.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f621.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f622.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f623.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f624.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f625.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f626.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f627.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f628.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f629.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f630.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f631.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f632.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f633.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f634.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f635.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f636.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f637.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f638.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f639.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f640.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f641.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f642.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f643.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f644.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f645.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f646.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f647.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f648.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f649.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f650.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f651.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f652.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f653.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f654.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f655.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f656.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f657.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f658.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f659.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f660.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f661.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f662.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f663.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f664.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f665.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f666.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f667.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f668.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f669.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f670.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f671.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f672.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f673.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f674.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f675.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f676.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f677.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f678.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f679.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f680.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f681.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f682.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f683.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f684.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f685.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f686.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f687.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f688.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f689.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f690.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f691.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f692.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f693.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f694.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f695.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f696.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f697.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f698.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f699.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f700.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f701.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f702.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f703.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f704.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f705.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f706.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f707.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f708.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f709.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f710.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f711.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f712.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f713.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f714.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f715.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f716.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f717.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f718.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f719.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f720.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f721.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f722.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f723.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f724.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f725.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f726.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f727.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f728.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f729.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f730.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f731.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f732.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f733.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f734.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f735.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f736.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f737.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f738.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f739.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f740.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f741.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f742.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f743.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f744.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f745.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f746.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f747.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f748.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f749.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f750.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f751.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f752.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f753.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f754.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f755.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f756.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f757.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f758.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f759.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f760.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f761.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f762.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f763.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f764.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f765.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f766.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f767.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f768.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f769.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f770.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f771.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f772.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f773.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f774.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f775.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f776.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f777.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f778.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f779.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f780.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f781.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f782.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f783.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f784.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f785.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f786.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f787.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f788.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f789.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f790.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f791.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f792.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f793.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f794.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f795.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f796.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f797.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f798.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f799.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f800.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f801.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f802.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f803.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f804.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f805.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f806.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f807.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f808.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f809.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f810.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f811.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f812.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f813.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f814.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f815.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f816.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f817.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f818.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f819.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f820.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f821.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f822.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f823.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f824.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f825.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f826.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f827.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f828.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f829.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f830.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f831.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f832.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f833.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f834.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f835.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f836.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f837.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f838.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f839.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f840.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f841.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f842.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f843.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f844.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f845.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f846.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f847.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f848.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f849.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f850.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f851.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f852.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f853.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f854.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f855.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f856.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f857.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f858.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f859.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f860.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f861.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f862.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f863.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f864.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f865.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f866.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f867.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f868.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f869.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f870.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f871.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f872.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f873.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f874.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f875.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f876.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f877.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f878.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f879.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f880.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f881.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f882.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f883.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f884.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f885.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f886.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f887.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f888.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f889.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f890.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f891.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f892.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f893.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f894.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f895.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f896.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f897.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f898.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f899.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f900.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f901.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f902.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f903.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f904.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f905.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f906.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f907.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f908.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f909.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f910.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f911.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f912.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f913.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f914.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f915.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f916.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f917.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f918.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f919.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f920.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f921.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f922.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f923.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f924.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f925.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f926.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f927.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f928.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f929.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f930.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f931.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f932.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f933.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f934.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f935.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f936.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f937.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f938.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f939.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f940.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f941.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f942.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f943.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f944.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f945.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f946.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f947.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f948.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f949.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f950.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f951.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f952.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f953.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f954.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f955.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f956.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f957.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f958.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f959.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f960.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f961.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f962.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f963.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f964.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f965.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f966.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f967.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f968.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f969.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f970.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f971.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f972.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f973.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f974.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f975.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f976.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f977.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f978.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f979.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f980.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f981.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f982.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f983.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f984.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f985.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f986.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f987.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f988.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f989.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f990.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f991.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f992.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f993.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f994.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f995.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f996.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f997.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f998.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: missing f999.s19 (None)
+WARNING  s19tui:app.py:13515 Project P: not recorded firmware.s19 (None)
+INFO     s19tui:app.py:13757 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18161 Load summary: file_type=s19 path=<OUT>/bt-hyb1/test_tc_b100_61_sec6_5_distinc0/app/.s19tool/workarea/P/firmware.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:13774 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:17679 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:13710 Project loaded. name=P file=<OUT>/bt-hyb1/test_tc_b100_61_sec6_5_distinc0/app/.s19tool/workarea/P/firmware.s19 mac=None
+INFO     s19tui:app.py:18289 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:17695 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:17707 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19211 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:17274 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17329 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:16202 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:18823 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:17720 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:18516 Memory Map updated. ranges=2
+INFO     s19tui:app.py:17737 Loaded file successfully: path=<OUT>/bt-hyb1/test_tc_b100_61_sec6_5_distinc0/app/.s19tool/workarea/P/firmware.s19 file_type=s19 elapsed_seconds=0.904 has_mac=False precomputed=False
+INFO     s19tui:app.py:15099 Load phase boundary: dialog_callback_entry path=<OUT>/bt-hyb1/test_tc_b100_61_sec6_5_distinc0/src/extra.s19
+INFO     s19tui:app.py:15120 Load phase boundary: copy_started path=<OUT>/bt-hyb1/test_tc_b100_61_sec6_5_distinc0/src/extra.s19
+INFO     s19tui:app.py:15133 Load phase boundary: copy_done path=extra.s19 elapsed=0.001s
+WARNING  s19tui:app.py:15152 Recent sources not updated: '<OUT>/bt-hyb1/test_tc_b100_61_sec6_5_distinc0/src/extra.s19'
+INFO     s19tui:app.py:7957 Workarea refreshed. files=1
+INFO     s19tui:app.py:15170 File copied to temp: path=<OUT>/bt-hyb1/test_tc_b100_61_sec6_5_distinc0/app/.s19tool/workarea/temp/extra.s19 size_bytes=349 copy_seconds=0.001
+INFO     s19tui:app.py:15176 Load phase boundary: worker_spawned path=extra.s19
+INFO     s19tui:app.py:17961 Load phase boundary: worker_parse_start path=extra.s19
+INFO     s19tui:app.py:17421 Loading file: path=<OUT>/bt-hyb1/test_tc_b100_61_sec6_5_distinc0/app/.s19tool/workarea/temp/extra.s19 suffix=.s19 project=P
+INFO     s19tui:app.py:13757 Load phase boundary: parse_branch_entry path=extra.s19 suffix=.s19
+INFO     s19tui:app.py:18161 Load summary: file_type=s19 path=<OUT>/bt-hyb1/test_tc_b100_61_sec6_5_distinc0/app/.s19tool/workarea/temp/extra.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:13774 Load phase boundary: parse_branch_done path=extra.s19 branch=s19
+INFO     s19tui:app.py:17980 Load phase boundary: worker_parse_done path=extra.s19 elapsed=0.021s
+INFO     s19tui:app.py:17825 Load phase boundary: prepare_entry path=extra.s19 file_type=s19
+INFO     s19tui:app.py:17844 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:17274 MAC validation computed: records=0 issues=0 elapsed_seconds=0.011
+INFO     s19tui:app.py:17853 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:17873 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:17880 Load phase boundary: prepare_bases_done row_bases=7
+INFO     s19tui:app.py:17890 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:17896 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:17997 Load phase boundary: worker_compute_done path=extra.s19 precomputed=True elapsed=0.027s
+INFO     s19tui:app.py:18004 Load phase boundary: call_from_thread_apply_dispatched path=extra.s19
+INFO     s19tui:app.py:17679 Load phase boundary: apply_install_state path=extra.s19 precomputed=True
+INFO     s19tui:app.py:18289 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:17695 Load phase boundary: apply_sections_done path=extra.s19
+WARNING  s19tui:app.py:14466 Manifest not rewritten (holds entries that were skipped): <OUT>/bt-hyb1/test_tc_b100_61_sec6_5_distinc0/app/.s19tool/workarea/P (placed <OUT>/bt-hyb1/test_tc_b100_61_sec6_5_distinc0/app/.s19tool/workarea/P/extra.s19)
+INFO     s19tui:app.py:14695 Appended variant 'extra' into project: <OUT>/bt-hyb1/test_tc_b100_61_sec6_5_distinc0/app/.s19tool/workarea/P
+INFO     s19tui:app.py:17707 Load phase boundary: apply_hex_done path=extra.s19
+INFO     s19tui:app.py:19211 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:16202 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:18823 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:17720 Load phase boundary: apply_a2l_done path=extra.s19
+INFO     s19tui:app.py:18516 Memory Map updated. ranges=2
+INFO     s19tui:app.py:17737 Loaded file successfully: path=<OUT>/bt-hyb1/test_tc_b100_61_sec6_5_distinc0/app/.s19tool/workarea/temp/extra.s19 file_type=s19 elapsed_seconds=0.725 has_mac=False precomputed=True
+============================= QC-TM timing margins =============================
+LOW -11.3%  1.113 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+LOW 1.1%  0.989 s / 1.000 s  TC-B100-20 save-project  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-project]
+LOW 3.7%  0.963 s / 1.000 s  TC-B100-61 cap painted  tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded
+LOW 9.2%  0.908 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+20.7%  0.793 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+23.9%  0.761 s / 1.000 s  TC-B100-30 brackets-1MiB  tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[brackets-1MiB]
+25.4%  0.746 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+28.3%  0.717 s / 1.000 s  TC-B100-20 variant-append  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[variant-append]
+34.6%  0.196 s / 0.300 s  TC-B100-65 final paint  tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_is_a_150ms_debounce
+38.3%  0.185 s / 0.300 s  TC-B100-65 4MiB paint  tests/test_b100_save_dialog.py::test_tc_b100_65_emitting_4mib_image_recomputes_fast
+41.4%  0.586 s / 1.000 s  TC-B100-30 20000-entries  tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[20000-entries]
+42.2%  0.578 s / 1.000 s  TC-B100-20 a2l-sync  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[a2l-sync]
+42.7%  0.573 s / 1.000 s  TC-B100-30 5000-digit-integer  tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[5000-digit-integer]
+44.7%  0.166 s / 0.300 s  TC-B100-65 keystroke paint  tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_at_most_three_of_twenty_keystrokes
+48.1%  0.519 s / 1.000 s  TC-B100-20 mac-sync  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync]
+56.6%  0.434 s / 1.000 s  TC-B100-20 save-back  tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-back]
+60.5%  0.395 s / 1.000 s  TC-B100-05 merge  tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second
+61.2%  0.776 s / 2.000 s  TC-B100-65 case06 paint  tests/test_b100_save_dialog.py::test_tc_b100_65_session_decided_once_per_open_case06
+65.2%  0.348 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+68.1%  0.159 s / 0.500 s  TC-B100-65 q delay  tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_is_a_150ms_debounce
+69.5%  0.305 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+75.1%  0.249 s / 1.000 s  TC-B100-61 cap load  tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded
+76.9%  0.231 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+77.4%  0.226 s / 1.000 s  TC-B100-61 checks a  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+78.5%  0.215 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+78.7%  0.213 s / 1.000 s  TC-B100-61 all-bad load  tests/test_b100_project_check.py::test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second
+81.8%  0.909 s / 5.000 s  TC-B100-31 10001 refused  tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10001 refused]
+85.6%  0.144 s / 1.000 s  TC-B100-61 sec7 serialize  tests/test_b100_project_check.py::test_tc_b100_61_sec7_r2_2_one_serialize_checks_each_name_once
+86.8%  0.132 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+88.4%  0.232 s / 2.000 s  TC-006 large image  tests/test_compare_engine.py::test_large_image_perf
+89.4%  0.106 s / 1.000 s  TC-B100-30 classifier exactly-1000-entries  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[exactly-1000-entries]
+90.2%  0.195 s / 2.000 s  MAC view cache  tests/test_tui_app.py::test_build_mac_view_cache_scales_under_load
+91.4%  0.086 s / 1.000 s  TC-B100-61 checks d  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+91.4%  0.086 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+92.3%  1.531 s / 20.000 s  stress load s19_first  tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[s19_first]
+92.9%  1.412 s / 20.000 s  stress load mac_first  tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[mac_first]
+94.6%  0.539 s / 10.000 s  end-to-end load pipeline  tests/test_tui_app.py::test_end_to_end_load_pipeline_under_budget
+95.5%  0.045 s / 1.000 s  TC-B100-61 checks e  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+96.0%  0.040 s / 1.000 s  TC-B100-61 R2-2 read  tests/test_b100_project_check.py::test_tc_b100_61_r2_2_legitimate_manifest_inside_every_cap_is_checked_whole
+96.2%  0.190 s / 5.000 s  AT101  tests/test_a2l_multiline_headers.py::test_at101_megabyte_unterminated_block_is_linear
+97.6%  0.024 s / 1.000 s  TC-B100-28  tests/test_b100_document.py::test_tc_b100_28_document_finding_is_kept_first_beside_a_full_batch
+98.7%  0.013 s / 1.000 s  TC-B100-61 checks b  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+98.8%  0.012 s / 1.000 s  TC-B100-30 classifier 1001-entries  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[1001-entries]
+99.5%  0.005 s / 1.000 s  TC-B100-24 assignments  tests/test_b100_project_check.py::test_tc_b100_24_assignments_75_by_1000_is_one_issue_fast
+99.9%  0.001 s / 1.000 s  TC-B100-30 classifier entries-long-string  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-long-string]
+99.9%  0.001 s / 1.000 s  TC-B100-24 files  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[files]
+99.9%  0.001 s / 1.000 s  TC-B100-24 declared_regions  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[declared_regions]
+99.9%  0.001 s / 1.000 s  TC-B100-24 derived_from  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[derived_from]
+99.9%  0.001 s / 1.000 s  TC-B100-61 all-bad painted  tests/test_b100_project_check.py::test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second
+99.9%  0.001 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+100.0%  0.000 s / 2.000 s  AT120  tests/test_a2l_alignment_sizing.py::test_at120_oversized_alignment_layout_clamps_to_none
+100.0%  0.000 s / 1.000 s  TC149  tests/test_a2l_alignment_sizing.py::test_tc149_dos_clamp_includes_padding
+100.0%  0.000 s / 1.000 s  TC138  tests/test_a2l_inline_axis_length.py::test_tc138_dos_clamp_pure_arithmetic
+100.0%  0.000 s / 2.000 s  AT111  tests/test_a2l_inline_axis_length.py::test_at111_oversized_axis_clamps_to_none
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier 20000-entries  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[20000-entries]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier 5000-digit-integer  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[5000-digit-integer]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier bare-entries-is-5  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[bare-entries-is-5]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier brackets-1MiB  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-1MiB]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier brackets-under-entries  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-under-entries]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier empty-entries  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[empty-entries]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier entries-is-5  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-is-5]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier entries-wide-object  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-wide-object]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier not-utf8  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[not-utf8]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier one-byte-over-1MiB  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-byte-over-1MiB]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier one-entry  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-entry]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier truncated  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[truncated]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier v1-document  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[v1-document]
+100.0%  0.000 s / 1.000 s  TC-B100-24 batch  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[batch]
+100.0%  0.000 s / 1.000 s  TC-B100-24 gathered  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[gathered]
+QC-TM: 69 bounds, 4 under 20 % margin
+============================== slowest durations ===============================
+90.62s call     tests/test_b100_busy.py::test_at_b100_17_worker_load_of_an_8_mib_s19_by_keys
+56.65s call     tests/test_b100_save_dialog.py::test_tc_b100_65_emitting_4mib_image_recomputes_fast
+43.43s call     tests/test_b100_save_dialog.py::test_tc_b100_65_session_decided_once_per_open_case06
+8.72s call     tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10000 saved]
+8.59s call     tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_is_a_150ms_debounce
+8.58s call     tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10001 refused]
+7.25s call     tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_at_most_three_of_twenty_keystrokes
+6.34s call     tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+6.27s call     tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+5.82s call     tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[5000-digit-integer]
+5.57s call     tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+5.12s call     tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-project]
+4.99s call     tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[a2l-sync]
+4.90s call     tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[variant-append]
+4.90s call     tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync]
+4.77s call     tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded
+4.45s call     tests/test_b100_project_check.py::test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second
+4.44s call     tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-back]
+3.67s call     tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[brackets-1MiB]
+3.59s call     tests/test_compare_engine.py::test_large_image_perf
+3.11s call     tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[20000-entries]
+3.06s call     tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second
+1.71s call     tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[s19_first]
+1.59s call     tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[mac_first]
+0.58s call     tests/test_tui_app.py::test_end_to_end_load_pipeline_under_budget
+0.38s call     tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+0.20s call     tests/test_tui_app.py::test_build_mac_view_cache_scales_under_load
+0.19s call     tests/test_a2l_multiline_headers.py::test_at101_megabyte_unterminated_block_is_linear
+0.18s call     tests/test_b100_project_check.py::test_tc_b100_61_sec7_r2_2_one_serialize_checks_each_name_once
+0.12s call     tests/test_b100_project_check.py::test_tc_b100_61_r2_2_legitimate_manifest_inside_every_cap_is_checked_whole
+0.11s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[exactly-1000-entries]
+0.03s teardown tests/test_tui_app.py::test_end_to_end_load_pipeline_under_budget
+0.02s call     tests/test_b100_document.py::test_tc_b100_28_document_finding_is_kept_first_beside_a_full_batch
+0.02s call     tests/test_b100_project_check.py::test_tc_b100_24_assignments_75_by_1000_is_one_issue_fast
+0.01s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[1001-entries]
+0.00s call     tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[derived_from]
+0.00s call     tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[files]
+0.00s call     tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[declared_regions]
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-long-string]
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_junction_loop_costs_one_failure
+0.00s setup    tests/test_a2l_alignment_sizing.py::test_at120_oversized_alignment_layout_clamps_to_none
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[gathered]
+0.00s call     tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[batch]
+0.00s call     tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[gathered]
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+0.00s setup    tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_is_a_150ms_debounce
+0.00s setup    tests/test_b100_document.py::test_tc_b100_28_document_finding_is_kept_first_beside_a_full_batch
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_24_assignments_75_by_1000_is_one_issue_fast
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-1MiB]
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+0.00s setup    tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10001 refused]
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-under-entries]
+0.00s setup    tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[s19_first]
+0.00s setup    tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-project]
+0.00s setup    tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync]
+0.00s setup    tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second
+0.00s setup    tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[mac_first]
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[batch]
+0.00s setup    tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_at_most_three_of_twenty_keystrokes
+0.00s setup    tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[a2l-sync]
+0.00s setup    tests/test_a2l_inline_axis_length.py::test_at111_oversized_axis_clamps_to_none
+0.00s setup    tests/test_b100_save_dialog.py::test_tc_b100_65_session_decided_once_per_open_case06
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[5000-digit-integer]
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[1001-entries]
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[not-utf8]
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-under-entries]
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[empty-entries]
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[20000-entries]
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_61_r2_2_legitimate_manifest_inside_every_cap_is_checked_whole
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[declared_regions]
+0.00s setup    tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-back]
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+0.00s setup    tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10000 saved]
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[bare-entries-is-5]
+0.00s setup    tests/test_b100_busy.py::test_at_b100_17_worker_load_of_an_8_mib_s19_by_keys
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[brackets-1MiB]
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_61_sec7_r2_2_one_serialize_checks_each_name_once
+0.00s setup    tests/test_b100_save_dialog.py::test_tc_b100_65_emitting_4mib_image_recomputes_fast
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[files]
+0.00s setup    tests/test_b100_project_homes.py::test_tc_b100_31_junction_cycle_ends
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[5000-digit-integer]
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-long-string]
+0.00s setup    tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[variant-append]
+0.00s setup    tests/test_compare_engine.py::test_large_image_perf
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-1MiB]
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[truncated]
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-entry]
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[20000-entries]
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[exactly-1000-entries]
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-wide-object]
+0.00s setup    tests/test_tui_app.py::test_build_mac_view_cache_scales_under_load
+0.00s setup    tests/test_tui_app.py::test_end_to_end_load_pipeline_under_budget
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-is-5]
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[derived_from]
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-byte-over-1MiB]
+0.00s setup    tests/test_a2l_multiline_headers.py::test_at101_megabyte_unterminated_block_is_linear
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[v1-document]
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-wide-object]
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[20000-entries]
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_61_sec7_r2_2_one_serialize_checks_each_name_once
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-byte-over-1MiB]
+0.00s call     tests/test_a2l_alignment_sizing.py::test_at120_oversized_alignment_layout_clamps_to_none
+0.00s setup    tests/test_a2l_alignment_sizing.py::test_tc149_dos_clamp_includes_padding
+0.00s call     tests/test_a2l_inline_axis_length.py::test_at111_oversized_axis_clamps_to_none
+0.00s teardown tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[mac_first]
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[v1-document]
+0.00s setup    tests/test_a2l_inline_axis_length.py::test_tc138_dos_clamp_pure_arithmetic
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[5000-digit-integer]
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[empty-entries]
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-is-5]
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-entry]
+0.00s teardown tests/test_b100_save_dialog.py::test_tc_b100_65_session_decided_once_per_open_case06
+0.00s teardown tests/test_tui_app.py::test_build_mac_view_cache_scales_under_load
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[bare-entries-is-5]
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[not-utf8]
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[truncated]
+0.00s teardown tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[brackets-1MiB]
+0.00s teardown tests/test_b100_busy.py::test_at_b100_17_worker_load_of_an_8_mib_s19_by_keys
+0.00s teardown tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10000 saved]
+0.00s teardown tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10001 refused]
+0.00s teardown tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync]
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+0.00s teardown tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-back]
+0.00s teardown tests/test_b100_document.py::test_tc_b100_28_document_finding_is_kept_first_beside_a_full_batch
+0.00s teardown tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-project]
+0.00s teardown tests/test_b100_save_dialog.py::test_tc_b100_65_emitting_4mib_image_recomputes_fast
+0.00s teardown tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[a2l-sync]
+0.00s teardown tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_at_most_three_of_twenty_keystrokes
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[5000-digit-integer]
+0.00s teardown tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[s19_first]
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[20000-entries]
+0.00s teardown tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[variant-append]
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_61_r2_2_legitimate_manifest_inside_every_cap_is_checked_whole
+0.00s teardown tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_is_a_150ms_debounce
+0.00s teardown tests/test_a2l_multiline_headers.py::test_at101_megabyte_unterminated_block_is_linear
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[exactly-1000-entries]
+0.00s teardown tests/test_compare_engine.py::test_large_image_perf
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[1001-entries]
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-long-string]
+0.00s teardown tests/test_a2l_alignment_sizing.py::test_at120_oversized_alignment_layout_clamps_to_none
+0.00s teardown tests/test_a2l_alignment_sizing.py::test_tc149_dos_clamp_includes_padding
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_24_assignments_75_by_1000_is_one_issue_fast
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[declared_regions]
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[files]
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[derived_from]
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-1MiB]
+0.00s teardown tests/test_a2l_inline_axis_length.py::test_tc138_dos_clamp_pure_arithmetic
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[20000-entries]
+0.00s call     tests/test_a2l_inline_axis_length.py::test_tc138_dos_clamp_pure_arithmetic
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-under-entries]
+0.00s teardown tests/test_a2l_inline_axis_length.py::test_at111_oversized_axis_clamps_to_none
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[gathered]
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[batch]
+0.00s call     tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_junction_loop_costs_one_failure
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[5000-digit-integer]
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[bare-entries-is-5]
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[empty-entries]
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-wide-object]
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-is-5]
+0.00s call     tests/test_b100_project_homes.py::test_tc_b100_31_junction_cycle_ends
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-byte-over-1MiB]
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[truncated]
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[v1-document]
+0.00s call     tests/test_a2l_alignment_sizing.py::test_tc149_dos_clamp_includes_padding
+0.00s teardown tests/test_b100_project_homes.py::test_tc_b100_31_junction_cycle_ends
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-entry]
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_junction_loop_costs_one_failure
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[not-utf8]
+=========================== short test summary info ============================
+SKIPPED [2] tests/support/b100_links.py:30: directory junctions are a Windows-only test arm (PDR C-QA-6)
+===== 1 failed, 56 passed, 2 skipped, 5217 deselected in 304.08s (0:05:04) =====
+EXIT=1
+ 03:31:45 up 10:15,  2 users,  load average: 1.33, 1.11, 0.95

@@ -1,0 +1,19 @@
+<stdin>:51: trailing whitespace.
+#   
+<stdin>:71: trailing whitespace.
+#   
+<stdin>:74: trailing whitespace.
+#   
+<stdin>:113: trailing whitespace.
+#   
+<stdin>:116: trailing whitespace.
+#   
+warning: squelched 1200 whitespace errors
+warning: 1205 lines add whitespace errors.
+commit-base e2663953 + inc2 57d19f4 diff
+66.4%  0.504 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 2 bounds, 0 under 20 % margin
+90 passed in 161.44s (0:02:41)
+=========================== short test summary info ============================
+SKIPPED [2] tests/support/b100_links.py:30: directory junctions are a Windows-only test arm (PDR C-QA-6)
+3 failed, 55 passed, 2 skipped, 5281 deselected in 304.28s (0:05:04)

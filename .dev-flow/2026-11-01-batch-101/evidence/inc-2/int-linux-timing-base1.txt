@@ -1,0 +1,1447 @@
+# batch-101 Inc 2 E4 integration — LAN Linux host, serial timing measurement (base1)
+# tree: origin/main e2663953 (base), the 59 head serial_timing node ids minus the hygiene node, passed explicitly
+# command: pytest -p no:cacheprovider --basetemp <OUT>/bt-<run> -rs --durations=0 -vv <selection>  (serial, no xdist; timeout 1800)
+# env: PYTHONDONTWRITEBYTECODE=1 PYTHONUTF8=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. NO_COLOR unset; Python 3.11.18, pytest 9.2.0; host otherwise idle
+# order run: base1, head1, base2, head2, basewaits1, basewaits2
+
+<HOME>/work/s19_app/s19_app/__init__.py
+ 03:05:28 up  9:48,  2 users,  load average: 0.26, 0.22, 0.20
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0 -- /data/miniconda3/envs/s19ci/bin/python
+rootdir: <HOME>/work/s19_app
+configfile: pyproject.toml
+plugins: platformdirs-4.14.3, xdist-3.8.0
+collecting ... collected 59 items
+
+tests/test_a2l_alignment_sizing.py::test_at120_oversized_alignment_layout_clamps_to_none PASSED [  1%]
+tests/test_a2l_alignment_sizing.py::test_tc149_dos_clamp_includes_padding PASSED [  3%]
+tests/test_a2l_inline_axis_length.py::test_tc138_dos_clamp_pure_arithmetic PASSED [  5%]
+tests/test_a2l_inline_axis_length.py::test_at111_oversized_axis_clamps_to_none PASSED [  6%]
+tests/test_a2l_multiline_headers.py::test_at101_megabyte_unterminated_block_is_linear PASSED [  8%]
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[variant-append] PASSED [ 10%]
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync] PASSED [ 11%]
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[a2l-sync] PASSED [ 13%]
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-back] PASSED [ 15%]
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-project] PASSED [ 16%]
+tests/test_b100_busy.py::test_at_b100_17_worker_load_of_an_8_mib_s19_by_keys PASSED [ 18%]
+tests/test_b100_document.py::test_tc_b100_28_document_finding_is_kept_first_beside_a_full_batch PASSED [ 20%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[1001-entries] PASSED [ 22%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[20000-entries] PASSED [ 23%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[5000-digit-integer] PASSED [ 25%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[bare-entries-is-5] PASSED [ 27%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-1MiB] PASSED [ 28%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-under-entries] PASSED [ 30%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[empty-entries] PASSED [ 32%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-is-5] PASSED [ 33%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-long-string] PASSED [ 35%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-wide-object] PASSED [ 37%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[exactly-1000-entries] PASSED [ 38%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[not-utf8] PASSED [ 40%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-byte-over-1MiB] PASSED [ 42%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-entry] PASSED [ 44%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[truncated] PASSED [ 45%]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[v1-document] PASSED [ 47%]
+tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[20000-entries] PASSED [ 49%]
+tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[5000-digit-integer] PASSED [ 50%]
+tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[brackets-1MiB] PASSED [ 52%]
+tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[batch] PASSED [ 54%]
+tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[files] PASSED [ 55%]
+tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[declared_regions] PASSED [ 57%]
+tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[gathered] PASSED [ 59%]
+tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[derived_from] PASSED [ 61%]
+tests/test_b100_project_check.py::test_tc_b100_24_assignments_75_by_1000_is_one_issue_fast PASSED [ 62%]
+tests/test_b100_project_check.py::test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second FAILED [ 64%]
+tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read PASSED [ 66%]
+tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent PASSED [ 67%]
+tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked PASSED [ 69%]
+tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling PASSED [ 71%]
+tests/test_b100_project_check.py::test_tc_b100_61_r2_2_legitimate_manifest_inside_every_cap_is_checked_whole PASSED [ 72%]
+tests/test_b100_project_check.py::test_tc_b100_61_sec7_r2_2_one_serialize_checks_each_name_once PASSED [ 74%]
+tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_junction_loop_costs_one_failure SKIPPED [ 76%]
+tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded PASSED [ 77%]
+tests/test_b100_project_homes.py::test_tc_b100_31_junction_cycle_ends SKIPPED [ 79%]
+tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10000 saved] PASSED [ 81%]
+tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10001 refused] PASSED [ 83%]
+tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_is_a_150ms_debounce PASSED [ 84%]
+tests/test_b100_save_dialog.py::test_tc_b100_65_session_decided_once_per_open_case06 PASSED [ 86%]
+tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_at_most_three_of_twenty_keystrokes PASSED [ 88%]
+tests/test_b100_save_dialog.py::test_tc_b100_65_emitting_4mib_image_recomputes_fast PASSED [ 89%]
+tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second PASSED [ 91%]
+tests/test_compare_engine.py::test_large_image_perf PASSED               [ 93%]
+tests/test_tui_app.py::test_build_mac_view_cache_scales_under_load PASSED [ 94%]
+tests/test_tui_app.py::test_end_to_end_load_pipeline_under_budget PASSED [ 96%]
+tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[s19_first] PASSED [ 98%]
+tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[mac_first] PASSED [100%]
+
+=================================== FAILURES ===================================
+____ test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second _____
+
+tmp_path = PosixPath('<OUT>/bt-base1/test_tc_b100_61_every_array_at0')
+
+    def test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second(
+        tmp_path: Path,
+    ) -> None:
+        """SEC6-5: every capped array at exactly 1 000 entries, every entry an
+        escaping path, distinct across arrays (5 000 skipped entries plus 1 000
+        malformed regions). The load and the panel are bounded: the load runs
+        under 1 s, the panel opens and is painted, and the panel holds at most
+        :data:`LOAD_PANEL_ROW_BOUND` rows.
+    
+        RED (reviewed Inc 6 tree): 6 000 bad entries froze load and panel for
+        10.2 s."""
+        base = tmp_path / "app"
+        project_dir = projects.copy_sources(_workarea(base) / "P", projects.CASE01_DIR, "firmware.s19")
+        _write_manifest(project_dir, hostile.dumps(hostile.every_array_at_cap_all_bad()))
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            real_load = app._handle_load_project
+            timing: list = []
+    
+            def _timed(name, *args, **kwargs):  # Inc 12b X-6: the router passes routed=True
+                app._load_started_at = time.perf_counter()
+                real_load(name, *args, **kwargs)
+    
+            # E4 integration re-pin (A-8): at 12b the handler only starts the
+            # worker, so the load is timed to the end of the one install callback
+            # (the work the base did inside the handler), and the panel's paint
+            # clock starts there, as it did at the base.
+            real_install = app._install_prepared_project
+    
+            def _installed(prepared):
+                real_install(prepared)
+                timing.append(time.perf_counter() - app._load_started_at)
+                app._load_returned_at = time.perf_counter()
+    
+            app._handle_load_project = _timed
+            app._install_prepared_project = _installed
+            async with app.run_test(size=(118, 54)) as pilot:
+                await pilot.pause()
+                await _open_panel_through_the_dialog(pilot, app)
+                pressed = time.perf_counter()
+                await _wait_for(
+                    pilot,
+                    lambda: len(app.screen.query("#result_summary")) > 0
+                    and app.screen.query_one("#result_summary").size.height > 0,
+                    "the painted Load-result panel",
+                    attempts=4000,
+                )
+                painted = time.perf_counter() - _paint_clock_start(app, pressed)
+                rows = len(app.screen.query("#result_body .result-problem"))
+                return timing, painted, rows
+    
+        timing, painted, rows = asyncio.run(_drive())
+        assert timing and timing[0] < timing_bound(1.0), f"the load took {timing}"
+>       assert painted < timing_bound(1.0), f"the panel took {painted:.2f} s to paint"
+E       AssertionError: the panel took 1.24 s to paint
+E       assert 1.236149974 < 1.0
+E        +  where 1.0 = timing_bound(1.0)
+
+tests/test_b100_project_check.py:842: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2943 App initialized. base_dir=<OUT>/bt-base1/test_tc_b100_61_every_array_at0/app workarea=<OUT>/bt-base1/test_tc_b100_61_every_array_at0/app/.s19tool/workarea
+INFO     s19tui:app.py:7957 Workarea refreshed. files=0
+INFO     s19tui:app.py:16202 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.007
+INFO     s19tui:app.py:8104 Load project action triggered.
+INFO     s19tui:app.py:15054 Load phase boundary: modal_dismiss_scheduled kind=project value='P'
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0000.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0001.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0002.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0003.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0004.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0005.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0006.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0007.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0008.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0009.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0010.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0011.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0012.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0013.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0014.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0015.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0016.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0017.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0018.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0019.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0020.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0021.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0022.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0023.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0024.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0025.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0026.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0027.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0028.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0029.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0030.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0031.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0032.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0033.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0034.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0035.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0036.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0037.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0038.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0039.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0040.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0041.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0042.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0043.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0044.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0045.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0046.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0047.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0048.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0049.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0050.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0051.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0052.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0053.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0054.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0055.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0056.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0057.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0058.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0059.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0060.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0061.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0062.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0063.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0064.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0065.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0066.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0067.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0068.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0069.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0070.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0071.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0072.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0073.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0074.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0075.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0076.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0077.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0078.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0079.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0080.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0081.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0082.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0083.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0084.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0085.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0086.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0087.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0088.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0089.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0090.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0091.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0092.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0093.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0094.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0095.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0096.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0097.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0098.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged ../b0099.s19 (MANIFEST-PATH-ESCAPE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged project.json (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: manifest damaged 4900 more recorded entries (MANIFEST-BAD-STRUCTURE)
+WARNING  s19tui:app.py:13515 Project P: no digests saved project.json (None)
+INFO     s19tui:app.py:13757 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18161 Load summary: file_type=s19 path=<OUT>/bt-base1/test_tc_b100_61_every_array_at0/app/.s19tool/workarea/P/firmware.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:13774 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:17679 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:13710 Project loaded. name=P file=<OUT>/bt-base1/test_tc_b100_61_every_array_at0/app/.s19tool/workarea/P/firmware.s19 mac=None
+INFO     s19tui:app.py:18289 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:17695 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:17707 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19211 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17274 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17329 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:16202 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:18823 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:17720 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:18516 Memory Map updated. ranges=2
+INFO     s19tui:app.py:17737 Loaded file successfully: path=<OUT>/bt-base1/test_tc_b100_61_every_array_at0/app/.s19tool/workarea/P/firmware.s19 file_type=s19 elapsed_seconds=0.798 has_mac=False precomputed=False
+============================== slowest durations ===============================
+89.76s call     tests/test_b100_busy.py::test_at_b100_17_worker_load_of_an_8_mib_s19_by_keys
+56.15s call     tests/test_b100_save_dialog.py::test_tc_b100_65_emitting_4mib_image_recomputes_fast
+42.66s call     tests/test_b100_save_dialog.py::test_tc_b100_65_session_decided_once_per_open_case06
+8.96s call     tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10000 saved]
+8.60s call     tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_is_a_150ms_debounce
+8.27s call     tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10001 refused]
+6.64s call     tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_at_most_three_of_twenty_keystrokes
+6.38s call     tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+5.99s call     tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+5.94s call     tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[20000-entries]
+5.44s call     tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+4.96s call     tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second
+4.83s call     tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-project]
+4.68s call     tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync]
+4.64s call     tests/test_b100_project_check.py::test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second
+4.63s call     tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[variant-append]
+4.51s call     tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[a2l-sync]
+4.42s call     tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded
+4.30s call     tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-back]
+3.99s call     tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[brackets-1MiB]
+3.77s call     tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[5000-digit-integer]
+2.34s call     tests/test_compare_engine.py::test_large_image_perf
+2.03s call     tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[s19_first]
+1.56s call     tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[mac_first]
+0.61s call     tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+0.54s call     tests/test_tui_app.py::test_end_to_end_load_pipeline_under_budget
+0.19s call     tests/test_a2l_multiline_headers.py::test_at101_megabyte_unterminated_block_is_linear
+0.16s call     tests/test_b100_project_check.py::test_tc_b100_61_sec7_r2_2_one_serialize_checks_each_name_once
+0.13s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[exactly-1000-entries]
+0.12s call     tests/test_b100_project_check.py::test_tc_b100_61_r2_2_legitimate_manifest_inside_every_cap_is_checked_whole
+0.05s call     tests/test_tui_app.py::test_build_mac_view_cache_scales_under_load
+0.03s teardown tests/test_tui_app.py::test_end_to_end_load_pipeline_under_budget
+0.03s call     tests/test_b100_document.py::test_tc_b100_28_document_finding_is_kept_first_beside_a_full_batch
+0.03s call     tests/test_b100_project_check.py::test_tc_b100_24_assignments_75_by_1000_is_one_issue_fast
+0.00s call     tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[derived_from]
+0.00s call     tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[files]
+0.00s call     tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[declared_regions]
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-long-string]
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+0.00s setup    tests/test_a2l_alignment_sizing.py::test_at120_oversized_alignment_layout_clamps_to_none
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[1001-entries]
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+0.00s call     tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[batch]
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-1MiB]
+0.00s setup    tests/test_b100_save_dialog.py::test_tc_b100_65_session_decided_once_per_open_case06
+0.00s call     tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[gathered]
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-under-entries]
+0.00s setup    tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_is_a_150ms_debounce
+0.00s setup    tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[s19_first]
+0.00s setup    tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync]
+0.00s setup    tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10001 refused]
+0.00s setup    tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-back]
+0.00s setup    tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_at_most_three_of_twenty_keystrokes
+0.00s setup    tests/test_b100_document.py::test_tc_b100_28_document_finding_is_kept_first_beside_a_full_batch
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[brackets-1MiB]
+0.00s setup    tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[a2l-sync]
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[5000-digit-integer]
+0.00s setup    tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second
+0.00s setup    tests/test_tui_app.py::test_end_to_end_load_pipeline_under_budget
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_61_r2_2_legitimate_manifest_inside_every_cap_is_checked_whole
+0.00s setup    tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[mac_first]
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[files]
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_61_sec7_r2_2_one_serialize_checks_each_name_once
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[1001-entries]
+0.00s setup    tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[variant-append]
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[declared_regions]
+0.00s setup    tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-project]
+0.00s setup    tests/test_b100_project_homes.py::test_tc_b100_31_junction_cycle_ends
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[batch]
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second
+0.00s setup    tests/test_tui_app.py::test_build_mac_view_cache_scales_under_load
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[gathered]
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-under-entries]
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[not-utf8]
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[exactly-1000-entries]
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[bare-entries-is-5]
+0.00s setup    tests/test_b100_save_dialog.py::test_tc_b100_65_emitting_4mib_image_recomputes_fast
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-entry]
+0.00s setup    tests/test_compare_engine.py::test_large_image_perf
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[empty-entries]
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[v1-document]
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-byte-over-1MiB]
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-wide-object]
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[truncated]
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_junction_loop_costs_one_failure
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[20000-entries]
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[derived_from]
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-long-string]
+0.00s setup    tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10000 saved]
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[20000-entries]
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[5000-digit-integer]
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_24_assignments_75_by_1000_is_one_issue_fast
+0.00s setup    tests/test_a2l_inline_axis_length.py::test_at111_oversized_axis_clamps_to_none
+0.00s setup    tests/test_b100_busy.py::test_at_b100_17_worker_load_of_an_8_mib_s19_by_keys
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-1MiB]
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-wide-object]
+0.00s setup    tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded
+0.00s setup    tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-is-5]
+0.00s setup    tests/test_a2l_multiline_headers.py::test_at101_megabyte_unterminated_block_is_linear
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_61_sec7_r2_2_one_serialize_checks_each_name_once
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[20000-entries]
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[truncated]
+0.00s setup    tests/test_a2l_alignment_sizing.py::test_tc149_dos_clamp_includes_padding
+0.00s call     tests/test_a2l_alignment_sizing.py::test_at120_oversized_alignment_layout_clamps_to_none
+0.00s teardown tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[mac_first]
+0.00s setup    tests/test_a2l_inline_axis_length.py::test_tc138_dos_clamp_pure_arithmetic
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-entry]
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-byte-over-1MiB]
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[not-utf8]
+0.00s call     tests/test_a2l_inline_axis_length.py::test_at111_oversized_axis_clamps_to_none
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[5000-digit-integer]
+0.00s teardown tests/test_tui_app.py::test_build_mac_view_cache_scales_under_load
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[empty-entries]
+0.00s teardown tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync]
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[v1-document]
+0.00s teardown tests/test_b100_save_dialog.py::test_tc_b100_65_session_decided_once_per_open_case06
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[bare-entries-is-5]
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[brackets-1MiB]
+0.00s call     tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-is-5]
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[derived_from]
+0.00s teardown tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10001 refused]
+0.00s teardown tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10000 saved]
+0.00s teardown tests/test_a2l_multiline_headers.py::test_at101_megabyte_unterminated_block_is_linear
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-entry]
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[20000-entries]
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-long-string]
+0.00s teardown tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[a2l-sync]
+0.00s teardown tests/test_b100_busy.py::test_at_b100_17_worker_load_of_an_8_mib_s19_by_keys
+0.00s teardown tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_at_most_three_of_twenty_keystrokes
+0.00s teardown tests/test_b100_save_dialog.py::test_tc_b100_65_emitting_4mib_image_recomputes_fast
+0.00s teardown tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[variant-append]
+0.00s teardown tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[s19_first]
+0.00s teardown tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-back]
+0.00s teardown tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-project]
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[5000-digit-integer]
+0.00s teardown tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second
+0.00s teardown tests/test_b100_project_homes.py::test_tc_b100_31_junction_cycle_ends
+0.00s teardown tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_is_a_150ms_debounce
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[exactly-1000-entries]
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_24_assignments_75_by_1000_is_one_issue_fast
+0.00s teardown tests/test_compare_engine.py::test_large_image_perf
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_61_r2_2_legitimate_manifest_inside_every_cap_is_checked_whole
+0.00s teardown tests/test_b100_document.py::test_tc_b100_28_document_finding_is_kept_first_beside_a_full_batch
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[bare-entries-is-5]
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[files]
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-under-entries]
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[declared_regions]
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-1MiB]
+0.00s call     tests/test_a2l_inline_axis_length.py::test_tc138_dos_clamp_pure_arithmetic
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[batch]
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[gathered]
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[1001-entries]
+0.00s teardown tests/test_a2l_alignment_sizing.py::test_at120_oversized_alignment_layout_clamps_to_none
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[20000-entries]
+0.00s teardown tests/test_a2l_inline_axis_length.py::test_at111_oversized_axis_clamps_to_none
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[not-utf8]
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-wide-object]
+0.00s call     tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_junction_loop_costs_one_failure
+0.00s call     tests/test_b100_project_homes.py::test_tc_b100_31_junction_cycle_ends
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[5000-digit-integer]
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-byte-over-1MiB]
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[empty-entries]
+0.00s teardown tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_junction_loop_costs_one_failure
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[truncated]
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[v1-document]
+0.00s call     tests/test_a2l_alignment_sizing.py::test_tc149_dos_clamp_includes_padding
+0.00s teardown tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-is-5]
+0.00s teardown tests/test_a2l_inline_axis_length.py::test_tc138_dos_clamp_pure_arithmetic
+0.00s teardown tests/test_a2l_alignment_sizing.py::test_tc149_dos_clamp_includes_padding
+=========================== short test summary info ============================
+SKIPPED [2] tests/support/b100_links.py:30: directory junctions are a Windows-only test arm (PDR C-QA-6)
+============= 1 failed, 56 passed, 2 skipped in 298.09s (0:04:58) ==============
+EXIT=1
+ 03:10:27 up  9:53,  2 users,  load average: 1.03, 0.75, 0.45

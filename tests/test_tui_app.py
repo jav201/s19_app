@@ -15,6 +15,7 @@ from s19_app.tui.screens import SaveProjectPayload
 from s19_app.tui.workspace import WORKAREA_TEMP
 from s19_app.validation import ValidationIssue, ValidationSeverity
 from tests.support.b100_workers import settle_workers
+from tests.support.timing import report_margin
 
 
 def test_default_tag_and_mac_page_sizes(tmp_path: Path):
@@ -877,6 +878,7 @@ def test_get_range_index_caches_and_speeds_up_membership(tmp_path: Path):
     assert first[1] == [0x1010, 0x2020, 0x3040]
 
 
+@pytest.mark.serial_timing
 def test_build_mac_view_cache_scales_under_load(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     """Perf smoke: 5k MAC records over 2k fragmented ranges must finish under a tight budget."""
     app = S19TuiApp(base_dir=tmp_path)
@@ -913,7 +915,9 @@ def test_build_mac_view_cache_scales_under_load(tmp_path: Path, monkeypatch: pyt
 
     # Binary-search lookups make this O((N + R) log R); on any laptop this should finish
     # well under 2 seconds even without a JIT. Keep the budget generous to avoid flakes.
-    assert elapsed < 2.0, f"_build_mac_view_cache too slow: {elapsed:.3f}s"
+    assert elapsed < report_margin(
+        "MAC view cache", elapsed, 2.0
+    ), f"_build_mac_view_cache too slow: {elapsed:.3f}s"
     assert app._mac_view_cache_rows, "cache should populate rows"
 
 
@@ -1202,6 +1206,7 @@ def test_update_sections_caps_mac_out_of_range(tmp_path: Path, monkeypatch: pyte
 
 
 @pytest.mark.slow
+@pytest.mark.serial_timing
 def test_end_to_end_load_pipeline_under_budget(tmp_path: Path):
     """Perf smoke: 32k MAC records + 2k ranges + 625k row_bases finish prepare+compute in time."""
     import time as _time
@@ -1241,10 +1246,13 @@ def test_end_to_end_load_pipeline_under_budget(tmp_path: Path):
     assert len(prepared.mac_rows) == len(mac_records)
     # Keep the CI budget generous; the point is the pipeline finishes in seconds,
     # not the original "frozen for an hour" user reported.
-    assert elapsed < 10.0, f"end-to-end prepare too slow: {elapsed:.3f}s"
+    assert elapsed < report_margin(
+        "end-to-end load pipeline", elapsed, 10.0
+    ), f"end-to-end prepare too slow: {elapsed:.3f}s"
 
 
 @pytest.mark.slow
+@pytest.mark.serial_timing
 @pytest.mark.parametrize("load_order", ["s19_first", "mac_first"])
 def test_stress_load_s19_then_a2l_then_mac(
     tmp_path: Path, load_order: str
@@ -1330,7 +1338,9 @@ def test_stress_load_s19_then_a2l_then_mac(
 
     # Perf budget: default 20s on CI, overridable for slower hardware via env var.
     budget_s = float(os.environ.get("S19_APP_STRESS_BUDGET_S", "20.0"))
-    assert elapsed_total < budget_s, (
+    assert elapsed_total < report_margin(
+        f"stress load {load_order}", elapsed_total, budget_s
+    ), (
         f"stress load over budget: order={load_order} elapsed={elapsed_total:.2f}s "
         f"phases={phase_times}"
     )

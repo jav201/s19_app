@@ -51,6 +51,7 @@ from tests.support import b100_links
 from tests.support import b100_projects as projects
 from tests.support import b100_save_dialog as sd
 from tests.support.b100_projects import LOAD_RESULT_CLOSE
+from tests.support.timing import report_margin
 
 AT_SIZES = [(118, 54), (220, 60)]
 SAVED = "Saved project to"
@@ -334,6 +335,7 @@ def test_tc_b100_31_links_are_skipped_and_named(tmp_path: Path) -> None:
     assert all(link in lines[0] for link in links), lines
 
 
+@pytest.mark.serial_timing
 def test_tc_b100_31_junction_cycle_ends(tmp_path: Path) -> None:
     """LLR-171.1a cycle: P with the junction ``flows/loop`` → P, saved as Q
     → the save completes in under 5 s, 0 entries under ``Q/flows/loop``,
@@ -360,7 +362,7 @@ def test_tc_b100_31_junction_cycle_ends(tmp_path: Path) -> None:
     target = _workarea(base) / "Q"
     print(f"[timing] save as with a junction cycle: {elapsed:.2f} s")
     assert _saved(messages), messages
-    assert elapsed < 5.0, elapsed
+    assert elapsed < report_margin("TC-B100-31 junction cycle", elapsed, 5.0), elapsed
     assert not os.path.lexists(target / "flows" / "loop")
     assert (target / "flows" / "f1.json").is_file(), _files_in(target)
 
@@ -720,6 +722,7 @@ def test_tc_b100_31_depth_ceiling(
         assert calls == [] and not target.exists(), calls
 
 
+@pytest.mark.serial_timing
 @pytest.mark.parametrize("arm", ["10000 saved", "10001 refused"])
 def test_tc_b100_31_entry_ceiling(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str
@@ -763,7 +766,7 @@ def test_tc_b100_31_entry_ceiling(
         )
         assert len(lines) == 1, messages
         assert calls == [] and not target.exists(), calls
-        assert elapsed < 5.0, elapsed
+        assert elapsed < report_margin(f"TC-B100-31 {arm}", elapsed, 5.0), elapsed
 
 
 # ---------------------------------------------------------------------------

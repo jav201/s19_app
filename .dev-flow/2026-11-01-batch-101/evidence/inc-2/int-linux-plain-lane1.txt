@@ -1,0 +1,535 @@
+# batch-101 Inc 2 E4 corrective — LAN Linux host, ruling G-1 evidence: lane 1 with plain xdist load distribution
+# command: pytest -p no:cacheprovider -n 8 -rs -rf -m "not serial_timing"  (timeout 7200)
+# env: PYTHONDONTWRITEBYTECODE=1 PYTHONUTF8=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. USERNAME set, default basetemp, NO_COLOR unset; Python 3.11.18, pytest 9.2.0, xdist 3.8.0
+# tree: origin/main e2663953 + the Inc 2 diff at 86c8aa6, i.e. before the corrective edits (those change only the marker text, the CI lane-1 commands and the hygiene pins on them; re-verified in int-win-final2.txt)
+
+head = origin/main e2663953 + Inc 2 diff (86c8aa6)
+<HOME>/work/s19_app/s19_app/__init__.py
+ 06:16:55 up 13:00,  2 users,  load average: 0.29, 0.25, 0.23
+Mon Nov  2 12:16:55 PM UTC 2026
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0
+rootdir: <HOME>/work/s19_app
+configfile: pyproject.toml
+plugins: platformdirs-4.14.3, xdist-3.8.0
+created: 8/8 workers
+8 workers [5270 items]
+
+s..s.s...sssssssss.......s.............................s................ [  1%]
+...................ss.......s........................................... [  2%]
+...................................sss...ss.........ssss.....s......s.ss [  4%]
+s.sss...........s.............s.....s....s.ss.sss......s......sssss..... [  5%]
+.s....s.sss........................sss.....ss........................... [  6%]
+.......s............s........s..ssssss...s...ss.......sss.ss............ [  8%]
+.....ss....................ss.....s..............................ss..... [  9%]
+...s.sss....................s.....................ss.................... [ 10%]
+........................................................................ [ 12%]
+..........s..s.......................................................... [ 13%]
+..................................s...ss......s.......s.....ssssssss..s. [ 15%]
+..............s..............s......ss....................s........ss..s [ 16%]
+......................s.............................................s... [ 17%]
+.......s..........................sssss.......s......................... [ 19%]
+........................s...s....s.........s..s.......................ss [ 20%]
+ss.s.......s.....................s.............ssssssssssssss........... [ 21%]
+.................................................................s...... [ 23%]
+.............................................s.......................... [ 24%]
+............................................s............sssssss........ [ 25%]
+...........s........s...............sss................................. [ 27%]
+........................s..............................................s [ 28%]
+........................................................................ [ 30%]
+.........................................................F.............. [ 31%]
+........................................................................ [ 32%]
+........................................................................ [ 34%]
+...........s......s..................................................... [ 35%]
+........................s............................................... [ 36%]
+...s.................................................................... [ 38%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+.........................s.............................................. [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 45%]
+........................................................................ [ 46%]
+........................................................................ [ 47%]
+........................................................................ [ 49%]
+...............ss....................................................... [ 50%]
+.....................s..................................s............... [ 51%]
+........................................................................ [ 53%]
+........................................................................ [ 54%]
+........................................................................ [ 56%]
+........................................................................ [ 57%]
+........................................................................ [ 58%]
+............................................F........................... [ 60%]
+........................................................................ [ 61%]
+........................................................................ [ 62%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 66%]
+..x..................................................................... [ 68%]
+........................................................................ [ 69%]
+...x.................................................................... [ 71%]
+.............................................F.......................... [ 72%]
+........................................................................ [ 73%]
+........................................................................ [ 75%]
+........................................................................ [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 81%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+........................................................................ [ 86%]
+........................................................................ [ 87%]
+........................................................................ [ 88%]
+...............x...........sssssssssssssssssssssssssssss................ [ 90%]
+.....................................s.................................. [ 91%]
+...........F............................................................ [ 92%]
+........................................................................ [ 94%]
+..................................................x..................... [ 95%]
+...................................................FF................... [ 97%]
+........................................................................ [ 98%]
+........................................................................ [ 99%]
+..............                                                           [100%]
+=================================== FAILURES ===================================
+___________ test_tc1802_nine_md_sections_intact_tenth_section_added ____________
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+    def test_tc1802_nine_md_sections_intact_tenth_section_added() -> None:
+        """TC-1802 (the no-disturbance census): the data home holds EXACTLY
+        the nine batch-95 md-authored sections plus this one tenth key — and
+        every one of the nine is still a verbatim port of
+        ``help_sections.md`` (title + every step string), so the batch-96
+        addition disturbed nothing the batch-95 contract froze."""
+        # Named supersession (batch-97 Inc-3): the code-authored ``check_editor``
+        # section (LLR-148.6) joins the data home; it is not an md port either.
+        assert frozenset(WINDOW_HELP_SECTIONS) == _MD_AUTHORED_KEYS | {
+            SECTION_KEY,
+            "check_editor",
+            "patch",
+            "crc_designer",
+            "reports",
+            "flow",
+            # batch-97 Inc-6 (named supersession, D25 / LLR-148.6): the
+            # code-authored ``flow_execution`` section joins the data home.
+            "flow_execution",
+            # batch-97 Inc-8: the code-authored ``map`` section.
+            "map",
+        }, (
+            "the data home must hold exactly the nine md-authored sections "
+            "plus the batch-96 changes_file_notation and batch-97 check_editor "
+            "sections"
+        )
+>       md_text = _HELP_SECTIONS_MD.read_text(encoding="utf-8")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_changes_file_notation_help.py:174: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/data/miniconda3/envs/s19ci/lib/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('<HOME>/work/s19_app/prototypes/cambios_10_12_2026/help_sections.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '<HOME>/work/s19_app/prototypes/cambios_10_12_2026/help_sections.md'
+
+/data/miniconda3/envs/s19ci/lib/python3.11/pathlib.py:1044: FileNotFoundError
+____________ test_tc_b100_65_merge_names_the_active_variant_it_sets ____________
+[gw7] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-33/popen-gw7/test_tc_b100_65_merge_names_th0')
+
+    def test_tc_b100_65_merge_names_the_active_variant_it_sets(tmp_path: Path) -> None:
+        """LLR-175.4f, B11-52 (2 + 1): F-merge where ``ab`` records ``firmware``
+        and the image lands as ``firmware_1.s19`` → 1 row holding ``active
+        variant``, ``firmware_1`` and ``firmware``; after ``alt+s``
+        ``ab/project.json`` records ``active_variant == "firmware_1"``; a merge
+        whose target records no active variant → 1 row naming ``none
+        recorded``.
+    
+        Why: a merge silently switched the project's active variant
+        (UX-35). Negative control: the row omitted → 0 rows → RED; the row
+        naming the first variant by name → the after-save equality fails →
+        RED."""
+>       out = _scenario_paint(tmp_path, "merge", save=True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b100_save_dialog.py:3039: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b100_save_dialog.py:2652: in _scenario_paint
+    ctx = _scenario_prep(key, tmp_path, base)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b100_save_dialog.py:2614: in _scenario_prep
+    _save_project_from(base, "ab", [other / "firmware.s19"])
+tests/test_b100_save_dialog.py:190: in _save_project_from
+    project = asyncio.run(_drive())
+              ^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def _drive() -> Path:
+        app = S19TuiApp(base_dir=base)
+        async with app.run_test(size=(160, 50)) as pilot:
+            await pilot.pause()
+            for path in sources:
+                path = Path(path)
+                if path.suffix.lower() == ".a2l":
+                    app.load_a2l_from_path(path)
+                    done = lambda: app.current_a2l_path is not None  # noqa: E731
+                else:
+                    app._load_path_from_user_input(path)
+                    done = lambda p=path: app.current_file is not None and (  # noqa: E731
+                        app.current_file.path.name == p.name
+                        or (app.current_file.mac_path is not None and app.current_file.mac_path.name == p.name)
+                    )
+                for _ in range(400):
+                    if done():
+                        break
+                    await pilot.pause()
+                else:
+                    raise AssertionError(f"the load of {path.name} did not land")
+            app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name=name))
+            for _ in range(400):
+                if app.current_project is not None and app.current_project.casefold() == name.casefold():
+                    break
+                await pilot.pause()
+            else:
+>               raise AssertionError(f"Save project {name} did not land")
+E               AssertionError: Save project ab did not land
+
+tests/test_b100_save_dialog.py:187: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2943 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-33/popen-gw7/test_tc_b100_65_merge_names_th0/app workarea=/tmp/pytest-of-<USER>/pytest-33/popen-gw7/test_tc_b100_65_merge_names_th0/app/.s19tool/workarea
+INFO     s19tui:app.py:7957 Workarea refreshed. files=0
+INFO     s19tui:app.py:16202 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.014
+INFO     s19tui:app.py:15099 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<USER>/pytest-33/popen-gw7/test_tc_b100_65_merge_names_th0/src02_test_tc_b100_65_merge_names_th0/firmware.s19
+INFO     s19tui:app.py:15120 Load phase boundary: copy_started path=/tmp/pytest-of-<USER>/pytest-33/popen-gw7/test_tc_b100_65_merge_names_th0/src02_test_tc_b100_65_merge_names_th0/firmware.s19
+INFO     s19tui:app.py:15133 Load phase boundary: copy_done path=firmware.s19 elapsed=0.003s
+WARNING  s19tui:app.py:15152 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-33/popen-gw7/test_tc_b100_65_merge_names_th0/src02_test_tc_b100_65_merge_names_th0/firmware.s19'
+INFO     s19tui:app.py:7957 Workarea refreshed. files=1
+INFO     s19tui:app.py:15170 File copied to temp: path=/tmp/pytest-of-<USER>/pytest-33/popen-gw7/test_tc_b100_65_merge_names_th0/app/.s19tool/workarea/temp/firmware.s19 size_bytes=302 copy_seconds=0.003
+INFO     s19tui:app.py:15176 Load phase boundary: worker_spawned path=firmware.s19
+INFO     s19tui:app.py:17961 Load phase boundary: worker_parse_start path=firmware.s19
+INFO     s19tui:app.py:17421 Loading file: path=/tmp/pytest-of-<USER>/pytest-33/popen-gw7/test_tc_b100_65_merge_names_th0/app/.s19tool/workarea/temp/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:13757 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18161 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-33/popen-gw7/test_tc_b100_65_merge_names_th0/app/.s19tool/workarea/temp/firmware.s19 addresses=82 range_count=3 range_bytes=82 errors=0
+INFO     s19tui:app.py:13774 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:17980 Load phase boundary: worker_parse_done path=firmware.s19 elapsed=0.001s
+INFO     s19tui:app.py:17825 Load phase boundary: prepare_entry path=firmware.s19 file_type=s19
+INFO     s19tui:app.py:17844 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:17274 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17853 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:17873 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:17880 Load phase boundary: prepare_bases_done row_bases=6
+INFO     s19tui:app.py:17890 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:17896 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:17997 Load phase boundary: worker_compute_done path=firmware.s19 precomputed=True elapsed=0.001s
+INFO     s19tui:app.py:18004 Load phase boundary: call_from_thread_apply_dispatched path=firmware.s19
+INFO     s19tui:app.py:17679 Load phase boundary: apply_install_state path=firmware.s19 precomputed=True
+INFO     s19tui:app.py:18289 Sections updated. count=3 rendered_ranges=3 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:17695 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:17707 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19211 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.002
+INFO     s19tui:app.py:16202 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.018
+INFO     s19tui:app.py:18823 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.021
+INFO     s19tui:app.py:17720 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:20461 Request refused while busy: Loading firmware.s19
+INFO     s19tui:app.py:18516 Memory Map updated. ranges=3
+INFO     s19tui:app.py:17737 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-33/popen-gw7/test_tc_b100_65_merge_names_th0/app/.s19tool/workarea/temp/firmware.s19 file_type=s19 elapsed_seconds=1.446 has_mac=False precomputed=True
+______ test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact _______
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-33/popen-gw2/test_at_b78_03_the_palette_act0')
+
+    def test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact(
+        tmp_path: Path,
+    ) -> None:
+        """AT-B78-03 (GATE) -- the action set equals the Inc-0 ARTIFACT, not the producer.
+    
+        ⚠️ **This node was provably INERT before Inc-0 froze the artifact, and the
+        reason is worth carrying.** `CommandBar` is constructed as
+        `CommandBar(self._build_palette_entries())`, so an implementation comparing
+        the rendered palette against `_build_palette_entries()` compares a producer
+        with ITSELF: executed, the predicate stayed GREEN at `36 == 36` with a whole
+        `Binding` removed from `S19TuiApp.BINDINGS`.
+    
+        What breaks the circularity is the TEMPORAL FREEZE -- a set captured before
+        the change and read back from disk. So this reads
+        `tests/goldens/batch78/at-b78-03-palette-actions.json` and **never
+        regenerates it**; a run that rebuilds it has restored the tautology.
+        """
+        import json
+    
+        from s19_app.tui.command_bar import CommandBar
+    
+        frozen = json.loads(
+            Path("tests/goldens/batch78/at-b78-03-palette-actions.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        expected = frozen if isinstance(frozen, list) else frozen.get("actions", frozen)
+    
+        async def _drive():
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                bar = app.query_one(CommandBar)
+                await pilot.press("ctrl+k")
+                await pilot.pause()
+                rows = list(bar.query_one("#palette_list").children)
+                return [item.data for item in rows]
+    
+        observed = asyncio.run(_drive())
+    
+        # Union of both lanes' amendments to the frozen artifact (RC-1 rebase #4):
+        # batch-95 change 4 (LLR-135.6, ruling Q6/7a) hand-appended ONE action —
+        # "open_split_join_export", the palette-first Split / Join / Export screen
+        # entry — so the freeze now carries the 37 Inc-0 rows plus that one
+        # reviewed amendment (a REGENERATION would restore the tautology this
+        # node exists to break). batch-94's two non-digit rail bindings are NOT
+        # in the freeze — each is pinned as a named live-only delta below
+        # (Inc-001's Check Editor `=`; Inc-003's Flow Execution `]`, US-007).
+        assert len(expected) == 38, (
+            f"the frozen artifact must still carry the 37 Inc-0 actions plus the "
+            f"one batch-95 amendment; it has {len(expected)} -- if this fails "
+            f"the artifact was REGENERATED, which restores the tautology"
+        )
+        live_deltas = ["show_screen('check_editor')", "show_screen('flow_execution')"]
+        for added in live_deltas:
+            assert added in observed, (
+                f"a non-digit rail binding must add exactly one palette action "
+                f"({added!r}); observed={observed!r}"
+            )
+        observed_pre_change = [
+            a for a in observed if a not in live_deltas
+        ]
+        assert len(observed_pre_change) == len(observed) - len(live_deltas), (
+            "each live-only delta must appear exactly once (no duplicates)"
+        )
+>       assert observed_pre_change == list(expected), (
+            f"the pre-change palette action set must equal the Inc-0 freeze.\n"
+            f"missing: {sorted(set(expected) - set(observed_pre_change))}\n"
+            f"unexpected: {sorted(set(observed_pre_change) - set(expected))}"
+        )
+E       AssertionError: the pre-change palette action set must equal the Inc-0 freeze.
+E         missing: []
+E         unexpected: ['a2l_describe_tag', 'confirm_attention']
+E       assert ['focus_palet...us_goto', ...] == ['focus_palet...us_goto', ...]
+E         
+E         At index 13 diff: 'a2l_describe_tag' != 'view_reports'
+E         Left contains 2 more items, first extra item: 'open_settings_menu'
+E         Use -v to get more diff
+
+tests/test_tui_commandbar.py:2704: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2943 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-33/popen-gw2/test_at_b78_03_the_palette_act0 workarea=/tmp/pytest-of-<USER>/pytest-33/popen-gw2/test_at_b78_03_the_palette_act0/.s19tool/workarea
+INFO     s19tui:app.py:7957 Workarea refreshed. files=0
+INFO     s19tui:app.py:16202 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.014
+________ test_at_056e_a2b_diff_report_byte_identical_despite_selection _________
+[gw5] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-33/popen-gw5/test_at_056e_a2b_diff_report_b0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7eff3d107d50>
+
+    def test_at_056e_a2b_diff_report_byte_identical_despite_selection(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """AT-056e / LLR-054.5 (HLR-054 scope guard, Q-5 black-box arm).
+    
+        Intent: with a filter SELECTED on the report selector, the A2B diff
+        report driven through ITS shipped surface (Compare then Report on the
+        diff screen) is byte-identical (canonical form) to a no-filter A2B
+        run under the same environment pin — the sticky selection observably
+        does NOT leak into the always-complete diff report.
+        """
+        _pin_report_clocks(monkeypatch)
+    
+        def _session(root: Path, select_filter: bool) -> Dict[str, bytes]:
+            project_dir = _make_project(
+                root, "proj", filters={"f.json": _valid_filter_body()}
+            )
+    
+            async def _drive() -> Dict[str, bytes]:
+                app = S19TuiApp(base_dir=root)
+                async with app.run_test(size=(120, 40)) as pilot:
+                    await pilot.pause()
+                    await _load_project(app, pilot, "proj")
+                    if select_filter:
+                        await _select_filter_via_dropdown(app, pilot, "f.json")
+                    app.action_show_screen("diff")
+                    await pilot.pause()
+                    app.query_one("#diff_path_a", Input).value = str(
+                        project_dir / "a.s19"
+                    )
+                    app.query_one("#diff_path_b", Input).value = str(
+                        project_dir / "b.s19"
+                    )
+                    app.query_one("#diff_compare_button", Button).press()
+                    await _flush(pilot)
+                    app.query_one("#diff_report_button", Button).press()
+                    await _flush(pilot)
+                return _reports(project_dir)
+    
+            return asyncio.run(_drive())
+    
+        base_root = tmp_path / "base"
+        sel_root = tmp_path / "sel"
+        base_root.mkdir()
+        sel_root.mkdir()
+        baseline = _session(base_root, select_filter=False)
+        selected = _session(sel_root, select_filter=True)
+    
+        expected = {_DIFF_MD_NAME, _DIFF_HTML_NAME}
+>       assert set(baseline) == expected, f"baseline wrote {sorted(baseline)}"
+E       AssertionError: baseline wrote []
+E       assert set() == {'20260710T12...ff-report.md'}
+E         
+E         Extra items in the right set:
+E         '20260710T120000Z-diff-report.html'
+E         '20260710T120000Z-diff-report.md'
+E         Use -v to get more diff
+
+tests/test_tui_report_filter_surface.py:773: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2943 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-33/popen-gw5/test_at_056e_a2b_diff_report_b0/base workarea=/tmp/pytest-of-<USER>/pytest-33/popen-gw5/test_at_056e_a2b_diff_report_b0/base/.s19tool/workarea
+INFO     s19tui:app.py:7957 Workarea refreshed. files=0
+INFO     s19tui:app.py:16202 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.014
+WARNING  s19tui:app.py:13515 Project proj: no digests saved project.json (None)
+INFO     s19tui:app.py:13757 Load phase boundary: parse_branch_entry path=a.s19 suffix=.s19
+INFO     s19tui:app.py:18161 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-33/popen-gw5/test_at_056e_a2b_diff_report_b0/base/.s19tool/workarea/proj/a.s19 addresses=4 range_count=1 range_bytes=4 errors=0
+INFO     s19tui:app.py:13774 Load phase boundary: parse_branch_done path=a.s19 branch=s19
+INFO     s19tui:app.py:17679 Load phase boundary: apply_install_state path=a.s19 precomputed=False
+INFO     s19tui:app.py:13710 Project loaded. name=proj file=/tmp/pytest-of-<USER>/pytest-33/popen-gw5/test_at_056e_a2b_diff_report_b0/base/.s19tool/workarea/proj/a.s19 mac=None
+INFO     s19tui:app.py:18289 Sections updated. count=1 rendered_ranges=1 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:17695 Load phase boundary: apply_sections_done path=a.s19
+INFO     s19tui:app.py:17707 Load phase boundary: apply_hex_done path=a.s19
+INFO     s19tui:app.py:19211 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17274 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17329 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:16202 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.015
+INFO     s19tui:app.py:18823 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.017
+INFO     s19tui:app.py:17720 Load phase boundary: apply_a2l_done path=a.s19
+INFO     s19tui:app.py:18516 Memory Map updated. ranges=1
+INFO     s19tui:app.py:17737 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-33/popen-gw5/test_at_056e_a2b_diff_report_b0/base/.s19tool/workarea/proj/a.s19 file_type=s19 elapsed_seconds=0.378 has_mac=False precomputed=False
+INFO     s19tui:app.py:2943 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-33/popen-gw5/test_at_056e_a2b_diff_report_b0/sel workarea=/tmp/pytest-of-<USER>/pytest-33/popen-gw5/test_at_056e_a2b_diff_report_b0/sel/.s19tool/workarea
+INFO     s19tui:app.py:7957 Workarea refreshed. files=0
+INFO     s19tui:app.py:16202 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.013
+WARNING  s19tui:app.py:13515 Project proj: no digests saved project.json (None)
+INFO     s19tui:app.py:13757 Load phase boundary: parse_branch_entry path=a.s19 suffix=.s19
+INFO     s19tui:app.py:18161 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-33/popen-gw5/test_at_056e_a2b_diff_report_b0/sel/.s19tool/workarea/proj/a.s19 addresses=4 range_count=1 range_bytes=4 errors=0
+INFO     s19tui:app.py:13774 Load phase boundary: parse_branch_done path=a.s19 branch=s19
+INFO     s19tui:app.py:17679 Load phase boundary: apply_install_state path=a.s19 precomputed=False
+INFO     s19tui:app.py:13710 Project loaded. name=proj file=/tmp/pytest-of-<USER>/pytest-33/popen-gw5/test_at_056e_a2b_diff_report_b0/sel/.s19tool/workarea/proj/a.s19 mac=None
+INFO     s19tui:app.py:18289 Sections updated. count=1 rendered_ranges=1 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:17695 Load phase boundary: apply_sections_done path=a.s19
+INFO     s19tui:app.py:17707 Load phase boundary: apply_hex_done path=a.s19
+INFO     s19tui:app.py:19211 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17274 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17329 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:16202 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.015
+INFO     s19tui:app.py:18823 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.017
+INFO     s19tui:app.py:17720 Load phase boundary: apply_a2l_done path=a.s19
+INFO     s19tui:app.py:18516 Memory Map updated. ranges=1
+INFO     s19tui:app.py:17737 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-33/popen-gw5/test_at_056e_a2b_diff_report_b0/sel/.s19tool/workarea/proj/a.s19 file_type=s19 elapsed_seconds=0.353 has_mac=False precomputed=False
+INFO     s19tui:app.py:5858 View reports action. project=proj count=0
+INFO     s19tui:app.py:5936 Report filter selected: /tmp/pytest-of-<USER>/pytest-33/popen-gw5/test_at_056e_a2b_diff_report_b0/sel/.s19tool/workarea/proj/filters/f.json
+INFO     s19tui:screens.py:2639 ReportViewerScreen dismissed by close.
+______________ test_tc707_copy_matches_help_sections_md_verbatim _______________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+    def test_tc707_copy_matches_help_sections_md_verbatim() -> None:
+        """TC-707 (LLR-140.2, the operator-editable home): every shipped step
+        string of the nine md-authored sections is a verbatim port of
+        ``help_sections.md`` — the md is the source draft, so a drifted copy
+        edit reddens here against the source. The batch-96
+        ``changes_file_notation`` section is code-authored (not an md port);
+        it is iterated here only if it ever lands in the md, and is covered by
+        TC-1802 otherwise."""
+>       md_text = _HELP_SECTIONS_MD.read_text(encoding="utf-8")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_window_usage_help.py:214: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/data/miniconda3/envs/s19ci/lib/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('<HOME>/work/s19_app/prototypes/cambios_10_12_2026/help_sections.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '<HOME>/work/s19_app/prototypes/cambios_10_12_2026/help_sections.md'
+
+/data/miniconda3/envs/s19ci/lib/python3.11/pathlib.py:1044: FileNotFoundError
+__________________ test_tc707_numbering_generated_sequential ___________________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+    def test_tc707_numbering_generated_sequential() -> None:
+        """TC-707 (LLR-140.2, the numbered-steps voice): the rendered body's
+        paragraphs are numbered 1..N with no gap — the numbering is generated
+        at render so the operator's delete/reorder edits can never strand a
+        gap, and it matches the md's own sequential numbering per section."""
+>       md_text = _HELP_SECTIONS_MD.read_text(encoding="utf-8")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_window_usage_help.py:234: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/data/miniconda3/envs/s19ci/lib/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('<HOME>/work/s19_app/prototypes/cambios_10_12_2026/help_sections.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '<HOME>/work/s19_app/prototypes/cambios_10_12_2026/help_sections.md'
+
+/data/miniconda3/envs/s19ci/lib/python3.11/pathlib.py:1044: FileNotFoundError
+=========================== short test summary info ============================
+FAILED tests/test_changes_file_notation_help.py::test_tc1802_nine_md_sections_intact_tenth_section_added
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_merge_names_the_active_variant_it_sets
+FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+FAILED tests/test_window_usage_help.py::test_tc707_copy_matches_help_sections_md_verbatim
+FAILED tests/test_window_usage_help.py::test_tc707_numbering_generated_sequential
+===== 6 failed, 5055 passed, 205 skipped, 4 xfailed in 4014.94s (1:06:54) ======
+EXIT=1
+Mon Nov  2 01:23:50 PM UTC 2026

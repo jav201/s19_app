@@ -1,0 +1,51 @@
+# batch-101 Inc 2 E4 integration — LAN Linux host: base vs head confirmation of the 3 non-known lane-1 failures
+# each block: same commands on base (origin/main e2663953) and head (+ Inc 2 diff); PYTHONPATH=. PYTHONDONTWRITEBYTECODE=1 NO_COLOR unset
+# tc016b reads os.environ['USERNAME'] (unset in the host's ssh login shell); tc016s requires 'pytest' or a 'snapshot_public' part in the fixture path (a custom --basetemp removes it)
+
+### tree=base (e2663953)
+### tc016b, USERNAME unset (ssh login env)
+tests/test_flow_report_service.py:386: AssertionError
+1 failed in 1.61s
+### tc016b, USERNAME=$(whoami)
+.                                                                        [100%]
+1 passed in 0.38s
+### tc016s, --basetemp outside a pytest-named dir
+tests/test_tui_snapshot.py:1270: AssertionError
+1 failed in 0.38s
+### tc016s, default basetemp
+.                                                                        [100%]
+1 passed in 0.47s
+### tc_b97_23 serial run 1
+4 passed in 35.52s
+### tc_b97_23 serial run 2
+4 passed in 35.22s
+### tc_b97_23 serial run 3
+4 passed in 35.48s
+### test_b97_flow_execution.py under -n 8 --dist loadfile
+75 passed in 522.12s (0:08:42)
+### test_b97_flow_execution.py under -n 8 (default dist)
+75 passed in 119.59s (0:01:59)
+
+### tree=head (e2663953 + Inc 2 diff)
+### tc016b, USERNAME unset (ssh login env)
+tests/test_flow_report_service.py:386: AssertionError
+1 failed in 0.39s
+### tc016b, USERNAME=$(whoami)
+.                                                                        [100%]
+1 passed in 0.38s
+### tc016s, --basetemp outside a pytest-named dir
+tests/test_tui_snapshot.py:1270: AssertionError
+1 failed in 0.40s
+### tc016s, default basetemp
+.                                                                        [100%]
+1 passed in 0.38s
+### tc_b97_23 serial run 1
+4 passed in 36.45s
+### tc_b97_23 serial run 2
+4 passed in 35.81s
+### tc_b97_23 serial run 3
+4 passed in 35.85s
+### test_b97_flow_execution.py under -n 8 --dist loadfile
+75 passed in 531.61s (0:08:51)
+### test_b97_flow_execution.py under -n 8 (default dist)
+75 passed in 122.65s (0:02:02)

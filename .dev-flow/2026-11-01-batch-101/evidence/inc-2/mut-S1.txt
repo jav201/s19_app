@@ -1,0 +1,25 @@
+== E5 mutant S1 ==
+== date: 2026-11-02T13:54:53Z ==
+s19_app: <HOME>\AppData\Local\Temp\s19m2\wt\s19_app\__init__.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+______________ test_r_tst_001_serial_timing_marker_is_registered ______________
+
+    def test_r_tst_001_serial_timing_marker_is_registered() -> None:
+        proc = subprocess.run(
+            [sys.executable, "-m", "pytest", "--markers", "-p", "no:cacheprovider"],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            timeout=300,
+            env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
+        )
+        lines = [line.strip() for line in proc.stdout.splitlines()]
+>       assert MARKER_LINE in lines
+E       assert '@pytest.mark.serial_timing: a wall-clock timing arm; run apart and serially (-m serial_timing)' in ["@pytest.mark.slow: marks tests as slow perf smoke tests (deselect with -m 'not slow')", '', "@pytest.mark.snapshot: ...pytest.mark.serial_timing: serial_timing: a wall-clock timing arm; run apart and serially (-m serial_timing)', '', ...]
+
+tests\test_suite_hygiene.py:329: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_suite_hygiene.py::test_r_tst_001_serial_timing_marker_is_registered
+1 failed in 0.79s
+pytest exit: 1

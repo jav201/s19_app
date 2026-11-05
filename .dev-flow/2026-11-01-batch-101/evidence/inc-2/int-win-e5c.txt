@@ -1,0 +1,195 @@
+# batch-101 Inc 2 E5 corrective — Windows: hygiene suite + Inc 1 guards + tests/test_b100_project_check.py
+# env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<temp>/la, --basetemp <temp>/bt*, NO_COLOR unset; Windows, s19env Python 3.11.15, pytest 8.4.2
+# tree: branch b101-inc2 at ab879c8 + the E5 corrective edits (committed in the E5 corrective commit)
+
+<HOME>\Github\s19_app-b101-inc2\s19_app\__init__.py
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
+rootdir: <HOME>\Github\s19_app-b101-inc2
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collected 186 items
+
+tests\test_suite_hygiene.py ............................................ [ 23%]
+.....................                                                    [ 34%]
+tests\test_id_registry.py ............                                   [ 41%]
+tests\test_batch91_registry_hygiene.py ..                                [ 42%]
+tests\test_requirements_canon.py ...........                             [ 48%]
+tests\test_b100_project_check.py ....................................... [ 69%]
+.................................F.F....F................                [100%]
+
+================================== FAILURES ===================================
+_______ test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent ________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19e5/bt/test_tc_b100_61_sec6_5_deep_en0')
+
+    @pytest.mark.serial_timing
+    def test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent(tmp_path: Path) -> None:
+        """Inc 7 corrective SEC7-1 (the security probe A1's shape at a depth
+        the reader walks): 5 x 1 000 entries, 30 components deep, none on disk
+        and none escaping on the text. The first missing folder ends each walk
+        and is checked once per read → read, Load + panel and the variant
+        append's re-read each under 1 s; the 3 000 deep entries are kept and
+        the 2 000 nested ``files`` / ``derived_from`` keys are refused on the
+        text (100 rows + 1 counting row).
+    
+        RED (corrective-pass base): one ``resolve()`` per entry (A1: read
+        9.94 s, Load 10.74 s, append 10.64 s)."""
+        scene = _sec6_5_filesystem_scene(tmp_path, hostile.deep_missing_at_cap())
+>       _assert_sec6_5_bounded(scene)
+
+tests\test_b100_project_check.py:1106: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+scene = {'appended': 0.5901829999638721, 'load': 0.3830119000049308, 'manifest': ProjectManifest(schema_version=1, active_vari...ntries above'})], files={}, derived_from={}, unknown_keys=(), active_document=None), 'painted': 2.487892200006172, ...}
+
+    def _assert_sec6_5_bounded(scene: dict) -> None:
+        timings = {key: scene[key] for key in ("read", "load", "painted", "appended")}
+        print("SEC6-5 timings (s):", {key: round(value, 3) for key, value in timings.items()})
+        assert scene["read"] < report_margin("sec6_5 read", scene["read"], timing_bound(1.0)), timings
+        assert scene["load"] is not None and scene["load"] < report_margin(
+            "sec6_5 load", scene["load"], timing_bound(1.0)
+        ), timings
+>       assert scene["painted"] < report_margin(
+            "sec6_5 painted", scene["painted"], timing_bound(1.0)
+        ), timings
+E       AssertionError: {'appended': 0.5901829999638721, 'load': 0.3830119000049308, 'painted': 2.487892200006172, 'read': 0.24100040004123002}
+E       assert 2.487892200006172 < 1.0
+E        +  where 1.0 = report_margin('sec6_5 painted', 2.487892200006172, 1.0)
+E        +    where 1.0 = timing_bound(1.0)
+
+tests\test_b100_project_check.py:993: AssertionError
+---------------------------- Captured stdout call -----------------------------
+SEC6-5 timings (s): {'read': 0.241, 'load': 0.383, 'painted': 2.488, 'appended': 0.59}
+_____ test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling ______
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19e5/bt/test_tc_b100_61_sec6_5_distinc0')
+
+    @pytest.mark.serial_timing
+    def test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling(tmp_path: Path) -> None:
+        """Inc 7 corrective pass 2 (R2-2), the folder ceiling's worst case: 3 x
+        1 000 entries each under its own real folder, 1 000 ``files`` records
+        and 1 000 ``derived_from`` records with distinct bases (the most folder
+        and file checks the caps allow). Folder checks stop at
+        ``MANIFEST_FOLDER_CHECK_CAP`` (1 000); the 2 000 entries past it are skipped
+        unchecked and counted in one row (never silently); read, Load + panel
+        and the variant append's re-read each stay under 1 s."""
+    
+        def _folders(project_dir: Path) -> None:
+            for name in hostile.distinct_folder_names():
+                (project_dir / name).mkdir()
+                (project_dir / name / "x.json").write_text("{}", encoding="utf-8")
+    
+        scene = _sec6_5_filesystem_scene(tmp_path, hostile.distinct_folders_at_cap(), setup=_folders)
+>       _assert_sec6_5_bounded(scene)
+
+tests\test_b100_project_check.py:1160: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+scene = {'appended': 1.0165023000445217, 'load': 0.6407563999528065, 'manifest': ProjectManifest(schema_version=1, active_vari...e41e4649b934ca495991b7852b855', differ=1)}, unknown_keys=(), active_document=None), 'painted': 0.7764233000343665, ...}
+
+    def _assert_sec6_5_bounded(scene: dict) -> None:
+        timings = {key: scene[key] for key in ("read", "load", "painted", "appended")}
+        print("SEC6-5 timings (s):", {key: round(value, 3) for key, value in timings.items()})
+        assert scene["read"] < report_margin("sec6_5 read", scene["read"], timing_bound(1.0)), timings
+        assert scene["load"] is not None and scene["load"] < report_margin(
+            "sec6_5 load", scene["load"], timing_bound(1.0)
+        ), timings
+        assert scene["painted"] < report_margin(
+            "sec6_5 painted", scene["painted"], timing_bound(1.0)
+        ), timings
+>       assert scene["appended"] < report_margin(
+            "sec6_5 appended", scene["appended"], timing_bound(1.0)
+        ), timings
+E       AssertionError: {'appended': 1.0165023000445217, 'load': 0.6407563999528065, 'painted': 0.7764233000343665, 'read': 0.27703310002107173}
+E       assert 1.0165023000445217 < 1.0
+E        +  where 1.0 = report_margin('sec6_5 appended', 1.0165023000445217, 1.0)
+E        +    where 1.0 = timing_bound(1.0)
+
+tests\test_b100_project_check.py:996: AssertionError
+---------------------------- Captured stdout call -----------------------------
+SEC6-5 timings (s): {'read': 0.277, 'load': 0.641, 'painted': 0.776, 'appended': 1.017}
+___________ test_tc_b100_61_sec6_5_junction_loop_costs_one_failure ____________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19e5/bt/test_tc_b100_61_sec6_5_junctio0')
+
+    @pytest.mark.serial_timing
+    def test_tc_b100_61_sec6_5_junction_loop_costs_one_failure(tmp_path: Path) -> None:
+        """Inc 7 corrective SEC7-1 (the security probe A3): 5 x 1 000 entries
+        through ``loop``, a junction to itself. The walk refuses at the
+        junction once; every later entry is refused from the cache → read,
+        Load + panel and the append's re-read each under 1 s, 100 rows + 1.
+    
+        RED (corrective-pass base): A3 read 19.57 s."""
+        b100_links.require_junctions()
+        loops: list = []
+    
+        def _loop(project_dir: Path) -> None:
+            loops.append(projects.create_junction_loop(project_dir / "loop"))
+    
+        try:
+            scene = _sec6_5_filesystem_scene(tmp_path, hostile.junction_loop_at_cap(), setup=_loop)
+        finally:
+            for link in loops:
+                os.rmdir(link)
+>       _assert_sec6_5_bounded(scene)
+
+tests\test_b100_project_check.py:1318: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+scene = {'appended': 0.47377289994619787, 'load': 0.21646569995209575, 'manifest': ProjectManifest(schema_version=1, active_va...tries above'})], files={}, derived_from={}, unknown_keys=(), active_document=None), 'painted': 2.4918959999922663, ...}
+
+    def _assert_sec6_5_bounded(scene: dict) -> None:
+        timings = {key: scene[key] for key in ("read", "load", "painted", "appended")}
+        print("SEC6-5 timings (s):", {key: round(value, 3) for key, value in timings.items()})
+        assert scene["read"] < report_margin("sec6_5 read", scene["read"], timing_bound(1.0)), timings
+        assert scene["load"] is not None and scene["load"] < report_margin(
+            "sec6_5 load", scene["load"], timing_bound(1.0)
+        ), timings
+>       assert scene["painted"] < report_margin(
+            "sec6_5 painted", scene["painted"], timing_bound(1.0)
+        ), timings
+E       AssertionError: {'appended': 0.47377289994619787, 'load': 0.21646569995209575, 'painted': 2.4918959999922663, 'read': 0.05968980002216995}
+E       assert 2.4918959999922663 < 1.0
+E        +  where 1.0 = report_margin('sec6_5 painted', 2.4918959999922663, 1.0)
+E        +    where 1.0 = timing_bound(1.0)
+
+tests\test_b100_project_check.py:993: AssertionError
+---------------------------- Captured stdout call -----------------------------
+SEC6-5 timings (s): {'read': 0.06, 'load': 0.216, 'painted': 2.492, 'appended': 0.474}
+============================ QC-TM timing margins =============================
+LOW -149.2%  2.492 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_junction_loop_costs_one_failure
+LOW -148.8%  2.488 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+LOW -1.7%  1.017 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+LOW 6.8%  0.932 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+22.4%  0.776 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+23.7%  0.763 s / 1.000 s  TC-B100-61 cap painted  tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded
+35.9%  0.641 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+36.6%  0.634 s / 1.000 s  TC-B100-61 all-bad painted  tests/test_b100_project_check.py::test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second
+49.5%  0.202 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+51.4%  0.486 s / 1.000 s  TC-B100-61 all-bad load  tests/test_b100_project_check.py::test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second
+60.5%  0.395 s / 1.000 s  TC-B100-61 cap load  tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded
+61.7%  0.383 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+63.8%  0.362 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+64.9%  0.527 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+66.1%  0.339 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+72.3%  0.277 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+74.1%  0.259 s / 1.000 s  TC-B100-61 checks a  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+75.9%  0.241 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+78.4%  0.216 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_junction_loop_costs_one_failure
+84.6%  0.154 s / 1.000 s  TC-B100-61 sec7 serialize  tests/test_b100_project_check.py::test_tc_b100_61_sec7_r2_2_one_serialize_checks_each_name_once
+84.8%  0.152 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+85.7%  0.143 s / 1.000 s  TC-B100-61 checks d  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+87.9%  0.121 s / 1.000 s  TC-B100-61 R2-2 read  tests/test_b100_project_check.py::test_tc_b100_61_r2_2_legitimate_manifest_inside_every_cap_is_checked_whole
+92.0%  0.080 s / 1.000 s  TC-B100-61 checks e  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+94.0%  0.060 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_junction_loop_costs_one_failure
+98.3%  0.017 s / 1.000 s  TC-B100-61 checks b  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+99.1%  0.009 s / 1.000 s  TC-B100-24 assignments  tests/test_b100_project_check.py::test_tc_b100_24_assignments_75_by_1000_is_one_issue_fast
+99.3%  0.007 s / 1.000 s  TC-B100-24 declared_regions  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[declared_regions]
+99.4%  0.006 s / 1.000 s  TC-B100-24 files  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[files]
+99.4%  0.006 s / 1.000 s  TC-B100-24 gathered  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[gathered]
+99.4%  0.006 s / 1.000 s  TC-B100-24 derived_from  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[derived_from]
+99.5%  0.005 s / 1.000 s  TC-B100-24 batch  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[batch]
+QC-TM: 32 bounds, 4 under 20 % margin
+================== 3 failed, 183 passed in 365.23s (0:06:05) ==================
+EXIT=1

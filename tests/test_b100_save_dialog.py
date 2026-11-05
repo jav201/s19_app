@@ -79,6 +79,7 @@ from tests.support import b100_load_dialog as ld
 from tests.support import b100_projects as projects
 from tests.support import b100_save_dialog as sd
 from tests.support.b100_workers import settle_workers
+from tests.support.timing import report_margin
 
 ROOT = Path(__file__).resolve().parents[1]
 CASE01_DIR = ROOT / "examples" / "case_01_basic_valid"
@@ -2272,6 +2273,7 @@ def test_tc_b100_65_paint_rows_verbatim_in_order_and_refusal_empties(tmp_path: P
     assert out["refused_class"] is True and out["bold"] is True, out
 
 
+@pytest.mark.serial_timing
 def test_tc_b100_65_recompute_is_a_150ms_debounce(tmp_path: Path) -> None:
     """LLR-175.5a, S5-1, S5-3, S5-4 (3 arms): 20 keys ``a`` … ``t`` posted
     10 ms apart → ``preview`` is called at most 3 times (the debounce
@@ -2330,9 +2332,13 @@ def test_tc_b100_65_recompute_is_a_150ms_debounce(tmp_path: Path) -> None:
     out = _dialog_run(tmp_path, scene)
     assert 1 <= len(out["burst_calls"]) <= 3, out
     assert out["burst_calls"][-1] == "abcdefghijklmnopqrst", out
-    assert out["final_after"] <= 0.3, out
+    assert out["final_after"] <= report_margin(
+        "TC-B100-65 final paint", out["final_after"], 0.3
+    ), out
     assert out["q_calls"] == ["q"], out
-    assert 0.1 <= out["q_delay"] <= 0.5, out
+    assert 0.1 <= out["q_delay"] <= report_margin(
+        "TC-B100-65 q delay", out["q_delay"], 0.5
+    ), out
     assert out["two_bursts"] == ["ab", "abcd"], out
 
 
@@ -3392,6 +3398,7 @@ async def _post_keys(app, text: str, gap: float = 0.01) -> float:
     return time.monotonic()
 
 
+@pytest.mark.serial_timing
 def test_tc_b100_65_session_decided_once_per_open_case06(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """LLR-175.5, A11-01, B11-36, B11-37, B11-83 (F-case06: the 37 742 888-byte
     A2L, its S19 and MAC, 1 applied entry so the image is emitted): 1 dialog
@@ -3456,9 +3463,12 @@ def test_tc_b100_65_session_decided_once_per_open_case06(tmp_path: Path, monkeyp
     assert after_keys == at_open, (at_open, after_keys)
     assert after_save == at_open, (at_open, after_save)
     assert image_digests == [0, 0], image_digests
-    assert painted_after <= 2.0, painted_after
+    assert painted_after <= report_margin(
+        "TC-B100-65 case06 paint", painted_after, 2.0
+    ), painted_after
 
 
+@pytest.mark.serial_timing
 def test_tc_b100_65_recompute_at_most_three_of_twenty_keystrokes(tmp_path: Path) -> None:
     """LLR-175.5a (app half, 3 assertions): F-fresh, 20 keystrokes 10 ms
     apart → at most 3 calls of the app's preview for the burst, each
@@ -3491,9 +3501,10 @@ def test_tc_b100_65_recompute_at_most_three_of_twenty_keystrokes(tmp_path: Path)
 
     count, final = _run(base, scenario)
     assert 1 <= count <= 3, count
-    assert final <= 0.3, final
+    assert final <= report_margin("TC-B100-65 keystroke paint", final, 0.3), final
 
 
+@pytest.mark.serial_timing
 def test_tc_b100_65_emitting_4mib_image_recomputes_fast(tmp_path: Path) -> None:
     """LLR-175.5a 4 MiB arm, A11-01 (1 of 1): a 4 MiB S19 with 1 applied
     entry (an emitting session) → after the first summary, 20 keystrokes
@@ -3532,7 +3543,7 @@ def test_tc_b100_65_emitting_4mib_image_recomputes_fast(tmp_path: Path) -> None:
 
     final = _run(base, scenario)
     print(f"[C-QA-5] 4 MiB emitting image: final paint {final * 1000:.0f} ms after the last key")
-    assert final <= 0.3, final
+    assert final <= report_margin("TC-B100-65 4MiB paint", final, 0.3), final
 
 
 def test_tc_b100_65_first_frame_before_the_image_decision(tmp_path: Path) -> None:

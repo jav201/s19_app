@@ -1,0 +1,24 @@
+# batch-101 Inc 2 E5 corrective — F11: the AT-288 capture branch run against a temporary capture path (never the repository tree)
+# env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<temp>/la, --basetemp <temp>/bt*, NO_COLOR unset; Windows, s19env Python 3.11.15, pytest 8.4.2
+# harness:
+#   """E5 F11 harness: the AT-288 capture branch tokenizes only the Tool version line."""
+#   from pathlib import Path
+#   
+#   import tests.test_report_service as service
+#   from tests.conftest import canonical_report_bytes, large_s19  # noqa: F401  (fixture)
+#   
+#   
+#   def test_capture_branch_tokenizes_only_the_version_line(tmp_path, large_s19, monkeypatch):
+#       capture = tmp_path / "capture" / "at288.bin"
+#       monkeypatch.setattr(service, "_AT288_CAPTURE", capture)
+#       service.test_at288_report_hex_sections_identical_after_move(tmp_path / "run", large_s19)
+#       data = capture.read_bytes()
+#       assert data.count(b"<TOOL-VERSION>") == 1
+#       assert b"Tool version: <TOOL-VERSION>" in data
+#       committed = (Path(service.__file__).parent / "goldens" / "batch99" / "at288-pre-move-report.bin").read_bytes()
+#       assert canonical_report_bytes(data) == canonical_report_bytes(committed)
+
+<HOME>\Github\s19_app-b101-inc2\s19_app\__init__.py
+.                                                                        [100%]
+1 passed in 101.35s (0:01:41)
+EXIT=0

@@ -1,0 +1,29 @@
+GitHub CI run 42037470050 (pull_request, PR #212, head 379cd20) - tui-ci job, excerpts (grep of the job log; timestamps stripped)
+Successfully installed execnet-2.1.2 pytest-xdist-3.8.0
+created: 4/4 workers
+plugins: xdist-3.8.0, platformdirs-4.14.5
+--- the 6 history arms (R-TST-014) ---
+[gw3] [ 32%] PASSED tests/test_b97_flow_builder.py::test_tc_b97_19_builder_reach_guard_on_9c7beaf 
+[gw3] [ 34%] PASSED tests/test_b97_flow_builder.py::test_tc_b97_flow_css_shared_rules_byte_equal_and_section_scoped 
+[gw3] [ 34%] PASSED tests/test_b97_flow_execution.py::test_tc_b97_25_service_reach_guard_on_9c7beaf 
+[gw3] [ 34%] PASSED tests/test_b97_flow_execution.py::test_tc_b97_25_module_constant_in_english 
+[gw3] [ 36%] PASSED tests/test_b97_flow_execution.py::test_tc_b97_25_panel_constants_carry_no_spanish 
+[gw3] [ 43%] PASSED tests/test_b97_flow_execution.py::test_tc_b97_flow_execution_css_section_is_scoped 
+skip lines naming 'unavailable': 0
+--- lane summaries and failures ---
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_64_burst_on_two_waiting_lanes_confirms_one
+FAILED tests/test_b97_key_bar.py::test_tc_b97_69_page_keys_do_nothing_where_disabled
+FAILED tests/test_changes_file_notation_help.py::test_tc1802_nine_md_sections_intact_tenth_section_added
+FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+FAILED tests/test_window_usage_help.py::test_tc707_copy_matches_help_sections_md_verbatim
+FAILED tests/test_window_usage_help.py::test_tc707_numbering_generated_sequential
+===== 7 failed, 5192 passed, 204 skipped, 4 xfailed in 6988.08s (1:56:28) ======
+53 passed, 2 skipped, 5429 deselected in 346.17s (0:05:46)
+--- step times (GitHub API) ---
+job tui-ci: started 2026-11-05T13:37:57Z completed 2026-11-05T15:40:30Z
+step Run lean test suite (pull requests): failure 2026-11-05T13:38:12Z -> 2026-11-05T15:34:41Z
+step Run timing arms (pull requests): success 2026-11-05T15:34:41Z -> 2026-11-05T15:40:29Z
+step Run full test suite (pushes): skipped 2026-11-05T15:40:29Z -> 2026-11-05T15:40:29Z
+step Run timing arms (pushes): skipped 2026-11-05T15:40:29Z -> 2026-11-05T15:40:29Z
+snapshot job: failure (2 failed, 27 passed, 4 deselected) - the same 2 tc016s patch-comfortable snapshots as main run 41826394456

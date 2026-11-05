@@ -1,0 +1,36 @@
+== E5 mutant 052 ==
+== date: 2026-11-02T14:01:27Z ==
+s19_app: <HOME>\AppData\Local\Temp\s19m2\wt\s19_app\__init__.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+__________ test_r_tst_007_conventions_hold_each_test_rule[R-TST-052] __________
+
+rule_id = 'R-TST-052'
+
+    @pytest.mark.parametrize(
+        "rule_id", ["R-TST-007", "R-TST-030", "R-TST-047", "R-TST-048", "R-TST-052", "R-TST-060"]
+    )
+    def test_r_tst_007_conventions_hold_each_test_rule(rule_id) -> None:
+        text = CONVENTIONS_PATH.read_text(encoding="utf-8")
+        if rule_id == "R-TST-007":
+            assert CONVENTIONS_SECTION_TITLE in text
+            section = text.split(CONVENTIONS_SECTION_TITLE, 1)[1]
+            section = section.split("\n#", 1)[0]
+            parallel = 'pytest -n 8 -m "not serial_timing"'
+            serial = "pytest -m serial_timing"
+            assert parallel in section, "release gate parallel lane missing"
+            assert serial in section, "release gate serial lane missing"
+            assert section.index(parallel) < section.index(serial), "lanes out of order"
+            assert "LAN Linux host" in section
+        else:
+>           assert _CONVENTION_RULES[rule_id] in text, (
+                f"{rule_id} sentence missing or edited in {CONVENTIONS_PATH.name}"
+            )
+E           AssertionError: R-TST-052 sentence missing or edited in engineering-rules.md
+E           assert 'A test that waits on a painted outcome collects the lines painted since its trigger (StatusLog.since(mark)) and asserts the one it needs; it never waits on the newest line alone.' in '# s19_app — Project Engineering Rules\n\nProject- and stack-specific gates for the Textual TUI + pytest-textual-snaps...and the timing-arm census; requirements R-TST-007, 030, 047, 048,\n052, 060 and the wait/hook rows R-TST-020 … 046.)\n'
+
+tests\test_suite_hygiene.py:616: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-052]
+1 failed in 0.20s
+pytest exit: 1

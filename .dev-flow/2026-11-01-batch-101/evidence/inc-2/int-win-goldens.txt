@@ -1,0 +1,90 @@
+# batch-101 Inc 2 E4 integration — Windows (the 9 golden test files)
+# env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<temp>/la, --basetemp <temp>/bt, NO_COLOR unset; s19env Python 3.11.15, pytest 8.4.2
+# tree: branch b101-inc2 working tree (rebased on main e266395 + the E4 integration fixes)
+
+<HOME>\Github\s19_app-b101-inc2\s19_app\__init__.py
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
+rootdir: <HOME>\Github\s19_app-b101-inc2
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collected 205 items
+
+tests\test_before_after_report.py ...............                        [  7%]
+tests\test_flow_report_ac6_golden.py ...                                 [  8%]
+tests\test_report_addendum_bound.py ............................         [ 22%]
+tests\test_report_symbol_escape.py ......                                [ 25%]
+tests\test_tui_report_filter_surface.py ......F.......                   [ 32%]
+tests\test_tui_report_seam.py ............................               [ 45%]
+tests\test_report_service.py ........................................    [ 65%]
+tests\test_report_document_bound.py .................................... [ 82%]
+..                                                                       [ 83%]
+tests\test_report_producer_bound.py .................................    [100%]
+
+================================== FAILURES ===================================
+________ test_at_056e_a2b_diff_report_byte_identical_despite_selection ________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19int2/bt/test_at_056e_a2b_diff_report_b0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000021E98158090>
+
+    def test_at_056e_a2b_diff_report_byte_identical_despite_selection(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """AT-056e / LLR-054.5 (HLR-054 scope guard, Q-5 black-box arm).
+    
+        Intent: with a filter SELECTED on the report selector, the A2B diff
+        report driven through ITS shipped surface (Compare then Report on the
+        diff screen) is byte-identical (canonical form) to a no-filter A2B
+        run under the same environment pin — the sticky selection observably
+        does NOT leak into the always-complete diff report.
+        """
+        _pin_report_clocks(monkeypatch)
+    
+        def _session(root: Path, select_filter: bool) -> Dict[str, bytes]:
+            project_dir = _make_project(
+                root, "proj", filters={"f.json": _valid_filter_body()}
+            )
+    
+            async def _drive() -> Dict[str, bytes]:
+                app = S19TuiApp(base_dir=root)
+                async with app.run_test(size=(120, 40)) as pilot:
+                    await pilot.pause()
+                    await _load_project(app, pilot, "proj")
+                    if select_filter:
+                        await _select_filter_via_dropdown(app, pilot, "f.json")
+                    app.action_show_screen("diff")
+                    await pilot.pause()
+                    app.query_one("#diff_path_a", Input).value = str(
+                        project_dir / "a.s19"
+                    )
+                    app.query_one("#diff_path_b", Input).value = str(
+                        project_dir / "b.s19"
+                    )
+                    app.query_one("#diff_compare_button", Button).press()
+                    await _flush(pilot)
+                    app.query_one("#diff_report_button", Button).press()
+                    await _flush(pilot)
+                return _reports(project_dir)
+    
+            return asyncio.run(_drive())
+    
+        base_root = tmp_path / "base"
+        sel_root = tmp_path / "sel"
+        base_root.mkdir()
+        sel_root.mkdir()
+        baseline = _session(base_root, select_filter=False)
+        selected = _session(sel_root, select_filter=True)
+    
+        expected = {_DIFF_MD_NAME, _DIFF_HTML_NAME}
+>       assert set(baseline) == expected, f"baseline wrote {sorted(baseline)}"
+E       AssertionError: baseline wrote []
+E       assert set() == {'20260710T12...ff-report.md'}
+E         
+E         Extra items in the right set:
+E         '20260710T120000Z-diff-report.md'
+E         '20260710T120000Z-diff-report.html'
+E         Use -v to get more diff
+
+tests\test_tui_report_filter_surface.py:773: AssertionError
+================== 1 failed, 204 passed in 387.09s (0:06:27) ==================
+EXIT=1

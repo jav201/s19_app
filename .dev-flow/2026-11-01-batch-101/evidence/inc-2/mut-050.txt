@@ -1,0 +1,36 @@
+== E5 mutant 050 ==
+== date: 2026-11-02T14:16:29Z ==
+s19_app: <HOME>\AppData\Local\Temp\s19m2\wt\s19_app\__init__.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____________ test_r_tst_050_status_log_keeps_every_painted_line ______________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m2/bt/050/test_r_tst_050_status_log_keep0')
+
+    def test_r_tst_050_status_log_keeps_every_painted_line(tmp_path) -> None:
+        from tests.support import b100_projects as projects
+        from tests.support import suite_census
+    
+        seen = {}
+    
+        async def scenario(app, pilot, log):
+            mark = len(log.messages)
+            for i in range(1, 7):
+                app.set_status(f"line {i}")
+            seen["since"] = list(log.since(mark))
+            seen["app_log_lines"] = len(list(app.log_lines))
+    
+        projects.run_app(tmp_path / "app", scenario)
+>       assert seen["since"] == [f"line {i}" for i in range(1, 7)], seen
+E       AssertionError: {'app_log_lines': 4, 'since': ['line 3', 'line 4', 'line 5', 'line 6']}
+E       assert ['line 3', 'l... 5', 'line 6'] == ['line 1', 'l... 5', 'line 6']
+E         
+E         At index 0 diff: 'line 3' != 'line 1'
+E         Right contains 2 more items, first extra item: 'line 5'
+E         Use -v to get more diff
+
+tests\test_suite_hygiene.py:1459: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_suite_hygiene.py::test_r_tst_050_status_log_keeps_every_painted_line
+1 failed in 1.87s
+pytest exit: 1

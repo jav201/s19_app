@@ -27,6 +27,8 @@ from __future__ import annotations
 import time
 from pathlib import Path
 
+import pytest
+
 from s19_app.tui.a2l import (
     DATATYPE_SIZES,
     MAX_A2L_DECODE_BYTES,
@@ -42,6 +44,7 @@ from s19_app.tui.services.a2l_service import enrich_tags_and_render
 from s19_app.validation.model import ValidationSeverity
 
 from tests.test_a2l_inline_axis_length import _demo_char, _write_a2l  # M5: reuse, no dup
+from tests.support.timing import report_margin
 
 # The §2.5 primary fixture — a CURVE with an inline STD_AXIS (MaxAxisPoints=2) and
 # a RECORD_LAYOUT declaring two alignment classes (WORD + LONG). Packed span 13;
@@ -229,6 +232,7 @@ def test_at119_no_trailing_pad_length_17(tmp_path: Path) -> None:
     assert tag["length"] == 17
 
 
+@pytest.mark.serial_timing
 def test_at120_oversized_alignment_layout_clamps_to_none(tmp_path: Path) -> None:
     """AT-120 (DoS) — oversized axis + declared alignment → None, completes fast.
 
@@ -248,7 +252,7 @@ def test_at120_oversized_alignment_layout_clamps_to_none(tmp_path: Path) -> None
     )
     elapsed = time.perf_counter() - started
     assert tag["length"] is None
-    assert elapsed < 2.0
+    assert elapsed < report_margin("AT120", elapsed, 2.0)
 
 
 def test_at122_hostile_alignment_value_forces_none(tmp_path: Path) -> None:
@@ -383,6 +387,7 @@ def test_tc148_mod_common_excluded_and_unmodeled_forces_none() -> None:
     assert _collect_declared_alignments([]) == {}
 
 
+@pytest.mark.serial_timing
 def test_tc149_dos_clamp_includes_padding() -> None:
     """TC-149 (LLR-A56.5) — the padded running total clamps to None via the byte cap, <1s.
 
@@ -397,7 +402,7 @@ def test_tc149_dos_clamp_includes_padding() -> None:
     )
     elapsed = time.perf_counter() - started
     assert huge is None
-    assert elapsed < 1.0
+    assert elapsed < report_margin("TC149", elapsed, 1.0)
 
 
 def test_tc150_no_trailing_pad_r_c() -> None:

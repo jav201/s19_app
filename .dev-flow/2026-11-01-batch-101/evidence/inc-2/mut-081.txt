@@ -1,0 +1,378 @@
+== E5 mutant 081 ==
+== date: 2026-11-02T14:17:24Z ==
+s19_app: <HOME>\AppData\Local\Temp\s19m2\wt\s19_app\__init__.py
+FFFFFFF                                                                  [100%]
+================================== FAILURES ===================================
+______ test_at_054b_no_filter_bkey_report_pair_byte_identical_to_golden _______
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m2/bt/081/test_at_054b_no_filter_bkey_re0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FADDFA39D0>
+
+    def test_at_054b_no_filter_bkey_report_pair_byte_identical_to_golden(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """AT-054b / LLR-054.4 (HLR-054): with NO filter selected, the shipped
+        ``b``-key flow writes an MD+HTML pair byte-identical to the goldens
+        captured at the batch base revision ``79699a5`` under the declared
+        environment pin.
+    
+        Intent: the batch-35 guard golden — every later increment must keep the
+        unfiltered before/after output byte-for-byte untouched; any generator
+        byte drift flips this equality RED.
+    
+        Environment pin (test-side monkeypatch on SERVICE module attributes,
+        never a shipped-path change):
+        - ``s19_app.tui.services.diff_report_service._default_now`` -> fixed
+          2026-07-10T12:00:00Z — the default-clock seam BOTH generators resolve
+          when the handler passes no ``now_fn`` (``app.py`` passes none;
+          ``before_after_service`` forwards ``now_fn=None`` untouched).
+        - ``s19_app.tui.changes.apply.datetime`` -> :class:`_FixedApplyDatetime`
+          — the apply-stamp clock (inline default at ``apply.py:313-314``, no
+          ``_default_now`` symbol exists there) whose stamp is printed as the
+          ``Applied (UTC)`` report line.
+        Comparison runs on :func:`canonical_report_bytes` (CRLF undo +
+        per-run tmp-root tokenization); all other bytes are compared exact.
+        Goldens: ``tests/goldens/batch35/at054b-before-after-report.{md,html}``.
+        Double-proof (batch-24 control): a one-byte golden perturbation makes
+        this AT RED — captured in increment-000.md.
+        """
+        written = _drive_bkey_report_pair(tmp_path, monkeypatch)
+    
+        md_name = "20260710T120000Z-before-after-report.md"
+        html_name = "20260710T120000Z-before-after-report.html"
+        assert sorted(written) == [html_name, md_name], (
+            f"AT-054b: expected exactly the pinned-clock MD+HTML pair, "
+            f"got {sorted(written)}"
+        )
+    
+        for label, name, golden_path in (
+            ("md", md_name, _AT054B_MD_GOLDEN),
+            ("html", html_name, _AT054B_HTML_GOLDEN),
+        ):
+            assert golden_path.is_file(), (
+                f"AT-054b: golden fixture missing: {golden_path} (captured in "
+                f"batch-35 increment-000 at base revision 79699a5)"
+            )
+            observed = canonical_report_bytes(written[name], tmp_path)
+            golden = canonical_report_bytes(golden_path.read_bytes())
+>           assert observed == golden, (
+                f"AT-054b: unfiltered {label} report bytes drifted from golden "
+                f"{golden_path.name} (LLR-054.4 byte-identity, canonical form)"
+            )
+E           AssertionError: AT-054b: unfiltered md report bytes drifted from golden at054b-before-after-report.md (LLR-054.4 byte-identity, canonical form)
+E           assert b'# Diff repo........|\n```\n' == b'# Diff repo........|\n```\n'
+E             
+E             At index 76 diff: b'1' != b'<'
+E             Use -v to get more diff
+
+tests\test_before_after_report.py:905: AssertionError
+_______ test_at_055b_no_filter_generate_report_byte_identical_to_golden _______
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m2/bt/081/test_at_055b_no_filter_generat0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FAE6793BD0>
+
+    def test_at_055b_no_filter_generate_report_byte_identical_to_golden(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """AT-055b / LLR-055.3 (HLR-055): with NO filter selected, the shipped
+        Generate flow writes a project report byte-identical to the golden
+        captured at the batch base revision ``79699a5`` under the declared
+        environment pin.
+    
+        Intent: the batch-35 guard golden — every later increment must keep the
+        unfiltered project-report output byte-for-byte untouched; any generator
+        byte drift flips this equality RED.
+    
+        Environment pin (test-side monkeypatch on the SERVICE module attribute,
+        never a shipped-path change):
+        - ``s19_app.tui.services.report_service._default_now`` -> fixed
+          2026-07-10T12:00:00Z — the ``NowFn`` default-clock seam
+          (``report_service.py:125-140``) ``generate_project_report`` resolves
+          when no ``now_fn`` is passed (the shipped worker passes none).
+        Comparison runs on :func:`canonical_report_bytes` (CRLF undo +
+        per-run tmp-root tokenization); all other bytes are compared exact.
+        Golden: ``tests/goldens/batch35/at055b-project-report.md``.
+        Double-proof (batch-24 control): a one-byte golden perturbation makes
+        this AT RED — captured in increment-000.md.
+        """
+        written = _drive_generate_report_bytes(tmp_path, monkeypatch)
+    
+        report_name = "20260710T120000Z-report.md"
+        assert sorted(written) == [report_name], (
+            f"AT-055b: expected exactly the pinned-clock report file, "
+            f"got {sorted(written)}"
+        )
+        assert _AT055B_GOLDEN.is_file(), (
+            f"AT-055b: golden fixture missing: {_AT055B_GOLDEN} (captured in "
+            f"batch-35 increment-000 at base revision 79699a5)"
+        )
+        observed = canonical_report_bytes(written[report_name], tmp_path)
+        golden = canonical_report_bytes(_AT055B_GOLDEN.read_bytes())
+>       assert observed == golden, (
+            f"AT-055b: unfiltered project-report bytes drifted from golden "
+            f"{_AT055B_GOLDEN.name} (LLR-055.3 byte-identity, canonical form)"
+        )
+E       AssertionError: AT-055b: unfiltered project-report bytes drifted from golden at055b-project-report.md (LLR-055.3 byte-identity, canonical form)
+E       assert b'# Project r...confidence)\n' == b'# Project r...confidence)\n'
+E         
+E         At index 101 diff: b'1' != b'<'
+E         Use -v to get more diff
+
+tests\test_tui_report_seam.py:1420: AssertionError
+_____ test_at196_below_bound_report_is_byte_identical_to_the_inc1_golden ______
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m2/bt/081/test_at196_below_bound_report_0')
+
+    def test_at196_below_bound_report_is_byte_identical_to_the_inc1_golden(
+        tmp_path: Path,
+    ) -> None:
+        """AT-196 / LLR-103.4 / US-B64-1 — while no admission cap has fired, the
+        report the shipped surface writes is byte-identical, under
+        ``canonical_report_bytes``, to the golden captured at Inc-1.
+    
+        Six shapes ship: the architect lane's ``(R,V,E)`` = ``(1,1,1)``,
+        ``(3,2,5)``, ``(2,3,66)``, ``(1,1,0)``, ``(1,1,200)`` plus the qa lane's
+        hostile ``FIX-GOLD`` (overlapping + nested + inclusive-edge + empty
+        regions, escapable variant ids, ``S = 2``, check results).
+    
+        Intent: ``_addendum_lines`` has ZERO direct tests today (inherited finding
+        #9) and ``tests/goldens/batch35/at055b-project-report.md`` contains **0**
+        addendum bytes, so nothing protects a structural rewrite from silent
+        drift. This is the arm batch-63 dropped (its D-2) and the one both of its
+        Phase-1 lanes independently converged on.
+    
+        Expected at Inc-1: **GREEN — a regression guard, by construction.** The
+        golden is captured FROM the code under test, so it cannot be RED here
+        without manufacturing one. Its detection power is carried by the Inc-2
+        mutant arms the spec requires reproduced against the IMPLEMENTED producer:
+        ``FIX-B`` (per-class bucket concatenation), ``FIX-E`` (raw ``range_index``
+        membership without coalescing), ``FIX-G`` (a spurious notice below the
+        bound) — all three executed RED on ``FIX-GOLD``.
+        """
+        documents = _golden_documents()
+        shapes = _golden_shapes()
+        assert set(documents) == set(shapes), (
+            f"AT-196: golden shapes {sorted(documents)} do not match the fixture "
+            f"shapes {sorted(shapes)}"
+        )
+        for name in shapes:
+            observed = _canonical_shape_bytes(tmp_path, name)
+>           assert observed == documents[name], (
+                f"AT-196: shape {name} drifted from the Inc-1 golden "
+                f"{_GOLDEN.name} (LLR-103.4 byte identity, canonical form); "
+                f"observed {len(observed)} bytes vs golden "
+                f"{len(documents[name])} bytes"
+            )
+E           AssertionError: AT-196: shape R1V1E1 drifted from the Inc-1 golden addendum-below-bound.md (LLR-103.4 byte identity, canonical form); observed 2869 bytes vs golden 2875 bytes
+E           assert b'# Project r...variant v0)\n' == b'# Project r...variant v0)\n'
+E             
+E             At index 101 diff: b'1' != b'<'
+E             Use -v to get more diff
+
+tests\test_report_addendum_bound.py:1393: AssertionError
+_____ test_at247_under_cap_report_is_byte_identical_to_the_shipped_output _____
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m2/bt/081/test_at247_under_cap_report_is0')
+
+    def test_at247_under_cap_report_is_byte_identical_to_the_shipped_output(
+        tmp_path: Path,
+    ) -> None:
+        """AT-247 — an under-cap, in-domain, sub-width report does not change.
+    
+        Intent: the bounds must be invisible where they do not fire. The golden was
+        captured at Inc-0 from the SHIPPED producer, in its own commit, so it
+        cannot certify the rewrite against itself (C-12).
+        """
+        root = tmp_path / "proj"
+        root.mkdir(parents=True, exist_ok=True)
+        path = generate_project_report(
+            root,
+            build_results(),
+            ReportOptions(),
+            variant_set=variant_set(),
+            now_fn=lambda: _CONTROL_INSTANT,
+        )
+    
+        assert _GOLDEN.exists(), f"the Inc-0 golden is missing at {_GOLDEN}"
+        produced = canonical_report_bytes(path.read_bytes(), tmp_path)
+        stored = canonical_report_bytes(_GOLDEN.read_bytes(), None)
+>       assert produced == stored, (
+            "the under-cap report drifted from the Inc-0 golden — the bound fired "
+            "where it must not, or the untruncated rendering changed"
+        )
+E       AssertionError: the under-cap report drifted from the Inc-0 golden — the bound fired where it must not, or the untruncated rendering changed
+E       assert b'# Project r...t computed.\n' == b'# Project r...t computed.\n'
+E         
+E         At index 101 diff: b'1' != b'<'
+E         Use -v to get more diff
+
+tests\test_report_producer_bound.py:623: AssertionError
+____ test_at256_pin_under_cap_report_is_byte_identical_to_the_inc0_golden _____
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m2/bt/081/test_at256_pin_under_cap_repor0')
+
+    def test_at256_pin_under_cap_report_is_byte_identical_to_the_inc0_golden(
+        tmp_path: Path,
+    ) -> None:
+        """AT-256 (PIN) — the bound is INVISIBLE where it does not fire.
+    
+        The golden was captured at Inc-0 from the SHIPPED producer, in its own
+        commit, so it cannot certify this rewrite against itself (C-12). The fixture
+        is duplicated verbatim from that capture script; drift makes this node fail,
+        which is the correct signal.
+        """
+        results = _inc0_fixture()
+        root = tmp_path / "proj"
+        root.mkdir(parents=True, exist_ok=True)
+        path = generate_project_report(
+            root,
+            results,
+            ReportOptions(),
+            variant_set=_inc0_variant_set(),
+            now_fn=lambda: _INSTANT,
+        )
+        assert _GOLDEN.exists(), f"the Inc-0 golden is missing at {_GOLDEN}"
+        produced = canonical_report_bytes(path.read_bytes(), tmp_path)
+        stored = canonical_report_bytes(_GOLDEN.read_bytes(), None)
+>       assert produced == stored, (
+            "the under-cap report drifted from the Inc-0 golden — the gate fired "
+            "where it must not"
+        )
+E       AssertionError: the under-cap report drifted from the Inc-0 golden — the gate fired where it must not
+E       assert b'# Project r...1 window(s)\n' == b'# Project r...1 window(s)\n'
+E         
+E         At index 101 diff: b'1' != b'<'
+E         Use -v to get more diff
+
+tests\test_report_document_bound.py:621: AssertionError
+_____________ test_at288_report_hex_sections_identical_after_move _____________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m2/bt/081/test_at288_report_hex_sections0')
+large_s19 = WindowsPath('<HOME>/AppData/Local/Temp/s19m2/bt/081/test_at288_report_hex_sections0/stress.s19')
+
+    def test_at288_report_hex_sections_identical_after_move(
+        tmp_path: Path, large_s19: Path
+    ) -> None:
+        """AT-288 — report hex sections byte-identical across the hexview move.
+    
+        Intent: HLR-001 acceptance — the report service end-to-end over the
+        ``large_s19`` fixture (200 ranges x 4 KB, ``make_large_s19``), driving
+        non-default parameters through the surface per F-QA-5 as re-chartered by
+        QA-PDR-1 (LED-…92.13): a modified region at the tail of fixture range 0
+        with a non-default ``context_bytes`` (0x200, default 0x40) so the emitted
+        ``row_bases`` window spans the fixture gap into disjoint fixture range 1.
+        The report path calls the plain ``render_hex_view`` (report_service:590
+        verifies the Text-variant parameters are NOT driveable), so the oracle
+        exercises the moved functions ``build_mem_map_s19`` (via
+        ``load_service.build_loaded_s19``), ``build_row_bases`` and
+        ``render_hex_view`` themselves. Protocol (PDR §1): on the base tree the
+        capture is ABSENT and the node stores the emitted bytes; after the move
+        the capture EXISTS and the node asserts byte-equality with it.
+        """
+        from s19_app.core import S19File as _Parser
+        from s19_app.tui.services.load_service import build_loaded_s19
+    
+        # Fixture geometry (conftest.make_large_s19 defaults): range i is
+        # [BASE + i*STRIDE, BASE + i*STRIDE + RANGE_LEN); the ranges are disjoint
+        # with a 0x100-byte unmapped gap between them.
+        base = 0x0800_0000
+        range_len = 0x1000
+        gap = 0x100
+        stride = range_len + gap
+        range0_end = base + range_len  # 0x08001000 (exclusive)
+        range1_start = base + stride  # 0x08001100 (inclusive)
+    
+        context_bytes = 0x200  # non-default (REPORT_CONTEXT_BYTES_DEFAULT == 64)
+        region_start = range0_end - 16  # tail 16 bytes of fixture range 0
+    
+        loaded = build_loaded_s19(large_s19, _Parser(str(large_s19)), None, None)
+        entries = [_applied_entry(region_start, (0x00, 0x00), (0xAA, 0xBB))]
+        # LLR-007.8: ``mem_map`` rides the result as the POST-change map.
+        post_change_map = dict(loaded.mem_map)
+        post_change_map[region_start] = 0xAA
+        post_change_map[region_start + 1] = 0xBB
+        result = VariantExecutionResult(
+            variant_id="stress",
+            status="ok",
+            change_summaries=[_summary(entries)],
+            mem_map=post_change_map,
+        )
+        path = generate_project_report(
+            tmp_path,
+            [result],
+            ReportOptions(context_bytes=context_bytes),
+            variant_set=_variant_set("stress"),
+            now_fn=_fixed_clock,
+        )
+        emitted = path.read_bytes()
+    
+        # --- driveable non-default parameters asserted on the EMITTED form ---
+        low = (region_start - context_bytes) // 16 * 16
+        high = (range0_end + context_bytes + 15) // 16 * 16
+        text = emitted.decode("utf-8")
+        window_header = f"Window 0x{low:08X}-0x{high:08X}:"
+        assert window_header in text, (
+            f"AT-288: the emitted window header {window_header!r} must be present"
+        )
+        assert "- Context bytes: 512" in text  # non-default context drove through
+        # The window must span >=2 disjoint fixture ranges: it ends past the end
+        # of range 0 and reaches into range 1 across the unmapped gap.
+        assert low < range0_end < range1_start < high, (
+            "AT-288: the row_bases window must span the gap between two disjoint "
+            "fixture ranges"
+        )
+        gap_row = f"0x{range0_end:08X}"
+        assert gap_row in text, "AT-288: the unmapped gap row must be emitted"
+        gap_line = next(ln for ln in text.splitlines() if ln.startswith(gap_row))
+        assert gap_line.endswith("|................|"), (
+            "AT-288: the gap row renders 16 unmapped byte cells"
+        )
+        range1_row = f"0x{range1_start:08X}"
+        assert range1_row in text, (
+            "AT-288: mapped rows of disjoint fixture range 1 must be emitted"
+        )
+        # The patched bytes of the region itself are in the dump.
+        region_row = f"0x{region_start:08X}"
+        assert region_row in text
+        region_line = next(ln for ln in text.splitlines() if ln.startswith(region_row))
+        assert "AA BB" in region_line
+    
+        # --- the pinned byte-identity oracle ---
+        if _AT288_CAPTURE.exists():
+            pinned = _AT288_CAPTURE.read_bytes()
+>           assert emitted == canonical_report_bytes(pinned), (
+                "AT-288: post-move report bytes differ from the pinned pre-move "
+                "capture — the hexview move is NOT byte-identical"
+            )
+E           AssertionError: AT-288: post-move report bytes differ from the pinned pre-move capture — the hexview move is NOT byte-identical
+E           assert b'# Project r...4 window(s)\n' == b'# Project r...4 window(s)\n'
+E             
+E             At index 101 diff: b'1' != b'<'
+E             Use -v to get more diff
+
+tests\test_report_service.py:1767: AssertionError
+_______________ test_r_tst_081_golden_takes_the_package_version _______________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FAE6F2F790>
+
+    def test_r_tst_081_golden_takes_the_package_version(monkeypatch) -> None:
+        import s19_app.version
+    
+        from tests.conftest import canonical_report_bytes
+    
+        monkeypatch.setattr(s19_app.version, "__version__", "9.9.9")
+        out = canonical_report_bytes(b"- Tool version: <TOOL-VERSION>\n")
+>       assert b"Tool version: 9.9.9" in out
+E       AssertionError: assert b'Tool version: 9.9.9' in b'- Tool version: <TOOL-VERSION>\n'
+
+tests\test_suite_hygiene.py:1638: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_before_after_report.py::test_at_054b_no_filter_bkey_report_pair_byte_identical_to_golden
+FAILED tests/test_tui_report_seam.py::test_at_055b_no_filter_generate_report_byte_identical_to_golden
+FAILED tests/test_report_addendum_bound.py::test_at196_below_bound_report_is_byte_identical_to_the_inc1_golden
+FAILED tests/test_report_producer_bound.py::test_at247_under_cap_report_is_byte_identical_to_the_shipped_output
+FAILED tests/test_report_document_bound.py::test_at256_pin_under_cap_report_is_byte_identical_to_the_inc0_golden
+FAILED tests/test_report_service.py::test_at288_report_hex_sections_identical_after_move
+FAILED tests/test_suite_hygiene.py::test_r_tst_081_golden_takes_the_package_version
+7 failed in 12.72s
+pytest exit: 1

@@ -1,0 +1,30 @@
+== E5 mutant 021 ==
+== date: 2026-11-02T14:05:00Z ==
+s19_app: <HOME>\AppData\Local\Temp\s19m2\wt\s19_app\__init__.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+______________ test_r_tst_021_shared_wait_yields_between_checks _______________
+
+    def test_r_tst_021_shared_wait_yields_between_checks() -> None:
+        from tests.support import timing as timing_support
+    
+        pilot = _FakePilot()
+        checks = {"n": 0}
+    
+        def _predicate():
+            checks["n"] += 1
+            return False
+    
+        with pytest.raises(AssertionError, match="never"):
+            asyncio.run(timing_support.wait_until(pilot, _predicate, "never", timeout=1.0))
+>       assert checks["n"] <= 21, (
+            f"a yielding wait must run at most 21 checks over 1.0 s, got {checks['n']}"
+        )
+E       AssertionError: a yielding wait must run at most 21 checks over 1.0 s, got 5214775
+E       assert 5214775 <= 21
+
+tests\test_suite_hygiene.py:909: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_suite_hygiene.py::test_r_tst_021_shared_wait_yields_between_checks
+1 failed in 1.20s
+pytest exit: 1

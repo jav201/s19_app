@@ -1042,7 +1042,7 @@ def _golden_documents() -> Dict[str, bytes]:
         f"byte-identity golden missing: {_GOLDEN} — captured in batch-64 "
         f"increment-001 from the SHIPPED producer at base revision 082ada9"
     )
-    raw = _GOLDEN.read_bytes().replace(b"\r\n", b"\n").decode("utf-8")
+    raw = canonical_report_bytes(_GOLDEN.read_bytes()).decode("utf-8")
     marks = list(_GOLDEN_DELIM_RE.finditer(raw))
     assert marks, f"golden {_GOLDEN.name} carries no shape delimiter"
     documents: Dict[str, bytes] = {}

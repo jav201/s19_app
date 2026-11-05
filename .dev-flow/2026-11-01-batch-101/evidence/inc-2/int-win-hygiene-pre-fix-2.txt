@@ -1,0 +1,36 @@
+# batch-101 Inc 2 E4 integration — Windows (tests/test_suite_hygiene.py, after F-1 (F-2/F-3 visible))
+# env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<temp>/la, --basetemp <temp>/bt, NO_COLOR unset; s19env Python 3.11.15, pytest 8.4.2
+# tree: as above + pyproject.toml F-1
+
+<HOME>\Github\s19_app-b101-inc2\s19_app\__init__.py
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
+rootdir: <HOME>\Github\s19_app-b101-inc2
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collected 54 items
+
+tests\test_suite_hygiene.py ........................................F... [ 81%]
+..........                                                               [100%]
+
+================================== FAILURES ===================================
+________ test_r_tst_031_032_post_press_and_dwell_arms_keep_their_forms ________
+
+    def test_r_tst_031_032_post_press_and_dwell_arms_keep_their_forms() -> None:
+        from tests.support import suite_census
+    
+        workers_text = (TESTS_ROOT / "test_b100_workers.py").read_text(encoding="utf-8")
+        quit_body = _function_source(
+            workers_text,
+            "test_at_b100_18_quit_confirm_half_slow_save_as_leaves_no_partial_folder",
+        )
+>       assert "held_save_scene" in quit_body
+E       assert 'held_save_scene' in 'def test_at_b100_18_quit_confirm_half_slow_save_as_leaves_no_partial_folder(tmp_path: Path, monkeypatch) -> None:\n  ...= projects.file_records(target), "S9 is a partial project"\n    assert len(list((target / "flows").iterdir())) == 2000'
+
+tests\test_suite_hygiene.py:1123: AssertionError
+============================ QC-TM timing margins =============================
+47.0%  0.212 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+65.9%  0.511 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 2 bounds, 0 under 20 % margin
+================== 1 failed, 53 passed in 123.38s (0:02:03) ===================
+EXIT=1

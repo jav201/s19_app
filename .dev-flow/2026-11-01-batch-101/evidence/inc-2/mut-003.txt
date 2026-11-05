@@ -1,0 +1,58 @@
+== E5 mutant 003 ==
+== date: 2026-11-02T13:55:54Z ==
+s19_app: <HOME>\AppData\Local\Temp\s19m2\wt\s19_app\__init__.py
+FF                                                                       [100%]
+================================== FAILURES ===================================
+_______________ test_r_tst_003_an_unmarked_timing_arm_is_named ________________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m2/bt/003/test_r_tst_003_an_unmarked_tim0')
+
+    def test_r_tst_003_an_unmarked_timing_arm_is_named(tmp_path) -> None:
+        from tests.support import suite_census
+    
+        planted = tmp_path / "test_unmarked_arm.py"
+        planted.write_text(_PLANTED_UNMARKED_ARM, encoding="utf-8")
+        arms = suite_census.timing_arms(tmp_path)
+        keys = [key for key in arms if key.endswith("::test_x")]
+        assert len(keys) == 1, f"planted arm not detected exactly once: {arms}"
+        assert len(arms) == 1, f"unexpected extra arms: {arms}"
+        marked, refusals = _marked_set(tmp_path)
+        assert not refusals
+        guard_lines = _marker_guard_lines(set(arms), set(), marked)
+>       assert guard_lines == [f"timing arm without serial_timing: {keys[0]}"]
+E       AssertionError: assert [] == ['timing arm ...m.py::test_x']
+E         
+E         Right contains one more item: 'timing arm without serial_timing: test_r_tst_003_an_unmarked_tim0/test_unmarked_arm.py::test_x'
+E         Use -v to get more diff
+
+tests\test_suite_hygiene.py:413: AssertionError
+__________________ test_r_tst_004_a_marked_non_arm_is_named ___________________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m2/bt/003/test_r_tst_004_a_marked_non_ar0')
+
+    def test_r_tst_004_a_marked_non_arm_is_named(tmp_path) -> None:
+        from tests.support import suite_census
+    
+        planted = tmp_path / "test_marked_non_arm.py"
+        planted.write_text(_PLANTED_MARKED_NON_ARM, encoding="utf-8")
+        arms = suite_census.timing_arms(tmp_path)
+        assert arms == {}, f"non-arm reported as arm: {arms}"
+        marked, refusals = _marked_set(tmp_path)
+        assert not refusals
+        guard_lines = _marker_guard_lines(set(arms), set(), marked)
+        keys = sorted(marked)
+        assert len(keys) == 1
+>       assert guard_lines == [
+            f"serial_timing on a test that is not a timing arm: {keys[0]}"
+        ]
+E       AssertionError: assert [] == ['serial_timi...m.py::test_y']
+E         
+E         Right contains one more item: 'serial_timing on a test that is not a timing arm: tests/test_marked_non_arm.py::test_y'
+E         Use -v to get more diff
+
+tests\test_suite_hygiene.py:428: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_suite_hygiene.py::test_r_tst_003_an_unmarked_timing_arm_is_named
+FAILED tests/test_suite_hygiene.py::test_r_tst_004_a_marked_non_arm_is_named
+2 failed in 0.25s
+pytest exit: 1

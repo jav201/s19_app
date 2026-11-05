@@ -1,0 +1,90 @@
+# batch-101 Inc 2 E5 corrective — mutant re-run in a detached copy (removed afterwards)
+# env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<temp>/la, --basetemp <temp>/bt*, NO_COLOR unset; Windows, s19env Python 3.11.15, pytest 8.4.2
+
+== E5 corrective re-run of mutant M-040/4 ==
+== date: 2026-11-02T14:22:13Z ==
+tree: b101-inc2 HEAD ab879c8 + the E5 corrective diff (detached copy)
+s19_app: <HOME>\AppData\Local\Temp\s19e5\wt-mut\s19_app\__init__.py
+-- unmutated: the four 040/041 nodes
+....                                                                     [100%]
+4 passed, 61 deselected in 60.78s (0:01:00)
+pytest exit: 0
+mutant applied: IfExp no longer propagates INTERVAL (census _Unit.classify)
+-- mutated: the same four nodes
+.F.F                                                                     [100%]
+================================== FAILURES ===================================
+______________ test_r_tst_040_1_base_tree_reports_its_37_bounds _______________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19e5/bt3/test_r_tst_040_1_base_tree_rep0')
+
+    def test_r_tst_040_1_base_tree_reports_its_37_bounds(tmp_path) -> None:
+        """R-TST-040/1, 040/3, 040/4 base halves: the census of the b3bf42e tree
+        reports exactly its 37 upper bounds, the 3 list-appended reads among them,
+        and none of the count or lower-bound comparisons."""
+        root = _extract_tests_tree(_BOUND_BASE_COMMIT, tmp_path)
+        lines = _margin_guard_lines(root)
+        sites = [line.rsplit(": ", 1)[1] for line in lines]
+>       assert len(sites) == 37, "\n".join(lines)
+E       AssertionError: timing bound without report_margin: tests/test_a2l_alignment_sizing.py:251
+E         timing bound without report_margin: tests/test_a2l_alignment_sizing.py:400
+E         timing bound without report_margin: tests/test_a2l_inline_axis_length.py:352
+E         timing bound without report_margin: tests/test_a2l_inline_axis_length.py:567
+E         timing bound without report_margin: tests/test_a2l_multiline_headers.py:321
+E         timing bound without report_margin: tests/test_b100_active_variant.py:738
+E         timing bound without report_margin: tests/test_b100_document.py:1206
+E         timing bound without report_margin: tests/test_b100_document.py:366
+E         timing bound without report_margin: tests/test_b100_document.py:964
+E         timing bound without report_margin: tests/test_b100_project_check.py:1023
+E         timing bound without report_margin: tests/test_b100_project_check.py:1034
+E         timing bound without report_margin: tests/test_b100_project_check.py:1050
+E         timing bound without report_margin: tests/test_b100_project_check.py:1066
+E         timing bound without report_margin: tests/test_b100_project_check.py:1183
+E         timing bound without report_margin: tests/test_b100_project_check.py:1268
+E         timing bound without report_margin: tests/test_b100_project_check.py:1350
+E         timing bound without report_margin: tests/test_b100_project_check.py:1351
+E         timing bound without report_margin: tests/test_b100_project_check.py:363
+E         timing bound without report_margin: tests/test_b100_project_check.py:383
+E         timing bound without report_margin: tests/test_b100_project_check.py:841
+E         timing bound without report_margin: tests/test_b100_project_check.py:842
+E         timing bound without report_margin: tests/test_b100_project_check.py:977
+E         timing bound without report_margin: tests/test_b100_project_check.py:979
+E         timing bound without report_margin: tests/test_b100_project_check.py:980
+E         timing bound without report_margin: tests/test_b100_project_homes.py:363
+E         timing bound without report_margin: tests/test_b100_project_homes.py:766
+E         timing bound without report_margin: tests/test_b100_save_dialog.py:2333
+E         timing bound without report_margin: tests/test_b100_save_dialog.py:2335
+E         timing bound without report_margin: tests/test_b100_save_dialog.py:3459
+E         timing bound without report_margin: tests/test_b100_save_dialog.py:3494
+E         timing bound without report_margin: tests/test_b100_save_dialog.py:3535
+E         timing bound without report_margin: tests/test_compare_engine.py:279
+E         timing bound without report_margin: tests/test_tui_app.py:1244
+E         timing bound without report_margin: tests/test_tui_app.py:1333
+E         timing bound without report_margin: tests/test_tui_app.py:916
+E       assert 35 == 37
+E        +  where 35 = len(['tests/test_a2l_alignment_sizing.py:251', 'tests/test_a2l_alignment_sizing.py:400', 'tests/test_a2l_inline_axis_lengt...2l_inline_axis_length.py:567', 'tests/test_a2l_multiline_headers.py:321', 'tests/test_b100_active_variant.py:738', ...])
+
+tests\test_suite_hygiene.py:1450: AssertionError
+_________ test_r_tst_040_4_appended_and_conditional_reads_are_bounds __________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19e5/bt3/test_r_tst_040_4_appended_and_0')
+
+    def test_r_tst_040_4_appended_and_conditional_reads_are_bounds(tmp_path) -> None:
+        """R-TST-040/4 (N-1): an item of a list appended an interval, read through
+        a conditional expression, is a timing arm and an upper timing bound."""
+        from tests.support import suite_census
+    
+        root = tmp_path / "tests"
+        root.mkdir()
+        (root / "test_appended_planted.py").write_text(_PLANTED_APPENDED, encoding="utf-8")
+        arms = [_norm_arm_key(key) for key in suite_census.timing_arms(root)]
+>       assert arms == ["tests/test_appended_planted.py::test_appended"], arms
+E       AssertionError: []
+E       assert [] == ['tests/test_...est_appended']
+E         
+E         Right contains one more item: 'tests/test_appended_planted.py::test_appended'
+E         Use -v to get more diff
+
+tests\test_suite_hygiene.py:1558: AssertionError
+2 failed, 2 passed, 61 deselected in 58.27s
+pytest exit: 1
+census restored to the corrective version: 1 IfExp line(s)

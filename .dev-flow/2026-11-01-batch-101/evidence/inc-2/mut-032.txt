@@ -1,0 +1,59 @@
+== E5 mutant 032 ==
+== date: 2026-11-02T14:10:00Z ==
+s19_app: <HOME>\AppData\Local\Temp\s19m2\wt\s19_app\__init__.py
+.F                                                                       [100%]
+================================== FAILURES ===================================
+_______________ test_tc_b97_64_a_new_set_run_restarts_the_dwell _______________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m2/bt/032/test_tc_b97_64_a_new_set_run_r0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000237BF5810D0>
+
+    def test_tc_b97_64_a_new_set_run_restarts_the_dwell(tmp_path: Path, monkeypatch) -> None:
+        """TC-B97-64 / I-7 (c) (gate fold, code-reviewer F1): a new set run
+        restarts the attention even when the same lane waits at the same block,
+        through ``_rearm_attention(restart=True)`` — so a ``c`` right after the
+        run ends is a ``c`` inside the dwell and confirms nothing.
+    
+        Why: the old lane's dwell base was taken before the run; reusing it would
+        let a ``c`` typed during the run confirm the moment the run ends.
+        Mutation: the restart arm removed → the ``c`` confirms 1.
+    
+        Fix round 3 (CI10-1/2, then CI 41338318239): with the wall clock the
+        ``c`` was inside the dwell only if run end → ``c`` took under
+        ``CONFIRM_DWELL_S``; a slow host spent longer in ``run_lanes``' wait and
+        the ``c`` confirmed. The dwell clock is now the D15 seam ``_fx_clock``
+        held by the test: it moves only where the test moves it (the old base
+        ages 0.6 s before the run, none after), and the restarted base must read
+        the moved time before the ``c``.
+        """
+        from tests.b97_probes import record_statuses
+    
+        confirms = ConfirmSpy(monkeypatch)
+        statuses = record_statuses(monkeypatch)
+        now = [100.0]
+        monkeypatch.setattr(fs, "_fx_clock", lambda: now[0])
+    
+        async def body(app, pilot, panel, project_dir):
+            await poll(pilot, lambda: panel._attention_since is not None, 200)
+            first = panel._attention_since
+            now[0] += 0.6
+            await run_lanes(app, pilot, panel, key=True)
+            await poll(pilot, lambda: panel._attention_since == now[0], 200)
+            restarted = panel._attention_since
+            await pilot.press("c")
+            await settle(pilot, 6)
+            return (first, restarted), list(confirms.posts), list(statuses)[-1:], panel._lanes[1].paused_block
+    
+        bases, posts, last, paused = run_fx(tmp_path, (118, 54), body, stems=THREE, run=True, evidence=True)
+>       assert bases == (100.0, 100.6), bases
+E       AssertionError: (100.0, 100.0)
+E       assert (100.0, 100.0) == (100.0, 100.6)
+E         
+E         At index 1 diff: 100.0 != 100.6
+E         Use -v to get more diff
+
+tests\test_b97_flow_execution.py:1788: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_64_a_new_set_run_restarts_the_dwell
+1 failed, 1 passed in 62.55s (0:01:02)
+pytest exit: 1

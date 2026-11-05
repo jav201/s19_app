@@ -32,6 +32,8 @@ from s19_app.tui.a2l import (
     parse_a2l_file,
 )
 
+from tests.support.timing import report_margin
+
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 _DEMO_A2L = _REPO_ROOT / "examples" / "case_00_public" / "ASAP2_Demo_V161.a2l"
 _CASE01_A2L = _REPO_ROOT / "examples" / "case_01_basic_valid" / "firmware.a2l"
@@ -307,6 +309,7 @@ def test_at101_quoted_metachar_bytes_preserved(tmp_path: Path) -> None:
 
 
 @pytest.mark.slow
+@pytest.mark.serial_timing
 def test_at101_megabyte_unterminated_block_is_linear(tmp_path: Path) -> None:
     """sec-F1: an MB-scale unterminated ``/*`` completes well under a wall bound.
 
@@ -318,7 +321,7 @@ def test_at101_megabyte_unterminated_block_is_linear(tmp_path: Path) -> None:
     char = _parse_single_char(tmp_path, body, name="dos.a2l")
     elapsed = time.perf_counter() - started
     assert char is not None
-    assert elapsed < 5.0
+    assert elapsed < report_margin("AT101", elapsed, 5.0)
 
 
 # ---------------------------------------------------------------------------

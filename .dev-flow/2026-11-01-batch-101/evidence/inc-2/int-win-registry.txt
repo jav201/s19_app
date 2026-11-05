@@ -1,0 +1,18 @@
+# batch-101 Inc 2 E4 integration — Windows (Inc 1 guards after TC-607: test_id_registry, test_batch91_registry_hygiene, test_requirements_canon)
+# env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<temp>/la, --basetemp <temp>/bt, NO_COLOR unset; s19env Python 3.11.15, pytest 8.4.2
+# tree: branch b101-inc2 working tree (rebased on main e266395 + the E4 integration fixes)
+
+<HOME>\Github\s19_app-b101-inc2\s19_app\__init__.py
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0
+rootdir: <HOME>\Github\s19_app-b101-inc2
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collected 25 items
+
+tests\test_id_registry.py ............                                   [ 48%]
+tests\test_batch91_registry_hygiene.py ..                                [ 56%]
+tests\test_requirements_canon.py ...........                             [100%]
+
+============================= 25 passed in 5.54s ==============================
+EXIT=0

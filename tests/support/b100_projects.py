@@ -34,6 +34,7 @@ import subprocess
 from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Iterable, Optional
 from tests.support.b100_workers import settle_workers
+from tests.support.timing import wait_until
 
 ROOT = Path(__file__).resolve().parents[2]
 CASE01_DIR = ROOT / "examples" / "case_01_basic_valid"
@@ -209,16 +210,26 @@ def load_result_panel_text(app) -> str:
     return "\n".join(lines)
 
 
-async def read_load_result_panel(pilot, app, attempts: int = 200) -> str:
+async def read_load_result_panel(
+    pilot, app, attempts: int = 200, *, timeout: float = 60.0
+) -> str:
     """The open panel's painted text, once it is laid out and painted (the
     summary has a height): a panel read the instant it is pushed paints
-    nothing yet."""
-    for _ in range(attempts):
+    nothing yet.
+
+    ``attempts`` is accepted and ignored; the bound is ``timeout`` seconds of
+    wall time."""
+    def _summary_laid_out() -> bool:
         summary = app.screen.query("#result_summary")
-        if len(summary) > 0 and summary.first().size.height > 0:
-            return load_result_panel_text(app)
-        await pilot.pause()
-    raise AssertionError("the Load-result panel was not painted")
+        return len(summary) > 0 and summary.first().size.height > 0
+
+    await wait_until(
+        pilot,
+        _summary_laid_out,
+        "the Load-result panel was not painted",
+        timeout=timeout,
+    )
+    return load_result_panel_text(app)
 
 
 def flat(text: str) -> str:
@@ -227,21 +238,28 @@ def flat(text: str) -> str:
     return " ".join(text.split())
 
 
-async def dismiss_load_result_panel(pilot, app, attempts: int = 200) -> None:
+async def dismiss_load_result_panel(
+    pilot, app, attempts: int = 200, *, timeout: float = 60.0
+) -> None:
     """Wait for the Load-result panel that the Load project dialog opens,
     close it with its shown key ``esc``, and assert that it closed — a panel
-    that does not close fails HERE, not at a later, less clear step."""
-    for _ in range(attempts):
-        if len(app.screen.query(LOAD_RESULT_CLOSE)) > 0:
-            break
-        await pilot.pause()
-    assert len(app.screen.query(LOAD_RESULT_CLOSE)) > 0, "the Load-result panel did not open"
+    that does not close fails HERE, not at a later, less clear step.
+
+    ``attempts`` is accepted and ignored; the bound is ``timeout`` seconds of
+    wall time."""
+    await wait_until(
+        pilot,
+        lambda: len(app.screen.query(LOAD_RESULT_CLOSE)) > 0,
+        "the Load-result panel did not open",
+        timeout=timeout,
+    )
     await pilot.press("escape")
-    for _ in range(attempts):
-        if len(app.screen.query(LOAD_RESULT_CLOSE)) == 0:
-            return
-        await pilot.pause()
-    raise AssertionError("the Load-result panel did not close on esc")
+    await wait_until(
+        pilot,
+        lambda: len(app.screen.query(LOAD_RESULT_CLOSE)) == 0,
+        "the Load-result panel did not close on esc",
+        timeout=timeout,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -274,6 +292,8 @@ def save_case01_project(
     base: Path,
     name: str = "P",
     files: Iterable[str] = ("firmware.s19", "firmware.mac", "firmware.a2l"),
+    *,
+    timeout: float = 60.0,
 ) -> Path:
     """Save project ``name`` holding case_01's ``files`` through the shipped
     Save project handler, in an app of its own; returns the project folder."""
@@ -301,12 +321,9 @@ def save_case01_project(
                         or (app.current_file.mac_path is not None
                             and app.current_file.mac_path.name == item)
                     )
-                for _ in range(400):
-                    if done():
-                        break
-                    await pilot.pause()
-                else:
-                    raise AssertionError(f"the load of {item} did not land")
+                await wait_until(
+                    pilot, done, f"the load of {item} did not land", timeout=timeout
+                )
                 # E4 integration re-pin (A-10): the load's run ends after its
                 # install; the next load (or the save) is refused while it runs.
                 await settle_workers(pilot)
@@ -314,12 +331,12 @@ def save_case01_project(
                 SaveProjectPayload(parent_folder=str(app.workarea), project_name=name)
             )
             await settle_workers(pilot)  # E4 integration re-pin: the save is a worker
-            for _ in range(400):
-                if app.current_project == name:
-                    break
-                await pilot.pause()
-            else:
-                raise AssertionError(f"Save project {name} did not land")
+            await wait_until(
+                pilot,
+                lambda: app.current_project == name,
+                f"Save project {name} did not land",
+                timeout=timeout,
+            )
             return app.workarea / name
 
     return asyncio.run(_drive())
@@ -366,7 +383,9 @@ def build_p04_case(base: Path, case: str) -> Path:
     return project_dir
 
 
-def append_variant(base: Path, source: Path, name: str = "P") -> None:
+def append_variant(
+    base: Path, source: Path, name: str = "P", *, timeout: float = 60.0
+) -> None:
     """Open project ``name`` and load ``source`` into it, so the shipped
     variant append places it and rewrites ``project.json`` through the
     manifest seam (it becomes the recorded active variant)."""
@@ -391,11 +410,12 @@ def append_variant(base: Path, source: Path, name: str = "P") -> None:
             # refused while the project worker runs; wait for the install.
             await settle_workers(pilot)
             app.load_from_path(source)
-            for _ in range(400):
-                if any("manifest verified" in line for line in statuses):
-                    return
-                await pilot.pause()
-            raise AssertionError(f"the variant append of {source.name} did not land: {statuses}")
+            await wait_until(
+                pilot,
+                lambda: any("manifest verified" in line for line in statuses),
+                lambda: f"the variant append of {source.name} did not land: {statuses}",
+                timeout=timeout,
+            )
 
     asyncio.run(_drive())
 
@@ -595,12 +615,17 @@ def run_app(base: Path, scenario, size: tuple = (160, 50)):
     return asyncio.run(_drive())
 
 
-async def wait_for(pilot, predicate, description: str, attempts: int = 400) -> None:
-    for _ in range(attempts):
-        if predicate():
-            return
-        await pilot.pause()
-    raise AssertionError(f"timed out waiting for {description}")
+async def wait_for(
+    pilot, predicate, description: str, attempts: int = 400, *, timeout: float = 60.0
+) -> None:
+    """Wait until ``predicate()`` holds, checking it before the first pause.
+
+    ``attempts`` is accepted and ignored: it is kept for the existing call
+    sites and no longer bounds anything; the bound is ``timeout`` seconds of
+    wall time."""
+    await wait_until(
+        pilot, predicate, f"timed out waiting for {description}", timeout=timeout
+    )
 
 
 async def load_image(pilot, app, path: Path) -> None:
@@ -618,19 +643,37 @@ async def load_project(pilot, app, name: str = "P") -> float:
 
     Inc 12b (E2 ruling "Vacuous timing", census C11): the handler returns
     at once and the reopen runs on a worker, so the handler's own wall time
-    bounds nothing. The clock runs from the call until the polled condition
-    holds (``current_project`` and the image are set in the one install
-    callback), as ``test_b100_active_variant.py``'s TC-B100-20 measures."""
+    bounds nothing. The clock runs from the call until the install callback
+    returns (``current_project`` and the image are set in that one callback),
+    as ``test_b100_active_variant.py``'s TC-B100-20 measures: the install
+    method is wrapped on the instance for one call and stamps the clock at
+    its return, so the poll no longer adds up to one cycle to the reading."""
     import time
 
     start = time.perf_counter()
-    app._handle_load_project(name)
-    await wait_for(
-        pilot,
-        lambda: app.current_project == name and app.current_file is not None,
-        f"the project load of {name}",
-    )
-    elapsed = time.perf_counter() - start
+    real_install = app._install_prepared_project
+    stamps: list = []
+
+    def _record(prepared):
+        result = real_install(prepared)
+        stamps.append(time.perf_counter())
+        return result
+
+    app._install_prepared_project = _record
+    try:
+        app._handle_load_project(name)
+        await wait_for(
+            pilot,
+            lambda: app.current_project == name and app.current_file is not None,
+            f"the project load of {name}",
+        )
+        if not stamps:
+            raise AssertionError(
+                f"the project install callback of {name} was not reached"
+            )
+        elapsed = stamps[0] - start
+    finally:
+        app._install_prepared_project = real_install
     await settle_workers(pilot)
     for _ in range(6):
         await pilot.pause()

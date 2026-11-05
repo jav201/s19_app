@@ -36,6 +36,7 @@ from s19_app.compare import (
 )
 from s19_app.core import S19File
 from tests.conftest import make_large_s19
+from tests.support.timing import report_margin
 
 
 # ---------------------------------------------------------------------------
@@ -258,6 +259,7 @@ def test_symmetry_swap_only_a_only_b() -> None:
 
 
 @pytest.mark.slow
+@pytest.mark.serial_timing
 def test_large_image_perf(tmp_path: Path) -> None:
     path_a = make_large_s19(tmp_path / "a.s19")
     path_b = make_large_s19(tmp_path / "b.s19", seed=1)
@@ -276,7 +278,7 @@ def test_large_image_perf(tmp_path: Path) -> None:
     runs, stats = diff_mem_maps(map_a, map_b)
     elapsed = time.perf_counter() - start
 
-    assert elapsed <= 2.0, f"diff compute took {elapsed:.3f}s, budget 2.0s"
+    assert elapsed <= report_margin("TC-006 large image", elapsed, 2.0), f"diff compute took {elapsed:.3f}s, budget 2.0s"
 
     # Every planted change is reported.
     changed_addrs: set[int] = set()

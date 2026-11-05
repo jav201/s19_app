@@ -1,0 +1,10 @@
+== E5 mutant 040-4 ==
+== date: 2026-11-02T14:12:10Z ==
+s19_app: <HOME>\AppData\Local\Temp\s19m2\wt\s19_app\__init__.py
+.                                                                        [100%]
+1 passed in 30.35s
+pytest exit: 0
+== probe (same mutant, census on a planted /4 arm: timing.append(perf_counter()-t0); x = timing[0] if timing else None; assert x < 1.0) ==
+PROBE planted /4 arm detected: {}
+PROBE unreported sites: []
+== probe conclusion: with the N-1 taint removed the planted arm vanishes from the census, so no raw-bound site is ever reported ==

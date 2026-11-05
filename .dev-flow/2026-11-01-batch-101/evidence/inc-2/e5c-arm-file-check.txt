@@ -1,0 +1,57 @@
+# batch-101 Inc 2 E5 corrective — F1 confirmation: each of the 12 wrapped arm files against main, compared as ASTs after undoing the wrap
+# (serial_timing decorators dropped, report_margin(label, measured, bound) -> bound, the report_margin import and an added 'import pytest' dropped)
+# script:
+#   """Whole-file check: each file differs from <base> only by serial_timing
+#   markers, the report_margin import and report_margin(label, measured, bound) wraps."""
+#   import ast, subprocess, sys
+#   
+#   class Strip(ast.NodeTransformer):
+#       def visit_Call(self, node):
+#           self.generic_visit(node)
+#           f = node.func
+#           name = f.id if isinstance(f, ast.Name) else f.attr if isinstance(f, ast.Attribute) else None
+#           if name == "report_margin" and len(node.args) == 3 and not node.keywords:
+#               return node.args[2]
+#           return node
+#       def _deco(self, node):
+#           self.generic_visit(node)
+#           node.decorator_list = [d for d in node.decorator_list if ast.unparse(d) != "pytest.mark.serial_timing"]
+#           return node
+#       visit_FunctionDef = visit_AsyncFunctionDef = _deco
+#       def visit_Import(self, node):
+#           node.names = [a for a in node.names if a.name != "pytest"]
+#           return node if node.names else None
+#       def visit_ImportFrom(self, node):
+#           node.names = [a for a in node.names if a.name != "report_margin"]
+#           return node if node.names else None
+#   
+#   def norm(src):
+#       return ast.dump(Strip().visit(ast.parse(src)))
+#   
+#   base = sys.argv[1]
+#   bad = []
+#   for path in sys.argv[2:]:
+#       old = subprocess.run(["git", "show", f"{base}:{path}"], capture_output=True, text=True, encoding="utf-8").stdout
+#       new = open(path, encoding="utf-8").read()
+#       same = norm(old) == norm(new)
+#       print(("same " if same else "DIFF ") + path)
+#       if not same:
+#           bad.append(path)
+#   sys.exit(1 if bad else 0)
+
+## head (after the F1 restore) vs main:
+same tests/test_a2l_alignment_sizing.py
+same tests/test_a2l_inline_axis_length.py
+same tests/test_a2l_multiline_headers.py
+same tests/test_b100_active_variant.py
+same tests/test_b100_busy.py
+same tests/test_b100_document.py
+same tests/test_b100_project_check.py
+same tests/test_b100_project_homes.py
+same tests/test_b100_save_dialog.py
+same tests/test_b100_save_guards.py
+same tests/test_compare_engine.py
+same tests/test_tui_app.py
+exit 0
+
+## ab879c8 (before the F1 restore), tests/test_b100_project_check.py vs main: same after normalisation = False

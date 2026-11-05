@@ -1,0 +1,90 @@
+# batch-101 Inc 2 E5 corrective — mutation checks for test-side corrections, and the pre-E5 gates on the E5 planted inputs
+# env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<temp>/la, --basetemp <temp>/bt*, NO_COLOR unset; Windows, s19env Python 3.11.15, pytest 8.4.2
+
+tree: ab879c8 + the E5 test_suite_hygiene.py; mutants: (a) the dwell arm's setattr(fs, "_fx_clock", ...) line removed (its docstring still names _fx_clock); (b) report_margin's label check removed
+FF                                                                       [100%]
+================================== FAILURES ===================================
+________ test_r_tst_031_032_post_press_and_dwell_arms_keep_their_forms ________
+
+    def test_r_tst_031_032_post_press_and_dwell_arms_keep_their_forms() -> None:
+        from tests.support import suite_census
+    
+        workers_text = (TESTS_ROOT / "test_b100_workers.py").read_text(encoding="utf-8")
+        quit_body = _function_source(
+            workers_text,
+            "test_at_b100_18_quit_confirm_half_slow_save_as_leaves_no_partial_folder",
+        )
+        assert 'Hold(monkeypatch, app_module, "place_into_workarea"' in quit_body, (
+            "the quit-confirm arm must hold the save worker at a forced slow step"
+        )
+        parse_body = _function_source(
+            workers_text, "test_at_b100_17_parse_half_case06_a2l_by_keys"
+        )
+        assert "= app.step_busy" in parse_body and "app.step_busy = " in parse_body, (
+            "the parse arm must record states at the progress hook (step_busy)"
+        )
+        flow_text = (TESTS_ROOT / "test_b97_flow_execution.py").read_text(encoding="utf-8")
+        dwell_body = _function_source(
+            flow_text, "test_tc_b97_64_a_new_set_run_restarts_the_dwell"
+        )
+        clock_patches = [
+            node
+            for node in ast.walk(ast.parse(dwell_body))
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Attribute)
+            and node.func.attr == "setattr"
+            and len(node.args) >= 2
+            and isinstance(node.args[1], ast.Constant)
+            and node.args[1].value == "_fx_clock"
+        ]
+>       assert len(clock_patches) == 1, (
+            "the dwell restart arm must patch the injected dwell clock (_fx_clock)"
+        )
+E       AssertionError: the dwell restart arm must patch the injected dwell clock (_fx_clock)
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\test_suite_hygiene.py:1239: AssertionError
+____________ test_r_tst_040_2_report_margin_refuses_unsafe_labels _____________
+
+fresh_pending = []
+
+    def test_r_tst_040_2_report_margin_refuses_unsafe_labels(fresh_pending) -> None:
+        """E3S-7 / E5S-3: a label holding the record separator or a control
+        character is refused and nothing is recorded; a plain label round-trips
+        through the drain and the QC-TM section."""
+        from tests.support import timing as timing_support
+    
+        for label in ("a|b", "a\x1b[31m", "two\nlines"):
+>           with pytest.raises(ValueError):
+E           Failed: DID NOT RAISE <class 'ValueError'>
+
+tests\test_suite_hygiene.py:1288: Failed
+============================ QC-TM timing margins =============================
+50.0%  0.500 s / 1.000 s  a|b  tests/test_suite_hygiene.py::test_r_tst_040_2_report_margin_refuses_unsafe_labels
+QC-TM: 1 bounds, 0 under 20 % margin
+=========================== short test summary info ===========================
+FAILED tests/test_suite_hygiene.py::test_r_tst_031_032_post_press_and_dwell_arms_keep_their_forms
+FAILED tests/test_suite_hygiene.py::test_r_tst_040_2_report_margin_refuses_unsafe_labels
+2 failed, 63 deselected in 0.50s
+EXIT=1
+--- the pre-E5 032 check on the same mutant (old test file from ab879c8):
+.                                                                        [100%]
+1 passed, 53 deselected in 32.29s
+EXIT=0
+
+pre-E5 redaction gate on the E5 planted leak lines (patterns only, ignoring that its suffix filter skips .xml):
+  caught  posix home path outside the runner image: <planted example line of this form, see _PLANTED_LEAKS in tests/test_suite_hygiene.py>
+  caught  user-profile path: <planted example line of this form, see _PLANTED_LEAKS in tests/test_suite_hygiene.py>
+  MISSED  unix-style user-profile path: <planted example line of this form, see _PLANTED_LEAKS in tests/test_suite_hygiene.py>
+  MISSED  pytest temp folder of an account: <planted example line of this form, see _PLANTED_LEAKS in tests/test_suite_hygiene.py>
+  MISSED  junit hostname attribute: <planted example line of this form, see _PLANTED_LEAKS in tests/test_suite_hygiene.py>
+  MISSED  shell prompt user@host: <planted example line of this form, see _PLANTED_LEAKS in tests/test_suite_hygiene.py>
+  MISSED  unc host path: <planted example line of this form, see _PLANTED_LEAKS in tests/test_suite_hygiene.py>
+  caught  lan address: <planted example line of this form, see _PLANTED_LEAKS in tests/test_suite_hygiene.py>
+  MISSED  local account or host name: <planted example line of this form, see _PLANTED_LEAKS in tests/test_suite_hygiene.py>
+  3 of 9 forms; scanned suffixes: ['.json', '.jsonl', '.log', '.md', '.txt', '.yaml', '.yml'] (.xml not among them)
+pre-E5 injection check on the planted run lines:
+  MISSED (substring check passes): echo ${{github.event.pull_request.title}}
+  caught: echo ${{ github.head_ref }}
+  and it read only the tui-ci job's steps (the planted 'b' job is another job)

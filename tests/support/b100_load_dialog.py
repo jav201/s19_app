@@ -27,6 +27,8 @@ from __future__ import annotations
 
 from typing import Callable, Optional
 
+from tests.support.timing import wait_until
+
 
 def load_dialog_cls():
     """``s19_app.tui.screens.LoadDialog`` (lazy: absent before Inc 9b)."""
@@ -69,12 +71,17 @@ def bare_path_dialog(**overrides):
     return LoadDialog(**kwargs)
 
 
-async def wait_for(pilot, predicate: Callable[[], bool], description: str, attempts: int = 400) -> None:
-    for _ in range(attempts):
-        if predicate():
-            return
-        await pilot.pause()
-    raise AssertionError(f"timed out waiting for {description}")
+async def wait_for(
+    pilot, predicate: Callable[[], bool], description: str, attempts: int = 400, *, timeout: float = 60.0
+) -> None:
+    """Wait until ``predicate()`` holds, checking it before the first pause.
+
+    ``attempts`` is accepted and ignored: it is kept for the existing call
+    sites and no longer bounds anything; the bound is ``timeout`` seconds of
+    wall time."""
+    await wait_until(
+        pilot, predicate, f"timed out waiting for {description}", timeout=timeout
+    )
 
 
 async def wait_for_dialog(pilot, app, attempts: int = 400) -> None:

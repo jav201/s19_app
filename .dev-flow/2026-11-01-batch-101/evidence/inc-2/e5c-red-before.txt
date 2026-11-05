@@ -1,0 +1,84 @@
+# batch-101 Inc 2 E5 corrective — RED before: the E5 tests/test_suite_hygiene.py run on ab879c8 (pre-E5 code, records and workflow)
+# env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<temp>/la, --basetemp <temp>/bt*, NO_COLOR unset; Windows, s19env Python 3.11.15, pytest 8.4.2
+
+<HOME>\AppData\Local\Temp\s19e5\wt-pre\s19_app\__init__.py
+tree: ab879c8 (before the E5 corrective) + the E5 tests/test_suite_hygiene.py only
+..F...F.....F..                                                          [100%]
+================================== FAILURES ===================================
+________ test_r_tst_013_snapshot_job_changes_only_persist_credentials _________
+
+    def test_r_tst_013_snapshot_job_changes_only_persist_credentials() -> None:
+        """R-TST-013/1 (E5 F9): the snapshot checkout carries only
+        persist-credentials: false (no fetch-depth), and the snapshot job differs
+        from its base only by that setting."""
+        text = WORKFLOW_PATH.read_text(encoding="utf-8")
+        snap = _workflow_jobs(text)["snapshot"]
+        checkouts = [
+            step
+            for step in _job_steps(snap)
+            if (_step_value(step, "uses") or "").startswith("actions/checkout@")
+        ]
+        assert len(checkouts) == 1
+        with_values = [line.strip() for line in checkouts[0] if line.startswith("          ")]
+>       assert with_values == ["persist-credentials: false"], with_values
+E       AssertionError: ['fetch-depth: 0', 'persist-credentials: false']
+E       assert ['fetch-depth...tials: false'] == ['persist-credentials: false']
+E         
+E         At index 0 diff: 'fetch-depth: 0' != 'persist-credentials: false'
+E         Left contains one more item: 'persist-credentials: false'
+E         Use -v to get more diff
+
+tests\test_suite_hygiene.py:850: AssertionError
+_______________ test_r_tst_049_wrapped_arms_change_nothing_else _______________
+
+    def test_r_tst_049_wrapped_arms_change_nothing_else() -> None:
+        """E5 F10: every function this branch wraps as a timing arm (against the
+        merge-base with main) differs from its base only by the serial_timing
+        marker and the report_margin wraps."""
+        base = _merge_base_with_main()
+        if base is None:
+            pytest.skip("no merge-base with main in this checkout")
+        drift = []
+        for path in sorted(TESTS_ROOT.rglob("*.py")):
+            text = path.read_text(encoding="utf-8")
+            if "report_margin" not in text and "serial_timing" not in text:
+                continue
+            rel = path.relative_to(REPO_ROOT).as_posix()
+            old = _git("show", f"{base}:{rel}")
+            if old is None:
+                continue
+            for name in _wrap_drift(old.decode("utf-8"), text):
+                drift.append(
+                    f"wrapped timing arm changed beyond marker and report_margin: {rel}::{name}"
+                )
+>       assert drift == [], "\n".join(drift)
+E       AssertionError: wrapped timing arm changed beyond marker and report_margin: tests/test_b100_project_check.py::test_tc_b100_61_r2_2_legitimate_manifest_inside_every_cap_is_checked_whole
+E       assert ['wrapped tim...hecked_whole'] == []
+E         
+E         Left contains one more item: 'wrapped timing arm changed beyond marker and report_margin: tests/test_b100_project_check.py::test_tc_b100_61_r2_2_legitimate_manifest_inside_every_cap_is_checked_whole'
+E         Use -v to get more diff
+
+tests\test_suite_hygiene.py:1432: AssertionError
+_________ test_r_tst_051_all_line_reader_counts_only_under_minus_one __________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19e5/bt2/test_r_tst_051_all_line_reader0')
+
+    def test_r_tst_051_all_line_reader_counts_only_under_minus_one(tmp_path) -> None:
+        """E5 F2: a wait that reads every painted line through an all-line reader
+        is the form the rule asks for and counts 0; the same reader under [-1]
+        reads only the newest line and counts 1."""
+        from tests.support import suite_census
+    
+        root = tmp_path / "tests"
+        root.mkdir()
+        (root / "test_all_line_planted.py").write_text(_PLANTED_ALL_LINE_READER, encoding="utf-8")
+>       assert suite_census.newest_line_waits(root) == {"tests/test_all_line_planted.py": 1}
+E       AssertionError: assert {'tests/test_...lanted.py': 2} == {'tests/test_...lanted.py': 1}
+E         
+E         Differing items:
+E         {'tests/test_all_line_planted.py': 2} != {'tests/test_all_line_planted.py': 1}
+E         Use -v to get more diff
+
+tests\test_suite_hygiene.py:1891: AssertionError
+3 failed, 12 passed, 50 deselected in 69.52s (0:01:09)
+EXIT=1

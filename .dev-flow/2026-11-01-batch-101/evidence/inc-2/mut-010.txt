@@ -1,0 +1,23 @@
+== E5 mutant 010 ==
+== date: 2026-11-02T14:01:51Z ==
+s19_app: <HOME>\AppData\Local\Temp\s19m2\wt\s19_app\__init__.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________________ test_r_tst_010_pull_request_runs_two_lanes __________________
+
+    def test_r_tst_010_pull_request_runs_two_lanes() -> None:
+        text = WORKFLOW_PATH.read_text(encoding="utf-8")
+        jobs = _workflow_jobs(text)
+        steps = _job_steps(jobs["tui-ci"])
+        runs = [_step_run(step) for step in _lane_steps(steps, "pull_request")]
+>       assert runs == [PR_LANE_1, PR_LANE_2]
+E       assert ['pytest -q -...w"  # MUTANT'] == ['pytest -v -...nd not slow"']
+E         
+E         At index 0 diff: 'pytest -q -m "not slow"  # MUTANT: single lean step' != 'pytest -v -rs -n auto -m "not slow and not serial_timing"'
+E         Use -v to get more diff
+
+tests\test_suite_hygiene.py:727: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_suite_hygiene.py::test_r_tst_010_pull_request_runs_two_lanes
+1 failed in 0.22s
+pytest exit: 1

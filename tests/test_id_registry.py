@@ -166,11 +166,14 @@ from tools.id_registry import (
 # batch-101 Inc 1: 237 -> 239, measured (the guard's own count). The base e273181
 # already scanned 238 (tests/test_synth_release_case.py was added without the bump);
 # this increment adds tests/test_requirements_canon.py.
-# batch-102: 239 -> 246, measured (the guard's own count): the seven new
-# tests/test_b102_*.py modules (clipboard, a2l_refresh, parameter_picker,
-# bulk_add, patch_picker, flow_block_edit, flow_file_chooser).
-EXPECTED_SCANNED_TEST_FILES = 246
+# batch-102: 239 -> 246 (seven tests/test_b102_*.py modules); batch-101 Inc 2:
+# 246 -> 248, measured (tests/support/suite_census.py, tests/test_suite_hygiene.py).
+EXPECTED_SCANNED_TEST_FILES = 248
 """Test modules scanned, including this one.
+
+batch-101 Inc 2: 246 -> 248 (after batch-102). ``tests/support/suite_census.py`` and
+``tests/test_suite_hygiene.py`` (R-TST-001 .. 082) are added. MEASURED: the
+guard reports 241.
 
 batch-101 Inc 1: 237 -> 239. ``tests/test_synth_release_case.py`` was already on
 the base (e273181 scanned 238, TC-607 red) and ``tests/test_requirements_canon.py``

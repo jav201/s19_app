@@ -85,6 +85,7 @@ from s19_app.tui.services.variant_execution_service import (
 )
 from s19_app.tui.workspace import build_variant_set, validate_project_files
 from s19_app.validation.model import ValidationIssue, ValidationSeverity
+from tests.conftest import canonical_report_bytes
 
 FIXED_NOW = datetime(2026, 6, 10, 12, 0, 0, tzinfo=timezone.utc)
 
@@ -1763,10 +1764,16 @@ def test_at288_report_hex_sections_identical_after_move(
     # --- the pinned byte-identity oracle ---
     if _AT288_CAPTURE.exists():
         pinned = _AT288_CAPTURE.read_bytes()
-        assert emitted == pinned, (
+        assert emitted == canonical_report_bytes(pinned), (
             "AT-288: post-move report bytes differ from the pinned pre-move "
             "capture — the hexview move is NOT byte-identical"
         )
     else:
+        import s19_app.version
+
+        tokenized = emitted.replace(
+            b"Tool version: " + s19_app.version.__version__.encode("utf-8"),
+            b"Tool version: <TOOL-VERSION>",
+        )
         _AT288_CAPTURE.parent.mkdir(parents=True, exist_ok=True)
-        _AT288_CAPTURE.write_bytes(emitted)
+        _AT288_CAPTURE.write_bytes(tokenized)

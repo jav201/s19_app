@@ -1,0 +1,20 @@
+== E5 mutant 018 ==
+== date: 2026-11-02T14:04:19Z ==
+s19_app: <HOME>\AppData\Local\Temp\s19m2\wt\s19_app\__init__.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+___________________ test_r_tst_018_ci_installs_pinned_xdist ___________________
+
+    def test_r_tst_018_ci_installs_pinned_xdist() -> None:
+        text = WORKFLOW_PATH.read_text(encoding="utf-8")
+        jobs = _workflow_jobs(text)
+        steps = _job_steps(jobs["tui-ci"])
+        runs = "\n".join(run for run in (_step_run(step) for step in steps) if run)
+>       assert XDIST_INSTALL_LINE in runs
+E       assert 'python -m pip install "pytest-xdist==3.8.0"' in 'python -m pip install --upgrade pip\npython -m pip install -r requirements.txt\npython -m pip install pytest\npython ...t -q -rs -m "serial_timing and not slow"\npytest -v -rs -n auto -m "not serial_timing"\npytest -q -rs -m serial_timing'
+
+tests\test_suite_hygiene.py:812: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_suite_hygiene.py::test_r_tst_018_ci_installs_pinned_xdist
+1 failed in 0.20s
+pytest exit: 1

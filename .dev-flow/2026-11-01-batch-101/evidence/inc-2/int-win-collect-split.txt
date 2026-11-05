@@ -1,0 +1,72 @@
+# batch-101 Inc 2 E4 integration — Windows (collect split)
+# env: PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<temp>/la, --basetemp <temp>/bt, NO_COLOR unset; s19env Python 3.11.15, pytest 8.4.2
+# tree: branch b101-inc2 working tree (rebased on main e266395 + the E4 integration fixes)
+
+## all: pytest --collect-only -q
+5330 tests collected in 11.92s
+## not: pytest --collect-only -q -m \"not serial_timing\"
+5270/5330 tests collected (60 deselected) in 11.56s
+## ser: pytest --collect-only -q -m serial_timing
+60/5330 tests collected (5270 deselected) in 12.29s
+
+## the -m serial_timing selection
+tests/test_a2l_alignment_sizing.py::test_at120_oversized_alignment_layout_clamps_to_none
+tests/test_a2l_alignment_sizing.py::test_tc149_dos_clamp_includes_padding
+tests/test_a2l_inline_axis_length.py::test_tc138_dos_clamp_pure_arithmetic
+tests/test_a2l_inline_axis_length.py::test_at111_oversized_axis_clamps_to_none
+tests/test_a2l_multiline_headers.py::test_at101_megabyte_unterminated_block_is_linear
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[variant-append]
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[mac-sync]
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[a2l-sync]
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-back]
+tests/test_b100_active_variant.py::test_tc_b100_20_writers_on_a_31_folder_manifest_finish_under_one_second[save-project]
+tests/test_b100_busy.py::test_at_b100_17_worker_load_of_an_8_mib_s19_by_keys
+tests/test_b100_document.py::test_tc_b100_28_document_finding_is_kept_first_beside_a_full_batch
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[1001-entries]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[20000-entries]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[5000-digit-integer]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[bare-entries-is-5]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-1MiB]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-under-entries]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[empty-entries]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-is-5]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-long-string]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-wide-object]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[exactly-1000-entries]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[not-utf8]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-byte-over-1MiB]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-entry]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[truncated]
+tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[v1-document]
+tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[20000-entries]
+tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[5000-digit-integer]
+tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[brackets-1MiB]
+tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[batch]
+tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[files]
+tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[declared_regions]
+tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[gathered]
+tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[derived_from]
+tests/test_b100_project_check.py::test_tc_b100_24_assignments_75_by_1000_is_one_issue_fast
+tests/test_b100_project_check.py::test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second
+tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+tests/test_b100_project_check.py::test_tc_b100_61_r2_2_legitimate_manifest_inside_every_cap_is_checked_whole
+tests/test_b100_project_check.py::test_tc_b100_61_sec7_r2_2_one_serialize_checks_each_name_once
+tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_junction_loop_costs_one_failure
+tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded
+tests/test_b100_project_homes.py::test_tc_b100_31_junction_cycle_ends
+tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10000 saved]
+tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10001 refused]
+tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_is_a_150ms_debounce
+tests/test_b100_save_dialog.py::test_tc_b100_65_session_decided_once_per_open_case06
+tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_at_most_three_of_twenty_keystrokes
+tests/test_b100_save_dialog.py::test_tc_b100_65_emitting_4mib_image_recomputes_fast
+tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second
+tests/test_compare_engine.py::test_large_image_perf
+tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+tests/test_tui_app.py::test_build_mac_view_cache_scales_under_load
+tests/test_tui_app.py::test_end_to_end_load_pipeline_under_budget
+tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[s19_first]
+tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[mac_first]

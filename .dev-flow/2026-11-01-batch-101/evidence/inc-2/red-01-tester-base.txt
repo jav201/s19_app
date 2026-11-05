@@ -1,0 +1,906 @@
+== s19_app location ==
+<HOME>\AppData\Local\Temp\s19i2t\base\s19_app\__init__.py
+== RED run: pytest tests/test_suite_hygiene.py on base 84d4507 ==
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFEEEEEFFFFFF                   [100%]
+=================================== ERRORS ====================================
+______ ERROR at setup of test_r_tst_040_report_margin_returns_the_bound _______
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001A3B6A8EA50>
+
+    @pytest.fixture
+    def fresh_pending(monkeypatch):
+        """E3A-11 / E3S-1: a fresh pending list, empty again at teardown."""
+        from tests.support import timing as timing_support
+    
+        pending = []
+>       monkeypatch.setattr(timing_support, "_QC_TM_PENDING", pending)
+E       AttributeError: <module 'tests.support.timing' from '<HOME>\\AppData\\Local\\Temp\\s19i2t\\base\\tests\\support\\timing.py'> has no attribute '_QC_TM_PENDING'
+
+tests\test_suite_hygiene.py:1163: AttributeError
+______ ERROR at setup of test_r_tst_042_margin_report_is_a_test_property ______
+file <HOME>\AppData\Local\Temp\s19i2t\base\tests\test_suite_hygiene.py, line 1308
+  def test_r_tst_042_margin_report_is_a_test_property(pytester) -> None:
+E       fixture 'pytester' not found
+>       available fixtures: _recent_store_isolated, _recent_store_session_guard, _syrupy_apply_ide_patches, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, corrupt_records, doctest_namespace, duplicate_alias_mac, fresh_pending, large_a2l, large_mac, large_project, large_s19, monkeypatch, overlap_s19_hex, pytestconfig, ranged_s19, record_property, record_testsuite_property, record_xml_attribute, recwarn, snap_compare, snapshot, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+<HOME>\AppData\Local\Temp\s19i2t\base\tests\test_suite_hygiene.py:1308
+______ ERROR at setup of test_r_tst_043_045_qc_tm_section_rows_and_count ______
+file <HOME>\AppData\Local\Temp\s19i2t\base\tests\test_suite_hygiene.py, line 1356
+  def test_r_tst_043_045_qc_tm_section_rows_and_count(pytester) -> None:
+E       fixture 'pytester' not found
+>       available fixtures: _recent_store_isolated, _recent_store_session_guard, _syrupy_apply_ide_patches, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, corrupt_records, doctest_namespace, duplicate_alias_mac, fresh_pending, large_a2l, large_mac, large_project, large_s19, monkeypatch, overlap_s19_hex, pytestconfig, ranged_s19, record_property, record_testsuite_property, record_xml_attribute, recwarn, snap_compare, snapshot, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+<HOME>\AppData\Local\Temp\s19i2t\base\tests\test_suite_hygiene.py:1356
+___ ERROR at setup of test_r_tst_043_2_teardown_error_report_gives_one_row ____
+file <HOME>\AppData\Local\Temp\s19i2t\base\tests\test_suite_hygiene.py, line 1384
+  def test_r_tst_043_2_teardown_error_report_gives_one_row(pytester) -> None:
+E       fixture 'pytester' not found
+>       available fixtures: _recent_store_isolated, _recent_store_session_guard, _syrupy_apply_ide_patches, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, corrupt_records, doctest_namespace, duplicate_alias_mac, fresh_pending, large_a2l, large_mac, large_project, large_s19, monkeypatch, overlap_s19_hex, pytestconfig, ranged_s19, record_property, record_testsuite_property, record_xml_attribute, recwarn, snap_compare, snapshot, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+<HOME>\AppData\Local\Temp\s19i2t\base\tests\test_suite_hygiene.py:1384
+_____________ ERROR at setup of test_r_tst_044_low_margin_prefix ______________
+file <HOME>\AppData\Local\Temp\s19i2t\base\tests\test_suite_hygiene.py, line 1406
+  def test_r_tst_044_low_margin_prefix(pytester) -> None:
+E       fixture 'pytester' not found
+>       available fixtures: _recent_store_isolated, _recent_store_session_guard, _syrupy_apply_ide_patches, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, corrupt_records, doctest_namespace, duplicate_alias_mac, fresh_pending, large_a2l, large_mac, large_project, large_s19, monkeypatch, overlap_s19_hex, pytestconfig, ranged_s19, record_property, record_testsuite_property, record_xml_attribute, recwarn, snap_compare, snapshot, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+<HOME>\AppData\Local\Temp\s19i2t\base\tests\test_suite_hygiene.py:1406
+________ ERROR at setup of test_r_tst_046_over_bound_arm_still_reports ________
+file <HOME>\AppData\Local\Temp\s19i2t\base\tests\test_suite_hygiene.py, line 1425
+  def test_r_tst_046_over_bound_arm_still_reports(pytester) -> None:
+E       fixture 'pytester' not found
+>       available fixtures: _recent_store_isolated, _recent_store_session_guard, _syrupy_apply_ide_patches, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, corrupt_records, doctest_namespace, duplicate_alias_mac, fresh_pending, large_a2l, large_mac, large_project, large_s19, monkeypatch, overlap_s19_hex, pytestconfig, ranged_s19, record_property, record_testsuite_property, record_xml_attribute, recwarn, snap_compare, snapshot, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+<HOME>\AppData\Local\Temp\s19i2t\base\tests\test_suite_hygiene.py:1425
+================================== FAILURES ===================================
+______________ test_r_tst_001_serial_timing_marker_is_registered ______________
+
+    def test_r_tst_001_serial_timing_marker_is_registered() -> None:
+        proc = subprocess.run(
+            [sys.executable, "-m", "pytest", "--markers", "-p", "no:cacheprovider"],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            timeout=300,
+            env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
+        )
+        lines = [line.strip() for line in proc.stdout.splitlines()]
+>       assert MARKER_LINE in lines
+E       assert '@pytest.mark.serial_timing: serial_timing: a wall-clock timing arm; run apart and serially (-m serial_timing)' in ["@pytest.mark.slow: marks tests as slow perf smoke tests (deselect with -m 'not slow')", '', "@pytest.mark.snapshot: ...he given test. see https://docs.pytest.org/en/stable/how-to/capture-warnings.html#pytest-mark-filterwarnings', '', ...]
+
+tests\test_suite_hygiene.py:329: AssertionError
+____________ test_r_tst_002_every_timing_arm_carries_serial_timing ____________
+
+    def test_r_tst_002_every_timing_arm_carries_serial_timing() -> None:
+>       from tests.support import suite_census
+E       ImportError: cannot import name 'suite_census' from 'tests.support' (<HOME>\AppData\Local\Temp\s19i2t\base\tests\support\__init__.py)
+
+tests\test_suite_hygiene.py:338: ImportError
+_______ test_r_tst_002_2_parallel_lane_collection_prints_no_qc_tm_text ________
+
+    def test_r_tst_002_2_parallel_lane_collection_prints_no_qc_tm_text() -> None:
+        """E3S-1 guard case: collecting the parallel lane prints no QC-TM text."""
+        proc = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "pytest",
+                "--collect-only",
+                "-q",
+                "-m",
+                "not serial_timing",
+                "-p",
+                "no:cacheprovider",
+            ],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            timeout=900,
+            env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
+        )
+        output = proc.stdout + proc.stderr
+        assert proc.returncode == 0, output[-2000:]
+        assert "QC-TM" not in output
+>       assert "Unknown pytest.mark.serial_timing" not in output
+E       AssertionError: assert 'Unknown pyt...erial_timing' not in 'tests/test_... in 14.38s\n'
+E         
+E         'Unknown pytest.mark.serial_timing' is contained here:
+E           kWarning: Unknown pytest.mark.serial_timing - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+E         ?           +++++++++++++++++++++++++++++++++
+E               @pytest.mark.serial_timing
+E           
+E           -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+E           5329/5330 tests collected (1 deselected) in 14.38s
+
+tests\test_suite_hygiene.py:374: AssertionError
+_______________ test_r_tst_003_an_unmarked_timing_arm_is_named ________________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19i2t/bt/test_r_tst_003_an_unmarked_tim0')
+
+    def test_r_tst_003_an_unmarked_timing_arm_is_named(tmp_path) -> None:
+>       from tests.support import suite_census
+E       ImportError: cannot import name 'suite_census' from 'tests.support' (<HOME>\AppData\Local\Temp\s19i2t\base\tests\support\__init__.py)
+
+tests\test_suite_hygiene.py:400: ImportError
+__________________ test_r_tst_004_a_marked_non_arm_is_named ___________________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19i2t/bt/test_r_tst_004_a_marked_non_ar0')
+
+    def test_r_tst_004_a_marked_non_arm_is_named(tmp_path) -> None:
+>       from tests.support import suite_census
+E       ImportError: cannot import name 'suite_census' from 'tests.support' (<HOME>\AppData\Local\Temp\s19i2t\base\tests\support\__init__.py)
+
+tests\test_suite_hygiene.py:415: ImportError
+__________ test_r_tst_005_detector_finds_each_timing_arm_form[form1] __________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19i2t/bt/test_r_tst_005_detector_finds_0')
+form = 'form1'
+
+    @pytest.mark.parametrize(
+        "form", ["form1", "form2", "form3", "form4", "form5", "form6", "form7"]
+    )
+    def test_r_tst_005_detector_finds_each_timing_arm_form(tmp_path, form) -> None:
+>       from tests.support import suite_census
+E       ImportError: cannot import name 'suite_census' from 'tests.support' (<HOME>\AppData\Local\Temp\s19i2t\base\tests\support\__init__.py)
+
+tests\test_suite_hygiene.py:543: ImportError
+__________ test_r_tst_005_detector_finds_each_timing_arm_form[form2] __________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19i2t/bt/test_r_tst_005_detector_finds_1')
+form = 'form2'
+
+    @pytest.mark.parametrize(
+        "form", ["form1", "form2", "form3", "form4", "form5", "form6", "form7"]
+    )
+    def test_r_tst_005_detector_finds_each_timing_arm_form(tmp_path, form) -> None:
+>       from tests.support import suite_census
+E       ImportError: cannot import name 'suite_census' from 'tests.support' (<HOME>\AppData\Local\Temp\s19i2t\base\tests\support\__init__.py)
+
+tests\test_suite_hygiene.py:543: ImportError
+__________ test_r_tst_005_detector_finds_each_timing_arm_form[form3] __________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19i2t/bt/test_r_tst_005_detector_finds_2')
+form = 'form3'
+
+    @pytest.mark.parametrize(
+        "form", ["form1", "form2", "form3", "form4", "form5", "form6", "form7"]
+    )
+    def test_r_tst_005_detector_finds_each_timing_arm_form(tmp_path, form) -> None:
+>       from tests.support import suite_census
+E       ImportError: cannot import name 'suite_census' from 'tests.support' (<HOME>\AppData\Local\Temp\s19i2t\base\tests\support\__init__.py)
+
+tests\test_suite_hygiene.py:543: ImportError
+__________ test_r_tst_005_detector_finds_each_timing_arm_form[form4] __________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19i2t/bt/test_r_tst_005_detector_finds_3')
+form = 'form4'
+
+    @pytest.mark.parametrize(
+        "form", ["form1", "form2", "form3", "form4", "form5", "form6", "form7"]
+    )
+    def test_r_tst_005_detector_finds_each_timing_arm_form(tmp_path, form) -> None:
+>       from tests.support import suite_census
+E       ImportError: cannot import name 'suite_census' from 'tests.support' (<HOME>\AppData\Local\Temp\s19i2t\base\tests\support\__init__.py)
+
+tests\test_suite_hygiene.py:543: ImportError
+__________ test_r_tst_005_detector_finds_each_timing_arm_form[form5] __________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19i2t/bt/test_r_tst_005_detector_finds_4')
+form = 'form5'
+
+    @pytest.mark.parametrize(
+        "form", ["form1", "form2", "form3", "form4", "form5", "form6", "form7"]
+    )
+    def test_r_tst_005_detector_finds_each_timing_arm_form(tmp_path, form) -> None:
+>       from tests.support import suite_census
+E       ImportError: cannot import name 'suite_census' from 'tests.support' (<HOME>\AppData\Local\Temp\s19i2t\base\tests\support\__init__.py)
+
+tests\test_suite_hygiene.py:543: ImportError
+__________ test_r_tst_005_detector_finds_each_timing_arm_form[form6] __________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19i2t/bt/test_r_tst_005_detector_finds_5')
+form = 'form6'
+
+    @pytest.mark.parametrize(
+        "form", ["form1", "form2", "form3", "form4", "form5", "form6", "form7"]
+    )
+    def test_r_tst_005_detector_finds_each_timing_arm_form(tmp_path, form) -> None:
+>       from tests.support import suite_census
+E       ImportError: cannot import name 'suite_census' from 'tests.support' (<HOME>\AppData\Local\Temp\s19i2t\base\tests\support\__init__.py)
+
+tests\test_suite_hygiene.py:543: ImportError
+__________ test_r_tst_005_detector_finds_each_timing_arm_form[form7] __________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19i2t/bt/test_r_tst_005_detector_finds_6')
+form = 'form7'
+
+    @pytest.mark.parametrize(
+        "form", ["form1", "form2", "form3", "form4", "form5", "form6", "form7"]
+    )
+    def test_r_tst_005_detector_finds_each_timing_arm_form(tmp_path, form) -> None:
+>       from tests.support import suite_census
+E       ImportError: cannot import name 'suite_census' from 'tests.support' (<HOME>\AppData\Local\Temp\s19i2t\base\tests\support\__init__.py)
+
+tests\test_suite_hygiene.py:543: ImportError
+__________ test_r_tst_006_detector_ignores_intervals_no_assert_reads __________
+
+    def test_r_tst_006_detector_ignores_intervals_no_assert_reads() -> None:
+>       from tests.support import suite_census
+E       ImportError: cannot import name 'suite_census' from 'tests.support' (<HOME>\AppData\Local\Temp\s19i2t\base\tests\support\__init__.py)
+
+tests\test_suite_hygiene.py:575: ImportError
+__________ test_r_tst_007_conventions_hold_each_test_rule[R-TST-007] __________
+
+rule_id = 'R-TST-007'
+
+    @pytest.mark.parametrize(
+        "rule_id", ["R-TST-007", "R-TST-030", "R-TST-047", "R-TST-048", "R-TST-052", "R-TST-060"]
+    )
+    def test_r_tst_007_conventions_hold_each_test_rule(rule_id) -> None:
+        text = CONVENTIONS_PATH.read_text(encoding="utf-8")
+        if rule_id == "R-TST-007":
+>           assert CONVENTIONS_SECTION_TITLE in text
+E           assert 'Test timing, waits and oracles (batch-101 Inc 2)' in '# s19_app — Project Engineering Rules\n\nProject- and stack-specific gates for the Textual TUI + pytest-textual-snaps...utput" — here the *scope* of "complete" for a render increment is the full guard host, not a story-scoped selector.)\n'
+
+tests\test_suite_hygiene.py:606: AssertionError
+__________ test_r_tst_007_conventions_hold_each_test_rule[R-TST-030] __________
+
+rule_id = 'R-TST-030'
+
+    @pytest.mark.parametrize(
+        "rule_id", ["R-TST-007", "R-TST-030", "R-TST-047", "R-TST-048", "R-TST-052", "R-TST-060"]
+    )
+    def test_r_tst_007_conventions_hold_each_test_rule(rule_id) -> None:
+        text = CONVENTIONS_PATH.read_text(encoding="utf-8")
+        if rule_id == "R-TST-007":
+            assert CONVENTIONS_SECTION_TITLE in text
+            section = text.split(CONVENTIONS_SECTION_TITLE, 1)[1]
+            section = section.split("\n#", 1)[0]
+            parallel = 'pytest -n 8 -m "not serial_timing"'
+            serial = "pytest -m serial_timing"
+            assert parallel in section, "release gate parallel lane missing"
+            assert serial in section, "release gate serial lane missing"
+            assert section.index(parallel) < section.index(serial), "lanes out of order"
+            assert "LAN Linux host" in section
+        else:
+>           assert _CONVENTION_RULES[rule_id] in text, (
+                f"{rule_id} sentence missing or edited in {CONVENTIONS_PATH.name}"
+            )
+E           AssertionError: R-TST-030 sentence missing or edited in engineering-rules.md
+E           assert 'An arm that checks the state a key press leaves while a real worker runs holds the worker at a forced slow step or records the state at the product hook; it never samples after the press.' in '# s19_app — Project Engineering Rules\n\nProject- and stack-specific gates for the Textual TUI + pytest-textual-snaps...utput" — here the *scope* of "complete" for a render increment is the full guard host, not a story-scoped selector.)\n'
+
+tests\test_suite_hygiene.py:616: AssertionError
+__________ test_r_tst_007_conventions_hold_each_test_rule[R-TST-047] __________
+
+rule_id = 'R-TST-047'
+
+    @pytest.mark.parametrize(
+        "rule_id", ["R-TST-007", "R-TST-030", "R-TST-047", "R-TST-048", "R-TST-052", "R-TST-060"]
+    )
+    def test_r_tst_007_conventions_hold_each_test_rule(rule_id) -> None:
+        text = CONVENTIONS_PATH.read_text(encoding="utf-8")
+        if rule_id == "R-TST-007":
+            assert CONVENTIONS_SECTION_TITLE in text
+            section = text.split(CONVENTIONS_SECTION_TITLE, 1)[1]
+            section = section.split("\n#", 1)[0]
+            parallel = 'pytest -n 8 -m "not serial_timing"'
+            serial = "pytest -m serial_timing"
+            assert parallel in section, "release gate parallel lane missing"
+            assert serial in section, "release gate serial lane missing"
+            assert section.index(parallel) < section.index(serial), "lanes out of order"
+            assert "LAN Linux host" in section
+        else:
+>           assert _CONVENTION_RULES[rule_id] in text, (
+                f"{rule_id} sentence missing or edited in {CONVENTIONS_PATH.name}"
+            )
+E           AssertionError: R-TST-047 sentence missing or edited in engineering-rules.md
+E           assert 'A timing arm stops its clock at a stamp the product emits (a commit handler, a painted line, an install callback), never when a poll notices.' in '# s19_app — Project Engineering Rules\n\nProject- and stack-specific gates for the Textual TUI + pytest-textual-snaps...utput" — here the *scope* of "complete" for a render increment is the full guard host, not a story-scoped selector.)\n'
+
+tests\test_suite_hygiene.py:616: AssertionError
+__________ test_r_tst_007_conventions_hold_each_test_rule[R-TST-048] __________
+
+rule_id = 'R-TST-048'
+
+    @pytest.mark.parametrize(
+        "rule_id", ["R-TST-007", "R-TST-030", "R-TST-047", "R-TST-048", "R-TST-052", "R-TST-060"]
+    )
+    def test_r_tst_007_conventions_hold_each_test_rule(rule_id) -> None:
+        text = CONVENTIONS_PATH.read_text(encoding="utf-8")
+        if rule_id == "R-TST-007":
+            assert CONVENTIONS_SECTION_TITLE in text
+            section = text.split(CONVENTIONS_SECTION_TITLE, 1)[1]
+            section = section.split("\n#", 1)[0]
+            parallel = 'pytest -n 8 -m "not serial_timing"'
+            serial = "pytest -m serial_timing"
+            assert parallel in section, "release gate parallel lane missing"
+            assert serial in section, "release gate serial lane missing"
+            assert section.index(parallel) < section.index(serial), "lanes out of order"
+            assert "LAN Linux host" in section
+        else:
+>           assert _CONVENTION_RULES[rule_id] in text, (
+                f"{rule_id} sentence missing or edited in {CONVENTIONS_PATH.name}"
+            )
+E           AssertionError: R-TST-048 sentence missing or edited in engineering-rules.md
+E           assert "A margin under 20 % in the serial lane's QC-TM section is a gate finding; the finding gives the base tree's time beside it." in '# s19_app — Project Engineering Rules\n\nProject- and stack-specific gates for the Textual TUI + pytest-textual-snaps...utput" — here the *scope* of "complete" for a render increment is the full guard host, not a story-scoped selector.)\n'
+
+tests\test_suite_hygiene.py:616: AssertionError
+__________ test_r_tst_007_conventions_hold_each_test_rule[R-TST-052] __________
+
+rule_id = 'R-TST-052'
+
+    @pytest.mark.parametrize(
+        "rule_id", ["R-TST-007", "R-TST-030", "R-TST-047", "R-TST-048", "R-TST-052", "R-TST-060"]
+    )
+    def test_r_tst_007_conventions_hold_each_test_rule(rule_id) -> None:
+        text = CONVENTIONS_PATH.read_text(encoding="utf-8")
+        if rule_id == "R-TST-007":
+            assert CONVENTIONS_SECTION_TITLE in text
+            section = text.split(CONVENTIONS_SECTION_TITLE, 1)[1]
+            section = section.split("\n#", 1)[0]
+            parallel = 'pytest -n 8 -m "not serial_timing"'
+            serial = "pytest -m serial_timing"
+            assert parallel in section, "release gate parallel lane missing"
+            assert serial in section, "release gate serial lane missing"
+            assert section.index(parallel) < section.index(serial), "lanes out of order"
+            assert "LAN Linux host" in section
+        else:
+>           assert _CONVENTION_RULES[rule_id] in text, (
+                f"{rule_id} sentence missing or edited in {CONVENTIONS_PATH.name}"
+            )
+E           AssertionError: R-TST-052 sentence missing or edited in engineering-rules.md
+E           assert 'A test that waits on a painted outcome collects the lines painted since its trigger (StatusLog.since(mark)) and asserts the one it needs; it never waits on the newest line alone.' in '# s19_app — Project Engineering Rules\n\nProject- and stack-specific gates for the Textual TUI + pytest-textual-snaps...utput" — here the *scope* of "complete" for a render increment is the full guard host, not a story-scoped selector.)\n'
+
+tests\test_suite_hygiene.py:616: AssertionError
+__________ test_r_tst_007_conventions_hold_each_test_rule[R-TST-060] __________
+
+rule_id = 'R-TST-060'
+
+    @pytest.mark.parametrize(
+        "rule_id", ["R-TST-007", "R-TST-030", "R-TST-047", "R-TST-048", "R-TST-052", "R-TST-060"]
+    )
+    def test_r_tst_007_conventions_hold_each_test_rule(rule_id) -> None:
+        text = CONVENTIONS_PATH.read_text(encoding="utf-8")
+        if rule_id == "R-TST-007":
+            assert CONVENTIONS_SECTION_TITLE in text
+            section = text.split(CONVENTIONS_SECTION_TITLE, 1)[1]
+            section = section.split("\n#", 1)[0]
+            parallel = 'pytest -n 8 -m "not serial_timing"'
+            serial = "pytest -m serial_timing"
+            assert parallel in section, "release gate parallel lane missing"
+            assert serial in section, "release gate serial lane missing"
+            assert section.index(parallel) < section.index(serial), "lanes out of order"
+            assert "LAN Linux host" in section
+        else:
+>           assert _CONVENTION_RULES[rule_id] in text, (
+                f"{rule_id} sentence missing or edited in {CONVENTIONS_PATH.name}"
+            )
+E           AssertionError: R-TST-060 sentence missing or edited in engineering-rules.md
+E           assert 'When an increment changes the order or the source of an observable, its gate greps tests/ for every node that asserts that observable and runs them, whatever module they sit in.' in '# s19_app — Project Engineering Rules\n\nProject- and stack-specific gates for the Textual TUI + pytest-textual-snaps...utput" — here the *scope* of "complete" for a render increment is the full guard host, not a story-scoped selector.)\n'
+
+tests\test_suite_hygiene.py:616: AssertionError
+_________________ test_r_tst_010_pull_request_runs_two_lanes __________________
+
+    def test_r_tst_010_pull_request_runs_two_lanes() -> None:
+        text = WORKFLOW_PATH.read_text(encoding="utf-8")
+        jobs = _workflow_jobs(text)
+        steps = _job_steps(jobs["tui-ci"])
+        runs = [_step_run(step) for step in _lane_steps(steps, "pull_request")]
+>       assert runs == [PR_LANE_1, PR_LANE_2]
+E       assert ['pytest -q -m "not slow"'] == ['pytest -v -...nd not slow"']
+E         
+E         At index 0 diff: 'pytest -q -m "not slow"' != 'pytest -v -rs -n auto --dist loadfile -m "not slow and not serial_timing"'
+E         Right contains one more item: 'pytest -q -rs -m "serial_timing and not slow"'
+E         Use -v to get more diff
+
+tests\test_suite_hygiene.py:727: AssertionError
+_____________________ test_r_tst_011_push_runs_two_lanes ______________________
+
+    def test_r_tst_011_push_runs_two_lanes() -> None:
+        text = WORKFLOW_PATH.read_text(encoding="utf-8")
+        jobs = _workflow_jobs(text)
+        steps = _job_steps(jobs["tui-ci"])
+        runs = [_step_run(step) for step in _lane_steps(steps, "push")]
+>       assert runs == [PUSH_LANE_1, PUSH_LANE_2]
+E       assert ['pytest -q'] == ['pytest -v -...erial_timing']
+E         
+E         At index 0 diff: 'pytest -q' != 'pytest -v -rs -n auto --dist loadfile -m "not serial_timing"'
+E         Right contains one more item: 'pytest -q -rs -m serial_timing'
+E         Use -v to get more diff
+
+tests\test_suite_hygiene.py:737: AssertionError
+______________ test_r_tst_012_serial_lane_runs_after_a_red_lane _______________
+
+    def test_r_tst_012_serial_lane_runs_after_a_red_lane() -> None:
+        text = WORKFLOW_PATH.read_text(encoding="utf-8")
+        jobs = _workflow_jobs(text)
+        steps = _job_steps(jobs["tui-ci"])
+        by_run = {}
+        for step in steps:
+            run = _step_run(step)
+            if run:
+                by_run[run] = step
+>       lane2_ifs = [
+            _step_value(by_run[command], "if") for command in (PR_LANE_2, PUSH_LANE_2)
+        ]
+
+tests\test_suite_hygiene.py:750: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+.0 = <tuple_iterator object at 0x000001A3B34EBCA0>
+
+    lane2_ifs = [
+>       _step_value(by_run[command], "if") for command in (PR_LANE_2, PUSH_LANE_2)
+                    ^^^^^^^^^^^^^^^
+    ]
+E   KeyError: 'pytest -q -rs -m "serial_timing and not slow"'
+
+tests\test_suite_hygiene.py:751: KeyError
+________________ test_r_tst_013_014_ci_checks_out_full_history ________________
+
+    def test_r_tst_013_014_ci_checks_out_full_history() -> None:
+        text = WORKFLOW_PATH.read_text(encoding="utf-8")
+        jobs = _workflow_jobs(text)
+        assert "snapshot" in jobs, "snapshot job must stay present"
+        tui_steps = _job_steps(jobs["tui-ci"])
+        checkouts = [
+            step
+            for step in tui_steps
+            if (_step_value(step, "uses") or "").startswith("actions/checkout@")
+        ]
+        assert len(checkouts) == 1
+        checkout_lines = "\n".join(checkouts[0])
+>       assert "fetch-depth: 0" in checkout_lines
+E       AssertionError: assert 'fetch-depth: 0' in '      - name: Check out repository\n        uses: actions/checkout@v4\n'
+
+tests\test_suite_hygiene.py:768: AssertionError
+____________________ test_r_tst_015_016_017_ci_time_limits ____________________
+
+    def test_r_tst_015_016_017_ci_time_limits() -> None:
+        text = WORKFLOW_PATH.read_text(encoding="utf-8")
+        jobs = _workflow_jobs(text)
+        tui_lines = jobs["tui-ci"]
+        steps = _job_steps(tui_lines)
+        by_run = {}
+        for step in steps:
+            run = _step_run(step)
+            if run:
+                by_run[run] = step
+        for command in (PR_LANE_1, PR_LANE_2, PUSH_LANE_1, PUSH_LANE_2):
+>           assert command in by_run, f"missing lane step: {command}"
+E           AssertionError: missing lane step: pytest -v -rs -n auto --dist loadfile -m "not slow and not serial_timing"
+E           assert 'pytest -v -rs -n auto --dist loadfile -m "not slow and not serial_timing"' in {'pytest -q': ['      - name: Run full test suite (pushes)', "        if: github.event_name == 'push'", '        run: ... requirements.txt', '          python -m pip install pytest', '          python -m pip install -e ".[evidence]"', ...]}
+
+tests\test_suite_hygiene.py:791: AssertionError
+___________________ test_r_tst_018_ci_installs_pinned_xdist ___________________
+
+    def test_r_tst_018_ci_installs_pinned_xdist() -> None:
+        text = WORKFLOW_PATH.read_text(encoding="utf-8")
+        jobs = _workflow_jobs(text)
+        steps = _job_steps(jobs["tui-ci"])
+        runs = "\n".join(run for run in (_step_run(step) for step in steps) if run)
+>       assert XDIST_INSTALL_LINE in runs
+E       assert 'python -m pip install "pytest-xdist==3.8.0"' in 'python -m pip install --upgrade pip\npython -m pip install -r requirements.txt\npython -m pip install pytest\npython ... features.check(\'freetype2\'), \'freetype2 unavailable\'; print(PIL.__version__)"\npytest -q -m "not slow"\npytest -q'
+
+tests\test_suite_hygiene.py:812: AssertionError
+___________ test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock ___________
+
+    @pytest.mark.serial_timing
+    def test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock() -> None:
+        from tests.support import timing as timing_support
+    
+        pilot = _FakePilot()
+        started = time.perf_counter()
+        with pytest.raises(AssertionError) as excinfo:
+            asyncio.run(
+>               timing_support.wait_until(pilot, lambda: False, "never", timeout=0.5)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+            )
+E           AttributeError: module 'tests.support.timing' has no attribute 'wait_until'
+
+tests\test_suite_hygiene.py:828: AttributeError
+_________ test_r_tst_020_021_shared_helpers_delegate_to_the_one_wait __________
+
+    def test_r_tst_020_021_shared_helpers_delegate_to_the_one_wait() -> None:
+>       from tests.support import suite_census
+E       ImportError: cannot import name 'suite_census' from 'tests.support' (<HOME>\AppData\Local\Temp\s19i2t\base\tests\support\__init__.py)
+
+tests\test_suite_hygiene.py:869: ImportError
+______________ test_r_tst_021_shared_wait_yields_between_checks _______________
+
+    def test_r_tst_021_shared_wait_yields_between_checks() -> None:
+        from tests.support import timing as timing_support
+    
+        pilot = _FakePilot()
+        checks = {"n": 0}
+    
+        def _predicate():
+            checks["n"] += 1
+            return False
+    
+        with pytest.raises(AssertionError, match="never"):
+>           asyncio.run(timing_support.wait_until(pilot, _predicate, "never", timeout=1.0))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'tests.support.timing' has no attribute 'wait_until'
+
+tests\test_suite_hygiene.py:908: AttributeError
+____________ test_r_tst_022_settled_pauses_before_its_first_check _____________
+
+    def test_r_tst_022_settled_pauses_before_its_first_check() -> None:
+        from tests import b97_probes
+    
+        pilot = _FakePilot()
+        seen = []
+    
+        def _predicate():
+            if not seen:
+                seen.append(pilot.pauses)
+            return True
+    
+>       asyncio.run(b97_probes.settled(pilot, _predicate, "row 2 back", timeout=5.0))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: settled() got an unexpected keyword argument 'timeout'
+
+tests\test_suite_hygiene.py:925: TypeError
+_______________ test_r_tst_023_shared_wait_signatures_are_kept ________________
+
+    def test_r_tst_023_shared_wait_signatures_are_kept() -> None:
+        from tests import b97_probes
+        from tests.support import b100_load_dialog
+        from tests.support import b100_projects
+    
+        def _check_wait_signature(fn, positional, defaults, timeout_default=60.0):
+            sig = inspect.signature(fn)
+            params = list(sig.parameters.values())
+            ordered = [
+                p
+                for p in params
+                if p.kind in (inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD)
+            ]
+            assert [p.name for p in ordered] == positional, f"{fn.__name__}: {ordered}"
+            for name, value in defaults.items():
+                assert sig.parameters[name].default == value, (
+                    f"{fn.__name__}: default of {name} changed"
+                )
+            timeout = sig.parameters.get("timeout")
+            assert timeout is not None and timeout.kind is inspect.Parameter.KEYWORD_ONLY, (
+                f"{fn.__name__}: keyword-only timeout missing"
+            )
+            assert timeout.default == timeout_default
+    
+>       _check_wait_signature(
+            b97_probes.settled, ["pilot", "predicate", "description", "attempts"], {"attempts": 60}
+        )
+
+tests\test_suite_hygiene.py:960: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+fn = <function settled at 0x000001A3B5FEA200>
+positional = ['pilot', 'predicate', 'description', 'attempts']
+defaults = {'attempts': 60}, timeout_default = 60.0
+
+    def _check_wait_signature(fn, positional, defaults, timeout_default=60.0):
+        sig = inspect.signature(fn)
+        params = list(sig.parameters.values())
+        ordered = [
+            p
+            for p in params
+            if p.kind in (inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD)
+        ]
+        assert [p.name for p in ordered] == positional, f"{fn.__name__}: {ordered}"
+        for name, value in defaults.items():
+            assert sig.parameters[name].default == value, (
+                f"{fn.__name__}: default of {name} changed"
+            )
+        timeout = sig.parameters.get("timeout")
+>       assert timeout is not None and timeout.kind is inspect.Parameter.KEYWORD_ONLY, (
+            f"{fn.__name__}: keyword-only timeout missing"
+        )
+E       AssertionError: settled: keyword-only timeout missing
+E       assert (None is not None)
+
+tests\test_suite_hygiene.py:955: AssertionError
+________________ test_r_tst_024_shared_wait_failure_texts[W1] _________________
+
+case = 'W1'
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19i2t/bt/test_r_tst_024_shared_wait_fai0')
+
+    @pytest.mark.parametrize("case", [f"W{i}" for i in range(1, 10)])
+    def test_r_tst_024_shared_wait_failure_texts(case, tmp_path) -> None:
+>       from tests.support import suite_census
+E       ImportError: cannot import name 'suite_census' from 'tests.support' (<HOME>\AppData\Local\Temp\s19i2t\base\tests\support\__init__.py)
+
+tests\test_suite_hygiene.py:1004: ImportError
+________________ test_r_tst_024_shared_wait_failure_texts[W2] _________________
+
+case = 'W2'
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19i2t/bt/test_r_tst_024_shared_wait_fai1')
+
+    @pytest.mark.parametrize("case", [f"W{i}" for i in range(1, 10)])
+    def test_r_tst_024_shared_wait_failure_texts(case, tmp_path) -> None:
+>       from tests.support import suite_census
+E       ImportError: cannot import name 'suite_census' from 'tests.support' (<HOME>\AppData\Local\Temp\s19i2t\base\tests\support\__init__.py)
+
+tests\test_suite_hygiene.py:1004: ImportError
+________________ test_r_tst_024_shared_wait_failure_texts[W3] _________________
+
+case = 'W3'
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19i2t/bt/test_r_tst_024_shared_wait_fai2')
+
+    @pytest.mark.parametrize("case", [f"W{i}" for i in range(1, 10)])
+    def test_r_tst_024_shared_wait_failure_texts(case, tmp_path) -> None:
+>       from tests.support import suite_census
+E       ImportError: cannot import name 'suite_census' from 'tests.support' (<HOME>\AppData\Local\Temp\s19i2t\base\tests\support\__init__.py)
+
+tests\test_suite_hygiene.py:1004: ImportError
+________________ test_r_tst_024_shared_wait_failure_texts[W4] _________________
+
+case = 'W4'
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19i2t/bt/test_r_tst_024_shared_wait_fai3')
+
+    @pytest.mark.parametrize("case", [f"W{i}" for i in range(1, 10)])
+    def test_r_tst_024_shared_wait_failure_texts(case, tmp_path) -> None:
+>       from tests.support import suite_census
+E       ImportError: cannot import name 'suite_census' from 'tests.support' (<HOME>\AppData\Local\Temp\s19i2t\base\tests\support\__init__.py)
+
+tests\test_suite_hygiene.py:1004: ImportError
+________________ test_r_tst_024_shared_wait_failure_texts[W5] _________________
+
+case = 'W5'
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19i2t/bt/test_r_tst_024_shared_wait_fai4')
+
+    @pytest.mark.parametrize("case", [f"W{i}" for i in range(1, 10)])
+    def test_r_tst_024_shared_wait_failure_texts(case, tmp_path) -> None:
+>       from tests.support import suite_census
+E       ImportError: cannot import name 'suite_census' from 'tests.support' (<HOME>\AppData\Local\Temp\s19i2t\base\tests\support\__init__.py)
+
+tests\test_suite_hygiene.py:1004: ImportError
+________________ test_r_tst_024_shared_wait_failure_texts[W6] _________________
+
+case = 'W6'
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19i2t/bt/test_r_tst_024_shared_wait_fai5')
+
+    @pytest.mark.parametrize("case", [f"W{i}" for i in range(1, 10)])
+    def test_r_tst_024_shared_wait_failure_texts(case, tmp_path) -> None:
+>       from tests.support import suite_census
+E       ImportError: cannot import name 'suite_census' from 'tests.support' (<HOME>\AppData\Local\Temp\s19i2t\base\tests\support\__init__.py)
+
+tests\test_suite_hygiene.py:1004: ImportError
+________________ test_r_tst_024_shared_wait_failure_texts[W7] _________________
+
+case = 'W7'
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19i2t/bt/test_r_tst_024_shared_wait_fai6')
+
+    @pytest.mark.parametrize("case", [f"W{i}" for i in range(1, 10)])
+    def test_r_tst_024_shared_wait_failure_texts(case, tmp_path) -> None:
+>       from tests.support import suite_census
+E       ImportError: cannot import name 'suite_census' from 'tests.support' (<HOME>\AppData\Local\Temp\s19i2t\base\tests\support\__init__.py)
+
+tests\test_suite_hygiene.py:1004: ImportError
+________________ test_r_tst_024_shared_wait_failure_texts[W8] _________________
+
+case = 'W8'
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19i2t/bt/test_r_tst_024_shared_wait_fai7')
+
+    @pytest.mark.parametrize("case", [f"W{i}" for i in range(1, 10)])
+    def test_r_tst_024_shared_wait_failure_texts(case, tmp_path) -> None:
+>       from tests.support import suite_census
+E       ImportError: cannot import name 'suite_census' from 'tests.support' (<HOME>\AppData\Local\Temp\s19i2t\base\tests\support\__init__.py)
+
+tests\test_suite_hygiene.py:1004: ImportError
+________________ test_r_tst_024_shared_wait_failure_texts[W9] _________________
+
+case = 'W9'
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19i2t/bt/test_r_tst_024_shared_wait_fai8')
+
+    @pytest.mark.parametrize("case", [f"W{i}" for i in range(1, 10)])
+    def test_r_tst_024_shared_wait_failure_texts(case, tmp_path) -> None:
+>       from tests.support import suite_census
+E       ImportError: cannot import name 'suite_census' from 'tests.support' (<HOME>\AppData\Local\Temp\s19i2t\base\tests\support\__init__.py)
+
+tests\test_suite_hygiene.py:1004: ImportError
+_______ test_r_tst_025_load_project_clock_stops_at_the_install_callback _______
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19i2t/bt/test_r_tst_025_load_project_cl0')
+
+    def test_r_tst_025_load_project_clock_stops_at_the_install_callback(tmp_path) -> None:
+        from tests.support import b100_projects as projects
+    
+        base = tmp_path / "app"
+        projects.save_case01_project(base, files=("firmware.s19",))
+        for _ in range(3):
+            stamps = []
+    
+            async def scenario(app, pilot, log):
+                real_install = app._install_prepared_project
+    
+                def recorder(prepared):
+                    real_install(prepared)
+                    stamps.append(time.perf_counter())
+    
+                app._install_prepared_project = recorder
+                stamps.append(time.perf_counter())
+                elapsed = await projects.load_project(pilot, app, "P")
+                assert (
+                    app._install_prepared_project is recorder
+                ), "the install wrapper must be restored (E3A-12)"
+                return elapsed
+    
+            elapsed = projects.run_app(base, scenario)
+            start, stamp = stamps
+>           assert abs(elapsed - (stamp - start)) <= 0.001, (
+                f"returned interval {elapsed:.6f} s is not the install-return stamp "
+                f"minus the start ({stamp - start:.6f} s)"
+            )
+E           AssertionError: returned interval 0.612764 s is not the install-return stamp minus the start (0.135097 s)
+E           assert 0.4776665000244975 <= 0.001
+E            +  where 0.4776665000244975 = abs((0.6127636000746861 - (686105.3600778 - 686105.2249807)))
+
+tests\test_suite_hygiene.py:1104: AssertionError
+________ test_r_tst_031_032_post_press_and_dwell_arms_keep_their_forms ________
+
+    def test_r_tst_031_032_post_press_and_dwell_arms_keep_their_forms() -> None:
+>       from tests.support import suite_census
+E       ImportError: cannot import name 'suite_census' from 'tests.support' (<HOME>\AppData\Local\Temp\s19i2t\base\tests\support\__init__.py)
+
+tests\test_suite_hygiene.py:1116: ImportError
+___________ test_r_tst_040_041_every_upper_timing_bound_is_reported ___________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19i2t/bt/test_r_tst_040_041_every_upper0')
+
+    def test_r_tst_040_041_every_upper_timing_bound_is_reported(tmp_path) -> None:
+>       from tests.support import suite_census
+E       ImportError: cannot import name 'suite_census' from 'tests.support' (<HOME>\AppData\Local\Temp\s19i2t\base\tests\support\__init__.py)
+
+tests\test_suite_hygiene.py:1180: ImportError
+_____________ test_r_tst_050_status_log_keeps_every_painted_line ______________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19i2t/bt/test_r_tst_050_status_log_keep0')
+
+    def test_r_tst_050_status_log_keeps_every_painted_line(tmp_path) -> None:
+        from tests.support import b100_projects as projects
+>       from tests.support import suite_census
+E       ImportError: cannot import name 'suite_census' from 'tests.support' (<HOME>\AppData\Local\Temp\s19i2t\base\tests\support\__init__.py)
+
+tests\test_suite_hygiene.py:1448: ImportError
+________________ test_r_tst_051_newest_line_waits_do_not_grow _________________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19i2t/bt/test_r_tst_051_newest_line_wai0')
+
+    def test_r_tst_051_newest_line_waits_do_not_grow(tmp_path) -> None:
+>       from tests.support import suite_census
+E       ImportError: cannot import name 'suite_census' from 'tests.support' (<HOME>\AppData\Local\Temp\s19i2t\base\tests\support\__init__.py)
+
+tests\test_suite_hygiene.py:1503: ImportError
+___ test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses ____
+
+    def test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses() -> None:
+        inc2_dir = EVIDENCE_ROOT / "inc-2"
+        if not inc2_dir.is_dir():
+>           pytest.fail(
+                "the increment's evidence folder is missing from this checkout; "
+                "the redaction gate has nothing it is responsible for"
+            )
+E           Failed: the increment's evidence folder is missing from this checkout; the redaction gate has nothing it is responsible for
+
+tests\test_suite_hygiene.py:1593: Failed
+_____________ test_r_tst_080_report_goldens_hold_no_tool_version ______________
+
+    def test_r_tst_080_report_goldens_hold_no_tool_version() -> None:
+        goldens = TESTS_ROOT / "goldens"
+        pinned = []
+        for path in sorted(goldens.rglob("*")):
+            if not path.is_file():
+                continue
+            data = path.read_bytes()
+            if re.search(rb"Tool version: [0-9]", data):
+                pinned.append(path.relative_to(REPO_ROOT).as_posix())
+>       assert not pinned, "goldens pin a tool version: " + ", ".join(pinned)
+E       AssertionError: goldens pin a tool version: tests/goldens/batch35/at054b-before-after-report.html, tests/goldens/batch35/at054b-before-after-report.md, tests/goldens/batch35/at055b-project-report.md, tests/goldens/batch64/addendum-below-bound.md, tests/goldens/batch74/producer-bound-positive-control.md, tests/goldens/batch76/document-bound-preflight.md, tests/goldens/batch99/at288-pre-move-report.bin
+E       assert not ['tests/goldens/batch35/at054b-before-after-report.html', 'tests/goldens/batch35/at054b-before-after-report.md', 'test..., 'tests/goldens/batch74/producer-bound-positive-control.md', 'tests/goldens/batch76/document-bound-preflight.md', ...]
+
+tests\test_suite_hygiene.py:1624: AssertionError
+_______________ test_r_tst_081_golden_takes_the_package_version _______________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001A3B702F050>
+
+    def test_r_tst_081_golden_takes_the_package_version(monkeypatch) -> None:
+        import s19_app.version
+    
+        from tests.conftest import canonical_report_bytes
+    
+        monkeypatch.setattr(s19_app.version, "__version__", "9.9.9")
+        out = canonical_report_bytes(b"- Tool version: <TOOL-VERSION>\n")
+>       assert b"Tool version: 9.9.9" in out
+E       AssertionError: assert b'Tool version: 9.9.9' in b'- Tool version: <TOOL-VERSION>\n'
+
+tests\test_suite_hygiene.py:1639: AssertionError
+_________________ test_r_tst_082_wrong_version_still_differs __________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001A3B37E0590>
+
+    def test_r_tst_082_wrong_version_still_differs(monkeypatch) -> None:
+        import s19_app.version
+    
+        from tests.conftest import canonical_report_bytes
+    
+        monkeypatch.setattr(s19_app.version, "__version__", "9.9.9")
+        produced = canonical_report_bytes(b"- Tool version: 0.0.0\n")
+        assert produced == b"- Tool version: 0.0.0\n", (
+            "a produced report's own version must not be touched by the canonicalizer"
+        )
+        golden_side = canonical_report_bytes(b"- Tool version: <TOOL-VERSION>\n")
+>       assert golden_side == b"- Tool version: 9.9.9\n"
+E       AssertionError: assert b'- Tool vers...OL-VERSION>\n' == b'- Tool version: 9.9.9\n'
+E         
+E         At index 16 diff: b'<' != b'9'
+E         Use -v to get more diff
+
+tests\test_suite_hygiene.py:1654: AssertionError
+============================== warnings summary ===============================
+tests\test_suite_hygiene.py:820
+  <HOME>\AppData\Local\Temp\s19i2t\base\tests\test_suite_hygiene.py:820: PytestUnknownMarkWarning: Unknown pytest.mark.serial_timing - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.serial_timing
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_suite_hygiene.py::test_r_tst_001_serial_timing_marker_is_registered
+FAILED tests/test_suite_hygiene.py::test_r_tst_002_every_timing_arm_carries_serial_timing
+FAILED tests/test_suite_hygiene.py::test_r_tst_002_2_parallel_lane_collection_prints_no_qc_tm_text
+FAILED tests/test_suite_hygiene.py::test_r_tst_003_an_unmarked_timing_arm_is_named
+FAILED tests/test_suite_hygiene.py::test_r_tst_004_a_marked_non_arm_is_named
+FAILED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form1]
+FAILED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form2]
+FAILED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form3]
+FAILED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form4]
+FAILED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form5]
+FAILED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form6]
+FAILED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form7]
+FAILED tests/test_suite_hygiene.py::test_r_tst_006_detector_ignores_intervals_no_assert_reads
+FAILED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-007]
+FAILED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-030]
+FAILED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-047]
+FAILED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-048]
+FAILED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-052]
+FAILED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-060]
+FAILED tests/test_suite_hygiene.py::test_r_tst_010_pull_request_runs_two_lanes
+FAILED tests/test_suite_hygiene.py::test_r_tst_011_push_runs_two_lanes - asse...
+FAILED tests/test_suite_hygiene.py::test_r_tst_012_serial_lane_runs_after_a_red_lane
+FAILED tests/test_suite_hygiene.py::test_r_tst_013_014_ci_checks_out_full_history
+FAILED tests/test_suite_hygiene.py::test_r_tst_015_016_017_ci_time_limits - A...
+FAILED tests/test_suite_hygiene.py::test_r_tst_018_ci_installs_pinned_xdist
+FAILED tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+FAILED tests/test_suite_hygiene.py::test_r_tst_020_021_shared_helpers_delegate_to_the_one_wait
+FAILED tests/test_suite_hygiene.py::test_r_tst_021_shared_wait_yields_between_checks
+FAILED tests/test_suite_hygiene.py::test_r_tst_022_settled_pauses_before_its_first_check
+FAILED tests/test_suite_hygiene.py::test_r_tst_023_shared_wait_signatures_are_kept
+FAILED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W1]
+FAILED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W2]
+FAILED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W3]
+FAILED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W4]
+FAILED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W5]
+FAILED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W6]
+FAILED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W7]
+FAILED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W8]
+FAILED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W9]
+FAILED tests/test_suite_hygiene.py::test_r_tst_025_load_project_clock_stops_at_the_install_callback
+FAILED tests/test_suite_hygiene.py::test_r_tst_031_032_post_press_and_dwell_arms_keep_their_forms
+FAILED tests/test_suite_hygiene.py::test_r_tst_040_041_every_upper_timing_bound_is_reported
+FAILED tests/test_suite_hygiene.py::test_r_tst_050_status_log_keeps_every_painted_line
+FAILED tests/test_suite_hygiene.py::test_r_tst_051_newest_line_waits_do_not_grow
+FAILED tests/test_suite_hygiene.py::test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses
+FAILED tests/test_suite_hygiene.py::test_r_tst_080_report_goldens_hold_no_tool_version
+FAILED tests/test_suite_hygiene.py::test_r_tst_081_golden_takes_the_package_version
+FAILED tests/test_suite_hygiene.py::test_r_tst_082_wrong_version_still_differs
+ERROR tests/test_suite_hygiene.py::test_r_tst_040_report_margin_returns_the_bound
+ERROR tests/test_suite_hygiene.py::test_r_tst_042_margin_report_is_a_test_property
+ERROR tests/test_suite_hygiene.py::test_r_tst_043_045_qc_tm_section_rows_and_count
+ERROR tests/test_suite_hygiene.py::test_r_tst_043_2_teardown_error_report_gives_one_row
+ERROR tests/test_suite_hygiene.py::test_r_tst_044_low_margin_prefix
+ERROR tests/test_suite_hygiene.py::test_r_tst_046_over_bound_arm_still_reports
+48 failed, 1 warning, 6 errors in 24.40s
+== exit code: 1 ==

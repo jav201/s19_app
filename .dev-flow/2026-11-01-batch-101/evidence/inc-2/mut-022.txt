@@ -1,0 +1,28 @@
+== E5 mutant 022 ==
+== date: 2026-11-02T14:05:18Z ==
+s19_app: <HOME>\AppData\Local\Temp\s19m2\wt\s19_app\__init__.py
+F                                                                        [100%]
+================================== FAILURES ===================================
+____________ test_r_tst_022_settled_pauses_before_its_first_check _____________
+
+    def test_r_tst_022_settled_pauses_before_its_first_check() -> None:
+        from tests import b97_probes
+    
+        pilot = _FakePilot()
+        seen = []
+    
+        def _predicate():
+            if not seen:
+                seen.append(pilot.pauses)
+            return True
+    
+        asyncio.run(b97_probes.settled(pilot, _predicate, "row 2 back", timeout=5.0))
+>       assert seen and seen[0] >= 1, "settled must pause once before its first check"
+E       AssertionError: settled must pause once before its first check
+E       assert ([0] and 0 >= 1)
+
+tests\test_suite_hygiene.py:926: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_suite_hygiene.py::test_r_tst_022_settled_pauses_before_its_first_check
+1 failed in 0.65s
+pytest exit: 1
