@@ -2058,7 +2058,7 @@ def test_r_cmp_004_9_1_6_filter_file_name_report_safe(tmp_path: Path) -> None:
     assert "- Filter file: a\\|b\\`c\\<b\\>d\\.json" in md_text.splitlines()
 
 
-def test_r_cmp_004_9_1_7_symbol_cut_at_512(tmp_path: Path) -> None:
+def test_r_cmp_004_9_1_7_symbol_cut_to_512_characters(tmp_path: Path) -> None:
     """A 600-character symbol name is cut at the 512-character field limit
     and marked."""
     comparison = _comparison(

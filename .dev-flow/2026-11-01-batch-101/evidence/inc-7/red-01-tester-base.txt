@@ -5,7 +5,7 @@
 # Paths redacted (<SCRATCH>, <CONDA>, <HOME>).
 
 base revision: 9f9f6af6417ac1a3d7fd7679a93995b38088e6f1
-s19_app.__file__ = C:\Users\<user>\AppData\Local\Temp\s19e4t7\base\s19_app\__init__.py
+s19_app.__file__ = <HOME>\AppData\Local\Temp\s19e4t7\base\s19_app\__init__.py
 FFFF.FFFF...FFFFFFFFFF..FFFFFFFF.FFFFFFFFFF..FFFFFFFFFFFF.FFFFFF         [100%]
 ================================== FAILURES ===================================
 _______________ test_r_cmp_004_14_1_markdown_changed_run_whole ________________

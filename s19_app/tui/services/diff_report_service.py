@@ -247,6 +247,8 @@ def _strip_ctl(value: object) -> str:
         ``_esc`` escapes markup but does not replace. The private
         ``markdown_safety._normalise`` is imported on purpose (one definition of
         the dropped categories, pinned by ``tests/test_report_markup_safety.py``).
+        No public alias exists because adding one would have been a fifth
+        source file in batch-101 Inc 7 (the increment cap).
 
     Args:
         value (object): The raw value (symbol, path, entry field); rendered

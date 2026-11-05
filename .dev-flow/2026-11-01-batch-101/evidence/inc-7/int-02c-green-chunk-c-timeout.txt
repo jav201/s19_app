@@ -1,0 +1,9 @@
+$ git rev-parse --short HEAD: 9508239
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc7\s19_app\__init__.py
+$ python -m pytest -q -rA -m not serial_timing tests/test_tui_commandbar.py tests/test_tui_diff_screen.py tests/test_tui_directionb.py tests/test_tui_flow_builder_b94.py tests/test_tui_map_big.py tests/test_tui_patch_json.py tests/test_tui_report_filter_surface.py tests/test_tui_report_seam.py
+........................................F........F...................... [ 15%]
+........................................................................ [ 31%]
+........................................................................ [ 47%]
+........................................................................ [ 63%]
+........................................................................ [ 79%]
+exit=124
