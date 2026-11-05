@@ -94,7 +94,7 @@ The UI rows are known failed checks for the next iteration.
 | 2 | Test hygiene, timing arms and CI | G-015, SR12b-7, SR12b-7b, QC-TM, QC-OR, QC-BC, R2-CI, CI deferral, dwell flake `test_tc_b97_64` | 0 | merges after 1 |
 | 3 | Save project margin; a vanished project folder | R1-P1, OBS-F2-1 (D11-72) | `app.py` | 1, 2 |
 | 4 | Documents resolve symbols through the loaded A2L | F-01 (3 sites), T-03, T-04, T-12 | `app.py`, `change_service.py`, `variant_execution_service.py` | 3 |
-| 5 | Check Editor keeps picks, names and expected bytes | F-26 (D9-12), F-27, D9-11 | `app.py`, `screens_directionb.py` | 4 |
+| 5 | Check Editor keeps picks, names and expected bytes; **first:** CRC Designer coverage refreshes after an in-place apply (Inc 13 D-4 / SEC-3, integrity priority: designer CRC after the apply equals `zlib.crc32` of the new bytes) | F-26 (D9-12), F-27, D9-11, D-4 (Inc 13) | `app.py`, `screens_directionb.py` | 4 |
 | 6 | Patch Editor document lifecycle | F-05 (D14-14), F-06 (D10-25, D9-15), F-40 (D9-10, D10-30), F-47 | `app.py`, `change_service.py`, `screens_directionb.py` | 5 |
 | 7 | Before/after report names itself and its inputs; full hex windows in written reports | F-42 (D14-15), F6-1 (HIGH, co-located) | `diff_report_service.py`, `before_after_service.py` | 1 |
 | 8 | Flow CRC block reads designer templates; external outputs stay current | F-28 (D13-23), F-49 (D15-17) | `flow_execution_service.py`, `crc_config.py`, `workspace.py`, `variant_execution_service.py`? | 1 (4 if the last file) |
