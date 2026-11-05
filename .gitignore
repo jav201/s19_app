@@ -28,3 +28,6 @@ examples/case_08_release_demo/demo_check.chk.json
 examples/case_08_release_demo/demo_check_fails.chk.json
 examples/case_08_release_demo/firmware_issues.a2l
 examples/case_08_release_demo/firmware_issues.mac
+
+# Prototype rounds live outside the repository (archived 2026-11-05)
+/prototypes/
