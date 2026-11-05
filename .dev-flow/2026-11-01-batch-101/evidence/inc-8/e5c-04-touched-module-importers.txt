@@ -1,0 +1,341 @@
+=== tests/test_b100_load_dialog.py
+$ pytest -q --tb=short --show-capture=no tests/test_b100_load_dialog.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+........................................................................ [ 45%]
+........................................................................ [ 90%]
+...............                                                          [100%]
+159 passed in 720.03s (0:12:00)
+exit=0
+=== tests/test_b101_crc_model_and_reasons.py
+$ pytest -q --tb=short --show-capture=no tests/test_b101_crc_model_and_reasons.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+...............................................                          [100%]
+47 passed in 47.18s
+exit=0
+=== tests/test_b101_flow_ext_copy.py
+$ pytest -q --tb=short --show-capture=no tests/test_b101_flow_ext_copy.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+..................................................                       [100%]
+50 passed in 7.77s
+exit=0
+=== tests/test_b102_flow_block_edit.py
+$ pytest -q --tb=short --show-capture=no tests/test_b102_flow_block_edit.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+..................................                                       [100%]
+34 passed in 115.68s (0:01:55)
+exit=0
+=== tests/test_b102_flow_file_chooser.py
+$ pytest -q --tb=short --show-capture=no tests/test_b102_flow_file_chooser.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+.........................................                                [100%]
+41 passed in 108.43s (0:01:48)
+exit=0
+=== tests/test_b97_chips_help.py
+$ pytest -q --tb=short --show-capture=no tests/test_b97_chips_help.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+........................................................................ [ 91%]
+.......                                                                  [100%]
+79 passed in 343.12s (0:05:43)
+exit=0
+=== tests/test_b97_flow_builder.py
+$ pytest -q --tb=short --show-capture=no tests/test_b97_flow_builder.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+.....................................................................    [100%]
+69 passed in 211.69s (0:03:31)
+exit=0
+=== tests/test_b97_flow_execution.py
+$ pytest -q --tb=short --show-capture=no tests/test_b97_flow_execution.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+..........................................F............................. [ 96%]
+...                                                                      [100%]
+================================== FAILURES ===================================
+________ test_tc_b97_55_input_queued_during_a_run_starts_no_second_run ________
+tests\test_b97_flow_execution.py:1164: in test_tc_b97_55_input_queued_during_a_run_starts_no_second_run
+    assert calls == 1, f"{calls} run_chain_set calls for one Run"
+E   AssertionError: 2 run_chain_set calls for one Run
+E   assert 2 == 1
+=========================== short test summary info ===========================
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_55_input_queued_during_a_run_starts_no_second_run
+1 failed, 74 passed in 435.23s (0:07:15)
+exit=1
+=== tests/test_b99_crc_region.py
+$ pytest -q --tb=short --show-capture=no tests/test_b99_crc_region.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+........                                                                 [100%]
+8 passed in 43.20s
+exit=0
+=== tests/test_b99_patch_truth.py
+$ pytest -q --tb=short --show-capture=no tests/test_b99_patch_truth.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+....................                                                     [100%]
+20 passed in 23.37s
+exit=0
+=== tests/test_b99_staging.py
+$ pytest -q --tb=short --show-capture=no tests/test_b99_staging.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+...............................                                          [100%]
+31 passed in 77.56s (0:01:17)
+exit=0
+=== tests/test_b99_truncation.py
+$ pytest -q --tb=short --show-capture=no tests/test_b99_truncation.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+........................                                                 [100%]
+24 passed in 21.74s
+exit=0
+=== tests/test_changes_symbol_entries.py
+$ pytest -q --tb=short --show-capture=no tests/test_changes_symbol_entries.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+..............................................                           [100%]
+46 passed in 0.77s
+exit=0
+=== tests/test_crc_config.py
+$ pytest -q --tb=short --show-capture=no tests/test_crc_config.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+...................................                                      [100%]
+35 passed in 0.46s
+exit=0
+=== tests/test_crc_designer_model.py
+$ pytest -q --tb=short --show-capture=no tests/test_crc_designer_model.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+..........................                                               [100%]
+26 passed in 0.37s
+exit=0
+=== tests/test_crc_designer_view.py
+$ pytest -q --tb=short --show-capture=no tests/test_crc_designer_view.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+........................................                                 [100%]
+40 passed in 114.41s (0:01:54)
+exit=0
+=== tests/test_crc_engine.py
+$ pytest -q --tb=short --show-capture=no tests/test_crc_engine.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+....................                                                     [100%]
+20 passed in 0.38s
+exit=0
+=== tests/test_crc_job_upconvert.py
+$ pytest -q --tb=short --show-capture=no tests/test_crc_job_upconvert.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+.............                                                            [100%]
+13 passed in 0.31s
+exit=0
+=== tests/test_crc_operation.py
+$ pytest -q --tb=short --show-capture=no tests/test_crc_operation.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+..............................                                           [100%]
+30 passed in 0.53s
+exit=0
+=== tests/test_crc_template_loader.py
+$ pytest -q --tb=short --show-capture=no tests/test_crc_template_loader.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+......                                                                   [100%]
+6 passed in 0.35s
+exit=0
+=== tests/test_crc_word_codec.py
+$ pytest -q --tb=short --show-capture=no tests/test_crc_word_codec.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+.............                                                            [100%]
+13 passed in 0.31s
+exit=0
+=== tests/test_flow_a2b_b94.py
+$ pytest -q --tb=short --show-capture=no tests/test_flow_a2b_b94.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+.............                                                            [100%]
+13 passed in 0.43s
+exit=0
+=== tests/test_flow_builder_render.py
+$ pytest -q --tb=short --show-capture=no tests/test_flow_builder_render.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+...........                                                              [100%]
+11 passed in 24.39s
+exit=0
+=== tests/test_flow_chainset_b94.py
+$ pytest -q --tb=short --show-capture=no tests/test_flow_chainset_b94.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+........                                                                 [100%]
+8 passed in 0.58s
+exit=0
+=== tests/test_flow_crc_block.py
+$ pytest -q --tb=short --show-capture=no tests/test_flow_crc_block.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+............                                                             [100%]
+12 passed in 0.44s
+exit=0
+=== tests/test_flow_crc_ribbon.py
+$ pytest -q --tb=short --show-capture=no tests/test_flow_crc_ribbon.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+.....                                                                    [100%]
+5 passed in 9.53s
+exit=0
+=== tests/test_flow_crc_ui.py
+$ pytest -q --tb=short --show-capture=no tests/test_flow_crc_ui.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+..                                                                       [100%]
+2 passed in 2.69s
+exit=0
+=== tests/test_flow_execution.py
+$ pytest -q --tb=short --show-capture=no tests/test_flow_execution.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+....                                                                     [100%]
+4 passed in 0.34s
+exit=0
+=== tests/test_flow_execution_service.py
+$ pytest -q --tb=short --show-capture=no tests/test_flow_execution_service.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+...............                                                          [100%]
+15 passed in 0.55s
+exit=0
+=== tests/test_flow_external_step_b96.py
+$ pytest -q --tb=short --show-capture=no tests/test_flow_external_step_b96.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+........                                                                 [100%]
+8 passed in 10.07s
+exit=0
+=== tests/test_flow_funnel_b96.py
+$ pytest -q --tb=short --show-capture=no tests/test_flow_funnel_b96.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+.......                                                                  [100%]
+7 passed in 7.10s
+exit=0
+=== tests/test_flow_model.py
+$ pytest -q --tb=short --show-capture=no tests/test_flow_model.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+....                                                                     [100%]
+4 passed in 0.29s
+exit=0
+=== tests/test_flow_multi_image.py
+$ pytest -q --tb=short --show-capture=no tests/test_flow_multi_image.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+...........                                                              [100%]
+11 passed in 0.37s
+exit=0
+=== tests/test_flow_multi_image_ui.py
+$ pytest -q --tb=short --show-capture=no tests/test_flow_multi_image_ui.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+........                                                                 [100%]
+8 passed in 4.51s
+exit=0
+=== tests/test_flow_persistence.py
+$ pytest -q --tb=short --show-capture=no tests/test_flow_persistence.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+........................................                                 [100%]
+40 passed in 0.58s
+exit=0
+=== tests/test_flow_report_ac6_golden.py
+$ pytest -q --tb=short --show-capture=no tests/test_flow_report_ac6_golden.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+...                                                                      [100%]
+3 passed in 0.35s
+exit=0
+=== tests/test_flow_report_fusion.py
+$ pytest -q --tb=short --show-capture=no tests/test_flow_report_fusion.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+.............                                                            [100%]
+13 passed in 0.32s
+exit=0
+=== tests/test_flow_report_service.py
+$ pytest -q --tb=short --show-capture=no tests/test_flow_report_service.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+.........................................                                [100%]
+41 passed in 0.79s
+exit=0
+=== tests/test_flow_report_ui.py
+$ pytest -q --tb=short --show-capture=no tests/test_flow_report_ui.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+...                                                                      [100%]
+3 passed in 4.58s
+exit=0
+=== tests/test_flow_report_wire.py
+$ pytest -q --tb=short --show-capture=no tests/test_flow_report_wire.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+...........                                                              [100%]
+11 passed in 0.57s
+exit=0
+=== tests/test_patch_dual_entry.py
+$ pytest -q --tb=short --show-capture=no tests/test_patch_dual_entry.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+....                                                                     [100%]
+4 passed in 0.36s
+exit=0
+=== tests/test_report_document_bytes.py
+$ pytest -q --tb=short --show-capture=no tests/test_report_document_bytes.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+.......                                                                  [100%]
+7 passed in 0.66s
+exit=0
+=== tests/test_report_filter.py
+$ pytest -q --tb=short --show-capture=no tests/test_report_filter.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+.........................................................                [100%]
+57 passed in 0.48s
+exit=0
+=== tests/test_tui_crc_surface.py
+$ pytest -q --tb=short --show-capture=no tests/test_tui_crc_surface.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+..............                                                           [100%]
+14 passed in 104.23s (0:01:44)
+exit=0
+=== tests/test_tui_flow_builder_b94.py
+$ pytest -q --tb=short --show-capture=no tests/test_tui_flow_builder_b94.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+.....                                                                    [100%]
+5 passed in 22.28s
+exit=0
+=== tests/test_tui_flow_execution_b94.py
+$ pytest -q --tb=short --show-capture=no tests/test_tui_flow_execution_b94.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+...........                                                              [100%]
+11 passed in 62.26s (0:01:02)
+exit=0
+=== tests/test_tui_flow_persistence_ui.py
+$ pytest -q --tb=short --show-capture=no tests/test_tui_flow_persistence_ui.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+.......                                                                  [100%]
+7 passed in 20.22s
+exit=0

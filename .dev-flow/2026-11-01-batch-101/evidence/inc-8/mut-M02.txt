@@ -1,0 +1,88 @@
+# label: M02
+# cmd: timeout 900 env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<TMP>/la python -m pytest tests/test_b101_flow_ext_copy.py tests/test_b101_crc_model_and_reasons.py --basetemp <TMP>/bt -q -p no:cacheprovider
+s19_app.__file__ = <HOME>\AppData\Local\Temp\s19m8\wt\s19_app\__init__.py
+            ("RIELLO", 16, 0x1021, 0xB2AA, True, True, 0x0000, 0x63D0),
+            ("TMS37157", 16, 0x1021, 0x89EC, True, True, 0x0000, 0x26B1),
+            ("ISO-HDLC", 32, 0x04C11DB7, 0xFFFFFFFF, True, True, 0xFFFFFFFF, 0xCBF43926),
+            ("MPEG-2", 32, 0x04C11DB7, 0xFFFFFFFF, False, False, 0x00000000, 0x0376E6E7),
+        ],
+    )
+    def test_r_crc_designer_001_1_catalogue_checks(
+        name: str, width: int, poly: int, init: int, refin: bool, refout: bool,
+        xorout: int, expected: int,
+    ) -> None:
+        """The Designer engine gives the published catalogue check over the KAT
+        message (unchanged by Inc 8 — the oracle of the D13-20 rows)."""
+>       assert (
+            crc_stream(
+                KAT, width=width, poly=poly, init=init, refin=refin, refout=refout, xorout=xorout
+            )
+            == expected
+        )
+E       AssertionError: assert 56146 == 25552
+E        +  where 56146 = crc_stream(b'123456789', width=16, poly=4129, init=45738, refin=True, refout=True, xorout=0)
+
+tests\test_b101_crc_model_and_reasons.py:295: AssertionError
+_ test_r_crc_designer_001_1_catalogue_checks[TMS37157-16-4129-35308-True-True-0-9905] _
+
+name = 'TMS37157', width = 16, poly = 4129, init = 35308, refin = True
+refout = True, xorout = 0, expected = 9905
+
+    @pytest.mark.parametrize(
+        "name,width,poly,init,refin,refout,xorout,expected",
+        [
+            ("ARC", 16, 0x8005, 0x0000, True, True, 0x0000, 0xBB3D),
+            ("MODBUS", 16, 0x8005, 0xFFFF, True, True, 0x0000, 0x4B37),
+            ("RIELLO", 16, 0x1021, 0xB2AA, True, True, 0x0000, 0x63D0),
+            ("TMS37157", 16, 0x1021, 0x89EC, True, True, 0x0000, 0x26B1),
+            ("ISO-HDLC", 32, 0x04C11DB7, 0xFFFFFFFF, True, True, 0xFFFFFFFF, 0xCBF43926),
+            ("MPEG-2", 32, 0x04C11DB7, 0xFFFFFFFF, False, False, 0x00000000, 0x0376E6E7),
+        ],
+    )
+    def test_r_crc_designer_001_1_catalogue_checks(
+        name: str, width: int, poly: int, init: int, refin: bool, refout: bool,
+        xorout: int, expected: int,
+    ) -> None:
+        """The Designer engine gives the published catalogue check over the KAT
+        message (unchanged by Inc 8 — the oracle of the D13-20 rows)."""
+>       assert (
+            crc_stream(
+                KAT, width=width, poly=poly, init=init, refin=refin, refout=refout, xorout=xorout
+            )
+            == expected
+        )
+E       AssertionError: assert 54218 == 9905
+E        +  where 54218 = crc_stream(b'123456789', width=16, poly=4129, init=35308, refin=True, refout=True, xorout=0)
+
+tests\test_b101_crc_model_and_reasons.py:295: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_engine_002_2_1_operation_equals_designer_grid
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_engine_002_2_2_operation_equals_designer_random
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_designer_001_1_catalogue_checks[RIELLO-16-4129-45738-True-True-0-25552]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_designer_001_1_catalogue_checks[TMS37157-16-4129-35308-True-True-0-9905]
+4 failed, 78 passed in 26.14s
+# exit: 1
+
+# ---- mutation diff ----
+diff --git a/s19_app/tui/operations/crc_kernel.py b/s19_app/tui/operations/crc_kernel.py
+index b3c22fb..a0b3f2a 100644
+--- a/s19_app/tui/operations/crc_kernel.py
++++ b/s19_app/tui/operations/crc_kernel.py
+@@ -128,7 +128,7 @@ def crc_stream(
+         )
+     mask = (1 << width) - 1
+     topbit = 1 << (width - 1)
+-    reg = init & mask
++    reg = (reflect(init & mask, width) if refin else init & mask)
+     for byte in data:
+         if refin:
+             byte = reflect(byte, 8)
+@@ -242,7 +242,7 @@ def crc_lut(
+     table = make_crc_table(width, poly)
+     mask = (1 << width) - 1
+     shift = width - 8
+-    reg = init & mask
++    reg = (reflect(init & mask, width) if refin else init & mask)
+     for byte in data:
+         if refin:
+             byte = reflect(byte, 8)

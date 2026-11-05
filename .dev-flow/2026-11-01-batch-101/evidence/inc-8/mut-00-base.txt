@@ -1,0 +1,7 @@
+# label: base
+# cmd: timeout 900 env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<TMP>/la python -m pytest tests/test_b101_flow_ext_copy.py tests/test_b101_crc_model_and_reasons.py --basetemp <TMP>/bt -q -p no:cacheprovider
+s19_app.__file__ = <HOME>\AppData\Local\Temp\s19m8\wt\s19_app\__init__.py
+........................................................................ [ 87%]
+..........                                                               [100%]
+82 passed in 26.57s
+# exit: 0

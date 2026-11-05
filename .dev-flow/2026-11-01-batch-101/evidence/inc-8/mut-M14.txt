@@ -1,0 +1,66 @@
+# label: M14
+# cmd: timeout 900 env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<TMP>/la python -m pytest tests/test_b101_flow_ext_copy.py tests/test_b101_crc_model_and_reasons.py --basetemp <TMP>/bt -q -p no:cacheprovider
+s19_app.__file__ = <HOME>\AppData\Local\Temp\s19m8\wt\s19_app\__init__.py
+................F....................................................... [ 87%]
+..........                                                               [100%]
+================================== FAILURES ===================================
+_________ test_r_flow_ext_9_15_refused_ref_stays_refused_after_rebind _________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19m8/bt/test_r_flow_ext_9_15_refused_r0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001248BE749D0>
+
+    @pytest.mark.skipif(not sys.platform.startswith("win"), reason="the junction half is Windows")
+    def test_r_flow_ext_9_15_refused_ref_stays_refused_after_rebind(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """[S-4] After a rebind, (a) an absolute ref and (b) a junction ref that
+        name the output file name are still refused by the manifest guard (holds
+        on base — the guard ran first there too; the case pins the order)."""
+        from tests.b97_fixtures import make_junction
+    
+        cwd = Path.cwd()
+        try:
+            monkeypatch.chdir(tmp_path)
+            # (a) the absolute ref
+            project = _project(tmp_path, {"base.s19": _S19_SRC}, name="proj_a")
+            bench_a = tmp_path / "bench_a"
+            bench_a.mkdir(exist_ok=True)
+            _write_bench(bench_a, _doc("AA"))
+            run_flow(
+                _flow_x(bench_a),
+                FlowContext(project_dir=project, external_confirmations=_confirm(bench_a)),
+            )
+            _write_bench(bench_a, _doc("BB"))
+            result_a = _run(
+                _flow_x(bench_a, patch_ref=str(project / "step.changes.json")),
+                project,
+                _confirm(bench_a),
+            )
+            patch_a = result_a.block_results[2]
+>           assert patch_a.status == BLOCK_STATUS_ERROR
+E           AssertionError: assert 'ok' == 'error'
+E             
+E             - error
+E             + ok
+
+tests\test_b101_flow_ext_copy.py:794: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_15_refused_ref_stays_refused_after_rebind
+1 failed, 81 passed in 25.62s
+# exit: 1
+
+# ---- mutation diff ----
+diff --git a/s19_app/tui/services/flow_execution_service.py b/s19_app/tui/services/flow_execution_service.py
+index c6fe4b1..e94427a 100644
+--- a/s19_app/tui/services/flow_execution_service.py
++++ b/s19_app/tui/services/flow_execution_service.py
+@@ -1405,6 +1405,9 @@ def _resolve_block_ref(
+     caller reads this run's copy in place of the ref and records the read in
+     ``FlowRunResult.in_place_reads``.
+     """
++    _pre = rebinds.get(os.path.normcase(str(Path(project_dir) / ref)))
++    if _pre is not None and os.path.normcase(str(_pre)) != os.path.normcase(str(Path(project_dir) / ref)):
++        return _pre, True
+     path = _resolve_manifest_entry(project_dir, ref, label, issues)
+     if path is None:
+         return None, False

@@ -1,0 +1,16 @@
+$ pytest -q -rA --tb=line --show-capture=no tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_9_deep_value_gives_the_reason_not_a_raise tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_10_operations_execute_survives_deep_value tests/test_b101_flow_ext_copy.py::test_r_flow_ext_14_4_both_climb_the_log_is_named tests/test_b101_flow_ext_copy.py::test_r_flow_ext_14_5_missing_log_named_before_climbing_output
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+FF.F                                                                     [100%]
+================================== FAILURES ===================================
+<HOME>\anaconda3\envs\s19env\Lib\json\encoder.py:258: RecursionError: maximum recursion depth exceeded while encoding a JSON object
+<HOME>\anaconda3\envs\s19env\Lib\json\encoder.py:258: RecursionError: maximum recursion depth exceeded while encoding a JSON object
+<HOME>\Github\s19_app-b101-inc8\tests\test_b101_flow_ext_copy.py:1438: assert "output '../....e the project" == "log 'missing...ever optional"
+=================================== PASSES ====================================
+=========================== short test summary info ===========================
+PASSED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_14_4_both_climb_the_log_is_named
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_9_deep_value_gives_the_reason_not_a_raise
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_10_operations_execute_survives_deep_value
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_14_5_missing_log_named_before_climbing_output
+3 failed, 1 passed in 166.01s (0:02:46)
+exit=1

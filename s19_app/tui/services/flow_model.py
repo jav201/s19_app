@@ -782,6 +782,11 @@ class FlowRunResult:
             per ERROR-severity issue (batch-95 inc-004b, LLR-143.2: "a named
             refusal is still an attribution line, never silently dropped").
             Additive per §6.3 R-6; empty when nothing was refused.
+        in_place_reads (List[Tuple[int, str, str, Path]]): One entry per
+            in-place read of this run — (block index, resolution label such
+            as ``SourceBlock.image_ref``, the typed ref, the copy read) in
+            read order (batch-101 inc-8, R-FLOW-EXT.9/12/13). Empty when no
+            block read an external step's copy in place of its ref.
     """
 
     status: str
@@ -792,6 +797,7 @@ class FlowRunResult:
     pre_crc_ranges: List[Tuple[int, int]] = field(default_factory=list)
     change_records: List[FlowChangeRecord] = field(default_factory=list)
     refusals: List[FlowRefusal] = field(default_factory=list)
+    in_place_reads: List[Tuple[int, str, str, Path]] = field(default_factory=list)
 
 
 @dataclass(slots=True)

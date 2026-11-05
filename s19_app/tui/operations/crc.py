@@ -172,7 +172,8 @@ def crc32_stream(
     Args:
         data (bytes): The ordered byte stream to digest.
         polynomial (int): The CRC generator polynomial (normal form).
-        init (int): The initial register value (pre-reflection).
+        init (int): The initial register value (used as given; the model
+            of CTX-CRC does not reflect the init, in either direction).
         reverse (bool): When ``True``, standard reflected-input /
             reflected-output (refin/refout) semantics; the zlib convention.
         final_xor (int): Value XORed into the register after the last byte.
@@ -208,7 +209,7 @@ def crc32_stream(
         # internally; its default seed (0) IS the zlib/PKZIP convention.
         return zlib.crc32(data) & _MASK32
 
-    reg = _reflect(init, 32) if reverse else (init & _MASK32)
+    reg = init & _MASK32
     for byte in data:
         if reverse:
             byte = _reflect(byte, 8)

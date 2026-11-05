@@ -120,6 +120,7 @@ def test_tc346_crc_block_model() -> None:
 # ---------------------------------------------------------------------------
 
 def test_at123_crc_computed_and_injected_at_output_address(tmp_path: Path) -> None:
+    """R-FLOW-CRC.1: a CRC block computes the CRC and injects it at the output address."""
     cfg = _crc_config(output_address="0x2000")
     patch = _patch_doc([{"type": "bytes", "address": "0x1000", "bytes": "AA"}])
     project = _make_project(

@@ -1,0 +1,137 @@
+# INT-03 (E4 integration) - RED on base: the corrected two files copied into a detached worktree of origin/main f11b3f4 (the merge base after the merge), only those two files added; --tb=line. Result: 64 failed, 18 passed; every failure behavioural except 12/8 and 13/2 (AttributeError on the new API fields, structural, as the tester recorded).
+# Env: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<TMP>/la, timeout 1800, interpreter <HOME>/anaconda3/envs/s19env/python.exe, -p no:cacheprovider, --basetemp <TMP>/bt*; s19_app.__file__ printed first.
+#
+s19_app.__file__ = <HOME>\AppData\Local\Temp\s19int8\main\s19_app\__init__.py
+FF..FFFFF......FFFFFFFFFFFFFFFFFF.FFFF.FF..FFFFFFFFFF..FF.FFFFFFFFFFFFFF [ 87%]
+FFF.F.FF.F                                                               [100%]
+================================== FAILURES ===================================
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_crc_model_and_reasons.py:116: AssertionError: assert 402811690 == 260797489
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_crc_model_and_reasons.py:133: assert (981875147, 860698960) == (860698960, 981875147)
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_crc_model_and_reasons.py:167: assert 402811690 == 260797489
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_crc_model_and_reasons.py:178: assert [42, 107, 2, 24] == [49, 116, 139, 15]
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_crc_model_and_reasons.py:213: assert [42, 107, 2, 24] == [49, 116, 139, 15]
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_crc_model_and_reasons.py:242: AssertionError: init 0x12345678 reverse True xorout 0x00000000: 0xe7fd94d5 != 0xf0748bce
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_crc_model_and_reasons.py:270: assert 3393983058 == 119058638
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_crc_model_and_reasons.py:347: AssertionError: ["CRC config is structurally invalid: 'reverse'"]
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_crc_model_and_reasons.py:347: AssertionError: ["CRC config is structurally invalid: 'polynomial'"]
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_crc_model_and_reasons.py:347: AssertionError: ["CRC config is structurally invalid: 'init'"]
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_crc_model_and_reasons.py:347: AssertionError: ["CRC config is structurally invalid: 'final_xor'"]
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_crc_model_and_reasons.py:347: AssertionError: ["CRC config is structurally invalid: 'start'"]
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_crc_model_and_reasons.py:347: AssertionError: ["CRC config is structurally invalid: 'output_address'"]
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_crc_model_and_reasons.py:347: AssertionError: ["CRC config is structurally invalid: 'regions'"]
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_crc_model_and_reasons.py:347: AssertionError: ["CRC config is structurally invalid: 'end'"]
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_crc_model_and_reasons.py:396: AssertionError: ["CRC config is structurally invalid: invalid literal for int() with base 16: 'zz'"]
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_crc_model_and_reasons.py:396: AssertionError: ['CRC config is structurally invalid: expected an integer, got a boolean']
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_crc_model_and_reasons.py:396: AssertionError: ['CRC config is structurally invalid: expected an int or hex string, got float']
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_crc_model_and_reasons.py:396: AssertionError: ['CRC config is structurally invalid: expected an int or hex string, got NoneType']
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_crc_model_and_reasons.py:396: AssertionError: ["CRC config is structurally invalid: invalid literal for int() with base 16: '0xQ'"]
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_crc_model_and_reasons.py:396: AssertionError: ["CRC config is structurally invalid: invalid literal for int() with base 16: 'x'"]
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_crc_model_and_reasons.py:410: AssertionError: ["CRC config is structurally invalid: invalid literal for int() with base 16: 'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz...zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"]
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_crc_model_and_reasons.py:465: AssertionError: ["CRC config is structurally invalid: 'reverse'"]
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_crc_model_and_reasons.py:465: AssertionError: ["CRC config is structurally invalid: 'reverse'"]
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_crc_model_and_reasons.py:465: AssertionError: ["CRC config is structurally invalid: 'reverse'"]
+<HOME>\anaconda3\envs\s19env\Lib\json\decoder.py:353: RecursionError: maximum recursion depth exceeded while decoding a JSON array from a unicode string
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_crc_model_and_reasons.py:559: AssertionError: CRC config error - no check was run:
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_crc_model_and_reasons.py:601: AssertionError: CRC config error - no check was run:
+<HOME>\anaconda3\envs\s19env\Lib\json\decoder.py:353: RecursionError: maximum recursion depth exceeded while decoding a JSON array from a unicode string
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:274: AssertionError: assert 'error' == 'ok'
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:312: AssertionError: applied 1 entry
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:386: AssertionError: assert 'ok' == 'notices'
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:418: AssertionError: 0x1020
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:444: assert [1, 2] == [9, 8]
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:479: AssertionError: # Diff report
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:504: AssertionError: applied 1 entry
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:537: AssertionError: [FlowChangeRecord(block_index=3, change_doc_ref='step.changes.json', a2l_ref=None, entry_type='string', symbol=None, address_start=4096, address_end=4098, disposition='applied', before_bytes=(65, 65), after_bytes=(65, 65))]
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:553: AssertionError: applied 1 entry
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:659: AssertionError: assert b'BENCH=OK' == b'BENCH=V2'
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:690: AssertionError: []
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:709: AssertionError: applied 1 entry
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:865: AssertionError: assert ([FlowChangeRecord(block_index=2, change_doc_ref='step.changes.json', a2l_ref=None, entry_type='string', symbol=None, address_start=4096, address_end=4098, disposition='applied', before_bytes=(1, 2), after_bytes=(65, 65))] and 'step.changes.json' == 'step.changes_1.json'
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:913: AssertionError:
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:1003: AssertionError: []
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:1031: AssertionError: loaded base.s19 (1 ranges)
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:1050: AssertionError: assert 'applied 1 entry' == 'applied 1 en....changes.json'
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:1064: AssertionError: passed=1 failed=0 uncheckable=0
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:1078: AssertionError: injected 1 CRC region
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:1101: AssertionError: loaded fw.s19 (1 ranges)
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:1129: AssertionError: wrote reports/20261105T134942Z-01-flow-a2b.md
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:1149: AssertionError: assert 'notices' == 'error'
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:1197: AssertionError: applied 1 entry
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:1215: AttributeError: 'FlowRunResult' object has no attribute 'in_place_reads'
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:1232: AssertionError: error
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:1268: AssertionError: a2l reference unresolved
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:1304: AssertionError: assert [('fw.s19', '...roj\\fw.s19')] == [('fw.s19', '...j\\fw_1.s19')]
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:1334: AttributeError: 'ChainRunOutcome' object has no attribute 'in_place_inputs'
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:1363: AssertionError: assert 'ok' == 'error'
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:1392: assert "output 'benc...re confirming" == "output 'benc...e the project"
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:1415: AssertionError: assert 'error' == 'ok'
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:1443: AssertionError: assert {'base.s19', ...anges_1.json'} == {'base.s19', ...anges_1.json'}
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:1501: assert "crc config i...id: 'reverse'" == 'crc config i...ons or groups'
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:1523: assert "crc config i...id: 'reverse'" == "crc config i...e' is missing"
+<HOME>\AppData\Local\Temp\s19int8\main\tests\test_b101_flow_ext_copy.py:1563: AssertionError: assert 'crc config i...mn 1 (char 0)' == 'crc config i... was not read'
+=========================== short test summary info ===========================
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_engine_001_1_1_reverse_takes_init_as_given
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_engine_001_1_2_bit_reversed_inits_stay_distinct
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_engine_001_1_5_operations_check_gives_model_value
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_engine_001_1_6_operations_write_stores_model_value
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_engine_001_1_7_flow_crc_block_injects_model_value
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_engine_002_2_1_operation_equals_designer_grid
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_engine_002_2_2_operation_equals_designer_random
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_10_missing_field_is_named[reverse]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_10_missing_field_is_named[polynomial]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_10_missing_field_is_named[init]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_10_missing_field_is_named[final_xor]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_10_missing_field_is_named[region-start]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_10_missing_field_is_named[group-output_address]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_10_missing_field_is_named[group-regions]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_10_missing_field_is_named[span-end]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_non_number_is_named[init-zz]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_non_number_is_named[init-true]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_non_number_is_named[polynomial-1.5]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_non_number_is_named[final_xor-null]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_non_number_is_named[region-end]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_non_number_is_named[span-start]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_7_value_is_clipped
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_16_designer_template_is_named[saved-None]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_16_designer_template_is_named[width16-{"name": "T16", "algorithm": {"width": 16, "poly": "0x1021", "init": "0xFFFF", "refin": false, "refout": false, "xorout": "0x0000", "check": null}}]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_16_designer_template_is_named[algorithm-not-object-{"algorithm": 5}]
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_17_1_deep_nesting_is_a_reason
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_11_8_markup_value_shown_plain
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_16_5_operations_dialog_names_template
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_config_001_17_2_operations_execute_survives_deep_nesting
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_2_2_relative_output_read_under_project
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_1_later_patch_reads_this_runs_copy
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_4_later_check_block
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_5_later_crc_block
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_6_later_load_block
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_7_later_a2b_file_input
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_8_other_refs_unchanged
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_9_earlier_block_reads_the_file_as_it_is
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_10_case_insensitive_on_windows
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_11_flow_execution_confirm_reads_new_output
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_12_later_a2l_ref
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_13_first_run_over_a_foreign_file_reads_the_copy
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_10_1_flow_report_names_the_copy
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_10_2_chain_set_report_names_the_copy
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_10_4_flow_report_names_the_copy_a2l_own
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_10_5_flow_report_names_the_copy_a2l_inherited
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_12_1_summary_names_the_copy_patch
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_12_2_summary_names_the_copy_check
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_12_3_summary_names_the_copy_crc
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_12_4_summary_names_the_copy_load
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_12_5_summary_names_the_copy_a2b
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_12_6_summary_names_the_copy_error
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_12_7_two_refs_read_order
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_12_8_no_suffix_without_in_place_read
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_12_9_suffix_survives_the_raise_exit
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_12_10_suffix_before_the_refusal_token
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_13_chain_set_provenance_names_the_copy
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_13_2_unbound_input_keeps_the_base_line
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_14_climbing_path_refused_log
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_14_climbing_path_refused_output
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_14_climbing_path_inside_accepted
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_11_earlier_copy_unchanged_names
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_crc_4_designer_template_is_named_in_the_flow
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_crc_4_missing_field_is_named_in_the_flow
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_crc_9_over_limit_config_not_read
+64 failed, 18 passed in 46.25s

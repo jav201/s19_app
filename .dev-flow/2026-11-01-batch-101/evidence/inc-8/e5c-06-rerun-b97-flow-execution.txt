@@ -1,0 +1,7 @@
+$ pytest -q -rf --tb=short --show-capture=no tests/test_b97_flow_execution.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc8\s19_app\__init__.py
+python 3.11.15 win32
+........................................................................ [ 96%]
+...                                                                      [100%]
+75 passed in 438.18s (0:07:18)
+exit=0

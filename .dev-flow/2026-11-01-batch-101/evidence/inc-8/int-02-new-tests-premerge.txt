@@ -1,0 +1,870 @@
+# INT-02 (E4 integration) - the same two files on the pre-merge commit 499d15d (detached worktree outside the repo). Result: the same 22 failed, 60 passed - no failure comes from the merge.
+# Env: env -u NO_COLOR PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8 PYTHONPATH=. LOCALAPPDATA=<TMP>/la, timeout 1800, interpreter <HOME>/anaconda3/envs/s19env/python.exe, -p no:cacheprovider, --basetemp <TMP>/bt*; s19_app.__file__ printed first.
+#
+s19_app.__file__ = <HOME>\AppData\Local\Temp\s19int8\pre\s19_app\__init__.py
+......F.................................F...FF.FFFFF..FFF.FF.FF..FF..FFF [ 87%]
+....F.....                                                               [100%]
+================================== FAILURES ===================================
+________ test_r_crc_engine_001_1_7_flow_crc_block_injects_model_value _________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19int8/bt2/test_r_crc_engine_001_1_7_flow0')
+
+    def test_r_crc_engine_001_1_7_flow_crc_block_injects_model_value(tmp_path: Path) -> None:
+        """Flow LOAD k.s19 → CRC templates/k.json (Config K) → WRITE-OUT: the CRC
+        block is ok and out.s19 holds 31 74 8B 0F at 0x1010..0x1013."""
+        project = _make_project(
+            tmp_path, {"k.s19": _kat_image_s19(), "templates/k.json": json.dumps(_CONFIG_K)}
+        )
+        flow = Flow(
+            name="crc",
+            blocks=[
+                SourceBlock("k.s19"),
+                CrcBlock("templates/k.json"),
+                WriteOutBlock("out.s19"),
+            ],
+        )
+        result = run_flow(flow, FlowContext(project_dir=project))
+>       assert result.status == FLOW_STATUS_OK
+E       AssertionError: assert 'completed-with-issues' == 'ok'
+E         
+E         - ok
+E         + completed-with-issues
+
+tests\test_b101_crc_model_and_reasons.py:195: AssertionError
+____________ test_r_flow_ext_9_1_later_patch_reads_this_runs_copy _____________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19int8/bt2/test_r_flow_ext_9_1_later_patc0')
+
+    def test_r_flow_ext_9_1_later_patch_reads_this_runs_copy(tmp_path: Path) -> None:
+        """[F-49] Run 2's differing output is copied as _1 and the later PATCH
+        reads the copy (base keeps the first copy's bytes)."""
+        project, bench, flow = _two_runs_flow_x(tmp_path)
+        _write_bench(bench, _doc("BB"))
+    
+        result = _run(flow, project, _confirm(bench))
+    
+        ext, patch = result.block_results[1], result.block_results[2]
+        assert ext.status == BLOCK_STATUS_OK
+        assert ext.summary == (
+            "log 'step.log' received · output copied to step.changes_1.json (session)"
+        ), ext.summary
+        assert patch.status == BLOCK_STATUS_OK
+        assert patch.summary == (
+            "applied 1 entry"
+            + _READ_SUFFIX.format(copy="step.changes_1.json", ref="step.changes.json")
+        ), patch.summary
+>       assert [(entry.block_index, entry.change_doc_ref) for entry in result.in_place_reads] == [
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            (2, "step.changes_1.json")
+        ]
+
+tests\test_b101_flow_ext_copy.py:302: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+.0 = <list_iterator object at 0x00000202B8579F00>
+
+>   assert [(entry.block_index, entry.change_doc_ref) for entry in result.in_place_reads] == [
+             ^^^^^^^^^^^^^^^^^
+        (2, "step.changes_1.json")
+    ]
+E   AttributeError: 'tuple' object has no attribute 'block_index'
+
+tests\test_b101_flow_ext_copy.py:302: AttributeError
+_____________________ test_r_flow_ext_9_5_later_crc_block _____________________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19int8/bt2/test_r_flow_ext_9_5_later_crc_0')
+
+    def test_r_flow_ext_9_5_later_crc_block(tmp_path: Path) -> None:
+        """Run 2's CRC block reads the copy: 4 CRC bytes at the NEW output address
+        and none at the old one."""
+        project = _project(tmp_path, {"base.s19": _S19_SRC})
+        bench = _bench(tmp_path)
+        _write_bench(bench, _crc_config_text(0x1010), "step.crc.json")
+        flow = _crc_flow(bench)
+        first = _run(flow, project, _confirm(bench, output="step.crc.json"))
+>       assert first.status == "ok"
+E       AssertionError: assert 'completed-with-issues' == 'ok'
+E         
+E         - ok
+E         + completed-with-issues
+
+tests\test_b101_flow_ext_copy.py:396: AssertionError
+____________________ test_r_flow_ext_9_6_later_load_block _____________________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19int8/bt2/test_r_flow_ext_9_6_later_load0')
+
+    def test_r_flow_ext_9_6_later_load_block(tmp_path: Path) -> None:
+        """Run 2's LOAD reads the copy: out.s19 holds image B's bytes."""
+        image_a = emit_s19_from_mem_map({0x1000: 0x01, 0x1001: 0x02}, [(0x1000, 0x1002)])
+        image_b = emit_s19_from_mem_map({0x1000: 0x09, 0x1001: 0x08}, [(0x1000, 0x1002)])
+        project = _project(tmp_path, {})
+        bench = _bench(tmp_path)
+        _write_bench(bench, image_a, "fw.s19")
+        flow = Flow(
+            name="load_flow",
+            blocks=[
+                _ext_block(bench, str(bench / "step.log"), str(bench / "fw.s19")),
+                SourceBlock("fw.s19"),
+                WriteOutBlock("out.s19"),
+            ],
+        )
+        first = _run(flow, project, _confirm(bench, index=0, output="fw.s19"))
+        assert first.status == "ok"
+        _write_bench(bench, image_b, "fw.s19")
+    
+        second = _run(flow, project, _confirm(bench, index=0, output="fw.s19"))
+    
+        mem = _reload_mem(project / "out.s19")
+>       assert [mem[0x1000 + i] for i in range(2)] == [0x09, 0x08]
+E       assert [1, 2] == [9, 8]
+E         
+E         At index 0 diff: 1 != 9
+E         Use -v to get more diff
+
+tests\test_b101_flow_ext_copy.py:428: AssertionError
+__________________ test_r_flow_ext_9_8_other_refs_unchanged ___________________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19int8/bt2/test_r_flow_ext_9_8_other_refs0')
+
+    def test_r_flow_ext_9_8_other_refs_unchanged(tmp_path: Path) -> None:
+        """A ref that names another file is not read in place: the second PATCH
+        applies `patches/other.changes.json` (holds on base; the rebind is by the
+        output file name only)."""
+        project, bench, flow = _two_runs_flow_x(tmp_path)
+        (project / "patches").mkdir()
+        (project / "patches" / "other.changes.json").write_text(
+            _doc("EE"), encoding="utf-8"
+        )
+        flow = Flow(
+            name="flow_x",
+            blocks=[
+                *flow.blocks[:3],
+                PatchBlock("patches/other.changes.json"),
+                flow.blocks[-1],
+            ],
+        )
+        _write_bench(bench, _doc("BB"))
+    
+        result = _run(flow, project, _confirm(bench))
+    
+        first_patch, second_patch = result.block_results[2], result.block_results[3]
+        assert first_patch.summary.endswith(
+            _READ_SUFFIX.format(copy="step.changes_1.json", ref="step.changes.json")
+        ), first_patch.summary
+        assert second_patch.summary == "applied 1 entry", second_patch.summary
+        records = [c for c in result.change_records if c.block_index == 3]
+        assert records and records[0].change_doc_ref == "patches/other.changes.json"
+        mem = _reload_mem(project / "out.s19")
+>       assert [mem[0x1000 + i] for i in range(2)] == [0x45, 0x45]
+E       assert [65, 65] == [69, 69]
+E         
+E         At index 0 diff: 65 != 69
+E         Use -v to get more diff
+
+tests\test_b101_flow_ext_copy.py:495: AssertionError
+__________ test_r_flow_ext_9_9_earlier_block_reads_the_file_as_it_is __________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19int8/bt2/test_r_flow_ext_9_9_earlier_bl0')
+
+    def test_r_flow_ext_9_9_earlier_block_reads_the_file_as_it_is(tmp_path: Path) -> None:
+        """A block BEFORE the step reads the file as it is: run 2's first PATCH
+        sees the run-1 copy (AA), the second sees this run's (BB)."""
+        project, bench, _ = _two_runs_flow_x(tmp_path)
+        flow = Flow(
+            name="reordered",
+            blocks=[
+                SourceBlock("base.s19"),
+                PatchBlock("step.changes.json"),
+                _ext_block(bench, str(bench / "step.log"), str(bench / "step.changes.json")),
+                PatchBlock("step.changes.json"),
+                WriteOutBlock("out.s19"),
+            ],
+        )
+        _write_bench(bench, _doc("BB"))
+    
+        result = _run(flow, project, _confirm(bench, index=2))
+    
+        first_patch, second_patch = result.block_results[1], result.block_results[3]
+        assert first_patch.summary == "applied 1 entry", first_patch.summary
+        early = [c for c in result.change_records if c.block_index == 1]
+        late = [c for c in result.change_records if c.block_index == 3]
+>       assert early and early[0].after_bytes[0:2] == [0x41, 0x41], early
+E       AssertionError: [FlowChangeRecord(block_index=1, change_doc_ref='step.changes.json', a2l_ref=None, entry_type='string', symbol=None, address_start=4096, address_end=4098, disposition='applied', before_bytes=(1, 2), after_bytes=(65, 65))]
+E       assert ([FlowChangeRecord(block_index=1, change_doc_ref='step.changes.json', a2l_ref=None, entry_type='string', symbol=None, address_start=4096, address_end=4098, disposition='applied', before_bytes=(1, 2), after_bytes=(65, 65))] and (65, 65) == [65, 65]
+E         
+E         Use -v to get more diff)
+
+tests\test_b101_flow_ext_copy.py:520: AssertionError
+______________ test_r_flow_ext_9_10_case_insensitive_on_windows _______________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19int8/bt2/test_r_flow_ext_9_10_case_inse0')
+
+    @pytest.mark.skipif(not sys.platform.startswith("win"), reason="case rule: Windows")
+    def test_r_flow_ext_9_10_case_insensitive_on_windows(tmp_path: Path) -> None:
+        """A ref spelling the output file name case-differently is read in place
+        on Windows (the name comparison is case-insensitive)."""
+        project, bench, _ = _two_runs_flow_x(tmp_path)
+        flow = _flow_x(bench, patch_ref="STEP.CHANGES.JSON")
+        _write_bench(bench, _doc("BB"))
+    
+        result = _run(flow, project, _confirm(bench))
+    
+        patch = result.block_results[2]
+        assert patch.summary.endswith(
+            _READ_SUFFIX.format(copy="step.changes_1.json", ref="STEP.CHANGES.JSON")
+        ), patch.summary
+        mem = _reload_mem(project / "out.s19")
+>       assert [mem[0x1000 + i] for i in range(2)] == [0x42, 0x42]
+E       assert [65, 65] == [66, 66]
+E         
+E         At index 0 diff: 65 != 66
+E         Use -v to get more diff
+
+tests\test_b101_flow_ext_copy.py:541: AssertionError
+________ test_r_flow_ext_9_11_flow_execution_confirm_reads_new_output _________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19int8/bt2/test_r_flow_ext_9_11_flow_exec0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000202B71B2710>
+
+    def test_r_flow_ext_9_11_flow_execution_confirm_reads_new_output(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """The lane is confirmed against BENCH=OK; the bench output is rewritten
+        with BENCH=V2; Run then `c` re-runs the lane and terminal_out.s19 holds
+        BENCH=V2 at 0x00C001B0 (base: the PATCH re-applies the first copy)."""
+        from tests.b97_fixtures import (
+            load_project,
+            open_flow_execution,
+            run_lanes,
+            import_lanes,
+            write_flow,
+        )
+        from tests.b97_probes import settle
+    
+        base_text = emit_s19_from_mem_map(
+            {0x00C001B0 + i: byte for i, byte in enumerate(b"BENCH=OK")},
+            [(0x00C001B0, 0x00C001B8)],
+        )
+        bench = _bench(tmp_path)
+    
+        async def _drive() -> bytes:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(118, 54)) as pilot:
+                await settle(pilot)
+                project_dir = app.workarea / "demo"
+                project_dir.mkdir(parents=True, exist_ok=True)
+                (project_dir / "base.s19").write_text(base_text, encoding="utf-8")
+                write_flow(
+                    project_dir,
+                    "terminal",
+                    [
+                        SourceBlock("base.s19"),
+                        _ext_block(bench, str(bench / "step.log"), str(bench / "step.changes.json")),
+                        PatchBlock("step.changes.json"),
+                        WriteOutBlock("terminal_out.s19"),
+                    ],
+                )
+                await load_project(app, "demo")
+                panel = await open_flow_execution(app, pilot)
+                await import_lanes(app, pilot, "terminal")
+                _write_bench(bench, _doc("BENCH=OK", address=0x00C001B0))
+                await run_lanes(app, pilot, panel, key=True)
+                await pilot.press("c")  # confirm run 1 (BENCH=OK)
+                for _ in range(300):
+                    await pilot.pause()
+                    if (project_dir / "terminal_out.s19").exists():
+                        break
+                assert (project_dir / "terminal_out.s19").exists(), "run 1 never finished"
+                first = _reload_mem(project_dir / "terminal_out.s19")
+                assert [first[0x00C001B0 + i] for i in range(8)] == list(b"BENCH=OK")
+                # the bench output now holds the NEW evidence
+                _write_bench(bench, _doc("BENCH=V2", address=0x00C001B0))
+                await run_lanes(app, pilot, panel, key=True)
+                await pilot.press("c")
+                for _ in range(300):
+                    await pilot.pause()
+                    if (project_dir / "step.changes_1.json").exists():
+                        break
+                assert (project_dir / "step.changes_1.json").exists(), (
+                    "run 2 never copied the new output"
+                )
+                await settle(pilot, 6)
+                return bytes(
+                    _reload_mem(project_dir / "terminal_out.s19")[0x00C001B0 + i]
+                    for i in range(8)
+                )
+    
+>       assert asyncio.run(_drive()) == b"BENCH=V2"
+               ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_b101_flow_ext_copy.py:617: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<HOME>\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    async def _drive() -> bytes:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(118, 54)) as pilot:
+            await settle(pilot)
+            project_dir = app.workarea / "demo"
+            project_dir.mkdir(parents=True, exist_ok=True)
+            (project_dir / "base.s19").write_text(base_text, encoding="utf-8")
+            write_flow(
+                project_dir,
+                "terminal",
+                [
+                    SourceBlock("base.s19"),
+                    _ext_block(bench, str(bench / "step.log"), str(bench / "step.changes.json")),
+                    PatchBlock("step.changes.json"),
+                    WriteOutBlock("terminal_out.s19"),
+                ],
+            )
+            await load_project(app, "demo")
+            panel = await open_flow_execution(app, pilot)
+            await import_lanes(app, pilot, "terminal")
+            _write_bench(bench, _doc("BENCH=OK", address=0x00C001B0))
+            await run_lanes(app, pilot, panel, key=True)
+            await pilot.press("c")  # confirm run 1 (BENCH=OK)
+            for _ in range(300):
+                await pilot.pause()
+                if (project_dir / "terminal_out.s19").exists():
+                    break
+>           assert (project_dir / "terminal_out.s19").exists(), "run 1 never finished"
+E           AssertionError: run 1 never finished
+E           assert False
+E            +  where False = exists()
+E            +    where exists = (WindowsPath('<HOME>/AppData/Local/Temp/s19int8/bt2/test_r_flow_ext_9_11_flow_exec0/.s19tool/workarea/demo') / 'terminal_out.s19').exists
+
+tests\test_b101_flow_ext_copy.py:597: AssertionError
+_____________________ test_r_flow_ext_9_12_later_a2l_ref ______________________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19int8/bt2/test_r_flow_ext_9_12_later_a2l0')
+
+    def test_r_flow_ext_9_12_later_a2l_ref(tmp_path: Path) -> None:
+        """Run 2's PATCH resolves its symbol entry against the copied A2L: the
+        change record address is the v2 address 0x1002."""
+        project = _project(tmp_path, {"base.s19": _S19_SRC})
+        bench = _bench(tmp_path)
+        _write_bench(bench, _a2l_text(0x1000), "cal.a2l")
+        (project / "step.changes.json").write_text(_symbol_doc(), encoding="utf-8")
+        flow = Flow(
+            name="a2l_flow",
+            blocks=[
+                SourceBlock("base.s19"),
+                _ext_block(bench, str(bench / "step.log"), str(bench / "cal.a2l")),
+                PatchBlock("step.changes.json", a2l_ref="cal.a2l"),
+                WriteOutBlock("out.s19"),
+            ],
+        )
+        first = _run(flow, project, _confirm(bench, output="cal.a2l"))
+        assert first.status == "ok"
+        record = [c for c in first.change_records if c.block_index == 2]
+        assert record and record[0].address_start == 0x1000
+        _write_bench(bench, _a2l_text(0x1002), "cal.a2l")
+    
+        second = _run(flow, project, _confirm(bench, output="cal.a2l"))
+    
+        record = [c for c in second.change_records if c.block_index == 2]
+>       assert record and record[0].address_start == 0x1002, record
+E       AssertionError: []
+E       assert ([])
+
+tests\test_b101_flow_ext_copy.py:645: AssertionError
+_________ test_r_flow_ext_9_15_refused_ref_stays_refused_after_rebind _________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19int8/bt2/test_r_flow_ext_9_15_refused_r0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000202B8C45110>
+
+    @pytest.mark.skipif(not sys.platform.startswith("win"), reason="the junction half is Windows")
+    def test_r_flow_ext_9_15_refused_ref_stays_refused_after_rebind(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """[S-4] After a rebind, (a) an absolute ref and (b) a junction ref that
+        name the output file name are still refused by the manifest guard (holds
+        on base — the guard ran first there too; the case pins the order)."""
+        from tests.b97_fixtures import make_junction
+    
+        cwd = Path.cwd()
+        try:
+            monkeypatch.chdir(tmp_path)
+            # (a) the absolute ref
+            project = _project(tmp_path, {"base.s19": _S19_SRC}, name="proj_a")
+            bench_a = tmp_path / "bench_a"
+            bench_a.mkdir(exist_ok=True)
+            _write_bench(bench_a, _doc("AA"))
+            run_flow(
+                _flow_x(bench_a),
+                FlowContext(project_dir=project, external_confirmations=_confirm(bench_a)),
+            )
+            _write_bench(bench_a, _doc("BB"))
+            result_a = _run(
+                _flow_x(bench_a, patch_ref=str(project / "step.changes.json")),
+                project,
+                _confirm(bench_a),
+            )
+            patch_a = result_a.block_results[2]
+            assert patch_a.status == BLOCK_STATUS_ERROR
+            assert patch_a.summary == "change doc unresolved", patch_a.summary
+            assert _cause(patch_a) == "change document not found or not inside the project"
+            escape_a = [d for d in patch_a.diagnostics if d.startswith("[MANIFEST-PATH-ESCAPE]")]
+            assert len(escape_a) == 1, patch_a.diagnostics
+            assert result_a.block_results[3].status == BLOCK_STATUS_SKIPPED
+            assert str(project / "out.s19") not in [str(p) for p in result_a.written_paths]
+    
+            # (b) the junction ref
+            project_b = _project(tmp_path, {"base.s19": _S19_SRC}, name="proj_b")
+            bench_b = tmp_path / "bench_b"
+            bench_b.mkdir(exist_ok=True)
+            _write_bench(bench_b, _doc("AA"))
+            run_flow(
+                _flow_x(bench_b),
+                FlowContext(project_dir=project_b, external_confirmations=_confirm(bench_b)),
+            )
+            make_junction(project_b / "jl", project_b)
+            _write_bench(bench_b, _doc("BB"))
+            result_b = _run(
+                _flow_x(bench_b, patch_ref="jl/step.changes.json"),
+                project_b,
+                _confirm(bench_b),
+            )
+            patch_b = result_b.block_results[2]
+>           assert patch_b.status == BLOCK_STATUS_ERROR
+E           AssertionError: assert 'ok' == 'error'
+E             
+E             - error
+E             + ok
+
+tests\test_b101_flow_ext_copy.py:774: AssertionError
+_______________ test_r_flow_ext_10_1_flow_report_names_the_copy _______________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19int8/bt2/test_r_flow_ext_10_1_flow_repo0')
+
+    def test_r_flow_ext_10_1_flow_report_names_the_copy(tmp_path: Path) -> None:
+        """The flow report's Change attribution row names the copy."""
+        project, bench, _ = _two_runs_flow_x(tmp_path)
+        flow = Flow(
+            name="flow_x",
+            blocks=[*(_flow_x(bench).blocks[:-1]), ReportBlock()],
+        )
+        _write_bench(bench, _doc("BB"))
+    
+        before = _report_snapshot(project)
+        result = _run(flow, project, _confirm(bench))
+    
+        record = [c for c in result.change_records if c.block_index == 2]
+        assert record and record[0].change_doc_ref == "step.changes_1.json"
+        text = _new_flow_report(project, before)
+        assert "## Change attribution" in text
+        section = text.split("## Change attribution")[1].split("## Not applied")[0]
+        assert md_safe("step.changes_1.json", limit=120) in section, section
+>       assert "step\\.changes_1.json" in section or "step.changes_1.json" in section
+E       AssertionError: assert ('step\\.changes_1.json' in '\n\n| Patch | Change document | Address | Length | Before | After | Symbol | A2L reference |\n|---|---|---|---|---|---|---|---|\n| #3 | step\\.changes\\_1\\.json | 0x00001000 | 2 | 01 02 | 42 42 | - | - |\n\n' or 'step.changes_1.json' in '\n\n| Patch | Change document | Address | Length | Before | After | Symbol | A2L reference |\n|---|---|---|---|---|---|---|---|\n| #3 | step\\.changes\\_1\\.json | 0x00001000 | 2 | 01 02 | 42 42 | - | - |\n\n')
+
+tests\test_b101_flow_ext_copy.py:819: AssertionError
+____________ test_r_flow_ext_10_2_chain_set_report_names_the_copy _____________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19int8/bt2/test_r_flow_ext_10_2_chain_set0')
+
+    def test_r_flow_ext_10_2_chain_set_report_names_the_copy(tmp_path: Path) -> None:
+        """The chain-set report's Not applied line carries the copy name."""
+        project, bench, _ = _two_runs_flow_x(tmp_path)
+        _write_bench(
+            bench,
+            json.dumps(
+                {
+                    "format": "s19app-changeset",
+                    "version": "2.0",
+                    "kind": "change",
+                    "encoding": "utf-8",
+                    "value_mode": "text",
+                    "entries": [
+                        {"type": "string", "address": "0x00001000", "value": "BB"},
+                        {"type": "string", "address": "0x00009000", "value": "ZZ"},
+                    ],
+                }
+            ),
+        )
+        chain = ChainSpec(
+            name="lane1",
+            template="lane1",
+            flow=_flow_x(bench),
+        )
+    
+        record = run_chain_set(
+            [chain],
+            FlowContext(project_dir=project, external_confirmations=_confirm(bench)),
+            mode=CHAIN_RUN_SEQUENTIAL,
+        )
+    
+        outcome = record.outcomes[0]
+        assert outcome.status in ("ok", "completed-with-issues")
+        text = record.report_path.read_text(encoding="utf-8")
+        not_applied = text.split("## Not applied")[1].split("## Refusals")[0]
+        lines = [
+            ln
+            for ln in not_applied.splitlines()
+            if ln.startswith("- Chain ") and "0x00009000" in ln
+        ]
+        assert len(lines) == 1, not_applied
+>       assert lines[0].endswith("(step.changes_1.json)"), lines[0]
+E       AssertionError: - Chain lane1: 0x00009000 skipped-outside (step\.changes\_1\.json)
+E       assert False
+E        +  where False = <built-in method endswith of str object at 0x00000202B8B27BB0>('(step.changes_1.json)')
+E        +    where <built-in method endswith of str object at 0x00000202B8B27BB0> = '- Chain lane1: 0x00009000 skipped-outside (step\\.changes\\_1\\.json)'.endswith
+
+tests\test_b101_flow_ext_copy.py:863: AssertionError
+___________ test_r_flow_ext_10_4_flow_report_names_the_copy_a2l_own ___________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19int8/bt2/test_r_flow_ext_10_4_flow_repo0')
+
+    def test_r_flow_ext_10_4_flow_report_names_the_copy_a2l_own(tmp_path: Path) -> None:
+        """[A-1] The flow report's A2L reference cell names the PATCH's own A2L
+        copy (base: the typed ref)."""
+        project = _project(tmp_path, {"base.s19": _S19_SRC, "doc.json": _symbol_doc()})
+        bench = _bench(tmp_path)
+        _write_bench(bench, _a2l_text(0x1000), "cal.a2l")
+        flow = Flow(
+            name="a2l_report",
+            blocks=[
+                *(_a2l_patch_flow(bench, load_declares=False).blocks),
+                ReportBlock(),
+            ],
+        )
+        first = _run(flow, project, _confirm(bench, index=0, output="cal.a2l"))
+        assert first.status == "ok"
+        before = _report_snapshot(project)
+        _write_bench(bench, _a2l_text(0x1002), "cal.a2l")
+    
+        second = _run(flow, project, _confirm(bench, index=0, output="cal.a2l"))
+    
+        record = [c for c in second.change_records if c.block_index == 2]
+>       assert record and record[0].a2l_ref == "cal_1.a2l", record
+E       AssertionError: []
+E       assert ([])
+
+tests\test_b101_flow_ext_copy.py:951: AssertionError
+________ test_r_flow_ext_10_5_flow_report_names_the_copy_a2l_inherited ________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19int8/bt2/test_r_flow_ext_10_5_flow_repo0')
+
+    def test_r_flow_ext_10_5_flow_report_names_the_copy_a2l_inherited(tmp_path: Path) -> None:
+        """[A-1] The PATCH inherits the LOAD's A2L: the record and the report
+        name the inherited copy; the LOAD summary carries the read suffix."""
+        project = _project(tmp_path, {"base.s19": _S19_SRC, "doc.json": _symbol_doc()})
+        bench = _bench(tmp_path)
+        _write_bench(bench, _a2l_text(0x1000), "cal.a2l")
+        flow = Flow(
+            name="a2l_report",
+            blocks=[
+                *(_a2l_patch_flow(bench, load_declares=True).blocks),
+                ReportBlock(),
+            ],
+        )
+        first = _run(flow, project, _confirm(bench, index=0, output="cal.a2l"))
+        assert first.status == "ok"
+        before = _report_snapshot(project)
+        _write_bench(bench, _a2l_text(0x1002), "cal.a2l")
+    
+        second = _run(flow, project, _confirm(bench, index=0, output="cal.a2l"))
+    
+        load_block = second.block_results[1]
+        assert load_block.summary.endswith(
+            _READ_SUFFIX.format(copy="cal_1.a2l", ref="cal.a2l")
+        ), load_block.summary
+        record = [c for c in second.change_records if c.block_index == 2]
+>       assert record and record[0].a2l_ref == "cal_1.a2l", record
+E       AssertionError: []
+E       assert ([])
+
+tests\test_b101_flow_ext_copy.py:982: AssertionError
+______________ test_r_flow_ext_12_2_summary_names_the_copy_check ______________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19int8/bt2/test_r_flow_ext_12_2_summary_n0')
+
+    def test_r_flow_ext_12_2_summary_names_the_copy_check(tmp_path: Path) -> None:
+        project = _project(tmp_path, {"base.s19": _S19_SRC})
+        bench = _bench(tmp_path)
+        _write_bench(bench, _bytes_doc([(0x1000, "01 02")], kind="check"), "step.chk.json")
+        flow = _check_flow(bench)
+        _run(flow, project, _confirm(bench, output="step.chk.json"))
+        _write_bench(bench, _bytes_doc([(0x1000, "FF FF")], kind="check"), "step.chk.json")
+        result = _run(flow, project, _confirm(bench, output="step.chk.json"))
+>       assert result.block_results[2].summary == (
+            "passed=0 failed=1 uncheckable=0"
+            + _READ_SUFFIX.format(copy="step_1.chk.json", ref="step.chk.json")
+        ), result.block_results[2].summary
+E       AssertionError: passed=0 failed=1 uncheckable=0 · read step.chk_1.json in place of step.chk.json
+E       assert 'passed=0 fai...step.chk.json' == 'passed=0 fai...step.chk.json'
+E         
+E         Skipping 33 identical leading characters in diff, use -v to show
+E         -  read step_1.chk.json in place of step.chk.json
+E         ?           --
+E         +  read step.chk_1.json in place of step.chk.json
+E         ?               ++
+
+tests\test_b101_flow_ext_copy.py:1011: AssertionError
+_______________ test_r_flow_ext_12_3_summary_names_the_copy_crc _______________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19int8/bt2/test_r_flow_ext_12_3_summary_n0')
+
+    def test_r_flow_ext_12_3_summary_names_the_copy_crc(tmp_path: Path) -> None:
+        project = _project(tmp_path, {"base.s19": _S19_SRC})
+        bench = _bench(tmp_path)
+        _write_bench(bench, _crc_config_text(0x1010), "step.crc.json")
+        flow = _crc_flow(bench)
+        _run(flow, project, _confirm(bench, output="step.crc.json"))
+        _write_bench(bench, _crc_config_text(0x1020), "step.crc.json")
+        result = _run(flow, project, _confirm(bench, output="step.crc.json"))
+>       assert result.block_results[2].summary == (
+            "injected 1 CRC region"
+            + _READ_SUFFIX.format(copy="step_1.crc.json", ref="step.crc.json")
+        ), result.block_results[2].summary
+E       AssertionError: injected 1 CRC region · read step.crc_1.json in place of step.crc.json
+E       assert 'injected 1 C...step.crc.json' == 'injected 1 C...step.crc.json'
+E         
+E         - injected 1 CRC region · read step_1.crc.json in place of step.crc.json
+E         ?                                  --
+E         + injected 1 CRC region · read step.crc_1.json in place of step.crc.json
+E         ?                                      ++
+
+tests\test_b101_flow_ext_copy.py:1025: AssertionError
+______________ test_r_flow_ext_12_6_summary_names_the_copy_error ______________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19int8/bt2/test_r_flow_ext_12_6_summary_n0')
+
+    def test_r_flow_ext_12_6_summary_names_the_copy_error(tmp_path: Path) -> None:
+        """An error summary carries the suffix too (the config in the copied
+        output is malformed: no `reverse`)."""
+        project = _project(tmp_path, {"base.s19": _S19_SRC})
+        bench = _bench(tmp_path)
+        _write_bench(bench, _crc_config_text(0x1010), "step.crc.json")
+        flow = _crc_flow(bench)
+        _run(flow, project, _confirm(bench, output="step.crc.json"))
+        bad = json.loads(_crc_config_text(0x1020))
+        del bad["reverse"]
+        _write_bench(bench, json.dumps(bad), "step.crc.json")
+    
+        result = _run(flow, project, _confirm(bench, output="step.crc.json"))
+    
+        crc = result.block_results[2]
+        assert crc.status == BLOCK_STATUS_ERROR
+>       assert crc.summary == (
+            "config malformed"
+            + _READ_SUFFIX.format(copy="step_1.crc.json", ref="step.crc.json")
+        ), crc.summary
+E       AssertionError: config malformed · read step.crc_1.json in place of step.crc.json
+E       assert 'config malfo...step.crc.json' == 'config malfo...step.crc.json'
+E         
+E         - config malformed · read step_1.crc.json in place of step.crc.json
+E         ?                             --
+E         + config malformed · read step.crc_1.json in place of step.crc.json
+E         ?                                 ++
+
+tests\test_b101_flow_ext_copy.py:1097: AssertionError
+__________________ test_r_flow_ext_12_7_two_refs_read_order ___________________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19int8/bt2/test_r_flow_ext_12_7_two_refs_0')
+
+    def test_r_flow_ext_12_7_two_refs_read_order(tmp_path: Path) -> None:
+        """Two in-place reads in one block: the document first, then the A2L —
+        the suffixes appear in read order."""
+        project = _project(tmp_path, {"base.s19": _S19_SRC, "doc.json": _symbol_doc()})
+        bench = _bench(tmp_path)
+        _write_bench(bench, _a2l_text(0x1000), "cal.a2l")
+        flow = Flow(
+            name="two_refs",
+            blocks=[
+                _ext_block(bench, str(bench / "step.log"), str(bench / "cal.a2l")),
+                SourceBlock("base.s19"),
+                _ext_block(bench, str(bench / "step.log"), str(bench / "step.changes.json")),
+                PatchBlock("step.changes.json", a2l_ref="cal.a2l"),
+                WriteOutBlock("out.s19"),
+            ],
+        )
+        # run 1: the document travels as the second step's output too — but the
+        # PATCH document must exist under the project for the first run; write it
+        # before run 1 and let the step's output replace it from run 2 on.
+        (project / "step.changes.json").write_text(_doc("AA"), encoding="utf-8")
+        first = _run(
+            flow,
+            project,
+            {1: ExternalStepConfirmation(1, str(bench / "step.log"), str(bench / "cal.a2l")),
+             3: ExternalStepConfirmation(3, str(bench / "step.log"), str(bench / "step.changes.json"))},
+        )
+>       assert first.status == "ok", [b.summary for b in first.block_results]
+E       AssertionError: ["paused - waiting for a human: command 'python tool.py --release' | LOG '<HOME>\\AppData\\Local\\Temp\\s19i...ep)', 'skipped (waiting on external step)', 'skipped (waiting on external step)', 'skipped (waiting on external step)']
+E       assert 'paused' == 'ok'
+E         
+E         - ok
+E         + paused
+
+tests\test_b101_flow_ext_copy.py:1133: AssertionError
+____________ test_r_flow_ext_12_10_suffix_before_the_refusal_token ____________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19int8/bt2/test_r_flow_ext_12_10_suffix_b0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000202B8A90A50>
+
+    @pytest.mark.skipif(not sys.platform.startswith("win"), reason="junctions are the Windows case")
+    def test_r_flow_ext_12_10_suffix_before_the_refusal_token(tmp_path: Path, monkeypatch) -> None:
+        """[N-2 option (c)] An in-place read followed by a junction-refused A2L
+        keeps the refusal token LAST in the summary (the lane's ✗ detail keeps
+        coding on it) while still naming the copy."""
+        project, bench, _ = _two_runs_flow_x(tmp_path)
+        (project / "cal.a2l").write_text(_a2l_text(0x1000), encoding="utf-8")
+        flow = _flow_x(bench, patch_a2l_ref="cal.a2l")
+        _write_bench(bench, _doc("BB"))
+        from tests.b97_fixtures import make_junction
+    
+        make_junction(project / "jl", project)
+        flow2 = Flow(
+            name="flow_x",
+            blocks=[
+                SourceBlock("base.s19"),
+                _ext_block(bench, str(bench / "step.log"), str(bench / "step.changes.json")),
+                PatchBlock("step.changes.json", a2l_ref="jl/cal.a2l"),
+                WriteOutBlock("out.s19"),
+            ],
+        )
+    
+        result = _run(flow2, project, _confirm(bench))
+    
+        patch = result.block_results[2]
+>       assert patch.status == BLOCK_STATUS_ERROR
+E       AssertionError: assert 'ok' == 'error'
+E         
+E         - error
+E         + ok
+
+tests\test_b101_flow_ext_copy.py:1212: AssertionError
+___________ test_r_flow_ext_13_chain_set_provenance_names_the_copy ____________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19int8/bt2/test_r_flow_ext_13_chain_set_p0')
+
+    def test_r_flow_ext_13_chain_set_provenance_names_the_copy(tmp_path: Path) -> None:
+        image_a = emit_s19_from_mem_map({0x1000: 0x01}, [(0x1000, 0x1001)])
+        image_b = emit_s19_from_mem_map({0x1000: 0x09}, [(0x1000, 0x1001)])
+        project = _project(tmp_path, {})
+        bench = _bench(tmp_path)
+        _write_bench(bench, image_a, "fw.s19")
+        flow = Flow(
+            name="load_flow",
+            blocks=[
+                _ext_block(bench, str(bench / "step.log"), str(bench / "fw.s19")),
+                SourceBlock("fw.s19"),
+                WriteOutBlock("out.s19"),
+            ],
+        )
+        chain = ChainSpec(name="lane1", template="lane1", flow=flow)
+        ctx = FlowContext(project_dir=project, external_confirmations=_confirm(bench, index=0, output="fw.s19"))
+        first = run_chain_set([chain], ctx, mode=CHAIN_RUN_SEQUENTIAL)
+        assert first.outcomes[0].status == "ok"
+        _write_bench(bench, image_b, "fw.s19")
+    
+        record = run_chain_set([chain], ctx, mode=CHAIN_RUN_SEQUENTIAL)
+    
+        outcome = record.outcomes[0]
+        assert outcome.inputs == [("fw.s19", str(project / "fw_1.s19"))]
+        text = record.report_path.read_text(encoding="utf-8")
+        provenance = text.split("## Input provenance")[1].split("## Written files")[0]
+        expected_line = (
+            f"- Chain lane1 input 1: fw.s19 [bound] path=`{project / 'fw_1.s19'}`"
+            + _READ_SUFFIX.format(copy="fw_1.s19", ref="fw.s19")
+        )
+>       assert expected_line in provenance, provenance
+E       AssertionError: 
+E         
+E         - Chain lane1 input 1: fw\.s19 [bound] path=`<HOME>\AppData\Local\Temp\s19int8\bt2\test_r_flow_ext_13_chain_set_p0\.s19tool\workarea\proj\fw_1.s19` · read fw\_1\.s19 in place of fw\.s19
+E         
+E         
+E       assert '- Chain lane1 input 1: fw.s19 [bound] path=`<HOME>\\AppData\\Local\\Temp\\s19int8\\bt2\\test_r_flow_ext_13_chain_set_p0\\.s19tool\\workarea\\proj\\fw_1.s19` · read fw_1.s19 in place of fw.s19' in '\n\n- Chain lane1 input 1: fw\\.s19 [bound] path=`<HOME>\\AppData\\Local\\Temp\\s19int8\\bt2\\test_r_flow_ext_13_chain_set_p0\\.s19tool\\workarea\\proj\\fw_1.s19` · read fw\\_1\\.s19 in place of fw\\.s19\n\n'
+
+tests\test_b101_flow_ext_copy.py:1257: AssertionError
+___________ test_r_flow_ext_13_2_unbound_input_keeps_the_base_line ____________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19int8/bt2/test_r_flow_ext_13_2_unbound_i0')
+
+    def test_r_flow_ext_13_2_unbound_input_keeps_the_base_line(tmp_path: Path) -> None:
+        """An unbound input keeps the base provenance line (holds on base; pinned
+        so the suffix never leaks onto a plain input)."""
+        project = _project(tmp_path, {"base.s19": _S19_SRC})
+        chain = ChainSpec(
+            name="lane1",
+            template="lane1",
+            flow=Flow(
+                name="lane1",
+                blocks=[SourceBlock("base.s19"), WriteOutBlock("out.s19")],
+            ),
+        )
+        record = run_chain_set(
+            [chain], FlowContext(project_dir=project), mode=CHAIN_RUN_SEQUENTIAL
+        )
+        outcome = record.outcomes[0]
+        assert outcome.inputs == [("base.s19", str(project / "base.s19"))]
+        assert outcome.in_place_inputs == {}
+        text = record.report_path.read_text(encoding="utf-8")
+        provenance = text.split("## Input provenance")[1].split("## Written files")[0]
+        expected_line = f"- Chain lane1 input 1: base.s19 [bound] path=`{project / 'base.s19'}`"
+>       assert expected_line in provenance, provenance
+E       AssertionError: 
+E         
+E         - Chain lane1 input 1: base\.s19 [bound] path=`<HOME>\AppData\Local\Temp\s19int8\bt2\test_r_flow_ext_13_2_unbound_i0\.s19tool\workarea\proj\base.s19`
+E         
+E         
+E       assert '- Chain lane1 input 1: base.s19 [bound] path=`<HOME>\\AppData\\Local\\Temp\\s19int8\\bt2\\test_r_flow_ext_13_2_unbound_i0\\.s19tool\\workarea\\proj\\base.s19`' in '\n\n- Chain lane1 input 1: base\\.s19 [bound] path=`<HOME>\\AppData\\Local\\Temp\\s19int8\\bt2\\test_r_flow_ext_13_2_unbound_i0\\.s19tool\\workarea\\proj\\base.s19`\n\n'
+
+tests\test_b101_flow_ext_copy.py:1281: AssertionError
+_______________ test_r_flow_ext_11_earlier_copy_unchanged_names _______________
+
+tmp_path = WindowsPath('<HOME>/AppData/Local/Temp/s19int8/bt2/test_r_flow_ext_11_earlier_cop1')
+
+    def test_r_flow_ext_11_earlier_copy_unchanged_names(tmp_path: Path) -> None:
+        project, bench, flow = _two_runs_flow_x(tmp_path)
+        _write_bench(bench, _doc("BB"))
+    
+        _run(flow, project, _confirm(bench))
+    
+>       assert {path.name for path in project.iterdir()} == {
+            "base.s19",
+            "out.s19",
+            "step.changes.json",
+            "step.changes_1.json",
+        }
+E       AssertionError: assert {'base.s19', ...anges_1.json'} == {'base.s19', ...anges_1.json'}
+E         
+E         Extra items in the left set:
+E         'out_1.s19'
+E         Use -v to get more diff
+
+tests\test_b101_flow_ext_copy.py:1383: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_b101_crc_model_and_reasons.py::test_r_crc_engine_001_1_7_flow_crc_block_injects_model_value
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_1_later_patch_reads_this_runs_copy
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_5_later_crc_block
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_6_later_load_block
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_8_other_refs_unchanged
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_9_earlier_block_reads_the_file_as_it_is
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_10_case_insensitive_on_windows
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_11_flow_execution_confirm_reads_new_output
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_12_later_a2l_ref
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_9_15_refused_ref_stays_refused_after_rebind
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_10_1_flow_report_names_the_copy
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_10_2_chain_set_report_names_the_copy
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_10_4_flow_report_names_the_copy_a2l_own
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_10_5_flow_report_names_the_copy_a2l_inherited
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_12_2_summary_names_the_copy_check
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_12_3_summary_names_the_copy_crc
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_12_6_summary_names_the_copy_error
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_12_7_two_refs_read_order
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_12_10_suffix_before_the_refusal_token
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_13_chain_set_provenance_names_the_copy
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_13_2_unbound_input_keeps_the_base_line
+FAILED tests/test_b101_flow_ext_copy.py::test_r_flow_ext_11_earlier_copy_unchanged_names
+22 failed, 60 passed in 43.46s
