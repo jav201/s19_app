@@ -1,0 +1,29 @@
+LAN Linux host, merged tree 2a70774 (main a77b749 + Inc 7 + Inc 8), 65 test files (touched by Inc 7/8, importers of their modules, id registry, hygiene, placement guard)
+<HOME>/work/s19_merge/s19_app/__init__.py
+INFO     s19tui:app.py:18131 Load phase boundary: apply_hex_done path=a.s19
+INFO     s19tui:app.py:19790 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.002
+INFO     s19tui:app.py:17663 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17718 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:16568 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.035
+INFO     s19tui:app.py:19304 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.042
+INFO     s19tui:app.py:18144 Load phase boundary: apply_a2l_done path=a.s19
+INFO     s19tui:app.py:18997 Memory Map updated. ranges=1
+INFO     s19tui:app.py:18161 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-65/popen-gw3/test_at_056e_a2b_diff_report_b0/sel/.s19tool/workarea/proj/a.s19 file_type=s19 elapsed_seconds=0.679 has_mac=False precomputed=False
+INFO     s19tui:app.py:6164 View reports action. project=proj count=0
+INFO     s19tui:app.py:6242 Report filter selected: /tmp/pytest-of-<USER>/pytest-65/popen-gw3/test_at_056e_a2b_diff_report_b0/sel/.s19tool/workarea/proj/filters/f.json
+INFO     s19tui:screens.py:3480 ReportViewerScreen dismissed by close.
+=========================== short test summary info ============================
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+1 failed, 1774 passed, 14 skipped in 1290.70s (0:21:30)
+---serial---
+/data/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/pilot.py:524: WaitForScreenTimeout
+============================= QC-TM timing margins =============================
+49.7%  0.201 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+66.5%  0.503 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 2 bounds, 0 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b100_busy.py::test_at_b100_17_worker_load_of_an_8_mib_s19_by_keys
+1 failed, 1 passed, 1789 deselected in 185.44s (0:03:05)
+--- rerun of the serial failure alone, same tree, host load average ~8-11 from another agent's runs during the lane ---
+1 passed in 99.33s (0:01:39)
+1 passed in 97.91s (0:01:37)
