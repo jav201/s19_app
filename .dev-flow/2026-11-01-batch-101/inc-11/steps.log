@@ -1,0 +1,4 @@
+E1 start 2026-11-05T20:24Z model=opus base=b7b77c4
+E1 end 2026-11-05T20:45Z model=opus
+E2 start 2026-11-05T20:45Z model=opus (baseline graph built in parallel with E1)
+E2 end 2026-11-05T20:45Z model=opus
