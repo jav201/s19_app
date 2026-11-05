@@ -19,3 +19,12 @@ Inputs: E3-architect.md (FAIL: A-1, A-2 MAJOR in the test records; A-3…A-8 MIN
 | SEC-9 | The new matrix test includes a hostile Ranges state (verbatim payload). |
 
 Runs and measurements: LAN Linux host only (operator rule).
+
+## Round 2 (2026-11-05)
+
+Round 2 (architect + security items, one reviewer): PASS-WITH-NOTES; A-1, A-2, SEC-1 closed; SEC-2 sound. E4 addenda (binding, no further round):
+- **Cap (SEC-2):** the coverage cap is **16 777 216 bytes (16 MiB)**, not the reviewer's 4.5 MiB. Reason: 4.5 MiB would refuse whole-image previews of the ~10–12 MiB images the increment targets, removing a working capability; at the measured 0.4834 µs/B a 16 MiB coverage costs ~8.1 s (bounded, no freeze of the kind SEC-2 found), a whole 12 MiB image ~6 s, and the F-23 scene (4 198 399 B) ~2.0 s within its 3 s target. The 3 s target applies to the F-23 scene rows, not to the cap. Row 001.11 text and its case use 16777216; the cap is a module constant.
+- **N-1:** the A-1 AST check compares the whole module after stripping the allowed inserted waits (catches a deleted/renamed base test and changed module constants such as `_STORE_WORD_BYTES`).
+- **N-3:** the M-5/M-6 negative controls expect 2 recomputes (still RED against the row's 1).
+- **N-4:** the per-run glyph cap is dropped (it never binds); the min/max sizing of SEC-1 stays.
+- **N-5:** an E5 skip of the AST check counts as not-run, never as pass.
