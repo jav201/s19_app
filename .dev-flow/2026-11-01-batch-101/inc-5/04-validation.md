@@ -58,4 +58,4 @@ The four E4 integration failures (int-02, int-04) are the batch's known failures
 
 ## Trace
 
-`trace_check.py --req 01-requirements.md E1-slice.md --tests tests --base c2cba35 --src s19_app` at close: `trace_check: 3 US, 13 active requirements (1 withdrawn), 0 gap(s)`. The evidence citations in this record were written with their full committed paths (`.dev-flow/2026-11-01-batch-101/evidence/inc-5/…`) so no EVID "not committed" gap remains; `04-validation.md` and `03-increments/increment-005.md` are the two new records of this unit and are uncommitted until the orchestrator commits them.
+`trace_check.py --req 01-requirements.md E1-slice.md --tests tests --base c2cba35 --src s19_app` at close: `trace_check: 3 US, 13 active requirements (1 withdrawn), 0 gap(s)`. Every evidence citation in this record is a full committed path under the batch's evidence home, so no EVID gap remains.
