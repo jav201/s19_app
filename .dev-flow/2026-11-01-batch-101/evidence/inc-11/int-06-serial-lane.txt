@@ -1,0 +1,41 @@
+## host: LAN Linux host; worktree: <HOME>/work/s19_i11; date: 2026-11-06T00:17:22Z
+## git base: f9f3cb09 + Inc 11 branch diff (b7b77c4..b101-inc11) applied
+s19_app.__file__ = <HOME>/work/s19_i11/s19_app/__init__.py
+python 3.11.18 textual 8.2.8
+## cmd: pytest -q -p no:cacheprovider --basetemp /tmp/pytest-s19i11-100719  -m "serial_timing" tests/test_a2l_alignment_sizing.py tests/test_a2l_curve_description.py tests/test_a2l_enriched.py tests/test_a2l_f841_cleanup.py tests/test_a2l_inline_axis_length.py tests/test_a2l_missing_length_fix.py tests/test_a2l_multiline_headers.py tests/test_a2l_record_layout_address.py tests/test_a2l_record_layout_length.py tests/test_a2l_record_layout_walker.py tests/test_b100_a2l_progress.py tests/test_b100_document.py tests/test_b102_bulk_add.py tests/test_b102_patch_picker.py tests/test_b97_patch_editor.py tests/test_b99_a2l_encode.py tests/test_changes_symbol_entries.py tests/test_color_policy_round_trip.py tests/test_compare_service.py tests/test_examples_smoke.py tests/test_import_census.py tests/test_tui_a2l.py tests/test_tui_a2l_issue_recolor.py tests/test_tui_issues_view.py tests/test_tui_public_api.py tests/test_validation_engine.py tests/test_validation_service_supplemental.py tests/test_validation_a2l.py tests/test_tui_app.py tests/test_tui_directionb.py tests/test_tui_snapshot.py tests/test_b101_a2l_blocks_and_segments.py tests/test_b101_issues_severity_view.py tests/test_b101_inc11_acceptance.py tests/test_tui_issues_triage_b94.py tests/test_synth_release_case.py tests/test_segment_split_window.py tests/test_engine_unchanged.py tests/test_id_registry.py tests/test_suite_hygiene.py tests/test_requirements_canon.py
+..............................                                           [100%]
+============================= QC-TM timing margins =============================
+49.9%  0.201 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+66.6%  0.502 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+88.6%  0.114 s / 1.000 s  TC-B100-30 classifier exactly-1000-entries  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[exactly-1000-entries]
+89.5%  0.105 s / 1.000 s  TC-B100-30 5000-digit-integer  tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[5000-digit-integer]
+90.0%  0.100 s / 1.000 s  TC-B100-30 20000-entries  tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[20000-entries]
+90.4%  0.096 s / 1.000 s  TC-B100-30 brackets-1MiB  tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[brackets-1MiB]
+91.8%  1.634 s / 20.000 s  stress load mac_first  tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[mac_first]
+92.7%  1.459 s / 20.000 s  stress load s19_first  tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[s19_first]
+92.9%  0.710 s / 10.000 s  end-to-end load pipeline  tests/test_tui_app.py::test_end_to_end_load_pipeline_under_budget
+96.0%  0.199 s / 5.000 s  AT101  tests/test_a2l_multiline_headers.py::test_at101_megabyte_unterminated_block_is_linear
+96.8%  0.065 s / 2.000 s  MAC view cache  tests/test_tui_app.py::test_build_mac_view_cache_scales_under_load
+98.9%  0.011 s / 1.000 s  TC-B100-28  tests/test_b100_document.py::test_tc_b100_28_document_finding_is_kept_first_beside_a_full_batch
+99.8%  0.002 s / 1.000 s  TC-B100-30 classifier entries-long-string  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-long-string]
+99.9%  0.001 s / 1.000 s  TC-B100-30 classifier 1001-entries  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[1001-entries]
+99.9%  0.001 s / 1.000 s  TC-B100-30 classifier brackets-1MiB  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-1MiB]
+100.0%  0.000 s / 2.000 s  AT120  tests/test_a2l_alignment_sizing.py::test_at120_oversized_alignment_layout_clamps_to_none
+100.0%  0.000 s / 1.000 s  TC149  tests/test_a2l_alignment_sizing.py::test_tc149_dos_clamp_includes_padding
+100.0%  0.000 s / 1.000 s  TC138  tests/test_a2l_inline_axis_length.py::test_tc138_dos_clamp_pure_arithmetic
+100.0%  0.000 s / 2.000 s  AT111  tests/test_a2l_inline_axis_length.py::test_at111_oversized_axis_clamps_to_none
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier 20000-entries  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[20000-entries]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier 5000-digit-integer  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[5000-digit-integer]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier bare-entries-is-5  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[bare-entries-is-5]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier brackets-under-entries  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-under-entries]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier empty-entries  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[empty-entries]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier entries-is-5  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-is-5]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier entries-wide-object  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-wide-object]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier not-utf8  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[not-utf8]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier one-byte-over-1MiB  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-byte-over-1MiB]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier one-entry  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-entry]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier truncated  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[truncated]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier v1-document  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[v1-document]
+QC-TM: 31 bounds, 0 under 20 % margin
+30 passed, 1114 deselected in 21.60s
+## exit: 0  end: 2026-11-06T00:17:44Z

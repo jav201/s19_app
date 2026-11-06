@@ -271,7 +271,8 @@ def test_at_i11_3_warnings_filter_lists_warnings_only(tmp_path: Path, demo_dir: 
         async with app.run_test(size=(120, 36)) as pilot:
             await _load_demo(pilot, app, demo_dir, FAULTY, "demo_faulty")
             await _open_issues(pilot, app)
-            app.query_one("#issues_filter_warning", Button).press()
+            # A real pointer click on the Warnings button (OR-8, E4 integration).
+            assert await pilot.click("#issues_filter_warning"), "click missed #issues_filter_warning"
             await wait_until(
                 pilot,
                 lambda: "filter=warning" in _summary(app) and len(_headers(app)) > 0,
@@ -296,18 +297,37 @@ def test_at_i11_4_split_join_lists_four_demo_segments(tmp_path: Path, demo_dir: 
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(120, 36)) as pilot:
             await _load_demo(pilot, app, demo_dir, CLEAN, "demo_clean")
-            app.action_open_split_join_export()
+            # Command palette (OR-8, E4 integration): ctrl+k, type, Enter runs the first match.
+            from textual.widgets import TextArea
+
+            from s19_app.tui.command_bar import CommandBar
             from s19_app.tui.segment_split_view import _SegTable
 
+            await _press(pilot, "ctrl+k")
+            await wait_until(pilot, lambda: app.query_one(CommandBar).palette_is_open, "the palette opened")
+            await _press(pilot, *"join")
+            await _press(pilot, "enter")
             await wait_until(
                 pilot,
-                lambda: bool(app.query("#sje_table")),
-                "the Split / Join / Export table mounted",
+                lambda: app.focused is not None and app.focused.id == "sje_table",
+                "the Split / Join / Export table focused",
             )
             table = app.query_one("#sje_table", _SegTable)
-            table.focus()
-            await wait_until(pilot, lambda: app.focused is table, "the table focused")
+            # `t` on the manual tab focuses its localities box (keyboard-first,
+            # segment_split_view.action_cycle_tab), so a second `t` would be typed there:
+            # the user leaves the box with Tab, then `t` again (seam ruling SR-1).
             await _press(pilot, "t")  # ranges -> manual
+            await wait_until(
+                pilot,
+                lambda: isinstance(app.focused, TextArea),
+                "the manual localities box focused",
+            )
+            await _press(pilot, "tab")
+            await wait_until(
+                pilot,
+                lambda: app.focused is not None and not isinstance(app.focused, TextArea),
+                lambda: f"focus still in the box: {app.focused!r}",
+            )
             await _press(pilot, "t")  # manual -> a2l
             await wait_until(
                 pilot,

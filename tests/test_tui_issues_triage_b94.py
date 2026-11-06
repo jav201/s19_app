@@ -141,6 +141,16 @@ def _note_count(panel: GroupedIssuesPanel) -> int:
     return len(list(panel.query(".issue-reclassify-note")))
 
 
+def _rows_composed(panel: GroupedIssuesPanel, count: int) -> bool:
+    """``count`` rows are mounted AND each has composed its code chip.
+
+    A row is counted by ``query(IssueRow)`` as soon as it mounts, one frame before its
+    ``compose`` children exist; reading the chip in that frame raises ``NoMatches``
+    (E4 integration, LAN Linux host under load)."""
+    rows = list(panel.query(IssueRow))
+    return len(rows) == count and all(len(row.query(".issue-code-chip")) == 1 for row in rows)
+
+
 def _row_codes(panel: GroupedIssuesPanel) -> list[tuple[str, str]]:
     """Return ``(severity css class, chip code)`` for every mounted row."""
     return [
@@ -195,7 +205,7 @@ def test_at_b94_14_fixture_triage_through_surface(tmp_path: Path) -> None:
             panel = app.query_one("#validation_issues_groups", GroupedIssuesPanel)
             await wait_until(
                 pilot,
-                lambda: "WARNINGS" in _headers(panel),
+                lambda: "WARNINGS" in _headers(panel) and _rows_composed(panel, 1),
                 lambda: f"no WARNINGS group painted: {list(_headers(panel))}",
             )
             headers = _headers(panel)
@@ -344,7 +354,7 @@ def test_tc_b94_19_panel_reclassification_matrix(tmp_path: Path) -> None:
             _mount_panel(app, mixed, counts)
             await wait_until(
                 pilot,
-                lambda: len(list(panel.query(IssueRow))) == 6,
+                lambda: _rows_composed(panel, 6),
                 lambda: f"rows mounted: {len(list(panel.query(IssueRow)))}",
             )
             headers = _headers(panel)
@@ -394,7 +404,7 @@ def test_tc_b94_19_panel_reclassification_matrix(tmp_path: Path) -> None:
             _mount_panel(app, [hostile], {_WARNING: 1})
             await wait_until(
                 pilot,
-                lambda: len(list(panel.query(IssueRow))) == 1,
+                lambda: _rows_composed(panel, 1),
                 "the hostile row",
             )
             headers = _headers(panel)

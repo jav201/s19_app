@@ -1,0 +1,86 @@
+## host: LAN Linux host; worktree: <HOME>/work/s19_i11; date: 2026-11-06T00:32:07Z
+## git base: f9f3cb09 + Inc 11 branch diff (b7b77c4..b101-inc11) applied
+s19_app.__file__ = <HOME>/work/s19_i11/s19_app/__init__.py
+python 3.11.18 textual 8.2.8
+## tree fingerprint: f2c0ee954a895b80
+## cmd: pytest -q -p no:cacheprovider --basetemp /tmp/pytest-s19i11-105480 -n 6 -m "not serial_timing" tests/test_tui_app.py tests/test_tui_directionb.py tests/test_tui_snapshot.py
+bringing up nodes...
+bringing up nodes...
+
+.............................................................x.......... [ 25%]
+........................................................................ [ 51%]
+..........................................FF............................ [ 77%]
+.....................ssssssssssssssssssssssssss....s.s.s.....            [100%]
+=================================== FAILURES ===================================
+________________ test_tc031_engine_modules_have_no_diff_vs_main ________________
+[gw1] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19i11-105480/popen-gw1/test_tc031_engine_modules_have0')
+
+    def test_tc031_engine_modules_have_no_diff_vs_main(tmp_path: Path) -> None:
+        """The engine / data-processing modules show zero diff vs ``main``.
+    
+        Intent: LLR-014.1 / C-1 — the parse/validate engine is frozen for this
+        view-only batch. ``git diff --stat main`` over ``core.py``,
+        ``hexfile.py``, ``range_index.py``, ``validation/``, ``tui/a2l.py``,
+        ``tui/mac.py`` and ``tui/color_policy.py`` must be empty. An empty diff
+        is the strongest possible verdict for the cosmetic-only rubric (Q-11):
+        there are zero changed lines, so there is trivially no logic, constant
+        or signature change.
+    
+        If a future increment touches an engine module — even cosmetically —
+        this test fails and forces the change to be classified by hand against
+        the rubric (whitespace/comment/import-order = cosmetic; logic/constant/
+        signature = a violation) rather than slipping through silently.
+        """
+        diff_stat = _git("diff", "--stat", "main", "--", *_ENGINE_PATHS)
+>       assert diff_stat.strip() == "", (
+            "the engine / data-processing modules must be byte-identical to "
+            f"the batch start (main); git diff --stat reported:\n{diff_stat}"
+        )
+E       AssertionError: the engine / data-processing modules must be byte-identical to the batch start (main); git diff --stat reported:
+E          s19_app/tui/a2l.py          | 217 +++++++++++++++++++++++++++++++++++++-------
+E          s19_app/validation/rules.py |  85 +++++++++++++----
+E          2 files changed, 253 insertions(+), 49 deletions(-)
+E         
+E       assert 's19_app/tui/... deletions(-)' == ''
+E         
+E         + s19_app/tui/a2l.py          | 217 +++++++++++++++++++++++++++++++++++++-------
+E         +  s19_app/validation/rules.py |  85 +++++++++++++----
+E         +  2 files changed, 253 insertions(+), 49 deletions(-)
+
+tests/test_tui_directionb.py:7063: AssertionError
+___________ test_tc031_engine_modules_have_no_name_only_diff_vs_main ___________
+[gw1] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19i11-105480/popen-gw1/test_tc031_engine_modules_have1')
+
+    def test_tc031_engine_modules_have_no_name_only_diff_vs_main(tmp_path: Path) -> None:
+        """No engine module file appears in ``git diff --name-only main``.
+    
+        Intent: LLR-014.1 — a second, independent check that no file under the
+        frozen engine surface was modified, added or deleted relative to the
+        batch start. ``--stat`` (the test above) and ``--name-only`` (here)
+        cross-check each other so a formatting quirk in one cannot mask a real
+        change.
+        """
+        names = _git("diff", "--name-only", "main", "--", *_ENGINE_PATHS)
+        changed = [line for line in names.splitlines() if line.strip()]
+>       assert changed == [], (
+            f"engine / data-processing files changed vs the batch start: "
+            f"{changed} — C-1 / LLR-014.1 freezes these modules"
+        )
+E       AssertionError: engine / data-processing files changed vs the batch start: ['s19_app/tui/a2l.py', 's19_app/validation/rules.py'] — C-1 / LLR-014.1 freezes these modules
+E       assert ['s19_app/tui...ion/rules.py'] == []
+E         
+E         Left contains 2 more items, first extra item: 's19_app/tui/a2l.py'
+E         Use -v to get more diff
+
+tests/test_tui_directionb.py:7080: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_tui_directionb.py::test_tc031_engine_modules_have_no_diff_vs_main
+FAILED tests/test_tui_directionb.py::test_tc031_engine_modules_have_no_name_only_diff_vs_main
+SKIPPED [29] tests/test_tui_snapshot.py:1184: pytest-textual-snapshot not installed (dev-only optional extra)
+2 failed, 245 passed, 29 skipped, 1 xfailed in 260.46s (0:04:20)
+## tree fingerprint: f2c0ee954a895b80
+## exit: 1  end: 2026-11-06T00:36:28Z

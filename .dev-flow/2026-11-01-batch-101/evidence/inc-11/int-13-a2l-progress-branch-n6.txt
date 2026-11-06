@@ -1,0 +1,13 @@
+## host: LAN Linux host; worktree: <HOME>/work/s19_i11; date: 2026-11-06T00:46:33Z
+## git base: f9f3cb09 + Inc 11 branch diff (b7b77c4..b101-inc11) applied
+s19_app.__file__ = <HOME>/work/s19_i11/s19_app/__init__.py
+python 3.11.18 textual 8.2.8
+## tree fingerprint: f2c0ee954a895b80
+## cmd: pytest -q -p no:cacheprovider --basetemp /tmp/pytest-s19i11-110534 -n 6 -m "not serial_timing" tests/test_b100_a2l_progress.py
+bringing up nodes...
+bringing up nodes...
+
+..........                                                               [100%]
+10 passed in 67.73s (0:01:07)
+## tree fingerprint: f2c0ee954a895b80
+## exit: 0  end: 2026-11-06T00:47:41Z

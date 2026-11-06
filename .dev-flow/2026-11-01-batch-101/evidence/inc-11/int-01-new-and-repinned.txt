@@ -1,0 +1,574 @@
+## host: LAN Linux host; worktree: <HOME>/work/s19_i11; date: 2026-11-05T23:44:02Z
+## git base: f9f3cb09 + Inc 11 branch diff (b7b77c4..b101-inc11) applied
+s19_app.__file__ = <HOME>/work/s19_i11/s19_app/__init__.py
+python 3.11.18 textual 8.2.8
+## cmd: pytest -q -p no:cacheprovider --basetemp /tmp/pytest-s19i11-80925 -n 6 -m "not serial_timing" tests/test_b101_a2l_blocks_and_segments.py tests/test_b101_issues_severity_view.py tests/test_b101_inc11_acceptance.py tests/test_tui_issues_triage_b94.py tests/test_synth_release_case.py tests/test_segment_split_window.py tests/test_engine_unchanged.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 29%]
+........................................................................ [ 59%]
+....F..........F........................................................ [ 89%]
+...............F.....F..F                                                [100%]
+=================================== FAILURES ===================================
+_________________ test_tc_b94_18_curated_set_and_engine_freeze _________________
+[gw5] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19i11-80925/popen-gw5/test_tc_b94_18_curated_set_and0')
+
+    def test_tc_b94_18_curated_set_and_engine_freeze(tmp_path: Path) -> None:
+        """TC-B94-18 / R-VAL-032.2, .3 — the 21 former curated names raise no issue; engine freeze.
+    
+        Intent: the guarantee the view constant used to give now sits in the engine. Each of
+        the 21 names raises no issue inside an IF_DATA block; the 11 ASAM names among them
+        raise none at the top level either; the 10 interface names (PAGE, SEGMENT, DAQ …) are
+        a WARNING at the top level, so the exemption is by IF_DATA, not by name. In the SAME
+        run the engine freeze holds: no diff vs ``main`` over ``validation/rules.py`` and
+        ``tui/a2l.py`` and the worktree bytes equal ``main``'s blobs (CRLF-aware). On the
+        Inc 11 branch that arm is RED by plan (the unfreeze) and GREEN after the merge (OR-3).
+        The freeze arm rides the proven TC-027 idiom: where the ``main`` ref is absent it
+        SKIPS instead of erroring.
+        """
+        names = FORMER_CURATED_ASAM + FORMER_CURATED_INTERFACE
+        assert len(names) == 21 and len(set(names)) == 21
+    
+        inside = ["/begin IF_DATA XCP"]
+        for name in names:
+            inside += [f"/begin {name}", f"/end {name}"]
+        inside += ["/end IF_DATA"]
+        issues = _engine_issues_of_text(tmp_path, inside)
+        assert issues == [], [(i.code, i.message) for i in issues]
+    
+        for name in FORMER_CURATED_ASAM:
+            top = _engine_issues_of_text(tmp_path, [f"/begin {name}", f"/end {name}"])
+            assert [i for i in top if i.code == "A2L_UNRECOGNIZED_BLOCK"] == [], name
+        for name in FORMER_CURATED_INTERFACE:
+            top = _engine_issues_of_text(tmp_path, [f"/begin {name}", f"/end {name}"])
+            found = [i for i in top if i.code == "A2L_UNRECOGNIZED_BLOCK"]
+            assert [(i.severity, i.message) for i in found] == [
+                (ValidationSeverity.WARNING, f"Unrecognized A2L block '{name}'.")
+            ], name
+    
+        # Engine freeze, same run — the proven TC-027 idiom (check=True, skip on
+        # CalledProcessError / FileNotFoundError) plus a CRLF-aware byte-equality
+        # against ``main``'s blobs (the checkout may carry CRLF). The CI PR
+        # checkout fetches the PR head only, so ``main`` does not resolve there:
+        # the arm skips instead of dying with exit 128 — exactly how
+        # tests/test_engine_unchanged.py stays green on CI. Where ``main`` exists
+        # (local runs, the post-merge gate) both assertions still bite, same run.
+        frozen_paths = ["s19_app/validation/rules.py", "s19_app/tui/a2l.py"]
+        try:
+            completed = subprocess.run(
+                ["git", "diff", "--name-only", "main", "--", *frozen_paths],
+                cwd=_REPO_ROOT,
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            changed = [line for line in completed.stdout.splitlines() if line.strip()]
+>           assert changed == [], changed
+E           AssertionError: ['s19_app/tui/a2l.py', 's19_app/validation/rules.py']
+E           assert ['s19_app/tui...ion/rules.py'] == []
+E             
+E             Left contains 2 more items, first extra item: 's19_app/tui/a2l.py'
+E             Use -v to get more diff
+
+tests/test_tui_issues_triage_b94.py:269: AssertionError
+_________________ test_tc_b94_19_panel_reclassification_matrix _________________
+[gw5] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19i11-80925/popen-gw5/test_tc_b94_19_panel_reclassif0')
+
+    def test_tc_b94_19_panel_reclassification_matrix(tmp_path: Path) -> None:
+        """TC-B94-19 / R-TUI-042b.1, .2, .4, .6 — WARNING stays WARNING, no note, C-17.
+    
+        Intent (white-box over ``GroupedIssuesPanel.render_groups``): a WARNING for a block
+        name once curated (REF_CHARACTERISTIC, PAGE) renders under WARNINGS with the
+        ``sev-warning`` class and no justification note; the header counts are the caller's
+        verbatim; the empty state renders; the caller's issues are never mutated; a hostile
+        file-derived block name renders literal — 0 markup spans.
+        """
+        error_row = ValidationIssue(
+            code="MAC_DUPLICATE",
+            severity=ValidationSeverity.ERROR,
+            message="dup",
+            artifact="mac",
+        )
+        plain_warning = ValidationIssue(
+            code="RANGE_GAP",
+            severity=ValidationSeverity.WARNING,
+            message="gap",
+            artifact="s19",
+        )
+        plain_info = ValidationIssue(
+            code="NOTE",
+            severity=ValidationSeverity.INFO,
+            message="note",
+            artifact="s19",
+        )
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+    
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("issues")
+                panel = app.query_one("#validation_issues_groups", GroupedIssuesPanel)
+    
+                # --- a curated-name WARNING stays a WARNING; no note; counts verbatim ---
+                mixed = [
+                    _unrecognized_issue("REF_CHARACTERISTIC"),
+                    _unrecognized_issue("PAGE"),
+                    _FROBNICATE,
+                    plain_warning,
+                    error_row,
+                    plain_info,
+                ]
+                counts = {
+                    ValidationSeverity.ERROR: 1,
+                    ValidationSeverity.WARNING: 4,
+                    ValidationSeverity.INFO: 1,
+                }
+                _mount_panel(app, mixed, counts)
+                await wait_until(
+                    pilot,
+                    lambda: len(list(panel.query(IssueRow))) == 6,
+                    lambda: f"rows mounted: {len(list(panel.query(IssueRow)))}",
+                )
+                headers = _headers(panel)
+                assert headers["ERRORS"].issue_count == 1
+                assert headers["WARNINGS"].issue_count == 4, headers["WARNINGS"].issue_count
+                assert headers["INFO"].issue_count == 1, headers["INFO"].issue_count
+                assert _note_count(panel) == 0
+                rows = _row_codes(panel)
+                assert rows.count(("sev-warning", "A2L_UNRECOGNIZED_BLOCK")) == 3, rows
+                assert ("sev-info", "A2L_UNRECOGNIZED_BLOCK") not in rows, rows
+                assert ("sev-warning", "RANGE_GAP") in rows, rows
+                assert ("sev-error", "MAC_DUPLICATE") in rows, rows
+                assert ("sev-info", "NOTE") in rows, rows
+                warn_rows = [
+                    row
+                    for row in panel.query(IssueRow)
+                    if row._sev_class == "sev-warning" and row.issue.code == "A2L_UNRECOGNIZED_BLOCK"
+                ]
+                assert {row.issue.message for row in warn_rows} == {
+                    "Unrecognized A2L block 'REF_CHARACTERISTIC'.",
+                    "Unrecognized A2L block 'PAGE'.",
+                    "Unrecognized A2L block 'FROBNICATE'.",
+                }
+                # the caller's list is unmutated (raw severities preserved)
+                assert [issue.severity for issue in mixed] == [
+                    _WARNING,
+                    _WARNING,
+                    _WARNING,
+                    _WARNING,
+                    ValidationSeverity.ERROR,
+                    ValidationSeverity.INFO,
+                ]
+    
+                # --- empty state: no A2L, nothing to group ---
+                panel.render_groups([], {})
+                await wait_until(
+                    pilot,
+                    lambda: len(list(panel.query(IssueGroupHeader))) == 0
+                    and len(list(panel.query(".issues-empty-note"))) == 1,
+                    "the empty note",
+                )
+                empty = panel.query_one(".issues-empty-note")
+                assert empty.render().plain == GroupedIssuesPanel.EMPTY_TEXT
+    
+                # --- C-17 hostile arm: a markup-laden block name renders literal ---
+                hostile = _unrecognized_issue("EVIL[red]")
+                _mount_panel(app, [hostile], {_WARNING: 1})
+                await wait_until(
+                    pilot,
+                    lambda: len(list(panel.query(IssueRow))) == 1,
+                    "the hostile row",
+                )
+                headers = _headers(panel)
+                assert headers["WARNINGS"].issue_count == 1
+                assert _note_count(panel) == 0
+                hostile_row = panel.query_one(IssueRow)
+                detail = hostile_row.query_one(".issue-detail")
+                rendered = detail.render()
+                assert "[red]" in rendered.plain, rendered.plain
+                assert rendered.spans == [], rendered.spans
+                assert hostile_row.query_one(".issue-code-chip").render().plain == (
+                    "A2L_UNRECOGNIZED_BLOCK"
+                )
+    
+>       asyncio.run(_drive())
+
+tests/test_tui_issues_triage_b94.py:412: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+<CONDA>/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<CONDA>/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<CONDA>/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_tui_issues_triage_b94.py:355: in _drive
+    rows = _row_codes(panel)
+           ^^^^^^^^^^^^^^^^^
+tests/test_tui_issues_triage_b94.py:146: in _row_codes
+    return [
+tests/test_tui_issues_triage_b94.py:147: in <listcomp>
+    (row._sev_class, row.query_one(".issue-code-chip", Static).render().plain)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = IssueRow(classes='sev-error issue-row'), selector = '.issue-code-chip'
+expect_type = <class 'textual.widgets._static.Static'>
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+            raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+    
+        try:
+            selector_set = parse_selectors(query_selector)
+        except TokenError:
+            raise InvalidQueryFormat(
+                f"Unable to parse {query_selector!r} as a query; check for syntax errors"
+            ) from None
+    
+        if all(selectors.is_simple for selectors in selector_set):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+        else:
+            cache_key = None
+    
+        for node in walk_breadth_first(base_node, with_root=False):
+            if not match(selector_set, node):
+                continue
+            if expect_type is not None and not isinstance(node, expect_type):
+                raise WrongType(
+                    f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                )
+            if cache_key is not None:
+                base_node._query_one_cache[cache_key] = node
+            return node
+    
+>       raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E       textual.css.query.NoMatches: No nodes match '.issue-code-chip' on IssueRow(classes='sev-error issue-row')
+
+<CONDA>/envs/s19ci/lib/python3.11/site-packages/textual/dom.py:1533: NoMatches
+_________________ test_tc027_engine_modules_unchanged_vs_main __________________
+[gw1] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+
+    def test_tc027_engine_modules_unchanged_vs_main() -> None:
+        """TC-027 — the parsing / range / validation engine is unchanged vs ``main``.
+    
+        The read-only-engine constraint forbids TUI-side batches from editing the
+        parsing layer (``core.py`` / ``hexfile.py`` / ``tui/mac.py``), the range
+        primitive (``range_index.py``) or the validation engine (``validation/``):
+        they are *consumed* read-only. ``tui/a2l.py`` left the frozen set for
+        batch-95 (contract-pinned ``extract_memory_segments`` hardening, HLR-137 /
+        LLR-137.4 — see the ``_ENGINE_PATHS`` note) and is expected to diff. This
+        runs ``git diff --name-only main`` over exactly those paths and asserts
+        the result is empty — so a single accidental edit to any engine module is
+        caught at the increment boundary, not discovered later. ``git diff`` is
+        line-ending / ``__pycache__`` aware, so the verdict is robust to checkout
+        noise.
+        """
+        repo_root = _repo_root()
+        try:
+            changed = _git_diff_name_only(repo_root, _ENGINE_PATHS)
+        except (subprocess.CalledProcessError, FileNotFoundError) as exc:
+            pytest.skip(
+                "git is unavailable or the 'main' ref is missing in this "
+                f"environment — TC-027's engine-unchanged arm cannot run: {exc}"
+            )
+    
+>       assert changed == [], (
+            "TUI-side batches must not edit the parsing / range / validation "
+            f"engine (read-only constraint) — git reports these changed vs main: "
+            f"{changed}"
+        )
+E       AssertionError: TUI-side batches must not edit the parsing / range / validation engine (read-only constraint) — git reports these changed vs main: ['s19_app/tui/a2l.py', 's19_app/validation/rules.py']
+E       assert ['s19_app/tui...ion/rules.py'] == []
+E         
+E         Left contains 2 more items, first extra item: 's19_app/tui/a2l.py'
+E         Use -v to get more diff
+
+tests/test_engine_unchanged.py:175: AssertionError
+______________ test_at_i11_4_split_join_lists_four_demo_segments _______________
+[gw3] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19i11-80925/popen-gw3/test_at_i11_4_split_join_lists0')
+demo_dir = PosixPath('/tmp/pytest-s19i11-80925/popen-gw3/b101_inc11_acceptance_demo0')
+
+    def test_at_i11_4_split_join_lists_four_demo_segments(tmp_path: Path, demo_dir: Path) -> None:
+        """The a2l source of the clean demo lists its 4 MEMORY_SEGMENTs (base: a2l(0))."""
+    
+        async def _go() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 36)) as pilot:
+                await _load_demo(pilot, app, demo_dir, CLEAN, "demo_clean")
+                app.action_open_split_join_export()
+                from s19_app.tui.segment_split_view import _SegTable
+    
+                await wait_until(
+                    pilot,
+                    lambda: bool(app.query("#sje_table")),
+                    "the Split / Join / Export table mounted",
+                )
+                table = app.query_one("#sje_table", _SegTable)
+                table.focus()
+                await wait_until(pilot, lambda: app.focused is table, "the table focused")
+                await _press(pilot, "t")  # ranges -> manual
+                await _press(pilot, "t")  # manual -> a2l
+                await wait_until(
+                    pilot,
+                    lambda: "a2l(4)" in _plain(app.query_one("#sje_tabs")),
+                    lambda: f"chip line: {_plain(app.query_one('#sje_tabs'))!r}",
+                )
+                body = lambda: _plain(table.query_one(Static))  # noqa: E731
+                wanted = ("0x00000000", "0x00040000", "0x00800000", "0x00C00000")
+                await wait_until(
+                    pilot,
+                    lambda: all(w in body() for w in wanted),
+                    lambda: f"table body: {body()!r}",
+                )
+                text = body()
+                for name in ("boot", "app", "cal", "config"):
+                    assert name in text, text
+    
+>       asyncio.run(_go())
+
+tests/test_b101_inc11_acceptance.py:328: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+<CONDA>/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<CONDA>/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<CONDA>/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b101_inc11_acceptance.py:319: in _go
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_at_i11_4_split_join_lists_four_demo_segments.<locals>._go.<locals>.<lambda> at 0x7f6b6cd4c220>
+failure = <function test_at_i11_4_split_join_lists_four_demo_segments.<locals>._go.<locals>.<lambda> at 0x7f6b95306520>
+timeout = 300.0
+
+    async def wait_until(pilot, predicate, failure, *, timeout: float = 300.0) -> None:
+        """Poll ``predicate`` like ``tests/support/timing.py::wait_until`` but ride out a
+        ``WaitForScreenTimeout``: loading the 10 MB demo keeps the app busy for longer
+        than Textual's 30 s pause limit on a loaded shared host. The deadline still
+        bounds the wait."""
+        deadline = time.monotonic() + timeout
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: table body: 'type localities (0xSTART-0xEND, one per line)'
+
+tests/test_b101_inc11_acceptance.py:72: AssertionError
+________________ test_at_b94_14_fixture_triage_through_surface _________________
+[gw3] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19i11-80925/popen-gw3/test_at_b94_14_fixture_triage_0')
+
+    def test_at_b94_14_fixture_triage_through_surface(tmp_path: Path) -> None:
+        """AT-B94-14 / R-VAL-032.3 — software_a.a2l raises no unrecognized-block issue; the screen
+        shows no INFO group from A2L blocks; an unknown block still warns.
+    
+        Intent: the stand-in fixture (IF_DATA > SEGMENT > PAGE and the ASAM names the base
+        did not know) loads through the real engine with 0 ``A2L_UNRECOGNIZED_BLOCK`` issues
+        (base: 1 023). The live Issues screen then shows ``info=0`` and no INFO header from
+        A2L blocks, and a planted ``FROBNICATE`` (the executed negative control) is exactly
+        one WARNING row — the engine fix must not silence a genuinely unknown block.
+        """
+        engine_issues = _engine_issues_of_fixture()
+        unrecognized = [i for i in engine_issues if i.code == "A2L_UNRECOGNIZED_BLOCK"]
+        assert unrecognized == [], [i.message for i in unrecognized[:5]]
+    
+        async def _drive_app_chrome() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+    
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("issues")
+    
+                _seed_app_and_show_issues(app, tmp_path, engine_issues + [_FROBNICATE])
+                panel = app.query_one("#validation_issues_groups", GroupedIssuesPanel)
+                await wait_until(
+                    pilot,
+                    lambda: "WARNINGS" in _headers(panel),
+                    lambda: f"no WARNINGS group painted: {list(_headers(panel))}",
+                )
+                headers = _headers(panel)
+                assert "INFO" not in headers, list(headers)
+                assert headers["WARNINGS"].issue_count == 1
+                assert _row_codes(panel) == [("sev-warning", "A2L_UNRECOGNIZED_BLOCK")]
+                strip_plain = panel.app.query_one("#issues_severity_strip", Static).render().plain
+                assert "Warnings 1" in strip_plain and "Info 0" in strip_plain, strip_plain
+                summary_plain = panel.app.query_one("#validation_issues_summary").render().plain
+                assert "warnings=1" in summary_plain and "info=0" in summary_plain, summary_plain
+                assert _note_count(panel) == 0
+    
+>       asyncio.run(_drive_app_chrome())
+
+tests/test_tui_issues_triage_b94.py:211: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+<CONDA>/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<CONDA>/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<CONDA>/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_tui_issues_triage_b94.py:204: in _drive_app_chrome
+    assert _row_codes(panel) == [("sev-warning", "A2L_UNRECOGNIZED_BLOCK")]
+           ^^^^^^^^^^^^^^^^^
+tests/test_tui_issues_triage_b94.py:146: in _row_codes
+    return [
+tests/test_tui_issues_triage_b94.py:147: in <listcomp>
+    (row._sev_class, row.query_one(".issue-code-chip", Static).render().plain)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = IssueRow(classes='sev-warning issue-row'), selector = '.issue-code-chip'
+expect_type = <class 'textual.widgets._static.Static'>
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+            raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+    
+        try:
+            selector_set = parse_selectors(query_selector)
+        except TokenError:
+            raise InvalidQueryFormat(
+                f"Unable to parse {query_selector!r} as a query; check for syntax errors"
+            ) from None
+    
+        if all(selectors.is_simple for selectors in selector_set):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+        else:
+            cache_key = None
+    
+        for node in walk_breadth_first(base_node, with_root=False):
+            if not match(selector_set, node):
+                continue
+            if expect_type is not None and not isinstance(node, expect_type):
+                raise WrongType(
+                    f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                )
+            if cache_key is not None:
+                base_node._query_one_cache[cache_key] = node
+            return node
+    
+>       raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E       textual.css.query.NoMatches: No nodes match '.issue-code-chip' on IssueRow(classes='sev-warning issue-row')
+
+<CONDA>/envs/s19ci/lib/python3.11/site-packages/textual/dom.py:1533: NoMatches
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2991 App initialized. base_dir=/tmp/pytest-s19i11-80925/popen-gw3/test_at_b94_14_fixture_triage_0 workarea=/tmp/pytest-s19i11-80925/popen-gw3/test_at_b94_14_fixture_triage_0/.s19tool/workarea
+INFO     s19tui:app.py:8318 Workarea refreshed. files=0
+INFO     s19tui:app.py:16571 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:16603 Load phase boundary: populate_issues_table_done rows=1 total=1 elapsed=0.009
+=========================== short test summary info ============================
+FAILED tests/test_tui_issues_triage_b94.py::test_tc_b94_18_curated_set_and_engine_freeze
+FAILED tests/test_tui_issues_triage_b94.py::test_tc_b94_19_panel_reclassification_matrix
+FAILED tests/test_engine_unchanged.py::test_tc027_engine_modules_unchanged_vs_main
+FAILED tests/test_b101_inc11_acceptance.py::test_at_i11_4_split_join_lists_four_demo_segments
+FAILED tests/test_tui_issues_triage_b94.py::test_at_b94_14_fixture_triage_through_surface
+5 failed, 236 passed in 675.40s (0:11:15)
+## exit: 1  end: 2026-11-05T23:55:18Z

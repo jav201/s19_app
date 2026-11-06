@@ -1,0 +1,10 @@
+## tree: <HOME>/work/s19_i11 f9f3cb09 dirty-files=12 date: 2026-11-06T00:37:00Z
+s19_app.__file__ = <HOME>/work/s19_i11/s19_app/__init__.py
+..                                                                       [100%]
+============================= slowest 3 durations ==============================
+42.08s call     tests/test_b100_a2l_progress.py::test_tc_b100_52_project_install_step_is_painted_before_the_install[case_06]
+8.39s call     tests/test_b100_a2l_progress.py::test_tc_b100_52_project_install_step_is_painted_before_the_install[case_01]
+
+(1 durations < 0.005s hidden.  Use -vv to show these durations.)
+2 passed in 51.14s
+## exit: 0  end: 2026-11-06T00:37:52Z
