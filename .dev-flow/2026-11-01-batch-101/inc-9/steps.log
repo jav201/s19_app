@@ -1,0 +1,6 @@
+E1 start 2026-11-06T12:49Z model=opus base=98d94d7 (Inc 6 in flight on b101-inc6)
+E1 end 2026-11-06T13:17Z model=opus rows=11 (9 new, 2 changed) TCs=24 (21 + 3 AT) evidence=evidence-e1/i9e1-pilot-transcript.txt (LAN Linux, 98d94d7)
+E2 start 2026-11-06T13:17Z model=opus
+E2 end 2026-11-06T13:21Z model=opus graph=codewire/graph-inc9.md nodes=15 (7 changed, 8 context) entities=8 (1 new constant, 1 changed docstring) edges=16; codewire_lint: not read=0
+E2 trace_check (E1/E2 records): 3 US, 11 active requirements (0 withdrawn), 12 gap(s) = 11 TEST (tests are E4) + 1 EVID (04-validation.md is E5); CASE 0, SLICE 0, US 0. LAN worktree removed.
+E1 rulings 2026-11-06T13:23Z orchestrator D-1 (C), D-2 (no), D-6 (yes)
