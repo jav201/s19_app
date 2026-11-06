@@ -1,0 +1,1413 @@
+=== Inc 6 E5 corrective run: e5c-01-base-red
+date: 2026-11-06T15:17:10Z
+worktree HEAD (base): 98d94d724a72c56468292be123ff15f664acb4fa
+index tree with the increment staged: 10edb677f5b8fba98e24e12dfdf04b6a187b107c
+staged files vs base: 2
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i6c_base/s19_app/__init__.py
+CMD: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -n 10 -m not serial_timing -rfs tests/test_b101_document_homes.py::test_r_chked_032_write_status_names_the_home tests/test_b101_document_homes.py::test_r_chked_031_write_home[after-library-pick] tests/test_b101_document_homes.py::test_r_patch_doc_dropdown_001_4_refused[unknown-folder] tests/test_b101_document_homes.py::test_r_patch_doc_dropdown_001_3_pick[library] tests/test_b101_document_homes.py::test_r_patch_doc_dropdown_001_3_pick_keeps_spelling tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[project] tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[project] tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_kept_on_save_project tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_kept_on_save_project tests/test_b101_patch_lifecycle.py::test_r_chk_pe_008_subtitle[revert] tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[add] tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[project] tests/test_b101_patch_lifecycle.py::test_r_chk_pe_010_status[project] tests/test_b101_patch_lifecycle.py::test_r_chk_pe_011_strip[project] tests/test_b101_patch_lifecycle.py::test_r_chk_pe_012_rows[project] tests/test_b101_patch_lifecycle.py::test_r_chk_pe_014_glyph_after_save_back
+bringing up nodes...
+bringing up nodes...
+
+F.FFFFF.FF.FFFFFFF                                                       [100%]
+=================================== FAILURES ===================================
+_____________ test_r_patch_doc_dropdown_001_3_pick_keeps_spelling ______________
+[gw6] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-333/popen-gw6/test_r_patch_doc_dropdown_001_0')
+
+    def test_r_patch_doc_dropdown_001_3_pick_keeps_spelling(tmp_path: Path) -> None:
+        """Case R-PATCH-DOC-DROPDOWN-001.3/4 (S-4): the app's base folder is named
+        through a link ``alias -> real`` above ``.s19tool``, so the given and the
+        resolved spellings differ. A pick of ``patches/a.json`` keeps the work
+        area's spelling as the document source, so Save project classes the file
+        in the project and, with an entry added, a Save project through ``ctrl+s``
+        and its dialog (E5 C-3) says
+        ``Change document a.json has unsaved edits - the project records the file
+        as it is on disk; save it from the Patch Editor to keep them``.
+    
+        Negative control: the resolved path returned as the source -> the file is
+        classed outside the project and the line is missing -> RED."""
+        real = tmp_path / "real"
+        real.mkdir()
+        alias = tmp_path / "alias"
+        make_link(alias, real)
+    
+        async def scenario(app, pilot, log):
+            project = make_project(app.workarea)
+            write_doc(project / "patches" / "a.json", ENTRY_C)
+            await open_project_shipped(pilot, app)
+            await show_patch_editor(pilot, app)
+            mark = len(log.messages)
+            await pick(pilot, app, "#patch_doc_file_select", "patches/a.json")
+            await wait_line(
+                pilot, log, mark, lambda line: line.startswith("Loaded "), "the load status"
+            )
+            assert str(source_of(app)).startswith(str(alias)), (
+                f"the source must keep the work area's spelling, got {source_of(app)}"
+            )
+            await add_patch_entry(pilot, app, "0x8007", "CC")
+            mark = len(log.messages)
+            await save_project_by_dialog(pilot, app, log, "proj")
+            lines = log.since(mark)
+            expected = (
+                "Change document a.json has unsaved edits — the project records "
+                "the file as it is on disk; save it from the Patch Editor to keep them"
+            )
+            assert expected in lines, lines
+            return True
+    
+>       assert run(tmp_path, scenario, base=alias) is True
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b101_document_homes.py:634: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_document_homes.py:142: in run
+    return projects.run_app(root, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_document_homes.py:616: in scenario
+    await pick(pilot, app, "#patch_doc_file_select", "patches/a.json")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+select_id = '#patch_doc_file_select', value = 'patches/a.json'
+
+    async def pick(pilot, app, select_id: str, value: str) -> None:
+        """Pick ``value`` the way the operator does: click the dropdown open, move
+        with the arrow keys, press enter (no ``Select.value`` write)."""
+        from textual.widgets._select import SelectCurrent, SelectOverlay
+    
+        select = app.query_one(select_id, Select)
+        values = [option_value for _prompt, option_value in select._options]
+>       assert value in values, (
+            f"{value!r} is not offered by {select_id}; the dropdown lists {option_values(select)!r}"
+        )
+E       AssertionError: 'patches/a.json' is not offered by #patch_doc_file_select; the dropdown lists []
+E       assert 'patches/a.json' in [Select.NULL]
+
+tests/test_b101_document_homes.py:265: AssertionError
+_______________ test_r_chked_031_write_home[after-library-pick] ________________
+[gw3] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-333/popen-gw3/test_r_chked_031_write_home_af0')
+arm = 'after-library-pick'
+
+    @pytest.mark.parametrize(
+        "arm", ["project", "no-project", "after-library-pick", "never-overwrites"]
+    )
+    def test_r_chked_031_write_home(tmp_path: Path, arm: str) -> None:
+        """Cases R-CHKED-031/1 .. /3, plus the free-name claim of revised D-3.
+    
+        /1: Write as ``s1.chk.json`` in a project -> ``proj/checks/s1.chk.json``
+        and no ``workarea/patches/s1.chk.json``. /2: with no project -> the common
+        folder. /3: after a pick of ``library/w.chk.json``, Write (Write as
+        ``w.chk.json``) -> ``proj/checks/w.chk.json``; ``workarea/patches/`` holds
+        only ``w.chk.json``, unchanged; the status names the project copy,
+        ``Check Editor: wrote checks/w.chk.json (1 fields, kind=check).``
+        (R-CHKED-032/3, E5 C-9). never-overwrites: a ``checks/s1.chk.json``
+        that already exists keeps its bytes and the new spec takes another name.
+    
+        Negative control: Write without the check home -> the file lands in
+        ``workarea/patches/`` -> RED."""
+    
+        async def scenario(app, pilot, log):
+            if arm == "no-project":
+                await load_image_fixture(pilot, app, app.base_dir)
+            else:
+                project = make_project(app.workarea)
+                if arm == "after-library-pick":
+                    write_doc(lib(app) / "w.chk.json", ENTRY_W, kind="check")
+                if arm == "never-overwrites":
+                    write_doc(project / "checks" / "s1.chk.json", ENTRY_W, kind="check")
+                await open_project_shipped(pilot, app)
+            await show_check_editor(pilot, app)
+            if arm == "after-library-pick":
+                library_before = files_under(lib(app))
+                mark = len(log.messages)
+                await pick(pilot, app, "#check_spec_file_select", "library/w.chk.json")
+                await wait_line(
+                    pilot, log, mark, lambda line: line.startswith("Check Editor: loaded "),
+                    "the spec pick status",
+                )
+                lines = await write_spec(pilot, app, log, "w.chk.json")
+                assert "Check Editor: wrote checks/w.chk.json (1 fields, kind=check)." in lines, lines
+                assert (app.workarea / "proj" / "checks" / "w.chk.json").is_file()
+                assert files_under(lib(app)) == library_before, "Write touched the library"
+                return True
+            await add_check_row(pilot, app)
+            before = files_under(app.workarea / "proj" / "checks") if arm == "never-overwrites" else {}
+            lines = await write_spec(pilot, app, log, "s1.chk.json")
+            assert any(line.startswith("Check Editor: wrote ") for line in lines), lines
+            if arm == "project":
+                assert (app.workarea / "proj" / "checks" / "s1.chk.json").is_file()
+                assert not (lib(app) / "s1.chk.json").exists()
+            elif arm == "no-project":
+                assert (lib(app) / "s1.chk.json").is_file()
+            else:
+                after = files_under(app.workarea / "proj" / "checks")
+                assert after["s1.chk.json"] == before["s1.chk.json"], "Write overwrote the spec"
+                assert len(after) == len(before) + 1, sorted(after)
+                assert not (lib(app) / "s1.chk.json").exists()
+            return True
+    
+>       assert run(tmp_path, scenario) is True
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b101_document_homes.py:806: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_document_homes.py:142: in run
+    return projects.run_app(root, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_document_homes.py:780: in scenario
+    await pick(pilot, app, "#check_spec_file_select", "library/w.chk.json")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+select_id = '#check_spec_file_select', value = 'library/w.chk.json'
+
+    async def pick(pilot, app, select_id: str, value: str) -> None:
+        """Pick ``value`` the way the operator does: click the dropdown open, move
+        with the arrow keys, press enter (no ``Select.value`` write)."""
+        from textual.widgets._select import SelectCurrent, SelectOverlay
+    
+        select = app.query_one(select_id, Select)
+        values = [option_value for _prompt, option_value in select._options]
+>       assert value in values, (
+            f"{value!r} is not offered by {select_id}; the dropdown lists {option_values(select)!r}"
+        )
+E       AssertionError: 'library/w.chk.json' is not offered by #check_spec_file_select; the dropdown lists ['w.chk.json']
+E       assert 'library/w.chk.json' in [Select.NULL, 'w.chk.json']
+
+tests/test_b101_document_homes.py:265: AssertionError
+____________ test_r_chked_032_write_status_names_the_home[project] _____________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-333/popen-gw0/test_r_chked_032_write_status_0')
+arm = 'project'
+
+    @pytest.mark.parametrize("arm", ["project", "no-project", "collision"])
+    def test_r_chked_032_write_status_names_the_home(tmp_path: Path, arm: str) -> None:
+        """Cases R-CHKED-032/1, /2 and /4 (E5 C-9 = SEC E5-2): the Write status
+        names the written file as the Spec list lists it. /1: in a project, Write
+        as ``s1.chk.json`` -> exactly ``Check Editor: wrote checks/s1.chk.json (1
+        fields, kind=check).``. /2: with no project the bare name, as before. /4:
+        with ``proj/checks/s1.chk.json`` already present the status names the
+        claimed free name under ``checks/``. (/3, after a library pick, is
+        ``test_r_chked_031_write_home[after-library-pick]``.)
+    
+        Negative control (M44): the status built from the bare file name -> /1
+        reads ``wrote s1.chk.json`` and /4 the bare claimed name -> RED."""
+    
+        async def scenario(app, pilot, log):
+            if arm == "no-project":
+                await load_image_fixture(pilot, app, app.base_dir)
+                home = lib(app)
+            else:
+                project = make_project(app.workarea)
+                home = project / "checks"
+                if arm == "collision":
+                    write_doc(home / "s1.chk.json", ENTRY_W, kind="check")
+                await open_project_shipped(pilot, app)
+            await show_check_editor(pilot, app)
+            await add_check_row(pilot, app)
+            before = files_under(home) if home.is_dir() else {}
+            lines = await write_spec(pilot, app, log, "s1.chk.json")
+            written = [line for line in lines if line.startswith("Check Editor: wrote ")]
+            if arm == "project":
+                assert written == ["Check Editor: wrote checks/s1.chk.json (1 fields, kind=check)."], lines
+            elif arm == "no-project":
+                assert written == ["Check Editor: wrote s1.chk.json (1 fields, kind=check)."], lines
+            else:
+                after = files_under(home)
+                assert after["s1.chk.json"] == before["s1.chk.json"], "Write overwrote the spec"
+                claimed = sorted(set(after) - set(before))
+                assert len(claimed) == 1, sorted(after)
+                assert written == [f"Check Editor: wrote checks/{claimed[0]} (1 fields, kind=check)."], lines
+            return True
+    
+>       assert run(tmp_path, scenario) is True
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b101_document_homes.py:849: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_document_homes.py:142: in run
+    return projects.run_app(root, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f8496bd33d0>
+
+    async def scenario(app, pilot, log):
+        if arm == "no-project":
+            await load_image_fixture(pilot, app, app.base_dir)
+            home = lib(app)
+        else:
+            project = make_project(app.workarea)
+            home = project / "checks"
+            if arm == "collision":
+                write_doc(home / "s1.chk.json", ENTRY_W, kind="check")
+            await open_project_shipped(pilot, app)
+        await show_check_editor(pilot, app)
+        await add_check_row(pilot, app)
+        before = files_under(home) if home.is_dir() else {}
+        lines = await write_spec(pilot, app, log, "s1.chk.json")
+        written = [line for line in lines if line.startswith("Check Editor: wrote ")]
+        if arm == "project":
+>           assert written == ["Check Editor: wrote checks/s1.chk.json (1 fields, kind=check)."], lines
+E           AssertionError: ['Check Editor: wrote s1.chk.json (1 fields, kind=check).']
+E           assert ['Check Edito...kind=check).'] == ['Check Edito...kind=check).']
+E             
+E             At index 0 diff: 'Check Editor: wrote s1.chk.json (1 fields, kind=check).' != 'Check Editor: wrote checks/s1.chk.json (1 fields, kind=check).'
+E             Use -v to get more diff
+
+tests/test_b101_document_homes.py:838: AssertionError
+________________ test_r_patch_doc_dropdown_001_3_pick[library] _________________
+[gw5] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-333/popen-gw5/test_r_patch_doc_dropdown_001_0')
+arm = 'library'
+
+    @pytest.mark.parametrize("arm", ["project", "library"])
+    def test_r_patch_doc_dropdown_001_3_pick(tmp_path: Path, arm: str) -> None:
+        """Cases R-PATCH-DOC-DROPDOWN-001.3/1 and /3: a pick of a project file
+        loads that file, the document source spelled from the app's work area (not
+        resolved, S-4), status ``Loaded check: 2 entries, 0 error(s)``; a pick of
+        ``library/w.json`` in a project loads ``workarea/patches/w.json``, status
+        ``Loaded change: 1 entry, 0 error(s)``, ribbon name segment exactly
+        ``w.json`` (not the listed ``library/w.json``; E5 C-4).
+    
+        Negative control: the pick resolved under ``workarea/patches/`` ->
+        ``checks/k.chk.json`` is refused -> RED; the resolved path returned as the
+        source -> /1 fails its equality when the work area is reached through a
+        link (see ``..._pick_keeps_spelling``)."""
+    
+        async def scenario(app, pilot, log):
+            project = make_project(app.workarea)
+            write_doc(project / "checks" / "k.chk.json", ENTRIES_K, kind="check")
+            write_doc(lib(app) / "w.json", ENTRY_C)
+            await open_project_shipped(pilot, app)
+            await show_patch_editor(pilot, app)
+            mark = len(log.messages)
+            if arm == "project":
+                await pick(pilot, app, "#patch_doc_file_select", "checks/k.chk.json")
+                lines = await wait_line(
+                    pilot, log, mark, lambda line: line.startswith("Loaded "), "the load status"
+                )
+                assert "Loaded check: 2 entries, 0 error(s)" in lines, lines
+                assert source_of(app) == app.workarea / "proj" / "checks" / "k.chk.json"
+            else:
+                await pick(pilot, app, "#patch_doc_file_select", "library/w.json")
+                lines = await wait_line(
+                    pilot, log, mark, lambda line: line.startswith("Loaded "), "the load status"
+                )
+                assert "Loaded change: 1 entry, 0 error(s)" in lines, lines
+                assert source_of(app) == lib(app) / "w.json"
+                ribbon = str(app.query_one("#patch_identity_ribbon").render())
+                assert ribbon.split(" · ")[0] == "w.json", ribbon
+            return True
+    
+>       assert run(tmp_path, scenario) is True
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b101_document_homes.py:550: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_document_homes.py:142: in run
+    return projects.run_app(root, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_document_homes.py:540: in scenario
+    await pick(pilot, app, "#patch_doc_file_select", "library/w.json")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+select_id = '#patch_doc_file_select', value = 'library/w.json'
+
+    async def pick(pilot, app, select_id: str, value: str) -> None:
+        """Pick ``value`` the way the operator does: click the dropdown open, move
+        with the arrow keys, press enter (no ``Select.value`` write)."""
+        from textual.widgets._select import SelectCurrent, SelectOverlay
+    
+        select = app.query_one(select_id, Select)
+        values = [option_value for _prompt, option_value in select._options]
+>       assert value in values, (
+            f"{value!r} is not offered by {select_id}; the dropdown lists {option_values(select)!r}"
+        )
+E       AssertionError: 'library/w.json' is not offered by #patch_doc_file_select; the dropdown lists ['w.json']
+E       assert 'library/w.json' in [Select.NULL, 'w.json']
+
+tests/test_b101_document_homes.py:265: AssertionError
+___________ test_r_chked_032_write_status_names_the_home[collision] ____________
+[gw2] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-333/popen-gw2/test_r_chked_032_write_status_0')
+arm = 'collision'
+
+    @pytest.mark.parametrize("arm", ["project", "no-project", "collision"])
+    def test_r_chked_032_write_status_names_the_home(tmp_path: Path, arm: str) -> None:
+        """Cases R-CHKED-032/1, /2 and /4 (E5 C-9 = SEC E5-2): the Write status
+        names the written file as the Spec list lists it. /1: in a project, Write
+        as ``s1.chk.json`` -> exactly ``Check Editor: wrote checks/s1.chk.json (1
+        fields, kind=check).``. /2: with no project the bare name, as before. /4:
+        with ``proj/checks/s1.chk.json`` already present the status names the
+        claimed free name under ``checks/``. (/3, after a library pick, is
+        ``test_r_chked_031_write_home[after-library-pick]``.)
+    
+        Negative control (M44): the status built from the bare file name -> /1
+        reads ``wrote s1.chk.json`` and /4 the bare claimed name -> RED."""
+    
+        async def scenario(app, pilot, log):
+            if arm == "no-project":
+                await load_image_fixture(pilot, app, app.base_dir)
+                home = lib(app)
+            else:
+                project = make_project(app.workarea)
+                home = project / "checks"
+                if arm == "collision":
+                    write_doc(home / "s1.chk.json", ENTRY_W, kind="check")
+                await open_project_shipped(pilot, app)
+            await show_check_editor(pilot, app)
+            await add_check_row(pilot, app)
+            before = files_under(home) if home.is_dir() else {}
+            lines = await write_spec(pilot, app, log, "s1.chk.json")
+            written = [line for line in lines if line.startswith("Check Editor: wrote ")]
+            if arm == "project":
+                assert written == ["Check Editor: wrote checks/s1.chk.json (1 fields, kind=check)."], lines
+            elif arm == "no-project":
+                assert written == ["Check Editor: wrote s1.chk.json (1 fields, kind=check)."], lines
+            else:
+                after = files_under(home)
+                assert after["s1.chk.json"] == before["s1.chk.json"], "Write overwrote the spec"
+                claimed = sorted(set(after) - set(before))
+                assert len(claimed) == 1, sorted(after)
+                assert written == [f"Check Editor: wrote checks/{claimed[0]} (1 fields, kind=check)."], lines
+            return True
+    
+>       assert run(tmp_path, scenario) is True
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b101_document_homes.py:849: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_document_homes.py:142: in run
+    return projects.run_app(root, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f849a5a5590>
+
+    async def scenario(app, pilot, log):
+        if arm == "no-project":
+            await load_image_fixture(pilot, app, app.base_dir)
+            home = lib(app)
+        else:
+            project = make_project(app.workarea)
+            home = project / "checks"
+            if arm == "collision":
+                write_doc(home / "s1.chk.json", ENTRY_W, kind="check")
+            await open_project_shipped(pilot, app)
+        await show_check_editor(pilot, app)
+        await add_check_row(pilot, app)
+        before = files_under(home) if home.is_dir() else {}
+        lines = await write_spec(pilot, app, log, "s1.chk.json")
+        written = [line for line in lines if line.startswith("Check Editor: wrote ")]
+        if arm == "project":
+            assert written == ["Check Editor: wrote checks/s1.chk.json (1 fields, kind=check)."], lines
+        elif arm == "no-project":
+            assert written == ["Check Editor: wrote s1.chk.json (1 fields, kind=check)."], lines
+        else:
+            after = files_under(home)
+            assert after["s1.chk.json"] == before["s1.chk.json"], "Write overwrote the spec"
+            claimed = sorted(set(after) - set(before))
+>           assert len(claimed) == 1, sorted(after)
+E           AssertionError: ['s1.chk.json']
+E           assert 0 == 1
+E            +  where 0 = len([])
+
+tests/test_b101_document_homes.py:845: AssertionError
+___________ test_r_patch_doc_dropdown_001_4_refused[unknown-folder] ____________
+[gw4] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-333/popen-gw4/test_r_patch_doc_dropdown_001_0')
+arm = 'unknown-folder'
+
+    @pytest.mark.parametrize(
+        "arm", ["link", "linked-folder", "unknown-folder", "inside-link", "popup-recheck"]
+    )
+    def test_r_patch_doc_dropdown_001_4_refused(tmp_path: Path, arm: str) -> None:
+        """Cases R-PATCH-DOC-DROPDOWN-001.4/1 .. /5: a pick that is a link, lies
+        under a linked folder (also one that stays inside the project, S-3), has no
+        known folder, a ``..`` or is ``.`` (the folder itself, E5 C-7), or whose folder became a link while the
+        unsaved-changes popup was open (S-5), is refused with the status
+        ``Patch Editor: change file '<name>' is outside the patches folder — not
+        loaded.`` and the document is unchanged.
+    
+        Negative control: a guard that resolves and compares instead of walking
+        the links -> the inside-project link arm loads -> RED; no re-check after
+        the popup -> the popup arm loads through the link -> RED."""
+        if arm == "link":
+            # the file link is made inside the scenario; skip early on a platform
+            # that cannot make one
+            probe = tmp_path / "probe"
+            probe.write_text("x", encoding="utf-8")
+            make_link(tmp_path / "probe-link", probe)
+    
+        async def scenario(app, pilot, log):
+            project = make_project(app.workarea)
+            outside = tmp_path / "outside"
+            write_doc(lib(app) / "a.json", ENTRY_C)
+            write_doc(lib(app) / "w.json", ENTRY_C)
+            if arm == "link":
+                (project / "patches").mkdir()
+            elif arm == "linked-folder":
+                write_doc(outside / "x.json", ENTRY_C)
+            elif arm == "inside-link":
+                write_doc(project / "patches" / "x.json", ENTRY_C)
+            elif arm == "popup-recheck":
+                write_doc(project / "patches" / "a.json", ENTRY_C)
+            await open_project_shipped(pilot, app)
+            await show_patch_editor(pilot, app)
+            if arm == "link":
+                make_link(project / "patches" / "l.json", lib(app) / "a.json")
+                names = ["patches/l.json"]
+            elif arm == "linked-folder":
+                make_link(project / "patches", outside)
+                names = ["patches/x.json"]
+            elif arm == "unknown-folder":
+                names = ["w.json", "patches/../../w.json", "patches/."]
+            elif arm == "inside-link":
+                make_link(project / "checks", project / "patches")
+                names = ["checks/x.json"]
+            else:
+                names = []
+            if arm != "popup-recheck":
+                before = doc_snapshot(app)
+                for name in names:
+                    lines = await post_change_pick(pilot, app, log, name)
+                    assert REFUSED_PATCH.format(name=name) in lines, lines
+                    assert doc_snapshot(app) == before, "a refused pick changed the document"
+                return True
+            # popup-recheck: dirty document, pick, swap the folder, accept.
+            await add_patch_entry(pilot, app, "0x8007", "CC")
+            before = doc_snapshot(app)
+            write_doc(outside / "a.json", [projects.address_entry(0x800A, b"\x55")])
+            await pick(pilot, app, "#patch_doc_file_select", "patches/a.json")
+            from s19_app.tui.screens_directionb import LoadGuardScreen
+    
+            await settled(
+                pilot, lambda: isinstance(app.screen, LoadGuardScreen), "the unsaved-changes popup"
+            )
+            shutil.rmtree(project / "patches")
+            make_link(project / "patches", outside)
+            mark = len(log.messages)
+            assert await pilot.click("#load_guard_accept"), "click missed the popup's accept"
+            await wait_until(
+                pilot,
+                lambda: len(log.since(mark)) > 0 and not isinstance(app.screen, LoadGuardScreen),
+                lambda: f"no status line after the accept; lines: {log.since(mark)!r}",
+                pause_first=True,
+            )
+            lines = log.since(mark)
+            assert REFUSED_PATCH.format(name="patches/a.json") in lines, lines
+            assert doc_snapshot(app) == before, "the accept loaded through the link"
+            return True
+    
+>       assert run(tmp_path, scenario) is True
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b101_document_homes.py:740: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_document_homes.py:142: in run
+    return projects.run_app(root, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7fe72a632e90>
+
+    async def scenario(app, pilot, log):
+        project = make_project(app.workarea)
+        outside = tmp_path / "outside"
+        write_doc(lib(app) / "a.json", ENTRY_C)
+        write_doc(lib(app) / "w.json", ENTRY_C)
+        if arm == "link":
+            (project / "patches").mkdir()
+        elif arm == "linked-folder":
+            write_doc(outside / "x.json", ENTRY_C)
+        elif arm == "inside-link":
+            write_doc(project / "patches" / "x.json", ENTRY_C)
+        elif arm == "popup-recheck":
+            write_doc(project / "patches" / "a.json", ENTRY_C)
+        await open_project_shipped(pilot, app)
+        await show_patch_editor(pilot, app)
+        if arm == "link":
+            make_link(project / "patches" / "l.json", lib(app) / "a.json")
+            names = ["patches/l.json"]
+        elif arm == "linked-folder":
+            make_link(project / "patches", outside)
+            names = ["patches/x.json"]
+        elif arm == "unknown-folder":
+            names = ["w.json", "patches/../../w.json", "patches/."]
+        elif arm == "inside-link":
+            make_link(project / "checks", project / "patches")
+            names = ["checks/x.json"]
+        else:
+            names = []
+        if arm != "popup-recheck":
+            before = doc_snapshot(app)
+            for name in names:
+                lines = await post_change_pick(pilot, app, log, name)
+>               assert REFUSED_PATCH.format(name=name) in lines, lines
+E               AssertionError: ['Loaded change: 1 entry, 0 error(s)']
+E               assert "Patch Editor: change file 'w.json' is outside the patches folder — not loaded." in ['Loaded change: 1 entry, 0 error(s)']
+E                +  where "Patch Editor: change file 'w.json' is outside the patches folder — not loaded." = <built-in method format of str object at 0x7fe729742b50>(name='w.json')
+E                +    where <built-in method format of str object at 0x7fe729742b50> = 'Patch Editor: change file {name!r} is outside the patches folder — not loaded.'.format
+
+tests/test_b101_document_homes.py:712: AssertionError
+__________________ test_r_tui_049_3_2_prompt_hidden[project] ___________________
+[gw8] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-333/popen-gw8/test_r_tui_049_3_2_prompt_hidd0')
+alt = 'project'
+
+    @pytest.mark.parametrize("alt", ALTERNATIVES)
+    def test_r_tui_049_3_2_prompt_hidden(tmp_path: Path, alt: str) -> None:
+        """R-TUI-049.3.2/1 .. /8: after the document is replaced (or another image
+        loaded) ``Save patched image as:`` is not painted. Base: stays after every
+        alternative. (E5 C-5: no "no file written" clause; Write file is the
+        prompt's own confirm, so no operator route reaches it once hidden.)"""
+    
+        async def scenario(app, pilot, log):
+            needle = await _replace_scenario(app, pilot, log, tmp_path, alt, "prompt")
+            await await_gone(pilot, app, needle, f"after {alt}")
+    
+>       projects.run_app(tmp_path, scenario, size=SIZE)
+
+tests/test_b101_patch_lifecycle.py:507: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:505: in scenario
+    await await_gone(pilot, app, needle, f"after {alt}")
+tests/test_b101_patch_lifecycle.py:163: in await_gone
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function await_gone.<locals>.<lambda> at 0x7f8811604180>
+failure = "did not settle: after project: 'Save patched image as:' is still painted in the Patch Editor"
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: did not settle: after project: 'Save patched image as:' is still painted in the Patch Editor
+
+tests/support/timing.py:66: AssertionError
+__________________ test_r_tui_049_3_1_control_hidden[project] __________________
+[gw7] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-333/popen-gw7/test_r_tui_049_3_1_control_hid0')
+alt = 'project'
+
+    @pytest.mark.parametrize("alt", ALTERNATIVES)
+    def test_r_tui_049_3_1_control_hidden(tmp_path: Path, alt: str) -> None:
+        """R-TUI-049.3.1/1 .. /8 (``load``, ``pick``, ``guarded``, ``project``,
+        ``paste``, ``undo``, ``redo``, ``image``): after the document is replaced
+        (or another image loaded) ``Before/after report available:`` is not
+        painted. Base: stays after every alternative but ``load`` and ``paste``
+        (those two are standing guards)."""
+    
+        async def scenario(app, pilot, log):
+            needle = await _replace_scenario(app, pilot, log, tmp_path, alt, "control")
+            await await_gone(pilot, app, needle, f"after {alt}")
+    
+>       projects.run_app(tmp_path, scenario, size=SIZE)
+
+tests/test_b101_patch_lifecycle.py:493: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:491: in scenario
+    await await_gone(pilot, app, needle, f"after {alt}")
+tests/test_b101_patch_lifecycle.py:163: in await_gone
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function await_gone.<locals>.<lambda> at 0x7f103ed384a0>
+failure = "did not settle: after project: 'Before/after report available:' is still painted in the Patch Editor"
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: did not settle: after project: 'Before/after report available:' is still painted in the Patch Editor
+
+tests/support/timing.py:66: AssertionError
+_______________________ test_r_chk_pe_012_rows[project] ________________________
+[gw6] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-333/popen-gw6/test_r_chk_pe_012_rows_project0')
+how = 'project'
+
+    @pytest.mark.parametrize("how", ["load", "project"])
+    def test_r_chk_pe_012_rows(tmp_path: Path, how: str) -> None:
+        """R-CHK-PE-012/1, /2: after another document load / a project load the
+        Checks tab holds no result row."""
+    
+        async def scenario(app, pilot, log):
+            if how == "project":
+                make_project(app)
+            await checks_ready(app, pilot, log, tmp_path)
+            assert len(panel(app).query_one("#patch_checks_results").children) == 2
+            await _end_run(pilot, app, log, tmp_path, how)
+            await settled(
+                pilot,
+                lambda: len(panel(app).query_one("#patch_checks_results").children) == 0,
+                "no result row",
+                timeout=GONE,
+            )
+    
+>       projects.run_app(tmp_path, scenario, size=SIZE)
+
+tests/test_b101_patch_lifecycle.py:726: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:719: in scenario
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_r_chk_pe_012_rows.<locals>.scenario.<locals>.<lambda> at 0x7f24d04a4720>
+failure = 'did not settle: no result row'
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: did not settle: no result row
+
+tests/support/timing.py:66: AssertionError
+______________________ test_r_chk_pe_009_no_run[project] _______________________
+[gw3] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-333/popen-gw3/test_r_chk_pe_009_no_run_proje0')
+how = 'project'
+
+    @pytest.mark.parametrize("how", ["load", "image", "project", "add", "apply", "mac"])
+    def test_r_chk_pe_009_no_run(tmp_path: Path, how: str) -> None:
+        """R-CHK-PE-009/1 .. /6: the subtitle reads ``no run yet`` after another
+        document load, an image load, a project load, an Add, an apply of a check
+        document that writes the image in place (/5, E3A-03), and a MAC load (/6).
+        Base: ``2 checked`` (``1 checked`` for /5) stays."""
+    
+        async def scenario(app, pilot, log):
+            if how == "apply":
+                await start(app, pilot, tmp_path)
+                await load_doc(pilot, app, write_doc(tmp_path / "c.json", CHG))
+                await apply_to_prompt(pilot, app, log)
+                await load_doc(pilot, app, write_doc(tmp_path / "k1.chk.json", CHK1, kind="check"))
+                await show_tab(pilot, app, "checks")
+                await run_checks(pilot, app, "Checks: 1 passed, 0 failed, 0 uncheckable")
+                await settled(pilot, lambda: checks_subtitle(app) == "1 checked", "1 checked")
+                await apply_doc(pilot, app, log, expect=r"Apply: 0 applied, 0 skipped, 1 blocked")
+            else:
+                if how == "project":
+                    make_project(app)
+                await checks_ready(app, pilot, log, tmp_path)
+                await _end_run(pilot, app, log, tmp_path, how)
+            await settled(pilot, lambda: _no_run_shown(app), f"no run yet after {how} (painted: {checks_subtitle(app)!r})", timeout=GONE)
+            if how == "mac":
+                await settled(
+                    pilot,
+                    lambda: len(panel(app).query_one("#patch_checks_results").children) == 0,
+                    "no result row after the MAC load",
+                    timeout=GONE,
+                )
+            if how == "apply":
+                assert plain(panel(app).query_one("#patch_checks_status")) == NO_RUN_STATUS
+    
+>       projects.run_app(tmp_path, scenario, size=SIZE)
+
+tests/test_b101_patch_lifecycle.py:668: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:657: in scenario
+    await settled(pilot, lambda: _no_run_shown(app), f"no run yet after {how} (painted: {checks_subtitle(app)!r})", timeout=GONE)
+tests/b97_probes.py:326: in settled
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_r_chk_pe_009_no_run.<locals>.scenario.<locals>.<lambda> at 0x7f950f799300>
+failure = "did not settle: no run yet after project (painted: '2 checked')"
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: did not settle: no run yet after project (painted: '2 checked')
+
+tests/support/timing.py:66: AssertionError
+_______________________ test_r_chk_pe_011_strip[project] _______________________
+[gw5] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-333/popen-gw5/test_r_chk_pe_011_strip_projec0')
+how = 'project'
+
+    @pytest.mark.parametrize("how", ["load", "project"])
+    def test_r_chk_pe_011_strip(tmp_path: Path, how: str) -> None:
+        """R-CHK-PE-011/1, /2: after another document load / a project load the
+        patch strip reads ``✓0 ✗0 ◐0`` over an empty bar ``░░░░░░░░``."""
+    
+        async def scenario(app, pilot, log):
+            if how == "project":
+                make_project(app)
+            await checks_ready(app, pilot, log, tmp_path)
+            await _end_run(pilot, app, log, tmp_path, how)
+            await settled(
+                pilot, lambda: strip_lines(app) == ["✓0 ✗0 ◐0", "░░░░░░░░"], f"the zero strip (now {strip_lines(app)!r})", timeout=GONE
+            )
+    
+>       projects.run_app(tmp_path, scenario, size=SIZE)
+
+tests/test_b101_patch_lifecycle.py:705: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:701: in scenario
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_r_chk_pe_011_strip.<locals>.scenario.<locals>.<lambda> at 0x7fe2d0eb0180>
+failure = "did not settle: the zero strip (now ['✓1 ✗1 ◐0', '████░░░░'])"
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: did not settle: the zero strip (now ['✓1 ✗1 ◐0', '████░░░░'])
+
+tests/support/timing.py:66: AssertionError
+______________________ test_r_chk_pe_008_subtitle[revert] ______________________
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-333/popen-gw1/test_r_chk_pe_008_subtitle_rev0')
+case = 'revert'
+
+    @pytest.mark.parametrize("case", ["two", "zero", "revert"])
+    def test_r_chk_pe_008_subtitle(tmp_path: Path, case: str) -> None:
+        """R-CHK-PE-008/1 (``two``): a current 2-entry run reads ``2 checked``;
+        /2 (``zero``): a current 0-entry run reads ``0 checked`` (base:
+        ``no run yet``); /3 (``revert``): an Add ends the current state
+        (``no run yet``) and the Remove that undoes it restores ``2 checked`` with
+        its 2 result rows and the same status."""
+    
+        async def scenario(app, pilot, log):
+            if case == "zero":
+                await checks_ready(app, pilot, log, tmp_path, entries=[], name="e.chk.json",
+                                   expect="Checks: 0 passed, 0 failed, 0 uncheckable")
+                await settled(pilot, lambda: checks_subtitle(app) == "0 checked", "the 0-entry run's subtitle")
+                return
+            await checks_ready(app, pilot, log, tmp_path)
+            assert checks_subtitle(app) == "2 checked"
+            if case == "revert":
+                # Add and Remove live on the Inspector tab (E5 C-3)
+                await show_tab(pilot, app, "inspector")
+                await add_entry(pilot, app, "0x8007", "CC")
+                await show_tab(pilot, app, "checks")
+                await settled(pilot, lambda: checks_subtitle(app) == "no run yet", "no run yet after Add", timeout=GONE)
+                await show_tab(pilot, app, "inspector")
+                await remove_entry(pilot, app, "0x8007")
+                await show_tab(pilot, app, "checks")
+                await settled(pilot, lambda: checks_subtitle(app) == "2 checked", "2 checked after Remove", timeout=GONE)
+                assert len(panel(app).query_one("#patch_checks_results").children) == 2
+                assert plain(panel(app).query_one("#patch_checks_status")) == RUN_STATUS_K
+    
+>       projects.run_app(tmp_path, scenario, size=SIZE)
+
+tests/test_b101_patch_lifecycle.py:603: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:595: in scenario
+    await settled(pilot, lambda: checks_subtitle(app) == "no run yet", "no run yet after Add", timeout=GONE)
+tests/b97_probes.py:326: in settled
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_r_chk_pe_008_subtitle.<locals>.scenario.<locals>.<lambda> at 0x7f5696e08e00>
+failure = 'did not settle: no run yet after Add'
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: did not settle: no run yet after Add
+
+tests/support/timing.py:66: AssertionError
+________________________ test_r_chk_pe_009_no_run[add] _________________________
+[gw2] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-333/popen-gw2/test_r_chk_pe_009_no_run_add_0')
+how = 'add'
+
+    @pytest.mark.parametrize("how", ["load", "image", "project", "add", "apply", "mac"])
+    def test_r_chk_pe_009_no_run(tmp_path: Path, how: str) -> None:
+        """R-CHK-PE-009/1 .. /6: the subtitle reads ``no run yet`` after another
+        document load, an image load, a project load, an Add, an apply of a check
+        document that writes the image in place (/5, E3A-03), and a MAC load (/6).
+        Base: ``2 checked`` (``1 checked`` for /5) stays."""
+    
+        async def scenario(app, pilot, log):
+            if how == "apply":
+                await start(app, pilot, tmp_path)
+                await load_doc(pilot, app, write_doc(tmp_path / "c.json", CHG))
+                await apply_to_prompt(pilot, app, log)
+                await load_doc(pilot, app, write_doc(tmp_path / "k1.chk.json", CHK1, kind="check"))
+                await show_tab(pilot, app, "checks")
+                await run_checks(pilot, app, "Checks: 1 passed, 0 failed, 0 uncheckable")
+                await settled(pilot, lambda: checks_subtitle(app) == "1 checked", "1 checked")
+                await apply_doc(pilot, app, log, expect=r"Apply: 0 applied, 0 skipped, 1 blocked")
+            else:
+                if how == "project":
+                    make_project(app)
+                await checks_ready(app, pilot, log, tmp_path)
+                await _end_run(pilot, app, log, tmp_path, how)
+            await settled(pilot, lambda: _no_run_shown(app), f"no run yet after {how} (painted: {checks_subtitle(app)!r})", timeout=GONE)
+            if how == "mac":
+                await settled(
+                    pilot,
+                    lambda: len(panel(app).query_one("#patch_checks_results").children) == 0,
+                    "no result row after the MAC load",
+                    timeout=GONE,
+                )
+            if how == "apply":
+                assert plain(panel(app).query_one("#patch_checks_status")) == NO_RUN_STATUS
+    
+>       projects.run_app(tmp_path, scenario, size=SIZE)
+
+tests/test_b101_patch_lifecycle.py:668: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:657: in scenario
+    await settled(pilot, lambda: _no_run_shown(app), f"no run yet after {how} (painted: {checks_subtitle(app)!r})", timeout=GONE)
+tests/b97_probes.py:326: in settled
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_r_chk_pe_009_no_run.<locals>.scenario.<locals>.<lambda> at 0x7f84923fbce0>
+failure = "did not settle: no run yet after add (painted: '2 checked')"
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: did not settle: no run yet after add (painted: '2 checked')
+
+tests/support/timing.py:66: AssertionError
+______________________ test_r_chk_pe_010_status[project] _______________________
+[gw4] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-333/popen-gw4/test_r_chk_pe_010_status_proje0')
+how = 'project'
+
+    @pytest.mark.parametrize("how", ["load", "project"])
+    def test_r_chk_pe_010_status(tmp_path: Path, how: str) -> None:
+        """R-CHK-PE-010/1, /2: after another document load / a project load the
+        Checks tab status is ``No check run yet: press Run checks.``."""
+    
+        async def scenario(app, pilot, log):
+            if how == "project":
+                make_project(app)
+            await checks_ready(app, pilot, log, tmp_path)
+            await _end_run(pilot, app, log, tmp_path, how)
+            await settled(
+                pilot,
+                lambda: plain(panel(app).query_one("#patch_checks_status")) == NO_RUN_STATUS,
+                "the no-run status",
+                timeout=GONE,
+            )
+    
+>       projects.run_app(tmp_path, scenario, size=SIZE)
+
+tests/test_b101_patch_lifecycle.py:688: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:681: in scenario
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_r_chk_pe_010_status.<locals>.scenario.<locals>.<lambda> at 0x7fe72871d940>
+failure = 'did not settle: the no-run status'
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: did not settle: the no-run status
+
+tests/support/timing.py:66: AssertionError
+___________________ test_r_chk_pe_014_glyph_after_save_back ____________________
+[gw7] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-333/popen-gw7/test_r_chk_pe_014_glyph_after_0')
+
+    def test_r_chk_pe_014_glyph_after_save_back(tmp_path: Path) -> None:
+        """R-CHK-PE-014/1: a save-back that ends a run repaints the ledger: the Kind
+        cell leads with ``·`` and the subtitle reads ``no run yet``. Before it the
+        blocked run's entries read ``◐``. Base: ``◐`` stays."""
+    
+        async def scenario(app, pilot, log):
+            await start(app, pilot, tmp_path)
+            await load_doc(pilot, app, write_doc(tmp_path / "c.json", CHG))
+            await apply_to_prompt(pilot, app, log)
+            await show_tab(pilot, app, "checks")
+            panel(app).query_one("#patch_checks_run_button", Button).press()
+            await settled(
+                pilot,
+                lambda: plain(panel(app).query_one("#patch_checks_status")).startswith("Checks: not run — "),
+                "the blocked run's status",
+            )
+            await settled(pilot, lambda: kind_glyph(app) == "◐", "the ledger's ◐ after the run")
+            # Write file lives on the JSON tab (E5 C-3)
+            await show_tab(pilot, app, "json")
+            await write_file(pilot, app, log)
+            await settled(pilot, lambda: kind_glyph(app) == "·", f"the ledger's · after the save-back (now {kind_glyph(app)!r})", timeout=GONE)
+            await show_tab(pilot, app, "checks")
+            await settled(pilot, lambda: checks_subtitle(app) == "no run yet", f"no run yet on the Checks tab (now {checks_subtitle(app)!r})", timeout=GONE)
+    
+>       projects.run_app(tmp_path, scenario, size=SIZE)
+
+tests/test_b101_patch_lifecycle.py:753: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:749: in scenario
+    await settled(pilot, lambda: kind_glyph(app) == "·", f"the ledger's · after the save-back (now {kind_glyph(app)!r})", timeout=GONE)
+tests/b97_probes.py:326: in settled
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_r_chk_pe_014_glyph_after_save_back.<locals>.scenario.<locals>.<lambda> at 0x7f103d0425c0>
+failure = "did not settle: the ledger's · after the save-back (now '◐')"
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: did not settle: the ledger's · after the save-back (now '◐')
+
+tests/support/timing.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_document_homes.py::test_r_patch_doc_dropdown_001_3_pick_keeps_spelling
+FAILED tests/test_b101_document_homes.py::test_r_chked_031_write_home[after-library-pick]
+FAILED tests/test_b101_document_homes.py::test_r_chked_032_write_status_names_the_home[project]
+FAILED tests/test_b101_document_homes.py::test_r_patch_doc_dropdown_001_3_pick[library]
+FAILED tests/test_b101_document_homes.py::test_r_chked_032_write_status_names_the_home[collision]
+FAILED tests/test_b101_document_homes.py::test_r_patch_doc_dropdown_001_4_refused[unknown-folder]
+FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[project]
+FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[project]
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_012_rows[project] - ...
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[project]
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_011_strip[project]
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_008_subtitle[revert]
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[add] - As...
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_010_status[project]
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_014_glyph_after_save_back
+15 failed, 3 passed in 31.23s
+=== exit code: 1

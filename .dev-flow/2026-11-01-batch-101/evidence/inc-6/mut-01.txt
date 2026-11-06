@@ -1,0 +1,214 @@
+# mutant M1  (BEFORE-AFTER-REPORT-001.1)
+base_commit=98d94d724a72c56468292be123ff15f664acb4fa
+s19_app.__file__=<HOME>/work/s19_i6m_copy/s19_app/__init__.py
+mutation=s19_app/tui/app.py:5091
+--- pytest (mutant copy) ---
+bringing up nodes...
+bringing up nodes...
+
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_____ test_at_038a_saveback_trigger_report_pair_reread_from_surfaced_path ______
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-251/popen-gw1/test_at_038a_saveback_trigger_0')
+
+    def test_at_038a_saveback_trigger_report_pair_reread_from_surfaced_path(
+        tmp_path: Path,
+    ) -> None:
+        """Apply -> collide-save -> key ``b`` -> surfaced path == dir-diff file ->
+        re-read shows -/+ bytes, linkage row, pinned dedup "after" identity.
+    
+        Intent: HLR-038 acceptance (Q-M1 chain): the AT snapshots the reports
+        listing BEFORE the trigger, captures the surfaced status text, asserts the
+        surfaced md/html paths equal the exactly-two new files, then re-reads THE
+        SURFACED md path for the content asserts. C-10: the typed save-back name
+        collides with a pre-planted file so the header's "after" MUST be the
+        dedup-suffixed ``img-patched_1.s19`` — a typed-name echo fails.
+        Counterfactual: pre-implementation key ``b`` is unbound -> no new file ->
+        the dir-diff assert fails (the RED captured in increment-4.md).
+        """
+        from textual.widgets import Button
+    
+        image_path = _make_s19_image(tmp_path)
+    
+        async def _drive() -> dict[str, object]:
+            outcomes: dict[str, object] = {}
+            app = S19TuiApp(base_dir=tmp_path)
+            project_dir = tmp_path / ".s19tool" / "workarea" / "proj"
+            reports_dir = project_dir / "reports"
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                project_dir.mkdir(parents=True, exist_ok=True)
+                app.current_project = "proj"
+                _load_image(app, image_path)
+                app.action_show_screen("patch")
+                await pilot.pause()
+                await _drive_apply(app, pilot)
+    
+                # C-10 collision drive: plant the suggested name BEFORE confirming.
+                (project_dir / "img-patched.s19").write_text(
+                    "S00600004844521B\nS9030000FC\n", encoding="ascii"
+                )
+                notices = _notices(app)
+                statuses = _statuses(app)
+                app.query_one("#patch_saveback_confirm_button", Button).press()
+                await pilot.pause()
+                outcomes["offer_notices"] = list(notices)
+                # Failure DIAGNOSTIC only — never an expected operand (Q-M2):
+                outcomes["saved_path_diag"] = app._change_service.last_summary.saved_path
+    
+                before = _report_names(reports_dir)
+                statuses.clear()
+                progress: list[int] = []
+                _original_progress = type(app).set_progress
+                app.set_progress = (  # type: ignore[method-assign]
+                    lambda value, message=None: (
+                        progress.append(value),
+                        _original_progress(app, value, message),
+                    )[1]
+                )
+                app.set_focus(None)
+                await pilot.press("b")
+                # batch-68 N5: the composer now runs on a worker thread, so the
+                # report pair does NOT exist when the key handler returns. Waiting
+                # on the worker makes this deterministic; a bare `pause()` passed
+                # only because the composition happened to be fast, which is a race
+                # this suite must not depend on.
+                await app.workers.wait_for_complete()
+                await pilot.pause()
+                outcomes["progress"] = list(progress)
+                outcomes["new_files"] = sorted(_report_names(reports_dir) - before)
+                outcomes["statuses"] = list(statuses)
+                outcomes["notices_all"] = list(notices)
+                outcomes["reports_dir"] = reports_dir
+            return outcomes
+    
+        outcomes = asyncio.run(_drive())
+    
+        # --- dir-diff: exactly one new md + one new html -----------------------
+        new_files = outcomes["new_files"]
+        md_new = [n for n in new_files if n.endswith(".md")]
+        html_new = [n for n in new_files if n.endswith(".html")]
+        assert len(new_files) == 2 and len(md_new) == 1 and len(html_new) == 1, (
+            f"AT-038a: expected exactly one new md + one new html under reports/, "
+            f"got {new_files}; saved_path diagnostic: {outcomes['saved_path_diag']}; "
+            f"statuses: {outcomes['statuses']}"
+        )
+        assert _MD_NAME.match(md_new[0]), md_new[0]
+        assert _HTML_NAME.match(html_new[0]), html_new[0]
+    
+        # --- surfaced path equals the dir-diff file (Q-M1) ----------------------
+        # batch-68 AC-3 (success arm): the bar must never stick mid-fill on a
+        # written report (Inc 12a: it ends cleared, see the re-pin below).
+        # Asserted here rather than in tests/test_report_off_ui_thread.py because
+        # this is the only place with a real save-back that makes the composer
+        # succeed; the standalone AC-3 test can only reach the refusal arm.
+        # Inc 12a re-pin (census A4; LLR-176.1k, A12-63): the written report
+        # still never leaves the bar mid-fill, but the end now CLEARS it — the
+        # 1-step before/after run begins at 0 and ends at 0 (the old pin, 100,
+        # encoded the stale-100 defect HLR-176c removes).
+        progress = outcomes["progress"]
+        assert progress and progress[0] == 0 and progress[-1] == 0, (
+            f"a successfully written before/after report must begin the bar at 0 "
+            f"and leave it cleared, not mid-fill. Sequence: {progress}"
+        )
+        assert all(value in (0, 100) for value in progress), progress
+    
+        written = [s for s in outcomes["statuses"] if "Before/after report written" in s]
+        assert len(written) == 1, (
+            f"AT-038a: expected exactly one surfaced written-status line, "
+            f"got {outcomes['statuses']}"
+        )
+        surfaced = written[0].split("Before/after report written:", 1)[1]
+        surfaced_md, surfaced_html = [p.strip() for p in surfaced.split("|")]
+        assert Path(surfaced_md).name == md_new[0], (
+            f"surfaced md path {surfaced_md!r} != new file {md_new[0]!r}"
+        )
+        assert Path(surfaced_html).name == html_new[0]
+    
+        # --- re-read THE SURFACED path (C-12) -----------------------------------
+        text = Path(surfaced_md).read_text(encoding="utf-8")
+    
+        # Provenance header: before = the original; after = the PINNED dedup
+        # literal (typed-name-echo discriminator, Q-M2).
+        before_match = _PROVENANCE_BEFORE.search(text)
+        after_match = _PROVENANCE_AFTER.search(text)
+        assert before_match is not None and after_match is not None, text[:800]
+        assert Path(before_match.group(1)) == image_path
+        assert Path(after_match.group(1)).name == "img-patched_1.s19", (
+            f"AT-038a C-10: the 'after' identity must be the dedup-suffixed "
+            f"saved_path basename, got {after_match.group(1)!r}"
+        )
+    
+        # Linkage table row for the applied entry.
+        assert (
+            "| 1 | bytes | 0x00000100 | 0x00000102 | applied | standalone | - "
+            "| 00 00 \\|..\\| | AA BB \\|..\\| |" in text
+        ), "AT-038a: linkage row for the applied entry missing"
+    
+        # Diff fence: pre-patch bytes as '-' lines, after_bytes as '+' lines.
+        heading = "### Run 0x00000100-0x00000102 (changed)"
+        assert heading in text
+        fence = text[text.index("```diff", text.index(heading)) + len("```diff"):]
+        fence = fence[: fence.index("```")]
+        minus = [ln for ln in fence.splitlines() if ln.startswith("-")]
+        plus = [ln for ln in fence.splitlines() if ln.startswith("+")]
+        assert any("00 00" in ln for ln in minus), minus
+        assert any("AA BB" in ln for ln in plus), plus
+    
+        # Offer notify (LLR-038.3): information severity, names action + key b.
+        offers = [
+            (title, msg, sev)
+            for title, msg, sev in outcomes["offer_notices"]
+            if title == "Before/after report"
+        ]
+        assert offers and offers[0][2] == "information", outcomes["offer_notices"]
+        assert "press b" in offers[0][1].lower()
+>       assert offers[0][1] == (
+            "Before/after report ready - press b to write it to the project reports directory."
+        ), offers[0][1]
+E       AssertionError: Before/after report ready - press b to write it to the project reports directory (action: before_after_report).
+E       assert 'Before/after...fter_report).' == 'Before/after...ts directory.'
+E         
+E         Skipping 70 identical leading characters in diff, use -v to show
+E         -  directory.
+E         +  directory (action: before_after_report).
+
+../s19_i6m/tests/test_before_after_report.py:332: AssertionError
+__________ test_r_before_after_report_001_1_1_offer_text_in_a_project __________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-251/popen-gw0/test_r_before_after_report_0010')
+
+    def test_r_before_after_report_001_1_1_offer_text_in_a_project(tmp_path: Path) -> None:
+        """R-BEFORE-AFTER-REPORT-001.1/1: a save-back with a project open shows
+        exactly one offer, titled ``Before/after report``, with the text that
+        names no developer action. Base: the text ends ``(action: ...)``."""
+    
+        async def scenario(app, pilot, log):
+            seen = notices(app)
+            make_project(app)
+            await start(app, pilot, tmp_path)
+            await projects.load_project(pilot, app, "proj")
+            assert app._active_project_dir() is not None
+            await load_doc(pilot, app, write_doc(tmp_path / "c.json", CHG))
+            await apply_to_prompt(pilot, app, log)
+            await write_file(pilot, app, log)
+            await await_text(pilot, app, CONTROL, "after the save-back")
+            return [m for t, m in seen if t == "Before/after report"]
+    
+        offers = projects.run_app(tmp_path, scenario, size=SIZE)
+>       assert offers == [OFFER], offers
+E       AssertionError: ['Before/after report ready - press b to write it to the project reports directory (action: before_after_report).']
+E       assert ['Before/afte...ter_report).'] == ['Before/afte...s directory.']
+E         
+E         At index 0 diff: 'Before/after report ready - press b to write it to the project reports directory (action: before_after_report).' != 'Before/after report ready - press b to write it to the project reports directory.'
+E         Use -v to get more diff
+
+../s19_i6m/tests/test_b101_patch_lifecycle.py:331: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_before_after_report.py::test_at_038a_saveback_trigger_report_pair_reread_from_surfaced_path
+FAILED tests/test_b101_patch_lifecycle.py::test_r_before_after_report_001_1_1_offer_text_in_a_project
+2 failed in 7.42s
+

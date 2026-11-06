@@ -1,0 +1,163 @@
+# mutant M5  (TUI-049.3.1/.3.2 image install (S-1))
+base_commit=98d94d724a72c56468292be123ff15f664acb4fa
+s19_app.__file__=<HOME>/work/s19_i6m_copy/s19_app/__init__.py
+mutation=s19_app/tui/app.py:18548
+--- pytest (mutant copy) ---
+bringing up nodes...
+bringing up nodes...
+
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+___________________ test_r_tui_049_3_1_control_hidden[image] ___________________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-259/popen-gw0/test_r_tui_049_3_1_control_hid0')
+alt = 'image'
+
+    @pytest.mark.parametrize("alt", ALTERNATIVES)
+    def test_r_tui_049_3_1_control_hidden(tmp_path: Path, alt: str) -> None:
+        """R-TUI-049.3.1/1 .. /8 (``load``, ``pick``, ``guarded``, ``project``,
+        ``paste``, ``undo``, ``redo``, ``image``): after the document is replaced
+        (or another image loaded) ``Before/after report available:`` is not
+        painted. Base: stays after every alternative but ``load`` and ``paste``
+        (those two are standing guards)."""
+    
+        async def scenario(app, pilot, log):
+            needle = await _replace_scenario(app, pilot, log, tmp_path, alt, "control")
+            await await_gone(pilot, app, needle, f"after {alt}")
+    
+>       projects.run_app(tmp_path, scenario, size=SIZE)
+
+../s19_i6m/tests/test_b101_patch_lifecycle.py:447: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i6m/tests/test_b101_patch_lifecycle.py:445: in scenario
+    await await_gone(pilot, app, needle, f"after {alt}")
+../s19_i6m/tests/test_b101_patch_lifecycle.py:161: in await_gone
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function await_gone.<locals>.<lambda> at 0x7f7c74af7060>
+failure = "did not settle: after image: 'Before/after report available:' is still painted in the Patch Editor"
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: did not settle: after image: 'Before/after report available:' is still painted in the Patch Editor
+
+tests/support/timing.py:66: AssertionError
+___________________ test_r_tui_049_3_2_prompt_hidden[image] ____________________
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-259/popen-gw1/test_r_tui_049_3_2_prompt_hidd0')
+alt = 'image'
+
+    @pytest.mark.parametrize("alt", ALTERNATIVES)
+    def test_r_tui_049_3_2_prompt_hidden(tmp_path: Path, alt: str) -> None:
+        """R-TUI-049.3.2/1 .. /8: after the document is replaced (or another image
+        loaded) ``Save patched image as:`` is not painted, and no file is written
+        (/8: no ``img-patched.s19`` under the work area; base: a confirm would write
+        image 2 under that name). Base: stays after every alternative."""
+    
+        async def scenario(app, pilot, log):
+            needle = await _replace_scenario(app, pilot, log, tmp_path, alt, "prompt")
+            await await_gone(pilot, app, needle, f"after {alt}")
+            assert not list(app.workarea.rglob("img-patched*.s19")), "a save-back file exists"
+    
+>       projects.run_app(tmp_path, scenario, size=SIZE)
+
+../s19_i6m/tests/test_b101_patch_lifecycle.py:462: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i6m/tests/test_b101_patch_lifecycle.py:459: in scenario
+    await await_gone(pilot, app, needle, f"after {alt}")
+../s19_i6m/tests/test_b101_patch_lifecycle.py:161: in await_gone
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function await_gone.<locals>.<lambda> at 0x7f4798d24fe0>
+failure = "did not settle: after image: 'Save patched image as:' is still painted in the Patch Editor"
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: did not settle: after image: 'Save patched image as:' is still painted in the Patch Editor
+
+tests/support/timing.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[image]
+FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[image]
+2 failed in 20.07s
+

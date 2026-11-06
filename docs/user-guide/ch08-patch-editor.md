@@ -99,15 +99,16 @@ On the JSON tab: **Save patched image as** (suggested `firmware-patched.s19`),
 ![Image written](img/ch08-09-patch-image-written.png)
 
 **Write file** writes and re-reads the file: *Saved + verified:
-firmware-patched.s19*. A notice offers the before/after report with `b`.
+firmware-patched.s19*. Without a project no before/after offer is shown (8.10).
+(capture taken before 1.0.0: it shows the earlier offer toast)
 
 ### 8.10 The before/after report needs a project
 
 ![Before after refused](img/ch08-10-patch-before-after-report.png)
 
-Without a project, **Write before/after report** (or `b`) is refused: the report
-needs the project's `reports\` folder (finding F-05 — the notice offers it anyway).
-Section 8.19 writes it inside a project.
+Without a project the save-back shows no before/after offer (finding F-05);
+**Write before/after report** (or `b`) is still refused: the report needs the
+project's `reports\` folder. Section 8.19 writes it inside a project.
 
 ### 8.11 A pasted document
 
@@ -177,8 +178,9 @@ The Checks window (Chapter 11) shows the same run.
 After loading project `demo`, applying `guide_patch_nosym.changes.json` and writing
 the patched image, the image becomes a new project variant
 (`demo:firmware-patched (1/3)`) and **Write before/after report** writes
-`reports\<time>-before-after-….md` in the project. The Checks tab still shows the
-results of the earlier check run, from before the project was loaded (finding F-40).
+`reports\<time>-before-after-….md` in the project. The Checks tab shows no
+stale run after the project load: the earlier check run ended with it (finding
+F-40). (capture taken before 1.0.0: it shows the earlier run's results)
 
 ### 8.20 Execute over variants
 

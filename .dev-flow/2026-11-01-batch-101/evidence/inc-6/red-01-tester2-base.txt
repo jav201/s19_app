@@ -1,0 +1,242 @@
+823d0c93abe630b23e4c5380fb6f39c7238a9ffa
+s19_app.__file__ = ~/work/s19_i6t2/s19_app/__init__.py
+CMD: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -n 4 --tb=line --show-capture=no -rfs -v tests/test_b101_document_homes.py tests/test_b101_symbol_reads.py::test_r_chg_sym_10_reads_with_no_a2l_loaded_declare_none tests/test_b101_help_legend_docs.py::test_r_doc_readme_4_1_no_stale_claim
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0
+rootdir: ~/work/s19_i6t2
+configfile: pyproject.toml
+plugins: platformdirs-4.14.3, xdist-3.8.0
+created: 4/4 workers
+4 workers [43 items]
+
+F.FF.FFFFFFFFFFF.FFFFFFFFFFFFFFF.FFF....F.F                              [100%]
+=================================== FAILURES ===================================
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: assert ['w.json'] == ['checks/k.ch...brary/w.json']
+      
+      At index 0 diff: 'w.json' != 'checks/k.chk.json'
+      Right contains 2 more items, first extra item: 'patches/a.json'
+      Use -v to get more diff
+~/work/s19_i6t2/tests/test_b101_document_homes.py:411: AssertionError: assert ['w.json'] == ['checks/k.ch...brary/w.json']
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: assert ['w.json'] == ['patches/a.j...brary/w.json']
+      
+      At index 0 diff: 'w.json' != 'patches/a.json'
+      Right contains one more item: 'library/w.json'
+      Use -v to get more diff
+~/work/s19_i6t2/tests/test_b101_document_homes.py:455: AssertionError: assert ['w.json'] == ['patches/a.j...brary/w.json']
+[gw1] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: assert [] == ['checks/k.chk.json']
+      
+      Right contains one more item: 'checks/k.chk.json'
+      Use -v to get more diff
+~/work/s19_i6t2/tests/test_b101_document_homes.py:440: AssertionError: assert [] == ['checks/k.chk.json']
+[gw3] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: assert ['w.json'] == ['library/w.json']
+      
+      At index 0 diff: 'w.json' != 'library/w.json'
+      Use -v to get more diff
+~/work/s19_i6t2/tests/test_b101_document_homes.py:499: AssertionError: assert ['w.json'] == ['library/w.json']
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: assert ['w.json'] == ['library/w.json']
+      
+      At index 0 diff: 'w.json' != 'library/w.json'
+      Use -v to get more diff
+~/work/s19_i6t2/tests/test_b101_document_homes.py:463: AssertionError: assert ['w.json'] == ['library/w.json']
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: assert [] == ['patches/changes.json']
+      
+      Right contains one more item: 'patches/changes.json'
+      Use -v to get more diff
+~/work/s19_i6t2/tests/test_b101_document_homes.py:428: AssertionError: assert [] == ['patches/changes.json']
+[gw1] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: 'patches/a.json' is not offered by #patch_doc_file_select; the dropdown lists ['a.json', 'w.json']
+    assert 'patches/a.json' in [Select.NULL, 'a.json', 'w.json']
+~/work/s19_i6t2/tests/test_b101_document_homes.py:264: AssertionError: 'patches/a.json' is not offered by #patch_doc_file_select; the dropdown lists ['a.json', 'w.json']
+[gw3] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: 'patches/a.json' is not offered by #patch_doc_file_select; the dropdown lists []
+    assert 'patches/a.json' in [Select.NULL]
+~/work/s19_i6t2/tests/test_b101_document_homes.py:264: AssertionError: 'patches/a.json' is not offered by #patch_doc_file_select; the dropdown lists []
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: 'checks/k.chk.json' is not offered by #patch_doc_file_select; the dropdown lists ['w.json']
+    assert 'checks/k.chk.json' in [Select.NULL, 'w.json']
+~/work/s19_i6t2/tests/test_b101_document_homes.py:264: AssertionError: 'checks/k.chk.json' is not offered by #patch_doc_file_select; the dropdown lists ['w.json']
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: ['Loaded change: 1 entry, 0 error(s)']
+    assert "Patch Editor: change file 'w.json' is outside the patches folder — not loaded." in ['Loaded change: 1 entry, 0 error(s)']
+     +  where "Patch Editor: change file 'w.json' is outside the patches folder — not loaded." = <built-in method format of str object at 0x7f9d5c4c9b60>(name='w.json')
+     +    where <built-in method format of str object at 0x7f9d5c4c9b60> = 'Patch Editor: change file {name!r} is outside the patches folder — not loaded.'.format
+~/work/s19_i6t2/tests/test_b101_document_homes.py:707: AssertionError: ['Loaded change: 1 entry, 0 error(s)']
+[gw1] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: assert False
+     +  where False = is_file()
+     +    where is_file = (((PosixPath('/tmp/pytest-of-USER/pytest-278/popen-gw1/test_r_chked_031_write_home_pr0/app/.s19tool/workarea') / 'proj') / 'checks') / 's1.chk.json').is_file
+     +      where PosixPath('/tmp/pytest-of-USER/pytest-278/popen-gw1/test_r_chked_031_write_home_pr0/app/.s19tool/workarea') = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}).workarea
+~/work/s19_i6t2/tests/test_b101_document_homes.py:788: AssertionError: assert False
+[gw3] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: ['Loaded : 0 entries, 1 error(s)', "[MF-PATH-UNRESOLVED] error: the change-file path could not be resolved — no file w.../pytest-of-USER/pytest-278/popen-gw3/test_r_patch_doc_dropdown_001_3/app/.s19tool/workarea/patches/patches/l.json'"]
+    assert "Patch Editor: change file 'patches/l.json' is outside the patches folder — not loaded." in ['Loaded : 0 entries, 1 error(s)', "[MF-PATH-UNRESOLVED] error: the change-file path could not be resolved — no file w.../pytest-of-USER/pytest-278/popen-gw3/test_r_patch_doc_dropdown_001_3/app/.s19tool/workarea/patches/patches/l.json'"]
+     +  where "Patch Editor: change file 'patches/l.json' is outside the patches folder — not loaded." = <built-in method format of str object at 0x7f0377649b60>(name='patches/l.json')
+     +    where <built-in method format of str object at 0x7f0377649b60> = 'Patch Editor: change file {name!r} is outside the patches folder — not loaded.'.format
+~/work/s19_i6t2/tests/test_b101_document_homes.py:707: AssertionError: ['Loaded : 0 entries, 1 error(s)', "[MF-PATH-UNRESOLVED] error: the change-file path could not be resolved — no file w.../pytest-of-USER/pytest-278/popen-gw3/test_r_patch_doc_dropdown_001_3/app/.s19tool/workarea/patches/patches/l.json'"]
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: 'library/w.json' is not offered by #patch_doc_file_select; the dropdown lists ['w.json']
+    assert 'library/w.json' in [Select.NULL, 'w.json']
+~/work/s19_i6t2/tests/test_b101_document_homes.py:264: AssertionError: 'library/w.json' is not offered by #patch_doc_file_select; the dropdown lists ['w.json']
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: ['Loaded : 0 entries, 1 error(s)', "[MF-PATH-UNRESOLVED] error: the change-file path could not be resolved — no file w...p/pytest-of-USER/pytest-278/popen-gw2/test_r_patch_doc_dropdown_001_3/app/.s19tool/workarea/patches/checks/x.json'"]
+    assert "Patch Editor: change file 'checks/x.json' is outside the patches folder — not loaded." in ['Loaded : 0 entries, 1 error(s)', "[MF-PATH-UNRESOLVED] error: the change-file path could not be resolved — no file w...p/pytest-of-USER/pytest-278/popen-gw2/test_r_patch_doc_dropdown_001_3/app/.s19tool/workarea/patches/checks/x.json'"]
+     +  where "Patch Editor: change file 'checks/x.json' is outside the patches folder — not loaded." = <built-in method format of str object at 0x7f9d5c4c9b60>(name='checks/x.json')
+     +    where <built-in method format of str object at 0x7f9d5c4c9b60> = 'Patch Editor: change file {name!r} is outside the patches folder — not loaded.'.format
+~/work/s19_i6t2/tests/test_b101_document_homes.py:707: AssertionError: ['Loaded : 0 entries, 1 error(s)', "[MF-PATH-UNRESOLVED] error: the change-file path could not be resolved — no file w...p/pytest-of-USER/pytest-278/popen-gw2/test_r_patch_doc_dropdown_001_3/app/.s19tool/workarea/patches/checks/x.json'"]
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: 'library/w.json' is not offered by #patch_doc_file_select; the dropdown lists ['w.json']
+    assert 'library/w.json' in [Select.NULL, 'w.json']
+~/work/s19_i6t2/tests/test_b101_document_homes.py:264: AssertionError: 'library/w.json' is not offered by #patch_doc_file_select; the dropdown lists ['w.json']
+[gw3] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: ['Loaded : 0 entries, 1 error(s)', "[MF-PATH-UNRESOLVED] error: the change-file path could not be resolved — no file w.../pytest-of-USER/pytest-278/popen-gw3/test_r_patch_doc_dropdown_001_4/app/.s19tool/workarea/patches/patches/x.json'"]
+    assert "Patch Editor: change file 'patches/x.json' is outside the patches folder — not loaded." in ['Loaded : 0 entries, 1 error(s)', "[MF-PATH-UNRESOLVED] error: the change-file path could not be resolved — no file w.../pytest-of-USER/pytest-278/popen-gw3/test_r_patch_doc_dropdown_001_4/app/.s19tool/workarea/patches/patches/x.json'"]
+     +  where "Patch Editor: change file 'patches/x.json' is outside the patches folder — not loaded." = <built-in method format of str object at 0x7f0377649b60>(name='patches/x.json')
+     +    where <built-in method format of str object at 0x7f0377649b60> = 'Patch Editor: change file {name!r} is outside the patches folder — not loaded.'.format
+~/work/s19_i6t2/tests/test_b101_document_homes.py:707: AssertionError: ['Loaded : 0 entries, 1 error(s)', "[MF-PATH-UNRESOLVED] error: the change-file path could not be resolved — no file w.../pytest-of-USER/pytest-278/popen-gw3/test_r_patch_doc_dropdown_001_4/app/.s19tool/workarea/patches/patches/x.json'"]
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: ['s1.chk.json']
+    assert 1 == (1 + 1)
+     +  where 1 = len({'s1.chk.json': b'{\n  "format": "s19app-changeset",\n  "version": "2.0",\n  "kind": "check",\n  "encoding": "utf-8",\...",\n  "entries": [\n    {\n      "type": "bytes",\n      "address": "0x00008000",\n      "bytes": "00"\n    }\n  ]\n}'})
+     +  and   1 = len({'s1.chk.json': b'{\n  "format": "s19app-changeset",\n  "version": "2.0",\n  "kind": "check",\n  "encoding": "utf-8",\...",\n  "entries": [\n    {\n      "type": "bytes",\n      "address": "0x00008000",\n      "bytes": "00"\n    }\n  ]\n}'})
+~/work/s19_i6t2/tests/test_b101_document_homes.py:795: AssertionError: ['s1.chk.json']
+[gw1] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: 'library/w.chk.json' is not offered by #check_spec_file_select; the dropdown lists ['w.chk.json']
+    assert 'library/w.chk.json' in [Select.NULL, 'w.chk.json']
+~/work/s19_i6t2/tests/test_b101_document_homes.py:264: AssertionError: 'library/w.chk.json' is not offered by #check_spec_file_select; the dropdown lists ['w.chk.json']
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: assert ['w.chk.json'] == ['checks/k.ch...y/w.chk.json']
+      
+      At index 0 diff: 'w.chk.json' != 'checks/k.chk.json'
+      Right contains one more item: 'library/w.chk.json'
+      Use -v to get more diff
+~/work/s19_i6t2/tests/test_b101_document_homes.py:864: AssertionError: assert ['w.chk.json'] == ['checks/k.ch...y/w.chk.json']
+[gw3] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: ['Check Editor: wrote s1.chk.json (1 fields, kind=check).']
+    assert 'Check Editor: spec NOT written.' in ['Check Editor: wrote s1.chk.json (1 fields, kind=check).']
+~/work/s19_i6t2/tests/test_b101_document_homes.py:820: AssertionError: ['Check Editor: wrote s1.chk.json (1 fields, kind=check).']
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: assert ['s1.chk.json', 'w.chk.json'] == ['checks/k.ch...y/w.chk.json']
+      
+      At index 0 diff: 's1.chk.json' != 'checks/k.chk.json'
+      Right contains one more item: 'library/w.chk.json'
+      Use -v to get more diff
+~/work/s19_i6t2/tests/test_b101_document_homes.py:872: AssertionError: assert ['s1.chk.json', 'w.chk.json'] == ['checks/k.ch...y/w.chk.json']
+[gw1] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: assert ['w.chk.json'] == ['library/w.chk.json']
+      
+      At index 0 diff: 'w.chk.json' != 'library/w.chk.json'
+      Use -v to get more diff
+~/work/s19_i6t2/tests/test_b101_document_homes.py:888: AssertionError: assert ['w.chk.json'] == ['library/w.chk.json']
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: assert ['w.chk.json'] == ['checks/k.ch...y/w.chk.json']
+      
+      At index 0 diff: 'w.chk.json' != 'checks/k.chk.json'
+      Right contains one more item: 'library/w.chk.json'
+      Use -v to get more diff
+~/work/s19_i6t2/tests/test_b101_document_homes.py:888: AssertionError: assert ['w.chk.json'] == ['checks/k.ch...y/w.chk.json']
+[gw3] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: 'library/w.chk.json' is not offered by #check_spec_file_select; the dropdown lists ['w.chk.json']
+    assert 'library/w.chk.json' in [Select.NULL, 'w.chk.json']
+~/work/s19_i6t2/tests/test_b101_document_homes.py:264: AssertionError: 'library/w.chk.json' is not offered by #check_spec_file_select; the dropdown lists ['w.chk.json']
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: ["[MF-PATH-UNRESOLVED] error: the change-file path could not be resolved — no file was opened: '/tmp/pytest-of-USER...w2/test_r_chked_044_refused_link_0/app/.s19tool/workarea/patches/checks/l.chk.json'", 'Check Editor: spec NOT loaded.']
+    assert "Check Editor: file 'checks/l.chk.json' is outside the patches folder — not loaded." in ["[MF-PATH-UNRESOLVED] error: the change-file path could not be resolved — no file was opened: '/tmp/pytest-of-USER...w2/test_r_chked_044_refused_link_0/app/.s19tool/workarea/patches/checks/l.chk.json'", 'Check Editor: spec NOT loaded.']
+     +  where ["[MF-PATH-UNRESOLVED] error: the change-file path could not be resolved — no file was opened: '/tmp/pytest-of-USER...w2/test_r_chked_044_refused_link_0/app/.s19tool/workarea/patches/checks/l.chk.json'", 'Check Editor: spec NOT loaded.'] = since(1)
+     +    where since = <tests.support.b100_projects.StatusLog object at 0x7f9d56495a90>.since
+~/work/s19_i6t2/tests/test_b101_document_homes.py:965: AssertionError: ["[MF-PATH-UNRESOLVED] error: the change-file path could not be resolved — no file was opened: '/tmp/pytest-of-USER...w2/test_r_chked_044_refused_link_0/app/.s19tool/workarea/patches/checks/l.chk.json'", 'Check Editor: spec NOT loaded.']
+[gw1] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: ["[MF-PATH-UNRESOLVED] error: the change-file path could not be resolved — no file was opened: '/tmp/pytest-of-USER...w1/test_r_chked_044_refused_linke0/app/.s19tool/workarea/patches/checks/x.chk.json'", 'Check Editor: spec NOT loaded.']
+    assert "Check Editor: file 'checks/x.chk.json' is outside the patches folder — not loaded." in ["[MF-PATH-UNRESOLVED] error: the change-file path could not be resolved — no file was opened: '/tmp/pytest-of-USER...w1/test_r_chked_044_refused_linke0/app/.s19tool/workarea/patches/checks/x.chk.json'", 'Check Editor: spec NOT loaded.']
+     +  where ["[MF-PATH-UNRESOLVED] error: the change-file path could not be resolved — no file was opened: '/tmp/pytest-of-USER...w1/test_r_chked_044_refused_linke0/app/.s19tool/workarea/patches/checks/x.chk.json'", 'Check Editor: spec NOT loaded.'] = since(1)
+     +    where since = <tests.support.b100_projects.StatusLog object at 0x7fd200935a90>.since
+~/work/s19_i6t2/tests/test_b101_document_homes.py:965: AssertionError: ["[MF-PATH-UNRESOLVED] error: the change-file path could not be resolved — no file was opened: '/tmp/pytest-of-USER...w1/test_r_chked_044_refused_linke0/app/.s19tool/workarea/patches/checks/x.chk.json'", 'Check Editor: spec NOT loaded.']
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: assert ['w.chk.json'] == ['checks/k.ch...y/w.chk.json']
+      
+      At index 0 diff: 'w.chk.json' != 'checks/k.chk.json'
+      Right contains one more item: 'library/w.chk.json'
+      Use -v to get more diff
+~/work/s19_i6t2/tests/test_b101_document_homes.py:999: AssertionError: assert ['w.chk.json'] == ['checks/k.ch...y/w.chk.json']
+[gw3] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: assert ['w.chk.json'] == ['checks/k.ch...y/w.chk.json']
+      
+      At index 0 diff: 'w.chk.json' != 'checks/k.chk.json'
+      Right contains one more item: 'library/w.chk.json'
+      Use -v to get more diff
+~/work/s19_i6t2/tests/test_b101_document_homes.py:1014: AssertionError: assert ['w.chk.json'] == ['checks/k.ch...y/w.chk.json']
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: assert ['w.chk.json'] == ['library/w.chk.json']
+      
+      At index 0 diff: 'w.chk.json' != 'library/w.chk.json'
+      Use -v to get more diff
+~/work/s19_i6t2/tests/test_b101_document_homes.py:1014: AssertionError: assert ['w.chk.json'] == ['library/w.chk.json']
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: Check spec not loaded — [MF-PATH-UNRESOLVED] error: the change-file path could not be resolved — no file was opened: '/tmp/pytest-of-USER/pytest-278/popen-gw0/test_r_diff_chk_5_refused_link0/app/.s19tool/workarea/patches/checks/l.chk.json'
+    assert "Check spec n...s/l.chk.json'" == "Check spec: ...— not loaded."
+      
+      - Check spec: 'checks/l.chk.json' is outside the patches folder — not loaded.
+      + Check spec not loaded — [MF-PATH-UNRESOLVED] error: the change-file path could not be resolved — no file was opened: '/tmp/pytest-of-USER/pytest-278/popen-gw0/test_r_diff_chk_5_refused_link0/app/.s19tool/workarea/patches/checks/l.chk.json'
+~/work/s19_i6t2/tests/test_b101_document_homes.py:1082: AssertionError: Check spec not loaded — [MF-PATH-UNRESOLVED] error: the change-file path could not be resolved — no file was opened: '/tmp/pytest-of-USER/pytest-278/popen-gw0/test_r_diff_chk_5_refused_link0/app/.s19tool/workarea/patches/checks/l.chk.json'
+[gw3] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: Check spec not loaded — [MF-PATH-UNRESOLVED] error: the change-file path could not be resolved — no file was opened: '/tmp/pytest-of-USER/pytest-278/popen-gw3/test_r_diff_chk_5_refused_link0/app/.s19tool/workarea/patches/checks/x.chk.json'
+    assert "Check spec n...s/x.chk.json'" == "Check spec: ...— not loaded."
+      
+      - Check spec: 'checks/x.chk.json' is outside the patches folder — not loaded.
+      + Check spec not loaded — [MF-PATH-UNRESOLVED] error: the change-file path could not be resolved — no file was opened: '/tmp/pytest-of-USER/pytest-278/popen-gw3/test_r_diff_chk_5_refused_link0/app/.s19tool/workarea/patches/checks/x.chk.json'
+~/work/s19_i6t2/tests/test_b101_document_homes.py:1082: AssertionError: Check spec not loaded — [MF-PATH-UNRESOLVED] error: the change-file path could not be resolved — no file was opened: '/tmp/pytest-of-USER/pytest-278/popen-gw3/test_r_diff_chk_5_refused_link0/app/.s19tool/workarea/patches/checks/x.chk.json'
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: 'library/w.chk.json' is not offered by #diff_check_select; the dropdown lists ['w.chk.json']
+    assert 'library/w.chk.json' in ['', 'w.chk.json']
+~/work/s19_i6t2/tests/test_b101_document_homes.py:264: AssertionError: 'library/w.chk.json' is not offered by #diff_check_select; the dropdown lists ['w.chk.json']
+[gw3] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: Check Editor section keeps the stale Write sentence
+    assert 'writes the ...ut a project' not in 'Collects A2...ks/` folder.'
+      
+      'writes the spec in...r without a project' is contained here:
+        hk.json** writes the spec into the common `.s19tool/workarea/patches/` folder, with or without a project; Save project copies the specs the project uses into its `checks/` folder.
+~/work/s19_i6t2/tests/test_b101_help_legend_docs.py:1418: AssertionError: Check Editor section keeps the stale Write sentence
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: timed out waiting for #diff_check_select after key '7'
+~/work/s19_i6t2/tests/support/timing.py:66: AssertionError: timed out waiting for #diff_check_select after key '7'
+=========================== short test summary info ============================
+FAILED tests/test_b101_document_homes.py::test_r_patch_doc_dropdown_001_1_change_list[open]
+FAILED tests/test_b101_document_homes.py::test_r_patch_doc_dropdown_001_1_change_list[project-load]
+FAILED tests/test_b101_document_homes.py::test_r_patch_doc_dropdown_001_1_change_list[refresh]
+FAILED tests/test_b101_document_homes.py::test_r_patch_doc_dropdown_001_2_empty[library-only]
+FAILED tests/test_b101_document_homes.py::test_r_patch_doc_dropdown_001_1_change_list[save-project]
+FAILED tests/test_b101_document_homes.py::test_r_patch_doc_dropdown_001_1_change_list[save]
+FAILED tests/test_b101_document_homes.py::test_r_patch_doc_dropdown_001_4_refused[popup-recheck]
+FAILED tests/test_b101_document_homes.py::test_r_patch_doc_dropdown_001_3_pick_keeps_spelling
+FAILED tests/test_b101_document_homes.py::test_r_patch_doc_dropdown_001_3_pick[project]
+FAILED tests/test_b101_document_homes.py::test_r_patch_doc_dropdown_001_4_refused[unknown-folder]
+FAILED tests/test_b101_document_homes.py::test_r_chked_031_write_home[project]
+FAILED tests/test_b101_document_homes.py::test_r_patch_doc_dropdown_001_4_refused[link]
+FAILED tests/test_b101_document_homes.py::test_r_patch_doc_dropdown_001_3_pick[library]
+FAILED tests/test_b101_document_homes.py::test_r_patch_doc_dropdown_001_4_refused[inside-link]
+FAILED tests/test_b101_document_homes.py::test_r_patch_doc_dropdown_001_3_save_after_library_pick
+FAILED tests/test_b101_document_homes.py::test_r_patch_doc_dropdown_001_4_refused[linked-folder]
+FAILED tests/test_b101_document_homes.py::test_r_chked_031_write_home[never-overwrites]
+FAILED tests/test_b101_document_homes.py::test_r_chked_031_write_home[after-library-pick]
+FAILED tests/test_b101_document_homes.py::test_r_chked_040_spec_list[project]
+FAILED tests/test_b101_document_homes.py::test_r_chked_034_linked_check_home
+FAILED tests/test_b101_document_homes.py::test_r_chked_040_spec_list[after-write]
+FAILED tests/test_b101_document_homes.py::test_r_chked_040_spec_list[save-project]
+FAILED tests/test_b101_document_homes.py::test_r_chked_040_spec_list[project-load]
+FAILED tests/test_b101_document_homes.py::test_r_chked_042_write_as_bare_name
+FAILED tests/test_b101_document_homes.py::test_r_chked_044_refused[link] - As...
+FAILED tests/test_b101_document_homes.py::test_r_chked_044_refused[linked-folder]
+FAILED tests/test_b101_document_homes.py::test_r_diff_chk_1_list[project] - A...
+FAILED tests/test_b101_document_homes.py::test_r_diff_chk_1_list[project-load]
+FAILED tests/test_b101_document_homes.py::test_r_diff_chk_1_list[save-project]
+FAILED tests/test_b101_document_homes.py::test_r_diff_chk_5_refused[link] - A...
+FAILED tests/test_b101_document_homes.py::test_r_diff_chk_5_refused[linked-folder]
+FAILED tests/test_b101_document_homes.py::test_r_diff_chk_8_library_spec_loads
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_readme_4_1_no_stale_claim
+FAILED tests/test_b101_symbol_reads.py::test_r_chg_sym_10_reads_with_no_a2l_loaded_declare_none[ab-diff-project-a2l-not-implicit]
+=================== 34 failed, 9 passed in 149.14s (0:02:29) ===================

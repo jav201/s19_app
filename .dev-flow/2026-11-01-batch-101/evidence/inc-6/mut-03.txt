@@ -1,0 +1,65 @@
+# mutant M3  (BEFORE-AFTER-REPORT-001.11)
+base_commit=98d94d724a72c56468292be123ff15f664acb4fa
+s19_app.__file__=<HOME>/work/s19_i6m_copy/s19_app/__init__.py
+mutation=s19_app/tui/services/before_after_service.py:354
+--- pytest (mutant copy) ---
+bringing up nodes...
+bringing up nodes...
+
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_______ test_r_before_after_report_001_11_1_no_project_reason_exact_text _______
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-255/popen-gw0/test_r_before_after_report_0010')
+
+    def test_r_before_after_report_001_11_1_no_project_reason_exact_text(
+        tmp_path: Path,
+    ) -> None:
+        """No project open: the composer refuses with exactly the canon reason
+        and writes nothing."""
+        bas = _bas()
+        workarea = tmp_path / ".s19tool" / "workarea"
+        workarea.mkdir(parents=True)
+        original = _make_s19_image(tmp_path)
+        patched = _make_s19_image(workarea, name="img-patched.s19", patched=True)
+    
+        result = bas.compose_before_after_report(
+            _summary(saved_path=patched, source_image_path=original),
+            original,
+            project_dir=None,
+            workarea=workarea,
+        )
+    
+        assert result.written is False
+>       assert result.diagnostics == [_NO_PROJECT_REASON]
+E       AssertionError: assert ['No active p...ion instead.'] == ['No active p...ion instead.']
+E         
+E         At index 0 diff: 'No active project - the before/after report needs a project reports/ destination; use the manual A<->B Diff report (screen 7) with an explicit destination instead.' != 'No active project - the before/after report needs a project reports/ destination; use the manual A<->B Diff report (key 7) with an explicit destination instead.'
+E         Use -v to get more diff
+
+../s19_i6m/tests/test_before_after_report.py:1593: AssertionError
+__________ test_r_before_after_report_001_11_2_bkey_no_project_status __________
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-255/popen-gw1/test_r_before_after_report_0010')
+
+    def test_r_before_after_report_001_11_2_bkey_no_project_status(
+        tmp_path: Path,
+    ) -> None:
+        """Key ``b`` with no project open: the status is ``Before/after report
+        refused: `` followed by the whole canon reason, and no report file
+        exists anywhere."""
+        outcome = _drive_bkey_texts(tmp_path, project=False)
+>       assert "Before/after report refused: " + _NO_PROJECT_REASON in (
+            outcome["statuses"]
+        ), outcome["statuses"]
+E       AssertionError: ['Before/after report refused: No active project - the before/after report needs a project reports/ destination; use the manual A<->B Diff report (screen 7) with an explicit destination instead.']
+E       assert ('Before/after report refused: ' + 'No active project - the before/after report needs a project reports/ destination; use the manual A<->B Diff report (key 7) with an explicit destination instead.') in ['Before/after report refused: No active project - the before/after report needs a project reports/ destination; use the manual A<->B Diff report (screen 7) with an explicit destination instead.']
+
+../s19_i6m/tests/test_before_after_report.py:1604: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_before_after_report.py::test_r_before_after_report_001_11_1_no_project_reason_exact_text
+FAILED tests/test_before_after_report.py::test_r_before_after_report_001_11_2_bkey_no_project_status
+2 failed in 4.32s
+

@@ -1,0 +1,526 @@
+=== Inc 6 E4 integration run: int-02-qcbc
+date: 2026-11-06T13:09:49Z
+worktree HEAD (base): 98d94d724a72c56468292be123ff15f664acb4fa
+index tree with the increment staged: 60737950a18ed3d41e464048101a849df0f8ebed
+staged files vs base: 15
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i6int/s19_app/__init__.py
+CMD: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -n 10 -m not serial_timing -rfs tests/test_b100_active_variant.py tests/test_b100_announce.py tests/test_b100_busy.py tests/test_b100_document.py tests/test_b100_focus.py tests/test_b100_load_dialog.py tests/test_b100_load_question.py tests/test_b100_project_check.py tests/test_b100_project_homes.py tests/test_b100_recents.py tests/test_b100_reuse.py tests/test_b100_save_dialog.py tests/test_b100_save_guards.py tests/test_b100_save_image.py tests/test_b100_session_reset.py tests/test_b100_workers.py tests/test_b101_check_spec_keep.py tests/test_b101_designer_writes.py tests/test_b101_flow_ext_copy.py tests/test_b102_flow_block_edit.py tests/test_b97_check_editor.py tests/test_b97_chips_help.py tests/test_b97_flow_builder.py tests/test_b97_flow_execution.py tests/test_b97_key_bar.py tests/test_b97_patch_editor.py tests/test_b97_width.py tests/test_b99_bytes_field.py tests/test_b99_editor_image.py tests/test_b99_load_project.py tests/test_b99_s0.py tests/test_b99_staging.py tests/test_change_service.py tests/test_changes_file_notation_help.py tests/test_checks_engine.py tests/test_diff_report_service.py tests/test_loadfilescreen_input.py tests/test_open_folder_chips.py tests/test_project_gather.py tests/test_report_logging.py tests/test_report_off_ui_thread.py tests/test_segment_split_window.py tests/test_synth_release_case.py tests/test_tui_check_chain_b94.py tests/test_tui_check_editor.py tests/test_tui_checks_view.py tests/test_tui_diff_screen.py tests/test_tui_directionb.py tests/test_tui_patch_big.py tests/test_tui_patch_card.py tests/test_tui_patch_checks_strip.py tests/test_tui_patch_editor_b94.py tests/test_tui_patch_editor_v2.py tests/test_tui_patch_glyphs.py tests/test_tui_patch_json.py tests/test_tui_patch_layout.py tests/test_tui_report_filter_surface.py tests/test_tui_snapshot.py tests/test_undo_redo_ux.py tests/test_variant_execution.py tests/test_window_usage_help.py
+bringing up nodes...
+bringing up nodes...
+
+.....s...................s....s......................................... [  2%]
+........................................................................ [  5%]
+........s........................s............................s......... [  7%]
+..................s...ss...s..ss.............................ss......... [ 10%]
+........s.........................ss...sss....ss................ss...... [ 12%]
+........................s........s.....sssssssssssssssss..............s. [ 15%]
+.......sss....ss...s..............s........s............................ [ 17%]
+......ss............................sss.ss..............s......ssssssss. [ 20%]
+............s..................s............s......sss.................. [ 22%]
+s...............sss................s............ss.....s...ssssss..s.... [ 25%]
+.ss..........................s...ss.....sssss.....s..................... [ 27%]
+.s.........................s..........................s................s [ 30%]
+..ssss......s.......s.........................s.............ssssssssssss [ 32%]
+.ss........sss..s...........................................s........... [ 35%]
+...s.....ss.....s........s......................ssss.......s.ssssss..... [ 37%]
+......................s................................................. [ 40%]
+.........s...s............s.................................s..........s [ 42%]
+....sssssss...............s...........s............sss.................. [ 45%]
+...................s........s..s.x........s...............s............. [ 47%]
+..........s................s............................................ [ 50%]
+.........s.............................................................. [ 52%]
+........................................................................ [ 55%]
+........................................................................ [ 57%]
+........................................................................ [ 60%]
+........................................................................ [ 62%]
+........................................................................ [ 65%]
+........................................................................ [ 67%]
+........................................................................ [ 70%]
+........................................................................ [ 72%]
+........................................................................ [ 75%]
+s.......................................F............................... [ 77%]
+........................................................................ [ 80%]
+........................................................................ [ 82%]
+........................................................................ [ 85%]
+........................................................................ [ 87%]
+........................................................................ [ 90%]
+........................................................................ [ 92%]
+........................................................................ [ 95%]
+..................F......................................F.............. [ 97%]
+...F...................................................................  [100%]
+=================================== FAILURES ===================================
+________________ test_tc_b94_07_rail_mounting_and_write_routing ________________
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-242/popen-gw1/test_tc_b94_07_rail_mounting_a0')
+
+    def test_tc_b94_07_rail_mounting_and_write_routing(tmp_path: Path) -> None:
+        """Selecting the entry mounts exactly 1 CheckEditorPanel; the write
+        message reaches the service handler (LLR-001.2).
+    
+        Intent: TC-B94-07 — mounting through the shipped rail path at 120x30 and
+        the 80x24 boundary arm; the write action routes to the change writer with
+        a captured call count of exactly 1. Cross-mounting negative control:
+        selecting Patch Editor mounts the patch panel, not the twin.
+    
+        FIX ROUND A (C-40): the panel census alone is routing-blind — every rail
+        screen composes eagerly at startup, so the panel sits in the DOM whether
+        or not `=` targets it (the binding mutation SURVIVED). The kill subject
+        is the RAIL TARGET: after `=`, the Check Editor screen must be the
+        visible one and the rail's single active marker must move to
+        ``check_editor`` (LLR-001.2's ``set_active`` seam).
+        """
+    
+        async def _drive(size) -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=size) as pilot:
+                await pilot.pause()
+                await pilot.press("equals_sign")
+                await pilot.pause()
+                await pilot.pause()
+                # The rail-target observation (FIX ROUND A — the kill subject).
+                visible = [
+                    sid
+                    for sid in ("screen_check_editor", "screen_patch")
+                    if "hidden" not in app.query_one(f"#{sid}").classes
+                ]
+                rail_active = app.query_one(Rail).active_key
+                panels = list(app.query(CheckEditorPanel))
+                # Mount the twin-crossing negative control.
+                await pilot.press("6")
+                await pilot.pause()
+                patch_panels = list(app.query(PatchEditorPanel))
+                # Back to the Check Editor for the write drive.
+                await pilot.press("equals_sign")
+                await pilot.pause()
+                # Drive one write through the shipped surface (focus + Enter — a
+                # re-layout after the add shifts the buttons under a raw click).
+                app.query_one("#check_mem_address_input", Input).value = "0x100"
+                app.query_one("#check_mem_label_input", Input).value = "x"
+                app.query_one("#check_mem_size_input", Input).value = "1"
+                app.query_one("#check_mem_add_button").focus()
+                await pilot.press("enter")
+                await pilot.pause()
+                calls, original = _write_calls()
+                try:
+                    app.query_one("#check_write_button").focus()
+                    await pilot.press("enter")
+                    await pilot.pause()
+                finally:
+                    app_module.write_change_document = original
+                return (
+                    len(panels),
+                    len(patch_panels),
+                    len(calls),
+                    visible,
+                    rail_active,
+                )
+    
+>       mounted, patch_panels, write_calls, visible, rail_active = asyncio.run(
+            _drive((120, 30))
+        )
+
+tests/test_tui_check_editor.py:223: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_tui_check_editor.py:180: in _drive
+    async with app.run_test(size=size) as pilot:
+../../miniconda3/envs/s19ci/lib/python3.11/contextlib.py:217: in __aexit__
+    await anext(self.gen)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:2218: in run_test
+    raise self._exception
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:663: in _process_messages_loop
+    await self._dispatch_message(message)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:739: in _dispatch_message
+    await self._on_message(message)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:829: in _on_message
+    await invoke(method, message)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:56: in _invoke
+    result = callback(*params[:parameter_count])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+event = ActionRequested()
+
+    def on_check_editor_panel_action_requested(
+        self, event: CheckEditorPanel.ActionRequested
+    ) -> None:
+        """Route a Check Editor write/validate action (LLR-001.2/.009).
+    
+        Summary:
+            Exactly the two :data:`CHECK_EDITOR_ACTIONS` — a non-member
+            action is one status error, never a crash. ``write_doc``
+            assembles the ``kind="check"`` document (expected bytes from the
+            spec for a field loaded from one, else from the loaded image),
+            writes it through ``changes.io.
+            write_change_document`` under the operator's name (the
+            ``.chk.json`` suffix is preserved by ``_safe_name``), surfaces
+            the outcome and refreshes the folder listing so the new spec
+            appears suffix-distinguished in every dropdown. ``validate_doc``
+            assembles the same document and runs it through the shipped
+            ``run_check_document`` (no image → every entry ``uncheckable``),
+            feeding one verdict row per entry back to the panel.
+        """
+        panel = self.query_one("#check_editor_panel", CheckEditorPanel)
+        if event.action not in CHECK_EDITOR_ACTIONS:
+            self.set_status(
+                f"Check Editor: unsupported action {event.action!r}"
+            )
+            return
+        loaded = self.current_file
+        loaded_ranges = loaded.ranges if loaded is not None else None
+        mac_records = loaded.mac_records if loaded is not None else None
+        a2l_tags = self._compute_a2l_enriched_tags() or None
+        document, skipped = self._check_items_to_document(event.items)
+        file_name = event.file_name_text.strip() or "spec.chk.json"
+        if skipped:
+            self.set_status(
+                f"Check Editor: {skipped} field(s) outside the loaded "
+                "image — not declared."
+            )
+        if event.action == "write_doc":
+>           path, issues = write_change_document(
+                document, self.base_dir, file_name, dest_dir=self._check_home()
+            )
+E           TypeError: _write_calls.<locals>._spy() got an unexpected keyword argument 'dest_dir'
+
+s19_app/tui/app.py:7789: TypeError
+----------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ <HOME>/work/s19_i6int/s19_app/tui/app.py:7789 in                     │
+│ on_check_editor_panel_action_requested                                       │
+│                                                                              │
+│    7786 │   │   │   │   "image — not declared."                              │
+│    7787 │   │   │   )                                                        │
+│    7788 │   │   if event.action == "write_doc":                              │
+│ ❱  7789 │   │   │   path, issues = write_change_document(                    │
+│    7790 │   │   │   │   document, self.base_dir, file_name, dest_dir=self._c │
+│    7791 │   │   │   )                                                        │
+│    7792 │   │   │   for issue in issues:                                     │
+│                                                                              │
+│ ╭───────────────────────── locals ──────────────────────────╮                │
+│ │      a2l_tags = None                                      │                │
+│ │      document = ChangeDocument(                           │                │
+│ │                 │   format='s19app-changeset',            │                │
+│ │                 │   version='2.0',                        │                │
+│ │                 │   kind='check',                         │                │
+│ │                 │   encoding='utf-8',                     │                │
+│ │                 │   value_mode='text',                    │                │
+│ │                 │   entries=[],                           │                │
+│ │                 │   issues=[],                            │                │
+│ │                 │   source_path=None                      │                │
+│ │                 )                                         │                │
+│ │         event = ActionRequested()                         │                │
+│ │     file_name = 'spec.chk.json'                           │                │
+│ │        loaded = None                                      │                │
+│ │ loaded_ranges = None                                      │                │
+│ │   mac_records = None                                      │                │
+│ │         panel = CheckEditorPanel(id='check_editor_panel') │                │
+│ │          self = S19TuiApp(                                │                │
+│ │                 │   title='Hex Edit Tool',                │                │
+│ │                 │   classes={'-dark-mode'},               │                │
+│ │                 │   pseudo_classes={'dark', 'focus'}      │                │
+│ │                 )                                         │                │
+│ │       skipped = 1                                         │                │
+│ ╰───────────────────────────────────────────────────────────╯                │
+╰──────────────────────────────────────────────────────────────────────────────╯
+TypeError: _write_calls.<locals>._spy() got an unexpected keyword argument 
+'dest_dir'
+________ test_at_056e_a2b_diff_report_byte_identical_despite_selection _________
+[gw3] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-242/popen-gw3/test_at_056e_a2b_diff_report_b0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f572a814c90>
+
+    def test_at_056e_a2b_diff_report_byte_identical_despite_selection(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """AT-056e / LLR-054.5 (HLR-054 scope guard, Q-5 black-box arm).
+    
+        Intent: with a filter SELECTED on the report selector, the A2B diff
+        report driven through ITS shipped surface (Compare then Report on the
+        diff screen) is byte-identical (canonical form) to a no-filter A2B
+        run under the same environment pin — the sticky selection observably
+        does NOT leak into the always-complete diff report.
+        """
+        _pin_report_clocks(monkeypatch)
+    
+        def _session(root: Path, select_filter: bool) -> Dict[str, bytes]:
+            project_dir = _make_project(
+                root, "proj", filters={"f.json": _valid_filter_body()}
+            )
+    
+            async def _drive() -> Dict[str, bytes]:
+                app = S19TuiApp(base_dir=root)
+                async with app.run_test(size=(120, 40)) as pilot:
+                    await pilot.pause()
+                    await _load_project(app, pilot, "proj")
+                    if select_filter:
+                        await _select_filter_via_dropdown(app, pilot, "f.json")
+                    app.action_show_screen("diff")
+                    await pilot.pause()
+                    app.query_one("#diff_path_a", Input).value = str(
+                        project_dir / "a.s19"
+                    )
+                    app.query_one("#diff_path_b", Input).value = str(
+                        project_dir / "b.s19"
+                    )
+                    app.query_one("#diff_compare_button", Button).press()
+                    await _flush(pilot)
+                    app.query_one("#diff_report_button", Button).press()
+                    await _flush(pilot)
+                return _reports(project_dir)
+    
+            return asyncio.run(_drive())
+    
+        base_root = tmp_path / "base"
+        sel_root = tmp_path / "sel"
+        base_root.mkdir()
+        sel_root.mkdir()
+        baseline = _session(base_root, select_filter=False)
+        selected = _session(sel_root, select_filter=True)
+    
+        expected = {_DIFF_MD_NAME, _DIFF_HTML_NAME}
+>       assert set(baseline) == expected, f"baseline wrote {sorted(baseline)}"
+E       AssertionError: baseline wrote []
+E       assert set() == {'20260710T12...ff-report.md'}
+E         
+E         Extra items in the right set:
+E         '20260710T120000Z-diff-report.html'
+E         '20260710T120000Z-diff-report.md'
+E         Use -v to get more diff
+
+tests/test_tui_report_filter_surface.py:775: AssertionError
+_________ test_tc016s_density_layout_snapshot[patch-comfortable-80x24] _________
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+snap_compare = <function snap_compare.<locals>.compare at 0x7fea9ea7fa60>
+public_triple = {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-242/popen-gw1/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/py...napshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-242/popen-gw1/snapshot_public0/snap.s19')}
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-242/popen-gw1/test_tc016s_density_layout_sna3')
+screen = 'patch', density = 'comfortable', size_key = '80x24'
+
+    @pytest.mark.skipif(
+        not snapshot_plugin_available,
+        reason="pytest-textual-snapshot not installed (dev-only optional extra)",
+    )
+    @pytest.mark.snapshot
+    @pytest.mark.parametrize("screen, density, size_key", _ALL_SNAPSHOT_CELLS)
+    def test_tc016s_density_layout_snapshot(
+        snap_compare,
+        public_triple: dict[str, Path],
+        tmp_path: Path,
+        screen: str,
+        density: str,
+        size_key: str,
+    ) -> None:
+        """Each Direction B screen matches its approved layout baseline (TC-016-S).
+    
+        Intent: LLR-007.1 — the SVG baseline is the primary verdict that every
+        Direction B screen lays out without overlapping or clipped panes in
+        both density modes across the fixed {80x24, 120x30, 160x40} matrix. A
+        layout-drift regression (a pane resized, a regime mis-toggled, a token
+        re-themed) changes the rendered SVG and fails the cell. LLR-007.2 — the
+        app renders only the public synthetic ``conftest.py`` generators; no
+        client artifact is opened.
+    
+        The 29-cell matrix: the 4 restyled screens carry the full
+        {density x size} grid (24 cells); the diff scaffold is pinned at 120x30
+        comfortable (1 cell); the patch and map scaffolds each carry 80x24 + 120x30
+        to lock, respectively, the batch-22 2x2 four-pane layout and the batch-27
+        minimap redesign + narrow-regime reflow at both regimes (4 cells).
+    
+        # AT-034a
+        # AT-034b
+        # TC-16s
+        """
+        width, height = _SIZES[size_key]
+        app = S19TuiApp(base_dir=tmp_path)
+>       assert snap_compare(
+            app,
+            terminal_size=(width, height),
+            run_before=_snapshot_run_before(screen, density, public_triple),
+        )
+E       AssertionError: assert False
+E        +  where False = <function snap_compare.<locals>.compare at 0x7fea9ea7fa60>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}), terminal_size=(80, 24), run_before=<function _snapshot_run_before.<locals>.run_before at 0x7fea9ea7d620>)
+E        +    where <function _snapshot_run_before.<locals>.run_before at 0x7fea9ea7d620> = _snapshot_run_before('patch', 'comfortable', {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-242/popen-gw1/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/py...napshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-242/popen-gw1/snapshot_public0/snap.s19')})
+
+tests/test_tui_snapshot.py:1220: AssertionError
+________ test_tc016s_density_layout_snapshot[patch-comfortable-120x30] _________
+[gw4] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+snap_compare = <function snap_compare.<locals>.compare at 0x7ff430330fe0>
+public_triple = {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-242/popen-gw4/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/py...napshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-242/popen-gw4/snapshot_public0/snap.s19')}
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-242/popen-gw4/test_tc016s_density_layout_sna0')
+screen = 'patch', density = 'comfortable', size_key = '120x30'
+
+    @pytest.mark.skipif(
+        not snapshot_plugin_available,
+        reason="pytest-textual-snapshot not installed (dev-only optional extra)",
+    )
+    @pytest.mark.snapshot
+    @pytest.mark.parametrize("screen, density, size_key", _ALL_SNAPSHOT_CELLS)
+    def test_tc016s_density_layout_snapshot(
+        snap_compare,
+        public_triple: dict[str, Path],
+        tmp_path: Path,
+        screen: str,
+        density: str,
+        size_key: str,
+    ) -> None:
+        """Each Direction B screen matches its approved layout baseline (TC-016-S).
+    
+        Intent: LLR-007.1 — the SVG baseline is the primary verdict that every
+        Direction B screen lays out without overlapping or clipped panes in
+        both density modes across the fixed {80x24, 120x30, 160x40} matrix. A
+        layout-drift regression (a pane resized, a regime mis-toggled, a token
+        re-themed) changes the rendered SVG and fails the cell. LLR-007.2 — the
+        app renders only the public synthetic ``conftest.py`` generators; no
+        client artifact is opened.
+    
+        The 29-cell matrix: the 4 restyled screens carry the full
+        {density x size} grid (24 cells); the diff scaffold is pinned at 120x30
+        comfortable (1 cell); the patch and map scaffolds each carry 80x24 + 120x30
+        to lock, respectively, the batch-22 2x2 four-pane layout and the batch-27
+        minimap redesign + narrow-regime reflow at both regimes (4 cells).
+    
+        # AT-034a
+        # AT-034b
+        # TC-16s
+        """
+        width, height = _SIZES[size_key]
+        app = S19TuiApp(base_dir=tmp_path)
+>       assert snap_compare(
+            app,
+            terminal_size=(width, height),
+            run_before=_snapshot_run_before(screen, density, public_triple),
+        )
+E       AssertionError: assert False
+E        +  where False = <function snap_compare.<locals>.compare at 0x7ff430330fe0>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}), terminal_size=(120, 30), run_before=<function _snapshot_run_before.<locals>.run_before at 0x7ff430ab0220>)
+E        +    where <function _snapshot_run_before.<locals>.run_before at 0x7ff430ab0220> = _snapshot_run_before('patch', 'comfortable', {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-242/popen-gw4/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/py...napshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-242/popen-gw4/snapshot_public0/snap.s19')})
+
+tests/test_tui_snapshot.py:1220: AssertionError
+[1;31mTextual Snapshot Report[0m
+
+[1;30;41m2[0m[30;41m mismatched snapshots[0m
+
+[1mView the [0m]8;id=6315862;file://<HOME>/work/s19_i6int/snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+
+[2;35m<HOME>/work/s19_i6int/[0m[2;95msnapshot_report.html[0m
+
+=========================== short test summary info ============================
+FAILED tests/test_tui_check_editor.py::test_tc_b94_07_rail_mounting_and_write_routing
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-120x30]
+SKIPPED [1] tests/test_b100_document.py:1836: share-mode locks are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [52] tests/support/b100_links.py:30: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_load_dialog.py:2576: Windows strips a trailing dot from a file name, so fw.s19. opens fw.s19; on posix fw.s19. is a distinct, missing name (fix round 1, CI9b-4)
+SKIPPED [1] tests/test_b100_load_dialog.py:2599: case-insensitive file system arm; Windows only
+SKIPPED [1] tests/test_b100_project_check.py:471: NUL is a device only on Windows (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_document.py:1027: share-mode locks are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [2] tests/test_b100_load_dialog.py:2642: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [2] tests/test_b100_project_homes.py:790: trailing-dot names are a Windows-only arm
+SKIPPED [1] tests/test_b100_document.py:1222: share-mode locks are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_document.py:1401: a case-folding filesystem is the Windows arm of this case
+SKIPPED [1] tests/test_b100_active_variant.py:766: a read-only file blocks a replace only on Windows (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_document.py:1651: share-mode locks are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_document.py:1698: share-mode locks are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/support/b100_links.py:40: case-sensitive folders are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [3] tests/test_b100_recents.py:1035: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [4] tests/test_b100_recents.py:1071: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:1145: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [2] tests/test_b100_recents.py:1181: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:1209: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:1250: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:1281: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:1320: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:1339: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:1466: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_recents.py:1704: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:1772: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:1804: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [2] tests/test_b100_recents.py:1980: Win32 name rule arm (stream / 8.3 / trailing dot or space); Windows only (E3 R12)
+SKIPPED [1] tests/test_b100_load_dialog.py:2766: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_recents.py:2093: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_recents.py:2134: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [2] tests/test_b100_recents.py:2186: case-insensitive file system arm; Windows only (E3 R12)
+SKIPPED [1] tests/test_b100_project_homes.py:1266: not run: the upper-case spelling needs a case-insensitive file system (Windows)
+SKIPPED [1] tests/test_b100_load_question.py:2017: an exclusively held file is a Windows-only arm (reported not run elsewhere)
+SKIPPED [1] tests/test_b100_recents.py:2224: case-insensitive file system arm; Windows only (E3 R12)
+SKIPPED [1] tests/test_b100_recents.py:2300: case-insensitive file system arm; Windows only (E3 R12)
+SKIPPED [3] tests/test_b100_recents.py:2300: Win32 name rule arm (stream / 8.3 / trailing dot or space); Windows only (E3 R12)
+SKIPPED [1] tests/test_b100_load_dialog.py:1956: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [3] tests/test_b100_recents.py:2379: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_recents.py:2409: Win32 name rule arm (stream / 8.3 / trailing dot or space); Windows only (E3 R12)
+SKIPPED [1] tests/test_b100_recents.py:2456: case-insensitive file system arm; Windows only (E3 R12)
+SKIPPED [3] tests/test_b100_recents.py:2456: Win32 name rule arm (stream / 8.3 / trailing dot or space); Windows only (E3 R12)
+SKIPPED [1] tests/test_b100_recents.py:2493: case-insensitive file system arm; Windows only (E3 R12)
+SKIPPED [2] tests/test_b100_recents.py:2511: Win32 name rule arm (stream / 8.3 / trailing dot or space); Windows only (E3 R12)
+SKIPPED [1] tests/test_b100_recents.py:2608: case-insensitive file system arm; Windows only (E3 R12)
+SKIPPED [2] tests/test_b100_recents.py:2608: Win32 name rule arm (stream / 8.3 / trailing dot or space); Windows only (E3 R12)
+SKIPPED [1] tests/test_b100_save_guards.py:2539: share-mode locks are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_recents.py:2719: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_recents.py:2719: Win32 root-relative path arm; Windows only (E3 R12)
+SKIPPED [3] tests/test_b100_project_homes.py:2167: reserved device names are a Windows-only arm
+SKIPPED [1] tests/test_b100_project_homes.py:2197: trailing-dot names are a Windows-only arm
+SKIPPED [1] tests/test_b100_save_dialog.py:1023: Windows-only test arm (junction / case-insensitive volume); not run here
+SKIPPED [1] tests/test_b100_load_dialog.py:2450: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only
+SKIPPED [1] tests/test_b100_project_homes.py:2343: not run: a con.json file needs the Windows extended spelling
+SKIPPED [1] tests/test_b100_load_dialog.py:3666: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only
+SKIPPED [1] tests/test_b100_load_dialog.py:3811: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only
+SKIPPED [1] tests/test_b100_recents.py:477: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:545: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:643: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:669: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:686: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_recents.py:706: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:733: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:755: case-insensitive file system arm; Windows only (E3 R12)
+SKIPPED [1] tests/test_b100_recents.py:774: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:801: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:867: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:908: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:968: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_recents.py:1002: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [2] tests/test_b100_recents.py:2872: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:2993: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_recents.py:3029: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:3060: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_save_dialog.py:1291: Windows-only test arm (junction / case-insensitive volume); not run here
+SKIPPED [1] tests/test_b100_save_image.py:960: msvcrt byte-range lock
+SKIPPED [2] tests/test_b100_save_dialog.py:2992: Windows-only test arm (junction / case-insensitive volume); not run here
+SKIPPED [1] tests/test_b100_reuse.py:259: case-folding of candidate names is a Windows arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_reuse.py:1125: WinError 123 invalid-spelling arm is Windows-only (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_reuse.py:1145: case-insensitive anchor names are a Windows arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_reuse.py:1166: 8.3 short-name anchors are a Windows arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_reuse.py:1194: case-folded group word is a Windows arm (PDR C-QA-6)
+SKIPPED [2] tests/test_b100_save_dialog.py:1423: Windows-only arm; not run here
+SKIPPED [1] tests/test_b100_load_dialog.py:774: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only
+SKIPPED [1] tests/test_b100_save_guards.py:1080: icacls deny-read is a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_save_dialog.py:517: Windows-only test arm (junction / case-insensitive volume); not run here
+SKIPPED [1] tests/test_b100_save_guards.py:1226: icacls deny-read is a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_save_guards.py:1451: case-insensitive names are a Windows-only arm (PDR C-QA-6)
+SKIPPED [2] tests/test_b100_save_guards.py:1505: case-insensitive names are a Windows-only arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_save_guards.py:1709: an open handle blocks a replace only on Windows (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_save_guards.py:1732: an open handle blocks a replace only on Windows (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_save_guards.py:1791: an open handle blocks a replace only on Windows (PDR C-QA-6)
+SKIPPED [2] tests/test_b100_save_dialog.py:805: Windows-only arm; not run here
+SKIPPED [1] tests/test_b101_flow_ext_copy.py:563: case rule: Windows
+SKIPPED [1] tests/test_b100_save_guards.py:1991: an open handle blocks a replace only on Windows (PDR C-QA-6)
+SKIPPED [1] tests/test_b101_flow_ext_copy.py:796: the junction half is Windows
+SKIPPED [1] tests/test_b101_flow_ext_copy.py:1268: junctions are the Windows case
+4 failed, 2701 passed, 173 skipped, 1 xfailed in 2778.73s (0:46:18)
+=== exit code: 1
