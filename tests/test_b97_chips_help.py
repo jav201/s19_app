@@ -1376,7 +1376,7 @@ def test_tc_b97_32_flow_help_names_every_label(tmp_path: Path) -> None:
             for kind in FLOW_KINDS:
                 if panel.query(f"#flow_palette_{kind}"):
                     panel.query_one(f"#flow_palette_{kind}").press()
-                    await _poll(pilot, lambda: str(panel.query_one("#flow_kind").value) == kind)
+                    await _poll(pilot, lambda: panel.query_one(f"#flow_palette_{kind}").has_class("chip-selected"))
                     await settle(pilot, 2)
                 harvest()
             mode = panel.query_one("#flow_ext_mode", _Select)
@@ -2211,7 +2211,7 @@ async def _drive_states(app, pilot, screen_key: str, harvest) -> None:
         await _poll(pilot, lambda: panel.query_one("#flow_funnel_editor").display)
         for kind in FLOW_KINDS:
             panel.query_one(f"#flow_palette_{kind}").press()
-            await _poll(pilot, lambda: str(panel.query_one("#flow_kind").value) == kind)
+            await _poll(pilot, lambda: panel.query_one(f"#flow_palette_{kind}").has_class("chip-selected"))
             await settle(pilot, 2)
             harvest()
     else:

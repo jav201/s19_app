@@ -16,7 +16,8 @@ markup-safety):
   (the filedialog→copy step itself is service-covered by AT-P1-10, C-12, which
   cannot run headless).
 - AT-006 / AMD-2 — a loaded report-bearing flow renders a ``REPORT`` row (the
-  ``_flow_block_label`` report arm is non-vacuous).
+  pipeline card's REPORT arm is non-vacuous; Inc 12b re-pointed it from the
+  removed block list).
 - AT-006 / TC-016 — quarantine card PAINTED ``sev-error`` on a rejected load,
   one line per finding, hostile ref rendered literally (no injected span), and
   the current flow left UNCHANGED (C-32 / C-17 / LLR-003.5).
@@ -234,7 +235,7 @@ def test_at006_report_bearing_flow_shows_report_row(tmp_path: Path) -> None:
             app.screen.query_one("#flow_load_ok", Button).press()
             await pilot.pause()
             await pilot.pause()
-            return app.query_one("#flow_blocks", Static).render().plain
+            return app.query_one("#flow_pipeline", Static).render().plain
 
     blocks_text = asyncio.run(_drive())
     assert "REPORT" in blocks_text
@@ -268,7 +269,7 @@ def test_at006_quarantine_card_painted_and_flow_unchanged(tmp_path: Path) -> Non
             app.query_one("#flow_ref", Input).value = "keep.s19"
             app.query_one("#flow_add", Button).press()
             await pilot.pause()
-            blocks_before = app.query_one("#flow_blocks", Static).render().plain
+            blocks_before = app.query_one("#flow_pipeline", Static).render().plain
             # Open Load, pick the hostile file, Load it.
             app.query_one("#flow_load", Button).press()
             await _wait_for(app, pilot, "#flow_load_ok")
@@ -287,7 +288,7 @@ def test_at006_quarantine_card_painted_and_flow_unchanged(tmp_path: Path) -> Non
             spans = [list(s.render().spans) for s in app.query(
                 "#flow_result .flow-quarantine-line"
             )]
-            blocks_after = app.query_one("#flow_blocks", Static).render().plain
+            blocks_after = app.query_one("#flow_pipeline", Static).render().plain
             strip = _painted(app.query_one("#flow_name_strip", Static))
             return {
                 "has_card": card is not None,
@@ -389,14 +390,14 @@ def test_at005_dirty_guard_cancel_keeps_blocks_confirm_replaces(tmp_path: Path) 
             )
             app.screen.query_one("#flow_discard_cancel", Button).press()
             await pilot.pause()
-            blocks_after_cancel = app.query_one("#flow_blocks", Static).render().plain
+            blocks_after_cancel = app.query_one("#flow_pipeline", Static).render().plain
 
             # (b) dirty + Load -> Discard -> blocks replaced with the loaded flow.
             await _load_other(app, pilot, expect_confirm=True)
             app.screen.query_one("#flow_discard_ok", Button).press()
             await pilot.pause()
             await pilot.pause()
-            blocks_after_discard = app.query_one("#flow_blocks", Static).render().plain
+            blocks_after_discard = app.query_one("#flow_pipeline", Static).render().plain
             strip_after_discard = _painted(app.query_one("#flow_name_strip", Static))
 
             # (c) clean + Load -> NO modal (loads directly).

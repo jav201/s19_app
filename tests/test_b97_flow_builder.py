@@ -486,9 +486,15 @@ def card_count(app, panel) -> int:
     return lines[0].count("╭") if lines else 0
 
 
+def selected_kinds(panel) -> List[str]:
+    """The kinds whose chip carries ``chip-selected`` (the add form's visible
+    kind mark; exactly one is expected)."""
+    return [k for k in KINDS if panel.query_one(f"#flow_palette_{k}").has_class("chip-selected")]
+
+
 async def choose_kind(app, pilot, panel, kind: str) -> None:
     await pilot.click(f"#flow_palette_{kind}")
-    await poll(pilot, lambda: str(panel.query_one("#flow_kind", Select).value) == kind)
+    await poll(pilot, lambda: selected_kinds(panel) == [kind])
     await settle(pilot, 2)
 
 
@@ -522,16 +528,16 @@ def test_tc_b97_13_pipeline_cards_and_cables_replace_list_and_canvas(tmp_path: P
     one row) joined by 3 cables on one row, the kinds in block order. Empty
     arm: with no blocks the pipeline paints one line.
 
-    RED on main (main-observable clause first, PC-11): ``#flow_blocks``
+    RED on main (main-observable clause first, PC-11): the numbered list
     displayed at (5, 37, 110, 5). Mutation: a cable left out between two cards.
+    The list and canvas are gone from the screen: that absence is guarded by
+    the walks R-TUI-059.25/1 (``tests/test_b101_flow_shown_widgets.py``).
     """
 
     async def body(app, pilot, panel, project_dir):
         empty = [r for r in pipeline_lines(app, panel) if r.strip()] if panel.query("#flow_pipeline") else None
         await load_flow(app, pilot, "patch_chain")
         await settle(pilot, 2)
-        hidden = (not shown(panel.query_one("#flow_blocks")), not shown(panel.query_one("#flow_canvas")))
-        assert hidden == (True, True), f"list / canvas displayed: {hidden}"
         return empty, pipeline_lines(app, panel)
 
     empty, rows = run_builder(tmp_path, (118, 54), body)
@@ -555,7 +561,8 @@ def test_tc_b97_13_pipeline_cards_and_cables_replace_list_and_canvas(tmp_path: P
 def test_tc_b97_14_palette_offers_every_kind_in_order(tmp_path: Path) -> None:
     """TC-B97-14 (LLR-146.2): one ``flow_palette_<kind>`` chip per kind of
     ``_KIND_OPTIONS``, in that order (C-40 limb 2: the expected list is read
-    from the panel's own table), and each click sets ``#flow_kind``.
+    from the panel's own table), and each click marks that chip (and only
+    it) ``chip-selected``.
 
     RED on main (P-13): 4 chips (patch, CRC, A2B, EXT-STEP). Mutation: one
     kind left out of the palette.
@@ -567,13 +574,13 @@ def test_tc_b97_14_palette_offers_every_kind_in_order(tmp_path: Path) -> None:
         got = {}
         for kind in KINDS:
             await pilot.click(f"#flow_palette_{kind}")
-            await poll(pilot, lambda: str(panel.query_one("#flow_kind", Select).value) == kind)
-            got[kind] = str(panel.query_one("#flow_kind", Select).value)
+            await poll(pilot, lambda: selected_kinds(panel) == [kind])
+            got[kind] = selected_kinds(panel)
         return got
 
     got = run_builder(tmp_path, (118, 54), body, project=False)
     assert len(KINDS) == 7 and KINDS[0] == BLOCK_SOURCE and KINDS[-1] == BLOCK_EXTERNAL_STEP
-    assert got == {k: k for k in KINDS}, got
+    assert got == {k: [k] for k in KINDS}, got
 
 
 # --------------------------------------------------------------------------- #
@@ -996,17 +1003,15 @@ def test_tc_b97_48_variables_chip_counts_and_toggles(tmp_path: Path) -> None:
 @pytest.mark.parametrize("arm", ["project", "no_project"])
 def test_tc_b97_49_session_on_the_ribbon(tmp_path: Path, arm: str) -> None:
     """TC-B97-49 (LLR-146.11): with a project opened through the app's own
-    load, the ribbon's painted line ends with the session path's last segment
-    and ``#flow_ext_session`` is not displayed; with no project the ribbon
-    names the state in English (LLR-148.9).
+    load, the ribbon's painted line ends with the session path's last segment;
+    with no project the ribbon names the state in English (LLR-148.9).
 
-    RED on main: the session sits in the displayed ``#flow_ext_session``
+    RED on main: the session sat in a displayed line of its own
     (``flow_screens.py:764``). Mutation: the ribbon keeping the path's head.
+    That the old line is gone is guarded by the walks R-TUI-059.25/1.
     """
 
     async def body(app, pilot, panel, project_dir):
-        session = panel.query_one("#flow_ext_session")
-        assert not shown(session), "#flow_ext_session is displayed"
         rows = [r.rstrip() for r in painted_rows(app, need(panel, "#flow_ribbon")) if r.strip()]
         return rows, project_dir
 
@@ -1284,8 +1289,8 @@ def test_tc_b97_51_keyboard_order_keys_and_chip_states(tmp_path: Path) -> None:
                 await poll(pilot, lambda: app.focused is widget and not widget.has_class("-active"), 120)
                 await pilot.press(key)
                 kind = chip.removeprefix("flow_palette_")
-                await poll(pilot, lambda: str(panel.query_one("#flow_kind", Select).value) == kind)
-                keyed[(chip, key)] = str(panel.query_one("#flow_kind", Select).value) == kind
+                await poll(pilot, lambda: selected_kinds(panel) == [kind])
+                keyed[(chip, key)] = selected_kinds(panel) == [kind]
         enters = {}
 
         async def enter_on(wid, predicate):
@@ -1451,18 +1456,11 @@ def test_tc_b97_62_nul_pasted_into_the_add_form_is_refused(tmp_path: Path, kind,
     helper call removed from the ``flow_add`` branch.
     """
 
-    async def set_kind(pilot, panel, value):
-        # White-box driver: the kind select the chips set (mounted on main and
-        # on the rail), so a run on HEAD fails at the acceptance clause (PC-11).
-        panel.query_one("#flow_kind", Select).value = value
-        await poll(pilot, lambda: str(panel.query_one("#flow_kind", Select).value) == value)
-        await settle(pilot, 2)
-
     async def body(app, pilot, panel, project_dir):
-        await set_kind(pilot, panel, BLOCK_SOURCE)
+        await choose_kind(app, pilot, panel, BLOCK_SOURCE)
         panel.query_one("#flow_ref", Input).value = "prg.s19"
         await press(pilot, panel, "flow_add", lambda: len(panel._blocks) == 1)
-        await set_kind(pilot, panel, kind)
+        await choose_kind(app, pilot, panel, kind)
         for wid, value in others.items():
             panel.query_one(wid, Input).value = value
         box = panel.query_one(target, Input)

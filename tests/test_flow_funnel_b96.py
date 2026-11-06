@@ -304,7 +304,14 @@ def test_tc1817_builder_funnel_table_edits(tmp_path: Path) -> None:
             toggle_label = str(app.query_one("#flow_funnel_toggle", Button).label)
 
             # A flow needs ≥1 block to save — place one through Add.
-            app.query_one("#flow_kind").value = "source"
+            load_chip = app.query_one("#flow_palette_source", Button)
+            load_chip.press()
+            for _ in range(25):
+                await pilot.pause()
+                if load_chip.has_class("chip-selected"):
+                    break
+            else:
+                raise AssertionError("the LOAD chip did not become selected")
             app.query_one("#flow_ref", Input).value = "base.s19"
             app.query_one("#flow_add", Button).press()
             await pilot.pause()

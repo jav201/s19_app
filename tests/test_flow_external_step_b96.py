@@ -358,11 +358,13 @@ def test_tc1804_confirmed_run_refuses_missing_evidence(tmp_path: Path) -> None:
 
 
 def test_tc1804_builder_palette_select_and_config_row_gate(tmp_path: Path) -> None:
-    """TC-1804 (builder): the external-step kind rides the palette rail AND
-    the kind select; choosing it hides the plain ref input and shows the
+    """TC-1804 (builder): the external-step kind rides the palette rail;
+    choosing it (its chip) hides the plain ref input and shows the
     config row; the Add button REFUSES a block without the MANDATORY log
     (visible wiring notice, block never added) and accepts a complete one —
-    the canvas then paints the wider EXT-STEP box with its mode tag."""
+    the pipeline then paints the EXT-STEP card with its mode tag. The session
+    path rides the ribbon (Inc 12b re-pointed this node from the removed
+    session line and canvas)."""
     project = _make_project(tmp_path, {"base.s19": _S19})
 
     async def _drive() -> "tuple[list[str], list[str], str, int, str]":
@@ -381,13 +383,19 @@ def test_tc1804_builder_palette_select_and_config_row_gate(tmp_path: Path) -> No
                 value for _label, value in FlowBuilderPanel._KIND_OPTIONS
             ]
 
-            from textual.widgets import Button, Input, Select, Static
+            from textual.widgets import Button, Input, Static
 
-            app.query_one("#flow_kind", Select).value = BLOCK_EXTERNAL_STEP
-            await pilot.pause()
+            chip = app.query_one(f"#flow_palette_{BLOCK_EXTERNAL_STEP}", Button)
+            chip.press()
+            for _ in range(25):
+                await pilot.pause()
+                if chip.has_class("chip-selected"):
+                    break
+            else:
+                raise AssertionError("the EXT-STEP chip did not become selected")
             ext_row_visible = app.query_one("#flow_ext_row").display
             ref_hidden = not app.query_one("#flow_ref", Input).display
-            session_text = app.query_one("#flow_ext_session", Static).render().plain
+            session_text = app.query_one("#flow_name_strip", Static).render().plain
 
             # Refused: the MANDATORY log is empty.
             app.query_one("#flow_ext_instruction", Input).value = "make flash"
@@ -404,7 +412,7 @@ def test_tc1804_builder_palette_select_and_config_row_gate(tmp_path: Path) -> No
             app.query_one("#flow_add", Button).press()
             await pilot.pause()
             accepted_count = len(panel._blocks)
-            canvas = app.query_one("#flow_canvas", Static).render().plain
+            canvas = app.query_one("#flow_pipeline", Static).render().plain
             return (
                 palette_kinds,
                 kind_values,
@@ -420,15 +428,14 @@ def test_tc1804_builder_palette_select_and_config_row_gate(tmp_path: Path) -> No
 
     # batch-97 Inc-5 (named supersession): the palette offers every kind of
     # ``_KIND_OPTIONS`` (LLR-146.2); the refusal is English (LLR-146.7); the
-    # session path rides the ribbon and ``#flow_ext_session`` stays mounted,
-    # hidden, in English (LLR-146.11).
+    # session path rides the ribbon, in English (LLR-146.11).
     assert palette_kinds == kind_values
     assert BLOCK_EXTERNAL_STEP in kind_values
     assert "log file is required" in notice and "refused" in notice
     assert counts == 1  # 0 kept after the refusal, 1 after the accept
     assert gates == "1"  # config row shown, plain ref hidden
-    assert session_text.startswith("session: ")
-    assert "EXT-STEP" in canvas and "TERMINAL" in canvas
+    assert "session" in session_text and project.name in session_text, session_text
+    assert "EXT-STEP" in canvas and f"{EXTERNAL_MODE_TERMINAL} · human" in canvas
 
 
 def test_tc1804_fx_lane_pause_confirm_rerun(tmp_path: Path) -> None:

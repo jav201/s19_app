@@ -4,3 +4,4 @@ E3 round-2 correction 2026-11-06T21:34Z model=opus base=2d1e2b1 records only (no
 E3 closed 2026-11-06T21:36Z orchestrator (see inc-12/E3-rulings.md, round-2 correction check); E4 after Inc 9 merges
 E4 start 2026-11-06T22:26Z implementer model=deepseek-v4-pro (G4 flow_screens.py) testers=sonnet x2 (G-T3 re-points 39 nodes in 13 files; G-T4 new file); branch b101-inc12b from b101-inc12 8a25e5f + main 2f54c7d (Inc 9 in)
 E4 implementer end 2026-11-06T22:37Z model=deepseek-v4-pro (G4 flow_screens.py: exit 0, -511/+30 lines; 2 minor deviations: extra stale comments fixed, dict(_KIND_OPTIONS).values() idiom)
+E4 testers end 2026-11-06T22:52Z model=sonnet x2: G-T3 39 re-pointed nodes in 13 files, 54 passed on base 2f54c7d + oracle controls RED; G-T4 4 nodes (3 RED, 1 standing)

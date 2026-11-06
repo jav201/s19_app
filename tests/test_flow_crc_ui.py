@@ -17,8 +17,8 @@ from pathlib import Path
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.flow_screens import (
     FlowBuilderPanel,
-    _flow_block_label,
     _make_flow_block,
+    pipeline_text,
 )
 from s19_app.tui.services.flow_model import (
     BLOCK_CRC,
@@ -88,7 +88,12 @@ def test_tc356_crc_in_dropdown_and_builder() -> None:
     block = _make_flow_block(BLOCK_CRC, "crc.json")
     assert isinstance(block, CrcBlock)
     assert block.config_ref == "crc.json"
-    assert _flow_block_label(block) == "CRC  crc.json"
+    # Inc 12b: the CRC card of the pipeline names the kind and holds the ref
+    # (was the one-line list label ``CRC  crc.json``).
+    card = pipeline_text([block], 24).plain.splitlines()
+    assert "⊕ CRC" in card[1]
+    assert any("in · tpl" in line for line in card)
+    assert any("crc.json" in line for line in card)
     # empty ref no-ops (panel contract)
     assert _make_flow_block(BLOCK_CRC, "   ") is None
 
@@ -113,15 +118,15 @@ def test_at128_crc_node_renders_and_shows_status(tmp_path: Path) -> None:
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(80, 24)) as pilot:
             await pilot.pause()
-            # pre-run block list carries the CRC label + config_ref (LLR-093.2)
+            # pre-run pipeline carries the CRC card + config_ref (LLR-093.2)
             app.current_project_dir = project
             await pilot.press("8")
             await pilot.pause()
             panel = app.query_one("#flow_panel", FlowBuilderPanel)
             panel._blocks = list(blocks)
-            panel.query_one("#flow_blocks", Static).update(panel._blocks_text())
+            panel._refresh_blocks()
             await pilot.pause()
-            blocks_list = _node_text(app.query_one("#flow_blocks", Static))
+            blocks_list = _node_text(app.query_one("#flow_pipeline", Static))
             # run and read the result nodes
             app.query_one("#flow_run", Button).press()
             await pilot.pause()
@@ -143,5 +148,5 @@ def test_at128_crc_node_renders_and_shows_status(tmp_path: Path) -> None:
     assert any(
         "injected" in s and "CRC" in s for s in summaries
     ), f"no CRC injection summary; summaries={summaries}"
-    # The pre-run block list surfaces the CRC label + its config_ref (LLR-093.2).
+    # The pre-run pipeline surfaces the CRC card + its config_ref (LLR-093.2).
     assert "CRC" in blocks_list and "crc.json" in blocks_list, blocks_list

@@ -12,7 +12,7 @@ import asyncio
 import json
 from pathlib import Path
 
-from textual.widgets import Button, Input, Select, Static
+from textual.widgets import Button, Input, Static
 
 from s19_app.core import S19File
 from s19_app.tui.app import S19TuiApp
@@ -109,8 +109,17 @@ async def _wait_prefill(app: S19TuiApp, pilot, expected: str) -> None:
             return
     raise AssertionError(f"save-name prefill {expected!r} did not land")
 
-def _add_ref_block(app: S19TuiApp, kind: str, ref: str) -> None:
-    app.query_one("#flow_kind", Select).value = kind
+async def _add_ref_block(app: S19TuiApp, pilot, kind: str, ref: str) -> None:
+    """Choose ``kind`` by pressing its chip (waiting for the chip's
+    ``chip-selected`` mark, the visible sign), type ``ref`` and press Add."""
+    chip = app.query_one(f"#flow_palette_{kind}", Button)
+    chip.press()
+    for _ in range(25):
+        await pilot.pause()
+        if chip.has_class("chip-selected"):
+            break
+    else:
+        raise AssertionError(f"the {kind} chip did not become selected")
     app.query_one("#flow_ref", Input).value = ref
     app.query_one("#flow_add", Button).press()
 
@@ -144,19 +153,21 @@ def test_at_b94_15_fb_a_surface_and_wired_patch_run(tmp_path: Path) -> None:
                 button.id.removeprefix("flow_palette_")
                 for button in app.query("#flow_palette Button")
             ]
-            empty_canvas, _ = _painted_static(app, "#flow_canvas")
-            assert "(empty canvas" in empty_canvas
+            empty_chain, _ = _painted_static(app, "#flow_pipeline")
+            assert "No blocks yet" in empty_chain
 
-            _add_ref_block(app, "source", "prg.s19")
+            await _add_ref_block(app, pilot, "source", "prg.s19")
             await pilot.pause()
-            _add_ref_block(app, "patch", "hotfix.json")
+            await _add_ref_block(app, pilot, "patch", "hotfix.json")
             await pilot.pause()
-            _add_ref_block(app, "write_out", "out.s19")
+            await _add_ref_block(app, pilot, "write_out", "out.s19")
             await pilot.pause()
 
-            canvas, _ = _painted_static(app, "#flow_canvas")
+            canvas, _ = _painted_static(app, "#flow_pipeline")
             screen = app.query_one("#screen_flow")
-            canvas_region = app.query_one("#flow_canvas").region
+            rail = app.query_one("#flow_pipeline_scroll")
+            rail_width = rail.region.width
+            chain_width = app.query_one("#flow_pipeline").region.width
             app.query_one("#flow_run", Button).press()
             for _ in range(30):
                 await pilot.pause()
@@ -164,27 +175,29 @@ def test_at_b94_15_fb_a_surface_and_wired_patch_run(tmp_path: Path) -> None:
                 palette_kinds,
                 canvas,
                 (screen.region.width, screen.region.height),
-                canvas_region.width,
+                (rail_width, chain_width),
             )
 
-    palette_kinds, canvas, screen_box, canvas_width = asyncio.run(_drive())
+    palette_kinds, canvas, screen_box, (rail_width, chain_width) = asyncio.run(_drive())
 
     # batch-97 Inc-5 (LLR-146.2, named supersession): the palette offers every
     # kind of ``_KIND_OPTIONS`` in its order (was the four fb_a types).
     assert palette_kinds == [kind for _label, kind in FlowBuilderPanel._KIND_OPTIONS]
-    # Box-drawn blocks with typed stubs and >=1 cable run (fb_a geometry).
+    # Boxed cards with typed in / out rows and >=1 cable run (the pipeline
+    # that replaced the batch-94 canvas, Inc 12b named supersession: the
+    # canvas glyphs for stubs, bends and grid dots went with the canvas).
     assert "PATCH" in canvas and "WRITE-OUT" in canvas
-    assert "prg.s19" in canvas  # SOURCE chip
-    assert "┌" in canvas and "┐" in canvas and "└" in canvas  # framed canvas + bends
-    assert "┤" in canvas and "├" in canvas  # typed in/out stubs
-    assert "─" in canvas and "│" in canvas  # the cable run
-    assert "·" in canvas  # grid dots
-    assert all(len(line) <= 88 for line in canvas.splitlines())
+    assert "prg.s19" in canvas  # SOURCE card
+    assert "╭" in canvas and "╮" in canvas and "╰" in canvas and "╯" in canvas  # the cards
+    assert "in · " in canvas and "out" in canvas  # typed in / out rows
+    assert "─" in canvas and "│" in canvas and "▶" in canvas  # the cable run
+    assert canvas.count("╭") == 3 and canvas.count("▶") == 2  # 3 cards, 2 cables
+    assert all(len(line) <= chain_width for line in canvas.splitlines())
     # The boxed budget: the screen is the measured 96x18 at 120x30 and the
-    # canvas paints inside it (C-23 measured, C-32 painted oracle).
+    # chain paints inside it (C-23 measured, C-32 painted oracle).
     # batch-97 Inc-8 (LLR-150.6, named supersession): the two-row key bar costs one row: 96x17.
     assert screen_box == (96, 17), screen_box
-    assert canvas_width <= 96
+    assert rail_width <= 96
     # The wired run wrote the patched image: 100% of the declared addresses.
     mem_map = _reload(project / "out.s19")
     assert mem_map[0x1000] == 0x01
@@ -211,9 +224,9 @@ def test_at_b94_16_a2b_wiring_rule_and_report_provenance(tmp_path: Path) -> None
             await _show_flow(app, pilot, project)
             panel = app.query_one("#flow_panel", FlowBuilderPanel)
 
-            _add_ref_block(app, "source", "prg.s19")
+            await _add_ref_block(app, pilot, "source", "prg.s19")
             await pilot.pause()
-            _add_ref_block(app, "patch", "hotfix.json")
+            await _add_ref_block(app, pilot, "patch", "hotfix.json")
             await pilot.pause()
 
             # Refused wiring: both inputs external.
@@ -237,7 +250,7 @@ def test_at_b94_16_a2b_wiring_rule_and_report_provenance(tmp_path: Path) -> None
             await pilot.pause()
             accepted_blocks = len(panel._blocks)
             notice_hidden = not app.query_one("#flow_wiring_notice", Static).display
-            canvas, _ = _painted_static(app, "#flow_canvas")
+            canvas, _ = _painted_static(app, "#flow_pipeline")
 
             app.query_one("#flow_run", Button).press()
             for _ in range(30):
@@ -261,7 +274,7 @@ def test_at_b94_16_a2b_wiring_rule_and_report_provenance(tmp_path: Path) -> None
 
     assert "refused" in refused_text
     assert refused_state == 1002  # 2 blocks kept + the notice was visible
-    assert "#2.out" in canvas  # the accepted flow binding paints on the canvas
+    assert "#2.out" in canvas  # the accepted flow binding paints on the A2B card
     assert len(provenance) == 2, provenance
     assert any("[flow]" in ln and "block 2 (patch).out" in ln for ln in provenance)
     assert any("[external]" in ln and "base.s19" in ln for ln in provenance)
@@ -286,9 +299,9 @@ def test_at_b94_17_template_save_listing_import_and_dedup(tmp_path: Path) -> Non
             await pilot.pause()
             await _show_flow(app, pilot, project)
             panel = app.query_one("#flow_panel", FlowBuilderPanel)
-            _add_ref_block(app, "source", "prg.s19")
+            await _add_ref_block(app, pilot, "source", "prg.s19")
             await pilot.pause()
-            _add_ref_block(app, "patch", "hotfix.json")
+            await _add_ref_block(app, pilot, "patch", "hotfix.json")
             await pilot.pause()
 
             # Save "chain1" through the real button + modal.
@@ -302,7 +315,7 @@ def test_at_b94_17_template_save_listing_import_and_dedup(tmp_path: Path) -> Non
             strip, _ = _painted_static(app, "#flow_name_strip")
 
             # Second save under the SAME name (a write-out variant flow).
-            _add_ref_block(app, "write_out", "out.s19")
+            await _add_ref_block(app, pilot, "write_out", "out.s19")
             await pilot.pause()
             app.query_one("#flow_save", Button).press()
             await _wait_prefill(app, pilot, "chain1")
@@ -343,8 +356,8 @@ def test_at_b94_17_template_save_listing_import_and_dedup(tmp_path: Path) -> Non
 
 def test_at_b94_18_hostile_names_render_literally(tmp_path: Path) -> None:
     """AT-B94-18 (HLR-016, black-box, C-17): the batch-77 hostile payload in a
-    bound file name renders literally on the canvas (sentinel visible, markup
-    literal, 0 control bytes) and a Windows-legal hostile name reaches the
+    bound file name renders literally on the pipeline card (sentinel visible,
+    markup literal, 0 control bytes, no style span from the input) and a Windows-legal hostile name reaches the
     emitted report with the sentinel visible, the Mode-A label escaped and 0
     control bytes. Two app sessions: the full payload never runs (its file
     does not exist), the report arm uses the legal on-disk name."""
@@ -353,12 +366,12 @@ def test_at_b94_18_hostile_names_render_literally(tmp_path: Path) -> None:
         {"prg.s19": _S19, _HOSTILE_FILE_NAME: _S19, "hotfix.json": _patch_json()},
     )
 
-    async def _drive_canvas() -> str:
+    async def _drive_canvas() -> "tuple[str, list]":
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(120, 30)) as pilot:
             await pilot.pause()
             await _show_flow(app, pilot, project)
-            _add_ref_block(app, "source", "prg.s19")
+            await _add_ref_block(app, pilot, "source", "prg.s19")
             await pilot.pause()
             # The full hostile payload (control bytes + markup) as the file
             # input — refused bindings never paint, so pair it with a legal
@@ -372,15 +385,16 @@ def test_at_b94_18_hostile_names_render_literally(tmp_path: Path) -> None:
             app.query_one("#flow_ref_b", Input).value = _HOSTILE_SYMBOL.replace("\x00", "")
             app.query_one("#flow_add", Button).press()
             await pilot.pause()
-            canvas, _spans = _painted_static(app, "#flow_canvas")
-            return canvas
+            # The whole scrubbed payload fits the card at 120x30 (two cards),
+            # so the card holds it uncut (E3 S2-2); the node checks that below.
+            return _painted_static(app, "#flow_pipeline")
 
     async def _drive_report() -> str:
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(120, 30)) as pilot:
             await pilot.pause()
             await _show_flow(app, pilot, project)
-            _add_ref_block(app, "source", "prg.s19")
+            await _add_ref_block(app, pilot, "source", "prg.s19")
             await pilot.pause()
             app.query_one("#flow_palette_a2b", Button).press()
             await pilot.pause()
@@ -395,15 +409,29 @@ def test_at_b94_18_hostile_names_render_literally(tmp_path: Path) -> None:
             assert reports, "the runnable hostile-name arm must emit a report"
             return reports[-1].read_bytes().decode("utf-8")
 
-    canvas = asyncio.run(_drive_canvas())
+    canvas, canvas_spans = asyncio.run(_drive_canvas())
     report_text = asyncio.run(_drive_report())
 
-    # Canvas: sentinel visible, brackets literal, 0 control bytes. (The canvas
-    # legitimately carries STYLE spans — box-art colours — so the markup
-    # census is the AST scan in test_tc_042_10, not a span emptiness check.)
+    # Pipeline card: sentinel visible, brackets literal, 0 control bytes. (The
+    # card legitimately carries STYLE spans — rules and colours — so the
+    # markup census is the AST scan in test_tc_042_10; here the input's own
+    # text must sit under ONE span style, never a style it parsed out of the
+    # brackets.) The input's text is cut by no span, and one span covers it
+    # exactly (the card's value style).
+    # The control bytes are deleted on the way to the card (C0, DEL, C1); the
+    # markup text and the sentinel stay.
+    scrubbed = "".join(
+        c for c in _HOSTILE_SYMBOL if not (ord(c) < 0x20 or 0x7F <= ord(c) < 0xA0)
+    )
     assert _SENTINEL in canvas
     assert "_evil[red]" in canvas  # literal brackets, never parsed
+    assert scrubbed in canvas, "the scrubbed payload is not whole on the card"
     assert _control_bytes(canvas) == []
+    start = canvas.index(scrubbed)
+    stop = start + len(scrubbed)
+    cutting = [s for s in canvas_spans if start < s.start < stop or start < s.end < stop]
+    exact = [s for s in canvas_spans if (s.start, s.end) == (start, stop)]
+    assert cutting == [] and len(exact) == 1, (cutting, exact)
     # Report: sentinel visible, the Mode-A label escaped, 0 control bytes
     # (over the newline-normalized bytes — the CRLF convention is the
     # producer's own).
@@ -435,10 +463,10 @@ def test_at_b94_18_hostile_names_render_literally(tmp_path: Path) -> None:
 
 def test_tc_b94_20_fb_a_composition_census(tmp_path: Path) -> None:
     """TC-B94-20 (LLR-013.1, white-box census): the reworked panel composes
-    exactly ONE palette rail (carrying the three placeable types), ONE framed
-    canvas; a source + two box blocks render >=1 cable run with typed stubs
-    inside the boxed 96x18 at 120x30; the empty canvas renders the fb_a empty
-    state; the panel also composes at the 80x24 floor (C-29 overflow scrolls,
+    exactly ONE palette rail (carrying the three placeable types), ONE
+    pipeline of cards; a source + two cards render >=1 cable run with typed
+    in / out rows inside the boxed 96x18 at 120x30; the empty chain renders
+    the empty state; the panel also composes at the 80x24 floor (C-29 overflow scrolls,
     no exception)."""
     project = _project(tmp_path)
 
@@ -449,47 +477,49 @@ def test_tc_b94_20_fb_a_composition_census(tmp_path: Path) -> None:
             await _show_flow(app, pilot, project)
             palette_count = len(app.query("#flow_palette"))  # one rail…
             palette_buttons = len(app.query("#flow_palette Button"))
-            canvas_count = len(app.query("#flow_canvas"))
+            canvas_count = len(app.query("#flow_pipeline"))
             if size == (120, 30):
-                empty_canvas, _ = _painted_static(app, "#flow_canvas")
-                assert "(empty canvas" in empty_canvas
-            _add_ref_block(app, "source", "prg.s19")
+                empty_chain, _ = _painted_static(app, "#flow_pipeline")
+                assert "No blocks yet" in empty_chain
+            await _add_ref_block(app, pilot, "source", "prg.s19")
             await pilot.pause()
-            _add_ref_block(app, "patch", "hotfix.json")
+            await _add_ref_block(app, pilot, "patch", "hotfix.json")
             await pilot.pause()
-            _add_ref_block(app, "write_out", "out.s19")
+            await _add_ref_block(app, pilot, "write_out", "out.s19")
             await pilot.pause()
-            canvas, _ = _painted_static(app, "#flow_canvas")
+            canvas, _ = _painted_static(app, "#flow_pipeline")
+            rail = app.query_one("#flow_pipeline_scroll")
             return (
                 palette_count,
                 palette_buttons,
                 canvas_count,
                 canvas,
-                app.query_one("#flow_canvas").region.width,
+                (rail.region.width, app.query_one("#flow_pipeline").region.width),
             )
 
-    palette_count, palette_buttons, canvas_count, canvas, canvas_width = asyncio.run(
+    palette_count, palette_buttons, canvas_count, canvas, (rail_width, chain_width) = asyncio.run(
         _drive((120, 30))
     )
     assert palette_count == 1  # one palette rail…
     # batch-97 Inc-5 (LLR-146.2, named supersession): …carrying one chip per
     # kind of ``_KIND_OPTIONS`` (was the four fb_a types of ``_PALETTE_TYPES``,
-    # retired with the canvas from view); the canvas stays mounted, hidden,
-    # and is still painted (its text is read below).
+    # retired with the canvas from view); Inc 12b (named supersession): the
+    # canvas left with them and the pipeline of cards is the one chain view.
     assert palette_buttons == len(FlowBuilderPanel._KIND_OPTIONS) == 7
-    assert canvas_count == 1  # …one framed canvas
+    assert canvas_count == 1  # …one pipeline
     assert {kind for _label, kind in FlowBuilderPanel._KIND_OPTIONS} >= {
         BLOCK_PATCH,
         BLOCK_CRC,
         BLOCK_A2B,
         BLOCK_EXTERNAL_STEP,
     }
-    # The source chip + two box blocks render >=1 cable run with typed stubs,
-    # inside the boxed budget.
-    assert "┤" in canvas and "├" in canvas
-    assert "└" in canvas and "┘" in canvas  # the bend glyphs of a cable run
-    assert canvas_width <= 96
-    assert all(len(line) <= 88 for line in canvas.splitlines())
+    # The source card + two cards render >=1 cable run with typed in / out
+    # rows, inside the boxed budget.
+    assert "in · " in canvas and "out" in canvas
+    assert "╰" in canvas and "╯" in canvas and "▶" in canvas  # cards and cables
+    assert canvas.count("╭") == 3 and canvas.count("▶") == 2
+    assert rail_width <= 96
+    assert all(len(line) <= chain_width for line in canvas.splitlines())
     # The 80x24 floor composes and paints without exception (run_test raises
     # on mount/paint errors).
     small_palette, small_buttons, small_canvas, small_text, _ = asyncio.run(
