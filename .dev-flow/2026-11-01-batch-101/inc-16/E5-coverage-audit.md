@@ -283,3 +283,96 @@ Executor: qa-reviewer (E5 audit), on Windows. Read-only `git show`, `git log`, `
   - **Test names:** the record's 44 N names equal the 44 `def test_r_doc_*` in the file.
 
 **What these inspections cannot cover:** they are not pytest runs and not the validator run. They read committed blobs, so they say nothing about an uncommitted working-tree change; the only uncommitted change is `steps.log`.
+
+## Re-audit
+
+**Mode: validation (a re-audit of the changed items only).** The auditor (qa-reviewer, E5) re-checks only what the corrective pass touched: C-2 (DEV.8/1, the new DEV.8/2), C-3 (DEV.8/1, DEV.15/1), C-4 (DEV.11/1), C-5 (ARCH.4/2), C-8 (REF.5/1 and the instrument line it adds to REF.5/2, ARCH.1/2, DEV.1/1, ARCHIVE.2/2), C-9 (ARCH.1/2, ARCHIVE.1/2, ARCHIVE.2/1, ARCHIVE.2/2), and whether C-1 moved every other mark to the audited value with a cited run and a control. Commit `5b45b1b` on branch `b101-inc16`; the worktree is clean. Inputs: `E5-rulings.md`, `E5-corrective-notes.md`, `E5-mutants.md`, `01-requirements.md`, `02-test-cases.md`, the diff `b843fc6..5b45b1b`, and `evidence/inc-16/e5c-01.txt` … `e5c-10.txt` and `mut-NN.txt`. No pytest ran and nothing imported `s19_app`; the inspections of Appendix B are labelled as inspections.
+
+### R.1 Verdict
+
+**PASS-WITH-NOTES. Marks I would change: none.**
+
+- **Every touched case carries the right mark and cites a transcript.** The new and changed guard nodes have their own controls in `e5c-01` … `e5c-04`, and each fix is shown twice: RED under the corrected guard, and GREEN (or RED, for a hard-coded count) under the guard of `b843fc6`. The four E5-T cases cite `e5c-05` … `e5c-08`, and their oracles cite `e5c-09`.
+- **The E5 transcripts ran on the corrective tree before the commit.** Appendix B re-derives the four E5-T results at `5b45b1b` itself, and they match the transcripts exactly.
+- **C-1 is complete.** 53 of 53 cases read `covered` and `verified`. Each one names its run (`e5c-10`, or its own E5-T transcript) and a control. The 29 controls the first audit marked pending now cite their `mut-NN` row, mapped by requirement; I checked all 33 rows of `E5-mutants.md` against the case cells.
+- **ARCH.5/2 should not become `partial`.** Reasons are in R.3.
+
+### R.2 Per case
+
+| Case | Ruling | Mark / coverage | Result and control | Re-audit |
+|---|---|---|---|---|
+| DEV.8/1 | C-2, C-3 | full / covered | `e5c-10`; `mut-16`; `e5c-01` M-1 RED, P-1 GREEN, P-1/old RED (`4 == 3`) | right. The hard count is gone, and `assert declared` keeps the set from being empty. |
+| DEV.8/2 (new) | C-2 | full / covered | `e5c-10`; `e5c-01` M-2, M-3, M-4 RED, P-1 GREEN | right. The case text matches the node (one sentence, set equality on both sets). The requirement row and its control column were widened, and the base 2/3 and 2/3 hold (B.3). |
+| DEV.15/1 | C-3 | full / covered | `e5c-10`; `mut-23`; `e5c-01` M-5, M-6 RED, P-2 GREEN, P-2/old RED (`16 == 15`) | right. |
+| DEV.11/1 | C-4 | full / covered | `e5c-10`; `mut-19`; `e5c-02` M-7 RED (and GREEN under the E4 guard, so F-3 is shown), M-8, M-9, M-10 RED | right. The 13th label is read as text from `app.py`, and the check is bound to the one shell item. The base "9/13" holds inside that item too (B.3). |
+| ARCH.4/2 | C-5 | full / covered | `e5c-10`; `e5c-03` M-11 RED, P-3 GREEN, P-3/old RED | right. The node no longer reads the docstring, and R-DOC-ARCH.4 never stated that clause, so dropping it leaves the row whole. Backlog row I-7 tells Inc 9. Its second clause (`flow_screens → services/flow_model`) has no RED of its own; the literal occurs once at base (B.4). |
+| REF.5/1 | C-8 | A full / covered | `e5c-10`; `mut-05`; `e5c-04` M-12 RED and GREEN under the E4 test, M-13 RED | right. A shape excuses only its own occurrence, and the phrase shapes stay per line, as CTX-DOCHYG defines them ("or on a line that holds …"). |
+| REF.5/2 | C-8 (added line) | A full / covered | `e5c-10`; `e5c-04` M-14 RED | right. |
+| ARCH.1/2 | C-8, C-9 | E5-T / covered | `e5c-05` PASS; `e5c-09` O-1 FAIL as expected | right. The expected text equals the V8 output. The validator hash in `e5c-05` equals the installed validator's. V8's inputs do not change between the transcript and the commit (B.2). |
+| DEV.1/1 | C-8 | full / covered | `e5c-10`; `mut-08` | right. The text is the wording proposed in C-6 of the first audit. |
+| ARCHIVE.1/2 | C-9 | E5-T / covered | `e5c-06` 3/3; `e5c-09` O-2 | right. It holds at `5b45b1b` (B.2). |
+| ARCHIVE.2/1 | C-9 | E5-T / covered | `e5c-07` 368/368; `mut-31`; `e5c-09` O-3 | right. 478 lines removed, 368 in scope, all 368 found at `5b45b1b` (B.2). |
+| ARCHIVE.2/2 | C-8, C-9 | E5-T / covered | `e5c-08`; `e5c-09` O-4 | right. The case states the grammar, corpus and expected set of C-5 in the first audit. At `5b45b1b`: 1,733 files, 49 ids, new = {`LLR-155.1..155.4`} (B.2). |
+| README.4/4 | C-1 (audit C-2) | N partial + G14 partial / covered | `e5c-10`; `mut-07` (G14) | right. |
+
+**Controls carried over from `mut-NN` onto changed nodes.** `mut-NN` ran on the E4 tree. For every node the corrective pass changed, a re-run in `e5c-01` … `e5c-04` replaces it. Two cells still rest on code reading:
+
+- **REF.6/1 (`mut-06`).** The CDFX branch of `_live_token_findings` is unchanged and returns before the changed s19tool step.
+- **ARCHIVE.4/1 (`mut-33`).** The F-9 edit only removes `root` from the name set. The `mut-33` hit is the drive-letter path form (R-DOC-ARCHIVE.4 "No: 1 — the drive-letter cloud-folder path"), and that edit does not touch it.
+
+### R.3 ARCH.5/2: keep `full` / `covered`
+
+- **What `partial` means here.** In this record, `partial` means the test asserts only part of the expected result. The node asserts all three clauses: twelve present and ten absent, `saved file` in 5/5 Shape cells, and every `Frozen?` cell either `no` or the `batch_id`. `_interfaces_table` fixes the five-column header, so `row[3]` is Shape and `row[4]` is `Frozen?`.
+- **What is actually missing.** The case lacks a cited negative control for its own clauses. That is a gap in control evidence, not in assertion coverage. Marking it `partial` would mix the two, and would also be inconsistent with other cases in the same class: the second clauses of ARCH.4/2 and ARCH.6/1 have no RED of their own either, and `mut-29` fires ARCH.6/1's first clause.
+- **What the inspection shows.** Calling the committed node in-process on mutated map text, as an inspection (B.1), turns every assertion RED.
+- **How to close it.** Choose one:
+  - Run the four text mutations of B.1 as cited rows on the LAN host. This is cheap and matches C-1's standard that a control cites a run.
+  - Have the orchestrator rule that inspection B.1 is accepted.
+
+  Until one of these happens, the Result cell's disclosure ("its own three clauses were not mutated") is accurate and should stay.
+
+### R.4 Notes (no mark change)
+
+- **N-1, record.** The `02-test-cases.md` header names the runs but not who executed them. The executors are named only in `E5-corrective-notes.md` §4 (the E5 corrective pass for `e5c-*`) and `E5-mutants.md` (the E5 mutant worker for `mut-NN`). One phrase in the header would close it.
+- **N-2, evidence binding.** `e5c-10`'s tree binds to `5b45b1b` by path count and the notes, not by hash:
+  - It staged 133 paths. The commit has 134 against `c2cba35`; the extra one is `e5c-10.txt`.
+  - The controls staged 124 paths. The extra 9 are `e5c-01` … `e5c-09`.
+  - Every assertion message quoted in `e5c-01` … `e5c-04` occurs in the committed guards.
+
+  The index trees `1ec14f22` and `e661d717` are not in the local object store. Printing the blob ids of the guard files would make the binding checkable.
+- **N-3, carried over (not this pass's scope).** C-7 of the corrective notes leaves Inc 15's helper copy in `tests/test_suite_hygiene.py` still exposed to `root`. That item is correctly recorded as open there.
+
+### Appendix B — inspections (re-audit)
+
+Executor: qa-reviewer, on Windows with Python 3.12. The methods were read-only `git` and text parsing under `python -I -B`, and the guard module was loaded from its file. That module imports only the standard library, so no `conftest` loaded and no pytest ran; each script asserts that `s19_app` is absent from `sys.modules`. The worktree status stayed empty throughout. The helper scripts lived outside the repository.
+
+- **B.1 — ARCH.5/2 under in-memory mutations.** Method: call `test_r_doc_arch_5_2_rail_saved_files_and_frozen_cells` with `_architecture` replaced by mutated text. Baseline GREEN.
+
+  | Mutation | Result | Assertion that fired |
+  |---|---|---|
+  | K-1: rail row, `twelve` → `ten` | RED | "does not say twelve" |
+  | K-2: rail row keeps `twelve` and adds "(formerly ten)" | RED | "still says ten" |
+  | K-3: `B100-I9` Shape cell without `saved file` | RED | "Shape cell lacks 'saved file'" |
+  | K-4: the `B97-I-1` `Frozen?` cell reads `yes` | RED | "neither 'no' nor …" |
+
+  This is not a cited run on the LAN host.
+- **B.2 — the E5-T results at `5b45b1b`.**
+  - **ARCHIVE.1/2.** `git log --follow` gives `f65d23a1 ad10fb5c 121feaaa`, `f65d23a1 b167828e 84180b4c` and `f65d23a1 41ed7c55 9fd3638b`. `git diff b843fc6 5b45b1b -- .dev-flow/design/archive/` is empty.
+  - **ARCHIVE.2/1.** Method A.2 against `5b45b1b`: 478 removed, 368 in scope, 368/368 in the archive.
+  - **ARCHIVE.2/2.** The digits-and-dots grammar over `git grep` at `5b45b1b`, with the archive file and the inc-16 folder excluded: 1,733 files, 49 ids, not found = {`LLR-155.1..155.4`}.
+  - **ARCH.1/2.** No `.py`, `.ts`, `.tsx` or `.js` path is added between `b843fc6` and `5b45b1b`; only the two existing test files are modified. No `` `x/**` `` token changes in `docs/architecture.md`. The installed validator's sha256 equals the `b197fda5…` printed in `e5c-05`.
+- **B.3 — base figures.** The committed helpers were run on the `c2cba35` blobs.
+  - **DEV.11/1:** 12 rail labels and the palette label are read. Exactly 1 shell item; 9/13 are named in it, and also in the whole §3.
+  - **DEV.8/2:** the base `pyproject.toml` markers are {`serial_timing`, `slow`, `snapshot`}. The base §8 bullets are {`slow`, `snapshot`}, and its dependency sentence names `rich` and `textual`.
+- **B.4 — literals with no RED of their own.** `flow_screens → services/flow_model` occurs once in the base map, and `≤ 5 files` occurs once. Both checks would match the base text, so neither is vacuous by construction. `mut-29` fired ARCH.6/1's first clause, not its second.
+
+**What these inspections cannot cover:** they are not pytest runs and not runs on the LAN host. B.1 shows that the node's assertions can fail, but it is not a cited control under C-1's standard.
+
+### Evidence checklist (re-audit)
+
+- ✓ The mode is declared (validation; re-audit of changed items), in the header of this section.
+- ✓ Every touched case carries a result state and a cited transcript (R.2). Executors: the E5 corrective pass (`e5c-*`), the E5 mutant worker (`mut-NN`), and qa-reviewer for the inspections (Appendix B).
+- ✓ No claim of running the suite or the controls; the inspections are labelled.
+- ✓ No real PII or secrets: no local path, account or host name is written here.
+- n/a Given/When/Then, regression and exit criteria: this is a re-audit of an existing case table.
+- n/a Layer B: a documentation increment; the guards read the shipped documents themselves.

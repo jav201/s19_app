@@ -16,3 +16,10 @@ Inputs: `E5-mutants.md` (DeepSeek: **35/35 KILLED**, every row's negative contro
 | C-10 (outside the diff) | 48 older `.dev-flow/` records hold a drive path and 14 the local account name; `BACKLOG-CODE.md` holds two cloud-drive path lines. → one backlog row (redaction pass over older batch records), flagged to the operator. | The repository is public; history keeps the text; out of this increment's rows. |
 
 Corrective: one Opus pass (docs, guard tests, records; source edits stay comment-only). Re-audit: only the cases C-2 … C-9 touched.
+
+## Re-audit rulings (2026-11-06)
+
+Re-audit: **PASS-WITH-NOTES**, no mark changed.
+
+- **RA-1 (ARCH.5/2):** stays `full`/`covered`; the three clauses' own negative controls are owed (the row's mutant was killed; the auditor's in-memory check is not a cited run and is not used as evidence). Recorded as owed in `04-validation.md` and as a backlog line. Why: the test asserts all three clauses; what is missing is a control, not coverage.
+- **RA-2 (notes):** the `02-test-cases.md` header names who ran the tests; `e5c-10` is cited by commit hash in the close records.
