@@ -27,6 +27,7 @@ Committed vs `main` (`git diff --stat main...HEAD` at `fa35466`: 99 files, +13 4
 | `s19_app/tui/a2l.py` | source | US-I11-3, US-I11-4 | `PROGRAM_TYPE_WORDS`, `MEMORY_TYPE_WORDS`, `_a2l_number`, `_memory_segment_record_words`, anchored `extract_memory_segments` with the 2^32 bound; `render_curve_description` index line (+185 / −32) |
 | `s19_app/tui/issues_view.py` | source | US-I11-2 | Batch-94 triage removed (`a2l_reclassified_severity`, `adjust_counts_for_a2l_triage`, the header note); groups paint each issue's own severity (+7 / −256) |
 | `s19_app/tui/app.py` | source | US-I11-2 | Filtered issue list sorted by severity rank (stable, unknown severities last); strip, summary and pages read true severities (+53 / −54) |
+| `tests/test_a2l_enriched.py` | test | US-I11-4 | Docstrings of three TC-682 tests name R-A2L-036.3 / R-A2L-036.6 (trace link; no assertion changed) |
 | `tests/test_b101_a2l_blocks_and_segments.py` | test | US-I11-1, US-I11-3, US-I11-4 | New G1 (+599): block names, IF_DATA skip, 37-file corpus, segment shapes, broken records, bound, regions, CURVE note |
 | `tests/test_b101_issues_severity_view.py` | test | US-I11-2, US-I11-4 | New G2 (+458): group order, header counts, colour, filters, ordering across pages, Split / Join a2l rows |
 | `tests/test_b101_inc11_acceptance.py` | test | US-I11-1, US-I11-2, US-I11-3, US-I11-4 | New G3 (+515): AT-I11-1 … AT-I11-7 through keys, dialogs and the palette |
@@ -168,7 +169,7 @@ env -u NO_COLOR python -m pytest tests/test_tui_snapshot.py -m snapshot
 
 Snapshot job (CI recipe, laptop host): before 6 failed, 23 passed; after the re-record 2 failed, 27 passed — the 2 known `patch-comfortable` nodes, which fail on `origin/main` alone (`snap-01`, `snap-05`). OR-3 freeze guards (TC-027, TC-B94-18 freeze arm, TC-031 ×2): RED on the branch by design; owed GREEN on the merged tree. Coverage after the corrective pass: 78 cases, 76 covered, 2 partial, 0 gap. Code coverage (line, branch): `not-run`.
 
-trace_check (`--req inc-11/01-requirements.md inc-11/E1-slice.md --tests tests --base b7b77c4 --src s19_app`), last line: `trace_check: 4 US, 28 active requirements (2 withdrawn), 2 gap(s)` — the 2 gaps are TEST lines: R-A2L-036.3 and R-A2L-036.6 are named by no file under `tests` (their cases run through `test_a2l_enriched.py::test_tc682_*` and G1's `test_r_a2l_036_name_first_record_line_software_a`, which do not cite the ids); 0 EVID gaps after the close files were staged
+trace_check (`--req inc-11/01-requirements.md inc-11/E1-slice.md --tests tests --base b7b77c4 --src s19_app`), last line after the orchestrator's docstring trace fix (`tests/test_a2l_enriched.py`, R-A2L-036.3 / .6): `trace_check: 4 US, 28 active requirements (2 withdrawn), 0 gap(s)`; the first run read `2 gap(s)` — the 2 gaps are TEST lines: R-A2L-036.3 and R-A2L-036.6 are named by no file under `tests` (their cases run through `test_a2l_enriched.py::test_tc682_*` and G1's `test_r_a2l_036_name_first_record_line_software_a`, which do not cite the ids); 0 EVID gaps after the close files were staged
 
 Validator (`devflow-validate.py --brief`): `4 block · 776 notice · 39 not applicable` — the 4 blocks are V20 (`.dev-flow/_derived/ATLAS-*.md`, the orchestrator's atlas regeneration); none names an Inc 11 file. Inc 11's own line is the V9 notice (4 source files, reason in §2)
 
