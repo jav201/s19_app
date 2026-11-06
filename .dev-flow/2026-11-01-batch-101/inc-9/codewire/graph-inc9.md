@@ -24,7 +24,7 @@ How to read it:
 | I-4 start name | **withdrawn** with R-FB-RUN.8 (D-2 = no, E3A-01): Clear keeps the name; `"flow"` stays only the name `FlowBuilderPanel.__init__` gives (`flow_screens.py:1535`), unchanged | — |
 | I-5 the shared guard | `workspace._guarded_destination(destination, workarea_root=None) -> (resolved_destination, resolved_root)`, unchanged; raises `WorkareaContainmentError`. The same helpers (`_path_traverses_reparse_point`, `_is_reparse_point`) serve Inc 6's pick guard and Write guard (Inc 6 E3 ruling S-3); Inc 9 changes none | `workspace.py` (not edited) → G1 |
 | I-6 Inc 8 fields | `ChainRunOutcome.in_place_inputs`, `FlowRunResult.in_place_reads` (Inc 8's I-6) kept as they are | `run_chain_set` (G1) |
-| I-7 the claim primitive | `_create_new_json(home: Path, resolved_home: Path, clean: str, render: Callable[[str], str]) -> Path` claims with `os.open(candidate, O_CREAT\|O_EXCL\|O_WRONLY\|O_BINARY)` (`O_BINARY` where the platform has it) and fills the claim through that descriptor; the cases' Create spy and Windows follow wrap this `os.open` (E3 S-2) | G1 → tests (G-T1) |
+| I-7 the claim primitive | `_create_new_json(home: Path, resolved_home: Path, clean: str, render: Callable[[str], str]) -> Path` claims with `os.open(candidate, O_CREAT\|O_EXCL\|O_WRONLY\|O_BINARY)` (`O_BINARY` where the platform has it) **with mode `0o666`** (E4-R3: `write_text`'s mode; the umask applies) and fills the claim through that descriptor; the cases' Create spy and Windows follow wrap this `os.open` (E3 S-2) | G1 → tests (G-T1) |
 
 Order inside E4: G1 and G2 in parallel; G2's app cases need G1's I-1 and I-2 at integration.
 

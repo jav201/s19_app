@@ -97,3 +97,7 @@ Run in a copy of the tree (never this worktree), one mutant at a time, with the 
 | M19 | DOSSIER (E4-R2) | `DOSSIER.md` F-45: the ` · fixed in 1.0.0` mark removed | D `doc_guide_2_1_fixed_rows_marked`, `doc_guide_2_2_no_other_row_marked` |
 
 Not a mutant: S-3's render-before-claim and write-failure arms (the graph's robustness example has no row and no node: a coverage gap for E5's audit to rule); the `ch18-flow-execution.md` sentence (no requirement row; no node reads it); the `flow_screens.py` docstring (D-8: E5's phrase check, no node); I-D9 (no row).
+
+## 6. Orchestrator follow-up after integration (2026-11-06)
+
+I-D9 ruled as **E4-R3** (`E4-rulings.md`): the claim passes mode `0o666`; cases R-FLOW-FILE.14/6 and R-FLOW-SET.8/5 added with one parametrised node in `tests/test_b101_flow_saves.py`. int-09 (LAN Linux host 2, staged tree `d1b3f7dd…`, `evidence/inc-9/int-09-e4r3.txt`): `test_b101_flow_saves`, `test_b99_staging`, `test_address_census`, `test_suite_hygiene`, `test_id_registry` — 158 passed; negative control without the mode argument — the 2 new ids fail. The `_keep_previous_manifest` default mode in `app.py` is backlog BL-I9-5.

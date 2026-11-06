@@ -408,3 +408,24 @@ def test_r_flow_set_8_4_followed_create_gets_no_byte(area, monkeypatch):
     assert (outside / "followed.json").read_bytes() == b""
     assert (home / "s.json").is_symlink()
     assert _entries(home) == ["s.json"]
+
+
+# ------------------------------------------------ E4-R3: the saved file's mode --
+
+
+@pytest.mark.skipif(os.name == "nt", reason="POSIX permission bits; Windows ignores the execute bits")
+@pytest.mark.parametrize("kind", ["flow", "set"])
+def test_r_flow_file_14_6_saved_file_mode_matches_write_text(area, kind):
+    """R-FLOW-FILE.14/6, R-FLOW-SET.8/5 (E4 ruling E4-R3): the exclusive create keeps
+    the mode a plain ``write_text`` gives a sibling file in the same folder, so a
+    saved flow or chain set is never created executable (negative control: the
+    claim without a mode argument gives ``0o777`` less the umask → RED)."""
+    _root, project, _out = area
+    if kind == "flow":
+        saved = save_flow_json(F1, "m", project)
+    else:
+        saved = save_chain_set(C1, "m", project)
+    sibling = saved.parent / "sibling.txt"
+    sibling.write_text("x", encoding="utf-8")
+    assert oct(saved.stat().st_mode & 0o777) == oct(sibling.stat().st_mode & 0o777)
+    assert saved.stat().st_mode & 0o111 == 0

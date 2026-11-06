@@ -1072,6 +1072,7 @@ def _create_new_json(
             fd = os.open(
                 candidate,
                 os.O_CREAT | os.O_EXCL | os.O_WRONLY | getattr(os, "O_BINARY", 0),
+                0o666,  # write_text's mode: the umask applies, no execute bits (E4-R3)
             )
         except FileExistsError:
             # Lost the lexists-vs-open race: the name is taken after all.
