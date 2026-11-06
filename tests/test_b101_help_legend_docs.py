@@ -1399,7 +1399,11 @@ _STALE_README = (
     "**Save patched**",
     "Flows and change-set runs can execute variant-scoped",
 )
-_CHECK_EDITOR_PHRASE = (
+# Inc 6 (D9-15): Write puts the spec in the open project's `checks/` folder;
+# the old sentence ("... common ... folder, with or without a project") is now
+# false and is pinned as stale. The present claim is read from the Write
+# sentence itself (batch-101 Inc 6 E4 addendum).
+_CHECK_EDITOR_STALE = (
     "writes the spec into the common `.s19tool/workarea/patches/` folder, "
     "with or without a project"
 )
@@ -1411,7 +1415,12 @@ def test_r_doc_readme_4_1_no_stale_claim() -> None:
     present = [phrase for phrase in _STALE_README if _flat(phrase) in text]
     assert present == [], f"stale README claims still present: {present}"
     section = _flat(_sections(_readme()).get("Check Editor", ""))
-    assert _CHECK_EDITOR_PHRASE in section, "Check Editor section lacks the present phrase"
+    assert _CHECK_EDITOR_STALE not in section, "Check Editor section keeps the stale Write sentence"
+    write_start = section.index("**Write .chk.json**")
+    write_sentence = section[write_start:].split(". ")[0]
+    assert "`checks/`" in write_sentence and "project" in write_sentence, write_sentence
+    assert "`.s19tool/workarea/patches/`" in write_sentence, write_sentence
+    assert "with or without a project" not in write_sentence, write_sentence
 
 
 def _link_targets(text: str) -> List[str]:

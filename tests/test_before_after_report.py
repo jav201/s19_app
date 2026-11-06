@@ -325,10 +325,13 @@ def test_at_038a_saveback_trigger_report_pair_reread_from_surfaced_path(
     offers = [
         (title, msg, sev)
         for title, msg, sev in outcomes["offer_notices"]
-        if "before_after_report" in msg
+        if title == "Before/after report"
     ]
     assert offers and offers[0][2] == "information", outcomes["offer_notices"]
     assert "press b" in offers[0][1].lower()
+    assert offers[0][1] == (
+        "Before/after report ready - press b to write it to the project reports directory."
+    ), offers[0][1]
 
     # S-F5: surfaced text carries paths/diagnostics only — no entry bytes.
     for message in outcomes["statuses"] + [m for _t, m, _s in outcomes["notices_all"]]:
