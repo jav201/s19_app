@@ -478,7 +478,7 @@ def test_r_crc_preview_002_1_image_set_cleared_replaced(tmp_path: Path) -> None:
             app.current_file = loaded(changed)
             await wait_until(
                 pilot,
-                lambda: _preview(app).split("\n")[1] == f"concat: 0x{changed_crc:08X}",
+                lambda: _preview(app).split("\n")[1:2] == [f"concat: 0x{changed_crc:08X}"],
                 lambda: f"preview after the image was replaced: {_preview(app)!r}",
                 timeout=1.0,
                 pause_first=True,

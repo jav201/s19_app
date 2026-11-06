@@ -1,0 +1,29 @@
+# batch-101 Inc 13 E4 integration - Lane 1, run 2 (after the integration fixes) - GREEN
+# Host: LAN Linux host 2 (16 cores), env s19ci (Python 3.11, pytest-xdist 3.8.0, textual 8.2.8)
+# Tree: detached worktree at origin/main f9f3cb09 (contains b7b77c4; no s19_app/ or tests/ drift from it)
+#       plus `git diff b7b77c4 -- s19_app tests` of branch b101-inc13 (38e31bf + integration edits)
+# Lines 1-5 below: remote HEAD, changed-file count, s19_app.__file__, Python version, uptime/load
+# Command: cd <HOME>/work/s19_i13 && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 2400 <HOME>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider --basetemp /tmp/pytest-s19i13 -n 12 -m "not serial_timing" tests/test_b101_designer_recompute.py tests/test_b101_split_join_band.py tests/test_b101_inc13_perf.py tests/test_crc_designer_view.py tests/test_crc_kernel.py tests/test_b101_crc_model_and_reasons.py tests/test_b100_reuse.py tests/test_b101_flow_ext_copy.py tests/test_b97_key_bar.py tests/test_b99_export.py tests/test_b99_staging.py tests/test_crc_designer_model.py tests/test_crc_job_upconvert.py tests/test_import_census.py tests/test_project_gather.py tests/test_segment_split_window.py tests/test_tui_patch_json.py tests/test_universal_paste.py tests/test_id_registry.py tests/test_suite_hygiene.py tests/test_engine_unchanged.py tests/test_requirements_canon.py tests/test_tui_directionb.py
+
+HEAD=f9f3cb09
+11
+<HOME>/work/s19_i13/s19_app/__init__.py
+3.11.18 (main, Oct 26 2026, 11:35:17) [GCC 15.3.0]
+ 18:50:38 up 10:22,  2 users,  load average: 1.14, 3.87, 2.38
+bringing up nodes...
+bringing up nodes...
+
+.s.....s....s....s.....ss.s....................................s........ [  8%]
+......................................ssss................s............. [ 17%]
+........................................................................ [ 26%]
+....s...........................................................s....... [ 35%]
+.........................................................s.............. [ 43%]
+........................................................................ [ 52%]
+........................................................................ [ 61%]
+........................................................................ [ 70%]
+........................................................................ [ 79%]
+........................................................................ [ 87%]
+........................................................................ [ 96%]
+............................                                             [100%]
+804 passed, 16 skipped in 308.76s (0:05:08)
+EXIT=0

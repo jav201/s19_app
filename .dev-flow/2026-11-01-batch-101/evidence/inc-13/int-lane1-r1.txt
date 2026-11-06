@@ -1,0 +1,253 @@
+# batch-101 Inc 13 E4 integration - Lane 1, run 1 (before the integration fixes; 3 FAILED, see E4-integration-notes)
+# Host: LAN Linux host 2 (16 cores), env s19ci (Python 3.11, pytest-xdist 3.8.0, textual 8.2.8)
+# Tree: detached worktree at origin/main f9f3cb09 (contains b7b77c4; no s19_app/ or tests/ drift from it)
+#       plus `git diff b7b77c4 -- s19_app tests` of branch b101-inc13 (branch commit 38e31bf)
+# Lines 1-5 below: remote HEAD, changed-file count, s19_app.__file__, Python version, uptime/load
+# Command: cd <HOME>/work/s19_i13 && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 2400 <HOME>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider --basetemp /tmp/pytest-s19i13 -n 12 -m "not serial_timing" tests/test_b101_designer_recompute.py tests/test_b101_split_join_band.py tests/test_b101_inc13_perf.py tests/test_crc_designer_view.py tests/test_crc_kernel.py tests/test_b101_crc_model_and_reasons.py tests/test_b100_reuse.py tests/test_b101_flow_ext_copy.py tests/test_b97_key_bar.py tests/test_b99_export.py tests/test_b99_staging.py tests/test_crc_designer_model.py tests/test_crc_job_upconvert.py tests/test_import_census.py tests/test_project_gather.py tests/test_segment_split_window.py tests/test_tui_patch_json.py tests/test_universal_paste.py tests/test_id_registry.py tests/test_suite_hygiene.py tests/test_engine_unchanged.py tests/test_requirements_canon.py tests/test_tui_directionb.py
+
+HEAD=f9f3cb09
+10
+<HOME>/work/s19_i13/s19_app/__init__.py
+3.11.18 (main, Oct 26 2026, 11:35:17) [GCC 15.3.0]
+ 18:43:21 up 10:15,  2 users,  load average: 0.06, 0.06, 0.05
+bringing up nodes...
+bringing up nodes...
+
+..s............s.s....s....s.s..s....................................... [  8%]
+..............................s...............ssss...................... [ 17%]
+.....s.................................................................. [ 26%]
+............s........................................................s.. [ 35%]
+...................................................................s.... [ 43%]
+........................................................................ [ 52%]
+........................................................................ [ 61%]
+...............................................F........................ [ 70%]
+........................F............................................... [ 79%]
+........................................................................ [ 87%]
+........................................................................ [ 96%]
+....................F.......                                             [100%]
+=================================== FAILURES ===================================
+_____________ test_tc607_scanned_corpus_matches_the_declared_bound _____________
+[gw3] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+corpus = <tests.test_id_registry._Corpus object at 0x7fc0b3573850>
+
+    def test_tc607_scanned_corpus_matches_the_declared_bound(corpus: _Corpus) -> None:
+        """TC-607 — the guard's corpus is bounded by a declared, executable constant.
+    
+        Asserting *how many files the guard opens* is deterministic where a
+        wall-clock budget would be flaky. Widening the scan — most obviously to
+        ``.dev-flow/``, which would make the guard's verdict depend on batch prose —
+        moves this count and turns the threshold red immediately.
+        """
+        actual = len(corpus.test_files)
+>       assert actual == EXPECTED_SCANNED_TEST_FILES, (
+            f"the guard scanned {actual} test modules, not the declared "
+            f"{EXPECTED_SCANNED_TEST_FILES}. If tests/ legitimately grew, bump "
+            f"EXPECTED_SCANNED_TEST_FILES in the same PR so the bound stays a "
+            f"decision rather than a rubber stamp."
+        )
+E       AssertionError: the guard scanned 256 test modules, not the declared 250. If tests/ legitimately grew, bump EXPECTED_SCANNED_TEST_FILES in the same PR so the bound stays a decision rather than a rubber stamp.
+E       assert 256 == 250
+
+tests/test_id_registry.py:513: AssertionError
+_____________ test_r_crc_preview_002_1_image_set_cleared_replaced ______________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19i13/popen-gw0/test_r_crc_preview_002_1_image0')
+
+    def test_r_crc_preview_002_1_image_set_cleared_replaced(tmp_path: Path) -> None:
+        """With the CRC Designer displayed (key ``0``): (a) the fixture image set ->
+        within 1 s the preview is exactly the three lines and window line 2 is
+        ``concat 0x9C5BCBBD   fill 0x2A8A3950``; (b) the image cleared -> within 1 s
+        preview and window both read the empty-state note exactly; (c) a second
+        image (byte ``0x8000`` = ``0xAA``) -> within 1 s ``concat: 0x<crc32 of its
+        16 range bytes>``. 3 of 3.
+    
+        Why (F-24): the panel said ``Load an image to preview coverage CRCs over
+        real bytes.`` while an image was loaded, and kept stale CRCs after an
+        unload. Negative control: the image watcher not registered -> (a) shows the
+        empty-state note -> RED."""
+        changed = fixture_mem()
+        changed[0x8000] = 0xAA
+        changed_crc = zlib.crc32(b"\xaa" + bytes(range(1, 8)) + bytes(range(0x10, 0x18)))
+    
+        async def scenario():
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                await pilot.press("0")
+                await pilot.pause()
+                app.current_file = loaded(fixture_mem())
+                await wait_until(
+                    pilot,
+                    lambda: _preview(app) == FIXTURE_PREVIEW,
+                    lambda: f"preview after the image was set: {_preview(app)!r}",
+                    timeout=1.0,
+                    pause_first=True,
+                )
+                window_set = _window_lines(app)
+                app.current_file = None
+                await wait_until(
+                    pilot,
+                    lambda: _preview(app) == EMPTY_STATE and str(_window(app)) == EMPTY_STATE,
+                    lambda: f"after the clear: {_preview(app)!r} / {str(_window(app))!r}",
+                    timeout=1.0,
+                    pause_first=True,
+                )
+                app.current_file = loaded(changed)
+                await wait_until(
+                    pilot,
+                    lambda: _preview(app).split("\n")[1] == f"concat: 0x{changed_crc:08X}",
+                    lambda: f"preview after the image was replaced: {_preview(app)!r}",
+                    timeout=1.0,
+                    pause_first=True,
+                )
+                return window_set
+    
+>       for window_set in _run(scenario):
+                          ^^^^^^^^^^^^^^
+
+tests/test_b101_designer_recompute.py:488: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_designer_recompute.py:153: in _run
+    return [asyncio.run(coro_factory()) for _ in range(reps)]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_designer_recompute.py:153: in <listcomp>
+    return [asyncio.run(coro_factory()) for _ in range(reps)]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b101_designer_recompute.py:479: in scenario
+    await wait_until(
+tests/support/timing.py:63: in wait_until
+    if predicate():
+       ^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>       lambda: _preview(app).split("\n")[1] == f"concat: 0x{changed_crc:08X}",
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        lambda: f"preview after the image was replaced: {_preview(app)!r}",
+        timeout=1.0,
+        pause_first=True,
+    )
+E   IndexError: list index out of range
+
+tests/test_b101_designer_recompute.py:481: IndexError
+______________ test_tc_b97_69_page_keys_do_nothing_where_disabled ______________
+[gw9] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19i13/popen-gw9/test_tc_b97_69_page_keys_do_no0')
+
+    def test_tc_b97_69_page_keys_do_nothing_where_disabled(tmp_path: Path) -> None:
+        """TC-B97-69 (LLR-150.4, behaviour): with an image and an A2L loaded, ``,``
+        ``.`` pressed on every window but Workspace and ``+`` ``-`` on every
+        window but A2L / MAC leave the Workspace hex window start and the A2L /
+        MAC page starts unchanged (0 changes) and none of them is a live binding
+        there (``app.active_bindings``); ``.`` on Workspace advances the
+        hex window by one page and ``+`` on A2L advances the tag page.
+    
+        RED on main (P-63): ``.`` on the Patch Editor advances the hidden hex view.
+        Mutation: drop a ``check_action`` arm.
+        """
+    
+        async def _drive():
+            app = S19TuiApp(base_dir=tmp_path)
+            changes, positives, live = [], {}, []
+            async with app.run_test(size=(118, 54)) as pilot:
+                await settle(pilot)
+                app.load_from_path(EXAMPLES_DIR / "prg.s19")
+                await settled(pilot, lambda: app.current_file is not None, "image loaded", 200)
+                app.load_a2l_from_path(DEMO_A2L)
+                await settled(pilot, lambda: bool(app.current_a2l_data), "A2L loaded", 200)
+                await settle(pilot, 3)
+                app.a2l_tags_page_size = 10
+                for window in _windows():
+                    await show(app, pilot, window)
+                    for key in ("comma", "period", "plus", "minus"):
+                        enabled = (window == "workspace") if key in ("comma", "period") else window in ("a2l", "mac")
+                        if enabled:
+                            continue
+                        app.screen.set_focus(None)
+                        if key in app.active_bindings:
+                            live.append((window, key))
+                        before = _hex_start(app)
+                        await pilot.press(key)
+                        await settle(pilot, 2)
+                        if _hex_start(app) != before:
+                            changes.append((window, key, before, _hex_start(app)))
+                await show(app, pilot, "workspace")
+                app.screen.set_focus(None)
+                before = app._hex_window_start
+                await pilot.press("period")
+                await settle(pilot, 2)
+                positives["hex"] = (before, app._hex_window_start)
+                await show(app, pilot, "a2l")
+                focus_rail(app)
+                before = app._a2l_window_start
+                await pilot.press("plus")
+                await settle(pilot, 2)
+                positives["a2l"] = (before, app._a2l_window_start)
+            return changes, positives, live
+    
+>       changes, positives, live = asyncio.run(_drive())
+                                   ^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b97_key_bar.py:746: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b97_key_bar.py:715: in _drive
+    await settled(pilot, lambda: bool(app.current_a2l_data), "A2L loaded", 200)
+tests/b97_probes.py:326: in settled
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_tc_b97_69_page_keys_do_nothing_where_disabled.<locals>._drive.<locals>.<lambda> at 0x7f2490acb2e0>
+failure = 'did not settle: A2L loaded'
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: did not settle: A2L loaded
+
+tests/support/timing.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound
+FAILED tests/test_b101_designer_recompute.py::test_r_crc_preview_002_1_image_set_cleared_replaced
+FAILED tests/test_b97_key_bar.py::test_tc_b97_69_page_keys_do_nothing_where_disabled
+3 failed, 801 passed, 16 skipped in 322.78s (0:05:22)
+EXIT=1
