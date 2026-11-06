@@ -12,3 +12,4 @@ E5 start 2026-11-06T08:38Z mutants=deepseek-v4-pro reviews=opus audit=qa-reviewe
 E5 mutants end 2026-11-06T09:10Z model=deepseek-v4-pro 35/35 killed
 E5 correction start 2026-11-06T09:22Z model=opus rulings C-1..C-10 (one pass: docs, guard tests, records)
 E5 correction end 2026-11-06T09:29Z model=opus C-1..C-10 done; e5c-10 192 passed 0 failed; controls 22/22 + oracle 4/4; cases 53 covered/verified
+E5 end 2026-11-06T09:47:41Z model=deepseek-v4-pro (records)
