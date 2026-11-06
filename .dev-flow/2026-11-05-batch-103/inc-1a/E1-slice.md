@@ -1,0 +1,104 @@
+# Inc 1a — E1 slice: every file and function to change, counted and mapped
+
+Base: product tree `e07fb00` (branch `batch-103`, `332f8ca3`). Line numbers are as of `e07fb00`. Rows: `01-requirements.md`; decisions: `E1-rulings.md` §3 (the slice follows D-1 A, D-2 A, D-3 A, D-4 A, D-5 A, D-6 B). Callers: Code-Wire v3.1.0 extractor (`git -C C:\Users\jjgh8\Github\code-wire describe --tags` = `v3.1.0`; the tag object resolves to `e436a08`, not the `ebc3bb7` the PLAN names — both are the "Merge pull request #7" commit and `git diff ebc3bb7 e436a08 -- tools/` is empty, so the extractor is the same) run on a throwaway copy of `s19_app/` with `# node:` marks above the 22 slice functions (`evidence-e1/i1a-codewire-marks.sh` → `evidence-e1/i1a-codewire-callers.txt`; its site lines are in the marked copy, each mark adding one line, so the table below gives the base lines read from the unmarked file), plus the census (C) and `git grep` for module-level names and constructions the extractor does not resolve (classes, constants, functions passed as values).
+
+## 1. Summary
+
+| File | Functions | Rows |
+|---|---|---|
+| `s19_app/tui/os_clipboard_input.py` | **removed:** `_create_tk_root`, `_TkRootSingleton` (class: `__init__`, `get_or_create`, `get_existing`), `_destroy_tk_root_singleton`, `_prime_tk_root`, `_read_via_tk`, `_write_via_tk`; constants `_TK_RETRIES`, `_TK_RETRY_DELAY_S`, `_TK_ROOT`; the `atexit` import. **changed:** `_read_via_powershell`, `_write_via_powershell`, `read_os_clipboard`, `write_os_clipboard` (docstring only), `_mirror_and_write_os_clipboard`, `OsClipboardInput.action_paste`; module-level `_STRATEGIES`, `_WRITE_STRATEGIES`, `_POWERSHELL_WRITE_COMMAND`; the module docstring and the `OsClipboardInput` class docstring. **new:** `_system_powershell`, `OsClipboardInput._on_paste` | R-TUI-043.6, .9, .10.1, .10.2, R-TUI-044.2, R-PASTE.1 … .19 |
+| `s19_app/tui/capped_text_area.py` | **changed:** `CappedTextArea.action_paste`; the module docstring | R-TUI-043.6, .10.1, .10.2, R-PASTE.18 |
+| config: `.github/workflows/clipboard-windows.yml` (**new**, D-6 B) — or, under D-6 A, a third job in `.github/workflows/tui-ci.yml` | one job `clipboard-windows`: `runs-on: windows-latest`, `timeout-minutes: 30`; triggers `pull_request` and `push` to `main`, `main-tui`, plus `workflow_dispatch`; `permissions: contents: read`; steps: checkout (`persist-credentials: false`), setup-python 3.11, `pip install -r requirements.txt`, `pytest`, `-e .`; one serial step `pytest -q -rs` over the OS clipboard test files (no `-n`: the timing arms are `serial_timing`) | R-PASTE.20 |
+
+**Totals:** **2 source files of the 4 allowed**, plus 1 config file. 6 changed functions (1 of them docstring-only: `write_os_clipboard`), 3 changed module-level values, 2 new functions; removed: 6 functions, 1 class with 3 methods, 3 constants, 1 import. Graph estimate: 8 changed or new nodes and 8 removed nodes (PLAN: ~8), under the 40 cap. Unchanged and only called or read: `_read_via_ctypes`, `_write_via_ctypes`, `_bound_clipboard_text`, `OsClipboardInput.action_copy`, `OsClipboardInput.action_cut`, `CappedTextArea._on_paste`, `CappedTextArea.action_copy`, `CappedTextArea.action_cut`, `App.copy_to_clipboard` (textual; the OSC 52 request, R-PASTE.15).
+
+Not source (optional, E4): one clause in `CLAUDE.md`'s CI sentence naming the Windows job. `tests/test_b101_doc_hygiene.py::test_r_doc_dev_3_1_ci_sentence_matches_the_workflow` checks only the branches and the two lane markers, so the clause neither breaks nor is required by it.
+
+## 2. Function map
+
+| Function | File:line (base) | Change | Rows |
+|---|---|---|---|
+| module docstring | `os_clipboard_input.py:1-71` | **changed:** the read cascade becomes Win32 → system PowerShell, the write cascade Win32 → system PowerShell, both Windows-only; no Tk layer; off Windows no OS clipboard (D-2) | — |
+| `_TK_RETRIES`, `_TK_RETRY_DELAY_S` (and their budget comment) | `:92-101` | **removed** (D-1 A); the comment keeps the ctypes and PowerShell budgets | R-TUI-043.10.1 |
+| `_POWERSHELL_WRITE_COMMAND` | `:130-136` | **changed:** no program name in it (the tail `-NoProfile -Command …Set-Clipboard`); the program comes from `_system_powershell()` at call time | R-PASTE.16 |
+| `_create_tk_root` | `:139-161` | **removed** (D-1 A, D-3 A) | R-TUI-043.10.1 |
+| `_TkRootSingleton` (`__init__` `:175-183`, `get_or_create` `:185-208`, `get_existing` `:210-213`) | `:164-213` | **removed** | R-TUI-043.10.1, R-PASTE.13 |
+| `_destroy_tk_root_singleton` | `:216-225` | **removed** (with its `atexit` registration, `:207`, and the `atexit` import, `:76`) | R-TUI-043.10.1 |
+| `_TK_ROOT` | `:228` | **removed** | — |
+| `_prime_tk_root` | `:231-241` | **removed**; its three callers drop the call (below) | R-TUI-043.10.1 |
+| `_read_via_tk` | `:244-272` | **removed** (D-1 A): 3,155 ms in the executor (B, pilot P3) | R-TUI-043.10.1, R-TUI-043.10.2 |
+| `_read_via_ctypes` | `:275-328` | unchanged (Win32 read; `''` for an empty text, handled by `read_os_clipboard`) | R-TUI-043.4, .11 |
+| `_read_via_powershell` | `:331-386` | **changed:** the argv starts with `_system_powershell()`; when that is `None` the layer returns `None` and starts nothing; the bare name `"powershell"` (`:361`) and its `FileNotFoundError` "not on PATH" branch (`:372-374`) go | R-PASTE.16, R-PASTE.17, R-TUI-043.10.2 |
+| `_write_via_ctypes` | `:389-466` | unchanged | R-PASTE.2, .11 |
+| `_write_via_tk` | `:469-490` | **removed** (D-3 A): 1,001 ms in the executor (B, pilot P3), a false success on the main thread (F §1.4 D2) | R-PASTE.13, R-PASTE.2 |
+| `_write_via_powershell` | `:493-541` | **changed:** argv = [`_system_powershell()`, …tail]; `None` → `False`, nothing started; the stdin payload, `shell=False`, hidden window and lock stay | R-PASTE.16, R-PASTE.17, R-PASTE.13 |
+| `_system_powershell` (new) | `os_clipboard_input.py`, before `_read_via_powershell` | `() -> Optional[str]`: off Windows `None`; on Windows `<system folder>\WindowsPowerShell\v1.0\powershell.exe` when that file exists, else `None`; `<system folder>` from the Windows API (not from an environment variable a caller controls; E2 picks the call). A module function, so tests can point it at a fixed path (it is also the seam the faked-`sys.platform` tests need, §5) | R-PASTE.16, R-PASTE.17 |
+| `_STRATEGIES` | `:547-551` | **changed:** `(("ctypes-win32", _read_via_ctypes), ("powershell", _read_via_powershell))` | R-TUI-043.10.1 |
+| `_WRITE_STRATEGIES` | `:558-562` | **changed:** `(("win32", _write_via_ctypes), ("powershell", _write_via_powershell))` | R-PASTE.2, .13 |
+| `_bound_clipboard_text` | `:565-598` | unchanged | R-TUI-044.2 |
+| `read_os_clipboard` | `:601-662` | **changed:** an empty text from a layer counts as no text (the cascade goes on, and `None` comes back when every layer gives none; `:652`); docstring: cascade and budget (`:626-631`) | R-TUI-043.6, R-TUI-043.12 |
+| `write_os_clipboard` | `:665-724` | docstring only (cascade `:671-673`, `:694-697`) | R-PASTE.2 |
+| `_mirror_and_write_os_clipboard` | `:727-782` | **changed:** the `_prime_tk_root()` call (`:767`) goes; the rest stays (cut, app clipboard + OSC 52 through `App.copy_to_clipboard`, the executor write, the warning and the WARNING line) | R-PASTE.3, .9, .10, .12, .13, .14, .15 |
+| `OsClipboardInput` (class docstring) | `:785-837` | **changed:** cascade words, the priming bullet (`:801-807`) | — |
+| `OsClipboardInput.action_copy` | `:839-864` | unchanged | R-PASTE.2, .3, .4, .5, .15 |
+| `OsClipboardInput.action_cut` | `:866-892` | unchanged | R-PASTE.5, .6, .7, .15 |
+| `OsClipboardInput.action_paste` | `:894-937` | **changed:** the `_prime_tk_root()` call and its comment (`:895-900`) go; the app-clipboard fallback (`:908-910`) is cut to 65,536 characters before its first line is taken (D-5 A) | R-TUI-043.4, .6, .7, .8, .10.1, .10.2, R-TUI-044.2 |
+| `OsClipboardInput._on_paste` (new) | `os_clipboard_input.py`, in the class | `(self, event: events.Paste) -> None`: cuts `event.text` to 65,536 characters in place, nothing else; the stock `Input._on_paste` runs after it through Textual's MRO dispatch (the `CappedTextArea._on_paste` pattern, `capped_text_area.py:131-165`) and inserts the first line; it must not call `super()._on_paste` (that would insert twice) | R-TUI-044.2, R-PASTE.1 |
+| module docstring | `capped_text_area.py:1-87` | **changed:** "tkinter → Win32 → PowerShell read cascade" (`:16`), the Tk priming (`:66-68`, `:75`) | — |
+| `CappedTextArea._on_paste` | `:131-165` | unchanged | R-TUI-044.2, .4 |
+| `CappedTextArea.action_paste` | `:167-237` | **changed:** the `_os_clipboard_input._prime_tk_root()` call (`:208-211`) goes; the read stays through the module namespace (`:213`, the seam the batch-67 tests patch); docstring (`:173-174`, `:191`, `:197`) | R-TUI-043.6, .10.1, .10.2, R-TUI-044.3 |
+| `CappedTextArea.action_copy`, `.action_cut` | `:239-268`, `:270-306` | unchanged | R-PASTE.2 … .8, .15 |
+
+## 3. Callers read (rule 8: read before you write)
+
+Product callers of each slice name (extractor edges, base lines; the extractor found **no** top-level site, i.e. no function outside the slice calls a slice function):
+
+| Name | Callers (base) | How known |
+|---|---|---|
+| `_mirror_and_write_os_clipboard` | `OsClipboardInput.action_copy` `:864`, `.action_cut` `:892`; `CappedTextArea.action_copy` `capped_text_area.py:268`, `.action_cut` `:306` | extractor |
+| `read_os_clipboard` | `OsClipboardInput.action_paste` `:906` (passed to `run_in_executor`); `CappedTextArea.action_paste` `capped_text_area.py:213` (as `_os_clipboard_input.read_os_clipboard`: an attribute passed as a value, which the extractor does not resolve) | extractor; `git grep` |
+| `write_os_clipboard` | `_mirror_and_write_os_clipboard` `:769` (passed to `run_in_executor`) | extractor |
+| `_prime_tk_root` (removed) | `OsClipboardInput.action_paste` `:900`, `_mirror_and_write_os_clipboard` `:767`, `CappedTextArea.action_paste` `capped_text_area.py:211` | extractor |
+| `_TkRootSingleton.get_or_create` / `.get_existing`, `_create_tk_root`, `_destroy_tk_root_singleton` (removed) | `_prime_tk_root` `:241` and `_read_via_tk` `:259`; `_write_via_tk` `:481`; `get_or_create` `:201`; the `atexit` registration `:207` | extractor |
+| `_bound_clipboard_text` | `read_os_clipboard` `:653` | extractor |
+| `_read_via_*`, `_write_via_*` | only through `_STRATEGIES` / `_WRITE_STRATEGIES` (`:547-562`), iterated by `read_os_clipboard` `:646-657` and `write_os_clipboard` `:710-716` | read (module-level values; not seen by the extractor) |
+| `OsClipboardInput.action_copy` / `.action_cut` / `.action_paste` | no product call: reached by the `Input` bindings `ctrl+c`, `ctrl+x`, `ctrl+v` (textual `widgets/_input.py:138-140`) | extractor (0 sites); read |
+| `CappedTextArea.action_*`, `._on_paste` | no product call: the `TextArea` bindings (textual `widgets/_text_area.py:374-391`) and the message pump on `events.Paste` (forwarded by `App.on_event`, textual `app.py:4142-4146`) | extractor (0 sites); read |
+| class `OsClipboardInput` | 40 constructions in `a2l_parameter_picker.py`, `app.py`, `command_bar.py`, `crc_designer_view.py`, `flow_screens.py`, `screens.py`, `screens_directionb.py` (C, part A, rows by `file:line`) | census |
+| class `CappedTextArea` | 6 constructions in `screens.py` (`:771`, `:858`, `:975`, `:3301`, `:3727`) and `segment_split_view.py:1556`; subclass `JsonHighlightTextArea` (`json_highlight.py:261`) constructed at `screens_directionb.py:5056` | census |
+| `_CLIPBOARD_CAP_CHARS` | `screens.py:49` (import), `:951`, `:1024`; `capped_text_area.py:100` | `git grep` |
+| `_CLIPBOARD_READ_CAP_CHARS` | `screens_directionb.py:119` (import), `:4553` | `git grep` |
+| `_PASTE_FAIL_NOTIFICATION` | `capped_text_area.py:101`, `:224` | `git grep` |
+
+**Public names stay stable:** every name a module outside the slice imports (`OsClipboardInput`, `_CLIPBOARD_CAP_CHARS`, `_CLIPBOARD_READ_CAP_CHARS`) keeps its name and meaning, so none of the eight importing modules changes. The removed names have no product caller outside `os_clipboard_input.py` and `capped_text_area.py` (`git grep` of `s19_app/`).
+
+## 4. Interfaces (I-1, pinned for Inc 1b, 7, 8, 9)
+
+See `E1-rulings.md` §5. In short: `read_os_clipboard`, `write_os_clipboard`, `_mirror_and_write_os_clipboard`, the four constants and `OsClipboardInput` keep their names and signatures; the Tk names are removed; off Windows the read returns `None` and the write `False` at once (D-2 A).
+
+## 5. Existing tests E4 must replace or re-point (named here; not edited at E1)
+
+| Test | Why | Action |
+|---|---|---|
+| `tests/test_clipboard_tk_singleton.py` — all 4 nodes (`test_tc1815_root_created_once_across_repeated_pastes`, `_creation_is_main_thread_only`, `_tk_unavailable_falls_through_to_other_layers`, `_shared_root_destroyed_once_at_exit`) | they test the removed Tk singleton; the first drives Ctrl+V with a fake root whose `clipboard_get` is plain Python, which is why it never paid D1's cross-thread wait | **retire** under D-1 A: the module goes and TC-1815 gets a `RETIRED` row appended to `AT-TC-REGISTRY.jsonl` (`:1505`; append-only, CLAUDE.md id rules) |
+| `tests/test_b102_clipboard.py::test_tc_b102_04_powershell_read_rescue_uses_enlarged_timeout` | asserts `argv[0] == "powershell"` (`:602`) | **re-point** to the system PowerShell (R-PASTE.16); patch `_system_powershell` (it fakes `sys.platform` to `win32` on Linux, where the Windows API is absent) |
+| `tests/test_b102_clipboard.py::test_tc_b102_05_powershell_write_rescue_uses_enlarged_timeout_via_static_stdin_command` | fakes `sys.platform`; with the resolver giving `None` off Windows it would get `written is False` | **re-point**: patch `_system_powershell`; add the argv[0] assertion |
+| `tests/test_loadfilescreen_input.py::test_powershell_layer_does_not_require_wt_or_windows_terminal` | asserts `argv[0] == "powershell"` (`:492`) | **re-point** (as TC-B102-04) |
+| `tests/test_loadfilescreen_input.py::test_powershell_layer_swallows_timeout_expired`, `::test_powershell_layer_swallows_file_not_found` | fake `sys.platform`; with the resolver giving `None` they still get `None` but no longer reach the exception path (vacuous) | **re-point**: patch `_system_powershell` so the fake `subprocess.run` is reached; the "not on PATH" case becomes "the system PowerShell vanished between the check and the start" |
+| `tests/test_b102_clipboard.py::test_tc_b102_02_write_os_clipboard_cascade_order` | injects its own `win32 / tk / powershell` strategies: it tests the loop, not the product order, and names a removed layer | keep (loop contract); optional relabel |
+| `tests/test_loadfilescreen_input.py::test_read_os_clipboard_*` (`:312-405`, `:837`) | inject `("tkinter", …)` strategies: loop contract only | keep; optional relabel |
+| `tests/test_b102_clipboard.py` TC-B102-01 (4 nodes), TC-B102-02/03/06/07/08 | stub `read_os_clipboard` / `_STRATEGIES` / `write_os_clipboard`: the stand-ins hid D1 (F §1.4) | keep as **partial** evidence; the full evidence of R-TUI-043.4, R-TUI-044.3, R-PASTE.2, .6, .9 is the WinCI cases |
+| `tests/test_universal_paste.py` AC-2 (2 nodes), `tests/test_capped_text_area.py::test_ac_1_3_*` (2), `tests/test_loadfilescreen_input.py` stubbed Ctrl+V nodes (`:224-290`, `:409-460`, `:551-585`) | stub `read_os_clipboard` | keep as partial (names stable); AC-1 census stays (complements R-TUI-044.1's census) |
+| `tests/test_tui_patch_json.py` | imports `_CLIPBOARD_READ_CAP_CHARS` only (`:107`, `:700-714`) | **no change** (name kept) |
+| `tests/test_b100_load_dialog.py` (`:2731-2840`), `tests/test_diff_same_path_guard.py` | stub `read_os_clipboard`, or mention the old cascade in a docstring | no change |
+
+## 6. New test files (proposed; E4 fixes the names)
+
+| Group | File | Holds |
+|---|---|---|
+| G-T1 core | `tests/test_b103_clipboard_core.py` | LinuxH and static cases: R-TUI-043.6/1, .7, .8, .12/1, .13, R-TUI-044.2/1–3, .4, R-PASTE.1, .3, .4, .5, .6/1, .7, .8, .9/1, .10, .11/3, .12/1, .15, .18/census, .19/1, .20/1, .21/1, .21/3, .22/1, R-TUI-043.10.1/3–4 |
+| G-T2 Windows | `tests/test_b103_clipboard_windows.py` | the WinCI cases (skipped off Windows with the reason `Windows only`) |
+| G-T3 matrix and walk | `tests/test_b103_clipboard_matrix.py` | AT-I1a-1 … 9 and the 24 walk cases (R-TUI-044.1/1–17, R-PASTE.18/1–7), on WinCI and on LinuxH |
+| support | `tests/support/b103_clipboard.py` | the isolation guard (R-PASTE.21), the probe (R-PASTE.22), other-program read / write, the held clipboard, terminal paste, typed-key time, tick lateness, the OSC 52 spy (fixtures of `02-test-cases.md`) |
+
+Every timing case is a `serial_timing` arm with its bound through `tests/support/timing.timing_bound` and its margin through `report_margin` (R-TST-002, R-TST-040/041 guards in `tests/test_suite_hygiene.py`).

@@ -1,0 +1,14 @@
+TEST   R-COPY.1 is named by no file under /tmp/b103-e1-1b/emptytests, and neither is a TC/AT id it lists
+TEST   R-COPY.10 is named by no file under /tmp/b103-e1-1b/emptytests, and neither is a TC/AT id it lists
+TEST   R-COPY.11 is named by no file under /tmp/b103-e1-1b/emptytests, and neither is a TC/AT id it lists
+TEST   R-COPY.2 is named by no file under /tmp/b103-e1-1b/emptytests, and neither is a TC/AT id it lists
+TEST   R-COPY.3 is named by no file under /tmp/b103-e1-1b/emptytests, and neither is a TC/AT id it lists
+TEST   R-COPY.4 is named by no file under /tmp/b103-e1-1b/emptytests, and neither is a TC/AT id it lists
+TEST   R-COPY.5 is named by no file under /tmp/b103-e1-1b/emptytests, and neither is a TC/AT id it lists
+TEST   R-COPY.6 is named by no file under /tmp/b103-e1-1b/emptytests, and neither is a TC/AT id it lists
+TEST   R-COPY.7 is named by no file under /tmp/b103-e1-1b/emptytests, and neither is a TC/AT id it lists
+TEST   R-COPY.8 is named by no file under /tmp/b103-e1-1b/emptytests, and neither is a TC/AT id it lists
+TEST   R-COPY.9 is named by no file under /tmp/b103-e1-1b/emptytests, and neither is a TC/AT id it lists
+EVID   no 04-validation.md beside inc-1b/01-requirements.md
+trace_check: 1 US, 11 active requirements (0 withdrawn), 12 gap(s)
+exit=1

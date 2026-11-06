@@ -8,3 +8,5 @@
 2026-11-05T11:40:57-06:00 PAUSED by operator — 'dejemos que el batch 101 termine'; E1 agents (Inc 1, 2, 4) stopped while still reading, no E1 files written; resume from E1 after batch-101 closes
 2026-11-06T15:32:42-06:00 RESUMED — operator approved amendment A1 (design/G1-amendment-A1.json): rebase, Inc 2-4 full cycle, Inc 1 split 1a/1b, no merge before v1.0.0; DeepSeek unthrottled; test scope = modified+new between increments, full suite at batch end only
 2026-11-06T15:32:42-06:00 rebase — batch-103 onto main e07fb00 (2 record commits, no conflict)
+2026-11-06T15:34:56-06:00 E1 start — Inc 1a, 1b, 2, 4 in parallel; model Opus 5.5 (architect agents, one per folder); common rules design/E1-brief-common.md; ids R-PASTE (1a), R-COPY (1b), R-A2L-DEF (2, Inc 3 continues), R-A2L-MATCH (4)
+2026-11-06T16:18:57-06:00 E1 done — Inc 1a (25 rows: 22 new, 3 changed; 111 cases), 1b (11 new; 77 cases+cells), 2 (63 new; 204 cases), 4 (36 new; 109 cases); model Opus 5.5 ×4, ~36-41 min each; orchestrator rulings appended to each E1-rulings.md; open to operator: 1b D-2, P-1 (1b D-3), branch push for 1a's Windows job

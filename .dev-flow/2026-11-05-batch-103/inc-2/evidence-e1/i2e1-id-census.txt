@@ -1,0 +1,33 @@
+# i2e1 id census — 2026-11-06T15:54:47-06:00; worktree HEAD 332f8ca3
+## grep -c 'R-A2L-DEF' REQUIREMENTS.md docs/requirements/review/*.md
+(no file holds the id)
+## grep -rl 'R-A2L-DEF' C:/Users/jjgh8/Github/s19w/review/
+(none)
+## grep -rl 'R-A2L-DEF' .dev-flow/ (excluding this increment's folder)
+(none)
+## .dev-flow/2026-11-05-batch-103/steps.log mentions (the id family assignment)
+11:2026-11-06T15:34:56-06:00 E1 start — Inc 1a, 1b, 2, 4 in parallel; model Opus 5.5 (architect agents, one per folder); common rules design/E1-brief-common.md; ids R-PASTE (1a), R-COPY (1b), R-A2L-DEF (2, Inc 3 continues), R-A2L-MATCH (4)
+## git grep R-A2L-DEF on every local b101-* branch
+b101-canon: 0 files
+b101-inc10: 0 files
+b101-inc11: 0 files
+b101-inc12: 0 files
+b101-inc13: 0 files
+b101-inc14: 0 files
+b101-inc15: 0 files
+b101-inc16: 0 files
+b101-inc2: 0 files
+b101-inc3: 0 files
+b101-inc4: 0 files
+b101-inc5: 0 files
+b101-inc6: 0 files
+b101-inc7: 0 files
+b101-inc8: 0 files
+b101-inc9: 0 files
+b101-p0: 0 files
+## max R-A2L-<n> in the canon
+R-A2L-116
+R-A2L-117
+R-A2L-118
+R-A2L-119
+R-A2L-119a

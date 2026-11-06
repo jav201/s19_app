@@ -1,0 +1,93 @@
+rc=0
+s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+case08 462  software_a 13990  software_a[1234] = 'JotafVod_msrqlLzL_kh2C_rWl_pfue._0_'
+
+=== AT-1 typing over case08, limit 5
+query='m'
+    ('MAP_0001', 'prefix', 0, [(0, 1)])
+    ('MAP_0002', 'prefix', 0, [(0, 1)])
+    ('MAP_0003', 'prefix', 0, [(0, 1)])
+    ('MAP_0004', 'prefix', 0, [(0, 1)])
+    ('MAP_0005', 'prefix', 0, [(0, 1)])
+query='ma'
+    ('MAP_0001', 'prefix', 0, [(0, 2)])
+    ('MAP_0002', 'prefix', 0, [(0, 2)])
+    ('MAP_0003', 'prefix', 0, [(0, 2)])
+    ('MAP_0004', 'prefix', 0, [(0, 2)])
+    ('MAP_0005', 'prefix', 0, [(0, 2)])
+query='map'
+    ('MAP_0001', 'prefix', 0, [(0, 3)])
+    ('MAP_0002', 'prefix', 0, [(0, 3)])
+    ('MAP_0003', 'prefix', 0, [(0, 3)])
+    ('MAP_0004', 'prefix', 0, [(0, 3)])
+    ('MAP_0005', 'prefix', 0, [(0, 3)])
+query='map_'
+    ('MAP_0001', 'prefix', 0, [(0, 4)])
+    ('MAP_0002', 'prefix', 0, [(0, 4)])
+    ('MAP_0003', 'prefix', 0, [(0, 4)])
+    ('MAP_0004', 'prefix', 0, [(0, 4)])
+    ('MAP_0005', 'prefix', 0, [(0, 4)])
+query='map_00'
+    ('MAP_0001', 'prefix', 0, [(0, 6)])
+    ('MAP_0002', 'prefix', 0, [(0, 6)])
+    ('MAP_0003', 'prefix', 0, [(0, 6)])
+    ('MAP_0004', 'prefix', 0, [(0, 6)])
+    ('MAP_0005', 'prefix', 0, [(0, 6)])
+query='map_002'
+    ('MAP_0020', 'prefix', 0, [(0, 7)])
+    ('MAP_0002', 'subsequence', 0, [(0, 3), (4, 6), (7, 8)])
+    ('MAP_0012', 'subsequence', 0, [(0, 3), (4, 6), (7, 8)])
+query='map_0020'
+    ('MAP_0020', 'exact', 0, [(0, 8)])
+query='map 20'
+    ('MAP_0020', 'subsequence', 0, [(0, 3), (6, 8)])
+query='map20'
+    ('MAP_0020', 'subsequence', 0, [(0, 3), (6, 8)])
+
+=== AT-2 operator's words over software_a, limit 5
+query='JotafVod_msrqlLzL_kh2C_rWl_pfue._0_'  target position = 0
+    ('JotafVod_msrqlLzL_kh2C_rWl_pfue._0_', 'exact', 0, [(0, 35)])
+query='jotafvod'  target position = 0
+    ('JotafVod_msrqlLzL_kh2C_rWl_pfue._0_', 'prefix', 0, [(0, 8)])
+    ('RjoqcJoha__Trebb4.NaqdfgyVietysoWjoqjnvTfd', 'subsequence', 0, [(1, 3), (11, 12), (19, 20), (22, 23), (25, 26), (31, 32), (41, 42)])
+    ('JTI_FO2_BWH_UCF_WDFTPA_EYHSK.CfcxiiqvolRdvazk', 'subsequence', 0, [(0, 1), (5, 6), (19, 20), (21, 22), (30, 31), (36, 38), (40, 41)])
+    ('JSB_JAIO.QSJ_TGTP_X_YLX_KCA_GMZ_BNJ_FPLWHVBGEZ22_RWGLLOUO_RKXOPD', 'subsequence', 0, [(0, 1), (7, 8), (13, 14), (26, 27), (36, 37), (41, 42), (54, 55), (63, 64)])
+query='msrqlLzL'  target position = 0
+    ('JotafVod_msrqlLzL_kh2C_rWl_pfue._0_', 'substring', 0, [(9, 17)])
+    ('RmhvrLqzz.ZXGRzlaGlskiVarb.QylQmkdopbGlskzvhHzanv.mlcqcYlseZhPbg', 'subsequence', 0, [(1, 2), (19, 20), (24, 25), (27, 28), (29, 30), (38, 39), (41, 42), (51, 52)])
+    ('AcD_ZwlusXgzrjWhjxz_ma._7_.LvtlhUbfxsrkvv_q.Flhlrvq_t.SvoiIzylssu_i', 'subsequence', 0, [(20, 21), (36, 38), (42, 43), (45, 46), (47, 48), (59, 60), (61, 62)])
+    ('BmdqeVorn.UPEJpjtJutspUcsc.UivXwvzerqGgolegkNizdn.pplNejcklBdgJflzLfc', 'subsequence', 0, [(1, 2), (20, 21), (35, 37), (40, 41), (52, 53), (65, 67)])
+    ('RmbxysrbjdtKimcecky.LnmfreqgregBwezwlnx_CGL_Hmliik2Pxzpdalb_Ylsggueu_rgu16', 'subsequence', 0, [(1, 2), (5, 7), (26, 27), (36, 37), (42, 43), (53, 54), (57, 58)])
+query='rWl_pfue'  target position = 0
+    ('JotafVod_msrqlLzL_kh2C_rWl_pfue._0_', 'substring', 0, [(23, 31)])
+    ('RxawcObbxBkD.SbqkdYfxl._4_.PegYowfUsedadg', 'subsequence', 0, [(0, 1), (3, 4), (21, 22), (27, 28), (33, 35), (36, 37)])
+    ('TRTWvxumtkCimuorlzwEtee2.TqidhPfhtrUvhegnp', 'subsequence', 0, [(1, 2), (3, 4), (16, 17), (30, 32), (35, 36), (38, 39)])
+    ('Tgk_RjsrwClr.UbvIpnzfFtsv._7_.Aamukb.Zivebiaavn', 'subsequence', 0, [(4, 5), (8, 9), (10, 11), (17, 18), (20, 21), (33, 34), (40, 41)])
+    ('Tdw_KmWjgQxjq._6_.RoLnwLlgfJxilpFgfYepUpDtGmbEigl', 'subsequence', 0, [(18, 19), (22, 24), (31, 33), (38, 39), (45, 46)])
+query='pfue._0_'  target position = 0
+    ('JotafVod_msrqlLzL_kh2C_rWl_pfue._0_', 'substring', 0, [(27, 35)])
+    ('Gcp_VfjNkgUiwtse_000._11_', 'subsequence', 0, [(2, 3), (5, 6), (10, 11), (15, 16), (17, 18)])
+    ('QtmcqPzu_fgxiF_zpuIXtsmQu_bfoe._0_', 'subsequence', 0, [(5, 6), (9, 10), (17, 18), (29, 30), (32, 33)])
+    ('Pxm_Pxf_GwdvouLvzd.KtbqmQgcsye._70_', 'subsequence', 0, [(0, 1), (6, 7), (13, 14), (29, 30), (33, 34)])
+    ('Xga_Bvl_QshbiePaqn.QfmueQgbbmn._30_', 'subsequence', 0, [(14, 15), (20, 21), (22, 24), (33, 34)])
+query='jotaf vod'  target position = 0
+    ('JotafVod_msrqlLzL_kh2C_rWl_pfue._0_', 'token', 0, [(0, 8)])
+    ('RjoqcJoha__Trebb4.NaqdfgyVietysoWjoqjnvTfd', 'subsequence', 0, [(1, 3), (11, 12), (19, 20), (22, 23), (25, 26), (31, 32), (41, 42)])
+    ('JTI_FO2_BWH_UCF_WDFTPA_EYHSK.CfcxiiqvolRdvazk', 'subsequence', 0, [(0, 1), (5, 6), (19, 20), (21, 22), (30, 31), (36, 38), (40, 41)])
+    ('JSB_JAIO.QSJ_TGTP_X_YLX_KCA_GMZ_BNJ_FPLWHVBGEZ22_RWGLLOUO_RKXOPD', 'subsequence', 0, [(0, 1), (7, 8), (13, 14), (26, 27), (36, 37), (41, 42), (54, 55), (63, 64)])
+query='vod jotaf'  target position = 0
+    ('JotafVod_msrqlLzL_kh2C_rWl_pfue._0_', 'token', 0, [(0, 8)])
+    ('BFC_PVSOZ_ISUTDK_XQFYDRL_H_JHYOY.TnaajZfnxfw', 'subsequence', 0, [(5, 6), (7, 8), (14, 15), (27, 28), (30, 31), (33, 34), (35, 36), (39, 40)])
+    ('NvvpraaLrthofvdJpeetm.OegMkkUtabaw_Zafsvabum_mdj', 'subsequence', 0, [(1, 2), (11, 12), (14, 16), (22, 23), (29, 31), (37, 38)])
+    ('JOA_BFPOIS2_PWKYO_LQSVXGS_2_OZRFD_JOA_TITGN.YdmwaFbzerm', 'subsequence', 0, [(21, 22), (28, 29), (32, 33), (34, 36), (38, 39), (48, 50)])
+    ('UiiWudvlUozntKgqrIww.OuoflahvCxeJdmivPjjqo.YlmunNtpvety._2_.UdtchimgAfxfsb', 'subsequence', 0, [(6, 7), (9, 10), (33, 34), (38, 39), (41, 42), (49, 50), (68, 70)])
+query='jotfa vod'  target position = 2
+    ('LonD_TxqjotkBximlqw._2_.CfpvuqsedSnagCbmTqqCvVapaazoLiksnld', 'subsequence', 0, [(8, 11), (25, 26), (35, 36), (44, 45), (51, 52), (58, 59)])
+    ('DLO_JOOC.KHA_YNSY_B_KMX_TBH_THX_FEJ_AUVBKBFOUEVZWBR_TIKIDG_KVOZUM', 'subsequence', 0, [(4, 6), (24, 25), (32, 33), (36, 37), (38, 39), (43, 44), (56, 57)])
+    ('JotafVod_msrqlLzL_kh2C_rWl_pfue._0_', 'fuzzy', 1, [(0, 8)])
+query='jtfvd'  target position = None
+    ('Czq_Tjt_UngxqmYjtf.JvkduNnmedx', 'subsequence', 0, [(5, 7), (17, 18), (20, 21), (22, 23)])
+    ('AJT_UFV_4mk_KN_J_LTDBZ.Ewhpcxwkb', 'subsequence', 0, [(1, 3), (5, 7), (19, 20)])
+    ('JKZ_TEV_FNIV_G_CMRBP.XslmVaqdbzb', 'subsequence', 0, [(0, 1), (4, 5), (8, 9), (11, 12), (28, 29)])
+    ('Bad_AohikJku.UtkPhbokSyyfyjyjJvdm', 'subsequence', 0, [(9, 10), (14, 15), (24, 25), (30, 32)])
+    ('MzcnJtzfknyXzgo.BwsUxvtadRqsxwxye', 'subsequence', 0, [(4, 6), (7, 8), (21, 22), (24, 25)])

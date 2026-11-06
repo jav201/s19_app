@@ -7,7 +7,7 @@
 - **Process:** `dev-flow-v3-beta` (E0–E5 per increment, batch end once).
 - **Method versions (checked 2026-11-05; use only these):**
   - dev-flow v3 beta: `C:\Users\jjgh8\.claude\skills\dev-flow-v3-beta\SKILL.md` and `trace_check.py`, commit `d858a9a` of the skills repo, working tree clean. Not the public `jav201/dev-flow` (rev94) and not the old `skills\dev-flow\` kit.
-  - Code-Wire v3.1.0: tag `v3.1.0` = commit `ebc3bb7`, which is also `origin/main`. Local clone `C:\Users\jjgh8\Github\code-wire`. Core only: examples from the requirement, real callers from `tools/codewire_extract.py`, and a test that fails. Lint and recordings are records, not gates.
+  - Code-Wire v3.1.0: tag `v3.1.0` (annotated, 2026-11-05) = commit `e436a08` = `origin/main` (corrected 2026-11-06: the E0 text said `ebc3bb7`, a commit off that line; `tools/` is identical). Local clone `C:\Users\jjgh8\Github\code-wire`. Core only: examples from the requirement, real callers from `tools/codewire_extract.py`, and a test that fails. Lint and recordings are records, not gates.
 - **Inputs:**
   - Operator verdict: `prototypes/b103_ux/veredicto-b103.json`.
   - Evidence: `prototypes/b103_ux/findings/{A,B,C}-*.md`.

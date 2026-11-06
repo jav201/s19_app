@@ -1,0 +1,60 @@
+s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+python = 3.11.18
+host = cachyos-rtx  load = (11.58349609375, 10.35400390625, 5.9970703125)  cpus = 16
+HOME = /tmp/b103-e1-4/home  LOCALAPPDATA = /tmp/b103-e1-4/home/localappdata
+
+=== 1. v2 index vs v1 naive oracle (same pool and queries as v1, seed 20261106)
+  pool 944 names, 409 queries x 4 limits: mismatches = 0
+
+=== 2. timing on the 50,000-name reference list
+  reference list: 50000 names (software_a, then +_1, +_2, +_3), unique 50000, distinct tokens 77256
+  build: [2.47, 3.903, 3.257] s  median 3.257 s  max-RSS growth ~137 MiB
+  sample name software_a[1234] = 'JotafVod_msrqlLzL_kh2C_rWl_pfue._0_'
+  limit=  20 query='a'                                      median    10.3 ms  max    11.0 ms  results   20 {'prefix': 20}
+  limit=  20 query='e'                                      median    10.5 ms  max    13.0 ms  results   20 {'prefix': 20}
+  limit=  20 query='0'                                      median    12.9 ms  max    13.1 ms  results   20 {'substring': 20}
+  limit=  20 query='zz'                                     median     6.5 ms  max     7.6 ms  results   20 {'prefix': 20}
+  limit=  20 query='ab'                                     median     6.9 ms  max     7.1 ms  results   20 {'prefix': 20}
+  limit=  20 query='JotafVod_msrqlLzL_kh2C_rWl_pfue._0_'    median    55.3 ms  max    63.3 ms  results    4 {'exact': 1, 'prefix': 3}
+  limit=  20 query='JotafVod_msr'                           median    25.7 ms  max    42.0 ms  results    4 {'prefix': 4}
+  limit=  20 query='srqlLzL_'                               median    31.8 ms  max    33.6 ms  results   20 {'substring': 4, 'subsequence': 16}
+  limit=  20 query='0 jotaf'                                median    25.1 ms  max    29.3 ms  results   20 {'token': 4, 'subsequence': 16}
+  limit=  20 query='JVmL'                                   median    18.1 ms  max    18.9 ms  results   20 {'substring': 7, 'token': 13}
+  limit=  20 query='xqzjvkw'                                median    24.8 ms  max    28.5 ms  results   20 {'subsequence': 20}
+  limit=  20 query='qqqq zzzz'                              median    53.3 ms  max   192.2 ms  results   13 {'subsequence': 13}
+  limit=  20 query='aaaa'                                   median    45.3 ms  max    48.7 ms  results   20 {'subsequence': 20}
+  limit=  20 query='e e e'                                  median    53.8 ms  max   149.8 ms  results   20 {'token': 20}
+  limit=  20 query='Nzukij'                                 median    16.6 ms  max    17.6 ms  results   20 {'substring': 4, 'subsequence': 16}
+  limit=  20 query='Ierxjr_Eud'                             median    73.1 ms  max    75.0 ms  results    4 {'substring': 4}
+  limit=  20 query='ledRing'                                median    15.6 ms  max    15.9 ms  results   20 {'subsequence': 20}
+  limit=  20 query='pposbxiif'                              median   102.7 ms  max   187.8 ms  results    4 {'substring': 4}
+  limit=  20 query='cnt'                                    median    10.3 ms  max    14.6 ms  results   20 {'prefix': 4, 'substring': 16}
+  limit=  20 query='temp_sensor_max'                        median    75.2 ms  max    90.1 ms  results    0 {}
+  limit=  20 query='x y z w v u'                            median    63.3 ms  max    89.9 ms  results   20 {'token': 10, 'subsequence': 10}
+  limit=  20 query='pposbxiifkdgfiajnbbpvb_dyan_xvz1'       median   122.2 ms  max   171.9 ms  results    4 {'subsequence': 4}
+  limit=20: worst median over 22 queries = 122.2 ms (query 'pposbxiifkdgfiajnbbpvb_dyan_xvz1')
+  limit= 100 query='a'                                      median     7.7 ms  max     7.9 ms  results  100 {'prefix': 100}
+  limit= 100 query='e'                                      median     7.5 ms  max     7.8 ms  results  100 {'prefix': 100}
+  limit= 100 query='0'                                      median     9.8 ms  max    10.2 ms  results  100 {'substring': 100}
+  limit= 100 query='zz'                                     median     7.8 ms  max     8.0 ms  results  100 {'prefix': 48, 'substring': 52}
+  limit= 100 query='ab'                                     median     8.6 ms  max     8.7 ms  results  100 {'prefix': 59, 'substring': 41}
+  limit= 100 query='JotafVod_msrqlLzL_kh2C_rWl_pfue._0_'    median    58.4 ms  max    85.4 ms  results    4 {'exact': 1, 'prefix': 3}
+  limit= 100 query='JotafVod_msr'                           median    25.4 ms  max    40.5 ms  results    4 {'prefix': 4}
+  limit= 100 query='srqlLzL_'                               median    31.5 ms  max    32.6 ms  results   42 {'substring': 4, 'subsequence': 38}
+  limit= 100 query='0 jotaf'                                median    24.2 ms  max    26.9 ms  results   28 {'token': 4, 'subsequence': 24}
+  limit= 100 query='JVmL'                                   median    32.6 ms  max    35.5 ms  results  100 {'substring': 7, 'token': 21, 'subsequence': 72}
+  limit= 100 query='xqzjvkw'                                median    80.3 ms  max    84.1 ms  results   58 {'subsequence': 58}
+  limit= 100 query='qqqq zzzz'                              median    48.2 ms  max    95.4 ms  results   13 {'subsequence': 13}
+  limit= 100 query='aaaa'                                   median    57.6 ms  max    59.2 ms  results  100 {'subsequence': 100}
+  limit= 100 query='e e e'                                  median    83.1 ms  max   204.4 ms  results  100 {'token': 100}
+  limit= 100 query='Nzukij'                                 median    43.7 ms  max    48.0 ms  results  100 {'substring': 4, 'subsequence': 96}
+  limit= 100 query='Ierxjr_Eud'                             median    74.5 ms  max   157.2 ms  results    4 {'substring': 4}
+  limit= 100 query='ledRing'                                median    38.4 ms  max    39.0 ms  results   78 {'subsequence': 63, 'fuzzy': 15}
+  limit= 100 query='pposbxiif'                              median    73.6 ms  max   163.4 ms  results    4 {'substring': 4}
+  limit= 100 query='cnt'                                    median    46.7 ms  max    50.0 ms  results  100 {'prefix': 4, 'substring': 51, 'subsequence': 45}
+  limit= 100 query='temp_sensor_max'                        median    91.4 ms  max   119.6 ms  results    0 {}
+  limit= 100 query='x y z w v u'                            median    66.6 ms  max   157.5 ms  results  100 {'token': 10, 'subsequence': 90}
+  limit= 100 query='pposbxiifkdgfiajnbbpvb_dyan_xvz1'       median   202.3 ms  max   216.5 ms  results    4 {'subsequence': 4}
+  limit=100: worst median over 22 queries = 202.3 ms (query 'pposbxiifkdgfiajnbbpvb_dyan_xvz1')
+
+load at end = (12.17138671875, 10.85693359375, 6.53759765625)

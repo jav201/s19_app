@@ -1,0 +1,194 @@
+s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+python = 3.11.18; DISPLAY=None; WAYLAND_DISPLAY=None
+textual = 8.2.8
+
+== Part A: static census of text-field constructions ==
+field classes known (constructor name -> class):
+  CappedTextArea -> CappedTextArea  (lineage CappedTextArea > TextArea)
+  Input -> stock Input  (lineage Input)
+  JsonHighlightTextArea -> CappedTextArea  (lineage JsonHighlightTextArea > CappedTextArea > TextArea)
+  MaskedInput -> stock Input  (lineage MaskedInput)
+  OsClipboardInput -> OsClipboardInput  (lineage OsClipboardInput > Input)
+  TextArea -> stock TextArea  (lineage TextArea)
+
+constructions found: 48
+file:line | enclosing class | function | constructor | field class | id | read_only
+s19_app/tui/a2l_parameter_picker.py:615 | A2LParameterPicker | compose | OsClipboardInput | OsClipboardInput | 'ids.filter' | None
+s19_app/tui/app.py:3505 | S19TuiApp | _compose_screen_workspace | OsClipboardInput | OsClipboardInput | 'search_input' | None
+s19_app/tui/app.py:3507 | S19TuiApp | _compose_screen_workspace | OsClipboardInput | OsClipboardInput | 'goto_input' | None
+s19_app/tui/app.py:8498 | S19TuiApp | _compose_screen_a2l | OsClipboardInput | OsClipboardInput | 'a2l_tags_filter_input' | None
+s19_app/tui/app.py:8503 | S19TuiApp | _compose_screen_a2l | OsClipboardInput | OsClipboardInput | 'a2l_tag_find_input' | None
+s19_app/tui/app.py:8534 | S19TuiApp | _compose_screen_a2l | OsClipboardInput | OsClipboardInput | 'alt_search_input' | None
+s19_app/tui/app.py:8538 | S19TuiApp | _compose_screen_a2l | OsClipboardInput | OsClipboardInput | 'alt_goto_input' | None
+s19_app/tui/app.py:8619 | S19TuiApp | _compose_screen_mac | OsClipboardInput | OsClipboardInput | 'mac_search_input' | None
+s19_app/tui/app.py:8623 | S19TuiApp | _compose_screen_mac | OsClipboardInput | OsClipboardInput | 'mac_goto_input' | None
+s19_app/tui/command_bar.py:147 | CommandBar | compose | OsClipboardInput | OsClipboardInput | 'palette_input' | None
+s19_app/tui/crc_designer_view.py:546 | CrcDesignerPanel | _text_row | OsClipboardInput | OsClipboardInput | 'field_id' | None
+s19_app/tui/flow_screens.py:1632 | FlowBuilderPanel | compose | OsClipboardInput | OsClipboardInput | 'flow_ref' | None
+s19_app/tui/flow_screens.py:1643 | FlowBuilderPanel | compose | OsClipboardInput | OsClipboardInput | 'flow_ref_a' | None
+s19_app/tui/flow_screens.py:1646 | FlowBuilderPanel | compose | OsClipboardInput | OsClipboardInput | 'flow_ref_b' | None
+s19_app/tui/flow_screens.py:1657 | FlowBuilderPanel | compose | OsClipboardInput | OsClipboardInput | 'flow_ext_instruction' | None
+s19_app/tui/flow_screens.py:1667 | FlowBuilderPanel | compose | OsClipboardInput | OsClipboardInput | 'flow_ext_log' | None
+s19_app/tui/flow_screens.py:1669 | FlowBuilderPanel | compose | OsClipboardInput | OsClipboardInput | 'flow_ext_output' | None
+s19_app/tui/flow_screens.py:1677 | FlowBuilderPanel | compose | OsClipboardInput | OsClipboardInput | 'flow_pick' | None
+s19_app/tui/flow_screens.py:1686 | FlowBuilderPanel | compose | OsClipboardInput | OsClipboardInput | 'flow_funnel_name' | None
+s19_app/tui/flow_screens.py:1688 | FlowBuilderPanel | compose | OsClipboardInput | OsClipboardInput | 'flow_funnel_value' | None
+s19_app/tui/flow_screens.py:3329 | FlowExecutionPanel | compose | OsClipboardInput | OsClipboardInput | 'fx_set_name' | None
+s19_app/tui/flow_screens.py:3533 | FlowExecutionPanel | _card_widget | OsClipboardInput | OsClipboardInput | "f'fx_in_{index}_{j}'" | None
+s19_app/tui/screens.py:401 | LoadDialog | compose | OsClipboardInput | OsClipboardInput | 'load_path' | None
+s19_app/tui/screens.py:771 | ChangeSetJsonScreen | compose | CappedTextArea | CappedTextArea | 'changeset_json_text' | None
+s19_app/tui/screens.py:858 | EntryJsonScreen | compose | CappedTextArea | CappedTextArea | 'entry_json_text' | None
+s19_app/tui/screens.py:975 | BulkParameterAddScreen | compose | CappedTextArea | CappedTextArea | 'bulk_param_text' | None
+s19_app/tui/screens.py:1260 | SaveProjectScreen | compose | OsClipboardInput | OsClipboardInput | 'project_name' | None
+s19_app/tui/screens.py:1519 | SaveFlowScreen | compose | OsClipboardInput | OsClipboardInput | 'flow_save_name' | None
+s19_app/tui/screens.py:1774 | FileRefChooserScreen | compose | OsClipboardInput | OsClipboardInput | 'flow_external_path_input' | None
+s19_app/tui/screens.py:2062 | FlowBlockEditScreen | _ref_row | OsClipboardInput | OsClipboardInput | 'input_id' | None
+s19_app/tui/screens.py:3301 | ReportViewerScreen | compose | CappedTextArea | CappedTextArea | 'report_declared_regions' | None
+s19_app/tui/screens.py:3328 | ReportViewerScreen | compose | OsClipboardInput | OsClipboardInput | 'report_filter_path' | None
+s19_app/tui/screens.py:3337 | ReportViewerScreen | compose | OsClipboardInput | OsClipboardInput | 'report_context_bytes' | None
+s19_app/tui/screens.py:3722 | OperationsScreen | compose | OsClipboardInput | OsClipboardInput | 'operation_config_path' | None
+s19_app/tui/screens.py:3727 | OperationsScreen | compose | CappedTextArea | CappedTextArea | 'operation_config' | None
+s19_app/tui/screens_directionb.py:4996 | PatchEditorPanel | compose | OsClipboardInput | OsClipboardInput | 'input_id' | None
+s19_app/tui/screens_directionb.py:5030 | PatchEditorPanel | compose | TextArea | stock TextArea | 'patch_json_view' | True
+s19_app/tui/screens_directionb.py:5056 | PatchEditorPanel | compose | JsonHighlightTextArea | CappedTextArea | 'patch_paste_text' | None
+s19_app/tui/screens_directionb.py:5122 | PatchEditorPanel | compose | OsClipboardInput | OsClipboardInput | 'patch_saveback_name_input' | None
+s19_app/tui/screens_directionb.py:5246 | PatchEditorPanel | compose | OsClipboardInput | OsClipboardInput | 'patch_doc_path_input' | None
+s19_app/tui/screens_directionb.py:7748 | CheckEditorPanel | compose | OsClipboardInput | OsClipboardInput | 'check_mem_address_input' | None
+s19_app/tui/screens_directionb.py:7755 | CheckEditorPanel | compose | OsClipboardInput | OsClipboardInput | 'check_mem_label_input' | None
+s19_app/tui/screens_directionb.py:7762 | CheckEditorPanel | compose | OsClipboardInput | OsClipboardInput | 'check_mem_size_input' | None
+s19_app/tui/screens_directionb.py:7802 | CheckEditorPanel | compose | OsClipboardInput | OsClipboardInput | 'check_file_name_input' | None
+s19_app/tui/screens_directionb.py:8401 | AbDiffPanel | compose | OsClipboardInput | OsClipboardInput | 'diff_path_a' | None
+s19_app/tui/screens_directionb.py:8407 | AbDiffPanel | compose | OsClipboardInput | OsClipboardInput | 'diff_path_b' | None
+s19_app/tui/screens_directionb.py:8437 | AbDiffPanel | compose | OsClipboardInput | OsClipboardInput | 'diff_report_dest' | None
+s19_app/tui/segment_split_view.py:1556 | SplitJoinWindow | compose | CappedTextArea | CappedTextArea | 'sje_manual' | None
+
+count by field class:
+  CappedTextArea: 7
+  OsClipboardInput: 40
+  stock TextArea: 1
+
+holders (enclosing class) with their field classes:
+  [dialog] BulkParameterAddScreen: CappedTextArea x1
+  [dialog] ChangeSetJsonScreen: CappedTextArea x1
+  [dialog] EntryJsonScreen: CappedTextArea x1
+  [dialog] FileRefChooserScreen: OsClipboardInput x1
+  [dialog] FlowBlockEditScreen: OsClipboardInput x1
+  [dialog] LoadDialog: OsClipboardInput x1
+  [dialog] OperationsScreen: CappedTextArea x1, OsClipboardInput x1
+  [dialog] ReportViewerScreen: CappedTextArea x1, OsClipboardInput x2
+  [dialog] SaveFlowScreen: OsClipboardInput x1
+  [dialog] SaveProjectScreen: OsClipboardInput x1
+  [widget/window] A2LParameterPicker: OsClipboardInput x1
+  [widget/window] AbDiffPanel: OsClipboardInput x3
+  [widget/window] CheckEditorPanel: OsClipboardInput x4
+  [widget/window] CommandBar: OsClipboardInput x1
+  [widget/window] CrcDesignerPanel: OsClipboardInput x1
+  [widget/window] FlowBuilderPanel: OsClipboardInput x9
+  [widget/window] FlowExecutionPanel: OsClipboardInput x2
+  [widget/window] PatchEditorPanel: CappedTextArea x1, OsClipboardInput x3, stock TextArea x1
+  [widget/window] S19TuiApp: OsClipboardInput x8
+  [widget/window] SplitJoinWindow: CappedTextArea x1
+
+dialog classes (ModalScreen subclasses): 22
+  BulkParameterAddScreen: CappedTextArea x1
+  ChangeSetJsonScreen: CappedTextArea x1
+  ConfirmDiscardScreen: no text field constructed in its body
+  ConfirmQuestionScreen: no text field constructed in its body
+  ConfirmWriteScreen: no text field constructed in its body
+  CurveDescriptionScreen: no text field constructed in its body
+  EntryJsonScreen: CappedTextArea x1
+  FileRefChooserScreen: OsClipboardInput x1
+  FlowBlockEditScreen: OsClipboardInput x1
+  LegendScreen: no text field constructed in its body
+  LoadDialog: OsClipboardInput x1
+  LoadFlowScreen: no text field constructed in its body
+  LoadGuardScreen: no text field constructed in its body
+  LoadResultScreen: no text field constructed in its body
+  OperationsScreen: CappedTextArea x1, OsClipboardInput x1
+  ReportViewerScreen: CappedTextArea x1, OsClipboardInput x2
+  SaveFlowScreen: OsClipboardInput x1
+  SaveProjectScreen: OsClipboardInput x1
+  SelectVariantScreen: no text field constructed in its body
+  VariantHelpScreen: no text field constructed in its body
+  WindowHelpScreen: no text field constructed in its body
+  _QuitQuestionScreen: no text field constructed in its body
+
+== Part B: runtime census of the rail windows (headless, 160x48) ==
+rail windows: 12 -> ['workspace', 'a2l', 'mac', 'map', 'issues', 'patch', 'check_editor', 'diff', 'flow', 'flow_execution', 'checks', 'crc_designer']
+
+[workspace] #screen_workspace: 2 text field(s)
+   #search_input | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=False
+   #goto_input | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=False
+
+[a2l] #screen_a2l: 4 text field(s)
+   #a2l_tags_filter_input | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+   #a2l_tag_find_input | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+   #alt_search_input | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+   #alt_goto_input | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+
+[mac] #screen_mac: 2 text field(s)
+   #mac_search_input | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+   #mac_goto_input | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+
+[map] #screen_map: 0 text field(s)
+
+[issues] #screen_issues: 0 text field(s)
+
+[patch] #screen_patch: 8 text field(s)
+   #patch_entry_address_input | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+   #patch_entry_value_input | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+   #patch_entry_bytes_input | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+   #patch_json_view | stock TextArea (TextArea) | read_only=True | displayed=True | shown_region=False
+   #patch_paste_text | CappedTextArea (JsonHighlightTextArea) | read_only=False | displayed=True | shown_region=False
+   #patch_saveback_name_input | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=False
+   #patch_param_filter | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=False
+   #patch_doc_path_input | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+
+[check_editor] #screen_check_editor: 5 text field(s)
+   #check_param_filter | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+   #check_mem_address_input | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+   #check_mem_label_input | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+   #check_mem_size_input | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+   #check_file_name_input | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+
+[diff] #screen_diff: 3 text field(s)
+   #diff_path_a | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+   #diff_path_b | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+   #diff_report_dest | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+
+[flow] #screen_flow: 9 text field(s)
+   #flow_ref | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+   #flow_ref_a | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=False | shown_region=False
+   #flow_ref_b | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=False | shown_region=False
+   #flow_ext_instruction | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=False | shown_region=False
+   #flow_ext_log | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=False
+   #flow_ext_output | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=False
+   #flow_pick | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+   #flow_funnel_name | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=False
+   #flow_funnel_value | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=False
+
+[flow_execution] #screen_flow_execution: 1 text field(s)
+   #fx_set_name | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+
+[checks] #screen_checks: 0 text field(s)
+
+[crc_designer] #screen_crc_designer: 13 text field(s)
+   #crc_field_width | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+   #crc_field_poly | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+   #crc_field_init | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+   #crc_field_xorout | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+   #crc_field_check | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+   #crc_coverage_ranges | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+   #crc_coverage_pad_byte | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+   #crc_field_output_address | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+   #crc_field_store_width | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+   #crc_custom_vector | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+   #crc_field_name | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+   #crc_field_aliases | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+   #crc_load_path | OsClipboardInput (OsClipboardInput) | read_only=None | displayed=True | shown_region=True
+
+[outside the rail windows, main screen]: 2 text field(s)
+   #palette_input | OsClipboardInput (OsClipboardInput) | read_only=None | ancestors=['palette_input', 'command_palette', 'command_bar', 'command_bar_slot']
+   #sje_manual | CappedTextArea (CappedTextArea) | read_only=False | ancestors=['sje_manual', 'sje_left', 'sje_body', 'screen_split_join']
+
+census done
