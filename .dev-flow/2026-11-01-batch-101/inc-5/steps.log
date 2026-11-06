@@ -13,3 +13,4 @@ E4 integration end 2026-11-06T09:42Z model=opus GREEN: int-01 58 passed (new fil
 E5 start 2026-11-06T09:43Z mutants=deepseek-v4-pro reviews=opus audit=qa-reviewer(opus)
 E5 corrective start 2026-11-06T10:24Z model=opus (C-1 … C-11; one pass: code within the slice, tests, records, graph); LAN host 2 waits for the orchestrator's merge run before the first pytest
 E5 corrective end 2026-11-06T11:26Z model=opus C-1..C-11 done; R-CHKED-057 new; e5c-02 68 passed; RED base 9/10 (1 standing guard); CE 3/3 (33, 33); mutants M25-M30 6/6 killed; law guards 103 passed; serial 2 passed; LAN worktree removed
+E5 mutants end 2026-11-06T11:27Z model=deepseek-v4-pro 24/24 killed at 8fc3cd3; corrective M25-M30 killed (opus)

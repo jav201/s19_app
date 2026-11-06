@@ -1,0 +1,97 @@
+# Mutant M8
+BASE_COMMIT=c2cba356f254cf85ba8c0e05b47b5103baf2d733
+s19_app.__file__=<HOME>/work/s19_i5m_copy/s19_app/__init__.py
+edits:
+  s19_app/tui/screens_directionb.py:7299
+verify:
+grep s19_app/tui/screens_directionb.py: replaced -> 'if kept:' FOUND
+guard nodes (5):
+  tests/test_b101_check_spec_keep.py::test_r_chked_010_2_same_a2l_reloaded_keeps_picks
+  tests/test_b101_check_spec_keep.py::test_r_chked_010_3_image_reloaded_keeps_picks
+  tests/test_b101_check_spec_keep.py::test_r_chked_026_4_spec_bytes_survive_same_range_reload
+  tests/test_b101_check_spec_keep.py::test_r_chked_055_1_unlisted_parameter_dropped
+  tests/test_b101_check_spec_keep.py::test_r_chked_025_3_reincluded_after_move_reads_the_image
+
+--- pytest ---
+bringing up nodes...
+bringing up nodes...
+
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+_______________ test_r_chked_010_2_same_a2l_reloaded_keeps_picks _______________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+tests/test_b101_check_spec_keep.py:610: in test_r_chked_010_2_same_a2l_reloaded_keeps_picks
+    assert picks == [facts.v1.name, facts.v2.name], picks
+E   AssertionError: []
+E   assert [] == ['VALUE_0001', 'VALUE_0002']
+E     
+E     Right contains 2 more items, first extra item: 'VALUE_0001'
+E     Use -v to get more diff
+___________ test_r_chked_025_3_reincluded_after_move_reads_the_image ___________
+[gw5] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+tests/test_b101_check_spec_keep.py:1044: in test_r_chked_025_3_reincluded_after_move_reads_the_image
+    entries = run(tmp_path, scenario)
+              ^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_check_spec_keep.py:255: in run
+    return projects.run_app(base, scenario)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_check_spec_keep.py:1039: in scenario
+    assert included(app) == [facts.v2.name], included(app)
+E   AssertionError: []
+E   assert [] == ['VALUE_0002']
+E     
+E     Right contains one more item: 'VALUE_0002'
+E     Use -v to get more diff
+________________ test_r_chked_055_1_unlisted_parameter_dropped _________________
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+tests/test_b101_check_spec_keep.py:664: in test_r_chked_055_1_unlisted_parameter_dropped
+    assert picks == [facts.v2.name], picks
+E   AssertionError: []
+E   assert [] == ['VALUE_0002']
+E     
+E     Right contains one more item: 'VALUE_0002'
+E     Use -v to get more diff
+________________ test_r_chked_010_3_image_reloaded_keeps_picks _________________
+[gw1] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+tests/test_b101_check_spec_keep.py:633: in test_r_chked_010_3_image_reloaded_keeps_picks
+    assert picks == [facts.v1.name, facts.v2.name], picks
+E   AssertionError: []
+E   assert [] == ['VALUE_0001', 'VALUE_0002']
+E     
+E     Right contains 2 more items, first extra item: 'VALUE_0001'
+E     Use -v to get more diff
+___________ test_r_chked_026_4_spec_bytes_survive_same_range_reload ____________
+[gw3] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+tests/test_b101_check_spec_keep.py:1145: in test_r_chked_026_4_spec_bytes_survive_same_range_reload
+    assert picks == [facts.v1.name, facts.v2.name], picks
+E   AssertionError: []
+E   assert [] == ['VALUE_0001', 'VALUE_0002']
+E     
+E     Right contains 2 more items, first extra item: 'VALUE_0001'
+E     Use -v to get more diff
+=========================== short test summary info ============================
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_010_2_same_a2l_reloaded_keeps_picks
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_025_3_reincluded_after_move_reads_the_image
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_055_1_unlisted_parameter_dropped
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_010_3_image_reloaded_keeps_picks
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_026_4_spec_bytes_survive_same_range_reload
+5 failed in 38.07s
+
+
+RESULT=KILLED
+FIRST_ASSERTION=E   AssertionError: []
