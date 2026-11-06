@@ -1,0 +1,60 @@
+=== batch-101 Inc 16 E5 corrective: controls of ruling group C-2-C-3 (COPY worktree)
+date: 2026-11-06T09:24:02Z
+source: branch b101-inc16 at b843fc6 plus the uncommitted E5 corrective edits (patch sha256 8e850809bbf34324)
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree with the increment staged: 1ec14f2277283169f33eb869979b51f697b50663
+staged paths vs base: 124
+working tree equal to the index: yes
+python: Python 3.11.18
+s19_app.__file__: <HOME>/work/s19_i16c_copy/s19_app/__init__.py
+--- command: python i16c-controls.py <copy> C-2-C-3 <guards of b843fc6>   (each control: pytest -q -p no:cacheprovider -m "not serial_timing" <node>, serial)
+--- M-1 delete the markdown-it-py line of requirements.txt
+    nodes: test_r_doc_dev_8_1_requirements_txt_equals_runtime_dependencies
+    expected RED, got RED (exit 1) -> as expected
+    pytest: 1 failed in 0.20s
+    first assertion line: AssertionError: requirements.txt ['rich>=13.0', 'textual>=8.2.8,<9'] != pyproject ['markdown-it-py>=3', 'rich>=13.0', 'textual>=8.2.8,<9'] | assert {'rich>=13.0'...al>=8.2.8,<9'} == {'markdown-it...al>=8.2.8,<9'}
+--- M-2 restore the base runtime-dependency sentence of section 8 (rich, textual)
+    nodes: test_r_doc_dev_8_2_architecture_states_dependencies_and_markers
+    expected RED, got RED (exit 1) -> as expected
+    pytest: 1 failed in 0.15s
+    first assertion line: AssertionError: section 8 states dependencies ['rich', 'textual'], pyproject declares ['markdown-it-py', 'rich', 'textual'] | assert {'rich', 'textual'} == {'markdown-it...h', 'textual'}
+--- M-3 delete the serial_timing bullet of section 8
+    nodes: test_r_doc_dev_8_2_architecture_states_dependencies_and_markers
+    expected RED, got RED (exit 1) -> as expected
+    pytest: 1 failed in 0.21s
+    first assertion line: AssertionError: section 8 lists markers ['slow', 'snapshot'], pyproject registers ['serial_timing', 'slow', 'snapshot'] | assert {'slow', 'snapshot'} == {'serial_timi...', 'snapshot'}
+--- M-4 register a fourth marker in pyproject.toml only
+    nodes: test_r_doc_dev_8_2_architecture_states_dependencies_and_markers
+    expected RED, got RED (exit 1) -> as expected
+    pytest: 1 failed in 0.15s
+    first assertion line: AssertionError: section 8 lists markers ['serial_timing', 'slow', 'snapshot'], pyproject registers ['probe_marker', 'serial_timing', 'slow', 'snapshot'] | assert {'serial_timi...', 'snapshot'} == {'probe_marke...', 'snapshot'}
+--- P-1 a legitimate fourth dependency, added to pyproject.toml, requirements.txt and section 8
+    nodes: test_r_doc_dev_8_1_requirements_txt_equals_runtime_dependencies, test_r_doc_dev_8_2_architecture_states_dependencies_and_markers
+    expected GREEN, got GREEN (exit 0) -> as expected
+    pytest: 2 passed in 0.04s
+--- P-1/old the same addition under the guard file of b843fc6 (len(declared) == 3)
+    nodes: test_r_doc_dev_8_1_requirements_txt_equals_runtime_dependencies
+    expected RED, got RED (exit 1) -> as expected
+    pytest: 1 failed in 0.13s
+    first assertion line: AssertionError: pyproject declares {'markdown-it-py>=3', 'packaging>=20', 'rich>=13.0', 'textual>=8.2.8,<9'} | assert 4 == 3
+--- M-5 delete the case_08_release_demo entry of the manifest
+    nodes: test_r_doc_dev_15_1_manifest_lists_every_case
+    expected RED, got RED (exit 1) -> as expected
+    pytest: 1 failed in 0.14s
+    first assertion line: AssertionError: MANIFEST.md does not name 1 of 15 case folders: ['case_08_release_demo'] | assert not ['case_08_release_demo']
+--- M-6 a tracked case_09_probe folder that the manifest does not name
+    nodes: test_r_doc_dev_15_1_manifest_lists_every_case
+    expected RED, got RED (exit 1) -> as expected
+    pytest: 1 failed in 0.08s
+    first assertion line: AssertionError: MANIFEST.md does not name 1 of 16 case folders: ['case_09_probe'] | assert not ['case_09_probe']
+--- P-2 a legitimate case_09_probe folder, tracked and named in the manifest
+    nodes: test_r_doc_dev_15_1_manifest_lists_every_case
+    expected GREEN, got GREEN (exit 0) -> as expected
+    pytest: 1 passed in 0.10s
+--- P-2/old the same addition under the guard file of b843fc6 (len(folders) == 15)
+    nodes: test_r_doc_dev_15_1_manifest_lists_every_case
+    expected RED, got RED (exit 1) -> as expected
+    pytest: 1 failed in 0.14s
+    first assertion line: AssertionError: expected 15 case folders, found ['case_01_basic_valid', 'case_02_gaps_and_patch_targets', 'case_03_overlapping_records', 'case_04_bad_checksums', 'case_05_dense_mixed_content', 'case_06_large_nested_a2l', | assert 16 == 15
+=== C-2-C-3: 10 of 10 controls as expected; copy worktree equal to its index afterwards: yes
+=== exit code: 0

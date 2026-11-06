@@ -1,0 +1,16 @@
+=== batch-101 Inc 16 E5 corrective: C-9 E5-T case arch12
+date: 2026-11-06T09:24:30Z
+source: branch b101-inc16 at b843fc6 plus the uncommitted E5 corrective edits (patch sha256 8e850809bbf34324)
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree with the increment staged: 1ec14f2277283169f33eb869979b51f697b50663
+staged paths vs base: 124
+working tree equal to the index: yes
+python: Python 3.11.18
+s19_app.__file__: <HOME>/work/s19_i16c/s19_app/__init__.py
+--- command: python i16c-history.py arch12 <worktree> <HOME>/work/i16c-devflow-validate.py
+validator sha256: b197fda5756a7b4f5291678d7e2413b1b79ff903b94e664494fc12915229a807
+V8 output over the staged tree (1 finding(s)):
+  [!] V8   setup.py: no `path/**` prefix can match a file with no directory component — the rule cannot express a repository-root file, so this is a bound of the rule, and the map is not behind
+stale-module notices: 0; root notices: ['setup.py']; SKIP lines: 0
+PASS: V8 prints exactly one finding, the root NOTICE for setup.py, and no 'under no declared module' notice
+=== exit code: 0

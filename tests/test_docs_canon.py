@@ -105,6 +105,11 @@ _S19TOOL_OK = re.compile(
     r"\.s19tool[/\\]|s19tool/|s19tool\.egg-info|pip\s+\w[\w-]*\s+s19tool|"
     r"Distribution name|module-only|runs only as a module|"
     r"No `s19tool` console script|what remains", re.I)
+# The occurrence shapes among them excuse only their own occurrence, not the
+# line: a line that holds `.s19tool/` and a bare command is still caught
+# (CTX-DOCHYG defines them per occurrence; batch-101 Inc 16 E5 ruling C-8).
+_S19TOOL_OCCURRENCE = re.compile(
+    r"\.s19tool[/\\]|s19tool/|s19tool\.egg-info|pip\s+\w[\w-]*\s+s19tool", re.I)
 
 _DOC_PREFIXES_OUT = (".dev-flow/", "docs/requirements/", "tests/goldens/", "tests/__snapshots__/")
 
@@ -131,7 +136,8 @@ def _live_token_findings(line: str) -> list[str]:
     if re.search(r"\bCDFX\b|CDF 2\.0", line, re.I):
         # only a removal mark excuses CDFX (R-DOC-REF.6); the s19tool shapes do not
         return ["unmarked CDFX"]
-    if re.search(r"\bs19tool\b", line) and not _S19TOOL_OK.search(line):
+    rest = _S19TOOL_OCCURRENCE.sub("", line)
+    if re.search(r"\bs19tool\b", rest) and not _S19TOOL_OK.search(rest):
         return ["s19tool as a live command"]
     return []
 
@@ -150,6 +156,7 @@ def test_at285_no_live_cdfx_or_s19tool_console_script_token():
         (f"`.{tool}/workarea/temp/`", 0),
         (f"Distribution name `{tool}`", 0),
         (f"{tool} firmware.s19 info", 1),
+        (f"`.{tool}/` is created by `{tool} firmware.s19 info`", 1),
         ("the " + "CD" + "FX exporter", 1),
         ("the " + "CD" + "FX exporter was removed", 0),
         ("ASAM " + "CDF 2" + ".0 for vCDM", 1),

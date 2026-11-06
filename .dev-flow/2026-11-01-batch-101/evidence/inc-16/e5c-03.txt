@@ -1,0 +1,26 @@
+=== batch-101 Inc 16 E5 corrective: controls of ruling group C-5 (COPY worktree)
+date: 2026-11-06T09:24:12Z
+source: branch b101-inc16 at b843fc6 plus the uncommitted E5 corrective edits (patch sha256 8e850809bbf34324)
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree with the increment staged: 1ec14f2277283169f33eb869979b51f697b50663
+staged paths vs base: 124
+working tree equal to the index: yes
+python: Python 3.11.18
+s19_app.__file__: <HOME>/work/s19_i16c_copy/s19_app/__init__.py
+--- command: python i16c-controls.py <copy> C-5 <guards of b843fc6>   (each control: pytest -q -p no:cacheprovider -m "not serial_timing" <node>, serial)
+--- M-11 restore the batch-94 'never called directly' rule in the map
+    nodes: test_r_doc_arch_4_2_no_broken_import_rule_restated
+    expected RED, got RED (exit 1) -> as expected
+    pytest: 1 failed in 0.08s
+    first assertion line: AssertionError: the map restates the batch-94 'never called directly' rule | assert 'never called directly' not in '# s19_app —...ing | no |\n'
+--- P-3 Inc 9 rewrites the flow_screens.py docstring to cite section 11
+    nodes: test_r_doc_arch_4_2_no_broken_import_rule_restated
+    expected GREEN, got GREEN (exit 0) -> as expected
+    pytest: 1 passed in 0.11s
+--- P-3/old the same rewrite under the guard file of b843fc6 (code review F-4)
+    nodes: test_r_doc_arch_4_2_no_broken_import_rule_restated
+    expected RED, got RED (exit 1) -> as expected
+    pytest: 1 failed in 0.21s
+    first assertion line: AssertionError: flow_screens.py cites docs/architecture.md section 11; it holds no sub-module table | assert []
+=== C-5: 3 of 3 controls as expected; copy worktree equal to its index afterwards: yes
+=== exit code: 0

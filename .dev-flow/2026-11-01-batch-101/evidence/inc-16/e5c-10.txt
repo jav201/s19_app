@@ -1,0 +1,27 @@
+=== batch-101 Inc 16 E5 corrective: final run on the corrected tree
+date: 2026-11-06T09:27:28Z
+source: branch b101-inc16 at b843fc6 plus the uncommitted E5 corrective edits (patch sha256 8340ce1de8464615)
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree with the increment staged: e661d71706f2ae77e5eacccfad0c4d0302d6b0b7
+staged paths vs base: 133
+working tree equal to the index: yes
+python: Python 3.11.18
+s19_app.__file__: <HOME>/work/s19_i16c/s19_app/__init__.py
+repository documents (CTX-DOCHYG) in the index: 49
+--- command: env -u NO_COLOR python -m pytest --collect-only -q -p no:cacheprovider tests/test_b101_doc_hygiene.py tests/test_docs_canon.py tests/test_b101_help_legend_docs.py tests/test_id_registry.py tests/test_suite_hygiene.py | tail -1
+193 tests collected in 0.94s
+  tests/test_b101_doc_hygiene.py: 45
+  tests/test_docs_canon.py: 2
+--- command: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -n 8 -m "not serial_timing" tests/test_b101_doc_hygiene.py tests/test_docs_canon.py tests/test_b101_help_legend_docs.py tests/test_id_registry.py tests/test_suite_hygiene.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 37%]
+........................................................................ [ 75%]
+................................................                         [100%]
+192 passed in 113.07s (0:01:53)
+=== exit code: 0
+--- command: env -u NO_COLOR python -m pytest --collect-only -q -p no:cacheprovider -m serial_timing <the same 5 files>   (what the marker filter left out)
+tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+1/193 tests collected (192 deselected) in 0.34s
+(not run here: the serial lane of these files)

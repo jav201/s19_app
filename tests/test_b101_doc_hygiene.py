@@ -669,8 +669,28 @@ def test_r_doc_dev_8_1_requirements_txt_equals_runtime_dependencies():
         if line and not line.startswith("#"):
             lines.add(re.sub(r"\s+", "", line))
     declared = {re.sub(r"\s+", "", d) for d in _pyproject()["project"]["dependencies"]}
-    assert len(declared) == 3, f"pyproject declares {declared}"
+    assert declared, "pyproject.toml declares no runtime dependency"
     assert lines == declared, f"requirements.txt {sorted(lines)} != pyproject {sorted(declared)}"
+
+
+def test_r_doc_dev_8_2_architecture_states_dependencies_and_markers():
+    """Verifies R-DOC-DEV.8 (case /2): section 8 of the architecture map names
+    the runtime dependencies and the test markers pyproject.toml declares, no
+    more and no fewer."""
+    pyproject = _pyproject()
+    names = {
+        re.match(r"[A-Za-z0-9][A-Za-z0-9._-]*", d.strip()).group(0)
+        for d in pyproject["project"]["dependencies"]
+    }
+    markers = {m.split(":", 1)[0].strip() for m in pyproject["tool"]["pytest"]["ini_options"]["markers"]}
+    assert names and markers, "pyproject.toml declares no dependency or no marker"
+    section = _section(_architecture(), 8)
+    sentences = re.findall(r"runtime dependency set \(([^)]*)\)", section)
+    assert len(sentences) == 1, f"section 8 holds {len(sentences)} runtime-dependency sentences, expected 1"
+    stated = set(re.findall(r"`([^`]+)`", sentences[0]))
+    assert stated == names, f"section 8 states dependencies {sorted(stated)}, pyproject declares {sorted(names)}"
+    bulleted = set(re.findall(r"(?m)^\s*[-*]\s+\*\*`([\w-]+)`\*\*", section))
+    assert bulleted == markers, f"section 8 lists markers {sorted(bulleted)}, pyproject registers {sorted(markers)}"
 
 
 _ROOT_DOCUMENTS = ("README.md", "REQUIREMENTS.md", "CLAUDE.md", "PROJECT_RULES.md", "SECURITY.md", "CHANGELOG.md")
@@ -747,15 +767,30 @@ def _rail_labels() -> set[str]:
     return labels
 
 
+def _split_join_label() -> str:
+    """The palette label of the Split / Join / Export window, read from the
+    EXTRA_PALETTE_ENTRIES pair whose action opens it."""
+    found = re.findall(r'\(\s*"([^"]+)",\s*"open_split_join_export"\s*\)', _need("s19_app/tui/app.py"))
+    assert len(found) == 1, f"expected one palette entry for open_split_join_export, read {found}"
+    return found[0]
+
+
 def test_r_doc_dev_11_1_overview_names_every_window():
-    """Verifies R-DOC-DEV.11 (case /1): docs/overview.md section 3 names every
-    rail window by its label and the Split / Join / Export window."""
+    """Verifies R-DOC-DEV.11 (case /1): the shell bullet of docs/overview.md
+    section 3 (the list item that holds "rail screens") names every rail
+    window by its label and the Split / Join / Export window. The check is
+    bound to that bullet: four labels also occur in other bullets of section 3,
+    so a section-wide search could not see one dropped from the window list."""
     labels = _rail_labels()
     assert len(labels) == 12, f"expected 12 distinct rail labels, read {sorted(labels)}"
+    wanted = sorted(labels) + [_split_join_label()]
     section = _section(_need("docs/overview.md"), 3)
-    wanted = sorted(labels) + ["Split / Join / Export"]
-    missing = [w for w in wanted if w not in section]
-    assert not missing, f"overview section 3 does not name: {missing}"
+    shell = [item for item in _list_items(section) if "rail screens" in item]
+    assert len(shell) == 1, f"{len(shell)} list items of section 3 hold 'rail screens', expected 1"
+    missing = [
+        w for w in wanted if not re.search(r"(?<![\w/])" + re.escape(w) + r"(?![\w/])", shell[0])
+    ]
+    assert not missing, f"overview section 3 window list does not name: {missing}"
 
 
 _KEY_RANGE_RX = re.compile(r"(?i)\btwelve\b.*`1`\s*[\u2013-]\s*`0`.*`=`.*`\]`")
@@ -877,10 +912,12 @@ def test_r_doc_dev_15_1_manifest_lists_every_case():
     folder of examples/ by its path relative to examples/; deleting one entry
     is reported."""
     folders = _example_case_folders()
-    assert len(folders) == 15, f"expected 15 case folders, found {folders}"
+    assert any("/" in f for f in folders) and any("/" not in f for f in folders), (
+        f"the tree yields no top-level case or no professional-validation case: {folders}"
+    )
     text = _need("examples/case_00_public/MANIFEST.md")
     missing = _manifest_missing(text, folders)
-    assert not missing, f"MANIFEST.md does not name {len(missing)} of 15 case folders: {missing}"
+    assert not missing, f"MANIFEST.md does not name {len(missing)} of {len(folders)} case folders: {missing}"
     control = "professional_validation/case_03_overlapping_records"
     mutated = text.replace(control, "")
     assert _manifest_missing(mutated, folders) == [control], "control: the deleted entry is not reported"
@@ -1000,19 +1037,12 @@ def test_r_doc_arch_4_1_submodules_declared():
 
 def test_r_doc_arch_4_2_no_broken_import_rule_restated():
     """Verifies R-DOC-ARCH.4 (case /2): the map restates no import rule the
-    code breaks, and each section the flow_screens module docstring cites
-    resolves to a section holding the sub-module table."""
+    code breaks. It reads the map only: the flow_screens.py docstring that
+    cites it is Inc 9's to rewrite (BACKLOG-CODE.md), and a docs guard must not
+    constrain that rewrite."""
     text = _architecture()
     assert "never called directly" not in text, "the map restates the batch-94 'never called directly' rule"
     assert "flow_screens \u2192 services/flow_model" not in text, "the map restates the batch-94 data-edge rule"
-    tree = ast.parse(_need("s19_app/tui/flow_screens.py"))
-    doc = ast.get_docstring(tree) or ""
-    cited = re.findall(r"docs/architecture\.md[`'\"\s]*(?:\u00a7|section\s)\s*(\d+)", doc)
-    for number in cited:
-        section = _section(text, int(number))
-        assert _submodule_tables(section), (
-            f"flow_screens.py cites docs/architecture.md section {number}; it holds no sub-module table"
-        )
 
 
 _NAMED_CONTRACTS = (
@@ -1203,7 +1233,7 @@ def _local_account_and_host_names() -> set[str]:
     ):
         if value:
             short = value.split(".")[0]
-            if len(short) >= 3 and short.lower() != "runner":
+            if len(short) >= 3 and short.lower() not in ("runner", "root"):
                 names.add(short)
     return names
 

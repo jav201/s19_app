@@ -155,12 +155,13 @@ Markers (registered in `pyproject.toml`):
 
 - **`slow`** — stress / perf smoke tests. `pytest -q -m "not slow"` skips them. No example smoke case is currently pinned `@pytest.mark.slow`: the former ~490s `pv__case_06_large_nested_a2l` duplicate was pruned in batch-36 (US-060), and the large-A2L pipeline is now covered by the retained 36 MB top-level `case_06_large_nested_a2l` in the normal suite.
 - **`snapshot`** — `pytest-textual-snapshot` baselines.
+- **`serial_timing`** — a wall-clock timing arm, run apart and serially: CI lane 2 runs `-m serial_timing`, lane 1 leaves these out (`-m "not serial_timing"`).
 
 Visual regression: 29 SVG baselines under `tests/__snapshots__/`, generated only against the public synthetic fixtures (`examples/case_00_public/` and the `tests/conftest.py` generators) — **never against client firmware, A2L or MAC artefacts** (`R-TUI-034`, the TC-031 no-leak inspection).
 
 Per-case Pilot / GIF evidence lives under `tests/test_examples_*`.
 
-`pytest-textual-snapshot` is declared under `[project.optional-dependencies]` in `pyproject.toml` (dev-only); the runtime dependency set (`rich`, `textual`) is unchanged (`R-TUI-032`).
+`pytest-textual-snapshot` is declared under `[project.optional-dependencies]` in `pyproject.toml` (dev-only); the runtime dependency set (`rich`, `textual`, `markdown-it-py`) is unchanged (`R-TUI-032`).
 
 ## 9. The dev-flow process that built it
 
@@ -179,8 +180,8 @@ Per-batch artefacts are archived under `.dev-flow/<YYYY-MM-DD>-batch-NN/`. The r
 
 **The `Paths it owns` column is the mechanical part.** It is what makes this a map and not an essay:
 any touched file is classified by path prefix, so the A-family triggers can be evaluated by a script.
-Measured 2026-08-24 over `git ls-files` — **266 tracked source files** (`.py`), every one classified
-below except the single exception named after the table.
+Every tracked source file (`.py`, by `git ls-files`) is classified below except the single
+exception named after the table.
 
 | Module | Paths it owns | What it encapsulates | What it EXPOSES | What does NOT belong to it |
 |---|---|---|---|---|

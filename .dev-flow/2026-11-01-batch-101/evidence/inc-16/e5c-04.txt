@@ -1,0 +1,31 @@
+=== batch-101 Inc 16 E5 corrective: controls of ruling group C-8 (COPY worktree)
+date: 2026-11-06T09:24:15Z
+source: branch b101-inc16 at b843fc6 plus the uncommitted E5 corrective edits (patch sha256 8e850809bbf34324)
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree with the increment staged: 1ec14f2277283169f33eb869979b51f697b50663
+staged paths vs base: 124
+working tree equal to the index: yes
+python: Python 3.11.18
+s19_app.__file__: <HOME>/work/s19_i16c_copy/s19_app/__init__.py
+--- command: python i16c-controls.py <copy> C-8 <guards of b843fc6>   (each control: pytest -q -p no:cacheprovider -m "not serial_timing" <node>, serial)
+--- M-12 a CLAUDE.md line with one s19tool shape and a bare command
+    nodes: test_at285_no_live_cdfx_or_s19tool_console_script_token
+    expected RED, got RED (exit 1) -> as expected
+    pytest: 1 failed in 0.20s
+    first assertion line: AssertionError: live CDFX / s19tool-console-script tokens: | CLAUDE.md:7: s19tool as a live command: The `.s19tool/` folder is created by `s19tool firmware.s19 info`.
+--- M-12/old the same line under the canon test of b843fc6 (whole-line excuse, coverage audit C-3)
+    nodes: test_at285_no_live_cdfx_or_s19tool_console_script_token
+    expected GREEN, got GREEN (exit 0) -> as expected
+    pytest: 1 passed in 0.15s
+--- M-13 add a bare command line to CLAUDE.md (E5-mutants mut-05)
+    nodes: test_at285_no_live_cdfx_or_s19tool_console_script_token
+    expected RED, got RED (exit 1) -> as expected
+    pytest: 1 failed in 0.16s
+    first assertion line: AssertionError: live CDFX / s19tool-console-script tokens: | CLAUDE.md:7: s19tool as a live command: s19tool firmware.s19 info
+--- M-14 the per-occurrence step removed from the canon test (instrument)
+    nodes: test_at285_no_live_cdfx_or_s19tool_console_script_token
+    expected RED, got RED (exit 1) -> as expected
+    pytest: 1 failed in 0.06s
+    first assertion line: AssertionError: negative-control lines misjudged (line, expected, got): [('`.s19tool/` is created by `s19tool firmware.s19 info`', 1, 0)] | assert not [('`.s19tool/` is created by `s19tool firmware.s19 info`', 1, 0)]
+=== C-8: 4 of 4 controls as expected; copy worktree equal to its index afterwards: yes
+=== exit code: 0

@@ -11,7 +11,7 @@ This `docs/` directory holds the **general** documentation that sits above the p
 | Document | For |
 |---|---|
 | [overview.md](./overview.md) | what `s19_app` is, who it's for, current capabilities, typical workflow, what's deferred |
-| [architecture.md](./architecture.md) | three-layer architecture, Direction B TUI shell, Patch Editor flow, path / XML / JSON safety, engine invariant, testing |
+| [architecture.md](./architecture.md) | three-layer architecture, Direction B TUI shell, Patch Editor flow, path / JSON safety, engine invariant, testing, module map (§10) and interface contracts (§11) |
 | [engineering-rules.md](./engineering-rules.md) | project- and stack-specific dev-flow gates and engineering controls |
 | [CENSUS-BASELINE-canon-mirror.md](./CENSUS-BASELINE-canon-mirror.md) | frozen census baseline mirror of the requirements canon |
 | [requirements/](requirements/) | requirements rationale ([review](requirements/review/)) and earlier canon ([history](requirements/history/)) |
