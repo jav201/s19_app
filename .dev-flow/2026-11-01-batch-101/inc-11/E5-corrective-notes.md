@@ -71,7 +71,7 @@ Snapshot plugin: E4 recorded `pytest-textual-snapshot` as absent on the host. It
 - **F5 for `tc710`** kept `'PrgCode'` (reason in the table above).
 - **R-A2L-036.7/1** and **R-SEG-SRC.6/2** stay partial. A black-box route for the empty-segment clause would need one more Load-dialog AT. I judged that out of scope for C-7, which asks to add each clause.
 - The **R-VAL-032.2/3 corpus oracle** still walks the parser's tree (audit §3 recommendation). No ruling covers it; it is noted in the O-5 backlog bullet.
-- Remote helper `/tmp/c11e5_mutate.py`, `/tmp/c11e5_svgdiff.py` and `/tmp/c11e5_bak` were removed with the worktree. Local helpers (`c11e5_*`) stay in the session scratchpad, outside the repository.
+- **Remote clean-up not done:** after the last run the LAN host 2 stopped answering on port 22 (ssh connection timed out repeatedly over about 20 minutes). Still on the host: the worktree `<HOME>/work/s19_c11` (detached `f9f3cb09` + the uncommitted branch diff), the helpers `/tmp/c11e5_mutate.py`, `/tmp/c11e5_svgdiff.py`, `/tmp/c11e5_bak` and the basetemp `/tmp/pytest-s19c11`. To remove them: `git -C ~/work/s19_app worktree remove --force ~/work/s19_c11 && git -C ~/work/s19_app worktree prune` and `rm -rf /tmp/c11e5_* /tmp/pytest-s19c11`. Local helpers (`c11e5_*`) stay in the session scratchpad, outside the repository.
 
 ## Evidence checklist
 
