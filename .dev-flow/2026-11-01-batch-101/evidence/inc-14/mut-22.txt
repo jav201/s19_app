@@ -1,0 +1,29 @@
+REPLACE_COUNT=1
+MUTATED
+APPFILE=<HOME>/work/s19_m14/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________________ test_r_doc_readme_3_1_every_ctx_key_listed __________________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+    def test_r_doc_readme_3_1_every_ctx_key_listed() -> None:
+        assert len(_CTX_KEYS) == 26
+        rows = _table_rows(_readme())
+        found = _ctx_key_rows_found(rows)
+        missing = [k for k in _CTX_KEYS if k not in found]
+>       assert missing == [], f"keys with no README table row and action: {missing}"
+E       AssertionError: keys with no README table row and action: [('c',)]
+E       assert [('c',)] == []
+E         
+E         Left contains one more item: ('c',)
+E         Use -v to get more diff
+
+tests/test_b101_help_legend_docs.py:1376: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_readme_3_1_every_ctx_key_listed
+1 failed in 1.26s
+PYTEST_RC=1
+RESTORE_OK

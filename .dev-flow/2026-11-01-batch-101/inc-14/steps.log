@@ -11,3 +11,4 @@ E4 integration start 2026-11-05T22:00Z model=opus
 E4 integration end 2026-11-05T23:41Z GREEN on the LAN Linux host model=opus
 E5 corrective start 2026-11-05T23:52Z model=opus
 E5 corrective end 2026-11-06T01:13Z model=opus cases=74 covered=71 not-testable=3 runs=int-07,int-07b,int-08,int-09
+E5 end 2026-11-06T02:34:22Z model=deepseek-v4-pro (records)

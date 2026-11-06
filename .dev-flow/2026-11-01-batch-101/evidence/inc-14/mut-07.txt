@@ -1,0 +1,34 @@
+REPLACE_COUNT=1
+MUTATED
+APPFILE=<HOME>/work/s19_m14/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________________ test_tc707_numbering_generated_sequential ___________________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+    def test_tc707_numbering_generated_sequential() -> None:
+        """TC-707 (R-WHELP.7/1, E3 A-3; node name kept, it no longer reads the
+        md): in all 12 sections (a) paragraph n of the rendered body equals
+        ``f"{n}. {steps[n-1]}"`` -- the numbering is generated at render so an
+        edit can never leave a gap; (b) no stored step starts with its own number;
+        (c) the step count equals the pinned count.
+    
+        Negative controls: a stored step ``1. Checks run ...`` reddens (b); one
+        step dropped from any section reddens (c); a gap in a rendered body
+        reddens (a).
+        """
+>       assert _numbering_defects(WINDOW_HELP_SECTIONS) == []
+E       AssertionError: assert [('checks', 'b')] == []
+E         
+E         Left contains one more item: ('checks', 'b')
+E         Use -v to get more diff
+
+tests/test_window_usage_help.py:317: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_window_usage_help.py::test_tc707_numbering_generated_sequential
+1 failed in 1.12s
+PYTEST_RC=1
+RESTORE_OK

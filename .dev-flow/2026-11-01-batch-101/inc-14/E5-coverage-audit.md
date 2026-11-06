@@ -140,3 +140,52 @@ If `SECURITY.md` is held out at merge, the following move with it:
 | R-DOC-README.4/2 | `test_r_doc_readme_4_2_linked_documents_exist` | asserts that every README link target exists (`test_b101_help_legend_docs.py:1198`), and `README.md:429` links `SECURITY.md`. Its Expected also lists `SECURITY.md`. It stays GREEN only if the README row is held out with the file and the case's link list is edited. |
 
 No other case depends on `SECURITY.md`: `CHANGELOG.md` does not link it, and the TC-607 bound counts only `tests/**/*.py`.
+
+## Re-audit (2026-11-05)
+
+Head `0bbb2c6`. Mode: **validation**, re-check of the cases the corrective pass changed or added (33 of 74: 28 changed, 5 new). Inputs: `E5-rulings.md` (C-1 … C-9), `E5-corrective-notes.md`, `git diff 7d37efa..0bbb2c6` of `02-test-cases.md`, `01-requirements.md`, `E1-rulings.md`, `E3-rulings.md` and `tests/`, the `e5c-*` transcripts and `gh-pvr.txt`. `E5-mutants.md` was not read or touched.
+
+Evidence: **inspection** of the tests and product code; one **executed** `pytest --collect-only` over the 12 cited files, run by me on the Windows PC (418 collected, 0 errors; every one of the 85 distinct node ids the cases cite collects; the only non-match is the prose template `passage-<n>`). I ran no test. Every pass or fail below is read from the corrective-pass runs on the LAN Linux host (int-07, int-07b, int-08, int-09), executed by the corrective-pass agent for the orchestrator. One data read: the pinned release-note paragraphs in G equal `inc-8/release-note-crc.md` §What changed and §Am I affected?, verbatim.
+
+### R.1 Earlier issues
+
+| Earlier issue | Status | Evidence |
+|---|---|---|
+| 12/2 window scope and prefix match | **closed** | each rail window read from `#<SCREEN_CONTAINER_IDS[w]>`; `_label_names` matches whole labels; negative controls for another window's control (`Filter tags` in Checks) and for longer labels. Mutants M1 (Checks loses `Hex Peek`) and M2 (A2L `Goto` → `Go`) are RED on the new test and GREEN on the pre-E5 probe; `app.py` diff 0 after the reverts (`e5c-c1-*.txt`) |
+| 13/2 union, not mapping | **closed** | `_FOLDER_MAP` (12 spans) against the product constants read by `_folder_constants()`; reports unmapped spans, unwritten entries and wrong folders; a swap negative control |
+| README.4/3 | **closed** | both whole sentences pinned; `not implemented` tied to exactly `extract` and `split_by_segment`; two swap controls; `split_by_segment` executed |
+| RELNOTE.1/1 | **closed** | both headings compared whole, whitespace-normalised; the pinned oracle equals the Inc 8 note (data read) |
+| GUIDE.1/9 | **closed**, one weak control (R.2 #4) | `_bullet` scopes to the `Header` and `Runs` bullets of `## 21.1` |
+| SR-1 record text | **closed in the text**; one citation gap (R.2 #1) | requirement threshold, D-5 and cases /1, /4, /7, /8 follow I-5 |
+| 12/1 "11 sections" | **closed** | 8 sections, N-1 in Inputs |
+| Module cites (21/2, 011/2) | **closed** | both name nodes; both collect |
+| Nine clauses (§4) | **closed** | C-1 → 7/2; C-2 → 1/3; C-3 → 2/2 not-testable; C-4 → 6/1; C-5 → 7/1; C-6 → 8/2 not-testable; C-7 → 1/1; C-8 → 1/12; C-9 → 12/2 |
+| Black box `?` and `k` | **closed** | 7/2 presses `question_mark` (and `t` for Reports) with a non-chip, non-text widget focused, and compares the rendered `.modal-title` and `#window_help_body` with the `tests/support` copy (7 sections; Flow Builder's 6 steps and its 59-step count). `062_10_1_3` presses `4` then `k` and compares the rendered `Map keys` box with `COPY.MAP_KEYS_LINE`. Focus is set by `app.set_focus`, not by key (precondition only) |
+| Load-path note (TCP-MAP-7) | **closed** | in 12/2, 7/2, 20/2, 21/2, 22/2, 011/1, 011/2 |
+| Hold-out group | **identified**; two record gaps (R.2 #5) | G docstring, E3 N-2 and C-9 name the three tests and the README row; `README.md:468` links `SECURITY.md` (confirmed). SECURITY.1/2 reads `failed`, citing `gh-pvr.txt` = `{"enabled":false}` at 2026-11-05T23:42:44Z |
+
+### R.2 Remaining issues
+
+| # | Case | Issue | Fix | Who |
+|---|---|---|---|---|
+| 1 | R-DOC-GUIDE.1/1, /4, /7, /8 | Expected now asks for `(capture taken before 1.0.0` **followed by** `: <what the capture shows>)`, but the only node cited, `passage-N`, pins the prefix `_BEFORE` only (`test_b101_help_legend_docs.py:1780`). The continuation is asserted by `test_r_doc_guide_1_12_*`, which these four cases do not cite (TCP-MAP-1) | cite `test_r_doc_guide_1_12_capture_notes_beside_their_captures` (full: the continuation) in each Tests cell. Records only | case |
+| 2 | R-WHELP.7/2 | The key-line arm compares the painted `#window_help_keys` with `window_keys_text(app, key)`, which is the call the modal composes it from (`window_help.py:714-716`). So the content of the key lines is checked against the product itself. The presence/absence set is independent, and it agrees with CTX-KEYBAR (Flow Builder and CRC Designer have no window keys; Reports is not a window), but the test justifies it by `WINDOW_KEYS`, not by CTX-KEYBAR | compare the key of each painted line with the CTX-KEYBAR window-keys list (Workspace `/ g , . k p o r U`, A2L `/ g + - d k`, Checks `k`, Split/Join/Export `space a n t m g f p d e esc`), or mark the key-line content `partial` with this reason | test or case |
+| 3 | R-TUI-062.10.1/1 | The new black-box node is named `test_r_tui_062_10_1_3_*`, but no case R-TUI-062.10.1/3 exists; it is cited under /1. The id points at a case that is not there | rename to `…_1_1_k_paints_…`, or add the case | test or case |
+| 4 | R-DOC-GUIDE.1/9 | The negative control deletes `from the loaded A2L and MAC`; the comment says "moved to another bullet". A deletion is also caught by the whole-file `passage-9` arm, so the control does not show that the bullet scope works | move the phrase into the `Header` bullet and assert that `Runs` no longer holds it. Mark stays full | test |
+| 5 | R-DOC-SECURITY.2/1; R-DOC-README.4/2 | 2/1's row does not say it belongs to the hold-out group (1/1, 1/2 and 1/3 say so; 2/2 depends on the file too). README.4/2 is not a changed case, but its Expected still lists `SECURITY.md` among the link targets, which turns false once row `:468` is held out | tag 2/1 (and 2/2) as hold-out; make 4/2's `SECURITY.md` entry conditional on the group | case |
+
+Notes, no change asked:
+- R-DOC-SECURITY.2/2 is `not-testable` but is in fact testable at the tag (a tree listing of the release tag). "Deferred to batch end" is the more exact word; the flow has none, so it stands.
+- The Result column keeps `verified (linux, int-07)` per ruling C-4. I do not reopen that. int-07 had one failure (the hygiene guard, on a record line), and it re-ran GREEN in int-07b. The last guard run over the final folder was executed but not saved.
+
+### R.3 Re-checked cases I would still change
+
+**8 of 33 = 24.2%**: GUIDE.1/1, /4, /7, /8 (#1, records only), R-WHELP.7/2 (#2), R-TUI-062.10.1/1 (#3), R-DOC-GUIDE.1/9 (#4), R-DOC-SECURITY.2/1 (#5). README.4/2 is outside the 33.
+
+### R.4 Final totals (74 cases)
+
+| As recorded at `0bbb2c6` | After this re-audit |
+|---|---|
+| covered 71 · not-testable 3 | covered **66** · partial **5** (GUIDE.1/1, /4, /7, /8 until they cite 1/12; R-WHELP.7/2 key-line content) · not-testable **3** |
+
+Once #1 is applied (records only), the totals are 70 · 1 · 3. They are 71 · 0 · 3 once #2 is applied too. Results: 71 `verified (linux, int-07)`, 1 `failed` (R-DOC-SECURITY.1/2, the setting is off), and 2 `not_run`.

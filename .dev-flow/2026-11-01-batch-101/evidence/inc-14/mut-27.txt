@@ -1,0 +1,34 @@
+DELETED
+APPFILE=<HOME>/work/s19_m14/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______________ test_r_doc_security_1_1_policy_names_private_path _______________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+    def test_r_doc_security_1_1_policy_names_private_path() -> None:
+        # The graph's text sets the UI names in bold (**Security** tab); match the rendered words.
+>       text = _flat(_doc("SECURITY.md")).replace("**", "")
+                     ^^^^^^^^^^^^^^^^^^^
+
+tests/test_b101_help_legend_docs.py:1482: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'SECURITY.md'
+
+    def _doc(rel: str) -> str:
+        path = ROOT / rel
+>       assert path.is_file(), f"{rel} does not exist in the repository"
+E       AssertionError: SECURITY.md does not exist in the repository
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('<HOME>/work/s19_m14/SECURITY.md').is_file
+
+tests/test_b101_help_legend_docs.py:87: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_security_1_1_policy_names_private_path
+1 failed in 1.26s
+PYTEST_RC=1
+RESTORE_OK

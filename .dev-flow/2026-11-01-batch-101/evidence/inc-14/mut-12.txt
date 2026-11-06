@@ -1,0 +1,32 @@
+REPLACE_COUNT=1
+MUTATED
+APPFILE=<HOME>/work/s19_m14/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________ test_r_whelp_21_1_split_step_names_the_loaded_image ______________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+    def test_r_whelp_21_1_split_step_names_the_loaded_image() -> None:
+>       _equals_copy("split_join_export", 1)
+
+tests/test_b101_help_legend_docs.py:790: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+section = 'split_join_export', number = 1
+
+    def _equals_copy(section: str, number: int) -> None:
+>       assert _steps(section)[number - 1] == COPY.REWRITTEN_SECTIONS[section][1][number - 1]
+E       AssertionError: assert 'Pick the sou...c` closes it.' == 'The window e...c` closes it.'
+E         
+E         - The window exports parts of the loaded image (`^L`). Open it from the palette (`^K`, Split / Join / Export); `esc` closes it.
+E         + Pick the source image: the loaded file, a project file, or browse to one. Open it from the palette (`^K`, Split / Join / Export); `esc` closes it.
+
+tests/test_b101_help_legend_docs.py:772: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_help_legend_docs.py::test_r_whelp_21_1_split_step_names_the_loaded_image
+1 failed in 1.22s
+PYTEST_RC=1
+RESTORE_OK
