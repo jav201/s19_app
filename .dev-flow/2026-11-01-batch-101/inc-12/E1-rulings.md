@@ -69,3 +69,18 @@ No other canon row changes. Cited and unchanged: R-DLG.9 (Close changes nothing 
 - **BL-I12-2** (observation): the Reports dialog of a project with no report opens with the focus on its `?` chip (B line 53); no canon row decides where it should land.
 - **BL-I12-3** (D-9, with D7-31): the Reports dialog's Close button shows no key (R-DLG.11).
 - **BL-I12-4** (D-2 B or C only): if `_jump_to_validation_issue*` stays, it remains code no route runs (D3-7 stays open).
+
+## Orchestrator rulings (2026-11-06, under the operator's standing commission)
+
+| Decision | Ruling | Why |
+|---|---|---|
+| D-1 | **A** — remove `VariantHelpScreen`, `VARIANT_HELP_TEXT`, the one test node and its token tuple. | No opener on the base (census); a dialog no route opens is dead code. |
+| D-2 | **A** — remove the three aliases and take D3-7 (`_jump_to_validation_issue`, `_jump_to_validation_issue_object`, `_format_validation_issue_line`, the node and the 3 formatter assertions). **Rules Inc 10a:** the orchestrator verified on main `2d1e2b1` that `_jump_to_validation_issue` has no caller and `_jump_to_validation_issue_object` is called only by it, so no product route runs the issue jump. Inc 10a drops its slice #11 and every case that drives the issue jump (R-TUI-018.1/5, R-TUI-040.12/2 and any other the census finds), before its E4 — recorded in `inc-10/E3-rulings.md` (addendum "Inc 12 D-2"). | The approved product has no issue jump (Enter on an issue row repaints the peek); testing a dead adapter is a partial test, and wiring a new jump is a feature outside batch-101. |
+| D-3 | **A** — remove the Check Editor `Addendum preview` button and its handler branch. | The Addendum tab chip carries its function. |
+| D-4 | **A** — `#flow_kind` removed; the kind is `FlowBuilderPanel._kind`, set by the chips. | A hidden widget as the state holder is the defect F-35 names. |
+| D-5 | **B** — split: **Inc 12b** takes `flow_screens.py` alone (D16-6 and D-4, its nodes and the 36 re-pointed test nodes, tester lane G-T3); **Inc 12** keeps F-33, F-34 + D3-7, F-51, D9-8 (3 source files). Inc 12b's E4 starts once Inc 9 merges (the module docstring), in parallel with Inc 10a/10b; Inc 12's E4 stays last in the `app.py` chain. The split is applied by the E3 correction pass (Opus): records in `inc-12/` and `inc-12b/`, as Inc 10 / 10b. | Takes the largest test work off the serial `app.py` chain (schedule), and keeps each increment small (orchestration rule: split rather than grow). |
+| D-6 | **A** — backlog BL-I12-1. | The 4-source-file cap; docstrings only. |
+| D-7 | **A** — a plain (non-priority) screen binding `escape` that does what Close does. | Matches the other dialogs; an open dropdown keeps its own Escape (D-8). E3 (UX lens) checks the 10 focus places. |
+| D-8 | **A** — R-DLG.2 gains "while none of its dropdown lists is open"; new R-DLG.15 for that state. | The canon row as written is contradicted by Textual's open-list behaviour. |
+| D-9 | **A** — keep `Close`; BL-I12-3. | Visible keys on buttons go through a prototype round (D7-31). |
+| D-10 | **A** — census rows R-DLG.14, R-SHELL-KEYS.3 and the widget census, reading the toolkit's bindings. | A census guards the class of defect, not only the four instances. |
