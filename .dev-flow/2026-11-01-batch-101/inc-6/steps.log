@@ -1,0 +1,5 @@
+E1 start 2026-11-06T10:58Z model=opus base=9bb0e3a (Inc 5 in flight on b101-inc5)
+E1 pilot 2026-11-06T11:10Z LAN Linux host on 9bb0e3a: F-05, D10-30, F-06 (+D9-15, D14-17), F-40 reproduced; F-47 not reproduced (evidence-e1/)
+E1 end 2026-11-06T11:22Z model=opus rows=22 active (+1 withdrawn parent) cases=53 slice=30 functions in 3 files
+E2 end 2026-11-06T11:22Z model=opus graph=codewire/graph-inc6.md 30 nodes, 3 groups, 6 pinned interfaces
+E1 rulings 2026-11-06T11:23Z orchestrator D-1..D-6
