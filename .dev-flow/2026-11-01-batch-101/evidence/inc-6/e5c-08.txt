@@ -1,0 +1,11 @@
+=== Inc 6 E5 corrective run: e5c-08-windows-junction-and-file-link-arms (C-12)
+date: 2026-11-06T15:26:46Z
+host: this Windows PC (Windows-only-arm rule: LOCALAPPDATA, APPDATA, TEMP, TMP = a fresh folder; the clipboard is never written; NO_COLOR unset)
+branch head: 56593a30d2f172729ef42bc794c120526074b0b9 (plus this pass's uncommitted edits)
+tree of origin/main + this diff (s19_app tests docs README.md): 2dedfdeb78d36dda9a8fc5ff480b1633770a9cd3 (= the LAN host 2 staged tree of e5c-02 … e5c-07)
+python: Python 3.11.15
+CMD: env -u NO_COLOR python -c 'import s19_app, pytest; ...; pytest.main([-q, -p no:cacheprovider, -m not serial_timing, -rfs, <10 nodes>])'
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc6\s19_app\__init__.py
+..........                                                               [100%]
+10 passed in 45.78s
+=== exit code: 0

@@ -1,0 +1,42 @@
+=== Inc 6 E5 corrective run: e5c-04-repeat-1
+date: 2026-11-06T15:23:31Z
+worktree HEAD (base): 98d94d724a72c56468292be123ff15f664acb4fa
+index tree with the increment staged: 2dedfdeb78d36dda9a8fc5ff480b1633770a9cd3
+staged files vs base: 18
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i6c/s19_app/__init__.py
+CMD: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -n 10 -m not serial_timing -rfs tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[project] tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[project] tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_kept_on_save_project tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_kept_on_save_project tests/test_b101_patch_lifecycle.py::test_r_chk_pe_008_subtitle[revert] tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[add] tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[project] tests/test_b101_patch_lifecycle.py::test_r_chk_pe_010_status[project] tests/test_b101_patch_lifecycle.py::test_r_chk_pe_011_strip[project] tests/test_b101_patch_lifecycle.py::test_r_chk_pe_012_rows[project] tests/test_b101_patch_lifecycle.py::test_r_chk_pe_014_glyph_after_save_back tests/test_b101_document_homes.py::test_r_patch_doc_dropdown_001_3_pick_keeps_spelling tests/test_b101_document_homes.py::test_r_patch_doc_dropdown_001_3_pick[library] tests/test_b101_document_homes.py::test_r_chked_032_write_status_names_the_home tests/test_b101_document_homes.py::test_r_chked_031_write_home[after-library-pick] tests/test_b101_document_homes.py::test_r_patch_doc_dropdown_001_4_refused[unknown-folder] tests/test_tui_patch_editor_v2.py::test_at030a_dropdown_lists_and_loads_selected_change_file tests/test_tui_check_chain_b94.py::test_tc_b94_15_dropdown_population
+bringing up nodes...
+bringing up nodes...
+
+....................                                                     [100%]
+20 passed in 23.68s
+=== exit code: 0
+=== Inc 6 E5 corrective run: e5c-04-repeat-2
+date: 2026-11-06T15:23:55Z
+worktree HEAD (base): 98d94d724a72c56468292be123ff15f664acb4fa
+index tree with the increment staged: 2dedfdeb78d36dda9a8fc5ff480b1633770a9cd3
+staged files vs base: 18
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i6c/s19_app/__init__.py
+CMD: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -n 10 -m not serial_timing -rfs tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[project] tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[project] tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_kept_on_save_project tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_kept_on_save_project tests/test_b101_patch_lifecycle.py::test_r_chk_pe_008_subtitle[revert] tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[add] tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[project] tests/test_b101_patch_lifecycle.py::test_r_chk_pe_010_status[project] tests/test_b101_patch_lifecycle.py::test_r_chk_pe_011_strip[project] tests/test_b101_patch_lifecycle.py::test_r_chk_pe_012_rows[project] tests/test_b101_patch_lifecycle.py::test_r_chk_pe_014_glyph_after_save_back tests/test_b101_document_homes.py::test_r_patch_doc_dropdown_001_3_pick_keeps_spelling tests/test_b101_document_homes.py::test_r_patch_doc_dropdown_001_3_pick[library] tests/test_b101_document_homes.py::test_r_chked_032_write_status_names_the_home tests/test_b101_document_homes.py::test_r_chked_031_write_home[after-library-pick] tests/test_b101_document_homes.py::test_r_patch_doc_dropdown_001_4_refused[unknown-folder] tests/test_tui_patch_editor_v2.py::test_at030a_dropdown_lists_and_loads_selected_change_file tests/test_tui_check_chain_b94.py::test_tc_b94_15_dropdown_population
+bringing up nodes...
+bringing up nodes...
+
+....................                                                     [100%]
+20 passed in 24.50s
+=== exit code: 0
+=== Inc 6 E5 corrective run: e5c-04-repeat-3
+date: 2026-11-06T15:24:20Z
+worktree HEAD (base): 98d94d724a72c56468292be123ff15f664acb4fa
+index tree with the increment staged: 2dedfdeb78d36dda9a8fc5ff480b1633770a9cd3
+staged files vs base: 18
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i6c/s19_app/__init__.py
+CMD: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -n 10 -m not serial_timing -rfs tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[project] tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[project] tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_kept_on_save_project tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_kept_on_save_project tests/test_b101_patch_lifecycle.py::test_r_chk_pe_008_subtitle[revert] tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[add] tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[project] tests/test_b101_patch_lifecycle.py::test_r_chk_pe_010_status[project] tests/test_b101_patch_lifecycle.py::test_r_chk_pe_011_strip[project] tests/test_b101_patch_lifecycle.py::test_r_chk_pe_012_rows[project] tests/test_b101_patch_lifecycle.py::test_r_chk_pe_014_glyph_after_save_back tests/test_b101_document_homes.py::test_r_patch_doc_dropdown_001_3_pick_keeps_spelling tests/test_b101_document_homes.py::test_r_patch_doc_dropdown_001_3_pick[library] tests/test_b101_document_homes.py::test_r_chked_032_write_status_names_the_home tests/test_b101_document_homes.py::test_r_chked_031_write_home[after-library-pick] tests/test_b101_document_homes.py::test_r_patch_doc_dropdown_001_4_refused[unknown-folder] tests/test_tui_patch_editor_v2.py::test_at030a_dropdown_lists_and_loads_selected_change_file tests/test_tui_check_chain_b94.py::test_tc_b94_15_dropdown_population
+bringing up nodes...
+bringing up nodes...
+
+....................                                                     [100%]
+20 passed in 24.34s
+=== exit code: 0

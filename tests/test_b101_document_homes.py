@@ -514,7 +514,8 @@ def test_r_patch_doc_dropdown_001_3_pick(tmp_path: Path, arm: str) -> None:
     loads that file, the document source spelled from the app's work area (not
     resolved, S-4), status ``Loaded check: 2 entries, 0 error(s)``; a pick of
     ``library/w.json`` in a project loads ``workarea/patches/w.json``, status
-    ``Loaded change: 1 entry, 0 error(s)``, ribbon name ``w.json``.
+    ``Loaded change: 1 entry, 0 error(s)``, ribbon name segment exactly
+    ``w.json`` (not the listed ``library/w.json``; E5 C-4).
 
     Negative control: the pick resolved under ``workarea/patches/`` ->
     ``checks/k.chk.json`` is refused -> RED; the resolved path returned as the
@@ -543,7 +544,7 @@ def test_r_patch_doc_dropdown_001_3_pick(tmp_path: Path, arm: str) -> None:
             assert "Loaded change: 1 entry, 0 error(s)" in lines, lines
             assert source_of(app) == lib(app) / "w.json"
             ribbon = str(app.query_one("#patch_identity_ribbon").render())
-            assert "w.json" in ribbon, ribbon
+            assert ribbon.split(" · ")[0] == "w.json", ribbon
         return True
 
     assert run(tmp_path, scenario) is True
@@ -594,7 +595,8 @@ def test_r_patch_doc_dropdown_001_3_pick_keeps_spelling(tmp_path: Path) -> None:
     through a link ``alias -> real`` above ``.s19tool``, so the given and the
     resolved spellings differ. A pick of ``patches/a.json`` keeps the work
     area's spelling as the document source, so Save project classes the file
-    in the project and, with an entry added, says
+    in the project and, with an entry added, a Save project through ``ctrl+s``
+    and its dialog (E5 C-3) says
     ``Change document a.json has unsaved edits - the project records the file
     as it is on disk; save it from the Patch Editor to keep them``.
 
@@ -619,7 +621,9 @@ def test_r_patch_doc_dropdown_001_3_pick_keeps_spelling(tmp_path: Path) -> None:
             f"the source must keep the work area's spelling, got {source_of(app)}"
         )
         await add_patch_entry(pilot, app, "0x8007", "CC")
-        lines = await projects.save_project(pilot, app, log, "proj")
+        mark = len(log.messages)
+        await save_project_by_dialog(pilot, app, log, "proj")
+        lines = log.since(mark)
         expected = (
             "Change document a.json has unsaved edits — the project records "
             "the file as it is on disk; save it from the Patch Editor to keep them"
@@ -658,7 +662,7 @@ async def post_change_pick(pilot, app, log, name: str) -> list:
 def test_r_patch_doc_dropdown_001_4_refused(tmp_path: Path, arm: str) -> None:
     """Cases R-PATCH-DOC-DROPDOWN-001.4/1 .. /5: a pick that is a link, lies
     under a linked folder (also one that stays inside the project, S-3), has no
-    known folder or a ``..``, or whose folder became a link while the
+    known folder, a ``..`` or is ``.`` (the folder itself, E5 C-7), or whose folder became a link while the
     unsaved-changes popup was open (S-5), is refused with the status
     ``Patch Editor: change file '<name>' is outside the patches folder — not
     loaded.`` and the document is unchanged.
@@ -695,7 +699,7 @@ def test_r_patch_doc_dropdown_001_4_refused(tmp_path: Path, arm: str) -> None:
             make_link(project / "patches", outside)
             names = ["patches/x.json"]
         elif arm == "unknown-folder":
-            names = ["w.json", "patches/../../w.json"]
+            names = ["w.json", "patches/../../w.json", "patches/."]
         elif arm == "inside-link":
             make_link(project / "checks", project / "patches")
             names = ["checks/x.json"]
@@ -751,7 +755,9 @@ def test_r_chked_031_write_home(tmp_path: Path, arm: str) -> None:
     and no ``workarea/patches/s1.chk.json``. /2: with no project -> the common
     folder. /3: after a pick of ``library/w.chk.json``, Write (Write as
     ``w.chk.json``) -> ``proj/checks/w.chk.json``; ``workarea/patches/`` holds
-    only ``w.chk.json``, unchanged. never-overwrites: a ``checks/s1.chk.json``
+    only ``w.chk.json``, unchanged; the status names the project copy,
+    ``Check Editor: wrote checks/w.chk.json (1 fields, kind=check).``
+    (R-CHKED-032/3, E5 C-9). never-overwrites: a ``checks/s1.chk.json``
     that already exists keeps its bytes and the new spec takes another name.
 
     Negative control: Write without the check home -> the file lands in
@@ -777,7 +783,7 @@ def test_r_chked_031_write_home(tmp_path: Path, arm: str) -> None:
                 "the spec pick status",
             )
             lines = await write_spec(pilot, app, log, "w.chk.json")
-            assert "Check Editor: wrote w.chk.json (1 fields, kind=check)." in lines, lines
+            assert "Check Editor: wrote checks/w.chk.json (1 fields, kind=check)." in lines, lines
             assert (app.workarea / "proj" / "checks" / "w.chk.json").is_file()
             assert files_under(lib(app)) == library_before, "Write touched the library"
             return True
@@ -795,6 +801,49 @@ def test_r_chked_031_write_home(tmp_path: Path, arm: str) -> None:
             assert after["s1.chk.json"] == before["s1.chk.json"], "Write overwrote the spec"
             assert len(after) == len(before) + 1, sorted(after)
             assert not (lib(app) / "s1.chk.json").exists()
+        return True
+
+    assert run(tmp_path, scenario) is True
+
+
+@pytest.mark.parametrize("arm", ["project", "no-project", "collision"])
+def test_r_chked_032_write_status_names_the_home(tmp_path: Path, arm: str) -> None:
+    """Cases R-CHKED-032/1, /2 and /4 (E5 C-9 = SEC E5-2): the Write status
+    names the written file as the Spec list lists it. /1: in a project, Write
+    as ``s1.chk.json`` -> exactly ``Check Editor: wrote checks/s1.chk.json (1
+    fields, kind=check).``. /2: with no project the bare name, as before. /4:
+    with ``proj/checks/s1.chk.json`` already present the status names the
+    claimed free name under ``checks/``. (/3, after a library pick, is
+    ``test_r_chked_031_write_home[after-library-pick]``.)
+
+    Negative control (M44): the status built from the bare file name -> /1
+    reads ``wrote s1.chk.json`` and /4 the bare claimed name -> RED."""
+
+    async def scenario(app, pilot, log):
+        if arm == "no-project":
+            await load_image_fixture(pilot, app, app.base_dir)
+            home = lib(app)
+        else:
+            project = make_project(app.workarea)
+            home = project / "checks"
+            if arm == "collision":
+                write_doc(home / "s1.chk.json", ENTRY_W, kind="check")
+            await open_project_shipped(pilot, app)
+        await show_check_editor(pilot, app)
+        await add_check_row(pilot, app)
+        before = files_under(home) if home.is_dir() else {}
+        lines = await write_spec(pilot, app, log, "s1.chk.json")
+        written = [line for line in lines if line.startswith("Check Editor: wrote ")]
+        if arm == "project":
+            assert written == ["Check Editor: wrote checks/s1.chk.json (1 fields, kind=check)."], lines
+        elif arm == "no-project":
+            assert written == ["Check Editor: wrote s1.chk.json (1 fields, kind=check)."], lines
+        else:
+            after = files_under(home)
+            assert after["s1.chk.json"] == before["s1.chk.json"], "Write overwrote the spec"
+            claimed = sorted(set(after) - set(before))
+            assert len(claimed) == 1, sorted(after)
+            assert written == [f"Check Editor: wrote checks/{claimed[0]} (1 fields, kind=check)."], lines
         return True
 
     assert run(tmp_path, scenario) is True
@@ -869,7 +918,7 @@ def test_r_chked_040_spec_list(tmp_path: Path, arm: str) -> None:
             else:
                 await add_check_row(pilot, app)
                 lines = await write_spec(pilot, app, log, "s1.chk.json")
-                assert any(line.startswith("Check Editor: wrote s1.chk.json") for line in lines), lines
+                assert any(line.startswith("Check Editor: wrote checks/s1.chk.json") for line in lines), lines
                 assert option_values(spec_select(app)) == [
                     "checks/k.chk.json",
                     "checks/s1.chk.json",

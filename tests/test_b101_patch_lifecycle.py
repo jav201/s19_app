@@ -38,6 +38,8 @@ from s19_app.tui.screens_directionb import LoadGuardScreen, PatchEditorPanel
 from tests.b97_probes import painted_rows, settled
 from tests.support import b100_load_dialog as ld
 from tests.support import b100_projects as projects
+from tests.support import b100_save_dialog as sd
+from tests.support.b100_workers import settle_workers
 
 SIZE = (118, 54)
 #: Bound for a read that waits for something to DISAPPEAR (fails fast on base).
@@ -279,6 +281,48 @@ async def load_image_through_dialog(pilot, app, path: Path) -> None:
         await settled(pilot, loaded, f"the load of {path.name} after Replace")
 
 
+async def open_project_by_dialog(pilot, app, name: str = "proj") -> bool:
+    """The ``p`` key, the row of ``name``, Load (E5 C-3: the operator's route,
+    not the private handler); answer Replace (``y``) when the replace question
+    asks about unsaved work; then close the Load-result panel the routed load
+    opens. Returns whether the question was asked."""
+    from s19_app.tui.screens import ConfirmQuestionScreen
+
+    def installed() -> bool:
+        return app.current_project == name and app.current_file is not None
+
+    app.set_focus(None)
+    await ld.open_project_through_dialog(pilot, app, name)
+    await settled(
+        pilot,
+        lambda: installed() or isinstance(app.screen, ConfirmQuestionScreen),
+        f"the install (or the replace question) of {name}",
+    )
+    asked = isinstance(app.screen, ConfirmQuestionScreen)
+    if asked:
+        await pilot.press("y")
+        await settled(pilot, installed, f"the install of {name} after Replace")
+    await settle_workers(pilot)
+    await projects.dismiss_load_result_panel(pilot, app)
+    await settle_workers(pilot)
+    return asked
+
+
+async def save_project_by_dialog(pilot, app, log, name: str = "proj") -> list:
+    """``ctrl+s``, the name, Save (E5 C-3); wait for the ``Saved project to``
+    line; return every status line the save wrote."""
+    mark = len(log.messages)
+    app.set_focus(None)
+    await sd.save_through_dialog(pilot, app, name)
+    await settled(
+        pilot,
+        lambda: any(m.startswith("Saved project to ") for m in log.since(mark)),
+        "the Save project outcome",
+    )
+    await settle_workers(pilot)
+    return log.since(mark)
+
+
 async def open_checks_screen(pilot, app) -> None:
     app.set_focus(None)
     await pilot.press("9")
@@ -408,7 +452,9 @@ async def _replace_scenario(app, pilot, log, base: Path, alt: str, shown: str):
         app.screen.query_one("#load_guard_accept", Button).press()
         await settled(pilot, lambda: doc_name(app) == "c2.json", "the accepted load of c2.json")
     elif alt == "project":
-        await projects.load_project(pilot, app, "proj")
+        asked = await open_project_by_dialog(pilot, app)
+        # the apply left unsaved image bytes only when no Write file followed
+        assert asked == (shown == "prompt"), f"replace question asked: {asked}"
         await settled(
             pilot,
             lambda: app.current_file is not None and app.current_file.path.name == "v.s19",
@@ -450,14 +496,13 @@ def test_r_tui_049_3_1_control_hidden(tmp_path: Path, alt: str) -> None:
 @pytest.mark.parametrize("alt", ALTERNATIVES)
 def test_r_tui_049_3_2_prompt_hidden(tmp_path: Path, alt: str) -> None:
     """R-TUI-049.3.2/1 .. /8: after the document is replaced (or another image
-    loaded) ``Save patched image as:`` is not painted, and no file is written
-    (/8: no ``img-patched.s19`` under the work area; base: a confirm would write
-    image 2 under that name). Base: stays after every alternative."""
+    loaded) ``Save patched image as:`` is not painted. Base: stays after every
+    alternative. (E5 C-5: no "no file written" clause; Write file is the
+    prompt's own confirm, so no operator route reaches it once hidden.)"""
 
     async def scenario(app, pilot, log):
         needle = await _replace_scenario(app, pilot, log, tmp_path, alt, "prompt")
         await await_gone(pilot, app, needle, f"after {alt}")
-        assert not list(app.workarea.rglob("img-patched*.s19")), "a save-back file exists"
 
     projects.run_app(tmp_path, scenario, size=SIZE)
 
@@ -472,8 +517,7 @@ async def _save_project_keeps(app, pilot, log, base: Path, shown: str):
         await write_file(pilot, app, log)
     needle = CONTROL if shown == "control" else PROMPT
     await await_text(pilot, app, needle, "the precondition")
-    messages = await projects.save_project(pilot, app, log, "proj")
-    assert any(m.startswith("Saved project to ") for m in messages), messages
+    await save_project_by_dialog(pilot, app, log)
     for _ in range(6):
         await pilot.pause()
     await show_tab(pilot, app, "json")
@@ -544,9 +588,14 @@ def test_r_chk_pe_008_subtitle(tmp_path: Path, case: str) -> None:
         await checks_ready(app, pilot, log, tmp_path)
         assert checks_subtitle(app) == "2 checked"
         if case == "revert":
+            # Add and Remove live on the Inspector tab (E5 C-3)
+            await show_tab(pilot, app, "inspector")
             await add_entry(pilot, app, "0x8007", "CC")
+            await show_tab(pilot, app, "checks")
             await settled(pilot, lambda: checks_subtitle(app) == "no run yet", "no run yet after Add", timeout=GONE)
+            await show_tab(pilot, app, "inspector")
             await remove_entry(pilot, app, "0x8007")
+            await show_tab(pilot, app, "checks")
             await settled(pilot, lambda: checks_subtitle(app) == "2 checked", "2 checked after Remove", timeout=GONE)
             assert len(panel(app).query_one("#patch_checks_results").children) == 2
             assert plain(panel(app).query_one("#patch_checks_status")) == RUN_STATUS_K
@@ -562,9 +611,12 @@ async def _end_run(pilot, app, log, base: Path, how: str) -> None:
     elif how == "image":
         await load_image_through_dialog(pilot, app, write_image(base / "img2.s19", fill=0x40))
     elif how == "project":
-        await projects.load_project(pilot, app, "proj")
+        await open_project_by_dialog(pilot, app)
     elif how == "add":
+        # Add lives on the Inspector tab (E5 C-3)
+        await show_tab(pilot, app, "inspector")
         await add_entry(pilot, app, "0x8007", "CC")
+        await show_tab(pilot, app, "checks")
     elif how == "mac":
         mac = base / "m.mac"
         mac.write_text("T=0x8000\n", encoding="ascii")
@@ -691,9 +743,12 @@ def test_r_chk_pe_014_glyph_after_save_back(tmp_path: Path) -> None:
             "the blocked run's status",
         )
         await settled(pilot, lambda: kind_glyph(app) == "◐", "the ledger's ◐ after the run")
+        # Write file lives on the JSON tab (E5 C-3)
+        await show_tab(pilot, app, "json")
         await write_file(pilot, app, log)
         await settled(pilot, lambda: kind_glyph(app) == "·", f"the ledger's · after the save-back (now {kind_glyph(app)!r})", timeout=GONE)
-        assert checks_subtitle(app) == "no run yet"
+        await show_tab(pilot, app, "checks")
+        await settled(pilot, lambda: checks_subtitle(app) == "no run yet", f"no run yet on the Checks tab (now {checks_subtitle(app)!r})", timeout=GONE)
 
     projects.run_app(tmp_path, scenario, size=SIZE)
 

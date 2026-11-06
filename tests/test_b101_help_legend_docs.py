@@ -1867,10 +1867,14 @@ def test_r_doc_guide_1_9_named_bullets_hold_the_1_0_0_phrases() -> None:
     assert "from the loaded A2L and MAC" not in _bullet(moved, section, "Runs")
 
 
-#: R-DOC-GUIDE.1 / E5 C-6: (file, capture image stem) of the four captures
-#: taken before 1.0.0 beside a changed passage (D-5).
+#: R-DOC-GUIDE.1 / E5 C-6: (file, capture image stem) of the captures taken
+#: before 1.0.0 beside a changed passage (D-5). batch-101 Inc 6 E5 C-6 extends
+#: the set by named supersession with ch08-09 and ch08-20, the two captures
+#: beside the passages its F-05 and F-40 fixes changed (4 -> 6).
 _CAPTURES_BEFORE = (
     ("ch06-memory-map.md", "ch06-05-"),
+    ("ch08-patch-editor.md", "ch08-09-"),
+    ("ch08-patch-editor.md", "ch08-20-"),
     ("ch17-flow-builder.md", "ch17-05-"),
     ("ch19-help-palettes-settings.md", "ch19-01-"),
     ("ch21-html-reports.md", "ch21-02-"),

@@ -4726,11 +4726,13 @@ class PatchEditorPanel(ScrollableContainer):
 
         Summary:
             Posted when ``#patch_doc_file_select`` fires ``Select.Changed`` with
-            a concrete filename (not the blank sentinel). Carries the bare
-            filename only — the panel owns no ``changes``-package logic and no
-            path resolution; ``app.py`` re-resolves the name under the patches
-            folder (with the LLR-030.3 containment guard) and routes it through
-            the existing ``ChangeService.load`` path. Blank / cleared selections
+            a concrete filename (not the blank sentinel). Carries the listed
+            value only (``checks/<n>``, ``patches/<n>`` or ``library/<n>`` in a
+            project; the bare name without one) — the panel owns no
+            ``changes``-package logic and no path resolution; ``app.py``
+            resolves the value against its homes through the pick guard
+            (``_resolve_listed_file``) and routes it through the existing
+            ``ChangeService.load`` path. Blank / cleared selections
             post nothing (a blank is not a load request).
 
         Args:
@@ -4883,9 +4885,11 @@ class PatchEditorPanel(ScrollableContainer):
             valid placeholder dropdown without crashing (AT-030b / W1).
 
         Args:
-            names (Sequence[str]): Bare change-file component names (``*.json``)
-                discovered under ``workarea/patches/``, already sorted
-                deterministically by the caller. The option value equals the
+            names (Sequence[str]): The change list's listed values
+                (``*.json``): ``checks/<n>``, ``patches/<n>`` and
+                ``library/<n>`` with a project open, the bare names of
+                ``workarea/patches/`` without one, already ordered by the
+                caller. The option value equals the
                 name, so the ``Select.Changed`` handler forwards it verbatim.
 
         Returns:
@@ -6160,9 +6164,9 @@ class PatchEditorPanel(ScrollableContainer):
 
         Summary:
             When ``#patch_doc_file_select`` changes to a concrete filename,
-            post a :class:`ChangeFileSelected` carrying the bare name so the app
-            re-resolves it under the patches folder (with the LLR-030.3
-            containment guard) and loads it via the existing
+            post a :class:`ChangeFileSelected` carrying the listed value so
+            the app resolves it against its homes through the pick guard
+            (``_resolve_listed_file``) and loads it via the existing
             ``ChangeService.load`` path. A blank selection (``Select.NULL`` —
             the ``NoSelection`` placeholder emitted when ``set_change_files``
             repopulates or clears the option set) is NOT a request, so
@@ -8303,8 +8307,10 @@ class AbDiffPanel(Container):
 
         Summary:
             Posted when ``#diff_check_select`` fires ``Select.Changed`` with a
-            concrete filename (not the blank sentinel). Carries the bare name
-            only — ``app.py`` re-resolves it under the patches folder, reads it
+            concrete filename (not the blank sentinel). Carries the listed
+            value only (``checks/<n>`` or ``library/<n>`` in a project; the
+            bare name without one) — ``app.py`` resolves it against the spec
+            homes through the pick guard (``_resolve_listed_file``), reads it
             through the shipped ``read_change_document`` seam and, when it is a
             valid ``kind="check"`` document, stashes it as the check spec the
             next Report generation appends (LLR-010.2). A blank selection
@@ -8707,8 +8713,10 @@ class AbDiffPanel(Container):
             re-population).
 
         Args:
-            names (Sequence[str]): Sorted bare names from the folder scan
-                (both patch ``*.json`` and check-spec ``*.chk.json`` files).
+            names (Sequence[str]): The spec list's listed values (patch
+                ``*.json`` and check-spec ``*.chk.json`` files):
+                ``checks/<n>`` then ``library/<n>`` with a project open, the
+                sorted bare names without one.
 
         Returns:
             List[Tuple[Any, str]]: ``(label, value)`` pairs; the label is a
@@ -8785,8 +8793,10 @@ class AbDiffPanel(Container):
             the action row, with this scan's options baked in.
 
         Args:
-            names (Sequence[str]): Sorted bare names from the folder scan
-                (both patch ``*.json`` and check-spec ``*.chk.json`` files).
+            names (Sequence[str]): The spec list's listed values (patch
+                ``*.json`` and check-spec ``*.chk.json`` files):
+                ``checks/<n>`` then ``library/<n>`` with a project open, the
+                sorted bare names without one.
         """
         try:
             select = self.query_one("#diff_check_select", Select)

@@ -79,3 +79,14 @@ the base worktree.
 - Mutation score (killed / (total − expected survivors)): **39 / 41 = 95.1%**.
 - Raw kill ratio (killed / total): 39 / 42 = 92.9%.
 
+## Rulings applied (E5 corrective, `E5-rulings.md` C-2, C-7, C-9)
+
+- **C-2.** M10 and M35 are **equivalent** under every buildable route: the project install's variant install (`_apply_prepared_load`) and the reopen tail also hide the controls and repaint the Checks tab on a project load, so no project load the UI can build exposes the reset-only calls. M27 is the **expected** E3A-16 survivor (I-D3; M28 is its effective control). The redundant calls in `_reset_project_session` stay (a project load that installs no variant would rely on them). Score with the equivalents set aside: **39 / 39 killed**.
+- **Added by the corrective pass** (Opus, LAN Linux host 2, a copy of the staged tree `2dedfdeb…` outside the worktree, deleted after each run; transcripts print the base commit, the tree, the landed diff and `s19_app.__file__` = the copy):
+
+| # | Row | Mutation | Guard nodes | Result | First assertion line |
+|---|---|---|---|---|---|
+| M43 | PATCH-DOC-DROPDOWN-001.4 (C-7 = CR F4) | `s19_app/tui/app.py:7263` — `name in ("", ".", "..")` → `name in ("", "..")` | H `001_4_refused[unknown-folder]` | KILLED (`e5c-05`) | `assert "Patch Editor: change file 'patches/.' is outside the patches folder — not loaded." in ['Loaded : 0 entries, 1 error(s)', "[MF-PATH-UNRESOLVED] …"]` |
+| M44 | CHKED-032 (C-9 = SEC E5-2) | `s19_app/tui/app.py:7816` — `home_prefix = self._spec_homes()[0][0]` → `home_prefix = ""` | H `032_write_status_names_the_home[project, no-project, collision]`, `031_write_home[after-library-pick]` | KILLED (`e5c-06`): 3 RED (`project`, `collision`, `after-library-pick`), `no-project` GREEN by design (the unchanged arm) | `At index 0 diff: 'Check Editor: wrote s1.chk.json (1 fields, kind=check).' != 'Check Editor: wrote checks/s1.chk.json (1 fields, kind=check).'` |
+
+A first M43 attempt matched its site twice (`folder.name in ("", ".", "..")` at `app.py:14872` also holds the text), applied nothing and passed; the runner now aborts when a site is not unique, and the recorded `e5c-05` is the anchored re-run.

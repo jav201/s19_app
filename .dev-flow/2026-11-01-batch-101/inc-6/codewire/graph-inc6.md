@@ -195,11 +195,12 @@ S19TuiApp._resolve_listed_file
 req: R-PATCH-DOC-DROPDOWN-001.3, R-PATCH-DOC-DROPDOWN-001.4, R-CHKED-044, R-DIFF-CHK.5
 in: value: str, homes: list[tuple[str, Path]]
 out: Optional[Path]
-func: new. Picks the home whose prefix starts `value` (`""` matches only when it is the sole home); `name = value[len(prefix):]`; `path = folder / name` (unresolved). `None` when no home matches; `name` is empty, holds a separator or is `..`; `_path_traverses_reparse_point(path, stop_at=self.workarea.parent)` or `_is_reparse_point(self.workarea.parent)` — the Write guard's walk and stop point (S-3 = E3A-06: a link anywhere from the work area down to the file, also one that stays inside the project, D-6); or `path.resolve()` is not inside `self.workarea.resolve()` (the Write guard's last check). Otherwise `path` itself, **unresolved** (S-4: the Save project classifier compares unresolved text).
+func: new. Picks the home whose prefix starts `value` (`""` matches only when it is the sole home); `name = value[len(prefix):]`; `path = folder / name` (unresolved). `None` when no home matches; `name` is empty, holds a separator or is `.` or `..` (E5 C-7 = CR F4: `folder / "."` is the folder itself); `_path_traverses_reparse_point(path, stop_at=self.workarea.parent)` or `_is_reparse_point(self.workarea.parent)` — the Write guard's walk and stop point (S-3 = E3A-06: a link anywhere from the work area down to the file, also one that stays inside the project, D-6); or `path.resolve()` is not inside `self.workarea.resolve()` (the Write guard's last check). Otherwise `path` itself, **unresolved** (S-4: the Save project classifier compares unresolved text).
 module: s19_app/tui/app.py
 calls: workspace._path_traverses_reparse_point, workspace._is_reparse_point, Path.resolve
 examples: (R-PATCH-DOC-DROPDOWN-001.3/1) `"checks/k.chk.json"`, proj homes → `<workarea>/proj/checks/k.chk.json` as `self.workarea` spells it
 examples: (R-PATCH-DOC-DROPDOWN-001.3/3) `"library/w.json"`, proj homes → `<workarea>/patches/w.json`
+examples: (R-PATCH-DOC-DROPDOWN-001.4/3) `"w.json"`, `"patches/../../w.json"`, `"patches/."`, proj homes → `None` each (E5 C-7)
 examples: (R-PATCH-DOC-DROPDOWN-001.3/4) base folder `alias` → `real`: returns `alias/.s19tool/workarea/proj/patches/a.json` (not `real/…`); the link above `.s19tool` is outside the walk, as for Write
 examples: (R-PATCH-DOC-DROPDOWN-001.4/2) `proj/patches` linked to an outside folder, `"patches/x.json"` → `None`
 examples: (R-PATCH-DOC-DROPDOWN-001.4/3) proj open, `"w.json"` → `None`; `"patches/../../w.json"` → `None`
@@ -265,15 +266,17 @@ calls: S19TuiApp._scan_spec_files
 examples: (R-DIFF-CHK.1/2) no project at compose → `workarea/patches` names, as on base
 
 S19TuiApp.on_check_editor_panel_action_requested
-req: R-CHKED-031, R-CHKED-034
+req: R-CHKED-031, R-CHKED-032, R-CHKED-034
 in: CheckEditorPanel.ActionRequested
 out: None
-func: changed (write arm only). was: `write_change_document(document, self.base_dir, file_name)`. / now: `write_change_document(document, self.base_dir, file_name, dest_dir=self._check_home())`; a placement refusal returns `MF-WRITE-CONTAINMENT` and takes the existing refusal branch (R-CHKED-034, -035). The listings refresh after a write is unchanged.
+func: changed (write arm only). was: `write_change_document(document, self.base_dir, file_name)`. / now: `write_change_document(document, self.base_dir, file_name, dest_dir=self._check_home())`; a placement refusal returns `MF-WRITE-CONTAINMENT` and takes the existing refusal branch (R-CHKED-034, -035). The listings refresh after a write is unchanged. **E5 C-9 (design gap, SEC E5-2):** the success status was `f"Check Editor: wrote {path.name} …"` / now `f"Check Editor: wrote {home_prefix}{path.name} …"` with `home_prefix = self._spec_homes()[0][0]` — `checks/` with a project open, `""` without one — so the status names the written file as the Spec list lists it (R-CHKED-032 amended).
 module: s19_app/tui/app.py
 calls: write_change_document, S19TuiApp._check_home, S19TuiApp._prefill_check_editor, S19TuiApp._prefill_patch_change_files, S19TuiApp._prefill_diff_check_files
-examples: (R-CHKED-031/1) proj open, Write as `s1.chk.json` → `proj/checks/s1.chk.json`; status `Check Editor: wrote s1.chk.json (0 fields, kind=check).` (base P: `workarea/patches/s1.chk.json`)
+examples: (R-CHKED-031/1, R-CHKED-032/1) proj open, Write as `s1.chk.json` → `proj/checks/s1.chk.json`; status `Check Editor: wrote checks/s1.chk.json (1 fields, kind=check).` (base P: `workarea/patches/s1.chk.json`, status `… wrote s1.chk.json …`)
+examples: (R-CHKED-032/2) no project, Write as `s1.chk.json` → status `Check Editor: wrote s1.chk.json (1 fields, kind=check).` (unchanged)
+examples: (R-CHKED-032/4) proj open, `proj/checks/s1.chk.json` present, Write as `s1.chk.json` → the claimed free name `<n>`; status `Check Editor: wrote checks/<n> (1 fields, kind=check).`
 examples: (R-CHKED-034/1) `proj/checks` linked → status `Check Editor: spec NOT written.`, Fields `Write refused: MF-WRITE-CONTAINMENT.`, no file through the link
-examples: (R-CHKED-031/3) proj open, `library/w.chk.json` picked (Write as `w.chk.json`), Write → `proj/checks/w.chk.json`; `workarea/patches/` unchanged
+examples: (R-CHKED-031/3, R-CHKED-032/3) proj open, `library/w.chk.json` picked (Write as `w.chk.json`), Write → `proj/checks/w.chk.json`; `workarea/patches/` unchanged; status `Check Editor: wrote checks/w.chk.json (1 fields, kind=check).`
 
 S19TuiApp._patch_editor_load
 req: R-TUI-049.3.1, R-TUI-049.3.2
@@ -413,4 +416,4 @@ examples: (R-CHK-PE-009/1) `[]`, `""` → `no run yet`, status `No check run yet
 
 ## Rows → example index
 
-R-BEFORE-AFTER-REPORT-001.1, .36 → save_back_decision; .11 → unchanged (`test_r_before_after_report_001_11_*`). R-TUI-049.3.1, .3.2 → #9 and its callers: the `parse_paste` arm, undo, redo, `_patch_editor_load` (#31), `_reset_project_session`, `_apply_prepared_load` (new image only); Save project keeps both (/9, `_patch_editor_load_tail`). R-PATCH-DOC-DROPDOWN-001.1 → `_scan_patch_change_files`, `_refill_document_lists` (via `_install_prepared_project`, `_on_project_saved`); .2 → `_change_homes`, `_scan_patch_change_files`; .3, .4 → `_resolve_listed_file`, change_file_selected. R-CHKED-031, -034 → Check Editor write arm; -040 → `_prefill_check_editor`, `_refill_document_lists`; -042, -044 → spec_file_selected. R-DIFF-CHK.1, .3, .5, .8 → `_spec_homes`, `_scan_spec_files` and the A2B nodes. R-CHK-PE-008 … 012 → #8, #30, G2; -009/5, -014 → `_note_image_bytes_written`, `end_check_run`; -009/6 → `_apply_prepared_load`. R-CHKS-001, -004, -009 → `update_checks_view` (R-CHKS-004/1: image 2 loaded after a K run → note `No check run yet — run checks from the Patch Editor.`); -004/2, -009/2 → `_apply_prepared_load`, `_reset_project_session` (displayed screen).
+R-BEFORE-AFTER-REPORT-001.1, .36 → save_back_decision; .11 → unchanged (`test_r_before_after_report_001_11_*`). R-TUI-049.3.1, .3.2 → #9 and its callers: the `parse_paste` arm, undo, redo, `_patch_editor_load` (#31), `_reset_project_session`, `_apply_prepared_load` (new image only); Save project keeps both (/9, `_patch_editor_load_tail`). R-PATCH-DOC-DROPDOWN-001.1 → `_scan_patch_change_files`, `_refill_document_lists` (via `_install_prepared_project`, `_on_project_saved`); .2 → `_change_homes`, `_scan_patch_change_files`; .3, .4 → `_resolve_listed_file`, change_file_selected. R-CHKED-031, -032 (E5 C-9), -034 → Check Editor write arm; -040 → `_prefill_check_editor`, `_refill_document_lists`; -042, -044 → spec_file_selected. R-DIFF-CHK.1, .3, .5, .8 → `_spec_homes`, `_scan_spec_files` and the A2B nodes. R-CHK-PE-008 … 012 → #8, #30, G2; -009/5, -014 → `_note_image_bytes_written`, `end_check_run`; -009/6 → `_apply_prepared_load`. R-CHKS-001, -004, -009 → `update_checks_view` (R-CHKS-004/1: image 2 loaded after a K run → note `No check run yet — run checks from the Patch Editor.`); -004/2, -009/2 → `_apply_prepared_load`, `_reset_project_session` (displayed screen).

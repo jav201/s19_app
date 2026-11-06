@@ -99,7 +99,8 @@ On the JSON tab: **Save patched image as** (suggested `firmware-patched.s19`),
 ![Image written](img/ch08-09-patch-image-written.png)
 
 **Write file** writes and re-reads the file: *Saved + verified:
-firmware-patched.s19*. A notice offers the before/after report with `b`.
+firmware-patched.s19*. Without a project no before/after offer is shown (8.10).
+(capture taken before 1.0.0: it shows the earlier offer toast)
 
 ### 8.10 The before/after report needs a project
 
@@ -179,7 +180,7 @@ the patched image, the image becomes a new project variant
 (`demo:firmware-patched (1/3)`) and **Write before/after report** writes
 `reports\<time>-before-after-….md` in the project. The Checks tab shows no
 stale run after the project load: the earlier check run ended with it (finding
-F-40).
+F-40). (capture taken before 1.0.0: it shows the earlier run's results)
 
 ### 8.20 Execute over variants
 

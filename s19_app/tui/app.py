@@ -4990,7 +4990,8 @@ class S19TuiApp(App):
               findings surface on the status path. ``loaded.path`` rides the
               ``source_image_path`` kwarg — the LLR-038.2 B-2 provenance
               stamp the before/after composer checks for staleness. On a
-              successful save, after the verify outcome surfaces, an
+              successful save, after the verify outcome surfaces and only
+              when a project is open (R-BEFORE-AFTER-REPORT-001.36), an
               information notify offers the before/after report action
               (key ``b`` — LLR-038.3).
             - A save into the open project makes the written file the
@@ -7106,6 +7107,8 @@ class S19TuiApp(App):
             Used by:
                 - ``_scan_spec_files`` / ``_resolve_listed_file``
                   (via the Check Editor and A2B Diff pick guards)
+                - ``on_check_editor_panel_action_requested`` (the Write
+                  status names the home prefix, R-CHKED-032)
         """
         project_dir = self._active_project_dir()
         if project_dir is None:
@@ -7206,8 +7209,8 @@ class S19TuiApp(App):
             only when it is the sole home); ``name = value[len(prefix):]``;
             ``path = folder / name`` (UNRESOLVED). Refuse — return ``None``
             — when no home matches, the name is empty, holds a separator or
-            is ``..``, the walk from the work area down to the file meets a
-            link/reparse point (the Write guard's walk and stop point, S-3),
+            is ``.`` or ``..``, the walk from the work area down to the file
+            meets a link/reparse point (the Write guard's walk and stop point, S-3),
             or the resolved path is not inside the resolved work area. Else
             return the unresolved ``path`` (S-4: the Save project classifier
             compares unresolved text).
@@ -7257,10 +7260,9 @@ class S19TuiApp(App):
             return None
         name = value[prefix_len:]
         if (
-            not name
+            name in ("", ".", "..")
             or "/" in name
             or "\\" in name
-            or name == ".."
         ):
             return None
         path = folder / name
@@ -7438,39 +7440,46 @@ class S19TuiApp(App):
         """Load a dropdown-chosen change file through the existing load path.
 
         Summary:
-            Re-resolve the operator's chosen filename under the patches folder
-            and, once the F1 containment guard passes, route it through the
-            SAME ``ChangeService.load`` seam the typed-path Load action uses
-            (LLR-030.3) — so the picked file becomes the active change document
-            (its entries table reflects it). No new load/parse surface is
-            introduced; only the source of the path differs.
+            Resolve the picked listed value against the change-list homes
+            through the pick guard and, once it passes, route the file through
+            the SAME ``ChangeService.load`` seam the typed-path Load action
+            uses (LLR-030.3) — so the picked file becomes the active change
+            document (its entries table reflects it). No new load/parse
+            surface is introduced; only the source of the path differs.
 
         Args:
-            event (PatchEditorPanel.ChangeFileSelected): Carries the bare
-                filename the operator selected.
+            event (PatchEditorPanel.ChangeFileSelected): Carries the listed
+                value the operator selected (``checks/<n>``, ``patches/<n>``
+                or ``library/<n>`` in a project; the bare name without one).
 
         Returns:
             None
 
         Data Flow:
-            - Build ``candidate = patches_dir / event.filename`` and re-resolve.
-            - **F1 guard:** SKIP (status line, no load) when the resolved path
-              is a symlink or does not lie inside ``patches_dir.resolve()`` —
-              closing the read-path asymmetry (``resolve_input_path`` has only a
-              size cap, no containment/symlink guard).
+            - ``candidate = _resolve_listed_file(event.filename,
+              _change_homes())`` (R-PATCH-DOC-DROPDOWN-001.3/.4).
+            - **Pick guard:** SKIP (the refusal status, no load) when the
+              prefix names no home, the name is not a plain file name (empty,
+              a separator, ``.`` or ``..``), a link or reparse point lies on
+              the walk from the work area down to the file (also one that
+              stays inside the project), or the resolved file is outside the
+              work area. The unresolved ``folder / name`` is loaded (S-4).
             - **Dropdown guard (LLR-174.2t, S10-02):** when the panel holds
               unsaved entries, push the same ``LoadGuardScreen`` the Load
-              button uses — accept loads ``str(candidate)``, cancel keeps
+              button uses — accept runs the pick guard again (S-5) and loads
+              ``str(candidate)`` only when it still passes, cancel keeps
               the document and resets ``#patch_doc_file_select`` to
               ``Select.NULL`` (A10-R2-3) so the same pick fires again.
               A clean panel loads at once.
-            - Otherwise call ``ChangeService.load`` on the resolved absolute
-              path and surface the result (``_report_change_result``); refresh
-              the entries table from the new document.
+            - Otherwise call ``ChangeService.load`` on the unresolved
+              ``candidate`` and surface the result
+              (``_report_change_result``); refresh the entries table from
+              the new document.
 
         Dependencies:
             Uses:
-                - ``_patches_dir`` / ``ChangeService.load``
+                - ``_resolve_listed_file`` / ``_change_homes`` /
+                  ``ChangeService.load``
                 - ``_patch_editor_load`` / ``LoadGuardScreen``
                 - ``_report_change_result`` / ``PatchEditorPanel.refresh_entries``
             Used by:
@@ -7802,8 +7811,11 @@ class S19TuiApp(App):
                     f"Write refused: {codes or 'not written'}."
                 )
             else:
+                # R-CHKED-032: name the file as the Spec list lists it
+                # (``checks/<n>`` in a project), not only its bare name.
+                home_prefix = self._spec_homes()[0][0]
                 self.set_status(
-                    f"Check Editor: wrote {path.name} "
+                    f"Check Editor: wrote {home_prefix}{path.name} "
                     f"({len(document.entries)} fields, kind=check)."
                 )
                 # The new spec joins the suffix-distinguished listings.
@@ -7867,9 +7879,12 @@ class S19TuiApp(App):
         """Load a dropdown-chosen spec into the collector (LLR-009.1 read arm).
 
         Summary:
-            Re-resolve the picked filename under the patches folder (the F1
-            containment guard, mirroring the patch editor's change-file
-            handler), read it through the shipped ``read_change_document``
+            Resolve the picked listed value against the spec homes
+            (``_spec_homes``) through the pick guard shared with the patch
+            editor's change-file handler (``_resolve_listed_file``: an
+            unknown prefix, a name that is not a plain file name, a link on
+            the walk from the work area or a file outside it is refused),
+            read it through the shipped ``read_change_document``
             seam and, for a clean ``kind="check"`` document, mirror the
             declared fields into the collector via
             :meth:`CheckEditorPanel.load_spec`. A failing read surfaces its
@@ -8189,9 +8204,10 @@ class S19TuiApp(App):
         Summary:
             The operator picked a file from the check-spec dropdown. The
             blank pick (``""``) clears the stashed spec — the next report
-            emits no addendum. A concrete pick re-resolves under the patches
-            folder (the F1 containment guard, mirroring the patch editor's
-            change-file handler) and reads through the shipped
+            emits no addendum. A concrete pick resolves against the spec
+            homes (``_spec_homes``) through the pick guard shared with the
+            patch editor's change-file handler (``_resolve_listed_file``)
+            and reads through the shipped
             ``read_change_document`` seam. Only a clean ``kind="check"``
             document is stashed for the report; a failing read surfaces its
             collected issues (never silently loaded) and a non-check

@@ -50,6 +50,7 @@ from s19_app.tui.services.diff_report_service import (
     _check_addendum_lines,
     generate_diff_report,
 )
+from tests.b97_probes import settled
 
 ROOT = Path(__file__).resolve().parent.parent
 FIX_A = ROOT / "examples" / "case_00_public" / "prg.s19"
@@ -268,7 +269,9 @@ def test_tc_b94_14_run_check_document() -> None:
 
 def test_tc_b94_15_dropdown_population(tmp_path: Path) -> None:
     """The dropdown lists the scan set; CHECK labels carry the distinction;
-    a failing-read spec surfaces its issues on load."""
+    a failing-read spec surfaces its issues on load. The painted labels and
+    the option values are asserted exactly and in order (batch-101 Inc 6 E5
+    C-4, case R-DIFF-CHK.1/2)."""
 
     async def _drive() -> tuple:
         app = S19TuiApp(base_dir=tmp_path)
@@ -283,32 +286,43 @@ def test_tc_b94_15_dropdown_population(tmp_path: Path) -> None:
         async with app.run_test(size=(120, 30)) as pilot:
             await pilot.pause()
             await pilot.press("7")
-            await pilot.pause()
-            await pilot.pause()
+            await settled(
+                pilot,
+                lambda: len(app.query("#diff_check_select")) > 0
+                and app.query_one("#diff_check_select", Select).region.area > 0,
+                "the A2B Diff check-spec list painted",
+            )
             select = app.query_one("#diff_check_select", Select)
             scan = app._scan_patch_change_files()
             labels = [
                 (label.plain if hasattr(label, "plain") else str(label))
                 for label, _v in select._options
             ]
+            values = [value for _label, value in select._options]
             # The failing-read arm: loading the broken spec surfaces issues.
             select.value = "broken.chk.json"
-            await pilot.pause()
-            await pilot.pause()
+            await settled(
+                pilot,
+                lambda: any(
+                    token in str(app.query_one("#diff_status").render())
+                    for token in ("MF-JSON-PARSE", "not loaded")
+                ),
+                "the status of the broken spec's pick",
+            )
             status_broken = str(app.query_one("#diff_status").render())
             assert app._diff_check_spec is None, (
                 "a failing spec is never stashed"
             )
-            return scan, labels, status_broken
+            return scan, labels, values, status_broken
 
-    scan, labels, status_broken = asyncio.run(_drive())
-    listed = sorted(
-        item for item in labels if ".json" in item and "broken" not in item
-    )
-    assert listed == [
+    scan, labels, values, status_broken = asyncio.run(_drive())
+    assert labels == [
+        "(no check spec)",
         "baseline.chk.json CHECK",
+        "broken.chk.json CHECK",
         "hotfix.pch.json PATCH",
-    ], f"the dropdown lists the scan set with distinctions, got {listed}"
+    ], f"the dropdown paints the scan set in order with distinctions, got {labels}"
+    assert values == ["", "baseline.chk.json", "broken.chk.json", "hotfix.pch.json"], values
     assert sorted(scan) == ["baseline.chk.json", "broken.chk.json", "hotfix.pch.json"]
     assert "MF-JSON-PARSE" in status_broken or "not loaded" in status_broken, (
         f"the failing read surfaces its issues, got {status_broken!r}"
