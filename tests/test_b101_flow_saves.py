@@ -349,7 +349,8 @@ def test_r_flow_file_14_5_swapped_home_gets_no_byte(area, monkeypatch):
 
     Under the swap the created file is regular and the same file as the
     descriptor, so only the real-path clause of the check after the claim
-    refuses it. Runs on Linux and on Windows alike.
+    refuses it. The swap puts in a directory symbolic link (``os.symlink``):
+    it runs on Linux, and on Windows only where that link is permitted.
     """
     _root, project, outside = area
     home = project / "flows"
