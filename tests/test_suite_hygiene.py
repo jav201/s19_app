@@ -2266,6 +2266,30 @@ def _pause_loops(function) -> list:
     return found
 
 
+def _settled_bindings(tree) -> list:
+    """Every statement in ``tree`` that binds the name ``settled``."""
+    found = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom):
+            found += [
+                f"from {node.module} import {alias.name}"
+                for alias in node.names
+                if (alias.asname or alias.name) == "settled"
+            ]
+        elif (
+            isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+            and node.name == "settled"
+        ):
+            found.append(f"def settled (line {node.lineno})")
+        elif (
+            isinstance(node, ast.Name)
+            and node.id == "settled"
+            and isinstance(node.ctx, ast.Store)
+        ):
+            found.append(f"settled = ... (line {node.lineno})")
+    return found
+
+
 def test_r_tst_154_155_inc15_arms_wait_through_settled() -> None:
     """R-TST-154, R-TST-155, R-TST-163: the eight table-D wait sites of the
     four Inc 15 arms go through ``tests.b97_probes.settled``, pass their
@@ -2278,6 +2302,14 @@ def test_r_tst_154_155_inc15_arms_wait_through_settled() -> None:
     expected = Counter(
         (module, arm) for (module, arm, _h, _t, _d) in _INC15_WAIT_SITES
     )
+
+    # R-TST-155: the name ``settled`` the sites call is the shared wait.
+    for module_rel in sorted({module for (module, *_rest) in _INC15_WAIT_SITES}):
+        tree = ast.parse((REPO_ROOT / module_rel).read_text(encoding="utf-8"))
+        assert _settled_bindings(tree) == ["from tests.b97_probes import settled"], (
+            f"{module_rel}: `settled` must be bound only by the import from "
+            f"tests.b97_probes, found {_settled_bindings(tree)}"
+        )
 
     for module_rel, arm_name, helper, trigger, description in _INC15_WAIT_SITES:
         module_path = REPO_ROOT / module_rel
