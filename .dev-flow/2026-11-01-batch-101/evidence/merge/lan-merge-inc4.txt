@@ -1,0 +1,27 @@
+LAN host 2, merged tree c2cba35 (main + Inc 4 merge 6d7b179 + merge fix c2cba35) — FULL suite (-n 12 --dist loadfile, not serial_timing) + serial lane; snapshot suite on the LAN laptop host in the CI-recipe venv. The first verification of the merge (6d7b179) found 3 merged-tree failures beyond the known ones — test_at_b83_08 (address census: an attribute passed to query in tests/test_b101_symbol_reads.py), test_r_tst_070_2 (the batch handoff note held a home path, LAN addresses and host names) and test_inc13_d2_touched_nodes_differ_from_base_only_by_the_waits (Inc 13's guard did not strip its own additions from a merged base) — all fixed in c2cba35 (143 passed over the three guard files). test_tc_b100_65 passed alone (known pause-count flake). Below: main lane = only the 4 known failures (b78_03, 056e_a2b, 2 tc016s snapshots). Serial lane run 1: TC-B100-05 took 2.359 s against a 1.0 s bound (one-off; alone 0.411-0.414 s x3); serial lane run 2: 68 passed, 0 under 20 % margin (TC-B100-05 0.576 s).
+---main+serial run 1---
+HEAD c2cba356
+<HOME>/work/s19_m4fix/s19_app/__init__.py
+-------- generated xml file: <HOME>/work/m4v-out/junit-main.xml --------
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-120x30]
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+4 failed, 5743 passed, 181 skipped, 4 xfailed in 2650.57s (0:44:10)
+---serial---
+QC-TM: 94 bounds, 1 under 20 % margin
+FAILED tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second
+1 failed, 67 passed, 2 skipped, 5932 deselected in 354.84s (0:05:54)
+exit=done
+---serial run 2---
+42.4%  0.576 s / 1.000 s  TC-B100-05 merge  tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second
+QC-TM: 94 bounds, 0 under 20 % margin
+68 passed, 2 skipped, 5932 deselected in 354.91s (0:05:54)
+---snapshot-laptop---
+<HOME>/work/s19_m4snap/s19_app/__init__.py
+--------------------------- snapshot report summary ----------------------------
+2 snapshots failed. 27 snapshots passed.
+=========================== short test summary info ============================
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-120x30]
+2 failed, 27 passed, 4 deselected in 118.65s (0:01:58)
