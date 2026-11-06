@@ -64,6 +64,6 @@ S4-1 / E5S4-1 (link or reparse point as the project's A2L, to Inc 9 with S8-1/S8
 
 - ✓ Tests pass: `e5c-01`, `e5c-03-*`, `e5c-04`, `e5c-05`, `e5c-06`. The one failure is the routed environment failure `tc1802`.
 - ✓ No secrets. Transcripts are redacted, and a grep for the account, host and LAN address over `evidence/inc-4/e5c-*` returns nothing.
-- ✓ No destructive command outside the agent's own remote worktree. Remote resets and cleans touched only `~/work/s19_c4`, and that worktree is removed at the end.
+- ✓ No destructive command outside the agent's own remote worktree. Remote resets and cleans touched only `<HOME>/work/s19_c4`, and that worktree is removed at the end.
 - ✓ File count: 0 source files, 1 test file, records.
 - ✓ No test, probe or product code ran on the Windows PC. Only git, the file edits (small editing scripts), one Python syntax parse of the test file, and the transcript redaction ran there.

@@ -11,3 +11,4 @@ E4 integration end 2026-11-06T01:24Z model=opus verdict=GREEN (LAN Linux host); 
 E5 start 2026-11-06T01:25Z mutants=deepseek-v4-pro reviews=opus
 E5 corrective start 2026-11-06T02:22Z model=opus
 E5 corrective end 2026-11-06T04:29Z model=opus rulings C-1..C-8 done; 0 source files; new file 22+2 passed (e5c-01, e5c-05); importers 2737 passed / 1 failed (tc1802 env, routed) / 97 skipped / 1 xfailed; guards 379 passed; serial lane 53 passed; mutants M-16, M-17 killed (17/17); R-CHG-SYM.13/1 0.173-0.181 s, 13/3 addition max 0.422 s (bound 1.0 s, 5/5); 23 cases covered
+E5 end 2026-11-06T04:41Z model=deepseek-v4-pro (records)

@@ -130,3 +130,56 @@ No Windows timing was run (operator rule; R-CHG-SYM.13).
 - ✗ Layer B (black-box): 8 surfaces are owed (§4). The outputs are product-produced, the drives are not.
 - ✓ Bidirectional reachability: every input surface of R-CHG-SYM.9, .10 and .11 reaches the handler. The stand-in gestures are listed in §4.
 - ✓ No unfilled placeholders in this file. No PII, names, hosts or paths: transcripts are quoted as `<HOME>`.
+
+## Re-audit (2026-11-06)
+
+Mode: **validation**. Scope: only the cases the E5 corrective pass changed or added, against §2–§5 above. Tree: worktree head `200cc69`. Inputs: `E5-rulings.md` (C-1 … C-8), `E5-corrective-notes.md`, `git diff 149e3bf..200cc69 -- 02-test-cases.md 01-requirements.md tests/` (`01-requirements.md` is unchanged), `evidence/inc-4/e5c-*.txt`. Execution: **I ran no test.** I ran `pytest --collect-only` only. Every pass, fail and time below was executed by the E5 corrective agent (Opus) on the LAN Linux host. I read each one from its own transcript. Every final transcript prints fingerprint `7f5b5b48049d1725` at start and end, and `e5c-01` lists all 22 non-timing nodes by name. This closes the §6 revision and naming gap.
+
+### R.1 Earlier issues: closed
+
+| Earlier | Now | Evidence | Rating |
+|---|---|---|---|
+| C-1 9/4 "document replaced" | A second confirm of row 2 changes every byte (XOR 0x5A, length kept). `replaced == (type, address, new bytes, <tag 2>)`, with 7 entries | M-17 (`if edited is None or True`, `app.py:5529`) is RED at `(164,) != (254,)` (`e5c-mut17`, `RESTORE_OK`) | **full** |
+| C-2 11/2 | Scope and Execute go through `pilot.click`. Arm b unloads with key `1` and a click on the Loaded panel's `Button.loaded-unload[name=a2l]`. `lines[-1] ==` the finished line, read after the `lines_after` flush | `e5c-01` | **full** |
+| C-3 11/3 | Overview applied `== 7`. Modifications has 7 rows and none has Before `-`. `report_service.py` renders `before_bytes=None` (every non-applied disposition) as `-`, so this does show 0 blocked. Key `t`, then a Generate click | `e5c-01` | **full** |
+| C-4 13/1 | All 1 000 spellings compared, on every one of the 5 runs | `e5c-05` | **full** |
+| §3 unguarded fix → 13/2 | Third arm: no-A2L read, builder called exactly 1 time, 2 R-CHG-SYM.2 findings | M-16 (`symbol_index is None`, `io.py:904`) is RED with "2 time(s)" (`e5c-mut16`, `RESTORE_OK`) | **full** |
+| C-12 13/3 | New row. 5 samples, each asserted against `timing_bound(1.0)`. Additions 0.422 / 0.290 / 0.021 / 0.008 / 0.351 s (max 0.422 s). Quiet host (load 1.34), QC-TM 0 under 20 % | `e5c-05` | **full** for the measurement (stand-in trigger accepted, C-12) |
+| C-5…C-11 Expected/labels | 10/3 (refused ×1 + 2 findings + all 7 unchanged), 10/4 (`lines[2:] == [PLAIN]`, C-8), 058.9/1 (adds the `[entry-json]` node plus a 7-entry compare in its own node), 058.9/3 (`[REJECTED, finding]` in both arms), 9/1, 9/5 and 12/2 (gesture drives; 12/2 pins `0 error(s)` last) | each matches its test | unchanged, full |
+| C-13 Coverage column | `covered` ×23, and every node carries `(full)` with any precondition stand-in named | record | — |
+| §3 10 "each check document" | The Check Editor arm also picks `demo_check_fails`, and the exact 2 lines are pinned | `e5c-01` | full |
+| §4 BB-1…BB-8 | Dropdowns: a click on the face (hit checked by ancestry), arrow keys and `enter`, with no `Select.value` write. Pastes: a click, `f7`, then `events.Paste` posted to the app; the app forwards it to the focused widget (`textual/app.py:4142`, the terminal route). Buttons, tab chips, Confirms and Generate are clicked with an asserted hit. Ledger: a click, then arrow keys. Unload: the Loaded panel `[u]`. Reports: key `t` | test diff | 0 owed |
+
+### R.2 The Check Editor "spelling not visible" ruling (9/5)
+
+**I accept it on risk, but the wording is wrong.** `on_check_editor_panel_spec_file_selected` (`app.py:7436`) reads through `read_change_document(..., a2l_context=self.current_a2l_data)`. It keeps `{address, size}` only and then drops the document, so no product surface shows the spelling. Alternatives 1, 2, 3, 4 and 6 assert the spelling through the same `io` reader, and 9/5's 0 findings needs the session A2L to resolve the tag. Calling the clause "not-testable" overstates it, though. A spy on `read_change_document` would test it, and that is the same technique 13/1's call counter uses and this audit rates full. The new address assertion comes from the document's own `address` field, so it proves the symbol entry was kept, not which tag it resolved to. Fix: reword the clause to "not observable on this surface; the shared reader is asserted in alternatives 1–4 and 6", or add the spy. This does not change the rating.
+
+### R.3 Remaining issues (none change a rating)
+
+| # | Case | Issue | Fix |
+|---|---|---|---|
+| RA-1 | 9/5 | "not-testable" wording (R.2) | reword, or add a spy |
+| RA-2 | 13/3 | The Expected says each confirm "**ends** `Loaded change: 1000 entries, 0 error(s)`". The test asserts `in lines`, the same membership-versus-ending gap that 11/2 had | `lines[-1] ==`, or Expected "paints" |
+| RA-3 | 13/2 arm 3 | It pins exactly 1 builder call on a no-A2L read. That is an implementation detail: a correct read that skips the builder with no context (0 calls) would go RED. A-2 is "at most once" | `<= 1`. M-16 (2 calls) stays killed (advisory) |
+| RA-4 | record hygiene | Line 67 of `E5-corrective-notes.md` names a home-relative remote path (`~/work/…`). The transcripts already redact it as `<HOME>` | redact it in the notes |
+
+### R.4 Collection
+
+`python -m pytest --collect-only -q` (s19env, Windows PC, `PYTHONPATH=.`, `LOCALAPPDATA` set to an isolated temp folder), over the 24 node ids the Tests column now cites: **24 tests collected**, 0 errors. `git status` stayed clean.
+
+### R.5 Totals
+
+| Measure | Count |
+|---|---|
+| Cases | 23 |
+| Re-checked (test or Expected changed, or added) | 21 (all except 11/1 and 12/1, which changed only the Coverage label; I checked that label as well) |
+| Covered, full node | 23 / 23 |
+| Partial / gap | 0 / 0 |
+| Re-checked cases I would still change | **3 / 21 = 14 %** (RA-1 to RA-3: wording or advisory; 0 rating changes) |
+| Requirement clauses with no asserting node | 0. One clause (spelling, alternative 5) is not observable on one surface and is asserted on the other five |
+| Black-box ATs owed | 0 / 8 |
+| Mutants | 17 / 17 killed (M-16 and M-17 read from their own transcripts) |
+| Timing rows with enough runs | 2 / 2 |
+| Cited nodes that collect | 24 / 24 |
+
+Evidence checklist for this re-audit: ✓ mode declared; ✓ every executed result names its executor (the E5 corrective agent) and I claim only the collection; ✓ Layer B: 5 cases are black-box end to end, and the rest use gesture drives with named precondition stand-ins; ✓ the Expected values were checked against the pinned values; ✓ no PII, names, hosts or paths in this section.
