@@ -1,0 +1,5 @@
+E1 start 2026-11-06T14:02Z model=opus base=98d94d7 (Incs 6, 9 in flight)
+D-4 check 2026-11-06T14:34Z model=opus LAN 98d94d7: (a) reproduced (Raw 108 after 0x93 written; uncached 147); (b) reproduced while displayed via Save project commit (band conflict 1 vs uncached 2), not while hidden; evidence-e1/i10e1-pilot-transcript.txt; LAN worktree removed
+E1 end 2026-11-06T14:34Z model=opus rows=23 active (5 new, 4 changed canon, 14 unchanged text) TCs=71 slice=2 files/19 functions (17 changed, 2 new) trace_check: 4 US, 23 active, 24 gaps (23 TEST, 1 EVID: owed at E4/E5)
+E2 end 2026-11-06T14:34Z model=opus graph=codewire/graph-inc10.md nodes=19 slice + 6 context; interfaces I-1..I-4; shared with Inc 6: _note_image_bytes_written
+E1 rulings 2026-11-06T14:34Z orchestrator D-2..D-5, N-1
