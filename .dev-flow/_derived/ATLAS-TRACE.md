@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 93 requirement files | corpus digest: 8149a7c96b3537ca -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 95 requirement files | corpus digest: a42652e08fba4fa9 -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
@@ -1522,7 +1522,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 2380 unique id(s)
+## family US/HLR/LLR — 2387 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -2836,6 +2836,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `LLR-154.4` | batches |
 | `LLR-154.x` | batches |
 | `LLR-155.1` | batches, canon, tests |
+| `LLR-155.1..155.4` | batches |
 | `LLR-155.1..3` | batches |
 | `LLR-155.2` | batches, tests |
 | `LLR-155.3` | batches, tests |
@@ -3711,6 +3712,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `US-140` | batches, tests |
 | `US-141` | batches, tests |
 | `US-141..151` | batches |
+| `US-141..US-151` | batches |
 | `US-141..US-152` | batches |
 | `US-142` | batches, tests |
 | `US-143` | batches, tests |
@@ -3826,6 +3828,9 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `US-CRC3` | batches |
 | `US-CRC4` | batches |
 | `US-D` | batches |
+| `US-DOC-HYG-1` | batches |
+| `US-DOC-HYG-2` | batches |
+| `US-DOC-HYG-3` | batches |
 | `US-DoS` | batches |
 | `US-E4` | batches |
 | `US-E5` | batches |
@@ -3888,6 +3893,8 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `US-SYM-2` | batches |
 | `US-SYM-3` | batches |
 | `US-TST-1` | batches |
+| `US-TST-15` | batches |
+| `US-TST-16` | batches |
 | `US-TST-2` | batches |
 | `US-TST-3` | batches |
 | `US-TST-4` | batches |
@@ -3907,7 +3914,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `US-less` | batches |
 | `US-nnn` | batches |
 
-## family R — 532 unique id(s)
+## family R — 547 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -4290,6 +4297,21 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `R-TST-111` | batches, tests |
 | `R-TST-112` | batches, tests |
 | `R-TST-113` | batches, tests |
+| `R-TST-150` | batches, tests |
+| `R-TST-151` | batches, tests |
+| `R-TST-152` | batches, tests |
+| `R-TST-153` | batches, tests |
+| `R-TST-154` | batches, tests |
+| `R-TST-155` | batches, tests |
+| `R-TST-156` | batches |
+| `R-TST-157` | batches |
+| `R-TST-158` | batches, tests |
+| `R-TST-159` | batches, tests |
+| `R-TST-160` | batches, tests |
+| `R-TST-161` | batches, tests |
+| `R-TST-162` | batches, tests |
+| `R-TST-163` | batches, tests |
+| `R-TST-164` | batches, tests |
 | `R-TUI-001` | batches, canon |
 | `R-TUI-002` | batches, canon |
 | `R-TUI-003` | batches |
@@ -4444,11 +4466,12 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `R-VAR-003` | batches |
 | `R-VER-001` | canon |
 
-## family AT/TC — 2015 unique id(s)
+## family AT/TC — 2016 unique id(s)
 
 | id | seen in |
 |---|---|
 | `AT-0` | batches |
+| `AT-0000` | batches |
 | `AT-001` | batches, tests |
 | `AT-002` | batches, tests |
 | `AT-002b` | batches, tests |
@@ -5602,16 +5625,16 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `TC-1728` | batches, tests |
 | `TC-18` | batches |
 | `TC-1800` | batches, tests |
-| `TC-1801` | tests |
+| `TC-1801` | batches, tests |
 | `TC-1802` | batches, tests |
-| `TC-1803` | tests |
+| `TC-1803` | batches, tests |
 | `TC-1804` | batches, tests |
-| `TC-1810` | tests |
+| `TC-1810` | batches, tests |
 | `TC-1811` | batches, tests |
-| `TC-1815` | tests |
-| `TC-1816` | tests |
+| `TC-1815` | batches, tests |
+| `TC-1816` | batches, tests |
 | `TC-1817` | tests |
-| `TC-1818` | tests |
+| `TC-1818` | batches, tests |
 | `TC-1819` | tests |
 | `TC-1820` | batches, tests |
 | `TC-1821` | tests |
