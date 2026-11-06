@@ -1,0 +1,176 @@
+# mutant M43 (Inc 6 E5 corrective)
+base_commit=98d94d724a72c56468292be123ff15f664acb4fa
+staged_tree=2dedfdeb78d36dda9a8fc5ff480b1633770a9cd3
+mutation=s19_app/tui/app.py:7263
+--- landed (diff copy vs tree) ---
+7263c7263
+<             name in ("", ".", "..")
+---
+>             name in ("", "..")
+s19_app.__file__=<HOME>/work/i6c-mut-copy/s19_app/__init__.py
+--- pytest (mutant copy) ---
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_r_patch_doc_dropdown_001_4_refused[unknown-folder] ____________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-340/popen-gw0/test_r_patch_doc_dropdown_001_0')
+arm = 'unknown-folder'
+
+    @pytest.mark.parametrize(
+        "arm", ["link", "linked-folder", "unknown-folder", "inside-link", "popup-recheck"]
+    )
+    def test_r_patch_doc_dropdown_001_4_refused(tmp_path: Path, arm: str) -> None:
+        """Cases R-PATCH-DOC-DROPDOWN-001.4/1 .. /5: a pick that is a link, lies
+        under a linked folder (also one that stays inside the project, S-3), has no
+        known folder, a ``..`` or is ``.`` (the folder itself, E5 C-7), or whose folder became a link while the
+        unsaved-changes popup was open (S-5), is refused with the status
+        ``Patch Editor: change file '<name>' is outside the patches folder — not
+        loaded.`` and the document is unchanged.
+    
+        Negative control: a guard that resolves and compares instead of walking
+        the links -> the inside-project link arm loads -> RED; no re-check after
+        the popup -> the popup arm loads through the link -> RED."""
+        if arm == "link":
+            # the file link is made inside the scenario; skip early on a platform
+            # that cannot make one
+            probe = tmp_path / "probe"
+            probe.write_text("x", encoding="utf-8")
+            make_link(tmp_path / "probe-link", probe)
+    
+        async def scenario(app, pilot, log):
+            project = make_project(app.workarea)
+            outside = tmp_path / "outside"
+            write_doc(lib(app) / "a.json", ENTRY_C)
+            write_doc(lib(app) / "w.json", ENTRY_C)
+            if arm == "link":
+                (project / "patches").mkdir()
+            elif arm == "linked-folder":
+                write_doc(outside / "x.json", ENTRY_C)
+            elif arm == "inside-link":
+                write_doc(project / "patches" / "x.json", ENTRY_C)
+            elif arm == "popup-recheck":
+                write_doc(project / "patches" / "a.json", ENTRY_C)
+            await open_project_shipped(pilot, app)
+            await show_patch_editor(pilot, app)
+            if arm == "link":
+                make_link(project / "patches" / "l.json", lib(app) / "a.json")
+                names = ["patches/l.json"]
+            elif arm == "linked-folder":
+                make_link(project / "patches", outside)
+                names = ["patches/x.json"]
+            elif arm == "unknown-folder":
+                names = ["w.json", "patches/../../w.json", "patches/."]
+            elif arm == "inside-link":
+                make_link(project / "checks", project / "patches")
+                names = ["checks/x.json"]
+            else:
+                names = []
+            if arm != "popup-recheck":
+                before = doc_snapshot(app)
+                for name in names:
+                    lines = await post_change_pick(pilot, app, log, name)
+                    assert REFUSED_PATCH.format(name=name) in lines, lines
+                    assert doc_snapshot(app) == before, "a refused pick changed the document"
+                return True
+            # popup-recheck: dirty document, pick, swap the folder, accept.
+            await add_patch_entry(pilot, app, "0x8007", "CC")
+            before = doc_snapshot(app)
+            write_doc(outside / "a.json", [projects.address_entry(0x800A, b"\x55")])
+            await pick(pilot, app, "#patch_doc_file_select", "patches/a.json")
+            from s19_app.tui.screens_directionb import LoadGuardScreen
+    
+            await settled(
+                pilot, lambda: isinstance(app.screen, LoadGuardScreen), "the unsaved-changes popup"
+            )
+            shutil.rmtree(project / "patches")
+            make_link(project / "patches", outside)
+            mark = len(log.messages)
+            assert await pilot.click("#load_guard_accept"), "click missed the popup's accept"
+            await wait_until(
+                pilot,
+                lambda: len(log.since(mark)) > 0 and not isinstance(app.screen, LoadGuardScreen),
+                lambda: f"no status line after the accept; lines: {log.since(mark)!r}",
+                pause_first=True,
+            )
+            lines = log.since(mark)
+            assert REFUSED_PATCH.format(name="patches/a.json") in lines, lines
+            assert doc_snapshot(app) == before, "the accept loaded through the link"
+            return True
+    
+>       assert run(tmp_path, scenario) is True
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+../s19_i6c/tests/test_b101_document_homes.py:740: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i6c/tests/test_b101_document_homes.py:142: in run
+    return projects.run_app(root, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7fed82acc550>
+
+    async def scenario(app, pilot, log):
+        project = make_project(app.workarea)
+        outside = tmp_path / "outside"
+        write_doc(lib(app) / "a.json", ENTRY_C)
+        write_doc(lib(app) / "w.json", ENTRY_C)
+        if arm == "link":
+            (project / "patches").mkdir()
+        elif arm == "linked-folder":
+            write_doc(outside / "x.json", ENTRY_C)
+        elif arm == "inside-link":
+            write_doc(project / "patches" / "x.json", ENTRY_C)
+        elif arm == "popup-recheck":
+            write_doc(project / "patches" / "a.json", ENTRY_C)
+        await open_project_shipped(pilot, app)
+        await show_patch_editor(pilot, app)
+        if arm == "link":
+            make_link(project / "patches" / "l.json", lib(app) / "a.json")
+            names = ["patches/l.json"]
+        elif arm == "linked-folder":
+            make_link(project / "patches", outside)
+            names = ["patches/x.json"]
+        elif arm == "unknown-folder":
+            names = ["w.json", "patches/../../w.json", "patches/."]
+        elif arm == "inside-link":
+            make_link(project / "checks", project / "patches")
+            names = ["checks/x.json"]
+        else:
+            names = []
+        if arm != "popup-recheck":
+            before = doc_snapshot(app)
+            for name in names:
+                lines = await post_change_pick(pilot, app, log, name)
+>               assert REFUSED_PATCH.format(name=name) in lines, lines
+E               AssertionError: ['Loaded : 0 entries, 1 error(s)', "[MF-PATH-UNRESOLVED] error: the change-file path could not be resolved — no file w...ed: '/tmp/pytest-of-<user>/pytest-340/popen-gw0/test_r_patch_doc_dropdown_001_0/app/.s19tool/workarea/proj/patches'"]
+E               assert "Patch Editor: change file 'patches/.' is outside the patches folder — not loaded." in ['Loaded : 0 entries, 1 error(s)', "[MF-PATH-UNRESOLVED] error: the change-file path could not be resolved — no file w...ed: '/tmp/pytest-of-<user>/pytest-340/popen-gw0/test_r_patch_doc_dropdown_001_0/app/.s19tool/workarea/proj/patches'"]
+E                +  where "Patch Editor: change file 'patches/.' is outside the patches folder — not loaded." = <built-in method format of str object at 0x7fed82d2e880>(name='patches/.')
+E                +    where <built-in method format of str object at 0x7fed82d2e880> = 'Patch Editor: change file {name!r} is outside the patches folder — not loaded.'.format
+
+../s19_i6c/tests/test_b101_document_homes.py:712: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_document_homes.py::test_r_patch_doc_dropdown_001_4_refused[unknown-folder]
+1 failed in 6.69s
+=== exit code: 1
+copy removed: yes

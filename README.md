@@ -190,9 +190,9 @@ image are the shipped hand-off.
 Collects A2L parameters and memory rows into a **check spec** (`.chk.json`):
 addresses with their expected bytes. A check spec is never applied; the A2B Diff
 report lists its fields in a `## Checks` section. **Write .chk.json** writes the
-spec into the common `.s19tool/workarea/patches/` folder, with or without a
-project; Save project copies the specs the project uses into its `checks/`
-folder.
+spec into the check home: the project's `checks/` folder with a project open,
+or the common `.s19tool/workarea/patches/` folder without one; the common
+folder's specs stay reachable in the Spec list as `library/<n>`.
 
 ### A2B Diff
 

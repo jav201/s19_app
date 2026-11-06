@@ -1,0 +1,34 @@
+# i6e1-pilot on 9bb0e3a0 (origin/main), LAN Linux host, 2026-11-06T11:10Z
+s19_app.__file__ = /tmp/i6e1/wt/s19_app/__init__.py
+F05 no-project offers: ['Before/after report ready - press b to write it to the project reports directory (action: before_after_report).']
+F05 no-project control visible: True
+F05 no-project b: ['Before/after report refused: No active project - the before/after report needs a project reports/ destination; use the manual A<->B Diff report (key 7) with an explicit destination instead.']
+F05 project offers: ['Before/after report ready - press b to write it to the project reports directory (action: before_after_report).']
+D1030 control after save-back: True
+D1030 control after dropdown pick: True
+D1030 save-back prompt after dropdown pick: True
+D1030 save-back prompt after undo: True
+F06 files after Patch Save: ['proj/patches/changes.json']
+F06 Patch dropdown values: ['Select.NULL']
+F06 Check Write status: ['Check Editor: wrote s1.chk.json (0 fields, kind=check).']
+F06 spec files: ['patches/s1.chk.json']
+F06 Check Spec values: ['Select.NULL', 's1.chk.json']
+F06 A2B check-list scan: ['s1.chk.json']
+F40 after run: {'status': 'Checks: 1 passed, 1 failed, 0 uncheckable', 'rows': 2, 'subtitle': '2 checked', 'strip': '✓1 ✗1 ◐0 / ████░░░░'} | screen: ✗ FAILED  (1) | 0x8001-0x8001 expected [FF] actual [01] -> fail | ✓ PASSED  (1) | 0x8000-0x8000 expected [00] actual [00] -> pass | ✗ FAILED  (1) | ✓ PASSED  (1
+F40 after another document load: {'status': 'Checks: 1 passed, 1 failed, 0 uncheckable', 'rows': 2, 'subtitle': '2 checked', 'strip': '✓1 ✗1 ◐0 / ████░░░░'} | screen: ✗ FAILED  (1) | 0x8001-0x8001 expected [FF] actual [01] -> fail | ✓ PASSED  (1) | 0x8000-0x8000 expected [00] actual [00] -> pass | ✗ FAILED  (1) | ✓ PASSED  (1
+F40 after image load: {'status': 'Checks: 1 passed, 1 failed, 0 uncheckable', 'rows': 2, 'subtitle': '2 checked', 'strip': '✓1 ✗1 ◐0 / ████░░░░'} | screen: ✗ FAILED  (1) | 0x8001-0x8001 expected [FF] actual [01] -> fail | ✓ PASSED  (1) | 0x8000-0x8000 expected [00] actual [00] -> pass | ✗ FAILED  (1) | ✓ PASSED  (1
+F40 after project load: {'status': 'Checks: 0 passed, 2 failed, 0 uncheckable', 'rows': 2, 'subtitle': '2 checked', 'strip': '✓0 ✗2 ◐0 / ░░░░░░░░'} | last_check_result: False | screen: ✗ FAILED  (2) | 0x8000-0x8000 expected [00] actual [40] -> fail | 0x8001-0x8001 expected [FF] actual [41] -> fail | No check run yet — run checks from the Patch
+F40 0-entry run: {'status': 'Checks: 0 passed, 0 failed, 0 uncheckable', 'rows': 0, 'subtitle': 'no run yet', 'strip': '✓0 ✗0 ◐0 / ░░░░░░░░'}
+F47 refusals after start: 0
+F47 refusals after project load: 0
+F47 key 'p': refusals=0
+F47 key 'slash': refusals=0
+F47 key 'g': refusals=0
+F47 key 'tab': refusals=0
+F47 key 'enter': refusals=0
+F47 key 'space': refusals=0
+F47 key 'ctrl+z': refusals=0
+F47 key 'right_square_bracket': refusals=0
+F47 key 'B': refusals=0
+F47 key 'b': refusals=1
+exit=0

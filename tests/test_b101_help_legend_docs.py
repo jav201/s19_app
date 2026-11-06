@@ -1399,7 +1399,11 @@ _STALE_README = (
     "**Save patched**",
     "Flows and change-set runs can execute variant-scoped",
 )
-_CHECK_EDITOR_PHRASE = (
+# Inc 6 (D9-15): Write puts the spec in the open project's `checks/` folder;
+# the old sentence ("... common ... folder, with or without a project") is now
+# false and is pinned as stale. The present claim is read from the Write
+# sentence itself (batch-101 Inc 6 E4 addendum).
+_CHECK_EDITOR_STALE = (
     "writes the spec into the common `.s19tool/workarea/patches/` folder, "
     "with or without a project"
 )
@@ -1411,7 +1415,12 @@ def test_r_doc_readme_4_1_no_stale_claim() -> None:
     present = [phrase for phrase in _STALE_README if _flat(phrase) in text]
     assert present == [], f"stale README claims still present: {present}"
     section = _flat(_sections(_readme()).get("Check Editor", ""))
-    assert _CHECK_EDITOR_PHRASE in section, "Check Editor section lacks the present phrase"
+    assert _CHECK_EDITOR_STALE not in section, "Check Editor section keeps the stale Write sentence"
+    write_start = section.index("**Write .chk.json**")
+    write_sentence = section[write_start:].split(". ")[0]
+    assert "`checks/`" in write_sentence and "project" in write_sentence, write_sentence
+    assert "`.s19tool/workarea/patches/`" in write_sentence, write_sentence
+    assert "with or without a project" not in write_sentence, write_sentence
 
 
 def _link_targets(text: str) -> List[str]:
@@ -1858,10 +1867,14 @@ def test_r_doc_guide_1_9_named_bullets_hold_the_1_0_0_phrases() -> None:
     assert "from the loaded A2L and MAC" not in _bullet(moved, section, "Runs")
 
 
-#: R-DOC-GUIDE.1 / E5 C-6: (file, capture image stem) of the four captures
-#: taken before 1.0.0 beside a changed passage (D-5).
+#: R-DOC-GUIDE.1 / E5 C-6: (file, capture image stem) of the captures taken
+#: before 1.0.0 beside a changed passage (D-5). batch-101 Inc 6 E5 C-6 extends
+#: the set by named supersession with ch08-09 and ch08-20, the two captures
+#: beside the passages its F-05 and F-40 fixes changed (4 -> 6).
 _CAPTURES_BEFORE = (
     ("ch06-memory-map.md", "ch06-05-"),
+    ("ch08-patch-editor.md", "ch08-09-"),
+    ("ch08-patch-editor.md", "ch08-20-"),
     ("ch17-flow-builder.md", "ch17-05-"),
     ("ch19-help-palettes-settings.md", "ch19-01-"),
     ("ch21-html-reports.md", "ch21-02-"),
@@ -1905,7 +1918,13 @@ def test_r_doc_guide_1_12_capture_notes_beside_their_captures() -> None:
     assert _capture_note_defect(cut + "\n(capture taken before 1.0.0: moved)\n", "ch19-01-")
 
 
-_FIXED = ("F-16", "F-28", "F-30", "F-37", "F-38", "F-41", "F-42", "F-49")
+#: Pinned set of R-DOC-GUIDE.2. batch-101 Inc 6 extends it by named
+#: supersession with F-05, F-06 and F-40, the three findings it fixes
+#: (8 -> 11); F-47 stays unmarked (carried, not reproduced).
+_FIXED = (
+    "F-05", "F-06", "F-16", "F-28", "F-30", "F-37", "F-38", "F-40", "F-41",
+    "F-42", "F-49",
+)
 
 
 def _findings_rows() -> Dict[str, str]:
@@ -1921,7 +1940,7 @@ def _findings_rows() -> Dict[str, str]:
 
 def test_r_doc_guide_2_1_fixed_rows_marked() -> None:
     rows = _findings_rows()
-    assert len(_FIXED) == 8
+    assert len(_FIXED) == 11
     unmarked = [
         f for f in _FIXED if not rows.get(f, "").endswith(_FIXED_MARK.get(f, "fixed in 1.0.0"))
     ]

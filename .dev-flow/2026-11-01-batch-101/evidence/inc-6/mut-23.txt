@@ -1,0 +1,1169 @@
+# mutant M23  (CHKED-040, DIFF-CHK.1 (E1))
+base_commit=98d94d724a72c56468292be123ff15f664acb4fa
+s19_app.__file__=<HOME>/work/s19_i6m_copy/s19_app/__init__.py
+mutation=s19_app/tui/app.py:7113
+--- pytest (mutant copy) ---
+bringing up nodes...
+bringing up nodes...
+
+FFFFFFFFFF                                                               [100%]
+=================================== FAILURES ===================================
+_____________________ test_r_chked_042_write_as_bare_name ______________________
+[gw6] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-295/popen-gw6/test_r_chked_042_write_as_bare0')
+
+    def test_r_chked_042_write_as_bare_name(tmp_path: Path) -> None:
+        """Case R-CHKED-042/1 (revised D-3): a pick of ``library/w.chk.json`` in a
+        project sets the Write as input to the bare file name ``w.chk.json`` (no
+        folder part); the status is ``Check Editor: loaded 'library/w.chk.json'
+        (1 fields).``
+    
+        Negative control: the listed value passed on as the name -> the input
+        reads ``library/w.chk.json`` -> RED."""
+    
+        async def scenario(app, pilot, log):
+            make_project(app.workarea)
+            write_doc(lib(app) / "w.chk.json", ENTRY_W, kind="check")
+            await open_project_shipped(pilot, app)
+            await show_check_editor(pilot, app)
+            mark = len(log.messages)
+            await pick(pilot, app, "#check_spec_file_select", "library/w.chk.json")
+            lines = await wait_line(
+                pilot, log, mark, lambda line: line.startswith("Check Editor: "),
+                "the spec pick status",
+            )
+            assert "Check Editor: loaded 'library/w.chk.json' (1 fields)." in lines, lines
+            assert app.query_one("#check_file_name_input", Input).value == "w.chk.json"
+            return True
+    
+>       assert run(tmp_path, scenario) is True
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+../s19_i6m/tests/test_b101_document_homes.py:919: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i6m/tests/test_b101_document_homes.py:142: in run
+    return projects.run_app(root, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i6m/tests/test_b101_document_homes.py:910: in scenario
+    await pick(pilot, app, "#check_spec_file_select", "library/w.chk.json")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+select_id = '#check_spec_file_select', value = 'library/w.chk.json'
+
+    async def pick(pilot, app, select_id: str, value: str) -> None:
+        """Pick ``value`` the way the operator does: click the dropdown open, move
+        with the arrow keys, press enter (no ``Select.value`` write)."""
+        from textual.widgets._select import SelectCurrent, SelectOverlay
+    
+        select = app.query_one(select_id, Select)
+        values = [option_value for _prompt, option_value in select._options]
+>       assert value in values, (
+            f"{value!r} is not offered by {select_id}; the dropdown lists {option_values(select)!r}"
+        )
+E       AssertionError: 'library/w.chk.json' is not offered by #check_spec_file_select; the dropdown lists ['w.chk.json']
+E       assert 'library/w.chk.json' in [Select.NULL, 'w.chk.json']
+
+../s19_i6m/tests/test_b101_document_homes.py:265: AssertionError
+_____________________ test_r_chked_040_spec_list[project] ______________________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-295/popen-gw0/test_r_chked_040_spec_list_pro0')
+arm = 'project'
+
+    @pytest.mark.parametrize(
+        "arm", ["project", "after-write", "save-project", "project-load"]
+    )
+    def test_r_chked_040_spec_list(tmp_path: Path, arm: str) -> None:
+        """Cases R-CHKED-040/1 .. /3 and the project-load trigger of E3A-18.
+    
+        /1: in a project the Spec dropdown lists ``checks/k.chk.json`` then
+        ``library/w.chk.json``, both labelled `` CHECK``. /2: after a Write as
+        ``s1.chk.json`` it lists ``checks/k.chk.json``, ``checks/s1.chk.json``,
+        ``library/w.chk.json``. /3: after a Save project that creates the project,
+        with the Check Editor displayed: ``library/w.chk.json``. project-load: after
+        a project load with the Check Editor displayed: ``checks/k.chk.json``,
+        ``library/w.chk.json``.
+    
+        Negative control: the common-folder scan -> the project arms list
+        ``w.chk.json`` bare -> RED; no refill after a Save project or a project
+        load -> RED."""
+    
+        async def scenario(app, pilot, log):
+            write_doc(lib(app) / "w.chk.json", ENTRY_W, kind="check")
+            project = make_project(app.workarea)
+            write_doc(project / "checks" / "k.chk.json", ENTRIES_K, kind="check")
+            if arm in ("project", "after-write"):
+                await open_project_shipped(pilot, app)
+                await show_check_editor(pilot, app)
+                if arm == "project":
+                    select = spec_select(app)
+                    assert option_values(select) == ["checks/k.chk.json", "library/w.chk.json"]
+                    assert all(label.endswith(" CHECK") for label in option_labels(select)), (
+                        option_labels(select)
+                    )
+                else:
+                    await add_check_row(pilot, app)
+                    lines = await write_spec(pilot, app, log, "s1.chk.json")
+                    assert any(line.startswith("Check Editor: wrote s1.chk.json") for line in lines), lines
+                    assert option_values(spec_select(app)) == [
+                        "checks/k.chk.json",
+                        "checks/s1.chk.json",
+                        "library/w.chk.json",
+                    ]
+            else:
+                await load_image_fixture(pilot, app, app.base_dir)
+                await show_check_editor(pilot, app)
+                assert option_values(spec_select(app)) == ["w.chk.json"]
+                if arm == "save-project":
+                    await save_project_by_dialog(pilot, app, log, "new")
+                    expected = ["library/w.chk.json"]
+                else:
+                    await open_project_by_dialog(pilot, app)
+                    expected = ["checks/k.chk.json", "library/w.chk.json"]
+                assert spec_select(app).region.width > 0, "the Check Editor stayed displayed"
+                assert option_values(spec_select(app)) == expected
+            return True
+    
+>       assert run(tmp_path, scenario) is True
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+../s19_i6m/tests/test_b101_document_homes.py:892: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i6m/tests/test_b101_document_homes.py:142: in run
+    return projects.run_app(root, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f4c8fbd52d0>
+
+    async def scenario(app, pilot, log):
+        write_doc(lib(app) / "w.chk.json", ENTRY_W, kind="check")
+        project = make_project(app.workarea)
+        write_doc(project / "checks" / "k.chk.json", ENTRIES_K, kind="check")
+        if arm in ("project", "after-write"):
+            await open_project_shipped(pilot, app)
+            await show_check_editor(pilot, app)
+            if arm == "project":
+                select = spec_select(app)
+>               assert option_values(select) == ["checks/k.chk.json", "library/w.chk.json"]
+E               AssertionError: assert ['w.chk.json'] == ['checks/k.ch...y/w.chk.json']
+E                 
+E                 At index 0 diff: 'w.chk.json' != 'checks/k.chk.json'
+E                 Right contains one more item: 'library/w.chk.json'
+E                 Use -v to get more diff
+
+../s19_i6m/tests/test_b101_document_homes.py:865: AssertionError
+___________________ test_r_chked_040_spec_list[project-load] ___________________
+[gw4] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-295/popen-gw4/test_r_chked_040_spec_list_pro0')
+arm = 'project-load'
+
+    @pytest.mark.parametrize(
+        "arm", ["project", "after-write", "save-project", "project-load"]
+    )
+    def test_r_chked_040_spec_list(tmp_path: Path, arm: str) -> None:
+        """Cases R-CHKED-040/1 .. /3 and the project-load trigger of E3A-18.
+    
+        /1: in a project the Spec dropdown lists ``checks/k.chk.json`` then
+        ``library/w.chk.json``, both labelled `` CHECK``. /2: after a Write as
+        ``s1.chk.json`` it lists ``checks/k.chk.json``, ``checks/s1.chk.json``,
+        ``library/w.chk.json``. /3: after a Save project that creates the project,
+        with the Check Editor displayed: ``library/w.chk.json``. project-load: after
+        a project load with the Check Editor displayed: ``checks/k.chk.json``,
+        ``library/w.chk.json``.
+    
+        Negative control: the common-folder scan -> the project arms list
+        ``w.chk.json`` bare -> RED; no refill after a Save project or a project
+        load -> RED."""
+    
+        async def scenario(app, pilot, log):
+            write_doc(lib(app) / "w.chk.json", ENTRY_W, kind="check")
+            project = make_project(app.workarea)
+            write_doc(project / "checks" / "k.chk.json", ENTRIES_K, kind="check")
+            if arm in ("project", "after-write"):
+                await open_project_shipped(pilot, app)
+                await show_check_editor(pilot, app)
+                if arm == "project":
+                    select = spec_select(app)
+                    assert option_values(select) == ["checks/k.chk.json", "library/w.chk.json"]
+                    assert all(label.endswith(" CHECK") for label in option_labels(select)), (
+                        option_labels(select)
+                    )
+                else:
+                    await add_check_row(pilot, app)
+                    lines = await write_spec(pilot, app, log, "s1.chk.json")
+                    assert any(line.startswith("Check Editor: wrote s1.chk.json") for line in lines), lines
+                    assert option_values(spec_select(app)) == [
+                        "checks/k.chk.json",
+                        "checks/s1.chk.json",
+                        "library/w.chk.json",
+                    ]
+            else:
+                await load_image_fixture(pilot, app, app.base_dir)
+                await show_check_editor(pilot, app)
+                assert option_values(spec_select(app)) == ["w.chk.json"]
+                if arm == "save-project":
+                    await save_project_by_dialog(pilot, app, log, "new")
+                    expected = ["library/w.chk.json"]
+                else:
+                    await open_project_by_dialog(pilot, app)
+                    expected = ["checks/k.chk.json", "library/w.chk.json"]
+                assert spec_select(app).region.width > 0, "the Check Editor stayed displayed"
+                assert option_values(spec_select(app)) == expected
+            return True
+    
+>       assert run(tmp_path, scenario) is True
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+../s19_i6m/tests/test_b101_document_homes.py:892: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i6m/tests/test_b101_document_homes.py:142: in run
+    return projects.run_app(root, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7ff195b2e650>
+
+    async def scenario(app, pilot, log):
+        write_doc(lib(app) / "w.chk.json", ENTRY_W, kind="check")
+        project = make_project(app.workarea)
+        write_doc(project / "checks" / "k.chk.json", ENTRIES_K, kind="check")
+        if arm in ("project", "after-write"):
+            await open_project_shipped(pilot, app)
+            await show_check_editor(pilot, app)
+            if arm == "project":
+                select = spec_select(app)
+                assert option_values(select) == ["checks/k.chk.json", "library/w.chk.json"]
+                assert all(label.endswith(" CHECK") for label in option_labels(select)), (
+                    option_labels(select)
+                )
+            else:
+                await add_check_row(pilot, app)
+                lines = await write_spec(pilot, app, log, "s1.chk.json")
+                assert any(line.startswith("Check Editor: wrote s1.chk.json") for line in lines), lines
+                assert option_values(spec_select(app)) == [
+                    "checks/k.chk.json",
+                    "checks/s1.chk.json",
+                    "library/w.chk.json",
+                ]
+        else:
+            await load_image_fixture(pilot, app, app.base_dir)
+            await show_check_editor(pilot, app)
+            assert option_values(spec_select(app)) == ["w.chk.json"]
+            if arm == "save-project":
+                await save_project_by_dialog(pilot, app, log, "new")
+                expected = ["library/w.chk.json"]
+            else:
+                await open_project_by_dialog(pilot, app)
+                expected = ["checks/k.chk.json", "library/w.chk.json"]
+            assert spec_select(app).region.width > 0, "the Check Editor stayed displayed"
+>           assert option_values(spec_select(app)) == expected
+E           AssertionError: assert ['w.chk.json'] == ['checks/k.ch...y/w.chk.json']
+E             
+E             At index 0 diff: 'w.chk.json' != 'checks/k.chk.json'
+E             Right contains one more item: 'library/w.chk.json'
+E             Use -v to get more diff
+
+../s19_i6m/tests/test_b101_document_homes.py:889: AssertionError
+_____________________ test_r_diff_chk_1_list[save-project] _____________________
+[gw7] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-295/popen-gw7/test_r_diff_chk_1_list_save_pr0')
+arm = 'save-project'
+
+    @pytest.mark.parametrize("arm", ["project", "project-load", "save-project"])
+    def test_r_diff_chk_1_list(tmp_path: Path, arm: str) -> None:
+        """Cases R-DIFF-CHK.1/1, /3 and the Save project trigger of E3A-18: the
+        option values after ``(no check spec)`` equal the spec list exactly.
+    
+        /1 (key ``7`` in a project): ``checks/k.chk.json``, ``library/w.chk.json``.
+        /3 (a project load while the A2B Diff stays displayed): the same, where the
+        base kept ``w.chk.json``. save-project (a Save project that creates the
+        project, A2B Diff displayed): ``library/w.chk.json``. (/2, the no-project
+        list, is the existing ``test_tc_b94_15_dropdown_population``.)
+    
+        Negative control: the common-folder scan -> the project arms list bare
+        names -> RED; no refill after the project install or the Save project ->
+        RED."""
+    
+        async def scenario(app, pilot, log):
+            write_doc(lib(app) / "w.chk.json", ENTRY_W, kind="check")
+            project = make_project(app.workarea)
+            write_doc(project / "checks" / "k.chk.json", ENTRIES_K, kind="check")
+            if arm == "project":
+                await open_project_shipped(pilot, app)
+                await show_diff(pilot, app)
+                assert option_values(diff_select(app)) == [
+                    "checks/k.chk.json",
+                    "library/w.chk.json",
+                ]
+            else:
+                await load_image_fixture(pilot, app, app.base_dir)
+                await show_diff(pilot, app)
+                assert option_values(diff_select(app)) == ["w.chk.json"]
+                if arm == "project-load":
+                    await open_project_by_dialog(pilot, app)
+                    expected = ["checks/k.chk.json", "library/w.chk.json"]
+                else:
+                    await save_project_by_dialog(pilot, app, log, "new")
+                    expected = ["library/w.chk.json"]
+                assert app.query_one("#ab_diff_panel").region.width > 0, "the A2B Diff stayed displayed"
+                assert option_values(diff_select(app)) == expected
+            return True
+    
+>       assert run(tmp_path, scenario) is True
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+../s19_i6m/tests/test_b101_document_homes.py:1018: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i6m/tests/test_b101_document_homes.py:142: in run
+    return projects.run_app(root, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f2d993c42d0>
+
+    async def scenario(app, pilot, log):
+        write_doc(lib(app) / "w.chk.json", ENTRY_W, kind="check")
+        project = make_project(app.workarea)
+        write_doc(project / "checks" / "k.chk.json", ENTRIES_K, kind="check")
+        if arm == "project":
+            await open_project_shipped(pilot, app)
+            await show_diff(pilot, app)
+            assert option_values(diff_select(app)) == [
+                "checks/k.chk.json",
+                "library/w.chk.json",
+            ]
+        else:
+            await load_image_fixture(pilot, app, app.base_dir)
+            await show_diff(pilot, app)
+            assert option_values(diff_select(app)) == ["w.chk.json"]
+            if arm == "project-load":
+                await open_project_by_dialog(pilot, app)
+                expected = ["checks/k.chk.json", "library/w.chk.json"]
+            else:
+                await save_project_by_dialog(pilot, app, log, "new")
+                expected = ["library/w.chk.json"]
+            assert app.query_one("#ab_diff_panel").region.width > 0, "the A2B Diff stayed displayed"
+>           assert option_values(diff_select(app)) == expected
+E           AssertionError: assert ['w.chk.json'] == ['library/w.chk.json']
+E             
+E             At index 0 diff: 'w.chk.json' != 'library/w.chk.json'
+E             Use -v to get more diff
+
+../s19_i6m/tests/test_b101_document_homes.py:1015: AssertionError
+_______________________ test_r_diff_chk_1_list[project] ________________________
+[gw3] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-295/popen-gw3/test_r_diff_chk_1_list_project0')
+arm = 'project'
+
+    @pytest.mark.parametrize("arm", ["project", "project-load", "save-project"])
+    def test_r_diff_chk_1_list(tmp_path: Path, arm: str) -> None:
+        """Cases R-DIFF-CHK.1/1, /3 and the Save project trigger of E3A-18: the
+        option values after ``(no check spec)`` equal the spec list exactly.
+    
+        /1 (key ``7`` in a project): ``checks/k.chk.json``, ``library/w.chk.json``.
+        /3 (a project load while the A2B Diff stays displayed): the same, where the
+        base kept ``w.chk.json``. save-project (a Save project that creates the
+        project, A2B Diff displayed): ``library/w.chk.json``. (/2, the no-project
+        list, is the existing ``test_tc_b94_15_dropdown_population``.)
+    
+        Negative control: the common-folder scan -> the project arms list bare
+        names -> RED; no refill after the project install or the Save project ->
+        RED."""
+    
+        async def scenario(app, pilot, log):
+            write_doc(lib(app) / "w.chk.json", ENTRY_W, kind="check")
+            project = make_project(app.workarea)
+            write_doc(project / "checks" / "k.chk.json", ENTRIES_K, kind="check")
+            if arm == "project":
+                await open_project_shipped(pilot, app)
+                await show_diff(pilot, app)
+                assert option_values(diff_select(app)) == [
+                    "checks/k.chk.json",
+                    "library/w.chk.json",
+                ]
+            else:
+                await load_image_fixture(pilot, app, app.base_dir)
+                await show_diff(pilot, app)
+                assert option_values(diff_select(app)) == ["w.chk.json"]
+                if arm == "project-load":
+                    await open_project_by_dialog(pilot, app)
+                    expected = ["checks/k.chk.json", "library/w.chk.json"]
+                else:
+                    await save_project_by_dialog(pilot, app, log, "new")
+                    expected = ["library/w.chk.json"]
+                assert app.query_one("#ab_diff_panel").region.width > 0, "the A2B Diff stayed displayed"
+                assert option_values(diff_select(app)) == expected
+            return True
+    
+>       assert run(tmp_path, scenario) is True
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+../s19_i6m/tests/test_b101_document_homes.py:1018: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i6m/tests/test_b101_document_homes.py:142: in run
+    return projects.run_app(root, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f5e86710ed0>
+
+    async def scenario(app, pilot, log):
+        write_doc(lib(app) / "w.chk.json", ENTRY_W, kind="check")
+        project = make_project(app.workarea)
+        write_doc(project / "checks" / "k.chk.json", ENTRIES_K, kind="check")
+        if arm == "project":
+            await open_project_shipped(pilot, app)
+            await show_diff(pilot, app)
+>           assert option_values(diff_select(app)) == [
+                "checks/k.chk.json",
+                "library/w.chk.json",
+            ]
+E           AssertionError: assert ['w.chk.json'] == ['checks/k.ch...y/w.chk.json']
+E             
+E             At index 0 diff: 'w.chk.json' != 'checks/k.chk.json'
+E             Right contains one more item: 'library/w.chk.json'
+E             Use -v to get more diff
+
+../s19_i6m/tests/test_b101_document_homes.py:1000: AssertionError
+___________________ test_r_chked_040_spec_list[save-project] ___________________
+[gw2] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-295/popen-gw2/test_r_chked_040_spec_list_sav0')
+arm = 'save-project'
+
+    @pytest.mark.parametrize(
+        "arm", ["project", "after-write", "save-project", "project-load"]
+    )
+    def test_r_chked_040_spec_list(tmp_path: Path, arm: str) -> None:
+        """Cases R-CHKED-040/1 .. /3 and the project-load trigger of E3A-18.
+    
+        /1: in a project the Spec dropdown lists ``checks/k.chk.json`` then
+        ``library/w.chk.json``, both labelled `` CHECK``. /2: after a Write as
+        ``s1.chk.json`` it lists ``checks/k.chk.json``, ``checks/s1.chk.json``,
+        ``library/w.chk.json``. /3: after a Save project that creates the project,
+        with the Check Editor displayed: ``library/w.chk.json``. project-load: after
+        a project load with the Check Editor displayed: ``checks/k.chk.json``,
+        ``library/w.chk.json``.
+    
+        Negative control: the common-folder scan -> the project arms list
+        ``w.chk.json`` bare -> RED; no refill after a Save project or a project
+        load -> RED."""
+    
+        async def scenario(app, pilot, log):
+            write_doc(lib(app) / "w.chk.json", ENTRY_W, kind="check")
+            project = make_project(app.workarea)
+            write_doc(project / "checks" / "k.chk.json", ENTRIES_K, kind="check")
+            if arm in ("project", "after-write"):
+                await open_project_shipped(pilot, app)
+                await show_check_editor(pilot, app)
+                if arm == "project":
+                    select = spec_select(app)
+                    assert option_values(select) == ["checks/k.chk.json", "library/w.chk.json"]
+                    assert all(label.endswith(" CHECK") for label in option_labels(select)), (
+                        option_labels(select)
+                    )
+                else:
+                    await add_check_row(pilot, app)
+                    lines = await write_spec(pilot, app, log, "s1.chk.json")
+                    assert any(line.startswith("Check Editor: wrote s1.chk.json") for line in lines), lines
+                    assert option_values(spec_select(app)) == [
+                        "checks/k.chk.json",
+                        "checks/s1.chk.json",
+                        "library/w.chk.json",
+                    ]
+            else:
+                await load_image_fixture(pilot, app, app.base_dir)
+                await show_check_editor(pilot, app)
+                assert option_values(spec_select(app)) == ["w.chk.json"]
+                if arm == "save-project":
+                    await save_project_by_dialog(pilot, app, log, "new")
+                    expected = ["library/w.chk.json"]
+                else:
+                    await open_project_by_dialog(pilot, app)
+                    expected = ["checks/k.chk.json", "library/w.chk.json"]
+                assert spec_select(app).region.width > 0, "the Check Editor stayed displayed"
+                assert option_values(spec_select(app)) == expected
+            return True
+    
+>       assert run(tmp_path, scenario) is True
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+../s19_i6m/tests/test_b101_document_homes.py:892: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i6m/tests/test_b101_document_homes.py:142: in run
+    return projects.run_app(root, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7fe6d59e2450>
+
+    async def scenario(app, pilot, log):
+        write_doc(lib(app) / "w.chk.json", ENTRY_W, kind="check")
+        project = make_project(app.workarea)
+        write_doc(project / "checks" / "k.chk.json", ENTRIES_K, kind="check")
+        if arm in ("project", "after-write"):
+            await open_project_shipped(pilot, app)
+            await show_check_editor(pilot, app)
+            if arm == "project":
+                select = spec_select(app)
+                assert option_values(select) == ["checks/k.chk.json", "library/w.chk.json"]
+                assert all(label.endswith(" CHECK") for label in option_labels(select)), (
+                    option_labels(select)
+                )
+            else:
+                await add_check_row(pilot, app)
+                lines = await write_spec(pilot, app, log, "s1.chk.json")
+                assert any(line.startswith("Check Editor: wrote s1.chk.json") for line in lines), lines
+                assert option_values(spec_select(app)) == [
+                    "checks/k.chk.json",
+                    "checks/s1.chk.json",
+                    "library/w.chk.json",
+                ]
+        else:
+            await load_image_fixture(pilot, app, app.base_dir)
+            await show_check_editor(pilot, app)
+            assert option_values(spec_select(app)) == ["w.chk.json"]
+            if arm == "save-project":
+                await save_project_by_dialog(pilot, app, log, "new")
+                expected = ["library/w.chk.json"]
+            else:
+                await open_project_by_dialog(pilot, app)
+                expected = ["checks/k.chk.json", "library/w.chk.json"]
+            assert spec_select(app).region.width > 0, "the Check Editor stayed displayed"
+>           assert option_values(spec_select(app)) == expected
+E           AssertionError: assert ['w.chk.json'] == ['library/w.chk.json']
+E             
+E             At index 0 diff: 'w.chk.json' != 'library/w.chk.json'
+E             Use -v to get more diff
+
+../s19_i6m/tests/test_b101_document_homes.py:889: AssertionError
+___________________ test_r_chked_040_spec_list[after-write] ____________________
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-295/popen-gw1/test_r_chked_040_spec_list_aft0')
+arm = 'after-write'
+
+    @pytest.mark.parametrize(
+        "arm", ["project", "after-write", "save-project", "project-load"]
+    )
+    def test_r_chked_040_spec_list(tmp_path: Path, arm: str) -> None:
+        """Cases R-CHKED-040/1 .. /3 and the project-load trigger of E3A-18.
+    
+        /1: in a project the Spec dropdown lists ``checks/k.chk.json`` then
+        ``library/w.chk.json``, both labelled `` CHECK``. /2: after a Write as
+        ``s1.chk.json`` it lists ``checks/k.chk.json``, ``checks/s1.chk.json``,
+        ``library/w.chk.json``. /3: after a Save project that creates the project,
+        with the Check Editor displayed: ``library/w.chk.json``. project-load: after
+        a project load with the Check Editor displayed: ``checks/k.chk.json``,
+        ``library/w.chk.json``.
+    
+        Negative control: the common-folder scan -> the project arms list
+        ``w.chk.json`` bare -> RED; no refill after a Save project or a project
+        load -> RED."""
+    
+        async def scenario(app, pilot, log):
+            write_doc(lib(app) / "w.chk.json", ENTRY_W, kind="check")
+            project = make_project(app.workarea)
+            write_doc(project / "checks" / "k.chk.json", ENTRIES_K, kind="check")
+            if arm in ("project", "after-write"):
+                await open_project_shipped(pilot, app)
+                await show_check_editor(pilot, app)
+                if arm == "project":
+                    select = spec_select(app)
+                    assert option_values(select) == ["checks/k.chk.json", "library/w.chk.json"]
+                    assert all(label.endswith(" CHECK") for label in option_labels(select)), (
+                        option_labels(select)
+                    )
+                else:
+                    await add_check_row(pilot, app)
+                    lines = await write_spec(pilot, app, log, "s1.chk.json")
+                    assert any(line.startswith("Check Editor: wrote s1.chk.json") for line in lines), lines
+                    assert option_values(spec_select(app)) == [
+                        "checks/k.chk.json",
+                        "checks/s1.chk.json",
+                        "library/w.chk.json",
+                    ]
+            else:
+                await load_image_fixture(pilot, app, app.base_dir)
+                await show_check_editor(pilot, app)
+                assert option_values(spec_select(app)) == ["w.chk.json"]
+                if arm == "save-project":
+                    await save_project_by_dialog(pilot, app, log, "new")
+                    expected = ["library/w.chk.json"]
+                else:
+                    await open_project_by_dialog(pilot, app)
+                    expected = ["checks/k.chk.json", "library/w.chk.json"]
+                assert spec_select(app).region.width > 0, "the Check Editor stayed displayed"
+                assert option_values(spec_select(app)) == expected
+            return True
+    
+>       assert run(tmp_path, scenario) is True
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+../s19_i6m/tests/test_b101_document_homes.py:892: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i6m/tests/test_b101_document_homes.py:142: in run
+    return projects.run_app(root, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7fb0665f8f10>
+
+    async def scenario(app, pilot, log):
+        write_doc(lib(app) / "w.chk.json", ENTRY_W, kind="check")
+        project = make_project(app.workarea)
+        write_doc(project / "checks" / "k.chk.json", ENTRIES_K, kind="check")
+        if arm in ("project", "after-write"):
+            await open_project_shipped(pilot, app)
+            await show_check_editor(pilot, app)
+            if arm == "project":
+                select = spec_select(app)
+                assert option_values(select) == ["checks/k.chk.json", "library/w.chk.json"]
+                assert all(label.endswith(" CHECK") for label in option_labels(select)), (
+                    option_labels(select)
+                )
+            else:
+                await add_check_row(pilot, app)
+                lines = await write_spec(pilot, app, log, "s1.chk.json")
+                assert any(line.startswith("Check Editor: wrote s1.chk.json") for line in lines), lines
+>               assert option_values(spec_select(app)) == [
+                    "checks/k.chk.json",
+                    "checks/s1.chk.json",
+                    "library/w.chk.json",
+                ]
+E               AssertionError: assert ['w.chk.json'] == ['checks/k.ch...y/w.chk.json']
+E                 
+E                 At index 0 diff: 'w.chk.json' != 'checks/k.chk.json'
+E                 Right contains 2 more items, first extra item: 'checks/s1.chk.json'
+E                 Use -v to get more diff
+
+../s19_i6m/tests/test_b101_document_homes.py:873: AssertionError
+_____________________ test_r_diff_chk_8_library_spec_loads _____________________
+[gw8] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-295/popen-gw8/test_r_diff_chk_8_library_spec0')
+
+    def test_r_diff_chk_8_library_spec_loads(tmp_path: Path) -> None:
+        """Case R-DIFF-CHK.8/1 (revised D-3): in a project, a pick of
+        ``library/w.chk.json`` in the A2B Diff loads the library file: ``#diff_status``
+        reads ``Check spec 'library/w.chk.json' loaded — 1 declared field(s) will
+        ride the report.``
+    
+        Negative control: the listed value resolved under the project -> the pick is
+        refused -> RED."""
+    
+        async def scenario(app, pilot, log):
+            make_project(app.workarea)
+            write_doc(lib(app) / "w.chk.json", ENTRY_W, kind="check")
+            await open_project_shipped(pilot, app)
+            await show_diff(pilot, app)
+            await pick(pilot, app, "#diff_check_select", "library/w.chk.json")
+            expected = (
+                "Check spec 'library/w.chk.json' loaded — 1 declared field(s) "
+                "will ride the report."
+            )
+            await wait_until(
+                pilot,
+                lambda: diff_status(app).startswith("Check spec"),
+                lambda: f"#diff_status read {diff_status(app)!r}",
+                pause_first=True,
+            )
+            await settled(pilot, lambda: diff_status(app) == expected, "the loaded status")
+            return True
+    
+>       assert run(tmp_path, scenario) is True
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+../s19_i6m/tests/test_b101_document_homes.py:1117: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i6m/tests/test_b101_document_homes.py:142: in run
+    return projects.run_app(root, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i6m/tests/test_b101_document_homes.py:1103: in scenario
+    await pick(pilot, app, "#diff_check_select", "library/w.chk.json")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+select_id = '#diff_check_select', value = 'library/w.chk.json'
+
+    async def pick(pilot, app, select_id: str, value: str) -> None:
+        """Pick ``value`` the way the operator does: click the dropdown open, move
+        with the arrow keys, press enter (no ``Select.value`` write)."""
+        from textual.widgets._select import SelectCurrent, SelectOverlay
+    
+        select = app.query_one(select_id, Select)
+        values = [option_value for _prompt, option_value in select._options]
+>       assert value in values, (
+            f"{value!r} is not offered by {select_id}; the dropdown lists {option_values(select)!r}"
+        )
+E       AssertionError: 'library/w.chk.json' is not offered by #diff_check_select; the dropdown lists ['w.chk.json']
+E       assert 'library/w.chk.json' in ['', 'w.chk.json']
+
+../s19_i6m/tests/test_b101_document_homes.py:265: AssertionError
+_____________________ test_r_diff_chk_1_list[project-load] _____________________
+[gw5] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-295/popen-gw5/test_r_diff_chk_1_list_project0')
+arm = 'project-load'
+
+    @pytest.mark.parametrize("arm", ["project", "project-load", "save-project"])
+    def test_r_diff_chk_1_list(tmp_path: Path, arm: str) -> None:
+        """Cases R-DIFF-CHK.1/1, /3 and the Save project trigger of E3A-18: the
+        option values after ``(no check spec)`` equal the spec list exactly.
+    
+        /1 (key ``7`` in a project): ``checks/k.chk.json``, ``library/w.chk.json``.
+        /3 (a project load while the A2B Diff stays displayed): the same, where the
+        base kept ``w.chk.json``. save-project (a Save project that creates the
+        project, A2B Diff displayed): ``library/w.chk.json``. (/2, the no-project
+        list, is the existing ``test_tc_b94_15_dropdown_population``.)
+    
+        Negative control: the common-folder scan -> the project arms list bare
+        names -> RED; no refill after the project install or the Save project ->
+        RED."""
+    
+        async def scenario(app, pilot, log):
+            write_doc(lib(app) / "w.chk.json", ENTRY_W, kind="check")
+            project = make_project(app.workarea)
+            write_doc(project / "checks" / "k.chk.json", ENTRIES_K, kind="check")
+            if arm == "project":
+                await open_project_shipped(pilot, app)
+                await show_diff(pilot, app)
+                assert option_values(diff_select(app)) == [
+                    "checks/k.chk.json",
+                    "library/w.chk.json",
+                ]
+            else:
+                await load_image_fixture(pilot, app, app.base_dir)
+                await show_diff(pilot, app)
+                assert option_values(diff_select(app)) == ["w.chk.json"]
+                if arm == "project-load":
+                    await open_project_by_dialog(pilot, app)
+                    expected = ["checks/k.chk.json", "library/w.chk.json"]
+                else:
+                    await save_project_by_dialog(pilot, app, log, "new")
+                    expected = ["library/w.chk.json"]
+                assert app.query_one("#ab_diff_panel").region.width > 0, "the A2B Diff stayed displayed"
+                assert option_values(diff_select(app)) == expected
+            return True
+    
+>       assert run(tmp_path, scenario) is True
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+../s19_i6m/tests/test_b101_document_homes.py:1018: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i6m/tests/test_b101_document_homes.py:142: in run
+    return projects.run_app(root, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f08281ad150>
+
+    async def scenario(app, pilot, log):
+        write_doc(lib(app) / "w.chk.json", ENTRY_W, kind="check")
+        project = make_project(app.workarea)
+        write_doc(project / "checks" / "k.chk.json", ENTRIES_K, kind="check")
+        if arm == "project":
+            await open_project_shipped(pilot, app)
+            await show_diff(pilot, app)
+            assert option_values(diff_select(app)) == [
+                "checks/k.chk.json",
+                "library/w.chk.json",
+            ]
+        else:
+            await load_image_fixture(pilot, app, app.base_dir)
+            await show_diff(pilot, app)
+            assert option_values(diff_select(app)) == ["w.chk.json"]
+            if arm == "project-load":
+                await open_project_by_dialog(pilot, app)
+                expected = ["checks/k.chk.json", "library/w.chk.json"]
+            else:
+                await save_project_by_dialog(pilot, app, log, "new")
+                expected = ["library/w.chk.json"]
+            assert app.query_one("#ab_diff_panel").region.width > 0, "the A2B Diff stayed displayed"
+>           assert option_values(diff_select(app)) == expected
+E           AssertionError: assert ['w.chk.json'] == ['checks/k.ch...y/w.chk.json']
+E             
+E             At index 0 diff: 'w.chk.json' != 'checks/k.chk.json'
+E             Right contains one more item: 'library/w.chk.json'
+E             Use -v to get more diff
+
+../s19_i6m/tests/test_b101_document_homes.py:1015: AssertionError
+_ test_r_chg_sym_10_reads_with_no_a2l_loaded_declare_none[ab-diff-project-a2l-not-implicit] _
+[gw9] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-295/popen-gw9/test_r_chg_sym_10_reads_with_n0')
+case08 = PosixPath('/tmp/pytest-of-<USER>/pytest-295/popen-gw9/b101_case080')
+surface = 'ab-diff-project-a2l-not-implicit'
+
+    @pytest.mark.parametrize(
+        "surface",
+        [
+            "file-load",
+            "paste",
+            "edit-json",
+            "entry-json",
+            "check-editor",
+            "ab-diff-project-a2l-not-implicit",
+        ],
+    )
+    def test_r_chg_sym_10_reads_with_no_a2l_loaded_declare_none(
+        tmp_path: Path, case08: Path, surface: str
+    ) -> None:
+        """Cases R-CHG-SYM.10/1 .. /6: each of the six session reads, with no A2L
+        loaded, reads the document with no declared A2L: every symbol entry
+        paints the no-context finding (2 for ``demo_patch``, 1 for each check
+        document: the Check Editor arm picks ``demo_check`` and then
+        ``demo_check_fails``, E5 C-6) and nothing resolves. The A2B Diff arm runs inside an open project whose
+        folder holds ``firmware.a2l`` with the session A2L unloaded: the project's
+        file is not used implicitly.
+    
+        Why: the no-implicit-A2L law (R-CHG-SYM.2). This is the negative control
+        of the previous group; it holds on the base revision. Negative control of
+        this group: a read that declares the last or the project's A2L when none is
+        loaded paints 0 findings -> RED.
+    
+        Drive (E5 C-6): dropdowns are clicked open and picked with the arrow keys,
+        the paste goes through the app's paste event, buttons are clicked, and the
+        A2L is unloaded from the Workspace "Loaded" panel's control. The
+        per-entry arm pins the full painted list, the R-TUI-058.9 line last (E5
+        C-8)."""
+        patch_rows = symbol_rows(case08, PATCH)
+        (check_index, check_entry), = symbol_rows(case08, CHECK)
+        (fails_index, fails_entry), = symbol_rows(case08, CHECK_FAILS)
+    
+        def two_findings(lines: list) -> None:
+            assert sorted(unresolved_lines(lines)) == sorted(
+                finding_no_ctx(i, e["symbol"]) for i, e in patch_rows
+            ), lines
+    
+        async def scenario(app, pilot, log):
+            stage(app, case08, PATCH, CHECK, CHECK_FAILS)
+            await attach_image(pilot, app, case08)
+            if surface == "file-load":
+                await show_screen(pilot, app, "6", "#patch_doc_file_select")
+                mark = len(log.messages)
+                await pick_by_keys(pilot, app, "#patch_doc_file_select", PATCH)
+                lines = await lines_after(
+                    pilot, log, mark,
+                    lambda ls: any(line.startswith("Loaded change:") for line in ls),
+                    "the file load",
+                )
+                assert "Loaded change: 5 entries, 2 error(s)" in lines, lines
+                two_findings(lines)
+            elif surface == "paste":
+                await show_screen(pilot, app, "6", "#patch_paste_text")
+                await show_tab(pilot, app, "patch_tab_json", "patch_paste_text")
+                await paste_into(pilot, app, "#patch_paste_text", doc_text(case08, PATCH))
+                mark = len(log.messages)
+                await click(pilot, "#patch_paste_parse_button", "Parse paste")
+                lines = await lines_after(
+                    pilot, log, mark,
+                    lambda ls: any(line.startswith("Loaded change:") for line in ls),
+                    "the paste parse",
+                )
+                assert "Loaded change: 5 entries, 2 error(s)" in lines, lines
+                two_findings(lines)
+            elif surface in ("edit-json", "entry-json"):
+                await attach_a2l(pilot, app, case08)
+                await show_screen(pilot, app, "6", "#patch_edit_json_button")
+                await install_draft(pilot, app, doc_text(case08, PATCH), app.current_a2l_data)
+                await unload_a2l(pilot, app, back="6")
+                before_entries = [entry_state(e) for e in service(app).document.entries]
+                if surface == "edit-json":
+                    lines = await whole_document_confirm(pilot, app, log)
+                    assert lines.count(EDIT_REFUSED_2) == 1, lines
+                    two_findings(lines)
+                else:
+                    row, entry = patch_rows[0]
+                    lines = await entry_json_confirm(pilot, app, log, row)
+                    assert lines[:2] == [REJECTED, finding_no_ctx(0, entry["symbol"])], lines
+                    assert lines[2:] == [PLAIN], lines
+                assert [entry_state(e) for e in service(app).document.entries] == before_entries
+                assert len(before_entries) == 7
+            elif surface == "check-editor":
+                await show_screen(pilot, app, "equals_sign", "#check_spec_file_select")
+                mark = len(log.messages)
+                await pick_by_keys(pilot, app, "#check_spec_file_select", CHECK)
+                lines = await lines_after(
+                    pilot, log, mark,
+                    lambda ls: "Check Editor: spec NOT loaded." in ls,
+                    "the Check Editor spec pick",
+                )
+                assert lines == [
+                    finding_no_ctx(check_index, check_entry["symbol"]),
+                    "Check Editor: spec NOT loaded.",
+                ], lines
+                mark = len(log.messages)
+                await pick_by_keys(pilot, app, "#check_spec_file_select", CHECK_FAILS)
+                lines = await lines_after(
+                    pilot, log, mark,
+                    lambda ls: "Check Editor: spec NOT loaded." in ls,
+                    "the Check Editor pick of demo_check_fails",
+                )
+                assert lines == [
+                    finding_no_ctx(fails_index, fails_entry["symbol"]),
+                    "Check Editor: spec NOT loaded.",
+                ], lines
+            else:
+                raise AssertionError(surface)
+            return True
+    
+        async def diff_scenario(app, pilot, log):
+            # Inside an open project that holds the A2L file; the session A2L is
+            # then unloaded. The pick must not fall back to the project's file.
+            project = make_project(app.workarea, "P", case08, [], with_a2l=True)
+            # Inc 6 (D-1): in a project the A2B Diff lists the project's own
+            # ``checks/`` folder as ``checks/<name>``; the document is staged there.
+            (project / "checks").mkdir()
+            shutil.copy(case08 / CHECK, project / "checks" / CHECK)
+            await ld.open_project_through_dialog(pilot, app, "P")
+            await wait_until(
+                pilot,
+                lambda: app.current_project == "P" and app.current_a2l_data is not None,
+                "timed out waiting for the project install",
+            )
+            await settle_workers(pilot)
+            await dismiss_result_panel_if_open(pilot, app)
+            await unload_a2l(pilot, app)
+            await show_screen(pilot, app, "7", "#diff_check_select")
+            await pick_by_keys(pilot, app, "#diff_check_select", f"checks/{CHECK}")
+            await wait_until(
+                pilot,
+                lambda: str(app.query_one("#diff_status").render()).startswith("Check spec"),
+                lambda: f"got {str(app.query_one('#diff_status').render())!r}",
+            )
+            await settle(pilot)
+            return str(app.query_one("#diff_status").render())
+    
+        if surface == "ab-diff-project-a2l-not-implicit":
+>           status = run(tmp_path, diff_scenario)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+../s19_i6m/tests/test_b101_symbol_reads.py:884: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i6m/tests/test_b101_symbol_reads.py:155: in run
+    return projects.run_app(base, _with_log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i6m/tests/test_b101_symbol_reads.py:153: in _with_log
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i6m/tests/test_b101_symbol_reads.py:873: in diff_scenario
+    await show_screen(pilot, app, "7", "#diff_check_select")
+../s19_i6m/tests/test_b101_symbol_reads.py:332: in show_screen
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function show_screen.<locals>.<lambda> at 0x7faccec9dda0>
+failure = "timed out waiting for #diff_check_select after key '7'"
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: timed out waiting for #diff_check_select after key '7'
+
+tests/support/timing.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_document_homes.py::test_r_chked_042_write_as_bare_name
+FAILED tests/test_b101_document_homes.py::test_r_chked_040_spec_list[project]
+FAILED tests/test_b101_document_homes.py::test_r_chked_040_spec_list[project-load]
+FAILED tests/test_b101_document_homes.py::test_r_diff_chk_1_list[save-project]
+FAILED tests/test_b101_document_homes.py::test_r_diff_chk_1_list[project] - A...
+FAILED tests/test_b101_document_homes.py::test_r_chked_040_spec_list[save-project]
+FAILED tests/test_b101_document_homes.py::test_r_chked_040_spec_list[after-write]
+FAILED tests/test_b101_document_homes.py::test_r_diff_chk_8_library_spec_loads
+FAILED tests/test_b101_document_homes.py::test_r_diff_chk_1_list[project-load]
+FAILED tests/test_b101_symbol_reads.py::test_r_chg_sym_10_reads_with_no_a2l_loaded_declare_none[ab-diff-project-a2l-not-implicit]
+10 failed in 74.62s (0:01:14)
+

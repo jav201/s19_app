@@ -1,0 +1,9 @@
+=== Inc 6 E4 integration: E3A-16 mutant check (int-06)
+date: 2026-11-06T13:07:27Z
+worktree HEAD (base): 98d94d724a72c56468292be123ff15f664acb4fa
+mutant: _reset_project_session without its Inc 6 update_checks_view() (graph #7, E3A-02)
+s19_app.__file__ = <HOME>/work/s19_i6mut/s19_app/__init__.py
+CMD: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -p no:xdist -rfs tests/test_b101_patch_lifecycle.py::test_r_chks_009_zero_line_while_displayed tests/test_b101_patch_lifecycle.py::test_r_chk_pe_010_status tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run
+....                                                                     [100%]
+4 passed in 37.56s
+=== exit code: 0

@@ -1,0 +1,11 @@
+# mutant M35  (CHK-PE-009/3, -010/2, -012/2 (project))
+base_commit=98d94d724a72c56468292be123ff15f664acb4fa
+s19_app.__file__=<HOME>/work/s19_i6m_copy/s19_app/__init__.py
+mutation=s19_app/tui/app.py:13991
+--- pytest (mutant copy) ---
+bringing up nodes...
+bringing up nodes...
+
+...                                                                      [100%]
+3 passed in 8.05s
+

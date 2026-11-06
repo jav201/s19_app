@@ -1,0 +1,29 @@
+LAN host 2, merged tree 8a40763 (main 98d94d7 + Inc 6 merge; EXPECTED_SCANNED_TEST_FILES 267) — FULL suite (-n 12 --dist loadfile, not serial_timing) + serial lane; snapshot suite on the LAN laptop host in the CI-recipe venv. Main lane: the 4 known failures, test_r_tst_070_2 (the redaction gate: evidence/inc-6/red-01-tester2-base.txt held pytest temp folders named pytest-of-USER) — fixed in e0cb491 (token redacted to pytest-of-<user>, packet SHA-256 updated; the gate then passed with the new STATUS and HANDOFF records staged, below) — and test_tc_b100_53[load_dialog] (WaitForScreenTimeout at 227 s; the node takes about 230 s in every full-suite run and passed 3/3 alone on the same tree; routed to BACKLOG-CODE as slow under load). Serial lane: 68 passed, 1 bound under 20 % margin (reported by QC-TM, no failure).
+---main+serial---
+HEAD 8a40763c
+<HOME>/work/s19_m6/s19_app/__init__.py
+-------- generated xml file: <HOME>/work/m6-out/junit-main.xml ---------
+FAILED tests/test_b100_workers.py::test_tc_b100_53_workarea_data_pick_parses_on_the_file_load_worker[load_dialog]
+FAILED tests/test_suite_hygiene.py::test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-120x30]
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+6 failed, 5916 passed, 181 skipped, 4 xfailed in 3150.33s (0:52:30)
+---serial---
+QC-TM: 94 bounds, 1 under 20 % margin
+68 passed, 2 skipped, 6107 deselected in 355.99s (0:05:55)
+exit=done
+---tc_b100_53 alone x3 (same tree)---
+2 passed in 293.02s (0:04:53)
+2 passed in 297.34s (0:04:57)
+2 passed in 294.39s (0:04:54)
+---redaction gate after the fix---
+tests/test_suite_hygiene.py -k 070: 2 passed, 65 deselected
+---snapshot-laptop---
+<HOME>/work/s19_m6snap/s19_app/__init__.py
+2 snapshots failed. 27 snapshots passed.
+=========================== short test summary info ============================
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-120x30]
+2 failed, 27 passed, 4 deselected in 116.31s (0:01:56)
