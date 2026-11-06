@@ -1,0 +1,24 @@
+# int-74: Windows serial run 5 of 20, the 4 Inc 15 nodes (R-TST-156)
+# cmd: python -m pytest -p i15int_guard -p no:cacheprovider -v <4 nodes>
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- <HOME>\anaconda3\envs\s19env\python.exe
+i15int: commit under test = 77f4553 (Windows worktree) (tree = s19_app-b101-inc15; git HEAD here = 77f45537a235cd79339f2d4d0bb4f3959f822ca7)
+i15int: s19_app.__file__ = <HOME>\Github\s19_app-b101-inc15\s19_app\__init__.py
+i15int: python 3.11.15 on Windows; textual 8.2.8
+i15int: NO_COLOR set = False; LOCALAPPDATA = <HOME>\.claude\jobs\3f13b036\tmp\i15int-win\int-74\Local; APPDATA = <HOME>\.claude\jobs\3f13b036\tmp\i15int-win\int-74\Roaming
+i15int: TEMP = <HOME>\.claude\jobs\3f13b036\tmp\i15int-win\int-74\Temp; TMP = <HOME>\.claude\jobs\3f13b036\tmp\i15int-win\int-74\Temp
+i15int: OS clipboard writers replaced by a raising guard
+i15int: hold =  action =  s = 1.5; never = ''
+rootdir: <HOME>\Github\s19_app-b101-inc15
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 4 items
+
+tests/test_tui_patch_editor_v2.py::test_tc331_disable_guard_predicate_tracks_source_path PASSED [ 25%]
+tests/test_tui_patch_editor_v2.py::test_at030c_directly_dropped_file_is_listed_and_loadable PASSED [ 50%]
+tests/test_tui_patch_editor_v2.py::test_save_back_prompt PASSED          [ 75%]
+tests/test_tui_flow_execution_b94.py::test_tc_b94_27_lane_binding_isolation_and_noop PASSED [100%]
+
+i15int: hold installed = None; never installed = None
+============================== 4 passed in 8.15s ==============================
+# rc=0

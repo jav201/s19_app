@@ -1,0 +1,52 @@
+# int-66: R-TST-158 control: rule 7 deleted from the conventions (copy)
+# tree: g8; env: I15_HOLD= I15_HOLD_ACTION= I15_NEVER=
+# cmd: python -m pytest -p i15int_guard -p no:cacheprovider -v tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-158]
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0 -- /data/miniconda3/envs/s19ci/bin/python
+i15int: commit under test = 77f4553 (c2cba35 + the Inc 15 tests/docs patch, sha256 fdde60cc) (tree = g8; git HEAD here = n/a (CalledProcessError))
+i15int: s19_app.__file__ = /tmp/i15int/trees/g8/s19_app/__init__.py
+i15int: python 3.11.18 on Linux; textual 8.2.8
+i15int: NO_COLOR set = False; LOCALAPPDATA = None; APPDATA = None
+i15int: TEMP = None; TMP = None
+i15int: OS clipboard writers replaced by a raising guard
+i15int: hold =  action =  s = 1.5; never = ''
+rootdir: /tmp/i15int/trees/g8
+configfile: pyproject.toml
+plugins: platformdirs-4.14.3, xdist-3.8.0
+collecting ... collected 1 item
+
+tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-158] FAILED [100%]
+
+=================================== FAILURES ===================================
+__________ test_r_tst_007_conventions_hold_each_test_rule[R-TST-158] ___________
+
+rule_id = 'R-TST-158'
+
+    @pytest.mark.parametrize(
+        "rule_id", ["R-TST-007", "R-TST-030", "R-TST-047", "R-TST-048", "R-TST-052", "R-TST-060", "R-TST-158"]
+    )
+    def test_r_tst_007_conventions_hold_each_test_rule(rule_id) -> None:
+        text = CONVENTIONS_PATH.read_text(encoding="utf-8")
+        if rule_id == "R-TST-007":
+            assert CONVENTIONS_SECTION_TITLE in text
+            section = text.split(CONVENTIONS_SECTION_TITLE, 1)[1]
+            section = section.split("\n#", 1)[0]
+            parallel = 'pytest -n 8 -m "not serial_timing"'
+            serial = "pytest -m serial_timing"
+            assert parallel in section, "release gate parallel lane missing"
+            assert serial in section, "release gate serial lane missing"
+            assert section.index(parallel) < section.index(serial), "lanes out of order"
+            assert "LAN Linux host" in section
+        else:
+>           assert _CONVENTION_RULES[rule_id] in text, (
+                f"{rule_id} sentence missing or edited in {CONVENTIONS_PATH.name}"
+            )
+E           AssertionError: R-TST-158 sentence missing or edited in engineering-rules.md
+E           assert 'A new or changed arm that checks the state a press, a value it sets or a posted action leaves waits through a shared wait for a sign that the app handled it, also when it asserts that nothing changed; it never reads after fixed pauses alone.' in '# s19_app — Project Engineering Rules\n\nProject- and stack-specific gates for the Textual TUI + pytest-textual-snapshot stack. These\nare the s19_app-scoped counterparts to the portable controls in the global /dev-flow command —\nrelocated here so the workflow command stays language- and framework-agnostic. Consulted during\nevery /dev-flow batch alongside the general controls. Canonical history: memory\nproject_devflow_control_lineage.md.\n\n## Backlog routing — where this project\'s canonical open work lives (Phase 0 + close)\n\n**Not a control; a routing fact.** Both `/dev-flow` (Phase 0 input, Phase 6 close) and `/fast-dev-flow`\n(Phase C step 6) ask *this document* which file is the project\'s canonical cross-batch backlog. Since\n**2026-07-27 the queue is PARTITIONED into two lanes**, so the answer is two files, not one:\n\n| Lane | File | Scope | Read it if your batch is about… |\n|---|---|---|---|\n| **A — code** | `.dev-flow/BACKLOG-CODE.md` | the s19_app application code **and the development flow of that code** — features, defects, Flow Builder, tests, CI, repo hygiene | production code, tests, CI |\n| **B — process** | `.dev-flow/BACKLOG-PROCESS.md` | engineering pr... by the serial lane `pytest -m serial_timing`, both on the LAN Linux host.\n2. Post-press: An arm that checks the state a key press leaves while a real worker runs holds the worker at a forced slow step or records the state at the product hook; it never samples after the press.\n3. Clock stop: A timing arm stops its clock at a stamp the product emits (a commit handler, a painted line, an install callback), never when a poll notices.\n4. Margin finding: A margin under 20 % in the serial lane\'s QC-TM section is a gate finding; the finding gives the base tree\'s time beside it.\n5. Painted-outcome oracle: A test that waits on a painted outcome collects the lines painted since its trigger (StatusLog.since(mark)) and asserts the one it needs; it never waits on the newest line alone.\n6. Observable census: When an increment changes the order or the source of an observable, its gate greps tests/ for every node that asserts that observable and runs them, whatever module they sit in.\n\n(Origin: batch-101 Inc 2 — the serial/parallel lane split, the QC-TM margin\nsection, and the timing-arm census; requirements R-TST-007, 030, 047, 048,\n052, 060 and the wait/hook rows R-TST-020 … 046.)\n'
+
+tests/test_suite_hygiene.py:653: AssertionError
+i15int: hold installed = None; never installed = None
+=========================== short test summary info ============================
+FAILED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-158]
+============================== 1 failed in 0.21s ===============================
+# rc=1

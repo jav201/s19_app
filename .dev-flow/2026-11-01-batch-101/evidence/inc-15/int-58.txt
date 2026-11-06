@@ -1,0 +1,76 @@
+# int-58: guard control: wait D1 removed
+# tree: g1; env: I15_HOLD= I15_HOLD_ACTION= I15_NEVER=
+# cmd: python -m pytest -p i15int_guard -p no:cacheprovider -v tests/test_suite_hygiene.py::test_r_tst_154_155_inc15_arms_wait_through_settled
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0 -- /data/miniconda3/envs/s19ci/bin/python
+i15int: commit under test = 77f4553 (c2cba35 + the Inc 15 tests/docs patch, sha256 fdde60cc) (tree = g1; git HEAD here = n/a (CalledProcessError))
+i15int: s19_app.__file__ = /tmp/i15int/trees/g1/s19_app/__init__.py
+i15int: python 3.11.18 on Linux; textual 8.2.8
+i15int: NO_COLOR set = False; LOCALAPPDATA = None; APPDATA = None
+i15int: TEMP = None; TMP = None
+i15int: OS clipboard writers replaced by a raising guard
+i15int: hold =  action =  s = 1.5; never = ''
+rootdir: /tmp/i15int/trees/g1
+configfile: pyproject.toml
+plugins: platformdirs-4.14.3, xdist-3.8.0
+collecting ... collected 1 item
+
+tests/test_suite_hygiene.py::test_r_tst_154_155_inc15_arms_wait_through_settled FAILED [100%]
+
+=================================== FAILURES ===================================
+______________ test_r_tst_154_155_inc15_arms_wait_through_settled ______________
+
+    def test_r_tst_154_155_inc15_arms_wait_through_settled() -> None:
+        """R-TST-154, R-TST-155, R-TST-163: the eight table-D wait sites of the
+        four Inc 15 arms go through ``tests.b97_probes.settled``, pass their
+        table-D descriptions verbatim, and sit as the statement directly after
+        their trigger in the same block; each arm holds exactly its table-D count
+        of ``settled`` calls and no ``range``-counted pause loop or module-local
+        ``_settled``."""
+        from collections import Counter
+    
+        expected = Counter(
+            (module, arm) for (module, arm, _h, _t, _d) in _INC15_WAIT_SITES
+        )
+    
+        # R-TST-155: the name ``settled`` the sites call is the shared wait.
+        for module_rel in sorted({module for (module, *_rest) in _INC15_WAIT_SITES}):
+            tree = ast.parse((REPO_ROOT / module_rel).read_text(encoding="utf-8"))
+            assert _settled_bindings(tree) == ["from tests.b97_probes import settled"], (
+                f"{module_rel}: `settled` must be bound only by the import from "
+                f"tests.b97_probes, found {_settled_bindings(tree)}"
+            )
+    
+        for module_rel, arm_name, helper, trigger, description in _INC15_WAIT_SITES:
+            module_path = REPO_ROOT / module_rel
+            arm = _arm_function(module_path, arm_name)
+            drive = _nested_def(arm, "_drive")
+            assert drive is not None, f"{arm_name}: nested _drive coroutine missing"
+            if helper is None:
+                body = _drive_body(drive)
+            else:
+                helper_def = _nested_def(drive, helper)
+                assert helper_def is not None, f"{arm_name}: nested {helper} missing"
+                body = helper_def.body
+            index = next(
+                (i for i, stmt in enumerate(body) if ast.unparse(stmt) == trigger),
+                None,
+            )
+            assert index is not None, (
+                f"{arm_name} › {helper or '_drive'}: trigger {trigger!r} not found"
+            )
+            following = body[index + 1] if index + 1 < len(body) else None
+>           assert _settled_description(following) == description, (
+                f"{arm_name} › {helper or '_drive'}: the statement after "
+                f"{trigger!r} must be an `await settled` passing {description!r}"
+            )
+E           AssertionError: test_tc331_disable_guard_predicate_tracks_source_path › _drive: the statement after "panel.request_action('load_doc')" must be an `await settled` passing 'TC-331: the load of f.json reached the change document'
+E           assert None == 'TC-331: the load of f.json reached the change document'
+E            +  where None = _settled_description(<ast.Assign object at 0x7f0465dd7bb0>)
+
+tests/test_suite_hygiene.py:2333: AssertionError
+i15int: hold installed = None; never installed = None
+=========================== short test summary info ============================
+FAILED tests/test_suite_hygiene.py::test_r_tst_154_155_inc15_arms_wait_through_settled
+============================== 1 failed in 0.29s ===============================
+# rc=1
