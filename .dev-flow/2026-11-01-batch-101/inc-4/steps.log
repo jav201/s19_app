@@ -6,3 +6,5 @@ E3 start 2026-11-05T20:40Z architect+security model=opus
 E3 end 2026-11-05T20:53Z correction model=opus rulings=A-1..A-9,S4-1..S4-9 folded; TC=22 (+R-CHG-SYM.11/3, .12/2, .13/2); R-CHG-SYM.13 resized 1000x220040 within 1.0 s (Linux, call counter primary); trace_check 3 US, 6 active, 7 gaps
 E4 start 2026-11-05T20:54Z implementers model=deepseek-v4-pro (3 units) tester=sonnet
 E4 implementers end 2026-11-05T21:00Z model=deepseek-v4-pro (3 units, exit 0, no hang, py_compile OK, no deviations declared)
+E4 integration start 2026-11-05T21:33Z model=opus
+E4 integration end 2026-11-06T01:24Z model=opus verdict=GREEN (LAN Linux host); lane1 int-01..20 3036 passed / 11 failed (load L-1 x6, env E-1 x1, registry name F-1 x3, canon seam F-3 x1; all resolved or re-run); serial int-26 53 passed; final int-27 2 passed, int-28 179 passed; R-CHG-SYM.13/1 0.174-0.186 s, 13/3 addition 0.395-0.622 s (bound 1.0 s, OR-2); 22/22 cases verified

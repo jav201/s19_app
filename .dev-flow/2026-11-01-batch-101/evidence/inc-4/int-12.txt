@@ -1,0 +1,51 @@
+$ git -C <HOME>/work/s19_i4 log --oneline -1   (the Inc 4 diff over b7b77c4 applied on top)
+7add3d63 batch-101 PLAN: Inc 5 takes Inc 13's D-4 (stale CRC Designer coverage after an in-place apply) first, integrity priority
+$ python -c 'import s19_app; print(s19_app.__file__)'
+<HOME>/work/s19_i4/s19_app/__init__.py
+$ cd <HOME>/work/s19_i4 && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 2400 python -m pytest -q -p no:cacheprovider --rootdir=<HOME>/work/s19_i4 -rfE -n 8 -m not serial_timing tests/test_report_producer_bound.py tests/test_report_service.py tests/test_report_symbol_escape.py tests/test_requirements_canon.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 80%]
+.............F....                                                       [100%]
+=================================== FAILURES ===================================
+__________________ test_review_files_name_only_existing_tests __________________
+[gw6] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+    def test_review_files_name_only_existing_tests() -> None:
+        """R-DOC-CANON.10 -- every test the review files name is defined under ``tests/``.
+    
+        Why: a rationale that cites ``test_x`` as the proof of a decision is a promise. A
+        renamed or deleted test turns the promise into a phantom that reads as coverage.
+        Whole code spans only (``test_y`` or ``tests/x.py::test_y``): a file
+        (``test_x.py``) or a prefix (``test_b100_``) names no single test and is skipped.
+        """
+        files = sorted(REVIEW_DIR.glob("*.md"))
+        defined = _defined_test_names()
+        cited: Dict[str, str] = {}  # test name -> first place it is cited
+        for path in files:
+            text = _read_utf8(path)
+            for number, line in enumerate(text.split("\n"), start=1):
+                for name in _TEST_NAME_SPAN_RE.findall(line):
+                    cited.setdefault(name, f"{path.name}:{number}")
+        checked = len(cited)
+        offenders = [f"{where}: `{name}` is not a def test_ or class Test under tests/" for name, where in cited.items() if name not in defined]
+        problems = []
+        if offenders:
+            problems.append(f"{len(offenders)} of {checked} cited test names are not defined:\n  " + "\n  ".join(offenders[:SHOWN]))
+        if checked < MIN_TEST_NAMES:
+            problems.append(
+                f"only {checked} test names were checked in {len(files)} files of {REVIEW_DIR}, below the bound of {MIN_TEST_NAMES}: "
+                "the review files are missing or are not being read"
+            )
+        if problems:
+>           pytest.fail("R-DOC-CANON.10 " + "\n".join(problems))
+E           Failed: R-DOC-CANON.10 1 of 1110 cited test names are not defined:
+E             CODE-CHANGES.md:222: `test_headless_project_run` is not a def test_ or class Test under tests/
+
+tests/test_requirements_canon.py:452: Failed
+=========================== short test summary info ============================
+FAILED tests/test_requirements_canon.py::test_review_files_name_only_existing_tests
+1 failed, 89 passed in 5.08s
+wall=6s
+exit=1

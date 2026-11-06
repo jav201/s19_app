@@ -1,0 +1,220 @@
+$ git -C <HOME>/work/s19_i4 log --oneline -1   (the Inc 4 diff over b7b77c4 applied on top)
+7add3d63 batch-101 PLAN: Inc 5 takes Inc 13's D-4 (stale CRC Designer coverage after an in-place apply) first, integrity priority
+$ python -c 'import s19_app; print(s19_app.__file__)'
+<HOME>/work/s19_i4/s19_app/__init__.py
+$ cd <HOME>/work/s19_i4 && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 2400 python -m pytest -q -p no:cacheprovider --rootdir=<HOME>/work/s19_i4 -rfE -n 8 -m not serial_timing tests/test_b100_active_variant.py tests/test_b100_announce.py tests/test_b100_busy.py tests/test_b100_document.py tests/test_b100_load_dialog.py tests/test_b100_load_question.py
+bringing up nodes...
+bringing up nodes...
+
+...................................................F.................... [ 12%]
+...s......F..........................ss................................. [ 24%]
+........................................................................ [ 37%]
+......s..s...........................................s.................s [ 49%]
+.......sss..........s.s...ss......ss.................................... [ 62%]
+...........s....................s.................s..................... [ 74%]
+s.......................s.s....ss...........s........................... [ 87%]
+.......s....s.............................s............................. [ 99%]
+...                                                                      [100%]
+=================================== FAILURES ===================================
+___________ test_tc_b100_19_save_back_becomes_the_active_variant[B] ____________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-169/popen-gw0/test_tc_b100_19_save_back_beco1')
+case = 'B'
+
+    @pytest.mark.parametrize("case", ["A", "B"])
+    def test_tc_b100_19_save_back_becomes_the_active_variant(tmp_path: Path, case: str) -> None:
+        """``p02`` A (typed ``firmware.s19`` -> ``firmware_1.s19``) and B (the
+        default ``firmware-patched.s19``): after the save-back the session's
+        active variant, the image's variant id and ``project.json`` all name the
+        written file; ``current_file.path`` is still the loaded image.
+    
+        RED (executed on 1d677ba, P-3): ``active_variant 'firmware'``."""
+        src = projects.copy_sources(tmp_path / "src", projects.CASE01_DIR, "firmware.s19")
+        base = tmp_path / "app"
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                await _load_through_handler(pilot, app, src / "firmware.s19")
+                await _save_project(pilot, app, "P")
+                loaded_path = app.current_file.path
+                _apply_patch(app)
+                typed = projects.typed_name(case) or f"{app.current_file.variant_id}-patched.s19"
+                await _save_back(pilot, app, typed)
+                return (
+                    loaded_path,
+                    app.current_file.path,
+                    app._variant_set.active_id,
+                    app.current_file.variant_id,
+                )
+    
+>       loaded_path, path_after, active_id, variant_id = asyncio.run(_drive())
+                                                         ^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b100_active_variant.py:300: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b100_active_variant.py:288: in _drive
+    await _save_project(pilot, app, "P")
+tests/test_b100_active_variant.py:249: in _save_project
+    await _wait_for(pilot, lambda: app.current_project == name, "the project save")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function _save_project.<locals>.<lambda> at 0x7fe801a5ba60>
+description = 'the project save', attempts = 200
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the project save
+
+tests/test_b100_active_variant.py:109: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2979 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-169/popen-gw0/test_tc_b100_19_save_back_beco1/app workarea=/tmp/pytest-of-<USER>/pytest-169/popen-gw0/test_tc_b100_19_save_back_beco1/app/.s19tool/workarea
+INFO     s19tui:app.py:8332 Workarea refreshed. files=0
+INFO     s19tui:app.py:16593 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.037
+INFO     s19tui:app.py:15446 Load phase boundary: modal_dismiss_scheduled kind=path value='/tmp/pytest-of-<USER>/pytest-169/popen-gw0/test_tc_b100_19_save_back_beco1/src/firmware.s19'
+INFO     s19tui:app.py:15491 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<USER>/pytest-169/popen-gw0/test_tc_b100_19_save_back_beco1/src/firmware.s19
+INFO     s19tui:app.py:15512 Load phase boundary: copy_started path=/tmp/pytest-of-<USER>/pytest-169/popen-gw0/test_tc_b100_19_save_back_beco1/src/firmware.s19
+INFO     s19tui:app.py:15525 Load phase boundary: copy_done path=firmware.s19 elapsed=0.003s
+WARNING  s19tui:app.py:15544 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-169/popen-gw0/test_tc_b100_19_save_back_beco1/src/firmware.s19'
+INFO     s19tui:app.py:8332 Workarea refreshed. files=1
+INFO     s19tui:app.py:15562 File copied to temp: path=/tmp/pytest-of-<USER>/pytest-169/popen-gw0/test_tc_b100_19_save_back_beco1/app/.s19tool/workarea/temp/firmware.s19 size_bytes=349 copy_seconds=0.003
+INFO     s19tui:app.py:15568 Load phase boundary: worker_spawned path=firmware.s19
+INFO     s19tui:app.py:18451 Load phase boundary: worker_parse_start path=firmware.s19
+INFO     s19tui:app.py:17835 Loading file: path=/tmp/pytest-of-<USER>/pytest-169/popen-gw0/test_tc_b100_19_save_back_beco1/app/.s19tool/workarea/temp/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14151 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18667 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-169/popen-gw0/test_tc_b100_19_save_back_beco1/app/.s19tool/workarea/temp/firmware.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14168 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18470 Load phase boundary: worker_parse_done path=firmware.s19 elapsed=0.001s
+INFO     s19tui:app.py:18294 Load phase boundary: prepare_entry path=firmware.s19 file_type=s19
+INFO     s19tui:app.py:18329 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:17688 MAC validation computed: records=0 issues=0 elapsed_seconds=0.001
+INFO     s19tui:app.py:18338 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:18358 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:18365 Load phase boundary: prepare_bases_done row_bases=7
+INFO     s19tui:app.py:18375 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:18381 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:18503 Load phase boundary: worker_compute_done path=firmware.s19 precomputed=True elapsed=0.002s
+INFO     s19tui:app.py:18510 Load phase boundary: call_from_thread_apply_dispatched path=firmware.s19
+INFO     s19tui:app.py:18128 Load phase boundary: apply_install_state path=firmware.s19 precomputed=True
+INFO     s19tui:app.py:18795 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18144 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18156 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19815 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.005
+INFO     s19tui:app.py:16593 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.048
+INFO     s19tui:app.py:19329 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.054
+INFO     s19tui:app.py:18169 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:21065 Request refused while busy: Loading firmware.s19
+INFO     s19tui:app.py:19022 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18186 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-169/popen-gw0/test_tc_b100_19_save_back_beco1/app/.s19tool/workarea/temp/firmware.s19 file_type=s19 elapsed_seconds=1.584 has_mac=False precomputed=True
+_________ test_tc_b100_19_save_back_with_no_project_writes_no_manifest _________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-169/popen-gw0/test_tc_b100_19_save_back_with0')
+
+    def test_tc_b100_19_save_back_with_no_project_writes_no_manifest(tmp_path: Path) -> None:
+        """Boundary: no project open -> the save-back lands in the work area and
+        no ``project.json`` is written anywhere."""
+        src = projects.copy_sources(tmp_path / "src", projects.CASE01_DIR, "firmware.s19")
+        base = tmp_path / "app"
+    
+        async def _drive() -> None:
+            app = S19TuiApp(base_dir=base)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                await _load_through_handler(pilot, app, src / "firmware.s19")
+                _apply_patch(app)
+                await _save_back(pilot, app, "out.s19")
+    
+>       asyncio.run(_drive())
+
+tests/test_b100_active_variant.py:327: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b100_active_variant.py:325: in _drive
+    await _save_back(pilot, app, "out.s19")
+tests/test_b100_active_variant.py:264: in _save_back
+    await _wait_for(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function _save_back.<locals>.<lambda> at 0x7fe801354220>
+description = 'the save-back outcome', attempts = 200
+
+    async def _wait_for(pilot, predicate, description: str, attempts: int = 200) -> None:
+        for _ in range(attempts):
+            if predicate():
+                return
+            await pilot.pause()
+>       raise AssertionError(f"timed out waiting for {description}")
+E       AssertionError: timed out waiting for the save-back outcome
+
+tests/test_b100_active_variant.py:109: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2979 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-169/popen-gw0/test_tc_b100_19_save_back_with0/app workarea=/tmp/pytest-of-<USER>/pytest-169/popen-gw0/test_tc_b100_19_save_back_with0/app/.s19tool/workarea
+INFO     s19tui:app.py:8332 Workarea refreshed. files=0
+INFO     s19tui:app.py:16593 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.035
+INFO     s19tui:app.py:15446 Load phase boundary: modal_dismiss_scheduled kind=path value='/tmp/pytest-of-<USER>/pytest-169/popen-gw0/test_tc_b100_19_save_back_with0/src/firmware.s19'
+INFO     s19tui:app.py:15491 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<USER>/pytest-169/popen-gw0/test_tc_b100_19_save_back_with0/src/firmware.s19
+INFO     s19tui:app.py:15512 Load phase boundary: copy_started path=/tmp/pytest-of-<USER>/pytest-169/popen-gw0/test_tc_b100_19_save_back_with0/src/firmware.s19
+INFO     s19tui:app.py:15525 Load phase boundary: copy_done path=firmware.s19 elapsed=0.006s
+WARNING  s19tui:app.py:15544 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-169/popen-gw0/test_tc_b100_19_save_back_with0/src/firmware.s19'
+INFO     s19tui:app.py:8332 Workarea refreshed. files=1
+INFO     s19tui:app.py:15562 File copied to temp: path=/tmp/pytest-of-<USER>/pytest-169/popen-gw0/test_tc_b100_19_save_back_with0/app/.s19tool/workarea/temp/firmware.s19 size_bytes=349 copy_seconds=0.006
+INFO     s19tui:app.py:15568 Load phase boundary: worker_spawned path=firmware.s19
+INFO     s19tui:app.py:18451 Load phase boundary: worker_parse_start path=firmware.s19
+INFO     s19tui:app.py:17835 Loading file: path=/tmp/pytest-of-<USER>/pytest-169/popen-gw0/test_tc_b100_19_save_back_with0/app/.s19tool/workarea/temp/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14151 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18667 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-169/popen-gw0/test_tc_b100_19_save_back_with0/app/.s19tool/workarea/temp/firmware.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14168 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18470 Load phase boundary: worker_parse_done path=firmware.s19 elapsed=0.002s
+INFO     s19tui:app.py:18294 Load phase boundary: prepare_entry path=firmware.s19 file_type=s19
+INFO     s19tui:app.py:18329 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:17688 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18338 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:18358 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:18365 Load phase boundary: prepare_bases_done row_bases=7
+INFO     s19tui:app.py:18375 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:18381 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:18503 Load phase boundary: worker_compute_done path=firmware.s19 precomputed=True elapsed=0.005s
+INFO     s19tui:app.py:18510 Load phase boundary: call_from_thread_apply_dispatched path=firmware.s19
+INFO     s19tui:app.py:18128 Load phase boundary: apply_install_state path=firmware.s19 precomputed=True
+INFO     s19tui:app.py:18795 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18144 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18156 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19815 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:16593 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.051
+INFO     s19tui:app.py:19329 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.058
+INFO     s19tui:app.py:18169 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:21065 Request refused while busy: Loading firmware.s19
+INFO     s19tui:app.py:19022 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18186 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-169/popen-gw0/test_tc_b100_19_save_back_with0/app/.s19tool/workarea/temp/firmware.s19 file_type=s19 elapsed_seconds=1.741 has_mac=False precomputed=True
+=========================== short test summary info ============================
+FAILED tests/test_b100_active_variant.py::test_tc_b100_19_save_back_becomes_the_active_variant[B]
+FAILED tests/test_b100_active_variant.py::test_tc_b100_19_save_back_with_no_project_writes_no_manifest
+2 failed, 549 passed, 28 skipped in 1444.94s (0:24:04)
+wall=1445s
+exit=1

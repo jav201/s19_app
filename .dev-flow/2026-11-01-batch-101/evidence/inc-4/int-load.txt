@@ -1,0 +1,23 @@
+Host load (1, 5, 15 min) before each lane-1 chunk on the LAN Linux host (8 cores), shared with other agents' runs:
+int-01 18.96 18.81 17.67
+int-02 12.59 16.35 17.56
+int-03 12.87 15.80 16.92
+int-04 2.52 8.03 12.81
+int-05 6.36 9.46 11.78
+int-06 6.60 8.99 11.29
+int-07 7.45 9.02 11.24
+int-08 7.26 8.95 11.20
+int-09 6.83 8.80 11.13
+int-10 7.76 8.88 11.11
+int-11 7.76 8.88 11.11
+int-12 6.92 8.60 10.94
+int-13 6.60 8.51 10.90
+int-14 5.47 7.81 10.40
+int-15 6.79 7.85 10.26
+int-16 9.07 8.62 10.04
+int-17 9.91 9.28 10.06
+int-18 12.44 10.68 10.47
+int-19 13.85 11.78 10.89
+int-20 13.41 12.55 11.31
+
+int-21..28: the 'load before' line at the top of each transcript.

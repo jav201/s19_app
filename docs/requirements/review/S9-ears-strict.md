@@ -23,7 +23,7 @@ Result:
 |---|---|---|
 | R-CHK-001 | "same v2 schema family … one reader, one rule set": the format and the reader are S8's. The row restates them. | Cite S8 in CTX-CHECK; S9 rows start where a document is already read (D9-2). |
 | R-CHK-001 | "uncheckable covering any entry whose target range is not fully inside the loaded image or when no image is loaded": true only for a runnable document. A blocked run and a collision make an entry uncheckable too. | Outcome rows in check order: blocked, tainted, containment (R-CHK-001.5 … .10). |
-| R-CHK-001 | "a headless service entry point (`run_checks_for_project`)": only a test calls it (`tests/test_checks_engine.py::test_headless_project_run`). Flows and variant execution call the engine directly (`flow_execution_service.py:754`, `variant_execution_service.py:776`). | Removed (D9-7). |
+| R-CHK-001 | "a headless service entry point (`run_checks_for_project`)": only a test called it (the headless project-run test of `tests/test_checks_engine.py`; both deleted in batch-101 Inc 4). Flows and variant execution call the engine directly (`flow_execution_service.py:754`, `variant_execution_service.py:776`). | Removed (D9-7). |
 | R-CHK-001 | "`CheckRunResult` carries per-entry expected/actual bytes …": a data class, not behaviour. | Observable rows only: what the result rows show (CTX-CHECK-TEXT). |
 | R-CHK-002 | "`markup=False` at construction", "closes the pre-existing five-message exposure class": implementation and history. | One plain-text row per surface. |
 | R-CHK-002 | "the checks help affordance states …": that text is the Patch Editor's Run checks help (R-PATCH-CHECKS-CLARITY-001, S10). | Moved to S10. |
@@ -285,7 +285,7 @@ With no file loaded the screen shows the empty state (S5 R-TUI-029.4).
 
 | # | The situation | Recommendation (applied) |
 |---|---|---|
-| D9-7 | `run_checks_for_project` (`change_service.py:3163`): only `test_headless_project_run` calls it; flows and variant execution call the engine directly. | Delete it and its test. |
+| D9-7 | `run_checks_for_project` (`change_service.py:3163`): only the headless project-run test of `tests/test_checks_engine.py` called it (both deleted in batch-101 Inc 4); flows and variant execution call the engine directly. | Delete it and its test. |
 | D9-8 | `#check_preview_toggle_button` is mounted and never displayed (`screens_directionb.py:7539-7545`); the Addendum tab carries its function. | Delete the widget and its handler (`:7640-7642`). |
 
 **Code change: correct a defect**

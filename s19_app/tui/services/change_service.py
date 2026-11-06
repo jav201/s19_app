@@ -3145,6 +3145,3 @@ class ChangeService:
             f"[{issue.code}] {issue.severity.value}: {issue.message}"
             for issue in self.document.issues
         ]
-
-
-

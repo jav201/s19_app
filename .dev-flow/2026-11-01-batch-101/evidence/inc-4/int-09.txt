@@ -1,0 +1,85 @@
+$ git -C <HOME>/work/s19_i4 log --oneline -1   (the Inc 4 diff over b7b77c4 applied on top)
+7add3d63 batch-101 PLAN: Inc 5 takes Inc 13's D-4 (stale CRC Designer coverage after an in-place apply) first, integrity priority
+$ python -c 'import s19_app; print(s19_app.__file__)'
+<HOME>/work/s19_i4/s19_app/__init__.py
+$ cd <HOME>/work/s19_i4 && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 2400 python -m pytest -q -p no:cacheprovider --rootdir=<HOME>/work/s19_i4 -rfE -n 8 -m not serial_timing tests/test_flow_multi_image_ui.py tests/test_flow_persistence.py tests/test_hex_emit.py tests/test_id_registry.py tests/test_linkage_soundness.py tests/test_manifest_verify.py
+bringing up nodes...
+bringing up nodes...
+
+...........................s.............................F.............. [ 83%]
+..F........F..                                                           [100%]
+=================================== FAILURES ===================================
+_______________ test_tc600_g1_every_named_node_id_is_registered ________________
+[gw1] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+corpus = <tests.test_id_registry._Corpus object at 0x7fd36f079d50>
+
+    def test_tc600_g1_every_named_node_id_is_registered(corpus: _Corpus) -> None:
+        """TC-600 / G1 — no test node carries an id the registry has never seen."""
+        problems = g1_named_nodes_are_registered(corpus, corpus.registry)
+>       assert not problems, _report("G1 (node -> registry)", problems)
+E       AssertionError: G1 (node -> registry) failed with 1 offender(s):
+E           - AT-1000 carried by ['tests/test_b101_symbol_reads.py::test_r_chg_sym_13_symbol_read_at_1000_entries_by_220040_tags_builds_the_index_once', 'tests/test_b101_symbol_reads.py::test_r_chg_sym_13_whole_document_edit_json_confirm_at_1000_entries_by_220040_tags'] is not in the registry
+E       assert not ["AT-1000 carried by ['tests/test_b101_symbol_reads.py::test_r_chg_sym_13_symbol_read_at_1000_entries_by_220040_tags_b..._reads.py::test_r_chg_sym_13_whole_document_edit_json_confirm_at_1000_entries_by_220040_tags'] is not in the registry"]
+
+tests/test_id_registry.py:470: AssertionError
+_____________________ test_at281_every_guard_rule_can_fail _____________________
+[gw6] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+corpus = <tests.test_id_registry._Corpus object at 0x7f4c45712450>
+
+    def test_at281_every_guard_rule_can_fail(corpus: _Corpus) -> None:
+        """AT-281 — each of G1..G3 and G5..G7 goes red under one targeted mutation.
+    
+        A rule that has never been observed to fail is indistinguishable from one
+        that cannot. Each case below **records the substituted value**, not "the
+        check was removed": ``max(a, b)`` has two one-token mutations and naming the
+        deleted operator identifies neither.
+    
+        Every mutation is applied to a deep copy of the *passing* state, never to a
+        pre-fix tree — an error raised on an old tree proves nothing about the rule.
+        """
+        baseline = {name: rule(corpus, corpus.registry) for name, rule in RULES}
+>       assert not any(baseline.values()), (
+            "the counterfactual is only meaningful from a green baseline; "
+            f"these rules were already red: {[n for n, p in baseline.items() if p]}"
+        )
+E       AssertionError: the counterfactual is only meaningful from a green baseline; these rules were already red: ['G1']
+E       assert not True
+E        +  where True = any(dict_values([["AT-1000 carried by ['tests/test_b101_symbol_reads.py::test_r_chg_sym_13_symbol_read_at_1000_entries_by_...sym_13_whole_document_edit_json_confirm_at_1000_entries_by_220040_tags'] is not in the registry"], [], [], [], [], []]))
+E        +    where dict_values([["AT-1000 carried by ['tests/test_b101_symbol_reads.py::test_r_chg_sym_13_symbol_read_at_1000_entries_by_...sym_13_whole_document_edit_json_confirm_at_1000_entries_by_220040_tags'] is not in the registry"], [], [], [], [], []]) = <built-in method values of dict object at 0x7f4c44225780>()
+E        +      where <built-in method values of dict object at 0x7f4c44225780> = {'G1': ["AT-1000 carried by ['tests/test_b101_symbol_reads.py::test_r_chg_sym_13_symbol_read_at_1000_entries_by_220040...ocument_edit_json_confirm_at_1000_entries_by_220040_tags'] is not in the registry"], 'G2': [], 'G3': [], 'G5': [], ...}.values
+
+tests/test_id_registry.py:708: AssertionError
+_________ test_at280_registry_and_repository_agree_in_both_directions __________
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+corpus = <tests.test_id_registry._Corpus object at 0x7fa36af11250>
+
+    def test_at280_registry_and_repository_agree_in_both_directions(corpus: _Corpus) -> None:
+        """AT-280 — the registry and the repository agree, both ways at once.
+    
+        The two directions are asserted together here, as one observable, because
+        that is the property the backlog item actually asks for. The individual
+        ``TC-6xx`` rules localise a failure; this one states the outcome.
+        """
+        failures = {
+            name: rule(corpus, corpus.registry)
+            for name, rule in RULES
+            if rule(corpus, corpus.registry)
+        }
+>       assert not failures, "\n\n".join(
+            _report(name, problems) for name, problems in failures.items()
+        )
+E       AssertionError: G1 failed with 1 offender(s):
+E           - AT-1000 carried by ['tests/test_b101_symbol_reads.py::test_r_chg_sym_13_symbol_read_at_1000_entries_by_220040_tags_builds_the_index_once', 'tests/test_b101_symbol_reads.py::test_r_chg_sym_13_whole_document_edit_json_confirm_at_1000_entries_by_220040_tags'] is not in the registry
+E       assert not {'G1': ["AT-1000 carried by ['tests/test_b101_symbol_reads.py::test_r_chg_sym_13_symbol_read_at_1000_entries_by_220040...reads.py::test_r_chg_sym_13_whole_document_edit_json_confirm_at_1000_entries_by_220040_tags'] is not in the registry"]}
+
+tests/test_id_registry.py:686: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_id_registry.py::test_tc600_g1_every_named_node_id_is_registered
+FAILED tests/test_id_registry.py::test_at281_every_guard_rule_can_fail - Asse...
+FAILED tests/test_id_registry.py::test_at280_registry_and_repository_agree_in_both_directions
+3 failed, 82 passed, 1 skipped in 17.79s
+wall=18s
+exit=1

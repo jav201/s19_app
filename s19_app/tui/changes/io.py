@@ -898,13 +898,15 @@ def _parse_entries(
 
     entries: list[ChangeEntry] = []
     symbol_index: Optional[dict[str, dict]] = None
+    index_built = False
     for index, element in enumerate(in_ceiling):
         if (
-            symbol_index is None
+            not index_built
             and isinstance(element, dict)
             and isinstance(element.get("symbol"), str)
         ):
             symbol_index = _symbol_name_index(a2l_context)
+            index_built = True
         entry = _parse_entry(
             index, element, encoding, value_mode, issues,
             symbol_index=symbol_index,

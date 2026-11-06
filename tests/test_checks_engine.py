@@ -15,9 +15,9 @@ anywhere:
   ``kind`` / envelope faults block the run with a loud reason).
 - **TC-022** — result shape (LLR-004.3): the C-6 ``CheckRunResult`` field
   set plus fixed-clock double-run ``to_dict()`` equality (B-4).
-- **TC-023** — headless project run (LLR-004.4):
-  ``run_checks_for_project`` on ``examples/case_00_public/prg.s19`` plus the
-  static import-graph no-Textual inspection (never an in-session
+- **TC-023** — the static import-graph no-Textual inspection (LLR-004.4;
+  the headless ``run_checks_for_project`` entry point and its test were
+  deleted in batch-101 Inc 4, CODE-CHANGES D9-7) (never an in-session
   ``sys.modules`` assertion — F-Q-07; see the probe test's docstring for
   why the subprocess dotted-import alternative cannot apply here).
 
@@ -43,10 +43,8 @@ from s19_app.tui.changes import (
 from s19_app.tui.changes.check import run_check_document
 from s19_app.tui.changes.io import read_change_document
 from s19_app.tui.changes.model import CheckRunResult
-from s19_app.tui.services.change_service import run_checks_for_project
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-PUBLIC_EXAMPLES = REPO_ROOT / "examples" / "case_00_public"
 
 
 def _write_document(path: Path, entries: list[dict], kind: str) -> Path:
@@ -321,50 +319,8 @@ def test_result_shape_deterministic() -> None:
 
 
 # ===========================================================================
-# TC-023 — headless project run + no-Textual probe (LLR-004.4)
+# TC-023 — no-Textual probe (LLR-004.4)
 # ===========================================================================
-
-
-def test_headless_project_run(tmp_path: Path) -> None:
-    """run_checks_for_project executes a check file against prg.s19.
-
-    Intent: LLR-004.4 — paths in, ONE ``CheckRunResult`` out, reusing the
-    load-service parse path; expected/actual values asserted against the
-    public ``examples/case_00_public/prg.s19`` bytes (0xEB00 = 20 59,
-    0xEB04 = CC); the optional MAC source feeds informative linkage.
-    """
-    check_path = _write_document(
-        tmp_path / "prg-checks.json",
-        [
-            {"type": "bytes", "address": "0xEB00", "bytes": "20 59"},  # pass
-            {"type": "bytes", "address": "0xEB04", "bytes": "FF"},  # fail
-            {"type": "bytes", "address": "0x10", "bytes": "00"},  # outside
-        ],
-        "check",
-    )
-    mac_path = tmp_path / "prg.mac"
-    mac_path.write_text("TAG1=EB00\n", encoding="ascii")
-
-    result = run_checks_for_project(
-        check_path, PUBLIC_EXAMPLES / "prg.s19", mac_path=mac_path
-    )
-
-    assert isinstance(result, CheckRunResult)
-    assert result.variant_id == "prg"
-    assert result.source_path is not None
-    assert result.source_path.name == "prg-checks.json"
-    assert result.issues == []
-    assert result.aggregates == {"passed": 1, "failed": 1, "uncheckable": 1}
-    assert [entry.result for entry in result.entries] == [
-        "pass",
-        "fail",
-        "uncheckable",
-    ]
-    assert result.entries[0].actual_bytes == (0x20, 0x59)
-    assert result.entries[0].linkage == "mac-linked"
-    assert result.entries[0].linkage_symbol == "TAG1"
-    assert result.entries[1].actual_bytes == (0xCC,)
-    assert result.entries[2].actual_bytes is None
 
 
 def _module_file(name: str) -> Path | None:

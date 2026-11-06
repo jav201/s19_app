@@ -170,8 +170,12 @@ from tools.id_registry import (
 # 246 -> 248, measured (tests/support/suite_census.py, tests/test_suite_hygiene.py).
 # batch-101 Inc 8 (merged after Inc 2): 248 -> 250, measured
 # (tests/test_b101_crc_model_and_reasons.py, tests/test_b101_flow_ext_copy.py).
-EXPECTED_SCANNED_TEST_FILES = 250
+# batch-101 Inc 4: 250 -> 251, measured (tests/test_b101_symbol_reads.py).
+EXPECTED_SCANNED_TEST_FILES = 251
 """Test modules scanned, including this one.
+
+batch-101 Inc 4: 250 -> 251. ``tests/test_b101_symbol_reads.py`` (R-CHG-SYM.9 .. .13,
+R-TUI-058.9) is added. MEASURED by the guard on the LAN Linux host.
 
 batch-101 Inc 2: 246 -> 248 (after batch-102). ``tests/support/suite_census.py`` and
 ``tests/test_suite_hygiene.py`` (R-TST-001 .. 082) are added. MEASURED: the

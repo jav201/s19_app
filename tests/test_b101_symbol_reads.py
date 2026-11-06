@@ -1050,7 +1050,7 @@ def count_index_builds(monkeypatch: pytest.MonkeyPatch) -> list:
 
 
 @pytest.mark.serial_timing
-def test_r_chg_sym_13_symbol_read_at_1000_entries_by_220040_tags_builds_the_index_once(
+def test_r_chg_sym_13_symbol_read_of_1000_entries_by_220040_tags_builds_the_index_once(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Case R-CHG-SYM.13/1: reading a planted document of 1 000 symbol entries
@@ -1119,7 +1119,7 @@ def test_r_chg_sym_13_read_without_symbol_entries_builds_no_index(
 
 
 @pytest.mark.serial_timing
-def test_r_chg_sym_13_whole_document_edit_json_confirm_at_1000_entries_by_220040_tags(
+def test_r_chg_sym_13_whole_document_edit_json_confirm_of_1000_entries_by_220040_tags(
     tmp_path: Path,
 ) -> None:
     """Case R-CHG-SYM.13/3 (E3 A-7, measurement): the whole-document Edit JSON
@@ -1129,7 +1129,9 @@ def test_r_chg_sym_13_whole_document_edit_json_confirm_at_1000_entries_by_220040
     error(s)``, and the time the symbol resolution adds to the confirm - the
     confirm of the 1 000 symbol entries minus the confirm of the same 1 000
     entries without ``symbol`` (which pays the same table render) - stays
-    within twice the row's bound (two reads, each within 1.0 s).
+    within its bound: 2 x the E4 measurement of that addition on the LAN Linux
+    host, with a ceiling of 1.0 s (E4 ruling OR-2; measured 0.622 s, so the
+    ceiling governs).
 
     Why: the whole confirm costs more than the two reads (the ledger and the
     JSON view render 1 000 rows); that render is not this increment's cost and
@@ -1175,7 +1177,7 @@ def test_r_chg_sym_13_whole_document_edit_json_confirm_at_1000_entries_by_220040
         f"resolution adds {added:.3f} s"
     )
     assert added < report_margin(
-        "edit json confirm resolution 1000x220040", added, 2 * timing_bound(1.0)
+        "edit json confirm resolution 1000x220040", added, timing_bound(1.0)
     ), (plain_took, took)
 
 
