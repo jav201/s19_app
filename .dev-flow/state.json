@@ -177,6 +177,11 @@
       "station": "P3",
       "date": "2026-11-05",
       "decision": "P3 increment 003 (Inc 3, gather once per name without resolve, no folder re-creation on sync, panel-paint timing verifiers R-TST-110..113) approved and merged at b7b77c4 under the standing authorization: mutants 14/14 (Windows junction arms on Windows, the rest on the LAN Linux host); code-reviewer and security-reviewer PASS-WITH-NOTES; coverage 30 cases covered (27 full, 3 partial); save-project 5/5 on Windows and 5/5 on Linux under 0.8 s; trace_check 0 gaps. Merge verified on the LAN Linux host: 1088 passed, 0 failed; serial lane 51 passed, 0 bounds under 20 % margin (evidence/merge/lan-merge-inc3.txt)."
+    },
+    {
+      "station": "P3",
+      "date": "2026-11-05",
+      "decision": "P3 increment 011 (Inc 11, A2L validation and parsing: 62 ASAM block names, IF_DATA skip, anchored memory-segment reader with an ASCII Number and a 2^32 bound, curve description, severity order) approved and merged under the standing authorization: E3 architect FAIL then PASS-WITH-NOTES in round 2; mutants 32/32 (DeepSeek) plus corrective controls; code-reviewer and security-reviewer PASS-WITH-NOTES; coverage 78 cases, 76 covered, 2 partial; 4 snapshot baselines re-recorded with the CI recipe (Region unknown -> flash, issue count 60 -> 59); trace_check 0 gaps. Merge verified on the LAN laptop host: 1063 passed, 5 failed = 4 freeze guards by design (OR-3, checked on CI) + the known tc_b100_52 load flake; snapshots: the 2 known failures only (evidence/merge/lan-merge-inc11.txt)."
     }
   ],
   "obsidian_synced": false,

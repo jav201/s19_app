@@ -1,0 +1,28 @@
+LAN laptop host, merged tree d53985a (main + Inc 11), 40 test files (Inc 11 tests, importers of validation.rules / issues_view / a2l, freeze guards, registry, hygiene, canon) + serial lane + snapshot suite in a CI-recipe venv (py3.11, pytest-textual-snapshot 1.1.0). The 4 freeze-guard failures compare against the clone's pre-merge 'main' ref by design (OR-3) and pass once main is the merged tree (checked on CI). tc_b100_52[case_06] is the known host-load flake (E5 watch item).
+load average: 4.34, 3.14, 2.34
+<HOME>/work/s19_merge11/s19_app/__init__.py
+E           AssertionError: ['s19_app/tui/a2l.py', 's19_app/validation/rules.py']
+E           assert ['s19_app/tui...ion/rules.py'] == []
+E             
+E             Left contains 2 more items, first extra item: 's19_app/tui/a2l.py'
+E             Use -v to get more diff
+
+tests/test_tui_issues_triage_b94.py:279: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b100_a2l_progress.py::test_tc_b100_52_project_install_step_is_painted_before_the_install[case_06]
+FAILED tests/test_engine_unchanged.py::test_tc027_engine_modules_unchanged_vs_main
+FAILED tests/test_tui_directionb.py::test_tc031_engine_modules_have_no_diff_vs_main
+FAILED tests/test_tui_directionb.py::test_tc031_engine_modules_have_no_name_only_diff_vs_main
+FAILED tests/test_tui_issues_triage_b94.py::test_tc_b94_18_curated_set_and_engine_freeze
+5 failed, 1063 passed, 46 skipped, 3 xfailed in 1902.29s (0:31:42)
+---serial---
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier truncated  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[truncated]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier v1-document  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[v1-document]
+QC-TM: 31 bounds, 0 under 20 % margin
+30 passed, 1117 deselected in 23.44s
+---snapshot---
+2 snapshots failed. 27 snapshots passed.
+=========================== short test summary info ============================
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-120x30]
+2 failed, 27 passed, 4 deselected in 140.19s (0:02:20)

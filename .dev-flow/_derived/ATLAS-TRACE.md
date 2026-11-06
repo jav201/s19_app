@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 89 requirement files | corpus digest: db4c96438f198b97 -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 90 requirement files | corpus digest: dbfa5b14c9560c5e -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
@@ -1522,7 +1522,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 2364 unique id(s)
+## family US/HLR/LLR — 2368 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -1551,7 +1551,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `HLR-009` | batches, canon, tests |
 | `HLR-010` | batches, canon, tests |
 | `HLR-011` | batches, canon, tests |
-| `HLR-012` | batches, canon, tests |
+| `HLR-012` | batches, canon |
 | `HLR-013` | batches, canon, tests |
 | `HLR-013..016` | batches |
 | `HLR-014` | batches, canon, tests |
@@ -3563,7 +3563,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `US-002..005` | batches |
 | `US-002..US-005` | batches |
 | `US-003` | batches, tests |
-| `US-004` | batches, tests |
+| `US-004` | batches |
 | `US-005` | batches |
 | `US-006` | batches, tests |
 | `US-006..US-009` | batches |
@@ -3835,6 +3835,10 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `US-H` | batches |
 | `US-HEXWIN-1` | batches |
 | `US-I` | batches |
+| `US-I11-1` | batches |
+| `US-I11-2` | batches |
+| `US-I11-3` | batches |
+| `US-I11-4` | batches |
 | `US-I8-1` | batches |
 | `US-I8-2` | batches |
 | `US-I8-3` | batches |
@@ -4298,7 +4302,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `R-TUI-022` | batches, canon |
 | `R-TUI-023` | batches, canon |
 | `R-TUI-024` | batches, canon |
-| `R-TUI-025` | batches, canon |
+| `R-TUI-025` | batches, canon, tests |
 | `R-TUI-026` | batches, tests |
 | `R-TUI-027` | batches |
 | `R-TUI-028` | batches |
@@ -4402,8 +4406,8 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `R-VAL-025` | canon |
 | `R-VAL-030` | canon |
 | `R-VAL-031` | canon |
-| `R-VAL-032` | batches, canon |
-| `R-VAL-033` | canon |
+| `R-VAL-032` | batches, canon, tests |
+| `R-VAL-033` | batches, canon |
 | `R-VAL-034` | canon |
 | `R-VAL-035` | canon |
 | `R-VAL-036` | canon |
@@ -5596,7 +5600,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `TC-1817` | tests |
 | `TC-1818` | tests |
 | `TC-1819` | tests |
-| `TC-1820` | tests |
+| `TC-1820` | batches, tests |
 | `TC-1821` | tests |
 | `TC-1822` | tests |
 | `TC-19` | batches |
