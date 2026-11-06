@@ -7,12 +7,12 @@ Base `c2cba35`. **0 files under `s19_app/`** (source cap 0 of 4). Line numbers a
 | Group | File | Functions / entries | Rows |
 |---|---|---|---|
 | TC-331 arm | `tests/test_tui_patch_editor_v2.py` | 1 changed test function, `test_tc331_disable_guard_predicate_tracks_source_path` (`:3501-3553`): 2 waits added; the module imports `settled` from `tests.b97_probes` | R-TST-150, 151, 154, 155, 163 |
-| TC-B94-27 arm | `tests/test_tui_flow_execution_b94.py` | 1 changed test function, `test_tc_b94_27_lane_binding_isolation_and_noop` (`:480-543`): a call recorder around the panel's bind step + 2 waits; **E5:** wait D9 after the second import (C-10) and lane B's paint read off the compositor (C-6); the module imports `settled` from `tests.b97_probes`. The shared `_bind` helper (`:166-168`, 8 callers) is **not** changed | R-TST-152, 153, 154, 155, 163 |
+| TC-B94-27 arm | `tests/test_tui_flow_execution_b94.py` | 1 changed test function, `test_tc_b94_27_lane_binding_isolation_and_noop` (`:480-543`): a call recorder around the panel's bind step + 2 waits; **E5:** wait D9 after the second import (C-10) and lane B's paint read off the compositor (C-6); the module imports `settled` from `tests.b97_probes`. The shared `_bind` helper (`:166-168`, 8 callers) is **not** changed | R-TST-152, 153, 154, 155, 163, 164 |
 | AT-030c arm [D-1] | `tests/test_tui_patch_editor_v2.py` | 1 changed test function, `test_at030c_directly_dropped_file_is_listed_and_loadable` (`:1555-1598`): 1 wait added (E3 F1) | R-TST-159, 154, 155, 163 |
 | TC-051 save-back arm [D-1] | `tests/test_tui_patch_editor_v2.py` | 1 changed test function, `test_save_back_prompt` (`:529-646`): 3 wait sites, one in the nested helper `_apply`, one after Don't save, one in the nested helper `_confirm_with` (13 waits at run time with D1 … D5) (E3 F1) | R-TST-160, 161, 162, 154, 155, 163 |
 | Static check of the waits | `tests/test_suite_hygiene.py` (Inc 2's guard host) | 1 new test, proposed name `test_r_tst_154_155_inc15_arms_wait_through_settled` (AST over the four functions above, keyed on the nine static wait sites of table D (D9 at E5 C-10), each with its predicate (E5 C-2); its docstring cites R-TST-154, R-TST-155, R-TST-163) | R-TST-154, 155, 163 |
 | Conventions [D-3] | `docs/engineering-rules.md` | rule 7 added after rule 2's list (`:196-206`), "Six rules" → "Seven rules"; `tests/test_suite_hygiene.py`: `_CONVENTION_RULES` (`:83`) gains `R-TST-158`, and the parametrize list of `test_r_tst_007_conventions_hold_each_test_rule` (`:631-634`) gains `"R-TST-158"` | R-TST-158 |
-| Runs (no file) | Windows host, LAN Linux host | 20 serial runs per node (4 nodes) on Windows; 3 serial runs + the parallel lane on Linux; the held-handler probes and the forced-never runs of R-TST-154 on Linux | R-TST-154, 156, 157; thresholds of 150 … 153, 159 … 162 |
+| Runs (no file) | Windows host, LAN Linux host | 20 serial runs per node (4 nodes) on Windows; 3 serial runs + the parallel lane on Linux; the held-handler probes and the forced-never runs of R-TST-154 on Linux | R-TST-154, 156, 157; thresholds of 150 … 153, 159 … 162, 164 |
 
 **Totals:** 4 files (0 product, 3 test files, 1 doc), 4 changed test functions, 1 new test function, 1 new parameter of an existing test, 1 convention sentence. No new test file, so TC-607's scanned-file count does not change. E2 Code-Wire graph: not applicable, tests-only (`codewire/graph-inc15.md`, E3 F10).
 
@@ -27,7 +27,7 @@ Base `c2cba35`. **0 files under `s19_app/`** (source cap 0 of 4). Line numbers a
 
 The asserted values stay the product's: `button.disabled` read after each wait (`:3536`, `:3540`). The predicates read the document, never the button, so the guard mutants of R-TST-150 (b) and R-TST-151 (b) turn the arm RED at once instead of at the wait's bound. The document replacement and the guard are set in the same synchronous handler (`s19_app/tui/app.py:4733`, the `load_doc` / `parse_paste` branches `:4811-4834`), so no read can fall between them. The Edit JSON guard has three writers (E3 F2): `:7191` in `_patch_editor_load_tail` (a load runs it), `:4929` at the end of the action handler (a load and a paste both run it) and `:5170` (history path, not used here). Hence 150 (b) removes both load-path writers (`:7191`, `:4929`) → RED at the load step, and 151 (b) removes `:4929` only → RED at the paste step, while the load tail still guards the load.
 
-### `test_tc_b94_27_lane_binding_isolation_and_noop` (R-TST-152, 153)
+### `test_tc_b94_27_lane_binding_isolation_and_noop` (R-TST-152, 153, 164)
 
 | Point | Base | Change | Wait predicate (signal) | Description |
 |---|---|---|---|---|
@@ -74,7 +74,7 @@ Scope (E3 F3): the check pins these eight sites only and stops no one-pause read
 | Row | Changed function or run |
 |---|---|
 | R-TST-150, 151 | `test_tc331_disable_guard_predicate_tracks_source_path` |
-| R-TST-152, 153 | `test_tc_b94_27_lane_binding_isolation_and_noop` |
+| R-TST-152, 153, 164 | `test_tc_b94_27_lane_binding_isolation_and_noop` |
 | R-TST-159 | `test_at030c_directly_dropped_file_is_listed_and_loadable` |
 | R-TST-160, 161, 162 | `test_save_back_prompt` (its helpers `_apply`, `_confirm_with`) |
 | R-TST-154, 155, 163 | the four functions above + `test_r_tst_154_155_inc15_arms_wait_through_settled`; R-TST-154's behavioural half is a Linux run, no file |

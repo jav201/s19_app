@@ -483,8 +483,8 @@ def test_tc_b94_27_lane_binding_isolation_and_noop(tmp_path: Path) -> None:
     A changes exactly A's record; B's bound path is byte-identical
     before/after (0 fields changed); a rebind to the same path is a no-op.
 
-    Inc 15 (R-TST-152, R-TST-153, R-TST-154, R-TST-155, R-TST-163): the
-    reads after each Bind wait through the shared wait for the panel's
+    Inc 15 (R-TST-152, R-TST-153, R-TST-154, R-TST-155, R-TST-163, R-TST-164):
+    the reads after each Bind wait through the shared wait for the panel's
     bind step to return (a recorder on ``_rebind``), so the no-op arm is
     non-vacuous. The reads after the imports wait for both lanes on screen
     (D9), and lane B's paint is read off the compositor (E5 C-6, C-10).
