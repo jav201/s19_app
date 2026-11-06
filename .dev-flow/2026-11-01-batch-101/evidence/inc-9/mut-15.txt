@@ -1,0 +1,95 @@
+base commit (origin/main): e07fb00f9fc13afd314d0334fac683fe33b29b6c
+applied-tree head: b204c7d44a42383f2a7c63295280b0a4b7f3ad58
+mutant: M15 — TC-B99-13 (E3A-09)
+
+--- mutation (diff) ---
+--- a/s19_app/tui/services/flow_persistence_service.py
++++ b/s19_app/tui/services/flow_persistence_service.py
+@@ -1214,16 +1214,15 @@
+     if clean is None:
+         return None
+     flows_dir = project_dir / FLOWS_SUBDIR
+-    resolved_home, _ = _guarded_destination(flows_dir, workarea_root)
+     flows_dir.mkdir(parents=True, exist_ok=True)
+-
+-    def render(stem: str) -> str:
+-        return json.dumps(
+-            flow_to_dict(replace(flow, name=stem[:FLOW_MAX_NAME_LEN])),
+-            indent=2,
+-        )
+-
+-    return _create_new_json(flows_dir, resolved_home, clean, render)
++    target = flows_dir / f"{clean}.json"
++    if target.exists():
++        counter = 2
++        while (flows_dir / f"{clean}_{counter}.json").exists():
++            counter += 1
++        target = flows_dir / f"{clean}_{counter}.json"
++    target.write_text(json.dumps(flow_to_dict(flow), indent=2), encoding="utf-8")
++    return target
+ 
+ 
+ def list_saved_flows(project_dir: Path) -> List[str]:
+
+--- s19_app.__file__ (from inside the copy) ---
+<HOME>/work/s19_i9mut_m15/s19_app/__init__.py
+
+--- pytest ---
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+____________ test_tc_b99_13_no_final_name_replace_outside_placement ____________
+
+    def test_tc_b99_13_no_final_name_replace_outside_placement() -> None:
+        """LLR-155.3's census arm (TC-B99-13's second arm): across ``s19_app/``
+        no ``unlink`` / ``os.replace`` / ``shutil.copy2`` / ``write_bytes`` /
+        ``write_text`` (the ``write_text`` limb is review finding F4a) onto an
+        existing final name exists outside the pinned placement functions and
+        the pinned declared exceptions — in particular
+        ``project_gather_service._gather_copy`` holds none after the Inc-3b
+        conversion. RED at HEAD: ``_gather_copy`` still unlinks and recopies in
+        place (``project_gather_service.py:297/299``).
+        """
+        all_violations: list = []
+        pkg_root = REPO_ROOT / "s19_app"
+        for path in sorted(pkg_root.rglob("*.py")):
+            rel = path.relative_to(REPO_ROOT).as_posix()
+            all_violations.extend(
+                _final_name_census(rel, path.read_text(encoding="utf-8"))
+            )
+>       assert all_violations == [], (
+            "LLR-155.3: a final-name replace/delete/copy outside the placement "
+            f"functions: {all_violations}"
+        )
+E       AssertionError: LLR-155.3: a final-name replace/delete/copy outside the placement functions: ["s19_app/tui/services/flow_persistence_service.py:1224 write_text outside the pinned placement allow-list (in 'save_flow_json')"]
+E       assert ["s19_app/tui..._flow_json')"] == []
+E         
+E         Left contains one more item: "s19_app/tui/services/flow_persistence_service.py:1224 write_text outside the pinned placement allow-list (in 'save_flow_json')"
+E         Use -v to get more diff
+
+../s19_i9mut/tests/test_b99_staging.py:2281: AssertionError
+_______________ test_r_flow_file_14_3_no_create_on_a_taken_name ________________
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-380/test_r_flow_file_14_3_no_creat0/.s19tool/workarea'), PosixPath('/tmp/py..._creat0/.s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-380/test_r_flow_file_14_3_no_creat0/outside'))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f4bf71707d0>
+
+    def test_r_flow_file_14_3_no_create_on_a_taken_name(area, monkeypatch):
+        """R-FLOW-FILE.14/3: no create is attempted on a candidate name that exists (E3 S-2 a)."""
+        _root, project, outside = area
+        (outside / "dangling").mkdir()
+        _link_file(project / "flows", "z.json", outside / "dangling" / "z.json")
+        calls = _spy_on_open(monkeypatch)
+        saved = save_flow_json(F1, "z", project)
+        taken = str(project / "flows" / "z.json")
+        assert calls.count(taken) == 0
+>       assert calls.count(str(saved)) == 1
+E       AssertionError: assert 0 == 1
+E        +  where 0 = <built-in method count of list object at 0x7f4bf7034140>('/tmp/pytest-of-<user>/pytest-380/test_r_flow_file_14_3_no_creat0/.s19tool/workarea/p/flows/z.json')
+E        +    where <built-in method count of list object at 0x7f4bf7034140> = [].count
+E        +    and   '/tmp/pytest-of-<user>/pytest-380/test_r_flow_file_14_3_no_creat0/.s19tool/workarea/p/flows/z.json' = str(PosixPath('/tmp/pytest-of-<user>/pytest-380/test_r_flow_file_14_3_no_creat0/.s19tool/workarea/p/flows/z.json'))
+
+../s19_i9mut/tests/test_b101_flow_saves.py:330: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b99_staging.py::test_tc_b99_13_no_final_name_replace_outside_placement
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_3_no_create_on_a_taken_name
+2 failed in 1.16s
+

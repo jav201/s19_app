@@ -856,8 +856,11 @@ def test_r_chg_sym_10_reads_with_no_a2l_loaded_declare_none(
     async def diff_scenario(app, pilot, log):
         # Inside an open project that holds the A2L file; the session A2L is
         # then unloaded. The pick must not fall back to the project's file.
-        stage(app, case08, CHECK)
-        make_project(app.workarea, "P", case08, [], with_a2l=True)
+        project = make_project(app.workarea, "P", case08, [], with_a2l=True)
+        # Inc 6 (D-1): in a project the A2B Diff lists the project's own
+        # ``checks/`` folder as ``checks/<name>``; the document is staged there.
+        (project / "checks").mkdir()
+        shutil.copy(case08 / CHECK, project / "checks" / CHECK)
         await ld.open_project_through_dialog(pilot, app, "P")
         await wait_until(
             pilot,
@@ -868,7 +871,7 @@ def test_r_chg_sym_10_reads_with_no_a2l_loaded_declare_none(
         await dismiss_result_panel_if_open(pilot, app)
         await unload_a2l(pilot, app)
         await show_screen(pilot, app, "7", "#diff_check_select")
-        await pick_by_keys(pilot, app, "#diff_check_select", CHECK)
+        await pick_by_keys(pilot, app, "#diff_check_select", f"checks/{CHECK}")
         await wait_until(
             pilot,
             lambda: str(app.query_one("#diff_status").render()).startswith("Check spec"),

@@ -1,0 +1,108 @@
+# mutant M17  (PATCH-DOC-DROPDOWN-001.3/4 (S-4))
+base_commit=98d94d724a72c56468292be123ff15f664acb4fa
+s19_app.__file__=<HOME>/work/s19_i6m_copy/s19_app/__init__.py
+mutation=s19_app/tui/app.py:7277
+--- pytest (mutant copy) ---
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________ test_r_patch_doc_dropdown_001_3_pick_keeps_spelling ______________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-283/popen-gw0/test_r_patch_doc_dropdown_001_0')
+
+    def test_r_patch_doc_dropdown_001_3_pick_keeps_spelling(tmp_path: Path) -> None:
+        """Case R-PATCH-DOC-DROPDOWN-001.3/4 (S-4): the app's base folder is named
+        through a link ``alias -> real`` above ``.s19tool``, so the given and the
+        resolved spellings differ. A pick of ``patches/a.json`` keeps the work
+        area's spelling as the document source, so Save project classes the file
+        in the project and, with an entry added, says
+        ``Change document a.json has unsaved edits - the project records the file
+        as it is on disk; save it from the Patch Editor to keep them``.
+    
+        Negative control: the resolved path returned as the source -> the file is
+        classed outside the project and the line is missing -> RED."""
+        real = tmp_path / "real"
+        real.mkdir()
+        alias = tmp_path / "alias"
+        make_link(alias, real)
+    
+        async def scenario(app, pilot, log):
+            project = make_project(app.workarea)
+            write_doc(project / "patches" / "a.json", ENTRY_C)
+            await open_project_shipped(pilot, app)
+            await show_patch_editor(pilot, app)
+            mark = len(log.messages)
+            await pick(pilot, app, "#patch_doc_file_select", "patches/a.json")
+            await wait_line(
+                pilot, log, mark, lambda line: line.startswith("Loaded "), "the load status"
+            )
+            assert str(source_of(app)).startswith(str(alias)), (
+                f"the source must keep the work area's spelling, got {source_of(app)}"
+            )
+            await add_patch_entry(pilot, app, "0x8007", "CC")
+            lines = await projects.save_project(pilot, app, log, "proj")
+            expected = (
+                "Change document a.json has unsaved edits — the project records "
+                "the file as it is on disk; save it from the Patch Editor to keep them"
+            )
+            assert expected in lines, lines
+            return True
+    
+>       assert run(tmp_path, scenario, base=alias) is True
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+../s19_i6m/tests/test_b101_document_homes.py:630: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i6m/tests/test_b101_document_homes.py:142: in run
+    return projects.run_app(root, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f0754a0f550>
+
+    async def scenario(app, pilot, log):
+        project = make_project(app.workarea)
+        write_doc(project / "patches" / "a.json", ENTRY_C)
+        await open_project_shipped(pilot, app)
+        await show_patch_editor(pilot, app)
+        mark = len(log.messages)
+        await pick(pilot, app, "#patch_doc_file_select", "patches/a.json")
+        await wait_line(
+            pilot, log, mark, lambda line: line.startswith("Loaded "), "the load status"
+        )
+>       assert str(source_of(app)).startswith(str(alias)), (
+            f"the source must keep the work area's spelling, got {source_of(app)}"
+        )
+E       AssertionError: the source must keep the work area's spelling, got /tmp/pytest-of-<USER>/pytest-283/popen-gw0/test_r_patch_doc_dropdown_001_0/real/.s19tool/workarea/proj/patches/a.json
+E       assert False
+E        +  where False = <built-in method startswith of str object at 0x7f0754643aa0>('/tmp/pytest-of-<USER>/pytest-283/popen-gw0/test_r_patch_doc_dropdown_001_0/alias')
+E        +    where <built-in method startswith of str object at 0x7f0754643aa0> = '/tmp/pytest-of-<USER>/pytest-283/popen-gw0/test_r_patch_doc_dropdown_001_0/real/.s19tool/workarea/proj/patches/a.json'.startswith
+E        +      where '/tmp/pytest-of-<USER>/pytest-283/popen-gw0/test_r_patch_doc_dropdown_001_0/real/.s19tool/workarea/proj/patches/a.json' = str(PosixPath('/tmp/pytest-of-<USER>/pytest-283/popen-gw0/test_r_patch_doc_dropdown_001_0/real/.s19tool/workarea/proj/patches/a.json'))
+E        +        where PosixPath('/tmp/pytest-of-<USER>/pytest-283/popen-gw0/test_r_patch_doc_dropdown_001_0/real/.s19tool/workarea/proj/patches/a.json') = source_of(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}))
+E        +    and   '/tmp/pytest-of-<USER>/pytest-283/popen-gw0/test_r_patch_doc_dropdown_001_0/alias' = str(PosixPath('/tmp/pytest-of-<USER>/pytest-283/popen-gw0/test_r_patch_doc_dropdown_001_0/alias'))
+
+../s19_i6m/tests/test_b101_document_homes.py:618: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_document_homes.py::test_r_patch_doc_dropdown_001_3_pick_keeps_spelling
+1 failed in 6.98s
+

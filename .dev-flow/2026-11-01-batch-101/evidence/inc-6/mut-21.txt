@@ -1,0 +1,511 @@
+# mutant M21  (CHKED-031 (E1))
+base_commit=98d94d724a72c56468292be123ff15f664acb4fa
+s19_app.__file__=<HOME>/work/s19_i6m_copy/s19_app/__init__.py
+mutation=s19_app/tui/app.py:7789
+--- pytest (mutant copy) ---
+bringing up nodes...
+bringing up nodes...
+
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+___________________ test_r_chked_040_spec_list[after-write] ____________________
+[gw3] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-291/popen-gw3/test_r_chked_040_spec_list_aft0')
+arm = 'after-write'
+
+    @pytest.mark.parametrize(
+        "arm", ["project", "after-write", "save-project", "project-load"]
+    )
+    def test_r_chked_040_spec_list(tmp_path: Path, arm: str) -> None:
+        """Cases R-CHKED-040/1 .. /3 and the project-load trigger of E3A-18.
+    
+        /1: in a project the Spec dropdown lists ``checks/k.chk.json`` then
+        ``library/w.chk.json``, both labelled `` CHECK``. /2: after a Write as
+        ``s1.chk.json`` it lists ``checks/k.chk.json``, ``checks/s1.chk.json``,
+        ``library/w.chk.json``. /3: after a Save project that creates the project,
+        with the Check Editor displayed: ``library/w.chk.json``. project-load: after
+        a project load with the Check Editor displayed: ``checks/k.chk.json``,
+        ``library/w.chk.json``.
+    
+        Negative control: the common-folder scan -> the project arms list
+        ``w.chk.json`` bare -> RED; no refill after a Save project or a project
+        load -> RED."""
+    
+        async def scenario(app, pilot, log):
+            write_doc(lib(app) / "w.chk.json", ENTRY_W, kind="check")
+            project = make_project(app.workarea)
+            write_doc(project / "checks" / "k.chk.json", ENTRIES_K, kind="check")
+            if arm in ("project", "after-write"):
+                await open_project_shipped(pilot, app)
+                await show_check_editor(pilot, app)
+                if arm == "project":
+                    select = spec_select(app)
+                    assert option_values(select) == ["checks/k.chk.json", "library/w.chk.json"]
+                    assert all(label.endswith(" CHECK") for label in option_labels(select)), (
+                        option_labels(select)
+                    )
+                else:
+                    await add_check_row(pilot, app)
+                    lines = await write_spec(pilot, app, log, "s1.chk.json")
+                    assert any(line.startswith("Check Editor: wrote s1.chk.json") for line in lines), lines
+                    assert option_values(spec_select(app)) == [
+                        "checks/k.chk.json",
+                        "checks/s1.chk.json",
+                        "library/w.chk.json",
+                    ]
+            else:
+                await load_image_fixture(pilot, app, app.base_dir)
+                await show_check_editor(pilot, app)
+                assert option_values(spec_select(app)) == ["w.chk.json"]
+                if arm == "save-project":
+                    await save_project_by_dialog(pilot, app, log, "new")
+                    expected = ["library/w.chk.json"]
+                else:
+                    await open_project_by_dialog(pilot, app)
+                    expected = ["checks/k.chk.json", "library/w.chk.json"]
+                assert spec_select(app).region.width > 0, "the Check Editor stayed displayed"
+                assert option_values(spec_select(app)) == expected
+            return True
+    
+>       assert run(tmp_path, scenario) is True
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+../s19_i6m/tests/test_b101_document_homes.py:892: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i6m/tests/test_b101_document_homes.py:142: in run
+    return projects.run_app(root, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f0b1060f650>
+
+    async def scenario(app, pilot, log):
+        write_doc(lib(app) / "w.chk.json", ENTRY_W, kind="check")
+        project = make_project(app.workarea)
+        write_doc(project / "checks" / "k.chk.json", ENTRIES_K, kind="check")
+        if arm in ("project", "after-write"):
+            await open_project_shipped(pilot, app)
+            await show_check_editor(pilot, app)
+            if arm == "project":
+                select = spec_select(app)
+                assert option_values(select) == ["checks/k.chk.json", "library/w.chk.json"]
+                assert all(label.endswith(" CHECK") for label in option_labels(select)), (
+                    option_labels(select)
+                )
+            else:
+                await add_check_row(pilot, app)
+                lines = await write_spec(pilot, app, log, "s1.chk.json")
+                assert any(line.startswith("Check Editor: wrote s1.chk.json") for line in lines), lines
+>               assert option_values(spec_select(app)) == [
+                    "checks/k.chk.json",
+                    "checks/s1.chk.json",
+                    "library/w.chk.json",
+                ]
+E               AssertionError: assert ['checks/k.ch...y/w.chk.json'] == ['checks/k.ch...y/w.chk.json']
+E                 
+E                 At index 1 diff: 'library/s1.chk.json' != 'checks/s1.chk.json'
+E                 Use -v to get more diff
+
+../s19_i6m/tests/test_b101_document_homes.py:873: AssertionError
+_____________________ test_r_chked_031_write_home[project] _____________________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-291/popen-gw0/test_r_chked_031_write_home_pr0')
+arm = 'project'
+
+    @pytest.mark.parametrize(
+        "arm", ["project", "no-project", "after-library-pick", "never-overwrites"]
+    )
+    def test_r_chked_031_write_home(tmp_path: Path, arm: str) -> None:
+        """Cases R-CHKED-031/1 .. /3, plus the free-name claim of revised D-3.
+    
+        /1: Write as ``s1.chk.json`` in a project -> ``proj/checks/s1.chk.json``
+        and no ``workarea/patches/s1.chk.json``. /2: with no project -> the common
+        folder. /3: after a pick of ``library/w.chk.json``, Write (Write as
+        ``w.chk.json``) -> ``proj/checks/w.chk.json``; ``workarea/patches/`` holds
+        only ``w.chk.json``, unchanged. never-overwrites: a ``checks/s1.chk.json``
+        that already exists keeps its bytes and the new spec takes another name.
+    
+        Negative control: Write without the check home -> the file lands in
+        ``workarea/patches/`` -> RED."""
+    
+        async def scenario(app, pilot, log):
+            if arm == "no-project":
+                await load_image_fixture(pilot, app, app.base_dir)
+            else:
+                project = make_project(app.workarea)
+                if arm == "after-library-pick":
+                    write_doc(lib(app) / "w.chk.json", ENTRY_W, kind="check")
+                if arm == "never-overwrites":
+                    write_doc(project / "checks" / "s1.chk.json", ENTRY_W, kind="check")
+                await open_project_shipped(pilot, app)
+            await show_check_editor(pilot, app)
+            if arm == "after-library-pick":
+                library_before = files_under(lib(app))
+                mark = len(log.messages)
+                await pick(pilot, app, "#check_spec_file_select", "library/w.chk.json")
+                await wait_line(
+                    pilot, log, mark, lambda line: line.startswith("Check Editor: loaded "),
+                    "the spec pick status",
+                )
+                lines = await write_spec(pilot, app, log, "w.chk.json")
+                assert "Check Editor: wrote w.chk.json (1 fields, kind=check)." in lines, lines
+                assert (app.workarea / "proj" / "checks" / "w.chk.json").is_file()
+                assert files_under(lib(app)) == library_before, "Write touched the library"
+                return True
+            await add_check_row(pilot, app)
+            before = files_under(app.workarea / "proj" / "checks") if arm == "never-overwrites" else {}
+            lines = await write_spec(pilot, app, log, "s1.chk.json")
+            assert any(line.startswith("Check Editor: wrote ") for line in lines), lines
+            if arm == "project":
+                assert (app.workarea / "proj" / "checks" / "s1.chk.json").is_file()
+                assert not (lib(app) / "s1.chk.json").exists()
+            elif arm == "no-project":
+                assert (lib(app) / "s1.chk.json").is_file()
+            else:
+                after = files_under(app.workarea / "proj" / "checks")
+                assert after["s1.chk.json"] == before["s1.chk.json"], "Write overwrote the spec"
+                assert len(after) == len(before) + 1, sorted(after)
+                assert not (lib(app) / "s1.chk.json").exists()
+            return True
+    
+>       assert run(tmp_path, scenario) is True
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+../s19_i6m/tests/test_b101_document_homes.py:800: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i6m/tests/test_b101_document_homes.py:142: in run
+    return projects.run_app(root, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f1e4a300550>
+
+    async def scenario(app, pilot, log):
+        if arm == "no-project":
+            await load_image_fixture(pilot, app, app.base_dir)
+        else:
+            project = make_project(app.workarea)
+            if arm == "after-library-pick":
+                write_doc(lib(app) / "w.chk.json", ENTRY_W, kind="check")
+            if arm == "never-overwrites":
+                write_doc(project / "checks" / "s1.chk.json", ENTRY_W, kind="check")
+            await open_project_shipped(pilot, app)
+        await show_check_editor(pilot, app)
+        if arm == "after-library-pick":
+            library_before = files_under(lib(app))
+            mark = len(log.messages)
+            await pick(pilot, app, "#check_spec_file_select", "library/w.chk.json")
+            await wait_line(
+                pilot, log, mark, lambda line: line.startswith("Check Editor: loaded "),
+                "the spec pick status",
+            )
+            lines = await write_spec(pilot, app, log, "w.chk.json")
+            assert "Check Editor: wrote w.chk.json (1 fields, kind=check)." in lines, lines
+            assert (app.workarea / "proj" / "checks" / "w.chk.json").is_file()
+            assert files_under(lib(app)) == library_before, "Write touched the library"
+            return True
+        await add_check_row(pilot, app)
+        before = files_under(app.workarea / "proj" / "checks") if arm == "never-overwrites" else {}
+        lines = await write_spec(pilot, app, log, "s1.chk.json")
+        assert any(line.startswith("Check Editor: wrote ") for line in lines), lines
+        if arm == "project":
+>           assert (app.workarea / "proj" / "checks" / "s1.chk.json").is_file()
+E           AssertionError: assert False
+E            +  where False = is_file()
+E            +    where is_file = (((PosixPath('/tmp/pytest-of-<USER>/pytest-291/popen-gw0/test_r_chked_031_write_home_pr0/app/.s19tool/workarea') / 'proj') / 'checks') / 's1.chk.json').is_file
+E            +      where PosixPath('/tmp/pytest-of-<USER>/pytest-291/popen-gw0/test_r_chked_031_write_home_pr0/app/.s19tool/workarea') = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}).workarea
+
+../s19_i6m/tests/test_b101_document_homes.py:789: AssertionError
+________________ test_r_chked_031_write_home[never-overwrites] _________________
+[gw2] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-291/popen-gw2/test_r_chked_031_write_home_ne0')
+arm = 'never-overwrites'
+
+    @pytest.mark.parametrize(
+        "arm", ["project", "no-project", "after-library-pick", "never-overwrites"]
+    )
+    def test_r_chked_031_write_home(tmp_path: Path, arm: str) -> None:
+        """Cases R-CHKED-031/1 .. /3, plus the free-name claim of revised D-3.
+    
+        /1: Write as ``s1.chk.json`` in a project -> ``proj/checks/s1.chk.json``
+        and no ``workarea/patches/s1.chk.json``. /2: with no project -> the common
+        folder. /3: after a pick of ``library/w.chk.json``, Write (Write as
+        ``w.chk.json``) -> ``proj/checks/w.chk.json``; ``workarea/patches/`` holds
+        only ``w.chk.json``, unchanged. never-overwrites: a ``checks/s1.chk.json``
+        that already exists keeps its bytes and the new spec takes another name.
+    
+        Negative control: Write without the check home -> the file lands in
+        ``workarea/patches/`` -> RED."""
+    
+        async def scenario(app, pilot, log):
+            if arm == "no-project":
+                await load_image_fixture(pilot, app, app.base_dir)
+            else:
+                project = make_project(app.workarea)
+                if arm == "after-library-pick":
+                    write_doc(lib(app) / "w.chk.json", ENTRY_W, kind="check")
+                if arm == "never-overwrites":
+                    write_doc(project / "checks" / "s1.chk.json", ENTRY_W, kind="check")
+                await open_project_shipped(pilot, app)
+            await show_check_editor(pilot, app)
+            if arm == "after-library-pick":
+                library_before = files_under(lib(app))
+                mark = len(log.messages)
+                await pick(pilot, app, "#check_spec_file_select", "library/w.chk.json")
+                await wait_line(
+                    pilot, log, mark, lambda line: line.startswith("Check Editor: loaded "),
+                    "the spec pick status",
+                )
+                lines = await write_spec(pilot, app, log, "w.chk.json")
+                assert "Check Editor: wrote w.chk.json (1 fields, kind=check)." in lines, lines
+                assert (app.workarea / "proj" / "checks" / "w.chk.json").is_file()
+                assert files_under(lib(app)) == library_before, "Write touched the library"
+                return True
+            await add_check_row(pilot, app)
+            before = files_under(app.workarea / "proj" / "checks") if arm == "never-overwrites" else {}
+            lines = await write_spec(pilot, app, log, "s1.chk.json")
+            assert any(line.startswith("Check Editor: wrote ") for line in lines), lines
+            if arm == "project":
+                assert (app.workarea / "proj" / "checks" / "s1.chk.json").is_file()
+                assert not (lib(app) / "s1.chk.json").exists()
+            elif arm == "no-project":
+                assert (lib(app) / "s1.chk.json").is_file()
+            else:
+                after = files_under(app.workarea / "proj" / "checks")
+                assert after["s1.chk.json"] == before["s1.chk.json"], "Write overwrote the spec"
+                assert len(after) == len(before) + 1, sorted(after)
+                assert not (lib(app) / "s1.chk.json").exists()
+            return True
+    
+>       assert run(tmp_path, scenario) is True
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+../s19_i6m/tests/test_b101_document_homes.py:800: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i6m/tests/test_b101_document_homes.py:142: in run
+    return projects.run_app(root, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7fea76ef2a90>
+
+    async def scenario(app, pilot, log):
+        if arm == "no-project":
+            await load_image_fixture(pilot, app, app.base_dir)
+        else:
+            project = make_project(app.workarea)
+            if arm == "after-library-pick":
+                write_doc(lib(app) / "w.chk.json", ENTRY_W, kind="check")
+            if arm == "never-overwrites":
+                write_doc(project / "checks" / "s1.chk.json", ENTRY_W, kind="check")
+            await open_project_shipped(pilot, app)
+        await show_check_editor(pilot, app)
+        if arm == "after-library-pick":
+            library_before = files_under(lib(app))
+            mark = len(log.messages)
+            await pick(pilot, app, "#check_spec_file_select", "library/w.chk.json")
+            await wait_line(
+                pilot, log, mark, lambda line: line.startswith("Check Editor: loaded "),
+                "the spec pick status",
+            )
+            lines = await write_spec(pilot, app, log, "w.chk.json")
+            assert "Check Editor: wrote w.chk.json (1 fields, kind=check)." in lines, lines
+            assert (app.workarea / "proj" / "checks" / "w.chk.json").is_file()
+            assert files_under(lib(app)) == library_before, "Write touched the library"
+            return True
+        await add_check_row(pilot, app)
+        before = files_under(app.workarea / "proj" / "checks") if arm == "never-overwrites" else {}
+        lines = await write_spec(pilot, app, log, "s1.chk.json")
+        assert any(line.startswith("Check Editor: wrote ") for line in lines), lines
+        if arm == "project":
+            assert (app.workarea / "proj" / "checks" / "s1.chk.json").is_file()
+            assert not (lib(app) / "s1.chk.json").exists()
+        elif arm == "no-project":
+            assert (lib(app) / "s1.chk.json").is_file()
+        else:
+            after = files_under(app.workarea / "proj" / "checks")
+            assert after["s1.chk.json"] == before["s1.chk.json"], "Write overwrote the spec"
+>           assert len(after) == len(before) + 1, sorted(after)
+E           AssertionError: ['s1.chk.json']
+E           assert 1 == (1 + 1)
+E            +  where 1 = len({'s1.chk.json': b'{\n  "format": "s19app-changeset",\n  "version": "2.0",\n  "kind": "check",\n  "encoding": "utf-8",\...",\n  "entries": [\n    {\n      "type": "bytes",\n      "address": "0x00008000",\n      "bytes": "00"\n    }\n  ]\n}'})
+E            +  and   1 = len({'s1.chk.json': b'{\n  "format": "s19app-changeset",\n  "version": "2.0",\n  "kind": "check",\n  "encoding": "utf-8",\...",\n  "entries": [\n    {\n      "type": "bytes",\n      "address": "0x00008000",\n      "bytes": "00"\n    }\n  ]\n}'})
+
+../s19_i6m/tests/test_b101_document_homes.py:796: AssertionError
+_______________ test_r_chked_031_write_home[after-library-pick] ________________
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-291/popen-gw1/test_r_chked_031_write_home_af0')
+arm = 'after-library-pick'
+
+    @pytest.mark.parametrize(
+        "arm", ["project", "no-project", "after-library-pick", "never-overwrites"]
+    )
+    def test_r_chked_031_write_home(tmp_path: Path, arm: str) -> None:
+        """Cases R-CHKED-031/1 .. /3, plus the free-name claim of revised D-3.
+    
+        /1: Write as ``s1.chk.json`` in a project -> ``proj/checks/s1.chk.json``
+        and no ``workarea/patches/s1.chk.json``. /2: with no project -> the common
+        folder. /3: after a pick of ``library/w.chk.json``, Write (Write as
+        ``w.chk.json``) -> ``proj/checks/w.chk.json``; ``workarea/patches/`` holds
+        only ``w.chk.json``, unchanged. never-overwrites: a ``checks/s1.chk.json``
+        that already exists keeps its bytes and the new spec takes another name.
+    
+        Negative control: Write without the check home -> the file lands in
+        ``workarea/patches/`` -> RED."""
+    
+        async def scenario(app, pilot, log):
+            if arm == "no-project":
+                await load_image_fixture(pilot, app, app.base_dir)
+            else:
+                project = make_project(app.workarea)
+                if arm == "after-library-pick":
+                    write_doc(lib(app) / "w.chk.json", ENTRY_W, kind="check")
+                if arm == "never-overwrites":
+                    write_doc(project / "checks" / "s1.chk.json", ENTRY_W, kind="check")
+                await open_project_shipped(pilot, app)
+            await show_check_editor(pilot, app)
+            if arm == "after-library-pick":
+                library_before = files_under(lib(app))
+                mark = len(log.messages)
+                await pick(pilot, app, "#check_spec_file_select", "library/w.chk.json")
+                await wait_line(
+                    pilot, log, mark, lambda line: line.startswith("Check Editor: loaded "),
+                    "the spec pick status",
+                )
+                lines = await write_spec(pilot, app, log, "w.chk.json")
+                assert "Check Editor: wrote w.chk.json (1 fields, kind=check)." in lines, lines
+                assert (app.workarea / "proj" / "checks" / "w.chk.json").is_file()
+                assert files_under(lib(app)) == library_before, "Write touched the library"
+                return True
+            await add_check_row(pilot, app)
+            before = files_under(app.workarea / "proj" / "checks") if arm == "never-overwrites" else {}
+            lines = await write_spec(pilot, app, log, "s1.chk.json")
+            assert any(line.startswith("Check Editor: wrote ") for line in lines), lines
+            if arm == "project":
+                assert (app.workarea / "proj" / "checks" / "s1.chk.json").is_file()
+                assert not (lib(app) / "s1.chk.json").exists()
+            elif arm == "no-project":
+                assert (lib(app) / "s1.chk.json").is_file()
+            else:
+                after = files_under(app.workarea / "proj" / "checks")
+                assert after["s1.chk.json"] == before["s1.chk.json"], "Write overwrote the spec"
+                assert len(after) == len(before) + 1, sorted(after)
+                assert not (lib(app) / "s1.chk.json").exists()
+            return True
+    
+>       assert run(tmp_path, scenario) is True
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+../s19_i6m/tests/test_b101_document_homes.py:800: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i6m/tests/test_b101_document_homes.py:142: in run
+    return projects.run_app(root, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f50f854f2d0>
+
+    async def scenario(app, pilot, log):
+        if arm == "no-project":
+            await load_image_fixture(pilot, app, app.base_dir)
+        else:
+            project = make_project(app.workarea)
+            if arm == "after-library-pick":
+                write_doc(lib(app) / "w.chk.json", ENTRY_W, kind="check")
+            if arm == "never-overwrites":
+                write_doc(project / "checks" / "s1.chk.json", ENTRY_W, kind="check")
+            await open_project_shipped(pilot, app)
+        await show_check_editor(pilot, app)
+        if arm == "after-library-pick":
+            library_before = files_under(lib(app))
+            mark = len(log.messages)
+            await pick(pilot, app, "#check_spec_file_select", "library/w.chk.json")
+            await wait_line(
+                pilot, log, mark, lambda line: line.startswith("Check Editor: loaded "),
+                "the spec pick status",
+            )
+            lines = await write_spec(pilot, app, log, "w.chk.json")
+>           assert "Check Editor: wrote w.chk.json (1 fields, kind=check)." in lines, lines
+E           AssertionError: ['Check Editor: wrote w.chk_1.json (1 fields, kind=check).']
+E           assert 'Check Editor: wrote w.chk.json (1 fields, kind=check).' in ['Check Editor: wrote w.chk_1.json (1 fields, kind=check).']
+
+../s19_i6m/tests/test_b101_document_homes.py:780: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_document_homes.py::test_r_chked_040_spec_list[after-write]
+FAILED tests/test_b101_document_homes.py::test_r_chked_031_write_home[project]
+FAILED tests/test_b101_document_homes.py::test_r_chked_031_write_home[never-overwrites]
+FAILED tests/test_b101_document_homes.py::test_r_chked_031_write_home[after-library-pick]
+4 failed in 7.29s
+

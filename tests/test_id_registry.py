@@ -179,7 +179,11 @@ from tools.id_registry import (
 # batch-101 Inc 16 (on main after Inc 4): 262 -> 263, measured (tests/test_b101_doc_hygiene.py).
 # batch-101 Inc 5: 263 -> 265 at its merge (tests/test_b101_designer_writes.py,
 # tests/test_b101_check_spec_keep.py); re-measured by the merge verification.
-EXPECTED_SCANNED_TEST_FILES = 265
+# batch-101 Inc 6: 265 -> 267, measured at E4 integration (tests/test_b101_patch_lifecycle.py,
+# tests/test_b101_document_homes.py).
+# batch-101 Inc 9: 267 -> 269, measured at E4 integration (tests/test_b101_flow_saves.py,
+# tests/test_b101_flow_names_ui.py).
+EXPECTED_SCANNED_TEST_FILES = 269
 """Test modules scanned, including this one.
 
 batch-101 Inc 11: 250 -> 253. ``tests/test_b101_a2l_blocks_and_segments.py``,

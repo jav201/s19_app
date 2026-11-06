@@ -1415,9 +1415,11 @@ def test_at030a_dropdown_lists_and_loads_selected_change_file(
     (``request_action("save_doc")`` — Inc1's path into ``patches/``, NOT the
     save-back image writer), each with a DISTINCT distinguishing entry (file #1
     holds only 0x100, file #2 holds only 0x200). Re-open the patch editor,
-    assert ``#patch_doc_file_select`` lists BOTH names, then select the SECOND
-    BY KNOWN FILENAME (read from disk — not positional index) and assert the
-    editor's active change document now holds file #2's distinguishing entry
+    assert ``#patch_doc_file_select`` lists BOTH names, exactly and sorted,
+    then select the SECOND BY KNOWN FILENAME (read from disk — not positional
+    index) and assert the editor's active change document is that file —
+    source exactly ``workarea/patches/<name>`` (batch-101 Inc 6 E5 C-4, case
+    R-PATCH-DOC-DROPDOWN-001.3/2) — and holds file #2's distinguishing entry
     (0x200), not file #1's (0x100), not a dummy. Sub-assertion (F-Q4/R2): a
     save performed WHILE the patch screen is open appears in the dropdown
     without re-activation.
@@ -1430,7 +1432,7 @@ def test_at030a_dropdown_lists_and_loads_selected_change_file(
 
     patches = tmp_path / ".s19tool" / "workarea" / "patches"
 
-    async def _drive() -> tuple[list[str], int]:
+    async def _drive() -> tuple[list[str], int, Optional[Path]]:
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(120, 40)) as pilot:
             await pilot.pause()
@@ -1468,24 +1470,38 @@ def test_at030a_dropdown_lists_and_loads_selected_change_file(
             # Select file #2 BY KNOWN FILENAME (the name holding only 0x200).
             second_name = _name_holding_address(patches, 0x200)
             select.value = second_name
-            await pilot.pause()
 
+            def _source() -> Optional[Path]:
+                return app._change_service.document.source_path
+
+            await settled(
+                pilot,
+                lambda: _source() is not None and Path(_source()).name == second_name,
+                f"the pick of {second_name} as the document",
+            )
             active_addresses = [
                 entry.address
                 for entry in app._change_service.document.entries
             ]
-            return options, active_addresses[0] if active_addresses else -1
+            return (
+                options,
+                active_addresses[0] if active_addresses else -1,
+                _source(),
+            )
 
-    options, loaded_address = asyncio.run(_drive())
+    options, loaded_address, source = asyncio.run(_drive())
     # Sanity: both saves landed as distinct on-disk files.
     saved = sorted(p.name for p in patches.glob("*.json"))
     assert len(saved) == 2, f"expected two saved change files, found {saved}"
 
-    # The dropdown lists BOTH files, sorted deterministically.
-    assert set(options) == set(saved), (
-        f"dropdown options {options} must list both saved files {saved}"
+    # The dropdown lists BOTH files, exactly and sorted deterministically.
+    assert options == saved, (
+        f"dropdown options {options} must be exactly the saved files {saved}"
     )
-    assert options == sorted(options), "dropdown options must be sorted"
+
+    # The pick's document is the common folder's file, spelled from the work
+    # area (R-PATCH-DOC-DROPDOWN-001.3/2).
+    assert source == patches / _name_holding_address(patches, 0x200), source
 
     # Selecting file #2 by known filename loads ITS distinguishing entry.
     assert loaded_address == 0x200, (

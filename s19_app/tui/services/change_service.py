@@ -853,6 +853,12 @@ class ChangeService:
         #: drive ``CheckRunEntry.linkage``, NOT ``.result``; the glyph renders
         #: ``.result`` only, so they are deliberately NOT covered.
         self._last_check_stamp: Optional[Tuple[object, int]] = None
+        #: The status message the most recent check run returned (the
+        #: ``ChangeActionResult.message`` of :meth:`run_checks`), kept beside
+        #: the provenance stamp so :meth:`check_status_line` can show it ONLY
+        #: while that run is still current (Inc 6, R-CHK-PE-010). Empty before
+        #: any run and whenever the run is no longer current.
+        self._last_check_message: str = ""
         #: The change-set undo history (US-068a / LLR-068a.1): a bounded stack
         #: of DEEP-COPY :class:`ChangeDocument` snapshots, each captured
         #: immediately before a document-mutating operation. :meth:`undo` pops
@@ -2665,7 +2671,8 @@ class ChangeService:
         Data Flow:
             - Call ``check_runner(document, mem_map, ranges, mac_records,
               a2l_tags)``; store the result; read its ``aggregates``
-              mapping for the status counts.
+              mapping for the status counts; store the composed status
+              message in ``_last_check_message`` for :meth:`check_status_line`.
 
         Dependencies:
             Uses:
@@ -2700,23 +2707,130 @@ class ChangeService:
         # counts still follow so report consumers keep their anchors.
         blocked_reason = getattr(result, "run_blocked_reason", None)
         if blocked_reason:
+            message = (
+                f"Checks: not run — {blocked_reason} "
+                f"({passed} passed, {failed} failed, "
+                f"{uncheckable} uncheckable)"
+            )
+            self._last_check_message = message
             return ChangeActionResult(
-                message=(
-                    f"Checks: not run — {blocked_reason} "
-                    f"({passed} passed, {failed} failed, "
-                    f"{uncheckable} uncheckable)"
-                ),
+                message=message,
                 issues=list(getattr(result, "issues", []) or []),
                 ok=False,
             )
+        message = (
+            f"Checks: {passed} passed, {failed} failed, "
+            f"{uncheckable} uncheckable"
+        )
+        self._last_check_message = message
         return ChangeActionResult(
-            message=(
-                f"Checks: {passed} passed, {failed} failed, "
-                f"{uncheckable} uncheckable"
-            ),
+            message=message,
             issues=list(getattr(result, "issues", []) or []),
             ok=failed == 0,
         )
+
+    def check_run_is_current(self) -> bool:
+        """
+        Summary:
+            Report whether the stored check result still describes the live
+            document and the live image — the single "current run" gate every
+            reader shares (Inc 6, I-1). The result is current only while it
+            exists AND its two-part provenance stamp (document signature,
+            image generation) still equals the live values. A document
+            mutation, an image load, a MAC load or a project load changes one
+            stamp part and therefore ends the run; an in-place write of the
+            image's bytes ends it through :meth:`end_check_run`.
+
+        Returns:
+            bool: ``True`` while :attr:`last_check_result` is not ``None`` and
+            :attr:`_last_check_stamp` equals ``(_document_signature(),
+            image_generation)``; ``False`` before any run, after ``undo`` /
+            ``redo`` / :meth:`end_check_run`, and on any stamp mismatch.
+
+        Data Flow:
+            - Compare the stored two-part stamp against the live
+              ``_document_signature()`` and ``image_generation``.
+
+        Dependencies:
+            Uses:
+                - _document_signature
+            Used by:
+                - check_status_line / check_aggregates / _check_glyphs
+                - app.py ``_refresh_patch_checks_tab`` and ``update_checks_view``
+
+        Example:
+            >>> service = ChangeService()
+            >>> service.check_run_is_current()
+            False
+        """
+        return (
+            self.last_check_result is not None
+            and self._last_check_stamp
+            == (self._document_signature(), self.image_generation)
+        )
+
+    def check_status_line(self) -> str:
+        """
+        Summary:
+            Return the message the most recent check run returned — but ONLY
+            while that run is still current (Inc 6, I-2). This is the one
+            status source for the Checks tab when no result is current: an
+            empty line tells the panel to paint the no-run state.
+
+        Returns:
+            str: ``_last_check_message`` while :meth:`check_run_is_current`;
+            the empty string otherwise (before any run, after a load, an
+            in-place write, or ``undo`` / ``redo``).
+
+        Data Flow:
+            - Gate on :meth:`check_run_is_current`; read
+              ``_last_check_message``.
+
+        Dependencies:
+            Uses:
+                - check_run_is_current
+            Used by:
+                - app.py ``_refresh_patch_checks_tab``
+
+        Example:
+            >>> service = ChangeService()
+            >>> service.check_status_line()
+            ''
+        """
+        if self.check_run_is_current():
+            return self._last_check_message
+        return ""
+
+    def end_check_run(self) -> None:
+        """
+        Summary:
+            End the current check run without touching the document, journal
+            or provenance stamp (Inc 6, I-7). This is the reset an in-place
+            write of the loaded image's bytes needs: the bytes the run read no
+            longer describe the image, so the run must not be shown again.
+            Idempotent — ending an already-ended (or never-started) run
+            changes nothing.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Set ``last_check_result = None`` and ``_last_check_message = ""``.
+              The next :meth:`run_checks` starts a fresh run.
+
+        Dependencies:
+            Used by:
+                - app.py ``_note_image_bytes_written`` (the Inc 5 in-place-write
+                  seam, node #33)
+
+        Example:
+            >>> service = ChangeService()
+            >>> service.end_check_run()
+            >>> service.check_run_is_current()
+            False
+        """
+        self.last_check_result = None
+        self._last_check_message = ""
 
     def check_aggregates(self) -> dict[str, int]:
         """
@@ -2734,17 +2848,19 @@ class ChangeService:
 
         Data Flow:
             - Read ``last_check_result.aggregates``; coerce each key to
-              ``int``. ``last_check_result is None`` — no run yet, or an
-              ``undo``/``redo`` reset it (``:538`` / ``:570``) — yields the
-              all-zero mapping, which is how the strip CLEARS: it rides the
-              EXISTING reset rather than re-implementing invalidation.
+              ``int``. ``not check_run_is_current()`` — no run yet, a stale
+              provenance stamp, or an ``undo``/``redo`` / ``end_check_run``
+              reset — yields the all-zero mapping, which is how the strip
+              CLEARS: it rides the EXISTING reset rather than re-implementing
+              invalidation.
             - The cleared mapping is deliberately indistinguishable from a
               0-entry run's aggregates: both are honestly "nothing passed,
               nothing failed, nothing was uncheckable".
 
         Dependencies:
             Uses:
-                - CHECK_AGGREGATE_KEYS ; self.last_check_result
+                - CHECK_AGGREGATE_KEYS ; check_run_is_current ;
+                  self.last_check_result
             Used by:
                 - app.py, threaded into
                   ``PatchEditorPanel.refresh_check_results`` at BOTH call
@@ -2756,9 +2872,9 @@ class ChangeService:
             >>> service.check_aggregates()
             {'passed': 0, 'failed': 0, 'uncheckable': 0}
         """
-        result = self.last_check_result
-        if result is None:
+        if not self.check_run_is_current():
             return {key: 0 for key in CHECK_AGGREGATE_KEYS}
+        result = self.last_check_result
         aggregates = getattr(result, "aggregates", None) or {}
         return {key: int(aggregates.get(key, 0)) for key in CHECK_AGGREGATE_KEYS}
 
@@ -2993,13 +3109,14 @@ class ChangeService:
             :data:`GLYPH_NO_RESULT` for every row (the honest degradation).
 
         Data Flow:
-            - Refuse on ``last_check_result is None`` or on a stamp mismatch.
+            - Refuse while :meth:`check_run_is_current` is ``False`` (no
+              result, or the stamp no longer matches the live inputs).
             - Otherwise map each record's ``result`` token through
               ``_CHECK_RESULT_GLYPH``; an unrecognised token → ``◐``.
 
         Dependencies:
             Uses:
-                - _document_signature / _CHECK_RESULT_GLYPH
+                - check_run_is_current / _CHECK_RESULT_GLYPH
             Used by:
                 - rows
 
@@ -3008,10 +3125,7 @@ class ChangeService:
             []
         """
         result = self.last_check_result
-        if result is None:
-            return []
-        live_stamp = (self._document_signature(), self.image_generation)
-        if self._last_check_stamp != live_stamp:
+        if not self.check_run_is_current():
             return []
         return [
             _CHECK_RESULT_GLYPH.get(

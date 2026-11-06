@@ -1,0 +1,174 @@
+# mutant M28  (CHKS-009/2, -004/2 (effective control))
+base_commit=98d94d724a72c56468292be123ff15f664acb4fa
+s19_app.__file__=<HOME>/work/s19_i6m_copy/s19_app/__init__.py
+mutation=s19_app/tui/app.py:13994
+--- pytest (mutant copy) ---
+bringing up nodes...
+bringing up nodes...
+
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+__________________ test_r_chks_009_zero_line_while_displayed ___________________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-305/popen-gw0/test_r_chks_009_zero_line_whil0')
+
+    def test_r_chks_009_zero_line_while_displayed(tmp_path: Path) -> None:
+        """R-CHKS-009/2: the Checks screen stays displayed while a project loads
+        through the Load dialog (key ``p``); once the project is installed and the
+        load-result panel is closed, the aggregate line reads zero without
+        reopening the screen. Base: ``Pass 1 / Fail 1 / Uncheck 0``. Deviation from
+        E3A-16 (no variant): a project must hold a data or A2L file, and an A2L-only
+        project installs no image, so the Checks content is hidden (empty state) and
+        nothing is painted to read; the variant's project is used, and base still
+        shows the stale line."""
+    
+        async def scenario(app, pilot, log):
+            make_project(app)
+            await checks_ready(app, pilot, log, tmp_path)
+            await open_checks_screen(pilot, app)
+            await settled(pilot, lambda: checks_strip_text(app).startswith("Pass 1 / Fail 1"), "the run's aggregate line")
+            await ld.open_project_through_dialog(pilot, app, "proj")
+            await settled(
+                pilot,
+                lambda: app.current_project == "proj" and app._last_load_announcement is not None,
+                "the project-load summary",
+            )
+            await projects.dismiss_load_result_panel(pilot, app)
+            for _ in range(4):
+                await pilot.pause()
+            await settled(pilot, lambda: checks_strip_text(app) == ZERO_LINE, f"the zero line (now {checks_strip_text(app)!r})", timeout=GONE)
+    
+>       projects.run_app(tmp_path, scenario, size=SIZE)
+
+../s19_i6m/tests/test_b101_patch_lifecycle.py:801: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i6m/tests/test_b101_patch_lifecycle.py:799: in scenario
+    await settled(pilot, lambda: checks_strip_text(app) == ZERO_LINE, f"the zero line (now {checks_strip_text(app)!r})", timeout=GONE)
+tests/b97_probes.py:326: in settled
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_r_chks_009_zero_line_while_displayed.<locals>.scenario.<locals>.<lambda> at 0x7f61e70d72e0>
+failure = "did not settle: the zero line (now 'Pass 1 / Fail 1 / Uncheck 0 ████░░░░')"
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: did not settle: the zero line (now 'Pass 1 / Fail 1 / Uncheck 0 ████░░░░')
+
+tests/support/timing.py:66: AssertionError
+_____________________ test_r_chks_004_note_while_displayed _____________________
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-305/popen-gw1/test_r_chks_004_note_while_dis0')
+
+    def test_r_chks_004_note_while_displayed(tmp_path: Path) -> None:
+        """R-CHKS-004/2: the Checks screen stays displayed while another image
+        loads; once the load's file status is painted the note is painted without
+        reopening the screen, and no group header. Base: the groups stay."""
+    
+        async def scenario(app, pilot, log):
+            await checks_ready(app, pilot, log, tmp_path)
+            await open_checks_screen(pilot, app)
+            await settled(pilot, lambda: "✗ FAILED (1)" in checks_screen_text(app) and "✓ PASSED (1)" in checks_screen_text(app), "both groups")
+            mark = len(log.messages)
+            await load_image_through_dialog(pilot, app, write_image(tmp_path / "img2.s19", fill=0x40))
+            await settled(pilot, lambda: any(m.startswith("Loaded img2.s19") for m in log.since(mark)), "the load's file status")
+            await settled(pilot, lambda: NO_RUN_NOTE in checks_screen_text(app), "the note without reopening", timeout=GONE)
+            assert "FAILED" not in checks_screen_text(app)
+    
+>       projects.run_app(tmp_path, scenario, size=SIZE)
+
+../s19_i6m/tests/test_b101_patch_lifecycle.py:759: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i6m/tests/test_b101_patch_lifecycle.py:756: in scenario
+    await settled(pilot, lambda: NO_RUN_NOTE in checks_screen_text(app), "the note without reopening", timeout=GONE)
+tests/b97_probes.py:326: in settled
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_r_chks_004_note_while_displayed.<locals>.scenario.<locals>.<lambda> at 0x7fad8adfb6a0>
+failure = 'did not settle: the note without reopening'
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: did not settle: the note without reopening
+
+tests/support/timing.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chks_009_zero_line_while_displayed
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chks_004_note_while_displayed
+2 failed in 19.51s
+

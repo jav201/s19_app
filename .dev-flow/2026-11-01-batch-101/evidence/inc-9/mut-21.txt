@@ -1,0 +1,58 @@
+base commit (origin/main): e07fb00f9fc13afd314d0334fac683fe33b29b6c
+applied-tree head: b204c7d44a42383f2a7c63295280b0a4b7f3ad58
+mutant: M21 — E4-R1 (re-resolved home)
+
+--- mutation (diff) ---
+--- a/s19_app/tui/services/flow_persistence_service.py
++++ b/s19_app/tui/services/flow_persistence_service.py
+@@ -1111,7 +1111,7 @@
+         if not (
+             owned
+             and not _is_reparse_point(candidate)
+-            and Path(os.path.realpath(candidate)).parent == resolved_home
++            and contained_in_workarea(Path(os.path.realpath(candidate)), resolved_home)
+         ):
+             os.close(fd)
+             if owned:
+--- a/s19_app/tui/services/flow_persistence_service.py
++++ b/s19_app/tui/services/flow_persistence_service.py
+@@ -87,6 +87,7 @@
+ )
+ from ..workspace import (
+     WorkareaContainmentError,
++    contained_in_workarea,
+     _guarded_destination,
+     _is_reparse_point,
+     copy_into_workarea,
+
+--- s19_app.__file__ (from inside the copy) ---
+<HOME>/work/s19_i9mut_m21/s19_app/__init__.py
+
+--- pytest ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______________ test_r_flow_file_14_5_swapped_home_gets_no_byte ________________
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-386/test_r_flow_file_14_5_swapped_0/.s19tool/workarea'), PosixPath('/tmp/py...apped_0/.s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-386/test_r_flow_file_14_5_swapped_0/outside'))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fd2e5df6f90>
+
+    def test_r_flow_file_14_5_swapped_home_gets_no_byte(area, monkeypatch):
+        """R-FLOW-FILE.14/5 (E3 R2-1): a home swapped for a link after the name check gets no byte.
+    
+        Under the swap the created file is regular and the same file as the
+        descriptor, so only the real-path clause of the check after the claim
+        refuses it. The swap puts in a directory symbolic link (``os.symlink``):
+        it runs on Linux, and on Windows only where that link is permitted.
+        """
+        _root, project, outside = area
+        home = project / "flows"
+        home.mkdir()
+        _swap_home_for_link(monkeypatch, home, project / "flows_aside", outside)
+>       with pytest.raises(WorkareaContainmentError):
+E       Failed: DID NOT RAISE <class 's19_app.tui.workspace.WorkareaContainmentError'>
+
+../s19_i9mut/tests/test_b101_flow_saves.py:359: Failed
+=========================== short test summary info ============================
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_5_swapped_home_gets_no_byte
+1 failed in 0.22s
+

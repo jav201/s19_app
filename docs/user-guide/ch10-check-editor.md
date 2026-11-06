@@ -20,7 +20,8 @@ the image.
 - **REPORT FIELDS** (right) — tabs **Fields**, **JSON**, **Addendum**; the field
   lines; **MEMORY LOCATIONS** with *Address*, *Label*, *Size (bytes)*, **Add row**,
   **Remove row**.
-- Bottom — *Spec* dropdown (check specs in the patches folder), *Write as* (file
+- Bottom — *Spec* dropdown (the project's check specs, then the common library's
+  `library/<n>`; without a project, the common patches folder), *Write as* (file
   name), **Validate**, **Write .chk.json**, a struck-through *APPLY — not
   available*, and the glyph legend.
 - Header: `?` and **📂 Open patches/** (without a project the specs live in the

@@ -274,6 +274,12 @@ def test_tc084_3_update_checks_view_groups_and_aggregates(tmp_path: Path) -> Non
             await pilot.pause()
             _load_image(app, s19_path)
             app._change_service.last_check_result = result
+            # Inc 6 (R-CHKS-001): a run is shown only while it is current, so the
+            # injected run carries the provenance stamp a real run leaves.
+            app._change_service._last_check_stamp = (
+                app._change_service._document_signature(),
+                app._change_service.image_generation,
+            )
             await pilot.press("9")
             await pilot.pause()
             panel = app.query_one("#checks_grouped", GroupedChecksPanel)
@@ -649,6 +655,12 @@ def test_at084g_hostile_input_renders_literal(tmp_path: Path) -> None:
             await pilot.pause()
             _load_image(app, s19_path)
             app._change_service.last_check_result = result
+            # Inc 6 (R-CHKS-001): a run is shown only while it is current, so the
+            # injected run carries the provenance stamp a real run leaves.
+            app._change_service._last_check_stamp = (
+                app._change_service._document_signature(),
+                app._change_service.image_generation,
+            )
             await pilot.press("9")
             await pilot.pause()
             panel = app.query_one("#checks_grouped", GroupedChecksPanel)

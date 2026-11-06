@@ -1,0 +1,382 @@
+e07fb00f9fc13afd314d0334fac683fe33b29b6c
+<HOME>/work/s19_i9t1/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+FFFF.FFFF.FFFFFF.FFFF.FF                                                 [100%]
+=================================== FAILURES ===================================
+_______________ test_r_flow_file_12_2_clash_file_holds_its_stem ________________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_file_12_2_clash_fi0/.s19tool/workarea'), PosixPath...s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_file_12_2_clash_fi0/outside'))
+
+    def test_r_flow_file_12_2_clash_file_holds_its_stem(area):
+        """R-FLOW-FILE.12/2: a clash file holds its own stem as its name."""
+        _root, project, _out = area
+        (project / "flows").mkdir()
+        (project / "flows" / "tune_b.json").write_text("{}", encoding="utf-8")
+        saved = save_flow_json(Flow(name="tune_a", blocks=[SourceBlock("prg.s19")]), "tune_b", project)
+        assert saved is not None and saved.stem != "tune_b"
+        assert saved.stem.startswith("tune_b")
+>       assert _name_in(saved) == saved.stem
+E       AssertionError: assert 'tune_a' == 'tune_b_2'
+E         
+E         - tune_b_2
+E         + tune_a
+
+tests/test_b101_flow_saves.py:132: AssertionError
+________________ test_r_flow_file_12_3_cleaned_name_is_written _________________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_file_12_3_cleaned_0/.s19tool/workarea'), PosixPath...s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_file_12_3_cleaned_0/outside'))
+
+    def test_r_flow_file_12_3_cleaned_name_is_written(area):
+        """R-FLOW-FILE.12/3: a cleaned typed name is the file stem and the name."""
+        _root, project, _out = area
+        saved = save_flow_json(F1, "Nightly Release!  ", project)
+        assert saved == project / "flows" / "NightlyRelease.json"
+>       assert _name_in(saved) == "NightlyRelease"
+E       AssertionError: assert 'a' == 'NightlyRelease'
+E         
+E         - NightlyRelease
+E         + a
+
+tests/test_b101_flow_saves.py:140: AssertionError
+__________________ test_r_flow_file_12_4_stem_of_64_is_whole ___________________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_file_12_4_stem_of_0/.s19tool/workarea'), PosixPath...s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_file_12_4_stem_of_0/outside'))
+
+    def test_r_flow_file_12_4_stem_of_64_is_whole(area):
+        """R-FLOW-FILE.12/4: a 64-character stem is written whole and loads clean."""
+        _root, project, _out = area
+        saved = save_flow_json(F1, "A" * 64, project)
+        assert saved.stem == "A" * 64
+>       assert _name_in(saved) == "A" * 64
+E       AssertionError: assert 'a' == 'AAAAAAAAAAAA...AAAAAAAAAAAAA'
+E         
+E         - AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+E         + a
+
+tests/test_b101_flow_saves.py:148: AssertionError
+_________________ test_r_flow_file_13_1_long_stem_is_cut_to_64 _________________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_file_13_1_long_ste0/.s19tool/workarea'), PosixPath...s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_file_13_1_long_ste0/outside'))
+
+    def test_r_flow_file_13_1_long_stem_is_cut_to_64(area):
+        """R-FLOW-FILE.13/1: a 65-character stem names the file whole, the name is cut to 64."""
+        _root, project, _out = area
+        saved = save_flow_json(F1, "B" * 65, project)
+        assert saved == project / "flows" / ("B" * 65 + ".json")
+>       assert _name_in(saved) == "B" * 64
+E       AssertionError: assert 'a' == 'BBBBBBBBBBBB...BBBBBBBBBBBBB'
+E         
+E         - BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
+E         + a
+
+tests/test_b101_flow_saves.py:158: AssertionError
+__________________ test_r_flow_file_13_2_clash_suffix_is_cut ___________________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_file_13_2_clash_su0/.s19tool/workarea'), PosixPath...s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_file_13_2_clash_su0/outside'))
+
+    def test_r_flow_file_13_2_clash_suffix_is_cut(area):
+        """R-FLOW-FILE.13/2: when a clash suffix makes the stem longer than 64, the name is still cut."""
+        _root, project, _out = area
+        (project / "flows").mkdir()
+        (project / "flows" / ("C" * 64 + ".json")).write_text("{}", encoding="utf-8")
+        saved = save_flow_json(F1, "C" * 64, project)
+        assert saved.stem.startswith("C" * 64) and len(saved.stem) > 64
+>       assert _name_in(saved) == "C" * 64
+E       AssertionError: assert 'a' == 'CCCCCCCCCCCC...CCCCCCCCCCCCC'
+E         
+E         - CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+E         + a
+
+tests/test_b101_flow_saves.py:185: AssertionError
+_________________ test_r_flow_set_9_1_cleaned_name_is_written __________________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_set_9_1_cleaned_na0/.s19tool/workarea'), PosixPath...s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_set_9_1_cleaned_na0/outside'))
+
+    def test_r_flow_set_9_1_cleaned_name_is_written(area):
+        """R-FLOW-SET.9/1: a saved set holds its cleaned file stem as its name."""
+        _root, project, _out = area
+        saved = save_chain_set(replace(C1, name="Nightly Set!"), "Nightly Set!  ", project)
+        assert saved == project / "flowsets" / "NightlySet.json"
+>       assert _name_in(saved) == "NightlySet"
+E       AssertionError: assert 'Nightly Set!' == 'NightlySet'
+E         
+E         - NightlySet
+E         + Nightly Set!
+E         ?        +   +
+
+tests/test_b101_flow_saves.py:198: AssertionError
+________________ test_r_flow_set_9_2_clash_file_holds_its_stem _________________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_set_9_2_clash_file0/.s19tool/workarea'), PosixPath...s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_set_9_2_clash_file0/outside'))
+
+    def test_r_flow_set_9_2_clash_file_holds_its_stem(area):
+        """R-FLOW-SET.9/2: a clash set file holds its own stem as its name."""
+        _root, project, _out = area
+        (project / "flowsets").mkdir()
+        (project / "flowsets" / "s.json").write_text("{}", encoding="utf-8")
+        saved = save_chain_set(C1, "s", project)
+        assert saved.stem != "s"
+>       assert _name_in(saved) == saved.stem
+E       AssertionError: assert 's' == 's_2'
+E         
+E         - s_2
+E         + s
+
+tests/test_b101_flow_saves.py:211: AssertionError
+_________________ test_r_flow_set_10_1_long_stem_is_cut_to_64 __________________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_set_10_1_long_stem0/.s19tool/workarea'), PosixPath...s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_set_10_1_long_stem0/outside'))
+
+    def test_r_flow_set_10_1_long_stem_is_cut_to_64(area):
+        """R-FLOW-SET.10/1: a 65-character set stem names the file whole, the name is cut to 64."""
+        _root, project, _out = area
+        saved = save_chain_set(replace(C1, name="D" * 65), "D" * 65, project)
+        assert saved == project / "flowsets" / ("D" * 65 + ".json")
+>       assert _name_in(saved) == "D" * 64
+E       AssertionError: assert 'DDDDDDDDDDDD...DDDDDDDDDDDDD' == 'DDDDDDDDDDDD...DDDDDDDDDDDDD'
+E         
+E         Skipping 53 identical leading characters in diff, use -v to show
+E         - DDDDDDDDDDD
+E         + DDDDDDDDDDDD
+E         ?            +
+
+tests/test_b101_flow_saves.py:219: AssertionError
+___________ test_r_flow_file_11_1_home_linked_outside_saves_nothing ____________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_file_11_1_home_lin0/.s19tool/workarea'), PosixPath...s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_file_11_1_home_lin0/outside'))
+
+    def test_r_flow_file_11_1_home_linked_outside_saves_nothing(area):
+        """R-FLOW-FILE.11/1: a flows home linked outside the work area saves nothing."""
+        root, project, outside = area
+        make_junction(project / "flows", outside / "flows")
+        with pytest.raises(WorkareaContainmentError):
+>           save_flow_json(F1, "x", project, workarea_root=root)
+E           TypeError: save_flow_json() got an unexpected keyword argument 'workarea_root'
+
+tests/test_b101_flow_saves.py:244: TypeError
+____________ test_r_flow_file_11_2_home_linked_inside_saves_nothing ____________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_file_11_2_home_lin0/.s19tool/workarea'), PosixPath...s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_file_11_2_home_lin0/outside'))
+
+    def test_r_flow_file_11_2_home_linked_inside_saves_nothing(area):
+        """R-FLOW-FILE.11/2: a flows home linked inside the project saves nothing."""
+        root, project, _out = area
+        (project / "patches").mkdir()
+        make_junction(project / "flows", project / "patches")
+        with pytest.raises(WorkareaContainmentError):
+>           save_flow_json(F1, "x", project, workarea_root=root)
+E           TypeError: save_flow_json() got an unexpected keyword argument 'workarea_root'
+
+tests/test_b101_flow_saves.py:254: TypeError
+__________ test_r_flow_file_11_3_linked_project_folder_saves_nothing ___________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_file_11_3_linked_p0/.s19tool/workarea'), PosixPath...s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_file_11_3_linked_p0/outside'))
+
+    def test_r_flow_file_11_3_linked_project_folder_saves_nothing(area):
+        """R-FLOW-FILE.11/3: a flows home under a linked project folder saves nothing (E3A-06)."""
+        root, _project, _out = area
+        real = root / "q"
+        real.mkdir()
+        (real / "prg.s19").write_text("S9030000FC\n", encoding="utf-8")
+        make_junction(root / "pl", real)
+        before = _entries(real)
+        with pytest.raises(WorkareaContainmentError):
+>           save_flow_json(F1, "x", root / "pl", workarea_root=root)
+E           TypeError: save_flow_json() got an unexpected keyword argument 'workarea_root'
+
+tests/test_b101_flow_saves.py:267: TypeError
+____________ test_r_flow_set_7_1_home_linked_outside_saves_nothing _____________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_set_7_1_home_linke0/.s19tool/workarea'), PosixPath...s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_set_7_1_home_linke0/outside'))
+
+    def test_r_flow_set_7_1_home_linked_outside_saves_nothing(area):
+        """R-FLOW-SET.7/1: a flowsets home linked outside the work area saves nothing."""
+        root, project, outside = area
+        make_junction(project / "flowsets", outside / "flowsets")
+        with pytest.raises(WorkareaContainmentError):
+>           save_chain_set(C1, "s", project, workarea_root=root)
+E           TypeError: save_chain_set() got an unexpected keyword argument 'workarea_root'
+
+tests/test_b101_flow_saves.py:277: TypeError
+_____________ test_r_flow_set_7_2_home_linked_inside_saves_nothing _____________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_set_7_2_home_linke0/.s19tool/workarea'), PosixPath...s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_set_7_2_home_linke0/outside'))
+
+    def test_r_flow_set_7_2_home_linked_inside_saves_nothing(area):
+        """R-FLOW-SET.7/2: a flowsets home linked inside the project saves nothing."""
+        root, project, _out = area
+        (project / "patches").mkdir()
+        make_junction(project / "flowsets", project / "patches")
+        with pytest.raises(WorkareaContainmentError):
+>           save_chain_set(C1, "s", project, workarea_root=root)
+E           TypeError: save_chain_set() got an unexpected keyword argument 'workarea_root'
+
+tests/test_b101_flow_saves.py:287: TypeError
+_______________ test_r_flow_file_14_1_dangling_link_gets_no_file _______________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_file_14_1_dangling0/.s19tool/workarea'), PosixPath...s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_file_14_1_dangling0/outside'))
+
+    def test_r_flow_file_14_1_dangling_link_gets_no_file(area):
+        """R-FLOW-FILE.14/1: a link named like the file, target missing, gets no file."""
+        _root, project, outside = area
+        (outside / "dangling").mkdir()
+        _link_file(project / "flows", "z.json", outside / "dangling" / "z.json")
+        saved = save_flow_json(F1, "z", project)
+>       assert not (outside / "dangling" / "z.json").exists()
+E       AssertionError: assert not True
+E        +  where True = exists()
+E        +    where exists = ((PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_file_14_1_dangling0/outside') / 'dangling') / 'z.json').exists
+
+tests/test_b101_flow_saves.py:305: AssertionError
+_______________ test_r_flow_file_14_3_no_create_on_a_taken_name ________________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_file_14_3_no_creat0/.s19tool/workarea'), PosixPath...s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_file_14_3_no_creat0/outside'))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fcf4ddf5350>
+
+    def test_r_flow_file_14_3_no_create_on_a_taken_name(area, monkeypatch):
+        """R-FLOW-FILE.14/3: no create is attempted on a candidate name that exists (E3 S-2 a)."""
+        _root, project, outside = area
+        (outside / "dangling").mkdir()
+        _link_file(project / "flows", "z.json", outside / "dangling" / "z.json")
+        calls = _spy_on_open(monkeypatch)
+        saved = save_flow_json(F1, "z", project)
+        taken = str(project / "flows" / "z.json")
+        assert calls.count(taken) == 0
+>       assert calls.count(str(saved)) == 1
+E       AssertionError: assert 0 == 1
+E        +  where 0 = <built-in method count of list object at 0x7fcf4cc213c0>('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_file_14_3_no_creat0/.s19tool/workarea/p/flows/z.json')
+E        +    where <built-in method count of list object at 0x7fcf4cc213c0> = [].count
+E        +    and   '/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_file_14_3_no_creat0/.s19tool/workarea/p/flows/z.json' = str(PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_file_14_3_no_creat0/.s19tool/workarea/p/flows/z.json'))
+
+tests/test_b101_flow_saves.py:330: AssertionError
+______________ test_r_flow_file_14_4_followed_create_gets_no_byte ______________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_file_14_4_followed0/.s19tool/workarea'), PosixPath...s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_file_14_4_followed0/outside'))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fcf4dd85250>
+
+    def test_r_flow_file_14_4_followed_create_gets_no_byte(area, monkeypatch):
+        """R-FLOW-FILE.14/4: a link put in at the free name gets no byte (E3 S-2 b)."""
+        _root, project, outside = area
+        home = project / "flows"
+        home.mkdir()
+        _windows_follow(monkeypatch, home, outside)
+>       with pytest.raises(WorkareaContainmentError):
+E       Failed: DID NOT RAISE WorkareaContainmentError
+
+tests/test_b101_flow_saves.py:340: Failed
+_______________ test_r_flow_file_14_5_swapped_home_gets_no_byte ________________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_file_14_5_swapped_0/.s19tool/workarea'), PosixPath...s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_file_14_5_swapped_0/outside'))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fcf4ce223d0>
+
+    def test_r_flow_file_14_5_swapped_home_gets_no_byte(area, monkeypatch):
+        """R-FLOW-FILE.14/5 (E3 R2-1): a home swapped for a link after the name check gets no byte.
+    
+        Under the swap the created file is regular and the same file as the
+        descriptor, so only the real-path clause of the check after the claim
+        refuses it. Runs on Linux and on Windows alike.
+        """
+        _root, project, outside = area
+        home = project / "flows"
+        home.mkdir()
+        _swap_home_for_link(monkeypatch, home, project / "flows_aside", outside)
+>       with pytest.raises(WorkareaContainmentError):
+E       Failed: DID NOT RAISE WorkareaContainmentError
+
+tests/test_b101_flow_saves.py:358: Failed
+________________ test_r_flow_set_8_1_dangling_link_gets_no_file ________________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_set_8_1_dangling_l0/.s19tool/workarea'), PosixPath...s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_set_8_1_dangling_l0/outside'))
+
+    def test_r_flow_set_8_1_dangling_link_gets_no_file(area):
+        """R-FLOW-SET.8/1: a link named like the set file, target missing, gets no file."""
+        _root, project, outside = area
+        (outside / "dangling").mkdir()
+        _link_file(project / "flowsets", "s.json", outside / "dangling" / "s.json")
+        saved = save_chain_set(C1, "s", project)
+>       assert not (outside / "dangling" / "s.json").exists()
+E       AssertionError: assert not True
+E        +  where True = exists()
+E        +    where exists = ((PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_set_8_1_dangling_l0/outside') / 'dangling') / 's.json').exists
+
+tests/test_b101_flow_saves.py:371: AssertionError
+________________ test_r_flow_set_8_3_no_create_on_a_taken_name _________________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_set_8_3_no_create_0/.s19tool/workarea'), PosixPath...s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_set_8_3_no_create_0/outside'))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fcf4cd72390>
+
+    def test_r_flow_set_8_3_no_create_on_a_taken_name(area, monkeypatch):
+        """R-FLOW-SET.8/3: no create is attempted on a set candidate name that exists (E3 S-2 a)."""
+        _root, project, outside = area
+        (outside / "dangling").mkdir()
+        _link_file(project / "flowsets", "s.json", outside / "dangling" / "s.json")
+        calls = _spy_on_open(monkeypatch)
+        saved = save_chain_set(C1, "s", project)
+        taken = str(project / "flowsets" / "s.json")
+        assert calls.count(taken) == 0
+>       assert calls.count(str(saved)) == 1
+E       AssertionError: assert 0 == 1
+E        +  where 0 = <built-in method count of list object at 0x7fcf4cd727c0>('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_set_8_3_no_create_0/.s19tool/workarea/p/flowsets/s.json')
+E        +    where <built-in method count of list object at 0x7fcf4cd727c0> = [].count
+E        +    and   '/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_set_8_3_no_create_0/.s19tool/workarea/p/flowsets/s.json' = str(PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_set_8_3_no_create_0/.s19tool/workarea/p/flowsets/s.json'))
+
+tests/test_b101_flow_saves.py:395: AssertionError
+_______________ test_r_flow_set_8_4_followed_create_gets_no_byte _______________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_set_8_4_followed_c0/.s19tool/workarea'), PosixPath...s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-286/popen-gw0/test_r_flow_set_8_4_followed_c0/outside'))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fcf4dde7d50>
+
+    def test_r_flow_set_8_4_followed_create_gets_no_byte(area, monkeypatch):
+        """R-FLOW-SET.8/4: a link put in at the free set name gets no byte (E3 S-2 b)."""
+        _root, project, outside = area
+        home = project / "flowsets"
+        home.mkdir()
+        _windows_follow(monkeypatch, home, outside)
+>       with pytest.raises(WorkareaContainmentError):
+E       Failed: DID NOT RAISE WorkareaContainmentError
+
+tests/test_b101_flow_saves.py:405: Failed
+=========================== short test summary info ============================
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_12_2_clash_file_holds_its_stem
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_12_3_cleaned_name_is_written
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_12_4_stem_of_64_is_whole
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_13_1_long_stem_is_cut_to_64
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_13_2_clash_suffix_is_cut
+FAILED tests/test_b101_flow_saves.py::test_r_flow_set_9_1_cleaned_name_is_written
+FAILED tests/test_b101_flow_saves.py::test_r_flow_set_9_2_clash_file_holds_its_stem
+FAILED tests/test_b101_flow_saves.py::test_r_flow_set_10_1_long_stem_is_cut_to_64
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_11_1_home_linked_outside_saves_nothing
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_11_2_home_linked_inside_saves_nothing
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_11_3_linked_project_folder_saves_nothing
+FAILED tests/test_b101_flow_saves.py::test_r_flow_set_7_1_home_linked_outside_saves_nothing
+FAILED tests/test_b101_flow_saves.py::test_r_flow_set_7_2_home_linked_inside_saves_nothing
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_1_dangling_link_gets_no_file
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_3_no_create_on_a_taken_name
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_4_followed_create_gets_no_byte
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_5_swapped_home_gets_no_byte
+FAILED tests/test_b101_flow_saves.py::test_r_flow_set_8_1_dangling_link_gets_no_file
+FAILED tests/test_b101_flow_saves.py::test_r_flow_set_8_3_no_create_on_a_taken_name
+FAILED tests/test_b101_flow_saves.py::test_r_flow_set_8_4_followed_create_gets_no_byte
+20 failed, 4 passed in 1.71s

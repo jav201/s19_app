@@ -1,0 +1,1132 @@
+# Inc 6 tester 1 (lifecycle) RED on base 823d0c93 (main with Inc 5), LAN Linux host, 2026-11-06
+# Test files copied onto a detached worktree of the base; nothing else changed. Redacted: user, home, host.
+ M tests/test_before_after_report.py
+ M tests/test_tui_checks_screen.py
+?? tests/test_b101_patch_lifecycle.py
+823d0c93 Merge batch-101 Inc 5: CRC Designer refreshes after in-place writes; Check Editor keeps picks, names and spec bytes; validation results clear after a write
+s19_app.__file__ = <home>/work/s19_i6t1/s19_app/__init__.py
+--- command: env -u NO_COLOR python -m pytest -p no:cacheprovider -n 4 -v --tb=short --show-capture=no tests/test_b101_patch_lifecycle.py tests/test_before_after_report.py::test_at_038a_saveback_trigger_report_pair_reread_from_surfaced_path tests/test_tui_checks_screen.py::test_tc084_3_update_checks_view_groups_and_aggregates tests/test_tui_checks_screen.py::test_at084g_hostile_input_renders_literal
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0 -- python
+rootdir: <home>/work/s19_i6t1
+configfile: pyproject.toml
+plugins: platformdirs-4.14.3, xdist-3.8.0
+created: 4/4 workers
+4 workers [46 items]
+
+scheduling tests via LoadScheduling
+
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[paste] 
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[load] 
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[guarded] 
+tests/test_b101_patch_lifecycle.py::test_r_before_after_report_001_1_1_offer_text_in_a_project 
+[gw3] [  2%] PASSED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[paste] 
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[undo] 
+[gw2] [  4%] PASSED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[load] 
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[pick] 
+[gw0] [  6%] FAILED tests/test_b101_patch_lifecycle.py::test_r_before_after_report_001_1_1_offer_text_in_a_project 
+tests/test_b101_patch_lifecycle.py::test_r_before_after_report_001_36_1_no_offer_without_a_project 
+[gw0] [  8%] FAILED tests/test_b101_patch_lifecycle.py::test_r_before_after_report_001_36_1_no_offer_without_a_project 
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[paste] 
+[gw1] [ 10%] FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[guarded] 
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[project] 
+[gw2] [ 13%] FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[pick] 
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[pick] 
+[gw3] [ 15%] FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[undo] 
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[redo] 
+[gw0] [ 17%] FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[paste] 
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[undo] 
+[gw1] [ 19%] FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[project] 
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[image] 
+[gw2] [ 21%] FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[pick] 
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[guarded] 
+[gw3] [ 23%] FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[redo] 
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[image] 
+[gw0] [ 26%] FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[undo] 
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[redo] 
+[gw2] [ 28%] FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[guarded] 
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[project] 
+[gw1] [ 30%] FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[image] 
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_kept_on_save_project 
+[gw0] [ 32%] FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[redo] 
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_kept_on_save_project 
+[gw3] [ 34%] FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[image] 
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[load] 
+[gw1] [ 36%] PASSED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_kept_on_save_project 
+tests/test_b101_patch_lifecycle.py::test_r_chk_pe_008_subtitle[revert] 
+[gw2] [ 39%] FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[project] 
+tests/test_b101_patch_lifecycle.py::test_r_chk_pe_008_subtitle[two] 
+[gw0] [ 41%] PASSED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_kept_on_save_project 
+tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_redo_with_no_step_keeps_it 
+[gw2] [ 43%] PASSED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_008_subtitle[two] 
+tests/test_b101_patch_lifecycle.py::test_r_chk_pe_008_subtitle[zero] 
+[gw3] [ 45%] FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[load] 
+tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[load] 
+[gw1] [ 47%] FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_008_subtitle[revert] 
+tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[image] 
+[gw0] [ 50%] FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_redo_with_no_step_keeps_it 
+tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[project] 
+[gw3] [ 52%] FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[load] 
+tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[apply] 
+[gw1] [ 54%] FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[image] 
+tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[mac] 
+[gw0] [ 56%] FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[project] 
+tests/test_b101_patch_lifecycle.py::test_r_chk_pe_010_status[load] 
+[gw3] [ 58%] FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[apply] 
+tests/test_b101_patch_lifecycle.py::test_r_chk_pe_010_status[project] 
+[gw0] [ 60%] FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_010_status[load] 
+tests/test_b101_patch_lifecycle.py::test_r_chk_pe_011_strip[project] 
+[gw3] [ 63%] FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_010_status[project] 
+tests/test_b101_patch_lifecycle.py::test_r_chk_pe_012_rows[load] 
+[gw1] [ 65%] FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[mac] 
+tests/test_b101_patch_lifecycle.py::test_r_chk_pe_011_strip[load] 
+[gw0] [ 67%] FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_011_strip[project] 
+tests/test_b101_patch_lifecycle.py::test_r_chk_pe_012_rows[project] 
+[gw3] [ 69%] FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_012_rows[load] 
+tests/test_b101_patch_lifecycle.py::test_r_chk_pe_014_glyph_after_save_back 
+[gw1] [ 71%] FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_011_strip[load] 
+tests/test_b101_patch_lifecycle.py::test_r_chks_001_screen[current] 
+[gw1] [ 73%] PASSED tests/test_b101_patch_lifecycle.py::test_r_chks_001_screen[current] 
+tests/test_b101_patch_lifecycle.py::test_r_chks_004_note_while_displayed 
+[gw0] [ 76%] FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_012_rows[project] 
+tests/test_b101_patch_lifecycle.py::test_r_chks_001_screen[stale] 
+[gw2] [ 78%] FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_008_subtitle[zero] 
+tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[add] 
+[gw3] [ 80%] FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_014_glyph_after_save_back 
+tests/test_b101_patch_lifecycle.py::test_r_chks_004_note_after_image_load 
+[gw0] [ 82%] FAILED tests/test_b101_patch_lifecycle.py::test_r_chks_001_screen[stale] 
+tests/test_b101_patch_lifecycle.py::test_r_chks_009_zero_line_while_displayed 
+[gw2] [ 84%] FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[add] 
+tests/test_before_after_report.py::test_at_038a_saveback_trigger_report_pair_reread_from_surfaced_path 
+[gw1] [ 86%] FAILED tests/test_b101_patch_lifecycle.py::test_r_chks_004_note_while_displayed 
+tests/test_b101_patch_lifecycle.py::test_r_chks_009_zero_line 
+[gw2] [ 89%] FAILED tests/test_before_after_report.py::test_at_038a_saveback_trigger_report_pair_reread_from_surfaced_path 
+[gw3] [ 91%] FAILED tests/test_b101_patch_lifecycle.py::test_r_chks_004_note_after_image_load 
+tests/test_tui_checks_screen.py::test_tc084_3_update_checks_view_groups_and_aggregates 
+[gw3] [ 93%] PASSED tests/test_tui_checks_screen.py::test_tc084_3_update_checks_view_groups_and_aggregates 
+[gw0] [ 95%] FAILED tests/test_b101_patch_lifecycle.py::test_r_chks_009_zero_line_while_displayed 
+tests/test_tui_checks_screen.py::test_at084g_hostile_input_renders_literal 
+[gw0] [ 97%] PASSED tests/test_tui_checks_screen.py::test_at084g_hostile_input_renders_literal 
+[gw1] [100%] FAILED tests/test_b101_patch_lifecycle.py::test_r_chks_009_zero_line 
+
+=================================== FAILURES ===================================
+__________ test_r_before_after_report_001_1_1_offer_text_in_a_project __________
+[gw0] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:331: in test_r_before_after_report_001_1_1_offer_text_in_a_project
+    assert offers == [OFFER], offers
+E   AssertionError: ['Before/after report ready - press b to write it to the project reports directory (action: before_after_report).']
+E   assert ['Before/afte...ter_report).'] == ['Before/afte...s directory.']
+E     
+E     At index 0 diff: 'Before/after report ready - press b to write it to the project reports directory (action: before_after_report).' != 'Before/after report ready - press b to write it to the project reports directory.'
+E     
+E     Full diff: (-: missing in left side, +: extra in left side)
+E       [
+E           'Before/after report ready - press b to write it to the project reports '
+E     -     'directory.',
+E     +     'directory (action: before_after_report).',
+E       ]
+________ test_r_before_after_report_001_36_1_no_offer_without_a_project ________
+[gw0] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:356: in test_r_before_after_report_001_36_1_no_offer_without_a_project
+    assert offers == [], offers
+E   AssertionError: ['Before/after report ready - press b to write it to the project reports directory (action: before_after_report).']
+E   assert ['Before/afte...ter_report).'] == []
+E     
+E     Left contains one more item: 'Before/after report ready - press b to write it to the project reports directory (action: before_after_report).'
+E     
+E     Full diff: (-: missing in left side, +: extra in left side)
+E     - []
+E     + [
+E     +     'Before/after report ready - press b to write it to the project reports '
+E     +     'directory (action: before_after_report).',
+E     + ]
+__________________ test_r_tui_049_3_1_control_hidden[guarded] __________________
+[gw1] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:447: in test_r_tui_049_3_1_control_hidden
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:445: in scenario
+    await await_gone(pilot, app, needle, f"after {alt}")
+tests/test_b101_patch_lifecycle.py:161: in await_gone
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: after guarded: 'Before/after report available:' is still painted in the Patch Editor
+___________________ test_r_tui_049_3_1_control_hidden[pick] ____________________
+[gw2] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:447: in test_r_tui_049_3_1_control_hidden
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:445: in scenario
+    await await_gone(pilot, app, needle, f"after {alt}")
+tests/test_b101_patch_lifecycle.py:161: in await_gone
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: after pick: 'Before/after report available:' is still painted in the Patch Editor
+___________________ test_r_tui_049_3_1_control_hidden[undo] ____________________
+[gw3] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:447: in test_r_tui_049_3_1_control_hidden
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:445: in scenario
+    await await_gone(pilot, app, needle, f"after {alt}")
+tests/test_b101_patch_lifecycle.py:161: in await_gone
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: after undo: 'Before/after report available:' is still painted in the Patch Editor
+___________________ test_r_tui_049_3_2_prompt_hidden[paste] ____________________
+[gw0] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:462: in test_r_tui_049_3_2_prompt_hidden
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:459: in scenario
+    await await_gone(pilot, app, needle, f"after {alt}")
+tests/test_b101_patch_lifecycle.py:161: in await_gone
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: after paste: 'Save patched image as:' is still painted in the Patch Editor
+__________________ test_r_tui_049_3_1_control_hidden[project] __________________
+[gw1] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:447: in test_r_tui_049_3_1_control_hidden
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:445: in scenario
+    await await_gone(pilot, app, needle, f"after {alt}")
+tests/test_b101_patch_lifecycle.py:161: in await_gone
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: after project: 'Before/after report available:' is still painted in the Patch Editor
+____________________ test_r_tui_049_3_2_prompt_hidden[pick] ____________________
+[gw2] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:462: in test_r_tui_049_3_2_prompt_hidden
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:459: in scenario
+    await await_gone(pilot, app, needle, f"after {alt}")
+tests/test_b101_patch_lifecycle.py:161: in await_gone
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: after pick: 'Save patched image as:' is still painted in the Patch Editor
+___________________ test_r_tui_049_3_1_control_hidden[redo] ____________________
+[gw3] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:447: in test_r_tui_049_3_1_control_hidden
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:445: in scenario
+    await await_gone(pilot, app, needle, f"after {alt}")
+tests/test_b101_patch_lifecycle.py:161: in await_gone
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: after redo: 'Before/after report available:' is still painted in the Patch Editor
+____________________ test_r_tui_049_3_2_prompt_hidden[undo] ____________________
+[gw0] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:462: in test_r_tui_049_3_2_prompt_hidden
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:459: in scenario
+    await await_gone(pilot, app, needle, f"after {alt}")
+tests/test_b101_patch_lifecycle.py:161: in await_gone
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: after undo: 'Save patched image as:' is still painted in the Patch Editor
+__________________ test_r_tui_049_3_2_prompt_hidden[guarded] ___________________
+[gw2] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:462: in test_r_tui_049_3_2_prompt_hidden
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:459: in scenario
+    await await_gone(pilot, app, needle, f"after {alt}")
+tests/test_b101_patch_lifecycle.py:161: in await_gone
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: after guarded: 'Save patched image as:' is still painted in the Patch Editor
+___________________ test_r_tui_049_3_2_prompt_hidden[image] ____________________
+[gw1] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:462: in test_r_tui_049_3_2_prompt_hidden
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:459: in scenario
+    await await_gone(pilot, app, needle, f"after {alt}")
+tests/test_b101_patch_lifecycle.py:161: in await_gone
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: after image: 'Save patched image as:' is still painted in the Patch Editor
+____________________ test_r_tui_049_3_2_prompt_hidden[redo] ____________________
+[gw0] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:462: in test_r_tui_049_3_2_prompt_hidden
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:459: in scenario
+    await await_gone(pilot, app, needle, f"after {alt}")
+tests/test_b101_patch_lifecycle.py:161: in await_gone
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: after redo: 'Save patched image as:' is still painted in the Patch Editor
+___________________ test_r_tui_049_3_1_control_hidden[image] ___________________
+[gw3] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:447: in test_r_tui_049_3_1_control_hidden
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:445: in scenario
+    await await_gone(pilot, app, needle, f"after {alt}")
+tests/test_b101_patch_lifecycle.py:161: in await_gone
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: after image: 'Before/after report available:' is still painted in the Patch Editor
+__________________ test_r_tui_049_3_2_prompt_hidden[project] ___________________
+[gw2] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:462: in test_r_tui_049_3_2_prompt_hidden
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:459: in scenario
+    await await_gone(pilot, app, needle, f"after {alt}")
+tests/test_b101_patch_lifecycle.py:161: in await_gone
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: after project: 'Save patched image as:' is still painted in the Patch Editor
+____________________ test_r_tui_049_3_2_prompt_hidden[load] ____________________
+[gw3] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:462: in test_r_tui_049_3_2_prompt_hidden
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:459: in scenario
+    await await_gone(pilot, app, needle, f"after {alt}")
+tests/test_b101_patch_lifecycle.py:161: in await_gone
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: after load: 'Save patched image as:' is still painted in the Patch Editor
+______________________ test_r_chk_pe_008_subtitle[revert] ______________________
+[gw1] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:554: in test_r_chk_pe_008_subtitle
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:548: in scenario
+    await settled(pilot, lambda: checks_subtitle(app) == "no run yet", "no run yet after Add", timeout=GONE)
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: no run yet after Add
+_____________ test_r_tui_049_3_2_prompt_redo_with_no_step_keeps_it _____________
+[gw0] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:522: in test_r_tui_049_3_2_prompt_redo_with_no_step_keeps_it
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:507: in scenario
+    await await_gone(pilot, app, PROMPT, "after the redo")
+tests/test_b101_patch_lifecycle.py:161: in await_gone
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: after the redo: 'Save patched image as:' is still painted in the Patch Editor
+________________________ test_r_chk_pe_009_no_run[load] ________________________
+[gw3] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:616: in test_r_chk_pe_009_no_run
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:605: in scenario
+    await settled(pilot, lambda: _no_run_shown(app), f"no run yet after {how} (painted: {checks_subtitle(app)!r})", timeout=GONE)
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: no run yet after load (painted: '2 checked')
+_______________________ test_r_chk_pe_009_no_run[image] ________________________
+[gw1] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:616: in test_r_chk_pe_009_no_run
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:605: in scenario
+    await settled(pilot, lambda: _no_run_shown(app), f"no run yet after {how} (painted: {checks_subtitle(app)!r})", timeout=GONE)
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: no run yet after image (painted: '2 checked')
+______________________ test_r_chk_pe_009_no_run[project] _______________________
+[gw0] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:616: in test_r_chk_pe_009_no_run
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:605: in scenario
+    await settled(pilot, lambda: _no_run_shown(app), f"no run yet after {how} (painted: {checks_subtitle(app)!r})", timeout=GONE)
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: no run yet after project (painted: '2 checked')
+_______________________ test_r_chk_pe_009_no_run[apply] ________________________
+[gw3] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:616: in test_r_chk_pe_009_no_run
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:605: in scenario
+    await settled(pilot, lambda: _no_run_shown(app), f"no run yet after {how} (painted: {checks_subtitle(app)!r})", timeout=GONE)
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: no run yet after apply (painted: '1 checked')
+________________________ test_r_chk_pe_010_status[load] ________________________
+[gw0] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:636: in test_r_chk_pe_010_status
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:629: in scenario
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: the no-run status
+______________________ test_r_chk_pe_010_status[project] _______________________
+[gw3] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:636: in test_r_chk_pe_010_status
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:629: in scenario
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: the no-run status
+________________________ test_r_chk_pe_009_no_run[mac] _________________________
+[gw1] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:616: in test_r_chk_pe_009_no_run
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:605: in scenario
+    await settled(pilot, lambda: _no_run_shown(app), f"no run yet after {how} (painted: {checks_subtitle(app)!r})", timeout=GONE)
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: no run yet after mac (painted: '2 checked')
+_______________________ test_r_chk_pe_011_strip[project] _______________________
+[gw0] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:653: in test_r_chk_pe_011_strip
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:649: in scenario
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: the zero strip (now ['✓1 ✗1 ◐0', '████░░░░'])
+_________________________ test_r_chk_pe_012_rows[load] _________________________
+[gw3] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:674: in test_r_chk_pe_012_rows
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:667: in scenario
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: no result row
+________________________ test_r_chk_pe_011_strip[load] _________________________
+[gw1] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:653: in test_r_chk_pe_011_strip
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:649: in scenario
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: the zero strip (now ['✓1 ✗1 ◐0', '████░░░░'])
+_______________________ test_r_chk_pe_012_rows[project] ________________________
+[gw0] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:674: in test_r_chk_pe_012_rows
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:667: in scenario
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: no result row
+_______________________ test_r_chk_pe_008_subtitle[zero] _______________________
+[gw2] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:554: in test_r_chk_pe_008_subtitle
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:542: in scenario
+    await settled(pilot, lambda: checks_subtitle(app) == "0 checked", "the 0-entry run's subtitle")
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: the 0-entry run's subtitle
+___________________ test_r_chk_pe_014_glyph_after_save_back ____________________
+[gw3] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:698: in test_r_chk_pe_014_glyph_after_save_back
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:695: in scenario
+    await settled(pilot, lambda: kind_glyph(app) == "·", f"the ledger's · after the save-back (now {kind_glyph(app)!r})", timeout=GONE)
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: the ledger's · after the save-back (now '◐')
+________________________ test_r_chks_001_screen[stale] _________________________
+[gw0] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:727: in test_r_chks_001_screen
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:724: in scenario
+    await settled(pilot, lambda: NO_RUN_NOTE in checks_screen_text(app), "the no-run note", timeout=GONE)
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: the no-run note
+________________________ test_r_chk_pe_009_no_run[add] _________________________
+[gw2] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:616: in test_r_chk_pe_009_no_run
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:605: in scenario
+    await settled(pilot, lambda: _no_run_shown(app), f"no run yet after {how} (painted: {checks_subtitle(app)!r})", timeout=GONE)
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: no run yet after add (painted: '2 checked')
+_____________________ test_r_chks_004_note_while_displayed _____________________
+[gw1] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:759: in test_r_chks_004_note_while_displayed
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:756: in scenario
+    await settled(pilot, lambda: NO_RUN_NOTE in checks_screen_text(app), "the note without reopening", timeout=GONE)
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: the note without reopening
+_____ test_at_038a_saveback_trigger_report_pair_reread_from_surfaced_path ______
+[gw2] linux -- Python 3.11.18 python
+tests/test_before_after_report.py:332: in test_at_038a_saveback_trigger_report_pair_reread_from_surfaced_path
+    assert offers[0][1] == (
+E   AssertionError: Before/after report ready - press b to write it to the project reports directory (action: before_after_report).
+E   assert 'Before/after...fter_report).' == 'Before/after...ts directory.'
+E     
+E     - Before/after report ready - press b to write it to the project reports directory.
+E     + Before/after report ready - press b to write it to the project reports directory (action: before_after_report).
+E     ?                                                                                 ++++++++++++++++++++++++++++++
+____________________ test_r_chks_004_note_after_image_load _____________________
+[gw3] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:741: in test_r_chks_004_note_after_image_load
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:738: in scenario
+    await settled(pilot, lambda: NO_RUN_NOTE in checks_screen_text(app), "the no-run note", timeout=GONE)
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: the no-run note
+__________________ test_r_chks_009_zero_line_while_displayed ___________________
+[gw0] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:801: in test_r_chks_009_zero_line_while_displayed
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:799: in scenario
+    await settled(pilot, lambda: checks_strip_text(app) == ZERO_LINE, f"the zero line (now {checks_strip_text(app)!r})", timeout=GONE)
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: the zero line (now 'Pass 1 / Fail 1 / Uncheck 0 ████░░░░')
+__________________________ test_r_chks_009_zero_line ___________________________
+[gw1] linux -- Python 3.11.18 python
+tests/test_b101_patch_lifecycle.py:772: in test_r_chks_009_zero_line
+    projects.run_app(tmp_path, scenario, size=SIZE)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<env>/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_patch_lifecycle.py:770: in scenario
+    await settled(pilot, lambda: checks_strip_text(app) == ZERO_LINE, f"the zero line (now {checks_strip_text(app)!r})", timeout=GONE)
+tests/b97_probes.py:326: in settled
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: did not settle: the zero line (now 'Pass 1 / Fail 1 / Uncheck 0 ████░░░░')
+=========================== short test summary info ============================
+FAILED tests/test_b101_patch_lifecycle.py::test_r_before_after_report_001_1_1_offer_text_in_a_project
+FAILED tests/test_b101_patch_lifecycle.py::test_r_before_after_report_001_36_1_no_offer_without_a_project
+FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[guarded]
+FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[pick]
+FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[undo]
+FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[paste]
+FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[project]
+FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[pick]
+FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[redo]
+FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[undo]
+FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[guarded]
+FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[image]
+FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[redo]
+FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_1_control_hidden[image]
+FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[project]
+FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_hidden[load]
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_008_subtitle[revert]
+FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_redo_with_no_step_keeps_it
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[load] - A...
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[image] - ...
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[project]
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[apply] - ...
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_010_status[load] - A...
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_010_status[project]
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[mac] - As...
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_011_strip[project]
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_012_rows[load] - Ass...
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_011_strip[load] - As...
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_012_rows[project] - ...
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_008_subtitle[zero]
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_014_glyph_after_save_back
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chks_001_screen[stale] - As...
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[add] - As...
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chks_004_note_while_displayed
+FAILED tests/test_before_after_report.py::test_at_038a_saveback_trigger_report_pair_reread_from_surfaced_path
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chks_004_note_after_image_load
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chks_009_zero_line_while_displayed
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chks_009_zero_line - Assert...
+=================== 38 failed, 8 passed in 165.17s (0:02:45) ===================

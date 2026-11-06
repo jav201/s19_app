@@ -1,0 +1,31 @@
+# mutant M40  (DOSSIER (I-D2))
+base_commit=98d94d724a72c56468292be123ff15f664acb4fa
+s19_app.__file__=<HOME>/work/s19_i6m_copy/s19_app/__init__.py
+mutation=docs/user-guide/DOSSIER.md:749
+--- pytest (mutant copy) ---
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________________ test_r_doc_guide_2_1_fixed_rows_marked ____________________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+    def test_r_doc_guide_2_1_fixed_rows_marked() -> None:
+        rows = _findings_rows()
+        assert len(_FIXED) == 11
+        unmarked = [
+            f for f in _FIXED if not rows.get(f, "").endswith(_FIXED_MARK.get(f, "fixed in 1.0.0"))
+        ]
+>       assert unmarked == [], f"rows without the fixed mark: {unmarked}"
+E       AssertionError: rows without the fixed mark: ['F-40']
+E       assert ['F-40'] == []
+E         
+E         Left contains one more item: 'F-40'
+E         Use -v to get more diff
+
+../s19_i6m/tests/test_b101_help_legend_docs.py:1943: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_guide_2_1_fixed_rows_marked
+1 failed in 1.50s
+

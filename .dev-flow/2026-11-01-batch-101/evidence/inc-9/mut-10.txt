@@ -1,0 +1,66 @@
+base commit (origin/main): e07fb00f9fc13afd314d0334fac683fe33b29b6c
+applied-tree head: b204c7d44a42383f2a7c63295280b0a4b7f3ad58
+mutant: M10 — R-FLOW-FILE.14/3, R-FLOW-SET.8/3 (E3 S-2 a)
+
+--- mutation (diff) ---
+--- a/s19_app/tui/services/flow_persistence_service.py
++++ b/s19_app/tui/services/flow_persistence_service.py
+@@ -1056,7 +1056,7 @@
+     while True:
+         # (a) The name is taken when ANY entry of that name exists — a file,
+         # a folder or a link, also a link whose target is missing.
+-        if os.path.lexists(candidate):
++        if candidate.exists():
+             candidate = home / f"{clean}_{counter}.json"
+             counter += 1
+             continue
+
+--- s19_app.__file__ (from inside the copy) ---
+<HOME>/work/s19_i9mut_m10/s19_app/__init__.py
+
+--- pytest ---
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_______________ test_r_flow_file_14_3_no_create_on_a_taken_name ________________
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-375/test_r_flow_file_14_3_no_creat0/.s19tool/workarea'), PosixPath('/tmp/py..._creat0/.s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-375/test_r_flow_file_14_3_no_creat0/outside'))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f1dbdae4890>
+
+    def test_r_flow_file_14_3_no_create_on_a_taken_name(area, monkeypatch):
+        """R-FLOW-FILE.14/3: no create is attempted on a candidate name that exists (E3 S-2 a)."""
+        _root, project, outside = area
+        (outside / "dangling").mkdir()
+        _link_file(project / "flows", "z.json", outside / "dangling" / "z.json")
+        calls = _spy_on_open(monkeypatch)
+        saved = save_flow_json(F1, "z", project)
+        taken = str(project / "flows" / "z.json")
+>       assert calls.count(taken) == 0
+E       AssertionError: assert 1 == 0
+E        +  where 1 = <built-in method count of list object at 0x7f1dbd1101c0>('/tmp/pytest-of-<user>/pytest-375/test_r_flow_file_14_3_no_creat0/.s19tool/workarea/p/flows/z.json')
+E        +    where <built-in method count of list object at 0x7f1dbd1101c0> = ['/tmp/pytest-of-<user>/pytest-375/test_r_flow_file_14_3_no_creat0/.s19tool/workarea/p/flows/z.json', '/tmp/pytest-of-<user>/pytest-375/test_r_flow_file_14_3_no_creat0/.s19tool/workarea/p/flows/z_2.json'].count
+
+../s19_i9mut/tests/test_b101_flow_saves.py:329: AssertionError
+________________ test_r_flow_set_8_3_no_create_on_a_taken_name _________________
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-375/test_r_flow_set_8_3_no_create_0/.s19tool/workarea'), PosixPath('/tmp/py...reate_0/.s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-375/test_r_flow_set_8_3_no_create_0/outside'))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f1dbd11fd50>
+
+    def test_r_flow_set_8_3_no_create_on_a_taken_name(area, monkeypatch):
+        """R-FLOW-SET.8/3: no create is attempted on a set candidate name that exists (E3 S-2 a)."""
+        _root, project, outside = area
+        (outside / "dangling").mkdir()
+        _link_file(project / "flowsets", "s.json", outside / "dangling" / "s.json")
+        calls = _spy_on_open(monkeypatch)
+        saved = save_chain_set(C1, "s", project)
+        taken = str(project / "flowsets" / "s.json")
+>       assert calls.count(taken) == 0
+E       AssertionError: assert 1 == 0
+E        +  where 1 = <built-in method count of list object at 0x7f1dbd0150c0>('/tmp/pytest-of-<user>/pytest-375/test_r_flow_set_8_3_no_create_0/.s19tool/workarea/p/flowsets/s.json')
+E        +    where <built-in method count of list object at 0x7f1dbd0150c0> = ['/tmp/pytest-of-<user>/pytest-375/test_r_flow_set_8_3_no_create_0/.s19tool/workarea/p/flowsets/s.json', '/tmp/pytest-of-<user>/pytest-375/test_r_flow_set_8_3_no_create_0/.s19tool/workarea/p/flowsets/s_2.json'].count
+
+../s19_i9mut/tests/test_b101_flow_saves.py:395: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_3_no_create_on_a_taken_name
+FAILED tests/test_b101_flow_saves.py::test_r_flow_set_8_3_no_create_on_a_taken_name
+2 failed in 0.23s
+

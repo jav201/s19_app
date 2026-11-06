@@ -1,0 +1,79 @@
+base commit (origin/main): e07fb00f9fc13afd314d0334fac683fe33b29b6c
+applied-tree head: b204c7d44a42383f2a7c63295280b0a4b7f3ad58
+mutant: M20 — E4-R3 (claim mode 0o666)
+
+--- mutation (diff) ---
+--- a/s19_app/tui/services/flow_persistence_service.py
++++ b/s19_app/tui/services/flow_persistence_service.py
+@@ -1072,7 +1072,6 @@
+             fd = os.open(
+                 candidate,
+                 os.O_CREAT | os.O_EXCL | os.O_WRONLY | getattr(os, "O_BINARY", 0),
+-                0o666,  # write_text's mode: the umask applies, no execute bits (E4-R3)
+             )
+         except FileExistsError:
+             # Lost the lexists-vs-open race: the name is taken after all.
+
+--- s19_app.__file__ (from inside the copy) ---
+<HOME>/work/s19_i9mut_m20/s19_app/__init__.py
+
+--- pytest ---
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+________ test_r_flow_file_14_6_saved_file_mode_matches_write_text[flow] ________
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-385/test_r_flow_file_14_6_saved_fi0/.s19tool/workarea'), PosixPath('/tmp/py...ved_fi0/.s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-385/test_r_flow_file_14_6_saved_fi0/outside'))
+kind = 'flow'
+
+    @pytest.mark.skipif(os.name == "nt", reason="POSIX permission bits; Windows ignores the execute bits")
+    @pytest.mark.parametrize("kind", ["flow", "set"])
+    def test_r_flow_file_14_6_saved_file_mode_matches_write_text(area, kind):
+        """R-FLOW-FILE.14/6, R-FLOW-SET.8/5 (E4 ruling E4-R3): the exclusive create keeps
+        the mode a plain ``write_text`` gives a sibling file in the same folder, so a
+        saved flow or chain set is never created executable (negative control: the
+        claim without a mode argument gives ``0o777`` less the umask → RED)."""
+        _root, project, _out = area
+        if kind == "flow":
+            saved = save_flow_json(F1, "m", project)
+        else:
+            saved = save_chain_set(C1, "m", project)
+        sibling = saved.parent / "sibling.txt"
+        sibling.write_text("x", encoding="utf-8")
+>       assert oct(saved.stat().st_mode & 0o777) == oct(sibling.stat().st_mode & 0o777)
+E       AssertionError: assert '0o755' == '0o644'
+E         
+E         - 0o644
+E         + 0o755
+
+../s19_i9mut/tests/test_b101_flow_saves.py:430: AssertionError
+________ test_r_flow_file_14_6_saved_file_mode_matches_write_text[set] _________
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-385/test_r_flow_file_14_6_saved_fi1/.s19tool/workarea'), PosixPath('/tmp/py...ved_fi1/.s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-385/test_r_flow_file_14_6_saved_fi1/outside'))
+kind = 'set'
+
+    @pytest.mark.skipif(os.name == "nt", reason="POSIX permission bits; Windows ignores the execute bits")
+    @pytest.mark.parametrize("kind", ["flow", "set"])
+    def test_r_flow_file_14_6_saved_file_mode_matches_write_text(area, kind):
+        """R-FLOW-FILE.14/6, R-FLOW-SET.8/5 (E4 ruling E4-R3): the exclusive create keeps
+        the mode a plain ``write_text`` gives a sibling file in the same folder, so a
+        saved flow or chain set is never created executable (negative control: the
+        claim without a mode argument gives ``0o777`` less the umask → RED)."""
+        _root, project, _out = area
+        if kind == "flow":
+            saved = save_flow_json(F1, "m", project)
+        else:
+            saved = save_chain_set(C1, "m", project)
+        sibling = saved.parent / "sibling.txt"
+        sibling.write_text("x", encoding="utf-8")
+>       assert oct(saved.stat().st_mode & 0o777) == oct(sibling.stat().st_mode & 0o777)
+E       AssertionError: assert '0o755' == '0o644'
+E         
+E         - 0o644
+E         + 0o755
+
+../s19_i9mut/tests/test_b101_flow_saves.py:430: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_6_saved_file_mode_matches_write_text[flow]
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_6_saved_file_mode_matches_write_text[set]
+2 failed in 0.22s
+

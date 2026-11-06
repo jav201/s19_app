@@ -1,0 +1,375 @@
+"""i9e5 probe: exec the EXACT source text of the Inc 9 claim helper and the
+house guard helpers (extracted by AST; nothing from s19_app is imported) and
+drive them on real Windows links in a scratch folder.
+
+Usage: python -I i9e5_probe.py <worktree> <scratch_run_dir>
+"""
+import ast
+import ctypes
+import json
+import msvcrt
+import os
+import shutil
+import stat
+import sys
+import _winapi
+from ctypes import wintypes
+from pathlib import Path
+from typing import Callable, Optional
+
+WT = Path(sys.argv[1])
+RUN = Path(sys.argv[2])
+
+WS = WT / "s19_app/tui/workspace.py"
+FPS = WT / "s19_app/tui/services/flow_persistence_service.py"
+
+WS_NAMES = {
+    "WorkareaContainmentError", "_is_reparse_point", "_path_traverses_reparse_point",
+    "_find_workarea_root", "_find_workarea_root_shortname", "contained_in_workarea",
+    "_guarded_destination",
+}
+WS_CONSTS = {"WORKAREA_DIRNAME", "WORKAREA_SUBDIR"}
+
+
+def extract(path, names, consts=()):
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    out, found = [], set()
+    for node in tree.body:
+        if isinstance(node, (ast.FunctionDef, ast.ClassDef)) and node.name in names:
+            out.append(ast.get_source_segment(path.read_text(encoding="utf-8"), node))
+            found.add(node.name)
+        elif isinstance(node, (ast.Assign, ast.AnnAssign)):
+            targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+            if any(isinstance(t, ast.Name) and t.id in consts for t in targets):
+                out.append(ast.get_source_segment(path.read_text(encoding="utf-8"), node))
+                found.update(t.id for t in targets if isinstance(t, ast.Name))
+    missing = (set(names) | set(consts)) - found
+    assert not missing, missing
+    return "\n\n".join(out)
+
+
+ns = {"os": os, "stat": stat, "sys": sys, "Path": Path, "Optional": Optional,
+      "Callable": Callable, "__name__": "i9e5"}
+exec(compile(extract(WS, WS_NAMES, WS_CONSTS), str(WS), "exec"), ns)
+# WorkareaPlacementError is not needed; the claim helper raises the containment class.
+exec(compile(extract(FPS, {"_create_new_json"}), str(FPS), "exec"), ns)
+create = ns["_create_new_json"]
+guard = ns["_guarded_destination"]
+WCE = ns["WorkareaContainmentError"]
+
+kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+kernel32.GetFinalPathNameByHandleW.argtypes = [wintypes.HANDLE, wintypes.LPWSTR, wintypes.DWORD, wintypes.DWORD]
+kernel32.GetFinalPathNameByHandleW.restype = wintypes.DWORD
+
+
+def final_path_of_fd(fd):
+    buf = ctypes.create_unicode_buffer(1024)
+    n = kernel32.GetFinalPathNameByHandleW(msvcrt.get_osfhandle(fd), buf, 1024, 0)
+    return buf.value if n else f"<err {ctypes.get_last_error()}>"
+
+
+def fresh(name):
+    base = RUN / name
+    root = base / ".s19tool" / "workarea"
+    project = root / "p"
+    home = project / "flows"
+    outside = base / "outside"
+    project.mkdir(parents=True)
+    outside.mkdir()
+    return base, root, project, home, outside
+
+
+def save(home, root, render=None):
+    """save_flow_json's three steps, in its order: guard -> mkdir -> claim."""
+    resolved_home, _ = guard(home, root)
+    home.mkdir(parents=True, exist_ok=True)
+    render = render or (lambda stem: json.dumps({"name": stem, "payload": "CONTENT"}, indent=2))
+    return create(home, resolved_home, "z", render)
+
+
+def listing(folder):
+    out = {}
+    for dirpath, dirnames, filenames in os.walk(folder, followlinks=False):
+        for n in dirnames + filenames:
+            p = Path(dirpath) / n
+            try:
+                st = os.lstat(p)
+            except OSError:
+                continue
+            kind = "link" if (stat.S_ISLNK(st.st_mode) or getattr(st, "st_file_attributes", 0) & 0x400) else (
+                "dir" if stat.S_ISDIR(st.st_mode) else f"file {st.st_size}B nlink={st.st_nlink}")
+            out[str(p.relative_to(folder))] = kind
+    return out
+
+
+def run(label, fn):
+    print(f"\n=== {label}")
+    try:
+        result = fn()
+        print("  result:", result)
+    except WCE as exc:
+        print("  raised WorkareaContainmentError:", str(exc)[:160])
+    except Exception as exc:  # noqa: BLE001
+        import traceback
+        print("  raised", type(exc).__name__, str(exc)[:160])
+        print("  at:", traceback.extract_tb(exc.__traceback__)[-1][:3])
+
+
+real_open, real_lstat = os.open, os.lstat
+
+
+def patched(open_fn=None, lstat_fn=None):
+    class _P:
+        def __enter__(self):
+            if open_fn:
+                os.open = open_fn
+            if lstat_fn:
+                os.lstat = lstat_fn
+
+        def __exit__(self, *a):
+            os.open, os.lstat = real_open, real_lstat
+    return _P()
+
+
+# P0 baseline
+def p0():
+    base, root, project, home, outside = fresh("p0")
+    saved = save(home, root)
+    return saved.name, listing(home)
+run("P0 baseline save", p0)
+
+
+# P5 a dangling junction named like the file BEFORE the save (catalogue's Windows arm of /14/1)
+def p5():
+    base, root, project, home, outside = fresh("p5")
+    home.mkdir()
+    (outside / "missing_dir").mkdir()
+    _winapi.CreateJunction(str(outside / "missing_dir"), str(home / "z.json"))
+    (outside / "missing_dir").rmdir()  # now dangling
+    saved = save(home, root)
+    return saved.name, listing(base)
+run("P5 dangling junction at z.json before the save", p5)
+
+
+# P1 a dangling junction put in at the FREE name between lexists and the create (real follow?)
+def p1():
+    base, root, project, home, outside = fresh("p1")
+    state = {}
+
+    def op(path, flags, *a, **k):
+        c = Path(os.fspath(path))
+        if not state and c.parent == home and c.suffix == ".json":
+            state["x"] = 1
+            (outside / "t.json").mkdir()
+            _winapi.CreateJunction(str(outside / "t.json"), str(c))
+            (outside / "t.json").rmdir()  # now dangling
+        return real_open(path, flags, *a, **k)
+    with patched(open_fn=op):
+        try:
+            return save(home, root)
+        finally:
+            print("  after:", listing(base))
+run("P1 dangling junction put in at the free name (real Windows create)", p1)
+
+
+# P6 a dangling FILE symlink put in at the free name (house S-F1, real Windows follow)
+def p6():
+    base, root, project, home, outside = fresh("p6")
+    state = {}
+
+    def op(path, flags, *a, **k):
+        c = Path(os.fspath(path))
+        if not state and c.parent == home and c.suffix == ".json":
+            state["x"] = 1
+            os.symlink(outside / "t.json", c)
+        return real_open(path, flags, *a, **k)
+    with patched(open_fn=op):
+        try:
+            return save(home, root)
+        finally:
+            print("  after:", listing(base))
+run("P6 dangling file symlink put in at the free name (real S-F1 follow)", p6)
+
+
+# P2 the home swapped for a junction to O once, between the name check and the create
+def p2():
+    base, root, project, home, outside = fresh("p2")
+    state = {}
+
+    def op(path, flags, *a, **k):
+        c = Path(os.fspath(path))
+        if not state and c.parent == home and c.suffix == ".json":
+            state["x"] = 1
+            home.rename(project / "flows_aside")
+            _winapi.CreateJunction(str(outside), str(home))
+        return real_open(path, flags, *a, **k)
+    with patched(open_fn=op):
+        try:
+            return save(home, root)
+        finally:
+            print("  after:", listing(base))
+run("P2 home swapped once (junction) before the create", p2)
+
+
+# P3 the home swapped out before the create and BACK inside the check (after its lstat)
+def p3():
+    base, root, project, home, outside = fresh("p3")
+    state = {}
+
+    def op(path, flags, *a, **k):
+        c = Path(os.fspath(path))
+        if "fd" not in state and c.parent == home and c.suffix == ".json":
+            home.rename(project / "flows_aside")
+            _winapi.CreateJunction(str(outside), str(home))
+            fd = real_open(path, flags, *a, **k)
+            state["fd"], state["cand"] = fd, c
+            return fd
+        return real_open(path, flags, *a, **k)
+
+    def ls(path, *a, **k):
+        st = real_lstat(path, *a, **k)
+        if "fd" in state and "back" not in state and Path(os.fspath(path)) == state["cand"]:
+            state["back"] = 1
+            print("  fd final path at the check:", final_path_of_fd(state["fd"]), "nlink", st.st_nlink)
+            os.rmdir(home)  # remove the junction
+            (project / "flows_aside").rename(home)
+        return st
+    with patched(open_fn=op, lstat_fn=ls):
+        try:
+            return save(home, root)
+        finally:
+            print("  after:", listing(base))
+            o = outside / "z.json"
+            if o.exists():
+                print("  outside/z.json bytes:", o.read_bytes()[:60])
+run("P3 home swapped out before the create, back inside the check", p3)
+
+
+# P4 real S-F1 follow, then a HARD LINK to the followed target put in at the name
+def p4():
+    base, root, project, home, outside = fresh("p4")
+    state = {}
+
+    def op(path, flags, *a, **k):
+        c = Path(os.fspath(path))
+        if "fd" not in state and c.parent == home and c.suffix == ".json":
+            os.symlink(outside / "t.json", c)          # dangling file link at the free name
+            fd = real_open(path, flags, *a, **k)       # Windows follows it: creates outside/t.json
+            os.unlink(c)                               # take the link away ...
+            os.link(outside / "t.json", c)             # ... and put a hard link to the target there
+            state["fd"] = fd
+            print("  fd final path at the check:", final_path_of_fd(fd))
+            return fd
+        return real_open(path, flags, *a, **k)
+    with patched(open_fn=op):
+        try:
+            return save(home, root)
+        finally:
+            print("  after:", listing(base))
+            o = outside / "t.json"
+            if o.exists():
+                print("  outside/t.json bytes:", o.read_bytes()[:60])
+run("P4 real S-F1 follow, then a hard link at the name", p4)
+
+
+# P7 guard: flows home a junction to O before the save; project folder a junction
+def p7():
+    base, root, project, home, outside = fresh("p7")
+    (outside / "flows").mkdir()
+    _winapi.CreateJunction(str(outside / "flows"), str(home))
+    try:
+        return save(home, root)
+    finally:
+        print("  after:", listing(base))
+run("P7 flows home is a junction to O (guard)", p7)
+
+
+def p8():
+    base, root, project, home, outside = fresh("p8")
+    real = root / "q"
+    real.mkdir()
+    _winapi.CreateJunction(str(real), str(root / "pl"))
+    try:
+        return save(root / "pl" / "flows", root)
+    finally:
+        print("  after:", listing(base))
+run("P8 project folder is a junction (guard)", p8)
+
+
+real_close = os.close
+
+
+# P9 the home swapped to O before the create (refused by the real-path clause), then
+# re-pointed at V (a folder holding a victim z.json) after the close, before the cleanup unlink
+def p9():
+    base, root, project, home, outside = fresh("p9")
+    victim = base / "victim"
+    victim.mkdir()
+    (victim / "z.json").write_bytes(b"VICTIM")
+    state = {}
+
+    def op(path, flags, *a, **k):
+        c = Path(os.fspath(path))
+        if "fd" not in state and c.parent == home and c.suffix == ".json":
+            home.rename(project / "flows_aside")
+            _winapi.CreateJunction(str(outside), str(home))
+            fd = real_open(path, flags, *a, **k)
+            state["fd"] = fd
+            return fd
+        return real_open(path, flags, *a, **k)
+
+    def cl(fd):
+        real_close(fd)
+        if fd == state.get("fd") and "re" not in state:
+            state["re"] = 1
+            os.rmdir(home)
+            _winapi.CreateJunction(str(victim), str(home))
+    os.close = cl
+    try:
+        with patched(open_fn=op):
+            return save(home, root)
+    finally:
+        os.close = real_close
+        print("  after:", listing(base))
+run("P9 refused claim, home re-pointed at V before the cleanup unlink", p9)
+
+
+# P10 the lstat-failure path: home swapped to an empty folder just before the check's
+# lstat (lstat fails), then re-pointed at V after the close, before its unconditional unlink
+def p10():
+    base, root, project, home, outside = fresh("p10")
+    victim = base / "victim"
+    victim.mkdir()
+    (victim / "z.json").write_bytes(b"VICTIM")
+    empty = base / "empty"
+    empty.mkdir()
+    state = {}
+
+    def op(path, flags, *a, **k):
+        fd = real_open(path, flags, *a, **k)
+        c = Path(os.fspath(path))
+        if "fd" not in state and c.parent == home and c.suffix == ".json":
+            state["fd"], state["cand"] = fd, c
+        return fd
+
+    def ls(path, *a, **k):
+        if "fd" in state and "out" not in state and Path(os.fspath(path)) == state["cand"]:
+            state["out"] = 1
+            home.rename(project / "flows_aside")
+            _winapi.CreateJunction(str(empty), str(home))
+        return real_lstat(path, *a, **k)
+
+    def cl(fd):
+        real_close(fd)
+        if fd == state.get("fd") and "re" not in state:
+            state["re"] = 1
+            os.rmdir(home)
+            _winapi.CreateJunction(str(victim), str(home))
+    os.close = cl
+    try:
+        with patched(open_fn=op, lstat_fn=ls):
+            return save(home, root)
+    finally:
+        os.close = real_close
+        print("  after:", listing(base))
+run("P10 lstat-failure path, home re-pointed at V before its unlink", p10)

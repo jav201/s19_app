@@ -1,0 +1,61 @@
+win-02 (Inc 9 E5, after the corrective): Windows PC, Windows-only arms; worktree head 3f8b9e98; LOCALAPPDATA isolated to a scratch folder; OS clipboard not used; command: python -m pytest -p no:cacheprovider -p no:xdist -v -rfEs tests/test_b101_flow_saves.py tests/test_b101_flow_names_ui.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc9\s19_app\__init__.py
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- <HOME>\anaconda3\envs\s19env\python.exe
+rootdir: <HOME>\Github\s19_app-b101-inc9
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 48 items
+
+tests/test_b101_flow_saves.py::test_r_flow_file_12_2_clash_file_holds_its_stem PASSED [  2%]
+tests/test_b101_flow_saves.py::test_r_flow_file_12_3_cleaned_name_is_written PASSED [  4%]
+tests/test_b101_flow_saves.py::test_r_flow_file_12_4_stem_of_64_is_whole PASSED [  6%]
+tests/test_b101_flow_saves.py::test_r_flow_file_13_1_long_stem_is_cut_to_64 PASSED [  8%]
+tests/test_b101_flow_saves.py::test_r_flow_file_13_1_control_whole_65_name_is_refused_by_loader PASSED [ 10%]
+tests/test_b101_flow_saves.py::test_r_flow_file_13_2_clash_suffix_is_cut PASSED [ 12%]
+tests/test_b101_flow_saves.py::test_r_flow_set_9_1_cleaned_name_is_written PASSED [ 14%]
+tests/test_b101_flow_saves.py::test_r_flow_set_9_2_clash_file_holds_its_stem PASSED [ 16%]
+tests/test_b101_flow_saves.py::test_r_flow_set_10_1_long_stem_is_cut_to_64 PASSED [ 18%]
+tests/test_b101_flow_saves.py::test_r_flow_set_10_1_control_whole_65_name_is_refused_by_loader PASSED [ 20%]
+tests/test_b101_flow_saves.py::test_r_flow_file_11_1_home_linked_outside_saves_nothing PASSED [ 22%]
+tests/test_b101_flow_saves.py::test_r_flow_file_11_2_home_linked_inside_saves_nothing PASSED [ 25%]
+tests/test_b101_flow_saves.py::test_r_flow_file_11_3_linked_project_folder_saves_nothing PASSED [ 27%]
+tests/test_b101_flow_saves.py::test_r_flow_set_7_1_home_linked_outside_saves_nothing PASSED [ 29%]
+tests/test_b101_flow_saves.py::test_r_flow_set_7_2_home_linked_inside_saves_nothing PASSED [ 31%]
+tests/test_b101_flow_saves.py::test_r_flow_file_14_1_dangling_link_gets_no_file PASSED [ 33%]
+tests/test_b101_flow_saves.py::test_r_flow_file_14_2_link_to_file_is_not_written PASSED [ 35%]
+tests/test_b101_flow_saves.py::test_r_flow_file_14_3_no_create_on_a_taken_name PASSED [ 37%]
+tests/test_b101_flow_saves.py::test_r_flow_file_14_4_followed_create_gets_no_byte PASSED [ 39%]
+tests/test_b101_flow_saves.py::test_r_flow_file_14_5_swapped_home_gets_no_byte PASSED [ 41%]
+tests/test_b101_flow_saves.py::test_r_flow_set_8_1_dangling_link_gets_no_file PASSED [ 43%]
+tests/test_b101_flow_saves.py::test_r_flow_set_8_2_link_to_file_is_not_written PASSED [ 45%]
+tests/test_b101_flow_saves.py::test_r_flow_set_8_3_no_create_on_a_taken_name PASSED [ 47%]
+tests/test_b101_flow_saves.py::test_r_flow_set_8_4_followed_create_gets_no_byte PASSED [ 50%]
+tests/test_b101_flow_saves.py::test_r_flow_file_14_6_saved_file_mode_matches_write_text[flow] SKIPPED [ 52%]
+tests/test_b101_flow_saves.py::test_r_flow_file_14_6_saved_file_mode_matches_write_text[set] SKIPPED [ 54%]
+tests/test_b101_flow_saves.py::test_r_flow_file_14_7_link_to_a_sibling_in_the_home_gets_no_byte[flow] PASSED [ 56%]
+tests/test_b101_flow_saves.py::test_r_flow_file_14_7_link_to_a_sibling_in_the_home_gets_no_byte[set] PASSED [ 58%]
+tests/test_b101_flow_saves.py::test_r_flow_file_14_8_claim_error_arms[render] PASSED [ 60%]
+tests/test_b101_flow_saves.py::test_r_flow_file_14_8_claim_error_arms[write] PASSED [ 62%]
+tests/test_b101_flow_saves.py::test_r_flow_file_14_8_claim_error_arms[lstat] PASSED [ 64%]
+tests/test_b101_flow_saves.py::test_r_flow_file_14_8_claim_error_arms[taken-by-folder] PASSED [ 66%]
+tests/test_b101_flow_saves.py::test_r_flow_file_14_9_repointed_home_keeps_the_file_elsewhere[flow] PASSED [ 68%]
+tests/test_b101_flow_saves.py::test_r_flow_file_14_9_repointed_home_keeps_the_file_elsewhere[set] PASSED [ 70%]
+tests/test_b101_flow_saves.py::test_r_flow_file_14_10_other_file_at_the_name_gets_no_byte[flow] PASSED [ 72%]
+tests/test_b101_flow_saves.py::test_r_flow_file_14_10_other_file_at_the_name_gets_no_byte[set] PASSED [ 75%]
+tests/test_b101_flow_saves.py::test_r_flow_file_14_11_hard_link_at_the_name_gets_no_byte[flow] PASSED [ 77%]
+tests/test_b101_flow_saves.py::test_r_flow_file_14_11_hard_link_at_the_name_gets_no_byte[set] PASSED [ 79%]
+tests/test_b101_flow_names_ui.py::test_r_flow_chain_19_1_confirm_writes_one_lane_report PASSED [ 81%]
+tests/test_b101_flow_names_ui.py::test_r_flow_chain_20_1_parallel_confirm_mode_line PASSED [ 83%]
+tests/test_b101_flow_names_ui.py::test_r_flow_chain_20_2_sequential_confirm_mode_line PASSED [ 85%]
+tests/test_b101_flow_names_ui.py::test_r_flow_file_12_1_save_after_clear_holds_own_name PASSED [ 87%]
+tests/test_b101_flow_names_ui.py::test_r_flow_file_12_5_lane_report_reads_the_saved_name PASSED [ 89%]
+tests/test_b101_flow_names_ui.py::test_r_fb_save_8_1_refused_home_status PASSED [ 91%]
+tests/test_b101_flow_names_ui.py::test_r_fx_set_15_1_refused_home_status PASSED [ 93%]
+tests/test_b101_flow_names_ui.py::test_at_i9_1_confirm_report_says_confirm_rerun PASSED [ 95%]
+tests/test_b101_flow_names_ui.py::test_at_i9_2_resaved_flow_and_long_set_keep_own_names PASSED [ 97%]
+tests/test_b101_flow_names_ui.py::test_at_i9_3_linked_homes_refuse_saves PASSED [100%]
+
+=========================== short test summary info ===========================
+SKIPPED [2] tests\test_b101_flow_saves.py:496: POSIX permission bits; Windows ignores the execute bits
+======================= 46 passed, 2 skipped in 58.01s ========================
