@@ -181,3 +181,67 @@ No test was run. Nothing that imports `s19_app` ran on the Windows PC. The only 
 | Result `not_run` (windows) | not stated | 81 (10 with a Windows-only arm) |
 | Negative control `pending mutants` | — | 81 (13 with no mutant in the table; 7 with an expected or possible survivor) |
 | Black-box AT holes (route) | — | 12 rows |
+
+## Re-audit
+
+Re-audit of the E5 corrective (`E5-rulings.md` C-1 … C-12, `E5-corrective-notes.md`), head `2260d4d`. Mode: **validation**. Scope: only the cases C-3, C-4, C-5, C-9 and C-12 touched, and the C-1 move of every other mark. Auditor: the QA reviewer agent, which wrote no case, node or run of this pass. Nothing was run: no test, and nothing that imports `s19_app` on the Windows PC. The only commands were git plumbing in a scratch index and object directory, file reads, and a `python -I` count of the `02-test-cases.md` rows.
+
+### R.1 Verdict
+
+- **"85 covered, 0 partial": true for row coverage.** All 85 rows are `covered`, and every row has a `full` node through the shipped route or an exact oracle.
+- **Marks still to change: 4 rows, plus the Windows trace of 10 rows.** Three control citations are wrong: R-TUI-049.3.1/9, R-TUI-049.3.2/9 and R-CHKED-031/3. One secondary node mark is still `partial`: R-PATCH-DOC-DROPDOWN-001.1/4. The e5c-08 transcript does not name the 10 Windows nodes it ran (R.4).
+- **Annotation owed on the re-driven rows.** Their mutant kills ran on the node bodies from before the corrective. They carry to the new bodies by inspection, not by a run (R.2).
+
+### R.2 Evidence checks
+
+- **The tree is the commit.** Base `98d94d7` + `git diff 98d94d7 2260d4d -- s19_app tests docs README.md` = `2dedfdeb…` (18 files). That is the tree that e5c-02 … e5c-08 print. The working tree equals the commit. e5c-01's `10edb677…` = base + the committed L and H as CRLF bytes, a copy of the Windows checkout. Its content is the commit's after line-ending normalisation.
+- **Runs.** e5c-02: `158 passed`, no skip, no deselection. Every node that the 85 rows cite is in its command. e5c-04: the 20 rewritten nodes pass 3 out of 3 times. e5c-05 (M43) and e5c-06 (M44) ran a copy of `2dedfdeb` and print the landed diff. Executor of every run: the orchestrator's corrective pass.
+- **Base RED, e5c-01** (15 RED / 3 GREEN, as recorded). Where each RED fails:
+  - **At the asserted read:** 049.3.1/4, 3.2/4, CHK-PE-008/3, -009/3, -009/4, -010/2, -011/2, -012/2 and CHKED-032/1.
+  - **At a precondition (the list):** 001.3/3, 001.3/4 and CHKED-031/3.
+  - **At the placement:** CHKED-032/4.
+  - **At the ledger, before the Checks-tab read:** CHK-PE-014/1.
+- **Mutants M1 … M42** ran on the `8530ebe` node bodies (tree `4d71b9b7…`). For the re-driven nodes, the kill carries over by inspection. The steps before the change are unchanged. On a tab switch, `_show_tab` → `_refresh_inspector_subtitle` only repaints the stored `#patch_win_checks` subtitle (`screens_directionb.py:5321-5333`, `:5637-5649`), so M39 and M31 still meet a stale subtitle. No mutant was re-run on these nodes.
+- **Mutant citations, C-1.** Each row's cited mutant was checked against the FAILED lines of its `mut-NN.txt`. All match, except R-CHKED-031/3 (M24, R.3).
+
+### R.3 Touched cases
+
+| Case | Route / oracle now | Mark | Agree | Note |
+|---|---|---|---|---|
+| R-TUI-049.3.1/4 | `p`, row, Load; Load-result closed; the node asserts that no question was asked | full / covered | yes | Base RED at the read; M10 equivalent (C-2) |
+| R-TUI-049.3.2/4 | as /4; the node asserts that the replace question was asked, and answers `y` | full / covered | yes | as above |
+| R-TUI-049.3.1/9 | `ctrl+s` dialog; read after the `Saved project to` line | full / covered | **control: change** | "M6 killed (mut-06)" → "no mutant isolates it: M6 fails both nodes at the precondition `after Apply` (`mut-06.txt:76`, `:145`), before the Save project; standing guard on base (e5c-01)". No run shows that the kept read can fail |
+| R-TUI-049.3.2/9 | as 3.1/9 | full / covered | **control: change** | as 3.1/9 |
+| R-PATCH-DOC-DROPDOWN-001.3/4 | `ctrl+s` dialog; `proj` opened by the handler (a precondition only) | full / covered | yes | Base RED and M17 fail before the Save project. The source assert is the S-4 discriminator |
+| R-CHK-PE-008/3, -009/4 | Inspector tab, press, Checks tab, read | full / covered | yes | Base RED at the read; M39 carried by inspection |
+| R-CHK-PE-009/3, -010/2, -011/2, -012/2 | `p` route; Load-result closed | full / covered | yes | Base RED at the read; M35 equivalent |
+| R-CHK-PE-014/1 | JSON tab, Write file, ledger read, Checks tab, subtitle read | full / covered | yes | The subtitle half is shown failing only by M31 on the old node (`mut-31.txt:77`); it carries by inspection |
+| R-PATCH-DOC-DROPDOWN-001.3/3 | ribbon `split(" · ")[0] == "w.json"` | full / covered | yes | No run shows the ribbon read failing: base, M12 and M15 all fail at the list. A mutant that paints the listed value would isolate it |
+| R-PATCH-DOC-DROPDOWN-001.3/2 | `test_at030a`: options `== saved`; source `== workarea/patches/<name>`; a settled wait on the pick | full / covered | yes | The options are still read after fixed pauses. The read is positive, so a slow fill fails and cannot pass vacuously. The control's "standing guard on base" never ran for the C-4 body: write "no mutant; not run on base" |
+| R-PATCH-DOC-DROPDOWN-001.1/4 (secondary) | `test_at030a` | **full → partial** | **change** | It opens the Patch Editor with `app.action_show_screen("patch")`, not key `6` (the case's Input), on generated names. The primary H node is full, so the row stays `covered` |
+| R-DIFF-CHK.1/2 | `test_tc_b94_15`: labels and values exact and in order; settled waits; fixture amended (E-4) | full / covered | yes | The labels are the `Select._options` prompts, not painted strips. Write "option labels", not "painted labels". The control is worded as for 001.3/2 |
+| R-TUI-049.3.2/1, /8 | the clause removed (C-5) | full / covered | yes | R-TUI-049.3.2's threshold names only the painted absence |
+| R-CHKED-032/1, /2, /4 | H `032[...]`: `written == [exact line]` | full / covered | yes | Event form, one `shall`, 4 cases for the threshold's 4 arms. M44 kills `project` and `collision`; `no-project` is a standing guard by design (e5c-06) |
+| R-CHKED-032/3 | H `031[after-library-pick]`: the exact line among the lines | full / covered | yes | M44 kills it (e5c-06) |
+| R-CHKED-031/3 | unchanged route; status assert amended | full / covered | **control: change** | Drop "M24 killed (mut-24)". `mut-24.txt` reads `1 failed, 1 passed`, and only `042` FAILED: this node stayed GREEN, because `write_spec` sets Write as explicitly. M21, M25 and M44 remain |
+
+### R.4 Windows (C-12)
+
+e5c-08 prints:
+
+- the tree `2dedfdeb…`, which equals the commit;
+- the host, Python 3.11.15 and an `s19_app.__file__` in the worktree;
+- `10 passed`, with no skip under `-rfs`.
+
+Its command elides the node list (`<10 nodes>`), and `-q` prints no node id. **Which 10 nodes ran is therefore not in the transcript.** The junction route follows from `make_link` (`sys.platform == "win32"` → `create_junction`), which is an inspection. **Change:** hold `windows: verified (e5c-08)` on the 10 rows until the transcript names its nodes (a re-record or a re-run with the node ids and `-rA`; executor: the orchestrator). Until then, read the 10 rows as executed, with the nodes untraced.
+
+### R.5 Totals
+
+| | Corrective record | Re-audit |
+|---|---|---|
+| Rows `covered` / `partial` / `gap` | 85 / 0 / 0 | 85 / 0 / 0 |
+| Secondary node marks `partial` | 2 | 3 (+ 001.1/4 `test_at030a`) |
+| Control citations to correct | — | 3 rows (049.3.1/9, 3.2/9, CHKED-031/3) |
+| Control wording to correct | — | 2 rows (001.3/2, DIFF-CHK.1/2: "not run on base") |
+| Re-driven rows whose kill carries by inspection | not stated | 5 rows (CHK-PE-008/3, -009/4, -014/1, 001.3/3, 001.3/4) |
+| Windows rows with traced nodes | 10 | 0 of 10 (run executed, 10 passed; node ids not in e5c-08) |

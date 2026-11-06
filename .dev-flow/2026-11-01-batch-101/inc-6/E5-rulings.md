@@ -18,3 +18,13 @@ Inputs: `E5-mutants.md` (DeepSeek, M1–M42: **39/41 killed**, 1 not applicable,
 | C-12 (Windows) | The 10 cases with junction or file-link arms run once on this PC under the Windows-only-arm rule (isolated app-state folders, never the clipboard); otherwise they stay `not_run` on Windows. | CI and the LAN hosts are Linux. |
 
 Corrective: one Opus pass (tests, records, docs, comment fixes, C-7 and C-9 code within the slice). Then a re-audit of the cases C-1 … C-5, C-9 touched, and a security re-check of C-9.
+
+## Re-audit rulings (2026-11-06)
+
+Re-audit: row coverage "85 covered" holds and the run trees match `2260d4d`. Record-only fixes (applied by the close unit):
+
+- **RA-1:** 049.3.1/9 and 3.2/9 — control column says "no mutant isolates the kept read (M6 fails both nodes before the Save project step, mut-06)".
+- **RA-2:** R-CHKED-031/3 — drop M24 from its controls (mut-24 shows the node GREEN).
+- **RA-3:** 001.1/4 — secondary `test_at030a` full → partial (it opens the editor with `action_show_screen`, not key `6`).
+- **RA-4:** the 10 Windows arms — `e5c-08` elides its node list, so the Windows result is recorded as `not_run (evidence incomplete)` on those rows; the Linux result stands. The batch-end battery re-runs them on Windows with node ids. Why: a result counts only for a transcript that names what ran.
+- **RA-5:** 001.3/2 and DIFF-CHK.1/2 — "standing guard on base" → "not run on base"; the five re-driven rows' kills are marked "carried over by inspection".
