@@ -15,3 +15,13 @@ Round 1: `E3-architect.md` **FAIL** (1 MAJOR A-1, 5 MINOR); `E3-security.md` **F
 | A-6 (MINOR) | Accept: the address rule matches a symbol by address **and** size; fold if it is a one-line edit, otherwise an E4 addendum. | Same root as SEC5-1. |
 
 Correction: one design-correction agent, targeted edits only. Round 2: the security reviewer re-checks SEC5-1, SEC5-2, SEC5-3 and A-1 only.
+
+## Round 2 (2026-11-06)
+
+`E3-security.md` §Round 2: **PASS-WITH-NOTES** — SEC5-1, SEC5-2, SEC5-3 and A-1 closed as ruled. Rulings on what it raised:
+
+- **R2-1 (MINOR)** — after a relayout A2L a session field can land on a demoted row's range, and Write then reports success for a spec the pick would refuse as colliding. No false pass. → **backlog row** (new behaviour would need its own requirement; not blocking).
+- **NOTE (mutants)** — E4's mutant table uses the name-only key (keys by name, drop address and size) as SEC5-1's negative control, not single range-test deletions. → E4/E5 addendum.
+- **NOTE (041.3/5)** — not reachable through a pick → the case is driven through the panel seam and marked `partial` by the tester, or ruled `not-testable` at E5 with this reason.
+
+E3 closed; E4 may start.

@@ -35,3 +35,59 @@ Run (operator rule: LAN Linux host only): one probe of base behaviour, `i5e3s-bl
 - [x] No secret values in this report (no credentials involved; the host name and path appear only as the brief gives them).
 - [x] Verdict explicit: FAIL — BLOCK-UNTIL: SEC5-1. The HIGH is open and its mitigation is `planned` (record amendments). I re-verify it when the records change.
 - [x] No new external tool or integration in scope (n/a — local TUI change).
+
+## Round 2
+
+I re-checked SEC5-1, SEC5-2, SEC5-3 and A-1 only, on `d61565a`, the correction commit (`git show d61565a --stat`: 5 records).
+
+- **Records read:** `E3-rulings.md`; `01-requirements.md`; `E1-rulings.md` §1, §2, E1-D3, E1-D5, E1-D6 and §6; `E1-slice.md`; `02-test-cases.md`; `codewire/graph-inc5.md`.
+- **Code read at base, for the collision questions:**
+  - `changes/io.py`: `read_change_document` :622, `serialize_change_document` :1448, `write_change_document` :1559-1680.
+  - `changes/validate.py::collision_issues`.
+  - `changes/check.py` :296-340.
+  - `changes/model.py::has_errors` :261.
+  - `services/change_service.py::ChangeService.apply` :1984.
+  - `app.py` :7283-7333, :7338-7395, :7449-7495.
+  - `screens_directionb.py` :7240-7380, :7814-7848.
+  - `workspace.py::copy_into_workarea` :1441.
+- **Run:** nothing. No LAN probe was needed. Every new claim below comes from reading code, so its evidence state is `not-run`.
+
+### Verdict
+
+**PASS-WITH-NOTES.** The design closes SEC5-1. The record mitigation is `executed` (`d61565a`), and I re-verified it here (`approved`). Its code is `planned` for E4. It is pinned by cases that turn RED on the E1 design. E5 re-verifies the code closure: those cases GREEN and the name-only-key mutant RED. This clearance covers the E3 design gate only and authorizes nothing else. One new MINOR (R2-1) and two NOTEs go to E4 as addenda.
+
+### Closure of the round-1 findings
+
+| Round-1 finding | State | Evidence |
+|---|---|---|
+| SEC5-1 (HIGH) | closed (design) | **Key.** A spec's bytes are now keyed by (name, address, size). The records carry this in three places: the definition *field loaded from a spec* (amended), the new definition *still lists*, and E1-D6 (amended, with alternatives (a)–(c)). The nodes carry it: `__init__`, `load_spec`, `set_a2l_parameters`, `_prune_spec_bytes`, `_collected_items`, and the new `_demote_moved_spec_params`. **No path moves the bytes.** No path is left that hands a spec's bytes to any range other than its entry's. Three range tests each enforce this: in the demotion, in the prune and in the collected items. The E1-D6 length check backs them. **Rows.** R-CHKED-055 is scoped to fields included in this session: strict EARS, one shall. R-CHKED-056 is new: EARS unwanted form, one shall, every term defined. **Cases able to fail:** R-CHKED-056/1 (name-only key → entry *A* `6C`, none at `0x0`); /2 (R-CHKED-055's drop applied → 2 entries); /3 (size left out of the key → a 2-byte entry at `0x0` read from the image); R-CHKED-025/3 (name-only key → `VALUE_0001` still included, so the precondition fails, and *A* `6C`); R-CHKED-026/4 (bytes dropped on every repopulation → `0x0` `93`). *A* is concrete, and its definition guarantees the mutant's `6C` differs from the image byte. **Examples are concrete:** tuples, entries in order, head lines, status texts. |
+| A-1 (MAJOR) | closed (design) | The same correction, in the ruled security form. The architect's case is now R-CHKED-025/3, with its expected result adapted to the demotion: 4 entries, *A* = the image byte, `0x0` `6C`. |
+| SEC5-2 (MAJOR) | closed | The row, the cases and the graph all carry two new alternatives of R-CRC-PREVIEW-002.5. /7 is the save-back refused as blocked, with this report's round-1 probe values `0x9C5BCBBD` / `0x2A8A3950`. /8 is the apply with 0 applied after the journal restore. Slice #2 and #3 say neither hook is gated. The negative controls are listed for the E4 mutant table: the hook under `if result.ok:` → /7 RED; the hook under `applied > 0` → /8 RED. /8's premise is `not-run`: that an entry at `0x9000` ends `1 skipped` and the restore gives back `03`. The premise is plausible, because `ChangeService.apply` restores the journal before the engine runs (`change_service.py:1984`). If E4 sees another status, the case's text changes. The hook's gate never does. |
+| SEC5-3 (MAJOR) | closed as ruled | `E1-rulings.md` §1 (5)–(7) admits three visible changes: Write no longer re-baselines, a rewritten spec reorders its entries, and a parameter can be demoted. `E1-slice.md` §1 lists the guide text for ch10 §10.6–§10.8 (E4, text only). §6 opens the backlog row for a provenance cue, with a prototype round first. |
+
+### Questions this round was asked
+
+- **Two spec entries colliding at one address — cannot reach the panel through a pick.** `read_change_document` runs the collision rule on every document (`io.py:622`). Identical addresses and intersecting ranges are ERROR `CHG-COLLISION`. The pick refuses any document with an ERROR (`app.py:7476-7481`, `Check Editor: spec NOT loaded.`). So a demoted row never meets a colliding twin from its own spec, and demoted rows overlap neither each other nor the spec's memory rows.
+  - Side effect, for the orchestrator (not a round-1 finding): for the same reason, R-CHKED-041.3/5 (two entries at `VALUE_0001`'s address) cannot be driven through a picked file. E4 either drives it through the panel seam (partial, as /6 is) or restates the case.
+  - The `taken` clause of *named parameter* is then only defensive.
+- **Overlap with an existing memory row — none created by the demotion itself.** The demotion adds a row only at its own spec entry's range. An overlap needs another field to land on that range: see R2-1.
+- **Saved-file meaning — unchanged.**
+  - In the moved, renamed and resized cases, the rewritten spec asserts the same `(address, bytes)` set as the picked one. Only the entry order changes (§1 (6)).
+  - The wire form carries no names, so the file loses nothing about `VALUE_0001`.
+  - Write never overwrites the picked spec. The placement claims the lowest free `_<N>` (`workspace.py:1441`).
+
+### Findings (round 2)
+
+| Id | Severity | Row / node | Finding | Proposed fix |
+|---|---|---|---|---|
+| R2-1 | MINOR | R-CHKED-056; R-CHKED-010 (a session field keeps its name); `on_check_editor_panel_action_requested` (not in the slice) | **What.** After an A2L change, the Check Editor can write a spec that its own pick refuses, and it reports success. A demoted row stays at its spec entry's range, while a parameter included in this session follows its name to its new range (R-CHKED-010 with *still lists*). With a relayout A2L the two can land on one range, and the operator does nothing after the load to cause it. **Example.** The pilot spec is picked and `VALUE_0003` included. A planted A2L lists `VALUE_0001` at *A* and `VALUE_0003` at `0x0` with 1 byte. On return the fields are `VALUE_0002` and `VALUE_0003` @ `0x0` (the image byte), and the memory rows are `0xC00FFC` and `0x0` `6C`. In the renamed and resized cases, the same state is one keystroke away: `space` on `VALUE_0001_R`, or on the 2-byte `VALUE_0001`. **What follows.** Write succeeds with `Check Editor: wrote … (4 fields, kind=check).`, because Write never runs the collision rule: `write_change_document` only serializes and places (`io.py:1641-1665`), and `_check_items_to_document` builds a document with no issues. The editor's Validate judges both entries separately, since the taint reads only `document.issues` (`check.py:326-340`). It shows `pass` and `fail` at one address with no collision notice. Picking the written spec back is refused: `[CHG-COLLISION] …`, then `Check Editor: spec NOT loaded.`. In any other run of that file, both entries come out `uncheckable` (`entry-fault`). **Why MINOR.** No false `pass` reaches a run, and the picked spec is not overwritten. The root is pre-existing: on base, adding a memory row over an included parameter writes the same file. What Inc 5 adds is a way to reach it without the operator choosing the overlap. Evidence: `not-run`, read from code at base. | E4 addendum. The orchestrator rules between: **(a) minimum.** §1 (7) and the guide's §10.8 say that a demoted row keeps the spec's address, and that a field on the same range gives a spec the pick refuses ("remove the memory row first"). Plus a backlog row: the Check Editor's Write and Validate run the collision rule on the document they build. Write then refuses through the existing path (`[CHG-COLLISION] …`, `Check Editor: spec NOT written.`, `Write refused: CHG-COLLISION.`, LLR-148.9). Validate taints the partners as it does for a document it read. **(b) Fold the Write refusal into Inc 5 now.** One row (unwanted form) and one case: the example above → `spec NOT written`, no file. It goes in `app.py`, a file already in the slice, and adds no new text. Recommendation: (a) for Inc 5. |
+| R2-N1 | NOTE | Negative controls of R-CHKED-025/3 and R-CHKED-056/1; E4 mutant table | Three range tests guard the bytes: the `del` in `_demote_moved_spec_params`, the range test in `_prune_spec_bytes`, and the range test in `_collected_items`. They mask one another, so deleting any one of them is an equivalent mutant for every end-to-end case. Only the name-only key turns R-CHKED-056/1 and R-CHKED-025/3 RED: all three tests gone, which is the E1 design. The count paragraph of `02-test-cases.md` says so. The negative-control text of 025/3 ("the spec's bytes kept under the parameter's name") reads like the single-`del` mutant. | E4: use the name-only key mutant for 056/1 and 025/3 in the mutant table. Kill each single test with a node-level test built from its graph example (`_collected_items` backstop, `_prune_spec_bytes`, `_demote_moved_spec_params` /1), or mark it equivalent. Never count a single-test mutant as killed by an end-to-end case. |
+| R2-N2 | NOTE | R-CHKED-055, R-CHKED-056 (form) | Both rows read "If <condition> when <trigger>, then …". The form is acceptable and unchanged since round 1. The canonical complex order is "When the operator returns to the Check Editor, if the loaded A2L no longer lists …, then the system shall …". | Optional, at the canon fold. |
+
+### Evidence checklist (round 2)
+
+- [x] Each finding has what · where · why · recommendation (table above).
+- [x] Each finding has a severity.
+- [x] No secret values in this section (none involved).
+- [x] Verdict explicit: PASS-WITH-NOTES. SEC5-1 (HIGH) is closed on the records: `executed` in `d61565a`, `approved` here. Its code is `planned` (E4). E5 re-verifies it through R-CHKED-056/1–3, R-CHKED-025/3, R-CHKED-026/4 and the name-only-key mutant.
+- [x] No new external tool or integration (n/a — local TUI change).
