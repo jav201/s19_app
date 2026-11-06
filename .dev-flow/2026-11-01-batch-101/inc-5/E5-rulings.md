@@ -18,3 +18,13 @@ Inputs: `E5-code-review.md` (code-reviewer **PASS-WITH-NOTES**: F1 MAJOR design-
 | — (SEC E5-S2 INFO) | No action. | The exception ends the app; nothing stale stays on screen. |
 
 Corrective: one Opus pass (code within the slice, tests, records, graph). Then a re-review of C-2 and C-10 (code + security) and a re-audit of the cases C-2 … C-6 and C-10 touched.
+
+## Re-review and re-audit rulings (2026-11-06)
+
+Security re-review: E5-S1 and code-review F1 **closed** (executed · approved), HIGH 0, MEDIUM 0. Re-audit: **PASS**, 0 marks to change; 4 partials stand with their reasons. The residuals are recorded as owed in `04-validation.md`, none blocking:
+
+- RA-1: M1–M24 ran at `8fc3cd3` (before the corrective, which touched only the hook's callee set and tests); they carry over by reasoning, and the batch-end battery re-runs the mutant table on the merged tree.
+- RA-2: mutant transcripts show `Files … differ`, not the mutant text — the mutant table in `E5-mutants.md` and `E5-corrective-notes.md` names each edit; future units print the diff.
+- RA-3: R-CHKED-041.2/4 and 041.3/1 have no executed control of their own; 010/4's base failure hits another defect — backlog line for the next Check Editor increment.
+- RA-4: AT-I5-4 proves the save-back confirm is reachable by keys, not that the clipped row is visible — the clipping is a UI row (KF-101 family), backlog.
+- RA-5: refused/raising paths reach R-CHKED-057 only through the shared hook (RR-2); R-CHKED-056's Base column is refreshed by the close record (RR-3).

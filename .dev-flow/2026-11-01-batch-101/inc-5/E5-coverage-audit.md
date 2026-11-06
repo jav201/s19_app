@@ -134,3 +134,39 @@ Not reached by keys or clicks anywhere: **Write**, **Validate**, the **memory-ro
 | Result | 34 verified (linux, int-01) | 7 designer verified (2 runs × 3 reps); 27 Check Editor verified 2 of 3 runs, 1 run owed; windows not_run |
 | Negative controls | — | red-on-base 29 nodes executed; M1 … M24 pending mutants; 4 rows with none (M25 … M28 proposed) |
 | Cases changed | — | substantive 10/34 = **29.4 %**; with drive labels 21/34 = 61.8 %; any column 32/34 = 94.1 % |
+
+## Re-audit
+
+Re-audit of the changed items only, at head `ab8558b` (branch `b101-inc5`). Role: qa-reviewer, mode **validation**. Same auditor as above; I wrote none of the cases, tests or runs. This section is the only edit.
+
+**Scope.** C-1 (every other mark against §2/§3), C-2 (056/1–/3, 025/3), C-3 (002.5/3, /4, /7, /8), C-4 (AT-I5-1 … AT-I5-4), C-5 (the 3/3 Check Editor runs), C-6 (041.2/4, 010/4, 002.5/9; M26–M28 for 010/1, 025/1, 027/1), C-10 (R-CHKED-057/1–/3), and the 4 partials.
+
+**Evidence.**
+- **Executed by this auditor (Windows PC, no import of `s19_app`):** `git rev-parse ab8558b:{s19_app,tests,docs}` = `397a3b2` / `2dad0b4` / `172ff6f`, equal to `22cfd4c`'s and to the index-tree subtrees printed in `e5c-02`, `-03`, `-04`. `git diff --stat 22cfd4c ab8558b` touches only `mut-*.txt`, `E5-mutants.md` and `steps.log`. So the e5c runs are runs of this commit's code, tests and guide.
+- **Inspection:** the corrective diffs of `tests/test_b101_designer_writes.py` and `tests/test_b101_check_spec_keep.py` (`8fc3cd3..ab8558b`), their drive helpers, `_note_image_bytes_written` (`app.py:17910`) and `CheckEditorPanel.clear_check_results` (`screens_directionb.py:8027`); transcripts `e5c-01` … `e5c-10`, and `mut-01` (header only).
+- **Not executed by this auditor:** every pass, fail and kill below. `e5c-01` … `e5c-12` were executed by the E5 corrective pass (Opus) on LAN host 2. `mut-01` … `mut-24` were executed by the DeepSeek battery at `8fc3cd3`.
+
+### Verdict
+
+**Every mark in scope is right. I would change 0 marks.** Each result is backed by a cited transcript for this commit. Counts in `02-test-cases.md`: 40 cases, 36 `covered`, 4 `partial`; Tests marks 23 `full`, 13 `full (output); drive partial`, 4 `partial`. I recounted these from the table and they match.
+
+| Item | Checked | Result |
+|---|---|---|
+| C-1 | Each of the other cases against §2/§3. Checked: the 14 Check Editor drive labels and 002.5/4, /7; 041.3/5's extra "what" text; R-2, R-3, R-4 (no `N` cell, no stale sentence), R-5, R-6 (now `-rA`, node ids in the transcripts) | right |
+| C-2 | 056/1–/3 (`relayout_and_write`) and 025/3 apply `0x0` = `93` before the pick. The expected `0x0 6C` comes from `Facts.image`, the independent S19 reader, so it equals the spec's bytes and not the session's. `e5c-05`: M25 KILLED 5/5, `0x0` written as `93` | `covered` is right |
+| C-3 | `before = designer_recomputes()` now sits directly above `_apply` / `_save_back` in /3, /4, /6, /7, /8. In /8 it sits after the Remove and Add entry ops, which do not write the image | /3, /4, /7, /8 `covered` is right; /6 stays `partial` |
+| C-4 | AT-I5-1 … -3 use only `click_on`, `type_into`, `include_by_keys`, `write_by_click`, `validate_by_click` and `apply_by_keys`: real clicks and keys. Their setup seams are a staged spec file and a focus release, both accepted earlier. AT-I5-4 types the name and reaches the confirm with `tab` and `enter`; it asserts 0 recomputes from a snapshot taken before the trigger, then exactly 1, the crc32 and window line 2; 3 reps. All four ATs RED on base (`e5c-01`) and GREEN (`e5c-02`) | the `full, black box` marks on 002.5/4, 010/2, 054/1, 041.2/1, 026/1, 026/2 and 056/1 are right |
+| C-5 | `e5c-02` (68 passed), `-03` and `-04` (33 passed each): the same tree, the same 33-node set (I diffed the `PASSED` lines), 30 cases in **C** plus S node 9 | `3/3 runs` is right |
+| C-6 | 041.2/4 checks the included list and the Fields lines in entry order (v2 then v1); RED on base. 010/4 RED on base. 002.5/9 asserts `0xBB`, the `RuntimeError` out of the run and return code 1, in 3 reps; it passes on base by design; `e5c-10` M30 KILLED. `e5c-06` M26 KILLED (`[]`), `e5c-07` M27 KILLED (`VALUE_0003` = zeros), `e5c-08` M28 KILLED (`2 fields`, no outside status) | right |
+| C-10 | 057/1 runs entirely on keys and clicks, so `full`. 057/2 confirms the save-back with `_save_back`, which calls `Button.press()`, so `drive partial`. 057/3 commits through the Save project dialog; its project is opened by the shipped handler, a setup step accepted earlier, so `full`. `card()` reads the painted `#check_status` and `#check_results Static`. RED on base 3/3 (`e5c-01`); M29 KILLED 3/3 (`e5c-09`); 057/2 and /3 run 3 reps through `_reps` | right |
+| Partials | 002.5/6 and 002.5/9: fault injected; 002.5/9 can never be `covered`, because its subject is the injected fault. 041.3/5: a pick cannot reach the duplicate (E3 Round 2 NOTE), and the status clause is not asserted. 041.3/6: Inc 4's reader drops the entry. Each reason is stated in its Tests cell | correctly `partial` |
+
+### Residuals (non-blocking; no mark changes)
+
+1. **Clause-specific negative controls for the new deciding cases.** The base RED of 041.2/4 and of 010/4 comes from another defect: 0 included, and picks cleared, respectively. Both cases discriminate by construction, but neither has an executed control for its own clause. R-CHKED-041.2's Negative-control column has no entry for /4 at all. Add "included in ledger or address order → (/4) `[VALUE_0001, VALUE_0002]` → RED". Optionally, run that mutant and "a session field demoted on a move → (/4) `[VALUE_0002]`".
+2. **M1–M24 ran at `8fc3cd3`, against the test bodies from before the corrective.** Their carry-over to `ab8558b` for 002.5/3–/8 and for 056/025/3 holds by inspection only: C-3 moves the snapshot earlier and C-2 adds a patch, and both only strengthen the checks. No run at this commit shows it. Cells that cite M1, M2, M4, M6, M7, M13 or M22–M24 should say "at `8fc3cd3`".
+3. **`e5c-05` … `e5c-10` end with `Files … differ`, not with the mutant's diff.** E5-corrective-notes §5 says they end with the diff. Each mutant's identity rests on the notes' prose; the failure values are consistent with it. Attach the `diff -u`, or reword the claim.
+4. **041.3/1 still has no executed negative control.** It is GREEN on base, and M12's guard list was not extended, as §5 had proposed.
+5. **AT-I5-4 proves the confirm can be reached by `tab`, not that it can be seen.** It does not assert that the focused confirm is painted, outside the status bar's clip, at 160×54. "Not a product finding" is shown for reachability only.
+6. **R-CHKED-057's "whatever its status / outcome" variants have no 057 case.** These are the error apply, the blocked save-back and the 0-applied restore. They ride on the same no-argument hook, whose call sites 002.5/6–/8 and M5–M7 pin. This holds by inspection.
+7. **NITs.** The header still says "abbreviated **N** below". 057/1's Inputs read "the change document `0x0` = `93` typed"; the test types its path. R-CRC-PREVIEW-002.5's /8 threshold still says "address edited to `0x9000`" (C-4: deferred to the canon fold).

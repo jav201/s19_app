@@ -89,3 +89,43 @@ The CRC oracle is independent of the product: `zlib.crc32` of the session range 
 - [x] No secret values: no credentials involved. The host is named only as "LAN Linux host 2", and home paths are redacted.
 - [x] Verdict explicit: PASS-WITH-NOTES, HIGH 0. SEC5-1 (the E3 HIGH) is `executed` and `approved` in code, with its negative control M24 KILLED 4/4.
 - [x] No new external tool or integration (n/a — local TUI change). No new file writer and no clipboard use.
+
+## Re-review
+
+Scope: only what `E5-rulings.md` ruled for this reviewer's lens, C-10 (E5-S1) and C-2 (code-review F1). Read: `E5-rulings.md`, `E5-corrective-notes.md`, `E5-code-review.md` F1, `git diff 8fc3cd3 22cfd4c -- s19_app tests`, R-CHKED-057 and the Definitions *in-place write* and *validation results* in `01-requirements.md`, cases 057/1 … /3, 056/1 … /3 and 025/3 in `02-test-cases.md`, transcripts `../evidence/inc-5/e5c-01` … `e5c-05`, `e5c-09`. Read-only; nothing ran here (nothing that imports `s19_app` on Windows). The evidence trees (`s19_app` `397a3b2`, `tests` `2dad0b4`, `docs` `172ff6f`, printed in e5c-02 … -04) equal both `22cfd4c` and the head `ab8558b`. The worktree is clean.
+
+### Verdict
+
+**E5-S1: closed** (`executed` · `approved`). **F1: closed** (`executed` · `approved`). HIGH 0, MEDIUM 0. Two INFO notes and one NIT follow; none blocks. This clearance covers the security lens of E5 only. It is not the operator's authorization to merge.
+
+### (a) E5-S1 — R-CHKED-057
+
+| Check | Result | State · evidence |
+|---|---|---|
+| Every in-place write reaches the clear | The clear lives in `_note_image_bytes_written` (`app.py:17910-17955`). Its three call sites are unchanged: apply at `:4913-4914`, after the `try`/`except` and keyed on the action only, so it covers a raise and 0 applied; save-back at `:5046`, unconditional before `_report_change_result`, so it covers the refused save-back; project save at `:12642`, inside `if request.image is not None:`. The census of writers (SEC5-6) is unchanged. | `executed` (read). Per path: M1, M5, M7, M2, M6, M3 KILLED (first review). The clear in the helper: M29 KILLED 3/3 (e5c-09: stale `validation complete` and `-> pass` on 057/1, /2, /3). |
+| Independent of the designer | The two panels are queried separately; a missing designer skips only its own notice. A fault inside either panel stays loud (both delegations sit outside the `try`). | `executed` (read) |
+| No tab switch, no focus move | `CheckEditorPanel.clear_check_results` (`screens_directionb.py:8027-8050`) does two statements: it sets `#check_status` to `_STATUS_HINT` and calls `remove_children()` on `#check_results`. It makes no `_show_tab`, `focus` or `refresh_window` call. | `executed` (read) |
+| Cleared = R-CHKED-057's state | `_STATUS_HINT` = `Validate compares fields to the image` (`:7168`), the text the label is composed with (`:7775-7781`), and 0 rows, which matches the Definition *validation results*. The tests assert `(status, rows) == (HINT, [])` exactly, plus no `validation complete` and no `-> pass` row. | `approved`: GREEN e5c-02 (68 passed), e5c-03 and e5c-04 (33 passed each, including 057/1); RED on base e5c-01 (057/1, /2, /3 keep `validation complete` and `-> pass`) |
+| No stale `pass` can come back | Validate is synchronous in the handler (`app.py:7429-7474`, no worker or timer), so no Validate in flight can repaint after the clear. | `executed` (read) |
+| Nothing else cleared | The clear touches neither the picks, nor `_spec_bytes`, nor `_memory_rows`, nor the JSON or addendum previews. 057/1's second Validate reports `2 passed, 1 failed` with `0x0-0x0 expected [6C] actual [93] -> fail`. The 3 fields survive, so the picks survive. `6C` is the spec's byte, since the image now holds `93`, so the spec bytes survive. | `approved` (057/1, e5c-02 … -04) |
+| Remainder | The other triggers of E5-S1 (image load, spec pick, A2L load, collector change) are not ruled in. They are recorded as a backlog row in `E1-rulings.md` §6 (line 105). | `executed` (records) |
+
+### (b) F1 — R-CHKED-056 bytes clause
+
+- **The precondition now decides.** `relayout_and_write` (`tests/test_b101_check_spec_keep.py:1199-1214`), shared by 056/1, /2 and /3, and the 025/3 scenario (`:1033-1045`) apply `0x0` = `93` before the spec pick. The expected entry is `facts.image_bytes(...)`, which comes from the generated file and is `6C`, so a demoted row that reads the session image fails. The requirement row and the three cases carry the new precondition. Their expected results are unchanged. `executed`.
+- **M25 is a real RED.** e5c-05 shows M25 KILLED 5/5 (056/1, /2, /3, 025/3, AT-I5-3). Each failure is an assertion on the targeted defect: `At index 2 diff: (0, b'\x93') != (0, b'l')` (index 3 for 025/3). None fails at import or by timeout. On the GREEN tree all five pass 3/3 (e5c-02 … -04). `approved`.
+
+### Notes
+
+| Id | Severity | What · recommendation |
+|---|---|---|
+| RR-1 | INFO | The mutant transcripts (e5c-05, e5c-09) end in `Files … differ`, not in the mutant text. The operation is stated only in `E5-corrective-notes.md` §5. Each RED reason is exactly the signature of its stated operation, so this is accepted. For future batteries, print `diff -u` in the transcript. |
+| RR-2 | INFO | No 057 case drives the refused save-back, the raising apply or the 0-applied apply. They are covered transitively: the clear sits in the one helper, whose call on each of those paths M2, M6, M1, M5 and M7 kill. No action needed. |
+| RR-3 | NIT (records) | R-CHKED-056's Base column still reads "its written entries match only because the image still holds the spec's bytes". After C-2 the image holds `93`. The base is still RED through the head line. Reword at the canon fold. |
+
+### Evidence checklist (re-review)
+
+- [x] Each finding and note has what, where, why and a recommendation, with a severity.
+- [x] No secret values: none are involved, and home paths stay redacted as in the transcripts.
+- [x] Verdict explicit: E5-S1 and F1 closed; HIGH 0.
+- [x] No new tool or integration (n/a); no new writer and no clipboard use in the corrective diff (its `+` lines grepped).
