@@ -1,0 +1,35 @@
+REPLACE_COUNT=1
+MUTATED
+APPFILE=<HOME>/work/s19_m14/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________________ test_r_whelp_24_1_crc_step_names_typed_ranges _________________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+    def test_r_whelp_24_1_crc_step_names_typed_ranges() -> None:
+>       _equals_copy("crc_designer", 3)
+
+tests/test_b101_help_legend_docs.py:802: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+section = 'crc_designer', number = 3
+
+    def _equals_copy(section: str, number: int) -> None:
+>       assert _steps(section)[number - 1] == COPY.REWRITTEN_SECTIONS[section][1][number - 1]
+E       AssertionError: assert 'Coverage com...g is written.' == 'Coverage com...g is written.'
+E         
+E         - Coverage computes CRCs over the ranges you type in Ranges (`start-end`, end excluded), in the loaded image: Intra gap and Join gaps choose how gaps are handled, Pad byte is the fill byte, and On conflict chooses what happens when a padded gap holds image bytes. It is a preview; nothing is written.
+E         ?                                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+E         + Coverage computes CRCs over the image's real ranges: (`start-end`, end excluded), in the loaded image: Intra gap and Join gaps choose how gaps are handled, Pad byte is the fill byte, and On conflict chooses what hap...
+E         
+E         ...Full output truncated, use '-vv' to show
+
+tests/test_b101_help_legend_docs.py:772: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_help_legend_docs.py::test_r_whelp_24_1_crc_step_names_typed_ranges
+1 failed in 1.23s
+PYTEST_RC=1
+RESTORE_OK

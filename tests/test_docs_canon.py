@@ -2,7 +2,8 @@
 
 Two arms:
 1. every key the README's keybinding table names exists in the shipped seat
-   (`S19TuiApp.BINDINGS`) — a documented key that leaves the keymap reddens here,
+   (`S19TuiApp._merged_bindings` plus the palette key while the palette is on) —
+   a documented key that leaves the keymap reddens here,
    so the docs cannot drift from the app again;
 2. no unmarked `CDFX` token and no `s19tool` presented as a runnable command in
    README.md or docs/ — `s19tool` is the DISTRIBUTION name (paths, "Distribution
@@ -20,9 +21,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def _readme_keys() -> set[str]:
-    """Every key token the README's keybinding table names (single-key cells)."""
-    text = (ROOT / "README.md").read_text(encoding="utf-8")
+def _readme_keys(text: str | None = None) -> set[str]:
+    """Every key token the README's keybinding table names (single-key cells).
+
+    ``text`` replaces the README (the negative controls feed a synthetic one).
+    """
+    if text is None:
+        text = (ROOT / "README.md").read_text(encoding="utf-8")
     keys: set[str] = set()
     in_table = False
     for line in text.splitlines():
@@ -38,23 +43,25 @@ def _readme_keys() -> set[str]:
 
 
 def _shipped_keys() -> set[str]:
+    """Every key the app binds: the merged bindings (the class's own and the
+    ones it inherits from Textual's ``App``, e.g. ``ctrl+q``), plus the command
+    palette key while the palette is enabled (batch-101 Inc 14, E3 A-5)."""
     from s19_app.tui.app import S19TuiApp
     out: set[str] = set()
-    for b in S19TuiApp.BINDINGS:
-        if hasattr(b, "key"):
-            key, display = b.key, b.key_display
-        else:
-            key = b[0]
-            display = b[3] if len(b) > 3 else None
+    for key, bindings in S19TuiApp._merged_bindings.key_to_bindings.items():
         for k in str(key).split(","):
             out.add(_norm(k.strip()))
-        if display:
-            out.add(_norm(str(display)))
+        for binding in bindings:
+            if binding.key_display:
+                out.add(_norm(str(binding.key_display)))
+    if S19TuiApp.ENABLE_COMMAND_PALETTE:
+        out.add(_norm(S19TuiApp.COMMAND_PALETTE_BINDING))
     return out
 
 
 _GLYPH = {"/": "slash", "?": "question_mark", ",": "comma", ".": "period",
-          "+": "plus", "-": "minus"}
+          "+": "plus", "-": "minus", "=": "equals_sign",
+          "]": "right_square_bracket"}
 
 
 def _norm(key: str) -> str:
@@ -62,9 +69,28 @@ def _norm(key: str) -> str:
     return _GLYPH.get(key, key)
 
 
-def test_at285_every_readme_named_key_exists_in_the_seat():
-    missing = {k for k in _readme_keys() if _norm(k) not in _shipped_keys()}
+def _unbound(keys: set[str]) -> set[str]:
+    shipped = _shipped_keys()
+    return {k for k in keys if _norm(k) not in shipped}
+
+
+def test_at285_every_readme_named_key_exists_in_the_seat(monkeypatch):
+    missing = _unbound(_readme_keys())
     assert not missing, f"README names keys the seat does not bind: {sorted(missing)}"
+    # Negative controls (batch-101 Inc 14, E3 A-5; R-DOC-README.3/2).
+    # (1) a table row for a key nothing binds is reported;
+    synthetic = "| Key | Action |\n|---|---|\n| `h` | nothing |\n| `Ctrl+Q` | quit |\n"
+    assert _unbound(_readme_keys(synthetic)) == {"h"}
+    # (2) the README lists Ctrl+P (D-11) and the keys Textual's App binds;
+    #     with the command palette disabled the same README is then RED.
+    keys = _readme_keys()
+    assert {"Ctrl+P", "=", "]"} <= keys, (
+        "the README key tables must list Ctrl+P, = and ] as single-key cells"
+    )
+    from s19_app.tui.app import S19TuiApp
+
+    monkeypatch.setattr(S19TuiApp, "ENABLE_COMMAND_PALETTE", False)
+    assert _unbound(keys) == {"Ctrl+P"}
 
 
 _HISTORIC = re.compile(r"removed|deleted|historic|superseded|legacy|no longer|moot", re.I)

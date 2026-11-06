@@ -1,0 +1,15 @@
+# E5 corrective final run int-09 — LAN Linux host, conda env s19ci
+# worktree: origin/main f9f3cb09 + branch b101-inc14 diff (local head 7d37efa + E5 working tree) applied with git apply
+# started 2026-11-06T01:06:38Z; load: 1.51 3.40 6.00
+s19_app.__file__ = <host-home>/work/s19_c14/s19_app/__init__.py
+python 3.11.18
+$ env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 2400 python -m pytest -q -p no:cacheprovider --basetemp /tmp/pytest-s19c14 -n 4 -rfEs tests/test_legend_map_sheet.py tests/test_legend_n8.py tests/test_legend_two_pane.py tests/test_legend_scope_and_logwidth.py tests/test_tui_legend.py tests/test_report_service.py tests/test_segment_split_window.py tests/test_tui_diff_screen.py tests/test_tui_report_seam.py tests/test_tui_theme.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 26%]
+........................................................................ [ 52%]
+........................................................................ [ 78%]
+..........................................................               [100%]
+274 passed in 250.74s (0:04:10)
+# exit 0 at 2026-11-06T01:10:49Z

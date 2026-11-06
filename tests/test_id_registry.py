@@ -170,7 +170,9 @@ from tools.id_registry import (
 # 246 -> 248, measured (tests/support/suite_census.py, tests/test_suite_hygiene.py).
 # batch-101 Inc 8 (merged after Inc 2): 248 -> 250, measured
 # (tests/test_b101_crc_model_and_reasons.py, tests/test_b101_flow_ext_copy.py).
-EXPECTED_SCANNED_TEST_FILES = 253
+# batch-101 Inc 14 (merged after Inc 11): 253 -> 255, measured
+# (tests/test_b101_help_legend_docs.py, tests/support/help_copy_i14.py).
+EXPECTED_SCANNED_TEST_FILES = 255
 """Test modules scanned, including this one.
 
 batch-101 Inc 11: 250 -> 253. ``tests/test_b101_a2l_blocks_and_segments.py``,

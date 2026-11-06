@@ -58,10 +58,12 @@ shows the variables (the *funnel*) at work.
 ![Run result](img/ch17-05-flow-run-result.png)
 
 **Run** runs the chain on the project and lists each block's verdict: `source ok`,
-`patch ok — applied 5 entries`, `check notices — passed=3 failed=1 uncheckable=1`,
-then `crc error — CRC config is structurally invalid: 'reverse'`. The CRC block
-cannot read the template the CRC Designer saves (finding F-28), so the chain ends
-**FAILED** there.
+`patch ok — applied 5 entries`, `check notices — passed=3 failed=1 uncheckable=1`;
+then the CRC block stops: it names the template the CRC Designer saved, and a CRC
+block reads a CRC config, not a Designer template. Its cause is `crc config invalid:
+CRC config is structurally invalid: a CRC Designer template is not a CRC config - it
+has no regions or groups` (finding F-28), and the chain ends **FAILED** there.
+(capture taken before 1.0.0: it shows the earlier cause `… 'reverse'`)
 
 ### 17.6 Save the flow
 
@@ -174,9 +176,10 @@ flows side by side.
 - **Using the output in a later block:** there is no wiring for it — no `#n` reference,
   no binding and no `${NAME}` variable points at an external step's output. A later
   block can only name the copy **by its file name**, relative to the project, as any
-  other ref (finding F-48). That works for the first run; when a later run produces a
-  different output, the copy is stored as `<name>_1…` but the later block still reads
-  the first copy (finding F-49).
+  other ref (finding F-48). When a later run produces a different output, the copy is
+  stored as `<name>_1…`, and a later block of the same run that names the output reads
+  this run's copy; its summary ends ` · read <copy> in place of <ref>` (finding F-49,
+  fixed in 1.0.0).
 
 **The demo: a command that writes a change document, which the next block applies.**
 In project `demo`, with a folder `C:\Users\Public\s19demo\bench` for the bench files:

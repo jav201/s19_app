@@ -1,0 +1,64 @@
+$ git -C <HOME>/work/s19_i14 rev-parse HEAD (base) + applied diff of b101-inc14
+7add3d63cb9541957ed327a9ca7ca6bee1b4d843
+s19_app: <HOME>/work/s19_i14/s19_app/__init__.py
+3.11.18
+$ pytest -q -p no:cacheprovider -rfE -n 8 tests/test_report_service.py tests/test_segment_split_window.py tests/test_tui_diff_screen.py tests/test_tui_report_seam.py tests/test_tui_theme.py tests/test_tui_snapshot.py tests/test_help_toggle_and_a2l_panel.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 30%]
+........................................................................ [ 61%]
+.......................................sssssssssssssssssssssssssssssF... [ 92%]
+.................                                                        [100%]
+=================================== FAILURES ===================================
+____________ test_tc016s_snapshot_setup_loads_only_public_fixtures _____________
+[gw4] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+public_triple = {'s19': PosixPath('/tmp/s19_i14_bt/popen-gw4/snapshot_public0/snap.s19'), 'a2l': PosixPath('/tmp/s19_i14_bt/popen-gw4/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/s19_i14_bt/popen-gw4/snapshot_public0/snap.mac')}
+
+    def test_tc016s_snapshot_setup_loads_only_public_fixtures(
+        public_triple: dict[str, Path],
+    ) -> None:
+        """The snapshot setup loads only public synthetic fixtures (LLR-007.2).
+    
+        Intent: S-2 — a committed SVG baseline embeds the rendered screen
+        content. Every baseline must trace to a public synthetic fixture so no
+        proprietary client byte / address / symbol is ever committed. This test
+        asserts (a) the snapshot fixture source is the ``conftest.py``
+        generators, (b) those generators wrote their output under a pytest temp
+        directory (never a client path), and (c) the snapshot ``run_before``
+        setup code references no static ``examples/`` artifact and no client
+        directory — its only data source is the generator-built triple.
+        """
+        # (a) The recorded fixture sources are exactly the conftest generators.
+        assert set(_PUBLIC_FIXTURE_SOURCES) == {
+            "make_large_s19",
+            "make_large_a2l",
+            "make_large_mac",
+        }, "snapshot fixture source must be the conftest.py public generators"
+        for name, generator in _PUBLIC_FIXTURE_SOURCES.items():
+            assert generator.__module__ in ("conftest", "tests.conftest"), (
+                f"{name} must be the conftest.py generator (got module "
+                f"{generator.__module__})"
+            )
+    
+        # (b) Every triple file is a synthetic, generator-written file living in
+        # a pytest temp directory — never a client artifact path.
+        for kind, path in public_triple.items():
+            assert path.exists(), f"public {kind} fixture must have been generated"
+            parts = {p.lower() for p in path.parts}
+>           assert "snapshot_public" in parts or "pytest" in " ".join(parts).lower(), (
+                f"public {kind} fixture must live in a pytest temp dir, got {path}"
+            )
+E           AssertionError: public s19 fixture must live in a pytest temp dir, got /tmp/s19_i14_bt/popen-gw4/snapshot_public0/snap.s19
+E           assert ('snapshot_public' in {'/', 'popen-gw4', 's19_i14_bt', 'snap.s19', 'snapshot_public0', 'tmp'} or 'pytest' in 'tmp popen-gw4 / s19_i14_bt snapshot_public0 snap.s19')
+E            +  where 'tmp popen-gw4 / s19_i14_bt snapshot_public0 snap.s19' = <built-in method lower of str object at 0x7fcc37b6ef00>()
+E            +    where <built-in method lower of str object at 0x7fcc37b6ef00> = 'tmp popen-gw4 / s19_i14_bt snapshot_public0 snap.s19'.lower
+E            +      where 'tmp popen-gw4 / s19_i14_bt snapshot_public0 snap.s19' = <built-in method join of str object at 0x557ecb2dcf08>({'/', 'popen-gw4', 's19_i14_bt', 'snap.s19', 'snapshot_public0', 'tmp'})
+E            +        where <built-in method join of str object at 0x557ecb2dcf08> = ' '.join
+
+tests/test_tui_snapshot.py:1270: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_tui_snapshot.py::test_tc016s_snapshot_setup_loads_only_public_fixtures
+1 failed, 203 passed, 29 skipped in 319.85s (0:05:19)
+exit=1

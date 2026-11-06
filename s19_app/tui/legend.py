@@ -481,13 +481,18 @@ MAP_REGION_ROW_SAMPLE = " ▒ 0x08000000 2.0 KiB ████  3 medium   ↵"
 #: The Region-row box's field key: one line decoding every sample field
 #: (LLR-132.1). Authored to fit the 80x24 floor box interior — the width
 #: budget is recorded with the ``.legend-sheet-*`` rules in ``styles.tcss``.
+#: ``↵ inspect`` is Enter's action on a region row today (R-LEGEND-011);
+#: when D4-21 makes Enter open the hex view, this line changes with it.
 MAP_REGION_ROW_FIELD_KEY = (
-    "glyph · start · size · size vs largest · A2L sym · band · ↵ opens hex"
+    "glyph · start · size · size vs largest · A2L sym · band · ↵ inspect"
 )
 
-#: The Keys box's one line (LLR-132.1, verbatim from the contract).
+#: The Keys box's one line (R-TUI-062.10.1): names only keys the Memory Map
+#: handles — arrows move the focus, a click or Enter inspects, a double
+#: click opens the hex view. When D4-21 lands (Enter opens hex), this line
+#: changes with it.
 MAP_KEYS_LINE = (
-    "↑↓ / j k select · click inspect · double-click / ↵ open hex · Esc close"
+    "↑↓ move · click / ↵ inspect · double-click open hex · Esc close"
 )
 
 

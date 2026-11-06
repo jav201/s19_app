@@ -12,20 +12,12 @@ window-focused path claims the key (LLR-140.1).
 The modal is the shipped :class:`~s19_app.tui.screens.VariantHelpScreen`
 pattern (``screens.py:416``) generalized to the authored sections: the
 title + numbered steps render through a ``markup=False`` ``Static`` so the
-copy is verbatim — no Rich/console-markup parsing of the file-derived
-strings. The copy lives in ONE editable home — :data:`WINDOW_HELP_SECTIONS`
-below — a faithful port of the operator-authored ``prototypes/cambios_10_12_2026/
-help_sections.md`` (that md stays the source draft for the nine window
-sections; the shipped copy lives here, LLR-140.2). The numbering is
-generated at render time so the operator can delete/reorder steps freely
-(the md's own drafting notes) without ever leaving a gap in the sequence.
-A tenth section (``changes_file_notation``, batch-96 / TC-1802) is
-code-authored beside the md port — it documents the v2 change-set JSON
-notation for hand-editing and is NOT part of the md fidelity census.
-
-The ninth section (``split_join_export``) ships NOW but its window is
-change 4 (inc-004) — no placeholder window is invented; a future seat calls
-:func:`open_window_help` with that key and gets the modal for free.
+copy is verbatim — no Rich/console-markup parsing of the strings. The copy
+lives in ONE editable home — :data:`WINDOW_HELP_SECTIONS` below — and every
+section is code-authored (batch-101 Inc 14): each step names only the keys,
+controls, folders and behaviour its window actually ships. The numbering is
+generated at render time so steps can be deleted or reordered freely
+without ever leaving a gap in the sequence.
 """
 from __future__ import annotations
 
@@ -53,12 +45,12 @@ logger = logging.getLogger(__name__)
 # Keys are the windows' keys: the seven rail screens use their
 # SCREEN_CONTAINER_IDS keys (``patch`` / ``checks`` / ``crc_designer`` /
 # ``map`` / ``flow`` / ``a2l`` / ``workspace``), the Reports modal uses
-# ``reports``, and the ninth authored section (Split / Join / Export) is
-# ``split_join_export`` — reserved for the inc-004 window. Every one of
-# those nine steps is a verbatim port of help_sections.md (numbers
-# stripped; they re-render as ``N.`` at compose time). The tenth key,
-# ``changes_file_notation`` (batch-96 / TC-1802), is code-authored next to
-# them — NOT an md port — and documents the v2 change-set file notation.
+# ``reports``, Split / Join / Export is ``split_join_export``, Flow
+# Execution is ``flow_execution``, the Check Editor is ``check_editor``,
+# and ``changes_file_notation`` documents the v2 change-set file notation.
+# Every section is code-authored (batch-101 Inc 14): each step is written
+# here, next to the window it describes, with no numbered prefix — the
+# numbers re-render as ``N.`` at compose time.
 
 WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
     #: batch-97 Inc-4 (D25, LLR-148.6): rewritten and CODE-authored like
@@ -142,61 +134,74 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
             "hold.",
         ),
     },
+    #: batch-101 Inc 14 (D7-26, F-30, F-37, F-41): code-authored; left the
+    #: help_sections.md census.
     "checks": {
         "title": "Checks",
         "steps": (
-            "Checks run from the Patch Editor — this window is the "
-            "read-only result view.",
-            "The header tallies **Pass / Fail / Uncheck**; the table lists "
-            "every entry with its status. Grouped view clusters failures by "
-            "reason.",
-            "Select a row to peek at its bytes in the Hex Peek pane and see "
-            "*why* it failed.",
-            "An “Uncheck” entry is not a failure: it means the entry "
-            "cannot be verified (no image, outside range, declaration "
-            "fault) — fix the change document or load the right image.",
-            "Re-run after every edit; a change-set that is not 100 % pass "
-            "should not be exported.",
+            "Checks run in the Patch Editor (Run checks on its Checks tab); "
+            "this window shows the last run, read-only.",
+            "The top line tallies Pass / Fail / Uncheck. The list groups "
+            "the entries by outcome: failed, then uncheckable, then passed, "
+            "each under a header with its count.",
+            "Click a row, or press Enter on it, to show the bytes around "
+            "its address in the Hex Peek pane.",
+            "An uncheckable entry is not a failure: it could not be "
+            "verified (no image, address outside the image, declaration "
+            "fault), and its row names the reason. Fix the change document "
+            "or load the right image.",
+            "The list shows at most 40 entries; when the run holds more, "
+            "its last line says so.",
+            "Run checks again after every edit.",
         ),
     },
+    #: batch-101 Inc 14 (D7-26, F-30, F-37, F-41): code-authored; left the
+    #: help_sections.md census.
     "crc_designer": {
         "title": "CRC Designer",
         "steps": (
-            "Pick a preset (e.g. CRC-32/ISO-HDC) — presets are read-only "
-            "starting points; every parameter (width, polynomial, init, "
-            "reflections, XOR-out) stays editable.",
-            "The self-test vector (`123456789`) must read **MATCH** before "
-            "you trust a custom set.",
-            "Coverage computes CRCs over the image's real ranges: choose "
-            "how intra-gaps are handled (skip / concat), the pad byte, and "
-            "the on-conflict behaviour.",
-            "**Store placement** sets where the coverage CRC is written "
-            "back (address, byte count, endianness) — preview-only until "
-            "an image is loaded.",
-            "Save reusable parameter sets as templates — they land in the "
-            "template library (`.s19tool\\templates\\`, or the project "
-            "folder under change 1) and reload by name.",
-            "**Open templates/** (change 2) opens exactly that template "
-            "library.",
+            "Pick a preset (e.g. CRC-32/ISO-HDLC); presets are starting "
+            "points, and every parameter (width, polynomial, init, "
+            "reflection in and out, XOR out) stays editable.",
+            "The self-test computes the CRC of `123456789`; it must read "
+            "MATCH before you trust a custom set.",
+            "Coverage computes CRCs over the ranges you type in Ranges "
+            "(`start-end`, end excluded), in the loaded image: Intra gap "
+            "and Join gaps choose how gaps are handled, Pad byte is the "
+            "fill byte, and On conflict chooses what happens when a padded "
+            "gap holds image bytes. It is a preview; nothing is written.",
+            "Store placement shows where the CRC would be written (Address, "
+            "Bytes, Store endianness). The CRC Designer never writes the "
+            "image; Operations (`x`) writes CRCs from a CRC config.",
+            "Save writes the algorithm as a template, `<Name>.crc.json`, "
+            "into the project's `templates\\` folder, or without a project "
+            "into the common `.s19tool\\templates\\` folder; Load reads the "
+            "template typed in Load path.",
+            "Open templates/ opens the folder Save writes to.",
         ),
     },
+    #: batch-101 Inc 14 (D7-26, F-30, F-37, F-41): code-authored; left the
+    #: help_sections.md census.
     "reports": {
         "title": "Reports",
         "steps": (
             "Reports belong to a project — load or save one first (`p` / "
             "`^S`).",
-            "The list shows every `reports\\*.md` newest-first; pick one "
-            "to view it.",
-            "Use **Filter** (dropdown or a filter path) to render only "
-            "part of a report — blank means the full report.",
-            "**Declared regions** pre-fills from the loaded A2L; add "
+            "The list shows the project's `reports\\*.md` files, its "
+            "generated reports newest first; pick one to view it.",
+            "Filter picks a filter file from the project's `filters\\` "
+            "folder, or takes a typed filter path, to write only part of a "
+            "report; blank means the full report.",
+            "Declared regions starts with the regions saved with the open "
+            "project (empty when it has none) and keeps the lines of your "
+            "last Generate; Save project stores them with the project. Add "
             "`name,start,end` lines to annotate region coverage in the "
             "generated report.",
-            "**Context bytes** controls how many bytes of surrounding "
-            "memory accompany each change in the report.",
-            "**Generate new report** writes the `*.md` + `*.html` pair "
-            "into the project's `reports\\` folder; **Open reports/** "
-            "(change 2) opens that folder directly.",
+            "Context bytes sets how many bytes of surrounding memory "
+            "accompany each change in the report.",
+            "Generate new report writes one Markdown file, "
+            "`<time>-report.md`, into the project's `reports\\` folder; "
+            "Open reports/ opens that folder.",
         ),
     },
     #: batch-97 Inc-8 (operator decision at the Inc-8 gate, LED-…97.41):
@@ -225,12 +230,12 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
             "pipeline shows each block as a card, in run order, joined by "
             "cables, and the area under Run lists each block's verdict. "
             "Flows are project-only: Save… and Load… use the project's "
-            "`flows\\` folder (LLR-003.7).",
+            "`flows\\` folder.",
             "LOAD — picks a load block: it reads the image file named beside it.",
             "PATCH — picks a patch block: it applies a change doc to the image.",
             "CHECK — picks a check block: it verifies addresses against a "
             "check doc.",
-            "CRC — picks a CRC block: it stamps a CRC from a CRC template.",
+            "CRC — picks a CRC block: it stamps CRCs from a CRC config file.",
             "WRITE-OUT — picks a write-out block: it writes the image to an "
             "output file.",
             "A2B-DIFF — picks an A2B diff block: it compares two images and "
@@ -243,7 +248,9 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
             "project.",
             "change doc — the change-set a patch block applies.",
             "check doc — the check spec a check block verifies.",
-            "CRC template — the CRC configuration a CRC block stamps.",
+            "CRC template — the CRC config file a CRC block reads (the "
+            "same format as the Operations CRC config); a template the CRC "
+            "Designer saves is not a CRC config and is refused.",
             "output file — the file a write-out block writes, or the file an "
             "external step leaves behind (an absolute path is preferred "
             "there).",
@@ -257,21 +264,21 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
             "from: project, temp (the workarea temp folder), loaded (an "
             "artifact loaded now) or external (imported into the project's "
             "`external\\` folder); a bold `missing: <name>` names a ref "
-            "nothing provides (R-B102-FILE-001).",
+            "nothing provides.",
             "Browse — beside a file ref field (and in the block edit "
             "dialog), opens a chooser listing the project's files, the "
             "workarea temp files and the loaded artifacts; a pick only "
-            "fills the field — the block changes with Add or Save "
-            "(R-B102-FILE-002/003).  A temp or loaded file outside the "
+            "fills the field — the block changes with Add or Save. A temp "
+            "or loaded file outside the "
             "project is copied into the project's `external\\` folder "
-            "first, so the chain can run it (E3 ruling 1); an existing "
+            "first, so the chain can run it; an existing "
             "name gets a `-1`, `-2`, … suffix, never an overwrite.",
             "External path — in the chooser, type an absolute path and "
             "press Import to bring an outside file into the project's "
             "`external\\` folder; without a project the import refuses "
             "with `Load or create a project before importing an external "
             "file.`, and an unreadable file with `External file not "
-            "readable: <name>` (R-B102-FILE-004..006).",
+            "readable: <name>`.",
             "mode — Terminal: a command run outside the app; Manual: an "
             "instruction for a human.",
             "command — the exact command run outside the app (Terminal mode).",
@@ -332,19 +339,31 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
             "□ — a block waiting for a human (an external step).",
         ),
     },
+    #: batch-101 Inc 14 (D7-26, F-30, F-37, F-41): code-authored; left the
+    #: help_sections.md census.
     "a2l": {
         "title": "A2L Explorer",
         "steps": (
-            "Load an A2L (`^L`) to browse its section tree — "
-            "characteristics, measurements, records, typedefs.",
-            "Use find (`/`) to jump to a name; the tree highlights "
-            "matches in place.",
-            "`j` dumps the parsed A2L to JSON for external tooling.",
-            "Memory segments (when the A2L declares `MEMORY_SEGMENT`) "
-            "classify addresses as flash/RAM — this is the same table the "
-            "Split / Join / Export window offers.",
+            "Load an A2L (`^L`) to list its tags (measurements and "
+            "characteristics) in the tag table, each with its address, "
+            "length, values and the memory region it falls in.",
+            "Filter tags narrows the table to the tags that match; All, "
+            "Invalid and In-Memory choose which tags it lists; type in "
+            "Find in tag table and press Find next to move to the next "
+            "matching tag; Page Prev and Page Next turn its pages.",
+            "`/` puts the cursor in Search ASCII text, the search box of "
+            "the hex pane: Find Next finds that text in the loaded image's "
+            "bytes. `g` puts it in Goto 0xADDR: Goto shows that address.",
+            "`d` describes the highlighted tag, with its points for a CURVE "
+            "or MAP tag. `j` writes the parsed A2L as JSON into the work "
+            "area's `temp\\` folder.",
+            "The Region column comes from the A2L's MEMORY_SEGMENT "
+            "declarations (flash, ram or unknown); the A2L tab of Split / "
+            "Join / Export lists the same segments.",
         ),
     },
+    #: batch-101 Inc 14 (D7-26, F-30, F-37, F-41): code-authored; left the
+    #: help_sections.md census.
     "workspace": {
         "title": "Workspace",
         "steps": (
@@ -352,39 +371,50 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
             "Loaded artifacts appear in the Loaded panel with their "
             "diagnostics.",
             "Save a project (`^S` / `s`) to gather the loaded files into "
-            "one project folder; load one back with `p`. Change 1 extends "
-            "the gather to the JSON artifacts.",
-            "`o` opens the workarea in Explorer; `r` refreshes the file "
-            "list.",
+            "one project folder; load one back with `p`.",
+            "`o` opens the work area folder in the file manager; `r` "
+            "refreshes the file list.",
             "`U` unloads everything (with per-artifact unload from the "
             "Loaded panel).",
-            "Without a project, artifacts stay in the workspace's common "
-            "folders — see the folders.html board for the exact layout.",
+            "Without a project, the files you save stay in the common "
+            "folders under `.s19tool\\`: change-set and check files in "
+            "`workarea\\patches\\`, Split / Join / Export files in "
+            "`workarea\\splits\\`, CRC templates in `templates\\`.",
         ),
     },
+    #: batch-101 Inc 14 (D7-26, F-30, F-37, F-41): code-authored; left the
+    #: help_sections.md census.
     "split_join_export": {
         "title": "Split / Join / Export",
         "steps": (
-            "Pick the source image: the loaded file, a project file, or "
-            "browse to one.",
-            "Choose what to slice by — A2L `MEMORY_SEGMENT`s, the image's "
-            "own contiguous ranges, or manual `0xSTART-0xEND` localities "
-            "(one per line).",
-            "Tick the ranges to export; the coverage column warns when a "
-            "range has no bytes in the source image.",
-            "Choose the mode. **split** writes one file per selected "
-            "range. **join** packs the whole selection into ONE file — "
-            "`concat` (ranges back-to-back) or `fill` (ranges stay at "
-            "their original offsets, the gaps between them padded) — same "
-            "vocabulary as the CRC Designer's coverage editor.",
-            "Set the gap policy when more than one range is in play: "
-            "`skip` keeps files sparse (today's emitters), `fill` pads "
-            "with the configurable pad byte (default `0x00`).",
-            "Pick the format — S19 / HEX / BIN — it applies to BOTH "
-            "modes; then destination (project or common folder) and the "
-            "naming pattern. The sample filename updates live.",
-            "Export: split writes `‹stem›_‹segment›.‹ext›` per range; "
-            "join writes one `‹stem›_joined.‹ext›`.",
+            "The window exports parts of the loaded image (`^L`). Open it "
+            "from the palette (`^K`, Split / Join / Export); `esc` closes "
+            "it.",
+            "`t` chooses where the ranges come from: the A2L's "
+            "MEMORY_SEGMENTs, the image's own contiguous ranges (the "
+            "default), or manual lines `0xSTART-0xEND` that you type, one "
+            "per line, end included.",
+            "Tick the ranges to export: `space` ticks the highlighted row, "
+            "`a` ticks all, `n` none. The coverage column warns when a "
+            "range has no bytes in the image.",
+            "`m` switches the mode. Split writes one file per ticked "
+            "range. Join packs the ticked ranges into ONE file: concat "
+            "puts them back to back, fill keeps their offsets and pads the "
+            "gaps between them.",
+            "`g` switches the gaps: in split mode, skip keeps each file "
+            "sparse and fill pads the holes in each range; in join mode, "
+            "concat or fill. `p` switches the pad byte between 0x00 and "
+            "0xFF.",
+            "`f` switches the format (S19, HEX or BIN) for both modes. `d` "
+            "switches the destination: project writes into the project's "
+            "`splits\\` folder (the common one when no project is open), "
+            "common into `.s19tool\\workarea\\splits\\`.",
+            "`e` exports: split writes `‹stem›_‹segment›.‹ext›` per range, "
+            "join writes one `‹stem›_joined.‹ext›`, where ‹stem› is the "
+            "loaded image's file name without its extension. The NAMING "
+            "line shows the name of the first file.",
+            "When the export would write a large padded span or an empty "
+            "file, the first `e` only warns; press `e` again to write.",
         ),
     },
     #: batch-97 Inc-6 (D10 / D25, LLR-148.6): CODE-authored like

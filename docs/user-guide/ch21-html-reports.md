@@ -21,7 +21,7 @@ throw-away profile), the full page was rendered and cut into the slices shown.
 | Chain-set report | Flow Execution → **Run** | `<time>-chain-set-report.md` only | Chapter 18 |
 
 Only the before/after report and the diff report have an HTML copy; the other three
-are Markdown only (findings F-41 and F-44). The Markdown files open in the Reports
+are Markdown only (finding F-44). The Markdown files open in the Reports
 viewer (`t`).
 
 ## 21.1 Before/after report — what the patch changed
@@ -38,9 +38,10 @@ before/after report**: the log ends with *Before/after report written:
 What each section tells you:
 
 - **Header** — when, with which tool version, and which two files were compared: A is
-  the image as loaded (`firmware.s19`), B the written file (`firmware-patched.s19`).
-  The page is titled "Diff report" although it is the before/after report (finding
-  F-42).
+  the image as loaded (`firmware.s19`), B the written file (`firmware-patched.s19`),
+  with artifact lines computed against the loaded A2L and MAC (`a2l=used (…)`). The
+  page is titled "Before/after report". (capture taken before 1.0.0: it shows the
+  title "Diff report" and `a2l=absent; mac=absent`, finding F-42)
 - **Before/after provenance** — the original image, the saved patched image, when the
   change was applied, and the change document that was applied. This is the audit
   trail: which document produced which file.
@@ -51,8 +52,8 @@ What each section tells you:
 - **Statistics** — runs and bytes per class: `changed`, `only in A`, `only in B`.
   Here 5 runs, 35 bytes changed, nothing added or removed.
 - **Runs** — each differing address run with its length and class. The *Symbols*
-  column stays `-` in this report, although the linkage above names the symbols
-  (finding F-42).
+  column names the A2L and MAC symbols whose address lies in the run, from the loaded
+  A2L and MAC (the capture, taken before 1.0.0, shows `-`).
 - **Hex windows** — for each run (nearby runs grouped), the bytes around it before (A)
   and after (B), changed bytes highlighted.
 
@@ -90,6 +91,11 @@ A2B Diff, A = variant `firmware`, B = variant `firmware_v2`, check spec
   states that a check spec is a record, never applied. The addendum lists expected
   values only, without the actual value or a pass/fail verdict (finding F-43); run the
   check document in the Patch Editor for the verdicts (Chapter 11).
+
+In the `.md` file, names carry a backslash before each Markdown character (`CAL\_A`,
+`img\.s19`), and paths stay as written inside their code spans, so a Markdown reader
+shows both exactly; a plain-text search of the `.md` file for `CAL_A` finds nothing —
+search the `.html` file, or open the `.md` in a Markdown reader.
 
 ## 21.3 Diff report with flow change attribution — what a flow changed
 
@@ -138,7 +144,7 @@ far.
 
 Reports (`t`) → **Generate new report** wrote `reports/<time>-report.md` (it first ran
 the active variant's assigned documents: *Report: no prior execution - running active
-scope…*). Markdown only (finding F-41). Its sections: variant inventory, consolidated
+scope…*). Markdown only. Its sections: variant inventory, consolidated
 overview, the legend, and per variant the modified files, modifications, declaration
 errors, checklists, memory regions and entropy.
 

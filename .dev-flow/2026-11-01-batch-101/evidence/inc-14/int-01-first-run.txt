@@ -1,0 +1,147 @@
+$ git -C <HOME>/work/s19_i14 rev-parse HEAD (base) + applied diff of b101-inc14
+7add3d63cb9541957ed327a9ca7ca6bee1b4d843
+s19_app: <HOME>/work/s19_i14/s19_app/__init__.py
+3.11.18
+$ pytest -q -p no:cacheprovider -n 8 tests/test_b101_help_legend_docs.py tests/test_window_usage_help.py tests/test_changes_file_notation_help.py tests/test_docs_canon.py tests/test_id_registry.py tests/test_suite_hygiene.py tests/test_b101_flow_ext_copy.py
+bringing up nodes...
+bringing up nodes...
+
+.......................................FF..F.F.F........................ [ 30%]
+........................................................................ [ 61%]
+.............F..................s.....s..............s.................. [ 91%]
+....................                                                     [100%]
+=================================== FAILURES ===================================
+____________ test_r_doc_guide_1_passages_describe_1_0_0[passage-7] _____________
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+number = 7
+
+    @pytest.mark.parametrize(
+        "number", range(1, len(_GUIDE_PASSAGES) + 1), ids=lambda n: f"passage-{n}"
+    )
+    def test_r_doc_guide_1_passages_describe_1_0_0(number: int) -> None:
+        name, absent, present = _GUIDE_PASSAGES[number - 1]
+        text = _flat(_doc(f"docs/user-guide/{name}"))
+        stale = [p for p in absent if _flat(p) in text]
+        missing = [p for p in present if _flat(p) not in text]
+        assert stale == [], f"{name}: stale text still present: {stale}"
+>       assert missing == [], f"{name}: 1.0.0 text missing: {missing}"
+E       AssertionError: ch19-help-palettes-settings.md: 1.0.0 text missing: ['(capture taken before 1.0.0)']
+E       assert ['(capture ta...efore 1.0.0)'] == []
+E         
+E         Left contains one more item: '(capture taken before 1.0.0)'
+E         Use -v to get more diff
+
+tests/test_b101_help_legend_docs.py:1490: AssertionError
+____________ test_r_doc_guide_1_passages_describe_1_0_0[passage-1] _____________
+[gw7] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+number = 1
+
+    @pytest.mark.parametrize(
+        "number", range(1, len(_GUIDE_PASSAGES) + 1), ids=lambda n: f"passage-{n}"
+    )
+    def test_r_doc_guide_1_passages_describe_1_0_0(number: int) -> None:
+        name, absent, present = _GUIDE_PASSAGES[number - 1]
+        text = _flat(_doc(f"docs/user-guide/{name}"))
+        stale = [p for p in absent if _flat(p) in text]
+        missing = [p for p in present if _flat(p) not in text]
+        assert stale == [], f"{name}: stale text still present: {stale}"
+>       assert missing == [], f"{name}: 1.0.0 text missing: {missing}"
+E       AssertionError: ch06-memory-map.md: 1.0.0 text missing: ['(capture taken before 1.0.0)']
+E       assert ['(capture ta...efore 1.0.0)'] == []
+E         
+E         Left contains one more item: '(capture taken before 1.0.0)'
+E         Use -v to get more diff
+
+tests/test_b101_help_legend_docs.py:1490: AssertionError
+______________ test_r_doc_security_1_1_policy_names_private_path _______________
+[gw4] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+    def test_r_doc_security_1_1_policy_names_private_path() -> None:
+        text = _flat(_doc("SECURITY.md"))
+>       assert "Security tab" in text
+E       AssertionError: assert 'Security tab' in '# Security policy ## Supported versions | Version | Security fixes | |--------|----------------| | `1.0.x` | yes | | ...and, or paint escape sequences or markup taken from the file; a small file that makes it use unbounded memory or time.'
+
+tests/test_b101_help_legend_docs.py:1226: AssertionError
+____________ test_r_doc_guide_1_passages_describe_1_0_0[passage-4] _____________
+[gw7] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+number = 4
+
+    @pytest.mark.parametrize(
+        "number", range(1, len(_GUIDE_PASSAGES) + 1), ids=lambda n: f"passage-{n}"
+    )
+    def test_r_doc_guide_1_passages_describe_1_0_0(number: int) -> None:
+        name, absent, present = _GUIDE_PASSAGES[number - 1]
+        text = _flat(_doc(f"docs/user-guide/{name}"))
+        stale = [p for p in absent if _flat(p) in text]
+        missing = [p for p in present if _flat(p) not in text]
+        assert stale == [], f"{name}: stale text still present: {stale}"
+>       assert missing == [], f"{name}: 1.0.0 text missing: {missing}"
+E       AssertionError: ch17-flow-builder.md: 1.0.0 text missing: ['(capture taken before 1.0.0)']
+E       assert ['(capture ta...efore 1.0.0)'] == []
+E         
+E         Left contains one more item: '(capture taken before 1.0.0)'
+E         Use -v to get more diff
+
+tests/test_b101_help_legend_docs.py:1490: AssertionError
+____________ test_r_doc_guide_1_passages_describe_1_0_0[passage-8] _____________
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+number = 8
+
+    @pytest.mark.parametrize(
+        "number", range(1, len(_GUIDE_PASSAGES) + 1), ids=lambda n: f"passage-{n}"
+    )
+    def test_r_doc_guide_1_passages_describe_1_0_0(number: int) -> None:
+        name, absent, present = _GUIDE_PASSAGES[number - 1]
+        text = _flat(_doc(f"docs/user-guide/{name}"))
+        stale = [p for p in absent if _flat(p) in text]
+        missing = [p for p in present if _flat(p) not in text]
+        assert stale == [], f"{name}: stale text still present: {stale}"
+>       assert missing == [], f"{name}: 1.0.0 text missing: {missing}"
+E       AssertionError: ch21-html-reports.md: 1.0.0 text missing: ['(capture taken before 1.0.0)']
+E       assert ['(capture ta...efore 1.0.0)'] == []
+E         
+E         Left contains one more item: '(capture taken before 1.0.0)'
+E         Use -v to get more diff
+
+tests/test_b101_help_legend_docs.py:1490: AssertionError
+_____________ test_tc607_scanned_corpus_matches_the_declared_bound _____________
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+corpus = <tests.test_id_registry._Corpus object at 0x7fa8f34b0450>
+
+    def test_tc607_scanned_corpus_matches_the_declared_bound(corpus: _Corpus) -> None:
+        """TC-607 — the guard's corpus is bounded by a declared, executable constant.
+    
+        Asserting *how many files the guard opens* is deterministic where a
+        wall-clock budget would be flaky. Widening the scan — most obviously to
+        ``.dev-flow/``, which would make the guard's verdict depend on batch prose —
+        moves this count and turns the threshold red immediately.
+        """
+        actual = len(corpus.test_files)
+>       assert actual == EXPECTED_SCANNED_TEST_FILES, (
+            f"the guard scanned {actual} test modules, not the declared "
+            f"{EXPECTED_SCANNED_TEST_FILES}. If tests/ legitimately grew, bump "
+            f"EXPECTED_SCANNED_TEST_FILES in the same PR so the bound stays a "
+            f"decision rather than a rubber stamp."
+        )
+E       AssertionError: the guard scanned 252 test modules, not the declared 250. If tests/ legitimately grew, bump EXPECTED_SCANNED_TEST_FILES in the same PR so the bound stays a decision rather than a rubber stamp.
+E       assert 252 == 250
+
+tests/test_id_registry.py:513: AssertionError
+============================= QC-TM timing margins =============================
+49.8%  0.201 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+66.0%  0.511 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 2 bounds, 0 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-7]
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-1]
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_security_1_1_policy_names_private_path
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-4]
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-8]
+FAILED tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound
+6 failed, 227 passed, 3 skipped in 344.93s (0:05:44)
+exit=1

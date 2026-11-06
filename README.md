@@ -78,28 +78,32 @@ s19tui
 s19tui --load examples/case_07_stress_smoke/firmware.s19
 ```
 
-A left activity rail switches between ten single-context screens, bound to keys
-`1`–`0`.
+A left activity rail switches between twelve windows, one key each. Split / Join
+/ Export has no rail item and no key: open it from the command palette
+(`Ctrl+K`).
 
-| Key | Screen |
+| Key | Window |
 |----|--------|
 | `1` | Workspace — sections · hex · context |
-| `2` | A2L Explorer — symbol table + hex pane |
+| `2` | A2L Explorer — tag table + hex pane |
 | `3` | MAC View — record table + hex pane |
 | `4` | Memory Map — coverage + entropy bands |
 | `5` | Issues Report — validation findings |
-| `6` | Patch Editor — change-set authoring, checks, patched-image emit |
-| `7` | A2B Diff — compare two images, emit a diff report |
-| `8` | Flow Builder — ordered operation chains over project images |
-| `9` | Checks — every check result, grouped by outcome |
+| `6` | Patch Editor — change-set authoring, checks, patched-image write |
+| `=` | Check Editor — check specs for the A2B diff report |
+| `7` | A2B Diff — compare two images, write a diff report |
+| `8` | Flow Builder — chains of blocks run on the loaded image |
+| `]` | Flow Execution — saved flows run as lanes |
+| `9` | Checks — the last check run, grouped by outcome |
 | `0` | CRC Designer — parametric CRC authoring + known-answer proof |
 
-Every other bound key (the full set lives in `S19TuiApp.BINDINGS`,
-`s19_app/tui/app.py`):
+The global keys (the full set lives in `S19TuiApp.BINDINGS`,
+`s19_app/tui/app.py`; `Ctrl+Q` and `Ctrl+P` come from Textual):
 
 | Key | Action |
 |-----|--------|
 | `Ctrl+K` | command palette |
+| `Ctrl+P` | Textual's own command palette |
 | `Ctrl+D` | cycle layout density |
 | `Ctrl+L` / `l` | load a file |
 | `Ctrl+S` / `s` | save project |
@@ -108,21 +112,28 @@ Every other bound key (the full set lives in `S19TuiApp.BINDINGS`,
 | `r` | refresh the workarea file list |
 | `o` | open the workarea folder |
 | `v` | select the active variant |
-| `x` | Operations modal |
-| `j` | dump the enriched A2L as JSON |
+| `x` | Operations dialog |
+| `j` | write the parsed A2L as JSON into `.s19tool/workarea/temp/` |
+| `d` | describe the highlighted A2L tag (A2L Explorer) |
 | `t` | report viewer |
 | `b` | before/after report for the applied change-set |
-| `/` | find in memory |
-| `g` | go-to address |
-| `k` | legend (scoped to the active screen) |
-| `?` | help — lists every active binding, including the hidden ones |
-| `+` / `-` | page the focused table/viewer forward / back (also `PgDn` / `PgUp`) |
-| `,` / `.` | page the hex pane back / forward |
+| `c` | confirm the lane waiting at an external step (Flow Execution) |
+| `/` | the window's find box (Workspace, A2L Explorer, MAC View) |
+| `g` | the window's go-to box (Workspace, A2L Explorer, MAC View) |
+| `k` | legend (scoped to the shown window) |
+| `?` | help (see below) |
+| `+` / `-` | page the A2L or MAC table forward / back |
+| `PgDn` / `PgUp` | page forward / back (Issues Report, A2L Explorer, MAC View) |
+| `,` / `.` | page the Workspace hex view back / forward |
 | `Ctrl+Z` / `Ctrl+Y` | undo / redo the Patch Editor change-set |
-| `q` | quit |
+| `q` / `Ctrl+Q` | quit |
 
-Most of these are `show=False` bindings — the footer stays uncrowded, and
-`?` is the in-app way to discover all of them.
+Two rows at the bottom of every window show the keys: row 1 the global keys
+(`^K` Palette · `^D` Density · `^L` Load · `^S` Save project · `x` Operations ·
+`?` Help · `q` Quit · `^P` palette), row 2 the shown window's own keys. `?`
+opens the help of the window that has the focus — its numbered steps, then its
+keys; with the focus outside a window that has help, it opens the panel that
+lists every active key.
 
 ### Workspace
 
@@ -168,23 +179,43 @@ against the loaded image's ranges, checkable, undoable (`Ctrl+Z`/`Ctrl+Y`).
 The change-set saves and loads as a versioned JSON document
 (`"format": "s19app-changeset"`, `"version": "2.0"` — the v2 change-set
 engine in `s19_app/tui/changes/`); the retired v1 envelope is recognised
-only to be rejected with a `CHG-V1-FORMAT` finding. **Apply** writes the
-entries into a working copy of the image, and **Save patched** emits the
-result as a real `.s19` / `.hex` file into the workarea — the change-set
-JSON plus the patched image emit are the shipped hand-off.
+only to be rejected with a `CHG-V1-FORMAT` finding. **Apply loaded changes**
+writes the entries into the loaded image, and **Write file** (under **Save
+patched image as**) writes the result as a new `.s19` / `.hex` file; in a
+project the file becomes a new variant. The change-set JSON and the written
+image are the shipped hand-off.
 
-### A↔B Diff
+### Check Editor
 
-Loads a second image and diffs the two memory maps into classified runs
-(`changed` / `only_a` / `only_b`), then emits a diff report as Markdown or
-self-contained HTML.
+Collects A2L parameters and memory rows into a **check spec** (`.chk.json`):
+addresses with their expected bytes. A check spec is never applied; the A2B Diff
+report lists its fields in a `## Checks` section. **Write .chk.json** writes the
+spec into the common `.s19tool/workarea/patches/` folder, with or without a
+project; Save project copies the specs the project uses into its `checks/`
+folder.
+
+### A2B Diff
+
+Compares two images (project variants or files) into classified runs (`changed`
+/ `only_a` / `only_b`), then writes a diff report as a Markdown file and a
+self-contained HTML file side by side, with a `## Checks` section when a check
+spec is chosen.
 
 ### Flow Builder
 
-Composes an ordered chain of typed blocks (`SOURCE` → `PATCH` → `WRITE-OUT`,
-plus CRC) and runs it over a project image — or over every variant of a
-project, producing one fused report rather than one file per variant. Flows
-persist to `flow.json`.
+Composes an ordered chain of typed blocks — LOAD, PATCH, CHECK, CRC, WRITE-OUT,
+A2B-DIFF and EXT-STEP (a step a human runs outside the app) — and runs it on the
+loaded image. Flows belong to a project and are saved as `flows/<name>.json` in
+the project folder.
+
+### Flow Execution
+
+Runs saved flows as lanes, one lane per flow, one after another or in parallel.
+A lane that reaches an external step waits until you confirm it (`c`). Each run
+writes a chain-set report, `reports/<time>-chain-set-report.md`, in the project;
+a set of lanes saves as `flowsets/<name>.json`. The command or instruction of an
+external step is text from the flow file, and the app never runs it: read it
+before you run it, and import flows only from sources you trust.
 
 ### Checks
 
@@ -200,20 +231,30 @@ presets. A live known-answer verdict (`MATCH` / `MISMATCH` / `NO-EXPECTED`)
 recomputes on every keystroke, and the algorithm saves/loads as a
 `*.crc.json` template.
 
+### Split / Join / Export
+
+No rail item and no key: open it from the command palette (`Ctrl+K`, Split /
+Join / Export). It exports ranges of the loaded image — the A2L's memory
+segments, the image's own ranges, or ranges you type — as one file per range
+(split) or one file holding them all (join), in S19, Intel HEX or binary, into
+the project's `splits/` folder or the common `.s19tool/workarea/splits/`.
+
 ### Operations modal
 
-`x` lists the registered operations (the deterministic registry in
-`s19_app/tui/operations/registry.py`: `crc`, `extract`, `split_by_segment`)
-and executes the selected one against the loaded image, in-app.
+`x` opens the Operations dialog, which lists the registered operations
+(`s19_app/tui/operations/registry.py`). `crc` checks or writes CRCs over the
+loaded image from a CRC config. `extract` and `split_by_segment` are listed but
+not implemented yet: they answer `placeholder: <name> not yet implemented` and
+change nothing.
 
 ### Projects and variants
 
 A saved project is a directory under the workarea holding a `project.json`
 manifest. The manifest can declare **variants** — named image/A2L/MAC
-assignments — with one active variant (`v` switches it). Flows and
-change-set runs can execute variant-scoped: each variant's image is parsed
-in isolation, one failing variant never aborts the rest, and the run leaves
-a single fused report.
+assignments — with one active variant (`v` switches it). The Patch Editor's
+**Execute scope** applies a change-set over the chosen variants: each variant's
+image is parsed in isolation, one failing variant never aborts the rest, and
+Reports → **Generate new report** writes the project report of that run.
 
 ### Workarea
 
@@ -221,8 +262,11 @@ The TUI keeps its own on-disk area next to where you launched it:
 
 | Path | Holds |
 |------|-------|
-| `.s19tool/workarea/temp/` | transient loads |
-| `.s19tool/workarea/<project>/` | saved projects — a `project.json` manifest plus the image / MAC / A2L artefacts it references, optionally per-variant |
+| `.s19tool/workarea/temp/` | transient loads, and the A2L JSON that `j` writes |
+| `.s19tool/workarea/patches/` | change-sets and check specs saved without a project |
+| `.s19tool/workarea/splits/` | Split / Join / Export output without a project |
+| `.s19tool/workarea/<project>/` | saved projects — a `project.json` manifest plus the image / MAC / A2L artefacts it references, optionally per-variant, and the `patches/`, `checks/`, `templates/`, `flows/`, `flowsets/`, `reports/`, `splits/`, `external/` folders as they are used, and `filters/` (report filter files you place there; read, not created — `REPORT_FILTERS_DIR_NAME`, `app.py:866`) |
+| `.s19tool/templates/` | CRC Designer templates saved without a project |
 | `.s19tool/logs/s19tui.log` | TUI log, 5 MB rotating |
 
 ---
@@ -396,9 +440,6 @@ full suite on pushes to `main` / `main-tui`, on Python 3.11.
 Things you will hit if you follow this README, stated plainly rather than
 papered over:
 
-- `project.toml` at the repo root is a pre-PEP-621 leftover. The build reads
-  `pyproject.toml` only.
-
 **On the deprecated CLI**, kept here for anyone who still runs it. These are not
 TUI defects and are not being fixed — the surface is going away:
 
@@ -424,6 +465,8 @@ TUI defects and are not being fixed — the surface is going away:
 | [REQUIREMENTS.md](REQUIREMENTS.md) | the requirements: strict EARS rows per module S0–S17 (rationale in [docs/requirements/review/](docs/requirements/review/), earlier canon in [docs/requirements/history/](docs/requirements/history/)) |
 | [CLAUDE.md](CLAUDE.md) | conventions, commands, layer rules |
 | [PROJECT_RULES.md](PROJECT_RULES.md) | docstring and function-design contract |
+| [SECURITY.md](SECURITY.md) | how to report a vulnerability, supported versions |
+| [CHANGELOG.md](CHANGELOG.md) | release notes |
 
 ---
 

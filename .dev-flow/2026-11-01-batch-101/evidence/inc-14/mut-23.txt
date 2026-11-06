@@ -1,0 +1,25 @@
+REPLACE_COUNT=1
+MUTATED
+APPFILE=<HOME>/work/s19_m14/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________ test_at285_every_readme_named_key_exists_in_the_seat _____________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fb73995a890>
+
+    def test_at285_every_readme_named_key_exists_in_the_seat(monkeypatch):
+        missing = _unbound(_readme_keys())
+>       assert not missing, f"README names keys the seat does not bind: {sorted(missing)}"
+E       AssertionError: README names keys the seat does not bind: ['h']
+E       assert not {'h'}
+
+tests/test_docs_canon.py:79: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_docs_canon.py::test_at285_every_readme_named_key_exists_in_the_seat
+1 failed in 1.09s
+PYTEST_RC=1
+RESTORE_OK

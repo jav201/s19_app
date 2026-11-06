@@ -1,0 +1,3 @@
+$ gh api repos/jav201/s19_app/private-vulnerability-reporting   # 2026-11-06T03:13:12Z, after the operator asked to enable it (gh api -X PUT)
+{"enabled":true}
+exit=0

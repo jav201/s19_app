@@ -1,0 +1,30 @@
+(test_zz_c1_old_probe.py = tests/test_b101_help_legend_docs.py as committed at 7d37efa, before E5; a temporary copy in the remote worktree only)
+=== E5 C-1 mutant M1: the Checks window's Hex Peek pane is renamed Peek (Hex Peek is then painted by the Issues window only) ===
+-        _checks_hex_pane.border_title = "Hex Peek"
++        _checks_hex_pane.border_title = "Peek"
+    assert [('checks', 'Hex Peek')] == []
+      
+      Left contains one more item: ('checks', 'Hex Peek')
+      Use -v to get more diff
+<host-home>/work/s19_c14/tests/test_b101_help_legend_docs.py:388: AssertionError: named controls not painted by their window: [('checks', 'Hex Peek')]
+=========================== short test summary info ============================
+FAILED tests/test_b101_help_legend_docs.py::test_r_whelp_12_2_named_controls_exist
+1 failed, 1 passed in 88.71s (0:01:28)
+M1 reverted: app.py diff lines = 0
+
+=== E5 C-1 mutant M2: the A2L Explorer's Goto button is relabelled Go (its Goto 0xADDR box stays; Goto stays on Workspace and MAC) ===
+-                Button("Goto", id="alt_goto_button"),
++                Button("Go", id="alt_goto_button"),
+    assert [('a2l', 'Goto')] == []
+      
+      Left contains one more item: ('a2l', 'Goto')
+      Use -v to get more diff
+<host-home>/work/s19_c14/tests/test_b101_help_legend_docs.py:388: AssertionError: named controls not painted by their window: [('a2l', 'Goto')]
+=========================== short test summary info ============================
+FAILED tests/test_b101_help_legend_docs.py::test_r_whelp_12_2_named_controls_exist
+1 failed, 1 passed in 101.20s (0:01:41)
+M2 reverted: app.py diff lines = 0
+
+=== after both reverts: the strengthened test on the unmutated code ===
+.                                                                        [100%]
+1 passed in 43.03s

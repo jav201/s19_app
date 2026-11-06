@@ -1,0 +1,14 @@
+E1 start 2026-11-05T20:24Z model=opus base=b7b77c4
+E1 end 2026-11-05T20:52Z model=opus rows=28 cases=60
+E2 start 2026-11-05T20:52Z model=opus
+E2 end 2026-11-05T20:52Z model=opus graph=codewire/graph-inc14.md
+E3 start 2026-11-05T20:54Z architect+security model=opus
+E3 round-1 correction end 2026-11-05T21:16Z model=opus
+E3 end 2026-11-05T21:22Z round 2 PASS-WITH-NOTES model=opus
+E4 start 2026-11-05T21:22Z implementers model=deepseek-v4-pro (3 units) tester=sonnet
+E4 implementers end 2026-11-05T21:29Z model=deepseek-v4-pro (3 units, exit 0, no hang)
+E4 integration start 2026-11-05T22:00Z model=opus
+E4 integration end 2026-11-05T23:41Z GREEN on the LAN Linux host model=opus
+E5 corrective start 2026-11-05T23:52Z model=opus
+E5 corrective end 2026-11-06T01:13Z model=opus cases=74 covered=71 not-testable=3 runs=int-07,int-07b,int-08,int-09
+E5 end 2026-11-06T02:34:22Z model=deepseek-v4-pro (records)

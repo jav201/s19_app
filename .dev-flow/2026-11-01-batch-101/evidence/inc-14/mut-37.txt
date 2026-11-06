@@ -1,0 +1,38 @@
+REPLACE_COUNT=1
+MUTATED
+APPFILE=<HOME>/work/s19_m14/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________ test_r_doc_relnote_7_1_deleted_project_folder_stated _____________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+    def test_r_doc_relnote_7_1_deleted_project_folder_stated() -> None:
+        from s19_app.tui import app as app_module
+    
+>       _holds(_subsection(_release(), "Projects"), "no longer re-creates", "Project sync NOT done")
+
+tests/test_b101_help_legend_docs.py:1689: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = "Projects\n\nLoading an S19, Intel HEX, MAC or A2L file into a project whose folder was deleted outside the app create... `Project sync NOT done: project '<name>' could not be read — check that the folder can be opened, then load again.`\n"
+phrases = ('no longer re-creates', 'Project sync NOT done')
+
+    def _holds(text: str, *phrases: str) -> None:
+        flat = _flat(text)
+        missing = [p for p in phrases if _flat(p) not in flat]
+>       assert missing == [], f"missing from the release notes: {missing}"
+E       AssertionError: missing from the release notes: ['no longer re-creates']
+E       assert ['no longer re-creates'] == []
+E         
+E         Left contains one more item: 'no longer re-creates'
+E         Use -v to get more diff
+
+tests/test_b101_help_legend_docs.py:1565: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_7_1_deleted_project_folder_stated
+1 failed in 1.28s
+PYTEST_RC=1
+RESTORE_OK

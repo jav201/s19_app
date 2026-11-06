@@ -1,0 +1,6 @@
+E5 evidence for R-DOC-SECURITY.1/2 (case R-DOC-SECURITY.1/2), batch 2026-11-01-batch-101, Inc 14.
+Date (UTC): 2026-11-05T23:42:44Z
+Command: gh api repos/jav201/s19_app/private-vulnerability-reporting
+Exit code: 0
+Output (exact):
+{"enabled":false}
