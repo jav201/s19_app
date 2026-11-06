@@ -5,3 +5,5 @@ E2 end 2026-11-06T11:22Z model=opus graph=codewire/graph-inc6.md 30 nodes, 3 gro
 E1 rulings 2026-11-06T11:23Z orchestrator D-1..D-6
 E3 correction 2026-11-06T12:13Z model=opus rulings E3A-01..15, S-1..S-7 folded (targeted edits; D-3 revised: library/<n>); rows=27 active (+1 withdrawn) cases=77 slice=37 functions in 4 files (window_help.py text only); trace_check 30 gaps (26 TEST: no tests yet; 3 SLICE: branch behind main after the Inc 5 merge 823d0c9, rebase before E4; 1 EVID)
 E3 round2 2026-11-06T12:26Z architect=opus PWN, security=opus PWN; E3 closed
+E4 start 2026-11-06T12:27Z implementers model=deepseek-v4-pro (2 units: A app.py; B change_service+screens_directionb+window_help text+docs) testers=sonnet x2 (lifecycle; homes/lists) — orchestrator split the planned single test file into two
+E4 implementers end 2026-11-06T12:40Z model=deepseek-v4-pro (2 units, exit 0, py_compile OK)

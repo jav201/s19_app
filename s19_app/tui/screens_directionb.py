@@ -6898,7 +6898,8 @@ class PatchEditorPanel(ScrollableContainer):
             - Update the status label, render the strip, remove prior result
               children, mount one classed ``Static`` per row.
             - Set the CHECKS window's run-state border subtitle (LLR-075.1):
-              the row count when a run produced rows, else the no-run token.
+              the row count when a run is shown (a non-empty status line),
+              else the no-run token.
             - The strip CLEARS by riding ``last_check_result``'s existing
               ``undo``/``redo`` reset (``change_service.py:538`` / ``:570``):
               the history call site passes the accessor's all-zero mapping,
@@ -6923,12 +6924,13 @@ class PatchEditorPanel(ScrollableContainer):
         container.remove_children()
         for row in rows:
             container.mount(Static(row.text, classes=row.css_class, markup=False))
-        # LLR-075.1: derived from the ROW COUNT, never from `status_line` —
-        # the status line is service-shaped text and the subtitle must stay an
-        # author-composed token (C-17).
+        # LLR-075.1: derived from whether a run is shown (the status line is
+        # non-empty), never from the row count — an empty 0-entry run shows
+        # "0 checked" while a non-current run shows "no run yet". The subtitle
+        # stays an author-composed token (C-17).
         self._set_window_subtitle(
             "patch_win_checks",
-            f"{len(rows)} checked" if rows else self._NO_RUN_SUBTITLE,
+            f"{len(rows)} checked" if status_line else self._NO_RUN_SUBTITLE,
         )
 
 

@@ -224,6 +224,7 @@ from .services.project_gather_service import (
     painted_names,
     plan_project_save,
     scoped_home,
+    scoped_home_target,
 )
 from .services import folder_open_service
 from . import workspace
@@ -4800,14 +4801,17 @@ class S19TuiApp(App):
                     event.address_text, event.value_text, event.bytes_text
                 )
                 self.set_status("Patch Editor: entry added.")
+                self._refresh_patch_checks_tab(panel)
             elif event.action == "edit_entry":
                 service.edit_entry(
                     event.address_text, event.value_text, event.bytes_text
                 )
                 self.set_status("Patch Editor: entry updated.")
+                self._refresh_patch_checks_tab(panel)
             elif event.action == "remove_entry":
                 service.remove_entry(event.address_text)
                 self.set_status("Patch Editor: entry removed.")
+                self._refresh_patch_checks_tab(panel)
             elif event.action == "load_doc":
                 # US-061 / LLR-061.1 clear-on-context: a new load resets
                 # ChangeService.last_summary to None, so the persistent
@@ -4820,7 +4824,10 @@ class S19TuiApp(App):
                 else:
                     self._patch_editor_load(panel, event.path_text)
             elif event.action == "parse_paste":
-                panel.hide_before_after_prompt()  # LLR-061.1 clear-on-context
+                # LLR-061.1 clear-on-context; Inc 6 hides the save-back
+                # prompt too — a parsed paste replaces the document, so the
+                # old apply's prompt and control must not survive it.
+                self._hide_replaced_document_controls(panel)
                 result = service.load_text(event.paste_text, a2l_context=self.current_a2l_data)
                 self._report_change_result(result)
                 # batch-97 Inc-4 gate (ux H1, LLR-144.6 amended): a parsed
@@ -4830,6 +4837,7 @@ class S19TuiApp(App):
                 if result.ok:
                     panel.mark_pasted()
                     self._parsed_paste_text = event.paste_text
+                self._refresh_patch_checks_tab(panel)
             elif event.action == "refresh_doc":
                 # batch-94 (annotation 6 / HLR-008 / LLR-008.2): Refresh
                 # repopulates the file dropdown from the patches-folder
@@ -5072,12 +5080,19 @@ class S19TuiApp(App):
             # verify-mismatch error notice is never masked; a mismatch does
             # NOT suppress the offer (A-m2: the report is an honest
             # disk-to-disk comparison of what was actually written).
-            self.notify(
-                "Before/after report ready - press b to write it to the "
-                "project reports directory (action: before_after_report).",
-                title="Before/after report",
-                severity="information",
-            )
+            # Inc 6 (R-BEFORE-AFTER-REPORT-001.1/.36): the offer needs a
+            # project reports/ destination, so it is shown only when a
+            # project is open — the same ``project_dir`` the manifest
+            # rewrite above used. The persistent control stays unconditional
+            # (R-TUI-049.1, D-2): pressing it without a project gives the
+            # .11 refusal, which names the manual path.
+            if project_dir is not None:
+                self.notify(
+                    "Before/after report ready - press b to write it to the "
+                    "project reports directory.",
+                    title="Before/after report",
+                    severity="information",
+                )
 
     def on_patch_editor_panel_before_after_report_requested(
         self, event: PatchEditorPanel.BeforeAfterReportRequested
@@ -5113,6 +5128,77 @@ class S19TuiApp(App):
                 - Textual message dispatch for ``PatchEditorPanel``
         """
         self.action_before_after_report()
+
+    def _refresh_patch_checks_tab(self, panel: PatchEditorPanel) -> None:
+        """Render the Patch Editor Checks tab from the live run state (Inc 6).
+
+        Summary:
+            The one Checks-tab writer outside the run arm: paint the rows of
+            a CURRENT check run (else none), the live status line and the
+            live aggregates. A run that is no longer current — after a
+            document load, an image install, a project reset or an
+            in-place write — renders as ``no run yet`` with zero counts and
+            no rows (R-CHK-PE-008 … -012). Pure render: reads the service,
+            writes only the Checks tab.
+
+        Args:
+            panel (PatchEditorPanel): The mounted Patch Editor panel.
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``check_run_is_current()`` gates the rows (I-1); the status
+              line (I-2) and aggregates (I-3) ride the live accessors so a
+              non-current run degrades to ``""`` / all-zero.
+
+        Dependencies:
+            Uses:
+                - ``ChangeService.check_run_is_current`` / ``check_rows`` /
+                  ``check_status_line`` / ``check_aggregates``
+                - ``PatchEditorPanel.refresh_check_results``
+            Used by:
+                - the Patch Editor action arms, the load tail, the history
+                  view, the project reset and the image install
+        """
+        service = self._change_service
+        current = service.check_run_is_current()
+        panel.refresh_check_results(
+            service.check_rows() if current else [],
+            service.check_status_line(),
+            service.check_aggregates(),
+        )
+
+    def _hide_replaced_document_controls(self, panel: PatchEditorPanel) -> None:
+        """Hide the before/after control and the save-back prompt (Inc 6).
+
+        Summary:
+            The single clear-on-replace helper: whenever the document is
+            replaced (a load, a paste, undo/redo that moved a step, a
+            project reset) or a new image is installed, the old apply's
+            persistent before/after control and its save-back prompt must
+            not survive under the new document or onto the new image
+            (R-TUI-049.3.1/.3.2). Writes nothing to disk and moves no focus.
+
+        Args:
+            panel (PatchEditorPanel): The mounted Patch Editor panel.
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``hide_before_after_prompt()`` then ``hide_save_prompt()``.
+
+        Dependencies:
+            Uses:
+                - ``PatchEditorPanel.hide_before_after_prompt`` /
+                  ``hide_save_prompt``
+            Used by:
+                - the parse-paste arm, undo/redo, ``_patch_editor_load``,
+                  ``_reset_project_session``, ``_apply_prepared_load``
+        """
+        panel.hide_before_after_prompt()
+        panel.hide_save_prompt()
 
     def _refresh_patch_history_view(self) -> None:
         """
@@ -5171,9 +5257,9 @@ class S19TuiApp(App):
         # ``check_aggregates()`` reads all-zero once ``last_check_result`` is
         # None, so the strip clears in step with the rows. Omitting it here
         # (while the post-run site supplies it) would leave a stale count.
-        panel.refresh_check_results(
-            service.check_rows(), "", service.check_aggregates()
-        )
+        # Inc 6: the one Checks-tab writer renders rows of a current run
+        # (else none), the live status line and the live aggregates.
+        self._refresh_patch_checks_tab(panel)
         # batch-49 LLR-084.7 (site 2 of 2): the CHECKS screen rides the SAME
         # undo/redo reset of ``last_check_result`` (``change_service.py:571/603``)
         # so its grouped list + aggregate strip clear in step with the Patch
@@ -5302,7 +5388,14 @@ class S19TuiApp(App):
             return
         if not self._patch_history_action_allowed():
             return
-        self._change_service.undo()
+        service = self._change_service
+        before = service.document
+        service.undo()
+        # Inc 6 (R-TUI-049.3.1/.3.2): a history move that changed the
+        # document replaces it — hide the old apply's prompt and control.
+        if service.document is not before:
+            panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+            self._hide_replaced_document_controls(panel)
         self._refresh_patch_history_view()
 
     def action_patch_redo(self) -> None:
@@ -5330,7 +5423,14 @@ class S19TuiApp(App):
             return
         if not self._patch_history_action_allowed():
             return
-        self._change_service.redo()
+        service = self._change_service
+        before = service.document
+        service.redo()
+        # Inc 6 (R-TUI-049.3.1/.3.2): as the undo arm — a redo that moved a
+        # step replaces the document.
+        if service.document is not before:
+            panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+            self._hide_replaced_document_controls(panel)
         self._refresh_patch_history_view()
 
     def on_patch_editor_panel_edit_json_requested(
@@ -6788,7 +6888,7 @@ class S19TuiApp(App):
             # the panel cannot scan for itself, and an empty listing must not
             # reserve the row's rows against the hex panes. The live listing
             # still rides ``set_check_files`` on every diff activation.
-            AbDiffPanel(check_files=self._scan_patch_change_files()),
+            AbDiffPanel(check_files=self._scan_spec_files()),
             id="screen_diff",
             classes="db-screen hidden",
         )
@@ -6839,7 +6939,7 @@ class S19TuiApp(App):
             panel = self.query_one("#ab_diff_panel", AbDiffPanel)
         except Exception:
             return
-        panel.set_check_files(self._scan_patch_change_files())
+        panel.set_check_files(self._scan_spec_files())
 
     def _patches_dir(self) -> Path:
         """Return the dedicated patches folder path (``workarea/patches/``).
@@ -6907,35 +7007,143 @@ class S19TuiApp(App):
         subdir = PROJECT_CHECKS_DIR if kind == "check" else PROJECT_PATCHES_DIR
         return scoped_home(project_dir, subdir, self.workarea / WORKAREA_PATCHES)
 
-    def _scan_patch_change_files(self) -> List[str]:
-        """Discover the change files under the patches folder (LLR-030.3).
+    def _check_home(self) -> Path:
+        """Resolve the check home path without creating anything (Inc 6).
 
         Summary:
-            Return the sorted bare names of every ``*.json`` change file in
-            ``workarea/patches/``, feeding the dropdown (US-026). The scan is
-            SORTED deterministically (F-Q2) so the AT can select by known
-            filename rather than by filesystem order, and it applies the
-            read-path security fold at discovery time (F1): a symlink entry is
-            SKIPPED (never listed), closing the write-guarded / read-unguarded
-            asymmetry of the typed-path load.
+            The one Check-Editor Write destination (R-CHKED-031): with a
+            project ``<project>/checks/``, without one the COMMON
+            ``workarea/patches/`` library. Path arithmetic only — Write's
+            placement creates and containment-checks the folder, so this
+            must never mkdir (the open-folder chips' missing-folder state
+            stays observable).
 
         Args:
             None
 
         Returns:
-            List[str]: The sorted bare component names (``match.name``) of the
-            non-symlink ``*.json`` files under the patches folder; an empty
-            list when the folder is absent or holds no change file.
+            Path: ``scoped_home_target(_active_project_dir(),
+            PROJECT_CHECKS_DIR, workarea/patches)``.
 
         Data Flow:
-            - ``patches_dir.glob("*.json")`` → drop ``is_symlink`` matches →
-              collect ``match.name`` → ``sorted``.
-            - A missing folder yields no glob matches (empty list), never a
-              raise.
+            - ``scoped_home_target`` — pure path arithmetic, no IO.
 
         Dependencies:
             Uses:
-                - ``_patches_dir``
+                - ``scoped_home_target`` / ``_active_project_dir``
+            Used by:
+                - ``on_check_editor_panel_action_requested`` (Write)
+                - ``_spec_homes`` (the ``checks/`` home in a project)
+        """
+        return scoped_home_target(
+            self._active_project_dir(),
+            PROJECT_CHECKS_DIR,
+            self.workarea / WORKAREA_PATCHES,
+        )
+
+    def _change_homes(self) -> list[tuple[str, Path]]:
+        """The change-list folders with their name prefixes (Inc 6, I-6).
+
+        Summary:
+            Without a project one home — the COMMON ``workarea/patches/``,
+            listed bare. With a project the project's ``checks/`` then
+            ``patches/`` (each prefixed with its folder name) then the
+            COMMON library as ``library/`` (revised D-3). The order of the
+            list is the order of the listing — project entries first, then
+            the library — never one global sort.
+
+        Args:
+            None
+
+        Returns:
+            list[tuple[str, Path]]: ``(prefix, folder)`` pairs; nothing is
+            created.
+
+        Data Flow:
+            - ``_active_project_dir()`` chooses the shape; path arithmetic
+              only.
+
+        Dependencies:
+            Uses:
+                - ``_active_project_dir``
+            Used by:
+                - ``_scan_patch_change_files`` / ``_resolve_listed_file``
+                  (via ``on_patch_editor_panel_change_file_selected``)
+        """
+        project_dir = self._active_project_dir()
+        if project_dir is None:
+            return [("", self.workarea / WORKAREA_PATCHES)]
+        return [
+            ("checks/", project_dir / PROJECT_CHECKS_DIR),
+            ("patches/", project_dir / PROJECT_PATCHES_DIR),
+            ("library/", self.workarea / WORKAREA_PATCHES),
+        ]
+
+    def _spec_homes(self) -> list[tuple[str, Path]]:
+        """The spec-list folders with their name prefixes (Inc 6, I-6).
+
+        Summary:
+            The check-spec listing's homes (revised D-3): without a project
+            the COMMON ``workarea/patches/`` listed bare; with a project the
+            check home as ``checks/`` then the COMMON library as
+            ``library/``. A spec list keeps its canon source (the check
+            home), so it shows no ``patches/``.
+
+        Args:
+            None
+
+        Returns:
+            list[tuple[str, Path]]: ``(prefix, folder)`` pairs; nothing is
+            created.
+
+        Data Flow:
+            - ``_active_project_dir()`` chooses the shape; the project's
+              ``checks/`` home rides ``_check_home()``.
+
+        Dependencies:
+            Uses:
+                - ``_active_project_dir`` / ``_check_home``
+            Used by:
+                - ``_scan_spec_files`` / ``_resolve_listed_file``
+                  (via the Check Editor and A2B Diff pick guards)
+        """
+        project_dir = self._active_project_dir()
+        if project_dir is None:
+            return [("", self.workarea / WORKAREA_PATCHES)]
+        return [
+            ("checks/", self._check_home()),
+            ("library/", self.workarea / WORKAREA_PATCHES),
+        ]
+
+    def _scan_patch_change_files(self) -> List[str]:
+        """Discover the change list for the Patch Editor dropdown (Inc 6).
+
+        Summary:
+            Return every ``*.json`` change file of each change home, in home
+            order (project entries, then the COMMON library), each prefixed
+            with its folder name in a project (revised D-3). Each home's
+            names are SORTED deterministically (F-Q2), and the read-path
+            security fold holds at discovery time (F1): a symlink entry is
+            SKIPPED (never listed). The homes' lists are JOINED in home
+            order — not one global sort, since ``library/`` would sort
+            between ``checks/`` and ``patches/``.
+
+        Args:
+            None
+
+        Returns:
+            List[str]: The prefixed file names (bare without a project); an
+            empty list when every home is absent or holds no change file.
+
+        Data Flow:
+            - For each ``(prefix, folder)`` of ``_change_homes()``, append
+              ``prefix + name`` for every ``list_change_documents(folder)``
+              name (sorted, links skipped by the helper), joined in home
+              order.
+
+        Dependencies:
+            Uses:
+                - ``_change_homes`` / ``list_change_documents``
             Used by:
                 - ``_prefill_patch_change_files``
 
@@ -6943,13 +7151,132 @@ class S19TuiApp(App):
             >>> app._scan_patch_change_files()
             ['changes-1.json', 'changes.json']
         """
-        patches_dir = self._patches_dir()
-        # batch-94 (LLR-010.1): the scan lists BOTH patch ``*.json`` and
-        # check-spec ``*.chk.json`` files from the same directory (the glob
-        # already matches both); the suffix-aware helper keeps the symlink
-        # fold (F1) and the deterministic sort (F-Q2) in one place, and the
-        # ``is_check_spec`` half rides to the dropdowns' labels.
-        return [name for name, _is_check in list_change_documents(patches_dir)]
+        # Inc 6 (revised D-3): the change list spans the project homes and
+        # the COMMON library, joined in home order.
+        names: list[str] = []
+        for prefix, folder in self._change_homes():
+            for name, _is_check in list_change_documents(folder):
+                names.append(prefix + name)
+        return names
+
+    def _scan_spec_files(self) -> List[str]:
+        """Discover the spec list for the two spec dropdowns (Inc 6).
+
+        Summary:
+            As :meth:`_scan_patch_change_files`, over ``_spec_homes()``: the
+            check home (prefixed ``checks/`` in a project) then the COMMON
+            library (``library/``), joined in home order; bare names without
+            a project. The Check Editor Spec dropdown and the A2B Diff
+            check-spec list both read it (revised D-3).
+
+        Args:
+            None
+
+        Returns:
+            List[str]: The prefixed spec file names; empty when every home
+            is absent or empty.
+
+        Data Flow:
+            - For each ``(prefix, folder)`` of ``_spec_homes()``, append
+              ``prefix + name`` per ``list_change_documents(folder)`` name.
+
+        Dependencies:
+            Uses:
+                - ``_spec_homes`` / ``list_change_documents``
+            Used by:
+                - ``_prefill_check_editor`` / ``_prefill_diff_check_files`` /
+                  ``_compose_screen_diff`` / ``_refill_document_lists``
+        """
+        names: list[str] = []
+        for prefix, folder in self._spec_homes():
+            for name, _is_check in list_change_documents(folder):
+                names.append(prefix + name)
+        return names
+
+    def _resolve_listed_file(
+        self, value: str, homes: list[tuple[str, Path]]
+    ) -> Optional[Path]:
+        """Resolve one listed pick against its homes with the pick guard (Inc 6).
+
+        Summary:
+            The one pick guard shared by the Patch Editor change-file pick,
+            the Check Editor spec pick and the A2B Diff check-spec pick
+            (R-PATCH-DOC-DROPDOWN-001.3/.4, R-CHKED-044, R-DIFF-CHK.5). Pick
+            the home whose prefix starts ``value`` (the empty prefix matches
+            only when it is the sole home); ``name = value[len(prefix):]``;
+            ``path = folder / name`` (UNRESOLVED). Refuse — return ``None``
+            — when no home matches, the name is empty, holds a separator or
+            is ``..``, the walk from the work area down to the file meets a
+            link/reparse point (the Write guard's walk and stop point, S-3),
+            or the resolved path is not inside the resolved work area. Else
+            return the unresolved ``path`` (S-4: the Save project classifier
+            compares unresolved text).
+
+        Args:
+            value (str): The listed value (``checks/<n>``, ``patches/<n>``,
+                ``library/<n>`` or a bare name).
+            homes (list[tuple[str, Path]]): The ``(prefix, folder)`` list of
+                the pick's listing.
+
+        Returns:
+            Optional[Path]: The unresolved ``folder / name``, or ``None`` on
+            any refusal.
+
+        Data Flow:
+            - Prefix match → name extraction → textual-shape checks →
+              ``_path_traverses_reparse_point(path,
+              stop_at=self.workarea.parent)`` or ``_is_reparse_point(
+              self.workarea.parent)`` → ``path.resolve()`` inside
+              ``self.workarea.resolve()``.
+
+        Dependencies:
+            Uses:
+                - ``workspace._path_traverses_reparse_point`` /
+                  ``_is_reparse_point`` / ``Path.resolve``
+            Used by:
+                - ``on_patch_editor_panel_change_file_selected``
+                - ``on_check_editor_panel_spec_file_selected``
+                - ``on_ab_diff_panel_check_file_selected``
+        """
+        folder: Optional[Path] = None
+        prefix_len = 0
+        for prefix, candidate_folder in homes:
+            if prefix == "":
+                # The bare (no-project) home matches only when it is the
+                # sole home; in a project a bare name matches no prefix and
+                # is refused.
+                if len(homes) == 1:
+                    folder = candidate_folder
+                    prefix_len = 0
+                break
+            if value.startswith(prefix):
+                folder = candidate_folder
+                prefix_len = len(prefix)
+                break
+        if folder is None:
+            return None
+        name = value[prefix_len:]
+        if (
+            not name
+            or "/" in name
+            or "\\" in name
+            or name == ".."
+        ):
+            return None
+        path = folder / name
+        if (
+            _path_traverses_reparse_point(path, stop_at=self.workarea.parent)
+            or _is_reparse_point(self.workarea.parent)
+        ):
+            return None
+        try:
+            resolved = path.resolve()
+            root = self.workarea.resolve()
+        except OSError:
+            return None
+        if not resolved.is_relative_to(root):
+            return None
+        return path
 
     def _report_filters_dir(self) -> Optional[Path]:
         """Resolve the active project's report-filters directory (US-056).
@@ -7063,6 +7390,48 @@ class S19TuiApp(App):
             return
         panel.set_change_files(self._scan_patch_change_files())
 
+    def _refill_document_lists(self) -> None:
+        """Refill the three document lists after a project change (Inc 6, E3A-04).
+
+        Summary:
+            Re-scan the change list and the spec list once
+            ``current_project_dir`` holds the new project, so the Patch
+            Editor File dropdown, the Check Editor Spec dropdown and the A2B
+            Diff check-spec list all show the new project's homes plus the
+            COMMON library (revised D-3). Called from the project install and
+            every committed Save project (plain, create, save-as) — never
+            from ``_reset_project_session``, which runs before the
+            assignment.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``_prefill_patch_change_files()``; the Check Editor panel when
+              mounted gets ``set_spec_files(self._scan_spec_files())`` (the
+              Spec half only — the A2L picker half stays on screen entry);
+              ``_prefill_diff_check_files()``. Each tolerates an unmounted
+              panel.
+
+        Dependencies:
+            Uses:
+                - ``_prefill_patch_change_files`` / ``_scan_spec_files`` /
+                  ``_prefill_diff_check_files``
+            Used by:
+                - ``_install_prepared_project`` / ``_on_project_saved``
+        """
+        self._prefill_patch_change_files()
+        try:
+            panel = self.query_one("#check_editor_panel", CheckEditorPanel)
+        except Exception:
+            panel = None
+        if panel is not None:
+            panel.set_spec_files(self._scan_spec_files())
+        self._prefill_diff_check_files()
+
     def on_patch_editor_panel_change_file_selected(
         self, event: PatchEditorPanel.ChangeFileSelected
     ) -> None:
@@ -7109,10 +7478,10 @@ class S19TuiApp(App):
         """
         if self._refuse_if_busy():
             return
-        patches_dir = self._patches_dir().resolve()
-        raw = self._patches_dir() / event.filename
-        candidate = raw.resolve()
-        if raw.is_symlink() or not candidate.is_relative_to(patches_dir):
+        candidate = self._resolve_listed_file(
+            event.filename, self._change_homes()
+        )
+        if candidate is None:
             self.set_status(
                 f"Patch Editor: change file {event.filename!r} is outside "
                 "the patches folder — not loaded."
@@ -7130,7 +7499,19 @@ class S19TuiApp(App):
                     return
                 if self._refuse_if_busy():
                     return
-                self._patch_editor_load(panel, str(candidate))
+                # Inc 6 (S-5): re-run the pick guard at accept — the folder
+                # may have changed under the popup; a now-refused pick loads
+                # nothing.
+                rechecked = self._resolve_listed_file(
+                    event.filename, self._change_homes()
+                )
+                if rechecked is None:
+                    self.set_status(
+                        f"Patch Editor: change file {event.filename!r} is outside "
+                        "the patches folder — not loaded."
+                    )
+                    return
+                self._patch_editor_load(panel, str(rechecked))
 
             self.push_screen(LoadGuardScreen(), _answer)
             return
@@ -7150,6 +7531,10 @@ class S19TuiApp(App):
             call sites; the post-load re-render tail lives in
             :meth:`_patch_editor_load_tail` so no site can drift.
         """
+        # Inc 6 (R-TUI-049.3.1/.3.2, E3A-01): every load replaces the
+        # document — also a failed read (``ChangeService.load`` always
+        # assigns) — so the old apply's controls hide first.
+        self._hide_replaced_document_controls(panel)
         service = self._change_service
         result = service.load(path_text, self.base_dir, a2l_context=self.current_a2l_data)
         self._report_change_result(result)
@@ -7208,6 +7593,9 @@ class S19TuiApp(App):
         )
         # US-068b / LLR-068b.4 A-01 guard: same for the per-entry JSON edit.
         panel.set_entry_edit_json_enabled(service.document.source_path is None)
+        # Inc 6 (R-CHK-PE-009 … -012): a load replaces the document, so any
+        # completed run is no longer current — render ``no run yet``.
+        self._refresh_patch_checks_tab(panel)
 
     def on_patch_editor_panel_dirty_load_requested(
         self, event: PatchEditorPanel.DirtyLoadRequested
@@ -7264,7 +7652,7 @@ class S19TuiApp(App):
             panel = self.query_one("#check_editor_panel", CheckEditorPanel)
         except Exception:
             return
-        panel.set_spec_files(self._scan_patch_change_files())
+        panel.set_spec_files(self._scan_spec_files())
         tags = self._compute_a2l_enriched_tags()
         measurable = [
             tag for tag in tags if isinstance(tag.get("address"), int)
@@ -7399,7 +7787,7 @@ class S19TuiApp(App):
             )
         if event.action == "write_doc":
             path, issues = write_change_document(
-                document, self.base_dir, file_name
+                document, self.base_dir, file_name, dest_dir=self._check_home()
             )
             for issue in issues:
                 self.set_status(
@@ -7488,10 +7876,10 @@ class S19TuiApp(App):
             collected issues on the status path (never silently loaded);
             a non-check document is refused with its kind named.
         """
-        patches_dir = self._patches_dir().resolve()
-        raw = self._patches_dir() / event.filename
-        candidate = raw.resolve()
-        if raw.is_symlink() or not candidate.is_relative_to(patches_dir):
+        candidate = self._resolve_listed_file(
+            event.filename, self._spec_homes()
+        )
+        if candidate is None:
             self.set_status(
                 f"Check Editor: file {event.filename!r} is outside the "
                 "patches folder — not loaded."
@@ -7523,7 +7911,9 @@ class S19TuiApp(App):
             for entry in document.entries
         ]
         panel = self.query_one("#check_editor_panel", CheckEditorPanel)
-        panel.load_spec(items, event.filename)
+        # Inc 6 (R-CHKED-042): the Write-as input takes the bare file name —
+        # the listed value would put ``library/`` into it.
+        panel.load_spec(items, candidate.name)
         self.set_status(
             f"Check Editor: loaded {event.filename!r} "
             f"({len(items)} fields)."
@@ -7815,10 +8205,10 @@ class S19TuiApp(App):
             self._diff_check_spec_name = ""
             panel.set_status("Check spec: none — the report gains no addendum.")
             return
-        patches_dir = self._patches_dir().resolve()
-        raw = self._patches_dir() / event.filename
-        candidate = raw.resolve()
-        if raw.is_symlink() or not candidate.is_relative_to(patches_dir):
+        candidate = self._resolve_listed_file(
+            event.filename, self._spec_homes()
+        )
+        if candidate is None:
             self._diff_check_spec = None
             self._diff_check_spec_name = ""
             panel.set_status(
@@ -12714,6 +13104,9 @@ class S19TuiApp(App):
             saved_painted = len(tail) > 1
             self.current_project = prepared.cleaned
             self.current_project_dir = prepared.project_dir
+            # Inc 6 (E3A-04): every committed Save project (plain, create,
+            # save-as) re-scans the lists under the new project.
+            self._refill_document_lists()
             self.update_project_labels()
             self.refresh_files()
             if prepared.save_as_source is not None:
@@ -13593,6 +13986,13 @@ class S19TuiApp(App):
             panel.clear_paste_buffer()
             panel.mark_loaded()
             self.refresh_bindings()
+            # Inc 6 (R-TUI-049.3.1/.3.2): the reset discards the document,
+            # so the old apply's controls go; the fresh service has no run.
+            self._hide_replaced_document_controls(panel)
+            self._refresh_patch_checks_tab(panel)
+        # Inc 6 (E3A-02, R-CHKS-009): a displayed Checks screen repaints
+        # with the reset run state (a guarded no-op when not mounted).
+        self.update_checks_view()
 
     def _session_snapshot(self) -> dict:
         """
@@ -14121,6 +14521,9 @@ class S19TuiApp(App):
             self._reopen_active_document(prepared.document)
             self.current_project = request.name
             self.current_project_dir = request.project_dir
+            # Inc 6 (E3A-04): the lists depend on the open project; refill
+            # once the new project is assigned.
+            self._refill_document_lists()
             self._variant_set = prepared.variant_set
             if prepared.image is not None:
                 self._pending_variant_id = install.variant.variant_id
@@ -16511,8 +16914,9 @@ class S19TuiApp(App):
             ``ChangeService.check_display_rows()`` fail → uncheckable → pass
             into ``#checks_grouped`` and repaint the pass/fail/uncheckable
             ``#checks_aggregate_strip`` from ``check_aggregates()``. When a
-            file is loaded but no check has run (``last_check_result is
-            None``), render the distinct "no check run yet" note instead of a
+            file is loaded but no check run is current (``check_run_is_current``
+            is ``False`` — no run yet, or the document / image it ran over
+            changed), render the distinct "no check run yet" note instead of a
             zeroed list (LLR-084.6, R-6). A guarded no-op when the screen is
             not mounted (no active screen / widget absent), mirroring
             ``_render_validation_issues_groups`` plus the headless
@@ -16528,7 +16932,8 @@ class S19TuiApp(App):
             - No mounted screen (headless / monkeypatched call) or no
               ``#checks_grouped`` panel present → no-op.
             - Read ``check_display_rows()`` + ``check_aggregates()``; when
-              ``last_check_result is None`` render the no-run note, else group
+              ``check_run_is_current()`` is ``False`` render the no-run note,
+              else group
               the rows by ``result`` and render them; always repaint the
               aggregate strip (all-zero when no run — it rides the reset).
 
@@ -16550,7 +16955,7 @@ class S19TuiApp(App):
             return
         rows = self._change_service.check_display_rows()
         aggregates = self._change_service.check_aggregates()
-        if self._change_service.last_check_result is None:
+        if not self._change_service.check_run_is_current():
             panel.render_no_run()
         else:
             group_counts = {
@@ -17931,7 +18336,9 @@ class S19TuiApp(App):
               (``note_image_bytes_written``, ``clear_check_results``); a
               missing panel skips only its own notice. A fault inside a
               panel is NOT swallowed — each delegation sits outside its
-              ``try``.
+              ``try``. Inc 6 (E3A-03) prepends: end the current check run,
+              repaint the Patch Editor ledger/Checks tab through the load
+              tail, and repaint the Checks screen.
 
         Dependencies:
             Uses:
@@ -17942,6 +18349,18 @@ class S19TuiApp(App):
                 - ``on_patch_editor_panel_save_back_decision``
                 - ``_on_project_saved``
         """
+        # Inc 6 (E3A-03, I-7/I-8): an in-place write of the loaded image's
+        # bytes ends the current run, then the Patch Editor ledger glyphs and
+        # the Checks tab repaint with ``no run yet``, and a displayed Checks
+        # screen follows (a guarded no-op when not mounted).
+        self._change_service.end_check_run()
+        try:
+            panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+        except Exception:
+            panel = None
+        if panel is not None:
+            self._patch_editor_load_tail(panel)
+        self.update_checks_view()
         try:
             designer = self.query_one(CrcDesignerPanel)
         except Exception:
@@ -18123,6 +18542,17 @@ class S19TuiApp(App):
             # batch-97 Inc-8 (PC-23): the key bar dims Undo / Redo by the
             # document's source, which this refresh may have changed.
             self.refresh_bindings()
+            # Inc 6 (R-TUI-049.3.1/.3.2, S-1): a NEW image dict installs a
+            # new image — hide the old apply's controls; a MAC attach keeps
+            # the dict, so it hides nothing.
+            if loaded.mem_map is not previous_map:
+                self._hide_replaced_document_controls(panel)
+            # Inc 6 (R-CHK-PE-009 … -012): every install bumps the image
+            # generation, so the run ends (a MAC load included).
+            self._refresh_patch_checks_tab(panel)
+        # Inc 6 (E3A-02, R-CHKS-004/-009): a displayed Checks screen
+        # repaints with the no-run note (a guarded no-op when not mounted).
+        self.update_checks_view()
         # F-09 (LLR-056.3): every load path — project load, loose-file
         # load, variant activation — funnels through this install point,
         # so the sticky report-filter selection dies with the previous

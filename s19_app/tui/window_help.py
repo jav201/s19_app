@@ -110,10 +110,12 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
             "save.",
             "Run checks — runs a check document's entries against the loaded "
             "image; uncheckable rows name their reason.",
-            "File — picks a change file in `patches/`, or takes a typed path "
-            "for Load.",
+            "File — picks a change file in the project's `checks/` and "
+            "`patches/` then the common `library/`, or a typed path for "
+            "Load.",
             "Load — loads the typed path (a pick in the list loads at once).",
-            "Refresh — re-reads the file list of `patches/`.",
+            "Refresh — re-reads the file list (project files, then the "
+            "library).",
             "Validate — checks the document against the loaded image.",
             "Apply loaded changes — writes the entries into the loaded image "
             "and offers to save it.",
@@ -527,8 +529,8 @@ WINDOW_HELP_SECTIONS: Dict[str, Dict[str, object]] = {
             "u32 / u64.",
             "Add row — appends the memory row typed above.",
             "Remove row — removes the highlighted memory row.",
-            "Spec — loads a check spec from the patches folder into the "
-            "collector.",
+            "Spec — loads a check spec from the project's `checks/` then the "
+            "common `library/` into the collector.",
             "Write as — the file name Write .chk.json saves under.",
             "Validate — checks the fields against the loaded image; the "
             "verdicts show under the memory form.",
