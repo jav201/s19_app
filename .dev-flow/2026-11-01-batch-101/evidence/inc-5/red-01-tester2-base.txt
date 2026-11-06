@@ -1,0 +1,354 @@
+# Inc 5 tester 2 (Check Editor) RED on base c2cba35, LAN host 2, python 3.11 (env s19ci), NO_COLOR unset
+# command: cd <detached worktree at m4fix-main> && env -u NO_COLOR python -m pytest -p no:cacheprovider -rA --tb=short -v tests/test_b101_check_spec_keep.py tests/test_b101_symbol_reads.py::test_r_chg_sym_9_check_editor_spec_pick_resolves_symbols  (one complete run; exit 1)
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- <home>/miniconda3/envs/s19ci/bin/python
+rootdir: <home>/work/s19_i5t2
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collecting ... collected 27 items
+
+tests/test_b101_check_spec_keep.py::test_r_chked_010_1_plain_return_keeps_picks PASSED [  3%]
+tests/test_b101_check_spec_keep.py::test_r_chked_010_2_same_a2l_reloaded_keeps_picks FAILED [  7%]
+tests/test_b101_check_spec_keep.py::test_r_chked_010_3_image_reloaded_keeps_picks FAILED [ 11%]
+tests/test_b101_check_spec_keep.py::test_r_chked_055_1_unlisted_parameter_dropped FAILED [ 14%]
+tests/test_b101_check_spec_keep.py::test_r_chked_054_1_write_keeps_the_field_set PASSED [ 18%]
+tests/test_b101_check_spec_keep.py::test_r_chked_041_1_pick_replaces_the_field_set PASSED [ 22%]
+tests/test_b101_check_spec_keep.py::test_r_chked_041_2_1_written_spec_names_come_back FAILED [ 25%]
+tests/test_b101_check_spec_keep.py::test_r_chked_041_2_3_symbol_disambiguates FAILED [ 29%]
+tests/test_b101_check_spec_keep.py::test_r_chked_041_3_1_no_a2l_memory_rows PASSED [ 33%]
+tests/test_b101_check_spec_keep.py::test_r_chked_041_3_2_unmatched_address_memory_row FAILED [ 37%]
+tests/test_b101_check_spec_keep.py::test_r_chked_041_3_3_size_mismatch_memory_row FAILED [ 40%]
+tests/test_b101_check_spec_keep.py::test_r_chked_041_3_4_ambiguous_memory_row FAILED [ 44%]
+tests/test_b101_check_spec_keep.py::test_r_chked_041_3_5_duplicate_memory_row FAILED [ 48%]
+tests/test_b101_check_spec_keep.py::test_r_chked_041_3_6_symbol_range_mismatch_memory_row FAILED [ 51%]
+tests/test_b101_check_spec_keep.py::test_r_chked_025_1_session_field_reads_the_image PASSED [ 55%]
+tests/test_b101_check_spec_keep.py::test_r_chked_025_2_exclude_include_rebaselines FAILED [ 59%]
+tests/test_b101_check_spec_keep.py::test_r_chked_025_3_reincluded_after_move_reads_the_image FAILED [ 62%]
+tests/test_b101_check_spec_keep.py::test_r_chked_026_1_write_keeps_spec_bytes FAILED [ 66%]
+tests/test_b101_check_spec_keep.py::test_r_chked_026_2_validate_reports_the_drift FAILED [ 70%]
+tests/test_b101_check_spec_keep.py::test_r_chked_026_3_memory_row_keeps_spec_bytes FAILED [ 74%]
+tests/test_b101_check_spec_keep.py::test_r_chked_026_4_spec_bytes_survive_same_range_reload FAILED [ 77%]
+tests/test_b101_check_spec_keep.py::test_r_chked_027_1_session_field_outside_left_out PASSED [ 81%]
+tests/test_b101_check_spec_keep.py::test_r_chked_027_2_loaded_fields_kept_without_image FAILED [ 85%]
+tests/test_b101_check_spec_keep.py::test_r_chked_056_1_moved_parameter_keeps_the_declared_entry FAILED [ 88%]
+tests/test_b101_check_spec_keep.py::test_r_chked_056_2_renamed_parameter_keeps_the_declared_entry FAILED [ 92%]
+tests/test_b101_check_spec_keep.py::test_r_chked_056_3_resized_parameter_keeps_the_declared_entry FAILED [ 96%]
+tests/test_b101_symbol_reads.py::test_r_chg_sym_9_check_editor_spec_pick_resolves_symbols FAILED [100%]
+
+=================================== FAILURES ===================================
+_______________ test_r_chked_010_2_same_a2l_reloaded_keeps_picks _______________
+tests/test_b101_check_spec_keep.py:610: in test_r_chked_010_2_same_a2l_reloaded_keeps_picks
+    assert picks == [facts.v1.name, facts.v2.name], picks
+E   AssertionError: []
+E   assert [] == ['VALUE_0001', 'VALUE_0002']
+E     
+E     Right contains 2 more items, first extra item: 'VALUE_0001'
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     'VALUE_0001',
+E     -     'VALUE_0002',
+E     - ]
+________________ test_r_chked_010_3_image_reloaded_keeps_picks _________________
+tests/test_b101_check_spec_keep.py:633: in test_r_chked_010_3_image_reloaded_keeps_picks
+    assert picks == [facts.v1.name, facts.v2.name], picks
+E   AssertionError: []
+E   assert [] == ['VALUE_0001', 'VALUE_0002']
+E     
+E     Right contains 2 more items, first extra item: 'VALUE_0001'
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     'VALUE_0001',
+E     -     'VALUE_0002',
+E     - ]
+________________ test_r_chked_055_1_unlisted_parameter_dropped _________________
+tests/test_b101_check_spec_keep.py:664: in test_r_chked_055_1_unlisted_parameter_dropped
+    assert picks == [facts.v2.name], picks
+E   AssertionError: []
+E   assert [] == ['VALUE_0002']
+E     
+E     Right contains one more item: 'VALUE_0002'
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     'VALUE_0002',
+E     - ]
+______________ test_r_chked_041_2_1_written_spec_names_come_back _______________
+tests/test_b101_check_spec_keep.py:753: in test_r_chked_041_2_1_written_spec_names_come_back
+    assert picks == [facts.v1.name, facts.v2.name], picks
+E   AssertionError: []
+E   assert [] == ['VALUE_0001', 'VALUE_0002']
+E     
+E     Right contains 2 more items, first extra item: 'VALUE_0001'
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     'VALUE_0001',
+E     -     'VALUE_0002',
+E     - ]
+__________________ test_r_chked_041_2_3_symbol_disambiguates ___________________
+tests/test_b101_check_spec_keep.py:780: in test_r_chked_041_2_3_symbol_disambiguates
+    assert picks == ["BETA"], picks
+E   AssertionError: []
+E   assert [] == ['BETA']
+E     
+E     Right contains one more item: 'BETA'
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     'BETA',
+E     - ]
+______________ test_r_chked_041_3_2_unmatched_address_memory_row _______________
+tests/test_b101_check_spec_keep.py:823: in test_r_chked_041_3_2_unmatched_address_memory_row
+    assert picks == [facts.v1.name, facts.v2.name], picks
+E   AssertionError: []
+E   assert [] == ['VALUE_0001', 'VALUE_0002']
+E     
+E     Right contains 2 more items, first extra item: 'VALUE_0001'
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     'VALUE_0001',
+E     -     'VALUE_0002',
+E     - ]
+________________ test_r_chked_041_3_3_size_mismatch_memory_row _________________
+tests/test_b101_check_spec_keep.py:851: in test_r_chked_041_3_3_size_mismatch_memory_row
+    assert control == [facts.v1.name, facts.v2.name], control
+E   AssertionError: []
+E   assert [] == ['VALUE_0001', 'VALUE_0002']
+E     
+E     Right contains 2 more items, first extra item: 'VALUE_0001'
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     'VALUE_0001',
+E     -     'VALUE_0002',
+E     - ]
+__________________ test_r_chked_041_3_4_ambiguous_memory_row ___________________
+tests/test_b101_check_spec_keep.py:880: in test_r_chked_041_3_4_ambiguous_memory_row
+    assert control == ["BETA"], control
+E   AssertionError: []
+E   assert [] == ['BETA']
+E     
+E     Right contains one more item: 'BETA'
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     'BETA',
+E     - ]
+__________________ test_r_chked_041_3_5_duplicate_memory_row ___________________
+tests/test_b101_check_spec_keep.py:907: in test_r_chked_041_3_5_duplicate_memory_row
+    assert picks == [v1.name], picks
+E   AssertionError: []
+E   assert [] == ['VALUE_0001']
+E     
+E     Right contains one more item: 'VALUE_0001'
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     'VALUE_0001',
+E     - ]
+____________ test_r_chked_041_3_6_symbol_range_mismatch_memory_row _____________
+tests/test_b101_check_spec_keep.py:955: in test_r_chked_041_3_6_symbol_range_mismatch_memory_row
+    assert control == ["ALPHA"], control
+E   AssertionError: []
+E   assert [] == ['ALPHA']
+E     
+E     Right contains one more item: 'ALPHA'
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     'ALPHA',
+E     - ]
+________________ test_r_chked_025_2_exclude_include_rebaselines ________________
+tests/test_b101_check_spec_keep.py:1009: in test_r_chked_025_2_exclude_include_rebaselines
+    assert picks == [facts.v2.name, facts.v1.name], picks
+E   AssertionError: []
+E   assert [] == ['VALUE_0002', 'VALUE_0001']
+E     
+E     Right contains 2 more items, first extra item: 'VALUE_0002'
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     'VALUE_0002',
+E     -     'VALUE_0001',
+E     - ]
+___________ test_r_chked_025_3_reincluded_after_move_reads_the_image ___________
+tests/test_b101_check_spec_keep.py:1044: in test_r_chked_025_3_reincluded_after_move_reads_the_image
+    entries = run(tmp_path, scenario)
+              ^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_check_spec_keep.py:255: in run
+    return projects.run_app(base, scenario)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_check_spec_keep.py:1039: in scenario
+    assert included(app) == [facts.v2.name], included(app)
+E   AssertionError: []
+E   assert [] == ['VALUE_0002']
+E     
+E     Right contains one more item: 'VALUE_0002'
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     'VALUE_0002',
+E     - ]
+__________________ test_r_chked_026_1_write_keeps_spec_bytes ___________________
+tests/test_b101_check_spec_keep.py:1077: in test_r_chked_026_1_write_keeps_spec_bytes
+    assert entries == pilot_entries(facts), entries
+E   AssertionError: [(0, b'\x93'), (20, b'\xa0\xbe'), (12587004, b'\xff\xff\xff\xff')]
+E   assert [(0, b'\x93')...xff\xff\xff')] == [(0, b'l'), (...xff\xff\xff')]
+E     
+E     At index 0 diff: (0, b'\x93') != (0, b'l')
+E     
+E     Full diff:
+E       [
+E           (
+E               0,...
+E     
+E     ...Full output truncated (14 lines hidden), use '-vv' to show
+________________ test_r_chked_026_2_validate_reports_the_drift _________________
+tests/test_b101_check_spec_keep.py:1094: in test_r_chked_026_2_validate_reports_the_drift
+    assert "Checks: 2 passed, 1 failed, 0 uncheckable" in lines, lines
+E   AssertionError: ['Checks: 3 passed, 0 failed, 0 uncheckable']
+E   assert 'Checks: 2 passed, 1 failed, 0 uncheckable' in ['Checks: 3 passed, 0 failed, 0 uncheckable']
+________________ test_r_chked_026_3_memory_row_keeps_spec_bytes ________________
+tests/test_b101_check_spec_keep.py:1118: in test_r_chked_026_3_memory_row_keeps_spec_bytes
+    assert [e for e in entries if e[0] == facts.serial] == [
+E   AssertionError: [(0, b'l'), (20, b'\xa0\xbe'), (12587004, b'\x00\x00\x00\x00')]
+E   assert [(12587004, b...x00\x00\x00')] == [(12587004, b...xff\xff\xff')]
+E     
+E     At index 0 diff: (12587004, b'\x00\x00\x00\x00') != (12587004, b'\xff\xff\xff\xff')
+E     
+E     Full diff:
+E       [
+E           (
+E               12587004,...
+E     
+E     ...Full output truncated (4 lines hidden), use '-vv' to show
+___________ test_r_chked_026_4_spec_bytes_survive_same_range_reload ____________
+tests/test_b101_check_spec_keep.py:1145: in test_r_chked_026_4_spec_bytes_survive_same_range_reload
+    assert picks == [facts.v1.name, facts.v2.name], picks
+E   AssertionError: []
+E   assert [] == ['VALUE_0001', 'VALUE_0002']
+E     
+E     Right contains 2 more items, first extra item: 'VALUE_0001'
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     'VALUE_0001',
+E     -     'VALUE_0002',
+E     - ]
+_____________ test_r_chked_027_2_loaded_fields_kept_without_image ______________
+tests/test_b101_check_spec_keep.py:1187: in test_r_chked_027_2_loaded_fields_kept_without_image
+    assert not [ln for ln in lines if "outside the loaded image" in ln], lines
+E   AssertionError: ['Check Editor: 3 field(s) outside the loaded image — not declared.', 'Check Editor: wrote noimage.chk.json (0 fields, kind=check).']
+E   assert not ['Check Editor: 3 field(s) outside the loaded image — not declared.']
+_________ test_r_chked_056_1_moved_parameter_keeps_the_declared_entry __________
+tests/test_b101_check_spec_keep.py:1243: in test_r_chked_056_1_moved_parameter_keeps_the_declared_entry
+    assert_declared_entry_kept(facts, state, lines, entries)
+tests/test_b101_check_spec_keep.py:1212: in assert_declared_entry_kept
+    assert picks == [f.v2.name], picks
+E   AssertionError: []
+E   assert [] == ['VALUE_0002']
+E     
+E     Right contains one more item: 'VALUE_0002'
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     'VALUE_0002',
+E     - ]
+________ test_r_chked_056_2_renamed_parameter_keeps_the_declared_entry _________
+tests/test_b101_check_spec_keep.py:1263: in test_r_chked_056_2_renamed_parameter_keeps_the_declared_entry
+    assert_declared_entry_kept(facts, state, lines, entries)
+tests/test_b101_check_spec_keep.py:1212: in assert_declared_entry_kept
+    assert picks == [f.v2.name], picks
+E   AssertionError: []
+E   assert [] == ['VALUE_0002']
+E     
+E     Right contains one more item: 'VALUE_0002'
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     'VALUE_0002',
+E     - ]
+________ test_r_chked_056_3_resized_parameter_keeps_the_declared_entry _________
+tests/test_b101_check_spec_keep.py:1281: in test_r_chked_056_3_resized_parameter_keeps_the_declared_entry
+    assert_declared_entry_kept(facts, state, lines, entries)
+tests/test_b101_check_spec_keep.py:1212: in assert_declared_entry_kept
+    assert picks == [f.v2.name], picks
+E   AssertionError: []
+E   assert [] == ['VALUE_0002']
+E     
+E     Right contains one more item: 'VALUE_0002'
+E     
+E     Full diff:
+E     + []
+E     - [
+E     -     'VALUE_0002',
+E     - ]
+___________ test_r_chg_sym_9_check_editor_spec_pick_resolves_symbols ___________
+tests/test_b101_symbol_reads.py:678: in test_r_chg_sym_9_check_editor_spec_pick_resolves_symbols
+    assert check_entry["symbol"] in picked, (check_entry["symbol"], picked)
+E   AssertionError: ('VALUE_0185', [])
+E   assert 'VALUE_0185' in []
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_010_1_plain_return_keeps_picks
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_054_1_write_keeps_the_field_set
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_041_1_pick_replaces_the_field_set
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_041_3_1_no_a2l_memory_rows
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_025_1_session_field_reads_the_image
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_027_1_session_field_outside_left_out
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_010_2_same_a2l_reloaded_keeps_picks
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_010_3_image_reloaded_keeps_picks
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_055_1_unlisted_parameter_dropped
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_041_2_1_written_spec_names_come_back
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_041_2_3_symbol_disambiguates
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_041_3_2_unmatched_address_memory_row
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_041_3_3_size_mismatch_memory_row
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_041_3_4_ambiguous_memory_row
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_041_3_5_duplicate_memory_row
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_041_3_6_symbol_range_mismatch_memory_row
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_025_2_exclude_include_rebaselines
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_025_3_reincluded_after_move_reads_the_image
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_026_1_write_keeps_spec_bytes
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_026_2_validate_reports_the_drift
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_026_3_memory_row_keeps_spec_bytes
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_026_4_spec_bytes_survive_same_range_reload
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_027_2_loaded_fields_kept_without_image
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_056_1_moved_parameter_keeps_the_declared_entry
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_056_2_renamed_parameter_keeps_the_declared_entry
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_056_3_resized_parameter_keeps_the_declared_entry
+FAILED tests/test_b101_symbol_reads.py::test_r_chg_sym_9_check_editor_spec_pick_resolves_symbols
+=================== 21 failed, 6 passed in 636.79s (0:10:36) ===================
+exit=1

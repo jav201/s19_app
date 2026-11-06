@@ -1,0 +1,180 @@
+== e5c-09 mutant M29 in a copy of the staged tree (M29: applied to s19_app/tui/app.py)
+2026-11-06T11:21:03Z
+tree: a copy (no git); see the label for its source
+s19_app.__file__ <HOME>/work/s19_i5c_mut/s19_app/__init__.py
+python 3.11.18
+pytest tests/test_b101_check_spec_keep.py tests/test_b101_designer_writes.py -k test_r_chked_057_ -n 3 -q -rA -p no:cacheprovider
+bringing up nodes...
+bringing up nodes...
+
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+____________ test_r_chked_057_1_apply_clears_the_validation_results ____________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-232/popen-gw0/test_r_chked_057_1_apply_clear0')
+facts = Facts(case=PosixPath('/tmp/pytest-of-<USER>/pytest-232/popen-gw0/b101_inc5_case080'), image={0: 108, 1: 49, 2: 57, 3...ram(name='VALUE_0002', address=20, size=2), v3=Param(name='VALUE_0003', address=40, size=4), serial=12587004, moved=32)
+
+    def test_r_chked_057_1_apply_clears_the_validation_results(tmp_path: Path, facts: Facts) -> None:
+        """Case R-CHKED-057/1 (E5 C-10, SEC E5-S1), driven by keys and clicks:
+        case 08 and its A2L loaded, the pilot spec picked, Validate clicked ->
+        ``Checks: 3 passed, 0 failed, 0 uncheckable``, the row ``0x0-0x0 expected
+        [6C] actual [6C] -> pass`` under ``validation complete``; key ``6``, a
+        Patch Editor apply of ``0x0`` = ``93``; key ``=`` -> 0 verdict rows, the
+        status line exactly ``Validate compares fields to the image``, no line
+        ``validation complete`` or ending ``-> pass``; Validate clicked again ->
+        ``Checks: 2 passed, 1 failed, 0 uncheckable`` and ``0x0-0x0 expected [6C]
+        actual [93] -> fail``.
+    
+        Why: after the write the old ``pass`` is false, and the operator would
+        trust it. Base: the card keeps ``validation complete`` and the ``-> pass``
+        row -> RED. Negative control: the in-place-write hook not telling the
+        Check Editor -> RED (M29)."""
+        v1 = facts.v1.address
+        original = facts.image[v1]
+        assert original != PATCH_BYTE
+        pass_row = f"0x{v1:X}-0x{v1:X} expected [{original:02X}] actual [{original:02X}] -> pass"
+        fail_row = f"0x{v1:X}-0x{v1:X} expected [{original:02X}] actual [{PATCH_BYTE:02X}] -> fail"
+    
+        async def scenario(app, pilot, log):
+            await open_session(pilot, app, facts, specs={PILOT: spec_doc(pilot_entries(facts))})
+            await pick_spec(pilot, app, log, PILOT)
+            first = await validate_by_click(pilot, app, log)
+            await apply_by_keys(pilot, app, log, tmp_path, v1, bytes([PATCH_BYTE]))
+            after = card(app)
+            again = await validate_by_click(pilot, app, log)
+            return first, after, again
+    
+        (lines1, (status1, rows1)), (status2, rows2), (lines3, (_s3, rows3)) = run(tmp_path, scenario)
+        assert "Checks: 3 passed, 0 failed, 0 uncheckable" in lines1, lines1
+        assert status1 == "validation complete" and pass_row in rows1, (status1, rows1)
+>       assert (status2, rows2) == (HINT, []), (status2, rows2)
+E       AssertionError: ('validation complete', ['0x0-0x0 expected [6C] actual [6C] -> pass', '0x14-0x15 expected [A0 BE] actual [A0 BE] -> pass', '0xC00FFC-0xC00FFF expected [FF FF FF FF] actual [FF FF FF FF] -> pass'])
+E       assert ('validation ...FF] -> pass']) == ('Validate co...he image', [])
+E         
+E         At index 0 diff: 'validation complete' != 'Validate compares fields to the image'
+E         Use -v to get more diff
+
+../s19_i5c/tests/test_b101_check_spec_keep.py:1562: AssertionError
+__________ test_r_chked_057_2_save_back_clears_the_validation_results __________
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-232/popen-gw1/test_r_chked_057_2_save_back_c0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fcc7fb5d790>
+
+    def test_r_chked_057_2_save_back_clears_the_validation_results(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Case R-CHKED-057/2: the fixture image, ``0x8003`` applied as ``AA``, a
+        memory row ``0x8003`` size 1 added and Validate clicked (``0x8003-0x8003
+        expected [AA] actual [AA] -> pass``); the entry edited to ``BB`` and *Save
+        patched image as* confirmed -> key ``=``: 0 verdict rows and the status
+        line ``Validate compares fields to the image``.
+    
+        Base: the ``-> pass`` row under ``validation complete`` stays -> RED.
+        Negative control: the hook not telling the Check Editor -> RED (M29)."""
+        _set_quiet(monkeypatch, QUIET_SHORT_S)
+        seen = []
+    
+        def make(folder: Path, image: Path):
+            async def scenario(app, pilot, log):
+                await _load_image_by_dialog(pilot, app, image)
+                await _load_document(pilot, app, log, folder, "d.changes.json", [AA_ENTRY])
+                assert await _apply(pilot, app, log, "Apply:") == "Apply: 1 applied, 0 skipped, 0 blocked"
+                first = await _validate_a_session_row(pilot, app, log)
+                await _entry_op(
+                    pilot, app, log, "#patch_entry_edit_button", "0x8003", "BB", "Patch Editor: entry updated."
+                )
+                await _save_back(pilot, app, log, "fixture-patched.s19", "Saved + verified")
+                assert app.current_file.mem_map[0x8003] == 0xBB
+                seen.append((first, await _card_after_return(pilot, app)))
+    
+            return scenario
+    
+        _reps(tmp_path, make)
+        for first, after in seen:
+>           _assert_cleared(first, after, "0x8003-0x8003 expected [AA] actual [AA] -> pass")
+
+../s19_i5c/tests/test_b101_designer_writes.py:860: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+first = (['Checks: 1 passed, 0 failed, 0 uncheckable'], ('validation complete', ['0x8003-0x8003 expected [AA] actual [AA] -> pass']))
+after = ('validation complete', ['0x8003-0x8003 expected [AA] actual [AA] -> pass'])
+row = '0x8003-0x8003 expected [AA] actual [AA] -> pass'
+
+    def _assert_cleared(first, after, row: str) -> None:
+        lines, (status, rows) = first
+        assert "Checks: 1 passed, 0 failed, 0 uncheckable" in lines, lines
+        assert status == "validation complete" and rows == [row], (status, rows)
+>       assert after == (HINT, []), f"stale validation results after the write: {after!r}"
+E       AssertionError: stale validation results after the write: ('validation complete', ['0x8003-0x8003 expected [AA] actual [AA] -> pass'])
+E       assert ('validation ...AA] -> pass']) == ('Validate co...he image', [])
+E         
+E         At index 0 diff: 'validation complete' != 'Validate compares fields to the image'
+E         Use -v to get more diff
+
+../s19_i5c/tests/test_b101_designer_writes.py:822: AssertionError
+_____ test_r_chked_057_3_save_project_commit_clears_the_validation_results _____
+[gw2] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-232/popen-gw2/test_r_chked_057_3_save_projec0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f81a5d38290>
+
+    def test_r_chked_057_3_save_project_commit_clears_the_validation_results(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Case R-CHKED-057/3: as /2 inside an open project, then a Save project
+        commit by ``ctrl+s`` instead of the save-back -> key ``=``: 0 verdict rows
+        and the status line ``Validate compares fields to the image``.
+    
+        Base: the stale ``-> pass`` row stays -> RED. Negative control: M29."""
+        _set_quiet(monkeypatch, QUIET_SHORT_S)
+        seen = []
+    
+        def make(folder: Path, image: Path):
+            async def scenario(app, pilot, log):
+                await _load_image_by_dialog(pilot, app, image)
+                await _open_project(pilot, app, log)
+                await _load_document(pilot, app, log, folder, "d.changes.json", [AA_ENTRY])
+                assert await _apply(pilot, app, log, "Apply:") == "Apply: 1 applied, 0 skipped, 0 blocked"
+                first = await _validate_a_session_row(pilot, app, log)
+                await _entry_op(
+                    pilot, app, log, "#patch_entry_edit_button", "0x8003", "BB", "Patch Editor: entry updated."
+                )
+                await _show_rail(pilot, app, "1", "#loaded_slots")
+                await _save_project(pilot, app, log)
+                assert app.current_file.mem_map[0x8003] == 0xBB, "the commit did not write the BB"
+                seen.append((first, await _card_after_return(pilot, app)))
+    
+            return scenario
+    
+        _reps(tmp_path, make)
+        for first, after in seen:
+>           _assert_cleared(first, after, "0x8003-0x8003 expected [AA] actual [AA] -> pass")
+
+../s19_i5c/tests/test_b101_designer_writes.py:893: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+first = (['Checks: 1 passed, 0 failed, 0 uncheckable'], ('validation complete', ['0x8003-0x8003 expected [AA] actual [AA] -> pass']))
+after = ('validation complete', ['0x8003-0x8003 expected [AA] actual [AA] -> pass'])
+row = '0x8003-0x8003 expected [AA] actual [AA] -> pass'
+
+    def _assert_cleared(first, after, row: str) -> None:
+        lines, (status, rows) = first
+        assert "Checks: 1 passed, 0 failed, 0 uncheckable" in lines, lines
+        assert status == "validation complete" and rows == [row], (status, rows)
+>       assert after == (HINT, []), f"stale validation results after the write: {after!r}"
+E       AssertionError: stale validation results after the write: ('validation complete', ['0x8003-0x8003 expected [AA] actual [AA] -> pass'])
+E       assert ('validation ...AA] -> pass']) == ('Validate co...he image', [])
+E         
+E         At index 0 diff: 'validation complete' != 'Validate compares fields to the image'
+E         Use -v to get more diff
+
+../s19_i5c/tests/test_b101_designer_writes.py:822: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_057_1_apply_clears_the_validation_results
+FAILED tests/test_b101_designer_writes.py::test_r_chked_057_2_save_back_clears_the_validation_results
+FAILED tests/test_b101_designer_writes.py::test_r_chked_057_3_save_project_commit_clears_the_validation_results
+3 failed in 93.70s (0:01:33)
+exit=1
+Files <HOME>/work/s19_i5c/s19_app/tui/app.py and s19_app/tui/app.py differ

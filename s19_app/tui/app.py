@@ -4906,6 +4906,13 @@ class S19TuiApp(App):
         except (ValueError, KeyError) as exc:
             self.set_status(f"Patch Editor: {exc}")
 
+        # Inc 5 D-4: an apply wrote the loaded image's bytes in place (also
+        # when it raises after the journal restore, and when 0 applied
+        # restored an earlier apply), so tell the CRC Designer on both
+        # outcomes — never gated on ``applied > 0`` (R-CRC-PREVIEW-002.5/8).
+        if event.action == "apply_doc":
+            self._note_image_bytes_written()
+
         # batch-48 (LLR-080.2) — site 1 of 5: push the image's memory map so
         # the before/after card can read its "before" bytes. `mem_map` is
         # already resolved above (`loaded.mem_map if loaded is not None else
@@ -5032,6 +5039,11 @@ class S19TuiApp(App):
             # SEC-4 (LED .56): the emit stages under THIS work area.
             workarea_root=self.workarea,
         )
+        # Inc 5 D-4: a save-back wrote (or reverted) the loaded image's bytes
+        # in place — ``save_patched`` adopts the re-derived bytes before it
+        # possibly refuses a blocked save — so tell the CRC Designer whatever
+        # ``result.ok`` (R-CRC-PREVIEW-002.5/7).
+        self._note_image_bytes_written()
         self._report_change_result(result)
         if result.ok:
             # LLR-167.5: a successful save-back records the saved image.
@@ -7286,13 +7298,18 @@ class S19TuiApp(App):
         """Assemble the ``kind="check"`` document from collector items (LLR-009.1).
 
         Summary:
-            One :class:`ChangeEntry` per collected field, in collector order,
-            with the EXPECTED bytes read from the loaded image's memory map
-            at ``[address, address + size)`` — a check spec asserts the
-            current image state. A field whose address is missing, negative
-            or not fully mapped in the loaded image cannot declare expected
-            bytes and is SKIPPED (counted in the return); with no image
-            loaded every field is skipped and the EMPTY spec still writes
+            One :class:`ChangeEntry` per collected field, in collector order.
+            A field loaded from a spec carries its spec entry's bytes in
+            ``expected`` (a tuple of exactly ``size`` ints); they are
+            declared as they are and the image is not read, so such a field
+            is never skipped for lack of an image (amended *declared field*,
+            R-CHKED-026 / R-CHKED-027). Any other field takes the EXPECTED
+            bytes read from the loaded image's memory map at
+            ``[address, address + size)`` — the current image state. Such a
+            field whose address is missing, negative or not fully mapped in
+            the loaded image cannot declare expected bytes and is SKIPPED
+            (counted in the return); with no image loaded every such field
+            is skipped, and a spec with no field left still writes EMPTY
             (LLR-009.1's empty arm). No bytes are ever written to the image
             — the document is data, and the apply gate is what keeps it
             inert (LLR-009.3).
@@ -7308,6 +7325,15 @@ class S19TuiApp(App):
             size = int(item.get("size") or 1)
             if not isinstance(address, int) or address < 0 or size <= 0:
                 skipped += 1
+                continue
+            spec_expected = item.get("expected")
+            if isinstance(spec_expected, tuple) and len(spec_expected) == size:
+                # A field loaded from a spec declares the spec's bytes at its
+                # own entry's range; the image is not read (amended "declared
+                # field", Inc 5 D9-11 / R-CHKED-026).
+                entries.append(
+                    ChangeEntry("bytes", address, spec_expected, value=None)
+                )
                 continue
             expected: list[int] = []
             if mem_map is not None:
@@ -7344,7 +7370,8 @@ class S19TuiApp(App):
             Exactly the two :data:`CHECK_EDITOR_ACTIONS` — a non-member
             action is one status error, never a crash. ``write_doc``
             assembles the ``kind="check"`` document (expected bytes from the
-            loaded image), writes it through ``changes.io.
+            spec for a field loaded from one, else from the loaded image),
+            writes it through ``changes.io.
             write_change_document`` under the operator's name (the
             ``.chk.json`` suffix is preserved by ``_safe_name``), surfaces
             the outcome and refreshes the folder listing so the new spec
@@ -7490,6 +7517,8 @@ class S19TuiApp(App):
             {
                 "address": entry.address,
                 "size": max(1, len(entry.encoded_bytes)),
+                "expected": tuple(entry.encoded_bytes),
+                "symbol": entry.symbol,
             }
             for entry in document.entries
         ]
@@ -12607,6 +12636,10 @@ class S19TuiApp(App):
                 self._change_service.adopt_rederived(
                     mem_map, request.image.derived, summary
                 )
+                # Inc 5 D-4: the committed save wrote the image's bytes in
+                # place; tell the CRC Designer inside the same ``if`` (only
+                # when the commit wrote the image — R-CRC-PREVIEW-002.1/6).
+                self._note_image_bytes_written()
                 self._surface_verify_result()
             if request.image is not None or not self._change_service.image_differs_from_source(
                 mem_map
@@ -17873,6 +17906,53 @@ class S19TuiApp(App):
                 - ``load_selected_file`` (synchronous path)
         """
         self._apply_prepared_load(PreparedLoad(loaded=loaded), path, load_started)
+
+    def _note_image_bytes_written(self) -> None:
+        """
+        Summary:
+            Tell the CRC Designer that the loaded image's bytes were written
+            in place, so its coverage follows the written bytes (Inc 5 D-4).
+            The ``current_file`` reactive does not fire for an in-place
+            write (an apply, a save-back or a Save project commit), so this
+            helper is the in-place twin of :meth:`watch_current_file`. It
+            also clears the Check Editor's validation results, whose verdict
+            rows judged the bytes before the write (R-CHKED-057). A
+            not-yet-mounted panel (headless unit path) is tolerated as a
+            no-op, matching ``watch_current_file``.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Query each panel separately and delegate to its public method
+              (``note_image_bytes_written``, ``clear_check_results``); a
+              missing panel skips only its own notice. A fault inside a
+              panel is NOT swallowed — each delegation sits outside its
+              ``try``.
+
+        Dependencies:
+            Uses:
+                - ``CrcDesignerPanel``
+                - ``CheckEditorPanel``
+            Used by:
+                - ``on_patch_editor_panel_action_requested``
+                - ``on_patch_editor_panel_save_back_decision``
+                - ``_on_project_saved``
+        """
+        try:
+            designer = self.query_one(CrcDesignerPanel)
+        except Exception:
+            designer = None
+        if designer is not None:
+            designer.note_image_bytes_written()
+        try:
+            checks = self.query_one("#check_editor_panel", CheckEditorPanel)
+        except Exception:
+            return
+        checks.clear_check_results()
 
     def watch_current_file(self) -> None:
         """

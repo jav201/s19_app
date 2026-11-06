@@ -1,0 +1,120 @@
+== e5c-10 mutant M30 in a copy of the staged tree (M30: applied to s19_app/tui/app.py
+M30: applied to s19_app/tui/app.py)
+2026-11-06T11:22:38Z
+tree: a copy (no git); see the label for its source
+s19_app.__file__ <HOME>/work/s19_i5c_mut/s19_app/__init__.py
+python 3.11.18
+pytest tests/test_b101_designer_writes.py -k test_r_crc_preview_002_5_9 -n 1 -q -rA -p no:cacheprovider
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__ test_r_crc_preview_002_5_9_save_back_raising_after_the_adopt_ends_the_app ___
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-233/popen-gw0/test_r_crc_preview_002_5_9_sav0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f90253ad050>
+
+    def test_r_crc_preview_002_5_9_save_back_raising_after_the_adopt_ends_the_app(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Case R-CRC-PREVIEW-002.5/9 (E5 C-6, robustness; partial: the fault is
+        injected): after the apply of ``AA``, a display and the entry edited to
+        ``BB``, a save-back whose emit raises after ``save_patched`` adopted the
+        re-derived bytes -> ``0x8003`` holds ``BB``, and the app ends with that
+        error (return code 1, the error raised out of the run), so the CRC
+        Designer can never show the pre-write CRC (E5-S2 ruling: no hook needed).
+    
+        Standing guard (passes on the base). Negative control: the save-back
+        handler swallowing the error -> the app keeps running -> RED (M30)."""
+        _set_quiet(monkeypatch, QUIET_SHORT_S)
+    
+        def raise_after_adopt(self, *args, **kwargs):
+            raise RuntimeError("probe after adopt")
+    
+        monkeypatch.setattr(change_service_module.ChangeService, "emit_and_verify", raise_after_adopt)
+        seen = {}
+    
+        def make(folder: Path, image: Path):
+            async def scenario(app, pilot, log):
+                seen["app"] = app
+                await _load_image_by_dialog(pilot, app, image)
+                await _load_document(pilot, app, log, folder, "d.changes.json", [AA_ENTRY])
+                assert await _apply(pilot, app, log, "Apply:") == "Apply: 1 applied, 0 skipped, 0 blocked"
+                await _fresh_designer_display(pilot, app, AFTER_AA)
+                await _entry_op(
+                    pilot, app, log, "#patch_entry_edit_button", "0x8003", "BB", "Patch Editor: entry updated."
+                )
+                await _confirm_save_back(pilot, app, "fixture-raise.s19", by_keys=False)
+                for _ in range(200):
+                    if app._exception is not None:
+                        break
+                    await asyncio.sleep(0.05)
+                seen["byte"] = app.current_file.mem_map[0x8003]
+                assert app._exception is not None, "the save-back error was swallowed; the app runs on"
+    
+            return scenario
+    
+        for rep in range(REPS):
+            folder = tmp_path / f"rep{rep}"
+            base = folder / "app"
+            base.mkdir(parents=True)
+            image = folder / "fixture.s19"
+            write_fixture_image(image)
+            seen.clear()
+            with pytest.raises(RuntimeError, match="probe after adopt"):
+>               _run(base, make(folder, image))
+
+../s19_i5c/tests/test_b101_designer_writes.py:970: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i5c/tests/test_b101_designer_writes.py:396: in _run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f90263ce350>
+
+    async def scenario(app, pilot, log):
+        seen["app"] = app
+        await _load_image_by_dialog(pilot, app, image)
+        await _load_document(pilot, app, log, folder, "d.changes.json", [AA_ENTRY])
+        assert await _apply(pilot, app, log, "Apply:") == "Apply: 1 applied, 0 skipped, 0 blocked"
+        await _fresh_designer_display(pilot, app, AFTER_AA)
+        await _entry_op(
+            pilot, app, log, "#patch_entry_edit_button", "0x8003", "BB", "Patch Editor: entry updated."
+        )
+        await _confirm_save_back(pilot, app, "fixture-raise.s19", by_keys=False)
+        for _ in range(200):
+            if app._exception is not None:
+                break
+            await asyncio.sleep(0.05)
+        seen["byte"] = app.current_file.mem_map[0x8003]
+>       assert app._exception is not None, "the save-back error was swallowed; the app runs on"
+E       AssertionError: the save-back error was swallowed; the app runs on
+E       assert None is not None
+E        +  where None = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})._exception
+
+../s19_i5c/tests/test_b101_designer_writes.py:958: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_9_save_back_raising_after_the_adopt_ends_the_app
+1 failed in 38.53s
+exit=1
+Files <HOME>/work/s19_i5c/s19_app/tui/app.py and s19_app/tui/app.py differ

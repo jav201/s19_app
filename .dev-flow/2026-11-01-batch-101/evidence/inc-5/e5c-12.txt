@@ -1,0 +1,37 @@
+== e5c-12 serial_timing lane of the touched test files, serial
+2026-11-06T11:24:32Z
+HEAD c2cba356
+index tree 6c846528aba230fac19db478b8d1de83ccf92909
+040000 tree 172ff6fc2f6d1c179d1e59f6742ab80a660744e4	docs
+040000 tree 397a3b2ff5296c6d4b8a933002cb8f6e51aece07	s19_app
+040000 tree 2dad0b4fa9f4adb4c0c09d26d2df648279a1ce42	tests
+s19_app.__file__ <HOME>/work/s19_i5c/s19_app/__init__.py
+python 3.11.18
+pytest tests/test_b101_designer_writes.py tests/test_b101_check_spec_keep.py tests/test_b101_symbol_reads.py -m serial_timing -p no:xdist -q -rA -p no:cacheprovider
+..                                                                       [100%]
+==================================== PASSES ====================================
+_ test_r_chg_sym_13_whole_document_edit_json_confirm_of_1000_entries_by_220040_tags _
+----------------------------- Captured stdout call -----------------------------
+MEASURED sample 1/5 whole-document confirm, 1000 entries x 220040 tags: without symbols 1.042 s, with symbols 1.267 s, resolution adds 0.226 s
+MEASURED sample 2/5 whole-document confirm, 1000 entries x 220040 tags: without symbols 0.936 s, with symbols 1.221 s, resolution adds 0.285 s
+MEASURED sample 3/5 whole-document confirm, 1000 entries x 220040 tags: without symbols 1.106 s, with symbols 1.086 s, resolution adds 0.000 s
+MEASURED sample 4/5 whole-document confirm, 1000 entries x 220040 tags: without symbols 1.094 s, with symbols 1.094 s, resolution adds 0.000 s
+MEASURED sample 5/5 whole-document confirm, 1000 entries x 220040 tags: without symbols 1.118 s, with symbols 1.237 s, resolution adds 0.119 s
+MEASURED resolution addition max 0.285 s over 5 samples
+============================= QC-TM timing margins =============================
+71.5%  0.285 s / 1.000 s  edit json confirm resolution 1000x220040  tests/test_b101_symbol_reads.py::test_r_chg_sym_13_whole_document_edit_json_confirm_of_1000_entries_by_220040_tags
+77.4%  0.226 s / 1.000 s  edit json confirm resolution 1000x220040  tests/test_b101_symbol_reads.py::test_r_chg_sym_13_whole_document_edit_json_confirm_of_1000_entries_by_220040_tags
+85.4%  0.146 s / 1.000 s  symbol read 1000x220040  tests/test_b101_symbol_reads.py::test_r_chg_sym_13_symbol_read_of_1000_entries_by_220040_tags_builds_the_index_once
+85.8%  0.142 s / 1.000 s  symbol read 1000x220040  tests/test_b101_symbol_reads.py::test_r_chg_sym_13_symbol_read_of_1000_entries_by_220040_tags_builds_the_index_once
+85.8%  0.142 s / 1.000 s  symbol read 1000x220040  tests/test_b101_symbol_reads.py::test_r_chg_sym_13_symbol_read_of_1000_entries_by_220040_tags_builds_the_index_once
+85.8%  0.142 s / 1.000 s  symbol read 1000x220040  tests/test_b101_symbol_reads.py::test_r_chg_sym_13_symbol_read_of_1000_entries_by_220040_tags_builds_the_index_once
+85.9%  0.141 s / 1.000 s  symbol read 1000x220040  tests/test_b101_symbol_reads.py::test_r_chg_sym_13_symbol_read_of_1000_entries_by_220040_tags_builds_the_index_once
+88.1%  0.119 s / 1.000 s  edit json confirm resolution 1000x220040  tests/test_b101_symbol_reads.py::test_r_chg_sym_13_whole_document_edit_json_confirm_of_1000_entries_by_220040_tags
+100.0%  0.000 s / 1.000 s  edit json confirm resolution 1000x220040  tests/test_b101_symbol_reads.py::test_r_chg_sym_13_whole_document_edit_json_confirm_of_1000_entries_by_220040_tags
+100.0%  0.000 s / 1.000 s  edit json confirm resolution 1000x220040  tests/test_b101_symbol_reads.py::test_r_chg_sym_13_whole_document_edit_json_confirm_of_1000_entries_by_220040_tags
+QC-TM: 10 bounds, 0 under 20 % margin
+=========================== short test summary info ============================
+PASSED tests/test_b101_symbol_reads.py::test_r_chg_sym_13_symbol_read_of_1000_entries_by_220040_tags_builds_the_index_once
+PASSED tests/test_b101_symbol_reads.py::test_r_chg_sym_13_whole_document_edit_json_confirm_of_1000_entries_by_220040_tags
+2 passed, 68 deselected in 18.38s
+exit=0
