@@ -1,7 +1,7 @@
 # PLAN — s19_app — batch 2026-11-05-batch-103 (editors + A2L)
 
-- **Status:** E0 draft, awaiting operator approval (gate G1).
-- **Branch:** `batch-103` from `main` `9f9f6af`, worktree `C:/Users/jjgh8/Github/s19_app-b103`.
+- **Status:** G1 approved 2026-11-05; amended 2026-11-06 (amendment A1 below). E1 running for Inc 1a, 1b, 2 and 4.
+- **Branch:** `batch-103`, rebased 2026-11-06 onto `main` `e07fb00` (batch-101 Incs 1–8, 11, 13–16 merged); first opened from `9f9f6af`. Worktree `C:/Users/jjgh8/Github/s19_app-b103`.
   - The draft's base was `f11b3f4`, the batch-102 merge.
   - `9f9f6af` is that base plus the batch-101 Inc 2 merge.
 - **Process:** `dev-flow-v3-beta` (E0–E5 per increment, batch end once).
@@ -51,7 +51,8 @@ All estimates are orchestrator guesses made before E1. The caps are about 80 req
 
 | Inc | Draft | Wave | Title | US | Scope | Source files (≤ 4) | Est. req / nodes | Depends / gate |
 |---|---|---|---|---|---|---|---|---|
-| 1 | 1 | W0 | Clipboard: instant paste, copy from every view | 01 | Read cascade without the Tk worker-thread penalty (C-D1). Tk write removed or moved to the main thread (C-D2). `powershell.exe` called by absolute path. Copy reaches the OS clipboard from the read-only Patch document, the hex view, the A2L summaries and the A2L tag table (new copy action). Copy→paste matrix as ATs. | `os_clipboard_input.py`, `capped_text_area.py`, `app.py`, `screens_directionb.py`; config: `.github/workflows/tui-ci.yml` (Windows job) | ~35 / ~14 | none |
+| 1a | 1 (part) | W0 | Clipboard core: instant paste | 01 | Read cascade without the Tk worker-thread penalty (C-D1). Tk write removed or moved to the main thread (C-D2). `powershell.exe` called by absolute path. Copy→paste matrix rows whose source and target are text fields (both field classes, both paste routes, every window with a text field once). | `os_clipboard_input.py`, `capped_text_area.py`; config: `.github/workflows/tui-ci.yml` (Windows job) | ~22 / ~8 | none |
+| 1b | 1 (part) | W0 | Clipboard: copy from every view | 01 | Copy reaches the OS clipboard from the read-only Patch document, the hex view, the A2L summaries and the A2L tag table (new copy action). The remaining copy→paste matrix rows (sources that are not text fields). | `app.py`, `screens_directionb.py` | ~15 / ~8 | E1 now; E2–E4 after batch-101 Inc 10a and Inc 12 merge (A1) |
 | 2 | 2 (part) | W0 | A2L definition model I: scalar kinds | 05 | Pure model. TAB_VERB/COMPU_VTAB enums, BIT_MASK, ASCII, FORMAT/PHYS_UNIT, EXTENDED_LIMITS. Decode and encode round trip. Synth gains enum and BIT_MASK (D6). | new `a2l_definition.py` | ~50 / ~16 | none (`a2l.py` frozen) |
 | 3 | 2 (part) | W0 | A2L definition model II: arrays and axes | 05 | VAL_BLK/MATRIX_DIM, axis conversion, STD/FIX/COM_AXIS with AXIS_PTS. Round trip. Synth gains COM_AXIS (D6). | `a2l_definition.py` | ~45 / ~14 | Inc 2 |
 | 4 | new (handoff 2026-11-05) | W0 | Label similarity matcher (pure) | 03 | Tokenise on `_`, camelCase and digit boundaries. Match a substring anywhere, a subsequence, or per-token Damerau-Levenshtein. One deterministic ranking. Tested on case08 names and real A2L name shapes. | new `label_match.py` | ~25 / ~8 | none |
@@ -61,7 +62,7 @@ All estimates are orchestrator guesses made before E1. The caps are about 80 req
 | 8 | 6 | W2 | Patch Editor: edit by definition (scalars, enums, bit masks, text) | 05 | pe_B staging sheet: change list, parameter list, horizontal detail. | `screens_directionb.py`, new editor widget module, `change_service.py`, `app.py` | ~50 / ~20 | G2 verdict; Inc 2, 6 |
 | 9 | 7 | W2 | Patch Editor: CURVE / MAP / VAL_BLK | 05 | pe_C bench views inside the pe_B sheet. | editor widget module, `screens_directionb.py` | ~45 / ~18 | Inc 3, 8 |
 
-Order: Inc 1, 2 and 4 run in parallel and share no source file. Inc 3 follows Inc 2, which owns the same file. W1 waits for batch-101. W2 waits for G2.
+Order: Inc 1a, 2 and 4 run in parallel and share no source file; Inc 1b's E1 runs with them (records only), its E2 waits (A1). Inc 3 follows Inc 2, which owns the same file. W1 waits for batch-101. W2 waits for G2.
 
 Differences from PLAN-DRAFT, with their reasons:
 - **File lists.** PLAN-DRAFT named an "A2L view module" for its Inc 1, 3 and 5, and `workspace.py` for its Inc 1. Both were wrong.
@@ -77,13 +78,31 @@ Differences from PLAN-DRAFT, with their reasons:
 
 | Id | Interface | Producer → consumers |
 |---|---|---|
-| I-1 | OS clipboard read/write and the copy action for non-input views | Inc 1 → Inc 7 (paste modal), Inc 8/9 (editors) |
+| I-1 | OS clipboard read/write (Inc 1a) and the copy action for non-input views (Inc 1b) | Inc 1a → Inc 1b, Inc 7 (paste modal), Inc 8/9 (editors) |
 | I-2 | Definition model: decode / encode / describe one A2L object | Inc 2/3 → Inc 6 (array length), Inc 8/9 |
 | I-3 | Matcher: `rank(query, names, limit)` → ordered matches, each with the rule that matched | Inc 4 → Inc 7 |
 | I-4 | A2L refresh contract (load generation reaches every A2L view) | Inc 5 → Inc 6, 7 |
 | I-5 | Label-list parser (batch-102 bulk parser in `a2l_parameter_picker.py`) | existing → Inc 6 (Patch bulk include), Inc 7 (modal) |
 
-## Parallel safety with batch-101 (checked 2026-11-05)
+## Amendment A1 (operator, 2026-11-06)
+
+Batch-101 runs until 2026-11-07. The operator approved working in parallel under four rules:
+1. `batch-103` is rebased onto the current `main` (`e07fb00`). Done 2026-11-06.
+2. Inc 2, 3 and 4 run the whole cycle now (new modules only). The D6 synth extension is additive: a new case or an opt-in option, and a test pins case 08's output hash so batch-101's fixtures do not move.
+3. Inc 1 is split. Inc 1a (clipboard core, no `app.py`) runs now. Inc 1b (copy from non-input views, `app.py` hex/A2L views and `screens_directionb.py`) writes its E1 now; its E2–E4 wait for batch-101 Inc 10a (hex view in `app.py`) and Inc 12 (`screens_directionb.py`) to merge, so the graph cites lines that no longer move.
+4. Nothing from batch-103 merges to `main` before the batch-101 v1.0.0 tag.
+
+Batch-101 work still open on 2026-11-06 (other session; branches not touched here):
+
+| b101 | Source files |
+|---|---|
+| Inc 9 (E5) | `app.py`, `flow_screens.py`, `flow_execution_service.py`, `flow_persistence_service.py` |
+| Inc 10a / 10b | `app.py` (hex view), `segment_split_view.py`, `hexview.py` |
+| Inc 12 / 12b | `screens.py`, `app.py`, `screens_directionb.py` (`CheckEditorPanel`), `flow_screens.py` |
+
+None changes `os_clipboard_input.py`, `capped_text_area.py`, `tui-ci.yml` or `tools/synth/make_release_case.py` (Inc 10 and 12 read case 08 as a fixture).
+
+## Parallel safety with batch-101 (checked 2026-11-05; superseded by A1)
 
 Batch-101 branches in flight, owned by another session and not touched here:
 - `b101-inc3`: `app.py` (−2 lines near :14937 and :15060) and `project_gather_service.py`.
@@ -98,7 +117,8 @@ Overlap with batch-101 that must not be fixed twice:
 
 ## Test platform (operator rule, 2026-11-05)
 
-- All test runs and probes run on the CachyOS host (`ssh javierg@…`, env `s19ci`). Nothing runs on the main PC.
+- All test runs and probes run on the CachyOS host `cachyos-rtx` (`ssh javiergr@192.168.1.67`, env `s19ci` at `~/miniconda3/envs/s19ci`, clone `~/work/s19_app`; login shell fish, wrap in `bash -lc`). Nothing runs on the main PC except the G1 exception (real Windows Terminal captures, isolated `LOCALAPPDATA`, no clipboard, every window closed).
+- **Test scope (operator, 2026-11-06):** between increments, run only the tests of what the increment modified or added (new and changed requirements, tests the increment changed, the law guards). The full suite runs once, at the batch end, after every increment is implemented.
 - Clipboard tests run under a private Xvfb display: real X clipboard, isolated by construction.
 - The Win32/PowerShell clipboard layer runs only in the new `windows-latest` CI job.
   - **Open risk:** whether the hosted runner exposes a usable clipboard. Its first run checks this.
@@ -114,7 +134,7 @@ Overlap with batch-101 that must not be fixed twice:
 | Stage | Model |
 |---|---|
 | E0–E3, integration, E5 reviews and rulings | Opus (orchestrator, main session) |
-| E4 implementation | DeepSeek v4 Pro via `opencode run`, isolated worktree, launched by the operator from the W0 handoffs |
+| E4 implementation, record-correction passes | DeepSeek v4 Pro, isolated worktree, launched by the orchestrator from the per-increment handoff files (operator, 2026-11-06: no DeepSeek limit). The handoff files stay self-contained so the operator can re-run one. |
 | E4 tests | Sonnet tester(s), launched by the orchestrator, one per file group plus one for cross-group ATs |
 | Mechanical (mutant runs, captures, records) | Sonnet |
 
