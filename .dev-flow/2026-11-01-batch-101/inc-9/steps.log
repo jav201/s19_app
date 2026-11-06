@@ -6,3 +6,5 @@ E2 trace_check (E1/E2 records): 3 US, 11 active requirements (0 withdrawn), 12 g
 E1 rulings 2026-11-06T13:23Z orchestrator D-1 (C), D-2 (no), D-6 (yes)
 E3 correction 2026-11-06T13:55Z model=opus rulings=E3-rulings.md applied (E3A-01..10, S-1..S-6) rows=12 active (10 new, 2 changed) + 1 withdrawn (R-FB-RUN.8) TCs=31 (28 + 3 AT; 2 withdrawn kept by id) slice=4 source files (+1 private helper _create_new_json; flow_screens.py docstring only) graph nodes=18 (6 changed, 1 new, 11 context) edges=20; trace_check: 3 US, 12 active (1 withdrawn), 13 gaps = 12 TEST (E4) + 1 EVID (E5); CASE 0, SLICE 0, US 0
 E3 round2 2026-11-06T14:02Z security=opus PWN, architect=opus PWN; E3 closed; E4 waits for Inc 6 merge
+E4 start 2026-11-06T19:04Z implementers model=deepseek-v4-pro (G1 services; G2 app+flow_screens+2 docs) testers=sonnet x2 (G-T1 flow_saves; G-T2 flow_names_ui); branch merged with main b9e42de
+E4 implementers end 2026-11-06T19:11Z model=deepseek-v4-pro (G1, G2: exit 0, 0 deviations, py_compile OK); tester G-T1 model=sonnet 24 nodes, RED on base 20 failed / 4 passed; ruling E4-R1 (I-7 (d) re-resolved the home: fixed in the slice, orchestrator)

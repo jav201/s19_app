@@ -2150,6 +2150,15 @@ _FINAL_NAME_ALLOWLIST = {
     "s19_app/tui/services/manifest_writer.py": frozenset(
         {"write_project_manifest"}
     ),
+    # batch-101 Inc 9 (R-FLOW-FILE.14, R-FLOW-SET.8): the flow / chain-set
+    # saves moved off write_text onto _create_new_json — the one helper that
+    # claims a NEW name with O_CREAT|O_EXCL (never an overwrite), writes no
+    # byte before the post-claim check (regular file, no reparse point, the
+    # same file as the open descriptor, real path inside the approved home),
+    # and unlinks only its own same-stat claim on a failure path.
+    "s19_app/tui/services/flow_persistence_service.py": frozenset(
+        {"_create_new_json"}
+    ),
     "s19_app/tui/services/flow_execution_service.py": frozenset(
         {"write_chain_set_report"}
     ),
@@ -2186,9 +2195,6 @@ _FINAL_NAME_ALLOWLIST = {
 #: HLR-155). Recorded here as pinned exceptions and in the increment packet's
 #: backlog — conversion candidates, NOT fixed in this round.
 _FINAL_NAME_DECLARED_EXCEPTIONS = {
-    "s19_app/tui/services/flow_persistence_service.py": frozenset(
-        {"save_flow_json", "save_chain_set"}
-    ),
     # Review round 2: the CRC designer's same-name template save overwrites
     # in place in the project templates/ folder, which the gather also writes
     # into -- a real violator of the immutability invariant, declared here and

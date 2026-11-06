@@ -40,9 +40,11 @@ Finding taxonomy (OQ-1, §6.2 — mixed and honest):
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass, field
+import os
+import stat
+from dataclasses import dataclass, field, replace
 from pathlib import Path, PurePosixPath, PureWindowsPath
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
 from ...validation.model import ValidationIssue, ValidationSeverity
 from .flow_model import (
@@ -83,7 +85,13 @@ from .variant_execution_service import (
     MANIFEST_PATH_ESCAPE,
     _resolve_manifest_entry,
 )
-from ..workspace import copy_into_workarea, sanitize_project_name
+from ..workspace import (
+    WorkareaContainmentError,
+    _guarded_destination,
+    _is_reparse_point,
+    copy_into_workarea,
+    sanitize_project_name,
+)
 
 #: The one supported envelope version (``Flow.schema_version`` defaults to 1).
 FLOW_SCHEMA_VERSION = 1
@@ -973,7 +981,175 @@ def load_flow_json(
     return dict_to_flow(payload, project_dir)
 
 
-def save_flow_json(flow: Flow, raw_name: str, project_dir: Path) -> Optional[Path]:
+def _create_new_json(
+    home: Path,
+    resolved_home: Path,
+    clean: str,
+    render: Callable[[str], str],
+) -> Path:
+    """Claim the first free ``<clean>.json`` name and write ``render(stem)``.
+
+    The house free-name claim of ``place_into_workarea`` (``workspace.py``,
+    house finding S-F1) in the form of E3 ruling S-1, shared by
+    :func:`save_flow_json` and :func:`save_chain_set`. Every step runs on the
+    name alone, so a link in the home named like the candidate is a taken
+    name, never written through.
+
+    Summary:
+        For each candidate ``<clean>.json``, ``<clean>_2.json``, …: a name is
+        taken when ANY entry of that name exists — a file, a folder or a link,
+        a dangling link included (``os.path.lexists``; ``exists()`` follows a
+        link and would miss a dangling one). The payload is rendered BEFORE
+        the claim, so a serialiser raise leaves no file (E3 S-3). The free
+        name is claimed with an exclusive create, then — before any byte is
+        written — re-verified to be the regular file this call created and to
+        resolve inside the home the guard approved; otherwise the claim is
+        removed (only when it is ours), nothing is written and
+        ``WorkareaContainmentError`` is raised. On Windows the exclusive
+        create follows a dangling link (house finding S-F1), so only the
+        check after the claim keeps the content out of a link put in after
+        the name check.
+
+    Args:
+        home (Path): The UNRESOLVED home directory (``flows/`` or
+            ``flowsets/``) the file lands in.
+        resolved_home (Path): The resolved home ``_guarded_destination``
+            returned — the containment base the claim's real path is checked
+            against.
+        clean (str): The sanitised stem (never ``None``).
+        render (Callable[[str], str]): ``stem → JSON text``; the payload is
+            built from the candidate's own stem, so the file's ``name`` is
+            its file stem (cut to the format cap by the caller).
+
+    Returns:
+        Path: The plain file the claim created and filled.
+
+    Raises:
+        WorkareaContainmentError: When the claimed name cannot be verified
+            after the claim (not a regular file, a link, not the same file
+            as the open descriptor, or its real path outside the approved
+            home), or when its ``lstat`` fails — nothing is written.
+
+    Data Flow:
+        - candidate loop → ``lexists`` (name check) → ``render(stem)``
+          (payload before the claim) → ``os.open(O_CREAT|O_EXCL|O_WRONLY|
+          O_BINARY)`` (claim) → ``lstat`` / reparse / ``samestat`` /
+          real parent == ``resolved_home`` (check after the claim; the
+          approved home is never resolved again, so a home swapped for a
+          link after the guard cannot pass) →
+          ``os.fdopen`` (write) → return the candidate.
+        - On a check failure or a write failure the claim this call made is
+          removed (best-effort) and nothing but an empty file in a lost race
+          can ever sit at a link's target (BL-I9-4).
+
+    Dependencies:
+        Uses:
+            - os.open / os.lstat / os.fstat / os.fdopen / os.unlink
+            - os.path.lexists / os.path.samestat / os.path.realpath
+            - stat.S_ISREG
+            - _is_reparse_point (workspace.py)
+        Used by:
+            - save_flow_json / save_chain_set
+    """
+    counter = 2
+    candidate = home / f"{clean}.json"
+    while True:
+        # (a) The name is taken when ANY entry of that name exists — a file,
+        # a folder or a link, also a link whose target is missing.
+        if os.path.lexists(candidate):
+            candidate = home / f"{clean}_{counter}.json"
+            counter += 1
+            continue
+
+        # (b) Build the payload before the claim, so a serialiser raise
+        # leaves no file under the name (E3 S-3).
+        text = render(candidate.stem)
+
+        # (c) Claim the free name with an exclusive create (O_BINARY where
+        # the platform has it — the fd is written through, and the text
+        # wrapper alone must own the newline handling).
+        try:
+            fd = os.open(
+                candidate,
+                os.O_CREAT | os.O_EXCL | os.O_WRONLY | getattr(os, "O_BINARY", 0),
+            )
+        except FileExistsError:
+            # Lost the lexists-vs-open race: the name is taken after all.
+            candidate = home / f"{clean}_{counter}.json"
+            counter += 1
+            continue
+        except OSError:
+            # House F1: a directory that wins the race raises PermissionError
+            # on Windows; if the name now exists it is simply taken.
+            if os.path.lexists(candidate):
+                candidate = home / f"{clean}_{counter}.json"
+                counter += 1
+                continue
+            raise
+
+        # (d) The post-claim check (E3 S-1): before any byte is written, the
+        # new entry must be the regular file this call created — not a link
+        # or special file swapped in after the name check — and its real
+        # path must lie inside the home the guard approved.
+        try:
+            st = os.lstat(candidate)
+        except OSError as exc:
+            # R2-2: an lstat failure inside the check counts as a failed
+            # check — close the descriptor, remove the claim (best-effort)
+            # and refuse, nothing written.
+            os.close(fd)
+            try:
+                os.unlink(candidate)
+            except OSError:
+                pass
+            raise WorkareaContainmentError(
+                f"Not saved: {candidate.name} in {home} could not be "
+                f"verified after the claim: {exc}. Nothing written."
+            ) from exc
+        owned = stat.S_ISREG(st.st_mode) and os.path.samestat(os.fstat(fd), st)
+        if not (
+            owned
+            and not _is_reparse_point(candidate)
+            and Path(os.path.realpath(candidate)).parent == resolved_home
+        ):
+            os.close(fd)
+            if owned:
+                # Remove only the regular file this call created — a link or
+                # special file swapped in is left as it is (it is not ours).
+                try:
+                    os.unlink(candidate)
+                except OSError:
+                    pass
+            raise WorkareaContainmentError(
+                f"Not saved: {candidate.name} in {home} was replaced by a "
+                "link or special file between the claim and the write, or "
+                "resolves outside the approved home. Nothing written."
+            )
+
+        # (e) Write through the claim's descriptor. The ``with`` block owns
+        # the close (a flush error surfaces here); a write failure removes
+        # the file this call claimed (ours by (d)) and re-raises, never
+        # leaving a cut-off file under the claimed name (E3 S-3).
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as handle:
+                handle.write(text)
+        except OSError:
+            try:
+                os.unlink(candidate)
+            except OSError:
+                pass
+            raise
+
+        return candidate
+
+
+def save_flow_json(
+    flow: Flow,
+    raw_name: str,
+    project_dir: Path,
+    *,
+    workarea_root: Optional[Path] = None,
+) -> Optional[Path]:
     """Serialize ``flow`` and write it to ``flows/<sanitized>.json`` (LLR-001.2).
 
     Summary:
@@ -981,22 +1157,38 @@ def save_flow_json(flow: Flow, raw_name: str, project_dir: Path) -> Optional[Pat
         the project-save path uses (write-side containment — the sanitiser, not
         the embedded display name, is the identity). When the raw name sanitises
         to ``None`` (empty / punctuation-only) NOTHING is written and ``None`` is
-        returned. Otherwise the ``flows/`` subdirectory is created and the
-        schema-v1 envelope is written pretty-printed UTF-8.
+        returned. The ``flows/`` home is guarded through
+        ``_guarded_destination`` BEFORE the folder is created — a refusal
+        raises ``WorkareaContainmentError`` and nothing is created (D-10). The
+        file's ``name`` is the file stem cut to ``FLOW_MAX_NAME_LEN``, and the
+        name is claimed and filled by :func:`_create_new_json` (a name taken
+        by any entry dedup-suffixes ``_<N>``; a link named like the candidate
+        is never written through).
 
     Args:
         flow (Flow): The in-memory flow to persist (trusted-side).
         raw_name (str): The operator-typed flow name (untrusted text → sanitised
             to a filesystem-safe stem).
         project_dir (Path): The active ``.s19tool/workarea/<project>/`` directory.
+        workarea_root (Optional[Path]): The explicit work-area root the app
+            passes when it knows THIS app's work area; ``None`` derives the
+            root from the destination's own textual path.
 
     Returns:
         Optional[Path]: The absolute path written (``flows/<clean>.json``), or
         ``None`` when ``raw_name`` sanitises to ``None`` (no file created).
 
+    Raises:
+        WorkareaContainmentError: When the ``flows/`` home passes through a
+            link or resolves outside the work area, or when the claimed name
+            fails the post-claim check — nothing is written.
+
     Data Flow:
         - ``raw_name`` → ``sanitize_project_name`` → ``clean`` (or ``None`` stop).
-        - ``flow`` → :func:`flow_to_dict` → ``json.dumps(..., indent=2)`` → file.
+        - ``flows_dir`` → ``_guarded_destination`` → ``(resolved_home, _)``.
+        - ``flow`` → :func:`_create_new_json` → ``flow_to_dict(replace(flow,
+          name=stem[:FLOW_MAX_NAME_LEN]))`` → ``json.dumps(..., indent=2)``
+          → the claimed file.
         - The write-side inverse of :func:`load_flow_json`; a saved file round-trips.
 
         batch-94 Inc-002 (LLR-015.1): a name collision dedup-suffixes
@@ -1007,7 +1199,8 @@ def save_flow_json(flow: Flow, raw_name: str, project_dir: Path) -> Optional[Pat
     Dependencies:
         Uses:
             - sanitize_project_name (write-side containment, workspace.py)
-            - flow_to_dict / json
+            - _guarded_destination / _create_new_json
+            - flow_to_dict / json / dataclasses.replace
         Used by:
             - the app Save handler (later increment)
 
@@ -1020,17 +1213,16 @@ def save_flow_json(flow: Flow, raw_name: str, project_dir: Path) -> Optional[Pat
     if clean is None:
         return None
     flows_dir = project_dir / FLOWS_SUBDIR
+    resolved_home, _ = _guarded_destination(flows_dir, workarea_root)
     flows_dir.mkdir(parents=True, exist_ok=True)
-    target = flows_dir / f"{clean}.json"
-    if target.exists():
-        # Collision dedup-suffix (LLR-015.1) — a second same-name save must
-        # never overwrite the first template.
-        counter = 2
-        while (flows_dir / f"{clean}_{counter}.json").exists():
-            counter += 1
-        target = flows_dir / f"{clean}_{counter}.json"
-    target.write_text(json.dumps(flow_to_dict(flow), indent=2), encoding="utf-8")
-    return target
+
+    def render(stem: str) -> str:
+        return json.dumps(
+            flow_to_dict(replace(flow, name=stem[:FLOW_MAX_NAME_LEN])),
+            indent=2,
+        )
+
+    return _create_new_json(flows_dir, resolved_home, clean, render)
 
 
 def list_saved_flows(project_dir: Path) -> List[str]:
@@ -1471,6 +1663,8 @@ def save_chain_set(
     chain_set: ChainSet,
     raw_name: str,
     project_dir: Path,
+    *,
+    workarea_root: Optional[Path] = None,
 ) -> Optional[Path]:
     """Serialize the set and write it to ``flowsets/<sanitized>.json`` (LLR-021.1).
 
@@ -1479,16 +1673,30 @@ def save_chain_set(
         is the containment authority; an empty set (or a name that sanitises
         to ``None``) writes NOTHING and returns ``None`` — LLR-021.1's empty
         arm, ``0 empty sets written as non-empty``; a name collision
-        dedup-suffixes (``_<N>``) instead of clobbering.
+        dedup-suffixes (``_<N>``) instead of clobbering. The ``flowsets/``
+        home is guarded through ``_guarded_destination`` BEFORE the folder is
+        created — a refusal raises ``WorkareaContainmentError`` and nothing
+        is created (D-10). The file's ``name`` is the file stem cut to
+        ``CHAIN_SET_MAX_NAME_LEN`` (E3A-04), and the name is claimed and
+        filled by :func:`_create_new_json` (a link named like the candidate
+        is never written through).
 
     Args:
         chain_set (ChainSet): The in-memory set to persist (trusted-side).
         raw_name (str): The operator-typed set name (untrusted text).
         project_dir (Path): The active ``.s19tool/workarea/<project>/`` dir.
+        workarea_root (Optional[Path]): The explicit work-area root the app
+            passes when it knows THIS app's work area; ``None`` derives the
+            root from the destination's own textual path.
 
     Returns:
         Optional[Path]: The absolute path written (``flowsets/<clean>.json``),
         or ``None`` when nothing was written (empty set / un-sanitisable name).
+
+    Raises:
+        WorkareaContainmentError: When the ``flowsets/`` home passes through
+            a link or resolves outside the work area, or when the claimed
+            name fails the post-claim check — nothing is written.
     """
     if not chain_set.chains:
         return None
@@ -1496,17 +1704,18 @@ def save_chain_set(
     if clean is None:
         return None
     flowsets_dir = project_dir / FLOWSETS_SUBDIR
+    resolved_home, _ = _guarded_destination(flowsets_dir, workarea_root)
     flowsets_dir.mkdir(parents=True, exist_ok=True)
-    target = flowsets_dir / f"{clean}.json"
-    if target.exists():
-        counter = 2
-        while (flowsets_dir / f"{clean}_{counter}.json").exists():
-            counter += 1
-        target = flowsets_dir / f"{clean}_{counter}.json"
-    target.write_text(
-        json.dumps(chain_set_to_dict(chain_set), indent=2), encoding="utf-8"
-    )
-    return target
+
+    def render(stem: str) -> str:
+        return json.dumps(
+            chain_set_to_dict(
+                replace(chain_set, name=stem[:CHAIN_SET_MAX_NAME_LEN])
+            ),
+            indent=2,
+        )
+
+    return _create_new_json(flowsets_dir, resolved_home, clean, render)
 
 
 def load_chain_set(

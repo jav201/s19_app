@@ -3,11 +3,12 @@ Inc-003 fx_a).
 
 This module is the R8 home of the flow family: the reworked fb_a
 :class:`FlowBuilderPanel` (Inc-002) and the fx_a
-:class:`FlowExecutionPanel` (Inc-003 — US-007, HLR-017…021). Pure view layer —
-the panels and their ``ActionRequested``-kin message types; flow execution
-SEMANTICS stays in ``services/flow_*`` (messages out, services never called
-directly; the one declared data edge ``flow_screens → services/flow_model``
-is read-only constants/dataclasses per ``docs/architecture.md`` §10).
+:class:`FlowExecutionPanel` (Inc-003 — US-007, HLR-017…021). Presentational —
+the panels post messages and never call the executor
+(``services/flow_execution_service``); the module reads
+``services/flow_model`` (the block and flow data types and constants) and
+``services/flow_persistence_service`` (the wire serializer and the loader, for
+copy and paste, and the unsafe-ref finding code).
 
 fb_a doctrine (the ratified spike graduation call, ``flow_bench.NOTES.md`` —
 "connectivity is the builder's job"): a block palette rail, a framed canvas
@@ -29,8 +30,10 @@ posts the lane payloads to the app, the app runs the service's chain-set
 runner and hands the record back for painting; Save Set / Load Set post the
 same way. Every file-derived string renders through ``safe_text`` (C-17).
 
-No engine code is imported beyond the read-only flow-model data types; every
-file-derived string renders through ``safe_text`` (C-17).
+The two service edges above are the measured ones — the module reads the
+read-only flow-model data types and the persistence serializer/loader, and
+calls no other service; no ``docs/architecture.md`` section is cited for an
+import rule.
 
 batch-96 B1/B2 additions: the FUNNEL table editor (a flow-level name→value
 declaration, batch-96 B1) and block COPY/PASTE (batch-96 B2) reuse the real

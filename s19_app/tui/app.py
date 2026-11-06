@@ -4013,7 +4013,16 @@ class S19TuiApp(App):
         def _do_save(raw_name: Optional[str]) -> None:
             if raw_name is None:
                 return
-            saved = save_flow_json(event.flow, raw_name, project_dir)
+            try:
+                saved = save_flow_json(
+                    event.flow, raw_name, project_dir, workarea_root=self.workarea
+                )
+            except WorkareaContainmentError:
+                self.set_status(
+                    "Flow not saved - the project's flows folder is a link or is "
+                    "outside the work area."
+                )
+                return
             if saved is None:
                 self.set_status("Flow name is empty after sanitising - not saved.")
                 return
@@ -4457,7 +4466,11 @@ class S19TuiApp(App):
             event (FlowExecutionPanel.ExternalStepConfirmed): Carries the
                 lane index and the external-step block index.
         """
-        from .services.flow_execution_service import ChainSpec, run_chain_set
+        from .services.flow_execution_service import (
+            CHAIN_RUN_CONFIRM_RERUN,
+            ChainSpec,
+            run_chain_set,
+        )
         from .services.flow_model import (
             ExternalStepBlock,
             ExternalStepConfirmation,
@@ -4515,7 +4528,7 @@ class S19TuiApp(App):
             record = run_chain_set(
                 chains,
                 ctx,
-                mode="sequential",
+                mode=CHAIN_RUN_CONFIRM_RERUN,
                 set_name=str(self.query_one("#fx_set_name", Input).value),
             )
         except Exception as exc:  # noqa: BLE001 - every raise becomes one line
@@ -4563,7 +4576,16 @@ class S19TuiApp(App):
                 for lane in event.lanes
             ),
         )
-        saved = save_chain_set(chain_set, event.raw_name, project_dir)
+        try:
+            saved = save_chain_set(
+                chain_set, event.raw_name, project_dir, workarea_root=self.workarea
+            )
+        except WorkareaContainmentError:
+            self.set_status(
+                "Chain set not saved - the project's flowsets folder is a link or is "
+                "outside the work area."
+            )
+            return
         if saved is None:
             self.set_status(
                 "Chain set not saved - the set is empty or the name sanitised away."
