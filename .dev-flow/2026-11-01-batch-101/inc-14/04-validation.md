@@ -67,3 +67,7 @@ The 2 EVID gaps are the mutant transcripts (`.dev-flow/2026-11-01-batch-101/evid
 ## Addendum (orchestrator, 2026-11-06)
 
 The operator asked to enable GitHub private vulnerability reporting; it was enabled with `gh api -X PUT` and now reads `{"enabled":true}` (`evidence/inc-14/gh-pvr-2.txt`). E5-1 is closed, R-DOC-SECURITY.1/2 is verified, and the hold-out no longer applies: SECURITY.md, its three tests and README row 468 merge with Inc 14.
+
+## Addendum 2 (orchestrator, 2026-11-06)
+
+The merge verification on LAN host 2 (main + Inc 11 + Inc 14) found the law guard `tests/test_address_census.py::test_at_b83_08_tree_holds_no_assembled_selectors` RED: `tests/test_b101_help_legend_docs.py:1153/1160` passed a subscript (`rows[2]`) to `pilot.click`/`pilot.double_click`, a form the census refuses. Fix: the target is bound to a name first (`target_row = rows[2]`), no assertion changed; `tests/test_address_census.py` + the Inc 14 test file: 92 passed. Cause: the Inc 14 runs did not include the address-census law guard (it is not named in the repo's law-guard list the briefs cited) — recorded for the batch-end battery.

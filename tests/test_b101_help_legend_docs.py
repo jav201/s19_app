@@ -1150,14 +1150,15 @@ def test_r_tui_062_10_1_2_named_actions_are_the_handled_ones(tmp_path: Path) -> 
                 widget, _ = app.get_widget_at(int(cx), int(cy))
                 if isinstance(widget, RegionRow) and widget.region_start == rows[2].region_start:
                     break
-            await pilot.click(rows[2])
+            target_row = rows[2]
+            await pilot.click(target_row)
             await _pause(pilot)
             out["click_chains"] = list(chains)
             out["click_detail"] = f"0x{rows[2].region_start:08X}" in detail()
             out["click_navs"] = list(navs)
             # a double click opens the Workspace at the region start
             chains.clear()
-            await pilot.double_click(rows[2])
+            await pilot.double_click(target_row)
             await _pause(pilot)
             out["double_navs"] = list(navs)
             out["double_start"] = rows[2].region_start
