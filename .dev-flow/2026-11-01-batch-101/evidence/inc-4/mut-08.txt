@@ -1,0 +1,243 @@
+--- sha256 before (M-8) ---
+f111f33cefa43f7d361944c0a38667f8dcb07c1c089b6af16dc1667ec884b50a  s19_app/tui/changes/io.py
+60b4d129746a0ba7251a0d40805d550285ca8d93edafb00f53fc8da67216c19e  s19_app/tui/services/change_service.py
+1335a5ee3b7d4e400fa6fe8a29d2d7993279ffb2a3044d07fa7ba60cd3f14aef  s19_app/tui/services/variant_execution_service.py
+3d256f64d99814b70dd94297c7961a6a220edfdcd0426a6dd58f57eacc603eb9  s19_app/tui/app.py
+applied M-8 -> s19_app/tui/services/variant_execution_service.py
+s19_app.__file__ = <HOME>/work/s19_m4/s19_app/__init__.py
+=== pytest (M-8) flags=[-n 2] nodes=[tests/test_b101_symbol_reads.py::test_r_chg_sym_11_variant_run_declares_the_project_a2l_file tests/test_b101_symbol_reads.py::test_r_chg_sym_11_execute_scope_applies_symbol_entries_by_keys tests/test_b101_symbol_reads.py::test_r_chg_sym_11_report_run_declares_the_project_a2l_file] ===
+bringing up nodes...
+bringing up nodes...
+
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+_________ test_r_chg_sym_11_variant_run_declares_the_project_a2l_file __________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m4/popen-gw0/test_r_chg_sym_11_variant_run_0')
+case08 = PosixPath('/tmp/pytest-s19m4/popen-gw0/b101_case080')
+
+    def test_r_chg_sym_11_variant_run_declares_the_project_a2l_file(
+        tmp_path: Path, case08: Path
+    ) -> None:
+        """Case R-CHG-SYM.11/1: three Execute-scope-all runs of a project holding
+        ``firmware.s19`` and ``firmware.a2l``, the manifest batch naming one
+        case-08 document per run. Run 1 (``demo_patch``): 0 unresolved findings,
+        no entry blocked, the two symbol entries applied. Run 2 (``demo_check``):
+        3 passed. Run 3 (``demo_check_fails``): 3 failed. No run is blocked
+        ``doc-fault``.
+    
+        One project per run, so that a patched file saved by run 1 is not a second
+        variant of a later run. Negative control: the variant run passing no A2L
+        blocks every entry of run 1 and blocks runs 2 and 3 ``doc-fault`` (the
+        base) -> RED."""
+        _dir, results = run_variants(tmp_path / "r1", "p1", case08, PATCH, with_a2l=True)
+        assert [r.status for r in results] == ["ok"], [r.status for r in results]
+        summary = results[0].change_summaries[0]
+>       assert [i.code for i in summary.issues if i.code == UNRESOLVED] == [], summary.issues
+E       AssertionError: [ValidationIssue(code='CHG-SYMBOL-UNRESOLVED', severity=<ValidationSeverity.ERROR: 'error'>, message="entry 2: the sym...ry was skipped", artifact='changes', symbol=None, address=8411968, line_number=None, related_artifacts=[], details={})]
+E       assert ['CHG-SYMBOL-...L-UNRESOLVED'] == []
+E         
+E         Left contains 2 more items, first extra item: 'CHG-SYMBOL-UNRESOLVED'
+E         Use -v to get more diff
+
+tests/test_b101_symbol_reads.py:768: AssertionError
+_ test_r_chg_sym_11_execute_scope_applies_symbol_entries_by_keys[session-a2l-loaded] _
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m4/popen-gw0/test_r_chg_sym_11_execute_scop0')
+case08 = PosixPath('/tmp/pytest-s19m4/popen-gw0/b101_case080')
+arm = 'session-a2l-loaded'
+
+    @pytest.mark.parametrize("arm", ["session-a2l-loaded", "session-a2l-unloaded"])
+    def test_r_chg_sym_11_execute_scope_applies_symbol_entries_by_keys(
+        tmp_path: Path, case08: Path, arm: str
+    ) -> None:
+        """Case R-CHG-SYM.11/2 (black-box; arm b is the S4-2 control): the project
+        is opened through the Load dialog and Execute scope ``all`` is run from its
+        control; the run ends ``Execute: scope 'all' finished - 1 variant(s), 0
+        error(s)`` and the project folder holds ``firmware-patched.s19`` whose
+        bytes at both symbol addresses are the document's bytes. Arm b: the
+        session A2L is unloaded after the project opens and before Execute scope;
+        the run still applies (the project's A2L file is used, not the session's).
+    
+        Negative control: the variant run passing no A2L writes no patched file
+        (the base) -> RED; a run fed the session A2L instead of the project's file
+        fails arm b."""
+    
+        async def scenario(app, pilot, log):
+            folder = await open_project(pilot, app, case08, with_a2l=True)
+            assert app.current_a2l_data is not None
+            if arm == "session-a2l-unloaded":
+                await unload_a2l(pilot, app)
+            await show_screen(pilot, app, "6", "#patch_execute_run_button")
+            lines = await execute_scope_all(app, pilot, log)
+            return folder, lines
+    
+        folder, lines = run(tmp_path, scenario)
+        assert "Execute: scope 'all' finished - 1 variant(s), 0 error(s)" in lines, lines
+>       assert_patched_symbols(folder, case08)
+
+tests/test_b101_symbol_reads.py:875: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+folder = PosixPath('/tmp/pytest-s19m4/popen-gw0/test_r_chg_sym_11_execute_scop0/app/.s19tool/workarea/P')
+case = PosixPath('/tmp/pytest-s19m4/popen-gw0/b101_case080')
+
+    def assert_patched_symbols(folder: Path, case: Path) -> None:
+        """The patched variant file exists and holds the symbol entries' bytes."""
+        patched = folder / "firmware-patched.s19"
+>       assert patched.is_file(), sorted(p.name for p in folder.iterdir())
+E       AssertionError: ['demo_patch.changes.json', 'firmware.a2l', 'firmware.s19', 'project.json']
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/tmp/pytest-s19m4/popen-gw0/test_r_chg_sym_11_execute_scop0/app/.s19tool/workarea/P/firmware-patched.s19').is_file
+
+tests/test_b101_symbol_reads.py:838: AssertionError
+_ test_r_chg_sym_11_execute_scope_applies_symbol_entries_by_keys[session-a2l-unloaded] _
+[gw1] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m4/popen-gw1/test_r_chg_sym_11_execute_scop0')
+case08 = PosixPath('/tmp/pytest-s19m4/popen-gw1/b101_case080')
+arm = 'session-a2l-unloaded'
+
+    @pytest.mark.parametrize("arm", ["session-a2l-loaded", "session-a2l-unloaded"])
+    def test_r_chg_sym_11_execute_scope_applies_symbol_entries_by_keys(
+        tmp_path: Path, case08: Path, arm: str
+    ) -> None:
+        """Case R-CHG-SYM.11/2 (black-box; arm b is the S4-2 control): the project
+        is opened through the Load dialog and Execute scope ``all`` is run from its
+        control; the run ends ``Execute: scope 'all' finished - 1 variant(s), 0
+        error(s)`` and the project folder holds ``firmware-patched.s19`` whose
+        bytes at both symbol addresses are the document's bytes. Arm b: the
+        session A2L is unloaded after the project opens and before Execute scope;
+        the run still applies (the project's A2L file is used, not the session's).
+    
+        Negative control: the variant run passing no A2L writes no patched file
+        (the base) -> RED; a run fed the session A2L instead of the project's file
+        fails arm b."""
+    
+        async def scenario(app, pilot, log):
+            folder = await open_project(pilot, app, case08, with_a2l=True)
+            assert app.current_a2l_data is not None
+            if arm == "session-a2l-unloaded":
+                await unload_a2l(pilot, app)
+            await show_screen(pilot, app, "6", "#patch_execute_run_button")
+            lines = await execute_scope_all(app, pilot, log)
+            return folder, lines
+    
+        folder, lines = run(tmp_path, scenario)
+        assert "Execute: scope 'all' finished - 1 variant(s), 0 error(s)" in lines, lines
+>       assert_patched_symbols(folder, case08)
+
+tests/test_b101_symbol_reads.py:875: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+folder = PosixPath('/tmp/pytest-s19m4/popen-gw1/test_r_chg_sym_11_execute_scop0/app/.s19tool/workarea/P')
+case = PosixPath('/tmp/pytest-s19m4/popen-gw1/b101_case080')
+
+    def assert_patched_symbols(folder: Path, case: Path) -> None:
+        """The patched variant file exists and holds the symbol entries' bytes."""
+        patched = folder / "firmware-patched.s19"
+>       assert patched.is_file(), sorted(p.name for p in folder.iterdir())
+E       AssertionError: ['demo_patch.changes.json', 'firmware.a2l', 'firmware.s19', 'project.json']
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/tmp/pytest-s19m4/popen-gw1/test_r_chg_sym_11_execute_scop0/app/.s19tool/workarea/P/firmware-patched.s19').is_file
+
+tests/test_b101_symbol_reads.py:838: AssertionError
+__________ test_r_chg_sym_11_report_run_declares_the_project_a2l_file __________
+[gw1] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m4/popen-gw1/test_r_chg_sym_11_report_run_d0')
+case08 = PosixPath('/tmp/pytest-s19m4/popen-gw1/b101_case080')
+
+    def test_r_chg_sym_11_report_run_declares_the_project_a2l_file(
+        tmp_path: Path, case08: Path
+    ) -> None:
+        """Case R-CHG-SYM.11/3 (E3 A-4): the project report run, which executes the
+        variants itself when no execution precedes it, declares the project's A2L
+        file: the project folder holds ``firmware-patched.s19`` with both symbol
+        entries' bytes, the report's consolidated overview counts applied changes
+        (at least the two symbol entries), both symbols appear in the report and
+        the report carries no unresolved-symbol code.
+    
+        Negative control: the report run passing no A2L blocks the change document
+        (0 applied, no patched file; the base) -> RED."""
+        from s19_app.tui.screens import ReportViewerScreen
+        from textual.widgets import Button
+    
+        from s19_app.tui.services.report_service import list_project_reports
+    
+        async def scenario(app, pilot, log):
+            folder = await open_project(pilot, app, case08, with_a2l=True)
+            app.action_view_reports()
+            await wait_until(
+                pilot,
+                lambda: isinstance(app.screen_stack[-1], ReportViewerScreen)
+                and len(app.screen_stack[-1].query("#report_generate")) > 0,
+                "timed out waiting for the Reports screen",
+            )
+            app.screen_stack[-1].query_one("#report_generate", Button).press()
+            await settle(pilot, 12)
+            await app.workers.wait_for_complete()
+            await settle(pilot, 12)
+            reports = list_project_reports(folder)
+            return folder, [p.read_text(encoding="utf-8") for p in reports]
+    
+        folder, texts = run(tmp_path, scenario)
+        assert len(texts) == 1, len(texts)
+        report = texts[0]
+>       assert_patched_symbols(folder, case08)
+
+tests/test_b101_symbol_reads.py:914: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+folder = PosixPath('/tmp/pytest-s19m4/popen-gw1/test_r_chg_sym_11_report_run_d0/app/.s19tool/workarea/P')
+case = PosixPath('/tmp/pytest-s19m4/popen-gw1/b101_case080')
+
+    def assert_patched_symbols(folder: Path, case: Path) -> None:
+        """The patched variant file exists and holds the symbol entries' bytes."""
+        patched = folder / "firmware-patched.s19"
+>       assert patched.is_file(), sorted(p.name for p in folder.iterdir())
+E       AssertionError: ['demo_patch.changes.json', 'firmware.a2l', 'firmware.s19', 'project.json', 'reports']
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/tmp/pytest-s19m4/popen-gw1/test_r_chg_sym_11_report_run_d0/app/.s19tool/workarea/P/firmware-patched.s19').is_file
+
+tests/test_b101_symbol_reads.py:838: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2979 App initialized. base_dir=/tmp/pytest-s19m4/popen-gw1/test_r_chg_sym_11_report_run_d0/app workarea=/tmp/pytest-s19m4/popen-gw1/test_r_chg_sym_11_report_run_d0/app/.s19tool/workarea
+INFO     s19tui:app.py:8332 Workarea refreshed. files=0
+INFO     s19tui:app.py:16593 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:8479 Load project action triggered.
+INFO     s19tui:app.py:15446 Load phase boundary: modal_dismiss_scheduled kind=project value='P'
+WARNING  s19tui:app.py:13909 Project P: manifest damaged demo_patch.changes.json (MANIFEST-BAD-STRUCTURE)
+INFO     s19tui:app.py:932 A2L cache miss: path=/tmp/pytest-s19m4/popen-gw1/test_r_chg_sym_11_report_run_d0/app/.s19tool/workarea/P/firmware.a2l size_bytes=97347
+INFO     s19tui:app.py:14151 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18667 Load summary: file_type=s19 path=/tmp/pytest-s19m4/popen-gw1/test_r_chg_sym_11_report_run_d0/app/.s19tool/workarea/P/firmware.s19 addresses=424736 range_count=4 range_bytes=424736 errors=0
+INFO     s19tui:app.py:14168 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18128 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:14104 Project loaded. name=P file=/tmp/pytest-s19m4/popen-gw1/test_r_chg_sym_11_report_run_d0/app/.s19tool/workarea/P/firmware.s19 mac=None
+INFO     s19tui:app.py:18795 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18144 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18156 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:17688 MAC validation computed: records=0 issues=564 elapsed_seconds=0.681
+INFO     s19tui:app.py:17743 MAC row cache built: records=0 elapsed_seconds=0.681
+INFO     s19tui:app.py:16625 Load phase boundary: populate_issues_table_done rows=40 total=564 elapsed=0.020
+INFO     s19tui:app.py:19329 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.702
+INFO     s19tui:app.py:19856 Load phase boundary: populate_a2l_table_done rows=200 total=462 elapsed=0.014
+INFO     s19tui:app.py:18169 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:19022 Memory Map updated. ranges=4
+INFO     s19tui:app.py:18186 Loaded file successfully: path=/tmp/pytest-s19m4/popen-gw1/test_r_chg_sym_11_report_run_d0/app/.s19tool/workarea/P/firmware.s19 file_type=s19 elapsed_seconds=1.505 has_mac=False precomputed=False
+INFO     s19tui:app.py:6187 View reports action. project=P count=0
+INFO     s19tui:screens.py:3490 ReportViewerScreen requesting generation. context_bytes=64
+INFO     s19tui:app.py:6699 report kind=project source=P output=/tmp/pytest-s19m4/popen-gw1/test_r_chg_sym_11_report_run_d0/app/.s19tool/workarea/P/reports/20261106T014901Z-report.md outcome=ok
+=========================== short test summary info ============================
+FAILED tests/test_b101_symbol_reads.py::test_r_chg_sym_11_variant_run_declares_the_project_a2l_file
+FAILED tests/test_b101_symbol_reads.py::test_r_chg_sym_11_execute_scope_applies_symbol_entries_by_keys[session-a2l-loaded]
+FAILED tests/test_b101_symbol_reads.py::test_r_chg_sym_11_execute_scope_applies_symbol_entries_by_keys[session-a2l-unloaded]
+FAILED tests/test_b101_symbol_reads.py::test_r_chg_sym_11_report_run_declares_the_project_a2l_file
+4 failed in 30.46s
+PYTEST_EXIT=1
+RESTORE_OK

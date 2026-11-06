@@ -27,12 +27,14 @@ Full = the product itself produces what the test asserts. All cases run on the L
 | .11/3 | `test_r_chg_sym_11_report_run_declares_the_project_a2l_file` | full (Reports screen, Generate) | RED: no patched file |
 | .12/1 | `test_r_chg_sym_12_variant_run_without_a_project_a2l_declares_none` | full | holds on base |
 | .12/2 | `test_r_chg_sym_12_session_a2l_does_not_reach_a_project_without_a2l` | full for the output; premise adjusted (ambiguity 1) | holds on base |
-| .13/1 | `test_r_chg_sym_13_symbol_read_at_1000_entries_by_220040_tags_builds_the_index_once` (`serial_timing`) | full | RED: index built 0 times (no builder); the read took 81.54 s |
+| .13/1 | `test_r_chg_sym_13_symbol_read_of_1000_entries_by_220040_tags_builds_the_index_once` (`serial_timing`) | full | RED: index built 0 times (no builder); the read took 81.54 s |
 | .13/2 | `test_r_chg_sym_13_read_without_symbol_entries_builds_no_index` | full | arm 1 (address-only, counter 0) holds on base; arm 2 (`demo_patch`, counter 1) RED |
-| .13/3 (A-7) | `test_r_chg_sym_13_whole_document_edit_json_confirm_at_1000_entries_by_220040_tags` (`serial_timing`) | measurement | RED: `Edit JSON refused: change text carries 1000 error(s)` |
+| .13/3 (A-7) | `test_r_chg_sym_13_whole_document_edit_json_confirm_of_1000_entries_by_220040_tags` (`serial_timing`) | measurement | RED: `Edit JSON refused: change text carries 1000 error(s)` |
 | R-TUI-058.9/1 | `test_r_tui_058_9_entry_edit_without_a2l_ends_on_the_plain_line` | full | RED: 2 lines, no plain line |
 | .9/2 | `test_r_tui_058_9_entry_edit_with_a_non_string_symbol_paints_no_plain_line` | full | holds on base (guards mutant M-11) |
 | .9/3 (arms a, b) | `test_r_tui_058_9_entry_edit_with_an_unknown_symbol_paints_no_plain_line` | full | RED: base paints the no-context finding, not the "resolves to no tag" one |
+
+Names: the two R-CHG-SYM.13 timing tests carry the `…_of_1000_entries…` names given at E4 integration (F-1; the registry reads `_at_<digits>` as an AT id). This table was updated at the E5 corrective pass (ruling C-5); the base RED results are the tester's, taken under the old names.
 
 Uncovered: none of the 22 cases is uncovered. E5 mutants M-1 … M-15 are E5's to run; the table above names which test each one should turn RED.
 

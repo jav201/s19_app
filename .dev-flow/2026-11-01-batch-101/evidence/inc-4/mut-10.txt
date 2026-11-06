@@ -1,0 +1,53 @@
+--- sha256 before (M-10) ---
+f111f33cefa43f7d361944c0a38667f8dcb07c1c089b6af16dc1667ec884b50a  s19_app/tui/changes/io.py
+60b4d129746a0ba7251a0d40805d550285ca8d93edafb00f53fc8da67216c19e  s19_app/tui/services/change_service.py
+1335a5ee3b7d4e400fa6fe8a29d2d7993279ffb2a3044d07fa7ba60cd3f14aef  s19_app/tui/services/variant_execution_service.py
+3d256f64d99814b70dd94297c7961a6a220edfdcd0426a6dd58f57eacc603eb9  s19_app/tui/app.py
+applied M-10 -> s19_app/tui/changes/io.py
+s19_app.__file__ = <HOME>/work/s19_m4/s19_app/__init__.py
+=== pytest (M-10) flags=[-m serial_timing] nodes=[tests/test_b101_symbol_reads.py::test_r_chg_sym_13_symbol_read_of_1000_entries_by_220040_tags_builds_the_index_once] ===
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_r_chg_sym_13_symbol_read_of_1000_entries_by_220040_tags_builds_the_index_once _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f76cdffff50>
+
+    @pytest.mark.serial_timing
+    def test_r_chg_sym_13_symbol_read_of_1000_entries_by_220040_tags_builds_the_index_once(
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Case R-CHG-SYM.13/1: reading a planted document of 1 000 symbol entries
+        against a planted context of 220 040 tags builds the tag-name index exactly
+        once per read (call counter, the primary oracle), resolves every entry with
+        0 findings, and finishes each of 5 runs within the bound (1.0 s, through
+        ``report_margin``; serial, on the LAN Linux host).
+    
+        Why: the editors read on the screen thread; an index rebuilt per symbol
+        entry freezes the screen for minutes at this size. Negative control: the
+        base rebuilds the index for every entry (counter 0 on the base because the
+        builder does not exist, and a wall clock in the minutes) -> RED; the assert
+        message carries the measured first run."""
+        context = planted_context()
+        text = planted_document()
+        calls = count_index_builds(monkeypatch)
+        times = []
+        for run_number in range(5):
+            before = len(calls)
+            started = time.perf_counter()
+            document = parse_change_document(text, a2l_context=context)
+            took = time.perf_counter() - started
+            times.append(took)
+>           assert len(calls) - before == 1, (
+                f"run {run_number}: the tag-name index was built {len(calls) - before} "
+                f"time(s), expected exactly 1 per read; the read took {took:.2f} s"
+            )
+E           AssertionError: run 0: the tag-name index was built 1000 time(s), expected exactly 1 per read; the read took 64.09 s
+E           assert (1000 - 0) == 1
+E            +  where 1000 = len([1, 1, 1, 1, 1, 1, ...])
+
+tests/test_b101_symbol_reads.py:1077: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_symbol_reads.py::test_r_chg_sym_13_symbol_read_of_1000_entries_by_220040_tags_builds_the_index_once
+1 failed in 64.91s (0:01:04)
+PYTEST_EXIT=1
+RESTORE_OK

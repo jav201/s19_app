@@ -147,7 +147,12 @@ def unresolved_lines(lines: list) -> list:
 def run(tmp_path: Path, scenario, name: str = "app"):
     base = tmp_path / name
     base.mkdir(parents=True, exist_ok=True)
-    return projects.run_app(base, scenario)
+
+    async def _with_log(app, pilot, log):
+        app._test_status_log = log  # read by the draft helper
+        return await scenario(app, pilot, log)
+
+    return projects.run_app(base, _with_log)
 
 
 async def settle(pilot, count: int = 6) -> None:
@@ -224,16 +229,102 @@ async def attach_a2l(pilot, app, case: Path) -> None:
     )
 
 
-async def unload_a2l(pilot, app) -> None:
-    from s19_app.tui.screens_directionb import LoadedArtifactsPanel
+async def click(pilot, target, what: str) -> None:
+    """A mouse click that must land on ``target`` (a selector or a widget)."""
+    assert await pilot.click(target), f"click missed {what}"
 
-    app.on_loaded_artifacts_panel_unload_requested(
-        LoadedArtifactsPanel.UnloadRequested("a2l")
+
+async def unload_a2l(pilot, app, back: str | None = None) -> None:
+    """Unload the A2L from the Workspace "Loaded" panel's ``[u]`` control
+    (key ``1``, click the A2L slot's unload button); then, when ``back`` is
+    given, press that rail key to return to the screen the case runs on."""
+    from textual.widgets import Button
+
+    await pilot.press("1")
+    await wait_until(
+        pilot,
+        lambda: any(
+            b.name == "a2l" and b.region.width > 0
+            for b in app.query("Button.loaded-unload")
+        ),
+        "timed out waiting for the Loaded panel's A2L unload control",
     )
+    (button,) = [b for b in app.query("Button.loaded-unload") if b.name == "a2l"]
+    assert isinstance(button, Button)
+    await click(pilot, button, "the Loaded panel's A2L [u]")
     await wait_until(
         pilot, lambda: app.current_a2l_data is None, "timed out waiting for the A2L unload"
     )
     await settle(pilot)
+    if back is not None:
+        await pilot.press(back)
+        await settle(pilot)
+
+
+async def pick_by_keys(pilot, app, select_id: str, value: str) -> None:
+    """Pick ``value`` in a dropdown the way the operator does: click the
+    dropdown open, move with the arrow keys, press enter (no ``Select.value``
+    write)."""
+    from textual.widgets import Select
+    from textual.widgets._select import SelectCurrent, SelectOverlay
+
+    select = app.query_one(select_id, Select)
+    values = [option_value for _prompt, option_value in select._options]
+    assert value in values, (value, values)
+    target = values.index(value)
+    # The click goes to the dropdown's face (``SelectCurrent``). The widget
+    # under the mouse may be the face or one of its children (a compact face
+    # has no border), and ``pilot.click`` reports a hit only for the exact
+    # widget, so the hit is checked here by ancestry.
+    face = select.query_one(SelectCurrent)
+    under, _region = app.get_widget_at(face.region.x, face.region.y)
+    assert under is face or face in under.ancestors, (select_id, under)
+    await pilot.click(face)
+    overlay = select.query_one(SelectOverlay)
+    await wait_until(
+        pilot,
+        lambda: select.expanded and app.focused is overlay,
+        f"timed out waiting for the {select_id} dropdown to open",
+    )
+    for _ in range(len(values) + 1):
+        if overlay.highlighted == target:
+            break
+        current = -1 if overlay.highlighted is None else overlay.highlighted
+        await pilot.press("down" if current < target else "up")
+    assert overlay.highlighted == target, (overlay.highlighted, target, values)
+    await pilot.press("enter")
+    await wait_until(
+        pilot,
+        lambda: not select.expanded and select.value == value,
+        f"timed out waiting for {select_id} to take {value!r}",
+    )
+
+
+async def paste_into(pilot, app, area_id: str, text: str) -> None:
+    """Click the text area, select all (``f7``) and paste ``text`` through the
+    app's paste event (the route a terminal paste takes)."""
+    from textual import events
+    from textual.widgets import TextArea
+
+    area = app.screen.query_one(area_id, TextArea)
+    await click(pilot, area, area_id)
+    await wait_until(pilot, lambda: app.focused is area, f"timed out focusing {area_id}")
+    await pilot.press("f7")
+    app.post_message(events.Paste(text))
+    await wait_until(
+        pilot, lambda: area.text == text, f"timed out waiting for the paste into {area_id}"
+    )
+
+
+async def show_tab(pilot, app, tab: str, pane: str) -> None:
+    """Click a Patch Editor inspector tab chip and wait for its pane."""
+    await click(pilot, f"#{tab}", tab)
+    await wait_until(
+        pilot,
+        lambda: app.query_one(f"#{pane}").region.width > 0,
+        f"timed out waiting for #{pane} after the {tab} click",
+    )
+    await settle(pilot, 2)
 
 
 async def show_screen(pilot, app, key: str, widget_id: str) -> None:
@@ -257,18 +348,26 @@ def table_rows(app) -> int:
 
 
 async def install_draft(pilot, app, text: str, a2l_context=None) -> None:
-    """Make ``text`` the pasted draft (source_path None) and refresh the panel.
+    """Make ``text`` the pasted draft (source_path None) the operator's way:
+    the JSON tab, a paste into the paste field, a click on Parse paste.
 
-    The draft is installed through the service seam with an explicit context so
-    that the Edit JSON cases do not depend on the paste read they are not
-    testing."""
-    from textual.widgets import TextArea
-
-    result = service(app).load_text(text, a2l_context=a2l_context)
-    assert result.ok, result.message
-    app.query_one("#patch_paste_text", TextArea).text = text
-    app._refresh_patch_history_view()
-    await settle(pilot)
+    E5 corrective (C-6, BB-3/BB-4): the draft used to be installed through the
+    service seam with an explicit context. The paste reads with the session's
+    A2L (R-CHG-SYM.9 alternative 2 / R-CHG-SYM.10), so ``a2l_context`` is now a
+    precondition check: it must be the A2L the session holds."""
+    assert a2l_context is app.current_a2l_data, "the paste reads the session A2L"
+    log = app._test_status_log
+    await show_tab(pilot, app, "patch_tab_json", "patch_paste_text")
+    await paste_into(pilot, app, "#patch_paste_text", text)
+    mark = len(log.messages)
+    await click(pilot, "#patch_paste_parse_button", "Parse paste")
+    lines = await lines_after(
+        pilot, log, mark,
+        lambda ls: any(line.startswith("Loaded change:") for line in ls),
+        "the draft's paste parse",
+    )
+    assert unresolved_lines(lines) == [], lines
+    assert service(app).document is not None
 
 
 def entry_state(entry) -> tuple:
@@ -276,17 +375,27 @@ def entry_state(entry) -> tuple:
 
 
 async def entry_json_confirm(pilot, app, log, row: int, replacement=None) -> list:
-    """Open the per-entry JSON popup on ``row``, optionally replace its text,
-    confirm, and return the status lines the confirm painted."""
-    from textual.widgets import Button, DataTable, TextArea
+    """Choose ``row`` in the ledger by keys, open the per-entry JSON popup with
+    a click, optionally replace its text by a paste, click Confirm, and return
+    the status lines the confirm painted."""
+    from textual.widgets import Button, DataTable
 
     from s19_app.tui.screens import EntryJsonScreen
 
-    app.query_one("#patch_doc_entries_table", DataTable).move_cursor(row=row)
+    await show_tab(pilot, app, "patch_tab_inspector", "patch_entry_edit_json_button")
+    table = app.query_one("#patch_doc_entries_table", DataTable)
+    await click(pilot, table, "the ledger")
+    await wait_until(pilot, lambda: app.focused is table, "timed out focusing the ledger")
+    for _ in range(table.row_count + 1):
+        if table.cursor_row == row:
+            break
+        await pilot.press("down" if table.cursor_row < row else "up")
+        await settle(pilot, 1)
+    assert table.cursor_row == row, (table.cursor_row, row)
     await settle(pilot, 2)
     button = app.query_one("#patch_entry_edit_json_button", Button)
     await wait_until(pilot, lambda: not button.disabled, "timed out: per-entry Edit JSON disabled")
-    button.press()
+    await click(pilot, button, "per-entry Edit JSON")
 
     def _ready() -> bool:
         if not isinstance(app.screen, EntryJsonScreen):
@@ -294,10 +403,11 @@ async def entry_json_confirm(pilot, app, log, row: int, replacement=None) -> lis
         return len(app.screen.query("#entry_json_confirm")) > 0
 
     await wait_until(pilot, _ready, "timed out waiting for the per-entry JSON popup")
+    await settle(pilot, 2)
     if replacement is not None:
-        app.screen.query_one("#entry_json_text", TextArea).text = replacement
+        await paste_into(pilot, app, "#entry_json_text", replacement)
     mark = len(log.messages)
-    app.screen.query_one("#entry_json_confirm", Button).press()
+    await click(pilot, "#entry_json_confirm", "the per-entry Confirm")
     await wait_until(
         pilot,
         lambda: not isinstance(app.screen, EntryJsonScreen),
@@ -308,15 +418,17 @@ async def entry_json_confirm(pilot, app, log, row: int, replacement=None) -> lis
 
 
 async def whole_document_confirm(pilot, app, log, replacement=None) -> list:
-    """Open the whole-document JSON popup (seeded from the paste buffer),
-    optionally replace its text, confirm; return the lines painted."""
-    from textual.widgets import Button, TextArea
+    """Click Edit JSON on the JSON tab (the popup is seeded from the paste
+    buffer), optionally replace its text by a paste, click Confirm; return the
+    lines painted."""
+    from textual.widgets import Button
 
     from s19_app.tui.screens import ChangeSetJsonScreen
 
+    await show_tab(pilot, app, "patch_tab_json", "patch_edit_json_button")
     button = app.query_one("#patch_edit_json_button", Button)
     await wait_until(pilot, lambda: not button.disabled, "timed out: Edit JSON disabled")
-    button.press()
+    await click(pilot, button, "Edit JSON")
 
     def _ready() -> bool:
         if not isinstance(app.screen, ChangeSetJsonScreen):
@@ -324,10 +436,11 @@ async def whole_document_confirm(pilot, app, log, replacement=None) -> list:
         return len(app.screen.query("#changeset_json_confirm")) > 0
 
     await wait_until(pilot, _ready, "timed out waiting for the whole-document popup")
+    await settle(pilot, 2)
     if replacement is not None:
-        app.screen.query_one("#changeset_json_text", TextArea).text = replacement
+        await paste_into(pilot, app, "#changeset_json_text", replacement)
     mark = len(log.messages)
-    app.screen.query_one("#changeset_json_confirm", Button).press()
+    await click(pilot, "#changeset_json_confirm", "the whole-document Confirm")
     await wait_until(
         pilot,
         lambda: not isinstance(app.screen, ChangeSetJsonScreen),
@@ -354,8 +467,9 @@ def test_r_chg_sym_9_patch_editor_file_load_resolves_symbols_through_the_loaded_
 
     Why: the shipped demo document must load as delivered (F-01). Negative
     control: the load passing no A2L paints ``5 entries, 2 error(s)`` and two
-    finding lines (the base) -> RED."""
-    from textual.widgets import Select, TextArea
+    finding lines (the base) -> RED. Drive (E5 C-6, BB-1): the dropdown is
+    opened with a click and the file is picked with the arrow keys and enter."""
+    from textual.widgets import TextArea
 
     symbols = [entry["symbol"] for _i, entry in symbol_rows(case08, PATCH)]
     assert len(symbols) == 2
@@ -366,15 +480,14 @@ def test_r_chg_sym_9_patch_editor_file_load_resolves_symbols_through_the_loaded_
         await attach_a2l(pilot, app, case08)
         await show_screen(pilot, app, "6", "#patch_doc_file_select")
         mark = len(log.messages)
-        app.query_one("#patch_doc_file_select", Select).value = PATCH
+        await pick_by_keys(pilot, app, "#patch_doc_file_select", PATCH)
         lines = await lines_after(
             pilot, log, mark,
             lambda ls: any(line.startswith("Loaded change:") for line in ls),
             "the Patch Editor file load",
         )
         rows = table_rows(app)
-        app.query_one("#patch_tab_json").press()
-        await settle(pilot)
+        await show_tab(pilot, app, "patch_tab_json", "patch_json_view")
         view = app.query_one("#patch_json_view", TextArea).text
         return lines, rows, view
 
@@ -394,18 +507,19 @@ def test_r_chg_sym_9_paste_resolves_symbols_through_the_loaded_a2l(
     error(s)``, no finding line, and the draft's symbol entries carry the
     tag spellings.
 
-    Negative control: the paste arm passing no A2L -> 5 entries, 2 errors."""
-    from textual.widgets import Button, TextArea
-
+    Negative control: the paste arm passing no A2L -> 5 entries, 2 errors.
+    Drive (E5 C-6, BB-2): the text is pasted into the paste field through the
+    app's paste event and Parse paste is clicked."""
     rows = symbol_rows(case08, PATCH)
 
     async def scenario(app, pilot, log):
         await attach_image(pilot, app, case08)
         await attach_a2l(pilot, app, case08)
         await show_screen(pilot, app, "6", "#patch_paste_text")
-        app.query_one("#patch_paste_text", TextArea).text = doc_text(case08, PATCH)
+        await show_tab(pilot, app, "patch_tab_json", "patch_paste_text")
+        await paste_into(pilot, app, "#patch_paste_text", doc_text(case08, PATCH))
         mark = len(log.messages)
-        app.query_one("#patch_paste_parse_button", Button).press()
+        await click(pilot, "#patch_paste_parse_button", "Parse paste")
         lines = await lines_after(
             pilot, log, mark,
             lambda ls: any(line.startswith("Loaded change:") for line in ls),
@@ -429,8 +543,8 @@ def test_r_chg_sym_9_whole_document_edit_json_confirm_resolves_symbols(
     ``Edit JSON refused`` line, paints ``Loaded change: 7 entries, 0
     error(s)`` once, and the draft keeps 7 entries with the symbols.
 
-    The draft is installed through the service with an explicit context so
-    this case stands apart from the paste read of the previous case.
+    Drive (E5 C-6, BB-3): the draft comes from a real paste and Parse paste
+    click while the A2L is loaded; Edit JSON and Confirm are clicked.
     Negative control: the pre-check reading with no A2L refuses the confirm
     (the base) -> RED."""
     rows = symbol_rows(case08, PATCH)
@@ -462,10 +576,20 @@ def test_r_chg_sym_9_per_entry_edit_json_confirm_of_a_symbol_entry_succeeds(
     keeps 7 entries. The success status text is not asserted (it is out of
     scope for this increment).
 
+    Second confirm (E5 C-4, the "document is replaced" clause of R-CHG-SYM.9):
+    the same entry confirmed with every byte changed and the length kept (so
+    it still matches the tag) - entry 2 then holds the new bytes and keeps its
+    symbol and address; 7 entries; no rejection, no finding line. A confirm
+    that returns without replacing the document leaves the old bytes -> RED.
+
     Negative control: the confirm passing no A2L rejects the symbol entry
-    with the no-context finding (the base) -> RED."""
+    with the no-context finding (the base) -> RED. Drive (E5 C-6, BB-4): a
+    pasted draft, the row chosen with the arrow keys, Edit JSON and Confirm
+    clicked, the replacement text pasted into the popup."""
     rows = symbol_rows(case08, PATCH)
     row, entry = rows[0]
+    new_data = bytes(byte ^ 0x5A for byte in entry_data(entry))
+    changed = json.dumps(dict(entry, bytes=" ".join(f"{b:02X}" for b in new_data)))
 
     async def scenario(app, pilot, log):
         await attach_image(pilot, app, case08)
@@ -475,14 +599,25 @@ def test_r_chg_sym_9_per_entry_edit_json_confirm_of_a_symbol_entry_succeeds(
         before = entry_state(service(app).document.entries[row])
         lines = await entry_json_confirm(pilot, app, log, row)
         entries = service(app).document.entries
-        return lines, before, entry_state(entries[row]), len(entries)
+        first = (lines, before, entry_state(entries[row]), len(entries))
+        lines = await entry_json_confirm(pilot, app, log, row, changed)
+        entries = service(app).document.entries
+        return first, (lines, entry_state(entries[row]), len(entries))
 
-    lines, before, after, count = run(tmp_path, scenario)
+    (lines, before, after, count), (changed_lines, replaced, changed_count) = run(
+        tmp_path, scenario
+    )
     assert REJECTED not in lines, lines
     assert unresolved_lines(lines) == [], lines
     assert after == before, (before, after)
     assert after[3] == entry["symbol"] and after[1] == entry_address(entry), after
     assert count == 7, count
+    assert REJECTED not in changed_lines, changed_lines
+    assert unresolved_lines(changed_lines) == [], changed_lines
+    assert replaced == (before[0], before[1], tuple(new_data), entry["symbol"]), (
+        before, replaced,
+    )
+    assert changed_count == 7, changed_count
 
 
 def test_r_chg_sym_9_check_editor_spec_pick_resolves_symbols(
@@ -494,9 +629,18 @@ def test_r_chg_sym_9_check_editor_spec_pick_resolves_symbols(
     finding line; the collector holds 3 memory rows today (unlabelled rows -
     Inc 5 re-pins this count when it names them).
 
+    E5 C-6 (R-CHG-SYM.9 "every symbol entry ... in the read document"): the
+    collector row of the symbol entry shows that entry's address. The Check
+    Editor keeps only address and size per row, so the tag's spelling is not
+    observable on this surface (not-testable here; alternatives 1, 2, 3, 4 and
+    6 assert the spelling).
+
     Negative control: the pick passing no A2L -> ``Check Editor: spec NOT
-    loaded.`` (the base) -> RED."""
-    from textual.widgets import DataTable, Select
+    loaded.`` (the base) -> RED. Drive (E5 C-6, BB-5): the Spec dropdown is
+    opened with a click and the file is picked with the arrow keys and enter."""
+    from textual.widgets import DataTable
+
+    (check_index, check_entry), = symbol_rows(case08, CHECK)
 
     async def scenario(app, pilot, log):
         stage(app, case08, CHECK)
@@ -504,7 +648,7 @@ def test_r_chg_sym_9_check_editor_spec_pick_resolves_symbols(
         await attach_a2l(pilot, app, case08)
         await show_screen(pilot, app, "equals_sign", "#check_spec_file_select")
         mark = len(log.messages)
-        app.query_one("#check_spec_file_select", Select).value = CHECK
+        await pick_by_keys(pilot, app, "#check_spec_file_select", CHECK)
         lines = await lines_after(
             pilot, log, mark,
             lambda ls: any(
@@ -514,13 +658,16 @@ def test_r_chg_sym_9_check_editor_spec_pick_resolves_symbols(
             ),
             "the Check Editor spec pick",
         )
-        return lines, app.query_one("#check_mem_table", DataTable).row_count
+        table = app.query_one("#check_mem_table", DataTable)
+        cells = [str(getattr(cell, "plain", cell)) for cell in table.get_row_at(check_index)]
+        return lines, table.row_count, cells
 
-    lines, rows = run(tmp_path, scenario)
+    lines, rows, symbol_row = run(tmp_path, scenario)
     assert lines[-1] == f"Check Editor: loaded '{CHECK}' (3 fields).", lines
     assert "Check Editor: spec NOT loaded." not in lines, lines
     assert unresolved_lines(lines) == [], lines
     assert rows == 3, rows
+    assert symbol_row[0] == f"0x{entry_address(check_entry):08X}", symbol_row
 
 
 def test_r_chg_sym_9_ab_diff_check_spec_pick_resolves_symbols(
@@ -532,9 +679,9 @@ def test_r_chg_sym_9_ab_diff_check_spec_pick_resolves_symbols(
     report.`` and stashes a 3-entry spec whose entry 2 carries the tag.
 
     Negative control: the pick passing no A2L paints ``Check spec not loaded -
-    [CHG-SYMBOL-UNRESOLVED] ...`` and stashes nothing (the base) -> RED."""
-    from textual.widgets import Select
-
+    [CHG-SYMBOL-UNRESOLVED] ...`` and stashes nothing (the base) -> RED.
+    Drive (E5 C-6, BB-6): the check-spec dropdown is opened with a click and
+    the file is picked with the arrow keys and enter."""
     (index, entry), = symbol_rows(case08, CHECK)
 
     async def scenario(app, pilot, log):
@@ -542,7 +689,7 @@ def test_r_chg_sym_9_ab_diff_check_spec_pick_resolves_symbols(
         await attach_image(pilot, app, case08)
         await attach_a2l(pilot, app, case08)
         await show_screen(pilot, app, "7", "#diff_check_select")
-        app.query_one("#diff_check_select", Select).value = CHECK
+        await pick_by_keys(pilot, app, "#diff_check_select", CHECK)
         await wait_until(
             pilot,
             lambda: str(app.query_one("#diff_status").render()).startswith("Check spec"),
@@ -585,19 +732,25 @@ def test_r_chg_sym_10_reads_with_no_a2l_loaded_declare_none(
 ) -> None:
     """Cases R-CHG-SYM.10/1 .. /6: each of the six session reads, with no A2L
     loaded, reads the document with no declared A2L: every symbol entry
-    paints the no-context finding (2 for ``demo_patch``, 1 for ``demo_check``)
-    and nothing resolves. The A2B Diff arm runs inside an open project whose
+    paints the no-context finding (2 for ``demo_patch``, 1 for each check
+    document: the Check Editor arm picks ``demo_check`` and then
+    ``demo_check_fails``, E5 C-6) and nothing resolves. The A2B Diff arm runs inside an open project whose
     folder holds ``firmware.a2l`` with the session A2L unloaded: the project's
     file is not used implicitly.
 
     Why: the no-implicit-A2L law (R-CHG-SYM.2). This is the negative control
     of the previous group; it holds on the base revision. Negative control of
     this group: a read that declares the last or the project's A2L when none is
-    loaded paints 0 findings -> RED."""
-    from textual.widgets import Button, Select, TextArea
+    loaded paints 0 findings -> RED.
 
+    Drive (E5 C-6): dropdowns are clicked open and picked with the arrow keys,
+    the paste goes through the app's paste event, buttons are clicked, and the
+    A2L is unloaded from the Workspace "Loaded" panel's control. The
+    per-entry arm pins the full painted list, the R-TUI-058.9 line last (E5
+    C-8)."""
     patch_rows = symbol_rows(case08, PATCH)
     (check_index, check_entry), = symbol_rows(case08, CHECK)
+    (fails_index, fails_entry), = symbol_rows(case08, CHECK_FAILS)
 
     def two_findings(lines: list) -> None:
         assert sorted(unresolved_lines(lines)) == sorted(
@@ -605,12 +758,12 @@ def test_r_chg_sym_10_reads_with_no_a2l_loaded_declare_none(
         ), lines
 
     async def scenario(app, pilot, log):
-        stage(app, case08, PATCH, CHECK)
+        stage(app, case08, PATCH, CHECK, CHECK_FAILS)
         await attach_image(pilot, app, case08)
         if surface == "file-load":
             await show_screen(pilot, app, "6", "#patch_doc_file_select")
             mark = len(log.messages)
-            app.query_one("#patch_doc_file_select", Select).value = PATCH
+            await pick_by_keys(pilot, app, "#patch_doc_file_select", PATCH)
             lines = await lines_after(
                 pilot, log, mark,
                 lambda ls: any(line.startswith("Loaded change:") for line in ls),
@@ -620,9 +773,10 @@ def test_r_chg_sym_10_reads_with_no_a2l_loaded_declare_none(
             two_findings(lines)
         elif surface == "paste":
             await show_screen(pilot, app, "6", "#patch_paste_text")
-            app.query_one("#patch_paste_text", TextArea).text = doc_text(case08, PATCH)
+            await show_tab(pilot, app, "patch_tab_json", "patch_paste_text")
+            await paste_into(pilot, app, "#patch_paste_text", doc_text(case08, PATCH))
             mark = len(log.messages)
-            app.query_one("#patch_paste_parse_button", Button).press()
+            await click(pilot, "#patch_paste_parse_button", "Parse paste")
             lines = await lines_after(
                 pilot, log, mark,
                 lambda ls: any(line.startswith("Loaded change:") for line in ls),
@@ -634,7 +788,7 @@ def test_r_chg_sym_10_reads_with_no_a2l_loaded_declare_none(
             await attach_a2l(pilot, app, case08)
             await show_screen(pilot, app, "6", "#patch_edit_json_button")
             await install_draft(pilot, app, doc_text(case08, PATCH), app.current_a2l_data)
-            await unload_a2l(pilot, app)
+            await unload_a2l(pilot, app, back="6")
             before_entries = [entry_state(e) for e in service(app).document.entries]
             if surface == "edit-json":
                 lines = await whole_document_confirm(pilot, app, log)
@@ -644,13 +798,13 @@ def test_r_chg_sym_10_reads_with_no_a2l_loaded_declare_none(
                 row, entry = patch_rows[0]
                 lines = await entry_json_confirm(pilot, app, log, row)
                 assert lines[:2] == [REJECTED, finding_no_ctx(0, entry["symbol"])], lines
-                assert lines[2:] in ([], [PLAIN]), lines
+                assert lines[2:] == [PLAIN], lines
             assert [entry_state(e) for e in service(app).document.entries] == before_entries
             assert len(before_entries) == 7
         elif surface == "check-editor":
             await show_screen(pilot, app, "equals_sign", "#check_spec_file_select")
             mark = len(log.messages)
-            app.query_one("#check_spec_file_select", Select).value = CHECK
+            await pick_by_keys(pilot, app, "#check_spec_file_select", CHECK)
             lines = await lines_after(
                 pilot, log, mark,
                 lambda ls: "Check Editor: spec NOT loaded." in ls,
@@ -658,6 +812,17 @@ def test_r_chg_sym_10_reads_with_no_a2l_loaded_declare_none(
             )
             assert lines == [
                 finding_no_ctx(check_index, check_entry["symbol"]),
+                "Check Editor: spec NOT loaded.",
+            ], lines
+            mark = len(log.messages)
+            await pick_by_keys(pilot, app, "#check_spec_file_select", CHECK_FAILS)
+            lines = await lines_after(
+                pilot, log, mark,
+                lambda ls: "Check Editor: spec NOT loaded." in ls,
+                "the Check Editor pick of demo_check_fails",
+            )
+            assert lines == [
+                finding_no_ctx(fails_index, fails_entry["symbol"]),
                 "Check Editor: spec NOT loaded.",
             ], lines
         else:
@@ -679,7 +844,7 @@ def test_r_chg_sym_10_reads_with_no_a2l_loaded_declare_none(
         await dismiss_result_panel_if_open(pilot, app)
         await unload_a2l(pilot, app)
         await show_screen(pilot, app, "7", "#diff_check_select")
-        app.query_one("#diff_check_select", Select).value = CHECK
+        await pick_by_keys(pilot, app, "#diff_check_select", CHECK)
         await wait_until(
             pilot,
             lambda: str(app.query_one("#diff_status").render()).startswith("Check spec"),
@@ -786,22 +951,24 @@ def test_r_chg_sym_11_variant_run_declares_the_project_a2l_file(
 
 
 async def execute_scope_all(app, pilot, log) -> list:
-    """Select scope ``all`` on the Patch Editor and press Execute scope;
-    return the lines since the press once the run's finished line is
-    painted."""
+    """Click the scope control on the Patch Editor's JSON tab until it reads
+    scope ``all``, click Execute scope; return the lines since the click once
+    the run's finished line is painted (E5 C-4 / C-6, BB-7: clicks, not
+    ``Button.press()``)."""
     from textual.widgets import Button
 
+    await show_tab(pilot, app, "patch_tab_json", "patch_execute_run_button")
     panel = app.query_one("#patch_editor_panel")
     want = f"Scope: {panel._SCOPE_LABELS['all']}"
     scope_button = app.query_one("#patch_execute_scope_button", Button)
     for _ in range(4):
         if str(scope_button.label) == want:
             break
-        scope_button.press()
+        await click(pilot, scope_button, "the Execute scope control")
         await settle(pilot, 2)
     assert str(scope_button.label) == want, str(scope_button.label)
     mark = len(log.messages)
-    app.query_one("#patch_execute_run_button", Button).press()
+    await click(pilot, "#patch_execute_run_button", "Execute scope")
     lines = await lines_after(
         pilot, log, mark,
         lambda ls: any(line.startswith("Execute: scope 'all' finished") for line in ls),
@@ -859,7 +1026,9 @@ def test_r_chg_sym_11_execute_scope_applies_symbol_entries_by_keys(
 
     Negative control: the variant run passing no A2L writes no patched file
     (the base) -> RED; a run fed the session A2L instead of the project's file
-    fails arm b."""
+    fails arm b. Drive (E5 C-6, BB-7): scope and Execute are clicked, and arm
+    b unloads from the Workspace "Loaded" panel's control. E5 C-4: the run's
+    finished line is the last line painted, not just one of them."""
 
     async def scenario(app, pilot, log):
         folder = await open_project(pilot, app, case08, with_a2l=True)
@@ -872,6 +1041,7 @@ def test_r_chg_sym_11_execute_scope_applies_symbol_entries_by_keys(
 
     folder, lines = run(tmp_path, scenario)
     assert "Execute: scope 'all' finished - 1 variant(s), 0 error(s)" in lines, lines
+    assert lines[-1] == "Execute: scope 'all' finished - 1 variant(s), 0 error(s)", lines
     assert_patched_symbols(folder, case08)
 
 
@@ -885,6 +1055,12 @@ def test_r_chg_sym_11_report_run_declares_the_project_a2l_file(
     (at least the two symbol entries), both symbols appear in the report and
     the report carries no unresolved-symbol code.
 
+    E5 C-2: the overview counts exactly 7 applied (every entry of
+    ``demo_patch``), and the Modifications table holds 7 rows with no row
+    whose Before cell is ``-`` (the report's rendering of an entry that was
+    not applied), so 0 entries are ``blocked``. Drive (E5 C-2 / C-6, BB-8): the
+    Reports screen opens through its key ``t`` and Generate is clicked.
+
     Negative control: the report run passing no A2L blocks the change document
     (0 applied, no patched file; the base) -> RED."""
     from s19_app.tui.screens import ReportViewerScreen
@@ -894,14 +1070,17 @@ def test_r_chg_sym_11_report_run_declares_the_project_a2l_file(
 
     async def scenario(app, pilot, log):
         folder = await open_project(pilot, app, case08, with_a2l=True)
-        app.action_view_reports()
+        await pilot.press("t")
         await wait_until(
             pilot,
             lambda: isinstance(app.screen_stack[-1], ReportViewerScreen)
             and len(app.screen_stack[-1].query("#report_generate")) > 0,
-            "timed out waiting for the Reports screen",
+            "timed out waiting for the Reports screen after key t",
         )
-        app.screen_stack[-1].query_one("#report_generate", Button).press()
+        await settle(pilot, 2)
+        await click(
+            pilot, app.screen_stack[-1].query_one("#report_generate", Button), "Generate"
+        )
         await settle(pilot, 12)
         await app.workers.wait_for_complete()
         await settle(pilot, 12)
@@ -915,7 +1094,13 @@ def test_r_chg_sym_11_report_run_declares_the_project_a2l_file(
     match = re.search(r"^\| firmware \| [^|]+\| (\d+) \|", report, re.MULTILINE)
     assert match is not None, report[:2000]
     assert int(match.group(1)) >= 2, match.group(0)
+    assert int(match.group(1)) == len(doc_json(case08, PATCH)["entries"]) == 7, match.group(0)
     modifications = report[report.index("### Modifications"):]
+    section = modifications.split("\n### ", 1)[0]
+    table = [line for line in section.splitlines() if line.startswith("| 0x")]
+    assert len(table) == 7, table
+    not_applied = [line for line in table if line.split("|")[3].strip() == "-"]
+    assert not_applied == [], not_applied
     for _index, entry in symbol_rows(case08, PATCH):
         data = entry_data(entry)
         row = [
@@ -966,7 +1151,9 @@ def test_r_chg_sym_12_session_a2l_does_not_reach_a_project_without_a2l(
     stays loaded.
 
     Holds on the base. Mutant: the session A2L fed to the variant run writes a
-    patched file -> RED."""
+    patched file -> RED. E5 C-3: the run ends ``0 error(s)``, so "no patched
+    file" cannot come from a run that errored before the document read. Drive
+    (E5 C-6, BB-7): scope and Execute are clicked."""
 
     async def scenario(app, pilot, log):
         folder = await open_project(pilot, app, case08, with_a2l=False)
@@ -986,6 +1173,7 @@ def test_r_chg_sym_12_session_a2l_does_not_reach_a_project_without_a2l(
 
     folder, lines, a2l_kept, synced_before = run(tmp_path, scenario)
     assert any(l.startswith("Execute: scope 'all' finished - 1 variant(s),") for l in lines), lines
+    assert lines[-1] == "Execute: scope 'all' finished - 1 variant(s), 0 error(s)", lines
     assert not (folder / "firmware-patched.s19").exists(), sorted(p.name for p in folder.iterdir())
     assert a2l_kept
     assert not (folder / "firmware.a2l").exists(), synced_before
@@ -997,6 +1185,7 @@ def test_r_chg_sym_12_session_a2l_does_not_reach_a_project_without_a2l(
 
 TAG_COUNT = 220_040  # case_06's tag count (examples/case_06_large_nested_a2l)
 ENTRY_COUNT = 1_000
+SAMPLES_13_3 = 5  # R-CHG-SYM.13/3 run count (E5 ruling C-7)
 
 
 def planted_context(count: int = TAG_COUNT) -> dict:
@@ -1063,9 +1252,11 @@ def test_r_chg_sym_13_symbol_read_of_1000_entries_by_220040_tags_builds_the_inde
     entry freezes the screen for minutes at this size. Negative control: the
     base rebuilds the index for every entry (counter 0 on the base because the
     builder does not exist, and a wall clock in the minutes) -> RED; the assert
-    message carries the measured first run."""
+    message carries the measured first run. E5 C-4: every one of the 1 000
+    entries carries its tag's spelling, not only the first and the last."""
     context = planted_context()
     text = planted_document()
+    spellings = [f"T{k * (TAG_COUNT // ENTRY_COUNT):06d}" for k in range(ENTRY_COUNT)]
     calls = count_index_builds(monkeypatch)
     times = []
     for run_number in range(5):
@@ -1082,6 +1273,7 @@ def test_r_chg_sym_13_symbol_read_of_1000_entries_by_220040_tags_builds_the_inde
         assert document.issues == [], document.issues[:3]
         assert document.entries[0].symbol == "T000000"
         assert document.entries[-1].symbol == f"T{(ENTRY_COUNT - 1) * (TAG_COUNT // ENTRY_COUNT):06d}"
+        assert [entry.symbol for entry in document.entries] == spellings, run_number
     for took in times:
         assert took < report_margin("symbol read 1000x220040", took, timing_bound(1.0)), times
 
@@ -1095,7 +1287,13 @@ def test_r_chg_sym_13_read_without_symbol_entries_builds_no_index(
 
     Negative control: the index built eagerly before the loop counts 1 for
     the address-only document -> RED (the first arm holds on the base; the
-    second arm is RED there because the base has no builder)."""
+    second arm is RED there because the base has no builder).
+
+    Third arm (E5 C-1, the E4 ``index_built`` fix): ``demo_patch`` read with no
+    declared A2L calls the builder exactly once (it returns no index) and both
+    symbol entries give the R-CHG-SYM.2 finding. Mutant: the lazy gate keyed
+    on ``symbol_index is None`` (the pre-fix code) calls it once per symbol
+    entry, 2 -> RED."""
     calls = count_index_builds(monkeypatch)
     context = planted_context()
     plain = json.dumps(
@@ -1117,6 +1315,15 @@ def test_r_chg_sym_13_read_without_symbol_entries_builds_no_index(
     assert len(document.entries) == 7 and document.issues == [], document.issues
     assert len(calls) == 1, f"the symbol read built the index {len(calls)} time(s), expected 1"
 
+    before = len(calls)
+    document = parse_change_document(doc_text(case08, PATCH), a2l_context=None)
+    assert len(calls) - before == 1, (
+        f"a read with no declared A2L called the index builder {len(calls) - before} "
+        f"time(s), expected exactly 1"
+    )
+    findings = [i for i in document.issues if i.code == UNRESOLVED]
+    assert len(findings) == 2 and all(NO_CTX in i.message for i in findings), document.issues
+
 
 @pytest.mark.serial_timing
 def test_r_chg_sym_13_whole_document_edit_json_confirm_of_1000_entries_by_220040_tags(
@@ -1136,6 +1343,11 @@ def test_r_chg_sym_13_whole_document_edit_json_confirm_of_1000_entries_by_220040
     Why: the whole confirm costs more than the two reads (the ledger and the
     JSON view render 1 000 rows); that render is not this increment's cost and
     is measured by the plain arm, so the difference isolates the reads.
+    E5 C-7: 5 samples (plain then symbolic, after one discarded warm-up), each
+    asserted against the bound; the transcript prints every sample and the
+    max. The session A2L is planted (``current_a2l_data``) and the confirm
+    callback is called directly - a precondition stand-in accepted for this
+    measurement row (coverage audit C-12).
     Negative control: the base ignores the session A2L and refuses the confirm
     at once -> RED on the painted result, not on the clock."""
     from textual.widgets import TextArea
@@ -1163,22 +1375,31 @@ def test_r_chg_sym_13_whole_document_edit_json_confirm_of_1000_entries_by_220040
         await show_screen(pilot, app, "6", "#patch_edit_json_button")
         app.current_a2l_data = context
         await confirm(app, pilot, log, plain)  # warm-up, discarded
-        plain_lines, plain_took = await confirm(app, pilot, log, plain)
-        symbolic_lines, symbolic_took = await confirm(app, pilot, log, symbolic)
-        return plain_lines, plain_took, symbolic_lines, symbolic_took
+        samples = []
+        for _sample in range(SAMPLES_13_3):
+            plain_lines, plain_took = await confirm(app, pilot, log, plain)
+            symbolic_lines, symbolic_took = await confirm(app, pilot, log, symbolic)
+            samples.append((plain_lines, plain_took, symbolic_lines, symbolic_took))
+        return samples
 
-    plain_lines, plain_took, lines, took = run(tmp_path, scenario)
-    assert "Loaded change: 1000 entries, 0 error(s)" in plain_lines, plain_lines[:3]
-    assert "Loaded change: 1000 entries, 0 error(s)" in lines, lines[:3]
-    added = max(took - plain_took, 0.0)
-    print(
-        f"MEASURED whole-document confirm, 1000 entries x 220040 tags: "
-        f"without symbols {plain_took:.3f} s, with symbols {took:.3f} s, "
-        f"resolution adds {added:.3f} s"
-    )
-    assert added < report_margin(
-        "edit json confirm resolution 1000x220040", added, timing_bound(1.0)
-    ), (plain_took, took)
+    samples = run(tmp_path, scenario)
+    assert len(samples) == SAMPLES_13_3
+    added_all = []
+    for number, (plain_lines, plain_took, lines, took) in enumerate(samples):
+        assert "Loaded change: 1000 entries, 0 error(s)" in plain_lines, plain_lines[:3]
+        assert "Loaded change: 1000 entries, 0 error(s)" in lines, lines[:3]
+        added = max(took - plain_took, 0.0)
+        added_all.append(added)
+        print(
+            f"MEASURED sample {number + 1}/{SAMPLES_13_3} whole-document confirm, "
+            f"1000 entries x 220040 tags: without symbols {plain_took:.3f} s, "
+            f"with symbols {took:.3f} s, resolution adds {added:.3f} s"
+        )
+    print(f"MEASURED resolution addition max {max(added_all):.3f} s over {SAMPLES_13_3} samples")
+    for added in added_all:
+        assert added < report_margin(
+            "edit json confirm resolution 1000x220040", added, timing_bound(1.0)
+        ), added_all
 
 
 # ---------------------------------------------------------------------------
@@ -1193,10 +1414,12 @@ def test_r_tui_058_9_entry_edit_without_a2l_ends_on_the_plain_line(
     A2L was loaded), the A2L then unloaded, the per-entry Edit JSON of a
     symbol entry confirmed unchanged: the lines painted are, in order, the
     rejection line, the no-context finding line, and the plain-language line
-    exactly once, last; the entry is unchanged.
+    exactly once, last; the entry is unchanged, and so is the whole document
+    (7 entries equal; E5 C-5/C-6, the "document unchanged" clause).
 
     Negative control: the confirm ends on the finding line (the base); the
-    line removed -> RED."""
+    line removed -> RED. Drive (E5 C-6, BB-4): a pasted draft, the unload from
+    the Workspace "Loaded" panel's control, the row chosen by keys, clicks."""
     row, entry = symbol_rows(case08, PATCH)[0]
 
     async def scenario(app, pilot, log):
@@ -1204,14 +1427,17 @@ def test_r_tui_058_9_entry_edit_without_a2l_ends_on_the_plain_line(
         await attach_a2l(pilot, app, case08)
         await show_screen(pilot, app, "6", "#patch_entry_edit_json_button")
         await install_draft(pilot, app, doc_text(case08, PATCH), app.current_a2l_data)
-        await unload_a2l(pilot, app)
+        await unload_a2l(pilot, app, back="6")
         before = entry_state(service(app).document.entries[row])
+        before_all = [entry_state(e) for e in service(app).document.entries]
         lines = await entry_json_confirm(pilot, app, log, row)
-        return lines, before, entry_state(service(app).document.entries[row])
+        after_all = [entry_state(e) for e in service(app).document.entries]
+        return lines, before, entry_state(service(app).document.entries[row]), before_all, after_all
 
-    lines, before, after = run(tmp_path, scenario)
+    lines, before, after, before_all, after_all = run(tmp_path, scenario)
     assert lines == [REJECTED, finding_no_ctx(0, entry["symbol"]), PLAIN], lines
     assert after == before
+    assert len(before_all) == 7 and after_all == before_all, (before_all, after_all)
 
 
 def test_r_tui_058_9_entry_edit_with_a_non_string_symbol_paints_no_plain_line(
@@ -1268,7 +1494,7 @@ def test_r_tui_058_9_entry_edit_with_an_unknown_symbol_paints_no_plain_line(
         await attach_image(pilot, app, case08)
         await attach_a2l(pilot, app, case08)
         await show_screen(pilot, app, "6", "#patch_entry_edit_json_button")
-        await install_draft(pilot, app, envelope)
+        await install_draft(pilot, app, envelope, app.current_a2l_data)
         arm_a = await entry_json_confirm(pilot, app, log, 0, entry_with("NO_SUCH_TAG"))
         arm_b = await entry_json_confirm(pilot, app, log, 0, entry_with(NO_CTX))
         return arm_a, arm_b
