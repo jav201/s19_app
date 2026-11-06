@@ -634,8 +634,9 @@ async def _drive_state(tmp_path: Path, mem, width: str, join: str, conflict: str
 def test_r_crc_preview_001_2_coverage_field_state_matrix(
     tmp_path: Path, state: tuple
 ) -> None:
-    """Preview (R-CRC-PREVIEW-001.2, .4, .6, .7, .8) and coverage window
-    (R-CRC-PREVIEW-001.3, .5) over the field-state matrix: image (fixture /
+    """Preview (R-CRC-PREVIEW-001.2, R-CRC-PREVIEW-001.4, R-CRC-PREVIEW-001.6,
+    R-CRC-PREVIEW-001.7, R-CRC-PREVIEW-001.8) and coverage window
+    (R-CRC-PREVIEW-001.3, R-CRC-PREVIEW-001.5) over the field-state matrix: image (fixture /
     dirty) x Width (32 / 4) x Join gaps (concat / fill) x On conflict (abort /
     warn / ignore) = 24 states, plus the hostile Ranges state. Width is set
     first (a text edit, then a wait on the recompute), then the two dropdowns.

@@ -59,3 +59,7 @@ The host was not quiet — another session's `-n 4` lane ran throughout (load 3.
 - **Requirements-session records still describe the old state-line order.** `docs/requirements/review/S17-ears-strict.md:279` ("Partly: a guard file hides it") and `CODE-CHANGES.md` D17-27 predate the C-1 fix; the notice half of D17-27 (R-SEG-EXP.3) stays open. For the requirements session, not this record.
 - The serial runs were not on a quiet host (disclosed above; C-3 asked for one, and a pass under load is conservative for an upper bound).
 - Nothing was pushed; the records here are uncommitted and left for the orchestrator to commit.
+
+## Addendum (orchestrator, 2026-11-06)
+
+`trace_check --req inc-13/01-requirements.md inc-13/E1-slice.md --tests tests --base b7b77c4 --src s19_app`: `trace_check: 3 US, 24 active requirements (1 withdrawn), 0 gap(s)` after the orchestrator spelled out the abbreviated requirement ids (".4, .6, .7") in the docstring of `tests/test_b101_designer_recompute.py::test_r_crc_preview_001_2_coverage_field_state_matrix` (docstring text only). The record run above reported 4 TEST gaps for R-CRC-PREVIEW-001.4…001.7 for that reason.
