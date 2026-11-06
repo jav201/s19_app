@@ -1,0 +1,33 @@
+## host: LAN Linux host; worktree: <HOME>/work/s19_i11_base (pristine origin/main); date: 2026-11-06T00:39:17Z
+## git base: f9f3cb09 (no Inc 11 diff)
+s19_app.__file__ = <HOME>/work/s19_i11_base/s19_app/__init__.py
+python 3.11.18 textual 8.2.8
+## tree fingerprint: e3b0c44298fc1c14
+## cmd: pytest -q -p no:cacheprovider --basetemp /tmp/pytest-s19i11-108103 -n 6 -m "not serial_timing" tests/test_a2l_alignment_sizing.py tests/test_a2l_curve_description.py tests/test_a2l_enriched.py tests/test_a2l_f841_cleanup.py tests/test_a2l_inline_axis_length.py tests/test_a2l_missing_length_fix.py tests/test_a2l_multiline_headers.py tests/test_a2l_record_layout_address.py tests/test_a2l_record_layout_length.py tests/test_a2l_record_layout_walker.py tests/test_b100_a2l_progress.py tests/test_b100_document.py tests/test_b102_bulk_add.py tests/test_b102_patch_picker.py tests/test_b97_patch_editor.py tests/test_b99_a2l_encode.py tests/test_changes_symbol_entries.py tests/test_color_policy_round_trip.py tests/test_compare_service.py tests/test_examples_smoke.py tests/test_import_census.py tests/test_tui_a2l.py tests/test_tui_a2l_issue_recolor.py tests/test_tui_issues_view.py tests/test_tui_public_api.py tests/test_validation_engine.py tests/test_validation_service_supplemental.py tests/test_validation_a2l.py
+bringing up nodes...
+bringing up nodes...
+
+................................s...s................................... [ 14%]
+.................................................s...................... [ 28%]
+...s.........................................s..s....................... [ 42%]
+s....s.s....sss...........s....s...ss................................... [ 56%]
+........................................................................ [ 70%]
+.............................s.......................................... [ 84%]
+.............x..........x............................................... [ 99%]
+.....                                                                    [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_a2l_enriched.py:123: examples/check_test.a2l not present
+SKIPPED [1] tests/test_a2l_enriched.py:135: examples/software_a.a2l not present
+SKIPPED [1] tests/test_a2l_f841_cleanup.py:53: ruff is not installed in this environment (runtime-only)
+SKIPPED [6] tests/support/b100_links.py:30: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_document.py:1651: share-mode locks are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_document.py:1698: share-mode locks are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_document.py:1222: share-mode locks are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/support/b100_links.py:40: case-sensitive folders are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_document.py:1836: share-mode locks are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_document.py:1401: a case-folding filesystem is the Windows arm of this case
+SKIPPED [1] tests/test_b100_document.py:1027: share-mode locks are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_examples_smoke.py:120: case_08_release_demo: no S19/HEX image present
+490 passed, 17 skipped, 2 xfailed in 420.70s (0:07:00)
+## tree fingerprint: e3b0c44298fc1c14
+## exit: 0  end: 2026-11-06T00:46:18Z

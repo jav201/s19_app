@@ -1,0 +1,34 @@
+# E5 corrective mutant m-036-4-default0
+== start 2026-11-06T01:40:56Z fingerprint=3095a2c7fd8b4a6b
+s19_app.__file__ = <HOME>/work/s19_c11/s19_app/__init__.py
+baseline s19_app/tui/a2l.py e99d9e15da3f31160046889300ac41f0741ca917166ecea18da6f27c0d9f89a8
+APPLIED m-036-4-default0: s19_app/tui/a2l.py 74b1d874733e75a04a29cb4487645a21628985f96bae22e029e54b97da125b09
+== mutated fingerprint=68a36e6f68c03c01
+== cmd: pytest -q -p no:cacheprovider --tb=no -rf -n 4 tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[bad_size_placeholders-begin-line]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[none-begin-line]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[single-begin-line]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[split-begin-line]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[bad_size_placeholders-own-line]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[none-own-line]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[split-own-line]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[bad_address-begin-line]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[single-own-line]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[bad_address-own-line]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[negative_base-own-line]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[zero_size-begin-line]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[zero_size-own-line]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[negative_base-begin-line]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[quoted_words-own-line]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[quoted_words-begin-line]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[underscore-own-line]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[underscore-begin-line]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[nine_hex_digits-own-line]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[nine_hex_digits-begin-line]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[nine_hex_digits_small-own-line]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[nine_hex_digits_small-begin-line]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[non_ascii_digit-begin-line]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[non_ascii_digit-own-line]
+24 failed in 1.36s
+RESTORED m-036-4-default0: s19_app/tui/a2l.py e99d9e15da3f31160046889300ac41f0741ca917166ecea18da6f27c0d9f89a8 ok=True
+== end 2026-11-06T01:40:58Z fingerprint=3095a2c7fd8b4a6b

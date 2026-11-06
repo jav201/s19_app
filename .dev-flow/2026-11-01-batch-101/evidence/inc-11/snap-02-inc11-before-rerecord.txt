@@ -1,0 +1,349 @@
+=== snap11 run: inc11-tree ===
+date_utc: 2026-11-06T02:25Z
+platform: laptop host (LAN Linux), Linux 7.3.1
+python: Python 3.11.18
+s19_app.__file__: <HOME>/work/s19_snap11/s19_app/__init__.py
+textual: 8.2.8 pytest-textual-snapshot: 1.1.0 syrupy: 4.8.0
+HEAD: f9f3cb0973
+tree fingerprint (sha256 of git diff): 00ac31f8ee8681b1
+cmd: pytest tests/test_tui_snapshot.py -m snapshot -p no:cacheprovider --basetemp /tmp/pytest-s19snap11 -q -rf
+........F..F............FFFF.                                            [100%]
+=================================== FAILURES ===================================
+___________ test_tc016s_density_layout_snapshot[a2l-compact-160x40] ____________
+
+snap_compare = <function snap_compare.<locals>.compare at 0x7ff75c7209a0>
+public_triple = {'a2l': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.s19')}
+tmp_path = PosixPath('/tmp/pytest-s19snap11/test_tc016s_density_layout_sna8')
+screen = 'a2l', density = 'compact', size_key = '160x40'
+
+    @pytest.mark.skipif(
+        not snapshot_plugin_available,
+        reason="pytest-textual-snapshot not installed (dev-only optional extra)",
+    )
+    @pytest.mark.snapshot
+    @pytest.mark.parametrize("screen, density, size_key", _ALL_SNAPSHOT_CELLS)
+    def test_tc016s_density_layout_snapshot(
+        snap_compare,
+        public_triple: dict[str, Path],
+        tmp_path: Path,
+        screen: str,
+        density: str,
+        size_key: str,
+    ) -> None:
+        """Each Direction B screen matches its approved layout baseline (TC-016-S).
+    
+        Intent: LLR-007.1 — the SVG baseline is the primary verdict that every
+        Direction B screen lays out without overlapping or clipped panes in
+        both density modes across the fixed {80x24, 120x30, 160x40} matrix. A
+        layout-drift regression (a pane resized, a regime mis-toggled, a token
+        re-themed) changes the rendered SVG and fails the cell. LLR-007.2 — the
+        app renders only the public synthetic ``conftest.py`` generators; no
+        client artifact is opened.
+    
+        The 29-cell matrix: the 4 restyled screens carry the full
+        {density x size} grid (24 cells); the diff scaffold is pinned at 120x30
+        comfortable (1 cell); the patch and map scaffolds each carry 80x24 + 120x30
+        to lock, respectively, the batch-22 2x2 four-pane layout and the batch-27
+        minimap redesign + narrow-regime reflow at both regimes (4 cells).
+    
+        # AT-034a
+        # AT-034b
+        # TC-16s
+        """
+        width, height = _SIZES[size_key]
+        app = S19TuiApp(base_dir=tmp_path)
+>       assert snap_compare(
+            app,
+            terminal_size=(width, height),
+            run_before=_snapshot_run_before(screen, density, public_triple),
+        )
+E       AssertionError: assert False
+E        +  where False = <function snap_compare.<locals>.compare at 0x7ff75c7209a0>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}), terminal_size=(160, 40), run_before=<function _snapshot_run_before.<locals>.run_before at 0x7ff75ee4c7c0>)
+E        +    where <function _snapshot_run_before.<locals>.run_before at 0x7ff75ee4c7c0> = _snapshot_run_before('a2l', 'compact', {'a2l': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.s19')})
+
+tests/test_tui_snapshot.py:1220: AssertionError
+_________ test_tc016s_density_layout_snapshot[a2l-comfortable-160x40] __________
+
+snap_compare = <function snap_compare.<locals>.compare at 0x7ff75e2ebf60>
+public_triple = {'a2l': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.s19')}
+tmp_path = PosixPath('/tmp/pytest-s19snap11/test_tc016s_density_layout_sna11')
+screen = 'a2l', density = 'comfortable', size_key = '160x40'
+
+    @pytest.mark.skipif(
+        not snapshot_plugin_available,
+        reason="pytest-textual-snapshot not installed (dev-only optional extra)",
+    )
+    @pytest.mark.snapshot
+    @pytest.mark.parametrize("screen, density, size_key", _ALL_SNAPSHOT_CELLS)
+    def test_tc016s_density_layout_snapshot(
+        snap_compare,
+        public_triple: dict[str, Path],
+        tmp_path: Path,
+        screen: str,
+        density: str,
+        size_key: str,
+    ) -> None:
+        """Each Direction B screen matches its approved layout baseline (TC-016-S).
+    
+        Intent: LLR-007.1 — the SVG baseline is the primary verdict that every
+        Direction B screen lays out without overlapping or clipped panes in
+        both density modes across the fixed {80x24, 120x30, 160x40} matrix. A
+        layout-drift regression (a pane resized, a regime mis-toggled, a token
+        re-themed) changes the rendered SVG and fails the cell. LLR-007.2 — the
+        app renders only the public synthetic ``conftest.py`` generators; no
+        client artifact is opened.
+    
+        The 29-cell matrix: the 4 restyled screens carry the full
+        {density x size} grid (24 cells); the diff scaffold is pinned at 120x30
+        comfortable (1 cell); the patch and map scaffolds each carry 80x24 + 120x30
+        to lock, respectively, the batch-22 2x2 four-pane layout and the batch-27
+        minimap redesign + narrow-regime reflow at both regimes (4 cells).
+    
+        # AT-034a
+        # AT-034b
+        # TC-16s
+        """
+        width, height = _SIZES[size_key]
+        app = S19TuiApp(base_dir=tmp_path)
+>       assert snap_compare(
+            app,
+            terminal_size=(width, height),
+            run_before=_snapshot_run_before(screen, density, public_triple),
+        )
+E       AssertionError: assert False
+E        +  where False = <function snap_compare.<locals>.compare at 0x7ff75e2ebf60>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}), terminal_size=(160, 40), run_before=<function _snapshot_run_before.<locals>.run_before at 0x7ff75f439ee0>)
+E        +    where <function _snapshot_run_before.<locals>.run_before at 0x7ff75f439ee0> = _snapshot_run_before('a2l', 'comfortable', {'a2l': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.s19')})
+
+tests/test_tui_snapshot.py:1220: AssertionError
+__________ test_tc016s_density_layout_snapshot[map-comfortable-80x24] __________
+
+snap_compare = <function snap_compare.<locals>.compare at 0x7ff75f0839c0>
+public_triple = {'a2l': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.s19')}
+tmp_path = PosixPath('/tmp/pytest-s19snap11/test_tc016s_density_layout_sna24')
+screen = 'map', density = 'comfortable', size_key = '80x24'
+
+    @pytest.mark.skipif(
+        not snapshot_plugin_available,
+        reason="pytest-textual-snapshot not installed (dev-only optional extra)",
+    )
+    @pytest.mark.snapshot
+    @pytest.mark.parametrize("screen, density, size_key", _ALL_SNAPSHOT_CELLS)
+    def test_tc016s_density_layout_snapshot(
+        snap_compare,
+        public_triple: dict[str, Path],
+        tmp_path: Path,
+        screen: str,
+        density: str,
+        size_key: str,
+    ) -> None:
+        """Each Direction B screen matches its approved layout baseline (TC-016-S).
+    
+        Intent: LLR-007.1 — the SVG baseline is the primary verdict that every
+        Direction B screen lays out without overlapping or clipped panes in
+        both density modes across the fixed {80x24, 120x30, 160x40} matrix. A
+        layout-drift regression (a pane resized, a regime mis-toggled, a token
+        re-themed) changes the rendered SVG and fails the cell. LLR-007.2 — the
+        app renders only the public synthetic ``conftest.py`` generators; no
+        client artifact is opened.
+    
+        The 29-cell matrix: the 4 restyled screens carry the full
+        {density x size} grid (24 cells); the diff scaffold is pinned at 120x30
+        comfortable (1 cell); the patch and map scaffolds each carry 80x24 + 120x30
+        to lock, respectively, the batch-22 2x2 four-pane layout and the batch-27
+        minimap redesign + narrow-regime reflow at both regimes (4 cells).
+    
+        # AT-034a
+        # AT-034b
+        # TC-16s
+        """
+        width, height = _SIZES[size_key]
+        app = S19TuiApp(base_dir=tmp_path)
+>       assert snap_compare(
+            app,
+            terminal_size=(width, height),
+            run_before=_snapshot_run_before(screen, density, public_triple),
+        )
+E       AssertionError: assert False
+E        +  where False = <function snap_compare.<locals>.compare at 0x7ff75f0839c0>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}), terminal_size=(80, 24), run_before=<function _snapshot_run_before.<locals>.run_before at 0x7ff75b5d0ea0>)
+E        +    where <function _snapshot_run_before.<locals>.run_before at 0x7ff75b5d0ea0> = _snapshot_run_before('map', 'comfortable', {'a2l': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.s19')})
+
+tests/test_tui_snapshot.py:1220: AssertionError
+_________ test_tc016s_density_layout_snapshot[map-comfortable-120x30] __________
+
+snap_compare = <function snap_compare.<locals>.compare at 0x7ff75be5e7a0>
+public_triple = {'a2l': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.s19')}
+tmp_path = PosixPath('/tmp/pytest-s19snap11/test_tc016s_density_layout_sna25')
+screen = 'map', density = 'comfortable', size_key = '120x30'
+
+    @pytest.mark.skipif(
+        not snapshot_plugin_available,
+        reason="pytest-textual-snapshot not installed (dev-only optional extra)",
+    )
+    @pytest.mark.snapshot
+    @pytest.mark.parametrize("screen, density, size_key", _ALL_SNAPSHOT_CELLS)
+    def test_tc016s_density_layout_snapshot(
+        snap_compare,
+        public_triple: dict[str, Path],
+        tmp_path: Path,
+        screen: str,
+        density: str,
+        size_key: str,
+    ) -> None:
+        """Each Direction B screen matches its approved layout baseline (TC-016-S).
+    
+        Intent: LLR-007.1 — the SVG baseline is the primary verdict that every
+        Direction B screen lays out without overlapping or clipped panes in
+        both density modes across the fixed {80x24, 120x30, 160x40} matrix. A
+        layout-drift regression (a pane resized, a regime mis-toggled, a token
+        re-themed) changes the rendered SVG and fails the cell. LLR-007.2 — the
+        app renders only the public synthetic ``conftest.py`` generators; no
+        client artifact is opened.
+    
+        The 29-cell matrix: the 4 restyled screens carry the full
+        {density x size} grid (24 cells); the diff scaffold is pinned at 120x30
+        comfortable (1 cell); the patch and map scaffolds each carry 80x24 + 120x30
+        to lock, respectively, the batch-22 2x2 four-pane layout and the batch-27
+        minimap redesign + narrow-regime reflow at both regimes (4 cells).
+    
+        # AT-034a
+        # AT-034b
+        # TC-16s
+        """
+        width, height = _SIZES[size_key]
+        app = S19TuiApp(base_dir=tmp_path)
+>       assert snap_compare(
+            app,
+            terminal_size=(width, height),
+            run_before=_snapshot_run_before(screen, density, public_triple),
+        )
+E       AssertionError: assert False
+E        +  where False = <function snap_compare.<locals>.compare at 0x7ff75be5e7a0>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}), terminal_size=(120, 30), run_before=<function _snapshot_run_before.<locals>.run_before at 0x7ff75ac87ec0>)
+E        +    where <function _snapshot_run_before.<locals>.run_before at 0x7ff75ac87ec0> = _snapshot_run_before('map', 'comfortable', {'a2l': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.s19')})
+
+tests/test_tui_snapshot.py:1220: AssertionError
+_________ test_tc016s_density_layout_snapshot[patch-comfortable-80x24] _________
+
+snap_compare = <function snap_compare.<locals>.compare at 0x7ff75ac1f600>
+public_triple = {'a2l': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.s19')}
+tmp_path = PosixPath('/tmp/pytest-s19snap11/test_tc016s_density_layout_sna26')
+screen = 'patch', density = 'comfortable', size_key = '80x24'
+
+    @pytest.mark.skipif(
+        not snapshot_plugin_available,
+        reason="pytest-textual-snapshot not installed (dev-only optional extra)",
+    )
+    @pytest.mark.snapshot
+    @pytest.mark.parametrize("screen, density, size_key", _ALL_SNAPSHOT_CELLS)
+    def test_tc016s_density_layout_snapshot(
+        snap_compare,
+        public_triple: dict[str, Path],
+        tmp_path: Path,
+        screen: str,
+        density: str,
+        size_key: str,
+    ) -> None:
+        """Each Direction B screen matches its approved layout baseline (TC-016-S).
+    
+        Intent: LLR-007.1 — the SVG baseline is the primary verdict that every
+        Direction B screen lays out without overlapping or clipped panes in
+        both density modes across the fixed {80x24, 120x30, 160x40} matrix. A
+        layout-drift regression (a pane resized, a regime mis-toggled, a token
+        re-themed) changes the rendered SVG and fails the cell. LLR-007.2 — the
+        app renders only the public synthetic ``conftest.py`` generators; no
+        client artifact is opened.
+    
+        The 29-cell matrix: the 4 restyled screens carry the full
+        {density x size} grid (24 cells); the diff scaffold is pinned at 120x30
+        comfortable (1 cell); the patch and map scaffolds each carry 80x24 + 120x30
+        to lock, respectively, the batch-22 2x2 four-pane layout and the batch-27
+        minimap redesign + narrow-regime reflow at both regimes (4 cells).
+    
+        # AT-034a
+        # AT-034b
+        # TC-16s
+        """
+        width, height = _SIZES[size_key]
+        app = S19TuiApp(base_dir=tmp_path)
+>       assert snap_compare(
+            app,
+            terminal_size=(width, height),
+            run_before=_snapshot_run_before(screen, density, public_triple),
+        )
+E       AssertionError: assert False
+E        +  where False = <function snap_compare.<locals>.compare at 0x7ff75ac1f600>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}), terminal_size=(80, 24), run_before=<function _snapshot_run_before.<locals>.run_before at 0x7ff75fd7dc60>)
+E        +    where <function _snapshot_run_before.<locals>.run_before at 0x7ff75fd7dc60> = _snapshot_run_before('patch', 'comfortable', {'a2l': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.s19')})
+
+tests/test_tui_snapshot.py:1220: AssertionError
+________ test_tc016s_density_layout_snapshot[patch-comfortable-120x30] _________
+
+snap_compare = <function snap_compare.<locals>.compare at 0x7ff75bb73e20>
+public_triple = {'a2l': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.s19')}
+tmp_path = PosixPath('/tmp/pytest-s19snap11/test_tc016s_density_layout_sna27')
+screen = 'patch', density = 'comfortable', size_key = '120x30'
+
+    @pytest.mark.skipif(
+        not snapshot_plugin_available,
+        reason="pytest-textual-snapshot not installed (dev-only optional extra)",
+    )
+    @pytest.mark.snapshot
+    @pytest.mark.parametrize("screen, density, size_key", _ALL_SNAPSHOT_CELLS)
+    def test_tc016s_density_layout_snapshot(
+        snap_compare,
+        public_triple: dict[str, Path],
+        tmp_path: Path,
+        screen: str,
+        density: str,
+        size_key: str,
+    ) -> None:
+        """Each Direction B screen matches its approved layout baseline (TC-016-S).
+    
+        Intent: LLR-007.1 — the SVG baseline is the primary verdict that every
+        Direction B screen lays out without overlapping or clipped panes in
+        both density modes across the fixed {80x24, 120x30, 160x40} matrix. A
+        layout-drift regression (a pane resized, a regime mis-toggled, a token
+        re-themed) changes the rendered SVG and fails the cell. LLR-007.2 — the
+        app renders only the public synthetic ``conftest.py`` generators; no
+        client artifact is opened.
+    
+        The 29-cell matrix: the 4 restyled screens carry the full
+        {density x size} grid (24 cells); the diff scaffold is pinned at 120x30
+        comfortable (1 cell); the patch and map scaffolds each carry 80x24 + 120x30
+        to lock, respectively, the batch-22 2x2 four-pane layout and the batch-27
+        minimap redesign + narrow-regime reflow at both regimes (4 cells).
+    
+        # AT-034a
+        # AT-034b
+        # TC-16s
+        """
+        width, height = _SIZES[size_key]
+        app = S19TuiApp(base_dir=tmp_path)
+>       assert snap_compare(
+            app,
+            terminal_size=(width, height),
+            run_before=_snapshot_run_before(screen, density, public_triple),
+        )
+E       AssertionError: assert False
+E        +  where False = <function snap_compare.<locals>.compare at 0x7ff75bb73e20>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}), terminal_size=(120, 30), run_before=<function _snapshot_run_before.<locals>.run_before at 0x7ff75c303f60>)
+E        +    where <function _snapshot_run_before.<locals>.run_before at 0x7ff75c303f60> = _snapshot_run_before('patch', 'comfortable', {'a2l': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-s19snap11/snapshot_public0/snap.s19')})
+
+tests/test_tui_snapshot.py:1220: AssertionError
+Textual Snapshot Report
+
+6 mismatched snapshots
+
+View the failure report.
+
+<HOME>/work/s19_snap11/snapshot_report.html
+
+--------------------------- snapshot report summary ----------------------------
+6 snapshots failed. 23 snapshots passed.
+=========================== short test summary info ============================
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-compact-160x40]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[a2l-comfortable-160x40]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[map-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[map-comfortable-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-120x30]
+6 failed, 23 passed, 4 deselected in 119.89s (0:01:59)
+exit: 1
+tree fingerprint at end: 00ac31f8ee8681b1

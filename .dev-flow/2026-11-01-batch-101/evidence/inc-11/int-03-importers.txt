@@ -1,0 +1,220 @@
+## host: LAN Linux host; worktree: <HOME>/work/s19_i11; date: 2026-11-06T00:03:57Z
+## git base: f9f3cb09 + Inc 11 branch diff (b7b77c4..b101-inc11) applied
+s19_app.__file__ = <HOME>/work/s19_i11/s19_app/__init__.py
+python 3.11.18 textual 8.2.8
+## cmd: pytest -q -p no:cacheprovider --basetemp /tmp/pytest-s19i11-93312 -n 6 -m "not serial_timing" tests/test_a2l_alignment_sizing.py tests/test_a2l_curve_description.py tests/test_a2l_enriched.py tests/test_a2l_f841_cleanup.py tests/test_a2l_inline_axis_length.py tests/test_a2l_missing_length_fix.py tests/test_a2l_multiline_headers.py tests/test_a2l_record_layout_address.py tests/test_a2l_record_layout_length.py tests/test_a2l_record_layout_walker.py tests/test_b100_a2l_progress.py tests/test_b100_document.py tests/test_b102_bulk_add.py tests/test_b102_patch_picker.py tests/test_b97_patch_editor.py tests/test_b99_a2l_encode.py tests/test_changes_symbol_entries.py tests/test_color_policy_round_trip.py tests/test_compare_service.py tests/test_examples_smoke.py tests/test_import_census.py tests/test_tui_a2l.py tests/test_tui_a2l_issue_recolor.py tests/test_tui_issues_view.py tests/test_tui_public_api.py tests/test_validation_engine.py tests/test_validation_service_supplemental.py tests/test_validation_a2l.py
+bringing up nodes...
+bringing up nodes...
+
+.........................s...s.......................................... [ 14%]
+.......................s................................................ [ 28%]
+.....................s.......................s..s......................s [ 42%]
+....s....sss.s..............s...ss....s.....................F........... [ 56%]
+........................................................................ [ 70%]
+.......................s................................................ [ 84%]
+..............x..........x.............................................. [ 99%]
+.....                                                                    [100%]
+=================================== FAILURES ===================================
+_ test_tc_b100_52_project_install_step_is_painted_before_the_install[case_06] __
+[gw5] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19i11-93312/popen-gw5/test_tc_b100_52_project_instal0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f6a535bbc50>
+case = 'case_06'
+
+    @pytest.mark.parametrize("case", ["case_06", "case_01"])
+    def test_tc_b100_52_project_install_step_is_painted_before_the_install(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, case: str
+    ) -> None:
+        """LLR-176.3 (project arm, and the small arm) (P1-26): a project of the
+        case's image, MAC and A2L → a read of ``#status_text`` scheduled right
+        after the ``project_load`` step-4 call reads ``<glyph> Loading project
+        P · step 4/4 Install · <mm:ss>`` and the install had not started
+        (``_install_prepared_project`` not entered).
+    
+        Why: the install is the main-thread step of a project load; painted
+        after it, the user would never see it named.
+        Negative control: an install called directly → the read sees
+        ``Loaded project 'P' -> …`` → RED (base: the install runs in the frame
+        of step 4)."""
+        seen: list = []
+        started = {"install": False}
+        _probe_step(monkeypatch, "project_load", 4, seen, started)
+        real_install = getattr(S19TuiApp, "_install_prepared_project", None)
+    
+        if real_install is not None:
+            def _install(app, *a, **k):
+                started["install"] = True
+                return real_install(app, *a, **k)
+    
+            monkeypatch.setattr(S19TuiApp, "_install_prepared_project", _install)
+        else:
+            real_apply = S19TuiApp._apply_loaded_file
+    
+            def _apply(app, *a, **k):
+                started["install"] = True
+                return real_apply(app, *a, **k)
+    
+            monkeypatch.setattr(S19TuiApp, "_apply_loaded_file", _apply)
+    
+        source = CASE06 if case == "case_06" else ROOT / "examples" / "case_01_basic_valid"
+        base = tmp_path / "app"
+        project = base / WORKAREA_DIRNAME / WORKAREA_SUBDIR / "P"
+        project.mkdir(parents=True)
+        for name in ("firmware.s19", "firmware.mac", "firmware.a2l"):
+            shutil.copyfile(source / name, project / name)
+    
+        async def scenario(app, pilot, log):
+            app._handle_load_project("P")
+            for _ in range(6000):
+                if app.current_project == "P" and not app._busy.runs:
+                    break
+                await pilot.pause(0.02)
+            await settle_workers(pilot)
+            return list(seen)
+    
+>       got = projects.run_app(base, scenario, size=SIZE)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b100_a2l_progress.py:357: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<CONDA>/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<CONDA>/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<CONDA>/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b100_a2l_progress.py:354: in scenario
+    await settle_workers(pilot)
+tests/support/b100_workers.py:27: in settle_workers
+    await pilot.pause()
+<CONDA>/envs/s19ci/lib/python3.11/site-packages/textual/pilot.py:542: in pause
+    await self._wait_for_screen()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+timeout = 30.0
+
+    async def _wait_for_screen(self, timeout: float = 30.0) -> bool:
+        """Wait for the current screen and its children to have processed all pending events.
+    
+        Args:
+            timeout: A timeout in seconds to wait.
+    
+        Returns:
+            `True` if all events were processed. `False` if an exception occurred,
+            meaning that not all events could be processed.
+    
+        Raises:
+            WaitForScreenTimeout: If the screen and its children didn't finish processing within the timeout.
+        """
+        try:
+            screen = self.app.screen
+        except Exception:
+            return False
+        children = [self.app, *screen.walk_children(with_self=True)]
+        count = 0
+        count_zero_event = asyncio.Event()
+    
+        def decrement_counter() -> None:
+            """Decrement internal counter, and set an event if it reaches zero."""
+            nonlocal count
+            count -= 1
+            if count == 0:
+                # When count is zero, all messages queued at the start of the method have been processed
+                count_zero_event.set()
+    
+        # Increase the count for every successful call_later
+        for child in children:
+            if child.call_later(decrement_counter):
+                count += 1
+    
+        if count:
+            # Wait for the count to return to zero, or a timeout, or an exception
+            wait_for = [
+                asyncio.create_task(count_zero_event.wait()),
+                asyncio.create_task(self.app._exception_event.wait()),
+            ]
+            _, pending = await asyncio.wait(
+                wait_for,
+                timeout=timeout,
+                return_when=asyncio.FIRST_COMPLETED,
+            )
+    
+            for task in pending:
+                task.cancel()
+    
+            timed_out = len(wait_for) == len(pending)
+            if timed_out:
+>               raise WaitForScreenTimeout(
+                    "Timed out while waiting for widgets to process pending messages."
+                )
+E               textual.pilot.WaitForScreenTimeout: Timed out while waiting for widgets to process pending messages.
+
+<CONDA>/envs/s19ci/lib/python3.11/site-packages/textual/pilot.py:524: WaitForScreenTimeout
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2991 App initialized. base_dir=/tmp/pytest-s19i11-93312/popen-gw5/test_tc_b100_52_project_instal0/app workarea=/tmp/pytest-s19i11-93312/popen-gw5/test_tc_b100_52_project_instal0/app/.s19tool/workarea
+INFO     s19tui:app.py:8318 Workarea refreshed. files=0
+INFO     s19tui:app.py:16571 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.032
+WARNING  s19tui:app.py:13895 Project P: no project.json project.json (None)
+INFO     s19tui:app.py:944 A2L cache miss: path=/tmp/pytest-s19i11-93312/popen-gw5/test_tc_b100_52_project_instal0/app/.s19tool/workarea/P/firmware.a2l size_bytes=36702962
+INFO     s19tui:app.py:14137 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18639 Load summary: file_type=s19 path=/tmp/pytest-s19i11-93312/popen-gw5/test_tc_b100_52_project_instal0/app/.s19tool/workarea/P/firmware.s19 addresses=1105 range_count=2 range_bytes=1105 errors=0
+INFO     s19tui:app.py:14154 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:14137 Load phase boundary: parse_branch_entry path=firmware.mac suffix=.mac
+INFO     s19tui:app.py:16824 Load phase boundary: mac_parse_entry path=firmware.mac
+INFO     s19tui:app.py:16830 Load phase boundary: mac_parse_done path=firmware.mac rows=4 diagnostics=4 elapsed=0.000s
+INFO     s19tui:app.py:16844 MAC parse summary (mirrored): path=/tmp/pytest-s19i11-93312/popen-gw5/test_tc_b100_52_project_instal0/app/.s19tool/workarea/P/firmware.mac rows=4 parse_ok=0 diagnostics=4 valid_addresses=0
+INFO     s19tui:app.py:16865 Load phase boundary: mac_a2l_resolve_entry path=firmware.mac a2l_path=/tmp/pytest-s19i11-93312/popen-gw5/test_tc_b100_52_project_instal0/app/.s19tool/workarea/P/firmware.a2l
+INFO     s19tui:app.py:16871 Load phase boundary: mac_a2l_resolve_done path=firmware.mac has_a2l_data=True
+INFO     s19tui:app.py:16877 MAC parse summary: path=/tmp/pytest-s19i11-93312/popen-gw5/test_tc_b100_52_project_instal0/app/.s19tool/workarea/P/firmware.mac total_records=4 parse_ok=0 diagnostics=4 valid_addresses=0 a2l_path=/tmp/pytest-s19i11-93312/popen-gw5/test_tc_b100_52_project_instal0/app/.s19tool/workarea/P/firmware.a2l elapsed_seconds=0.000
+INFO     s19tui:app.py:14179 Load phase boundary: mac_merge_entry path=firmware.mac has_primary=True
+INFO     s19tui:app.py:14186 Load phase boundary: mac_merge_done path=firmware.mac file_type=s19
+INFO     s19tui:app.py:18639 Load summary: file_type=s19+mac path=/tmp/pytest-s19i11-93312/popen-gw5/test_tc_b100_52_project_instal0/app/.s19tool/workarea/P/firmware.mac addresses=1105 range_count=2 range_bytes=1105 errors=0
+INFO     s19tui:app.py:14208 Load phase boundary: parse_branch_done path=firmware.mac branch=mac
+INFO     s19tui:app.py:18100 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:18100 Load phase boundary: apply_install_state path=firmware.mac precomputed=False
+INFO     s19tui:app.py:14090 Project loaded. name=P file=/tmp/pytest-s19i11-93312/popen-gw5/test_tc_b100_52_project_instal0/app/.s19tool/workarea/P/firmware.s19 mac=/tmp/pytest-s19i11-93312/popen-gw5/test_tc_b100_52_project_instal0/app/.s19tool/workarea/P/firmware.mac
+INFO     s19tui:app.py:18767 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18116 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18767 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18116 Load phase boundary: apply_sections_done path=firmware.mac
+INFO     s19tui:app.py:18128 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:18128 Load phase boundary: apply_hex_done path=firmware.mac
+INFO     s19tui:app.py:17660 MAC validation computed: records=4 issues=419244 elapsed_seconds=13.083
+INFO     s19tui:app.py:17715 MAC row cache built: records=4 elapsed_seconds=13.692
+INFO     s19tui:app.py:16603 Load phase boundary: populate_issues_table_done rows=40 total=419244 elapsed=1.124
+INFO     s19tui:app.py:19352 Load phase boundary: populate_mac_table_done rows=4 total=4 elapsed=14.837
+INFO     s19tui:app.py:19828 Load phase boundary: populate_a2l_table_done rows=200 total=220040 elapsed=0.171
+INFO     s19tui:app.py:18141 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:16603 Load phase boundary: populate_issues_table_done rows=40 total=419244 elapsed=1.254
+INFO     s19tui:app.py:19352 Load phase boundary: populate_mac_table_done rows=4 total=4 elapsed=1.270
+INFO     s19tui:app.py:19828 Load phase boundary: populate_a2l_table_done rows=200 total=220040 elapsed=0.172
+INFO     s19tui:app.py:18141 Load phase boundary: apply_a2l_done path=firmware.mac
+INFO     s19tui:app.py:18994 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18158 Loaded file successfully: path=/tmp/pytest-s19i11-93312/popen-gw5/test_tc_b100_52_project_instal0/app/.s19tool/workarea/P/firmware.s19 file_type=s19 elapsed_seconds=34.916 has_mac=False precomputed=False
+=========================== short test summary info ============================
+FAILED tests/test_b100_a2l_progress.py::test_tc_b100_52_project_install_step_is_painted_before_the_install[case_06]
+SKIPPED [1] tests/test_a2l_enriched.py:123: examples/check_test.a2l not present
+SKIPPED [1] tests/test_a2l_enriched.py:135: examples/software_a.a2l not present
+SKIPPED [1] tests/test_a2l_f841_cleanup.py:53: ruff is not installed in this environment (runtime-only)
+SKIPPED [6] tests/support/b100_links.py:30: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_document.py:1651: share-mode locks are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_document.py:1698: share-mode locks are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/support/b100_links.py:40: case-sensitive folders are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_document.py:1836: share-mode locks are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_document.py:1222: share-mode locks are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_document.py:1027: share-mode locks are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_document.py:1401: a case-folding filesystem is the Windows arm of this case
+SKIPPED [1] tests/test_examples_smoke.py:120: case_08_release_demo: no S19/HEX image present
+1 failed, 489 passed, 17 skipped, 2 xfailed in 442.88s (0:07:22)
+## exit: 1  end: 2026-11-06T00:11:21Z

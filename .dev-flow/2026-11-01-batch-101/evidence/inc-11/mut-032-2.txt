@@ -1,0 +1,80 @@
+# mutant 032.2 (R-VAL-032.2)
+# mutation: drop AXIS_DESCR from the recognized names -> demo gives 100 issues
+# apply output:
+APPLIED 032.2
+a2l.py e99d9e15da3f31160046889300ac41f0741ca917166ecea18da6f27c0d9f89a8
+app.py c3197405780f9d871045c8ba3e6684681d6eb95eaa912b2e995a664d208d9fe3
+issues_view.py f543a58ecc7274d03adf3dd95a6c670187242ad6225ebbcf5206236012c1dd3a
+rules.py 5ecd89692f9b773f259c9347230dc7d8e9b10df746df389946d0cbead4b40f93
+
+# restore verify ok=True:
+a2l.py e99d9e15da3f31160046889300ac41f0741ca917166ecea18da6f27c0d9f89a8
+app.py c3197405780f9d871045c8ba3e6684681d6eb95eaa912b2e995a664d208d9fe3
+issues_view.py f543a58ecc7274d03adf3dd95a6c670187242ad6225ebbcf5206236012c1dd3a
+rules.py d3fd869193b6a207040d67c75cdc3d03b88115a9938715732131759640081130
+
+# command: cd ~/work/s19_m11 && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 900 ~/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -n 2 --basetemp /tmp/pytest-s19m11 tests/test_b101_a2l_blocks_and_segments.py::test_r_val_032_2_asam_block_names_raise_nothing tests/test_synth_release_case.py::test_a2l_zero_issues
+# exit=1
+
+bringing up nodes...
+bringing up nodes...
+
+....................................F.........................F          [100%]
+=================================== FAILURES ===================================
+_________ test_r_val_032_2_asam_block_names_raise_nothing[AXIS_DESCR] __________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m11/popen-gw0/test_r_val_032_2_asam_block_na4')
+name = 'AXIS_DESCR'
+
+    @pytest.mark.parametrize("name", ASAM_BLOCK_NAMES)
+    def test_r_val_032_2_asam_block_names_raise_nothing(tmp_path: Path, name: str) -> None:
+        """Why: a standard block is not a finding. 62/62 names give 0 unrecognized issues."""
+        issues = _issues(tmp_path, [f"/begin {name}", f"/end {name}"])
+>       assert _unrecognized(issues) == [], [(i.code, i.message) for i in issues]
+E       AssertionError: [('A2L_UNRECOGNIZED_BLOCK', "Unrecognized A2L block 'AXIS_DESCR'.")]
+E       assert [ValidationIs..., details={})] == []
+E         
+E         Left contains one more item: ValidationIssue(code='A2L_UNRECOGNIZED_BLOCK', severity=<ValidationSeverity.WARNING: 'warning'>, message="Unrecognized A2L block 'AXIS_DESCR'.", artifact='a2l', symbol=None, address=None, line_number=3, related_artifacts=[], details={})
+E         Use -v to get more diff
+
+tests/test_b101_a2l_blocks_and_segments.py:172: AssertionError
+_____________________________ test_a2l_zero_issues _____________________________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+case_dir = PosixPath('/tmp/pytest-s19m11/popen-gw0/synth_case0')
+
+    def test_a2l_zero_issues(case_dir: Path) -> None:
+        """A2L parses and validates with zero issues through the app's functions."""
+        s19, mem, _ranges, _overlap, a2l, checks, _mac = _load_clean(case_dir)
+    
+        assert a2l["errors"] == []
+        tags = a2l["tags"]
+        assert sum(1 for t in tags if t["section"] == "CHARACTERISTIC") >= 300
+        assert sum(1 for t in tags if t["section"] == "MEASUREMENT") >= 100
+    
+        assert all(t["schema_ok"] for t in checks)
+        assert all(t["in_memory"] for t in checks if t["memory_checked"])
+        assert not any(t.get("decode_error") for t in checks)
+        assert not any(t.get("value_outside_limits") for t in checks)
+    
+        # Batch-101 Inc 11 (R-VAL-032.2): MOD_COMMON / MOD_PAR / AXIS_DESCR are ASAM
+        # block names, so the clean demo's A2L raises no issue at all (base: 102
+        # A2L_UNRECOGNIZED_BLOCK). `== []` replaces the former "all unrecognized"
+        # assertion, which would pass vacuously on an empty list.
+        issues = validate_a2l_internal_issues(a2l, tag_checks=checks)
+>       assert issues == [], [(issue.code, issue.message) for issue in issues[:5]]
+E       AssertionError: [('A2L_UNRECOGNIZED_BLOCK', "Unrecognized A2L block 'AXIS_DESCR'."), ('A2L_UNRECOGNIZED_BLOCK', "Unrecognized A2L bloc...ED_BLOCK', "Unrecognized A2L block 'AXIS_DESCR'."), ('A2L_UNRECOGNIZED_BLOCK', "Unrecognized A2L block 'AXIS_DESCR'.")]
+E       assert [ValidationIs...ails={}), ...] == []
+E         
+E         Left contains 100 more items, first extra item: ValidationIssue(code='A2L_UNRECOGNIZED_BLOCK', severity=<ValidationSeverity.WARNING: 'warning'>, message="Unrecognized A2L block 'AXIS_DESCR'.", artifact='a2l', symbol=None, address=None, line_number=1538, related_artifacts=[], details={})
+E         Use -v to get more diff
+
+tests/test_synth_release_case.py:128: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_val_032_2_asam_block_names_raise_nothing[AXIS_DESCR]
+FAILED tests/test_synth_release_case.py::test_a2l_zero_issues - AssertionErro...
+2 failed, 61 passed in 2.22s
+
+# --- stderr ---
+

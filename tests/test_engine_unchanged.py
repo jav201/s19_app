@@ -134,6 +134,10 @@ _ENGINE_PATHS: list[str] = [
     # re-frozen by the same increment (LLR-176.4b). On the increment branch
     # TC-027 compares against ``main``, where a2l.py differs until the merge,
     # so its full run is owed after the merge.
+    # UNFROZEN for batch-101 Inc 11 (ruling OR-3, planned at P0): `validation/rules.py`
+    # (ASAM block names, IF_DATA exemption) and `tui/a2l.py` (MEMORY_SEGMENT reader,
+    # CURVE index note) change by plan. This test is RED on the Inc 11 branch and GREEN
+    # again once the merge puts the new bytes on ``main`` (re-freeze by merge).
     "s19_app/tui/a2l.py",
     "s19_app/tui/mac.py",
 ]

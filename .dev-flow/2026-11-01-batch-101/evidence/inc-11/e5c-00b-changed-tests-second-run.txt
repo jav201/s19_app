@@ -1,0 +1,100 @@
+## E5 corrective (batch-101 Inc 11); host: LAN Linux host 2; worktree: <HOME>/work/s19_c11 = origin/main f9f3cb09 + git diff b7b77c4 of the local branch (s19_app tests docs) applied uncommitted; second run of the two fixed tests (colour: detail span is foreground by design, assertion narrowed to row + chip) - superseded
+== start 2026-11-06T01:34:38Z fingerprint=29e5663c6ba0dedc
+s19_app.__file__ = <HOME>/work/s19_c11/s19_app/__init__.py
+python 3.11.18 textual 8.2.8
+== cmd: pytest -q -p no:cacheprovider -n 2 tests/test_b101_issues_severity_view.py::test_r_tui_042b_4_unrecognized_block_rows_paint_warning tests/test_b101_inc11_acceptance.py::test_at_i11_5_curve_description_index_note_once
+bringing up nodes...
+bringing up nodes...
+
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+___________ test_r_tui_042b_4_unrecognized_block_rows_paint_warning ____________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19c11/popen-gw0/test_r_tui_042b_4_unrecognized0')
+
+    def test_r_tui_042b_4_unrecognized_block_rows_paint_warning(tmp_path: Path) -> None:
+        """Why: the row carries the colour class of its severity (base: sev-info), and the
+        colour it is painted in is the warning colour #f6ff8f (C-4, E5): the class alone is
+        not the painted style."""
+    
+        async def drive(app, pilot) -> None:
+            rows = [r for _, rs in _layout(app) for r in rs if r.issue.code == UNRECOGNIZED]
+            assert len(rows) == 3
+            assert all(r.has_class("sev-warning") for r in rows), [r.classes for r in rows]
+            assert not any(r.has_class("sev-info") for r in rows)
+            # A row is queryable one frame before its compose children exist (SR-2, E4).
+            await wait_until(
+                pilot,
+                lambda: all(
+                    len(list(r.query(".issue-code-chip"))) == 1 and len(list(r.query(".issue-detail"))) == 1
+                    for r in rows
+                ),
+                "the three rows composed",
+            )
+            painted = [
+                (
+                    _hex(r.styles.color),
+                    _hex(r.query_one(".issue-code-chip").styles.color),
+                    _hex(r.query_one(".issue-detail").styles.color),
+                )
+                for r in rows
+            ]
+            assert painted == [(WARNING_COLOUR,) * 3] * 3, painted
+    
+>       _run(tmp_path, _list_l4(), drive)
+
+tests/test_b101_issues_severity_view.py:237: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_issues_severity_view.py:149: in _run
+    asyncio.run(_go())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b101_issues_severity_view.py:147: in _go
+    await drive(app, pilot)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+
+    async def drive(app, pilot) -> None:
+        rows = [r for _, rs in _layout(app) for r in rs if r.issue.code == UNRECOGNIZED]
+        assert len(rows) == 3
+        assert all(r.has_class("sev-warning") for r in rows), [r.classes for r in rows]
+        assert not any(r.has_class("sev-info") for r in rows)
+        # A row is queryable one frame before its compose children exist (SR-2, E4).
+        await wait_until(
+            pilot,
+            lambda: all(
+                len(list(r.query(".issue-code-chip"))) == 1 and len(list(r.query(".issue-detail"))) == 1
+                for r in rows
+            ),
+            "the three rows composed",
+        )
+        painted = [
+            (
+                _hex(r.styles.color),
+                _hex(r.query_one(".issue-code-chip").styles.color),
+                _hex(r.query_one(".issue-detail").styles.color),
+            )
+            for r in rows
+        ]
+>       assert painted == [(WARNING_COLOUR,) * 3] * 3, painted
+E       AssertionError: [('#F6FF8F', '#F6FF8F', '#FFFFFF'), ('#F6FF8F', '#F6FF8F', '#FFFFFF'), ('#F6FF8F', '#F6FF8F', '#FFFFFF')]
+E       assert [('#F6FF8F', ...', '#FFFFFF')] == [('#F6FF8F', ...', '#F6FF8F')]
+E         
+E         At index 0 diff: ('#F6FF8F', '#F6FF8F', '#FFFFFF') != ('#F6FF8F', '#F6FF8F', '#F6FF8F')
+E         Use -v to get more diff
+
+tests/test_b101_issues_severity_view.py:235: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_issues_severity_view.py::test_r_tui_042b_4_unrecognized_block_rows_paint_warning
+1 failed, 1 passed in 258.79s (0:04:18)
+== exit 1 end 2026-11-06T01:38:58Z fingerprint=29e5663c6ba0dedc

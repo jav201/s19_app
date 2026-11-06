@@ -116,24 +116,28 @@ EXAMPLE_PRG = (
 )
 
 #: The batch-95 demo A2L segments (the extracted rows the round signed on),
-#: injected as parsed-A2L sections (the hardened extractor's input shape).
+#: injected as parsed-A2L sections (the hardened extractor's input shape). Batch-101
+#: Inc 11 (E3 A-2): the record lines are rewritten to the real ASAM shape of
+#: ``examples/case_00_public/memorysegment.a2l`` (``CODE FLASH INTERN <address> <size>
+#: -1 -1 -1 -1 -1``); the old ``CODE FLASH 0x0 <address> <size> 0x0`` is not an ASAM
+#: record, and the anchored reader would take base 0x0 and size = the address.
 DEMO_A2L_SECTIONS = [
     {
         "name": "MEMORY_SEGMENT",
-        "meta": "'AscetCode'",
-        "lines": ["CODE FLASH 0x0 0x08000000 0xF800 0x0"],
+        "meta": "AscetCode \"\"",
+        "lines": ["CODE FLASH INTERN 0x08000000 0x0000F800 -1 -1 -1 -1 -1"],
         "children": [],
     },
     {
         "name": "MEMORY_SEGMENT",
-        "meta": "'AscetCalibrationRom'",
-        "lines": ["DATA ROM 0x0 0x0800F800 0x800 0x0"],
+        "meta": "AscetCalibrationRom \"\"",
+        "lines": ["DATA ROM INTERN 0x0800F800 0x00000800 -1 -1 -1 -1 -1"],
         "children": [],
     },
     {
         "name": "MEMORY_SEGMENT",
-        "meta": "'Variables'",
-        "lines": ["DATA RAM 0x0 0x20000000 0x2800 0x0"],
+        "meta": "Variables \"\"",
+        "lines": ["DATA RAM INTERN 0x20000000 0x00002800 -1 -1 -1 -1 -1"],
         "children": [],
     },
 ]
@@ -1211,8 +1215,8 @@ def test_tc710_split_from_each_source_naming(tmp_path: Path) -> None:
             sections = [
                 {
                     "name": "MEMORY_SEGMENT",
-                    "meta": "'PrgCode'",
-                    "lines": ["CODE FLASH 0x0 0x0000EB00 0x1000 0x0"],
+                    "meta": "'PrgCode' \"\"",
+                    "lines": ["CODE FLASH INTERN 0x0000EB00 0x1000 -1 -1 -1 -1 -1"],
                     "children": [],
                 }
             ]

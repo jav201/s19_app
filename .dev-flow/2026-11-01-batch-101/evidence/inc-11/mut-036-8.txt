@@ -1,0 +1,46 @@
+# mutant 036.8 (R-A2L-036.8)
+# mutation: take the first program-type word after the name -> M3 gives CODE
+# apply output:
+APPLIED 036.8
+a2l.py a071c1785803d7f24b32894e79e23c3ddccc605e733b10d9c6d17b8516ef6b68
+app.py c3197405780f9d871045c8ba3e6684681d6eb95eaa912b2e995a664d208d9fe3
+issues_view.py f543a58ecc7274d03adf3dd95a6c670187242ad6225ebbcf5206236012c1dd3a
+rules.py d3fd869193b6a207040d67c75cdc3d03b88115a9938715732131759640081130
+
+# restore verify ok=True:
+a2l.py e99d9e15da3f31160046889300ac41f0741ca917166ecea18da6f27c0d9f89a8
+app.py c3197405780f9d871045c8ba3e6684681d6eb95eaa912b2e995a664d208d9fe3
+issues_view.py f543a58ecc7274d03adf3dd95a6c670187242ad6225ebbcf5206236012c1dd3a
+rules.py d3fd869193b6a207040d67c75cdc3d03b88115a9938715732131759640081130
+
+# command: cd ~/work/s19_m11 && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 900 ~/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -n 2 --basetemp /tmp/pytest-s19m11 tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_8_last_program_type_word_wins
+# exit=1
+
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________________ test_r_a2l_036_8_last_program_type_word_wins _________________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m11/popen-gw0/test_r_a2l_036_8_last_program_0')
+
+    def test_r_a2l_036_8_last_program_type_word_wins(tmp_path: Path) -> None:
+        """Why: a long identifier that is itself a program-type word ("CODE") must not win."""
+        seg = _one_segment(
+            tmp_path, '/begin MEMORY_SEGMENT M3 "CODE" DATA FLASH INTERN 0x100 0x10'
+        )
+>       assert seg["usage"] == "DATA"
+E       AssertionError: assert 'CODE' == 'DATA'
+E         
+E         - DATA
+E         + CODE
+
+tests/test_b101_a2l_blocks_and_segments.py:419: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_8_last_program_type_word_wins
+1 failed in 1.09s
+
+# --- stderr ---
+

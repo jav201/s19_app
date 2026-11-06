@@ -192,7 +192,7 @@ UNQUOTED_EXPECTATIONS = {
 
 @pytest.mark.parametrize("file_name", sorted(QUOTED_DEMO_EXPECTATIONS))
 def test_tc682_quoted_demo_a2l_segments_parse_to_full_rows(file_name: str) -> None:
-    """TC-682 (LLR-137.4): the shipped quoted ASAP2 demos yield full rows —
+    """TC-682 (LLR-137.4; R-A2L-036.3, R-A2L-036.6): the shipped quoted ASAP2 demos yield full rows —
     every MEMORY_SEGMENT carries non-null base/size (the P-6 bug: the quoted
     multi-word long-identifier line broke the tokenizer, base/size -> null)."""
     src = CASE00 / file_name
@@ -217,7 +217,7 @@ def test_tc682_quoted_demo_a2l_segments_parse_to_full_rows(file_name: str) -> No
 
 
 def test_tc682_unquoted_fixture_rows_parse_byte_identically() -> None:
-    """TC-682 (LLR-137.4's backward-compat limb): the unquoted fixture parses
+    """TC-682 (LLR-137.4's backward-compat limb; R-A2L-036.3): the unquoted fixture parses
     exactly as today — same usage/kind/base/size, and the demos' placeholder
     offset (-1) is now surfaced as the new offset field."""
     src = CASE00 / "memorysegment.a2l"
@@ -236,7 +236,7 @@ def test_tc682_unquoted_fixture_rows_parse_byte_identically() -> None:
 
 
 def test_tc682_quoted_names_and_the_offset_field(tmp_path: Path) -> None:
-    """TC-682 (LLR-137.4): a quoted multi-word name AND long identifier parse
+    """TC-682 (LLR-137.4; R-A2L-036.6): a quoted multi-word name AND long identifier parse
     to a full row; the offset field (record parts[5]) lands when declared and
     stays None when the block declares none."""
     a2l = tmp_path / "quoted.a2l"

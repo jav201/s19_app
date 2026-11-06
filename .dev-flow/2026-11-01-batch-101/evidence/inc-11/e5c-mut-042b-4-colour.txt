@@ -1,0 +1,16 @@
+# E5 corrective mutant m-042b-4-colour
+== start 2026-11-06T01:41:07Z fingerprint=3095a2c7fd8b4a6b
+s19_app.__file__ = <HOME>/work/s19_c11/s19_app/__init__.py
+baseline s19_app/tui/styles.tcss 7e5e1b4a3b614672ff5a8e3a6661209b8f727b64921db308e0368a9c368fce96
+APPLIED m-042b-4-colour: s19_app/tui/styles.tcss dc1c72bf9a02cd83477c7fff72e584e6a581f86c3ad81fe21ad3833786511950
+== mutated fingerprint=a4f8b298794d050d
+== cmd: pytest -q -p no:cacheprovider tests/test_b101_issues_severity_view.py::test_r_tui_042b_4_unrecognized_block_rows_paint_warning
+E       AssertionError: [('#D9A35B', '#D9A35B'), ('#D9A35B', '#D9A35B'), ('#D9A35B', '#D9A35B')]
+E       assert [('#D9A35B', ...', '#D9A35B')] == [('#F6FF8F', ...', '#F6FF8F')]
+E         
+E         At index 0 diff: ('#D9A35B', '#D9A35B') != ('#F6FF8F', '#F6FF8F')
+E         Use -v to get more diff
+FAILED tests/test_b101_issues_severity_view.py::test_r_tui_042b_4_unrecognized_block_rows_paint_warning
+1 failed in 2.61s
+RESTORED m-042b-4-colour: s19_app/tui/styles.tcss 7e5e1b4a3b614672ff5a8e3a6661209b8f727b64921db308e0368a9c368fce96 ok=True
+== end 2026-11-06T01:41:11Z fingerprint=3095a2c7fd8b4a6b

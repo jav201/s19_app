@@ -1,0 +1,102 @@
+# mutant 036.3 (R-A2L-036.3)
+# mutation: take the word after the size (the offset) -> V161 size -1
+# apply output:
+APPLIED 036.3
+a2l.py fe41d838402cfc1e0e9f0749cee7cdc9c992b2f5218dd613b73241e4985ed1f3
+app.py c3197405780f9d871045c8ba3e6684681d6eb95eaa912b2e995a664d208d9fe3
+issues_view.py f543a58ecc7274d03adf3dd95a6c670187242ad6225ebbcf5206236012c1dd3a
+rules.py d3fd869193b6a207040d67c75cdc3d03b88115a9938715732131759640081130
+
+# restore verify ok=True:
+a2l.py e99d9e15da3f31160046889300ac41f0741ca917166ecea18da6f27c0d9f89a8
+app.py c3197405780f9d871045c8ba3e6684681d6eb95eaa912b2e995a664d208d9fe3
+issues_view.py f543a58ecc7274d03adf3dd95a6c670187242ad6225ebbcf5206236012c1dd3a
+rules.py d3fd869193b6a207040d67c75cdc3d03b88115a9938715732131759640081130
+
+# command: cd ~/work/s19_m11 && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 900 ~/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -n 2 --basetemp /tmp/pytest-s19m11 tests/test_a2l_enriched.py::test_tc682_quoted_demo_a2l_segments_parse_to_full_rows tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_release_demo_segments
+# exit=1
+
+bringing up nodes...
+bringing up nodes...
+
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_ test_tc682_quoted_demo_a2l_segments_parse_to_full_rows[ASAP2_Demo_V161.a2l] __
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+file_name = 'ASAP2_Demo_V161.a2l'
+
+    @pytest.mark.parametrize("file_name", sorted(QUOTED_DEMO_EXPECTATIONS))
+    def test_tc682_quoted_demo_a2l_segments_parse_to_full_rows(file_name: str) -> None:
+        """TC-682 (LLR-137.4): the shipped quoted ASAP2 demos yield full rows —
+        every MEMORY_SEGMENT carries non-null base/size (the P-6 bug: the quoted
+        multi-word long-identifier line broke the tokenizer, base/size -> null)."""
+        src = CASE00 / file_name
+        if not src.is_file():
+            pytest.skip(f"examples/case_00_public/{file_name} not present")
+        segments = extract_memory_segments(parse_a2l_file(src)["sections"])
+        expected = QUOTED_DEMO_EXPECTATIONS[file_name]
+    
+        assert len(segments) == len(expected)
+        for row in segments:
+            usage, kind, base, size = expected[row["block_name"]]
+>           assert row["usage"] == usage
+E           AssertionError: assert None == 'DATA'
+
+tests/test_a2l_enriched.py:207: AssertionError
+_ test_tc682_quoted_demo_a2l_segments_parse_to_full_rows[ASAP2_Demo_V171.a2l] __
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+file_name = 'ASAP2_Demo_V171.a2l'
+
+    @pytest.mark.parametrize("file_name", sorted(QUOTED_DEMO_EXPECTATIONS))
+    def test_tc682_quoted_demo_a2l_segments_parse_to_full_rows(file_name: str) -> None:
+        """TC-682 (LLR-137.4): the shipped quoted ASAP2 demos yield full rows —
+        every MEMORY_SEGMENT carries non-null base/size (the P-6 bug: the quoted
+        multi-word long-identifier line broke the tokenizer, base/size -> null)."""
+        src = CASE00 / file_name
+        if not src.is_file():
+            pytest.skip(f"examples/case_00_public/{file_name} not present")
+        segments = extract_memory_segments(parse_a2l_file(src)["sections"])
+        expected = QUOTED_DEMO_EXPECTATIONS[file_name]
+    
+        assert len(segments) == len(expected)
+        for row in segments:
+            usage, kind, base, size = expected[row["block_name"]]
+>           assert row["usage"] == usage
+E           AssertionError: assert None == 'DATA'
+
+tests/test_a2l_enriched.py:207: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.a2l:a2l.py:250 A2L section tree has structural errors: path=<HOME>/work/s19_m11/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+_____________________ test_r_a2l_036_release_demo_segments _____________________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+demo_dir = PosixPath('/tmp/pytest-s19m11/popen-gw0/b101_inc11_demo0')
+
+    def test_r_a2l_036_release_demo_segments(demo_dir: Path) -> None:
+        """Why: the 4 demo segments must all be read (base: 0 of 4 usable).
+        Rows 036.2/3, 036.3/3, 036.8/2, 036.9/2."""
+        data = parse_a2l_file(demo_dir / "firmware.a2l")
+        segs = extract_memory_segments(data["sections"])
+        got = [(s["block_name"], s["usage"], s["kind"], s["base"], s["size"]) for s in segs]
+>       assert got == [
+            ("boot", "CODE", "FLASH", 0x0, 0x10000),
+            ("app", "CODE", "FLASH", 0x40000, 0x2C9FA0),
+            ("cal", "DATA", "FLASH", 0x800000, 0x131FC0),
+            ("config", "DATA", "FLASH", 0xC00000, 0x1000),
+        ]
+E       AssertionError: assert [('boot', Non..., None, None)] == [('boot', 'CO...582912, 4096)]
+E         
+E         At index 0 diff: ('boot', None, None, None, None) != ('boot', 'CODE', 'FLASH', 0, 65536)
+E         Use -v to get more diff
+
+tests/test_b101_a2l_blocks_and_segments.py:336: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_a2l_enriched.py::test_tc682_quoted_demo_a2l_segments_parse_to_full_rows[ASAP2_Demo_V161.a2l]
+FAILED tests/test_a2l_enriched.py::test_tc682_quoted_demo_a2l_segments_parse_to_full_rows[ASAP2_Demo_V171.a2l]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_release_demo_segments
+3 failed in 5.02s
+
+# --- stderr ---
+

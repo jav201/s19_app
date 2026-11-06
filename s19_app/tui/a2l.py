@@ -928,16 +928,149 @@ def extract_compu_tables(sections: list[dict]) -> dict[str, dict]:
     return out
 
 
-def extract_memory_segments(sections: list[dict]) -> list[dict]:
-    """Parse MEMORY_SEGMENT blocks (CODE/DATA FLASH/RAM ROM, base, size, offset).
+PROGRAM_TYPE_WORDS = frozenset(
+    {
+        "CALIBRATION_VARIABLES",
+        "CODE",
+        "DATA",
+        "EXCLUDE_FROM_FLASH",
+        "OFFLINE_DATA",
+        "RESERVED",
+        "SERAM",
+        "VARIABLES",
+    }
+)
 
-    Hardened (batch-95, LLR-137.4): the record line is tokenized with
-    :func:`_split_line_respecting_quotes`, and the first line tokenizing into
-    >= 5 parts is the record — a quoted multi-word long identifier on its own
-    line (the shipped ASAP2 demos) collapses to ONE token and is skipped, so
-    quoted blocks yield full rows instead of null base/size. Unquoted blocks
-    tokenize exactly as the old ``str.split()`` and parse byte-identically.
-    Each entry carries the ``offset`` field (record parts[5]) when declared.
+MEMORY_TYPE_WORDS = frozenset(
+    {"EEPROM", "EPROM", "FLASH", "NOT_IN_ECU", "RAM", "REGISTER", "ROM"}
+)
+
+
+def _a2l_number(word: str) -> Optional[int]:
+    """Parse an ASCII Number word, or ``None`` when the word is not one.
+
+    The value when ``word`` fully matches the ASCII pattern
+    ``[+-]?(0[xX][0-9A-Fa-f]{1,8}|[0-9]{1,10})``: decimal digits read in base
+    10 (so ``0400`` is 400) and hex digits in base 16, with the sign. No other
+    word is a Number: not ``0o``/``0b``, not a word with ``_``, not a
+    non-ASCII digit, not a longer digit run. Never called for a quoted word.
+    """
+    if not word:
+        return None
+    text = word
+    sign = 1
+    if text[0] in "+-":
+        if text[0] == "-":
+            sign = -1
+        text = text[1:]
+    if not text:
+        return None
+    if text[:2] in ("0x", "0X"):
+        digits = text[2:]
+        if not 1 <= len(digits) <= 8:
+            return None
+        if any(ch not in "0123456789abcdefABCDEF" for ch in digits):
+            return None
+        return sign * int(digits, 16)
+    if not 1 <= len(text) <= 10:
+        return None
+    if not all("0" <= ch <= "9" for ch in text):
+        return None
+    return sign * int(text, 10)
+
+
+def _memory_segment_record_words(
+    sec: dict,
+) -> tuple[list[tuple[str, int, bool]], list[str]]:
+    """Collect the record words of a MEMORY_SEGMENT block and its clean texts.
+
+    One linear scan over the block's own texts (its ``meta`` then each of its
+    own ``lines``), in file order. A whitespace run ends an unquoted word; a
+    ``"…"`` span is one word without its quotes and carries a quoted flag
+    (``""`` is the empty quoted word, and a ``\"`` does not close it). Outside
+    a quoted word a ``/* … */`` comment (which may span texts) or a ``//``
+    comment to the end of the text gives no word. The quote state starts closed
+    on each text, so a ``"`` left open ends its quoted text at the end of that
+    line.
+
+    Returns the words as ``(text, text_index, quoted)`` tuples and the texts
+    with comments removed.
+    """
+    texts: list[str] = [sec.get("meta") or "", *(sec.get("lines") or [])]
+    words: list[tuple[str, int, bool]] = []
+    stripped_texts: list[str] = []
+    in_block_comment = False
+    for text_index, text in enumerate(texts):
+        out: list[str] = []
+        in_string = False
+        i = 0
+        n = len(text)
+        while i < n:
+            ch = text[i]
+            if in_block_comment:
+                if ch == "*" and i + 1 < n and text[i + 1] == "/":
+                    in_block_comment = False
+                    i += 2
+                else:
+                    i += 1
+                continue
+            if in_string:
+                out.append(ch)
+                if ch == '"' and text[i - 1] != "\\":
+                    in_string = False
+                i += 1
+                continue
+            if ch == '"':
+                in_string = True
+                out.append(ch)
+                i += 1
+                continue
+            if ch == "/" and i + 1 < n and text[i + 1] == "*":
+                in_block_comment = True
+                i += 2
+                continue
+            if ch == "/" and i + 1 < n and text[i + 1] == "/":
+                break
+            out.append(ch)
+            i += 1
+        stripped = "".join(out)
+        stripped_texts.append(stripped)
+        j = 0
+        m = len(stripped)
+        while j < m:
+            while j < m and stripped[j].isspace():
+                j += 1
+            if j >= m:
+                break
+            if stripped[j] == '"':
+                k = j + 1
+                while k < m:
+                    if stripped[k] == '"' and stripped[k - 1] != "\\":
+                        break
+                    k += 1
+                words.append((stripped[j + 1 : k], text_index, True))
+                j = k + 1
+                continue
+            k = j
+            while k < m and not stripped[k].isspace():
+                k += 1
+            words.append((stripped[j:k], text_index, False))
+            j = k
+    return words, stripped_texts
+
+
+def extract_memory_segments(sections: list[dict]) -> list[dict]:
+    """Parse MEMORY_SEGMENT blocks into name, usage, kind, base, size, offset.
+
+    Anchored rule (batch-101 Inc 11): the record words come from
+    :func:`_memory_segment_record_words` (the ``/begin`` line's words after
+    ``/begin MEMORY_SEGMENT``, then each own line). The name is the first
+    record word; the address word is the first unquoted word after the name
+    that starts with an ASCII digit or sign; base and size are that word and
+    the word after it as ASCII Numbers, kept only when base ≥ 0, size > 0 and
+    base + size ≤ 2^32. Usage and kind are the last program-type / memory-type
+    word before the address word. No address word or a failed check leaves
+    every numeric field ``None`` with no further scan.
     """
     out: list[dict] = []
 
@@ -947,7 +1080,7 @@ def extract_memory_segments(sections: list[dict]) -> list[dict]:
                 walk(sec.get("children") or [])
                 continue
             entry: dict = {
-                "block_name": parse_begin_meta(sec.get("meta", "") or "")[0],
+                "block_name": None,
                 "raw_first_line": "",
                 "usage": None,
                 "kind": None,
@@ -955,27 +1088,42 @@ def extract_memory_segments(sections: list[dict]) -> list[dict]:
                 "size": None,
                 "offset": None,
             }
-            for line in sec.get("lines") or []:
-                stripped = line.strip()
-                if not stripped:
-                    continue
-                parts = _split_line_respecting_quotes(stripped)
-                if len(parts) < 5:
-                    continue  # a quoted long-identifier line collapses to 1 token
-                entry["raw_first_line"] = stripped
-                entry["usage"] = parts[0]
-                entry["kind"] = parts[1]
-                try:
-                    entry["base"] = int(parts[3], 0)
-                    entry["size"] = int(parts[4], 0)
-                except ValueError:
-                    pass
-                if len(parts) >= 6:
-                    try:
-                        entry["offset"] = int(parts[5], 0)
-                    except ValueError:
-                        entry["offset"] = None
-                break
+            words, texts = _memory_segment_record_words(sec)
+            if words:
+                entry["block_name"] = words[0][0] or None
+                k = None
+                for idx in range(1, len(words)):
+                    text, _, quoted = words[idx]
+                    if not quoted and text and text[0] in "0123456789+-":
+                        k = idx
+                        break
+                if k is not None:
+                    base = _a2l_number(words[k][0])
+                    size = None
+                    if k + 1 < len(words) and not words[k + 1][2]:
+                        size = _a2l_number(words[k + 1][0])
+                    if (
+                        base is not None
+                        and size is not None
+                        and base >= 0
+                        and size > 0
+                        and base + size <= 2**32
+                    ):
+                        entry["base"] = base
+                        entry["size"] = size
+                        entry["raw_first_line"] = texts[words[k][1]].strip()
+                        if k + 2 < len(words) and not words[k + 2][2]:
+                            entry["offset"] = _a2l_number(words[k + 2][0])
+                        usage = None
+                        kind = None
+                        for idx in range(1, k):
+                            text = words[idx][0]
+                            if text in PROGRAM_TYPE_WORDS:
+                                usage = text
+                            if text in MEMORY_TYPE_WORDS:
+                                kind = text
+                        entry["usage"] = usage
+                        entry["kind"] = kind
             out.append(entry)
             walk(sec.get("children") or [])
 
@@ -3270,9 +3418,14 @@ def render_curve_description(description: dict) -> str:
         ]
         x_width = max([len("x")] + [len(c) for c in x_cells])
         y_width = max([len("y")] + [len(c) for c in y_cells])
+        all_index = all(p.get("x_note") for p in points)
+        if all_index:
+            lines.append("  x: point index (axis points unavailable)")
         lines.append(f"  {'x':>{x_width}}   {'y':>{y_width}}")
         for p, x_cell, y_cell in zip(points, x_cells, y_cells):
-            note = f"   ({p['x_note']})" if p.get("x_note") else ""
+            note = (
+                "" if all_index else (f"   ({p['x_note']})" if p.get("x_note") else "")
+            )
             lines.append(f"  {x_cell:>{x_width}}   {y_cell:>{y_width}}{note}")
         y_numbers = [_to_float(p["y"]) for p in points]
         spark = _sparkline([n for n in y_numbers if n is not None])

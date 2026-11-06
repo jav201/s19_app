@@ -143,7 +143,7 @@ from .issues_view import (
     _GROUP_DISPLAY_MAX,
     GroupedIssuesPanel,
     IssueRow,
-    adjust_counts_for_a2l_triage,
+    SEVERITY_ORDER,
     build_issues_severity_strip,
 )
 from .checks_view import (
@@ -738,6 +738,19 @@ _A2L_ISSUE_SEVERITY_RANK: dict[ValidationSeverity, int] = {
     ValidationSeverity.ERROR: 4,
 }
 """Severity ordering for ``_a2l_issue_severity_map`` — ``ERROR`` ranks above all (LLR-037.1)."""
+
+
+#: Display rank for the Issues-list sort (R-TUI-042b.5): ERROR → WARNING →
+#: INFO in the fixed ``issues_view.SEVERITY_ORDER`` display order, so the
+#: filtered list, the grouped panel, the paging and the summary line all
+#: share one order. A severity outside ``SEVERITY_ORDER`` (OK, NEUTRAL) has
+#: no entry here and is given the default rank ``len(SEVERITY_ORDER)`` — after
+#: INFO — by ``_filtered_validation_issues`` (E3 A-5 / S-5). Distinct from
+#: ``_A2L_ISSUE_SEVERITY_RANK`` above, which ranks all five severities
+#: ascending to pick the worst per symbol.
+_ISSUE_DISPLAY_RANK: dict[ValidationSeverity, int] = {
+    severity: rank for rank, severity in enumerate(SEVERITY_ORDER)
+}
 
 
 def _a2l_issue_severity_map(
@@ -16372,10 +16385,17 @@ class S19TuiApp(App):
     def _filtered_validation_issues(self) -> list[ValidationIssue]:
         """Return cached validation issues filtered by active severity mode."""
         if self.validation_issue_filter_mode == "error":
-            return [item for item in self._validation_issues if item.severity == ValidationSeverity.ERROR]
-        if self.validation_issue_filter_mode == "warning":
-            return [item for item in self._validation_issues if item.severity == ValidationSeverity.WARNING]
-        return list(self._validation_issues)
+            filtered = [item for item in self._validation_issues if item.severity == ValidationSeverity.ERROR]
+        elif self.validation_issue_filter_mode == "warning":
+            filtered = [item for item in self._validation_issues if item.severity == ValidationSeverity.WARNING]
+        else:
+            filtered = list(self._validation_issues)
+        return sorted(
+            filtered,
+            key=lambda issue: _ISSUE_DISPLAY_RANK.get(
+                issue.severity, len(SEVERITY_ORDER)
+            ),
+        )
 
     def _format_validation_issue_line(self, issue: ValidationIssue) -> str:
         symbol = issue.symbol or "-"
@@ -16492,10 +16512,6 @@ class S19TuiApp(App):
             Compute the aggregate validation-issue counts + paging summary line,
             push them into the ``#validation_issues_summary`` ``Label``, and
             render the grouped Issues view via ``_render_validation_issues_groups``.
-            Batch-94 Inc-004 (HLR-012): the counts are triaged through
-            ``adjust_counts_for_a2l_triage`` — curated ``A2L_UNRECOGNIZED_BLOCK``
-            names count as INFO, not WARNING, in the strip + summary + panel
-            headers alike.
 
         Args:
             None
@@ -16528,34 +16544,23 @@ class S19TuiApp(App):
         # Whole-list severity distribution (batch-49, LLR-082.2) — computed
         # before the empty-filter short-circuit so the strip reflects the full
         # distribution (a 0/0/0 boundary only when the list is truly empty).
-        # Batch-94 Inc-004 (HLR-012, the fold round): the counts ride the
-        # view's ``adjust_counts_for_a2l_triage`` — curated-name
-        # ``A2L_UNRECOGNIZED_BLOCK`` findings move WARNING → INFO in the
-        # strip, the summary line AND the grouped panel's ``group_counts``
-        # (all three through this one helper), so the operator's headline
-        # counters stop broadcasting the triaged rows as warnings. Zero
-        # reclassifiable rows → the identical dict, byte-for-byte the
-        # pre-Inc-004 painters.
-        severity_counts = adjust_counts_for_a2l_triage(
-            {
-                ValidationSeverity.ERROR: sum(
-                    1
-                    for item in self._validation_issues
-                    if item.severity == ValidationSeverity.ERROR
-                ),
-                ValidationSeverity.WARNING: sum(
-                    1
-                    for item in self._validation_issues
-                    if item.severity == ValidationSeverity.WARNING
-                ),
-                ValidationSeverity.INFO: sum(
-                    1
-                    for item in self._validation_issues
-                    if item.severity == ValidationSeverity.INFO
-                ),
-            },
-            self._validation_issues,
-        )
+        severity_counts = {
+            ValidationSeverity.ERROR: sum(
+                1
+                for item in self._validation_issues
+                if item.severity == ValidationSeverity.ERROR
+            ),
+            ValidationSeverity.WARNING: sum(
+                1
+                for item in self._validation_issues
+                if item.severity == ValidationSeverity.WARNING
+            ),
+            ValidationSeverity.INFO: sum(
+                1
+                for item in self._validation_issues
+                if item.severity == ValidationSeverity.INFO
+            ),
+        }
         error_count = severity_counts[ValidationSeverity.ERROR]
         warning_count = severity_counts[ValidationSeverity.WARNING]
         info_count = severity_counts[ValidationSeverity.INFO]
@@ -16652,23 +16657,17 @@ class S19TuiApp(App):
             total, self._validation_issues_window_start, page_size
         )
         window = filtered[start:end]
-        # Inc-004 (HLR-012): the panel mounts these counts verbatim — triage
-        # them here (same helper as the strip/summary) so the group headers
-        # agree with the headline counters; the panel remaps the rows itself.
-        group_counts = adjust_counts_for_a2l_triage(
-            {
-                ValidationSeverity.ERROR: sum(
-                    1 for item in filtered if item.severity == ValidationSeverity.ERROR
-                ),
-                ValidationSeverity.WARNING: sum(
-                    1 for item in filtered if item.severity == ValidationSeverity.WARNING
-                ),
-                ValidationSeverity.INFO: sum(
-                    1 for item in filtered if item.severity == ValidationSeverity.INFO
-                ),
-            },
-            filtered,
-        )
+        group_counts = {
+            ValidationSeverity.ERROR: sum(
+                1 for item in filtered if item.severity == ValidationSeverity.ERROR
+            ),
+            ValidationSeverity.WARNING: sum(
+                1 for item in filtered if item.severity == ValidationSeverity.WARNING
+            ),
+            ValidationSeverity.INFO: sum(
+                1 for item in filtered if item.severity == ValidationSeverity.INFO
+            ),
+        }
         panel.render_groups(window, group_counts, truncated=(end - start) < total)
 
     def on_issue_row_selected(self, event: "IssueRow.Selected") -> None:

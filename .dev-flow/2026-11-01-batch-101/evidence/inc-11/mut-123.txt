@@ -1,0 +1,62 @@
+# mutant 123 (R-A2L-123)
+# mutation: emit R-A2L-121's line for any missing axis value -> the line appears
+# apply output:
+APPLIED 123
+a2l.py 15ae239b1f2561dce240af89d4494fc59aa10678241e35f100fe9e5c4eb7860f
+app.py c3197405780f9d871045c8ba3e6684681d6eb95eaa912b2e995a664d208d9fe3
+issues_view.py f543a58ecc7274d03adf3dd95a6c670187242ad6225ebbcf5206236012c1dd3a
+rules.py d3fd869193b6a207040d67c75cdc3d03b88115a9938715732131759640081130
+
+# restore verify ok=True:
+a2l.py e99d9e15da3f31160046889300ac41f0741ca917166ecea18da6f27c0d9f89a8
+app.py c3197405780f9d871045c8ba3e6684681d6eb95eaa912b2e995a664d208d9fe3
+issues_view.py f543a58ecc7274d03adf3dd95a6c670187242ad6225ebbcf5206236012c1dd3a
+rules.py d3fd869193b6a207040d67c75cdc3d03b88115a9938715732131759640081130
+
+# command: cd ~/work/s19_m11 && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 900 ~/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -n 2 --basetemp /tmp/pytest-s19m11 tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_123_mixed_points_keep_row_note
+# exit=1
+
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________________ test_r_a2l_123_mixed_points_keep_row_note ___________________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+    def test_r_a2l_123_mixed_points_keep_row_note() -> None:
+        """Why: when only some points lack an axis value the reader must see which rows
+        are indexes; the once-line of R-A2L-121 is then absent."""
+    
+        def point(x, y, note: Optional[str] = None) -> dict:
+            return {"x": x, "y": y, "y_raw": y, "x_note": note, "outside_limits": False}
+    
+        description = {
+            "char_type": "CURVE",
+            "name": "CM",
+            "status": "ok",
+            "points": [
+                point(10, 100.0),
+                point(20, 200.0),
+                point(2, 300.0, "index (axis points unavailable)"),
+            ],
+            "axes": [],
+            "notes": [],
+        }
+        text = render_curve_description(description)
+        point_rows = [line for line in text.split("\n") if line.strip().split(" ")[0] in {"10", "20", "2"}]
+        assert len(point_rows) == 3, text
+        assert not point_rows[0].endswith("   " + ROW_SUFFIX)
+        assert not point_rows[1].endswith("   " + ROW_SUFFIX)
+>       assert point_rows[2].endswith("   " + ROW_SUFFIX)
+E       AssertionError: assert False
+E        +  where False = <built-in method endswith of str object at 0x7f5a9f8cb4b0>(('   ' + '(index (axis points unavailable))'))
+E        +    where <built-in method endswith of str object at 0x7f5a9f8cb4b0> = '   2   300'.endswith
+
+tests/test_b101_a2l_blocks_and_segments.py:586: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_123_mixed_points_keep_row_note
+1 failed in 1.09s
+
+# --- stderr ---
+

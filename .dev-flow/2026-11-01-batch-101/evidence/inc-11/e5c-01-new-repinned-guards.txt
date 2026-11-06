@@ -1,0 +1,121 @@
+## E5 corrective (batch-101 Inc 11); host: LAN Linux host 2; worktree: <HOME>/work/s19_c11 = origin/main f9f3cb09 + git diff b7b77c4 of the local branch (s19_app tests docs) applied uncommitted; FINAL: 3 new files, re-pinned files, test_segment_split_window.py, law guards (parallel lane)
+== start 2026-11-06T01:44:42Z fingerprint=d6cb4d5789b7571b
+s19_app.__file__ = <HOME>/work/s19_c11/s19_app/__init__.py
+python 3.11.18 textual 8.2.8
+== cmd: pytest -q -p no:cacheprovider -m <not serial_timing> -n 8 tests/test_b101_a2l_blocks_and_segments.py tests/test_b101_issues_severity_view.py tests/test_b101_inc11_acceptance.py tests/test_tui_issues_triage_b94.py tests/test_synth_release_case.py tests/test_segment_split_window.py tests/test_engine_unchanged.py tests/test_id_registry.py tests/test_suite_hygiene.py tests/test_requirements_canon.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 21%]
+........................................................................ [ 43%]
+........................................................................ [ 64%]
+...................F.................................................... [ 86%]
+............................................F                            [100%]
+=================================== FAILURES ===================================
+_________________ test_tc027_engine_modules_unchanged_vs_main __________________
+[gw4] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+    def test_tc027_engine_modules_unchanged_vs_main() -> None:
+        """TC-027 — the parsing / range / validation engine is unchanged vs ``main``.
+    
+        The read-only-engine constraint forbids TUI-side batches from editing the
+        parsing layer (``core.py`` / ``hexfile.py`` / ``tui/mac.py``), the range
+        primitive (``range_index.py``) or the validation engine (``validation/``):
+        they are *consumed* read-only. ``tui/a2l.py`` left the frozen set for
+        batch-95 (contract-pinned ``extract_memory_segments`` hardening, HLR-137 /
+        LLR-137.4 — see the ``_ENGINE_PATHS`` note) and is expected to diff. This
+        runs ``git diff --name-only main`` over exactly those paths and asserts
+        the result is empty — so a single accidental edit to any engine module is
+        caught at the increment boundary, not discovered later. ``git diff`` is
+        line-ending / ``__pycache__`` aware, so the verdict is robust to checkout
+        noise.
+        """
+        repo_root = _repo_root()
+        try:
+            changed = _git_diff_name_only(repo_root, _ENGINE_PATHS)
+        except (subprocess.CalledProcessError, FileNotFoundError) as exc:
+            pytest.skip(
+                "git is unavailable or the 'main' ref is missing in this "
+                f"environment — TC-027's engine-unchanged arm cannot run: {exc}"
+            )
+    
+>       assert changed == [], (
+            "TUI-side batches must not edit the parsing / range / validation "
+            f"engine (read-only constraint) — git reports these changed vs main: "
+            f"{changed}"
+        )
+E       AssertionError: TUI-side batches must not edit the parsing / range / validation engine (read-only constraint) — git reports these changed vs main: ['s19_app/tui/a2l.py', 's19_app/validation/rules.py']
+E       assert ['s19_app/tui...ion/rules.py'] == []
+E         
+E         Left contains 2 more items, first extra item: 's19_app/tui/a2l.py'
+E         Use -v to get more diff
+
+tests/test_engine_unchanged.py:175: AssertionError
+_________________ test_tc_b94_18_curated_set_and_engine_freeze _________________
+[gw5] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19c11/popen-gw5/test_tc_b94_18_curated_set_and0')
+
+    def test_tc_b94_18_curated_set_and_engine_freeze(tmp_path: Path) -> None:
+        """TC-B94-18 / R-VAL-032.2, .3 — the 21 former curated names raise no issue; engine freeze.
+    
+        Intent: the guarantee the view constant used to give now sits in the engine. Each of
+        the 21 names raises no issue inside an IF_DATA block; the 11 ASAM names among them
+        raise none at the top level either; the 10 interface names (PAGE, SEGMENT, DAQ …) are
+        a WARNING at the top level, so the exemption is by IF_DATA, not by name. In the SAME
+        run the engine freeze holds: no diff vs ``main`` over ``validation/rules.py`` and
+        ``tui/a2l.py`` and the worktree bytes equal ``main``'s blobs (CRLF-aware). On the
+        Inc 11 branch that arm is RED by plan (the unfreeze) and GREEN after the merge (OR-3).
+        The freeze arm rides the proven TC-027 idiom: where the ``main`` ref is absent it
+        SKIPS instead of erroring.
+        """
+        names = FORMER_CURATED_ASAM + FORMER_CURATED_INTERFACE
+        assert len(names) == 21 and len(set(names)) == 21
+    
+        inside = ["/begin IF_DATA XCP"]
+        for name in names:
+            inside += [f"/begin {name}", f"/end {name}"]
+        inside += ["/end IF_DATA"]
+        issues = _engine_issues_of_text(tmp_path, inside)
+        assert issues == [], [(i.code, i.message) for i in issues]
+    
+        for name in FORMER_CURATED_ASAM:
+            top = _engine_issues_of_text(tmp_path, [f"/begin {name}", f"/end {name}"])
+            assert [i for i in top if i.code == "A2L_UNRECOGNIZED_BLOCK"] == [], name
+        for name in FORMER_CURATED_INTERFACE:
+            top = _engine_issues_of_text(tmp_path, [f"/begin {name}", f"/end {name}"])
+            found = [i for i in top if i.code == "A2L_UNRECOGNIZED_BLOCK"]
+            assert [(i.severity, i.message) for i in found] == [
+                (ValidationSeverity.WARNING, f"Unrecognized A2L block '{name}'.")
+            ], name
+    
+        # Engine freeze, same run — the proven TC-027 idiom (check=True, skip on
+        # CalledProcessError / FileNotFoundError) plus a CRLF-aware byte-equality
+        # against ``main``'s blobs (the checkout may carry CRLF). The CI PR
+        # checkout fetches the PR head only, so ``main`` does not resolve there:
+        # the arm skips instead of dying with exit 128 — exactly how
+        # tests/test_engine_unchanged.py stays green on CI. Where ``main`` exists
+        # (local runs, the post-merge gate) both assertions still bite, same run.
+        frozen_paths = ["s19_app/validation/rules.py", "s19_app/tui/a2l.py"]
+        try:
+            completed = subprocess.run(
+                ["git", "diff", "--name-only", "main", "--", *frozen_paths],
+                cwd=_REPO_ROOT,
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            changed = [line for line in completed.stdout.splitlines() if line.strip()]
+>           assert changed == [], changed
+E           AssertionError: ['s19_app/tui/a2l.py', 's19_app/validation/rules.py']
+E           assert ['s19_app/tui...ion/rules.py'] == []
+E             
+E             Left contains 2 more items, first extra item: 's19_app/tui/a2l.py'
+E             Use -v to get more diff
+
+tests/test_tui_issues_triage_b94.py:279: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_engine_unchanged.py::test_tc027_engine_modules_unchanged_vs_main
+FAILED tests/test_tui_issues_triage_b94.py::test_tc_b94_18_curated_set_and_engine_freeze
+2 failed, 331 passed in 382.77s (0:06:22)
+== exit 1 end 2026-11-06T01:51:05Z fingerprint=d6cb4d5789b7571b

@@ -1,0 +1,60 @@
+# mutant 034 (R-A2L-034)
+# mutation: the base segment reader -> 462 unknown
+# apply output:
+APPLIED 034
+a2l.py 25f52210937ef07fa3337806863b4670d29969a99b378f9c97e15134cd70ef53
+app.py c3197405780f9d871045c8ba3e6684681d6eb95eaa912b2e995a664d208d9fe3
+issues_view.py f543a58ecc7274d03adf3dd95a6c670187242ad6225ebbcf5206236012c1dd3a
+rules.py d3fd869193b6a207040d67c75cdc3d03b88115a9938715732131759640081130
+
+# restore verify ok=True:
+a2l.py e99d9e15da3f31160046889300ac41f0741ca917166ecea18da6f27c0d9f89a8
+app.py c3197405780f9d871045c8ba3e6684681d6eb95eaa912b2e995a664d208d9fe3
+issues_view.py f543a58ecc7274d03adf3dd95a6c670187242ad6225ebbcf5206236012c1dd3a
+rules.py d3fd869193b6a207040d67c75cdc3d03b88115a9938715732131759640081130
+
+# command: cd ~/work/s19_m11 && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 900 ~/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -n 2 --basetemp /tmp/pytest-s19m11 tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_034_release_demo_tags_are_flash tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_034_case_07_regions
+# exit=1
+
+bringing up nodes...
+bringing up nodes...
+
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+________________________ test_r_a2l_034_case_07_regions ________________________
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+    def test_r_a2l_034_case_07_regions() -> None:
+        """Why: case_07 has one FLASH segment: 8 tags inside it, 4 outside (unknown)."""
+        tags = parse_a2l_file(REPO_ROOT / "examples" / "case_07_stress_smoke" / "firmware.a2l")["tags"]
+        regions = [t.get("memory_region") for t in tags]
+>       assert regions.count("flash") == 8, regions
+E       AssertionError: ['unknown', 'unknown', 'unknown', 'unknown', 'unknown', 'unknown', ...]
+E       assert 0 == 8
+E        +  where 0 = <built-in method count of list object at 0x7f3af8545140>('flash')
+E        +    where <built-in method count of list object at 0x7f3af8545140> = ['unknown', 'unknown', 'unknown', 'unknown', 'unknown', 'unknown', ...].count
+
+tests/test_b101_a2l_blocks_and_segments.py:487: AssertionError
+__________________ test_r_a2l_034_release_demo_tags_are_flash __________________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+demo_dir = PosixPath('/tmp/pytest-s19m11/popen-gw0/b101_inc11_demo0')
+
+    def test_r_a2l_034_release_demo_tags_are_flash(demo_dir: Path) -> None:
+        """Why: with the 4 demo segments read, every tag lies in FLASH (base: 462 unknown)."""
+        tags = parse_a2l_file(demo_dir / "firmware.a2l")["tags"]
+        assert len(tags) == 462
+>       assert [t for t in tags if t.get("memory_region") != "flash"] == []
+E       AssertionError: assert [{'access': N...ne, ...}, ...] == []
+E         
+E         Left contains 462 more items, first extra item: {'access': None, 'address': 0, 'axis_meta': [], 'bit_org': None, ...}
+E         Use -v to get more diff
+
+tests/test_b101_a2l_blocks_and_segments.py:480: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_034_case_07_regions
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_034_release_demo_tags_are_flash
+2 failed in 5.20s
+
+# --- stderr ---
+

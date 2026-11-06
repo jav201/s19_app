@@ -1,0 +1,74 @@
+## host: LAN Linux host; worktree: <HOME>/work/s19_i11; date: 2026-11-05T23:46:28Z
+## git base: f9f3cb09 + Inc 11 branch diff (b7b77c4..b101-inc11) applied
+s19_app.__file__ = <HOME>/work/s19_i11/s19_app/__init__.py
+python 3.11.18 textual 8.2.8
+## cmd: pytest -q -p no:cacheprovider --basetemp /tmp/pytest-s19i11-81637  -m "not serial_timing" tests/test_id_registry.py tests/test_suite_hygiene.py tests/test_requirements_canon.py tests/test_engine_unchanged.py
+......F................................................................. [ 81%]
+...............F                                                         [100%]
+=================================== FAILURES ===================================
+_____________ test_tc607_scanned_corpus_matches_the_declared_bound _____________
+
+corpus = <tests.test_id_registry._Corpus object at 0x7f9f663b8710>
+
+    def test_tc607_scanned_corpus_matches_the_declared_bound(corpus: _Corpus) -> None:
+        """TC-607 — the guard's corpus is bounded by a declared, executable constant.
+    
+        Asserting *how many files the guard opens* is deterministic where a
+        wall-clock budget would be flaky. Widening the scan — most obviously to
+        ``.dev-flow/``, which would make the guard's verdict depend on batch prose —
+        moves this count and turns the threshold red immediately.
+        """
+        actual = len(corpus.test_files)
+>       assert actual == EXPECTED_SCANNED_TEST_FILES, (
+            f"the guard scanned {actual} test modules, not the declared "
+            f"{EXPECTED_SCANNED_TEST_FILES}. If tests/ legitimately grew, bump "
+            f"EXPECTED_SCANNED_TEST_FILES in the same PR so the bound stays a "
+            f"decision rather than a rubber stamp."
+        )
+E       AssertionError: the guard scanned 253 test modules, not the declared 250. If tests/ legitimately grew, bump EXPECTED_SCANNED_TEST_FILES in the same PR so the bound stays a decision rather than a rubber stamp.
+E       assert 253 == 250
+
+tests/test_id_registry.py:513: AssertionError
+_________________ test_tc027_engine_modules_unchanged_vs_main __________________
+
+    def test_tc027_engine_modules_unchanged_vs_main() -> None:
+        """TC-027 — the parsing / range / validation engine is unchanged vs ``main``.
+    
+        The read-only-engine constraint forbids TUI-side batches from editing the
+        parsing layer (``core.py`` / ``hexfile.py`` / ``tui/mac.py``), the range
+        primitive (``range_index.py``) or the validation engine (``validation/``):
+        they are *consumed* read-only. ``tui/a2l.py`` left the frozen set for
+        batch-95 (contract-pinned ``extract_memory_segments`` hardening, HLR-137 /
+        LLR-137.4 — see the ``_ENGINE_PATHS`` note) and is expected to diff. This
+        runs ``git diff --name-only main`` over exactly those paths and asserts
+        the result is empty — so a single accidental edit to any engine module is
+        caught at the increment boundary, not discovered later. ``git diff`` is
+        line-ending / ``__pycache__`` aware, so the verdict is robust to checkout
+        noise.
+        """
+        repo_root = _repo_root()
+        try:
+            changed = _git_diff_name_only(repo_root, _ENGINE_PATHS)
+        except (subprocess.CalledProcessError, FileNotFoundError) as exc:
+            pytest.skip(
+                "git is unavailable or the 'main' ref is missing in this "
+                f"environment — TC-027's engine-unchanged arm cannot run: {exc}"
+            )
+    
+>       assert changed == [], (
+            "TUI-side batches must not edit the parsing / range / validation "
+            f"engine (read-only constraint) — git reports these changed vs main: "
+            f"{changed}"
+        )
+E       AssertionError: TUI-side batches must not edit the parsing / range / validation engine (read-only constraint) — git reports these changed vs main: ['s19_app/tui/a2l.py', 's19_app/validation/rules.py']
+E       assert ['s19_app/tui...ion/rules.py'] == []
+E         
+E         Left contains 2 more items, first extra item: 's19_app/tui/a2l.py'
+E         Use -v to get more diff
+
+tests/test_engine_unchanged.py:175: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound
+FAILED tests/test_engine_unchanged.py::test_tc027_engine_modules_unchanged_vs_main
+2 failed, 86 passed, 1 deselected in 343.30s (0:05:43)
+## exit: 1  end: 2026-11-05T23:52:29Z

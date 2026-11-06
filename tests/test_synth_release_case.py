@@ -120,12 +120,12 @@ def test_a2l_zero_issues(case_dir: Path) -> None:
     assert not any(t.get("decode_error") for t in checks)
     assert not any(t.get("value_outside_limits") for t in checks)
 
-    # The app's structural validator flags only the standard ASAP2 blocks that
-    # its RECOGNIZED_A2L_BLOCKS catalog omits (MOD_COMMON/MOD_PAR/AXIS_DESCR).
-    # Nothing may be an ERROR, a duplicate, an invalid address, or a broken
-    # reference.
+    # Batch-101 Inc 11 (R-VAL-032.2): MOD_COMMON / MOD_PAR / AXIS_DESCR are ASAM
+    # block names, so the clean demo's A2L raises no issue at all (base: 102
+    # A2L_UNRECOGNIZED_BLOCK). `== []` replaces the former "all unrecognized"
+    # assertion, which would pass vacuously on an empty list.
     issues = validate_a2l_internal_issues(a2l, tag_checks=checks)
-    assert all(issue.code == "A2L_UNRECOGNIZED_BLOCK" for issue in issues)
+    assert issues == [], [(issue.code, issue.message) for issue in issues[:5]]
 
 
 def test_tab_verb_and_object_census(case_dir: Path) -> None:
