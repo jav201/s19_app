@@ -187,6 +187,11 @@
       "station": "P3",
       "date": "2026-11-05",
       "decision": "P3 increment 014 (Inc 14, help, legend and README describe the shipped app; SECURITY.md; 1.0.0 release notes; user-guide text) approved and merged under the standing authorization: E3 architect FAIL then PASS-WITH-NOTES in round 2; mutants 45/45 (DeepSeek); code-reviewer PASS-WITH-NOTES; security-reviewer BLOCK-UNTIL E5-1 for SECURITY.md, closed when the operator had GitHub private vulnerability reporting enabled (gh api enabled:true, 2026-11-06); coverage 74 cases; trace_check 0 gaps. Merge verification on LAN host 2 found an address-census law-guard failure in the new test file, fixed (4433f7d, 92 passed); the other failures are the known flake, the stale-ref freeze arms and the 2 known snapshots (evidence/merge/lan-merge-inc14.txt)."
+    },
+    {
+      "station": "P3",
+      "date": "2026-11-05",
+      "decision": "P3 increment 013 (Inc 13, CRC Designer and Split/Join responsive at 10 MB: debounced shared recompute, 16 MiB coverage cap, reflect table, O(m log m) sweep; conflict-first state line) approved and merged under the standing authorization: E3 architect FAIL then PASS-WITH-NOTES in round 2 (cap ruled 16 MiB); mutants 24/25 (M-12 equivalent); code-reviewer PASS-WITH-NOTES then PASS on re-review (E4-F1 fixed, D17-27); security-reviewer PASS-WITH-NOTES; coverage 52 cases (49 covered, 3 partial); timings 5/5 within margin; trace_check 0 gaps. Full-suite merge verification on LAN host 2 found two merged-tree failures, fixed in 219b858 (evidence/merge/lan-merge-inc13.txt, fix13-notes.md)."
     }
   ],
   "obsidian_synced": false,

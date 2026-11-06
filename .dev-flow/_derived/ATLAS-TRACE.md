@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 91 requirement files | corpus digest: 6bedbd8af488ce01 -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 92 requirement files | corpus digest: 949d3892dfc2b943 -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
@@ -1522,7 +1522,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 2374 unique id(s)
+## family US/HLR/LLR — 2377 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -3819,6 +3819,8 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `US-C52-4b` | batches |
 | `US-C52-5` | batches |
 | `US-C52-6` | batches |
+| `US-CRC-FRESH-1` | batches |
+| `US-CRC-RESP-1` | batches |
 | `US-CRC1` | batches |
 | `US-CRC2` | batches |
 | `US-CRC3` | batches |
@@ -3881,6 +3883,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `US-README-1` | batches |
 | `US-REL-1` | batches |
 | `US-SEC-1` | batches |
+| `US-SEG-RESP-1` | batches |
 | `US-TST-1` | batches |
 | `US-TST-2` | batches |
 | `US-TST-3` | batches |

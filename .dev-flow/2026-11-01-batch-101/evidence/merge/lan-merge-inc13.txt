@@ -1,0 +1,27 @@
+LAN host 2, merged tree d16f77c (main + Inc 13) — FULL suite (-n 12) + serial lane; snapshot suite on the LAN laptop host in the CI-recipe venv. New failures vs main CI: test_at_b83_08 (address census: an attribute passed to query_one in tests/test_b101_designer_recompute.py) and test_r_whelp_24_2 (an Inc 14 test reusing Inc 13's helper without its counter fixture) — both fixed in 219b858 (evidence/merge/fix13-*.{md,txt}: 304 passed). The other 4 failures are the known ones (b78_03, 056e_a2b, 2 tc016s snapshots).
+<HOME>/work/s19_merge13/s19_app/__init__.py
+2 mismatched snapshots
+
+View the failure report.
+
+<HOME>/work/s19_merge13/snapshot_report.html
+
+=========================== short test summary info ============================
+FAILED tests/test_address_census.py::test_at_b83_08_tree_holds_no_assembled_selectors
+FAILED tests/test_b101_help_legend_docs.py::test_r_whelp_24_2_coverage_reads_typed_ranges
+FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-120x30]
+6 failed, 5720 passed, 181 skipped, 4 xfailed in 2730.13s (0:45:30)
+---serial---
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier v1-document  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[v1-document]
+100.0%  0.000 s / 1.000 s  TC-B100-24 batch  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[batch]
+100.0%  0.000 s / 1.000 s  TC-B100-24 gathered  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[gathered]
+QC-TM: 84 bounds, 0 under 20 % margin
+66 passed, 2 skipped, 5911 deselected in 349.27s (0:05:49)
+---snapshot-laptop---
+=========================== short test summary info ============================
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-120x30]
+2 failed, 27 passed, 4 deselected in 118.66s (0:01:58)
