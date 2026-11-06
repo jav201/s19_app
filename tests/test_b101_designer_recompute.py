@@ -1202,7 +1202,8 @@ def test_r_crc_preview_coverage_crc_error_after_a_clean_evaluation_is_named(
             await pilot.pause()
             await pilot.press("0")
             await pilot.pause()
-            panel = app.query_one(crc_designer_view.CrcDesignerPanel)
+            panel_cls = crc_designer_view.CrcDesignerPanel
+            panel = app.query_one(panel_cls)
             run = crc_designer_view._CoverageRun(
                 target=panel._build_coverage_target(),
                 evaluation=crc_designer_model.TargetEvaluation(

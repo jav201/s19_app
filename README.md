@@ -228,8 +228,9 @@ per-group counts.
 Tailors a CRC from the parametric (Rocksoft) building blocks — width 8–64,
 polynomial, init, reflection, final XOR — seeded from a catalogue of named
 presets. A live known-answer verdict (`MATCH` / `MISMATCH` / `NO-EXPECTED`)
-recomputes on every keystroke, and the algorithm saves/loads as a
-`*.crc.json` template.
+recomputes 150 ms after the last keystroke in a text field (at once on a
+toggle or a dropdown), and the algorithm saves/loads as a `*.crc.json`
+template.
 
 ### Split / Join / Export
 

@@ -49,6 +49,9 @@ from s19_app.tui.services.report_service import REPORT_FILENAME_REGEX
 from s19_app.tui.window_help import WINDOW_HELP_SECTIONS
 from tests.support import help_copy_i14 as COPY
 from tests.support.b100_workers import settle_workers
+from tests.support.b101_designer import (  # noqa: F401  (the fixture is used by name)
+    designer_recompute_counter,
+)
 from tests.support.timing import wait_until
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -1038,6 +1041,9 @@ def test_r_whelp_23_2_checks_group_order() -> None:
     assert asyncio.run(_drive()) == ["FAILED", "UNCHECKABLE", "PASSED"]
 
 
+# Inc 13 debounces the recompute and ``_coverage_preview`` waits on the
+# recompute count, which only the counter fixture advances.
+@pytest.mark.usefixtures("designer_recompute_counter")
 def test_r_whelp_24_2_coverage_reads_typed_ranges(tmp_path: Path) -> None:
     from tests.test_crc_designer_view import _coverage_preview
 

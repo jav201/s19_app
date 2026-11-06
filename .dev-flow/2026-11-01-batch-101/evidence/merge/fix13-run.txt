@@ -1,0 +1,16 @@
+# fix13 final run: LAN Linux host 2, merged tree (origin/main b7acd4b + local Inc 13 merge + fix13 edits), Python 3.11 (s19ci env), env -u NO_COLOR, pytest -n 8
+# tests/test_address_census.py tests/test_b101_help_legend_docs.py tests/test_b101_designer_recompute.py tests/test_crc_designer_view.py tests/test_window_usage_help.py tests/test_docs_canon.py tests/test_id_registry.py tests/test_suite_hygiene.py
+# exit=0
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 23%]
+........................................................................ [ 47%]
+........................................................................ [ 71%]
+........................................................................ [ 94%]
+................                                                         [100%]
+============================= QC-TM timing margins =============================
+49.6%  0.202 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+66.4%  0.504 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 2 bounds, 0 under 20 % margin
+304 passed in 183.30s (0:03:03)
