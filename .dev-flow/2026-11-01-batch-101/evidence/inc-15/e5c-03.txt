@@ -1,0 +1,25 @@
+# e5c-03: 4 nodes serial, rep 1 (R-TST-157/1)
+# tree: s19_i15c; env: I15_HOLD= I15_HOLD_ACTION= I15_NEVER=
+# cmd: python -m pytest -p i15c_e5_guard -p no:cacheprovider -v tests/test_tui_patch_editor_v2.py::test_tc331_disable_guard_predicate_tracks_source_path tests/test_tui_patch_editor_v2.py::test_at030c_directly_dropped_file_is_listed_and_loadable tests/test_tui_patch_editor_v2.py::test_save_back_prompt tests/test_tui_flow_execution_b94.py::test_tc_b94_27_lane_binding_isolation_and_noop
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0 -- /data/miniconda3/envs/s19ci/bin/python
+i15c: commit under test = 5edcb3f (c2cba35 + the Inc 15 tests/docs patch at 5edcb3f, sha256 15df472e) (tree = s19_i15c; git HEAD here = c2cba356f254cf85ba8c0e05b47b5103baf2d733)
+i15c: s19_app.__file__ = <HOME>/work/s19_i15c/s19_app/__init__.py
+i15c: python 3.11.18 on Linux; textual 8.2.8
+i15c: NO_COLOR set = False; LOCALAPPDATA = None; APPDATA = None
+i15c: TEMP = None; TMP = None
+i15c: OS clipboard writers replaced by a raising guard
+i15c: hold =  action =  s = 1.5; never = ''
+rootdir: <HOME>/work/s19_i15c
+configfile: pyproject.toml
+plugins: platformdirs-4.14.3, xdist-3.8.0
+collecting ... collected 4 items
+
+tests/test_tui_patch_editor_v2.py::test_tc331_disable_guard_predicate_tracks_source_path PASSED [ 25%]
+tests/test_tui_patch_editor_v2.py::test_at030c_directly_dropped_file_is_listed_and_loadable PASSED [ 50%]
+tests/test_tui_patch_editor_v2.py::test_save_back_prompt PASSED          [ 75%]
+tests/test_tui_flow_execution_b94.py::test_tc_b94_27_lane_binding_isolation_and_noop PASSED [100%]
+
+i15c: hold installed = None; never installed = None
+============================== 4 passed in 12.98s ==============================
+# rc=0

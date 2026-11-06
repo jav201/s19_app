@@ -1,0 +1,6 @@
+platform Windows 10 python 3.11.15
+process_time clock info namespace(implementation='GetProcessTimes()', monotonic=True, adjustable=False, resolution=1e-07)
+observed process_time steps (s) [0.0156]
+cpu ms read after 5 ms of busy work, 20 tries: [0.0, 15.62, 0.0, 0.0, 15.62, 0.0, 0.0, 15.62, 0.0, 0.0, 15.62, 0.0, 0.0, 0.0, 15.62, 0.0, 0.0, 15.62, 0.0, 0.0]
+cpu ms read after 1 ms of busy work, 20 tries: [15.62, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 15.62, 0.0, 0.0, 0.0]
+asyncio.sleep(0.02) wall ms, 20 tries: [31.8, 27.6, 29.6, 27.9, 27.9, 27.5, 23.8, 27.1, 31.3, 27.3, 30.6, 31.5, 28.4, 27.6, 24.4, 27.6, 28.1, 24.5, 27.8, 28.4]

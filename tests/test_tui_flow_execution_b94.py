@@ -27,6 +27,7 @@ from s19_app.tui.services.flow_model import (
     SourceBlock,
     WriteOutBlock,
 )
+from tests.b97_probes import painted_rows, settled
 
 #: Minimal CLEAN S19 — 01 02 03 04 at 0x1000 (checksum-verified).
 _S19 = "S107100001020304DE\nS9030000FC\n"
@@ -481,6 +482,12 @@ def test_tc_b94_27_lane_binding_isolation_and_noop(tmp_path: Path) -> None:
     """TC-B94-27 (LLR-018.1, white-box over the shipped panel): editing lane
     A changes exactly A's record; B's bound path is byte-identical
     before/after (0 fields changed); a rebind to the same path is a no-op.
+
+    Inc 15 (R-TST-152, R-TST-153, R-TST-154, R-TST-155, R-TST-163, R-TST-164):
+    the reads after each Bind wait through the shared wait for the panel's
+    bind step to return (a recorder on ``_rebind``), so the no-op arm is
+    non-vacuous. The reads after the imports wait for both lanes on screen
+    (D9), and lane B's paint is read off the compositor (E5 C-6, C-10).
     """
     project = _project(tmp_path)
 
@@ -493,23 +500,56 @@ def test_tc_b94_27_lane_binding_isolation_and_noop(tmp_path: Path) -> None:
             await _import_stem(app, pilot, "base")
             await pilot.pause()
             await _import_stem(app, pilot, "base")
-            await pilot.pause()
+            await settled(
+                pilot,
+                lambda: (
+                    panel.lane_names() == ["base", "base_2"]
+                    and bool(app.query("#fx_in_1_0"))
+                    and bool(app.query_one("#fx_in_1_0").region)
+                ),
+                "TC-B94-27: the panel mounted lanes base and base_2",
+            )
             before_b = panel.lane_bindings("base_2")
             field_b = app.query_one("#fx_in_1_0", Input).value
             dirty_before_noop = panel.is_dirty
 
+            # Record the panel's bind step: each wait below reads this
+            # counter so the no-op arm proves the press was handled
+            # (R-TST-152, 153).
+            real_rebind = panel._rebind
+            rebind_calls: list[int] = []
+
+            def _recorded_rebind(*args, **kwargs):
+                result = real_rebind(*args, **kwargs)
+                rebind_calls.append(1)
+                return result
+
+            panel._rebind = _recorded_rebind
+
             # Rebind A (the no-op arm first: same ref as now).
             _bind(app, 0, 0, "base.s19")
-            await pilot.pause()
+            await settled(
+                pilot,
+                lambda: len(rebind_calls) >= 1,
+                "TC-B94-27: the panel handled the Bind to the same ref",
+            )
             noop_bindings = panel.lane_bindings("base")
 
             # Rebind A to a different file — exactly A's record changes.
             _bind(app, 0, 0, "variant_b.hex")
-            await pilot.pause()
+            await settled(
+                pilot,
+                lambda: len(rebind_calls) >= 2,
+                "TC-B94-27: the panel handled the Bind to variant_b.hex",
+            )
             after_a = panel.lane_bindings("base")
             after_b = panel.lane_bindings("base_2")
             field_b_after = app.query_one("#fx_in_1_0", Input).value
-            paint_b = panel.lane_paint_plain(1)
+            lane_b = app.query_one("#fx_lane_1")
+            shown = app.screen.find_widget(lane_b)
+            paint_b = "\n".join(
+                painted_rows(app, lane_b, shown.region.intersection(shown.clip))
+            )
             return {
                 "before_b": before_b,
                 "field_b": field_b,

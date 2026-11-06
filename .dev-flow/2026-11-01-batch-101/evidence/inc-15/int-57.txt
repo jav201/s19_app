@@ -1,0 +1,189 @@
+# int-57: D8 never settles
+# tree: never; env: I15_HOLD= I15_HOLD_ACTION= I15_NEVER=TC-051: the confirm hid the save-back prompt
+# cmd: python -m pytest -p i15int_guard -p no:cacheprovider -v tests/test_tui_patch_editor_v2.py::test_save_back_prompt
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0 -- /data/miniconda3/envs/s19ci/bin/python
+i15int: commit under test = 77f4553 (c2cba35 + the Inc 15 tests/docs patch, sha256 fdde60cc) (tree = never; git HEAD here = n/a (CalledProcessError))
+i15int: s19_app.__file__ = /tmp/i15int/trees/never/s19_app/__init__.py
+i15int: python 3.11.18 on Linux; textual 8.2.8
+i15int: NO_COLOR set = False; LOCALAPPDATA = None; APPDATA = None
+i15int: TEMP = None; TMP = None
+i15int: OS clipboard writers replaced by a raising guard
+i15int: hold =  action =  s = 1.5; never = 'TC-051: the confirm hid the save-back prompt'
+rootdir: /tmp/i15int/trees/never
+configfile: pyproject.toml
+plugins: platformdirs-4.14.3, xdist-3.8.0
+collecting ... collected 1 item
+
+tests/test_tui_patch_editor_v2.py::test_save_back_prompt FAILED          [100%]
+
+=================================== FAILURES ===================================
+____________________________ test_save_back_prompt _____________________________
+
+tmp_path = PosixPath('/tmp/i15int/runs/int-57/bt/test_save_back_prompt0')
+
+    def test_save_back_prompt(tmp_path: Path) -> None:
+        """The post-apply prompt offers an editable suggestion; decline writes
+        nothing; adversarial typed names are contained or refused.
+    
+        Intent: LLR-002.7 UI half (F-Q-10) — after an apply with ≥1 applied
+        entry on an S19 image the prompt appears pre-filled with
+        ``<variant_id>-patched.s19``; declining leaves ``saved_path`` ``None``
+        and writes no file; the operator-typed name passes the F-S-01
+        sanitizer — a traversal name and an absolute path are neutralised into
+        the work area, a reserved device name is refused (3 adversarial cases —
+        the v2 replacement for the retired batch-04 containment tests).
+    
+        Inc 15 (R-TST-160, R-TST-161, R-TST-162, R-TST-154, R-TST-155,
+        R-TST-163): every read after an apply or a save-back answer waits
+        through the shared wait for the prompt to show or hide.
+        """
+        from textual.containers import Container
+        from textual.widgets import Button, Input
+    
+        image_path = _make_s19_image(tmp_path)
+    
+        async def _drive() -> dict[str, object]:
+            outcomes: dict[str, object] = {}
+            workarea = tmp_path / ".s19tool" / "workarea"
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                _load_image(app, image_path)
+                app.action_show_screen("patch")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+    
+                _set_entry_inputs(app, address="0x100", bytes_text="AA BB")
+                panel.request_action("add_entry")
+                await pilot.pause()
+    
+                async def _apply() -> None:
+                    panel.request_action("apply_doc")
+                    await settled(
+                        pilot,
+                        lambda: not prompt.has_class("hidden"),
+                        "TC-051: the apply showed the save-back prompt",
+                    )
+    
+                prompt = app.query_one("#patch_saveback_row", Container)
+                name_input = app.query_one("#patch_saveback_name_input", Input)
+    
+                # Stage 1 — prompt appears with the pre-filled suggestion.
+                await _apply()
+                outcomes["prompt_shown"] = not prompt.has_class("hidden")
+                outcomes["suggestion"] = name_input.value
+    
+                # Stage 2 — decline: nothing written, saved_path stays None.
+                app.query_one("#patch_saveback_decline_button", Button).press()
+                await settled(
+                    pilot,
+                    lambda: prompt.has_class("hidden"),
+                    "TC-051: the decline hid the save-back prompt",
+                )
+                outcomes["prompt_hidden_after_decline"] = prompt.has_class(
+                    "hidden"
+                )
+                outcomes["declined_saved_path"] = (
+                    app._change_service.last_summary.saved_path
+                )
+                outcomes["s19_after_decline"] = sorted(
+                    p.name for p in workarea.rglob("*.s19")
+                )
+    
+                # Stage 3 — the suggestion is editable; adversarial names.
+                async def _confirm_with(name: str) -> None:
+                    await _apply()
+                    name_input.value = name
+                    app.query_one(
+                        "#patch_saveback_confirm_button", Button
+                    ).press()
+                    await settled(
+                        pilot,
+                        lambda: prompt.has_class("hidden"),
+                        "TC-051: the confirm hid the save-back prompt",
+                    )
+    
+                await _confirm_with("..\\escape.s19")
+                outcomes["traversal_saved_path"] = (
+                    app._change_service.last_summary.saved_path
+                )
+                outcomes["traversal_escaped"] = (
+                    (tmp_path / "escape.s19").exists()
+                    or (tmp_path.parent / "escape.s19").exists()
+                )
+    
+                await _confirm_with("C:\\evil\\abs.s19")
+                outcomes["absolute_saved_path"] = (
+                    app._change_service.last_summary.saved_path
+                )
+    
+                await _confirm_with("CON.s19")
+                outcomes["reserved_saved_path"] = (
+                    app._change_service.last_summary.saved_path
+                )
+                outcomes["reserved_files"] = sorted(
+                    p.name for p in workarea.rglob("CON*")
+                )
+            return outcomes
+    
+>       outcomes = asyncio.run(_drive())
+                   ^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_tui_patch_editor_v2.py:635: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_tui_patch_editor_v2.py:612: in _drive
+    await _confirm_with("..\\escape.s19")
+tests/test_tui_patch_editor_v2.py:606: in _confirm_with
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+../../scripts/i15int_guard.py:115: in never
+    return await real(pilot, predicate, failure, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function _install_never.<locals>.never.<locals>.<lambda> at 0x7f28eb2c9940>
+failure = 'did not settle: TC-051: the confirm hid the save-back prompt'
+timeout = 3.0, pause_first = True
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: did not settle: TC-051: the confirm hid the save-back prompt
+
+tests/support/timing.py:66: AssertionError
+i15int: hold installed = None; never installed = 'TC-051: the confirm hid the save-back prompt'
+=========================== short test summary info ============================
+FAILED tests/test_tui_patch_editor_v2.py::test_save_back_prompt - AssertionEr...
+============================== 1 failed in 6.47s ===============================
+# rc=1

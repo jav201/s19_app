@@ -57,6 +57,7 @@ from s19_app.tui.changes.io import (
 )
 from s19_app.tui.screens_directionb import PatchEditorPanel
 from s19_app.tui.services.load_service import build_loaded_hex, build_loaded_s19
+from tests.b97_probes import settled
 
 NEW_WIDGET_IDS = (
     "patch_doc_path_input",
@@ -537,6 +538,10 @@ def test_save_back_prompt(tmp_path: Path) -> None:
     sanitizer — a traversal name and an absolute path are neutralised into
     the work area, a reserved device name is refused (3 adversarial cases —
     the v2 replacement for the retired batch-04 containment tests).
+
+    Inc 15 (R-TST-160, R-TST-161, R-TST-162, R-TST-154, R-TST-155,
+    R-TST-163): every read after an apply or a save-back answer waits
+    through the shared wait for the prompt to show or hide.
     """
     from textual.containers import Container
     from textual.widgets import Button, Input
@@ -560,7 +565,11 @@ def test_save_back_prompt(tmp_path: Path) -> None:
 
             async def _apply() -> None:
                 panel.request_action("apply_doc")
-                await pilot.pause()
+                await settled(
+                    pilot,
+                    lambda: not prompt.has_class("hidden"),
+                    "TC-051: the apply showed the save-back prompt",
+                )
 
             prompt = app.query_one("#patch_saveback_row", Container)
             name_input = app.query_one("#patch_saveback_name_input", Input)
@@ -572,7 +581,11 @@ def test_save_back_prompt(tmp_path: Path) -> None:
 
             # Stage 2 — decline: nothing written, saved_path stays None.
             app.query_one("#patch_saveback_decline_button", Button).press()
-            await pilot.pause()
+            await settled(
+                pilot,
+                lambda: prompt.has_class("hidden"),
+                "TC-051: the decline hid the save-back prompt",
+            )
             outcomes["prompt_hidden_after_decline"] = prompt.has_class(
                 "hidden"
             )
@@ -590,7 +603,11 @@ def test_save_back_prompt(tmp_path: Path) -> None:
                 app.query_one(
                     "#patch_saveback_confirm_button", Button
                 ).press()
-                await pilot.pause()
+                await settled(
+                    pilot,
+                    lambda: prompt.has_class("hidden"),
+                    "TC-051: the confirm hid the save-back prompt",
+                )
 
             await _confirm_with("..\\escape.s19")
             outcomes["traversal_saved_path"] = (
@@ -1561,6 +1578,9 @@ def test_at030c_directly_dropped_file_is_listed_and_loadable(
     v2 change file dropped DIRECTLY into ``patches/`` (bypassing ``save_doc``)
     must be listed in the dropdown and loadable. This stays green even under a
     reverted save handler, so it is structurally a guard, NOT the C-12 gate.
+
+    Inc 15 (R-TST-159, R-TST-154, R-TST-155, R-TST-163): the entry read
+    waits through the shared wait for the pick to load ``dropped.json``.
     """
     from textual.widgets import Select
 
@@ -1581,7 +1601,15 @@ def test_at030c_directly_dropped_file_is_listed_and_loadable(
             options = _select_option_values(select)
 
             select.value = "dropped.json"
-            await pilot.pause()
+            await settled(
+                pilot,
+                lambda: (
+                    app._change_service.document.source_path is not None
+                    and app._change_service.document.source_path.name
+                    == "dropped.json"
+                ),
+                "AT-030c: the load of dropped.json reached the change document",
+            )
             active = [
                 entry.address
                 for entry in app._change_service.document.entries
@@ -3507,6 +3535,10 @@ def test_tc331_disable_guard_predicate_tracks_source_path(
     ``ChangeService.document.source_path`` across the file→paste transition —
     fresh (None) → enabled; after a file load (not None) → disabled; after a
     subsequent paste (None) → enabled again.
+
+    Inc 15 (R-TST-150, R-TST-151, R-TST-154, R-TST-155, R-TST-163): the
+    two reads wait through the shared wait for the load and the paste to
+    reach the change document.
     """
     from textual.widgets import Button
 
@@ -3532,11 +3564,23 @@ def test_tc331_disable_guard_predicate_tracks_source_path(
 
             _set_entry_inputs(app, path_text=str(doc_path))
             panel.request_action("load_doc")
-            await pilot.pause()
+            await settled(
+                pilot,
+                lambda: (
+                    app._change_service.document.source_path is not None
+                    and app._change_service.document.source_path.name
+                    == "f.json"
+                ),
+                "TC-331: the load of f.json reached the change document",
+            )
             outcomes["file_disabled"] = button.disabled
 
             _seed_via_paste(app, paste)
-            await pilot.pause()
+            await settled(
+                pilot,
+                lambda: app._change_service.document.source_path is None,
+                "TC-331: the parsed paste reached the change document",
+            )
             outcomes["paste_enabled"] = not button.disabled
         return outcomes
 

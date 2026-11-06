@@ -1,0 +1,22 @@
+# int-12: D2 patch_action[parse_paste] hold, fixed form, rep 2
+# tree: hold-fixed; env: I15_HOLD=patch_action I15_HOLD_ACTION=parse_paste I15_NEVER=
+# cmd: python -m pytest -p i15int_guard -p no:cacheprovider -v tests/test_tui_patch_editor_v2.py::test_tc331_disable_guard_predicate_tracks_source_path
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0 -- /data/miniconda3/envs/s19ci/bin/python
+i15int: commit under test = 77f4553 (c2cba35 + the Inc 15 tests/docs patch, sha256 fdde60cc) (tree = hold-fixed; git HEAD here = n/a (CalledProcessError))
+i15int: s19_app.__file__ = /tmp/i15int/trees/hold-fixed/s19_app/__init__.py
+i15int: python 3.11.18 on Linux; textual 8.2.8
+i15int: NO_COLOR set = False; LOCALAPPDATA = None; APPDATA = None
+i15int: TEMP = None; TMP = None
+i15int: OS clipboard writers replaced by a raising guard
+i15int: hold = patch_action action = parse_paste s = 1.5; never = ''
+rootdir: /tmp/i15int/trees/hold-fixed
+configfile: pyproject.toml
+plugins: platformdirs-4.14.3, xdist-3.8.0
+collecting ... collected 1 item
+
+tests/test_tui_patch_editor_v2.py::test_tc331_disable_guard_predicate_tracks_source_path PASSED [100%]
+
+i15int: hold installed = patch_action[parse_paste] 1.5s; never installed = None
+============================== 1 passed in 4.30s ===============================
+# rc=0

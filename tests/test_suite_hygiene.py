@@ -43,6 +43,7 @@ import sys
 import time
 import xml.etree.ElementTree as etree
 import zipfile
+from collections import Counter
 from pathlib import Path
 
 import pytest
@@ -104,6 +105,12 @@ _CONVENTION_RULES = {
         "When an increment changes the order or the source of an observable, "
         "its gate greps tests/ for every node that asserts that observable "
         "and runs them, whatever module they sit in."
+    ),
+    "R-TST-158": (
+        "A new or changed arm that checks the state a press, a value it sets "
+        "or a posted action leaves waits through a shared wait for a sign "
+        "that the app handled it, also when it asserts that nothing changed; "
+        "it never reads after fixed pauses alone."
     ),
 }
 
@@ -629,7 +636,7 @@ def test_r_tst_006_detector_ignores_intervals_no_assert_reads() -> None:
 
 
 @pytest.mark.parametrize(
-    "rule_id", ["R-TST-007", "R-TST-030", "R-TST-047", "R-TST-048", "R-TST-052", "R-TST-060"]
+    "rule_id", ["R-TST-007", "R-TST-030", "R-TST-047", "R-TST-048", "R-TST-052", "R-TST-060", "R-TST-158"]
 )
 def test_r_tst_007_conventions_hold_each_test_rule(rule_id) -> None:
     text = CONVENTIONS_PATH.read_text(encoding="utf-8")
@@ -2099,3 +2106,284 @@ def test_r_tst_082_wrong_version_still_differs(monkeypatch) -> None:
     assert produced != golden_side, (
         "a report printing another version must still differ from the golden"
     )
+
+
+# ---------------------------------------------------------------------------
+# R-TST-154 / 155 / 163 — the Inc 15 arms wait through the shared wait
+# ---------------------------------------------------------------------------
+
+
+#: The nine static wait sites of table D (01-requirements.md): (module, arm,
+#: helper-or-none, trigger-as-unparse, description, predicate-as-unparse).
+#: "helper or none" is the arm's nested ``_drive`` body for D1 … D5, D7 and D9
+#: (N1); ``_apply`` and ``_confirm_with`` are nested inside ``_drive``. The
+#: predicate column pins each wait's sign (E5 C-2): a vacuous or swapped
+#: predicate has to edit this table, where review sees it.
+_INC15_WAIT_SITES = (
+    (
+        "tests/test_tui_patch_editor_v2.py",
+        "test_tc331_disable_guard_predicate_tracks_source_path",
+        None,
+        "panel.request_action('load_doc')",
+        "TC-331: the load of f.json reached the change document",
+        (
+            "lambda: app._change_service.document.source_path is not None and "
+            "app._change_service.document.source_path.name == 'f.json'"
+        ),
+    ),
+    (
+        "tests/test_tui_patch_editor_v2.py",
+        "test_tc331_disable_guard_predicate_tracks_source_path",
+        None,
+        "_seed_via_paste(app, paste)",
+        "TC-331: the parsed paste reached the change document",
+        "lambda: app._change_service.document.source_path is None",
+    ),
+    (
+        "tests/test_tui_flow_execution_b94.py",
+        "test_tc_b94_27_lane_binding_isolation_and_noop",
+        None,
+        "_bind(app, 0, 0, 'base.s19')",
+        "TC-B94-27: the panel handled the Bind to the same ref",
+        "lambda: len(rebind_calls) >= 1",
+    ),
+    (
+        "tests/test_tui_flow_execution_b94.py",
+        "test_tc_b94_27_lane_binding_isolation_and_noop",
+        None,
+        "_bind(app, 0, 0, 'variant_b.hex')",
+        "TC-B94-27: the panel handled the Bind to variant_b.hex",
+        "lambda: len(rebind_calls) >= 2",
+    ),
+    (
+        "tests/test_tui_patch_editor_v2.py",
+        "test_at030c_directly_dropped_file_is_listed_and_loadable",
+        None,
+        "select.value = 'dropped.json'",
+        "AT-030c: the load of dropped.json reached the change document",
+        (
+            "lambda: app._change_service.document.source_path is not None and "
+            "app._change_service.document.source_path.name == 'dropped.json'"
+        ),
+    ),
+    (
+        "tests/test_tui_patch_editor_v2.py",
+        "test_save_back_prompt",
+        "_apply",
+        "panel.request_action('apply_doc')",
+        "TC-051: the apply showed the save-back prompt",
+        "lambda: not prompt.has_class('hidden')",
+    ),
+    (
+        "tests/test_tui_patch_editor_v2.py",
+        "test_save_back_prompt",
+        None,
+        "app.query_one('#patch_saveback_decline_button', Button).press()",
+        "TC-051: the decline hid the save-back prompt",
+        "lambda: prompt.has_class('hidden')",
+    ),
+    (
+        "tests/test_tui_patch_editor_v2.py",
+        "test_save_back_prompt",
+        "_confirm_with",
+        "app.query_one('#patch_saveback_confirm_button', Button).press()",
+        "TC-051: the confirm hid the save-back prompt",
+        "lambda: prompt.has_class('hidden')",
+    ),
+    (
+        "tests/test_tui_flow_execution_b94.py",
+        "test_tc_b94_27_lane_binding_isolation_and_noop",
+        None,
+        "await _import_stem(app, pilot, 'base')",
+        "TC-B94-27: the panel mounted lanes base and base_2",
+        (
+            "lambda: panel.lane_names() == ['base', 'base_2'] and "
+            "bool(app.query('#fx_in_1_0')) and bool(app.query_one('#fx_in_1_0').region)"
+        ),
+    ),
+)
+
+
+def _arm_function(module_path: Path, name: str):
+    """Parse ``module_path`` and return its top-level function ``name``.
+
+    Raises:
+        AssertionError: the function is not a top-level def of the module.
+    """
+    tree = ast.parse(module_path.read_text(encoding="utf-8"), filename=str(module_path))
+    for node in tree.body:
+        if (
+            isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+            and node.name == name
+        ):
+            return node
+    raise AssertionError(f"arm {name} not found in {module_path}")
+
+
+def _nested_def(node, name: str):
+    """The nested ``def name`` inside ``node`` (excluding ``node`` itself)."""
+    for child in ast.walk(node):
+        if child is node:
+            continue
+        if (
+            isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef))
+            and child.name == name
+        ):
+            return child
+    return None
+
+
+def _drive_body(drive):
+    """The body of ``_drive``'s ``async with app.run_test(…)`` block (N1)."""
+    for stmt in drive.body:
+        if isinstance(stmt, ast.AsyncWith):
+            return stmt.body
+    raise AssertionError("_drive has no async with app.run_test(...) block")
+
+
+def _settled_description(statement):
+    """The description constant of an ``await settled(..., <desc>)`` statement."""
+    if not isinstance(statement, ast.Expr):
+        return None
+    value = statement.value
+    if not isinstance(value, ast.Await):
+        return None
+    call = value.value
+    if not isinstance(call, ast.Call):
+        return None
+    func = call.func
+    if not (
+        (isinstance(func, ast.Name) and func.id == "settled")
+        or (isinstance(func, ast.Attribute) and func.attr == "settled")
+    ):
+        return None
+    if len(call.args) > 2 and isinstance(call.args[2], ast.Constant):
+        return call.args[2].value
+    return None
+
+
+def _settled_predicate(statement):
+    """The predicate of an ``await settled(pilot, <predicate>, ...)`` statement,
+    as ``ast.unparse`` (call it after ``_settled_description`` matched)."""
+    return ast.unparse(statement.value.value.args[1])
+
+
+def _calls_named(node, name: str) -> bool:
+    """True when ``node`` is a call whose function is the bare name ``name``."""
+    return (
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == name
+    )
+
+
+def _pause_loops(function) -> list:
+    """The ``for … in range(…)`` loops of ``function`` whose body pauses."""
+    found = []
+    for node in ast.walk(function):
+        if not isinstance(node, (ast.For, ast.AsyncFor)):
+            continue
+        if not isinstance(node.iter, ast.Call):
+            continue
+        if not (isinstance(node.iter.func, ast.Name) and node.iter.func.id == "range"):
+            continue
+        for child in ast.walk(node):
+            if (
+                isinstance(child, ast.Call)
+                and isinstance(child.func, ast.Attribute)
+                and child.func.attr == "pause"
+                and isinstance(child.func.value, ast.Name)
+                and child.func.value.id == "pilot"
+            ):
+                found.append(node)
+                break
+    return found
+
+
+def _settled_bindings(tree) -> list:
+    """Every statement in ``tree`` that binds the name ``settled``."""
+    found = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom):
+            found += [
+                f"from {node.module} import {alias.name}"
+                for alias in node.names
+                if (alias.asname or alias.name) == "settled"
+            ]
+        elif (
+            isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+            and node.name == "settled"
+        ):
+            found.append(f"def settled (line {node.lineno})")
+        elif (
+            isinstance(node, ast.Name)
+            and node.id == "settled"
+            and isinstance(node.ctx, ast.Store)
+        ):
+            found.append(f"settled = ... (line {node.lineno})")
+    return found
+
+
+def test_r_tst_154_155_inc15_arms_wait_through_settled() -> None:
+    """R-TST-154, R-TST-155, R-TST-163: the nine table-D wait sites of the
+    four Inc 15 arms go through ``tests.b97_probes.settled``, pass their
+    table-D descriptions verbatim and their pinned predicates, and sit as the
+    statement directly after their trigger in the same block (a trigger that
+    repeats in the block is keyed on its last occurrence, which the reads
+    follow); each arm holds exactly its table-D count of ``settled`` calls
+    and no ``range``-counted pause loop and no call of a module-local wait
+    helper (``_settled``, ``_wait_for``)."""
+    expected = Counter(
+        (module, arm) for (module, arm, _h, _t, _d, _p) in _INC15_WAIT_SITES
+    )
+
+    # R-TST-155: the name ``settled`` the sites call is the shared wait.
+    for module_rel in sorted({module for (module, *_rest) in _INC15_WAIT_SITES}):
+        tree = ast.parse((REPO_ROOT / module_rel).read_text(encoding="utf-8"))
+        assert _settled_bindings(tree) == ["from tests.b97_probes import settled"], (
+            f"{module_rel}: `settled` must be bound only by the import from "
+            f"tests.b97_probes, found {_settled_bindings(tree)}"
+        )
+
+    for module_rel, arm_name, helper, trigger, description, predicate in _INC15_WAIT_SITES:
+        module_path = REPO_ROOT / module_rel
+        arm = _arm_function(module_path, arm_name)
+        drive = _nested_def(arm, "_drive")
+        assert drive is not None, f"{arm_name}: nested _drive coroutine missing"
+        if helper is None:
+            body = _drive_body(drive)
+        else:
+            helper_def = _nested_def(drive, helper)
+            assert helper_def is not None, f"{arm_name}: nested {helper} missing"
+            body = helper_def.body
+        index = max(
+            (i for i, stmt in enumerate(body) if ast.unparse(stmt) == trigger),
+            default=None,
+        )
+        assert index is not None, (
+            f"{arm_name} › {helper or '_drive'}: trigger {trigger!r} not found"
+        )
+        following = body[index + 1] if index + 1 < len(body) else None
+        assert _settled_description(following) == description, (
+            f"{arm_name} › {helper or '_drive'}: the statement after "
+            f"{trigger!r} must be an `await settled` passing {description!r}"
+        )
+        assert _settled_predicate(following) == predicate, (
+            f"{arm_name} › {helper or '_drive'}: the wait after {trigger!r} "
+            f"must poll the table-D predicate {predicate!r}"
+        )
+
+    for (module_rel, arm_name), want in sorted(expected.items()):
+        arm = _arm_function(REPO_ROOT / module_rel, arm_name)
+        settled_calls = sum(
+            1 for node in ast.walk(arm) if _calls_named(node, "settled")
+        )
+        assert settled_calls == want, (
+            f"{arm_name}: {settled_calls} settled() calls, expected {want}"
+        )
+        for local_wait in ("_settled", "_wait_for"):
+            local_calls = sum(
+                1 for node in ast.walk(arm) if _calls_named(node, local_wait)
+            )
+            assert local_calls == 0, f"{arm_name} uses the module-local {local_wait}"
+        assert not _pause_loops(arm), f"{arm_name} has a range-counted pause loop"

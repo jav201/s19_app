@@ -1,0 +1,128 @@
+# e5c-10: D9 fx_import hold, base form (5054743), rep 1
+# tree: hold-base; env: I15_HOLD=fx_import I15_HOLD_ACTION= I15_NEVER=
+# cmd: python -m pytest -p i15c_e5_guard -p no:cacheprovider -v tests/test_tui_flow_execution_b94.py::test_tc_b94_27_lane_binding_isolation_and_noop
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0 -- /data/miniconda3/envs/s19ci/bin/python
+i15c: commit under test = 5edcb3f (c2cba35 + the Inc 15 tests/docs patch at 5edcb3f, sha256 15df472e) (tree = hold-base; git HEAD here = n/a (CalledProcessError))
+i15c: s19_app.__file__ = /tmp/i15c/trees/hold-base/s19_app/__init__.py
+i15c: python 3.11.18 on Linux; textual 8.2.8
+i15c: NO_COLOR set = False; LOCALAPPDATA = None; APPDATA = None
+i15c: TEMP = None; TMP = None
+i15c: OS clipboard writers replaced by a raising guard
+i15c: hold = fx_import action =  s = 1.5; never = ''
+rootdir: /tmp/i15c/trees/hold-base
+configfile: pyproject.toml
+plugins: platformdirs-4.14.3, xdist-3.8.0
+collecting ... collected 1 item
+
+tests/test_tui_flow_execution_b94.py::test_tc_b94_27_lane_binding_isolation_and_noop FAILED [100%]
+
+=================================== FAILURES ===================================
+________________ test_tc_b94_27_lane_binding_isolation_and_noop ________________
+
+tmp_path = PosixPath('/tmp/i15c/runs/e5c-10/bt/test_tc_b94_27_lane_binding_is0')
+
+    def test_tc_b94_27_lane_binding_isolation_and_noop(tmp_path: Path) -> None:
+        """TC-B94-27 (LLR-018.1, white-box over the shipped panel): editing lane
+        A changes exactly A's record; B's bound path is byte-identical
+        before/after (0 fields changed); a rebind to the same path is a no-op.
+    
+        Inc 15 (R-TST-152, R-TST-153, R-TST-154, R-TST-155, R-TST-163): the
+        reads after each Bind wait through the shared wait for the panel's
+        bind step to return (a recorder on ``_rebind``), so the no-op arm is
+        non-vacuous.
+        """
+        project = _project(tmp_path)
+    
+        async def _drive() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                await _show_fx(app, pilot, project)
+                panel = app.query_one("#fx_panel", FlowExecutionPanel)
+                await _import_stem(app, pilot, "base")
+                await pilot.pause()
+                await _import_stem(app, pilot, "base")
+                await pilot.pause()
+                before_b = panel.lane_bindings("base_2")
+                field_b = app.query_one("#fx_in_1_0", Input).value
+                dirty_before_noop = panel.is_dirty
+    
+                # Record the panel's bind step: each wait below reads this
+                # counter so the no-op arm proves the press was handled
+                # (R-TST-152, 153).
+                real_rebind = panel._rebind
+                rebind_calls: list[int] = []
+    
+                def _recorded_rebind(*args, **kwargs):
+                    result = real_rebind(*args, **kwargs)
+                    rebind_calls.append(1)
+                    return result
+    
+                panel._rebind = _recorded_rebind
+    
+                # Rebind A (the no-op arm first: same ref as now).
+                _bind(app, 0, 0, "base.s19")
+                await settled(
+                    pilot,
+                    lambda: len(rebind_calls) >= 1,
+                    "TC-B94-27: the panel handled the Bind to the same ref",
+                )
+                noop_bindings = panel.lane_bindings("base")
+    
+                # Rebind A to a different file — exactly A's record changes.
+                _bind(app, 0, 0, "variant_b.hex")
+                await settled(
+                    pilot,
+                    lambda: len(rebind_calls) >= 2,
+                    "TC-B94-27: the panel handled the Bind to variant_b.hex",
+                )
+                after_a = panel.lane_bindings("base")
+                after_b = panel.lane_bindings("base_2")
+                field_b_after = app.query_one("#fx_in_1_0", Input).value
+                paint_b = panel.lane_paint_plain(1)
+                return {
+                    "before_b": before_b,
+                    "field_b": field_b,
+                    "dirty_before_noop": dirty_before_noop,
+                    "noop_bindings": noop_bindings,
+                    "after_a": after_a,
+                    "after_b": after_b,
+                    "field_b_after": field_b_after,
+                    "paint_b": paint_b,
+                }
+    
+>       state = asyncio.run(_drive())
+                ^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_tui_flow_execution_b94.py:551: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_tui_flow_execution_b94.py:503: in _drive
+    before_b = panel.lane_bindings("base_2")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = FlowExecutionPanel(id='fx_panel'), lane_name = 'base_2'
+
+    def lane_bindings(self, lane_name: str) -> Dict[int, str]:
+        for lane in self._lanes:
+            if lane.name == lane_name:
+                return dict(lane.bindings)
+>       raise KeyError(lane_name)
+E       KeyError: 'base_2'
+
+s19_app/tui/flow_screens.py:3708: KeyError
+i15c: hold installed = fx_import[*] 1.5s; never installed = None
+=========================== short test summary info ============================
+FAILED tests/test_tui_flow_execution_b94.py::test_tc_b94_27_lane_binding_isolation_and_noop
+============================== 1 failed in 3.29s ===============================
+# rc=1

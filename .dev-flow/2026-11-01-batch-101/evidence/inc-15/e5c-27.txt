@@ -1,0 +1,36 @@
+# e5c-27: ast.unparse of each table-D trigger, description and predicate against the guard table, under three interpreters (pure AST; imports nothing from s19_app or tests)
+# commit under test = 5edcb3f (LAN: c2cba35 + the patch, sha256 15df472e; Windows: the worktree at 5edcb3f)
+# LAN, s19ci:
+OK  TC-331: the load of f.json reached the change document 
+OK  TC-331: the parsed paste reached the change document 
+OK  TC-B94-27: the panel handled the Bind to the same ref 
+OK  TC-B94-27: the panel handled the Bind to variant_b.hex 
+OK  AT-030c: the load of dropped.json reached the change document 
+OK  TC-051: the apply showed the save-back prompt 
+OK  TC-051: the decline hid the save-back prompt 
+OK  TC-051: the confirm hid the save-back prompt 
+OK  TC-B94-27: the panel mounted lanes base and base_2 
+python 3.11.18: 9/9 sites match
+# LAN, system python3:
+OK  TC-331: the load of f.json reached the change document 
+OK  TC-331: the parsed paste reached the change document 
+OK  TC-B94-27: the panel handled the Bind to the same ref 
+OK  TC-B94-27: the panel handled the Bind to variant_b.hex 
+OK  AT-030c: the load of dropped.json reached the change document 
+OK  TC-051: the apply showed the save-back prompt 
+OK  TC-051: the decline hid the save-back prompt 
+OK  TC-051: the confirm hid the save-back prompt 
+OK  TC-B94-27: the panel mounted lanes base and base_2 
+python 3.14.9: 9/9 sites match
+# Windows, base interpreter (no pytest, no s19_app import):
+5edcb3f9
+OK  TC-331: the load of f.json reached the change document 
+OK  TC-331: the parsed paste reached the change document 
+OK  TC-B94-27: the panel handled the Bind to the same ref 
+OK  TC-B94-27: the panel handled the Bind to variant_b.hex 
+OK  AT-030c: the load of dropped.json reached the change document 
+OK  TC-051: the apply showed the save-back prompt 
+OK  TC-051: the decline hid the save-back prompt 
+OK  TC-051: the confirm hid the save-back prompt 
+OK  TC-B94-27: the panel mounted lanes base and base_2 
+python 3.12.7: 9/9 sites match

@@ -1,0 +1,154 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- <HOME>\anaconda3\envs\s19env\python.exe
+i15: s19_app.__file__ = <HOME>\Github\s19_app-b101-inc15\s19_app\__init__.py
+i15: python 3.11.15 on Windows 10; textual 8.2.8
+i15: NO_COLOR set = False; LOCALAPPDATA = <HOME>\.claude\jobs\3f13b036\tmp\i15win\run-05-1\Local
+i15: TEMP = <HOME>\.claude\jobs\3f13b036\tmp\i15win\run-05-1\Temp; USERPROFILE = <HOME>\.claude\jobs\3f13b036\tmp\i15win\run-05-1\Home
+i15: OS clipboard writers replaced by a raising guard
+rootdir: <HOME>\Github\s19_app-b101-inc15
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 2 items
+
+tests/test_tui_patch_editor_v2.py::test_tc331_disable_guard_predicate_tracks_source_path FAILED [ 50%]
+tests/test_tui_flow_execution_b94.py::test_tc_b94_27_lane_binding_isolation_and_noop PASSED [100%]
+
+================================== FAILURES ===================================
+____________ test_tc331_disable_guard_predicate_tracks_source_path ____________
+
+tmp_path = WindowsPath('<HOME>/.claude/jobs/3f13b036/tmp/i15win/run-05-1/bt/test_tc331_disable_guard_predi0')
+
+    def test_tc331_disable_guard_predicate_tracks_source_path(
+        tmp_path: Path,
+    ) -> None:
+        """The disable-guard predicate tracks ``source_path`` live (TC-331).
+    
+        Intent (TC-331, LLR-064b.4): the Edit-JSON control's disabled state tracks
+        ``ChangeService.document.source_path`` across the file\u2192paste transition \u2014
+        fresh (None) \u2192 enabled; after a file load (not None) \u2192 disabled; after a
+        subsequent paste (None) \u2192 enabled again.
+        """
+        from textual.widgets import Button
+    
+        doc_path = _write_v2_document(
+            tmp_path / "f.json",
+            [{"type": "bytes", "address": "0x100", "bytes": "AA BB"}],
+        )
+        paste = _changeset_text(
+            [{"type": "string", "address": "0x9", "value": "P"}]
+        )
+    
+        async def _drive() -> dict[str, bool]:
+            outcomes: dict[str, bool] = {}
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("patch")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                button = app.query_one("#patch_edit_json_button", Button)
+    
+                outcomes["fresh_enabled"] = not button.disabled
+    
+                _set_entry_inputs(app, path_text=str(doc_path))
+                panel.request_action("load_doc")
+                await pilot.pause()
+                outcomes["file_disabled"] = button.disabled
+    
+                _seed_via_paste(app, paste)
+                await pilot.pause()
+                outcomes["paste_enabled"] = not button.disabled
+            return outcomes
+    
+>       outcomes = asyncio.run(_drive())
+                   ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_tui_patch_editor_v2.py:3543: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\asyncio\base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\test_tui_patch_editor_v2.py:3524: in _drive
+    async with app.run_test(size=(120, 40)) as pilot:
+..\..\anaconda3\envs\s19env\Lib\contextlib.py:217: in __aexit__
+    await anext(self.gen)
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\app.py:2218: in run_test
+    raise self._exception
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\message_pump.py:663: in _process_messages_loop
+    await self._dispatch_message(message)
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\message_pump.py:739: in _dispatch_message
+    await self._on_message(message)
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\message_pump.py:829: in _on_message
+    await invoke(method, message)
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\_callback.py:56: in _invoke
+    result = callback(*params[:parameter_count])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app\tui\app.py:4792: in on_patch_editor_panel_action_requested
+    panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+selector = '#patch_editor_panel'
+expect_type = <class 's19_app.tui.screens_directionb.PatchEditorPanel'>
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#patch_editor_panel' on Screen(id='_default')
+
+..\..\anaconda3\envs\s19env\Lib\site-packages\textual\dom.py:1505: NoMatches
+i15: pause probe = native; affinity = None; trace = False
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_editor_v2.py::test_tc331_disable_guard_predicate_tracks_source_path
+========================= 1 failed, 1 passed in 4.59s =========================

@@ -1,0 +1,87 @@
+== A: GREEN in the worktree (int-01 .. int-05)
+int-01 rc=0 [changed files, parallel lane -n 6] | 
+int-02 rc=0 [changed files, serial lane] | 
+int-03 rc=0 [4 nodes serial, rep 1 (R-TST-157)] | ============================== 4 passed in 13.05s ==============================
+int-04 rc=0 [4 nodes serial, rep 2 (R-TST-157)] | ============================== 4 passed in 12.87s ==============================
+int-05 rc=0 [4 nodes serial, rep 3 (R-TST-157)] | ============================== 4 passed in 12.91s ==============================
+== B: holds, fixed x3 then base x2 (int-06 .. int-40)
+int-06 rc=0 [D1 patch_action[*] hold, fixed form, rep 1] | ============================== 1 passed in 5.95s ===============================
+int-07 rc=0 [D1 patch_action[*] hold, fixed form, rep 2] | ============================== 1 passed in 5.83s ===============================
+int-08 rc=0 [D1 patch_action[*] hold, fixed form, rep 3] | ============================== 1 passed in 5.93s ===============================
+int-09 rc=1 [D1 patch_action[*] hold, base form, rep 1] E       AssertionError: a file-backed document (source_path not None) → Edit JSON disabled E       assert False is True | ============================== 1 failed in 2.77s ===============================
+int-10 rc=1 [D1 patch_action[*] hold, base form, rep 2] E       AssertionError: a file-backed document (source_path not None) → Edit JSON disabled E       assert False is True | ============================== 1 failed in 2.64s ===============================
+int-11 rc=0 [D2 patch_action[parse_paste] hold, fixed form, rep 1] | ============================== 1 passed in 4.17s ===============================
+int-12 rc=0 [D2 patch_action[parse_paste] hold, fixed form, rep 2] | ============================== 1 passed in 4.30s ===============================
+int-13 rc=0 [D2 patch_action[parse_paste] hold, fixed form, rep 3] | ============================== 1 passed in 4.15s ===============================
+int-14 rc=1 [D2 patch_action[parse_paste] hold, base form, rep 1] E       AssertionError: a subsequent paste (source_path None) → Edit JSON re-enabled E       assert False is True | ============================== 1 failed in 2.73s ===============================
+int-15 rc=1 [D2 patch_action[parse_paste] hold, base form, rep 2] E       AssertionError: a subsequent paste (source_path None) → Edit JSON re-enabled E       assert False is True | ============================== 1 failed in 2.73s ===============================
+int-16 rc=0 [D3+D4 fx_bind hold, fixed form, rep 1] | ============================== 1 passed in 6.86s ===============================
+int-17 rc=0 [D3+D4 fx_bind hold, fixed form, rep 2] | ============================== 1 passed in 6.77s ===============================
+int-18 rc=0 [D3+D4 fx_bind hold, fixed form, rep 3] | ============================== 1 passed in 6.62s ===============================
+int-19 rc=1 [D3+D4 fx_bind hold, base form, rep 1] E       AssertionError: {} E       assert {} == {0: 'variant_b.hex'} | ============================== 1 failed in 3.57s ===============================
+int-20 rc=1 [D3+D4 fx_bind hold, base form, rep 2] E       AssertionError: {} E       assert {} == {0: 'variant_b.hex'} | ============================== 1 failed in 3.51s ===============================
+int-21 rc=0 [D5 change_file hold, fixed form, rep 1] | ============================== 1 passed in 4.20s ===============================
+int-22 rc=0 [D5 change_file hold, fixed form, rep 2] | ============================== 1 passed in 4.14s ===============================
+int-23 rc=0 [D5 change_file hold, fixed form, rep 3] | ============================== 1 passed in 4.04s ===============================
+int-24 rc=1 [D5 change_file hold, base form, rep 1] E       AssertionError: selecting the dropped file must load its 0x300 entry, got -0x1 E       assert -1 == 768 | ============================== 1 failed in 2.46s ===============================
+int-25 rc=1 [D5 change_file hold, base form, rep 2] E       AssertionError: selecting the dropped file must load its 0x300 entry, got -0x1 E       assert -1 == 768 | ============================== 1 failed in 2.61s ===============================
+int-26 rc=0 [D6 patch_action[apply_doc] hold, fixed form, rep 1] | ============================== 1 passed in 10.21s ==============================
+int-27 rc=0 [D6 patch_action[apply_doc] hold, fixed form, rep 2] | ============================== 1 passed in 10.18s ==============================
+int-28 rc=0 [D6 patch_action[apply_doc] hold, fixed form, rep 3] | ============================== 1 passed in 10.12s ==============================
+int-29 rc=1 [D6 patch_action[apply_doc] hold, base form, rep 1] E           AttributeError: 'NoneType' object has no attribute 'saved_path' | ============================== 1 failed in 3.05s ===============================
+int-30 rc=1 [D6 patch_action[apply_doc] hold, base form, rep 2] E           AttributeError: 'NoneType' object has no attribute 'saved_path' | ============================== 1 failed in 2.82s ===============================
+int-31 rc=0 [D7 save_back[decline] hold, fixed form, rep 1] | ============================== 1 passed in 5.66s ===============================
+int-32 rc=0 [D7 save_back[decline] hold, fixed form, rep 2] | ============================== 1 passed in 5.49s ===============================
+int-33 rc=0 [D7 save_back[decline] hold, fixed form, rep 3] | ============================== 1 passed in 5.58s ===============================
+int-34 rc=1 [D7 save_back[decline] hold, base form, rep 1] E       assert False is True | ============================== 1 failed in 3.92s ===============================
+int-35 rc=1 [D7 save_back[decline] hold, base form, rep 2] E       assert False is True | ============================== 1 failed in 3.89s ===============================
+int-36 rc=0 [D8 save_back[confirm] hold, fixed form, rep 1] | ============================== 1 passed in 8.44s ===============================
+int-37 rc=0 [D8 save_back[confirm] hold, fixed form, rep 2] | ============================== 1 passed in 8.43s ===============================
+int-38 rc=0 [D8 save_back[confirm] hold, fixed form, rep 3] | ============================== 1 passed in 8.64s ===============================
+int-39 rc=1 [D8 save_back[confirm] hold, base form, rep 1] E       assert None is not None | ============================== 1 failed in 3.85s ===============================
+int-40 rc=1 [D8 save_back[confirm] hold, base form, rep 2] E       assert None is not None | ============================== 1 failed in 3.81s ===============================
+== C: product mutants (int-41 .. int-49)
+i15int_mutate: applied m150b to m150b
+int-41 rc=1 [R-TST-150 (b) mutant, fixed form] E       AssertionError: a file-backed document (source_path not None) → Edit JSON disabled E       assert False is True | ============================== 1 failed in 2.99s ===============================
+i15int_mutate: applied m151b to m151b
+int-42 rc=1 [R-TST-151 (b) mutant, fixed form] E       AssertionError: a subsequent paste (source_path None) → Edit JSON re-enabled E       assert False is True | ============================== 1 failed in 2.94s ===============================
+i15int_mutate: applied m153b to m153b
+int-43 rc=1 [R-TST-153 (b) mutant, fixed form] E       AssertionError: assert {0: 'variant_b.hex'} == {} | ============================== 1 failed in 3.73s ===============================
+i15int_mutate: applied m152 to m152f
+int-44 rc=1 [R-TST-152 vacuity: mutant + fx_bind hold, fixed form] E       AssertionError: rebinding to the same ref wrote a record: {0: 'base.s19'} E       assert {0: 'base.s19'} == {} | ============================== 1 failed in 6.67s ===============================
+i15int_mutate: applied m152 to m152b
+int-45 rc=1 [R-TST-152 vacuity: mutant + fx_bind hold, base form] E       AssertionError: {} E       assert {} == {0: 'variant_b.hex'} | ============================== 1 failed in 3.61s ===============================
+i15int_mutate: applied m161b to m161f
+int-46 rc=1 [R-TST-161 (b): mutant + decline hold, fixed form] E       AssertionError: assert PosixPath('/tmp/i15int/runs/int-46/bt/test_save_back_prompt0/.s19tool/workarea/img-patched.s19') is None | ============================== 1 failed in 5.80s ===============================
+i15int_mutate: applied m161b to m161bb
+int-47 rc=1 [R-TST-161 (b): mutant + decline hold, base form] E       assert False is True | ============================== 1 failed in 4.18s ===============================
+i15int_mutate: applied m162b to m162f
+int-48 rc=1 [R-TST-162 (b): mutant + confirm hold, fixed form] E       AssertionError: a Windows reserved device name must be refused E       assert PosixPath('/tmp/i15int/runs/int-48/bt/test_save_back_prompt0/.s19tool/workarea/CON.s19') is None | ============================== 1 failed in 9.19s ===============================
+i15int_mutate: applied m162b to m162bb
+int-49 rc=1 [R-TST-162 (b): mutant + confirm hold, base form] E       assert None is not None | ============================== 1 failed in 4.06s ===============================
+== D: R-TST-154 behavioural, one never-settling site per run (int-50 .. int-57)
+int-50 rc=1 [D1 never settles] failure = 'did not settle: TC-331: the load of f.json reached the change document' E               AssertionError: did not settle: TC-331: the load of f.json reached the change document | ============================== 1 failed in 5.81s ===============================
+int-51 rc=1 [D2 never settles] failure = 'did not settle: TC-331: the parsed paste reached the change document' E               AssertionError: did not settle: TC-331: the parsed paste reached the change document | ============================== 1 failed in 5.78s ===============================
+int-52 rc=1 [D3 never settles] failure = 'did not settle: TC-B94-27: the panel handled the Bind to the same ref' E               AssertionError: did not settle: TC-B94-27: the panel handled the Bind to the same ref | ============================== 1 failed in 6.57s ===============================
+int-53 rc=1 [D4 never settles] failure = 'did not settle: TC-B94-27: the panel handled the Bind to variant_b.hex' E               AssertionError: did not settle: TC-B94-27: the panel handled the Bind to variant_b.hex | ============================== 1 failed in 6.63s ===============================
+int-54 rc=1 [D5 never settles] failure = 'did not settle: AT-030c: the load of dropped.json reached the change document' E               AssertionError: did not settle: AT-030c: the load of dropped.json reached the change document | ============================== 1 failed in 5.53s ===============================
+int-55 rc=1 [D6 never settles] failure = 'did not settle: TC-051: the apply showed the save-back prompt' E               AssertionError: did not settle: TC-051: the apply showed the save-back prompt | ============================== 1 failed in 5.74s ===============================
+int-56 rc=1 [D7 never settles] failure = 'did not settle: TC-051: the decline hid the save-back prompt' E               AssertionError: did not settle: TC-051: the decline hid the save-back prompt | ============================== 1 failed in 5.96s ===============================
+int-57 rc=1 [D8 never settles] failure = 'did not settle: TC-051: the confirm hid the save-back prompt' E               AssertionError: did not settle: TC-051: the confirm hid the save-back prompt | ============================== 1 failed in 6.47s ===============================
+== E: static guard negative controls (int-58 .. int-64)
+i15int_mutate: applied g_remove_d1 to g1
+int-58 rc=1 [guard control: wait D1 removed] E           AssertionError: test_tc331_disable_guard_predicate_tracks_source_path › _drive: the statement after "panel.request_action('load_doc')" mus E           assert None == 'TC-331: the load of f.json reached the change document' | ============================== 1 failed in 0.29s ===============================
+i15int_mutate: applied g_move_d1 to g2
+int-59 rc=1 [guard control: wait D1 moved after its read (R-TST-163/2)] E           AssertionError: test_tc331_disable_guard_predicate_tracks_source_path › _drive: the statement after "panel.request_action('load_doc')" mus E           assert None == 'TC-331: the load of f.json reached the change document' | ============================== 1 failed in 0.29s ===============================
+i15int_mutate: applied g_fstring_d3 to g3
+int-60 rc=1 [guard control: D3 description built as an f-string] E           AssertionError: test_tc_b94_27_lane_binding_isolation_and_noop › _drive: the statement after "_bind(app, 0, 0, 'base.s19')" must be an `aw E           assert None == 'TC-B94-27: the panel handled the Bind to the same ref' | ============================== 1 failed in 0.32s ===============================
+i15int_mutate: applied g_desc_d5 to g4
+int-61 rc=1 [guard control: D5 description changed] E           AssertionError: test_at030c_directly_dropped_file_is_listed_and_loadable › _drive: the statement after "select.value = 'dropped.json'" mus E           assert 'AT-030c: the...d file loaded' == 'AT-030c: the...ange document' | ============================== 1 failed in 0.42s ===============================
+i15int_mutate: applied g_range_loop to g5
+int-62 rc=1 [guard control: range-counted pause loop in TC-331] E           AssertionError: test_tc331_disable_guard_predicate_tracks_source_path has a range-counted pause loop E           assert not [<ast.For object at 0x7faacd6bcb80>] | ============================== 1 failed in 0.53s ===============================
+i15int_mutate: applied g_local_settled to g6
+int-63 rc=1 [guard control: module-local settled in the b94 module (integrator's guard)] E           AssertionError: tests/test_tui_flow_execution_b94.py: `settled` must be bound only by the import from tests.b97_probes, found ['from tests E           assert ['from tests....ed (line 33)'] == ['from tests....port settled'] | ============================== 1 failed in 0.22s ===============================
+i15int_mutate: applied g_local_settled to g7
+i15int: binding check stripped (pre-integration guard)
+int-64 rc=0 [guard control: module-local settled, pre-integration guard (68452f6 form)] | ============================== 1 passed in 0.42s ===============================
+== done N=64

@@ -1,0 +1,49 @@
+== A: GREEN in the worktree (e5c-01 .. 06)
+e5c-01 rc=0 [changed files, parallel lane -n 8 (R-TST-157/2, C-8)] | 
+e5c-02 rc=0 [changed files, serial lane] | 
+e5c-03 rc=0 [4 nodes serial, rep 1 (R-TST-157/1)] | ============================== 4 passed in 12.98s ==============================
+e5c-04 rc=0 [4 nodes serial, rep 2 (R-TST-157/1)] | ============================== 4 passed in 13.06s ==============================
+e5c-05 rc=0 [4 nodes serial, rep 3 (R-TST-157/1)] | ============================== 4 passed in 12.82s ==============================
+e5c-06 rc=0 [static guard + conventions parameters] | ============================== 8 passed in 0.43s ===============================
+== B: D9 hold fx_import, fixed x3 then base x2 (e5c-07 .. 11)
+i15c_e5_mutate: applied base_b94 to hold-base
+e5c-07 rc=0 [D9 fx_import hold, fixed form, rep 1] | ============================== 1 passed in 4.70s ===============================
+e5c-08 rc=0 [D9 fx_import hold, fixed form, rep 2] | ============================== 1 passed in 4.78s ===============================
+e5c-09 rc=0 [D9 fx_import hold, fixed form, rep 3] | ============================== 1 passed in 4.82s ===============================
+e5c-10 rc=1 [D9 fx_import hold, base form (5054743), rep 1] E       KeyError: 'base_2' | ============================== 1 failed in 3.29s ===============================
+e5c-11 rc=1 [D9 fx_import hold, base form (5054743), rep 2] E       KeyError: 'base_2' | ============================== 1 failed in 3.26s ===============================
+== C: D3+D4 on the changed arm (e5c-12 .. 16)
+e5c-12 rc=0 [D3+D4 fx_bind hold, fixed form, rep 1] | ============================== 1 passed in 6.49s ===============================
+e5c-13 rc=0 [D3+D4 fx_bind hold, fixed form, rep 2] | ============================== 1 passed in 6.69s ===============================
+e5c-14 rc=0 [D3+D4 fx_bind hold, fixed form, rep 3] | ============================== 1 passed in 6.68s ===============================
+i15c_e5_mutate: applied m153b to m153b
+e5c-15 rc=1 [R-TST-153 (b) mutant, fixed form] E       AssertionError: assert {0: 'variant_b.hex'} == {} | ============================== 1 failed in 3.62s ===============================
+i15c_e5_mutate: applied m152 to m152f
+e5c-16 rc=1 [R-TST-152 vacuity: mutant + fx_bind hold, fixed form] E       AssertionError: rebinding to the same ref wrote a record: {0: 'base.s19'} E       assert {0: 'base.s19'} == {} | ============================== 1 failed in 6.78s ===============================
+== D: never-settling sites of the changed arm (e5c-17 .. 19)
+e5c-17 rc=1 [D9 never settles] failure = 'did not settle: TC-B94-27: the panel mounted lanes base and base_2' E               AssertionError: did not settle: TC-B94-27: the panel mounted lanes base and base_2 | ============================== 1 failed in 6.55s ===============================
+e5c-18 rc=1 [D3 never settles] failure = 'did not settle: TC-B94-27: the panel handled the Bind to the same ref' E               AssertionError: did not settle: TC-B94-27: the panel handled the Bind to the same ref | ============================== 1 failed in 6.50s ===============================
+e5c-19 rc=1 [D4 never settles] failure = 'did not settle: TC-B94-27: the panel handled the Bind to variant_b.hex' E               AssertionError: did not settle: TC-B94-27: the panel handled the Bind to variant_b.hex | ============================== 1 failed in 6.68s ===============================
+== E: static guard controls (e5c-20 .. 26)
+i15c_e5_mutate: applied c2_d6_true to g-c2a
+e5c-20 rc=1 [guard control C-2: D6 predicate -> lambda: True] E           AssertionError: test_save_back_prompt › _apply: the wait after "panel.request_action('apply_doc')" must poll the table-D predicate "lambda E           assert 'lambda: True' == "lambda: not ...ass('hidden')" | ============================== 1 failed in 0.40s ===============================
+i15c_e5_mutate: applied c2_d7_swap to g-c2b
+e5c-21 rc=1 [guard control C-2 (b): D7 polls D6's sign] E           AssertionError: test_save_back_prompt › _drive: the wait after "app.query_one('#patch_saveback_decline_button', Button).press()" must poll E           assert "lambda: not ...ass('hidden')" == "lambda: prom...ass('hidden')" | ============================== 1 failed in 0.42s ===============================
+i15c_e5_mutate: applied c7_wait_for to g-c7
+e5c-22 rc=1 [guard control C-7: _wait_for called in TC-B94-27] E               AssertionError: test_tc_b94_27_lane_binding_isolation_and_noop uses the module-local _wait_for E               assert 1 == 0 | ============================== 1 failed in 0.49s ===============================
+i15c_e5_mutate: applied c9_rename_confirm to g-c9
+e5c-23 rc=1 [guard control C-9 (163/1): helper _confirm_with not found (no skip)] E               AssertionError: test_save_back_prompt: nested _confirm_with missing E               assert None is not None | ============================== 1 failed in 0.44s ===============================
+i15c_e5_mutate: applied c10_remove_d9 to g-c10
+e5c-24 rc=1 [guard control C-10: D9 removed (one pause after the import)] E           AssertionError: test_tc_b94_27_lane_binding_isolation_and_noop › _drive: the statement after "await _import_stem(app, pilot, 'base')" must E           assert None == 'TC-B94-27: the panel mounted lanes base and base_2' | ============================== 1 failed in 0.47s ===============================
+i15c_e5_mutate: applied base_b94 to g-c2pre
+i15c_e5_mutate: applied base_hygiene to g-c2pre
+i15c_e5_mutate: applied c2_d6_true to g-c2pre
+e5c-25 rc=0 [pre-corrective guard (5054743) + D6 predicate -> lambda: True] | ============================== 1 passed in 0.49s ===============================
+i15c_e5_mutate: applied base_b94 to g-c7pre
+i15c_e5_mutate: applied base_hygiene to g-c7pre
+i15c_e5_mutate: applied c7_wait_for to g-c7pre
+e5c-26 rc=0 [pre-corrective guard (5054743) + _wait_for in TC-B94-27] | ============================== 1 passed in 0.49s ===============================
+== done N=26
+== re-run of e5c-01, e5c-02 without -q (the quiet runs printed no header; the quiet results were 129 passed / 1 passed, 129 deselected)
+e5c-01 rc=0 [changed files, parallel lane -n 8 (R-TST-157/2, C-8); re-run without -q so the header prints] | 129 passed in 132.68s
+e5c-02 rc=0 [changed files, serial lane; re-run without -q so the header prints] | 1 passed, 129 deselected in 0.82s

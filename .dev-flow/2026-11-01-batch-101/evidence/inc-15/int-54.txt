@@ -1,0 +1,129 @@
+# int-54: D5 never settles
+# tree: never; env: I15_HOLD= I15_HOLD_ACTION= I15_NEVER=AT-030c: the load of dropped.json reached the change document
+# cmd: python -m pytest -p i15int_guard -p no:cacheprovider -v tests/test_tui_patch_editor_v2.py::test_at030c_directly_dropped_file_is_listed_and_loadable
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0 -- /data/miniconda3/envs/s19ci/bin/python
+i15int: commit under test = 77f4553 (c2cba35 + the Inc 15 tests/docs patch, sha256 fdde60cc) (tree = never; git HEAD here = n/a (CalledProcessError))
+i15int: s19_app.__file__ = /tmp/i15int/trees/never/s19_app/__init__.py
+i15int: python 3.11.18 on Linux; textual 8.2.8
+i15int: NO_COLOR set = False; LOCALAPPDATA = None; APPDATA = None
+i15int: TEMP = None; TMP = None
+i15int: OS clipboard writers replaced by a raising guard
+i15int: hold =  action =  s = 1.5; never = 'AT-030c: the load of dropped.json reached the change document'
+rootdir: /tmp/i15int/trees/never
+configfile: pyproject.toml
+plugins: platformdirs-4.14.3, xdist-3.8.0
+collecting ... collected 1 item
+
+tests/test_tui_patch_editor_v2.py::test_at030c_directly_dropped_file_is_listed_and_loadable FAILED [100%]
+
+=================================== FAILURES ===================================
+___________ test_at030c_directly_dropped_file_is_listed_and_loadable ___________
+
+tmp_path = PosixPath('/tmp/i15int/runs/int-54/bt/test_at030c_directly_dropped_f0')
+
+    def test_at030c_directly_dropped_file_is_listed_and_loadable(
+        tmp_path: Path,
+    ) -> None:
+        """AT-030c (GUARD, not the gate) — a hand-dropped file lists + loads.
+    
+        Intent: pins the SCAN contract independently of the save handler. A valid
+        v2 change file dropped DIRECTLY into ``patches/`` (bypassing ``save_doc``)
+        must be listed in the dropdown and loadable. This stays green even under a
+        reverted save handler, so it is structurally a guard, NOT the C-12 gate.
+    
+        Inc 15 (R-TST-159, R-TST-154, R-TST-155, R-TST-163): the entry read
+        waits through the shared wait for the pick to load ``dropped.json``.
+        """
+        from textual.widgets import Select
+    
+        patches = tmp_path / ".s19tool" / "workarea" / "patches"
+        patches.mkdir(parents=True, exist_ok=True)
+        _write_v2_document(
+            patches / "dropped.json",
+            [{"type": "bytes", "address": "0x300", "bytes": "EE FF"}],
+        )
+    
+        async def _drive() -> tuple[list[str], int]:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("patch")
+                await pilot.pause()
+                select = app.query_one("#patch_doc_file_select", Select)
+                options = _select_option_values(select)
+    
+                select.value = "dropped.json"
+                await settled(
+                    pilot,
+                    lambda: (
+                        app._change_service.document.source_path is not None
+                        and app._change_service.document.source_path.name
+                        == "dropped.json"
+                    ),
+                    "AT-030c: the load of dropped.json reached the change document",
+                )
+                active = [
+                    entry.address
+                    for entry in app._change_service.document.entries
+                ]
+                return options, active[0] if active else -1
+    
+>       options, loaded_address = asyncio.run(_drive())
+                                  ^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_tui_patch_editor_v2.py:1619: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_tui_patch_editor_v2.py:1604: in _drive
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+../../scripts/i15int_guard.py:115: in never
+    return await real(pilot, predicate, failure, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function _install_never.<locals>.never.<locals>.<lambda> at 0x7f9973094360>
+failure = 'did not settle: AT-030c: the load of dropped.json reached the change document'
+timeout = 3.0, pause_first = True
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: did not settle: AT-030c: the load of dropped.json reached the change document
+
+tests/support/timing.py:66: AssertionError
+i15int: hold installed = None; never installed = 'AT-030c: the load of dropped.json reached the change document'
+=========================== short test summary info ============================
+FAILED tests/test_tui_patch_editor_v2.py::test_at030c_directly_dropped_file_is_listed_and_loadable
+============================== 1 failed in 5.53s ===============================
+# rc=1

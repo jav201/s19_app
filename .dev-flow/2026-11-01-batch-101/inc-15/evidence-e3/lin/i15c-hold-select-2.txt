@@ -1,0 +1,70 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0 -- /data/miniconda3/envs/s19ci/bin/python
+i15c: s19_app.__file__ = /tmp/i15c/wt/s19_app/__init__.py
+i15c: python 3.11.18 on Linux; textual 8.2.8
+i15c: NO_COLOR set = False
+i15c: hold = change_file action =  s = 1.5
+rootdir: /tmp/i15c/wt
+configfile: pyproject.toml
+plugins: platformdirs-4.14.3, xdist-3.8.0
+collecting ... collected 1 item
+
+tests/test_tui_patch_editor_v2.py::test_at030c_directly_dropped_file_is_listed_and_loadable FAILED [100%]
+
+=================================== FAILURES ===================================
+___________ test_at030c_directly_dropped_file_is_listed_and_loadable ___________
+
+tmp_path = PosixPath('/tmp/i15c/runs/i15c-hold-select-2/bt/test_at030c_directly_dropped_f0')
+
+    def test_at030c_directly_dropped_file_is_listed_and_loadable(
+        tmp_path: Path,
+    ) -> None:
+        """AT-030c (GUARD, not the gate) — a hand-dropped file lists + loads.
+    
+        Intent: pins the SCAN contract independently of the save handler. A valid
+        v2 change file dropped DIRECTLY into ``patches/`` (bypassing ``save_doc``)
+        must be listed in the dropdown and loadable. This stays green even under a
+        reverted save handler, so it is structurally a guard, NOT the C-12 gate.
+        """
+        from textual.widgets import Select
+    
+        patches = tmp_path / ".s19tool" / "workarea" / "patches"
+        patches.mkdir(parents=True, exist_ok=True)
+        _write_v2_document(
+            patches / "dropped.json",
+            [{"type": "bytes", "address": "0x300", "bytes": "EE FF"}],
+        )
+    
+        async def _drive() -> tuple[list[str], int]:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("patch")
+                await pilot.pause()
+                select = app.query_one("#patch_doc_file_select", Select)
+                options = _select_option_values(select)
+    
+                select.value = "dropped.json"
+                await pilot.pause()
+                active = [
+                    entry.address
+                    for entry in app._change_service.document.entries
+                ]
+                return options, active[0] if active else -1
+    
+        options, loaded_address = asyncio.run(_drive())
+        assert options == ["dropped.json"], (
+            f"a directly-dropped change file must be listed, got {options}"
+        )
+>       assert loaded_address == 0x300, (
+            f"selecting the dropped file must load its 0x300 entry, "
+            f"got {loaded_address:#x}"
+        )
+E       AssertionError: selecting the dropped file must load its 0x300 entry, got -0x1
+E       assert -1 == 768
+
+tests/test_tui_patch_editor_v2.py:1595: AssertionError
+i15c: hold installed = change_file[*] 1.5s
+=========================== short test summary info ============================
+FAILED tests/test_tui_patch_editor_v2.py::test_at030c_directly_dropped_file_is_listed_and_loadable
+============================== 1 failed in 2.57s ===============================
