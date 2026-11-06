@@ -715,6 +715,11 @@ class CrcDesignerPanel(ScrollableContainer):
         Returns:
             None
 
+        Data Flow:
+            - Delegates to :meth:`_on_image_changed` (schedule a recompute
+              while displayed, else mark the coverage stale); no compute
+              here.
+
         Dependencies:
             Uses:
                 - :meth:`_on_image_changed`

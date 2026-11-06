@@ -22,6 +22,7 @@ The slice has 17 functions in 3 files; the groups follow file ownership. The int
 | I-1 in-place write notice | `CrcDesignerPanel.note_image_bytes_written(self) -> None`: public, no argument, no return, never computes synchronously | G2 → G1 |
 | I-2 collected item | `{"source": "param" \| "memory", "name": str, "address": int \| None, "size": int, "expected": tuple[int, ...] \| None}` in `CheckEditorPanel.ActionRequested.items`; the first four keys as on base; `expected` is the spec's bytes for a field loaded from a spec — for a parameter only while its current ledger range is its spec entry's (E3 SEC5-1) — else `None` | G3 → G1 (`_check_items_to_document`) |
 | I-3 spec-load item | `load_spec(items, source_name)` with each item `{"address": int, "size": int, "expected": tuple[int, ...], "symbol": str \| None}`; signature of `load_spec` unchanged | G1 → G3 |
+| I-5 validation results cleared (E5 C-10) | `CheckEditorPanel.clear_check_results(self) -> None`: public, no argument, no return; `#check_status` back to `_STATUS_HINT`, `#check_results` emptied; no tab switch, no focus move | G3 → G1 |
 | I-4 memory row | `CheckEditorPanel._memory_rows: list[tuple[int, str, int, tuple[int, ...] \| None]]` — `(address, label, size, expected)`; internal to G3 | G3 only |
 
 Interfaces with other increments:
@@ -38,15 +39,16 @@ Interfaces with other increments:
 ## Nodes — G1 app
 
 S19TuiApp._note_image_bytes_written
-req: R-CRC-PREVIEW-002.1, R-CRC-PREVIEW-002.5
+req: R-CRC-PREVIEW-002.1, R-CRC-PREVIEW-002.5, R-CHKED-057
 in: —
 out: None
-func: new. `try: panel = self.query_one(CrcDesignerPanel)` / `except Exception: return` around the query only — the app's idiom for a not-yet-mounted tree (`watch_current_file`, `_prefill_check_editor`; `app.py` imports no `NoMatches`); then, outside the `try`, `panel.note_image_bytes_written()`, so a fault in the panel is not swallowed. Called only by the three in-place-write sites below; never on a load (the `current_file` watcher already covers loads).
+func: new. **Changed at E5 (C-10):** the CRC Designer and the Check Editor are queried separately, each in its own `try` (a missing panel skips only its own notice); the designer delegate as below, then `checks.clear_check_results()` (I-5), also outside its `try`. No focus move, no tab switch, no `refresh_window`. E2 text: `try: panel = self.query_one(CrcDesignerPanel)` / `except Exception: return` around the query only — the app's idiom for a not-yet-mounted tree (`watch_current_file`, `_prefill_check_editor`; `app.py` imports no `NoMatches`); then, outside the `try`, `panel.note_image_bytes_written()`, so a fault in the panel is not swallowed. Called only by the three in-place-write sites below; never on a load (the `current_file` watcher already covers loads).
 module: s19_app/tui/app.py
-calls: DOMNode.query_one, CrcDesignerPanel.note_image_bytes_written
+calls: DOMNode.query_one, CrcDesignerPanel.note_image_bytes_written, CheckEditorPanel.clear_check_results
 examples: (R-CRC-PREVIEW-002.5/3) CRC Designer hidden → the panel's `_coverage_dirty` becomes True, recompute count +0
 examples: (R-CRC-PREVIEW-002.1/6) CRC Designer displayed, Q = 10 s → a recompute pending, count +0 after two pauses
 examples: (no panel mounted) → returns None, nothing raised
+examples: (R-CHKED-057/1) case 08, pilot spec picked, Validate painted `0x0-0x0 expected [6C] actual [6C] -> pass` under `validation complete`; the apply of `0x0` = `93` → the Check Editor shows 0 verdict rows and `Validate compares fields to the image` (base: the stale `-> pass` row stays)
 
 S19TuiApp.on_patch_editor_panel_action_requested
 req: R-CRC-PREVIEW-002.5
@@ -245,6 +247,17 @@ examples: (R-CHKED-056/3) new ledger `VALUE_0001 → (0x0, 2)` → the same; the
 examples: (R-CHKED-026/4) the same A2L again (`VALUE_0001 → (0x0, 1)`) → returns `kept` unchanged; nothing appended
 examples: (R-CHKED-055/1) session picks with no spec entry, ledger `{VALUE_0002}` → returns `[VALUE_0001, VALUE_0002]`; nothing appended (`include_names` then leaves `VALUE_0001` out)
 
+CheckEditorPanel.clear_check_results
+req: R-CHKED-057
+in: —
+out: None
+func: new, public (I-5, E5 C-10). `#check_status` ← `_STATUS_HINT` (`Validate compares fields to the image`, the mount text); `#check_results` children removed. Unlike `refresh_check_results` it does not call `_show_tab`, so the card's tab and the focus stay as they are. The app calls it after an in-place write; the verdict rows judged the old bytes.
+module: s19_app/tui/screens_directionb.py
+calls: DOMNode.query_one, Label.update, Widget.remove_children
+examples: (R-CHKED-057/1) after Validate (`Checks: 3 passed, 0 failed, 0 uncheckable`, one row `-> pass`) and the apply of `0x0` = `93` → 0 rows, status `Validate compares fields to the image`; Validate again → `Checks: 2 passed, 1 failed, 0 uncheckable`, `0x0-0x0 expected [6C] actual [93] -> fail`
+examples: (R-CHKED-057/2, /3) a save-back or a Save project commit after Validate → 0 rows, the mount status line
+examples: (nothing validated yet) → the card already in its mount state; stays so
+
 ## Context (unchanged)
 
 A2LParameterPicker.include_names
@@ -262,4 +275,4 @@ module: s19_app/tui/services/change_service.py
 
 ## Coverage of the rows by examples
 
-R-CRC-PREVIEW-002.1 (`_note_image_bytes_written`, `_on_project_saved`, `note_image_bytes_written`); R-CRC-PREVIEW-002.5 (`on_patch_editor_panel_action_requested`, `on_patch_editor_panel_save_back_decision`, `_on_project_saved`, `note_image_bytes_written`, `on_show`); R-CHKED-010 (`set_a2l_parameters`, `_demote_moved_spec_params`); R-CHKED-054 (`set_a2l_parameters`); R-CHKED-055 (`set_a2l_parameters`, `include_names`, `_prune_spec_bytes`, `_demote_moved_spec_params`); R-CHKED-056 (`__init__`, `load_spec`, `set_a2l_parameters`, `_demote_moved_spec_params`, `_collected_items`, `_rebuild_memory_table`); R-CHKED-041.1 (`load_spec`); R-CHKED-041.2 (`load_spec`, `_named_parameter`, `on_check_editor_panel_spec_file_selected`); R-CHKED-041.3 (`load_spec`, `_named_parameter`, `_rebuild_memory_table`); R-CHKED-025 (`_check_items_to_document`, `_collected_items`, `_on_a2l_parameter_picker_selection_changed`, `_prune_spec_bytes`); R-CHKED-026 (`_check_items_to_document`, `_collected_items`, `load_spec`, `__init__`); R-CHKED-027 (`_check_items_to_document`, `_add_memory_row`). Nodes: 17 slice nodes + 4 context nodes.
+R-CRC-PREVIEW-002.1 (`_note_image_bytes_written`, `_on_project_saved`, `note_image_bytes_written`); R-CRC-PREVIEW-002.5 (`on_patch_editor_panel_action_requested`, `on_patch_editor_panel_save_back_decision`, `_on_project_saved`, `note_image_bytes_written`, `on_show`); R-CHKED-010 (`set_a2l_parameters`, `_demote_moved_spec_params`); R-CHKED-054 (`set_a2l_parameters`); R-CHKED-055 (`set_a2l_parameters`, `include_names`, `_prune_spec_bytes`, `_demote_moved_spec_params`); R-CHKED-056 (`__init__`, `load_spec`, `set_a2l_parameters`, `_demote_moved_spec_params`, `_collected_items`, `_rebuild_memory_table`); R-CHKED-041.1 (`load_spec`); R-CHKED-041.2 (`load_spec`, `_named_parameter`, `on_check_editor_panel_spec_file_selected`); R-CHKED-041.3 (`load_spec`, `_named_parameter`, `_rebuild_memory_table`); R-CHKED-025 (`_check_items_to_document`, `_collected_items`, `_on_a2l_parameter_picker_selection_changed`, `_prune_spec_bytes`); R-CHKED-026 (`_check_items_to_document`, `_collected_items`, `load_spec`, `__init__`); R-CHKED-027 (`_check_items_to_document`, `_add_memory_row`); R-CHKED-057 (`_note_image_bytes_written`, `clear_check_results`; E5 C-10). Nodes: 18 slice nodes + 4 context nodes.

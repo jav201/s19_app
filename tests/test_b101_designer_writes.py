@@ -61,6 +61,13 @@ from tests.support.b101_designer import (  # noqa: F401  (the fixture is used by
     wait_designer_recompute,
 )
 from tests.support.timing import wait_until
+from tests.test_b101_check_spec_keep import (  # E5 C-10: the Check Editor drivers
+    HINT,
+    card,
+    click_on,
+    type_into,
+    validate_by_click,
+)
 
 pytestmark = pytest.mark.usefixtures("designer_recompute_counter")
 
@@ -426,10 +433,10 @@ def test_r_crc_preview_002_5_3_apply_then_display(
             await _load_image_by_dialog(pilot, app, image)
             await _first_display(pilot, app, PRE)
             await _load_document(pilot, app, log, folder, "d.changes.json", [AA_ENTRY])
+            before = designer_recomputes()  # E5 C-3: before the trigger
             status = await _apply(pilot, app, log, "Apply:")
             assert status == "Apply: 1 applied, 0 skipped, 0 blocked", status
             assert app.current_file.mem_map[0x8003] == 0xAA
-            before = designer_recomputes()
             await _quiet(pilot)
             assert designer_recomputes() == before, "a hidden CRC Designer recomputed"
             await _press_rail(pilot, app, "0")
@@ -466,10 +473,10 @@ def test_r_crc_preview_002_5_4_save_back_then_display(
             await _entry_op(
                 pilot, app, log, "#patch_entry_edit_button", "0x8003", "BB", "Patch Editor: entry updated."
             )
+            before = designer_recomputes()  # E5 C-3: before the trigger
             await _save_back(pilot, app, log, "fixture-patched.s19", "Saved + verified")
             assert list((folder / "app").rglob("fixture-patched.s19")), "the save-back wrote no file"
             assert app.current_file.mem_map[0x8003] == 0xBB
-            before = designer_recomputes()
             await _quiet(pilot)
             assert designer_recomputes() == before, "a hidden CRC Designer recomputed"
             await _press_rail(pilot, app, "0")
@@ -549,10 +556,10 @@ def test_r_crc_preview_002_5_6_apply_error_still_refreshes(
             await _load_image_by_dialog(pilot, app, image)
             await _first_display(pilot, app, PRE)
             await _load_document(pilot, app, log, folder, "d.changes.json", [AA_ENTRY])
+            before = designer_recomputes()  # E5 C-3: before the trigger
             status = await _apply(pilot, app, log, "Patch Editor:")
             assert status == "Patch Editor: 'probe'", status
             assert app.current_file.mem_map[0x8003] == 0xAA, "the engine wrote nothing before it raised"
-            before = designer_recomputes()
             await _quiet(pilot)
             assert designer_recomputes() == before, "a hidden CRC Designer recomputed"
             await _press_rail(pilot, app, "0")
@@ -591,6 +598,7 @@ def test_r_crc_preview_002_5_7_blocked_save_back_still_refreshes(
             await _entry_op(
                 pilot, app, log, "#patch_entry_add_button", "0x8002", "11 22", "Patch Editor: entry added."
             )
+            before = designer_recomputes()  # E5 C-3: before the trigger
             lines = await _save_back(
                 pilot,
                 app,
@@ -603,7 +611,6 @@ def test_r_crc_preview_002_5_7_blocked_save_back_still_refreshes(
             assert not list((folder / "app").rglob("fixture-blocked.s19")), "a blocked save-back wrote a file"
             mem = app.current_file.mem_map
             assert (mem[0x8002], mem[0x8003]) == (0x02, 0x03), (mem[0x8002], mem[0x8003])
-            before = designer_recomputes()
             await _quiet(pilot)
             assert designer_recomputes() == before, "a hidden CRC Designer recomputed"
             await _press_rail(pilot, app, "0")
@@ -645,10 +652,10 @@ def test_r_crc_preview_002_5_8_zero_applied_restore_still_refreshes(
             await _entry_op(
                 pilot, app, log, "#patch_entry_add_button", "0x9000", "AA", "Patch Editor: entry added."
             )
+            before = designer_recomputes()  # E5 C-3: before the trigger
             status = await _apply(pilot, app, log, "Apply:")
             assert status == "Apply: 0 applied, 1 skipped, 0 blocked", status
             assert app.current_file.mem_map[0x8003] == 0x03, "the journal restore did not run"
-            before = designer_recomputes()
             await _quiet(pilot)
             assert designer_recomputes() == before, "a hidden CRC Designer recomputed"
             await _press_rail(pilot, app, "0")
@@ -774,6 +781,231 @@ def test_control_other_patch_actions_do_not_mark_the_coverage_stale(
             assert designer_recomputes() == before, "an unapplied entry made the coverage stale"
             assert _preview_lines(app) == _preview_for(PRE), _preview_lines(app)
             assert app.current_file.mem_map[0x8003] == 0x03
+
+        return scenario
+
+    _reps(tmp_path, make)
+
+
+# ---------------------------------------------------------------------------
+# E5 corrective additions (rulings C-4, C-6, C-10 of inc-5/E5-rulings.md),
+# written by the corrective pass.
+# ---------------------------------------------------------------------------
+
+
+async def _validate_a_session_row(pilot, app, log) -> tuple:
+    """Key ``=``; a memory row ``0x8003`` size 1 typed and Add clicked;
+    Validate clicked; return ``(status lines, card)``."""
+    await _show_rail(pilot, app, "equals_sign", "#check_validate_button")
+    await type_into(pilot, app, "#check_mem_address_input", "0x8003")
+    await type_into(pilot, app, "#check_mem_size_input", "1")
+    await click_on(pilot, app, "#check_mem_add_button")
+    await wait_until(
+        pilot,
+        lambda: len(app.query_one("#check_editor_panel")._memory_rows) == 1,
+        "timed out waiting for the memory row 0x8003",
+    )
+    return await validate_by_click(pilot, app, log)
+
+
+async def _card_after_return(pilot, app) -> tuple:
+    """Key ``=`` and the Check Editor's Fields card as painted."""
+    await _show_rail(pilot, app, "equals_sign", "#check_validate_button")
+    await _quiet(pilot, 3)
+    return card(app)
+
+
+def _assert_cleared(first, after, row: str) -> None:
+    lines, (status, rows) = first
+    assert "Checks: 1 passed, 0 failed, 0 uncheckable" in lines, lines
+    assert status == "validation complete" and rows == [row], (status, rows)
+    assert after == (HINT, []), f"stale validation results after the write: {after!r}"
+
+
+# ---------------------------------------------------------------------------
+# R-CHKED-057/2, /3 - a save-back or a Save project commit clears the
+# Check Editor's validation results (E5 C-10)
+# ---------------------------------------------------------------------------
+def test_r_chked_057_2_save_back_clears_the_validation_results(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Case R-CHKED-057/2: the fixture image, ``0x8003`` applied as ``AA``, a
+    memory row ``0x8003`` size 1 added and Validate clicked (``0x8003-0x8003
+    expected [AA] actual [AA] -> pass``); the entry edited to ``BB`` and *Save
+    patched image as* confirmed -> key ``=``: 0 verdict rows and the status
+    line ``Validate compares fields to the image``.
+
+    Base: the ``-> pass`` row under ``validation complete`` stays -> RED.
+    Negative control: the hook not telling the Check Editor -> RED (M29)."""
+    _set_quiet(monkeypatch, QUIET_SHORT_S)
+    seen = []
+
+    def make(folder: Path, image: Path):
+        async def scenario(app, pilot, log):
+            await _load_image_by_dialog(pilot, app, image)
+            await _load_document(pilot, app, log, folder, "d.changes.json", [AA_ENTRY])
+            assert await _apply(pilot, app, log, "Apply:") == "Apply: 1 applied, 0 skipped, 0 blocked"
+            first = await _validate_a_session_row(pilot, app, log)
+            await _entry_op(
+                pilot, app, log, "#patch_entry_edit_button", "0x8003", "BB", "Patch Editor: entry updated."
+            )
+            await _save_back(pilot, app, log, "fixture-patched.s19", "Saved + verified")
+            assert app.current_file.mem_map[0x8003] == 0xBB
+            seen.append((first, await _card_after_return(pilot, app)))
+
+        return scenario
+
+    _reps(tmp_path, make)
+    for first, after in seen:
+        _assert_cleared(first, after, "0x8003-0x8003 expected [AA] actual [AA] -> pass")
+
+
+def test_r_chked_057_3_save_project_commit_clears_the_validation_results(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Case R-CHKED-057/3: as /2 inside an open project, then a Save project
+    commit by ``ctrl+s`` instead of the save-back -> key ``=``: 0 verdict rows
+    and the status line ``Validate compares fields to the image``.
+
+    Base: the stale ``-> pass`` row stays -> RED. Negative control: M29."""
+    _set_quiet(monkeypatch, QUIET_SHORT_S)
+    seen = []
+
+    def make(folder: Path, image: Path):
+        async def scenario(app, pilot, log):
+            await _load_image_by_dialog(pilot, app, image)
+            await _open_project(pilot, app, log)
+            await _load_document(pilot, app, log, folder, "d.changes.json", [AA_ENTRY])
+            assert await _apply(pilot, app, log, "Apply:") == "Apply: 1 applied, 0 skipped, 0 blocked"
+            first = await _validate_a_session_row(pilot, app, log)
+            await _entry_op(
+                pilot, app, log, "#patch_entry_edit_button", "0x8003", "BB", "Patch Editor: entry updated."
+            )
+            await _show_rail(pilot, app, "1", "#loaded_slots")
+            await _save_project(pilot, app, log)
+            assert app.current_file.mem_map[0x8003] == 0xBB, "the commit did not write the BB"
+            seen.append((first, await _card_after_return(pilot, app)))
+
+        return scenario
+
+    _reps(tmp_path, make)
+    for first, after in seen:
+        _assert_cleared(first, after, "0x8003-0x8003 expected [AA] actual [AA] -> pass")
+
+
+# ---------------------------------------------------------------------------
+# R-CRC-PREVIEW-002.5/9 - a save-back that raises after the adopt ends the app
+# ---------------------------------------------------------------------------
+async def _confirm_save_back(pilot, app, name: str, *, by_keys: bool) -> None:
+    """The JSON tab clicked, ``name`` typed into the save-back field, then the
+    confirm: by ``tab`` to *Write file* and ``enter`` (``by_keys``), or a press
+    of the shipped button."""
+    assert await pilot.click("#patch_tab_json"), "click missed #patch_tab_json"
+    await wait_until(
+        pilot,
+        lambda: app.query_one("#patch_saveback_confirm_button").region.width > 0,
+        "timed out waiting for the save-back row",
+    )
+    await _type_into(pilot, app, "#patch_saveback_name_input", name)
+    confirm = app.query_one("#patch_saveback_confirm_button", Button)
+    if not by_keys:
+        confirm.press()
+        return
+    for _ in range(6):
+        if app.focused is confirm:
+            break
+        await pilot.press("tab")
+    assert app.focused is confirm, f"tab never reached the save-back confirm: {app.focused!r}"
+    await pilot.press("enter")
+
+
+def test_r_crc_preview_002_5_9_save_back_raising_after_the_adopt_ends_the_app(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Case R-CRC-PREVIEW-002.5/9 (E5 C-6, robustness; partial: the fault is
+    injected): after the apply of ``AA``, a display and the entry edited to
+    ``BB``, a save-back whose emit raises after ``save_patched`` adopted the
+    re-derived bytes -> ``0x8003`` holds ``BB``, and the app ends with that
+    error (return code 1, the error raised out of the run), so the CRC
+    Designer can never show the pre-write CRC (E5-S2 ruling: no hook needed).
+
+    Standing guard (passes on the base). Negative control: the save-back
+    handler swallowing the error -> the app keeps running -> RED (M30)."""
+    _set_quiet(monkeypatch, QUIET_SHORT_S)
+
+    def raise_after_adopt(self, *args, **kwargs):
+        raise RuntimeError("probe after adopt")
+
+    monkeypatch.setattr(change_service_module.ChangeService, "emit_and_verify", raise_after_adopt)
+    seen = {}
+
+    def make(folder: Path, image: Path):
+        async def scenario(app, pilot, log):
+            seen["app"] = app
+            await _load_image_by_dialog(pilot, app, image)
+            await _load_document(pilot, app, log, folder, "d.changes.json", [AA_ENTRY])
+            assert await _apply(pilot, app, log, "Apply:") == "Apply: 1 applied, 0 skipped, 0 blocked"
+            await _fresh_designer_display(pilot, app, AFTER_AA)
+            await _entry_op(
+                pilot, app, log, "#patch_entry_edit_button", "0x8003", "BB", "Patch Editor: entry updated."
+            )
+            await _confirm_save_back(pilot, app, "fixture-raise.s19", by_keys=False)
+            for _ in range(200):
+                if app._exception is not None:
+                    break
+                await asyncio.sleep(0.05)
+            seen["byte"] = app.current_file.mem_map[0x8003]
+            assert app._exception is not None, "the save-back error was swallowed; the app runs on"
+
+        return scenario
+
+    for rep in range(REPS):
+        folder = tmp_path / f"rep{rep}"
+        base = folder / "app"
+        base.mkdir(parents=True)
+        image = folder / "fixture.s19"
+        write_fixture_image(image)
+        seen.clear()
+        with pytest.raises(RuntimeError, match="probe after adopt"):
+            _run(base, make(folder, image))
+        assert seen["byte"] == 0xBB, "the fault was not injected after the adopt"
+        assert seen["app"].return_code == 1, seen["app"].return_code
+
+
+# ---------------------------------------------------------------------------
+# AT-I5-4 - the save-back confirm reached by keys (C-4)
+# ---------------------------------------------------------------------------
+def test_at_i5_4_save_back_by_keys_then_display(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """AT-I5-4 (US-CRC-FRESH-2; drives R-CRC-PREVIEW-002.5/4 black box): the
+    Load dialog, key ``6``, the path typed, Load and Apply clicked (``AA``);
+    key ``0`` (``0x08DAAFB7``); the entry edited to ``BB`` by typed fields and
+    a click; the save-back name typed and the confirm reached by ``tab`` and
+    pressed by ``enter`` -> ``Saved + verified``, the file written; 0
+    recomputes before key ``0``; after key ``0`` exactly 1, concat
+    ``0x614BD0E8`` / fill ``0xE1E79AB1``."""
+    _set_quiet(monkeypatch, QUIET_SHORT_S)
+
+    def make(folder: Path, image: Path):
+        async def scenario(app, pilot, log):
+            await _load_image_by_dialog(pilot, app, image)
+            await _load_document(pilot, app, log, folder, "d.changes.json", [AA_ENTRY])
+            assert await _apply(pilot, app, log, "Apply:") == "Apply: 1 applied, 0 skipped, 0 blocked"
+            await _fresh_designer_display(pilot, app, AFTER_AA)
+            await _entry_op(
+                pilot, app, log, "#patch_entry_edit_button", "0x8003", "BB", "Patch Editor: entry updated."
+            )
+            before = designer_recomputes()
+            mark = len(log.messages)
+            await _confirm_save_back(pilot, app, "fixture-keys.s19", by_keys=True)
+            await _status_since(pilot, log, mark, lambda m: "Saved + verified" in m, "the save-back")
+            assert list((folder / "app").rglob("fixture-keys.s19")), "the save-back wrote no file"
+            assert app.current_file.mem_map[0x8003] == 0xBB
+            await _quiet(pilot)
+            assert designer_recomputes() == before, "a hidden CRC Designer recomputed"
+            await _press_rail(pilot, app, "0")
+            await _expect_refresh(pilot, app, before, AFTER_BB, "save-back by keys then display")
 
         return scenario
 

@@ -8,11 +8,11 @@ Base `c2cba35`. Rows: `01-requirements.md`. Design of each function: `codewire/g
 
 Docs, text only, not a source file (E4; E3 ruling SEC5-3 / A-3): `docs/user-guide/ch10-check-editor.md` §10.6 *Validate*, §10.7 *Write the spec*, §10.8 *Load a spec back* — state what `E1-rulings.md` §1 (5)–(7) admits: Validate compares a field loaded from a spec with the spec's bytes; Write keeps them (to re-baseline, exclude and include the parameter, or remove and add the memory row); a rewritten spec lists its parameters first; a parameter a new A2L moves, resizes or no longer lists comes back as an unlabelled memory row.
 
-## 2. Functions (17: 13 changed, 4 new; #17 added at E3)
+## 2. Functions (18: 13 changed, 5 new; #17 added at E3, #18 at E5)
 
 | # | File | Function | Change | Rows |
 |---|---|---|---|---|
-| 1 | `app.py` | `S19TuiApp._note_image_bytes_written` | **new**: tell the CRC Designer that the loaded image's bytes were written in place; no-op when the panel is not mounted | R-CRC-PREVIEW-002.1, -002.5 |
+| 1 | `app.py` | `S19TuiApp._note_image_bytes_written` | **new**: tell the CRC Designer that the loaded image's bytes were written in place; no-op when the panel is not mounted. E5 C-10: also clears the Check Editor's validation results (#18), queried separately | R-CRC-PREVIEW-002.1, -002.5, R-CHKED-057 |
 | 2 | `app.py` | `S19TuiApp.on_patch_editor_panel_action_requested` (`:4733`) | changed: after the `try`/`except`, when the action is `apply_doc`, call #1 (both outcomes; never inside `if counts["applied"] > 0`, E3 A-2) | R-CRC-PREVIEW-002.5 (/3, /6, /8) |
 | 3 | `app.py` | `S19TuiApp.on_patch_editor_panel_save_back_decision` (`:4943`) | changed: call #1 after `save_patched` returns, whatever `result.ok` (a save-back refused as blocked has reverted the image, E3 SEC5-2) | R-CRC-PREVIEW-002.5 (/4, /7) |
 | 4 | `app.py` | `S19TuiApp._on_project_saved` (`:12560`) | changed: call #1 after `adopt_rederived` (only when the commit wrote the image) | R-CRC-PREVIEW-002.1 (/6), -002.5 (/5) |
@@ -29,10 +29,11 @@ Docs, text only, not a source file (E4; E3 ruling SEC5-3 / A-3): `docs/user-guid
 | 15 | `screens_directionb.py` | `CheckEditorPanel._on_a2l_parameter_picker_selection_changed` (`:7725`) | changed: prune `_spec_bytes` to the current picks before the preview refresh | R-CHKED-025 (/2), -026 |
 | 16 | `screens_directionb.py` | `CheckEditorPanel._prune_spec_bytes` | **new**: keep only the `_spec_bytes` entries of currently included names whose ledger range is still their spec entry's | R-CHKED-025, -026, -055 |
 | 17 | `screens_directionb.py` | `CheckEditorPanel._demote_moved_spec_params` | **new** (E3, SEC5-1 = A-1): for each earlier pick with a spec entry that the new ledger does not list at that entry's address and byte count (moved, resized or not listed), append the memory row `(address, default label, size, bytes)` and drop the name from `_spec_bytes`; return the earlier picks to re-include | R-CHKED-056, -010 |
+| 18 | `screens_directionb.py` | `CheckEditorPanel.clear_check_results` | **new** (E5 C-10, SEC E5-S1): public; the Validate status line back to its mount text and the verdict rows removed; no tab switch, no focus move. #1 also calls it (changed at E5) | R-CHKED-057 |
 
 Context (unchanged, read by the changed nodes): `CrcDesignerPanel._on_image_changed`, `on_show`, `_recompute` (Inc 13); `ChangeService.apply`, `save_patched`, `adopt_rederived`; `A2LParameterPicker.set_parameters`, `clear_picks`, `include_names`, `picked_params`, `param_rows`; `CheckEditorPanel.on_button_pressed` (Remove row pops by index, which keeps working with 4-tuples); `S19TuiApp._prefill_check_editor`; `read_change_document` (Inc 4: `entry.symbol`).
 
-Every row maps to at least one function: R-CRC-PREVIEW-002.1 (#1, #4, #7), -002.5 (#1–#4, #7), R-CHKED-010 (#9, #17), -054 (#9), -055 (#9, #16, #17), -041.1 (#10), -041.2 (#5, #10, #11), -041.3 (#10, #11, #13), -025 (#6, #12, #14, #15, #16), -026 (#5, #6, #8, #9, #10, #12, #15, #16), -027 (#6), -056 (#8, #9, #12, #13, #17).
+Every row maps to at least one function: R-CRC-PREVIEW-002.1 (#1, #4, #7), -002.5 (#1–#4, #7), R-CHKED-010 (#9, #17), -054 (#9), -055 (#9, #16, #17), -041.1 (#10), -041.2 (#5, #10, #11), -041.3 (#10, #11, #13), -025 (#6, #12, #14, #15, #16), -026 (#5, #6, #8, #9, #10, #12, #15, #16), -027 (#6), -056 (#8, #9, #12, #13, #17), -057 (#1, #18).
 
 ## 3. Nodes touched (existing tests)
 

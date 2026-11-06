@@ -7298,13 +7298,18 @@ class S19TuiApp(App):
         """Assemble the ``kind="check"`` document from collector items (LLR-009.1).
 
         Summary:
-            One :class:`ChangeEntry` per collected field, in collector order,
-            with the EXPECTED bytes read from the loaded image's memory map
-            at ``[address, address + size)`` — a check spec asserts the
-            current image state. A field whose address is missing, negative
-            or not fully mapped in the loaded image cannot declare expected
-            bytes and is SKIPPED (counted in the return); with no image
-            loaded every field is skipped and the EMPTY spec still writes
+            One :class:`ChangeEntry` per collected field, in collector order.
+            A field loaded from a spec carries its spec entry's bytes in
+            ``expected`` (a tuple of exactly ``size`` ints); they are
+            declared as they are and the image is not read, so such a field
+            is never skipped for lack of an image (amended *declared field*,
+            R-CHKED-026 / R-CHKED-027). Any other field takes the EXPECTED
+            bytes read from the loaded image's memory map at
+            ``[address, address + size)`` — the current image state. Such a
+            field whose address is missing, negative or not fully mapped in
+            the loaded image cannot declare expected bytes and is SKIPPED
+            (counted in the return); with no image loaded every such field
+            is skipped, and a spec with no field left still writes EMPTY
             (LLR-009.1's empty arm). No bytes are ever written to the image
             — the document is data, and the apply gate is what keeps it
             inert (LLR-009.3).
@@ -7365,7 +7370,8 @@ class S19TuiApp(App):
             Exactly the two :data:`CHECK_EDITOR_ACTIONS` — a non-member
             action is one status error, never a crash. ``write_doc``
             assembles the ``kind="check"`` document (expected bytes from the
-            loaded image), writes it through ``changes.io.
+            spec for a field loaded from one, else from the loaded image),
+            writes it through ``changes.io.
             write_change_document`` under the operator's name (the
             ``.chk.json`` suffix is preserved by ``_safe_name``), surfaces
             the outcome and refreshes the folder listing so the new spec
@@ -17908,9 +17914,11 @@ class S19TuiApp(App):
             in place, so its coverage follows the written bytes (Inc 5 D-4).
             The ``current_file`` reactive does not fire for an in-place
             write (an apply, a save-back or a Save project commit), so this
-            helper is the in-place twin of :meth:`watch_current_file`. A
-            not-yet-mounted designer tree (headless unit path) is tolerated
-            as a no-op, matching ``watch_current_file``.
+            helper is the in-place twin of :meth:`watch_current_file`. It
+            also clears the Check Editor's validation results, whose verdict
+            rows judged the bytes before the write (R-CHKED-057). A
+            not-yet-mounted panel (headless unit path) is tolerated as a
+            no-op, matching ``watch_current_file``.
 
         Args:
             None
@@ -17919,24 +17927,32 @@ class S19TuiApp(App):
             None
 
         Data Flow:
-            - Query the designer panel by type and delegate to its public
-              ``note_image_bytes_written``; a missing panel returns without
-              raising. A fault inside the panel is NOT swallowed — the
-              delegation sits outside the ``try``.
+            - Query each panel separately and delegate to its public method
+              (``note_image_bytes_written``, ``clear_check_results``); a
+              missing panel skips only its own notice. A fault inside a
+              panel is NOT swallowed — each delegation sits outside its
+              ``try``.
 
         Dependencies:
             Uses:
                 - ``CrcDesignerPanel``
+                - ``CheckEditorPanel``
             Used by:
                 - ``on_patch_editor_panel_action_requested``
                 - ``on_patch_editor_panel_save_back_decision``
                 - ``_on_project_saved``
         """
         try:
-            panel = self.query_one(CrcDesignerPanel)
+            designer = self.query_one(CrcDesignerPanel)
+        except Exception:
+            designer = None
+        if designer is not None:
+            designer.note_image_bytes_written()
+        try:
+            checks = self.query_one("#check_editor_panel", CheckEditorPanel)
         except Exception:
             return
-        panel.note_image_bytes_written()
+        checks.clear_check_results()
 
     def watch_current_file(self) -> None:
         """

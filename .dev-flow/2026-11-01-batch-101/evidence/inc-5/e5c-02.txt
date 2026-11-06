@@ -1,0 +1,914 @@
+== e5c-02 GREEN: both new files + symbol-reads (c2cba35 + increment, staged)
+2026-11-06T11:06:02Z
+HEAD c2cba356
+index tree 6c846528aba230fac19db478b8d1de83ccf92909
+040000 tree 172ff6fc2f6d1c179d1e59f6742ab80a660744e4	docs
+040000 tree 397a3b2ff5296c6d4b8a933002cb8f6e51aece07	s19_app
+040000 tree 2dad0b4fa9f4adb4c0c09d26d2df648279a1ce42	tests
+s19_app.__file__ <HOME>/work/s19_i5c/s19_app/__init__.py
+python 3.11.18
+pytest tests/test_b101_designer_writes.py tests/test_b101_check_spec_keep.py tests/test_b101_symbol_reads.py -n 8 -m not serial_timing -q -rA -p no:cacheprovider
+bringing up nodes...
+bringing up nodes...
+
+....................................................................     [100%]
+==================================== PASSES ====================================
+__ test_r_crc_preview_002_5_9_save_back_raising_after_the_adopt_ends_the_app ___
+[gw6] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+----------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ <HOME>/work/s19_i5c/s19_app/tui/app.py:5025 in                       │
+│ on_patch_editor_panel_save_back_decision                                     │
+│                                                                              │
+│    5022 │   │   │   )                                                        │
+│    5023 │   │   else:                                                        │
+│    5024 │   │   │   s0_header = None                                         │
+│ ❱  5025 │   │   result = self._change_service.save_patched(                  │
+│    5026 │   │   │   loaded.mem_map,                                          │
+│    5027 │   │   │   loaded.ranges,                                           │
+│    5028 │   │   │   dest_dir,                                                │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │ bytes_per_line = 32                                                      │ │
+│ │       dest_dir = PosixPath('/tmp/pytest-of-<USER>/pytest-224/popen-gw… │ │
+│ │          event = SaveBackDecision()                                      │ │
+│ │         loaded = LoadedFile(                                             │ │
+│ │                  │                                                       │ │
+│ │                  path=PosixPath('/tmp/pytest-of-<USER>/pytest-224/pop… │ │
+│ │                  │   file_type='s19',                                    │ │
+│ │                  │   mem_map={                                           │ │
+│ │                  │   │   32768: 0,                                       │ │
+│ │                  │   │   32769: 1,                                       │ │
+│ │                  │   │   32770: 2,                                       │ │
+│ │                  │   │   32771: 187,                                     │ │
+│ │                  │   │   32772: 4,                                       │ │
+│ │                  │   │   32773: 5,                                       │ │
+│ │                  │   │   32774: 6,                                       │ │
+│ │                  │   │   32775: 7,                                       │ │
+│ │                  │   │   32784: 16,                                      │ │
+│ │                  │   │   32785: 17,                                      │ │
+│ │                  │   │   ... +6                                          │ │
+│ │                  │   },                                                  │ │
+│ │                  │   row_bases=[32768, 32784],                           │ │
+│ │                  │   ranges=[(32768, 32776), (32784, 32792)],            │ │
+│ │                  │   range_validity=[True, True],                        │ │
+│ │                  │   errors=[],                                          │ │
+│ │                  │   a2l_path=None,                                      │ │
+│ │                  │   a2l_data=None,                                      │ │
+│ │                  │   mac_path=None,                                      │ │
+│ │                  │   mac_records=[],                                     │ │
+│ │                  │   mac_diagnostics=[],                                 │ │
+│ │                  │   variant_id=None,                                    │ │
+│ │                  │   source_s0_header=b'',                               │ │
+│ │                  │   entropy_windows=[                                   │ │
+│ │                  │   │   EntropyWindow(                                  │ │
+│ │                  │   │   │   start=32768,                                │ │
+│ │                  │   │   │   end=32776,                                  │ │
+│ │                  │   │   │   sample_count=8,                             │ │
+│ │                  │   │   │   entropy=3.0,                                │ │
+│ │                  │   │   │   band='low',                                 │ │
+│ │                  │   │   │   low_confidence=True                         │ │
+│ │                  │   │   ),                                              │ │
+│ │                  │   │   EntropyWindow(                                  │ │
+│ │                  │   │   │   start=32784,                                │ │
+│ │                  │   │   │   end=32792,                                  │ │
+│ │                  │   │   │   sample_count=8,                             │ │
+│ │                  │   │   │   entropy=3.0,                                │ │
+│ │                  │   │   │   band='low',                                 │ │
+│ │                  │   │   │   low_confidence=True                         │ │
+│ │                  │   │   )                                               │ │
+│ │                  │   ],                                                  │ │
+│ │                  │   out_of_order_count=0,                               │ │
+│ │                  │   entry_point=0                                       │ │
+│ │                  )                                                       │ │
+│ │          panel = PatchEditorPanel(id='patch_editor_panel')               │ │
+│ │      s0_header = b'fixture-raise.s19'                                    │ │
+│ │           self = S19TuiApp(                                              │ │
+│ │                  │   title='Hex Edit Tool',                              │ │
+│ │                  │   classes={'-dark-mode'},                             │ │
+│ │                  │   pseudo_classes={'dark', 'focus'}                    │ │
+│ │                  )                                                       │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ <HOME>/work/s19_i5c/s19_app/tui/services/change_service.py:2618 in   │
+│ save_patched                                                                 │
+│                                                                              │
+│   2615 │   │   │   for record in summary.entries                             │
+│   2616 │   │   │   if record.disposition == DISPOSITION_APPLIED              │
+│   2617 │   │   )                                                             │
+│ ❱ 2618 │   │   return self.emit_and_verify(                                  │
+│   2619 │   │   │   mem_map,                                                  │
+│   2620 │   │   │   ranges,                                                   │
+│   2621 │   │   │   dest_dir,                                                 │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │          a2l_tags = None                                                 │ │
+│ │           blocked = 0                                                    │ │
+│ │    bytes_per_line = 32                                                   │ │
+│ │           derived = {                                                    │ │
+│ │                     │   32768: 0,                                        │ │
+│ │                     │   32769: 1,                                        │ │
+│ │                     │   32770: 2,                                        │ │
+│ │                     │   32771: 187,                                      │ │
+│ │                     │   32772: 4,                                        │ │
+│ │                     │   32773: 5,                                        │ │
+│ │                     │   32774: 6,                                        │ │
+│ │                     │   32775: 7,                                        │ │
+│ │                     │   32784: 16,                                       │ │
+│ │                     │   32785: 17,                                       │ │
+│ │                     │   ... +6                                           │ │
+│ │                     }                                                    │ │
+│ │          dest_dir = PosixPath('/tmp/pytest-of-<USER>/pytest-224/popen… │ │
+│ │          filename = 'fixture-raise.s19'                                  │ │
+│ │             fresh = ChangeSummary(                                       │ │
+│ │                     │                                                    │ │
+│ │                     source_path=PosixPath('/tmp/pytest-of-<USER>/pyte… │ │
+│ │                     │   kind='change',                                   │ │
+│ │                     │   encoding='utf-8',                                │ │
+│ │                     │   value_mode='text',                               │ │
+│ │                     │                                                    │ │
+│ │                     timestamp_utc='2026-11-06T11:06:32.315971+00:00',    │ │
+│ │                     │   variant_id='fixture',                            │ │
+│ │                     │   counts={                                         │ │
+│ │                     │   │   'applied': 1,                                │ │
+│ │                     │   │   'skipped-partial': 0,                        │ │
+│ │                     │   │   'skipped-outside': 0,                        │ │
+│ │                     │   │   'skipped-no-image': 0,                       │ │
+│ │                     │   │   'blocked': 0                                 │ │
+│ │                     │   },                                               │ │
+│ │                     │   entries=[                                        │ │
+│ │                     │   │   ChangeSummaryEntry(                          │ │
+│ │                     │   │   │   entry_type='bytes',                      │ │
+│ │                     │   │   │   address_start=32771,                     │ │
+│ │                     │   │   │   address_end=32772,                       │ │
+│ │                     │   │   │   before_bytes=(3,),                       │ │
+│ │                     │   │   │   after_bytes=(187,),                      │ │
+│ │                     │   │   │   disposition='applied',                   │ │
+│ │                     │   │   │   linkage='standalone',                    │ │
+│ │                     │   │   │   linkage_symbol=None,                     │ │
+│ │                     │   │   │   symbol=None                              │ │
+│ │                     │   │   )                                            │ │
+│ │                     │   ],                                               │ │
+│ │                     │   issues=[],                                       │ │
+│ │                     │   saved_path=None,                                 │ │
+│ │                     │   verify_result=None,                              │ │
+│ │                     │   source_image_path=None                           │ │
+│ │                     )                                                    │ │
+│ │       mac_records = []                                                   │ │
+│ │           mem_map = {                                                    │ │
+│ │                     │   32768: 0,                                        │ │
+│ │                     │   32769: 1,                                        │ │
+│ │                     │   32770: 2,                                        │ │
+│ │                     │   32771: 187,                                      │ │
+│ │                     │   32772: 4,                                        │ │
+│ │                     │   32773: 5,                                        │ │
+│ │                     │   32774: 6,                                        │ │
+│ │                     │   32775: 7,                                        │ │
+│ │                     │   32784: 16,                                       │ │
+│ │                     │   32785: 17,                                       │ │
+│ │                     │   ... +6                                           │ │
+│ │                     }                                                    │ │
+│ │             prior = ChangeSummary(                                       │ │
+│ │                     │                                                    │ │
+│ │                     source_path=PosixPath('/tmp/pytest-of-<USER>/pyte… │ │
+│ │                     │   kind='change',                                   │ │
+│ │                     │   encoding='utf-8',                                │ │
+│ │                     │   value_mode='text',                               │ │
+│ │                     │                                                    │ │
+│ │                     timestamp_utc='2026-11-06T11:06:23.275811+00:00',    │ │
+│ │                     │   variant_id='fixture',                            │ │
+│ │                     │   counts={                                         │ │
+│ │                     │   │   'applied': 1,                                │ │
+│ │                     │   │   'skipped-partial': 0,                        │ │
+│ │                     │   │   'skipped-outside': 0,                        │ │
+│ │                     │   │   'skipped-no-image': 0,                       │ │
+│ │                     │   │   'blocked': 0                                 │ │
+│ │                     │   },                                               │ │
+│ │                     │   entries=[                                        │ │
+│ │                     │   │   ChangeSummaryEntry(                          │ │
+│ │                     │   │   │   entry_type='bytes',                      │ │
+│ │                     │   │   │   address_start=32771,                     │ │
+│ │                     │   │   │   address_end=32772,                       │ │
+│ │                     │   │   │   before_bytes=(3,),                       │ │
+│ │                     │   │   │   after_bytes=(170,),                      │ │
+│ │                     │   │   │   disposition='applied',                   │ │
+│ │                     │   │   │   linkage='standalone',                    │ │
+│ │                     │   │   │   linkage_symbol=None,                     │ │
+│ │                     │   │   │   symbol=None                              │ │
+│ │                     │   │   )                                            │ │
+│ │                     │   ],                                               │ │
+│ │                     │   issues=[],                                       │ │
+│ │                     │   saved_path=None,                                 │ │
+│ │                     │   verify_result=None,                              │ │
+│ │                     │   source_image_path=None                           │ │
+│ │                     )                                                    │ │
+│ │            ranges = [(32768, 32776), (32784, 32792)]                     │ │
+│ │     reuse_summary = False                                                │ │
+│ │         s0_header = b'fixture-raise.s19'                                 │ │
+│ │              self = <s19_app.tui.services.change_service.ChangeService   │ │
+│ │                     object at 0x7f3d93963750>                            │ │
+│ │ source_image_path = PosixPath('/tmp/pytest-of-<USER>/pytest-224/popen… │ │
+│ │       source_kind = 's19'                                                │ │
+│ │           summary = ChangeSummary(                                       │ │
+│ │                     │                                                    │ │
+│ │                     source_path=PosixPath('/tmp/pytest-of-<USER>/pyte… │ │
+│ │                     │   kind='change',                                   │ │
+│ │                     │   encoding='utf-8',                                │ │
+│ │                     │   value_mode='text',                               │ │
+│ │                     │                                                    │ │
+│ │                     timestamp_utc='2026-11-06T11:06:32.315971+00:00',    │ │
+│ │                     │   variant_id='fixture',                            │ │
+│ │                     │   counts={                                         │ │
+│ │                     │   │   'applied': 1,                                │ │
+│ │                     │   │   'skipped-partial': 0,                        │ │
+│ │                     │   │   'skipped-outside': 0,                        │ │
+│ │                     │   │   'skipped-no-image': 0,                       │ │
+│ │                     │   │   'blocked': 0                                 │ │
+│ │                     │   },                                               │ │
+│ │                     │   entries=[                                        │ │
+│ │                     │   │   ChangeSummaryEntry(                          │ │
+│ │                     │   │   │   entry_type='bytes',                      │ │
+│ │                     │   │   │   address_start=32771,                     │ │
+│ │                     │   │   │   address_end=32772,                       │ │
+│ │                     │   │   │   before_bytes=(3,),                       │ │
+│ │                     │   │   │   after_bytes=(187,),                      │ │
+│ │                     │   │   │   disposition='applied',                   │ │
+│ │                     │   │   │   linkage='standalone',                    │ │
+│ │                     │   │   │   linkage_symbol=None,                     │ │
+│ │                     │   │   │   symbol=None                              │ │
+│ │                     │   │   )                                            │ │
+│ │                     │   ],                                               │ │
+│ │                     │   issues=[],                                       │ │
+│ │                     │   saved_path=None,                                 │ │
+│ │                     │   verify_result=None,                              │ │
+│ │                     │   source_image_path=None                           │ │
+│ │                     )                                                    │ │
+│ │     workarea_root = PosixPath('/tmp/pytest-of-<USER>/pytest-224/popen… │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ <HOME>/work/s19_i5c/tests/test_b101_designer_writes.py:937 in        │
+│ raise_after_adopt                                                            │
+│                                                                              │
+│    934 │   _set_quiet(monkeypatch, QUIET_SHORT_S)                            │
+│    935 │                                                                     │
+│    936 │   def raise_after_adopt(self, *args, **kwargs):                     │
+│ ❱  937 │   │   raise RuntimeError("probe after adopt")                       │
+│    938 │                                                                     │
+│    939 │   monkeypatch.setattr(change_service_module.ChangeService, "emit_an │
+│    940 │   seen = {}                                                         │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │   args = (                                                               │ │
+│ │          │   {                                                           │ │
+│ │          │   │   32768: 0,                                               │ │
+│ │          │   │   32769: 1,                                               │ │
+│ │          │   │   32770: 2,                                               │ │
+│ │          │   │   32771: 187,                                             │ │
+│ │          │   │   32772: 4,                                               │ │
+│ │          │   │   32773: 5,                                               │ │
+│ │          │   │   32774: 6,                                               │ │
+│ │          │   │   32775: 7,                                               │ │
+│ │          │   │   32784: 16,                                              │ │
+│ │          │   │   32785: 17,                                              │ │
+│ │          │   │   ... +6                                                  │ │
+│ │          │   },                                                          │ │
+│ │          │   [(32768, 32776), (32784, 32792)],                           │ │
+│ │          │                                                               │ │
+│ │          PosixPath('/tmp/pytest-of-<USER>/pytest-224/popen-gw6/test_r… │ │
+│ │          │   'fixture-raise.s19'                                         │ │
+│ │          )                                                               │ │
+│ │ kwargs = {                                                               │ │
+│ │          │   'source_kind': 's19',                                       │ │
+│ │          │   'bytes_per_line': 32,                                       │ │
+│ │          │   's0_header': b'fixture-raise.s19',                          │ │
+│ │          │   'source_image_path':                                        │ │
+│ │          PosixPath('/tmp/pytest-of-<USER>/pytest-224/popen-gw6/test_r… │ │
+│ │          │   'workarea_root':                                            │ │
+│ │          PosixPath('/tmp/pytest-of-<USER>/pytest-224/popen-gw6/test_r… │ │
+│ │          }                                                               │ │
+│ │   self = <s19_app.tui.services.change_service.ChangeService object at    │ │
+│ │          0x7f3d93963750>                                                 │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+╰──────────────────────────────────────────────────────────────────────────────╯
+RuntimeError: probe after adopt
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ <HOME>/work/s19_i5c/s19_app/tui/app.py:5025 in                       │
+│ on_patch_editor_panel_save_back_decision                                     │
+│                                                                              │
+│    5022 │   │   │   )                                                        │
+│    5023 │   │   else:                                                        │
+│    5024 │   │   │   s0_header = None                                         │
+│ ❱  5025 │   │   result = self._change_service.save_patched(                  │
+│    5026 │   │   │   loaded.mem_map,                                          │
+│    5027 │   │   │   loaded.ranges,                                           │
+│    5028 │   │   │   dest_dir,                                                │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │ bytes_per_line = 32                                                      │ │
+│ │       dest_dir = PosixPath('/tmp/pytest-of-<USER>/pytest-224/popen-gw… │ │
+│ │          event = SaveBackDecision()                                      │ │
+│ │         loaded = LoadedFile(                                             │ │
+│ │                  │                                                       │ │
+│ │                  path=PosixPath('/tmp/pytest-of-<USER>/pytest-224/pop… │ │
+│ │                  │   file_type='s19',                                    │ │
+│ │                  │   mem_map={                                           │ │
+│ │                  │   │   32768: 0,                                       │ │
+│ │                  │   │   32769: 1,                                       │ │
+│ │                  │   │   32770: 2,                                       │ │
+│ │                  │   │   32771: 187,                                     │ │
+│ │                  │   │   32772: 4,                                       │ │
+│ │                  │   │   32773: 5,                                       │ │
+│ │                  │   │   32774: 6,                                       │ │
+│ │                  │   │   32775: 7,                                       │ │
+│ │                  │   │   32784: 16,                                      │ │
+│ │                  │   │   32785: 17,                                      │ │
+│ │                  │   │   ... +6                                          │ │
+│ │                  │   },                                                  │ │
+│ │                  │   row_bases=[32768, 32784],                           │ │
+│ │                  │   ranges=[(32768, 32776), (32784, 32792)],            │ │
+│ │                  │   range_validity=[True, True],                        │ │
+│ │                  │   errors=[],                                          │ │
+│ │                  │   a2l_path=None,                                      │ │
+│ │                  │   a2l_data=None,                                      │ │
+│ │                  │   mac_path=None,                                      │ │
+│ │                  │   mac_records=[],                                     │ │
+│ │                  │   mac_diagnostics=[],                                 │ │
+│ │                  │   variant_id=None,                                    │ │
+│ │                  │   source_s0_header=b'',                               │ │
+│ │                  │   entropy_windows=[                                   │ │
+│ │                  │   │   EntropyWindow(                                  │ │
+│ │                  │   │   │   start=32768,                                │ │
+│ │                  │   │   │   end=32776,                                  │ │
+│ │                  │   │   │   sample_count=8,                             │ │
+│ │                  │   │   │   entropy=3.0,                                │ │
+│ │                  │   │   │   band='low',                                 │ │
+│ │                  │   │   │   low_confidence=True                         │ │
+│ │                  │   │   ),                                              │ │
+│ │                  │   │   EntropyWindow(                                  │ │
+│ │                  │   │   │   start=32784,                                │ │
+│ │                  │   │   │   end=32792,                                  │ │
+│ │                  │   │   │   sample_count=8,                             │ │
+│ │                  │   │   │   entropy=3.0,                                │ │
+│ │                  │   │   │   band='low',                                 │ │
+│ │                  │   │   │   low_confidence=True                         │ │
+│ │                  │   │   )                                               │ │
+│ │                  │   ],                                                  │ │
+│ │                  │   out_of_order_count=0,                               │ │
+│ │                  │   entry_point=0                                       │ │
+│ │                  )                                                       │ │
+│ │          panel = PatchEditorPanel(id='patch_editor_panel')               │ │
+│ │      s0_header = b'fixture-raise.s19'                                    │ │
+│ │           self = S19TuiApp(                                              │ │
+│ │                  │   title='Hex Edit Tool',                              │ │
+│ │                  │   classes={'-dark-mode'},                             │ │
+│ │                  │   pseudo_classes={'dark', 'focus'}                    │ │
+│ │                  )                                                       │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ <HOME>/work/s19_i5c/s19_app/tui/services/change_service.py:2618 in   │
+│ save_patched                                                                 │
+│                                                                              │
+│   2615 │   │   │   for record in summary.entries                             │
+│   2616 │   │   │   if record.disposition == DISPOSITION_APPLIED              │
+│   2617 │   │   )                                                             │
+│ ❱ 2618 │   │   return self.emit_and_verify(                                  │
+│   2619 │   │   │   mem_map,                                                  │
+│   2620 │   │   │   ranges,                                                   │
+│   2621 │   │   │   dest_dir,                                                 │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │          a2l_tags = None                                                 │ │
+│ │           blocked = 0                                                    │ │
+│ │    bytes_per_line = 32                                                   │ │
+│ │           derived = {                                                    │ │
+│ │                     │   32768: 0,                                        │ │
+│ │                     │   32769: 1,                                        │ │
+│ │                     │   32770: 2,                                        │ │
+│ │                     │   32771: 187,                                      │ │
+│ │                     │   32772: 4,                                        │ │
+│ │                     │   32773: 5,                                        │ │
+│ │                     │   32774: 6,                                        │ │
+│ │                     │   32775: 7,                                        │ │
+│ │                     │   32784: 16,                                       │ │
+│ │                     │   32785: 17,                                       │ │
+│ │                     │   ... +6                                           │ │
+│ │                     }                                                    │ │
+│ │          dest_dir = PosixPath('/tmp/pytest-of-<USER>/pytest-224/popen… │ │
+│ │          filename = 'fixture-raise.s19'                                  │ │
+│ │             fresh = ChangeSummary(                                       │ │
+│ │                     │                                                    │ │
+│ │                     source_path=PosixPath('/tmp/pytest-of-<USER>/pyte… │ │
+│ │                     │   kind='change',                                   │ │
+│ │                     │   encoding='utf-8',                                │ │
+│ │                     │   value_mode='text',                               │ │
+│ │                     │                                                    │ │
+│ │                     timestamp_utc='2026-11-06T11:07:01.571389+00:00',    │ │
+│ │                     │   variant_id='fixture',                            │ │
+│ │                     │   counts={                                         │ │
+│ │                     │   │   'applied': 1,                                │ │
+│ │                     │   │   'skipped-partial': 0,                        │ │
+│ │                     │   │   'skipped-outside': 0,                        │ │
+│ │                     │   │   'skipped-no-image': 0,                       │ │
+│ │                     │   │   'blocked': 0                                 │ │
+│ │                     │   },                                               │ │
+│ │                     │   entries=[                                        │ │
+│ │                     │   │   ChangeSummaryEntry(                          │ │
+│ │                     │   │   │   entry_type='bytes',                      │ │
+│ │                     │   │   │   address_start=32771,                     │ │
+│ │                     │   │   │   address_end=32772,                       │ │
+│ │                     │   │   │   before_bytes=(3,),                       │ │
+│ │                     │   │   │   after_bytes=(187,),                      │ │
+│ │                     │   │   │   disposition='applied',                   │ │
+│ │                     │   │   │   linkage='standalone',                    │ │
+│ │                     │   │   │   linkage_symbol=None,                     │ │
+│ │                     │   │   │   symbol=None                              │ │
+│ │                     │   │   )                                            │ │
+│ │                     │   ],                                               │ │
+│ │                     │   issues=[],                                       │ │
+│ │                     │   saved_path=None,                                 │ │
+│ │                     │   verify_result=None,                              │ │
+│ │                     │   source_image_path=None                           │ │
+│ │                     )                                                    │ │
+│ │       mac_records = []                                                   │ │
+│ │           mem_map = {                                                    │ │
+│ │                     │   32768: 0,                                        │ │
+│ │                     │   32769: 1,                                        │ │
+│ │                     │   32770: 2,                                        │ │
+│ │                     │   32771: 187,                                      │ │
+│ │                     │   32772: 4,                                        │ │
+│ │                     │   32773: 5,                                        │ │
+│ │                     │   32774: 6,                                        │ │
+│ │                     │   32775: 7,                                        │ │
+│ │                     │   32784: 16,                                       │ │
+│ │                     │   32785: 17,                                       │ │
+│ │                     │   ... +6                                           │ │
+│ │                     }                                                    │ │
+│ │             prior = ChangeSummary(                                       │ │
+│ │                     │                                                    │ │
+│ │                     source_path=PosixPath('/tmp/pytest-of-<USER>/pyte… │ │
+│ │                     │   kind='change',                                   │ │
+│ │                     │   encoding='utf-8',                                │ │
+│ │                     │   value_mode='text',                               │ │
+│ │                     │                                                    │ │
+│ │                     timestamp_utc='2026-11-06T11:06:52.457629+00:00',    │ │
+│ │                     │   variant_id='fixture',                            │ │
+│ │                     │   counts={                                         │ │
+│ │                     │   │   'applied': 1,                                │ │
+│ │                     │   │   'skipped-partial': 0,                        │ │
+│ │                     │   │   'skipped-outside': 0,                        │ │
+│ │                     │   │   'skipped-no-image': 0,                       │ │
+│ │                     │   │   'blocked': 0                                 │ │
+│ │                     │   },                                               │ │
+│ │                     │   entries=[                                        │ │
+│ │                     │   │   ChangeSummaryEntry(                          │ │
+│ │                     │   │   │   entry_type='bytes',                      │ │
+│ │                     │   │   │   address_start=32771,                     │ │
+│ │                     │   │   │   address_end=32772,                       │ │
+│ │                     │   │   │   before_bytes=(3,),                       │ │
+│ │                     │   │   │   after_bytes=(170,),                      │ │
+│ │                     │   │   │   disposition='applied',                   │ │
+│ │                     │   │   │   linkage='standalone',                    │ │
+│ │                     │   │   │   linkage_symbol=None,                     │ │
+│ │                     │   │   │   symbol=None                              │ │
+│ │                     │   │   )                                            │ │
+│ │                     │   ],                                               │ │
+│ │                     │   issues=[],                                       │ │
+│ │                     │   saved_path=None,                                 │ │
+│ │                     │   verify_result=None,                              │ │
+│ │                     │   source_image_path=None                           │ │
+│ │                     )                                                    │ │
+│ │            ranges = [(32768, 32776), (32784, 32792)]                     │ │
+│ │     reuse_summary = False                                                │ │
+│ │         s0_header = b'fixture-raise.s19'                                 │ │
+│ │              self = <s19_app.tui.services.change_service.ChangeService   │ │
+│ │                     object at 0x7f3d907151d0>                            │ │
+│ │ source_image_path = PosixPath('/tmp/pytest-of-<USER>/pytest-224/popen… │ │
+│ │       source_kind = 's19'                                                │ │
+│ │           summary = ChangeSummary(                                       │ │
+│ │                     │                                                    │ │
+│ │                     source_path=PosixPath('/tmp/pytest-of-<USER>/pyte… │ │
+│ │                     │   kind='change',                                   │ │
+│ │                     │   encoding='utf-8',                                │ │
+│ │                     │   value_mode='text',                               │ │
+│ │                     │                                                    │ │
+│ │                     timestamp_utc='2026-11-06T11:07:01.571389+00:00',    │ │
+│ │                     │   variant_id='fixture',                            │ │
+│ │                     │   counts={                                         │ │
+│ │                     │   │   'applied': 1,                                │ │
+│ │                     │   │   'skipped-partial': 0,                        │ │
+│ │                     │   │   'skipped-outside': 0,                        │ │
+│ │                     │   │   'skipped-no-image': 0,                       │ │
+│ │                     │   │   'blocked': 0                                 │ │
+│ │                     │   },                                               │ │
+│ │                     │   entries=[                                        │ │
+│ │                     │   │   ChangeSummaryEntry(                          │ │
+│ │                     │   │   │   entry_type='bytes',                      │ │
+│ │                     │   │   │   address_start=32771,                     │ │
+│ │                     │   │   │   address_end=32772,                       │ │
+│ │                     │   │   │   before_bytes=(3,),                       │ │
+│ │                     │   │   │   after_bytes=(187,),                      │ │
+│ │                     │   │   │   disposition='applied',                   │ │
+│ │                     │   │   │   linkage='standalone',                    │ │
+│ │                     │   │   │   linkage_symbol=None,                     │ │
+│ │                     │   │   │   symbol=None                              │ │
+│ │                     │   │   )                                            │ │
+│ │                     │   ],                                               │ │
+│ │                     │   issues=[],                                       │ │
+│ │                     │   saved_path=None,                                 │ │
+│ │                     │   verify_result=None,                              │ │
+│ │                     │   source_image_path=None                           │ │
+│ │                     )                                                    │ │
+│ │     workarea_root = PosixPath('/tmp/pytest-of-<USER>/pytest-224/popen… │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ <HOME>/work/s19_i5c/tests/test_b101_designer_writes.py:937 in        │
+│ raise_after_adopt                                                            │
+│                                                                              │
+│    934 │   _set_quiet(monkeypatch, QUIET_SHORT_S)                            │
+│    935 │                                                                     │
+│    936 │   def raise_after_adopt(self, *args, **kwargs):                     │
+│ ❱  937 │   │   raise RuntimeError("probe after adopt")                       │
+│    938 │                                                                     │
+│    939 │   monkeypatch.setattr(change_service_module.ChangeService, "emit_an │
+│    940 │   seen = {}                                                         │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │   args = (                                                               │ │
+│ │          │   {                                                           │ │
+│ │          │   │   32768: 0,                                               │ │
+│ │          │   │   32769: 1,                                               │ │
+│ │          │   │   32770: 2,                                               │ │
+│ │          │   │   32771: 187,                                             │ │
+│ │          │   │   32772: 4,                                               │ │
+│ │          │   │   32773: 5,                                               │ │
+│ │          │   │   32774: 6,                                               │ │
+│ │          │   │   32775: 7,                                               │ │
+│ │          │   │   32784: 16,                                              │ │
+│ │          │   │   32785: 17,                                              │ │
+│ │          │   │   ... +6                                                  │ │
+│ │          │   },                                                          │ │
+│ │          │   [(32768, 32776), (32784, 32792)],                           │ │
+│ │          │                                                               │ │
+│ │          PosixPath('/tmp/pytest-of-<USER>/pytest-224/popen-gw6/test_r… │ │
+│ │          │   'fixture-raise.s19'                                         │ │
+│ │          )                                                               │ │
+│ │ kwargs = {                                                               │ │
+│ │          │   'source_kind': 's19',                                       │ │
+│ │          │   'bytes_per_line': 32,                                       │ │
+│ │          │   's0_header': b'fixture-raise.s19',                          │ │
+│ │          │   'source_image_path':                                        │ │
+│ │          PosixPath('/tmp/pytest-of-<USER>/pytest-224/popen-gw6/test_r… │ │
+│ │          │   'workarea_root':                                            │ │
+│ │          PosixPath('/tmp/pytest-of-<USER>/pytest-224/popen-gw6/test_r… │ │
+│ │          }                                                               │ │
+│ │   self = <s19_app.tui.services.change_service.ChangeService object at    │ │
+│ │          0x7f3d907151d0>                                                 │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+╰──────────────────────────────────────────────────────────────────────────────╯
+RuntimeError: probe after adopt
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ <HOME>/work/s19_i5c/s19_app/tui/app.py:5025 in                       │
+│ on_patch_editor_panel_save_back_decision                                     │
+│                                                                              │
+│    5022 │   │   │   )                                                        │
+│    5023 │   │   else:                                                        │
+│    5024 │   │   │   s0_header = None                                         │
+│ ❱  5025 │   │   result = self._change_service.save_patched(                  │
+│    5026 │   │   │   loaded.mem_map,                                          │
+│    5027 │   │   │   loaded.ranges,                                           │
+│    5028 │   │   │   dest_dir,                                                │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │ bytes_per_line = 32                                                      │ │
+│ │       dest_dir = PosixPath('/tmp/pytest-of-<USER>/pytest-224/popen-gw… │ │
+│ │          event = SaveBackDecision()                                      │ │
+│ │         loaded = LoadedFile(                                             │ │
+│ │                  │                                                       │ │
+│ │                  path=PosixPath('/tmp/pytest-of-<USER>/pytest-224/pop… │ │
+│ │                  │   file_type='s19',                                    │ │
+│ │                  │   mem_map={                                           │ │
+│ │                  │   │   32768: 0,                                       │ │
+│ │                  │   │   32769: 1,                                       │ │
+│ │                  │   │   32770: 2,                                       │ │
+│ │                  │   │   32771: 187,                                     │ │
+│ │                  │   │   32772: 4,                                       │ │
+│ │                  │   │   32773: 5,                                       │ │
+│ │                  │   │   32774: 6,                                       │ │
+│ │                  │   │   32775: 7,                                       │ │
+│ │                  │   │   32784: 16,                                      │ │
+│ │                  │   │   32785: 17,                                      │ │
+│ │                  │   │   ... +6                                          │ │
+│ │                  │   },                                                  │ │
+│ │                  │   row_bases=[32768, 32784],                           │ │
+│ │                  │   ranges=[(32768, 32776), (32784, 32792)],            │ │
+│ │                  │   range_validity=[True, True],                        │ │
+│ │                  │   errors=[],                                          │ │
+│ │                  │   a2l_path=None,                                      │ │
+│ │                  │   a2l_data=None,                                      │ │
+│ │                  │   mac_path=None,                                      │ │
+│ │                  │   mac_records=[],                                     │ │
+│ │                  │   mac_diagnostics=[],                                 │ │
+│ │                  │   variant_id=None,                                    │ │
+│ │                  │   source_s0_header=b'',                               │ │
+│ │                  │   entropy_windows=[                                   │ │
+│ │                  │   │   EntropyWindow(                                  │ │
+│ │                  │   │   │   start=32768,                                │ │
+│ │                  │   │   │   end=32776,                                  │ │
+│ │                  │   │   │   sample_count=8,                             │ │
+│ │                  │   │   │   entropy=3.0,                                │ │
+│ │                  │   │   │   band='low',                                 │ │
+│ │                  │   │   │   low_confidence=True                         │ │
+│ │                  │   │   ),                                              │ │
+│ │                  │   │   EntropyWindow(                                  │ │
+│ │                  │   │   │   start=32784,                                │ │
+│ │                  │   │   │   end=32792,                                  │ │
+│ │                  │   │   │   sample_count=8,                             │ │
+│ │                  │   │   │   entropy=3.0,                                │ │
+│ │                  │   │   │   band='low',                                 │ │
+│ │                  │   │   │   low_confidence=True                         │ │
+│ │                  │   │   )                                               │ │
+│ │                  │   ],                                                  │ │
+│ │                  │   out_of_order_count=0,                               │ │
+│ │                  │   entry_point=0                                       │ │
+│ │                  )                                                       │ │
+│ │          panel = PatchEditorPanel(id='patch_editor_panel')               │ │
+│ │      s0_header = b'fixture-raise.s19'                                    │ │
+│ │           self = S19TuiApp(                                              │ │
+│ │                  │   title='Hex Edit Tool',                              │ │
+│ │                  │   classes={'-dark-mode'},                             │ │
+│ │                  │   pseudo_classes={'dark', 'focus'}                    │ │
+│ │                  )                                                       │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ <HOME>/work/s19_i5c/s19_app/tui/services/change_service.py:2618 in   │
+│ save_patched                                                                 │
+│                                                                              │
+│   2615 │   │   │   for record in summary.entries                             │
+│   2616 │   │   │   if record.disposition == DISPOSITION_APPLIED              │
+│   2617 │   │   )                                                             │
+│ ❱ 2618 │   │   return self.emit_and_verify(                                  │
+│   2619 │   │   │   mem_map,                                                  │
+│   2620 │   │   │   ranges,                                                   │
+│   2621 │   │   │   dest_dir,                                                 │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │          a2l_tags = None                                                 │ │
+│ │           blocked = 0                                                    │ │
+│ │    bytes_per_line = 32                                                   │ │
+│ │           derived = {                                                    │ │
+│ │                     │   32768: 0,                                        │ │
+│ │                     │   32769: 1,                                        │ │
+│ │                     │   32770: 2,                                        │ │
+│ │                     │   32771: 187,                                      │ │
+│ │                     │   32772: 4,                                        │ │
+│ │                     │   32773: 5,                                        │ │
+│ │                     │   32774: 6,                                        │ │
+│ │                     │   32775: 7,                                        │ │
+│ │                     │   32784: 16,                                       │ │
+│ │                     │   32785: 17,                                       │ │
+│ │                     │   ... +6                                           │ │
+│ │                     }                                                    │ │
+│ │          dest_dir = PosixPath('/tmp/pytest-of-<USER>/pytest-224/popen… │ │
+│ │          filename = 'fixture-raise.s19'                                  │ │
+│ │             fresh = ChangeSummary(                                       │ │
+│ │                     │                                                    │ │
+│ │                     source_path=PosixPath('/tmp/pytest-of-<USER>/pyte… │ │
+│ │                     │   kind='change',                                   │ │
+│ │                     │   encoding='utf-8',                                │ │
+│ │                     │   value_mode='text',                               │ │
+│ │                     │                                                    │ │
+│ │                     timestamp_utc='2026-11-06T11:07:30.816614+00:00',    │ │
+│ │                     │   variant_id='fixture',                            │ │
+│ │                     │   counts={                                         │ │
+│ │                     │   │   'applied': 1,                                │ │
+│ │                     │   │   'skipped-partial': 0,                        │ │
+│ │                     │   │   'skipped-outside': 0,                        │ │
+│ │                     │   │   'skipped-no-image': 0,                       │ │
+│ │                     │   │   'blocked': 0                                 │ │
+│ │                     │   },                                               │ │
+│ │                     │   entries=[                                        │ │
+│ │                     │   │   ChangeSummaryEntry(                          │ │
+│ │                     │   │   │   entry_type='bytes',                      │ │
+│ │                     │   │   │   address_start=32771,                     │ │
+│ │                     │   │   │   address_end=32772,                       │ │
+│ │                     │   │   │   before_bytes=(3,),                       │ │
+│ │                     │   │   │   after_bytes=(187,),                      │ │
+│ │                     │   │   │   disposition='applied',                   │ │
+│ │                     │   │   │   linkage='standalone',                    │ │
+│ │                     │   │   │   linkage_symbol=None,                     │ │
+│ │                     │   │   │   symbol=None                              │ │
+│ │                     │   │   )                                            │ │
+│ │                     │   ],                                               │ │
+│ │                     │   issues=[],                                       │ │
+│ │                     │   saved_path=None,                                 │ │
+│ │                     │   verify_result=None,                              │ │
+│ │                     │   source_image_path=None                           │ │
+│ │                     )                                                    │ │
+│ │       mac_records = []                                                   │ │
+│ │           mem_map = {                                                    │ │
+│ │                     │   32768: 0,                                        │ │
+│ │                     │   32769: 1,                                        │ │
+│ │                     │   32770: 2,                                        │ │
+│ │                     │   32771: 187,                                      │ │
+│ │                     │   32772: 4,                                        │ │
+│ │                     │   32773: 5,                                        │ │
+│ │                     │   32774: 6,                                        │ │
+│ │                     │   32775: 7,                                        │ │
+│ │                     │   32784: 16,                                       │ │
+│ │                     │   32785: 17,                                       │ │
+│ │                     │   ... +6                                           │ │
+│ │                     }                                                    │ │
+│ │             prior = ChangeSummary(                                       │ │
+│ │                     │                                                    │ │
+│ │                     source_path=PosixPath('/tmp/pytest-of-<USER>/pyte… │ │
+│ │                     │   kind='change',                                   │ │
+│ │                     │   encoding='utf-8',                                │ │
+│ │                     │   value_mode='text',                               │ │
+│ │                     │                                                    │ │
+│ │                     timestamp_utc='2026-11-06T11:07:21.775461+00:00',    │ │
+│ │                     │   variant_id='fixture',                            │ │
+│ │                     │   counts={                                         │ │
+│ │                     │   │   'applied': 1,                                │ │
+│ │                     │   │   'skipped-partial': 0,                        │ │
+│ │                     │   │   'skipped-outside': 0,                        │ │
+│ │                     │   │   'skipped-no-image': 0,                       │ │
+│ │                     │   │   'blocked': 0                                 │ │
+│ │                     │   },                                               │ │
+│ │                     │   entries=[                                        │ │
+│ │                     │   │   ChangeSummaryEntry(                          │ │
+│ │                     │   │   │   entry_type='bytes',                      │ │
+│ │                     │   │   │   address_start=32771,                     │ │
+│ │                     │   │   │   address_end=32772,                       │ │
+│ │                     │   │   │   before_bytes=(3,),                       │ │
+│ │                     │   │   │   after_bytes=(170,),                      │ │
+│ │                     │   │   │   disposition='applied',                   │ │
+│ │                     │   │   │   linkage='standalone',                    │ │
+│ │                     │   │   │   linkage_symbol=None,                     │ │
+│ │                     │   │   │   symbol=None                              │ │
+│ │                     │   │   )                                            │ │
+│ │                     │   ],                                               │ │
+│ │                     │   issues=[],                                       │ │
+│ │                     │   saved_path=None,                                 │ │
+│ │                     │   verify_result=None,                              │ │
+│ │                     │   source_image_path=None                           │ │
+│ │                     )                                                    │ │
+│ │            ranges = [(32768, 32776), (32784, 32792)]                     │ │
+│ │     reuse_summary = False                                                │ │
+│ │         s0_header = b'fixture-raise.s19'                                 │ │
+│ │              self = <s19_app.tui.services.change_service.ChangeService   │ │
+│ │                     object at 0x7f3d8b39ec10>                            │ │
+│ │ source_image_path = PosixPath('/tmp/pytest-of-<USER>/pytest-224/popen… │ │
+│ │       source_kind = 's19'                                                │ │
+│ │           summary = ChangeSummary(                                       │ │
+│ │                     │                                                    │ │
+│ │                     source_path=PosixPath('/tmp/pytest-of-<USER>/pyte… │ │
+│ │                     │   kind='change',                                   │ │
+│ │                     │   encoding='utf-8',                                │ │
+│ │                     │   value_mode='text',                               │ │
+│ │                     │                                                    │ │
+│ │                     timestamp_utc='2026-11-06T11:07:30.816614+00:00',    │ │
+│ │                     │   variant_id='fixture',                            │ │
+│ │                     │   counts={                                         │ │
+│ │                     │   │   'applied': 1,                                │ │
+│ │                     │   │   'skipped-partial': 0,                        │ │
+│ │                     │   │   'skipped-outside': 0,                        │ │
+│ │                     │   │   'skipped-no-image': 0,                       │ │
+│ │                     │   │   'blocked': 0                                 │ │
+│ │                     │   },                                               │ │
+│ │                     │   entries=[                                        │ │
+│ │                     │   │   ChangeSummaryEntry(                          │ │
+│ │                     │   │   │   entry_type='bytes',                      │ │
+│ │                     │   │   │   address_start=32771,                     │ │
+│ │                     │   │   │   address_end=32772,                       │ │
+│ │                     │   │   │   before_bytes=(3,),                       │ │
+│ │                     │   │   │   after_bytes=(187,),                      │ │
+│ │                     │   │   │   disposition='applied',                   │ │
+│ │                     │   │   │   linkage='standalone',                    │ │
+│ │                     │   │   │   linkage_symbol=None,                     │ │
+│ │                     │   │   │   symbol=None                              │ │
+│ │                     │   │   )                                            │ │
+│ │                     │   ],                                               │ │
+│ │                     │   issues=[],                                       │ │
+│ │                     │   saved_path=None,                                 │ │
+│ │                     │   verify_result=None,                              │ │
+│ │                     │   source_image_path=None                           │ │
+│ │                     )                                                    │ │
+│ │     workarea_root = PosixPath('/tmp/pytest-of-<USER>/pytest-224/popen… │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ <HOME>/work/s19_i5c/tests/test_b101_designer_writes.py:937 in        │
+│ raise_after_adopt                                                            │
+│                                                                              │
+│    934 │   _set_quiet(monkeypatch, QUIET_SHORT_S)                            │
+│    935 │                                                                     │
+│    936 │   def raise_after_adopt(self, *args, **kwargs):                     │
+│ ❱  937 │   │   raise RuntimeError("probe after adopt")                       │
+│    938 │                                                                     │
+│    939 │   monkeypatch.setattr(change_service_module.ChangeService, "emit_an │
+│    940 │   seen = {}                                                         │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │   args = (                                                               │ │
+│ │          │   {                                                           │ │
+│ │          │   │   32768: 0,                                               │ │
+│ │          │   │   32769: 1,                                               │ │
+│ │          │   │   32770: 2,                                               │ │
+│ │          │   │   32771: 187,                                             │ │
+│ │          │   │   32772: 4,                                               │ │
+│ │          │   │   32773: 5,                                               │ │
+│ │          │   │   32774: 6,                                               │ │
+│ │          │   │   32775: 7,                                               │ │
+│ │          │   │   32784: 16,                                              │ │
+│ │          │   │   32785: 17,                                              │ │
+│ │          │   │   ... +6                                                  │ │
+│ │          │   },                                                          │ │
+│ │          │   [(32768, 32776), (32784, 32792)],                           │ │
+│ │          │                                                               │ │
+│ │          PosixPath('/tmp/pytest-of-<USER>/pytest-224/popen-gw6/test_r… │ │
+│ │          │   'fixture-raise.s19'                                         │ │
+│ │          )                                                               │ │
+│ │ kwargs = {                                                               │ │
+│ │          │   'source_kind': 's19',                                       │ │
+│ │          │   'bytes_per_line': 32,                                       │ │
+│ │          │   's0_header': b'fixture-raise.s19',                          │ │
+│ │          │   'source_image_path':                                        │ │
+│ │          PosixPath('/tmp/pytest-of-<USER>/pytest-224/popen-gw6/test_r… │ │
+│ │          │   'workarea_root':                                            │ │
+│ │          PosixPath('/tmp/pytest-of-<USER>/pytest-224/popen-gw6/test_r… │ │
+│ │          }                                                               │ │
+│ │   self = <s19_app.tui.services.change_service.ChangeService object at    │ │
+│ │          0x7f3d8b39ec10>                                                 │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+╰──────────────────────────────────────────────────────────────────────────────╯
+RuntimeError: probe after adopt
+=========================== short test summary info ============================
+PASSED tests/test_b101_designer_writes.py::test_oracle_constants_are_the_crc32_of_the_stated_byte_states
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_010_1_plain_return_keeps_picks
+PASSED tests/test_b101_designer_writes.py::test_control_other_patch_actions_do_not_mark_the_coverage_stale
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_010_2_same_a2l_reloaded_keeps_picks
+PASSED tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_3_apply_then_display
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_054_1_write_keeps_the_field_set
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_010_3_image_reloaded_keeps_picks
+PASSED tests/test_b101_designer_writes.py::test_r_crc_preview_002_1_6_save_project_commit_while_displayed_schedules_a_recompute
+PASSED tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_9_save_back_raising_after_the_adopt_ends_the_app
+PASSED tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_5_save_project_then_display
+PASSED tests/test_b101_designer_writes.py::test_r_chked_057_2_save_back_clears_the_validation_results
+PASSED tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_7_blocked_save_back_still_refreshes
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_041_1_pick_replaces_the_field_set
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_055_1_unlisted_parameter_dropped
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_041_3_1_no_a2l_memory_rows
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_041_3_2_unmatched_address_memory_row
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_025_2_exclude_include_rebaselines
+PASSED tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_4_save_back_then_display
+PASSED tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_6_apply_error_still_refreshes
+PASSED tests/test_b101_designer_writes.py::test_r_crc_preview_002_1_6_save_project_commit_while_displayed_recomputes_after_the_quiet_time
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_026_1_write_keeps_spec_bytes
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_025_3_reincluded_after_move_reads_the_image
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_041_2_1_written_spec_names_come_back
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_041_3_5_duplicate_memory_row
+PASSED tests/test_b101_designer_writes.py::test_at_i5_4_save_back_by_keys_then_display
+PASSED tests/test_b101_designer_writes.py::test_r_chked_057_3_save_project_commit_clears_the_validation_results
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_041_3_3_size_mismatch_memory_row
+PASSED tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_8_zero_applied_restore_still_refreshes
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_041_3_6_symbol_range_mismatch_memory_row
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_026_3_memory_row_keeps_spec_bytes
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_026_2_validate_reports_the_drift
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_041_2_3_symbol_disambiguates
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_027_1_session_field_outside_left_out
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_041_3_4_ambiguous_memory_row
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_026_4_spec_bytes_survive_same_range_reload
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_025_1_session_field_reads_the_image
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_027_2_loaded_fields_kept_without_image
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_010_4_session_field_moved_stays_included
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_041_2_4_entry_order_is_kept
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_056_1_moved_parameter_keeps_the_declared_entry
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_056_2_renamed_parameter_keeps_the_declared_entry
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_057_1_apply_clears_the_validation_results
+PASSED tests/test_b101_check_spec_keep.py::test_r_chked_056_3_resized_parameter_keeps_the_declared_entry
+PASSED tests/test_b101_symbol_reads.py::test_r_chg_sym_9_paste_resolves_symbols_through_the_loaded_a2l
+PASSED tests/test_b101_symbol_reads.py::test_r_chg_sym_9_patch_editor_file_load_resolves_symbols_through_the_loaded_a2l
+PASSED tests/test_b101_check_spec_keep.py::test_at_i5_1_picks_survive_write_and_return_by_keys
+PASSED tests/test_b101_check_spec_keep.py::test_at_i5_2_spec_comes_back_and_validate_reports_the_drift
+PASSED tests/test_b101_symbol_reads.py::test_r_chg_sym_10_reads_with_no_a2l_loaded_declare_none[check-editor]
+PASSED tests/test_b101_symbol_reads.py::test_r_chg_sym_9_per_entry_edit_json_confirm_of_a_symbol_entry_succeeds
+PASSED tests/test_b101_symbol_reads.py::test_r_chg_sym_9_whole_document_edit_json_confirm_resolves_symbols
+PASSED tests/test_b101_check_spec_keep.py::test_at_i5_3_moved_parameter_keeps_the_declared_entry_by_keys
+PASSED tests/test_b101_symbol_reads.py::test_r_chg_sym_9_check_editor_spec_pick_resolves_symbols
+PASSED tests/test_b101_symbol_reads.py::test_r_chg_sym_11_variant_run_declares_the_project_a2l_file
+PASSED tests/test_b101_symbol_reads.py::test_r_chg_sym_9_ab_diff_check_spec_pick_resolves_symbols
+PASSED tests/test_b101_symbol_reads.py::test_r_chg_sym_10_reads_with_no_a2l_loaded_declare_none[paste]
+PASSED tests/test_b101_symbol_reads.py::test_r_chg_sym_12_variant_run_without_a_project_a2l_declares_none
+PASSED tests/test_b101_symbol_reads.py::test_r_chg_sym_10_reads_with_no_a2l_loaded_declare_none[file-load]
+PASSED tests/test_b101_symbol_reads.py::test_r_chg_sym_11_execute_scope_applies_symbol_entries_by_keys[session-a2l-loaded]
+PASSED tests/test_b101_symbol_reads.py::test_r_chg_sym_10_reads_with_no_a2l_loaded_declare_none[ab-diff-project-a2l-not-implicit]
+PASSED tests/test_b101_symbol_reads.py::test_r_tui_058_9_entry_edit_with_a_non_string_symbol_paints_no_plain_line
+PASSED tests/test_b101_symbol_reads.py::test_r_chg_sym_10_reads_with_no_a2l_loaded_declare_none[entry-json]
+PASSED tests/test_b101_symbol_reads.py::test_r_chg_sym_11_report_run_declares_the_project_a2l_file
+PASSED tests/test_b101_symbol_reads.py::test_r_chg_sym_10_reads_with_no_a2l_loaded_declare_none[edit-json]
+PASSED tests/test_b101_symbol_reads.py::test_r_chg_sym_13_read_without_symbol_entries_builds_no_index
+PASSED tests/test_b101_symbol_reads.py::test_r_chg_sym_12_session_a2l_does_not_reach_a_project_without_a2l
+PASSED tests/test_b101_symbol_reads.py::test_r_tui_058_9_entry_edit_with_an_unknown_symbol_paints_no_plain_line
+PASSED tests/test_b101_symbol_reads.py::test_r_chg_sym_11_execute_scope_applies_symbol_entries_by_keys[session-a2l-unloaded]
+PASSED tests/test_b101_symbol_reads.py::test_r_tui_058_9_entry_edit_without_a2l_ends_on_the_plain_line
+68 passed in 335.36s (0:05:35)
+exit=0

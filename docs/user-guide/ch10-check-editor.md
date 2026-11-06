@@ -84,8 +84,7 @@ Pick the spec in the *Spec* dropdown: *loaded 'guide_fields.chk.json' (3 fields)
 Each entry whose parameter the loaded A2L lists comes back as a `✓` parameter with
 its name; the memory-row label (`SERIAL`) is not restored. A parameter a newly
 loaded A2L moves, resizes, or no longer lists comes back as an unlabelled `▪`
-memory row at the spec's address. A spec with `symbol` entries
-(`demo_check.chk.json`) is refused the same way as in the Patch Editor (F-01).
+memory row at the spec's address.
 
 ## Features of this window
 

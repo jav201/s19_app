@@ -7230,7 +7230,9 @@ class CheckEditorPanel(ScrollableContainer):
         self._memory_rows: list = []
         #: Spec bytes of a field loaded from a spec, keyed by the included
         #: parameter name: name -> (address, size, bytes) of its spec entry.
-        self._spec_bytes: dict = {}
+        self._spec_bytes: dict[
+            str, tuple[int, int, Optional[tuple[int, ...]]]
+        ] = {}
         #: The last derived widths; ``None`` until the panel is measured.
         self._layout: Optional[CheckLayout] = None
 
@@ -8021,6 +8023,31 @@ class CheckEditorPanel(ScrollableContainer):
         container.remove_children()
         for text, css_class in rows:
             container.mount(Static(text, classes=css_class, markup=False))
+
+    def clear_check_results(self) -> None:
+        """Return the validation results to their mount state (R-CHKED-057).
+
+        Summary:
+            The app calls this after it wrote bytes into the loaded image in
+            place: the painted verdict rows judged the bytes before the
+            write, so they are removed and the status line goes back to the
+            text the card shows when it opens. Unlike
+            :meth:`refresh_check_results` it neither switches the card's tab
+            nor moves the focus.
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``#check_status`` <- ``_STATUS_HINT``; every child of
+              ``#check_results`` removed. Nothing is computed.
+
+        Dependencies:
+            Used by:
+                - ``S19TuiApp._note_image_bytes_written``
+        """
+        self.query_one("#check_status", Label).update(self._STATUS_HINT)
+        self.query_one("#check_results", Container).remove_children()
 
 
 #: HLR-124 / LLR-124.1 — the three width/height regime constants. All three are

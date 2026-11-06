@@ -1032,6 +1032,9 @@ def test_r_chked_025_3_reincluded_after_move_reads_the_image(
 
     async def scenario(app, pilot, log):
         await open_session(pilot, app, facts, specs={PILOT: spec_doc(pilot_entries(facts))})
+        # E5 C-2: the image byte at 0x0 differs from the spec's, so the 0x0
+        # entry below can only be the spec's 6C.
+        await apply_bytes(pilot, app, log, tmp_path, facts.v1.address, bytes([PATCH_BYTE]))
         await pick_spec(pilot, app, log, PILOT)
         await go_workspace(pilot, app)
         await load_a2l_file(pilot, app, moved)
@@ -1194,10 +1197,14 @@ def test_r_chked_027_2_loaded_fields_kept_without_image(tmp_path: Path, facts: F
 
 
 async def relayout_and_write(pilot, app, log, f: Facts, tmp_path: Path, planted: Path):
-    """Case 08 and its A2L loaded, the pilot spec picked; key ``1``; the
-    planted A2L loaded through the Load dialog; key ``=``; Write as
-    ``kept.chk.json``. Returns the state the cases read."""
+    """Case 08 and its A2L loaded; a Patch Editor apply set ``0x0`` to ``93``
+    (E5 C-2: a memory row that read the image would then write ``93``, not
+    the spec's ``6C``); the pilot spec picked; key ``1``; the planted A2L
+    loaded through the Load dialog; key ``=``; Write as ``kept.chk.json``.
+    Returns the state the cases read."""
+    assert f.image[f.v1.address] != PATCH_BYTE
     await open_session(pilot, app, f, specs={PILOT: spec_doc(pilot_entries(f))})
+    await apply_bytes(pilot, app, log, tmp_path, f.v1.address, bytes([PATCH_BYTE]))
     await pick_spec(pilot, app, log, PILOT)
     await go_workspace(pilot, app)
     await load_a2l_file(pilot, app, planted)
@@ -1282,3 +1289,380 @@ def test_r_chked_056_3_resized_parameter_keeps_the_declared_entry(
     assert [e for e in entries if e[0] == facts.v1.address] == [
         (facts.v1.address, facts.image_bytes(facts.v1.address, 1))
     ], entries
+
+
+# ---------------------------------------------------------------------------
+# E5 corrective additions (rulings C-4, C-6, C-10 of inc-5/E5-rulings.md),
+# written by the corrective pass. The triggers below are driven by keys and
+# clicks only: Write, Validate, Add, the Patch Editor's Load and Apply, the
+# Spec dropdown and the ledger toggles. A view scroll (``scroll_visible``) or
+# a focus release before a rail key is setup, not the trigger.
+# ---------------------------------------------------------------------------
+
+HINT = "Validate compares fields to the image"
+
+
+def card(app) -> tuple:
+    """``(status line, verdict row texts)`` of the Check Editor's Fields card."""
+    from textual.widgets import Label
+
+    status = painted(app.query_one("#check_status", Label))
+    return status, [painted(w) for w in app.query("#check_results Static")]
+
+
+async def press_rail(pilot, app, key: str) -> None:
+    """A rail key with no text field focused (as after a click on empty space)."""
+    app.screen.set_focus(None)
+    await pilot.pause()
+    await pilot.press(key)
+
+
+async def click_on(pilot, app, selector: str) -> None:
+    """A mouse click on ``selector``, scrolled into view first."""
+    widget = app.query_one(selector)
+    await wait_until(
+        pilot, lambda: widget.region.width > 0, f"timed out waiting for {selector} to show"
+    )
+    widget.scroll_visible(animate=False)
+    await settle(pilot, 2)
+    assert await pilot.click(selector), f"click missed {selector}"
+
+
+async def type_into(pilot, app, selector: str, text: str) -> None:
+    """Focus the input by a click, empty it with keys, type ``text`` key by key."""
+    from textual.widgets import Input
+
+    field = app.query_one(selector, Input)
+    await click_on(pilot, app, selector)
+    await pilot.press("end", *(["backspace"] * len(field.value)))
+    if text:
+        await pilot.press(*("space" if ch == " " else ch for ch in text))
+    assert field.value == text, (selector, field.value, text)
+
+
+async def include_by_keys(pilot, app, name: str) -> None:
+    """A click on the ledger (focus), the arrow keys to ``name``'s row, space."""
+    from textual.widgets import DataTable
+
+    panel = editor(app)
+    table = panel.query_one("#check_param_table", DataTable)
+    row = panel._visible_params.index(name)
+    was = name in panel._picked_params
+    picks = list(panel._picked_params)
+    seen = len(param_lines(app))
+    offset = (4, 2)  # a data row near the top of the ledger
+    assert await pilot.click(table, offset=offset), "click missed the ledger"
+    await wait_until(pilot, lambda: app.focused is table, "the ledger click did not focus it")
+    assert list(panel._picked_params) == picks, "a click on the ledger toggled a parameter"
+    for _ in range(len(panel._visible_params) + 1):
+        if table.cursor_row == row:
+            break
+        await pilot.press("down" if table.cursor_row < row else "up")
+    assert table.cursor_row == row, (table.cursor_row, row)
+    await pilot.press("space")
+    await wait_until(
+        pilot,
+        lambda: (name in panel._picked_params) != was
+        and len(param_lines(app)) == seen + (-1 if was else 1),
+        f"timed out waiting for the toggle of {name} to be painted",
+    )
+
+
+async def add_row_by_keys(pilot, app, address: int, label: str, size: int) -> None:
+    before = len(mem_rows(app))
+    await type_into(pilot, app, "#check_mem_address_input", f"0x{address:08X}")
+    await type_into(pilot, app, "#check_mem_label_input", label)
+    await type_into(pilot, app, "#check_mem_size_input", str(size))
+    await click_on(pilot, app, "#check_mem_add_button")
+    await wait_until(
+        pilot, lambda: len(mem_rows(app)) == before + 1, f"timed out waiting for the row {label}"
+    )
+
+
+async def write_by_click(pilot, app, log, name: str) -> tuple:
+    """Type ``name``, click Write; return ``(status lines, entries)`` read back."""
+    await type_into(pilot, app, "#check_file_name_input", name)
+    mark = len(log.messages)
+    await click_on(pilot, app, "#check_write_button")
+    await wait_until(
+        pilot,
+        lambda: any(
+            m.startswith("Check Editor: wrote") or m == "Check Editor: spec NOT written."
+            for m in log.since(mark)
+        ),
+        lambda: f"timed out waiting for the write of {name}: {log.since(mark)!r}",
+    )
+    await settle(pilot, 3)
+    document = json.loads((app._patches_dir() / name).read_text(encoding="utf-8"))
+    entries = [
+        (int(e["address"], 16), bytes.fromhex(e["bytes"].replace(" ", "")))
+        for e in document["entries"]
+    ]
+    return log.since(mark), entries
+
+
+async def validate_by_click(pilot, app, log) -> tuple:
+    """Click Validate; return ``(status lines, card)``."""
+    mark = len(log.messages)
+    await click_on(pilot, app, "#check_validate_button")
+    await wait_until(
+        pilot,
+        lambda: any(m.startswith("Checks:") for m in log.since(mark))
+        and len(app.query("#check_results Static")) > 0,
+        lambda: f"timed out waiting for Validate: {log.since(mark)!r}",
+    )
+    await settle(pilot, 2)
+    return log.since(mark), card(app)
+
+
+async def apply_by_keys(pilot, app, log, tmp_path: Path, address: int, data: bytes) -> None:
+    """Key ``6``; the change document's path typed; Load and Apply clicked;
+    the apply status awaited; key ``=`` back to the Check Editor."""
+    doc = tmp_path / "docs" / f"set_{address:X}.changes.json"
+    doc.parent.mkdir(parents=True, exist_ok=True)
+    doc.write_text(change_doc(address, data), encoding="utf-8")
+    await press_rail(pilot, app, "6")
+    await wait_until(
+        pilot,
+        lambda: len(app.query("#patch_doc_path_input")) > 0
+        and app.query_one("#patch_doc_path_input").region.width > 0,
+        "timed out waiting for the Patch Editor after key 6",
+    )
+    await settle(pilot, 3)
+    await type_into(pilot, app, "#patch_doc_path_input", str(doc))
+    mark = len(log.messages)
+    await click_on(pilot, app, "#patch_doc_load_button")
+    await wait_until(
+        pilot,
+        lambda: any(m.startswith("Loaded change:") for m in log.since(mark)),
+        lambda: f"timed out waiting for the change load: {log.since(mark)!r}",
+    )
+    await click_on(pilot, app, "#patch_doc_apply_button")
+    await wait_until(
+        pilot,
+        lambda: "Apply: 1 applied, 0 skipped, 0 blocked" in log.since(mark),
+        lambda: f"timed out waiting for the apply: {log.since(mark)!r}",
+    )
+    mem = app.current_file.mem_map
+    assert bytes(mem[address + i] for i in range(len(data))) == data, "the apply did not write"
+    app.screen.set_focus(None)
+    await enter_check_editor(pilot, app)
+
+
+async def workspace_by_key(pilot, app) -> None:
+    await press_rail(pilot, app, "1")
+    await wait_until(
+        pilot,
+        lambda: any(b.region.width > 0 for b in app.query("Button.loaded-unload")),
+        "timed out waiting for the Workspace after key 1",
+    )
+
+
+# --- C-6: deciding cases for the clauses the coverage audit named ----------
+
+
+def test_r_chked_041_2_4_entry_order_is_kept(tmp_path: Path, facts: Facts) -> None:
+    """Case R-CHKED-041.2/4 (E5 C-6, "in entry order"): case 08 and its A2L
+    loaded; a spec whose entries are ``VALUE_0002`` then ``VALUE_0001`` picked
+    -> included exactly ``[VALUE_0002, VALUE_0001]`` and the Fields lines in
+    that order.
+
+    Why: every other spec lists its parameters in A2L order, so a build that
+    includes them in ledger order would pass there. Base: 0 included -> RED."""
+    entries = [(p.address, facts.image_bytes(p.address, p.size)) for p in (facts.v2, facts.v1)]
+
+    async def scenario(app, pilot, log):
+        await open_session(pilot, app, facts, specs={"order.chk.json": spec_doc(entries)})
+        await pick_spec(pilot, app, log, "order.chk.json")
+        return included(app), param_lines(app)
+
+    picks, lines = run(tmp_path, scenario)
+    assert picks == [facts.v2.name, facts.v1.name], picks
+    assert lines == [
+        f"◆ 0x{facts.v2.address:08X} {facts.v2.name}",
+        f"◆ 0x{facts.v1.address:08X} {facts.v1.name}",
+    ], lines
+
+
+def test_r_chked_010_4_session_field_moved_stays_included(tmp_path: Path, facts: Facts) -> None:
+    """Case R-CHKED-010/4 (E5 C-6, *still lists* for a field included in this
+    session): as /1; key ``1``, the planted moved A2L (``VALUE_0001`` at *A*)
+    loaded through the Load dialog, key ``=`` -> included exactly
+    ``[VALUE_0001, VALUE_0002]``, the Fields line ``◆ <A> VALUE_0001``, head
+    line ``3 fields: 2 params · 1 memory row``; Write writes *A* = the image
+    byte at *A*.
+
+    Why: only the name counts for a field included in this session; the
+    spec-field demotion (R-CHKED-056) must not reach it. Base: the
+    repopulation clears the picks -> ``[]`` -> RED. Negative control: a
+    session field put in a memory row when it moves -> ``[VALUE_0002]`` -> RED."""
+    moved = planted_moved(facts, tmp_path)
+    a = facts.moved
+
+    async def scenario(app, pilot, log):
+        await picked_session(pilot, app, log, facts, tmp_path)
+        await go_workspace(pilot, app)
+        await load_a2l_file(pilot, app, moved)
+        await enter_check_editor(pilot, app)
+        state = (included(app), param_lines(app), head(app), mem_rows(app))
+        _lines, written = await write_spec(pilot, app, log, "moved_session.chk.json")
+        return state, written
+
+    (picks, lines, line, rows), written = run(tmp_path, scenario)
+    assert picks == [facts.v1.name, facts.v2.name], picks
+    assert lines == [
+        f"◆ 0x{a:08X} {facts.v1.name}",
+        f"◆ 0x{facts.v2.address:08X} {facts.v2.name}",
+    ], lines
+    assert line == HEAD_3, line
+    assert rows == [SERIAL_ROW(facts)], rows
+    assert written == [
+        (a, bytes([facts.image[a]])),
+        (facts.v2.address, facts.image_bytes(facts.v2.address, facts.v2.size)),
+        (facts.serial, facts.image_bytes(facts.serial, 4)),
+    ], written
+
+
+# --- C-10: R-CHKED-057/1 - an in-place write clears the validation results --
+
+
+def test_r_chked_057_1_apply_clears_the_validation_results(tmp_path: Path, facts: Facts) -> None:
+    """Case R-CHKED-057/1 (E5 C-10, SEC E5-S1), driven by keys and clicks:
+    case 08 and its A2L loaded, the pilot spec picked, Validate clicked ->
+    ``Checks: 3 passed, 0 failed, 0 uncheckable``, the row ``0x0-0x0 expected
+    [6C] actual [6C] -> pass`` under ``validation complete``; key ``6``, a
+    Patch Editor apply of ``0x0`` = ``93``; key ``=`` -> 0 verdict rows, the
+    status line exactly ``Validate compares fields to the image``, no line
+    ``validation complete`` or ending ``-> pass``; Validate clicked again ->
+    ``Checks: 2 passed, 1 failed, 0 uncheckable`` and ``0x0-0x0 expected [6C]
+    actual [93] -> fail``.
+
+    Why: after the write the old ``pass`` is false, and the operator would
+    trust it. Base: the card keeps ``validation complete`` and the ``-> pass``
+    row -> RED. Negative control: the in-place-write hook not telling the
+    Check Editor -> RED (M29)."""
+    v1 = facts.v1.address
+    original = facts.image[v1]
+    assert original != PATCH_BYTE
+    pass_row = f"0x{v1:X}-0x{v1:X} expected [{original:02X}] actual [{original:02X}] -> pass"
+    fail_row = f"0x{v1:X}-0x{v1:X} expected [{original:02X}] actual [{PATCH_BYTE:02X}] -> fail"
+
+    async def scenario(app, pilot, log):
+        await open_session(pilot, app, facts, specs={PILOT: spec_doc(pilot_entries(facts))})
+        await pick_spec(pilot, app, log, PILOT)
+        first = await validate_by_click(pilot, app, log)
+        await apply_by_keys(pilot, app, log, tmp_path, v1, bytes([PATCH_BYTE]))
+        after = card(app)
+        again = await validate_by_click(pilot, app, log)
+        return first, after, again
+
+    (lines1, (status1, rows1)), (status2, rows2), (lines3, (_s3, rows3)) = run(tmp_path, scenario)
+    assert "Checks: 3 passed, 0 failed, 0 uncheckable" in lines1, lines1
+    assert status1 == "validation complete" and pass_row in rows1, (status1, rows1)
+    assert (status2, rows2) == (HINT, []), (status2, rows2)
+    assert not [r for r in rows2 if r.endswith("-> pass")] and status2 != "validation complete"
+    assert "Checks: 2 passed, 1 failed, 0 uncheckable" in lines3, lines3
+    assert fail_row in rows3, rows3
+
+
+# --- C-4: black-box acceptance tests (keys, clicks and dialogs only) -------
+
+
+def test_at_i5_1_picks_survive_write_and_return_by_keys(tmp_path: Path, facts: Facts) -> None:
+    """AT-I5-1 (US-CHK-KEEP-1; drives R-CHKED-054/1 and R-CHKED-010/2 black
+    box): key ``=``; ``VALUE_0001`` and ``VALUE_0002`` included by a click on
+    the ledger, arrows and ``space``; address, label and size typed and Add
+    clicked; the name typed and Write clicked -> ``Check Editor: wrote
+    pilot_fields.chk.json (3 fields, kind=check).``, head line and both ``✓``
+    unchanged; key ``1``, ``firmware.a2l`` through the Load dialog, key ``=``
+    -> included ``[VALUE_0001, VALUE_0002]``, head line and both ``✓``
+    unchanged."""
+
+    def marks(app) -> tuple:
+        return head(app), mark_of(app, facts.v1.name), mark_of(app, facts.v2.name)
+
+    async def scenario(app, pilot, log):
+        await open_session(pilot, app, facts)
+        await include_by_keys(pilot, app, facts.v1.name)
+        await include_by_keys(pilot, app, facts.v2.name)
+        await add_row_by_keys(pilot, app, facts.serial, "SERIAL", 4)
+        before = marks(app)
+        lines, entries = await write_by_click(pilot, app, log, PILOT)
+        after_write = marks(app)
+        await workspace_by_key(pilot, app)
+        await load_a2l_file(pilot, app, facts.case / "firmware.a2l")
+        app.screen.set_focus(None)
+        await enter_check_editor(pilot, app)
+        return before, lines, entries, after_write, marks(app), included(app), mem_rows(app)
+
+    before, lines, entries, after_write, after_return, picks, rows = run(tmp_path, scenario)
+    assert before == (HEAD_3, "✓", "✓"), before
+    assert f"Check Editor: wrote {PILOT} (3 fields, kind=check)." in lines, lines
+    assert entries == pilot_entries(facts), entries
+    assert after_write == before, after_write
+    assert after_return == before, after_return
+    assert picks == [facts.v1.name, facts.v2.name], picks
+    assert rows == [SERIAL_ROW(facts)], rows
+
+
+def test_at_i5_2_spec_comes_back_and_validate_reports_the_drift(
+    tmp_path: Path, facts: Facts
+) -> None:
+    """AT-I5-2 (US-CHK-SPEC-1, F-27 + D9-11; drives R-CHKED-041.2/1, 026/1,
+    026/2 black box): key ``6``, the change document's path typed, Load and
+    Apply clicked (``0x0`` -> ``93``); key ``=``; the pilot spec picked by keys
+    -> Fields lines with the names; the name typed and Write clicked -> the
+    file holds ``0x0`` ``6C``; Validate clicked -> ``Checks: 2 passed, 1
+    failed, 0 uncheckable`` and the painted drift row."""
+    v1 = facts.v1.address
+    fail_row = (
+        f"0x{v1:X}-0x{v1:X} expected [{facts.image[v1]:02X}] actual [{PATCH_BYTE:02X}] -> fail"
+    )
+
+    async def scenario(app, pilot, log):
+        await open_session(pilot, app, facts, specs={PILOT: spec_doc(pilot_entries(facts))})
+        await apply_by_keys(pilot, app, log, tmp_path, v1, bytes([PATCH_BYTE]))
+        await pick_spec(pilot, app, log, PILOT)
+        flines = fields_lines(app)
+        _wl, entries = await write_by_click(pilot, app, log, "rewritten.chk.json")
+        vlines, (_status, rows) = await validate_by_click(pilot, app, log)
+        return flines, entries, vlines, rows
+
+    flines, entries, vlines, rows = run(tmp_path, scenario)
+    assert flines == [
+        HEAD_3,
+        f"◆ 0x{facts.v1.address:08X} {facts.v1.name}",
+        f"◆ 0x{facts.v2.address:08X} {facts.v2.name}",
+        f"▪ 0x{facts.serial:08X} u32 memory row",
+    ], flines
+    assert entries == pilot_entries(facts), entries
+    assert "Checks: 2 passed, 1 failed, 0 uncheckable" in vlines, vlines
+    assert fail_row in rows, rows
+
+
+def test_at_i5_3_moved_parameter_keeps_the_declared_entry_by_keys(
+    tmp_path: Path, facts: Facts
+) -> None:
+    """AT-I5-3 (SEC5-1; drives R-CHKED-056/1 black box): as AT-I5-2 to the
+    pick; key ``1``; the planted moved A2L through the Load dialog; key ``=``
+    -> painted memory table and head line; the name typed and Write clicked ->
+    ``0x14`` ``A0 BE``, ``0xC00FFC`` ``FF FF FF FF``, ``0x0`` ``6C`` with the
+    image at ``0x0`` = ``93``, none at *A*."""
+    planted = planted_moved(facts, tmp_path)
+
+    async def scenario(app, pilot, log):
+        await open_session(pilot, app, facts, specs={PILOT: spec_doc(pilot_entries(facts))})
+        await apply_by_keys(pilot, app, log, tmp_path, facts.v1.address, bytes([PATCH_BYTE]))
+        await pick_spec(pilot, app, log, PILOT)
+        await workspace_by_key(pilot, app)
+        await load_a2l_file(pilot, app, planted)
+        app.screen.set_focus(None)
+        await enter_check_editor(pilot, app)
+        state = (included(app), mem_rows(app), head(app))
+        lines, entries = await write_by_click(pilot, app, log, "kept.chk.json")
+        return state, lines, entries, app.current_file.mem_map[facts.v1.address]
+
+    state, lines, entries, image_byte = run(tmp_path, scenario)
+    assert image_byte == PATCH_BYTE, image_byte
+    assert_declared_entry_kept(facts, state, lines, entries)
+    assert facts.moved not in [a for a, _ in entries], entries
