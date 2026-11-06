@@ -63,3 +63,7 @@ trace_check: 6 US, 36 active requirements (0 withdrawn), 2 gap(s)
 ```
 
 The 2 EVID gaps are the mutant transcripts (`.dev-flow/2026-11-01-batch-101/evidence/inc-14/mut-*.txt`, 45 files), which are uncommitted — expected: this record and the mutant battery are written at E5 close and are committed by the orchestrator with the other E5 records. No US, CASE, TEST, SLICE, EVID-record or CANON gap.
+
+## Addendum (orchestrator, 2026-11-06)
+
+The operator asked to enable GitHub private vulnerability reporting; it was enabled with `gh api -X PUT` and now reads `{"enabled":true}` (`evidence/inc-14/gh-pvr-2.txt`). E5-1 is closed, R-DOC-SECURITY.1/2 is verified, and the hold-out no longer applies: SECURITY.md, its three tests and README row 468 merge with Inc 14.
