@@ -15,6 +15,7 @@ RED on base: any of these was true of the pre-batch-91 docs.
 from __future__ import annotations
 
 import re
+import subprocess
 from pathlib import Path
 
 
@@ -93,20 +94,79 @@ def test_at285_every_readme_named_key_exists_in_the_seat(monkeypatch):
     assert _unbound(keys) == {"Ctrl+P"}
 
 
-_HISTORIC = re.compile(r"removed|deleted|historic|superseded|legacy|no longer|moot", re.I)
+# Removal marks: the words of AT-285 plus "retired" and "moved" (CTX-DOCHYG).
+_HISTORIC = re.compile(
+    r"removed|deleted|historic|superseded|legacy|no longer|moot|retired|moved", re.I
+)
+# The shapes in which the distribution name stays legitimate (CTX-DOCHYG
+# "s19tool shape"): the work-area folder, a path, the egg-info folder,
+# `pip <verb> <name>`, and the honest module-only negations.
 _S19TOOL_OK = re.compile(
-    r"\.s19tool/|s19tool/|Distribution name|module-only|runs only as a module|"
+    r"\.s19tool[/\\]|s19tool/|s19tool\.egg-info|pip\s+\w[\w-]*\s+s19tool|"
+    r"Distribution name|module-only|runs only as a module|"
     r"No `s19tool` console script|what remains", re.I)
+
+_DOC_PREFIXES_OUT = (".dev-flow/", "docs/requirements/", "tests/goldens/", "tests/__snapshots__/")
+
+
+def _repository_documents() -> list[str]:
+    """Tracked .md/.txt/.rst files (CTX-DOCHYG "repository document"), by git."""
+    out = subprocess.run(
+        ["git", "ls-files", "-z"], cwd=ROOT, capture_output=True, check=True
+    ).stdout.decode("utf-8")
+    return [
+        p
+        for p in out.split("\0")
+        if p.endswith((".md", ".txt", ".rst"))
+        and not p.startswith(_DOC_PREFIXES_OUT)
+        and p != "REQUIREMENTS.md"
+    ]
+
+
+def _live_token_findings(line: str) -> list[str]:
+    """Findings for one line: an unmarked CDFX / CDF 2.0 token, or `s19tool`
+    outside an allowed shape (matched case-sensitively, as AT-285 does)."""
+    if _HISTORIC.search(line):
+        return []
+    if re.search(r"\bCDFX\b|CDF 2\.0", line, re.I):
+        # only a removal mark excuses CDFX (R-DOC-REF.6); the s19tool shapes do not
+        return ["unmarked CDFX"]
+    if re.search(r"\bs19tool\b", line) and not _S19TOOL_OK.search(line):
+        return ["s19tool as a live command"]
+    return []
 
 
 def test_at285_no_live_cdfx_or_s19tool_console_script_token():
+    """AT-285 arm 2, widened to every repository document (R-DOC-REF.5,
+    R-DOC-REF.6): no unmarked CDFX / CDF 2.0 token and no `s19tool` outside an
+    allowed shape in any tracked .md/.txt/.rst document.
+
+    Instrument check first: the allowed shapes pass and a command is caught.
+    """
+    tool = "s19" + "tool"
+    controls = [
+        (f"pip show {tool}", 0),
+        (f"the common `.{tool}\\templates\\` library", 0),
+        (f"`.{tool}/workarea/temp/`", 0),
+        (f"Distribution name `{tool}`", 0),
+        (f"{tool} firmware.s19 info", 1),
+        ("the " + "CD" + "FX exporter", 1),
+        ("the " + "CD" + "FX exporter was removed", 0),
+        ("ASAM " + "CDF 2" + ".0 for vCDM", 1),
+        ("Distribution name " + f"`{tool}`; ASAM " + "CD" + "FX exchange", 1),
+    ]
+    wrong = [(l, n, len(_live_token_findings(l))) for l, n in controls if len(_live_token_findings(l)) != n]
+    assert not wrong, f"negative-control lines misjudged (line, expected, got): {wrong}"
+
+    documents = _repository_documents()
+    assert documents, "git ls-files returned no repository document"
     bad: list[str] = []
-    for rel in ("README.md", "docs/overview.md", "docs/architecture.md"):
-        for i, line in enumerate((ROOT / rel).read_text(encoding="utf-8").splitlines(), 1):
-            if _HISTORIC.search(line) or _S19TOOL_OK.search(line):
-                continue
-            if re.search(r"\bCDFX\b", line):
-                bad.append(f"{rel}:{i}: unmarked CDFX: {line.strip()[:90]}")
-            elif re.search(r"\bs19tool\b", line):
-                bad.append(f"{rel}:{i}: s19tool as a live command: {line.strip()[:90]}")
+    for rel in documents:
+        try:
+            text = (ROOT / rel).read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            continue
+        for i, line in enumerate(text.splitlines(), 1):
+            for finding in _live_token_findings(line):
+                bad.append(f"{rel}:{i}: {finding}: {line.strip()[:90]}")
     assert not bad, "live CDFX / s19tool-console-script tokens:\n" + "\n".join(bad)
