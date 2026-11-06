@@ -1,0 +1,8 @@
+E1 start 2026-11-06T06:41Z diagnosis model=opus base=c2cba35
+E1 end 2026-11-06T07:07Z model=opus rows=9 cases=13 cause=test (one-pause reads); tc331 reproduced Windows 5/16 at c2cba35; tc_b94_27 not reproduced natively (0/16), symptom reproduced by held-handler probe (Linux 2/2); 0 files under s19_app/; decisions D-1..D-6 open
+E1 rulings 2026-11-06T07:07Z orchestrator D-1..D-6
+E3 round1 2026-11-06T07:17Z architect=opus FAIL (1 HIGH, 2 MAJOR); rulings written
+E3 correction 2026-11-06T07:34Z model=opus F1..F10 folded (targeted edits); rows=14 (R-TST-159..163 new) cases=26; E2 n/a recorded (codewire/graph-inc15.md); LAN hold runs 10 (evidence-e3, base RED 2/2 per new hold), LAN worktree removed; trace_check 5 gaps (TEST 154,155,158,163 owed by E4; EVID owed by E5)
+E3 round2 2026-11-06T07:42Z architect=opus PASS-WITH-NOTES (F1-F3 closed; N1-N3 to E4)
+E4 start 2026-11-06T07:42Z implementer model=deepseek-v4-pro (1 unit, tests-only)
+E4 implementer end 2026-11-06T07:59Z model=deepseek-v4-pro (1 unit, exit 0, py_compile OK, no deviations declared)
