@@ -1,0 +1,158 @@
+# mutant M36  (CHK-PE-011, CHKS-009 (E1: aggregates not gated))
+base_commit=98d94d724a72c56468292be123ff15f664acb4fa
+s19_app.__file__=<HOME>/work/s19_i6m_copy/s19_app/__init__.py
+mutation=s19_app/tui/services/change_service.py:2875
+--- pytest (mutant copy) ---
+bringing up nodes...
+bringing up nodes...
+
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+__________________________ test_r_chks_009_zero_line ___________________________
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-320/popen-gw1/test_r_chks_009_zero_line0')
+
+    def test_r_chks_009_zero_line(tmp_path: Path) -> None:
+        """R-CHKS-009/1: after a run and another document's load, the Checks
+        screen's aggregate line reads ``Pass 0 / Fail 0 / Uncheck 0 ░░░░░░░░``."""
+    
+        async def scenario(app, pilot, log):
+            await checks_ready(app, pilot, log, tmp_path)
+            await load_doc(pilot, app, write_doc(tmp_path / "c.json", CHG))
+            await open_checks_screen(pilot, app)
+            await settled(pilot, lambda: checks_strip_text(app) == ZERO_LINE, f"the zero line (now {checks_strip_text(app)!r})", timeout=GONE)
+    
+>       projects.run_app(tmp_path, scenario, size=SIZE)
+
+../s19_i6m/tests/test_b101_patch_lifecycle.py:772: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i6m/tests/test_b101_patch_lifecycle.py:770: in scenario
+    await settled(pilot, lambda: checks_strip_text(app) == ZERO_LINE, f"the zero line (now {checks_strip_text(app)!r})", timeout=GONE)
+tests/b97_probes.py:326: in settled
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_r_chks_009_zero_line.<locals>.scenario.<locals>.<lambda> at 0x7f4a9b087a60>
+failure = "did not settle: the zero line (now 'Pass 1 / Fail 1 / Uncheck 0 ████░░░░')"
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: did not settle: the zero line (now 'Pass 1 / Fail 1 / Uncheck 0 ████░░░░')
+
+tests/support/timing.py:66: AssertionError
+________________________ test_r_chk_pe_011_strip[load] _________________________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-320/popen-gw0/test_r_chk_pe_011_strip_load_0')
+how = 'load'
+
+    @pytest.mark.parametrize("how", ["load", "project"])
+    def test_r_chk_pe_011_strip(tmp_path: Path, how: str) -> None:
+        """R-CHK-PE-011/1, /2: after another document load / a project load the
+        patch strip reads ``✓0 ✗0 ◐0`` over an empty bar ``░░░░░░░░``."""
+    
+        async def scenario(app, pilot, log):
+            if how == "project":
+                make_project(app)
+            await checks_ready(app, pilot, log, tmp_path)
+            await _end_run(pilot, app, log, tmp_path, how)
+            await settled(
+                pilot, lambda: strip_lines(app) == ["✓0 ✗0 ◐0", "░░░░░░░░"], f"the zero strip (now {strip_lines(app)!r})", timeout=GONE
+            )
+    
+>       projects.run_app(tmp_path, scenario, size=SIZE)
+
+../s19_i6m/tests/test_b101_patch_lifecycle.py:653: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i6m/tests/test_b101_patch_lifecycle.py:649: in scenario
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_r_chk_pe_011_strip.<locals>.scenario.<locals>.<lambda> at 0x7f2a4d0d3880>
+failure = "did not settle: the zero strip (now ['✓1 ✗1 ◐0', '████░░░░'])"
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: did not settle: the zero strip (now ['✓1 ✗1 ◐0', '████░░░░'])
+
+tests/support/timing.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chks_009_zero_line - Assert...
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_011_strip[load] - As...
+2 failed in 13.18s
+

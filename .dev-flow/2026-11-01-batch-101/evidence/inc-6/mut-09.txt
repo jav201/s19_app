@@ -1,0 +1,87 @@
+# mutant M9  (TUI-049.3.2/7 negative arm (E3A-08b))
+base_commit=98d94d724a72c56468292be123ff15f664acb4fa
+s19_app.__file__=<HOME>/work/s19_i6m_copy/s19_app/__init__.py
+mutation=s19_app/tui/app.py:5428
+--- pytest (mutant copy) ---
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________ test_r_tui_049_3_2_prompt_redo_with_no_step_keeps_it _____________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-267/popen-gw0/test_r_tui_049_3_2_prompt_redo0')
+
+    def test_r_tui_049_3_2_prompt_redo_with_no_step_keeps_it(tmp_path: Path) -> None:
+        """R-TUI-049.3.2/7 (negative arm of the redo case): a redo that finds no
+        step leaves the prompt of a fresh Apply painted. The sign that both presses
+        were handled is the later Refresh's status line."""
+    
+        async def scenario(app, pilot, log):
+            await _replace_scenario(app, pilot, log, tmp_path, "redo", "prompt")
+            await await_gone(pilot, app, PROMPT, "after the redo")
+            await apply_to_prompt(pilot, app, log)  # the redo stack is empty now
+            app.set_focus(None)
+            await pilot.press("ctrl+y")
+            mark = len(log.messages)
+            panel(app).query_one("#patch_doc_refresh_button", Button).press()
+            await settled(
+                pilot,
+                lambda: any("Patch Editor: file list refreshed." in m for m in log.since(mark)),
+                "the Refresh status line",
+            )
+            for _ in range(4):
+                await pilot.pause()
+            assert PROMPT in pe_text(app), "a redo with no step hid the save-back prompt"
+    
+>       projects.run_app(tmp_path, scenario, size=SIZE)
+
+../s19_i6m/tests/test_b101_patch_lifecycle.py:522: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f2710bc9250>
+
+    async def scenario(app, pilot, log):
+        await _replace_scenario(app, pilot, log, tmp_path, "redo", "prompt")
+        await await_gone(pilot, app, PROMPT, "after the redo")
+        await apply_to_prompt(pilot, app, log)  # the redo stack is empty now
+        app.set_focus(None)
+        await pilot.press("ctrl+y")
+        mark = len(log.messages)
+        panel(app).query_one("#patch_doc_refresh_button", Button).press()
+        await settled(
+            pilot,
+            lambda: any("Patch Editor: file list refreshed." in m for m in log.since(mark)),
+            "the Refresh status line",
+        )
+        for _ in range(4):
+            await pilot.pause()
+>       assert PROMPT in pe_text(app), "a redo with no step hid the save-back prompt"
+E       AssertionError: a redo with no step hid the save-back prompt
+E       assert 'Save patched image as:' in ' draft · change                                                                                                 \n╭─ ...    \n ✓ check passed   ✗ check failed   ◐ uncheckable   · not checked   -- byte not in the image                     '
+E        +  where ' draft · change                                                                                                 \n╭─ ...    \n ✓ check passed   ✗ check failed   ◐ uncheckable   · not checked   -- byte not in the image                     ' = pe_text(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}))
+
+../s19_i6m/tests/test_b101_patch_lifecycle.py:520: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_patch_lifecycle.py::test_r_tui_049_3_2_prompt_redo_with_no_step_keeps_it
+1 failed in 9.51s
+

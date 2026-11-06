@@ -1,0 +1,11 @@
+# mutant M10  (TUI-049.3.1/.3.2 project (D-5))
+base_commit=98d94d724a72c56468292be123ff15f664acb4fa
+s19_app.__file__=<HOME>/work/s19_i6m_copy/s19_app/__init__.py
+mutation=s19_app/tui/app.py:13991
+--- pytest (mutant copy) ---
+bringing up nodes...
+bringing up nodes...
+
+..                                                                       [100%]
+2 passed in 8.78s
+

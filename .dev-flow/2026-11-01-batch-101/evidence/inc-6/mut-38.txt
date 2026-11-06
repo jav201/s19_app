@@ -1,0 +1,272 @@
+# mutant M38  (I-1)
+base_commit=98d94d724a72c56468292be123ff15f664acb4fa
+s19_app.__file__=<HOME>/work/s19_i6m_copy/s19_app/__init__.py
+mutation=s19_app/tui/services/change_service.py:2766
+--- pytest (mutant copy) ---
+bringing up nodes...
+bringing up nodes...
+
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+________________________ test_r_chk_pe_009_no_run[mac] _________________________
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-324/popen-gw1/test_r_chk_pe_009_no_run_mac_0')
+how = 'mac'
+
+    @pytest.mark.parametrize("how", ["load", "image", "project", "add", "apply", "mac"])
+    def test_r_chk_pe_009_no_run(tmp_path: Path, how: str) -> None:
+        """R-CHK-PE-009/1 .. /6: the subtitle reads ``no run yet`` after another
+        document load, an image load, a project load, an Add, an apply of a check
+        document that writes the image in place (/5, E3A-03), and a MAC load (/6).
+        Base: ``2 checked`` (``1 checked`` for /5) stays."""
+    
+        async def scenario(app, pilot, log):
+            if how == "apply":
+                await start(app, pilot, tmp_path)
+                await load_doc(pilot, app, write_doc(tmp_path / "c.json", CHG))
+                await apply_to_prompt(pilot, app, log)
+                await load_doc(pilot, app, write_doc(tmp_path / "k1.chk.json", CHK1, kind="check"))
+                await show_tab(pilot, app, "checks")
+                await run_checks(pilot, app, "Checks: 1 passed, 0 failed, 0 uncheckable")
+                await settled(pilot, lambda: checks_subtitle(app) == "1 checked", "1 checked")
+                await apply_doc(pilot, app, log, expect=r"Apply: 0 applied, 0 skipped, 1 blocked")
+            else:
+                if how == "project":
+                    make_project(app)
+                await checks_ready(app, pilot, log, tmp_path)
+                await _end_run(pilot, app, log, tmp_path, how)
+            await settled(pilot, lambda: _no_run_shown(app), f"no run yet after {how} (painted: {checks_subtitle(app)!r})", timeout=GONE)
+            if how == "mac":
+                await settled(
+                    pilot,
+                    lambda: len(panel(app).query_one("#patch_checks_results").children) == 0,
+                    "no result row after the MAC load",
+                    timeout=GONE,
+                )
+            if how == "apply":
+                assert plain(panel(app).query_one("#patch_checks_status")) == NO_RUN_STATUS
+    
+>       projects.run_app(tmp_path, scenario, size=SIZE)
+
+../s19_i6m/tests/test_b101_patch_lifecycle.py:616: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i6m/tests/test_b101_patch_lifecycle.py:605: in scenario
+    await settled(pilot, lambda: _no_run_shown(app), f"no run yet after {how} (painted: {checks_subtitle(app)!r})", timeout=GONE)
+tests/b97_probes.py:326: in settled
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_r_chk_pe_009_no_run.<locals>.scenario.<locals>.<lambda> at 0x7f8cfb93b2e0>
+failure = "did not settle: no run yet after mac (painted: '2 checked')"
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: did not settle: no run yet after mac (painted: '2 checked')
+
+tests/support/timing.py:66: AssertionError
+_______________________ test_r_chk_pe_009_no_run[image] ________________________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-324/popen-gw0/test_r_chk_pe_009_no_run_image0')
+how = 'image'
+
+    @pytest.mark.parametrize("how", ["load", "image", "project", "add", "apply", "mac"])
+    def test_r_chk_pe_009_no_run(tmp_path: Path, how: str) -> None:
+        """R-CHK-PE-009/1 .. /6: the subtitle reads ``no run yet`` after another
+        document load, an image load, a project load, an Add, an apply of a check
+        document that writes the image in place (/5, E3A-03), and a MAC load (/6).
+        Base: ``2 checked`` (``1 checked`` for /5) stays."""
+    
+        async def scenario(app, pilot, log):
+            if how == "apply":
+                await start(app, pilot, tmp_path)
+                await load_doc(pilot, app, write_doc(tmp_path / "c.json", CHG))
+                await apply_to_prompt(pilot, app, log)
+                await load_doc(pilot, app, write_doc(tmp_path / "k1.chk.json", CHK1, kind="check"))
+                await show_tab(pilot, app, "checks")
+                await run_checks(pilot, app, "Checks: 1 passed, 0 failed, 0 uncheckable")
+                await settled(pilot, lambda: checks_subtitle(app) == "1 checked", "1 checked")
+                await apply_doc(pilot, app, log, expect=r"Apply: 0 applied, 0 skipped, 1 blocked")
+            else:
+                if how == "project":
+                    make_project(app)
+                await checks_ready(app, pilot, log, tmp_path)
+                await _end_run(pilot, app, log, tmp_path, how)
+            await settled(pilot, lambda: _no_run_shown(app), f"no run yet after {how} (painted: {checks_subtitle(app)!r})", timeout=GONE)
+            if how == "mac":
+                await settled(
+                    pilot,
+                    lambda: len(panel(app).query_one("#patch_checks_results").children) == 0,
+                    "no result row after the MAC load",
+                    timeout=GONE,
+                )
+            if how == "apply":
+                assert plain(panel(app).query_one("#patch_checks_status")) == NO_RUN_STATUS
+    
+>       projects.run_app(tmp_path, scenario, size=SIZE)
+
+../s19_i6m/tests/test_b101_patch_lifecycle.py:616: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i6m/tests/test_b101_patch_lifecycle.py:605: in scenario
+    await settled(pilot, lambda: _no_run_shown(app), f"no run yet after {how} (painted: {checks_subtitle(app)!r})", timeout=GONE)
+tests/b97_probes.py:326: in settled
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_r_chk_pe_009_no_run.<locals>.scenario.<locals>.<lambda> at 0x7fc2669d0fe0>
+failure = "did not settle: no run yet after image (painted: '2 checked')"
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: did not settle: no run yet after image (painted: '2 checked')
+
+tests/support/timing.py:66: AssertionError
+____________________ test_r_chks_004_note_after_image_load _____________________
+[gw2] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-324/popen-gw2/test_r_chks_004_note_after_ima0')
+
+    def test_r_chks_004_note_after_image_load(tmp_path: Path) -> None:
+        """R-CHKS-004/1: after a run and another image's load, opening the Checks
+        screen shows ``No check run yet — run checks from the Patch Editor.``."""
+    
+        async def scenario(app, pilot, log):
+            await checks_ready(app, pilot, log, tmp_path)
+            await load_image_through_dialog(pilot, app, write_image(tmp_path / "img2.s19", fill=0x40))
+            await open_checks_screen(pilot, app)
+            await settled(pilot, lambda: NO_RUN_NOTE in checks_screen_text(app), "the no-run note", timeout=GONE)
+            assert "FAILED" not in checks_screen_text(app)
+    
+>       projects.run_app(tmp_path, scenario, size=SIZE)
+
+../s19_i6m/tests/test_b101_patch_lifecycle.py:741: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i6m/tests/test_b101_patch_lifecycle.py:738: in scenario
+    await settled(pilot, lambda: NO_RUN_NOTE in checks_screen_text(app), "the no-run note", timeout=GONE)
+tests/b97_probes.py:326: in settled
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_r_chks_004_note_after_image_load.<locals>.scenario.<locals>.<lambda> at 0x7ff1a8ae4d60>
+failure = 'did not settle: the no-run note'
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: did not settle: the no-run note
+
+tests/support/timing.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[mac] - As...
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chk_pe_009_no_run[image] - ...
+FAILED tests/test_b101_patch_lifecycle.py::test_r_chks_004_note_after_image_load
+3 failed in 19.79s
+
