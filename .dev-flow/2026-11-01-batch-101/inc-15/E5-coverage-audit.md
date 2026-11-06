@@ -114,3 +114,90 @@ Record marks on every row: Tests `full`, Coverage `gap`, Result `not_run`. Evide
 | No unfilled placeholders | ✓ | — |
 | No real PII or secrets | ✓ | repository-relative paths only |
 | Layer B | n/a | tests-only increment, 0 files under `s19_app/` changed (`git diff --name-only c2cba35 77f4553`) |
+
+## Re-audit
+
+**Mode: validation.** This is a re-audit of the changed items only, after rulings `E5-rulings.md` C-1 … C-10 and the corrective pass (`E5-corrective-notes.md`). The auditor is the qa-reviewer agent. The E5 corrective agent (Opus) executed every cited `e5c-NN` run: LAN Linux e5c-01 … 27 and Windows e5c-31 … 50. **This re-audit ran no test and imported nothing from `s19_app`.** It used only `git diff`, `sha256sum`, `grep` and reads of the transcripts, the tests and the installed Textual source.
+
+**Verdict: 6 of the 7 re-checked cases hold as marked: 153/1, 153/3, 154/1, 155/1, 157/1 and 163/1. One case is over-marked. R-TST-157/2's Coverage should read `partial`, because its run is the lane's flags over 3 test files, not the release gate's lane. One trace is wrong. D9 is not covered by R-TST-153's text, so 153/3 needs its own requirement row. C-1 is correct: the other 21 rows carry the audited marks.**
+
+### Commit identity
+
+- Head `2af73ef` differs from `5edcb3f` only under `.dev-flow/` (`git diff --name-only 5edcb3f 2af73ef`).
+- On LAN Linux, `git diff --binary c2cba35 5edcb3f -- tests docs | sha256sum` gives `15df472e7925f3a2…`. That matches the header of every `e5c-01 … 27` transcript.
+- Windows e5c-31 … 50: all 20 headers read `git HEAD here = 5edcb3f92e17…` and place `s19_app.__file__` in the worktree. Each run has its own scratch `LOCALAPPDATA`, `APPDATA`, `TEMP` and `TMP`, and each shows `NO_COLOR set = False`. All 20 report `1 passed` with `rc=0`.
+- Since `77f4553`, only `tests/test_suite_hygiene.py` and `tests/test_tui_flow_execution_b94.py` changed (`git diff --name-only 77f4553 5edcb3f -- tests s19_app docs`). So the `int-NN` results for the patch-editor arms still hold.
+
+### Re-checked cases
+
+| Case | Marks in the record | Re-audit | Basis |
+|---|---|---|---|
+| 153/1 | full / covered / verified | **holds** | The paint read now comes off the compositor through `painted_rows` (`b94.py:548-552`), so C-6 is met. GREEN in e5c-03 … 05 (3/3) and W e5c-31 … 50 (20/20). See note R1. |
+| 153/3 | full / covered / verified | **marks hold; trace does not** | The hold is installed: e5c-07 … 09 end with `hold installed = fx_import[*] 1.5s` and are GREEN 3/3. The form at `5054743` fails at the "before" read, `KeyError: 'base_2'` (`e5c-10:110-121`, e5c-11). D9's sign is not vacuous: Textual 8.2.8 `Region.__bool__` returns `width * height > 0` (`textual/geometry.py:467-470`). For the trace, see below. |
+| 154/1 | full / covered / verified | **holds** | "and in order" is gone. Static check: e5c-06 GREEN; e5c-24 (D9 removed) RED. The f-string and changed-text controls int-60 and int-61 ran on the `77f4553` guard. They still apply by inspection, not by a re-run: `_settled_description` (`hygiene.py:2244`) is unchanged, and it runs before the new predicate assert. |
+| 155/1 | full / covered / verified | **holds** | The ban loops over `_settled` and `_wait_for` (`hygiene.py:2384`). e5c-22 is RED, naming `_wait_for`, and e5c-26 shows the pre-fix guard GREEN on the same edit. The predicate pins come from C-2: e5c-20 and e5c-21 are RED, and e5c-25 is the pre-fix guard GREEN. Expected now matches what the guard checks. See note R2. |
+| 157/1 | full / covered / verified | **holds** | Serial runs: e5c-03 … 05 give 12/12 at `5edcb3f`, and int-03 … 05 give 12/12 at `77f4553`. |
+| 157/2 | full / **covered** / verified | **Coverage → `partial`** | e5c-01 ran `-n 8 -m "not serial_timing"` over the 3 changed files: 129 passed. e5c-02 deselects 129 and keeps 1, the hygiene arm, which places the four nodes among the 129. The case's Objective and R-TST-157 both name the release gate's parallel lane, which is the whole suite. The case itself says that lane is still owed by the merge verification. So the result is `verified` for what ran and `partial` for the lane. The alternative is to reword the Objective to "the lane's flags over the three changed files" and record R-TST-157's lane clause as owed. |
+| 163/1 | full / covered / verified | **holds** | e5c-23 (`_confirm_with` renamed) gives `nested _confirm_with missing`, 1 failed, 0 skipped under `-rs`. The missing-function half is covered by inspection only: `_arm_function` raises AssertionError (`hygiene.py:2207-2220`). The last-occurrence key (`max`, `:2359`) is safe because D1 … D8 have unique triggers. |
+
+### Is D9 traced correctly to R-TST-153?
+
+**No.** R-TST-153's requirement sentence did not change at E5. Its trigger is still "presses Bind with `variant_b.hex` on lane A", and its response is "read … only after the panel has handled that press".
+
+D9 has a different trigger, the second `await _import_stem(…)`. It guards reads that happen before any Bind, so that sentence cannot cover them.
+
+The E5 edit added D9 only to R-TST-153's Threshold and Negative-control cells. A threshold measures the shall-sentence; it cannot add a trigger the sentence does not name, and strict EARS allows one trigger per row. The gap was already latent at E1, when the "before" read sat in this threshold, but D9 now makes it a named wait.
+
+R-TST-155 and R-TST-163 reach D9 only through "each wait of R-TST-150 … R-TST-153". **Fix:**
+
+1. Add a new row, R-TST-164 (E): "When the TC-B94-27 arm imports `base` a second time, the test suite shall read lane B's bindings and box only after the panel shows lanes `base` and `base_2`."
+   - Threshold: D9, plus the `fx_import` hold 3/3.
+   - Negative control: (c), moved from R-TST-153.
+   - User story: US-TST-15.
+2. Move 153/3 to R-TST-164/2.
+3. Split the "before" read out of 153/1 into a new case, 164/1, which cites e5c-03 … 05 and W e5c-31 … 50.
+4. Extend the ranges in R-TST-155 and R-TST-163 to include R-TST-164.
+
+That gives 15 requirements and 29 cases.
+
+### C-1 (the other marks)
+
+The other 21 rows carry `full / covered / verified`, the values this audit set:
+
+- 150/1, 150/2, 151/1, 151/2, 152/1, 152/2, 153/2, 154/2, 156/1, 158/1, 159/1, 159/2
+- 160/1, 160/2, 161/1, 161/2, 161/3, 162/1, 162/2, 162/3, 163/2
+
+The rows for the changed TC-B94-27 arm now cite runs at `5edcb3f`:
+
+- 152/1: e5c-03 … 05 and W e5c-31 … 50
+- 152/2: e5c-16
+- 153/2: e5c-12 … 14 and e5c-15
+- 154/2: e5c-17 … 19
+- 156/1: W e5c-31 … 50
+
+I checked every cited `e5c` transcript against `e5c-index-linux.txt` and `e5c-index-windows.txt`.
+
+### Notes (no mark change)
+
+- **R1. The negative paint assertion has no failing control of its own.**
+  - The check is `"variant_b.hex" not in paint_b` (`b94.py:578`). Mutant m153b (e5c-15) fails earlier, at the record assert on `:573`, and it never repaints lane B: `_rebind` repaints only `lane_index` (`flow_screens.py:4421`). So this assertion has only ever passed.
+  - The painted `base.s19` is lane B's input box `#fx_in_1_0`, the SOURCE card's box (`flow_screens.py:3533-3538`). The paint read and the box read therefore observe the same widget.
+  - A cheap control would close this: in a copy, add a mutant that also repaints lane B, and drop the record and box asserts.
+- **R2. D9's trigger calls `_wait_for` internally.** `_import_stem` calls `_wait_for` at `b94.py:153-154`, a pause loop counted with `range`. The ban sees only direct calls in the arm, so it does not see these. The helper predates Inc 15 and is not "added to the four arms", so R-TST-155 holds. A late picker fails loudly (`… did not mount`), and Windows passed 20/20. This belongs in the D-6 backlog row.
+
+### Totals after the re-audit
+
+- 28 cases. Tests `full`: 28.
+- Coverage `covered`: 27, plus 1 `partial` (157/2).
+- Result `verified`: 28.
+- One trace defect: D9 and case 153/3 → R-TST-164.
+
+### Evidence checklist
+
+| Item | Status | Evidence |
+|---|---|---|
+| Mode declared | ✓ | `validation` |
+| Executor named | ✓ | The E5 corrective agent ran e5c-01 … 50. This re-audit ran nothing. |
+| Results trace to the commit under test | ✓ | Patch sha256 matches. The Windows HEAD is `5edcb3f`. `2af73ef` changes only `.dev-flow/`. |
+| Every re-checked case has a result word | ✓ | 7 of 7 `verified`. 157/2 coverage is contested. |
+| No real PII or secrets | ✓ | Repository-relative paths only. |
