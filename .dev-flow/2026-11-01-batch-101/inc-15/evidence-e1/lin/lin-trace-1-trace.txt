@@ -1,0 +1,61 @@
+   0.0592 === call begin tests/test_tui_patch_editor_v2.py::test_tc331_disable_guard_predicate_tracks_source_path
+   1.8825 pause enter delay=None
+   1.9930 pause exit
+   2.0782 pause enter delay=None
+   2.2587 pause exit
+   2.2639 pause enter delay=None
+   2.3296 app action_requested action=load_doc running=True stack=1 screen_children=6
+   2.4437 pause exit
+   2.4452 press id=patch_paste_parse_button disabled=False display=True mounted=True
+   2.4461 pause enter delay=None
+   2.5062 app action_requested action=parse_paste running=True stack=1 screen_children=6
+   2.5846 pause exit
+   2.5847 app _shutdown begin
+   2.6584 app _shutdown end
+   2.6586 === call end tests/test_tui_patch_editor_v2.py::test_tc331_disable_guard_predicate_tracks_source_path excinfo=None
+   2.6600 === call begin tests/test_tui_flow_execution_b94.py::test_tc_b94_27_lane_binding_isolation_and_noop
+   4.5652 pause enter delay=None
+   4.6425 pause exit
+   4.6766 pause enter delay=None
+   4.8377 pause exit
+   4.8383 press id=fx_import disabled=False display=True mounted=True
+   4.8396 pause enter delay=None
+   4.9081 fx on_button_pressed id=fx_import
+   5.0094 pause exit
+   5.0095 pause enter delay=None
+   5.0309 pause exit
+   5.0312 press id=flow_load_ok disabled=False display=True mounted=True
+   5.0322 pause enter delay=None
+   5.2870 pause exit
+   5.2870 pause enter delay=None
+   5.3627 pause exit
+   5.3627 pause enter delay=None
+   5.4346 pause exit
+   5.4358 press id=fx_import disabled=False display=True mounted=True
+   5.4387 pause enter delay=None
+   5.5114 fx on_button_pressed id=fx_import
+   5.6154 pause exit
+   5.6155 pause enter delay=None
+   5.6367 pause exit
+   5.6369 press id=flow_load_ok disabled=False display=True mounted=True
+   5.6379 pause enter delay=None
+   5.7754 pause exit
+   5.7754 pause enter delay=None
+   5.9322 pause exit
+   5.9322 pause enter delay=None
+   6.0054 pause exit
+   6.0073 press id=fx_bind_0_0 disabled=False display=True mounted=True
+   6.0082 pause enter delay=None
+   6.0654 fx on_button_pressed id=fx_bind_0_0
+   6.0655 fx _rebind lane=0 src=0 value='base.s19' effective='base.s19'
+   6.0655 fx _rebind done bindings={}
+   6.0854 pause exit
+   6.0856 press id=fx_bind_0_0 disabled=False display=True mounted=True
+   6.0857 pause enter delay=None
+   6.1447 fx on_button_pressed id=fx_bind_0_0
+   6.1447 fx _rebind lane=0 src=0 value='variant_b.hex' effective='base.s19'
+   6.1462 fx _rebind done bindings={0: 'variant_b.hex'}
+   6.2063 pause exit
+   6.2070 app _shutdown begin
+   6.3116 app _shutdown end
+   6.3118 === call end tests/test_tui_flow_execution_b94.py::test_tc_b94_27_lane_binding_isolation_and_noop excinfo=None

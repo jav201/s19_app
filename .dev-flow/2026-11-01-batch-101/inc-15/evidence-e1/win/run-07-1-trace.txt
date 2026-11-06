@@ -1,0 +1,63 @@
+   2.4828 === call begin tests/test_tui_flow_execution_b94.py::test_tc_b94_27_lane_binding_isolation_and_noop
+  14.2447 pause enter delay=None
+  15.4929 pause exit
+  15.5127 pause enter delay=None
+  16.1302 pause exit
+  16.1307 press id=fx_import disabled=False display=True mounted=True
+  16.1313 pause enter delay=None
+  16.1583 fx on_button_pressed id=fx_import
+  16.7197 pause exit
+  16.7207 pause enter delay=None
+  17.1435 pause exit
+  17.1436 pause enter delay=None
+  17.1679 pause exit
+  17.1681 press id=flow_load_ok disabled=False display=True mounted=True
+  17.1687 pause enter delay=None
+  17.3644 pause exit
+  17.3644 pause enter delay=None
+  18.6561 pause exit
+  18.6562 pause enter delay=None
+  18.8975 pause exit
+  18.8980 press id=fx_import disabled=False display=True mounted=True
+  18.8987 pause enter delay=None
+  18.9281 fx on_button_pressed id=fx_import
+  19.7184 pause exit
+  19.7185 pause enter delay=None
+  19.9328 pause exit
+  19.9330 press id=flow_load_ok disabled=False display=True mounted=True
+  19.9336 pause enter delay=None
+  21.1069 pause exit
+  21.1070 pause enter delay=None
+  21.7701 pause exit
+  21.7701 pause enter delay=None
+  22.2195 pause exit
+  22.2208 press id=fx_bind_0_0 disabled=False display=True mounted=True
+  22.2216 pause enter delay=None
+  22.5978 fx on_button_pressed id=fx_bind_0_0
+  22.5979 fx _rebind lane=0 src=0 value='base.s19' effective='base.s19'
+  22.5979 fx _rebind done bindings={}
+  22.6157 pause exit
+  22.6159 press id=fx_bind_0_0 disabled=False display=True mounted=True
+  22.6166 pause enter delay=None
+  22.6515 fx on_button_pressed id=fx_bind_0_0
+  22.6516 fx _rebind lane=0 src=0 value='variant_b.hex' effective='base.s19'
+  22.6554 fx _rebind done bindings={0: 'variant_b.hex'}
+  22.6909 pause exit
+  22.6910 app _shutdown begin
+  22.7643 app _shutdown end
+  23.3425 === call end tests/test_tui_flow_execution_b94.py::test_tc_b94_27_lane_binding_isolation_and_noop excinfo=None
+  23.3454 === call begin tests/test_tui_patch_editor_v2.py::test_tc331_disable_guard_predicate_tracks_source_path
+  33.6163 pause enter delay=None
+  34.9025 pause exit
+  35.1504 pause enter delay=None
+  37.5944 pause exit
+  37.5972 pause enter delay=None
+  38.2196 app action_requested action=load_doc running=True stack=1 screen_children=6
+  38.4545 pause exit
+  38.4560 press id=patch_paste_parse_button disabled=False display=True mounted=True
+  38.4567 pause enter delay=None
+  39.3620 app action_requested action=parse_paste running=True stack=1 screen_children=6
+  39.7375 pause exit
+  39.7392 app _shutdown begin
+  40.4966 app _shutdown end
+  41.4683 === call end tests/test_tui_patch_editor_v2.py::test_tc331_disable_guard_predicate_tracks_source_path excinfo=None

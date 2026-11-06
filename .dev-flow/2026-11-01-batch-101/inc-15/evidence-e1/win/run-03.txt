@@ -1,0 +1,80 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- <HOME>\anaconda3\envs\s19env\python.exe
+i15: s19_app.__file__ = <HOME>\Github\s19_app-b101-inc15\s19_app\__init__.py
+i15: python 3.11.15 on Windows 10; textual 8.2.8
+i15: NO_COLOR set = False; LOCALAPPDATA = <HOME>\.claude\jobs\3f13b036\tmp\i15win\run-03\Local
+i15: TEMP = <HOME>\.claude\jobs\3f13b036\tmp\i15win\run-03\Temp; USERPROFILE = <HOME>\.claude\jobs\3f13b036\tmp\i15win\run-03\Home
+i15: OS clipboard writers replaced by a raising guard
+rootdir: <HOME>\Github\s19_app-b101-inc15
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 2 items
+
+tests/test_tui_patch_editor_v2.py::test_tc331_disable_guard_predicate_tracks_source_path FAILED [ 50%]
+tests/test_tui_flow_execution_b94.py::test_tc_b94_27_lane_binding_isolation_and_noop PASSED [100%]
+
+================================== FAILURES ===================================
+____________ test_tc331_disable_guard_predicate_tracks_source_path ____________
+
+tmp_path = WindowsPath('<HOME>/.claude/jobs/3f13b036/tmp/i15win/run-03/bt/test_tc331_disable_guard_predi0')
+
+    def test_tc331_disable_guard_predicate_tracks_source_path(
+        tmp_path: Path,
+    ) -> None:
+        """The disable-guard predicate tracks ``source_path`` live (TC-331).
+    
+        Intent (TC-331, LLR-064b.4): the Edit-JSON control's disabled state tracks
+        ``ChangeService.document.source_path`` across the file\u2192paste transition \u2014
+        fresh (None) \u2192 enabled; after a file load (not None) \u2192 disabled; after a
+        subsequent paste (None) \u2192 enabled again.
+        """
+        from textual.widgets import Button
+    
+        doc_path = _write_v2_document(
+            tmp_path / "f.json",
+            [{"type": "bytes", "address": "0x100", "bytes": "AA BB"}],
+        )
+        paste = _changeset_text(
+            [{"type": "string", "address": "0x9", "value": "P"}]
+        )
+    
+        async def _drive() -> dict[str, bool]:
+            outcomes: dict[str, bool] = {}
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 40)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("patch")
+                await pilot.pause()
+                panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+                button = app.query_one("#patch_edit_json_button", Button)
+    
+                outcomes["fresh_enabled"] = not button.disabled
+    
+                _set_entry_inputs(app, path_text=str(doc_path))
+                panel.request_action("load_doc")
+                await pilot.pause()
+                outcomes["file_disabled"] = button.disabled
+    
+                _seed_via_paste(app, paste)
+                await pilot.pause()
+                outcomes["paste_enabled"] = not button.disabled
+            return outcomes
+    
+        outcomes = asyncio.run(_drive())
+        assert outcomes["fresh_enabled"] is True, (
+            "a fresh (paste-authored/empty) document \u2192 Edit JSON enabled"
+        )
+        assert outcomes["file_disabled"] is True, (
+            "a file-backed document (source_path not None) \u2192 Edit JSON disabled"
+        )
+>       assert outcomes["paste_enabled"] is True, (
+            "a subsequent paste (source_path None) \u2192 Edit JSON re-enabled"
+        )
+E       AssertionError: a subsequent paste (source_path None) \u2192 Edit JSON re-enabled
+E       assert False is True
+
+tests\test_tui_patch_editor_v2.py:3550: AssertionError
+i15: pause probe = zero
+=========================== short test summary info ===========================
+FAILED tests/test_tui_patch_editor_v2.py::test_tc331_disable_guard_predicate_tracks_source_path
+========================= 1 failed, 1 passed in 3.79s =========================

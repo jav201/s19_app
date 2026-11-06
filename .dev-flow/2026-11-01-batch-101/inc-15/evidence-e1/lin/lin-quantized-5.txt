@@ -1,0 +1,17 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0 -- /data/miniconda3/envs/s19ci/bin/python
+i15: s19_app.__file__ = /tmp/i15/wt/s19_app/__init__.py
+i15: python 3.11.18 on Linux 7.3.1-1-cachyos; textual 8.2.8
+i15: NO_COLOR set = False; LOCALAPPDATA = None
+i15: TEMP = None; USERPROFILE = None
+i15: OS clipboard writers replaced by a raising guard
+rootdir: /tmp/i15/wt
+configfile: pyproject.toml
+plugins: platformdirs-4.14.3, xdist-3.8.0
+collecting ... collected 2 items
+
+tests/test_tui_patch_editor_v2.py::test_tc331_disable_guard_predicate_tracks_source_path PASSED [ 50%]
+tests/test_tui_flow_execution_b94.py::test_tc_b94_27_lane_binding_isolation_and_noop PASSED [100%]
+
+i15: pause probe = quantized; affinity = None; trace = False
+============================== 2 passed in 6.22s ===============================
