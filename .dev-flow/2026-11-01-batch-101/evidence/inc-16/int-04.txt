@@ -1,0 +1,39 @@
+=== Inc 16 E4 integration: collect counts and negative controls
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733; index tree: 1d1a365619035dc2ef941760c45ac8fcb02ca59a
+s19_app.__file__: /home/<user>/work/s19_i16int/s19_app/__init__.py
+--- collected nodes per file (pytest --collect-only -q, -m "not serial_timing")
+tests/test_b101_doc_hygiene.py: 44
+tests/test_docs_canon.py: 2
+--- scanned test modules (tools.id_registry.scanned_test_files): 263
+--- M-1: -python -m s19_app.cli verify firmware.s19 +python -m s19_app.cli firmware.s19 verify 
+E       AssertionError: CLI example lines that do not run the module as `<command> <file>` with a defined sub-command:
+E         python -m s19_app.cli firmware.s19 verify
+E       assert not ['python -m s19_app.cli firmware.s19 verify']
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_2_1_cli_examples_run_the_module
+M-1: RED (killed), exit 1
+--- M-2: -python -m s19_app.cli dump firmware.s19 --start 0x7AF0 --length 64 +python -m s19_app.cli dump --start 0x7AF0 --length 64 
+E       AssertionError: CLI example lines that do not run the module as `<command> <file>` with a defined sub-command:
+E         python -m s19_app.cli dump --start 0x7AF0 --length 64
+E       assert not ['python -m s19_app.cli dump --start 0x7AF0 --length 64']
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_2_1_cli_examples_run_the_module
+M-2: RED (killed), exit 1
+--- M-3: -CI (`.github/workflows/tui-ci.yml`) runs pytest on Python 3.11 for pushes and pull requests to `main` and `main-tui`, in two lanes: lane 1 in parallel (`-m "not serial_timing"`) and lane 2 the timing arms serially (`-m 
+E       AssertionError: CI sentence must name both `main` and `main-tui`
+E       assert (None)
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_3_1_ci_sentence_matches_the_workflow
+1 failed in 0.09s
+M-3: RED (killed), exit 1
+--- M-4: -EXPECTED_SCANNED_TEST_FILES = 263 +EXPECTED_SCANNED_TEST_FILES = 262 
+E       AssertionError: the guard scanned 263 test modules, not the declared 262. If tests/ legitimately grew, bump EXPECTED_SCANNED_TEST_FILES in the same PR so the bound stays a decision rather than
+E       assert 263 == 262
+FAILED tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound
+1 failed in 5.55s
+M-4: RED (killed), exit 1
+--- M-5: -| [engineering-rules.md](./engineering-rules.md) | project- and stack-specific dev-flow gates and engineering controls | 
+E       AssertionError: docs/README.md does not link 1 of 12 entries: ['docs/engineering-rules.md']
+E       assert not ['docs/engineering-rules.md']
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_9_1_docs_index_links_every_entry
+1 failed in 0.09s
+M-5: RED (killed), exit 1
+--- working tree vs index after restore (expect empty):
+=== end

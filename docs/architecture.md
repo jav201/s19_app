@@ -213,7 +213,7 @@ standing map and each holds on the tree.
 | Sub-module | Encapsulates | Exposes | Must not import |
 |---|---|---|---|
 | `s19_app/render/hexview.py` | the pure hex-window renderer: hex/ASCII rendering of a memory map, in-memory string search, and the memory-map builders | `render_hex_view`, `render_hex_view_text`, `build_mem_map_s19`, `build_range_validity_s19`, `build_range_validity_hex`, `build_row_bases`, `find_string_in_mem`; constants `HEX_WIDTH`, `MAX_HEX_ROWS`, `MAX_HEX_BYTES`, `FOCUS_CONTEXT_ROWS`, `SEARCH_ENCODING` | `s19_app.tui` modules — it imports `rich.text`, `..core`, `..hexfile`, `..range_index` and `.format` |
-| `s19_app/render/format.py` | presentation-neutral formatting primitives: the `microbar` gauge and the pure style constants | `microbar`, `MICROBAR_FILLED`, `MICROBAR_EMPTY`, `GREEN`, `LABEL`, `VALUE` | `s19_app.tui` modules — it imports `rich.text` only |
+| `s19_app/render/format.py` | presentation-neutral formatting primitives: the `microbar` gauge and the pure style constants | `microbar`, `MICROBAR_FILLED`, `MICROBAR_EMPTY` and the style constants `GREEN`, `LABEL`, `VALUE`, `CYAN`, `DGRAY` (re-exported by `tui/insight_style.py`), plus `FOCUS_HIGHLIGHT_STYLE` and `MAC_ADDRESS_OVERLAY_STYLE` for `render/hexview.py` | `s19_app.tui` modules — it imports `rich.text` only |
 | `s19_app/tui/flow_screens.py` | the flow surfaces: `FlowBuilderPanel` and `FlowExecutionPanel` with their message types | the two panel classes and their message types, consumed by `tui/app.py` and `tui/screens.py` | `not declared` |
 
 ## 11. Interfaces — the contracts between modules
@@ -230,7 +230,7 @@ row of this one table, never as a new table.
 | `screen_workspace` — Part B contract | product | 94 declared consumers | 31 outputs; `PARENT : workspace_body` | no |
 | `workspace_body` — Part B contract | product | 139 declared consumers | 42 outputs; `PARENT : workspace_shell` | no |
 | `render.hexview` surface | `s19_app/render/hexview.py` | views and report services | the renderer functions and constants of §10, consumed as plain data (`Text`/`str`) | no |
-| `render.format` surface | `s19_app/render/format.py` | services and views | `microbar`, `MICROBAR_FILLED`, `MICROBAR_EMPTY`, `GREEN`, `LABEL`, `VALUE` | no |
+| `render.format` surface | `s19_app/render/format.py` | `tui/services/validation_service.py`, the views through the `tui/insight_style.py` re-export | `microbar`, `MICROBAR_FILLED`, `MICROBAR_EMPTY`, `GREEN`, `LABEL`, `VALUE`, `CYAN`, `DGRAY` | no |
 | `utils.safe_text` contract | `s19_app/utils.py` | `checks_view`, `issues_view`, the flow surfaces | security contract — deletes every C0/DEL/C1 codepoint and wraps the remainder as a literal `Text`, never `Text.from_markup` | no |
 | `tui/__init__` re-export surface | `s19_app/tui/__init__.py` | view and service importers | the range_index wrappers are removed; the renderer names stay, repointed to `render.hexview` | no |
 | `PatchEditorPanel.ActionRequested` contract | `s19_app/tui/screens_directionb.py` | `app.py`, `screens.py` | the message family the panel emits (edit-json requests, entry edit-json); the variant request retired with the variant selector | no |
@@ -266,7 +266,7 @@ row of this one table, never as a new table.
 | `B100-I3` the Load-side project check | `s19_app/tui/services/manifest_writer.py` | `_handle_load_project`, `compose_load_announcement`, the Load dialog preview | returns manifest and disk problems only, never parses an image, never raises | no |
 | `B100-I4` the project-session reset seam | `s19_app/tui/app.py` | `_handle_load_project` | resets the session inventory; never resets monotonic counters or view preferences; guarded by `_session_snapshot()` | no |
 | `B100-I5` `image_differs_from_source` | `s19_app/tui/services/change_service.py` | `_handle_save_dialog` | a read-only fast path into the data comparison, never the copy decision | no |
-| `B100-I6` `copy_into_workarea` reuse rule | `s19_app/tui/workspace.py` | the 15 direct call sites | reuse the first byte-identical file, else claim the lowest free `_<N>` (amends B99-I2) | no |
+| `B100-I6` `copy_into_workarea` reuse rule | `s19_app/tui/workspace.py` | its direct call sites and the injected path in `changes/io.py` | reuse the first byte-identical file, else claim the lowest free `_<N>` (amends B99-I2) | no |
 | `B100-I7` the one manifest-writing seam | `s19_app/tui/app.py` | Save project, save-back, the variant / MAC / A2L syncs | every write of `project.json` goes through it; every key it does not own is carried unchanged | no |
 | `B100-I8` the Load dialog result | `s19_app/tui/screens.py` | the one app router | `LoadChoice(kind, value)` with `kind` in project / workarea / recent / path | no |
 | `B100-I9` the recent-sources store | `s19_app/tui/workspace.py` | `load_from_path`, `load_a2l_from_path`, the Load dialog | saved file | no |

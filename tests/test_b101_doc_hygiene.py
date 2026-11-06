@@ -40,7 +40,7 @@ _PROTO = "proto" + "types"
 _FDF = "fast" + "-dev-" + "flow"
 _FDF_DIR = "." + _FDF
 _S19T = "s19" + "tool"
-_CLOUD_DRIVE = "G" + ":/My Dri" + "ve/"  # a drive-letter cloud-folder path
+_CLOUD_DRIVE = "X" + ":/My Dri" + "ve/"  # a drive-letter cloud-folder path
 
 
 # =============================================================================
@@ -531,7 +531,9 @@ def test_r_doc_dev_1_1_claude_lists_declared_console_scripts():
 
 def test_r_doc_dev_2_1_cli_examples_run_the_module():
     """Verifies R-DOC-DEV.2 (case /1): each CLI example line of CLAUDE.md's
-    common-commands block runs the module and a sub-command cli.py defines."""
+    common-commands block runs the module as ``<command> <file>`` with a
+    sub-command cli.py defines (each sub-parser takes the file as its own
+    positional, so ``<file> <command>`` is rejected by argparse)."""
     text = _need("CLAUDE.md")
     marker = re.search(r"(?m)^# CLI examples\b[^\n]*$", text)
     assert marker, "CLAUDE.md has no '# CLI examples' comment"
@@ -547,9 +549,17 @@ def test_r_doc_dev_2_1_cli_examples_run_the_module():
     bad = []
     for line in lines:
         tokens = line.split()
-        if not line.startswith("python -m s19_app.cli ") or len(tokens) < 5 or tokens[4] not in defined:
+        if (
+            not line.startswith("python -m s19_app.cli ")
+            or len(tokens) < 5
+            or tokens[3] not in defined
+            or tokens[4].startswith("-")
+        ):
             bad.append(line)
-    assert not bad, "CLI example lines that do not run the module and a defined sub-command:\n" + "\n".join(bad)
+    assert not bad, (
+        "CLI example lines that do not run the module as `<command> <file>` with a defined "
+        "sub-command:\n" + "\n".join(bad)
+    )
 
 
 def test_r_doc_dev_3_1_ci_sentence_matches_the_workflow():

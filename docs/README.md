@@ -2,7 +2,7 @@
 
 Project-level documentation for `s19_app` (distribution name `s19tool`) — an offline desktop tool for embedded / automotive firmware engineering (S19 / Intel-HEX / A2L / MAC analysis, calibration change-set authoring, patched-image emission).
 
-This `docs/` directory holds the **general** documentation that sits above the per-batch dev-flow archives. For per-batch detail (requirements, decisions, test verdicts, post-mortems), follow the archive links in [requirements/](requirements/) and the dev-flow archive folders.
+This `docs/` directory holds the **general** documentation that sits above the per-batch dev-flow archives. For per-batch detail (requirements, decisions, test verdicts, post-mortems), read the per-batch records under `.dev-flow/<batch>/`.
 
 ---
 

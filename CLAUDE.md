@@ -37,13 +37,13 @@ s19tui
 s19tui --load examples/case_00_public/prg.s19
 
 # CLI examples (module-only; no console script)
-python -m s19_app.cli firmware.s19 info
-python -m s19_app.cli firmware.s19 verify
-python -m s19_app.cli firmware.s19 dump --start 0x7AF0 --length 64
-python -m s19_app.cli firmware.s19 patch-hex --addr 0x80040000 --bytes "01 02 03 04" --save-as out.s19
+python -m s19_app.cli info firmware.s19
+python -m s19_app.cli verify firmware.s19
+python -m s19_app.cli dump firmware.s19 --start 0x7AF0 --length 64
+python -m s19_app.cli patch-hex firmware.s19 --addr 0x80040000 --bytes "01 02 03 04" --save-as out.s19
 ```
 
-CI (`.github/workflows/tui-ci.yml`) runs `pytest -q` on Python 3.11 against pushes/PRs to `main` and `main-tui`, in two lanes: lane 1 parallel (`-m "not serial_timing"`) and lane 2 the timing arms serial (`-m serial_timing`).
+CI (`.github/workflows/tui-ci.yml`) runs pytest on Python 3.11 for pushes and pull requests to `main` and `main-tui`, in two lanes: lane 1 in parallel (`-m "not serial_timing"`) and lane 2 the timing arms serially (`-m serial_timing`); pull requests also leave out the `slow` tests in both lanes.
 
 ## Architecture
 

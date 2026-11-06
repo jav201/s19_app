@@ -1,0 +1,9 @@
+=== Inc 16 E4 integration: base differential of the two int-02 snapshot failures
+base worktree HEAD: c2cba356f254cf85ba8c0e05b47b5103baf2d733; staged vs base: 0; dirty: 0
+s19_app.__file__: /home/<user>/work/s19_i16base/s19_app/__init__.py
+--- command: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -m "not serial_timing" <the two nodes>
+2 mismatched snapshots
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-120x30]
+2 failed in 8.11s
+=== exit code: 1

@@ -1,0 +1,38 @@
+=== Inc 16 E4 integration: CLAUDE.md CLI example forms against s19_app/cli.py (I-1)
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733; index tree: 1d1a365619035dc2ef941760c45ac8fcb02ca59a
+s19_app.__file__: /home/<user>/work/s19_i16int/s19_app/__init__.py
+--- python -m s19_app.cli info examples/case_01_basic_valid/firmware.s19
+[INFO] S19 load summary: path=examples/case_01_basic_valid/firmware.s19 records=9 errors=0 validation_errors=0 parse_errors=0
+[INFO] Endian auto-detected as: big
+[INFO] File loaded: examples/case_01_basic_valid/firmware.s19
+[INFO] 9 records parsed.
+exit code: 0
+--- python -m s19_app.cli verify examples/case_01_basic_valid/firmware.s19
+[INFO] S19 load summary: path=examples/case_01_basic_valid/firmware.s19 records=9 errors=0 validation_errors=0 parse_errors=0
+[INFO] Endian auto-detected as: big
+[INFO] File loaded: examples/case_01_basic_valid/firmware.s19
+[INFO] 9 records parsed.
+exit code: 0
+--- python -m s19_app.cli dump examples/case_01_basic_valid/firmware.s19 --start 0x0 --length 16
+[INFO] S19 load summary: path=examples/case_01_basic_valid/firmware.s19 records=9 errors=0 validation_errors=0 parse_errors=0
+[INFO] Endian auto-detected as: big
+[INFO] File loaded: examples/case_01_basic_valid/firmware.s19
+[INFO] 9 records parsed.
+exit code: 0
+--- python -m s19_app.cli examples/case_01_basic_valid/firmware.s19 info
+usage: cli.py [-h]
+              {info,layout,ranges,gaps,version,verify,update-checksums,dump,dump-by-range,dump-all,patch-str,patch-hex,save}
+              ...
+cli.py: error: argument command: invalid choice: 'examples/case_01_basic_valid/firmware.s19' (choose from 'info', 'layout', 'ranges', 'gaps', 'version', 'verify
+exit code: 2
+--- python -m s19_app.cli examples/case_01_basic_valid/firmware.s19 verify
+usage: cli.py [-h]
+              {info,layout,ranges,gaps,version,verify,update-checksums,dump,dump-by-range,dump-all,patch-str,patch-hex,save}
+              ...
+cli.py: error: argument command: invalid choice: 'examples/case_01_basic_valid/firmware.s19' (choose from 'info', 'layout', 'ranges', 'gaps', 'version', 'verify
+exit code: 2
+--- CLAUDE.md example lines as committed:
+40:python -m s19_app.cli info firmware.s19
+41:python -m s19_app.cli verify firmware.s19
+42:python -m s19_app.cli dump firmware.s19 --start 0x7AF0 --length 64
+43:python -m s19_app.cli patch-hex firmware.s19 --addr 0x80040000 --bytes "01 02 03 04" --save-as out.s19

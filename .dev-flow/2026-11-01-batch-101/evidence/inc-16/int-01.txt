@@ -1,0 +1,16 @@
+=== Inc 16 E4 integration run: int-01-guards-and-laws
+date: 2026-11-06T08:18:49Z
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree with the increment staged: 1d1a365619035dc2ef941760c45ac8fcb02ca59a
+staged files vs base: 77
+python: Python 3.11.18
+s19_app.__file__: /home/<user>/work/s19_i16int/s19_app/__init__.py
+--- command: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -n 8 -m "not serial_timing" tests/test_b101_doc_hygiene.py tests/test_docs_canon.py tests/test_id_registry.py tests/test_suite_hygiene.py tests/test_address_census.py tests/test_requirements_canon.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 46%]
+........................................................................ [ 92%]
+............                                                             [100%]
+156 passed in 77.13s (0:01:17)
+=== exit code: 0
