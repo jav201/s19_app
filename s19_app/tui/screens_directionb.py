@@ -7226,8 +7226,11 @@ class CheckEditorPanel(ScrollableContainer):
         #: ``layout_provider`` (a one-way call — the provider reads cached
         #: scalars, never picker entry points, so there is no cycle).
         self._picker = A2LParameterPicker(layout_provider=self._widths)
-        #: The declared memory rows: list of (address, label, size).
+        #: The declared memory rows: list of (address, label, size, expected).
         self._memory_rows: list = []
+        #: Spec bytes of a field loaded from a spec, keyed by the included
+        #: parameter name: name -> (address, size, bytes) of its spec entry.
+        self._spec_bytes: dict = {}
         #: The last derived widths; ``None`` until the panel is measured.
         self._layout: Optional[CheckLayout] = None
 
@@ -7282,11 +7285,22 @@ class CheckEditorPanel(ScrollableContainer):
         signature is unchanged (R-B102-SEL-004) and no-ops on the
         unchanged-signature re-entry, in which case this shim returns without
         touching the layout or the previews. On a real (re)population it
-        re-derives the widths (the cached longest ``Fmt · Unit`` text is an
-        input of :func:`check_layout`).
+        re-includes every earlier pick the new ledger lists, demotes a pick
+        loaded from a spec that the new ledger no longer lists at its spec
+        entry's range into a memory row (R-CHKED-056) and drops the rest
+        (R-CHKED-055), then re-derives the widths (the cached longest
+        ``Fmt · Unit`` text is an input of :func:`check_layout`).
         """
+        kept = list(self._picker.picked_params)
         if not self._picker.set_parameters(rows, signature):
             return
+        rows_before = len(self._memory_rows)
+        kept = self._demote_moved_spec_params(kept)
+        if kept:
+            self._picker.include_names(kept)
+            self._prune_spec_bytes()
+        if len(self._memory_rows) != rows_before:
+            self._rebuild_memory_table()
         self._layout = None
         self.call_after_refresh(self._apply_layout)
         self._refresh_preview()
@@ -7294,17 +7308,41 @@ class CheckEditorPanel(ScrollableContainer):
     def load_spec(self, items: Sequence[dict], source_name: str) -> None:
         """Populate the collector from a loaded check spec (LLR-009.1 read arm).
 
-        Every declared address becomes a memory row (the v2 wire grammar
-        carries no names). ``app.py`` read the document; this only mirrors it.
+        Each entry's named parameter (its symbol when the loaded A2L lists
+        it at the entry's range, else the one parameter at the entry's
+        address and byte count) is included in entry order; an entry without
+        one becomes an unlabelled memory row carrying the spec's bytes.
+        ``app.py`` read the document; this only mirrors it.
         """
         self._picker.clear_picks()
+        self._spec_bytes = {}
         self._memory_rows = []
+        by_key: dict = {}
+        for name, (address, size, _fmt) in self._param_rows.items():
+            if isinstance(address, int):
+                by_key.setdefault((address, size), []).append(name)
+        taken: set = set()
+        named: list = []
         for item in items:
             address = item.get("address")
             if address is None:
                 continue
+            address = int(address)
             size = int(item.get("size") or 1)
-            self._memory_rows.append((int(address), self._default_label(int(address)), size))
+            expected = item.get("expected")
+            name = self._named_parameter(
+                address, size, item.get("symbol"), by_key, taken
+            )
+            if name is not None:
+                named.append(name)
+                taken.add(name)
+                self._spec_bytes[name] = (address, size, expected)
+            else:
+                self._memory_rows.append(
+                    (address, self._default_label(address), size, expected)
+                )
+        if named:
+            self._picker.include_names(named)
         self._rebuild_memory_table()
         self._rebuild_ledger()
         base = str(source_name)
@@ -7330,6 +7368,85 @@ class CheckEditorPanel(ScrollableContainer):
         """The stored name of a memory row typed with no label (kept in the spec)."""
         return f"field @ 0x{address:08X}"
 
+    def _named_parameter(
+        self,
+        address: int,
+        size: int,
+        symbol: Optional[str],
+        by_key: dict,
+        taken: set,
+    ) -> Optional[str]:
+        """The named parameter of one spec entry (the named-parameter rule).
+
+        A symbol the loaded A2L lists names the entry only when its ledger
+        range is the entry's address and byte count and it was not taken by
+        an earlier entry; otherwise the address rule is not tried (E3 A-6).
+        Without a usable symbol, the single parameter at the entry's address
+        and byte count names it, when exactly one exists and is not taken.
+
+        Args:
+            address (int): The entry's address.
+            size (int): The entry's byte count.
+            symbol (Optional[str]): The resolved tag spelling, or ``None``.
+            by_key (dict): ``(address, size)`` → the ledger names, in order.
+            taken (set): Names already taken by earlier entries.
+
+        Returns:
+            Optional[str]: The named parameter, or ``None`` when there is
+                none, it is ambiguous or taken, or the symbol names a listed
+                parameter at another range.
+        """
+        if isinstance(symbol, str) and symbol and symbol in self._param_rows:
+            if self._param_rows[symbol][:2] == (address, size) and symbol not in taken:
+                return symbol
+            return None
+        names = by_key.get((address, size), [])
+        if len(names) == 1 and names[0] not in taken:
+            return names[0]
+        return None
+
+    def _demote_moved_spec_params(self, kept: list) -> list:
+        """Demote spec-loaded picks the new ledger no longer lists at their
+        spec entry's range into unlabelled memory rows (R-CHKED-056).
+
+        Runs after ``set_parameters`` replaced the ledger. A pick whose name
+        now resolves to another address, another byte count, or not at all
+        (while it carries a spec entry) becomes a memory row at the spec
+        entry's own address with its byte count and bytes, and is left out of
+        the re-include list. The spec entry's address, size and bytes are
+        never changed and the image is never read.
+
+        Args:
+            kept (list): The picks before the repopulation, in order.
+
+        Returns:
+            list: The picks to re-include, in order (a session pick the new
+                ledger no longer lists is returned too — ``include_names``
+                ignores it).
+        """
+        result: list = []
+        for name in kept:
+            spec = self._spec_bytes.get(name)
+            if spec is None or self._param_rows.get(name, (None, None, ""))[:2] == spec[:2]:
+                result.append(name)
+                continue
+            self._memory_rows.append(
+                (spec[0], self._default_label(spec[0]), spec[1], spec[2])
+            )
+            del self._spec_bytes[name]
+        return result
+
+    def _prune_spec_bytes(self) -> None:
+        """Keep only the spec bytes of currently included names whose ledger
+        range is still their spec entry's (backstop to the demotion)."""
+        picked = set(self._picker.picked_params)
+        self._spec_bytes = {
+            name: spec
+            for name, spec in self._spec_bytes.items()
+            if name in picked
+            and self._param_rows.get(name, (None, None, ""))[:2] == spec[:2]
+        }
+
     def _widths(self) -> CheckLayout:
         """The current layout, or the 118-column reading before the first measure."""
         return self._layout or check_layout(68, 38, self._fmt_longest())
@@ -7346,7 +7463,7 @@ class CheckEditorPanel(ScrollableContainer):
         table = self.query_one("#check_mem_table", DataTable)
         layout = self._widths()
         table.clear()
-        for address, label, size in self._memory_rows:
+        for address, label, size, _expected in self._memory_rows:
             # A row typed with no label shows ``—``: its stored name only
             # repeats the address of the cell beside it (ux-reviewer M1).
             shown = (
@@ -7363,19 +7480,39 @@ class CheckEditorPanel(ScrollableContainer):
     def _collected_items(self) -> tuple:
         """Gather the collector state into the message items tuple.
 
-        One ``{"source", "name", "address", "size"}`` dict per declared
-        field, in collector order: the included parameters first (inclusion
-        order), then the memory rows (table order).
+        One ``{"source", "name", "address", "size", "expected"}`` dict per
+        declared field, in collector order: the included parameters first
+        (inclusion order), then the memory rows (table order). ``expected``
+        carries the spec's bytes for a field loaded from a spec — for a
+        parameter only while its current ledger range is its spec entry's —
+        and ``None`` otherwise.
         """
         items = []
         for name in self._picked_params:
             address, size, _fmt = self._param_rows.get(name, (None, 1, ""))
+            spec = self._spec_bytes.get(name)
+            if spec is not None and spec[:2] == (address, size):
+                expected = spec[2]
+            else:
+                expected = None
             items.append(
-                {"source": "param", "name": name, "address": address, "size": size}
+                {
+                    "source": "param",
+                    "name": name,
+                    "address": address,
+                    "size": size,
+                    "expected": expected,
+                }
             )
-        for address, label, size in self._memory_rows:
+        for address, label, size, expected in self._memory_rows:
             items.append(
-                {"source": "memory", "name": label, "address": address, "size": size}
+                {
+                    "source": "memory",
+                    "name": label,
+                    "address": address,
+                    "size": size,
+                    "expected": expected,
+                }
             )
         return tuple(items)
 
@@ -7725,11 +7862,13 @@ class CheckEditorPanel(ScrollableContainer):
     def _on_a2l_parameter_picker_selection_changed(
         self, event: A2LParameterPicker.SelectionChanged
     ) -> None:
-        """One ledger row was included or excluded (R-B102-SEL-003): refresh
-        the Fields/JSON/Addendum previews and the left-column count. The
+        """One ledger row was included or excluded (R-B102-SEL-003): prune the
+        spec bytes to the current picks, then refresh the
+        Fields/JSON/Addendum previews and the left-column count. The
         document controls keep collecting ``items`` from the picker at
         write/validate time."""
         event.stop()
+        self._prune_spec_bytes()
         self._refresh_preview()
 
     def _on_a2l_parameter_picker_bulk_add_requested(
@@ -7843,7 +7982,7 @@ class CheckEditorPanel(ScrollableContainer):
             return
         if not label:
             label = self._default_label(address)
-        self._memory_rows.append((address, label, size))
+        self._memory_rows.append((address, label, size, None))
         self._rebuild_memory_table()
         self._refresh_preview()
 

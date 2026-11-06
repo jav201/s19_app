@@ -60,24 +60,31 @@ What the A2B diff report gains: a `## Checks` section with the three fields.
 ![Validate](img/ch10-06-check-validate.png)
 
 **Validate** reads the fields from the loaded image and lists them under the form:
-*validation complete*, three `pass` lines.
+*validation complete*, three `pass` lines. A field loaded back from a spec is
+compared with the bytes that spec declared, so Validate can now report `fail` when
+the image no longer matches the spec.
 
 ### 10.7 Write the spec
 
 ![Write](img/ch10-07-check-write.png)
 
 Type a name in *Write as* and press **Write .chk.json**: *wrote guide_fields.chk.json
-(3 fields, kind=check)*. After the write the collector shows only the memory row
-(`1 field: 0 params`) and the ledger loses its ✓ marks, although the file holds all
-three fields (finding F-26).
+(3 fields, kind=check)*. The collector keeps its fields after the write — the
+included parameters stay included. Write does not re-baseline a field loaded from
+a spec against the image: it writes the spec's bytes again. To re-baseline one
+field from the image, exclude the parameter and include it again, or remove the
+memory row and add it again. A rewritten spec lists its parameter entries first,
+then its memory rows.
 
 ### 10.8 Load a spec back
 
 ![Spec loaded](img/ch10-08-check-spec-loaded.png)
 
 Pick the spec in the *Spec* dropdown: *loaded 'guide_fields.chk.json' (3 fields)*.
-All three come back as memory rows without labels — the parameter names and the
-`SERIAL` label are not restored (finding F-27). A spec with `symbol` entries
+Each entry whose parameter the loaded A2L lists comes back as a `✓` parameter with
+its name; the memory-row label (`SERIAL`) is not restored. A parameter a newly
+loaded A2L moves, resizes, or no longer lists comes back as an unlabelled `▪`
+memory row at the spec's address. A spec with `symbol` entries
 (`demo_check.chk.json`) is refused the same way as in the Patch Editor (F-01).
 
 ## Features of this window
