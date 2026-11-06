@@ -33,3 +33,48 @@
 - **Displayed check verdicts.** The stamp (entries plus image generation) covers every path that writes bytes in place: an apply, a save-back and a Save project commit, Inc 5's census. An apply or a Save project emit under a check document is blocked (`_decide_project_image` returns `emit=False`; `rederive_for_save` marks every entry `blocked`), so the amended "current run" note holds. No other reader of `last_check_result` exists.
 - **A linked project folder.** `list_projects` and `_project_folder_refusal` refuse one at load. The Write guard also catches one that appears after the load.
 - **Where the Write root comes from (note).** `write_change_document` places files with a work-area root it reads from the destination path. The Patch Editor Save, already shipped, does the same. The save-back passes the root explicitly (SEC-4). It is acceptable here because the project folder is always `self.workarea/<name>`.
+
+## Round 2
+
+**Verdict: PASS-WITH-NOTES.** S-1 and S-2 are closed in the design at `64c24ac`. The revised D-3 opens no hole that can write outside the project home, overwrite a file, or read through a link. There are two new LOW notes (S-8, S-9). Each mitigation is `planned` until E4 runs its cases. This clears design risk only. It is not merge authority.
+
+Scope: `E3-rulings.md`, `git show HEAD --stat` (the five records), and the base code they rely on: `ChangeService.save` / `save_patched`, `write_change_document` / `_safe_name` / `list_change_documents`, `place_into_workarea` (the `lstat` + `O_EXCL` claim, `_placed_name_candidates`), `_path_traverses_reparse_point`, `RESERVED_WORKAREA_HOMES`, `_apply_prepared_load`, `_apply_unload` / `_unload_primary`, the save-back handler, and the Save project document handling (`app.py:12650-12680`, `:13070-13100`). Read only; nothing imported `s19_app`.
+
+### S-1 — closed (design)
+- #10 hides the prompt and the control when `loaded.mem_map is not previous_map`. `previous_map` is taken before `current_file` is replaced. `current_file` is assigned in three places: `_apply_prepared_load`, `_apply_unload` and the project reset (#7 hides there). So every new image dict passes through the hide. A MAC attach keeps the dict and the bytes, so a confirm after it still writes the reviewed image under its own name.
+- A primary unload leaves the prompt painted. A confirm after it writes nothing: `_unload_primary` gives `file_type="mac"`, which `save_patched` refuses (`CHG-HEX-SAVE-UNSUPPORTED`). An unload of all gives `current_file None`, which the handler refuses. In both cases `ok=False`, so neither `_activate_project_file` nor `_rewrite_project_manifest` runs. No finding.
+- R-TUI-049.3.1 and .3.2 now name the image load. Cases /8 cover it (the oracle: not painted, and no `img-patched.s19`). The case runs with no project open. The project half of the consequence, the `project.json` rewrite, uses the same hide, so it needs no case of its own.
+
+### S-2 — closed (design)
+- The library appears as `library/<n>` in all three lists while a project is open (`_change_homes` #12, `_spec_homes` #32, the CTX *change list* / *spec list* amendments). It is reachable through #16 (cases R-PATCH-DOC-DROPDOWN-001.2/2, 001.3/3, R-CHKED-040/1, R-CHKED-042/1, R-DIFF-CHK.1/1, R-DIFF-CHK.8/1). No function is lost.
+
+### Revised D-3 — no new hole
+- **Where Write lands after a `library/<n>` pick.**
+  - Patch Editor Save calls `service.save(base_dir, dest_dir=_change_doc_save_home())` with the default name `changes.json`. It never uses the source path, so it never writes the library file.
+  - Check Editor Write writes to `_check_home()` with the bare Write as name (R-CHKED-042).
+  - Save project copies a library document into the project as `outside` through `place_into_workarea`.
+  - All three take the claim: an `lstat`, then `O_CREAT|O_EXCL` on the first free `<stem>_<N><suffix>`, with byte-identical reuse. A project file of the same name is never overwritten (R-CHKED-031/3).
+- **A library entry as a link.** The listing skips symlinks (`is_symlink`). #16 walks the file, `workarea/patches`, and `workarea` (stopping at `.s19tool`, exclusive), and it also checks `.s19tool`. A junction directory named `x.json` is listed, because `glob` matches folders, but the pick is refused. A hard link is only read. Writes go to a new claim, never into an existing inode.
+- **Prefix ambiguity.** `glob("*.json")` lists direct children only. No file name on Windows or Linux can hold `/`, so a file literally named `library/x` cannot exist. With a project open, the three prefixes are distinct and none starts another. The `""` home exists only without a project. A stale list fails closed: `patches/a.json` with no project holds a separator, and `w.json` in a project matches no prefix, so both are refused. A project cannot be named `patches`, because `RESERVED_WORKAREA_HOMES` is case-folded, so no project folder is the library. `current_project_dir` is set only at `:12683` and `:14090`, and both refill the lists (#35).
+
+### S-3 … S-6 — landed as ruled
+- S-3: #16 uses the Write guard's walk and stop point. "Linked folder" now covers any link (Definitions). Inc 9 is named in `E1-rulings.md` §6 and in the graph's interface table. Case 001.4/4.
+- S-4: #16 returns the unresolved `folder / name`. Cases 001.3/1 and /4.
+- S-5: `_answer` runs #16 again. Case 001.4/5.
+- S-6: the rows 001.4, R-CHKED-044 and R-DIFF-CHK.5 state the linked-folder condition. S-7 is in the backlog as (d).
+
+### New notes
+
+| Id | Severity | Where | Finding | Proposed fix |
+|---|---|---|---|---|
+| S-8 | LOW | `E1-rulings.md` §5, D-6 row, first sentence | The row still says "the guard requires the resolved file inside the open project folder". An implementer who follows it refuses every `library/<n>` pick and brings S-2 back. The graph (#16: inside the resolved work area) is right. | Strike the clause or replace it with #16's rule. |
+| S-9 | LOW | `_on_project_saved` (#37), `app.py:12663` | The "has unsaved edits" line fires only for `in_home`. If a library document is edited and Save project runs, the project records the library file as it is on disk and shows no line. The panel stays dirty. This happens at base for a typed path too; revised D-3 makes it one pick away. No data leaves the work area. | Backlog: extend the line to a copied `outside` document. |
+
+Outside the security lens, for the architect: a Write collision names the new file `w.chk_1.json` (`_placed_name_candidates`). The name no longer ends `.chk.json`, so it is listed as ` PATCH`. This happens at base too.
+
+### Evidence checklist
+- ✓ Every finding has what, where, why and a fix (table above).
+- ✓ Every finding has a severity.
+- ✓ No secret values (none in scope).
+- ✓ The verdict is explicit. There is no HIGH.
+- n/a — no new tool or integration.

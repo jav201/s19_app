@@ -4,3 +4,4 @@ E1 end 2026-11-06T11:22Z model=opus rows=22 active (+1 withdrawn parent) cases=5
 E2 end 2026-11-06T11:22Z model=opus graph=codewire/graph-inc6.md 30 nodes, 3 groups, 6 pinned interfaces
 E1 rulings 2026-11-06T11:23Z orchestrator D-1..D-6
 E3 correction 2026-11-06T12:13Z model=opus rulings E3A-01..15, S-1..S-7 folded (targeted edits; D-3 revised: library/<n>); rows=27 active (+1 withdrawn) cases=77 slice=37 functions in 4 files (window_help.py text only); trace_check 30 gaps (26 TEST: no tests yet; 3 SLICE: branch behind main after the Inc 5 merge 823d0c9, rebase before E4; 1 EVID)
+E3 round2 2026-11-06T12:26Z architect=opus PWN, security=opus PWN; E3 closed

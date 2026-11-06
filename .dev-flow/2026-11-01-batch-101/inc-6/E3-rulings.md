@@ -18,3 +18,13 @@ Round 1: `E3-architect.md` **FAIL** (4 MAJOR, 11 MINOR); `E3-security.md` **PASS
 | E3A-07 … E3A-13, E3A-15 (MINOR) | Fold each as a targeted edit: hidden-class asserts → `partial` unless the painted state is read; rule-7 waits planned in every case; the /7 negative arm rebuilt or the case ruled `not-testable` with its reason; .36/1 status sign and -009/1 expected value fixed; E4 updates the guide/help/DOSSIER text the change makes stale (text only); "patches folder" refusal texts named; R-DIFF-CHK.3 empty row; the overlap list gains the 2 functions; no re-mount on every action; US-PE-LIFE-1 narrowed to what the rows cover. | Minors fold without another round where they are one-line edits. |
 
 Correction: one design-correction agent, targeted edits only. Round 2: the architect re-checks E3A-01 … E3A-04 and the revised D-3; the security reviewer re-checks S-1 and S-2.
+
+## Round 2 (2026-11-06)
+
+Architect **PASS-WITH-NOTES** (E3A-01 … E3A-04 and the revised D-3 closed); security **PASS-WITH-NOTES** (S-1, S-2 closed; the revised D-3 opens no hole: every write claims a free name with `lstat` + `O_EXCL`, links are refused, no file name can hold `/`). E3 closed. Minors go to E4 as addenda:
+
+- **S-8 (LOW):** reword the D-6 sentence so the "inside the project folder" condition applies to project entries only — a `library/<n>` pick is not refused by it.
+- **S-9 (LOW):** backlog row — Save project gives no unsaved-edits warning when the edited document came from the library.
+- **E3A-16 (MINOR):** R-CHKS-009/2 uses a project with no variant, so the case fails without #7.
+- **E3A-17 (MINOR):** admit in `E1-rulings.md` §1 that the Save-project refill clears a spec picked on a displayed A2B Diff (the list is rebuilt for the new project).
+- **E3A-18 (MINOR):** add the two trigger cases (R-CHKED-040 on a project load; R-DIFF-CHK.1 on Save project) and a Patch Editor Save-after-library-pick assertion (the file lands in the project home).
