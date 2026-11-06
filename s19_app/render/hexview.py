@@ -145,6 +145,62 @@ def find_string_in_mem(
     return None
 
 
+def hex_row_bases(
+    row_bases: List[int],
+    row_bases_set: Optional[set[int]] = None,
+    extra_addresses: Optional[set[int]] = None,
+) -> List[int]:
+    """
+    Summary:
+        Resolve the row anchors a hex view paints: the image's own 16-byte-aligned
+        row bases plus any extra row bases (e.g. MAC highlight addresses) spliced in,
+        ascending. The input list is returned unchanged — the same object, no copy —
+        when nothing is added, keeping the multi-million-row hot path allocation-free.
+
+    Args:
+        row_bases (List[int]): Sorted 16-byte-aligned row anchors for the image.
+        row_bases_set (Optional[set[int]]): Precomputed ``set(row_bases)`` reused as the
+            fast-path membership check so a multi-million-entry set is never rebuilt per
+            render.
+        extra_addresses (Optional[set[int]]): Additional addresses (e.g. MAC highlights)
+            whose row anchors must also be present, even when they fall outside
+            ``row_bases``.
+
+    Returns:
+        List[int]: ``row_bases`` itself when there is no extra address or every extra row
+        is already present; otherwise the sorted union of the existing and extra row
+        anchors.
+
+    Data Flow:
+        - Empty ``extra_addresses`` short-circuits to ``row_bases`` (no copy).
+        - Extra addresses are floored to their row base (``HEX_WIDTH``) and, when any is
+          missing from ``existing``, merged and sorted into a new list.
+
+    Dependencies:
+        Uses:
+            - HEX_WIDTH
+        Used by:
+            - _collect_hex_rows
+            - S19TuiApp._hex_view_rows
+
+    Example:
+        >>> hex_row_bases([0x8000, 0x8010, 0x8020], extra_addresses={0x1000})
+        [0x1000, 0x8000, 0x8010, 0x8020]
+    """
+    extra = extra_addresses or set()
+    if not extra:
+        # Hot path: no extra bases to splice in, so reuse the pre-sorted row_bases as-is.
+        # This avoids rebuilding a set of millions of addresses on every hex-view refresh.
+        return row_bases
+    extra_bases = {addr - (addr % HEX_WIDTH) for addr in extra}
+    # Prefer the caller-provided membership set so multi-million-row images skip the
+    # O(n) set(row_bases) rebuild on every hex render.
+    existing: set[int] = row_bases_set if row_bases_set is not None else set(row_bases)
+    if extra_bases.issubset(existing):
+        return row_bases
+    return sorted(existing | extra_bases)
+
+
 def _collect_hex_rows(
     mem_map: Dict[int, int],
     focus_address: Optional[int] = None,
@@ -188,23 +244,7 @@ def _collect_hex_rows(
     """
     base_row_bases = row_bases if row_bases is not None else build_row_bases(mem_map)
     extra = extra_addresses or set()
-    if not extra:
-        # Hot path: no extra bases to splice in, so reuse the pre-sorted row_bases as-is.
-        # This avoids rebuilding a set of millions of addresses on every hex-view refresh.
-        bases: List[int] = base_row_bases if isinstance(base_row_bases, list) else list(base_row_bases)
-    else:
-        extra_bases = {addr - (addr % HEX_WIDTH) for addr in extra}
-        # Prefer the caller-provided membership set so multi-million-row images skip the
-        # O(n) set(base_row_bases) rebuild on every hex render.
-        existing: set[int]
-        if row_bases_set is not None:
-            existing = row_bases_set
-        else:
-            existing = set(base_row_bases)
-        if extra_bases.issubset(existing):
-            bases = base_row_bases if isinstance(base_row_bases, list) else list(base_row_bases)
-        else:
-            bases = sorted(existing | extra_bases)
+    bases: List[int] = hex_row_bases(base_row_bases, row_bases_set, extra)
     if not bases:
         return ["No data available."], []
 

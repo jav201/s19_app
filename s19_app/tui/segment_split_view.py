@@ -1740,10 +1740,34 @@ class SplitJoinWindow(WindowSection):
         # `_fit` guards stay unclamped); after the next refresh the widths
         # are true and every clamp lands (the wrap audit's law).
         self.call_after_refresh(self._sync)
-        try:
-            self.query_one("#sje_table", _SegTable).focus()
-        except Exception:
-            pass
+        # R-SEG-OPEN.6 / I-2: focus the table only while the window is shown;
+        # a hidden window (a load or unload while it is closed) must not
+        # steal the focus.
+        if not self.has_class("hidden"):
+            try:
+                self.query_one("#sje_table", _SegTable).focus()
+            except Exception:
+                pass
+
+    def check_action(self, action: str, parameters: tuple) -> Optional[bool]:
+        """Refuse the window's own keys while it is hidden (E3 S-3, D-11, I-6).
+
+        Textual asks this for every binding of the window (``␣``, ``a``, ``n``,
+        ``t``, ``m``, ``g``, ``f``, ``p``, ``d``, ``e``, Esc, the arrows); a
+        hidden window answers ``False`` so the key falls through to the app's
+        bindings and the window's action never runs.
+
+        Args:
+            action (str): The action name.
+            parameters (tuple): The action's parameters.
+
+        Returns:
+            Optional[bool]: ``False`` while the window has ``hidden``, else
+            what ``Widget.check_action`` returns.
+        """
+        if self.has_class("hidden"):
+            return False
+        return super().check_action(action, parameters)
 
     def on_resize(self, event: events.Resize) -> None:
         self._apply_regime()
@@ -2055,6 +2079,12 @@ class SplitJoinWindow(WindowSection):
             self.action_export()
 
     def action_export(self) -> None:
+        # E3 SR2-1: the EXPORT button's own binding runs ``action_export``
+        # directly and bypasses ``check_action``, so the hidden-window guard
+        # lives here too — Enter, a click or ``e`` on a hidden window writes
+        # nothing.
+        if self.has_class("hidden"):
+            return
         app = self._app()
         rows = self._rows()
         plan = self._plan(rows)
