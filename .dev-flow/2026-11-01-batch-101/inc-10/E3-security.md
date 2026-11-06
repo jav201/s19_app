@@ -98,3 +98,43 @@ This clearance covers the E3 design gate only and authorizes nothing else.
 - ✓ No secret values appear in this section. None appear in the records or the code read.
 - ✓ The verdict is explicit for each part: 10a FAIL on R2-1, 10b PASS. No HIGH is marked closed beyond its design, and the code mitigations stay `planned`.
 - ✓ No new tool or integration is added (n/a). The write surfaces were re-checked: the Split / Join export (R2-1), the Patch Editor buttons, Save project and the project sync.
+
+## Round 3
+
+I re-checked only SR2-1 (and its case R-SEG-OPEN.7/4) and SR2-2 (case R-SHELL-FOCUS.2/6), on `4c885c9`, the round-2 correction (`git show HEAD --stat`: 9 records).
+
+- **Records read:** `E3-rulings.md` §Round 2; the `4c885c9` diffs of `01-requirements.md` (R-SEG-OPEN.7), `02-test-cases.md` (R-SHELL-FOCUS.2/6, /7, R-SEG-OPEN.7/4), `E1-slice.md` (#28), `E1-rulings.md` §1, and `codewire/graph-inc10.md` (node `SplitJoinWindow.action_export`, I-4, `action_show_screen`, `_land_focus`); the R-SHELL-FOCUS.2 row; the Definitions (case 08).
+- **Code read at base `98d94d7`:** `segment_split_view.py` :426-429 (`build_plan` with no pick), :1514 (`e`), :1517-1521 (the window is `#screen_split_join`, built with `hidden`), :1571, :1730-1736 (the selection resets only on a new image), :2007-2008, :2053-2062, :2109 (the one call of `write_split_join_export`), :2195-2199; `app.py` :9514-9517 (palette extras), :9616-9617, :9758-9760, :10223; `window_help.py` :884-887, :1248-1255.
+- **Textual 8.2.8, read only:** `app.py:4245` (`run_action` asks `check_action`), `widget.py:4484`, `widgets/_button.py:429`, `:435`, `screen.py:1119-1124`.
+- **Run:** nothing. Nothing imported `s19_app`. Every claim below is `not-run` (code reading).
+
+### Verdict
+
+- **Inc 10a: FAIL**, on one new MAJOR (R3-1): case R-SEG-OPEN.7/4 cannot fail.
+  - SR2-1: closed (design). The case that verifies it is vacuous (R3-1).
+  - SR2-2: closed (design).
+  - No HIGH is open, so this gate is not `BLOCK-UNTIL`. The code mitigations stay `planned` until E5.
+  - R3-1 is one setup clause and one assertion in one case. I can confirm that edit from the records, with no probe.
+
+This clearance covers the E3 design gate only and authorizes nothing else.
+
+### Closure of the round-2 findings
+
+| Round-2 finding | State | Evidence |
+|---|---|---|
+| R2-1 = SR2-1 (MAJOR) | closed (design); case vacuous, see R3-1 | **The sink.** Node `SplitJoinWindow.action_export` returns at once while the window has `hidden`, before the export body, so before the arm too. The window object is the `hidden` holder: it is built with it (`:1517-1521`), and every hide adds it (the rail switch `app.py:9616-9617`, Esc `:2195-2199`); only the open removes it (`app.py:9758-9760`). The guard therefore holds from mount to the first open. **Every route that writes an export passes the sink:** `write_split_join_export` has one caller, `action_export` (`:2109`). (1) The `e` binding: I-6, then the sink. (2) Enter or a click on `#sje_export`: `Button.press` posts `Pressed` (`_button.py:435`), then `on_button_pressed` calls `action_export` (`:2053-2055`); the sink refuses. (3) The window-help key bar's owned `e` token: `widget.run_action` goes to `App.run_action` (`widget.py:4484`), which asks `check_action` (`app.py:4245`), then the sink. (4) The command palette: its entries are the app's `BINDINGS` plus two extras (`app.py:9514-9517`), and no app action is `export`. The palette's one Split / Join entry opens the window, which removes `hidden` first. **Observable refusal:** the return writes nothing and sets no status. The case observes it as 0 files and no message starting `Exported`. Those two observables are enough only when the export would otherwise write (R3-1). |
+| R2-2 = SR2-2 (MINOR) | closed (design) | **Case /6 can fail.** Its first oracle is `default_screen.focused is None`, read right after `action_show_screen("workspace")` returns, before any await. `Screen.set_focus(None)` assigns `focused = None` synchronously (`screen.py:1119-1124`), so the oracle does not depend on the pilot's idle waits. On base, and with the mutant "D-8 (1) removed", the Validate button stays focused, so the case is RED. With the fix, it is GREEN. The mutant is named in the case's expected column. |
+
+### New findings
+
+| Id | Severity | Part / case | Finding | Proposed fix | State |
+|---|---|---|---|---|---|
+| R3-1 | MAJOR | 10a; R-SEG-OPEN.7/4 (and the R-SEG-OPEN.7 row's input clause) | **Gap.** The case ticks no row. Case 08 starts with an empty selection, and the open resets it on a new image (`:1730-1736`). Its setup is: open, Esc, focus `#sje_export`, Enter. **On base:** Enter runs `action_export`, which stops at `nothing selected — tick a row with ␣ or press a` (`:2061-2062`; `build_plan` `:426-429`). That writes 0 files and no `Exported`, so the case is GREEN on base. It is also GREEN with the mutant "`action_export`'s hidden guard removed". So the row's negative control ("the `#sje_export` Enter writes files") does not hold for the case as written. A tick cannot be added after Esc: I-6 refuses `a` while the window is hidden. **Consequence.** SR2-1's code mitigation would reach E5 with a case that cannot fail. | **Tick while shown.** In /4 and in the row's input clause: open, `a` (all ranges ticked), Esc, focus `#sje_export`, Enter. Before Enter, assert the precondition: the ranges selection holds all rows, so a lost tick fails instead of passing. Expected: 0 files, no message starting `Exported`, and the newest status does not start `nothing selected`, so the 0 comes from the hidden guard. Add the base note as /1 has: `Exported 4 files` (the P3 shape, one `e` after `a`). | finding `not-run` (code reading); mitigation absent |
+
+### Evidence checklist (round 3)
+
+- ✓ Each finding has what, where, why and a fix (table above).
+- ✓ Each finding has a severity: R3-1 MAJOR.
+- ✓ No secret values appear in this section. None appear in the records or the code read.
+- ✓ The verdict is explicit: 10a FAIL on R3-1. No HIGH is open. The code mitigations stay `planned`.
+- ✓ No new tool or integration (n/a). The write surface re-checked is the Split / Join export, through each of its routes: binding, button, key bar and palette.

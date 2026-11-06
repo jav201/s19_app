@@ -40,3 +40,7 @@ Architect: **10a PASS-WITH-NOTES, 10b PASS-WITH-NOTES** (A10-01 … A10-04 close
 - **Interfaces:** name the shared `segment_split_view.py` in both parts' interface lists.
 
 Correction: DeepSeek v4 Pro, targeted edits only (the operator's 2026-11-06 reminder: DeepSeek where pertinent; Opus reviews behind it). Then the security reviewer re-checks SR2-1.
+
+## Round 3 (2026-11-06)
+
+Security re-check: SR2-1 and SR2-2 **closed** (`action_export` is the only caller of the write; its hidden-window guard covers the `e` key, Enter or click on EXPORT and the key-bar token). New **R3-1 (MAJOR, case only):** R-SEG-OPEN.7/4 could not fail (no row ticked, so the base stops at "nothing selected"). Fixed by the orchestrator in `02-test-cases.md`: the precondition ticks every row with `a` and asserts the ticks before the trigger. No design change. **E3 closed for 10a and 10b.**
