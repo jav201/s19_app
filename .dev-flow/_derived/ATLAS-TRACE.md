@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 92 requirement files | corpus digest: 949d3892dfc2b943 -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 93 requirement files | corpus digest: 8149a7c96b3537ca -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
@@ -1522,7 +1522,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 2377 unique id(s)
+## family US/HLR/LLR — 2380 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -3884,6 +3884,9 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `US-REL-1` | batches |
 | `US-SEC-1` | batches |
 | `US-SEG-RESP-1` | batches |
+| `US-SYM-1` | batches |
+| `US-SYM-2` | batches |
+| `US-SYM-3` | batches |
 | `US-TST-1` | batches |
 | `US-TST-2` | batches |
 | `US-TST-3` | batches |
@@ -3913,7 +3916,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `R-CDFX-005` | batches |
 | `R-CDFX-016` | batches |
 | `R-CDFX-018` | batches |
-| `R-CHG-001` | canon |
+| `R-CHG-001` | batches, canon |
 | `R-CHG-002` | batches, canon, tests |
 | `R-CHG-003` | batches, canon |
 | `R-CHG-004` | canon |
@@ -4344,7 +4347,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `R-TUI-055` | batches |
 | `R-TUI-056` | batches |
 | `R-TUI-057` | batches, canon |
-| `R-TUI-058` | batches, canon |
+| `R-TUI-058` | batches, canon, tests |
 | `R-TUI-059` | batches, canon, tests |
 | `R-TUI-060` | batches, canon, tests |
 | `R-TUI-061` | batches, canon, tests |
@@ -4441,7 +4444,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `R-VAR-003` | batches |
 | `R-VER-001` | canon |
 
-## family AT/TC — 2014 unique id(s)
+## family AT/TC — 2015 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -4761,6 +4764,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `AT-1` | batches |
 | `AT-10` | batches |
 | `AT-100` | batches, tests |
+| `AT-1000` | batches |
 | `AT-101` | batches, tests |
 | `AT-102` | batches, tests |
 | `AT-103` | batches, tests |
