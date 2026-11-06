@@ -1,0 +1,107 @@
+# Inc 5 E1 confirmation pilot - LAN Linux host, worktree at c2cba35 (detached), python 3.11 env s19ci, NO_COLOR unset
+# command: cd <worktree> && python i5e1-pilot.py /tmp/i5e1/run  (exit 0)
+s19_app.__file__ = /tmp/i5e1/wt/s19_app/__init__.py
+{
+  "scenario": "D4",
+  "ranges": [
+    "0x8000-0x8008",
+    "0x8010-0x8018"
+  ],
+  "preview_before_apply": "Active policy: join=concat\nconcat: 0x9C5BCBBD\nfill:   0x2A8A3950",
+  "oracle_before": "0x9C5BCBBD",
+  "status_lines": [
+    "Loaded change: 1 entry, 0 error(s)",
+    "Apply: 1 applied, 0 skipped, 0 blocked"
+  ],
+  "byte_0x8003_after": "0xAA",
+  "same_mem_map_object": true,
+  "recomputes_after_apply": 0,
+  "preview_after_apply": "Active policy: join=concat\nconcat: 0x9C5BCBBD\nfill:   0x2A8A3950",
+  "oracle_after": "0x08DAAFB7",
+  "designer_concat_after": "0x9C5BCBBD",
+  "designer_matches_post_apply_bytes": false
+}
+{
+  "scenario": "D4b",
+  "ranges": [
+    "0x8000-0x8008",
+    "0x8010-0x8018"
+  ],
+  "preview_before_apply": "Active policy: join=concat\nconcat: 0x9C5BCBBD\nfill:   0x2A8A3950",
+  "oracle_before": "0x9C5BCBBD",
+  "status_lines": [
+    "Loaded change: 1 entry, 0 error(s)",
+    "Apply: 1 applied, 0 skipped, 0 blocked"
+  ],
+  "byte_0x8003_after": "0xAA",
+  "same_mem_map_object": true,
+  "recomputes_after_apply": 0,
+  "preview_after_apply": "Active policy: join=concat\nconcat: 0x9C5BCBBD\nfill:   0x2A8A3950",
+  "oracle_after": "0x08DAAFB7",
+  "designer_concat_after": "0x9C5BCBBD",
+  "designer_matches_post_apply_bytes": false
+}
+{
+  "scenario": "CHK",
+  "measurable_params": 462,
+  "params_sharing_address_and_size": 0,
+  "params_sharing_address_any_size": 0,
+  "picked": [
+    "VALUE_0001",
+    "VALUE_0002"
+  ],
+  "head_before_write": "3 fields: 2 params · 1 memory row",
+  "write_status": [
+    "Check Editor: wrote pilot_fields.chk.json (3 fields, kind=check)."
+  ],
+  "F26_head_after_write": "3 fields: 2 params · 1 memory row",
+  "F26_picks_after_write": [
+    "VALUE_0001",
+    "VALUE_0002"
+  ],
+  "written_entries": [
+    {
+      "type": "bytes",
+      "address": "0x0",
+      "bytes": "6C"
+    },
+    {
+      "type": "bytes",
+      "address": "0x14",
+      "bytes": "A0 BE"
+    },
+    {
+      "type": "bytes",
+      "address": "0xC00FFC",
+      "bytes": "FF FF FF FF"
+    }
+  ],
+  "R010_picks_after_same_a2l_reattached_and_return": [],
+  "image_byte_changed": "VALUE_0001 @ 0x00000000: 0x6C -> 0x93",
+  "load_status": [
+    "Check Editor: loaded 'pilot_fields.chk.json' (3 fields)."
+  ],
+  "F27_head_after_reload": "3 fields: 0 params · 3 memory rows",
+  "F27_picks_after_reload": [],
+  "F27_memory_rows_after_reload": [
+    [
+      "0x00000000",
+      "field @ 0x00000000",
+      1
+    ],
+    [
+      "0x00000014",
+      "field @ 0x00000014",
+      2
+    ],
+    [
+      "0x00C00FFC",
+      "field @ 0x00C00FFC",
+      4
+    ]
+  ],
+  "D9_11_validate_status": [
+    "Checks: 3 passed, 0 failed, 0 uncheckable"
+  ],
+  "D9_11_expected_if_spec_bytes_kept": "Checks: 2 passed, 1 failed, 0 uncheckable"
+}
