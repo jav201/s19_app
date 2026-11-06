@@ -27,7 +27,7 @@ from s19_app.tui.services.flow_model import (
     SourceBlock,
     WriteOutBlock,
 )
-from tests.b97_probes import settled
+from tests.b97_probes import painted_rows, settled
 
 #: Minimal CLEAN S19 — 01 02 03 04 at 0x1000 (checksum-verified).
 _S19 = "S107100001020304DE\nS9030000FC\n"
@@ -486,7 +486,8 @@ def test_tc_b94_27_lane_binding_isolation_and_noop(tmp_path: Path) -> None:
     Inc 15 (R-TST-152, R-TST-153, R-TST-154, R-TST-155, R-TST-163): the
     reads after each Bind wait through the shared wait for the panel's
     bind step to return (a recorder on ``_rebind``), so the no-op arm is
-    non-vacuous.
+    non-vacuous. The reads after the imports wait for both lanes on screen
+    (D9), and lane B's paint is read off the compositor (E5 C-6, C-10).
     """
     project = _project(tmp_path)
 
@@ -499,7 +500,15 @@ def test_tc_b94_27_lane_binding_isolation_and_noop(tmp_path: Path) -> None:
             await _import_stem(app, pilot, "base")
             await pilot.pause()
             await _import_stem(app, pilot, "base")
-            await pilot.pause()
+            await settled(
+                pilot,
+                lambda: (
+                    panel.lane_names() == ["base", "base_2"]
+                    and bool(app.query("#fx_in_1_0"))
+                    and bool(app.query_one("#fx_in_1_0").region)
+                ),
+                "TC-B94-27: the panel mounted lanes base and base_2",
+            )
             before_b = panel.lane_bindings("base_2")
             field_b = app.query_one("#fx_in_1_0", Input).value
             dirty_before_noop = panel.is_dirty
@@ -536,7 +545,11 @@ def test_tc_b94_27_lane_binding_isolation_and_noop(tmp_path: Path) -> None:
             after_a = panel.lane_bindings("base")
             after_b = panel.lane_bindings("base_2")
             field_b_after = app.query_one("#fx_in_1_0", Input).value
-            paint_b = panel.lane_paint_plain(1)
+            lane_b = app.query_one("#fx_lane_1")
+            shown = app.screen.find_widget(lane_b)
+            paint_b = "\n".join(
+                painted_rows(app, lane_b, shown.region.intersection(shown.clip))
+            )
             return {
                 "before_b": before_b,
                 "field_b": field_b,

@@ -43,6 +43,7 @@ import sys
 import time
 import xml.etree.ElementTree as etree
 import zipfile
+from collections import Counter
 from pathlib import Path
 
 import pytest
@@ -2112,10 +2113,12 @@ def test_r_tst_082_wrong_version_still_differs(monkeypatch) -> None:
 # ---------------------------------------------------------------------------
 
 
-#: The eight static wait sites of table D (01-requirements.md): (module, arm,
-#: helper-or-none, trigger-as-unparse, description). "helper or none" is the
-#: arm's nested ``_drive`` body for D1 … D5 and D7 (N1); ``_apply`` and
-#: ``_confirm_with`` are nested inside ``_drive``.
+#: The nine static wait sites of table D (01-requirements.md): (module, arm,
+#: helper-or-none, trigger-as-unparse, description, predicate-as-unparse).
+#: "helper or none" is the arm's nested ``_drive`` body for D1 … D5, D7 and D9
+#: (N1); ``_apply`` and ``_confirm_with`` are nested inside ``_drive``. The
+#: predicate column pins each wait's sign (E5 C-2): a vacuous or swapped
+#: predicate has to edit this table, where review sees it.
 _INC15_WAIT_SITES = (
     (
         "tests/test_tui_patch_editor_v2.py",
@@ -2123,6 +2126,10 @@ _INC15_WAIT_SITES = (
         None,
         "panel.request_action('load_doc')",
         "TC-331: the load of f.json reached the change document",
+        (
+            "lambda: app._change_service.document.source_path is not None and "
+            "app._change_service.document.source_path.name == 'f.json'"
+        ),
     ),
     (
         "tests/test_tui_patch_editor_v2.py",
@@ -2130,6 +2137,7 @@ _INC15_WAIT_SITES = (
         None,
         "_seed_via_paste(app, paste)",
         "TC-331: the parsed paste reached the change document",
+        "lambda: app._change_service.document.source_path is None",
     ),
     (
         "tests/test_tui_flow_execution_b94.py",
@@ -2137,6 +2145,7 @@ _INC15_WAIT_SITES = (
         None,
         "_bind(app, 0, 0, 'base.s19')",
         "TC-B94-27: the panel handled the Bind to the same ref",
+        "lambda: len(rebind_calls) >= 1",
     ),
     (
         "tests/test_tui_flow_execution_b94.py",
@@ -2144,6 +2153,7 @@ _INC15_WAIT_SITES = (
         None,
         "_bind(app, 0, 0, 'variant_b.hex')",
         "TC-B94-27: the panel handled the Bind to variant_b.hex",
+        "lambda: len(rebind_calls) >= 2",
     ),
     (
         "tests/test_tui_patch_editor_v2.py",
@@ -2151,6 +2161,10 @@ _INC15_WAIT_SITES = (
         None,
         "select.value = 'dropped.json'",
         "AT-030c: the load of dropped.json reached the change document",
+        (
+            "lambda: app._change_service.document.source_path is not None and "
+            "app._change_service.document.source_path.name == 'dropped.json'"
+        ),
     ),
     (
         "tests/test_tui_patch_editor_v2.py",
@@ -2158,6 +2172,7 @@ _INC15_WAIT_SITES = (
         "_apply",
         "panel.request_action('apply_doc')",
         "TC-051: the apply showed the save-back prompt",
+        "lambda: not prompt.has_class('hidden')",
     ),
     (
         "tests/test_tui_patch_editor_v2.py",
@@ -2165,6 +2180,7 @@ _INC15_WAIT_SITES = (
         None,
         "app.query_one('#patch_saveback_decline_button', Button).press()",
         "TC-051: the decline hid the save-back prompt",
+        "lambda: prompt.has_class('hidden')",
     ),
     (
         "tests/test_tui_patch_editor_v2.py",
@@ -2172,6 +2188,18 @@ _INC15_WAIT_SITES = (
         "_confirm_with",
         "app.query_one('#patch_saveback_confirm_button', Button).press()",
         "TC-051: the confirm hid the save-back prompt",
+        "lambda: prompt.has_class('hidden')",
+    ),
+    (
+        "tests/test_tui_flow_execution_b94.py",
+        "test_tc_b94_27_lane_binding_isolation_and_noop",
+        None,
+        "await _import_stem(app, pilot, 'base')",
+        "TC-B94-27: the panel mounted lanes base and base_2",
+        (
+            "lambda: panel.lane_names() == ['base', 'base_2'] and "
+            "bool(app.query('#fx_in_1_0')) and bool(app.query_one('#fx_in_1_0').region)"
+        ),
     ),
 )
 
@@ -2234,6 +2262,12 @@ def _settled_description(statement):
     return None
 
 
+def _settled_predicate(statement):
+    """The predicate of an ``await settled(pilot, <predicate>, ...)`` statement,
+    as ``ast.unparse`` (call it after ``_settled_description`` matched)."""
+    return ast.unparse(statement.value.value.args[1])
+
+
 def _calls_named(node, name: str) -> bool:
     """True when ``node`` is a call whose function is the bare name ``name``."""
     return (
@@ -2291,16 +2325,16 @@ def _settled_bindings(tree) -> list:
 
 
 def test_r_tst_154_155_inc15_arms_wait_through_settled() -> None:
-    """R-TST-154, R-TST-155, R-TST-163: the eight table-D wait sites of the
+    """R-TST-154, R-TST-155, R-TST-163: the nine table-D wait sites of the
     four Inc 15 arms go through ``tests.b97_probes.settled``, pass their
-    table-D descriptions verbatim, and sit as the statement directly after
-    their trigger in the same block; each arm holds exactly its table-D count
-    of ``settled`` calls and no ``range``-counted pause loop or module-local
-    ``_settled``."""
-    from collections import Counter
-
+    table-D descriptions verbatim and their pinned predicates, and sit as the
+    statement directly after their trigger in the same block (a trigger that
+    repeats in the block is keyed on its last occurrence, which the reads
+    follow); each arm holds exactly its table-D count of ``settled`` calls
+    and no ``range``-counted pause loop and no call of a module-local wait
+    helper (``_settled``, ``_wait_for``)."""
     expected = Counter(
-        (module, arm) for (module, arm, _h, _t, _d) in _INC15_WAIT_SITES
+        (module, arm) for (module, arm, _h, _t, _d, _p) in _INC15_WAIT_SITES
     )
 
     # R-TST-155: the name ``settled`` the sites call is the shared wait.
@@ -2311,7 +2345,7 @@ def test_r_tst_154_155_inc15_arms_wait_through_settled() -> None:
             f"tests.b97_probes, found {_settled_bindings(tree)}"
         )
 
-    for module_rel, arm_name, helper, trigger, description in _INC15_WAIT_SITES:
+    for module_rel, arm_name, helper, trigger, description, predicate in _INC15_WAIT_SITES:
         module_path = REPO_ROOT / module_rel
         arm = _arm_function(module_path, arm_name)
         drive = _nested_def(arm, "_drive")
@@ -2322,9 +2356,9 @@ def test_r_tst_154_155_inc15_arms_wait_through_settled() -> None:
             helper_def = _nested_def(drive, helper)
             assert helper_def is not None, f"{arm_name}: nested {helper} missing"
             body = helper_def.body
-        index = next(
+        index = max(
             (i for i, stmt in enumerate(body) if ast.unparse(stmt) == trigger),
-            None,
+            default=None,
         )
         assert index is not None, (
             f"{arm_name} › {helper or '_drive'}: trigger {trigger!r} not found"
@@ -2333,6 +2367,10 @@ def test_r_tst_154_155_inc15_arms_wait_through_settled() -> None:
         assert _settled_description(following) == description, (
             f"{arm_name} › {helper or '_drive'}: the statement after "
             f"{trigger!r} must be an `await settled` passing {description!r}"
+        )
+        assert _settled_predicate(following) == predicate, (
+            f"{arm_name} › {helper or '_drive'}: the wait after {trigger!r} "
+            f"must poll the table-D predicate {predicate!r}"
         )
 
     for (module_rel, arm_name), want in sorted(expected.items()):
@@ -2343,8 +2381,9 @@ def test_r_tst_154_155_inc15_arms_wait_through_settled() -> None:
         assert settled_calls == want, (
             f"{arm_name}: {settled_calls} settled() calls, expected {want}"
         )
-        local_settled = sum(
-            1 for node in ast.walk(arm) if _calls_named(node, "_settled")
-        )
-        assert local_settled == 0, f"{arm_name} uses the module-local _settled"
+        for local_wait in ("_settled", "_wait_for"):
+            local_calls = sum(
+                1 for node in ast.walk(arm) if _calls_named(node, local_wait)
+            )
+            assert local_calls == 0, f"{arm_name} uses the module-local {local_wait}"
         assert not _pause_loops(arm), f"{arm_name} has a range-counted pause loop"
