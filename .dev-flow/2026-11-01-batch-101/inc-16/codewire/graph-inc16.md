@@ -13,11 +13,11 @@
 | 5 | `docs/README.md` | edit: short index of CTX-DOCINDEX; no state block, no batch table, no CDFX, no diagrams link | R-DOC-REF.2, R-DOC-REF.6, R-DOC-DEV.9, R-DOC-DEV.10 |
 | 6 | `docs/overview.md` | edit: 13 windows by rail label, twelve, no test count, Operations placeholders, no diagrams link | R-DOC-REF.2, R-DOC-DEV.11 … R-DOC-DEV.14 |
 | 7 | `README.md` | edit `:465`: delete the diagrams row | R-DOC-REF.2, R-DOC-README.4 |
-| 8 | `docs/architecture.md` | edit (D-4): §1–§9 fixed in place (evidence paths → `.dev-flow/2026-10-12-batch-94/evidence/…`, no test count, `≤ 4 source files`, no diagrams link); §10 module table without `prototypes/**` + sub-module table; §11 one Interfaces table; banners and batch blocks out | R-DOC-REF.1 … R-DOC-REF.3, R-DOC-DEV.12, R-DOC-DEV.13, R-DOC-ARCH.1 … R-DOC-ARCH.6 |
-| 9 | `.dev-flow/design/archive/architecture-batch-declarations-88-100.md` | create: the removed blocks, verbatim | R-DOC-ARCHIVE.2 |
-| 10 | `PENDIENTES-batch96.md` | git mv → `.dev-flow/design/archive/PENDIENTES-batch96.md` | R-DOC-ARCHIVE.1, R-DOC-REF.3 |
-| 11 | `docs/crc-algorithm-designer/01-requirements.md` | git mv → `.dev-flow/design/archive/crc-algorithm-designer-requirements-draft-2026-07-20.md` | R-DOC-ARCHIVE.1, R-DOC-REF.1 |
-| 12 | `tools/synth/VERIFY.md` | git mv → `.dev-flow/design/archive/synth-case08-release-demo-VERIFY.md` | R-DOC-ARCHIVE.1 |
+| 8 | `docs/architecture.md` | edit (D-4): §1–§9 fixed in place (evidence paths → `.dev-flow/2026-10-12-batch-94/evidence/…`, no test count, `≤ 4 source files`, no diagrams link); §10 module table without `prototypes/**` + sub-module table (8 facts, no import rule for `flow_screens.py`, E3 A16-4); §11 one Interfaces table of the 57 CTX-IFACE contracts (every landed contract, E3 A16-5); banners and batch blocks out | R-DOC-REF.1 … R-DOC-REF.3, R-DOC-DEV.12, R-DOC-DEV.13, R-DOC-ARCH.1 … R-DOC-ARCH.6 |
+| 9 | `.dev-flow/design/archive/architecture-batch-declarations-88-100.md` | create: the removed blocks, verbatim | R-DOC-ARCHIVE.2, R-DOC-ARCHIVE.4 |
+| 10 | `PENDIENTES-batch96.md` | git mv → `.dev-flow/design/archive/PENDIENTES-batch96.md`; redact the drive path at `:3` (D-8) | R-DOC-ARCHIVE.1, R-DOC-ARCHIVE.4, R-DOC-REF.3 |
+| 11 | `docs/crc-algorithm-designer/01-requirements.md` | git mv → `.dev-flow/design/archive/crc-algorithm-designer-requirements-draft-2026-07-20.md` | R-DOC-ARCHIVE.1, R-DOC-ARCHIVE.4, R-DOC-REF.1 |
+| 12 | `tools/synth/VERIFY.md` | git mv → `.dev-flow/design/archive/synth-case08-release-demo-VERIFY.md` | R-DOC-ARCHIVE.1, R-DOC-ARCHIVE.4 |
 | 13 | `docs/diagrams/architecture.md` | git rm | R-DOC-ARCHIVE.3, R-DOC-REF.1, R-DOC-REF.5, R-DOC-REF.6 |
 | 14 | `s19_app/tui/operations/requirements/REQ-crc.md` | git rm (CODE-CHANGES D13-17) | R-DOC-ARCHIVE.3 |
 | 15 | `examples/case_00_public/from_source_input.txt`, `s19_sample.txt` | git rm | R-DOC-ARCHIVE.3 |
@@ -34,4 +34,4 @@ Counts per action: edit 9 documents + 2 source comment-only + 8 test comment-onl
 
 ## Interfaces with other increments
 
-Listed in `E1-rulings.md` §6. The one code-facing interface: `s19_app/tui/flow_screens.py:10` cites `docs/architecture.md` §10 for the read-only data edge `flow_screens → services/flow_model`; R-DOC-ARCH.4 keeps that edge declared in §10 (Incs 9 and 12 change `flow_screens.py`). A later change to a CTX-IFACE contract amends §11's single Interfaces table (R-DOC-ARCH.5).
+Listed in `E1-rulings.md` §6. The one code-facing interface: the module docstring of `s19_app/tui/flow_screens.py` (`:5-10`) cites `docs/architecture.md` §10 for "the one declared data edge `flow_screens → services/flow_model`", a rule the module breaks (`:119` imports `services/flow_persistence_service`). R-DOC-ARCH.4 keeps §10, so the citation resolves, and stops stating the rule (E3 ruling A16-4); the docstring fix is a backlog row routed to Inc 9 (Incs 9 and 12 change `flow_screens.py`). A later change to a CTX-IFACE contract amends §11's single Interfaces table (R-DOC-ARCH.5).

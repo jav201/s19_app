@@ -23,12 +23,12 @@ Count: **3 of 4** (2 comment-only Python files + 1 document deleted from the pac
 | edit | `docs/README.md` (short index; no state block, no batch table, no CDFX) | REF.2, REF.6, DEV.9, DEV.10 |
 | edit | `docs/overview.md` | REF.2, DEV.11 … DEV.14 |
 | edit | `README.md:465` (delete the diagrams row) | REF.2, R-DOC-README.4 |
-| edit | `docs/architecture.md` (D-4 shape) | REF.1 … REF.3, DEV.12, DEV.13, ARCH.1 … ARCH.6 |
-| edit | `examples/case_00_public/MANIFEST.md` | DEV.15 |
-| create | `.dev-flow/design/archive/architecture-batch-declarations-88-100.md` (verbatim blocks from `docs/architecture.md`) | ARCHIVE.2 |
-| git mv | `PENDIENTES-batch96.md` → `.dev-flow/design/archive/PENDIENTES-batch96.md` | ARCHIVE.1, REF.3 |
-| git mv | `docs/crc-algorithm-designer/01-requirements.md` → `.dev-flow/design/archive/crc-algorithm-designer-requirements-draft-2026-07-20.md` | ARCHIVE.1, REF.1 |
-| git mv | `tools/synth/VERIFY.md` → `.dev-flow/design/archive/synth-case08-release-demo-VERIFY.md` | ARCHIVE.1 |
+| edit | `docs/architecture.md` (D-4 shape as amended at E3: §10 sub-module table of 8 facts, no import rule for `flow_screens.py`; §11 one table of the 57 CTX-IFACE contracts) | REF.1 … REF.3, DEV.12, DEV.13, ARCH.1 … ARCH.6 |
+| edit | `examples/case_00_public/MANIFEST.md` (also reword `:3`, "stress-test S19Tool", E3 A16-7) | DEV.15 |
+| create | `.dev-flow/design/archive/architecture-batch-declarations-88-100.md` (verbatim blocks from `docs/architecture.md`) | ARCHIVE.2, ARCHIVE.4 |
+| git mv | `PENDIENTES-batch96.md` → `.dev-flow/design/archive/PENDIENTES-batch96.md`; in the moved copy the drive path at `:3` is redacted (D-8) | ARCHIVE.1, ARCHIVE.4, REF.3 |
+| git mv | `docs/crc-algorithm-designer/01-requirements.md` → `.dev-flow/design/archive/crc-algorithm-designer-requirements-draft-2026-07-20.md` | ARCHIVE.1, ARCHIVE.4, REF.1 |
+| git mv | `tools/synth/VERIFY.md` → `.dev-flow/design/archive/synth-case08-release-demo-VERIFY.md` | ARCHIVE.1, ARCHIVE.4 |
 | git rm | `docs/diagrams/architecture.md` | ARCHIVE.3, REF.1, REF.5, REF.6 |
 | git rm | `examples/case_00_public/from_source_input.txt`, `examples/case_00_public/s19_sample.txt` | ARCHIVE.3 |
 | git rm -r | `.fast-dev-flow/` (33 files) | ARCHIVE.3, REF.3, REF.4 |
@@ -45,7 +45,7 @@ Count: **3 of 4** (2 comment-only Python files + 1 document deleted from the pac
 | comment only | `tests/test_tui_patch_editor_v2.py:1905`, `tests/test_tui_snapshot.py:413` | REF.4 |
 | docstring only | `tests/test_tui_map_big.py:2918` (helper `_demo_loaded`), `tests/test_tui_patch_layout.py:287` (helper `_fully_visible`) | REF.3 |
 | guard, body widened | `tests/test_docs_canon.py::test_at285_no_live_cdfx_or_s19tool_console_script_token` — scope from 3 files to every repository document (CTX-DOCHYG); `_HISTORIC` and `_S19TOOL_OK` gain the shapes of CTX-DOCHYG (`retired`, `moved`, `.s19tool\`, `s19tool.egg-info`, `pip <verb> s19tool`); docstring cites R-DOC-REF.5, R-DOC-REF.6 | REF.5, REF.6 |
-| guard, new file | `tests/test_b101_doc_hygiene.py` (E4 tester) — one test per row family, names carrying the row id (`test_r_doc_ref_1_…` … `test_r_doc_archive_3_…`) | REF.1 … REF.4, DEV.1 … DEV.15, ARCH.1 … ARCH.6, ARCHIVE.1, ARCHIVE.3 |
+| guard, new file | `tests/test_b101_doc_hygiene.py` (E4 tester) — one test per row family, names carrying the row id (`test_r_doc_ref_1_…` … `test_r_doc_archive_3_…`) | REF.1 … REF.4, DEV.1 … DEV.15, ARCH.1 … ARCH.6, ARCHIVE.1, ARCHIVE.3, ARCHIVE.4 |
 
 New test file: **1** → `tests/test_id_registry.py` `EXPECTED_SCANNED_TEST_FILES` is re-measured at integration. The guards read text and `git ls-files` only; none imports `s19_app` (ARCH.1 reads `git ls-files '*.py'`; DEV.2 reads `s19_app/cli.py` as text).
 
@@ -69,4 +69,4 @@ New test file: **1** → `tests/test_id_registry.py` `EXPECTED_SCANNED_TEST_FILE
 | Files removed (`git rm`) | 37 (33 `.fast-dev-flow/`, diagrams, `REQ-crc.md` counted in §1, 2 example `.txt`) |
 | Test files with comment/docstring edits | 8 |
 | Test files with guard changes | 2 (1 widened, 1 new) |
-| Requirements | 31 (30 new + `R-DOC-README.4` unchanged) |
+| Requirements | 32 (31 new + `R-DOC-README.4` unchanged; `R-DOC-ARCHIVE.4` added at E3) |
