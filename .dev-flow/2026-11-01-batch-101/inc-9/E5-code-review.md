@@ -133,3 +133,118 @@ There are ten MINOR findings, all recommendations:
 ## §4b Independent review cell
 
 `code-reviewer · PASS-WITH-NOTES · no HIGH (none to resolve); open as recommendations, all MINOR: CR-01 cut name can equal another file's stem (US-I9-2 vs R-FLOW-FILE.13/2, needs a ruling); CR-02 samestat clause has no node; CR-03 claim error arms have no node; CR-04 raw os.symlink, no named skip on Windows; CR-05 handler and save docstrings (Summary, Raises OSError, Used by); CR-06 leftover single-edge claims in flow_screens.py; CR-07 part of check (d) outside try; CR-08 triple "next candidate" step; CR-09 /8/1 and /14/5 assert less than their row; CR-10 BL-I9-4 omits the empty-folder residual`
+
+## Re-review of the corrective (code + security)
+
+Reviewer: code-reviewer, the author of CR-01 … CR-10; I wrote none of the corrective. Scope: `git diff b204c7d 3f8b9e9 -- s19_app tests`, plus the records the commit changed: `01-requirements.md`, `02-test-cases.md`, `E1-rulings.md`, `E3-rulings.md`, `E4-rulings.md` and `codewire/graph-inc9.md`. I read them against `E5-rulings.md`, `E5-corrective-notes.md`, `E5-security.md`, `E5-coverage-audit.md`, the transcripts `e5c-01` … `e5c-07` and `win-02`. Head `d6f1801`; `d6f1801` adds evidence only, so `s19_app/`, `tests/` and `docs/` equal `3f8b9e9` (`git diff --quiet`), and the working tree is clean for both. Lens: code, and security on the changed items only. Severity uses the flow scale: LOW = MINOR, INFO = note.
+
+I ran nothing that imports `s19_app`. Tree check: a scratch index (`read-tree e07fb00` + `git diff --binary e07fb00 3f8b9e9 -- s19_app tests docs README.md | git apply --cached`) gives **`608f5e91…`**, the tree that e5c-02, e5c-03 and e5c-07 ran. Windows: two stdlib-only probes under `-I`, with files only in my session scratchpad (removed afterwards), `LOCALAPPDATA` pointed at the scratchpad and no clipboard, on Python 3.12.7. Probe 1 replays /14/9's swap, close and re-point sequence and the cleanup's two clauses. Probe 2 checks the `os.readlink` prefix that `_link_points_at` strips.
+
+### Verdict
+
+**PASS-WITH-NOTES.** Every ruling is met as ruled, and there is no HIGH or MEDIUM finding.
+- **Code:** I found no new defect in `_create_new_json` or `_unlink_own_claim`: every error path closes the descriptor before any unlink, and every cleanup unlink passes the ownership rule.
+- **Mutants:** each new node fails under its named mutant on the final tree.
+- **Census:** the TC-B99-13 allow-list move is exact.
+- **The corrective's own calls:** E-1 … E-7 are sound.
+- **Four notes, none blocking:**
+  - RR-1 (records): the empty-folder residual now understates what is left.
+  - RR-2 (carried, volume): the new one-link clause widens the false-refusal surface on unprobed volumes.
+  - RR-3 (test): /14/9 does not assert its own premise.
+  - RR-4 (INFO, records): `02-test-cases.md` does not cite `win-02` yet.
+
+### Rulings, checked on the diff
+
+| Ruling | Met? | Evidence (file:line on `3f8b9e9`) | State |
+|---|---|---|---|
+| CR-02 | yes | `/14/10` `[flow, set]` (S:662): a planted regular file, so only `samestat` (P:1174) can refuse. M22 → both ids `DID NOT RAISE` (e5c-02). The planted file is neither written nor removed. | executed (cited) · approved |
+| CR-03 + QA-4 | yes, as ruled (flow only) | `/14/8[render, write, lstat, taken-by-folder]` (S:561). Each mutant fails only its own arm: M26 (render after the claim), M27 (write-arm cleanup dropped), M28 (`except OSError` narrowed), M29 (re-raise every non-`FileExistsError`). The `lstat` arm asserts the sentinel `state["failed"]`, so it cannot pass vacuously. `WorkareaContainmentError` is a `ValueError`, so the write arm's `pytest.raises(OSError)` plus its `errno` check discriminates. | executed (cited) · approved |
+| CR-04 (+ QA-6) | yes | `_symlink_or_skip` (S:87) uses the house text. `_require_symlinks` (S:97) runs before any wrapper is patched, in `_windows_follow` (S:151) and `_swap_home_for_link` (S:160). `_repoint_home_at_close` (S:187) is used only after `_swap_home_for_link` has probed. `_link_file` (S:365) uses the skip. U makes links only through `make_junction` (U:130). The probe's dangling file link needs the same Windows privilege as a directory link (E-5). | executed (read) · approved |
+| CR-05 | yes | `_create_new_json`, `save_flow_json` and `save_chain_set` gain `Raises: OSError`. `save_flow_json` Used by (P:1270). `save_chain_set` gains Data Flow and Dependencies (P:1769-1785). `run_chain_set` Used by names `on_flow_execution_panel_external_step_confirmed` (`flow_execution_service.py:2006`; the handler is at `app.py:4448`). Both handler Summaries name the refusal (`app.py:4000-4002`, `:4555-4558`). | executed (read, grep) · approved |
+| CR-06 | yes | `flow_screens.py:44`, `:1412-1416`, `:3077-3078`, `:3206`. A grep for `declared R8`, `R8 declared`, `never imports the execution`, `single edge` and `declared edge` finds nothing. The new `Uses` entry matches `fps.*` at `:827`, `:2241`, `:2273`, `:2279`. | executed (grep) · approved |
+| CR-07 + SE5-2 | yes | All reads of the check sit in one `try` (P:1168-1179): `fstat`, `lstat`, the reparse test and `realpath`. `_unlink_own_claim` (P:985-1035) unlinks only when `claim` is not `None`, `samestat(claim, lstat(candidate))` holds and `realpath(candidate).parent == resolved_home`. It is called on the refusal path (P:1182, after the close at P:1181) and on the write failure (P:1202, after the `with` has closed the handle). SE5-2's case is `/14/9` (S:635); M24 → victim deleted → RED (e5c-02). | executed (read; cited) · approved |
+| SE5-1 (nlink half) | yes | `st.st_nlink == 1` (P:1173). `/14/11` `[flow, set]` (S:686); M23 → `DID NOT RAISE` (e5c-02). BL-I9-10 is recorded (`E1-rulings.md:74`). | executed (cited) · approved |
+| SE5-3 + CR-10 | yes, except RR-1 | The docstring (P:1102-1114), BL-I9-4 (`E1-rulings.md:69`), the R-FLOW-FILE.14 note (`01-requirements.md:56`), the annotation on E3 S-1 and the graph entity now state the residual under a concurrent writer: an empty file, content only under a double swap (BL-I9-10), never an overwrite, and no junction followed at the free name. Each clause matches the code, except the parent-swap clause (RR-1). | executed (read) · RR-1 |
+| CR-08 | yes | One walk (P:1126-1130): `<clean>.json`, then `_2`, `_3`, …, with `next(names)` per pass and no other change. The numbering nodes are GREEN (e5c-07) and `/14/8[taken-by-folder]` → `z_2`. | executed (read; cited) · approved |
+| CR-09, QA-2, QA-8 | yes (with E-1) | `/8/1` checks the link unchanged (S:450). `/14/1`, `/14/2`, `/8/1` and `/8/2` check the link through `_link_points_at`. `/14/2` and `/8/2` also check the parent. `re.fullmatch` replaces `startswith`. `20/2` asserts that no line reads `- **Mode:** sequential`, placed before the positive line (U:342); M30 fails there (e5c-03). M31 fails the new link lines (e5c-02). | executed (cited) · approved |
+| QA-3 | yes | `/14/7` `[flow, set]` (S:518) links to a sibling inside the home, so the real-parent clause passes and only the link clauses can refuse. M14b (S_ISREG, `samestat` and the reparse test dropped) → `DID NOT RAISE` (e5c-02). The form of M14b is E-4's, the closest one to QA-3's once `owned` no longer exists. | executed (cited) · approved |
+| CR-04 named skips on Windows | run, path not taken | `win-02` (head `3f8b9e98`): 46 passed, 2 skipped (the POSIX-mode skip of /14/6). This account holds the symlink privilege, so no named skip fired and the skip path itself is unexercised. That is expected. | executed (cited) |
+
+### The corrective's own calls
+
+- **E-1 (CR-09 against SE5-2 on /14/5): sound, and I accept the supersession as CR-09's author.**
+  - CR-09 asked for an oracle as exact as the code. Its premise, "the code removes the claim", was true only before SE5-2.
+  - Under the ruled rule, a claim whose real parent is not the approved home is never unlinked. Folder O holding exactly the empty `z.json` is therefore the exact oracle.
+  - M25 (the cleanup's real-parent clause dropped) fails /14/5 alone (e5c-02), so the clause has an isolating node. BL-I9-4 permits the empty file.
+- **The extra cases /14/11 (and 8/9) and /14/10 (and 8/8): sound.**
+  - "A clause no node can fail is unproven" (the rulings, CR-02) applies to SE5-1's new clause, and the coverage audit's §5 owed P4 a case.
+  - Each node isolates one clause:
+    - /14/10: the entry is a regular file, `nlink` 1, inside the home and not the same file as the claim, so only `samestat` refuses.
+    - /14/11: the entry is the same file as the claim and inside the home, but has 2 links, so only `nlink` refuses.
+  - By reading, the cleanup's `samestat` clause on its own is also killed by /14/7 and /14/10: both have a real parent equal to the home and an entry that is not ours, so a cleanup without `samestat` would unlink the link or the planted file. No single-clause mutant was run for it; M24 drops both clauses.
+- **E-3 (`_unlink_own_claim` removes the hard-link name in /14/11): safe.**
+  - `samestat` with the descriptor of an `O_CREAT|O_EXCL` create can only match a file this call created. On Windows the followed create also creates a new file.
+  - So the cleanup can never unlink a name that is a hard link to a file that existed before the save. Removing the name in the home only drops the new empty file's link count to 1.
+- **E-5, E-6, E-7: sound.**
+  - E-6: e5c-07 runs the gate set in a `--shared` clone whose `main` is `e07fb00`: 297 passed, with the command line printed. The TC-027 failure in e5c-04 is explained by the stale local `main`.
+
+### New-defect search: `_create_new_json` / `_unlink_own_claim`
+
+- **Every error path:**
+  - A taken name → next (P:1133); `FileExistsError` → next (P:1149); any other `OSError` → next if the name now exists, else re-raise (P:1152-1157). No descriptor is open yet on any of these.
+  - A `render` raise (P:1138) happens before the claim.
+  - A failed read in the check → close, cleanup, `WorkareaContainmentError` chained `from failure` (P:1180-1187).
+  - A failed check → close, cleanup, raise (P:1188-1192).
+  - A failed write → the `with` closes first, and a flush error at the close still closes the raw fd. Then cleanup and re-raise (P:1198-1203).
+  - `claim is None` (the `fstat` failed) → nothing unlinked, so the empty claim keeps the name. That is the ruled outcome.
+- **Descriptor leaks:** none. After P:1144, every path either closes at P:1181 or hands the fd to `fdopen` at P:1199. The only raise not guarded is `os.close` itself (EIO on NFS), unchanged from the code before the corrective.
+- **Windows:**
+  - Every cleanup runs after the close, which Windows needs (no `FILE_SHARE_DELETE`).
+  - `samestat` across the close and `st_nlink` both hold on NTFS:
+    - `win-02` (3.11.15): /14/8[write] removed the claim after the close, /14/11 removed the hard-link name, and /14/10 kept the planted file.
+    - Probe 1 (3.12.7): `nlink 1`, and `samestat(fstat, lstat)` is true through a directory link.
+  - Both `realpath` sides come from `ntpath.realpath` / `Path.resolve()`, so the real-parent comparison is the one E4-R1 already used.
+- **`_link_points_at` (S:105):** the source literal `"\\\\?\\"` is the 4-character `\\?\` at run time (byte dump). Probe 2: Windows `os.readlink` of an absolute file link returns the `\\?\` prefix, and the stripped path compares equal to the target. A target without the prefix (POSIX, or a print name) falls through unchanged. A UNC target would not strip correctly, but no node uses one.
+- **Security, on the changed items:**
+  - The new nodes create everything under `tmp_path`, including `victim/`, and `_require_symlinks` leaves no entry behind in O.
+  - No new writer and no clipboard use.
+  - The refusal text is not painted (I-3).
+
+### TC-B99-13 allow-list move: exact
+
+The census (`tests/test_b99_staging.py:2210-2265`) flags `.unlink`, `write_text`, `write_bytes`, `os.replace` and `shutil.copy2`. In the module on `3f8b9e9`, the only such call is `os.unlink(candidate)` at P:1033, inside `_unlink_own_claim`. On `b204c7d` the three calls (`:1103`, `:1121`, `:1139`) were all inside `_create_new_json`. The allow-list now names exactly `{"_unlink_own_claim"}` (Q:2163-2165). Keeping `_create_new_json` in it would allow a future unlink there, so removing it is the stricter and exact form. e5c-07 passes the census.
+
+### Findings
+
+| Id | Severity · tag | Where | Scenario | Fix |
+|---|---|---|---|---|
+| RR-1 | LOW · records | P:1107-1109 (docstring); `E1-rulings.md:69` (BL-I9-4); `01-requirements.md:56` (R-FLOW-FILE.14 note); `codewire/graph-inc9.md:266`, `:293` | **"An empty `flows/` / `flowsets/` folder" understates the parent-swap residual after SE5-2.** The project folder is swapped for a link to O between the guard (P:1281) and the `mkdir` (P:1282). The `mkdir` creates `O/flows/`, and the claim lands at `O/flows/z.json`. The check refuses it on the real parent, and `_unlink_own_claim` will not unlink it either (its real parent `O/flows` ≠ `resolved_home`). So `O/flows/` keeps an **empty `z.json`**. CR-10's wording was right for the code before SE5-2, which removed the claim. The corrective applied both rulings without reconciling them, the same kind of conflict it settled for /14/5 (E-1). Still no content and never an overwrite. | In the five places, "an empty `flows/` / `flowsets/` folder **holding the empty claim**". No code change. |
+| RR-2 | LOW · carried (volume) | P:1173 (`st.st_nlink == 1`); check 4 above | **One more volume-reported property every save depends on.** A filesystem that reports `st_nlink` ≠ 1 for a newly created file would refuse every save with the I-3 status. That is a false refusal, not a leak. Only local NTFS (`win-02`, probe 1) and Linux (e5c-07) are evidenced. Network, virtual and cloud-sync volumes are not probed, and the work area is `<cwd>/.s19tool/workarea`, so it can sit on any of them. | No code change. Add `st_nlink` to check 4's carry: E5's or the batch-end Windows run does one plain save on the operator's real volume type. |
+| RR-3 | LOW · test strength | `tests/test_b101_flow_saves.py:635-658`; helper `:175-189` | **/14/9 never asserts that the re-point ran.** If the `os.close` wrapper does not fire (say a future close path, or `home.is_symlink()` reading false on some platform), the node still passes: the real-parent clause leaves the claim in O and V is untouched. /14/9 then silently becomes /14/5 and SE5-2's case goes unexercised. On Linux, M24's failure (`FileNotFoundError` on `victim/z.json`, e5c-02) shows the re-point fires. On Windows, `win-02`'s PASS alone does not; my stdlib replay (probe 1, 3.12.7) shows that it does on this PC. | One line after the `raises` block: `assert Path(os.path.realpath(home)) == victim.resolve()` (or have the helper return its `state` and assert `state["done"]`). Show it RED with the wrapper disabled. |
+| RR-4 | INFO · records | `02-test-cases.md` Windows column (rows /14/7 … /11, 8/6 … /9, and the 32 rows citing `win-01, b204c7d`) | `win-02` (head `3f8b9e98`, the same `s19_app`/`tests` as `d6f1801`, with a command line) ran all 46 nodes: 46 passed, 2 skipped by design. The 9 new rows still read `windows: not_run (… owed)`. | Re-cite the 34 non-skipped rows as `verified (win-02, 3f8b9e9)`. Executor: the orchestrator. |
+
+### Carried, not findings
+
+- The `fstat` and `realpath` failure arms of the check have no node. Only `lstat` does, which is what the ruling named. A mutant that moves `fstat` out of the `try` would survive. Both reads are improbable failures, and the arm exists to keep the outcome a refusal.
+- DeepSeek's M11 … M14 name the old step (d) and must be re-mapped before they are ruled (corrective notes §3). BL-I9-9 and BL-I9-10 are recorded. The `os.close` EIO path is unchanged.
+
+### Evidence states
+
+- Rulings CR-02 … CR-09, SE5-1, SE5-2, SE5-3, QA-2, QA-3, QA-4, CR-04: `executed` by reading, with the cited runs e5c-02, e5c-03, e5c-07 and win-02 (not mine); `approved`, except SE5-3's parent-swap clause (RR-1).
+- Tree `608f5e91` = `3f8b9e9` (scratch index): `executed`.
+- Windows probes 1 and 2 (stdlib only): `executed`.
+- The census move: `executed` (read and grep).
+- RR-1: `executed` (read). RR-2: `not-run` (no non-NTFS volume probed). RR-3: `executed` (read; probe 1). RR-4: `executed` (read). The fixes are `planned`.
+
+### Evidence checklist
+
+- [x] Diff read in full: `git diff b204c7d 3f8b9e9 -- s19_app tests` (`flow_persistence_service.py`, the 3 test files, `app.py`, `flow_screens.py`, `flow_execution_service.py`) and the changed records.
+- [x] Correctness pass: every error path, descriptor ownership, close before unlink, `claim is None`, the parent-swap residual (RR-1).
+- [x] Simplicity pass: one walk (CR-08); one cleanup helper shared by two call sites; no speculative parameters.
+- [x] Reuse: `_is_reparse_point` and `_guarded_destination` are reused as they are; the skip text follows the house pattern of `test_b100_load_dialog.py:385`.
+- [x] Tests reviewed for intent: one isolating mutant per clause, sentinels, discriminating negatives; RR-3 is the gap.
+- [x] Verdict explicit: PASS-WITH-NOTES. No HIGH is open.
+
+### §4b Independent review cell (re-review)
+
+`code-reviewer · PASS-WITH-NOTES · no HIGH (none to resolve); the corrective 3f8b9e9 meets every E5 ruling as ruled (CR-02…CR-09, SE5-1 nlink, SE5-2/CR-07 ownership rule, SE5-3, QA-2/3/4, CR-04), E-1 settlement sound, census move exact, mutants M14b/M22–M31 each RED on target; open as recommendations: RR-1 LOW parent-swap residual now leaves the empty claim inside the outside flows/ (records say "empty folder"); RR-2 LOW nlink clause widens the unprobed-volume false-refusal carry; RR-3 LOW /14/9 does not assert its re-point ran; RR-4 INFO 02-test-cases Windows column not yet re-cited to win-02`

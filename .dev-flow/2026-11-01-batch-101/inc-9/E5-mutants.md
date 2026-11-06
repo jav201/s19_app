@@ -84,3 +84,55 @@ The render-before-claim and write-failure arms remain not-a-mutant (no requireme
 node: a coverage gap already ruled for the audit in `E4-integration-notes.md`), as do the
 `ch18-flow-execution.md` sentence, the `flow_screens.py` docstring, and `_keep_previous_manifest`'s
 default mode (backlog BL-I9-5).
+
+## Re-map on the final tree (d6f1801)
+
+The corrective (`3f8b9e9`) restructured `_create_new_json` — one candidate walk, every
+check read inside one `try`, the cleanup through `_unlink_own_claim`, and the `st_nlink == 1`
+clause — so the rows of M1 … M21 whose mutated code it changed (M11 … M14 and M21, all in the
+old step (d)) no longer apply as written. They were re-expressed against the final code (same
+intent) and re-run one at a time on the final tree, on the LAN Linux host 2 only, same rules
+as the first run: base copy `~/work/s19_i9rm` at `origin/main` `e07fb00` with the local tree's
+`git diff --binary e07fb00 -- s19_app tests docs README.md` applied (head `d6f1801`); the union
+of the rows' nodes ran GREEN on the unmutated copy first (3 passed); each mutant in a `cp -a`
+copy, the edit verified to have landed, only the row's nodes run, `s19_app.__file__` printed
+from inside the copy. Transcripts: `evidence/inc-9/mut-r-11.txt` … `mut-r-21.txt`.
+
+The other 16 rows (M1 … M10, M15 … M20) still apply unchanged — the corrective did not touch
+their mutated lines — so their pre-corrective verdicts (all killed) stand on the final tree:
+M1 … M3 are in `app.py`'s confirm handler and `flow_execution_service.py` `run_chain_set` (only
+docstrings changed there); M4 … M9 are the `save_flow_json` / `save_chain_set` render and guard
+lines (docstrings only); M10 is the `os.path.lexists` name check, whose line the one-walk change
+(CR-08) left intact; M15 is the `write_text` revert in `save_flow_json` (the `_create_new_json`
+call site is unchanged; only the TC-B99-13 allow-list moved, in the test); M16 … M18 are the
+`app.py` `except` messages; M19 is `DOSSIER.md` F-45; M20 is the claim's `0o666` mode argument
+(E4-R3's change, untouched by the corrective).
+
+| M | old mutation | new mutation | nodes | result | transcript |
+|---|---|---|---|---|---|
+| M11 | `_create_new_json`: step (d) removed | the whole post-claim check block removed; the write-arm cleanup reverted to a direct best-effort `os.unlink` (its `claim` argument is gone with the check) | S `flow_file_14_4_…`, `flow_set_8_4_…`, `flow_file_14_5_…` | KILLED — all three `DID NOT RAISE WorkareaContainmentError` | mut-r-11.txt |
+| M12 | `_create_new_json` (d): the real-parent clause dropped | `and Path(os.path.realpath(candidate)).parent == resolved_home` dropped from `verified` | S `flow_file_14_5_…` | KILLED — `DID NOT RAISE WorkareaContainmentError` | mut-r-12.txt |
+| M13 | `_create_new_json` (d): the graph's first form `contained_in_workarea(Path(os.path.realpath(candidate)), resolved_home)` | the same clause re-expressed on the `verified` conjunction (+ `contained_in_workarea` import) | S `flow_file_14_5_…` | KILLED — `DID NOT RAISE WorkareaContainmentError` | mut-r-13.txt |
+| M14 | `_create_new_json` (d): `owned` without `stat.S_ISREG` and `samestat` | `stat.S_ISREG(st.st_mode)` and `os.path.samestat(claim, st)` dropped from `verified` (`st_nlink == 1`, the reparse and the real-parent clauses kept) | S `flow_file_14_4_…`, `flow_set_8_4_…`, `flow_file_14_5_…` | SURVIVED (equivalent) — 3 passed | mut-r-14.txt |
+| M21 | `_create_new_json` (d): the real-path clause → `contained_in_workarea(Path(os.path.realpath(candidate)), resolved_home)` (re-resolves the home) | identical to M13 on the final code | S `flow_file_14_5_…` | KILLED — `DID NOT RAISE WorkareaContainmentError` | mut-r-21.txt |
+
+### Combined score with the corrective's M14b, M22–M31
+
+- Re-mapped on the final tree (this table): **4 killed / 5** — M11, M12, M13, M21 killed; **M14 survived as an equivalent mutant** (below).
+- Unchanged rows (M1 … M10, M15 … M20): **16 killed / 16** — verdicts carry over unchanged.
+- Corrective battery (`e5c-02`, `e5c-03`): M14b, M22 … M31 — **11 killed / 11**.
+- **Combined on the final tree: 31 killed / 32 mutants**; the one survivor is M14, equivalent.
+
+### Why M14 now survives (was killed pre-corrective)
+
+Pre-corrective, dropping `S_ISREG`/`samestat` made `owned := True`, so the refusal's unlink arm
+deleted a swapped-in link by name and `flow_file_14_4` / `flow_set_8_4` failed their `is_symlink()`
+assertion — an honest kill of the "unlink only your own same-stat claim" fact. On the final tree
+the unlink goes through `_unlink_own_claim` (re-read + `samestat` + real parent), so a swapped-in
+link is never removed by the mutant, and the check still refuses the row's nodes through its
+other clauses: the reparse clause on `flow_file_14_4` / `flow_set_8_4` (the link at the name),
+the real-parent clause on `flow_file_14_5` (the swapped home). The dropped clauses are not a
+coverage gap — the same-file clause is pinned alone by /14/10 (M22), the one-link clause by
+/14/11 (M23), and `S_ISREG` is subsumed by `samestat` (a non-regular entry cannot samestat-equal
+the claim's regular-file descriptor). M14 is therefore an equivalent mutant on the final tree,
+not a survivor that hides a bug.

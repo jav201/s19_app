@@ -653,6 +653,8 @@ def test_r_flow_file_14_9_repointed_home_keeps_the_file_elsewhere(area, monkeypa
     _repoint_home_at_close(monkeypatch, home, project / f"{home.name}_to_o", victim)
     with pytest.raises(WorkareaContainmentError):
         save(stem)
+    # RR-3: the re-point at the close ran, so this is not /14/5 again.
+    assert Path(os.path.realpath(home)) == victim.resolve()
     assert (victim / f"{stem}.json").read_bytes() == b"VICTIM"
     assert _entries(victim) == [f"{stem}.json"]
     assert (outside / f"{stem}.json").read_bytes() == b""
