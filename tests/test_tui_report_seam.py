@@ -1,7 +1,7 @@
 """Black-box e2e acceptance for the in-TUI report-generation seam.
 
 Audit-gaps follow-up (gap #3, batch-07 HLR-008 / LLR-008.5). Spec
-``.fast-dev-flow/spec.md`` §3 AC-A1/A2/A3.
+§3 AC-A1/A2/A3.
 
 This is the Pilot e2e the 2026-06-23 audit found missing: the report
 *service* (file write) and the ``ReportViewerScreen`` (render) were each

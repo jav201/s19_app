@@ -1,6 +1,6 @@
 """Project gather (HLR-138) — the save-gather and the scoped artifact homes.
 
-Change 1 of the operator's 2026-10-12 round (``prototypes/cambios_10_12_2026``):
+Change 1 of the operator's 2026-10-12 round (batch-95 / batch-97):
 the project folder becomes a self-contained snapshot. The shipped save
 (``app.py`` ``_handle_save_dialog``) already COPYs the loaded S19/HEX + MAC +
 A2L into the project dir; this module adds the JSON-artifact gather — the

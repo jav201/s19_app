@@ -462,7 +462,6 @@ TUI defects and are not being fixed — the surface is going away:
 |----------|--------|
 | [docs/overview.md](docs/overview.md) | what it is, who it is for, current capabilities |
 | [docs/architecture.md](docs/architecture.md) | the three layers, TUI shell, `changes/` + `operations/` packages, safety contracts |
-| [docs/diagrams/architecture.md](docs/diagrams/architecture.md) | living Mermaid architecture diagrams |
 | [REQUIREMENTS.md](REQUIREMENTS.md) | the requirements: strict EARS rows per module S0–S17 (rationale in [docs/requirements/review/](docs/requirements/review/), earlier canon in [docs/requirements/history/](docs/requirements/history/)) |
 | [CLAUDE.md](CLAUDE.md) | conventions, commands, layer rules |
 | [PROJECT_RULES.md](PROJECT_RULES.md) | docstring and function-design contract |

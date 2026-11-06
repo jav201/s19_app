@@ -1,7 +1,7 @@
 """Black-box e2e acceptance for the demo-evidence packs (gap #4, batch-01).
 
 Audit-gaps follow-up (gap #4, batch-01 demo evidence / LLR-004.1). Spec
-``.fast-dev-flow/spec.md`` §3 AC-B1/AC-B2.
+§3 AC-B1/AC-B2.
 
 These are the Pilot e2e tests the 2026-06-23 audit found missing: the
 batch-01 demo evidence claims — "saving a project creates a project folder

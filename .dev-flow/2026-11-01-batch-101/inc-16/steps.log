@@ -1,0 +1,10 @@
+E1 start 2026-11-06T06:40Z model=opus base=c2cba35
+E1 end 2026-11-06T06:59Z model=opus rows=31 (30 new, 1 canon unchanged) cases=49 slice=0 functions, 3 s19_app files
+E2 start 2026-11-06T06:59Z model=opus
+E2 end 2026-11-06T06:59Z model=opus graph=not applicable (docs increment; codewire/graph-inc16.md holds the document change map)
+E1 rulings 2026-11-06T07:00Z orchestrator D-1..D-3,D-8,D-9
+E3 round1 2026-11-06T07:14Z architect=opus FAIL 6 MAJOR; rulings written
+E3 correction 2026-11-06T07:29Z model=opus A16-1..A16-6 applied, minors A16-7..A16-16 folded (E4 addenda 1-8 in E1-rulings.md); rows=32 (31 new, R-DOC-ARCHIVE.4 added) cases=52; trace_check 32 active, 30 gaps (29 TEST, 1 EVID)
+E3 round2 2026-11-06T07:40Z architect=opus PASS-WITH-NOTES (A16-1..6 closed; N-1..N-3 to E4)
+E4 start 2026-11-06T07:40Z implementers model=deepseek-v4-pro (3 units) tester=sonnet
+E4 implementers end 2026-11-06T08:09Z model=deepseek-v4-pro (3 units, exit 0; deviations declared in notes u1/u2)

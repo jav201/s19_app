@@ -378,8 +378,8 @@ def build_band_key_rows() -> List[BandKeyRow]:
 # ---------------------------------------------------------------------------
 # HLR-132 (batch 2026-10-11-batch-93 inc-003) — the map view's SPEC SHEET.
 #
-# The operator ruling of 2026-08-06 (legend A, captured in
-# ``prototypes/memmap2_legend_A.120w.svg``) replaced the map's annotated
+# The operator ruling of 2026-08-06 (legend A, the HLR-132 legend sheet)
+# replaced the map's annotated
 # example card with a grouped spec sheet: four bordered boxes — Entropy bands ·
 # Map anatomy · Region row · Keys — zero prose paragraphs, no wrapping line.
 # The box RENDER lives in ``LegendScreen._render_map_sheet`` (screens.py); this
@@ -829,7 +829,7 @@ def _issues_lines() -> List[LegendLine]:
 #: Per-view annotated example-card content, keyed by ``_active_screen_key``
 #: (``workspace`` / ``a2l`` / ``mac`` / ``issues``). Each value is an
 #: ordered list of :class:`LegendLine` transcribed at FULL density from
-#: ``prototypes/legend_n8.kimi.NOTES.md`` / ``legend_n8.INVENTORY.md``. Rendered
+#: the batch-n8 legend notes. Rendered
 #: by ``LegendScreen.compose`` (Inc-2/Inc-3) above the view's colour/band key.
 #: The MAP key is deliberately ABSENT (batch-93 HLR-132, inc-003): the map
 #: view's annotated card retired with the N8 example card in favour of the

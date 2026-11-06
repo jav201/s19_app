@@ -1,6 +1,6 @@
 # Batch-96 — pendientes del PDF del operador (2026-10-18)
 
-Fuente: `G:/My Drive/Scan_20261018_153449.pdf` (scan 4 páginas, doodles ignorados).
+Fuente: `<operator drive>/Scan_20261018_153449.pdf` (scan 4 páginas, doodles ignorados).
 
 ## ESTADO (2026-10-18, features completas)
 
