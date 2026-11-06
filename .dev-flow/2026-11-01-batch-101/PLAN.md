@@ -21,7 +21,7 @@ orchestrator presents the full plan in-conversation at each phase gate.
 | Project | s19_app |
 | Batch | 2026-11-01-batch-101 |
 | Objective | Release hardening for v1.0.0: fix the user-guide findings that block a release (F-01..F-51, docs/user-guide/DOSSIER.md section 5), the 5 UX majors of batch-100's expert inspection (UX-I-01, -06, -10, -12, -13) and the UX-I-17 emphasis rule, R1-P1 (the Save project margin), the in-app help and README text that describes absent features, the deferred post-close CI confirmation of batch-100, and the serial marking of timing-bound tests (G-015); performance with ~10 MB images (F-15, F-23) gets an explicit in-scope or deferred decision. UI changes go through a prototype round with the operator's verdict before implementation. **Narrowed at P0 by the operator's rulings of 2026-11-01** (see Key decisions): every UI row goes to the backlog as a known failed check, and the strict-EARS canon swap enters as Inc 1. |
-| Last updated | P0 · 2026-11-01 |
+| Last updated | P3 · 2026-11-06 |
 | Standing authorization | The operator's commission, quoted: «Quiero que continues hasta terminar los incrementos, las decisiones, tomalas con tus recomendaciones.» · «Si, sigue con (3), usa a kimi 2.8 para apoyarte con la carga de trabajo.» · «Por ahora pausa deepseek, está ya corto en tokens, usa sólo kimi.» (2026-11-01) |
 | First gate | <the first gate run's exit code and what its `V7` line reported — owed by the orchestrator. An architect probe at P0 (`devflow-validate.py --brief .`) exited 1 with `4 block · 708 notice · 41 not applicable`; the 4 BLOCKs are V20 (`.dev-flow/_derived/ATLAS-{BATCHES,IFC,ORPHANS,TRACE}.md` differ from the corpus)> |
 | Premises / RC-1 | **RC-1 (a):** `git ls-remote --exit-code --heads origin main` → `e273181aaa7692eaf6a1e40141120a92dad5097e` = worktree `HEAD`. `state.json` `base_ref` = `7717394` (the merge before the rollover commit; `e273181` changes `.dev-flow/` and `.gitattributes` only). **RC-2:** origin answered; its newest commit is dated 2026-11-01T22:48:42-06:00, under one day old. **RC-1 (b):** each in-scope finding was located in code at `e273181` by the triage, and spot-checked (`p0/PLAN-draft.md` §a). Each increment's E1 re-runs the already-shipped check against the new canon. **Premises:** (1) the strict-EARS canon (`s19w/review/S<n>-ears-strict.md`, 2612 rows, reconciled with batch-100 at `e279c8b`) replaces the canon in Inc 1; (2) Kimi K2.8 is the only worker model; (3) the LAN Linux host runs the full suite in about 1 h. |
@@ -53,13 +53,11 @@ The trigger evaluation `state.json`'s `triggers.record` points at: one row per t
 
 ## Where we are
 
-- **Station:** P0/ARQ, after the operator's three rulings of 2026-11-01.
-- **Done:** the triage is verified (`p0/PLAN-draft.md` §a, three rows did not hold). The 37 UI rows are recorded as known failed checks (`p0/known-failed.md`). The plan is 14 increments, with no prototype round.
-- **Owed next:**
-  - the orchestrator records the trigger lists with `devflow-init.py --fired … --not-fired …`;
-  - the orchestrator writes the 8 `KF-101-*` rows and the backlog flips into `BACKLOG-CODE.md`;
-  - the 4 V20 BLOCKs are regenerated or ruled;
-  - the P0 gate decision.
+- **Station:** P3 (increments), 2026-11-06.
+- **Merged and pushed:** Incs 1, 2, 3, 4, 7, 8, 11, 13, 14 (decisions in `state.json`; merge evidence `evidence/merge/`).
+- **In flight:** Inc 5 (E3 round 2), Inc 15 (E3 round 2; tests only; merges before Inc 6), Inc 16 (E3 round 2; docs).
+- **Next:** the serial `app.py` chain 5 → 6 → 9 → 10 → 12; before Inc 10's E1, the LAN check of Inc 5 ruling D-4 (A2L explorer value column and Split/Join after an in-place write).
+- **Batch end:** full battery, canon fold, review page, v1.0.0 tag.
 
 ## Objective
 
