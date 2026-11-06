@@ -44,10 +44,12 @@ limbs · TC-709 the screen wrap audit · TC-710 the negative-control battery).
 """
 from __future__ import annotations
 
+import re
 import shutil
 import sys
 from bisect import bisect_right
 from dataclasses import dataclass
+from itertools import repeat
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Tuple
 
@@ -291,21 +293,45 @@ def _sweep(lo: int, hi: int, marks: List[Tuple[int, int, str]]) -> List[Block]:
     Priority: data > conflict > fill > ctx — a cell never mixes classes and
     adjacent equal classes coalesce BY CONSTRUCTION (one styled span per
     block, the run-economy law of LLR-135.2).
+
+    One sweep over the sorted boundaries (O(m log m)): each mark adds its
+    class at its clamped start and removes it at its clamped end, and the
+    class of each elementary interval is the highest-priority class whose
+    live count is above zero (``"none"`` when none). Empty or inverted
+    marks, and marks wholly outside ``[lo, hi)``, cover no interval on base
+    and add nothing here.
     """
     cuts = {lo, hi}
-    for a, b, _ in marks:
-        cuts.add(max(lo, min(a, hi)))
-        cuts.add(max(lo, min(b, hi)))
+    starts: Dict[int, List[str]] = {}
+    ends: Dict[int, List[str]] = {}
+    for s, e, cls in marks:
+        cs = max(lo, min(s, hi))
+        ce = max(lo, min(e, hi))
+        if cs >= ce:
+            continue
+        cuts.add(cs)
+        cuts.add(ce)
+        starts.setdefault(cs, []).append(cls)
+        ends.setdefault(ce, []).append(cls)
     pts = sorted(cuts)
     prio = {"data": 4, "conflict": 3, "fill": 2, "ctx": 1}
+    counts: Dict[str, int] = {}
     blocks: List[Block] = []
     for a, b in zip(pts, pts[1:]):
+        for cls in ends.get(a, ()):
+            counts[cls] -= 1
+            if counts[cls] == 0:
+                del counts[cls]
+        for cls in starts.get(a, ()):
+            counts[cls] = counts.get(cls, 0) + 1
         if a >= b:
             continue
         best = "none"
-        for s, e, cls in marks:
-            if s < b and e > a and prio[cls] > prio.get(best, 0):
+        best_prio = 0
+        for cls, n in counts.items():
+            if n > 0 and prio[cls] > best_prio:
                 best = cls
+                best_prio = prio[cls]
         if blocks and blocks[-1].cls == best:
             blocks[-1].size += b - a
         else:
@@ -324,8 +350,19 @@ def _conflict_marks(
     ``gap_conflict`` detector (the engine's abort law, ruling 8f), swept over
     the source∩gap intersections only (bounded by the SOURCE size, never the
     gap size — the guard case's 402 MiB gap must not be walked per byte).
-    Equivalence with ``gap_conflict`` is pinned in tests/test_segment_ops.py's
-    sibling (tests/test_segment_split_window.py, TC-710 battery).
+
+    Each source∩gap window is built with C-level calls
+    (``bytes(map(mem_map.get, range(lo, hi), repeat(pad_byte, hi - lo)))``:
+    an absent address reads as the pad, so absent and pad-valued bytes are
+    both non-conflict, exactly the base predicate) and its non-pad runs found
+    with one compiled pattern
+    ``re.compile(b"[^" + re.escape(bytes([pad_byte])) + b"]+")``, no flags.
+    Adjacent runs merge as on base. Equivalence is pinned by the
+    R-SEG-PREV.2/2 and R-SEG-PREV.2/3 nodes against the base reference, and
+    by R-SEG-PREV.2/5 over every pad byte.
+
+    Preconditions (as on base, now stated): every image value and ``pad_byte``
+    lie in 0 … 255 (``bytes([pad_byte])`` raises otherwise: fail loud).
     """
     spans = sorted(picked_spans)
     merged: List[Tuple[int, int]] = []
@@ -334,6 +371,7 @@ def _conflict_marks(
             merged[-1] = (merged[-1][0], max(merged[-1][1], end))
         else:
             merged.append((start, end))
+    pattern = re.compile(b"[^" + re.escape(bytes([pad_byte])) + b"]+")
     marks: List[Tuple[int, int, str]] = []
     prev_end: Optional[int] = None
     for start, end in merged:
@@ -341,12 +379,18 @@ def _conflict_marks(
             g_lo, g_hi = prev_end, start
             for s, e in src:
                 lo, hi = max(g_lo, s), min(g_hi, e)
-                for addr in range(lo, hi):
-                    if addr in mem_map and mem_map[addr] != pad_byte:
-                        if marks and marks[-1][1] == addr:
-                            marks[-1] = (marks[-1][0], addr + 1, "conflict")
-                        else:
-                            marks.append((addr, addr + 1, "conflict"))
+                if lo >= hi:
+                    continue
+                window = bytes(
+                    map(mem_map.get, range(lo, hi), repeat(pad_byte, hi - lo))
+                )
+                for m in pattern.finditer(window):
+                    a = lo + m.start()
+                    b = lo + m.end()
+                    if marks and marks[-1][1] == a:
+                        marks[-1] = (marks[-1][0], b, "conflict")
+                    else:
+                        marks.append((a, b, "conflict"))
         prev_end = end
     return marks
 

@@ -1,0 +1,341 @@
+RED capture on BASE (origin/main 7add3d63), detached worktree on the LAN Linux host, interpreter env s19ci (py3.11).
+Only the new/changed test files were copied in. serial_timing nodes ran alone (not under -n). Host load average was 9-12 (shared host): absolute times are inflated.
+s19_app.__file__ = <HOME>/work/s19_t13/s19_app/__init__.py
+
+##### Run A: tests/test_b101_designer_recompute.py tests/test_b101_split_join_band.py tests/test_crc_designer_view.py (hostile 001.12(b) node deselected: 4.29 G glyphs on base)
+.FFFFFFFF..........................F.FFFFFF......FFFF................... [ 75%]
+........................                                                 [100%]
+=================================== FAILURES ===================================
+____ test_r_crc_designer_001_2_2_text_edit_recomputes_after_the_quiet_time _____
+tests/test_b101_designer_recompute.py:252: in test_r_crc_designer_001_2_2_text_edit_recomputes_after_the_quiet_time
+    assert delta == 0, f"no recompute before the quiet time, got {delta}"
+E   AssertionError: no recompute before the quiet time, got 1
+E   assert 1 == 0
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-117/test_r_crc_designer_001_2_2_te0 workarea=/tmp/pytest-of-<user>/pytest-117/test_r_crc_designer_001_2_2_te0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.030
+_________ test_r_crc_designer_001_2_2_image_change_is_a_pending_change _________
+tests/test_b101_designer_recompute.py:296: in test_r_crc_designer_001_2_2_image_change_is_a_pending_change
+    assert pending is not None, "the image change must leave a recompute pending"
+E   AssertionError: the image change must leave a recompute pending
+E   assert None is not None
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-117/test_r_crc_designer_001_2_2_im0 workarea=/tmp/pytest-of-<user>/pytest-117/test_r_crc_designer_001_2_2_im0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.018
+_______________ test_r_crc_designer_001_2_2_quiet_time_is_150_ms _______________
+tests/test_b101_designer_recompute.py:308: in test_r_crc_designer_001_2_2_quiet_time_is_150_ms
+    assert getattr(crc_designer_view, "CRC_RECOMPUTE_S", None) == SHIPPED_QUIET_S
+E   AssertionError: assert None == 0.15
+E    +  where None = getattr(crc_designer_view, 'CRC_RECOMPUTE_S', None)
+_____________ test_r_crc_designer_007_1_edit_burst_recomputes_once _____________
+tests/test_b101_designer_recompute.py:341: in test_r_crc_designer_007_1_edit_burst_recomputes_once
+    assert delta == 1, f"an edit burst must recompute once, got {delta}"
+E   AssertionError: an edit burst must recompute once, got 5
+E   assert 5 == 1
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-117/test_r_crc_designer_007_1_edit0 workarea=/tmp/pytest-of-<user>/pytest-117/test_r_crc_designer_007_1_edit0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.023
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-117/test_r_crc_designer_007_1_edit0 workarea=/tmp/pytest-of-<user>/pytest-117/test_r_crc_designer_007_1_edit0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.025
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-117/test_r_crc_designer_007_1_edit0 workarea=/tmp/pytest-of-<user>/pytest-117/test_r_crc_designer_007_1_edit0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.016
+___________ test_r_crc_designer_007_2_template_load_recomputes_once ____________
+tests/test_b101_designer_recompute.py:403: in test_r_crc_designer_007_2_template_load_recomputes_once
+    assert delta == 1, f"a template load must recompute once, got {delta}"
+E   AssertionError: a template load must recompute once, got 9
+E   assert 9 == 1
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-117/test_r_crc_designer_007_2_temp0 workarea=/tmp/pytest-of-<user>/pytest-117/test_r_crc_designer_007_2_temp0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.015
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-117/test_r_crc_designer_007_2_temp0 workarea=/tmp/pytest-of-<user>/pytest-117/test_r_crc_designer_007_2_temp0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.014
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-117/test_r_crc_designer_007_2_temp0 workarea=/tmp/pytest-of-<user>/pytest-117/test_r_crc_designer_007_2_temp0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.017
+____________ test_r_crc_designer_007_3_preset_pick_recomputes_once _____________
+tests/test_b101_designer_recompute.py:432: in test_r_crc_designer_007_3_preset_pick_recomputes_once
+    assert delta == 1, f"a preset pick must recompute once, got {delta}"
+E   AssertionError: a preset pick must recompute once, got 8
+E   assert 8 == 1
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-117/test_r_crc_designer_007_3_pres0 workarea=/tmp/pytest-of-<user>/pytest-117/test_r_crc_designer_007_3_pres0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.019
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-117/test_r_crc_designer_007_3_pres0 workarea=/tmp/pytest-of-<user>/pytest-117/test_r_crc_designer_007_3_pres0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.015
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-117/test_r_crc_designer_007_3_pres0 workarea=/tmp/pytest-of-<user>/pytest-117/test_r_crc_designer_007_3_pres0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.014
+_____________ test_r_crc_preview_002_1_image_set_cleared_replaced ______________
+tests/test_b101_designer_recompute.py:488: in test_r_crc_preview_002_1_image_set_cleared_replaced
+    for window_set in _run(scenario):
+                      ^^^^^^^^^^^^^^
+tests/test_b101_designer_recompute.py:153: in _run
+    return [asyncio.run(coro_factory()) for _ in range(reps)]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_designer_recompute.py:153: in <listcomp>
+    return [asyncio.run(coro_factory()) for _ in range(reps)]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b101_designer_recompute.py:462: in scenario
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: preview after the image was set: 'Load an image to preview coverage CRCs over real bytes.'
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-117/test_r_crc_preview_002_1_image0 workarea=/tmp/pytest-of-<user>/pytest-117/test_r_crc_preview_002_1_image0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.017
+______ test_r_crc_preview_002_5_stale_coverage_recomputes_once_on_display ______
+tests/test_b101_designer_recompute.py:528: in test_r_crc_preview_002_5_stale_coverage_recomputes_once_on_display
+    for hidden, shown, after_redisplay in _run(scenario):
+                                          ^^^^^^^^^^^^^^
+tests/test_b101_designer_recompute.py:153: in _run
+    return [asyncio.run(coro_factory()) for _ in range(reps)]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_designer_recompute.py:153: in <listcomp>
+    return [asyncio.run(coro_factory()) for _ in range(reps)]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b101_designer_recompute.py:520: in scenario
+    await wait_designer_recompute(pilot, app, before, timeout=10.0)
+tests/support/b101_designer.py:89: in wait_designer_recompute
+    await wait_until(
+tests/support/timing.py:66: in wait_until
+    raise AssertionError(failure() if callable(failure) else failure)
+E   AssertionError: no settled recompute: count 18 (snapshot 18), pending None
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-117/test_r_crc_preview_002_5_stale0 workarea=/tmp/pytest-of-<user>/pytest-117/test_r_crc_preview_002_5_stale0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.030
+_ test_r_crc_preview_002_2_one_recompute_reads_the_window_at_most_twice[abort-fixture] _
+tests/test_b101_designer_recompute.py:714: in test_r_crc_preview_002_2_one_recompute_reads_the_window_at_most_twice
+    assert reads <= 2, f"a recompute may read the window at most twice, read {reads}"
+E   AssertionError: a recompute may read the window at most twice, read 6
+E   assert 6 <= 2
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-117/test_r_crc_preview_002_2_one_r0 workarea=/tmp/pytest-of-<user>/pytest-117/test_r_crc_preview_002_2_one_r0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.014
+_ test_r_crc_preview_002_2_one_recompute_reads_the_window_at_most_twice[warn-fixture] _
+tests/test_b101_designer_recompute.py:714: in test_r_crc_preview_002_2_one_recompute_reads_the_window_at_most_twice
+    assert reads <= 2, f"a recompute may read the window at most twice, read {reads}"
+E   AssertionError: a recompute may read the window at most twice, read 6
+E   assert 6 <= 2
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-117/test_r_crc_preview_002_2_one_r2 workarea=/tmp/pytest-of-<user>/pytest-117/test_r_crc_preview_002_2_one_r2/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.016
+_ test_r_crc_preview_002_2_one_recompute_reads_the_window_at_most_twice[warn-dirty] _
+tests/test_b101_designer_recompute.py:714: in test_r_crc_preview_002_2_one_recompute_reads_the_window_at_most_twice
+    assert reads <= 2, f"a recompute may read the window at most twice, read {reads}"
+E   AssertionError: a recompute may read the window at most twice, read 6
+E   assert 6 <= 2
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-117/test_r_crc_preview_002_2_one_r3 workarea=/tmp/pytest-of-<user>/pytest-117/test_r_crc_preview_002_2_one_r3/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.019
+_ test_r_crc_preview_002_2_one_recompute_reads_the_window_at_most_twice[ignore-fixture] _
+tests/test_b101_designer_recompute.py:714: in test_r_crc_preview_002_2_one_recompute_reads_the_window_at_most_twice
+    assert reads <= 2, f"a recompute may read the window at most twice, read {reads}"
+E   AssertionError: a recompute may read the window at most twice, read 6
+E   assert 6 <= 2
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-117/test_r_crc_preview_002_2_one_r4 workarea=/tmp/pytest-of-<user>/pytest-117/test_r_crc_preview_002_2_one_r4/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.015
+_ test_r_crc_preview_002_2_one_recompute_reads_the_window_at_most_twice[ignore-dirty] _
+tests/test_b101_designer_recompute.py:714: in test_r_crc_preview_002_2_one_recompute_reads_the_window_at_most_twice
+    assert reads <= 2, f"a recompute may read the window at most twice, read {reads}"
+E   AssertionError: a recompute may read the window at most twice, read 6
+E   assert 6 <= 2
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-117/test_r_crc_preview_002_2_one_r5 workarea=/tmp/pytest-of-<user>/pytest-117/test_r_crc_preview_002_2_one_r5/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.022
+__________ test_r_crc_preview_001_11_coverage_over_the_cap_is_refused __________
+tests/test_b101_designer_recompute.py:750: in test_r_crc_preview_001_11_coverage_over_the_cap_is_refused
+    assert preview == note, preview
+E   AssertionError: Active policy: join=concat
+E     concat: 0x9C5BCBBD
+E     fill:   0x9C5BCBBD
+E   assert 'Active polic...   0x9C5BCBBD' == 'Cannot previ...6777216 bytes'
+E     
+E     - Cannot preview: coverage exceeds 16777216 bytes
+E     + Active policy: join=concat
+E     + concat: 0x9C5BCBBD
+E     + fill:   0x9C5BCBBD
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-117/test_r_crc_preview_001_11_cove0 workarea=/tmp/pytest-of-<user>/pytest-117/test_r_crc_preview_001_11_cove0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.016
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-117/test_r_crc_preview_001_11_cove0 workarea=/tmp/pytest-of-<user>/pytest-117/test_r_crc_preview_001_11_cove0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.027
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-117/test_r_crc_preview_001_11_cove0 workarea=/tmp/pytest-of-<user>/pytest-117/test_r_crc_preview_001_11_cove0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.019
+______ test_r_crc_preview_001_12_out_of_order_ranges_draw_a_bounded_line _______
+tests/test_b101_designer_recompute.py:815: in test_r_crc_preview_001_12_out_of_order_ranges_draw_a_bounded_line
+    assert _glyphs(lines_a[0]) == 15, _glyphs(lines_a[0])
+E   AssertionError: 1257406
+E   assert 1257406 == 15
+E    +  where 1257406 = _glyphs('█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████...██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████')
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-117/test_r_crc_preview_001_12_out_0 workarea=/tmp/pytest-of-<user>/pytest-117/test_r_crc_preview_001_12_out_0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.025
+_ test_r_seg_prev_2_plan_matches_the_base_reference_in_every_mode[split-skip] __
+tests/test_b101_split_join_band.py:198: in test_r_seg_prev_2_plan_matches_the_base_reference_in_every_mode
+    got = _plan_view(_build(rows, ticks, src, mem, mode, gap, pad))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_split_join_band.py:92: in _plan_view
+    "files": [
+tests/test_b101_split_join_band.py:93: in <listcomp>
+    (f.name, _blocks(f.blocks), f.packed, f.pad, f.conflict, f.empty)
+     ^^^^^^
+E   AttributeError: 'OutFile' object has no attribute 'name'
+_ test_r_seg_prev_2_plan_matches_the_base_reference_in_every_mode[split-fill] __
+tests/test_b101_split_join_band.py:198: in test_r_seg_prev_2_plan_matches_the_base_reference_in_every_mode
+    got = _plan_view(_build(rows, ticks, src, mem, mode, gap, pad))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_split_join_band.py:92: in _plan_view
+    "files": [
+tests/test_b101_split_join_band.py:93: in <listcomp>
+    (f.name, _blocks(f.blocks), f.packed, f.pad, f.conflict, f.empty)
+     ^^^^^^
+E   AttributeError: 'OutFile' object has no attribute 'name'
+_ test_r_seg_prev_2_plan_matches_the_base_reference_in_every_mode[join-concat] _
+tests/test_b101_split_join_band.py:198: in test_r_seg_prev_2_plan_matches_the_base_reference_in_every_mode
+    got = _plan_view(_build(rows, ticks, src, mem, mode, gap, pad))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_split_join_band.py:92: in _plan_view
+    "files": [
+tests/test_b101_split_join_band.py:93: in <listcomp>
+    (f.name, _blocks(f.blocks), f.packed, f.pad, f.conflict, f.empty)
+     ^^^^^^
+E   AttributeError: 'OutFile' object has no attribute 'name'
+__ test_r_seg_prev_2_plan_matches_the_base_reference_in_every_mode[join-fill] __
+tests/test_b101_split_join_band.py:198: in test_r_seg_prev_2_plan_matches_the_base_reference_in_every_mode
+    got = _plan_view(_build(rows, ticks, src, mem, mode, gap, pad))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_split_join_band.py:92: in _plan_view
+    "files": [
+tests/test_b101_split_join_band.py:93: in <listcomp>
+    (f.name, _blocks(f.blocks), f.packed, f.pad, f.conflict, f.empty)
+     ^^^^^^
+E   AttributeError: 'OutFile' object has no attribute 'name'
+=========================== short test summary info ============================
+FAILED tests/test_b101_designer_recompute.py::test_r_crc_designer_001_2_2_text_edit_recomputes_after_the_quiet_time
+FAILED tests/test_b101_designer_recompute.py::test_r_crc_designer_001_2_2_image_change_is_a_pending_change
+FAILED tests/test_b101_designer_recompute.py::test_r_crc_designer_001_2_2_quiet_time_is_150_ms
+FAILED tests/test_b101_designer_recompute.py::test_r_crc_designer_007_1_edit_burst_recomputes_once
+FAILED tests/test_b101_designer_recompute.py::test_r_crc_designer_007_2_template_load_recomputes_once
+FAILED tests/test_b101_designer_recompute.py::test_r_crc_designer_007_3_preset_pick_recomputes_once
+FAILED tests/test_b101_designer_recompute.py::test_r_crc_preview_002_1_image_set_cleared_replaced
+FAILED tests/test_b101_designer_recompute.py::test_r_crc_preview_002_5_stale_coverage_recomputes_once_on_display
+FAILED tests/test_b101_designer_recompute.py::test_r_crc_preview_002_2_one_recompute_reads_the_window_at_most_twice[abort-fixture]
+FAILED tests/test_b101_designer_recompute.py::test_r_crc_preview_002_2_one_recompute_reads_the_window_at_most_twice[warn-fixture]
+FAILED tests/test_b101_designer_recompute.py::test_r_crc_preview_002_2_one_recompute_reads_the_window_at_most_twice[warn-dirty]
+FAILED tests/test_b101_designer_recompute.py::test_r_crc_preview_002_2_one_recompute_reads_the_window_at_most_twice[ignore-fixture]
+FAILED tests/test_b101_designer_recompute.py::test_r_crc_preview_002_2_one_recompute_reads_the_window_at_most_twice[ignore-dirty]
+FAILED tests/test_b101_designer_recompute.py::test_r_crc_preview_001_11_coverage_over_the_cap_is_refused
+FAILED tests/test_b101_designer_recompute.py::test_r_crc_preview_001_12_out_of_order_ranges_draw_a_bounded_line
+FAILED tests/test_b101_split_join_band.py::test_r_seg_prev_2_plan_matches_the_base_reference_in_every_mode[split-skip]
+FAILED tests/test_b101_split_join_band.py::test_r_seg_prev_2_plan_matches_the_base_reference_in_every_mode[split-fill]
+FAILED tests/test_b101_split_join_band.py::test_r_seg_prev_2_plan_matches_the_base_reference_in_every_mode[join-concat]
+FAILED tests/test_b101_split_join_band.py::test_r_seg_prev_2_plan_matches_the_base_reference_in_every_mode[join-fill]
+19 failed, 77 passed, 1 deselected in 1234.33s (0:20:34)
+
+##### Run A note: the 4 test_r_seg_prev_2_plan_matches... failures above are a TEST bug (OutFile has .label/.conflicts, not .name/.conflict), fixed afterwards. Re-run of tests/test_b101_split_join_band.py on base after the fix:
+11 passed in 16.63s  (invariance pins: nothing may change, so GREEN on base by design)
+
+##### Run B: -m serial_timing tests/test_b101_inc13_perf.py (alone)
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+_______ test_r_crc_preview_002_2_join_change_in_the_f23_scene_within_3_s _______
+tests/test_b101_inc13_perf.py:167: in test_r_crc_preview_002_2_join_change_in_the_f23_scene_within_3_s
+    assert elapsed < report_margin("R-CRC-PREVIEW-002.2/1", elapsed, timing_bound(3.0)), elapsed
+E   AssertionError: 28.42743270198116
+E   assert 28.42743270198116 < 3.0
+E    +  where 3.0 = report_margin('R-CRC-PREVIEW-002.2/1', 28.42743270198116, 3.0)
+E    +    where 3.0 = timing_bound(3.0)
+______ test_r_crc_preview_002_3_template_load_in_the_f23_scene_within_3_s ______
+tests/test_b101_inc13_perf.py:212: in test_r_crc_preview_002_3_template_load_in_the_f23_scene_within_3_s
+    assert elapsed < report_margin("R-CRC-PREVIEW-002.3/1", elapsed, timing_bound(3.0)), elapsed
+E   AssertionError: 531.6660908719932
+E   assert 531.6660908719932 < 3.0
+E    +  where 3.0 = report_margin('R-CRC-PREVIEW-002.3/1', 531.6660908719932, 3.0)
+E    +    where 3.0 = timing_bound(3.0)
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-161/test_r_crc_preview_002_3_templ0 workarea=/tmp/pytest-of-<user>/pytest-161/test_r_crc_preview_002_3_templ0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.042
+_______ test_r_crc_preview_002_4_ranges_edit_in_the_f23_scene_within_3_s _______
+tests/test_b101_inc13_perf.py:254: in test_r_crc_preview_002_4_ranges_edit_in_the_f23_scene_within_3_s
+    assert elapsed < report_margin("R-CRC-PREVIEW-002.4/1", elapsed, timing_bound(3.0)), elapsed
+E   AssertionError: 60.29549280300853
+E   assert 60.29549280300853 < 3.0
+E    +  where 3.0 = report_margin('R-CRC-PREVIEW-002.4/1', 60.29549280300853, 3.0)
+E    +    where 3.0 = timing_bound(3.0)
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-161/test_r_crc_preview_002_4_range0 workarea=/tmp/pytest-of-<user>/pytest-161/test_r_crc_preview_002_4_range0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.043
+__________ test_r_seg_prev_20_join_fill_in_the_f23_scene_within_2_5_s __________
+tests/test_b101_inc13_perf.py:319: in test_r_seg_prev_20_join_fill_in_the_f23_scene_within_2_5_s
+    assert elapsed < report_margin("R-SEG-PREV.20/1", elapsed, timing_bound(2.5)), elapsed
+E   AssertionError: 198.8539966320095
+E   assert 198.8539966320095 < 2.5
+E    +  where 2.5 = report_margin('R-SEG-PREV.20/1', 198.8539966320095, 2.5)
+E    +    where 2.5 = timing_bound(2.5)
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-161/test_r_seg_prev_20_join_fill_i0 workarea=/tmp/pytest-of-<user>/pytest-161/test_r_seg_prev_20_join_fill_i0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.049
+============================= QC-TM timing margins =============================
+LOW -17622.2%  531.666 s / 3.000 s  R-CRC-PREVIEW-002.3/1  tests/test_b101_inc13_perf.py::test_r_crc_preview_002_3_template_load_in_the_f23_scene_within_3_s
+LOW -7854.2%  198.854 s / 2.500 s  R-SEG-PREV.20/1  tests/test_b101_inc13_perf.py::test_r_seg_prev_20_join_fill_in_the_f23_scene_within_2_5_s
+LOW -1909.8%  60.295 s / 3.000 s  R-CRC-PREVIEW-002.4/1  tests/test_b101_inc13_perf.py::test_r_crc_preview_002_4_ranges_edit_in_the_f23_scene_within_3_s
+LOW -847.6%  28.427 s / 3.000 s  R-CRC-PREVIEW-002.2/1  tests/test_b101_inc13_perf.py::test_r_crc_preview_002_2_join_change_in_the_f23_scene_within_3_s
+QC-TM: 4 bounds, 4 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b101_inc13_perf.py::test_r_crc_preview_002_2_join_change_in_the_f23_scene_within_3_s
+FAILED tests/test_b101_inc13_perf.py::test_r_crc_preview_002_3_template_load_in_the_f23_scene_within_3_s
+FAILED tests/test_b101_inc13_perf.py::test_r_crc_preview_002_4_ranges_edit_in_the_f23_scene_within_3_s
+FAILED tests/test_b101_inc13_perf.py::test_r_seg_prev_20_join_fill_in_the_f23_scene_within_2_5_s
+4 failed in 1120.54s (0:18:40)
+
+##### Probe (timing neutralised in a python -c wrapper) of the text oracles on base: 002.2 and 002.4 PASS their text asserts; R-SEG-PREV.20 stats line matched, state line on base is the GUARD chip:
+AssertionError: ['packed 1.26 MiB  .  span 9.20 MiB  .  fill 56.22%', '(!) GUARD  9.20 MiB span - e will ask']  -> test then re-pinned to the GUARD line
+
+##### Teeth of the invariance pins: mutants of the BASE source (restored after each run)
+M-13 _sweep keeps lowest priority: tests/test_b101_split_join_band.py -> 8 failed, 3 passed
+M-14 run finder counts pad-valued bytes: tests/test_b101_split_join_band.py -> 7 failed, 4 passed
+M-pad pad masked to 7 bits (pads >= 0x80 wrong): every_pad node -> 1 failed
+M-9 store line takes the other policy's CRC: state_matrix -> 11 failed, 14 passed
+M-10 diagnostics dropped from the preview: state_matrix -> 1 failed, 24 passed
