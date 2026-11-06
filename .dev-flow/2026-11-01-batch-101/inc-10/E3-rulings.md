@@ -28,3 +28,15 @@ The records keep Inc 10's folder for 10a; 10b gets its own folder `inc-10b/` wit
 | S-6 | — | Backlog: Cf characters in the Loaded panel, the save line and the log. | Outside both slices. |
 
 Correction: one Opus design pass (it splits the records and writes new rows — E1/E2-level work); then round 2 per part (architect + security, only the blocking findings).
+
+## Round 2 (2026-11-06)
+
+Architect: **10a PASS-WITH-NOTES, 10b PASS-WITH-NOTES** (A10-01 … A10-04 closed; sizes 10a 3 files / 36 nodes / 26 rows, 10b 2 files / 17 nodes / 10 rows). Security: **10b PASS**; **10a FAIL** on one new MAJOR (R2-1). Rulings:
+
+- **SR2-1 (MAJOR, 10a):** accept — `action_export` of Split/Join refuses while its window is hidden (the Enter on the EXPORT button bypasses `check_action`); new case R-SEG-OPEN.7/4. Security re-checks only this.
+- **SR2-2 (MINOR, 10a):** case R-SHELL-FOCUS.2/6 is built so the synchronous focus clear decides it (the landing must not run first); E4 addendum with AR2-3.
+- **AR2-1 … AR2-6 (MINOR, 10a):** fold — test `focus is not trigger` (Textual moves focus synchronously in `_prune`); stamp each landing with its switch so a stale one cannot fall back to the rail item; case /6 rebuilt to fail reliably; re-showing the shown window does not move focus; a load or MAC change re-anchors the window (widens D4-14); main-view marker clause gains "not None", view rows sorted once.
+- **AR2-7 (MINOR, 10b):** fold in inc-10b — the A2L repaint uses `update_width=True` where a value can widen, and imports `Coordinate`.
+- **Interfaces:** name the shared `segment_split_view.py` in both parts' interface lists.
+
+Correction: DeepSeek v4 Pro, targeted edits only (the operator's 2026-11-06 reminder: DeepSeek where pertinent; Opus reviews behind it). Then the security reviewer re-checks SR2-1.
