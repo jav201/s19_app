@@ -169,7 +169,7 @@ Digests: SHA-256 (`sha256sum`) of the bytes at the cited path, taken 2026-11-06.
 | e5c-08.txt | evidence/inc-6/e5c-08.txt | 3f1aa7b78bb59e22c0a2aec7bb23c590df179d4248015ec24f8f15b117c2b045 |
 | mut-01.txt … mut-42.txt | evidence/inc-6/mut-01.txt … mut-42.txt | (each cited in `E5-mutants.md`; the full digest list is in `evidence/inc-6/`) |
 | red-01-tester1-base.txt | evidence/inc-6/red-01-tester1-base.txt | 7a1547d78826e8351be1abcbabe82296c3e56f401841104211d0273fa782ce3d |
-| red-01-tester2-base.txt | evidence/inc-6/red-01-tester2-base.txt | a34258cb6dda8fb40d7c3090bd795b8e65bfb5e41d18f90a4e48c841ab8e6ab6 |
+| red-01-tester2-base.txt | evidence/inc-6/red-01-tester2-base.txt | 9e9f86c7bc373f18c5c280fc13485564fcfaf2253ce91dab488830fac620ce3a |
 
 | Field | Value |
 |---|---|
