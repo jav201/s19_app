@@ -982,7 +982,8 @@ async def dismiss_result_panel_if_open(pilot, app) -> None:
     """Close the Load-result panel when the project open raised one (a project
     with a clean digest record raises none)."""
     await settle(pilot, 4)
-    if len(app.screen.query(projects.LOAD_RESULT_CLOSE)) > 0:
+    close_selector = projects.LOAD_RESULT_CLOSE
+    if len(app.screen.query(close_selector)) > 0:
         await projects.dismiss_load_result_panel(pilot, app)
 
 

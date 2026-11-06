@@ -940,8 +940,14 @@ def _d2_drift(base_src: str, head_src: str) -> List[str]:
         )
 
     head_by_key = {_top_key(s): s for s in head.body if not allowed_addition(s)}
+    # Once the increment is merged the base holds the same waits and module-level
+    # additions: strip them from the base too, so the comparison still covers every
+    # other statement (before the merge both steps are no-ops on the base).
+    base = _StripInsertedWaits().visit(base)
     drift = []
     for stmt in base.body:
+        if allowed_addition(stmt):
+            continue
         key = _top_key(stmt)
         other = head_by_key.get(key)
         if other is None:
