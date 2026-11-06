@@ -54,6 +54,7 @@ from s19_app.tui.screens_directionb import (
 from tests.b97_probes import is_displayed, painted_rows, settled
 from tests.support import b100_load_dialog as ld
 from tests.support import b100_projects as projects
+from tests.support.b100_projects import LOAD_RESULT_CLOSE
 from tests.support import b100_save_dialog as sd
 from tests.support.b100_workers import settle_workers
 from tests.support.timing import wait_until
@@ -311,7 +312,7 @@ async def open_project_by_dialog(pilot, app, name: str = "proj") -> None:
 async def close_result_panel(pilot, app) -> None:
     for _ in range(4):
         await pilot.pause()
-    if len(app.screen.query(projects.LOAD_RESULT_CLOSE)) > 0:
+    if len(app.screen.query(LOAD_RESULT_CLOSE)) > 0:
         await projects.dismiss_load_result_panel(pilot, app)
     await settle_workers(pilot)
 

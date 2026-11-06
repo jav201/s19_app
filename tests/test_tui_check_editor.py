@@ -83,9 +83,11 @@ def _write_calls() -> tuple[list, object]:
     calls: list = []
     original = app_module.write_change_document
 
-    def _spy(document, base_dir, file_name, copy_fn=None):
+    # batch-101 Inc 6: the spy takes the writer's whole signature; the Check
+    # Editor Write now passes ``dest_dir`` (the check home, R-CHKED-031).
+    def _spy(document, base_dir, file_name, copy_fn=None, dest_dir=None):
         calls.append((document, file_name))
-        return original(document, base_dir, file_name, copy_fn)
+        return original(document, base_dir, file_name, copy_fn, dest_dir=dest_dir)
 
     app_module.write_change_document = _spy
     return calls, original

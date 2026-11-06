@@ -1,0 +1,17 @@
+=== Inc 6 E4 integration run: int-07-final-tree
+date: 2026-11-06T14:13:14Z
+worktree HEAD (base): 98d94d724a72c56468292be123ff15f664acb4fa
+index tree with the increment staged: 4d71b9b7e1bd9b67ebb4134027af921350c3db21
+staged files vs base: 16
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i6int/s19_app/__init__.py
+CMD: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -n 10 -m not serial_timing -rfs tests/test_b101_document_homes.py tests/test_tui_check_editor.py tests/test_address_census.py tests/test_suite_hygiene.py tests/test_id_registry.py tests/test_engine_unchanged.py tests/test_docs_canon.py tests/test_b101_doc_hygiene.py tests/test_b101_help_legend_docs.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 27%]
+........................................................................ [ 55%]
+........................................................................ [ 82%]
+.............................................                            [100%]
+261 passed in 120.17s (0:02:00)
+=== exit code: 0

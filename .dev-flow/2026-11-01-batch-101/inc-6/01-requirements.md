@@ -1,7 +1,7 @@
 # Inc 6 — Patch Editor document lifecycle: requirements (E1)
 
 Batch 2026-11-01-batch-101, increment 6. Base `9bb0e3a` (main: Incs 1, 2, 3, 4, 7, 8, 11, 13, 14, 15, 16). Designed against main plus Inc 5 (`b101-inc5`, in flight; it merges first). Findings F-05, F-06, F-40, F-47 (`docs/user-guide/DOSSIER.md` §5); CODE-CHANGES D14-14, D10-25, D9-15, D9-10, D10-30, and D14-17 (co-located, ruling D-1 in `E1-rulings.md`).
-Rulings, decisions and canon changes: `E1-rulings.md` (E3 round-1 corrections of `E3-rulings.md` folded in, 2026-11-06). Slice: `E1-slice.md`. Cases: `02-test-cases.md`. Graph: `codewire/graph-inc6.md`. Pilot on `9bb0e3a`: `evidence-e1/i6e1-pilot-transcript.txt` (`P` below).
+Rulings, decisions and canon changes: `E1-rulings.md` (E3 round-1 corrections of `E3-rulings.md` folded in, 2026-11-06). Slice: `E1-slice.md` (source files `s19_app/tui/app.py`, `s19_app/tui/services/change_service.py`, `s19_app/tui/screens_directionb.py`, `s19_app/tui/window_help.py`). Cases: `02-test-cases.md`. Graph: `codewire/graph-inc6.md`. Pilot on `9bb0e3a`: `evidence-e1/i6e1-pilot-transcript.txt` (`P` below).
 
 Form column: U = ubiquitous, E = event (`When`), S = state (`While`), N = unwanted (`If … then`). Row texts marked "unchanged" are the canon's; the increment changes the code (and, where stated, a context note). "Base" = what `9bb0e3a` does.
 
