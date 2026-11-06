@@ -4,3 +4,4 @@ E2 start 2026-11-06T13:17Z model=opus
 E2 end 2026-11-06T13:21Z model=opus graph=codewire/graph-inc9.md nodes=15 (7 changed, 8 context) entities=8 (1 new constant, 1 changed docstring) edges=16; codewire_lint: not read=0
 E2 trace_check (E1/E2 records): 3 US, 11 active requirements (0 withdrawn), 12 gap(s) = 11 TEST (tests are E4) + 1 EVID (04-validation.md is E5); CASE 0, SLICE 0, US 0. LAN worktree removed.
 E1 rulings 2026-11-06T13:23Z orchestrator D-1 (C), D-2 (no), D-6 (yes)
+E3 correction 2026-11-06T13:55Z model=opus rulings=E3-rulings.md applied (E3A-01..10, S-1..S-6) rows=12 active (10 new, 2 changed) + 1 withdrawn (R-FB-RUN.8) TCs=31 (28 + 3 AT; 2 withdrawn kept by id) slice=4 source files (+1 private helper _create_new_json; flow_screens.py docstring only) graph nodes=18 (6 changed, 1 new, 11 context) edges=20; trace_check: 3 US, 12 active (1 withdrawn), 13 gaps = 12 TEST (E4) + 1 EVID (E5); CASE 0, SLICE 0, US 0
