@@ -1,0 +1,5 @@
+E1 start 2026-11-06T19:08Z model=opus base=2d1e2b1 (product e07fb00; Inc 9 in E4 on b101-inc9; Inc 10a/10b E3 closed on b101-inc10)
+E1 end 2026-11-06T20:10Z model=opus rows=7 active (6 new, 1 changed) TCs=21 (18 + 3 AT) decisions=D-1..D-10 evidence=evidence-e1/i12e1-census-transcript.txt, evidence-e1/i12e1-pilot-transcript.txt (LAN Linux, e07fb00); all four findings reproduced
+E2 start 2026-11-06T20:10Z model=opus
+E2 end 2026-11-06T20:15Z model=opus graph=codewire/graph-inc12.md nodes=35 (12 changed, 1 new, 12 removed, 10 context) entities=11 (1 groups the 14 canvas grid helpers) edges=18; codewire_lint: not read=0
+E2 trace_check (E1/E2 records): 3 US, 7 active requirements (0 withdrawn), 8 gaps = 7 TEST (tests are E4) + 1 EVID (04-validation.md is E5); CASE 0, SLICE 0, US 0. LAN worktree s19_i12e1 and run folder removed.

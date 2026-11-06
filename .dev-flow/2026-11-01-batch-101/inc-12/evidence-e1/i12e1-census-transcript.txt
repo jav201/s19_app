@@ -1,0 +1,199 @@
+commit: e07fb00f (origin/main; s19_app/ and tests/ equal to main 2d1e2b17)
+platform: Linux x86_64, Python 3.11.18 (LAN Linux host)
+command: PYTHONPATH=<worktree> python i12e1-census.py (cwd = the detached worktree; HOME, XDG and LOCALAPPDATA isolated under the run folder; NO_COLOR unset)
+
+commit: e07fb00f
+python: 3.11.18
+modules parsed: 86
+
+== F-33: dialogs (ModalScreen subclasses) and their product construction sites
+CurveDescriptionScreen       s19_app/tui/a2l_describe.py:31-97  product construction sites: 1
+_QuitQuestionScreen          s19_app/tui/app.py:454-462  product construction sites: 1
+LoadDialog                   s19_app/tui/screens.py:308-702  product construction sites: 2
+ChangeSetJsonScreen          s19_app/tui/screens.py:705-795  product construction sites: 1
+EntryJsonScreen              s19_app/tui/screens.py:798-874  product construction sites: 1
+BulkParameterAddScreen       s19_app/tui/screens.py:877-1067  product construction sites: 1
+VariantHelpScreen            s19_app/tui/screens.py:1091-1153  product construction sites: 0
+SaveProjectScreen            s19_app/tui/screens.py:1161-1490  product construction sites: 1
+SaveFlowScreen               s19_app/tui/screens.py:1493-1559  product construction sites: 1
+LoadFlowScreen               s19_app/tui/screens.py:1562-1659  product construction sites: 2
+FileRefChooserScreen         s19_app/tui/screens.py:1697-1856  product construction sites: 1
+FlowBlockEditScreen          s19_app/tui/screens.py:1872-2260  product construction sites: 1
+ConfirmDiscardScreen         s19_app/tui/screens.py:2272-2312  product construction sites: 1
+ConfirmQuestionScreen        s19_app/tui/screens.py:2315-2404  product construction sites: 2  (subclassed by ['_QuitQuestionScreen'])
+SelectVariantScreen          s19_app/tui/screens.py:2407-2478  product construction sites: 1
+LoadResultScreen             s19_app/tui/screens.py:2493-2634  product construction sites: 1
+LegendScreen                 s19_app/tui/screens.py:2663-3049  product construction sites: 1
+ReportViewerScreen           s19_app/tui/screens.py:3099-3506  product construction sites: 1
+ConfirmWriteScreen           s19_app/tui/screens.py:3527-3612  product construction sites: 1
+OperationsScreen             s19_app/tui/screens.py:3615-4419  product construction sites: 1
+LoadGuardScreen              s19_app/tui/screens_directionb.py:4294-4371  product construction sites: 2
+WindowHelpScreen             s19_app/tui/window_help.py:657-752  product construction sites: 1
+dialogs with no product construction site: ['VariantHelpScreen']
+source lines naming VariantHelpScreen: ['s19_app/tui/screens.py:1091', 's19_app/tui/screens.py:1123', 's19_app/tui/screens.py:1152', 's19_app/tui/window_help.py:12', 's19_app/tui/window_help.py:627', 's19_app/tui/window_help.py:661']
+source lines naming VARIANT_HELP_TEXT: ['s19_app/tui/screens.py:1078', 's19_app/tui/screens.py:1098', 's19_app/tui/screens.py:1110', 's19_app/tui/screens.py:1117', 's19_app/tui/screens.py:1130']
+-- test nodes naming F-33
+   VariantHelpScreen: 1
+      tests/test_tui_variants.py::test_variant_help_modal_fits_at_both_sizes
+   _VARIANT_HELP_TOKENS: 1
+      tests/test_tui_variants.py::test_variant_help_modal_fits_at_both_sizes
+   VARIANT_HELP_TEXT: 0
+   variant_help_: 1
+      tests/test_tui_variants.py::test_variant_help_modal_fits_at_both_sizes
+
+== F-34: S19TuiApp actions and how each is reached
+actions defined on S19TuiApp: 41
+   view_main                        action strings: 0  direct calls: 0 []
+   view_alt                         action strings: 0  direct calls: 1 ['s19_app/tui/app.py:16840 in S19TuiApp._jump_to_validation_issue_object']
+   view_mac                         action strings: 0  direct calls: 0 []
+   a2l_tags_page_next               action strings: 0  direct calls: 2 ['s19_app/tui/app.py:10918 in S19TuiApp.action_page_next_context', 's19_app/tui/app.py:21015 in S19TuiApp.on_button_pressed']
+   a2l_tags_page_prev               action strings: 0  direct calls: 2 ['s19_app/tui/app.py:10945 in S19TuiApp.action_page_prev_context', 's19_app/tui/app.py:21013 in S19TuiApp.on_button_pressed']
+   mac_records_page_next            action strings: 0  direct calls: 2 ['s19_app/tui/app.py:10920 in S19TuiApp.action_page_next_context', 's19_app/tui/app.py:21019 in S19TuiApp.on_button_pressed']
+   mac_records_page_prev            action strings: 0  direct calls: 2 ['s19_app/tui/app.py:10947 in S19TuiApp.action_page_prev_context', 's19_app/tui/app.py:21017 in S19TuiApp.on_button_pressed']
+actions with no action string (no key, palette entry, button or markup link): ['view_main', 'view_alt', 'view_mac', 'a2l_tags_page_next', 'a2l_tags_page_prev', 'mac_records_page_next', 'mac_records_page_prev']
+... of these, with no direct product call either: ['view_main', 'view_mac']
+-- every action_* method of every class in s19_app (string literals that are not docstrings)
+action methods in s19_app: 83
+   S19TuiApp.action_view_main (s19_app/tui/app.py:10753): no action string in s19_app; direct calls []
+   S19TuiApp.action_view_alt (s19_app/tui/app.py:10757): no action string in s19_app; direct calls ['s19_app/tui/app.py:16840']
+   S19TuiApp.action_view_mac (s19_app/tui/app.py:10761): no action string in s19_app; direct calls []
+   S19TuiApp.action_a2l_tags_page_next (s19_app/tui/app.py:11076): no action string in s19_app; direct calls ['s19_app/tui/app.py:10918', 's19_app/tui/app.py:21015']
+   S19TuiApp.action_a2l_tags_page_prev (s19_app/tui/app.py:11104): no action string in s19_app; direct calls ['s19_app/tui/app.py:10945', 's19_app/tui/app.py:21013']
+   S19TuiApp.action_mac_records_page_next (s19_app/tui/app.py:11130): no action string in s19_app; direct calls ['s19_app/tui/app.py:10920', 's19_app/tui/app.py:21019']
+   S19TuiApp.action_mac_records_page_prev (s19_app/tui/app.py:11161): no action string in s19_app; direct calls ['s19_app/tui/app.py:10947', 's19_app/tui/app.py:21017']
+   CappedTextArea.action_cut (s19_app/tui/capped_text_area.py:270): no action string in s19_app; direct calls []; bound by the framework (_input.py)
+   OsClipboardInput.action_cut (s19_app/tui/os_clipboard_input.py:866): no action string in s19_app; direct calls []; bound by the framework (_input.py)
+action methods with no action string, no framework binding and no direct call: ['S19TuiApp.action_view_main', 'S19TuiApp.action_view_mac']
+-- one-hop caller census of the direct callers (D3-7 co-location)
+   _jump_to_validation_issue_object: product call sites 1 ['s19_app/tui/app.py:16752 in S19TuiApp._jump_to_validation_issue']
+   _jump_to_validation_issue: product call sites 0 []
+   _format_validation_issue_line: product call sites 0 []
+   key 1 -> show_screen('workspace')
+   key 2 -> show_screen('a2l')
+   key 3 -> show_screen('mac')
+-- test nodes naming F-34 / D3-7
+   action_view_main|\"view_main\": 2
+      tests/test_tui_directionb.py::test_tc011_every_pre_batch_action_keeps_a_keyboard_path
+      tests/test_tui_goto_marker.py::test_goto_focus_not_cleared_on_tab_switch
+   action_view_alt|\"view_alt\": 2
+      tests/test_tui_directionb.py::test_tc011_every_pre_batch_action_keeps_a_keyboard_path
+      tests/test_tui_goto_marker.py::test_goto_focus_not_cleared_on_tab_switch
+   action_view_mac|\"view_mac\": 2
+      tests/test_tui_directionb.py::test_tc011_every_pre_batch_action_keeps_a_keyboard_path
+      tests/test_tui_goto_marker.py::test_goto_focus_not_cleared_on_tab_switch
+   _jump_to_validation_issue: 1
+      tests/test_tui_app.py::test_jump_to_validation_issue_prefers_address
+   _format_validation_issue_line: 1
+      tests/test_tui_app.py::test_validation_issue_filtering_and_format
+
+== F-35: widgets hidden at mount (display = False in compose / on_mount) and their readers
+flow_help                      FlowBuilderPanel.on_mount (s19_app/tui/flow_screens.py)  product query sites: 1 ['s19_app/tui/flow_screens.py:2588']
+flow_canvas                    FlowBuilderPanel.on_mount (s19_app/tui/flow_screens.py)  product query sites: 2 ['s19_app/tui/flow_screens.py:2110', 's19_app/tui/flow_screens.py:2588']
+flow_blocks                    FlowBuilderPanel.on_mount (s19_app/tui/flow_screens.py)  product query sites: 2 ['s19_app/tui/flow_screens.py:2109', 's19_app/tui/flow_screens.py:2588']
+flow_kind                      FlowBuilderPanel.on_mount (s19_app/tui/flow_screens.py)  product query sites: 4 ['s19_app/tui/flow_screens.py:2506', 's19_app/tui/flow_screens.py:2515', 's19_app/tui/flow_screens.py:2588', 's19_app/tui/flow_screens.py:2594']
+flow_ext_session               FlowBuilderPanel.on_mount (s19_app/tui/flow_screens.py)  product query sites: 2 ['s19_app/tui/flow_screens.py:1592', 's19_app/tui/flow_screens.py:2588']
+flow_funnel_editor             FlowBuilderPanel.on_mount (s19_app/tui/flow_screens.py)  product query sites: 1 ['s19_app/tui/flow_screens.py:2569']
+flow_funnel_list               FlowBuilderPanel.on_mount (s19_app/tui/flow_screens.py)  product query sites: 2 ['s19_app/tui/flow_screens.py:2171', 's19_app/tui/flow_screens.py:2571']
+fx_help                        FlowExecutionPanel.on_mount (s19_app/tui/flow_screens.py)  product query sites: 0 []
+fx_required                    FlowExecutionPanel.on_mount (s19_app/tui/flow_screens.py)  product query sites: 1 ['s19_app/tui/flow_screens.py:4174']
+file_ref_status                FileRefChooserScreen.on_mount (s19_app/tui/screens.py)  product query sites: 1 ['s19_app/tui/screens.py:1851']
+block_edit_refusal             FlowBlockEditScreen.on_mount (s19_app/tui/screens.py)  product query sites: 1 ['s19_app/tui/screens.py:2254']
+check_preview_toggle_button    CheckEditorPanel.compose (s19_app/tui/screens_directionb.py)  product query sites: 0 []
+-- test nodes naming F-35 ids (as a query selector or a quoted id)
+   #check_preview_toggle_button\b|"check_preview_toggle_button"|CE_IDS_9C7BEAF: 2
+      tests/test_b97_check_editor.py::test_tc_b97_08_census_rows_and_one_docked_row
+      tests/test_b97_check_editor.py::test_tc_b97_61_every_control_displayed_in_its_home
+   #flow_help\b|"flow_help": 0
+   #flow_canvas\b|"flow_canvas": 6
+      tests/test_b97_flow_builder.py::test_tc_b97_13_pipeline_cards_and_cables_replace_list_and_canvas
+      tests/test_flow_external_step_b96.py::test_tc1804_builder_palette_select_and_config_row_gate
+      tests/test_tui_flow_builder_b94.py::test_at_b94_15_fb_a_surface_and_wired_patch_run
+      tests/test_tui_flow_builder_b94.py::test_at_b94_16_a2b_wiring_rule_and_report_provenance
+      tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally
+      tests/test_tui_flow_builder_b94.py::test_tc_b94_20_fb_a_composition_census
+   #flow_blocks\b|"flow_blocks": 9
+      tests/test_b97_flow_builder.py::test_tc_b97_13_pipeline_cards_and_cables_replace_list_and_canvas
+      tests/test_flow_builder_render.py::test_at088b_check_ref_label_renders_literally
+      tests/test_flow_crc_ribbon.py::test_tc358_empty_flow_renders_without_crash
+      tests/test_flow_crc_ui.py::test_at128_crc_node_renders_and_shows_status
+      tests/test_tui_directionb.py::test_at_flow_add_blocks_and_run_renders_result
+      tests/test_tui_directionb.py::test_at_flow_block_label_markup_safe
+      tests/test_tui_flow_persistence_ui.py::test_at006_report_bearing_flow_shows_report_row
+      tests/test_tui_flow_persistence_ui.py::test_at006_quarantine_card_painted_and_flow_unchanged
+      tests/test_tui_flow_persistence_ui.py::test_at005_dirty_guard_cancel_keeps_blocks_confirm_replaces
+   #flow_kind\b|"flow_kind": 26
+      tests/test_b102_flow_file_chooser.py::test_tc_b102_file_02_browse_beside_every_ref_field
+      tests/test_b97_chips_help.py::test_tc_b97_32_flow_help_names_every_label
+      tests/test_b97_chips_help.py::test_at_b97_14_help_chip_opens_a_body_covering_the_screen
+      tests/test_b97_flow_builder.py::test_tc_b97_14_palette_offers_every_kind_in_order
+      tests/test_b97_flow_builder.py::test_tc_b97_15_add_form_shows_exactly_the_kind_inputs
+      tests/test_b97_flow_builder.py::test_tc_b97_17_run_is_the_one_filled_action_on_one_foot_row
+      tests/test_b97_flow_builder.py::test_tc_b97_49_ribbon_paints_saved_then_unsaved
+      tests/test_b97_flow_builder.py::test_tc_b97_58_add_with_an_empty_field_says_what_it_needs
+      tests/test_b97_flow_builder.py::test_tc_b97_58_add_notice_clears_on_kind_change_and_run
+      tests/test_b97_flow_builder.py::test_tc_b97_51_keyboard_order_keys_and_chip_states
+      tests/test_b97_flow_builder.py::test_tc_b97_51_space_presses_every_builder_button_group
+      tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused
+      tests/test_b97_flow_builder.py::test_at_b97_07_each_kind_its_inputs_and_an_ext_step_card
+      tests/test_b97_flow_builder.py::test_at_b97_08_hostile_and_nul_refs_never_crash_or_inject
+      tests/test_flow_builder_render.py::test_at088b_check_ref_label_renders_literally
+      tests/test_flow_builder_render.py::test_at088_gating_selector_appends_block_own_op_check
+      tests/test_flow_crc_ribbon.py::test_tc361_gating_control_hidden_for_non_check
+      tests/test_flow_external_step_b96.py::test_tc1804_builder_palette_select_and_config_row_gate
+      tests/test_flow_funnel_b96.py::test_tc1817_builder_funnel_table_edits
+      tests/test_tui_directionb.py::test_at_flow_add_blocks_and_run_renders_result
+      tests/test_tui_directionb.py::test_at_flow_block_label_markup_safe
+      tests/test_tui_flow_builder_b94.py::test_at_b94_15_fb_a_surface_and_wired_patch_run
+      tests/test_tui_flow_builder_b94.py::test_at_b94_16_a2b_wiring_rule_and_report_provenance
+      tests/test_tui_flow_builder_b94.py::test_at_b94_17_template_save_listing_import_and_dedup
+      tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally
+      tests/test_tui_flow_builder_b94.py::test_tc_b94_20_fb_a_composition_census
+   #flow_ext_session\b|"flow_ext_session": 3
+      tests/test_b100_project_homes.py::test_tc_b100_31_flow_session_folder_follows_q
+      tests/test_b97_flow_builder.py::test_tc_b97_49_session_on_the_ribbon
+      tests/test_flow_external_step_b96.py::test_tc1804_builder_palette_select_and_config_row_gate
+   #fx_help\b|"fx_help": 0
+-- the Flow Builder canvas painter family (D16-6): definitions and every name reference
+   _canvas_text       def [(1955, 2094, 'FlowBuilderPanel')]  referenced from ['FlowBuilderPanel._refresh_blocks', 'FlowBuilderPanel.compose']
+   _blocks_text       def [(2096, 2104, 'FlowBuilderPanel')]  referenced from ['FlowBuilderPanel._refresh_blocks', 'FlowBuilderPanel.compose']
+   _flow_block_label  def [(373, 398, '_flow_block_label')]  referenced from ['FlowBuilderPanel._blocks_text']
+   _layout            def [(1912, 1953, 'FlowBuilderPanel')]  referenced from ['FlowBuilderPanel._canvas_text']  other modules ['s19_app/tui/a2l_parameter_picker.py', 's19_app/tui/screens_directionb.py']
+   _block_rows        def [(1857, 1910, 'FlowBuilderPanel')]  referenced from ['FlowBuilderPanel._canvas_text', 'FlowBuilderPanel._layout']
+   _Grid              def [(585, 634, '_Grid')]  referenced from ['FlowBuilderPanel._canvas_text', '_chip', '_plc_block', '_wire_bend', '_wire_drop']
+   _plc_block         def [(637, 659, '_plc_block')]  referenced from ['FlowBuilderPanel._canvas_text']
+   _chip              def [(662, 668, '_chip')]  referenced from ['FlowBuilderPanel._canvas_text']
+   _wire_bend         def [(671, 684, '_wire_bend')]  referenced from ['FlowBuilderPanel._canvas_text']
+   _wire_drop         def [(687, 713, '_wire_drop')]  referenced from ['FlowBuilderPanel._canvas_text']
+   _block_width       def [(559, 563, '_block_width')]  referenced from ['FlowBuilderPanel._layout']
+   _short_ext         def [(566, 571, '_short_ext')]  referenced from ['FlowBuilderPanel._block_rows']
+   _CANVAS_COLS       def [(547, 547, '<module>')]  referenced from ['<module>', 'FlowBuilderPanel._canvas_text', 'FlowBuilderPanel._layout']
+   _BLOCK_W           def [(550, 550, '<module>')]  referenced from ['<module>', '_block_width']
+   _EXT_BLOCK_W       def [(556, 556, '<module>')]  referenced from ['<module>', 'FlowBuilderPanel._block_rows', '_block_width']
+   _S_WIRE            def [(576, 576, '<module>')]  referenced from ['<module>', 'FlowBuilderPanel._canvas_text', '_wire_bend', '_wire_drop']
+   _S_LABEL           def [(578, 578, '<module>')]  referenced from ['<module>', '_chip', '_plc_block']
+   _S_VALUE           def [(579, 579, '<module>')]  referenced from ['<module>', 'FlowBuilderPanel._block_rows', '_Grid.text']
+   _S_HEAD            def [(581, 581, '<module>')]  referenced from ['<module>', '_plc_block']
+   (for the four FlowBuilderPanel methods: calls, and loads inside FlowBuilderPanel; FlowExecutionPanel's own attribute of the same name `_layout` is not the method)
+-- test nodes naming the painter family
+   _canvas_text: 0
+   _blocks_text: 1
+      tests/test_flow_crc_ui.py::test_at128_crc_node_renders_and_shows_status
+   _flow_block_label: 4
+      tests/test_flow_builder_render.py::test_at088b_check_ref_label_renders_literally
+      tests/test_flow_builder_render.py::test_flow_block_label_covers_check
+      tests/test_flow_crc_ui.py::test_tc356_crc_in_dropdown_and_builder
+      tests/test_tui_directionb.py::test_at_flow_block_label_markup_safe
+   _Grid\b: 0
+
+== F-51: the Reports dialog's bindings, and test nodes that open it and press escape
+ReportViewerScreen.BINDINGS (screens.py:3169): [         Binding("question_mark", "show_window_usage_help", "Window help", show=False),     ]
+ReportViewerScreen action_* methods: ['action_show_window_usage_help']
+test nodes that open Reports (or name its seat): 64; of these, pressing escape: 5
+    tests/test_b100_focus.py::test_at_b100_04_focus_lands_and_single_keys_reach_their_screens
+    tests/test_b101_help_legend_docs.py::test_r_whelp_7_2_question_mark_paints_the_approved_copy
+    tests/test_b99_export.py::test_at_b99_11_sanitised_mac_only_second_export_takes_suffix
+    tests/test_window_usage_help.py::test_tc706_close_and_escape_dismiss
+    tests/test_window_usage_help.py::test_tc706_focused_question_mark_opens_same_modal
+-- test nodes naming the Reports binding census
+   ReportViewerScreen\.BINDINGS: 1
+      tests/test_window_usage_help.py::test_tc706_seat_census_header_row_and_window_section
