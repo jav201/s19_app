@@ -10,3 +10,4 @@ E3 addendum 2026-11-06T20:29Z model=opus Inc 12 D-2 applied: issue jump has no p
 E4 start 2026-11-06T21:48Z Inc 10a implementers model=deepseek-v4-pro (G1 app.py, G2 segment_split_view.py) testers=sonnet x2 (H hex_jump, F unload_focus); branch merged with local main f653241 (Inc 9 in)
 E4 G3 2026-11-06T22:10Z orchestrator missed group G3 (render/hexview.py) at the first launch; G3 launched now, model=deepseek-v4-pro. G1, G2 done exit 0 (G1: 1 deviation AR2-5, 4 open questions)
 E4 implementers end 2026-11-06T22:15Z model=deepseek-v4-pro (G1 app, G2 split-join, G3 render: exit 0; deviations: G1 AR2-5 not built, for the integrator)
+E4 testers end 2026-11-06T22:30Z model=sonnet x2: H 41 nodes (36 RED, 4 standing, 1 skip), F 46 nodes (41 RED, 5 standing); findings for the integrator in the notes
