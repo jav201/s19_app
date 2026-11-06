@@ -10,3 +10,8 @@
 2026-11-06T15:32:42-06:00 rebase — batch-103 onto main e07fb00 (2 record commits, no conflict)
 2026-11-06T15:34:56-06:00 E1 start — Inc 1a, 1b, 2, 4 in parallel; model Opus 5.5 (architect agents, one per folder); common rules design/E1-brief-common.md; ids R-PASTE (1a), R-COPY (1b), R-A2L-DEF (2, Inc 3 continues), R-A2L-MATCH (4)
 2026-11-06T16:18:57-06:00 E1 done — Inc 1a (25 rows: 22 new, 3 changed; 111 cases), 1b (11 new; 77 cases+cells), 2 (63 new; 204 cases), 4 (36 new; 109 cases); model Opus 5.5 ×4, ~36-41 min each; orchestrator rulings appended to each E1-rulings.md; open to operator: 1b D-2, P-1 (1b D-3), branch push for 1a's Windows job
+2026-11-06T16:21:28-06:00 E1 correction start — Inc 1a (design/E1-corr-1a.md) and Inc 4 (design/E1-corr-4.md); model deepseek-v4-pro via pi, timeout 1500, stdin closed
+2026-11-06T16:21:28-06:00 E2 start — Inc 2 (graph); model Opus 5.5; common rules design/E2-brief-common.md; one agent for a2l_definition.py + synth (synth small, no code interface)
+2026-11-06T16:21:28-06:00 E1 start — Inc 3 (arrays and axes, R-A2L-DEF.64+); model Opus 5.5
+2026-11-06T16:29:56-06:00 E1 correction done — Inc 1a (R-PASTE.20 triggers, new R-PASTE.23, counts) and Inc 4 (S2.8, new R-A2L-MATCH.37, counts); deepseek-v4-pro via pi, exit 0 both, ~2 min each; diffs checked by orchestrator (10-column rows intact)
+2026-11-06T16:29:56-06:00 operator answers — P-1/D-2: Ctrl+C must not be the copy key (terminal convention = quit): Ctrl+C asks a quit confirmation; copy and paste by right-click, paste also Ctrl+V; push of batch-103 approved with path redaction (or tests on the main PC, not taken: those tests write the OS clipboard)

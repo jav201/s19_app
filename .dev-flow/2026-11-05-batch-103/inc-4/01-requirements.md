@@ -71,7 +71,7 @@ match span        [start, end): the offsets of the name characters a match cover
 prepared name list  A name list the system has prepared for ranking (R-A2L-MATCH.35).
 ```
 
-## Requirements (new module S2.7 · Label matching, CTX-A2L-MATCH; proposed home: `E1-rulings.md` D-10)
+## Requirements (new module S2.8 · Label matching, CTX-A2L-MATCH; proposed home: `E1-rulings.md` D-10)
 
 ### The query (US-I4-1)
 
@@ -138,6 +138,7 @@ prepared name list  A name list the system has prepared for ranking (R-A2L-MATCH
 |---|---|---|---|---|---|---|---|
 | R-A2L-MATCH.35 | E | When the system prepares a name list of 50,000 names for ranking, the system shall finish within 5.0 s. | median of 3 preparations of the reference list (`02-test-cases.md`, fixture REF) ≤ 5.0 s on cachyos-rtx, Python 3.11.18, a `serial_timing` test that prints the host load before and after | a preparation that computes the fuzzy distances of every name token pair (quadratic) → minutes → RED | US-I4-2 | new | No (B, v3: median 2.00 s, host load 3.2–3.4 on 16 cores, `i4e1-pilot3-transcript.txt` §4; v2: 3.26 s under load ≈ 12; the pilot's dict trie added ~137 MiB, `E1-rulings.md` D-12) |
 | R-A2L-MATCH.36 | E | When the system ranks a prepared name list of 50,000 names for a query with a limit of 20, the system shall return the ranked list within 200 ms. | each of the 22 queries of fixture QSET over the prepared reference list: the median of 7 consecutive rankings ≤ 200 ms, on cachyos-rtx, Python 3.11.18, `serial_timing`, host load printed | no preparation (every ranking re-reads the 50,000 names: 9.15 s for one query, B v1) → RED; a fuzzy step that scans every distinct token per query token (v1 index: 1,186.7 ms for `qqqq zzzz`) → RED | US-I4-2 | new | No (B, v3: worst median 122.6 ms, `pposbxiifkdgfiajnbbpvb_dyan_xvz1`; 20 of 22 queries ≤ 77 ms; `i4e1-pilot3-transcript.txt` §4; v2 (order A) 122.2 ms under load ≈ 12) |
+| R-A2L-MATCH.37 | E | When the system prepares a name list of 50,000 names for ranking, the system shall hold the prepared list in at most 64 MiB. | the tracemalloc peak during the preparation of the reference list (fixture REF, 50,000 names) ≤ 67,108,864 bytes (64 MiB), on cachyos-rtx, Python 3.11.18; the peak printed in the transcript | the pilot's dict trie (about 137 MiB) → RED | US-I4-2 | new (D-12 A + D, orchestrator ruling) | No (B: the pilot v3 index took about 137 MiB) |
 
 ## Edge cases the brief names, and where they live
 
@@ -162,4 +163,4 @@ The increment has no key or dialog of its own (the UI is Inc 7, whose acceptance
 
 ## Counts
 
-36 new rows (R-A2L-MATCH.1 … .36), 0 changed, 0 retired; 1 new context note (CTX-A2L-MATCH, proposed for a new subsection S2.7). PLAN estimate: ~25 rows / ~8 nodes; E1: 36 rows / 12 slice nodes (`E1-slice.md`), within the caps (80 / 40).
+37 new rows (R-A2L-MATCH.1 … .37), 0 changed, 0 retired; 1 new context note (CTX-A2L-MATCH, proposed for a new subsection S2.8). PLAN estimate: ~25 rows / ~8 nodes; E1: 37 rows / 12 slice nodes (`E1-slice.md`), within the caps (80 / 40).

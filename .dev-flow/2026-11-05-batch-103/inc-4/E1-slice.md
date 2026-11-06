@@ -6,7 +6,7 @@ Base `e07fb00`. Line numbers are "as of `e07fb00`". Rows: `01-requirements.md`; 
 
 | File | Functions | Rows |
 |---|---|---|
-| `s19_app/tui/services/label_match.py` (**new**, D-11 A) | 3 types, 2 public functions, 7 private helpers | R-A2L-MATCH.1 … .36 |
+| `s19_app/tui/services/label_match.py` (**new**, D-11 A) | 3 types, 2 public functions, 7 private helpers | R-A2L-MATCH.1 … .37 |
 
 **Totals:** **1 source file of the 4 allowed** (new). 12 graph nodes (PLAN estimate ~8). 0 changed, 0 removed functions: nothing in `e07fb00` changes. Not source: none (the user guide gains the autocomplete with Inc 7). Tests (not capped): 2 new files (§4).
 
@@ -16,8 +16,8 @@ Base `e07fb00`. Line numbers are "as of `e07fb00`". Rows: `01-requirements.md`; 
 |---|---|---|---|
 | `MatchRule` | `str` enum | six members in rank order: `exact`, `prefix`, `substring`, `token`, `fuzzy`, `subsequence` | .5–.10, .16, .20 |
 | `LabelMatch` | frozen dataclass | `name: str`, `rule: MatchRule`, `edits: int` (total edits for `fuzzy`, else 0), `spans: tuple[tuple[int, int], ...]` | .16, .26–.34 |
-| `LabelIndex` | immutable class (opaque) | the prepared name list: distinct names in first-occurrence order, their folded forms, their tokens, their boundary offsets, and a structure of the distinct folded tokens for the token and fuzzy steps | .17, .35 |
-| `build_label_index(names: Iterable[str]) -> LabelIndex` | public | de-duplicates, folds, tokenises, indexes; `TypeError` for a non-`str` name (I-3) | .17, .35 |
+| `LabelIndex` | immutable class (opaque) | the prepared name list: distinct names in first-occurrence order, their folded forms, their tokens, their boundary offsets, and a structure of the distinct folded tokens for the token and fuzzy steps | .17, .35, .37 |
+| `build_label_index(names: Iterable[str]) -> LabelIndex` | public | de-duplicates, folds, tokenises, indexes; `TypeError` for a non-`str` name (I-3) | .17, .35, .37 |
 | `rank(query: str, index: LabelIndex, limit: int) -> list[LabelMatch]` | public | strips the query (.1); `[]` for no letter or digit (.2) or a limit below 1 (.19); finds each name's first rule (.14–.16), orders (.20–.25), cuts at the limit (.18); `TypeError` for a non-`str` query or a non-`int` limit (I-3) | .1, .2, .14–.16, .18–.25, .36 |
 | `_fold(text: str) -> str` | private | `A`–`Z` → `a`–`z`, every other character kept (same length) | .3, .4 |
 | `_tokens(text: str) -> tuple[tuple[int, int], ...]` | private | the token spans of CTX-A2L-MATCH *token*, read on the unfolded text (the case cuts need the case) | .8, .10, .21, .28–.30, .32 |
