@@ -1,0 +1,173 @@
+== host: LAN Linux host 2 (bash login shell); interpreter: Python 3.11.18
+== worktree HEAD (base revision): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+== worktree status (expected: only the two copied test files untracked/modified):
+ M tests/test_docs_canon.py
+?? i16t-archive-probe.py
+?? i16t-measure.py
+?? i16t-mutants.py
+?? i16t-red.sh
+?? i16t-synth.py
+?? tests/test_b101_doc_hygiene.py
+== s19_app.__file__ (informational; the guards never import s19_app):
+<HOME>/work/s19_i16t/s19_app/__init__.py
+
+== A. pure base: command
+env -u NO_COLOR python -m pytest -q -p no:cacheprovider tests/test_b101_doc_hygiene.py tests/test_docs_canon.py::test_at285_no_live_cdfx_or_s19tool_console_script_token -rA --tb=line
+F.FFFF.F.FFFFFFFFFF.FFF.FFF.FFFFFFFFFFFFFFF.F                            [100%]
+=================================== FAILURES ===================================
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:286: AssertionError: 33 unmarked repository paths that do not exist:
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:325: AssertionError: 5 broken links:
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:344: AssertionError: links to the removed diagrams file:
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:440: AssertionError: 16 paths in the retired workflow folder:
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:448: AssertionError: 12 paths in the removed design-probe folder:
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:484: AssertionError: 82 unmarked mentions of the retired workflow:
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:528: AssertionError: CLAUDE.md lists ['s19tool', 's19tui'], pyproject declares ['s19tui']
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:552: AssertionError: CLI example lines that do not run the module and a defined sub-command:
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:569: AssertionError: CI sentence must name both `main` and `main-tui`
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:584: AssertionError: still name tui/hexview.py: ['CLAUDE.md', 'PROJECT_RULES.md']
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:595: AssertionError: do not name render/hexview.py: ['CLAUDE.md', 'PROJECT_RULES.md', 'docs/engineering-rules.md']
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:620: AssertionError: module sizes in CLAUDE.md:
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:632: AssertionError: file:line citations in CLAUDE.md:
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:646: AssertionError: a personal memory file is still cited
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:663: AssertionError: requirements.txt ['rich>=13.0', 'textual'] != pyproject ['markdown-it-py>=3', 'rich>=13.0', 'textual>=8.2.8,<9']
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:703: AssertionError: docs/README.md does not link 7 of 14 entries: ['docs/CENSUS-BASELINE-canon-mirror.md', 'docs/crc-algorithm-designer', 'docs/engineering-rules.md', 'docs/user-guide', 'PROJECT_RULES.md', 'SECURITY.md', 'CHANGELOG.md']
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:723: AssertionError: a 'Project state' heading remains
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:748: AssertionError: overview section 3 does not name: ['A2B Diff', 'Check Editor', 'Flow Execution', 'Split / Join / Export']
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:779: AssertionError: docs/overview.md holds no line stating twelve rail windows with keys `1`-`0`, `=` and `]`
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:823: AssertionError: test counts remain:
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:830: AssertionError: the overview still says the Operations modal executes the placeholder operations
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:873: AssertionError: MANIFEST.md does not name 8 of 15 case folders: ['case_08_release_demo', 'professional_validation/case_01_baseline_valid', 'professional_validation/case_02_patch_targets_and_gaps', 'professional_validation/case_03_overlapping_records', 'professional_validation/case_04_bad_checksums', 'professional_validation/case_05_out_of_order_and_mixed', 'professional_validation/case_07_cross_reference_inconsistencies', 'professional_validation/case_08_heavy_fragmentation']
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:920: AssertionError: module prefixes that match no tracked file: ['prototypes']
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:933: AssertionError: amendment notes remain:
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:941: AssertionError: per-batch headings remain:
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:952: AssertionError: per-batch declarations remain:
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:964: AssertionError: 0 sub-module tables in section 10, expected 1
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:996: AssertionError: the map restates the batch-94 'never called directly' rule
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:1037: AssertionError: section 11 holds 6 tables, expected exactly 1
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:1037: AssertionError: section 11 holds 6 tables, expected exactly 1
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:1108: AssertionError: section 9 does not state the 4-source-file cap
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:1132: AssertionError: not tracked at the archive path: ['.dev-flow/design/archive/PENDIENTES-batch96.md', '.dev-flow/design/archive/crc-algorithm-designer-requirements-draft-2026-07-20.md', '.dev-flow/design/archive/synth-case08-release-demo-VERIFY.md']
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:1142: AssertionError: 33 tracked files remain in the retired workflow folder
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:1148: AssertionError: assert ['docs/diagra...hitecture.md'] == []
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:1154: AssertionError: assert ['s19_app/tui...s/REQ-crc.md'] == []
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:1160: AssertionError: assert ['examples/ca...9_sample.txt'] == []
+<HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py:1230: AssertionError: archive files not tracked, nothing to scan: ['.dev-flow/design/archive/PENDIENTES-batch96.md', '.dev-flow/design/archive/crc-algorithm-designer-requirements-draft-2026-07-20.md', '.dev-flow/design/archive/synth-case08-release-demo-VERIFY.md', '.dev-flow/design/archive/architecture-batch-declarations-88-100.md']
+<HOME>/work/s19_i16t/tests/test_docs_canon.py:172: AssertionError: live CDFX / s19tool-console-script tokens:
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_ref_1_2_path_scan_reports_a_missing_path
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_ref_3_3_exemptions_are_by_file_and_text
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_ref_4_2_exempt_lines_skipped
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_9_2_index_rule_follows_the_tree
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_12_2_predicates_on_fixed_lines
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_arch_1_1_module_table_covers_python_folders
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_archive_4_2_scan_reports_a_local_path
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_ref_1_1_named_paths_exist
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_ref_2_1_relative_links_resolve
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_ref_2_2_no_link_to_the_diagrams_file
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_ref_3_1_no_fast_dev_flow_path
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_ref_3_2_no_prototypes_path
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_ref_4_1_retired_workflow_named_only_as_retired
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_1_1_claude_lists_declared_console_scripts
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_2_1_cli_examples_run_the_module
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_3_1_ci_sentence_matches_the_workflow
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_4_1_no_tui_hexview_path
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_4_2_hex_renderer_named_at_render
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_5_1_claude_states_no_module_size
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_6_1_claude_cites_no_line_numbers
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_7_1_rules_cite_no_memory_file
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_8_1_requirements_txt_equals_runtime_dependencies
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_9_1_docs_index_links_every_entry
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_10_1_docs_index_states_no_project_state
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_11_1_overview_names_every_window
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_12_1_rail_counted_as_twelve
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_13_1_no_test_count - As...
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_14_1_overview_names_placeholder_operations
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_15_1_manifest_lists_every_case
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_arch_2_1_no_empty_module_prefix
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_arch_3_1_no_amendment_note
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_arch_3_2_no_batch_declaration_heading
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_arch_3_3_no_batch_interface_amendment
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_arch_4_1_submodules_declared
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_arch_4_2_no_broken_import_rule_restated
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_arch_5_1_one_interfaces_table
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_arch_5_2_rail_saved_files_and_frozen_cells
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_arch_6_1_increment_cap_is_four_source_files
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_archive_1_1_notes_only_in_the_archive
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_archive_3_1_no_fast_dev_flow_folder
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_archive_3_2_no_diagrams_file
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_archive_3_3_no_req_crc_in_package
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_archive_3_4_no_unused_example_txt
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_archive_4_1_archive_holds_no_local_identity
+FAILED tests/test_docs_canon.py::test_at285_no_live_cdfx_or_s19tool_console_script_token
+38 failed, 7 passed in 1.55s
+== exit status of A: 1
+
+== B. instrument counts on base with the retired workflow folder excluded from the corpus (i16t-measure.py)
+module file: <HOME>/work/s19_i16t/tests/test_b101_doc_hygiene.py
+repository documents (excl retired folder): 56
+REF.1 unmarked missing paths: 22
+REF.2 relative links: 249 broken: 0
+REF.3 retired-folder path lines: 4 | design-probe path lines: 11 | REF.4 lines: 10
+A cdfx lines: 27 s19tool lines: 7
+
+== C. base plus the R2 removal only (git rm of the retired workflow folder, index only): the corpus the base counts describe
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_ref_1_2_path_scan_reports_a_missing_path
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_ref_2_1_relative_links_resolve
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_ref_3_3_exemptions_are_by_file_and_text
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_ref_4_2_exempt_lines_skipped
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_9_2_index_rule_follows_the_tree
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_12_2_predicates_on_fixed_lines
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_arch_1_1_module_table_covers_python_folders
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_archive_3_1_no_fast_dev_flow_folder
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_archive_4_2_scan_reports_a_local_path
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_ref_1_1_named_paths_exist
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_ref_2_2_no_link_to_the_diagrams_file
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_ref_3_1_no_fast_dev_flow_path
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_ref_3_2_no_prototypes_path
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_ref_4_1_retired_workflow_named_only_as_retired
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_1_1_claude_lists_declared_console_scripts
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_2_1_cli_examples_run_the_module
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_3_1_ci_sentence_matches_the_workflow
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_4_1_no_tui_hexview_path
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_4_2_hex_renderer_named_at_render
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_5_1_claude_states_no_module_size
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_6_1_claude_cites_no_line_numbers
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_7_1_rules_cite_no_memory_file
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_8_1_requirements_txt_equals_runtime_dependencies
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_9_1_docs_index_links_every_entry
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_10_1_docs_index_states_no_project_state
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_11_1_overview_names_every_window
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_12_1_rail_counted_as_twelve
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_13_1_no_test_count - As...
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_14_1_overview_names_placeholder_operations
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_15_1_manifest_lists_every_case
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_arch_2_1_no_empty_module_prefix
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_arch_3_1_no_amendment_note
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_arch_3_2_no_batch_declaration_heading
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_arch_3_3_no_batch_interface_amendment
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_arch_4_1_submodules_declared
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_arch_4_2_no_broken_import_rule_restated
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_arch_5_1_one_interfaces_table
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_arch_5_2_rail_saved_files_and_frozen_cells
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_arch_6_1_increment_cap_is_four_source_files
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_archive_1_1_notes_only_in_the_archive
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_archive_3_2_no_diagrams_file
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_archive_3_3_no_req_crc_in_package
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_archive_3_4_no_unused_example_txt
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_archive_4_1_archive_holds_no_local_identity
+FAILED tests/test_docs_canon.py::test_at285_no_live_cdfx_or_s19tool_console_script_token
+36 failed, 9 passed in 1.44s
+restored retired folder: 33 files tracked
+
+== D. oracle controls on synthetic documents (i16t-synth.py) and instrument mutants (i16t-mutants.py)
+summary: 68 OK, 0 BAD
+unmutated control: 1 failed, 6 passed in 0.14s
+survivors/skips: 0
+mutant kills: 14
+
+== E. R-DOC-ARCHIVE.4 scanner pointed at the four base source notes (i16t-archive-probe.py)
+PENDIENTES-batch96.md: 1 local-identity hit(s) ['drive-letter cloud folder']
+docs/crc-algorithm-designer/01-requirements.md: 0 local-identity hit(s) []
+tools/synth/VERIFY.md: 0 local-identity hit(s) []
+docs/architecture.md: 0 local-identity hit(s) []

@@ -1,0 +1,49 @@
+=== batch-101 Inc 16 E5 mutant mut-27
+row: R-DOC-ARCH.4
+mutation: delete the render/format.py no-s19_app.tui-import fact
+guard: tests/test_b101_doc_hygiene.py::test_r_doc_arch_4_1_submodules_declared
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree: 6ad8adbc88885f5f3af72b40463bf10498111ba5
+s19_app.__file__: <HOME>/<USER>/work/s19_i16m_copy/s19_app/__init__.py
+---
+result: KILLED (exit 1)
+first assertion line: E           AssertionError: s19_app/render/format.py: Must-not-import cell does not name s19_app.tui
+---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________________ test_r_doc_arch_4_1_submodules_declared ____________________
+
+    def test_r_doc_arch_4_1_submodules_declared():
+        """Verifies R-DOC-ARCH.4 (case /1): section 10 declares the three
+        sub-modules with their facts in present tense."""
+        section = _section(_architecture(), 10)
+        tables = _submodule_tables(section)
+        assert len(tables) == 1, f"{len(tables)} sub-module tables in section 10, expected 1"
+        table = tables[0]
+        assert [_plain(c) for c in table["header"]] == [
+            "Sub-module",
+            "Encapsulates",
+            "Exposes",
+            "Must not import",
+        ]
+        expected = ["s19_app/render/hexview.py", "s19_app/render/format.py", "s19_app/tui/flow_screens.py"]
+        rows = {}
+        for row in table["rows"]:
+            assert len(row) == 4, f"malformed row: {row}"
+            for path in expected:
+                if path in row[0]:
+                    rows[path] = row
+        assert sorted(rows) == sorted(expected), f"sub-module rows: {sorted(rows)}"
+        assert len(table["rows"]) == 3
+        for path, row in rows.items():
+            assert _plain(row[1]) and _plain(row[2]), f"{path}: empty Encapsulates or Exposes cell"
+        for path in expected[:2]:
+>           assert "s19_app.tui" in rows[path][3], f"{path}: Must-not-import cell does not name s19_app.tui"
+E           AssertionError: s19_app/render/format.py: Must-not-import cell does not name s19_app.tui
+E           assert 's19_app.tui' in ''
+
+tests/test_b101_doc_hygiene.py:994: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_arch_4_1_submodules_declared
+1 failed in 0.15s
+=== end

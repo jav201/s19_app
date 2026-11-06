@@ -1,0 +1,38 @@
+=== batch-101 Inc 16 E5 mutant mut-16
+row: R-DOC-DEV.8
+mutation: delete the markdown-it-py>=3 line from requirements.txt
+guard: tests/test_b101_doc_hygiene.py::test_r_doc_dev_8_1_requirements_txt_equals_runtime_dependencies
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree: 7839352ae2cdaa20d7ebec0e5372d2ce6815aa17
+s19_app.__file__: <HOME>/<USER>/work/s19_i16m_copy/s19_app/__init__.py
+---
+result: KILLED (exit 1)
+first assertion line: E       AssertionError: requirements.txt ['rich>=13.0', 'textual>=8.2.8,<9'] != pyproject ['markdown-it-py>=3', 'rich>=13.0', 'textual>=8.2.8,<9']
+---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_r_doc_dev_8_1_requirements_txt_equals_runtime_dependencies ________
+
+    def test_r_doc_dev_8_1_requirements_txt_equals_runtime_dependencies():
+        """Verifies R-DOC-DEV.8 (case /1): requirements.txt declares the runtime
+        requirements pyproject.toml declares."""
+        lines = set()
+        for raw in _need("requirements.txt").splitlines():
+            line = re.sub(r"\s+#.*$", "", raw).strip()
+            if line and not line.startswith("#"):
+                lines.add(re.sub(r"\s+", "", line))
+        declared = {re.sub(r"\s+", "", d) for d in _pyproject()["project"]["dependencies"]}
+        assert len(declared) == 3, f"pyproject declares {declared}"
+>       assert lines == declared, f"requirements.txt {sorted(lines)} != pyproject {sorted(declared)}"
+E       AssertionError: requirements.txt ['rich>=13.0', 'textual>=8.2.8,<9'] != pyproject ['markdown-it-py>=3', 'rich>=13.0', 'textual>=8.2.8,<9']
+E       assert {'rich>=13.0'...al>=8.2.8,<9'} == {'markdown-it...al>=8.2.8,<9'}
+E         
+E         Extra items in the right set:
+E         'markdown-it-py>=3'
+E         Use -v to get more diff
+
+tests/test_b101_doc_hygiene.py:673: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_8_1_requirements_txt_equals_runtime_dependencies
+1 failed in 0.15s
+=== end

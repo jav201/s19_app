@@ -1,0 +1,35 @@
+=== batch-101 Inc 16 E5 mutant mut-13
+row: R-DOC-DEV.5
+mutation: restore `~5k-line` in CLAUDE.md
+guard: tests/test_b101_doc_hygiene.py::test_r_doc_dev_5_1_claude_states_no_module_size
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree: ebedb238f50090306cd654c7be327d6038351538
+s19_app.__file__: <HOME>/<USER>/work/s19_i16m_copy/s19_app/__init__.py
+---
+result: KILLED (exit 1)
+first assertion line: E       AssertionError: module sizes in CLAUDE.md:
+---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______________ test_r_doc_dev_5_1_claude_states_no_module_size ________________
+
+    def test_r_doc_dev_5_1_claude_states_no_module_size():
+        """Verifies R-DOC-DEV.5 (case /1): CLAUDE.md states no module size in
+        lines; the pattern catches a comma-grouped count (instrument check)."""
+        probe = _MODULE_SIZE_RX.search("a 21,138 lines module")
+        assert probe and probe.group(0) == "21,138 lines", "instrument: pattern misses '21,138 lines'"
+        hits = [
+            f"CLAUDE.md:{n}: {line.strip()[:100]}"
+            for n, line in enumerate(_need("CLAUDE.md").splitlines(), 1)
+            if _MODULE_SIZE_RX.search(line)
+        ]
+>       assert not hits, "module sizes in CLAUDE.md:\n" + "\n".join(hits)
+E       AssertionError: module sizes in CLAUDE.md:
+E         CLAUDE.md:67: - `app.py::S19TuiApp` is a ~5k-line Textual `App`. It is intentionally orchestration-only: parsing/e
+E       assert not ['CLAUDE.md:67: - `app.py::S19TuiApp` is a ~5k-line Textual `App`. It is intentionally orchestration-only: parsing/e']
+
+tests/test_b101_doc_hygiene.py:630: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_5_1_claude_states_no_module_size
+1 failed in 0.15s
+=== end

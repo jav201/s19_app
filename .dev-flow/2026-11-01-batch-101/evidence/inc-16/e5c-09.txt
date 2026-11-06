@@ -1,0 +1,29 @@
+=== batch-101 Inc 16 E5 corrective: negative controls of the four E5-T oracles (C-9), COPY worktree
+date: 2026-11-06T09:24:58Z
+source: branch b101-inc16 at b843fc6 plus the uncommitted E5 corrective edits (patch sha256 8e850809bbf34324)
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree with the increment staged: 1ec14f2277283169f33eb869979b51f697b50663
+staged paths vs base: 124
+working tree equal to the index: yes
+python: Python 3.11.18
+s19_app.__file__: <HOME>/work/s19_i16c_copy/s19_app/__init__.py
+--- command: i16c-oracle-controls.sh (each: python i16c-history.py <case> <copy> ...)
+--- O-1 ARCH.1/2: a tracked .py under a folder the map does not declare
+    expected FAIL, got FAIL (exit 1) -> as expected
+      [!] V8   scripts/i16c_probe.py: under no declared module — the map is stale, ARQ fires
+      [!] V8   setup.py: no `path/**` prefix can match a file with no directory component — the rule cannot express a repository-root file, so this is a bound of the rule, and the map is not behind
+    stale-module notices: 1; root notices: ['setup.py']; SKIP lines: 0
+    FAIL: V8 prints exactly one finding, the root NOTICE for setup.py, and no 'under no declared module' notice
+--- O-2 ARCHIVE.1/2: a path added by the increment with no earlier history (the new archive file)
+    expected FAIL, got FAIL (exit 1) -> as expected
+    FAIL: each of the 3 archive paths lists >= 1 commit before the increment, through a rename (3/3)
+--- O-3 ARCHIVE.2/1: the B99-I1 row dropped from the archive
+    expected FAIL, got FAIL (exit 1) -> as expected
+      MISSING (base :645): | B99-I1 the S19 memory-map contract — `S19File.get_memory_map` / `get_memory_ranges` / `get_record_for_address` / `_build_overlap_map` (`core.py:485`
+    FAIL: 100 % of those lines occur in the archive (stripped, as a line or a substring)
+--- O-4 ARCHIVE.2/2: a second new id LLR-999.9 in the archive
+    expected FAIL, got FAIL (exit 1) -> as expected
+    ids in the archive: 50; not found in the corpus: ['LLR-155.1..155.4', 'LLR-999.9']
+    FAIL: the ids the archive adds to .dev-flow/ are a subset of {LLR-155.1..155.4} (<= 1)
+=== copy worktree equal to its index afterwards: yes
+=== exit code: 0

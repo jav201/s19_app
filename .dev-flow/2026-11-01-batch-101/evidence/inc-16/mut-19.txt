@@ -1,0 +1,32 @@
+=== batch-101 Inc 16 E5 mutant mut-19
+row: R-DOC-DEV.11
+mutation: delete `Check Editor` from docs/overview.md section 3
+guard: tests/test_b101_doc_hygiene.py::test_r_doc_dev_11_1_overview_names_every_window
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree: 4ea4e9ee72a85393caceb717c47835e41aff34e7
+s19_app.__file__: <HOME>/<USER>/work/s19_i16m_copy/s19_app/__init__.py
+---
+result: KILLED (exit 1)
+first assertion line: E       AssertionError: overview section 3 does not name: ['Check Editor']
+---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______________ test_r_doc_dev_11_1_overview_names_every_window ________________
+
+    def test_r_doc_dev_11_1_overview_names_every_window():
+        """Verifies R-DOC-DEV.11 (case /1): docs/overview.md section 3 names every
+        rail window by its label and the Split / Join / Export window."""
+        labels = _rail_labels()
+        assert len(labels) == 12, f"expected 12 distinct rail labels, read {sorted(labels)}"
+        section = _section(_need("docs/overview.md"), 3)
+        wanted = sorted(labels) + ["Split / Join / Export"]
+        missing = [w for w in wanted if w not in section]
+>       assert not missing, f"overview section 3 does not name: {missing}"
+E       AssertionError: overview section 3 does not name: ['Check Editor']
+E       assert not ['Check Editor']
+
+tests/test_b101_doc_hygiene.py:758: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_11_1_overview_names_every_window
+1 failed in 0.15s
+=== end

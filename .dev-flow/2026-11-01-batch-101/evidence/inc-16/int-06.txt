@@ -1,0 +1,17 @@
+=== Inc 16 E4 integration run: int-06-final-tree-guards
+date: 2026-11-06T08:36:17Z
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree with the increment staged: 52f12b19e0ff57e687befdd178f9e663ab4ee14b
+staged files vs base: 83
+python: Python 3.11.18
+s19_app.__file__: /home/<user>/work/s19_i16int/s19_app/__init__.py
+--- command: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -n 8 -m "not serial_timing" tests/test_b101_doc_hygiene.py tests/test_docs_canon.py tests/test_id_registry.py tests/test_suite_hygiene.py tests/test_address_census.py tests/test_requirements_canon.py tests/test_b101_help_legend_docs.py tests/test_cli.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 31%]
+........................................................................ [ 63%]
+........................................................................ [ 94%]
+............                                                             [100%]
+228 passed in 114.15s (0:01:54)
+=== exit code: 0

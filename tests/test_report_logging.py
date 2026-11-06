@@ -1,6 +1,6 @@
 """N3 — report-generation observability (fail-loud logging).
 
-Covers the spec ACs for `.fast-dev-flow/spec.md` batch `n3-report-logging`:
+Covers the spec ACs of batch `n3-report-logging`:
 
 - AC-1..3: each report kind (project / before-after / diff) logs a structured
   metadata line (kind · source · output · outcome).

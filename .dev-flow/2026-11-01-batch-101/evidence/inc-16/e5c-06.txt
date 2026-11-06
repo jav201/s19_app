@@ -1,0 +1,25 @@
+=== batch-101 Inc 16 E5 corrective: C-9 E5-T case archive12
+date: 2026-11-06T09:24:31Z
+source: branch b101-inc16 at b843fc6 plus the uncommitted E5 corrective edits (patch sha256 8e850809bbf34324)
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree with the increment staged: 1ec14f2277283169f33eb869979b51f697b50663
+staged paths vs base: 124
+working tree equal to the index: yes
+python: Python 3.11.18
+s19_app.__file__: <HOME>/work/s19_i16c/s19_app/__init__.py
+--- command: python i16c-history.py archive12 <worktree> refs/i16c/b101-inc16
+ref: refs/i16c/b101-inc16 b843fc69e0e3718de9736d07669ff0297bd451a6
+.dev-flow/design/archive/PENDIENTES-batch96.md
+  git log --follow: f65d23a1 ad10fb5c 121feaaa
+  commits before the base (ancestors of c2cba35): ad10fb5c 121feaaa (2)
+  rename line: R098	PENDIENTES-batch96.md	.dev-flow/design/archive/PENDIENTES-batch96.md
+.dev-flow/design/archive/crc-algorithm-designer-requirements-draft-2026-07-20.md
+  git log --follow: f65d23a1 b167828e 84180b4c
+  commits before the base (ancestors of c2cba35): b167828e 84180b4c (2)
+  rename line: R100	docs/crc-algorithm-designer/01-requirements.md	.dev-flow/design/archive/crc-algorithm-designer-requirements-draft-2026-07-20.md
+.dev-flow/design/archive/synth-case08-release-demo-VERIFY.md
+  git log --follow: f65d23a1 41ed7c55 9fd3638b
+  commits before the base (ancestors of c2cba35): 41ed7c55 9fd3638b (2)
+  rename line: R100	tools/synth/VERIFY.md	.dev-flow/design/archive/synth-case08-release-demo-VERIFY.md
+PASS: each of the 3 archive paths lists >= 1 commit before the increment, through a rename (3/3)
+=== exit code: 0

@@ -1,0 +1,34 @@
+=== batch-101 Inc 16 E5 mutant mut-25
+row: R-DOC-ARCH.2
+mutation: restore the `prototypes` row in the module table
+guard: tests/test_b101_doc_hygiene.py::test_r_doc_arch_2_1_no_empty_module_prefix
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree: d21946f6aca90dcbebf146a82c47113a38c78a7f
+s19_app.__file__: <HOME>/<USER>/work/s19_i16m_copy/s19_app/__init__.py
+---
+result: KILLED (exit 1)
+first assertion line: E       AssertionError: module prefixes that match no tracked file: ['prototypes']
+---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________________ test_r_doc_arch_2_1_no_empty_module_prefix __________________
+
+    def test_r_doc_arch_2_1_no_empty_module_prefix():
+        """Verifies R-DOC-ARCH.2 (case /1): the module table declares no prefix
+        that matches no tracked file, and no rationale row names the removed
+        design-probe module."""
+        section = _section(_architecture(), 10)
+        empty = [
+            p
+            for p in _module_prefixes(_module_table(section))
+            if not any(t.startswith(p + "/") for t in _tracked())
+        ]
+>       assert not empty, f"module prefixes that match no tracked file: {empty}"
+E       AssertionError: module prefixes that match no tracked file: ['prototypes']
+E       assert not ['prototypes']
+
+tests/test_b101_doc_hygiene.py:930: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_arch_2_1_no_empty_module_prefix
+1 failed in 0.15s
+=== end

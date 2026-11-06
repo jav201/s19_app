@@ -410,7 +410,7 @@ def _restyled_cell_marks(screen: str) -> tuple:
     return ()
 
 
-# batch-31 (fast-dev-flow P1 quick strike) geometry drift: AC-5/AC-7 (B-06
+# batch-31 (P1 quick strike) geometry drift: AC-5/AC-7 (B-06
 # `#files_list` 1fr + B-20 Load-project button) reshaped the Workspace left
 # pane and AC-6 (B-15 `MapCell.render` width-fill) repainted the map grid
 # band — 8 grid cells (6 workspace + 2 map) plus the entropy-80x24 backdrop

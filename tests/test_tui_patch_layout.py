@@ -284,7 +284,7 @@ _UNREACHABLE_UNDER_SCROLL: dict[tuple[int, int], tuple[str, ...]] = {
 def _fully_visible(app: S19TuiApp, w: object) -> bool:
     """True if ``w`` is fully on screen AT THE CURRENT SCROLL.
 
-    Lifted from ``prototypes/patch_editor_layout.prototype.py:243-259``: the
+    Lifted from the patch-editor layout prototype: the
     widget's region must be non-empty, contained by the screen, AND contained
     by every scrollable ancestor's visible ``content_region`` — so a button
     scrolled below a fold counts as NOT visible (the B2 defect). Returns False

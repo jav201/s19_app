@@ -4,12 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project layout
 
-Single Python package `s19_app/` (distribution name `s19tool`) plus a `tests/` suite, with `examples/` carrying realistic S19/HEX/A2L/MAC fixtures used both as TUI inputs and parser-stress targets. Two console entry points are exposed via `pyproject.toml`:
+Single Python package `s19_app/` (distribution name `s19tool`) plus a `tests/` suite, with `examples/` carrying realistic S19/HEX/A2L/MAC fixtures used both as TUI inputs and parser-stress targets. One console entry point is exposed via `pyproject.toml`:
 
-- `s19tool` → `s19_app.cli:main` (Rich-formatted CLI)
-- `s19tui`  → `s19_app.tui:main` (Textual TUI)
+- `s19tui` → `s19_app.tui:main` (Textual TUI)
 
-Note: the active build config is `pyproject.toml`, and it is now the **only** one — the historical pre-PEP 621 `project.toml` duplicate was deleted in `1d2e9fe` (batch-89), so there is no longer a second copy to keep aligned. `setup.py` is a bare `setup()` shim that delegates entirely to `pyproject.toml`; it declares nothing. Two stale readers still probe for the removed file as a fallback (`s19_app/tui/workspace.py:508`, `tests/test_changes_schema.py:523` — both `pyproject.toml or project.toml`); the `or` branch is simply dead, so they are harmless, not broken.
+Note: the active build config is `pyproject.toml`, and it is now the **only** one — the historical pre-PEP 621 `project.toml` duplicate was deleted in `1d2e9fe` (batch-89), so there is no longer a second copy to keep aligned. `setup.py` is a bare `setup()` shim that delegates entirely to `pyproject.toml`; it declares nothing. Two stale readers still probe for the removed file as a fallback (`s19_app/tui/workspace.py` `find_repo_root`, `tests/test_changes_schema.py` repo-root helper — both `pyproject.toml or project.toml`); the `or` branch is simply dead, so they are harmless, not broken.
 
 ## Common commands
 
@@ -37,14 +36,14 @@ python tests/generate_large_samples.py
 s19tui
 s19tui --load examples/case_00_public/prg.s19
 
-# CLI examples
-s19tool firmware.s19 info
-s19tool firmware.s19 verify
-s19tool firmware.s19 dump --start 0x7AF0 --length 64
-s19tool firmware.s19 patch-hex --addr 0x80040000 --bytes "01 02 03 04" --save-as out.s19
+# CLI examples (module-only; no console script)
+python -m s19_app.cli info firmware.s19
+python -m s19_app.cli verify firmware.s19
+python -m s19_app.cli dump firmware.s19 --start 0x7AF0 --length 64
+python -m s19_app.cli patch-hex firmware.s19 --addr 0x80040000 --bytes "01 02 03 04" --save-as out.s19
 ```
 
-CI (`.github/workflows/tui-ci.yml`) runs `pytest -q` on Python 3.11 against pushes/PRs to `main-tui`.
+CI (`.github/workflows/tui-ci.yml`) runs pytest on Python 3.11 for pushes and pull requests to `main` and `main-tui`, in two lanes: lane 1 in parallel (`-m "not serial_timing"`) and lane 2 the timing arms serially (`-m serial_timing`); pull requests also leave out the `slow` tests in both lanes.
 
 ## Architecture
 
@@ -53,7 +52,7 @@ The system has three layers that should be modified together when behavior cross
 ### Parsing layer (`s19_app/core.py`, `s19_app/hexfile.py`, `s19_app/tui/mac.py`, `s19_app/tui/a2l.py`)
 
 - `S19File` and `IntelHexFile` build a sparse `Dict[int, int]` memory map plus contiguous `(start, end)` ranges and per-line `errors`. Both are designed to **collect** validation failures (per-record + per-file) without aborting the load — preserve that contract. Address-length and checksum rules per record type are documented in the header comment of `core.py`.
-- `tui/a2l.py` (1.4k LOC) is the canonical A2L module. The four sibling files `a2l_parse.py`, `a2l_extract.py`, `a2l_render.py`, `a2l_validate.py` are thin re-export facades around it — add new public symbols to `a2l.py` and re-export from the matching facade so imports stay narrow.
+- `tui/a2l.py` is the canonical A2L module. The four sibling files `a2l_parse.py`, `a2l_extract.py`, `a2l_render.py`, `a2l_validate.py` are thin re-export facades around it — add new public symbols to `a2l.py` and re-export from the matching facade so imports stay narrow.
 - `tui/mac.py` parses `.mac` `TAG=hexaddr` files and emits both records and human-readable diagnostics.
 - **Engine-frozen guard.** These parsing-layer engine modules are git-frozen against modification by the `_ENGINE_PATHS` guards (`tests/test_engine_unchanged.py`, `tests/test_tui_directionb.py::test_tc031_*`): the frozen set is `core.py`, `hexfile.py`, `range_index.py`, `validation/`, `tui/a2l.py`, `tui/mac.py`, and `tui/color_policy.py`. Any TUI-side batch that diffs one of these vs `main` trips the guards, so new code that would edit them must live elsewhere — e.g. the Intel HEX emission logic (batch-10) went in `tui/changes/io.py`, next to `emit_s19_from_mem_map`, not in `hexfile.py` (which stays the reader/oracle only). **`tui/a2l.py` is UNFROZEN only under an explicit operator grant, then RE-FROZEN as a post-merge follow-up PR** — it has cycled through this for the a2l-missing-length-fix / a2l-record-layout-length fixes + batch-50 P-2 (F841 cleanup) and again for **batch-54** (multi-line CHARACTERISTIC/AXIS_DESCR header parsing), each time re-frozen once the sanctioned edits landed on `main`. It is a read-only oracle again. Keep it the canonical A2L module (add public symbols here + re-export from the facades); any further edit needs an explicit unfreeze. (Sequencing: an *unfreeze* removes it from the guard set so the same PR can edit it; a *re-freeze* adds it back and must be a separate post-merge PR, else the vs-`main` diff self-trips.)
 
@@ -65,9 +64,9 @@ The system has three layers that should be modified together when behavior cross
 
 ### TUI layer (`s19_app/tui/`)
 
-- `app.py::S19TuiApp` is a ~5k-line Textual `App`. It is intentionally orchestration-only: parsing/enrichment/validation calls are routed through `tui/services/` (`load_service.build_loaded_s19/build_loaded_hex`, `a2l_service.enrich_tags_and_render`, `validation_service.build_validation_report`). When adding new feature logic, **prefer extending a service** and calling it from the app; only put UI state machinery in `app.py`. PROJECT_RULES.md explicitly calls this module out for ongoing decomposition.
+- `app.py::S19TuiApp` is a Textual `App`. It is intentionally orchestration-only: parsing/enrichment/validation calls are routed through `tui/services/` (`load_service.build_loaded_s19/build_loaded_hex`, `a2l_service.enrich_tags_and_render`, `validation_service.build_validation_report`). When adding new feature logic, **prefer extending a service** and calling it from the app; only put UI state machinery in `app.py`. PROJECT_RULES.md explicitly calls this module out for ongoing decomposition.
 - `models.py::LoadedFile` is the snapshot every renderer reads. It is built on a worker thread by `_parse_loaded_file`, then handed to `_apply_loaded_file` which calls each `update_*` renderer on the main UI thread. Keep this thread split — renderers must not parse files.
-- `hexview.py` produces all hex/ASCII output (`render_hex_view_text`, `find_string_in_mem`, `_collect_hex_rows`). The constants `MAX_HEX_BYTES`, `MAX_HEX_ROWS`, `FOCUS_CONTEXT_ROWS`, `HEX_WIDTH`, and `SEARCH_ENCODING` cap rendering cost and are part of the public API exported from `tui/__init__.py`.
+- `s19_app/render/hexview.py` (outside `tui/`) produces all hex/ASCII output (`render_hex_view_text`, `find_string_in_mem`, `_collect_hex_rows`). The constants `MAX_HEX_BYTES`, `MAX_HEX_ROWS`, `FOCUS_CONTEXT_ROWS`, `HEX_WIDTH`, and `SEARCH_ENCODING` cap rendering cost and are part of the public API exported from `tui/__init__.py`.
 - `screens.py` defines the modal Load/Save/Project screens and the `SaveProjectPayload` dataclass passed back to `S19TuiApp`.
 - `workspace.py` owns the on-disk `.s19tool/` layout: `.s19tool/workarea/temp/` for transient loads, `.s19tool/workarea/<project>/` for saved projects (one S19/HEX + one MAC + one A2L max — enforced by `validate_project_files`), and `.s19tool/logs/s19tui.log` (5 MB rotating). Project names are normalized through `sanitize_project_name`. Path resolution for user-typed inputs goes through `resolve_input_path` which walks both the app cwd and the nearest repo root (`find_repo_root` looks for `pyproject.toml`/`project.toml`).
 
@@ -77,7 +76,7 @@ A2L row colouring: Red = schema/structural failure; Green = memory-checked + pre
 
 ## Conventions to preserve
 
-- **Docstrings**: PROJECT_RULES.md is enforced for non-trivial functions/methods. Use the fixed section order `Summary → Args → Returns → Raises → Data Flow → Dependencies → Example`. The `Data Flow` and `Dependencies` (`Uses` / `Used by`) sections are not optional on new public functions; existing files in `s19_app/tui/a2l.py`, `s19_app/tui/hexview.py`, and `s19_app/tui/app.py` are the style baseline.
+- **Docstrings**: PROJECT_RULES.md is enforced for non-trivial functions/methods. Use the fixed section order `Summary → Args → Returns → Raises → Data Flow → Dependencies → Example`. The `Data Flow` and `Dependencies` (`Uses` / `Used by`) sections are not optional on new public functions; existing files in `s19_app/tui/a2l.py`, `s19_app/render/hexview.py`, and `s19_app/tui/app.py` are the style baseline.
 - **Type hints**: mandatory for new/changed functions and must agree with the Args/Returns docstring types.
 - **Function granularity**: split when a function exceeds ~40-60 logical lines, mixes parse/validate/render concerns, or accumulates 3+ side effects. Prefer pipelines like `sections → segments → tags → validated_tags` at call sites.
 - **Requirements**: `REQUIREMENTS.md` holds the strict EARS rows (`| Id | Form | Requirement |`, one sentence each) per module S0–S17; the rationale (decisions `D<n>-k`, the "Code today" snapshot) is in `docs/requirements/review/`, and the earlier canon is kept in `docs/requirements/history/`. Ids are kept stable: when you add or change behavior, add or change the row with its `R-*` id and keep the id of a row that stays. Test ids (`AT-*` / `TC-*`) are not written in the canon; they live in `AT-TC-REGISTRY.jsonl`. `tests/test_requirements_canon.py` checks the form of every row.

@@ -1,4 +1,5 @@
 # S19_APP/requirements.txt
 
 rich>=13.0
-textual
+textual>=8.2.8,<9
+markdown-it-py>=3

@@ -1,0 +1,32 @@
+=== batch-101 Inc 16 E5 mutant mut-12
+row: R-DOC-DEV.4
+mutation: restore `s19_app/tui/hexview.py` in CLAUDE.md docstring-baseline line
+guard: tests/test_b101_doc_hygiene.py::test_r_doc_dev_4_1_no_tui_hexview_path
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree: 44b688c24b14c7c9a059d08dd33d5270cd7d3cd4
+s19_app.__file__: <HOME>/<USER>/work/s19_i16m_copy/s19_app/__init__.py
+---
+result: KILLED (exit 1)
+first assertion line: E       AssertionError: still name tui/hexview.py: ['CLAUDE.md']
+---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________________ test_r_doc_dev_4_1_no_tui_hexview_path ____________________
+
+    def test_r_doc_dev_4_1_no_tui_hexview_path():
+        """Verifies R-DOC-DEV.4 (case /1): no developer document names the removed
+        tui/hexview.py."""
+        bad = [
+            rel
+            for rel in ("CLAUDE.md", "PROJECT_RULES.md", "docs/engineering-rules.md")
+            if "tui/hexview.py" in _need(rel)
+        ]
+>       assert not bad, f"still name tui/hexview.py: {bad}"
+E       AssertionError: still name tui/hexview.py: ['CLAUDE.md']
+E       assert not ['CLAUDE.md']
+
+tests/test_b101_doc_hygiene.py:594: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_4_1_no_tui_hexview_path
+1 failed in 0.15s
+=== end

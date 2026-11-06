@@ -1,0 +1,31 @@
+=== batch-101 Inc 16 E5 mutant mut-15
+row: R-DOC-DEV.7
+mutation: restore the personal-memory source sentence in docs/engineering-rules.md
+guard: tests/test_b101_doc_hygiene.py::test_r_doc_dev_7_1_rules_cite_no_memory_file
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree: dc400c9003ff22bc2d362723920f44dc5a366f97
+s19_app.__file__: <HOME>/<USER>/work/s19_i16m_copy/s19_app/__init__.py
+---
+result: KILLED (exit 1)
+first assertion line: E       AssertionError: a personal memory file is still cited
+---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________________ test_r_doc_dev_7_1_rules_cite_no_memory_file _________________
+
+    def test_r_doc_dev_7_1_rules_cite_no_memory_file():
+        """Verifies R-DOC-DEV.7 (case /1): the engineering rules point to no
+        personal memory file."""
+        text = _need("docs/engineering-rules.md")
+>       assert "project_devflow_control_lineage" not in text, "a personal memory file is still cited"
+E       AssertionError: a personal memory file is still cited
+E       assert 'project_dev...trol_lineage' not in '# s19_app —...ineage.md.\n'
+E         
+E         'project_devflow_control_lineage' is contained here:
+E           y: memory project_devflow_control_lineage.md.
+
+tests/test_b101_doc_hygiene.py:656: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_7_1_rules_cite_no_memory_file
+1 failed in 0.14s
+=== end

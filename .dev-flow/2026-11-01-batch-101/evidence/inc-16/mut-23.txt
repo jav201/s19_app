@@ -1,0 +1,32 @@
+=== batch-101 Inc 16 E5 mutant mut-23
+row: R-DOC-DEV.15
+mutation: delete the case_08_release_demo entry from MANIFEST.md
+guard: tests/test_b101_doc_hygiene.py::test_r_doc_dev_15_1_manifest_lists_every_case
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree: 0c254dbc4ed0ea443beb2cacec928c091d497911
+s19_app.__file__: <HOME>/<USER>/work/s19_i16m_copy/s19_app/__init__.py
+---
+result: KILLED (exit 1)
+first assertion line: E       AssertionError: MANIFEST.md does not name 1 of 15 case folders: ['case_08_release_demo']
+---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________________ test_r_doc_dev_15_1_manifest_lists_every_case _________________
+
+    def test_r_doc_dev_15_1_manifest_lists_every_case():
+        """Verifies R-DOC-DEV.15 (case /1): the examples manifest lists each case
+        folder of examples/ by its path relative to examples/; deleting one entry
+        is reported."""
+        folders = _example_case_folders()
+        assert len(folders) == 15, f"expected 15 case folders, found {folders}"
+        text = _need("examples/case_00_public/MANIFEST.md")
+        missing = _manifest_missing(text, folders)
+>       assert not missing, f"MANIFEST.md does not name {len(missing)} of 15 case folders: {missing}"
+E       AssertionError: MANIFEST.md does not name 1 of 15 case folders: ['case_08_release_demo']
+E       assert not ['case_08_release_demo']
+
+tests/test_b101_doc_hygiene.py:883: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_15_1_manifest_lists_every_case
+1 failed in 0.15s
+=== end

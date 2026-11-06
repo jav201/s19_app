@@ -1,0 +1,15 @@
+=== batch-101 Inc 16 E5 corrective: C-9 E5-T case archive22
+date: 2026-11-06T09:24:32Z
+source: branch b101-inc16 at b843fc6 plus the uncommitted E5 corrective edits (patch sha256 8e850809bbf34324)
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree with the increment staged: 1ec14f2277283169f33eb869979b51f697b50663
+staged paths vs base: 124
+working tree equal to the index: yes
+python: Python 3.11.18
+s19_app.__file__: <HOME>/work/s19_i16c/s19_app/__init__.py
+--- command: python i16c-history.py archive22 <worktree> 
+grammar: (US|HLR|LLR)-[digits and dots], trailing dots stripped
+corpus: 1733 tracked .md files under .dev-flow/, less the archive file and .dev-flow/2026-11-01-batch-101/inc-16/
+ids in the archive: 49; not found in the corpus: ['LLR-155.1..155.4']
+PASS: the ids the archive adds to .dev-flow/ are a subset of {LLR-155.1..155.4} (<= 1)
+=== exit code: 0

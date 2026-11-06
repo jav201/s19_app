@@ -1,0 +1,31 @@
+=== batch-101 Inc 16 E5 mutant mut-32
+row: R-DOC-ARCHIVE.3
+mutation: restore examples/case_00_public/s19_sample.txt
+guard: tests/test_b101_doc_hygiene.py::test_r_doc_archive_3_4_no_unused_example_txt
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree: 95b15da38e91efd4d9a8b0f13ea384d55ef66432
+s19_app.__file__: <HOME>/<USER>/work/s19_i16m_copy/s19_app/__init__.py
+---
+result: KILLED (exit 1)
+first assertion line: E       AssertionError: assert ['examples/ca...9_sample.txt'] == []
+---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________________ test_r_doc_archive_3_4_no_unused_example_txt _________________
+
+    def test_r_doc_archive_3_4_no_unused_example_txt():
+        """Verifies R-DOC-ARCHIVE.3 (case /4): the two unused example text files
+        are gone."""
+>       assert _ls(
+            "examples/case_00_public/from_source_input.txt", "examples/case_00_public/s19_sample.txt"
+        ) == []
+E       AssertionError: assert ['examples/ca...9_sample.txt'] == []
+E         
+E         Left contains one more item: 'examples/case_00_public/s19_sample.txt'
+E         Use -v to get more diff
+
+tests/test_b101_doc_hygiene.py:1170: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_archive_3_4_no_unused_example_txt
+1 failed in 0.15s
+=== end

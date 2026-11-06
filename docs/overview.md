@@ -13,7 +13,7 @@ This document sits above the per-batch dev-flow archives. For point-in-time deta
 
 It is written in Python and ships one console entry point (configured in `pyproject.toml`):
 
-- **`s19tui`** — a Textual terminal interface (a "TUI") for interactive exploration, cross-artefact validation and calibration-change authoring. It uses the **Direction B** layout: a left activity rail + a top command bar + ten single-context screens.
+- **`s19tui`** — a Textual terminal interface (a "TUI") for interactive exploration, cross-artefact validation and calibration-change authoring. It uses the **Direction B** layout: a left activity rail + a top command bar + twelve single-context screens.
 
 A legacy Rich-formatted command line (`info`, `verify`, `dump`, `patch-hex`, `patch-str`, …) survives as a **module-only** invocation — `python -m s19_app.cli` — with no console script; the TUI is the product surface.
 
@@ -34,18 +34,18 @@ Embedded **calibration engineers** working with ASAM A2L description files and E
 The shipped app, as it stands today:
 
 - **Engine + validation.** S-record / Intel-HEX parsing, sparse memory map, contiguous range index, A2L structural parsing and enrichment, MAC parsing, and a cross-artefact validation engine producing `ValidationIssue` records with severity / coverage metrics — **17 public issue codes** (five `MAC_*`, five `A2L_*`, and seven `CROSS_*` / `TRIPLE_*`) that the test suite asserts on. Engine reference: [REQUIREMENTS.md](../REQUIREMENTS.md), modules S1–S3 (the R-READ, R-PARSE, R-VAL, R-HEX and R-A2L rows).
-- **Direction B TUI shell.** Activity rail + command bar + **ten** rail screens: Workspace, A2L Explorer, MAC View, Memory Map, Issues Report, Patch Editor, A↔B Diff, Flow Builder, Checks, CRC Designer (keys `1`–`0`), plus fourteen modal screens (load/save project, load file, variant selection, report viewer, legend, operations, flow save/load, and friends). Calm Dark theme; density toggle; responsive two-regime layout (fixed ≥ 120 cols, proportional < 120).
+- **Direction B TUI shell.** Activity rail + command bar + **twelve** rail screens: Workspace, A2L Explorer, MAC View, Memory Map, Issues Report, Patch Editor, Check Editor, A2B Diff, Flow Builder, Flow Execution, Checks, CRC Designer (keys `1`–`0`, `=`, `]`), plus the Split / Join / Export window, and modal screens (load/save project, load file, variant selection, report viewer, legend, operations, flow save/load, and friends). Calm Dark theme; density toggle; responsive two-regime layout (fixed ≥ 120 cols, proportional < 120).
 - **Change-set engine v2 + apply.** The Patch Editor authors an address-keyed change-set, saves/loads it as a versioned JSON document (`"format": "s19app-changeset"`, `"version": "2.0"` — `s19_app/tui/changes/`), validates and checks it against the loaded image, and **applies** it to emit a **patched S19/HEX image** into the workarea. Undo/redo is shipped (`Ctrl+Z` / `Ctrl+Y`).
 - **Projects and variants.** A saved project carries a `project.json` manifest with named **variants** (per-variant image/A2L/MAC assignments); change-set runs and flows execute variant-scoped, one image at a time, and leave a single fused report.
 - **Flow Builder.** Ordered chains of typed blocks (`SOURCE` → `PATCH` → `WRITE-OUT`, plus CRC) executed over a project image or variant-scoped, persisted to `flow.json`.
 - **A↔B Diff.** Two-image comparison into classified runs (`changed` / `only_a` / `only_b`) with Markdown and self-contained HTML diff reports.
 - **CRC family.** A width-general (8–64) parametric Rocksoft CRC kernel with a named-preset catalogue, `*.crc.json` algorithm-template load/save, a legacy CRC-32 operation, and the **CRC Designer** screen with live known-answer verification.
-- **Operations.** A deterministic registry (`crc`, `extract`, `split_by_segment`) executable from the in-app Operations modal.
+- **Operations.** A deterministic registry (`crc`, `extract`, `split_by_segment`) in the in-app Operations modal — `extract` and `split_by_segment` are listed but not implemented (they answer with a "not yet implemented" placeholder).
 - **Entropy service.** Per-window Shannon entropy over the loaded image, classified into four bands (`constant/padding` · `low` · `medium` · `high/random`), feeding the Memory Map's banding and the report/viewer surfaces.
 
 **Superseded history.** Batches `2026-05-21-batch-03`/`batch-04` shipped an ASAM CDF 2.0 (`.cdfx`) reader/writer and a v1 "unified change-set" JSON as the calibration-change hand-off to Vector vCDM. **Both are removed**: the `s19_app/tui/cdfx/` package no longer exists, and the v2 reader recognises the v1 envelope only to reject it with a `CHG-V1-FORMAT` finding. The shipped replacement is the v2 change-set JSON + the patched-image emit described above.
 
-**Test suite:** `pytest --collect-only -q` reports **2760 collected tests** (measured 2026-10-11). CI runs the lean suite on pull requests and the full suite on pushes to `main`.
+**Test suite:** CI runs the lean suite on pull requests and the full suite on pushes to `main` and `main-tui`.
 
 ## 4. Key formats handled
 
@@ -84,14 +84,13 @@ A change-set round-trip is exact: a value saved to the v2 JSON and re-loaded com
 |---|---|---|
 | **PDF report export** | export the Issues Report to PDF | batch-02 post-mortem `B-3D` |
 
-Formerly deferred, **now shipped** (kept here so old citations resolve): apply-the-change-set / patched-image export, undo/redo, the CRC engine and designer, and the A↔B firmware diff are all live surfaces (§3). The batch-02 **Bookmarks** placeholder screen was superseded — the rail's ten screens no longer include it. The **live vCDM round-trip** row is moot: the CDFX exchange surface itself was removed.
+Formerly deferred, **now shipped** (kept here so old citations resolve): apply-the-change-set / patched-image export, undo/redo, the CRC engine and designer, and the A↔B firmware diff are all live surfaces (§3). The batch-02 **Bookmarks** placeholder screen was superseded — the rail's twelve screens no longer include it. The **live vCDM round-trip** row is moot: the CDFX exchange surface itself was removed.
 
 ## 7. Where things live
 
 | You need to know… | Look in |
 |---|---|
 | project-level architecture | [architecture.md](./architecture.md) |
-| living Mermaid diagrams (system, TUI shell, layout, memory) | [diagrams/architecture.md](./diagrams/architecture.md) |
 | the requirements: strict EARS rows per module S0–S17 (rationale in [requirements/review/](./requirements/review/), earlier canon in [requirements/history/](./requirements/history/)) | [../REQUIREMENTS.md](../REQUIREMENTS.md) |
 | coding conventions, common commands, file-layer rules | [../CLAUDE.md](../CLAUDE.md) |
 | per-batch executive summary (stakeholder-level, what shipped) | `.dev-flow/<batch>/06-docs/executive-summary.md` |

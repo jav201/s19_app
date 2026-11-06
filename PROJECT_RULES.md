@@ -132,7 +132,7 @@ When touching these files, prioritize richer data-flow documentation and decompo
   - `parse_a2l_file`
   - `extract_a2l_tags`
   - `validate_a2l_tags`
-- `s19_app/tui/hexview.py` transformation pipeline functions.
+- `s19_app/render/hexview.py` transformation pipeline functions.
 - `s19_app/tui/app.py` large methods in `S19TuiApp` should be gradually decomposed into smaller, named helpers.
 
 ## Reference Example (Style Baseline)

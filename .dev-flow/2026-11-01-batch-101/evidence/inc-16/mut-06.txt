@@ -1,0 +1,58 @@
+=== batch-101 Inc 16 E5 mutant mut-06
+row: R-DOC-REF.6
+mutation: restore `cdfx/` package in the architecture row of docs/README.md
+guard: tests/test_docs_canon.py::test_at285_no_live_cdfx_or_s19tool_console_script_token
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree: 1003aaeefdf7485c62c31a12b10553e0ccc6ce45
+s19_app.__file__: <HOME>/<USER>/work/s19_i16m_copy/s19_app/__init__.py
+---
+result: KILLED (exit 1)
+first assertion line: E       AssertionError: live CDFX / s19tool-console-script tokens:
+---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_at285_no_live_cdfx_or_s19tool_console_script_token ____________
+
+    def test_at285_no_live_cdfx_or_s19tool_console_script_token():
+        """AT-285 arm 2, widened to every repository document (R-DOC-REF.5,
+        R-DOC-REF.6): no unmarked CDFX / CDF 2.0 token and no `s19tool` outside an
+        allowed shape in any tracked .md/.txt/.rst document.
+    
+        Instrument check first: the allowed shapes pass and a command is caught.
+        """
+        tool = "s19" + "tool"
+        controls = [
+            (f"pip show {tool}", 0),
+            (f"the common `.{tool}\\templates\\` library", 0),
+            (f"`.{tool}/workarea/temp/`", 0),
+            (f"Distribution name `{tool}`", 0),
+            (f"{tool} firmware.s19 info", 1),
+            ("the " + "CD" + "FX exporter", 1),
+            ("the " + "CD" + "FX exporter was removed", 0),
+            ("ASAM " + "CDF 2" + ".0 for vCDM", 1),
+            ("Distribution name " + f"`{tool}`; ASAM " + "CD" + "FX exchange", 1),
+        ]
+        wrong = [(l, n, len(_live_token_findings(l))) for l, n in controls if len(_live_token_findings(l)) != n]
+        assert not wrong, f"negative-control lines misjudged (line, expected, got): {wrong}"
+    
+        documents = _repository_documents()
+        assert documents, "git ls-files returned no repository document"
+        bad: list[str] = []
+        for rel in documents:
+            try:
+                text = (ROOT / rel).read_text(encoding="utf-8")
+            except (OSError, UnicodeDecodeError):
+                continue
+            for i, line in enumerate(text.splitlines(), 1):
+                for finding in _live_token_findings(line):
+                    bad.append(f"{rel}:{i}: {finding}: {line.strip()[:90]}")
+>       assert not bad, "live CDFX / s19tool-console-script tokens:\n" + "\n".join(bad)
+E       AssertionError: live CDFX / s19tool-console-script tokens:
+E         docs/README.md:14: unmarked CDFX: | [architecture.md](./architecture.md) | three-layer architecture, `cdfx/` package, Direct
+E       assert not ['docs/README.md:14: unmarked CDFX: | [architecture.md](./architecture.md) | three-layer architecture, `cdfx/` package, Direct']
+
+tests/test_docs_canon.py:172: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_docs_canon.py::test_at285_no_live_cdfx_or_s19tool_console_script_token
+1 failed in 0.12s
+=== end

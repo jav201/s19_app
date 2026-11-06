@@ -1930,7 +1930,7 @@ def test_at032b_clarity_added_action_wiring_unchanged(tmp_path: Path) -> None:
 
 
 # ---------------------------------------------------------------------------
-# batch-31 (fast-dev-flow P1 quick strike) — Inc-1 geometry, AC-4 (B-05).
+# batch-31 (P1 quick strike) — Inc-1 geometry, AC-4 (B-05).
 # ---------------------------------------------------------------------------
 
 

@@ -1,0 +1,41 @@
+=== batch-101 Inc 16 E5 mutant mut-33
+row: R-DOC-ARCHIVE.4
+mutation: restore the base text of PENDIENTES-batch96.md:3 in the archived copy
+guard: tests/test_b101_doc_hygiene.py::test_r_doc_archive_4_1_archive_holds_no_local_identity
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree: a29e034055ce2bfd6db177e46c4fc381aca68a07
+s19_app.__file__: <HOME>/<USER>/work/s19_i16m_copy/s19_app/__init__.py
+---
+result: KILLED (exit 1)
+first assertion line: E       AssertionError: local identities in the archive folder:
+---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________ test_r_doc_archive_4_1_archive_holds_no_local_identity ____________
+
+    def test_r_doc_archive_4_1_archive_holds_no_local_identity():
+        """Verifies R-DOC-ARCHIVE.4 (case /1): the files of the archive folder hold
+        no local identity (home path, profile path, account or host name, LAN
+        address, cloud-folder drive path)."""
+        files = _ls(_ARCHIVE_DIR)
+        required = [new for _old, new in _MOVED_NOTES] + [
+            _ARCHIVE_DIR + "architecture-batch-declarations-88-100.md"
+        ]
+        absent = [p for p in required if p not in files]
+        assert not absent, f"archive files not tracked, nothing to scan: {absent}"
+        hits = []
+        for rel in files:
+            text = _read(rel)
+            if text is None:
+                continue
+            hits += [f"{rel}: {h}" for h in _local_identity_hits(text)]
+>       assert not hits, "local identities in the archive folder:\n" + "\n".join(hits)
+E       AssertionError: local identities in the archive folder:
+E         .dev-flow/design/archive/PENDIENTES-batch96.md: drive-letter cloud folder: <DRIVE>:/My Drive/
+E       assert not ['.dev-flow/design/archive/PENDIENTES-batch96.md: drive-letter cloud folder: <DRIVE>:/My Drive/']
+
+tests/test_b101_doc_hygiene.py:1247: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_archive_4_1_archive_holds_no_local_identity
+1 failed in 0.20s
+=== end

@@ -1,0 +1,35 @@
+=== batch-101 Inc 16 E5 mutant mut-01
+row: R-DOC-REF.1
+mutation: restore s19_app/tui/hexview.py at PROJECT_RULES.md:135
+guard: tests/test_b101_doc_hygiene.py::test_r_doc_ref_1_1_named_paths_exist
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree: af25457839ed0d72284bc2a7cd93f0d289ac373c
+s19_app.__file__: <HOME>/<USER>/work/s19_i16m_copy/s19_app/__init__.py
+---
+result: KILLED (exit 1)
+first assertion line: E       AssertionError: 1 unmarked repository paths that do not exist:
+---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________________ test_r_doc_ref_1_1_named_paths_exist _____________________
+
+    def test_r_doc_ref_1_1_named_paths_exist():
+        """Verifies R-DOC-REF.1 (case /1): every repository path a repository
+        document names exists, unless its line carries a removal mark."""
+        bad: list[str] = []
+        documents = _repository_documents()
+        assert documents, "git ls-files returned no repository document"
+        for rel in documents:
+            text = _read(rel)
+            if text is not None:
+                bad.extend(_unmarked_missing_paths(rel, text))
+>       assert not bad, f"{len(bad)} unmarked repository paths that do not exist:\n" + "\n".join(bad)
+E       AssertionError: 1 unmarked repository paths that do not exist:
+E         PROJECT_RULES.md:135: s19_app/tui/hexview.py
+E       assert not ['PROJECT_RULES.md:135: s19_app/tui/hexview.py']
+
+tests/test_b101_doc_hygiene.py:286: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_ref_1_1_named_paths_exist
+1 failed in 0.26s
+=== end

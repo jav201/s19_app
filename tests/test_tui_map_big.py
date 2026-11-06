@@ -2915,7 +2915,7 @@ def _lcg_bytes(seed: int, n: int):
 def _demo_loaded() -> LoadedFile:
     """The charter demo fixture (memmap2): 9 merged runs over 5 ranges.
 
-    Mirrors ``prototypes/memmap2.tui_prototype.py::_fixture`` — the capture
+    Mirrors the memmap2 prototype's ``_fixture`` — the capture
     population P-6 re-derived: 5376 B mapped, span 0x00000000..0x1FFF0200,
     4 gaps, chips ``· 1 19% ░ 1 5% ▒ 4 57% ▓ 3 19%``. Built in-memory through
     the real ``compute_entropy`` + ``LoadedFile`` (no disk write).

@@ -7013,7 +7013,7 @@ def test_tc030_footer_updates_and_reflects_active_screen(tmp_path: Path) -> None
 def test_tc030_operations_binding_shown_in_footer(tmp_path: Path) -> None:
     """The Operations view's ``x`` binding is discoverable on every screen.
 
-    Intent: fast-dev-flow AC "x/Operations is footer-discoverable" — now row 1
+    Intent: AC "x/Operations is footer-discoverable" — now row 1
     of the key bar: ``x Operations`` is painted on every rail screen (AC-1),
     labelled with the binding's description ``Operations`` (AC-2).
     """
@@ -7210,7 +7210,7 @@ def test_tc032_directionb_tests_do_not_monkeypatch_engine_functions() -> None:
 
 
 # ---------------------------------------------------------------------------
-# fast-dev-flow (sections-label) — Data Sections range label two-line wrap.
+# (sections-label) — Data Sections range label two-line wrap.
 #
 # The fixed 22-column ``#ws_left`` pane clipped the old single-line range
 # label ``0x{start:08X} - 0x{end-1:08X} ({size} bytes)`` (~33 chars), so the
@@ -7575,7 +7575,7 @@ def test_at_038c_a2l_error_row_keeps_severity_style(tmp_path: Path) -> None:
     leaned unknowingly on ``CAL_BLOCK_A``'s missing-length ``schema_ok=False``;
     that batch corrected the verdict — an underivable length is not a schema
     failure — exposing that the seed never wired through. See
-    ``.fast-dev-flow/spec.md`` §AC-5.)
+    §AC-5.)
     """
     import copy
 
@@ -8970,7 +8970,7 @@ def test_tc_042_12_memory_strip_touches_no_frozen_path() -> None:
 
 
 # ---------------------------------------------------------------------------
-# batch-31 (fast-dev-flow P1 quick strike) — Inc-1 geometry.
+# batch-31 (P1 quick strike) — Inc-1 geometry.
 #
 # AC-5 (B-06): the Workspace work-area file list is elastic (was a fixed
 # 8-row cap), so taller terminals show more files.

@@ -1,0 +1,32 @@
+=== batch-101 Inc 16 E5 mutant mut-18
+row: R-DOC-DEV.10
+mutation: restore the test tally in docs/README.md
+guard: tests/test_b101_doc_hygiene.py::test_r_doc_dev_10_1_docs_index_states_no_project_state
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree: 5f25bec72123d582ba1c5664f2e5f96d78d1947c
+s19_app.__file__: <HOME>/<USER>/work/s19_i16m_copy/s19_app/__init__.py
+---
+result: KILLED (exit 1)
+first assertion line: E       AssertionError: a test tally remains
+---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________ test_r_doc_dev_10_1_docs_index_states_no_project_state ____________
+
+    def test_r_doc_dev_10_1_docs_index_states_no_project_state():
+        """Verifies R-DOC-DEV.10 (case /1): docs/README.md states no branch,
+        commit, test tally or per-batch table as the project's state."""
+        text = _need("docs/README.md")
+        assert not re.search(r"(?mi)^#{1,6}\s*Project state\b", text), "a 'Project state' heading remains"
+        assert "latest merge" not in text
+>       assert not re.search(r"\d+ pass", text), "a test tally remains"
+E       AssertionError: a test tally remains
+E       assert not <re.Match object; span=(1891, 1899), match='762 pass'>
+E        +  where <re.Match object; span=(1891, 1899), match='762 pass'> = <function search at 0x7f4868dbe340>('\\d+ pass', '# `s19_app` — Project documentation index\n\nProject-level documentation for `s19_app` (distribution name `s19tool`) ...ed versions |\n| [../CHANGELOG.md](../CHANGELOG.md) | release notes |\n- **Tests:** 762 pass / 3 xfailed / 2 skipped\n')
+E        +    where <function search at 0x7f4868dbe340> = re.search
+
+tests/test_b101_doc_hygiene.py:735: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_10_1_docs_index_states_no_project_state
+1 failed in 0.14s
+=== end
