@@ -54,8 +54,8 @@ The trigger evaluation `state.json`'s `triggers.record` points at: one row per t
 ## Where we are
 
 - **Station:** P3 (increments), 2026-11-06.
-- **Merged and pushed:** Incs 1, 2, 3, 4, 7, 8, 11, 13, 14 (decisions in `state.json`; merge evidence `evidence/merge/`).
-- **In flight:** Inc 5 (E3 round 2), Inc 15 (E3 round 2; tests only; merges before Inc 6), Inc 16 (E3 round 2; docs).
+- **Merged and pushed:** Incs 1, 2, 3, 4, 7, 8, 11, 13, 14, 15, 16 (decisions in `state.json`; merge evidence `evidence/merge/`).
+- **In flight:** Inc 5 (E5 corrective: C-10 folds in the stale Validate results after an in-place write).
 - **Next:** the serial `app.py` chain 5 → 6 → 9 → 10 → 12; before Inc 10's E1, the LAN check of Inc 5 ruling D-4 (A2L explorer value column and Split/Join after an in-place write).
 - **Batch end:** full battery, canon fold, review page, v1.0.0 tag.
 
