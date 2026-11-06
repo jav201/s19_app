@@ -1,0 +1,648 @@
+$ git -C <HOME>/work/s19_i4 log --oneline -1   (the Inc 4 diff over b7b77c4 applied on top)
+7add3d63 batch-101 PLAN: Inc 5 takes Inc 13's D-4 (stale CRC Designer coverage after an in-place apply) first, integrity priority
+$ python -c 'import s19_app; print(s19_app.__file__)'
+<HOME>/work/s19_i4/s19_app/__init__.py
+$ cd <HOME>/work/s19_i4 && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 2400 python -m pytest -q -p no:cacheprovider --rootdir=<HOME>/work/s19_i4 -rfE -n 8 -m not serial_timing tests/test_b100_project_check.py tests/test_b100_project_homes.py tests/test_b100_save_dialog.py tests/test_b100_save_guards.py tests/test_b100_save_image.py
+bringing up nodes...
+bringing up nodes...
+
+...s....s.................................ss....sss...................s. [ 14%]
+....sss..........sssssssss.........s......ss..s........sssss.s.......... [ 29%]
+...............s...........ss...........s.sss..s...............s.....s.. [ 44%]
+.........s......s.........................F.......................F..... [ 59%]
+..........F.................F.ss.....ssss...s...s.....s.sssss......s.... [ 74%]
+.......s.............s.....s...............................s............ [ 88%]
+............................s........s.s..............                   [100%]
+=================================== FAILURES ===================================
+____________ test_tc_b100_65_save_executes_the_painted_plan[merge] _____________
+[gw5] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-174/popen-gw5/test_tc_b100_65_save_executes_0')
+key = 'merge'
+
+    @pytest.mark.parametrize("key", SCENARIOS)
+    def test_tc_b100_65_save_executes_the_painted_plan(tmp_path: Path, key: str) -> None:
+        """LLR-175.4a, HLR-175a, B11-13, B11-65 (7 of 7): ``alt+s`` → the commit
+        step (a spy on ``_commit_project_save``) receives a prepared save whose
+        ``plan`` IS the plan the dialog painted (``screen.plan``, identity), and
+        a payload carrying that same object; the tree written under the target
+        equals that plan by full path and action (``new`` written, ``keep``
+        untouched, ``rewrite`` / ``merge`` on an existing file, every planned
+        folder's files copied, nothing else; the gather homes excluded by name).
+        The refused scenario commits nothing and writes 0 new paths.
+    
+        Why: HLR-175a — Save writes exactly the files the painted plan names.
+        Negative control: a router that always re-prepares → ``prepared.plan is
+        screen.plan`` false → RED; a commit that re-plans without the document
+        row writes ``patches/changes.json`` with no painted row → RED. RED
+        (base): ``_commit_project_save`` / ``screen.plan`` do not exist."""
+>       out = _scenario_paint(tmp_path, key, save=True, commit_spy=True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b100_save_dialog.py:2770: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b100_save_dialog.py:2652: in _scenario_paint
+    ctx = _scenario_prep(key, tmp_path, base)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b100_save_dialog.py:2614: in _scenario_prep
+    _save_project_from(base, "ab", [other / "firmware.s19"])
+tests/test_b100_save_dialog.py:190: in _save_project_from
+    project = asyncio.run(_drive())
+              ^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def _drive() -> Path:
+        app = S19TuiApp(base_dir=base)
+        async with app.run_test(size=(160, 50)) as pilot:
+            await pilot.pause()
+            for path in sources:
+                path = Path(path)
+                if path.suffix.lower() == ".a2l":
+                    app.load_a2l_from_path(path)
+                    done = lambda: app.current_a2l_path is not None  # noqa: E731
+                else:
+                    app._load_path_from_user_input(path)
+                    done = lambda p=path: app.current_file is not None and (  # noqa: E731
+                        app.current_file.path.name == p.name
+                        or (app.current_file.mac_path is not None and app.current_file.mac_path.name == p.name)
+                    )
+                for _ in range(400):
+                    if done():
+                        break
+                    await pilot.pause()
+                else:
+                    raise AssertionError(f"the load of {path.name} did not land")
+            app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name=name))
+            for _ in range(400):
+                if app.current_project is not None and app.current_project.casefold() == name.casefold():
+                    break
+                await pilot.pause()
+            else:
+>               raise AssertionError(f"Save project {name} did not land")
+E               AssertionError: Save project ab did not land
+
+tests/test_b100_save_dialog.py:187: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2979 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-174/popen-gw5/test_tc_b100_65_save_executes_0/app workarea=/tmp/pytest-of-<USER>/pytest-174/popen-gw5/test_tc_b100_65_save_executes_0/app/.s19tool/workarea
+INFO     s19tui:app.py:8332 Workarea refreshed. files=0
+INFO     s19tui:app.py:16593 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.034
+INFO     s19tui:app.py:15491 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<USER>/pytest-174/popen-gw5/test_tc_b100_65_save_executes_0/src02_test_tc_b100_65_save_executes_0/firmware.s19
+INFO     s19tui:app.py:15512 Load phase boundary: copy_started path=/tmp/pytest-of-<USER>/pytest-174/popen-gw5/test_tc_b100_65_save_executes_0/src02_test_tc_b100_65_save_executes_0/firmware.s19
+INFO     s19tui:app.py:15525 Load phase boundary: copy_done path=firmware.s19 elapsed=0.001s
+WARNING  s19tui:app.py:15544 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-174/popen-gw5/test_tc_b100_65_save_executes_0/src02_test_tc_b100_65_save_executes_0/firmware.s19'
+INFO     s19tui:app.py:8332 Workarea refreshed. files=1
+INFO     s19tui:app.py:15562 File copied to temp: path=/tmp/pytest-of-<USER>/pytest-174/popen-gw5/test_tc_b100_65_save_executes_0/app/.s19tool/workarea/temp/firmware.s19 size_bytes=302 copy_seconds=0.001
+INFO     s19tui:app.py:15568 Load phase boundary: worker_spawned path=firmware.s19
+INFO     s19tui:app.py:18451 Load phase boundary: worker_parse_start path=firmware.s19
+INFO     s19tui:app.py:17835 Loading file: path=/tmp/pytest-of-<USER>/pytest-174/popen-gw5/test_tc_b100_65_save_executes_0/app/.s19tool/workarea/temp/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14151 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18667 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-174/popen-gw5/test_tc_b100_65_save_executes_0/app/.s19tool/workarea/temp/firmware.s19 addresses=82 range_count=3 range_bytes=82 errors=0
+INFO     s19tui:app.py:14168 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18470 Load phase boundary: worker_parse_done path=firmware.s19 elapsed=0.003s
+INFO     s19tui:app.py:18294 Load phase boundary: prepare_entry path=firmware.s19 file_type=s19
+INFO     s19tui:app.py:18329 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:17688 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18338 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:18358 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:18365 Load phase boundary: prepare_bases_done row_bases=6
+INFO     s19tui:app.py:18375 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:18381 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:18503 Load phase boundary: worker_compute_done path=firmware.s19 precomputed=True elapsed=0.012s
+INFO     s19tui:app.py:18510 Load phase boundary: call_from_thread_apply_dispatched path=firmware.s19
+INFO     s19tui:app.py:18128 Load phase boundary: apply_install_state path=firmware.s19 precomputed=True
+INFO     s19tui:app.py:18795 Sections updated. count=3 rendered_ranges=3 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18144 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18156 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19815 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.005
+INFO     s19tui:app.py:16593 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.039
+INFO     s19tui:app.py:19329 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.043
+INFO     s19tui:app.py:18169 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:21065 Request refused while busy: Loading firmware.s19
+INFO     s19tui:app.py:19022 Memory Map updated. ranges=3
+INFO     s19tui:app.py:18186 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-174/popen-gw5/test_tc_b100_65_save_executes_0/app/.s19tool/workarea/temp/firmware.s19 file_type=s19 elapsed_seconds=2.684 has_mac=False precomputed=True
+______________ test_tc_b100_65_summary_rows_equal_the_plan[merge] ______________
+[gw3] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-174/popen-gw3/test_tc_b100_65_summary_rows_e2')
+key = 'merge'
+
+    @pytest.mark.parametrize("key", SCENARIOS)
+    def test_tc_b100_65_summary_rows_equal_the_plan(tmp_path: Path, key: str) -> None:
+        """LLR-175.4, HLR-175, B11-48, B11-55 (7 of 7, at 220 columns): the
+        painted summary rows are exactly the scenario's rows (the image line,
+        the pending line, one row per plan file row with its landing name — and
+        its source name when the two differ — and its action word, one row per
+        planned sub-folder with its file count, the merge's active-variant row,
+        the ``project.json`` row), they equal the painted plan's ``rows`` and
+        ``folders`` one for one by landing name and action word (0
+        differences), the action words are only ``new``, ``keep``, ``merge`` and
+        ``rewrite``, no row holds a line break, and every row and the target
+        line have 0 markup spans. The refused scenario paints 0 rows.
+    
+        Why: R-PC — the operator's P-C note: an error here could invalidate,
+        lose, overwrite or rename the engineer's work, so the dialog paints the
+        one plan the save executes. Negative control: a painter that drops
+        ``keep`` rows → the pending scenario loses ``MAC firmware.mac — keep``
+        → RED; on base there is no summary (P11-2) → RED."""
+>       out = _scenario_paint(tmp_path, key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b100_save_dialog.py:2721: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b100_save_dialog.py:2652: in _scenario_paint
+    ctx = _scenario_prep(key, tmp_path, base)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b100_save_dialog.py:2614: in _scenario_prep
+    _save_project_from(base, "ab", [other / "firmware.s19"])
+tests/test_b100_save_dialog.py:190: in _save_project_from
+    project = asyncio.run(_drive())
+              ^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def _drive() -> Path:
+        app = S19TuiApp(base_dir=base)
+        async with app.run_test(size=(160, 50)) as pilot:
+            await pilot.pause()
+            for path in sources:
+                path = Path(path)
+                if path.suffix.lower() == ".a2l":
+                    app.load_a2l_from_path(path)
+                    done = lambda: app.current_a2l_path is not None  # noqa: E731
+                else:
+                    app._load_path_from_user_input(path)
+                    done = lambda p=path: app.current_file is not None and (  # noqa: E731
+                        app.current_file.path.name == p.name
+                        or (app.current_file.mac_path is not None and app.current_file.mac_path.name == p.name)
+                    )
+                for _ in range(400):
+                    if done():
+                        break
+                    await pilot.pause()
+                else:
+                    raise AssertionError(f"the load of {path.name} did not land")
+            app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name=name))
+            for _ in range(400):
+                if app.current_project is not None and app.current_project.casefold() == name.casefold():
+                    break
+                await pilot.pause()
+            else:
+>               raise AssertionError(f"Save project {name} did not land")
+E               AssertionError: Save project ab did not land
+
+tests/test_b100_save_dialog.py:187: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2979 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-174/popen-gw3/test_tc_b100_65_summary_rows_e2/app workarea=/tmp/pytest-of-<USER>/pytest-174/popen-gw3/test_tc_b100_65_summary_rows_e2/app/.s19tool/workarea
+INFO     s19tui:app.py:8332 Workarea refreshed. files=0
+INFO     s19tui:app.py:16593 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.015
+INFO     s19tui:app.py:15491 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<USER>/pytest-174/popen-gw3/test_tc_b100_65_summary_rows_e2/src02_test_tc_b100_65_summary_rows_e2/firmware.s19
+INFO     s19tui:app.py:15512 Load phase boundary: copy_started path=/tmp/pytest-of-<USER>/pytest-174/popen-gw3/test_tc_b100_65_summary_rows_e2/src02_test_tc_b100_65_summary_rows_e2/firmware.s19
+INFO     s19tui:app.py:15525 Load phase boundary: copy_done path=firmware.s19 elapsed=0.003s
+WARNING  s19tui:app.py:15544 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-174/popen-gw3/test_tc_b100_65_summary_rows_e2/src02_test_tc_b100_65_summary_rows_e2/firmware.s19'
+INFO     s19tui:app.py:8332 Workarea refreshed. files=1
+INFO     s19tui:app.py:15562 File copied to temp: path=/tmp/pytest-of-<USER>/pytest-174/popen-gw3/test_tc_b100_65_summary_rows_e2/app/.s19tool/workarea/temp/firmware.s19 size_bytes=302 copy_seconds=0.003
+INFO     s19tui:app.py:15568 Load phase boundary: worker_spawned path=firmware.s19
+INFO     s19tui:app.py:18451 Load phase boundary: worker_parse_start path=firmware.s19
+INFO     s19tui:app.py:17835 Loading file: path=/tmp/pytest-of-<USER>/pytest-174/popen-gw3/test_tc_b100_65_summary_rows_e2/app/.s19tool/workarea/temp/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14151 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18667 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-174/popen-gw3/test_tc_b100_65_summary_rows_e2/app/.s19tool/workarea/temp/firmware.s19 addresses=82 range_count=3 range_bytes=82 errors=0
+INFO     s19tui:app.py:14168 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18470 Load phase boundary: worker_parse_done path=firmware.s19 elapsed=0.004s
+INFO     s19tui:app.py:18294 Load phase boundary: prepare_entry path=firmware.s19 file_type=s19
+INFO     s19tui:app.py:18329 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:17688 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18338 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:18358 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:18365 Load phase boundary: prepare_bases_done row_bases=6
+INFO     s19tui:app.py:18375 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:18381 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:18503 Load phase boundary: worker_compute_done path=firmware.s19 precomputed=True elapsed=0.008s
+INFO     s19tui:app.py:18510 Load phase boundary: call_from_thread_apply_dispatched path=firmware.s19
+INFO     s19tui:app.py:18128 Load phase boundary: apply_install_state path=firmware.s19 precomputed=True
+INFO     s19tui:app.py:18795 Sections updated. count=3 rendered_ranges=3 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18144 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18156 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19815 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.002
+INFO     s19tui:app.py:16593 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.017
+INFO     s19tui:app.py:19329 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.021
+INFO     s19tui:app.py:18169 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:21065 Request refused while busy: Loading firmware.s19
+INFO     s19tui:app.py:19022 Memory Map updated. ranges=3
+INFO     s19tui:app.py:18186 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-174/popen-gw3/test_tc_b100_65_summary_rows_e2/app/.s19tool/workarea/temp/firmware.s19 file_type=s19 elapsed_seconds=2.024 has_mac=False precomputed=True
+____________ test_tc_b100_65_merge_names_the_active_variant_it_sets ____________
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-174/popen-gw2/test_tc_b100_65_merge_names_th0')
+
+    def test_tc_b100_65_merge_names_the_active_variant_it_sets(tmp_path: Path) -> None:
+        """LLR-175.4f, B11-52 (2 + 1): F-merge where ``ab`` records ``firmware``
+        and the image lands as ``firmware_1.s19`` → 1 row holding ``active
+        variant``, ``firmware_1`` and ``firmware``; after ``alt+s``
+        ``ab/project.json`` records ``active_variant == "firmware_1"``; a merge
+        whose target records no active variant → 1 row naming ``none
+        recorded``.
+    
+        Why: a merge silently switched the project's active variant
+        (UX-35). Negative control: the row omitted → 0 rows → RED; the row
+        naming the first variant by name → the after-save equality fails →
+        RED."""
+>       out = _scenario_paint(tmp_path, "merge", save=True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b100_save_dialog.py:3039: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b100_save_dialog.py:2652: in _scenario_paint
+    ctx = _scenario_prep(key, tmp_path, base)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b100_save_dialog.py:2614: in _scenario_prep
+    _save_project_from(base, "ab", [other / "firmware.s19"])
+tests/test_b100_save_dialog.py:190: in _save_project_from
+    project = asyncio.run(_drive())
+              ^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def _drive() -> Path:
+        app = S19TuiApp(base_dir=base)
+        async with app.run_test(size=(160, 50)) as pilot:
+            await pilot.pause()
+            for path in sources:
+                path = Path(path)
+                if path.suffix.lower() == ".a2l":
+                    app.load_a2l_from_path(path)
+                    done = lambda: app.current_a2l_path is not None  # noqa: E731
+                else:
+                    app._load_path_from_user_input(path)
+                    done = lambda p=path: app.current_file is not None and (  # noqa: E731
+                        app.current_file.path.name == p.name
+                        or (app.current_file.mac_path is not None and app.current_file.mac_path.name == p.name)
+                    )
+                for _ in range(400):
+                    if done():
+                        break
+                    await pilot.pause()
+                else:
+                    raise AssertionError(f"the load of {path.name} did not land")
+            app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name=name))
+            for _ in range(400):
+                if app.current_project is not None and app.current_project.casefold() == name.casefold():
+                    break
+                await pilot.pause()
+            else:
+>               raise AssertionError(f"Save project {name} did not land")
+E               AssertionError: Save project ab did not land
+
+tests/test_b100_save_dialog.py:187: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2979 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-174/popen-gw2/test_tc_b100_65_merge_names_th0/app workarea=/tmp/pytest-of-<USER>/pytest-174/popen-gw2/test_tc_b100_65_merge_names_th0/app/.s19tool/workarea
+INFO     s19tui:app.py:8332 Workarea refreshed. files=0
+INFO     s19tui:app.py:16593 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.033
+INFO     s19tui:app.py:15491 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<USER>/pytest-174/popen-gw2/test_tc_b100_65_merge_names_th0/src02_test_tc_b100_65_merge_names_th0/firmware.s19
+INFO     s19tui:app.py:15512 Load phase boundary: copy_started path=/tmp/pytest-of-<USER>/pytest-174/popen-gw2/test_tc_b100_65_merge_names_th0/src02_test_tc_b100_65_merge_names_th0/firmware.s19
+INFO     s19tui:app.py:15525 Load phase boundary: copy_done path=firmware.s19 elapsed=0.002s
+WARNING  s19tui:app.py:15544 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-174/popen-gw2/test_tc_b100_65_merge_names_th0/src02_test_tc_b100_65_merge_names_th0/firmware.s19'
+INFO     s19tui:app.py:8332 Workarea refreshed. files=1
+INFO     s19tui:app.py:15562 File copied to temp: path=/tmp/pytest-of-<USER>/pytest-174/popen-gw2/test_tc_b100_65_merge_names_th0/app/.s19tool/workarea/temp/firmware.s19 size_bytes=302 copy_seconds=0.002
+INFO     s19tui:app.py:15568 Load phase boundary: worker_spawned path=firmware.s19
+INFO     s19tui:app.py:18451 Load phase boundary: worker_parse_start path=firmware.s19
+INFO     s19tui:app.py:17835 Loading file: path=/tmp/pytest-of-<USER>/pytest-174/popen-gw2/test_tc_b100_65_merge_names_th0/app/.s19tool/workarea/temp/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14151 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18667 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-174/popen-gw2/test_tc_b100_65_merge_names_th0/app/.s19tool/workarea/temp/firmware.s19 addresses=82 range_count=3 range_bytes=82 errors=0
+INFO     s19tui:app.py:14168 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18470 Load phase boundary: worker_parse_done path=firmware.s19 elapsed=0.003s
+INFO     s19tui:app.py:18294 Load phase boundary: prepare_entry path=firmware.s19 file_type=s19
+INFO     s19tui:app.py:18329 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:17688 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18338 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:18358 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:18365 Load phase boundary: prepare_bases_done row_bases=6
+INFO     s19tui:app.py:18375 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:18381 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:18503 Load phase boundary: worker_compute_done path=firmware.s19 precomputed=True elapsed=0.001s
+INFO     s19tui:app.py:18510 Load phase boundary: call_from_thread_apply_dispatched path=firmware.s19
+INFO     s19tui:app.py:18128 Load phase boundary: apply_install_state path=firmware.s19 precomputed=True
+INFO     s19tui:app.py:18795 Sections updated. count=3 rendered_ranges=3 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18144 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18156 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19815 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.003
+INFO     s19tui:app.py:16593 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.032
+INFO     s19tui:app.py:19329 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.037
+INFO     s19tui:app.py:18169 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:21065 Request refused while busy: Loading firmware.s19
+INFO     s19tui:app.py:19022 Memory Map updated. ranges=3
+INFO     s19tui:app.py:18186 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-174/popen-gw2/test_tc_b100_65_merge_names_th0/app/.s19tool/workarea/temp/firmware.s19 file_type=s19 elapsed_seconds=1.780 has_mac=False precomputed=True
+______________ test_tc_b100_66_save_dialog_paints_no_decision_id _______________
+[gw7] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0')
+
+    def test_tc_b100_66_save_dialog_paints_no_decision_id(tmp_path: Path) -> None:
+        """LLR-173.7 (TC-B100-66 Inc 11 extension, B11-57, S2-4; 6 scenarios):
+        the painted ``#save_where`` and summary text of the dialog in the fresh,
+        open-project, merge, save-as, refused and empty-Save scenarios hold 0
+        matches of ``\\bD\\d+\\b``, ``\\bO-\\d+``, ``VS-``, ``LLR-``, ``HLR-``; so
+        does every string literal of the ``SaveProjectScreen`` class body.
+    
+        Why: painted strings are English and carry no internal decision id.
+        Negative control: the pc_B hint ``Browse is gone (D7)`` shipped → 1
+        match → RED. RED (base): no summary is painted."""
+        texts = {}
+        for key in ("fresh", "files", "merge", "saveas", "refused"):
+>           out = _scenario_paint(tmp_path / key, key)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b100_save_dialog.py:4112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b100_save_dialog.py:2652: in _scenario_paint
+    ctx = _scenario_prep(key, tmp_path, base)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b100_save_dialog.py:2614: in _scenario_prep
+    _save_project_from(base, "ab", [other / "firmware.s19"])
+tests/test_b100_save_dialog.py:190: in _save_project_from
+    project = asyncio.run(_drive())
+              ^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def _drive() -> Path:
+        app = S19TuiApp(base_dir=base)
+        async with app.run_test(size=(160, 50)) as pilot:
+            await pilot.pause()
+            for path in sources:
+                path = Path(path)
+                if path.suffix.lower() == ".a2l":
+                    app.load_a2l_from_path(path)
+                    done = lambda: app.current_a2l_path is not None  # noqa: E731
+                else:
+                    app._load_path_from_user_input(path)
+                    done = lambda p=path: app.current_file is not None and (  # noqa: E731
+                        app.current_file.path.name == p.name
+                        or (app.current_file.mac_path is not None and app.current_file.mac_path.name == p.name)
+                    )
+                for _ in range(400):
+                    if done():
+                        break
+                    await pilot.pause()
+                else:
+                    raise AssertionError(f"the load of {path.name} did not land")
+            app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name=name))
+            for _ in range(400):
+                if app.current_project is not None and app.current_project.casefold() == name.casefold():
+                    break
+                await pilot.pause()
+            else:
+>               raise AssertionError(f"Save project {name} did not land")
+E               AssertionError: Save project ab did not land
+
+tests/test_b100_save_dialog.py:187: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2979 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/fresh/app workarea=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/fresh/app/.s19tool/workarea
+INFO     s19tui:app.py:8332 Workarea refreshed. files=0
+INFO     s19tui:app.py:16593 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.018
+INFO     s19tui:app.py:15491 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/fresh/src_fresh_fresh/firmware.s19
+INFO     s19tui:app.py:15512 Load phase boundary: copy_started path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/fresh/src_fresh_fresh/firmware.s19
+INFO     s19tui:app.py:15525 Load phase boundary: copy_done path=firmware.s19 elapsed=0.004s
+WARNING  s19tui:app.py:15544 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/fresh/src_fresh_fresh/firmware.s19'
+INFO     s19tui:app.py:8332 Workarea refreshed. files=1
+INFO     s19tui:app.py:15562 File copied to temp: path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/fresh/app/.s19tool/workarea/temp/firmware.s19 size_bytes=349 copy_seconds=0.004
+INFO     s19tui:app.py:15568 Load phase boundary: worker_spawned path=firmware.s19
+INFO     s19tui:app.py:18451 Load phase boundary: worker_parse_start path=firmware.s19
+INFO     s19tui:app.py:17835 Loading file: path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/fresh/app/.s19tool/workarea/temp/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14151 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18667 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/fresh/app/.s19tool/workarea/temp/firmware.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14168 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18470 Load phase boundary: worker_parse_done path=firmware.s19 elapsed=0.016s
+INFO     s19tui:app.py:18294 Load phase boundary: prepare_entry path=firmware.s19 file_type=s19
+INFO     s19tui:app.py:18329 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:17688 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18338 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:18358 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:18365 Load phase boundary: prepare_bases_done row_bases=7
+INFO     s19tui:app.py:18375 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:18381 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:18503 Load phase boundary: worker_compute_done path=firmware.s19 precomputed=True elapsed=0.001s
+INFO     s19tui:app.py:18510 Load phase boundary: call_from_thread_apply_dispatched path=firmware.s19
+INFO     s19tui:app.py:18128 Load phase boundary: apply_install_state path=firmware.s19 precomputed=True
+INFO     s19tui:app.py:18795 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18144 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18156 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19815 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.002
+INFO     s19tui:app.py:16593 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.017
+INFO     s19tui:app.py:19329 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.020
+INFO     s19tui:app.py:18169 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:19022 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18186 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/fresh/app/.s19tool/workarea/temp/firmware.s19 file_type=s19 elapsed_seconds=1.687 has_mac=False precomputed=True
+INFO     s19tui:app.py:8414 Save project action triggered for /tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/fresh/app/.s19tool/workarea/temp/firmware.s19
+INFO     s19tui:app.py:2979 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app workarea=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app/.s19tool/workarea
+INFO     s19tui:app.py:8332 Workarea refreshed. files=0
+INFO     s19tui:app.py:16593 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.036
+INFO     s19tui:app.py:15491 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app_src/firmware.s19
+INFO     s19tui:app.py:15512 Load phase boundary: copy_started path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app_src/firmware.s19
+INFO     s19tui:app.py:15525 Load phase boundary: copy_done path=firmware.s19 elapsed=0.003s
+WARNING  s19tui:app.py:15544 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app_src/firmware.s19'
+INFO     s19tui:app.py:8332 Workarea refreshed. files=1
+INFO     s19tui:app.py:15562 File copied to temp: path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app/.s19tool/workarea/temp/firmware.s19 size_bytes=349 copy_seconds=0.003
+INFO     s19tui:app.py:15568 Load phase boundary: worker_spawned path=firmware.s19
+INFO     s19tui:app.py:18451 Load phase boundary: worker_parse_start path=firmware.s19
+INFO     s19tui:app.py:17835 Loading file: path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app/.s19tool/workarea/temp/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14151 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18667 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app/.s19tool/workarea/temp/firmware.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14168 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18470 Load phase boundary: worker_parse_done path=firmware.s19 elapsed=0.004s
+INFO     s19tui:app.py:18294 Load phase boundary: prepare_entry path=firmware.s19 file_type=s19
+INFO     s19tui:app.py:18329 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:17688 MAC validation computed: records=0 issues=0 elapsed_seconds=0.024
+INFO     s19tui:app.py:18338 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:18358 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:18365 Load phase boundary: prepare_bases_done row_bases=7
+INFO     s19tui:app.py:18375 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:18381 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:18503 Load phase boundary: worker_compute_done path=firmware.s19 precomputed=True elapsed=0.025s
+INFO     s19tui:app.py:18510 Load phase boundary: call_from_thread_apply_dispatched path=firmware.s19
+INFO     s19tui:app.py:18128 Load phase boundary: apply_install_state path=firmware.s19 precomputed=True
+INFO     s19tui:app.py:18795 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18144 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18156 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19815 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:16593 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.023
+INFO     s19tui:app.py:19329 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.027
+INFO     s19tui:app.py:18169 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:19022 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18186 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app/.s19tool/workarea/temp/firmware.s19 file_type=s19 elapsed_seconds=1.964 has_mac=False precomputed=True
+INFO     s19tui:app.py:15491 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app_src/firmware.mac
+INFO     s19tui:app.py:15512 Load phase boundary: copy_started path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app_src/firmware.mac
+INFO     s19tui:app.py:15525 Load phase boundary: copy_done path=firmware.mac elapsed=0.005s
+WARNING  s19tui:app.py:15544 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app_src/firmware.mac'
+INFO     s19tui:app.py:8332 Workarea refreshed. files=2
+INFO     s19tui:app.py:15562 File copied to temp: path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app/.s19tool/workarea/temp/firmware.mac size_bytes=32 copy_seconds=0.005
+INFO     s19tui:app.py:15568 Load phase boundary: worker_spawned path=firmware.mac
+INFO     s19tui:app.py:18451 Load phase boundary: worker_parse_start path=firmware.mac
+INFO     s19tui:app.py:17835 Loading file: path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app/.s19tool/workarea/temp/firmware.mac suffix=.mac project=None
+INFO     s19tui:app.py:14151 Load phase boundary: parse_branch_entry path=firmware.mac suffix=.mac
+INFO     s19tui:app.py:16852 Load phase boundary: mac_parse_entry path=firmware.mac
+INFO     s19tui:app.py:16858 Load phase boundary: mac_parse_done path=firmware.mac rows=2 diagnostics=1 elapsed=0.000s
+INFO     s19tui:app.py:16872 MAC parse summary (mirrored): path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app/.s19tool/workarea/temp/firmware.mac rows=2 parse_ok=1 diagnostics=1 valid_addresses=1
+INFO     s19tui:app.py:16893 Load phase boundary: mac_a2l_resolve_entry path=firmware.mac a2l_path=None
+INFO     s19tui:app.py:16899 Load phase boundary: mac_a2l_resolve_done path=firmware.mac has_a2l_data=False
+INFO     s19tui:app.py:16905 MAC parse summary: path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app/.s19tool/workarea/temp/firmware.mac total_records=2 parse_ok=1 diagnostics=1 valid_addresses=1 a2l_path=None elapsed_seconds=0.001
+INFO     s19tui:app.py:14193 Load phase boundary: mac_merge_entry path=firmware.mac has_primary=True
+INFO     s19tui:app.py:14200 Load phase boundary: mac_merge_done path=firmware.mac file_type=s19
+INFO     s19tui:app.py:18667 Load summary: file_type=s19+mac path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app/.s19tool/workarea/temp/firmware.mac addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14222 Load phase boundary: parse_branch_done path=firmware.mac branch=mac
+INFO     s19tui:app.py:18470 Load phase boundary: worker_parse_done path=firmware.mac elapsed=0.002s
+INFO     s19tui:app.py:18294 Load phase boundary: prepare_entry path=firmware.s19 file_type=s19
+INFO     s19tui:app.py:18329 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:17688 MAC validation computed: records=2 issues=2 elapsed_seconds=0.000
+INFO     s19tui:app.py:18338 Load phase boundary: prepare_mac_payload_done rows=2 issues=2
+INFO     s19tui:app.py:18358 Load phase boundary: prepare_highlights_done highlights=1 out_of_range=0
+INFO     s19tui:app.py:18365 Load phase boundary: prepare_bases_done row_bases=7
+INFO     s19tui:app.py:18375 Load phase boundary: prepare_datatable_done mac_rows=2 widths=(9, 10, 5, 5, 9, 10, 26, 8)
+INFO     s19tui:app.py:18381 Load phase boundary: prepare_done records=2
+INFO     s19tui:app.py:18503 Load phase boundary: worker_compute_done path=firmware.mac precomputed=True elapsed=0.001s
+INFO     s19tui:app.py:18510 Load phase boundary: call_from_thread_apply_dispatched path=firmware.mac
+INFO     s19tui:app.py:18128 Load phase boundary: apply_install_state path=firmware.mac precomputed=True
+INFO     s19tui:app.py:18795 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18144 Load phase boundary: apply_sections_done path=firmware.mac
+INFO     s19tui:app.py:18156 Load phase boundary: apply_hex_done path=firmware.mac
+INFO     s19tui:app.py:19815 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.003
+INFO     s19tui:app.py:16625 Load phase boundary: populate_issues_table_done rows=2 total=2 elapsed=0.039
+INFO     s19tui:app.py:19380 Load phase boundary: populate_mac_table_done rows=2 total=2 elapsed=0.044
+INFO     s19tui:app.py:18169 Load phase boundary: apply_a2l_done path=firmware.mac
+INFO     s19tui:app.py:19022 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18186 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app/.s19tool/workarea/temp/firmware.mac file_type=s19 elapsed_seconds=2.790 has_mac=True precomputed=True
+INFO     s19tui:app.py:15675 A2L copy complete: path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app/.s19tool/workarea/temp/firmware.a2l size_bytes=1391 copy_seconds=0.001
+INFO     s19tui:app.py:932 A2L cache miss: path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app/.s19tool/workarea/temp/firmware.a2l size_bytes=1391
+WARNING  s19tui:app.py:15713 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app_src/firmware.a2l'
+INFO     s19tui:app.py:8332 Workarea refreshed. files=3
+INFO     s19tui:app.py:18614 A2L parse summary: path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.004 sections=1 tags=3 errors=0
+INFO     s19tui:app.py:17688 MAC validation computed: records=2 issues=9 elapsed_seconds=0.001
+INFO     s19tui:app.py:17743 MAC row cache built: records=2 elapsed_seconds=0.001
+INFO     s19tui:app.py:16625 Load phase boundary: populate_issues_table_done rows=9 total=9 elapsed=0.039
+INFO     s19tui:app.py:19380 Load phase boundary: populate_mac_table_done rows=2 total=2 elapsed=0.737
+INFO     s19tui:app.py:19856 Load phase boundary: populate_a2l_table_done rows=3 total=3 elapsed=0.002
+INFO     s19tui:app.py:15732 A2L view refresh complete: path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.744
+INFO     s19tui:app.py:15740 A2L loaded: /tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app/.s19tool/workarea/temp/firmware.a2l
+INFO     s19tui:app.py:12148 Project saved image. name=P file=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app/.s19tool/workarea/P/firmware.s19
+INFO     s19tui:app.py:12148 Project saved mac. name=P file=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app/.s19tool/workarea/P/firmware.mac
+INFO     s19tui:app.py:12148 Project saved a2l. name=P file=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app/.s19tool/workarea/P/firmware.a2l
+INFO     s19tui:app.py:8332 Workarea refreshed. files=3
+INFO     s19tui:app.py:2979 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app workarea=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app/.s19tool/workarea
+INFO     s19tui:app.py:8332 Workarea refreshed. files=3
+INFO     s19tui:app.py:16593 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.032
+INFO     s19tui:app.py:932 A2L cache miss: path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app/.s19tool/workarea/P/firmware.a2l size_bytes=1391
+INFO     s19tui:app.py:14151 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18667 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app/.s19tool/workarea/P/firmware.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14168 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:14151 Load phase boundary: parse_branch_entry path=firmware.mac suffix=.mac
+INFO     s19tui:app.py:16852 Load phase boundary: mac_parse_entry path=firmware.mac
+INFO     s19tui:app.py:16858 Load phase boundary: mac_parse_done path=firmware.mac rows=2 diagnostics=1 elapsed=0.000s
+INFO     s19tui:app.py:16872 MAC parse summary (mirrored): path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app/.s19tool/workarea/P/firmware.mac rows=2 parse_ok=1 diagnostics=1 valid_addresses=1
+INFO     s19tui:app.py:16893 Load phase boundary: mac_a2l_resolve_entry path=firmware.mac a2l_path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app/.s19tool/workarea/P/firmware.a2l
+INFO     s19tui:app.py:16899 Load phase boundary: mac_a2l_resolve_done path=firmware.mac has_a2l_data=True
+INFO     s19tui:app.py:16905 MAC parse summary: path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app/.s19tool/workarea/P/firmware.mac total_records=2 parse_ok=1 diagnostics=1 valid_addresses=1 a2l_path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app/.s19tool/workarea/P/firmware.a2l elapsed_seconds=0.002
+INFO     s19tui:app.py:14193 Load phase boundary: mac_merge_entry path=firmware.mac has_primary=True
+INFO     s19tui:app.py:14200 Load phase boundary: mac_merge_done path=firmware.mac file_type=s19
+INFO     s19tui:app.py:18667 Load summary: file_type=s19+mac path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app/.s19tool/workarea/P/firmware.mac addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14222 Load phase boundary: parse_branch_done path=firmware.mac branch=mac
+INFO     s19tui:app.py:18128 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:18128 Load phase boundary: apply_install_state path=firmware.mac precomputed=False
+INFO     s19tui:app.py:14104 Project loaded. name=P file=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app/.s19tool/workarea/P/firmware.s19 mac=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app/.s19tool/workarea/P/firmware.mac
+INFO     s19tui:app.py:18795 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18144 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18795 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18144 Load phase boundary: apply_sections_done path=firmware.mac
+INFO     s19tui:app.py:18156 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:18156 Load phase boundary: apply_hex_done path=firmware.mac
+INFO     s19tui:app.py:17688 MAC validation computed: records=2 issues=9 elapsed_seconds=0.002
+INFO     s19tui:app.py:17743 MAC row cache built: records=2 elapsed_seconds=0.003
+INFO     s19tui:app.py:16625 Load phase boundary: populate_issues_table_done rows=9 total=9 elapsed=0.051
+INFO     s19tui:app.py:19380 Load phase boundary: populate_mac_table_done rows=2 total=2 elapsed=0.058
+INFO     s19tui:app.py:19856 Load phase boundary: populate_a2l_table_done rows=3 total=3 elapsed=0.006
+INFO     s19tui:app.py:18169 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:16625 Load phase boundary: populate_issues_table_done rows=9 total=9 elapsed=0.071
+INFO     s19tui:app.py:19380 Load phase boundary: populate_mac_table_done rows=2 total=2 elapsed=0.081
+INFO     s19tui:app.py:19856 Load phase boundary: populate_a2l_table_done rows=3 total=3 elapsed=0.004
+INFO     s19tui:app.py:18169 Load phase boundary: apply_a2l_done path=firmware.mac
+INFO     s19tui:app.py:19022 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18186 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app/.s19tool/workarea/P/firmware.s19 file_type=s19 elapsed_seconds=3.687 has_mac=False precomputed=False
+INFO     s19tui:app.py:19022 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18186 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app/.s19tool/workarea/P/firmware.mac file_type=s19 elapsed_seconds=4.006 has_mac=True precomputed=False
+INFO     s19tui:app.py:8414 Save project action triggered for /tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/files/app/.s19tool/workarea/P/firmware.s19
+INFO     s19tui:app.py:2979 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/merge/app workarea=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/merge/app/.s19tool/workarea
+INFO     s19tui:app.py:8332 Workarea refreshed. files=0
+INFO     s19tui:app.py:16593 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.034
+INFO     s19tui:app.py:15491 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/merge/src02_merge/firmware.s19
+INFO     s19tui:app.py:15512 Load phase boundary: copy_started path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/merge/src02_merge/firmware.s19
+INFO     s19tui:app.py:15525 Load phase boundary: copy_done path=firmware.s19 elapsed=0.005s
+WARNING  s19tui:app.py:15544 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/merge/src02_merge/firmware.s19'
+INFO     s19tui:app.py:8332 Workarea refreshed. files=1
+INFO     s19tui:app.py:15562 File copied to temp: path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/merge/app/.s19tool/workarea/temp/firmware.s19 size_bytes=302 copy_seconds=0.005
+INFO     s19tui:app.py:15568 Load phase boundary: worker_spawned path=firmware.s19
+INFO     s19tui:app.py:18451 Load phase boundary: worker_parse_start path=firmware.s19
+INFO     s19tui:app.py:17835 Loading file: path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/merge/app/.s19tool/workarea/temp/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14151 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18667 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/merge/app/.s19tool/workarea/temp/firmware.s19 addresses=82 range_count=3 range_bytes=82 errors=0
+INFO     s19tui:app.py:14168 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18470 Load phase boundary: worker_parse_done path=firmware.s19 elapsed=0.009s
+INFO     s19tui:app.py:18294 Load phase boundary: prepare_entry path=firmware.s19 file_type=s19
+INFO     s19tui:app.py:18329 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:17688 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18338 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:18358 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:18365 Load phase boundary: prepare_bases_done row_bases=6
+INFO     s19tui:app.py:18375 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:18381 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:18503 Load phase boundary: worker_compute_done path=firmware.s19 precomputed=True elapsed=0.001s
+INFO     s19tui:app.py:18510 Load phase boundary: call_from_thread_apply_dispatched path=firmware.s19
+INFO     s19tui:app.py:18128 Load phase boundary: apply_install_state path=firmware.s19 precomputed=True
+INFO     s19tui:app.py:18795 Sections updated. count=3 rendered_ranges=3 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18144 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18156 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19815 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:16593 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.018
+INFO     s19tui:app.py:19329 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.020
+INFO     s19tui:app.py:18169 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:21065 Request refused while busy: Loading firmware.s19
+INFO     s19tui:app.py:19022 Memory Map updated. ranges=3
+INFO     s19tui:app.py:18186 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-174/popen-gw7/test_tc_b100_66_save_dialog_pa0/merge/app/.s19tool/workarea/temp/firmware.s19 file_type=s19 elapsed_seconds=1.596 has_mac=False precomputed=True
+=========================== short test summary info ============================
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_save_executes_the_painted_plan[merge]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_summary_rows_equal_the_plan[merge]
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_merge_names_the_active_variant_it_sets
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_66_save_dialog_paints_no_decision_id
+4 failed, 418 passed, 64 skipped in 1445.14s (0:24:05)
+wall=1446s
+exit=1

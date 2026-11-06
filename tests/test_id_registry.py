@@ -175,7 +175,8 @@ from tools.id_registry import (
 # batch-101 Inc 13 (merged after Inc 14): 255 -> 261, measured (3 test files,
 # 3 support modules: tests/test_b101_designer_recompute.py, test_b101_split_join_band.py,
 # test_b101_inc13_perf.py, tests/support/b101_designer.py, b101_demo_image.py, b101_inc13_reference.py).
-EXPECTED_SCANNED_TEST_FILES = 261
+# batch-101 Inc 4 (merged after Inc 13): 261 -> 262, measured (tests/test_b101_symbol_reads.py).
+EXPECTED_SCANNED_TEST_FILES = 262
 """Test modules scanned, including this one.
 
 batch-101 Inc 11: 250 -> 253. ``tests/test_b101_a2l_blocks_and_segments.py``,

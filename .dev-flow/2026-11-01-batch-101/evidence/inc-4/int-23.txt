@@ -1,0 +1,183 @@
+load before: 9.15 10.05 10.72
+$ git -C <HOME>/work/s19_i4b log --oneline -1   (clean base, no Inc 4 diff)
+7add3d63 batch-101 PLAN: Inc 5 takes Inc 13's D-4 (stale CRC Designer coverage after an in-place apply) first, integrity priority
+$ python -c 'import s19_app; print(s19_app.__file__)'
+<HOME>/work/s19_i4b/s19_app/__init__.py
+$ cd <HOME>/work/s19_i4b && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 2400 python -m pytest -q -p no:cacheprovider --rootdir=<HOME>/work/s19_i4b -rfE tests/test_b100_active_variant.py::test_tc_b100_19_save_back_becomes_the_active_variant tests/test_b100_active_variant.py::test_tc_b100_19_save_back_with_no_project_writes_no_manifest tests/test_b100_save_dialog.py::test_tc_b100_65_save_executes_the_painted_plan tests/test_b100_save_dialog.py::test_tc_b100_65_summary_rows_equal_the_plan tests/test_b100_save_dialog.py::test_tc_b100_65_merge_names_the_active_variant_it_sets tests/test_b100_save_dialog.py::test_tc_b100_66_save_dialog_paints_no_decision_id tests/test_changes_file_notation_help.py::test_tc1802_nine_md_sections_intact_tenth_section_added
+...............F...F                                                     [100%]
+=================================== FAILURES ===================================
+______________ test_tc_b100_65_summary_rows_equal_the_plan[merge] ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-195/test_tc_b100_65_summary_rows_e5')
+key = 'merge'
+
+    @pytest.mark.parametrize("key", SCENARIOS)
+    def test_tc_b100_65_summary_rows_equal_the_plan(tmp_path: Path, key: str) -> None:
+        """LLR-175.4, HLR-175, B11-48, B11-55 (7 of 7, at 220 columns): the
+        painted summary rows are exactly the scenario's rows (the image line,
+        the pending line, one row per plan file row with its landing name — and
+        its source name when the two differ — and its action word, one row per
+        planned sub-folder with its file count, the merge's active-variant row,
+        the ``project.json`` row), they equal the painted plan's ``rows`` and
+        ``folders`` one for one by landing name and action word (0
+        differences), the action words are only ``new``, ``keep``, ``merge`` and
+        ``rewrite``, no row holds a line break, and every row and the target
+        line have 0 markup spans. The refused scenario paints 0 rows.
+    
+        Why: R-PC — the operator's P-C note: an error here could invalidate,
+        lose, overwrite or rename the engineer's work, so the dialog paints the
+        one plan the save executes. Negative control: a painter that drops
+        ``keep`` rows → the pending scenario loses ``MAC firmware.mac — keep``
+        → RED; on base there is no summary (P11-2) → RED."""
+>       out = _scenario_paint(tmp_path, key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b100_save_dialog.py:2721: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b100_save_dialog.py:2652: in _scenario_paint
+    ctx = _scenario_prep(key, tmp_path, base)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b100_save_dialog.py:2614: in _scenario_prep
+    _save_project_from(base, "ab", [other / "firmware.s19"])
+tests/test_b100_save_dialog.py:190: in _save_project_from
+    project = asyncio.run(_drive())
+              ^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def _drive() -> Path:
+        app = S19TuiApp(base_dir=base)
+        async with app.run_test(size=(160, 50)) as pilot:
+            await pilot.pause()
+            for path in sources:
+                path = Path(path)
+                if path.suffix.lower() == ".a2l":
+                    app.load_a2l_from_path(path)
+                    done = lambda: app.current_a2l_path is not None  # noqa: E731
+                else:
+                    app._load_path_from_user_input(path)
+                    done = lambda p=path: app.current_file is not None and (  # noqa: E731
+                        app.current_file.path.name == p.name
+                        or (app.current_file.mac_path is not None and app.current_file.mac_path.name == p.name)
+                    )
+                for _ in range(400):
+                    if done():
+                        break
+                    await pilot.pause()
+                else:
+                    raise AssertionError(f"the load of {path.name} did not land")
+            app._handle_save_dialog(SaveProjectPayload(parent_folder=str(app.workarea), project_name=name))
+            for _ in range(400):
+                if app.current_project is not None and app.current_project.casefold() == name.casefold():
+                    break
+                await pilot.pause()
+            else:
+>               raise AssertionError(f"Save project {name} did not land")
+E               AssertionError: Save project ab did not land
+
+tests/test_b100_save_dialog.py:187: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-195/test_tc_b100_65_summary_rows_e5/app workarea=/tmp/pytest-of-<USER>/pytest-195/test_tc_b100_65_summary_rows_e5/app/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.015
+INFO     s19tui:app.py:15464 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<USER>/pytest-195/test_tc_b100_65_summary_rows_e5/src02_test_tc_b100_65_summary_rows_e5/firmware.s19
+INFO     s19tui:app.py:15485 Load phase boundary: copy_started path=/tmp/pytest-of-<USER>/pytest-195/test_tc_b100_65_summary_rows_e5/src02_test_tc_b100_65_summary_rows_e5/firmware.s19
+INFO     s19tui:app.py:15498 Load phase boundary: copy_done path=firmware.s19 elapsed=0.001s
+WARNING  s19tui:app.py:15517 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-195/test_tc_b100_65_summary_rows_e5/src02_test_tc_b100_65_summary_rows_e5/firmware.s19'
+INFO     s19tui:app.py:8305 Workarea refreshed. files=1
+INFO     s19tui:app.py:15535 File copied to temp: path=/tmp/pytest-of-<USER>/pytest-195/test_tc_b100_65_summary_rows_e5/app/.s19tool/workarea/temp/firmware.s19 size_bytes=302 copy_seconds=0.001
+INFO     s19tui:app.py:15541 Load phase boundary: worker_spawned path=firmware.s19
+INFO     s19tui:app.py:18424 Load phase boundary: worker_parse_start path=firmware.s19
+INFO     s19tui:app.py:17808 Loading file: path=/tmp/pytest-of-<USER>/pytest-195/test_tc_b100_65_summary_rows_e5/app/.s19tool/workarea/temp/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14124 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18640 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-195/test_tc_b100_65_summary_rows_e5/app/.s19tool/workarea/temp/firmware.s19 addresses=82 range_count=3 range_bytes=82 errors=0
+INFO     s19tui:app.py:14141 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18443 Load phase boundary: worker_parse_done path=firmware.s19 elapsed=0.003s
+INFO     s19tui:app.py:18267 Load phase boundary: prepare_entry path=firmware.s19 file_type=s19
+INFO     s19tui:app.py:18302 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:17661 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18311 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:18331 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:18338 Load phase boundary: prepare_bases_done row_bases=6
+INFO     s19tui:app.py:18348 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:18354 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:18476 Load phase boundary: worker_compute_done path=firmware.s19 precomputed=True elapsed=0.002s
+INFO     s19tui:app.py:18483 Load phase boundary: call_from_thread_apply_dispatched path=firmware.s19
+INFO     s19tui:app.py:18101 Load phase boundary: apply_install_state path=firmware.s19 precomputed=True
+INFO     s19tui:app.py:18768 Sections updated. count=3 rendered_ranges=3 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18117 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18129 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19788 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.002
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.020
+INFO     s19tui:app.py:19302 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.024
+INFO     s19tui:app.py:18142 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:21038 Request refused while busy: Loading firmware.s19
+INFO     s19tui:app.py:18995 Memory Map updated. ranges=3
+INFO     s19tui:app.py:18159 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-195/test_tc_b100_65_summary_rows_e5/app/.s19tool/workarea/temp/firmware.s19 file_type=s19 elapsed_seconds=1.472 has_mac=False precomputed=True
+___________ test_tc1802_nine_md_sections_intact_tenth_section_added ____________
+
+    def test_tc1802_nine_md_sections_intact_tenth_section_added() -> None:
+        """TC-1802 (the no-disturbance census): the data home holds EXACTLY
+        the nine batch-95 md-authored sections plus this one tenth key — and
+        every one of the nine is still a verbatim port of
+        ``help_sections.md`` (title + every step string), so the batch-96
+        addition disturbed nothing the batch-95 contract froze."""
+        # Named supersession (batch-97 Inc-3): the code-authored ``check_editor``
+        # section (LLR-148.6) joins the data home; it is not an md port either.
+        assert frozenset(WINDOW_HELP_SECTIONS) == _MD_AUTHORED_KEYS | {
+            SECTION_KEY,
+            "check_editor",
+            "patch",
+            "crc_designer",
+            "reports",
+            "flow",
+            # batch-97 Inc-6 (named supersession, D25 / LLR-148.6): the
+            # code-authored ``flow_execution`` section joins the data home.
+            "flow_execution",
+            # batch-97 Inc-8: the code-authored ``map`` section.
+            "map",
+        }, (
+            "the data home must hold exactly the nine md-authored sections "
+            "plus the batch-96 changes_file_notation and batch-97 check_editor "
+            "sections"
+        )
+>       md_text = _HELP_SECTIONS_MD.read_text(encoding="utf-8")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_changes_file_notation_help.py:174: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/data/miniconda3/envs/s19ci/lib/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('<HOME>/work/s19_i4b/prototypes/cambios_10_12_2026/help_sections.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '<HOME>/work/s19_i4b/prototypes/cambios_10_12_2026/help_sections.md'
+
+/data/miniconda3/envs/s19ci/lib/python3.11/pathlib.py:1044: FileNotFoundError
+=========================== short test summary info ============================
+FAILED tests/test_b100_save_dialog.py::test_tc_b100_65_summary_rows_equal_the_plan[merge]
+FAILED tests/test_changes_file_notation_help.py::test_tc1802_nine_md_sections_intact_tenth_section_added
+2 failed, 18 passed in 552.90s (0:09:12)
+wall=555s
+exit=1

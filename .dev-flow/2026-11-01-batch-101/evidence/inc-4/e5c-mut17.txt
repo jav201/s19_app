@@ -1,0 +1,80 @@
+tree fingerprint start: 7f5b5b48049d1725
+load: 1.43 2.67 2.01
+2026-11-06T02:38:50Z
+mutant diff:
+5529c5529
+<         if edited is None:
+---
+>         if edited is None or True:
+<HOME>/work/s19_c4/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ test_r_chg_sym_9_per_entry_edit_json_confirm_of_a_symbol_entry_succeeds ____
+
+tmp_path = PosixPath('/tmp/pytest-s19c4/test_r_chg_sym_9_per_entry_edi0')
+case08 = PosixPath('/tmp/pytest-s19c4/b101_case080')
+
+    def test_r_chg_sym_9_per_entry_edit_json_confirm_of_a_symbol_entry_succeeds(
+        tmp_path: Path, case08: Path
+    ) -> None:
+        """Case R-CHG-SYM.9/4: confirming the per-entry Edit JSON popup of a
+        symbol entry unchanged, with the A2L loaded, paints no rejection line and
+        no finding line; the entry equals its value before the edit and the draft
+        keeps 7 entries. The success status text is not asserted (it is out of
+        scope for this increment).
+    
+        Second confirm (E5 C-4, the "document is replaced" clause of R-CHG-SYM.9):
+        the same entry confirmed with every byte changed and the length kept (so
+        it still matches the tag) - entry 2 then holds the new bytes and keeps its
+        symbol and address; 7 entries; no rejection, no finding line. A confirm
+        that returns without replacing the document leaves the old bytes -> RED.
+    
+        Negative control: the confirm passing no A2L rejects the symbol entry
+        with the no-context finding (the base) -> RED. Drive (E5 C-6, BB-4): a
+        pasted draft, the row chosen with the arrow keys, Edit JSON and Confirm
+        clicked, the replacement text pasted into the popup."""
+        rows = symbol_rows(case08, PATCH)
+        row, entry = rows[0]
+        new_data = bytes(byte ^ 0x5A for byte in entry_data(entry))
+        changed = json.dumps(dict(entry, bytes=" ".join(f"{b:02X}" for b in new_data)))
+    
+        async def scenario(app, pilot, log):
+            await attach_image(pilot, app, case08)
+            await attach_a2l(pilot, app, case08)
+            await show_screen(pilot, app, "6", "#patch_entry_edit_json_button")
+            await install_draft(pilot, app, doc_text(case08, PATCH), app.current_a2l_data)
+            before = entry_state(service(app).document.entries[row])
+            lines = await entry_json_confirm(pilot, app, log, row)
+            entries = service(app).document.entries
+            first = (lines, before, entry_state(entries[row]), len(entries))
+            lines = await entry_json_confirm(pilot, app, log, row, changed)
+            entries = service(app).document.entries
+            return first, (lines, entry_state(entries[row]), len(entries))
+    
+        (lines, before, after, count), (changed_lines, replaced, changed_count) = run(
+            tmp_path, scenario
+        )
+        assert REJECTED not in lines, lines
+        assert unresolved_lines(lines) == [], lines
+        assert after == before, (before, after)
+        assert after[3] == entry["symbol"] and after[1] == entry_address(entry), after
+        assert count == 7, count
+        assert REJECTED not in changed_lines, changed_lines
+        assert unresolved_lines(changed_lines) == [], changed_lines
+>       assert replaced == (before[0], before[1], tuple(new_data), entry["symbol"]), (
+            before, replaced,
+        )
+E       AssertionError: (('bytes', 8411488, (164,), 'VALUE_0185'), ('bytes', 8411488, (164,), 'VALUE_0185'))
+E       assert ('bytes', 841... 'VALUE_0185') == ('bytes', 841... 'VALUE_0185')
+E         
+E         At index 2 diff: (164,) != (254,)
+E         Use -v to get more diff
+
+tests/test_b101_symbol_reads.py:617: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_symbol_reads.py::test_r_chg_sym_9_per_entry_edit_json_confirm_of_a_symbol_entry_succeeds
+1 failed in 31.63s
+exit=1
+RESTORE_OK
+2026-11-06T02:39:22Z
+tree fingerprint end: 7f5b5b48049d1725

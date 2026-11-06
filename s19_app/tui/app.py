@@ -58,6 +58,7 @@ from .changes.io import (
     DUMMY_CHANGESET_TEXT,
     MF_BAD_STRUCTURE,
     MF_JSON_PARSE,
+    SYMBOL_NO_A2L_CONTEXT_TEXT,
     list_change_documents,
     parse_change_document,
     read_change_document,
@@ -4820,7 +4821,7 @@ class S19TuiApp(App):
                     self._patch_editor_load(panel, event.path_text)
             elif event.action == "parse_paste":
                 panel.hide_before_after_prompt()  # LLR-061.1 clear-on-context
-                result = service.load_text(event.paste_text)
+                result = service.load_text(event.paste_text, a2l_context=self.current_a2l_data)
                 self._report_change_result(result)
                 # batch-97 Inc-4 gate (ux H1, LLR-144.6 amended): a parsed
                 # paste is a draft no file holds — unsaved work, so the stamp
@@ -5414,7 +5415,7 @@ class S19TuiApp(App):
             return
         # batch-94 (LLR-004.2): the validity pre-check decides whether the
         # confirm may touch the bound document at all.
-        parsed = parse_change_document(edited)
+        parsed = parse_change_document(edited, a2l_context=self.current_a2l_data)
         if parsed.has_errors:
             from .services.change_service import ChangeActionResult
 
@@ -5507,7 +5508,11 @@ class S19TuiApp(App):
             selected entry (malformed input is collected, not applied) — then
             surface the result and re-render the entries table / issue lines /
             enable guards through the shared :meth:`_refresh_patch_history_view`
-            tail. Cancel (``None``) is a no-op: the document is left unchanged.
+            tail. Batch-101 Inc 4 (R-CHG-SYM.9/.10, R-TUI-058.9): the edit is
+            validated against the session's loaded A2L, and when the read
+            records the R-CHG-SYM.2 finding with no A2L loaded one
+            plain-language status line follows the finding line (painted last).
+            Cancel (``None``) is a no-op: the document is left unchanged.
 
         Args:
             index (int): The entry index the popup was opened for.
@@ -5519,8 +5524,11 @@ class S19TuiApp(App):
 
         Data Flow:
             - ``None`` → return (Cancel; document unchanged).
-            - else → ``edit_entry_json(index, edited)`` →
-              ``_report_change_result`` → ``_refresh_patch_history_view``.
+            - else → ``edit_entry_json(index, edited,
+              a2l_context=self.current_a2l_data)`` →
+              ``_report_change_result`` → (R-TUI-058.9 plain-language line
+              when the read records the R-CHG-SYM.2 finding with no A2L
+              loaded) → ``_refresh_patch_history_view``.
 
         Dependencies:
             Uses:
@@ -5533,8 +5541,23 @@ class S19TuiApp(App):
             return
         if edited is None:
             return
-        result = self._change_service.edit_entry_json(index, edited)
+        result = self._change_service.edit_entry_json(
+            index, edited, a2l_context=self.current_a2l_data
+        )
         self._report_change_result(result)
+        if (
+            not result.ok
+            and self.current_a2l_data is None
+            and any(
+                issue.code == "CHG-SYMBOL-UNRESOLVED"
+                and SYMBOL_NO_A2L_CONTEXT_TEXT in issue.message
+                for issue in result.issues
+            )
+        ):
+            self.set_status(
+                "Patch Editor: the entry names an A2L symbol and no A2L is "
+                "loaded - load the A2L, then edit the entry again."
+            )
         self._refresh_patch_history_view()
 
     def _strip_source_map(
@@ -7116,7 +7139,7 @@ class S19TuiApp(App):
             :meth:`_patch_editor_load_tail` so no site can drift.
         """
         service = self._change_service
-        result = service.load(path_text, self.base_dir)
+        result = service.load(path_text, self.base_dir, a2l_context=self.current_a2l_data)
         self._report_change_result(result)
         if result.ok:
             panel.mark_loaded()
@@ -7447,7 +7470,9 @@ class S19TuiApp(App):
                 "patches folder — not loaded."
             )
             return
-        document = read_change_document(str(candidate), self.base_dir)
+        document = read_change_document(
+            str(candidate), self.base_dir, a2l_context=self.current_a2l_data
+        )
         if document.has_errors:
             for issue in document.issues:
                 self.set_status(
@@ -7773,7 +7798,9 @@ class S19TuiApp(App):
                 "sev-warning",
             )
             return
-        document = read_change_document(str(candidate), self.base_dir)
+        document = read_change_document(
+            str(candidate), self.base_dir, a2l_context=self.current_a2l_data
+        )
         if document.has_errors:
             self._diff_check_spec = None
             self._diff_check_spec_name = ""

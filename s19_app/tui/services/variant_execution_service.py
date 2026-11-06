@@ -2499,8 +2499,9 @@ def _execute_one_variant(
         mac_records (Optional[Sequence[dict]]): Parsed project MAC records
             (shared linkage source), or ``None``.
         a2l_data (Optional[dict]): Parsed project A2L payload (shared
-            linkage source), or ``None`` — enriched against THIS variant's
-            memory map before use.
+            linkage source and the declared A2L for each per-file
+            change/check document read), or ``None`` — enriched against
+            THIS variant's memory map before use.
         capture_mem_map (bool): When ``True``, the variant's memory map is
             referenced on ``result.mem_map`` — the apply engine mutates it
             in place, so the reference IS the post-change map the E7
@@ -2515,7 +2516,7 @@ def _execute_one_variant(
     Data Flow:
         - Parse the image via ``build_loaded_s19`` / ``build_loaded_hex``
           (``variant.file_type`` discriminates) — never the TUI snapshot.
-        - Per file: ``read_change_document(file, project_dir)``;
+        - Per file: ``read_change_document(file, project_dir, a2l_context=a2l_data)``;
           ``kind == "check"`` → check engine; anything else → apply engine
           (its gate blocks non-change documents).
         - A change apply with ``counts["applied"] > 0`` on an S19 variant
@@ -2554,7 +2555,9 @@ def _execute_one_variant(
             else None
         )
         for file_path in files:
-            document = read_change_document(str(file_path), project_dir)
+            document = read_change_document(
+                str(file_path), project_dir, a2l_context=a2l_data
+            )
             if document.kind == "check":
                 result.check_results.append(
                     run_check_document(

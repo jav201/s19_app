@@ -1,0 +1,14 @@
+E1 start 2026-11-05T20:23Z model=opus base=b7b77c4
+E1 end 2026-11-05T20:39Z model=opus rows=6 (amended R-CHG-SYM.9, .10; new R-CHG-SYM.11, .12, .13, R-TUI-058.9) TC=19; probe: parse 1000 symbol entries x 20000 tags = 3.12 s on base (Windows, not a test run)
+E2 start 2026-11-05T20:39Z model=opus
+E2 end 2026-11-05T20:39Z model=opus codewire_lint nodes=20 entities=3 edges=0 findings=0 not read=0; trace_check --base main (b7b77c4): 3 US, 6 active requirements, 7 gap(s) (6 TEST until E4, 1 EVID until E5); decisions D-1..D-4 open for the orchestrator
+E3 start 2026-11-05T20:40Z architect+security model=opus
+E3 end 2026-11-05T20:53Z correction model=opus rulings=A-1..A-9,S4-1..S4-9 folded; TC=22 (+R-CHG-SYM.11/3, .12/2, .13/2); R-CHG-SYM.13 resized 1000x220040 within 1.0 s (Linux, call counter primary); trace_check 3 US, 6 active, 7 gaps
+E4 start 2026-11-05T20:54Z implementers model=deepseek-v4-pro (3 units) tester=sonnet
+E4 implementers end 2026-11-05T21:00Z model=deepseek-v4-pro (3 units, exit 0, no hang, py_compile OK, no deviations declared)
+E4 integration start 2026-11-05T21:33Z model=opus
+E4 integration end 2026-11-06T01:24Z model=opus verdict=GREEN (LAN Linux host); lane1 int-01..20 3036 passed / 11 failed (load L-1 x6, env E-1 x1, registry name F-1 x3, canon seam F-3 x1; all resolved or re-run); serial int-26 53 passed; final int-27 2 passed, int-28 179 passed; R-CHG-SYM.13/1 0.174-0.186 s, 13/3 addition 0.395-0.622 s (bound 1.0 s, OR-2); 22/22 cases verified
+E5 start 2026-11-06T01:25Z mutants=deepseek-v4-pro reviews=opus
+E5 corrective start 2026-11-06T02:22Z model=opus
+E5 corrective end 2026-11-06T04:29Z model=opus rulings C-1..C-8 done; 0 source files; new file 22+2 passed (e5c-01, e5c-05); importers 2737 passed / 1 failed (tc1802 env, routed) / 97 skipped / 1 xfailed; guards 379 passed; serial lane 53 passed; mutants M-16, M-17 killed (17/17); R-CHG-SYM.13/1 0.173-0.181 s, 13/3 addition max 0.422 s (bound 1.0 s, 5/5); 23 cases covered
+E5 end 2026-11-06T04:41Z model=deepseek-v4-pro (records)

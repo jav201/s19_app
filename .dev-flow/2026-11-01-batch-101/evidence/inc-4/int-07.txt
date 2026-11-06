@@ -1,0 +1,70 @@
+$ git -C <HOME>/work/s19_i4 log --oneline -1   (the Inc 4 diff over b7b77c4 applied on top)
+7add3d63 batch-101 PLAN: Inc 5 takes Inc 13's D-4 (stale CRC Designer coverage after an in-place apply) first, integrity priority
+$ python -c 'import s19_app; print(s19_app.__file__)'
+<HOME>/work/s19_i4/s19_app/__init__.py
+$ cd <HOME>/work/s19_i4 && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 2400 python -m pytest -q -p no:cacheprovider --rootdir=<HOME>/work/s19_i4 -rfE -n 8 -m not serial_timing tests/test_changes_file_notation_help.py tests/test_changes_linkage.py tests/test_changes_schema.py tests/test_changes_symbol_entries.py tests/test_checks_engine.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 67%]
+...............F...................                                      [100%]
+=================================== FAILURES ===================================
+___________ test_tc1802_nine_md_sections_intact_tenth_section_added ____________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+    def test_tc1802_nine_md_sections_intact_tenth_section_added() -> None:
+        """TC-1802 (the no-disturbance census): the data home holds EXACTLY
+        the nine batch-95 md-authored sections plus this one tenth key — and
+        every one of the nine is still a verbatim port of
+        ``help_sections.md`` (title + every step string), so the batch-96
+        addition disturbed nothing the batch-95 contract froze."""
+        # Named supersession (batch-97 Inc-3): the code-authored ``check_editor``
+        # section (LLR-148.6) joins the data home; it is not an md port either.
+        assert frozenset(WINDOW_HELP_SECTIONS) == _MD_AUTHORED_KEYS | {
+            SECTION_KEY,
+            "check_editor",
+            "patch",
+            "crc_designer",
+            "reports",
+            "flow",
+            # batch-97 Inc-6 (named supersession, D25 / LLR-148.6): the
+            # code-authored ``flow_execution`` section joins the data home.
+            "flow_execution",
+            # batch-97 Inc-8: the code-authored ``map`` section.
+            "map",
+        }, (
+            "the data home must hold exactly the nine md-authored sections "
+            "plus the batch-96 changes_file_notation and batch-97 check_editor "
+            "sections"
+        )
+>       md_text = _HELP_SECTIONS_MD.read_text(encoding="utf-8")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_changes_file_notation_help.py:174: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/data/miniconda3/envs/s19ci/lib/python3.11/pathlib.py:1058: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('<HOME>/work/s19_i4/prototypes/cambios_10_12_2026/help_sections.md')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '<HOME>/work/s19_i4/prototypes/cambios_10_12_2026/help_sections.md'
+
+/data/miniconda3/envs/s19ci/lib/python3.11/pathlib.py:1044: FileNotFoundError
+=========================== short test summary info ============================
+FAILED tests/test_changes_file_notation_help.py::test_tc1802_nine_md_sections_intact_tenth_section_added
+1 failed, 106 passed in 3.40s
+wall=4s
+exit=1

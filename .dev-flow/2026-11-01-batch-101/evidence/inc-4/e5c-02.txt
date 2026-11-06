@@ -1,0 +1,31 @@
+tree fingerprint start: 7f5b5b48049d1725
+load: 3.60 2.92 2.21
+2026-11-06T02:42:22Z
+<HOME>/work/s19_c4/s19_app/__init__.py
+.MEASURED sample 1/5 whole-document confirm, 1000 entries x 220040 tags: without symbols 1.087 s, with symbols 1.495 s, resolution adds 0.408 s
+MEASURED sample 2/5 whole-document confirm, 1000 entries x 220040 tags: without symbols 1.096 s, with symbols 1.444 s, resolution adds 0.349 s
+MEASURED sample 3/5 whole-document confirm, 1000 entries x 220040 tags: without symbols 1.229 s, with symbols 1.277 s, resolution adds 0.049 s
+MEASURED sample 4/5 whole-document confirm, 1000 entries x 220040 tags: without symbols 1.294 s, with symbols 1.479 s, resolution adds 0.186 s
+MEASURED sample 5/5 whole-document confirm, 1000 entries x 220040 tags: without symbols 1.073 s, with symbols 1.503 s, resolution adds 0.430 s
+MEASURED resolution addition max 0.430 s over 5 samples
+.
+==================================== PASSES ====================================
+============================= QC-TM timing margins =============================
+57.0%  0.430 s / 1.000 s  edit json confirm resolution 1000x220040  tests/test_b101_symbol_reads.py::test_r_chg_sym_13_whole_document_edit_json_confirm_of_1000_entries_by_220040_tags
+59.2%  0.408 s / 1.000 s  edit json confirm resolution 1000x220040  tests/test_b101_symbol_reads.py::test_r_chg_sym_13_whole_document_edit_json_confirm_of_1000_entries_by_220040_tags
+65.1%  0.349 s / 1.000 s  edit json confirm resolution 1000x220040  tests/test_b101_symbol_reads.py::test_r_chg_sym_13_whole_document_edit_json_confirm_of_1000_entries_by_220040_tags
+81.2%  0.188 s / 1.000 s  symbol read 1000x220040  tests/test_b101_symbol_reads.py::test_r_chg_sym_13_symbol_read_of_1000_entries_by_220040_tags_builds_the_index_once
+81.4%  0.186 s / 1.000 s  edit json confirm resolution 1000x220040  tests/test_b101_symbol_reads.py::test_r_chg_sym_13_whole_document_edit_json_confirm_of_1000_entries_by_220040_tags
+81.5%  0.185 s / 1.000 s  symbol read 1000x220040  tests/test_b101_symbol_reads.py::test_r_chg_sym_13_symbol_read_of_1000_entries_by_220040_tags_builds_the_index_once
+81.5%  0.185 s / 1.000 s  symbol read 1000x220040  tests/test_b101_symbol_reads.py::test_r_chg_sym_13_symbol_read_of_1000_entries_by_220040_tags_builds_the_index_once
+82.0%  0.180 s / 1.000 s  symbol read 1000x220040  tests/test_b101_symbol_reads.py::test_r_chg_sym_13_symbol_read_of_1000_entries_by_220040_tags_builds_the_index_once
+82.0%  0.180 s / 1.000 s  symbol read 1000x220040  tests/test_b101_symbol_reads.py::test_r_chg_sym_13_symbol_read_of_1000_entries_by_220040_tags_builds_the_index_once
+95.1%  0.049 s / 1.000 s  edit json confirm resolution 1000x220040  tests/test_b101_symbol_reads.py::test_r_chg_sym_13_whole_document_edit_json_confirm_of_1000_entries_by_220040_tags
+QC-TM: 10 bounds, 0 under 20 % margin
+=========================== short test summary info ============================
+PASSED tests/test_b101_symbol_reads.py::test_r_chg_sym_13_symbol_read_of_1000_entries_by_220040_tags_builds_the_index_once
+PASSED tests/test_b101_symbol_reads.py::test_r_chg_sym_13_whole_document_edit_json_confirm_of_1000_entries_by_220040_tags
+2 passed, 22 deselected in 22.30s
+exit=0
+2026-11-06T02:42:45Z
+tree fingerprint end: 7f5b5b48049d1725

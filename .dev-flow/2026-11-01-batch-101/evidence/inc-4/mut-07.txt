@@ -1,0 +1,155 @@
+--- sha256 before (M-7) ---
+f111f33cefa43f7d361944c0a38667f8dcb07c1c089b6af16dc1667ec884b50a  s19_app/tui/changes/io.py
+60b4d129746a0ba7251a0d40805d550285ca8d93edafb00f53fc8da67216c19e  s19_app/tui/services/change_service.py
+1335a5ee3b7d4e400fa6fe8a29d2d7993279ffb2a3044d07fa7ba60cd3f14aef  s19_app/tui/services/variant_execution_service.py
+3d256f64d99814b70dd94297c7961a6a220edfdcd0426a6dd58f57eacc603eb9  s19_app/tui/app.py
+applied M-7 -> s19_app/tui/app.py
+s19_app.__file__ = <HOME>/work/s19_m4/s19_app/__init__.py
+=== pytest (M-7) flags=[-n 2] nodes=[tests/test_b101_symbol_reads.py::test_r_chg_sym_10_reads_with_no_a2l_loaded_declare_none[ab-diff-project-a2l-not-implicit]] ===
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_r_chg_sym_10_reads_with_no_a2l_loaded_declare_none[ab-diff-project-a2l-not-implicit] _
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m4/popen-gw0/test_r_chg_sym_10_reads_with_n0')
+case08 = PosixPath('/tmp/pytest-s19m4/popen-gw0/b101_case080')
+surface = 'ab-diff-project-a2l-not-implicit'
+
+    @pytest.mark.parametrize(
+        "surface",
+        [
+            "file-load",
+            "paste",
+            "edit-json",
+            "entry-json",
+            "check-editor",
+            "ab-diff-project-a2l-not-implicit",
+        ],
+    )
+    def test_r_chg_sym_10_reads_with_no_a2l_loaded_declare_none(
+        tmp_path: Path, case08: Path, surface: str
+    ) -> None:
+        """Cases R-CHG-SYM.10/1 .. /6: each of the six session reads, with no A2L
+        loaded, reads the document with no declared A2L: every symbol entry
+        paints the no-context finding (2 for ``demo_patch``, 1 for ``demo_check``)
+        and nothing resolves. The A2B Diff arm runs inside an open project whose
+        folder holds ``firmware.a2l`` with the session A2L unloaded: the project's
+        file is not used implicitly.
+    
+        Why: the no-implicit-A2L law (R-CHG-SYM.2). This is the negative control
+        of the previous group; it holds on the base revision. Negative control of
+        this group: a read that declares the last or the project's A2L when none is
+        loaded paints 0 findings -> RED."""
+        from textual.widgets import Button, Select, TextArea
+    
+        patch_rows = symbol_rows(case08, PATCH)
+        (check_index, check_entry), = symbol_rows(case08, CHECK)
+    
+        def two_findings(lines: list) -> None:
+            assert sorted(unresolved_lines(lines)) == sorted(
+                finding_no_ctx(i, e["symbol"]) for i, e in patch_rows
+            ), lines
+    
+        async def scenario(app, pilot, log):
+            stage(app, case08, PATCH, CHECK)
+            await attach_image(pilot, app, case08)
+            if surface == "file-load":
+                await show_screen(pilot, app, "6", "#patch_doc_file_select")
+                mark = len(log.messages)
+                app.query_one("#patch_doc_file_select", Select).value = PATCH
+                lines = await lines_after(
+                    pilot, log, mark,
+                    lambda ls: any(line.startswith("Loaded change:") for line in ls),
+                    "the file load",
+                )
+                assert "Loaded change: 5 entries, 2 error(s)" in lines, lines
+                two_findings(lines)
+            elif surface == "paste":
+                await show_screen(pilot, app, "6", "#patch_paste_text")
+                app.query_one("#patch_paste_text", TextArea).text = doc_text(case08, PATCH)
+                mark = len(log.messages)
+                app.query_one("#patch_paste_parse_button", Button).press()
+                lines = await lines_after(
+                    pilot, log, mark,
+                    lambda ls: any(line.startswith("Loaded change:") for line in ls),
+                    "the paste parse",
+                )
+                assert "Loaded change: 5 entries, 2 error(s)" in lines, lines
+                two_findings(lines)
+            elif surface in ("edit-json", "entry-json"):
+                await attach_a2l(pilot, app, case08)
+                await show_screen(pilot, app, "6", "#patch_edit_json_button")
+                await install_draft(pilot, app, doc_text(case08, PATCH), app.current_a2l_data)
+                await unload_a2l(pilot, app)
+                before_entries = [entry_state(e) for e in service(app).document.entries]
+                if surface == "edit-json":
+                    lines = await whole_document_confirm(pilot, app, log)
+                    assert lines.count(EDIT_REFUSED_2) == 1, lines
+                    two_findings(lines)
+                else:
+                    row, entry = patch_rows[0]
+                    lines = await entry_json_confirm(pilot, app, log, row)
+                    assert lines[:2] == [REJECTED, finding_no_ctx(0, entry["symbol"])], lines
+                    assert lines[2:] in ([], [PLAIN]), lines
+                assert [entry_state(e) for e in service(app).document.entries] == before_entries
+                assert len(before_entries) == 7
+            elif surface == "check-editor":
+                await show_screen(pilot, app, "equals_sign", "#check_spec_file_select")
+                mark = len(log.messages)
+                app.query_one("#check_spec_file_select", Select).value = CHECK
+                lines = await lines_after(
+                    pilot, log, mark,
+                    lambda ls: "Check Editor: spec NOT loaded." in ls,
+                    "the Check Editor spec pick",
+                )
+                assert lines == [
+                    finding_no_ctx(check_index, check_entry["symbol"]),
+                    "Check Editor: spec NOT loaded.",
+                ], lines
+            else:
+                raise AssertionError(surface)
+            return True
+    
+        async def diff_scenario(app, pilot, log):
+            # Inside an open project that holds the A2L file; the session A2L is
+            # then unloaded. The pick must not fall back to the project's file.
+            stage(app, case08, CHECK)
+            make_project(app.workarea, "P", case08, [], with_a2l=True)
+            await ld.open_project_through_dialog(pilot, app, "P")
+            await wait_until(
+                pilot,
+                lambda: app.current_project == "P" and app.current_a2l_data is not None,
+                "timed out waiting for the project install",
+            )
+            await settle_workers(pilot)
+            await dismiss_result_panel_if_open(pilot, app)
+            await unload_a2l(pilot, app)
+            await show_screen(pilot, app, "7", "#diff_check_select")
+            app.query_one("#diff_check_select", Select).value = CHECK
+            await wait_until(
+                pilot,
+                lambda: str(app.query_one("#diff_status").render()).startswith("Check spec"),
+                lambda: f"got {str(app.query_one('#diff_status').render())!r}",
+            )
+            await settle(pilot)
+            return str(app.query_one("#diff_status").render())
+    
+        if surface == "ab-diff-project-a2l-not-implicit":
+            status = run(tmp_path, diff_scenario)
+>           assert status.startswith(
+                f"Check spec not loaded {EM} [{UNRESOLVED}] error: entry {check_index}:"
+            ), status
+E           AssertionError: Check spec 'demo_check.chk.json' loaded — 3 declared field(s) will ride the report.
+E           assert False
+E            +  where False = <built-in method startswith of str object at 0x7f6fa2f13870>('Check spec not loaded — [CHG-SYMBOL-UNRESOLVED] error: entry 2:')
+E            +    where <built-in method startswith of str object at 0x7f6fa2f13870> = "Check spec 'demo_check.chk.json' loaded — 3 declared field(s) will ride the report.".startswith
+
+tests/test_b101_symbol_reads.py:693: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_symbol_reads.py::test_r_chg_sym_10_reads_with_no_a2l_loaded_declare_none[ab-diff-project-a2l-not-implicit]
+1 failed in 14.78s
+PYTEST_EXIT=1
+RESTORE_OK

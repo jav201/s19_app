@@ -219,7 +219,7 @@ Totals (counted by script, one per id; a row with several ids counts each): 317 
 
 | Id | Change | Rows | Status |
 |---|---|---|---|
-| D9-7 | Remove `run_checks_for_project` and `test_headless_project_run` (test-only caller) | — | open |
+| D9-7 | Remove `run_checks_for_project` and its test-only caller (the headless project-run test) | — | done (batch-101 Inc 4) |
 | D9-8 | Remove the hidden `#check_preview_toggle_button` and its handler | — | open |
 | D9-10 | One "current run" rule: the Checks tab (rows, status, strip, subtitle) and the Checks screen show the no-run state when the document or the image differs from the run's (the stamp the ledger glyphs already use); a 0-entry run shows `0 checked` | R-CHK-PE-008 … 012, R-CHKS-001, R-CHKS-004, R-CHKS-009 | open |
 | D9-11 | Check Editor: a field loaded from a spec keeps the spec's expected bytes; only new fields take the image's bytes (Write and Validate) | R-CHKED-025, R-CHKED-026 | open |

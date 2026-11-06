@@ -1,0 +1,71 @@
+tree fingerprint start: 7f5b5b48049d1725
+load: 1.90 2.99 2.06
+2026-11-06T02:37:57Z
+mutant diff:
+904c904
+<             not index_built
+---
+>             symbol_index is None
+<HOME>/work/s19_c4/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_r_chg_sym_13_read_without_symbol_entries_builds_no_index _________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f2712be2b90>
+case08 = PosixPath('/tmp/pytest-s19c4/b101_case080')
+
+    def test_r_chg_sym_13_read_without_symbol_entries_builds_no_index(
+        monkeypatch: pytest.MonkeyPatch, case08: Path
+    ) -> None:
+        """Case R-CHG-SYM.13/2 (E3 A-2): the index is lazy. A read of a document
+        with no symbol entry builds none (counter 0), against the 220 040-tag
+        context; ``demo_patch`` against the case-08 context builds exactly one.
+    
+        Negative control: the index built eagerly before the loop counts 1 for
+        the address-only document -> RED (the first arm holds on the base; the
+        second arm is RED there because the base has no builder).
+    
+        Third arm (E5 C-1, the E4 ``index_built`` fix): ``demo_patch`` read with no
+        declared A2L calls the builder exactly once (it returns no index) and both
+        symbol entries give the R-CHG-SYM.2 finding. Mutant: the lazy gate keyed
+        on ``symbol_index is None`` (the pre-fix code) calls it once per symbol
+        entry, 2 -> RED."""
+        calls = count_index_builds(monkeypatch)
+        context = planted_context()
+        plain = json.dumps(
+            {
+                "format": "s19app-changeset",
+                "version": "2.0",
+                "kind": "change",
+                "encoding": "utf-8",
+                "value_mode": "text",
+                "entries": [{"type": "bytes", "address": "0x1000", "bytes": "01"}],
+            }
+        )
+        document = parse_change_document(plain, a2l_context=context)
+        assert len(document.entries) == 1 and document.issues == [], document.issues
+        assert len(calls) == 0, f"an address-only read built the index {len(calls)} time(s)"
+    
+        case_context = parse_a2l_file(case08 / "firmware.a2l")
+        document = parse_change_document(doc_text(case08, PATCH), a2l_context=case_context)
+        assert len(document.entries) == 7 and document.issues == [], document.issues
+        assert len(calls) == 1, f"the symbol read built the index {len(calls)} time(s), expected 1"
+    
+        before = len(calls)
+        document = parse_change_document(doc_text(case08, PATCH), a2l_context=None)
+>       assert len(calls) - before == 1, (
+            f"a read with no declared A2L called the index builder {len(calls) - before} "
+            f"time(s), expected exactly 1"
+        )
+E       AssertionError: a read with no declared A2L called the index builder 2 time(s), expected exactly 1
+E       assert (3 - 1) == 1
+E        +  where 3 = len([1, 1, 1])
+
+tests/test_b101_symbol_reads.py:1320: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_symbol_reads.py::test_r_chg_sym_13_read_without_symbol_entries_builds_no_index
+1 failed in 1.39s
+exit=1
+RESTORE_OK
+2026-11-06T02:37:59Z
+tree fingerprint end: 7f5b5b48049d1725

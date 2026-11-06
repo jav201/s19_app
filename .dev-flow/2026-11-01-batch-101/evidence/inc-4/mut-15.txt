@@ -1,0 +1,50 @@
+--- sha256 before (M-15) ---
+f111f33cefa43f7d361944c0a38667f8dcb07c1c089b6af16dc1667ec884b50a  s19_app/tui/changes/io.py
+60b4d129746a0ba7251a0d40805d550285ca8d93edafb00f53fc8da67216c19e  s19_app/tui/services/change_service.py
+1335a5ee3b7d4e400fa6fe8a29d2d7993279ffb2a3044d07fa7ba60cd3f14aef  s19_app/tui/services/variant_execution_service.py
+3d256f64d99814b70dd94297c7961a6a220edfdcd0426a6dd58f57eacc603eb9  s19_app/tui/app.py
+applied M-15 -> s19_app/tui/changes/io.py
+s19_app.__file__ = <HOME>/work/s19_m4/s19_app/__init__.py
+=== pytest (M-15) flags=[] nodes=[tests/test_b101_symbol_reads.py::test_r_chg_sym_13_read_without_symbol_entries_builds_no_index] ===
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_r_chg_sym_13_read_without_symbol_entries_builds_no_index _________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f8387c717d0>
+case08 = PosixPath('/tmp/pytest-s19m4/b101_case080')
+
+    def test_r_chg_sym_13_read_without_symbol_entries_builds_no_index(
+        monkeypatch: pytest.MonkeyPatch, case08: Path
+    ) -> None:
+        """Case R-CHG-SYM.13/2 (E3 A-2): the index is lazy. A read of a document
+        with no symbol entry builds none (counter 0), against the 220 040-tag
+        context; ``demo_patch`` against the case-08 context builds exactly one.
+    
+        Negative control: the index built eagerly before the loop counts 1 for
+        the address-only document -> RED (the first arm holds on the base; the
+        second arm is RED there because the base has no builder)."""
+        calls = count_index_builds(monkeypatch)
+        context = planted_context()
+        plain = json.dumps(
+            {
+                "format": "s19app-changeset",
+                "version": "2.0",
+                "kind": "change",
+                "encoding": "utf-8",
+                "value_mode": "text",
+                "entries": [{"type": "bytes", "address": "0x1000", "bytes": "01"}],
+            }
+        )
+        document = parse_change_document(plain, a2l_context=context)
+        assert len(document.entries) == 1 and document.issues == [], document.issues
+>       assert len(calls) == 0, f"an address-only read built the index {len(calls)} time(s)"
+E       AssertionError: an address-only read built the index 1 time(s)
+E       assert 1 == 0
+E        +  where 1 = len([1])
+
+tests/test_b101_symbol_reads.py:1113: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_symbol_reads.py::test_r_chg_sym_13_read_without_symbol_entries_builds_no_index
+1 failed in 1.40s
+PYTEST_EXIT=1
+RESTORE_OK

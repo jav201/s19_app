@@ -1,0 +1,13 @@
+$ git -C <HOME>/work/s19_i4 log --oneline -1   (the Inc 4 diff over b7b77c4 applied on top)
+7add3d63 batch-101 PLAN: Inc 5 takes Inc 13's D-4 (stale CRC Designer coverage after an in-place apply) first, integrity priority
+$ python -c 'import s19_app; print(s19_app.__file__)'
+<HOME>/work/s19_i4/s19_app/__init__.py
+$ cd <HOME>/work/s19_i4 && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 2400 python -m pytest -q -p no:cacheprovider --rootdir=<HOME>/work/s19_i4 -rfE -n 8 -m not serial_timing tests/test_crc_operation.py tests/test_diff_report_service.py tests/test_diff_same_path_guard.py tests/test_engine_unchanged.py tests/test_flow_multi_image.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 60%]
+...............................................                          [100%]
+119 passed in 11.08s
+wall=12s
+exit=0

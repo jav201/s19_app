@@ -1,0 +1,68 @@
+--- sha256 before (M-6) ---
+f111f33cefa43f7d361944c0a38667f8dcb07c1c089b6af16dc1667ec884b50a  s19_app/tui/changes/io.py
+60b4d129746a0ba7251a0d40805d550285ca8d93edafb00f53fc8da67216c19e  s19_app/tui/services/change_service.py
+1335a5ee3b7d4e400fa6fe8a29d2d7993279ffb2a3044d07fa7ba60cd3f14aef  s19_app/tui/services/variant_execution_service.py
+3d256f64d99814b70dd94297c7961a6a220edfdcd0426a6dd58f57eacc603eb9  s19_app/tui/app.py
+applied M-6 -> s19_app/tui/app.py
+s19_app.__file__ = <HOME>/work/s19_m4/s19_app/__init__.py
+=== pytest (M-6) flags=[-n 2] nodes=[tests/test_b101_symbol_reads.py::test_r_chg_sym_9_ab_diff_check_spec_pick_resolves_symbols] ===
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________ test_r_chg_sym_9_ab_diff_check_spec_pick_resolves_symbols ___________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m4/popen-gw0/test_r_chg_sym_9_ab_diff_check0')
+case08 = PosixPath('/tmp/pytest-s19m4/popen-gw0/b101_case080')
+
+    def test_r_chg_sym_9_ab_diff_check_spec_pick_resolves_symbols(
+        tmp_path: Path, case08: Path
+    ) -> None:
+        """Case R-CHG-SYM.9/6: picking ``demo_check`` in the A2B Diff check-spec
+        dropdown with the image and A2L loaded paints the panel status ``Check
+        spec 'demo_check.chk.json' loaded - 3 declared field(s) will ride the
+        report.`` and stashes a 3-entry spec whose entry 2 carries the tag.
+    
+        Negative control: the pick passing no A2L paints ``Check spec not loaded -
+        [CHG-SYMBOL-UNRESOLVED] ...`` and stashes nothing (the base) -> RED."""
+        from textual.widgets import Select
+    
+        (index, entry), = symbol_rows(case08, CHECK)
+    
+        async def scenario(app, pilot, log):
+            stage(app, case08, CHECK)
+            await attach_image(pilot, app, case08)
+            await attach_a2l(pilot, app, case08)
+            await show_screen(pilot, app, "7", "#diff_check_select")
+            app.query_one("#diff_check_select", Select).value = CHECK
+            await wait_until(
+                pilot,
+                lambda: str(app.query_one("#diff_status").render()).startswith("Check spec"),
+                lambda: f"timed out waiting for the diff status; got {str(app.query_one('#diff_status').render())!r}",
+            )
+            await settle(pilot)
+            spec = app._diff_check_spec
+            return (
+                str(app.query_one("#diff_status").render()),
+                None if spec is None else len(spec.entries),
+                None if spec is None else spec.entries[index].symbol,
+            )
+    
+        status, count, symbol = run(tmp_path, scenario)
+>       assert status == (
+            f"Check spec '{CHECK}' loaded {EM} 3 declared field(s) will ride the report."
+        ), status
+E       AssertionError: Check spec not loaded — [CHG-SYMBOL-UNRESOLVED] error: entry 2: the symbol 'VALUE_0185' cannot be resolved — no A2L context is declared for this change-set — the entry was skipped
+E       assert 'Check spec n...y was skipped' == "Check spec '...e the report."
+E         
+E         - Check spec 'demo_check.chk.json' loaded — 3 declared field(s) will ride the report.
+E         + Check spec not loaded — [CHG-SYMBOL-UNRESOLVED] error: entry 2: the symbol 'VALUE_0185' cannot be resolved — no A2L context is declared for this change-set — the entry was skipped
+
+tests/test_b101_symbol_reads.py:560: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_symbol_reads.py::test_r_chg_sym_9_ab_diff_check_spec_pick_resolves_symbols
+1 failed in 15.30s
+PYTEST_EXIT=1
+RESTORE_OK
