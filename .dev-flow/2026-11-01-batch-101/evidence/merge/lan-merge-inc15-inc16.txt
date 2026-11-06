@@ -1,0 +1,26 @@
+LAN host 2, merged tree fd746ab (main 990db24 + CI evidence + Inc 15 merge 332a5be + Inc 16 merge fd746ab) — FULL suite (-n 12 --dist loadfile, not serial_timing) + serial lane; snapshot suite on the LAN laptop host in the CI-recipe venv. No merge conflicts; EXPECTED_SCANNED_TEST_FILES 263 (Inc 16's new file). Main lane: the 4 known failures (b78_03, 056e_a2b, 2 tc016s snapshots) plus test_tc_b97_55 (known flaky under load, BACKLOG-CODE row of 2026-11-05 from Inc 8 E5; 'assert 2 == 1' run_chain_set calls), which passed 3/3 alone on the same tree. Serial lane: 68 passed, 0 under 20 % margin. Inc 15 case R-TST-157/2 (the whole parallel lane) is covered by this run.
+---main+serial---
+HEAD fd746ab4
+<HOME>/work/s19_m1516/s19_app/__init__.py
+------- generated xml file: <HOME>/work/m1516-out/junit-main.xml -------
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_55_input_queued_during_a_run_starts_no_second_run
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-120x30]
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+5 failed, 5789 passed, 181 skipped, 4 xfailed in 2668.58s (0:44:28)
+---serial---
+QC-TM: 94 bounds, 0 under 20 % margin
+68 passed, 2 skipped, 5979 deselected in 354.72s (0:05:54)
+exit=done
+---tc_b97_55 alone x3 (same tree)---
+1 passed in 5.84s
+1 passed in 5.83s
+1 passed in 5.76s
+---snapshot-laptop---
+<HOME>/work/s19_m1516snap/s19_app/__init__.py
+2 snapshots failed. 27 snapshots passed.
+=========================== short test summary info ============================
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-120x30]
+2 failed, 27 passed, 4 deselected in 112.17s (0:01:52)

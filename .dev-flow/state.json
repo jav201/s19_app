@@ -197,6 +197,16 @@
       "station": "P3",
       "date": "2026-11-06",
       "decision": "P3 increment 004 (Inc 4, documents resolve symbols through the loaded A2L at all six session reads; variant and report runs use the project's A2L; lazy tag-name index, 1000 entries x 220040 tags within 1.0 s; headless entry point deleted) approved and merged under the standing authorization: E3 architect and security PASS-WITH-NOTES (A-1 HIGH folded into the records before E4); mutants 17/17 (DeepSeek, M-16/M-17 added by the corrective pass); code-reviewer PASS-WITH-NOTES; security-reviewer PASS-WITH-NOTES; coverage audit 23 cases covered after re-audit; trace_check 0 gaps. Full-suite merge verification on LAN host 2 found three merged-tree failures (address census in the new test helper, an unredacted handoff note, Inc 13's D-2 guard on a merged base), fixed in c2cba35; the rest are the 4 known failures; one serial-lane timing outlier (TC-B100-05 2.36 s) passed on re-run, 0 under margin (evidence/merge/lan-merge-inc4.txt)."
+    },
+    {
+      "station": "P3",
+      "date": "2026-11-06",
+      "decision": "P3 increment 015 (Inc 15, Windows-only test failures tc331 and tc_b94_27 plus the AT-030c and save-back siblings: single pauses after a press replaced by waits through the shared settled helper on product observables; static guard for the 9 sites; conventions rule 7; tests only, 0 product files) approved and merged under the standing authorization: E1 diagnosis reproduced tc331 5/16 on Windows and tc_b94_27 by a held handler on Linux; E3 architect FAIL (1 HIGH, 2 MAJOR) then PASS-WITH-NOTES in round 2; each wait D1-D9 RED under its hold on the base form and GREEN fixed; Windows after the fix 20/20 per node; E5 code-reviewer PASS-WITH-NOTES carrying the security lens (no product surface); coverage audit 11.5 % then re-audit, R-TST-164 added for D9; trace_check 0 gaps. Merged with Inc 16; full-suite verification on LAN host 2 shows only the known failures and the known load flake tc_b97_55 (evidence/merge/lan-merge-inc15-inc16.txt)."
+    },
+    {
+      "station": "P3",
+      "date": "2026-11-06",
+      "decision": "P3 increment 016 (Inc 16, documentation hygiene: CLAUDE.md, PROJECT_RULES.md, engineering rules, requirements.txt, docs index, overview and architecture describe the shipped app; superseded diagrams doc, retired .fast-dev-flow/, REQ-crc.md and stray example files removed; finished notes archived under .dev-flow/design/archive/ with the drive path redacted; comment-only source fixes; 44 doc-hygiene guards) approved and merged under the standing authorization: E3 architect FAIL (6 MAJOR) then PASS-WITH-NOTES in round 2; mutants 35/35 (DeepSeek); integration found R-DOC-DEV.2 wrong (CLI examples did not run) and corrected it; E5 code-reviewer PASS-WITH-NOTES carrying the security lens; coverage audit 5.8 % then re-audit with no mark changed; trace_check 1 gap ruled (R-DOC-ARCHIVE.2 is increment-local and transcript-verified, TR-1). Older batch records holding a drive path (48 files) or the account name (14) are a backlog row for the operator. Full-suite verification merged with Inc 15 (evidence/merge/lan-merge-inc15-inc16.txt)."
     }
   ],
   "obsidian_synced": false,
