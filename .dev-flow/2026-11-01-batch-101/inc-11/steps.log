@@ -12,3 +12,4 @@ E4 integration end 2026-11-06T00:56Z model=opus (GREEN on the LAN Linux host; OR
 E5 start 2026-11-06T00:57Z mutants=deepseek-v4-pro reviews=opus
 E5 corrective start 2026-11-06T01:22Z model=opus
 E5 corrective end 2026-11-06T02:02Z model=opus (C-1..C-8 done; 0 product changes; e5c-01 331 passed + 2 OR-3; e5c-03 758 passed, 8 failed = TC-031 x2 OR-3 + 6 snapshot classified; 78 cases covered 76 partial 2)
+E5 end 2026-11-06T02:38Z model=opus (snapshots + records)

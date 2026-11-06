@@ -1,0 +1,65 @@
+Inc 11 E5 close: snapshot baselines re-recorded in the CI recipe (ruling A-3 / OR-4)
+====================================================================================
+
+Platform: laptop host (LAN Linux), Linux 7.3.1, Python 3.11.18 in a dedicated venv
+(<HOME>/work/venv-snap311, created from the s19ci interpreter; the s19ci env was not modified).
+CI recipe: `pip install -r requirements.txt && pip install -e ".[dev]"` (textual 8.2.8,
+pytest-textual-snapshot 1.1.0, syrupy 4.8.0), then
+`pytest tests/test_tui_snapshot.py -m snapshot` (+ `-p no:cacheprovider --basetemp /tmp/pytest-s19snap11 -q -rf`),
+NO_COLOR unset. Own detached worktree <HOME>/work/s19_snap11 at origin/main f9f3cb0973;
+the Inc 11 tree = that worktree + `git diff b7b77c4` of branch b101-inc11 (head fa35466)
+applied uncommitted (new files intent-to-add). Each transcript prints s19_app.__file__ and the
+tree fingerprint (sha256 of `git diff`, 16 hex) at start and end. The worktree was removed after
+the last run; nothing ran on the Windows PC.
+
+Runs
+----
+snap-01-base-origin-main.txt        (a) origin/main alone: 2 failed, 27 passed, 4 deselected
+                                         FAILED [patch-comfortable-80x24], [patch-comfortable-120x30]
+                                         (the 2 known tc016s failures)
+snap-02-inc11-before-rerecord.txt   (b) Inc 11 tree: 6 failed, 23 passed, 4 deselected
+                                         FAILED [a2l-compact-160x40], [a2l-comfortable-160x40],
+                                         [map-comfortable-80x24], [map-comfortable-120x30],
+                                         [patch-comfortable-80x24], [patch-comfortable-120x30]
+snap-03-rerecord-four-nodes.txt     (c) `--snapshot-update` per node, one node per run, for the 4
+                                         Inc 11 nodes only: 4 x "1 passed"
+snap-04-svgdiff-per-node.txt        (c) element-level diff of each re-recorded SVG against its HEAD
+                                         baseline (class prefix normalised; non-text elements,
+                                         text-element geometry and visible text by row)
+snap-05-inc11-after-rerecord.txt    (d) Inc 11 tree after the re-record: 2 failed, 27 passed,
+                                         4 deselected; FAILED = the 2 known patch-comfortable nodes only
+
+Per-node diff summary (re-recorded)
+-----------------------------------
+[a2l-compact-160x40]      9 visible rows change: Region column `unknown` -> `flash` on the 9 in-memory
+                          tags (MEAS_000002..05, 07..09, 11..12; InMem `yes`). The 5 out-of-memory rows
+                          (InMem `no`) keep `unknown`. Geometry: each changed cell's background rect
+                          (85.4 px = 7 cells) splits into the 5-cell text rect (61 px) plus a 2-cell
+                          padding rect (24.4 px) of the SAME fill at the same x; text textLength 85.4 -> 61.
+                          No colour, style, clip path, column boundary or other text changes.
+                          Element counts: text 522 -> 522; non-text 960 -> 969 (the 9 padding rects).
+[a2l-comfortable-160x40]  identical change set to a2l-compact-160x40 (text 521 -> 521; non-text 958 -> 967).
+[map-comfortable-80x24]   1 row: status line `60 iss` -> `59 iss` (one fewer A2L_UNRECOGNIZED_BLOCK in
+                          the snapshot fixture: the IF_DATA / ASAM-name exemption, D-8 Issues counts).
+                          0 non-text and 0 geometry changes.
+[map-comfortable-120x30]  1 row: `60 issues` -> `59 issues`; 0 non-text and 0 geometry changes.
+
+Intended Inc 11 value changes seen: Region `unknown` -> `flash` (R-A2L-034 via the anchored
+MEMORY_SEGMENT reader, R-A2L-036) and the issue count (R-VAL-032.2/.3). No a2l(n) chip, re-label
+note or issue-group screen is part of the tc016s snapshot set, so none of those appears in a diff.
+
+Refused / not re-recorded
+-------------------------
+[patch-comfortable-80x24], [patch-comfortable-120x30]: the 2 known tc016s failures; they fail on
+origin/main alone (snap-01) with the same nodes. Not Inc 11's; never re-recorded.
+No other node failed, so no node with an unexpected diff was found.
+
+Baseline files copied back into the local worktree (sha256 equal on host and local copy):
+tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[a2l-compact-160x40].svg      2207c688007631c285bcbf5a4373ebff75834888269d030f4514a4d13d141d49
+tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[a2l-comfortable-160x40].svg  8d33f25c46db55ee112d5d59b22e8b4fc2bec96158c0e472414146904ae31ba6
+tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[map-comfortable-80x24].svg   1bff4cf48501a768c02f3f20742c92700a59f50d74283c33325c344f63a6702c
+tests/__snapshots__/test_tui_snapshot/test_tc016s_density_layout_snapshot[map-comfortable-120x30].svg  c19b3c20f635d56fbafe9782fd4d985fe122473894bfb74852dd6b8d985d4b3a
+`git diff --stat`: 4 files changed, 22 insertions(+), 22 deletions(-).
+
+Note: the Inc 11 diff applied on the host lacks `inc-11/steps.log` in the fingerprint (ignored by
+.gitignore, so intent-to-add skipped it); records only, no effect on any test.
