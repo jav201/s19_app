@@ -17,3 +17,12 @@ Round 1: `E3-architect.md` **FAIL** (1 HIGH, 1 MAJOR, 8 MINOR); `E3-security.md`
 | E3A-10 | Backlog row beside D14-11: `reports/` writes are not guarded. | Outside the four files. |
 
 Correction: one design-correction agent, targeted edits only. Round 2: the security reviewer re-checks S-1, S-2; the architect re-checks E3A-01, E3A-02, E3A-04.
+
+## Round 2 (2026-11-06)
+
+Security **PASS-WITH-NOTES** (S-1, S-2, S-3 closed; the TC-B99-13 census change is exact and tighter: a revert to `write_text` turns it RED). Architect **PASS-WITH-NOTES** (E3A-01, E3A-02, E3A-04 closed; 4 source files, 18 nodes). E3 closed. Addenda to E4:
+
+- **R2-1 (MINOR):** add a case for the real-path (home-swap) arm of the post-claim check; drop "Windows-only" from the wording where the check also runs on Linux.
+- **R2-2 (MINOR):** state the two error paths in the row or the graph: an `lstat` failure inside the check (treated as a failed check: remove, raise) and the best-effort unlink after close.
+- **N-1:** AT-I9-2 asserts `1 chain(s) restored` (`app.py:4645`), since "mounts lane `rep_b`" also holds on base.
+- **Order:** Inc 9's E4 starts after Inc 6 merges (one `app.py` writer at a time, P0 mitigation), although the two `app.py` slices do not overlap.

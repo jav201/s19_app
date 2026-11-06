@@ -38,3 +38,49 @@ Evidence state of every finding: **R** (read; no test, probe or script run on an
 - [x] No secret values in this report — none read; paths and code citations only.
 - [x] Verdict explicit — FAIL (S-1, S-2 open, state `planned` until the edit is applied and re-reviewed).
 - [x] New tool or integration: none added; the write surface (two save functions) is scoped in S-1 and the "Home guard" item.
+
+## Round 2
+
+Re-checked S-1, S-2, S-3 and the E4 addendum on TC-B99-13 only, on `524c6ab0` (the correction commit; `git show HEAD --stat`: 6 records). Read: `E3-rulings.md`; `01-requirements.md` rows R-FLOW-FILE.14, R-FLOW-SET.8; `02-test-cases.md` (common fixtures, R-FLOW-FILE.14/1-/4, R-FLOW-SET.8/1-/4, counts); `E1-slice.md` §2 rows `save_flow_json`, `_create_new_json`, the §5 census paragraph, §6; `E1-rulings.md` BL-I9-4; `codewire/graph-inc9.md` I-7, nodes `save_flow_json`, `_create_new_json`, `save_chain_set`, `_guarded_destination`, `[Data: outside folder]`, E2-2, E3-1. Code at base, read only: `workspace.py` `place_into_workarea` claim (`:1242-1316`), `contained_in_workarea` (`:637-677`), `_guarded_destination` (`:680-795`), `_is_reparse_point` (`:226-271`), the error classes (`:82-86`); `tests/test_b99_staging.py` `_FINAL_NAME_ALLOWLIST` (`:2093-2180`), `_FINAL_NAME_DECLARED_EXCEPTIONS` (`:2188-2197`), `_final_name_census` (`:2200-2248`). **Run:** nothing. Every claim below is `R` (read), evidence state `not-run`.
+
+### Verdict
+
+**PASS-WITH-NOTES.** No HIGH or MAJOR is open. S-1, S-2 and S-3 are closed at the design gate: the record mitigation is `executed` (`524c6ab0`) and re-verified here (`approved`, E3 only). The code is `planned` for E4; E5 re-verifies it by /3 and /4 GREEN and their mutants RED. This clearance covers the E3 design gate and authorizes nothing else. Two new MINOR notes (R2-1, R2-2) go to E4 as addenda; neither blocks.
+
+### Closure of the round-1 findings
+
+| Round-1 finding | State | Evidence |
+|---|---|---|
+| S-1 (MAJOR) | closed (design) | `_create_new_json` (graph I-7 and node; slice §2) holds every step of the round-1 fix, in order. (a) `lexists` → next. (b) The payload is rendered before the claim. (c) `os.open(…, O_CREAT\|O_EXCL\|O_WRONLY\|O_BINARY)`; `FileExistsError` → next; another `OSError` → next only if the name now exists (house F1), else re-raise. (d) Before any byte: `S_ISREG(lstat)`, not `_is_reparse_point`, `samestat(fstat(fd), lstat)`, `contained_in_workarea(realpath(candidate), resolved_home)`; else close, unlink only a same-stat regular file, raise `WorkareaContainmentError`. (e) Write through the fd. This is the house idiom (`workspace.py:1250-1316`: pre-claim `lstat`, `O_EXCL`, re-`lstat` for `S_ISREG` and reparse) plus two checks the house lacks: the same file, and the real path under the guarded home. It is stricter than the house in one place: the house unlinks a link found at the claim (`claim_owned`); Inc 9 leaves the link and unlinks only its own regular file. `resolved_home` is `_guarded_destination`'s first result (`Path(destination).resolve()`). So the real path is compared against this home, not the work-area root, and a swap to another project's `flows/` also fails. `O_BINARY` is right because the fd is written through: without it, the Windows CRT text mode would add a second CR to the wrapper's CRLF. `json.dumps` defaults to `ensure_ascii=True`, so the UTF-8 wrapper cannot raise an encode error mid-write. BL-I9-4 (E1-rulings), E2-2 and the `[Data: outside folder]` entity state the residual as an empty file at most, never content. |
+| S-2 (MAJOR) | closed (design) | One Linux-runnable negative control per defence, as asked. **Name check:** /3 (R-FLOW-FILE.14/3, R-FLOW-SET.8/3) runs on a dangling link with the Create spy and expects "0 calls on `z.json` and exactly 1 on the returned path". The `exists()` mutant records a call on `z.json` → RED on Linux, although `O_EXCL` then refuses the link. The "exactly 1" also turns a `write_text` revert RED (0 calls), so the case is not vacuous. The spy wraps `os.open`, and nothing else on that call path calls `os.open` (`Path.resolve`, `mkdir` and `json` do not), so the count is exact. **Check after the claim:** /4 emulates the Windows follow: the wrapped `os.open` creates `<O>/followed.json`, links the candidate to it and returns the target's fd. Expected: the raise, 0 bytes at the target, the link left, no other entry. Dropping step (d) → the JSON lands in the target → RED. In this scenario each of the four checks of (d) refuses on its own, so /4 pins step (d) as a whole, not each clause, which is what round 1 asked. The Windows arms are `not_run` until E5 (fixtures, "Evidence state per arm"). |
+| S-3 (MINOR) | closed (design) | (b) builds the payload before the claim, so a serialiser raise leaves no file. (e) removes the claimed file on a write `OSError` and re-raises. A process killed mid-write can still leave a cut-off file. Base `write_text` has the same, and only a staged write plus rename avoids it, which is not needed because no save overwrites. |
+
+### TC-B99-13 addendum (E4): exact, and tighter
+
+The census flags `unlink`, `os.replace`, `shutil.copy2`, `write_bytes` and `write_text` by the name of the enclosing function (`_final_name_census`). It does not census `os.open` or writes through a descriptor.
+
+- **Today.** The two saves are declared exceptions, so every censused primitive inside them passes, `write_text` onto any name included.
+- **After the addendum.** The module's exempt set is one function, `_create_new_json`. Its one censused call is the unlink of its own claim. The precedent is `_keep_previous_manifest` (`:2128-2131`: a NEW name by `O_CREAT|O_EXCL`; unlinks only its own claim). Neither save then holds a censused primitive, so a revert of either to `write_text` turns the census RED.
+- **Judgement.** The change keeps the guard exact (it names the one function that calls a censused primitive) and narrows it.
+- **Remaining gap.** One gap stays, as it does for every allow-listed function: the exemption is per function, so a later `write_text` or `os.replace` inside `_create_new_json` would pass the census. The behavioural cases close it: a `write_text` rewrite of the helper calls no `os.open`, so /3's "exactly 1" turns RED.
+
+For E4:
+- Remove the `flow_persistence_service.py` key from `_FINAL_NAME_DECLARED_EXCEPTIONS`; do not leave an empty set.
+- Write the allow-list comment with three facts: an exclusive create of a new name; no byte before the check in (d); unlink only of its own same-stat claim.
+- Keep the `os.unlink` calls in the helper's own body; a nested `def` is censused under its own name.
+- Close the F4a conversion item that the declared-exception comment routes to the backlog.
+
+### New notes (MINOR, to E4; not blocking)
+
+| Id | Severity | Where | Note | Proposed fix |
+|---|---|---|---|---|
+| R2-1 | MINOR | BL-I9-4 (`E1-rulings.md:69`), graph E2-2, `[Data: outside folder]` desc and edge `_create_new_json ──▶ [I/O: outside folder]` | The home-swap half of the residual rests on the `realpath` clause of (d) alone. Under a swap the created file is a regular file, not a link, and the same file as the fd, so only the real-path test refuses it. No case pins that clause: a mutant that drops it stays GREEN on all 31 cases. The records also call the empty file a Windows-only race. That holds for a link at the file name. But on Linux too, `O_EXCL` follows a link in the directory part of the path. On both platforms the helper then unlinks its own same-stat file, so the residual is smaller than stated, but the wording overclaims. | Either add a Linux case /5 for R-FLOW-FILE.14: `os.open` is wrapped to swap `flows/` for a symlink to `<O>`, then call through. Expected: the raise, and `<O>/z.json` absent or 0 bytes. Mutant: drop the `realpath` clause → `<O>/z.json` holds the JSON → RED. Or reword BL-I9-4 and the two graph texts: "a link at the file name on Windows, or a home swapped for a link on any platform; no case pins the home-swap defence (the `realpath` check)". |
+| R2-2 | MINOR | node `_create_new_json` (d), (e); slice §2 row `_create_new_json` | Two error paths that the house names and the design leaves open. (i) The design does not say that an `OSError` from (d)'s own `lstat` counts as a failed check, for example when a racer removes the entry between the claim and the check. The house treats it as a failure (`workspace.py:1289-1300`). Left open, the fd leaks, and a plain `OSError` escapes handlers that catch only `WorkareaContainmentError`. No byte is written either way. (ii) The design does not say that the unlinks in (d) and (e) are best-effort, and the write's error region leaves out the close; a flush error surfaces at close. On Windows the fd must be closed before the unlink, or the unlink fails. | State that any `OSError` in (d) is a failed check: close the fd and raise `WorkareaContainmentError`. State that the unlinks are best-effort (`except OSError: pass`, as the house does) and run after the fd is closed. Put the write and the close in one guarded region. |
+
+### Evidence checklist (round 2)
+
+- [x] Each finding has what, where, why and fix: the closure table (Evidence column) and the R2 table (Where / Note / Proposed fix).
+- [x] Each finding has a severity: S-1, S-2 MAJOR → closed; S-3 MINOR → closed; R2-1, R2-2 MINOR.
+- [x] No secret values: none read; paths and code citations only.
+- [x] Verdict explicit: PASS-WITH-NOTES. Neither round raised a HIGH. Both MAJORs are closed: the record edit is `executed` and re-verified (`approved`, E3 only); the code is `planned`.
+- [x] New tool or integration: none. The write surface is the one helper `_create_new_json`, scoped in S-1's closure and in the census addendum.
