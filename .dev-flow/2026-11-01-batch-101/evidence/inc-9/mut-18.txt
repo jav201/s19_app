@@ -1,0 +1,212 @@
+base commit (origin/main): e07fb00f9fc13afd314d0334fac683fe33b29b6c
+applied-tree head: b204c7d44a42383f2a7c63295280b0a4b7f3ad58
+mutant: M18 — R-FX-SET.15
+
+--- mutation (diff) ---
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -4582,8 +4582,7 @@
+             )
+         except WorkareaContainmentError:
+             self.set_status(
+-                "Chain set not saved - the project's flowsets folder is a link or is "
+-                "outside the work area."
++                "Chain set not saved - the set is empty or the name sanitised away."
+             )
+             return
+         if saved is None:
+
+--- s19_app.__file__ (from inside the copy) ---
+<HOME>/work/s19_i9mut_m18/s19_app/__init__.py
+
+--- pytest ---
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+____________________ test_r_fx_set_15_1_refused_home_status ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-383/test_r_fx_set_15_1_refused_hom0')
+
+    def test_r_fx_set_15_1_refused_home_status(tmp_path: Path) -> None:
+        """R-FX-SET.15 (case /1): with one lane imported and ``flowsets/`` replaced
+        by a link to a folder outside the work area, Save Set under ``s`` paints
+        exactly ``Chain set not saved - the project's flowsets folder is a link or
+        is outside the work area.``, writes nothing outside and the ribbon keeps
+        ``unsaved``.
+    
+        RED on base: the file lands outside and the ribbon shows ``saved``.
+        """
+    
+        async def body(app, pilot, project_dir, log):
+            panel = await import_lanes(app, pilot, "patch_chain")
+            outside = _link_home(tmp_path, project_dir, "flowsets")
+            panel.query_one("#fx_set_name", Input).value = "s"
+            mark = len(log.messages)
+            panel.query_one("#fx_save", Button).press()
+            await settled(
+                pilot,
+                lambda: SET_REFUSED in log.since(mark) or bool(_entries(outside)),
+                "the refusal status is painted, or the file landed (base)",
+            )
+            await settle(pilot, 2)
+            return (
+                _painted_status(app),
+                _entries(outside),
+                _painted(app, panel.query_one("#fx_name_strip")),
+            )
+    
+>       status, outside_files, ribbon = _drive(tmp_path, body)
+                                        ^^^^^^^^^^^^^^^^^^^^^^
+
+../s19_i9mut/tests/test_b101_flow_names_ui.py:473: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i9mut/tests/test_b101_flow_names_ui.py:77: in _drive
+    return asyncio.run(_run())
+           ^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i9mut/tests/test_b101_flow_names_ui.py:75: in _run
+    return await body(app, pilot, project_dir, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i9mut/tests/test_b101_flow_names_ui.py:461: in body
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_r_fx_set_15_1_refused_home_status.<locals>.body.<locals>.<lambda> at 0x7fe1415cb600>
+failure = 'did not settle: the refusal status is painted, or the file landed (base)'
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: did not settle: the refusal status is painted, or the file landed (base)
+
+tests/support/timing.py:66: AssertionError
+____________________ test_at_i9_3_linked_homes_refuse_saves ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-383/test_at_i9_3_linked_homes_refu0')
+
+    def test_at_i9_3_linked_homes_refuse_saves(tmp_path: Path) -> None:
+        """AT-I9-3 (US-I9-3, rows R-FLOW-FILE.11, R-FLOW-SET.7, R-FB-SAVE.8 and
+        R-FX-SET.15): with ``patch_chain`` imported as a lane and then ``flows/``
+        and ``flowsets/`` replaced by links to folders outside the work area, the
+        Builder Save... under ``x`` and Flow Execution Save Set under ``s`` each
+        paint their exact refusal line and leave both outside folders empty.
+    
+        RED on base: one file lands in each outside folder.
+        """
+    
+        async def body(app, pilot, project_dir, log):
+            fx_panel = await import_lanes(app, pilot, "patch_chain")
+            outside_flows = _link_home(tmp_path, project_dir, "flows")
+            outside_sets = _link_home(tmp_path, project_dir, "flowsets")
+            builder = await open_flow_builder(app, pilot)
+            await _add_load_block(app, pilot, builder)
+            mark = len(log.messages)
+            await _open_save_dialog(app, pilot, builder, "x")
+            await settled(
+                pilot,
+                lambda: FLOW_REFUSED in log.since(mark) or bool(_entries(outside_flows)),
+                "the Builder refusal is painted, or the file landed (base)",
+            )
+            await settle(pilot, 2)
+            flow_status = _painted_status(app)
+            await open_flow_execution(app, pilot)
+            mark = len(log.messages)
+            fx_panel.query_one("#fx_set_name", Input).value = "s"
+            fx_panel.query_one("#fx_save", Button).press()
+            await settled(
+                pilot,
+                lambda: SET_REFUSED in log.since(mark) or bool(_entries(outside_sets)),
+                "the Save Set refusal is painted, or the file landed (base)",
+            )
+            await settle(pilot, 2)
+            return flow_status, _painted_status(app), _entries(outside_flows), _entries(outside_sets)
+    
+>       flow_status, set_status, flows_files, sets_files = _drive(tmp_path, body)
+                                                           ^^^^^^^^^^^^^^^^^^^^^^
+
+../s19_i9mut/tests/test_b101_flow_names_ui.py:646: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i9mut/tests/test_b101_flow_names_ui.py:77: in _drive
+    return asyncio.run(_run())
+           ^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i9mut/tests/test_b101_flow_names_ui.py:75: in _run
+    return await body(app, pilot, project_dir, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i9mut/tests/test_b101_flow_names_ui.py:638: in body
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_at_i9_3_linked_homes_refuse_saves.<locals>.body.<locals>.<lambda> at 0x7fe142586ca0>
+failure = 'did not settle: the Save Set refusal is painted, or the file landed (base)'
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: did not settle: the Save Set refusal is painted, or the file landed (base)
+
+tests/support/timing.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_flow_names_ui.py::test_r_fx_set_15_1_refused_home_status
+FAILED tests/test_b101_flow_names_ui.py::test_at_i9_3_linked_homes_refuse_saves
+2 failed in 131.01s (0:02:11)
+

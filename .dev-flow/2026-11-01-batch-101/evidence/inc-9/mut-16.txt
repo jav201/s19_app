@@ -1,0 +1,217 @@
+base commit (origin/main): e07fb00f9fc13afd314d0334fac683fe33b29b6c
+applied-tree head: b204c7d44a42383f2a7c63295280b0a4b7f3ad58
+mutant: M16 — R-FB-SAVE.8
+
+--- mutation (diff) ---
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -4018,10 +4018,7 @@
+                     event.flow, raw_name, project_dir, workarea_root=self.workarea
+                 )
+             except WorkareaContainmentError:
+-                self.set_status(
+-                    "Flow not saved - the project's flows folder is a link or is "
+-                    "outside the work area."
+-                )
++                self.set_status("Flow name is empty after sanitising - not saved.")
+                 return
+             if saved is None:
+                 self.set_status("Flow name is empty after sanitising - not saved.")
+
+--- s19_app.__file__ (from inside the copy) ---
+<HOME>/work/s19_i9mut_m16/s19_app/__init__.py
+
+--- pytest ---
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+____________________ test_r_fb_save_8_1_refused_home_status ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-381/test_r_fb_save_8_1_refused_hom0')
+
+    def test_r_fb_save_8_1_refused_home_status(tmp_path: Path) -> None:
+        """R-FB-SAVE.8 (case /1): with ``flows/`` replaced by a link to a folder
+        outside the work area, Save... under ``x`` paints exactly
+        ``Flow not saved - the project's flows folder is a link or is outside the
+        work area.`` on the status line, writes nothing outside, and the result
+        area shows no ``saved`` line.
+    
+        RED on base: the file lands in the outside folder and the result shows
+        ``saved flows/x.json``.
+        """
+    
+        async def body(app, pilot, project_dir, log):
+            panel = await open_flow_builder(app, pilot)
+            outside = _link_home(tmp_path, project_dir, "flows")
+            await _add_load_block(app, pilot, panel)
+            mark = len(log.messages)
+            await _open_save_dialog(app, pilot, panel, "x")
+            await settled(
+                pilot,
+                lambda: FLOW_REFUSED in log.since(mark)
+                or bool(_entries(outside))
+                or "saved flows/" in _painted(app, panel.query_one("#flow_result")),
+                "the refusal status is painted, or the file landed (base)",
+            )
+            await settle(pilot, 2)
+            return (
+                _painted_status(app),
+                _entries(outside),
+                _painted(app, panel.query_one("#flow_result")),
+            )
+    
+>       status, outside_files, result = _drive(tmp_path, body, builder=True)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+../s19_i9mut/tests/test_b101_flow_names_ui.py:439: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i9mut/tests/test_b101_flow_names_ui.py:77: in _drive
+    return asyncio.run(_run())
+           ^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i9mut/tests/test_b101_flow_names_ui.py:75: in _run
+    return await body(app, pilot, project_dir, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i9mut/tests/test_b101_flow_names_ui.py:425: in body
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_r_fb_save_8_1_refused_home_status.<locals>.body.<locals>.<lambda> at 0x7fb59cbc0680>
+failure = 'did not settle: the refusal status is painted, or the file landed (base)'
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: did not settle: the refusal status is painted, or the file landed (base)
+
+tests/support/timing.py:66: AssertionError
+____________________ test_at_i9_3_linked_homes_refuse_saves ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-381/test_at_i9_3_linked_homes_refu0')
+
+    def test_at_i9_3_linked_homes_refuse_saves(tmp_path: Path) -> None:
+        """AT-I9-3 (US-I9-3, rows R-FLOW-FILE.11, R-FLOW-SET.7, R-FB-SAVE.8 and
+        R-FX-SET.15): with ``patch_chain`` imported as a lane and then ``flows/``
+        and ``flowsets/`` replaced by links to folders outside the work area, the
+        Builder Save... under ``x`` and Flow Execution Save Set under ``s`` each
+        paint their exact refusal line and leave both outside folders empty.
+    
+        RED on base: one file lands in each outside folder.
+        """
+    
+        async def body(app, pilot, project_dir, log):
+            fx_panel = await import_lanes(app, pilot, "patch_chain")
+            outside_flows = _link_home(tmp_path, project_dir, "flows")
+            outside_sets = _link_home(tmp_path, project_dir, "flowsets")
+            builder = await open_flow_builder(app, pilot)
+            await _add_load_block(app, pilot, builder)
+            mark = len(log.messages)
+            await _open_save_dialog(app, pilot, builder, "x")
+            await settled(
+                pilot,
+                lambda: FLOW_REFUSED in log.since(mark) or bool(_entries(outside_flows)),
+                "the Builder refusal is painted, or the file landed (base)",
+            )
+            await settle(pilot, 2)
+            flow_status = _painted_status(app)
+            await open_flow_execution(app, pilot)
+            mark = len(log.messages)
+            fx_panel.query_one("#fx_set_name", Input).value = "s"
+            fx_panel.query_one("#fx_save", Button).press()
+            await settled(
+                pilot,
+                lambda: SET_REFUSED in log.since(mark) or bool(_entries(outside_sets)),
+                "the Save Set refusal is painted, or the file landed (base)",
+            )
+            await settle(pilot, 2)
+            return flow_status, _painted_status(app), _entries(outside_flows), _entries(outside_sets)
+    
+>       flow_status, set_status, flows_files, sets_files = _drive(tmp_path, body)
+                                                           ^^^^^^^^^^^^^^^^^^^^^^
+
+../s19_i9mut/tests/test_b101_flow_names_ui.py:646: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i9mut/tests/test_b101_flow_names_ui.py:77: in _drive
+    return asyncio.run(_run())
+           ^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i9mut/tests/test_b101_flow_names_ui.py:75: in _run
+    return await body(app, pilot, project_dir, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i9mut/tests/test_b101_flow_names_ui.py:627: in body
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_at_i9_3_linked_homes_refuse_saves.<locals>.body.<locals>.<lambda> at 0x7fb59e27cfe0>
+failure = 'did not settle: the Builder refusal is painted, or the file landed (base)'
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: did not settle: the Builder refusal is painted, or the file landed (base)
+
+tests/support/timing.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_flow_names_ui.py::test_r_fb_save_8_1_refused_home_status
+FAILED tests/test_b101_flow_names_ui.py::test_at_i9_3_linked_homes_refuse_saves
+2 failed in 130.58s (0:02:10)
+
