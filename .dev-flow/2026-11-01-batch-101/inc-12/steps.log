@@ -4,3 +4,4 @@ E2 start 2026-11-06T20:10Z model=opus
 E2 end 2026-11-06T20:15Z model=opus graph=codewire/graph-inc12.md nodes=35 (12 changed, 1 new, 12 removed, 10 context) entities=11 (1 groups the 14 canvas grid helpers) edges=18; codewire_lint: not read=0
 E2 trace_check (E1/E2 records): 3 US, 7 active requirements (0 withdrawn), 8 gaps = 7 TEST (tests are E4) + 1 EVID (04-validation.md is E5); CASE 0, SLICE 0, US 0. LAN worktree s19_i12e1 and run folder removed.
 E1 rulings 2026-11-06T20:17Z orchestrator D-1..D-10 (D-2 A rules Inc 10a; D-5 B split into Inc 12 + 12b at the E3 correction)
+E3 rulings 2026-11-06T20:41Z orchestrator: architect FAIL (E3A-01 MAJOR), security PWN, ux PWN; rulings E3-rulings.md; correction + D-5 B split next (opus)
