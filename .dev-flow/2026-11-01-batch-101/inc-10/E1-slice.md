@@ -1,20 +1,20 @@
 # Inc 10a — E1 slice (E3 correction)
 
-Base `98d94d7`. Lines are base lines. E3: #16, #17 and #19 moved to `../inc-10b/E1-slice.md` (split); #20–#27 added. 3 source files of the 4 allowed; 24 functions (20 changed, 4 new). No module-level import changes (`painted_names` is already imported, `app.py:224`; `hex_row_bases` joins the existing `..render.hexview` import, `app.py:48`).
+Base `98d94d7`. Lines are base lines. E3: #16, #17 and #19 moved to `../inc-10b/E1-slice.md` (split); #20–#27 added. 3 source files of the 4 allowed; 25 functions (21 changed, 4 new). No module-level import changes (`painted_names` is already imported, `app.py:224`; `hex_row_bases` joins the existing `..render.hexview` import, `app.py:48`).
 
 ## 1. Files
 
 | File | Functions | Rows |
 |---|---|---|
 | `s19_app/tui/app.py` | 18 changed, 2 new (below) | S4, S5, S6 rows |
-| `s19_app/tui/segment_split_view.py` | `SplitJoinWindow.refresh_window` changed; `SplitJoinWindow.check_action` new | R-SEG-OPEN.1, .6, .7 |
+| `s19_app/tui/segment_split_view.py` | `SplitJoinWindow.refresh_window` changed; `SplitJoinWindow.check_action` new; `SplitJoinWindow.action_export` changed | R-SEG-OPEN.1, .6, .7 |
 | `s19_app/render/hexview.py` | `_collect_hex_rows` changed; `hex_row_bases` new | R-TUI-018.1, .3, R-TUI-007.8 |
 
 ## 2. Functions → rows
 
 | # | Function | File:line (base) | Change | Rows |
 |---|---|---|---|---|
-| 1 | `S19TuiApp.update_hex_view` | `app.py:19173-19213` | with a focus address: window start = #20's index (one view row above the target row, min 0) instead of the page floor; `#hex_scroll` reset to (0, 0) (`_reset_scroll_to_top`); `_goto_focus_address` cleared when it differs from the focus address. E3 A10-02: one clamp for both paths, `[0, len(view rows) − 1]` (the page floor at `:19191-19192` goes), so a render without a focus keeps a near-end window | R-TUI-018.1, .2, .3, .4, R-TUI-040.4, .8, .12, R-TUI-007.3, .5 |
+| 1 | `S19TuiApp.update_hex_view` | `app.py:19173-19213` | with a focus address: window start = #20's index (one view row above the target row, min 0) instead of the page floor; `#hex_scroll` reset to (0, 0) (`_reset_scroll_to_top`); `_goto_focus_address` cleared when a focus address that is not `None` differs from it (AR2-6 (a)). E3 A10-02: one clamp for both paths, `[0, len(view rows) − 1]` (the page floor at `:19191-19192` goes), so a render without a focus keeps a near-end window | R-TUI-018.1, .2, .3, .4, R-TUI-040.4, .8, .12, R-TUI-007.3, .5 |
 | 2 | `S19TuiApp.action_hex_page_next` | `app.py:10606-10637` | `start + page` when it is below the view-row count (#21), else the start is kept (was `min(max_start, start + page)` over the present rows) | R-TUI-007.3, .5, .8 |
 | 3 | `S19TuiApp.update_alt_hex_view` | `app.py:19247-19315` | new keyword-only `start_row: Optional[int] = None` (an index into the view rows; the failed-go-to re-render); the near-top start from #20; `_alt_first_visible_address` = the painted first view row; `_alt_goto_focus_address` cleared when a focus address that is not `None` differs from it | R-TUI-018.1, .3, .4, R-TUI-040.8, .11, .12 |
 | 4 | `S19TuiApp.update_mac_hex_view` | `app.py:19317-19358` | as #3 for the MAC view | R-TUI-040.8, .11, .12 |
@@ -40,6 +40,7 @@ Base `98d94d7`. Lines are base lines. E3: #16, #17 and #19 moved to `../inc-10b/
 | 25 | `SplitJoinWindow.check_action` (new) | `segment_split_view.py`, beside #18 | `False` while the window has `hidden`; else `super().check_action(action, parameters)` | R-SEG-OPEN.7 |
 | 26 | `hex_row_bases` (new, module) | `render/hexview.py`, before `_collect_hex_rows` | `(row_bases, row_bases_set=None, extra_addresses=None) -> List[int]`: the row list `_collect_hex_rows` builds today (`:192-207`), returned as is on the hot path (no copy) | R-TUI-018.1, R-TUI-007.8 |
 | 27 | `_collect_hex_rows` (module) | `render/hexview.py:148-247` | its row list from #26; output unchanged | R-TUI-007.8 |
+| 28 | `SplitJoinWindow.action_export` (changed) | `segment_split_view.py:2053-2081` | E3 SR2-1: returns at once while the window has `hidden`, before the export body, so Enter on the hidden `#sje_export` button exports nothing; `check_action` (I-6) does not reach this path | R-SEG-OPEN.7 |
 
 Not changed: `_jump_to_section`, `on_memory_map_panel_open_in_hex_requested`, `_handle_search` (their jumps go through #1); `_apply_goto`; `SplitJoinWindow.action_cycle_tab` (F-18 not reproduced, D-3) and `action_close_window` (its `action_show_screen` call gets the focus from #15); `_rehome_focus_after_load` (the load tails keep it; the unload now uses #24); `_resolve_focus_target`, `_fallback_focus_target`, `_focus_needs_rehome`; `_plan_project_save` and `_load_question_text` (they read the spine #12 builds).
 
@@ -55,7 +56,7 @@ Not changed: `_jump_to_section`, `on_memory_map_panel_open_in_hex_requested`, `_
 
 - **Inc 6** (`b101-inc6`, 30 functions, list in `inc-9/E1-slice.md` §4): after the split, none in common with 10a (`_note_image_bytes_written` is 10b's). No other function in common (`_apply_prepared_load`, `_on_project_saved` and the Patch Editor handlers are Inc 6's; Inc 10a reads them only).
 - **Inc 9** (`:3988-4572`, three flow save handlers): none in common.
-- **Inc 10b**: no function in common; both edit `app.py`, 10a merges first. Interfaces: `codewire/graph-inc10.md` (Interfaces with Inc 10b).
+- **Inc 10b**: no function in common; both edit `app.py` and `segment_split_view.py`, 10a merges first. Interfaces: `codewire/graph-inc10.md` (Interfaces with Inc 10b).
 - Main (with Incs 6 and 9) is merged into `b101-inc10` before E4.
 
 ## 5. Nodes touched (existing tests whose body may change; names kept)

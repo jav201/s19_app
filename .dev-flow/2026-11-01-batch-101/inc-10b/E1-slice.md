@@ -1,6 +1,6 @@
 # Inc 10b — E1 slice
 
-Records at base `98d94d7`; the hook is written against Inc 6's version (`b101-inc6`, `56593a30`). 2 source files of the 4 allowed; 5 functions (1 changed, 4 new). No module-level import changes.
+Records at base `98d94d7`; the hook is written against Inc 6's version (`b101-inc6`, `56593a30`). 2 source files of the 4 allowed; 5 functions (1 changed, 4 new). No module-level import changes except `Coordinate`, imported locally where #4 uses it (R2-7).
 
 ## 1. Files
 
@@ -16,7 +16,7 @@ Records at base `98d94d7`; the hook is written against Inc 6's version (`b101-in
 | 1 | `S19TuiApp._note_image_bytes_written` | `app.py:17910-17955` at `98d94d7`; `b101-inc6` `app.py:18315-` (Inc 6's body) | the Check Editor block switched from `except Exception: return` to the `checks = None` idiom (A10-08); then appended: `_refresh_hex_views_after_write()`, `_refresh_a2l_values_after_write()`, the Split / Join window's `note_image_bytes_written()` (a missing window skips only its own notice); never `refresh_window`, no focus call | all rows |
 | 2 | `S19TuiApp._refresh_hex_views_after_write` (new) | `app.py`, beside #1 | no file → return; `update_hex_view()` (no focus); `update_alt_hex_view(start_row=<index of _alt_first_visible_address in _hex_view_rows()>)`; the same for the MAC view; no scroll reset | R-TUI-004.7, .8, .9 |
 | 3 | `S19TuiApp._refresh_a2l_values_after_write` (new) | `app.py`, beside #1 | no A2L → return; `_a2l_enriched_key = None`; `_compute_a2l_enriched_tags()`; `_a2l_filtered_tags` re-pointed to the recomputed tags, same tags, same order, no re-filter; `_update_a2l_summary_buffer()` (S-8); `_repaint_a2l_tag_cells()` | R-A2L-048, -049, -105, -106 |
-| 4 | `S19TuiApp._repaint_a2l_tag_cells` (new) | `app.py`, beside `update_a2l_tags_view` (`:19840-19950`) | for each row of the shown page: the cells from `_build_a2l_table_cells` with the row's severity style; a cell whose text differs is written with `DataTable.update_cell_at(..., update_width=False)`; `_a2l_row_key_to_tag` re-pointed; the summary label recomputed with `update_a2l_tags_view`'s text; no `clear()`, no cursor or scroll call | R-A2L-048, -049, -105 |
+| 4 | `S19TuiApp._repaint_a2l_tag_cells` (new) | `app.py`, beside `update_a2l_tags_view` (`:19840-19950`) | for each row of the shown page: the cells from `_build_a2l_table_cells` with the row's severity style; a cell whose text differs is written with `DataTable.update_cell_at(..., update_width=True)` (R2-7); `_a2l_row_key_to_tag` re-pointed; the summary label recomputed with `update_a2l_tags_view`'s text; no `clear()`, no cursor or scroll call | R-A2L-048, -049, -105 |
 | 5 | `SplitJoinWindow.note_image_bytes_written` (new) | `segment_split_view.py`, beside `refresh_window` (`:1722-1746`) | while displayed: `self._bump()` (disarm and one sync); while hidden: `self._armed = False` only; no focus call, no selection reset | R-SEG-PREV.21, .22, R-SEG-EXP.15 |
 
 Not changed: `update_hex_view`, `update_alt_hex_view`, `update_mac_hex_view`, `_hex_view_rows` (Inc 10a's, used through I-3 and I-5); `_compute_a2l_enriched_tags`, `_update_a2l_summary_buffer`, `_build_a2l_table_cells`, `update_a2l_tags_view`, `on_data_table_row_highlighted`; `SplitJoinWindow._bump`, `_sync`, `refresh_window`.

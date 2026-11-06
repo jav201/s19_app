@@ -21,7 +21,7 @@ How to read it:
 | I-1 in-place write notice | `SplitJoinWindow.note_image_bytes_written(self) -> None`: public, no argument; while the window has no `hidden` class it calls `self._bump()` once (disarm and one `_sync`); while hidden it sets `self._armed = False` and does nothing else; it never focuses, never resets a selection and never calls `refresh_window` | G2 → G1 (`_note_image_bytes_written`) |
 | I-7 tag table repaint | `_repaint_a2l_tag_cells(self) -> None`: writes the shown page's cells in place; reads `_a2l_filtered_tags`, `_a2l_window_start`; never calls `DataTable.clear`, `move_cursor` or `scroll_to` | G1 internal |
 
-Interfaces with Inc 10a (10a merges first; both edit `app.py`; no function in common):
+Interfaces with Inc 10a (10a merges first; both edit `app.py` and `segment_split_view.py`; no function in common):
 
 | 10a item | What 10b relies on |
 |---|---|
@@ -87,13 +87,14 @@ S19TuiApp._repaint_a2l_tag_cells
 req: R-A2L-048, R-A2L-049, R-A2L-105
 in: —
 out: None
-func: new. `table = #a2l_tags_list`; for each row `i` of the shown page (`start = _a2l_window_start`, the page bounds `update_a2l_tags_view` uses): `tag = _a2l_filtered_tags[start + i]`; `cells = _build_a2l_table_cells(tag)` with the row's severity style (`_a2l_tag_row_severity`, `_severity_style`); each cell whose plain text or style differs from the table's is written with `table.update_cell_at(Coordinate(i, column), cell, update_width=False)`; `_a2l_row_key_to_tag[f"a2l:{start + i}"] = tag`; the summary label recomputed with `update_a2l_tags_view`'s text (`Page …  ·  <K> in image`). No `clear()`, no `move_cursor`, no `scroll_to`; no `RowHighlighted` is posted, so the detail card keeps its tag (it shows no value, R-TUI-069.1).
+func: new. `table = #a2l_tags_list`; for each row `i` of the shown page (`start = _a2l_window_start`, the page bounds `update_a2l_tags_view` uses): `tag = _a2l_filtered_tags[start + i]`; `cells = _build_a2l_table_cells(tag)` with the row's severity style (`_a2l_tag_row_severity`, `_severity_style`); each cell whose plain text or style differs from the table's is written with `table.update_cell_at(Coordinate(i, column), cell, update_width=True)` (R2-7: `update_width=True` only marks the column dimensions for update, so a written Raw or Physical value wider than its column's widest cell is not clipped; no cursor or scroll moves); `_a2l_row_key_to_tag[f"a2l:{start + i}"] = tag`; the summary label recomputed with `update_a2l_tags_view`'s text (`Page …  ·  <K> in image`). No `clear()`, no `move_cursor`, no `scroll_to`; no `RowHighlighted` is posted, so the detail card keeps its tag (it shows no value, R-TUI-069.1).
 module: s19_app/tui/app.py
-calls: S19TuiApp._build_a2l_table_cells, DataTable.update_cell_at
+calls: S19TuiApp._build_a2l_table_cells, DataTable.update_cell_at, Coordinate (imported locally, R2-7)
 examples: (R-A2L-049/1) first shown row = page row 30 before → page row 30 after (base P4 shape: `scroll_y` 30 → 0)
 examples: (R-A2L-049/2) filter on Raw, text `1`, first shown row page row 30 → page row 30 after
 examples: (R-A2L-105/1) cursor on page row 40 → cursor on page row 40, the detail card names the same tag (P4: cursor 40 → 0)
 examples: (R-A2L-048/1) the `VALUE_0001` row: Raw and Physical cells `108` → `147`; its other 14 cells unchanged, so not written
+examples: (R2-7) a written Raw value `108` → `1000` (wider than its column's widest cell) → `update_cell_at(..., update_width=True)` marks the column dimensions for update; the value is not clipped, no cursor or scroll moves
 
 ## Nodes — G2 split-join
 
