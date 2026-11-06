@@ -1,0 +1,22 @@
+=== Inc 5 E4 integration run: int-08-skip-reasons
+date: 2026-11-06T09:23:52Z
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree with the increment staged: 10e1b162b0a5dc96f303915522c7d22634237bdf
+staged files vs base: 25
+python: Python 3.11.18
+s19_app.__file__: <HOME>/work/s19_i5int/s19_app/__init__.py
+--- command: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -n 8 -m "not serial_timing" -rs tests/test_b101_designer_writes.py tests/test_b101_check_spec_keep.py tests/test_b101_symbol_reads.py tests/test_tui_check_editor.py tests/test_b97_check_editor.py tests/test_b102_parameter_picker.py tests/test_b102_bulk_add.py tests/test_b102_patch_picker.py tests/test_crc_designer_view.py tests/test_b101_designer_recompute.py tests/test_tui_patch_editor_v2.py tests/test_b97_patch_editor.py tests/test_b100_save_image.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 17%]
+........................................................................ [ 35%]
+........................................................................ [ 53%]
+........................................................................ [ 71%]
+.......................................s..............................s. [ 89%]
+.........s................s................                              [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_b100_save_image.py:960: msvcrt byte-range lock
+SKIPPED [3] tests/support/b100_links.py:30: directory junctions are a Windows-only test arm (PDR C-QA-6)
+399 passed, 4 skipped in 793.04s (0:13:13)
+=== exit code: 0

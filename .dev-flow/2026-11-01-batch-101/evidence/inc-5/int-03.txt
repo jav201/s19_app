@@ -1,0 +1,27 @@
+=== Inc 5 E4 integration run: int-03-base-known-failures
+date: 2026-11-06T09:11:33Z
+worktree HEAD (base, nothing applied): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree: 392b623db689d464faf5c3a4797eb58731ebad75
+python: Python 3.11.18
+s19_app.__file__: <HOME>/work/s19_i5base/s19_app/__init__.py
+--- command: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -m "not serial_timing" <2 nodes>
+E       AssertionError: the pre-change palette action set must equal the Inc-0 freeze.
+E         missing: []
+E         unexpected: ['a2l_describe_tag', 'confirm_attention']
+E       assert ['focus_palet...us_goto', ...] == ['focus_palet...us_goto', ...]
+E         
+E         At index 13 diff: 'a2l_describe_tag' != 'view_reports'
+E         Left contains 2 more items, first extra item: 'open_settings_menu'
+E         Use -v to get more diff
+E       AssertionError: baseline wrote []
+E       assert set() == {'20260710T12...ff-report.md'}
+E         
+E         Extra items in the right set:
+E         '20260710T120000Z-diff-report.html'
+E         '20260710T120000Z-diff-report.md'
+E         Use -v to get more diff
+FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+2 failed in 16.36s
+=== exit code: 1
+base worktree removed

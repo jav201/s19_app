@@ -1,0 +1,19 @@
+=== Inc 5 E4 integration run: int-05-base-known-snapshots
+date: 2026-11-06T09:16:05Z
+worktree HEAD (base, nothing applied): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree: 392b623db689d464faf5c3a4797eb58731ebad75
+python: Python 3.11.18
+s19_app.__file__: <HOME>/work/s19_i5base/s19_app/__init__.py
+--- command: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -m "not serial_timing" tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-80x24] tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-120x30]
+E       AssertionError: assert False
+E        +  where False = <function snap_compare.<locals>.compare at 0x7f4ea74e8d60>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}), terminal_size=(80, 24), run_before=<function _snapshot_run_before.<locals>.run_before at 0x7f4ea6fdab60>)
+E        +    where <function _snapshot_run_before.<locals>.run_before at 0x7f4ea6fdab60> = _snapshot_run_before('patch', 'comfortable', {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-154/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-ja...test-154/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-154/snapshot_public0/snap.s19')})
+E       AssertionError: assert False
+E        +  where False = <function snap_compare.<locals>.compare at 0x7f4ea6eaed40>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}), terminal_size=(120, 30), run_before=<function _snapshot_run_before.<locals>.run_before at 0x7f4ea5e35f80>)
+E        +    where <function _snapshot_run_before.<locals>.run_before at 0x7f4ea5e35f80> = _snapshot_run_before('patch', 'comfortable', {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-154/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/pytest-of-ja...test-154/snapshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-154/snapshot_public0/snap.s19')})
+2 snapshots failed.
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-120x30]
+2 failed in 6.52s
+=== exit code: 1
+base worktree removed

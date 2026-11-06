@@ -9,3 +9,4 @@ E3 correction 2026-11-06T07:29Z model=opus rulings SEC5-1..6 A-1..6 applied (tar
 E3 round2 2026-11-06T07:42Z security=opus PASS-WITH-NOTES (SEC5-1/2/3, A-1 closed; R2-1 backlog)
 E4 start 2026-11-06T07:42Z implementers model=deepseek-v4-pro (2 units: A app.py+crc_designer_view.py, B screens_directionb.py+guide) testers=sonnet x2 (designer writes; check editor) — orchestrator split the proposed single test file into two, one per tester
 E4 implementers end 2026-11-06T07:53Z model=deepseek-v4-pro (2 units, exit 0, py_compile OK, no deviations declared)
+E4 integration end 2026-11-06T09:42Z model=opus GREEN: int-01 58 passed (new files + symbol_reads); QC-BC 51 files 2428 passed; importers 24 files 488 passed; law guards 117 passed; serial_timing 58 passed; 4 known failures identical on base (int-03, int-05); no source or test-body change; registry 262->264 measured; LAN worktree removed
