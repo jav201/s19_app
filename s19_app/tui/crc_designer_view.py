@@ -701,6 +701,33 @@ class CrcDesignerPanel(ScrollableContainer):
         else:
             self._coverage_dirty = True
 
+    def note_image_bytes_written(self) -> None:
+        """Tell the designer the loaded image's bytes were written in place (Inc 5).
+
+        Summary:
+            The public in-place twin of the ``current_file`` watcher (I-1):
+            the app calls it after it wrote bytes into the loaded image in
+            place (an apply, a save-back or a Save project commit), and it
+            reuses :meth:`_on_image_changed`, which schedules a recompute
+            while the panel is displayed and marks the coverage stale
+            otherwise. It never computes synchronously and returns nothing.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Delegates to :meth:`_on_image_changed` (schedule a recompute
+              while displayed, else mark the coverage stale); no compute
+              here.
+
+        Dependencies:
+            Uses:
+                - :meth:`_on_image_changed`
+            Used by:
+                - ``S19TuiApp._note_image_bytes_written``
+        """
+        self._on_image_changed()
+
     def on_show(self) -> None:
         """Recompute once on display when the coverage is stale (Inc 13, E3 A-6).
 

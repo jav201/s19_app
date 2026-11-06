@@ -1,0 +1,1362 @@
+== e5c-01 RED on base: pristine c2cba35 copy + the new test files only; the E5 nodes
+2026-11-06T11:11:56Z
+tree: a copy (no git); see the label for its source
+s19_app.__file__ <HOME>/work/s19_i5c_red/s19_app/__init__.py
+python 3.11.18
+pytest tests/test_b101_check_spec_keep.py tests/test_b101_designer_writes.py -k test_r_chked_057_1 or test_r_chked_041_2_4 or test_r_chked_010_4 or test_at_i5_1 or test_at_i5_2 or test_at_i5_3 or test_r_chked_057_2 or test_r_chked_057_3 or test_r_crc_preview_002_5_9 or test_at_i5_4 -n 10 -q -rA -p no:cacheprovider
+bringing up nodes...
+bringing up nodes...
+
+FFFFFFF.FF                                                               [100%]
+=================================== FAILURES ===================================
+___________________ test_r_chked_041_2_4_entry_order_is_kept ___________________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen-gw0/test_r_chked_041_2_4_entry_ord0')
+facts = Facts(case=PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen-gw0/b101_inc5_case080'), image={0: 108, 1: 49, 2: 57, 3...ram(name='VALUE_0002', address=20, size=2), v3=Param(name='VALUE_0003', address=40, size=4), serial=12587004, moved=32)
+
+    def test_r_chked_041_2_4_entry_order_is_kept(tmp_path: Path, facts: Facts) -> None:
+        """Case R-CHKED-041.2/4 (E5 C-6, "in entry order"): case 08 and its A2L
+        loaded; a spec whose entries are ``VALUE_0002`` then ``VALUE_0001`` picked
+        -> included exactly ``[VALUE_0002, VALUE_0001]`` and the Fields lines in
+        that order.
+    
+        Why: every other spec lists its parameters in A2L order, so a build that
+        includes them in ledger order would pass there. Base: 0 included -> RED."""
+        entries = [(p.address, facts.image_bytes(p.address, p.size)) for p in (facts.v2, facts.v1)]
+    
+        async def scenario(app, pilot, log):
+            await open_session(pilot, app, facts, specs={"order.chk.json": spec_doc(entries)})
+            await pick_spec(pilot, app, log, "order.chk.json")
+            return included(app), param_lines(app)
+    
+        picks, lines = run(tmp_path, scenario)
+>       assert picks == [facts.v2.name, facts.v1.name], picks
+E       AssertionError: []
+E       assert [] == ['VALUE_0002', 'VALUE_0001']
+E         
+E         Right contains 2 more items, first extra item: 'VALUE_0002'
+E         Use -v to get more diff
+
+tests/test_b101_check_spec_keep.py:1480: AssertionError
+____________ test_r_chked_010_4_session_field_moved_stays_included _____________
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen-gw1/test_r_chked_010_4_session_fie0')
+facts = Facts(case=PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen-gw1/b101_inc5_case080'), image={0: 108, 1: 49, 2: 57, 3...ram(name='VALUE_0002', address=20, size=2), v3=Param(name='VALUE_0003', address=40, size=4), serial=12587004, moved=32)
+
+    def test_r_chked_010_4_session_field_moved_stays_included(tmp_path: Path, facts: Facts) -> None:
+        """Case R-CHKED-010/4 (E5 C-6, *still lists* for a field included in this
+        session): as /1; key ``1``, the planted moved A2L (``VALUE_0001`` at *A*)
+        loaded through the Load dialog, key ``=`` -> included exactly
+        ``[VALUE_0001, VALUE_0002]``, the Fields line ``◆ <A> VALUE_0001``, head
+        line ``3 fields: 2 params · 1 memory row``; Write writes *A* = the image
+        byte at *A*.
+    
+        Why: only the name counts for a field included in this session; the
+        spec-field demotion (R-CHKED-056) must not reach it. Base: the
+        repopulation clears the picks -> ``[]`` -> RED. Negative control: a
+        session field put in a memory row when it moves -> ``[VALUE_0002]`` -> RED."""
+        moved = planted_moved(facts, tmp_path)
+        a = facts.moved
+    
+        async def scenario(app, pilot, log):
+            await picked_session(pilot, app, log, facts, tmp_path)
+            await go_workspace(pilot, app)
+            await load_a2l_file(pilot, app, moved)
+            await enter_check_editor(pilot, app)
+            state = (included(app), param_lines(app), head(app), mem_rows(app))
+            _lines, written = await write_spec(pilot, app, log, "moved_session.chk.json")
+            return state, written
+    
+        (picks, lines, line, rows), written = run(tmp_path, scenario)
+>       assert picks == [facts.v1.name, facts.v2.name], picks
+E       AssertionError: []
+E       assert [] == ['VALUE_0001', 'VALUE_0002']
+E         
+E         Right contains 2 more items, first extra item: 'VALUE_0001'
+E         Use -v to get more diff
+
+tests/test_b101_check_spec_keep.py:1512: AssertionError
+____________ test_r_chked_057_1_apply_clears_the_validation_results ____________
+[gw2] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen-gw2/test_r_chked_057_1_apply_clear0')
+facts = Facts(case=PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen-gw2/b101_inc5_case080'), image={0: 108, 1: 49, 2: 57, 3...ram(name='VALUE_0002', address=20, size=2), v3=Param(name='VALUE_0003', address=40, size=4), serial=12587004, moved=32)
+
+    def test_r_chked_057_1_apply_clears_the_validation_results(tmp_path: Path, facts: Facts) -> None:
+        """Case R-CHKED-057/1 (E5 C-10, SEC E5-S1), driven by keys and clicks:
+        case 08 and its A2L loaded, the pilot spec picked, Validate clicked ->
+        ``Checks: 3 passed, 0 failed, 0 uncheckable``, the row ``0x0-0x0 expected
+        [6C] actual [6C] -> pass`` under ``validation complete``; key ``6``, a
+        Patch Editor apply of ``0x0`` = ``93``; key ``=`` -> 0 verdict rows, the
+        status line exactly ``Validate compares fields to the image``, no line
+        ``validation complete`` or ending ``-> pass``; Validate clicked again ->
+        ``Checks: 2 passed, 1 failed, 0 uncheckable`` and ``0x0-0x0 expected [6C]
+        actual [93] -> fail``.
+    
+        Why: after the write the old ``pass`` is false, and the operator would
+        trust it. Base: the card keeps ``validation complete`` and the ``-> pass``
+        row -> RED. Negative control: the in-place-write hook not telling the
+        Check Editor -> RED (M29)."""
+        v1 = facts.v1.address
+        original = facts.image[v1]
+        assert original != PATCH_BYTE
+        pass_row = f"0x{v1:X}-0x{v1:X} expected [{original:02X}] actual [{original:02X}] -> pass"
+        fail_row = f"0x{v1:X}-0x{v1:X} expected [{original:02X}] actual [{PATCH_BYTE:02X}] -> fail"
+    
+        async def scenario(app, pilot, log):
+            await open_session(pilot, app, facts, specs={PILOT: spec_doc(pilot_entries(facts))})
+            await pick_spec(pilot, app, log, PILOT)
+            first = await validate_by_click(pilot, app, log)
+            await apply_by_keys(pilot, app, log, tmp_path, v1, bytes([PATCH_BYTE]))
+            after = card(app)
+            again = await validate_by_click(pilot, app, log)
+            return first, after, again
+    
+        (lines1, (status1, rows1)), (status2, rows2), (lines3, (_s3, rows3)) = run(tmp_path, scenario)
+        assert "Checks: 3 passed, 0 failed, 0 uncheckable" in lines1, lines1
+        assert status1 == "validation complete" and pass_row in rows1, (status1, rows1)
+>       assert (status2, rows2) == (HINT, []), (status2, rows2)
+E       AssertionError: ('validation complete', ['0x0-0x0 expected [6C] actual [6C] -> pass', '0x14-0x15 expected [A0 BE] actual [A0 BE] -> pass', '0xC00FFC-0xC00FFF expected [FF FF FF FF] actual [FF FF FF FF] -> pass'])
+E       assert ('validation ...FF] -> pass']) == ('Validate co...he image', [])
+E         
+E         At index 0 diff: 'validation complete' != 'Validate compares fields to the image'
+E         Use -v to get more diff
+
+tests/test_b101_check_spec_keep.py:1562: AssertionError
+_________ test_at_i5_2_spec_comes_back_and_validate_reports_the_drift __________
+[gw4] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen-gw4/test_at_i5_2_spec_comes_back_a0')
+facts = Facts(case=PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen-gw4/b101_inc5_case080'), image={0: 108, 1: 49, 2: 57, 3...ram(name='VALUE_0002', address=20, size=2), v3=Param(name='VALUE_0003', address=40, size=4), serial=12587004, moved=32)
+
+    def test_at_i5_2_spec_comes_back_and_validate_reports_the_drift(
+        tmp_path: Path, facts: Facts
+    ) -> None:
+        """AT-I5-2 (US-CHK-SPEC-1, F-27 + D9-11; drives R-CHKED-041.2/1, 026/1,
+        026/2 black box): key ``6``, the change document's path typed, Load and
+        Apply clicked (``0x0`` -> ``93``); key ``=``; the pilot spec picked by keys
+        -> Fields lines with the names; the name typed and Write clicked -> the
+        file holds ``0x0`` ``6C``; Validate clicked -> ``Checks: 2 passed, 1
+        failed, 0 uncheckable`` and the painted drift row."""
+        v1 = facts.v1.address
+        fail_row = (
+            f"0x{v1:X}-0x{v1:X} expected [{facts.image[v1]:02X}] actual [{PATCH_BYTE:02X}] -> fail"
+        )
+    
+        async def scenario(app, pilot, log):
+            await open_session(pilot, app, facts, specs={PILOT: spec_doc(pilot_entries(facts))})
+            await apply_by_keys(pilot, app, log, tmp_path, v1, bytes([PATCH_BYTE]))
+            await pick_spec(pilot, app, log, PILOT)
+            flines = fields_lines(app)
+            _wl, entries = await write_by_click(pilot, app, log, "rewritten.chk.json")
+            vlines, (_status, rows) = await validate_by_click(pilot, app, log)
+            return flines, entries, vlines, rows
+    
+        flines, entries, vlines, rows = run(tmp_path, scenario)
+>       assert flines == [
+            HEAD_3,
+            f"◆ 0x{facts.v1.address:08X} {facts.v1.name}",
+            f"◆ 0x{facts.v2.address:08X} {facts.v2.name}",
+            f"▪ 0x{facts.serial:08X} u32 memory row",
+        ], flines
+E       AssertionError: ['3 fields: 0 params · 3 memory rows', '▪ 0x00000000 u8 memory row', '▪ 0x00000014 u16 memory row', '▪ 0x00C00FFC u32 memory row']
+E       assert ['3 fields: 0...2 memory row'] == ['3 fields: 2...2 memory row']
+E         
+E         At index 0 diff: '3 fields: 0 params · 3 memory rows' != '3 fields: 2 params · 1 memory row'
+E         Use -v to get more diff
+
+tests/test_b101_check_spec_keep.py:1632: AssertionError
+_____________ test_at_i5_1_picks_survive_write_and_return_by_keys ______________
+[gw3] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen-gw3/test_at_i5_1_picks_survive_wri0')
+facts = Facts(case=PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen-gw3/b101_inc5_case080'), image={0: 108, 1: 49, 2: 57, 3...ram(name='VALUE_0002', address=20, size=2), v3=Param(name='VALUE_0003', address=40, size=4), serial=12587004, moved=32)
+
+    def test_at_i5_1_picks_survive_write_and_return_by_keys(tmp_path: Path, facts: Facts) -> None:
+        """AT-I5-1 (US-CHK-KEEP-1; drives R-CHKED-054/1 and R-CHKED-010/2 black
+        box): key ``=``; ``VALUE_0001`` and ``VALUE_0002`` included by a click on
+        the ledger, arrows and ``space``; address, label and size typed and Add
+        clicked; the name typed and Write clicked -> ``Check Editor: wrote
+        pilot_fields.chk.json (3 fields, kind=check).``, head line and both ``✓``
+        unchanged; key ``1``, ``firmware.a2l`` through the Load dialog, key ``=``
+        -> included ``[VALUE_0001, VALUE_0002]``, head line and both ``✓``
+        unchanged."""
+    
+        def marks(app) -> tuple:
+            return head(app), mark_of(app, facts.v1.name), mark_of(app, facts.v2.name)
+    
+        async def scenario(app, pilot, log):
+            await open_session(pilot, app, facts)
+            await include_by_keys(pilot, app, facts.v1.name)
+            await include_by_keys(pilot, app, facts.v2.name)
+            await add_row_by_keys(pilot, app, facts.serial, "SERIAL", 4)
+            before = marks(app)
+            lines, entries = await write_by_click(pilot, app, log, PILOT)
+            after_write = marks(app)
+            await workspace_by_key(pilot, app)
+            await load_a2l_file(pilot, app, facts.case / "firmware.a2l")
+            app.screen.set_focus(None)
+            await enter_check_editor(pilot, app)
+            return before, lines, entries, after_write, marks(app), included(app), mem_rows(app)
+    
+        before, lines, entries, after_write, after_return, picks, rows = run(tmp_path, scenario)
+        assert before == (HEAD_3, "✓", "✓"), before
+        assert f"Check Editor: wrote {PILOT} (3 fields, kind=check)." in lines, lines
+        assert entries == pilot_entries(facts), entries
+        assert after_write == before, after_write
+>       assert after_return == before, after_return
+E       AssertionError: ('1 field: 0 params · 1 memory row', ' ', ' ')
+E       assert ('1 field: 0 ...ow', ' ', ' ') == ('3 fields: 2...ow', '✓', '✓')
+E         
+E         At index 0 diff: '1 field: 0 params · 1 memory row' != '3 fields: 2 params · 1 memory row'
+E         Use -v to get more diff
+
+tests/test_b101_check_spec_keep.py:1603: AssertionError
+_________________ test_at_i5_4_save_back_by_keys_then_display __________________
+[gw8] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+before = 9, expect = (1632358632, 3790052017)
+what = 'save-back by keys then display'
+
+    async def _expect_refresh(pilot, app, before: int, expect: Tuple[int, int], what: str) -> None:
+        """After the display that follows an in-place write: exactly one recompute,
+        the painted CRCs equal ``zlib.crc32`` of the session bytes and the literal
+        values the case states, and window line 2 says the same."""
+        try:
+>           await wait_designer_recompute(pilot, app, before, timeout=RECOMPUTE_TIMEOUT_S)
+
+tests/test_b101_designer_writes.py:372: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b101_designer.py:89: in wait_designer_recompute
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function wait_designer_recompute.<locals>.<lambda> at 0x7fa8d06cb7e0>
+failure = <function wait_designer_recompute.<locals>.<lambda> at 0x7fa8cb1732e0>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: no settled recompute: count 9 (snapshot 9), pending None
+
+tests/support/timing.py:66: AssertionError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen-gw8/test_at_i5_4_save_back_by_keys0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fa8d1f06bd0>
+
+    def test_at_i5_4_save_back_by_keys_then_display(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """AT-I5-4 (US-CRC-FRESH-2; drives R-CRC-PREVIEW-002.5/4 black box): the
+        Load dialog, key ``6``, the path typed, Load and Apply clicked (``AA``);
+        key ``0`` (``0x08DAAFB7``); the entry edited to ``BB`` by typed fields and
+        a click; the save-back name typed and the confirm reached by ``tab`` and
+        pressed by ``enter`` -> ``Saved + verified``, the file written; 0
+        recomputes before key ``0``; after key ``0`` exactly 1, concat
+        ``0x614BD0E8`` / fill ``0xE1E79AB1``."""
+        _set_quiet(monkeypatch, QUIET_SHORT_S)
+    
+        def make(folder: Path, image: Path):
+            async def scenario(app, pilot, log):
+                await _load_image_by_dialog(pilot, app, image)
+                await _load_document(pilot, app, log, folder, "d.changes.json", [AA_ENTRY])
+                assert await _apply(pilot, app, log, "Apply:") == "Apply: 1 applied, 0 skipped, 0 blocked"
+                await _fresh_designer_display(pilot, app, AFTER_AA)
+                await _entry_op(
+                    pilot, app, log, "#patch_entry_edit_button", "0x8003", "BB", "Patch Editor: entry updated."
+                )
+                before = designer_recomputes()
+                mark = len(log.messages)
+                await _confirm_save_back(pilot, app, "fixture-keys.s19", by_keys=True)
+                await _status_since(pilot, log, mark, lambda m: "Saved + verified" in m, "the save-back")
+                assert list((folder / "app").rglob("fixture-keys.s19")), "the save-back wrote no file"
+                assert app.current_file.mem_map[0x8003] == 0xBB
+                await _quiet(pilot)
+                assert designer_recomputes() == before, "a hidden CRC Designer recomputed"
+                await _press_rail(pilot, app, "0")
+                await _expect_refresh(pilot, app, before, AFTER_BB, "save-back by keys then display")
+    
+            return scenario
+    
+>       _reps(tmp_path, make)
+
+tests/test_b101_designer_writes.py:1012: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_designer_writes.py:408: in _reps
+    results.append(_run(base, make_scenario(folder, image)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_designer_writes.py:396: in _run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_designer_writes.py:1008: in scenario
+    await _expect_refresh(pilot, app, before, AFTER_BB, "save-back by keys then display")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+before = 9, expect = (1632358632, 3790052017)
+what = 'save-back by keys then display'
+
+    async def _expect_refresh(pilot, app, before: int, expect: Tuple[int, int], what: str) -> None:
+        """After the display that follows an in-place write: exactly one recompute,
+        the painted CRCs equal ``zlib.crc32`` of the session bytes and the literal
+        values the case states, and window line 2 says the same."""
+        try:
+            await wait_designer_recompute(pilot, app, before, timeout=RECOMPUTE_TIMEOUT_S)
+        except AssertionError as exc:
+>           raise AssertionError(
+                f"{what}: the CRC Designer never recomputed (count {designer_recomputes()}, "
+                f"snapshot {before}) - stale coverage; it paints {_preview_lines(app)[1:]!r}, "
+                f"the session bytes give concat 0x{oracle(app.current_file.mem_map)[0]:08X}"
+            ) from exc
+E           AssertionError: save-back by keys then display: the CRC Designer never recomputed (count 9, snapshot 9) - stale coverage; it paints ['concat: 0x08DAAFB7', 'fill:   0x35D90BC3'], the session bytes give concat 0x614BD0E8
+
+tests/test_b101_designer_writes.py:374: AssertionError
+________ test_at_i5_3_moved_parameter_keeps_the_declared_entry_by_keys _________
+[gw5] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen-gw5/test_at_i5_3_moved_parameter_k0')
+facts = Facts(case=PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen-gw5/b101_inc5_case080'), image={0: 108, 1: 49, 2: 57, 3...ram(name='VALUE_0002', address=20, size=2), v3=Param(name='VALUE_0003', address=40, size=4), serial=12587004, moved=32)
+
+    def test_at_i5_3_moved_parameter_keeps_the_declared_entry_by_keys(
+        tmp_path: Path, facts: Facts
+    ) -> None:
+        """AT-I5-3 (SEC5-1; drives R-CHKED-056/1 black box): as AT-I5-2 to the
+        pick; key ``1``; the planted moved A2L through the Load dialog; key ``=``
+        -> painted memory table and head line; the name typed and Write clicked ->
+        ``0x14`` ``A0 BE``, ``0xC00FFC`` ``FF FF FF FF``, ``0x0`` ``6C`` with the
+        image at ``0x0`` = ``93``, none at *A*."""
+        planted = planted_moved(facts, tmp_path)
+    
+        async def scenario(app, pilot, log):
+            await open_session(pilot, app, facts, specs={PILOT: spec_doc(pilot_entries(facts))})
+            await apply_by_keys(pilot, app, log, tmp_path, facts.v1.address, bytes([PATCH_BYTE]))
+            await pick_spec(pilot, app, log, PILOT)
+            await workspace_by_key(pilot, app)
+            await load_a2l_file(pilot, app, planted)
+            app.screen.set_focus(None)
+            await enter_check_editor(pilot, app)
+            state = (included(app), mem_rows(app), head(app))
+            lines, entries = await write_by_click(pilot, app, log, "kept.chk.json")
+            return state, lines, entries, app.current_file.mem_map[facts.v1.address]
+    
+        state, lines, entries, image_byte = run(tmp_path, scenario)
+        assert image_byte == PATCH_BYTE, image_byte
+>       assert_declared_entry_kept(facts, state, lines, entries)
+
+tests/test_b101_check_spec_keep.py:1667: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+f = Facts(case=PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen-gw5/b101_inc5_case080'), image={0: 108, 1: 49, 2: 57, 3...ram(name='VALUE_0002', address=20, size=2), v3=Param(name='VALUE_0003', address=40, size=4), serial=12587004, moved=32)
+state = ([], [('0x00000000', '—', 'u8'), ('0x00000014', '—', 'u16'), ('0x00C00FFC', '—', 'u32')], '3 fields: 0 params · 3 memory rows')
+lines = ['Check Editor: wrote kept.chk.json (3 fields, kind=check).']
+entries = [(0, b'\x93'), (20, b'\xa0\xbe'), (12587004, b'\xff\xff\xff\xff')]
+
+    def assert_declared_entry_kept(f: Facts, state, lines, entries) -> None:
+        picks, rows, line = state
+>       assert picks == [f.v2.name], picks
+E       AssertionError: []
+E       assert [] == ['VALUE_0002']
+E         
+E         Right contains one more item: 'VALUE_0002'
+E         Use -v to get more diff
+
+tests/test_b101_check_spec_keep.py:1219: AssertionError
+__________ test_r_chked_057_2_save_back_clears_the_validation_results __________
+[gw6] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen-gw6/test_r_chked_057_2_save_back_c0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7feaaebd8e10>
+
+    def test_r_chked_057_2_save_back_clears_the_validation_results(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Case R-CHKED-057/2: the fixture image, ``0x8003`` applied as ``AA``, a
+        memory row ``0x8003`` size 1 added and Validate clicked (``0x8003-0x8003
+        expected [AA] actual [AA] -> pass``); the entry edited to ``BB`` and *Save
+        patched image as* confirmed -> key ``=``: 0 verdict rows and the status
+        line ``Validate compares fields to the image``.
+    
+        Base: the ``-> pass`` row under ``validation complete`` stays -> RED.
+        Negative control: the hook not telling the Check Editor -> RED (M29)."""
+        _set_quiet(monkeypatch, QUIET_SHORT_S)
+        seen = []
+    
+        def make(folder: Path, image: Path):
+            async def scenario(app, pilot, log):
+                await _load_image_by_dialog(pilot, app, image)
+                await _load_document(pilot, app, log, folder, "d.changes.json", [AA_ENTRY])
+                assert await _apply(pilot, app, log, "Apply:") == "Apply: 1 applied, 0 skipped, 0 blocked"
+                first = await _validate_a_session_row(pilot, app, log)
+                await _entry_op(
+                    pilot, app, log, "#patch_entry_edit_button", "0x8003", "BB", "Patch Editor: entry updated."
+                )
+                await _save_back(pilot, app, log, "fixture-patched.s19", "Saved + verified")
+                assert app.current_file.mem_map[0x8003] == 0xBB
+                seen.append((first, await _card_after_return(pilot, app)))
+    
+            return scenario
+    
+        _reps(tmp_path, make)
+        for first, after in seen:
+>           _assert_cleared(first, after, "0x8003-0x8003 expected [AA] actual [AA] -> pass")
+
+tests/test_b101_designer_writes.py:860: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+first = (['Checks: 1 passed, 0 failed, 0 uncheckable'], ('validation complete', ['0x8003-0x8003 expected [AA] actual [AA] -> pass']))
+after = ('validation complete', ['0x8003-0x8003 expected [AA] actual [AA] -> pass'])
+row = '0x8003-0x8003 expected [AA] actual [AA] -> pass'
+
+    def _assert_cleared(first, after, row: str) -> None:
+        lines, (status, rows) = first
+        assert "Checks: 1 passed, 0 failed, 0 uncheckable" in lines, lines
+        assert status == "validation complete" and rows == [row], (status, rows)
+>       assert after == (HINT, []), f"stale validation results after the write: {after!r}"
+E       AssertionError: stale validation results after the write: ('validation complete', ['0x8003-0x8003 expected [AA] actual [AA] -> pass'])
+E       assert ('validation ...AA] -> pass']) == ('Validate co...he image', [])
+E         
+E         At index 0 diff: 'validation complete' != 'Validate compares fields to the image'
+E         Use -v to get more diff
+
+tests/test_b101_designer_writes.py:822: AssertionError
+_____ test_r_chked_057_3_save_project_commit_clears_the_validation_results _____
+[gw9] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen-gw9/test_r_chked_057_3_save_projec0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f350f48e310>
+
+    def test_r_chked_057_3_save_project_commit_clears_the_validation_results(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Case R-CHKED-057/3: as /2 inside an open project, then a Save project
+        commit by ``ctrl+s`` instead of the save-back -> key ``=``: 0 verdict rows
+        and the status line ``Validate compares fields to the image``.
+    
+        Base: the stale ``-> pass`` row stays -> RED. Negative control: M29."""
+        _set_quiet(monkeypatch, QUIET_SHORT_S)
+        seen = []
+    
+        def make(folder: Path, image: Path):
+            async def scenario(app, pilot, log):
+                await _load_image_by_dialog(pilot, app, image)
+                await _open_project(pilot, app, log)
+                await _load_document(pilot, app, log, folder, "d.changes.json", [AA_ENTRY])
+                assert await _apply(pilot, app, log, "Apply:") == "Apply: 1 applied, 0 skipped, 0 blocked"
+                first = await _validate_a_session_row(pilot, app, log)
+                await _entry_op(
+                    pilot, app, log, "#patch_entry_edit_button", "0x8003", "BB", "Patch Editor: entry updated."
+                )
+                await _show_rail(pilot, app, "1", "#loaded_slots")
+                await _save_project(pilot, app, log)
+                assert app.current_file.mem_map[0x8003] == 0xBB, "the commit did not write the BB"
+                seen.append((first, await _card_after_return(pilot, app)))
+    
+            return scenario
+    
+        _reps(tmp_path, make)
+        for first, after in seen:
+>           _assert_cleared(first, after, "0x8003-0x8003 expected [AA] actual [AA] -> pass")
+
+tests/test_b101_designer_writes.py:893: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+first = (['Checks: 1 passed, 0 failed, 0 uncheckable'], ('validation complete', ['0x8003-0x8003 expected [AA] actual [AA] -> pass']))
+after = ('validation complete', ['0x8003-0x8003 expected [AA] actual [AA] -> pass'])
+row = '0x8003-0x8003 expected [AA] actual [AA] -> pass'
+
+    def _assert_cleared(first, after, row: str) -> None:
+        lines, (status, rows) = first
+        assert "Checks: 1 passed, 0 failed, 0 uncheckable" in lines, lines
+        assert status == "validation complete" and rows == [row], (status, rows)
+>       assert after == (HINT, []), f"stale validation results after the write: {after!r}"
+E       AssertionError: stale validation results after the write: ('validation complete', ['0x8003-0x8003 expected [AA] actual [AA] -> pass'])
+E       assert ('validation ...AA] -> pass']) == ('Validate co...he image', [])
+E         
+E         At index 0 diff: 'validation complete' != 'Validate compares fields to the image'
+E         Use -v to get more diff
+
+tests/test_b101_designer_writes.py:822: AssertionError
+==================================== PASSES ====================================
+__ test_r_crc_preview_002_5_9_save_back_raising_after_the_adopt_ends_the_app ___
+[gw7] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+----------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ <HOME>/work/s19_i5c_red/s19_app/tui/app.py:5018 in                   │
+│ on_patch_editor_panel_save_back_decision                                     │
+│                                                                              │
+│    5015 │   │   │   )                                                        │
+│    5016 │   │   else:                                                        │
+│    5017 │   │   │   s0_header = None                                         │
+│ ❱  5018 │   │   result = self._change_service.save_patched(                  │
+│    5019 │   │   │   loaded.mem_map,                                          │
+│    5020 │   │   │   loaded.ranges,                                           │
+│    5021 │   │   │   dest_dir,                                                │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │ bytes_per_line = 32                                                      │ │
+│ │       dest_dir = PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen-gw… │ │
+│ │          event = SaveBackDecision()                                      │ │
+│ │         loaded = LoadedFile(                                             │ │
+│ │                  │                                                       │ │
+│ │                  path=PosixPath('/tmp/pytest-of-<USER>/pytest-225/pop… │ │
+│ │                  │   file_type='s19',                                    │ │
+│ │                  │   mem_map={                                           │ │
+│ │                  │   │   32768: 0,                                       │ │
+│ │                  │   │   32769: 1,                                       │ │
+│ │                  │   │   32770: 2,                                       │ │
+│ │                  │   │   32771: 187,                                     │ │
+│ │                  │   │   32772: 4,                                       │ │
+│ │                  │   │   32773: 5,                                       │ │
+│ │                  │   │   32774: 6,                                       │ │
+│ │                  │   │   32775: 7,                                       │ │
+│ │                  │   │   32784: 16,                                      │ │
+│ │                  │   │   32785: 17,                                      │ │
+│ │                  │   │   ... +6                                          │ │
+│ │                  │   },                                                  │ │
+│ │                  │   row_bases=[32768, 32784],                           │ │
+│ │                  │   ranges=[(32768, 32776), (32784, 32792)],            │ │
+│ │                  │   range_validity=[True, True],                        │ │
+│ │                  │   errors=[],                                          │ │
+│ │                  │   a2l_path=None,                                      │ │
+│ │                  │   a2l_data=None,                                      │ │
+│ │                  │   mac_path=None,                                      │ │
+│ │                  │   mac_records=[],                                     │ │
+│ │                  │   mac_diagnostics=[],                                 │ │
+│ │                  │   variant_id=None,                                    │ │
+│ │                  │   source_s0_header=b'',                               │ │
+│ │                  │   entropy_windows=[                                   │ │
+│ │                  │   │   EntropyWindow(                                  │ │
+│ │                  │   │   │   start=32768,                                │ │
+│ │                  │   │   │   end=32776,                                  │ │
+│ │                  │   │   │   sample_count=8,                             │ │
+│ │                  │   │   │   entropy=3.0,                                │ │
+│ │                  │   │   │   band='low',                                 │ │
+│ │                  │   │   │   low_confidence=True                         │ │
+│ │                  │   │   ),                                              │ │
+│ │                  │   │   EntropyWindow(                                  │ │
+│ │                  │   │   │   start=32784,                                │ │
+│ │                  │   │   │   end=32792,                                  │ │
+│ │                  │   │   │   sample_count=8,                             │ │
+│ │                  │   │   │   entropy=3.0,                                │ │
+│ │                  │   │   │   band='low',                                 │ │
+│ │                  │   │   │   low_confidence=True                         │ │
+│ │                  │   │   )                                               │ │
+│ │                  │   ],                                                  │ │
+│ │                  │   out_of_order_count=0,                               │ │
+│ │                  │   entry_point=0                                       │ │
+│ │                  )                                                       │ │
+│ │          panel = PatchEditorPanel(id='patch_editor_panel')               │ │
+│ │      s0_header = b'fixture-raise.s19'                                    │ │
+│ │           self = S19TuiApp(                                              │ │
+│ │                  │   title='Hex Edit Tool',                              │ │
+│ │                  │   classes={'-dark-mode'},                             │ │
+│ │                  │   pseudo_classes={'dark', 'focus'}                    │ │
+│ │                  )                                                       │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ <HOME>/work/s19_i5c_red/s19_app/tui/services/change_service.py:2618  │
+│ in save_patched                                                              │
+│                                                                              │
+│   2615 │   │   │   for record in summary.entries                             │
+│   2616 │   │   │   if record.disposition == DISPOSITION_APPLIED              │
+│   2617 │   │   )                                                             │
+│ ❱ 2618 │   │   return self.emit_and_verify(                                  │
+│   2619 │   │   │   mem_map,                                                  │
+│   2620 │   │   │   ranges,                                                   │
+│   2621 │   │   │   dest_dir,                                                 │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │          a2l_tags = None                                                 │ │
+│ │           blocked = 0                                                    │ │
+│ │    bytes_per_line = 32                                                   │ │
+│ │           derived = {                                                    │ │
+│ │                     │   32768: 0,                                        │ │
+│ │                     │   32769: 1,                                        │ │
+│ │                     │   32770: 2,                                        │ │
+│ │                     │   32771: 187,                                      │ │
+│ │                     │   32772: 4,                                        │ │
+│ │                     │   32773: 5,                                        │ │
+│ │                     │   32774: 6,                                        │ │
+│ │                     │   32775: 7,                                        │ │
+│ │                     │   32784: 16,                                       │ │
+│ │                     │   32785: 17,                                       │ │
+│ │                     │   ... +6                                           │ │
+│ │                     }                                                    │ │
+│ │          dest_dir = PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen… │ │
+│ │          filename = 'fixture-raise.s19'                                  │ │
+│ │             fresh = ChangeSummary(                                       │ │
+│ │                     │                                                    │ │
+│ │                     source_path=PosixPath('/tmp/pytest-of-<USER>/pyte… │ │
+│ │                     │   kind='change',                                   │ │
+│ │                     │   encoding='utf-8',                                │ │
+│ │                     │   value_mode='text',                               │ │
+│ │                     │                                                    │ │
+│ │                     timestamp_utc='2026-11-06T11:12:28.133733+00:00',    │ │
+│ │                     │   variant_id='fixture',                            │ │
+│ │                     │   counts={                                         │ │
+│ │                     │   │   'applied': 1,                                │ │
+│ │                     │   │   'skipped-partial': 0,                        │ │
+│ │                     │   │   'skipped-outside': 0,                        │ │
+│ │                     │   │   'skipped-no-image': 0,                       │ │
+│ │                     │   │   'blocked': 0                                 │ │
+│ │                     │   },                                               │ │
+│ │                     │   entries=[                                        │ │
+│ │                     │   │   ChangeSummaryEntry(                          │ │
+│ │                     │   │   │   entry_type='bytes',                      │ │
+│ │                     │   │   │   address_start=32771,                     │ │
+│ │                     │   │   │   address_end=32772,                       │ │
+│ │                     │   │   │   before_bytes=(3,),                       │ │
+│ │                     │   │   │   after_bytes=(187,),                      │ │
+│ │                     │   │   │   disposition='applied',                   │ │
+│ │                     │   │   │   linkage='standalone',                    │ │
+│ │                     │   │   │   linkage_symbol=None,                     │ │
+│ │                     │   │   │   symbol=None                              │ │
+│ │                     │   │   )                                            │ │
+│ │                     │   ],                                               │ │
+│ │                     │   issues=[],                                       │ │
+│ │                     │   saved_path=None,                                 │ │
+│ │                     │   verify_result=None,                              │ │
+│ │                     │   source_image_path=None                           │ │
+│ │                     )                                                    │ │
+│ │       mac_records = []                                                   │ │
+│ │           mem_map = {                                                    │ │
+│ │                     │   32768: 0,                                        │ │
+│ │                     │   32769: 1,                                        │ │
+│ │                     │   32770: 2,                                        │ │
+│ │                     │   32771: 187,                                      │ │
+│ │                     │   32772: 4,                                        │ │
+│ │                     │   32773: 5,                                        │ │
+│ │                     │   32774: 6,                                        │ │
+│ │                     │   32775: 7,                                        │ │
+│ │                     │   32784: 16,                                       │ │
+│ │                     │   32785: 17,                                       │ │
+│ │                     │   ... +6                                           │ │
+│ │                     }                                                    │ │
+│ │             prior = ChangeSummary(                                       │ │
+│ │                     │                                                    │ │
+│ │                     source_path=PosixPath('/tmp/pytest-of-<USER>/pyte… │ │
+│ │                     │   kind='change',                                   │ │
+│ │                     │   encoding='utf-8',                                │ │
+│ │                     │   value_mode='text',                               │ │
+│ │                     │                                                    │ │
+│ │                     timestamp_utc='2026-11-06T11:12:18.571177+00:00',    │ │
+│ │                     │   variant_id='fixture',                            │ │
+│ │                     │   counts={                                         │ │
+│ │                     │   │   'applied': 1,                                │ │
+│ │                     │   │   'skipped-partial': 0,                        │ │
+│ │                     │   │   'skipped-outside': 0,                        │ │
+│ │                     │   │   'skipped-no-image': 0,                       │ │
+│ │                     │   │   'blocked': 0                                 │ │
+│ │                     │   },                                               │ │
+│ │                     │   entries=[                                        │ │
+│ │                     │   │   ChangeSummaryEntry(                          │ │
+│ │                     │   │   │   entry_type='bytes',                      │ │
+│ │                     │   │   │   address_start=32771,                     │ │
+│ │                     │   │   │   address_end=32772,                       │ │
+│ │                     │   │   │   before_bytes=(3,),                       │ │
+│ │                     │   │   │   after_bytes=(170,),                      │ │
+│ │                     │   │   │   disposition='applied',                   │ │
+│ │                     │   │   │   linkage='standalone',                    │ │
+│ │                     │   │   │   linkage_symbol=None,                     │ │
+│ │                     │   │   │   symbol=None                              │ │
+│ │                     │   │   )                                            │ │
+│ │                     │   ],                                               │ │
+│ │                     │   issues=[],                                       │ │
+│ │                     │   saved_path=None,                                 │ │
+│ │                     │   verify_result=None,                              │ │
+│ │                     │   source_image_path=None                           │ │
+│ │                     )                                                    │ │
+│ │            ranges = [(32768, 32776), (32784, 32792)]                     │ │
+│ │     reuse_summary = False                                                │ │
+│ │         s0_header = b'fixture-raise.s19'                                 │ │
+│ │              self = <s19_app.tui.services.change_service.ChangeService   │ │
+│ │                     object at 0x7f53188a4250>                            │ │
+│ │ source_image_path = PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen… │ │
+│ │       source_kind = 's19'                                                │ │
+│ │           summary = ChangeSummary(                                       │ │
+│ │                     │                                                    │ │
+│ │                     source_path=PosixPath('/tmp/pytest-of-<USER>/pyte… │ │
+│ │                     │   kind='change',                                   │ │
+│ │                     │   encoding='utf-8',                                │ │
+│ │                     │   value_mode='text',                               │ │
+│ │                     │                                                    │ │
+│ │                     timestamp_utc='2026-11-06T11:12:28.133733+00:00',    │ │
+│ │                     │   variant_id='fixture',                            │ │
+│ │                     │   counts={                                         │ │
+│ │                     │   │   'applied': 1,                                │ │
+│ │                     │   │   'skipped-partial': 0,                        │ │
+│ │                     │   │   'skipped-outside': 0,                        │ │
+│ │                     │   │   'skipped-no-image': 0,                       │ │
+│ │                     │   │   'blocked': 0                                 │ │
+│ │                     │   },                                               │ │
+│ │                     │   entries=[                                        │ │
+│ │                     │   │   ChangeSummaryEntry(                          │ │
+│ │                     │   │   │   entry_type='bytes',                      │ │
+│ │                     │   │   │   address_start=32771,                     │ │
+│ │                     │   │   │   address_end=32772,                       │ │
+│ │                     │   │   │   before_bytes=(3,),                       │ │
+│ │                     │   │   │   after_bytes=(187,),                      │ │
+│ │                     │   │   │   disposition='applied',                   │ │
+│ │                     │   │   │   linkage='standalone',                    │ │
+│ │                     │   │   │   linkage_symbol=None,                     │ │
+│ │                     │   │   │   symbol=None                              │ │
+│ │                     │   │   )                                            │ │
+│ │                     │   ],                                               │ │
+│ │                     │   issues=[],                                       │ │
+│ │                     │   saved_path=None,                                 │ │
+│ │                     │   verify_result=None,                              │ │
+│ │                     │   source_image_path=None                           │ │
+│ │                     )                                                    │ │
+│ │     workarea_root = PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen… │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ <HOME>/work/s19_i5c_red/tests/test_b101_designer_writes.py:937 in    │
+│ raise_after_adopt                                                            │
+│                                                                              │
+│    934 │   _set_quiet(monkeypatch, QUIET_SHORT_S)                            │
+│    935 │                                                                     │
+│    936 │   def raise_after_adopt(self, *args, **kwargs):                     │
+│ ❱  937 │   │   raise RuntimeError("probe after adopt")                       │
+│    938 │                                                                     │
+│    939 │   monkeypatch.setattr(change_service_module.ChangeService, "emit_an │
+│    940 │   seen = {}                                                         │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │   args = (                                                               │ │
+│ │          │   {                                                           │ │
+│ │          │   │   32768: 0,                                               │ │
+│ │          │   │   32769: 1,                                               │ │
+│ │          │   │   32770: 2,                                               │ │
+│ │          │   │   32771: 187,                                             │ │
+│ │          │   │   32772: 4,                                               │ │
+│ │          │   │   32773: 5,                                               │ │
+│ │          │   │   32774: 6,                                               │ │
+│ │          │   │   32775: 7,                                               │ │
+│ │          │   │   32784: 16,                                              │ │
+│ │          │   │   32785: 17,                                              │ │
+│ │          │   │   ... +6                                                  │ │
+│ │          │   },                                                          │ │
+│ │          │   [(32768, 32776), (32784, 32792)],                           │ │
+│ │          │                                                               │ │
+│ │          PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen-gw7/test_r… │ │
+│ │          │   'fixture-raise.s19'                                         │ │
+│ │          )                                                               │ │
+│ │ kwargs = {                                                               │ │
+│ │          │   'source_kind': 's19',                                       │ │
+│ │          │   'bytes_per_line': 32,                                       │ │
+│ │          │   's0_header': b'fixture-raise.s19',                          │ │
+│ │          │   'source_image_path':                                        │ │
+│ │          PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen-gw7/test_r… │ │
+│ │          │   'workarea_root':                                            │ │
+│ │          PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen-gw7/test_r… │ │
+│ │          }                                                               │ │
+│ │   self = <s19_app.tui.services.change_service.ChangeService object at    │ │
+│ │          0x7f53188a4250>                                                 │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+╰──────────────────────────────────────────────────────────────────────────────╯
+RuntimeError: probe after adopt
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ <HOME>/work/s19_i5c_red/s19_app/tui/app.py:5018 in                   │
+│ on_patch_editor_panel_save_back_decision                                     │
+│                                                                              │
+│    5015 │   │   │   )                                                        │
+│    5016 │   │   else:                                                        │
+│    5017 │   │   │   s0_header = None                                         │
+│ ❱  5018 │   │   result = self._change_service.save_patched(                  │
+│    5019 │   │   │   loaded.mem_map,                                          │
+│    5020 │   │   │   loaded.ranges,                                           │
+│    5021 │   │   │   dest_dir,                                                │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │ bytes_per_line = 32                                                      │ │
+│ │       dest_dir = PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen-gw… │ │
+│ │          event = SaveBackDecision()                                      │ │
+│ │         loaded = LoadedFile(                                             │ │
+│ │                  │                                                       │ │
+│ │                  path=PosixPath('/tmp/pytest-of-<USER>/pytest-225/pop… │ │
+│ │                  │   file_type='s19',                                    │ │
+│ │                  │   mem_map={                                           │ │
+│ │                  │   │   32768: 0,                                       │ │
+│ │                  │   │   32769: 1,                                       │ │
+│ │                  │   │   32770: 2,                                       │ │
+│ │                  │   │   32771: 187,                                     │ │
+│ │                  │   │   32772: 4,                                       │ │
+│ │                  │   │   32773: 5,                                       │ │
+│ │                  │   │   32774: 6,                                       │ │
+│ │                  │   │   32775: 7,                                       │ │
+│ │                  │   │   32784: 16,                                      │ │
+│ │                  │   │   32785: 17,                                      │ │
+│ │                  │   │   ... +6                                          │ │
+│ │                  │   },                                                  │ │
+│ │                  │   row_bases=[32768, 32784],                           │ │
+│ │                  │   ranges=[(32768, 32776), (32784, 32792)],            │ │
+│ │                  │   range_validity=[True, True],                        │ │
+│ │                  │   errors=[],                                          │ │
+│ │                  │   a2l_path=None,                                      │ │
+│ │                  │   a2l_data=None,                                      │ │
+│ │                  │   mac_path=None,                                      │ │
+│ │                  │   mac_records=[],                                     │ │
+│ │                  │   mac_diagnostics=[],                                 │ │
+│ │                  │   variant_id=None,                                    │ │
+│ │                  │   source_s0_header=b'',                               │ │
+│ │                  │   entropy_windows=[                                   │ │
+│ │                  │   │   EntropyWindow(                                  │ │
+│ │                  │   │   │   start=32768,                                │ │
+│ │                  │   │   │   end=32776,                                  │ │
+│ │                  │   │   │   sample_count=8,                             │ │
+│ │                  │   │   │   entropy=3.0,                                │ │
+│ │                  │   │   │   band='low',                                 │ │
+│ │                  │   │   │   low_confidence=True                         │ │
+│ │                  │   │   ),                                              │ │
+│ │                  │   │   EntropyWindow(                                  │ │
+│ │                  │   │   │   start=32784,                                │ │
+│ │                  │   │   │   end=32792,                                  │ │
+│ │                  │   │   │   sample_count=8,                             │ │
+│ │                  │   │   │   entropy=3.0,                                │ │
+│ │                  │   │   │   band='low',                                 │ │
+│ │                  │   │   │   low_confidence=True                         │ │
+│ │                  │   │   )                                               │ │
+│ │                  │   ],                                                  │ │
+│ │                  │   out_of_order_count=0,                               │ │
+│ │                  │   entry_point=0                                       │ │
+│ │                  )                                                       │ │
+│ │          panel = PatchEditorPanel(id='patch_editor_panel')               │ │
+│ │      s0_header = b'fixture-raise.s19'                                    │ │
+│ │           self = S19TuiApp(                                              │ │
+│ │                  │   title='Hex Edit Tool',                              │ │
+│ │                  │   classes={'-dark-mode'},                             │ │
+│ │                  │   pseudo_classes={'dark', 'focus'}                    │ │
+│ │                  )                                                       │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ <HOME>/work/s19_i5c_red/s19_app/tui/services/change_service.py:2618  │
+│ in save_patched                                                              │
+│                                                                              │
+│   2615 │   │   │   for record in summary.entries                             │
+│   2616 │   │   │   if record.disposition == DISPOSITION_APPLIED              │
+│   2617 │   │   )                                                             │
+│ ❱ 2618 │   │   return self.emit_and_verify(                                  │
+│   2619 │   │   │   mem_map,                                                  │
+│   2620 │   │   │   ranges,                                                   │
+│   2621 │   │   │   dest_dir,                                                 │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │          a2l_tags = None                                                 │ │
+│ │           blocked = 0                                                    │ │
+│ │    bytes_per_line = 32                                                   │ │
+│ │           derived = {                                                    │ │
+│ │                     │   32768: 0,                                        │ │
+│ │                     │   32769: 1,                                        │ │
+│ │                     │   32770: 2,                                        │ │
+│ │                     │   32771: 187,                                      │ │
+│ │                     │   32772: 4,                                        │ │
+│ │                     │   32773: 5,                                        │ │
+│ │                     │   32774: 6,                                        │ │
+│ │                     │   32775: 7,                                        │ │
+│ │                     │   32784: 16,                                       │ │
+│ │                     │   32785: 17,                                       │ │
+│ │                     │   ... +6                                           │ │
+│ │                     }                                                    │ │
+│ │          dest_dir = PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen… │ │
+│ │          filename = 'fixture-raise.s19'                                  │ │
+│ │             fresh = ChangeSummary(                                       │ │
+│ │                     │                                                    │ │
+│ │                     source_path=PosixPath('/tmp/pytest-of-<USER>/pyte… │ │
+│ │                     │   kind='change',                                   │ │
+│ │                     │   encoding='utf-8',                                │ │
+│ │                     │   value_mode='text',                               │ │
+│ │                     │                                                    │ │
+│ │                     timestamp_utc='2026-11-06T11:12:57.163374+00:00',    │ │
+│ │                     │   variant_id='fixture',                            │ │
+│ │                     │   counts={                                         │ │
+│ │                     │   │   'applied': 1,                                │ │
+│ │                     │   │   'skipped-partial': 0,                        │ │
+│ │                     │   │   'skipped-outside': 0,                        │ │
+│ │                     │   │   'skipped-no-image': 0,                       │ │
+│ │                     │   │   'blocked': 0                                 │ │
+│ │                     │   },                                               │ │
+│ │                     │   entries=[                                        │ │
+│ │                     │   │   ChangeSummaryEntry(                          │ │
+│ │                     │   │   │   entry_type='bytes',                      │ │
+│ │                     │   │   │   address_start=32771,                     │ │
+│ │                     │   │   │   address_end=32772,                       │ │
+│ │                     │   │   │   before_bytes=(3,),                       │ │
+│ │                     │   │   │   after_bytes=(187,),                      │ │
+│ │                     │   │   │   disposition='applied',                   │ │
+│ │                     │   │   │   linkage='standalone',                    │ │
+│ │                     │   │   │   linkage_symbol=None,                     │ │
+│ │                     │   │   │   symbol=None                              │ │
+│ │                     │   │   )                                            │ │
+│ │                     │   ],                                               │ │
+│ │                     │   issues=[],                                       │ │
+│ │                     │   saved_path=None,                                 │ │
+│ │                     │   verify_result=None,                              │ │
+│ │                     │   source_image_path=None                           │ │
+│ │                     )                                                    │ │
+│ │       mac_records = []                                                   │ │
+│ │           mem_map = {                                                    │ │
+│ │                     │   32768: 0,                                        │ │
+│ │                     │   32769: 1,                                        │ │
+│ │                     │   32770: 2,                                        │ │
+│ │                     │   32771: 187,                                      │ │
+│ │                     │   32772: 4,                                        │ │
+│ │                     │   32773: 5,                                        │ │
+│ │                     │   32774: 6,                                        │ │
+│ │                     │   32775: 7,                                        │ │
+│ │                     │   32784: 16,                                       │ │
+│ │                     │   32785: 17,                                       │ │
+│ │                     │   ... +6                                           │ │
+│ │                     }                                                    │ │
+│ │             prior = ChangeSummary(                                       │ │
+│ │                     │                                                    │ │
+│ │                     source_path=PosixPath('/tmp/pytest-of-<USER>/pyte… │ │
+│ │                     │   kind='change',                                   │ │
+│ │                     │   encoding='utf-8',                                │ │
+│ │                     │   value_mode='text',                               │ │
+│ │                     │                                                    │ │
+│ │                     timestamp_utc='2026-11-06T11:12:48.359232+00:00',    │ │
+│ │                     │   variant_id='fixture',                            │ │
+│ │                     │   counts={                                         │ │
+│ │                     │   │   'applied': 1,                                │ │
+│ │                     │   │   'skipped-partial': 0,                        │ │
+│ │                     │   │   'skipped-outside': 0,                        │ │
+│ │                     │   │   'skipped-no-image': 0,                       │ │
+│ │                     │   │   'blocked': 0                                 │ │
+│ │                     │   },                                               │ │
+│ │                     │   entries=[                                        │ │
+│ │                     │   │   ChangeSummaryEntry(                          │ │
+│ │                     │   │   │   entry_type='bytes',                      │ │
+│ │                     │   │   │   address_start=32771,                     │ │
+│ │                     │   │   │   address_end=32772,                       │ │
+│ │                     │   │   │   before_bytes=(3,),                       │ │
+│ │                     │   │   │   after_bytes=(170,),                      │ │
+│ │                     │   │   │   disposition='applied',                   │ │
+│ │                     │   │   │   linkage='standalone',                    │ │
+│ │                     │   │   │   linkage_symbol=None,                     │ │
+│ │                     │   │   │   symbol=None                              │ │
+│ │                     │   │   )                                            │ │
+│ │                     │   ],                                               │ │
+│ │                     │   issues=[],                                       │ │
+│ │                     │   saved_path=None,                                 │ │
+│ │                     │   verify_result=None,                              │ │
+│ │                     │   source_image_path=None                           │ │
+│ │                     )                                                    │ │
+│ │            ranges = [(32768, 32776), (32784, 32792)]                     │ │
+│ │     reuse_summary = False                                                │ │
+│ │         s0_header = b'fixture-raise.s19'                                 │ │
+│ │              self = <s19_app.tui.services.change_service.ChangeService   │ │
+│ │                     object at 0x7f53188a41d0>                            │ │
+│ │ source_image_path = PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen… │ │
+│ │       source_kind = 's19'                                                │ │
+│ │           summary = ChangeSummary(                                       │ │
+│ │                     │                                                    │ │
+│ │                     source_path=PosixPath('/tmp/pytest-of-<USER>/pyte… │ │
+│ │                     │   kind='change',                                   │ │
+│ │                     │   encoding='utf-8',                                │ │
+│ │                     │   value_mode='text',                               │ │
+│ │                     │                                                    │ │
+│ │                     timestamp_utc='2026-11-06T11:12:57.163374+00:00',    │ │
+│ │                     │   variant_id='fixture',                            │ │
+│ │                     │   counts={                                         │ │
+│ │                     │   │   'applied': 1,                                │ │
+│ │                     │   │   'skipped-partial': 0,                        │ │
+│ │                     │   │   'skipped-outside': 0,                        │ │
+│ │                     │   │   'skipped-no-image': 0,                       │ │
+│ │                     │   │   'blocked': 0                                 │ │
+│ │                     │   },                                               │ │
+│ │                     │   entries=[                                        │ │
+│ │                     │   │   ChangeSummaryEntry(                          │ │
+│ │                     │   │   │   entry_type='bytes',                      │ │
+│ │                     │   │   │   address_start=32771,                     │ │
+│ │                     │   │   │   address_end=32772,                       │ │
+│ │                     │   │   │   before_bytes=(3,),                       │ │
+│ │                     │   │   │   after_bytes=(187,),                      │ │
+│ │                     │   │   │   disposition='applied',                   │ │
+│ │                     │   │   │   linkage='standalone',                    │ │
+│ │                     │   │   │   linkage_symbol=None,                     │ │
+│ │                     │   │   │   symbol=None                              │ │
+│ │                     │   │   )                                            │ │
+│ │                     │   ],                                               │ │
+│ │                     │   issues=[],                                       │ │
+│ │                     │   saved_path=None,                                 │ │
+│ │                     │   verify_result=None,                              │ │
+│ │                     │   source_image_path=None                           │ │
+│ │                     )                                                    │ │
+│ │     workarea_root = PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen… │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ <HOME>/work/s19_i5c_red/tests/test_b101_designer_writes.py:937 in    │
+│ raise_after_adopt                                                            │
+│                                                                              │
+│    934 │   _set_quiet(monkeypatch, QUIET_SHORT_S)                            │
+│    935 │                                                                     │
+│    936 │   def raise_after_adopt(self, *args, **kwargs):                     │
+│ ❱  937 │   │   raise RuntimeError("probe after adopt")                       │
+│    938 │                                                                     │
+│    939 │   monkeypatch.setattr(change_service_module.ChangeService, "emit_an │
+│    940 │   seen = {}                                                         │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │   args = (                                                               │ │
+│ │          │   {                                                           │ │
+│ │          │   │   32768: 0,                                               │ │
+│ │          │   │   32769: 1,                                               │ │
+│ │          │   │   32770: 2,                                               │ │
+│ │          │   │   32771: 187,                                             │ │
+│ │          │   │   32772: 4,                                               │ │
+│ │          │   │   32773: 5,                                               │ │
+│ │          │   │   32774: 6,                                               │ │
+│ │          │   │   32775: 7,                                               │ │
+│ │          │   │   32784: 16,                                              │ │
+│ │          │   │   32785: 17,                                              │ │
+│ │          │   │   ... +6                                                  │ │
+│ │          │   },                                                          │ │
+│ │          │   [(32768, 32776), (32784, 32792)],                           │ │
+│ │          │                                                               │ │
+│ │          PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen-gw7/test_r… │ │
+│ │          │   'fixture-raise.s19'                                         │ │
+│ │          )                                                               │ │
+│ │ kwargs = {                                                               │ │
+│ │          │   'source_kind': 's19',                                       │ │
+│ │          │   'bytes_per_line': 32,                                       │ │
+│ │          │   's0_header': b'fixture-raise.s19',                          │ │
+│ │          │   'source_image_path':                                        │ │
+│ │          PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen-gw7/test_r… │ │
+│ │          │   'workarea_root':                                            │ │
+│ │          PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen-gw7/test_r… │ │
+│ │          }                                                               │ │
+│ │   self = <s19_app.tui.services.change_service.ChangeService object at    │ │
+│ │          0x7f53188a41d0>                                                 │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+╰──────────────────────────────────────────────────────────────────────────────╯
+RuntimeError: probe after adopt
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ <HOME>/work/s19_i5c_red/s19_app/tui/app.py:5018 in                   │
+│ on_patch_editor_panel_save_back_decision                                     │
+│                                                                              │
+│    5015 │   │   │   )                                                        │
+│    5016 │   │   else:                                                        │
+│    5017 │   │   │   s0_header = None                                         │
+│ ❱  5018 │   │   result = self._change_service.save_patched(                  │
+│    5019 │   │   │   loaded.mem_map,                                          │
+│    5020 │   │   │   loaded.ranges,                                           │
+│    5021 │   │   │   dest_dir,                                                │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │ bytes_per_line = 32                                                      │ │
+│ │       dest_dir = PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen-gw… │ │
+│ │          event = SaveBackDecision()                                      │ │
+│ │         loaded = LoadedFile(                                             │ │
+│ │                  │                                                       │ │
+│ │                  path=PosixPath('/tmp/pytest-of-<USER>/pytest-225/pop… │ │
+│ │                  │   file_type='s19',                                    │ │
+│ │                  │   mem_map={                                           │ │
+│ │                  │   │   32768: 0,                                       │ │
+│ │                  │   │   32769: 1,                                       │ │
+│ │                  │   │   32770: 2,                                       │ │
+│ │                  │   │   32771: 187,                                     │ │
+│ │                  │   │   32772: 4,                                       │ │
+│ │                  │   │   32773: 5,                                       │ │
+│ │                  │   │   32774: 6,                                       │ │
+│ │                  │   │   32775: 7,                                       │ │
+│ │                  │   │   32784: 16,                                      │ │
+│ │                  │   │   32785: 17,                                      │ │
+│ │                  │   │   ... +6                                          │ │
+│ │                  │   },                                                  │ │
+│ │                  │   row_bases=[32768, 32784],                           │ │
+│ │                  │   ranges=[(32768, 32776), (32784, 32792)],            │ │
+│ │                  │   range_validity=[True, True],                        │ │
+│ │                  │   errors=[],                                          │ │
+│ │                  │   a2l_path=None,                                      │ │
+│ │                  │   a2l_data=None,                                      │ │
+│ │                  │   mac_path=None,                                      │ │
+│ │                  │   mac_records=[],                                     │ │
+│ │                  │   mac_diagnostics=[],                                 │ │
+│ │                  │   variant_id=None,                                    │ │
+│ │                  │   source_s0_header=b'',                               │ │
+│ │                  │   entropy_windows=[                                   │ │
+│ │                  │   │   EntropyWindow(                                  │ │
+│ │                  │   │   │   start=32768,                                │ │
+│ │                  │   │   │   end=32776,                                  │ │
+│ │                  │   │   │   sample_count=8,                             │ │
+│ │                  │   │   │   entropy=3.0,                                │ │
+│ │                  │   │   │   band='low',                                 │ │
+│ │                  │   │   │   low_confidence=True                         │ │
+│ │                  │   │   ),                                              │ │
+│ │                  │   │   EntropyWindow(                                  │ │
+│ │                  │   │   │   start=32784,                                │ │
+│ │                  │   │   │   end=32792,                                  │ │
+│ │                  │   │   │   sample_count=8,                             │ │
+│ │                  │   │   │   entropy=3.0,                                │ │
+│ │                  │   │   │   band='low',                                 │ │
+│ │                  │   │   │   low_confidence=True                         │ │
+│ │                  │   │   )                                               │ │
+│ │                  │   ],                                                  │ │
+│ │                  │   out_of_order_count=0,                               │ │
+│ │                  │   entry_point=0                                       │ │
+│ │                  )                                                       │ │
+│ │          panel = PatchEditorPanel(id='patch_editor_panel')               │ │
+│ │      s0_header = b'fixture-raise.s19'                                    │ │
+│ │           self = S19TuiApp(                                              │ │
+│ │                  │   title='Hex Edit Tool',                              │ │
+│ │                  │   classes={'-dark-mode'},                             │ │
+│ │                  │   pseudo_classes={'dark', 'focus'}                    │ │
+│ │                  )                                                       │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ <HOME>/work/s19_i5c_red/s19_app/tui/services/change_service.py:2618  │
+│ in save_patched                                                              │
+│                                                                              │
+│   2615 │   │   │   for record in summary.entries                             │
+│   2616 │   │   │   if record.disposition == DISPOSITION_APPLIED              │
+│   2617 │   │   )                                                             │
+│ ❱ 2618 │   │   return self.emit_and_verify(                                  │
+│   2619 │   │   │   mem_map,                                                  │
+│   2620 │   │   │   ranges,                                                   │
+│   2621 │   │   │   dest_dir,                                                 │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │          a2l_tags = None                                                 │ │
+│ │           blocked = 0                                                    │ │
+│ │    bytes_per_line = 32                                                   │ │
+│ │           derived = {                                                    │ │
+│ │                     │   32768: 0,                                        │ │
+│ │                     │   32769: 1,                                        │ │
+│ │                     │   32770: 2,                                        │ │
+│ │                     │   32771: 187,                                      │ │
+│ │                     │   32772: 4,                                        │ │
+│ │                     │   32773: 5,                                        │ │
+│ │                     │   32774: 6,                                        │ │
+│ │                     │   32775: 7,                                        │ │
+│ │                     │   32784: 16,                                       │ │
+│ │                     │   32785: 17,                                       │ │
+│ │                     │   ... +6                                           │ │
+│ │                     }                                                    │ │
+│ │          dest_dir = PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen… │ │
+│ │          filename = 'fixture-raise.s19'                                  │ │
+│ │             fresh = ChangeSummary(                                       │ │
+│ │                     │                                                    │ │
+│ │                     source_path=PosixPath('/tmp/pytest-of-<USER>/pyte… │ │
+│ │                     │   kind='change',                                   │ │
+│ │                     │   encoding='utf-8',                                │ │
+│ │                     │   value_mode='text',                               │ │
+│ │                     │                                                    │ │
+│ │                     timestamp_utc='2026-11-06T11:13:25.698381+00:00',    │ │
+│ │                     │   variant_id='fixture',                            │ │
+│ │                     │   counts={                                         │ │
+│ │                     │   │   'applied': 1,                                │ │
+│ │                     │   │   'skipped-partial': 0,                        │ │
+│ │                     │   │   'skipped-outside': 0,                        │ │
+│ │                     │   │   'skipped-no-image': 0,                       │ │
+│ │                     │   │   'blocked': 0                                 │ │
+│ │                     │   },                                               │ │
+│ │                     │   entries=[                                        │ │
+│ │                     │   │   ChangeSummaryEntry(                          │ │
+│ │                     │   │   │   entry_type='bytes',                      │ │
+│ │                     │   │   │   address_start=32771,                     │ │
+│ │                     │   │   │   address_end=32772,                       │ │
+│ │                     │   │   │   before_bytes=(3,),                       │ │
+│ │                     │   │   │   after_bytes=(187,),                      │ │
+│ │                     │   │   │   disposition='applied',                   │ │
+│ │                     │   │   │   linkage='standalone',                    │ │
+│ │                     │   │   │   linkage_symbol=None,                     │ │
+│ │                     │   │   │   symbol=None                              │ │
+│ │                     │   │   )                                            │ │
+│ │                     │   ],                                               │ │
+│ │                     │   issues=[],                                       │ │
+│ │                     │   saved_path=None,                                 │ │
+│ │                     │   verify_result=None,                              │ │
+│ │                     │   source_image_path=None                           │ │
+│ │                     )                                                    │ │
+│ │       mac_records = []                                                   │ │
+│ │           mem_map = {                                                    │ │
+│ │                     │   32768: 0,                                        │ │
+│ │                     │   32769: 1,                                        │ │
+│ │                     │   32770: 2,                                        │ │
+│ │                     │   32771: 187,                                      │ │
+│ │                     │   32772: 4,                                        │ │
+│ │                     │   32773: 5,                                        │ │
+│ │                     │   32774: 6,                                        │ │
+│ │                     │   32775: 7,                                        │ │
+│ │                     │   32784: 16,                                       │ │
+│ │                     │   32785: 17,                                       │ │
+│ │                     │   ... +6                                           │ │
+│ │                     }                                                    │ │
+│ │             prior = ChangeSummary(                                       │ │
+│ │                     │                                                    │ │
+│ │                     source_path=PosixPath('/tmp/pytest-of-<USER>/pyte… │ │
+│ │                     │   kind='change',                                   │ │
+│ │                     │   encoding='utf-8',                                │ │
+│ │                     │   value_mode='text',                               │ │
+│ │                     │                                                    │ │
+│ │                     timestamp_utc='2026-11-06T11:13:17.028867+00:00',    │ │
+│ │                     │   variant_id='fixture',                            │ │
+│ │                     │   counts={                                         │ │
+│ │                     │   │   'applied': 1,                                │ │
+│ │                     │   │   'skipped-partial': 0,                        │ │
+│ │                     │   │   'skipped-outside': 0,                        │ │
+│ │                     │   │   'skipped-no-image': 0,                       │ │
+│ │                     │   │   'blocked': 0                                 │ │
+│ │                     │   },                                               │ │
+│ │                     │   entries=[                                        │ │
+│ │                     │   │   ChangeSummaryEntry(                          │ │
+│ │                     │   │   │   entry_type='bytes',                      │ │
+│ │                     │   │   │   address_start=32771,                     │ │
+│ │                     │   │   │   address_end=32772,                       │ │
+│ │                     │   │   │   before_bytes=(3,),                       │ │
+│ │                     │   │   │   after_bytes=(170,),                      │ │
+│ │                     │   │   │   disposition='applied',                   │ │
+│ │                     │   │   │   linkage='standalone',                    │ │
+│ │                     │   │   │   linkage_symbol=None,                     │ │
+│ │                     │   │   │   symbol=None                              │ │
+│ │                     │   │   )                                            │ │
+│ │                     │   ],                                               │ │
+│ │                     │   issues=[],                                       │ │
+│ │                     │   saved_path=None,                                 │ │
+│ │                     │   verify_result=None,                              │ │
+│ │                     │   source_image_path=None                           │ │
+│ │                     )                                                    │ │
+│ │            ranges = [(32768, 32776), (32784, 32792)]                     │ │
+│ │     reuse_summary = False                                                │ │
+│ │         s0_header = b'fixture-raise.s19'                                 │ │
+│ │              self = <s19_app.tui.services.change_service.ChangeService   │ │
+│ │                     object at 0x7f531160b9d0>                            │ │
+│ │ source_image_path = PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen… │ │
+│ │       source_kind = 's19'                                                │ │
+│ │           summary = ChangeSummary(                                       │ │
+│ │                     │                                                    │ │
+│ │                     source_path=PosixPath('/tmp/pytest-of-<USER>/pyte… │ │
+│ │                     │   kind='change',                                   │ │
+│ │                     │   encoding='utf-8',                                │ │
+│ │                     │   value_mode='text',                               │ │
+│ │                     │                                                    │ │
+│ │                     timestamp_utc='2026-11-06T11:13:25.698381+00:00',    │ │
+│ │                     │   variant_id='fixture',                            │ │
+│ │                     │   counts={                                         │ │
+│ │                     │   │   'applied': 1,                                │ │
+│ │                     │   │   'skipped-partial': 0,                        │ │
+│ │                     │   │   'skipped-outside': 0,                        │ │
+│ │                     │   │   'skipped-no-image': 0,                       │ │
+│ │                     │   │   'blocked': 0                                 │ │
+│ │                     │   },                                               │ │
+│ │                     │   entries=[                                        │ │
+│ │                     │   │   ChangeSummaryEntry(                          │ │
+│ │                     │   │   │   entry_type='bytes',                      │ │
+│ │                     │   │   │   address_start=32771,                     │ │
+│ │                     │   │   │   address_end=32772,                       │ │
+│ │                     │   │   │   before_bytes=(3,),                       │ │
+│ │                     │   │   │   after_bytes=(187,),                      │ │
+│ │                     │   │   │   disposition='applied',                   │ │
+│ │                     │   │   │   linkage='standalone',                    │ │
+│ │                     │   │   │   linkage_symbol=None,                     │ │
+│ │                     │   │   │   symbol=None                              │ │
+│ │                     │   │   )                                            │ │
+│ │                     │   ],                                               │ │
+│ │                     │   issues=[],                                       │ │
+│ │                     │   saved_path=None,                                 │ │
+│ │                     │   verify_result=None,                              │ │
+│ │                     │   source_image_path=None                           │ │
+│ │                     )                                                    │ │
+│ │     workarea_root = PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen… │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ <HOME>/work/s19_i5c_red/tests/test_b101_designer_writes.py:937 in    │
+│ raise_after_adopt                                                            │
+│                                                                              │
+│    934 │   _set_quiet(monkeypatch, QUIET_SHORT_S)                            │
+│    935 │                                                                     │
+│    936 │   def raise_after_adopt(self, *args, **kwargs):                     │
+│ ❱  937 │   │   raise RuntimeError("probe after adopt")                       │
+│    938 │                                                                     │
+│    939 │   monkeypatch.setattr(change_service_module.ChangeService, "emit_an │
+│    940 │   seen = {}                                                         │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │   args = (                                                               │ │
+│ │          │   {                                                           │ │
+│ │          │   │   32768: 0,                                               │ │
+│ │          │   │   32769: 1,                                               │ │
+│ │          │   │   32770: 2,                                               │ │
+│ │          │   │   32771: 187,                                             │ │
+│ │          │   │   32772: 4,                                               │ │
+│ │          │   │   32773: 5,                                               │ │
+│ │          │   │   32774: 6,                                               │ │
+│ │          │   │   32775: 7,                                               │ │
+│ │          │   │   32784: 16,                                              │ │
+│ │          │   │   32785: 17,                                              │ │
+│ │          │   │   ... +6                                                  │ │
+│ │          │   },                                                          │ │
+│ │          │   [(32768, 32776), (32784, 32792)],                           │ │
+│ │          │                                                               │ │
+│ │          PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen-gw7/test_r… │ │
+│ │          │   'fixture-raise.s19'                                         │ │
+│ │          )                                                               │ │
+│ │ kwargs = {                                                               │ │
+│ │          │   'source_kind': 's19',                                       │ │
+│ │          │   'bytes_per_line': 32,                                       │ │
+│ │          │   's0_header': b'fixture-raise.s19',                          │ │
+│ │          │   'source_image_path':                                        │ │
+│ │          PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen-gw7/test_r… │ │
+│ │          │   'workarea_root':                                            │ │
+│ │          PosixPath('/tmp/pytest-of-<USER>/pytest-225/popen-gw7/test_r… │ │
+│ │          }                                                               │ │
+│ │   self = <s19_app.tui.services.change_service.ChangeService object at    │ │
+│ │          0x7f531160b9d0>                                                 │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+╰──────────────────────────────────────────────────────────────────────────────╯
+RuntimeError: probe after adopt
+=========================== short test summary info ============================
+PASSED tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_9_save_back_raising_after_the_adopt_ends_the_app
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_041_2_4_entry_order_is_kept
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_010_4_session_field_moved_stays_included
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_057_1_apply_clears_the_validation_results
+FAILED tests/test_b101_check_spec_keep.py::test_at_i5_2_spec_comes_back_and_validate_reports_the_drift
+FAILED tests/test_b101_check_spec_keep.py::test_at_i5_1_picks_survive_write_and_return_by_keys
+FAILED tests/test_b101_designer_writes.py::test_at_i5_4_save_back_by_keys_then_display
+FAILED tests/test_b101_check_spec_keep.py::test_at_i5_3_moved_parameter_keeps_the_declared_entry_by_keys
+FAILED tests/test_b101_designer_writes.py::test_r_chked_057_2_save_back_clears_the_validation_results
+FAILED tests/test_b101_designer_writes.py::test_r_chked_057_3_save_project_commit_clears_the_validation_results
+9 failed, 1 passed in 98.93s (0:01:38)
+exit=1

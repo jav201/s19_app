@@ -1,0 +1,154 @@
+# Mutant M13
+BASE_COMMIT=c2cba356f254cf85ba8c0e05b47b5103baf2d733
+s19_app.__file__=<HOME>/work/s19_i5m_copy/s19_app/__init__.py
+edits:
+  s19_app/tui/screens_directionb.py:7333
+verify:
+grep s19_app/tui/screens_directionb.py: replaced -> 'name = None' FOUND
+guard nodes (7):
+  tests/test_b101_check_spec_keep.py::test_r_chked_041_2_1_written_spec_names_come_back
+  tests/test_b101_check_spec_keep.py::test_r_chked_041_2_3_symbol_disambiguates
+  tests/test_b101_check_spec_keep.py::test_r_chked_026_4_spec_bytes_survive_same_range_reload
+  tests/test_b101_check_spec_keep.py::test_r_chked_056_1_moved_parameter_keeps_the_declared_entry
+  tests/test_b101_check_spec_keep.py::test_r_chked_056_2_renamed_parameter_keeps_the_declared_entry
+  tests/test_b101_check_spec_keep.py::test_r_chked_056_3_resized_parameter_keeps_the_declared_entry
+  tests/test_b101_symbol_reads.py::test_r_chg_sym_9_check_editor_spec_pick_resolves_symbols
+
+--- pytest ---
+bringing up nodes...
+bringing up nodes...
+
+FFFFFFF                                                                  [100%]
+=================================== FAILURES ===================================
+______________ test_r_chked_041_2_1_written_spec_names_come_back _______________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+tests/test_b101_check_spec_keep.py:753: in test_r_chked_041_2_1_written_spec_names_come_back
+    assert picks == [facts.v1.name, facts.v2.name], picks
+E   AssertionError: []
+E   assert [] == ['VALUE_0001', 'VALUE_0002']
+E     
+E     Right contains 2 more items, first extra item: 'VALUE_0001'
+E     Use -v to get more diff
+__________________ test_r_chked_041_2_3_symbol_disambiguates ___________________
+[gw1] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+tests/test_b101_check_spec_keep.py:780: in test_r_chked_041_2_3_symbol_disambiguates
+    assert picks == ["BETA"], picks
+E   AssertionError: []
+E   assert [] == ['BETA']
+E     
+E     Right contains one more item: 'BETA'
+E     Use -v to get more diff
+________ test_r_chked_056_3_resized_parameter_keeps_the_declared_entry _________
+[gw5] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+tests/test_b101_check_spec_keep.py:1281: in test_r_chked_056_3_resized_parameter_keeps_the_declared_entry
+    assert_declared_entry_kept(facts, state, lines, entries)
+tests/test_b101_check_spec_keep.py:1212: in assert_declared_entry_kept
+    assert picks == [f.v2.name], picks
+E   AssertionError: []
+E   assert [] == ['VALUE_0002']
+E     
+E     Right contains one more item: 'VALUE_0002'
+E     Use -v to get more diff
+________ test_r_chked_056_2_renamed_parameter_keeps_the_declared_entry _________
+[gw4] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+tests/test_b101_check_spec_keep.py:1263: in test_r_chked_056_2_renamed_parameter_keeps_the_declared_entry
+    assert_declared_entry_kept(facts, state, lines, entries)
+tests/test_b101_check_spec_keep.py:1212: in assert_declared_entry_kept
+    assert picks == [f.v2.name], picks
+E   AssertionError: []
+E   assert [] == ['VALUE_0002']
+E     
+E     Right contains one more item: 'VALUE_0002'
+E     Use -v to get more diff
+_________ test_r_chked_056_1_moved_parameter_keeps_the_declared_entry __________
+[gw3] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+tests/test_b101_check_spec_keep.py:1243: in test_r_chked_056_1_moved_parameter_keeps_the_declared_entry
+    assert_declared_entry_kept(facts, state, lines, entries)
+tests/test_b101_check_spec_keep.py:1212: in assert_declared_entry_kept
+    assert picks == [f.v2.name], picks
+E   AssertionError: []
+E   assert [] == ['VALUE_0002']
+E     
+E     Right contains one more item: 'VALUE_0002'
+E     Use -v to get more diff
+___________ test_r_chked_026_4_spec_bytes_survive_same_range_reload ____________
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+tests/test_b101_check_spec_keep.py:1145: in test_r_chked_026_4_spec_bytes_survive_same_range_reload
+    assert picks == [facts.v1.name, facts.v2.name], picks
+E   AssertionError: []
+E   assert [] == ['VALUE_0001', 'VALUE_0002']
+E     
+E     Right contains 2 more items, first extra item: 'VALUE_0001'
+E     Use -v to get more diff
+___________ test_r_chg_sym_9_check_editor_spec_pick_resolves_symbols ___________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+tests/test_b101_symbol_reads.py:678: in test_r_chg_sym_9_check_editor_spec_pick_resolves_symbols
+    assert check_entry["symbol"] in picked, (check_entry["symbol"], picked)
+E   AssertionError: ('VALUE_0185', [])
+E   assert 'VALUE_0185' in []
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2992 App initialized. base_dir=/tmp/pytest-of-<USER>/pytest-254/popen-gw0/test_r_chg_sym_9_check_editor_0/app workarea=/tmp/pytest-of-<USER>/pytest-254/popen-gw0/test_r_chg_sym_9_check_editor_0/app/.s19tool/workarea
+INFO     s19tui:app.py:8368 Workarea refreshed. files=0
+INFO     s19tui:app.py:16625 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:8377 Load file action triggered.
+INFO     s19tui:app.py:15486 Load phase boundary: modal_dismiss_scheduled kind=path value='/tmp/pytest-of-<USER>/pytest-254/popen-gw0/b101_case080/firmware.s19'
+INFO     s19tui:app.py:15531 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<USER>/pytest-254/popen-gw0/b101_case080/firmware.s19
+INFO     s19tui:app.py:15552 Load phase boundary: copy_started path=/tmp/pytest-of-<USER>/pytest-254/popen-gw0/b101_case080/firmware.s19
+INFO     s19tui:app.py:15565 Load phase boundary: copy_done path=firmware.s19 elapsed=0.004s
+WARNING  s19tui:app.py:15584 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-254/popen-gw0/b101_case080/firmware.s19'
+INFO     s19tui:app.py:8368 Workarea refreshed. files=1
+INFO     s19tui:app.py:15602 File copied to temp: path=/tmp/pytest-of-<USER>/pytest-254/popen-gw0/test_r_chg_sym_9_check_editor_0/app/.s19tool/workarea/temp/firmware.s19 size_bytes=1048633 copy_seconds=0.004
+INFO     s19tui:app.py:15608 Load phase boundary: worker_spawned path=firmware.s19
+INFO     s19tui:app.py:18514 Load phase boundary: worker_parse_start path=firmware.s19
+INFO     s19tui:app.py:17861 Loading file: path=/tmp/pytest-of-<USER>/pytest-254/popen-gw0/test_r_chg_sym_9_check_editor_0/app/.s19tool/workarea/temp/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14191 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18730 Load summary: file_type=s19 path=/tmp/pytest-of-<USER>/pytest-254/popen-gw0/test_r_chg_sym_9_check_editor_0/app/.s19tool/workarea/temp/firmware.s19 addresses=424736 range_count=4 range_bytes=424736 errors=0
+INFO     s19tui:app.py:14208 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18533 Load phase boundary: worker_parse_done path=firmware.s19 elapsed=0.919s
+INFO     s19tui:app.py:18357 Load phase boundary: prepare_entry path=firmware.s19 file_type=s19
+INFO     s19tui:app.py:18392 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:17714 MAC validation computed: records=0 issues=0 elapsed_seconds=0.999
+INFO     s19tui:app.py:18401 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:18421 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:18428 Load phase boundary: prepare_bases_done row_bases=26546
+INFO     s19tui:app.py:18438 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:18444 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:18566 Load phase boundary: worker_compute_done path=firmware.s19 precomputed=True elapsed=1.000s
+INFO     s19tui:app.py:18573 Load phase boundary: call_from_thread_apply_dispatched path=firmware.s19
+INFO     s19tui:app.py:18191 Load phase boundary: apply_install_state path=firmware.s19 precomputed=True
+INFO     s19tui:app.py:18858 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18207 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18219 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19878 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:16625 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:19392 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:18232 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:19085 Memory Map updated. ranges=4
+INFO     s19tui:app.py:18249 Loaded file successfully: path=/tmp/pytest-of-<USER>/pytest-254/popen-gw0/test_r_chg_sym_9_check_editor_0/app/.s19tool/workarea/temp/firmware.s19 file_type=s19 elapsed_seconds=2.537 has_mac=False precomputed=True
+INFO     s19tui:app.py:8377 Load file action triggered.
+INFO     s19tui:app.py:15486 Load phase boundary: modal_dismiss_scheduled kind=path value='/tmp/pytest-of-<USER>/pytest-254/popen-gw0/b101_case080/firmware.a2l'
+INFO     s19tui:app.py:15715 A2L copy complete: path=/tmp/pytest-of-<USER>/pytest-254/popen-gw0/test_r_chg_sym_9_check_editor_0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347 copy_seconds=0.001
+INFO     s19tui:app.py:945 A2L cache miss: path=/tmp/pytest-of-<USER>/pytest-254/popen-gw0/test_r_chg_sym_9_check_editor_0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347
+WARNING  s19tui:app.py:15753 Recent sources not updated: '/tmp/pytest-of-<USER>/pytest-254/popen-gw0/b101_case080/firmware.a2l'
+INFO     s19tui:app.py:8368 Workarea refreshed. files=2
+INFO     s19tui:app.py:18677 A2L parse summary: path=/tmp/pytest-of-<USER>/pytest-254/popen-gw0/test_r_chg_sym_9_check_editor_0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.018 sections=1 tags=462 errors=0
+INFO     s19tui:app.py:17714 MAC validation computed: records=0 issues=462 elapsed_seconds=0.640
+INFO     s19tui:app.py:17769 MAC row cache built: records=0 elapsed_seconds=0.640
+INFO     s19tui:app.py:16657 Load phase boundary: populate_issues_table_done rows=40 total=462 elapsed=0.035
+INFO     s19tui:app.py:19392 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.676
+INFO     s19tui:app.py:19919 Load phase boundary: populate_a2l_table_done rows=200 total=462 elapsed=0.013
+INFO     s19tui:app.py:15772 A2L view refresh complete: path=/tmp/pytest-of-<USER>/pytest-254/popen-gw0/test_r_chg_sym_9_check_editor_0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.699
+INFO     s19tui:app.py:15780 A2L loaded: /tmp/pytest-of-<USER>/pytest-254/popen-gw0/test_r_chg_sym_9_check_editor_0/app/.s19tool/workarea/temp/firmware.a2l
+=========================== short test summary info ============================
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_041_2_1_written_spec_names_come_back
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_041_2_3_symbol_disambiguates
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_056_3_resized_parameter_keeps_the_declared_entry
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_056_2_renamed_parameter_keeps_the_declared_entry
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_056_1_moved_parameter_keeps_the_declared_entry
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_026_4_spec_bytes_survive_same_range_reload
+FAILED tests/test_b101_symbol_reads.py::test_r_chg_sym_9_check_editor_spec_pick_resolves_symbols
+7 failed in 54.22s
+
+
+RESULT=KILLED
+FIRST_ASSERTION=E   AssertionError: []

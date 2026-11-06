@@ -1,0 +1,17 @@
+E1 start 2026-11-06T06:40Z model=opus base=c2cba35
+E1 pilot ran 2026-11-06T06:50Z LAN host c2cba35: D-4 reproduced (designer concat 0x9C5BCBBD, oracle 0x08DAAFB7, 0 recomputes); F-26 not reproduced (picks kept on Write); R-CHKED-010 signature-change arm fails (0 picks); F-27 reproduced (0 params, 3 memory rows); D9-11 reproduced (3 passed); transcript evidence-e1/i5e1-pilot-transcript.txt
+E1 end 2026-11-06T07:01Z model=opus rows=11 active+1 withdrawn TCs=26 slice=3 files/16 functions
+E2 end 2026-11-06T07:01Z model=opus graph=codewire/graph-inc5.md nodes=16 slice + 4 context
+LAN worktree /tmp/i5e1/wt removed and /tmp/i5e1 deleted 2026-11-06T07:01Z
+E1 rulings 2026-11-06T07:02Z orchestrator D-1..D-5
+E3 round1 2026-11-06T07:15Z architect=opus FAIL(1 MAJOR) security=opus FAIL(1 HIGH,2 MAJOR); rulings written
+E3 correction 2026-11-06T07:29Z model=opus rulings SEC5-1..6 A-1..6 applied (targeted edits): rows=12 active+1 withdrawn (new R-CHKED-056; R-CHKED-055 scoped) TCs=34 (+8) slice=3 files/17 functions (+_demote_moved_spec_params); trace_check: 3 US, 12 active requirements (1 withdrawn), 11 gap(s) (10 TEST pre-E4, 1 EVID)
+E3 round2 2026-11-06T07:42Z security=opus PASS-WITH-NOTES (SEC5-1/2/3, A-1 closed; R2-1 backlog)
+E4 start 2026-11-06T07:42Z implementers model=deepseek-v4-pro (2 units: A app.py+crc_designer_view.py, B screens_directionb.py+guide) testers=sonnet x2 (designer writes; check editor) — orchestrator split the proposed single test file into two, one per tester
+E4 implementers end 2026-11-06T07:53Z model=deepseek-v4-pro (2 units, exit 0, py_compile OK, no deviations declared)
+E4 integration end 2026-11-06T09:42Z model=opus GREEN: int-01 58 passed (new files + symbol_reads); QC-BC 51 files 2428 passed; importers 24 files 488 passed; law guards 117 passed; serial_timing 58 passed; 4 known failures identical on base (int-03, int-05); no source or test-body change; registry 262->264 measured; LAN worktree removed
+E5 start 2026-11-06T09:43Z mutants=deepseek-v4-pro reviews=opus audit=qa-reviewer(opus)
+E5 corrective start 2026-11-06T10:24Z model=opus (C-1 … C-11; one pass: code within the slice, tests, records, graph); LAN host 2 waits for the orchestrator's merge run before the first pytest
+E5 corrective end 2026-11-06T11:26Z model=opus C-1..C-11 done; R-CHKED-057 new; e5c-02 68 passed; RED base 9/10 (1 standing guard); CE 3/3 (33, 33); mutants M25-M30 6/6 killed; law guards 103 passed; serial 2 passed; LAN worktree removed
+E5 mutants end 2026-11-06T11:27Z model=deepseek-v4-pro 24/24 killed at 8fc3cd3; corrective M25-M30 killed (opus)
+E5 end 2026-11-06T11:36:46Z model=deepseek-v4-pro (records)

@@ -623,24 +623,27 @@ def test_r_chg_sym_9_per_entry_edit_json_confirm_of_a_symbol_entry_succeeds(
 def test_r_chg_sym_9_check_editor_spec_pick_resolves_symbols(
     tmp_path: Path, case08: Path
 ) -> None:
-    """Case R-CHG-SYM.9/5 (black-box): picking ``demo_check`` in the Check
-    Editor Spec dropdown with the image and A2L loaded ends on ``Check Editor:
-    loaded 'demo_check.chk.json' (3 fields).``; no ``spec NOT loaded`` line, no
-    finding line; the collector holds 3 memory rows today (unlabelled rows -
-    Inc 5 re-pins this count when it names them).
-
-    E5 C-6 (R-CHG-SYM.9 "every symbol entry ... in the read document"): the
-    collector row of the symbol entry shows that entry's address. The Check
-    Editor keeps only address and size per row, so the tag's spelling is not
-    observable on this surface (not-testable here; alternatives 1, 2, 3, 4 and
-    6 assert the spelling).
+    """Case R-CHG-SYM.9/5 (black-box) and R-CHKED-041.2/2 (Inc 5, E1 ruling
+    D-5): picking ``demo_check`` in the Check Editor Spec dropdown with the
+    image and A2L loaded ends on ``Check Editor: loaded 'demo_check.chk.json'
+    (3 fields).``; no ``spec NOT loaded`` line, no finding line; the field set
+    is the spec's entries with the named parameters included: the tag the
+    symbol entry names is included (its spelling is observable as the included
+    parameter's name - E5 C-6 note lifted), and the memory table holds 3 minus
+    the entries that have a named parameter (counted from the generated A2L
+    with the named-parameter rule: the entry's address and byte count name
+    exactly one parameter, or the symbol names a parameter listed at that
+    range).
 
     Negative control: the pick passing no A2L -> ``Check Editor: spec NOT
-    loaded.`` (the base) -> RED. Drive (E5 C-6, BB-5): the Spec dropdown is
-    opened with a click and the file is picked with the arrow keys and enter."""
+    loaded.`` -> RED; no resolution (the base) -> the symbol tag not included
+    and 3 memory rows -> RED. Drive (E5 C-6, BB-5): the Spec dropdown is
+    opened with a click and the file is picked with the arrow keys and
+    enter."""
     from textual.widgets import DataTable
 
     (check_index, check_entry), = symbol_rows(case08, CHECK)
+    entries = doc_json(case08, CHECK)["entries"]
 
     async def scenario(app, pilot, log):
         stage(app, case08, CHECK)
@@ -658,16 +661,37 @@ def test_r_chg_sym_9_check_editor_spec_pick_resolves_symbols(
             ),
             "the Check Editor spec pick",
         )
+        panel = app.query_one("#check_editor_panel")
         table = app.query_one("#check_mem_table", DataTable)
-        cells = [str(getattr(cell, "plain", cell)) for cell in table.get_row_at(check_index)]
-        return lines, table.row_count, cells
+        return (
+            lines,
+            table.row_count,
+            list(panel._picked_params),
+            dict(panel._param_rows),
+        )
 
-    lines, rows, symbol_row = run(tmp_path, scenario)
+    lines, rows, picked, ledger = run(tmp_path, scenario)
     assert lines[-1] == f"Check Editor: loaded '{CHECK}' (3 fields).", lines
     assert "Check Editor: spec NOT loaded." not in lines, lines
     assert unresolved_lines(lines) == [], lines
-    assert rows == 3, rows
-    assert symbol_row[0] == f"0x{entry_address(check_entry):08X}", symbol_row
+    # The symbol entry's tag is included (R-CHKED-041.2/2).
+    assert check_entry["symbol"] in picked, (check_entry["symbol"], picked)
+    # Named parameters by the definition (symbol first at the entry's range,
+    # else the one parameter with the entry's address and byte count; a
+    # parameter is named once), counted from the generated A2L's ledger.
+    named: list = []
+    for entry in entries:
+        address = entry_address(entry)
+        size = len(entry_data(entry)) if "bytes" in entry else len(entry["value"].encode("utf-8"))
+        symbol = entry.get("symbol")
+        if symbol in ledger:
+            found = [symbol] if ledger[symbol][:2] == (address, size) else []
+        else:
+            found = [n for n, (a, s, _f) in ledger.items() if (a, s) == (address, size)]
+        if len(found) == 1 and found[0] not in named:
+            named.append(found[0])
+    assert picked == named, (picked, named)
+    assert rows == 3 - len(named), (rows, named)
 
 
 def test_r_chg_sym_9_ab_diff_check_spec_pick_resolves_symbols(

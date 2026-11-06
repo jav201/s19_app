@@ -1,0 +1,50 @@
+== e5c-07 mutant M27 in a copy of the staged tree (M27: applied to s19_app/tui/app.py)
+2026-11-06T11:20:25Z
+tree: a copy (no git); see the label for its source
+s19_app.__file__ <HOME>/work/s19_i5c_mut/s19_app/__init__.py
+python 3.11.18
+pytest tests/test_b101_check_spec_keep.py -k test_r_chked_025_1 -n 1 -q -rA -p no:cacheprovider
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______________ test_r_chked_025_1_session_field_reads_the_image _______________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<USER>/pytest-230/popen-gw0/test_r_chked_025_1_session_fie0')
+facts = Facts(case=PosixPath('/tmp/pytest-of-<USER>/pytest-230/popen-gw0/b101_inc5_case080'), image={0: 108, 1: 49, 2: 57, 3...ram(name='VALUE_0002', address=20, size=2), v3=Param(name='VALUE_0003', address=40, size=4), serial=12587004, moved=32)
+
+    def test_r_chked_025_1_session_field_reads_the_image(tmp_path: Path, facts: Facts) -> None:
+        """Case R-CHKED-025/1: case 08 and its A2L loaded, the pilot spec picked;
+        ``VALUE_0003`` included by ``space``; Write as ``plus.chk.json`` -> the
+        entry at ``VALUE_0003``'s address holds the image bytes of its range.
+    
+        Standing guard: holds on the base (every field reads the image there; E1
+        base column "Yes"); it catches a build that gives a session field a spec's
+        bytes or none."""
+    
+        async def scenario(app, pilot, log):
+            await open_session(pilot, app, facts, specs={PILOT: spec_doc(pilot_entries(facts))})
+            await pick_spec(pilot, app, log, PILOT)
+            await include_by_space(pilot, app, facts.v3.name)
+            _lines, entries = await write_spec(pilot, app, log, "plus.chk.json")
+            return entries
+    
+        entries = run(tmp_path, scenario)
+        v3 = facts.v3
+>       assert [e for e in entries if e[0] == v3.address] == [
+            (v3.address, facts.image_bytes(v3.address, v3.size))
+        ], entries
+E       AssertionError: [(0, b'l'), (20, b'\xa0\xbe'), (40, b'\x00\x00\x00\x00'), (12587004, b'\xff\xff\xff\xff')]
+E       assert [(40, b'\x00\x00\x00\x00')] == [(40, b'^&\x03\xb4')]
+E         
+E         At index 0 diff: (40, b'\x00\x00\x00\x00') != (40, b'^&\x03\xb4')
+E         Use -v to get more diff
+
+../s19_i5c/tests/test_b101_check_spec_keep.py:981: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_025_1_session_field_reads_the_image
+1 failed in 23.54s
+exit=1
+Files <HOME>/work/s19_i5c/s19_app/tui/app.py and s19_app/tui/app.py differ

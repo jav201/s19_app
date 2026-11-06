@@ -1,0 +1,15 @@
+=== Inc 5 E4 integration run: int-06-law-guards
+date: 2026-11-06T09:16:20Z
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree with the increment staged: 10e1b162b0a5dc96f303915522c7d22634237bdf
+staged files vs base: 25
+python: Python 3.11.18
+s19_app.__file__: <HOME>/work/s19_i5int/s19_app/__init__.py
+--- command: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -n 8 -m "not serial_timing" tests/test_address_census.py tests/test_suite_hygiene.py tests/test_id_registry.py tests/test_engine_unchanged.py tests/test_requirements_canon.py tests/test_docs_canon.py tests/test_filename_markup_safety.py tests/test_import_census.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 61%]
+.............................................                            [100%]
+117 passed in 74.06s (0:01:14)
+=== exit code: 0

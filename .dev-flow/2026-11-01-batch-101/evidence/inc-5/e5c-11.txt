@@ -1,0 +1,21 @@
+== e5c-11 law guards (+ docs canon: the guide changed)
+2026-11-06T11:23:17Z
+HEAD c2cba356
+index tree 6c846528aba230fac19db478b8d1de83ccf92909
+040000 tree 172ff6fc2f6d1c179d1e59f6742ab80a660744e4	docs
+040000 tree 397a3b2ff5296c6d4b8a933002cb8f6e51aece07	s19_app
+040000 tree 2dad0b4fa9f4adb4c0c09d26d2df648279a1ce42	tests
+s19_app.__file__ <HOME>/work/s19_i5c/s19_app/__init__.py
+python 3.11.18
+pytest tests/test_address_census.py tests/test_suite_hygiene.py tests/test_id_registry.py tests/test_engine_unchanged.py tests/test_docs_canon.py -n 8 -q -rfE -p no:cacheprovider
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 69%]
+...............................                                          [100%]
+============================= QC-TM timing margins =============================
+49.8%  0.201 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+66.5%  0.502 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 2 bounds, 0 under 20 % margin
+103 passed in 75.16s (0:01:15)
+exit=0
