@@ -1920,10 +1920,12 @@ def test_r_doc_guide_1_12_capture_notes_beside_their_captures() -> None:
 
 #: Pinned set of R-DOC-GUIDE.2. batch-101 Inc 6 extends it by named
 #: supersession with F-05, F-06 and F-40, the three findings it fixes
-#: (8 -> 11); F-47 stays unmarked (carried, not reproduced).
+#: (8 -> 11); F-47 stays unmarked (carried, not reproduced). batch-101 Inc 9
+#: extends it by named supersession with F-45 and F-46, the two findings it
+#: fixes (11 -> 13).
 _FIXED = (
     "F-05", "F-06", "F-16", "F-28", "F-30", "F-37", "F-38", "F-40", "F-41",
-    "F-42", "F-49",
+    "F-42", "F-45", "F-46", "F-49",
 )
 
 
@@ -1940,7 +1942,7 @@ def _findings_rows() -> Dict[str, str]:
 
 def test_r_doc_guide_2_1_fixed_rows_marked() -> None:
     rows = _findings_rows()
-    assert len(_FIXED) == 11
+    assert len(_FIXED) == 13
     unmarked = [
         f for f in _FIXED if not rows.get(f, "").endswith(_FIXED_MARK.get(f, "fixed in 1.0.0"))
     ]

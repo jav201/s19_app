@@ -1,0 +1,80 @@
+=== Inc 9 E4 integration run: int-05
+date: 2026-11-06T20:18:11Z
+worktree HEAD (base): e07fb00f9fc13afd314d0334fac683fe33b29b6c
+index tree with the increment staged: e222dd2700c0a2d27bda3625b5ed6f910f0c788c
+staged files vs base: 11
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i9int/s19_app/__init__.py
+CMD: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -m serial_timing -p no:xdist -rfs tests/test_address_census.py tests/test_b100_document.py tests/test_b100_load_dialog.py tests/test_b100_load_question.py tests/test_b100_project_check.py tests/test_b100_project_homes.py tests/test_b100_recents.py tests/test_b100_save_dialog.py tests/test_b100_save_guards.py tests/test_b100_save_image.py tests/test_b100_workers.py tests/test_b101_crc_model_and_reasons.py tests/test_b101_doc_hygiene.py tests/test_b101_flow_ext_copy.py tests/test_b101_flow_names_ui.py tests/test_b101_flow_saves.py tests/test_b101_help_legend_docs.py tests/test_b102_flow_block_edit.py tests/test_b102_flow_file_chooser.py tests/test_b97_chips_help.py tests/test_b97_flow_builder.py tests/test_b97_flow_execution.py tests/test_b97_width.py tests/test_b99_crc_region.py tests/test_b99_patch_truth.py tests/test_b99_staging.py tests/test_b99_truncation.py tests/test_changes_symbol_entries.py tests/test_docs_canon.py tests/test_engine_unchanged.py tests/test_flow_a2b_b94.py tests/test_flow_builder_render.py tests/test_flow_chainset_b94.py tests/test_flow_crc_block.py tests/test_flow_crc_ribbon.py tests/test_flow_crc_ui.py tests/test_flow_execution.py tests/test_flow_execution_service.py tests/test_flow_external_step_b96.py tests/test_flow_funnel_b96.py tests/test_flow_multi_image.py tests/test_flow_multi_image_ui.py tests/test_flow_persistence.py tests/test_flow_report_ac6_golden.py tests/test_flow_report_ui.py tests/test_flow_report_wire.py tests/test_id_registry.py tests/test_import_census.py tests/test_patch_dual_entry.py tests/test_suite_hygiene.py tests/test_tui_directionb.py tests/test_tui_flow_builder_b94.py tests/test_tui_flow_execution_b94.py tests/test_tui_flow_persistence_ui.py tests/test_window_usage_help.py
+.................................s....s.........                         [100%]
+============================= QC-TM timing margins =============================
+46.0%  0.540 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+46.0%  0.162 s / 0.300 s  TC-B100-65 keystroke paint  tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_at_most_three_of_twenty_keystrokes
+47.7%  0.157 s / 0.300 s  TC-B100-65 final paint  tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_is_a_150ms_debounce
+48.3%  0.155 s / 0.300 s  TC-B100-65 4MiB paint  tests/test_b100_save_dialog.py::test_tc_b100_65_emitting_4mib_image_recomputes_fast
+49.6%  0.202 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+52.6%  0.474 s / 1.000 s  TC-B100-61 cap painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+54.3%  0.457 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+55.4%  0.446 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+56.1%  0.439 s / 1.000 s  TC-B100-61 all-bad painted  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+56.5%  0.435 s / 1.000 s  TC-B100-61 cap painted  tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded
+60.5%  0.395 s / 1.000 s  TC-B100-61 all-bad painted  tests/test_b100_project_check.py::test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second
+64.8%  0.352 s / 1.000 s  TC-B100-05 merge  tests/test_b100_save_guards.py::test_tc_b100_05_merge_keeps_a_too_large_document_under_one_second
+66.0%  0.340 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+66.4%  0.505 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+66.6%  0.334 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+68.9%  0.156 s / 0.500 s  TC-B100-65 q delay  tests/test_b100_save_dialog.py::test_tc_b100_65_recompute_is_a_150ms_debounce
+69.5%  0.305 s / 1.000 s  sec6_5 load  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+72.8%  0.272 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+74.2%  0.258 s / 1.000 s  TC-B100-61 cap load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[cap]
+74.3%  0.257 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+74.4%  0.513 s / 2.000 s  TC-B100-65 case06 paint  tests/test_b100_save_dialog.py::test_tc_b100_65_session_decided_once_per_open_case06
+74.6%  0.254 s / 1.000 s  TC-B100-61 cap load  tests/test_b100_project_check.py::test_tc_b100_61_files_at_the_cap_all_missing_are_bounded
+74.9%  0.251 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+74.9%  0.251 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+75.7%  0.243 s / 1.000 s  sec6_5 appended  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+78.1%  0.219 s / 1.000 s  TC-B100-61 all-bad load  tests/test_b100_project_check.py::test_tc_b100_61_every_array_at_the_cap_all_bad_opens_under_one_second
+79.4%  0.206 s / 1.000 s  TC-B100-61 all-bad load  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[all-bad]
+79.8%  0.202 s / 1.000 s  TC-B100-61 checks a  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+80.8%  0.192 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_deep_entries_need_one_check_each_parent
+87.1%  0.645 s / 5.000 s  TC-B100-31 10001 refused  tests/test_b100_project_homes.py::test_tc_b100_31_entry_ceiling[10001 refused]
+87.2%  0.128 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_r_tst_111_112_arm_values_equal_the_product_stamps[scene]
+87.5%  0.125 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_distinct_folders_stop_at_the_folder_ceiling
+89.6%  0.104 s / 1.000 s  TC-B100-61 sec7 serialize  tests/test_b100_project_check.py::test_tc_b100_61_sec7_r2_2_one_serialize_checks_each_name_once
+90.4%  0.096 s / 1.000 s  TC-B100-30 20000-entries  tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[20000-entries]
+91.7%  0.083 s / 1.000 s  sec6_5 painted  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+91.8%  0.082 s / 1.000 s  TC-B100-30 classifier exactly-1000-entries  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[exactly-1000-entries]
+92.4%  0.076 s / 1.000 s  TC-B100-30 5000-digit-integer  tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[5000-digit-integer]
+92.4%  0.076 s / 1.000 s  TC-B100-30 brackets-1MiB  tests/test_b100_document.py::test_tc_b100_30_hostile_document_is_one_not_readable_under_one_second[brackets-1MiB]
+92.4%  0.076 s / 1.000 s  TC-B100-61 checks d  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+92.5%  0.075 s / 1.000 s  sec6_5 read  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_entries_under_an_existing_folder_are_all_checked
+95.2%  0.048 s / 1.000 s  TC-B100-61 checks e  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+96.0%  0.040 s / 1.000 s  TC-B100-61 R2-2 read  tests/test_b100_project_check.py::test_tc_b100_61_r2_2_legitimate_manifest_inside_every_cap_is_checked_whole
+98.5%  0.015 s / 1.000 s  TC-B100-61 checks b  tests/test_b100_project_check.py::test_tc_b100_61_sec6_5_each_name_is_checked_once_per_read
+99.0%  0.010 s / 1.000 s  TC-B100-28  tests/test_b100_document.py::test_tc_b100_28_document_finding_is_kept_first_beside_a_full_batch
+99.6%  0.004 s / 1.000 s  TC-B100-24 assignments  tests/test_b100_project_check.py::test_tc_b100_24_assignments_75_by_1000_is_one_issue_fast
+99.9%  0.001 s / 1.000 s  TC-B100-30 classifier brackets-1MiB  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-1MiB]
+99.9%  0.001 s / 1.000 s  TC-B100-30 classifier brackets-under-entries  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[brackets-under-entries]
+99.9%  0.001 s / 1.000 s  TC-B100-30 classifier entries-long-string  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-long-string]
+99.9%  0.001 s / 1.000 s  TC-B100-24 files  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[files]
+99.9%  0.001 s / 1.000 s  TC-B100-24 derived_from  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[derived_from]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier 1001-entries  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[1001-entries]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier 20000-entries  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[20000-entries]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier 5000-digit-integer  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[5000-digit-integer]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier bare-entries-is-5  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[bare-entries-is-5]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier empty-entries  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[empty-entries]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier entries-is-5  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-is-5]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier entries-wide-object  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[entries-wide-object]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier not-utf8  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[not-utf8]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier one-byte-over-1MiB  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-byte-over-1MiB]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier one-entry  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[one-entry]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier truncated  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[truncated]
+100.0%  0.000 s / 1.000 s  TC-B100-30 classifier v1-document  tests/test_b100_document.py::test_tc_b100_30_classifier_outcome[v1-document]
+100.0%  0.000 s / 1.000 s  TC-B100-24 batch  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[batch]
+100.0%  0.000 s / 1.000 s  TC-B100-24 declared_regions  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[declared_regions]
+100.0%  0.000 s / 1.000 s  TC-B100-24 gathered  tests/test_b100_project_check.py::test_tc_b100_24_one_entry_over_the_cap_is_one_issue_fast[gathered]
+QC-TM: 65 bounds, 0 under 20 % margin
+=========================== short test summary info ============================
+SKIPPED [2] tests/support/b100_links.py:30: directory junctions are a Windows-only test arm (PDR C-QA-6)
+46 passed, 2 skipped, 2456 deselected in 197.06s (0:03:17)
+=== exit code: 0

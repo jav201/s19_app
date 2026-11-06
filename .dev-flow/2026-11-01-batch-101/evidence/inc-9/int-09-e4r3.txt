@@ -1,0 +1,17 @@
+int-09 (E4-R3): LAN Linux host 2, Python 3.11.18; detached worktree at origin/main e07fb00 with the local diff applied (staged tree d1b3f7dd551f7115ce02346fc47d959c6b69aeb2); run 1 = test_b101_flow_saves, test_b99_staging and the law guards address_census, suite_hygiene, id_registry (-n 12); run 2 = negative control, the 0o666 mode argument deleted, node 14_6 only.
+base=e07fb00f tree=d1b3f7dd551f7115ce02346fc47d959c6b69aeb2
+<HOME>/work/s19_i9r3/s19_app/__init__.py
+0022
+bringing up nodes...
+
+........................................................................ [ 45%]
+........................................................................ [ 91%]
+..............                                                           [100%]
+158 passed in 185.63s (0:03:05)
+---- negative control: the claim without a mode
+ s19_app/tui/services/flow_persistence_service.py | 1 -
+ 1 file changed, 1 deletion(-)
+=========================== short test summary info ============================
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_6_saved_file_mode_matches_write_text[flow]
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_6_saved_file_mode_matches_write_text[set]
+2 failed, 24 deselected in 0.22s

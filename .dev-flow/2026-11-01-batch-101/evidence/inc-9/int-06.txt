@@ -1,0 +1,47 @@
+=== Inc 9 E4 integration run: int-06 (mutant copy: the home guard removed from both saves)
+date: 2026-11-06T19:32:24Z
+worktree HEAD (base): e07fb00f9fc13afd314d0334fac683fe33b29b6c
+index tree with the increment staged (before the mutation): e222dd2700c0a2d27bda3625b5ed6f910f0c788c
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i9int_mut/s19_app/__init__.py
+--- mutation (working tree vs the staged increment):
+diff --git a/s19_app/tui/services/flow_persistence_service.py b/s19_app/tui/services/flow_persistence_service.py
+index be6d68ee..ec4c36b8 100644
+--- a/s19_app/tui/services/flow_persistence_service.py
++++ b/s19_app/tui/services/flow_persistence_service.py
+@@ -1213,7 +1213,7 @@ def save_flow_json(
+     if clean is None:
+         return None
+     flows_dir = project_dir / FLOWS_SUBDIR
+-    resolved_home, _ = _guarded_destination(flows_dir, workarea_root)
++    resolved_home = flows_dir.resolve()  # MUTANT int-06: guard removed
+     flows_dir.mkdir(parents=True, exist_ok=True)
+ 
+     def render(stem: str) -> str:
+@@ -1704,7 +1704,7 @@ def save_chain_set(
+     if clean is None:
+         return None
+     flowsets_dir = project_dir / FLOWSETS_SUBDIR
+-    resolved_home, _ = _guarded_destination(flowsets_dir, workarea_root)
++    resolved_home = flowsets_dir.resolve()  # MUTANT int-06: guard removed
+     flowsets_dir.mkdir(parents=True, exist_ok=True)
+ 
+     def render(stem: str) -> str:
+CMD: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -p no:xdist -rfs --basetemp=<worktree>/bt tests/test_b101_flow_saves.py -k 'flow_file_11 or flow_set_7'
+E       Failed: DID NOT RAISE <class 's19_app.tui.workspace.WorkareaContainmentError'>
+E       Failed: DID NOT RAISE <class 's19_app.tui.workspace.WorkareaContainmentError'>
+E       Failed: DID NOT RAISE <class 's19_app.tui.workspace.WorkareaContainmentError'>
+E       Failed: DID NOT RAISE <class 's19_app.tui.workspace.WorkareaContainmentError'>
+E       Failed: DID NOT RAISE <class 's19_app.tui.workspace.WorkareaContainmentError'>
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_11_1_home_linked_outside_saves_nothing
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_11_2_home_linked_inside_saves_nothing
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_11_3_linked_project_folder_saves_nothing
+FAILED tests/test_b101_flow_saves.py::test_r_flow_set_7_1_home_linked_outside_saves_nothing
+FAILED tests/test_b101_flow_saves.py::test_r_flow_set_7_2_home_linked_inside_saves_nothing
+5 failed, 19 deselected in 0.96s
+--- after the run: what each node's save wrote (the link targets)
+test_r_flow_file_11_1_home_lin0  outside/flows: ./x.json 
+test_r_flow_file_11_2_home_lin0  .s19tool/workarea/p/patches: ./x.json 
+test_r_flow_file_11_3_linked_p0  .s19tool/workarea/q/flows: ./x.json 
+test_r_flow_set_7_1_home_linke0  outside/flowsets: ./s.json 
+test_r_flow_set_7_2_home_linke0  .s19tool/workarea/p/patches: ./s.json 

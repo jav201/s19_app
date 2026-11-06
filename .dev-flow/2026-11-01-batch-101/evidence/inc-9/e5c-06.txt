@@ -1,0 +1,19 @@
+=== Inc 9 E5 corrective run: e5c-06-repeat (the saves file three times: the monkeypatch and link nodes are stable)
+date: 2026-11-06T21:11:34Z
+host: LAN Linux laptop (8 cores), Python 3.11.18
+base commit (origin/main): e07fb00f9fc13afd314d0334fac683fe33b29b6c
+staged tree (base + the local diff): 608f5e918389dbb016a57b61ed5643bec6515210
+s19_app.__file__ = <HOME>/work/s19_i9c/s19_app/__init__.py
+CMD (x3): env -u NO_COLOR PYTHONPATH=<HOME>/work/s19_i9c python -m pytest -q -p no:cacheprovider -n 6 -m "not serial_timing" -rfs tests/test_b101_flow_saves.py
+---- repeat 1
+
+......................................                                   [100%]
+38 passed in 1.36s
+---- repeat 2
+
+......................................                                   [100%]
+38 passed in 1.43s
+---- repeat 3
+
+......................................                                   [100%]
+38 passed in 1.35s

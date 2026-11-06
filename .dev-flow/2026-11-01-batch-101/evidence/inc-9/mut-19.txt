@@ -1,0 +1,58 @@
+base commit (origin/main): e07fb00f9fc13afd314d0334fac683fe33b29b6c
+applied-tree head: b204c7d44a42383f2a7c63295280b0a4b7f3ad58
+mutant: M19 — DOSSIER (E4-R2)
+
+--- mutation (diff) ---
+--- a/docs/user-guide/DOSSIER.md
++++ b/docs/user-guide/DOSSIER.md
+@@ -751,7 +751,7 @@
+ | F-42 | defect, live · fixed in 1.0.0 | The before/after report is titled "Diff report" in both `.md` and `.html`; its header shows `a2l=absent; mac=absent` and the Runs *Symbols* column stays `-` although the A2L is loaded and the linkage table names the symbols. | ch21-02 |
+ | F-43 | limitation, live | The diff report's `## Checks` addendum lists the declared fields with expected bytes only — no actual value and no pass/fail verdict. | ch21-06 |
+ | F-44 | limitation, code + live | The flow report (REPORT block, FB-P1b), the fused flow report and the chain-set report are Markdown only; the only HTML reports are the before/after and diff reports. | `flow_report_service.py`, `flow_execution_service.py:write_chain_set_report`; ch21-11 |
+-| F-45 | defect, live · fixed in 1.0.0 | After **Confirm** of an external step in a parallel run, the re-run writes a second chain-set report for that lane alone that records *Mode: sequential*, *Chains: 1*. | `reports\<time>-chain-set-report.md` of the Chapter 18.8 run |
++| F-45 | defect, live | After **Confirm** of an external step in a parallel run, the re-run writes a second chain-set report for that lane alone that records *Mode: sequential*, *Chains: 1*. | `reports\<time>-chain-set-report.md` of the Chapter 18.8 run |
+ | F-46 | defect, live · fixed in 1.0.0 | A flow saved after **Clear** keeps the previous flow's name inside its file (`flows\tune_b.json` holds `"name": "tune_a"`, `tune_c.json` holds `tune_b`); lanes use the file name, so the stale name is only cosmetic so far. | saved flow files of the Chapter 17.10 run |
+ | F-47 | to investigate, live · carried to backlog (not reproduced on the base) | In the Chapter 17.10 / 18.8 run the log tail shows *Before/after report refused: No applied change summary…* right after start, before any key the driver sent that maps to `b`; the trigger is not identified. | ch17-13 … ch18-09 |
+ | F-48 | gap, code + live | A later block cannot reference an external step's output: there is no `#n` reference, binding or `${NAME}` for it. The only way is to type the copy's file name as an ordinary project-relative ref (17.11). The block's docstring says "downstream blocks reference THAT copy". | `flow_model.ExternalStepBlock`, `flow_execution_service.run_flow` (`ExternalStepBlock` branch); ch18-17 |
+
+--- s19_app.__file__ (from inside the copy) ---
+<HOME>/work/s19_i9mut_m19/s19_app/__init__.py
+
+--- pytest ---
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+____________________ test_r_doc_guide_2_1_fixed_rows_marked ____________________
+
+    def test_r_doc_guide_2_1_fixed_rows_marked() -> None:
+        rows = _findings_rows()
+        assert len(_FIXED) == 13
+        unmarked = [
+            f for f in _FIXED if not rows.get(f, "").endswith(_FIXED_MARK.get(f, "fixed in 1.0.0"))
+        ]
+>       assert unmarked == [], f"rows without the fixed mark: {unmarked}"
+E       AssertionError: rows without the fixed mark: ['F-45']
+E       assert ['F-45'] == []
+E         
+E         Left contains one more item: 'F-45'
+E         Use -v to get more diff
+
+../s19_i9mut/tests/test_b101_help_legend_docs.py:1949: AssertionError
+___________________ test_r_doc_guide_2_2_no_other_row_marked ___________________
+
+    def test_r_doc_guide_2_2_no_other_row_marked() -> None:
+        rows = _findings_rows()
+        marked = sorted(f for f, kind in rows.items() if "fixed in 1.0.0" in kind)
+>       assert marked == sorted(_FIXED), f"marked set is not the pinned set: {marked}"
+E       AssertionError: marked set is not the pinned set: ['F-05', 'F-06', 'F-16', 'F-28', 'F-30', 'F-37', 'F-38', 'F-40', 'F-41', 'F-42', 'F-46', 'F-49']
+E       assert ['F-05', 'F-0..., 'F-37', ...] == ['F-05', 'F-0..., 'F-37', ...]
+E         
+E         At index 10 diff: 'F-46' != 'F-45'
+E         Right contains one more item: 'F-49'
+E         Use -v to get more diff
+
+../s19_i9mut/tests/test_b101_help_legend_docs.py:1965: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_guide_2_1_fixed_rows_marked
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_guide_2_2_no_other_row_marked
+2 failed in 0.25s
+

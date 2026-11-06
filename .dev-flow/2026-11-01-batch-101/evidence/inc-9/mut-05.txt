@@ -1,0 +1,65 @@
+base commit (origin/main): e07fb00f9fc13afd314d0334fac683fe33b29b6c
+applied-tree head: b204c7d44a42383f2a7c63295280b0a4b7f3ad58
+mutant: M5 — R-FLOW-FILE.13
+
+--- mutation (diff) ---
+--- a/s19_app/tui/services/flow_persistence_service.py
++++ b/s19_app/tui/services/flow_persistence_service.py
+@@ -1219,7 +1219,7 @@
+ 
+     def render(stem: str) -> str:
+         return json.dumps(
+-            flow_to_dict(replace(flow, name=stem[:FLOW_MAX_NAME_LEN])),
++            flow_to_dict(replace(flow, name=stem)),
+             indent=2,
+         )
+
+--- s19_app.__file__ (from inside the copy) ---
+<HOME>/work/s19_i9mut_m5/s19_app/__init__.py
+
+--- pytest ---
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_________________ test_r_flow_file_13_1_long_stem_is_cut_to_64 _________________
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-370/test_r_flow_file_13_1_long_ste0/.s19tool/workarea'), PosixPath('/tmp/py...ng_ste0/.s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-370/test_r_flow_file_13_1_long_ste0/outside'))
+
+    def test_r_flow_file_13_1_long_stem_is_cut_to_64(area):
+        """R-FLOW-FILE.13/1: a 65-character stem names the file whole, the name is cut to 64."""
+        _root, project, _out = area
+        saved = save_flow_json(F1, "B" * 65, project)
+        assert saved == project / "flows" / ("B" * 65 + ".json")
+>       assert _name_in(saved) == "B" * 64
+E       AssertionError: assert 'BBBBBBBBBBBB...BBBBBBBBBBBBB' == 'BBBBBBBBBBBB...BBBBBBBBBBBBB'
+E         
+E         Skipping 53 identical leading characters in diff, use -v to show
+E         - BBBBBBBBBBB
+E         + BBBBBBBBBBBB
+E         ?            +
+
+../s19_i9mut/tests/test_b101_flow_saves.py:158: AssertionError
+__________________ test_r_flow_file_13_2_clash_suffix_is_cut ___________________
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-370/test_r_flow_file_13_2_clash_su0/.s19tool/workarea'), PosixPath('/tmp/py...ash_su0/.s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-370/test_r_flow_file_13_2_clash_su0/outside'))
+
+    def test_r_flow_file_13_2_clash_suffix_is_cut(area):
+        """R-FLOW-FILE.13/2: when a clash suffix makes the stem longer than 64, the name is still cut."""
+        _root, project, _out = area
+        (project / "flows").mkdir()
+        (project / "flows" / ("C" * 64 + ".json")).write_text("{}", encoding="utf-8")
+        saved = save_flow_json(F1, "C" * 64, project)
+        assert saved.stem.startswith("C" * 64) and len(saved.stem) > 64
+>       assert _name_in(saved) == "C" * 64
+E       AssertionError: assert 'CCCCCCCCCCCC...CCCCCCCCCCC_2' == 'CCCCCCCCCCCC...CCCCCCCCCCCCC'
+E         
+E         Skipping 53 identical leading characters in diff, use -v to show
+E         - CCCCCCCCCCC
+E         + CCCCCCCCCCC_2
+E         ?            ++
+
+../s19_i9mut/tests/test_b101_flow_saves.py:185: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_13_1_long_stem_is_cut_to_64
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_13_2_clash_suffix_is_cut
+2 failed in 0.23s
+

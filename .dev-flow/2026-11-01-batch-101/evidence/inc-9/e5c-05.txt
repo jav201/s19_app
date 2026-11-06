@@ -1,0 +1,16 @@
+=== Inc 9 E5 corrective run: e5c-05-serial (QA-1: the serial_timing lane over the same files)
+date: 2026-11-06T21:11:32Z
+host: LAN Linux laptop (8 cores), Python 3.11.18
+base commit (origin/main): e07fb00f9fc13afd314d0334fac683fe33b29b6c
+staged tree (base + the local diff): 608f5e918389dbb016a57b61ed5643bec6515210
+s19_app.__file__ = <HOME>/work/s19_i9c/s19_app/__init__.py
+CMD: env -u NO_COLOR PYTHONPATH=<HOME>/work/s19_i9c python -m pytest -q -p no:cacheprovider -m serial_timing -p no:xdist -rA tests/test_b101_flow_saves.py tests/test_b101_flow_names_ui.py tests/test_b99_staging.py tests/test_b101_help_legend_docs.py tests/test_address_census.py tests/test_suite_hygiene.py tests/test_id_registry.py tests/test_engine_unchanged.py tests/test_docs_canon.py tests/test_b101_doc_hygiene.py
+.                                                                        [100%]
+==================================== PASSES ====================================
+============================= QC-TM timing margins =============================
+49.7%  0.201 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+66.4%  0.504 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 2 bounds, 0 under 20 % margin
+=========================== short test summary info ============================
+PASSED tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+1 passed, 297 deselected in 1.36s
