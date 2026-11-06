@@ -1106,7 +1106,7 @@ def _create_new_json(
           empty file at its target. A home swapped once for a link leaves an
           empty file at the link's target (its name resolves outside, so it
           is not unlinked), and a project folder swapped between the guard
-          and the ``mkdir`` an empty ``flows/`` / ``flowsets/`` folder there.
+          and the ``mkdir`` an empty ``flows/`` / ``flowsets/`` folder holding the empty claim there.
           Content outside only under a double swap (the home a link at the
           create and the real folder again at the check), and a cleanup
           unlink that deletes another file only under a swap inside the last

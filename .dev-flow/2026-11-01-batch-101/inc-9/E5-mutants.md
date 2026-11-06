@@ -136,3 +136,5 @@ coverage gap — the same-file clause is pinned alone by /14/10 (M22), the one-l
 /14/11 (M23), and `S_ISREG` is subsumed by `samestat` (a non-regular entry cannot samestat-equal
 the claim's regular-file descriptor). M14 is therefore an equivalent mutant on the final tree,
 not a survivor that hides a bug.
+
+Orchestrator note: M14's re-map ran only its original nodes; the corrective's /14/10 + /8/8 (M22, samestat dropped) cover the samestat half of M14 — see the orchestrator's run `mut-r-14b.txt`.
