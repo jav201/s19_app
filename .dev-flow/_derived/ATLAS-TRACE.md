@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 95 requirement files | corpus digest: a42652e08fba4fa9 -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 96 requirement files | corpus digest: e29077b91adb13be -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
@@ -1522,7 +1522,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 2387 unique id(s)
+## family US/HLR/LLR — 2390 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -3821,7 +3821,10 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `US-C52-4b` | batches |
 | `US-C52-5` | batches |
 | `US-C52-6` | batches |
+| `US-CHK-KEEP-1` | batches, tests |
+| `US-CHK-SPEC-1` | batches, tests |
 | `US-CRC-FRESH-1` | batches |
+| `US-CRC-FRESH-2` | batches, tests |
 | `US-CRC-RESP-1` | batches |
 | `US-CRC1` | batches |
 | `US-CRC2` | batches |
@@ -3914,7 +3917,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `US-less` | batches |
 | `US-nnn` | batches |
 
-## family R — 547 unique id(s)
+## family R — 551 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -3939,7 +3942,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `R-CHKED-007` | canon |
 | `R-CHKED-008` | canon |
 | `R-CHKED-009` | canon |
-| `R-CHKED-010` | batches, canon |
+| `R-CHKED-010` | batches, canon, tests |
 | `R-CHKED-011` | canon |
 | `R-CHKED-012` | canon |
 | `R-CHKED-013` | canon |
@@ -3953,10 +3956,10 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `R-CHKED-021` | canon |
 | `R-CHKED-022` | canon |
 | `R-CHKED-023` | canon |
-| `R-CHKED-024` | canon |
-| `R-CHKED-025` | batches, canon |
-| `R-CHKED-026` | canon |
-| `R-CHKED-027` | canon |
+| `R-CHKED-024` | batches, canon |
+| `R-CHKED-025` | batches, canon, tests |
+| `R-CHKED-026` | batches, canon, tests |
+| `R-CHKED-027` | batches, canon, tests |
 | `R-CHKED-028` | canon |
 | `R-CHKED-029` | canon |
 | `R-CHKED-030` | canon |
@@ -3970,19 +3973,23 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `R-CHKED-038` | canon |
 | `R-CHKED-039` | canon |
 | `R-CHKED-040` | canon |
-| `R-CHKED-041` | canon |
+| `R-CHKED-041` | batches, canon, tests |
 | `R-CHKED-042` | canon |
-| `R-CHKED-043` | canon |
+| `R-CHKED-043` | batches, canon |
 | `R-CHKED-044` | canon |
 | `R-CHKED-045` | canon |
 | `R-CHKED-046` | canon |
 | `R-CHKED-047` | canon |
-| `R-CHKED-048` | canon |
+| `R-CHKED-048` | batches, canon |
 | `R-CHKED-049` | canon |
 | `R-CHKED-050` | canon |
 | `R-CHKED-051` | canon |
 | `R-CHKED-052` | canon |
 | `R-CHKED-053` | canon |
+| `R-CHKED-054` | batches, tests |
+| `R-CHKED-055` | batches, tests |
+| `R-CHKED-056` | batches, tests |
+| `R-CHKED-057` | batches, tests |
 | `R-CHKS-001` | batches, canon |
 | `R-CHKS-002` | canon |
 | `R-CHKS-003` | canon |

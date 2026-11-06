@@ -1,0 +1,25 @@
+LAN host 2, merged tree 823d0c9 (main 9bb0e3a + Inc 5 merge; EXPECTED_SCANNED_TEST_FILES conflict resolved to 265) — FULL suite (-n 12 --dist loadfile, not serial_timing) + serial lane; snapshot suite on the LAN laptop host in the CI-recipe venv. Main lane: the 4 known failures, test_tc_b97_55 (known load flake, BACKLOG-CODE 2026-11-05; passed 3/3 alone on the Inc 15+16 tree, Inc 5 does not touch flow execution), and test_r_tst_070_2 (the redaction gate: evidence/inc-5/int-05.txt held a pytest temp folder named after the account) — fixed in the next commit on main (token redacted to pytest-of-<user>, packet SHA-256 updated); the gate then passed (2 passed, below). Serial lane: 68 passed, 0 under 20 % margin.
+---main+serial---
+HEAD 823d0c93
+<HOME>/work/s19_m5/s19_app/__init__.py
+-------- generated xml file: <HOME>/work/m5-out/junit-main.xml ---------
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_55_input_queued_during_a_run_starts_no_second_run
+FAILED tests/test_suite_hygiene.py::test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-120x30]
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+6 failed, 5834 passed, 181 skipped, 4 xfailed in 3037.31s (0:50:37)
+---serial---
+QC-TM: 94 bounds, 0 under 20 % margin
+68 passed, 2 skipped, 6025 deselected in 353.41s (0:05:53)
+exit=done
+---redaction gate after the fix (same tree + fixed files)---
+tests/test_suite_hygiene.py -k 070: 2 passed, 65 deselected
+---snapshot-laptop---
+<HOME>/work/s19_m5snap/s19_app/__init__.py
+2 snapshots failed. 27 snapshots passed.
+=========================== short test summary info ============================
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-120x30]
+2 failed, 27 passed, 4 deselected in 119.33s (0:01:59)
