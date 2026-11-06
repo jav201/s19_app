@@ -27,6 +27,7 @@ import re
 from itertools import permutations
 from pathlib import Path
 
+import pytest
 from textual.widgets import Button, Input, Label, Select, Static, Switch
 
 from s19_app.tui import crc_designer_view
@@ -41,6 +42,16 @@ from s19_app.tui.operations.crc_designer_model import (
 )
 from s19_app.tui.operations.crc_kernel import CrcAlgorithm, SEED_ALGORITHM, preset_by_name
 from s19_app.tui.rail import Rail
+from tests.support.b101_designer import (  # noqa: F401  (the fixture is used by name)
+    designer_recompute_counter,
+    designer_recomputes,
+    wait_designer_recompute,
+)
+
+# Inc 13: the CRC Designer recomputes a text edit after the quiet time, so a node
+# that reads a result surface after a text edit waits on product state (the
+# recompute count) instead of a fixed number of pauses.
+pytestmark = pytest.mark.usefixtures("designer_recompute_counter")
 
 #: The named form widget ids the scaffold must present (LLR-V1.2): the preset
 #: selector, the seven algorithm fields, the three serialization fields.
@@ -203,12 +214,16 @@ def test_live_verdict_transitions_on_single_field_events(tmp_path: Path) -> None
             before = _verdict(app)  # seed CRC-32 kat == check -> MATCH
 
             # Single real event: break xorout (kat changes, check pinned).
+            recomputes_before = designer_recomputes()
             app.query_one("#crc_field_xorout", Input).value = "0x00000000"
+            await wait_designer_recompute(pilot, app, recomputes_before)
             await pilot.pause()
             after_break = _verdict(app)
 
             # Single real event: clear check -> no expected value to compare.
+            recomputes_before = designer_recomputes()
             app.query_one("#crc_field_check", Input).value = ""
+            await wait_designer_recompute(pilot, app, recomputes_before)
             await pilot.pause()
             after_clear = _verdict(app)
             return before, after_break, after_clear
@@ -342,7 +357,9 @@ def test_verdict_fault_guard_out_of_range_width(tmp_path: Path) -> None:
             await pilot.pause()
             await pilot.press("0")
             await pilot.pause()
+            recomputes_before = designer_recomputes()
             app.query_one("#crc_field_width", Input).value = "4"
+            await wait_designer_recompute(pilot, app, recomputes_before)
             await pilot.pause()
             verdict_widget = app.query_one("#crc_kat_verdict", Static)
             markup_off = verdict_widget._render_markup is False
@@ -600,7 +617,9 @@ def test_store_width_too_small_warns_live(tmp_path: Path) -> None:
             await pilot.press("0")
             await pilot.pause()
             before = str(app.query_one("#crc_warnings", Static).content)
+            recomputes_before = designer_recomputes()
             app.query_one("#crc_field_store_width", Input).value = "1"
+            await wait_designer_recompute(pilot, app, recomputes_before)
             await pilot.pause()
             widget = app.query_one("#crc_warnings", Static)
             return before, str(widget.content), widget._render_markup is False
@@ -668,11 +687,13 @@ async def _coverage_preview(
             app.current_file = _loaded(mem_map)
         await pilot.press("0")
         await pilot.pause()
+        recomputes_before = designer_recomputes()
         app.query_one("#crc_coverage_ranges", Input).value = ranges
         app.query_one("#crc_coverage_intra_gap", Select).value = intra
         app.query_one("#crc_coverage_join", Select).value = join
         app.query_one("#crc_coverage_pad_byte", Input).value = pad
         app.query_one("#crc_coverage_on_gap_conflict", Select).value = on_conflict
+        await wait_designer_recompute(pilot, app, recomputes_before)
         await pilot.pause()
         return str(app.query_one("#crc_coverage_preview", Static).content)
 
@@ -803,12 +824,16 @@ def test_three_warn_conditions_through_view(tmp_path: Path) -> None:
 
             # (1) fill policy with no pad byte.
             app.query_one("#crc_coverage_join", Select).value = "fill"
+            recomputes_before = designer_recomputes()
             app.query_one("#crc_coverage_pad_byte", Input).value = ""
+            await wait_designer_recompute(pilot, app, recomputes_before)
             await pilot.pause()
             warn_fill = str(app.query_one("#crc_warnings", Static).content)
 
             # (2) store_width narrower than ceil(width/8).
+            recomputes_before = designer_recomputes()
             app.query_one("#crc_field_store_width", Input).value = "1"
+            await wait_designer_recompute(pilot, app, recomputes_before)
             await pilot.pause()
             warn_store = str(app.query_one("#crc_warnings", Static).content)
 
@@ -1036,9 +1061,11 @@ async def _window_after(
             app.current_file = _loaded(mem_map)
         await pilot.press("0")
         await pilot.pause()
+        recomputes_before = designer_recomputes()
         app.query_one("#crc_coverage_ranges", Input).value = ranges
         app.query_one("#crc_coverage_join", Select).value = join
         app.query_one("#crc_coverage_pad_byte", Input).value = pad
+        await wait_designer_recompute(pilot, app, recomputes_before)
         await pilot.pause()
         window = app.query_one("#crc_coverage_window", Static)
         rendered = window.render()
@@ -1103,7 +1130,9 @@ def test_coverage_window_deltas_and_repins_on_range_edit(tmp_path: Path) -> None
             app.query_one("#crc_coverage_join", Select).value = "fill"
             await pilot.pause()
             two_range = str(app.query_one("#crc_coverage_window", Static).render())
+            recomputes_before = designer_recomputes()
             app.query_one("#crc_coverage_ranges", Input).value = "0x8000-0x8008"
+            await wait_designer_recompute(pilot, app, recomputes_before)
             await pilot.pause()
             one_range = str(app.query_one("#crc_coverage_window", Static).render())
             return two_range, one_range
@@ -1151,7 +1180,9 @@ def test_coverage_window_malformed_range_markup_safe(tmp_path: Path) -> None:
             before = dict(mem_obj)
             await pilot.press("0")
             await pilot.pause()
+            recomputes_before = designer_recomputes()
             app.query_one("#crc_coverage_ranges", Input).value = "0x8010-0x8000"
+            await wait_designer_recompute(pilot, app, recomputes_before)
             await pilot.pause()
             window = app.query_one("#crc_coverage_window", Static)
             plain = str(window.render())
@@ -1192,10 +1223,12 @@ async def _window_text(
         app.current_file = _loaded(mem_map)
         await pilot.press("0")
         await pilot.pause()
+        recomputes_before = designer_recomputes()
         app.query_one("#crc_coverage_ranges", Input).value = ranges
         app.query_one("#crc_coverage_join", Select).value = join
         app.query_one("#crc_coverage_pad_byte", Input).value = pad
         app.query_one("#crc_coverage_on_gap_conflict", Select).value = on_conflict
+        await wait_designer_recompute(pilot, app, recomputes_before)
         await pilot.pause()
         return str(app.query_one("#crc_coverage_window", Static).render())
 
@@ -1256,7 +1289,9 @@ def test_recompute_handler_fires_through_relayout(tmp_path: Path) -> None:
                 app.query_one("#crc_field_xorout"), "crc_bench_c1"
             )
             before = _verdict(app)
+            recomputes_before = designer_recomputes()
             app.query_one("#crc_field_xorout", Input).value = "0x00000000"
+            await wait_designer_recompute(pilot, app, recomputes_before)
             await pilot.pause()
             after = _verdict(app)
             return field_in_bench, before, after
@@ -1329,9 +1364,11 @@ def test_coverage_window_hostile_markup_renders_literally(tmp_path: Path) -> Non
             app.current_file = _loaded(_fixture_mem())
             await pilot.press("0")
             await pilot.pause()
+            recomputes_before = designer_recomputes()
             app.query_one("#crc_coverage_ranges", Input).value = (
                 "[link=evil]0x8000-0x8008[/], ["
             )
+            await wait_designer_recompute(pilot, app, recomputes_before)
             await pilot.pause()
             window = app.query_one("#crc_coverage_window", Static)
             rendered = window.render()
@@ -1557,7 +1594,9 @@ def test_kat_verdict_demoted_to_self_test_row_under_check(tmp_path: Path) -> Non
                 str(child.render()) for child in verdict.parent.children
             )
             before = _verdict(app)
+            recomputes_before = designer_recomputes()
             app.query_one("#crc_field_check", Input).value = "0x00000000"
+            await wait_designer_recompute(pilot, app, recomputes_before)
             await pilot.pause()
             after = _verdict(app)
             return (
@@ -1640,7 +1679,9 @@ def test_recompute_surface_ids_are_the_live_markup_census(
                 "_RECOMPUTE_SURFACE_IDS",
                 surface_ids + ("crc_no_such_surface",),
             )
+            recomputes_before = designer_recomputes()
             app.query_one("#crc_field_xorout", Input).value = "0x00000000"
+            await wait_designer_recompute(pilot, app, recomputes_before)
             await pilot.pause()
             return before, _verdict(app)
 

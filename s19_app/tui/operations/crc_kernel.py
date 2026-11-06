@@ -70,6 +70,13 @@ def reflect(value: int, width: int) -> int:
     return result
 
 
+#: The 256-entry input-reflection table: ``_REFLECT8[b] == reflect(b, 8)`` for
+#: every byte value ``b``. :func:`crc_lut` translates its whole input through it
+#: once when ``refin`` is set, replacing the per-byte ``reflect(byte, 8)`` call
+#: with a single C-level :meth:`bytes.translate` (E1-D1, R-CRC-DESIGNER-001.1).
+_REFLECT8: bytes = bytes(reflect(b, 8) for b in range(256))
+
+
 def crc_stream(
     data: bytes,
     *,
@@ -219,13 +226,15 @@ def crc_lut(
         ValueError: When ``width`` is outside :data:`MIN_WIDTH`..:data:`MAX_WIDTH`.
 
     Data Flow:
-        - Fetch/build the table via :func:`make_crc_table`; run the byte loop
+        - Fetch/build the table via :func:`make_crc_table`; when ``refin``,
+          translate the input once through :data:`_REFLECT8`
+          (``bytes(memoryview(data)).translate(_REFLECT8)``); run the byte loop
           ``reg = (reg << 8) ^ table[((reg >> (width-8)) ^ byte) & 0xFF]``;
           reflect the register if ``refout``; XOR ``xorout``.
 
     Dependencies:
         Uses:
-            - :func:`make_crc_table`, :func:`reflect`
+            - :func:`make_crc_table`, :func:`reflect`, :data:`_REFLECT8`
         Used by:
             - :meth:`CrcAlgorithm.compute`
             - tests/test_crc_kernel.py (LUT differential test)
@@ -243,9 +252,9 @@ def crc_lut(
     mask = (1 << width) - 1
     shift = width - 8
     reg = init & mask
+    if refin:
+        data = bytes(memoryview(data)).translate(_REFLECT8)
     for byte in data:
-        if refin:
-            byte = reflect(byte, 8)
         reg = ((reg << 8) ^ table[((reg >> shift) ^ byte) & 0xFF]) & mask
     if refout:
         reg = reflect(reg, width)

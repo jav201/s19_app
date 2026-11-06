@@ -1,0 +1,15 @@
+# batch-101 Inc 13 E4 integration - Probe: the three lane-1 run-1 failures alone, after the fixes
+# Host: LAN Linux host 2 (16 cores), env s19ci (Python 3.11, pytest-xdist 3.8.0, textual 8.2.8)
+# Tree: detached worktree at origin/main f9f3cb09 (contains b7b77c4; no s19_app/ or tests/ drift from it)
+#       plus `git diff b7b77c4 -- s19_app tests` of branch b101-inc13 (38e31bf + integration edits)
+# Lines 1-5 below: remote HEAD, changed-file count, s19_app.__file__, Python version, uptime/load
+# Command: cd <HOME>/work/s19_i13 && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 2400 <HOME>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider --basetemp /tmp/pytest-s19i13 tests/test_b97_key_bar.py::test_tc_b97_69_page_keys_do_nothing_where_disabled tests/test_b101_designer_recompute.py::test_r_crc_preview_002_1_image_set_cleared_replaced tests/test_id_registry.py
+
+HEAD=f9f3cb09
+11
+<HOME>/work/s19_i13/s19_app/__init__.py
+3.11.18 (main, Oct 26 2026, 11:35:17) [GCC 15.3.0]
+ 18:49:41 up 10:21,  2 users,  load average: 1.87, 4.52, 2.49
+..............                                                           [100%]
+14 passed in 46.83s
+EXIT=0

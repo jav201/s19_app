@@ -68,13 +68,15 @@ a markup sink.
 
 from __future__ import annotations
 
-from dataclasses import replace
+from dataclasses import dataclass, replace
 from pathlib import Path
+from typing import Optional
 
 from rich.text import Text
 from textual.app import ComposeResult
 from textual.containers import Horizontal, ScrollableContainer, Vertical
 from textual.css.query import NoMatches
+from textual.timer import Timer
 from textual.widgets import Button, Input, Label, Select, Static, Switch
 
 from .os_clipboard_input import OsClipboardInput
@@ -94,6 +96,7 @@ from .operations.crc_designer_model import (
     JOIN_VALUES,
     ON_GAP_CONFLICT_VALUES,
     CrcTarget,
+    TargetEvaluation,
     _build_target,
     compute_target_crc,
     evaluate_target,
@@ -121,6 +124,63 @@ _COVERAGE_EMPTY_STATE = "Load an image to preview coverage CRCs over real bytes.
 #: contiguous-span window line never wraps. NOT inherited from the prototype's
 #: 150-col line (C-29 non-transfer).
 _COVERAGE_WINDOW_GLYPHS = 48
+
+#: The quiet time (seconds) between a text edit / image change and the single
+#: recompute it schedules (Inc 13, R-CRC-DESIGNER-001.2.2). Mirrors
+#: ``screens.SAVE_RECOMPUTE_S``; read at schedule time so tests can inject it.
+CRC_RECOMPUTE_S = 0.150
+
+#: The coverage size cap (bytes): a coverage whose widest window exceeds this
+#: is refused before any window read (Inc 13, R-CRC-PREVIEW-001.11, E3 SEC-2
+#: round 2: 16 MiB = 16777216). Read at each
+#: :meth:`CrcDesignerPanel._compute_coverage` call so tests can inject it
+#: (``monkeypatch.setattr``).
+_COVERAGE_CAP_BYTES = 16 * 1024 * 1024
+
+
+@dataclass(frozen=True)
+class _CoverageRun:
+    """One coverage computation, shared by the preview and the window (Inc 13).
+
+    Summary:
+        The single per-recompute coverage result.
+        :meth:`CrcDesignerPanel._recompute` builds exactly one of these as a
+        local and hands it to both coverage renderers, so a recompute reads the
+        coverage window at most twice instead of six times (E1-D5; never stored
+        on the panel, E3 SEC-4). A field that is ``None`` means "not applicable
+        to this run"; the invariants below make the renderer branch order safe.
+
+    Args:
+        target (Optional[CrcTarget]): The validated coverage target, present for
+            every run except the target-build fault.
+        invalid (Optional[str]): The ``str(exc)`` of a target-build fault; set
+            ⇒ every other field ``None``.
+        evaluation (Optional[TargetEvaluation]): The active policy's evaluation;
+            ``None`` when ``eval_error`` is set.
+        eval_error (Optional[str]): The ``str(exc)`` of a ``ValueError`` from
+            :func:`evaluate_target`; set ⇒ ``crc_error == eval_error``.
+        concat_crc (Optional[int]): The CRC of the concat-policy window.
+        fill_crc (Optional[int]): The CRC of the fill-policy window.
+        crc_error (Optional[str]): The ``str(exc)`` of any CRC fault the window
+            must show.
+        size_cap (Optional[int]): The cap the coverage size exceeded; set ⇒
+            ``target`` set and every other field ``None``.
+
+    Dependencies:
+        Used by:
+            - :meth:`CrcDesignerPanel._recompute` (as a local only)
+            - :meth:`CrcDesignerPanel._coverage_preview_text`
+            - :meth:`CrcDesignerPanel._render_coverage_window`
+    """
+
+    target: Optional[CrcTarget] = None
+    invalid: Optional[str] = None
+    evaluation: Optional[TargetEvaluation] = None
+    eval_error: Optional[str] = None
+    concat_crc: Optional[int] = None
+    fill_crc: Optional[int] = None
+    crc_error: Optional[str] = None
+    size_cap: Optional[int] = None
 
 #: The live surfaces :meth:`CrcDesignerPanel._recompute` refreshes on every
 #: change event (batch-72 LLR-072-8.1). Declared here so the markup-safety
@@ -267,6 +327,8 @@ class CrcDesignerPanel(ScrollableContainer):
 
     def __init__(self) -> None:
         super().__init__(id="crc_designer_panel", classes="crc-designer-form")
+        self._pending_recompute: Optional[Timer] = None
+        self._coverage_dirty = False
 
     def compose(self) -> ComposeResult:
         """Compose the realigned "coverage-first bench" (batch-59 + realign R1/R5/R6).
@@ -588,7 +650,8 @@ class CrcDesignerPanel(ScrollableContainer):
                 algo = preset_by_name(str(value))
                 if algo is not None:
                     try:
-                        self._apply_algorithm(algo)
+                        with self.prevent(Input.Changed, Switch.Changed):
+                            self._apply_algorithm(algo)
                     except NoMatches:
                         # Mount-time initial Changed can arrive before the field
                         # widgets are queryable; seed values are set in compose.
@@ -611,6 +674,54 @@ class CrcDesignerPanel(ScrollableContainer):
             - :meth:`_recompute` over the composed seed fields.
         """
         self._recompute()
+        self.watch(self.app, "current_file", self._on_image_changed, init=False)
+
+    def _on_image_changed(self) -> None:
+        """React to the loaded image changing (Inc 13, F-24).
+
+        Summary:
+            The ``current_file`` watcher registered in :meth:`on_mount`. While
+            the panel is displayed the change is a pending change, scheduled
+            after the quiet time; otherwise the coverage is marked stale and
+            the recompute is deferred to :meth:`on_show` (a load on another
+            view costs nothing here, E3 A-6). No compute runs here.
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses:
+                - :attr:`Widget.is_on_screen`
+                - :meth:`_schedule_recompute`
+            Used by:
+                - the ``current_file`` watcher
+        """
+        if self.is_on_screen:
+            self._schedule_recompute()
+        else:
+            self._coverage_dirty = True
+
+    def on_show(self) -> None:
+        """Recompute once on display when the coverage is stale (Inc 13, E3 A-6).
+
+        Summary:
+            :class:`events.Show` fires when the reflow shows this widget (e.g.
+            key ``0`` returns to the CRC Designer section). When an image was
+            loaded/replaced/cleared while the panel was hidden,
+            :meth:`_on_image_changed` set the stale flag; schedule the pending
+            recompute now. A clean display does nothing, so the rejected
+            "recompute on every show" cost never returns. The flag is cleared
+            by :meth:`_recompute`.
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses:
+                - :meth:`_schedule_recompute`
+        """
+        if self._coverage_dirty:
+            self._schedule_recompute()
 
     def on_input_changed(self, event: Input.Changed) -> None:
         """Recompute the live surfaces on any field / vector edit (LLR-V2.1).
@@ -622,7 +733,32 @@ class CrcDesignerPanel(ScrollableContainer):
         Returns:
             None
         """
-        self._recompute()
+        self._schedule_recompute()
+
+    def _schedule_recompute(self) -> None:
+        """(Re)schedule one recompute after the quiet time (Inc 13).
+
+        Summary:
+            Debounce the recompute behind :data:`CRC_RECOMPUTE_S`: stop a
+            pending timer, then start a fresh one that calls :meth:`_recompute`.
+            The module constant is read now (at schedule time) so tests can
+            inject it with ``monkeypatch.setattr``. The recompute itself clears
+            the recorded timer (its first statement), so the pending flag is
+            ``None`` again once it has run.
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses:
+                - :meth:`Widget.set_timer`, :class:`~textual.timer.Timer.stop`
+            Used by:
+                - :meth:`on_input_changed`, :meth:`_on_image_changed`,
+                  :meth:`on_show`
+        """
+        if self._pending_recompute is not None:
+            self._pending_recompute.stop()
+        self._pending_recompute = self.set_timer(CRC_RECOMPUTE_S, self._recompute)
 
     def on_switch_changed(self, event: Switch.Changed) -> None:
         """Recompute the live surfaces on a reflect-in/out toggle (LLR-V2.1).
@@ -918,13 +1054,13 @@ class CrcDesignerPanel(ScrollableContainer):
 
         Raises:
             ValueError: A malformed range/field or a ``_build_target`` rule
-                violation — caught by :meth:`_coverage_preview_text`.
+                violation — caught by :meth:`_compute_coverage`.
 
         Dependencies:
             Uses:
                 - :meth:`_parse_ranges`, :func:`_build_target`
             Used by:
-                - :meth:`_coverage_preview_text`
+                - :meth:`_compute_coverage`
         """
         ranges = self._parse_ranges(
             self.query_one("#crc_coverage_ranges", Input).value
@@ -948,23 +1084,102 @@ class CrcDesignerPanel(ScrollableContainer):
         }
         return _build_target(0, raw)
 
-    def _coverage_preview_text(self, algo: CrcAlgorithm) -> str:
-        """Render the per-policy coverage preview over the loaded image (LLR-V6.2 / V7.1).
+    def _compute_coverage(self, algo: CrcAlgorithm) -> Optional[_CoverageRun]:
+        """Compute the one coverage result a recompute shares (Inc 13).
 
         Summary:
-            While an image is loaded, compute the target's CRC over the real
-            ``mem_map`` for BOTH gap policies (``concat`` AND ``fill``) and show
-            them side by side, marking the active ``join`` (LLR-V6.2). A
-            ``join="fill"`` target is first evaluated under its
-            ``on_gap_conflict`` policy (:func:`evaluate_target`, LLR-V7.1):
-            ``abort`` refuses the preview (no CRC, a refusal notice), ``warn``
-            proceeds and appends the plain-text diagnostic, ``ignore`` proceeds
-            silently. No image loaded → a graceful "load an image" note and no
-            compute. The view only READS ``mem_map`` — never mutates it, never
-            writes firmware (LLR-V8.1). All text renders ``markup=False``.
+            Build the coverage target and evaluate it once; the preview and the
+            window both render this single result, so a recompute reads the
+            coverage window at most twice. Without an image the result is
+            ``None``. A target-build fault becomes the ``invalid`` reason; a
+            coverage whose size exceeds the cap (:data:`_COVERAGE_CAP_BYTES`,
+            read now) is refused before any window read (E3 SEC-2). Otherwise
+            the evaluation's CRC is the active policy's; only the other policy
+            is computed again. When the evaluation refuses (abort on a dirty
+            gap), both policies are computed for the window's comparison line.
 
         Args:
             algo (CrcAlgorithm): The current algorithm.
+
+        Returns:
+            Optional[_CoverageRun]: The shared result, or ``None`` without an
+            image.
+
+        Dependencies:
+            Uses:
+                - :meth:`_build_coverage_target`, :func:`evaluate_target`,
+                  :func:`compute_target_crc`, :func:`dataclasses.replace`
+            Used by:
+                - :meth:`_recompute`
+        """
+        loaded = getattr(self.app, "current_file", None)
+        mem_map = loaded.mem_map if loaded is not None else None
+        if not mem_map:
+            return None
+        try:
+            target = self._build_coverage_target()
+        except (ValueError, KeyError) as exc:
+            return _CoverageRun(invalid=str(exc))
+        cap = _COVERAGE_CAP_BYTES
+        coverage_size = sum(end - start for start, end in target.ranges)
+        prev_end: int | None = None
+        for start, end in target.ranges:
+            if prev_end is not None and start > prev_end:
+                coverage_size += start - prev_end
+            prev_end = end
+        if coverage_size > cap:
+            return _CoverageRun(target=target, size_cap=cap)
+        try:
+            evaluation = evaluate_target(mem_map, algo, target)
+        except ValueError as exc:
+            return _CoverageRun(
+                target=target, eval_error=str(exc), crc_error=str(exc)
+            )
+        try:
+            if evaluation.refused:
+                concat_crc = compute_target_crc(
+                    mem_map, algo, replace(target, join="concat")
+                )
+                fill_crc = compute_target_crc(
+                    mem_map, algo, replace(target, join="fill")
+                )
+            elif target.join == "concat":
+                concat_crc = evaluation.crc
+                fill_crc = compute_target_crc(
+                    mem_map, algo, replace(target, join="fill")
+                )
+            else:
+                fill_crc = evaluation.crc
+                concat_crc = compute_target_crc(
+                    mem_map, algo, replace(target, join="concat")
+                )
+        except ValueError as exc:
+            return _CoverageRun(
+                target=target, evaluation=evaluation, crc_error=str(exc)
+            )
+        return _CoverageRun(
+            target=target,
+            evaluation=evaluation,
+            concat_crc=concat_crc,
+            fill_crc=fill_crc,
+        )
+
+    def _coverage_preview_text(self, run: Optional[_CoverageRun]) -> str:
+        """Render the per-policy coverage preview from a shared run (Inc 13).
+
+        Summary:
+            Render the result :meth:`_compute_coverage` computed once per
+            recompute, in the same states and with the same texts as before:
+            ``None`` → the empty-state note; ``invalid`` → ``Invalid coverage:
+            <reason>``; ``size_cap`` → ``Cannot preview: coverage exceeds <cap>
+            bytes``; ``eval_error`` → ``Cannot preview: <reason>``; a refused
+            evaluation → the abort notice; ``crc_error`` → ``Cannot preview:
+            <reason>`` (E5-CR-3); otherwise the three lines (active policy,
+            concat CRC, fill CRC) plus any diagnostics. All text renders
+            ``markup=False``.
+
+        Args:
+            run (Optional[_CoverageRun]): The shared coverage result.
 
         Returns:
             str: The per-policy preview, a refusal notice, or the empty-state
@@ -972,94 +1187,82 @@ class CrcDesignerPanel(ScrollableContainer):
 
         Dependencies:
             Uses:
-                - :meth:`_build_coverage_target`, :func:`evaluate_target`,
-                  :func:`compute_target_crc`
+                - :class:`_CoverageRun`, :func:`_format_hex`
             Used by:
                 - :meth:`_recompute`
         """
-        loaded = getattr(self.app, "current_file", None)
-        mem_map = loaded.mem_map if loaded is not None else None
-        if not mem_map:
+        if run is None:
             return _COVERAGE_EMPTY_STATE
-        try:
-            target = self._build_coverage_target()
-        except (ValueError, KeyError) as exc:
-            return f"Invalid coverage: {exc}"
-        try:
-            evaluation = evaluate_target(mem_map, algo, target)
-        except ValueError as exc:
-            return f"Cannot preview: {exc}"
-        if evaluation.refused:
-            shown = ", ".join(f"0x{addr:X}" for addr in evaluation.conflicts[:8])
+        if run.invalid is not None:
+            return f"Invalid coverage: {run.invalid}"
+        if run.size_cap is not None:
+            return f"Cannot preview: coverage exceeds {run.size_cap} bytes"
+        if run.eval_error is not None:
+            return f"Cannot preview: {run.eval_error}"
+        if run.evaluation.refused:
+            shown = ", ".join(f"0x{addr:X}" for addr in run.evaluation.conflicts[:8])
             return (
                 "Preview refused (on_gap_conflict=abort): "
-                f"{len(evaluation.conflicts)} present byte(s) at {shown} conflict "
+                f"{len(run.evaluation.conflicts)} present byte(s) at {shown} conflict "
                 "with a filled gap; no CRC shown."
             )
-        concat_crc = compute_target_crc(mem_map, algo, replace(target, join="concat"))
-        fill_crc = compute_target_crc(mem_map, algo, replace(target, join="fill"))
+        if run.crc_error is not None:
+            return f"Cannot preview: {run.crc_error}"
+        target = run.target
         lines = [
             f"Active policy: join={target.join}",
-            f"concat: {_format_hex(concat_crc, target.store_width)}",
-            f"fill:   {_format_hex(fill_crc, target.store_width)}",
+            f"concat: {_format_hex(run.concat_crc, target.store_width)}",
+            f"fill:   {_format_hex(run.fill_crc, target.store_width)}",
         ]
-        lines.extend(evaluation.diagnostics)
+        lines.extend(run.evaluation.diagnostics)
         return "\n".join(lines)
 
-    def _render_coverage_window(self, algo: CrcAlgorithm) -> Text:
-        """Render the multi-range coverage window as colored block glyphs (LLR-L1.1).
+    def _render_coverage_window(self, run: Optional[_CoverageRun]) -> Text:
+        """Render the multi-range coverage window from a shared run (Inc 13).
 
         Summary:
-            The Variant-B signature (HLR-L1): draw the current target's memory
-            window as a block-glyph run per range (present bytes, accent hue) and
-            per inter-range gap (erased grey when ``join="concat"``, pad-fill in
-            the warning hue when ``join="fill"``), then the LIVE concat and fill
-            policy CRC hexes and the active-policy store-word bytes. The two CRCs
-            are computed over the real ``mem_map`` via the shipped
-            :func:`compute_target_crc` (reused verbatim — 0 new engine math), so a
-            static mock would fail the oracle pin (D-1 / B2). No image loaded → the
-            shipped empty-state note (no glyph compute); a malformed range → a
-            markup-safe ``Invalid coverage`` note (reusing the
-            :meth:`_build_coverage_target` fault path). Built via
-            :class:`~rich.text.Text` ``append`` — NEVER ``Text.from_markup`` — so
-            operator range text on the fault branch renders literally (C-17; the
-            widget is ``markup=False``, LLR-L1.2). The window only READS
-            ``mem_map`` (US-V8 preview-only, R-4).
+            Draw the same colored block-glyph window as before, but from the
+            result :meth:`_compute_coverage` computed once per recompute:
+            ``None`` → the empty-state note; ``invalid`` → ``Invalid coverage:
+            <reason>``. Line 1 is scaled to the whole span (lowest range start
+            to highest range end, E3 SEC-1) so out-of-order ranges draw a
+            bounded line while ascending ranges draw exactly as before;
+            ``size_cap`` → the cap notice as line 2; ``crc_error`` → ``Cannot
+            compute: <reason>`` as line 2; otherwise the concat/fill hexes, the
+            active-policy store word (or the abort refusal) and any diagnostics.
+            Built via :class:`~rich.text.Text` ``append`` — NEVER
+            ``Text.from_markup`` — so operator range text renders literally.
 
         Args:
-            algo (CrcAlgorithm): The current algorithm the CRCs are computed with.
+            run (Optional[_CoverageRun]): The shared coverage result.
 
         Returns:
             Text: The colored block-glyph window (glyphs + concat/fill hexes +
             store bytes), or the empty-state / invalid-coverage note.
 
-        Data Flow:
-            - :meth:`_build_coverage_target` → per-range/per-gap glyph runs
-              (:data:`insight_style` palette) + :func:`compute_target_crc`
-              (``join`` concat/fill) + :func:`store_word` → styled ``Text``.
-
         Dependencies:
             Uses:
-                - :meth:`_build_coverage_target`, :func:`compute_target_crc`,
-                  :func:`store_word`, :func:`_format_hex`, the ``insight_style``
-                  palette
+                - :class:`_CoverageRun`, :func:`store_word`, :func:`_format_hex`,
+                  the ``insight_style`` palette
             Used by:
                 - :meth:`_recompute`
         """
-        loaded = getattr(self.app, "current_file", None)
-        mem_map = loaded.mem_map if loaded is not None else None
-        if not mem_map:
+        if run is None:
             return Text(_COVERAGE_EMPTY_STATE)
-        try:
-            target = self._build_coverage_target()
-        except (ValueError, KeyError) as exc:
+        if run.invalid is not None:
             # Markup-safe by construction: Text() (NOT Text.from_markup) renders
             # the echoed raw operator token literally — the sink's safety rests on
             # markup=False, NOT on the source being int-only (this fault branch DOES
             # echo raw operator text; F2-minor / AT-B59-09).
-            return Text(f"Invalid coverage: {exc}")
+            return Text(f"Invalid coverage: {run.invalid}")
 
-        span = target.ranges[-1][1] - target.ranges[0][0]
+        target = run.target
+        # E3 SEC-1: scale line 1 to the whole span (lowest start to highest
+        # end), so out-of-order Ranges draw a bounded line; ascending Ranges
+        # draw exactly as on base (no run exceeds the span).
+        span = max(end for _, end in target.ranges) - min(
+            start for start, _ in target.ranges
+        )
         bytes_per_glyph = max(1, -(-span // _COVERAGE_WINDOW_GLYPHS))  # ceil-divide
         text = Text()
         prev_end: int | None = None
@@ -1075,30 +1278,26 @@ class CrcDesignerPanel(ScrollableContainer):
             prev_end = end
         text.append("\n")
 
-        try:
-            concat_crc = compute_target_crc(mem_map, algo, replace(target, join="concat"))
-            fill_crc = compute_target_crc(mem_map, algo, replace(target, join="fill"))
-            # F1: gate the ACTIVE-policy store word through the shipped abort
-            # contract so the hero agrees with the sibling preview — a dirty fill
-            # gap under on_gap_conflict="abort" refuses the CRC (crc=None), and the
-            # window must NOT emit that divergent store word (evaluate_target,
-            # AT-058-08). Showing both concat+fill hexes for comparison stays fine.
-            evaluation = evaluate_target(mem_map, algo, target)
-        except ValueError as exc:
-            text.append(f"Cannot compute: {exc}", style=DGRAY)
+        if run.size_cap is not None:
+            text.append(
+                f"Cannot preview: coverage exceeds {run.size_cap} bytes", style=DGRAY
+            )
+            return text
+        if run.crc_error is not None:
+            text.append(f"Cannot compute: {run.crc_error}", style=DGRAY)
             return text
         text.append("concat ", style=DGRAY)
-        text.append(_format_hex(concat_crc, target.store_width), style=HILITE)
+        text.append(_format_hex(run.concat_crc, target.store_width), style=HILITE)
         text.append("   fill ", style=DGRAY)
-        text.append(_format_hex(fill_crc, target.store_width), style=YELLOW)
+        text.append(_format_hex(run.fill_crc, target.store_width), style=YELLOW)
         text.append("\n")
-        if evaluation.refused:
+        if run.evaluation.refused:
             text.append("store — refused (on_gap_conflict=abort)", style=YELLOW)
             return text
-        store_bytes = store_word(evaluation.crc, target)
+        store_bytes = store_word(run.evaluation.crc, target)
         text.append("store ", style=DGRAY)
         text.append(store_bytes.hex(" ").upper(), style=HILITE)
-        for diagnostic in evaluation.diagnostics:
+        for diagnostic in run.evaluation.diagnostics:
             text.append("\n")
             text.append(diagnostic, style=YELLOW)
         return text
@@ -1124,19 +1323,27 @@ class CrcDesignerPanel(ScrollableContainer):
               name-keyed mapping (a missing id aborts the whole refresh).
             - :meth:`_current_template` → :meth:`_verdict_text` /
               :meth:`_custom_vector_text` / :meth:`_preview_text` /
-              :meth:`_live_warnings_text` / :meth:`_coverage_preview_text` →
-              each ``Static.update`` (markup-safe).
+              :meth:`_live_warnings_text` / :meth:`_compute_coverage` →
+              each ``Static.update`` (markup-safe); the one shared
+              :class:`_CoverageRun` feeds both :meth:`_coverage_preview_text`
+              and :meth:`_render_coverage_window`.
 
         Dependencies:
             Uses:
                 - :data:`_RECOMPUTE_SURFACE_IDS`
                 - :meth:`_current_template`, :meth:`_verdict_text`,
                   :meth:`_custom_vector_text`, :meth:`_preview_text`,
-                  :meth:`_live_warnings_text`, :meth:`_coverage_preview_text`
+                  :meth:`_live_warnings_text`, :meth:`_compute_coverage`,
+                  :meth:`_coverage_preview_text`, :meth:`_render_coverage_window`
             Used by:
-                - :meth:`on_mount`, :meth:`on_input_changed`,
-                  :meth:`on_switch_changed`, :meth:`on_select_changed`
+                - :meth:`on_mount`, :meth:`on_switch_changed`,
+                  :meth:`on_select_changed`, :meth:`_apply_template`,
+                  :meth:`_schedule_recompute` (as the timer callback)
         """
+        pending, self._pending_recompute = self._pending_recompute, None
+        if pending is not None:
+            pending.stop()
+        self._coverage_dirty = False
         try:
             surfaces = {
                 surface_id: self.query_one(f"#{surface_id}", Static)
@@ -1167,8 +1374,9 @@ class CrcDesignerPanel(ScrollableContainer):
         custom_result.update(self._custom_vector_text(algo))
         preview.update(self._preview_text(template))
         warnings.update(self._live_warnings_text(algo))
-        coverage.update(self._coverage_preview_text(algo))
-        window.update(self._render_coverage_window(algo))
+        run = self._compute_coverage(algo)
+        coverage.update(self._coverage_preview_text(run))
+        window.update(self._render_coverage_window(run))
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """Route the Save / Load button presses (LLR-V5.1 / V5.2).
@@ -1330,7 +1538,8 @@ class CrcDesignerPanel(ScrollableContainer):
             Used by:
                 - :meth:`_load_template`
         """
-        self._apply_algorithm(template.algorithm)
-        self.query_one("#crc_field_name", Input).value = template.algorithm.name
-        self.query_one("#crc_field_aliases", Input).value = ", ".join(template.aliases)
+        with self.prevent(Input.Changed, Switch.Changed):
+            self._apply_algorithm(template.algorithm)
+            self.query_one("#crc_field_name", Input).value = template.algorithm.name
+            self.query_one("#crc_field_aliases", Input).value = ", ".join(template.aliases)
         self._recompute()

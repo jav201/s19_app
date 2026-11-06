@@ -1,0 +1,192 @@
+# LAN Linux host, worktree s19_c13 (detached origin/main f9f3cb09 + git diff b7b77c4 of branch b101-inc13)
+# start 2026-11-06T02:35:43Z load 3.42 3.44 2.04
+# tree fingerprint (start): fab8769b9c713783
+# s19_app.__file__ = <HOME>/work/s19_c13/s19_app/__init__.py
+# python 3.11.18
+# cmd: pytest -q -p no:cacheprovider --basetemp /tmp/pytest-s19c13 tests/test_b101_designer_recompute.py::test_inc13_d2_check_names_a_snapshot_bound_to_another_name tests/test_b101_designer_recompute.py::test_inc13_d2_touched_nodes_differ_from_base_only_by_the_waits tests/test_b101_designer_recompute.py::test_r_crc_preview_001_1_no_image_at_start_exact_note_on_both_surfaces tests/test_b101_designer_recompute.py::test_r_crc_designer_recompute_updates_each_of_the_six_surfaces_once tests/test_b101_designer_recompute.py::test_r_crc_preview_coverage_crc_error_after_a_clean_evaluation_is_named tests/test_b101_designer_recompute.py::test_r_crc_designer_at_typing_burst_by_keys_recomputes_once tests/test_b101_designer_recompute.py::test_r_crc_designer_at_preset_and_coverage_dropdowns_by_keys tests/test_b101_designer_recompute.py::test_r_crc_designer_at_template_load_by_keys_recomputes_once tests/test_b101_designer_recompute.py::test_r_crc_preview_at_image_load_and_unload_through_the_shipped_routes tests/test_b101_designer_recompute.py::test_r_crc_preview_at_project_load_through_the_dialog_recomputes_once tests/test_b101_designer_recompute.py::test_r_crc_designer_007_2_template_load_recomputes_once tests/test_b101_designer_recompute.py::test_r_crc_designer_007_3_preset_pick_recomputes_once tests/test_crc_kernel.py -n 4 -rA --tb=short
+bringing up nodes...
+bringing up nodes...
+
+...FF.F.........................                                         [100%]
+=================================== FAILURES ===================================
+___ test_r_crc_preview_coverage_crc_error_after_a_clean_evaluation_is_named ____
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+tests/test_b101_designer_recompute.py:1216: in test_r_crc_preview_coverage_crc_error_after_a_clean_evaluation_is_named
+    preview, window = asyncio.run(scenario())
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b101_designer_recompute.py:1212: in scenario
+    preview = panel._coverage_preview_text(run)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/crc_designer_view.py:1211: in _coverage_preview_text
+    f"concat: {_format_hex(run.concat_crc, target.store_width)}",
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/crc_designer_view.py:282: in _format_hex
+    return f"0x{value:0{max(byte_width, 1) * 2}X}"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: unsupported format string passed to NoneType.__format__
+_________ test_r_crc_designer_at_typing_burst_by_keys_recomputes_once __________
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+tests/test_b101_designer_recompute.py:1304: in test_r_crc_designer_at_typing_burst_by_keys_recomputes_once
+    assert value == "0x0"
+E   AssertionError: assert '0x0xFFFFFFFF' == '0x0'
+E     
+E     - 0x0
+E     + 0x0xFFFFFFFF
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-s19c13/popen-gw2/test_r_crc_designer_at_typing_0 workarea=/tmp/pytest-s19c13/popen-gw2/test_r_crc_designer_at_typing_0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+_________ test_r_crc_designer_at_preset_and_coverage_dropdowns_by_keys _________
+[gw3] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+tests/test_b101_designer_recompute.py:1365: in test_r_crc_designer_at_preset_and_coverage_dropdowns_by_keys
+    assert out["join"] == (1, "Active policy: join=fill"), out["join"]
+E   AssertionError: (1, 'Preview refused (on_gap_conflict=abort): 1 present byte(s) at 0x800B conflict with a filled gap; no CRC shown.')
+E   assert (1, 'Preview ...o CRC shown.') == (1, 'Active p...y: join=fill')
+E     
+E     At index 1 diff: 'Preview refused (on_gap_conflict=abort): 1 present byte(s) at 0x800B conflict with a filled gap; no CRC shown.' != 'Active policy: join=fill'
+E     Use -v to get more diff
+==================================== PASSES ====================================
+_____ test_r_crc_designer_recompute_updates_each_of_the_six_surfaces_once ______
+[gw1] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-s19c13/popen-gw1/test_r_crc_designer_recompute_0 workarea=/tmp/pytest-s19c13/popen-gw1/test_r_crc_designer_recompute_0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+____________ test_r_crc_designer_007_3_preset_pick_recomputes_once _____________
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-s19c13/popen-gw2/test_r_crc_designer_007_3_pres0 workarea=/tmp/pytest-s19c13/popen-gw2/test_r_crc_designer_007_3_pres0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-s19c13/popen-gw2/test_r_crc_designer_007_3_pres0 workarea=/tmp/pytest-s19c13/popen-gw2/test_r_crc_designer_007_3_pres0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.014
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-s19c13/popen-gw2/test_r_crc_designer_007_3_pres0 workarea=/tmp/pytest-s19c13/popen-gw2/test_r_crc_designer_007_3_pres0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+_________ test_r_crc_designer_at_template_load_by_keys_recomputes_once _________
+[gw3] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-s19c13/popen-gw3/test_r_crc_designer_at_templat0 workarea=/tmp/pytest-s19c13/popen-gw3/test_r_crc_designer_at_templat0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.014
+___________ test_r_crc_designer_007_2_template_load_recomputes_once ____________
+[gw1] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-s19c13/popen-gw1/test_r_crc_designer_007_2_temp0 workarea=/tmp/pytest-s19c13/popen-gw1/test_r_crc_designer_007_2_temp0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-s19c13/popen-gw1/test_r_crc_designer_007_2_temp0 workarea=/tmp/pytest-s19c13/popen-gw1/test_r_crc_designer_007_2_temp0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-s19c13/popen-gw1/test_r_crc_designer_007_2_temp0 workarea=/tmp/pytest-s19c13/popen-gw1/test_r_crc_designer_007_2_temp0/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+____ test_r_crc_preview_at_project_load_through_the_dialog_recomputes_once _____
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-s19c13/popen-gw0/test_r_crc_preview_at_project_0/home workarea=/tmp/pytest-s19c13/popen-gw0/test_r_crc_preview_at_project_0/home/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=0
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:15464 Load phase boundary: dialog_callback_entry path=/tmp/pytest-s19c13/popen-gw0/test_r_crc_preview_at_project_0/home_src/firmware.s19
+INFO     s19tui:app.py:15485 Load phase boundary: copy_started path=/tmp/pytest-s19c13/popen-gw0/test_r_crc_preview_at_project_0/home_src/firmware.s19
+INFO     s19tui:app.py:15498 Load phase boundary: copy_done path=firmware.s19 elapsed=0.001s
+WARNING  s19tui:app.py:15517 Recent sources not updated: '/tmp/pytest-s19c13/popen-gw0/test_r_crc_preview_at_project_0/home_src/firmware.s19'
+INFO     s19tui:app.py:8305 Workarea refreshed. files=1
+INFO     s19tui:app.py:15535 File copied to temp: path=/tmp/pytest-s19c13/popen-gw0/test_r_crc_preview_at_project_0/home/.s19tool/workarea/temp/firmware.s19 size_bytes=349 copy_seconds=0.001
+INFO     s19tui:app.py:15541 Load phase boundary: worker_spawned path=firmware.s19
+INFO     s19tui:app.py:18424 Load phase boundary: worker_parse_start path=firmware.s19
+INFO     s19tui:app.py:17808 Loading file: path=/tmp/pytest-s19c13/popen-gw0/test_r_crc_preview_at_project_0/home/.s19tool/workarea/temp/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14124 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18640 Load summary: file_type=s19 path=/tmp/pytest-s19c13/popen-gw0/test_r_crc_preview_at_project_0/home/.s19tool/workarea/temp/firmware.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14141 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18443 Load phase boundary: worker_parse_done path=firmware.s19 elapsed=0.008s
+INFO     s19tui:app.py:18267 Load phase boundary: prepare_entry path=firmware.s19 file_type=s19
+INFO     s19tui:app.py:18302 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:17661 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18311 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:18331 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:18338 Load phase boundary: prepare_bases_done row_bases=7
+INFO     s19tui:app.py:18348 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:18354 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:18476 Load phase boundary: worker_compute_done path=firmware.s19 precomputed=True elapsed=0.001s
+INFO     s19tui:app.py:18483 Load phase boundary: call_from_thread_apply_dispatched path=firmware.s19
+INFO     s19tui:app.py:18101 Load phase boundary: apply_install_state path=firmware.s19 precomputed=True
+INFO     s19tui:app.py:18768 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18117 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18129 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19788 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:19302 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:18142 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:18995 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18159 Loaded file successfully: path=/tmp/pytest-s19c13/popen-gw0/test_r_crc_preview_at_project_0/home/.s19tool/workarea/temp/firmware.s19 file_type=s19 elapsed_seconds=0.413 has_mac=False precomputed=True
+INFO     s19tui:app.py:12121 Project saved image. name=P file=/tmp/pytest-s19c13/popen-gw0/test_r_crc_preview_at_project_0/home/.s19tool/workarea/P/firmware.s19
+INFO     s19tui:app.py:8305 Workarea refreshed. files=1
+INFO     s19tui:app.py:2978 App initialized. base_dir=/tmp/pytest-s19c13/popen-gw0/test_r_crc_preview_at_project_0/home workarea=/tmp/pytest-s19c13/popen-gw0/test_r_crc_preview_at_project_0/home/.s19tool/workarea
+INFO     s19tui:app.py:8305 Workarea refreshed. files=1
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:8452 Load project action triggered.
+INFO     s19tui:app.py:15419 Load phase boundary: modal_dismiss_scheduled kind=project value='P'
+INFO     s19tui:app.py:14124 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:18640 Load summary: file_type=s19 path=/tmp/pytest-s19c13/popen-gw0/test_r_crc_preview_at_project_0/home/.s19tool/workarea/P/firmware.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14141 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18101 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:14077 Project loaded. name=P file=/tmp/pytest-s19c13/popen-gw0/test_r_crc_preview_at_project_0/home/.s19tool/workarea/P/firmware.s19 mac=None
+INFO     s19tui:app.py:18768 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18117 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18129 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:19788 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17661 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17716 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:16566 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:19302 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:18142 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:18995 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18159 Loaded file successfully: path=/tmp/pytest-s19c13/popen-gw0/test_r_crc_preview_at_project_0/home/.s19tool/workarea/P/firmware.s19 file_type=s19 elapsed_seconds=0.505 has_mac=False precomputed=False
+=========================== short test summary info ============================
+PASSED tests/test_b101_designer_recompute.py::test_inc13_d2_check_names_a_snapshot_bound_to_another_name
+PASSED tests/test_b101_designer_recompute.py::test_inc13_d2_touched_nodes_differ_from_base_only_by_the_waits
+PASSED tests/test_b101_designer_recompute.py::test_r_crc_preview_001_1_no_image_at_start_exact_note_on_both_surfaces
+PASSED tests/test_b101_designer_recompute.py::test_r_crc_designer_recompute_updates_each_of_the_six_surfaces_once
+PASSED tests/test_b101_designer_recompute.py::test_r_crc_preview_at_image_load_and_unload_through_the_shipped_routes
+PASSED tests/test_b101_designer_recompute.py::test_r_crc_designer_007_3_preset_pick_recomputes_once
+PASSED tests/test_crc_kernel.py::test_every_preset_reproduces_its_catalogue_check[CRC-8/SMBUS]
+PASSED tests/test_crc_kernel.py::test_every_preset_reproduces_its_catalogue_check[CRC-32/ISO-HDLC]
+PASSED tests/test_crc_kernel.py::test_every_preset_reproduces_its_catalogue_check[CRC-32C/Castagnoli]
+PASSED tests/test_crc_kernel.py::test_every_preset_reproduces_its_catalogue_check[CRC-64/XZ]
+PASSED tests/test_crc_kernel.py::test_seed_algorithm_equals_zlib_crc32_over_many_vectors
+PASSED tests/test_crc_kernel.py::test_kat_ok_is_none_without_a_pinned_check
+PASSED tests/test_crc_kernel.py::test_kat_ok_false_on_a_diverged_variant
+PASSED tests/test_crc_kernel.py::test_reflect_reverses_low_bits
+PASSED tests/test_crc_kernel.py::test_crc_stream_rejects_out_of_range_width
+PASSED tests/test_crc_kernel.py::test_independent_refin_refout_is_wired
+PASSED tests/test_crc_kernel.py::test_preset_by_name_is_case_insensitive_and_misses_return_none
+PASSED tests/test_crc_kernel.py::test_lut_matches_bitwise_oracle_over_presets_and_random_vectors
+PASSED tests/test_crc_kernel.py::test_lut_matches_oracle_for_non_catalogue_refin_ne_refout
+PASSED tests/test_crc_kernel.py::test_lut_matches_oracle_for_non_byte_aligned_widths
+PASSED tests/test_crc_kernel.py::test_r_crc_designer_001_1_lut_matches_oracle_200_vectors_and_widths_9_to_63
+PASSED tests/test_crc_kernel.py::test_compute_routes_through_lut_and_preserves_kat
+PASSED tests/test_crc_kernel.py::test_crc_table_is_cached_per_width_poly
+PASSED tests/test_b101_designer_recompute.py::test_r_crc_designer_at_template_load_by_keys_recomputes_once
+PASSED tests/test_crc_kernel.py::test_every_preset_reproduces_its_catalogue_check[CRC-16/MODBUS]
+PASSED tests/test_b101_designer_recompute.py::test_r_crc_designer_007_2_template_load_recomputes_once
+PASSED tests/test_crc_kernel.py::test_every_preset_reproduces_its_catalogue_check[CRC-16/CCITT-FALSE]
+PASSED tests/test_b101_designer_recompute.py::test_r_crc_preview_at_project_load_through_the_dialog_recomputes_once
+PASSED tests/test_crc_kernel.py::test_every_preset_reproduces_its_catalogue_check[CRC-16/XMODEM]
+FAILED tests/test_b101_designer_recompute.py::test_r_crc_preview_coverage_crc_error_after_a_clean_evaluation_is_named
+FAILED tests/test_b101_designer_recompute.py::test_r_crc_designer_at_typing_burst_by_keys_recomputes_once
+FAILED tests/test_b101_designer_recompute.py::test_r_crc_designer_at_preset_and_coverage_dropdowns_by_keys
+3 failed, 29 passed in 37.77s
+# exit 1
+# tree fingerprint (end): fab8769b9c713783
+# end 2026-11-06T02:36:21Z load 3.73 3.53 2.12

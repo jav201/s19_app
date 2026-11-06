@@ -1,0 +1,112 @@
+=== MUTANT M-17 ===
+$ python -c 'import s19_app; print(s19_app.__file__)'
+<HOME>/work/s19_m13/s19_app/__init__.py
+$ timeout 900 <HOME>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -n 2 --basetemp /tmp/pytest-s19m13 tests/test_b101_designer_recompute.py::test_r_crc_preview_002_5_stale_coverage_recomputes_once_on_display
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______ test_r_crc_preview_002_5_stale_coverage_recomputes_once_on_display ______
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m13/popen-gw0/test_r_crc_preview_002_5_stale0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f4911143850>
+
+    def test_r_crc_preview_002_5_stale_coverage_recomputes_once_on_display(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Quiet time 0.05 s; app started, the CRC Designer NOT displayed; the
+        fixture image set -> after two pauses: no recompute and none pending; key
+        ``0`` -> once the count advances: exactly one recompute and the exact three
+        preview lines; then key ``1`` and key ``0`` again with no image change ->
+        after 0.3 s no further recompute. 3 of 3.
+    
+        Why: a load on another view costs nothing here, and a clean display costs
+        nothing either. Negative controls: the watcher scheduling while the panel
+        is hidden -> a recompute before key ``0`` -> RED; no recompute on display
+        -> the wait times out -> RED; a recompute on every display -> one more on
+        the clean re-display -> RED."""
+        _set_quiet(monkeypatch, 0.05)
+    
+        async def scenario():
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                before = designer_recomputes()
+                app.current_file = loaded(fixture_mem())
+                await pilot.pause()
+                await pilot.pause()
+                hidden = (designer_recomputes() - before, designer_pending(app))
+                await pilot.press("0")
+                await wait_designer_recompute(pilot, app, before, timeout=10.0)
+                shown = (designer_recomputes() - before, _preview(app))
+                await pilot.press("1")
+                await pilot.pause()
+                await pilot.press("0")
+                await pilot.pause(0.3)
+                return hidden, shown, designer_recomputes() - before
+    
+>       for hidden, shown, after_redisplay in _run(scenario):
+                                              ^^^^^^^^^^^^^^
+
+tests/test_b101_designer_recompute.py:528: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_designer_recompute.py:153: in _run
+    return [asyncio.run(coro_factory()) for _ in range(reps)]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_designer_recompute.py:153: in <listcomp>
+    return [asyncio.run(coro_factory()) for _ in range(reps)]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b101_designer_recompute.py:520: in scenario
+    await wait_designer_recompute(pilot, app, before, timeout=10.0)
+tests/support/b101_designer.py:89: in wait_designer_recompute
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function wait_designer_recompute.<locals>.<lambda> at 0x7f4910df0a40>
+failure = <function wait_designer_recompute.<locals>.<lambda> at 0x7f4910df1300>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: no settled recompute: count 7 (snapshot 7), pending None
+
+tests/support/timing.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_designer_recompute.py::test_r_crc_preview_002_5_stale_coverage_recomputes_once_on_display
+1 failed in 14.15s
+PYTEST_EXIT=1
+SHA256 s19_app/tui/crc_designer_view.py = 814aefc7247a1ee876e571102af1a080466888a65a00b51cf5cc7375ac2062f5
+SHA256 s19_app/tui/segment_split_view.py = 9b4f660d174eb4debe95f1ee5475a4ddcc1931348b1f0be8bd526bd6282051aa
+SHA256 s19_app/tui/operations/crc_kernel.py = f96188b2fb1266302f173268b0419a97b1ed9ad18cd685b2dbdf815233e91edf
+DONE M-17 exits=[1]

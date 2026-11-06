@@ -1,0 +1,295 @@
+=== MUTANT M-13 ===
+$ python -c 'import s19_app; print(s19_app.__file__)'
+<HOME>/work/s19_m13/s19_app/__init__.py
+$ timeout 900 <HOME>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -n 2 --basetemp /tmp/pytest-s19m13 tests/test_b101_split_join_band.py::test_r_seg_prev_2_join_fill_band_matches_the_canon_classifier tests/test_b101_split_join_band.py::test_r_seg_prev_2_plan_matches_the_base_reference_in_every_mode tests/test_b101_split_join_band.py::test_r_seg_prev_2_sweep_with_5000_marks_matches_the_reference
+bringing up nodes...
+bringing up nodes...
+
+FFFFFFF.F                                                                [100%]
+=================================== FAILURES ===================================
+_______ test_r_seg_prev_2_join_fill_band_matches_the_canon_classifier[0] _______
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+chunk = 0
+
+    @pytest.mark.parametrize("chunk", range(4))
+    def test_r_seg_prev_2_join_fill_band_matches_the_canon_classifier(chunk: int) -> None:
+        """200 seeded images (4 chunks of 50), join fill, pad 0x00 or 0xFF drawn per
+        image, random non-empty ticks: the band's blocks equal the run length of the
+        per-address classes data > conflict > fill > context > absent over the band
+        span, 200 of 200.
+    
+        Why: the band is what the operator reads before an export; a sweep that
+        kept the wrong class where marks overlap would paint a clobbered byte as
+        safe. Negative controls: a sweep that keeps the lowest priority -> RED; a
+        run finder that counts pad-valued bytes as conflict -> RED."""
+        for seed in range(chunk * 50, chunk * 50 + 50):
+            rows, src, mem, pad = _random_image(seed)
+            ticks = _random_ticks(seed, len(rows))
+            plan = _build(rows, ticks, src, mem, "join", "fill", pad)
+            lo, runs = _canon_classes(rows, ticks, src, mem, pad)
+            assert plan.band_lo == lo, f"seed {seed}"
+>           assert _blocks(plan.map_blocks) == runs, f"seed {seed} pad {pad:#04x}"
+E           AssertionError: seed 0 pad 0xff
+E           assert [('ctx', 34)] == [('data', 34)]
+E             
+E             At index 0 diff: ('ctx', 34) != ('data', 34)
+E             Use -v to get more diff
+
+tests/test_b101_split_join_band.py:173: AssertionError
+_______ test_r_seg_prev_2_join_fill_band_matches_the_canon_classifier[2] _______
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+chunk = 2
+
+    @pytest.mark.parametrize("chunk", range(4))
+    def test_r_seg_prev_2_join_fill_band_matches_the_canon_classifier(chunk: int) -> None:
+        """200 seeded images (4 chunks of 50), join fill, pad 0x00 or 0xFF drawn per
+        image, random non-empty ticks: the band's blocks equal the run length of the
+        per-address classes data > conflict > fill > context > absent over the band
+        span, 200 of 200.
+    
+        Why: the band is what the operator reads before an export; a sweep that
+        kept the wrong class where marks overlap would paint a clobbered byte as
+        safe. Negative controls: a sweep that keeps the lowest priority -> RED; a
+        run finder that counts pad-valued bytes as conflict -> RED."""
+        for seed in range(chunk * 50, chunk * 50 + 50):
+            rows, src, mem, pad = _random_image(seed)
+            ticks = _random_ticks(seed, len(rows))
+            plan = _build(rows, ticks, src, mem, "join", "fill", pad)
+            lo, runs = _canon_classes(rows, ticks, src, mem, pad)
+            assert plan.band_lo == lo, f"seed {seed}"
+>           assert _blocks(plan.map_blocks) == runs, f"seed {seed} pad {pad:#04x}"
+E           AssertionError: seed 100 pad 0x00
+E           assert [('ctx', 23),...ll', 64), ...] == [('data', 23)...ll', 64), ...]
+E             
+E             At index 0 diff: ('ctx', 23) != ('data', 23)
+E             Use -v to get more diff
+
+tests/test_b101_split_join_band.py:173: AssertionError
+_______ test_r_seg_prev_2_join_fill_band_matches_the_canon_classifier[3] _______
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+chunk = 3
+
+    @pytest.mark.parametrize("chunk", range(4))
+    def test_r_seg_prev_2_join_fill_band_matches_the_canon_classifier(chunk: int) -> None:
+        """200 seeded images (4 chunks of 50), join fill, pad 0x00 or 0xFF drawn per
+        image, random non-empty ticks: the band's blocks equal the run length of the
+        per-address classes data > conflict > fill > context > absent over the band
+        span, 200 of 200.
+    
+        Why: the band is what the operator reads before an export; a sweep that
+        kept the wrong class where marks overlap would paint a clobbered byte as
+        safe. Negative controls: a sweep that keeps the lowest priority -> RED; a
+        run finder that counts pad-valued bytes as conflict -> RED."""
+        for seed in range(chunk * 50, chunk * 50 + 50):
+            rows, src, mem, pad = _random_image(seed)
+            ticks = _random_ticks(seed, len(rows))
+            plan = _build(rows, ticks, src, mem, "join", "fill", pad)
+            lo, runs = _canon_classes(rows, ticks, src, mem, pad)
+            assert plan.band_lo == lo, f"seed {seed}"
+>           assert _blocks(plan.map_blocks) == runs, f"seed {seed} pad {pad:#04x}"
+E           AssertionError: seed 150 pad 0xff
+E           assert [('ctx', 30),..., ('ctx', 62)] == [('data', 30)..., ('ctx', 62)]
+E             
+E             At index 0 diff: ('ctx', 30) != ('data', 30)
+E             Use -v to get more diff
+
+tests/test_b101_split_join_band.py:173: AssertionError
+_______ test_r_seg_prev_2_join_fill_band_matches_the_canon_classifier[1] _______
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+chunk = 1
+
+    @pytest.mark.parametrize("chunk", range(4))
+    def test_r_seg_prev_2_join_fill_band_matches_the_canon_classifier(chunk: int) -> None:
+        """200 seeded images (4 chunks of 50), join fill, pad 0x00 or 0xFF drawn per
+        image, random non-empty ticks: the band's blocks equal the run length of the
+        per-address classes data > conflict > fill > context > absent over the band
+        span, 200 of 200.
+    
+        Why: the band is what the operator reads before an export; a sweep that
+        kept the wrong class where marks overlap would paint a clobbered byte as
+        safe. Negative controls: a sweep that keeps the lowest priority -> RED; a
+        run finder that counts pad-valued bytes as conflict -> RED."""
+        for seed in range(chunk * 50, chunk * 50 + 50):
+            rows, src, mem, pad = _random_image(seed)
+            ticks = _random_ticks(seed, len(rows))
+            plan = _build(rows, ticks, src, mem, "join", "fill", pad)
+            lo, runs = _canon_classes(rows, ticks, src, mem, pad)
+            assert plan.band_lo == lo, f"seed {seed}"
+>           assert _blocks(plan.map_blocks) == runs, f"seed {seed} pad {pad:#04x}"
+E           AssertionError: seed 50 pad 0xff
+E           assert [('fill', 8),..., ('ctx', 43)] == [('fill', 8),...ct', 24), ...]
+E             
+E             At index 1 diff: ('ctx', 82) != ('data', 82)
+E             Right contains 2 more items, first extra item: ('fill', 64)
+E             Use -v to get more diff
+
+tests/test_b101_split_join_band.py:173: AssertionError
+_ test_r_seg_prev_2_plan_matches_the_base_reference_in_every_mode[split-fill] __
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f000412b890>
+mode = 'split', gap = 'fill'
+
+    @pytest.mark.parametrize("mode,gap", MODES, ids=lambda v: str(v))
+    def test_r_seg_prev_2_plan_matches_the_base_reference_in_every_mode(
+        monkeypatch: pytest.MonkeyPatch, mode: str, gap: str
+    ) -> None:
+        """The same 200 images plus 20 with touching source ranges (``end == next
+        start``), every mode and gaps value, random ticks: the plan built by the
+        product (band blocks, every file's blocks and counters, packed, span, fill,
+        conflicts, guard) equals the plan built with the base ``_sweep`` and
+        ``_conflict_marks`` patched in, 220 of 220 per mode.
+    
+        Why: the increment must change no render. Negative controls: a run finder
+        that does not join a run across touching source ranges -> RED; a sweep that
+        keeps the lowest priority -> RED."""
+        cases = [(seed, False) for seed in range(200)] + [
+            (1000 + seed, True) for seed in range(20)
+        ]
+        for seed, touching in cases:
+            rows, src, mem, pad = _random_image(seed, touching)
+            ticks = _random_ticks(seed, len(rows))
+            got = _plan_view(_build(rows, ticks, src, mem, mode, gap, pad))
+            with monkeypatch.context() as patch:
+                patch.setattr(ssv, "_sweep", reference_sweep)
+                patch.setattr(ssv, "_conflict_marks", reference_conflict_marks)
+                want = _plan_view(_build(rows, ticks, src, mem, mode, gap, pad))
+>           assert got == want, f"seed {seed} touching={touching} {mode}/{gap}"
+E           AssertionError: seed 0 touching=False split/fill
+E           assert {'address_pre...iles': 0, ...} == {'address_pre...iles': 0, ...}
+E             
+E             Omitting 9 identical items, use -vv to show
+E             Differing items:
+E             {'files': [('t_range_00.s19', [('fill', 34)], 34, 0, 0, False)]} != {'files': [('t_range_00.s19', [('data', 34)], 34, 0, 0, False)]}
+E             {'map_blocks': [('ctx', 34)]} != {'map_blocks': [('data', 34)]}
+E             Use -v to get more diff
+
+tests/test_b101_split_join_band.py:203: AssertionError
+_ test_r_seg_prev_2_plan_matches_the_base_reference_in_every_mode[split-skip] __
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f4b69ad2d50>
+mode = 'split', gap = 'skip'
+
+    @pytest.mark.parametrize("mode,gap", MODES, ids=lambda v: str(v))
+    def test_r_seg_prev_2_plan_matches_the_base_reference_in_every_mode(
+        monkeypatch: pytest.MonkeyPatch, mode: str, gap: str
+    ) -> None:
+        """The same 200 images plus 20 with touching source ranges (``end == next
+        start``), every mode and gaps value, random ticks: the plan built by the
+        product (band blocks, every file's blocks and counters, packed, span, fill,
+        conflicts, guard) equals the plan built with the base ``_sweep`` and
+        ``_conflict_marks`` patched in, 220 of 220 per mode.
+    
+        Why: the increment must change no render. Negative controls: a run finder
+        that does not join a run across touching source ranges -> RED; a sweep that
+        keeps the lowest priority -> RED."""
+        cases = [(seed, False) for seed in range(200)] + [
+            (1000 + seed, True) for seed in range(20)
+        ]
+        for seed, touching in cases:
+            rows, src, mem, pad = _random_image(seed, touching)
+            ticks = _random_ticks(seed, len(rows))
+            got = _plan_view(_build(rows, ticks, src, mem, mode, gap, pad))
+            with monkeypatch.context() as patch:
+                patch.setattr(ssv, "_sweep", reference_sweep)
+                patch.setattr(ssv, "_conflict_marks", reference_conflict_marks)
+                want = _plan_view(_build(rows, ticks, src, mem, mode, gap, pad))
+>           assert got == want, f"seed {seed} touching={touching} {mode}/{gap}"
+E           AssertionError: seed 0 touching=False split/skip
+E           assert {'address_pre...iles': 0, ...} == {'address_pre...iles': 0, ...}
+E             
+E             Omitting 10 identical items, use -vv to show
+E             Differing items:
+E             {'map_blocks': [('ctx', 34)]} != {'map_blocks': [('data', 34)]}
+E             Use -v to get more diff
+
+tests/test_b101_split_join_band.py:203: AssertionError
+__ test_r_seg_prev_2_plan_matches_the_base_reference_in_every_mode[join-fill] __
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f4b69996310>
+mode = 'join', gap = 'fill'
+
+    @pytest.mark.parametrize("mode,gap", MODES, ids=lambda v: str(v))
+    def test_r_seg_prev_2_plan_matches_the_base_reference_in_every_mode(
+        monkeypatch: pytest.MonkeyPatch, mode: str, gap: str
+    ) -> None:
+        """The same 200 images plus 20 with touching source ranges (``end == next
+        start``), every mode and gaps value, random ticks: the plan built by the
+        product (band blocks, every file's blocks and counters, packed, span, fill,
+        conflicts, guard) equals the plan built with the base ``_sweep`` and
+        ``_conflict_marks`` patched in, 220 of 220 per mode.
+    
+        Why: the increment must change no render. Negative controls: a run finder
+        that does not join a run across touching source ranges -> RED; a sweep that
+        keeps the lowest priority -> RED."""
+        cases = [(seed, False) for seed in range(200)] + [
+            (1000 + seed, True) for seed in range(20)
+        ]
+        for seed, touching in cases:
+            rows, src, mem, pad = _random_image(seed, touching)
+            ticks = _random_ticks(seed, len(rows))
+            got = _plan_view(_build(rows, ticks, src, mem, mode, gap, pad))
+            with monkeypatch.context() as patch:
+                patch.setattr(ssv, "_sweep", reference_sweep)
+                patch.setattr(ssv, "_conflict_marks", reference_conflict_marks)
+                want = _plan_view(_build(rows, ticks, src, mem, mode, gap, pad))
+>           assert got == want, f"seed {seed} touching={touching} {mode}/{gap}"
+E           AssertionError: seed 0 touching=False join/fill
+E           assert {'address_pre...iles': 0, ...} == {'address_pre...iles': 0, ...}
+E             
+E             Omitting 9 identical items, use -vv to show
+E             Differing items:
+E             {'map_blocks': [('ctx', 34)]} != {'map_blocks': [('data', 34)]}
+E             {'files': [('t_joined.s19', [('ctx', 34)], 34, 0, 0, False)]} != {'files': [('t_joined.s19', [('data', 34)], 34, 0, 0, False)]}
+E             Use -v to get more diff
+
+tests/test_b101_split_join_band.py:203: AssertionError
+________ test_r_seg_prev_2_sweep_with_5000_marks_matches_the_reference _________
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+    def test_r_seg_prev_2_sweep_with_5000_marks_matches_the_reference() -> None:
+        """5000 random marks of the four classes over ``[0, 1 000 000)`` (seed 7):
+        ``_sweep(0, 1_000_000, marks)`` equals the base ``_sweep`` block for block
+        (1 of 1).
+    
+        Why: the base sweep is quadratic in the marks and the design replaces it
+        with a pass over sorted boundaries; with this many marks every overlap and
+        every priority tie is exercised. Negative control: a sweep that keeps the
+        lowest priority, or loses a block at a boundary -> RED."""
+        rng = random.Random(7)
+        marks: Marks = []
+        for _ in range(5000):
+            a = rng.randrange(0, 1_000_000)
+            b = min(1_000_000, a + rng.randint(1, 4000))
+            marks.append((a, b, rng.choice(("data", "conflict", "fill", "ctx"))))
+        got = _blocks(ssv._sweep(0, 1_000_000, marks))
+        want = _blocks(reference_sweep(0, 1_000_000, marks))
+>       assert got == want
+E       AssertionError: assert [('none', 190...', 9148), ...] == [('none', 190...a', 110), ...]
+E         
+E         At index 1 diff: ('ctx', 17186) != ('ctx', 179)
+E         Left contains 6 more items, first extra item: ('ctx', 217)
+E         Use -v to get more diff
+
+tests/test_b101_split_join_band.py:262: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_split_join_band.py::test_r_seg_prev_2_join_fill_band_matches_the_canon_classifier[0]
+FAILED tests/test_b101_split_join_band.py::test_r_seg_prev_2_join_fill_band_matches_the_canon_classifier[2]
+FAILED tests/test_b101_split_join_band.py::test_r_seg_prev_2_join_fill_band_matches_the_canon_classifier[3]
+FAILED tests/test_b101_split_join_band.py::test_r_seg_prev_2_join_fill_band_matches_the_canon_classifier[1]
+FAILED tests/test_b101_split_join_band.py::test_r_seg_prev_2_plan_matches_the_base_reference_in_every_mode[split-fill]
+FAILED tests/test_b101_split_join_band.py::test_r_seg_prev_2_plan_matches_the_base_reference_in_every_mode[split-skip]
+FAILED tests/test_b101_split_join_band.py::test_r_seg_prev_2_plan_matches_the_base_reference_in_every_mode[join-fill]
+FAILED tests/test_b101_split_join_band.py::test_r_seg_prev_2_sweep_with_5000_marks_matches_the_reference
+8 failed, 1 passed in 2.15s
+PYTEST_EXIT=1
+SHA256 s19_app/tui/crc_designer_view.py = 814aefc7247a1ee876e571102af1a080466888a65a00b51cf5cc7375ac2062f5
+SHA256 s19_app/tui/segment_split_view.py = 9b4f660d174eb4debe95f1ee5475a4ddcc1931348b1f0be8bd526bd6282051aa
+SHA256 s19_app/tui/operations/crc_kernel.py = f96188b2fb1266302f173268b0419a97b1ed9ad18cd685b2dbdf815233e91edf
+DONE M-13 exits=[1]

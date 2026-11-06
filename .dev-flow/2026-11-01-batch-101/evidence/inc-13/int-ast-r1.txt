@@ -1,0 +1,22 @@
+# batch-101 Inc 13 E4 integration - AST check (E3 A-1 / N-1 / N-5): both nodes PASSED, not skipped
+# Host: LAN Linux host 2 (16 cores), env s19ci (Python 3.11, pytest-xdist 3.8.0, textual 8.2.8)
+# Tree: detached worktree at origin/main f9f3cb09 (contains b7b77c4; no s19_app/ or tests/ drift from it)
+#       plus `git diff b7b77c4 -- s19_app tests` of branch b101-inc13 (38e31bf + integration edits)
+# Lines 1-5 below: remote HEAD, changed-file count, s19_app.__file__, Python version, uptime/load
+# Command: cd <HOME>/work/s19_i13 && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 2400 <HOME>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider --basetemp /tmp/pytest-s19i13 -rA -n 12 -m "not serial_timing" tests/test_b101_designer_recompute.py -k inc13_d2
+
+HEAD=f9f3cb09
+11
+<HOME>/work/s19_i13/s19_app/__init__.py
+3.11.18 (main, Oct 26 2026, 11:35:17) [GCC 15.3.0]
+ 18:56:09 up 10:27,  2 users,  load average: 4.05, 6.57, 4.25
+bringing up nodes...
+bringing up nodes...
+
+..                                                                       [100%]
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_b101_designer_recompute.py::test_inc13_d2_check_names_a_dropped_assertion_a_constant_and_a_deleted_test
+PASSED tests/test_b101_designer_recompute.py::test_inc13_d2_touched_nodes_differ_from_base_only_by_the_waits
+2 passed in 2.46s
+EXIT=0

@@ -138,6 +138,44 @@ def test_lut_matches_oracle_for_non_byte_aligned_widths() -> None:
                     assert crc_lut(data, **params) == crc_stream(data, **params), case
 
 
+def test_r_crc_designer_001_1_lut_matches_oracle_200_vectors_and_widths_9_to_63() -> None:
+    # batch-101 Inc 13 E5 corrective (C-6): the threshold of R-CRC-DESIGNER-001.1
+    # as written. (1) every catalogue preset over the 5 fixed vectors plus 200
+    # random ones (length 0-199, seed 20261105); (2) every width from 9 to 63
+    # that is not a multiple of 8 (49 widths), with all four refin/refout pairs,
+    # a seeded odd polynomial with its top bit set, a seeded init and xorout,
+    # over the 5 fixed vectors plus 20 random ones. The table-driven engine
+    # reflects input bytes through _REFLECT8 (Inc 13); one wrong entry of that
+    # table (M-11: _REFLECT8[1] = 0x01) makes a refin case differ.
+    rng = random.Random(20261105)
+    fixed = [b"", KAT_MESSAGE, bytes(range(256)), b"\x00" * 257, b"\xff" * 130]
+    many = fixed + [
+        bytes(rng.randrange(256) for _ in range(rng.randrange(0, 200))) for _ in range(200)
+    ]
+    assert len(many) == 205
+    for preset in PRESETS:
+        params = dict(
+            width=preset.width, poly=preset.poly, init=preset.init,
+            refin=preset.refin, refout=preset.refout, xorout=preset.xorout,
+        )
+        for data in many:
+            assert crc_lut(data, **params) == crc_stream(data, **params), preset.name
+    few = fixed + many[5:25]
+    widths = [w for w in range(9, 64) if w % 8]
+    assert len(widths) == 49
+    for width in widths:
+        poly = rng.getrandbits(width) | 1 | (1 << (width - 1))
+        init, xorout = rng.getrandbits(width), rng.getrandbits(width)
+        for refin in (False, True):
+            for refout in (False, True):
+                params = dict(
+                    width=width, poly=poly, init=init,
+                    refin=refin, refout=refout, xorout=xorout,
+                )
+                for data in few:
+                    assert crc_lut(data, **params) == crc_stream(data, **params), params
+
+
 def test_compute_routes_through_lut_and_preserves_kat() -> None:
     # compute() now uses crc_lut; the KAT values must be byte-identical.
     for preset in PRESETS:
