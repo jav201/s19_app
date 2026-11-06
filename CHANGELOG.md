@@ -41,7 +41,7 @@ In the Markdown file of a diff or before/after report, names (image labels, vari
 
 If writing a diff or before/after report fails, the reports folder keeps no partial report file and no Markdown file without its HTML file.
 
-A control or direction-override character in a name is written as `�` in both report files (a tab or a line break as one space).
+A control or direction-override character in a name is written as `�` in both report files (a tab, a carriage return or a line feed each as one space).
 
 An interrupted report write can leave a `<file name>.<hex>.part` file beside the report; it is safe to delete.
 

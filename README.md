@@ -78,7 +78,9 @@ s19tui
 s19tui --load examples/case_07_stress_smoke/firmware.s19
 ```
 
-A left activity rail switches between twelve windows, one key each. Split / Join / Export has no rail item and no key: open it from the command palette (`Ctrl+K`).
+A left activity rail switches between twelve windows, one key each. Split / Join
+/ Export has no rail item and no key: open it from the command palette
+(`Ctrl+K`).
 
 | Key | Window |
 |----|--------|
@@ -95,7 +97,8 @@ A left activity rail switches between twelve windows, one key each. Split / Join
 | `9` | Checks — the last check run, grouped by outcome |
 | `0` | CRC Designer — parametric CRC authoring + known-answer proof |
 
-The global keys (the full set lives in `S19TuiApp.BINDINGS`, `s19_app/tui/app.py`; `Ctrl+Q` and `Ctrl+P` come from Textual):
+The global keys (the full set lives in `S19TuiApp.BINDINGS`,
+`s19_app/tui/app.py`; `Ctrl+Q` and `Ctrl+P` come from Textual):
 
 | Key | Action |
 |-----|--------|
@@ -125,7 +128,12 @@ The global keys (the full set lives in `S19TuiApp.BINDINGS`, `s19_app/tui/app.py
 | `Ctrl+Z` / `Ctrl+Y` | undo / redo the Patch Editor change-set |
 | `q` / `Ctrl+Q` | quit |
 
-Two rows at the bottom of every window show the keys: row 1 the global keys (`^k` Palette · `^d` Density · `^l` Load · `^s` Save project · `x` Operations · `?` Help · `q` Quit · `^p` palette), row 2 the shown window's own keys. `?` opens the help of the window that has the focus — its numbered steps, then its keys; with the focus outside a window that has help, it opens the panel that lists every active key.
+Two rows at the bottom of every window show the keys: row 1 the global keys
+(`^K` Palette · `^D` Density · `^L` Load · `^S` Save project · `x` Operations ·
+`?` Help · `q` Quit · `^P` palette), row 2 the shown window's own keys. `?`
+opens the help of the window that has the focus — its numbered steps, then its
+keys; with the focus outside a window that has help, it opens the panel that
+lists every active key.
 
 ### Workspace
 
@@ -171,23 +179,43 @@ against the loaded image's ranges, checkable, undoable (`Ctrl+Z`/`Ctrl+Y`).
 The change-set saves and loads as a versioned JSON document
 (`"format": "s19app-changeset"`, `"version": "2.0"` — the v2 change-set
 engine in `s19_app/tui/changes/`); the retired v1 envelope is recognised
-only to be rejected with a `CHG-V1-FORMAT` finding. **Apply loaded changes** writes the entries into the loaded image, and **Write file** (under **Save patched image as**) writes the result as a new `.s19` / `.hex` file; in a project the file becomes a new variant. The change-set JSON and the written image are the shipped hand-off.
+only to be rejected with a `CHG-V1-FORMAT` finding. **Apply loaded changes**
+writes the entries into the loaded image, and **Write file** (under **Save
+patched image as**) writes the result as a new `.s19` / `.hex` file; in a
+project the file becomes a new variant. The change-set JSON and the written
+image are the shipped hand-off.
 
 ### Check Editor
 
-Collects A2L parameters and memory rows into a **check spec** (`.chk.json`): addresses with their expected bytes. A check spec is never applied; the A2B Diff report lists its fields in a `## Checks` section. **Write .chk.json** writes the spec into the common `.s19tool/workarea/patches/` folder, with or without a project; Save project copies the specs the project uses into its `checks/` folder.
+Collects A2L parameters and memory rows into a **check spec** (`.chk.json`):
+addresses with their expected bytes. A check spec is never applied; the A2B Diff
+report lists its fields in a `## Checks` section. **Write .chk.json** writes the
+spec into the common `.s19tool/workarea/patches/` folder, with or without a
+project; Save project copies the specs the project uses into its `checks/`
+folder.
 
 ### A2B Diff
 
-Compares two images (project variants or files) into classified runs (`changed` / `only_a` / `only_b`), then writes a diff report as a Markdown file and a self-contained HTML file side by side, with a `## Checks` section when a check spec is chosen.
+Compares two images (project variants or files) into classified runs (`changed`
+/ `only_a` / `only_b`), then writes a diff report as a Markdown file and a
+self-contained HTML file side by side, with a `## Checks` section when a check
+spec is chosen.
 
 ### Flow Builder
 
-Composes an ordered chain of typed blocks — LOAD, PATCH, CHECK, CRC, WRITE-OUT, A2B-DIFF and EXT-STEP (a step a human runs outside the app) — and runs it on the loaded image. Flows belong to a project and are saved as `flows/<name>.json` in the project folder.
+Composes an ordered chain of typed blocks — LOAD, PATCH, CHECK, CRC, WRITE-OUT,
+A2B-DIFF and EXT-STEP (a step a human runs outside the app) — and runs it on the
+loaded image. Flows belong to a project and are saved as `flows/<name>.json` in
+the project folder.
 
 ### Flow Execution
 
-Runs saved flows as lanes, one lane per flow, one after another or in parallel. A lane that reaches an external step waits until you confirm it (`c`). Each run writes a chain-set report, `reports/<time>-chain-set-report.md`, in the project; a set of lanes saves as `flowsets/<name>.json`. The command or instruction of an external step is text from the flow file, and the app never runs it: read it before you run it, and import flows only from sources you trust.
+Runs saved flows as lanes, one lane per flow, one after another or in parallel.
+A lane that reaches an external step waits until you confirm it (`c`). Each run
+writes a chain-set report, `reports/<time>-chain-set-report.md`, in the project;
+a set of lanes saves as `flowsets/<name>.json`. The command or instruction of an
+external step is text from the flow file, and the app never runs it: read it
+before you run it, and import flows only from sources you trust.
 
 ### Checks
 
@@ -205,17 +233,28 @@ recomputes on every keystroke, and the algorithm saves/loads as a
 
 ### Split / Join / Export
 
-No rail item and no key: open it from the command palette (`Ctrl+K`, Split / Join / Export). It exports ranges of the loaded image — the A2L's memory segments, the image's own ranges, or ranges you type — as one file per range (split) or one file holding them all (join), in S19, Intel HEX or binary, into the project's `splits/` folder or the common `.s19tool/workarea/splits/`.
+No rail item and no key: open it from the command palette (`Ctrl+K`, Split /
+Join / Export). It exports ranges of the loaded image — the A2L's memory
+segments, the image's own ranges, or ranges you type — as one file per range
+(split) or one file holding them all (join), in S19, Intel HEX or binary, into
+the project's `splits/` folder or the common `.s19tool/workarea/splits/`.
 
 ### Operations modal
 
-`x` opens the Operations dialog, which lists the registered operations (`s19_app/tui/operations/registry.py`). `crc` checks or writes CRCs over the loaded image from a CRC config. `extract` and `split_by_segment` are listed but not implemented yet: they answer `placeholder: <name> not yet implemented` and change nothing.
+`x` opens the Operations dialog, which lists the registered operations
+(`s19_app/tui/operations/registry.py`). `crc` checks or writes CRCs over the
+loaded image from a CRC config. `extract` and `split_by_segment` are listed but
+not implemented yet: they answer `placeholder: <name> not yet implemented` and
+change nothing.
 
 ### Projects and variants
 
 A saved project is a directory under the workarea holding a `project.json`
 manifest. The manifest can declare **variants** — named image/A2L/MAC
-assignments — with one active variant (`v` switches it). The Patch Editor's **Execute scope** applies a change-set over the chosen variants: each variant's image is parsed in isolation, one failing variant never aborts the rest, and Reports → **Generate new report** writes the project report of that run.
+assignments — with one active variant (`v` switches it). The Patch Editor's
+**Execute scope** applies a change-set over the chosen variants: each variant's
+image is parsed in isolation, one failing variant never aborts the rest, and
+Reports → **Generate new report** writes the project report of that run.
 
 ### Workarea
 

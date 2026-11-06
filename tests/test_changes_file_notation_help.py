@@ -156,5 +156,21 @@ def test_tc1802_nine_md_sections_intact_tenth_section_added() -> None:
     assert frozenset(WINDOW_HELP_SECTIONS) == _ALL_KEYS, (
         "the data home must hold exactly the twelve code-authored sections"
     )
-    assert frozenset(WINDOW_HELP_SECTIONS) - {"a2l"} != _ALL_KEYS
-    assert frozenset(WINDOW_HELP_SECTIONS) | {"extra"} != _ALL_KEYS
+    assert _key_census_defects(WINDOW_HELP_SECTIONS) == {}
+    # Negative controls (E5 C-8, F6): the same detector run on a data home
+    # missing one key, and on one holding an extra key, reports each.
+    missing = {k: v for k, v in WINDOW_HELP_SECTIONS.items() if k != "a2l"}
+    assert _key_census_defects(missing) == {"missing": ["a2l"]}
+    extra = {**WINDOW_HELP_SECTIONS, "extra": WINDOW_HELP_SECTIONS["a2l"]}
+    assert _key_census_defects(extra) == {"extra": ["extra"]}
+
+
+def _key_census_defects(sections) -> dict:
+    """The keys a data home lacks or holds beyond the twelve (R-WHELP.12/4)."""
+    keys = frozenset(sections)
+    defects = {}
+    if _ALL_KEYS - keys:
+        defects["missing"] = sorted(_ALL_KEYS - keys)
+    if keys - _ALL_KEYS:
+        defects["extra"] = sorted(keys - _ALL_KEYS)
+    return defects

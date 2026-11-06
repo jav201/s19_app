@@ -1,44 +1,40 @@
 """Per-window usage help — the ``?`` affordance + modal (batch-95 change 3,
 HLR-140 / LLR-140.1..140.2).
 
-The nine authored sections of ``prototypes/cambios_10_12_2026/help_sections.md``
-ship operator-editable from ONE home — ``window_help.WINDOW_HELP_SECTIONS`` —
-and render on the shipped ``VariantHelpScreen`` pattern: a per-window modal
-with numbered steps in plain prose, no markup parsing
-(``Static(markup=False)``), dismissed by Close and Esc. Each of the eight
-shipped windows seats a ``?`` ghost chip beside its title (never displacing
-the change-2 ``📂 Open folder`` chip) and claims the ``?`` key while one of
-its widgets holds focus; the app-wide ``question_mark`` binding (stock
+The help sections ship operator-editable from ONE home —
+``window_help.WINDOW_HELP_SECTIONS`` (twelve code-authored sections; since
+batch-101 Inc 14, ruling D-3, none is ported from the operator's
+``help_sections.md`` draft and no test reads it) — and render on the shipped
+``VariantHelpScreen`` pattern: a per-window modal with numbered steps in plain
+prose, no markup parsing (``Static(markup=False)``), dismissed by Close and
+Esc. Each shipped window seats a ``?`` ghost chip beside its title (never
+displacing the change-2 ``📂 Open folder`` chip) and claims the ``?`` key while
+one of its widgets holds focus; the app-wide ``question_mark`` binding (stock
 ``HelpPanel``) is untouched and fires whenever no window-focused path claims
-the key. The ninth section (Split / Join / Export) ships copy-only — inc-004
-mounts its window and calls ``open_window_help("split_join_export")``.
+the key. The Split / Join / Export window (opened from the palette) seats the
+same chip and binding through ``WindowSection``.
 
 Coverage map (test -> TC -> LLR):
 
 - TC-707 / LLR-140.2 — ``test_tc707_section_census_nine_sections_min_three_steps``
   / ``test_tc707_copy_matches_help_sections_md_verbatim`` /
   ``test_tc707_numbering_generated_sequential`` /
-  ``test_tc707_boundary_no_orphan_seats_no_blank_modal``: the data home holds
-  the nine md-authored sections under the windows' keys, each >= 3
-  numbered steps; the copy is a verbatim port of the operator's md (every
-  shipped step string occurs in it, the md's per-section numbering is
-  sequential and matches the step counts); the ``N.`` numbering is generated
-  at render so operator delete/reorder can never gap it; and the boundary
-  limbs — a key with no section opens nothing (never a blank modal), the
-  chip/screen constructors refuse to seat an unknown key, and the eight
-  shipped seats are exactly the nine keys minus ``split_join_export``.
-  Scope note (batch-96): the three md-fidelity census tests iterate
-  ``_EXPECTED_KEYS`` — the nine ``help_sections.md`` sections — because
-  that contract froze at batch-95; the data home's tenth section
-  (``changes_file_notation``, code-authored, TC-1802) is censused in
-  tests/test_changes_file_notation_help.py instead.
+  ``test_tc707_boundary_no_orphan_seats_no_blank_modal`` (node names kept
+  from batch-95): every section has a title and at least three steps; the six
+  sections Inc 14 rewrote equal the approved copy
+  (``tests/support/help_copy_i14.py``) step for step; the ``N.`` numbering is
+  generated at render, no stored step carries a number, and each section keeps
+  its pinned step count (R-WHELP.7); and the boundary limbs — a key with no
+  section opens nothing (never a blank modal), the chip/screen constructors
+  refuse to seat an unknown key, and the shipped seats are exactly the
+  code-authored set ``_CODE_AUTHORED_SHIPPED``.
 - TC-706 / LLR-140.1 — ``test_tc706_affordance_opens_window_section_modal``
-  (parametrized over all 8 windows): pressing the ``?`` chip pushes
+  (parametrized over all 9 chip seats): pressing the ``?`` chip pushes
   ``WindowHelpScreen`` with that window's section — the modal title is the
   section title and the body Static renders the numbered steps VERBATIM with
-  markup parsing off. ``test_tc706_close_and_escape_dismiss`` (all 8): Close
+  markup parsing off. ``test_tc706_close_and_escape_dismiss`` (all 9): Close
   and Esc each dismiss. ``test_tc706_focused_question_mark_opens_same_modal``
-  (all 8): with a widget of the window focused, ``?`` opens the same modal
+  (all 9): with a widget of the window focused, ``?`` opens the same modal
   (and mounts no HelpPanel). ``test_tc706_stock_help_panel_untouched``: the
   global binding is still ``question_mark -> show_help_panel`` (show=True,
   the only app-level ``?``) and a press on the no-window-focused path (rail
@@ -90,7 +86,7 @@ from s19_app.tui.window_help import (
 #: failed with ``FileNotFoundError`` before any assertion. The set is empty.
 _EXPECTED_KEYS: frozenset = frozenset()
 
-#: (window key, chip id, rail screen key or "reports") for the eight shipped
+#: (window key, chip id, rail screen key or "reports") for the nine shipped chip
 #: surfaces.
 _SEATS: Tuple[Tuple[str, str, str], ...] = (
     ("patch", "#window_help_patch", "patch"),
@@ -343,8 +339,8 @@ def test_tc707_boundary_no_orphan_seats_no_blank_modal() -> None:
     """TC-707/TC-706 (the boundary catalog): a window with no authored
     section keeps the stock help only — the seat constructors refuse an
     unknown key, the opener pushes nothing for one (never a blank modal),
-    and the shipped seats are exactly the nine keys minus the inc-004
-    ``split_join_export``."""
+    and the shipped chip seats are exactly the code-authored set (the
+    Split / Join / Export window seats its chip through ``WindowSection``)."""
     # Named supersession (batch-97 Inc-3, I-4): the shipped seats grow by the
     # code-authored ``check_editor`` key; the md-authored nine are unchanged.
     # Named supersession (batch-101 Inc 14, D-3): ``_EXPECTED_KEYS`` is empty
@@ -353,8 +349,8 @@ def test_tc707_boundary_no_orphan_seats_no_blank_modal() -> None:
     assert frozenset(SHIPPED_WINDOW_KEYS) == (
         _EXPECTED_KEYS - {"split_join_export"}
     ) | _CODE_AUTHORED_SHIPPED, (
-        "the shipped seats are the nine md sections minus split_join_export, "
-        "plus the code-authored check_editor section"
+        "the shipped seats are the code-authored sections (no md-ported "
+        "section remains, D-3)"
     )
     for key in WINDOW_HELP_SECTIONS:
         body = section_body_text(key)

@@ -26,6 +26,6 @@ Runs: tests on the LAN Linux host only (operator rule).
 
 Round 2 (architect + security items, one reviewer): PASS-WITH-NOTES; A-1…A-6 and S-1 closed. E4 addenda (binding, no further round):
 - **N-1:** K(w) excludes `/`, `g`, `pgdn`, `pgup` on windows where they do not act (`app.py:9351`, `:10474`); the census test models that.
-- **N-2:** the SECURITY.md hold-out names everything it takes with it: the file, its two tests, and the README link to it plus the README link-check arm (all held out together, re-checked at the batch end).
+- **N-2:** the SECURITY.md hold-out names everything it takes with it: the file, its three tests (`test_r_doc_security_1_1_policy_names_private_path`, `test_r_doc_security_2_1_supported_versions`, `test_r_doc_security_1_3_readme_links_the_policy`) and the README `## Documentation` row that links it (all held out together, re-checked at the batch end); `test_r_doc_readme_4_2_linked_documents_exist` stays, since it checks the CHANGELOG link. (Corrected at E5 C-8 / C-9, F8: first written as "its two tests … plus the README link-check arm".)
 - **N-3:** R-DOC-RELNOTE.7 cites `app.py:14980-14992`.
 - INFO notes (R-WHELP.12/1 count, CHANGELOG (f) wording) are fixed in the records at E4 integration.

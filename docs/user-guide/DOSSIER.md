@@ -734,7 +734,7 @@ app during the captures; "code" = read in the code.
 | F-25 | defect, live | A2B Diff: the A and B variant dropdowns are not painted at 118 or 220 columns; only the external-path fields are visible (the captures set the dropdown value directly). | ch09-01, ch09-08 |
 | F-26 | defect, live | Check Editor: after **Write .chk.json** the collector shows `1 field: 0 params` and the ledger loses its ✓ marks, though the file holds all fields. | ch10-07 |
 | F-27 | defect, live | Check Editor: reloading a written spec brings parameters back as unlabelled memory rows; parameter names and labels are lost. | ch10-08 |
-| F-28 | defect, live · fixed in 1.0.0 | Flow CRC block cannot read a template saved by the CRC Designer: `crc config invalid: CRC config is structurally invalid: 'reverse'`. | ch17-05 |
+| F-28 | defect, live · fixed in 1.0.0: the block names the cause when it refuses a Designer template; it does not read Designer templates | Flow CRC block cannot read a template saved by the CRC Designer: `crc config invalid: CRC config is structurally invalid: 'reverse'`. | ch17-05 |
 | F-29 | defect, live | Split / Join A2L source shows `a2l(0)` although the loaded A2L declares four `MEMORY_SEGMENT`s. | ch14-02 |
 | F-30 | help mismatch, live · fixed in 1.0.0 | Reports "Declared regions" stays empty with the A2L loaded; the help says it pre-fills from the A2L. | ch16-01 |
 | F-31 | placeholder, live + code | Operations `extract` and `split_by_segment` are listed but return "placeholder — not yet implemented". | ch13-06; `operations/placeholders.py` |

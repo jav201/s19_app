@@ -4,7 +4,8 @@ Independent tests of the approved design (``inc-14/01-requirements.md``,
 ``02-test-cases.md``): the six rewritten help sections and six Flow Builder
 steps against the approved copy, the claims those sections make against the
 running app, the Memory Map legend sheet, and the documents (README,
-SECURITY.md, CHANGELOG.md, the user guide and its findings table).
+CHANGELOG.md, the user guide and its findings table; SECURITY.md is the
+hold-out group below).
 
 Groups:
 
@@ -15,9 +16,10 @@ Groups:
 - legend: the Memory Map key line and the region-row field line;
 - documents: README, CHANGELOG.md, user guide, findings table;
 - SECURITY.md group (one hold-out unit, ruling N-2): every test named
-  ``test_r_doc_security_*``. If the repository setting that the policy names
-  is still off at merge, the file, these tests and the README link to it are
-  held out together and re-checked at the batch end.
+  ``test_r_doc_security_*`` (three). If the repository setting that the
+  policy names is still off at merge, the file, these tests and the README row
+  that links it are held out together and re-checked at the batch end
+  (E3 N-2, E5 C-9).
 
 Every check that scans text is also run against a deliberately broken copy
 (its negative control), so the check shows that it can fail.
@@ -300,21 +302,29 @@ def _painted_strings(root) -> set:
     return out
 
 
+def _label_names(line: str) -> set:
+    """The whole names a painted line gives a control: the line itself with a
+    leading icon, a trailing colon and a trailing parenthesis removed, and the
+    label a field line paints before its value, two spaces apart
+    (``NAMING  ‹stem›…``). A longer label never stands for a shorter one:
+    ``Goto 0xADDR`` does not name ``Goto`` (E5 C-1)."""
+    t = re.sub(r"^[^\w]+", "", line.strip())
+    t = t.rstrip(":").rstrip()
+    t = re.sub(r"\s*\([^()]*\)$", "", t).rstrip(":").rstrip()
+    return {t, re.split(r"\s{2,}", t)[0]}
+
+
 def _control_found(control: str, painted: set) -> bool:
     """A control is painted when a label, placeholder, title or column label
-    is the control's name (a leading icon, a trailing colon or a trailing
-    parenthesis aside)."""
+    is the control's whole name (see ``_label_names``)."""
     if control == "coverage":
         # the coverage column of the ranges table: a mark and a byte count
         return any(re.search(r"[✓✗!]\s*\d+ [KMG]?i?B", text) for text in painted)
-    for text in painted:
-        for line in text.splitlines():
-            t = re.sub(r"^[^\w]+", "", line.strip())
-            if t == control or t.rstrip(":") == control:
-                return True
-            if t.startswith(control + ":") or t.startswith(control + " "):
-                return True
-    return False
+    return any(
+        control in _label_names(line)
+        for text in painted
+        for line in text.splitlines()
+    )
 
 
 def test_r_whelp_12_2_named_controls_exist(tmp_path: Path) -> None:
@@ -349,7 +359,10 @@ def test_r_whelp_12_2_named_controls_exist(tmp_path: Path) -> None:
             ):
                 app.action_show_screen(screen)
                 await _pause(pilot)
-                painted[window] = _painted_strings(app.screen)
+                # E5 C-1: every rail window stays mounted on one screen, so
+                # each window is read from its own container only.
+                container = app.SCREEN_CONTAINER_IDS[screen]
+                painted[window] = _painted_strings(app.query_one(f"#{container}"))
             app.action_open_split_join_export()
             await _pause(pilot)
             window = app.query_one("#screen_split_join", SplitJoinWindow)
@@ -377,6 +390,144 @@ def test_r_whelp_12_2_named_controls_exist(tmp_path: Path) -> None:
     assert missing == [], f"named controls not painted by their window: {missing}"
     # negative control: a control no window paints is reported
     assert not _control_found("Section tree", painted["a2l"])
+    # E5 C-1 negative controls: a control painted by another window only is
+    # not found in this one, and a longer label does not stand for a control
+    assert not _control_found("Filter tags", painted["checks"])
+    assert not _control_found("Goto", {"Goto 0xADDR", "Load path"})
+    assert not _control_found("Save", {"Load / Save"})
+    assert not _control_found("Run checks", {"No check run yet: press Run checks."})
+    assert _control_found("NAMING", {"NAMING  ‹stem›_‹segment› → firmware_segment.s19"})
+
+
+# --------------------------------------------------------------------------- #
+# R-WHELP.7/2 -- `?` on each window whose section changed (black box, E5 C-7)
+# --------------------------------------------------------------------------- #
+
+#: The help sections Inc 14 changed, with the window `?` is pressed in.
+_CHANGED_HELP = (
+    ("a2l", "a2l"),
+    ("workspace", "workspace"),
+    ("checks", "checks"),
+    ("crc_designer", "crc_designer"),
+    ("flow", "flow"),
+    ("split_join_export", "split_join"),
+    ("reports", None),
+)
+
+
+def _focus_inside(app: S19TuiApp, root) -> Optional[object]:
+    """Focus a widget of ``root`` that takes no typed text and is not the
+    ``?`` chip; returns it, or None when no such widget takes the focus."""
+    from s19_app.tui.window_help import WindowHelpChip
+
+    for widget in root.query("*"):
+        if isinstance(widget, (WindowHelpChip, Input, TextArea)) or not widget.focusable:
+            continue
+        app.set_focus(widget)
+        if app.focused is widget:
+            return widget
+    return None
+
+
+def _expected_help_defects(key: str, title: str, body: str) -> List[str]:
+    """Where the painted title and body differ from the approved copy."""
+    defects = []
+    paragraphs = body.split("\n\n")
+    if key == "flow":
+        if title != WINDOW_HELP_SECTIONS["flow"]["title"]:
+            defects.append("title")
+        if len(paragraphs) != 59:
+            defects.append(f"{len(paragraphs)} steps, pinned 59")
+        for n, step in COPY.FLOW_STEPS.items():
+            if n > len(paragraphs) or paragraphs[n - 1] != f"{n}. {step}":
+                defects.append(f"step {n}")
+        return defects
+    want_title, steps = COPY.REWRITTEN_SECTIONS[key]
+    if title != want_title:
+        defects.append("title")
+    if body != "\n\n".join(f"{n}. {step}" for n, step in enumerate(steps, start=1)):
+        defects.append("body")
+    return defects
+
+
+def test_r_whelp_7_2_question_mark_paints_the_approved_copy(tmp_path: Path) -> None:
+    """R-WHELP.7 (event row) and R-WHELP.12/4, black box (E5 C-7): with a
+    widget of the window focused (not the chip), `?` opens the window's help;
+    its painted title and numbered steps equal the approved copy, and its
+    painted key lines are the window's keys block. `F1` is n/a: no binding."""
+    from tests.test_tui_report_seam import _flush, _make_report_project
+    from s19_app.tui.window_help import WindowHelpScreen, window_keys_text
+
+    async def _read_help(app: S19TuiApp, pilot, root) -> dict:
+        target = _focus_inside(app, root)
+        assert target is not None, f"no focusable widget in {root!r}"
+        await pilot.press("question_mark")
+        await _pause(pilot)
+        modal = app.screen
+        assert isinstance(modal, WindowHelpScreen), f"`?` opened {modal!r}"
+        keys = modal.query("#window_help_keys")
+        seen = {
+            "section": modal.section_key,
+            "title": str(modal.query_one(".modal-title", Label).render()),
+            "body": str(modal.query_one("#window_help_body", Static).render()),
+            "keys": str(keys.first().render()) if keys else "",
+            "keys_block": window_keys_text(app, modal.section_key),
+        }
+        await pilot.press("escape")
+        await _pause(pilot)
+        return seen
+
+    async def _drive() -> Dict[str, dict]:
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_report_project(app, "proj")
+        seen: Dict[str, dict] = {}
+        async with app.run_test(size=(120, 36)) as pilot:
+            await _pause(pilot)
+            await _load_image_f(app, pilot)
+            for key, window in _CHANGED_HELP:
+                if window is None:
+                    continue
+                if window == "split_join":
+                    app.action_open_split_join_export()
+                    await _pause(pilot)
+                    root = app.query_one("#screen_split_join", SplitJoinWindow)
+                    seen[key] = await _read_help(app, pilot, root)
+                    root.action_close_window()
+                    await _pause(pilot)
+                    continue
+                app.action_show_screen(window)
+                await _pause(pilot)
+                root = app.query_one(f"#{app.SCREEN_CONTAINER_IDS[window]}")
+                seen[key] = await _read_help(app, pilot, root)
+            app._handle_load_project("proj")
+            await _flush(pilot)
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+            await pilot.press("t")
+            await _flush(pilot)
+            reports = app.screen_stack[-1]
+            assert isinstance(reports, ReportViewerScreen), "t must open Reports"
+            seen["reports"] = await _read_help(app, pilot, reports)
+        return seen
+
+    seen = asyncio.run(_drive())
+    assert sorted(seen) == sorted(key for key, _w in _CHANGED_HELP)
+    defects = {
+        key: _expected_help_defects(key, s["title"], s["body"])
+        for key, s in seen.items()
+        if s["section"] != key or _expected_help_defects(key, s["title"], s["body"])
+    }
+    assert defects == {}, defects
+    for key, s in seen.items():
+        assert s["keys"] == s["keys_block"], key
+    # the windows with keys of their own paint key lines; CRC Designer, Flow
+    # Builder and the Reports dialog have none (``WINDOW_KEYS`` holds no entry
+    # for them, and Reports maps to no window)
+    without = sorted(key for key, s in seen.items() if not s["keys"].strip())
+    assert without == ["crc_designer", "flow", "reports"], without
+    # negative control: a painted body with one step dropped is reported
+    body = seen["a2l"]["body"].split("\n\n")
+    assert _expected_help_defects("a2l", seen["a2l"]["title"], "\n\n".join(body[:-1]))
 
 
 # --------------------------------------------------------------------------- #
@@ -525,6 +676,57 @@ def test_r_whelp_13_2_named_folders_are_the_apps() -> None:
     # negative control: a folder the app has no constant for is reported
     broken = _with_step_appended("workspace", "Files go to `boards\\` first.")
     assert any(part == "boards" for _k, _n, part in _folder_parts(broken))
+    # E5 C-2: each folder is the one its own constant names, in its place
+    assert _folder_mapping_defects(WINDOW_HELP_SECTIONS, constants) == []
+    # negative control: `splits\` written where `patches\` belongs is reported
+    swapped = copy.deepcopy(dict(WINDOW_HELP_SECTIONS))
+    steps = list(swapped["workspace"]["steps"])
+    steps[4] = steps[4].replace("workarea\\patches\\", "workarea\\splits\\")
+    swapped["workspace"] = {**swapped["workspace"], "steps": tuple(steps)}
+    assert _folder_mapping_defects(swapped, constants) != []
+
+
+#: (section, backslash code span) -> the constants that name its folders, in
+#: order (R-WHELP.13/2; the compound span of Workspace step 5 part by part,
+#: A-8). The last piece of a span is a file name or empty.
+_FOLDER_MAP = {
+    ("a2l", "temp\\"): ("WORKAREA_TEMP",),
+    ("workspace", ".s19tool\\"): ("WORKAREA_DIRNAME",),
+    ("workspace", "workarea\\patches\\"): ("WORKAREA_SUBDIR", "WORKAREA_PATCHES"),
+    ("workspace", "workarea\\splits\\"): ("WORKAREA_SUBDIR", "SPLITS_DIR"),
+    ("workspace", "templates\\"): ("WORKAREA_TEMPLATES",),
+    ("crc_designer", "templates\\"): ("PROJECT_TEMPLATES_DIR",),
+    ("crc_designer", ".s19tool\\templates\\"): ("WORKAREA_DIRNAME", "WORKAREA_TEMPLATES"),
+    ("reports", "reports\\*.md"): ("REPORTS_DIR_NAME",),
+    ("reports", "filters\\"): ("REPORT_FILTERS_DIR_NAME",),
+    ("reports", "reports\\"): ("REPORTS_DIR_NAME",),
+    ("split_join_export", "splits\\"): ("SPLITS_DIR",),
+    ("split_join_export", ".s19tool\\workarea\\splits\\"): (
+        "WORKAREA_DIRNAME", "WORKAREA_SUBDIR", "SPLITS_DIR",
+    ),
+}
+
+
+def _folder_mapping_defects(sections: dict, constants: Dict[str, str]) -> List[tuple]:
+    """Spans of the rewritten sections that are not in ``_FOLDER_MAP``, map
+    entries no section writes, and spans whose folders are not the values of
+    their constants."""
+    seen = set()
+    defects: List[tuple] = []
+    for key, n, step in _all_step_texts({k: sections[k] for k in _REWRITTEN}):
+        for span in re.findall(r"`([^`]+)`", step):
+            if "\\" not in span:
+                continue
+            seen.add((key, span))
+            names = _FOLDER_MAP.get((key, span))
+            if names is None:
+                defects.append(("unmapped", key, n, span))
+                continue
+            folders = tuple(span.split("\\")[:-1])
+            if folders != tuple(constants[name] for name in names):
+                defects.append(("wrong folder", key, n, span, names))
+    defects.extend(("not written", *entry) for entry in sorted(set(_FOLDER_MAP) - seen))
+    return defects
 
 
 # --------------------------------------------------------------------------- #
@@ -999,6 +1201,28 @@ def test_r_legend_011_1_region_row_field_line(tmp_path: Path) -> None:
     assert "opens hex" not in sheet
 
 
+def test_r_tui_062_10_1_3_k_paints_the_map_keys_line(tmp_path: Path) -> None:
+    """R-TUI-062.10.1/1, black box (E5 C-7): on the Memory Map (`4`), `k`
+    opens the legend and its Map keys box paints Legend copy I14."""
+
+    async def _drive() -> Tuple[List[str], List[str]]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 36)) as pilot:
+            await pilot.pause()
+            await _load_image_f(app, pilot)
+            await pilot.press("4")
+            await _pause(pilot)
+            await pilot.press("k")
+            await _pause(pilot)
+            legend = app.screen
+            assert isinstance(legend, LegendScreen), f"k opened {legend!r}"
+            return _box_lines(legend, "Map keys"), _box_lines(legend, "Region row")
+
+    map_keys, region_row = asyncio.run(_drive())
+    assert map_keys == [COPY.MAP_KEYS_LINE], map_keys
+    assert COPY.MAP_REGION_ROW_FIELD_KEY in region_row, region_row
+
+
 def test_r_legend_011_2_changed_lines_fit_the_floor(tmp_path: Path) -> None:
     assert cell_len(_MAP_KEYS) == 63 and cell_len(_FIELD_LINE) == 67
     assert cell_len(L.MAP_KEYS_LINE) <= 72
@@ -1214,6 +1438,38 @@ def test_r_doc_readme_4_3_operations_names_placeholders(tmp_path: Path) -> None:
     # the claim holds: extract only leaves a placeholder note
     result = get_operation("extract").execute(OperationInput.from_loaded(_image_f()))
     assert result.notes == ["placeholder: extract not yet implemented"]
+    # E5 C-2: each claim sits on its own operation. The sentence that names
+    # `crc` says it runs; the sentence that says "not implemented" names
+    # exactly `extract` and `split_by_segment` (graph README block (13)).
+    assert _operations_claim_defects(text) == []
+    assert _operations_claim_defects(
+        text.replace("`extract` and `split_by_segment` are", "`crc` and `split_by_segment` are")
+    ) != []
+    assert _operations_claim_defects(
+        text.replace("`crc` checks or writes CRCs", "`crc` is listed but not implemented; it checks or writes CRCs")
+    ) != []
+    split = get_operation("split_by_segment").execute(OperationInput.from_loaded(_image_f()))
+    assert split.notes == ["placeholder: split_by_segment not yet implemented"]
+
+
+_OPS_RUNS = "`crc` checks or writes CRCs over the loaded image from a CRC config."
+_OPS_PLACEHOLDERS = (
+    "`extract` and `split_by_segment` are listed but not implemented yet: they answer "
+    "`placeholder: <name> not yet implemented` and change nothing."
+)
+
+
+def _operations_claim_defects(section_text: str) -> List[str]:
+    sentences = re.split(r"(?<=\.)\s+(?=`)", _flat(section_text))
+    defects = []
+    if _OPS_RUNS not in sentences:
+        defects.append("no sentence says that `crc` runs")
+    if _OPS_PLACEHOLDERS not in sentences:
+        defects.append("no sentence names the two placeholders")
+    for sentence in sentences:
+        if "not implemented" in sentence and set(re.findall(r"`(crc|extract|split_by_segment)`", sentence)) != {"extract", "split_by_segment"}:
+            defects.append(f"'not implemented' is not tied to the two placeholders: {sentence}")
+    return defects
 
 
 # --------------------------------------------------------------------------- #
@@ -1227,6 +1483,23 @@ def test_r_doc_security_1_1_policy_names_private_path() -> None:
     assert "Security tab" in text
     assert "Report a vulnerability" in text
     assert "not in a public issue" in text, text
+    # E5 C-6 (R-DOC-SECURITY.1): no public-issue fallback and no e-mail route
+    assert _fallback_hits(text) == []
+    assert _fallback_hits(text + " If the button is missing, open an issue.") != []
+    assert _fallback_hits(text + " Or write to someone@example.org.") != []
+
+
+_FALLBACKS = (
+    "open an issue", "open a public issue", "file an issue", "create an issue",
+    "issues/new", "e-mail", "email",
+)
+
+
+def _fallback_hits(text: str) -> List[str]:
+    lowered = text.lower()
+    hits = [phrase for phrase in _FALLBACKS if phrase in lowered]
+    hits.extend(re.findall(r"[\w.+-]+@[\w-]+\.[\w.]+", text))
+    return hits
 
 
 def _status_cell(cells: List[str]) -> str:
@@ -1311,6 +1584,50 @@ def test_r_doc_relnote_1_1_crc_change_stated() -> None:
         "0x18026B2A",
         "0x0F8B7431",
     )
+    # E5 C-2: the two paragraphs of the Inc 8 release note, whole, each under
+    # its own heading (whitespace-normalised)
+    release = _release()
+    assert _flat(_heading_body(release, "#### What changed")) == _flat(_RELNOTE_WHAT_CHANGED)
+    assert _flat(_heading_body(release, "#### Am I affected?")) == _flat(_RELNOTE_AM_I_AFFECTED)
+    # negative control: a paraphrase in the release that keeps every pinned
+    # fragment is reported by the same comparison
+    paraphrased = release.replace("now compute every CRC", "compute each CRC")
+    assert paraphrased != release
+    assert _flat(_heading_body(paraphrased, "#### What changed")) != _flat(_RELNOTE_WHAT_CHANGED)
+
+
+#: ``inc-8/release-note-crc.md`` §What changed and §Am I affected?, verbatim.
+_RELNOTE_WHAT_CHANGED = (
+    "The CRC operation (Operations dialog: CRC check and Write CRC) and the Flow CRC "
+    "block now compute every CRC by the parametric CRC model: the register starts at "
+    "`init` exactly as written in the CRC config. Earlier versions bit-reversed `init` "
+    "first when `reverse` was `true`. The CRC Designer always used the model; the two "
+    "now agree for the same parameters."
+)
+_RELNOTE_AM_I_AFFECTED = (
+    "Only if a CRC config has **both**:\n"
+    "- `\"reverse\": true`, and\n"
+    "- an `init` that is **not bit-symmetric** — its 32 bits do not read the same "
+    "from both ends.\n\n"
+    "`0x00000000` and `0xFFFFFFFF` are bit-symmetric, so the example config, the "
+    "CRC-32 (zlib / PKZIP) defaults and every config with one of these two inits are "
+    "**not affected**. Configs with `\"reverse\": false` are not affected.\n\n"
+    "To check an init: write it as 32 binary digits; if the string reversed is the "
+    "same string, the init is bit-symmetric (for example `0x0FF00FF0`). Otherwise the "
+    "config is affected."
+)
+
+
+def _heading_body(text: str, heading: str) -> str:
+    """The text under ``heading`` (a whole line) up to the next heading."""
+    lines = text.splitlines()
+    assert heading in lines, f"no heading {heading!r}"
+    body = []
+    for line in lines[lines.index(heading) + 1:]:
+        if line.startswith("#"):
+            break
+        body.append(line)
+    return "\n".join(body)
 
 
 def test_r_doc_relnote_1_2_stated_value_is_the_engines() -> None:
@@ -1356,12 +1673,26 @@ def test_r_doc_relnote_6_1_whole_hex_windows_stated() -> None:
     release = _release()
     _holds(release, "every hex window whole", "each Markdown window", "512 rows")
     _absent(release, "cut each window at 512 rows")
+    # E5 C-6: the earlier cut names both windows, and no text says the HTML
+    # changed pane was cut (it was whole, R-CMP-004.14 Base)
+    _holds(
+        release,
+        "earlier versions cut each Markdown window, and the HTML window of a run "
+        "present in one image only, at 512 rows",
+    )
+    _absent(release, "changed pane", "every HTML window")
 
 
 def test_r_doc_relnote_7_1_deleted_project_folder_stated() -> None:
     from s19_app.tui import app as app_module
 
     _holds(_subsection(_release(), "Projects"), "no longer re-creates", "Project sync NOT done")
+    # E5 C-6: the whole status line, as the app writes it
+    _holds(
+        _subsection(_release(), "Projects"),
+        "`Project sync NOT done: project '<name>' could not be read — check that the "
+        "folder can be opened, then load again.`",
+    )
     reason, step = app_module._TYPED_REFUSAL_TOKENS["unreadable"]
     assert (reason, step) == (
         "could not be read",
@@ -1427,6 +1758,12 @@ def test_r_doc_relnote_13_1_visible_replacements_stated() -> None:
     assert _strip_ctl("a‮b") == "a�b"
     assert _strip_ctl("a\tb\r\nc") == "a b  c"
     _holds(_subsection(_release(), "Reports"), "direction-override", "�", "one space")
+    # E5 C-8 (F3): CR and LF are each one space, so CRLF is two
+    _holds(
+        _subsection(_release(), "Reports"),
+        "(a tab, a carriage return or a line feed each as one space)",
+    )
+    _absent(_subsection(_release(), "Reports"), "a line break as one space")
 
 
 def test_r_doc_relnote_14_1_part_file_safe_to_delete_stated() -> None:
@@ -1492,6 +1829,75 @@ def test_r_doc_guide_1_passages_describe_1_0_0(number: int) -> None:
     assert missing == [], f"{name}: 1.0.0 text missing: {missing}"
 
 
+def _bullet(text: str, section: str, label: str) -> str:
+    """The flattened text of the ``- **<label>**`` bullet of a ``## `` section."""
+    start = text.index(f"## {section}")
+    nxt = text.find("\n## ", start + 3)
+    body = text[start: nxt if nxt != -1 else len(text)]
+    match = re.search(rf"(?ms)^- \*\*{re.escape(label)}\*\*(.*?)(?=^- |^\S|\Z)", body)
+    assert match, f"no {label!r} bullet in {section!r}"
+    return _flat(match.group(1))
+
+
+def test_r_doc_guide_1_9_named_bullets_hold_the_1_0_0_phrases() -> None:
+    """R-DOC-GUIDE.1/9 (E5 C-2): each phrase sits in the bullet the case
+    names, not anywhere in the file."""
+    text = _doc("docs/user-guide/ch21-html-reports.md")
+    section = "21.1 Before/after report"
+    assert "a2l=used" in _bullet(text, section, "Header")
+    assert "from the loaded A2L and MAC" in _bullet(text, section, "Runs")
+    # negative control: the phrase moved to another bullet is not found
+    moved = text.replace("from the loaded\n  A2L and MAC", "")
+    assert "from the loaded A2L and MAC" not in _bullet(moved, section, "Runs")
+
+
+#: R-DOC-GUIDE.1 / E5 C-6: (file, capture image stem) of the four captures
+#: taken before 1.0.0 beside a changed passage (D-5).
+_CAPTURES_BEFORE = (
+    ("ch06-memory-map.md", "ch06-05-"),
+    ("ch17-flow-builder.md", "ch17-05-"),
+    ("ch19-help-palettes-settings.md", "ch19-01-"),
+    ("ch21-html-reports.md", "ch21-02-"),
+)
+#: Graph interface I-5: the note opens a parenthesis, then ``:`` and what the
+#: capture shows.
+_CAPTURE_NOTE = re.compile(r"\(capture taken before 1\.0\.0: [^)]*\S[^)]*\)")
+
+
+def _capture_note_defect(text: str, stem: str) -> Optional[str]:
+    """None when the block that follows the capture (up to the next image or
+    heading) carries the I-5 note."""
+    lines = text.splitlines()
+    starts = [i for i, line in enumerate(lines) if line.startswith("![") and f"img/{stem}" in line]
+    if len(starts) != 1:
+        return f"capture {stem} found {len(starts)} times"
+    block = []
+    for line in lines[starts[0] + 1:]:
+        if line.startswith("![") or line.startswith("#"):
+            break
+        block.append(line)
+    if not _CAPTURE_NOTE.search(_flat("\n".join(block))):
+        return f"no note beside capture {stem}"
+    return None
+
+
+def test_r_doc_guide_1_12_capture_notes_beside_their_captures() -> None:
+    """R-DOC-GUIDE.1 (E5 C-6): the I-5 note sits beside each named capture."""
+    defects = [
+        defect
+        for name, stem in _CAPTURES_BEFORE
+        if (defect := _capture_note_defect(_doc(f"docs/user-guide/{name}"), stem))
+    ]
+    assert defects == []
+    # negative controls: the note without its continuation, and the note
+    # moved away from its capture, are each reported
+    ch06 = _doc("docs/user-guide/ch06-memory-map.md")
+    assert _capture_note_defect(ch06.replace("1.0.0: it shows", "1.0.0) it shows"), "ch06-05-")
+    ch19 = _doc("docs/user-guide/ch19-help-palettes-settings.md")
+    cut = re.sub(r"\(capture taken before\s+1\.0\.0:", "(see below:", ch19)
+    assert _capture_note_defect(cut + "\n(capture taken before 1.0.0: moved)\n", "ch19-01-")
+
+
 _FIXED = ("F-16", "F-28", "F-30", "F-37", "F-38", "F-41", "F-42", "F-49")
 
 
@@ -1509,8 +1915,20 @@ def _findings_rows() -> Dict[str, str]:
 def test_r_doc_guide_2_1_fixed_rows_marked() -> None:
     rows = _findings_rows()
     assert len(_FIXED) == 8
-    unmarked = [f for f in _FIXED if not rows.get(f, "").endswith("fixed in 1.0.0")]
+    unmarked = [
+        f for f in _FIXED if not rows.get(f, "").endswith(_FIXED_MARK.get(f, "fixed in 1.0.0"))
+    ]
     assert unmarked == [], f"rows without the fixed mark: {unmarked}"
+
+
+#: E5 C-8 (F2): where 1.0.0 fixes a finding other than as its title reads,
+#: the mark goes on with what 1.0.0 does (graph G-DOSSIER, R-DOC-GUIDE.2).
+_FIXED_MARK = {
+    "F-28": (
+        "fixed in 1.0.0: the block names the cause when it refuses a Designer "
+        "template; it does not read Designer templates"
+    ),
+}
 
 
 def test_r_doc_guide_2_2_no_other_row_marked() -> None:

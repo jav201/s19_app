@@ -1,0 +1,50 @@
+# E5 corrective final run int-07 — LAN Linux host, conda env s19ci
+# worktree: origin/main f9f3cb09 + branch b101-inc14 diff (local head 7d37efa + E5 working tree) applied with git apply
+# started 2026-11-06T00:20:26Z; load: 7.28 10.05 10.82
+s19_app.__file__ = <host-home>/work/s19_c14/s19_app/__init__.py
+python 3.11.18
+$ env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 2400 python -m pytest -q -p no:cacheprovider --basetemp /tmp/pytest-s19c14 -n 4 -rfEs tests/test_b101_help_legend_docs.py tests/test_window_usage_help.py tests/test_changes_file_notation_help.py tests/test_docs_canon.py tests/test_id_registry.py tests/test_suite_hygiene.py tests/test_engine_unchanged.py tests/test_requirements_canon.py tests/test_tui_directionb.py tests/test_tui_checks_view.py tests/test_map_click_chain.py tests/test_b100_load_question.py tests/test_b101_flow_ext_copy.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 14%]
+........................................................................ [ 28%]
+.........F.............................................................. [ 42%]
+........................................................................ [ 56%]
+........................................................................ [ 71%]
+.................................................................s...... [ 85%]
+............................s.................s.....................s... [ 99%]
+...                                                                      [100%]
+=================================== FAILURES ===================================
+____ test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses ____
+[gw1] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+    def test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses() -> None:
+        """E3S-2 / E5S-1: every text file of the batch folder (records and
+        evidence, not git-ignored) holds no home path, account or host name,
+        junit host attribute, shell prompt, UNC host path or LAN address."""
+        inc2_dir = EVIDENCE_ROOT / "inc-2"
+        if not inc2_dir.is_dir():
+            pytest.fail(
+                "the increment's evidence folder is missing from this checkout; "
+                "the redaction gate has nothing it is responsible for"
+            )
+        hits = _redaction_hits(BATCH_ROOT, _local_identity_names(), _git_ignored(BATCH_ROOT))
+>       assert not hits, "unredacted batch records or evidence:\n" + "\n".join(hits)
+E       AssertionError: unredacted batch records or evidence:
+E         inc-14/E5-security.md: user-profile path: <Public-profile-path, redacted>
+E       assert not ['inc-14/E5-security.md: user-profile path: <Public-profile-path, redacted>']
+
+tests/test_suite_hygiene.py:2021: AssertionError
+============================= QC-TM timing margins =============================
+49.8%  0.201 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+66.0%  0.510 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 2 bounds, 0 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_suite_hygiene.py::test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses
+SKIPPED [1] tests/test_b100_load_question.py:2017: an exclusively held file is a Windows-only arm (reported not run elsewhere)
+SKIPPED [1] tests/test_b101_flow_ext_copy.py:563: case rule: Windows
+SKIPPED [1] tests/test_b101_flow_ext_copy.py:1268: junctions are the Windows case
+SKIPPED [1] tests/test_b101_flow_ext_copy.py:796: the junction half is Windows
+1 failed, 502 passed, 4 skipped in 1010.36s (0:16:50)
+# exit 1 at 2026-11-06T00:37:17Z

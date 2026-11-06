@@ -1,0 +1,31 @@
+# E5 corrective final run int-08 — LAN Linux host, conda env s19ci
+# worktree: origin/main f9f3cb09 + branch b101-inc14 diff (local head 7d37efa + E5 working tree) applied with git apply
+# started 2026-11-06T00:37:17Z; load: 4.89 8.86 9.92
+s19_app.__file__ = <host-home>/work/s19_c14/s19_app/__init__.py
+python 3.11.18
+$ env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 2400 python -m pytest -q -p no:cacheprovider --basetemp /tmp/pytest-s19c14 -n 4 -rfEs tests/test_b100_focus.py tests/test_b100_load_dialog.py tests/test_b97_check_editor.py tests/test_b97_chips_help.py tests/test_b97_flow_builder.py tests/test_b97_flow_execution.py tests/test_b97_key_bar.py tests/test_b97_patch_editor.py tests/test_b97_width.py tests/test_b99_bytes_field.py
+bringing up nodes...
+bringing up nodes...
+
+.................s.....s..............s......s......................ss.. [ 10%]
+...........................s..s......................................... [ 21%]
+........................................................................ [ 31%]
+......................s......s.......................................... [ 42%]
+........................................................................ [ 52%]
+........................................................................ [ 63%]
+........................................................................ [ 74%]
+........................................................................ [ 84%]
+........................................................................ [ 95%]
+................................                                         [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_b100_load_dialog.py:774: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only
+SKIPPED [1] tests/test_b100_load_dialog.py:2450: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only
+SKIPPED [1] tests/test_b100_load_dialog.py:2576: Windows strips a trailing dot from a file name, so fw.s19. opens fw.s19; on posix fw.s19. is a distinct, missing name (fix round 1, CI9b-4)
+SKIPPED [1] tests/test_b100_load_dialog.py:2599: case-insensitive file system arm; Windows only
+SKIPPED [2] tests/test_b100_load_dialog.py:2642: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_load_dialog.py:1956: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_load_dialog.py:2766: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_load_dialog.py:3666: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only
+SKIPPED [1] tests/test_b100_load_dialog.py:3811: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only
+670 passed, 10 skipped in 1760.39s (0:29:20)
+# exit 0 at 2026-11-06T01:06:38Z

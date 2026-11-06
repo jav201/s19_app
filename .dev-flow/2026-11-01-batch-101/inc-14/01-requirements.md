@@ -113,7 +113,7 @@ As a reader of the user guide, I want the passages about behaviour that batch-10
 - **Security policy.** `SECURITY.md` at the root of the repository (GitHub reads it from there).
 - **Release notes.** `CHANGELOG.md` at the root of the repository, one `## <version>` section per release, newest first (D-2; proposed CTX-README-like context in S0).
 - **User guide.** `docs/user-guide/ch*.md`; its **findings table** is `docs/user-guide/DOSSIER.md` §5.
-- **Fixed mark.** The text `fixed in 1.0.0` appended to the Kind cell of a findings-table row.
+- **Fixed mark.** The text `fixed in 1.0.0` appended to the Kind cell of a findings-table row; where 1.0.0 fixes the finding other than as its title reads, the mark goes on with `: <what 1.0.0 does>` (F-28: `fixed in 1.0.0: the block names the cause when it refuses a Designer template; it does not read Designer templates`; E5 C-8, F2).
 
 ## Requirements
 
@@ -180,7 +180,7 @@ As a reader of the user guide, I want the passages about behaviour that batch-10
 
 | Id | Form | Requirement | Threshold | Negative control | US | Base |
 |---|---|---|---|---|---|---|
-| R-DOC-GUIDE.1 | U | The system shall describe in its user guide no behaviour that the system does not provide. **new** | the 11 passages of `02-test-cases.md` R-DOC-GUIDE.1/1 … /11 describe 1.0.0: each passage's stale phrase absent and its 1.0.0 phrase present (11/11); a capture taken before 1.0.0 beside a changed passage carries the note `(capture taken before 1.0.0)` (4/4: ch06-05, ch17-05, ch19-01, ch21-02; D-5) | restore `CRC config is structurally invalid: 'reverse'` in ch17.5 → /4 RED | US-GUIDE-1 | No: 10 stale passages and 1 missing (the `.md` escaping consequence of Inc 7, F-E3-8) (B) |
+| R-DOC-GUIDE.1 | U | The system shall describe in its user guide no behaviour that the system does not provide. **new** | the 11 passages of `02-test-cases.md` R-DOC-GUIDE.1/1 … /11 describe 1.0.0: each passage's stale phrase absent and its 1.0.0 phrase present (11/11); a capture taken before 1.0.0 beside a changed passage carries the note `(capture taken before 1.0.0: <what the capture shows>)` — graph I-5: the text `(capture taken before 1.0.0` opens a parenthesis that goes on with `:` and what the capture shows — in the block that follows the capture (4/4: ch06-05, ch17-05, ch19-01, ch21-02; D-5; corrected at E5 C-3, SR-1) | restore `CRC config is structurally invalid: 'reverse'` in ch17.5 → /4 RED | US-GUIDE-1 | No: 10 stale passages and 1 missing (the `.md` escaping consequence of Inc 7, F-E3-8) (B) |
 | R-DOC-GUIDE.2 | U | The system shall mark each row of the user guide's findings table that 1.0.0 fixes with `fixed in 1.0.0`. **new** | rows F-16, F-28, F-30, F-37, F-38, F-41, F-42, F-49 carry the fixed mark (8/8); the marked set equals this pinned set, which a later increment or the batch-end doc pass extends only by named supersession, and no row whose Kind starts `limitation` carries the mark (0) [A-15] | mark F-43 (a limitation, deferred) → /2 RED; mark F-45 without a supersession of the pinned set → /2 RED | US-GUIDE-1 | No: no row is marked |
 
 Rows split or changed in the canon, and every id proposed new: `E1-rulings.md` §2, for the requirements session.
