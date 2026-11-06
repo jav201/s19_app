@@ -1,0 +1,74 @@
+# mutant 042b.4 (R-TUI-042b.4)
+# mutation: as R-TUI-042b.1 -> the row is sev-info
+# apply output:
+APPLIED 042b.4
+a2l.py e99d9e15da3f31160046889300ac41f0741ca917166ecea18da6f27c0d9f89a8
+app.py c3197405780f9d871045c8ba3e6684681d6eb95eaa912b2e995a664d208d9fe3
+issues_view.py 0c761e79156a9be760920127df6e77f0c39d58a4748374107b3e91de4f24fde9
+rules.py d3fd869193b6a207040d67c75cdc3d03b88115a9938715732131759640081130
+
+# restore verify ok=True:
+a2l.py e99d9e15da3f31160046889300ac41f0741ca917166ecea18da6f27c0d9f89a8
+app.py c3197405780f9d871045c8ba3e6684681d6eb95eaa912b2e995a664d208d9fe3
+issues_view.py f543a58ecc7274d03adf3dd95a6c670187242ad6225ebbcf5206236012c1dd3a
+rules.py d3fd869193b6a207040d67c75cdc3d03b88115a9938715732131759640081130
+
+# command: cd ~/work/s19_m11 && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 900 ~/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -n 2 --basetemp /tmp/pytest-s19m11 tests/test_b101_issues_severity_view.py::test_r_tui_042b_4_unrecognized_block_rows_paint_warning
+# exit=1
+
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_r_tui_042b_4_unrecognized_block_rows_paint_warning ____________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m11/popen-gw0/test_r_tui_042b_4_unrecognized0')
+
+    def test_r_tui_042b_4_unrecognized_block_rows_paint_warning(tmp_path: Path) -> None:
+        """Why: the row carries the colour class of its severity (base: sev-info)."""
+    
+        async def drive(app, pilot) -> None:
+            rows = [r for _, rs in _layout(app) for r in rs if r.issue.code == UNRECOGNIZED]
+            assert len(rows) == 3
+            assert all(r.has_class("sev-warning") for r in rows), [r.classes for r in rows]
+            assert not any(r.has_class("sev-info") for r in rows)
+    
+>       _run(tmp_path, _list_l4(), drive)
+
+tests/test_b101_issues_severity_view.py:209: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_issues_severity_view.py:149: in _run
+    asyncio.run(_go())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b101_issues_severity_view.py:147: in _go
+    await drive(app, pilot)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+
+    async def drive(app, pilot) -> None:
+        rows = [r for _, rs in _layout(app) for r in rs if r.issue.code == UNRECOGNIZED]
+        assert len(rows) == 3
+>       assert all(r.has_class("sev-warning") for r in rows), [r.classes for r in rows]
+E       AssertionError: [frozenset({'issue-row', 'sev-info'}), frozenset({'issue-row', 'sev-info'}), frozenset({'issue-row', 'sev-info'})]
+E       assert False
+E        +  where False = all(<generator object test_r_tui_042b_4_unrecognized_block_rows_paint_warning.<locals>.drive.<locals>.<genexpr> at 0x7f98da998900>)
+
+tests/test_b101_issues_severity_view.py:206: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_issues_severity_view.py::test_r_tui_042b_4_unrecognized_block_rows_paint_warning
+1 failed in 3.21s
+
+# --- stderr ---
+

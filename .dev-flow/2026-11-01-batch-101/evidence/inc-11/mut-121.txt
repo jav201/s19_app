@@ -1,0 +1,43 @@
+# mutant 121 (R-A2L-121)
+# mutation: emit the line per point -> 3 occurrences
+# apply output:
+APPLIED 121
+a2l.py c88a2ef1677d535db2c313fbbbfe923c19e8178d38e804379c5151cda1a42860
+app.py c3197405780f9d871045c8ba3e6684681d6eb95eaa912b2e995a664d208d9fe3
+issues_view.py f543a58ecc7274d03adf3dd95a6c670187242ad6225ebbcf5206236012c1dd3a
+rules.py d3fd869193b6a207040d67c75cdc3d03b88115a9938715732131759640081130
+
+# restore verify ok=True:
+a2l.py e99d9e15da3f31160046889300ac41f0741ca917166ecea18da6f27c0d9f89a8
+app.py c3197405780f9d871045c8ba3e6684681d6eb95eaa912b2e995a664d208d9fe3
+issues_view.py f543a58ecc7274d03adf3dd95a6c670187242ad6225ebbcf5206236012c1dd3a
+rules.py d3fd869193b6a207040d67c75cdc3d03b88115a9938715732131759640081130
+
+# command: cd ~/work/s19_m11 && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 900 ~/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -n 2 --basetemp /tmp/pytest-s19m11 tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_121_index_note_once_above_header tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_121_no_line_without_points
+# exit=1
+
+bringing up nodes...
+bringing up nodes...
+
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+_________________ test_r_a2l_121_index_note_once_above_header __________________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m11/popen-gw0/test_r_a2l_121_index_note_once0')
+
+    def test_r_a2l_121_index_note_once_above_header(tmp_path: Path) -> None:
+        """Why: the note is stated once, directly above the table, not on every row."""
+        text = _curve_c1_text(tmp_path)
+>       assert text.count(NOTE_TEXT) == 1
+E       assert 3 == 1
+E        +  where 3 = <built-in method count of str object at 0x5639e67a9d10>('x: point index (axis points unavailable)')
+E        +    where <built-in method count of str object at 0x5639e67a9d10> = 'CURVE  C1  -  curve one\naddress 0x00009200, 7 bytes\nUnit: rpm [0.0, 1000.0]\nConversion: LINEAR - CM_lin - "speed l...\n\n  y shape: ▁▄█\n\n  note: axis 1: the layout deposits no axis points (NO_AXIS_PTS) - x is shown as the point index'.count
+
+tests/test_b101_a2l_blocks_and_segments.py:534: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_121_index_note_once_above_header
+1 failed, 1 passed in 1.07s
+
+# --- stderr ---
+

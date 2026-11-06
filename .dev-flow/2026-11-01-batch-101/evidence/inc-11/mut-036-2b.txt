@@ -1,0 +1,73 @@
+# mutant 036.2b (R-A2L-036.2)
+# mutation: take the fourth word of the first line of 5+ words (base) -> software_a.a2l and the demo give no base
+# apply output:
+APPLIED 036.2b
+a2l.py e53b06ba814c712347bb6a15e866eae01f1c7fb19bb61ed491e71f25a47e29d8
+app.py c3197405780f9d871045c8ba3e6684681d6eb95eaa912b2e995a664d208d9fe3
+issues_view.py f543a58ecc7274d03adf3dd95a6c670187242ad6225ebbcf5206236012c1dd3a
+rules.py d3fd869193b6a207040d67c75cdc3d03b88115a9938715732131759640081130
+
+# restore verify ok=True:
+a2l.py e99d9e15da3f31160046889300ac41f0741ca917166ecea18da6f27c0d9f89a8
+app.py c3197405780f9d871045c8ba3e6684681d6eb95eaa912b2e995a664d208d9fe3
+issues_view.py f543a58ecc7274d03adf3dd95a6c670187242ad6225ebbcf5206236012c1dd3a
+rules.py d3fd869193b6a207040d67c75cdc3d03b88115a9938715732131759640081130
+
+# command: cd ~/work/s19_m11 && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 900 ~/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -n 2 --basetemp /tmp/pytest-s19m11 tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_name_first_record_line_software_a tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_release_demo_segments
+# exit=1
+
+bringing up nodes...
+bringing up nodes...
+
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_______________ test_r_a2l_036_name_first_record_line_software_a _______________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+    def test_r_a2l_036_name_first_record_line_software_a() -> None:
+        """Why: software_a.a2l writes the name first on the record line (base: UNKNOWN, no base).
+        Rows 036.1/2, 036.2/2, 036.3/2, 036.6/3, 036.8/1, 036.9/1."""
+        data = parse_a2l_file(REPO_ROOT / "examples" / "case_00_public" / "software_a.a2l")
+        segs = extract_memory_segments(data["sections"])
+        assert [s["block_name"] for s in segs] == [
+            "SystemCalFLash",
+            "SafetyCalFlash",
+            "PerformanceCalFlash",
+        ]
+>       assert [s["base"] for s in segs] == [0xA001C000, 0xA0038000, 0xA0050000]
+E       assert [None, None, None] == [2684469248, ...6, 2684682240]
+E         
+E         At index 0 diff: None != 2684469248
+E         Use -v to get more diff
+
+tests/test_b101_a2l_blocks_and_segments.py:311: AssertionError
+_____________________ test_r_a2l_036_release_demo_segments _____________________
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+demo_dir = PosixPath('/tmp/pytest-s19m11/popen-gw1/b101_inc11_demo0')
+
+    def test_r_a2l_036_release_demo_segments(demo_dir: Path) -> None:
+        """Why: the 4 demo segments must all be read (base: 0 of 4 usable).
+        Rows 036.2/3, 036.3/3, 036.8/2, 036.9/2."""
+        data = parse_a2l_file(demo_dir / "firmware.a2l")
+        segs = extract_memory_segments(data["sections"])
+        got = [(s["block_name"], s["usage"], s["kind"], s["base"], s["size"]) for s in segs]
+>       assert got == [
+            ("boot", "CODE", "FLASH", 0x0, 0x10000),
+            ("app", "CODE", "FLASH", 0x40000, 0x2C9FA0),
+            ("cal", "DATA", "FLASH", 0x800000, 0x131FC0),
+            ("config", "DATA", "FLASH", 0xC00000, 0x1000),
+        ]
+E       AssertionError: assert [('boot', Non..., None, None)] == [('boot', 'CO...582912, 4096)]
+E         
+E         At index 0 diff: ('boot', None, None, None, None) != ('boot', 'CODE', 'FLASH', 0, 65536)
+E         Use -v to get more diff
+
+tests/test_b101_a2l_blocks_and_segments.py:336: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_name_first_record_line_software_a
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_release_demo_segments
+2 failed in 5.04s
+
+# --- stderr ---
+

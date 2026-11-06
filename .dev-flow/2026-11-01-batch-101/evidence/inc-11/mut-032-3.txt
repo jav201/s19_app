@@ -1,0 +1,166 @@
+# mutant 032.3 (R-VAL-032.3)
+# mutation: treat only direct children of IF_DATA as inside -> 3-level FROBNICATE and software_a PAGE raised
+# apply output:
+APPLIED 032.3
+a2l.py e99d9e15da3f31160046889300ac41f0741ca917166ecea18da6f27c0d9f89a8
+app.py c3197405780f9d871045c8ba3e6684681d6eb95eaa912b2e995a664d208d9fe3
+issues_view.py f543a58ecc7274d03adf3dd95a6c670187242ad6225ebbcf5206236012c1dd3a
+rules.py 7f7635b6e1c9168baa8408cbd716b332cc6ff7bce304120c3a5844ee5a32f07b
+
+# restore verify ok=True:
+a2l.py e99d9e15da3f31160046889300ac41f0741ca917166ecea18da6f27c0d9f89a8
+app.py c3197405780f9d871045c8ba3e6684681d6eb95eaa912b2e995a664d208d9fe3
+issues_view.py f543a58ecc7274d03adf3dd95a6c670187242ad6225ebbcf5206236012c1dd3a
+rules.py d3fd869193b6a207040d67c75cdc3d03b88115a9938715732131759640081130
+
+# command: cd ~/work/s19_m11 && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 900 ~/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -n 2 --basetemp /tmp/pytest-s19m11 tests/test_b101_a2l_blocks_and_segments.py::test_r_val_032_3_inside_if_data_raises_nothing tests/test_b101_a2l_blocks_and_segments.py::test_r_val_032_3_software_a_raises_no_unrecognized_block tests/test_b101_a2l_blocks_and_segments.py::test_r_val_032_3_v171_one_line_if_data
+# exit=1
+
+bringing up nodes...
+bringing up nodes...
+
+FF.FF                                                                    [100%]
+=================================== FAILURES ===================================
+_____________ test_r_val_032_3_inside_if_data_raises_nothing[page] _____________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m11/popen-gw0/test_r_val_032_3_inside_if_dat0')
+case_id = 'page'
+body = ['/begin IF_DATA XCP', '/begin SEGMENT', '0x0', '/begin PAGE', '0x0', '/end PAGE', ...]
+
+    @pytest.mark.parametrize(
+        "case_id, body",
+        [
+            (
+                "page",
+                [
+                    "/begin IF_DATA XCP",
+                    "/begin SEGMENT",
+                    "0x0",
+                    "/begin PAGE",
+                    "0x0",
+                    "/end PAGE",
+                    "/end SEGMENT",
+                    "/end IF_DATA",
+                ],
+            ),
+            ("daq", ["/begin IF_DATA XCP", "/begin DAQ", "/end DAQ", "/end IF_DATA"]),
+            (
+                "deep",
+                [
+                    "/begin IF_DATA X",
+                    "/begin A",
+                    "/begin B",
+                    "/begin FROBNICATE",
+                    "/end FROBNICATE",
+                    "/end B",
+                    "/end A",
+                    "/end IF_DATA",
+                ],
+            ),
+        ],
+        ids=["page", "daq", "deep"],
+    )
+    def test_r_val_032_3_inside_if_data_raises_nothing(tmp_path: Path, case_id, body) -> None:
+        """Why: the interface block's grammar comes from the file's A2ML, not from MCD-2 MC.
+        Direct children and descendants at any depth give 0 issues."""
+        issues = _issues(tmp_path, body)
+>       assert issues == [], [(i.code, i.message) for i in issues]
+E       AssertionError: [('A2L_UNRECOGNIZED_BLOCK', "Unrecognized A2L block 'PAGE'.")]
+E       assert [ValidationIs..., details={})] == []
+E         
+E         Left contains one more item: ValidationIssue(code='A2L_UNRECOGNIZED_BLOCK', severity=<ValidationSeverity.WARNING: 'warning'>, message="Unrecognized A2L block 'PAGE'.", artifact='a2l', symbol=None, address=None, line_number=6, related_artifacts=[], details={})
+E         Use -v to get more diff
+
+tests/test_b101_a2l_blocks_and_segments.py:272: AssertionError
+_____________ test_r_val_032_3_inside_if_data_raises_nothing[deep] _____________
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m11/popen-gw1/test_r_val_032_3_inside_if_dat0')
+case_id = 'deep'
+body = ['/begin IF_DATA X', '/begin A', '/begin B', '/begin FROBNICATE', '/end FROBNICATE', '/end B', ...]
+
+    @pytest.mark.parametrize(
+        "case_id, body",
+        [
+            (
+                "page",
+                [
+                    "/begin IF_DATA XCP",
+                    "/begin SEGMENT",
+                    "0x0",
+                    "/begin PAGE",
+                    "0x0",
+                    "/end PAGE",
+                    "/end SEGMENT",
+                    "/end IF_DATA",
+                ],
+            ),
+            ("daq", ["/begin IF_DATA XCP", "/begin DAQ", "/end DAQ", "/end IF_DATA"]),
+            (
+                "deep",
+                [
+                    "/begin IF_DATA X",
+                    "/begin A",
+                    "/begin B",
+                    "/begin FROBNICATE",
+                    "/end FROBNICATE",
+                    "/end B",
+                    "/end A",
+                    "/end IF_DATA",
+                ],
+            ),
+        ],
+        ids=["page", "daq", "deep"],
+    )
+    def test_r_val_032_3_inside_if_data_raises_nothing(tmp_path: Path, case_id, body) -> None:
+        """Why: the interface block's grammar comes from the file's A2ML, not from MCD-2 MC.
+        Direct children and descendants at any depth give 0 issues."""
+        issues = _issues(tmp_path, body)
+>       assert issues == [], [(i.code, i.message) for i in issues]
+E       AssertionError: [('A2L_UNRECOGNIZED_BLOCK', "Unrecognized A2L block 'B'."), ('A2L_UNRECOGNIZED_BLOCK', "Unrecognized A2L block 'FROBNICATE'.")]
+E       assert [ValidationIs..., details={})] == []
+E         
+E         Left contains 2 more items, first extra item: ValidationIssue(code='A2L_UNRECOGNIZED_BLOCK', severity=<ValidationSeverity.WARNING: 'warning'>, message="Unrecognized A2L block 'B'.", artifact='a2l', symbol=None, address=None, line_number=5, related_artifacts=[], details={})
+E         Use -v to get more diff
+
+tests/test_b101_a2l_blocks_and_segments.py:272: AssertionError
+___________ test_r_val_032_3_software_a_raises_no_unrecognized_block ___________
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+    def test_r_val_032_3_software_a_raises_no_unrecognized_block() -> None:
+        """Why: the real fixture with IF_DATA > SEGMENT > PAGE (base: 1 023 issues)."""
+        data = parse_a2l_file(REPO_ROOT / "examples" / "case_00_public" / "software_a.a2l")
+>       assert _unrecognized(validate_a2l_structure(data)) == []
+E       assert [ValidationIs...ails={}), ...] == []
+E         
+E         Left contains 11 more items, first extra item: ValidationIssue(code='A2L_UNRECOGNIZED_BLOCK', severity=<ValidationSeverity.WARNING: 'warning'>, message="Unrecognized A2L block 'PAGE'.", artifact='a2l', symbol=None, address=None, line_number=859, related_artifacts=[], details={})
+E         Use -v to get more diff
+
+tests/test_b101_a2l_blocks_and_segments.py:278: AssertionError
+____________________ test_r_val_032_3_v171_one_line_if_data ____________________
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+    def test_r_val_032_3_v171_one_line_if_data() -> None:
+        """Why: a one-line IF_DATA stays open in the section tree (parser limit, backlog);
+        the exemption must still hold and the structure ERROR must still be raised."""
+        data = parse_a2l_file(REPO_ROOT / "examples" / "case_00_public" / "ASAP2_Demo_V171.a2l")
+        issues = validate_a2l_structure(data)
+>       assert _unrecognized(issues) == []
+E       assert [ValidationIs...ails={}), ...] == []
+E         
+E         Left contains 9 more items, first extra item: ValidationIssue(code='A2L_UNRECOGNIZED_BLOCK', severity=<ValidationSeverity.WARNING: 'warning'>, message="Unrecognized...'TIMESTAMP_SUPPORTED'.", artifact='a2l', symbol=None, address=None, line_number=2713, related_artifacts=[], details={})
+E         Use -v to get more diff
+
+tests/test_b101_a2l_blocks_and_segments.py:286: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.a2l:a2l.py:250 A2L section tree has structural errors: path=<HOME>/work/s19_m11/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+=========================== short test summary info ============================
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_val_032_3_inside_if_data_raises_nothing[page]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_val_032_3_inside_if_data_raises_nothing[deep]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_val_032_3_software_a_raises_no_unrecognized_block
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_val_032_3_v171_one_line_if_data
+4 failed, 1 passed in 1.91s
+
+# --- stderr ---
+

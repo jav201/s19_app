@@ -124,19 +124,19 @@ EXAMPLE_PRG = (
 DEMO_A2L_SECTIONS = [
     {
         "name": "MEMORY_SEGMENT",
-        "meta": "'AscetCode' \"\"",
+        "meta": "AscetCode \"\"",
         "lines": ["CODE FLASH INTERN 0x08000000 0x0000F800 -1 -1 -1 -1 -1"],
         "children": [],
     },
     {
         "name": "MEMORY_SEGMENT",
-        "meta": "'AscetCalibrationRom' \"\"",
+        "meta": "AscetCalibrationRom \"\"",
         "lines": ["DATA ROM INTERN 0x0800F800 0x00000800 -1 -1 -1 -1 -1"],
         "children": [],
     },
     {
         "name": "MEMORY_SEGMENT",
-        "meta": "'Variables' \"\"",
+        "meta": "Variables \"\"",
         "lines": ["DATA RAM INTERN 0x20000000 0x00002800 -1 -1 -1 -1 -1"],
         "children": [],
     },

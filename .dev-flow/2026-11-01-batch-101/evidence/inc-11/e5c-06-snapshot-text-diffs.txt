@@ -1,0 +1,78 @@
+## E5 corrective: text of the failing snapshot SVGs vs their baselines (branch, LAN Linux host 2, pytest-textual-snapshot 1.1.0); helper /tmp/c11e5_svgdiff.py groups <text> by y and diffs
+
+### [a2l-compact-160x40]
+1 failed in 3.88s
+svgs in report: 3
+--- svg 0: 23 diff lines
+--- baseline
++++ report-svg-0
+@@ -16,4 +16,4 @@
+-▏⊕  CRC Designer│▊✓ MEAS_0000020x080000082assignedyesunknown0..65535uni▎▊▊Searc▎ Find Next ▊Goto ▎ Goto ▎
+
+-│▊✓ MEAS_0000030x0800000C2assignedyesunknown0..65535uni▎▊▊▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+
+-│▊✓ MEAS_0000040x080000102assignedyesunknown0..65535uni▎▊▎
+
+-│▊✓ MEAS_0000050x080000142assignedyesunknown0..65535uni▁▁▎▊  0x08000000  C5 D7 14 84 F8 CF 9B F4 B7 6F 47 90 47▎
+
++▏⊕  CRC Designer│▊✓ MEAS_0000020x080000082assignedyesflash0..65535uni▎▊▊Searc▎ Find Next ▊Goto ▎ Goto ▎
+
++│▊✓ MEAS_0000030x0800000C2assignedyesflash0..65535uni▎▊▊▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▊▁▁▁▁▁▁▁▁▁▁▎▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▎
+
++│▊✓ MEAS_0000040x080000102assignedyesflash0..65535uni▎▊▎
+
++│▊✓ MEAS_0000050x080000142assignedyesflash0..65535uni▁▁▎▊  0x08000000  C5 D7 14 84 F8 CF 9B F4 B7 6F 47 90 47▎
+
+@@ -21,3 +21,3 @@
+-│▊✓ MEAS_0000070x0800001C2assignedyesunknown0..65535uni▎▊  0x08000010  9E 32 25 A9 F1 33 B5 DE A1 68 F4 E2 85▎
+
+-│▊✓ MEAS_0000080x080000202assignedyesunknown0..65535uni▎▊1F 07 2F  |.2%..3...h...../|▄▄▎
+
+-│▊✓ MEAS_0000090x080000242assignedyesunknown0..65535uni▎▊  0x08000020  CC 00 FC AA 7C A6 20 61 71 7A 48 E5 2E▎
+
++│▊✓ MEAS_0000070x0800001C2assignedyesflash0..65535uni▎▊  0x08000010  9E 32 25 A9 F1 33 B5 DE A1 68 F4 E2 85▎
+
+
+### [map-comfortable-80x24]
+1 failed in 3.88s
+svgs in report: 3
+--- svg 0: 5 diff lines
+--- baseline
++++ report-svg-0
+@@ -12 +12 @@
+-▏⏚││Mapped 1.0 KiB / 1.8 KiB 57.1429% · 4 rng (4 ok) · 3 gaps · 60 iss│
+
++▏⏚││Mapped 1.0 KiB / 1.8 KiB 57.1429% · 4 rng (4 ok) · 3 gaps · 59 iss│
+
+--- svg 1: 5 diff lines
+--- baseline
++++ report-svg-1
+@@ -12 +12 @@
+-▏⏚││Mapped 1.0 KiB / 1.8 KiB 57.1429% · 4 rng (4 ok) · 3 gaps · 60 iss│
+
++▏⏚││Mapped 1.0 KiB / 1.8 KiB 57.1429% · 4 rng (4 ok) · 3 gaps · 59 iss│
+
+--- svg 2: 0 diff lines
+
+
+### [patch-comfortable-80x24]
+1 failed in 3.68s
+svgs in report: 3
+--- svg 0: 5 diff lines
+--- baseline
++++ report-svg-0
+@@ -8 +8 @@
+-▏▤││No entries yet: Add on…││ Inspector  JSON  Checks │
+
++▏▤││No entries yet: Add on…││ Inspector  JSON  Checks  A2L │
+
+--- svg 1: 5 diff lines
+--- baseline
++++ report-svg-1
+@@ -8 +8 @@
+-▏▤││No entries yet: Add on…││ Inspector  JSON  Checks │
+
++▏▤││No entries yet: Add on…││ Inspector  JSON  Checks  A2L │
+
+--- svg 2: 0 diff lines
+

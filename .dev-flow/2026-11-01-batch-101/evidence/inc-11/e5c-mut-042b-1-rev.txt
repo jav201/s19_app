@@ -1,0 +1,15 @@
+# E5 corrective mutant m-042b-1-rev
+== start 2026-11-06T01:40:59Z fingerprint=3095a2c7fd8b4a6b
+s19_app.__file__ = <HOME>/work/s19_c11/s19_app/__init__.py
+baseline s19_app/tui/issues_view.py f543a58ecc7274d03adf3dd95a6c670187242ad6225ebbcf5206236012c1dd3a
+APPLIED m-042b-1-rev: s19_app/tui/issues_view.py 1dfe0f0a9975d2690a9d256832bf006330730d0ebd27925265a3683c7d2be95a
+== mutated fingerprint=6484eb665167504e
+== cmd: pytest -q -p no:cacheprovider tests/test_b101_issues_severity_view.py::test_r_tui_042b_1_groups_ordered_whatever_the_list_order
+E       AssertionError: assert ['• INFO  (1)... ERRORS  (1)'] == ['✗ ERRORS  (...'• INFO  (1)']
+E         
+E         At index 0 diff: '• INFO  (1)' != '✗ ERRORS  (1)'
+E         Use -v to get more diff
+FAILED tests/test_b101_issues_severity_view.py::test_r_tui_042b_1_groups_ordered_whatever_the_list_order
+1 failed in 2.33s
+RESTORED m-042b-1-rev: s19_app/tui/issues_view.py f543a58ecc7274d03adf3dd95a6c670187242ad6225ebbcf5206236012c1dd3a ok=True
+== end 2026-11-06T01:41:02Z fingerprint=3095a2c7fd8b4a6b

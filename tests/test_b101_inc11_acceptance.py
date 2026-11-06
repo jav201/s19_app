@@ -11,12 +11,15 @@ guide captured are then read as painted:
 
 Expected values are the requirement's exact values
 (``.dev-flow/2026-11-01-batch-101/inc-11/02-test-cases.md``, acceptance cases 1-6).
-Waits use ``tests/support/timing.py::wait_until``.
+Waits use this file's own ``wait_until`` (built on ``tests/support/timing.py::POLL_S``),
+which, unlike ``timing.wait_until``, rides out Textual's ``WaitForScreenTimeout`` while
+the 10 MB demo loads on a busy host; the deadline still bounds every wait.
 """
 
 from __future__ import annotations
 
 import asyncio
+import re
 import shutil
 import sys
 import time
@@ -113,7 +116,9 @@ def _plain(widget) -> str:
     return getattr(rendered, "plain", str(rendered))
 
 
-async def _load_demo(pilot, app: S19TuiApp, demo_dir: Path, files: dict, name: str) -> None:
+async def _load_demo(
+    pilot, app: S19TuiApp, demo_dir: Path, files: dict, name: str, *, expect_issues: bool = True
+) -> None:
     """Place the demo files as a work-area project and load it through the Load dialog."""
     project = Path(app.workarea) / name
     project.mkdir(parents=True, exist_ok=True)
@@ -137,12 +142,13 @@ async def _load_demo(pilot, app: S19TuiApp, demo_dir: Path, files: dict, name: s
         "the demo project (image and A2L) loaded",
     )
     await settle_workers(pilot)
-    await wait_until(
-        pilot,
-        lambda: len(app._validation_issues) > 0,
-        "the validation issues of the loaded demo",
-    )
-    await settle_workers(pilot)
+    if expect_issues:
+        await wait_until(
+            pilot,
+            lambda: len(app._validation_issues) > 0,
+            "the validation issues of the loaded demo",
+        )
+        await settle_workers(pilot)
     # the project load ends with the load-result window; close it with Esc
     from s19_app.tui.screens import LoadResultScreen
 
@@ -290,50 +296,72 @@ def test_at_i11_3_warnings_filter_lists_warnings_only(tmp_path: Path, demo_dir: 
 # ---------------------------------------------------------------------------
 
 
+async def _open_split_join_a2l_tab(pilot, app: S19TuiApp, chip: str):
+    """Open Split / Join / Export through the command palette and reach the a2l source tab
+    by keys; return the segment table once the chip line holds ``chip``."""
+    # Command palette (OR-8, E4 integration): ctrl+k, type, Enter runs the first match.
+    from textual.widgets import TextArea
+
+    from s19_app.tui.command_bar import CommandBar
+    from s19_app.tui.segment_split_view import _SegTable
+
+    await _press(pilot, "ctrl+k")
+    await wait_until(pilot, lambda: app.query_one(CommandBar).palette_is_open, "the palette opened")
+    await _press(pilot, *"join")
+    await _press(pilot, "enter")
+    await wait_until(
+        pilot,
+        lambda: app.focused is not None and app.focused.id == "sje_table",
+        "the Split / Join / Export table focused",
+    )
+    table = app.query_one("#sje_table", _SegTable)
+    # `t` on the manual tab focuses its localities box (keyboard-first,
+    # segment_split_view.action_cycle_tab), so a second `t` would be typed there:
+    # the user leaves the box with Tab, then `t` again (seam ruling SR-1).
+    await _press(pilot, "t")  # ranges -> manual
+    await wait_until(
+        pilot,
+        lambda: isinstance(app.focused, TextArea),
+        "the manual localities box focused",
+    )
+    await _press(pilot, "tab")
+    await wait_until(
+        pilot,
+        lambda: app.focused is not None and not isinstance(app.focused, TextArea),
+        lambda: f"focus still in the box: {app.focused!r}",
+    )
+    await _press(pilot, "t")  # manual -> a2l
+    await wait_until(
+        pilot,
+        lambda: chip in _plain(app.query_one("#sje_tabs")),
+        lambda: f"chip line: {_plain(app.query_one('#sje_tabs'))!r}",
+    )
+    return table
+
+
+#: A painted a2l-source row: selection glyph, the (tier-clamped) name, the 8-digit base.
+_SEG_ROW = re.compile(r"^\W*[●○] (?P<name>\S+)\s+(?P<base>0x[0-9A-F]{8})\b")
+
+
+def _painted_rows(body: str) -> List[tuple]:
+    """(name, base) of every painted row line, in paint order."""
+    out: List[tuple] = []
+    for line in body.split("\n"):
+        m = _SEG_ROW.match(line)
+        if m:
+            out.append((m.group("name"), m.group("base")))
+    return out
+
+
 def test_at_i11_4_split_join_lists_four_demo_segments(tmp_path: Path, demo_dir: Path) -> None:
-    """The a2l source of the clean demo lists its 4 MEMORY_SEGMENTs (base: a2l(0))."""
+    """The a2l source of the clean demo lists its 4 MEMORY_SEGMENTs, each name on the same
+    painted row as its own base (base: a2l(0))."""
 
     async def _go() -> None:
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(120, 36)) as pilot:
             await _load_demo(pilot, app, demo_dir, CLEAN, "demo_clean")
-            # Command palette (OR-8, E4 integration): ctrl+k, type, Enter runs the first match.
-            from textual.widgets import TextArea
-
-            from s19_app.tui.command_bar import CommandBar
-            from s19_app.tui.segment_split_view import _SegTable
-
-            await _press(pilot, "ctrl+k")
-            await wait_until(pilot, lambda: app.query_one(CommandBar).palette_is_open, "the palette opened")
-            await _press(pilot, *"join")
-            await _press(pilot, "enter")
-            await wait_until(
-                pilot,
-                lambda: app.focused is not None and app.focused.id == "sje_table",
-                "the Split / Join / Export table focused",
-            )
-            table = app.query_one("#sje_table", _SegTable)
-            # `t` on the manual tab focuses its localities box (keyboard-first,
-            # segment_split_view.action_cycle_tab), so a second `t` would be typed there:
-            # the user leaves the box with Tab, then `t` again (seam ruling SR-1).
-            await _press(pilot, "t")  # ranges -> manual
-            await wait_until(
-                pilot,
-                lambda: isinstance(app.focused, TextArea),
-                "the manual localities box focused",
-            )
-            await _press(pilot, "tab")
-            await wait_until(
-                pilot,
-                lambda: app.focused is not None and not isinstance(app.focused, TextArea),
-                lambda: f"focus still in the box: {app.focused!r}",
-            )
-            await _press(pilot, "t")  # manual -> a2l
-            await wait_until(
-                pilot,
-                lambda: "a2l(4)" in _plain(app.query_one("#sje_tabs")),
-                lambda: f"chip line: {_plain(app.query_one('#sje_tabs'))!r}",
-            )
+            table = await _open_split_join_a2l_tab(pilot, app, "a2l(4)")
             body = lambda: _plain(table.query_one(Static))  # noqa: E731
             wanted = ("0x00000000", "0x00040000", "0x00800000", "0x00C00000")
             await wait_until(
@@ -344,6 +372,50 @@ def test_at_i11_4_split_join_lists_four_demo_segments(tmp_path: Path, demo_dir: 
             text = body()
             for name in ("boot", "app", "cal", "config"):
                 assert name in text, text
+            # Each painted row pairs a name with ITS base (C-4, E5): a table that put
+            # `boot` at 0x00040000 passes the substring checks above but fails here.
+            assert _painted_rows(text) == [
+                ("boot", "0x00000000"),
+                ("app", "0x00040000"),
+                ("cal", "0x00800000"),
+                ("config", "0x00C00000"),
+            ], text
+
+    asyncio.run(_go())
+
+
+SOFTWARE_A_DIR = REPO_ROOT / "examples" / "case_00_public"
+SOFTWARE_A_PROJECT = {"prg.s19": "prg.s19", "software_a.a2l": "software_a.a2l"}
+
+
+def test_at_i11_7_split_join_lists_software_a_segments(tmp_path: Path) -> None:
+    """R-SEG-SRC.6, software_a.a2l arm, black-box: an image and software_a.a2l loaded through
+    the Load dialog, Split / Join opened from the palette, the a2l tab reached by keys. The
+    chip reads a2l(3) and the three painted rows hold the record-line names with their bases
+    (base: a2l(0), the name-first record line gave no base)."""
+
+    async def _go() -> None:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 36)) as pilot:
+            await _load_demo(
+                pilot, app, SOFTWARE_A_DIR, SOFTWARE_A_PROJECT, "software_a_project", expect_issues=False
+            )
+            table = await _open_split_join_a2l_tab(pilot, app, "a2l(3)")
+            body = lambda: _plain(table.query_one(Static))  # noqa: E731
+            wanted = ("0xA001C000", "0xA0038000", "0xA0050000")
+            await wait_until(
+                pilot,
+                lambda: all(w in body() for w in wanted),
+                lambda: f"table body: {body()!r}",
+            )
+            text = body()
+            # At 120x36 the table is in its narrow tier: names longer than 10 cells are
+            # clamped to 9 cells + an ellipsis (segment_split_view._SegTable._line).
+            assert _painted_rows(text) == [
+                ("SystemCal…", "0xA001C000"),
+                ("SafetyCal…", "0xA0038000"),
+                ("Performan…", "0xA0050000"),
+            ], text
 
     asyncio.run(_go())
 
@@ -387,7 +459,26 @@ def test_at_i11_5_curve_description_index_note_once(tmp_path: Path, demo_dir: Pa
                 )
             assert _first_row_of_type(app, "CURVE") is not None, "no CURVE row on any page"
             table = app.query_one("#a2l_tags_list", DataTable)
-            table.move_cursor(row=_first_row_of_type(app, "CURVE"))
+            target = _first_row_of_type(app, "CURVE")
+            # The cursor reaches the CURVE row by keys (C-7, E5), not by move_cursor:
+            # Tab moves the focus to the tag table, then Down / Up walk the cursor.
+            for _ in range(40):
+                if app.focused is table:
+                    break
+                await _press(pilot, "tab")
+            assert app.focused is table, f"Tab never reached the tag table: {app.focused!r}"
+            for _ in range(table.row_count + 1):
+                if table.cursor_row == target:
+                    break
+                before = table.cursor_row
+                await _press(pilot, "down" if before < target else "up")
+                await wait_until(
+                    pilot,
+                    lambda: table.cursor_row != before,
+                    lambda: f"cursor stuck at {table.cursor_row} (target {target})",
+                    timeout=15,
+                )
+            assert table.cursor_row == target, (table.cursor_row, target)
             await settle_workers(pilot)
             await _press(pilot, "d")
             await wait_until(

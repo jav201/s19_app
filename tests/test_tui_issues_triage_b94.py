@@ -400,7 +400,9 @@ def test_tc_b94_19_panel_reclassification_matrix(tmp_path: Path) -> None:
             assert empty.render().plain == GroupedIssuesPanel.EMPTY_TEXT
 
             # --- C-17 hostile arm: a markup-laden block name renders literal ---
-            hostile = _unrecognized_issue("EVIL[red]")
+            # E5 (C-8 / E5-4): the name also carries C0 control bytes (ESC, BEL) and a
+            # closing tag; markup stays literal AND the control bytes are scrubbed.
+            hostile = _unrecognized_issue("EVIL[red]\x1b[31m[/b]\x07")
             _mount_panel(app, [hostile], {_WARNING: 1})
             await wait_until(
                 pilot,
@@ -415,6 +417,10 @@ def test_tc_b94_19_panel_reclassification_matrix(tmp_path: Path) -> None:
             rendered = detail.render()
             assert "[red]" in rendered.plain, rendered.plain
             assert rendered.spans == [], rendered.spans
+            assert "[/b]" in rendered.plain, rendered.plain
+            assert not [c for c in rendered.plain if ord(c) < 0x20 or ord(c) == 0x7F], repr(
+                rendered.plain
+            )
             assert hostile_row.query_one(".issue-code-chip").render().plain == (
                 "A2L_UNRECOGNIZED_BLOCK"
             )

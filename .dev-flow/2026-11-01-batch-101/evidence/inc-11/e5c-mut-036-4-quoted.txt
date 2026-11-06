@@ -1,0 +1,16 @@
+# E5 corrective mutant m-036-4-quoted
+== start 2026-11-06T01:40:36Z fingerprint=3095a2c7fd8b4a6b
+s19_app.__file__ = <HOME>/work/s19_c11/s19_app/__init__.py
+baseline s19_app/tui/a2l.py e99d9e15da3f31160046889300ac41f0741ca917166ecea18da6f27c0d9f89a8
+APPLIED m-036-4-quoted: s19_app/tui/a2l.py 8a3022aac9170600ea743d873e16386d18a6e57518af066b06f8bc25fd6d7095
+== mutated fingerprint=9e7d8640dc131870
+== cmd: pytest -q -p no:cacheprovider -n 4 tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base
+E       AssertionError: {'base': 1, 'block_name': 'S6', 'kind': None, 'offset': None, ...}
+E       assert 1 is None
+E       AssertionError: {'base': 1, 'block_name': 'S6', 'kind': None, 'offset': None, ...}
+E       assert 1 is None
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[quoted_words-own-line]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[quoted_words-begin-line]
+2 failed, 22 passed in 1.37s
+RESTORED m-036-4-quoted: s19_app/tui/a2l.py e99d9e15da3f31160046889300ac41f0741ca917166ecea18da6f27c0d9f89a8 ok=True
+== end 2026-11-06T01:40:38Z fingerprint=3095a2c7fd8b4a6b

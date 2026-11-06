@@ -1,0 +1,10 @@
+# E5 corrective mutant m-042b-1-enc
+== start 2026-11-06T01:41:03Z fingerprint=3095a2c7fd8b4a6b
+s19_app.__file__ = <HOME>/work/s19_c11/s19_app/__init__.py
+baseline s19_app/tui/issues_view.py f543a58ecc7274d03adf3dd95a6c670187242ad6225ebbcf5206236012c1dd3a
+APPLIED m-042b-1-enc: s19_app/tui/issues_view.py 7fd27795bb2f85a9f0d264bfa012f3c5fd0808a1d5b7ef28ae4e0ac391662506
+== mutated fingerprint=4f9019f8b7e524cb
+== cmd: pytest -q -p no:cacheprovider tests/test_b101_issues_severity_view.py::test_r_tui_042b_1_groups_ordered_whatever_the_list_order
+1 passed in 2.30s
+RESTORED m-042b-1-enc: s19_app/tui/issues_view.py f543a58ecc7274d03adf3dd95a6c670187242ad6225ebbcf5206236012c1dd3a ok=True
+== end 2026-11-06T01:41:06Z fingerprint=3095a2c7fd8b4a6b

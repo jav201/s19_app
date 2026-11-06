@@ -1,0 +1,232 @@
+# mutant 036.4a (R-A2L-036.4)
+# mutation: scan on for the next two adjacent Numbers (the E1 rule) -> S1b base -1 size -1, S1c base 0x1000 size 0x400
+# apply output:
+APPLIED 036.4a
+a2l.py 941de4de9889914d078afbf57df710c4c6d3c5e7d1885f1d9b1d732030a57379
+app.py c3197405780f9d871045c8ba3e6684681d6eb95eaa912b2e995a664d208d9fe3
+issues_view.py f543a58ecc7274d03adf3dd95a6c670187242ad6225ebbcf5206236012c1dd3a
+rules.py d3fd869193b6a207040d67c75cdc3d03b88115a9938715732131759640081130
+
+# restore verify ok=True:
+a2l.py e99d9e15da3f31160046889300ac41f0741ca917166ecea18da6f27c0d9f89a8
+app.py c3197405780f9d871045c8ba3e6684681d6eb95eaa912b2e995a664d208d9fe3
+issues_view.py f543a58ecc7274d03adf3dd95a6c670187242ad6225ebbcf5206236012c1dd3a
+rules.py d3fd869193b6a207040d67c75cdc3d03b88115a9938715732131759640081130
+
+# command: cd ~/work/s19_m11 && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 900 ~/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -n 2 --basetemp /tmp/pytest-s19m11 tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base
+# exit=1
+
+bringing up nodes...
+bringing up nodes...
+
+......FFFFFFFF........                                                   [100%]
+=================================== FAILURES ===================================
+___________ test_r_a2l_036_4_no_base[bad_size_placeholders-own-line] ___________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m11/popen-gw0/test_r_a2l_036_4_no_base_bad_s0')
+name = 'S1b', record = '"" DATA FLASH INTERN 0x1000 BAD -1 -1 -1 -1 -1'
+shape = 'own-line'
+
+    @pytest.mark.parametrize("shape", ["begin-line", "own-line"])
+    @pytest.mark.parametrize(
+        "name, record", [(n, r) for n, r, _ in NO_BASE_RECORDS], ids=[i for _, _, i in NO_BASE_RECORDS]
+    )
+    def test_r_a2l_036_4_no_base(tmp_path: Path, name: str, record: str, shape: str) -> None:
+        """Why: a broken record must give NO base and NO size, never a plausible wrong pair
+        taken from the offset words (E1 rule gave base -1 / 0x1000 silently). The record is
+        written on the /begin line (the release-demo shape) and on its own line (the shipped
+        ASAM shape), because the base reader only sees the second."""
+        if shape == "begin-line":
+            seg = _one_segment(tmp_path, f"/begin MEMORY_SEGMENT {name} {record}")
+        else:
+            seg = _one_segment(tmp_path, f"/begin MEMORY_SEGMENT {name}", record)
+>       assert seg["base"] is None, seg
+E       AssertionError: {'base': -1, 'block_name': 'S1b', 'kind': 'FLASH', 'offset': -1, ...}
+E       assert -1 is None
+
+tests/test_b101_a2l_blocks_and_segments.py:402: AssertionError
+__________ test_r_a2l_036_4_no_base[bad_size_placeholders-begin-line] __________
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m11/popen-gw1/test_r_a2l_036_4_no_base_bad_s0')
+name = 'S1b', record = '"" DATA FLASH INTERN 0x1000 BAD -1 -1 -1 -1 -1'
+shape = 'begin-line'
+
+    @pytest.mark.parametrize("shape", ["begin-line", "own-line"])
+    @pytest.mark.parametrize(
+        "name, record", [(n, r) for n, r, _ in NO_BASE_RECORDS], ids=[i for _, _, i in NO_BASE_RECORDS]
+    )
+    def test_r_a2l_036_4_no_base(tmp_path: Path, name: str, record: str, shape: str) -> None:
+        """Why: a broken record must give NO base and NO size, never a plausible wrong pair
+        taken from the offset words (E1 rule gave base -1 / 0x1000 silently). The record is
+        written on the /begin line (the release-demo shape) and on its own line (the shipped
+        ASAM shape), because the base reader only sees the second."""
+        if shape == "begin-line":
+            seg = _one_segment(tmp_path, f"/begin MEMORY_SEGMENT {name} {record}")
+        else:
+            seg = _one_segment(tmp_path, f"/begin MEMORY_SEGMENT {name}", record)
+>       assert seg["base"] is None, seg
+E       AssertionError: {'base': -1, 'block_name': 'S1b', 'kind': 'FLASH', 'offset': -1, ...}
+E       assert -1 is None
+
+tests/test_b101_a2l_blocks_and_segments.py:402: AssertionError
+_______________ test_r_a2l_036_4_no_base[bad_address-begin-line] _______________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m11/popen-gw0/test_r_a2l_036_4_no_base_bad_a0')
+name = 'S1c', record = '"" DATA FLASH INTERN 0xZZ 0x1000 0x400 0x800 -1 -1 -1'
+shape = 'begin-line'
+
+    @pytest.mark.parametrize("shape", ["begin-line", "own-line"])
+    @pytest.mark.parametrize(
+        "name, record", [(n, r) for n, r, _ in NO_BASE_RECORDS], ids=[i for _, _, i in NO_BASE_RECORDS]
+    )
+    def test_r_a2l_036_4_no_base(tmp_path: Path, name: str, record: str, shape: str) -> None:
+        """Why: a broken record must give NO base and NO size, never a plausible wrong pair
+        taken from the offset words (E1 rule gave base -1 / 0x1000 silently). The record is
+        written on the /begin line (the release-demo shape) and on its own line (the shipped
+        ASAM shape), because the base reader only sees the second."""
+        if shape == "begin-line":
+            seg = _one_segment(tmp_path, f"/begin MEMORY_SEGMENT {name} {record}")
+        else:
+            seg = _one_segment(tmp_path, f"/begin MEMORY_SEGMENT {name}", record)
+>       assert seg["base"] is None, seg
+E       AssertionError: {'base': 4096, 'block_name': 'S1c', 'kind': 'FLASH', 'offset': 2048, ...}
+E       assert 4096 is None
+
+tests/test_b101_a2l_blocks_and_segments.py:402: AssertionError
+________________ test_r_a2l_036_4_no_base[bad_address-own-line] ________________
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m11/popen-gw1/test_r_a2l_036_4_no_base_bad_a0')
+name = 'S1c', record = '"" DATA FLASH INTERN 0xZZ 0x1000 0x400 0x800 -1 -1 -1'
+shape = 'own-line'
+
+    @pytest.mark.parametrize("shape", ["begin-line", "own-line"])
+    @pytest.mark.parametrize(
+        "name, record", [(n, r) for n, r, _ in NO_BASE_RECORDS], ids=[i for _, _, i in NO_BASE_RECORDS]
+    )
+    def test_r_a2l_036_4_no_base(tmp_path: Path, name: str, record: str, shape: str) -> None:
+        """Why: a broken record must give NO base and NO size, never a plausible wrong pair
+        taken from the offset words (E1 rule gave base -1 / 0x1000 silently). The record is
+        written on the /begin line (the release-demo shape) and on its own line (the shipped
+        ASAM shape), because the base reader only sees the second."""
+        if shape == "begin-line":
+            seg = _one_segment(tmp_path, f"/begin MEMORY_SEGMENT {name} {record}")
+        else:
+            seg = _one_segment(tmp_path, f"/begin MEMORY_SEGMENT {name}", record)
+>       assert seg["base"] is None, seg
+E       AssertionError: {'base': 4096, 'block_name': 'S1c', 'kind': 'FLASH', 'offset': 2048, ...}
+E       assert 4096 is None
+
+tests/test_b101_a2l_blocks_and_segments.py:402: AssertionError
+_______________ test_r_a2l_036_4_no_base[negative_base-own-line] _______________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m11/popen-gw0/test_r_a2l_036_4_no_base_negat0')
+name = 'S5', record = '"" DATA FLASH INTERN -1 0x100', shape = 'own-line'
+
+    @pytest.mark.parametrize("shape", ["begin-line", "own-line"])
+    @pytest.mark.parametrize(
+        "name, record", [(n, r) for n, r, _ in NO_BASE_RECORDS], ids=[i for _, _, i in NO_BASE_RECORDS]
+    )
+    def test_r_a2l_036_4_no_base(tmp_path: Path, name: str, record: str, shape: str) -> None:
+        """Why: a broken record must give NO base and NO size, never a plausible wrong pair
+        taken from the offset words (E1 rule gave base -1 / 0x1000 silently). The record is
+        written on the /begin line (the release-demo shape) and on its own line (the shipped
+        ASAM shape), because the base reader only sees the second."""
+        if shape == "begin-line":
+            seg = _one_segment(tmp_path, f"/begin MEMORY_SEGMENT {name} {record}")
+        else:
+            seg = _one_segment(tmp_path, f"/begin MEMORY_SEGMENT {name}", record)
+>       assert seg["base"] is None, seg
+E       AssertionError: {'base': -1, 'block_name': 'S5', 'kind': 'FLASH', 'offset': None, ...}
+E       assert -1 is None
+
+tests/test_b101_a2l_blocks_and_segments.py:402: AssertionError
+______________ test_r_a2l_036_4_no_base[negative_base-begin-line] ______________
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m11/popen-gw1/test_r_a2l_036_4_no_base_negat0')
+name = 'S5', record = '"" DATA FLASH INTERN -1 0x100', shape = 'begin-line'
+
+    @pytest.mark.parametrize("shape", ["begin-line", "own-line"])
+    @pytest.mark.parametrize(
+        "name, record", [(n, r) for n, r, _ in NO_BASE_RECORDS], ids=[i for _, _, i in NO_BASE_RECORDS]
+    )
+    def test_r_a2l_036_4_no_base(tmp_path: Path, name: str, record: str, shape: str) -> None:
+        """Why: a broken record must give NO base and NO size, never a plausible wrong pair
+        taken from the offset words (E1 rule gave base -1 / 0x1000 silently). The record is
+        written on the /begin line (the release-demo shape) and on its own line (the shipped
+        ASAM shape), because the base reader only sees the second."""
+        if shape == "begin-line":
+            seg = _one_segment(tmp_path, f"/begin MEMORY_SEGMENT {name} {record}")
+        else:
+            seg = _one_segment(tmp_path, f"/begin MEMORY_SEGMENT {name}", record)
+>       assert seg["base"] is None, seg
+E       AssertionError: {'base': -1, 'block_name': 'S5', 'kind': 'FLASH', 'offset': None, ...}
+E       assert -1 is None
+
+tests/test_b101_a2l_blocks_and_segments.py:402: AssertionError
+_________________ test_r_a2l_036_4_no_base[zero_size-own-line] _________________
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m11/popen-gw1/test_r_a2l_036_4_no_base_zero_0')
+name = 'S8', record = '"" DATA FLASH INTERN 0x1000 0x0', shape = 'own-line'
+
+    @pytest.mark.parametrize("shape", ["begin-line", "own-line"])
+    @pytest.mark.parametrize(
+        "name, record", [(n, r) for n, r, _ in NO_BASE_RECORDS], ids=[i for _, _, i in NO_BASE_RECORDS]
+    )
+    def test_r_a2l_036_4_no_base(tmp_path: Path, name: str, record: str, shape: str) -> None:
+        """Why: a broken record must give NO base and NO size, never a plausible wrong pair
+        taken from the offset words (E1 rule gave base -1 / 0x1000 silently). The record is
+        written on the /begin line (the release-demo shape) and on its own line (the shipped
+        ASAM shape), because the base reader only sees the second."""
+        if shape == "begin-line":
+            seg = _one_segment(tmp_path, f"/begin MEMORY_SEGMENT {name} {record}")
+        else:
+            seg = _one_segment(tmp_path, f"/begin MEMORY_SEGMENT {name}", record)
+>       assert seg["base"] is None, seg
+E       AssertionError: {'base': 4096, 'block_name': 'S8', 'kind': 'FLASH', 'offset': None, ...}
+E       assert 4096 is None
+
+tests/test_b101_a2l_blocks_and_segments.py:402: AssertionError
+________________ test_r_a2l_036_4_no_base[zero_size-begin-line] ________________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m11/popen-gw0/test_r_a2l_036_4_no_base_zero_0')
+name = 'S8', record = '"" DATA FLASH INTERN 0x1000 0x0', shape = 'begin-line'
+
+    @pytest.mark.parametrize("shape", ["begin-line", "own-line"])
+    @pytest.mark.parametrize(
+        "name, record", [(n, r) for n, r, _ in NO_BASE_RECORDS], ids=[i for _, _, i in NO_BASE_RECORDS]
+    )
+    def test_r_a2l_036_4_no_base(tmp_path: Path, name: str, record: str, shape: str) -> None:
+        """Why: a broken record must give NO base and NO size, never a plausible wrong pair
+        taken from the offset words (E1 rule gave base -1 / 0x1000 silently). The record is
+        written on the /begin line (the release-demo shape) and on its own line (the shipped
+        ASAM shape), because the base reader only sees the second."""
+        if shape == "begin-line":
+            seg = _one_segment(tmp_path, f"/begin MEMORY_SEGMENT {name} {record}")
+        else:
+            seg = _one_segment(tmp_path, f"/begin MEMORY_SEGMENT {name}", record)
+>       assert seg["base"] is None, seg
+E       AssertionError: {'base': 4096, 'block_name': 'S8', 'kind': 'FLASH', 'offset': None, ...}
+E       assert 4096 is None
+
+tests/test_b101_a2l_blocks_and_segments.py:402: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[bad_size_placeholders-own-line]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[bad_size_placeholders-begin-line]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[bad_address-begin-line]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[bad_address-own-line]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[negative_base-own-line]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[negative_base-begin-line]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[zero_size-own-line]
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base[zero_size-begin-line]
+8 failed, 14 passed in 1.23s
+
+# --- stderr ---
+

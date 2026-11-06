@@ -1,0 +1,66 @@
+# mutant SEG-SRC.6 (R-SEG-SRC.6)
+# mutation: the base segment reader -> a2l(0)
+# apply output:
+APPLIED SEG-SRC.6
+a2l.py 25f52210937ef07fa3337806863b4670d29969a99b378f9c97e15134cd70ef53
+app.py c3197405780f9d871045c8ba3e6684681d6eb95eaa912b2e995a664d208d9fe3
+issues_view.py f543a58ecc7274d03adf3dd95a6c670187242ad6225ebbcf5206236012c1dd3a
+rules.py d3fd869193b6a207040d67c75cdc3d03b88115a9938715732131759640081130
+
+# restore verify ok=True:
+a2l.py e99d9e15da3f31160046889300ac41f0741ca917166ecea18da6f27c0d9f89a8
+app.py c3197405780f9d871045c8ba3e6684681d6eb95eaa912b2e995a664d208d9fe3
+issues_view.py f543a58ecc7274d03adf3dd95a6c670187242ad6225ebbcf5206236012c1dd3a
+rules.py d3fd869193b6a207040d67c75cdc3d03b88115a9938715732131759640081130
+
+# command: cd ~/work/s19_m11 && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 900 ~/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -n 2 --basetemp /tmp/pytest-s19m11 tests/test_b101_issues_severity_view.py::test_r_seg_src_6_software_a_rows
+# exit=1
+
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______________________ test_r_seg_src_6_software_a_rows _______________________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m11/popen-gw0/test_r_seg_src_6_software_a_ro0')
+
+    def test_r_seg_src_6_software_a_rows(tmp_path: Path) -> None:
+        """Why: software_a.a2l writes the segment name first on the record line; the a2l source
+        must list its 3 segments (base: a2l(0))."""
+    
+        async def _go() -> dict:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 36)) as pilot:
+                await _pause(pilot)
+                loaded = _demo_loaded()
+                loaded.a2l_data = parse_a2l_file(SOFTWARE_A)
+                app.current_file = loaded
+                app.current_a2l_data = loaded.a2l_data
+                await _pause(pilot)
+                window = await _open_window(app, pilot)
+                window.action_cycle_tab()  # ranges -> manual
+                window.action_cycle_tab()  # manual -> a2l
+                await _pause(pilot)
+                from s19_app.tui.segment_split_view import _SegTable
+    
+                table = window.query_one("#sje_table", _SegTable)
+                return {
+                    "tabs": _plain(app.query_one("#sje_tabs")),
+                    "body": _plain(table.query_one(Static)),
+                    "rows": [(r.name, r.base, r.size) for r in window._a2l_rows()],
+                }
+    
+        seen = asyncio.run(_go())
+>       assert "a2l(3)" in seen["tabs"], seen["tabs"]
+E       AssertionError: SEG  ‹a2l(0)› ranges(11) manual(0)  …
+E       assert 'a2l(3)' in 'SEG  ‹a2l(0)› ranges(11) manual(0)  …'
+
+tests/test_b101_issues_severity_view.py:372: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_issues_severity_view.py::test_r_seg_src_6_software_a_rows
+1 failed in 5.14s
+
+# --- stderr ---
+

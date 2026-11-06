@@ -1,0 +1,239 @@
+## E5 corrective (batch-101 Inc 11); host: LAN Linux host 2; worktree: <HOME>/work/s19_c11 = origin/main f9f3cb09 + git diff b7b77c4 of the local branch (s19_app tests docs) applied uncommitted; first run of the changed tests (2 failed: colour test read the chip before compose; AT-I11-5 Down needed table focus) - superseded
+== start 2026-11-06T01:28:08Z fingerprint=43e4fbaff836dd92
+s19_app.__file__ = <HOME>/work/s19_c11/s19_app/__init__.py
+python 3.11.18 textual 8.2.8
+== cmd: pytest -q -p no:cacheprovider -n 8 tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_no_base tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_4_non_ascii_digit_word_is_skipped_by_the_anchor tests/test_b101_issues_severity_view.py::test_r_tui_042b_4_unrecognized_block_rows_paint_warning tests/test_b101_issues_severity_view.py::test_r_a2l_036_7_split_join_lists_no_row_for_empty_segment tests/test_tui_issues_triage_b94.py::test_tc_b94_19_panel_reclassification_matrix tests/test_segment_split_window.py tests/test_b101_inc11_acceptance.py::test_at_i11_4_split_join_lists_four_demo_segments tests/test_b101_inc11_acceptance.py::test_at_i11_5_curve_description_index_note_once tests/test_b101_inc11_acceptance.py::test_at_i11_7_split_join_lists_software_a_segments
+bringing up nodes...
+bringing up nodes...
+
+...................................F.................................... [ 82%]
+..............F                                                          [100%]
+=================================== FAILURES ===================================
+___________ test_r_tui_042b_4_unrecognized_block_rows_paint_warning ____________
+[gw5] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19c11/popen-gw5/test_r_tui_042b_4_unrecognized0')
+
+    def test_r_tui_042b_4_unrecognized_block_rows_paint_warning(tmp_path: Path) -> None:
+        """Why: the row carries the colour class of its severity (base: sev-info), and the
+        colour it is painted in is the warning colour #f6ff8f (C-4, E5): the class alone is
+        not the painted style."""
+    
+        async def drive(app, pilot) -> None:
+            rows = [r for _, rs in _layout(app) for r in rs if r.issue.code == UNRECOGNIZED]
+            assert len(rows) == 3
+            assert all(r.has_class("sev-warning") for r in rows), [r.classes for r in rows]
+            assert not any(r.has_class("sev-info") for r in rows)
+            painted = [
+                (
+                    _hex(r.styles.color),
+                    _hex(r.query_one(".issue-code-chip").styles.color),
+                    _hex(r.query_one(".issue-detail").styles.color),
+                )
+                for r in rows
+            ]
+            assert painted == [(WARNING_COLOUR,) * 3] * 3, painted
+    
+>       _run(tmp_path, _list_l4(), drive)
+
+tests/test_b101_issues_severity_view.py:228: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_issues_severity_view.py:149: in _run
+    asyncio.run(_go())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b101_issues_severity_view.py:147: in _go
+    await drive(app, pilot)
+tests/test_b101_issues_severity_view.py:218: in drive
+    painted = [
+tests/test_b101_issues_severity_view.py:221: in <listcomp>
+    _hex(r.query_one(".issue-code-chip").styles.color),
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = IssueRow(classes='issue-row sev-warning'), selector = '.issue-code-chip'
+expect_type = None
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+            raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+    
+        try:
+            selector_set = parse_selectors(query_selector)
+        except TokenError:
+            raise InvalidQueryFormat(
+                f"Unable to parse {query_selector!r} as a query; check for syntax errors"
+            ) from None
+    
+        if all(selectors.is_simple for selectors in selector_set):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+        else:
+            cache_key = None
+    
+        for node in walk_breadth_first(base_node, with_root=False):
+            if not match(selector_set, node):
+                continue
+            if expect_type is not None and not isinstance(node, expect_type):
+                raise WrongType(
+                    f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                )
+            if cache_key is not None:
+                base_node._query_one_cache[cache_key] = node
+            return node
+    
+>       raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E       textual.css.query.NoMatches: No nodes match '.issue-code-chip' on IssueRow(classes='issue-row sev-warning')
+
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/dom.py:1533: NoMatches
+_______________ test_at_i11_5_curve_description_index_note_once ________________
+[gw4] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19c11/popen-gw4/test_at_i11_5_curve_descriptio0')
+demo_dir = PosixPath('/tmp/pytest-s19c11/popen-gw4/b101_inc11_acceptance_demo0')
+
+    def test_at_i11_5_curve_description_index_note_once(tmp_path: Path, demo_dir: Path) -> None:
+        """The first CURVE's description states the index note once, above the table, and the
+        rows carry none (base: the note on every row)."""
+    
+        async def _go() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 36)) as pilot:
+                await _load_demo(pilot, app, demo_dir, CLEAN, "demo_clean")
+                await _press(pilot, "2")
+                await wait_until(
+                    pilot,
+                    lambda: app.query_one("#a2l_tags_list", DataTable).row_count > 0,
+                    "the A2L Explorer rows",
+                )
+                # the table is paged and the demo lists its 208 VALUE tags first:
+                # PgDn until a page holds a CURVE row.
+                for _ in range(20):
+                    if _first_row_of_type(app, "CURVE") is not None:
+                        break
+                    first = app.query_one("#a2l_tags_list", DataTable).coordinate_to_cell_key((0, 0))
+                    await _press(pilot, "pagedown")
+                    await wait_until(
+                        pilot,
+                        lambda: app.query_one("#a2l_tags_list", DataTable).coordinate_to_cell_key((0, 0)) != first,
+                        "the next A2L Explorer page",
+                        timeout=15,
+                    )
+                assert _first_row_of_type(app, "CURVE") is not None, "no CURVE row on any page"
+                table = app.query_one("#a2l_tags_list", DataTable)
+                target = _first_row_of_type(app, "CURVE")
+                # The cursor reaches the CURVE row by keys (C-7, E5), not by move_cursor.
+                await wait_until(pilot, lambda: app.focused is table, lambda: f"focus: {app.focused!r}")
+                for _ in range(table.row_count + 1):
+                    if table.cursor_row == target:
+                        break
+                    before = table.cursor_row
+                    await _press(pilot, "down" if before < target else "up")
+                    await wait_until(
+                        pilot,
+                        lambda: table.cursor_row != before,
+                        lambda: f"cursor stuck at {table.cursor_row} (target {target})",
+                        timeout=15,
+                    )
+                assert table.cursor_row == target, (table.cursor_row, target)
+                await settle_workers(pilot)
+                await _press(pilot, "d")
+                await wait_until(
+                    pilot,
+                    lambda: isinstance(app.screen, CurveDescriptionScreen),
+                    "the description window",
+                )
+                text = _plain(app.screen.query_one("#a2l_curve_desc_body", Static))
+                assert text.count(NOTE_TEXT) == 1, text
+                assert text.count(ROW_SUFFIX) == 0, text
+    
+>       asyncio.run(_go())
+
+tests/test_b101_inc11_acceptance.py:488: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b101_inc11_acceptance.py:464: in _go
+    await wait_until(pilot, lambda: app.focused is table, lambda: f"focus: {app.focused!r}")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_at_i11_5_curve_description_index_note_once.<locals>._go.<locals>.<lambda> at 0x7f8ff20ac0e0>
+failure = <function test_at_i11_5_curve_description_index_note_once.<locals>._go.<locals>.<lambda> at 0x7f90057d6a20>
+
+    async def wait_until(pilot, predicate, failure, *, timeout: float = 300.0) -> None:
+        """Poll ``predicate`` like ``tests/support/timing.py::wait_until`` but ride out a
+        ``WaitForScreenTimeout``: loading the 10 MB demo keeps the app busy for longer
+        than Textual's 30 s pause limit on a loaded shared host. The deadline still
+        bounds the wait."""
+        deadline = time.monotonic() + timeout
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: focus: Button(id='ws_load_project_button', classes='-style-default')
+
+tests/test_b101_inc11_acceptance.py:75: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_issues_severity_view.py::test_r_tui_042b_4_unrecognized_block_rows_paint_warning
+FAILED tests/test_b101_inc11_acceptance.py::test_at_i11_5_curve_description_index_note_once
+2 failed, 85 passed in 369.27s (0:06:09)
+== exit 1 end 2026-11-06T01:34:18Z fingerprint=43e4fbaff836dd92

@@ -1,0 +1,46 @@
+# mutant 036.2a (R-A2L-036.2)
+# mutation: read a Number with int(w, 0) -> 0400 is not a Number and S4 gets no base
+# apply output:
+APPLIED 036.2a
+a2l.py af2b818b5ba0ea935e3c1f4164bc1ba8c544508aa0fb532283f2f41b0c0a2738
+app.py c3197405780f9d871045c8ba3e6684681d6eb95eaa912b2e995a664d208d9fe3
+issues_view.py f543a58ecc7274d03adf3dd95a6c670187242ad6225ebbcf5206236012c1dd3a
+rules.py d3fd869193b6a207040d67c75cdc3d03b88115a9938715732131759640081130
+
+# restore verify ok=True:
+a2l.py e99d9e15da3f31160046889300ac41f0741ca917166ecea18da6f27c0d9f89a8
+app.py c3197405780f9d871045c8ba3e6684681d6eb95eaa912b2e995a664d208d9fe3
+issues_view.py f543a58ecc7274d03adf3dd95a6c670187242ad6225ebbcf5206236012c1dd3a
+rules.py d3fd869193b6a207040d67c75cdc3d03b88115a9938715732131759640081130
+
+# command: cd ~/work/s19_m11 && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 900 ~/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -n 2 --basetemp /tmp/pytest-s19m11 tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_2_leading_zero_decimal
+# exit=1
+
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________________ test_r_a2l_036_2_leading_zero_decimal _____________________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m11/popen-gw0/test_r_a2l_036_2_leading_zero_0')
+
+    def test_r_a2l_036_2_leading_zero_decimal(tmp_path: Path) -> None:
+        """Why: `0400` is decimal 400 under the ASCII Number pattern (ruling addendum)."""
+        seg = _one_segment(
+            tmp_path, '/begin MEMORY_SEGMENT S4 "" DATA RAM INTERN 0400 0x100 0x0'
+        )
+>       assert (seg["base"], seg["size"], seg["offset"]) == (400, 0x100, 0)
+E       assert (None, None, None) == (400, 256, 0)
+E         
+E         At index 0 diff: None != 400
+E         Use -v to get more diff
+
+tests/test_b101_a2l_blocks_and_segments.py:360: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_a2l_036_2_leading_zero_decimal
+1 failed in 1.09s
+
+# --- stderr ---
+

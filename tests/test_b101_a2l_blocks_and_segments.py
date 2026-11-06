@@ -382,6 +382,9 @@ NO_BASE_RECORDS = [
     ("S6", '"1" "0x10" DATA FLASH INTERN', "quoted_words"),
     ("S9", '"" DATA FLASH INTERN 0x1_000 0x10', "underscore"),
     ("S10", '"" DATA FLASH INTERN 0x123456789 0x10', "nine_hex_digits"),
+    # E5 C-6: nine hex digits whose value is small, so the 2^32 bound cannot mask a
+    # reader that drops the 8-digit limit (S10's value already exceeds the bound).
+    ("S10b", '"" DATA FLASH INTERN 0x000001000 0x10', "nine_hex_digits_small"),
     ("S11", '"" DATA FLASH INTERN ٣ 0x10', "non_ascii_digit"),
 ]
 
@@ -401,6 +404,15 @@ def test_r_a2l_036_4_no_base(tmp_path: Path, name: str, record: str, shape: str)
         seg = _one_segment(tmp_path, f"/begin MEMORY_SEGMENT {name}", record)
     assert seg["base"] is None, seg
     assert seg["size"] is None, seg
+
+
+def test_r_a2l_036_4_non_ascii_digit_word_is_skipped_by_the_anchor(tmp_path: Path) -> None:
+    """Why: pins the accepted residual N-2 (D-5): a word with a non-ASCII digit (U+0663) is
+    not a Number and does not start with an ASCII digit or sign, so it is not the address
+    word; the anchor is the next word, 0x10. S11 alone cannot show this (no word follows
+    0x10 there), so a change to the anchor rule would pass it silently (F4, E5)."""
+    seg = _one_segment(tmp_path, '/begin MEMORY_SEGMENT S11b "" DATA FLASH INTERN \u0663 0x10 0x20')
+    assert (seg["base"], seg["size"]) == (0x10, 0x20), seg
 
 
 def test_r_a2l_036_7_empty_segment_has_no_name(tmp_path: Path) -> None:

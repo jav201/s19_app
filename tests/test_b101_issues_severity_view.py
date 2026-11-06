@@ -197,14 +197,39 @@ def test_r_tui_042b_2_headers_count_issue_severity(tmp_path: Path) -> None:
     _run(tmp_path, _list_l4(), drive)
 
 
+#: The warning colour the row's threshold names (insight_style.YELLOW, styles.tcss .sev-warning).
+WARNING_COLOUR = "#F6FF8F"
+
+
+def _hex(color) -> str:
+    return color.hex.upper()[:7]
+
+
 def test_r_tui_042b_4_unrecognized_block_rows_paint_warning(tmp_path: Path) -> None:
-    """Why: the row carries the colour class of its severity (base: sev-info)."""
+    """Why: the row carries the colour class of its severity (base: sev-info), and the
+    colour it is painted in is the warning colour #f6ff8f (C-4, E5): the class alone is
+    not the painted style."""
 
     async def drive(app, pilot) -> None:
         rows = [r for _, rs in _layout(app) for r in rs if r.issue.code == UNRECOGNIZED]
         assert len(rows) == 3
         assert all(r.has_class("sev-warning") for r in rows), [r.classes for r in rows]
         assert not any(r.has_class("sev-info") for r in rows)
+        # A row is queryable one frame before its compose children exist (SR-2, E4).
+        await wait_until(
+            pilot,
+            lambda: all(
+                len(list(r.query(".issue-code-chip"))) == 1 and len(list(r.query(".issue-detail"))) == 1
+                for r in rows
+            ),
+            "the three rows composed",
+        )
+        # The row and its code chip are painted in the warning colour; the detail span
+        # keeps the foreground colour by design (unchanged from base).
+        painted = [
+            (_hex(r.styles.color), _hex(r.query_one(".issue-code-chip").styles.color)) for r in rows
+        ]
+        assert painted == [(WARNING_COLOUR, WARNING_COLOUR)] * 3, painted
 
     _run(tmp_path, _list_l4(), drive)
 
@@ -340,6 +365,60 @@ def test_r_tui_042b_5_other_severity_sorts_after_info(tmp_path: Path) -> None:
 # ---------------------------------------------------------------------------
 # R-SEG-SRC.6 — the Split / Join a2l source of software_a.a2l
 # ---------------------------------------------------------------------------
+
+
+def test_r_a2l_036_7_split_join_lists_no_row_for_empty_segment(tmp_path: Path) -> None:
+    """Why: an empty MEMORY_SEGMENT has no name and no base, so the a2l source must not
+    list a row for it (R-A2L-036.7 threshold, C-5 / C-7 of E5); the one segment with a
+    base and a size beside it is listed."""
+    a2l = tmp_path / "empty_segment.a2l"
+    a2l.write_text(
+        "\n".join(
+            [
+                '/begin PROJECT P ""',
+                '/begin MODULE M ""',
+                "/begin MOD_PAR \"\"",
+                "/begin MEMORY_SEGMENT",
+                "/end MEMORY_SEGMENT",
+                '/begin MEMORY_SEGMENT Good ""',
+                "DATA FLASH INTERN 0x1000 0x100 -1 -1 -1 -1 -1",
+                "/end MEMORY_SEGMENT",
+                "/end MOD_PAR",
+                "/end MODULE",
+                "/end PROJECT",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    async def _go() -> dict:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 36)) as pilot:
+            await _pause(pilot)
+            loaded = _demo_loaded()
+            loaded.a2l_data = parse_a2l_file(a2l)
+            app.current_file = loaded
+            app.current_a2l_data = loaded.a2l_data
+            await _pause(pilot)
+            window = await _open_window(app, pilot)
+            window.action_cycle_tab()  # ranges -> manual
+            window.action_cycle_tab()  # manual -> a2l
+            await _pause(pilot)
+            from s19_app.tui.segment_split_view import _SegTable
+
+            table = window.query_one("#sje_table", _SegTable)
+            return {
+                "tabs": _plain(app.query_one("#sje_tabs")),
+                "body": _plain(table.query_one(Static)),
+                "rows": [(r.name, r.base, r.size) for r in window._a2l_rows()],
+            }
+
+    seen = asyncio.run(_go())
+    assert "a2l(1)" in seen["tabs"], seen["tabs"]
+    assert seen["rows"] == [("Good", 0x1000, 0x100)], seen["rows"]
+    painted = [line for line in seen["body"].split("\n") if "0x" in line]
+    assert len(painted) == 1 and "Good" in painted[0] and "0x00001000" in painted[0], seen["body"]
 
 
 def test_r_seg_src_6_software_a_rows(tmp_path: Path) -> None:

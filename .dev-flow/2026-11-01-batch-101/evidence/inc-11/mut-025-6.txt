@@ -1,0 +1,102 @@
+# mutant 025.6 (R-TUI-025.6)
+# mutation: as R-TUI-042b.1 -> the Warnings view shows an INFO header
+# apply output:
+APPLIED 025.6
+a2l.py e99d9e15da3f31160046889300ac41f0741ca917166ecea18da6f27c0d9f89a8
+app.py c3197405780f9d871045c8ba3e6684681d6eb95eaa912b2e995a664d208d9fe3
+issues_view.py 0c761e79156a9be760920127df6e77f0c39d58a4748374107b3e91de4f24fde9
+rules.py d3fd869193b6a207040d67c75cdc3d03b88115a9938715732131759640081130
+
+# restore verify ok=True:
+a2l.py e99d9e15da3f31160046889300ac41f0741ca917166ecea18da6f27c0d9f89a8
+app.py c3197405780f9d871045c8ba3e6684681d6eb95eaa912b2e995a664d208d9fe3
+issues_view.py f543a58ecc7274d03adf3dd95a6c670187242ad6225ebbcf5206236012c1dd3a
+rules.py d3fd869193b6a207040d67c75cdc3d03b88115a9938715732131759640081130
+
+# command: cd ~/work/s19_m11 && env -u NO_COLOR PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. timeout 900 ~/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -n 2 --basetemp /tmp/pytest-s19m11 tests/test_b101_issues_severity_view.py::test_r_tui_025_6_warnings_filter_shows_warning_group_only
+# exit=1
+
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________ test_r_tui_025_6_warnings_filter_shows_warning_group_only ___________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m11/popen-gw0/test_r_tui_025_6_warnings_filt0')
+
+    def test_r_tui_025_6_warnings_filter_shows_warning_group_only(tmp_path: Path) -> None:
+        """Why: the Warnings button shows only WARNING issues; no INFO group (base: the INFO header
+        shows the re-labelled warnings)."""
+    
+        async def drive(app, pilot) -> None:
+            button = app.query_one("#issues_filter_warning", Button)
+            button.focus()
+            await wait_until(pilot, lambda: app.focused is button, "the Warnings button focused")
+            await pilot.press("enter")
+            await wait_until(
+                pilot,
+                lambda: _summary(app).endswith("filter=warning | page 1/1 rows 1-3/3")
+                and [h for h, _ in _layout(app)] == [HDR_WARNINGS.format(n=3)],
+                lambda: f"{_summary(app)!r} {[h for h, _ in _layout(app)]!r}",
+            )
+            groups = _layout(app)
+            assert len(groups) == 1 and len(groups[0][1]) == 3
+    
+>       _run(tmp_path, _list_l4(), drive)
+
+tests/test_b101_issues_severity_view.py:267: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_issues_severity_view.py:149: in _run
+    asyncio.run(_go())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b101_issues_severity_view.py:147: in _go
+    await drive(app, pilot)
+tests/test_b101_issues_severity_view.py:258: in drive
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_r_tui_025_6_warnings_filter_shows_warning_group_only.<locals>.drive.<locals>.<lambda> at 0x7fef59787740>
+failure = <function test_r_tui_025_6_warnings_filter_shows_warning_group_only.<locals>.drive.<locals>.<lambda> at 0x7fef5a778360>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: 'total=4 | errors=0 | warnings=3 | info=1 | filter=warning | page 1/1 rows 1-3/3' ['• INFO  (0)']
+
+tests/support/timing.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_issues_severity_view.py::test_r_tui_025_6_warnings_filter_shows_warning_group_only
+1 failed in 63.77s (0:01:03)
+
+# --- stderr ---
+
