@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 90 requirement files | corpus digest: dbfa5b14c9560c5e -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 91 requirement files | corpus digest: 6bedbd8af488ce01 -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
@@ -1522,7 +1522,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 2368 unique id(s)
+## family US/HLR/LLR — 2374 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -1938,7 +1938,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `LLR-003.4` | batches, tests |
 | `LLR-003.5` | batches, tests |
 | `LLR-003.6` | batches, tests |
-| `LLR-003.7` | batches |
+| `LLR-003.7` | batches, tests |
 | `LLR-003.x` | batches |
 | `LLR-004` | batches |
 | `LLR-004.1` | batches, canon, tests |
@@ -3832,7 +3832,9 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `US-FBP2-1` | batches |
 | `US-FBP2-2` | batches |
 | `US-FND` | batches, tests |
+| `US-GUIDE-1` | batches |
 | `US-H` | batches |
+| `US-HELP-1` | batches |
 | `US-HEXWIN-1` | batches |
 | `US-I` | batches |
 | `US-I11-1` | batches |
@@ -3851,6 +3853,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `US-L3` | batches |
 | `US-L4` | batches |
 | `US-L5` | batches |
+| `US-LEGEND-1` | batches |
 | `US-MAC` | batches, tests |
 | `US-MAP` | batches, tests |
 | `US-MDESC-1` | batches |
@@ -3875,6 +3878,9 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `US-P6` | batches, tests |
 | `US-PROJ-SAVE-1` | batches |
 | `US-PROJ-SYNC-1` | batches |
+| `US-README-1` | batches |
+| `US-REL-1` | batches |
+| `US-SEC-1` | batches |
 | `US-TST-1` | batches |
 | `US-TST-2` | batches |
 | `US-TST-3` | batches |

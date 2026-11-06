@@ -1,0 +1,22 @@
+LAN host 2 (16 cores), merged tree main + Inc 11 + Inc 14 (before the address-census fix), 34 test files (Inc 14 tests, importers of window_help / legend, docs canon, registry, hygiene) + serial lane; snapshot suite on the LAN laptop host in the CI-recipe venv. tc031 x2 compare against host 2's stale local 'main' ref (9f9f6af) - environment artifact; tc_b97_69 is the known page-keys flake; the 2 tc016s snapshots are the known failures. test_at_b83_08 (address census) was a real law-guard failure in the Inc 14 test file, fixed in 4433f7d; re-run after the fix: tests/test_address_census.py + tests/test_b101_help_legend_docs.py -> 92 passed in 28.29s.
+<HOME>/work/s19_merge14/s19_app/__init__.py
+<HOME>/work/s19_merge14/snapshot_report.html
+
+=========================== short test summary info ============================
+FAILED tests/test_address_census.py::test_at_b83_08_tree_holds_no_assembled_selectors
+FAILED tests/test_b97_key_bar.py::test_tc_b97_69_page_keys_do_nothing_where_disabled
+FAILED tests/test_tui_directionb.py::test_tc031_engine_modules_have_no_diff_vs_main
+FAILED tests/test_tui_directionb.py::test_tc031_engine_modules_have_no_name_only_diff_vs_main
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-80x24]
+6 failed, 1532 passed, 10 skipped in 924.44s (0:15:24)
+---serial---
+66.5%  0.503 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 2 bounds, 0 under 20 % margin
+2 passed, 1548 deselected in 13.18s
+---snapshot-laptop---
+2 snapshots failed. 27 snapshots passed.
+=========================== short test summary info ============================
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-120x30]
+2 failed, 27 passed, 4 deselected in 141.84s (0:02:21)

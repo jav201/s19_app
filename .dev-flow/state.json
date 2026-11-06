@@ -182,6 +182,11 @@
       "station": "P3",
       "date": "2026-11-05",
       "decision": "P3 increment 011 (Inc 11, A2L validation and parsing: 62 ASAM block names, IF_DATA skip, anchored memory-segment reader with an ASCII Number and a 2^32 bound, curve description, severity order) approved and merged under the standing authorization: E3 architect FAIL then PASS-WITH-NOTES in round 2; mutants 32/32 (DeepSeek) plus corrective controls; code-reviewer and security-reviewer PASS-WITH-NOTES; coverage 78 cases, 76 covered, 2 partial; 4 snapshot baselines re-recorded with the CI recipe (Region unknown -> flash, issue count 60 -> 59); trace_check 0 gaps. Merge verified on the LAN laptop host: 1063 passed, 5 failed = 4 freeze guards by design (OR-3, checked on CI) + the known tc_b100_52 load flake; snapshots: the 2 known failures only (evidence/merge/lan-merge-inc11.txt)."
+    },
+    {
+      "station": "P3",
+      "date": "2026-11-05",
+      "decision": "P3 increment 014 (Inc 14, help, legend and README describe the shipped app; SECURITY.md; 1.0.0 release notes; user-guide text) approved and merged under the standing authorization: E3 architect FAIL then PASS-WITH-NOTES in round 2; mutants 45/45 (DeepSeek); code-reviewer PASS-WITH-NOTES; security-reviewer BLOCK-UNTIL E5-1 for SECURITY.md, closed when the operator had GitHub private vulnerability reporting enabled (gh api enabled:true, 2026-11-06); coverage 74 cases; trace_check 0 gaps. Merge verification on LAN host 2 found an address-census law-guard failure in the new test file, fixed (4433f7d, 92 passed); the other failures are the known flake, the stale-ref freeze arms and the 2 known snapshots (evidence/merge/lan-merge-inc14.txt)."
     }
   ],
   "obsidian_synced": false,
