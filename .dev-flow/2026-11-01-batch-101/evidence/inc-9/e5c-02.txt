@@ -1,0 +1,311 @@
+=== Inc 9 E5 corrective run: e5c-02-mutants (the saves file under each one-off mutant)
+date: 2026-11-06T21:06:51Z
+host: LAN Linux laptop, Python 3.11.18
+base commit (origin/main): e07fb00f9fc13afd314d0334fac683fe33b29b6c
+staged tree (base + the local diff): 608f5e918389dbb016a57b61ed5643bec6515210
+mutant copy: <HOME>/work/s19_i9c_mut (a cp -a of the staged worktree; before each mutant the two mutable files are restored from the worktree)
+CMD (per mutant, cwd = the copy): env -u NO_COLOR PYTHONPATH=<copy> python -m pytest -q -p no:cacheprovider -n 6 -m "not serial_timing" --tb=line -rfs tests/test_b101_flow_saves.py
+
+---- M14b
+# mutant M14b: s19_app/tui/services/flow_persistence_service.py
+--- tree/s19_app/tui/services/flow_persistence_service.py
++++ mutant/s19_app/tui/services/flow_persistence_service.py
+@@ -1171,6 +1171,3 @@
+             verified = (
+-                stat.S_ISREG(st.st_mode)
+-                and st.st_nlink == 1
+-                and os.path.samestat(claim, st)
+-                and not _is_reparse_point(candidate)
++                st.st_nlink == 1
+                 and Path(os.path.realpath(candidate)).parent == resolved_home
+s19_app.__file__ = <HOME>/work/s19_i9c_mut/s19_app/__init__.py
+
+...........................F.F....FF..                                   [100%]
+=================================== FAILURES ===================================
+[gw4] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   Failed: DID NOT RAISE WorkareaContainmentError
+<HOME>/work/s19_i9c_mut/tests/test_b101_flow_saves.py:535: Failed: DID NOT RAISE WorkareaContainmentError
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   Failed: DID NOT RAISE WorkareaContainmentError
+<HOME>/work/s19_i9c_mut/tests/test_b101_flow_saves.py:535: Failed: DID NOT RAISE WorkareaContainmentError
+[gw1] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   Failed: DID NOT RAISE WorkareaContainmentError
+<HOME>/work/s19_i9c_mut/tests/test_b101_flow_saves.py:678: Failed: DID NOT RAISE WorkareaContainmentError
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   Failed: DID NOT RAISE WorkareaContainmentError
+<HOME>/work/s19_i9c_mut/tests/test_b101_flow_saves.py:678: Failed: DID NOT RAISE WorkareaContainmentError
+=========================== short test summary info ============================
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_7_link_to_a_sibling_in_the_home_gets_no_byte[flow]
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_7_link_to_a_sibling_in_the_home_gets_no_byte[set]
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_10_other_file_at_the_name_gets_no_byte[set]
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_10_other_file_at_the_name_gets_no_byte[flow]
+4 failed, 34 passed in 1.41s
+
+---- M22
+# mutant M22: s19_app/tui/services/flow_persistence_service.py
+--- tree/s19_app/tui/services/flow_persistence_service.py
++++ mutant/s19_app/tui/services/flow_persistence_service.py
+@@ -1173,3 +1173,2 @@
+                 and st.st_nlink == 1
+-                and os.path.samestat(claim, st)
+                 and not _is_reparse_point(candidate)
+s19_app.__file__ = <HOME>/work/s19_i9c_mut/s19_app/__init__.py
+
+...................................FF.                                   [100%]
+=================================== FAILURES ===================================
+[gw5] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   Failed: DID NOT RAISE WorkareaContainmentError
+<HOME>/work/s19_i9c_mut/tests/test_b101_flow_saves.py:678: Failed: DID NOT RAISE WorkareaContainmentError
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   Failed: DID NOT RAISE WorkareaContainmentError
+<HOME>/work/s19_i9c_mut/tests/test_b101_flow_saves.py:678: Failed: DID NOT RAISE WorkareaContainmentError
+=========================== short test summary info ============================
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_10_other_file_at_the_name_gets_no_byte[flow]
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_10_other_file_at_the_name_gets_no_byte[set]
+2 failed, 36 passed in 1.43s
+
+---- M23
+# mutant M23: s19_app/tui/services/flow_persistence_service.py
+--- tree/s19_app/tui/services/flow_persistence_service.py
++++ mutant/s19_app/tui/services/flow_persistence_service.py
+@@ -1172,3 +1172,2 @@
+                 stat.S_ISREG(st.st_mode)
+-                and st.st_nlink == 1
+                 and os.path.samestat(claim, st)
+s19_app.__file__ = <HOME>/work/s19_i9c_mut/s19_app/__init__.py
+
+....................................FF                                   [100%]
+=================================== FAILURES ===================================
+[gw4] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   Failed: DID NOT RAISE WorkareaContainmentError
+<HOME>/work/s19_i9c_mut/tests/test_b101_flow_saves.py:703: Failed: DID NOT RAISE WorkareaContainmentError
+[gw5] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   Failed: DID NOT RAISE WorkareaContainmentError
+<HOME>/work/s19_i9c_mut/tests/test_b101_flow_saves.py:703: Failed: DID NOT RAISE WorkareaContainmentError
+=========================== short test summary info ============================
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_11_hard_link_at_the_name_gets_no_byte[flow]
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_11_hard_link_at_the_name_gets_no_byte[set]
+2 failed, 36 passed in 1.43s
+
+---- M24
+# mutant M24: s19_app/tui/services/flow_persistence_service.py
+--- tree/s19_app/tui/services/flow_persistence_service.py
++++ mutant/s19_app/tui/services/flow_persistence_service.py
+@@ -1028,7 +1028,3 @@
+     try:
+-        if (
+-            os.path.samestat(claim, os.lstat(candidate))
+-            and Path(os.path.realpath(candidate)).parent == resolved_home
+-        ):
+-            os.unlink(candidate)
++        os.unlink(candidate)
+     except OSError:
+s19_app.__file__ = <HOME>/work/s19_i9c_mut/s19_app/__init__.py
+
+...................FF..FF.....F.F.FFF.                                   [100%]
+=================================== FAILURES ===================================
+[gw5] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: assert False
+     +  where False = is_symlink()
+     +    where is_symlink = (PosixPath('/tmp/pytest-of-<user>/pytest-297/popen-gw5/test_r_flow_file_14_4_followed0/.s19tool/workarea/p/flows') / 'z.json').is_symlink
+<HOME>/work/s19_i9c_mut/tests/test_b101_flow_saves.py:416: AssertionError: assert False
+[gw3] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: assert [] == ['z.json']
+      
+      Right contains one more item: 'z.json'
+      Use -v to get more diff
+<HOME>/work/s19_i9c_mut/tests/test_b101_flow_saves.py:439: AssertionError: assert [] == ['z.json']
+[gw1] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: assert False
+     +  where False = is_symlink()
+     +    where is_symlink = (PosixPath('/tmp/pytest-of-<user>/pytest-297/popen-gw1/test_r_flow_set_8_4_followed_c0/.s19tool/workarea/p/flowsets') / 's.json').is_symlink
+<HOME>/work/s19_i9c_mut/tests/test_b101_flow_saves.py:489: AssertionError: assert False
+[gw4] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: assert False
+     +  where False = _link_points_at((PosixPath('/tmp/pytest-of-<user>/pytest-297/popen-gw4/test_r_flow_file_14_7_link_to_0/.s19tool/workarea/p/flows') / 'z.json'), PosixPath('/tmp/pytest-of-<user>/pytest-297/popen-gw4/test_r_flow_file_14_7_link_to_0/.s19tool/workarea/p/flows/other.json'))
+<HOME>/work/s19_i9c_mut/tests/test_b101_flow_saves.py:538: AssertionError: assert False
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: assert False
+     +  where False = _link_points_at((PosixPath('/tmp/pytest-of-<user>/pytest-297/popen-gw2/test_r_flow_file_14_7_link_to_0/.s19tool/workarea/p/flowsets') / 's.json'), PosixPath('/tmp/pytest-of-<user>/pytest-297/popen-gw2/test_r_flow_file_14_7_link_to_0/.s19tool/workarea/p/flowsets/other.json'))
+<HOME>/work/s19_i9c_mut/tests/test_b101_flow_saves.py:538: AssertionError: assert False
+[gw3] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-<user>/pytest-297/popen-gw3/test_r_flow_file_14_9_repointe0/victim/z.json'
+/data/miniconda3/envs/s19ci/lib/python3.11/pathlib.py:1044: FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-<user>/pytest-297/popen-gw3/test_r_flow_file_14_9_repointe0/victim/z.json'
+[gw1] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-<user>/pytest-297/popen-gw1/test_r_flow_file_14_10_other_f0/.s19tool/workarea/p/flows/z.json'
+/data/miniconda3/envs/s19ci/lib/python3.11/pathlib.py:1044: FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-<user>/pytest-297/popen-gw1/test_r_flow_file_14_10_other_f0/.s19tool/workarea/p/flows/z.json'
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-<user>/pytest-297/popen-gw0/test_r_flow_file_14_10_other_f0/.s19tool/workarea/p/flowsets/s.json'
+/data/miniconda3/envs/s19ci/lib/python3.11/pathlib.py:1044: FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-<user>/pytest-297/popen-gw0/test_r_flow_file_14_10_other_f0/.s19tool/workarea/p/flowsets/s.json'
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-<user>/pytest-297/popen-gw2/test_r_flow_file_14_9_repointe0/victim/s.json'
+/data/miniconda3/envs/s19ci/lib/python3.11/pathlib.py:1044: FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-<user>/pytest-297/popen-gw2/test_r_flow_file_14_9_repointe0/victim/s.json'
+=========================== short test summary info ============================
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_4_followed_create_gets_no_byte
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_5_swapped_home_gets_no_byte
+FAILED tests/test_b101_flow_saves.py::test_r_flow_set_8_4_followed_create_gets_no_byte
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_7_link_to_a_sibling_in_the_home_gets_no_byte[flow]
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_7_link_to_a_sibling_in_the_home_gets_no_byte[set]
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_9_repointed_home_keeps_the_file_elsewhere[flow]
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_10_other_file_at_the_name_gets_no_byte[flow]
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_10_other_file_at_the_name_gets_no_byte[set]
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_9_repointed_home_keeps_the_file_elsewhere[set]
+9 failed, 29 passed in 1.40s
+
+---- M25
+# mutant M25: s19_app/tui/services/flow_persistence_service.py
+--- tree/s19_app/tui/services/flow_persistence_service.py
++++ mutant/s19_app/tui/services/flow_persistence_service.py
+@@ -1030,3 +1030,2 @@
+             os.path.samestat(claim, os.lstat(candidate))
+-            and Path(os.path.realpath(candidate)).parent == resolved_home
+         ):
+s19_app.__file__ = <HOME>/work/s19_i9c_mut/s19_app/__init__.py
+
+....................F.................                                   [100%]
+=================================== FAILURES ===================================
+[gw3] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: assert [] == ['z.json']
+      
+      Right contains one more item: 'z.json'
+      Use -v to get more diff
+<HOME>/work/s19_i9c_mut/tests/test_b101_flow_saves.py:439: AssertionError: assert [] == ['z.json']
+=========================== short test summary info ============================
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_5_swapped_home_gets_no_byte
+1 failed, 37 passed in 1.46s
+
+---- M26
+# mutant M26: s19_app/tui/services/flow_persistence_service.py
+--- tree/s19_app/tui/services/flow_persistence_service.py
++++ mutant/s19_app/tui/services/flow_persistence_service.py
+@@ -1137,3 +1137,2 @@
+         # leaves no file under the name (E3 S-3).
+-        text = render(candidate.stem)
+ 
+@@ -1158,2 +1157,3 @@
+ 
++        text = render(candidate.stem)
+         # (d) The post-claim check (E3 S-1, E4-R1, E5 SE5-1): before any
+s19_app.__file__ = <HOME>/work/s19_i9c_mut/s19_app/__init__.py
+
+.............................F........                                   [100%]
+=================================== FAILURES ===================================
+[gw5] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: assert ['/tmp/pytest...flows/z.json'] == []
+      
+      Left contains one more item: '/tmp/pytest-of-<user>/pytest-299/popen-gw5/test_r_flow_file_14_8_claim_er0/.s19tool/workarea/p/flows/z.json'
+      Use -v to get more diff
+<HOME>/work/s19_i9c_mut/tests/test_b101_flow_saves.py:590: AssertionError: assert ['/tmp/pytest...flows/z.json'] == []
+=========================== short test summary info ============================
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_8_claim_error_arms[render]
+1 failed, 37 passed in 1.44s
+
+---- M27
+# mutant M27: s19_app/tui/services/flow_persistence_service.py
+--- tree/s19_app/tui/services/flow_persistence_service.py
++++ mutant/s19_app/tui/services/flow_persistence_service.py
+@@ -1201,3 +1201,2 @@
+         except OSError:
+-            _unlink_own_claim(candidate, claim, resolved_home)
+             raise
+s19_app.__file__ = <HOME>/work/s19_i9c_mut/s19_app/__init__.py
+
+..............................F.......                                   [100%]
+=================================== FAILURES ===================================
+[gw4] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: assert ['z.json'] == []
+      
+      Left contains one more item: 'z.json'
+      Use -v to get more diff
+<HOME>/work/s19_i9c_mut/tests/test_b101_flow_saves.py:598: AssertionError: assert ['z.json'] == []
+=========================== short test summary info ============================
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_8_claim_error_arms[write]
+1 failed, 37 passed in 1.40s
+
+---- M28
+# mutant M28: s19_app/tui/services/flow_persistence_service.py
+--- tree/s19_app/tui/services/flow_persistence_service.py
++++ mutant/s19_app/tui/services/flow_persistence_service.py
+@@ -1177,3 +1177,3 @@
+             )
+-        except OSError as exc:
++        except RuntimeError as exc:
+             failure = exc
+s19_app.__file__ = <HOME>/work/s19_i9c_mut/s19_app/__init__.py
+
+................................F.....                                   [100%]
+=================================== FAILURES ===================================
+[gw3] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   PermissionError: [Errno 13] Permission denied: '/tmp/pytest-of-<user>/pytest-301/popen-gw3/test_r_flow_file_14_8_claim_er0/.s19tool/workarea/p/flows/z.json'
+<HOME>/work/s19_i9c_mut/tests/test_b101_flow_saves.py:611: PermissionError: [Errno 13] Permission denied: '/tmp/pytest-of-<user>/pytest-301/popen-gw3/test_r_flow_file_14_8_claim_er0/.s19tool/workarea/p/flows/z.json'
+=========================== short test summary info ============================
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_8_claim_error_arms[lstat]
+1 failed, 37 passed in 1.41s
+
+---- M29
+# mutant M29: s19_app/tui/services/flow_persistence_service.py
+--- tree/s19_app/tui/services/flow_persistence_service.py
++++ mutant/s19_app/tui/services/flow_persistence_service.py
+@@ -1154,4 +1154,2 @@
+             # on Windows; if the name now exists it is simply taken.
+-            if os.path.lexists(candidate):
+-                continue
+             raise
+s19_app.__file__ = <HOME>/work/s19_i9c_mut/s19_app/__init__.py
+
+...............................F......                                   [100%]
+=================================== FAILURES ===================================
+[gw3] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   PermissionError: [Errno 13] Permission denied: '/tmp/pytest-of-<user>/pytest-302/popen-gw3/test_r_flow_file_14_8_claim_er0/.s19tool/workarea/p/flows/z.json'
+<HOME>/work/s19_i9c_mut/tests/test_b101_flow_saves.py:624: PermissionError: [Errno 13] Permission denied: '/tmp/pytest-of-<user>/pytest-302/popen-gw3/test_r_flow_file_14_8_claim_er0/.s19tool/workarea/p/flows/z.json'
+=========================== short test summary info ============================
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_8_claim_error_arms[taken-by-folder]
+1 failed, 37 passed in 1.38s
+
+---- M31
+# mutant M31: s19_app/tui/services/flow_persistence_service.py
+--- tree/s19_app/tui/services/flow_persistence_service.py
++++ mutant/s19_app/tui/services/flow_persistence_service.py
+@@ -1130,2 +1130,4 @@
+         candidate = home / next(names)
++        if os.path.islink(candidate):
++            os.unlink(candidate)
+         # (a) The name is taken when ANY entry of that name exists — a file,
+s19_app.__file__ = <HOME>/work/s19_i9c_mut/s19_app/__init__.py
+
+...............FF.F.F...FF............                                   [100%]
+=================================== FAILURES ===================================
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: assert False
+     +  where False = _link_points_at(((PosixPath('/tmp/pytest-of-<user>/pytest-303/popen-gw2/test_r_flow_file_14_1_dangling0/.s19tool/workarea/p') / 'flows') / 'z.json'), ((PosixPath('/tmp/pytest-of-<user>/pytest-303/popen-gw2/test_r_flow_file_14_1_dangling0/outside') / 'dangling') / 'z.json'))
+<HOME>/work/s19_i9c_mut/tests/test_b101_flow_saves.py:377: AssertionError: assert False
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: assert False
+     +  where False = _link_points_at(((PosixPath('/tmp/pytest-of-<user>/pytest-303/popen-gw0/test_r_flow_file_14_2_link_to_0/.s19tool/workarea/p') / 'flows') / 'z.json'), (PosixPath('/tmp/pytest-of-<user>/pytest-303/popen-gw0/test_r_flow_file_14_2_link_to_0/outside') / 'z.json'))
+<HOME>/work/s19_i9c_mut/tests/test_b101_flow_saves.py:389: AssertionError: assert False
+[gw1] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: assert 1 == 0
+     +  where 1 = <built-in method count of list object at 0x7f08609b77c0>('/tmp/pytest-of-<user>/pytest-303/popen-gw1/test_r_flow_file_14_3_no_creat0/.s19tool/workarea/p/flows/z.json')
+     +    where <built-in method count of list object at 0x7f08609b77c0> = ['/tmp/pytest-of-<user>/pytest-303/popen-gw1/test_r_flow_file_14_3_no_creat0/.s19tool/workarea/p/flows/z.json'].count
+<HOME>/work/s19_i9c_mut/tests/test_b101_flow_saves.py:402: AssertionError: assert 1 == 0
+[gw4] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: assert False
+     +  where False = _link_points_at(((PosixPath('/tmp/pytest-of-<user>/pytest-303/popen-gw4/test_r_flow_set_8_1_dangling_l0/.s19tool/workarea/p') / 'flowsets') / 's.json'), ((PosixPath('/tmp/pytest-of-<user>/pytest-303/popen-gw4/test_r_flow_set_8_1_dangling_l0/outside') / 'dangling') / 's.json'))
+<HOME>/work/s19_i9c_mut/tests/test_b101_flow_saves.py:450: AssertionError: assert False
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: assert 1 == 0
+     +  where 1 = <built-in method count of list object at 0x7f20261ba900>('/tmp/pytest-of-<user>/pytest-303/popen-gw0/test_r_flow_set_8_3_no_create_0/.s19tool/workarea/p/flowsets/s.json')
+     +    where <built-in method count of list object at 0x7f20261ba900> = ['/tmp/pytest-of-<user>/pytest-303/popen-gw0/test_r_flow_set_8_3_no_create_0/.s19tool/workarea/p/flowsets/s.json'].count
+<HOME>/work/s19_i9c_mut/tests/test_b101_flow_saves.py:475: AssertionError: assert 1 == 0
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: assert False
+     +  where False = _link_points_at(((PosixPath('/tmp/pytest-of-<user>/pytest-303/popen-gw2/test_r_flow_set_8_2_link_to_fi0/.s19tool/workarea/p') / 'flowsets') / 's.json'), (PosixPath('/tmp/pytest-of-<user>/pytest-303/popen-gw2/test_r_flow_set_8_2_link_to_fi0/outside') / 's.json'))
+<HOME>/work/s19_i9c_mut/tests/test_b101_flow_saves.py:462: AssertionError: assert False
+=========================== short test summary info ============================
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_1_dangling_link_gets_no_file
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_2_link_to_file_is_not_written
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_3_no_create_on_a_taken_name
+FAILED tests/test_b101_flow_saves.py::test_r_flow_set_8_1_dangling_link_gets_no_file
+FAILED tests/test_b101_flow_saves.py::test_r_flow_set_8_3_no_create_on_a_taken_name
+FAILED tests/test_b101_flow_saves.py::test_r_flow_set_8_2_link_to_file_is_not_written
+6 failed, 32 passed in 1.44s

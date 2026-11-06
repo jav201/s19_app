@@ -3,11 +3,12 @@ Inc-003 fx_a).
 
 This module is the R8 home of the flow family: the reworked fb_a
 :class:`FlowBuilderPanel` (Inc-002) and the fx_a
-:class:`FlowExecutionPanel` (Inc-003 — US-007, HLR-017…021). Pure view layer —
-the panels and their ``ActionRequested``-kin message types; flow execution
-SEMANTICS stays in ``services/flow_*`` (messages out, services never called
-directly; the one declared data edge ``flow_screens → services/flow_model``
-is read-only constants/dataclasses per ``docs/architecture.md`` §10).
+:class:`FlowExecutionPanel` (Inc-003 — US-007, HLR-017…021). Presentational —
+the panels post messages and never call the executor
+(``services/flow_execution_service``); the module reads
+``services/flow_model`` (the block and flow data types and constants) and
+``services/flow_persistence_service`` (the wire serializer and the loader, for
+copy and paste, and the unsafe-ref finding code).
 
 fb_a doctrine (the ratified spike graduation call, ``flow_bench.NOTES.md`` —
 "connectivity is the builder's job"): a block palette rail, a framed canvas
@@ -29,8 +30,10 @@ posts the lane payloads to the app, the app runs the service's chain-set
 runner and hands the record back for painting; Save Set / Load Set post the
 same way. Every file-derived string renders through ``safe_text`` (C-17).
 
-No engine code is imported beyond the read-only flow-model data types; every
-file-derived string renders through ``safe_text`` (C-17).
+The two service edges above are the measured ones — the module reads the
+read-only flow-model data types and the persistence serializer/loader, and
+calls no other service; no ``docs/architecture.md`` section is cited for an
+import rule.
 
 batch-96 B1/B2 additions: the FUNNEL table editor (a flow-level name→value
 declaration, batch-96 B1) and block COPY/PASTE (batch-96 B2) reuse the real
@@ -38,8 +41,8 @@ persistence serializer/loader (``flow_persistence_service.flow_to_dict`` /
 ``dict_to_flow``) — the clipboard stores the WIRE projection of one block,
 never a live instance, and paste re-validates the wire dict through the
 hardened loader against the current flow's own blocks. That is the second
-declared ``flow_screens → services`` edge; both are pure
-serialize/validate, no execution semantics.
+``flow_screens → services`` edge; both are pure serialize/validate, no
+execution semantics.
 
 batch-102 Inc 6 (US-102-06): the copy/paste strip grows ``Edit`` / ``Remove``
 chips acting on the SAME ``#flow_pick`` ledger number (empty is INVALID for
@@ -1407,7 +1410,10 @@ class FlowBuilderPanel(ScrollableContainer):
     Dependencies:
         Uses:
             - ``flow_model`` (block dataclasses + the A2B binding grammar,
-              read-only per the R8 declared edge)
+              read-only)
+            - ``flow_persistence_service`` (``flow_to_dict`` /
+              ``dict_to_flow`` for copy and paste, the ``FLOW_UNSAFE_REF``
+              code)
             - ``safe_text`` (markup-safe render)
         Used by:
             - ``S19TuiApp._compose_screen_flow`` /
@@ -3068,9 +3074,8 @@ FX_NO_LANES_RUN = "No chains to run — Import… adds a lane first."
 class FxLaneSpec:
     """The panel-side lane payload posted to the app (Run / Save Set).
 
-    The app translates it into the service's ``ChainSpec`` / ``ChainSetEntry``
-    — the panel never imports the execution/persistence modules (the declared
-    ``flow_screens → services/flow_model`` edge stays read-only dataclasses).
+    The app translates it into the service's ``ChainSpec`` / ``ChainSetEntry``;
+    the panel never calls the executor.
 
     Args:
         name (str): The lane name (unique inside the set).
@@ -3198,7 +3203,7 @@ class FlowExecutionPanel(ScrollableContainer):
 
     Dependencies:
         Uses:
-            - ``flow_model`` (read-only dataclasses, the declared R8 edge)
+            - ``flow_model`` (read-only dataclasses)
             - ``safe_text``, ``clip_head`` / ``clip_tail``, ``lane_layout``
         Used by:
             - ``S19TuiApp._compose_screen_flow_execution`` + the

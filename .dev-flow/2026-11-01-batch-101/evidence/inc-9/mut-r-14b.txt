@@ -1,0 +1,20 @@
+mut-r-14b (orchestrator): M14 re-expressed on the final tree 286405a (S_ISREG and samestat dropped from the post-claim conjunction), LAN Linux laptop, detached worktree at origin/main e07fb00 with git diff e07fb00 286405a applied; nodes -k '14_10 or 14_4 or 8_4 or 14_5 or 14_7'
+--- mutation M14 on the final tree (286405a): S_ISREG and samestat dropped from verified
+            st = os.lstat(candidate)
+            verified = (
+                st.st_nlink == 1
+                and not _is_reparse_point(candidate)
+                and Path(os.path.realpath(candidate)).parent == resolved_home
+            )
+        except OSError as exc:
+base=e07fb00f
+<HOME>/work/s19_i9m14/s19_app/__init__.py
+>       with pytest.raises(WorkareaContainmentError):
+E       Failed: DID NOT RAISE WorkareaContainmentError
+
+tests/test_b101_flow_saves.py:680: Failed
+=========================== short test summary info ============================
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_10_other_file_at_the_name_gets_no_byte[flow]
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_10_other_file_at_the_name_gets_no_byte[set]
+2 failed, 5 passed, 31 deselected in 0.77s
+removed

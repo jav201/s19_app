@@ -1,0 +1,17 @@
+=== Inc 9 E4 integration run: int-07
+date: 2026-11-06T20:22:01Z
+worktree HEAD (base): e07fb00f9fc13afd314d0334fac683fe33b29b6c
+index tree with the increment staged: 7e6ba8ff3dd2967fdcafcd5a7aad49d77e76f825
+staged files vs base: 11
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i9int/s19_app/__init__.py
+CMD: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -n 12 --dist loadfile -m not serial_timing -rfs tests/test_b101_flow_saves.py tests/test_b101_flow_names_ui.py tests/test_b99_staging.py tests/test_b101_help_legend_docs.py tests/test_address_census.py tests/test_suite_hygiene.py tests/test_id_registry.py tests/test_engine_unchanged.py tests/test_docs_canon.py tests/test_b101_doc_hygiene.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 25%]
+........................................................................ [ 50%]
+........................................................................ [ 76%]
+...................................................................      [100%]
+283 passed in 189.38s (0:03:09)
+=== exit code: 0

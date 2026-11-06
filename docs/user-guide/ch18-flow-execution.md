@@ -110,7 +110,7 @@ own flow's values.
 
 After the bench log and result file exist, `c` confirms: `tune_c` re-runs from block 3
 and writes `tune_c_result.txt` and `tune_c.s19`. The confirm writes a second chain-set
-report for that lane alone, which records the mode as *sequential* (finding F-45).
+report for that lane alone, which records the mode as *confirm re-run*.
 
 ![Set saved](img/ch18-11-fx-tune-set-saved.png)
 

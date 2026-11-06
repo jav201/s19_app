@@ -1,0 +1,59 @@
+# i9e5 security probe (E5, Inc 9), Windows PC, Python 3.12.7, 2026-11-06.
+# The probe execs the source text of _create_new_json (flow_persistence_service.py) and the
+# house guard helpers (workspace.py) extracted by AST from the worktree at b204c7d; nothing from
+# s19_app is imported. LOCALAPPDATA pointed at a scratch folder; no clipboard; every path under <RUN>.
+# save() = save_flow_json's order: _guarded_destination -> mkdir -> _create_new_json.
+# P10 ends in the probe's own rmdir: on Windows the open claim pins the home folder's name
+# (rename with the claim open: PermissionError 5; after close: allowed), so its swap never happened.
+
+
+=== P0 baseline save
+  result: ('z.json', {'z.json': 'file 44B nlink=1'})
+
+=== P5 dangling junction at z.json before the save
+  result: ('z_2.json', {'.s19tool': 'dir', 'outside': 'dir', '.s19tool\workarea': 'dir', '.s19tool\workarea\p': 'dir', '.s19tool\workarea\p\flows': 'dir', '.s19tool\workarea\p\flows\z.json': 'link', '.s19tool\workarea\p\flows\z_2.json': 'file 46B nlink=1'})
+
+=== P1 dangling junction put in at the free name (real Windows create)
+  after: {'.s19tool': 'dir', 'outside': 'dir', '.s19tool\workarea': 'dir', '.s19tool\workarea\p': 'dir', '.s19tool\workarea\p\flows': 'dir', '.s19tool\workarea\p\flows\z.json': 'link', '.s19tool\workarea\p\flows\z_2.json': 'file 46B nlink=1'}
+  result: <RUN>\p1\.s19tool\workarea\p\flows\z_2.json
+
+=== P6 dangling file symlink put in at the free name (real S-F1 follow)
+  after: {'.s19tool': 'dir', 'outside': 'dir', '.s19tool\workarea': 'dir', '.s19tool\workarea\p': 'dir', '.s19tool\workarea\p\flows': 'dir', '.s19tool\workarea\p\flows\z.json': 'link', 'outside\t.json': 'file 0B nlink=1'}
+  raised WorkareaContainmentError: Not saved: z.json in <RUN>\p6\.s19tool\workarea\p\f
+
+=== P2 home swapped once (junction) before the create
+  after: {'.s19tool': 'dir', 'outside': 'dir', '.s19tool\workarea': 'dir', '.s19tool\workarea\p': 'dir', '.s19tool\workarea\p\flows': 'link', '.s19tool\workarea\p\flows_aside': 'dir'}
+  raised WorkareaContainmentError: Not saved: z.json in <RUN>\p2\.s19tool\workarea\p\f
+
+=== P3 home swapped out before the create, back inside the check
+  fd final path at the check: \?\<RUN>\p3\outside\z.json nlink 1
+  after: {'.s19tool': 'dir', 'outside': 'dir', '.s19tool\workarea': 'dir', '.s19tool\workarea\p': 'dir', '.s19tool\workarea\p\flows': 'dir', 'outside\z.json': 'file 44B nlink=1'}
+  outside/z.json bytes: b'{\r\n  "name": "z",\r\n  "payload": "CONTENT"\r\n}'
+  result: <RUN>\p3\.s19tool\workarea\p\flows\z.json
+
+=== P4 real S-F1 follow, then a hard link at the name
+  fd final path at the check: \?\<RUN>\p4\outside\t.json
+  after: {'.s19tool': 'dir', 'outside': 'dir', '.s19tool\workarea': 'dir', '.s19tool\workarea\p': 'dir', '.s19tool\workarea\p\flows': 'dir', '.s19tool\workarea\p\flows\z.json': 'file 44B nlink=2', 'outside\t.json': 'file 44B nlink=2'}
+  outside/t.json bytes: b'{\r\n  "name": "z",\r\n  "payload": "CONTENT"\r\n}'
+  result: <RUN>\p4\.s19tool\workarea\p\flows\z.json
+
+=== P7 flows home is a junction to O (guard)
+  after: {'.s19tool': 'dir', 'outside': 'dir', '.s19tool\workarea': 'dir', '.s19tool\workarea\p': 'dir', '.s19tool\workarea\p\flows': 'link', 'outside\flows': 'dir'}
+  raised WorkareaContainmentError: Refusing to place: destination traverses a symbolic link or reparse point: <HOME>\AppData\Local\Temp\claude\107abb51e32da120\e5f4854c-ff03-4b96-961e-71e
+
+=== P8 project folder is a junction (guard)
+  after: {'.s19tool': 'dir', 'outside': 'dir', '.s19tool\workarea': 'dir', '.s19tool\workarea\p': 'dir', '.s19tool\workarea\pl': 'link', '.s19tool\workarea\q': 'dir'}
+  raised WorkareaContainmentError: Refusing to place: destination traverses a symbolic link or reparse point: <HOME>\AppData\Local\Temp\claude\107abb51e32da120\e5f4854c-ff03-4b96-961e-71e
+
+=== P9 refused claim, home re-pointed at V before the cleanup unlink
+  after: {'.s19tool': 'dir', 'outside': 'dir', 'victim': 'dir', '.s19tool\workarea': 'dir', '.s19tool\workarea\p': 'dir', '.s19tool\workarea\p\flows': 'link', '.s19tool\workarea\p\flows_aside': 'dir', 'outside\z.json': 'file 0B nlink=1'}
+  raised WorkareaContainmentError: Not saved: z.json in <RUN>\p9\.s19tool\workarea\p\f
+
+=== P10 lstat-failure path, home re-pointed at V before its unlink
+  after: {'.s19tool': 'dir', 'empty': 'dir', 'outside': 'dir', 'victim': 'dir', '.s19tool\workarea': 'dir', '.s19tool\workarea\p': 'dir', '.s19tool\workarea\p\flows': 'dir', '.s19tool\workarea\p\flows\z.json': 'file 0B nlink=1', 'victim\z.json': 'file 6B nlink=1'}
+  raised OSError [WinError 145] The directory is not empty: '<HOME>\AppData\Local\Temp\claude\107abb51e32da120\e5f4854c-ff03-4b96-961e-71e14eb1ee40\scratchpad\
+  at: ('<HOME>\AppData\Local\Temp\claude\107abb51e32da120\e5f4854c-ff03-4b96-961e-71e14eb1ee40\scratchpad\i9e5\i9e5_probe.py', 366, 'cl')
+
+=== rename check
+  rename with the claim open: PermissionError 5
+  rename after close: allowed
