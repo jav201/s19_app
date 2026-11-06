@@ -161,3 +161,53 @@ Every Designer node sets widget values directly: `Input.value`, `Select.value`, 
 - E4-F1: `_state_text` checks GUARD before conflict, which contradicts R-SEG-PREV.7 / .8. Route it to a slice that owns the state line. Then flip the R-SEG-PREV.20/1 pin and re-run 7/1.
 - `test_tc_b97_69_page_keys_do_nothing_where_disabled`: one "A2L loaded did not settle" under `-n 12`. Re-run in the full battery before calling it a flake. The new `current_file` watcher is not excluded.
 - Tester ambiguity 3 (a dropdown stops a pending timer) is confirmed by the passing `pending is None` assertion in 001.2.1/1 (`int-lane1-r2`), once that case's precondition is corrected.
+
+## Re-audit (2026-11-06)
+
+Head `3e01603`. Scope: the 18 cases the corrective pass changed (the 17 of §2 plus R-SEG-PREV.2/2 for M-12) and the 13 new *(E5c)* cases, 31 in all. Mode: **validation**. Inputs: `E5-rulings.md`, `E5-corrective-notes.md`, `git diff a086fa5..3e01603 -- 01-requirements.md 02-test-cases.md tests/`, the `e5c-*` transcripts. This section is the only text I wrote.
+
+**Evidence:**
+- **Executed by this auditor (Windows PC):** `pytest --collect-only` on the six cited test files: 191 ids (176 + the 15 new nodes). Every node id cited in `02-test-cases.md` collects, including both matrix parameter ids. No test was run.
+- **Not executed by this auditor:** every pass and time below. They were executed by the orchestrator-spawned corrective agent on the LAN Linux host and read from `e5c-lane1` (818 passed, 1 failed (the routed `test_tc_b97_69` flake), 16 skipped) and `e5c-serial-r1` … `-r5`. Each transcript starts and ends with tree fingerprint `e7d6e2ef3b63a343`.
+- **Inspection:** the test bodies, `wait_until` (default timeout 60 s), `wait_designer_recompute` (90 s) and `SplitJoinWindow.action_export` (it refuses synchronously on conflicts).
+
+### Earlier issues: closed
+| Issue (§1–§5) | State |
+|---|---|
+| R-SEG-PREV.7/1 failed; .20/1 state line | **Closed.** The new `test_r_seg_prev_7_f23_scene_state_line_is_the_clobber_line` and the flipped .20/1 arm assert the canon line exactly. RED before C-1 (`e5c-c1-red`), GREEN after. 7/1 is covered and passes; the NC-SEG-PREV-7 control was KILLED. |
+| Timing 3 of 5 | **Closed.** 002.2/1, 002.3/1, 002.4/1 and 20/1: 5/5 each, `4 passed` and `0 under 20 %` in every run. The times match the notes' table; the worst margins are 37.7 / 44.8 / 44.3 / 62.2 %. |
+| 007.2/1 and 007.3/1 asserted values the first-shown form already shows | **Closed.** 007.2/1 asserts refin = refout = False at the start and every template field different. 007.3/1 asserts start `32` / `0x04C11DB7` / `0xFFFFFFFF`, then `16` / `0x8005` / `0xFFFF`. Both are **full**. The F-23 template definition and both negative-control texts (2 on head, about 11 / 9 on base) are corrected. |
+| DESIGNER-001.1/1 inputs | **Closed.** The new kernel node runs 205 vectors per preset and the 49 widths 9–63 (not multiples of 8) × 4 refin/refout pairs × 25 vectors. `bytes(range(256))` keeps M-11 observable. The row and the case state what runs. **Full.** |
+| M-12 | **Closed.** Dropped from row R-SEG-PREV.2, the mutant table and the graph, with the reason (equivalent at the plan). |
+| Stale cap 67108864 | **Closed, except one site** (below). |
+| PREVIEW-001.1/1, 001.2/1, 001.3/2, 001.5/1, 001.8/1, 001.11/1, 001.2.1/1, 001.2.2/3, 002.2/2 | **Closed** as §2 asked: new exact node on both surfaces; matrix id cited; marks corrected; inputs and precondition corrected. |
+| §4 clauses | **Closed.** (1) 001.2.1/4 counts updates on all six widgets per recompute (NC-SIX-SURFACES KILLED); the other rows count `_recompute`, which that node ties to the six surfaces. (2) Four route cases. (3) and (5) are not-testable rulings with sound reasons. (4) Covered. |
+| §5 black-box ATs | **Closed, two with gaps.** All 7 drive real keys, the palette or the dialogs and assert the painted text. Every change after `widget.focus()` is made by keys, which I accept. AT 2 and AT 5 have gaps (issues 1 and 2 below). |
+
+### Remaining issues
+1. **R-CRC-DESIGNER-001.2.1/3: full → partial.**
+   - Node: `test_r_crc_designer_at_preset_and_coverage_dropdowns_by_keys`.
+   - The case expects "one recompute **at once**". The node waits with `wait_until(designer_recomputes() > before)`, whose default timeout is 60 s, while the injected quiet time is 10 s. A dropdown routed to the timer (M-1) recomputes at 10 s, inside the wait, so the node passes.
+   - The docstring's claims ("a recompute seen here is the at-once one"; negative control "no recompute within the waits") are therefore false.
+   - Fix: wait with `timeout` well under 10 s, or assert the count after a single pause.
+2. **R-CRC-DESIGNER-007.3/2: full → partial.** Same node, preset step.
+   - The node counts "exactly 1 recompute" 1.5 s after the pick, with a 10 s quiet time and no pending check.
+   - Under the row's own negative control (the fill's change events left on, M-5/M-6), the extra recompute is still pending at 1.5 s. The next dropdown pick then stops that timer (E1-D2), so the extra recompute never fires.
+   - Fix: assert `designer_pending(app) is None` after the 1.5 s, or run the preset step with a 0.6 s quiet time, as 007.3/1 does.
+   - The AT 5 half also checks the preview only, not the window text that §5 asked for. That is minor.
+3. **R-SEG-PREV.20/1 objective, a wording fix only.** "with base-identical text" is now false for the state line: screen change (5) replaces base's GUARD chip there. Reword it, e.g. "with the canon text".
+4. **Stale cap at `E1-rulings.md` line 24**, "What the operator can notice" item (3): `Cannot preview: coverage exceeds 67108864 bytes`. It should be 16777216. The 67108864 / 64 MiB figures in M-0 (line 68) are the measured window and are marked superseded, so they can stay.
+5. **Noted, no change: the serial runs were not on a quiet host.** Another session's lane ran during them (load 3.7–4.6). This is disclosed, and C-3 asked for a quiet host. For an upper bound, a pass under load is conservative, and every margin is ≥ 37.7 %. I accept the 5/5; the orchestrator may rule otherwise.
+6. **Noted, no change:** 007.2/1 and 007.3/1 still decide on a fixed `pilot.pause(1.5)`. Under M-5 the second recompute lands about 0.6 s after the first, so a stalled loop could give a false pass. This is the residual from §2 and does not change the mark.
+
+### Re-checked cases I would still change
+**3 of 31 = 9.7 %**: 001.2.1/3 (mark and coverage), 007.3/2 (mark and coverage), 20/1 (objective wording). Every other re-checked case, and every other new case, is **full** under the rule: the product produces each asserted value.
+
+### Final totals (52 cases)
+| Count | Corrective pass | This re-audit |
+|---|---|---|
+| Covered | 51 | **49** |
+| Partial | 1 (001.2.2/3) | **3** (001.2.2/3, 001.2.1/3, 007.3/2) |
+| Gap | 0 | 0 |
+| Result | 52 pass | 52 pass (executed by the corrective agent: `e5c-lane1`, `e5c-serial-r1..r5`); the two new partials still pass, only their marks change |
+| Cited ids that do not collect | — | 0 (191 collected) |

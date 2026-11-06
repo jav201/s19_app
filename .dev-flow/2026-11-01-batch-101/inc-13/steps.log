@@ -12,3 +12,4 @@ E4 integration end 2026-11-06T01:01Z model=opus (GREEN on LAN Linux host 2; lane
 E5 start 2026-11-06T01:02Z mutants=deepseek-v4-pro reviews=opus
 E5 corrective start 2026-11-06T02:24Z model=opus
 E5 corrective end 2026-11-06T04:05Z model=opus (C-1..C-8 done; lane 818 passed, 1 known flake, 16 skipped; serial 5/5 x 4 arms; 52 cases, 51 covered)
+E5 end 2026-11-06T04:17:09Z model=deepseek-v4-pro (records)

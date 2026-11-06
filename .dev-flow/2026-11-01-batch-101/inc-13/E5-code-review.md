@@ -98,3 +98,42 @@ One MAJOR design-gap stays open: E5-CR-1 (E4-F1). The defect is real and is olde
 - ✓ Reuse checked: the debounce mirrors `screens.SAVE_RECOMPUTE_S`; the model functions are reused unchanged.
 - ✓ Tests reviewed for intent: E5-CR-2, E5-CR-4.
 - ✓ Verdict explicit: PASS-WITH-NOTES, no HIGH or BLOCKER open; E5-CR-1 is MAJOR and recommended for the corrective pass.
+
+## Re-review (2026-11-06)
+
+Scope: E5-CR-1 as fixed by ruling C-1, the CR-3 to CR-5 fixes (C-8), and any new product defect. Read-only: `git diff a086fa5..3e01603 -- s19_app tests` (head `3e01603`), `E5-rulings.md`, `E5-corrective-notes.md`, transcripts `e5c-c1-red`, `e5c-c1-green`, `e5c-mut-NC-SEG-PREV-7`, `e5c-cr3-red`, `e5c-cr3-green-and-ats`, `e5c-lane1`, `e5c-serial-r1..r5`. Nothing was run on the review PC.
+
+### Verdict
+
+**PASS.** E5-CR-1 is closed: the fix is applied and verified on the diff. No new defect was found in product code. Two LOW notes below; neither blocks.
+
+### E5-CR-1 (C-1): `approved` by reading, `executed` on the LAN host
+
+- **Order matches canon .7 / .8 exactly.** `segment_split_view.py:1776-1788`: `if plan.conflicts:` returns the clobber line before `if plan.guard:` is tested. So the GUARD chip shows only with a guard and no conflict byte (R-SEG-PREV.8), and the clobber line shows whenever a conflict byte exists (R-SEG-PREV.7). The empty-file and ready branches are unchanged and still come after.
+- **Texts, styles and the flag are unchanged.** The block was moved verbatim. The conflict branch still returns `False` and the guard branch `True`.
+- **Both callers.** `_stats_text` compact (`:1814`) and wide (`:1843`) both read `state, _ = ...`, so the flag is still discarded. The painted line is the only change, on both layouts. The line now agrees with `action_export`, which refuses on conflicts (`:2064`) before the arming gate (`:2078`).
+- **Guard alone still shows the chip.** Node `test_r_seg_prev_7_8_state_line_priority_conflict_over_guard` arm (b) asserts `(guard, conflicts) == (True, 0)` and the exact `⚠ GUARD  <fmtB(span)> span — e will ask`. The existing `_guard_case` tests in `test_segment_split_window.py` (no gap bytes) stay GREEN in `e5c-c1-green` (108 passed: band file, `test_segment_split_window.py`, `test_b97_key_bar.py`).
+- **The RED fails for the right reason.** `e5c-c1-red` (fingerprint start = end): both new nodes fail on the state-line equality alone, with the shipped GUARD chip in place of the expected clobber line (`⚠ 2.77 MiB would clobber source …` vs `⚠ GUARD  9.20 MiB span — e will ask`; `⚠ 4 B …` vs `⚠ GUARD  1.00 MiB span …`). The stats line and the plan-field asserts before it passed. So the failure is the branch order, not a scene or setup fault. The hand-examples node in the same run passed, as expected.
+- **The new nodes pin the canon line.** The F-23 node asserts `guard is True` and `plan.conflicts ==` the engine detector's count, then the exact `⚠ {fmtB(conflicts)} would clobber source — abort on export`. The priority node pins both arms with exact strings. The R-SEG-PREV.20/1 flip (`test_b101_inc13_perf.py:287-290`) replaces the GUARD chip with the same canon line and drops the OR-1 hold. It ran 5/5 in `e5c-serial-r1..r5` at fingerprint `e7d6e2ef3b63a343`, which equals the final lane's.
+- **The R-SEG-PREV.7 control is real.** `e5c-mut-NC-SEG-PREV-7` (census counted per block, not per byte) killed the F-23 node, the priority node and TC-710.
+
+### C-8: CR-3, CR-4, CR-5
+
+- **CR-3 (`crc_designer_view.py:1209-1210`).** The only behaviour change is one state: evaluation not refused, other-policy CRC faulted. Before, it raised `TypeError` inside `_recompute`. Now the preview reads `Cannot preview: <reason>`. Every other state renders as before: `eval_error` returns earlier, and a refused run still shows the refusal notice because that branch comes first. Node `test_r_crc_preview_coverage_crc_error_after_a_clean_evaluation_is_named` pins both surfaces with exact strings. Its RED is the `TypeError` (`e5c-cr3-red`), and its GREEN is in `e5c-cr3-green-and-ats`. The node builds the run directly. That is acceptable, because no form reaches the state today (E5-CR-3). **No uncovered behaviour change.**
+- **CR-4 (test only).** `_is_snapshot` now also requires `targets[0].id == "recomputes_before"`. This is as recommended, and `e5c-mut-NC-CR4` killed it.
+- **CR-5 (`:1373-1377`).** `_compute_coverage` now runs after the four non-coverage updates, as recommended. The surfaces do not read `run`, so nothing observable changes on any reachable path. The one behaviour change is that an unexpected exception from the coverage would now leave only the two coverage surfaces stale. No exception is known to be reachable, so no test is owed (`n/a — unreachable`).
+- **No other product change.** The diff touches only `segment_split_view.py` (`_state_text` and its docstring) and `crc_designer_view.py` (CR-3, CR-5).
+
+### Notes (LOW, not blocking)
+
+- **RR-1 (pre-existing, unreachable).** In a refused run that also has `crc_error`, the preview checks `refused` first (refusal notice) but the window checks `crc_error` first (`Cannot compute`), so the two surfaces would disagree. No form reaches this state: the width `ValueError` is raised by the evaluation first. Record it only; no action.
+- **RR-2 (records, outside this scope).** `docs/requirements/review/S17-ears-strict.md:279` ("Partly: a guard file hides it") and `CODE-CHANGES.md` D17-27 still describe the old order. The corrective notes route this to the requirements session. The notice half of D17-27 (R-SEG-EXP.3) stays open, as E5-CR-1 said.
+
+### Evidence checklist
+
+- ✓ Diff read in full (`s19_app` 2 files, +23/-14; tests at the C-1, CR-3, CR-4 and R-SEG-PREV.20/1 sites).
+- ✓ Correctness pass: branch order, flag, both callers, export path; CR-3 state table.
+- ✓ Simplicity: a pure move plus one guard clause; nothing added.
+- ✓ Reuse: n/a, nothing new.
+- ✓ Tests for intent: exact canon strings, a negative arm for the guard alone, a RED on the old order, and a killed control.
+- ✓ Verdict explicit: PASS. No HIGH or MAJOR is open, and E5-CR-1 is applied and verified.
