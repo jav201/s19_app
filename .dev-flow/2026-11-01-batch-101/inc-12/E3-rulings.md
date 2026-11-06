@@ -21,3 +21,17 @@ Round 1: `E3-architect.md` **FAIL** (1 MAJOR, 7 MINOR); `E3-security.md` **PASS-
 | S-3 | Closed for the commit (`d68cb9f`); at Inc 12's integration, grep the merged tree for every removed name (I-3 list) before the GREEN run. | The census cannot see a dangling call. |
 
 Correction: one Opus design-correction agent (targeted edits plus the split). Round 2: the architect re-checks E3A-01 … -05 and the split, and confirms U-1 … U-4 applied; the security reviewer re-checks S-1, S-2 in 12b.
+
+## Round 2 (2026-11-06)
+
+Architect: **Inc 12 FAIL** (E3A-R2-1 MAJOR), **Inc 12b PASS-WITH-NOTES**. Security: **PASS-WITH-NOTES** (S-1, S-2, S-3 closed; S2-1, S2-2 LOW). Rulings:
+
+| Finding | Ruling | Why |
+|---|---|---|
+| E3A-R2-1 (MAJOR, Inc 12) | Accept: **remove `S19TuiApp.action_a2l_tag_find_next`** (orchestrator verified on main `2d1e2b1`: no binding or palette entry names it; the Find-next button calls `_handle_a2l_tag_find_next()` directly, `app.py:21010`), as D-2 A. *Reach* counts only binding, palette, `run_action` and `@click=` positions (a widget id literal is not a reach). Base = 4 of 83; add the control "restore it → R-SHELL-KEYS.3 RED". Fix the docstrings that list it as a caller (`app.py` near `:16671`). | A dead action the census cannot see defeats F-34's guard. |
+| E3A-R2-2 | Accept: the after count includes `action_close_reports` (80 with R2-1). | Counts must add up. |
+| E3A-R2-3 | Accept: state the limit in full (every arm but the toolkit one matches by name, with the `select_variant` example; no instance on base). | Records must not under-state a limit. |
+| E3A-R2-4 (12b) + S2-1 | Accept: each I-3 grep pins `git grep -w` on the bare ids and names, narrows `_layout` to `FlowBuilderPanel`, and lists the expected remaining lines (e.g. the 3 `window_help.py` docstrings of BL-I12-1). | An "empty result" that can never be empty is not a check. |
+| S2-2 (12b) | Accept: a re-pointed hostile input stays whole when it fits a card; otherwise it keeps one of each hostile kind (markup tag, C0 / C1 / DEL bytes, sentinel). | The control-byte checks must still be able to fail. |
+
+Correction: one Opus pass (targeted edits). E3 closes for 12b after it; for Inc 12 the orchestrator checks R2-1's application (PDR) and closes E3.

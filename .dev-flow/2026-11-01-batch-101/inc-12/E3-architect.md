@@ -145,3 +145,102 @@ The MINOR rows can be folded in at the correction pass or at E4.
 - In BL: the D3-7 removal recorded as not verified.
 
 That also clears the MAJOR, but it leaves US-I12-1's "no operator path" without a test. The architect prefers the fix.
+
+## Round 2 (2026-11-06, records `9e96c38`)
+
+Scope, as `E3-rulings.md` asks: re-check E3A-01 … -05, -07, -08, U-1 … U-4 and the D-5 B split.
+
+**Records read** (both folders at `9e96c38`):
+- `inc-12/`: `01-requirements.md`, `02-test-cases.md`, `E1-slice.md`, `E1-rulings.md` §7, `codewire/graph-inc12.md`, `steps.log`.
+- `inc-12b/`: all six files and `codewire/graph-inc12b.md`.
+
+**Code read on base `2d1e2b1`** (the worktree's `s19_app/` equals it):
+- `app.py` :8495-8512, :9921-9967, :10615-10632, :11180-11196, :16646-16675, :21000-21048.
+- `screens.py` :1970-1992, :2125-2140.
+- `flow_screens.py` :2499-2520.
+- `window_help.py` :986-1031, :1230-1258.
+- `services/flow_model.py` :95-96.
+
+**Other increments read:**
+- Inc 9 at its committed head `b204c7d4` only. Its working tree holds uncommitted edits, which were not read. Files: `tests/test_b101_flow_names_ui.py`, `tests/test_b101_help_legend_docs.py`, `docs/user-guide/ch18-flow-execution.md`, `DOSSIER.md`.
+- Inc 10 at `d68cb9f`.
+
+**Toolkit read:** textual 8.2.8, read as text.
+
+**Run:** nothing that imports `s19_app`. Three AST scripts parsed the source text with `python -I`. They are in the session scratchpad, `r2/`:
+- `reach_r2.py`: I-5 as written, under two readings of "action string", with both negative controls as mutants.
+- `opener_r2.py`: R-DLG.14 with the full reached-function fixpoint.
+- `node_census.py`: the test nodes that name 12b's removed ids, two hops.
+
+The scripts are not evidence. Their results are `executed` as source reads on this PC; every number must be re-measured on the LAN host at E4.
+
+### Verdicts
+
+| Part | Verdict | Why |
+|---|---|---|
+| Inc 12 | **FAIL** | 1 MAJOR (E3A-R2-1). The corrected census finds a fourth action with no reach on base, and the slice does not remove it. Every round-1 item is applied. |
+| Inc 12b | **PASS-WITH-NOTES** | E3A-03 and E3A-05 applied and verified; the split is clean; 1 note (E3A-R2-4). |
+
+**When Inc 12 passes.** It becomes PASS-WITH-NOTES once E3A-R2-1 is ruled and applied. The fix is one ruling plus record edits.
+
+**Correction to my round 1.** Two of my round-1 numbers were wrong, and the correction pass copied both from my review:
+- **The base.** E3A-01 fix 3 and §4 said that the strict census gives "3 of 83, exactly the F-34 set". My round-1 audit took any whole literal as an action string, so a widget id hid a fourth dead action (E3A-R2-1).
+- **The after count.** I said "after 0 of 80" and left the new `action_close_reports` out of it (E3A-R2-2).
+
+### New findings
+
+| Id | Severity | Part | Finding | Evidence | Fix |
+|---|---|---|---|---|---|
+| E3A-R2-1 | MAJOR | Inc 12 | **A fourth dead action.** `S19TuiApp.action_a2l_tag_find_next` has no reach on base: no binding, palette entry, `run_action` literal, link, call or submit route. The "Find next" button calls `_handle_a2l_tag_find_next()` directly. The only literals that name it are a widget id and a comparison, and neither is an action string. **I-5 allows two readings.** It says "a string literal … that is wholly `<name>` … (a binding's or palette entry's action …)". *Read as positions:* the base is 4 of 83, and the designed tree is 1 of 81, so R-SHELL-KEYS.3/1 is RED after the change. *Read as any literal:* the id counts as a reach, so the census is GREEN and blind to this action. That is E3A-01 (b) again, with a widget id in place of prose. **The E1 census missed it the same way:** its word split counted the id (C lines 44-66). | **The action:** `app.py:11190-11192`. **The button:** `:8506` (`Button("Find next", id="a2l_tag_find_next")`); its branch at `:21010-21011` calls the handler. **The find box:** its `Changed` handler only resets the cursor (`:21042-21043`). **"Used by":** `:16670-16671`. **No other name:** no `Binding`, palette entry or test names it (`git grep` of `s19_app/`, `tests/`). **The audit** (`reach_r2.py`): positions → 4 of 83 (`view_main`, `view_alt`, `view_mac`, `a2l_tag_find_next`); any literal → 3. | **1. Ruling: remove `action_a2l_tag_find_next`.** The D-2 A precedent applies: it is co-located in `app.py` and is the F-34 class. Its work stays with the button and `_handle_a2l_tag_find_next`, whose "Used by" line drops it. No test changes. DOSSIER row 8 (`DOSSIER.md:218`) stays as found, by the U-5 precedent. *Alternative:* route the button branch through the action (one line); that keeps an alias that adds nothing. *Not:* a key (new UI, P0) or an allowlist (D-10). **2. Make the positions restrictive** in I-5, the census fixture and CTX-KEYS *Reach*: "a string literal in one of these positions: a binding's action, a palette entry's action, a literal `run_action` argument, an `@click=` target. The same text elsewhere (a widget id, a comparison, a dict key) is not an action string." The key bar adds no position: its tokens come from the classes' `BINDINGS` (`window_help.py:1005-1031`). **3. Update R-SHELL-KEYS.3.** Base 4 of 83; after 0 of 80 (83 − 4 + 1). Add the negative control "restore `action_a2l_tag_find_next` (the base) → RED". The graph gains one removed node, and I-3 gains the name. **4. R-DLG.14 is not affected** (Re-checks, E3A-02). |
+| E3A-R2-2 | MINOR | Inc 12 | **The after count.** The change removes 3 actions and adds `ReportViewerScreen.action_close_reports` (I-1), which gives 81 after, not 80. The "≥ 80" floor still passes, but the stated number is wrong. With E3A-R2-1's removal it is 80 (83 − 4 + 1). | **Base:** 83 actions (`reach_r2.py`). **The new action:** `ReportViewerScreen` has 1 action on base and 2 after. | Write the arithmetic in R-SHELL-KEYS.3, I-5 and E2-4: "83 − 4 removed + 1 new = 80", or 81 if the button is re-routed. |
+| E3A-R2-3 | MINOR | Inc 12 | **The stated limit is narrower than the real one.** I-5 and the fixture say only that "a product binding's action string counts for every action of that name". The other arms match by name too: the palette, `run_action` and link arms, the call-and-reference arm, and the reached-function fixpoint. An AST census cannot resolve `self.x()` to a class. **Example:** `self.action_select_variant()` (`app.py:9510`) also counts for `LoadResultScreen.action_select_variant`. Only the toolkit arm is class-scoped. | `reach_r2.py` | State it once: "every arm except the toolkit one matches an action by its name, not its class". Whether the limit is acceptable is judged below. |
+| E3A-R2-4 | NOTE | Inc 12b | **The I-3 grep cannot come back empty.** The step asks to "record the empty result", but `_layout` also names three things that stay: `A2lParameterPicker._layout` (`a2l_parameter_picker.py:742`), `FlowExecutionPanel._layout`, and a module helper of `tests/test_b101_issues_severity_view.py:107`. The other 18 names of the family appear only in `flow_screens.py`. | `git grep -w _layout 2d1e2b1`: 23 product hits, 15 test hits | Write the check for `_layout` as `FlowBuilderPanel._layout` or `self._layout(` inside `FlowBuilderPanel`, and name the three known hits as expected. Or let the AST census do it. |
+
+### Is the stated limit acceptable? Yes, for this increment, written as E3A-R2-3 asks
+
+- **No instance on base (measured).** Outside the toolkit arm, 3 action names are defined on more than one class:
+  - `cancel`, on 7 dialogs;
+  - `select_variant`, on `S19TuiApp` and `LoadResultScreen`;
+  - `show_window_usage_help`, on `ReportViewerScreen` and `WindowSection`.
+
+  Each of these 11 methods has a binding on its own class, so class scope would change no count:
+  - `cancel`: `screens.py:373`, `:762`, `:960`, `:1220`, `:1726`, `:1924`, `screens_directionb.py:4330`;
+  - `select_variant`: `app.py:2706`, `screens.py:2537`;
+  - `show_window_usage_help`: `screens.py:3170`, `window_help.py:803`.
+
+  The two `app.validation_issues_page_*` bindings on `GroupedIssuesPanel` (`issues_view.py:360-361`) reach the app through their `app.` prefix, so they are not cross-class matches.
+- **What it can miss.** A dead action whose name a live action shares. On base that is only the dialog `cancel` family. For example, a dialog loses its Escape binding but keeps `action_cancel`. That defect is the one R-DLG.2 states, and R-DLG.2 is tested only for Reports (`Partly`, BL-I12-5).
+- **Why no rule is added now.** By the batch's rule, a method grows only from a real defect. If E4 wants the extra guard, it is cheap: scope the unprefixed binding arm to the declaring class, its bases and its subclasses. The census already walks the class graph for the toolkit arm.
+- **What would change this verdict:** an instance on the merged tree at the E4 re-measure, or BL-I12-5 work that removes a dialog's binding.
+- **The negative controls still hold under the limit.**
+  - Restoring `view_alt` with its callers names `S19TuiApp.action_view_alt`.
+  - An unbound `action_copy` on a `ModalScreen` subclass is RED. No product binding names `copy`, and the toolkit's `Screen` binds `screen.copy_text`, not `copy` (`textual/screen.py:272`).
+
+### Re-checks
+
+| Item | State | Evidence |
+|---|---|---|
+| E3A-01 | **Applied, apart from E3A-R2-1 … R2-3.** All four records carry the same text for: *reach*, I-5, the fixture, the threshold, both negative controls, E2-4 and D-10's superseding note. `reach_r2.py` confirms three points. Both controls fail on their mutants. The six clipboard overrides are reached through the toolkit, as is `S19TuiApp.action_quit` (also bound by the product). The seed list produces no false RED on base. | `01-requirements.md:27`, `:40`; `02-test-cases.md:6`, `:16`; graph `:26`, `:133`, `:144`, `:289`; `E1-rulings.md:96` |
+| E3A-02 | ✓ The full fixpoint replaces round 1's one hop. 22 dialogs; 1 has no opener in a reached function: `VariantHelpScreen`, which has no construction at all. Base 1 of 22, after 0 of 21, as the row says. | `opener_r2.py`; `01-requirements.md:23`, `:39` |
+| E3A-03 | ✓ **Applied everywhere.** R-CHKED-058, R-TUI-059.25 and R-FX-SCR.4 say "with an id" and pin the population as the union over the named states, asserted first. Both fixtures and the compose nodes say the same. **Matches the pilot.** The named states are the E1 pilot's driven states. The floors (45, 45, 30) sit below the pilot's counts (48 − 1, 53 − 5, 35 − 1). | `inc-12/01-requirements.md:46`; `inc-12b/01-requirements.md` (R-TUI-059.25, R-FX-SCR.4); pilot transcript :17-27 |
+| E3A-04 + U-1 | ✓ **One owner.** Inc 12 owns the marks and `_FIXED`; 12b marks none. **The count.** `_FIXED` is 13 at Inc 9's head (`test_b101_help_legend_docs.py:1926-1945` at `b204c7d4`), so 13 → 17 holds. Inc 10's records name F-07, F-13, F-14 and F-18 as sources but plan no mark. If a mark lands before Inc 12, the `len` guard fails loudly and the edit becomes "+4 on the merged tree". **The cases.** `_GUIDE_PASSAGES` holds 11 entries on both trees, so the parametrize ids become `passage-12` and `passage-13`, as recorded. The ids /13 and /14 are free: the highest is /12, on main and on Inc 9. **The text.** Every absent phrase is in the base text (`ch16-reports.md:60`, and `ch18-flow-execution.md:172-173` at `b204c7d4`). `_flat` only folds whitespace, so wrapped lines still match. | as cited |
+| E3A-05 | ✓ **39 nodes in 13 files.** `node_census.py` over the base `tests/`, plus Inc 9's file at `b204c7d4`, gives exactly 12b's list. **Two false matches:** `test_b101_issues_severity_view.py` (10 nodes call a local `_layout` helper) and `test_b97_flow_execution.py` (it imports a `_flow_blocks()` helper). **Helpers:** no helper module (`b97_fixtures.py`, `b97_probes.py`) names a removed id. **Inc 9's file** is unchanged from `9120d91c` to `b204c7d4`, and `_add_load_block` (`:143-154`) is still its only reader of `#flow_kind` (`:149`). | as cited |
+| E3A-07 | ✓ **The fixture.** `tools/synth/make_release_case.py` builds it (`firmware_issues.a2l`, `:1030`). **The addendum.** `d68cb9f` is committed and 10a's tree is clean; R-TUI-018.1/5, R-TUI-018.3/1 and R-TUI-040.12/2 are withdrawn there. | `inc-10/02-test-cases.md:7`, `:17`, `:29`, `:46` at `d68cb9f` |
+| E3A-08 + U-3 | ✓ R-DLG.15/1 moves the highlight with `down`. It then asserts that the dropdown is blank, that no `Report filter:` status shows, and that the dropdown is still blank after reopening. Its mutant reads `f1.json`. | `02-test-cases.md:30`; graph `:112-113` |
+| U-2 | ✓ R-DLG.2/1 and AT-I12-1 record the focus and the window before `t`, with the focus asserted not `None`, and compare them with one Close press. | `02-test-cases.md:8`, `:18`, `:34`; graph `:54`, `:72` |
+| U-4 | ✓ **R-DLG.15/2 matches the code.** The gating dropdown offers `advisory` then `block-own-op`, with `allow_blank=False`, so `down` lands on `block-own-op`. Cancel and Escape both run `dismiss(None)`. **No dependency on 12b:** the block is added through the CHECK chip, so the case holds before and after 12b. | `screens.py:1978-1987`, `:2133-2137`; `flow_model.py:95-96` |
+| Split | ✓ clean | the split section below |
+
+### The split
+
+- **Counts are self-consistent.** Counted from the tables and graphs, both match `steps.log`.
+  - Inc 12: 5 rows; 22 cases (G-T1 20, G-T2 2); 19 nodes (3 changed, 1 new, 7 removed, 8 context); 10 entities; 13 edges.
+  - Inc 12b: 2 rows; 4 cases (G-T4 4); 17 nodes (9 changed, 5 removed, 3 context); 3 entities; 7 edges.
+- **No code edge.** No node of one part calls a node of the other. R-DLG.15/2 uses only the chip, `+ Add` and `#flow_edit`, and 12b leaves the `flow_edit` branch unchanged.
+- **The merge order is stated.** Inc 9 → 12b → (10a, 10b) → Inc 12 appears in each part's `01-requirements.md:3`, in `E1-slice.md` §4 and in the graph.
+- **CTX-SHELL** has the same text in both parts.
+- **Traces.** Behavioural: US-I12b-1 → AT-I12b-1. Functional: US-I12b-1 → the two rows → the cases → the slice.
+- **The G-T3 / G-T4 tester split is sound.** The two lanes own disjoint files: G-T3 the 13 existing files, G-T4 one new file. Only G-T3 needs G4's tree. G-T4's walks are RED on base by design, so it could start alongside G4.
+- **One contingency has no owner.** If the merge order ever flips, F-35 and `_FIXED` pass to 12b, but no 12b lane owns `test_b101_help_legend_docs.py` or DOSSIER. The ruling that flips the order would assign them. No change is needed while the order is pinned.
+
+**Risk carried from round 1.** The base numbers here (4 of 83 actions, 1 of 22 dialogs, 39 nodes) are `executed` as source reads on this PC only. Re-measure them on the LAN host at E4 before any of them enters a threshold.
