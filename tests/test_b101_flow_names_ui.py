@@ -324,7 +324,9 @@ def test_r_flow_chain_20_1_parallel_confirm_mode_line(tmp_path: Path) -> None:
 def test_r_flow_chain_20_2_sequential_confirm_mode_line(tmp_path: Path) -> None:
     """R-FLOW-CHAIN.20 (case /2): after a sequential Run, the Run's report
     holds ``- **Mode:** sequential`` and the confirm re-run's report holds
-    ``- **Mode:** confirm re-run``.
+    ``- **Mode:** confirm re-run`` and 0 lines ``- **Mode:** sequential`` (E5
+    QA-2: in this arm the defect's value and the dispatch value are the same
+    word, so the 0-lines clause is checked first).
 
     RED on base: both reports read ``- **Mode:** sequential``.
     """
@@ -337,6 +339,7 @@ def test_r_flow_chain_20_2_sequential_confirm_mode_line(tmp_path: Path) -> None:
     run_text, new = _drive(tmp_path, body)
     assert "- **Mode:** sequential" in run_text.splitlines(), run_text
     assert len(new) == 1, f"expected exactly 1 new report, got {len(new)}"
+    assert "- **Mode:** sequential" not in new[0].splitlines(), new[0].splitlines()[:8]
     assert "- **Mode:** confirm re-run" in new[0].splitlines(), new[0].splitlines()[:8]
 
 

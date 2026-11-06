@@ -1,0 +1,1268 @@
+=== Inc 9 E5 corrective run: e5c-07-final (QA-1 re-run: the 4 files + the 7 law guards on the final tree, in an isolated clone whose main = origin/main)
+date: 2026-11-06T21:12:52Z
+host: LAN Linux laptop (8 cores), Python 3.11.18
+why: e5c-04's one failure (TC-027) diffed against the laptop clone's stale local main f9f3cb09 (an ancestor of origin/main; a2l.py and validation/rules.py changed on main after it, not in Inc 9). This clone (git clone --shared of the laptop repo) has its own main = e07fb00; the laptop repo's refs are not touched.
+base commit: e07fb00f9fc13afd314d0334fac683fe33b29b6c  main: e07fb00f9fc13afd314d0334fac683fe33b29b6c
+staged tree (base + the local diff): 608f5e918389dbb016a57b61ed5643bec6515210
+s19_app.__file__ = <HOME>/work/s19_i9c_eng/s19_app/__init__.py
+CMD: env -u NO_COLOR PYTHONPATH=<HOME>/work/s19_i9c_eng python -m pytest -q -p no:cacheprovider -n 6 -m "not serial_timing" -rA tests/test_b101_flow_saves.py tests/test_b101_flow_names_ui.py tests/test_b99_staging.py tests/test_b101_help_legend_docs.py tests/test_address_census.py tests/test_suite_hygiene.py tests/test_id_registry.py tests/test_engine_unchanged.py tests/test_docs_canon.py tests/test_b101_doc_hygiene.py
+
+........................................................................ [ 24%]
+........................................................................ [ 48%]
+........................................................................ [ 72%]
+........................................................................ [ 96%]
+.........                                                                [100%]
+==================================== PASSES ====================================
+___________ test_at_b83_05_address_params_equals_the_live_derivation ___________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+----------------------------- Captured stdout call -----------------------------
+sleep=66.7ms clock=66.7ms diff=0.00%
+sleep=50.0ms clock=50.0ms diff=0.00%
+sleep=40.0ms clock=40.0ms diff=0.00%
+sleep=33.3ms clock=33.3ms diff=0.01%
+sleep=28.6ms clock=29.3ms diff=2.57%
+sleep=25.0ms clock=25.4ms diff=1.50%
+sleep=22.2ms clock=22.5ms diff=1.43%
+sleep=20.0ms clock=20.0ms diff=0.01%
+sleep=18.2ms clock=18.2ms diff=0.00%
+sleep=16.7ms clock=16.7ms diff=0.01%
+sleep=15.4ms clock=15.5ms diff=0.52%
+sleep=14.3ms clock=14.3ms diff=0.00%
+sleep=13.3ms clock=13.3ms diff=0.01%
+sleep=12.5ms clock=12.5ms diff=0.01%
+sleep=11.8ms clock=11.8ms diff=0.01%
+sleep=11.1ms clock=11.1ms diff=0.08%
+sleep=10.5ms clock=10.5ms diff=0.01%
+sleep=10.0ms clock=10.0ms diff=0.01%
+sleep=9.5ms clock=9.5ms diff=0.01%
+sleep=9.1ms clock=9.1ms diff=0.01%
+sleep=8.7ms clock=8.7ms diff=0.00%
+______________ test_r_flow_chain_20_1_parallel_confirm_mode_line _______________
+[gw3] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2993 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_r_flow_chain_20_1_paralle0 workarea=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_r_flow_chain_20_1_paralle0/.s19tool/workarea
+INFO     s19tui:app.py:8808 Workarea refreshed. files=0
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+WARNING  s19tui:app.py:14399 Project proj1: no project.json project.json (None)
+INFO     s19tui:app.py:14644 Load phase boundary: parse_branch_entry path=prg.s19 suffix=.s19
+INFO     s19tui:app.py:19220 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_r_flow_chain_20_1_paralle0/.s19tool/workarea/proj1/prg.s19 addresses=3968 range_count=11 range_bytes=3968 errors=0
+INFO     s19tui:app.py:14661 Load phase boundary: parse_branch_done path=prg.s19 branch=s19
+INFO     s19tui:app.py:18681 Load phase boundary: apply_install_state path=prg.s19 precomputed=False
+INFO     s19tui:app.py:14597 Project loaded. name=proj1 file=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_r_flow_chain_20_1_paralle0/.s19tool/workarea/proj1/prg.s19 mac=None
+INFO     s19tui:app.py:19348 Sections updated. count=11 rendered_ranges=11 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18697 Load phase boundary: apply_sections_done path=prg.s19
+INFO     s19tui:app.py:18709 Load phase boundary: apply_hex_done path=prg.s19
+INFO     s19tui:app.py:20368 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18169 MAC validation computed: records=0 issues=0 elapsed_seconds=0.142
+INFO     s19tui:app.py:18224 MAC row cache built: records=0 elapsed_seconds=0.142
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:19882 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.152
+INFO     s19tui:app.py:18722 Load phase boundary: apply_a2l_done path=prg.s19
+INFO     s19tui:app.py:19575 Memory Map updated. ranges=11
+INFO     s19tui:app.py:18739 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_r_flow_chain_20_1_paralle0/.s19tool/workarea/proj1/prg.s19 file_type=s19 elapsed_seconds=0.617 has_mac=False precomputed=False
+___________ test_tc_b99_14_placement_failure_removes_created_folder ____________
+[gw5] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2993 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_14_placement_failu0 workarea=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_14_placement_failu0/.s19tool/workarea
+INFO     s19tui:app.py:8808 Workarea refreshed. files=0
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.016
+INFO     s19tui:app.py:8817 Load file action triggered.
+INFO     s19tui:app.py:15939 Load phase boundary: modal_dismiss_scheduled kind=path value='/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_14_placement_failu0/firmware.s19'
+INFO     s19tui:app.py:15984 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_14_placement_failu0/firmware.s19
+INFO     s19tui:app.py:16005 Load phase boundary: copy_started path=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_14_placement_failu0/firmware.s19
+INFO     s19tui:app.py:16018 Load phase boundary: copy_done path=firmware.s19 elapsed=0.001s
+WARNING  s19tui:app.py:16037 Recent sources not updated: '/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_14_placement_failu0/firmware.s19'
+INFO     s19tui:app.py:8808 Workarea refreshed. files=1
+INFO     s19tui:app.py:16055 File copied to temp: path=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_14_placement_failu0/.s19tool/workarea/temp/firmware.s19 size_bytes=35 copy_seconds=0.001
+INFO     s19tui:app.py:16061 Load phase boundary: worker_spawned path=firmware.s19
+INFO     s19tui:app.py:19004 Load phase boundary: worker_parse_start path=firmware.s19
+INFO     s19tui:app.py:18316 Loading file: path=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_14_placement_failu0/.s19tool/workarea/temp/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14644 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:19220 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_14_placement_failu0/.s19tool/workarea/temp/firmware.s19 addresses=1 range_count=1 range_bytes=1 errors=0
+INFO     s19tui:app.py:14661 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:19023 Load phase boundary: worker_parse_done path=firmware.s19 elapsed=0.011s
+INFO     s19tui:app.py:18847 Load phase boundary: prepare_entry path=firmware.s19 file_type=s19
+INFO     s19tui:app.py:18882 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:18169 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18891 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:18911 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:18918 Load phase boundary: prepare_bases_done row_bases=1
+INFO     s19tui:app.py:18928 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:18934 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:19056 Load phase boundary: worker_compute_done path=firmware.s19 precomputed=True elapsed=0.001s
+INFO     s19tui:app.py:19063 Load phase boundary: call_from_thread_apply_dispatched path=firmware.s19
+INFO     s19tui:app.py:18681 Load phase boundary: apply_install_state path=firmware.s19 precomputed=True
+INFO     s19tui:app.py:19348 Sections updated. count=1 rendered_ranges=1 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18697 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18709 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:20368 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.015
+INFO     s19tui:app.py:19882 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.016
+INFO     s19tui:app.py:18722 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:19575 Memory Map updated. ranges=1
+INFO     s19tui:app.py:18739 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_14_placement_failu0/.s19tool/workarea/temp/firmware.s19 file_type=s19 elapsed_seconds=0.303 has_mac=False precomputed=True
+INFO     s19tui:app.py:8890 Save project action triggered for /tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_14_placement_failu0/.s19tool/workarea/temp/firmware.s19
+WARNING  s19tui:app.py:12868 Project save placement failed: Not saved: firmware.s19 in /tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_14_placement_failu0/.s19tool/workarea/proj is still locked after 5 retries, another program may hold it — close it and retry. Nothing written.
+___________ test_r_whelp_19_2_declared_regions_come_from_the_project ___________
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2993 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_19_2_declared_reg0/p workarea=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_19_2_declared_reg0/p/.s19tool/workarea
+INFO     s19tui:app.py:8808 Workarea refreshed. files=0
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.013
+WARNING  s19tui:app.py:14399 Project proj: no digests saved project.json (None)
+INFO     s19tui:app.py:14644 Load phase boundary: parse_branch_entry path=a.s19 suffix=.s19
+INFO     s19tui:app.py:19220 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_19_2_declared_reg0/p/.s19tool/workarea/proj/a.s19 addresses=4 range_count=1 range_bytes=4 errors=0
+INFO     s19tui:app.py:14661 Load phase boundary: parse_branch_done path=a.s19 branch=s19
+INFO     s19tui:app.py:18681 Load phase boundary: apply_install_state path=a.s19 precomputed=False
+INFO     s19tui:app.py:14597 Project loaded. name=proj file=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_19_2_declared_reg0/p/.s19tool/workarea/proj/a.s19 mac=None
+INFO     s19tui:app.py:19348 Sections updated. count=1 rendered_ranges=1 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18697 Load phase boundary: apply_sections_done path=a.s19
+INFO     s19tui:app.py:18709 Load phase boundary: apply_hex_done path=a.s19
+INFO     s19tui:app.py:20368 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18169 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18224 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.016
+INFO     s19tui:app.py:19882 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.019
+INFO     s19tui:app.py:18722 Load phase boundary: apply_a2l_done path=a.s19
+INFO     s19tui:app.py:19575 Memory Map updated. ranges=1
+INFO     s19tui:app.py:18739 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_19_2_declared_reg0/p/.s19tool/workarea/proj/a.s19 file_type=s19 elapsed_seconds=0.381 has_mac=False precomputed=False
+INFO     s19tui:app.py:6341 View reports action. project=proj count=0
+INFO     s19tui:app.py:2993 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_19_2_declared_reg0/p0 workarea=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_19_2_declared_reg0/p0/.s19tool/workarea
+INFO     s19tui:app.py:8808 Workarea refreshed. files=0
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+WARNING  s19tui:app.py:14399 Project proj: no digests saved project.json (None)
+INFO     s19tui:app.py:14644 Load phase boundary: parse_branch_entry path=a.s19 suffix=.s19
+INFO     s19tui:app.py:19220 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_19_2_declared_reg0/p0/.s19tool/workarea/proj/a.s19 addresses=4 range_count=1 range_bytes=4 errors=0
+INFO     s19tui:app.py:14661 Load phase boundary: parse_branch_done path=a.s19 branch=s19
+INFO     s19tui:app.py:18681 Load phase boundary: apply_install_state path=a.s19 precomputed=False
+INFO     s19tui:app.py:14597 Project loaded. name=proj file=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_19_2_declared_reg0/p0/.s19tool/workarea/proj/a.s19 mac=None
+INFO     s19tui:app.py:19348 Sections updated. count=1 rendered_ranges=1 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18697 Load phase boundary: apply_sections_done path=a.s19
+INFO     s19tui:app.py:18709 Load phase boundary: apply_hex_done path=a.s19
+INFO     s19tui:app.py:20368 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18169 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18224 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.015
+INFO     s19tui:app.py:19882 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.017
+INFO     s19tui:app.py:18722 Load phase boundary: apply_a2l_done path=a.s19
+INFO     s19tui:app.py:19575 Memory Map updated. ranges=1
+INFO     s19tui:app.py:18739 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_19_2_declared_reg0/p0/.s19tool/workarea/proj/a.s19 file_type=s19 elapsed_seconds=0.483 has_mac=False precomputed=False
+INFO     s19tui:app.py:16168 A2L copy complete: path=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_19_2_declared_reg0/p0/.s19tool/workarea/temp/firmware.a2l size_bytes=2446 copy_seconds=0.002
+INFO     s19tui:app.py:946 A2L cache miss: path=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_19_2_declared_reg0/p0/.s19tool/workarea/temp/firmware.a2l size_bytes=2446
+WARNING  s19tui:app.py:16206 Recent sources not updated: '<HOME>/work/s19_i9c_eng/examples/case_07_stress_smoke/firmware.a2l'
+INFO     s19tui:app.py:8808 Workarea refreshed. files=1
+INFO     s19tui:app.py:19167 A2L parse summary: path=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_19_2_declared_reg0/p0/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.002 sections=1 tags=12 errors=0
+INFO     s19tui:app.py:18169 MAC validation computed: records=0 issues=24 elapsed_seconds=0.000
+INFO     s19tui:app.py:18224 MAC row cache built: records=0 elapsed_seconds=0.001
+INFO     s19tui:app.py:17112 Load phase boundary: populate_issues_table_done rows=24 total=24 elapsed=0.028
+INFO     s19tui:app.py:19882 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.030
+INFO     s19tui:app.py:20409 Load phase boundary: populate_a2l_table_done rows=12 total=12 elapsed=0.007
+INFO     s19tui:app.py:16225 A2L view refresh complete: path=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_19_2_declared_reg0/p0/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.038
+INFO     s19tui:app.py:16233 A2L loaded: /tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_19_2_declared_reg0/p0/.s19tool/workarea/temp/firmware.a2l
+INFO     s19tui:app.py:15649 Synced A2L file into project: /tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_19_2_declared_reg0/p0/.s19tool/workarea/proj
+INFO     s19tui:app.py:6341 View reports action. project=proj count=0
+____________________ test_r_whelp_12_2_named_controls_exist ____________________
+[gw1] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2993 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-310/popen-gw1/test_r_whelp_12_2_named_contro0 workarea=/tmp/pytest-of-<user>/pytest-310/popen-gw1/test_r_whelp_12_2_named_contro0/.s19tool/workarea
+INFO     s19tui:app.py:8808 Workarea refreshed. files=0
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:18316 Loading file: path=<HOME>/work/s19_i9c_eng/examples/case_07_stress_smoke/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14644 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:19220 Load summary: file_type=s19 path=<HOME>/work/s19_i9c_eng/examples/case_07_stress_smoke/firmware.s19 addresses=1024 range_count=4 range_bytes=1024 errors=0
+INFO     s19tui:app.py:14661 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18681 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:19348 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18697 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18709 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:20368 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18169 MAC validation computed: records=0 issues=0 elapsed_seconds=0.002
+INFO     s19tui:app.py:18224 MAC row cache built: records=0 elapsed_seconds=0.003
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:19882 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.014
+INFO     s19tui:app.py:18722 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:19575 Memory Map updated. ranges=4
+INFO     s19tui:app.py:18739 Loaded file successfully: path=<HOME>/work/s19_i9c_eng/examples/case_07_stress_smoke/firmware.s19 file_type=s19 elapsed_seconds=0.844 has_mac=False precomputed=False
+INFO     s19tui:app.py:16168 A2L copy complete: path=/tmp/pytest-of-<user>/pytest-310/popen-gw1/test_r_whelp_12_2_named_contro0/.s19tool/workarea/temp/firmware.a2l size_bytes=2446 copy_seconds=0.020
+INFO     s19tui:app.py:946 A2L cache miss: path=/tmp/pytest-of-<user>/pytest-310/popen-gw1/test_r_whelp_12_2_named_contro0/.s19tool/workarea/temp/firmware.a2l size_bytes=2446
+WARNING  s19tui:app.py:16206 Recent sources not updated: '<HOME>/work/s19_i9c_eng/examples/case_07_stress_smoke/firmware.a2l'
+INFO     s19tui:app.py:8808 Workarea refreshed. files=1
+INFO     s19tui:app.py:19167 A2L parse summary: path=/tmp/pytest-of-<user>/pytest-310/popen-gw1/test_r_whelp_12_2_named_contro0/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.003 sections=1 tags=12 errors=0
+INFO     s19tui:app.py:18169 MAC validation computed: records=0 issues=16 elapsed_seconds=0.002
+INFO     s19tui:app.py:18224 MAC row cache built: records=0 elapsed_seconds=0.003
+INFO     s19tui:app.py:17112 Load phase boundary: populate_issues_table_done rows=16 total=16 elapsed=0.026
+INFO     s19tui:app.py:19882 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.031
+INFO     s19tui:app.py:20409 Load phase boundary: populate_a2l_table_done rows=12 total=12 elapsed=0.003
+INFO     s19tui:app.py:16225 A2L view refresh complete: path=/tmp/pytest-of-<user>/pytest-310/popen-gw1/test_r_whelp_12_2_named_contro0/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.037
+INFO     s19tui:app.py:16233 A2L loaded: /tmp/pytest-of-<user>/pytest-310/popen-gw1/test_r_whelp_12_2_named_contro0/.s19tool/workarea/temp/firmware.a2l
+WARNING  s19tui:app.py:14399 Project proj: no digests saved project.json (None)
+INFO     s19tui:app.py:14644 Load phase boundary: parse_branch_entry path=a.s19 suffix=.s19
+INFO     s19tui:app.py:19220 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-310/popen-gw1/test_r_whelp_12_2_named_contro0/.s19tool/workarea/proj/a.s19 addresses=4 range_count=1 range_bytes=4 errors=0
+INFO     s19tui:app.py:14661 Load phase boundary: parse_branch_done path=a.s19 branch=s19
+INFO     s19tui:app.py:18681 Load phase boundary: apply_install_state path=a.s19 precomputed=False
+INFO     s19tui:app.py:14597 Project loaded. name=proj file=/tmp/pytest-of-<user>/pytest-310/popen-gw1/test_r_whelp_12_2_named_contro0/.s19tool/workarea/proj/a.s19 mac=None
+INFO     s19tui:app.py:19348 Sections updated. count=1 rendered_ranges=1 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18697 Load phase boundary: apply_sections_done path=a.s19
+INFO     s19tui:app.py:18709 Load phase boundary: apply_hex_done path=a.s19
+INFO     s19tui:app.py:20368 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18169 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18224 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.017
+INFO     s19tui:app.py:19882 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.018
+INFO     s19tui:app.py:18722 Load phase boundary: apply_a2l_done path=a.s19
+INFO     s19tui:app.py:19575 Memory Map updated. ranges=1
+INFO     s19tui:app.py:18739 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-310/popen-gw1/test_r_whelp_12_2_named_contro0/.s19tool/workarea/proj/a.s19 file_type=s19 elapsed_seconds=0.392 has_mac=False precomputed=False
+INFO     s19tui:app.py:6341 View reports action. project=proj count=0
+_____________ test_r_flow_chain_20_2_sequential_confirm_mode_line ______________
+[gw3] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2993 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_r_flow_chain_20_2_sequent0 workarea=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_r_flow_chain_20_2_sequent0/.s19tool/workarea
+INFO     s19tui:app.py:8808 Workarea refreshed. files=0
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+WARNING  s19tui:app.py:14399 Project proj1: no project.json project.json (None)
+INFO     s19tui:app.py:14644 Load phase boundary: parse_branch_entry path=prg.s19 suffix=.s19
+INFO     s19tui:app.py:19220 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_r_flow_chain_20_2_sequent0/.s19tool/workarea/proj1/prg.s19 addresses=3968 range_count=11 range_bytes=3968 errors=0
+INFO     s19tui:app.py:14661 Load phase boundary: parse_branch_done path=prg.s19 branch=s19
+INFO     s19tui:app.py:18681 Load phase boundary: apply_install_state path=prg.s19 precomputed=False
+INFO     s19tui:app.py:14597 Project loaded. name=proj1 file=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_r_flow_chain_20_2_sequent0/.s19tool/workarea/proj1/prg.s19 mac=None
+INFO     s19tui:app.py:19348 Sections updated. count=11 rendered_ranges=11 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18697 Load phase boundary: apply_sections_done path=prg.s19
+INFO     s19tui:app.py:18709 Load phase boundary: apply_hex_done path=prg.s19
+INFO     s19tui:app.py:20368 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18169 MAC validation computed: records=0 issues=0 elapsed_seconds=0.006
+INFO     s19tui:app.py:18224 MAC row cache built: records=0 elapsed_seconds=0.006
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.016
+INFO     s19tui:app.py:19882 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.024
+INFO     s19tui:app.py:18722 Load phase boundary: apply_a2l_done path=prg.s19
+INFO     s19tui:app.py:19575 Memory Map updated. ranges=11
+INFO     s19tui:app.py:18739 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_r_flow_chain_20_2_sequent0/.s19tool/workarea/proj1/prg.s19 file_type=s19 elapsed_seconds=1.230 has_mac=False precomputed=False
+_________ test_tc_b99_14_preexisting_folder_survives_placement_failure _________
+[gw5] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2993 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_14_preexisting_fol0 workarea=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_14_preexisting_fol0/.s19tool/workarea
+INFO     s19tui:app.py:8808 Workarea refreshed. files=0
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.015
+INFO     s19tui:app.py:8817 Load file action triggered.
+INFO     s19tui:app.py:15939 Load phase boundary: modal_dismiss_scheduled kind=path value='/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_14_preexisting_fol0/firmware.s19'
+INFO     s19tui:app.py:15984 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_14_preexisting_fol0/firmware.s19
+INFO     s19tui:app.py:16005 Load phase boundary: copy_started path=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_14_preexisting_fol0/firmware.s19
+INFO     s19tui:app.py:16018 Load phase boundary: copy_done path=firmware.s19 elapsed=0.001s
+WARNING  s19tui:app.py:16037 Recent sources not updated: '/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_14_preexisting_fol0/firmware.s19'
+INFO     s19tui:app.py:8808 Workarea refreshed. files=1
+INFO     s19tui:app.py:16055 File copied to temp: path=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_14_preexisting_fol0/.s19tool/workarea/temp/firmware.s19 size_bytes=35 copy_seconds=0.001
+INFO     s19tui:app.py:16061 Load phase boundary: worker_spawned path=firmware.s19
+INFO     s19tui:app.py:19004 Load phase boundary: worker_parse_start path=firmware.s19
+INFO     s19tui:app.py:18316 Loading file: path=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_14_preexisting_fol0/.s19tool/workarea/temp/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14644 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:19220 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_14_preexisting_fol0/.s19tool/workarea/temp/firmware.s19 addresses=1 range_count=1 range_bytes=1 errors=0
+INFO     s19tui:app.py:14661 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:19023 Load phase boundary: worker_parse_done path=firmware.s19 elapsed=0.014s
+INFO     s19tui:app.py:18847 Load phase boundary: prepare_entry path=firmware.s19 file_type=s19
+INFO     s19tui:app.py:18882 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:18169 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18891 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:18911 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:18918 Load phase boundary: prepare_bases_done row_bases=1
+INFO     s19tui:app.py:18928 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:18934 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:19056 Load phase boundary: worker_compute_done path=firmware.s19 precomputed=True elapsed=0.001s
+INFO     s19tui:app.py:19063 Load phase boundary: call_from_thread_apply_dispatched path=firmware.s19
+INFO     s19tui:app.py:18681 Load phase boundary: apply_install_state path=firmware.s19 precomputed=True
+INFO     s19tui:app.py:19348 Sections updated. count=1 rendered_ranges=1 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18697 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18709 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:20368 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.012
+INFO     s19tui:app.py:19882 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.013
+INFO     s19tui:app.py:18722 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:19575 Memory Map updated. ranges=1
+INFO     s19tui:app.py:18739 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_14_preexisting_fol0/.s19tool/workarea/temp/firmware.s19 file_type=s19 elapsed_seconds=0.215 has_mac=False precomputed=True
+INFO     s19tui:app.py:8890 Save project action triggered for /tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_14_preexisting_fol0/.s19tool/workarea/temp/firmware.s19
+WARNING  s19tui:app.py:12868 Project save placement failed: Not saved: firmware.s19 in /tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_14_preexisting_fol0/.s19tool/workarea/proj is still locked after 5 retries, another program may hold it — close it and retry. Nothing written.
+__________ test_r_whelp_19_3_declared_regions_keep_the_last_generate ___________
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2993 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_19_3_declared_reg0 workarea=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_19_3_declared_reg0/.s19tool/workarea
+INFO     s19tui:app.py:8808 Workarea refreshed. files=0
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.014
+WARNING  s19tui:app.py:14399 Project proj: no digests saved project.json (None)
+INFO     s19tui:app.py:14644 Load phase boundary: parse_branch_entry path=a.s19 suffix=.s19
+INFO     s19tui:app.py:19220 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_19_3_declared_reg0/.s19tool/workarea/proj/a.s19 addresses=4 range_count=1 range_bytes=4 errors=0
+INFO     s19tui:app.py:14661 Load phase boundary: parse_branch_done path=a.s19 branch=s19
+INFO     s19tui:app.py:18681 Load phase boundary: apply_install_state path=a.s19 precomputed=False
+INFO     s19tui:app.py:14597 Project loaded. name=proj file=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_19_3_declared_reg0/.s19tool/workarea/proj/a.s19 mac=None
+INFO     s19tui:app.py:19348 Sections updated. count=1 rendered_ranges=1 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18697 Load phase boundary: apply_sections_done path=a.s19
+INFO     s19tui:app.py:18709 Load phase boundary: apply_hex_done path=a.s19
+INFO     s19tui:app.py:20368 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18169 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18224 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.014
+INFO     s19tui:app.py:19882 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.016
+INFO     s19tui:app.py:18722 Load phase boundary: apply_a2l_done path=a.s19
+INFO     s19tui:app.py:19575 Memory Map updated. ranges=1
+INFO     s19tui:app.py:18739 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_19_3_declared_reg0/.s19tool/workarea/proj/a.s19 file_type=s19 elapsed_seconds=0.448 has_mac=False precomputed=False
+INFO     s19tui:app.py:6341 View reports action. project=proj count=0
+INFO     s19tui:screens.py:3490 ReportViewerScreen requesting generation. context_bytes=64
+INFO     s19tui:app.py:6853 report kind=project source=proj output=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_19_3_declared_reg0/.s19tool/workarea/proj/reports/20261106T211327Z-report.md outcome=ok
+INFO     s19tui:app.py:6341 View reports action. project=proj count=1
+____________ test_r_flow_file_12_1_save_after_clear_holds_own_name _____________
+[gw3] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2993 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_r_flow_file_12_1_save_aft0 workarea=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_r_flow_file_12_1_save_aft0/.s19tool/workarea
+INFO     s19tui:app.py:8808 Workarea refreshed. files=0
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.010
+WARNING  s19tui:app.py:14399 Project proj1: no project.json project.json (None)
+INFO     s19tui:app.py:14644 Load phase boundary: parse_branch_entry path=prg.s19 suffix=.s19
+INFO     s19tui:app.py:19220 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_r_flow_file_12_1_save_aft0/.s19tool/workarea/proj1/prg.s19 addresses=3968 range_count=11 range_bytes=3968 errors=0
+INFO     s19tui:app.py:14661 Load phase boundary: parse_branch_done path=prg.s19 branch=s19
+INFO     s19tui:app.py:18681 Load phase boundary: apply_install_state path=prg.s19 precomputed=False
+INFO     s19tui:app.py:14597 Project loaded. name=proj1 file=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_r_flow_file_12_1_save_aft0/.s19tool/workarea/proj1/prg.s19 mac=None
+INFO     s19tui:app.py:19348 Sections updated. count=11 rendered_ranges=11 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18697 Load phase boundary: apply_sections_done path=prg.s19
+INFO     s19tui:app.py:18709 Load phase boundary: apply_hex_done path=prg.s19
+INFO     s19tui:app.py:20368 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18169 MAC validation computed: records=0 issues=0 elapsed_seconds=0.005
+INFO     s19tui:app.py:18224 MAC row cache built: records=0 elapsed_seconds=0.005
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.016
+INFO     s19tui:app.py:19882 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.023
+INFO     s19tui:app.py:18722 Load phase boundary: apply_a2l_done path=prg.s19
+INFO     s19tui:app.py:19575 Memory Map updated. ranges=11
+INFO     s19tui:app.py:18739 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_r_flow_file_12_1_save_aft0/.s19tool/workarea/proj1/prg.s19 file_type=s19 elapsed_seconds=0.875 has_mac=False precomputed=False
+_________ test_at_b83_11_every_derived_name_obeys_the_exclusion_rules __________
+[gw4] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+----------------------------- Captured stdout call -----------------------------
+sleep=66.7ms clock=66.7ms diff=0.00%
+sleep=50.0ms clock=50.0ms diff=0.10%
+sleep=40.0ms clock=40.0ms diff=0.00%
+sleep=33.3ms clock=33.3ms diff=0.00%
+sleep=28.6ms clock=28.6ms diff=0.00%
+sleep=25.0ms clock=25.0ms diff=0.01%
+sleep=22.2ms clock=22.2ms diff=0.00%
+sleep=20.0ms clock=20.0ms diff=0.01%
+sleep=18.2ms clock=18.2ms diff=0.00%
+sleep=16.7ms clock=16.7ms diff=0.00%
+sleep=15.4ms clock=15.4ms diff=0.00%
+sleep=14.3ms clock=14.3ms diff=0.23%
+sleep=13.3ms clock=13.3ms diff=0.01%
+sleep=12.5ms clock=12.5ms diff=0.00%
+sleep=11.8ms clock=11.8ms diff=0.00%
+sleep=11.1ms clock=11.1ms diff=0.01%
+sleep=10.5ms clock=10.5ms diff=0.01%
+sleep=10.0ms clock=10.0ms diff=0.01%
+sleep=9.5ms clock=9.6ms diff=0.41%
+sleep=9.1ms clock=9.1ms diff=0.00%
+sleep=8.7ms clock=8.7ms diff=0.61%
+_________________ test_r_whelp_20_2_slash_focuses_ascii_search _________________
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2993 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_20_2_slash_focuse0 workarea=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_20_2_slash_focuse0/.s19tool/workarea
+INFO     s19tui:app.py:8808 Workarea refreshed. files=0
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:18316 Loading file: path=<HOME>/work/s19_i9c_eng/examples/case_07_stress_smoke/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14644 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:19220 Load summary: file_type=s19 path=<HOME>/work/s19_i9c_eng/examples/case_07_stress_smoke/firmware.s19 addresses=1024 range_count=4 range_bytes=1024 errors=0
+INFO     s19tui:app.py:14661 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18681 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:19348 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18697 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18709 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:20368 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18169 MAC validation computed: records=0 issues=0 elapsed_seconds=0.001
+INFO     s19tui:app.py:18224 MAC row cache built: records=0 elapsed_seconds=0.001
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:19882 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.011
+INFO     s19tui:app.py:18722 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:19575 Memory Map updated. ranges=4
+INFO     s19tui:app.py:18739 Loaded file successfully: path=<HOME>/work/s19_i9c_eng/examples/case_07_stress_smoke/firmware.s19 file_type=s19 elapsed_seconds=0.500 has_mac=False precomputed=False
+INFO     s19tui:app.py:16168 A2L copy complete: path=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_20_2_slash_focuse0/.s19tool/workarea/temp/firmware.a2l size_bytes=2446 copy_seconds=0.012
+INFO     s19tui:app.py:946 A2L cache miss: path=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_20_2_slash_focuse0/.s19tool/workarea/temp/firmware.a2l size_bytes=2446
+WARNING  s19tui:app.py:16206 Recent sources not updated: '<HOME>/work/s19_i9c_eng/examples/case_07_stress_smoke/firmware.a2l'
+INFO     s19tui:app.py:8808 Workarea refreshed. files=1
+INFO     s19tui:app.py:19167 A2L parse summary: path=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_20_2_slash_focuse0/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.003 sections=1 tags=12 errors=0
+INFO     s19tui:app.py:18169 MAC validation computed: records=0 issues=16 elapsed_seconds=0.002
+INFO     s19tui:app.py:18224 MAC row cache built: records=0 elapsed_seconds=0.002
+INFO     s19tui:app.py:17112 Load phase boundary: populate_issues_table_done rows=16 total=16 elapsed=0.024
+INFO     s19tui:app.py:19882 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.028
+INFO     s19tui:app.py:20409 Load phase boundary: populate_a2l_table_done rows=12 total=12 elapsed=0.002
+INFO     s19tui:app.py:16225 A2L view refresh complete: path=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_20_2_slash_focuse0/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.033
+INFO     s19tui:app.py:16233 A2L loaded: /tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_20_2_slash_focuse0/.s19tool/workarea/temp/firmware.a2l
+___________ test_r_whelp_7_2_question_mark_paints_the_approved_copy ____________
+[gw1] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2993 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-310/popen-gw1/test_r_whelp_7_2_question_mark0 workarea=/tmp/pytest-of-<user>/pytest-310/popen-gw1/test_r_whelp_7_2_question_mark0/.s19tool/workarea
+INFO     s19tui:app.py:8808 Workarea refreshed. files=0
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:18316 Loading file: path=<HOME>/work/s19_i9c_eng/examples/case_07_stress_smoke/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14644 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:19220 Load summary: file_type=s19 path=<HOME>/work/s19_i9c_eng/examples/case_07_stress_smoke/firmware.s19 addresses=1024 range_count=4 range_bytes=1024 errors=0
+INFO     s19tui:app.py:14661 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18681 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:19348 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18697 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18709 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:20368 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18169 MAC validation computed: records=0 issues=0 elapsed_seconds=0.001
+INFO     s19tui:app.py:18224 MAC row cache built: records=0 elapsed_seconds=0.001
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:19882 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.012
+INFO     s19tui:app.py:18722 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:19575 Memory Map updated. ranges=4
+INFO     s19tui:app.py:18739 Loaded file successfully: path=<HOME>/work/s19_i9c_eng/examples/case_07_stress_smoke/firmware.s19 file_type=s19 elapsed_seconds=0.577 has_mac=False precomputed=False
+WARNING  s19tui:app.py:14399 Project proj: no digests saved project.json (None)
+INFO     s19tui:app.py:14644 Load phase boundary: parse_branch_entry path=a.s19 suffix=.s19
+INFO     s19tui:app.py:19220 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-310/popen-gw1/test_r_whelp_7_2_question_mark0/.s19tool/workarea/proj/a.s19 addresses=4 range_count=1 range_bytes=4 errors=0
+INFO     s19tui:app.py:14661 Load phase boundary: parse_branch_done path=a.s19 branch=s19
+INFO     s19tui:app.py:18681 Load phase boundary: apply_install_state path=a.s19 precomputed=False
+INFO     s19tui:app.py:14597 Project loaded. name=proj file=/tmp/pytest-of-<user>/pytest-310/popen-gw1/test_r_whelp_7_2_question_mark0/.s19tool/workarea/proj/a.s19 mac=None
+INFO     s19tui:app.py:19348 Sections updated. count=1 rendered_ranges=1 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18697 Load phase boundary: apply_sections_done path=a.s19
+INFO     s19tui:app.py:18709 Load phase boundary: apply_hex_done path=a.s19
+INFO     s19tui:app.py:20368 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18169 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18224 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.016
+INFO     s19tui:app.py:19882 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.017
+INFO     s19tui:app.py:18722 Load phase boundary: apply_a2l_done path=a.s19
+INFO     s19tui:app.py:19575 Memory Map updated. ranges=1
+INFO     s19tui:app.py:18739 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-310/popen-gw1/test_r_whelp_7_2_question_mark0/.s19tool/workarea/proj/a.s19 file_type=s19 elapsed_seconds=0.246 has_mac=False precomputed=False
+INFO     s19tui:app.py:6341 View reports action. project=proj count=0
+_____________ test_r_whelp_21_2_ranges_come_from_the_loaded_image ______________
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2993 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_21_2_ranges_come_0 workarea=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_21_2_ranges_come_0/.s19tool/workarea
+INFO     s19tui:app.py:8808 Workarea refreshed. files=0
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:18316 Loading file: path=<HOME>/work/s19_i9c_eng/examples/case_07_stress_smoke/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14644 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:19220 Load summary: file_type=s19 path=<HOME>/work/s19_i9c_eng/examples/case_07_stress_smoke/firmware.s19 addresses=1024 range_count=4 range_bytes=1024 errors=0
+INFO     s19tui:app.py:14661 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18681 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:19348 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18697 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18709 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:20368 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18169 MAC validation computed: records=0 issues=0 elapsed_seconds=0.001
+INFO     s19tui:app.py:18224 MAC row cache built: records=0 elapsed_seconds=0.002
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.016
+INFO     s19tui:app.py:19882 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.019
+INFO     s19tui:app.py:18722 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:19575 Memory Map updated. ranges=4
+INFO     s19tui:app.py:18739 Loaded file successfully: path=<HOME>/work/s19_i9c_eng/examples/case_07_stress_smoke/firmware.s19 file_type=s19 elapsed_seconds=0.750 has_mac=False precomputed=False
+____________ test_r_flow_file_12_5_lane_report_reads_the_saved_name ____________
+[gw3] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2993 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_r_flow_file_12_5_lane_rep0 workarea=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_r_flow_file_12_5_lane_rep0/.s19tool/workarea
+INFO     s19tui:app.py:8808 Workarea refreshed. files=0
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+WARNING  s19tui:app.py:14399 Project proj1: no project.json project.json (None)
+INFO     s19tui:app.py:14644 Load phase boundary: parse_branch_entry path=prg.s19 suffix=.s19
+INFO     s19tui:app.py:19220 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_r_flow_file_12_5_lane_rep0/.s19tool/workarea/proj1/prg.s19 addresses=3968 range_count=11 range_bytes=3968 errors=0
+INFO     s19tui:app.py:14661 Load phase boundary: parse_branch_done path=prg.s19 branch=s19
+INFO     s19tui:app.py:18681 Load phase boundary: apply_install_state path=prg.s19 precomputed=False
+INFO     s19tui:app.py:14597 Project loaded. name=proj1 file=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_r_flow_file_12_5_lane_rep0/.s19tool/workarea/proj1/prg.s19 mac=None
+INFO     s19tui:app.py:19348 Sections updated. count=11 rendered_ranges=11 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18697 Load phase boundary: apply_sections_done path=prg.s19
+INFO     s19tui:app.py:18709 Load phase boundary: apply_hex_done path=prg.s19
+INFO     s19tui:app.py:20368 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18169 MAC validation computed: records=0 issues=0 elapsed_seconds=0.004
+INFO     s19tui:app.py:18224 MAC row cache built: records=0 elapsed_seconds=0.004
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:19882 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.016
+INFO     s19tui:app.py:18722 Load phase boundary: apply_a2l_done path=prg.s19
+INFO     s19tui:app.py:19575 Memory Map updated. ranges=11
+INFO     s19tui:app.py:18739 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_r_flow_file_12_5_lane_rep0/.s19tool/workarea/proj1/prg.s19 file_type=s19 elapsed_seconds=0.910 has_mac=False precomputed=False
+_________________ test_r_whelp_22_2_naming_line_split_and_join _________________
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2993 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_22_2_naming_line_0 workarea=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_22_2_naming_line_0/.s19tool/workarea
+INFO     s19tui:app.py:8808 Workarea refreshed. files=0
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.015
+INFO     s19tui:app.py:18316 Loading file: path=<HOME>/work/s19_i9c_eng/examples/case_07_stress_smoke/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14644 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:19220 Load summary: file_type=s19 path=<HOME>/work/s19_i9c_eng/examples/case_07_stress_smoke/firmware.s19 addresses=1024 range_count=4 range_bytes=1024 errors=0
+INFO     s19tui:app.py:14661 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18681 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:19348 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18697 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18709 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:20368 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18169 MAC validation computed: records=0 issues=0 elapsed_seconds=0.001
+INFO     s19tui:app.py:18224 MAC row cache built: records=0 elapsed_seconds=0.001
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:19882 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.012
+INFO     s19tui:app.py:18722 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:19575 Memory Map updated. ranges=4
+INFO     s19tui:app.py:18739 Loaded file successfully: path=<HOME>/work/s19_i9c_eng/examples/case_07_stress_smoke/firmware.s19 file_type=s19 elapsed_seconds=0.562 has_mac=False precomputed=False
+____________ test_at_b99_05_save_project_after_same_name_save_back _____________
+[gw5] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2993 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_at_b99_05_save_project_af0 workarea=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_at_b99_05_save_project_af0/.s19tool/workarea
+INFO     s19tui:app.py:8808 Workarea refreshed. files=0
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:8817 Load file action triggered.
+INFO     s19tui:app.py:15939 Load phase boundary: modal_dismiss_scheduled kind=path value='/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_at_b99_05_save_project_af0/firmware.s19'
+INFO     s19tui:app.py:15984 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_at_b99_05_save_project_af0/firmware.s19
+INFO     s19tui:app.py:16005 Load phase boundary: copy_started path=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_at_b99_05_save_project_af0/firmware.s19
+INFO     s19tui:app.py:16018 Load phase boundary: copy_done path=firmware.s19 elapsed=0.001s
+WARNING  s19tui:app.py:16037 Recent sources not updated: '/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_at_b99_05_save_project_af0/firmware.s19'
+INFO     s19tui:app.py:8808 Workarea refreshed. files=1
+INFO     s19tui:app.py:16055 File copied to temp: path=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_at_b99_05_save_project_af0/.s19tool/workarea/temp/firmware.s19 size_bytes=48 copy_seconds=0.001
+INFO     s19tui:app.py:16061 Load phase boundary: worker_spawned path=firmware.s19
+INFO     s19tui:app.py:19004 Load phase boundary: worker_parse_start path=firmware.s19
+INFO     s19tui:app.py:18316 Loading file: path=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_at_b99_05_save_project_af0/.s19tool/workarea/temp/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14644 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:19220 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_at_b99_05_save_project_af0/.s19tool/workarea/temp/firmware.s19 addresses=2 range_count=2 range_bytes=2 errors=0
+INFO     s19tui:app.py:14661 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:19023 Load phase boundary: worker_parse_done path=firmware.s19 elapsed=0.007s
+INFO     s19tui:app.py:18847 Load phase boundary: prepare_entry path=firmware.s19 file_type=s19
+INFO     s19tui:app.py:18882 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:18169 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18891 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:18911 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:18918 Load phase boundary: prepare_bases_done row_bases=2
+INFO     s19tui:app.py:18928 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:18934 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:19056 Load phase boundary: worker_compute_done path=firmware.s19 precomputed=True elapsed=0.001s
+INFO     s19tui:app.py:19063 Load phase boundary: call_from_thread_apply_dispatched path=firmware.s19
+INFO     s19tui:app.py:18681 Load phase boundary: apply_install_state path=firmware.s19 precomputed=True
+INFO     s19tui:app.py:19348 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18697 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18709 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:20368 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.018
+INFO     s19tui:app.py:19882 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.021
+INFO     s19tui:app.py:18722 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:19575 Memory Map updated. ranges=2
+INFO     s19tui:app.py:18739 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_at_b99_05_save_project_af0/.s19tool/workarea/temp/firmware.s19 file_type=s19 elapsed_seconds=0.736 has_mac=False precomputed=True
+INFO     s19tui:app.py:8890 Save project action triggered for /tmp/pytest-of-<user>/pytest-310/popen-gw5/test_at_b99_05_save_project_af0/.s19tool/workarea/temp/firmware.s19
+INFO     s19tui:app.py:12624 Project saved image. name=proj file=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_at_b99_05_save_project_af0/.s19tool/workarea/proj/firmware.s19
+INFO     s19tui:app.py:12624 Project saved document. name=proj file=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_at_b99_05_save_project_af0/.s19tool/workarea/proj/patches/changes.json
+INFO     s19tui:app.py:8808 Workarea refreshed. files=1
+____________________ test_r_fb_save_8_1_refused_home_status ____________________
+[gw3] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2993 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_r_fb_save_8_1_refused_hom0 workarea=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_r_fb_save_8_1_refused_hom0/.s19tool/workarea
+INFO     s19tui:app.py:8808 Workarea refreshed. files=0
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.014
+WARNING  s19tui:app.py:14399 Project proj1: no project.json project.json (None)
+INFO     s19tui:app.py:14644 Load phase boundary: parse_branch_entry path=prg.s19 suffix=.s19
+INFO     s19tui:app.py:19220 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_r_fb_save_8_1_refused_hom0/.s19tool/workarea/proj1/prg.s19 addresses=3968 range_count=11 range_bytes=3968 errors=0
+INFO     s19tui:app.py:14661 Load phase boundary: parse_branch_done path=prg.s19 branch=s19
+INFO     s19tui:app.py:18681 Load phase boundary: apply_install_state path=prg.s19 precomputed=False
+INFO     s19tui:app.py:14597 Project loaded. name=proj1 file=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_r_fb_save_8_1_refused_hom0/.s19tool/workarea/proj1/prg.s19 mac=None
+INFO     s19tui:app.py:19348 Sections updated. count=11 rendered_ranges=11 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18697 Load phase boundary: apply_sections_done path=prg.s19
+INFO     s19tui:app.py:18709 Load phase boundary: apply_hex_done path=prg.s19
+INFO     s19tui:app.py:20368 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18169 MAC validation computed: records=0 issues=0 elapsed_seconds=0.004
+INFO     s19tui:app.py:18224 MAC row cache built: records=0 elapsed_seconds=0.004
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.011
+INFO     s19tui:app.py:19882 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.017
+INFO     s19tui:app.py:18722 Load phase boundary: apply_a2l_done path=prg.s19
+INFO     s19tui:app.py:19575 Memory Map updated. ranges=11
+INFO     s19tui:app.py:18739 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_r_fb_save_8_1_refused_hom0/.s19tool/workarea/proj1/prg.s19 file_type=s19 elapsed_seconds=1.235 has_mac=False precomputed=False
+________________ test_r_whelp_24_2_coverage_reads_typed_ranges _________________
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2993 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_24_2_coverage_rea0 workarea=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_whelp_24_2_coverage_rea0/.s19tool/workarea
+INFO     s19tui:app.py:8808 Workarea refreshed. files=0
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.014
+___________________ test_r_tui_062_10_1_1_map_key_line_text ____________________
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2993 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_tui_062_10_1_1_map_key_0 workarea=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_tui_062_10_1_1_map_key_0/.s19tool/workarea
+INFO     s19tui:app.py:8808 Workarea refreshed. files=0
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.014
+____________________ test_r_fx_set_15_1_refused_home_status ____________________
+[gw3] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2993 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_r_fx_set_15_1_refused_hom0 workarea=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_r_fx_set_15_1_refused_hom0/.s19tool/workarea
+INFO     s19tui:app.py:8808 Workarea refreshed. files=0
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.010
+WARNING  s19tui:app.py:14399 Project proj1: no project.json project.json (None)
+INFO     s19tui:app.py:14644 Load phase boundary: parse_branch_entry path=prg.s19 suffix=.s19
+INFO     s19tui:app.py:19220 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_r_fx_set_15_1_refused_hom0/.s19tool/workarea/proj1/prg.s19 addresses=3968 range_count=11 range_bytes=3968 errors=0
+INFO     s19tui:app.py:14661 Load phase boundary: parse_branch_done path=prg.s19 branch=s19
+INFO     s19tui:app.py:18681 Load phase boundary: apply_install_state path=prg.s19 precomputed=False
+INFO     s19tui:app.py:14597 Project loaded. name=proj1 file=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_r_fx_set_15_1_refused_hom0/.s19tool/workarea/proj1/prg.s19 mac=None
+INFO     s19tui:app.py:19348 Sections updated. count=11 rendered_ranges=11 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18697 Load phase boundary: apply_sections_done path=prg.s19
+INFO     s19tui:app.py:18709 Load phase boundary: apply_hex_done path=prg.s19
+INFO     s19tui:app.py:20368 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18169 MAC validation computed: records=0 issues=0 elapsed_seconds=0.003
+INFO     s19tui:app.py:18224 MAC row cache built: records=0 elapsed_seconds=0.003
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:19882 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.015
+INFO     s19tui:app.py:18722 Load phase boundary: apply_a2l_done path=prg.s19
+INFO     s19tui:app.py:19575 Memory Map updated. ranges=11
+INFO     s19tui:app.py:18739 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_r_fx_set_15_1_refused_hom0/.s19tool/workarea/proj1/prg.s19 file_type=s19 elapsed_seconds=1.002 has_mac=False precomputed=False
+___________ test_r_tui_062_10_1_2_named_actions_are_the_handled_ones ___________
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2993 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_tui_062_10_1_2_named_ac0 workarea=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_tui_062_10_1_2_named_ac0/.s19tool/workarea
+INFO     s19tui:app.py:8808 Workarea refreshed. files=0
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.014
+INFO     s19tui:app.py:19575 Memory Map updated. ranges=4
+INFO     s19tui:app.py:19687 Hex view focused at 0x08000400
+__________________ test_r_legend_011_1_region_row_field_line ___________________
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2993 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_legend_011_1_region_row0 workarea=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_legend_011_1_region_row0/.s19tool/workarea
+INFO     s19tui:app.py:8808 Workarea refreshed. files=0
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:18316 Loading file: path=<HOME>/work/s19_i9c_eng/examples/case_07_stress_smoke/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14644 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:19220 Load summary: file_type=s19 path=<HOME>/work/s19_i9c_eng/examples/case_07_stress_smoke/firmware.s19 addresses=1024 range_count=4 range_bytes=1024 errors=0
+INFO     s19tui:app.py:14661 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18681 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:19348 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18697 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18709 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:20368 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18169 MAC validation computed: records=0 issues=0 elapsed_seconds=0.001
+INFO     s19tui:app.py:18224 MAC row cache built: records=0 elapsed_seconds=0.001
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:19882 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.012
+INFO     s19tui:app.py:18722 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:19575 Memory Map updated. ranges=4
+INFO     s19tui:app.py:18739 Loaded file successfully: path=<HOME>/work/s19_i9c_eng/examples/case_07_stress_smoke/firmware.s19 file_type=s19 elapsed_seconds=0.520 has_mac=False precomputed=False
+________________ test_at_i9_1_confirm_report_says_confirm_rerun ________________
+[gw3] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2993 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_at_i9_1_confirm_report_sa0 workarea=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_at_i9_1_confirm_report_sa0/.s19tool/workarea
+INFO     s19tui:app.py:8808 Workarea refreshed. files=0
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.014
+WARNING  s19tui:app.py:14399 Project proj1: no project.json project.json (None)
+INFO     s19tui:app.py:14644 Load phase boundary: parse_branch_entry path=prg.s19 suffix=.s19
+INFO     s19tui:app.py:19220 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_at_i9_1_confirm_report_sa0/.s19tool/workarea/proj1/prg.s19 addresses=3968 range_count=11 range_bytes=3968 errors=0
+INFO     s19tui:app.py:14661 Load phase boundary: parse_branch_done path=prg.s19 branch=s19
+INFO     s19tui:app.py:18681 Load phase boundary: apply_install_state path=prg.s19 precomputed=False
+INFO     s19tui:app.py:14597 Project loaded. name=proj1 file=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_at_i9_1_confirm_report_sa0/.s19tool/workarea/proj1/prg.s19 mac=None
+INFO     s19tui:app.py:19348 Sections updated. count=11 rendered_ranges=11 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18697 Load phase boundary: apply_sections_done path=prg.s19
+INFO     s19tui:app.py:18709 Load phase boundary: apply_hex_done path=prg.s19
+INFO     s19tui:app.py:20368 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18169 MAC validation computed: records=0 issues=0 elapsed_seconds=0.006
+INFO     s19tui:app.py:18224 MAC row cache built: records=0 elapsed_seconds=0.007
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.017
+INFO     s19tui:app.py:19882 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.026
+INFO     s19tui:app.py:18722 Load phase boundary: apply_a2l_done path=prg.s19
+INFO     s19tui:app.py:19575 Memory Map updated. ranges=11
+INFO     s19tui:app.py:18739 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_at_i9_1_confirm_report_sa0/.s19tool/workarea/proj1/prg.s19 file_type=s19 elapsed_seconds=1.007 has_mac=False precomputed=False
+__________ test_at_b99_04_duplicate_refused_distinct_parallel_markers __________
+[gw5] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2993 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_at_b99_04_duplicate_refus0 workarea=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_at_b99_04_duplicate_refus0/.s19tool/workarea
+INFO     s19tui:app.py:8808 Workarea refreshed. files=0
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.014
+INFO     s19tui:app.py:8955 Load project action triggered.
+INFO     s19tui:app.py:15939 Load phase boundary: modal_dismiss_scheduled kind=project value='proj'
+WARNING  s19tui:app.py:14399 Project proj: no project.json project.json (None)
+INFO     s19tui:app.py:14644 Load phase boundary: parse_branch_entry path=base0.s19 suffix=.s19
+INFO     s19tui:app.py:19220 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_at_b99_04_duplicate_refus0/.s19tool/workarea/proj/base0.s19 addresses=1 range_count=1 range_bytes=1 errors=0
+INFO     s19tui:app.py:14661 Load phase boundary: parse_branch_done path=base0.s19 branch=s19
+INFO     s19tui:app.py:18681 Load phase boundary: apply_install_state path=base0.s19 precomputed=False
+INFO     s19tui:app.py:14597 Project loaded. name=proj file=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_at_b99_04_duplicate_refus0/.s19tool/workarea/proj/base0.s19 mac=None
+INFO     s19tui:app.py:19348 Sections updated. count=1 rendered_ranges=1 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18697 Load phase boundary: apply_sections_done path=base0.s19
+INFO     s19tui:app.py:18709 Load phase boundary: apply_hex_done path=base0.s19
+INFO     s19tui:app.py:20368 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18169 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18224 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.015
+INFO     s19tui:app.py:19882 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.017
+INFO     s19tui:app.py:18722 Load phase boundary: apply_a2l_done path=base0.s19
+INFO     s19tui:app.py:19575 Memory Map updated. ranges=1
+INFO     s19tui:app.py:18739 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_at_b99_04_duplicate_refus0/.s19tool/workarea/proj/base0.s19 file_type=s19 elapsed_seconds=0.751 has_mac=False precomputed=False
+_______________ test_r_tui_062_10_1_3_k_paints_the_map_keys_line _______________
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2993 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_tui_062_10_1_3_k_paints0 workarea=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_tui_062_10_1_3_k_paints0/.s19tool/workarea
+INFO     s19tui:app.py:8808 Workarea refreshed. files=0
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:18316 Loading file: path=<HOME>/work/s19_i9c_eng/examples/case_07_stress_smoke/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14644 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:19220 Load summary: file_type=s19 path=<HOME>/work/s19_i9c_eng/examples/case_07_stress_smoke/firmware.s19 addresses=1024 range_count=4 range_bytes=1024 errors=0
+INFO     s19tui:app.py:14661 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18681 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:19348 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18697 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18709 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:20368 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18169 MAC validation computed: records=0 issues=0 elapsed_seconds=0.002
+INFO     s19tui:app.py:18224 MAC row cache built: records=0 elapsed_seconds=0.002
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.016
+INFO     s19tui:app.py:19882 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.019
+INFO     s19tui:app.py:18722 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:19575 Memory Map updated. ranges=4
+INFO     s19tui:app.py:18739 Loaded file successfully: path=<HOME>/work/s19_i9c_eng/examples/case_07_stress_smoke/firmware.s19 file_type=s19 elapsed_seconds=0.842 has_mac=False precomputed=False
+__________ test_tc_b99_ux_c10_save_project_filename_renders_literally __________
+[gw5] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2993 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_ux_c10_save_projec0 workarea=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_ux_c10_save_projec0/.s19tool/workarea
+INFO     s19tui:app.py:8808 Workarea refreshed. files=0
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.014
+INFO     s19tui:app.py:15984 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_ux_c10_save_projec0/[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:16005 Load phase boundary: copy_started path=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_ux_c10_save_projec0/[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:16018 Load phase boundary: copy_done path=[red]x[@click=app.quit].s19 elapsed=0.001s
+WARNING  s19tui:app.py:16037 Recent sources not updated: '/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_ux_c10_save_projec0/[red]x[@click=app.quit].s19'
+INFO     s19tui:app.py:8808 Workarea refreshed. files=1
+INFO     s19tui:app.py:16055 File copied to temp: path=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_ux_c10_save_projec0/.s19tool/workarea/temp/[red]x[@click=app.quit].s19 size_bytes=35 copy_seconds=0.001
+INFO     s19tui:app.py:16061 Load phase boundary: worker_spawned path=[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:19004 Load phase boundary: worker_parse_start path=[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:18316 Loading file: path=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_ux_c10_save_projec0/.s19tool/workarea/temp/[red]x[@click=app.quit].s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14644 Load phase boundary: parse_branch_entry path=[red]x[@click=app.quit].s19 suffix=.s19
+INFO     s19tui:app.py:19220 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_ux_c10_save_projec0/.s19tool/workarea/temp/[red]x[@click=app.quit].s19 addresses=1 range_count=1 range_bytes=1 errors=0
+INFO     s19tui:app.py:14661 Load phase boundary: parse_branch_done path=[red]x[@click=app.quit].s19 branch=s19
+INFO     s19tui:app.py:19023 Load phase boundary: worker_parse_done path=[red]x[@click=app.quit].s19 elapsed=0.095s
+INFO     s19tui:app.py:18847 Load phase boundary: prepare_entry path=[red]x[@click=app.quit].s19 file_type=s19
+INFO     s19tui:app.py:18882 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:18169 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18891 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:18911 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:18918 Load phase boundary: prepare_bases_done row_bases=1
+INFO     s19tui:app.py:18928 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:18934 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:19056 Load phase boundary: worker_compute_done path=[red]x[@click=app.quit].s19 precomputed=True elapsed=0.001s
+INFO     s19tui:app.py:19063 Load phase boundary: call_from_thread_apply_dispatched path=[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:18681 Load phase boundary: apply_install_state path=[red]x[@click=app.quit].s19 precomputed=True
+INFO     s19tui:app.py:19348 Sections updated. count=1 rendered_ranges=1 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18697 Load phase boundary: apply_sections_done path=[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:18709 Load phase boundary: apply_hex_done path=[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:20368 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.014
+INFO     s19tui:app.py:19882 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.016
+INFO     s19tui:app.py:18722 Load phase boundary: apply_a2l_done path=[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:19575 Memory Map updated. ranges=1
+INFO     s19tui:app.py:18739 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_ux_c10_save_projec0/.s19tool/workarea/temp/[red]x[@click=app.quit].s19 file_type=s19 elapsed_seconds=0.640 has_mac=False precomputed=True
+INFO     s19tui:app.py:8890 Save project action triggered for /tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_ux_c10_save_projec0/.s19tool/workarea/temp/[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:11524 Save project canceled.
+WARNING  s19tui:app.py:11571 Save project refused: Project NOT saved: source file missing: [red]x[@click=app.quit].s19 — reload it or remove it from the project.
+_______________ test_r_legend_011_2_changed_lines_fit_the_floor ________________
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2993 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_legend_011_2_changed_li0 workarea=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_legend_011_2_changed_li0/.s19tool/workarea
+INFO     s19tui:app.py:8808 Workarea refreshed. files=0
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:18316 Loading file: path=<HOME>/work/s19_i9c_eng/examples/case_07_stress_smoke/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14644 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:19220 Load summary: file_type=s19 path=<HOME>/work/s19_i9c_eng/examples/case_07_stress_smoke/firmware.s19 addresses=1024 range_count=4 range_bytes=1024 errors=0
+INFO     s19tui:app.py:14661 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18681 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:19348 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18697 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18709 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:20368 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18169 MAC validation computed: records=0 issues=0 elapsed_seconds=0.001
+INFO     s19tui:app.py:18224 MAC row cache built: records=0 elapsed_seconds=0.002
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.015
+INFO     s19tui:app.py:19882 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.019
+INFO     s19tui:app.py:18722 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:19575 Memory Map updated. ranges=4
+INFO     s19tui:app.py:18739 Loaded file successfully: path=<HOME>/work/s19_i9c_eng/examples/case_07_stress_smoke/firmware.s19 file_type=s19 elapsed_seconds=0.572 has_mac=False precomputed=False
+_______________ test_r_tst_042_margin_report_is_a_test_property ________________
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+----------------------------- Captured stdout call -----------------------------
+running: /data/miniconda3/envs/s19ci/bin/python -mpytest --basetemp=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_tst_042_margin_report_is_a_test_property0/runpytest-0 -p no:cacheprovider --junitxml=junit.xml
+     in: /tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_tst_042_margin_report_is_a_test_property0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0
+rootdir: /tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_tst_042_margin_report_is_a_test_property0
+plugins: platformdirs-4.14.3, xdist-3.8.0
+collected 1 item
+
+test_margin_property.py .                                                [100%]
+
+- generated xml file: /tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_tst_042_margin_report_is_a_test_property0/junit.xml -
+============================= QC-TM timing margins =============================
+LOW 15.0%  0.850 s / 1.000 s  p  test_margin_property.py::test_arm
+QC-TM: 1 bounds, 1 under 20 % margin
+============================== 1 passed in 0.03s ===============================
+_______________ test_r_tst_043_045_qc_tm_section_rows_and_count ________________
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+----------------------------- Captured stdout call -----------------------------
+running: /data/miniconda3/envs/s19ci/bin/python -mpytest --basetemp=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_tst_043_045_qc_tm_section_rows_and_count0/runpytest-0 -p no:cacheprovider
+     in: /tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_tst_043_045_qc_tm_section_rows_and_count0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0
+rootdir: /tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_tst_043_045_qc_tm_section_rows_and_count0
+plugins: platformdirs-4.14.3, xdist-3.8.0
+collected 3 items
+
+test_qc_tm_rows.py ...                                                   [100%]
+============================= QC-TM timing margins =============================
+LOW 15.0%  0.850 s / 1.000 s  b  test_qc_tm_rows.py::test_b
+25.0%  0.750 s / 1.000 s  c  test_qc_tm_rows.py::test_c
+40.0%  0.600 s / 1.000 s  a  test_qc_tm_rows.py::test_a
+QC-TM: 3 bounds, 1 under 20 % margin
+
+============================== 3 passed in 0.02s ===============================
+_____________ test_r_tst_043_2_teardown_error_report_gives_one_row _____________
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+----------------------------- Captured stdout call -----------------------------
+running: /data/miniconda3/envs/s19ci/bin/python -mpytest --basetemp=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_tst_043_2_teardown_error_report_gives_one_row0/runpytest-0 -p no:cacheprovider
+     in: /tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_tst_043_2_teardown_error_report_gives_one_row0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0
+rootdir: /tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_tst_043_2_teardown_error_report_gives_one_row0
+plugins: platformdirs-4.14.3, xdist-3.8.0
+collected 1 item
+
+test_teardown_row.py .E                                                  [100%]
+
+==================================== ERRORS ====================================
+________________________ ERROR at teardown of test_arm _________________________
+
+    @pytest.fixture
+    def _boom():
+        yield
+>       raise RuntimeError("teardown boom")
+E       RuntimeError: teardown boom
+
+test_teardown_row.py:7: RuntimeError
+============================= QC-TM timing margins =============================
+LOW 15.0%  0.850 s / 1.000 s  e  test_teardown_row.py::test_arm
+QC-TM: 1 bounds, 1 under 20 % margin
+=========================== short test summary info ============================
+ERROR test_teardown_row.py::test_arm - RuntimeError: teardown boom
+========================== 1 passed, 1 error in 0.03s ==========================
+_______________________ test_r_tst_044_low_margin_prefix _______________________
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+----------------------------- Captured stdout call -----------------------------
+running: /data/miniconda3/envs/s19ci/bin/python -mpytest --basetemp=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_tst_044_low_margin_prefix0/runpytest-0 -p no:cacheprovider
+     in: /tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_tst_044_low_margin_prefix0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0
+rootdir: /tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_tst_044_low_margin_prefix0
+plugins: platformdirs-4.14.3, xdist-3.8.0
+collected 2 items
+
+test_low_prefix.py ..                                                    [100%]
+============================= QC-TM timing margins =============================
+LOW 15.0%  0.850 s / 1.000 s  b  test_low_prefix.py::test_b
+20.0%  0.800 s / 1.000 s  d  test_low_prefix.py::test_d
+QC-TM: 2 bounds, 1 under 20 % margin
+
+============================== 2 passed in 0.01s ===============================
+____________ test_at_i9_2_resaved_flow_and_long_set_keep_own_names _____________
+[gw3] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2993 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_at_i9_2_resaved_flow_and_0 workarea=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_at_i9_2_resaved_flow_and_0/.s19tool/workarea
+INFO     s19tui:app.py:8808 Workarea refreshed. files=0
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.015
+WARNING  s19tui:app.py:14399 Project proj1: no project.json project.json (None)
+INFO     s19tui:app.py:14644 Load phase boundary: parse_branch_entry path=prg.s19 suffix=.s19
+INFO     s19tui:app.py:19220 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_at_i9_2_resaved_flow_and_0/.s19tool/workarea/proj1/prg.s19 addresses=3968 range_count=11 range_bytes=3968 errors=0
+INFO     s19tui:app.py:14661 Load phase boundary: parse_branch_done path=prg.s19 branch=s19
+INFO     s19tui:app.py:18681 Load phase boundary: apply_install_state path=prg.s19 precomputed=False
+INFO     s19tui:app.py:14597 Project loaded. name=proj1 file=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_at_i9_2_resaved_flow_and_0/.s19tool/workarea/proj1/prg.s19 mac=None
+INFO     s19tui:app.py:19348 Sections updated. count=11 rendered_ranges=11 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18697 Load phase boundary: apply_sections_done path=prg.s19
+INFO     s19tui:app.py:18709 Load phase boundary: apply_hex_done path=prg.s19
+INFO     s19tui:app.py:20368 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18169 MAC validation computed: records=0 issues=0 elapsed_seconds=0.003
+INFO     s19tui:app.py:18224 MAC row cache built: records=0 elapsed_seconds=0.003
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.011
+INFO     s19tui:app.py:19882 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.016
+INFO     s19tui:app.py:18722 Load phase boundary: apply_a2l_done path=prg.s19
+INFO     s19tui:app.py:19575 Memory Map updated. ranges=11
+INFO     s19tui:app.py:18739 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_at_i9_2_resaved_flow_and_0/.s19tool/workarea/proj1/prg.s19 file_type=s19 elapsed_seconds=1.108 has_mac=False precomputed=False
+_________________ test_r_tst_046_over_bound_arm_still_reports __________________
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+----------------------------- Captured stdout call -----------------------------
+running: /data/miniconda3/envs/s19ci/bin/python -mpytest --basetemp=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_tst_046_over_bound_arm_still_reports0/runpytest-0 -p no:cacheprovider
+     in: /tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_tst_046_over_bound_arm_still_reports0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0
+rootdir: /tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_tst_046_over_bound_arm_still_reports0
+plugins: platformdirs-4.14.3, xdist-3.8.0
+collected 1 item
+
+test_over_bound.py F                                                     [100%]
+
+=================================== FAILURES ===================================
+__________________________________ test_over ___________________________________
+
+    def test_over():
+        from tests.support.timing import report_margin
+>       assert 1.2 < report_margin("o", 1.2, 1.0)
+E       AssertionError: assert 1.2 < 1.0
+E        +  where 1.0 = <function report_margin at 0x7f1cf2efe660>('o', 1.2, 1.0)
+
+test_over_bound.py:3: AssertionError
+============================= QC-TM timing margins =============================
+LOW -20.0%  1.200 s / 1.000 s  o  test_over_bound.py::test_over
+QC-TM: 1 bounds, 1 under 20 % margin
+=========================== short test summary info ============================
+FAILED test_over_bound.py::test_over - AssertionError: assert 1.2 < 1.0
+============================== 1 failed in 0.04s ===============================
+__________ test_tc_b99_ux_c10_placement_error_path_renders_literally ___________
+[gw5] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2993 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_ux_c10_placement_e0 workarea=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_ux_c10_placement_e0/.s19tool/workarea
+INFO     s19tui:app.py:8808 Workarea refreshed. files=0
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:15984 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_ux_c10_placement_e0/[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:16005 Load phase boundary: copy_started path=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_ux_c10_placement_e0/[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:16018 Load phase boundary: copy_done path=[red]x[@click=app.quit].s19 elapsed=0.001s
+WARNING  s19tui:app.py:16037 Recent sources not updated: '/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_ux_c10_placement_e0/[red]x[@click=app.quit].s19'
+INFO     s19tui:app.py:8808 Workarea refreshed. files=1
+INFO     s19tui:app.py:16055 File copied to temp: path=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_ux_c10_placement_e0/.s19tool/workarea/temp/[red]x[@click=app.quit].s19 size_bytes=35 copy_seconds=0.001
+INFO     s19tui:app.py:16061 Load phase boundary: worker_spawned path=[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:19004 Load phase boundary: worker_parse_start path=[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:18316 Loading file: path=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_ux_c10_placement_e0/.s19tool/workarea/temp/[red]x[@click=app.quit].s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14644 Load phase boundary: parse_branch_entry path=[red]x[@click=app.quit].s19 suffix=.s19
+INFO     s19tui:app.py:19220 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_ux_c10_placement_e0/.s19tool/workarea/temp/[red]x[@click=app.quit].s19 addresses=1 range_count=1 range_bytes=1 errors=0
+INFO     s19tui:app.py:14661 Load phase boundary: parse_branch_done path=[red]x[@click=app.quit].s19 branch=s19
+INFO     s19tui:app.py:19023 Load phase boundary: worker_parse_done path=[red]x[@click=app.quit].s19 elapsed=0.089s
+INFO     s19tui:app.py:18847 Load phase boundary: prepare_entry path=[red]x[@click=app.quit].s19 file_type=s19
+INFO     s19tui:app.py:18882 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:18169 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18891 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:18911 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:18918 Load phase boundary: prepare_bases_done row_bases=1
+INFO     s19tui:app.py:18928 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:18934 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:19056 Load phase boundary: worker_compute_done path=[red]x[@click=app.quit].s19 precomputed=True elapsed=0.001s
+INFO     s19tui:app.py:19063 Load phase boundary: call_from_thread_apply_dispatched path=[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:18681 Load phase boundary: apply_install_state path=[red]x[@click=app.quit].s19 precomputed=True
+INFO     s19tui:app.py:19348 Sections updated. count=1 rendered_ranges=1 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18697 Load phase boundary: apply_sections_done path=[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:18709 Load phase boundary: apply_hex_done path=[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:20368 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.015
+INFO     s19tui:app.py:19882 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.017
+INFO     s19tui:app.py:18722 Load phase boundary: apply_a2l_done path=[red]x[@click=app.quit].s19
+INFO     s19tui:app.py:19575 Memory Map updated. ranges=1
+INFO     s19tui:app.py:18739 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_ux_c10_placement_e0/.s19tool/workarea/temp/[red]x[@click=app.quit].s19 file_type=s19 elapsed_seconds=0.316 has_mac=False precomputed=True
+INFO     s19tui:app.py:8890 Save project action triggered for /tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_ux_c10_placement_e0/.s19tool/workarea/temp/[red]x[@click=app.quit].s19
+WARNING  s19tui:app.py:12868 Project save placement failed: Not saved: [red]x[@click=app.quit].s19 in /tmp/pytest-of-<user>/pytest-310/popen-gw5/test_tc_b99_ux_c10_placement_e0/.s19tool/workarea/proj is still locked after 5 retries, another program may hold it — close it and retry. Nothing written.
+____________________ test_at_i9_3_linked_homes_refuse_saves ____________________
+[gw3] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2993 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_at_i9_3_linked_homes_refu0 workarea=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_at_i9_3_linked_homes_refu0/.s19tool/workarea
+INFO     s19tui:app.py:8808 Workarea refreshed. files=0
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.012
+WARNING  s19tui:app.py:14399 Project proj1: no project.json project.json (None)
+INFO     s19tui:app.py:14644 Load phase boundary: parse_branch_entry path=prg.s19 suffix=.s19
+INFO     s19tui:app.py:19220 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_at_i9_3_linked_homes_refu0/.s19tool/workarea/proj1/prg.s19 addresses=3968 range_count=11 range_bytes=3968 errors=0
+INFO     s19tui:app.py:14661 Load phase boundary: parse_branch_done path=prg.s19 branch=s19
+INFO     s19tui:app.py:18681 Load phase boundary: apply_install_state path=prg.s19 precomputed=False
+INFO     s19tui:app.py:14597 Project loaded. name=proj1 file=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_at_i9_3_linked_homes_refu0/.s19tool/workarea/proj1/prg.s19 mac=None
+INFO     s19tui:app.py:19348 Sections updated. count=11 rendered_ranges=11 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18697 Load phase boundary: apply_sections_done path=prg.s19
+INFO     s19tui:app.py:18709 Load phase boundary: apply_hex_done path=prg.s19
+INFO     s19tui:app.py:20368 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.002
+INFO     s19tui:app.py:18169 MAC validation computed: records=0 issues=0 elapsed_seconds=0.007
+INFO     s19tui:app.py:18224 MAC row cache built: records=0 elapsed_seconds=0.007
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.035
+INFO     s19tui:app.py:19882 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.047
+INFO     s19tui:app.py:18722 Load phase boundary: apply_a2l_done path=prg.s19
+INFO     s19tui:app.py:19575 Memory Map updated. ranges=11
+INFO     s19tui:app.py:18739 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-310/popen-gw3/test_at_i9_3_linked_homes_refu0/.s19tool/workarea/proj1/prg.s19 file_type=s19 elapsed_seconds=1.024 has_mac=False precomputed=False
+______________ test_r_tst_050_status_log_keeps_every_painted_line ______________
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2993 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_tst_050_status_log_keep0/app workarea=/tmp/pytest-of-<user>/pytest-310/popen-gw2/test_r_tst_050_status_log_keep0/app/.s19tool/workarea
+INFO     s19tui:app.py:8808 Workarea refreshed. files=0
+INFO     s19tui:app.py:17080 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.014
+=========================== short test summary info ============================
+PASSED tests/test_b101_flow_saves.py::test_r_flow_file_11_3_linked_project_folder_saves_nothing
+PASSED tests/test_b101_flow_saves.py::test_r_flow_file_14_11_hard_link_at_the_name_gets_no_byte[flow]
+PASSED tests/test_b101_flow_saves.py::test_r_flow_file_12_2_clash_file_holds_its_stem
+PASSED tests/test_b101_flow_saves.py::test_r_flow_file_14_6_saved_file_mode_matches_write_text[flow]
+PASSED tests/test_b99_staging.py::test_tc_b99_13_symlink_target_is_never_reused
+PASSED tests/test_b101_flow_saves.py::test_r_flow_set_7_1_home_linked_outside_saves_nothing
+PASSED tests/test_b99_staging.py::test_tc_b99_11_same_name_save_back_keeps_work_copy
+PASSED tests/test_b101_flow_saves.py::test_r_flow_file_14_11_hard_link_at_the_name_gets_no_byte[set]
+PASSED tests/test_b101_flow_saves.py::test_r_flow_file_12_3_cleaned_name_is_written
+PASSED tests/test_b101_flow_saves.py::test_r_flow_set_7_2_home_linked_inside_saves_nothing
+PASSED tests/test_b99_staging.py::test_tc_b99_11_junction_at_staging_temp_is_refused
+PASSED tests/test_b101_flow_saves.py::test_r_flow_file_14_6_saved_file_mode_matches_write_text[set]
+PASSED tests/test_b101_flow_saves.py::test_r_flow_file_12_4_stem_of_64_is_whole
+PASSED tests/test_b101_flow_saves.py::test_r_flow_file_14_1_dangling_link_gets_no_file
+PASSED tests/test_b99_staging.py::test_tc_b99_11_dangling_junction_at_staging_temp_is_refused
+PASSED tests/test_b101_flow_saves.py::test_r_flow_file_14_7_link_to_a_sibling_in_the_home_gets_no_byte[flow]
+PASSED tests/test_b101_flow_saves.py::test_r_flow_file_14_2_link_to_file_is_not_written
+PASSED tests/test_b101_flow_saves.py::test_r_flow_file_13_1_long_stem_is_cut_to_64
+PASSED tests/test_b101_flow_saves.py::test_r_flow_file_14_7_link_to_a_sibling_in_the_home_gets_no_byte[set]
+PASSED tests/test_b101_flow_saves.py::test_r_flow_file_14_3_no_create_on_a_taken_name
+PASSED tests/test_b101_flow_saves.py::test_r_flow_file_13_1_control_whole_65_name_is_refused_by_loader
+PASSED tests/test_b101_flow_saves.py::test_r_flow_file_14_8_claim_error_arms[render]
+PASSED tests/test_b101_flow_saves.py::test_r_flow_file_14_4_followed_create_gets_no_byte
+PASSED tests/test_b101_flow_saves.py::test_r_flow_file_13_2_clash_suffix_is_cut
+PASSED tests/test_b101_flow_saves.py::test_r_flow_file_14_8_claim_error_arms[write]
+PASSED tests/test_b101_flow_saves.py::test_r_flow_file_14_5_swapped_home_gets_no_byte
+PASSED tests/test_b101_flow_saves.py::test_r_flow_set_9_1_cleaned_name_is_written
+PASSED tests/test_b101_flow_saves.py::test_r_flow_file_14_8_claim_error_arms[lstat]
+PASSED tests/test_b101_flow_saves.py::test_r_flow_set_8_1_dangling_link_gets_no_file
+PASSED tests/test_b101_flow_saves.py::test_r_flow_set_9_2_clash_file_holds_its_stem
+PASSED tests/test_b101_flow_saves.py::test_r_flow_file_14_8_claim_error_arms[taken-by-folder]
+PASSED tests/test_b101_flow_saves.py::test_r_flow_set_8_2_link_to_file_is_not_written
+PASSED tests/test_b101_flow_saves.py::test_r_flow_set_10_1_long_stem_is_cut_to_64
+PASSED tests/test_b101_flow_saves.py::test_r_flow_file_14_9_repointed_home_keeps_the_file_elsewhere[flow]
+PASSED tests/test_b101_flow_saves.py::test_r_flow_set_8_3_no_create_on_a_taken_name
+PASSED tests/test_b101_flow_saves.py::test_r_flow_set_10_1_control_whole_65_name_is_refused_by_loader
+PASSED tests/test_b101_flow_saves.py::test_r_flow_file_14_9_repointed_home_keeps_the_file_elsewhere[set]
+PASSED tests/test_b101_flow_saves.py::test_r_flow_file_11_1_home_linked_outside_saves_nothing
+PASSED tests/test_b101_flow_saves.py::test_r_flow_set_8_4_followed_create_gets_no_byte
+PASSED tests/test_b101_flow_saves.py::test_r_flow_file_14_10_other_file_at_the_name_gets_no_byte[flow]
+PASSED tests/test_b101_flow_saves.py::test_r_flow_file_11_2_home_linked_inside_saves_nothing
+PASSED tests/test_b101_flow_saves.py::test_r_flow_file_14_10_other_file_at_the_name_gets_no_byte[set]
+PASSED tests/test_b99_staging.py::test_tc_b99_15_distinct_names_run
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_12_3_no_stale_claim
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_24_1_crc_step_names_typed_ranges
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_25_1_crc_template_line_names_a_crc_config
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_26_1_flow_help_says_designer_template_refused
+PASSED tests/test_b99_staging.py::test_tc_b99_16_corrupted_write_out_is_error_naming_address
+PASSED tests/test_b99_staging.py::test_tc_b99_16_intact_write_out_is_ok
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_13_1_no_reference_to_unopenable_things
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_13_2_named_folders_are_the_apps
+PASSED tests/test_b99_staging.py::test_tc_b99_13_gather_drift_places_next_free_name
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_14_1_no_markdown_marks
+PASSED tests/test_b99_staging.py::test_tc_b99_13_unchanged_resave_after_drift_adds_no_duplicate
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_18_1_reports_step_names_one_markdown_file
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_19_1_reports_step_names_saved_regions
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_20_1_a2l_step_names_the_ascii_search
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_21_1_split_step_names_the_loaded_image
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_22_1_split_step_names_the_file_names
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_23_1_checks_step_names_outcome_groups
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_2_2_remedy_restores_old_value
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_3_1_before_after_report_stated
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_4_1_external_copy_stated
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_5_1_markdown_escaping_stated
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_6_1_whole_hex_windows_stated
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_7_1_deleted_project_folder_stated
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_8_1_climbing_path_refusal_stated
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_9_1_relative_output_under_project_stated
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_10_1_reports_name_the_copy_stated
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_11_1_crc_config_reasons_stated
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_12_1_failed_write_leaves_nothing_stated
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_13_1_visible_replacements_stated
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_14_1_part_file_safe_to_delete_stated
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-1]
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-2]
+PASSED tests/test_b99_staging.py::test_tc_b99_39_delete_calls_delete_only_owned_staging
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-3]
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-4]
+PASSED tests/test_b99_staging.py::test_tc_b99_44_change_document_stages_in_private_home
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-5]
+PASSED tests/test_b99_staging.py::test_tc_b99_44_junction_at_staging_temp_is_refused
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-6]
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-7]
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-8]
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-9]
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-10]
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-11]
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_9_named_bullets_hold_the_1_0_0_phrases
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_12_capture_notes_beside_their_captures
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_guide_2_1_fixed_rows_marked
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_guide_2_2_no_other_row_marked
+PASSED tests/test_address_census.py::test_at_b83_01_computed_address_is_recognised
+PASSED tests/test_address_census.py::test_at_b83_02_format_spec_is_not_a_selector
+PASSED tests/test_address_census.py::test_at_b83_02_hex_colour_is_classified_not_dropped
+PASSED tests/test_address_census.py::test_at_b83_03_prose_is_not_a_selector[title = f"## Variant: {name}"]
+PASSED tests/test_address_census.py::test_at_b83_03_prose_is_not_a_selector[msg = f"... {n} more ranges (see log)"]
+PASSED tests/test_address_census.py::test_at_b83_03_prose_is_not_a_selector[head = f"# Report {name}"]
+PASSED tests/test_address_census.py::test_at_b83_03_criterion_requires_identifier_or_interpolation
+PASSED tests/test_address_census.py::test_at_b83_04_taxonomy_does_not_collapse_the_hard_cases
+PASSED tests/test_b99_staging.py::test_tc_b99_12_eight_writers_one_name_zero_mismatches
+PASSED tests/test_b99_staging.py::test_tc_b99_12_forced_permission_error_refuses_cleanly
+PASSED tests/test_b99_staging.py::test_tc_b99_12_directory_squatting_requested_name_takes_next_free
+PASSED tests/test_b99_staging.py::test_tc_b99_12_forced_oserror_in_replace_raises_placement_error
+PASSED tests/test_b99_staging.py::test_tc_b99_12_dangling_symlink_at_requested_name_takes_next_free
+PASSED tests/test_b99_staging.py::test_tc_b99_12_source_vanishes_mid_copy_is_wrapped
+PASSED tests/test_b99_staging.py::test_tc_b99_12_source_bytes_and_mtime_unchanged
+PASSED tests/test_b99_staging.py::test_tc_b99_13_no_final_name_replace_outside_placement
+PASSED tests/test_b99_staging.py::test_tc_b99_13_concurrent_placements_one_name_own_bytes_returned
+PASSED tests/test_b99_staging.py::test_tc_b99_13_zero_byte_target_is_never_reused
+PASSED tests/test_b99_staging.py::test_tc_b99_ux_c10_d7_lane_name_renders_literally
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_12_1_quoted_keys_act_on_the_window
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_18_2_generate_writes_markdown_only
+PASSED tests/test_b101_flow_names_ui.py::test_r_flow_chain_19_1_confirm_writes_one_lane_report
+PASSED tests/test_b99_staging.py::test_tc_b99_14_save_project_missing_source
+PASSED tests/test_address_census.py::test_at_b83_08_tree_holds_no_assembled_selectors
+PASSED tests/test_address_census.py::test_at_b83_10_indirect_address_is_detected_on_a_fixture
+PASSED tests/test_address_census.py::test_at_b83_05_address_params_equals_the_live_derivation
+PASSED tests/test_address_census.py::test_at_b83_05_derivation_is_not_empty
+PASSED tests/test_address_census.py::test_at_b83_06_derivation_still_reaches_the_formerly_hand_declared_six
+PASSED tests/test_address_census.py::test_at_b83_06_type_addressing_is_not_an_address
+PASSED tests/test_address_census.py::test_at_b83_07_keyword_arguments_are_scanned[app.query_one(selector=f"#{widget_id}")]
+PASSED tests/test_address_census.py::test_at_b83_07_keyword_arguments_are_scanned[await pilot.click(widget=f"#{button_id}")]
+PASSED tests/test_address_census.py::test_at_b83_08_assembled_selectors_are_flagged_on_a_fixture[app.query_one("#" + name)-other:BinOp]
+PASSED tests/test_address_census.py::test_at_b83_08_assembled_selectors_are_flagged_on_a_fixture[app.query_one("#%s" % n)-other:BinOp]
+PASSED tests/test_address_census.py::test_at_b83_08_assembled_selectors_are_flagged_on_a_fixture[app.query_one("#{}".format(n))-other:Call]
+PASSED tests/test_b101_flow_names_ui.py::test_r_flow_chain_20_1_parallel_confirm_mode_line
+PASSED tests/test_b99_staging.py::test_tc_b99_14_placement_failure_removes_created_folder
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_19_2_declared_regions_come_from_the_project
+PASSED tests/test_address_census.py::test_at_b83_10_tree_holds_no_indirect_addresses
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_12_2_named_controls_exist
+PASSED tests/test_b101_flow_names_ui.py::test_r_flow_chain_20_2_sequential_confirm_mode_line
+PASSED tests/test_b99_staging.py::test_tc_b99_14_preexisting_folder_survives_placement_failure
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_19_3_declared_regions_keep_the_last_generate
+PASSED tests/test_b101_flow_names_ui.py::test_r_flow_file_12_1_save_after_clear_holds_own_name
+PASSED tests/test_address_census.py::test_at_b83_11_every_derived_name_obeys_the_exclusion_rules
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_20_2_slash_focuses_ascii_search
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_7_2_question_mark_paints_the_approved_copy
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_readme_4_1_no_stale_claim
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_readme_4_2_linked_documents_exist
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_readme_4_3_operations_names_placeholders
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_security_1_1_policy_names_private_path
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_security_2_1_supported_versions
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_security_1_3_readme_links_the_policy
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_1_1_crc_change_stated
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_1_2_stated_value_is_the_engines
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_2_1_remedy_stated
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form3]
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form4]
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form5]
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form6]
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form7]
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_21_2_ranges_come_from_the_loaded_image
+PASSED tests/test_b101_flow_names_ui.py::test_r_flow_file_12_5_lane_report_reads_the_saved_name
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_22_2_naming_line_split_and_join
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_23_2_checks_group_order
+PASSED tests/test_address_census.py::test_at_b83_12_bare_name_rows_carry_their_identifier
+PASSED tests/test_address_census.py::test_at_b83_09_bare_names_are_split_by_measurement
+PASSED tests/test_suite_hygiene.py::test_r_tst_001_serial_timing_marker_is_registered
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-158]
+PASSED tests/test_suite_hygiene.py::test_r_tst_010_pull_request_runs_two_lanes
+PASSED tests/test_suite_hygiene.py::test_r_tst_010_2_injection_ratchet_reads_every_run_line_of_every_job
+PASSED tests/test_suite_hygiene.py::test_r_tst_011_push_runs_two_lanes
+PASSED tests/test_suite_hygiene.py::test_r_tst_012_serial_lane_runs_after_a_red_lane
+PASSED tests/test_suite_hygiene.py::test_r_tst_013_014_ci_checks_out_full_history
+PASSED tests/test_suite_hygiene.py::test_r_tst_013_snapshot_job_changes_only_persist_credentials
+PASSED tests/test_suite_hygiene.py::test_r_tst_015_016_017_ci_time_limits
+PASSED tests/test_suite_hygiene.py::test_r_tst_018_ci_installs_pinned_xdist
+PASSED tests/test_suite_hygiene.py::test_r_tst_020_021_shared_helpers_delegate_to_the_one_wait
+PASSED tests/test_suite_hygiene.py::test_r_tst_021_shared_wait_yields_between_checks
+PASSED tests/test_suite_hygiene.py::test_r_tst_022_settled_pauses_before_its_first_check
+PASSED tests/test_suite_hygiene.py::test_r_tst_023_shared_wait_signatures_are_kept
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W1]
+PASSED tests/test_b99_staging.py::test_at_b99_05_save_project_after_same_name_save_back
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W2]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W3]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W4]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W5]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W6]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W7]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W8]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W9]
+PASSED tests/test_b101_flow_names_ui.py::test_r_fb_save_8_1_refused_home_status
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_24_2_coverage_reads_typed_ranges
+PASSED tests/test_b101_help_legend_docs.py::test_r_tui_062_10_1_1_map_key_line_text
+PASSED tests/test_b101_flow_names_ui.py::test_r_fx_set_15_1_refused_home_status
+PASSED tests/test_suite_hygiene.py::test_r_tst_002_every_timing_arm_carries_serial_timing
+PASSED tests/test_b101_help_legend_docs.py::test_r_tui_062_10_1_2_named_actions_are_the_handled_ones
+PASSED tests/test_suite_hygiene.py::test_r_tst_025_load_project_clock_stops_at_the_install_callback
+PASSED tests/test_b101_help_legend_docs.py::test_r_legend_011_1_region_row_field_line
+PASSED tests/test_b101_flow_names_ui.py::test_at_i9_1_confirm_report_says_confirm_rerun
+PASSED tests/test_b99_staging.py::test_at_b99_04_duplicate_refused_distinct_parallel_markers
+PASSED tests/test_b101_help_legend_docs.py::test_r_tui_062_10_1_3_k_paints_the_map_keys_line
+PASSED tests/test_suite_hygiene.py::test_r_tst_002_2_parallel_lane_collection_prints_no_qc_tm_text
+PASSED tests/test_suite_hygiene.py::test_r_tst_003_an_unmarked_timing_arm_is_named
+PASSED tests/test_suite_hygiene.py::test_r_tst_004_a_marked_non_arm_is_named
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form1]
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form2]
+PASSED tests/test_b99_staging.py::test_tc_b99_ux_c10_save_project_filename_renders_literally
+PASSED tests/test_b101_help_legend_docs.py::test_r_legend_011_2_changed_lines_fit_the_floor
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_readme_2_1_one_section_per_window
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_readme_2_2_rail_table
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_readme_3_1_every_ctx_key_listed
+PASSED tests/test_suite_hygiene.py::test_r_tst_040_4_appended_and_conditional_reads_are_bounds
+PASSED tests/test_suite_hygiene.py::test_r_tst_042_margin_report_is_a_test_property
+PASSED tests/test_suite_hygiene.py::test_r_tst_043_045_qc_tm_section_rows_and_count
+PASSED tests/test_suite_hygiene.py::test_r_tst_043_2_teardown_error_report_gives_one_row
+PASSED tests/test_suite_hygiene.py::test_r_tst_044_low_margin_prefix
+PASSED tests/test_b101_flow_names_ui.py::test_at_i9_2_resaved_flow_and_long_set_keep_own_names
+PASSED tests/test_suite_hygiene.py::test_r_tst_046_over_bound_arm_still_reports
+PASSED tests/test_b99_staging.py::test_tc_b99_ux_c10_placement_error_path_renders_literally
+PASSED tests/test_b99_staging.py::test_tc_b99_15_duplicate_write_out_names_refused
+PASSED tests/test_suite_hygiene.py::test_r_tst_081_golden_takes_the_package_version
+PASSED tests/test_suite_hygiene.py::test_r_tst_082_wrong_version_still_differs
+PASSED tests/test_suite_hygiene.py::test_r_tst_154_155_inc15_arms_wait_through_settled
+PASSED tests/test_suite_hygiene.py::test_r_tst_006_detector_ignores_intervals_no_assert_reads
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-007]
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-030]
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-047]
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-048]
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-052]
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-060]
+PASSED tests/test_b101_flow_names_ui.py::test_at_i9_3_linked_homes_refuse_saves
+PASSED tests/test_suite_hygiene.py::test_r_tst_051_all_line_reader_counts_only_under_minus_one
+PASSED tests/test_id_registry.py::test_tc605_g6_normalized_keys_are_unique
+PASSED tests/test_id_registry.py::test_tc606_g7_no_stem_exceeds_the_high_water_mark
+PASSED tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound
+PASSED tests/test_id_registry.py::test_tc608_tokenizer_and_normalizer_edge_cases
+PASSED tests/test_id_registry.py::test_tc609_registry_file_is_well_formed
+PASSED tests/test_id_registry.py::test_tc610_reservations_are_recorded_and_respected
+PASSED tests/test_id_registry.py::test_at280_registry_and_repository_agree_in_both_directions
+PASSED tests/test_id_registry.py::test_at281_every_guard_rule_can_fail
+PASSED tests/test_engine_unchanged.py::test_tc027_engine_modules_unchanged_vs_main
+PASSED tests/test_docs_canon.py::test_at285_every_readme_named_key_exists_in_the_seat
+PASSED tests/test_docs_canon.py::test_at285_no_live_cdfx_or_s19tool_console_script_token
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_ref_1_1_named_paths_exist
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_ref_1_2_path_scan_reports_a_missing_path
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_ref_2_1_relative_links_resolve
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_ref_2_2_no_link_to_the_diagrams_file
+PASSED tests/test_id_registry.py::test_tc600_g1_every_named_node_id_is_registered
+PASSED tests/test_id_registry.py::test_tc601_g2_live_entries_name_existing_nodes
+PASSED tests/test_id_registry.py::test_tc602_g3_every_citation_is_registered
+PASSED tests/test_id_registry.py::test_tc604_g5_grammar_holds_or_is_registered_legacy
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_ref_3_3_exemptions_are_by_file_and_text
+PASSED tests/test_suite_hygiene.py::test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses
+PASSED tests/test_suite_hygiene.py::test_r_tst_070_3_redaction_gate_names_each_leak_form
+PASSED tests/test_suite_hygiene.py::test_r_tst_080_report_goldens_hold_no_tool_version
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_2_1_cli_examples_run_the_module
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_3_1_ci_sentence_matches_the_workflow
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_4_1_no_tui_hexview_path
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_4_2_hex_renderer_named_at_render
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_5_1_claude_states_no_module_size
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_6_1_claude_cites_no_line_numbers
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_7_1_rules_cite_no_memory_file
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_8_1_requirements_txt_equals_runtime_dependencies
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_8_2_architecture_states_dependencies_and_markers
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_9_1_docs_index_links_every_entry
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_9_2_index_rule_follows_the_tree
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_10_1_docs_index_states_no_project_state
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_11_1_overview_names_every_window
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_12_1_rail_counted_as_twelve
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_12_2_predicates_on_fixed_lines
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_13_1_no_test_count
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_14_1_overview_names_placeholder_operations
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_15_1_manifest_lists_every_case
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_arch_1_1_module_table_covers_python_folders
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_arch_2_1_no_empty_module_prefix
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_arch_3_1_no_amendment_note
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_arch_3_2_no_batch_declaration_heading
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_arch_3_3_no_batch_interface_amendment
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_arch_4_1_submodules_declared
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_arch_4_2_no_broken_import_rule_restated
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_arch_5_1_one_interfaces_table
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_arch_5_2_rail_saved_files_and_frozen_cells
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_arch_6_1_increment_cap_is_four_source_files
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_archive_1_1_notes_only_in_the_archive
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_archive_3_1_no_fast_dev_flow_folder
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_archive_3_2_no_diagrams_file
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_archive_3_3_no_req_crc_in_package
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_archive_3_4_no_unused_example_txt
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_archive_4_1_archive_holds_no_local_identity
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_archive_4_2_scan_reports_a_local_path
+PASSED tests/test_suite_hygiene.py::test_r_tst_050_status_log_keeps_every_painted_line
+PASSED tests/test_suite_hygiene.py::test_r_tst_051_newest_line_waits_do_not_grow
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_ref_3_1_no_fast_dev_flow_path
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_ref_3_2_no_prototypes_path
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_ref_4_1_retired_workflow_named_only_as_retired
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_ref_4_2_exempt_lines_skipped
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_1_1_claude_lists_declared_console_scripts
+PASSED tests/test_suite_hygiene.py::test_r_tst_040_041_every_upper_timing_bound_is_reported
+PASSED tests/test_suite_hygiene.py::test_r_tst_031_032_post_press_and_dwell_arms_keep_their_forms
+PASSED tests/test_suite_hygiene.py::test_r_tst_040_report_margin_returns_the_bound
+PASSED tests/test_suite_hygiene.py::test_r_tst_040_2_report_margin_refuses_unsafe_labels
+PASSED tests/test_suite_hygiene.py::test_r_tst_049_wrap_drift_detector_names_a_dropped_assertion
+PASSED tests/test_suite_hygiene.py::test_r_tst_049_wrapped_arms_change_nothing_else
+PASSED tests/test_suite_hygiene.py::test_r_tst_040_1_base_tree_reports_its_37_bounds
+PASSED tests/test_suite_hygiene.py::test_r_tst_041_margin_guard_names_each_raw_bound
+PASSED tests/test_suite_hygiene.py::test_r_tst_040_3_counts_and_lower_bounds_are_not_bounds
+297 passed in 168.01s (0:02:48)

@@ -12,17 +12,27 @@ elsewhere) and ``os.symlink``; the claim primitive is wrapped at ``os.open``
 (graph interface I-7) for the Create spy, the emulated Windows link-follow and
 the home swap. No source file is edited here.
 
+E5 corrective (``inc-9/E5-rulings.md``): cases R-FLOW-FILE.14/7 … /11 and
+R-FLOW-SET.8/6 … /9 drive each clause of the check after the claim and of its
+cleanup alone (a link to a sibling inside the home, the claim's error arms,
+a home re-pointed before the cleanup, another file and a hard link at the
+name); every symbolic link goes through a named skip, so an account without
+the Windows symlink privilege reports the node not run instead of failing.
+
 Traceability (E4): node names start ``test_r_<row id>_...``.
 """
 from __future__ import annotations
 
+import errno
 import json
 import os
+import re
 from dataclasses import replace
 from pathlib import Path
 
 import pytest
 
+from s19_app.tui.services import flow_persistence_service as fps
 from s19_app.tui.services.flow_model import Flow, SourceBlock
 from s19_app.tui.services.flow_persistence_service import (
     CHAIN_SET_BAD_FIELD,
@@ -66,6 +76,42 @@ def _entries(folder: Path) -> list:
     return sorted(entry.name for entry in folder.iterdir())
 
 
+def _save_kind(project: Path, kind: str):
+    """``(home, stem, save)`` of the flow save (``flows/``, ``z``) or the set save
+    (``flowsets/``, ``s``); ``save(name)`` calls the service with the derived root."""
+    if kind == "flow":
+        return project / "flows", "z", lambda name: save_flow_json(F1, name, project)
+    return project / "flowsets", "s", lambda name: save_chain_set(C1, name, project)
+
+
+def _symlink_or_skip(link: Path, target: Path) -> None:
+    """``os.symlink`` or a named skip (E5 CR-04, the house pattern of
+    ``tests/test_b100_load_dialog.py``): a symbolic link needs a privilege on
+    Windows that an account may not hold, which is no product failure."""
+    try:
+        os.symlink(target, link)
+    except (OSError, NotImplementedError) as exc:
+        pytest.skip(f"os.symlink is unavailable here (reported not run): {exc}")
+
+
+def _require_symlinks(scratch: Path) -> None:
+    """Skip by name before any wrapper is patched when this account cannot make a
+    symbolic link (E5 CR-04): the wrappers make their links inside the product's
+    own ``os.open`` call, where a raise would read as a product failure."""
+    probe = scratch / "symlink-probe"
+    _symlink_or_skip(probe, scratch / "symlink-probe-target")
+    probe.unlink()
+
+
+def _link_points_at(link: Path, target: Path) -> bool:
+    """True when ``link`` is still a symbolic link to ``target`` (``os.readlink``,
+    without the ``\\\\?\\`` prefix Windows adds to an absolute target)."""
+    if not link.is_symlink():
+        return False
+    raw = os.readlink(link)
+    return Path(raw[4:] if raw.startswith("\\\\?\\") else raw) == target
+
+
 def _spy_on_open(monkeypatch) -> list:
     """Create spy: record every path ``os.open`` is called with, then call through."""
     calls: list = []
@@ -79,12 +125,12 @@ def _spy_on_open(monkeypatch) -> list:
     return calls
 
 
-def _windows_follow(monkeypatch, home: Path, outside: Path) -> None:
-    """Emulate Windows ``O_CREAT|O_EXCL`` through a link put in at the free name.
+def _follow_at_create(monkeypatch, home: Path, target: Path, put) -> None:
+    """Emulate Windows ``O_CREAT|O_EXCL`` following an entry put in at the free name.
 
-    The first ``os.open`` on a ``*.json`` directly in ``home`` creates
-    ``<outside>/followed.json``, puts a file link to it at the candidate and
-    returns the descriptor of ``followed.json`` (house finding S-F1).
+    The first ``os.open`` on a ``*.json`` directly in ``home`` creates and opens
+    ``target``, calls ``put(candidate)`` to put an entry at the candidate and
+    returns the descriptor of ``target`` (house finding S-F1).
     """
     real_open = os.open
     state = {"done": False}
@@ -93,17 +139,25 @@ def _windows_follow(monkeypatch, home: Path, outside: Path) -> None:
         candidate = Path(os.fspath(path))
         if not state["done"] and candidate.parent == home and candidate.suffix == ".json":
             state["done"] = True
-            target = outside / "followed.json"
             fd = real_open(target, os.O_CREAT | os.O_WRONLY | getattr(os, "O_BINARY", 0), 0o666)
-            os.symlink(target, candidate)
+            put(candidate)
             return fd
         return real_open(path, flags, *args, **kwargs)
 
     monkeypatch.setattr(os, "open", follow)
 
 
+def _windows_follow(monkeypatch, home: Path, outside: Path, target: Path | None = None) -> None:
+    """The emulated follow through a file link put in at the free name, to
+    ``target`` (default ``<outside>/followed.json``)."""
+    _require_symlinks(outside)
+    followed = target if target is not None else outside / "followed.json"
+    _follow_at_create(monkeypatch, home, followed, lambda candidate: os.symlink(followed, candidate))
+
+
 def _swap_home_for_link(monkeypatch, home: Path, aside: Path, outside: Path) -> None:
     """Between the name check and the create, replace ``home`` by a link to ``outside``."""
+    _require_symlinks(outside)
     real_open = os.open
     state = {"done": False}
 
@@ -116,6 +170,23 @@ def _swap_home_for_link(monkeypatch, home: Path, aside: Path, outside: Path) -> 
         return real_open(path, flags, *args, **kwargs)
 
     monkeypatch.setattr(os, "open", swap)
+
+
+def _repoint_home_at_close(monkeypatch, home: Path, parked: Path, elsewhere: Path) -> None:
+    """At the first ``os.close`` after ``home`` became a link, once the descriptor
+    is closed: move that link to ``parked`` and link ``home`` to ``elsewhere``
+    (probe P9: the home re-pointed between the close and the cleanup)."""
+    real_close = os.close
+    state = {"done": False}
+
+    def close(fd):
+        real_close(fd)
+        if not state["done"] and home.is_symlink():
+            state["done"] = True
+            home.rename(parked)
+            os.symlink(elsewhere, home, target_is_directory=True)
+
+    monkeypatch.setattr(os, "close", close)
 
 
 # ------------------------------------------------- R-FLOW-FILE.12 / .13 names --
@@ -293,7 +364,7 @@ def test_r_flow_set_7_2_home_linked_inside_saves_nothing(area):
 
 def _link_file(home: Path, name: str, target: Path) -> None:
     home.mkdir(parents=True, exist_ok=True)
-    os.symlink(target, home / name)
+    _symlink_or_skip(home / name, target)
 
 
 def test_r_flow_file_14_1_dangling_link_gets_no_file(area):
@@ -303,8 +374,8 @@ def test_r_flow_file_14_1_dangling_link_gets_no_file(area):
     _link_file(project / "flows", "z.json", outside / "dangling" / "z.json")
     saved = save_flow_json(F1, "z", project)
     assert not (outside / "dangling" / "z.json").exists()
-    assert (project / "flows" / "z.json").is_symlink()
-    assert saved.parent == project / "flows" and saved.name.startswith("z_")
+    assert _link_points_at(project / "flows" / "z.json", outside / "dangling" / "z.json")
+    assert saved.parent == project / "flows" and re.fullmatch(r"z_\d+\.json", saved.name)
     assert saved.is_file() and not saved.is_symlink()
 
 
@@ -315,7 +386,9 @@ def test_r_flow_file_14_2_link_to_file_is_not_written(area):
     _link_file(project / "flows", "z.json", outside / "z.json")
     saved = save_flow_json(F1, "z", project)
     assert (outside / "z.json").read_bytes() == b"KKK"
-    assert saved.name.startswith("z_") and saved.is_file() and not saved.is_symlink()
+    assert _link_points_at(project / "flows" / "z.json", outside / "z.json")
+    assert saved.parent == project / "flows" and re.fullmatch(r"z_\d+\.json", saved.name)
+    assert saved.is_file() and not saved.is_symlink()
 
 
 def test_r_flow_file_14_3_no_create_on_a_taken_name(area, monkeypatch):
@@ -328,7 +401,7 @@ def test_r_flow_file_14_3_no_create_on_a_taken_name(area, monkeypatch):
     taken = str(project / "flows" / "z.json")
     assert calls.count(taken) == 0
     assert calls.count(str(saved)) == 1
-    assert saved.name.startswith("z_") and saved.is_file() and not saved.is_symlink()
+    assert re.fullmatch(r"z_\d+\.json", saved.name) and saved.is_file() and not saved.is_symlink()
 
 
 def test_r_flow_file_14_4_followed_create_gets_no_byte(area, monkeypatch):
@@ -345,12 +418,17 @@ def test_r_flow_file_14_4_followed_create_gets_no_byte(area, monkeypatch):
 
 
 def test_r_flow_file_14_5_swapped_home_gets_no_byte(area, monkeypatch):
-    """R-FLOW-FILE.14/5 (E3 R2-1): a home swapped for a link after the name check gets no byte.
+    """R-FLOW-FILE.14/5 (E3 R2-1; E5 SE5-2, CR-09): a home swapped for a link after the name
+    check gets no byte, and the empty claim at the link's target is left where it is.
 
     Under the swap the created file is regular and the same file as the
     descriptor, so only the real-path clause of the check after the claim
-    refuses it. The swap puts in a directory symbolic link (``os.symlink``):
-    it runs on Linux, and on Windows only where that link is permitted.
+    refuses it. Its name now resolves outside the approved home, so the
+    cleanup does not unlink through it (E5 SE5-2): Folder O holds exactly the
+    empty claim (BL-I9-4; mutant M25, the cleanup's real-parent clause
+    dropped, removes it → RED). The swap puts in a directory symbolic link
+    (``os.symlink``): it runs on Linux, and on Windows only where that link is
+    permitted (a named skip otherwise).
     """
     _root, project, outside = area
     home = project / "flows"
@@ -358,9 +436,8 @@ def test_r_flow_file_14_5_swapped_home_gets_no_byte(area, monkeypatch):
     _swap_home_for_link(monkeypatch, home, project / "flows_aside", outside)
     with pytest.raises(WorkareaContainmentError):
         save_flow_json(F1, "z", project)
-    landed = outside / "z.json"
-    assert (not landed.exists()) or landed.stat().st_size == 0
-    assert [e for e in _entries(outside) if e != "z.json"] == []
+    assert _entries(outside) == ["z.json"]
+    assert (outside / "z.json").read_bytes() == b""
 
 
 def test_r_flow_set_8_1_dangling_link_gets_no_file(area):
@@ -370,7 +447,8 @@ def test_r_flow_set_8_1_dangling_link_gets_no_file(area):
     _link_file(project / "flowsets", "s.json", outside / "dangling" / "s.json")
     saved = save_chain_set(C1, "s", project)
     assert not (outside / "dangling" / "s.json").exists()
-    assert saved.parent == project / "flowsets" and saved.name.startswith("s_")
+    assert _link_points_at(project / "flowsets" / "s.json", outside / "dangling" / "s.json")
+    assert saved.parent == project / "flowsets" and re.fullmatch(r"s_\d+\.json", saved.name)
     assert saved.is_file() and not saved.is_symlink()
 
 
@@ -381,7 +459,9 @@ def test_r_flow_set_8_2_link_to_file_is_not_written(area):
     _link_file(project / "flowsets", "s.json", outside / "s.json")
     saved = save_chain_set(C1, "s", project)
     assert (outside / "s.json").read_bytes() == b"KKK"
-    assert saved.name.startswith("s_") and saved.is_file() and not saved.is_symlink()
+    assert _link_points_at(project / "flowsets" / "s.json", outside / "s.json")
+    assert saved.parent == project / "flowsets" and re.fullmatch(r"s_\d+\.json", saved.name)
+    assert saved.is_file() and not saved.is_symlink()
 
 
 def test_r_flow_set_8_3_no_create_on_a_taken_name(area, monkeypatch):
@@ -394,7 +474,7 @@ def test_r_flow_set_8_3_no_create_on_a_taken_name(area, monkeypatch):
     taken = str(project / "flowsets" / "s.json")
     assert calls.count(taken) == 0
     assert calls.count(str(saved)) == 1
-    assert saved.name.startswith("s_") and saved.is_file() and not saved.is_symlink()
+    assert re.fullmatch(r"s_\d+\.json", saved.name) and saved.is_file() and not saved.is_symlink()
 
 
 def test_r_flow_set_8_4_followed_create_gets_no_byte(area, monkeypatch):
@@ -429,3 +509,198 @@ def test_r_flow_file_14_6_saved_file_mode_matches_write_text(area, kind):
     sibling.write_text("x", encoding="utf-8")
     assert oct(saved.stat().st_mode & 0o777) == oct(sibling.stat().st_mode & 0o777)
     assert saved.stat().st_mode & 0o111 == 0
+
+
+# --------------------------- E5 corrective: each clause of the claim alone --
+
+
+@pytest.mark.parametrize("kind", ["flow", "set"])
+def test_r_flow_file_14_7_link_to_a_sibling_in_the_home_gets_no_byte(area, monkeypatch, kind):
+    """R-FLOW-FILE.14/7 [flow], R-FLOW-SET.8/6 [set] (E5 QA-3): a link put in at the free
+    name whose target is a sibling INSIDE the home gets no byte.
+
+    The followed create opens ``<home>/other.json``; the candidate's real
+    parent is then the approved home, so the real-path clause passes and only
+    the link clauses of the check after the claim (a regular file, the same
+    file as the descriptor, no reparse point) refuse it. The link is left (it
+    is not the claim) and nothing else is created (mutant M14b, the check
+    reduced to its one-link and real-path clauses → the payload lands in
+    ``other.json`` → RED).
+    """
+    _root, project, outside = area
+    home, stem, save = _save_kind(project, kind)
+    home.mkdir()
+    sibling = home / "other.json"
+    _windows_follow(monkeypatch, home, outside, target=sibling)
+    with pytest.raises(WorkareaContainmentError):
+        save(stem)
+    assert sibling.read_bytes() == b""
+    assert _link_points_at(home / f"{stem}.json", sibling)
+    assert _entries(home) == sorted(["other.json", f"{stem}.json"])
+
+
+class _FullDisk:
+    """A text handle whose ``write`` fails as a full disk does; it closes the
+    real handle it wraps on exit, as the ``with`` block of the save does."""
+
+    def __init__(self, handle):
+        self._handle = handle
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc_info):
+        self._handle.close()
+        return False
+
+    def write(self, text):
+        raise OSError(errno.ENOSPC, "No space left on device")
+
+
+@pytest.mark.parametrize("arm", ["render", "write", "lstat", "taken-by-folder"])
+def test_r_flow_file_14_8_claim_error_arms(area, monkeypatch, arm):
+    """R-FLOW-FILE.14/8 (E5 CR-03, QA-4; E3 S-3, R2-2, house F1): the error arms of the claim.
+
+    - ``render``: the serialiser raises → no create is attempted in the home
+      and no file is made (mutant M26, the payload rendered after the claim →
+      an empty ``z.json`` → RED).
+    - ``write``: the write through the claim fails with ``ENOSPC`` → that
+      ``OSError`` is re-raised and the claim removed, no cut-off file under
+      the name (mutant M27, the cleanup of the write arm dropped → RED).
+    - ``lstat``: the check's ``lstat`` fails → ``WorkareaContainmentError``,
+      nothing written, the claim removed (mutant M28, the check's reads
+      outside the ``try`` → the raw ``OSError`` escapes → RED).
+    - ``taken-by-folder``: the create raises ``PermissionError`` with a folder
+      now at the name (Windows) → the name is taken and the next one claimed
+      (mutant M29, every non-``FileExistsError`` re-raised → RED).
+    """
+    _root, project, _out = area
+    home = project / "flows"
+    home.mkdir()
+    candidate = home / "z.json"
+    real_open = os.open
+    if arm == "render":
+        def explode(_flow):
+            raise RuntimeError("serialiser fails")
+
+        monkeypatch.setattr(fps, "flow_to_dict", explode)
+        calls = _spy_on_open(monkeypatch)
+        with pytest.raises(RuntimeError, match="serialiser fails"):
+            save_flow_json(F1, "z", project)
+        assert [c for c in calls if Path(c).parent == home] == []
+        assert _entries(home) == []
+    elif arm == "write":
+        real_fdopen = os.fdopen
+        monkeypatch.setattr(os, "fdopen", lambda fd, *a, **k: _FullDisk(real_fdopen(fd, *a, **k)))
+        with pytest.raises(OSError) as raised:
+            save_flow_json(F1, "z", project)
+        assert raised.value.errno == errno.ENOSPC
+        assert _entries(home) == []
+    elif arm == "lstat":
+        real_lstat = os.lstat
+        state = {"claimed": False, "failed": False}
+
+        def claim(path, flags, *args, **kwargs):
+            fd = real_open(path, flags, *args, **kwargs)
+            state["claimed"] = state["claimed"] or Path(os.fspath(path)) == candidate
+            return fd
+
+        def flaky_lstat(path, *args, **kwargs):
+            if state["claimed"] and not state["failed"] and Path(os.fspath(path)) == candidate:
+                state["failed"] = True
+                raise PermissionError(errno.EACCES, "Permission denied", os.fspath(path))
+            return real_lstat(path, *args, **kwargs)
+
+        monkeypatch.setattr(os, "open", claim)
+        monkeypatch.setattr(os, "lstat", flaky_lstat)
+        with pytest.raises(WorkareaContainmentError):
+            save_flow_json(F1, "z", project)
+        assert state["failed"]
+        assert _entries(home) == []
+    else:
+        def racing_folder(path, flags, *args, **kwargs):
+            if Path(os.fspath(path)) == candidate:
+                os.mkdir(candidate)
+                raise PermissionError(errno.EACCES, "Permission denied", os.fspath(path))
+            return real_open(path, flags, *args, **kwargs)
+
+        monkeypatch.setattr(os, "open", racing_folder)
+        saved = save_flow_json(F1, "z", project)
+        assert saved == home / "z_2.json"
+        assert _name_in(saved) == "z_2"
+        assert candidate.is_dir()
+
+
+@pytest.mark.parametrize("kind", ["flow", "set"])
+def test_r_flow_file_14_9_repointed_home_keeps_the_file_elsewhere(area, monkeypatch, kind):
+    """R-FLOW-FILE.14/9 [flow], R-FLOW-SET.8/7 [set] (E5 SE5-2, probe P9): a home re-pointed
+    between the close and the cleanup never makes the cleanup delete a file outside.
+
+    The home is swapped for a link to Folder O at the create (the refusal of
+    /14/5); after the claim's descriptor is closed, the home is re-pointed at
+    a folder V that holds a file of the claimed name. The cleanup re-reads the
+    entry at the name: it is not the claim's file, so nothing is unlinked; V's
+    file keeps its bytes and the empty claim stays in O (mutant M24, the
+    cleanup unlinks by name without the re-read → V's file deleted → RED).
+    """
+    _root, project, outside = area
+    home, stem, save = _save_kind(project, kind)
+    home.mkdir()
+    victim = outside.parent / "victim"
+    victim.mkdir()
+    (victim / f"{stem}.json").write_bytes(b"VICTIM")
+    _swap_home_for_link(monkeypatch, home, project / f"{home.name}_aside", outside)
+    _repoint_home_at_close(monkeypatch, home, project / f"{home.name}_to_o", victim)
+    with pytest.raises(WorkareaContainmentError):
+        save(stem)
+    assert (victim / f"{stem}.json").read_bytes() == b"VICTIM"
+    assert _entries(victim) == [f"{stem}.json"]
+    assert (outside / f"{stem}.json").read_bytes() == b""
+
+
+@pytest.mark.parametrize("kind", ["flow", "set"])
+def test_r_flow_file_14_10_other_file_at_the_name_gets_no_byte(area, monkeypatch, kind):
+    """R-FLOW-FILE.14/10 [flow], R-FLOW-SET.8/8 [set] (E5 CR-02): a followed create, then the
+    link replaced by a regular file before the check, gets no byte.
+
+    The entry at the name is a regular file with one link, no reparse point,
+    directly in the home, so only the same-file clause of the check after the
+    claim refuses it: nothing goes through the descriptor into the followed
+    target, and the planted file is neither written nor removed (mutant M22,
+    the same-file clause dropped → the payload lands in ``followed.json`` →
+    RED). No symbolic link is made, so the node needs no privilege.
+    """
+    _root, project, outside = area
+    home, stem, save = _save_kind(project, kind)
+    home.mkdir()
+    followed = outside / "followed.json"
+    _follow_at_create(monkeypatch, home, followed, lambda candidate: candidate.write_bytes(b"PLANTED"))
+    with pytest.raises(WorkareaContainmentError):
+        save(stem)
+    assert followed.read_bytes() == b""
+    assert (home / f"{stem}.json").read_bytes() == b"PLANTED"
+    assert _entries(home) == [f"{stem}.json"]
+
+
+@pytest.mark.parametrize("kind", ["flow", "set"])
+def test_r_flow_file_14_11_hard_link_at_the_name_gets_no_byte(area, monkeypatch, kind):
+    """R-FLOW-FILE.14/11 [flow], R-FLOW-SET.8/9 [set] (E5 SE5-1, probe P4): a followed create,
+    then the link replaced by a hard link to the followed target, gets no byte.
+
+    The entry at the name is a regular file, the same file as the descriptor,
+    no reparse point, directly in the home, so only the one-link clause of
+    the check after the claim refuses it: the target outside gets no byte
+    (mutant M23, ``st_nlink == 1`` dropped → the payload lands outside →
+    RED). The hard-link name is the claim's own file in the approved home, so
+    the cleanup removes it and the home holds no entry. No symbolic link is
+    made, so the node needs no privilege.
+    """
+    _root, project, outside = area
+    home, stem, save = _save_kind(project, kind)
+    home.mkdir()
+    followed = outside / "followed.json"
+    _follow_at_create(monkeypatch, home, followed, lambda candidate: os.link(followed, candidate))
+    with pytest.raises(WorkareaContainmentError):
+        save(stem)
+    assert followed.read_bytes() == b""
+    assert _entries(home) == []

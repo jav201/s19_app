@@ -41,8 +41,8 @@ persistence serializer/loader (``flow_persistence_service.flow_to_dict`` /
 ``dict_to_flow``) — the clipboard stores the WIRE projection of one block,
 never a live instance, and paste re-validates the wire dict through the
 hardened loader against the current flow's own blocks. That is the second
-declared ``flow_screens → services`` edge; both are pure
-serialize/validate, no execution semantics.
+``flow_screens → services`` edge; both are pure serialize/validate, no
+execution semantics.
 
 batch-102 Inc 6 (US-102-06): the copy/paste strip grows ``Edit`` / ``Remove``
 chips acting on the SAME ``#flow_pick`` ledger number (empty is INVALID for
@@ -1410,7 +1410,10 @@ class FlowBuilderPanel(ScrollableContainer):
     Dependencies:
         Uses:
             - ``flow_model`` (block dataclasses + the A2B binding grammar,
-              read-only per the R8 declared edge)
+              read-only)
+            - ``flow_persistence_service`` (``flow_to_dict`` /
+              ``dict_to_flow`` for copy and paste, the ``FLOW_UNSAFE_REF``
+              code)
             - ``safe_text`` (markup-safe render)
         Used by:
             - ``S19TuiApp._compose_screen_flow`` /
@@ -3071,9 +3074,8 @@ FX_NO_LANES_RUN = "No chains to run — Import… adds a lane first."
 class FxLaneSpec:
     """The panel-side lane payload posted to the app (Run / Save Set).
 
-    The app translates it into the service's ``ChainSpec`` / ``ChainSetEntry``
-    — the panel never imports the execution/persistence modules (the declared
-    ``flow_screens → services/flow_model`` edge stays read-only dataclasses).
+    The app translates it into the service's ``ChainSpec`` / ``ChainSetEntry``;
+    the panel never calls the executor.
 
     Args:
         name (str): The lane name (unique inside the set).
@@ -3201,7 +3203,7 @@ class FlowExecutionPanel(ScrollableContainer):
 
     Dependencies:
         Uses:
-            - ``flow_model`` (read-only dataclasses, the declared R8 edge)
+            - ``flow_model`` (read-only dataclasses)
             - ``safe_text``, ``clip_head`` / ``clip_tail``, ``lane_layout``
         Used by:
             - ``S19TuiApp._compose_screen_flow_execution`` + the

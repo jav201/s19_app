@@ -2153,11 +2153,15 @@ _FINAL_NAME_ALLOWLIST = {
     # batch-101 Inc 9 (R-FLOW-FILE.14, R-FLOW-SET.8): the flow / chain-set
     # saves moved off write_text onto _create_new_json — the one helper that
     # claims a NEW name with O_CREAT|O_EXCL (never an overwrite), writes no
-    # byte before the post-claim check (regular file, no reparse point, the
-    # same file as the open descriptor, real path inside the approved home),
-    # and unlinks only its own same-stat claim on a failure path.
+    # byte before the post-claim check (regular file with one link, no
+    # reparse point, the same file as the open descriptor, real parent the
+    # approved home), and on a failure path unlinks only through
+    # _unlink_own_claim (E5 SE5-2): the entry at the name is re-read and
+    # removed only when it is the same file as the claim's descriptor and
+    # its real parent is the approved home. The unlink sits in that helper
+    # alone, so only it is allow-listed.
     "s19_app/tui/services/flow_persistence_service.py": frozenset(
-        {"_create_new_json"}
+        {"_unlink_own_claim"}
     ),
     "s19_app/tui/services/flow_execution_service.py": frozenset(
         {"write_chain_set_report"}

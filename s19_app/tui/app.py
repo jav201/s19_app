@@ -3997,6 +3997,9 @@ class S19TuiApp(App):
             through ``save_flow_json`` (``sanitize_project_name`` is the write-side
             containment authority) and mark the panel saved; a no-project state
             renders the error card, an un-sanitisable name a status message.
+            A ``flows/`` home that passes through a link or lies outside the
+            work area (``WorkareaContainmentError``) refuses the save with
+            its own status line (R-FB-SAVE.8), and nothing is marked saved.
 
         Args:
             event (FlowBuilderPanel.SaveRequested): Carries the current flow.
@@ -4549,7 +4552,10 @@ class S19TuiApp(App):
             through ``save_chain_set`` — the sanitiser is the write-side
             containment authority; an empty set (0 lanes) or an un-sanitisable
             name writes NOTHING and surfaces one status line. A successful
-            save marks the panel saved (identity = the stem).
+            save marks the panel saved (identity = the stem). A ``flowsets/``
+            home that passes through a link or lies outside the work area
+            (``WorkareaContainmentError``) refuses the save with its own
+            status line (R-FX-SET.15), and nothing is marked saved.
 
         Args:
             event (FlowExecutionPanel.SaveRequested): Carries the lanes and

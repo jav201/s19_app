@@ -1,0 +1,33 @@
+=== Inc 9 E5 corrective run: e5c-01-setup (the staged tree on the LAN Linux laptop, and a pre-check)
+date: 2026-11-06 (UTC), before e5c-02
+host: LAN Linux laptop (8 cores), Python 3.11.18
+note: transcribed from this pass's ssh session output — every command and the lines it printed, redacted (<HOME>); nothing that imports s19_app ran on the Windows PC (there: git plumbing and py_compile only)
+
+---- local (Windows PC, git plumbing only)
+CMD: git diff --binary e07fb00 -- s19_app tests docs README.md > i9c.diff
+     (11 files, 101310 bytes: docs/user-guide/DOSSIER.md, docs/user-guide/ch18-flow-execution.md, s19_app/tui/app.py,
+      s19_app/tui/flow_screens.py, s19_app/tui/services/flow_execution_service.py, s19_app/tui/services/flow_persistence_service.py,
+      tests/test_b101_flow_names_ui.py, tests/test_b101_flow_saves.py, tests/test_b101_help_legend_docs.py, tests/test_b99_staging.py,
+      tests/test_id_registry.py)
+CMD: GIT_INDEX_FILE=<scratch>/idx git read-tree e07fb00 && GIT_INDEX_FILE=<scratch>/idx git apply --cached i9c.diff && GIT_INDEX_FILE=<scratch>/idx git write-tree
+608f5e918389dbb016a57b61ed5643bec6515210
+
+---- remote (LAN Linux laptop)
+CMD: cd <HOME>/work/s19_app && git fetch -q origin && git rev-parse origin/main
+origin/main=e07fb00f9fc13afd314d0334fac683fe33b29b6c
+CMD: git worktree add -q --detach <HOME>/work/s19_i9c origin/main
+CMD: cd <HOME>/work/s19_i9c && git apply --index --binary <HOME>/work/i9c-helpers/i9c.diff && git rev-parse HEAD && git write-tree && git status --short | wc -l
+base=e07fb00f9fc13afd314d0334fac683fe33b29b6c tree=608f5e918389dbb016a57b61ed5643bec6515210
+11
+CMD: env -u NO_COLOR PYTHONPATH=$PWD /data/miniconda3/envs/s19ci/bin/python -c "import s19_app,sys; print(s19_app.__file__); print(sys.version.split()[0])"
+<HOME>/work/s19_i9c/s19_app/__init__.py
+3.11.18
+=> the staged tree equals the tree recomputed locally (608f5e91…); every later run of this pass is on this tree.
+
+---- pre-check (same tree)
+CMD: env -u NO_COLOR PYTHONPATH=$PWD python -m pytest -q -p no:cacheprovider -n 6 -m "not serial_timing" -rfs tests/test_b101_flow_saves.py tests/test_b99_staging.py "tests/test_b101_flow_names_ui.py::test_r_flow_chain_20_2_sequential_confirm_mode_line"
+bringing up nodes...
+bringing up nodes...
+
+......................................................................   [100%]
+70 passed in 35.08s

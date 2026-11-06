@@ -2003,6 +2003,8 @@ def run_chain_set(
             - compose_chain_set_report / write_chain_set_report
         Used by:
             - s19_app.tui.app.on_flow_execution_panel_run_requested
+            - s19_app.tui.app.on_flow_execution_panel_external_step_confirmed
+              (the confirm re-run, ``CHAIN_RUN_CONFIRM_RERUN``)
     """
     if mode not in CHAIN_RUN_MODES and mode != CHAIN_RUN_CONFIRM_RERUN:
         raise ValueError(f"unknown chain-run mode {mode!r}")

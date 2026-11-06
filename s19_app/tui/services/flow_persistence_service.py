@@ -39,6 +39,7 @@ Finding taxonomy (OQ-1, §6.2 — mixed and honest):
 
 from __future__ import annotations
 
+import itertools
 import json
 import os
 import stat
@@ -981,6 +982,59 @@ def load_flow_json(
     return dict_to_flow(payload, project_dir)
 
 
+def _unlink_own_claim(
+    candidate: Path,
+    claim: Optional[os.stat_result],
+    resolved_home: Path,
+) -> None:
+    """Remove ``candidate`` only when the entry at that name is provably the claim.
+
+    Summary:
+        The cleanup of :func:`_create_new_json` (E5 rulings CR-07, SE5-2). An
+        unlink goes by name, so the entry is re-read first: it is removed only
+        when its ``lstat`` succeeds, it is the same file as ``claim`` (the
+        descriptor's ``fstat``, taken before the close) and its real parent
+        equals the home the guard approved. Otherwise nothing is unlinked: a
+        name that now leads elsewhere (a home re-pointed after the close) or
+        to a file that is not ours is left as it is. Best-effort: an
+        ``OSError`` leaves the entry.
+
+    Args:
+        candidate (Path): The claimed name (in the UNRESOLVED home).
+        claim (Optional[os.stat_result]): ``os.fstat`` of the claim's
+            descriptor, or ``None`` when it could not be read (then nothing
+            is unlinked).
+        resolved_home (Path): The resolved home ``_guarded_destination``
+            returned.
+
+    Returns:
+        None.
+
+    Raises:
+        None: every ``OSError`` is swallowed (the entry stays).
+
+    Data Flow:
+        - ``lstat(candidate)`` → ``samestat(claim, ·)`` and
+          ``realpath(candidate).parent == resolved_home`` → ``os.unlink``.
+
+    Dependencies:
+        Uses:
+            - os.lstat / os.path.samestat / os.path.realpath / os.unlink
+        Used by:
+            - _create_new_json
+    """
+    if claim is None:
+        return
+    try:
+        if (
+            os.path.samestat(claim, os.lstat(candidate))
+            and Path(os.path.realpath(candidate)).parent == resolved_home
+        ):
+            os.unlink(candidate)
+    except OSError:
+        pass
+
+
 def _create_new_json(
     home: Path,
     resolved_home: Path,
@@ -1002,11 +1056,14 @@ def _create_new_json(
         link and would miss a dangling one). The payload is rendered BEFORE
         the claim, so a serialiser raise leaves no file (E3 S-3). The free
         name is claimed with an exclusive create, then — before any byte is
-        written — re-verified to be the regular file this call created and to
-        resolve inside the home the guard approved; otherwise the claim is
-        removed (only when it is ours), nothing is written and
+        written — re-verified to be a regular file with one link, the same
+        file as the open descriptor, no reparse point, and with its real
+        parent equal to the home the guard approved; a read of the check that
+        fails counts as a failed check (E5 CR-07). Otherwise nothing is
+        written, the claim is removed only when the entry at its name is
+        provably ours (:func:`_unlink_own_claim`, E5 SE5-2) and
         ``WorkareaContainmentError`` is raised. On Windows the exclusive
-        create follows a dangling link (house finding S-F1), so only the
+        create follows a dangling file link (house finding S-F1), so only the
         check after the claim keeps the content out of a link put in after
         the name check.
 
@@ -1026,39 +1083,54 @@ def _create_new_json(
 
     Raises:
         WorkareaContainmentError: When the claimed name cannot be verified
-            after the claim (not a regular file, a link, not the same file
-            as the open descriptor, or its real path outside the approved
-            home), or when its ``lstat`` fails — nothing is written.
+            after the claim (not a regular file, more than one link, not the
+            same file as the open descriptor, a link, or its real parent not
+            the approved home), or when a read of that check fails — nothing
+            is written.
+        OSError: When the create fails for a reason other than a taken name,
+            or the write fails (the claim is removed first when it is
+            provably ours).
 
     Data Flow:
-        - candidate loop → ``lexists`` (name check) → ``render(stem)``
+        - candidate walk → ``lexists`` (name check) → ``render(stem)``
           (payload before the claim) → ``os.open(O_CREAT|O_EXCL|O_WRONLY|
-          O_BINARY)`` (claim) → ``lstat`` / reparse / ``samestat`` /
-          real parent == ``resolved_home`` (check after the claim; the
-          approved home is never resolved again, so a home swapped for a
-          link after the guard cannot pass) →
+          O_BINARY, 0o666)`` (claim) → ``fstat`` / ``lstat`` / one link /
+          ``samestat`` / reparse / real parent == ``resolved_home`` (check
+          after the claim; the approved home is never resolved again, so a
+          home swapped for a link after the guard cannot pass) →
           ``os.fdopen`` (write) → return the candidate.
-        - On a check failure or a write failure the claim this call made is
-          removed (best-effort) and nothing but an empty file in a lost race
-          can ever sit at a link's target (BL-I9-4).
+        - Residual (BL-I9-4, E5 SE5-3), never an overwrite (``O_EXCL``):
+          with no concurrent writer, nothing lands outside the work area. A
+          file link put in at the free name on Windows (the symlink privilege
+          is needed; a junction at the free name is never followed) leaves an
+          empty file at its target. A home swapped once for a link leaves an
+          empty file at the link's target (its name resolves outside, so it
+          is not unlinked), and a project folder swapped between the guard
+          and the ``mkdir`` an empty ``flows/`` / ``flowsets/`` folder there.
+          Content outside only under a double swap (the home a link at the
+          create and the real folder again at the check), and a cleanup
+          unlink that deletes another file only under a swap inside the last
+          window between its re-read and the unlink: BL-I9-10 (a check bound
+          to the descriptor's own final path).
 
     Dependencies:
         Uses:
-            - os.open / os.lstat / os.fstat / os.fdopen / os.unlink
+            - os.open / os.lstat / os.fstat / os.fdopen / os.close
             - os.path.lexists / os.path.samestat / os.path.realpath
             - stat.S_ISREG
             - _is_reparse_point (workspace.py)
+            - _unlink_own_claim
         Used by:
             - save_flow_json / save_chain_set
     """
-    counter = 2
-    candidate = home / f"{clean}.json"
+    names = itertools.chain(
+        [f"{clean}.json"], (f"{clean}_{k}.json" for k in itertools.count(2))
+    )
     while True:
+        candidate = home / next(names)
         # (a) The name is taken when ANY entry of that name exists — a file,
         # a folder or a link, also a link whose target is missing.
         if os.path.lexists(candidate):
-            candidate = home / f"{clean}_{counter}.json"
-            counter += 1
             continue
 
         # (b) Build the payload before the claim, so a serialiser raise
@@ -1076,69 +1148,58 @@ def _create_new_json(
             )
         except FileExistsError:
             # Lost the lexists-vs-open race: the name is taken after all.
-            candidate = home / f"{clean}_{counter}.json"
-            counter += 1
             continue
         except OSError:
             # House F1: a directory that wins the race raises PermissionError
             # on Windows; if the name now exists it is simply taken.
             if os.path.lexists(candidate):
-                candidate = home / f"{clean}_{counter}.json"
-                counter += 1
                 continue
             raise
 
-        # (d) The post-claim check (E3 S-1): before any byte is written, the
-        # new entry must be the regular file this call created — not a link
-        # or special file swapped in after the name check — and its real
-        # path must lie inside the home the guard approved.
+        # (d) The post-claim check (E3 S-1, E4-R1, E5 SE5-1): before any
+        # byte is written, the new entry must be the regular file this call
+        # created, with one link (no hard link to a followed target), not a
+        # link or special file swapped in after the name check, and its real
+        # parent must be the home the guard approved. Every read sits inside
+        # the try, so a failure to read is a failed check (E5 CR-07).
+        claim: Optional[os.stat_result] = None
+        failure: Optional[OSError] = None
+        verified = False
         try:
+            claim = os.fstat(fd)
             st = os.lstat(candidate)
+            verified = (
+                stat.S_ISREG(st.st_mode)
+                and st.st_nlink == 1
+                and os.path.samestat(claim, st)
+                and not _is_reparse_point(candidate)
+                and Path(os.path.realpath(candidate)).parent == resolved_home
+            )
         except OSError as exc:
-            # R2-2: an lstat failure inside the check counts as a failed
-            # check — close the descriptor, remove the claim (best-effort)
-            # and refuse, nothing written.
+            failure = exc
+        if not verified:
             os.close(fd)
-            try:
-                os.unlink(candidate)
-            except OSError:
-                pass
-            raise WorkareaContainmentError(
-                f"Not saved: {candidate.name} in {home} could not be "
-                f"verified after the claim: {exc}. Nothing written."
-            ) from exc
-        owned = stat.S_ISREG(st.st_mode) and os.path.samestat(os.fstat(fd), st)
-        if not (
-            owned
-            and not _is_reparse_point(candidate)
-            and Path(os.path.realpath(candidate)).parent == resolved_home
-        ):
-            os.close(fd)
-            if owned:
-                # Remove only the regular file this call created — a link or
-                # special file swapped in is left as it is (it is not ours).
-                try:
-                    os.unlink(candidate)
-                except OSError:
-                    pass
+            _unlink_own_claim(candidate, claim, resolved_home)
+            if failure is not None:
+                raise WorkareaContainmentError(
+                    f"Not saved: {candidate.name} in {home} could not be "
+                    f"verified after the claim: {failure}. Nothing written."
+                ) from failure
             raise WorkareaContainmentError(
                 f"Not saved: {candidate.name} in {home} was replaced by a "
-                "link or special file between the claim and the write, or "
-                "resolves outside the approved home. Nothing written."
+                "link, a hard link or another file between the claim and the "
+                "write, or resolves outside the approved home. Nothing written."
             )
 
         # (e) Write through the claim's descriptor. The ``with`` block owns
         # the close (a flush error surfaces here); a write failure removes
-        # the file this call claimed (ours by (d)) and re-raises, never
-        # leaving a cut-off file under the claimed name (E3 S-3).
+        # the claim when it is provably ours and re-raises, never leaving a
+        # cut-off file under the claimed name (E3 S-3).
         try:
             with os.fdopen(fd, "w", encoding="utf-8") as handle:
                 handle.write(text)
         except OSError:
-            try:
-                os.unlink(candidate)
-            except OSError:
-                pass
+            _unlink_own_claim(candidate, claim, resolved_home)
             raise
 
         return candidate
@@ -1183,6 +1244,9 @@ def save_flow_json(
         WorkareaContainmentError: When the ``flows/`` home passes through a
             link or resolves outside the work area, or when the claimed name
             fails the post-claim check — nothing is written.
+        OSError: When the create fails for a reason other than a taken name,
+            or the write fails (the claim is removed first when it is
+            provably ours, :func:`_create_new_json`).
 
     Data Flow:
         - ``raw_name`` → ``sanitize_project_name`` → ``clean`` (or ``None`` stop).
@@ -1203,7 +1267,7 @@ def save_flow_json(
             - _guarded_destination / _create_new_json
             - flow_to_dict / json / dataclasses.replace
         Used by:
-            - the app Save handler (later increment)
+            - S19TuiApp.on_flow_builder_panel_save_requested (app.py)
 
     Example:
         >>> save_flow_json(Flow(name="n", blocks=[ReportBlock()]),
@@ -1698,6 +1762,27 @@ def save_chain_set(
         WorkareaContainmentError: When the ``flowsets/`` home passes through
             a link or resolves outside the work area, or when the claimed
             name fails the post-claim check — nothing is written.
+        OSError: When the create fails for a reason other than a taken name,
+            or the write fails (the claim is removed first when it is
+            provably ours, :func:`_create_new_json`).
+
+    Data Flow:
+        - ``chain_set.chains`` empty → ``None`` stop; ``raw_name`` →
+          ``sanitize_project_name`` → ``clean`` (or ``None`` stop).
+        - ``flowsets_dir`` → ``_guarded_destination`` → ``(resolved_home, _)``.
+        - ``chain_set`` → :func:`_create_new_json` →
+          ``chain_set_to_dict(replace(chain_set,
+          name=stem[:CHAIN_SET_MAX_NAME_LEN]))`` → ``json.dumps(..., indent=2)``
+          → the claimed file.
+        - The write-side inverse of :func:`load_chain_set`.
+
+    Dependencies:
+        Uses:
+            - sanitize_project_name (write-side containment, workspace.py)
+            - _guarded_destination / _create_new_json
+            - chain_set_to_dict / json / dataclasses.replace
+        Used by:
+            - S19TuiApp.on_flow_execution_panel_save_requested (app.py)
     """
     if not chain_set.chains:
         return None
