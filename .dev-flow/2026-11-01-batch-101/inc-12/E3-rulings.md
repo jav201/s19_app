@@ -35,3 +35,7 @@ Architect: **Inc 12 FAIL** (E3A-R2-1 MAJOR), **Inc 12b PASS-WITH-NOTES**. Securi
 | S2-2 (12b) | Accept: a re-pointed hostile input stays whole when it fits a card; otherwise it keeps one of each hostile kind (markup tag, C0 / C1 / DEL bytes, sentinel). | The control-byte checks must still be able to fail. |
 
 Correction: one Opus pass (targeted edits). E3 closes for 12b after it; for Inc 12 the orchestrator checks R2-1's application (PDR) and closes E3.
+
+## Round-2 correction check (orchestrator PDR, 2026-11-06) — E3 closed for Inc 12 and Inc 12b
+
+The correction (`82b8c3b`) applied E3A-R2-1 … R2-4, S2-1, S2-2. Orchestrator check of E3A-R2-1: the removed node `action_a2l_tag_find_next` is in the graph, the slice (with the overlap on Inc 10a's #10, `_handle_a2l_tag_find_next`, separate hunk), the requirement census (base 4 of 83, after 80) and the restore-it control case. **Ruled on the correction's open choice:** tests stop spelling the removed names (the by-name absence clauses of R-DLG.14/1 and R-SHELL-KEYS.3/1, TC-B97-61's toggle lines, 12b's "assert hidden" checks) so the pinned I-3 greps return exactly their listed lines — accepted: the censuses and the widget walks fail on any re-added dead entry, so the dropped clauses added no failure mode. No round 3: the MAJOR is a removal the orchestrator verified on main, and its application is checked above. **E3 closed** for Inc 12 and Inc 12b.
