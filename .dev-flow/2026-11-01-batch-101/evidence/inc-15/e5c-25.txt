@@ -1,0 +1,22 @@
+# e5c-25: pre-corrective guard (5054743) + D6 predicate -> lambda: True
+# tree: g-c2pre; env: I15_HOLD= I15_HOLD_ACTION= I15_NEVER=
+# cmd: python -m pytest -p i15c_e5_guard -p no:cacheprovider -v -rs tests/test_suite_hygiene.py::test_r_tst_154_155_inc15_arms_wait_through_settled
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0 -- /data/miniconda3/envs/s19ci/bin/python
+i15c: commit under test = 5edcb3f (c2cba35 + the Inc 15 tests/docs patch at 5edcb3f, sha256 15df472e) (tree = g-c2pre; git HEAD here = n/a (CalledProcessError))
+i15c: s19_app.__file__ = /tmp/i15c/trees/g-c2pre/s19_app/__init__.py
+i15c: python 3.11.18 on Linux; textual 8.2.8
+i15c: NO_COLOR set = False; LOCALAPPDATA = None; APPDATA = None
+i15c: TEMP = None; TMP = None
+i15c: OS clipboard writers replaced by a raising guard
+i15c: hold =  action =  s = 1.5; never = ''
+rootdir: /tmp/i15c/trees/g-c2pre
+configfile: pyproject.toml
+plugins: platformdirs-4.14.3, xdist-3.8.0
+collecting ... collected 1 item
+
+tests/test_suite_hygiene.py::test_r_tst_154_155_inc15_arms_wait_through_settled PASSED [100%]
+
+i15c: hold installed = None; never installed = None
+============================== 1 passed in 0.49s ===============================
+# rc=0

@@ -1,0 +1,22 @@
+# e5c-13: D3+D4 fx_bind hold, fixed form, rep 2
+# tree: hold-fixed; env: I15_HOLD=fx_bind I15_HOLD_ACTION= I15_NEVER=
+# cmd: python -m pytest -p i15c_e5_guard -p no:cacheprovider -v tests/test_tui_flow_execution_b94.py::test_tc_b94_27_lane_binding_isolation_and_noop
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0 -- /data/miniconda3/envs/s19ci/bin/python
+i15c: commit under test = 5edcb3f (c2cba35 + the Inc 15 tests/docs patch at 5edcb3f, sha256 15df472e) (tree = hold-fixed; git HEAD here = n/a (CalledProcessError))
+i15c: s19_app.__file__ = /tmp/i15c/trees/hold-fixed/s19_app/__init__.py
+i15c: python 3.11.18 on Linux; textual 8.2.8
+i15c: NO_COLOR set = False; LOCALAPPDATA = None; APPDATA = None
+i15c: TEMP = None; TMP = None
+i15c: OS clipboard writers replaced by a raising guard
+i15c: hold = fx_bind action =  s = 1.5; never = ''
+rootdir: /tmp/i15c/trees/hold-fixed
+configfile: pyproject.toml
+plugins: platformdirs-4.14.3, xdist-3.8.0
+collecting ... collected 1 item
+
+tests/test_tui_flow_execution_b94.py::test_tc_b94_27_lane_binding_isolation_and_noop PASSED [100%]
+
+i15c: hold installed = fx_bind[*] 1.5s; never installed = None
+============================== 1 passed in 6.69s ===============================
+# rc=0

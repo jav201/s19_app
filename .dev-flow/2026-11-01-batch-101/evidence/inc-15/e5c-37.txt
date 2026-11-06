@@ -1,0 +1,21 @@
+# e5c-37: Windows serial run 7 of 20, TC-B94-27 (R-TST-156, E5 C-10)
+# cmd: python -m pytest -p i15c_e5_guard -p no:cacheprovider -v <TC-B94-27>
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- <HOME>\anaconda3\envs\s19env\python.exe
+i15c: commit under test = 5edcb3f9 (Windows worktree) (tree = s19_app-b101-inc15; git HEAD here = 5edcb3f92e17ab83cc5d8639c18b477670d07e29)
+i15c: s19_app.__file__ = <HOME>\Github\s19_app-b101-inc15\s19_app\__init__.py
+i15c: python 3.11.15 on Windows; textual 8.2.8
+i15c: NO_COLOR set = False; LOCALAPPDATA = <HOME>\.claude\jobs\3f13b036\tmp\i15c-win\e5c-37\Local; APPDATA = <HOME>\.claude\jobs\3f13b036\tmp\i15c-win\e5c-37\Roaming
+i15c: TEMP = <HOME>\.claude\jobs\3f13b036\tmp\i15c-win\e5c-37\Temp; TMP = <HOME>\.claude\jobs\3f13b036\tmp\i15c-win\e5c-37\Temp
+i15c: OS clipboard writers replaced by a raising guard
+i15c: hold =  action =  s = 1.5; never = ''
+rootdir: <HOME>\Github\s19_app-b101-inc15
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 1 item
+
+tests/test_tui_flow_execution_b94.py::test_tc_b94_27_lane_binding_isolation_and_noop PASSED [100%]
+
+i15c: hold installed = None; never installed = None
+============================== 1 passed in 2.43s ==============================
+# rc=0

@@ -7,10 +7,10 @@ Base `c2cba35`. **0 files under `s19_app/`** (source cap 0 of 4). Line numbers a
 | Group | File | Functions / entries | Rows |
 |---|---|---|---|
 | TC-331 arm | `tests/test_tui_patch_editor_v2.py` | 1 changed test function, `test_tc331_disable_guard_predicate_tracks_source_path` (`:3501-3553`): 2 waits added; the module imports `settled` from `tests.b97_probes` | R-TST-150, 151, 154, 155, 163 |
-| TC-B94-27 arm | `tests/test_tui_flow_execution_b94.py` | 1 changed test function, `test_tc_b94_27_lane_binding_isolation_and_noop` (`:480-543`): a call recorder around the panel's bind step + 2 waits; the module imports `settled` from `tests.b97_probes`. The shared `_bind` helper (`:166-168`, 8 callers) is **not** changed | R-TST-152, 153, 154, 155, 163 |
+| TC-B94-27 arm | `tests/test_tui_flow_execution_b94.py` | 1 changed test function, `test_tc_b94_27_lane_binding_isolation_and_noop` (`:480-543`): a call recorder around the panel's bind step + 2 waits; **E5:** wait D9 after the second import (C-10) and lane B's paint read off the compositor (C-6); the module imports `settled` from `tests.b97_probes`. The shared `_bind` helper (`:166-168`, 8 callers) is **not** changed | R-TST-152, 153, 154, 155, 163 |
 | AT-030c arm [D-1] | `tests/test_tui_patch_editor_v2.py` | 1 changed test function, `test_at030c_directly_dropped_file_is_listed_and_loadable` (`:1555-1598`): 1 wait added (E3 F1) | R-TST-159, 154, 155, 163 |
 | TC-051 save-back arm [D-1] | `tests/test_tui_patch_editor_v2.py` | 1 changed test function, `test_save_back_prompt` (`:529-646`): 3 wait sites, one in the nested helper `_apply`, one after Don't save, one in the nested helper `_confirm_with` (13 waits at run time with D1 … D5) (E3 F1) | R-TST-160, 161, 162, 154, 155, 163 |
-| Static check of the waits | `tests/test_suite_hygiene.py` (Inc 2's guard host) | 1 new test, proposed name `test_r_tst_154_155_inc15_arms_wait_through_settled` (AST over the four functions above, keyed on the eight static wait sites of table D; its docstring cites R-TST-154, R-TST-155, R-TST-163) | R-TST-154, 155, 163 |
+| Static check of the waits | `tests/test_suite_hygiene.py` (Inc 2's guard host) | 1 new test, proposed name `test_r_tst_154_155_inc15_arms_wait_through_settled` (AST over the four functions above, keyed on the nine static wait sites of table D (D9 at E5 C-10), each with its predicate (E5 C-2); its docstring cites R-TST-154, R-TST-155, R-TST-163) | R-TST-154, 155, 163 |
 | Conventions [D-3] | `docs/engineering-rules.md` | rule 7 added after rule 2's list (`:196-206`), "Six rules" → "Seven rules"; `tests/test_suite_hygiene.py`: `_CONVENTION_RULES` (`:83`) gains `R-TST-158`, and the parametrize list of `test_r_tst_007_conventions_hold_each_test_rule` (`:631-634`) gains `"R-TST-158"` | R-TST-158 |
 | Runs (no file) | Windows host, LAN Linux host | 20 serial runs per node (4 nodes) on Windows; 3 serial runs + the parallel lane on Linux; the held-handler probes and the forced-never runs of R-TST-154 on Linux | R-TST-154, 156, 157; thresholds of 150 … 153, 159 … 162 |
 
@@ -34,8 +34,9 @@ The asserted values stay the product's: `button.disabled` read after each wait (
 | after the 2 imports, before the first `_bind` (`:500`) | — | wrap `panel._rebind` with a recorder (instance attribute; `FlowExecutionPanel.on_button_pressed` calls `self._rebind`, `s19_app/tui/flow_screens.py:4390-4392`). The install reads `panel._rebind` first, so a rename fails at install with `AttributeError`; the wrapper passes `*args, **kwargs` to the real step, so a signature change of Inc 9 still works, and appends one item **after** the real step returns (E3 F5) | — | — |
 | after `_bind(app, 0, 0, "base.s19")` (`:502-503`) | one `await pilot.pause()` | `await settled(pilot, <predicate>, <D3>)` | the recorder holds 1 call | D3 |
 | after `_bind(app, 0, 0, "variant_b.hex")` (`:507-508`) | one `await pilot.pause()` | `await settled(pilot, <predicate>, <D4>)` | the recorder holds 2 calls | D4 |
+| after the second `await _import_stem(app, pilot, "base")` (`:501-502`) (E5 C-10) | one `await pilot.pause()` | `await settled(pilot, <predicate>, <D9>)` | the panel's lane names read `["base", "base_2"]` and lane B's box `#fx_in_1_0` is mounted with a non-empty screen region (the import's result step is `FlowExecutionPanel.add_lane`, called by the app's picker callback `app.py:4347-4356`) | D9 |
 
-The recorder counts only; the asserted values stay the product's (`panel.lane_bindings`, `#fx_in_1_0`, `panel.lane_paint_plain(1)`). The recorder makes the no-op arm non-vacuous (R-TST-152): its `{}` is read after the press was handled.
+The recorder counts only; the asserted values stay the product's (`panel.lane_bindings`, `#fx_in_1_0`, and lane B's painted rows read off the compositor with `tests.b97_probes.painted_rows`, cropped to the part of lane B its scroll area shows; E5 C-6 replaced the `panel.lane_paint_plain(1)` seam, which rebuilds the text from state). The recorder makes the no-op arm non-vacuous (R-TST-152): its `{}` is read after the press was handled.
 
 ### `test_at030c_directly_dropped_file_is_listed_and_loadable` (R-TST-159) (E3 F1)
 
@@ -58,11 +59,12 @@ The asserted value stays the product's: the first entry address read after the w
 
 ### `tests/test_suite_hygiene.py` — new static test (R-TST-154, 155, 163)
 
-Parses `tests/test_tui_patch_editor_v2.py` and `tests/test_tui_flow_execution_b94.py` and checks the eight static wait sites of table D (`01-requirements.md`), keyed on (module, function, nested helper or none, trigger, description):
-- per function, the count of `settled` calls equals its table-D sites: 2 (TC-331), 2 (TC-B94-27), 1 (AT-030c), 3 (TC-051: one in `_apply`, one in the body, one in `_confirm_with`);
-- each site's description argument is the table-D string constant, verbatim and in order; an f-string or any non-constant fails (E3 F1 (c));
+Parses `tests/test_tui_patch_editor_v2.py` and `tests/test_tui_flow_execution_b94.py` and checks the nine static wait sites of table D (`01-requirements.md`), keyed on (module, function, nested helper or none, trigger, description, predicate) (D9 and the predicate at E5 C-10, C-2):
+- per function, the count of `settled` calls equals its table-D sites: 2 (TC-331), 3 (TC-B94-27, with D9), 1 (AT-030c), 3 (TC-051: one in `_apply`, one in the body, one in `_confirm_with`);
+- each site's description argument is the table-D string constant, verbatim (no order between sites is checked, E5 C-9); each site's predicate equals its pinned `ast.unparse` text (E5 C-2); an f-string or any non-constant fails (E3 F1 (c));
 - each site's `settled` statement directly follows its trigger statement in the same block (E3 F4, R-TST-163);
-- 0 `for … in range(…)` loops around `pilot.pause()` and 0 calls of the module-local `_settled` (`tests/test_tui_patch_editor_v2.py:3011`, an attempts-counted loop Inc 2 left out of scope) in the four functions;
+- each site's `settled` statement follows the trigger's last occurrence in the block when the trigger text repeats (D9: the arm imports `base` twice) (E5 C-10);
+- 0 `for … in range(…)` loops around `pilot.pause()` and 0 calls of the module-local `_settled` or of the b94 module's `_wait_for` (E5 C-7) (`tests/test_tui_patch_editor_v2.py:3011`, an attempts-counted loop Inc 2 left out of scope) in the four functions;
 - a function or helper not found by name fails the test, never skips it.
 
 Scope (E3 F3): the check pins these eight sites only and stops no one-pause read elsewhere; new and changed arms are bound by the R-TST-158 sentence, and the existing sites are the D-6 census backlog row (`E1-rulings.md` §4), which also records that a trigger wrapped in a helper (`_seed_via_paste`, `_bind`, `_apply`, `_confirm_with`) escapes a pattern census.
@@ -93,6 +95,7 @@ Scope (E3 F3): the check pins these eight sites only and stops no one-pause read
 - The vacuity control of R-TST-152: product mutant (the same-ref early return in `_rebind`, `s19_app/tui/flow_screens.py:4417-4418`, removed) **with** the `fx_bind` hold → the new form RED at the no-op assertion; the base form's no-op assertion passes and it fails later, at `after_a` (E3 F6) (mutant runs in a copy of the tree, never in the worktree).
 - The vacuity controls of R-TST-161 (b) (decline saves, `app.py:5003-5005`, with `save_back`/`decline`) and R-TST-162 (b) (reserved-name refusal removed, `s19_app/tui/changes/apply.py:934-940`, with `save_back`/`confirm`; **LAN Linux host only**): compare the failing assertions, new form at the no-op assertion, base form earlier.
 - The product mutants of R-TST-150 (b) (`app.py:7191` and `:4929` removed), 151 (b) (`:4929` only) and 153 (b) (E3 F2).
+- **E5 (C-10):** D9's hold `fx_import` (`../evidence/inc-15/probes/i15c_e5_guard.py`): `FlowExecutionPanel.add_lane` runs 1.5 s late; the arm 3/3 GREEN, the arm at `5054743` (one pause) 2/2 RED at the "before" read; D9 forced never to settle once.
 - The behavioural half of R-TST-154 (E3 F9): in a copy of the tree, force one site's predicate never to hold (short `timeout`), one site per run, 8 runs; the transcript quotes the 8 `did not settle: <description>` texts. This is also R-TST-157's negative control.
 - The Windows serial runs of R-TST-156 (4 nodes) under the operator's isolation rules (`probes/i15-run.sh`).
 - `docs/engineering-rules.md`: the R-TST-158 sentence as rule 7 after rule 6, "Six rules" → "Seven rules", with its own Origin line, e.g. `(Origin: batch-101 Inc 15 — four arms read after one pause and failed on the Windows host; R-TST-158. Existing one-pause reads are a census backlog row.)` (E3 F7).
