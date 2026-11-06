@@ -1,0 +1,30 @@
+=== batch-101 Inc 16 E5 mutant mut-03
+row: R-DOC-REF.3
+mutation: restore `prototypes/cambios_10_12_2026` in project_gather_service.py docstring
+guard: tests/test_b101_doc_hygiene.py::test_r_doc_ref_3_2_no_prototypes_path
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree: b8c37aeed3d6bda695eef92db314b49107c0ff5c
+s19_app.__file__: <HOME>/<USER>/work/s19_i16m_copy/s19_app/__init__.py
+---
+result: KILLED (exit 1)
+first assertion line: E       AssertionError: 1 paths in the removed design-probe folder:
+---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________________ test_r_doc_ref_3_2_no_prototypes_path _____________________
+
+    def test_r_doc_ref_3_2_no_prototypes_path():
+        """Verifies R-DOC-REF.3 (case /2): no tracked text file names a path in the
+        removed design-probe folder outside the exempt lines (the plain words are
+        not paths and pass)."""
+        hits = _retired_hits(_retired_candidates(), 3, path_rx=_RETIRED_PROTO_PATH_RX)
+>       assert not hits, f"{len(hits)} paths in the removed design-probe folder:\n" + "\n".join(hits)
+E       AssertionError: 1 paths in the removed design-probe folder:
+E         s19_app/tui/services/project_gather_service.py:3: Change 1 of the operator's 2026-10-12 round (`prototypes/cambios_10_12_2026`):
+E       assert not ["s19_app/tui/services/project_gather_service.py:3: Change 1 of the operator's 2026-10-12 round (`prototypes/cambios_10_12_2026`):"]
+
+tests/test_b101_doc_hygiene.py:448: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_ref_3_2_no_prototypes_path
+1 failed in 1.39s
+=== end

@@ -1,0 +1,55 @@
+=== batch-101 Inc 16 E5 mutant mut-10
+row: R-DOC-DEV.2
+mutation: write one CLI example as `python -m s19_app.cli firmware.s19 verify`
+guard: tests/test_b101_doc_hygiene.py::test_r_doc_dev_2_1_cli_examples_run_the_module
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree: 424826be1eeda1fb7ace23ad5d04a86d2538250d
+s19_app.__file__: <HOME>/<USER>/work/s19_i16m_copy/s19_app/__init__.py
+---
+result: KILLED (exit 1)
+first assertion line: E       AssertionError: CLI example lines that do not run the module as `<command> <file>` with a defined sub-command:
+---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________________ test_r_doc_dev_2_1_cli_examples_run_the_module ________________
+
+    def test_r_doc_dev_2_1_cli_examples_run_the_module():
+        """Verifies R-DOC-DEV.2 (case /1): each CLI example line of CLAUDE.md's
+        common-commands block runs the module as ``<command> <file>`` with a
+        sub-command cli.py defines (each sub-parser takes the file as its own
+        positional, so ``<file> <command>`` is rejected by argparse)."""
+        text = _need("CLAUDE.md")
+        marker = re.search(r"(?m)^# CLI examples\b[^\n]*$", text)
+        assert marker, "CLAUDE.md has no '# CLI examples' comment"
+        lines = []
+        for line in text[marker.end():].splitlines()[1:]:
+            if line.strip().startswith("```"):
+                break
+            if line.strip() and not line.lstrip().startswith("#"):
+                lines.append(line.strip())
+        assert len(lines) >= 4, f"expected the 4 CLI examples, found {lines}"
+        defined = set(re.findall(r'add_parser\("([^"]+)"', _need("s19_app/cli.py")))
+        assert {"info", "verify", "dump", "patch-hex"} <= defined
+        bad = []
+        for line in lines:
+            tokens = line.split()
+            if (
+                not line.startswith("python -m s19_app.cli ")
+                or len(tokens) < 5
+                or tokens[3] not in defined
+                or tokens[4].startswith("-")
+            ):
+                bad.append(line)
+>       assert not bad, (
+            "CLI example lines that do not run the module as `<command> <file>` with a defined "
+            "sub-command:\n" + "\n".join(bad)
+        )
+E       AssertionError: CLI example lines that do not run the module as `<command> <file>` with a defined sub-command:
+E         python -m s19_app.cli firmware.s19 verify
+E       assert not ['python -m s19_app.cli firmware.s19 verify']
+
+tests/test_b101_doc_hygiene.py:559: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_2_1_cli_examples_run_the_module
+1 failed in 0.15s
+=== end

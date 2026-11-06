@@ -1,0 +1,37 @@
+=== batch-101 Inc 16 E5 mutant mut-21
+row: R-DOC-DEV.13
+mutation: restore 'Roughly **2760 tests**' in docs/overview.md
+guard: tests/test_b101_doc_hygiene.py::test_r_doc_dev_13_1_no_test_count
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree: fe2de89793d0b6565ec6ec6105b98b08e62dd25e
+s19_app.__file__: <HOME>/<USER>/work/s19_i16m_copy/s19_app/__init__.py
+---
+result: KILLED (exit 1)
+first assertion line: E       AssertionError: test counts remain:
+---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______________________ test_r_doc_dev_13_1_no_test_count _______________________
+
+    def test_r_doc_dev_13_1_no_test_count():
+        """Verifies R-DOC-DEV.13 (case /1): the overview and the architecture map
+        state no count of tests; a snapshot-baseline count is not one."""
+        rx = re.compile(r"\d[\d,]*\s+(collected\s+)?tests\b")
+        assert not rx.search("29 SVG baselines"), "instrument: baseline count read as a test count"
+        assert rx.search("2760 collected tests") and rx.search("**2760 tests**")
+        hits = [
+            f"{rel}:{n}: {m.group(0)}"
+            for rel in ("docs/overview.md", "docs/architecture.md")
+            for n, line in enumerate(_need(rel).splitlines(), 1)
+            for m in rx.finditer(line)
+        ]
+>       assert not hits, "test counts remain:\n" + "\n".join(hits)
+E       AssertionError: test counts remain:
+E         docs/overview.md:102: 2760 tests
+E       assert not ['docs/overview.md:102: 2760 tests']
+
+tests/test_b101_doc_hygiene.py:833: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_13_1_no_test_count - As...
+1 failed in 0.15s
+=== end

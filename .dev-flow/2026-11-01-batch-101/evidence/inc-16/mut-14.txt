@@ -1,0 +1,34 @@
+=== batch-101 Inc 16 E5 mutant mut-14
+row: R-DOC-DEV.6
+mutation: restore `s19_app/tui/workspace.py:508` citation in CLAUDE.md
+guard: tests/test_b101_doc_hygiene.py::test_r_doc_dev_6_1_claude_cites_no_line_numbers
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree: da6dc28b4a44346c8078c19216ff915bd3d543d7
+s19_app.__file__: <HOME>/<USER>/work/s19_i16m_copy/s19_app/__init__.py
+---
+result: KILLED (exit 1)
+first assertion line: E       AssertionError: file:line citations in CLAUDE.md:
+---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______________ test_r_doc_dev_6_1_claude_cites_no_line_numbers ________________
+
+    def test_r_doc_dev_6_1_claude_cites_no_line_numbers():
+        """Verifies R-DOC-DEV.6 (case /1): CLAUDE.md cites code without line
+        numbers, and its project.toml paragraph names the two readers."""
+        text = _need("CLAUDE.md")
+        hits = [
+            f"CLAUDE.md:{n}: {m.group(0)}"
+            for n, line in enumerate(text.splitlines(), 1)
+            for m in re.finditer(r"[\w/]+\.py:\d+", line)
+        ]
+>       assert not hits, "file:line citations in CLAUDE.md:\n" + "\n".join(hits)
+E       AssertionError: file:line citations in CLAUDE.md:
+E         CLAUDE.md:71: s19_app/tui/workspace.py:508
+E       assert not ['CLAUDE.md:71: s19_app/tui/workspace.py:508']
+
+tests/test_b101_doc_hygiene.py:642: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_6_1_claude_cites_no_line_numbers
+1 failed in 0.15s
+=== end

@@ -1,0 +1,35 @@
+=== batch-101 Inc 16 E5 mutant mut-28
+row: R-DOC-ARCH.5
+mutation: delete the B100-I16 (derived_from) row from the Interfaces table
+guard: tests/test_b101_doc_hygiene.py::test_r_doc_arch_5_1_one_interfaces_table
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree: 535cfbbe17daed174525d72d8b1d92d9c6c3398f
+s19_app.__file__: <HOME>/<USER>/work/s19_i16m_copy/s19_app/__init__.py
+---
+result: KILLED (exit 1)
+first assertion line: E       AssertionError: 1 contracts missing from the first column: ['B100-I16']
+---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________________ test_r_doc_arch_5_1_one_interfaces_table ___________________
+
+    def test_r_doc_arch_5_1_one_interfaces_table():
+        """Verifies R-DOC-ARCH.5 (case /1): section 11 holds one Interfaces table
+        whose first column holds the 12 named contracts and the 46 source tags."""
+        assert len(_source_tags()) == 46
+        table = _interfaces_table()
+        first = [r[0] for r in table["rows"]]
+        joined = "\n".join(first)
+        missing = [n for n in _NAMED_CONTRACTS if n not in joined]
+        if not re.search(r"(?i)rail[- ]invariant", joined):
+            missing.append("rail invariant")
+        missing += [t for t in _source_tags() if not _tag_rx(t).search(joined)]
+>       assert not missing, f"{len(missing)} contracts missing from the first column: {missing}"
+E       AssertionError: 1 contracts missing from the first column: ['B100-I16']
+E       assert not ['B100-I16']
+
+tests/test_b101_doc_hygiene.py:1078: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_arch_5_1_one_interfaces_table
+1 failed in 0.15s
+=== end

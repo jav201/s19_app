@@ -1,0 +1,30 @@
+=== batch-101 Inc 16 E5 mutant mut-04
+row: R-DOC-REF.4
+mutation: restore '/fast-dev-flow' at docs/engineering-rules.md:11
+guard: tests/test_b101_doc_hygiene.py::test_r_doc_ref_4_1_retired_workflow_named_only_as_retired
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree: c6ee138cc6279a9d6ac96fb7a4180d9da456901f
+s19_app.__file__: <HOME>/<USER>/work/s19_i16m_copy/s19_app/__init__.py
+---
+result: KILLED (exit 1)
+first assertion line: E       AssertionError: 1 unmarked mentions of the retired workflow:
+---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________ test_r_doc_ref_4_1_retired_workflow_named_only_as_retired ___________
+
+    def test_r_doc_ref_4_1_retired_workflow_named_only_as_retired():
+        """Verifies R-DOC-REF.4 (case /1): the retired workflow's name appears in a
+        tracked text file only on a line with a removal mark, outside the exempt
+        lines."""
+        hits = _retired_hits(_retired_candidates(), 4)
+>       assert not hits, f"{len(hits)} unmarked mentions of the retired workflow:\n" + "\n".join(hits)
+E       AssertionError: 1 unmarked mentions of the retired workflow:
+E         docs/engineering-rules.md:10: **Not a control; a routing fact.** Both `/dev-flow` (Phase 0 input, Phase 6 close) and `/fast-dev-fl
+E       assert not ['docs/engineering-rules.md:10: **Not a control; a routing fact.** Both `/dev-flow` (Phase 0 input, Phase 6 close) and `/fast-dev-fl']
+
+tests/test_b101_doc_hygiene.py:484: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_ref_4_1_retired_workflow_named_only_as_retired
+1 failed in 1.35s
+=== end

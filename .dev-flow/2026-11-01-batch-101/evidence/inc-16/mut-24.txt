@@ -1,0 +1,31 @@
+=== batch-101 Inc 16 E5 mutant mut-24
+row: R-DOC-ARCH.1
+mutation: delete the `tools` row from the module table
+guard: tests/test_b101_doc_hygiene.py::test_r_doc_arch_1_1_module_table_covers_python_folders
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree: 258da34ca4712ebe7b4ea1d5b45ad5eda2b5cea1
+s19_app.__file__: <HOME>/<USER>/work/s19_i16m_copy/s19_app/__init__.py
+---
+result: KILLED (exit 1)
+first assertion line: E       AssertionError: Python folders without a module prefix: ['tools']
+---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________ test_r_doc_arch_1_1_module_table_covers_python_folders ____________
+
+    def test_r_doc_arch_1_1_module_table_covers_python_folders():
+        """Verifies R-DOC-ARCH.1 (case /1): the module table of the architecture
+        map declares a module prefix for each Python folder."""
+        folders = {p.split("/")[0] for p in _ls("*.py") if "/" in p}
+        assert folders >= {".dev-flow", "docs", "s19_app", "tests", "tools"}, folders
+        prefixes = set(_module_prefixes(_module_table(_section(_architecture(), 10))))
+        missing = sorted(folders - prefixes)
+>       assert not missing, f"Python folders without a module prefix: {missing}"
+E       AssertionError: Python folders without a module prefix: ['tools']
+E       assert not ['tools']
+
+tests/test_b101_doc_hygiene.py:917: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_arch_1_1_module_table_covers_python_folders
+1 failed in 0.15s
+=== end

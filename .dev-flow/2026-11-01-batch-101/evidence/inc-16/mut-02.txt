@@ -1,0 +1,44 @@
+=== batch-101 Inc 16 E5 mutant mut-02
+row: R-DOC-REF.2
+mutation: keep README.md:465 link to the deleted diagrams file
+guard: tests/test_b101_doc_hygiene.py::test_r_doc_ref_2_1_relative_links_resolve
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree: 248589f4c203616d12d79d48e622dc24dbf07b07
+s19_app.__file__: <HOME>/<USER>/work/s19_i16m_copy/s19_app/__init__.py
+---
+result: KILLED (exit 1)
+first assertion line: E       AssertionError: 1 broken links:
+---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________________ test_r_doc_ref_2_1_relative_links_resolve ___________________
+
+    def test_r_doc_ref_2_1_relative_links_resolve():
+        """Verifies R-DOC-REF.2 (case /1): every relative Markdown link of a
+        repository document resolves to a tracked file or folder."""
+        broken: list[str] = []
+        checked = 0
+        for rel in _repository_documents():
+            if not rel.endswith(".md"):
+                continue
+            text = _read(rel)
+            if text is None:
+                continue
+            for target in _links(text):
+                resolved = _resolve_link(rel, target)
+                if resolved is None:
+                    continue
+                checked += 1
+                if not _link_exists(resolved):
+                    broken.append(f"{rel}: ]({target}) -> {resolved}")
+        assert checked > 100, f"only {checked} relative links were checked; the scan lost its inputs"
+>       assert not broken, f"{len(broken)} broken links:\n" + "\n".join(broken)
+E       AssertionError: 1 broken links:
+E         README.md: ](docs/diagrams/architecture.md) -> docs/diagrams/architecture.md
+E       assert not ['README.md: ](docs/diagrams/architecture.md) -> docs/diagrams/architecture.md']
+
+tests/test_b101_doc_hygiene.py:325: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_ref_2_1_relative_links_resolve
+1 failed in 0.17s
+=== end

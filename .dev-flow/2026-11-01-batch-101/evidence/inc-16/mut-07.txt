@@ -1,0 +1,31 @@
+=== batch-101 Inc 16 E5 mutant mut-07
+row: R-DOC-README.4
+mutation: keep the diagrams row with the file deleted
+guard: tests/test_b101_help_legend_docs.py::test_r_doc_readme_4_2_linked_documents_exist
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree: 41835150174c2ea1cb58607983f5af75aeae4e0c
+s19_app.__file__: <HOME>/<USER>/work/s19_i16m_copy/s19_app/__init__.py
+---
+result: KILLED (exit 1)
+first assertion line: E       AssertionError: README links to files the tree does not hold: ['docs/diagrams/architecture.md']
+---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________________ test_r_doc_readme_4_2_linked_documents_exist _________________
+
+    def test_r_doc_readme_4_2_linked_documents_exist() -> None:
+        targets = _link_targets(_readme())
+        assert "CHANGELOG.md" in targets, "the README does not link CHANGELOG.md"
+        missing = [t for t in targets if not (ROOT / t).exists()]
+>       assert missing == [], f"README links to files the tree does not hold: {missing}"
+E       AssertionError: README links to files the tree does not hold: ['docs/diagrams/architecture.md']
+E       assert ['docs/diagra...hitecture.md'] == []
+E         
+E         Left contains one more item: 'docs/diagrams/architecture.md'
+E         Use -v to get more diff
+
+tests/test_b101_help_legend_docs.py:1430: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_readme_4_2_linked_documents_exist
+1 failed in 0.79s
+=== end

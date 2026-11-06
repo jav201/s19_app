@@ -1,0 +1,40 @@
+=== batch-101 Inc 16 E5 mutant mut-35
+row: E4 int-04 M-4
+mutation: EXPECTED_SCANNED_TEST_FILES = 262 (TC-607)
+guard: tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree: 2c43f46557a39191c38ad14af3d2951f08103455
+s19_app.__file__: <HOME>/<USER>/work/s19_i16m_copy/s19_app/__init__.py
+---
+result: KILLED (exit 1)
+first assertion line: E       AssertionError: the guard scanned 263 test modules, not the declared 262. If tests/ legitimately grew, bump EXPECTED_SCANNED_TEST_FILES in the same PR so the bound stays a decision rather than a rubber stamp.
+---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________ test_tc607_scanned_corpus_matches_the_declared_bound _____________
+
+corpus = <tests.test_id_registry._Corpus object at 0x7fd06c748b50>
+
+    def test_tc607_scanned_corpus_matches_the_declared_bound(corpus: _Corpus) -> None:
+        """TC-607 — the guard's corpus is bounded by a declared, executable constant.
+    
+        Asserting *how many files the guard opens* is deterministic where a
+        wall-clock budget would be flaky. Widening the scan — most obviously to
+        ``.dev-flow/``, which would make the guard's verdict depend on batch prose —
+        moves this count and turns the threshold red immediately.
+        """
+        actual = len(corpus.test_files)
+>       assert actual == EXPECTED_SCANNED_TEST_FILES, (
+            f"the guard scanned {actual} test modules, not the declared "
+            f"{EXPECTED_SCANNED_TEST_FILES}. If tests/ legitimately grew, bump "
+            f"EXPECTED_SCANNED_TEST_FILES in the same PR so the bound stays a "
+            f"decision rather than a rubber stamp."
+        )
+E       AssertionError: the guard scanned 263 test modules, not the declared 262. If tests/ legitimately grew, bump EXPECTED_SCANNED_TEST_FILES in the same PR so the bound stays a decision rather than a rubber stamp.
+E       assert 263 == 262
+
+tests/test_id_registry.py:524: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound
+1 failed in 4.99s
+=== end

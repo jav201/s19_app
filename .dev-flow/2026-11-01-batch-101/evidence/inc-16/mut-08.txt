@@ -1,0 +1,38 @@
+=== batch-101 Inc 16 E5 mutant mut-08
+row: R-DOC-DEV.1
+mutation: add `- `s19tool` -> `s19_app.cli:main`` back to CLAUDE.md
+guard: tests/test_b101_doc_hygiene.py::test_r_doc_dev_1_1_claude_lists_declared_console_scripts
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree: 7fcec1ef275f820857b05587cdf0e76649c70100
+s19_app.__file__: <HOME>/<USER>/work/s19_i16m_copy/s19_app/__init__.py
+---
+result: KILLED (exit 1)
+first assertion line: E       AssertionError: CLAUDE.md lists ['s19tool', 's19tui'], pyproject declares ['s19tui']
+---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_r_doc_dev_1_1_claude_lists_declared_console_scripts ___________
+
+    def test_r_doc_dev_1_1_claude_lists_declared_console_scripts():
+        """Verifies R-DOC-DEV.1 (case /1): CLAUDE.md "Project layout" lists exactly
+        the console scripts pyproject.toml declares and presents none other as an
+        entry point."""
+        text = _need("CLAUDE.md")
+        layout = re.search(r"(?ms)^## Project layout\s*$(.*?)(?=^## )", text)
+        assert layout, "CLAUDE.md has no '## Project layout' section"
+        arrow = re.compile(r"^\s*[-*]\s+`([^`]+)`\s*\u2192\s*`([\w.]+:\w+)`", re.M)
+        listed = {m.group(1) for m in arrow.finditer(layout.group(1))}
+        declared = set(_pyproject()["project"]["scripts"])
+>       assert listed == declared, f"CLAUDE.md lists {sorted(listed)}, pyproject declares {sorted(declared)}"
+E       AssertionError: CLAUDE.md lists ['s19tool', 's19tui'], pyproject declares ['s19tui']
+E       assert {'s19tool', 's19tui'} == {'s19tui'}
+E         
+E         Extra items in the left set:
+E         's19tool'
+E         Use -v to get more diff
+
+tests/test_b101_doc_hygiene.py:528: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_1_1_claude_lists_declared_console_scripts
+1 failed in 0.14s
+=== end

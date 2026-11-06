@@ -1,0 +1,31 @@
+=== batch-101 Inc 16 E5 mutant mut-17
+row: R-DOC-DEV.9
+mutation: delete the engineering-rules.md link row from docs/README.md
+guard: tests/test_b101_doc_hygiene.py::test_r_doc_dev_9_1_docs_index_links_every_entry
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree: c6bad1c512f0664d173b25e70e27bc088368a28f
+s19_app.__file__: <HOME>/<USER>/work/s19_i16m_copy/s19_app/__init__.py
+---
+result: KILLED (exit 1)
+first assertion line: E       AssertionError: docs/README.md does not link 1 of 12 entries: ['docs/engineering-rules.md']
+---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______________ test_r_doc_dev_9_1_docs_index_links_every_entry ________________
+
+    def test_r_doc_dev_9_1_docs_index_links_every_entry():
+        """Verifies R-DOC-DEV.9 (case /1): docs/README.md links every entry of the
+        documentation index, computed from the tree."""
+        for root_doc in _ROOT_DOCUMENTS:
+            assert root_doc in _tracked_set(), f"{root_doc} is not tracked"
+        entries = _docindex_entries(_tracked())
+        missing = _docindex_missing(entries, _docs_index_targets())
+>       assert not missing, f"docs/README.md does not link {len(missing)} of {len(entries)} entries: {missing}"
+E       AssertionError: docs/README.md does not link 1 of 12 entries: ['docs/engineering-rules.md']
+E       assert not ['docs/engineering-rules.md']
+
+tests/test_b101_doc_hygiene.py:713: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_9_1_docs_index_links_every_entry
+1 failed in 0.15s
+=== end

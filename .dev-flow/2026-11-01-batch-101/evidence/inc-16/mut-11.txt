@@ -1,0 +1,38 @@
+=== batch-101 Inc 16 E5 mutant mut-11
+row: R-DOC-DEV.3
+mutation: delete `main` from the CI sentence
+guard: tests/test_b101_doc_hygiene.py::test_r_doc_dev_3_1_ci_sentence_matches_the_workflow
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree: 07c98411efe455e8a1ab0b51d10c4db2c13b08f8
+s19_app.__file__: <HOME>/<USER>/work/s19_i16m_copy/s19_app/__init__.py
+---
+result: KILLED (exit 1)
+first assertion line: E       AssertionError: CI sentence must name both `main` and `main-tui`
+---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________ test_r_doc_dev_3_1_ci_sentence_matches_the_workflow ______________
+
+    def test_r_doc_dev_3_1_ci_sentence_matches_the_workflow():
+        """Verifies R-DOC-DEV.3 (case /1): the CLAUDE.md sentence about the CI
+        workflow names the branches and the two lane markers the workflow has."""
+        claude = _need("CLAUDE.md")
+        workflow = _need(".github/workflows/tui-ci.yml")
+        paragraphs = [p for p in _paragraphs(claude) if ".github/workflows/tui-ci.yml" in p]
+        assert len(paragraphs) == 1, f"{len(paragraphs)} paragraphs name the workflow, expected 1"
+        sentence = paragraphs[0]
+        on_block = re.search(r"(?ms)^on:\s*$(.*?)(?=^\S)", workflow)
+        assert on_block, "workflow has no top-level on: block"
+        branches = set(re.findall(r"(?m)^\s+-\s+([\w./-]+)\s*$", on_block.group(1)))
+        assert {"main", "main-tui"} <= branches, f"workflow branches: {branches}"
+        named_main = re.search(r"(?<![\w-])main(?![\w-])", sentence)
+        named_tui = re.search(r"(?<![\w-])main-tui(?![\w-])", sentence)
+>       assert named_main and named_tui, "CI sentence must name both `main` and `main-tui`"
+E       AssertionError: CI sentence must name both `main` and `main-tui`
+E       assert (None)
+
+tests/test_b101_doc_hygiene.py:579: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_3_1_ci_sentence_matches_the_workflow
+1 failed in 0.14s
+=== end

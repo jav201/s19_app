@@ -1,0 +1,42 @@
+=== batch-101 Inc 16 E5 mutant mut-20
+row: R-DOC-DEV.12
+mutation: restore 'ten single-context screens' at docs/overview.md:16
+guard: tests/test_b101_doc_hygiene.py::test_r_doc_dev_12_1_rail_counted_as_twelve
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree: d184fd3c2bb0c7ee002dba25ad51f9eb73b6b93f
+s19_app.__file__: <HOME>/<USER>/work/s19_i16m_copy/s19_app/__init__.py
+---
+result: KILLED (exit 1)
+first assertion line: E       AssertionError: rail line with another count, docs/overview.md:16: - **`s19tui`** — a Textual terminal interface (a "TUI") for interactive exploration, cross-artefact 
+---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________________ test_r_doc_dev_12_1_rail_counted_as_twelve __________________
+
+    def test_r_doc_dev_12_1_rail_counted_as_twelve():
+        """Verifies R-DOC-DEV.12 (case /1): the overview and the architecture map
+        count twelve rail windows with the twelve-key range and state no other
+        count on a rail line."""
+        problems: list[str] = []
+        for rel in ("docs/overview.md", "docs/architecture.md"):
+            text = _need(rel)
+            if not any(_KEY_RANGE_RX.search(l) for l in text.splitlines()):
+                problems.append(
+                    f"{rel} holds no line stating twelve rail windows with keys `1`-`0`, `=` and `]`"
+                )
+            problems += [
+                f"rail line with another count, {rel}:{n}: {l.strip()[:100]}"
+                for n, l in enumerate(text.splitlines(), 1)
+                if _is_rail_count_line(l)
+            ]
+        if not re.search(r"(?m)^#+\s*The twelve rail screens\s*$", _need("docs/architecture.md")):
+            problems.append("docs/architecture.md lost the heading 'The twelve rail screens'")
+>       assert not problems, "\n".join(problems)
+E       AssertionError: rail line with another count, docs/overview.md:16: - **`s19tui`** — a Textual terminal interface (a "TUI") for interactive exploration, cross-artefact 
+E       assert not ['rail line with another count, docs/overview.md:16: - **`s19tui`** — a Textual terminal interface (a "TUI") for interactive exploration, cross-artefact ']
+
+tests/test_b101_doc_hygiene.py:789: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_12_1_rail_counted_as_twelve
+1 failed in 0.15s
+=== end

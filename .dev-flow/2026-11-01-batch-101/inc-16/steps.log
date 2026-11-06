@@ -8,3 +8,5 @@ E3 correction 2026-11-06T07:29Z model=opus A16-1..A16-6 applied, minors A16-7..A
 E3 round2 2026-11-06T07:40Z architect=opus PASS-WITH-NOTES (A16-1..6 closed; N-1..N-3 to E4)
 E4 start 2026-11-06T07:40Z implementers model=deepseek-v4-pro (3 units) tester=sonnet
 E4 implementers end 2026-11-06T08:09Z model=deepseek-v4-pro (3 units, exit 0; deviations declared in notes u1/u2)
+E5 start 2026-11-06T08:38Z mutants=deepseek-v4-pro reviews=opus audit=qa-reviewer(opus)
+E5 mutants end 2026-11-06T09:10Z model=deepseek-v4-pro 35/35 killed

@@ -1,0 +1,23 @@
+=== batch-101 Inc 16 E5 mutant mut-31
+row: R-DOC-ARCHIVE.2
+mutation: drop the batch-99 table from the archive (E5 check ARCHIVE.2/1)
+guard: E5-T ARCHIVE.2/1 (git diff transcript)
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree: 8de35e1550e192cd274d9f1bbe6aa8d8d59eb3f2
+s19_app.__file__: <HOME>/<USER>/work/s19_i16m_copy/s19_app/__init__.py
+---
+result: KILLED (exit 1)
+first assertion line: ASSERTION: E5 check ARCHIVE.2/1 RED - removed section-10/11 lines missing from the archive
+---
+removed distinct section-10/11 lines (base vs working): 291
+missing from the archive: 15
+  MISSING: **Batch-99 interface amendments** (from `2026-10-25-batch-99`; **landed at `e7732f6`; every row frozen** — each froze at
+  MISSING: | B99-I1 the S19 memory-map contract — `S19File.get_memory_map` / `get_memory_ranges` / `get_record_for_address` / `_bui
+  MISSING: | B99-I10 the loader-notice codes (`core.py` `_load`, `hexfile.py` `_load`) | five stable codes `S19-NO-TERMINATOR`, `S1
+  MISSING: | B99-I11 the chain-set start check (`flow_execution_service.py:1443` `run_chain_set`) | refuses before any lane runs wh
+  MISSING: | B99-I12 the flow WRITE-OUT verify (`flow_execution_service.py` WRITE-OUT arm) | after placement, `verify_written_image
+  MISSING: | B99-I2 the write placement — `save_patched_image` (`changes/apply.py:625`) and `copy_into_workarea(source, destination
+  MISSING: | B99-I2a group placement (`tui/workspace.py` `place_group_into_workarea`, NEW) | places several files that must share o
+  MISSING: | B99-I3 `ChainRunOutcome` (`flow_execution_service.py:1366`) and the PATCH block status | `+ change_records`, `+ refusa
+ASSERTION: E5 check ARCHIVE.2/1 RED - removed section-10/11 lines missing from the archive
+=== end

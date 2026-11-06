@@ -1,0 +1,38 @@
+=== batch-101 Inc 16 E5 mutant mut-22
+row: R-DOC-DEV.14
+mutation: restore the base Operations bullet in docs/overview.md
+guard: tests/test_b101_doc_hygiene.py::test_r_doc_dev_14_1_overview_names_placeholder_operations
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree: f75b6d7b5799d0750be61a88eaf91965c62c041c
+s19_app.__file__: <HOME>/<USER>/work/s19_i16m_copy/s19_app/__init__.py
+---
+result: KILLED (exit 1)
+first assertion line: E       AssertionError: the overview still says the Operations modal executes the placeholder operations
+---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________ test_r_doc_dev_14_1_overview_names_placeholder_operations ___________
+
+    def test_r_doc_dev_14_1_overview_names_placeholder_operations():
+        """Verifies R-DOC-DEV.14 (case /1): the overview says the Operations modal
+        lists extract and split_by_segment without running them."""
+        text = _need("docs/overview.md")
+>       assert "executable from the in-app Operations modal" not in text, (
+            "the overview still says the Operations modal executes the placeholder operations"
+        )
+E       AssertionError: the overview still says the Operations modal executes the placeholder operations
+E       assert 'executable ...ations modal' not in '# s19_app —...ADME.md) |\n'
+E         
+E         'executable from th...pp Operations modal' is contained here:
+E           segment`) executable from the in-app Operations modal
+E           - **Entropy service.** Per-window Shannon entropy over the loaded image, classified into four bands (`constant/padding` · `low` · `medium` · `high/random`), feeding the Memory Map's banding and the report/viewer surfaces.
+E           
+E         ?                                                                                                                                                                                                                                          ...
+E         
+E         ...Full output truncated, use '-vv' to show
+
+tests/test_b101_doc_hygiene.py:840: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_dev_14_1_overview_names_placeholder_operations
+1 failed in 0.15s
+=== end

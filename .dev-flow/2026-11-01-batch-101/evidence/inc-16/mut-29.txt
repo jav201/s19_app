@@ -1,0 +1,29 @@
+=== batch-101 Inc 16 E5 mutant mut-29
+row: R-DOC-ARCH.6
+mutation: restore 'capped at <= 5 files' in section 9
+guard: tests/test_b101_doc_hygiene.py::test_r_doc_arch_6_1_increment_cap_is_four_source_files
+worktree HEAD (base): c2cba356f254cf85ba8c0e05b47b5103baf2d733
+index tree: a22a0af49d91ac64f155583d9fa52b2583ea9816
+s19_app.__file__: <HOME>/<USER>/work/s19_i16m_copy/s19_app/__init__.py
+---
+result: KILLED (exit 1)
+first assertion line: E       AssertionError: section 9 does not state the 4-source-file cap
+---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________ test_r_doc_arch_6_1_increment_cap_is_four_source_files ____________
+
+    def test_r_doc_arch_6_1_increment_cap_is_four_source_files():
+        """Verifies R-DOC-ARCH.6 (case /1): section 9 states the increment cap as
+        at most 4 source files and the old cap is gone."""
+        text = _architecture()
+>       assert "\u2264 4 source files" in _section(text, 9), "section 9 does not state the 4-source-file cap"
+E       AssertionError: section 9 does not state the 4-source-file cap
+E       assert '≤ 4 source files' in "## 9. The dev-flow process that built it\n\nEvery feature batch follows GRNDIA's six-phase V-model dev-flow:\n\n1. **.../history/](./requirements/history/). Ids are kept stable; test ids live in `AT-TC-REGISTRY.jsonl`, not in the canon.\n"
+E        +  where "## 9. The dev-flow process that built it\n\nEvery feature batch follows GRNDIA's six-phase V-model dev-flow:\n\n1. **.../history/](./requirements/history/). Ids are kept stable; test ids live in `AT-TC-REGISTRY.jsonl`, not in the canon.\n" = _section('# s19_app — Architecture\n\n**Audience:** a technical contributor about to read or change code.\n**Purpose:** describ...i/workspace.py` | `plan_project_save` | answers where `place_into_workarea` would put a file, without writing | no |\n', 9)
+
+tests/test_b101_doc_hygiene.py:1118: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_arch_6_1_increment_cap_is_four_source_files
+1 failed in 0.15s
+=== end
