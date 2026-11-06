@@ -27,7 +27,7 @@ The GREEN set: the 3 new test files; `tests/test_crc_designer_view.py` (whole mo
 | R-CRC-PREVIEW-002.4/1 (Ranges edit, after the quiet time) | 3.0 s | 1.008 s | 1.001 s | 1.003 s | 66.4 % |
 | R-SEG-PREV.20/1 (`g` in the F-23 Split/Join scene) | 2.5 s | 0.699 s | 0.683 s | 0.674 s | 72.0 % |
 
-Base, from the tester's RED run (host load 9-12): 28.4 s, 60.3 s, 531.7 s, 198.9 s. Host load at the start of each serial run: 5.64 / 3.73 / 2.73 (1-minute average, still falling after my own parallel run that ended about 30 s before). No other pytest was running when I checked at the end. Other worktrees on that host belong to other sessions, so concurrent use during the serial runs cannot be ruled out. The three runs agree within 4 %. The case text asks for 5/5 runs (M-3); the orchestrator asked for 3/3 at E4. The remaining runs are owed at E5.
+Base, from the tester's RED run (host load 9-12), in the table's order: 28.4 s, 531.7 s, 60.3 s, 198.9 s (002.3 = 531.7 s, 002.4 = 60.3 s per `red-01-tester-base.txt`; the two middle values were swapped here and corrected at the E5 corrective pass, C-6). Host load at the start of each serial run: 5.64 / 3.73 / 2.73 (1-minute average, still falling after my own parallel run that ended about 30 s before). No other pytest was running when I checked at the end. Other worktrees on that host belong to other sessions, so concurrent use during the serial runs cannot be ruled out. The three runs agree within 4 %. The case text asks for 5/5 runs (M-3); the orchestrator asked for 3/3 at E4. The remaining runs are owed at E5.
 
 ## Failures and causes (run 1)
 

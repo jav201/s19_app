@@ -1,0 +1,49 @@
+=== MUTANT M-22 ===
+$ python -c 'import s19_app; print(s19_app.__file__)'
+<HOME>/work/s19_m13/s19_app/__init__.py
+$ timeout 900 <HOME>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -n 2 --basetemp /tmp/pytest-s19m13 tests/test_b101_designer_recompute.py::test_r_crc_preview_001_12_out_of_order_ranges_draw_a_bounded_line
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______ test_r_crc_preview_001_12_out_of_order_ranges_draw_a_bounded_line _______
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m13/popen-gw0/test_r_crc_preview_001_12_out_0')
+
+    def test_r_crc_preview_001_12_out_of_order_ranges_draw_a_bounded_line(
+        tmp_path: Path,
+    ) -> None:
+        """(a) The F-23 CRC scene's ranges typed in reverse, ``0x00C00000-0x00C00FFF,
+        0x00800000-0x00931FBF`` -> line 1 exactly 15 glyphs (1 + 14) and line 2
+        ``concat 0x00000000   fill 0x00000000`` (the fixture holds no byte there:
+        ``zlib.crc32(b"")``). (c) Ascending Ranges draw as on base: the first-shown
+        Ranges 24 glyphs (8 + 8 + 8), then the F-23 CRC scene's ranges 49 glyphs
+        (14 + 34 + 1). 3 of 3.
+    
+        Why: the line was scaled by (last range's end - first range's start), which
+        for out-of-order Ranges is negative or tiny, so the line grew to one glyph
+        per byte (1257406 glyphs here). Negative control: the base scale restored ->
+        (a) draws 1257406 glyphs -> RED. The hostile three-range input is the next
+        node (it must not run against the base tree)."""
+        first_shown = "0x00008000-0x00008008, 0x00008010-0x00008018"
+        reverse = "0x00C00000-0x00C00FFF, 0x00800000-0x00931FBF"
+        for lines_a, lines_c1, lines_c2 in (
+            asyncio.run(_line1_after(tmp_path, [reverse, first_shown, F23_RANGES]))
+            for _ in range(REPS)
+        ):
+>           assert _glyphs(lines_a[0]) == 15, _glyphs(lines_a[0])
+E           AssertionError: 1257406
+E           assert 1257406 == 15
+E            +  where 1257406 = _glyphs('█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████...██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████')
+
+tests/test_b101_designer_recompute.py:815: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_designer_recompute.py::test_r_crc_preview_001_12_out_of_order_ranges_draw_a_bounded_line
+1 failed in 6.90s
+PYTEST_EXIT=1
+SHA256 s19_app/tui/crc_designer_view.py = 814aefc7247a1ee876e571102af1a080466888a65a00b51cf5cc7375ac2062f5
+SHA256 s19_app/tui/segment_split_view.py = 9b4f660d174eb4debe95f1ee5475a4ddcc1931348b1f0be8bd526bd6282051aa
+SHA256 s19_app/tui/operations/crc_kernel.py = f96188b2fb1266302f173268b0419a97b1ed9ad18cd685b2dbdf815233e91edf
+DONE M-22 exits=[1]

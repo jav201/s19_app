@@ -364,15 +364,18 @@ def test_r_crc_designer_007_2_template_load_recomputes_once(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """The F-23 template (CRC-16/MODBUS parameters, Check ``0x4B37``, Name
-    ``demo-modbus``, Aliases ``a, b``) loaded from the first-shown form, quiet
-    time 0.6 s: 1.5 s after Load exactly one recompute, every algorithm field,
-    Name and Aliases hold the template's values, and the status reads
-    ``Loaded template from file.``. 3 of 3.
+    ``demo-modbus``, Aliases ``a, b``) loaded from the first-shown form with
+    Reflection in and out switched off first (E5 corrective C-4: the
+    first-shown CRC-32/ISO-HDLC already has both on, so the start form must
+    differ from the template in every asserted field), quiet time 0.6 s: 1.5 s
+    after Load exactly one recompute, every algorithm field, Name and Aliases
+    hold the template's values (Reflection in/out on again), and the status
+    reads ``Loaded template from file.``. 3 of 3.
 
     Why: a load sets up to eleven widgets and each changed one used to post its
     own recompute (about 2 min with the 10 MB image). Negative control: the
-    per-field change events of the fill left on -> 1 + one per changed field
-    (about 11) -> RED."""
+    per-field change events of the fill left on -> 2 recomputes on head (N-3;
+    about 11 on base) -> RED."""
     _set_quiet(monkeypatch, 0.6)
     template = tmp_path / "demo-modbus.crc.json"
     _f23_template(template)
@@ -383,6 +386,15 @@ def test_r_crc_designer_007_2_template_load_recomputes_once(
             await pilot.pause()
             await pilot.press("0")
             await pilot.pause()
+            for switch_id in ("#crc_field_refin", "#crc_field_refout"):
+                before = designer_recomputes()
+                app.query_one(switch_id, Switch).value = False
+                await wait_designer_recompute(pilot, app, before)
+            start = (
+                {fid: app.query_one(f"#{fid}", Input).value for fid in F23_TEMPLATE_FIELDS},
+                app.query_one("#crc_field_refin", Switch).value,
+                app.query_one("#crc_field_refout", Switch).value,
+            )
             before = designer_recomputes()
             app.query_one("#crc_load_path", Input).value = str(template)
             await wait_designer_recompute(pilot, app, before)
@@ -397,9 +409,12 @@ def test_r_crc_designer_007_2_template_load_recomputes_once(
                 app.query_one("#crc_field_refout", Switch).value,
             )
             status = str(app.query_one("#crc_loadsave_status", Static).content)
-            return designer_recomputes() - before, fields, reflects, status
+            return designer_recomputes() - before, fields, reflects, status, start
 
-    for delta, fields, reflects, status in _run(scenario):
+    for delta, fields, reflects, status, start in _run(scenario):
+        start_fields, start_refin, start_refout = start
+        assert (start_refin, start_refout) == (False, False)
+        assert all(start_fields[f] != v for f, v in F23_TEMPLATE_FIELDS.items()), start_fields
         assert delta == 1, f"a template load must recompute once, got {delta}"
         assert fields == F23_TEMPLATE_FIELDS, fields
         assert reflects == (True, True)
@@ -410,12 +425,16 @@ def test_r_crc_designer_007_3_preset_pick_recomputes_once(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """CRC-16/MODBUS picked from the first-shown form, quiet time 0.6 s: 1.5 s
-    after the pick exactly one recompute and the verdict reads ``MATCH``. 3 of 3.
+    after the pick exactly one recompute, the verdict reads ``MATCH``, and
+    Width, Polynomial and Init hold the preset's ``16``, ``0x8005``, ``0xFFFF``
+    (E5 corrective C-4: the first-shown CRC-32/ISO-HDLC also reads ``MATCH``,
+    so the fields are what shows the pick was applied). 3 of 3.
 
     Why: the preset fill is the same function as the template fill and had the
     same defect (about nine recomputes). Negative control: the fill's change
-    events left on -> about nine -> RED."""
+    events left on -> 2 recomputes on head (N-3; about nine on base) -> RED."""
     _set_quiet(monkeypatch, 0.6)
+    ids = ("#crc_field_width", "#crc_field_poly", "#crc_field_init")
 
     async def scenario():
         app = S19TuiApp(base_dir=tmp_path)
@@ -423,14 +442,18 @@ def test_r_crc_designer_007_3_preset_pick_recomputes_once(
             await pilot.pause()
             await pilot.press("0")
             await pilot.pause()
+            start = tuple(app.query_one(i, Input).value for i in ids)
             before = designer_recomputes()
             app.query_one("#crc_preset_select", Select).value = "CRC-16/MODBUS"
             await pilot.pause(1.5)
-            return designer_recomputes() - before, _verdict(app)
+            fields = tuple(app.query_one(i, Input).value for i in ids)
+            return designer_recomputes() - before, _verdict(app), start, fields
 
-    for delta, verdict in _run(scenario):
+    for delta, verdict, start, fields in _run(scenario):
+        assert start == ("32", "0x04C11DB7", "0xFFFFFFFF"), start
         assert delta == 1, f"a preset pick must recompute once, got {delta}"
         assert "✓ MATCH" in verdict and "MISMATCH" not in verdict, verdict
+        assert fields == ("16", "0x8005", "0xFFFF"), fields
 
 
 # ---------------------------------------------------------------------------
@@ -844,10 +867,13 @@ _DESIGNER_MODULE = "tests.support.b101_designer"
 
 
 def _is_snapshot(node: ast.AST) -> bool:
+    # E5-CR-4: only the inserted name is stripped, so a snapshot that rebinds a
+    # name a later assertion reads stays visible to the check.
     return (
         isinstance(node, ast.Assign)
         and len(node.targets) == 1
         and isinstance(node.targets[0], ast.Name)
+        and node.targets[0].id == "recomputes_before"
         and isinstance(node.value, ast.Call)
         and isinstance(node.value.func, ast.Name)
         and node.value.func.id == "designer_recomputes"
@@ -1016,3 +1042,502 @@ def test_inc13_d2_check_names_a_dropped_assertion_a_constant_and_a_deleted_test(
     assert _d2_drift(_D2_BASE, deleted) == ["missing at head: def test_a"]
     added = _D2_HEAD_CLEAN + "\n\ndef test_new():\n    assert True\n"
     assert _d2_drift(_D2_BASE, added) == []
+
+
+def test_inc13_d2_check_names_a_snapshot_bound_to_another_name() -> None:
+    """Control for E5-CR-4: only ``recomputes_before = designer_recomputes()``
+    is an allowed insertion. A snapshot bound to any other name (here one that
+    rebinds a name a later assertion could read) is a drift and is named.
+
+    Why: the check stripped a snapshot under any name, so an inserted
+    ``expected = designer_recomputes()`` could change what an assertion reads
+    and stay invisible. Negative control: the name test removed from
+    ``_is_snapshot`` -> this returns no drift -> RED."""
+    other = _D2_HEAD_CLEAN.replace(
+        "    recomputes_before = designer_recomputes()\n",
+        "    expected = designer_recomputes()\n",
+    )
+    assert other != _D2_HEAD_CLEAN
+    assert _d2_drift(_D2_BASE, other) == ["changed at head: def test_a"]
+
+
+# ---------------------------------------------------------------------------
+# E5 corrective (C-4) - R-CRC-PREVIEW-001.1/1: the exact empty state, both surfaces
+# ---------------------------------------------------------------------------
+def test_r_crc_preview_001_1_no_image_at_start_exact_note_on_both_surfaces(
+    tmp_path: Path,
+) -> None:
+    """App started with no image, key ``0``: the coverage preview and the
+    coverage window's plain text are both exactly ``Load an image to preview
+    coverage CRCs over real bytes.`` (1 of 1).
+
+    Why: the two cited base nodes check a substring on one surface each, so a
+    note with extra text, or one surface left blank, would pass them. Negative
+    control: the window rendering anything else at start -> RED."""
+
+    async def scenario():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await pilot.press("0")
+            await wait_until(
+                pilot,
+                lambda: _preview(app) == EMPTY_STATE,
+                lambda: f"preview {_preview(app)!r}",
+                pause_first=True,
+            )
+            return _preview(app), str(_window(app))
+
+    preview, window = asyncio.run(scenario())
+    assert preview == EMPTY_STATE
+    assert window == EMPTY_STATE
+
+
+# ---------------------------------------------------------------------------
+# E5 corrective (C-7, clause 1) - a recompute updates every result surface once
+# ---------------------------------------------------------------------------
+SURFACE_IDS = (
+    "crc_kat_verdict",
+    "crc_custom_vector_result",
+    "crc_json_preview",
+    "crc_warnings",
+    "crc_coverage_preview",
+    "crc_coverage_window",
+)
+
+
+def _count_surface_updates(app: S19TuiApp) -> Dict[str, int]:
+    """Wrap the ``update`` of each of the six result-surface widgets of S13
+    CTX-DESIGNER (one instance each) and count the calls per id."""
+    counts = {sid: 0 for sid in SURFACE_IDS}
+    for sid in SURFACE_IDS:
+        widget = app.query_one(f"#{sid}", Static)
+        original = widget.update
+
+        def spy(*args, _sid=sid, _original=original, **kwargs):
+            counts[_sid] += 1
+            return _original(*args, **kwargs)
+
+        widget.update = spy
+    return counts
+
+
+def test_r_crc_designer_recompute_updates_each_of_the_six_surfaces_once(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The definition of "recompute" (01-requirements.md Definitions: each of
+    the six result-surface widgets is updated once), observed on the widgets:
+    with the fixture image and key ``0``, (a) Join gaps concat -> fill (a
+    dropdown, at once) -> each of the six widgets updated exactly once; (b) an
+    edit burst of XOR out (5 values back to back, quiet time 0.6 s) -> each
+    updated exactly once more; (c) the image replaced while displayed -> each
+    exactly once more. 1 of 1.
+
+    Why: the other cases count ``_recompute`` calls; this one shows that a
+    recompute reaches every surface (verdict, custom vector, JSON, Warnings,
+    coverage preview and window) and that no surface is refreshed twice or
+    skipped. Negative control: a surface dropped from ``_recompute`` (or the
+    coverage rendered twice) -> its count differs from 1 -> RED."""
+    _set_quiet(monkeypatch, 0.6)
+
+    async def scenario():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await pilot.press("0")
+            await pilot.pause()
+            before = designer_recomputes()
+            app.current_file = loaded(fixture_mem())
+            await wait_designer_recompute(pilot, app, before)
+            counts = _count_surface_updates(app)
+            steps = []
+            before = designer_recomputes()
+            app.query_one("#crc_coverage_join", Select).value = "fill"
+            await wait_designer_recompute(pilot, app, before)
+            await pilot.pause(0.3)
+            steps.append((dict(counts), designer_recomputes() - before))
+            before = designer_recomputes()
+            for value in ("0x1", "0x2", "0x3", "0x4", "0x00000000"):
+                app.query_one("#crc_field_xorout", Input).value = value
+            await wait_designer_recompute(pilot, app, before)
+            await pilot.pause(0.8)
+            steps.append((dict(counts), designer_recomputes() - before))
+            before = designer_recomputes()
+            replaced = fixture_mem()
+            replaced[0x8000] = 0xAA
+            app.current_file = loaded(replaced)
+            await wait_designer_recompute(pilot, app, before)
+            await pilot.pause(0.8)
+            steps.append((dict(counts), designer_recomputes() - before))
+            return steps
+
+    steps = asyncio.run(scenario())
+    for n, (counts, recomputes) in enumerate(steps, start=1):
+        assert recomputes == 1, (n, recomputes)
+        assert counts == {sid: n for sid in SURFACE_IDS}, (n, counts)
+
+
+# ---------------------------------------------------------------------------
+# E5 corrective (C-8, E5-CR-3) - a CRC fault after a clean evaluation is named
+# ---------------------------------------------------------------------------
+def test_r_crc_preview_coverage_crc_error_after_a_clean_evaluation_is_named(
+    tmp_path: Path,
+) -> None:
+    """A shared run whose evaluation is clean (not refused) but whose other
+    policy's CRC faulted (``crc_error`` set, both CRCs ``None``): the preview
+    reads exactly ``Cannot preview: <reason>`` and the window's line 2 exactly
+    ``Cannot compute: <reason>``. The run is built directly: no reachable form
+    produces it today (the only ``ValueError`` on that path is the width check,
+    which the evaluation raises first), so this pins the renderers' branch
+    order, as E5-CR-3 asks.
+
+    Why: without the branch the preview formatted ``None`` as a CRC and raised
+    ``TypeError`` inside the recompute. Negative control: the ``crc_error``
+    branch removed from ``_coverage_preview_text`` -> ``TypeError`` -> RED."""
+
+    async def scenario():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await pilot.press("0")
+            await pilot.pause()
+            panel = app.query_one(crc_designer_view.CrcDesignerPanel)
+            run = crc_designer_view._CoverageRun(
+                target=panel._build_coverage_target(),
+                evaluation=crc_designer_model.TargetEvaluation(
+                    crc=0x1234, refused=False, conflicts=(), diagnostics=()
+                ),
+                crc_error="width 99 out of range [8, 64]",
+            )
+            preview = panel._coverage_preview_text(run)
+            window = str(panel._render_coverage_window(run)).split("\n")
+            return preview, window
+
+    preview, window = asyncio.run(scenario())
+    assert preview == "Cannot preview: width 99 out of range [8, 64]"
+    assert window[1:] == ["Cannot compute: width 99 out of range [8, 64]"], window
+
+
+# ---------------------------------------------------------------------------
+# E5 corrective (C-7) - black-box acceptance: keys, dialogs and the shipped
+# load / project / unload routes (coverage audit section 5, items 1 to 5)
+# ---------------------------------------------------------------------------
+def _s19_record(address: int, data: bytes) -> str:
+    body = bytes([len(data) + 3]) + address.to_bytes(2, "big") + data
+    return "S1" + body.hex().upper() + f"{(~sum(body)) & 0xFF:02X}"
+
+
+def _write_fixture_s19(path: Path) -> Path:
+    """The fixture image as an S19 file (two S1 records, ``0x8000``-``0x8007``
+    = ``00``..``07`` and ``0x8010``-``0x8017`` = ``10``..``17``)."""
+    lines = [
+        "S0030000FC",
+        _s19_record(0x8000, bytes(range(8))),
+        _s19_record(0x8010, bytes(range(0x10, 0x18))),
+        "S9030000FC",
+    ]
+    path.write_text("\n".join(lines) + "\n", encoding="ascii")
+    return path
+
+
+async def _focus(pilot, app: S19TuiApp, selector: str):
+    widget = app.query_one(selector)
+    widget.focus()
+    await wait_until(pilot, lambda: app.focused is widget, f"{selector} focused", pause_first=True)
+    return widget
+
+
+async def _clear_and_type(pilot, app: S19TuiApp, selector: str, text: str) -> None:
+    """Focus a text field, clear it by keys (``end``, then one ``backspace`` per
+    character) and type ``text`` key by key."""
+    field = await _focus(pilot, app, selector)
+    await pilot.press("end")
+    await pilot.press(*(["backspace"] * len(field.value)))
+    await pilot.press(*text)
+
+
+async def _pick_by_keys(pilot, app: S19TuiApp, selector: str, moves: List[str], want: str) -> None:
+    """Open a dropdown by keys (``enter``), move the highlight, pick (``enter``)."""
+    select = await _focus(pilot, app, selector)
+    await pilot.press("enter")
+    for key in moves:
+        await pilot.press(key)
+    await pilot.press("enter")
+    await wait_until(
+        pilot,
+        lambda: str(select.value) == want,
+        lambda: f"{selector} reads {select.value!r}, not {want!r}",
+        pause_first=True,
+    )
+
+
+def test_r_crc_designer_at_typing_burst_by_keys_recomputes_once(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Black-box (audit AT 1; R-CRC-DESIGNER-007.1 / 001.2.2): key ``0``, XOR
+    out focused, cleared by ``end`` and ten ``backspace`` and ``0x0`` typed key
+    by key (13 edits back to back; quiet time 2 s so the burst is one burst on
+    a loaded host) -> none during the keys, then exactly one recompute after
+    the quiet time, XOR out reads ``0x0`` and the verdict is ``✗ MISMATCH``.
+    1 of 1.
+
+    Why: the other nodes set ``Input.value``; this is the operator's route,
+    one ``Input.Changed`` per key. Negative control: no timer (a recompute per
+    key) -> 13 -> RED."""
+    _set_quiet(monkeypatch, 2.0)
+
+    async def scenario():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(160, 50)) as pilot:
+            await pilot.pause()
+            await pilot.press("0")
+            await pilot.pause()
+            before = designer_recomputes()
+            await _clear_and_type(pilot, app, "#crc_field_xorout", "0x0")
+            pending_after_keys = designer_pending(app) is not None
+            count_after_keys = designer_recomputes() - before
+            await wait_designer_recompute(pilot, app, before, timeout=30)
+            await pilot.pause(0.5)
+            value = app.query_one("#crc_field_xorout", Input).value
+            return pending_after_keys, count_after_keys, designer_recomputes() - before, value, _verdict(app)
+
+    pending, early, delta, value, verdict = asyncio.run(scenario())
+    assert pending is True and early == 0, (pending, early)
+    assert value == "0x0"
+    assert delta == 1, f"a typed burst must recompute once, got {delta}"
+    assert "✗ MISMATCH" in verdict, verdict
+
+
+def test_r_crc_designer_at_preset_and_coverage_dropdowns_by_keys(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Black-box (audit ATs 2 and 5; R-CRC-DESIGNER-007.3, -001.2.1): the
+    fixture image set, key ``0``; then by keys only (focus, ``enter``, arrows,
+    ``enter``): (a) Preset ``CRC-32/ISO-HDLC`` -> ``CRC-16/MODBUS`` (two ``up``)
+    -> 1.5 s later exactly one recompute, Width ``16``, Polynomial ``0x8005``,
+    Init ``0xFFFF``, verdict ``✓ MATCH``; (b) the image is the dirty fixture:
+    On conflict ``abort`` -> ``warn`` (one ``down``) -> one recompute at once,
+    the preview keeps three lines (``Active policy: join=concat``, no gap
+    note under concat); (c) Join gaps ``concat`` -> ``fill`` (one ``down``) ->
+    one recompute at once, preview line 1 ``Active policy: join=fill`` and line
+    4 exactly the warn diagnostic. Quiet time 10 s, so a recompute seen here is
+    the at-once one. 1 of 1.
+
+    Why: the other nodes set ``Select.value``; the dropdown overlay is the
+    operator's route. Negative control: the select handlers routed to the timer
+    -> no recompute within the waits -> RED."""
+    _set_quiet(monkeypatch, 10.0)
+
+    async def scenario():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(160, 50)) as pilot:
+            await pilot.pause()
+            await pilot.press("0")
+            await pilot.pause()
+            await _load_and_recompute(pilot, app, dirty_mem(), ranges=None)
+            out = {}
+            before = designer_recomputes()
+            await _pick_by_keys(pilot, app, "#crc_preset_select", ["up", "up"], "CRC-16/MODBUS")
+            await pilot.pause(1.5)
+            out["preset"] = (
+                designer_recomputes() - before,
+                tuple(
+                    app.query_one(i, Input).value
+                    for i in ("#crc_field_width", "#crc_field_poly", "#crc_field_init")
+                ),
+                _verdict(app),
+            )
+            before = designer_recomputes()
+            await _pick_by_keys(pilot, app, "#crc_coverage_on_gap_conflict", ["down"], "warn")
+            await wait_until(
+                pilot, lambda: designer_recomputes() > before, "no at-once recompute", pause_first=True
+            )
+            await pilot.pause(0.3)
+            out["conflict"] = (designer_recomputes() - before, _preview(app).split("\n"))
+            before = designer_recomputes()
+            await _pick_by_keys(pilot, app, "#crc_coverage_join", ["down"], "fill")
+            await wait_until(
+                pilot, lambda: designer_recomputes() > before, "no at-once recompute", pause_first=True
+            )
+            await pilot.pause(0.3)
+            out["join"] = (designer_recomputes() - before, _preview(app).split("\n"))
+            return out
+
+    out = asyncio.run(scenario())
+    delta, fields, verdict = out["preset"]
+    assert delta == 1, delta
+    assert fields == ("16", "0x8005", "0xFFFF"), fields
+    assert "✓ MATCH" in verdict and "MISMATCH" not in verdict, verdict
+    delta, lines = out["conflict"]
+    assert delta == 1, delta
+    assert len(lines) == 3 and lines[0] == "Active policy: join=concat", lines
+    delta, lines = out["join"]
+    assert delta == 1, delta
+    assert lines[0] == "Active policy: join=fill", lines
+    assert lines[3:] == [GAP_NOTE_WARN], lines
+
+
+def test_r_crc_designer_at_template_load_by_keys_recomputes_once(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Black-box (audit AT 3; R-CRC-DESIGNER-007.2): key ``0``, the Load path
+    typed key by key (one burst), its recompute waited, then the Load button
+    pressed by keys (focus, ``enter``) -> 1.5 s later exactly one recompute,
+    every template field filled and the status ``Loaded template from file.``.
+    Quiet time 0.6 s. 1 of 1.
+
+    Why: the operator types the path and presses the button; a typed path is a
+    burst of text edits and the load must still recompute once. Negative
+    control: the fill's change events left on -> 2 -> RED."""
+    _set_quiet(monkeypatch, 0.6)
+    template = tmp_path / "t.crc.json"
+    _f23_template(template)
+
+    async def scenario():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(160, 50)) as pilot:
+            await pilot.pause()
+            await pilot.press("0")
+            await pilot.pause()
+            before = designer_recomputes()
+            await _clear_and_type(pilot, app, "#crc_load_path", str(template))
+            await wait_designer_recompute(pilot, app, before, timeout=30)
+            typed = app.query_one("#crc_load_path", Input).value
+            before = designer_recomputes()
+            await _focus(pilot, app, "#crc_load_btn")
+            await pilot.press("enter")
+            await pilot.pause(1.5)
+            fields = {
+                fid: app.query_one(f"#{fid}", Input).value for fid in F23_TEMPLATE_FIELDS
+            }
+            status = str(app.query_one("#crc_loadsave_status", Static).content)
+            return typed, designer_recomputes() - before, fields, status
+
+    typed, delta, fields, status = asyncio.run(scenario())
+    assert typed == str(template)
+    assert delta == 1, f"a template load must recompute once, got {delta}"
+    assert fields == F23_TEMPLATE_FIELDS, fields
+    assert status == "Loaded template from file.", status
+
+
+def test_r_crc_preview_at_image_load_and_unload_through_the_shipped_routes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Black-box (audit AT 4, file and unload halves; R-CRC-PREVIEW-002.1,
+    -002.5, -001.1/2): the fixture image written as an S19 file. (a) Designer
+    hidden (key ``1``): the file loaded through the Load dialog (``l``, the path
+    typed, ``#load_ok``) -> no recompute and nothing pending; key ``0`` -> one
+    recompute, preview exactly the three fixture lines. (b) Designer displayed:
+    ``U`` (Unload all) -> one recompute, preview and window exactly the
+    empty-state note. (c) Designer displayed: the file loaded again through the
+    dialog opened with ``ctrl+l`` -> one recompute, the three lines. Quiet time
+    0.6 s. 1 of 1.
+
+    Why: the other nodes assign ``app.current_file``; these are the routes that
+    assign it (a load, an unload) as the operator runs them. Negative control:
+    the image watcher not registered -> (c) keeps the empty-state note -> RED."""
+    from tests.support import b100_load_dialog as ld
+    from tests.support.b100_workers import settle_workers
+
+    _set_quiet(monkeypatch, 0.6)
+    image = _write_fixture_s19(tmp_path / "fixture.s19")
+
+    async def scenario():
+        app = S19TuiApp(base_dir=tmp_path / "home")
+        async with app.run_test(size=(160, 50)) as pilot:
+            await pilot.pause()
+            await pilot.press("0")
+            await pilot.pause()
+            await pilot.press("1")
+            await pilot.pause()
+            out = {}
+            before = designer_recomputes()
+            await ld.load_path_through_dialog(
+                pilot, app, image, until=lambda: app.current_file is not None
+                and app.current_file.path.name == "fixture.s19", what="the hidden load",
+            )
+            await settle_workers(pilot)
+            await pilot.pause(0.8)
+            out["hidden"] = (designer_recomputes() - before, designer_pending(app))
+            await pilot.press("0")
+            await wait_designer_recompute(pilot, app, before)
+            await pilot.pause(0.8)
+            out["shown"] = (designer_recomputes() - before, _preview(app))
+            await _focus(pilot, app, "#crc_designer_panel")
+            before = designer_recomputes()
+            await pilot.press("U")
+            await wait_until(pilot, lambda: app.current_file is None, "Unload all", pause_first=True)
+            await wait_designer_recompute(pilot, app, before)
+            await pilot.pause(0.8)
+            out["unload"] = (designer_recomputes() - before, _preview(app), str(_window(app)))
+            await _focus(pilot, app, "#crc_designer_panel")
+            before = designer_recomputes()
+            await ld.load_path_through_dialog(
+                pilot, app, image, open_key="ctrl+l", until=lambda: app.current_file is not None,
+                what="the displayed load",
+            )
+            await settle_workers(pilot)
+            await wait_designer_recompute(pilot, app, before)
+            await pilot.pause(0.8)
+            out["displayed"] = (designer_recomputes() - before, _preview(app), app._active_screen_key)
+            return out
+
+    out = asyncio.run(scenario())
+    assert out["hidden"] == (0, None), out["hidden"]
+    assert out["shown"] == (1, FIXTURE_PREVIEW), out["shown"]
+    assert out["unload"] == (1, EMPTY_STATE, EMPTY_STATE), out["unload"]
+    assert out["displayed"] == (1, FIXTURE_PREVIEW, "crc_designer"), out["displayed"]
+
+
+def test_r_crc_preview_at_project_load_through_the_dialog_recomputes_once(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Black-box (audit AT 4, project half; R-CRC-PREVIEW-002.1, the 001.2.2/2
+    rationale "a project load that sets the image twice recomputes once"): a
+    project ``P`` holding case_01's ``firmware.s19`` saved through the shipped
+    Save handler; a fresh app, key ``0``, Ranges typed ``0x80000000-0x80000010``
+    (bytes the image holds; no gap) and its recompute waited; then ``p``, row
+    ``P``, ``#load_ok``, the Load-result panel closed with ``esc`` -> exactly
+    one recompute after the load, preview exactly ``Active policy:
+    join=concat`` / ``concat: 0x<c>`` / ``fill:   0x<c>`` with ``<c>`` the
+    ``zlib.crc32`` of the image's 16 bytes at ``0x80000000``. Quiet time 0.6 s.
+    1 of 1.
+
+    Why: the project load resets the image to ``None`` and then installs the
+    new one; both are image changes and must cost one recompute. Negative
+    control: the watcher recomputing at once on every change -> 2 -> RED."""
+    from s19_app.core import S19File
+    from tests.support import b100_load_dialog as ld
+    from tests.support import b100_projects as projects
+    from tests.support.b100_workers import settle_workers
+
+    _set_quiet(monkeypatch, 0.6)
+    base = tmp_path / "home"
+    project_dir = projects.save_case01_project(base, "P", files=("firmware.s19",))
+    mem = S19File(str(project_dir / "firmware.s19")).get_memory_map()
+    window_bytes = bytes(mem[0x80000000 + i] for i in range(16))
+    crc = zlib.crc32(window_bytes)
+    want = f"Active policy: join=concat\nconcat: 0x{crc:08X}\nfill:   0x{crc:08X}"
+
+    async def scenario():
+        app = S19TuiApp(base_dir=base)
+        async with app.run_test(size=(160, 50)) as pilot:
+            await pilot.pause()
+            await pilot.press("0")
+            await pilot.pause()
+            before = designer_recomputes()
+            app.query_one("#crc_coverage_ranges", Input).value = "0x80000000-0x80000010"
+            await wait_designer_recompute(pilot, app, before)
+            await _focus(pilot, app, "#crc_designer_panel")
+            before = designer_recomputes()
+            await ld.open_project_through_dialog(pilot, app, "P")
+            await projects.dismiss_load_result_panel(pilot, app)
+            await settle_workers(pilot)
+            await wait_designer_recompute(pilot, app, before)
+            await pilot.pause(0.8)
+            return designer_recomputes() - before, _preview(app), app.current_project
+
+    delta, preview, project = asyncio.run(scenario())
+    assert project == "P"
+    assert delta == 1, f"a project load must recompute once, got {delta}"
+    assert preview == want, preview

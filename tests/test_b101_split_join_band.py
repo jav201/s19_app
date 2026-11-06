@@ -24,6 +24,7 @@ may change); they are RED against the mutants listed per node.
 """
 from __future__ import annotations
 
+import asyncio
 import random
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
@@ -31,13 +32,22 @@ from typing import Dict, List, Optional, Set, Tuple
 import pytest
 
 from s19_app.tui import segment_split_view as ssv
+from s19_app.tui.app import S19TuiApp
+from s19_app.tui.models import LoadedFile
 from s19_app.tui.operations.crc_designer_model import CrcTarget, gap_conflict
-from s19_app.tui.segment_split_view import SegRow, build_plan
-from tests.support.b101_demo_image import demo_mem_map
+from s19_app.tui.segment_split_view import (
+    GUARD_SPAN_MIN,
+    SegRow,
+    SplitJoinWindow,
+    build_plan,
+    fmtB,
+)
+from tests.support.b101_demo_image import demo_loaded_file, demo_mem_map
 from tests.support.b101_inc13_reference import (
     reference_conflict_marks,
     reference_sweep,
 )
+from tests.support.timing import wait_until
 
 Marks = List[Tuple[int, int, str]]
 MODES = (("split", "skip"), ("split", "fill"), ("join", "concat"), ("join", "fill"))
@@ -297,3 +307,315 @@ def test_r_seg_prev_2_conflict_marks_match_the_reference_for_every_pad() -> None
         assert got == reference_conflict_marks(mem, src, picked, pad), f"pad {pad:#04x}"
     # the image is not degenerate: the middle range lies in the gap and conflicts
     assert ssv._conflict_marks(mem, src, picked, 0x41)
+
+
+# ---------------------------------------------------------------------------
+# E5 corrective (C-2, E5-CR-2) - the sweep's three hand examples of the graph
+# ---------------------------------------------------------------------------
+def test_r_seg_prev_2_sweep_hand_examples_skip_empty_inverted_and_outside_marks() -> None:
+    """The three hand examples of graph node ``_sweep`` (R-SEG-PREV.2/4), as
+    exact block lists, each also equal to the base ``_sweep``:
+
+    - nested marks of the four classes keep the highest priority per interval;
+    - one data mark inside ``[0, 4)`` leaves ``none`` around it;
+    - a mark reaching outside the window is clamped, and an empty mark
+      ``(2, 2)`` and an inverted mark ``(3, 1)`` cover nothing.
+
+    Why: the faster sweep adds a class at a mark's start and removes it at its
+    end; without the skip of empty and inverted marks, the inverted mark's end
+    is processed before its start, so the per-class count goes wrong (a
+    ``KeyError`` or a class left alive). Negative control: remove
+    ``if cs >= ce: continue`` in ``_sweep`` -> the third list differs or raises."""
+    cases = [
+        (
+            (0, 10, [(0, 10, "ctx"), (2, 8, "fill"), (4, 5, "conflict"), (3, 6, "data")]),
+            [("ctx", 2), ("fill", 1), ("data", 3), ("fill", 2), ("ctx", 2)],
+        ),
+        ((0, 4, [(1, 2, "data")]), [("none", 1), ("data", 1), ("none", 2)]),
+        (
+            (0, 4, [(-5, 1, "fill"), (3, 9, "conflict"), (2, 2, "data"), (3, 1, "data")]),
+            [("fill", 1), ("none", 2), ("conflict", 1)],
+        ),
+    ]
+    for (lo, hi, marks), want in cases:
+        assert _blocks(ssv._sweep(lo, hi, list(marks))) == want, marks
+        assert _blocks(reference_sweep(lo, hi, list(marks))) == want, marks
+
+
+# ---------------------------------------------------------------------------
+# E5 corrective (C-1, E4-F1 / E5-CR-1, D17-27) - the state line puts a conflict
+# before the span guard (canon R-SEG-PREV.7 / .8)
+# ---------------------------------------------------------------------------
+#: The F-23 Split/Join scene's picked spans (``range_00`` boot, ``range_02`` cal).
+F23_PICKED = ((0x0, 0x10000), (0x800000, 0x931FC0))
+#: The small guard scene: two 64-byte islands at the ends of a span just over
+#: the guard's 1 MiB and, with a conflict, a 4-byte source range in the gap.
+GUARD_SCENE_SPAN = GUARD_SPAN_MIN + 16
+GUARD_SCENE_BASE = 0x1000
+
+
+def _f23_conflict_bytes() -> int:
+    return len(
+        gap_conflict(
+            demo_mem_map(), CrcTarget(F23_PICKED, "skip", "fill", 0x00, 0, 1, "little")
+        )
+    )
+
+
+def _guard_scene(with_conflict: bool) -> LoadedFile:
+    """A join-fill scene whose span guard fires (span ``GUARD_SPAN_MIN + 16``,
+    fill above 99 %): ``range_00`` and the last range are the two islands;
+    with ``with_conflict`` a middle source range of four ``0x55`` bytes lies in
+    the join gap (4 conflict bytes against pad ``0x00``)."""
+    lo = GUARD_SCENE_BASE
+    hi_start = GUARD_SCENE_BASE + GUARD_SCENE_SPAN - 64
+    ranges = [(lo, lo + 64)]
+    mem = {lo + i: 0xA0 + (i % 16) for i in range(64)}
+    if with_conflict:
+        middle = GUARD_SCENE_BASE + GUARD_SCENE_SPAN // 2
+        ranges.append((middle, middle + 4))
+        mem.update({middle + i: 0x55 for i in range(4)})
+    ranges.append((hi_start, hi_start + 64))
+    mem.update({hi_start + i: 0xB0 + (i % 16) for i in range(64)})
+    return LoadedFile(
+        path=Path("guard.s19"),
+        file_type="s19",
+        mem_map=mem,
+        row_bases=[],
+        ranges=ranges,
+        range_validity=[True] * len(ranges),
+        errors=[],
+        a2l_path=None,
+        a2l_data=None,
+    )
+
+
+def _stats_lines(app: S19TuiApp) -> List[str]:
+    return [line.rstrip() for line in str(app.query_one("#sje_stats").render()).split("\n")]
+
+
+def _window(app: S19TuiApp) -> SplitJoinWindow:
+    return app.query_one("#screen_split_join", SplitJoinWindow)
+
+
+async def _join_fill(pilot, app: S19TuiApp) -> None:
+    """``m`` (join, concat) then ``g`` (fill), each waited on its effect."""
+    window = _window(app)
+    await pilot.press("m")
+    await wait_until(pilot, lambda: window._mode == "join", "m set join", pause_first=True)
+    await pilot.press("g")
+    await wait_until(
+        pilot,
+        lambda: window._gap == "fill" and len(_stats_lines(app)) >= 2,
+        "g set fill and painted the stats",
+        pause_first=True,
+    )
+
+
+async def _open_by_action_and_tick(pilot, app: S19TuiApp, ticks: Set[int]) -> SplitJoinWindow:
+    """Open the window the palette's way (its action), tick ``ticks`` on the
+    ranges tab, then ``m`` and ``g``."""
+    app.action_open_split_join_export()
+    await wait_until(
+        pilot,
+        lambda: bool(app.query("#screen_split_join")) and bool(_window(app)._range_rows()),
+        "the Split / Join / Export window with its ranges rows",
+        pause_first=True,
+    )
+    _window(app)._sel["ranges"] = set(ticks)
+    await _join_fill(pilot, app)
+    return _window(app)
+
+
+def test_r_seg_prev_7_f23_scene_state_line_is_the_clobber_line(tmp_path: Path) -> None:
+    """The F-23 Split/Join scene (demo image; ``range_00`` and ``range_02``
+    ticked; ``m``, ``g``): the plan has conflict bytes AND a firing span guard,
+    and the state line under the stats is ``⚠ <size> would clobber source —
+    abort on export`` with ``<size>`` = ``fmtB`` of the engine detector's count
+    (canon R-SEG-PREV.7), not the GUARD chip.
+
+    Why: ``e`` refuses this export on its conflicts (LLR-136.4); a state line
+    naming the guard told the operator the export would ask, when it will
+    refuse. Negative control: the guard checked before the conflicts in
+    ``_state_text`` (the shipped order before E5, finding E4-F1) -> the GUARD
+    chip -> RED."""
+    conflicts = _f23_conflict_bytes()
+    assert conflicts > 0
+
+    async def drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 36)) as pilot:
+            await pilot.pause()
+            app.current_file = demo_loaded_file()
+            window = await _open_by_action_and_tick(pilot, app, {0, 2})
+            plan = window._plan(window._rows())
+            return plan.guard, plan.conflicts, _stats_lines(app)
+
+    guard, plan_conflicts, lines = asyncio.run(drive())
+    assert guard is True, "the scene's span guard must fire (the priority case)"
+    assert plan_conflicts == conflicts
+    assert lines[0].startswith("packed 1.26 MiB  ·  span 9.20 MiB  ·  fill "), lines
+    assert lines[1] == f"⚠ {fmtB(conflicts)} would clobber source — abort on export", lines
+
+
+def test_r_seg_prev_7_8_state_line_priority_conflict_over_guard(tmp_path: Path) -> None:
+    """The small guard scene, join fill: (a) guard and 4 conflict bytes -> the
+    state line is exactly ``⚠ 4 B would clobber source — abort on export``
+    (R-SEG-PREV.7); (b) the same scene without the conflict range -> exactly
+    ``⚠ GUARD  <fmtB(span)> span — e will ask`` (R-SEG-PREV.8: guard and no
+    conflict byte).
+
+    Why: the canon orders the two lines (a conflict hides the guard, never the
+    reverse); (b) proves the reorder did not drop the guard chip. Negative
+    control: the guard first -> (a) RED; the guard branch removed -> (b) RED."""
+
+    async def drive(with_conflict: bool):
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 36)) as pilot:
+            await pilot.pause()
+            app.current_file = _guard_scene(with_conflict)
+            last = 2 if with_conflict else 1
+            window = await _open_by_action_and_tick(pilot, app, {0, last})
+            plan = window._plan(window._rows())
+            return plan.guard, plan.conflicts, plan.span, _stats_lines(app)
+
+    guard, conflicts, span, lines = asyncio.run(drive(True))
+    assert (guard, conflicts, span) == (True, 4, GUARD_SCENE_SPAN)
+    assert lines[1] == "⚠ 4 B would clobber source — abort on export", lines
+    guard, conflicts, span, lines = asyncio.run(drive(False))
+    assert (guard, conflicts, span) == (True, 0, GUARD_SCENE_SPAN)
+    assert lines[1] == f"⚠ GUARD  {fmtB(GUARD_SCENE_SPAN)} span — e will ask", lines
+
+
+# ---------------------------------------------------------------------------
+# E5 corrective (C-7) - black-box acceptance through the palette and the keys
+# (coverage audit section 5, items 6 and 7)
+# ---------------------------------------------------------------------------
+async def _open_by_palette(pilot, app: S19TuiApp) -> SplitJoinWindow:
+    """``ctrl+k``, the entry's name typed, ``enter`` (the window is palette-only,
+    batch-95 ruling Q6/7a); wait for its table to hold the focus."""
+    await pilot.press("ctrl+k")
+    await wait_until(
+        pilot,
+        lambda: app.focused is not None and app.focused.id == "palette_input",
+        "the palette filter input focused",
+        pause_first=True,
+    )
+    await pilot.press(*"Split / Join / Export")
+    await wait_until(
+        pilot,
+        lambda: "Split / Join / Export"
+        in app.query_one("#command_bar").visible_palette_labels(),
+        "the palette listing the Split / Join / Export entry",
+    )
+    await pilot.press("enter")
+    await wait_until(
+        pilot,
+        lambda: app.focused is not None and app.focused.id == "sje_table",
+        "the Split / Join / Export window open with its table focused",
+    )
+    return _window(app)
+
+
+async def _tick_by_keys(pilot, app: S19TuiApp, rows: List[int]) -> None:
+    """Tick ``rows`` (ascending) with ``down`` and ``space`` from row 0."""
+    window = _window(app)
+    at = 0
+    for row in rows:
+        await pilot.press(*(["down"] * (row - at)))
+        await pilot.press("space")
+        at = row
+    await wait_until(
+        pilot,
+        lambda: window._sel["ranges"] == set(rows),
+        lambda: f"ticks {window._sel['ranges']!r}, not {set(rows)!r}",
+        pause_first=True,
+    )
+
+
+def _written(app: S19TuiApp) -> List[str]:
+    dest = Path(app.workarea) / "splits"
+    return sorted(p.name for p in dest.iterdir()) if dest.exists() else []
+
+
+def test_r_seg_prev_at_f23_scene_by_palette_and_keys_refuses_export(tmp_path: Path) -> None:
+    """Black-box (audit ATs 6 and 7a; R-SEG-PREV.20, .7, LLR-136.4): the demo
+    image; Split / Join / Export opened from the palette (``ctrl+k``, the name,
+    ``enter``); ``range_00`` and ``range_02`` ticked with ``space`` / ``down``;
+    ``m`` and ``g`` -> the stats line ``packed 1.26 MiB  ·  span 9.20 MiB  ·
+    fill <pct>%`` and the state line ``⚠ <size> would clobber source — abort
+    on export``; then ``e`` -> nothing written, the window not armed, the state
+    line unchanged. 1 of 1.
+
+    Why: the timing arm opens the window by its action and writes the ticks;
+    this is the operator's route, and the export key must do what the state
+    line says (refuse). Negative control: the guard first in ``_state_text`` ->
+    the GUARD chip -> RED; ``e`` arming on the guard -> ``_armed`` -> RED."""
+    conflicts = _f23_conflict_bytes()
+    packed = 0x10000 + (0x931FC0 - 0x800000)
+    span = 0x931FC0
+    stats = f"packed {fmtB(packed)}  ·  span {fmtB(span)}  ·  fill {100 * (span - packed - conflicts) / span:.2f}%"
+    clobber = f"⚠ {fmtB(conflicts)} would clobber source — abort on export"
+
+    async def drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 36)) as pilot:
+            await pilot.pause()
+            app.current_file = demo_loaded_file()
+            await _open_by_palette(pilot, app)
+            await _tick_by_keys(pilot, app, [0, 2])
+            await _join_fill(pilot, app)
+            before_e = _stats_lines(app)
+            await pilot.press("e")
+            await pilot.pause()
+            await pilot.pause()
+            return before_e, _stats_lines(app), _window(app)._armed, _written(app)
+
+    before_e, after_e, armed, written = asyncio.run(drive())
+    assert before_e[:2] == [stats, clobber], before_e
+    assert after_e[:2] == [stats, clobber], after_e
+    assert armed is False
+    assert written == []
+
+
+def test_r_seg_prev_at_guard_scene_e_asks_disarms_and_confirms_by_keys(tmp_path: Path) -> None:
+    """Black-box (audit AT 7b; R-SEG-PREV.8, LLR-135.5): the small guard scene
+    without a conflict, opened from the palette, ``range_00`` and ``range_01``
+    ticked by keys, ``m``, ``g`` -> ``⚠ GUARD  <span> span — e will ask``;
+    ``e`` -> ``... — e again to confirm`` and nothing written; ``f`` (a state
+    change) cancels -> ``... — e will ask``; ``e``, ``e`` -> the export is
+    written (files named ``guard_joined.*``). 1 of 1.
+
+    Why: the guard's two-step is the operator's confirm and cancel; the reorder
+    of C-1 must keep it for a plan with no conflict. Negative control: the guard
+    branch moved below a check that always fires -> no "e again" -> RED."""
+    chip = f"⚠ GUARD  {fmtB(GUARD_SCENE_SPAN)} span"
+
+    async def drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 36)) as pilot:
+            await pilot.pause()
+            app.current_file = _guard_scene(False)
+            await _open_by_palette(pilot, app)
+            await _tick_by_keys(pilot, app, [0, 1])
+            await _join_fill(pilot, app)
+            seen = [(_stats_lines(app)[1], _written(app))]
+            window = _window(app)
+            await pilot.press("e")
+            await wait_until(pilot, lambda: window._armed, "the first e arms", pause_first=True)
+            seen.append((_stats_lines(app)[1], _written(app)))
+            await pilot.press("f")
+            await wait_until(pilot, lambda: not window._armed, "f disarms", pause_first=True)
+            seen.append((_stats_lines(app)[1], _written(app)))
+            await pilot.press("e")
+            await wait_until(pilot, lambda: window._armed, "e re-arms", pause_first=True)
+            await pilot.press("e")
+            await wait_until(pilot, lambda: bool(_written(app)), "the confirmed export wrote", pause_first=True)
+            seen.append((None, _written(app)))
+            return seen
+
+    seen = asyncio.run(drive())
+    assert seen[0] == (f"{chip} — e will ask", []), seen[0]
+    assert seen[1] == (f"{chip} — e again to confirm", []), seen[1]
+    assert seen[2] == (f"{chip} — e will ask", []), seen[2]
+    assert seen[3][1] and all(name.startswith("guard_joined") for name in seen[3][1]), seen[3]

@@ -1,0 +1,170 @@
+=== MUTANT M-7 ===
+$ python -c 'import s19_app; print(s19_app.__file__)'
+<HOME>/work/s19_m13/s19_app/__init__.py
+$ timeout 900 <HOME>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -n 2 --basetemp /tmp/pytest-s19m13 tests/test_b101_designer_recompute.py::test_r_crc_preview_002_1_image_set_cleared_replaced tests/test_b101_designer_recompute.py::test_r_crc_designer_001_2_2_image_change_is_a_pending_change
+bringing up nodes...
+bringing up nodes...
+
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_________ test_r_crc_designer_001_2_2_image_change_is_a_pending_change _________
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m13/popen-gw1/test_r_crc_designer_001_2_2_im0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f43e399c050>
+
+    def test_r_crc_designer_001_2_2_image_change_is_a_pending_change(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """The loaded image set while the CRC Designer is displayed (F-24).
+    
+        (a) quiet time 10 s: after two pauses no recompute ran, one is pending and
+        the preview still shows the empty-state note. (b) quiet time 0.05 s on a
+        fresh app: after a wait on the count, exactly one recompute and the three
+        preview lines. 3 of 3.
+    
+        Why: an image change is a pending change, so a project load that sets the
+        image twice recomputes once and a load paints its own status first.
+        Negative controls: the image watcher not registered -> (a) finds nothing
+        pending, (b) the wait times out -> RED."""
+    
+        async def scenario(quiet: float, wait: bool):
+            _set_quiet(monkeypatch, quiet)
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                await pilot.press("0")
+                await pilot.pause()
+                before = designer_recomputes()
+                app.current_file = loaded(fixture_mem())
+                if wait:
+                    await wait_designer_recompute(pilot, app, before)
+                else:
+                    await pilot.pause()
+                    await pilot.pause()
+                return designer_recomputes() - before, designer_pending(app), _preview(app)
+    
+        for _ in range(REPS):
+            delta, pending, preview = asyncio.run(scenario(10.0, wait=False))
+            assert delta == 0, f"no recompute before the quiet time, got {delta}"
+>           assert pending is not None, "the image change must leave a recompute pending"
+E           AssertionError: the image change must leave a recompute pending
+E           assert None is not None
+
+tests/test_b101_designer_recompute.py:296: AssertionError
+_____________ test_r_crc_preview_002_1_image_set_cleared_replaced ______________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m13/popen-gw0/test_r_crc_preview_002_1_image0')
+
+    def test_r_crc_preview_002_1_image_set_cleared_replaced(tmp_path: Path) -> None:
+        """With the CRC Designer displayed (key ``0``): (a) the fixture image set ->
+        within 1 s the preview is exactly the three lines and window line 2 is
+        ``concat 0x9C5BCBBD   fill 0x2A8A3950``; (b) the image cleared -> within 1 s
+        preview and window both read the empty-state note exactly; (c) a second
+        image (byte ``0x8000`` = ``0xAA``) -> within 1 s ``concat: 0x<crc32 of its
+        16 range bytes>``. 3 of 3.
+    
+        Why (F-24): the panel said ``Load an image to preview coverage CRCs over
+        real bytes.`` while an image was loaded, and kept stale CRCs after an
+        unload. Negative control: the image watcher not registered -> (a) shows the
+        empty-state note -> RED."""
+        changed = fixture_mem()
+        changed[0x8000] = 0xAA
+        changed_crc = zlib.crc32(b"\xaa" + bytes(range(1, 8)) + bytes(range(0x10, 0x18)))
+    
+        async def scenario():
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                await pilot.press("0")
+                await pilot.pause()
+                app.current_file = loaded(fixture_mem())
+                await wait_until(
+                    pilot,
+                    lambda: _preview(app) == FIXTURE_PREVIEW,
+                    lambda: f"preview after the image was set: {_preview(app)!r}",
+                    timeout=1.0,
+                    pause_first=True,
+                )
+                window_set = _window_lines(app)
+                app.current_file = None
+                await wait_until(
+                    pilot,
+                    lambda: _preview(app) == EMPTY_STATE and str(_window(app)) == EMPTY_STATE,
+                    lambda: f"after the clear: {_preview(app)!r} / {str(_window(app))!r}",
+                    timeout=1.0,
+                    pause_first=True,
+                )
+                app.current_file = loaded(changed)
+                await wait_until(
+                    pilot,
+                    lambda: _preview(app).split("\n")[1:2] == [f"concat: 0x{changed_crc:08X}"],
+                    lambda: f"preview after the image was replaced: {_preview(app)!r}",
+                    timeout=1.0,
+                    pause_first=True,
+                )
+                return window_set
+    
+>       for window_set in _run(scenario):
+                          ^^^^^^^^^^^^^^
+
+tests/test_b101_designer_recompute.py:488: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_designer_recompute.py:153: in _run
+    return [asyncio.run(coro_factory()) for _ in range(reps)]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_designer_recompute.py:153: in <listcomp>
+    return [asyncio.run(coro_factory()) for _ in range(reps)]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b101_designer_recompute.py:462: in scenario
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_r_crc_preview_002_1_image_set_cleared_replaced.<locals>.scenario.<locals>.<lambda> at 0x7f0d4f6b80e0>
+failure = <function test_r_crc_preview_002_1_image_set_cleared_replaced.<locals>.scenario.<locals>.<lambda> at 0x7f0d4f933f60>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: preview after the image was set: 'Load an image to preview coverage CRCs over real bytes.'
+
+tests/support/timing.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_designer_recompute.py::test_r_crc_designer_001_2_2_image_change_is_a_pending_change
+FAILED tests/test_b101_designer_recompute.py::test_r_crc_preview_002_1_image_set_cleared_replaced
+2 failed in 5.06s
+PYTEST_EXIT=1
+SHA256 s19_app/tui/crc_designer_view.py = 814aefc7247a1ee876e571102af1a080466888a65a00b51cf5cc7375ac2062f5
+SHA256 s19_app/tui/segment_split_view.py = 9b4f660d174eb4debe95f1ee5475a4ddcc1931348b1f0be8bd526bd6282051aa
+SHA256 s19_app/tui/operations/crc_kernel.py = f96188b2fb1266302f173268b0419a97b1ed9ad18cd685b2dbdf815233e91edf
+DONE M-7 exits=[1]

@@ -264,10 +264,10 @@ def test_r_seg_prev_20_join_fill_in_the_f23_scene_within_2_5_s(tmp_path: Path) -
     and ``range_02`` ticked, ``m`` pressed (join, concat), then ``g`` (clock
     starts at the press): the first update of ``#sje_stats`` after it comes within
     ``timing_bound(2.5)``. The stats line is ``packed 1.26 MiB  ·  span 9.20 MiB
-    ·  fill <pct>%`` and the state line is the shipped GUARD chip
-    ``⚠ GUARD  9.20 MiB span — e will ask`` (see the OR-1 note in the code),
-    with ``<pct>`` derived from the engine
-    detector's count (fill = span - packed - conflict bytes).
+    ·  fill <pct>%`` and the state line is ``⚠ <size> would clobber source —
+    abort on export`` (canon R-SEG-PREV.7; E5 corrective C-1), with ``<pct>``
+    and ``<size>`` derived from the engine detector's count (fill = span -
+    packed - conflict bytes).
 
     Why: switching a join to fill took about 25 s because the band classified
     every interval against every conflict run. Negative control: the base
@@ -284,14 +284,10 @@ def test_r_seg_prev_20_join_fill_in_the_f23_scene_within_2_5_s(tmp_path: Path) -
     stats_line = (
         f"packed {fmtB(packed)}  ·  span {fmtB(span)}  ·  fill {fill_pct:.2f}%"
     )
-    # OR-1 (E4-integration-notes): canon R-SEG-PREV.7 / .8 put the "would
-    # clobber source" line first when a conflict byte exists (conflicts > 0
-    # here), but the shipped _state_text checks the span guard first and paints
-    # the GUARD chip. That is finding E4-F1 for E5, outside this increment's
-    # slice (no render change). This arm pins the shipped line so that the fix
-    # flips it on purpose; R-SEG-PREV.7/1 stays open, not passed. The conflict
-    # census still feeds the fill percentage above.
-    state_line = f"⚠ GUARD  {fmtB(span)} span — e will ask"
+    # OR-1 / E4-F1, fixed by E5 corrective C-1: canon R-SEG-PREV.7 / .8 put the
+    # "would clobber source" line first when a conflict byte exists (conflicts
+    # > 0 here, and the span guard also fires), so the arm pins the canon line.
+    state_line = f"⚠ {fmtB(conflicts)} would clobber source — abort on export"
     assert stats_line.startswith("packed 1.26 MiB  ·  span 9.20 MiB")
 
     async def arm() -> Tuple[float, str, Tuple[str, str, set]]:

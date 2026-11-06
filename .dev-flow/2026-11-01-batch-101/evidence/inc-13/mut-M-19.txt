@@ -1,0 +1,65 @@
+=== MUTANT M-19 ===
+$ python -c 'import s19_app; print(s19_app.__file__)'
+<HOME>/work/s19_m13/s19_app/__init__.py
+$ timeout 900 <HOME>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -n 2 --basetemp /tmp/pytest-s19m13 tests/test_b101_designer_recompute.py::test_r_crc_preview_001_11_coverage_over_the_cap_is_refused
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________ test_r_crc_preview_001_11_coverage_over_the_cap_is_refused __________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m13/popen-gw0/test_r_crc_preview_001_11_cove0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f4829c43bd0>
+
+    def test_r_crc_preview_001_11_coverage_over_the_cap_is_refused(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """(a) The shipped cap (16777216): Ranges ``0x00000000-0x01000001`` (coverage
+        size 16777217) over the fixture image -> preview exactly ``Cannot preview:
+        coverage exceeds 16777216 bytes``, window line 1 drawn (48 glyphs), line 2
+        exactly that text, no line 3, and 0 ``gather_target`` calls in that
+        recompute. (b) cap injected as 23, the first-shown Ranges (coverage size 24,
+        concat size 16) -> both surfaces ``Cannot preview: coverage exceeds 23
+        bytes``. (c) cap injected as 24 -> the three preview lines. 3 of 3.
+    
+        Why: a coverage of up to 4 GiB was materialised on the UI thread, and the
+        image watcher would make that reachable on a load. Negative controls: no
+        size check -> (a) reads the window (2 or more ``gather_target`` calls) ->
+        RED; ``>=`` in place of ``>`` -> (c) refused -> RED; the concat size checked
+        in place of the coverage size -> (b) not refused -> RED."""
+        calls = _count_gathers(monkeypatch)
+    
+        async def over_shipped_cap():
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                await pilot.press("0")
+                await pilot.pause()
+                calls[0] = 0
+                await _load_and_recompute(pilot, app, fixture_mem(), "0x00000000-0x01000001")
+                return _preview(app), _window_lines(app), calls[0]
+    
+        note = f"Cannot preview: coverage exceeds {SHIPPED_CAP} bytes"
+        for preview, lines, reads in _run(over_shipped_cap):
+>           assert preview == note, preview
+E           AssertionError: Active policy: join=concat
+E             concat: 0x9C5BCBBD
+E             fill:   0x9C5BCBBD
+E           assert 'Active polic...   0x9C5BCBBD' == 'Cannot previ...6777216 bytes'
+E             
+E             - Cannot preview: coverage exceeds 16777216 bytes
+E             + Active policy: join=concat
+E             + concat: 0x9C5BCBBD
+E             + fill:   0x9C5BCBBD
+
+tests/test_b101_designer_recompute.py:750: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_designer_recompute.py::test_r_crc_preview_001_11_coverage_over_the_cap_is_refused
+1 failed in 13.46s
+PYTEST_EXIT=1
+SHA256 s19_app/tui/crc_designer_view.py = 814aefc7247a1ee876e571102af1a080466888a65a00b51cf5cc7375ac2062f5
+SHA256 s19_app/tui/segment_split_view.py = 9b4f660d174eb4debe95f1ee5475a4ddcc1931348b1f0be8bd526bd6282051aa
+SHA256 s19_app/tui/operations/crc_kernel.py = f96188b2fb1266302f173268b0419a97b1ed9ad18cd685b2dbdf815233e91edf
+DONE M-19 exits=[1]

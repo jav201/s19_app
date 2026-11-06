@@ -1764,12 +1764,21 @@ class SplitJoinWindow(WindowSection):
         return "no ranges — load an image (^L) or switch to manual"
 
     def _state_text(self, plan: Plan) -> Tuple[Text, bool]:
-        """The one state line shared by both stat layouts: the guard chip /
-        conflict abort / empty-file gate / ready cue (LLR-135.5/136.4/136.6).
+        """The one state line shared by both stat layouts: the conflict abort /
+        guard chip / empty-file gate / ready cue (LLR-136.4/135.5/136.6).
+
+        A conflict comes before the guard (R-SEG-PREV.7 / .8): ``action_export``
+        refuses on a conflict before it reaches the guard gate.
 
         Returns the line and whether it demands the two-step confirm.
         """
         t = Text()
+        if plan.conflicts:
+            t.append(
+                f"⚠ {fmtB(plan.conflicts)} would clobber source — abort on export",
+                style=S_WARN_B,
+            )
+            return t, False
         if plan.guard:
             t.append(f"⚠ GUARD  {fmtB(plan.span)} span", style=S_WARN_B)
             t.append(
@@ -1777,12 +1786,6 @@ class SplitJoinWindow(WindowSection):
                 style=S_DIM,
             )
             return t, True
-        if plan.conflicts:
-            t.append(
-                f"⚠ {fmtB(plan.conflicts)} would clobber source — abort on export",
-                style=S_WARN_B,
-            )
-            return t, False
         if plan.empty_files:
             t.append(
                 f"⚠ {plan.empty_files} empty file"

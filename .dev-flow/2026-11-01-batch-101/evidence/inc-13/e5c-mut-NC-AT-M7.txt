@@ -1,0 +1,28 @@
+# mutant NC-AT-M7: s19_app/tui/crc_designer_view.py
+# --- replaced:
+#           self.watch(self.app, "current_file", self._on_image_changed, init=False)
+# --- with:
+# LAN Linux host, worktree s19_c13 (detached origin/main f9f3cb09 + git diff b7b77c4 of branch b101-inc13)
+# start 2026-11-06T02:40:40Z load 2.10 2.39 1.97
+# tree fingerprint (start): 5a21986d77d74c63
+# s19_app.__file__ = <HOME>/work/s19_c13/s19_app/__init__.py
+# python 3.11.18
+# cmd: pytest -q -p no:cacheprovider --basetemp /tmp/pytest-s19c13 tests/test_b101_designer_recompute.py::test_r_crc_preview_at_image_load_and_unload_through_the_shipped_routes tests/test_b101_designer_recompute.py::test_r_crc_preview_at_project_load_through_the_dialog_recomputes_once -n 2 -q --tb=line
+bringing up nodes...
+bringing up nodes...
+
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+[gw1] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: no settled recompute: count 15 (snapshot 15), pending None
+<HOME>/work/s19_c13/tests/support/timing.py:66: AssertionError: no settled recompute: count 15 (snapshot 15), pending None
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: no settled recompute: count 7 (snapshot 7), pending None
+<HOME>/work/s19_c13/tests/support/timing.py:66: AssertionError: no settled recompute: count 7 (snapshot 7), pending None
+=========================== short test summary info ============================
+FAILED tests/test_b101_designer_recompute.py::test_r_crc_preview_at_project_load_through_the_dialog_recomputes_once
+FAILED tests/test_b101_designer_recompute.py::test_r_crc_preview_at_image_load_and_unload_through_the_shipped_routes
+# exit 1
+# tree fingerprint (end): 5a21986d77d74c63
+# end 2026-11-06T02:42:24Z load 3.39 2.88 2.20
+restored (fingerprint re-synced)

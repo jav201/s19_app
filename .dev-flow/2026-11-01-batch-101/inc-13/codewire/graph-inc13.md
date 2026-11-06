@@ -1,6 +1,6 @@
 # Code-Wire graph — Inc 13 (CRC Designer and Split/Join responsive at 10 MB), batch-101
 
-Stage E2 of the design-first flow (`dev-flow-v3-beta`), corrected by the E3 round-1 rulings (`../E3-rulings.md`). Graph only: no stub, mark or declaration in any tree. Base `b7b77c4`. Requirements `../01-requirements.md`, slice `../E1-slice.md`, rulings `../E1-rulings.md`, cases `../02-test-cases.md`. Notation: Code-Wire v3.1 (`<HOME>/Github/code-wire/docs/Notation-Grammar.md`), as in `../../inc-2/codewire/graph-inc2.md`.
+Stage E2 of the design-first flow (`dev-flow-v3-beta`), corrected by the E3 round-1 rulings (`../E3-rulings.md`) and at the E5 corrective pass (`../E5-rulings.md` C-1: node `SplitJoinWindow._state_text`; C-5: the M-12 note; C-6: the cap 16777216; C-8: `_coverage_preview_text` and `_recompute`). Graph only: no stub, mark or declaration in any tree. Base `b7b77c4`. Requirements `../01-requirements.md`, slice `../E1-slice.md`, rulings `../E1-rulings.md`, cases `../02-test-cases.md`. Notation: Code-Wire v3.1 (`<HOME>/Github/code-wire/docs/Notation-Grammar.md`), as in `../../inc-2/codewire/graph-inc2.md`.
 
 How to read it:
 - One file holds the baseline and the prototype. Every node's `func:` starts with **unchanged**, **changed** (then "was: … / now: …", the baseline first) or **new**. Unchanged nodes are context: a changed node calls them, or they call it.
@@ -12,7 +12,7 @@ Groups for E4 (file ownership) and the interfaces they share — pinned here, ch
 | Group | Files | Owns nodes |
 |---|---|---|
 | G1 designer | `s19_app/tui/crc_designer_view.py` | `CRC_RECOMPUTE_S`, `_COVERAGE_CAP_BYTES`, `_CoverageRun`, `CrcDesignerPanel.__init__`, `.on_mount`, `._on_image_changed`, `.on_show`, `.on_input_changed`, `._schedule_recompute`, `.on_select_changed`, `._apply_template`, `._recompute`, `._compute_coverage`, `._coverage_preview_text`, `._render_coverage_window` |
-| G2 split/join | `s19_app/tui/segment_split_view.py` | `_sweep`, `_conflict_marks` |
+| G2 split/join | `s19_app/tui/segment_split_view.py` | `_sweep`, `_conflict_marks`; `SplitJoinWindow._state_text` (added by the E5 rulings, C-1) |
 | G3 kernel | `s19_app/tui/operations/crc_kernel.py` | `_REFLECT8`, `crc_lut` |
 | T-A designer tests | `tests/test_b101_designer_recompute.py`, `tests/support/b101_designer.py`, the waits in `tests/test_crc_designer_view.py` (`../E1-slice.md` §3) | the R-CRC-DESIGNER-001.2.x / 007.x, R-CRC-PREVIEW-001.x / 002.1 / 002.2/2 / 002.5 nodes and the D-2 AST check (`../E1-slice.md` §3) |
 | T-B band tests | `tests/test_b101_split_join_band.py`, `tests/support/b101_inc13_reference.py`, `tests/support/b101_demo_image.py` | the R-SEG-PREV.2 nodes |
@@ -28,7 +28,7 @@ Groups for E4 (file ownership) and the interfaces they share — pinned here, ch
 | I-6 the demo image | `tests/support/b101_demo_image.py`: `demo_regions() -> dict[str, tuple[int, bytearray]]` (`compute_region_sizes(10)` then `build_objects(regions, random.Random(20260001))`), `demo_loaded_file() -> LoadedFile` (path `firmware.s19`, `file_type="s19"`, `mem_map` from the regions, `ranges` = the four `(base, base + len)`), both cached per process | T-B → T-C |
 | I-7 the kernel | `crc_lut(data: bytes, *, width, poly, init, refin, refout, xorout) -> int` unchanged; accepts `bytes`, `bytearray`, `memoryview`; an `int` raises `TypeError` as on base (E3 A-8 / SEC-5); `_REFLECT8: bytes`, length 256, `_REFLECT8[b] == reflect(b, 8)` | G3 → G1 (through `CrcAlgorithm.compute`), `tests/test_crc_kernel.py` |
 | I-8 the image reactive (not changed here) | `S19TuiApp.current_file: reactive[Optional[LoadedFile]]` (`app.py:2748`), assigned on install, project-load reset and unload | app → G1 |
-| I-9 the coverage cap | `_COVERAGE_CAP_BYTES: int = 64 * 1024 * 1024` at module level of `crc_designer_view.py`; read at each `_compute_coverage` call (so `monkeypatch.setattr(crc_designer_view, "_COVERAGE_CAP_BYTES", 23)` takes effect) (E3 SEC-2) | G1 → T-A |
+| I-9 the coverage cap | `_COVERAGE_CAP_BYTES: int = 16 * 1024 * 1024` (16777216; E3 round-2 addendum) at module level of `crc_designer_view.py`; read at each `_compute_coverage` call (so `monkeypatch.setattr(crc_designer_view, "_COVERAGE_CAP_BYTES", 23)` takes effect) (E3 SEC-2) | G1 → T-A |
 
 Order inside E4: G1, G2, G3 in parallel (no interface between them except I-7, unchanged in form); T-B writes I-5 and I-6 first (T-C imports I-6); every tester proves RED on base first (M-1 profiles before the build, `../E1-rulings.md` §5).
 
@@ -40,9 +40,9 @@ module: s19_app/tui/crc_designer_view.py
 note: R-CRC-DESIGNER-001.2.2/3 reads it: `== 0.150`.
 
 _COVERAGE_CAP_BYTES
-func: new (E3 SEC-2). Module constant of `crc_designer_view.py`, `64 * 1024 * 1024` (67108864): the coverage cap. Cost at the cap measured on the LAN host (`../E1-rulings.md` §5 M-0): ≈ 16 s per window read, ≈ 32 s per recompute, ≈ 0.2 GiB.
+func: new (E3 SEC-2). Module constant of `crc_designer_view.py`, `16 * 1024 * 1024` (16777216, the E3 round-2 addendum): the coverage cap. Cost at the cap from the LAN host measurement (`../E1-rulings.md` §5 M-0, 0.4834 µs per byte of coverage size): ≈ 4.1 s per window read, ≈ 8.1 s per recompute.
 module: s19_app/tui/crc_designer_view.py
-examples: (R-CRC-PREVIEW-001.11/1) `== 67108864`; injected as 23 → the fixture's first-shown Ranges (coverage size 24) are refused
+examples: (R-CRC-PREVIEW-001.11/1) `== 16777216`; injected as 23 → the fixture's first-shown Ranges (coverage size 24) are refused
 
 _CoverageRun
 func: new. `@dataclass(frozen=True)` at module level. Fields: `target: Optional[CrcTarget] = None`; `invalid: Optional[str] = None` (the `str(exc)` of a target-build fault); `evaluation: Optional[TargetEvaluation] = None`; `eval_error: Optional[str] = None` (the `str(exc)` of a `ValueError` from `evaluate_target`); `concat_crc: Optional[int] = None`; `fill_crc: Optional[int] = None`; `crc_error: Optional[str] = None` (the `str(exc)` of any CRC fault the window must show); `size_cap: Optional[int] = None` (the cap the coverage size exceeded, E3 SEC-2). Invariants: `invalid` set ⇒ every other field `None`; `size_cap` set ⇒ `target` set and every other field `None`; `eval_error` set ⇒ `crc_error == eval_error`; `crc_error`, `invalid` and `size_cap` all `None` ⇒ `concat_crc` and `fill_crc` are ints. Only ever a local of `_recompute`, never an attribute of the panel (E1-D5, E3 SEC-4).
@@ -173,7 +173,7 @@ CrcDesignerPanel._recompute
 req: R-CRC-DESIGNER-001.2.1, R-CRC-DESIGNER-001.2.2, R-CRC-DESIGNER-007.1, R-CRC-DESIGNER-007.2, R-CRC-DESIGNER-007.3, R-CRC-PREVIEW-002.1, R-CRC-PREVIEW-002.2, R-CRC-PREVIEW-002.3
 in: —
 out: None
-func: changed. was: resolve the six surfaces by `_RECOMPUTE_SURFACE_IDS` (`NoMatches` → return); build the template (fault → `Invalid parameters: <exc>` on five surfaces, `—` on the custom-vector CRC); update verdict, custom vector, JSON, warnings, then `_coverage_preview_text(algo)` and `_render_coverage_window(algo)`, each building, evaluating and computing on its own (6 window reads). / now: argument-less, as today. First statement `pending, self._pending_recompute = self._pending_recompute, None` (before anything that can raise, so a fault never leaves a dead timer recorded and `wait_designer_recompute` never waits on one, E3 SEC-8); then `pending.stop()` if `pending is not None`; `self._coverage_dirty = False`; surfaces and the parameter-fault path unchanged; then `run = self._compute_coverage(algo)` once, a local (never stored, E3 SEC-4); `coverage.update(self._coverage_preview_text(run))`; `window.update(self._render_coverage_window(run))`.
+func: changed. was: resolve the six surfaces by `_RECOMPUTE_SURFACE_IDS` (`NoMatches` → return); build the template (fault → `Invalid parameters: <exc>` on five surfaces, `—` on the custom-vector CRC); update verdict, custom vector, JSON, warnings, then `_coverage_preview_text(algo)` and `_render_coverage_window(algo)`, each building, evaluating and computing on its own (6 window reads). / now: argument-less, as today. First statement `pending, self._pending_recompute = self._pending_recompute, None` (before anything that can raise, so a fault never leaves a dead timer recorded and `wait_designer_recompute` never waits on one, E3 SEC-8); then `pending.stop()` if `pending is not None`; `self._coverage_dirty = False`; surfaces and the parameter-fault path unchanged; the verdict, custom-vector, JSON and Warnings updates as today; then `run = self._compute_coverage(algo)` once, a local (never stored, E3 SEC-4), just before the coverage updates (E5-CR-5, corrective C-8: a coverage fault leaves only the two coverage surfaces stale, as on base); `coverage.update(self._coverage_preview_text(run))`; `window.update(self._render_coverage_window(run))`.
 module: s19_app/tui/crc_designer_view.py
 calls: CrcDesignerPanel._current_template, ._verdict_text, ._custom_vector_text, ._preview_text, ._live_warnings_text, ._compute_coverage, ._coverage_preview_text, ._render_coverage_window
 examples: (R-CRC-PREVIEW-002.2/2) fixture, join `fill`, each On conflict, fixture and dirty → `gather_target` called ≤ 2 times per `_recompute` (base: 6, or 2 when the preview refuses)
@@ -189,8 +189,8 @@ out: Optional[_CoverageRun]
 func: new. `mem_map = current_file.mem_map` if an image is loaded; falsy → return `None`. `try target = self._build_coverage_target()` except `(ValueError, KeyError)` as exc → `_CoverageRun(invalid=str(exc))`. `cap = _COVERAGE_CAP_BYTES` (read now, I-9); the coverage size = `sum(e - s for s, e in target.ranges)` + `sum(max(0, s2 - e1))` over each pair of consecutive ranges `(s1, e1), (s2, e2)` in written order (the fill window `gather_target` would build with Intra gap fill); if it exceeds `cap` → `_CoverageRun(target=target, size_cap=cap)`, before any window read (E3 SEC-2). `try evaluation = evaluate_target(mem_map, algo, target)` except `ValueError` as exc → `_CoverageRun(target=target, eval_error=str(exc), crc_error=str(exc))`. Then, in one `try` (except `ValueError` as exc → `_CoverageRun(target=target, evaluation=evaluation, crc_error=str(exc))`): if `evaluation.refused` → `concat = compute_target_crc(mem_map, algo, replace(target, join="concat"))`, `fill = compute_target_crc(…, join="fill")`; elif `target.join == "concat"` → `concat = evaluation.crc`, `fill = compute_target_crc(…, join="fill")`; else → `fill = evaluation.crc`, `concat = compute_target_crc(…, join="concat")`. Return `_CoverageRun(target, evaluation=evaluation, concat_crc=concat, fill_crc=fill)`. Reads `mem_map` only (R-CRC-PREVIEW-001.9).
 module: s19_app/tui/crc_designer_view.py
 calls: CrcDesignerPanel._build_coverage_target, evaluate_target, compute_target_crc
-examples: (R-CRC-PREVIEW-001.11/1) fixture, Ranges `0x00000000-0x04000001` → coverage size 67108865 > 67108864 → `size_cap = 67108864`, 0 `gather_target` calls; cap injected as 23 with the first-shown Ranges (size 24) → `size_cap = 23`; cap 24 → computed as usual (boundary: `>`)
-examples: (R-CRC-PREVIEW-001.12/1) `0x0-0x1, 0xFFFFFFF0-0xFFFFFFFF, 0x10-0x11` → size 4294967296 → `size_cap = 67108864` (base: materializes ≈ 4 GiB)
+examples: (R-CRC-PREVIEW-001.11/1) fixture, Ranges `0x00000000-0x01000001` → coverage size 16777217 > 16777216 → `size_cap = 16777216`, 0 `gather_target` calls; cap injected as 23 with the first-shown Ranges (size 24) → `size_cap = 23`; cap 24 → computed as usual (boundary: `>`)
+examples: (R-CRC-PREVIEW-001.12/1) `0x0-0x1, 0xFFFFFFF0-0xFFFFFFFF, 0x10-0x11` → size 4294967296 → `size_cap = 16777216` (base: materializes ≈ 4 GiB)
 examples: (R-CRC-PREVIEW-001.2/2) fixture, join `concat`, abort → `concat_crc = 0x9C5BCBBD` (from the evaluation), `fill_crc = 0x2A8A3950` (computed), 2 `gather_target` calls
 examples: (R-CRC-PREVIEW-001.4/1) dirty, join `fill`, abort → `evaluation.refused`, `evaluation.conflicts == (0x800B,)`, `concat_crc = 0x9C5BCBBD`, `fill_crc = 0x2A8A3950`, 2 calls
 examples: (R-CRC-PREVIEW-001.6/1) dirty, join `fill`, warn → `fill_crc = evaluation.crc = 0x2A8A3950`, `evaluation.diagnostics == ("gap-safety: 1 present byte(s) at 0x800B in a filled gap differ from pad_byte 0xFF — proceeding (on_gap_conflict=warn)",)`
@@ -203,7 +203,7 @@ CrcDesignerPanel._coverage_preview_text
 req: R-CRC-PREVIEW-001.1, R-CRC-PREVIEW-001.2, R-CRC-PREVIEW-001.4, R-CRC-PREVIEW-001.6, R-CRC-PREVIEW-001.7, R-CRC-PREVIEW-001.8
 in: Optional[_CoverageRun] run
 out: str
-func: changed. was: `(algo)`, read the image, build, evaluate and compute itself. / now: `(run)`: `None` → `_COVERAGE_EMPTY_STATE`; `run.invalid` → `f"Invalid coverage: {run.invalid}"`; `run.size_cap` → `f"Cannot preview: coverage exceeds {run.size_cap} bytes"` (E3 SEC-2); `run.eval_error` → `f"Cannot preview: {run.eval_error}"`; `run.evaluation.refused` → the refusal text exactly as today from `run.evaluation.conflicts`; else `Active policy: join=<run.target.join>`, `concat: <_format_hex(run.concat_crc, store_width)>`, `fill:   <_format_hex(run.fill_crc, store_width)>`, then `run.evaluation.diagnostics`, joined by `\n`. Every text unchanged.
+func: changed. was: `(algo)`, read the image, build, evaluate and compute itself. / now: `(run)`: `None` → `_COVERAGE_EMPTY_STATE`; `run.invalid` → `f"Invalid coverage: {run.invalid}"`; `run.size_cap` → `f"Cannot preview: coverage exceeds {run.size_cap} bytes"` (E3 SEC-2); `run.eval_error` → `f"Cannot preview: {run.eval_error}"`; `run.evaluation.refused` → the refusal text exactly as today from `run.evaluation.conflicts`; `run.crc_error` → `f"Cannot preview: {run.crc_error}"` (E5-CR-3, corrective C-8: a CRC fault after a clean evaluation; no reachable form produces it today); else `Active policy: join=<run.target.join>`, `concat: <_format_hex(run.concat_crc, store_width)>`, `fill:   <_format_hex(run.fill_crc, store_width)>`, then `run.evaluation.diagnostics`, joined by `\n`. Every text unchanged.
 module: s19_app/tui/crc_designer_view.py
 examples: (R-CRC-PREVIEW-001.2/2) fixture, concat, abort → `"Active policy: join=concat\nconcat: 0x9C5BCBBD\nfill:   0x2A8A3950"`
 examples: (R-CRC-PREVIEW-001.4/1) dirty, fill, abort → `"Preview refused (on_gap_conflict=abort): 1 present byte(s) at 0x800B conflict with a filled gap; no CRC shown."`
@@ -212,8 +212,9 @@ examples: (R-CRC-PREVIEW-001.7/1) dirty, fill, ignore → the three lines only
 examples: (R-CRC-PREVIEW-001.2/2) fixture, Width `4`, concat → `"Cannot preview: width 4 out of range [8, 64]"`
 examples: (R-CRC-PREVIEW-001.8/1) `0x8008-0x8000` → starts `"Invalid coverage: "`
 examples: (R-CRC-PREVIEW-001.8/2) Ranges `[link=evil]0x8000-0x8008[/], [` → `"Invalid coverage: invalid literal for int() with base 16: '[link=evil]0x8000'"`, a plain `str` into a `markup=False` widget (E3 SEC-9)
-examples: (R-CRC-PREVIEW-001.11/1) `size_cap = 67108864` → `"Cannot preview: coverage exceeds 67108864 bytes"`
+examples: (R-CRC-PREVIEW-001.11/1) `size_cap = 16777216` → `"Cannot preview: coverage exceeds 16777216 bytes"`
 examples: (R-CRC-PREVIEW-001.1/1) `None` → `"Load an image to preview coverage CRCs over real bytes."`
+examples: (E5-CR-3) a clean evaluation with `crc_error = "width 99 out of range [8, 64]"` → `"Cannot preview: width 99 out of range [8, 64]"`; the window's line 2 `Cannot compute: width 99 out of range [8, 64]` (base and E4 head: `TypeError` from `_format_hex(None, …)`)
 
 CrcDesignerPanel._render_coverage_window
 req: R-CRC-PREVIEW-001.1, R-CRC-PREVIEW-001.3, R-CRC-PREVIEW-001.5, R-CRC-PREVIEW-001.6, R-CRC-PREVIEW-001.8
@@ -228,9 +229,9 @@ examples: (R-CRC-PREVIEW-001.6/1) dirty, fill, warn → line 3 `store 50 39 8A 2
 examples: (R-CRC-PREVIEW-001.3/2) Width `4`, any state → line 2 `Cannot compute: width 4 out of range [8, 64]` (holds on base)
 examples: (R-CRC-PREVIEW-001.1/2) `None` → plain `"Load an image to preview coverage CRCs over real bytes."`
 examples: (R-CRC-PREVIEW-001.12/1) fixture, Ranges `0x00C00000-0x00C00FFF, 0x00800000-0x00931FBF` → `bytes_per_glyph` 87467, line 1 15 glyphs (1 + 14), line 2 `concat 0x00000000   fill 0x00000000` (base: 1257406 glyphs)
-examples: (R-CRC-PREVIEW-001.12/1) fixture, Ranges `0x0-0x1, 0xFFFFFFF0-0xFFFFFFFF, 0x10-0x11` → `bytes_per_glyph` 89478486, line 1 51 glyphs (1, 48 `MICROBAR_EMPTY`, 1, 1), line 2 `Cannot preview: coverage exceeds 67108864 bytes` (base: ≈ 4.29 G glyphs, MemoryError or a hang)
+examples: (R-CRC-PREVIEW-001.12/1) fixture, Ranges `0x0-0x1, 0xFFFFFFF0-0xFFFFFFFF, 0x10-0x11` → `bytes_per_glyph` 89478486, line 1 51 glyphs (1, 48 `MICROBAR_EMPTY`, 1, 1), line 2 `Cannot preview: coverage exceeds 16777216 bytes` (base: ≈ 4.29 G glyphs, MemoryError or a hang)
 examples: (R-CRC-PREVIEW-001.12/1) ascending: the first-shown Ranges → 24 glyphs (8 + 8 + 8); the F-23 CRC scene's ranges → 49 (14 + 34 + 1) (holds on base)
-examples: (R-CRC-PREVIEW-001.11/1) Ranges `0x00000000-0x04000001` → line 1 48 glyphs, line 2 `Cannot preview: coverage exceeds 67108864 bytes`, no line 3
+examples: (R-CRC-PREVIEW-001.11/1) Ranges `0x00000000-0x01000001` → line 1 48 glyphs, line 2 `Cannot preview: coverage exceeds 16777216 bytes`, no line 3
 
 CrcDesignerPanel._build_coverage_target
 req: R-CRC-PREVIEW-001.8
@@ -294,7 +295,7 @@ func: changed. was: merge the sorted picked spans; for each gap between merged s
 module: s19_app/tui/segment_split_view.py
 examples: (R-SEG-PREV.2/2) mem `{0:1, 1:2, 2:0, 3:5, 4:0, 5:0, 6:7, 7:8}`, src `[(0, 8)]`, picked `[(0, 1), (7, 8)]`, pad `0x00` → `[(1, 2, "conflict"), (3, 4, "conflict"), (6, 7, "conflict")]` (holds on base)
 examples: (R-SEG-PREV.2/2) the same with pad `0xFF` → `[(1, 7, "conflict")]` (holds on base)
-examples: (R-SEG-PREV.2/2) the same mem, src `[(0, 4), (4, 8)]` (touching), pad `0xFF` → `[(1, 7, "conflict")]`: the run of `[1, 4)` and the run of `[4, 7)` merge (holds on base; mutant M-12 gives two marks)
+examples: (R-SEG-PREV.2/2) the same mem, src `[(0, 4), (4, 8)]` (touching), pad `0xFF` → `[(1, 7, "conflict")]`: the run of `[1, 4)` and the run of `[4, 7)` merge (holds on base; mutant M-12 gives two marks here, but no product consumer observes the difference: `build_plan` hands the marks to `_sweep`, which merges adjacent equal blocks, so M-12 is equivalent at the plan, E5 ruling C-5)
 examples: (R-SEG-PREV.2/2) mem `{2: 0x00}` only, src `[(0, 8)]`, picked `[(0, 1), (7, 8)]`, pad `0x00` → `[]` (absent and pad-valued both clean)
 examples: (R-SEG-PREV.2/3) demo, src = the four ranges, picked `[(0x0, 0x10000), (0x800000, 0x931FC0)]`, pad `0x00` → equals `reference_conflict_marks(...)` as a list; `sum(e - s) == len(gap_conflict(...))` (≈ 2.77 MiB, guide ch14.7)
 examples: (R-SEG-PREV.7/2) `prg.s19`, ticks {0, 1, 2, 5, 6, 7}, pad `0x00` → 5 conflict bytes (holds on base, TC-710)
@@ -312,8 +313,19 @@ SplitJoinWindow._sync / SplitJoinWindow.action_cycle_gap
 req: R-SEG-PREV.1, R-SEG-PREV.20
 func: unchanged. `g` → `action_cycle_gap` → `_bump` → `_sync` → `_plan` → `build_plan`; `#sje_stats` is updated once per sync.
 module: s19_app/tui/segment_split_view.py
-examples: (R-SEG-PREV.20/1) the F-23 Split/Join scene, `g` → `#sje_stats` updated ≤ 2.5 s after the press with `packed 1.26 MiB  ·  span 9.20 MiB  ·  fill <pct>%` and `⚠ <fmtB(conflict count)> would clobber source — abort on export` (base: ≈ 25 s, the same text)
+examples: (R-SEG-PREV.20/1) the F-23 Split/Join scene, `g` → `#sje_stats` updated ≤ 2.5 s after the press with `packed 1.26 MiB  ·  span 9.20 MiB  ·  fill <pct>%` and `⚠ <fmtB(conflict count)> would clobber source — abort on export` (base: ≈ 25 s; base and the E4 head painted the GUARD chip on line 2, finding E4-F1, fixed by `_state_text` below)
+
+SplitJoinWindow._state_text
+req: R-SEG-PREV.7, R-SEG-PREV.8, R-SEG-PREV.20
+in: Plan plan
+out: Tuple[Text, bool]
+func: changed (added to the slice by the E5 rulings, C-1; D17-27 state-line half). was: `plan.guard` → `⚠ GUARD  <fmtB(span)> span` + ` — e again to confirm` / ` — e will ask`, `True`; elif `plan.conflicts` → `⚠ <fmtB(conflicts)> would clobber source — abort on export`, `False`; elif `plan.empty_files` → the empty-file gate, `True`; else `ready — e exports`, `False`. / now: the same four branches with the conflict branch first: conflicts → guard → empty files → ready. Texts, styles and the returned flag of each branch unchanged; both callers (`_stats_text`, twice) discard the flag, and the arming stays in `action_export`, which already refuses on conflicts before the guard gate (LLR-136.4).
+module: s19_app/tui/segment_split_view.py
+calls: fmtB
+examples: (R-SEG-PREV.7/1) the F-23 Split/Join scene (guard fires, conflicts > 0) → `⚠ <fmtB(len(gap_conflict(…)))> would clobber source — abort on export` (`⚠ 2.77 MiB …` on the LAN host run) (base and E4 head: `⚠ GUARD  9.20 MiB span — e will ask`)
+examples: (R-SEG-PREV.7/1) a join-fill scene with span `GUARD_SPAN_MIN + 16`, fill > 99 % and a 4-byte source range in the gap → `⚠ 4 B would clobber source — abort on export`
+examples: (R-SEG-PREV.8) the same scene without the gap range → `⚠ GUARD  1.00 MiB span — e will ask`; after the first `e` → `⚠ GUARD  1.00 MiB span — e again to confirm` (holds on base)
 
 ## Coverage of the requirements by examples
 
-Every active row of `../01-requirements.md` has at least one example above: R-CRC-DESIGNER-001.2.1 (`on_select_changed`, `on_switch_changed`), -001.2.2 (`on_input_changed`, `_schedule_recompute`, `_on_image_changed`, `__init__`), -007.1 (`on_input_changed`, `_schedule_recompute`), -007.2 (`_apply_template`), -007.3 (`on_select_changed`), -001.1 (`_REFLECT8`, `crc_lut`); R-CRC-PREVIEW-002.1 (`_on_image_changed`, `on_mount`), -002.2 (`_recompute`, `evaluate_target`, `crc_lut`), -002.3 (`_apply_template`), -002.4 (`_recompute`), -002.5 (`_on_image_changed`, `on_show`), -001.1 … .8 (`_compute_coverage`, `_coverage_preview_text`, `_render_coverage_window`), -001.11 (`_COVERAGE_CAP_BYTES`, `_compute_coverage`, `_coverage_preview_text`, `_render_coverage_window`), -001.12 (`_render_coverage_window`, `_compute_coverage`); R-SEG-PREV.20 (`_sweep`, `action_cycle_gap`), .2 (`_sweep`, `_conflict_marks`, `build_plan`), .7 (`_conflict_marks`, `build_plan`).
+Every active row of `../01-requirements.md` has at least one example above: R-CRC-DESIGNER-001.2.1 (`on_select_changed`, `on_switch_changed`), -001.2.2 (`on_input_changed`, `_schedule_recompute`, `_on_image_changed`, `__init__`), -007.1 (`on_input_changed`, `_schedule_recompute`), -007.2 (`_apply_template`), -007.3 (`on_select_changed`), -001.1 (`_REFLECT8`, `crc_lut`); R-CRC-PREVIEW-002.1 (`_on_image_changed`, `on_mount`), -002.2 (`_recompute`, `evaluate_target`, `crc_lut`), -002.3 (`_apply_template`), -002.4 (`_recompute`), -002.5 (`_on_image_changed`, `on_show`), -001.1 … .8 (`_compute_coverage`, `_coverage_preview_text`, `_render_coverage_window`), -001.11 (`_COVERAGE_CAP_BYTES`, `_compute_coverage`, `_coverage_preview_text`, `_render_coverage_window`), -001.12 (`_render_coverage_window`, `_compute_coverage`); R-SEG-PREV.20 (`_sweep`, `action_cycle_gap`), .2 (`_sweep`, `_conflict_marks`, `build_plan`), .7 (`_conflict_marks`, `build_plan`, `SplitJoinWindow._state_text`).

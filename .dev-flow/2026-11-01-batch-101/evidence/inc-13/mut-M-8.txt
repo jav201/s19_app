@@ -1,0 +1,266 @@
+=== MUTANT M-8 ===
+$ python -c 'import s19_app; print(s19_app.__file__)'
+<HOME>/work/s19_m13/s19_app/__init__.py
+$ timeout 900 <HOME>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -n 2 --basetemp /tmp/pytest-s19m13 tests/test_b101_designer_recompute.py::test_r_crc_preview_002_2_one_recompute_reads_the_window_at_most_twice
+bringing up nodes...
+bringing up nodes...
+
+FF.FFF                                                                   [100%]
+=================================== FAILURES ===================================
+_ test_r_crc_preview_002_2_one_recompute_reads_the_window_at_most_twice[abort-fixture] _
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m13/popen-gw0/test_r_crc_preview_002_2_one_r0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f1bd3b60750>
+image = 'fixture', conflict = 'abort'
+
+    @pytest.mark.parametrize("image", ["fixture", "dirty"])
+    @pytest.mark.parametrize("conflict", ["abort", "warn", "ignore"])
+    def test_r_crc_preview_002_2_one_recompute_reads_the_window_at_most_twice(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, image: str, conflict: str
+    ) -> None:
+        """Join gaps := fill (a dropdown) over the fixture image and over the dirty
+        fixture, with On conflict abort, warn and ignore (6 states): the one
+        recompute reads a coverage window from the image at most twice (count of
+        ``crc_designer_model.gather_target`` calls; base: 6 in the five states that
+        are not refused, 2 in dirty-abort). Partial: the count bounds the cost, not
+        the time (the timing arms in ``test_b101_inc13_perf.py`` bound the time).
+    
+        Why: the preview and the window each evaluated the coverage again; the
+        shared computation reads once for the evaluation and once for the other
+        policy. Negative control: the renderers computing their own CRCs again, or
+        the shared computation taking all three CRCs -> three or more reads -> RED."""
+        calls = _count_gathers(monkeypatch)
+    
+        async def scenario():
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                await pilot.press("0")
+                await pilot.pause()
+                mem = dirty_mem() if image == "dirty" else fixture_mem()
+                await _load_and_recompute(pilot, app, mem)
+                if conflict != "abort":
+                    app.query_one("#crc_coverage_on_gap_conflict", Select).value = conflict
+                    await pilot.pause()
+                calls[0] = 0
+                before = designer_recomputes()
+                app.query_one("#crc_coverage_join", Select).value = "fill"
+                await pilot.pause()
+                return designer_recomputes() - before, calls[0]
+    
+        recomputes, reads = asyncio.run(scenario())
+        assert recomputes == 1, f"one dropdown change is one recompute, got {recomputes}"
+>       assert reads <= 2, f"a recompute may read the window at most twice, read {reads}"
+E       AssertionError: a recompute may read the window at most twice, read 3
+E       assert 3 <= 2
+
+tests/test_b101_designer_recompute.py:714: AssertionError
+_ test_r_crc_preview_002_2_one_recompute_reads_the_window_at_most_twice[warn-fixture] _
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m13/popen-gw1/test_r_crc_preview_002_2_one_r0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7efc3ea747d0>
+image = 'fixture', conflict = 'warn'
+
+    @pytest.mark.parametrize("image", ["fixture", "dirty"])
+    @pytest.mark.parametrize("conflict", ["abort", "warn", "ignore"])
+    def test_r_crc_preview_002_2_one_recompute_reads_the_window_at_most_twice(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, image: str, conflict: str
+    ) -> None:
+        """Join gaps := fill (a dropdown) over the fixture image and over the dirty
+        fixture, with On conflict abort, warn and ignore (6 states): the one
+        recompute reads a coverage window from the image at most twice (count of
+        ``crc_designer_model.gather_target`` calls; base: 6 in the five states that
+        are not refused, 2 in dirty-abort). Partial: the count bounds the cost, not
+        the time (the timing arms in ``test_b101_inc13_perf.py`` bound the time).
+    
+        Why: the preview and the window each evaluated the coverage again; the
+        shared computation reads once for the evaluation and once for the other
+        policy. Negative control: the renderers computing their own CRCs again, or
+        the shared computation taking all three CRCs -> three or more reads -> RED."""
+        calls = _count_gathers(monkeypatch)
+    
+        async def scenario():
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                await pilot.press("0")
+                await pilot.pause()
+                mem = dirty_mem() if image == "dirty" else fixture_mem()
+                await _load_and_recompute(pilot, app, mem)
+                if conflict != "abort":
+                    app.query_one("#crc_coverage_on_gap_conflict", Select).value = conflict
+                    await pilot.pause()
+                calls[0] = 0
+                before = designer_recomputes()
+                app.query_one("#crc_coverage_join", Select).value = "fill"
+                await pilot.pause()
+                return designer_recomputes() - before, calls[0]
+    
+        recomputes, reads = asyncio.run(scenario())
+        assert recomputes == 1, f"one dropdown change is one recompute, got {recomputes}"
+>       assert reads <= 2, f"a recompute may read the window at most twice, read {reads}"
+E       AssertionError: a recompute may read the window at most twice, read 3
+E       assert 3 <= 2
+
+tests/test_b101_designer_recompute.py:714: AssertionError
+_ test_r_crc_preview_002_2_one_recompute_reads_the_window_at_most_twice[warn-dirty] _
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m13/popen-gw1/test_r_crc_preview_002_2_one_r1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7efc3ea74510>
+image = 'dirty', conflict = 'warn'
+
+    @pytest.mark.parametrize("image", ["fixture", "dirty"])
+    @pytest.mark.parametrize("conflict", ["abort", "warn", "ignore"])
+    def test_r_crc_preview_002_2_one_recompute_reads_the_window_at_most_twice(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, image: str, conflict: str
+    ) -> None:
+        """Join gaps := fill (a dropdown) over the fixture image and over the dirty
+        fixture, with On conflict abort, warn and ignore (6 states): the one
+        recompute reads a coverage window from the image at most twice (count of
+        ``crc_designer_model.gather_target`` calls; base: 6 in the five states that
+        are not refused, 2 in dirty-abort). Partial: the count bounds the cost, not
+        the time (the timing arms in ``test_b101_inc13_perf.py`` bound the time).
+    
+        Why: the preview and the window each evaluated the coverage again; the
+        shared computation reads once for the evaluation and once for the other
+        policy. Negative control: the renderers computing their own CRCs again, or
+        the shared computation taking all three CRCs -> three or more reads -> RED."""
+        calls = _count_gathers(monkeypatch)
+    
+        async def scenario():
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                await pilot.press("0")
+                await pilot.pause()
+                mem = dirty_mem() if image == "dirty" else fixture_mem()
+                await _load_and_recompute(pilot, app, mem)
+                if conflict != "abort":
+                    app.query_one("#crc_coverage_on_gap_conflict", Select).value = conflict
+                    await pilot.pause()
+                calls[0] = 0
+                before = designer_recomputes()
+                app.query_one("#crc_coverage_join", Select).value = "fill"
+                await pilot.pause()
+                return designer_recomputes() - before, calls[0]
+    
+        recomputes, reads = asyncio.run(scenario())
+        assert recomputes == 1, f"one dropdown change is one recompute, got {recomputes}"
+>       assert reads <= 2, f"a recompute may read the window at most twice, read {reads}"
+E       AssertionError: a recompute may read the window at most twice, read 3
+E       assert 3 <= 2
+
+tests/test_b101_designer_recompute.py:714: AssertionError
+_ test_r_crc_preview_002_2_one_recompute_reads_the_window_at_most_twice[ignore-dirty] _
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m13/popen-gw1/test_r_crc_preview_002_2_one_r2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7efc3d7018d0>
+image = 'dirty', conflict = 'ignore'
+
+    @pytest.mark.parametrize("image", ["fixture", "dirty"])
+    @pytest.mark.parametrize("conflict", ["abort", "warn", "ignore"])
+    def test_r_crc_preview_002_2_one_recompute_reads_the_window_at_most_twice(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, image: str, conflict: str
+    ) -> None:
+        """Join gaps := fill (a dropdown) over the fixture image and over the dirty
+        fixture, with On conflict abort, warn and ignore (6 states): the one
+        recompute reads a coverage window from the image at most twice (count of
+        ``crc_designer_model.gather_target`` calls; base: 6 in the five states that
+        are not refused, 2 in dirty-abort). Partial: the count bounds the cost, not
+        the time (the timing arms in ``test_b101_inc13_perf.py`` bound the time).
+    
+        Why: the preview and the window each evaluated the coverage again; the
+        shared computation reads once for the evaluation and once for the other
+        policy. Negative control: the renderers computing their own CRCs again, or
+        the shared computation taking all three CRCs -> three or more reads -> RED."""
+        calls = _count_gathers(monkeypatch)
+    
+        async def scenario():
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                await pilot.press("0")
+                await pilot.pause()
+                mem = dirty_mem() if image == "dirty" else fixture_mem()
+                await _load_and_recompute(pilot, app, mem)
+                if conflict != "abort":
+                    app.query_one("#crc_coverage_on_gap_conflict", Select).value = conflict
+                    await pilot.pause()
+                calls[0] = 0
+                before = designer_recomputes()
+                app.query_one("#crc_coverage_join", Select).value = "fill"
+                await pilot.pause()
+                return designer_recomputes() - before, calls[0]
+    
+        recomputes, reads = asyncio.run(scenario())
+        assert recomputes == 1, f"one dropdown change is one recompute, got {recomputes}"
+>       assert reads <= 2, f"a recompute may read the window at most twice, read {reads}"
+E       AssertionError: a recompute may read the window at most twice, read 3
+E       assert 3 <= 2
+
+tests/test_b101_designer_recompute.py:714: AssertionError
+_ test_r_crc_preview_002_2_one_recompute_reads_the_window_at_most_twice[ignore-fixture] _
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-s19m13/popen-gw0/test_r_crc_preview_002_2_one_r2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f1bd81f7710>
+image = 'fixture', conflict = 'ignore'
+
+    @pytest.mark.parametrize("image", ["fixture", "dirty"])
+    @pytest.mark.parametrize("conflict", ["abort", "warn", "ignore"])
+    def test_r_crc_preview_002_2_one_recompute_reads_the_window_at_most_twice(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, image: str, conflict: str
+    ) -> None:
+        """Join gaps := fill (a dropdown) over the fixture image and over the dirty
+        fixture, with On conflict abort, warn and ignore (6 states): the one
+        recompute reads a coverage window from the image at most twice (count of
+        ``crc_designer_model.gather_target`` calls; base: 6 in the five states that
+        are not refused, 2 in dirty-abort). Partial: the count bounds the cost, not
+        the time (the timing arms in ``test_b101_inc13_perf.py`` bound the time).
+    
+        Why: the preview and the window each evaluated the coverage again; the
+        shared computation reads once for the evaluation and once for the other
+        policy. Negative control: the renderers computing their own CRCs again, or
+        the shared computation taking all three CRCs -> three or more reads -> RED."""
+        calls = _count_gathers(monkeypatch)
+    
+        async def scenario():
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                await pilot.press("0")
+                await pilot.pause()
+                mem = dirty_mem() if image == "dirty" else fixture_mem()
+                await _load_and_recompute(pilot, app, mem)
+                if conflict != "abort":
+                    app.query_one("#crc_coverage_on_gap_conflict", Select).value = conflict
+                    await pilot.pause()
+                calls[0] = 0
+                before = designer_recomputes()
+                app.query_one("#crc_coverage_join", Select).value = "fill"
+                await pilot.pause()
+                return designer_recomputes() - before, calls[0]
+    
+        recomputes, reads = asyncio.run(scenario())
+        assert recomputes == 1, f"one dropdown change is one recompute, got {recomputes}"
+>       assert reads <= 2, f"a recompute may read the window at most twice, read {reads}"
+E       AssertionError: a recompute may read the window at most twice, read 3
+E       assert 3 <= 2
+
+tests/test_b101_designer_recompute.py:714: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_designer_recompute.py::test_r_crc_preview_002_2_one_recompute_reads_the_window_at_most_twice[abort-fixture]
+FAILED tests/test_b101_designer_recompute.py::test_r_crc_preview_002_2_one_recompute_reads_the_window_at_most_twice[warn-fixture]
+FAILED tests/test_b101_designer_recompute.py::test_r_crc_preview_002_2_one_recompute_reads_the_window_at_most_twice[warn-dirty]
+FAILED tests/test_b101_designer_recompute.py::test_r_crc_preview_002_2_one_recompute_reads_the_window_at_most_twice[ignore-dirty]
+FAILED tests/test_b101_designer_recompute.py::test_r_crc_preview_002_2_one_recompute_reads_the_window_at_most_twice[ignore-fixture]
+5 failed, 1 passed in 11.29s
+PYTEST_EXIT=1
+SHA256 s19_app/tui/crc_designer_view.py = 814aefc7247a1ee876e571102af1a080466888a65a00b51cf5cc7375ac2062f5
+SHA256 s19_app/tui/segment_split_view.py = 9b4f660d174eb4debe95f1ee5475a4ddcc1931348b1f0be8bd526bd6282051aa
+SHA256 s19_app/tui/operations/crc_kernel.py = f96188b2fb1266302f173268b0419a97b1ed9ad18cd685b2dbdf815233e91edf
+DONE M-8 exits=[1]

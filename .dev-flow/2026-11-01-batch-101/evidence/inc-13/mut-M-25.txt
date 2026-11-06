@@ -1,0 +1,63 @@
+=== MUTANT M-25 ===
+$ python -c 'import s19_app; print(s19_app.__file__)'
+<HOME>/work/s19_m13/s19_app/__init__.py
+$ timeout 900 <HOME>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -m serial_timing --basetemp /tmp/pytest-s19m13 tests/test_b101_inc13_perf.py::test_r_crc_preview_002_4_ranges_edit_in_the_f23_scene_within_3_s
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_r_crc_preview_002_4_ranges_edit_in_the_f23_scene_within_3_s _______
+
+tmp_path = PosixPath('/tmp/pytest-s19m13/test_r_crc_preview_002_4_range0')
+
+    @pytest.mark.serial_timing
+    def test_r_crc_preview_002_4_ranges_edit_in_the_f23_scene_within_3_s(
+        tmp_path: Path,
+    ) -> None:
+        """Ranges := the scene's ranges without the space (the same coverage, Join
+        gaps concat; clock starts at the statement, t0): the first update of
+        ``#crc_coverage_window`` after t0, minus (t0 + the shipped quiet time), comes
+        within ``timing_bound(3.0)``; window line 2 is ``concat <c>   fill <f>`` with
+        the ``zlib.crc32`` oracles.
+    
+        Why: typing in Ranges recomputed about 10 s per keystroke (six window reads
+        with concat active). Negative controls: the per-byte input reflection restored
+        in the CRC engine -> over the bound on the LAN host; the renderers computing
+        their own CRCs again -> the read count of the previous arm RED."""
+        concat, fill = _f23_window_crcs()
+        quiet = getattr(crc_designer_view, "CRC_RECOMPUTE_S", SHIPPED_QUIET_S)
+    
+        async def arm() -> Tuple[float, object]:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test() as pilot:
+                await pilot.pause()
+                await _crc_scene(pilot, app)
+                stamps = _Stamps(app.query_one("#crc_coverage_window", Static))
+                t0 = time.perf_counter()
+                app.query_one("#crc_coverage_ranges", Input).value = F23_RANGES_COMPACT
+                await wait_until(
+                    pilot,
+                    lambda: bool(stamps.after(t0)),
+                    "the coverage window was never updated after the Ranges edit",
+                    timeout=ARM_WAIT_S,
+                )
+                first = stamps.after(t0)[0]
+                return first[0] - (t0 + quiet), first[1]
+    
+        elapsed, content = asyncio.run(arm())
+>       assert elapsed < report_margin("R-CRC-PREVIEW-002.4/1", elapsed, timing_bound(3.0)), elapsed
+E       AssertionError: 3.5613312539971957
+E       assert 3.5613312539971957 < 3.0
+E        +  where 3.0 = report_margin('R-CRC-PREVIEW-002.4/1', 3.5613312539971957, 3.0)
+E        +    where 3.0 = timing_bound(3.0)
+
+tests/test_b101_inc13_perf.py:254: AssertionError
+============================= QC-TM timing margins =============================
+LOW -18.7%  3.561 s / 3.000 s  R-CRC-PREVIEW-002.4/1  tests/test_b101_inc13_perf.py::test_r_crc_preview_002_4_ranges_edit_in_the_f23_scene_within_3_s
+QC-TM: 1 bounds, 1 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b101_inc13_perf.py::test_r_crc_preview_002_4_ranges_edit_in_the_f23_scene_within_3_s
+1 failed in 12.38s
+PYTEST_EXIT=1
+SHA256 s19_app/tui/crc_designer_view.py = 814aefc7247a1ee876e571102af1a080466888a65a00b51cf5cc7375ac2062f5
+SHA256 s19_app/tui/segment_split_view.py = 9b4f660d174eb4debe95f1ee5475a4ddcc1931348b1f0be8bd526bd6282051aa
+SHA256 s19_app/tui/operations/crc_kernel.py = f96188b2fb1266302f173268b0419a97b1ed9ad18cd685b2dbdf815233e91edf
+DONE M-25 exits=[1]

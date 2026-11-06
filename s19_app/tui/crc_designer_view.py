@@ -1173,8 +1173,9 @@ class CrcDesignerPanel(ScrollableContainer):
             ``None`` → the empty-state note; ``invalid`` → ``Invalid coverage:
             <reason>``; ``size_cap`` → ``Cannot preview: coverage exceeds <cap>
             bytes``; ``eval_error`` → ``Cannot preview: <reason>``; a refused
-            evaluation → the abort notice; otherwise the three lines (active
-            policy, concat CRC, fill CRC) plus any diagnostics. All text renders
+            evaluation → the abort notice; ``crc_error`` → ``Cannot preview:
+            <reason>`` (E5-CR-3); otherwise the three lines (active policy,
+            concat CRC, fill CRC) plus any diagnostics. All text renders
             ``markup=False``.
 
         Args:
@@ -1205,6 +1206,8 @@ class CrcDesignerPanel(ScrollableContainer):
                 f"{len(run.evaluation.conflicts)} present byte(s) at {shown} conflict "
                 "with a filled gap; no CRC shown."
             )
+        if run.crc_error is not None:
+            return f"Cannot preview: {run.crc_error}"
         target = run.target
         lines = [
             f"Active policy: join={target.join}",
@@ -1367,11 +1370,11 @@ class CrcDesignerPanel(ScrollableContainer):
             window.update(warning)
             return
         algo = template.algorithm
-        run = self._compute_coverage(algo)
         verdict.update(self._verdict_text(algo))
         custom_result.update(self._custom_vector_text(algo))
         preview.update(self._preview_text(template))
         warnings.update(self._live_warnings_text(algo))
+        run = self._compute_coverage(algo)
         coverage.update(self._coverage_preview_text(run))
         window.update(self._render_coverage_window(run))
 
