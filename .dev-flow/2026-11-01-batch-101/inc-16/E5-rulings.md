@@ -23,3 +23,7 @@ Re-audit: **PASS-WITH-NOTES**, no mark changed.
 
 - **RA-1 (ARCH.5/2):** stays `full`/`covered`; the three clauses' own negative controls are owed (the row's mutant was killed; the auditor's in-memory check is not a cited run and is not used as evidence). Recorded as owed in `04-validation.md` and as a backlog line. Why: the test asserts all three clauses; what is missing is a control, not coverage.
 - **RA-2 (notes):** the `02-test-cases.md` header names who ran the tests; `e5c-10` is cited by commit hash in the close records.
+
+## Close ruling (2026-11-06)
+
+- **TR-1 (trace_check `1 gap`: TEST R-DOC-ARCHIVE.2):** ruled, not fixed. R-DOC-ARCHIVE.2 is local to this increment by E1 ruling D-1 (a one-time move, not folded into the canon). Its two cases are verified by E5 transcripts (`e5c-08` with its oracle control `e5c-09`, and the `git diff c2cba35` transcript for ARCHIVE.2/1). A standing test would re-check a past move against a fixed base commit, which a shallow CI clone cannot hold; naming the id in an unrelated test docstring would claim a verification that does not exist. Final trace line: `trace_check: 3 US, 32 active requirements (0 withdrawn), 1 gap(s)` — the one gap is this ruled row.
