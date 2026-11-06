@@ -44,3 +44,7 @@ Correction: DeepSeek v4 Pro, targeted edits only (the operator's 2026-11-06 remi
 ## Round 3 (2026-11-06)
 
 Security re-check: SR2-1 and SR2-2 **closed** (`action_export` is the only caller of the write; its hidden-window guard covers the `e` key, Enter or click on EXPORT and the key-bar token). New **R3-1 (MAJOR, case only):** R-SEG-OPEN.7/4 could not fail (no row ticked, so the base stops at "nothing selected"). Fixed by the orchestrator in `02-test-cases.md`: the precondition ticks every row with `a` and asserts the ticks before the trigger. No design change. **E3 closed for 10a and 10b.**
+
+## Addendum — Inc 12 D-2 (orchestrator, 2026-11-06, before 10a's E4)
+
+Inc 12's E1 found, and the orchestrator verified on main `2d1e2b1`, that no product route runs the issue jump: `S19TuiApp._jump_to_validation_issue` (the legacy ListView adapter) has no caller, and `_jump_to_validation_issue_object` is called only by it; Enter on an issue row repaints the Issues peek (`on_issue_row_selected`). Inc 12 removes the three functions (its D-2 A). Ruling for 10a: drop slice/graph node #11 (`_jump_to_validation_issue_object`) and every case that drives the issue jump (at least R-TUI-018.1/5 and R-TUI-040.12/2), withdrawn by id with this reason; where a coverage item loses its only route, re-point it to a shipped route or state the narrowed coverage; fix the counts. 10a's testers switch windows with the keys or `action_show_screen`, never `action_view_*` (removed by Inc 12).

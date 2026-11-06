@@ -9,12 +9,12 @@ How to read it:
 
 ## Groups and interfaces
 
-24 slice nodes in 3 files, grouped by file ownership (one E4 implementer per group; G1's 20 nodes are one file, so one agent; G3's two nodes may go to the same agent, built first, since G1 calls them). Interfaces are pinned here; an E4 agent proposes a change and never changes one alone.
+24 slice nodes in 3 files and 12 context nodes (E3 addendum, Inc 12 D-2: #11 `_jump_to_validation_issue_object` withdrawn, no product route; before: 25 slice nodes, the header said 24 since round 2 added `SplitJoinWindow.action_export`), grouped by file ownership (one E4 implementer per group; G1's 19 nodes are one file, so one agent; G3's two nodes may go to the same agent, built first, since G1 calls them). Interfaces are pinned here; an E4 agent proposes a change and never changes one alone.
 
 | Group | File | Owns nodes |
 |---|---|---|
-| G1 app | `s19_app/tui/app.py` | the 20 `S19TuiApp` / module nodes below |
-| G2 split-join | `s19_app/tui/segment_split_view.py` | `SplitJoinWindow.refresh_window`, `SplitJoinWindow.check_action` |
+| G1 app | `s19_app/tui/app.py` | the 19 `S19TuiApp` / module nodes below |
+| G2 split-join | `s19_app/tui/segment_split_view.py` | `SplitJoinWindow.refresh_window`, `SplitJoinWindow.check_action`, `SplitJoinWindow.action_export` |
 | G3 render | `s19_app/render/hexview.py` | `hex_row_bases`, `_collect_hex_rows` |
 
 | Interface | Pinned form | Producer → consumers |
@@ -36,7 +36,7 @@ Interfaces with other increments:
 | Inc 9 (in flight) | none (`app.py:3988-4572` flow save handlers) | — |
 | Inc 5 (merged) | the in-place-write hook and its three callers; the term *in-place write* | reused; scope of the term widened (`../E1-rulings.md` §4); no `refresh_window` from the hook (Inc 5 E3 A-4) |
 | Inc 13 (merged) | `segment_split_view.py` `_conflict_marks`, `build_plan`, `_state_text` (conflict first), `_sync` | reused unchanged; D-1 … D-4 of Inc 13 untouched |
-| Inc 12 (next in the `app.py` chain) | no function named in common at E1 | re-checked at Inc 12's E1 |
+| Inc 12 (next in the `app.py` chain) | Inc 12's E1 found one: `_jump_to_validation_issue_object` (10a #11). Inc 12 removes it, with `_jump_to_validation_issue`, `_format_validation_issue_line` and `action_view_main` / `_alt` / `_mac` (its D-2 A). 10a also changes `action_show_screen`, which Inc 12 only calls | E3 addendum (Inc 12 D-2): #11 withdrawn (no product route); 10a changes none of the removed functions, and no 10a test drives them (`../02-test-cases.md`, window-switch rule) |
 
 ## Nodes — G1 app
 
@@ -55,7 +55,7 @@ examples: (no focus, after `.`) → rows from `_hex_window_start`, marker as set
 examples: (R-TUI-040.8/4) after a jump to the last present row (start 26 544 of 26 546), a render without a focus → start 26 544 kept (base P7: 26 400, the last page floor)
 examples: (R-TUI-018.1/12) MAC below, go-to `0x00008020` → view rows `0x1000`, `0x8000`, `0x8010`, `0x8020`; start 2; rows `0x00008010`, `0x00008020` (base P5: start 1 counted in `row_bases`, target third)
 examples: (R-TUI-018.1/13) 80 × 24, go-to `0x00000960` → the `0x00000960` row is the second hex row, below at most 2 notice lines, inside `#hex_scroll`'s region
-examples: (R-TUI-018.3/1) issue at an address outside the image → start = (index of the snapped present row in the view rows) − 1; second row = the snapped row
+examples: (unit shape, no product route — Inc 12 D-2; R-TUI-018.3/1 withdrawn) a focus address with no present row → start = (index of the snapped present row in the view rows) − 1; second row = the snapped row. Every shipped main-view jump targets a present row, so no case drives this arm
 examples: (R-TUI-018.4/1) go-to `0x00000000` → start 0; first hex row `0x00000000`, no `... showing from` line; the miss after it (#5) re-renders from start 0
 
 S19TuiApp.action_hex_page_next
@@ -91,6 +91,7 @@ func: changed. As `update_alt_hex_view` for `#mac_hex_view`, `_mac_goto_focus_ad
 module: s19_app/tui/app.py
 calls: S19TuiApp._row_start_for_near_top_focus, render_hex_view_text, S19TuiApp._reset_scroll_to_top
 examples: (R-TUI-040.11/5) marker set, `zz` → 0 marked lines, rows unchanged
+examples: (R-TUI-018.3/3) case 08 + `firmware_issues.mac`; Enter on the `#mac_records_list` row of `0x00FF0000` (In mem `no`) → `_jump_to_mac_address` (unchanged) → `update_mac_hex_view(0x00FF0000, near_top=True, reset_scroll=True)` → snapped to the last present row `0x00C00FF0`; start = its view index − 1; rows `0x00C00FE0`, `0x00C00FF0`, then the MAC-added rows of the valid records outside the image (base: no start index → centred on the `0x00FF0000` row with 64 context rows)
 
 S19TuiApp._handle_goto
 req: R-TUI-040.8, R-TUI-040.11, R-TUI-018.4
@@ -149,14 +150,8 @@ module: s19_app/tui/app.py
 calls: S19TuiApp.update_alt_hex_view
 examples: (R-TUI-018.1/8) `VALUE_0200` → its address row is the second row
 
-S19TuiApp._jump_to_validation_issue_object
-req: R-TUI-018.1, R-TUI-018.2, R-TUI-018.3, R-TUI-040.12
-in: issue: ValidationIssue
-out: None
-func: changed. was: `update_hex_view(a)`, `update_alt_hex_view(a)`, `update_mac_hex_view(a)`. / now: the A2L and MAC calls with `near_top=True, reset_scroll=True`; the main call unchanged (near-top through `update_hex_view`).
-module: s19_app/tui/app.py
-calls: S19TuiApp.update_hex_view, S19TuiApp.update_alt_hex_view, S19TuiApp.update_mac_hex_view
-examples: (R-TUI-018.1/5) issue at *A* → second row of each view = *A*'s row; (R-TUI-040.12/2) three markers cleared
+S19TuiApp._jump_to_validation_issue_object — withdrawn (no product route — Inc 12 D-2)
+func: unchanged; not a slice node and not counted. Its only caller, `_jump_to_validation_issue` (the legacy ListView adapter), has no caller on `98d94d7` or on main `2d1e2b1`. Enter on an issue row runs `on_issue_row_selected` → `_update_issues_hex_pane` (the Issues peek). Its A2L and MAC renders keep the 64-row centring, which no product route reaches. Inc 12 removes it (its D-2 A). Cases R-TUI-018.1/5, R-TUI-018.3/1 and R-TUI-040.12/2 are withdrawn with it; R-TUI-018.3's MAC arm is re-pointed to R-TUI-018.3/3 (`update_mac_hex_view` above).
 
 _unload_primary
 req: R-WS-LOADED.16, R-WS-LOADED.19, R-WS-LOADED.20
@@ -204,7 +199,7 @@ S19TuiApp.action_show_screen
 req: R-SHELL-FOCUS.2, R-SHELL-FOCUS.5, R-SEG-OPEN.6
 in: screen_key: str
 out: None
-func: changed. was: swaps the `hidden` classes, hides Split / Join, moves the rail marker, runs the entry prefills; no focus move. / now (E3 A10-01 = S-4, D-8): identical, then, before `refresh_bindings()`: (1) when `default_screen.focused` has an ancestor in `_WINDOW_CONTAINER_IDS` that now has `hidden`, `default_screen.set_focus(None)` at once (a class test, valid before any layout); (2) when the call changed what is shown (the shown window's container had `hidden` before the swap, or Split / Join was displayed), `call_after_refresh(self._land_focus, default_screen.focused, self._active_screen_key, on_switch=True)`; a call that shows the window already shown (`1` on the Workspace, a click on the active rail item, `action_view_main`) schedules no landing and a healthy focus there stays (AR2-4). No synchronous landing: the window un-hidden in this call has no region until the next layout (Textual `widget.py:2285-2294`, P1/P2). Unknown key → return as on base. Every caller gets it (A10-11: rail keys and clicks, palette, Memory Map open-in-hex, window help, `action_view_*`, the Split / Join close).
+func: changed. was: swaps the `hidden` classes, hides Split / Join, moves the rail marker, runs the entry prefills; no focus move. / now (E3 A10-01 = S-4, D-8): identical, then, before `refresh_bindings()`: (1) when `default_screen.focused` has an ancestor in `_WINDOW_CONTAINER_IDS` that now has `hidden`, `default_screen.set_focus(None)` at once (a class test, valid before any layout); (2) when the call changed what is shown (the shown window's container had `hidden` before the swap, or Split / Join was displayed), `call_after_refresh(self._land_focus, default_screen.focused, self._active_screen_key, on_switch=True)`; a call that shows the window already shown (`1` on the Workspace, a click on the active rail item; on the base also `action_view_main`, which Inc 12 removes and no 10a test drives) schedules no landing and a healthy focus there stays (AR2-4). No synchronous landing: the window un-hidden in this call has no region until the next layout (Textual `widget.py:2285-2294`, P1/P2). Unknown key → return as on base. Every caller gets it (A10-11: rail keys and clicks, palette, Memory Map open-in-hex, window help, `action_view_*` (removed by Inc 12; tests switch with the keys or `action_show_screen`), the Split / Join close).
 module: s19_app/tui/app.py
 calls: Rail.set_active, S19TuiApp._apply_empty_state, Screen.set_focus, App.call_after_refresh, S19TuiApp._land_focus
 examples: (R-SHELL-FOCUS.2/1) `files_list` focused, `2` → `a2l_tags_list` (base P: `ws_load_project_button`, hidden, area 0)
