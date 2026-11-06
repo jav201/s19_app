@@ -11,3 +11,12 @@ The E3 round-1 reviews and rulings for this increment are Inc 12's, written befo
 | S-2 | every re-pointed security node keeps its hostile input and its painted-text assertion; E5 mutants `nul_add_refusal → None` and refs painted with `Text.from_markup` | `E1-slice.md` §5 (Security nodes); `02-test-cases.md` (Counts); graph `pipeline_text`, E2-3 |
 
 Round 2 (per `../inc-12/E3-rulings.md`): the architect re-checks E3A-03, E3A-05 and the split here; the security reviewer re-checks S-1 and S-2 here.
+
+Round 2 results (`../inc-12/E3-architect.md`, `../inc-12/E3-security.md`, §Round 2): architect **PASS-WITH-NOTES** for 12b (E3A-03, E3A-05 and the split verified; note E3A-R2-4); security **PASS-WITH-NOTES** (S-1, S-2 closed; S2-1, S2-2 LOW). The round-2 correction applied these rulings here:
+
+| Finding | Ruling (`../inc-12/E3-rulings.md` §Round 2) | Applied in |
+|---|---|---|
+| E3A-R2-4 + S2-1 | each I-3 grep pins `git grep -w` on the bare ids and names, narrows `_layout` to `FlowBuilderPanel`, and lists the expected remaining lines | graph I-3 (two commands; expected output empty; base 145 lines, and 2 + 0); `E1-slice.md` §5 (no re-pointed line spells a removed id; a hidden-is-hidden assertion drops, the walks carry it; the integration step) |
+| S2-2 | a re-pointed hostile input stays whole when it fits a card; otherwise it keeps one of each hostile kind (markup tag, C0 / C1 / DEL bytes, sentinel) | `E1-slice.md` §5 (Security nodes); graph I-4, `pipeline_text`, E2-3 |
+
+No count moves: 2 rows, 4 cases, 17 nodes, 3 entities, 7 edges. Per the ruling, E3 closes for 12b after this pass (`../inc-12/E3-rulings.md`).
