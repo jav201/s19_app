@@ -7,7 +7,7 @@ How to read it:
 - Example sources are the case ids of `02-test-cases.md`; `B` = the E1 pilot on the base tree (`../evidence-e1/i9e1-pilot-transcript.txt`). Every example states the Inc 9 target unless it says "holds on base".
 - `<W>` = `<tmp>/.s19tool/workarea/p` (Project W), `R` = `<tmp>/.s19tool/workarea`, `<O>` = `<tmp>/outside` (Folder O). `F1` = `Flow(name="a", blocks=[SourceBlock("prg.s19")])`. `C1` = the one-lane chain set of `02-test-cases.md`.
 - The graph follows the orchestrator's rulings (`../E1-rulings.md`, end; `../E3-rulings.md`): D-1 C, D-2 no (R-FB-RUN.8 withdrawn; Clear keeps the name), D-3 cut, D-5 the file stem (E3A-04), D-6 include with the check after the claim (E3 S-1, S-3), D-8 rewrite, D-10 raise.
-- Numbering (E3A-05): `_<N>` is the next free name. Where an example writes `_2`, that is the base numbering (`_2` first, D-9), kept as one concrete example; tests compare `name` with the returned stem, never with `_2`.
+- Numbering (E3A-05): `_<k>` is the next free name. Where an example writes `_2`, that is the base numbering (`_2` first, D-9), kept as one concrete example; tests compare `name` with the returned stem, never with `_2`.
 
 ### Groups for E4 (file ownership) and interfaces — pinned here, changed only by an orchestrator ruling
 
@@ -89,13 +89,13 @@ examples: (R-FLOW-FILE.12/2) <W> holding flows/tune_b.json; flow `Flow(name="tun
 examples: (R-FLOW-FILE.12/3) F1, "Nightly Release!  " → flows/NightlyRelease.json, `"name": "NightlyRelease"` (base: `"a"`)
 examples: (R-FLOW-FILE.12/4) F1, "A" × 64 → `"name"` = "A" × 64; `load_flow_json` → 0 findings
 examples: (R-FLOW-FILE.13/1) F1, "B" × 65 → flows/<"B"×65>.json, `"name"` = "B" × 64; `load_flow_json` → 0 findings
-examples: (R-FLOW-FILE.13/2) <W> holding flows/<"C"×64>.json; F1, "C" × 64 → flows/<"C"×64>_<N>.json (the next free name), `"name"` = "C" × 64; 0 findings
+examples: (R-FLOW-FILE.13/2) <W> holding flows/<"C"×64>.json; F1, "C" × 64 → flows/<"C"×64>_<k>.json (the next free name), `"name"` = "C" × 64; 0 findings
 examples: (R-FLOW-FILE.13/1 neg) mutant: `name=candidate.stem` uncut → `load_flow_json` → [FLOW-BAD-FIELD `flow name exceeds 64 characters`] → RED
 examples: (R-FLOW-FILE.11/1) <W>/flows = Link(→ <O>/flows); F1, "x", workarea_root R → raises WorkareaContainmentError; <O>/flows holds 0 files (base: x.json there, B)
 examples: (R-FLOW-FILE.11/2) <W>/flows = Link(→ <W>/patches) → raises WorkareaContainmentError; <W>/patches unchanged
 examples: (R-FLOW-FILE.11/3) R/q a project folder; R/p = Link(→ R/q); F1, "x", project_dir R/p, workarea_root R → raises WorkareaContainmentError (the walk finds R/p); R/q/flows not created (base: R/q/flows/x.json written)
-examples: (R-FLOW-FILE.14/1) plain <W>/flows holding the link z.json → <O>/dangling/z.json (missing); F1, "z" → <O>/dangling/z.json still missing; flows/z.json still the link; written flows/z_<N>.json, a plain file, `"name"` = its stem (base: <O>/dangling/z.json created, B)
-examples: (R-FLOW-FILE.14/2) the link z.json → <O>/z.json (bytes K) → <O>/z.json still K; written flows/z_<N>.json (holds on base: `exists()` follows the link to the file)
+examples: (R-FLOW-FILE.14/1) plain <W>/flows holding the link z.json → <O>/dangling/z.json (missing); F1, "z" → <O>/dangling/z.json still missing; flows/z.json still the link; written flows/z_<k>.json, a plain file, `"name"` = its stem (base: <O>/dangling/z.json created, B)
+examples: (R-FLOW-FILE.14/2) the link z.json → <O>/z.json (bytes K) → <O>/z.json still K; written flows/z_<k>.json (holds on base: `exists()` follows the link to the file)
 examples: (R-FLOW-FILE.3, holds on base) F1, "!!!" → `None`; flows/ not created
 examples: (R-FLOW-FILE.12/1 neg) mutant: `flow_to_dict(flow)` (the base payload) → /2 gives `"tune_a"` → RED
 examples: (R-FLOW-FILE.11/1 neg) mutant: the guard call removed → x.json lands in <O>/flows → RED
@@ -106,11 +106,11 @@ in: Path home; Path resolved_home; str clean; Callable[[str], str] render
 out: Path created
 func: new (E3 S-1, S-3; I-7). The house claim of `place_into_workarea` (`workspace.py:1243-1316`, house finding S-F1), once for both saves. For each candidate `<clean>.json`, `<clean>_2.json`, … in `home`: (a) `os.path.lexists(candidate)` → the name is taken, next; (b) `text = render(candidate.stem)` — the payload is built before the claim, so a serialiser raise leaves no file (S-3); (c) `fd = os.open(candidate, O_CREAT|O_EXCL|O_WRONLY|O_BINARY)`; `FileExistsError` → next; any other `OSError` → next when `lexists(candidate)` now holds (a racing directory raises `PermissionError` on Windows, house F1), else re-raise; (d) before any byte is written, inside one `try` (E5 CR-07: a failed read is a failed check): `claim = os.fstat(fd)`, `st = os.lstat(candidate)` is a regular file (`stat.S_ISREG`) with `st.st_nlink == 1` (E5 SE5-1), `os.path.samestat(claim, st)`, `_is_reparse_point(candidate)` is false, and `Path(os.path.realpath(candidate)).parent == resolved_home` (E4 ruling E4-R1: the claim's real parent equals the home the guard already resolved, never resolved again; was `contained_in_workarea(…, resolved_home)`, which re-resolves the home and passes a home swapped for a link) — otherwise close `fd`, call `_unlink_own_claim(candidate, claim, resolved_home)` (E5 SE5-2: the entry is re-read and unlinked only when it is provably the claim), and raise `WorkareaContainmentError` (E3 R2-2: a read failure is the same refusal); (e) write `text` through `os.fdopen(fd, "w", encoding="utf-8")` — `O_BINARY` leaves the newline handling to the text wrapper alone, so the bytes are those `write_text` writes (R, read; the Windows arm at E5 compares them); an `OSError` while writing → the `with` closes, `_unlink_own_claim(…)`, re-raise (S-3); (f) return `candidate`. The candidate walk is one generator (`<clean>.json`, then `_2`, `_3`, …; E5 CR-08, numbering unchanged). It calls no TC-B99-13 primitive itself since E5: the own-claim `os.unlink` sits in `_unlink_own_claim`, which is the allow-listed function (E3A-09, moved at E5). Residual (BL-I9-4, E5 SE5-3): never an overwrite; with no concurrent writer nothing outside; a file link put in at the free name on Windows (privilege needed; a junction at the free name is never followed, probe P1/P5) → an empty file at its target; one home swap → an empty file at the link's target, left there (its name resolves outside), or an empty `flows/` / `flowsets/` folder holding the empty claim when the project folder is swapped between the guard and the `mkdir` (CR-10); content outside only under a double swap, and a cleanup that deletes another file only under a swap inside the last window between its re-read and its unlink (BL-I9-10).
 module: s19_app/tui/services/flow_persistence_service.py
-examples: (R-FLOW-FILE.14/3) plain <W>/flows holding the dangling link z.json; Create spy; clean "z" → the spy records 0 calls on flows/z.json and 1 on the returned flows/z_<N>.json
+examples: (R-FLOW-FILE.14/3) plain <W>/flows holding the dangling link z.json; Create spy; clean "z" → the spy records 0 calls on flows/z.json and 1 on the returned flows/z_<k>.json
 examples: (R-FLOW-FILE.14/3 neg) mutant: `candidate.exists()` in (a) → `exists()` is False for the dangling link → a call on flows/z.json is recorded (on Linux `O_EXCL` then refuses the link and the loop moves on, so only the spy sees the mutant) → RED
 examples: (R-FLOW-FILE.14/4) plain, empty <W>/flows; Windows follow (emulated): the call for flows/z.json creates <O>/followed.json, puts a symlink to it at flows/z.json and returns its descriptor → (d) finds a link, not a regular file → `fd` closed, flows/z.json left as it is (not ours), raises WorkareaContainmentError; <O>/followed.json holds 0 bytes; flows/ holds no other entry
 examples: (R-FLOW-FILE.14/4 neg) mutant: (d) removed → the flow's JSON is written through `fd` into <O>/followed.json → RED
-examples: (R-FLOW-SET.8/3) plain <W>/flowsets holding the dangling link s.json; Create spy; clean "s" → 0 calls on flowsets/s.json, 1 on the returned flowsets/s_<N>.json
+examples: (R-FLOW-SET.8/3) plain <W>/flowsets holding the dangling link s.json; Create spy; clean "s" → 0 calls on flowsets/s.json, 1 on the returned flowsets/s_<k>.json
 examples: (R-FLOW-SET.8/4) Windows follow (emulated) on flowsets/s.json → raises WorkareaContainmentError; <O>/followed.json holds 0 bytes; flowsets/s.json still the link
 examples: (S-3, no row: design robustness) `render` raises → no `os.open` call, nothing created; a write `OSError` after (d) → the claimed file is removed and the error re-raised, the home holds no new entry
 examples: (house F1) a directory that wins the race at the free name: `os.open` raises `PermissionError` (Windows), `lexists` then holds → the next candidate is claimed
@@ -137,10 +137,10 @@ func: changed. was: no lane → `None`; `clean` `None` → `None`; `flowsets_dir
 module: s19_app/tui/services/flow_persistence_service.py
 examples: (R-FLOW-SET.7/1) <W>/flowsets = Link(→ <O>/flowsets); C1, "s", workarea_root R → raises WorkareaContainmentError; <O>/flowsets holds 0 files (base: s.json there, B)
 examples: (R-FLOW-SET.7/2) <W>/flowsets = Link(→ <W>/patches) → raises WorkareaContainmentError
-examples: (R-FLOW-SET.8/1) plain <W>/flowsets holding the link s.json → <O>/dangling/s.json (missing); C1, "s" → <O>/dangling/s.json still missing; written flowsets/s_<N>.json, a plain file
-examples: (R-FLOW-SET.8/2) the link s.json → <O>/s.json (bytes K) → <O>/s.json still K; written flowsets/s_<N>.json (holds on base)
+examples: (R-FLOW-SET.8/1) plain <W>/flowsets holding the link s.json → <O>/dangling/s.json (missing); C1, "s" → <O>/dangling/s.json still missing; written flowsets/s_<k>.json, a plain file
+examples: (R-FLOW-SET.8/2) the link s.json → <O>/s.json (bytes K) → <O>/s.json still K; written flowsets/s_<k>.json (holds on base)
 examples: (R-FLOW-SET.9/1) `replace(C1, name="Nightly Set!")`, "Nightly Set!  " → flowsets/NightlySet.json, `"name": "NightlySet"`; `load_chain_set` → the set, 0 findings (base: `"Nightly Set!"`)
-examples: (R-FLOW-SET.9/2) <W> holding flowsets/s.json; C1, "s" → written flowsets/s_<N>.json whose `"name"` equals its stem (base: `"s"`)
+examples: (R-FLOW-SET.9/2) <W> holding flowsets/s.json; C1, "s" → written flowsets/s_<k>.json whose `"name"` equals its stem (base: `"s"`)
 examples: (R-FLOW-SET.10/1) `replace(C1, name="D" × 65)`, "D" × 65 → flowsets/<"D"×65>.json, `"name"` = "D" × 64; `load_chain_set` → the set, 0 findings
 examples: (R-FLOW-SET.10/1 neg) mutant: `name=stem` uncut → `load_chain_set` → (None, [CHAIN-SET-BAD-FIELD `chain-set name exceeds 64 characters`]) → RED
 examples: (R-FLOW-SET.9/1 neg) mutant: `chain_set_to_dict(chain_set)` (the base payload) → `"Nightly Set!"` → RED
