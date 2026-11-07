@@ -1,0 +1,12 @@
+/home/javiergr/work/b103-int4/s19_app/__init__.py
+b97d19eb
+ 01:40:48 up 1 day, 17:12,  3 users,  load average: 1.52, 1.65, 1.54
+.                                                                        [100%]
+145 passed in 5.79s
+EXIT=0
+QC-TM: 102 bounds, 0 under 20 % margin
+20 passed in 174.40s (0:02:54)
+EXIT=0
+QC-TM: 2 bounds, 0 under 20 % margin
+219 passed in 75.15s (0:01:15)
+EXIT=0
