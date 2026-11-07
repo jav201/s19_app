@@ -1749,6 +1749,20 @@ class SplitJoinWindow(WindowSection):
             except Exception:
                 pass
 
+    def note_image_bytes_written(self) -> None:
+        """Notice the loaded image's bytes changed in place (I-1; R-SEG-PREV.21/
+        .22, R-SEG-EXP.15).
+
+        A displayed window re-plans from the live bytes and disarms a confirm
+        given against the old bytes (``_bump``); a hidden window only clears
+        the arm — the next open re-syncs through ``refresh_window``. It never
+        focuses, never resets a selection and never calls ``refresh_window``.
+        """
+        if not self.has_class("hidden"):
+            self._bump()
+        else:
+            self._armed = False
+
     def check_action(self, action: str, parameters: tuple) -> Optional[bool]:
         """Refuse the window's own keys while it is hidden (E3 S-3, D-11, I-6).
 
