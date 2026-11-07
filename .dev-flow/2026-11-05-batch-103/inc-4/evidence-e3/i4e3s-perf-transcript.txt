@@ -1,0 +1,85 @@
+s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+python = 3.11.18  PYTHONHASHSEED = None
+host = cachyos-rtx  load = (1.8134765625, 0.90771484375, 0.88671875)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e3-4-security/home  LOCALAPPDATA = /tmp/b103-e3-4-security/home/localappdata  PILOT_DIR = /tmp/b103-e3-4-security/pilot
+
+=== A. REF (50,000 names) built in 1.76 s [ok]; queries with limit 20
+  -- one letter token repeated ('e ' * n)
+     n=3      chars=6      query tokens=3      rank        8.1 ms  ok                       results=20
+     n=32     chars=64     query tokens=32     rank       32.3 ms  ok                       results=20
+     n=256    chars=512    query tokens=256    rank      226.9 ms  ok                       results=20
+     n=2048   chars=4096   query tokens=2048   rank     1741.8 ms  ok                       results=20
+     n=8192   chars=16384  query tokens=8192   rank     6931.5 ms  ok                       results=20
+     n=32768  chars=65536  query tokens=32768  rank    27790.0 ms  ok                       results=20
+  -- four 1-letter tokens repeated ('e x q z ' * n)
+     n=1      chars=8      query tokens=4      rank        6.2 ms  ok                       results=20
+     n=16     chars=128    query tokens=64     rank       38.0 ms  ok                       results=20
+     n=128    chars=1024   query tokens=512    rank      284.6 ms  ok                       results=20
+     n=1024   chars=8192   query tokens=4096   rank     2279.3 ms  ok                       results=20
+     n=8192   chars=65536  query tokens=32768  rank    17757.1 ms  ok                       results=20
+  -- one long token ('a' * n)
+     n=32     chars=32     query tokens=1      rank       54.9 ms  ok                       results=0
+     n=256    chars=256    query tokens=1      rank       64.7 ms  ok                       results=0
+     n=1024   chars=1024   query tokens=1      rank       99.0 ms  ok                       results=0
+     n=4096   chars=4096   query tokens=1      rank      239.1 ms  ok                       results=0
+     n=16384  chars=16384  query tokens=1      rank      793.9 ms  ok                       results=0
+     n=65536  chars=65536  query tokens=1      rank     3012.1 ms  ok                       results=0
+  -- digit tokens ('0 ' * n)
+     n=3      chars=6      query tokens=3      rank        5.0 ms  ok                       results=20
+     n=256    chars=512    query tokens=256    rank       94.1 ms  ok                       results=20
+     n=2048   chars=4096   query tokens=2048   rank      745.6 ms  ok                       results=20
+     n=32768  chars=65536  query tokens=32768  rank    11992.3 ms  ok                       results=20
+  -- pasted label list: n real names joined by ','
+     n=1      chars=22     query tokens=5      rank       96.6 ms  ok                       results=3
+     n=10     chars=381    query tokens=87     rank      826.0 ms  ok                       results=0
+     n=50     chars=2166   query tokens=450    rank     4870.8 ms  ok                       results=0
+     n=200    chars=8418   query tokens=1785   rank    18557.8 ms  ok                       results=0
+     n=800    chars=33025  query tokens=7019   rank    73730.1 ms  ok                       results=0
+     (series stopped)
+  -- n real words, each with a transposition, joined by ' '
+     n=3      chars=15     query tokens=3      rank       10.8 ms  ok                       results=0
+     n=10     chars=55     query tokens=10     rank        9.7 ms  ok                       results=0
+     n=50     chars=266    query tokens=50     rank       10.1 ms  ok                       results=0
+     n=200    chars=1167   query tokens=200    rank       11.3 ms  ok                       results=0
+     n=800    chars=4690   query tokens=800    rank       15.2 ms  ok                       results=0
+  -- the 64 KiB paste itself: 65483 chars, 1604 names, 13888 query tokens: not run (extrapolate from the series)
+
+=== B. hostile name lists
+  B1 50,000 identical names: build 0.7 ms [ok] len 1; rank 'value' 0.09 ms
+  B2 case_06 (a tracked example file): 220040 names, lengths [13]
+     first 50,000 of case_06: build 0.52 s [ok]
+       rank 'char'         median      18.1 ms [ok] {'prefix': 20}
+       rank 'char_0'       median      17.6 ms [ok] {'prefix': 20}
+       rank 'chr 0'        median     647.3 ms [ok] {'fuzzy': 20}
+       rank 'cahr'         median     680.4 ms [ok] {'fuzzy': 20}
+       rank 'meas 1'       median     347.8 ms [ok] {'token': 20}
+       rank 'c 0 1'        median     242.7 ms [ok] {'token': 20}
+       rank 'ch00'         median     429.9 ms [ok] {'token': 20}
+       rank 'mes_00001'    median       3.5 ms [ok] {'fuzzy': 20}
+       rank 'cahr_0001'    median       8.9 ms [ok] {'fuzzy': 20}
+       rank 'zz'           median       6.2 ms [ok] {}
+     all of case_06: build 2.26 s [ok]
+       rank 'char'         median      74.5 ms [ok] {'prefix': 20}
+       rank 'char_0'       median      77.0 ms [ok] {'prefix': 20}
+       rank 'chr 0'        median    2824.3 ms [ok] {'fuzzy': 20}
+       rank 'cahr'         median    2938.8 ms [ok] {'fuzzy': 20}
+       rank 'meas 1'       median    1597.1 ms [ok] {'token': 20}
+       rank 'c 0 1'        median    1137.8 ms [ok] {'token': 20}
+       rank 'ch00'         median     550.6 ms [ok] {'token': 20}
+       rank 'mes_00001'    median      11.0 ms [ok] {'fuzzy': 20}
+       rank 'cahr_0001'    median      17.2 ms [ok] {'fuzzy': 20}
+       rank 'zz'           median      28.6 ms [ok] {}
+  B3 one giant name 'x' + 'ab' * k beside 100 short names; queries 'ba', 'bab'
+     len   100,001: build 0.08 s [ok]; rank 'ba'     119.9 ms [ok]; 'bab'     122.0 ms [ok]
+     len 1,000,001: build 0.86 s [ok]; rank 'ba'    1180.1 ms [ok]; 'bab'    1189.3 ms [ok]
+     len 5,000,001: build 4.16 s [ok]; rank 'ba'    5846.2 ms [ok]; 'bab'    5843.5 ms [ok]
+  B4 one giant name 'value_' * k (k tokens) beside 100 short names; queries 'valeu' (fuzzy), 'vlu' (subsequence)
+     k  10,000 (len    60,000): build 0.04 s [ok]; rank 'valeu'     190.7 ms [ok]; 'vlu'     151.5 ms [ok]
+     k 100,000 (len   600,000): build 0.34 s [ok]; rank 'valeu'    2012.5 ms [ok]; 'vlu'    1468.9 ms [ok]
+     k 500,000 (len 3,000,000): build 1.60 s [ok]; rank 'valeu'    9466.1 ms [ok]; 'vlu'    7111.0 ms [ok]
+  B5 build memory: names of one unique random lowercase token each (trie amplification)
+     5,000 x 200 chars (1.0 MiB of names): build 2.13 s [ok] trie nodes 990,053  tracemalloc peak 22.1 MiB = 23.2 bytes per name character
+     5,000 x 1000 chars (4.8 MiB of names): build 28.85 s [ok] trie nodes 4,990,003  tracemalloc peak 112.1 MiB = 23.5 bytes per name character
+     20,000 x 500 chars (9.5 MiB of names): build 46.44 s [ok] trie nodes 9,952,217  tracemalloc peak 223.1 MiB = 23.4 bytes per name character
+
+load after = (5.259765625, 2.90283203125, 1.70556640625)

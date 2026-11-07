@@ -1,0 +1,78 @@
+s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+python = 3.11.18  host = cachyos-rtx  cpus = 16
+load before = (1.646484375, 1.07177734375, 0.94775390625)
+
+=== A. multi-word queries on REF (limit 20, median of 7)
+  SWA names with >= 4 letter tokens of >= 6 letters: 1209
+     98.6 ms  results  0 {}  query='nzukij ierxjr'
+    137.4 ms  results  0 {}  query='nzukij ierxjr pposbxiif'
+    132.2 ms  results  0 {}  query='nzukij ierxjr pposbxiif jotafvod'
+     54.3 ms  results  0 {}  query='engine speed sensor value'
+     54.6 ms  results  0 {}  query='engine speed sensor value offset limit'
+    181.2 ms  results  3 {'token': 3}  query='kiqsqaf jcvabao yshligp ubkxvqh'
+    185.6 ms  results  3 {'fuzzy': 3}  query='kisqqaf jcavbao yslhigp ubxkvqh'
+    181.9 ms  results  3 {'token': 3}  query='wyqxmxsj aotrifozux fwwmzz lgulbsvf'
+    183.4 ms  results  3 {'fuzzy': 3}  query='wyxqmxsj aortifozux fwmwzz lglubsvf'
+    181.5 ms  results  4 {'token': 4}  query='ilbmobu xgzjrmdvtej udsvjuuzzjk ssjzrftn'
+    183.0 ms  results  4 {'fuzzy': 4}  query='ilmbobu xgjzrmdvtej udvsjuuzzjk sszjrftn'
+    185.1 ms  results  3 {'token': 3}  query='jiyxds fnbcordr wbaodebqix vxijqd'
+    183.2 ms  results  3 {'fuzzy': 3}  query='jixyds fncbordr wboadebqix vxjiqd'
+    177.4 ms  results  3 {'token': 3}  query='alohftv nsozrp fcbcnq llnfrnobmcg'
+    174.6 ms  results  3 {'fuzzy': 3}  query='alhoftv nszorp fccbnq llfnrnobmcg'
+    180.4 ms  results  3 {'token': 3}  query='hpdtho fwhkak gfgogaxlmqx muxdvnv'
+    186.6 ms  results  3 {'fuzzy': 3}  query='hptdho fwkhak gfoggaxlmqx mudxvnv'
+  A worst median = 186.6 ms  query='hptdho fwkhak gfoggaxlmqx mudxvnv'
+
+=== B/C. mechanical list: the first 50,000 names of case_06 (limit 20, median of 7)
+  names 50000  lengths [13]  sample ['CHAR_00000_00', 'MEAS_00000_00', 'CHAR_00000_01'] ... ['CHAR_01249_19', 'MEAS_01249_19']
+  IndexC build 0.490 s
+  IndexC tracemalloc peak 6,526,643 bytes = 6.2 MiB (retained 5.7 MiB)
+  pilot    16.4 ms | graph-step-6    393.4 ms  results 20 {'prefix': 20}  query='m'
+  pilot    17.3 ms | graph-step-6    482.4 ms  results 20 {'prefix': 20}  query='me'
+  pilot    17.7 ms | graph-step-6    592.3 ms  results 20 {'prefix': 20}  query='mea'
+  pilot    22.6 ms | graph-step-6    689.9 ms  results 20 {'prefix': 20}  query='meas'
+  pilot    20.1 ms | graph-step-6    718.6 ms  results 20 {'prefix': 20}  query='meas_'
+  pilot    20.3 ms | graph-step-6    740.1 ms  results 20 {'prefix': 20}  query='meas_0'
+  pilot    16.1 ms | graph-step-6    608.3 ms  results 20 {'prefix': 20}  query='meas_00'
+  pilot     4.1 ms | graph-step-6     61.2 ms  results 20 {'prefix': 20}  query='meas_007'
+  pilot     2.6 ms | graph-step-6      8.7 ms  results 20 {'prefix': 20}  query='meas_0078'
+  pilot     3.1 ms | graph-step-6      3.1 ms  results 20 {'prefix': 20}  query='meas_00783'
+  pilot     3.5 ms | graph-step-6      3.2 ms  results 20 {'prefix': 20}  query='meas_00783_'
+  pilot     5.3 ms | graph-step-6      4.7 ms  results 20 {'prefix': 10, 'token': 10}  query='meas_00783_0'
+  pilot     8.7 ms | graph-step-6      8.0 ms  results  1 {'exact': 1}  query='meas_00783_08'
+  pilot   600.9 ms | graph-step-6    602.2 ms  results 20 {'fuzzy': 20}  query='chr'
+  pilot   675.7 ms | graph-step-6    676.4 ms  results 20 {'fuzzy': 20}  query='mesa'
+  pilot   355.0 ms | graph-step-6    353.7 ms  results 20 {'token': 20}  query='char 1'
+  pilot    39.4 ms | graph-step-6     38.5 ms  results 20 {'token': 20}  query='meas 12'
+  pilot     8.0 ms | graph-step-6      7.3 ms  results  1 {'fuzzy': 1}  query='cahr_01234_00'
+  pilot    99.9 ms | graph-step-6    754.5 ms  results 20 {'substring': 20}  query='0'
+  pilot    70.1 ms | graph-step-6    618.0 ms  results 20 {'substring': 20}  query='00'
+  pilot    20.1 ms | graph-step-6    702.7 ms  results 20 {'prefix': 20}  query='char_'
+  pilot    19.6 ms | graph-step-6    715.9 ms  results 20 {'prefix': 20}  query='meas_'
+  B worst median (pilot shortcut)      = 675.7 ms  query='mesa'
+  C worst median (graph literal step 6) = 754.5 ms  query='0'
+  C on REF: QSET with the graph's literal step 6
+  REF QSET worst median (graph literal step 6) = 61.6 ms  query='temp_sensor_max'
+
+=== D. memory mutants on REF (tracemalloc peak during one build; bound 67,108,864)
+  IndexC (as pinned)                       peak   18,940,733 =  18.1 MiB  retained  16.7 MiB  -> GREEN (<= 64 MiB)
+  M1 every array -> list                   peak   65,066,057 =  62.1 MiB  retained  59.9 MiB  -> GREEN (<= 64 MiB)
+  M2 + nested-dict trie of the tokens      peak   53,036,705 =  50.6 MiB  retained  50.6 MiB  -> GREEN (<= 64 MiB)
+  M3 + per-name tuple of token strings     peak   43,849,024 =  41.8 MiB  retained  41.7 MiB  -> GREEN (<= 64 MiB)
+
+=== E. OSA prefix distance (D-5 A) vs unrestricted Damerau-Levenshtein (D-5 B)
+  q='crxuve'     t='curve'        osa_prefix=3  dl_prefix=2
+  q='cuvre'      t='curve'        osa_prefix=1  dl_prefix=1
+  q='ca'         t='abc'          osa_prefix=1  dl_prefix=1
+  q='xxxxcayyy'  t='xxxxabcyyy'   osa_prefix=3  dl_prefix=2
+  q='maesu'      t='measurement'  osa_prefix=1  dl_prefix=1
+  q='vlaue'      t='value'        osa_prefix=1  dl_prefix=1
+  rank over C08 (462), query 'crxuve' (6 letters, 2 allowed edits): naive_rank_b = []
+
+=== F. str-mixin Enum formatting
+  f-string: 'M.FUZZY'  str(): 'M.FUZZY'  .value: 'fuzzy'  == 'fuzzy': True
+
+=== G. paste-modal workload: 100 labels with a one-letter substitution, rank limit 3 on REF
+  total 9.91 s  median 104.9 ms  max 240.6 ms per label
+
+load after = (3.34765625, 2.1015625, 1.365234375)

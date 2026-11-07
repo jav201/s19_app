@@ -1,0 +1,9 @@
+s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+python = 3.11.18  PYTHONHASHSEED = None
+host = cachyos-rtx  load = (6.193359375, 4.02197265625, 2.26953125)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e3-4-security/home  LOCALAPPDATA = /tmp/b103-e3-4-security/home/localappdata  PILOT_DIR = /tmp/b103-e3-4-security/pilot
+  ('a b c ... z ' * 1): 52 chars, 26 query tokens: rank    3261.7 ms (under tracemalloc) [ok] results=0  tracemalloc peak       6.8 MiB
+  ('a b c ... z ' * 10): 520 chars, 260 query tokens: rank    8587.3 ms (under tracemalloc) [ok] results=0  tracemalloc peak      60.9 MiB
+  ('a b c ... z ' * 100): 5200 chars, 2600 query tokens: rank   62087.9 ms (under tracemalloc) [ok] results=0  tracemalloc peak     601.9 MiB
+  ('a b c ... z ' * 1260): 65520 chars, 32760 query tokens: rank  300017.1 ms (under tracemalloc) [STOPPED at 300 s] results=-  tracemalloc peak       7.4 MiB
+load after = (2.115234375, 4.25830078125, 3.16748046875)

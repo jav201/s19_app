@@ -7,3 +7,5 @@
 2026-11-07T00:51:51Z E2 inc-1a end claude-opus-5-5 — codewire/graph-inc1a.md: 36 nodes (13 new incl. 3 test-support, 7 changed, 8 removed, 8 context), 15 entities, 30 edges, 6 findings; every active row has an example; extractor run 1 exit 0 (23 baseline nodes, 0 drift), run 2 exit 1 = the 13 new nodes only; lint not read=0; I-1 pinned, P-1..P-4 PROPOSED for Inc 1b
 2026-11-07T00:52:49Z E3 inc-1a architect start claude-opus-5-5
 2026-11-07T00:52:49Z E3 security inc-1a start claude-opus-5-5
+2026-11-07T01:10:31Z E3 security inc-1a end claude-opus-5-5 — E3-security.md: FAIL (2 MAJOR, 3 MEDIUM, 2 LOW, 5 INFO); probes P1/P2 on cachyos-rtx /tmp/b103-e3-1a-security (not committed)
+2026-11-07T01:13:03Z E3 inc-1a architect end claude-opus-5-5 — E3-architect.md: FAIL, 3 MAJOR (E3A-01 I-1 vs Inc 1b seam/file budget, E3A-02 no-text clipboard pays PowerShell vs R-TUI-043.10.1/R-PASTE.31, E3A-03 timing negative controls), 5 MEDIUM, 3 MINOR, 1 LOW, 2 INFO; E2-1 confirmed with a pin, E2-2 = design fix + cases, E2-5 = keep (never tags-ignore alone)

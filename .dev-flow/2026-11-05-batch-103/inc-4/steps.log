@@ -1,0 +1,9 @@
+2026-11-06T21:36:14Z E1 start claude-opus-5-5 (architect, inc-4 label matcher)
+2026-11-06T22:16:59Z E1 end claude-opus-5-5 (architect, inc-4): 36 new rows R-A2L-MATCH.1-.36, 0 changed, 109 cases, 12 slice nodes, D-1..D-13 PROPOSED
+2026-11-06T22:22:52Z E1 correction — model deepseek-v4-pro via pi — orchestrator rulings D-10 (S2.8) and D-12 (new R-A2L-MATCH.37 memory row, counts) applied
+2026-11-07T00:05:00Z E2 start claude-opus-5-5 (architect, inc-4 Code-Wire graph, label_match)
+2026-11-07T00:37:11Z E2 end claude-opus-5-5 (architect, inc-4): graph-inc4.md 18 nodes (17 new, 1 unchanged context, 0 changed/removed) + 5 entities; I-3 pinned, 0 PROPOSED; 37/37 rows and 110/110 cases with examples; compact index measured (peak 18.1 MiB, build 1.80 s, worst rank 62.6 ms)
+2026-11-07T00:40:55Z E3 start claude-opus-5-5 (architect, inc-4 label matcher design review)
+2026-11-07T00:45:12Z E3 start claude-opus-5-5 (security, inc-4 label matcher)
+2026-11-07T01:04:25Z E3 end claude-opus-5-5 (security, inc-4): FAIL - 2 MAJOR (E3S-01 unbounded query, E3S-02 case-exact pass over whole groups breaks .36 on case_06), 2 MEDIUM, 1 MINOR, 2 LOW, 1 INFO; probes on cachyos-rtx /tmp/b103-e3-4-security/
+2026-11-07T01:13:24Z E3 end claude-opus-5-5 (architect, inc-4): FAIL — 2 MAJOR (E3A-01 case-exactness over unbounded same-length groups: case_06 50k up to 717 ms; E3A-02 one trie walk per long query word: 5-6 words 244-297 ms on REF), 2 MEDIUM, 3 MINOR, 2 LOW, 2 INFO; E2 pilot re-run confirms 0 mismatches, 18,940,597 B, build 1.768 s, worst rank 61.6 ms; both fixes measured (85.5 / 71.2 ms)
