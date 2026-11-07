@@ -141,6 +141,32 @@ def test_r_a2l_def_59_3_object_list_digest_equals_the_e4_pin():
     assert hashlib.sha256(repr(objects).encode("utf-8")).hexdigest() == OBJECT_LIST_DIGEST_1MIB
 
 
+def test_r_a2l_def_59_4_every_seed_of_the_definitions_case_builds_and_decodes_to_its_plan(tmp_path):
+    """R-A2L-DEF.59/4 (CR-6; E5 fix pass) - seeds 1 ... 5: the enum's planned text is the text the model decodes.
+
+    The enum raw is drawn from the seed; its planned text must follow the draw.  Non-vacuity: the five seeds do not
+    all draw one raw (a fixed planned text would pass for the seeds that draw it).
+    """
+    m = _model()
+    seen_texts = set()
+    for seed in range(1, 6):
+        folder = tmp_path / f"seed_{seed}"
+        result = _run_cli(folder, "--seed", str(seed), "--case", "definitions")
+        assert result.returncode == 0, (seed, result.stderr)
+        a2l = parse_a2l_file(folder / "definitions.a2l")
+        image = S19File(str(folder / "definitions.s19")).get_memory_map()
+        _regions, objects = gen.build_definition_objects(random.Random(seed))
+        for obj in objects:
+            d = m.describe_definition(obj["name"], a2l)
+            assert d.refusal is None, (seed, obj["name"], d.refusal)
+            res = m.decode_definition(d, a2l, image)
+            assert isinstance(res, m.Decoded), (seed, obj["name"], res)
+            assert res.text == obj["planned_text"], (seed, obj["name"], res.text, obj["planned_text"])
+            if obj["name"] == "ENUM_0001":
+                seen_texts.add(res.text)
+    assert len(seen_texts) >= 2, seen_texts
+
+
 # ==========================================================================
 # R-A2L-DEF.60 ... .63 - the definitions case
 # ==========================================================================

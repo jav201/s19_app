@@ -566,6 +566,21 @@ def test_r_a2l_def_12_3_a_record_with_no_type_is_not_supported(tmp_path):
                 "EX: the conversion type (none) of CM_E is not supported")
 
 
+def test_r_a2l_def_12_4_a_listed_type_in_another_letter_case_is_not_supported(tmp_path):
+    """R-A2L-DEF.12/4 (E5 fix pass, CR-4 = E5S-05) - ``tab_intp`` is not ``TAB_INTP``: describe and decode refuse it."""
+    a2l = _inline(
+        tmp_path,
+        _cm("CM_LC", "tab_intp", fmt='"%.0"', ref="CT_LC"),
+        '/begin COMPU_TAB CT_LC "" TAB_INTP 2\n  0 0\n  100 100\n/end COMPU_TAB',
+        _val("LC", "0x10", LAYOUT["UBYTE"], "CM_LC", "0", "255"),
+    )
+    d = describe_definition("LC", a2l)
+    want = Refusal("A2L-DEF-CONVERSION", "LC: the conversion type tab_intp of CM_LC is not supported")
+    assert d.refusal == want, d.refusal
+    # the frozen view of the same bytes interpolates (50.0): a silent 0.0 from a case-folded verdict is the defect
+    assert decode_definition(d, a2l, {0x10: 50}) == want
+
+
 def test_r_a2l_def_13_1_enum_with_no_table_is_refused(tmp_path):
     """R-A2L-DEF.13/1 - TAB_VERB with no COMPU_TAB_REF."""
     a2l = _inline(tmp_path, _cm("CM_V", "TAB_VERB", fmt='"%.0"'), _val("EN", "0x10", "RL_U8", "CM_V"))
@@ -1632,7 +1647,6 @@ def test_at_b103_i2_3_case08_builds_and_decodes_with_the_model(c08):
 # --------------------------------------------------------------------------
 
 import dataclasses  # noqa: E402
-import inspect  # noqa: E402
 import math  # noqa: E402
 import re  # noqa: E402
 from types import MappingProxyType  # noqa: E402
@@ -1687,13 +1701,10 @@ def _name_maps(a2l: dict) -> tuple[dict, dict]:
 
 
 def _method_record(a2l: dict, name: str, reads: dict, methods: dict | None = None):
-    """``_read_method_record`` with the arguments of I-2's graph (the 3-argument form of the merged code when that
-    is what the module has)."""
+    """``_read_method_record`` with the arguments of I-2's graph."""
     found_methods, tables = _name_maps(a2l)
-    fn = defmod._read_method_record
-    if len(inspect.signature(fn).parameters) == 3:
-        return fn(name, methods if methods is not None else found_methods, reads)
-    return fn(name, methods if methods is not None else found_methods, tables, a2l.get("compu_tabs_by_name") or {}, reads)
+    return defmod._read_method_record(name, methods if methods is not None else found_methods, tables,
+                                      a2l.get("compu_tabs_by_name") or {}, reads)
 
 
 # ---- the immutability walker (.149/5) -------------------------------------------------------
@@ -1779,6 +1790,15 @@ def test_r_a2l_def_149_5_cached_read_form_is_immutable(tmp_path):
     for a, b in (("OBJ_A", "OBJ_B"), ("RNG_A", "RNG_B"), ("TAB_A", "TAB_B")):
         assert together[a]._table_form is not None and together[a]._table_form is together[b]._table_form
     assert together["LIN_A"]._table_form is None
+
+    # CR-7 / P-2: the two private fields change neither equality nor repr nor the decode (I-2's public surface)
+    for n in ("OBJ_A", "RNG_A", "TAB_A", "LIN_A"):
+        full = together[n]
+        bare = dataclasses.replace(full, _name_echo=None, _table_form=None)
+        assert full == bare, n                                                 # compare=False
+        assert "_table_form" not in repr(full) and "_name_echo" not in repr(full), n      # repr=False
+        assert decode_definition(bare, a2l, image) == decode_definition(full, a2l, image), n
+        assert _decoded(bare, a2l, image).text == expect[n[:3]], n
 
     # the public pieces: tuples, frozen entries, frozen definitions
     a = together["OBJ_A"]
@@ -2241,3 +2261,144 @@ def test_r_a2l_def_150_9_the_reduced_tab_lookup_equals_the_frozen_lookup(tmp_pat
     assert defmod._table_value(intp, -1, True) == (0.0, "")
     assert defmod._table_value(intp, math.nan, True) == (None, "value outside interpolation range")
     assert defmod._table_value(nointp, math.nan, False) == (0.0, "")
+
+
+# --------------------------------------------------------------------------
+# E5 fix pass (independent tester).  R-A2L-DEF.58.2/20 ... /24 (the number rule and the iterative
+# walk), .151/4 ... /6 (the number rule for MATRIX_DIM, address and length; a quoted kind word).
+# R-A2L-DEF.12/4 is above, next to .12/3; CR-7 is in .149/5; the timed .150/10 is in the perf file.
+# Expected messages are written out from the rows: a number above 2^64 - 1 is `0x` and its
+# UPPER-case hexadecimal digits cut by the .151 echo (256 characters, then an ellipsis).
+# --------------------------------------------------------------------------
+
+import threading  # noqa: E402
+
+HEX256 = "0x" + "F" * 254 + ELLIPSIS         # the echo of `0x` and 5,000 (or 1,000 or 1,500) `F`
+
+
+def _huge_span_case(tmp_path: Path, name: str, block: str) -> None:
+    """One 58.2/20-22 object: its describe refusal, the 1,024-character bound, and the decode of the same refusal."""
+    a2l = _inline(tmp_path, block)
+    d = describe_definition(name, a2l)                                         # 0 exceptions
+    want = Refusal("A2L-DEF-ADDRESS", f"{name}: its span of {HEX256} bytes at 0x10 cannot be read")
+    assert d.refusal == want, d.refusal
+    assert len(d.refusal.message) <= 1024
+    assert decode_definition(d, a2l, {0x10: 1, 0x11: 2}) == want
+
+
+def test_r_a2l_def_58_2_20_a_length_of_5000_hex_digits_is_a_refusal_not_an_exception(tmp_path):
+    """R-A2L-DEF.58.2/20 (E5S-01, CR-2) - LENGTH 0x + 5,000 F on a UWORD VALUE."""
+    _huge_span_case(tmp_path, "HL", _val("HL", "0x10", LAYOUT["UWORD"], "NO_COMPU_METHOD", "0", "65535",
+                                         "LENGTH 0x" + "F" * 5000))
+
+
+def test_r_a2l_def_58_2_21_a_data_size_of_5000_hex_digits_is_a_refusal_not_an_exception(tmp_path):
+    """R-A2L-DEF.58.2/21 (E5S-01) - DATA_SIZE 0x + 5,000 F on a UBYTE MEASUREMENT."""
+    _huge_span_case(tmp_path, "HD", _meas("HD", "UBYTE", "NO_COMPU_METHOD", "0", "255",
+                                          "DATA_SIZE 0x" + "F" * 5000, addr="0x10"))
+
+
+def test_r_a2l_def_58_2_22_a_number_of_5000_hex_digits_is_a_refusal_not_an_exception(tmp_path):
+    """R-A2L-DEF.58.2/22 (E5S-01) - NUMBER 0x + 5,000 F on an ASCII CHARACTERISTIC."""
+    _huge_span_case(tmp_path, "HN", _ascii("HN", "0x10", "0x" + "F" * 5000))
+
+
+def test_r_a2l_def_58_2_23_a_matrix_dim_of_5000_hex_digits_is_a_refusal_not_an_exception(tmp_path):
+    """R-A2L-DEF.58.2/23 (E5S-01, CR-2) - MATRIX_DIM 0x + 5,000 F on a UBYTE MEASUREMENT: A2L-DEF-KIND, bounded."""
+    a2l = _inline(tmp_path, _meas("MD", "UBYTE", "NO_COMPU_METHOD", "0", "255", "MATRIX_DIM 0x" + "F" * 5000,
+                                  addr="0x10"))
+    d = describe_definition("MD", a2l)                                         # 0 exceptions
+    want = Refusal("A2L-DEF-KIND", f"MD: the system has no definition for a MATRIX_DIM {HEX256} MEASUREMENT object")
+    assert d.refusal == want, d.refusal
+    assert len(d.refusal.message) <= 1024
+    assert describe_definitions(["MD"], a2l)["MD"] == d
+
+
+def _fresh_thread(fn, padding: int = 0):
+    """Run ``fn()`` in a new thread, ``padding`` Python frames deep; return its value or re-raise what it raised."""
+    box: dict = {}
+
+    def deeper(n: int) -> None:
+        if n:
+            return deeper(n - 1)
+        try:
+            box["value"] = fn()
+        except BaseException as exc:                                            # noqa: BLE001 - re-raised below
+            box["error"] = exc
+
+    thread = threading.Thread(target=deeper, args=(padding,))
+    thread.start()
+    thread.join()
+    if "error" in box:
+        raise box["error"]
+    return box["value"]
+
+
+NEST_DEPTH = 980                          # the app's parser reads this depth in a fresh thread; it fails itself at >= 990
+
+
+def test_r_a2l_def_58_2_24_deep_nesting_does_not_raise_and_the_walk_keeps_file_order(tmp_path):
+    """R-A2L-DEF.58.2/24 (E5S-04) - (N) 980 nested sections: 0 exceptions, same definition, same decode;
+    (O) the first COMPU_METHOD of a name in file order wins (each section before its children, children in order)."""
+    nested_block = "\n".join(['/begin GROUP G%d ""' % k for k in range(NEST_DEPTH)] + ["/end GROUP"] * NEST_DEPTH)
+    obj = _val("DN", "0x10", LAYOUT["UBYTE"], "NO_COMPU_METHOD", "0", "255")
+    flat = _inline(tmp_path, obj)
+    nested = _fresh_thread(lambda: _inline(tmp_path, obj, nested_block))     # the parser reads the depth itself
+    alone = describe_definition("DN", flat)
+    assert alone.refusal is None and alone.kind == "number" and alone.address == 0x10
+    # described and decoded 50 frames deep in a fresh thread: a recursive walk needs 980 more frames
+    got = _fresh_thread(lambda: describe_definitions(["DN"], nested)["DN"], padding=50)       # 0 exceptions
+    assert got == alone
+    assert _fresh_thread(lambda: decode_definition(got, nested, {0x10: 7}), padding=50) == Decoded(7, 7, "7")
+
+    # (O) CM_D is declared twice: inside a section (LINEAR 2 0) and later at module level (LINEAR 3 0)
+    inner = '/begin GROUP G ""\n' + _cm("CM_D", "LINEAR", "2", "0") + "\n/end GROUP"
+    order = _inline(tmp_path, inner, _cm("CM_D", "LINEAR", "3", "0"),
+                    _val("DD", "0x10", LAYOUT["UBYTE"], "CM_D", "0", "255"))
+    dd = describe_definitions(["DD"], order)["DD"]
+    assert dd.refusal is None, dd.refusal
+    assert decode_definition(dd, order, {0x10: 5}) == Decoded(5, 10.0, "10.000")
+
+
+def test_r_a2l_def_151_4_a_matrix_dim_number_is_written_by_the_number_rule(tmp_path):
+    """R-A2L-DEF.151/4 (CR-3, E5S-03) - 4,000 decimal digits and 1,000 hexadecimal digits: `0x` form, 256 characters, bounded."""
+    a2l = _inline(
+        tmp_path,
+        _meas("MD4", "UBYTE", "NO_COMPU_METHOD", "0", "255", "MATRIX_DIM " + "9" * 4000, addr="0x10"),
+        _meas("MD5", "UBYTE", "NO_COMPU_METHOD", "0", "255", "MATRIX_DIM 0x" + "F" * 1000, addr="0x11"),
+    )
+    got = describe_definitions(["MD4", "MD5"], a2l)
+    t4 = "0x" + format(10 ** 4000 - 1, "X")[:254] + ELLIPSIS
+    assert got["MD4"].refusal == Refusal("A2L-DEF-KIND", f"MD4: the system has no definition for a MATRIX_DIM {t4} MEASUREMENT object")
+    assert got["MD5"].refusal == Refusal("A2L-DEF-KIND", f"MD5: the system has no definition for a MATRIX_DIM {HEX256} MEASUREMENT object")
+    for name in ("MD4", "MD5"):
+        assert len(got[name].refusal.message) <= 1024, (name, len(got[name].refusal.message))
+
+
+def test_r_a2l_def_151_5_the_number_rule_for_an_address_and_a_length_at_its_bound(tmp_path):
+    """R-A2L-DEF.151/5 (E5S-03) - addresses of 1,500 hex digits are cut; 2^64 - 1 stays decimal and 2^64 is `0x` form."""
+    a2l = _inline(
+        tmp_path,
+        _meas("AH", "UBYTE", "NO_COMPU_METHOD", "0", "255", addr="0x" + "F" * 1500),
+        _val("CH", "0x" + "F" * 1500, LAYOUT["UBYTE"], "NO_COMPU_METHOD", "0", "255"),
+        _ascii("B1", "0x10", "18446744073709551615"),
+        _ascii("B2", "0x20", "18446744073709551616"),
+    )
+    got = describe_definitions(["AH", "CH", "B1", "B2"], a2l)
+    assert got["AH"].refusal == Refusal("A2L-DEF-ADDRESS", f"AH: its span of 1 bytes at {HEX256} cannot be read")
+    assert got["CH"].refusal == Refusal("A2L-DEF-ADDRESS", f"CH: its span of 1 bytes at {HEX256} cannot be read")
+    assert got["B1"].refusal == Refusal("A2L-DEF-ADDRESS", "B1: its span of 18446744073709551615 bytes at 0x10 cannot be read")
+    assert got["B2"].refusal == Refusal("A2L-DEF-ADDRESS", "B2: its span of 0x10000000000000000 bytes at 0x20 cannot be read")
+    for name in ("AH", "CH", "B1", "B2"):
+        assert len(got[name].refusal.message) <= 1024, (name, len(got[name].refusal.message))
+
+
+def test_r_a2l_def_151_6_a_quoted_kind_word_starting_with_matrix_dim_is_echoed_as_a_file_word(tmp_path):
+    """R-A2L-DEF.151/6 (CR-5) - the kind word `MATRIX_DIM <2,000 Z>` is a file word: 256 characters and an ellipsis."""
+    a2l = _inline(tmp_path, _char("QK", '"MATRIX_DIM ' + "Z" * 2000 + '"', "0x10", "RL_U8"))
+    word = next(t["char_type"] for t in a2l["tags"] if t["name"] == "QK")
+    assert len(word) == 2011 and word.startswith("MATRIX_DIM "), len(word)          # the parsed kind word, as the row says
+    d = describe_definition("QK", a2l)
+    assert d.refusal == Refusal("A2L-DEF-KIND", f"QK: the system has no definition for a {_echo256(word)} object"), d.refusal
+    assert len(d.refusal.message) <= 1024
+    assert d.refusal.message.count(FFFD) == 1                                   # only the space was rewritten
