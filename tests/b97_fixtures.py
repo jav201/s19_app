@@ -119,7 +119,8 @@ PE_IDS_9C7BEAF: frozenset[str] = frozenset(
     """.split()
 )
 
-#: The 31 ids of commit 9c7beaf plus the four batch-102 Inc 3 picker ids
+#: The 30 ids of commit 9c7beaf (31, less the hidden addendum toggle batch-101
+#: Inc 12 removed, D-3) plus the four batch-102 Inc 3 picker ids
 #: (E3 ruling 6): ``#check_param_status`` (the count/truncation line, ruling 3)
 #: and the pagination row ``#check_param_page_prev_button`` /
 #: ``#check_param_page_label`` / ``#check_param_page_next_button``; plus the
@@ -136,7 +137,7 @@ CE_IDS_9C7BEAF: frozenset[str] = frozenset(
     check_param_filter check_param_include_button check_param_page_label
     check_param_page_next_button check_param_page_prev_button
     check_param_status check_param_table check_preview
-    check_preview_toggle_button check_results check_right_column
+    check_results check_right_column
     check_spec_file_row check_spec_file_select check_status
     check_validate_button check_write_button
     """.split()
@@ -145,7 +146,7 @@ CE_IDS_9C7BEAF: frozenset[str] = frozenset(
 # The literals' own guards (A.2): a drifted copy fails at import.
 assert len(ES_48_9C7BEAF) == 48, len(ES_48_9C7BEAF)
 assert len(PE_IDS_9C7BEAF) == 66, len(PE_IDS_9C7BEAF)
-assert len(CE_IDS_9C7BEAF) == 36, len(CE_IDS_9C7BEAF)
+assert len(CE_IDS_9C7BEAF) == 35, len(CE_IDS_9C7BEAF)
 assert "\x00" not in HOSTILE_C1 and "\x00" in HOSTILE_NUL
 assert "/" not in HOSTILE_NAME
 

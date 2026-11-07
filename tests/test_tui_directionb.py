@@ -6615,9 +6615,9 @@ def test_tc011_every_pre_batch_action_keeps_a_keyboard_path(tmp_path: Path) -> N
     single pre-batch action. For each action in the frozen pre-batch set,
     assert it is reachable either by a current key binding OR by a command-
     palette entry. The ``view_main`` / ``view_alt`` / ``view_mac`` actions
-    are reachable through their retained legacy-alias methods and through
-    the ``show_screen`` rail actions on keys ``1``/``2``/``3`` — the
-    supersession sub-case below verdicts that path explicitly.
+    are reachable through the ``show_screen`` rail actions on keys
+    ``1``/``2``/``3`` (batch-101 Inc 12 removed their legacy-alias methods) —
+    the supersession sub-case below verdicts that path explicitly.
 
     This test fails loudly if a future edit removes an action's binding
     without re-homing it on the palette: the pre-batch set is a frozen
@@ -6643,8 +6643,8 @@ def test_tc011_every_pre_batch_action_keeps_a_keyboard_path(tmp_path: Path) -> N
     current_keys, current_actions, palette = asyncio.run(_drive())
 
     # The Workspace / A2L / MAC screens behind the retired view_* actions are
-    # reachable via the rail's show_screen actions; the legacy view_* aliases
-    # are also retained on S19TuiApp. Either path satisfies reachability.
+    # reachable via the rail's show_screen actions (batch-101 Inc 12 removed
+    # the legacy view_* alias methods). Either path satisfies reachability.
     view_action_aliases = {
         "view_main": ("show_screen('workspace')", "view_main"),
         "view_alt": ("show_screen('a2l')", "view_alt"),

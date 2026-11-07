@@ -655,38 +655,6 @@ def test_validation_issue_filtering_and_format(tmp_path: Path):
     filtered = app._filtered_validation_issues()
     assert len(filtered) == 1
     assert filtered[0].code == "CROSS_X"
-    line = app._format_validation_issue_line(filtered[0])
-    assert "CROSS_X" in line
-    assert "0x00001000" in line
-
-
-def test_jump_to_validation_issue_prefers_address(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
-    app = S19TuiApp(base_dir=tmp_path)
-    app.current_file = LoadedFile(
-        path=tmp_path / "x.s19",
-        file_type="s19",
-        mem_map={0x1000: 0x01},
-        row_bases=[0x1000],
-        ranges=[(0x1000, 0x1001)],
-        range_validity=[True],
-        errors=[],
-        a2l_path=None,
-        a2l_data=None,
-    )
-    called: dict[str, int] = {"hex": 0, "alt": 0, "mac": 0}
-    monkeypatch.setattr(app, "update_hex_view", lambda addr=None: called.__setitem__("hex", int(addr or 0)))
-    monkeypatch.setattr(app, "update_alt_hex_view", lambda addr=None: called.__setitem__("alt", int(addr or 0)))
-    monkeypatch.setattr(app, "update_mac_hex_view", lambda addr=None: called.__setitem__("mac", int(addr or 0)))
-    monkeypatch.setattr(app, "set_status", lambda _msg: None)
-
-    class FakeItem:
-        data = {"code": "ERR", "address": 0x1000}
-
-    app._jump_to_validation_issue(FakeItem())  # type: ignore[arg-type]
-
-    assert called["hex"] == 0x1000
-    assert called["alt"] == 0x1000
-    assert called["mac"] == 0x1000
 
 
 def test_parse_loaded_file_mac_after_s19_preserves_both(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):

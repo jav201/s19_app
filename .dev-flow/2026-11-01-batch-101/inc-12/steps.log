@@ -11,3 +11,4 @@ E3 round-2 correction 2026-11-06T21:34Z model=opus base=2d1e2b1 records only (no
 E3 closed 2026-11-06T21:36Z orchestrator PDR of the round-2 correction 82b8c3b; Inc 12 and 12b ready for E4 (12b after Inc 9 merges; Inc 12 after 10a, 10b)
 E4 start 2026-11-07T09:47Z implementers model=deepseek-v4-pro (G1 screens.py + docs, G2 app.py, G3 screens_directionb.py) testers=sonnet x2 (G-T1, G-T2); branch at main 3c196d1 (Incs 9, 12b, 10a in); started in parallel with Inc 10b's integration by orchestrator decision: disjoint app.py functions (10b: in-place write refresh; 12: removed dead actions), merge order 10b then 12 kept
 E4 implementers end 2026-11-07T09:53Z model=deepseek-v4-pro (G1 dialogs + docs, G2 app, G3 check editor: exit 0, 0 deviations)
+E4 testers end 2026-11-07T10:10Z model=sonnet x2: G-T1 18 nodes + passages + existing-test edits (20 RED incl. censuses); G-T2 2 nodes (walk RED, AT standing)
