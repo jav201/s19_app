@@ -1,0 +1,8 @@
+EDITS = [
+    ("used length is final (E3S-23); the per-tag checks run inside the one keyword pass (E3A-23). | `parse_a2l_file` `:2834` | R-A2L-001.2; READ.4, .12, .29 … .33, .36, .58 … .63, .67 |",
+     "used length is final (E3S-23); the per-tag checks run inside the one keyword pass (E3A-23). Round 3 (addenda): a hex-like surplus word (`3E00`, `E00`, `_4026` …) after an ECU_ADDRESS, size or BIT_MASK argument gives .58's error and no value (E3S-24); a byte-order source that is no byte-order word gives no address and .68's error, once per word (E3S-27); the external-axis post-pass compares a standing DATA_SIZE or LENGTH with the span it resolves (E3S-29); the tag's words reach the keyword pass as one stream, never as a list (E3S-28). | `parse_a2l_file` `:2834` | R-A2L-001.2; READ.4, .12, .29 … .33, .36, .58 … .63, .67; round 3: .52, .68 |"),
+    ("each word carries the line it starts on (E3S-25) | `build_section_tree` (#1); possibly #5 and #13 (E2) | READ.1 … .4, .7 … .11, .13 … .16; R-A2L-001.2, .3.1, .3.2; round 2: .52 (memory), .65/5 |",
+     "each word carries the line it starts on (E3S-25). Round 3 (E3S-28): no per-line word list; a long line's canonical text is joined in blocks of 4,096 words | `build_section_tree` (#1); possibly #5 and #13 (E2) | READ.1 … .4, .7 … .11, .13 … .16; R-A2L-001.2, .3.1, .3.2; round 2: .52 (memory), .65/5; round 3: .52/3, .65/6 |"),
+    ("`Line <n>: <section> <name> is not closed` (.67). Every file word in them is echoed by .66.",
+     "`Line <n>: <section> <name> is not closed` (.67). Added at the round-3 addenda (E3S-27): `Line <n>: BYTE_ORDER <word> is not a byte order` (.68). Every file word in them is echoed by .66."),
+]
