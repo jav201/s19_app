@@ -165,3 +165,9 @@ Notes for the 2b re-review:
 - **Inc 2a's open findings** (E3S-36, -38, -40, -43, the lost-mask shapes E3S-14/-24/-26/-30/-33, corr4-2 commented-out object) are **inherited reader defects**: 2a shows what the A2L views show today, with no write path. They are **ruled non-blocking for 2a** and owned by Inc 11 (reader fix); 2a's acceptance after Inc 11 lands re-runs their shapes. E3S-39 is 2b-only (span index).
 - E3A-27 (.59/3 text) and E3A-29 (b) are E4 addenda for 2a's tester.
 - **Inc 2a goes to E4** (50 rows, 181 cases, 32 nodes). **Inc 2b** (19 rows, 109 cases, 11 nodes) waits for Inc 11 and a security re-review against the fixed reader.
+
+## Inc 2a E5 — known design gaps (2026-11-07T02:56:10-06:00, orchestrator Opus 5.5)
+
+Applied (Opus, 50 min): one `reads` map per walk keyed by section identity, every value immutable (COMPU_METHOD → its 6 fields read-only; COMPU_VTAB / _RANGE → the table tuple by reference; RECORD_LAYOUT → its resolved datatype); new row **R-A2L-DEF.149** (cases /1–/4). Measured: the **current 2a code** takes 42.1 / 57.5 / 52.3 / 6.0 s with 400 objects sharing 256 KiB (> 60 s at 512 KiB) — a real DoS on a hostile A2L; the model 0.032–0.135 s (256 KiB), 0.044–0.218 s (512 KiB); 0 differences on the 35 fixtures.
+- **E5-1 (the 1.3× ratio is timing noise at host load 13–16):** the scaling clause of **.148 and .149** is restated to be robust: sizes **S and 8S**, median of 7 **interleaved** runs, the per-object part may grow by at most **2.0×** (a per-object walk of shared content grows ≥ 6×), `serial_timing` lane. Inc 3a's .148 takes the same wording at its E4.
+- Next: code (DeepSeek, Sonnet if its API fails) ∥ tests (Sonnet) for .149, GREEN, then Inc 2a's E5 reviews (code, security), mutants, coverage audit.

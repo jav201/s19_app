@@ -1,0 +1,13 @@
+s19_app.__file__ = /tmp/b103-e5g-2a/tree/s19_app/__init__.py | python 3.11.18
+[est3 method rep 1] load 13.8 | I21 median ratio x1.03 (quartiles x0.60 .. x4.85) | per-object part median 0.0168 -> 0.0230 s | 400-name total least 0.063 / 0.136 s -> GREEN
+[est3 method rep 2] load 14.1 | I21 median ratio x1.03 (quartiles x0.40 .. x2.92) | per-object part median 0.0194 -> 0.0203 s | 400-name total least 0.062 / 0.111 s -> GREEN
+[est3 method rep 3] load 13.9 | I21 median ratio x1.07 (quartiles x0.55 .. x3.75) | per-object part median 0.0185 -> 0.0229 s | 400-name total least 0.062 / 0.113 s -> GREEN
+[est3 vtab rep 1] load 13.8 | I21 median ratio x1.57 (quartiles x0.20 .. x6.39) | per-object part median 0.0172 -> 0.0206 s | 400-name total least 0.072 / 0.134 s -> RED
+[est3 vtab rep 2] load 13.9 | I21 median ratio x1.41 (quartiles x0.24 .. x7.31) | per-object part median 0.0184 -> 0.0189 s | 400-name total least 0.102 / 0.139 s -> RED
+[est3 vtab rep 3] load 14.8 | I21 median ratio x0.96 (quartiles x0.28 .. x5.83) | per-object part median 0.0185 -> 0.0179 s | 400-name total least 0.098 / 0.198 s -> GREEN
+[est3 range rep 1] load 15.3 | I21 median ratio x0.65 (quartiles x-0.57 .. x2.25) | per-object part median 0.0292 -> 0.0231 s | 400-name total least 0.114 / 0.214 s -> GREEN
+[est3 range rep 2] load 15.7 | I21 median ratio x1.18 (quartiles x-0.12 .. x2.55) | per-object part median 0.0227 -> 0.0194 s | 400-name total least 0.120 / 0.221 s -> GREEN
+[est3 range rep 3] load 16.2 | I21 median ratio x0.80 (quartiles x-2.30 .. x6.19) | per-object part median 0.0255 -> 0.0337 s | 400-name total least 0.117 / 0.206 s -> GREEN
+[est3 layout rep 1] load 16.1 | I21 median ratio x1.00 (quartiles x0.30 .. x1.02) | per-object part median 0.0170 -> 0.0165 s | 400-name total least 0.029 / 0.027 s -> GREEN
+[est3 layout rep 2] load 16.0 | I21 median ratio x0.99 (quartiles x0.73 .. x1.04) | per-object part median 0.0186 -> 0.0173 s | 400-name total least 0.030 / 0.042 s -> GREEN
+[est3 layout rep 3] load 15.8 | I21 median ratio x1.00 (quartiles x0.84 .. x1.07) | per-object part median 0.0180 -> 0.0177 s | 400-name total least 0.018 / 0.026 s -> GREEN
