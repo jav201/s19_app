@@ -1,0 +1,104 @@
+# red-base-synth transcript 2026-11-06T22:07:58-06:00 host cachyos-rtx tree /home/javiergr/work/b103-inc2a-base
+# command: python -m pytest -q -p no:cacheprovider -rA tests/test_b103_synth_definitions.py
+# cwd: /home/javiergr/work/b103-inc2a-base; python Python 3.11.18; HOME=/tmp/b103-e4-2a-tests/zq_iso_user
+/home/javiergr/work/b103-inc2a-base/s19_app/__init__.py
+...EEEFE                                                                 [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of test_r_a2l_def_60_1_the_definitions_case_has_an_enum_with_a_default _
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7f5aafaa8650>, _basetemp=PosixPath('/tmp/pytest-of-javiergr/pytest-561'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def defc(tmp_path_factory: pytest.TempPathFactory) -> dict:
+        """The definitions case through the shipped CLI, plus the generator's own object list."""
+        folder = tmp_path_factory.mktemp("b103_defc")
+        result = _run_cli(folder, "--seed", str(SEED), "--case", "definitions")
+>       assert result.returncode == 0, result.stderr
+E       AssertionError: usage: make_release_case.py [-h] --out OUT [--seed SEED] [--size-mb SIZE_MB]
+E         make_release_case.py: error: unrecognized arguments: --case definitions
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/home/javiergr/miniconda3/envs/s19ci/bin/python', '/home/javiergr/work/b103-inc2a-base/tools/s...-out OUT [--seed SEED] [--size-mb SIZE_MB]\nmake_release_case.py: error: unrecognized arguments: --case definitions\n').returncode
+
+tests/test_b103_synth_definitions.py:154: AssertionError
+___ ERROR at setup of test_r_a2l_def_61_1_two_disjoint_masks_at_one_address ____
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7f5aafaa8650>, _basetemp=PosixPath('/tmp/pytest-of-javiergr/pytest-561'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def defc(tmp_path_factory: pytest.TempPathFactory) -> dict:
+        """The definitions case through the shipped CLI, plus the generator's own object list."""
+        folder = tmp_path_factory.mktemp("b103_defc")
+        result = _run_cli(folder, "--seed", str(SEED), "--case", "definitions")
+>       assert result.returncode == 0, result.stderr
+E       AssertionError: usage: make_release_case.py [-h] --out OUT [--seed SEED] [--size-mb SIZE_MB]
+E         make_release_case.py: error: unrecognized arguments: --case definitions
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/home/javiergr/miniconda3/envs/s19ci/bin/python', '/home/javiergr/work/b103-inc2a-base/tools/s...-out OUT [--seed SEED] [--size-mb SIZE_MB]\nmake_release_case.py: error: unrecognized arguments: --case definitions\n').returncode
+
+tests/test_b103_synth_definitions.py:154: AssertionError
+_ ERROR at setup of test_r_a2l_def_62_1_the_display_object_has_format_unit_and_wider_extended_limits _
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7f5aafaa8650>, _basetemp=PosixPath('/tmp/pytest-of-javiergr/pytest-561'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def defc(tmp_path_factory: pytest.TempPathFactory) -> dict:
+        """The definitions case through the shipped CLI, plus the generator's own object list."""
+        folder = tmp_path_factory.mktemp("b103_defc")
+        result = _run_cli(folder, "--seed", str(SEED), "--case", "definitions")
+>       assert result.returncode == 0, result.stderr
+E       AssertionError: usage: make_release_case.py [-h] --out OUT [--seed SEED] [--size-mb SIZE_MB]
+E         make_release_case.py: error: unrecognized arguments: --case definitions
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/home/javiergr/miniconda3/envs/s19ci/bin/python', '/home/javiergr/work/b103-inc2a-base/tools/s...-out OUT [--seed SEED] [--size-mb SIZE_MB]\nmake_release_case.py: error: unrecognized arguments: --case definitions\n').returncode
+
+tests/test_b103_synth_definitions.py:154: AssertionError
+_ ERROR at setup of test_at_b103_i2_2_the_definitions_case_decodes_to_its_planned_values_through_the_loaders _
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7f5aafaa8650>, _basetemp=PosixPath('/tmp/pytest-of-javiergr/pytest-561'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def defc(tmp_path_factory: pytest.TempPathFactory) -> dict:
+        """The definitions case through the shipped CLI, plus the generator's own object list."""
+        folder = tmp_path_factory.mktemp("b103_defc")
+        result = _run_cli(folder, "--seed", str(SEED), "--case", "definitions")
+>       assert result.returncode == 0, result.stderr
+E       AssertionError: usage: make_release_case.py [-h] --out OUT [--seed SEED] [--size-mb SIZE_MB]
+E         make_release_case.py: error: unrecognized arguments: --case definitions
+E         
+E       assert 2 == 0
+E        +  where 2 = CompletedProcess(args=['/home/javiergr/miniconda3/envs/s19ci/bin/python', '/home/javiergr/work/b103-inc2a-base/tools/s...-out OUT [--seed SEED] [--size-mb SIZE_MB]\nmake_release_case.py: error: unrecognized arguments: --case definitions\n').returncode
+
+tests/test_b103_synth_definitions.py:154: AssertionError
+=================================== FAILURES ===================================
+__________ test_r_a2l_def_63_1_the_definitions_case_is_deterministic ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-561/test_r_a2l_def_63_1_the_defini0')
+
+    def test_r_a2l_def_63_1_the_definitions_case_is_deterministic(tmp_path):
+        """R-A2L-DEF.63/1 - two runs, same seed, two folders: every file byte-identical."""
+        a, b = tmp_path / "run_a", tmp_path / "run_b"
+        for folder in (a, b):
+            result = _run_cli(folder, "--seed", str(SEED), "--case", "definitions")
+>           assert result.returncode == 0, result.stderr
+E           AssertionError: usage: make_release_case.py [-h] --out OUT [--seed SEED] [--size-mb SIZE_MB]
+E             make_release_case.py: error: unrecognized arguments: --case definitions
+E             
+E           assert 2 == 0
+E            +  where 2 = CompletedProcess(args=['/home/javiergr/miniconda3/envs/s19ci/bin/python', '/home/javiergr/work/b103-inc2a-base/tools/s...-out OUT [--seed SEED] [--size-mb SIZE_MB]\nmake_release_case.py: error: unrecognized arguments: --case definitions\n').returncode
+
+tests/test_b103_synth_definitions.py:226: AssertionError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_b103_synth_definitions.py::test_r_a2l_def_59_1_case08_at_1_mib_equals_its_pin
+PASSED tests/test_b103_synth_definitions.py::test_r_a2l_def_59_2_case08_at_10_mib_equals_its_pin
+PASSED tests/test_b103_synth_definitions.py::test_r_a2l_def_59_3_object_list_digest_equals_the_e4_pin
+ERROR tests/test_b103_synth_definitions.py::test_r_a2l_def_60_1_the_definitions_case_has_an_enum_with_a_default
+ERROR tests/test_b103_synth_definitions.py::test_r_a2l_def_61_1_two_disjoint_masks_at_one_address
+ERROR tests/test_b103_synth_definitions.py::test_r_a2l_def_62_1_the_display_object_has_format_unit_and_wider_extended_limits
+ERROR tests/test_b103_synth_definitions.py::test_at_b103_i2_2_the_definitions_case_decodes_to_its_planned_values_through_the_loaders
+FAILED tests/test_b103_synth_definitions.py::test_r_a2l_def_63_1_the_definitions_case_is_deterministic
+1 failed, 3 passed, 4 errors in 5.08s
+# exit 1
