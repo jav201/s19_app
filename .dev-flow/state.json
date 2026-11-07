@@ -237,6 +237,11 @@
       "station": "P3",
       "date": "2026-11-07",
       "decision": "P3 increment 010b (Inc 10b, views after an in-place write: after an apply, a save-back or a Save project commit the main, A2L and MAC hex panes, the A2L value column and the Split/Join window show the new bytes without moving the filter, page or cursor; the A2L refresh recomputes only the tags whose bytes changed (220,040-tag A2L: 3.95 s -> 0.31 s, bound 1 s); Split/Join while hidden only disarms) approved and merged under the standing authorization: split from Inc 10 at E3; E4 integration GREEN with no product change; E5 review FAIL on R-1 (refresh cost on the large A2L) then fixed, coverage audit PASS-WITH-NOTES, corrective and re-review PASS-WITH-NOTES; mutants 15/15 (DeepSeek) + corrective mutants all RED; BL-I10b-1 (stale Hex Peek panes in Issues and Checks) flagged for the review page; trace_check 0 gaps. Partial merge verification on LAN host 2 by operator order 2026-11-06 (65 files: 2200 passed; failures = the 4 known; serial_timing 20 passed, QC-TM 0.314 s / 1 s); the full suite runs once at batch end."
+    },
+    {
+      "station": "P3",
+      "date": "2026-11-07",
+      "decision": "P3 increment 012 (Inc 12, unreachable code and the Reports viewer: VariantHelpScreen, the three view aliases, the dead issue-jump trio, action_a2l_tag_find_next and the hidden Check Editor toggle removed; censuses guard that every dialog has an opener and every action a reach; Escape closes the Reports viewer as Close does while an open dropdown keeps its own Escape; DOSSIER F-33, F-34, F-35, F-51 fixed in 1.0.0) approved and merged under the standing authorization: split at E3 into Inc 12 and 12b (12b merged earlier); D-2 removed the dead issue jump and ruled Inc 10a; E3 architect FAIL twice (reach rule, a fourth dead action) then closed; E5 review, coverage audit PASS-WITH-NOTES, mutants 17/17, corrective (records, oracles); trace_check 0 gaps. Merge verification = the batch-end FULL SUITE on the final tree (6113 passed; failures = the 4 known + test_tc_b100_53 x2, a load flake that passes alone 2/2; serial_timing 69 passed, 95 QC-TM bounds, 0 under 20 % margin); snapshot suite 31 passed + the 2 known; Inc 6's Windows arms re-run with node ids on the final tree, 82 passed."
     }
   ],
   "obsidian_synced": false,
