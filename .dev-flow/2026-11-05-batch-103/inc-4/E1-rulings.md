@@ -122,3 +122,5 @@ Consumer (Inc 7): build once per A2L load generation (I-4), off the UI thread; r
 
 ## Erratum (2026-11-06T18:37:50-06:00, orchestrator)
 §1, §2 and §6 above were written before the rulings: read **S2.8** for S2.7 and **37 rows** (R-A2L-MATCH.1 … .37) for 36. R-A2L-MATCH.37's negative control and base cite the v3 index at 77.9 MiB (tracemalloc), not the 137 MiB RSS figure (E2-2).
+
+**Backlog (E5 correction, 2026-11-07; E3S-03 (c), E5S-02):** **BL-I4-5** — bound the total characters of a prepared list. R-A2L-MATCH.35 and .37 bound a list of 50,000 names of at most 2,062,041 characters in all (REF) and .40 one of at most 2,356,624 (CRAFT; `evidence-e5/corr-e5-totals-A-transcript.txt`); beyond them the cost is linear in the total characters and measured above the bounds (50,000 names of 1,024 characters, 51,200,000 characters: build 26.3–29.3 s, about 0.33 GiB, a substring query 10.1 s; `evidence-e5/sec-e5-adv-transcript.txt` A3, `sec-e5-build-transcript.txt`). Decide at the batch end whether an `If` row refuses a prepared list over a total-character budget, or the residual is accepted for Inc 7's real A2L files.

@@ -1,0 +1,122 @@
+=== s19_app.__file__ ===
+/home/javiergr/mutr4B-work/s19_app/__init__.py
+
+=== DIFF base -> M-40b (s19_app/tui/services/label_match.py) ===
+--- /tmp/b103-e5-4-mutr4B/base/s19_app/tui/services/label_match.py	2026-11-07 01:32:51.000000000 -0600
++++ /home/javiergr/mutr4B-work/s19_app/tui/services/label_match.py	2026-11-07 03:00:53.969801196 -0600
+@@ -53,7 +53,7 @@
+ # ranking share this many trie node visits. The cap bounds how many walks run,
+ # not what one walk visits; a walk that reaches the budget returns the runs it
+ # found so far. A count, never a clock, so the lists are the same on every host.
+-_FUZZY_NODE_BUDGET = 400_000
++_FUZZY_NODE_BUDGET = 10**12
+ 
+ 
+ class MatchRule(str, Enum):
+
+=== uptime before ===
+03:00:54 up 1 day, 18:32,  8 users,  load average: 17.02, 17.96, 16.21
+
+=== uptime after ===
+03:03:52 up 1 day, 18:35,  9 users,  load average: 13.89, 16.94, 16.18
+
+=== PYTEST (tail, rc=1) ===
+........F.                                                               [100%]
+=================================== FAILURES ===================================
+_________________ test_r_a2l_match_40_one_token_walk_over_w40 __________________
+
+w40_index = <s19_app.tui.services.label_match.LabelIndex object at 0x7fc3110d5940>
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_match_40_one_token_walk_over_w40(w40_index):
+        """R-A2L-MATCH.40 (adversarial list W40, E5 round-2 ruling): the one-token queries ``'a' * 40`` and ``'a' * 64``
+        over 50,016 40-letter tokens within 2 substitutions (753,276 trie nodes), limit 20, median of 7 <= 2.0 s."""
+        print(_load("before"))
+        medians = []
+        for query in ("a" * 40, "a" * 64):
+            got = rank(query, w40_index, 20)
+            assert len(got) == 20
+            medians.append((f"R-A2L-MATCH.40 W40 {len(query)} a", _median_of(7, lambda q=query: rank(q, w40_index, 20))))
+        print(_load("after"))
+>       _check_all(medians, ANY_QUERY_BOUND_S)
+
+tests/test_b103_label_match_perf.py:665: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+medians = [('R-A2L-MATCH.40 W40 40 a', 2.337418584007537), ('R-A2L-MATCH.40 W40 64 a', 1.85952543199528)]
+bound_s = 2.0
+
+    def _check_all(medians, bound_s):
+        """Print EVERY margin line (no truncation, whatever the reporter or a ``tail`` keeps), then assert each
+        median against ``report_margin(..., timing_bound(bound_s))``; the failure names its label."""
+        bound = timing_bound(bound_s)
+        for label_, median in medians:
+            print(f"  {median * 1000:9.2f} ms  {(bound - median) / bound * 100:6.1f} % margin  {label_}")
+        for label_, median in medians:
+>           assert median <= report_margin(label_, median, timing_bound(bound_s)), f"{label_}: median {median:.4f} s"
+E           AssertionError: R-A2L-MATCH.40 W40 40 a: median 2.3374 s
+E           assert 2.337418584007537 <= 2.0
+E            +  where 2.0 = report_margin('R-A2L-MATCH.40 W40 40 a', 2.337418584007537, 2.0)
+E            +    where 2.0 = timing_bound(2.0)
+
+tests/test_b103_label_match_perf.py:261: AssertionError
+----------------------------- Captured stdout call -----------------------------
+host load before: 17.79 18.00 16.43
+host load after: 16.68 17.75 16.40
+    2337.42 ms   -16.9 % margin  R-A2L-MATCH.40 W40 40 a
+    1859.53 ms     7.0 % margin  R-A2L-MATCH.40 W40 64 a
+============================= QC-TM timing margins =============================
+LOW -16.9%  2.337 s / 2.000 s  R-A2L-MATCH.40 W40 40 a  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_one_token_walk_over_w40
+26.1%  1.479 s / 2.000 s  R-A2L-MATCH.40/5 U6 FAMQ(20)  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_5_famq_over_u6_dense_list
+40.5%  1.191 s / 2.000 s  R-A2L-MATCH.40 SUBO 'aaa'  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_substring_key_over_subo
+41.9%  1.161 s / 2.000 s  R-A2L-MATCH.40 SUBO 'aa'  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_substring_key_over_subo
+44.3%  1.114 s / 2.000 s  R-A2L-MATCH.40 SUBO 'aaaaaaaa'  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_substring_key_over_subo
+58.3%  0.833 s / 2.000 s  R-A2L-MATCH.40 D3 FAMQ(20)  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_famq_over_d3_densest_postings_list
+69.8%  0.604 s / 2.000 s  R-A2L-MATCH.40 E2 FAM6(12)  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_fam6_over_e2_two_edit_list
+73.5%  0.530 s / 2.000 s  R-A2L-MATCH.40 D3 FAMQ(12)  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_famq_over_d3_densest_postings_list
+81.9%  0.363 s / 2.000 s  R-A2L-MATCH.40 E2 FAM6(4)  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_fam6_over_e2_two_edit_list
+89.0%  0.220 s / 2.000 s  R-A2L-MATCH.40/3 CRAFT 20 tokens  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_3_crafted_stress_list
+89.1%  0.218 s / 2.000 s  R-A2L-MATCH.40 D3 FAMQ(4)  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_famq_over_d3_densest_postings_list
+89.8%  0.204 s / 2.000 s  R-A2L-MATCH.40 REF6 E3S-01 0 x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+89.8%  0.205 s / 2.000 s  R-A2L-MATCH.40/4 BAND head + 249-character token  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_4_prefix_distance_band_after_the_switch
+90.2%  0.195 s / 2.000 s  R-A2L-MATCH.40 REF6 0 x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+91.5%  0.170 s / 2.000 s  R-A2L-MATCH.40 REF6 00 x85  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+92.9%  0.141 s / 2.000 s  R-A2L-MATCH.40 REF6 c x125 + chax  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+93.2%  0.135 s / 2.000 s  R-A2L-MATCH.40 REF6 mesa x52  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+93.3%  0.133 s / 2.000 s  R-A2L-MATCH.40 REF6 cahr x51  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+93.7%  0.127 s / 2.000 s  R-A2L-MATCH.40 LONG a x128 + b  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_2_long_queries_against_1020_character_tokens
+93.8%  0.124 s / 2.000 s  R-A2L-MATCH.40 REF6 0 x125 + chax  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+93.9%  0.122 s / 2.000 s  R-A2L-MATCH.40 REF6 chax x52  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+94.1%  0.117 s / 2.000 s  R-A2L-MATCH.40 LONG a x255 + b  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_2_long_queries_against_1020_character_tokens
+94.1%  0.118 s / 2.000 s  R-A2L-MATCH.40 LONG a x254 + bb  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_2_long_queries_against_1020_character_tokens
+94.2%  0.115 s / 2.000 s  R-A2L-MATCH.40 REF6 chr x64  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+94.6%  0.109 s / 2.000 s  R-A2L-MATCH.40 REF6 1 x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+95.3%  0.094 s / 2.000 s  R-A2L-MATCH.40 REF6 m x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+95.4%  0.092 s / 2.000 s  R-A2L-MATCH.40 REF6 c 0 x64  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+95.4%  0.092 s / 2.000 s  R-A2L-MATCH.40 REF6 c x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+97.0%  0.061 s / 2.000 s  R-A2L-MATCH.40/3 CRAFT 4 tokens  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_3_crafted_stress_list
+98.0%  0.040 s / 2.000 s  R-A2L-MATCH.40 REF6 E3S-01 a x256  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+98.4%  0.032 s / 2.000 s  R-A2L-MATCH.40 REF6 E3S-01 e x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+98.8%  0.024 s / 2.000 s  R-A2L-MATCH.40 REF qza..qzz x3  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+99.1%  0.019 s / 2.000 s  R-A2L-MATCH.40/3 CRAFT 51 tokens  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_3_crafted_stress_list
+99.2%  0.016 s / 2.000 s  R-A2L-MATCH.40 REF cnt x64  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+99.2%  0.015 s / 2.000 s  R-A2L-MATCH.40 REF6 near tokens  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+99.2%  0.016 s / 2.000 s  R-A2L-MATCH.40 REF6 51 typos of char  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+99.2%  0.015 s / 2.000 s  R-A2L-MATCH.40/5 U6 FAMQ(76)  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_5_famq_over_u6_dense_list
+99.3%  0.013 s / 2.000 s  R-A2L-MATCH.40 REF qzx x64  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+99.3%  0.014 s / 2.000 s  R-A2L-MATCH.40 REF rat x64  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+99.3%  0.013 s / 2.000 s  R-A2L-MATCH.40 REF e x120 + rat  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+99.3%  0.015 s / 2.000 s  R-A2L-MATCH.40 REF6 cha..chz x3  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+99.3%  0.014 s / 2.000 s  R-A2L-MATCH.40 REF6 E3S-01 a..z  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+99.3%  0.015 s / 2.000 s  R-A2L-MATCH.40 REF6 E3S-01 longest swapped  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+99.3%  0.014 s / 2.000 s  R-A2L-MATCH.40 D3 FAMQ(76)  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_famq_over_d3_densest_postings_list
+99.4%  0.013 s / 2.000 s  R-A2L-MATCH.40 REF 1a x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+99.4%  0.012 s / 2.000 s  R-A2L-MATCH.40 REF6 E3S-01 pool[200:] join  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+99.4%  0.012 s / 2.000 s  R-A2L-MATCH.40 REF6 E3S-01 longest REF name  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+99.4%  0.012 s / 2.000 s  R-A2L-MATCH.40 E2 FAM6(36)  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_fam6_over_e2_two_edit_list
+99.5%  0.009 s / 2.000 s  R-A2L-MATCH.40 REF6 E3S-01 pool join  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+99.5%  0.011 s / 2.000 s  R-A2L-MATCH.40 E2 FAM6(24)  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_fam6_over_e2_two_edit_list
+QC-TM: 50 bounds, 1 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match_perf.py::test_r_a2l_match_40_one_token_walk_over_w40
+1 failed, 9 passed, 10 deselected in 177.81s (0:02:57)

@@ -1,0 +1,31 @@
+runner d3-run.sh sha256 3165c8cf50aa697565dfeaf500a9f4f54cdc5d65aa829b8301ce81a15a9da873; probe d3-probe.py sha256 597f605ef3920b5a9b93a6bdf3a6ac978b16cb65b15190fcc0235315bdecab14
+s19_app.__file__ = /tmp/b103-e5d3-4/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5d3-4/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 8f396c15d3c848ceb2c98ab74c112150bf9c09759abb662ea0f2162d1ca7c94d
+tests module = /tmp/b103-e5d3-4/tree/tests/test_b103_label_match_perf.py
+mode = d3 walkex  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = 6401089369449475239
+host = cachyos-rtx  load = (1.67, 2.69, 2.49)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5d3-4/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5d3-4/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5d3-4/pilot
+probe = sec-r3-probe.py sha256 9cf292424ce8f1a335da4da39354d86b2b99bb480f5b41f0d387f608e52ceefa; round-1 helpers = sec-e5-probe.py sha256 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+_FUZZY_TOKEN_CAP = 20; _FUZZY_SWITCH_CAP = 512; T.ANY_QUERY_BOUND_S = 2.0; T.KEYSTROKE_BOUND_S = 0.2
+d3 probe = d3-probe.py sha256 597f605ef3920b5a9b93a6bdf3a6ac978b16cb65b15190fcc0235315bdecab14; d3 pilot = d3-pilot.py sha256 825c53630deb68482d5b9f7ed8c77da5333e41947e3bc451c4560581b053a661; budget 400,000
+C08: 215 distinct tokens, 264 trie nodes
+  'cuvre', 1, budget 400,000 -> runs [(210, 211, 1)] [(210, 211, 1) curve], visits 18
+  'mpa', 1, budget 400,000 -> runs [(211, 213, 1)] [(211, 213, 1) map..measurement], visits 16
+  'maesu', 1, budget 400,000 -> runs [(212, 213, 1)] [(212, 213, 1) measurement], visits 20
+  'vblk', 1, budget 400,000 -> runs [(209, 210, 1)] [(209, 210, 1) blk], visits 18
+  'valu', 1, budget 400,000 -> runs [(213, 214, 1), (214, 215, 0)] [(213, 214, 1) val, (214, 215, 0) value], visits 18
+  'cvure', 1, budget 400,000 -> runs [] [], visits 17
+  '0300', 0, budget 400,000 -> runs [] [], visits 0
+  'va', 0, budget 400,000 -> runs [(213, 215, 0)] [(213, 215, 0) val..value], visits 0
+  'valu', 1, budget 0 -> runs [], visits 0
+  'valu', 1, budget 1 -> runs [], visits 1
+  'valu', 1, budget 2 -> runs [], visits 2
+  'valu', 1, budget 9 -> runs [], visits 9
+  'valu', 1, budget 17 -> runs [(213, 214, 1)], visits 17
+  'valu', 1, budget 18 -> runs [(213, 214, 1), (214, 215, 0)], visits 18
+  [CUVE, CURVE_0001], 'curvee', 2, budget 400,000 -> runs [(1, 2, 1), (2, 3, 2)], visits 10
+  W40, 'a' * 40, 2, budget 400,000 -> 1 runs covering 34,154 token ids, visits 400,000; first run (47916, 82070, 2), last run (47916, 82070, 2)
+  W40, 'a' * 40, 2, budget 1,000,000,000 -> 2 runs covering 50,016 token ids, visits 700,568; first run (47916, 97077, 2), last run (97078, 97933, 2)
+load after = (1.72, 2.67, 2.49)
+probe exit 0

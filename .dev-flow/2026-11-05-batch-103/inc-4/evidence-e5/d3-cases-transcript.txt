@@ -1,0 +1,85 @@
+runner d3-run.sh sha256 3165c8cf50aa697565dfeaf500a9f4f54cdc5d65aa829b8301ce81a15a9da873; probe d3-probe.py sha256 99109d891ff4822da573e25c7aa780e37a8af6cee0075733a7ecd10944121b39
+s19_app.__file__ = /tmp/b103-e5d3-4/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5d3-4/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 8f396c15d3c848ceb2c98ab74c112150bf9c09759abb662ea0f2162d1ca7c94d
+tests module = /tmp/b103-e5d3-4/tree/tests/test_b103_label_match_perf.py
+mode = d3 cases  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = 8600708065872765230
+host = cachyos-rtx  load = (3.1, 2.19, 2.14)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5d3-4/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5d3-4/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5d3-4/pilot
+probe = sec-r3-probe.py sha256 9cf292424ce8f1a335da4da39354d86b2b99bb480f5b41f0d387f608e52ceefa; round-1 helpers = sec-e5-probe.py sha256 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+_FUZZY_TOKEN_CAP = 20; _FUZZY_SWITCH_CAP = 512; T.ANY_QUERY_BOUND_S = 2.0; T.KEYSTROKE_BOUND_S = 0.2
+d3 probe = d3-probe.py sha256 99109d891ff4822da573e25c7aa780e37a8af6cee0075733a7ecd10944121b39; d3 pilot = d3-pilot.py sha256 825c53630deb68482d5b9f7ed8c77da5333e41947e3bc451c4560581b053a661; budget 400,000
+
+=== W40 = the test module's w40_names()
+    50,000 names, 2,336,068 characters in all (.40 scope: 50,000 names, <= 2,356,624; .35/.37 scope: <= 2,062,041); all ASCII True; longest name 983
+    build 1.98 s [ok]; 97,933 distinct tokens; 753,276 trie nodes; load (3.1, 2.19, 2.14)
+    sha256 of the 50,000 names joined by '\n': 467be34c6c101183e60c6ed948e95d4b49bec250a5bbfd676e7baf328083d95b
+
+  [R-A2L-MATCH.42/1] 'a' * 40 + ' ' + 'a' * 39 (2 distinct tokens, 80 chars)
+    BUDGETED   median of 7     699.0 ms [ok]  <= 2.0 s (x2.86 margin); trie node visits 400,000 (budget reached: True); load (3.18, 2.22, 2.15)
+               20 entries, rules ['subsequence'], edits [0]; entry 1 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaci_ama'... (len 983) subsequence e0 spans ((0, 38), (41, 42), (43, 79), (80, 81))...; bad spans 0; list sha256 29cb2305cae359f658d4f9d00644608ed26c83214fc09889ba8efd4076cb32cd
+    UNBUDGETED one ranking    2090.3 ms [ok]; trie node visits 1,351,120 in 2 walks
+               20 entries, rules ['fuzzy'], edits [3]; entry 1 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaci_ama'... (len 983) fuzzy e3 spans ((0, 40),); list sha256 eaea0a8cb8b37844d443a7675e216ff9fa8af1180c7d36e683f308e151f340a6
+    TRUNCATED BY THE BUDGET: yes (the lists differ)
+
+  [R-A2L-MATCH.42/2] 'a' * 40 ... 'a' * 35 (6 distinct tokens, 230 chars)
+    BUDGETED   median of 7     731.9 ms [ok]  <= 2.0 s (x2.73 margin); trie node visits 400,000 (budget reached: True); load (3.22, 2.26, 2.17)
+               20 entries, rules ['subsequence'], edits [0]; entry 1 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaci_ama'... (len 983) subsequence e0 spans ((0, 38), (41, 42), (43, 79), (80, 81))...; bad spans 0; list sha256 4243a09dd1d9577dd3ceb5e710c17716a066f9bd4f8423c86684689bb8a1b3e7
+    UNBUDGETED one ranking    5463.3 ms [ok]; trie node visits 3,494,116 in 6 walks
+               20 entries, rules ['fuzzy'], edits [3]; entry 1 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaci_ama'... (len 983) fuzzy e3 spans ((0, 40),); list sha256 79d825739d1a02c4144ab4cb7532358fbd3e5330cfb505786cfe54d98f10b76c
+    TRUNCATED BY THE BUDGET: yes (the lists differ)
+    NEGATIVE CONTROL (budget removed = the shipped rank) median of 3    5536.9 ms [ok]  > 2.0 s -> RED; load (3.13, 2.33, 2.2)
+
+  [derived] 'a' * 39 + b ... g (6 distinct tokens, 245 chars; the reviewer's dearest W40 query)
+    BUDGETED   median of 7     659.1 ms [ok]  <= 2.0 s (x3.03 margin); trie node visits 400,000 (budget reached: True); load (3.12, 2.34, 2.2)
+               12 entries, rules ['subsequence'], edits [0]; entry 1 'aaaaaaaaaaaaaaaaaaaeaaaaaaaaaaawaaaaaaaa_aaa'... (len 983) subsequence e0 spans ((0, 19), (20, 31), (32, 40), (41, 42))...; bad spans 0; list sha256 9520b49c9e012a1b209b1a42a485932828b3703e936502370d0652f1c6badb66
+    UNBUDGETED one ranking    6454.0 ms [ok]; trie node visits 4,202,729 in 6 walks
+               20 entries, rules ['fuzzy'], edits [9, 10]; entry 1 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaabaaaaaaaaav_aaa'... (len 983) fuzzy e9 spans ((0, 40), (82, 122), (369, 409), (574, 614)); list sha256 70191461004e3f687ae40036950ecab8227932db9087a1fa0c7eaebac40a6543
+    TRUNCATED BY THE BUDGET: yes (the lists differ)
+
+  [derived] 'a' * 40 (1 token; the test's query)
+    BUDGETED   median of 7     677.4 ms [ok]  <= 2.0 s (x2.95 margin); trie node visits 400,000 (budget reached: True); load (3.11, 2.39, 2.22)
+               20 entries, rules ['fuzzy'], edits [2]; entry 1 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaci_ama'... (len 983) fuzzy e2 spans ((0, 40),); bad spans 0; list sha256 40f9883aeeb19417d2b598f37a10ce3f1eca55968837e072adf7be28b009f520
+    UNBUDGETED one ranking    1171.3 ms [ok]; trie node visits 700,568 in 1 walks
+               20 entries, rules ['fuzzy'], edits [2]; entry 1 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaci_ama'... (len 983) fuzzy e2 spans ((0, 40),); list sha256 40f9883aeeb19417d2b598f37a10ce3f1eca55968837e072adf7be28b009f520
+    TRUNCATED BY THE BUDGET: no (the same list)
+
+=== DEEP40 = sec-r3-probe.py deep40()
+    50,000 names, 1,979,217 characters in all (.40 scope: 50,000 names, <= 2,356,624; .35/.37 scope: <= 2,062,041); all ASCII True; longest name 983
+    build 1.88 s [ok]; 89,532 distinct tokens; 1,389,057 trie nodes; load (3.18, 2.41, 2.23)
+    sha256 of the 50,000 names joined by '\n': 2ce84fa31c55c2d7a457ebe01cfe0746acefb786b9253f221b219362107db0cc
+
+  [R-A2L-MATCH.42/3] 'a' * 40 (1 token)
+    BUDGETED   median of 7     697.9 ms [ok]  <= 2.0 s (x2.87 margin); trie node visits 400,000 (budget reached: True); load (3.24, 2.44, 2.24)
+               20 entries, rules ['fuzzy'], edits [2]; entry 1 'agaaaaaazaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa_aaa'... (len 737) fuzzy e2 spans ((123, 163),); bad spans 0; list sha256 094071ae7a78cfda29d688955b846ef9984090df8b7133a136a3efe5579e350c
+    UNBUDGETED one ranking    2102.9 ms [ok]; trie node visits 1,335,947 in 1 walks
+               20 entries, rules ['fuzzy'], edits [2]; entry 1 'agaaaaaazaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa_aaa'... (len 737) fuzzy e2 spans ((0, 40),); list sha256 7ca343eeb2287415b244fe0e6a1e24c59f6aa75b44b6737145ad49c2d47556c1
+    TRUNCATED BY THE BUDGET: yes (the lists differ)
+
+  [R-A2L-MATCH.42/4] 'a' * 40 ... 'a' * 35 (6 distinct tokens, 230 chars)
+    BUDGETED   median of 7     708.0 ms [ok]  <= 2.0 s (x2.82 margin); trie node visits 400,000 (budget reached: True); load (3.29, 2.48, 2.25)
+               20 entries, rules ['subsequence'], edits [0]; entry 1 'agaaaaaazaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa_aaa'... (len 737) subsequence e0 spans ((0, 1), (2, 8), (9, 40), (41, 44))...; bad spans 0; list sha256 c032a4c1c1816604f9fe0f37368a6fe3d96f2100e0a3da96667b36f787529ef2
+    UNBUDGETED one ranking   11613.1 ms [ok]; trie node visits 7,396,932 in 6 walks
+               20 entries, rules ['fuzzy'], edits [12]; entry 1 'agaaaaaazaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa_aaa'... (len 737) fuzzy e12 spans ((0, 40),); list sha256 0580b685c020cb301275f1d1d9ec953400bf9ed9c7a704871e2ebdfeed469471
+    TRUNCATED BY THE BUDGET: yes (the lists differ)
+
+=== W12 = sec-r3-probe.py w12()
+    50,000 names, 850,992 characters in all (.40 scope: 50,000 names, <= 2,356,624; .35/.37 scope: <= 2,062,041); all ASCII True; longest name 311
+    build 0.92 s [ok]; 89,745 distinct tokens; 234,261 trie nodes; load (3.61, 2.62, 2.31)
+    sha256 of the 50,000 names joined by '\n': ec97932cba99e45011580d70b86cbc140113b9aac8dd715faf948dd71bb79d37
+
+  [R-A2L-MATCH.42/5] T20: 'a' * 10 + b ... u (20 distinct tokens, 239 chars)
+    BUDGETED   median of 7     576.6 ms [ok]  <= 2.0 s (x3.47 margin); trie node visits 400,000 (budget reached: True); load (3.64, 2.64, 2.32)
+               [] (0 entries); bad spans 0; list sha256 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
+    UNBUDGETED one ranking    4729.0 ms [ok]; trie node visits 3,475,440 in 20 walks
+               20 entries, rules ['fuzzy'], edits [17, 18]; entry 1 'aaaaaaaaaaaa_aaaaaaxuaaaa_acaagaaaaaaa_aaaaa'... (len 311) fuzzy e17 spans ((0, 12), (39, 51), (52, 64), (117, 129)); list sha256 5c1ff55ad4c53e0a798d148f0d7bf88782b9196de9c5c2d240faa4eb2d56b8e7
+    TRUNCATED BY THE BUDGET: yes (the lists differ)
+
+=== DEEP258 (the dearest node: a 256-character query of two 128-letter tokens)
+    50,000 names, 1,904,162 characters in all (.40 scope: 50,000 names, <= 2,356,624; .35/.37 scope: <= 2,062,041); all ASCII True; longest name 776
+    build 1.86 s [ok]; 54,167 distinct tokens; 1,647,244 trie nodes; load (3.7, 2.68, 2.33)
+
+  [derived] 'a' * 128 + ' ' + 'a' * 127 BUDGETED median of 3 805.2 ms [ok]; 400,000 visits; 2.01 us per visit (upper bound: the whole ranking over the visits); 20 entries, rules ['subsequence'], edits [0]; entry 1 'faaxaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'... (len 258) subsequence e0 spans ((1, 3), (4, 257)); load (3.72, 2.71, 2.34)
+
+load after = (3.72, 2.71, 2.34)
+probe exit 0

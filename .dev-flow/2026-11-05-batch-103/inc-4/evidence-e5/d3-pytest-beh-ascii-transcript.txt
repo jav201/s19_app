@@ -1,0 +1,119 @@
+runner d3-run.sh sha256 3165c8cf50aa697565dfeaf500a9f4f54cdc5d65aa829b8301ce81a15a9da873; plugin d3_plugin.py sha256 bc7c49282dfbb680d7f987ebee684d7262c5168f3cfbba26b4477ba59a45e07e; D3_BUDGET=off D3_ASCII=1; load 2.59 1.87 2.05
+d3_plugin: s19_app.__file__ = /tmp/b103-e5d3-4/tree/s19_app/__init__.py; label_match sha256 8f396c15d3c848ceb2c98ab74c112150bf9c09759abb662ea0f2162d1ca7c94d; budget=None ascii_only=True
+............FF.................................F........................ [ 51%]
+...............................F....................................     [100%]
+=================================== FAILURES ===================================
+_________________ test_ranked_list_is_exactly[R-A2L-MATCH.4/1] _________________
+
+prep = <function prep.<locals>.get at 0x7f6af2d6ade0>
+case_id = 'R-A2L-MATCH.4/1', key = 'NA', query = 'drück', limit = 20
+expected = [('Drück_Max', 'prefix', 0, ((0, 5),)), ('DRÜCK_MAX', 'fuzzy', 1, ((0, 5),)), ('druck_max', 'fuzzy', 1, ((0, 5),))]
+
+    @pytest.mark.parametrize(
+        "case_id,key,query,limit,expected",
+        EXACT_CASES,
+        ids=[c[0] for c in EXACT_CASES],
+    )
+    def test_ranked_list_is_exactly(prep, case_id, key, query, limit, expected):
+        """The ranked list is exactly the case's expected list (names, rules, edits, spans, order).
+    
+        Covers (the case id is the pytest id) R-A2L-MATCH.1/1 .1/2 .1/3 .1/4 .2/1 .2/2 .2/3 .2/4
+        .2/5 .3/1 .3/2 .3/3 .4/1 .4/2 .4/3 .5/1 .5/2 .6/1 .6/2 .6/3 .7/1 .7/2 .7/3 .7/4 .8/1 .8/2
+        .8/3 .8/4 .8/5 .8/6 .8/7 .8/8 .8/9 .9/1 .9/2 .9/3 .9/4 .10/1 .10/2 .10/3 .10/4 .10/5
+        .10/6 .11/1 .11/2 .11/3 .12/3 .12/4 .13/1 .13/2 .13/3 .13/4 .14/1 .14/2 .15/1 .15/2
+        .16/1 .16/2 .16/3 .17/1 .17/2 .18/3 .19/1 .19/2 .20/2 .21/1 .21/2 .21/3 .22/1 .23/2
+        .24/2 .24/4 .25/3 .28/1 .32/1 .32/3 .33/2 .33/3 .34/1 .38/1 .38/2 .39/1 .39/2 .41/1 .41/2 .41/3 .41/4 .41/5.
+        """
+        got = proj(run(prep, key, query, limit))
+>       assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E       AssertionError: R-A2L-MATCH.4/1: query 'drück' limit 20
+E       assert [('druck_max'...1, ((0, 5),))] == [('Drück_Max'...1, ((0, 5),))]
+E         
+E         At index 0 diff: ('druck_max', 'fuzzy', 1, ((0, 5),)) != ('Drück_Max', 'prefix', 0, ((0, 5),))
+E         Right contains 2 more items, first extra item: ('DRÜCK_MAX', 'fuzzy', 1, ((0, 5),))
+E         Use -v to get more diff
+
+tests/test_b103_label_match.py:408: AssertionError
+_________________ test_ranked_list_is_exactly[R-A2L-MATCH.4/2] _________________
+
+prep = <function prep.<locals>.get at 0x7f6af2d6ade0>
+case_id = 'R-A2L-MATCH.4/2', key = 'NA', query = 'DRÜCK', limit = 20
+expected = [('DRÜCK_MAX', 'prefix', 0, ((0, 5),)), ('Drück_Max', 'fuzzy', 1, ((0, 5),)), ('druck_max', 'fuzzy', 1, ((0, 5),))]
+
+    @pytest.mark.parametrize(
+        "case_id,key,query,limit,expected",
+        EXACT_CASES,
+        ids=[c[0] for c in EXACT_CASES],
+    )
+    def test_ranked_list_is_exactly(prep, case_id, key, query, limit, expected):
+        """The ranked list is exactly the case's expected list (names, rules, edits, spans, order).
+    
+        Covers (the case id is the pytest id) R-A2L-MATCH.1/1 .1/2 .1/3 .1/4 .2/1 .2/2 .2/3 .2/4
+        .2/5 .3/1 .3/2 .3/3 .4/1 .4/2 .4/3 .5/1 .5/2 .6/1 .6/2 .6/3 .7/1 .7/2 .7/3 .7/4 .8/1 .8/2
+        .8/3 .8/4 .8/5 .8/6 .8/7 .8/8 .8/9 .9/1 .9/2 .9/3 .9/4 .10/1 .10/2 .10/3 .10/4 .10/5
+        .10/6 .11/1 .11/2 .11/3 .12/3 .12/4 .13/1 .13/2 .13/3 .13/4 .14/1 .14/2 .15/1 .15/2
+        .16/1 .16/2 .16/3 .17/1 .17/2 .18/3 .19/1 .19/2 .20/2 .21/1 .21/2 .21/3 .22/1 .23/2
+        .24/2 .24/4 .25/3 .28/1 .32/1 .32/3 .33/2 .33/3 .34/1 .38/1 .38/2 .39/1 .39/2 .41/1 .41/2 .41/3 .41/4 .41/5.
+        """
+        got = proj(run(prep, key, query, limit))
+>       assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E       AssertionError: R-A2L-MATCH.4/2: query 'DRÜCK' limit 20
+E       assert [('druck_max'...1, ((0, 5),))] == [('DRÜCK_MAX'...1, ((0, 5),))]
+E         
+E         At index 0 diff: ('druck_max', 'fuzzy', 1, ((0, 5),)) != ('DRÜCK_MAX', 'prefix', 0, ((0, 5),))
+E         Right contains 2 more items, first extra item: ('Drück_Max', 'fuzzy', 1, ((0, 5),))
+E         Use -v to get more diff
+
+tests/test_b103_label_match.py:408: AssertionError
+________________ test_ranked_list_is_exactly[R-A2L-MATCH.12/4] _________________
+
+prep = <function prep.<locals>.get at 0x7f6af2d6ade0>
+case_id = 'R-A2L-MATCH.12/4', key = ('٣٣٣_X',), query = '٣٣٤', limit = 20
+expected = [('٣٣٣_X', 'fuzzy', 1, ((0, 3),))]
+
+    @pytest.mark.parametrize(
+        "case_id,key,query,limit,expected",
+        EXACT_CASES,
+        ids=[c[0] for c in EXACT_CASES],
+    )
+    def test_ranked_list_is_exactly(prep, case_id, key, query, limit, expected):
+        """The ranked list is exactly the case's expected list (names, rules, edits, spans, order).
+    
+        Covers (the case id is the pytest id) R-A2L-MATCH.1/1 .1/2 .1/3 .1/4 .2/1 .2/2 .2/3 .2/4
+        .2/5 .3/1 .3/2 .3/3 .4/1 .4/2 .4/3 .5/1 .5/2 .6/1 .6/2 .6/3 .7/1 .7/2 .7/3 .7/4 .8/1 .8/2
+        .8/3 .8/4 .8/5 .8/6 .8/7 .8/8 .8/9 .9/1 .9/2 .9/3 .9/4 .10/1 .10/2 .10/3 .10/4 .10/5
+        .10/6 .11/1 .11/2 .11/3 .12/3 .12/4 .13/1 .13/2 .13/3 .13/4 .14/1 .14/2 .15/1 .15/2
+        .16/1 .16/2 .16/3 .17/1 .17/2 .18/3 .19/1 .19/2 .20/2 .21/1 .21/2 .21/3 .22/1 .23/2
+        .24/2 .24/4 .25/3 .28/1 .32/1 .32/3 .33/2 .33/3 .34/1 .38/1 .38/2 .39/1 .39/2 .41/1 .41/2 .41/3 .41/4 .41/5.
+        """
+        got = proj(run(prep, key, query, limit))
+>       assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E       AssertionError: R-A2L-MATCH.12/4: query '٣٣٤' limit 20
+E       assert [] == [('٣٣٣_X', 'f...1, ((0, 3),))]
+E         
+E         Right contains one more item: ('٣٣٣_X', 'fuzzy', 1, ((0, 3),))
+E         Use -v to get more diff
+
+tests/test_b103_label_match.py:408: AssertionError
+______________ test_rows_24_3_fuzzy_ties_fall_to_code_point_order ______________
+
+prep = <function prep.<locals>.get at 0x7f6af2d6ade0>
+
+    def test_rows_24_3_fuzzy_ties_fall_to_code_point_order(prep):
+        """R-A2L-MATCH.24/3: fuzzy names of one rule, key and length are not ordered by case-exactness: entry 2 is DRÜCK_MAX, entry 3 druck_max."""
+        got = run(prep, "NA", "drück")
+>       assert [m.name for m in got] == ["Drück_Max", "DRÜCK_MAX", "druck_max"]
+E       AssertionError: assert ['druck_max'] == ['Drück_Max',..., 'druck_max']
+E         
+E         At index 0 diff: 'druck_max' != 'Drück_Max'
+E         Right contains 2 more items, first extra item: 'DRÜCK_MAX'
+E         Use -v to get more diff
+
+tests/test_b103_label_match.py:497: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.4/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.4/2]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.12/4]
+FAILED tests/test_b103_label_match.py::test_rows_24_3_fuzzy_ties_fall_to_code_point_order
+4 failed, 136 passed in 5.96s
+pytest exit 1; load 2.62 1.88 2.05

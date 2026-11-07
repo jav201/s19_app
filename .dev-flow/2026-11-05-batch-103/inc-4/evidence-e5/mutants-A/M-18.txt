@@ -1,0 +1,24 @@
+=== DIFF base -> M-18 (s19_app/tui/services/label_match.py) ===
+diff --git a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py b/M-18/s19_app/tui/services/label_match.py
+index d274de0..193b1ad 100644
+--- a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py
++++ b/M-18/s19_app/tui/services/label_match.py
+@@ -388,7 +388,7 @@ def rank(query: str, index: LabelIndex, limit: int) -> list[LabelMatch]:
+                     spans=spans,
+                 )
+             )
+-            if len(result) >= limit:
++            if False:
+                 return result
+     return result
+ 
+
+=== PYTEST (tail) ===
+FF.                                                                      [100%]
+=================================== FAILURES ===================================
+/tmp/b103-e5-4-mutA/M-18/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.18/3: query 'value_000' limit 1
+/tmp/b103-e5-4-mutA/M-18/tests/test_b103_label_match.py:416: AssertionError: assert [('VALUE_0001...0, 9),)), ...] == [('VALUE_0001...0, ((0, 9),))]
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.18/3]
+FAILED tests/test_b103_label_match.py::test_rows_18_1_limit_cut_is_the_head_of_the_full_list
+2 failed, 1 passed, 126 deselected in 5.15s

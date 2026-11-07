@@ -1,0 +1,22 @@
+s19_app.__file__ = /tmp/b103-e5-4-sec/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5-4-sec/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 24564b32d53f142b85fb33825aed3c30a116fbaaf4808be45e4378b2d8bedb9b
+tests module = /tmp/b103-e5-4-sec/tree/tests/test_b103_label_match_perf.py
+mode = adv2  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = 4216033679786333931
+host = cachyos-rtx  load = (2.09, 2.04, 1.54)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5-4-sec/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5-4-sec/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5-4-sec/pilot
+
+=== A4. subsequence tier (step 5): _subsequence over every name whose mask holds the keys
+names 'ab' * 130 + 'z' + tag (265 chars, one token); queries 'ab' * k + 'zzzzz' (one token, 5 edits: no fuzzy match)
+  5,000 crafted + 45,000 REF names: build 2.38 s [ok]; load (2.08, 2.04, 1.54)
+     len 255: median of 3     196.9 ms [ok] listed 0 []; _subsequence calls 21,256
+     len 125: median of 3     122.9 ms [ok] listed 0 []; _subsequence calls 21,256
+     len  45: median of 3      79.2 ms [ok] listed 0 []; _subsequence calls 21,256
+     len   5: median of 3      23.4 ms [ok] listed 20 ['subsequence']; _subsequence calls 21,256
+  50,000 crafted + 0 REF names: build 5.57 s [ok]; load (2.07, 2.04, 1.55)
+     len 255: median of 3     990.9 ms [ok] listed 0 []; _subsequence calls 38,416
+     len 125: median of 3     491.1 ms [ok] listed 0 []; _subsequence calls 38,416
+     len  45: median of 3     178.4 ms [ok] listed 0 []; _subsequence calls 38,416
+     len   5: median of 3      29.0 ms [ok] listed 0 []; _subsequence calls 38,416
+
+load after = (2.21, 2.07, 1.56)

@@ -1,0 +1,48 @@
+runner d2-run.sh sha256 94e6d48eb8c2d94620ad6b3db9d0f17471ad14f3e16c44b00d9babce4534ccba; probe d2-probe.py sha256 81bae37069b7a100641b76e0617aaf290760ecda3570ddec129c5c51d1302c3a; sec-r2-probe.py ecda78d650657c1f9395592572e8091e60432d4e8328363807afa8eb2c772233; sec-e5-probe.py 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+s19_app.__file__ = /tmp/b103-e5d2-4/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5d2-4/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0
+tests module = /tmp/b103-e5d2-4/tree/tests/test_b103_label_match_perf.py
+mode = d2 build flat  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = -5420079874442641613
+host = cachyos-rtx  load = (2.34, 2.17, 2.31)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5d2-4/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5d2-4/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5d2-4/pilot
+.35 / .37 scope today: 50,000 names that hold at most 2,062,041 characters in all (REF's total)
+S = shipped build_label_index; C = compact build (p_build2: one tokenising pass, flat span buffers); time = median of 3 builds; peak = one build under tracemalloc
+
+  REF (the row's fixture)
+    50,000 names, 2,062,041 characters, ASCII True, 77,256 distinct tokens; load (4.16, 2.65, 2.46)
+    sha256 of the names joined by newline: 766ef13d604c71ef314dd373cfc0eb859f7387b5f6685e2038411da2b2a678ce; names 0-1: ['AAD_UTRQ.HWV_VIUF_C_PposBXIIFfkdGfiaJnbbPvb_DYAN_XVZ1_Ierxjr_Eud_Y', 'ACN_ULWY.FVH_MUGP_O_SBW_RTD_NJZ_MKE_WODEYLMQXZ46_OXATIRMZ_YOQJZI']
+    S: build median 1.81 s; peak 21,306,149 B = 20.3 MiB; 10.3 B per character
+    C: build median 2.37 s; peak 18,680,621 B = 17.8 MiB; 9.1 B per character
+    S and C give equal indexes (all 12 fields): True
+
+  B4c: 9 distinct 4-letter camel tokens per name (the reviewer's 65.9 MiB list)
+    50,000 names, 1,800,000 characters, ASCII True, 450,000 distinct tokens; load (4.91, 3.21, 2.67)
+    sha256 of the names joined by newline: 7e6b2199c1686a1a61302f5becce9d372854f6f2c9f05736cce793b6ce4f9117; names 0-1: ['AaaaBaaaCaaaDaaaEaaaFaaaGaaaHaaaIaaa', 'JaaaKaaaLaaaMaaaNaaaOaaaPaaaQaaaRaaa']
+    S: build median 2.65 s; peak 69,103,604 B = 65.9 MiB  > 64 MiB; 38.4 B per character
+    C: build median 2.92 s; peak 55,427,504 B = 52.9 MiB; 30.8 B per character
+    S and C give equal indexes (all 12 fields): True
+
+  B4max: 10 distinct camel tokens per name, 500,000 distinct (all 456,976 4-letter + 43,024 5-letter)
+    50,000 names, 2,043,024 characters, ASCII True, 500,000 distinct tokens; load (3.43, 3.13, 2.69)
+    sha256 of the names joined by newline: afe7fad05aa652d882d30278315fb5832249cd42a9826c28e5798ea8fd36dfd0; names 0-1: ['DlbrJiokUdbyRkerNgqqEqfvIwirUldxZbftYela', 'DnnsHlesStraaPsfcVphyEgdwNusaVmymSeuiXubaa']
+    S: build median 2.72 s; peak 74,479,584 B = 71.0 MiB  > 64 MiB; 36.5 B per character
+    C: build median 3.21 s; peak 59,443,288 B = 56.7 MiB; 29.1 B per character
+    S and C give equal indexes (all 12 fields): True
+
+  NA2: non-ASCII, 12 distinct 2-letter CJK tokens per name, '0'-joined (600,000 distinct)
+    50,000 names, 1,750,000 characters, ASCII False, 600,001 distinct tokens; load (1.88, 2.71, 2.58)
+    sha256 of the names joined by newline: e935b7679a06df61a2a0de6e514538973a569eb3c1e0bad472e86631a0589078; names 0-1: ['亴傼0丽倭0儃伆0偽傘0侑仧0仃偉0儕佝0儙傌0偂候0偾偅0他侻0俋与', '乽儍0俿仲0偓佅0乇众0仲乧0俤低0傈亨0乣俪0倆两0儅傁0亄亦0傇佴']
+    S: build median 3.67 s; peak 132,086,496 B = 126.0 MiB  > 64 MiB; 75.5 B per character
+    C: build median 4.45 s; peak 129,525,144 B = 123.5 MiB  > 64 MiB; 74.0 B per character
+    S and C give equal indexes (all 12 fields): True
+
+  NA2h: the first 25,000 NA2 names
+    25,000 names, 875,000 characters, ASCII False, 300,001 distinct tokens; load (1.95, 2.6, 2.55)
+    sha256 of the names joined by newline: d056fec130014ba4ce086d7cc989849e3d63ad07476f58cf733757cf175c9803; names 0-1: ['亴傼0丽倭0儃伆0偽傘0侑仧0仃偉0儕佝0儙傌0偂候0偾偅0他侻0俋与', '乽儍0俿仲0偓佅0乇众0仲乧0俤低0傈亨0乣俪0倆两0儅傁0亄亦0傇佴']
+    S: build median 1.79 s; peak 67,007,296 B = 63.9 MiB; 76.6 B per character
+    C: build median 2.10 s; peak 64,619,700 B = 61.6 MiB; 73.9 B per character
+    S and C give equal indexes (all 12 fields): True
+
+load after = (1.95, 2.6, 2.55)
+probe exit 0

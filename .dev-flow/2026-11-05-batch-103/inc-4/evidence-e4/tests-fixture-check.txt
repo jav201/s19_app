@@ -1,0 +1,10 @@
+# fixture cross-check of tests/test_b103_label_match_perf.py builders vs evidence-e3/addenda-pset.txt
+2026-11-06T20:21:57-06:00
+/tmp/b103-e4-4-tests/stubtree/s19_app/__init__.py
+REF mine 6 file 6 equal: True
+REF6 mine 23 file 23 equal: True
+LONG mine 3 file 3 equal: True
+QSET 33: 33 shapes 5,6 vs file REF6 shapes: True True longest: True True
+longest REF name by independent count:
+27 103 True
+exit code: 0

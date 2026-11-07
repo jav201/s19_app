@@ -1,0 +1,46 @@
+runner sec-r2-run.sh sha256 01a6306bb691ca8ba9909f4f35ba0d442c21ea334e625d9331e6e9241c6bce63; probe sec-e5-probe.py sha256 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+s19_app.__file__ = /tmp/b103-e5-4-sec-r2/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5-4-sec-r2/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0
+tests module = /tmp/b103-e5-4-sec-r2/tree/tests/test_b103_label_match_perf.py
+mode = spans  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = 7308925488224809053
+host = cachyos-rtx  load = (3.28, 2.13, 1.84)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5-4-sec-r2/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5-4-sec-r2/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5-4-sec-r2/pilot
+hostile names 57; indexed 56 (duplicates and names over 1,024 characters left out)
+queries 3123 x 3 limits (86 s); listed entries 26401; exceptions 0; bad spans (empty, outside [0, len(name)), unsorted or touching) 0; rank != oracle 0; entries whose name is the input object 26401
+
+=== argument checks (I-3 pins the TypeError texts)
+  build_label_index(['a', None])                       -> TypeError: label names must be str, got NoneType
+  build_label_index(['a', b'b'])                       -> TypeError: label names must be str, got bytes
+  build_label_index([1])                               -> TypeError: label names must be str, got int
+  build_label_index(['a', ['x']])                      -> TypeError: label names must be str, got list
+  build_label_index('abc')                             -> TypeError: label names must be an iterable of str, got str
+  build_label_index(b'abc')                            -> TypeError: label names must be an iterable of str, got bytes
+  build_label_index(bytearray(b'ab'))                  -> TypeError: label names must be str, got int
+  build_label_index(None)  [not pinned]                -> TypeError: 'NoneType' object is not iterable
+  build_label_index(iter([]))                          -> returned 0
+  build_label_index([S('Sub_name')]) then rank('sub')  -> returned [('Sub_name', 'prefix', 0, ((0, 3),))]
+  rank(None, ix, 20)                                   -> TypeError: query must be str, got NoneType
+  rank(b'x', ix, 20)                                   -> TypeError: query must be str, got bytes
+  rank(None, ix, 'x')  [query checked first]           -> TypeError: query must be str, got NoneType
+  rank('x', ix, True)                                  -> TypeError: limit must be int, got bool
+  rank('x', ix, 2.0)                                   -> TypeError: limit must be int, got float
+  rank('x', ix, -5)                                    -> returned []
+  rank('x', ix, 0)                                     -> returned []
+  rank('x', ix, 10**30) -> count                       -> returned 23
+  rank(S(' VALUE '), ix, 3)                            -> returned [('VALUE_0001', 'prefix', 0, ((0, 5),)), ('Value_0001', 'prefix', 0, ((0, 5),)), ('value_0001', 'prefix', 0, (
+
+=== purity: private buffers and the argument list unchanged after rankings (E3S-07)
+  buffers sha256 before 03ae706220d8704f after 03ae706220d8704f equal True; argument list unchanged True
+
+=== huge lists (no count cap: cost linear in the list)
+  all of case_06: 220,040 names -> build 30.58 s under tracemalloc [ok], peak 34.2 MiB
+     worst REF6 query over all 220,040: 494.8 ms ('0')
+  1,000,000 short names: build 18.78 s [ok]; ru_maxrss now 558 MiB
+     rank 'n0000001'   median    418.5 ms [ok] n=1 bad spans 0
+     rank 'sig'        median   1959.6 ms [ok] n=20 bad spans 0
+     rank 'n000x001'   median    191.9 ms [ok] n=0 bad spans 0
+     rank 'zzz'        median    146.6 ms [ok] n=0 bad spans 0
+
+load after = (6.11, 3.39, 2.34)
+probe exit 0

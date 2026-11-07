@@ -1,0 +1,79 @@
+runner d3-run.sh sha256 3165c8cf50aa697565dfeaf500a9f4f54cdc5d65aa829b8301ce81a15a9da873; probe d3-probe.py sha256 99109d891ff4822da573e25c7aa780e37a8af6cee0075733a7ecd10944121b39
+s19_app.__file__ = /tmp/b103-e5d3-4/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5d3-4/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 8f396c15d3c848ceb2c98ab74c112150bf9c09759abb662ea0f2162d1ca7c94d
+tests module = /tmp/b103-e5d3-4/tree/tests/test_b103_label_match_perf.py
+mode = d3 ascii  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = 7521263855485181842
+host = cachyos-rtx  load = (2.01, 1.52, 1.97)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5d3-4/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5d3-4/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5d3-4/pilot
+probe = sec-r3-probe.py sha256 9cf292424ce8f1a335da4da39354d86b2b99bb480f5b41f0d387f608e52ceefa; round-1 helpers = sec-e5-probe.py sha256 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+_FUZZY_TOKEN_CAP = 20; _FUZZY_SWITCH_CAP = 512; T.ANY_QUERY_BOUND_S = 2.0; T.KEYSTROKE_BOUND_S = 0.2
+d3 probe = d3-probe.py sha256 99109d891ff4822da573e25c7aa780e37a8af6cee0075733a7ecd10944121b39; d3 pilot = d3-pilot.py sha256 825c53630deb68482d5b9f7ed8c77da5333e41947e3bc451c4560581b053a661; budget 400,000
+
+  [R-A2L-MATCH.43/1] ['VALUE' + U+007F], query 'value', limit 20
+    shipped  ['VALUE\x7f' . prefix . (0,5)]
+    .43      ['VALUE\x7f' . prefix . (0,5)]  (prepared names 1)
+
+  [R-A2L-MATCH.43/2] ['VALUE' + U+0080], query 'value', limit 20
+    shipped  ['VALUE\x80' . prefix . (0,5)]
+    .43      []  (prepared names 0)
+
+  [R-A2L-MATCH.43/3] NA, query 'max', limit 20
+    shipped  ['druck_max' . substring . (6,9); 'DR\xdcCK_MAX' . substring . (6,9); 'Dr\xfcck_Max' . substring . (6,9)]
+    .43      ['druck_max' . substring . (6,9)]  (prepared names 1)
+
+  [R-A2L-MATCH.4/1] NA, query 'dr\xfcck', limit 20
+    shipped  ['Dr\xfcck_Max' . prefix . (0,5); 'DR\xdcCK_MAX' . fuzzy . (0,5) . e1; 'druck_max' . fuzzy . (0,5) . e1]
+    .43      ['druck_max' . fuzzy . (0,5) . e1]  (prepared names 1)
+
+  [R-A2L-MATCH.4/2] NA, query 'DR\xdcCK', limit 20
+    shipped  ['DR\xdcCK_MAX' . prefix . (0,5); 'Dr\xfcck_Max' . fuzzy . (0,5) . e1; 'druck_max' . fuzzy . (0,5) . e1]
+    .43      ['druck_max' . fuzzy . (0,5) . e1]  (prepared names 1)
+
+  [R-A2L-MATCH.4/4 (new)] ['KEY'], query '\u212aey', limit 20
+    shipped  ['KEY' . fuzzy . (0,3) . e1]
+    .43      ['KEY' . fuzzy . (0,3) . e1]  (prepared names 1)
+
+  [R-A2L-MATCH.12/4 (old input)] ['٣٣٣_X'], query '\u0663\u0663\u0664', limit 20
+    shipped  ['\u0663\u0663\u0663_X' . fuzzy . (0,3) . e1]
+    .43      []  (prepared names 0)
+
+  [R-A2L-MATCH.12/4 (new input)] C08, query 'ma\u0663', limit 3
+    shipped  ['MAP_0001' . fuzzy . (0,3) . e1; 'MAP_0002' . fuzzy . (0,3) . e1; 'MAP_0003' . fuzzy . (0,3) . e1]
+    .43      ['MAP_0001' . fuzzy . (0,3) . e1; 'MAP_0002' . fuzzy . (0,3) . e1; 'MAP_0003' . fuzzy . (0,3) . e1]  (prepared names 462)
+
+  [R-A2L-MATCH.24/3 (old input)] NA, query 'dr\xfcck', limit 20
+    shipped  ['Dr\xfcck_Max' . prefix . (0,5); 'DR\xdcCK_MAX' . fuzzy . (0,5) . e1; 'druck_max' . fuzzy . (0,5) . e1]
+    .43      ['druck_max' . fuzzy . (0,5) . e1]  (prepared names 1)
+
+  [R-A2L-MATCH.24/3 (new input)] DR = ['druck_max', 'DRUCK_MAX'], query 'dr\xfcck', limit 20
+    shipped  ['DRUCK_MAX' . fuzzy . (0,5) . e1; 'druck_max' . fuzzy . (0,5) . e1]
+    .43      ['DRUCK_MAX' . fuzzy . (0,5) . e1; 'druck_max' . fuzzy . (0,5) . e1]  (prepared names 2)
+
+=== .4 negative controls on the piloted lists (the mutation applied to the query)
+  accent folding: 'drück' -> 'druck' over NA -> ['druck_max' . prefix . (0,5)]
+  str.lower: '\u212aey'.lower() = 'key' over ['KEY'] -> ['KEY' . exact . (0,3)]
+  str.lower on 'DRÜCK' -> 'dr\xfcck' over NA -> ['druck_max' . fuzzy . (0,5) . e1] (no difference: not a control)
+
+=== AST1 (E5S-11: 50,000 names of 20 distinct 1-character tokens above U+FFFF), tracemalloc peak of one preparation
+    50,000 names, 1,950,000 characters in all (.40 scope: 50,000 names, <= 2,356,624; .35/.37 scope: <= 2,062,041); all ASCII False; longest name 39
+    shipped: 50,000 names prepared, peak 218,155,000 B = 208.0 MiB  > 64 MiB (48.74 s [ok])
+    .43:     0 names prepared, peak 2,056 B = 0.002 MiB (0.00 s [ok])
+
+=== census: ASCII names only? (.43 leaves every name of these lists in)
+  REF    50,000 names; non-ASCII 0
+  REF6   50,000 names; non-ASCII 0
+  LONG   50,000 names; non-ASCII 0
+  C08       462 names; non-ASCII 0
+  BAL       111 names; non-ASCII 0
+  SRC        72 names; non-ASCII 0
+  SWB        67 names; non-ASCII 0
+  SWA    13,990 names; non-ASCII 0
+  CRAFT     300 names; non-ASCII 0
+  U6     50,000 names; non-ASCII 0
+  B4MAX  50,000 names; non-ASCII 0
+  W40    50,000 names; non-ASCII 0
+  SUBO   50,000 names; non-ASCII 0
+
+load after = (2.52, 1.78, 2.03)
+probe exit 0

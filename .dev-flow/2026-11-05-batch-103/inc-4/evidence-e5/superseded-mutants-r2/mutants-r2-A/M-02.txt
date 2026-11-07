@@ -1,0 +1,62 @@
+# M-02  row R-A2L-MATCH.2
+
+control: guard removed -> empty text is a prefix of all 462 names and `_` a substring of all
+edit: `_parse_query`: remove the no-letter/no-digit guard (`return None`)
+
+s19_app.__file__: /tmp/b103-e5-4-mutr2A/M-02/s19_app/__init__.py
+
+== diff ==
+--- /tmp/b103-e5-4-mutr2A/base/s19_app/tui/services/label_match.py	2026-11-06 22:11:34.000000000 -0600
++++ /tmp/b103-e5-4-mutr2A/M-02/s19_app/tui/services/label_match.py	2026-11-06 22:42:19.492377371 -0600
+@@ -875,8 +875,6 @@
+         if _is_word_char(ch):
+             has_alnum = True
+             break
+-    if not has_alnum:
+-        return None
+     text = _fold(stripped)
+     tokens = tuple(text[start:end] for start, end in _tokens(stripped))
+     keys = "".join(
+
+== pytest (returncode 1, KILLED) ==
+FFFF.                                                                    [100%]
+=================================== FAILURES ===================================
+_________________ test_ranked_list_is_exactly[R-A2L-MATCH.2/1] _________________
+tests/test_b103_label_match.py:391: in test_ranked_list_is_exactly
+    assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E   AssertionError: R-A2L-MATCH.2/1: query '' limit 20
+E   assert [('MAP_0001',...0, 0),)), ...] == []
+E     
+E     Left contains 20 more items, first extra item: ('MAP_0001', 'prefix', 0, ((0, 0),))
+E     Use -v to get more diff
+_________________ test_ranked_list_is_exactly[R-A2L-MATCH.2/2] _________________
+tests/test_b103_label_match.py:391: in test_ranked_list_is_exactly
+    assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E   AssertionError: R-A2L-MATCH.2/2: query '   ' limit 20
+E   assert [('MAP_0001',...0, 0),)), ...] == []
+E     
+E     Left contains 20 more items, first extra item: ('MAP_0001', 'prefix', 0, ((0, 0),))
+E     Use -v to get more diff
+_________________ test_ranked_list_is_exactly[R-A2L-MATCH.2/3] _________________
+tests/test_b103_label_match.py:391: in test_ranked_list_is_exactly
+    assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E   AssertionError: R-A2L-MATCH.2/3: query '\t\n' limit 20
+E   assert [('MAP_0001',...0, 0),)), ...] == []
+E     
+E     Left contains 20 more items, first extra item: ('MAP_0001', 'prefix', 0, ((0, 0),))
+E     Use -v to get more diff
+_________________ test_ranked_list_is_exactly[R-A2L-MATCH.2/4] _________________
+tests/test_b103_label_match.py:391: in test_ranked_list_is_exactly
+    assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E   AssertionError: R-A2L-MATCH.2/4: query '_' limit 20
+E   assert [('MAP_0001',...3, 4),)), ...] == []
+E     
+E     Left contains 20 more items, first extra item: ('MAP_0001', 'substring', 0, ((3, 4),))
+E     Use -v to get more diff
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.2/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.2/2]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.2/3]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.2/4]
+4 failed, 1 passed, 124 deselected in 5.12s
+

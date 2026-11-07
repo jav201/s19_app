@@ -1,0 +1,104 @@
+runner d3-run.sh sha256 3165c8cf50aa697565dfeaf500a9f4f54cdc5d65aa829b8301ce81a15a9da873; plugin d3_plugin.py sha256 bc7c49282dfbb680d7f987ebee684d7262c5168f3cfbba26b4477ba59a45e07e; D3_BUDGET=400000 D3_ASCII=1; load 3.47 2.96 2.48
+d3_plugin: s19_app.__file__ = /tmp/b103-e5d3-4/tree/s19_app/__init__.py; label_match sha256 8f396c15d3c848ceb2c98ab74c112150bf9c09759abb662ea0f2162d1ca7c94d; budget=400000 ascii_only=True
+...............                                                          [100%]
+============================= QC-TM timing margins =============================
+47.1%  0.106 s / 0.200 s  R-A2L-MATCH.36 REF6 '0'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+53.5%  0.930 s / 2.000 s  R-A2L-MATCH.40 SUBO 'aa'  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_substring_key_over_subo
+53.8%  0.925 s / 2.000 s  R-A2L-MATCH.40 SUBO 'aaaaaaaa'  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_substring_key_over_subo
+54.1%  0.918 s / 2.000 s  R-A2L-MATCH.40 SUBO 'aaa'  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_substring_key_over_subo
+57.9%  2.107 s / 5.000 s  R-A2L-MATCH.35 prepare REF  tests/test_b103_label_match_perf.py::test_r_a2l_match_35_1_preparing_50000_names
+64.3%  0.071 s / 0.200 s  R-A2L-MATCH.36 REF 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+65.1%  0.697 s / 2.000 s  R-A2L-MATCH.40 W40 64 a  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_one_token_walk_over_w40
+67.8%  0.645 s / 2.000 s  R-A2L-MATCH.40 W40 40 a  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_one_token_walk_over_w40
+67.9%  0.064 s / 0.200 s  R-A2L-MATCH.36 REF 'Ierxjr_Eud'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+68.6%  0.063 s / 0.200 s  R-A2L-MATCH.36 REF 'Nzukij'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+69.8%  0.060 s / 0.200 s  R-A2L-MATCH.36 REF 'xqzjvkw'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+71.3%  0.057 s / 0.200 s  R-A2L-MATCH.36 REF 'votklbi fjblnabj qghque pdjxmq tiprdynot'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+71.4%  0.057 s / 0.200 s  R-A2L-MATCH.36 REF 'njraipjtbtu lsuakcoj hsxgibymjxu orfltal'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+71.8%  0.056 s / 0.200 s  R-A2L-MATCH.36 REF 'e'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+72.3%  0.055 s / 0.200 s  R-A2L-MATCH.36 REF 'a'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+73.3%  0.053 s / 0.200 s  R-A2L-MATCH.36 REF 'lmmwngodou jadkvqy khbnukc qomfrybiza ev'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+73.4%  0.053 s / 0.200 s  R-A2L-MATCH.36 REF 'pposbxiif'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+73.7%  0.053 s / 0.200 s  R-A2L-MATCH.36 REF6 'chr 0'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+74.6%  0.051 s / 0.200 s  R-A2L-MATCH.36 REF6 'cr0'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+76.7%  0.047 s / 0.200 s  R-A2L-MATCH.36 REF6 'chr'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+76.7%  0.047 s / 0.200 s  R-A2L-MATCH.36 REF6 'mesa'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+76.8%  0.046 s / 0.200 s  R-A2L-MATCH.36 REF6 'cahr'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+81.6%  0.367 s / 2.000 s  R-A2L-MATCH.40/5 U6 FAMQ(20)  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_5_famq_over_u6_dense_list
+83.2%  0.034 s / 0.200 s  R-A2L-MATCH.36 REF6 'm'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+83.4%  0.033 s / 0.200 s  R-A2L-MATCH.36 REF6 'meas_'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+84.6%  0.307 s / 2.000 s  R-A2L-MATCH.40 D3 FAMQ(20)  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_famq_over_d3_densest_postings_list
+85.0%  0.030 s / 0.200 s  R-A2L-MATCH.36 REF6 'ch00'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+88.0%  0.024 s / 0.200 s  R-A2L-MATCH.36 REF 'qqqq zzzz'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+89.4%  0.021 s / 0.200 s  R-A2L-MATCH.36 REF6 'meas 1'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+89.5%  0.021 s / 0.200 s  R-A2L-MATCH.36 REF 'x y z w v u'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+89.5%  0.021 s / 0.200 s  R-A2L-MATCH.36 REF6 'c 0 1'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+89.8%  0.020 s / 0.200 s  R-A2L-MATCH.36 REF 'ledRing'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+90.0%  0.020 s / 0.200 s  R-A2L-MATCH.36 REF 'srqlLzL_'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+90.3%  0.194 s / 2.000 s  R-A2L-MATCH.40 D3 FAMQ(12)  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_famq_over_d3_densest_postings_list
+90.3%  0.194 s / 2.000 s  R-A2L-MATCH.40 E2 FAM6(12)  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_fam6_over_e2_two_edit_list
+90.5%  0.019 s / 0.200 s  R-A2L-MATCH.36 REF6 'char 1'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+91.3%  0.017 s / 0.200 s  R-A2L-MATCH.36 REF 'pposbxiifkdgfiajnbbpvb_dyan_xvz1'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+91.5%  0.017 s / 0.200 s  R-A2L-MATCH.36 REF 'temp_sensor_max'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+92.7%  0.015 s / 0.200 s  R-A2L-MATCH.36 REF 'JotafVod_msr'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+92.9%  0.014 s / 0.200 s  R-A2L-MATCH.36 REF '0 jotaf'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+94.1%  0.012 s / 0.200 s  R-A2L-MATCH.36 REF '0'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+94.2%  0.116 s / 2.000 s  R-A2L-MATCH.40/4 BAND head + 249-character token  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_4_prefix_distance_band_after_the_switch
+94.7%  0.011 s / 0.200 s  R-A2L-MATCH.36 REF 'a b c d e f g h i j k l m n o p q r s t '  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+94.9%  0.010 s / 0.200 s  R-A2L-MATCH.36 REF 'JotafVod_msrqlLzL_kh2C_rWl_pfue._0_'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+94.9%  0.101 s / 2.000 s  R-A2L-MATCH.40/3 CRAFT 20 tokens  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_3_crafted_stress_list
+95.2%  0.010 s / 0.200 s  R-A2L-MATCH.36 REF 'e e e'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+95.4%  0.092 s / 2.000 s  R-A2L-MATCH.40 E2 FAM6(4)  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_fam6_over_e2_two_edit_list
+95.6%  0.009 s / 0.200 s  R-A2L-MATCH.36 REF 'e e e e e e e e e e e e e e e e e e e e '  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+96.0%  0.081 s / 2.000 s  R-A2L-MATCH.40 D3 FAMQ(4)  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_famq_over_d3_densest_postings_list
+96.1%  0.078 s / 2.000 s  R-A2L-MATCH.40 REF6 0 x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+96.2%  0.008 s / 0.200 s  R-A2L-MATCH.36 REF 'HRR_WOL.TNY_U_ZmyrXSZTPeyoMsdpWwbcUtd_Dw'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+96.2%  0.076 s / 2.000 s  R-A2L-MATCH.40 REF6 E3S-01 0 x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+96.5%  0.007 s / 0.200 s  R-A2L-MATCH.36 REF 'FCA_NPUK_SMM.RWG_TjsPHIoim_SNX_TVC_2_ewh'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+96.5%  0.007 s / 0.200 s  R-A2L-MATCH.36 REF 'RUX_ARV_LFS_QM_GJWTDMS_WDGTH.Fgathduhjd,'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+96.6%  0.007 s / 0.200 s  R-A2L-MATCH.36 REF 'RHR_WOL.TNY_U_ZmyrXSZTPeyoMsdpWwbcUtd_Dw'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+96.9%  0.006 s / 0.200 s  R-A2L-MATCH.36 REF 'aaaa'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+96.9%  0.063 s / 2.000 s  R-A2L-MATCH.40 REF6 00 x85  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+97.0%  0.006 s / 0.200 s  R-A2L-MATCH.36 REF 'ab'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+97.0%  0.060 s / 2.000 s  R-A2L-MATCH.40 LONG a x255 + b  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_2_long_queries_against_1020_character_tokens
+97.0%  0.060 s / 2.000 s  R-A2L-MATCH.40 LONG a x254 + bb  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_2_long_queries_against_1020_character_tokens
+97.3%  0.054 s / 2.000 s  R-A2L-MATCH.40 LONG a x128 + b  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_2_long_queries_against_1020_character_tokens
+97.4%  0.005 s / 0.200 s  R-A2L-MATCH.36 REF 'zz'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+97.6%  0.005 s / 0.200 s  R-A2L-MATCH.36 REF '0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 '  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+97.6%  0.047 s / 2.000 s  R-A2L-MATCH.40 REF6 0 x125 + chax  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+97.6%  0.047 s / 2.000 s  R-A2L-MATCH.40 REF6 mesa x52  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+97.7%  0.045 s / 2.000 s  R-A2L-MATCH.40 REF6 chr x64  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+97.7%  0.045 s / 2.000 s  R-A2L-MATCH.40 REF6 cahr x51  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+97.7%  0.046 s / 2.000 s  R-A2L-MATCH.40 REF6 c x125 + chax  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+97.7%  0.047 s / 2.000 s  R-A2L-MATCH.40 REF6 chax x52  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+98.0%  0.004 s / 0.200 s  R-A2L-MATCH.36 REF 'JVmL'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+98.0%  0.039 s / 2.000 s  R-A2L-MATCH.40 REF6 1 x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+98.3%  0.035 s / 2.000 s  R-A2L-MATCH.40 REF6 c 0 x64  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+98.3%  0.034 s / 2.000 s  R-A2L-MATCH.40 REF6 c x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+98.3%  0.034 s / 2.000 s  R-A2L-MATCH.40 REF6 m x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+98.5%  0.003 s / 0.200 s  R-A2L-MATCH.36 REF 'cnt'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+98.5%  0.030 s / 2.000 s  R-A2L-MATCH.40/3 CRAFT 4 tokens  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_3_crafted_stress_list
+99.0%  0.021 s / 2.000 s  R-A2L-MATCH.40 REF6 E3S-01 a x256  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+99.3%  0.014 s / 2.000 s  R-A2L-MATCH.40 REF6 E3S-01 e x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+99.6%  0.008 s / 2.000 s  R-A2L-MATCH.40 REF qzx x64  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+99.6%  0.008 s / 2.000 s  R-A2L-MATCH.40 REF cnt x64  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+99.6%  0.008 s / 2.000 s  R-A2L-MATCH.40 REF rat x64  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+99.6%  0.007 s / 2.000 s  R-A2L-MATCH.40/5 U6 FAMQ(76)  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_5_famq_over_u6_dense_list
+99.7%  0.007 s / 2.000 s  R-A2L-MATCH.40 REF qza..qzz x3  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+99.7%  0.007 s / 2.000 s  R-A2L-MATCH.40 REF 1a x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+99.7%  0.007 s / 2.000 s  R-A2L-MATCH.40 REF e x120 + rat  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+99.7%  0.007 s / 2.000 s  R-A2L-MATCH.40 REF6 near tokens  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+99.7%  0.007 s / 2.000 s  R-A2L-MATCH.40 REF6 cha..chz x3  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+99.7%  0.007 s / 2.000 s  R-A2L-MATCH.40 REF6 51 typos of char  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+99.7%  0.006 s / 2.000 s  R-A2L-MATCH.40 REF6 E3S-01 a..z  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+99.7%  0.006 s / 2.000 s  R-A2L-MATCH.40 REF6 E3S-01 pool join  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+99.7%  0.006 s / 2.000 s  R-A2L-MATCH.40 REF6 E3S-01 pool[200:] join  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+99.7%  0.006 s / 2.000 s  R-A2L-MATCH.40 REF6 E3S-01 longest REF name  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+99.7%  0.006 s / 2.000 s  R-A2L-MATCH.40 REF6 E3S-01 longest swapped  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+99.7%  0.007 s / 2.000 s  R-A2L-MATCH.40/3 CRAFT 51 tokens  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_3_crafted_stress_list
+99.7%  0.007 s / 2.000 s  R-A2L-MATCH.40 D3 FAMQ(76)  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_famq_over_d3_densest_postings_list
+99.7%  0.005 s / 2.000 s  R-A2L-MATCH.40 E2 FAM6(24)  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_fam6_over_e2_two_edit_list
+99.7%  0.006 s / 2.000 s  R-A2L-MATCH.40 E2 FAM6(36)  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_fam6_over_e2_two_edit_list
+QC-TM: 97 bounds, 0 under 20 % margin
+15 passed in 147.71s (0:02:27)
+pytest exit 0; load 2.43 2.97 2.57

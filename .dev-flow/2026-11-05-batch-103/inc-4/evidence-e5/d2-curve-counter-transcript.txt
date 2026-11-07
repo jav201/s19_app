@@ -1,0 +1,131 @@
+runner d2-run.sh sha256 94e6d48eb8c2d94620ad6b3db9d0f17471ad14f3e16c44b00d9babce4534ccba; probe d2-probe.py sha256 404d4e5bf28f25e78e035a91526e5b932a7f6bb97cae6f6dfb3ee24719119add; sec-r2-probe.py ecda78d650657c1f9395592572e8091e60432d4e8328363807afa8eb2c772233; sec-e5-probe.py 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+s19_app.__file__ = /tmp/b103-e5d2-4/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5d2-4/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0
+tests module = /tmp/b103-e5d2-4/tree/tests/test_b103_label_match_perf.py
+mode = d2 curve totals=counter lists=U1,U6,S1,E2,M1,D3,SWC,X40,CRAFT,SEQ  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = 5284561843935062555
+host = cachyos-rtx  load = (7.95, 4.94, 2.95)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5d2-4/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5d2-4/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5d2-4/pilot
+per query: P = pilot uncapped (range tables, cap off); F = pilot with the fuzzy tier left out (cap 0); S = shipped rank (dict tables), run only where cheap; medians of 3, limit 20
+
+=== CRAFT: 50,000 names, 2,356,624 characters in all (.40 scope: 50,000 names, <= 2,356,624); 139,856 distinct tokens, 543,123 postings; built in 2.49 s; load (7.87, 5.03, 3.0)
+  n=  4  P     31.6 ms [ok]  F      9.2 ms [ok]  S     30.9 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  CRAFT 4 tokens
+  n=  6  P     41.9 ms [ok]  F      9.0 ms [ok]  S     40.3 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  CRAFT 6 tokens
+  n=  8  P     50.1 ms [ok]  F      9.4 ms [ok]  S     49.2 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  CRAFT 8 tokens
+  n= 10  P     58.5 ms [ok]  F      8.3 ms [ok]  S     57.4 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  CRAFT 10 tokens
+  n= 12  P     67.8 ms [ok]  F      7.8 ms [ok]  S     68.2 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  CRAFT 12 tokens
+  n= 16  P     89.6 ms [ok]  F      7.7 ms [ok]  S     83.7 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  CRAFT 16 tokens
+  n= 32  P    160.9 ms [ok]  F      7.9 ms [ok]  S    156.8 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  CRAFT 32 tokens
+  n= 51  P    255.8 ms [ok]  F      8.0 ms [ok]  S    238.1 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  CRAFT 51 tokens
+
+=== U1: 50,000 names, 300,000 characters in all (.40 scope: 50,000 names, <= 2,356,624); 50,000 distinct tokens, 50,000 postings; built in 0.34 s; load (7.88, 5.08, 3.03)
+  n=  4  P    110.5 ms [ok]  F      6.1 ms [ok]  S    169.1 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 4
+  n=  6  P    165.6 ms [ok]  F      6.3 ms [ok]  S    278.7 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 6
+  n=  8  P    222.5 ms [ok]  F      6.3 ms [ok]  S    336.0 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 8
+  n= 10  P    193.4 ms [ok]  F      6.2 ms [ok]  S    350.6 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 10
+  n= 12  P    185.2 ms [ok]  F      5.4 ms [ok]  S    341.3 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 12
+  n= 16  P    224.5 ms [ok]  F      5.5 ms [ok]  S    443.1 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 16
+  n= 24  P    338.6 ms [ok]  F      6.1 ms [ok]  S      nan ms [skipped]  P==S n/a  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 24
+  n= 32  P    413.8 ms [ok]  F      6.1 ms [ok]  S      nan ms [skipped]  P==S n/a  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 32
+  n= 52  P    657.5 ms [ok]  F      6.2 ms [ok]  S      nan ms [skipped]  P==S n/a  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 52
+  n= 76  P    904.6 ms [ok]  F      5.7 ms [ok]  S      nan ms [skipped]  P==S n/a  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 76
+
+=== U6: 50,000 names, 2,050,000 characters in all (.40 scope: 50,000 names, <= 2,356,624); 300,000 distinct tokens, 300,000 postings; built in 1.95 s; load (6.45, 4.97, 3.05)
+  n=  4  P    108.9 ms [ok]  F      7.5 ms [ok]  S    450.5 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 4
+  n=  6  P    134.0 ms [ok]  F      7.8 ms [ok]  S    655.6 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 6
+  n=  8  P    165.4 ms [ok]  F      7.9 ms [ok]  S    799.0 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 8
+  n= 10  P    203.0 ms [ok]  F      8.2 ms [ok]  S    975.5 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 10
+  n= 12  P    236.9 ms [ok]  F      8.6 ms [ok]  S   1222.2 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 12
+  n= 16  P    330.7 ms [ok]  F      7.3 ms [ok]  S   1709.3 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 16
+  n= 24  P    499.3 ms [ok]  F      7.4 ms [ok]  S      nan ms [skipped]  P==S n/a  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 24
+  n= 32  P    660.2 ms [ok]  F      7.2 ms [ok]  S      nan ms [skipped]  P==S n/a  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 32
+  n= 52  P    991.5 ms [ok]  F      7.2 ms [ok]  S      nan ms [skipped]  P==S n/a  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 52
+  n= 76  P   1292.1 ms [ok]  F      6.8 ms [ok]  S      nan ms [skipped]  P==S n/a  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 76
+
+=== S1: 50,000 names, 388,890 characters in all (.40 scope: 50,000 names, <= 2,356,624); 50,001 distinct tokens, 100,000 postings; built in 0.42 s; load (4.92, 4.75, 3.05)
+  n=  4  P     65.9 ms [ok]  F      8.9 ms [ok]  S     55.6 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 4
+  n=  6  P     80.0 ms [ok]  F      8.5 ms [ok]  S     69.7 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 6
+  n=  8  P     90.3 ms [ok]  F      8.5 ms [ok]  S     86.8 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 8
+  n= 10  P    107.1 ms [ok]  F      9.0 ms [ok]  S    101.4 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 10
+  n= 12  P    117.3 ms [ok]  F      8.9 ms [ok]  S    116.7 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 12
+  n= 16  P    145.3 ms [ok]  F      9.0 ms [ok]  S    147.0 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 16
+  n= 24  P    197.6 ms [ok]  F      8.8 ms [ok]  S      nan ms [skipped]  P==S n/a  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 24
+  n= 32  P    253.0 ms [ok]  F      8.7 ms [ok]  S      nan ms [skipped]  P==S n/a  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 32
+  n= 52  P    379.2 ms [ok]  F      8.7 ms [ok]  S      nan ms [skipped]  P==S n/a  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 52
+  n= 76  P    550.2 ms [ok]  F      8.9 ms [ok]  S      nan ms [skipped]  P==S n/a  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 76
+
+=== E2: 50,000 names, 400,000 characters in all (.40 scope: 50,000 names, <= 2,356,624); 50,000 distinct tokens, 50,000 postings; built in 0.40 s; load (4.63, 4.69, 3.05)
+  n=  4  P    114.8 ms [ok]  F      7.5 ms [ok]  S    156.6 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAM6 4
+  n=  6  P    122.8 ms [ok]  F      7.2 ms [ok]  S    195.6 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAM6 6
+  n=  8  P    149.6 ms [ok]  F      7.1 ms [ok]  S    259.3 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAM6 8
+  n= 10  P    176.3 ms [ok]  F      7.2 ms [ok]  S    310.9 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAM6 10
+  n= 12  P    224.3 ms [ok]  F      7.5 ms [ok]  S    408.1 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAM6 12
+  n= 24  P    396.5 ms [ok]  F      7.3 ms [ok]  S      nan ms [skipped]  P==S n/a  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAM6 24
+  n= 36  P    577.2 ms [ok]  F      7.5 ms [ok]  S      nan ms [skipped]  P==S n/a  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAM6 36
+
+=== M1: 50,000 names, 1,166,622 characters in all (.40 scope: 50,000 names, <= 2,356,624); 102,256 distinct tokens, 251,372 postings; built in 1.20 s; load (4.38, 4.64, 3.05)
+  n=  4  P     59.2 ms [ok]  F     11.4 ms [ok]  S     84.3 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 4
+  n=  6  P     79.5 ms [ok]  F      9.9 ms [ok]  S    124.9 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 6
+  n=  8  P    110.0 ms [ok]  F      9.4 ms [ok]  S    160.3 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 8
+  n= 10  P    117.0 ms [ok]  F      8.9 ms [ok]  S    194.4 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 10
+  n= 12  P    134.3 ms [ok]  F      7.9 ms [ok]  S    209.0 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 12
+  n= 16  P    164.3 ms [ok]  F      8.1 ms [ok]  S    292.8 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 16
+  n= 24  P    239.1 ms [ok]  F      7.9 ms [ok]  S      nan ms [skipped]  P==S n/a  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 24
+  n= 32  P    328.7 ms [ok]  F      6.9 ms [ok]  S      nan ms [skipped]  P==S n/a  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 32
+  n= 52  P    463.3 ms [ok]  F      7.9 ms [ok]  S      nan ms [skipped]  P==S n/a  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 52
+  n= 76  P    644.6 ms [ok]  F      8.0 ms [ok]  S      nan ms [skipped]  P==S n/a  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 76
+
+=== D3: 50,000 names, 2,286,890 characters in all (.40 scope: 50,000 names, <= 2,356,624); 37,026 distinct tokens, 748,000 postings; built in 2.14 s; load (4.07, 4.56, 3.04)
+  n=  4  P     87.1 ms [ok]  F      8.0 ms [ok]  S     78.7 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 4
+  n=  6  P    119.8 ms [ok]  F      8.5 ms [ok]  S    110.3 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 6
+  n=  8  P    153.7 ms [ok]  F      8.2 ms [ok]  S    142.5 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 8
+  n= 10  P    188.6 ms [ok]  F      8.7 ms [ok]  S    173.1 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 10
+  n= 12  P    237.9 ms [ok]  F      8.5 ms [ok]  S    206.0 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 12
+  n= 16  P    284.8 ms [ok]  F      8.7 ms [ok]  S    268.2 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 16
+  n= 24  P    415.1 ms [ok]  F      9.2 ms [ok]  S      nan ms [skipped]  P==S n/a  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 24
+  n= 32  P    543.4 ms [ok]  F      7.9 ms [ok]  S      nan ms [skipped]  P==S n/a  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 32
+  n= 52  P    868.4 ms [ok]  F      8.1 ms [ok]  S      nan ms [skipped]  P==S n/a  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 52
+  n= 76  P   1272.4 ms [ok]  F      8.0 ms [ok]  S      nan ms [skipped]  P==S n/a  F==S-without-fuzzy True  listed 20 ['fuzzy']  FAMQ 76
+
+=== SWC: 50,000 names, 301,206 characters in all (.40 scope: 50,000 names, <= 2,356,624); 50,002 distinct tokens, 50,004 postings; built in 0.32 s; load (3.76, 4.46, 3.04)
+  n=  4  P     17.6 ms [ok]  F      9.7 ms [ok]  S     65.0 ms [ok]  P==S True  F==S-without-fuzzy True  listed 2 ['fuzzy']  head + FAM3 3
+  n=  6  P     22.8 ms [ok]  F      8.8 ms [ok]  S    103.5 ms [ok]  P==S True  F==S-without-fuzzy True  listed 2 ['fuzzy']  head + FAM3 5
+  n=  8  P     27.6 ms [ok]  F      8.6 ms [ok]  S    139.5 ms [ok]  P==S True  F==S-without-fuzzy True  listed 2 ['fuzzy']  head + FAM3 7
+  n= 10  P     45.8 ms [ok]  F      9.0 ms [ok]  S    184.0 ms [ok]  P==S True  F==S-without-fuzzy True  listed 2 ['fuzzy']  head + FAM3 9
+  n= 12  P     42.9 ms [ok]  F      8.3 ms [ok]  S    213.1 ms [ok]  P==S True  F==S-without-fuzzy True  listed 2 ['fuzzy']  head + FAM3 11
+  n= 16  P     47.5 ms [ok]  F      8.8 ms [ok]  S    286.5 ms [ok]  P==S True  F==S-without-fuzzy True  listed 2 ['fuzzy']  head + FAM3 15
+  n= 24  P     65.9 ms [ok]  F      8.7 ms [ok]  S      nan ms [skipped]  P==S n/a  F==S-without-fuzzy True  listed 2 ['fuzzy']  head + FAM3 23
+  n= 32  P     82.3 ms [ok]  F      8.8 ms [ok]  S      nan ms [skipped]  P==S n/a  F==S-without-fuzzy True  listed 2 ['fuzzy']  head + FAM3 31
+  n= 52  P    123.1 ms [ok]  F      8.7 ms [ok]  S      nan ms [skipped]  P==S n/a  F==S-without-fuzzy True  listed 2 ['fuzzy']  head + FAM3 51
+  n= 76  P    181.9 ms [ok]  F      8.9 ms [ok]  S      nan ms [skipped]  P==S n/a  F==S-without-fuzzy True  listed 2 ['fuzzy']  head + FAM3 75
+
+=== X40: 50,000 names, 2,101,369 characters in all (.40 scope: 50,000 names, <= 2,356,624); 77,264 distinct tokens, 465,344 postings; built in 1.86 s; load (3.64, 4.41, 3.04)
+  n=  4  P     26.7 ms [ok]  F     22.9 ms [ok]  S     29.3 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  head + FAM3 3
+         limit 40: P     40.7 ms [ok] listed 40
+  n=  6  P     31.2 ms [ok]  F      8.2 ms [ok]  S     37.0 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  head + FAM3 5
+         limit 40: P     47.2 ms [ok] listed 40
+  n=  8  P     38.7 ms [ok]  F      8.3 ms [ok]  S     44.0 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  head + FAM3 7
+         limit 40: P     53.0 ms [ok] listed 40
+  n= 10  P     44.9 ms [ok]  F      8.4 ms [ok]  S     52.4 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  head + FAM3 9
+         limit 40: P     56.6 ms [ok] listed 40
+  n= 12  P     51.1 ms [ok]  F      8.3 ms [ok]  S     60.5 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  head + FAM3 11
+         limit 40: P     65.5 ms [ok] listed 40
+  n= 16  P     62.6 ms [ok]  F      7.7 ms [ok]  S     76.2 ms [ok]  P==S True  F==S-without-fuzzy True  listed 20 ['fuzzy']  head + FAM3 15
+         limit 40: P     77.9 ms [ok] listed 40
+  n= 24  P     87.9 ms [ok]  F      7.4 ms [ok]  S      nan ms [skipped]  P==S n/a  F==S-without-fuzzy True  listed 20 ['fuzzy']  head + FAM3 23
+         limit 40: P    102.3 ms [ok] listed 40
+  n= 32  P    111.4 ms [ok]  F      6.8 ms [ok]  S      nan ms [skipped]  P==S n/a  F==S-without-fuzzy True  listed 20 ['fuzzy']  head + FAM3 31
+         limit 40: P    121.6 ms [ok] listed 40
+  n= 52  P    173.3 ms [ok]  F      7.6 ms [ok]  S      nan ms [skipped]  P==S n/a  F==S-without-fuzzy True  listed 20 ['fuzzy']  head + FAM3 51
+         limit 40: P    185.1 ms [ok] listed 40
+  n= 76  P    255.2 ms [ok]  F      7.8 ms [ok]  S      nan ms [skipped]  P==S n/a  F==S-without-fuzzy True  listed 20 ['fuzzy']  head + FAM3 75
+         limit 40: P    259.5 ms [ok] listed 40
+
+=== SEQ: 50,000 names, 2,346,100 characters in all (.40 scope: 50,000 names, <= 2,356,624); 50,001 distinct tokens, 92,100 postings; built in 1.66 s; load (3.7, 4.39, 3.05)
+  n=  1  P    214.9 ms [ok]  F    212.9 ms [ok]  S    214.8 ms [ok]  P==S True  F==S-without-fuzzy True  listed 0 -  SEQ reviewer 255
+  n=  1  P    110.9 ms [ok]  F    109.5 ms [ok]  S    110.8 ms [ok]  P==S True  F==S-without-fuzzy True  listed 0 -  SEQ reviewer 125
+  n= 51  P    153.7 ms [ok]  F    152.9 ms [ok]  S    155.7 ms [ok]  P==S True  F==S-without-fuzzy True  listed 0 -  SEQ {a,b} words
+
+mismatches (P != S where S ran, or F != S-without-fuzzy): 0
+load after = (3.73, 4.39, 3.06)
+probe exit 0

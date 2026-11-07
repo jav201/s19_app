@@ -1,0 +1,24 @@
+=== DIFF base -> M-13 (s19_app/tui/services/label_match.py) ===
+diff --git a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py b/M-13/s19_app/tui/services/label_match.py
+index d274de0..5b91f86 100644
+--- a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py
++++ b/M-13/s19_app/tui/services/label_match.py
+@@ -577,7 +577,7 @@ def _allowed_edits(token: str) -> int:
+         return 0
+     if n <= 5:
+         return 1
+-    return 2
++    return 1
+ 
+ 
+ def _prefix_distance(query_token: str, name_token: str, cap: int) -> int:
+
+=== PYTEST (tail) ===
+F.F.                                                                     [100%]
+=================================== FAILURES ===================================
+/tmp/b103-e5-4-mutA/M-13/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.13/1: query 'valuexx_0001' limit 20
+/tmp/b103-e5-4-mutA/M-13/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.13/3: query 'curvee' limit 20
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.13/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.13/3]
+2 failed, 2 passed, 125 deselected in 5.21s

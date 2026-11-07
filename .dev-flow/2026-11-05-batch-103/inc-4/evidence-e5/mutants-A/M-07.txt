@@ -1,0 +1,44 @@
+=== DIFF base -> M-07 (s19_app/tui/services/label_match.py) ===
+diff --git a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py b/M-07/s19_app/tui/services/label_match.py
+index d274de0..de984cc 100644
+--- a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py
++++ b/M-07/s19_app/tui/services/label_match.py
+@@ -18,6 +18,7 @@ to share with a worker thread. Deterministic: no ``hash()``-dependent order.
+ 
+ from __future__ import annotations
+ 
++import re
+ from array import array
+ from bisect import bisect_left
+ from dataclasses import dataclass
+@@ -286,7 +287,7 @@ def rank(query: str, index: LabelIndex, limit: int) -> list[LabelMatch]:
+     subs: list[int] = []
+     for i in range(count):
+         name_folded = folded[i]
+-        if text in name_folded:
++        if re.search(text, name_folded):
+             if name_folded.startswith(text):
+                 (exact if len(name_folded) == text_len else prefix).append(i)
+             else:
+@@ -785,7 +786,8 @@ def _classify(query: _Query, name: str) -> tuple[MatchRule, int, tuple[tuple[int
+         return (MatchRule.EXACT, 0, ((0, len(name)),))
+     if folded.startswith(text):
+         return (MatchRule.PREFIX, 0, ((0, text_len),))
+-    p = folded.find(text)
++    m = re.search(text, folded)
++    p = m.start() if m else -1
+     if p >= 0:
+         key = 1
+         span = (p, p + text_len)
+
+=== PYTEST (tail) ===
+.FFF                                                                     [100%]
+=================================== FAILURES ===================================
+/tmp/b103-e5-4-mutA/M-07/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.7/2: query 'knife[1]' limit 20
+/tmp/b103-e5-4-mutA/M-07/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.7/3: query '[0].Spoon' limit 20
+/tmp/b103-e5-4-mutA/M-07/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.7/4: query 'ledRing[1]' limit 4
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.7/2]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.7/3]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.7/4]
+3 failed, 1 passed, 125 deselected in 5.40s

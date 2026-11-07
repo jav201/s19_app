@@ -1,0 +1,26 @@
+=== DIFF base -> M-05 (s19_app/tui/services/label_match.py) ===
+diff --git a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py b/M-05/s19_app/tui/services/label_match.py
+index d274de0..628bb5d 100644
+--- a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py
++++ b/M-05/s19_app/tui/services/label_match.py
+@@ -781,8 +781,6 @@ def _classify(query: _Query, name: str) -> tuple[MatchRule, int, tuple[tuple[int
+     folded = _fold(name)
+     text = query.text
+     text_len = len(text)
+-    if folded == text:
+-        return (MatchRule.EXACT, 0, ((0, len(name)),))
+     if folded.startswith(text):
+         return (MatchRule.PREFIX, 0, ((0, text_len),))
+     p = folded.find(text)
+
+=== PYTEST (tail) ===
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+/tmp/b103-e5-4-mutA/M-05/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.5/1: query 'VALUE_0001' limit 20
+/tmp/b103-e5-4-mutA/M-05/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.5/2: query 'map_0020' limit 20
+/tmp/b103-e5-4-mutA/M-05/tests/test_b103_label_match.py:403: assert False
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.5/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.5/2]
+FAILED tests/test_b103_label_match.py::test_rows_5_3_three_exact_matches_are_all_listed
+3 failed, 126 deselected in 5.34s

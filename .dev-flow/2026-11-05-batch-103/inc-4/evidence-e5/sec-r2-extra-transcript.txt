@@ -1,0 +1,25 @@
+runner sec-r2-run.sh sha256 01a6306bb691ca8ba9909f4f35ba0d442c21ea334e625d9331e6e9241c6bce63; probe sec-r2-probe.py sha256 ecda78d650657c1f9395592572e8091e60432d4e8328363807afa8eb2c772233
+s19_app.__file__ = /tmp/b103-e5-4-sec-r2/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5-4-sec-r2/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0
+tests module = /tmp/b103-e5-4-sec-r2/tree/tests/test_b103_label_match_perf.py
+mode = r2 extra  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = -6411133711778748898
+host = cachyos-rtx  load = (2.74, 3.26, 2.71)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5-4-sec-r2/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5-4-sec-r2/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5-4-sec-r2/pilot
+probe = sec-r2-probe.py sha256 ecda78d650657c1f9395592572e8091e60432d4e8328363807afa8eb2c772233; round-1 helpers = sec-e5-probe.py sha256 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+_FUZZY_SWITCH_CAP = 512
+=== _classify cost per listed FUZZY name (limit x distinct tokens x name tokens): 40 names head + 'Ab' x 507 + tag (1,023 chars, 509 tokens; mode switch's 'Ab' x 508 made 1,025-char names, left out by .39) among REF
+      311.2 ms [ok] median of 7; chars 232, tokens  76 (distinct  76); listed 20 ['fuzzy'] edits [75]; bad spans 0  40 x 509-token names: head + 74 distinct 3-letter tokens
+      walks 76, _prefix_distance 0, _classify 20; same list on {'map-only': True}
+      limit 20: 312.2 ms [ok] listed 20; _classify cumulative 337.3 ms under cProfile
+      limit 40: 388.8 ms [ok] listed 40; _classify cumulative 672.1 ms under cProfile
+
+=== memory of one fuzzy tier: shipped dict tables (kept to step 6) vs range tables
+  U1: 76 tokens: ranges peak    18.63 MiB (4.0 s [ok] under tracemalloc)
+  U1: 76 tokens: shipped _fuzzy_tier peak   320.54 MiB (6.4 s [ok] under tracemalloc)
+  U6: 32 tokens: ranges peak    19.31 MiB (7.5 s [ok] under tracemalloc)
+  U6: 32 tokens: shipped _fuzzy_tier peak   627.88 MiB (13.3 s [ok] under tracemalloc)
+  U6: 76 tokens: ranges peak    19.31 MiB (17.7 s [ok] under tracemalloc)
+
+load after = (3.19, 3.3, 2.77)
+probe exit 0

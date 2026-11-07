@@ -1,0 +1,99 @@
+runner sec-r4-run.sh sha256 7225a0c07c03fcc70fc7b999ce05a020dd89112bd40d37d6b63c27d49d485517; probe sec-r4-probe.py sha256 3cbaf0fb141a1399f27057356ea7a022104e0dac6b150483dce2590696af7bbf
+s19_app.__file__ = /tmp/b103-e5r4-4-sec/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5r4-4-sec/tree/s19_app/tui/services/label_match.py
+label_match sha256 = b97d19ebfe11dd47f096ded2ae6d7dd5f12f6fa02c42d8b9d5f782056bd79ecc
+tests module = /tmp/b103-e5r4-4-sec/tree/tests/test_b103_label_match_perf.py
+mode = r4 cheap  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = 4731927428611368944
+host = cachyos-rtx  load = (2.84, 2.91, 2.55)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5r4-4-sec/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5r4-4-sec/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5r4-4-sec/pilot
+probe = sec-r4-probe.py sha256 3cbaf0fb141a1399f27057356ea7a022104e0dac6b150483dce2590696af7bbf; sec-r3-probe.py sha256 9cf292424ce8f1a335da4da39354d86b2b99bb480f5b41f0d387f608e52ceefa; sec-e5-probe.py sha256 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+_FUZZY_NODE_BUDGET = 400,000; _FUZZY_TOKEN_CAP = 20; _FUZZY_SWITCH_CAP = 512; _TRIE_PREFIX = 258; T.ANY_QUERY_BOUND_S = 2.0; T.KEYSTROKE_BOUND_S = 0.2
+Shapes that make the exact / prefix / substring / token / subsequence tiers (and the fuzzy postings work) dear.
+
+=== SUBO (subo_names(), the row's list)
+    50,000 names, 2,334,000 characters in all (.40 scope: 50,000 names, <= 2,356,624); all ASCII True; longest name 1023
+    build 1.59 s [ok]; 50,000 prepared names; 50,002 distinct tokens; 57,803 trie nodes; 100,000 postings; load (2.84, 2.91, 2.55)
+       964.1 ms [ok] median of 5; chars   1, tokens   1 (distinct   1); listed 20 ['substring'] edits [0]; bad spans 0  (2.07x under 2.0 s)  'a'
+        walks 0 (0 walked, allowed>0), visits 0 (budget 400,000 reached: False; -; walks 0 ms); tiers ms [text 932, token 0, fuzzy 0, subsequence 0, cut 12] of 944 ms; instrumented list == shipped True
+        one ranking under tracemalloc: peak 0.45 MiB [ok]
+       954.0 ms [ok] median of 5; chars   2, tokens   1 (distinct   1); listed 20 ['substring'] edits [0]; bad spans 0  (2.10x under 2.0 s)  'aa'
+        walks 0 (0 walked, allowed>0), visits 0 (budget 400,000 reached: False; -; walks 0 ms); tiers ms [text 930, token 0, fuzzy 0, subsequence 0, cut 12] of 942 ms; instrumented list == shipped True
+        one ranking under tracemalloc: peak 0.45 MiB [ok]
+
+=== SUBU (round 3): 'X' + 'A' * 40 + 'Q' + 5-letter tag
+    50,000 names, 2,350,000 characters in all (.40 scope: 50,000 names, <= 2,356,624); all ASCII True; longest name 47
+    build 2.05 s [ok]; 50,000 prepared names; 50,001 distinct tokens; 91,412 trie nodes; 100,000 postings; load (2.83, 2.9, 2.55)
+      1347.4 ms [ok] median of 5; chars   1, tokens   1 (distinct   1); listed 20 ['substring'] edits [0]; bad spans 0  (1.48x under 2.0 s)  'a'
+        walks 0 (0 walked, allowed>0), visits 0 (budget 400,000 reached: False; -; walks 0 ms); tiers ms [text 1299, token 0, fuzzy 0, subsequence 0, cut 62] of 1361 ms; instrumented list == shipped True
+        one ranking under tracemalloc: peak 10.47 MiB [ok]
+      1342.2 ms [ok] median of 5; chars   1, tokens   1 (distinct   1); listed 20 ['substring'] edits [0]; bad spans 0  (1.49x under 2.0 s)  'A'
+        walks 0 (0 walked, allowed>0), visits 0 (budget 400,000 reached: False; -; walks 0 ms); tiers ms [text 1301, token 0, fuzzy 0, subsequence 0, cut 63] of 1364 ms; instrumented list == shipped True
+        one ranking under tracemalloc: peak 10.47 MiB [ok]
+
+=== SUBMAX: 4-letter upper tag + 'A' * 43 (2,150,000 non-boundary occurrences)
+    50,000 names, 2,350,000 characters in all (.40 scope: 50,000 names, <= 2,356,624); all ASCII True; longest name 47
+    build 2.68 s [ok]; 50,000 prepared names; 50,000 distinct tokens; 2,216,275 trie nodes; 50,000 postings; load (2.83, 2.89, 2.56)
+      1439.4 ms [ok] median of 7; chars   1, tokens   1 (distinct   1); listed 20 ['substring'] edits [0]; bad spans 0  (1.39x under 2.0 s)  'a'
+        walks 0 (0 walked, allowed>0), visits 0 (budget 400,000 reached: False; -; walks 0 ms); tiers ms [text 1380, token 0, fuzzy 0, subsequence 0, cut 58] of 1438 ms; instrumented list == shipped True
+        one ranking under tracemalloc: peak 10.47 MiB [ok]
+      1439.3 ms [ok] median of 7; chars   1, tokens   1 (distinct   1); listed 20 ['substring'] edits [0]; bad spans 0  (1.39x under 2.0 s)  'A'
+        walks 0 (0 walked, allowed>0), visits 0 (budget 400,000 reached: False; -; walks 0 ms); tiers ms [text 1380, token 0, fuzzy 0, subsequence 0, cut 58] of 1439 ms; instrumented list == shipped True
+        one ranking under tracemalloc: peak 10.47 MiB [ok]
+      1389.7 ms [ok] median of 7; chars   2, tokens   1 (distinct   1); listed 20 ['substring'] edits [0]; bad spans 0  (1.44x under 2.0 s)  'aa'
+        walks 0 (0 walked, allowed>0), visits 0 (budget 400,000 reached: False; -; walks 0 ms); tiers ms [text 1326, token 0, fuzzy 0, subsequence 0, cut 58] of 1385 ms; instrumented list == shipped True
+        one ranking under tracemalloc: peak 10.47 MiB [ok]
+
+=== SUBD: 5-digit tag + '0' * 42
+    50,000 names, 2,350,000 characters in all (.40 scope: 50,000 names, <= 2,356,624); all ASCII True; longest name 47
+    build 2.45 s [ok]; 50,000 prepared names; 50,000 distinct tokens; 2,157,380 trie nodes; 50,000 postings; load (3.05, 2.94, 2.59)
+      1175.5 ms [ok] median of 5; chars   1, tokens   1 (distinct   1); listed 20 ['substring'] edits [0]; bad spans 0  (1.70x under 2.0 s)  '0'
+        walks 0 (0 walked, allowed>0), visits 0 (budget 400,000 reached: False; -; walks 0 ms); tiers ms [text 1123, token 0, fuzzy 0, subsequence 0, cut 75] of 1198 ms; instrumented list == shipped True
+        one ranking under tracemalloc: peak 10.47 MiB [ok]
+
+=== INW: 2,114 names of 1,024 characters + 4-letter pads
+    50,000 names, 2,356,280 characters in all (.40 scope: 50,000 names, <= 2,356,624); all ASCII True; longest name 1024
+    build 1.64 s [ok]; 50,000 prepared names; 50,000 distinct tokens; 601,315 trie nodes; 50,000 postings; load (3.26, 3.0, 2.62)
+       214.3 ms [ok] median of 5; chars 256, tokens   1 (distinct   1); listed 0 - edits -; bad spans 0  (9.33x under 2.0 s)  INWQ ('a' * 253 + 'b' + 'aa')
+        walks 1 (1 walked, allowed>0), visits 16,275 (budget 400,000 reached: False; 2.12 us/visit incl. walk setup; walks 34 ms); tiers ms [text 124, token 0, fuzzy 34, subsequence 58, cut 0] of 217 ms; instrumented list == shipped True
+        first walks: 256ch k2 b400,000 v16,275 r0
+        one ranking under tracemalloc: peak 0.01 MiB [ok]
+        94.2 ms [ok] median of 5; chars 256, tokens   1 (distinct   1); listed 0 - edits -; bad spans 0  (21.24x under 2.0 s)  'a' * 255 + 'b'
+        walks 1 (1 walked, allowed>0), visits 16,275 (budget 400,000 reached: False; 2.14 us/visit incl. walk setup; walks 35 ms); tiers ms [text 3, token 0, fuzzy 35, subsequence 59, cut 0] of 96 ms; instrumented list == shipped True
+        first walks: 256ch k2 b400,000 v16,275 r0
+        one ranking under tracemalloc: peak 0.01 MiB [ok]
+
+=== INWD: 600 DEEP names + 1,538 INW names + 4-letter pads
+    50,000 names, 2,356,160 characters in all (.40 scope: 50,000 names, <= 2,356,624); all ASCII True; longest name 1024
+    build 1.79 s [ok]; 50,000 prepared names; 63,800 distinct tokens; 921,277 trie nodes; 63,800 postings; load (3.32, 3.01, 2.62)
+       952.2 ms [ok] median of 7; chars 256, tokens   1 (distinct   1); listed 20 ['subsequence'] edits [0]; bad spans 0  (2.10x under 2.0 s)  INWQ
+        walks 1 (1 walked, allowed>0), visits 400,000 (budget 400,000 reached: True; 1.95 us/visit incl. walk setup; walks 781 ms); tiers ms [text 92, token 0, fuzzy 781, subsequence 57, cut 11] of 941 ms; instrumented list == shipped True
+        first walks: 256ch k2 b400,000 v400,000 r0
+        one ranking under tracemalloc: peak 0.15 MiB [ok]
+       907.3 ms [ok] median of 7; chars 256, tokens   1 (distinct   1); listed 20 ['substring'] edits [0]; bad spans 0  (2.20x under 2.0 s)  'a' * 256
+        walks 0 (0 walked, allowed>0), visits 0 (budget 400,000 reached: False; -; walks 0 ms); tiers ms [text 899, token 0, fuzzy 0, subsequence 0, cut 13] of 913 ms; instrumented list == shipped True
+        one ranking under tracemalloc: peak 0.39 MiB [ok]
+      budget removed:     1118.4 ms [ok] (n=1); visits 482,763; listed 20 ['subsequence']  INWQ
+
+=== COMBO: 600 DEEP names + 49,400 'Ab' + X camel names
+    50,000 names, 2,355,000 characters in all (.40 scope: 50,000 names, <= 2,356,624); all ASCII True; longest name 983
+    build 2.37 s [ok]; 50,000 prepared names; 14,426 distinct tokens; 466,723 trie nodes; 602,800 postings; load (3.98, 3.2, 2.7)
+      1233.0 ms [ok] median of 7; chars 256, tokens  20 (distinct  20); listed 0 - edits -; bad spans 0  (1.62x under 2.0 s)  19 camel 'Ab' + c tokens + 'a' * 198
+        walks 20 (20 walked, allowed>0), visits 400,000 (budget 400,000 reached: True; 1.90 us/visit incl. walk setup; walks 761 ms); tiers ms [text 2, token 0, fuzzy 1242, subsequence 4, cut 0] of 1248 ms; instrumented list == shipped True
+        first walks: 3ch k1 b400,000 v797 r13; 3ch k1 b399,203 v806 r14; 3ch k1 b398,397 v805 r15; 3ch k1 b397,592 v803 r13; 3ch k1 b396,789 v808 r12 ...
+        one ranking under tracemalloc: peak 26.11 MiB [ok]
+      1258.1 ms [ok] median of 7; chars 256, tokens  20 (distinct  20); listed 0 - edits -; bad spans 0  (1.59x under 2.0 s)  19 spaced 'Ab' + c + 'a' * 180
+        walks 20 (20 walked, allowed>0), visits 400,000 (budget 400,000 reached: True; 1.98 us/visit incl. walk setup; walks 791 ms); tiers ms [text 2, token 0, fuzzy 1317, subsequence 4, cut 0] of 1323 ms; instrumented list == shipped True
+        first walks: 3ch k1 b400,000 v797 r13; 3ch k1 b399,203 v806 r14; 3ch k1 b398,397 v805 r15; 3ch k1 b397,592 v803 r13; 3ch k1 b396,789 v808 r12 ...
+        one ranking under tracemalloc: peak 26.11 MiB [ok]
+      1085.9 ms [ok] median of 7; chars 256, tokens  11 (distinct  11); listed 0 - edits -; bad spans 0  (1.84x under 2.0 s)  10 camel + 'a' * 225
+        walks 11 (11 walked, allowed>0), visits 400,000 (budget 400,000 reached: True; 2.16 us/visit incl. walk setup; walks 865 ms); tiers ms [text 2, token 0, fuzzy 1096, subsequence 5, cut 0] of 1103 ms; instrumented list == shipped True
+        first walks: 3ch k1 b400,000 v797 r13; 3ch k1 b399,203 v806 r14; 3ch k1 b398,397 v805 r15; 3ch k1 b397,592 v803 r13; 3ch k1 b396,789 v808 r12 ...
+        one ranking under tracemalloc: peak 26.09 MiB [ok]
+      1215.1 ms [ok] median of 7; chars  98, tokens  20 (distinct  20); listed 20 ['fuzzy'] edits [20, 21]; bad spans 0  (1.65x under 2.0 s)  19 camel + 'a' * 40
+        walks 20 (20 walked, allowed>0), visits 400,000 (budget 400,000 reached: True; 3.27 us/visit incl. walk setup; walks 1309 ms); tiers ms [text 4, token 0, fuzzy 3157, subsequence 0, cut 30] of 3191 ms; instrumented list == shipped True
+        first walks: 3ch k1 b400,000 v797 r13; 3ch k1 b399,203 v806 r14; 3ch k1 b398,397 v805 r15; 3ch k1 b397,592 v803 r13; 3ch k1 b396,789 v808 r12 ...
+        one ranking under tracemalloc: peak 26.11 MiB [ok]
+      budget removed:     3739.4 ms [ok] (n=1); visits 482,003; listed 0 -  19 camel 'Ab' + c tokens + 'a' * 198
+
+load after = (13.8, 6.88, 4.13)
+probe exit 0

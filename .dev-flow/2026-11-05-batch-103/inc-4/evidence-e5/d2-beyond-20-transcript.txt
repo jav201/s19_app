@@ -1,0 +1,29 @@
+runner d2-run.sh sha256 94e6d48eb8c2d94620ad6b3db9d0f17471ad14f3e16c44b00d9babce4534ccba; probe d2-probe.py sha256 151f1c57bded21710ca372f63715d821882e52a8fbdd23b7e066eafdec15074a; sec-r2-probe.py ecda78d650657c1f9395592572e8091e60432d4e8328363807afa8eb2c772233; sec-e5-probe.py 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+s19_app.__file__ = /tmp/b103-e5d2-4/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5d2-4/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0
+tests module = /tmp/b103-e5d2-4/tree/tests/test_b103_label_match_perf.py
+mode = d2 beyond N=20  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = -2580387290645165551
+host = cachyos-rtx  load = (2.31, 2.14, 2.31)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5d2-4/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5d2-4/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5d2-4/pilot
+shapes inside .40's scope (50,000 names, <= 2,356,624 characters, queries <= 256) whose cost does not depend on N
+
+=== W16: 16-letter tokens within 2 substitutions of 'a' * 16, 60 per name: 50,000 names, 1,466,976 characters in all (.40 scope: 50,000 names, <= 2,356,624); 117,969 distinct tokens, 448,850 trie nodes; load (2.31, 2.14, 2.31)
+  shipped     612.4 ms [ok] | pilot N=20     637.9 ms [ok]  listed 20 ['fuzzy']  query 'aaaaaaaaaaaaaaaa'... (16 characters, 1 distinct tokens)  > 0.5 s
+  shipped     597.0 ms [ok] | pilot N=20     610.6 ms [ok]  listed 20 ['fuzzy']  query 'aaaaaaaaaaaaaaaq'... (16 characters, 1 distinct tokens)  > 0.5 s
+  shipped      92.2 ms [ok] | pilot N=20      91.2 ms [ok]  listed 20 ['prefix']  query 'aaaaaa'... (6 characters, 1 distinct tokens)
+
+=== W40: 40-letter tokens within 2 substitutions of 'a' * 40, 24 per name: 50,000 names, 2,336,068 characters in all (.40 scope: 50,000 names, <= 2,356,624); 97,933 distinct tokens, 753,276 trie nodes; load (2.26, 2.14, 2.31)
+  shipped    1191.1 ms [ok] | pilot N=20    1079.4 ms [ok]  listed 20 ['fuzzy']  query 'aaaaaaaaaaaaaaaaaaaaaaaa'... (40 characters, 1 distinct tokens)  > 1.0 s
+  shipped    1218.5 ms [ok] | pilot N=20    1227.9 ms [ok]  listed 20 ['subsequence']  query 'aaaaaaaaaaaaaaaaaaaaaaaa'... (64 characters, 1 distinct tokens)  > 1.0 s
+
+=== SUBO: 2,000 names 'x' + 'a' * 1017 + 'Q' + tag (overlapping substring occurrences): 50,000 names, 2,334,000 characters in all (.40 scope: 50,000 names, <= 2,356,624); 50,002 distinct tokens, 57,803 trie nodes; load (2.21, 2.13, 2.3)
+  shipped     956.7 ms [ok] | pilot N=20     966.7 ms [ok]  listed 20 ['substring']  query 'aa'... (2 characters, 1 distinct tokens)  > 0.5 s
+  shipped     940.5 ms [ok] | pilot N=20     962.2 ms [ok]  listed 20 ['substring']  query 'aaa'... (3 characters, 1 distinct tokens)  > 0.5 s
+  shipped     998.4 ms [ok] | pilot N=20     957.1 ms [ok]  listed 20 ['substring']  query 'aaaaaaaa'... (8 characters, 1 distinct tokens)  > 0.5 s
+
+=== SUBR: the reviewer's substring shape, 'x' + 'ab' * 509 + 'Q' + tag: 50,000 names, 2,336,000 characters in all (.40 scope: 50,000 names, <= 2,356,624); 50,002 distinct tokens, 58,295 trie nodes; load (2.37, 2.17, 2.31)
+  shipped     483.8 ms [ok] | pilot N=20     497.1 ms [ok]  listed 20 ['substring']  query 'ba'... (2 characters, 1 distinct tokens)
+
+load after = (2.34, 2.17, 2.31)
+probe exit 0

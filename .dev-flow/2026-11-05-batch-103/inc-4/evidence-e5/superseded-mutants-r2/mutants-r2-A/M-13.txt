@@ -1,0 +1,44 @@
+# M-13  row R-A2L-MATCH.13
+
+control: 1 edit for >=6 letters -> `valuexx_0001` gives 0 entries (first clause)
+edit: `_allowed_edits`: >=6-letter tokens return 1 edit instead of 2
+
+s19_app.__file__: /tmp/b103-e5-4-mutr2A/M-13/s19_app/__init__.py
+
+== diff ==
+--- /tmp/b103-e5-4-mutr2A/base/s19_app/tui/services/label_match.py	2026-11-06 22:11:34.000000000 -0600
++++ /tmp/b103-e5-4-mutr2A/M-13/s19_app/tui/services/label_match.py	2026-11-06 22:43:25.930447923 -0600
+@@ -711,7 +711,7 @@
+         return 0
+     if n <= 5:
+         return 1
+-    return 2
++    return 1
+ 
+ 
+ def _prefix_distance(query_token: str, name_token: str, cap: int) -> int:
+
+== pytest (returncode 1, KILLED) ==
+F.F.                                                                     [100%]
+=================================== FAILURES ===================================
+________________ test_ranked_list_is_exactly[R-A2L-MATCH.13/1] _________________
+tests/test_b103_label_match.py:391: in test_ranked_list_is_exactly
+    assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E   AssertionError: R-A2L-MATCH.13/1: query 'valuexx_0001' limit 20
+E   assert [] == [('VALUE_0001...5), (6, 10)))]
+E     
+E     Right contains one more item: ('VALUE_0001', 'fuzzy', 2, ((0, 5), (6, 10)))
+E     Use -v to get more diff
+________________ test_ranked_list_is_exactly[R-A2L-MATCH.13/3] _________________
+tests/test_b103_label_match.py:391: in test_ranked_list_is_exactly
+    assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E   AssertionError: R-A2L-MATCH.13/3: query 'curvee' limit 20
+E   assert [('CURVE_0001...1, ((0, 5),))] == [('CURVE_0001...2, ((0, 4),))]
+E     
+E     Right contains one more item: ('CUVE', 'fuzzy', 2, ((0, 4),))
+E     Use -v to get more diff
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.13/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.13/3]
+2 failed, 2 passed, 125 deselected in 5.04s
+

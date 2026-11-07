@@ -1,0 +1,37 @@
+s19_app.__file__ = /tmp/b103-e5-4-sec/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5-4-sec/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 24564b32d53f142b85fb33825aed3c30a116fbaaf4808be45e4378b2d8bedb9b
+tests module = /tmp/b103-e5-4-sec/tree/tests/test_b103_label_match_perf.py
+mode = paste  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = 276346898542460679
+host = cachyos-rtx  load = (0.55, 1.19, 0.85)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5-4-sec/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5-4-sec/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5-4-sec/pilot
+
+=== REF prepared; limit 20; median of 5, then one ranking under tracemalloc; load (0.7, 1.2, 0.85)
+         0.010 ms [ok] peak       0.2 KiB [ok] result=0   len=65483  "1604 SWA names joined by ','"
+         0.016 ms [ok] peak      64.3 KiB [ok] result=0   len=65536  "'e ' x 32768"
+         0.007 ms [ok] peak       0.2 KiB [ok] result=0   len=65536  "'a' x 65536"
+         0.007 ms [ok] peak       0.2 KiB [ok] result=0   len=65536  "'1a' x 32768"
+         0.007 ms [ok] peak       0.2 KiB [ok] result=0   len=65536  "'é' x 65536"
+         0.015 ms [ok] peak      64.3 KiB [ok] result=0   len=65520  "'a b c ... z ' x 1260"
+         0.007 ms [ok] peak       0.2 KiB [ok] result=0   len=65536  "'U+1F600' x 65536"
+         0.008 ms [ok] peak       0.2 KiB [ok] result=0   len=65536  "'\\x00' x 65536"
+         0.008 ms [ok] peak       0.2 KiB [ok] result=0   len=65536  "'\\ud800' x 65536"
+        19.798 ms [ok] peak      52.4 KiB [ok] result=20  len=65005  "65,000 spaces + 'VALUE' (stripped 5 chars: ranked)"
+         0.180 ms [ok] peak       0.6 KiB [ok] result=0   len=64300  "32,000 spaces + 'a' x 300 + 32,000 spaces"
+         0.008 ms [ok] peak       0.2 KiB [ok] result=0   len=257    "'a' x 257 (just over)"
+
+=== REF6 prepared; limit 20; median of 5, then one ranking under tracemalloc; load (0.7, 1.2, 0.85)
+         0.007 ms [ok] peak       0.2 KiB [ok] result=0   len=65483  "1604 SWA names joined by ','"
+         0.015 ms [ok] peak      64.3 KiB [ok] result=0   len=65536  "'e ' x 32768"
+         0.008 ms [ok] peak       0.2 KiB [ok] result=0   len=65536  "'a' x 65536"
+         0.008 ms [ok] peak       0.2 KiB [ok] result=0   len=65536  "'1a' x 32768"
+         0.008 ms [ok] peak       0.2 KiB [ok] result=0   len=65536  "'é' x 65536"
+         0.015 ms [ok] peak      64.3 KiB [ok] result=0   len=65520  "'a b c ... z ' x 1260"
+         0.008 ms [ok] peak       0.2 KiB [ok] result=0   len=65536  "'U+1F600' x 65536"
+         0.008 ms [ok] peak       0.2 KiB [ok] result=0   len=65536  "'\\x00' x 65536"
+         0.008 ms [ok] peak       0.2 KiB [ok] result=0   len=65536  "'\\ud800' x 65536"
+         8.064 ms [ok] peak       4.5 KiB [ok] result=0   len=65005  "65,000 spaces + 'VALUE' (stripped 5 chars: ranked)"
+         0.180 ms [ok] peak       0.6 KiB [ok] result=0   len=64300  "32,000 spaces + 'a' x 300 + 32,000 spaces"
+         0.007 ms [ok] peak       0.2 KiB [ok] result=0   len=257    "'a' x 257 (just over)"
+
+load after = (0.8, 1.21, 0.86)

@@ -1,0 +1,58 @@
+runner d2-run.sh sha256 94e6d48eb8c2d94620ad6b3db9d0f17471ad14f3e16c44b00d9babce4534ccba; probe d2-probe.py sha256 81bae37069b7a100641b76e0617aaf290760ecda3570ddec129c5c51d1302c3a; sec-r2-probe.py ecda78d650657c1f9395592572e8091e60432d4e8328363807afa8eb2c772233; sec-e5-probe.py 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+s19_app.__file__ = /tmp/b103-e5d2-4/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5d2-4/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0
+tests module = /tmp/b103-e5d2-4/tree/tests/test_b103_label_match_perf.py
+mode = d2 capedge N=20  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = -3056386722993361628
+host = cachyos-rtx  load = (1.95, 2.6, 2.55)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5d2-4/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5d2-4/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5d2-4/pilot
+pilot cap N = 20; each query holds exactly n distinct query tokens; median of 7, limit 20
+U6 sha256 of the 50,000 names joined by newline: 3540f73d2c12242674453036becd9db53f3536c42b7e7ac03625c4b4c3811532; 2,050,000 characters; names 0-1: ['abaaaa_abbaaa_abcaaa_abdaaa_abeaaa_abfaaa', 'abgaaa_abhaaa_abiaaa_abjaaa_abkaaa_ablaaa']
+
+=== U6: load (2.03, 2.6, 2.54)
+     298.5 ms [ok] n= 16 (48 characters) listed 20 ['fuzzy'] edits [10]
+     370.0 ms [ok] n= 20 (60 characters) listed 20 ['fuzzy'] edits [14]
+       7.0 ms [ok] n= 21 (63 characters) listed 0 - edits -
+
+=== D3: load (2.11, 2.59, 2.54)
+     260.1 ms [ok] n= 16 (48 characters) listed 20 ['fuzzy'] edits [1]
+     325.1 ms [ok] n= 20 (60 characters) listed 20 ['fuzzy'] edits [1]
+       8.2 ms [ok] n= 21 (63 characters) listed 0 - edits -
+
+=== U1: load (2.1, 2.58, 2.54)
+     220.7 ms [ok] n= 16 (48 characters) listed 20 ['fuzzy'] edits [15]
+     267.8 ms [ok] n= 20 (60 characters) listed 20 ['fuzzy'] edits [19]
+       7.8 ms [ok] n= 21 (63 characters) listed 0 - edits -
+
+=== E2: load (2.25, 2.61, 2.55)
+     249.6 ms [ok] n= 16 (96 characters) listed 20 ['fuzzy'] edits [22]
+     300.3 ms [ok] n= 20 (120 characters) listed 20 ['fuzzy'] edits [29]
+       6.8 ms [ok] n= 21 (126 characters) listed 0 - edits -
+
+=== M1: load (2.23, 2.6, 2.55)
+     157.3 ms [ok] n= 16 (48 characters) listed 20 ['fuzzy'] edits [14, 15]
+     191.0 ms [ok] n= 20 (60 characters) listed 20 ['fuzzy'] edits [18, 19]
+       7.3 ms [ok] n= 21 (63 characters) listed 0 - edits -
+
+=== S1: load (2.21, 2.59, 2.54)
+     168.0 ms [ok] n= 16 (48 characters) listed 20 ['fuzzy'] edits [16]
+     200.3 ms [ok] n= 20 (60 characters) listed 20 ['fuzzy'] edits [20]
+       7.6 ms [ok] n= 21 (63 characters) listed 0 - edits -
+
+=== CRAFT: load (2.2, 2.58, 2.54)
+      78.5 ms [ok] n= 16 (81 characters) listed 20 ['fuzzy'] edits [15]
+      95.9 ms [ok] n= 20 (101 characters) listed 20 ['fuzzy'] edits [19]
+       7.1 ms [ok] n= 21 (106 characters) listed 0 - edits -
+
+=== SWC: load (2.2, 2.58, 2.54)
+      44.3 ms [ok] n= 16 (52 characters) listed 2 ['fuzzy'] edits [15]
+      53.1 ms [ok] n= 20 (64 characters) listed 2 ['fuzzy'] edits [19]
+       7.5 ms [ok] n= 21 (67 characters) listed 0 - edits -
+
+=== X40: load (2.26, 2.58, 2.54)
+      58.7 ms [ok] n= 16 (52 characters) listed 20 ['fuzzy'] edits [15]
+      69.4 ms [ok] n= 20 (64 characters) listed 20 ['fuzzy'] edits [19]
+       6.8 ms [ok] n= 21 (67 characters) listed 0 - edits -
+
+load after = (2.26, 2.58, 2.54)
+probe exit 0

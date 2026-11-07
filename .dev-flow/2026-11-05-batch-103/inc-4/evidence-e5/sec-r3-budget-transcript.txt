@@ -1,0 +1,60 @@
+runner sec-r3-run.sh sha256 8f70dd916038119faecd2d3ae51bc8e4ea5e6cc1ea06100f087bce044c077f84; probe sec-r3-probe.py sha256 9cf292424ce8f1a335da4da39354d86b2b99bb480f5b41f0d387f608e52ceefa
+s19_app.__file__ = /tmp/b103-e5r3-4-sec/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5r3-4-sec/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 8f396c15d3c848ceb2c98ab74c112150bf9c09759abb662ea0f2162d1ca7c94d
+tests module = /tmp/b103-e5r3-4-sec/tree/tests/test_b103_label_match_perf.py
+mode = r3 budget  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = -724155798372705174
+host = cachyos-rtx  load = (5.04, 5.23, 3.68)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5r3-4-sec/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5r3-4-sec/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5r3-4-sec/pilot
+probe = sec-r3-probe.py sha256 9cf292424ce8f1a335da4da39354d86b2b99bb480f5b41f0d387f608e52ceefa; round-1 helpers = sec-e5-probe.py sha256 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+_FUZZY_TOKEN_CAP = 20; _FUZZY_SWITCH_CAP = 512; T.ANY_QUERY_BOUND_S = 2.0; T.KEYSTROKE_BOUND_S = 0.2
+
+=== REF: 58 queries; nodes visited per ranking (all walks), top 5; load (5.17, 5.25, 3.71)
+          35,247 nodes in  2 walks; instrumented ranking      69.8 ms  'QSET 15'
+          32,504 nodes in  1 walks; instrumented ranking      61.4 ms  'QSET 23'
+          32,239 nodes in  1 walks; instrumented ranking      61.6 ms  'QSET 22'
+          31,782 nodes in  1 walks; instrumented ranking      66.5 ms  'QSET 14'
+          31,751 nodes in  1 walks; instrumented ranking      60.9 ms  'QSET 10'
+
+=== REF6: 49 queries; nodes visited per ranking (all walks), top 5; load (5.17, 5.25, 3.71)
+              43 nodes in  1 walks; instrumented ranking      31.4 ms  'PSET E3S-01 a x256'
+              43 nodes in  1 walks; instrumented ranking      30.0 ms  "shape 'a' x 256"
+              28 nodes in  2 walks; instrumented ranking      59.1 ms  "shape 'c ' x 125 + 'chax'"
+              28 nodes in  2 walks; instrumented ranking      57.2 ms  "shape 'chax ' cut 256"
+              28 nodes in  2 walks; instrumented ranking      57.1 ms  "shape '0 ' x 125 + 'chax'"
+
+=== LONG: 9 queries; nodes visited per ranking (all walks), top 5; load (5.24, 5.27, 3.73)
+          25,698 nodes in  1 walks; instrumented ranking      66.9 ms  'LONGQ a x254 + bb'
+          25,698 nodes in  1 walks; instrumented ranking      65.3 ms  'LONGQ a x255 + b'
+          25,571 nodes in  1 walks; instrumented ranking      60.1 ms  'LONGQ a x128 + b'
+          25,448 nodes in  1 walks; instrumented ranking      53.0 ms  "shape 'aaaaaq ' x 36 (2-edit token, repeated)"
+           2,407 nodes in  1 walks; instrumented ranking       5.8 ms  "shape 'aaaq ' x 51"
+
+=== CRAFT: 2 queries; nodes visited per ranking (all walks), top 5; load (5.24, 5.27, 3.73)
+          68,901 nodes in 20 walks; instrumented ranking     110.6 ms  'craft_query(20)'
+          11,034 nodes in  4 walks; instrumented ranking      32.0 ms  'craft_query(4)'
+
+=== U6: 1 queries; nodes visited per ranking (all walks), top 5; load (5.22, 5.26, 3.73)
+             540 nodes in 20 walks; instrumented ranking     410.0 ms  'FAMQ(20)'
+
+=== D3: 1 queries; nodes visited per ranking (all walks), top 5; load (5.22, 5.26, 3.73)
+           2,760 nodes in 20 walks; instrumented ranking     344.0 ms  'FAMQ(20)'
+
+=== E2: 1 queries; nodes visited per ranking (all walks), top 5; load (5.2, 5.26, 3.74)
+          24,080 nodes in 20 walks; instrumented ranking     330.6 ms  'FAM6(20)'
+
+=== BAND: 1 queries; nodes visited per ranking (all walks), top 5; load (5.2, 5.26, 3.74)
+               0 nodes in  1 walks; instrumented ranking     134.4 ms  'BAND'
+
+=== W40: 2 queries; nodes visited per ranking (all walks), top 5; load (5.17, 5.25, 3.75)
+       3,494,116 nodes in  6 walks; instrumented ranking    5651.1 ms  "'a' * 40 .. 'a' * 35"
+         700,568 nodes in  1 walks; instrumented ranking    1269.2 ms  "'a' * 40"
+
+=== W12: 1 queries; nodes visited per ranking (all walks), top 5; load (5.15, 5.24, 3.76)
+       3,475,440 nodes in 20 walks; instrumented ranking    4802.5 ms  'T20'
+
+=== DEEP40: 1 queries; nodes visited per ranking (all walks), top 5; load (5.14, 5.24, 3.77)
+       1,335,947 nodes in  1 walks; instrumented ranking    2378.9 ms  "'a' * 40"
+
+load after = (5.14, 5.24, 3.77)
+probe exit 0

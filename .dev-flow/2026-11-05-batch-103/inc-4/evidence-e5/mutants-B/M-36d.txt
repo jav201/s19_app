@@ -1,0 +1,62 @@
+===== diff -u (base vs mutant) s19_app/tui/services/label_match.py =====
+--- /tmp/b103-e5-4-mutB/base/s19_app/tui/services/label_match.py	2026-11-06 20:36:19.839317227 -0600
++++ /tmp/b103-e5-4-mutB/M-36d/s19_app/tui/services/label_match.py	2026-11-06 21:20:34.160639207 -0600
+@@ -430,8 +430,6 @@
+         candidates.difference_update(taken)
+         if not candidates:
+             return {}
+-        if len(candidates) <= 300:
+-            break
+ 
+     result: dict[int, int] = {}
+     memo: dict[tuple[str, int], int] = {}
+===== pytest tail =====
+--- uptime before ---
+ 21:20:34 up 1 day, 12:52,  3 users,  load average: 1.79, 1.99, 1.56
+      71.03 ms  R-A2L-MATCH.36 REF 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+      12.12 ms  R-A2L-MATCH.36 REF 'FCA_NPUK_SMM.RWG_TjsPHIoim_SNX_TVC_2_ewh'
+       8.14 ms  R-A2L-MATCH.36 REF 'RUX_ARV_LFS_QM_GJWTDMS_WDGTH.Fgathduhjd,'
+      13.17 ms  R-A2L-MATCH.36 REF 'HRR_WOL.TNY_U_ZmyrXSZTPeyoMsdpWwbcUtd_Dw'
+     198.07 ms  R-A2L-MATCH.36 REF 'RHR_WOL.TNY_U_ZmyrXSZTPeyoMsdpWwbcUtd_Dw'
+============================= QC-TM timing margins =============================
+LOW -43.6%  0.287 s / 0.200 s  R-A2L-MATCH.36 REF 'njraipjtbtu lsuakcoj hsxgibymjxu orfltal'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+49.9%  0.100 s / 0.200 s  R-A2L-MATCH.36 REF6 '0'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+67.9%  0.064 s / 0.200 s  R-A2L-MATCH.36 REF6 'chr 0'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+69.2%  0.062 s / 0.200 s  R-A2L-MATCH.36 REF 'Ierxjr_Eud'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+70.2%  0.060 s / 0.200 s  R-A2L-MATCH.36 REF 'Nzukij'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+70.4%  0.059 s / 0.200 s  R-A2L-MATCH.36 REF 'xqzjvkw'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+70.7%  0.059 s / 0.200 s  R-A2L-MATCH.36 REF 'pposbxiifkdgfiajnbbpvb_dyan_xvz1'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+73.6%  0.053 s / 0.200 s  R-A2L-MATCH.36 REF 'pposbxiif'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+74.5%  0.051 s / 0.200 s  R-A2L-MATCH.36 REF6 'mesa'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+74.8%  0.050 s / 0.200 s  R-A2L-MATCH.36 REF6 'chr'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+75.3%  0.049 s / 0.200 s  R-A2L-MATCH.36 REF6 'cr0'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+75.5%  0.049 s / 0.200 s  R-A2L-MATCH.36 REF6 'cahr'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+75.9%  0.048 s / 0.200 s  R-A2L-MATCH.36 REF 'e'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+76.1%  0.048 s / 0.200 s  R-A2L-MATCH.36 REF 'a'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+83.2%  0.034 s / 0.200 s  R-A2L-MATCH.36 REF6 'm'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+83.2%  0.034 s / 0.200 s  R-A2L-MATCH.36 REF6 'meas_'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+85.6%  0.029 s / 0.200 s  R-A2L-MATCH.36 REF6 'ch00'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+87.0%  0.026 s / 0.200 s  R-A2L-MATCH.36 REF 'qqqq zzzz'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+87.7%  0.025 s / 0.200 s  R-A2L-MATCH.36 REF 'x y z w v u'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+89.1%  0.022 s / 0.200 s  R-A2L-MATCH.36 REF 'ledRing'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+89.4%  0.021 s / 0.200 s  R-A2L-MATCH.36 REF 'srqlLzL_'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+89.9%  0.020 s / 0.200 s  R-A2L-MATCH.36 REF6 'c 0 1'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+90.5%  0.019 s / 0.200 s  R-A2L-MATCH.36 REF6 'meas 1'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+90.6%  0.019 s / 0.200 s  R-A2L-MATCH.36 REF6 'char 1'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+91.2%  0.018 s / 0.200 s  R-A2L-MATCH.36 REF 'JotafVod_msr'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+91.6%  0.017 s / 0.200 s  R-A2L-MATCH.36 REF 'temp_sensor_max'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+92.4%  0.015 s / 0.200 s  R-A2L-MATCH.36 REF '0 jotaf'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+94.7%  0.011 s / 0.200 s  R-A2L-MATCH.36 REF 'JotafVod_msrqlLzL_kh2C_rWl_pfue._0_'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+95.1%  0.010 s / 0.200 s  R-A2L-MATCH.36 REF '0'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+95.4%  0.009 s / 0.200 s  R-A2L-MATCH.36 REF 'e e e'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+96.8%  0.006 s / 0.200 s  R-A2L-MATCH.36 REF 'aaaa'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+97.4%  0.005 s / 0.200 s  R-A2L-MATCH.36 REF 'ab'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+97.8%  0.004 s / 0.200 s  R-A2L-MATCH.36 REF 'zz'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+98.2%  0.004 s / 0.200 s  R-A2L-MATCH.36 REF 'JVmL'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+98.5%  0.003 s / 0.200 s  R-A2L-MATCH.36 REF 'cnt'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+QC-TM: 35 bounds, 1 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+1 failed, 1 passed, 5 deselected in 25.57s
+--- uptime after ---
+ 21:21:00 up 1 day, 12:52,  3 users,  load average: 1.52, 1.91, 1.55

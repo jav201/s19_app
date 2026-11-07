@@ -1,0 +1,47 @@
+runner d2-run.sh sha256 94e6d48eb8c2d94620ad6b3db9d0f17471ad14f3e16c44b00d9babce4534ccba; probe d2-probe.py sha256 b070656fbb3f3248a3fc60b8c7b8e2eb8cccd8daaccb66f6b61e02ccd35a8c56; sec-r2-probe.py ecda78d650657c1f9395592572e8091e60432d4e8328363807afa8eb2c772233; sec-e5-probe.py 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+s19_app.__file__ = /tmp/b103-e5d2-4/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5d2-4/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0
+tests module = /tmp/b103-e5d2-4/tree/tests/test_b103_label_match_perf.py
+mode = d2 examples N=20  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = -6815505074980682622
+host = cachyos-rtx  load = (2.23, 2.1, 2.3)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5d2-4/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5d2-4/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5d2-4/pilot
+C08: 462 names from pilot/case08-names.txt (sha256 9a213d094842b504)
+
+_fuzzy_token_distances as runs (ids written as their tokens: first .. last, count, d) vs the shipped dict
+  C08 'cuvre' 1: runs [('curve', 'curve', 1, 1)]; raw [(210, 211, 1)]; equals the dict: True
+  C08 'mpa' 1: runs [('map', 'measurement', 2, 1)]; raw [(211, 213, 1)]; equals the dict: True
+  C08 'maesu' 1: runs [('measurement', 'measurement', 1, 1)]; raw [(212, 213, 1)]; equals the dict: True
+  C08 'vblk' 1: runs [('blk', 'blk', 1, 1)]; raw [(209, 210, 1)]; equals the dict: True
+  C08 'valu' 1: runs [('val', 'val', 1, 1), ('value', 'value', 1, 0)]; raw [(213, 214, 1), (214, 215, 0)]; equals the dict: True
+  C08 'cvure' 1: runs []; raw []; equals the dict: True
+  C08 '0300' 0: runs []; raw []; equals the dict: True
+  C08 'va' 0: runs [('val', 'value', 2, 0)]; raw [(213, 215, 0)]; equals the dict: True
+  C08 '0' 0: runs [('0001', '0208', 208, 0)]; raw [(0, 208, 0)]; equals the dict: True
+  [CUVE, CURVE_0001] 'curvee' 2: runs [('curve', 'curve', 1, 1), ('cuve', 'cuve', 1, 2)]; equals the dict: True
+  REF: 500 query tokens (QSET's and 300 one-edit mutations of REF tokens): runs sorted, disjoint and equal to the dict: 500 / 500
+
+R-A2L-MATCH.41 cases (pilot cap N = 20) and their negative control (shipped rank, no cap)
+  /1 N distinct: C08, 'curva curvb curvc curvd curvf curvg curvh curvi curvj curvk curvl curvm curvn curvo curvp curvq curvr curvs curvt curvu' (119 characters, 20 distinct), limit 3
+      pilot   [CURVE_0001 · fuzzy · (0,5) · e20; CURVE_0002 · fuzzy · (0,5) · e20; CURVE_0003 · fuzzy · (0,5) · e20]
+      shipped [CURVE_0001 · fuzzy · (0,5) · e20; CURVE_0002 · fuzzy · (0,5) · e20; CURVE_0003 · fuzzy · (0,5) · e20]
+  /2 N + 1 distinct: C08, 'curva curvb curvc curvd curvf curvg curvh curvi curvj curvk curvl curvm curvn curvo curvp curvq curvr curvs curvt curvu curvv' (125 characters, 21 distinct), limit 3
+      pilot   []
+      shipped [CURVE_0001 · fuzzy · (0,5) · e21; CURVE_0002 · fuzzy · (0,5) · e21; CURVE_0003 · fuzzy · (0,5) · e21]
+  /3 N distinct, N + 1 tokens: C08, 'curva curva curvb curvc curvd curvf curvg curvh curvi curvj curvk curvl curvm curvn curvo curvp curvq curvr curvs curvt curvu' (125 characters, 20 distinct), limit 3
+      pilot   [CURVE_0001 · fuzzy · (0,5) · e21; CURVE_0002 · fuzzy · (0,5) · e21; CURVE_0003 · fuzzy · (0,5) · e21]
+      shipped [CURVE_0001 · fuzzy · (0,5) · e21; CURVE_0002 · fuzzy · (0,5) · e21; CURVE_0003 · fuzzy · (0,5) · e21]
+  /4 the SWA name with the most distinct tokens, whole: SWA, 'HRR_WOL.TNY_U_ZmyrXSZTPeyoMsdpWwbcUtd_Dwvrap_YAL_o8gk5143_Tw_WjPcscmtzpCrxe_GFV_TVY3_YES_AyxwevsxrDBB' (101 characters, 26 distinct), limit 5
+      pilot   [HRR_WOL.TNY_U_ZmyrXSZTPeyoMsdpWwbcUtd_Dwvrap_YAL_o8gk5143_Tw_WjPcscmtzpCrxe_GFV_TVY3_YES_AyxwevsxrDBB · exact · (0,101)]
+      pilot == shipped-without-fuzzy True; shipped [HRR_WOL.TNY_U_ZmyrXSZTPeyoMsdpWwbcUtd_Dwvrap_YAL_o8gk5143_Tw_WjPcscmtzpCrxe_GFV_TVY3_YES_AyxwevsxrDBB · exact · (0,101)]
+  /5 its tokens in reverse order: SWA, 'dbb ayxwevsxr yes 3 tvy gfv crxe pcscmtzp wj tw 5143 gk 8 o yal dwvrap utd wwbc msdp peyo xszt zmyr u tny wol hrr' (113 characters, 26 distinct), limit 5
+      pilot   [HRR_WOL.TNY_U_ZmyrXSZTPeyoMsdpWwbcUtd_Dwvrap_YAL_o8gk5143_Tw_WjPcscmtzpCrxe_GFV_TVY3_YES_AyxwevsxrDBB · token · (0,3),(4,7),(8,11),(12,13),(14,37),(38,44),(45,48),(49,57),(58,60),(61,75),(76,79),(80,84),(85,88),(89,101)]
+      pilot == shipped-without-fuzzy True; shipped [HRR_WOL.TNY_U_ZmyrXSZTPeyoMsdpWwbcUtd_Dwvrap_YAL_o8gk5143_Tw_WjPcscmtzpCrxe_GFV_TVY3_YES_AyxwevsxrDBB · token · (0,3),(4,7),(8,11),(12,13),(14,37),(38,44),(45,48),(49,57),(58,60),(61,75),(76,79),(80,84),(85,88),(89,101)]
+  .40/5 U6 FAMQ 20 (60 characters): 20 entries, rules ['fuzzy'], edits [14], first [abaaaa_abbaaa_abcaaa_abdaaa_abeaaa_abfaaa · fuzzy · (0,6),(7,13),(14,20),(21,27),(28,34),(35,41) · e14]; query 'abqAbaAbbAbcAbdAbeAbfAbgAbhAbiAbjAbkAblA'...
+  .40/5 U6 FAMQ 76 (228 characters): 0 entries, rules [], edits [], first []; query 'abqAbaAbbAbcAbdAbeAbfAbgAbhAbiAbjAbkAblA'...
+  .40/5 DENSE FAMQ 20 (60 characters): 20 entries, rules ['fuzzy'], edits [1], first [AbaAbbAbcAbdAbeAbfAbgAbhAbiAbjAbkAblAbmAbnAboAbpAbrAbsAbtAbuAbvAbwAbxAbyAbz0 · fuzzy · (0,57) · e1]
+  .40/5 DENSE FAMQ 76 (228 characters): 0 entries, rules [], edits [], first []
+  DENSE: 50,000 names, 2,286,890 characters, sha256 2d3803e0ff2c899e4ae8459da816c6f6205220405845ba257530a8b140891e2f; 37,026 distinct tokens, 748,000 postings
+
+load after = (2.34, 2.15, 2.32)
+probe exit 0
