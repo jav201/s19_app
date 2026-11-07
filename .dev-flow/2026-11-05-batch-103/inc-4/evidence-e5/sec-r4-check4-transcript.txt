@@ -1,0 +1,71 @@
+runner sec-r4-run.sh sha256 7225a0c07c03fcc70fc7b999ce05a020dd89112bd40d37d6b63c27d49d485517; probe sec-r4-probe.py sha256 3cbaf0fb141a1399f27057356ea7a022104e0dac6b150483dce2590696af7bbf
+s19_app.__file__ = /tmp/b103-e5r4-4-sec/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5r4-4-sec/tree/s19_app/tui/services/label_match.py
+label_match sha256 = b97d19ebfe11dd47f096ded2ae6d7dd5f12f6fa02c42d8b9d5f782056bd79ecc
+tests module = /tmp/b103-e5r4-4-sec/tree/tests/test_b103_label_match_perf.py
+mode = r3 check  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = -2260241321755386971
+host = <runner>  load = (2.7, 2.33, 2.2)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5r4-4-sec/<user>  LOCALAPPDATA = /tmp/b103-e5r4-4-sec/<user>/localappdata  PILOT_DIR = /tmp/b103-e5r4-4-sec/pilot
+probe = sec-r3-probe.py sha256 9cf292424ce8f1a335da4da39354d86b2b99bb480f5b41f0d387f608e52ceefa; round-1 helpers = sec-e5-probe.py sha256 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+_FUZZY_TOKEN_CAP = 20; _FUZZY_SWITCH_CAP = 512; T.ANY_QUERY_BOUND_S = 2.0; T.KEYSTROKE_BOUND_S = 0.2
+=== A. hostile set (round-1 spans mode) with the R-A2L-MATCH.41-capped oracle
+s19_app.__file__ = /tmp/b103-e5r4-4-sec/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5r4-4-sec/tree/s19_app/tui/services/label_match.py
+label_match sha256 = b97d19ebfe11dd47f096ded2ae6d7dd5f12f6fa02c42d8b9d5f782056bd79ecc
+tests module = /tmp/b103-e5r4-4-sec/tree/tests/test_b103_label_match_perf.py
+mode = spans  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = -2260241321755386971
+host = <runner>  load = (2.7, 2.33, 2.2)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5r4-4-sec/<user>  LOCALAPPDATA = /tmp/b103-e5r4-4-sec/<user>/localappdata  PILOT_DIR = /tmp/b103-e5r4-4-sec/pilot
+hostile names 57; indexed 30 (duplicates and names over 1,024 characters left out)
+queries 3123 x 3 limits (79 s); listed entries 15309; exceptions 0; bad spans (empty, outside [0, len(name)), unsorted or touching) 0; rank != oracle 0; entries whose name is the input object 15309
+
+=== argument checks (I-3 pins the TypeError texts)
+  build_label_index(['a', None])                       -> TypeError: label names must be str, got NoneType
+  build_label_index(['a', b'b'])                       -> TypeError: label names must be str, got bytes
+  build_label_index([1])                               -> TypeError: label names must be str, got int
+  build_label_index(['a', ['x']])                      -> TypeError: label names must be str, got list
+  build_label_index('abc')                             -> TypeError: label names must be an iterable of str, got str
+  build_label_index(b'abc')                            -> TypeError: label names must be an iterable of str, got bytes
+  build_label_index(bytearray(b'ab'))                  -> TypeError: label names must be str, got int
+  build_label_index(None)  [not pinned]                -> TypeError: 'NoneType' object is not iterable
+  build_label_index(iter([]))                          -> returned 0
+  build_label_index([S('Sub_name')]) then rank('sub')  -> returned [('Sub_name', 'prefix', 0, ((0, 3),))]
+  rank(None, ix, 20)                                   -> TypeError: query must be str, got NoneType
+  rank(b'x', ix, 20)                                   -> TypeError: query must be str, got bytes
+  rank(None, ix, 'x')  [query checked first]           -> TypeError: query must be str, got NoneType
+  rank('x', ix, True)                                  -> TypeError: limit must be int, got bool
+  rank('x', ix, 2.0)                                   -> TypeError: limit must be int, got float
+  rank('x', ix, -5)                                    -> returned []
+  rank('x', ix, 0)                                     -> returned []
+  rank('x', ix, 10**30) -> count                       -> returned 8
+  rank(S(' VALUE '), ix, 3)                            -> returned [('VALUE_0001', 'prefix', 0, ((0, 5),)), ('Value_0001', 'prefix', 0, ((0, 5),)), ('value_0001', 'prefix', 0, (
+
+=== purity: private buffers and the argument list unchanged after rankings (E3S-07)
+  buffers sha256 before 910cc5932c146174 after 910cc5932c146174 equal True; argument list unchanged True
+
+=== huge lists (no count cap: cost linear in the list)
+  all of case_06: 220,040 names -> build 35.70 s under tracemalloc [ok], peak 26.9 MiB
+     worst REF6 query over all 220,040: 478.5 ms ('0')
+  1,000,000 short names: build 14.33 s [ok]; ru_maxrss now 556 MiB
+     rank 'n0000001'   median    410.7 ms [ok] n=1 bad spans 0
+     rank 'sig'        median   1849.0 ms [ok] n=20 bad spans 0
+     rank 'n000x001'   median    193.4 ms [ok] n=0 bad spans 0
+     rank 'zzz'        median    143.5 ms [ok] n=0 bad spans 0
+
+load after = (3.1, 2.81, 2.42)
+
+=== B. randomized rankings: shipped == capped oracle == both forced switch paths; 15-30 distinct tokens included
+queries x limits 1600 (57 s; 202 queries past 20 distinct tokens); listed entries 2505; exceptions 0; bad spans 0; rank != capped oracle 0; shipped vs forced paths (cap 0, cap 10**9) differing 0
+
+=== C. R-A2L-MATCH.41 cases on C08 (02-test-cases.md), and the cap removed (_FUZZY_TOKEN_CAP = 10**9)
+  /1 curva .. curvu (20 distinct), limit 3: shipped [('CURVE_0001', 'fuzzy', 20, ((0, 5),)), ('CURVE_0002', 'fuzzy', 20, ((0, 5),)), ('CURVE_0003', 'fuzzy', 20, ((0, 5),))]
+      cap removed [('CURVE_0001', 'fuzzy', 20, ((0, 5),)), ('CURVE_0002', 'fuzzy', 20, ((0, 5),)), ('CURVE_0003', 'fuzzy', 20, ((0, 5),))]
+  /2 curva .. curvv (21 distinct), limit 3: shipped []
+      cap removed [('CURVE_0001', 'fuzzy', 21, ((0, 5),)), ('CURVE_0002', 'fuzzy', 21, ((0, 5),)), ('CURVE_0003', 'fuzzy', 21, ((0, 5),))]
+  /3 curva twice + curvb .. curvu (21 tokens, 20 distinct), limit 3: shipped [('CURVE_0001', 'fuzzy', 21, ((0, 5),)), ('CURVE_0002', 'fuzzy', 21, ((0, 5),)), ('CURVE_0003', 'fuzzy', 21, ((0, 5),))]
+      cap removed [('CURVE_0001', 'fuzzy', 21, ((0, 5),)), ('CURVE_0002', 'fuzzy', 21, ((0, 5),)), ('CURVE_0003', 'fuzzy', 21, ((0, 5),))]
+
+load after = (3.38, 2.91, 2.48)
+
+walk log over the whole mode: 11,614 calls; most visits in one walk 9,937; smallest budget left after a walk 380,600 (> 0: the budget was never spent)
+probe exit 0

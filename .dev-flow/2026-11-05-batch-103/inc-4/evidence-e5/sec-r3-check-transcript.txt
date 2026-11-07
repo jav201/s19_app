@@ -1,0 +1,69 @@
+runner sec-r3-run.sh sha256 8f70dd916038119faecd2d3ae51bc8e4ea5e6cc1ea06100f087bce044c077f84; probe sec-r3-probe.py sha256 eb161db9dae675bf29146e1ee26edf0a0fd0344791761bd264485f2c879403da
+s19_app.__file__ = /tmp/b103-e5r3-4-sec/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5r3-4-sec/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 8f396c15d3c848ceb2c98ab74c112150bf9c09759abb662ea0f2162d1ca7c94d
+tests module = /tmp/b103-e5r3-4-sec/tree/tests/test_b103_label_match_perf.py
+mode = r3 check  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = 3469267207182703842
+host = <runner>  load = (1.77, 1.22, 1.19)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5r3-4-sec/<user>  LOCALAPPDATA = /tmp/b103-e5r3-4-sec/<user>/localappdata  PILOT_DIR = /tmp/b103-e5r3-4-sec/pilot
+probe = sec-r3-probe.py sha256 eb161db9dae675bf29146e1ee26edf0a0fd0344791761bd264485f2c879403da; round-1 helpers = sec-e5-probe.py sha256 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+_FUZZY_TOKEN_CAP = 20; _FUZZY_SWITCH_CAP = 512; T.ANY_QUERY_BOUND_S = 2.0; T.KEYSTROKE_BOUND_S = 0.2
+=== A. hostile set (round-1 spans mode) with the R-A2L-MATCH.41-capped oracle
+s19_app.__file__ = /tmp/b103-e5r3-4-sec/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5r3-4-sec/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 8f396c15d3c848ceb2c98ab74c112150bf9c09759abb662ea0f2162d1ca7c94d
+tests module = /tmp/b103-e5r3-4-sec/tree/tests/test_b103_label_match_perf.py
+mode = spans  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = 3469267207182703842
+host = <runner>  load = (1.77, 1.22, 1.19)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5r3-4-sec/<user>  LOCALAPPDATA = /tmp/b103-e5r3-4-sec/<user>/localappdata  PILOT_DIR = /tmp/b103-e5r3-4-sec/pilot
+hostile names 57; indexed 56 (duplicates and names over 1,024 characters left out)
+queries 3123 x 3 limits (84 s); listed entries 26401; exceptions 0; bad spans (empty, outside [0, len(name)), unsorted or touching) 0; rank != oracle 0; entries whose name is the input object 26401
+
+=== argument checks (I-3 pins the TypeError texts)
+  build_label_index(['a', None])                       -> TypeError: label names must be str, got NoneType
+  build_label_index(['a', b'b'])                       -> TypeError: label names must be str, got bytes
+  build_label_index([1])                               -> TypeError: label names must be str, got int
+  build_label_index(['a', ['x']])                      -> TypeError: label names must be str, got list
+  build_label_index('abc')                             -> TypeError: label names must be an iterable of str, got str
+  build_label_index(b'abc')                            -> TypeError: label names must be an iterable of str, got bytes
+  build_label_index(bytearray(b'ab'))                  -> TypeError: label names must be str, got int
+  build_label_index(None)  [not pinned]                -> TypeError: 'NoneType' object is not iterable
+  build_label_index(iter([]))                          -> returned 0
+  build_label_index([S('Sub_name')]) then rank('sub')  -> returned [('Sub_name', 'prefix', 0, ((0, 3),))]
+  rank(None, ix, 20)                                   -> TypeError: query must be str, got NoneType
+  rank(b'x', ix, 20)                                   -> TypeError: query must be str, got bytes
+  rank(None, ix, 'x')  [query checked first]           -> TypeError: query must be str, got NoneType
+  rank('x', ix, True)                                  -> TypeError: limit must be int, got bool
+  rank('x', ix, 2.0)                                   -> TypeError: limit must be int, got float
+  rank('x', ix, -5)                                    -> returned []
+  rank('x', ix, 0)                                     -> returned []
+  rank('x', ix, 10**30) -> count                       -> returned 23
+  rank(S(' VALUE '), ix, 3)                            -> returned [('VALUE_0001', 'prefix', 0, ((0, 5),)), ('Value_0001', 'prefix', 0, ((0, 5),)), ('value_0001', 'prefix', 0, (
+
+=== purity: private buffers and the argument list unchanged after rankings (E3S-07)
+  buffers sha256 before 03ae706220d8704f after 03ae706220d8704f equal True; argument list unchanged True
+
+=== huge lists (no count cap: cost linear in the list)
+  all of case_06: 220,040 names -> build 34.89 s under tracemalloc [ok], peak 26.9 MiB
+     worst REF6 query over all 220,040: 500.2 ms ('0')
+  1,000,000 short names: build 14.69 s [ok]; ru_maxrss now 556 MiB
+     rank 'n0000001'   median    415.1 ms [ok] n=1 bad spans 0
+     rank 'sig'        median   1859.6 ms [ok] n=20 bad spans 0
+     rank 'n000x001'   median    192.0 ms [ok] n=0 bad spans 0
+     rank 'zzz'        median    140.3 ms [ok] n=0 bad spans 0
+
+load after = (4.49, 2.56, 1.7)
+
+=== B. randomized rankings: shipped == capped oracle == both forced switch paths; 15-30 distinct tokens included
+queries x limits 1600 (60 s; 202 queries past 20 distinct tokens); listed entries 2509; exceptions 0; bad spans 0; rank != capped oracle 0; shipped vs forced paths (cap 0, cap 10**9) differing 0
+
+=== C. R-A2L-MATCH.41 cases on C08 (02-test-cases.md), and the cap removed (_FUZZY_TOKEN_CAP = 10**9)
+  /1 curva .. curvu (20 distinct), limit 3: shipped [('CURVE_0001', 'fuzzy', 20, ((0, 5),)), ('CURVE_0002', 'fuzzy', 20, ((0, 5),)), ('CURVE_0003', 'fuzzy', 20, ((0, 5),))]
+      cap removed [('CURVE_0001', 'fuzzy', 20, ((0, 5),)), ('CURVE_0002', 'fuzzy', 20, ((0, 5),)), ('CURVE_0003', 'fuzzy', 20, ((0, 5),))]
+  /2 curva .. curvv (21 distinct), limit 3: shipped []
+      cap removed [('CURVE_0001', 'fuzzy', 21, ((0, 5),)), ('CURVE_0002', 'fuzzy', 21, ((0, 5),)), ('CURVE_0003', 'fuzzy', 21, ((0, 5),))]
+  /3 curva twice + curvb .. curvu (21 tokens, 20 distinct), limit 3: shipped [('CURVE_0001', 'fuzzy', 21, ((0, 5),)), ('CURVE_0002', 'fuzzy', 21, ((0, 5),)), ('CURVE_0003', 'fuzzy', 21, ((0, 5),))]
+      cap removed [('CURVE_0001', 'fuzzy', 21, ((0, 5),)), ('CURVE_0002', 'fuzzy', 21, ((0, 5),)), ('CURVE_0003', 'fuzzy', 21, ((0, 5),))]
+
+load after = (4.95, 3.02, 1.92)
+probe exit 0

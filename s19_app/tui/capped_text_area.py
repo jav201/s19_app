@@ -13,13 +13,13 @@ Summary:
     * bracketed paste (terminal), delivered as an ``events.Paste`` message and
       handled by :meth:`TextArea._on_paste`, and
     * the ctrl+v action :meth:`action_paste`, which reads the OS clipboard
-      through the tkinter → Win32 → PowerShell read cascade (2.0 s
+      through the Win32 → system PowerShell read cascade (2.0 s
       PowerShell budget) and falls back to ``self.app.clipboard``.
 
     Copy/cut, OS + internal:
 
     * the ctrl+c action :meth:`action_copy` writes the selected document
-      text to the OS clipboard (Win32 → Tk → PowerShell write cascade) and
+      text to the OS clipboard (Win32 → system PowerShell write cascade) and
       mirrors it to Textual's internal clipboard, without mutating the
       document; an empty selection raises Textual's ``SkipAction``;
     * the ctrl+x action :meth:`action_cut` additionally removes the text:
@@ -39,7 +39,7 @@ Summary:
     Note on ``_on_paste``: Textual auto-dispatches every ``_on_*`` handler up
     the MRO (see ``MessagePump._get_dispatch_methods``), calling this subclass's
     handler *then* the base ``TextArea._on_paste``. So this override only
-    truncates ``event.text`` in place — it must NOT call ``super()._on_paste``,
+    truncates and strips ``event.text`` in place — it must NOT call ``super()._on_paste``,
     or the base handler would insert twice. ``action_paste`` / ``action_copy``
     / ``action_cut`` are plain actions (not ``_on_*`` handlers), so they
     fully replace the base methods.
@@ -64,7 +64,7 @@ Data Flow:
     ctrl+v → :meth:`action_paste` (OS read cascade in the executor, cap,
     internal fallback) → ``_replace_via_keyboard``.
     ctrl+c → :meth:`action_copy` (selection → internal mirror + OS write
-    cascade in the executor, Tk root primed first on the UI thread).
+    cascade in the executor).
     ctrl+x → :meth:`action_cut` (delete selection / cursor line, then the
     same copy tail).
 
@@ -72,7 +72,7 @@ Dependencies:
     Uses: ``textual.widgets.TextArea`` (base), ``textual.events.Paste``,
     ``textual.actions.SkipAction``,
     ``s19_app.tui.os_clipboard_input`` (the shared 64 KiB cap constant, the
-    read/write cascades and the Tk-root priming — imported, never
+    read/write cascades and the unsafe-paste strip — imported, never
     redefined). The private ``_replace_via_keyboard`` /
     ``_delete_via_keyboard`` / ``_delete_cursor_line`` calls are safe only
     because ``textual==8.2.8`` is pinned.
@@ -100,6 +100,7 @@ from .os_clipboard_input import (
     _CLIPBOARD_CAP_CHARS,
     _PASTE_FAIL_NOTIFICATION,
     _mirror_and_write_os_clipboard,
+    _strip_paste_controls,
 )
 
 logger = logging.getLogger(__name__)
@@ -129,19 +130,21 @@ class CappedTextArea(TextArea):
     """
 
     def _on_paste(self, event: events.Paste) -> None:
-        """Truncate an over-cap bracketed-paste event in place.
+        """Cap and strip a bracketed-paste event in place.
 
         Summary:
-            Caps ``event.text`` to the limit before the base
+            Caps ``event.text`` to the limit, then strips its unsafe paste
+            characters (keeping TAB, LF and CR) before the base
             ``TextArea._on_paste`` inserts it. Textual auto-dispatches every
             ``_on_*`` handler up the MRO, so this method runs FIRST and the base
-            handler runs immediately after against the (now-capped) text — this
-            override must NOT call ``super()._on_paste`` or the base would insert
-            twice.
+            handler runs immediately after against the (now-capped, stripped)
+            text — this override must NOT call ``super()._on_paste`` or the base
+            would insert twice.
 
         Args:
             event (events.Paste): The paste event carrying the pasted text;
-                mutated in place when over the cap.
+                mutated in place when over the cap or holding an unsafe
+                paste character.
 
         Returns:
             None.
@@ -150,11 +153,11 @@ class CappedTextArea(TextArea):
             None.
 
         Data Flow:
-            ``event.text`` → cap in place → (MRO) base ``TextArea._on_paste`` →
-            ``_replace_via_keyboard``.
+            ``event.text`` → cap in place → strip in place → (MRO) base
+            ``TextArea._on_paste`` → ``_replace_via_keyboard``.
 
         Dependencies:
-            Uses: ``_CLIPBOARD_CAP_CHARS``.
+            Uses: ``_CLIPBOARD_CAP_CHARS``, ``_strip_paste_controls``.
             Used by: the Textual message pump on ``events.Paste`` (which then
             calls the base handler in MRO order).
 
@@ -163,16 +166,17 @@ class CappedTextArea(TextArea):
         """
         if len(event.text) > _CLIPBOARD_CAP_CHARS:
             event.text = event.text[:_CLIPBOARD_CAP_CHARS]
+        event.text = _strip_paste_controls(event.text, multiline=True)
 
     async def action_paste(self) -> None:
-        """Paste the OS clipboard text at the selection, capped.
+        """Paste the OS clipboard text at the selection, capped and stripped.
 
         Summary:
             Async override of ``TextArea.action_paste``. Returns without
-            mutation for a read-only buffer. Primes the process-wide Tk
-            root on the UI thread, then runs the same OS-read cascade as
-            ``OsClipboardInput.action_paste`` in the executor; caps the
-            result at ``_CLIPBOARD_CAP_CHARS``; falls back to Textual's
+            mutation for a read-only buffer. Runs the same OS-read cascade
+            as ``OsClipboardInput.action_paste`` in the executor; caps the
+            result at ``_CLIPBOARD_CAP_CHARS`` and strips its unsafe paste
+            characters (keeping TAB, LF and CR); falls back to Textual's
             internal ``App.clipboard`` when every OS layer fails; inserts
             via the base ``_replace_via_keyboard`` path. When the total
             result is empty the whole buffer is selected and the exact
@@ -188,14 +192,13 @@ class CappedTextArea(TextArea):
             Propagates whatever the base insertion path raises.
 
         Data Flow:
-            read-only? → return; ``_prime_tk_root()`` →
-            ``read_os_clipboard`` in the executor → internal fallback →
-            empty? → ``select_all()`` + notify; else cap →
-            ``_replace_via_keyboard`` → ``move_cursor``.
+            read-only? → return; ``read_os_clipboard`` in the executor →
+            internal fallback → empty? → ``select_all()`` + notify; else
+            cap → strip → ``_replace_via_keyboard`` → ``move_cursor``.
 
         Dependencies:
-            Uses: ``read_os_clipboard``, ``_prime_tk_root``,
-            ``self.app.clipboard``, ``_CLIPBOARD_CAP_CHARS``,
+            Uses: ``read_os_clipboard``, ``self.app.clipboard``,
+            ``_CLIPBOARD_CAP_CHARS``, ``_strip_paste_controls``,
             ``_PASTE_FAIL_NOTIFICATION``, the private
             ``_replace_via_keyboard`` (pinned ``textual==8.2.8``).
             Used by: the widget's ctrl+v key binding.
@@ -205,10 +208,9 @@ class CappedTextArea(TextArea):
         """
         if self.read_only:
             return
-        # Prime + read go through the os_clipboard_input module namespace so
-        # a single monkeypatch of ``read_os_clipboard`` / ``_prime_tk_root``
-        # covers both widget classes (the seam the batch-67 tests use).
-        _os_clipboard_input._prime_tk_root()
+        # The read goes through the os_clipboard_input module namespace so
+        # a single monkeypatch of ``read_os_clipboard`` covers both widget
+        # classes (the seam the batch-67 tests use).
         loop = asyncio.get_event_loop()
         text = await loop.run_in_executor(None, _os_clipboard_input.read_os_clipboard)
         source = "os"
@@ -233,6 +235,7 @@ class CappedTextArea(TextArea):
             return
         if len(text) > _CLIPBOARD_CAP_CHARS:
             text = text[:_CLIPBOARD_CAP_CHARS]
+        text = _strip_paste_controls(text, multiline=True)
         if result := self._replace_via_keyboard(text, *self.selection):
             self.move_cursor(result.end_location)
 
@@ -245,9 +248,8 @@ class CappedTextArea(TextArea):
             (stock behaviour — the internal clipboard is NOT erased with
             an empty string); otherwise the text — capped at
             ``_CLIPBOARD_CAP_CHARS`` — is mirrored to ``App.clipboard``
-            and written to the OS clipboard through the Win32 → Tk →
-            PowerShell cascade, with the Tk root primed on the UI thread
-            before the executor runs. The document is not modified.
+            and written to the OS clipboard through the Win32 → system
+            PowerShell cascade. The document is not modified.
 
         Args:
             None.
@@ -304,3 +306,30 @@ class CappedTextArea(TextArea):
         if edit_result is None:
             return
         await _mirror_and_write_os_clipboard(self.app, edit_result.replaced_text)
+
+    async def _on_mouse_down(self, event: events.MouseDown) -> None:
+        """Copy or paste on a button-3 press, before the stock handler.
+
+        Button 3 is handled here: the press is prevented (no stock
+        ``TextArea._on_mouse_down`` cursor move, mouse capture or undo
+        checkpoint) and stopped (no ancestor or app handler). With a shown
+        selection it copies; without one it pastes (which returns for a
+        read-only box). No focus record: a multi-line box shows its
+        selection with or without the focus and does not select on focus,
+        so the selection and cursor here are those shown at the press. Any
+        other button returns, so the stock press handler runs as today.
+        """
+        if event.button != 3:
+            return
+        event.prevent_default()
+        event.stop()
+        if self.selected_text:
+            await self.action_copy()
+        else:
+            await self.action_paste()
+
+    def _on_click(self, event: events.Click) -> None:
+        """Stop a button-3 click before the widget's text select runs."""
+        if event.button == 3:
+            event.prevent_default()
+            event.stop()

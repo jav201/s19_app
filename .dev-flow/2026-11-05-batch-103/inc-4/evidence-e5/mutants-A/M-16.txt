@@ -1,0 +1,116 @@
+=== DIFF base -> M-16 (s19_app/tui/services/label_match.py) ===
+diff --git a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py b/M-16/s19_app/tui/services/label_match.py
+index d274de0..b0b5be3 100644
+--- a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py
++++ b/M-16/s19_app/tui/services/label_match.py
+@@ -781,40 +781,18 @@ def _classify(query: _Query, name: str) -> tuple[MatchRule, int, tuple[tuple[int
+     folded = _fold(name)
+     text = query.text
+     text_len = len(text)
+-    if folded == text:
+-        return (MatchRule.EXACT, 0, ((0, len(name)),))
+-    if folded.startswith(text):
+-        return (MatchRule.PREFIX, 0, ((0, text_len),))
+-    p = folded.find(text)
+-    if p >= 0:
+-        key = 1
+-        span = (p, p + text_len)
+-        cursor = p
+-        while cursor >= 0:
+-            if _at_boundary(name, cursor):
+-                key = 0
+-                span = (cursor, cursor + text_len)
+-                break
+-            cursor = folded.find(text, cursor + 1)
+-        return (MatchRule.SUBSTRING, key, (span,))
++
++    if query.keys:
++        offsets = _subsequence(query.keys, folded)
++        if offsets is not None:
++            return (
++                MatchRule.SUBSEQUENCE,
++                0,
++                _join_spans([(o, o + 1) for o in offsets]),
++            )
+ 
+     name_spans = _tokens(name)
+     if name_spans and query.tokens:
+-        token_spans: list[tuple[int, int]] = []
+-        token_ok = True
+-        for query_token in query.tokens:
+-            match_span: tuple[int, int] | None = None
+-            for start, end in name_spans:
+-                if folded[start:end].startswith(query_token):
+-                    match_span = (start, start + len(query_token))
+-                    break
+-            if match_span is None:
+-                token_ok = False
+-                break
+-            token_spans.append(match_span)
+-        if token_ok:
+-            return (MatchRule.TOKEN, 0, _join_spans(token_spans))
+-
+         total = 0
+         fuzzy_spans: list[tuple[int, int]] = []
+         for query_token in query.tokens:
+@@ -834,16 +812,39 @@ def _classify(query: _Query, name: str) -> tuple[MatchRule, int, tuple[tuple[int
+         if total >= 0:
+             return (MatchRule.FUZZY, total, _join_spans(fuzzy_spans))
+ 
+-    if query.keys:
+-        offsets = _subsequence(query.keys, folded)
+-        if offsets is not None:
+-            return (
+-                MatchRule.SUBSEQUENCE,
+-                0,
+-                _join_spans([(o, o + 1) for o in offsets]),
+-            )
+-    return None
++        token_spans: list[tuple[int, int]] = []
++        token_ok = True
++        for query_token in query.tokens:
++            match_span: tuple[int, int] | None = None
++            for start, end in name_spans:
++                if folded[start:end].startswith(query_token):
++                    match_span = (start, start + len(query_token))
++                    break
++            if match_span is None:
++                token_ok = False
++                break
++            token_spans.append(match_span)
++        if token_ok:
++            return (MatchRule.TOKEN, 0, _join_spans(token_spans))
++
++    p = folded.find(text)
++    if p >= 0:
++        key = 1
++        span = (p, p + text_len)
++        cursor = p
++        while cursor >= 0:
++            if _at_boundary(name, cursor):
++                key = 0
++                span = (cursor, cursor + text_len)
++                break
++            cursor = folded.find(text, cursor + 1)
++        return (MatchRule.SUBSTRING, key, (span,))
+ 
++    if folded.startswith(text):
++        return (MatchRule.PREFIX, 0, ((0, text_len),))
++    if folded == text:
++        return (MatchRule.EXACT, 0, ((0, len(name)),))
++    return None
+ 
+ def _order_key(rule: MatchRule, key: int, name: str, case_exact: bool) -> tuple:
+     """
+
+=== PYTEST (tail) ===
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+/tmp/b103-e5-4-mutA/M-16/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.16/1: query 'value_000' limit 1
+/tmp/b103-e5-4-mutA/M-16/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.16/2: query 'valu_0001' limit 20
+/tmp/b103-e5-4-mutA/M-16/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.16/3: query 'vale_0001' limit 20
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.16/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.16/2]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.16/3]
+3 failed, 126 deselected in 5.23s

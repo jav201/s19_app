@@ -1,0 +1,191 @@
+A2L section tree has structural errors: path=/tmp/b103-e1-1b/run/tmpb3radl9a/.s19tool/workarea/temp/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+textual 8.2.8
+DISPLAY in env: False | WAYLAND_DISPLAY in env: False
+HOME = /tmp/b103-e1-1b/home
+XDG_CONFIG_HOME = /tmp/b103-e1-1b/xdgc
+XDG_DATA_HOME = /tmp/b103-e1-1b/xdgd
+XDG_CACHE_HOME = /tmp/b103-e1-1b/xdgk
+LOCALAPPDATA = /tmp/b103-e1-1b/lad
+loaded: current_file True | a2l True | mac True
+notes during load: 0
+
+== 1 per-view census
+#hex_view [workspace] class=Static mro=(Static)
+    allow_select=True can_focus=False displayed=True focus_owner=#hex_scroll owner_class=ScrollableContainer
+    text: 16435 chars, 201 lines; first line '... window limited to 200 rows ...'
+#ws_stats [workspace] class=Static mro=(Static)
+    allow_select=True can_focus=False displayed=True focus_owner=None owner_class=None
+    text: 90 chars, 5 lines; first line 'Coverage: 6.68%'
+#a2l_view [workspace] class=Static mro=(Static)
+    allow_select=True can_focus=False displayed=True focus_owner=#a2l_scroll owner_class=ScrollableContainer
+    text: 106 chars, 4 lines; first line 'A2L summary lines 1-2 / 2'
+#a2l_tags_list [a2l] class=DataTable mro=(DataTable)
+    allow_select=False can_focus=True displayed=True focus_owner=#a2l_tags_list owner_class=DataTable
+    text: 35 chars, 1 lines; first line '<table rows=118 cols=16 cursor=row>'
+#a2l_tags_summary [a2l] class=Label mro=(Label)
+    allow_select=True can_focus=False displayed=True focus_owner=None owner_class=None
+    text: 78 chars, 1 lines; first line 'Page 1/1 | tags 1-118 / 118 (page size 200; +/- to change page)  ·  0 in image'
+#a2l_detail_card [a2l] class=A2LDetailCard mro=(A2LDetailCard > Static)
+    allow_select=True can_focus=False displayed=True focus_owner=None owner_class=None
+    text: 141 chars, 4 lines; first line '· DI.ASAM.M.SCALAR.UBYTE.IDENTICAL    /* optional display identifier */  0x00013A00'
+#alt_hex_view [a2l] class=Static mro=(Static)
+    allow_select=True can_focus=False displayed=True focus_owner=#alt_hex_scroll owner_class=ScrollableContainer
+    text: 16435 chars, 201 lines; first line '... window limited to 200 rows ...'
+#mac_records_list [mac] class=DataTable mro=(DataTable)
+    allow_select=False can_focus=True displayed=True focus_owner=#mac_records_list owner_class=DataTable
+    text: 33 chars, 1 lines; first line '<table rows=10 cols=8 cursor=row>'
+#mac_hex_view [mac] class=Static mro=(Static)
+    allow_select=True can_focus=False displayed=True focus_owner=#mac_hex_scroll owner_class=ScrollableContainer
+    text: 16435 chars, 201 lines; first line '... window limited to 200 rows ...'
+#patch_json_view [patch] class=TextArea mro=(TextArea)
+    allow_select=True can_focus=True displayed=False focus_owner=#patch_json_view owner_class=TextArea
+    text: 138 chars, 8 lines; first line '{'
+#patch_paste_text [patch] class=JsonHighlightTextArea mro=(JsonHighlightTextArea > CappedTextArea > TextArea)
+    allow_select=True can_focus=True displayed=False focus_owner=#patch_paste_text owner_class=JsonHighlightTextArea
+    text: 277 chars, 11 lines; first line '{'
+#search_input [workspace] class=OsClipboardInput mro=(OsClipboardInput > Input)
+    allow_select=True can_focus=True displayed=True focus_owner=#search_input owner_class=OsClipboardInput
+    text: 0 chars, 0 lines; first line ''
+
+== 2 binding chain for keys, with each view's focus owner focused
+#hex_view: focused=#hex_scroll
+    ctrl+c active=Screen:screen.copy_text chain=['Screen#_default:screen.copy_text', 'S19TuiApp#None:help_quit']
+    y      active=None chain=[]
+    c      active=None chain=['S19TuiApp#None:confirm_attention']
+    f7     active=None chain=[]
+    ctrl+a active=None chain=[]
+    ctrl+v active=None chain=[]
+#ws_stats: focused=None
+    ctrl+c active=Screen:screen.copy_text chain=['Screen#_default:screen.copy_text', 'S19TuiApp#None:help_quit']
+    y      active=None chain=[]
+    c      active=None chain=['S19TuiApp#None:confirm_attention']
+    f7     active=None chain=[]
+    ctrl+a active=None chain=[]
+    ctrl+v active=None chain=[]
+#a2l_view: focused=#a2l_scroll
+    ctrl+c active=Screen:screen.copy_text chain=['Screen#_default:screen.copy_text', 'S19TuiApp#None:help_quit']
+    y      active=None chain=[]
+    c      active=None chain=['S19TuiApp#None:confirm_attention']
+    f7     active=None chain=[]
+    ctrl+a active=None chain=[]
+    ctrl+v active=None chain=[]
+#a2l_tags_list: focused=#a2l_tags_list
+    ctrl+c active=Screen:screen.copy_text chain=['Screen#_default:screen.copy_text', 'S19TuiApp#None:help_quit']
+    y      active=None chain=[]
+    c      active=None chain=['S19TuiApp#None:confirm_attention']
+    f7     active=None chain=[]
+    ctrl+a active=None chain=[]
+    ctrl+v active=None chain=[]
+#a2l_tags_summary: focused=None
+    ctrl+c active=Screen:screen.copy_text chain=['Screen#_default:screen.copy_text', 'S19TuiApp#None:help_quit']
+    y      active=None chain=[]
+    c      active=None chain=['S19TuiApp#None:confirm_attention']
+    f7     active=None chain=[]
+    ctrl+a active=None chain=[]
+    ctrl+v active=None chain=[]
+#a2l_detail_card: focused=None
+    ctrl+c active=Screen:screen.copy_text chain=['Screen#_default:screen.copy_text', 'S19TuiApp#None:help_quit']
+    y      active=None chain=[]
+    c      active=None chain=['S19TuiApp#None:confirm_attention']
+    f7     active=None chain=[]
+    ctrl+a active=None chain=[]
+    ctrl+v active=None chain=[]
+#alt_hex_view: focused=#alt_hex_scroll
+    ctrl+c active=Screen:screen.copy_text chain=['Screen#_default:screen.copy_text', 'S19TuiApp#None:help_quit']
+    y      active=None chain=[]
+    c      active=None chain=['S19TuiApp#None:confirm_attention']
+    f7     active=None chain=[]
+    ctrl+a active=None chain=[]
+    ctrl+v active=None chain=[]
+#mac_records_list: focused=#mac_records_list
+    ctrl+c active=Screen:screen.copy_text chain=['Screen#_default:screen.copy_text', 'S19TuiApp#None:help_quit']
+    y      active=None chain=[]
+    c      active=None chain=['S19TuiApp#None:confirm_attention']
+    f7     active=None chain=[]
+    ctrl+a active=None chain=[]
+    ctrl+v active=None chain=[]
+#mac_hex_view: focused=#mac_hex_scroll
+    ctrl+c active=Screen:screen.copy_text chain=['Screen#_default:screen.copy_text', 'S19TuiApp#None:help_quit']
+    y      active=None chain=[]
+    c      active=None chain=['S19TuiApp#None:confirm_attention']
+    f7     active=None chain=[]
+    ctrl+a active=None chain=[]
+    ctrl+v active=None chain=[]
+#patch_json_view: focused=#patch_json_view
+    ctrl+c active=TextArea:copy chain=['TextArea#patch_json_view:copy', 'Screen#_default:screen.copy_text', 'S19TuiApp#None:help_quit']
+    y      active=None chain=[]
+    c      active=None chain=['S19TuiApp#None:confirm_attention']
+    f7     active=TextArea:select_all chain=['TextArea#patch_json_view:select_all']
+    ctrl+a active=TextArea:cursor_line_start chain=['TextArea#patch_json_view:cursor_line_start']
+    ctrl+v active=TextArea:paste chain=['TextArea#patch_json_view:paste']
+#patch_paste_text: focused=#patch_paste_text
+    ctrl+c active=JsonHighlightTextArea:copy chain=['JsonHighlightTextArea#patch_paste_text:copy', 'Screen#_default:screen.copy_text', 'S19TuiApp#None:help_quit']
+    y      active=None chain=[]
+    c      active=None chain=[]
+    f7     active=JsonHighlightTextArea:select_all chain=['JsonHighlightTextArea#patch_paste_text:select_all']
+    ctrl+a active=JsonHighlightTextArea:cursor_line_start chain=['JsonHighlightTextArea#patch_paste_text:cursor_line_start']
+    ctrl+v active=JsonHighlightTextArea:paste chain=['JsonHighlightTextArea#patch_paste_text:paste']
+#search_input: focused=#search_input
+    ctrl+c active=OsClipboardInput:copy chain=['OsClipboardInput#search_input:copy', 'Screen#_default:screen.copy_text', 'S19TuiApp#None:help_quit']
+    y      active=None chain=[]
+    c      active=None chain=[]
+    f7     active=None chain=[]
+    ctrl+a active=OsClipboardInput:home chain=['OsClipboardInput#search_input:home']
+    ctrl+v active=OsClipboardInput:paste chain=['OsClipboardInput#search_input:paste']
+
+== 3 ctrl+c after a full text selection
+#hex_view: screen selection=16434 chars; widget selection=None chars -> {'copy_to_clipboard': [16434], 'osc52_chars': [16434], 'os_write': [], 'notify': []}
+#ws_stats: screen selection=90 chars; widget selection=None chars -> {'copy_to_clipboard': [90], 'osc52_chars': [90], 'os_write': [], 'notify': []}
+#a2l_view: screen selection=106 chars; widget selection=None chars -> {'copy_to_clipboard': [106], 'osc52_chars': [106], 'os_write': [], 'notify': []}
+#a2l_tags_list: screen selection=0 chars; widget selection=None chars -> {'copy_to_clipboard': [0], 'osc52_chars': [0], 'os_write': [], 'notify': []}
+#a2l_tags_summary: screen selection=78 chars; widget selection=None chars -> {'copy_to_clipboard': [78], 'osc52_chars': [78], 'os_write': [], 'notify': []}
+#a2l_detail_card: screen selection=141 chars; widget selection=None chars -> {'copy_to_clipboard': [141], 'osc52_chars': [141], 'os_write': [], 'notify': []}
+#alt_hex_view: screen selection=16434 chars; widget selection=None chars -> {'copy_to_clipboard': [16434], 'osc52_chars': [16434], 'os_write': [], 'notify': []}
+#mac_records_list: screen selection=0 chars; widget selection=None chars -> {'copy_to_clipboard': [0], 'osc52_chars': [0], 'os_write': [], 'notify': []}
+#mac_hex_view: screen selection=16434 chars; widget selection=None chars -> {'copy_to_clipboard': [16434], 'osc52_chars': [16434], 'os_write': [], 'notify': []}
+#patch_json_view: screen selection=None chars; widget selection=138 chars -> {'copy_to_clipboard': [138], 'osc52_chars': [138], 'os_write': [], 'notify': []}
+#patch_paste_text: screen selection=None chars; widget selection=277 chars -> {'copy_to_clipboard': [277], 'osc52_chars': [277], 'os_write': [277], 'notify': []}
+#search_input: screen selection=None chars; widget selection=7 chars -> {'copy_to_clipboard': [7], 'osc52_chars': [7], 'os_write': [7], 'notify': []}
+
+== 4 ctrl+c with no selection on each focus owner
+#hex_view (focused #hex_scroll) -> {'copy_to_clipboard': [], 'osc52_chars': [], 'os_write': [], 'notify': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?')]}
+#ws_stats (focused None) -> {'copy_to_clipboard': [], 'osc52_chars': [], 'os_write': [], 'notify': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?')]}
+#a2l_view (focused #a2l_scroll) -> {'copy_to_clipboard': [], 'osc52_chars': [], 'os_write': [], 'notify': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?')]}
+#a2l_tags_list (focused #a2l_tags_list) -> {'copy_to_clipboard': [], 'osc52_chars': [], 'os_write': [], 'notify': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?')]}
+#a2l_tags_summary (focused None) -> {'copy_to_clipboard': [], 'osc52_chars': [], 'os_write': [], 'notify': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?')]}
+#a2l_detail_card (focused None) -> {'copy_to_clipboard': [], 'osc52_chars': [], 'os_write': [], 'notify': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?')]}
+#alt_hex_view (focused #alt_hex_scroll) -> {'copy_to_clipboard': [], 'osc52_chars': [], 'os_write': [], 'notify': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?')]}
+#mac_records_list (focused #mac_records_list) -> {'copy_to_clipboard': [], 'osc52_chars': [], 'os_write': [], 'notify': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?')]}
+#mac_hex_view (focused #mac_hex_scroll) -> {'copy_to_clipboard': [], 'osc52_chars': [], 'os_write': [], 'notify': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?')]}
+#patch_json_view (focused #patch_json_view) -> {'copy_to_clipboard': [], 'osc52_chars': [], 'os_write': [], 'notify': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?')]}
+#patch_paste_text (focused #patch_paste_text) -> {'copy_to_clipboard': [], 'osc52_chars': [], 'os_write': [], 'notify': [('Press [b]ctrl+q[/b] to quit the app', 'information', 'Do you want to quit?')]}
+#search_input (focused #search_input) -> {'copy_to_clipboard': [7], 'osc52_chars': [7], 'os_write': [7], 'notify': []}
+
+== 5 mouse drag over the main hex view
+selected after drag: '0x00000000                                                   |                |\n  0x000017E0  11                      01 3A                    |.       .:      |\n  0x000017F0  FF FF FF FF FF FF FF AA '
+ctrl+c after drag -> {'copy_to_clipboard': [203], 'osc52_chars': [203], 'os_write': [], 'notify': []}
+
+== 5b table rows as shown (cursor row 2), and the views' text
+#a2l_tags_list: rows=118 columns=['Tag', 'Address', 'Length', 'Source', 'Raw', 'Physical', 'InMem', 'Region', 'Limits', 'Unit', 'Bits', 'Endian', 'Virt', 'Func', 'Access', 'Dtype']
+    cursor row cells: ['· ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING', '0x00013A00', '1', 'formula', '', '', 'no', 'unknown', '0..252', 'm/s', '', '', 'no', '', '', 'UBYTE']
+#mac_records_list: rows=10 columns=['Tag', 'Address', 'InA2L', 'InMem', 'Status', 'SourceLine', 'ParseErr', 'A2LMatch']
+    cursor row cells: ['⚠ Curve_ExternalAxis', '0x00000000', 'no', 'no', 'OUT_OF_IMAGE', '19', '', '']
+#a2l_tags_summary text: 'Page 1/1 | tags 1-118 / 118 (page size 200; +/- to change page)  ·  0 in image'
+#a2l_detail_card text: '· DI.ASAM.M.SCALAR.UBYTE.IDENTICAL.STATUS_STRING    /* optional display identifier */  0x00013A00\nunit — · conv CM.RAT_FUNC.IDENT.STATUS_STRING\nbyteorder little\nlimits 0..252'
+#ws_stats first 4 lines: ['Coverage: 6.68%', 'Ranges: 11', 'Errors: 2', 'Warnings: 17'] | lines 5 | max line len 40
+#a2l_view first 4 lines: ['A2L summary lines 1-2 / 2', '-------------------------', 'A2L parse errors:', '- Unclosed /begin sections detected.'] | lines 4 | max line len 36
+#hex_view first 4 lines: ['... window limited to 200 rows ...', '  0x00000000                                                   |                |', '  0x000017E0  11                      01 3A                    |.       .:      |', '  0x000017F0  FF FF FF FF FF FF FF AA 0E FF                    |..........      |'] | lines 201 | max line len 81
+
+== 6 population: widgets with an id on the main screen, by family
+DataTable  allow_select=False: 6
+Input      allow_select=True: 46
+Label      allow_select=True: 29
+ListView   allow_select=True: 6
+Static     allow_select=False: 14
+Static     allow_select=True: 98
+TextArea   allow_select=True: 3
+tables and text areas: #a2l_tags_list(cursor=row), #mac_records_list(cursor=row), #patch_doc_entries_table(cursor=row), #patch_json_view(TextArea TextArea read_only=True), #patch_paste_text(TextArea JsonHighlightTextArea read_only=False), #patch_param_table(cursor=row), #check_param_table(cursor=row), #check_mem_table(cursor=row), #sje_manual(TextArea CappedTextArea read_only=False)
+App ALLOW_SELECT True | screen class Screen | screen allow_select True
+S19TuiApp.BINDINGS keys: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'U', 'b', 'c', 'comma', 'ctrl+d', 'ctrl+k', 'ctrl+l', 'ctrl+s', 'ctrl+y', 'ctrl+z', 'd', 'equals_sign', 'g', 'j', 'k', 'l', 'minus', 'o', 'p', 'pagedown', 'pageup', 'period', 'plus', 'q', 'question_mark', 'r', 'right_square_bracket', 's', 'slash', 't', 'v', 'x']
+total os writes recorded: 3

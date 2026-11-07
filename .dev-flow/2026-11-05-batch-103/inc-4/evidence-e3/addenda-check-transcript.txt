@@ -1,0 +1,32 @@
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+python = 3.11.18  PYTHONHASHSEED = None
+host = <runner>  load = (0.25927734375, 0.38818359375, 1.8154296875)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e3a-4/home  LOCALAPPDATA = /tmp/b103-e3a-4/home/<localappdata>  PILOT_DIR = /tmp/b103-e3a-4/pilot
+
+=== A-3: banded == unbanded _prefix_distance
+  20,000 random pairs (alphabet abc, cap 0-2): 0 differences
+  example: osa_band('a' * 255 + 'b', 'a' * 1000, 2) = 1  (unbanded 1)
+
+=== A-1: case .24/4 and the security variant (oracle any / oracle boundary / A / R2 boundary)
+  ['DiscouNTCount', 'DiscountCount'], 'count':
+    oracle any         [('DiscountCount', 'substring', 0, [(8, 13)]), ('DiscouNTCount', 'substring', 0, [(8, 13)])]
+    oracle boundary    [('DiscouNTCount', 'substring', 0, [(8, 13)]), ('DiscountCount', 'substring', 0, [(8, 13)])]
+    A (step 6 `in`)    [('DiscountCount', 'substring', 0, [(8, 13)]), ('DiscouNTCount', 'substring', 0, [(8, 13)])]
+    R2 sub=boundary    [('DiscouNTCount', 'substring', 0, [(8, 13)]), ('DiscountCount', 'substring', 0, [(8, 13)])]
+  ['abcdefg_count', 'DiscountCount'], 'count':
+    oracle any         [('DiscountCount', 'substring', 0, [(8, 13)]), ('abcdefg_count', 'substring', 0, [(8, 13)])]
+    oracle boundary    [('abcdefg_count', 'substring', 0, [(8, 13)]), ('DiscountCount', 'substring', 0, [(8, 13)])]
+    A (step 6 `in`)    [('DiscountCount', 'substring', 0, [(8, 13)]), ('abcdefg_count', 'substring', 0, [(8, 13)])]
+    R2 sub=boundary    [('abcdefg_count', 'substring', 0, [(8, 13)]), ('DiscountCount', 'substring', 0, [(8, 13)])]
+
+=== A changes no list: A == naive_r2 (any) on the small fixtures, repeated words included
+  BalanceTube_STMicro.a2l    35 queries x 3 limits: 0 mismatches
+  from_source.a2l            35 queries x 3 limits: 0 mismatches
+  software_b.a2l             35 queries x 3 limits: 0 mismatches
+
+=== A == R2 (graph at 15129b64, unbanded) on REF, REF6 and LONG
+  REF    39 queries: 0 differences; tier/_classify disagreements A 0
+  REF6   35 queries: 0 differences; tier/_classify disagreements A 0
+  LONG    3 queries: 0 differences; tier/_classify disagreements A 0
+
+load after = (0.712890625, 0.48876953125, 1.7958984375)

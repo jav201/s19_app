@@ -1,0 +1,253 @@
+runner d2-run.sh sha256 94e6d48eb8c2d94620ad6b3db9d0f17471ad14f3e16c44b00d9babce4534ccba; probe d2-probe.py sha256 cbcd3285def690a1d81257a4aa540a2d715e1ab1c77f8749bb5c8eddf8b8673d; sec-r2-probe.py ecda78d650657c1f9395592572e8091e60432d4e8328363807afa8eb2c772233; sec-e5-probe.py 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+s19_app.__file__ = /tmp/b103-e5d2-4/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5d2-4/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0
+tests module = /tmp/b103-e5d2-4/tree/tests/test_b103_label_match_perf.py
+mode = d2 verify N=20 totals=counter  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = 8734112732843017983
+host = <runner>  load = (0.43, 2.22, 2.55)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5d2-4/<user>  LOCALAPPDATA = /tmp/b103-e5d2-4/<user>/localappdata  PILOT_DIR = /tmp/b103-e5d2-4/pilot
+pilot with the cap N = 20 (a query of more than 20 distinct query tokens gets no fuzzy tier); median of 7 consecutive rankings, limit 20 (X40 also limit 40); every list's every query
+
+=== REF: 50,000 names, 2,062,041 characters in all (.40 scope: 50,000 names, <= 2,356,624); load (0.51, 2.18, 2.54)
+      50.9 ms [ok] n=  1 listed 20 ['prefix'] bad spans 0  QSET 0
+      51.1 ms [ok] n=  1 listed 20 ['prefix'] bad spans 0  QSET 1
+      11.0 ms [ok] n=  1 listed 20 ['substring'] bad spans 0  QSET 2
+       4.9 ms [ok] n=  1 listed 20 ['prefix'] bad spans 0  QSET 3
+       5.7 ms [ok] n=  1 listed 20 ['prefix'] bad spans 0  QSET 4
+       9.8 ms [ok] n= 12 listed 4 ['exact', 'prefix'] bad spans 0  QSET 5
+      13.4 ms [ok] n=  3 listed 4 ['prefix'] bad spans 0  QSET 6
+      18.4 ms [ok] n=  3 listed 20 ['subsequence', 'substring'] bad spans 0  QSET 7
+      13.2 ms [ok] n=  2 listed 20 ['subsequence', 'token'] bad spans 0  QSET 8
+       3.7 ms [ok] n=  3 listed 20 ['substring', 'token'] bad spans 0  QSET 9
+      53.7 ms [ok] n=  1 listed 20 ['subsequence'] bad spans 0  QSET 10
+      21.3 ms [ok] n=  2 listed 13 ['subsequence'] bad spans 0  QSET 11
+       5.5 ms [ok] n=  1 listed 20 ['fuzzy'] bad spans 0  QSET 12
+       9.0 ms [ok] n=  1 listed 20 ['token'] bad spans 0  QSET 13
+      54.0 ms [ok] n=  1 listed 20 ['fuzzy', 'subsequence', 'substring'] bad spans 0  QSET 14
+      57.2 ms [ok] n=  2 listed 4 ['substring'] bad spans 0  QSET 15
+      18.7 ms [ok] n=  2 listed 20 ['fuzzy', 'subsequence'] bad spans 0  QSET 16
+      47.5 ms [ok] n=  1 listed 4 ['substring'] bad spans 0  QSET 17
+       3.0 ms [ok] n=  1 listed 20 ['prefix', 'substring'] bad spans 0  QSET 18
+      15.2 ms [ok] n=  3 listed 0 - bad spans 0  QSET 19
+      19.6 ms [ok] n=  6 listed 20 ['subsequence', 'token'] bad spans 0  QSET 20
+      16.0 ms [ok] n=  4 listed 4 ['subsequence'] bad spans 0  QSET 21
+      51.6 ms [ok] n=  6 listed 4 ['fuzzy'] bad spans 0  QSET 22
+      51.3 ms [ok] n=  6 listed 4 ['fuzzy'] bad spans 0  QSET 23
+      49.1 ms [ok] n=  5 listed 3 ['fuzzy'] bad spans 0  QSET 24
+       8.3 ms [ok] n=  1 listed 20 ['token'] bad spans 0  QSET 25
+       9.5 ms [ok] n= 26 listed 0 - bad spans 0  QSET 26
+       4.8 ms [ok] n=  1 listed 20 ['token'] bad spans 0  QSET 27
+      64.7 ms [ok] n=  1 listed 0 - bad spans 0  QSET 28
+       6.9 ms [ok] n= 59 listed 0 - bad spans 0  QSET 29
+       6.9 ms [ok] n= 50 listed 0 - bad spans 0  QSET 30
+       7.4 ms [ok] n= 27 listed 1 ['exact'] bad spans 0  QSET 31
+       6.6 ms [ok] n= 27 listed 0 - bad spans 0  QSET 32
+       7.2 ms [ok] n=  1 listed 20 ['fuzzy', 'token'] bad spans 0  PSET qzx x64
+       6.7 ms [ok] n= 26 listed 0 - bad spans 0  PSET qza..qzz x3
+       7.7 ms [ok] n=  1 listed 20 ['fuzzy', 'token'] bad spans 0  PSET cnt x64
+       6.7 ms [ok] n=  2 listed 20 ['token'] bad spans 0  PSET 1a x128
+       7.3 ms [ok] n=  1 listed 20 ['fuzzy'] bad spans 0  PSET rat x64
+       6.4 ms [ok] n=  2 listed 20 ['fuzzy'] bad spans 0  PSET e x120 + rat
+
+=== REF6: 50,000 names, 650,000 characters in all (.40 scope: 50,000 names, <= 2,356,624); load (0.62, 2.12, 2.51)
+      32.0 ms [ok] n=  1 listed 20 ['prefix'] bad spans 0  REF6Q m
+      32.7 ms [ok] n=  1 listed 20 ['prefix'] bad spans 0  REF6Q meas_
+      43.2 ms [ok] n=  1 listed 20 ['fuzzy'] bad spans 0  REF6Q chr
+      43.8 ms [ok] n=  1 listed 20 ['fuzzy'] bad spans 0  REF6Q mesa
+      43.3 ms [ok] n=  1 listed 20 ['fuzzy'] bad spans 0  REF6Q cahr
+      50.0 ms [ok] n=  2 listed 20 ['subsequence'] bad spans 0  REF6Q cr0
+      18.0 ms [ok] n=  2 listed 20 ['token'] bad spans 0  REF6Q char 1
+     101.3 ms [ok] n=  1 listed 20 ['substring'] bad spans 0  REF6Q 0
+      47.3 ms [ok] n=  2 listed 20 ['fuzzy'] bad spans 0  REF6Q chr 0
+      28.0 ms [ok] n=  2 listed 20 ['token'] bad spans 0  REF6Q ch00
+      18.5 ms [ok] n=  2 listed 20 ['token'] bad spans 0  REF6Q meas 1
+      20.1 ms [ok] n=  3 listed 20 ['token'] bad spans 0  REF6Q c 0 1
+      46.4 ms [ok] n=  1 listed 20 ['fuzzy'] bad spans 0  PSET6 chr x64
+      44.5 ms [ok] n=  1 listed 20 ['fuzzy'] bad spans 0  PSET6 cahr x51
+      76.4 ms [ok] n=  1 listed 20 ['token'] bad spans 0  PSET6 0 x128
+      62.2 ms [ok] n=  1 listed 20 ['token'] bad spans 0  PSET6 00 x85
+      34.0 ms [ok] n=  2 listed 20 ['token'] bad spans 0  PSET6 c 0 x64
+      33.3 ms [ok] n=  1 listed 20 ['token'] bad spans 0  PSET6 c x128
+      37.4 ms [ok] n=  1 listed 20 ['token'] bad spans 0  PSET6 m x128
+      39.5 ms [ok] n=  1 listed 20 ['token'] bad spans 0  PSET6 1 x128
+      46.6 ms [ok] n=  2 listed 20 ['fuzzy'] bad spans 0  PSET6 c x125 + chax
+      47.1 ms [ok] n=  2 listed 20 ['fuzzy'] bad spans 0  PSET6 0 x125 + chax
+      46.2 ms [ok] n=  2 listed 20 ['fuzzy'] bad spans 0  PSET6 chax x52
+      46.7 ms [ok] n=  2 listed 20 ['fuzzy'] bad spans 0  PSET6 mesa x52
+       6.7 ms [ok] n= 62 listed 0 - bad spans 0  PSET6 near tokens
+       7.0 ms [ok] n= 26 listed 0 - bad spans 0  PSET6 cha..chz x3
+       6.6 ms [ok] n= 51 listed 0 - bad spans 0  PSET6 51 typos of char
+      14.0 ms [ok] n=  1 listed 0 - bad spans 0  PSET6 E3S-01 e x128
+       6.9 ms [ok] n= 26 listed 0 - bad spans 0  PSET6 E3S-01 a..z
+      77.2 ms [ok] n=  1 listed 20 ['token'] bad spans 0  PSET6 E3S-01 0 x128
+      21.0 ms [ok] n=  1 listed 0 - bad spans 0  PSET6 E3S-01 a x256
+       6.6 ms [ok] n= 59 listed 0 - bad spans 0  PSET6 E3S-01 pool join
+       6.7 ms [ok] n= 50 listed 0 - bad spans 0  PSET6 E3S-01 pool[200:] join
+       6.4 ms [ok] n= 27 listed 0 - bad spans 0  PSET6 E3S-01 longest REF name
+       6.4 ms [ok] n= 27 listed 0 - bad spans 0  PSET6 E3S-01 longest swapped
+
+=== LONG: 50,000 names, 2,160,180 characters in all (.40 scope: 50,000 names, <= 2,356,624); load (0.86, 2.1, 2.5)
+      57.5 ms [ok] n=  1 listed 20 ['fuzzy'] bad spans 0  LONGQ a x255 + b
+      57.0 ms [ok] n=  1 listed 20 ['fuzzy'] bad spans 0  LONGQ a x254 + bb
+      50.7 ms [ok] n=  1 listed 20 ['fuzzy'] bad spans 0  LONGQ a x128 + b
+       6.9 ms [ok] n=  1 listed 20 ['fuzzy', 'token'] bad spans 0  LONGX 'aaq ' x 64 (one 1-edit token, repeated)
+       4.9 ms [ok] n=  1 listed 20 ['fuzzy'] bad spans 0  LONGX 'aaaq ' x 51
+      43.8 ms [ok] n=  1 listed 20 ['fuzzy'] bad spans 0  LONGX 'aaaaaq ' x 36 (2-edit token, repeated)
+       6.9 ms [ok] n= 25 listed 0 - bad spans 0  LONGX 'aab' .. 'aaz' x 2, cut 256 (distinct 1-edit tokens)
+       2.9 ms [ok] n=  1 listed 20 ['prefix', 'substring'] bad spans 0  LONGX 'aaq'
+       1.8 ms [ok] n=  1 listed 20 ['prefix'] bad spans 0  LONGX 'a' x 256
+
+=== CRAFT: 50,000 names, 2,356,624 characters in all (.40 scope: 50,000 names, <= 2,356,624); load (0.87, 2.08, 2.49)
+      28.5 ms [ok] n=  4 listed 20 ['fuzzy'] bad spans 0  CRAFT 4 tokens
+      36.9 ms [ok] n=  6 listed 20 ['fuzzy'] bad spans 0  CRAFT 6 tokens
+      44.6 ms [ok] n=  8 listed 20 ['fuzzy'] bad spans 0  CRAFT 8 tokens
+      52.4 ms [ok] n= 10 listed 20 ['fuzzy'] bad spans 0  CRAFT 10 tokens
+      60.7 ms [ok] n= 12 listed 20 ['fuzzy'] bad spans 0  CRAFT 12 tokens
+      76.4 ms [ok] n= 16 listed 20 ['fuzzy'] bad spans 0  CRAFT 16 tokens
+       6.7 ms [ok] n= 32 listed 0 - bad spans 0  CRAFT 32 tokens
+       7.4 ms [ok] n= 51 listed 0 - bad spans 0  CRAFT 51 tokens
+
+=== BAND: 50,000 names, 2,279,697 characters in all (.40 scope: 50,000 names, <= 2,356,624); load (0.96, 2.08, 2.49)
+     113.8 ms [ok] n=  2 listed 20 ['fuzzy'] bad spans 0  BAND .40/4
+      11.4 ms [ok] n=  2 listed 20 ['token'] bad spans 0  BAND head + 249 a
+      86.9 ms [ok] n=  2 listed 0 - bad spans 0  BAND head + 249 b
+      99.1 ms [ok] n=  3 listed 20 ['fuzzy'] bad spans 0  BAND two ~124
+
+=== U1: 50,000 names, 300,000 characters in all (.40 scope: 50,000 names, <= 2,356,624); load (0.97, 2.06, 2.48)
+      81.9 ms [ok] n=  4 listed 20 ['fuzzy'] bad spans 0  FAMQ 4
+     105.0 ms [ok] n=  6 listed 20 ['fuzzy'] bad spans 0  FAMQ 6
+     128.2 ms [ok] n=  8 listed 20 ['fuzzy'] bad spans 0  FAMQ 8
+     150.4 ms [ok] n= 10 listed 20 ['fuzzy'] bad spans 0  FAMQ 10
+     174.9 ms [ok] n= 12 listed 20 ['fuzzy'] bad spans 0  FAMQ 12
+     222.8 ms [ok] n= 16 listed 20 ['fuzzy'] bad spans 0  FAMQ 16
+       6.6 ms [ok] n= 24 listed 0 - bad spans 0  FAMQ 24
+       6.7 ms [ok] n= 32 listed 0 - bad spans 0  FAMQ 32
+       6.7 ms [ok] n= 52 listed 0 - bad spans 0  FAMQ 52
+       6.8 ms [ok] n= 76 listed 0 - bad spans 0  FAMQ 76
+  one ranking under tracemalloc, FAMQ 20: peak 18.57 MiB (3.11 s [ok])
+  one ranking under tracemalloc, FAMQ 76: peak 0.02 MiB (0.09 s [ok])
+  negative controls:
+    cap removed (range tables kept), FAMQ 76: median of 3 811.7 ms [ok]
+    the shipped dict tables (rank as shipped, no cap), FAMQ 20: median of 3 543.8 ms [ok]
+
+=== U6: 50,000 names, 2,050,000 characters in all (.40 scope: 50,000 names, <= 2,356,624); load (0.98, 1.99, 2.44)
+     106.9 ms [ok] n=  4 listed 20 ['fuzzy'] bad spans 0  FAMQ 4
+     131.9 ms [ok] n=  6 listed 20 ['fuzzy'] bad spans 0  FAMQ 6
+     162.9 ms [ok] n=  8 listed 20 ['fuzzy'] bad spans 0  FAMQ 8
+     197.5 ms [ok] n= 10 listed 20 ['fuzzy'] bad spans 0  FAMQ 10
+     233.5 ms [ok] n= 12 listed 20 ['fuzzy'] bad spans 0  FAMQ 12
+     305.2 ms [ok] n= 16 listed 20 ['fuzzy'] bad spans 0  FAMQ 16
+       6.6 ms [ok] n= 24 listed 0 - bad spans 0  FAMQ 24
+       6.6 ms [ok] n= 32 listed 0 - bad spans 0  FAMQ 32
+       6.6 ms [ok] n= 52 listed 0 - bad spans 0  FAMQ 52
+       7.2 ms [ok] n= 76 listed 0 - bad spans 0  FAMQ 76
+  one ranking under tracemalloc, FAMQ 20: peak 19.00 MiB (14.59 s [ok])
+  one ranking under tracemalloc, FAMQ 76: peak 0.02 MiB (0.11 s [ok])
+  negative controls:
+    cap removed (range tables kept), FAMQ 76: median of 3 1219.7 ms [ok]  > 1.0 s: RED
+    the shipped dict tables (rank as shipped, no cap), FAMQ 20: median of 3 1931.2 ms [ok]  > 1.0 s: RED
+
+=== S1: 50,000 names, 388,890 characters in all (.40 scope: 50,000 names, <= 2,356,624); load (0.99, 1.88, 2.39)
+      64.4 ms [ok] n=  4 listed 20 ['fuzzy'] bad spans 0  FAMQ 4
+      76.6 ms [ok] n=  6 listed 20 ['fuzzy'] bad spans 0  FAMQ 6
+      89.5 ms [ok] n=  8 listed 20 ['fuzzy'] bad spans 0  FAMQ 8
+     102.1 ms [ok] n= 10 listed 20 ['fuzzy'] bad spans 0  FAMQ 10
+     115.2 ms [ok] n= 12 listed 20 ['fuzzy'] bad spans 0  FAMQ 12
+     140.7 ms [ok] n= 16 listed 20 ['fuzzy'] bad spans 0  FAMQ 16
+       8.3 ms [ok] n= 24 listed 0 - bad spans 0  FAMQ 24
+       7.9 ms [ok] n= 32 listed 0 - bad spans 0  FAMQ 32
+       8.0 ms [ok] n= 52 listed 0 - bad spans 0  FAMQ 52
+       8.0 ms [ok] n= 76 listed 0 - bad spans 0  FAMQ 76
+
+=== E2: 50,000 names, 400,000 characters in all (.40 scope: 50,000 names, <= 2,356,624); load (0.99, 1.86, 2.38)
+      94.8 ms [ok] n=  4 listed 20 ['fuzzy'] bad spans 0  FAM6 4
+     120.2 ms [ok] n=  6 listed 20 ['fuzzy'] bad spans 0  FAM6 6
+     147.7 ms [ok] n=  8 listed 20 ['fuzzy'] bad spans 0  FAM6 8
+     171.3 ms [ok] n= 10 listed 20 ['fuzzy'] bad spans 0  FAM6 10
+     198.6 ms [ok] n= 12 listed 20 ['fuzzy'] bad spans 0  FAM6 12
+       6.7 ms [ok] n= 24 listed 0 - bad spans 0  FAM6 24
+       6.7 ms [ok] n= 36 listed 0 - bad spans 0  FAM6 36
+
+=== M1: 50,000 names, 1,166,622 characters in all (.40 scope: 50,000 names, <= 2,356,624); load (0.99, 1.85, 2.37)
+      53.9 ms [ok] n=  4 listed 20 ['fuzzy'] bad spans 0  FAMQ 4
+      72.2 ms [ok] n=  6 listed 20 ['fuzzy'] bad spans 0  FAMQ 6
+      89.0 ms [ok] n=  8 listed 20 ['fuzzy'] bad spans 0  FAMQ 8
+     105.8 ms [ok] n= 10 listed 20 ['fuzzy'] bad spans 0  FAMQ 10
+     123.0 ms [ok] n= 12 listed 20 ['fuzzy'] bad spans 0  FAMQ 12
+     157.0 ms [ok] n= 16 listed 20 ['fuzzy'] bad spans 0  FAMQ 16
+       6.8 ms [ok] n= 24 listed 0 - bad spans 0  FAMQ 24
+       6.8 ms [ok] n= 32 listed 0 - bad spans 0  FAMQ 32
+       7.0 ms [ok] n= 52 listed 0 - bad spans 0  FAMQ 52
+       7.2 ms [ok] n= 76 listed 0 - bad spans 0  FAMQ 76
+
+=== D3: 50,000 names, 2,286,890 characters in all (.40 scope: 50,000 names, <= 2,356,624); load (0.99, 1.82, 2.36)
+      93.0 ms [ok] n=  4 listed 20 ['fuzzy'] bad spans 0  FAMQ 4
+     122.4 ms [ok] n=  6 listed 20 ['fuzzy'] bad spans 0  FAMQ 6
+     161.7 ms [ok] n=  8 listed 20 ['fuzzy'] bad spans 0  FAMQ 8
+     209.7 ms [ok] n= 10 listed 20 ['fuzzy'] bad spans 0  FAMQ 10
+     234.4 ms [ok] n= 12 listed 20 ['fuzzy'] bad spans 0  FAMQ 12
+     300.7 ms [ok] n= 16 listed 20 ['fuzzy'] bad spans 0  FAMQ 16
+       8.8 ms [ok] n= 24 listed 0 - bad spans 0  FAMQ 24
+       7.5 ms [ok] n= 32 listed 0 - bad spans 0  FAMQ 32
+       7.5 ms [ok] n= 52 listed 0 - bad spans 0  FAMQ 52
+       7.6 ms [ok] n= 76 listed 0 - bad spans 0  FAMQ 76
+  one ranking under tracemalloc, FAMQ 20: peak 17.12 MiB (31.95 s [ok])
+  one ranking under tracemalloc, FAMQ 76: peak 0.02 MiB (0.11 s [ok])
+  negative controls:
+    cap removed (range tables kept), FAMQ 76: median of 3 1224.8 ms [ok]  > 1.0 s: RED
+    the shipped dict tables (rank as shipped, no cap), FAMQ 20: median of 3 328.3 ms [ok]
+
+=== SWC: 50,000 names, 301,206 characters in all (.40 scope: 50,000 names, <= 2,356,624); load (2.22, 2.06, 2.42)
+      17.8 ms [ok] n=  4 listed 2 ['fuzzy'] bad spans 0  head + FAM3 3
+      22.6 ms [ok] n=  6 listed 2 ['fuzzy'] bad spans 0  head + FAM3 5
+      27.3 ms [ok] n=  8 listed 2 ['fuzzy'] bad spans 0  head + FAM3 7
+      32.2 ms [ok] n= 10 listed 2 ['fuzzy'] bad spans 0  head + FAM3 9
+      37.1 ms [ok] n= 12 listed 2 ['fuzzy'] bad spans 0  head + FAM3 11
+      54.8 ms [ok] n= 16 listed 2 ['fuzzy'] bad spans 0  head + FAM3 15
+       8.3 ms [ok] n= 24 listed 0 - bad spans 0  head + FAM3 23
+       8.1 ms [ok] n= 32 listed 0 - bad spans 0  head + FAM3 31
+       8.2 ms [ok] n= 52 listed 0 - bad spans 0  head + FAM3 51
+       8.2 ms [ok] n= 76 listed 0 - bad spans 0  head + FAM3 75
+
+=== X40: 50,000 names, 2,101,369 characters in all (.40 scope: 50,000 names, <= 2,356,624); load (2.19, 2.06, 2.41)
+      24.6 ms [ok] n=  4 listed 20 ['fuzzy'] bad spans 0  head + FAM3 3
+      38.5 ms [ok] limit 40 listed 40
+      30.3 ms [ok] n=  6 listed 20 ['fuzzy'] bad spans 0  head + FAM3 5
+      44.1 ms [ok] limit 40 listed 40
+      36.1 ms [ok] n=  8 listed 20 ['fuzzy'] bad spans 0  head + FAM3 7
+      49.6 ms [ok] limit 40 listed 40
+      41.5 ms [ok] n= 10 listed 20 ['fuzzy'] bad spans 0  head + FAM3 9
+      55.2 ms [ok] limit 40 listed 40
+      47.3 ms [ok] n= 12 listed 20 ['fuzzy'] bad spans 0  head + FAM3 11
+      60.5 ms [ok] limit 40 listed 40
+      57.3 ms [ok] n= 16 listed 20 ['fuzzy'] bad spans 0  head + FAM3 15
+      71.3 ms [ok] limit 40 listed 40
+       6.6 ms [ok] n= 24 listed 0 - bad spans 0  head + FAM3 23
+       6.6 ms [ok] limit 40 listed 0
+       6.6 ms [ok] n= 32 listed 0 - bad spans 0  head + FAM3 31
+       6.6 ms [ok] limit 40 listed 0
+       6.8 ms [ok] n= 52 listed 0 - bad spans 0  head + FAM3 51
+       6.8 ms [ok] limit 40 listed 0
+       7.0 ms [ok] n= 76 listed 0 - bad spans 0  head + FAM3 75
+       7.1 ms [ok] limit 40 listed 0
+
+=== SEQ: 50,000 names, 2,346,100 characters in all (.40 scope: 50,000 names, <= 2,356,624); load (2.17, 2.05, 2.41)
+     220.2 ms [ok] n=  1 listed 0 - bad spans 0  SEQ reviewer 255
+     113.2 ms [ok] n=  1 listed 0 - bad spans 0  SEQ reviewer 125
+     159.2 ms [ok] n= 51 listed 0 - bad spans 0  SEQ {a,b} words
+
+worst 12 medians:
+     305.2 ms  U6  n=16  FAMQ 16
+     300.7 ms  D3  n=16  FAMQ 16
+     234.4 ms  D3  n=12  FAMQ 12
+     233.5 ms  U6  n=12  FAMQ 12
+     222.8 ms  U1  n=16  FAMQ 16
+     220.2 ms  SEQ  n=1  SEQ reviewer 255
+     209.7 ms  D3  n=10  FAMQ 10
+     198.6 ms  E2  n=12  FAM6 12
+     197.5 ms  U6  n=10  FAMQ 10
+     174.9 ms  U1  n=12  FAMQ 12
+     171.3 ms  E2  n=10  FAM6 10
+     162.9 ms  U6  n=8  FAMQ 8
+load after = (2.16, 2.05, 2.41)
+probe exit 0

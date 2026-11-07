@@ -1,0 +1,24 @@
+runner sec-r4-run.sh sha256 7225a0c07c03fcc70fc7b999ce05a020dd89112bd40d37d6b63c27d49d485517; probe sec-r4-probe.py sha256 3cbaf0fb141a1399f27057356ea7a022104e0dac6b150483dce2590696af7bbf
+s19_app.__file__ = /tmp/b103-e5r4-4-sec/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5r4-4-sec/tree/s19_app/tui/services/label_match.py
+label_match sha256 = b97d19ebfe11dd47f096ded2ae6d7dd5f12f6fa02c42d8b9d5f782056bd79ecc
+tests module = /tmp/b103-e5r4-4-sec/tree/tests/test_b103_label_match_perf.py
+mode = r4 boundary  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = -8879642842276446693
+host = <runner>  load = (13.98, 7.03, 4.2)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5r4-4-sec/<user>  LOCALAPPDATA = /tmp/b103-e5r4-4-sec/<user>/localappdata  PILOT_DIR = /tmp/b103-e5r4-4-sec/pilot
+probe = sec-r4-probe.py sha256 3cbaf0fb141a1399f27057356ea7a022104e0dac6b150483dce2590696af7bbf; sec-r3-probe.py sha256 9cf292424ce8f1a335da4da39354d86b2b99bb480f5b41f0d387f608e52ceefa; sec-e5-probe.py sha256 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+_FUZZY_NODE_BUDGET = 400,000; _FUZZY_TOKEN_CAP = 20; _FUZZY_SWITCH_CAP = 512; _TRIE_PREFIX = 258; T.ANY_QUERY_BOUND_S = 2.0; T.KEYSTROKE_BOUND_S = 0.2
+query 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' (1 token, 2 allowed edits); natural visits = the shipped walk with budget 10**9; budget 400,000
+n_tok = 12,333 DEEP tokens; natural visits with 0 fillers 399,972, with 5 fillers 399,977 (one visit per filler: True)
+filler counts by natural visits: {399999: 27, 400000: 28, 400001: 29}
+
+  natural fillers | shipped rank('a'*40, limit 20): first entry; sentinel listed | budget removed: first entry; sentinel listed | visits in the ranking
+  399,999      27 | ('zzaaaaaaaaaa', 'fuzzy', 2, ((0, 40),)) True | ('zzaaaaaaaaaa', 'fuzzy', 2, ((0, 40),)) True | [(400000, 399999)]; listed 20; same as no budget True
+          median of 5: 1400.7 ms [ok]; 2-token query 'a'*40 + ' ' + 'a'*39 -> ['subsequence']
+  400,000      28 | ('zzaaaaaaaaaa', 'fuzzy', 2, ((0, 40),)) True | ('zzaaaaaaaaaa', 'fuzzy', 2, ((0, 40),)) True | [(400000, 400000)]; listed 20; same as no budget True
+          median of 5: 1349.8 ms [ok]; 2-token query 'a'*40 + ' ' + 'a'*39 -> ['subsequence']
+  400,001      29 | ('aapaaayaaaaa', 'fuzzy', 2, ((0, 40),)) False | ('zzaaaaaaaaaa', 'fuzzy', 2, ((0, 40),)) True | [(400000, 400000)]; listed 20; same as no budget False
+          median of 5: 1344.3 ms [ok]; 2-token query 'a'*40 + ' ' + 'a'*39 -> ['subsequence']
+
+load after = (16.97, 10.26, 5.69)
+probe exit 0

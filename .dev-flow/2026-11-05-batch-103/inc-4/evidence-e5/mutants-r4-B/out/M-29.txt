@@ -1,0 +1,44 @@
+=== s19_app.__file__ ===
+/tmp/b103-e5-4-mutr4B/M-29/s19_app/__init__.py
+
+=== DIFF base -> M-29 (s19_app/tui/services/label_match.py) ===
+--- /tmp/b103-e5-4-mutr4B/base/s19_app/tui/services/label_match.py	2026-11-07 01:32:51.000000000 -0600
++++ /tmp/b103-e5-4-mutr4B/M-29/s19_app/tui/services/label_match.py	2026-11-07 02:08:26.751507619 -0600
+@@ -988,14 +988,12 @@
+         p = folded.find(text)
+         if p < 0:
+             raise ValueError(f"substring: {name!r} does not meet its tier")
+-        span = (p, p + len(text))
+         cursor = p
+         while cursor >= 0:
+             if _at_boundary(name, cursor):
+-                span = (cursor, cursor + len(text))
+-                break
++                return ((cursor, cursor + len(text)),)
+             cursor = folded.find(text, cursor + 1)
+-        return (span,)
++        return ()
+ 
+     name_spans = _tokens(name)
+     counts: dict[str, int] = {}
+
+=== PYTEST (tail, rc=1) ===
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________________ test_rows_29_span_with_no_boundary_occurrence _________________
+
+prep = <function prep.<locals>.get at 0x7fa5969efc40>
+
+    def test_rows_29_span_with_no_boundary_occurrence(prep):
+        """R-A2L-MATCH.29/1 (BAL ``ounter``) and .29/2 (SWB ``sahw`` inside an uppercase run)."""
+        got = run(prep, "BAL", "ounter", 4)
+>       assert spans_of(got, "model.MainClass.ledController.sw.timeCounter") == ((38, 44),)
+E       assert () == ((38, 44),)
+E         
+E         Right contains one more item: (38, 44)
+E         Use -v to get more diff
+
+tests/test_b103_label_match.py:549: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_rows_29_span_with_no_boundary_occurrence
+1 failed, 144 deselected in 5.03s

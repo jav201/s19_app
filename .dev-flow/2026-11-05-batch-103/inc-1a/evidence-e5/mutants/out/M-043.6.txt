@@ -1,0 +1,88 @@
+# M-043.6
+# row: R-TUI-043.6
+# s19_app.__file__ = /tmp/b103-e5-1a-mut/work/s19_app/__init__.py
+# note: the app-clipboard fallback removed -> (a) RED
+# --- git diff ---
+diff --git a/s19_app/tui/capped_text_area.py b/s19_app/tui/capped_text_area.py
+index 42582b4d..07dc122d 100644
+--- a/s19_app/tui/capped_text_area.py
++++ b/s19_app/tui/capped_text_area.py
+@@ -214,9 +214,6 @@ class CappedTextArea(TextArea):
+         loop = asyncio.get_event_loop()
+         text = await loop.run_in_executor(None, _os_clipboard_input.read_os_clipboard)
+         source = "os"
+-        if text is None:
+-            text = self.app.clipboard
+-            source = "internal"
+         if not text:
+             # Selecting the whole buffer marks it as "stale — retype or
+             # re-paste", so the user sees the paste did nothing.
+diff --git a/s19_app/tui/os_clipboard_input.py b/s19_app/tui/os_clipboard_input.py
+index ad2f7240..cce58b6f 100644
+--- a/s19_app/tui/os_clipboard_input.py
++++ b/s19_app/tui/os_clipboard_input.py
+@@ -972,9 +972,6 @@ class OsClipboardInput(Input):
+         loop = asyncio.get_event_loop()
+         text = await loop.run_in_executor(None, read_os_clipboard)
+         source = "os"
+-        if text is None:
+-            text = self.app.clipboard[:_CLIPBOARD_CAP_CHARS]
+-            source = "internal"
+         if not text:
+             # Every source empty — surface a warning so the user knows
+             # nothing was pasted and can reach for the OS-level shortcut.
+
+# --- pytest (rc=1) ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________ test_r_tui_043_6_1_linux_ctrl_v_pastes_app_clipboard _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10015/test_r_tui_043_6_1_linux_ctrl_0')
+
+    def test_r_tui_043_6_1_linux_ctrl_v_pastes_app_clipboard(tmp_path: Path) -> None:
+        """R-TUI-043.6/1 (LinuxH): Ctrl+V pastes the app clipboard, both classes."""
+        _assert_linuxh_headless()
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            app._clipboard = "APP-TEXT"
+            async with app.run_test(size=(160, 48)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("a2l")
+                for _ in range(4):
+                    await pilot.pause()
+                box_a = app.query_one("#a2l_tags_filter_input", Input)
+                box_a.focus()
+                await pilot.pause()
+                await pilot.press("ctrl+v")
+                await pilot.pause()
+                await pilot.pause()
+                a_value = box_a.value
+                await show_patch_paste(app, pilot)
+                box_m = app.query_one("#patch_paste_text", TextArea)
+                box_m.text = ""
+                box_m.focus()
+                await pilot.pause()
+                await pilot.press("ctrl+v")
+                await pilot.pause()
+                await pilot.pause()
+                return a_value, box_m.text
+    
+        a_value, m_value = asyncio.run(_drive())
+>       assert a_value == "APP-TEXT", a_value
+E       AssertionError: 
+E       assert '' == 'APP-TEXT'
+E         
+E         - APP-TEXT
+
+tests/test_b103_clipboard_core.py:204: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:990 action_paste: no clipboard text available (source=os)
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.capped_text_area:capped_text_area.py:229 action_paste: no clipboard text available (source=os)
+=========================== short test summary info ============================
+FAILED tests/test_b103_clipboard_core.py::test_r_tui_043_6_1_linux_ctrl_v_pastes_app_clipboard
+1 failed, 86 deselected in 4.44s
+
+===== stderr =====

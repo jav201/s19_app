@@ -1,0 +1,54 @@
+# M-03  row R-A2L-MATCH.3
+
+control: case-sensitive compare -> `value_0001` gives no `exact` entry (and `rpm` one, not three)
+edit: `_fold`: return `text` unchanged (no A-Z folding)
+
+s19_app.__file__: /tmp/b103-e5-4-mutr2A/M-03/s19_app/__init__.py
+
+== diff ==
+--- /tmp/b103-e5-4-mutr2A/base/s19_app/tui/services/label_match.py	2026-11-06 22:11:34.000000000 -0600
++++ /tmp/b103-e5-4-mutr2A/M-03/s19_app/tui/services/label_match.py	2026-11-06 22:42:25.537781368 -0600
+@@ -619,7 +619,7 @@
+     Returns:
+         str: The folded text.
+     """
+-    return text.translate(_FOLD_TABLE)
++    return text
+ 
+ 
+ def _char_mask(text: str) -> int:
+
+== pytest (returncode 1, KILLED) ==
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_________________ test_ranked_list_is_exactly[R-A2L-MATCH.3/1] _________________
+tests/test_b103_label_match.py:391: in test_ranked_list_is_exactly
+    assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E   AssertionError: R-A2L-MATCH.3/1: query 'value_0001' limit 20
+E   assert [] == [('VALUE_0001..., ((0, 10),))]
+E     
+E     Right contains one more item: ('VALUE_0001', 'exact', 0, ((0, 10),))
+E     Use -v to get more diff
+_________________ test_ranked_list_is_exactly[R-A2L-MATCH.3/2] _________________
+tests/test_b103_label_match.py:391: in test_ranked_list_is_exactly
+    assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E   AssertionError: R-A2L-MATCH.3/2: query 'Value_0001' limit 20
+E   assert [] == [('VALUE_0001..., ((0, 10),))]
+E     
+E     Right contains one more item: ('VALUE_0001', 'exact', 0, ((0, 10),))
+E     Use -v to get more diff
+_________________ test_ranked_list_is_exactly[R-A2L-MATCH.3/3] _________________
+tests/test_b103_label_match.py:391: in test_ranked_list_is_exactly
+    assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E   AssertionError: R-A2L-MATCH.3/3: query 'rpm' limit 20
+E   assert [('rpm', 'exa...1, ((0, 3),))] == [('rpm', 'exa...0, ((0, 3),))]
+E     
+E     At index 1 diff: ('Rpm', 'fuzzy', 1, ((0, 3),)) != ('RPM', 'exact', 0, ((0, 3),))
+E     Right contains one more item: ('Rpm', 'exact', 0, ((0, 3),))
+E     Use -v to get more diff
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.3/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.3/2]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.3/3]
+3 failed, 126 deselected in 5.08s
+

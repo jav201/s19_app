@@ -1,0 +1,41 @@
+===== diff -u (base vs mutant) s19_app/tui/services/label_match.py =====
+--- /tmp/b103-e5-4-mutB/base/s19_app/tui/services/label_match.py	2026-11-06 20:36:19.839317227 -0600
++++ /tmp/b103-e5-4-mutB/M-29/s19_app/tui/services/label_match.py	2026-11-06 21:03:24.545930298 -0600
+@@ -788,7 +788,7 @@
+     p = folded.find(text)
+     if p >= 0:
+         key = 1
+-        span = (p, p + text_len)
++        span = None
+         cursor = p
+         while cursor >= 0:
+             if _at_boundary(name, cursor):
+@@ -796,6 +796,8 @@
+                 span = (cursor, cursor + text_len)
+                 break
+             cursor = folded.find(text, cursor + 1)
++        if span is None:
++            return (MatchRule.SUBSTRING, 1, ())
+         return (MatchRule.SUBSTRING, key, (span,))
+ 
+     name_spans = _tokens(name)
+===== pytest tail =====
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________________ test_rows_29_span_with_no_boundary_occurrence _________________
+
+prep = <function prep.<locals>.get at 0x7f71243e0f40>
+
+    def test_rows_29_span_with_no_boundary_occurrence(prep):
+        """R-A2L-MATCH.29/1 (BAL ``ounter``) and .29/2 (SWB ``sahw`` inside an uppercase run)."""
+        got = run(prep, "BAL", "ounter", 4)
+>       assert spans_of(got, "model.MainClass.ledController.sw.timeCounter") == ((38, 44),)
+E       assert () == ((38, 44),)
+E         
+E         Right contains one more item: (38, 44)
+E         Use -v to get more diff
+
+/home/<user>/work/b103-int4/tests/test_b103_label_match.py:494: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_rows_29_span_with_no_boundary_occurrence
+1 failed, 128 deselected in 4.87s

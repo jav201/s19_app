@@ -1,0 +1,157 @@
+A2L section tree has structural errors: path=/tmp/b103-e3r3-2-security/scratch/tmpo7rxfo1x/x.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/tmp/b103-e3r3-2-security/scratch/tmpo7rxfo1x/x.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/tmp/b103-e3r3-2-security/scratch/tmpo7rxfo1x/x.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/tmp/b103-e3r3-2-security/scratch/tmpo7rxfo1x/x.a2l sample=Line 20: /end without /begin
+A2L section tree has structural errors: path=/tmp/b103-e3r3-2-security/scratch/tmpo7rxfo1x/x.a2l sample=Line 20: /end without /begin
+s19_app.__file__ = ~/work/s19_app/s19_app/__init__.py
+
+== Q1/Q2 shapes ==
+[A] full header, BIT_MASK own line
+     tag: bit_org='0x0FF0' datatype='UWORD' addr=16 len=2 | parse errors=[]
+     model: header=['MA', '', 'UWORD', 'CM_ID', '0', '0', '0', '65535'] rest=['BIT_MASK', '0x0FF0', 'ECU_ADDRESS', '0x10'] mask_word='0x0FF0' keyword=False -> MASKED(0x0FF0)
+     REF: mask 0x0FF0 | BL-I2-1 reached (graph): False | proposed R'+E: MASKED(0x0FF0)
+[B] short header, BIT_MASK own line
+     tag: bit_org='0x0FF0' datatype=None addr=16 len=None | parse errors=[]
+     model: header=['MB', '', 'UWORD', 'CM_ID', '0', '0', '0', 'BIT_MASK'] rest=['0x0FF0', 'ECU_ADDRESS', '0x10'] mask_word=None keyword=True -> REFUSE(keyword)
+     REF: mask 0x0FF0 | BL-I2-1 reached (graph): False | proposed R'+E: REFUSE(R: letters, no mask read)
+[C] short header, BIT_MASK same line (.19/7)
+     tag: bit_org=None datatype='UWORD' addr=16 len=2 | parse errors=[]
+     model: header=['MC', '', 'UWORD', 'CM_ID', '0', '0', '0', 'BIT_MASK'] rest=['0x0FF0', 'ECU_ADDRESS', '0x10'] mask_word=None keyword=True -> REFUSE(keyword)
+     REF: mask 0x0FF0 | BL-I2-1 reached (graph): False | proposed R'+E: REFUSE(R: letters, no mask read)
+[D] short header, BIT_MASK behind a comment (.19/8)
+     tag: bit_org=None datatype=None addr=16 len=None | parse errors=[]
+     model: header=['MD', '', 'UWORD', 'CM_ID', '0', '0', '0', 'BIT_MASK'] rest=['0x0FF0', 'ECU_ADDRESS', '0x10'] mask_word=None keyword=True -> REFUSE(keyword)
+     REF: mask 0x0FF0 | BL-I2-1 reached (graph): False | proposed R'+E: REFUSE(R: letters, no mask read)
+[E] full header on /begin line + BIT_MASK
+     tag: bit_org=None datatype=None addr=16 len=None | parse errors=[]
+     model: header=['ME', '', 'UWORD', 'CM_ID', '0', '0', '0', '65535'] rest=['BIT_MASK', '0x0FF0', 'ECU_ADDRESS', '0x10'] mask_word='0x0FF0' keyword=False -> MASKED(0x0FF0)
+     REF: mask 0x0FF0 | BL-I2-1 reached (graph): False | proposed R'+E: MASKED(0x0FF0)
+[F] comment glued left of the keyword on the header line
+     tag: bit_org=None datatype='UWORD' addr=16 len=2 | parse errors=[]
+     model: header=['MF', '', 'UWORD', 'CM_ID', '0', '0', '0', '65535BIT_MASK'] rest=['0x0FF0', 'ECU_ADDRESS', '0x10'] mask_word=None keyword=False -> UNMASKED
+     REF: mask 0x0FF0 | BL-I2-1 reached (graph): True | proposed R'+E: REFUSE(R: letters, no mask read)
+     encode 35 on the unmasked view (what step 7 returns with no mask): (35, 0) msg=None
+[G] comment glued between keyword and word
+     tag: bit_org=None datatype='UWORD' addr=16 len=2 | parse errors=[]
+     model: header=['MG', '', 'UWORD', 'CM_ID', '0', '0', '0', '65535'] rest=['BIT_MASK0x0FF0', 'ECU_ADDRESS', '0x10'] mask_word=None keyword=False -> UNMASKED
+     REF: mask 0x0FF0 | BL-I2-1 reached (graph): True | proposed R'+E: REFUSE(R: letters, no mask read)
+[H] unterminated FORMAT quote, then BIT_MASK own line
+     tag: bit_org='0x0FF0' datatype='UWORD' addr=16 len=2 | parse errors=[]
+     model: header=['MH', '', 'UWORD', 'CM_ID', '0', '0', '0', '65535'] rest=['ECU_ADDRESS', '0x10', 'FORMAT', '%5.0\n BIT_MASK 0x0FF0'] mask_word=None keyword=False -> REFUSE(bit_org cross-check)
+     REF: malformed (unterminated string) | BL-I2-1 reached (graph): False | proposed R'+E: REFUSE(E: record ends inside a quote)
+[I] unterminated FORMAT quote, then comment-led BIT_MASK
+     tag: bit_org=None datatype='UWORD' addr=16 len=2 | parse errors=[]
+     model: header=['MI', '', 'UWORD', 'CM_ID', '0', '0', '0', '65535'] rest=['ECU_ADDRESS', '0x10', 'FORMAT', '%5.0\n /* m */ BIT_MASK 0x0FF0'] mask_word=None keyword=False -> UNMASKED
+     REF: malformed (unterminated string) | BL-I2-1 reached (graph): False | proposed R'+E: REFUSE(E: record ends inside a quote)
+[J] unclosed /begin IF_DATA before BIT_MASK
+     tag: bit_org=None datatype='UWORD' addr=16 len=2 | parse errors=['Unclosed /begin sections detected.']
+     model: header=['MJ', '', 'UWORD', 'CM_ID', '0', '0', '0', '65535'] rest=['ECU_ADDRESS', '0x10'] mask_word=None keyword=False -> UNMASKED
+     REF: malformed (/end MEASUREMENT closes IF_DATA) | BL-I2-1 reached (graph): False | proposed R'+E: REFUSE(R: letters, no mask read)
+[J1] one-line /begin IF_DATA ... /end IF_DATA (V171's line style) before BIT_MASK
+     tag: bit_org=None datatype='UWORD' addr=16 len=2 | parse errors=['Unclosed /begin sections detected.']
+     model: header=['MJ1', '', 'UWORD', 'CM_ID', '0', '0', '0', '65535'] rest=['ECU_ADDRESS', '0x10'] mask_word=None keyword=False -> UNMASKED
+     REF: mask 0x0FF0 | BL-I2-1 reached (graph): True | proposed R'+E: REFUSE(R: letters, no mask read)
+     encode 35 on the unmasked view (what step 7 returns with no mask): (35, 0) msg=None
+[K] closed IF_DATA holding BIT_MASK (not a mask by the grammar)
+     tag: bit_org=None datatype='UWORD' addr=16 len=2 | parse errors=[]
+     model: header=['MK', '', 'UWORD', 'CM_ID', '0', '0', '0', '65535'] rest=['ECU_ADDRESS', '0x10'] mask_word=None keyword=False -> UNMASKED
+     REF: no mask | BL-I2-1 reached (graph): False | proposed R'+E: REFUSE(R: letters, no mask read)
+[L] a /begin line inside a block comment
+     tag: bit_org=None datatype='UWORD' addr=16 len=2 | parse errors=['Unclosed /begin sections detected.']
+     model: header=['ML', '', 'UWORD', 'CM_ID', '0', '0', '0', '65535'] rest=['ECU_ADDRESS', '0x10'] mask_word=None keyword=False -> UNMASKED
+     REF: mask 0x0FF0 | BL-I2-1 reached (graph): True | proposed R'+E: REFUSE(E: record ends inside a comment)
+[L2] an IF_DATA block commented out, its */ on the /end line
+     tag: bit_org=None datatype='UWORD' addr=16 len=2 | parse errors=['Line 20: /end without /begin']
+     model: header=['ML2', '', 'UWORD', 'CM_ID', '0', '0', '0', '65535'] rest=['ECU_ADDRESS', '0x10'] mask_word=None keyword=False -> UNMASKED
+     REF: mask 0x0FF0 | BL-I2-1 reached (graph): True | proposed R'+E: REFUSE(E: record ends inside a comment)
+[L5] // on the /begin IF_DATA line, its /end left live
+     tag: bit_org=None datatype='UWORD' addr=16 len=2 | parse errors=['Line 20: /end without /begin']
+     model: header=['ML5', '', 'UWORD', 'CM_ID', '0', '0', '0', '65535'] rest=['ECU_ADDRESS', '0x10'] mask_word=None keyword=False -> UNMASKED
+     REF: malformed (/end IF_DATA closes MEASUREMENT) | BL-I2-1 reached (graph): False | proposed R'+E: UNMASKED
+[M] keyword only in a comment (not a mask)
+     tag: bit_org=None datatype='UWORD' addr=16 len=2 | parse errors=[]
+     model: header=['MM', '', 'UWORD', 'CM_ID', '0', '0', '0', '65535'] rest=['ECU_ADDRESS', '0x10'] mask_word=None keyword=False -> UNMASKED
+     REF: no mask | BL-I2-1 reached (graph): False | proposed R'+E: REFUSE(R: letters, no mask read)
+[N] keyword and word split across lines
+     tag: bit_org=None datatype='UWORD' addr=16 len=2 | parse errors=[]
+     model: header=['MN', '', 'UWORD', 'CM_ID', '0', '0', '0', '65535'] rest=['BIT_MASK', '0x0FF0', 'ECU_ADDRESS', '0x10'] mask_word='0x0FF0' keyword=False -> MASKED(0x0FF0)
+     REF: mask 0x0FF0 | BL-I2-1 reached (graph): False | proposed R'+E: MASKED(0x0FF0)
+[O] keyword in a quoted string, no mask
+     tag: bit_org=None datatype='UWORD' addr=16 len=2 | parse errors=[]
+     model: header=['MO', '', 'UWORD', 'CM_ID', '0', '0', '0', '65535'] rest=['PHYS_UNIT', 'BIT_MASK', 'ECU_ADDRESS', '0x10'] mask_word='ECU_ADDRESS' keyword=False -> REFUSE(unreadable 'ECU_ADDRESS')
+     REF: no mask | BL-I2-1 reached (graph): False | proposed R'+E: REFUSE(R: letters, no mask read)
+[O2] quoted "BIT_MASK" before a real mask
+     tag: bit_org='0x0FF0' datatype='UWORD' addr=16 len=2 | parse errors=[]
+     model: header=['MO2', '', 'UWORD', 'CM_ID', '0', '0', '0', '65535'] rest=['PHYS_UNIT', 'BIT_MASK', 'BIT_MASK', '0x0FF0', 'ECU_ADDRESS', '0x10'] mask_word='BIT_MASK' keyword=False -> REFUSE(unreadable 'BIT_MASK')
+     REF: mask 0x0FF0 | BL-I2-1 reached (graph): False | proposed R'+E: REFUSE(R: BIT_MASK 2 times)
+[P] two BIT_MASK lines (0x000F, then 0x0FF0)
+     tag: bit_org='0x0FF0' datatype='UWORD' addr=16 len=2 | parse errors=[]
+     model: header=['MP', '', 'UWORD', 'CM_ID', '0', '0', '0', '65535'] rest=['BIT_MASK', '0x000F', 'BIT_MASK', '0x0FF0', 'ECU_ADDRESS', '0x10'] mask_word='0x000F' keyword=False -> MASKED(0x000F)A2L section tree has structural errors: path=~/work/s19_app/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+
+     REF: mask 0x000F,0x0FF0 | BL-I2-1 reached (graph): False | proposed R'+E: REFUSE(R: BIT_MASK 2 times)
+[Q] lowercase bit_mask
+     tag: bit_org=None datatype='UWORD' addr=16 len=2 | parse errors=[]
+     model: header=['MQ', '', 'UWORD', 'CM_ID', '0', '0', '0', '65535'] rest=['bit_mask', '0x0FF0', 'ECU_ADDRESS', '0x10'] mask_word=None keyword=False -> UNMASKED
+     REF: no mask | BL-I2-1 reached (graph): False | proposed R'+E: REFUSE(R: letters, no mask read)
+[R] CHARACTERISTIC .19/6 MB3 (8 header words)
+     tag: bit_org='0x0FF0' datatype=None addr=None len=None | parse errors=[]
+     model: header=['MB3', '', 'VALUE', '0x10', 'RL_U16', '0', 'CM_ID', '0', 'BIT_MASK'] rest=['0x0FF0'] mask_word=None keyword=True -> A2L-DEF-ADDRESS
+     REF: mask 0x0FF0 | BL-I2-1 reached (graph): False | proposed R'+E: REFUSE(R: letters, no mask read)
+[R2] CHARACTERISTIC .19/6 with its header on body lines (MB4)
+     tag: bit_org='0x0FF0' datatype=None addr=16 len=2 | parse errors=[]
+     model: header=['MB4', '', 'VALUE', '0x10', 'RL_U16', '0', 'CM_ID', '0', 'BIT_MASK'] rest=['0x0FF0'] mask_word=None keyword=True -> REFUSE(keyword)
+     REF: mask 0x0FF0 | BL-I2-1 reached (graph): False | proposed R'+E: REFUSE(R: letters, no mask read)
+[S] tab between keyword and word
+     tag: bit_org='0x0FF0' datatype='UWORD' addr=16 len=2 | parse errors=[]
+     model: header=['MS', '', 'UWORD', 'CM_ID', '0', '0', '0', '65535'] rest=['BIT_MASK', '0x0FF0', 'ECU_ADDRESS', '0x10'] mask_word='0x0FF0' keyword=False -> MASKED(0x0FF0)
+     REF: mask 0x0FF0 | BL-I2-1 reached (graph): False | proposed R'+E: MASKED(0x0FF0)
+[T] form feed before the keyword on the header line
+     tag: bit_org=None datatype='UWORD' addr=16 len=2 | parse errors=[]
+     model: header=['MT', '', 'UWORD', 'CM_ID', '0', '0', '0', '65535'] rest=['BIT_MASK', '0x0FF0', 'ECU_ADDRESS', '0x10'] mask_word='0x0FF0' keyword=False -> MASKED(0x0FF0)
+     REF: mask 0x0FF0 | BL-I2-1 reached (graph): False | proposed R'+E: MASKED(0x0FF0)
+[U] keyword glued after a closing quote
+     tag: bit_org=None datatype='UWORD' addr=16 len=2 | parse errors=[]
+     model: header=['MU', '', 'UWORD', 'CM_ID', '0', '0', '0', '65535'] rest=['FORMAT', '%5.0', 'BIT_MASK', '0x0FF0', 'ECU_ADDRESS', '0x10'] mask_word='0x0FF0' keyword=False -> MASKED(0x0FF0)
+     REF: mask 0x0FF0 | BL-I2-1 reached (graph): False | proposed R'+E: MASKED(0x0FF0)
+[W] keyword in an ANNOTATION_TEXT child (not a mask)
+     tag: bit_org=None datatype='UWORD' addr=16 len=2 | parse errors=[]
+     model: header=['MW', '', 'UWORD', 'CM_ID', '0', '0', '0', '65535'] rest=['ECU_ADDRESS', '0x10'] mask_word=None keyword=False -> UNMASKED
+     REF: no mask | BL-I2-1 reached (graph): False | proposed R'+E: REFUSE(R: letters, no mask read)
+
+== Q2 fixtures: the corrected graph vs the proposed R'+E rule ==
+[FX] examples/case_00_public/ASAP2_Demo_V161.a2l: objects=75 {'MASKED': 6, 'REFUSE': 0, 'UNMASKED': 55, 'pre': 14} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/case_00_public/ASAP2_Demo_V171.a2l: objects=118 {'MASKED': 6, 'REFUSE': 0, 'UNMASKED': 90, 'pre': 22} errors=1 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/case_00_public/BalanceTube_STMicro.a2l: objects=111 {'MASKED': 9, 'REFUSE': 0, 'UNMASKED': 102, 'pre': 0} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/case_00_public/check_test.a2l: objects=1 {'MASKED': 0, 'REFUSE': 0, 'UNMASKED': 0, 'pre': 1} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/case_00_public/cleanup_test.a2l: objects=0 {'MASKED': 0, 'REFUSE': 0, 'UNMASKED': 0, 'pre': 0} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/case_00_public/from_source.a2l: objects=72 {'MASKED': 0, 'REFUSE': 0, 'UNMASKED': 20, 'pre': 52} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/case_00_public/from_source_structs.a2l: objects=0 {'MASKED': 0, 'REFUSE': 0, 'UNMASKED': 0, 'pre': 0} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/case_00_public/included.a2l: objects=1 {'MASKED': 0, 'REFUSE': 0, 'UNMASKED': 1, 'pre': 0} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/case_00_public/memorysegment.a2l: objects=0 {'MASKED': 0, 'REFUSE': 0, 'UNMASKED': 0, 'pre': 0} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/case_00_public/merge_inc_test.a2l: objects=0 {'MASKED': 0, 'REFUSE': 0, 'UNMASKED': 0, 'pre': 0} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/case_00_public/remove_test.a2l: objects=2 {'MASKED': 0, 'REFUSE': 0, 'UNMASKED': 2, 'pre': 0} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/case_00_public/software_a.a2l: objects=13990 {'MASKED': 0, 'REFUSE': 0, 'UNMASKED': 3419, 'pre': 10571} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/case_00_public/software_b.a2l: objects=67 {'MASKED': 0, 'REFUSE': 0, 'UNMASKED': 0, 'pre': 67} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/case_00_public/update_test1.a2l: objects=12 {'MASKED': 3, 'REFUSE': 0, 'UNMASKED': 8, 'pre': 1} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/case_00_public/update_test2.a2l: objects=14 {'MASKED': 3, 'REFUSE': 0, 'UNMASKED': 10, 'pre': 1} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/case_00_public/update_typedef_test1.a2l: objects=0 {'MASKED': 0, 'REFUSE': 0, 'UNMASKED': 0, 'pre': 0} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/case_00_public/update_typedef_test2.a2l: objects=0 {'MASKED': 0, 'REFUSE': 0, 'UNMASKED': 0, 'pre': 0} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/case_00_public/update_typedef_test3.a2l: objects=0 {'MASKED': 0, 'REFUSE': 0, 'UNMASKED': 0, 'pre': 0} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/case_00_public/update_typedef_test4.a2l: objects=0 {'MASKED': 0, 'REFUSE': 0, 'UNMASKED': 0, 'pre': 0} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/case_00_public/xcp_test.a2l: objects=0 {'MASKED': 0, 'REFUSE': 0, 'UNMASKED': 0, 'pre': 0} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/case_01_basic_valid/firmware.a2l: objects=3 {'MASKED': 0, 'REFUSE': 0, 'UNMASKED': 3, 'pre': 0} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/case_02_gaps_and_patch_targets/firmware.a2l: objects=3 {'MASKED': 0, 'REFUSE': 0, 'UNMASKED': 3, 'pre': 0} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/case_03_overlapping_records/firmware.a2l: objects=2 {'MASKED': 0, 'REFUSE': 0, 'UNMASKED': 2, 'pre': 0} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/case_04_bad_checksums/firmware.a2l: objects=1 {'MASKED': 0, 'REFUSE': 0, 'UNMASKED': 1, 'pre': 0} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/case_05_dense_mixed_content/firmware.a2l: objects=4 {'MASKED': 0, 'REFUSE': 0, 'UNMASKED': 4, 'pre': 0} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/case_06_large_nested_a2l/firmware.a2l: objects=220040 {'MASKED': 0, 'REFUSE': 0, 'UNMASKED': 220040, 'pre': 0} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/case_07_stress_smoke/firmware.a2l: objects=12 {'MASKED': 0, 'REFUSE': 0, 'UNMASKED': 0, 'pre': 12} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/professional_validation/case_01_baseline_valid/firmware.a2l: objects=3 {'MASKED': 0, 'REFUSE': 0, 'UNMASKED': 3, 'pre': 0} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/professional_validation/case_02_patch_targets_and_gaps/firmware.a2l: objects=6 {'MASKED': 0, 'REFUSE': 0, 'UNMASKED': 6, 'pre': 0} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/professional_validation/case_03_overlapping_records/firmware.a2l: objects=3 {'MASKED': 0, 'REFUSE': 0, 'UNMASKED': 3, 'pre': 0} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/professional_validation/case_04_bad_checksums/firmware.a2l: objects=1 {'MASKED': 0, 'REFUSE': 0, 'UNMASKED': 1, 'pre': 0} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/professional_validation/case_05_out_of_order_and_mixed/firmware.a2l: objects=3 {'MASKED': 0, 'REFUSE': 0, 'UNMASKED': 3, 'pre': 0} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/professional_validation/case_07_cross_reference_inconsistencies/firmware.a2l: objects=4 {'MASKED': 0, 'REFUSE': 0, 'UNMASKED': 4, 'pre': 0} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] examples/professional_validation/case_08_heavy_fragmentation/firmware.a2l: objects=100 {'MASKED': 0, 'REFUSE': 0, 'UNMASKED': 100, 'pre': 0} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX] tests/fixtures/synth/synth_a2l.a2l: objects=6 {'MASKED': 0, 'REFUSE': 0, 'UNMASKED': 6, 'pre': 0} errors=0 | mask word != tag bit_org: 0 [] | proposed R'+E refuses beyond the graph: 0 []
+[FX-total] objects=234654 masked=27 proposed-extra-refusals=0

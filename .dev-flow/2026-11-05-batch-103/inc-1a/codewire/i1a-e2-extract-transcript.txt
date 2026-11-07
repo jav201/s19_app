@@ -1,0 +1,108 @@
+# transcript: i1a-e2-extract.sh, run 2026-11-07T00:51:32Z
+# code-wire: v3.1.0 e436a08; repo product tree: cfa63f67 (git diff e07fb00 -- s19_app: 0 lines)
+# python: Python 3.12.7
+
+## marks (each replaces the blank line above its def)
+mark _create_tk_root -> s19_app/tui/os_clipboard_input.py:138 (def at 139)
+mark _destroy_tk_root_singleton -> s19_app/tui/os_clipboard_input.py:215 (def at 216)
+mark _prime_tk_root -> s19_app/tui/os_clipboard_input.py:230 (def at 231)
+mark _read_via_tk -> s19_app/tui/os_clipboard_input.py:243 (def at 244)
+mark _read_via_ctypes -> s19_app/tui/os_clipboard_input.py:274 (def at 275)
+mark _read_via_powershell -> s19_app/tui/os_clipboard_input.py:330 (def at 331)
+mark _write_via_ctypes -> s19_app/tui/os_clipboard_input.py:388 (def at 389)
+mark _write_via_tk -> s19_app/tui/os_clipboard_input.py:468 (def at 469)
+mark _write_via_powershell -> s19_app/tui/os_clipboard_input.py:492 (def at 493)
+mark _bound_clipboard_text -> s19_app/tui/os_clipboard_input.py:564 (def at 565)
+mark read_os_clipboard -> s19_app/tui/os_clipboard_input.py:600 (def at 601)
+mark write_os_clipboard -> s19_app/tui/os_clipboard_input.py:664 (def at 665)
+mark _mirror_and_write_os_clipboard -> s19_app/tui/os_clipboard_input.py:726 (def at 727)
+mark _TkRootSingleton.__init__ -> s19_app/tui/os_clipboard_input.py:174 (def at 175)
+mark _TkRootSingleton.get_or_create -> s19_app/tui/os_clipboard_input.py:184 (def at 185)
+mark _TkRootSingleton.get_existing -> s19_app/tui/os_clipboard_input.py:209 (def at 210)
+mark OsClipboardInput.action_copy -> s19_app/tui/os_clipboard_input.py:838 (def at 839)
+mark OsClipboardInput.action_cut -> s19_app/tui/os_clipboard_input.py:865 (def at 866)
+mark OsClipboardInput.action_paste -> s19_app/tui/os_clipboard_input.py:893 (def at 894)
+mark CappedTextArea._on_paste -> s19_app/tui/capped_text_area.py:130 (def at 131)
+mark CappedTextArea.action_paste -> s19_app/tui/capped_text_area.py:166 (def at 167)
+mark CappedTextArea.action_copy -> s19_app/tui/capped_text_area.py:238 (def at 239)
+mark CappedTextArea.action_cut -> s19_app/tui/capped_text_area.py:269 (def at 270)
+
+## line count unchanged by the marks
+s19_app/tui/os_clipboard_input.py: base 937 / marked copy 937
+s19_app/tui/capped_text_area.py: base 306 / marked copy 306
+
+## baseline subset: 23 nodes
+_create_tk_root _TkRootSingleton.__init__ _TkRootSingleton.get_or_create _TkRootSingleton.get_existing _destroy_tk_root_singleton _prime_tk_root _read_via_tk _write_via_tk _read_via_powershell _write_via_powershell read_os_clipboard write_os_clipboard _mirror_and_write_os_clipboard OsClipboardInput.action_paste CappedTextArea.action_paste _read_via_ctypes _write_via_ctypes _bound_clipboard_text OsClipboardInput.action_copy OsClipboardInput.action_cut CappedTextArea._on_paste CappedTextArea.action_copy CappedTextArea.action_cut 
+
+## run 1: baseline subset (expected exit 0)
+marks=23 graph_nodes=23 calls=15 findings=0 parse_failures=0
+exit=0
+
+# Code-Wire extractor report
+
+- Marks found: 23
+- Graph nodes parsed: 23
+- Real calls between marked nodes: 15
+- Findings: 0 (0 drift, 0 info)
+- Ambiguous call resolutions (a name matched several defs): 3
+- Files that failed to parse: 0
+
+Type normalisation: spaces and quotes dropped; `List/Dict/Tuple/Set` -> builtins; `X | None` and graph `X?` -> `Optional[X]`; graph `(Callable) A->B` -> `Callable[[A], B]`; graph `tuple(A a, B b)` -> `tuple[A, B]`. A bare graph container (`dict`) against a parameterised code type (`dict[str, Any]`) is info (loose match), not drift.
+
+Call resolution is name-based (`f()`, `Class()` -> `__init__`, `self.m()`, `x.m()` -> top-level `m` or a marked method `m`); dynamic calls and callables passed as values are not seen. Tests excluded.
+
+## Counts
+
+| Kind | Count |
+|---|---|
+
+## Real calls between marked nodes
+
+| Caller | Callee | Sites |
+|---|---|---|
+| `CappedTextArea.action_copy` | `_mirror_and_write_os_clipboard` | s19_app/tui/capped_text_area.py:268 |
+| `CappedTextArea.action_cut` | `_mirror_and_write_os_clipboard` | s19_app/tui/capped_text_area.py:306 |
+| `CappedTextArea.action_paste` | `_prime_tk_root` | s19_app/tui/capped_text_area.py:211 |
+| `OsClipboardInput.action_copy` | `_mirror_and_write_os_clipboard` | s19_app/tui/os_clipboard_input.py:864 |
+| `OsClipboardInput.action_cut` | `_mirror_and_write_os_clipboard` | s19_app/tui/os_clipboard_input.py:892 |
+| `OsClipboardInput.action_paste` | `_prime_tk_root` | s19_app/tui/os_clipboard_input.py:900 |
+| `OsClipboardInput.action_paste` | `read_os_clipboard` | s19_app/tui/os_clipboard_input.py:906 (ref) |
+| `_TkRootSingleton.get_or_create` | `_create_tk_root` | s19_app/tui/os_clipboard_input.py:201 |
+| `_TkRootSingleton.get_or_create` | `_destroy_tk_root_singleton` | s19_app/tui/os_clipboard_input.py:207 (ref) |
+| `_mirror_and_write_os_clipboard` | `_prime_tk_root` | s19_app/tui/os_clipboard_input.py:767 |
+| `_mirror_and_write_os_clipboard` | `write_os_clipboard` | s19_app/tui/os_clipboard_input.py:769 (ref) |
+| `_prime_tk_root` | `_TkRootSingleton.get_or_create` | s19_app/tui/os_clipboard_input.py:241 |
+| `_read_via_tk` | `_TkRootSingleton.get_or_create` | s19_app/tui/os_clipboard_input.py:259 |
+| `_write_via_tk` | `_TkRootSingleton.get_existing` | s19_app/tui/os_clipboard_input.py:481 |
+| `read_os_clipboard` | `_bound_clipboard_text` | s19_app/tui/os_clipboard_input.py:653 |
+
+## run 2: whole graph (expected exit 1: only NEW nodes without marks)
+marks=23 graph_nodes=36 calls=15 findings=13 parse_failures=0
+exit=1
+
+## Counts
+
+| Kind | Count |
+|---|---|
+| Graph node without mark (no code yet) | 13 |
+
+## Real calls between marked nodes
+## Graph node without mark (no code yet)
+
+- `s19_app/tui/os_clipboard_input.py` — `_system_directory`
+- `s19_app/tui/os_clipboard_input.py` — `_system_powershell`
+- `s19_app/tui/os_clipboard_input.py` — `OsClipboardInput._on_paste`
+- `s19_app/tui/os_clipboard_input.py` — `OsClipboardInput.focus_on_click`
+- `s19_app/tui/os_clipboard_input.py` — `OsClipboardInput._on_mouse_down`
+- `s19_app/tui/os_clipboard_input.py` — `OsClipboardInput._on_mouse_up`
+- `s19_app/tui/os_clipboard_input.py` — `OsClipboardInput._on_click`
+- `s19_app/tui/capped_text_area.py` — `CappedTextArea._on_mouse_down`
+- `s19_app/tui/capped_text_area.py` — `CappedTextArea._on_mouse_up`
+- `s19_app/tui/capped_text_area.py` — `CappedTextArea._on_click`
+- `tests/support/b103_clipboard.py` — `require_isolated_clipboard`
+- `tests/support/b103_clipboard.py` — `clipboard_probe`
+- `tests/support/b103_clipboard.py` — `os_clipboard_ready`
+
+## lint: whole graph (a record, not a gate)
+nodes=36 entities=15 edges=30 findings=6 not read=0
+exit=0

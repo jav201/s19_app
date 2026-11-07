@@ -1,0 +1,76 @@
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+=== SIZE (118, 54)
+  screen (116, 52) status 'Apply: 1 applied, 0 skipped, 0 blocked'
+  notices after apply []
+  row hidden class False
+  panel (5, 4, 112, 39) max_scroll_y 0
+   #patch_main region=(5, 5, 112, 35) shown=True hidden_by=[]
+   #patch_inspector region=(72, 5, 45, 35) shown=True hidden_by=[]
+   #patch_tab_switcher region=(74, 7, 41, 32) shown=True hidden_by=[]
+   #patch_doc_file_row region=(5, 40, 112, 1) shown=True hidden_by=[]
+   #patch_doc_controls region=(5, 41, 112, 1) shown=True hidden_by=[]
+   #patch_legend region=(5, 42, 112, 1) shown=True hidden_by=[]
+   #status_text region=(2, 44, 97, 1) shown=True hidden_by=[]
+  TAB patch_tab_inspector switcher.current patch_pane_inspector
+     row     region=(0, 0, 0, 0) shown=False hidden_by=['patch_win_json']
+     write   region=(0, 0, 0, 0) shown=False hidden_by=['patch_win_json'] hit no region
+     width   region=(0, 0, 0, 0) shown=False hidden_by=['patch_win_json']
+     apply   region=(17, 41, 22, 1) shown=True hidden_by=[] hit (28,41) -> #patch_doc_apply_button
+  TAB patch_tab_json switcher.current patch_win_json
+     row     region=(74, 36, 41, 3) shown=True hidden_by=[]
+     write   region=(96, 37, 12, 1) shown=True hidden_by=[] hit (102,37) -> #patch_saveback_confirm_button
+     width   region=(74, 37, 21, 1) shown=True hidden_by=[]
+     apply   region=(17, 41, 22, 1) shown=True hidden_by=[] hit (28,41) -> #patch_doc_apply_button
+  TAB patch_tab_checks switcher.current patch_win_checks
+     row     region=(0, 0, 0, 0) shown=False hidden_by=['patch_win_json']
+     write   region=(0, 0, 0, 0) shown=False hidden_by=['patch_win_json'] hit no region
+     width   region=(0, 0, 0, 0) shown=False hidden_by=['patch_win_json']
+     apply   region=(17, 41, 22, 1) shown=True hidden_by=[] hit (28,41) -> #patch_doc_apply_button
+  TAB patch_tab_a2l switcher.current patch_win_a2l
+     row     region=(0, 0, 0, 0) shown=False hidden_by=['patch_win_json']
+     write   region=(0, 0, 0, 0) shown=False hidden_by=['patch_win_json'] hit no region
+     width   region=(0, 0, 0, 0) shown=False hidden_by=['patch_win_json']
+     apply   region=(17, 41, 22, 1) shown=True hidden_by=[] hit (28,41) -> #patch_doc_apply_button
+  after Remove: status 'Patch Editor: entry removed.' entries 0 address box '0x8000007C'
+  ZERO-APPLY status 'Apply: 0 applied, 1 skipped, 0 blocked'
+  ZERO-APPLY row hidden class False
+  ZERO-APPLY notices []
+  ZERO-APPLY image byte 0x8000007C 0x3c
+=== SIZE (220, 60)
+  screen (218, 58) status 'Apply: 1 applied, 0 skipped, 0 blocked'
+  notices after apply []
+  row hidden class False
+  panel (23, 4, 196, 45) max_scroll_y 0
+   #patch_main region=(23, 5, 196, 41) shown=True hidden_by=[]
+   #patch_inspector region=(140, 5, 79, 41) shown=True hidden_by=[]
+   #patch_tab_switcher region=(142, 7, 75, 38) shown=True hidden_by=[]
+   #patch_doc_file_row region=(23, 46, 196, 1) shown=True hidden_by=[]
+   #patch_doc_controls region=(23, 47, 196, 1) shown=True hidden_by=[]
+   #patch_legend region=(23, 48, 196, 1) shown=True hidden_by=[]
+   #status_text region=(2, 50, 199, 1) shown=True hidden_by=[]
+  TAB patch_tab_inspector switcher.current patch_pane_inspector
+     row     region=(0, 0, 0, 0) shown=False hidden_by=['patch_win_json']
+     write   region=(0, 0, 0, 0) shown=False hidden_by=['patch_win_json'] hit no region
+     width   region=(0, 0, 0, 0) shown=False hidden_by=['patch_win_json']
+     apply   region=(35, 47, 22, 1) shown=True hidden_by=[] hit (46,47) -> #patch_doc_apply_button
+  TAB patch_tab_json switcher.current patch_win_json
+     row     region=(142, 42, 75, 3) shown=True hidden_by=[]
+     write   region=(164, 43, 12, 1) shown=True hidden_by=[] hit (170,43) -> #patch_saveback_confirm_button
+     width   region=(142, 43, 21, 1) shown=True hidden_by=[]
+     apply   region=(35, 47, 22, 1) shown=True hidden_by=[] hit (46,47) -> #patch_doc_apply_button
+  TAB patch_tab_checks switcher.current patch_win_checks
+     row     region=(0, 0, 0, 0) shown=False hidden_by=['patch_win_json']
+     write   region=(0, 0, 0, 0) shown=False hidden_by=['patch_win_json'] hit no region
+     width   region=(0, 0, 0, 0) shown=False hidden_by=['patch_win_json']
+     apply   region=(35, 47, 22, 1) shown=True hidden_by=[] hit (46,47) -> #patch_doc_apply_button
+  TAB patch_tab_a2l switcher.current patch_win_a2l
+     row     region=(0, 0, 0, 0) shown=False hidden_by=['patch_win_json']
+     write   region=(0, 0, 0, 0) shown=False hidden_by=['patch_win_json'] hit no region
+     width   region=(0, 0, 0, 0) shown=False hidden_by=['patch_win_json']
+     apply   region=(35, 47, 22, 1) shown=True hidden_by=[] hit (46,47) -> #patch_doc_apply_button
+  after Remove: status 'Patch Editor: entry removed.' entries 0 address box '0x8000007C'
+  ZERO-APPLY status 'Apply: 0 applied, 1 skipped, 0 blocked'
+  ZERO-APPLY row hidden class False
+  ZERO-APPLY notices []
+  ZERO-APPLY image byte 0x8000007C 0x3c
+END

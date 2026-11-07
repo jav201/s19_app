@@ -1,0 +1,15 @@
+s19_app.__file__ = ~/work/b103-int2a/s19_app/__init__.py | python 3.11.18
+  S8: refusal A2L-DEF-ALIGNMENT "S8: ('FNC_VALUES', 9, 10)" values_offset 9 conv ('enum', 'TAB_VERB', None) None axes_conv_refusals [None]
+  S7: refusal None None values_offset 8 conv ('enum', 'TAB_VERB', None) None axes_conv_refusals ['A2L-DEF-TABLE']
+  K1: refusal None None values_offset 0 conv ('enum', 'TAB_VERB', None) None axes_conv_refusals [None]
+  K2: refusal None None values_offset 0 conv ('enum', 'TAB_VERB', None) A2L-DEF-TABLE axes_conv_refusals [None]
+  S8b: refusal A2L-DEF-ALIGNMENT "S8b: ('FNC_VALUES', 9, 10)" values_offset 9 conv ('enum', 'TAB_VERB', None) None axes_conv_refusals [None]
+  V1: refusal None None values_offset None conv ('enum', 'TAB_VERB', None) None axes_conv_refusals []
+  V2: refusal None None values_offset None conv ('enum', 'TAB_VERB', None) A2L-DEF-TABLE axes_conv_refusals []
+  reads: 6 entries, stats {'layout_reads': 2, 'modc_reads': 1, 'axo_byte_order_reads': 1, 'conv_calls': 12, 'method_reads': 2, 'table_reads': 1}
+[O2] mutant None       : objects differing from a fresh walk per name: forward 0, reversed 0
+[O2] mutant owner-leak : objects differing from a fresh walk per name: forward 0, reversed 0
+[O2] mutant mutate     : objects differing from a fresh walk per name: forward raises AttributeError: 'tuple' object has no attribute 'extend', reversed raises AttributeError: 'tuple' object has no attribute 'extend'
+[O2] mutant cache-check: objects differing from a fresh walk per name: forward 3, reversed 3
+[O2] Inc 2a real describe memoised once per walk vs per name: differing 0
+[O2] Inc 2a real describe memoised once per walk vs per name: differing 0

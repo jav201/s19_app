@@ -1,0 +1,37 @@
+# M-PASTE.19
+# row: R-PASTE.19
+# s19_app.__file__ = /tmp/b103-e5-1a-mut/work/s19_app/__init__.py
+# note: one place's box with the stock copy (census 19/1)
+# --- git diff ---
+diff --git a/s19_app/tui/screens.py b/s19_app/tui/screens.py
+index 63a48d28..df25a3f7 100644
+--- a/s19_app/tui/screens.py
++++ b/s19_app/tui/screens.py
+@@ -1171,7 +1171,7 @@ class SaveProjectScreen(ModalScreen[Optional[SaveProjectPayload]]):
+     def compose(self) -> ComposeResult:
+         children: list = [
+             Label("Project name", classes="modal-title"),
+-            OsClipboardInput(
++            Input(
+                 value=self._initial_name or "",
+                 placeholder="letters, digits, - and _",
+                 id="project_name",
+
+# --- pytest (rc=1) ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________ test_r_paste_19_1_and_33_1_every_text_box_is_the_two_classes _________
+
+    def test_r_paste_19_1_and_33_1_every_text_box_is_the_two_classes() -> None:
+        """R-PASTE.19/1 + .33/1: 47/47 text boxes are the two clipboard classes."""
+        counts = _census_text_box_constructions()
+>       assert counts["OsClipboardInput"] == 40, counts
+E       AssertionError: {'CappedTextArea': 6, 'Input': 1, 'JsonHighlightTextArea': 1, 'OsClipboardInput': 39, ...}
+E       assert 39 == 40
+
+tests/test_b103_clipboard_core.py:1706: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_19_1_and_33_1_every_text_box_is_the_two_classes
+1 failed, 86 deselected in 0.73s
+
+===== stderr =====

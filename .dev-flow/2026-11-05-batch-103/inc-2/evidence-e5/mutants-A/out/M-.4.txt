@@ -1,0 +1,56 @@
+# M-.4
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.4/s19_app/__init__.py
+# note: VAL_BLK defined as a number
+#   EDIT-OK: '        if char_type is None:\n            return None, "(none)"\n      '
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..f42202ca 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -725,6 +725,8 @@ def _object_kind(tag: dict, conversion_type: Optional[str]) -> tuple[str | None,
+         if char_type == "VALUE":
+             kind = "enum" if conversion_type == "TAB_VERB" else "number"
+             return kind, "VALUE"
++        if char_type == "VAL_BLK":
++            return "number", "VAL_BLK"
+         if char_type is None:
+             return None, "(none)"
+         return None, _echo(str(char_type))
+
+# --- pytest (rc=1) ---
+F.......                                                                 [100%]
+=================================== FAILURES ===================================
+____________________ test_r_a2l_def_4_1_val_blk_is_refused _____________________
+
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp...BL_NOINTP', ...}}, 'errors': [], 'path': '/tmp/pytest-of-<user>/pytest-943/b103_c080/firmware_issues.a2l', ...}, ...}
+
+    def test_r_a2l_def_4_1_val_blk_is_refused(c08):
+        """R-A2L-DEF.4/1 - VAL_BLK refused; address and byte length 256 still given."""
+        d = describe_definition("VAL_BLK_0001", c08["a2l"])
+>       _is_refused(d, *_kind_msg("VAL_BLK_0001", "VAL_BLK"))
+
+../base/tests/test_b103_a2l_definition.py:323: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='VAL_BLK_0001', section='CHARACTERISTIC', char_type='VAL_BLK', kind='number', address=8388608, byte_le...None, refusal=Refusal(code='A2L-DEF-LENGTH', message='VAL_BLK_0001: its length 256 differs from the 2 bytes of UWORD'))
+code = 'A2L-DEF-KIND'
+message = 'VAL_BLK_0001: the system has no definition for a VAL_BLK object'
+
+    def _is_refused(d: Definition, code: str, message: str) -> None:
+>       assert d.refusal == Refusal(code, message), d.refusal
+E       AssertionError: Refusal(code='A2L-DEF-LENGTH', message='VAL_BLK_0001: its length 256 differs from the 2 bytes of UWORD')
+E       assert Refusal(code=...tes of UWORD') == Refusal(code=...L_BLK object')
+E         
+E         Differing attributes:
+E         ['code', 'message']
+E         
+E         Drill down into differing attribute code:
+E           code: 'A2L-DEF-LENGTH' != 'A2L-DEF-KIND'
+E           - A2L-DEF-KIND...
+E         
+E         ...Full output truncated (6 lines hidden), use '-vv' to show
+
+../base/tests/test_b103_a2l_definition.py:165: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_4_1_val_blk_is_refused
+1 failed, 7 passed, 183 deselected in 2.46s

@@ -1,0 +1,246 @@
+A2L section tree has structural errors: path=/tmp/b103-e3r4-2-security/scratch/tmpk4y6oa4i/x.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/tmp/b103-e3r4-2-security/scratch/tmpk4y6oa4i/x.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/tmp/b103-e3r4-2-security/scratch/tmpk4y6oa4i/x.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/tmp/b103-e3r4-2-security/scratch/tmpk4y6oa4i/x.a2l sample=Line 22: /end without /begin
+A2L section tree has structural errors: path=/tmp/b103-e3r4-2-security/scratch/tmpk4y6oa4i/x.a2l sample=Line 22: /end without /begin
+s19_app.__file__ = ~/work/s19_app/s19_app/__init__.py
+
+== Q1/Q2 shapes (INLINE header, BYTE_ORDER MSB_FIRST) ==
+[A] full header, BIT_MASK own line
+     tag: bit_org='0x0FF0' dt='UWORD' addr=16 len=2 | parse errors=[]
+     letters W=1 N=1 REF3=1 | record open=None pieces open=None mid-line /begin=False | mask word='0x0FF0' <mask> in message='0x0FF0'
+     round-3 graph: MASKED(0x0FF0) | records W: MASKED(0x0FF0) | records N: MASKED(0x0FF0) | REF3: MASKED(0x0FF0) | proposed: MASKED(0x0FF0)
+     REF: mask 0x0FF0 | whole-word write with a REF mask: W=False N=False REF3=False proposed=False
+[B] short header, BIT_MASK own line (graph .19/7 text)
+     tag: bit_org='0x0FF0' dt=None addr=16 len=None | parse errors=[]
+     letters W=1 N=1 REF3=1 | record open=None pieces open=None mid-line /begin=False | mask word=None <mask> in message='0x0FF0'
+     round-3 graph: REFUSE(keyword) | records W: REFUSE(letters, no mask read) | records N: REFUSE(letters, no mask read) | REF3: REFUSE(letters, no mask read) | proposed: REFUSE(letters, no mask read)
+     REF: mask 0x0FF0 | whole-word write with a REF mask: W=False N=False REF3=False proposed=False
+[C] short header, BIT_MASK same line (case .19/7)
+     tag: bit_org=None dt='UWORD' addr=16 len=2 | parse errors=[]
+     letters W=1 N=1 REF3=1 | record open=None pieces open=None mid-line /begin=False | mask word=None <mask> in message='0x0FF0'
+     round-3 graph: REFUSE(keyword) | records W: REFUSE(letters, no mask read) | records N: REFUSE(letters, no mask read) | REF3: REFUSE(letters, no mask read) | proposed: REFUSE(letters, no mask read)
+     REF: mask 0x0FF0 | whole-word write with a REF mask: W=False N=False REF3=False proposed=False
+[D] short header, comment-led BIT_MASK (.19/8)
+     tag: bit_org=None dt=None addr=16 len=None | parse errors=[]
+     letters W=1 N=1 REF3=1 | record open=None pieces open=None mid-line /begin=False | mask word=None <mask> in message='0x0FF0'
+     round-3 graph: REFUSE(keyword) | records W: REFUSE(letters, no mask read) | records N: REFUSE(letters, no mask read) | REF3: REFUSE(letters, no mask read) | proposed: REFUSE(letters, no mask read)
+     REF: mask 0x0FF0 | whole-word write with a REF mask: W=False N=False REF3=False proposed=False
+[E] full header on /begin line + BIT_MASK
+     tag: bit_org=None dt=None addr=16 len=None | parse errors=[]
+     letters W=1 N=1 REF3=1 | record open=None pieces open=None mid-line /begin=False | mask word='0x0FF0' <mask> in message='0x0FF0'
+     round-3 graph: MASKED(0x0FF0) | records W: MASKED(0x0FF0) | records N: MASKED(0x0FF0) | REF3: MASKED(0x0FF0) | proposed: MASKED(0x0FF0)
+     REF: mask 0x0FF0 | whole-word write with a REF mask: W=False N=False REF3=False proposed=False
+[F] comment glued left of the keyword (.19/10)
+     tag: bit_org=None dt='UWORD' addr=16 len=2 | parse errors=[]
+     letters W=1 N=1 REF3=1 | record open=None pieces open=None mid-line /begin=False | mask word=None <mask> in message='(none)'
+     round-3 graph: UNMASKED | records W: REFUSE(letters, no mask read) | records N: REFUSE(letters, no mask read) | REF3: REFUSE(letters, no mask read) | proposed: REFUSE(letters, no mask read)
+     REF: mask 0x0FF0 | whole-word write with a REF mask: W=False N=False REF3=False proposed=False
+     encode 35 on the unmasked view: ((0, 35), None)
+[G] comment glued between keyword and word (.19/11)
+     tag: bit_org=None dt='UWORD' addr=16 len=2 | parse errors=[]
+     letters W=1 N=1 REF3=1 | record open=None pieces open=None mid-line /begin=False | mask word=None <mask> in message='(none)'
+     round-3 graph: UNMASKED | records W: REFUSE(letters, no mask read) | records N: REFUSE(letters, no mask read) | REF3: REFUSE(letters, no mask read) | proposed: REFUSE(letters, no mask read)
+     REF: mask 0x0FF0 | whole-word write with a REF mask: W=False N=False REF3=False proposed=False
+[H] unterminated FORMAT quote, then BIT_MASK (.19/16)
+     tag: bit_org='0x0FF0' dt='UWORD' addr=16 len=2 | parse errors=[]
+     letters W=1 N=1 REF3=1 | record open=quote pieces open=record quote mid-line /begin=False | mask word=None <mask> in message='(none)'
+     round-3 graph: REFUSE(bit_org) | records W: REFUSE(open quote) | records N: REFUSE(open quote) | REF3: REFUSE(open quote) | proposed: REFUSE(open record quote)
+     REF: malformed (unterminated string) | whole-word write with a REF mask: W=False N=False REF3=False proposed=False
+[I] unterminated quote, then comment-led BIT_MASK
+     tag: bit_org=None dt='UWORD' addr=16 len=2 | parse errors=[]
+     letters W=1 N=1 REF3=1 | record open=quote pieces open=record quote mid-line /begin=False | mask word=None <mask> in message='(none)'
+     round-3 graph: UNMASKED | records W: REFUSE(open quote) | records N: REFUSE(open quote) | REF3: REFUSE(open quote) | proposed: REFUSE(open record quote)
+     REF: malformed (unterminated string) | whole-word write with a REF mask: W=False N=False REF3=False proposed=False
+[J] unclosed /begin IF_DATA before BIT_MASK
+     tag: bit_org=None dt='UWORD' addr=16 len=2 | parse errors=['Unclosed /begin sections detected.']
+     letters W=1 N=1 REF3=1 | record open=None pieces open=None mid-line /begin=False | mask word=None <mask> in message='(none)'
+     round-3 graph: UNMASKED | records W: REFUSE(letters, no mask read) | records N: REFUSE(letters, no mask read) | REF3: REFUSE(letters, no mask read) | proposed: REFUSE(letters, no mask read)
+     REF: malformed (/end MEASUREMENT closes IF_DATA) | whole-word write with a REF mask: W=False N=False REF3=False proposed=False
+[J1] one-line IF_DATA (V171 style) before BIT_MASK (.19/12)
+     tag: bit_org=None dt='UWORD' addr=16 len=2 | parse errors=['Unclosed /begin sections detected.']
+     letters W=1 N=1 REF3=1 | record open=None pieces open=None mid-line /begin=False | mask word=None <mask> in message='(none)'
+     round-3 graph: UNMASKED | records W: REFUSE(letters, no mask read) | records N: REFUSE(letters, no mask read) | REF3: REFUSE(letters, no mask read) | proposed: REFUSE(letters, no mask read)
+     REF: mask 0x0FF0 | whole-word write with a REF mask: W=False N=False REF3=False proposed=False
+     encode 35 on the unmasked view: ((0, 35), None)
+[K] closed IF_DATA holding BIT_MASK (not a mask)
+     tag: bit_org=None dt='UWORD' addr=16 len=2 | parse errors=[]
+     letters W=1 N=1 REF3=1 | record open=None pieces open=None mid-line /begin=False | mask word=None <mask> in message='(none)'
+     round-3 graph: UNMASKED | records W: REFUSE(letters, no mask read) | records N: REFUSE(letters, no mask read) | REF3: REFUSE(letters, no mask read) | proposed: REFUSE(letters, no mask read)
+     REF: no mask | whole-word write with a REF mask: W=False N=False REF3=False proposed=False
+[L] a /begin line inside a block comment (.19/15)
+     tag: bit_org=None dt='UWORD' addr=16 len=2 | parse errors=['Unclosed /begin sections detected.']
+     letters W=1 N=1 REF3=1 | record open=comment pieces open=record comment mid-line /begin=False | mask word=None <mask> in message='(none)'
+     round-3 graph: UNMASKED | records W: REFUSE(open comment) | records N: REFUSE(open comment) | REF3: REFUSE(open comment) | proposed: REFUSE(open record comment)
+     REF: mask 0x0FF0 | whole-word write with a REF mask: W=False N=False REF3=False proposed=False
+[L2] IF_DATA commented out, */ on its /end line (.19/13)
+     tag: bit_org=None dt='UWORD' addr=16 len=2 | parse errors=['Line 22: /end without /begin']
+     letters W=0 N=0 REF3=0 | record open=comment pieces open=record comment mid-line /begin=False | mask word=None <mask> in message='(none)'
+     round-3 graph: UNMASKED | records W: REFUSE(open comment) | records N: REFUSE(open comment) | REF3: REFUSE(open comment) | proposed: REFUSE(open record comment)
+     REF: mask 0x0FF0 | whole-word write with a REF mask: W=False N=False REF3=False proposed=False
+[L5] // on the /begin IF_DATA line, its /end left live
+     tag: bit_org=None dt='UWORD' addr=16 len=2 | parse errors=['Line 22: /end without /begin']
+     letters W=0 N=0 REF3=0 | record open=None pieces open=None mid-line /begin=False | mask word=None <mask> in message='(none)'
+     round-3 graph: UNMASKED | records W: UNMASKED | records N: UNMASKED | REF3: UNMASKED | proposed: UNMASKEDA2L section tree has structural errors: path=/tmp/b103-e3r4-2-security/scratch/tmpk4y6oa4i/x.a2l sample=Line 24: /end without /begin
+A2L section tree has structural errors: path=/tmp/b103-e3r4-2-security/scratch/tmpk4y6oa4i/x.a2l sample=Line 26: /end without /begin
+A2L section tree has structural errors: path=/tmp/b103-e3r4-2-security/scratch/tmpk4y6oa4i/x.a2l sample=Line 26: /end without /begin; Line 27: /end without /begin; Line 28: /end without /begin
+A2L section tree has structural errors: path=/tmp/b103-e3r4-2-security/scratch/tmpk4y6oa4i/x.a2l sample=Unclosed /begin sections detected.
+
+     REF: malformed (/end IF_DATA closes MEASUREMENT) | whole-word write with a REF mask: W=False N=False REF3=False proposed=False
+[M] keyword only in a comment (not a mask)
+     tag: bit_org=None dt='UWORD' addr=16 len=2 | parse errors=[]
+     letters W=1 N=1 REF3=1 | record open=None pieces open=None mid-line /begin=False | mask word=None <mask> in message='(none)'
+     round-3 graph: UNMASKED | records W: REFUSE(letters, no mask read) | records N: REFUSE(letters, no mask read) | REF3: REFUSE(letters, no mask read) | proposed: REFUSE(letters, no mask read)
+     REF: no mask | whole-word write with a REF mask: W=False N=False REF3=False proposed=False
+[N] keyword and word on two lines
+     tag: bit_org=None dt='UWORD' addr=16 len=2 | parse errors=[]
+     letters W=1 N=1 REF3=1 | record open=None pieces open=None mid-line /begin=False | mask word='0x0FF0' <mask> in message='0x0FF0'
+     round-3 graph: MASKED(0x0FF0) | records W: MASKED(0x0FF0) | records N: MASKED(0x0FF0) | REF3: MASKED(0x0FF0) | proposed: MASKED(0x0FF0)
+     REF: mask 0x0FF0 | whole-word write with a REF mask: W=False N=False REF3=False proposed=False
+[O] quoted "BIT_MASK", no mask
+     tag: bit_org=None dt='UWORD' addr=16 len=2 | parse errors=[]
+     letters W=1 N=1 REF3=1 | record open=None pieces open=None mid-line /begin=False | mask word='ECU_ADDRESS' <mask> in message='ECU_ADDRESS'
+     round-3 graph: REFUSE(unreadable 'ECU_ADDRESS') | records W: REFUSE(unreadable 'ECU_ADDRESS') | records N: REFUSE(unreadable 'ECU_ADDRESS') | REF3: REFUSE(unreadable 'ECU_ADDRESS') | proposed: REFUSE(unreadable 'ECU_ADDRESS')
+     REF: no mask | whole-word write with a REF mask: W=False N=False REF3=False proposed=False
+[O2] quoted "BIT_MASK" before a real mask
+     tag: bit_org='0x0FF0' dt='UWORD' addr=16 len=2 | parse errors=[]
+     letters W=2 N=2 REF3=2 | record open=None pieces open=None mid-line /begin=False | mask word='BIT_MASK' <mask> in message='BIT_MASK'
+     round-3 graph: REFUSE(unreadable 'BIT_MASK') | records W: REFUSE(letters x2) | records N: REFUSE(letters x2) | REF3: REFUSE(letters x2) | proposed: REFUSE(letters x2)
+     REF: mask 0x0FF0 | whole-word write with a REF mask: W=False N=False REF3=False proposed=False
+[P] two BIT_MASK lines 0x000F then 0x0FF0 (.19/14)
+     tag: bit_org='0x0FF0' dt='UWORD' addr=16 len=2 | parse errors=[]
+     letters W=2 N=2 REF3=2 | record open=None pieces open=None mid-line /begin=False | mask word='0x000F' <mask> in message='0x000F'
+     round-3 graph: MASKED(0x000F) | records W: REFUSE(letters x2) | records N: REFUSE(letters x2) | REF3: REFUSE(letters x2) | proposed: REFUSE(letters x2)
+     REF: mask 0x000F,0x0FF0 | whole-word write with a REF mask: W=False N=False REF3=False proposed=False
+[Q] lowercase bit_mask
+     tag: bit_org=None dt='UWORD' addr=16 len=2 | parse errors=[]
+     letters W=1 N=1 REF3=1 | record open=None pieces open=None mid-line /begin=False | mask word=None <mask> in message='(none)'
+     round-3 graph: UNMASKED | records W: REFUSE(letters, no mask read) | records N: REFUSE(letters, no mask read) | REF3: REFUSE(letters, no mask read) | proposed: REFUSE(letters, no mask read)
+     REF: no mask | whole-word write with a REF mask: W=False N=False REF3=False proposed=False
+[R2] CHARACTERISTIC .19/6 MB3, header on its own body line
+     tag: bit_org='0x0FF0' dt=None addr=16 len=2 | parse errors=[]
+     letters W=1 N=1 REF3=1 | record open=None pieces open=None mid-line /begin=False | mask word=None <mask> in message='0x0FF0'
+     round-3 graph: REFUSE(keyword) | records W: REFUSE(letters, no mask read) | records N: REFUSE(letters, no mask read) | REF3: REFUSE(letters, no mask read) | proposed: REFUSE(letters, no mask read)
+     REF: mask 0x0FF0 | whole-word write with a REF mask: W=False N=False REF3=False proposed=False
+[S] tab between keyword and word
+     tag: bit_org='0x0FF0' dt='UWORD' addr=16 len=2 | parse errors=[]
+     letters W=1 N=1 REF3=1 | record open=None pieces open=None mid-line /begin=False | mask word='0x0FF0' <mask> in message='0x0FF0'
+     round-3 graph: MASKED(0x0FF0) | records W: MASKED(0x0FF0) | records N: MASKED(0x0FF0) | REF3: MASKED(0x0FF0) | proposed: MASKED(0x0FF0)
+     REF: mask 0x0FF0 | whole-word write with a REF mask: W=False N=False REF3=False proposed=False
+[T] form feed before the keyword
+     tag: bit_org=None dt='UWORD' addr=16 len=2 | parse errors=[]
+     letters W=1 N=1 REF3=1 | record open=None pieces open=None mid-line /begin=False | mask word='0x0FF0' <mask> in message='0x0FF0'
+     round-3 graph: MASKED(0x0FF0) | records W: MASKED(0x0FF0) | records N: MASKED(0x0FF0) | REF3: MASKED(0x0FF0) | proposed: MASKED(0x0FF0)
+     REF: mask 0x0FF0 | whole-word write with a REF mask: W=False N=False REF3=False proposed=False
+[U] keyword glued after a closing quote
+     tag: bit_org=None dt='UWORD' addr=16 len=2 | parse errors=[]
+     letters W=1 N=1 REF3=1 | record open=None pieces open=None mid-line /begin=False | mask word='0x0FF0' <mask> in message='0x0FF0'
+     round-3 graph: MASKED(0x0FF0) | records W: MASKED(0x0FF0) | records N: MASKED(0x0FF0) | REF3: MASKED(0x0FF0) | proposed: MASKED(0x0FF0)
+     REF: mask 0x0FF0 | whole-word write with a REF mask: W=False N=False REF3=False proposed=False
+[W] keyword in an ANNOTATION_TEXT child (not a mask)
+     tag: bit_org=None dt='UWORD' addr=16 len=2 | parse errors=[]
+     letters W=1 N=0 REF3=1 | record open=None pieces open=None mid-line /begin=False | mask word=None <mask> in message='(none)'
+     round-3 graph: UNMASKED | records W: REFUSE(letters, no mask read) | records N: UNMASKED | REF3: REFUSE(letters, no mask read) | proposed: REFUSE(letters, no mask read)
+     REF: no mask | whole-word write with a REF mask: W=False N=False REF3=False proposed=False
+[L2C] L2 one level down: inside IF_DATA a child commented out, */ on its /end line
+     tag: bit_org=None dt='UWORD' addr=16 len=2 | parse errors=['Line 24: /end without /begin']
+     letters W=0 N=0 REF3=0 | record open=None pieces open=IF_DATA comment mid-line /begin=False | mask word=None <mask> in message='(none)'
+     round-3 graph: UNMASKED | records W: UNMASKED | records N: UNMASKED | REF3: UNMASKED | proposed: REFUSE(open IF_DATA comment)
+     REF: mask 0x0FF0 | whole-word write with a REF mask: W=True N=True REF3=True proposed=False
+     encode 35 on the unmasked view: ((0, 35), None)
+[L2N] L2 two levels down (IF_DATA > DAQ > commented EVENT_LIST)
+     tag: bit_org=None dt='UWORD' addr=16 len=2 | parse errors=['Line 26: /end without /begin']
+     letters W=0 N=0 REF3=0 | record open=None pieces open=DAQ comment mid-line /begin=False | mask word=None <mask> in message='(none)'
+     round-3 graph: UNMASKED | records W: UNMASKED | records N: UNMASKED | REF3: UNMASKED | proposed: REFUSE(open DAQ comment)
+     REF: mask 0x0FF0 | whole-word write with a REF mask: W=True N=True REF3=True proposed=False
+     encode 35 on the unmasked view: ((0, 35), None)
+[L7] a quote opened in ANNOTATION_TEXT holds /end lines
+     tag: bit_org=None dt='UWORD' addr=16 len=2 | parse errors=['Line 26: /end without /begin', 'Line 27: /end without /begin', 'Line 28: /end without /begin']
+     letters W=0 N=0 REF3=0 | record open=None pieces open=ANNOTATION_TEXT quote mid-line /begin=False | mask word=None <mask> in message='(none)'
+     round-3 graph: UNMASKED | records W: UNMASKED | records N: UNMASKED | REF3: UNMASKED | proposed: REFUSE(open ANNOTATION_TEXT quote)
+     REF: mask 0x0FF0 | whole-word write with a REF mask: W=True N=True REF3=True proposed=False
+     encode 35 on the unmasked view: ((0, 35), None)
+[J2] two one-line IF_DATA before BIT_MASK
+     tag: bit_org=None dt='UWORD' addr=16 len=2 | parse errors=['Unclosed /begin sections detected.']
+     letters W=1 N=0 REF3=1 | record open=None pieces open=None mid-line /begin=False | mask word=None <mask> in message='(none)'
+     round-3 graph: UNMASKED | records W: REFUSE(letters, no mask read) | records N: UNMASKED | REF3: REFUSE(letters, no mask read) | proposed: REFUSE(letters, no mask read)
+     REF: mask 0x0FF0 | whole-word write with a REF mask: W=False N=True REF3=False proposed=False
+     encode 35 on the unmasked view: ((0, 35), None)
+A2L section tree has structural errors: path=/tmp/b103-e3r4-2-security/scratch/tmpk4y6oa4i/x.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/tmp/b103-e3r4-2-security/scratch/tmpk4y6oa4i/x.a2l sample=Line 22: /end without /begin
+A2L section tree has structural errors: path=~/work/s19_app/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+[J3] one-line IF_DATA, BIT_MASK after its /end on the same line
+     tag: bit_org=None dt='UWORD' addr=16 len=2 | parse errors=['Unclosed /begin sections detected.']
+     letters W=1 N=0 REF3=1 | record open=None pieces open=None mid-line /begin=False | mask word=None <mask> in message='(none)'
+     round-3 graph: UNMASKED | records W: REFUSE(letters, no mask read) | records N: UNMASKED | REF3: REFUSE(letters, no mask read) | proposed: REFUSE(letters, no mask read)
+     REF: mask 0x0FF0 | whole-word write with a REF mask: W=False N=True REF3=False proposed=False
+     encode 35 on the unmasked view: ((0, 35), None)
+[J4] /begin IF_DATA not at line start, its /end on its own line
+     tag: bit_org=None dt='UWORD' addr=16 len=2 | parse errors=['Line 22: /end without /begin']
+     letters W=0 N=0 REF3=0 | record open=None pieces open=None mid-line /begin=True | mask word=None <mask> in message='(none)'
+     round-3 graph: UNMASKED | records W: UNMASKED | records N: UNMASKED | REF3: UNMASKED | proposed: REFUSE(open mid-line /begin)
+     REF: mask 0x0FF0 | whole-word write with a REF mask: W=True N=True REF3=True proposed=False
+     encode 35 on the unmasked view: ((0, 35), None)
+[J5] one-line IF_DATA not at line start, holding BIT_MASK (not a mask)
+     tag: bit_org=None dt='UWORD' addr=16 len=2 | parse errors=[]
+     letters W=1 N=1 REF3=1 | record open=None pieces open=None mid-line /begin=True | mask word='0x1' <mask> in message='0x1'
+     round-3 graph: MASKED(0x1) | records W: MASKED(0x1) | records N: MASKED(0x1) | REF3: MASKED(0x1) | proposed: REFUSE(open mid-line /begin)
+     REF: no mask | whole-word write with a REF mask: W=False N=False REF3=False proposed=False
+[X] short header, a comment inside the keyword BIT_/**/MASK
+     tag: bit_org=None dt=None addr=16 len=None | parse errors=[]
+     letters W=0 N=0 REF3=0 | record open=None pieces open=None mid-line /begin=False | mask word=None <mask> in message='0x0FF0'
+     round-3 graph: REFUSE(keyword) | records W: UNMASKED | records N: UNMASKED | REF3: UNMASKED | proposed: UNMASKED
+     REF: no mask | whole-word write with a REF mask: W=False N=False REF3=False proposed=False
+[X2] full header, a comment inside the keyword BIT_/**/MASK
+     tag: bit_org=None dt='UWORD' addr=16 len=2 | parse errors=[]
+     letters W=0 N=0 REF3=0 | record open=None pieces open=None mid-line /begin=False | mask word='0x0FF0' <mask> in message='0x0FF0'
+     round-3 graph: MASKED(0x0FF0) | records W: MASKED(0x0FF0) | records N: MASKED(0x0FF0) | REF3: MASKED(0x0FF0) | proposed: REFUSE(mask read, no letters)
+     REF: no mask | whole-word write with a REF mask: W=False N=False REF3=False proposed=False
+[N2] the letters in the object name, no mask
+     tag: bit_org=None dt='UWORD' addr=16 len=2 | parse errors=[]
+     letters W=0 N=0 REF3=1 | record open=None pieces open=None mid-line /begin=False | mask word=None <mask> in message='(none)'
+     round-3 graph: UNMASKED | records W: UNMASKED | records N: UNMASKED | REF3: REFUSE(letters, no mask read) | proposed: UNMASKED
+     REF: no mask | whole-word write with a REF mask: W=False N=False REF3=False proposed=False
+[CMN] the letters in the conversion name, no mask
+     tag: bit_org=None dt='UWORD' addr=16 len=2 | parse errors=[]
+     letters W=1 N=1 REF3=1 | record open=None pieces open=None mid-line /begin=False | mask word=None <mask> in message='(none)'
+     round-3 graph: UNMASKED | records W: REFUSE(letters, no mask read) | records N: REFUSE(letters, no mask read) | REF3: REFUSE(letters, no mask read) | proposed: REFUSE(letters, no mask read)
+     REF: no mask | whole-word write with a REF mask: W=False N=False REF3=False proposed=False
+
+== Q3 fixtures: each rule vs the round-3 graph ==
+[FX] examples/case_00_public/ASAP2_Demo_V161.a2l: objects=75 masked r3/W=6/6 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/case_00_public/ASAP2_Demo_V171.a2l: objects=118 masked r3/W=6/6 errors=1 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/case_00_public/BalanceTube_STMicro.a2l: objects=111 masked r3/W=9/9 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/case_00_public/check_test.a2l: objects=1 masked r3/W=0/0 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/case_00_public/cleanup_test.a2l: objects=0 masked r3/W=0/0 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/case_00_public/from_source.a2l: objects=72 masked r3/W=0/0 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/case_00_public/from_source_structs.a2l: objects=0 masked r3/W=0/0 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/case_00_public/included.a2l: objects=1 masked r3/W=0/0 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/case_00_public/memorysegment.a2l: objects=0 masked r3/W=0/0 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/case_00_public/merge_inc_test.a2l: objects=0 masked r3/W=0/0 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/case_00_public/remove_test.a2l: objects=2 masked r3/W=0/0 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/case_00_public/software_a.a2l: objects=13990 masked r3/W=0/0 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/case_00_public/software_b.a2l: objects=67 masked r3/W=0/0 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/case_00_public/update_test1.a2l: objects=12 masked r3/W=3/3 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/case_00_public/update_test2.a2l: objects=14 masked r3/W=3/3 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/case_00_public/update_typedef_test1.a2l: objects=0 masked r3/W=0/0 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/case_00_public/update_typedef_test2.a2l: objects=0 masked r3/W=0/0 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/case_00_public/update_typedef_test3.a2l: objects=0 masked r3/W=0/0 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/case_00_public/update_typedef_test4.a2l: objects=0 masked r3/W=0/0 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/case_00_public/xcp_test.a2l: objects=0 masked r3/W=0/0 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/case_01_basic_valid/firmware.a2l: objects=3 masked r3/W=0/0 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/case_02_gaps_and_patch_targets/firmware.a2l: objects=3 masked r3/W=0/0 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/case_03_overlapping_records/firmware.a2l: objects=2 masked r3/W=0/0 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/case_04_bad_checksums/firmware.a2l: objects=1 masked r3/W=0/0 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/case_05_dense_mixed_content/firmware.a2l: objects=4 masked r3/W=0/0 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/case_06_large_nested_a2l/firmware.a2l: objects=220040 masked r3/W=0/0 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/case_07_stress_smoke/firmware.a2l: objects=12 masked r3/W=0/0 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/professional_validation/case_01_baseline_valid/firmware.a2l: objects=3 masked r3/W=0/0 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/professional_validation/case_02_patch_targets_and_gaps/firmware.a2l: objects=6 masked r3/W=0/0 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/professional_validation/case_03_overlapping_records/firmware.a2l: objects=3 masked r3/W=0/0 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/professional_validation/case_04_bad_checksums/firmware.a2l: objects=1 masked r3/W=0/0 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/professional_validation/case_05_out_of_order_and_mixed/firmware.a2l: objects=3 masked r3/W=0/0 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/professional_validation/case_07_cross_reference_inconsistencies/firmware.a2l: objects=4 masked r3/W=0/0 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] examples/professional_validation/case_08_heavy_fragmentation/firmware.a2l: objects=100 masked r3/W=0/0 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX] tests/fixtures/synth/synth_a2l.a2l: objects=6 masked r3/W=0/0 errors=0 | W:+0/-0 N:+0/-0 REF3:+0/-0 PROP:+0/-0
+[FX-total] files=35 objects=234654 masked round-3/records-W=27/27 W: extra=0 dropped=0 N: extra=0 dropped=0 REF3: extra=0 dropped=0 PROP: extra=0 dropped=0

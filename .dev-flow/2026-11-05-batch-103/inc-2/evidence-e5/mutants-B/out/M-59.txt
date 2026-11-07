@@ -1,0 +1,79 @@
+===== mutant M-59 (2026-11-07T13:22:26Z) =====
+--- unified diff ---
+diff --git a/tools/synth/make_release_case.py b/tools/synth/make_release_case.py
+index 7b843b64..ff0ef966 100644
+--- a/tools/synth/make_release_case.py
++++ b/tools/synth/make_release_case.py
+@@ -416,7 +416,7 @@ def build_objects(regions: dict[str, tuple[int, int]], rng: random.Random) -> li
+ 
+     _push_scalars("boot", 4, False)
+     _push_scalars("boot", 8, True)
+-    _push_scalars("app", 180, False)
++    _push_scalars("app", 181, False)
+     _push_scalars("app", 52, True)
+     for _ in range(60):
+         specs.append(("cal", "VAL_BLK", VALBLK_DATATYPE, "CM_IDENT"))
+--- pytest ---
+s19_app.__file__ = /tmp/b103-e5-2-mutB/M-M-59/s19_app/__init__.py
+FFF.                                                                     [100%]
+=================================== FAILURES ===================================
+______________ test_r_a2l_def_59_1_case08_at_1_mib_equals_its_pin ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-929/test_r_a2l_def_59_1_case08_at_0')
+
+    def test_r_a2l_def_59_1_case08_at_1_mib_equals_its_pin(tmp_path):
+        """R-A2L-DEF.59/1 - seed 20260001, --size-mb 1, no case option: the 11 digests."""
+        result = _run_cli(tmp_path / "c08", "--seed", str(SEED), "--size-mb", "1")
+        assert result.returncode == 0, result.stderr
+>       assert case08_file_digests(tmp_path / "c08") == CASE08_PIN_1MIB
+E       AssertionError: assert {'README.txt'...45952d3', ...} == {'README.txt'...3d2ac79', ...}
+E         
+E         Differing items:
+E         {'firmware.a2l': 'da816f081064dfdf0fa0aae23bbae14042beaa10d797269c82fcae96003b4305'} != {'firmware.a2l': '34900db01fee2d2f67252b675f1536a0a2213fa178496e1140019bf05b7f3e8f'}
+E         {'firmware.hex': '31fa628608a409f4f2714f0e6278098fbdda10b6ad13aef55b5f66457dc22021'} != {'firmware.hex': 'f0eb7556d01b31a54009608af0dd0b1c73f5faa4b077941e55e757540bd2e8f2'}
+E         {'demo_check_fails.chk.json': '1b0d66a7256cc5f2847096dee172a945a4eac0c61f66af7f5b16c6ed02e796e3'} != {'demo_check_fails.chk.json': '8bcefc106cb80cab4f7e381d421b72c881c71fec76b6cfbfd6c7a2633704ec92'}
+E         {'firmware_issues....
+E         
+E         ...Full output truncated (9 lines hidden), use '-vv' to show
+
+tests/test_b103_synth_definitions.py:126: AssertionError
+_____________ test_r_a2l_def_59_2_case08_at_10_mib_equals_its_pin ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-929/test_r_a2l_def_59_2_case08_at_0')
+
+    @pytest.mark.slow
+    def test_r_a2l_def_59_2_case08_at_10_mib_equals_its_pin(tmp_path):
+        """R-A2L-DEF.59/2 - --size-mb 10 (slow)."""
+        result = _run_cli(tmp_path / "c08", "--seed", str(SEED), "--size-mb", "10")
+        assert result.returncode == 0, result.stderr
+>       assert case08_file_digests(tmp_path / "c08") == CASE08_PIN_10MIB
+E       AssertionError: assert {'README.txt'...64878f2', ...} == {'README.txt'...8153980', ...}
+E         
+E         Differing items:
+E         {'firmware.a2l': 'b117a6152b214819fcfbf244678c99a3dd58d2b18ca2c8cd6fd5d7545b66c2f8'} != {'firmware.a2l': '42ca7d40a8c3a1a4ee15abd6fb36ed9953554156c0bb1865e64b17615ba2d961'}
+E         {'firmware.hex': '44f425c48660925fdb16f0de2809fac74ae992fccc62b6213ced3242d86618f1'} != {'firmware.hex': '2bd129e0ce59d30b70b93ad4660a45f3ff91525fc39fc14c907a587d0766184d'}
+E         {'demo_check_fails.chk.json': '406685a7bf7c05b3cc0b2e70b0cae5899dfc03f375309e54c85ec01b0efb76f6'} != {'demo_check_fails.chk.json': 'a2151fae2f1be301662a18b16ae390eb2042f5fe045c058c9915fbd465b1f7fc'}
+E         {'firmware_issues....
+E         
+E         ...Full output truncated (9 lines hidden), use '-vv' to show
+
+tests/test_b103_synth_definitions.py:134: AssertionError
+___________ test_r_a2l_def_59_3_object_list_digest_equals_the_e4_pin ___________
+
+    def test_r_a2l_def_59_3_object_list_digest_equals_the_e4_pin():
+        """R-A2L-DEF.59/3 - build_objects at 1 MiB, seed 20260001: the digest of repr (E3A-27)."""
+        regions = gen.compute_region_sizes(1.0)
+        objects = gen.build_objects(regions, random.Random(SEED))
+>       assert hashlib.sha256(repr(objects).encode("utf-8")).hexdigest() == OBJECT_LIST_DIGEST_1MIB
+E       AssertionError: assert '5e607590a4da...a1f77e399873e' == '71252ba6f06a...67d0403a6fdec'
+E         
+E         - 71252ba6f06af28c6979ab634e3ee0f5aaff9d25a7bb55d49d467d0403a6fdec
+E         + 5e607590a4da21e3c05695d8b1095b1a0d7309eb8e6f2a568dea1f77e399873e
+
+tests/test_b103_synth_definitions.py:141: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_synth_definitions.py::test_r_a2l_def_59_1_case08_at_1_mib_equals_its_pin
+FAILED tests/test_b103_synth_definitions.py::test_r_a2l_def_59_2_case08_at_10_mib_equals_its_pin
+FAILED tests/test_b103_synth_definitions.py::test_r_a2l_def_59_3_object_list_digest_equals_the_e4_pin
+3 failed, 1 passed, 5 deselected in 12.51s
+pytest exit code: 1

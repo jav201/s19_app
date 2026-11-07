@@ -1,0 +1,43 @@
+# M-18  row R-A2L-MATCH.18
+
+control: limit ignored -> 20 entries for limit 5 (first clause)
+edit: `_cut`: stop the early `len(result) >= limit` cut
+
+s19_app.__file__: /tmp/b103-e5-4-mutr2A/M-18/s19_app/__init__.py
+
+== diff ==
+--- /tmp/b103-e5-4-mutr2A/base/s19_app/tui/services/label_match.py	2026-11-06 22:11:34.000000000 -0600
++++ /tmp/b103-e5-4-mutr2A/M-18/s19_app/tui/services/label_match.py	2026-11-06 22:43:56.476306363 -0600
+@@ -503,7 +503,7 @@
+                     spans=spans,
+                 )
+             )
+-            if len(result) >= limit:
++            if False:
+                 return result
+     return result
+ 
+
+== pytest (returncode 1, KILLED) ==
+FF.                                                                      [100%]
+=================================== FAILURES ===================================
+________________ test_ranked_list_is_exactly[R-A2L-MATCH.18/3] _________________
+tests/test_b103_label_match.py:391: in test_ranked_list_is_exactly
+    assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E   AssertionError: R-A2L-MATCH.18/3: query 'value_000' limit 1
+E   assert [('VALUE_0001...0, 9),)), ...] == [('VALUE_0001...0, ((0, 9),))]
+E     
+E     Left contains 8 more items, first extra item: ('VALUE_0002', 'prefix', 0, ((0, 9),))
+E     Use -v to get more diff
+____________ test_rows_18_1_limit_cut_is_the_head_of_the_full_list _____________
+tests/test_b103_label_match.py:416: in test_rows_18_1_limit_cut_is_the_head_of_the_full_list
+    assert proj(run(prep, "C08", "value_000", 5)) == R_VALUE_000[:5]
+E   AssertionError: assert [('VALUE_0001...0, 9),)), ...] == [('VALUE_0001...0, ((0, 9),))]
+E     
+E     Left contains 4 more items, first extra item: ('VALUE_0006', 'prefix', 0, ((0, 9),))
+E     Use -v to get more diff
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.18/3]
+FAILED tests/test_b103_label_match.py::test_rows_18_1_limit_cut_is_the_head_of_the_full_list
+2 failed, 1 passed, 126 deselected in 5.25s
+

@@ -1,0 +1,9 @@
+s19_app.__file__ = ~/work/b103-int2a/s19_app/__init__.py | python 3.11.18
+[V-method] 50 VALUEs sharing one COMPU_METHOD (no fill; file 5 KiB): Inc 2a describe_definitions 0.002 s (0.05 ms per object); kinds ['number']; refusals {None: 50}
+[V-method] 50 VALUEs sharing one COMPU_METHOD (256 KiB block comment; file 261 KiB): Inc 2a describe_definitions 0.697 s (13.93 ms per object); kinds ['number']; refusals {None: 50}
+[V-method] 400 VALUEs sharing one COMPU_METHOD (no fill; file 34 KiB): Inc 2a describe_definitions 0.018 s (0.04 ms per object); kinds ['number']; refusals {None: 400}
+[V-method] 400 VALUEs sharing one COMPU_METHOD (256 KiB block comment; file 290 KiB): Inc 2a describe_definitions 5.706 s (14.27 ms per object); kinds ['number']; refusals {None: 400}
+[V-vtab] 50 VALUEs sharing one COMPU_VTAB (no fill; file 5 KiB): Inc 2a describe_definitions 0.003 s (0.06 ms per object); kinds ['enum']; refusals {None: 50}
+[V-vtab] 50 VALUEs sharing one COMPU_VTAB (256 KiB block comment; file 261 KiB): Inc 2a describe_definitions 0.859 s (17.17 ms per object); kinds ['enum']; refusals {None: 50}
+[V-vtab] 400 VALUEs sharing one COMPU_VTAB (no fill; file 34 KiB): Inc 2a describe_definitions 0.021 s (0.05 ms per object); kinds ['enum']; refusals {None: 400}
+[V-vtab] 400 VALUEs sharing one COMPU_VTAB (256 KiB block comment; file 290 KiB): Inc 2a describe_definitions 5.703 s (14.26 ms per object); kinds ['enum']; refusals {None: 400}

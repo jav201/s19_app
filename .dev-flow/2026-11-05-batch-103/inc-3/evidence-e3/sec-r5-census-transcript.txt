@@ -1,0 +1,12 @@
+[W] files 203, parse errors 0
+[W] longest cm_type: 10 (synth_a2l.a2l)
+[W] longest cm_format: 23 (43.a2l)
+[W] longest cm_unit: 19 (158.a2l)
+[W] longest cm_tabref: 148 (software_b.a2l)
+[W] longest rl_word: 22 (software_a.a2l)
+[W] longest mc_align_word: 1 (synth_a2l.a2l)
+[W] longest vt_text: 135 (167.a2l)
+[W] longest vt_default: 25 (21.a2l)
+[W] longest vt_entries: 1751 (158.a2l)
+[W] longest ct_entries: 35 (157.a2l)
+[W] longest any_word: 964 (95.a2l)

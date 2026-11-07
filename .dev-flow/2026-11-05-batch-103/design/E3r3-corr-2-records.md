@@ -1,0 +1,5 @@
+# E3 round-3 correction unit R — Inc 2 rows and cases (`inc-2/01-requirements.md`, `inc-2/02-test-cases.md`)
+
+Rules: `design/E3-corr-common.md` (N = `2`; it applies here; no new row id). Authority: "## Round 3 rulings" at the end of `inc-2/E3-rulings.md`, then the "## Round 3" section of `inc-2/E3-security.md` (fix columns of E3S-24 … E3S-28).
+
+Apply to rows and cases only: R-A2L-DEF.19's condition becomes the single letters clause (the keyword clause and the `bit_org` cross-check text go); the CTX-A2L-DEF term *the text of the object*, worded exactly as E3S-24's fix column; the open-comment / open-quote refusal (in .19 if it shares the response, else as an alternative of the same row only if it shares the response — otherwise report it); the cases the fix columns name for every shape of the round-3 probe (F, G, J1, L, L2, H, P → .19/10 … .19/14 or as the fix column numbers them), .19/6 rewritten (E3S-25), .19/7 input pinned (E3S-27), the span wording (E3S-28). .19's threshold N/N equals its case count. Append to `inc-2/steps.log`: `<ISO timestamp> E3 round-3 correction unit R — deepseek-v4-pro via pi — <n> findings applied`.

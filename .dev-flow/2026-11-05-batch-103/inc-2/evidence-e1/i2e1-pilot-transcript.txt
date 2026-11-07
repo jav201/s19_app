@@ -1,0 +1,36 @@
+# i2e1-pilot transcript 2026-11-06T15:54:07-06:00 host <runner>
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed
+# python Python 3.11.18; HOME=/tmp/b103-e1-2/home LOCALAPPDATA=/tmp/b103-e1-2/home/<local> DISPLAY=unset
+A2L section tree has structural errors: path=/home/<user>/work/s19_app/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+[P1a V171 CM.TAB_VERB.DEFAULT_VALUE conversion_type/format/unit/ref] (None, None, None, 'CM.TAB_VERB.DEFAULT_VALUE.REF')
+[P1b V171 CM.VTAB_RANGE.DEFAULT_VALUE conversion_type/ref] (None, 'CM.VTAB_RANGE.DEFAULT_VALUE.REF')
+[P1c software_a TAB_VERB methods (by body line) / with conversion_type TAB_VERB] (163, 0)
+[P1d BalanceTube esdl_model_GameControllerStatemachineStates conversion_type/format/ref] (None, None, None)
+[P1e TAB_VERB in COMPU_CONVERSION_KEYWORDS] False
+[P2 TAB_VERB VALUE raw 2: raw/physical/status/error] (2, 2, 'unknown_method', 'unsupported conversion type ')
+[P3a V171 COMPU_VTAB CM.TAB_VERB.DEFAULT_VALUE.REF entries/kind] ([(1.0, 'SawTooth'), (2.0, 'Square'), (3.0, 'Sinus')], 'List of text strings and relation to impl value')
+[P3b DEFAULT_VALUE text kept anywhere in the side table] False
+[P3c COMPU_VTAB_RANGE CM.VTAB_RANGE.DEFAULT_VALUE.REF in compu_tabs_by_name] False
+[P3d sections named COMPU_VTAB_RANGE in V171 / V161 / software_a] (2, 2, 69)
+[P4 BITMASK_0FF0 word 0x1234: bit_org/raw/physical (masked field would be 0x23 = 35)] ('0x0FF0', 4660, 4660)
+[P5 encode 35 on BITMASK_0FF0: bytes/error/flags (bits outside 0x0FF0 not kept)] ((35, 0), None, [])
+[P6 software_a tag with PHYS_UNIT "V": unit] None
+[P7a tag keys holding a format (FORMAT "%6.1" in the file)] []
+[P7b V171 CM.IDENTICAL format/unit] ('%3.0', 'hours')
+[P8 tag keys holding extended limits (EXTENDED_LIMITS -128 127 in the file)] []
+[P8b limits as the tag holds them] ('-100', '100')
+[P9a V171 ASCII tags: name/length/address] [('UNKNOWN', 42, 8454656)]
+[P9b ASCII decode of 'Hello ASAM': raw/physical/byte_size] (72, 72, 1)
+[P10 _decode_scalar(FLOAT16 0x3C00 = 1.0)] None
+[P11a encode 3 with LINEAR a=2 on SWORD (limits -100..100)] (None, 'the converted raw value 1.5 is not integral', [])
+[P11a encode 200 with LINEAR a=2 on SWORD (limits -100..100)] ((100, 0), None, ["the value 200.0 is outside the tag's declared limits [-100.0, 100.0] - the write proceeds"])
+[P11a encode 1000000000.0 with LINEAR a=2 on SWORD (limits -100..100)] (None, 'the converted raw value 500000000 is outside the SWORD range', [])
+[P11b encode 2 on the TAB_VERB VALUE] (None, "conversion type '' is not supported", [])
+[P11c encode on the ASCII tag] (None, "characteristic type 'ASCII' is not a scalar VALUE", [])
+[P11d encode 1.0 on FLOAT16] (None, 'datatype FLOAT16_IEEE is not supported', [])
+[P11e encode 7 with an undeclared COMPU_METHOD (identity)] ((7,), None, [])
+[P11f encode 0.1 on FLOAT32 identity -> decoded back] ((205, 204, 204, 61), 0.10000000149011612)
+[P12 decode with an undeclared COMPU_METHOD: physical/status/error] (7, 'identity_fallback', 'compu method missing')
+[P13 method formats as a2l.py reads them (V171, V161, software_a, BalanceTube)] [('None', 180), ('%4.2', 99), ('%.3', 55), ('%.0', 49), ('%.4', 31), ('%12.6', 21), ('%3.1', 11), ('%8.4', 11), ('%3.0', 5), ('%1.0', 3), ('%5.0', 3), ('%17.15', 2)]
+# exit 0

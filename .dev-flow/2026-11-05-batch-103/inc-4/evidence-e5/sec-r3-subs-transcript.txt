@@ -1,0 +1,56 @@
+runner sec-r3-run.sh sha256 8f70dd916038119faecd2d3ae51bc8e4ea5e6cc1ea06100f087bce044c077f84; probe sec-r3-probe.py sha256 9cf292424ce8f1a335da4da39354d86b2b99bb480f5b41f0d387f608e52ceefa
+s19_app.__file__ = /tmp/b103-e5r3-4-sec/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5r3-4-sec/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 8f396c15d3c848ceb2c98ab74c112150bf9c09759abb662ea0f2162d1ca7c94d
+tests module = /tmp/b103-e5r3-4-sec/tree/tests/test_b103_label_match_perf.py
+mode = r3 subs  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = -2030542657862475053
+host = <runner>  load = (2.63, 3.74, 3.54)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5r3-4-sec/<user>  LOCALAPPDATA = /tmp/b103-e5r3-4-sec/<user>/localappdata  PILOT_DIR = /tmp/b103-e5r3-4-sec/pilot
+probe = sec-r3-probe.py sha256 9cf292424ce8f1a335da4da39354d86b2b99bb480f5b41f0d387f608e52ceefa; round-1 helpers = sec-e5-probe.py sha256 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+_FUZZY_TOKEN_CAP = 20; _FUZZY_SWITCH_CAP = 512; T.ANY_QUERY_BOUND_S = 2.0; T.KEYSTROKE_BOUND_S = 0.2
+
+=== SUBO (subo_names())
+    50,000 names, 2,334,000 characters in all (.40 scope: 50,000 names, <= 2,356,624; .35/.37 scope: <= 2,062,041); all ASCII True; longest name 1023
+    build 1.58 s [ok]; 50,002 distinct tokens; 57,803 trie nodes; load (2.58, 3.71, 3.53)
+       991.9 ms [ok] median of 5; chars   1, tokens   1 (distinct   1); listed 20 ['substring'] edits [0]; bad spans 0  'a'
+        walks 0, nodes visited 0 (-, walks 0 ms instrumented); _prefix_distance 0; instrumented list == shipped True
+        one ranking under tracemalloc: peak 0.45 MiB (6.0 s [ok])
+       991.8 ms [ok] median of 5; chars   2, tokens   1 (distinct   1); listed 20 ['substring'] edits [0]; bad spans 0  'aa'
+        walks 0, nodes visited 0 (-, walks 0 ms instrumented); _prefix_distance 0; instrumented list == shipped True
+        one ranking under tracemalloc: peak 0.45 MiB (6.0 s [ok])
+
+=== SUBL: 50,000 names 'x' + 'a' * 40 + 'Q' + 5-letter tag (2,350,000 chars)
+    50,000 names, 2,350,000 characters in all (.40 scope: 50,000 names, <= 2,356,624; .35/.37 scope: <= 2,062,041); all ASCII True; longest name 47
+    build 1.59 s [ok]; 50,001 distinct tokens; 91,412 trie nodes; load (2.44, 3.59, 3.5)
+      1012.9 ms [ok] median of 5; chars   1, tokens   1 (distinct   1); listed 20 ['substring'] edits [0]; bad spans 0  'a'
+        walks 0, nodes visited 0 (-, walks 0 ms instrumented); _prefix_distance 0; instrumented list == shipped True
+        one ranking under tracemalloc: peak 10.47 MiB (2.5 s [ok])
+       960.3 ms [ok] median of 5; chars   2, tokens   1 (distinct   1); listed 20 ['substring'] edits [0]; bad spans 0  'aa'
+        walks 0, nodes visited 0 (-, walks 0 ms instrumented); _prefix_distance 0; instrumented list == shipped True
+        one ranking under tracemalloc: peak 10.47 MiB (2.4 s [ok])
+
+=== SUBU: 50,000 names 'X' + 'A' * 40 + 'Q' + 5-letter tag (upper case: the longest _at_boundary path)
+    50,000 names, 2,350,000 characters in all (.40 scope: 50,000 names, <= 2,356,624; .35/.37 scope: <= 2,062,041); all ASCII True; longest name 47
+    build 2.06 s [ok]; 50,001 distinct tokens; 91,412 trie nodes; load (2.31, 3.48, 3.46)
+      1374.5 ms [ok] median of 5; chars   1, tokens   1 (distinct   1); listed 20 ['substring'] edits [0]; bad spans 0  'a'
+        walks 0, nodes visited 0 (-, walks 0 ms instrumented); _prefix_distance 0; instrumented list == shipped True
+        one ranking under tracemalloc: peak 10.47 MiB (2.8 s [ok])
+      1357.7 ms [ok] median of 5; chars   1, tokens   1 (distinct   1); listed 20 ['substring'] edits [0]; bad spans 0  'A'
+        walks 0, nodes visited 0 (-, walks 0 ms instrumented); _prefix_distance 0; instrumented list == shipped True
+        one ranking under tracemalloc: peak 10.47 MiB (2.8 s [ok])
+      1331.7 ms [ok] median of 5; chars   2, tokens   1 (distinct   1); listed 20 ['substring'] edits [0]; bad spans 0  'aa'
+        walks 0, nodes visited 0 (-, walks 0 ms instrumented); _prefix_distance 0; instrumented list == shipped True
+        one ranking under tracemalloc: peak 10.47 MiB (2.8 s [ok])
+
+=== SUBN: 50,000 names 'x' + U+00E9 * 40 + 'Q' + 5-letter tag (non-ASCII letters: .40 has no ASCII scope)
+    50,000 names, 2,350,000 characters in all (.40 scope: 50,000 names, <= 2,356,624; .35/.37 scope: <= 2,062,041); all ASCII False; longest name 47
+    build 2.66 s [ok]; 50,000 distinct tokens; 91,412 trie nodes; load (2.38, 3.36, 3.42)
+      1513.2 ms [ok] median of 5; chars   1, tokens   1 (distinct   1); listed 20 ['substring'] edits [0]; bad spans 0  'é'
+        walks 0, nodes visited 0 (-, walks 0 ms instrumented); _prefix_distance 0; instrumented list == shipped True
+        one ranking under tracemalloc: peak 10.47 MiB (3.0 s [ok])
+      1438.3 ms [ok] median of 5; chars   2, tokens   1 (distinct   1); listed 20 ['substring'] edits [0]; bad spans 0  'éé'
+        walks 0, nodes visited 0 (-, walks 0 ms instrumented); _prefix_distance 0; instrumented list == shipped True
+        one ranking under tracemalloc: peak 10.47 MiB (2.9 s [ok])
+
+load after = (2.59, 3.33, 3.41)
+probe exit 0

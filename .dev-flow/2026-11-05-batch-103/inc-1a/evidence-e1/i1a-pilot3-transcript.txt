@@ -1,0 +1,12 @@
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+python = 3.11.18; platform = linux; DISPLAY=None
+  terminal paste 'L1\nL2'             -> OsClipboardInput : 'L1' (108.7 ms incl. 5 pauses)
+  terminal paste 'L1\nL2'             -> CappedTextArea   : 'L1\nL2' (128.8 ms incl. 5 pauses)
+  terminal paste 70,000 chars         -> OsClipboardInput : length 70000 (155.2 ms incl. 5 pauses)
+  terminal paste 70,000 chars         -> CappedTextArea   : length 65536 (287.1 ms incl. 5 pauses)
+  terminal paste non-ASCII two lines  -> OsClipboardInput : 'Ñoño Ж 漢字 😀' (125.9 ms incl. 5 pauses)
+  terminal paste non-ASCII two lines  -> CappedTextArea   : 'Ñoño Ж 漢字 😀\nsecond' (128.4 ms incl. 5 pauses)
+  terminal paste 'ZZ' over selection 'AAAA' in OsClipboardInput: 'ZZ-BBBB'
+  terminal paste 'ZZ' over selection 'AAAA' in CappedTextArea : 'ZZ-BBBB'
+
+pilot3 done

@@ -1,0 +1,11 @@
+[D1] largest element counts (count, file, kind, shape, byte length, first refusal):
+    (524280, '160.a2l', 'MEASUREMENT', [8, 65535], 524280, None)
+    (524280, '160.a2l', 'MEASUREMENT', [8, 65535], 524280, None)
+    (524280, '160.a2l', 'MEASUREMENT', [8, 65535], 524280, None)
+    (524280, '159.a2l', 'MEASUREMENT', [8, 65535], 524280, None)
+    (524280, '159.a2l', 'MEASUREMENT', [8, 65535], 524280, None)
+    (524280, '159.a2l', 'MEASUREMENT', [8, 65535], 524280, None)
+    (8192, '110.a2l', 'MAP', [64, 128], 8192, None)
+    (5250, 'software_b.a2l', 'MEASUREMENT', [5250], 5250, 'A2L-DEF-ADDRESS')
+[D2] NO_AXIS_PTS component datatypes in the objects' own readable layouts: {'UBYTE': 218, 'UWORD': 48}
+[D3] FIX_AXIS_PAR / _DIST offset and step/shift words: {'FIX_AXIS_PAR_DIST integer words': 384, 'FIX_AXIS_PAR integer words': 4}

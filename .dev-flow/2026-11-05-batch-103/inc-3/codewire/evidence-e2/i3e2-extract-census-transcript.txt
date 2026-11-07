@@ -1,0 +1,64 @@
+# i3e2-extract census transcript 2026-11-06T18:25:08-06:00 host <runner>
+# copy: git archive e07fb00 s19_app tools/synth -> /tmp/b103-e2-3/copy-census (clone e07fb00f9fc13afd314d0334fac683fe33b29b6c, status 0 changed)
+# code-wire: code-wire v3.1.0 e436a08; codewire_extract.py sha256 78d54439f2c95b6e35f31f02b1ed9564b160774622c253624f78e155f23a8599; python Python 3.11.18
+marks written: 2044
+extractor: marks=2044 graph_nodes=0 calls=3839 findings=2058 parse_failures=0 exit 1 (drift expected: no graph)
+
+== s19_app/tui/a2l.py :: _walk_record_layout_components: 4 marked caller(s)
+   _decode_external_axis_points  <-  s19_app/tui/a2l.py:3278
+   _encode_curve_record_bytes  <-  s19_app/tui/a2l.py:2280
+   _record_layout_full_span  <-  s19_app/tui/a2l.py:1805
+   _resolve_record_layout_components  <-  s19_app/tui/a2l.py:1740
+
+== s19_app/tui/a2l.py :: _strip_a2l_comments: 1 marked caller(s)
+   _flatten_body_tokens  <-  s19_app/tui/a2l.py:456
+
+== s19_app/tui/a2l.py :: _split_line_respecting_quotes: 10 marked caller(s)
+   _byte_order_from_section_lines  <-  s19_app/tui/a2l.py:313
+   _flatten_body_tokens  <-  s19_app/tui/a2l.py:456
+   _parse_compu_method_conversion_from_body  <-  s19_app/tui/a2l.py:795
+   _parse_link_map_line  <-  s19_app/tui/a2l.py:674
+   extract_a2l_tags.<locals>.walk  <-  s19_app/tui/a2l.py:2712
+   extract_compu_methods  <-  s19_app/tui/a2l.py:848, s19_app/tui/a2l.py:873
+   extract_compu_tables  <-  s19_app/tui/a2l.py:909, s19_app/tui/a2l.py:913
+   extract_record_layouts  <-  s19_app/tui/a2l.py:718
+   parse_characteristic_header  <-  s19_app/tui/a2l.py:613
+   parse_measurement_header  <-  s19_app/tui/a2l.py:482
+
+== s19_app/tui/a2l.py :: _byte_order_from_section_lines: 2 marked caller(s)
+   extract_a2l_tags.<locals>._module_byte_order  <-  s19_app/tui/a2l.py:2587
+   extract_record_layouts  <-  s19_app/tui/a2l.py:723
+
+== s19_app/tui/a2l.py :: _encode_curve_record_bytes: 1 marked caller(s)
+   encode_physical_to_raw_bytes  <-  s19_app/tui/a2l.py:2462
+
+== s19_app/tui/a2l.py :: _collect_sections_by_name: 3 marked caller(s)
+   extract_compu_methods  <-  s19_app/tui/a2l.py:846
+   extract_compu_tables  <-  s19_app/tui/a2l.py:902
+   extract_record_layouts  <-  s19_app/tui/a2l.py:714
+
+== s19_app/tui/a2l.py :: _flatten_body_tokens: 2 marked caller(s)
+   assemble_characteristic_header  <-  s19_app/tui/a2l.py:653
+   extract_a2l_tags.<locals>.walk  <-  s19_app/tui/a2l.py:2729
+
+== s19_app/tui/a2l.py :: _decode_scalar: 2 marked caller(s)
+   _decode_component_run  <-  s19_app/tui/a2l.py:2975
+   _decode_raw_value  <-  s19_app/tui/a2l.py:1830, s19_app/tui/a2l.py:1834
+
+== s19_app/tui/a2l.py :: _normalize_byte_order: 2 marked caller(s)
+   _byte_order_from_section_lines  <-  s19_app/tui/a2l.py:315
+   extract_a2l_tags.<locals>.walk  <-  s19_app/tui/a2l.py:2682, s19_app/tui/a2l.py:2757
+
+== s19_app/tui/a2l.py :: _collect_declared_alignments: 1 marked caller(s)
+   _walk_record_layout_components  <-  s19_app/tui/a2l.py:1609
+
+== s19_app/tui/a2l.py :: describe_curve_tag: 1 marked caller(s)
+   S19TuiApp.action_a2l_describe_tag  <-  s19_app/tui/app.py:9776
+
+== s19_app/tui/a2l.py :: encode_physical_to_raw_bytes: 1 marked caller(s)
+   resolve_symbol_entry  <-  s19_app/tui/services/change_service.py:649
+
+== s19_app/tui/a2l_parameter_picker.py :: A2LParameterPicker.set_parameters: 2 marked caller(s)
+   CheckEditorPanel.set_a2l_parameters  <-  s19_app/tui/screens_directionb.py:7303
+   PatchEditorPanel.set_a2l_parameters  <-  s19_app/tui/screens_directionb.py:5388
+# exit 0

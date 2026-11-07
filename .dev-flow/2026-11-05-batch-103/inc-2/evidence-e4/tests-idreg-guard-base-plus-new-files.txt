@@ -1,0 +1,7 @@
+# idreg-guard transcript 2026-11-06T22:08:14-06:00 host <runner> tree /home/<user>/work/b103-inc2a-base
+# command: python -m pytest -q -p no:cacheprovider tests/test_id_registry.py
+# cwd: /home/<user>/work/b103-inc2a-base; python Python 3.11.18; HOME=/tmp/b103-e4-2a-tests/<user>
+/home/<user>/work/b103-inc2a-base/s19_app/__init__.py
+............                                                             [100%]
+12 passed in 4.75s
+# exit 0

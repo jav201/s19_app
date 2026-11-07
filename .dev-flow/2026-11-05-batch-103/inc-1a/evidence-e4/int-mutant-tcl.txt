@@ -1,0 +1,1330 @@
+/home/<user>/work/b103-int1a-mutant/s19_app/__init__.py
+====MUTANT-TCL-TIMING====
+FFFFFF                                                                   [100%]
+=================================== FAILURES ===================================
+___ test_r_tui_043_10_1_3_4_linux_ctrl_v_ends_within_typed_key_time[single] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1020/test_r_tui_043_10_1_3_4_linux_0')
+box_kind = 'a'
+
+    @pytest.mark.serial_timing
+    @pytest.mark.parametrize("box_kind", ["a", "m"], ids=["single", "multi"])
+    def test_r_tui_043_10_1_3_4_linux_ctrl_v_ends_within_typed_key_time(
+        tmp_path: Path, box_kind: str
+    ) -> None:
+        """R-TUI-043.10.1/3-4 (LinuxH): median Ctrl+V end ≤ typed-key time + bound."""
+        _assert_linuxh_headless()
+    
+        async def _drive() -> float:
+            app = S19TuiApp(base_dir=tmp_path)
+            app._clipboard = P1000
+            async with app.run_test(size=(160, 48)) as pilot:
+                await pilot.pause()
+                if box_kind == "a":
+                    app.action_show_screen("a2l")
+                    for _ in range(4):
+                        await pilot.pause()
+                    widget = app.query_one("#a2l_tags_filter_input", Input)
+                else:
+                    app.action_show_screen("patch")
+                    for _ in range(4):
+                        await pilot.pause()
+                    widget = app.query_one("#patch_paste_text", TextArea)
+                widget.focus()
+                await pilot.pause()
+                key_time = await typed_key_time(pilot, widget, app)
+                samples = []
+                for _ in range(10):
+                    _set_box(widget, "")
+                    await pilot.pause()
+                    start = time.monotonic()
+                    await pilot.press("ctrl+v")
+                    deadline = time.monotonic() + 10.0
+                    while time.monotonic() < deadline:
+                        await asyncio.sleep(0.005)
+                        await pilot.pause()
+                        if P1000[:10] in _box(widget):
+                            break
+                    samples.append(time.monotonic() - start)
+                samples.sort()
+                median = samples[len(samples) // 2]
+                return key_time, median
+    
+>       key_time, median = asyncio.run(_drive())
+                           ^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_clipboard_core.py:1533: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_clipboard_core.py:1501: in _drive
+    async with app.run_test(size=(160, 48)) as pilot:
+../../miniconda3/envs/s19ci/lib/python3.11/contextlib.py:217: in __aexit__
+    await anext(self.gen)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:2218: in run_test
+    raise self._exception
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:702: in _flush_next_callbacks
+    await invoke(callback.callback)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:56: in _invoke
+    result = callback(*params[:parameter_count])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/app.py:20665: in _apply_filter
+    self._refresh_a2l_filtered_tags(preserve_anchor=False)
+s19_app/tui/app.py:20217: in _refresh_a2l_filtered_tags
+    self.update_a2l_tags_view(
+s19_app/tui/app.py:20330: in update_a2l_tags_view
+    a2l_table = self.query_one("#a2l_tags_list", DataTable)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+selector = '#a2l_tags_list'
+expect_type = <class 'textual.widgets._data_table.DataTable'>
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#a2l_tags_list' on Screen(id='_default')
+
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/dom.py:1505: NoMatches
+----------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ /home/<user>/work/b103-int1a-mutant/s19_app/tui/app.py:20665 in            │
+│ _apply_filter                                                                │
+│                                                                              │
+│   20662 │   │   def _apply_filter() -> None:                                 │
+│   20663 │   │   │   if expected_token != self._a2l_filter_debounce_token:    │
+│   20664 │   │   │   │   return                                               │
+│ ❱ 20665 │   │   │   self._refresh_a2l_filtered_tags(preserve_anchor=False)   │
+│   20666 │   │                                                                │
+│   20667 │   │   self.set_timer(0.15, _apply_filter)                          │
+│   20668                                                                      │
+│                                                                              │
+│ ╭─────────────────────── locals ────────────────────────╮                    │
+│ │ expected_token = 39                                   │                    │
+│ │           self = S19TuiApp(                           │                    │
+│ │                  │   title='Hex Edit Tool',           │                    │
+│ │                  │   classes={'-dark-mode'},          │                    │
+│ │                  │   pseudo_classes={                 │                    │
+│ │                  │   │   'dark',                      │                    │
+│ │                  │   │   'focus'                      │                    │
+│ │                  │   }                                │                    │
+│ │                  )                                    │                    │
+│ ╰───────────────────────────────────────────────────────╯                    │
+│                                                                              │
+│ /home/<user>/work/b103-int1a-mutant/s19_app/tui/app.py:20217 in            │
+│ _refresh_a2l_filtered_tags                                                   │
+│                                                                              │
+│   20214 │   │   │   self._a2l_window_start = self._a2l_clamp_page_start(len( │
+│   20215 │   │   filter_text = self.a2l_tags_filter_text                      │
+│   20216 │   │   if not self._a2l_filtered_tags and filter_text:              │
+│ ❱ 20217 │   │   │   self.update_a2l_tags_view(                               │
+│   20218 │   │   │   │   self._a2l_filtered_tags,                             │
+│   20219 │   │   │   │   empty_message=f"No A2L tags match '{filter_text}'.", │
+│   20220 │   │   │   )                                                        │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │     filter_text = '0123456789012345678901234567890123456789012345678901… │ │
+│ │ preserve_anchor = False                                                  │ │
+│ │            self = S19TuiApp(                                             │ │
+│ │                   │   title='Hex Edit Tool',                             │ │
+│ │                   │   classes={'-dark-mode'},                            │ │
+│ │                   │   pseudo_classes={'dark', 'focus'}                   │ │
+│ │                   )                                                      │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /home/<user>/work/b103-int1a-mutant/s19_app/tui/app.py:20330 in            │
+│ update_a2l_tags_view                                                         │
+│                                                                              │
+│   20327 │   │   │   │   - A2L tag paging and find actions                    │
+│   20328 │   │   """                                                          │
+│   20329 │   │   populate_started = time.perf_counter()                       │
+│ ❱ 20330 │   │   a2l_table = self.query_one("#a2l_tags_list", DataTable)      │
+│   20331 │   │   summary_label = self.query_one("#a2l_tags_summary", Label)   │
+│   20332 │   │   self._a2l_row_key_to_tag = {}                                │
+│   20333 │   │   a2l_table.clear(columns=False)                               │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │    empty_message = "No A2L tags match                                    │ │
+│ │                    '012345678901234567890123456789012345678901234567890… │ │
+│ │ populate_started = 165268.079170725                                      │ │
+│ │             self = S19TuiApp(                                            │ │
+│ │                    │   title='Hex Edit Tool',                            │ │
+│ │                    │   classes={'-dark-mode'},                           │ │
+│ │                    │   pseudo_classes={'dark', 'focus'}                  │ │
+│ │                    )                                                     │ │
+│ │             tags = []                                                    │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+╰──────────────────────────────────────────────────────────────────────────────╯
+NoMatches: No nodes match '#a2l_tags_list' on Screen(id='_default')
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:713 read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:713 read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:713 read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:713 read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:713 read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:713 read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:713 read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:713 read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:713 read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:713 read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+____ test_r_tui_043_10_1_3_4_linux_ctrl_v_ends_within_typed_key_time[multi] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1020/test_r_tui_043_10_1_3_4_linux_1')
+box_kind = 'm'
+
+    @pytest.mark.serial_timing
+    @pytest.mark.parametrize("box_kind", ["a", "m"], ids=["single", "multi"])
+    def test_r_tui_043_10_1_3_4_linux_ctrl_v_ends_within_typed_key_time(
+        tmp_path: Path, box_kind: str
+    ) -> None:
+        """R-TUI-043.10.1/3-4 (LinuxH): median Ctrl+V end ≤ typed-key time + bound."""
+        _assert_linuxh_headless()
+    
+        async def _drive() -> float:
+            app = S19TuiApp(base_dir=tmp_path)
+            app._clipboard = P1000
+            async with app.run_test(size=(160, 48)) as pilot:
+                await pilot.pause()
+                if box_kind == "a":
+                    app.action_show_screen("a2l")
+                    for _ in range(4):
+                        await pilot.pause()
+                    widget = app.query_one("#a2l_tags_filter_input", Input)
+                else:
+                    app.action_show_screen("patch")
+                    for _ in range(4):
+                        await pilot.pause()
+                    widget = app.query_one("#patch_paste_text", TextArea)
+                widget.focus()
+                await pilot.pause()
+                key_time = await typed_key_time(pilot, widget, app)
+                samples = []
+                for _ in range(10):
+                    _set_box(widget, "")
+                    await pilot.pause()
+                    start = time.monotonic()
+                    await pilot.press("ctrl+v")
+                    deadline = time.monotonic() + 10.0
+                    while time.monotonic() < deadline:
+                        await asyncio.sleep(0.005)
+                        await pilot.pause()
+                        if P1000[:10] in _box(widget):
+                            break
+                    samples.append(time.monotonic() - start)
+                samples.sort()
+                median = samples[len(samples) // 2]
+                return key_time, median
+    
+        key_time, median = asyncio.run(_drive())
+        bound = timing_bound(0.1)
+>       assert median <= key_time + report_margin(
+            f"r_tui_043_10_1_{box_kind}", median, key_time + bound
+        ), (key_time, median)
+E       AssertionError: (0.198915790009778, 3.293217230006121)
+E       assert 3.293217230006121 <= (0.198915790009778 + 0.29891579000977797)
+E        +  where 0.29891579000977797 = report_margin('r_tui_043_10_1_m', 3.293217230006121, (0.198915790009778 + 0.1))
+
+tests/test_b103_clipboard_core.py:1535: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:713 read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:713 read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:713 read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:713 read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:713 read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:713 read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:713 read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:713 read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:713 read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:713 read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+___________ test_r_paste_11_3_linux_copy_ends_within_typed_key_time ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1020/test_r_paste_11_3_linux_copy_e0')
+
+    @pytest.mark.serial_timing
+    def test_r_paste_11_3_linux_copy_ends_within_typed_key_time(tmp_path: Path) -> None:
+        """R-PASTE.11/3 (LinuxH): median time to the write failure warning ≤ bound."""
+        _assert_linuxh_headless()
+    
+        async def _drive() -> float:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(160, 48)) as pilot:
+                await pilot.pause()
+                notices = install_notice_capture(app)
+                app.action_show_screen("a2l")
+                for _ in range(4):
+                    await pilot.pause()
+                box = app.query_one("#a2l_tags_filter_input", Input)
+                box.focus()
+                await pilot.pause()
+                key_time = await typed_key_time(pilot, box, app)
+                samples = []
+                for k in range(10):
+                    box.value = f"C{k}"
+                    box.selection = (0, len(box.value))
+                    await pilot.pause()
+                    before = len(notices)
+                    start = time.monotonic()
+                    await pilot.press("ctrl+c")
+                    deadline = time.monotonic() + 10.0
+                    while time.monotonic() < deadline:
+                        await asyncio.sleep(0.005)
+                        await pilot.pause()
+                        if len(notices) > before:
+                            break
+                    samples.append(time.monotonic() - start)
+                samples.sort()
+                return key_time, samples[len(samples) // 2]
+    
+        key_time, median = asyncio.run(_drive())
+        bound = timing_bound(0.1)
+>       assert median <= key_time + report_margin("r_paste_11_3", median, key_time + bound), (key_time, median)
+E       AssertionError: (0.22228763898601755, 1.158231943991268)
+E       assert 1.158231943991268 <= (0.22228763898601755 + 0.32228763898601753)
+E        +  where 0.32228763898601753 = report_margin('r_paste_11_3', 1.158231943991268, (0.22228763898601755 + 0.1))
+
+tests/test_b103_clipboard_core.py:1577: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:773 write_os_clipboard: every strategy failed (cascade=['win32', 'tkinter', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:835 OS clipboard write failed; retained Textual internal clipboard only
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:773 write_os_clipboard: every strategy failed (cascade=['win32', 'tkinter', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:835 OS clipboard write failed; retained Textual internal clipboard only
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:773 write_os_clipboard: every strategy failed (cascade=['win32', 'tkinter', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:835 OS clipboard write failed; retained Textual internal clipboard only
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:773 write_os_clipboard: every strategy failed (cascade=['win32', 'tkinter', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:835 OS clipboard write failed; retained Textual internal clipboard only
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:773 write_os_clipboard: every strategy failed (cascade=['win32', 'tkinter', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:835 OS clipboard write failed; retained Textual internal clipboard only
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:773 write_os_clipboard: every strategy failed (cascade=['win32', 'tkinter', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:835 OS clipboard write failed; retained Textual internal clipboard only
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:773 write_os_clipboard: every strategy failed (cascade=['win32', 'tkinter', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:835 OS clipboard write failed; retained Textual internal clipboard only
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:773 write_os_clipboard: every strategy failed (cascade=['win32', 'tkinter', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:835 OS clipboard write failed; retained Textual internal clipboard only
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:773 write_os_clipboard: every strategy failed (cascade=['win32', 'tkinter', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:835 OS clipboard write failed; retained Textual internal clipboard only
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:773 write_os_clipboard: every strategy failed (cascade=['win32', 'tkinter', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:835 OS clipboard write failed; retained Textual internal clipboard only
+_____ test_r_paste_27_3_linux_right_click_copy_ends_within_typed_key_time ______
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1020/test_r_paste_27_3_linux_right_0')
+
+    @pytest.mark.serial_timing
+    def test_r_paste_27_3_linux_right_click_copy_ends_within_typed_key_time(
+        tmp_path: Path,
+    ) -> None:
+        """R-PASTE.27/3 (LinuxH): median right-click copy end ≤ typed-key time + bound."""
+        _assert_linuxh_headless()
+    
+        async def _drive() -> float:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(160, 48)) as pilot:
+                await pilot.pause()
+                notices = install_notice_capture(app)
+                app.action_show_screen("a2l")
+                for _ in range(4):
+                    await pilot.pause()
+                box = app.query_one("#a2l_tags_filter_input", Input)
+                box.focus()
+                await pilot.pause()
+                key_time = await typed_key_time(pilot, box, app)
+                samples = []
+                for k in range(10):
+                    box.value = f"C{k}"
+                    box.selection = (0, len(box.value))
+                    await pilot.pause()
+                    before = len(notices)
+                    start = time.monotonic()
+                    await right_click_app_route(app, box)
+                    deadline = time.monotonic() + 10.0
+                    while time.monotonic() < deadline:
+                        await asyncio.sleep(0.005)
+                        await pilot.pause()
+                        if len(notices) > before:
+                            break
+                    samples.append(time.monotonic() - start)
+                samples.sort()
+                return key_time, samples[len(samples) // 2]
+    
+>       key_time, median = asyncio.run(_drive())
+                           ^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_clipboard_core.py:1617: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_clipboard_core.py:1589: in _drive
+    async with app.run_test(size=(160, 48)) as pilot:
+../../miniconda3/envs/s19ci/lib/python3.11/contextlib.py:217: in __aexit__
+    await anext(self.gen)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:2218: in run_test
+    raise self._exception
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:3493: in _process_messages
+    await run_process_messages()
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:3432: in run_process_messages
+    await self._dispatch_message(events.Compose())
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:727: in _dispatch_message
+    await self.on_event(message)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:4065: in on_event
+    await super().on_event(event)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:808: in on_event
+    await self._on_message(event)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:829: in _on_message
+    await invoke(method, message)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:58: in _invoke
+    result = await result
+             ^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:3554: in _on_compose
+    await self.mount_all(widgets)
+          ^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:2582: in mount_all
+    return self.mount(*widgets, before=before, after=after)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:2552: in mount
+    return self.screen.mount(*widgets, before=before, after=after)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Screen(id='_default'), before = None, after = None
+widgets = (Header(), Container(id='command_bar_slot'), Container(id='settings_menu', classes='hidden'), Horizontal(id='workspace_shell'), Container(id='workspace_status_bar'), KeyBar(id='key_bar'), ...)
+ids_to_mount = ['command_bar_slot', 'settings_menu', 'workspace_shell', 'workspace_status_bar', 'key_bar', 'command_bar_slot', ...]
+
+    def mount(
+        self,
+        *widgets: Widget,
+        before: int | str | Widget | None = None,
+        after: int | str | Widget | None = None,
+    ) -> AwaitMount:
+        """Mount widgets below this widget (making this widget a container).
+    
+        Args:
+            *widgets: The widget(s) to mount.
+            before: Optional location to mount before. An `int` is the index
+                of the child to mount before, a `str` is a `query_one` query to
+                find the widget to mount before.
+            after: Optional location to mount after. An `int` is the index
+                of the child to mount after, a `str` is a `query_one` query to
+                find the widget to mount after.
+    
+        Returns:
+            An awaitable object that waits for widgets to be mounted.
+    
+        Raises:
+            MountError: If there is a problem with the mount request.
+    
+        Note:
+            Only one of ``before`` or ``after`` can be provided. If both are
+            provided a ``MountError`` will be raised.
+        """
+        if self._closing or self._pruning:
+            return AwaitMount(self, [])
+        if not self.is_attached:
+            raise MountError(f"Can't mount widget(s) before {self!r} is mounted")
+        # Check for duplicate IDs in the incoming widgets
+        ids_to_mount = [
+            widget_id for widget in widgets if (widget_id := widget.id) is not None
+        ]
+        if len(set(ids_to_mount)) != len(ids_to_mount):
+            counter = Counter(ids_to_mount)
+            for widget_id, count in counter.items():
+                if count > 1:
+>                   raise MountError(
+                        f"Tried to insert {count!r} widgets with the same ID {widget_id!r}. "
+                        "Widget IDs must be unique."
+                    )
+E                   textual.widget.MountError: Tried to insert 2 widgets with the same ID 'command_bar_slot'. Widget IDs must be unique.
+
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/widget.py:1463: MountError
+----------------------------- Captured stderr call -----------------------------
+[?1049h[?1000h[?1003h[?1015h[?1006h[?25l[?1004h[>25u[?2048$p[?2004h[?7l[?1000h[?1003h[?1015h[?1006h[?2004l[?7h[?1000l[?1003l[?1015l[?1006l[<u[?1049l[?25h[?1004l]22;text]22;default]52;c;QzA=[1;1H[40m                                                                                                                                                                [0m
+[2;1H[40m [0m[100m [0m[97;100m⭘[0m[97;100m     [0m[100m [0m[97;100m                                                               [0m[97;100mHex Edit Tool[0m[97;100m                                                                [0m[100m [0m[97;100m[0m[100m        [0m[100m [0m[40m [0m
+[3;1H[40m [0m[40m                     [0m[30;40m│[0m[47m [0m[47m                                                           [0m[1;30;47mA2L Explorer[0m[47m                                                            [0m[47m [0m[1;37;40m ? [0m[40m [0m
+[4;1H[40m [0m[30;40m▏[0m[40m [0m[97;40m◫  Workspace[0m[40m      [0m[40m [0m[30;40m│[0m[40m                                                                                                                                        [0m[40m [0m
+[5;1H[40m [0m[37;40m▏[0m[40m [0m[1;37;40m≡  A2L Explorer[0m[40m   [0m[40m [0m[30;40m│[0m[7;30;40m▊[0m[30;40m▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔[0m[30;40m▎[0m[7;30;40m▊[0m[30;40m▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔[0m[30;40m▎[0m[40m [0m
+[6;1H[40m [0m[30;40m▏[0m[40m [0m[97;40m◉  MAC View[0m[40m       [0m[40m [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[47m [0m[47m                               [0m[1;30;47mA2L Tags[0m[47m                                [0m[47m [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m                                                         [0m[30;40m▎[0m[40m [0m
+[7;1H[40m [0m[30;40m▏[0m[40m [0m[97;40m▤  Memory Map[0m[40m     [0m[40m [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m [0m[37;40mHighlight a tag to inspect its fields.[0m[40m               [0m[40m [0m[40m [0m[30;40m▎[0m[40m [0m
+[8;1H[40m [0m[30;40m▏[0m[40m [0m[97;40m!  Issues Report[0m[40m  [0m[40m [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[7;36;40m▊[0m[36;40m▔▔▔▔[0m[36;40m▎[0m[90;40m▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔[0m[90;40m▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔[0m[90;40m▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔[0m[90;40m▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔[0m[7;30;40m▊[0m[30;40m▔▔[0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[90;40m───────────────────────────────────────────────────────[0m[40m [0m[30;40m▎[0m[40m [0m
+[9;1H[40m [0m[30;40m▏[0m[40m [0m[97;40m✎  Patch Editor[0m[40m   [0m[40m [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[7;36;40m▊[0m[40m  [0m[97;40m[0m[40m  [0m[36;40m▎[0m[40m [0m[1;97;40m Field: name [0m[40m  [0m[40m     [0m[1;97;40m All [0m[40m      [0m[40m   [0m[1;97;40m Invalid [0m[40m    [0m[40m  [0m[1;97;40m In-Memory [0m[40m   [0m[7;30;40m▊[0m[40m  [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[47m [0m[47m                     [0m[1;30;47mHex Viewer[0m[47m                      [0m[47m [0m[40m [0m[30;40m▎[0m[40m [0m
+[10;1H[40m [0m[30;40m▏[0m[40m [0m[97;40m✔  Check Editor[0m[40m   [0m[40m [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[7;36;40m▊[0m[36;40m▁▁▁▁[0m[36;40m▎[0m[30;40m▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁[0m[30;40m▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁[0m[30;40m▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁[0m[30;40m▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁[0m[7;30;40m▊[0m[30;40m▁▁[0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[11;1H[40m [0m[30;40m▏[0m[40m [0m[97;40m⏚  A2B Diff[0m[40m       [0m[40m [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[7;30;40m▊[0m[30;40m▔▔▔▔▔▔▔▔▔[0m[30;40m▎[0m[90;40m▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔[0m[7;30;40m▊[0m[30;40m▔▔▔▔▔▔▔▔▔▔[0m[30;40m▎[0m[90;40m▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔[0m[40m [0m[30;40m▎[0m[40m [0m
+[12;1H[40m [0m[30;40m▏[0m[40m [0m[97;40m✦  Flow Builder[0m[40m   [0m[40m [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[1;97;100mTag[0m[1;97;100mAddress[0m[1;97;100mLength[0m[1;97;100mSource[0m[1;97;100mRaw[0m[1;97;100mPhysical[0m[1;97;100mInMem[0m[1;97;100mRegion[0m[1;97;100mLimits[0m[1;97;100mUnit[0m[1;97;100mBits[0m[1;97;100mEndian[0m[1;97;100mVirt[0m[1;97;100mFunc[0m[1;97;100mA[0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[7;30;40m▊[0m[40m  [0m[90;40mSearc[0m[40m  [0m[30;40m▎[0m[40m  [0m[1;97;40m Find Next [0m[40m   [0m[7;30;40m▊[0m[40m  [0m[90;40mGoto [0m[97;40m [0m[40m  [0m[30;40m▎[0m[40m     [0m[1;97;40m Goto [0m[40m     [0m[40m [0m[30;40m▎[0m[40m [0m
+[13;1H[40m [0m[30;40m▏[0m[40m [0m[97;40m▶  Flow Execution[0m[40m [0m[40m [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[7;30;40m▊[0m[30;40m▁▁▁▁▁▁▁▁▁[0m[30;40m▎[0m[30;40m▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁[0m[7;30;40m▊[0m[30;40m▁▁▁▁▁▁▁▁▁▁[0m[30;40m▎[0m[30;40m▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁[0m[40m [0m[30;40m▎[0m[40m [0m
+[14;1H[40m [0m[30;40m▏[0m[40m [0m[97;40m☑  Checks[0m[40m         [0m[40m [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[15;1H[40m [0m[30;40m▏[0m[40m [0m[97;40m⊕  CRC Designer[0m[40m   [0m[40m [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[97;40m[0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[16;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[17;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[18;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[19;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[20;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[21;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[22;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[23;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[24;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[25;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[26;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[27;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[28;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[29;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[30;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[31;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[32;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[33;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[34;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[35;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[90;40m▎[0m[97;40m [0m[97;40m [0m[97;40m [0m[97;40m [0m[97;40m [0m[97;40m [0m[97;40m [0m[97;40m [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[36;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[40m [0m[97;40mNo A2L tags match 'a'.[0m[40m [0m[40m                                                 [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m                                                         [0m[30;40m▎[0m[40m [0m
+[37;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[30;40m▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁[0m[30;40m▎[0m[7;30;40m▊[0m[30;40m▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁[0m[30;40m▎[0m[40m [0m
+[38;1H[40m [0m[30;40m──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[0m[40m [0m
+[39;1H[40m [0m[40m [0m[97;40mReady.[0m[40m                                                                                                                                     [0m[97;40m(none)  |  (none)[0m[40m [0m[40m [0m
+[40;1H[40m [0m[40m [0m[40m                                                                                                                                                            [0m[40m [0m[40m [0m
+[41;1H[40m [0m[40m [0m[30;40m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m[97;40m   [0m[97;40m0%[0m[40m                                                                                                                       [0m[40m [0m[40m [0m
+[42;1H[40m [0m[40m [0m[40m                                                                                                                                                            [0m[40m [0m[40m [0m
+[43;1H[40m [0m[40m [0m[40m                                                                                                                                                            [0m[40m [0m[40m [0m
+[44;1H[40m [0m[40m [0m[40m                                                                                                                                                            [0m[40m [0m[40m [0m
+[45;1H[40m [0m[40m [0m[40m                                                                                                                                                            [0m[40m [0m[40m [0m
+[46;1H[40m [0m[1;91;100m ^k[0m[97;100m Palette [0m[1;91;100m ^d[0m[97;100m Density [0m[1;91;100m ^l[0m[97;100m Load [0m[1;91;100m ^s[0m[97;100m Save project [0m[1;91;100m x[0m[97;100m Operations [0m[1;91;100m ?[0m[97;100m Help [0m[1;91;100m q[0m[97;100m Quit [0m[1;91;100m ^p[0m[97;100m palette [0m[100m                                                                  [0m[40m [0m
+[47;1H[40m [0m[1;30;47m A2L Explorer [0m[1;91;100m /[0m[37;100m Find [0m[1;91;100m g[0m[37;100m Go-to [0m[1;91;100m +[0m[37;100m Page+ [0m[1;91;100m -[0m[37;100m Page- [0m[1;91;100m d[0m[37;100m Describe tag [0m[1;91;100m k[0m[37;100m Legend [0m[100m                                                                                   [0m[40m [0m
+[48;1H[40m                                                                                                                                                                [0m[9;30H[?1049h[?1000h[?1003h[?1015h[?1006h[?25l[?1004h[>25u[?2048$p[?2004h[?7l[?1000h[?1003h[?1015h[?1006h[?2004l[?7h[?1000l[?1003l[?1015l[?1006l[<u[?1049l[?25h[?1004l[?1049h[?1000h[?1003h[?1015h[?1006h[?25l[?1004h[>25u[?2048$p[?2004h[?7l[?1000h[?1003h[?1015h[?1006h[?2004l[?7h[?1000l[?1003l[?1015l[?1006l[<u[?1049l[?25h[?1004l[?1049h[?1000h[?1003h[?1015h[?1006h[?25l[?1004h[>25u[?2048$p[?2004h[?7l[?1000h[?1003h[?1015h[?1006h[?2004l[?7h[?1000l[?1003l[?1015l[?1006l[<u[?1049l[?25h[?1004l[?1049h[?1000h[?1003h[?1015h[?1006h[?25l[?1004h[>25u[?2048$p[?2004h[?7l[?1000h[?1003h[?1015h[?1006h[?2004l[?7h[?1000l[?1003l[?1015l[?1006l[<u[?1049l[?25h[?1004l[?1049h[?1000h[?1003h[?1015h[?1006h[?25l[?1004h[>25u[?2048$p[?2004h[?7l[?1000h[?1003h[?1015h[?1006h[?2004l[?7h[?1000l[?1003l[?1015l[?1006l[<u[?1049l[?25h[?1004l[?1049h[?1000h[?1003h[?1015h[?1006h[?25l[?1004h[>25u[?2048$p[?2004h[?7l[?1000h[?1003h[?1015h[?1006h[?2004l[?7h[?1000l[?1003l[?1015l[?1006l[<u[?1049l[?25h[?1004l[?1049h[?1000h[?1003h[?1015h[?1006h[?25l[?1004h[>25u[?2048$p[?2004h[?7l[?1000h[?1003h[?1015h[?1006h[?2004l[?7h[?1000l[?1003l[?1015l[?1006l[<u[?1049l[?25h[?1004l[?1049h[?1000h[?1003h[?1015h[?1006h[?25l[?1004h[>25u[?2048$p[?2004h[?7l[?1000h[?1003h[?1015h[?1006h[?2004l[?7h[?1000l[?1003l[?1015l[?1006l[<u[?1049l[?25h[?1004l[?1049h[?1000h[?1003h[?1015h[?1006h[?25l[?1004h[>25u[?2048$p[?2004h[?7l[?1000h[?1003h[?1015h[?1006h[?2004l[?7h[?1000l[?1003l[?1015l[?1006l[<u[?1049l[?25h[?1004l[?1000l[?1003l[?1015l[?1006l╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ /home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/ap │
+│ p.py:2582 in mount_all                                                       │
+│                                                                              │
+│   2579 │   │   │   Only one of `before` or `after` can be provided. If both  │
+│   2580 │   │   │   provided a `MountError` will be raised.                   │
+│   2581 │   │   """                                                           │
+│ ❱ 2582 │   │   return self.mount(*widgets, before=before, after=after)       │
+│   2583 │                                                                     │
+│   2584 │   def _init_mode(self, mode: str) -> AwaitMount:                    │
+│   2585 │   │   """Do internal initialization of a new screen stack mode.     │
+│                                                                              │
+│ ╭──────────────────────────── locals ────────────────────────────╮           │
+│ │   after = None                                                 │           │
+│ │  before = None                                                 │           │
+│ │    self = S19TuiApp(                                           │           │
+│ │           │   title='Hex Edit Tool',                           │           │
+│ │           │   classes={'-dark-mode'},                          │           │
+│ │           │   pseudo_classes={'dark', 'focus'}                 │           │
+│ │           )                                                    │           │
+│ │ widgets = [                                                    │           │
+│ │           │   Header(),                                        │           │
+│ │           │   Container(id='command_bar_slot'),                │           │
+│ │           │   Container(                                       │           │
+│ │           │   │   id='settings_menu',                          │           │
+│ │           │   │   classes='hidden'                             │           │
+│ │           │   ),                                               │           │
+│ │           │   Horizontal(id='workspace_shell'),                │           │
+│ │           │   Container(id='workspace_status_bar'),            │           │
+│ │           │   KeyBar(id='key_bar'),                            │           │
+│ │           │   Header(),                                        │           │
+│ │           │   Container(id='command_bar_slot'),                │           │
+│ │           │   Container(                                       │           │
+│ │           │   │   id='settings_menu',                          │           │
+│ │           │   │   classes='hidden'                             │           │
+│ │           │   ),                                               │           │
+│ │           │   Horizontal(id='workspace_shell'),                │           │
+│ │           │   ... +2                                           │           │
+│ │           ]                                                    │           │
+│ ╰────────────────────────────────────────────────────────────────╯           │
+│                                                                              │
+│ /home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/ap │
+│ p.py:2552 in mount                                                           │
+│                                                                              │
+│   2549 │   │   │   Only one of `before` or `after` can be provided. If both  │
+│   2550 │   │   │   provided a `MountError` will be raised.                   │
+│   2551 │   │   """                                                           │
+│ ❱ 2552 │   │   return self.screen.mount(*widgets, before=before, after=after │
+│   2553 │                                                                     │
+│   2554 │   def mount_all(                                                    │
+│   2555 │   │   self,                                                         │
+│                                                                              │
+│ ╭──────────────────────────── locals ────────────────────────────╮           │
+│ │   after = None                                                 │           │
+│ │  before = None                                                 │           │
+│ │    self = S19TuiApp(                                           │           │
+│ │           │   title='Hex Edit Tool',                           │           │
+│ │           │   classes={'-dark-mode'},                          │           │
+│ │           │   pseudo_classes={'dark', 'focus'}                 │           │
+│ │           )                                                    │           │
+│ │ widgets = (                                                    │           │
+│ │           │   Header(),                                        │           │
+│ │           │   Container(id='command_bar_slot'),                │           │
+│ │           │   Container(                                       │           │
+│ │           │   │   id='settings_menu',                          │           │
+│ │           │   │   classes='hidden'                             │           │
+│ │           │   ),                                               │           │
+│ │           │   Horizontal(id='workspace_shell'),                │           │
+│ │           │   Container(id='workspace_status_bar'),            │           │
+│ │           │   KeyBar(id='key_bar'),                            │           │
+│ │           │   Header(),                                        │           │
+│ │           │   Container(id='command_bar_slot'),                │           │
+│ │           │   Container(                                       │           │
+│ │           │   │   id='settings_menu',                          │           │
+│ │           │   │   classes='hidden'                             │           │
+│ │           │   ),                                               │           │
+│ │           │   Horizontal(id='workspace_shell'),                │           │
+│ │           │   ... +2                                           │           │
+│ │           )                                                    │           │
+│ ╰────────────────────────────────────────────────────────────────╯           │
+│                                                                              │
+│ /home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/wi │
+│ dget.py:1463 in mount                                                        │
+│                                                                              │
+│   1460 │   │   │   counter = Counter(ids_to_mount)                           │
+│   1461 │   │   │   for widget_id, count in counter.items():                  │
+│   1462 │   │   │   │   if count > 1:                                         │
+│ ❱ 1463 │   │   │   │   │   raise MountError(                                 │
+│   1464 │   │   │   │   │   │   f"Tried to insert {count!r} widgets with the  │
+│   1465 │   │   │   │   │   │   "Widget IDs must be unique."                  │
+│   1466 │   │   │   │   │   )                                                 │
+│                                                                              │
+│ ╭────────────────────────────── locals ───────────────────────────────╮      │
+│ │        after = None                                                 │      │
+│ │       before = None                                                 │      │
+│ │        count = 2                                                    │      │
+│ │      counter = Counter({                                            │      │
+│ │                │   'command_bar_slot': 2,                           │      │
+│ │                │   'settings_menu': 2,                              │      │
+│ │                │   'workspace_shell': 2,                            │      │
+│ │                │   'workspace_status_bar': 2,                       │      │
+│ │                │   'key_bar': 2                                     │      │
+│ │                })                                                   │      │
+│ │ ids_to_mount = [                                                    │      │
+│ │                │   'command_bar_slot',                              │      │
+│ │                │   'settings_menu',                                 │      │
+│ │                │   'workspace_shell',                               │      │
+│ │                │   'workspace_status_bar',                          │      │
+│ │                │   'key_bar',                                       │      │
+│ │                │   'command_bar_slot',                              │      │
+│ │                │   'settings_menu',                                 │      │
+│ │                │   'workspace_shell',                               │      │
+│ │                │   'workspace_status_bar',                          │      │
+│ │                │   'key_bar'                                        │      │
+│ │                ]                                                    │      │
+│ │         self = Screen(id='_default')                                │      │
+│ │    widget_id = 'command_bar_slot'                                   │      │
+│ │      widgets = (                                                    │      │
+│ │                │   Header(),                                        │      │
+│ │                │   Container(id='command_bar_slot'),                │      │
+│ │                │   Container(                                       │      │
+│ │                │   │   id='settings_menu',                          │      │
+│ │                │   │   classes='hidden'                             │      │
+│ │                │   ),                                               │      │
+│ │                │   Horizontal(id='workspace_shell'),                │      │
+│ │                │   Container(id='workspace_status_bar'),            │      │
+│ │                │   KeyBar(id='key_bar'),                            │      │
+│ │                │   Header(),                                        │      │
+│ │                │   Container(id='command_bar_slot'),                │      │
+│ │                │   Container(                                       │      │
+│ │                │   │   id='settings_menu',                          │      │
+│ │                │   │   classes='hidden'                             │      │
+│ │                │   ),                                               │      │
+│ │                │   Horizontal(id='workspace_shell'),                │      │
+│ │                │   ... +2                                           │      │
+│ │                )                                                    │      │
+│ ╰─────────────────────────────────────────────────────────────────────╯      │
+╰──────────────────────────────────────────────────────────────────────────────╯
+MountError: Tried to insert 2 widgets with the same ID 'command_bar_slot'. 
+Widget IDs must be unique.
+
+NOTE: 1 of 10 errors shown. Run with textual run --dev to see all errors.
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:773 write_os_clipboard: every strategy failed (cascade=['win32', 'tkinter', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:835 OS clipboard write failed; retained Textual internal clipboard only
+_ test_r_paste_31_3_4_linux_right_click_paste_ends_within_typed_key_time[single] _
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1020/test_r_paste_31_3_4_linux_righ0')
+box_kind = 'a'
+
+    @pytest.mark.serial_timing
+    @pytest.mark.parametrize("box_kind", ["a", "m"], ids=["single", "multi"])
+    def test_r_paste_31_3_4_linux_right_click_paste_ends_within_typed_key_time(
+        tmp_path: Path, box_kind: str
+    ) -> None:
+        """R-PASTE.31/3-4 (LinuxH): median right-click paste end ≤ typed-key time + bound."""
+        _assert_linuxh_headless()
+    
+        async def _drive() -> float:
+            app = S19TuiApp(base_dir=tmp_path)
+            app._clipboard = P1000
+            async with app.run_test(size=(160, 48)) as pilot:
+                await pilot.pause()
+                if box_kind == "a":
+                    app.action_show_screen("a2l")
+                    for _ in range(4):
+                        await pilot.pause()
+                    widget = app.query_one("#a2l_tags_filter_input", Input)
+                else:
+                    app.action_show_screen("patch")
+                    for _ in range(4):
+                        await pilot.pause()
+                    widget = app.query_one("#patch_paste_text", TextArea)
+                widget.focus()
+                await pilot.pause()
+                key_time = await typed_key_time(pilot, widget, app)
+                samples = []
+                for _ in range(10):
+                    _set_box(widget, "")
+                    await pilot.pause()
+                    start = time.monotonic()
+                    await right_click_app_route(app, widget)
+                    deadline = time.monotonic() + 10.0
+                    while time.monotonic() < deadline:
+                        await asyncio.sleep(0.005)
+                        await pilot.pause()
+                        if P1000[:10] in _box(widget):
+                            break
+                    samples.append(time.monotonic() - start)
+                samples.sort()
+                return key_time, samples[len(samples) // 2]
+    
+>       key_time, median = asyncio.run(_drive())
+                           ^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_clipboard_core.py:1664: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_clipboard_core.py:1633: in _drive
+    async with app.run_test(size=(160, 48)) as pilot:
+../../miniconda3/envs/s19ci/lib/python3.11/contextlib.py:217: in __aexit__
+    await anext(self.gen)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:2218: in run_test
+    raise self._exception
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:3493: in _process_messages
+    await run_process_messages()
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:3432: in run_process_messages
+    await self._dispatch_message(events.Compose())
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:727: in _dispatch_message
+    await self.on_event(message)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:4065: in on_event
+    await super().on_event(event)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:808: in on_event
+    await self._on_message(event)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:829: in _on_message
+    await invoke(method, message)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:58: in _invoke
+    result = await result
+             ^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:3554: in _on_compose
+    await self.mount_all(widgets)
+          ^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:2582: in mount_all
+    return self.mount(*widgets, before=before, after=after)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:2552: in mount
+    return self.screen.mount(*widgets, before=before, after=after)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Screen(id='_default'), before = None, after = None
+widgets = (Header(), Container(id='command_bar_slot'), Container(id='settings_menu', classes='hidden'), Horizontal(id='workspace_shell'), Container(id='workspace_status_bar'), KeyBar(id='key_bar'), ...)
+ids_to_mount = ['command_bar_slot', 'settings_menu', 'workspace_shell', 'workspace_status_bar', 'key_bar', 'command_bar_slot', ...]
+
+    def mount(
+        self,
+        *widgets: Widget,
+        before: int | str | Widget | None = None,
+        after: int | str | Widget | None = None,
+    ) -> AwaitMount:
+        """Mount widgets below this widget (making this widget a container).
+    
+        Args:
+            *widgets: The widget(s) to mount.
+            before: Optional location to mount before. An `int` is the index
+                of the child to mount before, a `str` is a `query_one` query to
+                find the widget to mount before.
+            after: Optional location to mount after. An `int` is the index
+                of the child to mount after, a `str` is a `query_one` query to
+                find the widget to mount after.
+    
+        Returns:
+            An awaitable object that waits for widgets to be mounted.
+    
+        Raises:
+            MountError: If there is a problem with the mount request.
+    
+        Note:
+            Only one of ``before`` or ``after`` can be provided. If both are
+            provided a ``MountError`` will be raised.
+        """
+        if self._closing or self._pruning:
+            return AwaitMount(self, [])
+        if not self.is_attached:
+            raise MountError(f"Can't mount widget(s) before {self!r} is mounted")
+        # Check for duplicate IDs in the incoming widgets
+        ids_to_mount = [
+            widget_id for widget in widgets if (widget_id := widget.id) is not None
+        ]
+        if len(set(ids_to_mount)) != len(ids_to_mount):
+            counter = Counter(ids_to_mount)
+            for widget_id, count in counter.items():
+                if count > 1:
+>                   raise MountError(
+                        f"Tried to insert {count!r} widgets with the same ID {widget_id!r}. "
+                        "Widget IDs must be unique."
+                    )
+E                   textual.widget.MountError: Tried to insert 2 widgets with the same ID 'command_bar_slot'. Widget IDs must be unique.
+
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/widget.py:1463: MountError
+----------------------------- Captured stderr call -----------------------------
+[?1049h[?1000h[?1003h[?1015h[?1006h[?25l[?1004h[>25u[?2048$p[?2004h[?7l[?1000h[?1003h[?1015h[?1006h[?2004l[?7h[?1000l[?1003l[?1015l[?1006l[<u[?1049l[?25h[?1004l]22;text]22;default[1;1H[40m                                                                                                                                                                [0m
+[2;1H[40m [0m[100m [0m[97;100m⭘[0m[97;100m     [0m[100m [0m[97;100m                                                               [0m[97;100mHex Edit Tool[0m[97;100m                                                                [0m[100m [0m[97;100m[0m[100m        [0m[100m [0m[40m [0m
+[3;1H[40m [0m[40m                     [0m[30;40m│[0m[47m [0m[47m                                                           [0m[1;30;47mA2L Explorer[0m[47m                                                            [0m[47m [0m[1;37;40m ? [0m[40m [0m
+[4;1H[40m [0m[30;40m▏[0m[40m [0m[97;40m◫  Workspace[0m[40m      [0m[40m [0m[30;40m│[0m[40m                                                                                                                                        [0m[40m [0m
+[5;1H[40m [0m[37;40m▏[0m[40m [0m[1;37;40m≡  A2L Explorer[0m[40m   [0m[40m [0m[30;40m│[0m[7;30;40m▊[0m[30;40m▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔[0m[30;40m▎[0m[7;30;40m▊[0m[30;40m▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔[0m[30;40m▎[0m[40m [0m
+[6;1H[40m [0m[30;40m▏[0m[40m [0m[97;40m◉  MAC View[0m[40m       [0m[40m [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[47m [0m[47m                               [0m[1;30;47mA2L Tags[0m[47m                                [0m[47m [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m                                                         [0m[30;40m▎[0m[40m [0m
+[7;1H[40m [0m[30;40m▏[0m[40m [0m[97;40m▤  Memory Map[0m[40m     [0m[40m [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m [0m[37;40mHighlight a tag to inspect its fields.[0m[40m               [0m[40m [0m[40m [0m[30;40m▎[0m[40m [0m
+[8;1H[40m [0m[30;40m▏[0m[40m [0m[97;40m!  Issues Report[0m[40m  [0m[40m [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[7;36;40m▊[0m[36;40m▔▔▔▔[0m[36;40m▎[0m[90;40m▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔[0m[90;40m▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔[0m[90;40m▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔[0m[90;40m▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔[0m[7;30;40m▊[0m[30;40m▔▔[0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[90;40m───────────────────────────────────────────────────────[0m[40m [0m[30;40m▎[0m[40m [0m
+[9;1H[40m [0m[30;40m▏[0m[40m [0m[97;40m✎  Patch Editor[0m[40m   [0m[40m [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[7;36;40m▊[0m[40m  [0m[30;107m[0m[40m  [0m[36;40m▎[0m[40m [0m[1;97;40m Field: name [0m[40m  [0m[40m     [0m[1;97;40m All [0m[40m      [0m[40m   [0m[1;97;40m Invalid [0m[40m    [0m[40m  [0m[1;97;40m In-Memory [0m[40m   [0m[7;30;40m▊[0m[40m  [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[47m [0m[47m                     [0m[1;30;47mHex Viewer[0m[47m                      [0m[47m [0m[40m [0m[30;40m▎[0m[40m [0m
+[10;1H[40m [0m[30;40m▏[0m[40m [0m[97;40m✔  Check Editor[0m[40m   [0m[40m [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[7;36;40m▊[0m[36;40m▁▁▁▁[0m[36;40m▎[0m[30;40m▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁[0m[30;40m▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁[0m[30;40m▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁[0m[30;40m▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁[0m[7;30;40m▊[0m[30;40m▁▁[0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[11;1H[40m [0m[30;40m▏[0m[40m [0m[97;40m⏚  A2B Diff[0m[40m       [0m[40m [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[7;30;40m▊[0m[30;40m▔▔▔▔▔▔▔▔▔[0m[30;40m▎[0m[90;40m▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔[0m[7;30;40m▊[0m[30;40m▔▔▔▔▔▔▔▔▔▔[0m[30;40m▎[0m[90;40m▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔[0m[40m [0m[30;40m▎[0m[40m [0m
+[12;1H[40m [0m[30;40m▏[0m[40m [0m[97;40m✦  Flow Builder[0m[40m   [0m[40m [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[1;97;100mTag[0m[1;97;100mAddress[0m[1;97;100mLength[0m[1;97;100mSource[0m[1;97;100mRaw[0m[1;97;100mPhysical[0m[1;97;100mInMem[0m[1;97;100mRegion[0m[1;97;100mLimits[0m[1;97;100mUnit[0m[1;97;100mBits[0m[1;97;100mEndian[0m[1;97;100mVirt[0m[1;97;100mFunc[0m[1;97;100mA[0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[7;30;40m▊[0m[40m  [0m[90;40mSearc[0m[40m  [0m[30;40m▎[0m[40m  [0m[1;97;40m Find Next [0m[40m   [0m[7;30;40m▊[0m[40m  [0m[90;40mGoto [0m[97;40m [0m[40m  [0m[30;40m▎[0m[40m     [0m[1;97;40m Goto [0m[40m     [0m[40m [0m[30;40m▎[0m[40m [0m
+[13;1H[40m [0m[30;40m▏[0m[40m [0m[97;40m▶  Flow Execution[0m[40m [0m[40m [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[7;30;40m▊[0m[30;40m▁▁▁▁▁▁▁▁▁[0m[30;40m▎[0m[30;40m▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁[0m[7;30;40m▊[0m[30;40m▁▁▁▁▁▁▁▁▁▁[0m[30;40m▎[0m[30;40m▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁[0m[40m [0m[30;40m▎[0m[40m [0m
+[14;1H[40m [0m[30;40m▏[0m[40m [0m[97;40m☑  Checks[0m[40m         [0m[40m [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[15;1H[40m [0m[30;40m▏[0m[40m [0m[97;40m⊕  CRC Designer[0m[40m   [0m[40m [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[97;40m[0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[16;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[17;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[18;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[19;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[20;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[21;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[22;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[23;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[24;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[25;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[26;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[27;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[28;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[29;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[30;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[31;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[32;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[33;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[34;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[97;40m                                                                         [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[35;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[7;90;40m [0m[90;40m▎[0m[97;40m [0m[97;40m [0m[97;40m [0m[97;40m [0m[97;40m [0m[97;40m [0m[97;40m [0m[97;40m [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m [0m[40m                                                       [0m[40m [0m[30;40m▎[0m[40m [0m
+[36;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[40m [0m[40m [0m[97;40mNo A2L tags match 'a'.[0m[40m [0m[40m                                                 [0m[40m [0m[30;40m▎[0m[7;30;40m▊[0m[40m                                                         [0m[30;40m▎[0m[40m [0m
+[37;1H[40m [0m[40m                     [0m[30;40m│[0m[7;30;40m▊[0m[30;40m▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁[0m[30;40m▎[0m[7;30;40m▊[0m[30;40m▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁[0m[30;40m▎[0m[40m [0m
+[38;1H[40m [0m[30;40m──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[0m[40m [0m
+[39;1H[40m [0m[40m [0m[97;40mReady.[0m[40m                                                                                                                                     [0m[97;40m(none)  |  (none)[0m[40m [0m[40m [0m
+[40;1H[40m [0m[40m [0m[40m                                                                                                                                                            [0m[40m [0m[40m [0m
+[41;1H[40m [0m[40m [0m[30;40m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m[97;40m   [0m[97;40m0%[0m[40m                                                                                                                       [0m[40m [0m[40m [0m
+[42;1H[40m [0m[40m [0m[40m                                                                                                                                                            [0m[40m [0m[40m [0m
+[43;1H[40m [0m[40m [0m[40m                                                                                                                                                            [0m[40m [0m[40m [0m
+[44;1H[40m [0m[40m [0m[40m                                                                                                                                                            [0m[40m [0m[40m [0m
+[45;1H[40m [0m[40m [0m[40m                                                                                                                                                            [0m[40m [0m[40m [0m
+[46;1H[40m [0m[1;91;100m ^k[0m[97;100m Palette [0m[1;91;100m ^d[0m[97;100m Density [0m[1;91;100m ^l[0m[97;100m Load [0m[1;91;100m ^s[0m[97;100m Save project [0m[1;91;100m x[0m[97;100m Operations [0m[1;91;100m ?[0m[97;100m Help [0m[1;91;100m q[0m[97;100m Quit [0m[1;91;100m ^p[0m[97;100m palette [0m[100m                                                                  [0m[40m [0m
+[47;1H[40m [0m[1;30;47m A2L Explorer [0m[1;91;100m /[0m[37;100m Find [0m[1;91;100m g[0m[37;100m Go-to [0m[1;91;100m +[0m[37;100m Page+ [0m[1;91;100m -[0m[37;100m Page- [0m[1;91;100m d[0m[37;100m Describe tag [0m[1;91;100m k[0m[37;100m Legend [0m[100m                                                                                   [0m[40m [0m
+[48;1H[40m                                                                                                                                                                [0m[9;28H[?1049h[?1000h[?1003h[?1015h[?1006h[?25l[?1004h[>25u[?2048$p[?2004h[?7l[?1000h[?1003h[?1015h[?1006h[?2004l[?7h[?1000l[?1003l[?1015l[?1006l[<u[?1049l[?25h[?1004l[?1049h[?1000h[?1003h[?1015h[?1006h[?25l[?1004h[>25u[?2048$p[?2004h[?7l[?1000h[?1003h[?1015h[?1006h[?2004l[?7h[?1000l[?1003l[?1015l[?1006l[<u[?1049l[?25h[?1004l[?1049h[?1000h[?1003h[?1015h[?1006h[?25l[?1004h[>25u[?2048$p[?2004h[?7l[?1000h[?1003h[?1015h[?1006h[?2004l[?7h[?1000l[?1003l[?1015l[?1006l[<u[?1049l[?25h[?1004l[?1049h[?1000h[?1003h[?1015h[?1006h[?25l[?1004h[>25u[?2048$p[?2004h[?7l[?1000h[?1003h[?1015h[?1006h[?2004l[?7h[?1000l[?1003l[?1015l[?1006l[<u[?1049l[?25h[?1004l[?1049h[?1000h[?1003h[?1015h[?1006h[?25l[?1004h[>25u[?2048$p[?2004h[?7l[?1000h[?1003h[?1015h[?1006h[?2004l[?7h[?1000l[?1003l[?1015l[?1006l[<u[?1049l[?25h[?1004l[?1049h[?1000h[?1003h[?1015h[?1006h[?25l[?1004h[>25u[?2048$p[?2004h[?7l[?1000h[?1003h[?1015h[?1006h[?2004l[?7h[?1000l[?1003l[?1015l[?1006l[<u[?1049l[?25h[?1004l[?1049h[?1000h[?1003h[?1015h[?1006h[?25l[?1004h[>25u[?2048$p[?2004h[?7l[?1000h[?1003h[?1015h[?1006h[?2004l[?7h[?1000l[?1003l[?1015l[?1006l[<u[?1049l[?25h[?1004l[?1049h[?1000h[?1003h[?1015h[?1006h[?25l[?1004h[>25u[?2048$p[?2004h[?7l[?1000h[?1003h[?1015h[?1006h[?2004l[?7h[?1000l[?1003l[?1015l[?1006l[<u[?1049l[?25h[?1004l[?1049h[?1000h[?1003h[?1015h[?1006h[?25l[?1004h[>25u[?2048$p[?2004h[?7l[?1000h[?1003h[?1015h[?1006h[?2004l[?7h[?1000l[?1003l[?1015l[?1006l[<u[?1049l[?25h[?1004l[?1000l[?1003l[?1015l[?1006l╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ /home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/ap │
+│ p.py:2582 in mount_all                                                       │
+│                                                                              │
+│   2579 │   │   │   Only one of `before` or `after` can be provided. If both  │
+│   2580 │   │   │   provided a `MountError` will be raised.                   │
+│   2581 │   │   """                                                           │
+│ ❱ 2582 │   │   return self.mount(*widgets, before=before, after=after)       │
+│   2583 │                                                                     │
+│   2584 │   def _init_mode(self, mode: str) -> AwaitMount:                    │
+│   2585 │   │   """Do internal initialization of a new screen stack mode.     │
+│                                                                              │
+│ ╭──────────────────────────── locals ────────────────────────────╮           │
+│ │   after = None                                                 │           │
+│ │  before = None                                                 │           │
+│ │    self = S19TuiApp(                                           │           │
+│ │           │   title='Hex Edit Tool',                           │           │
+│ │           │   classes={'-dark-mode'},                          │           │
+│ │           │   pseudo_classes={'dark', 'focus'}                 │           │
+│ │           )                                                    │           │
+│ │ widgets = [                                                    │           │
+│ │           │   Header(),                                        │           │
+│ │           │   Container(id='command_bar_slot'),                │           │
+│ │           │   Container(                                       │           │
+│ │           │   │   id='settings_menu',                          │           │
+│ │           │   │   classes='hidden'                             │           │
+│ │           │   ),                                               │           │
+│ │           │   Horizontal(id='workspace_shell'),                │           │
+│ │           │   Container(id='workspace_status_bar'),            │           │
+│ │           │   KeyBar(id='key_bar'),                            │           │
+│ │           │   Header(),                                        │           │
+│ │           │   Container(id='command_bar_slot'),                │           │
+│ │           │   Container(                                       │           │
+│ │           │   │   id='settings_menu',                          │           │
+│ │           │   │   classes='hidden'                             │           │
+│ │           │   ),                                               │           │
+│ │           │   Horizontal(id='workspace_shell'),                │           │
+│ │           │   ... +2                                           │           │
+│ │           ]                                                    │           │
+│ ╰────────────────────────────────────────────────────────────────╯           │
+│                                                                              │
+│ /home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/ap │
+│ p.py:2552 in mount                                                           │
+│                                                                              │
+│   2549 │   │   │   Only one of `before` or `after` can be provided. If both  │
+│   2550 │   │   │   provided a `MountError` will be raised.                   │
+│   2551 │   │   """                                                           │
+│ ❱ 2552 │   │   return self.screen.mount(*widgets, before=before, after=after │
+│   2553 │                                                                     │
+│   2554 │   def mount_all(                                                    │
+│   2555 │   │   self,                                                         │
+│                                                                              │
+│ ╭──────────────────────────── locals ────────────────────────────╮           │
+│ │   after = None                                                 │           │
+│ │  before = None                                                 │           │
+│ │    self = S19TuiApp(                                           │           │
+│ │           │   title='Hex Edit Tool',                           │           │
+│ │           │   classes={'-dark-mode'},                          │           │
+│ │           │   pseudo_classes={'dark', 'focus'}                 │           │
+│ │           )                                                    │           │
+│ │ widgets = (                                                    │           │
+│ │           │   Header(),                                        │           │
+│ │           │   Container(id='command_bar_slot'),                │           │
+│ │           │   Container(                                       │           │
+│ │           │   │   id='settings_menu',                          │           │
+│ │           │   │   classes='hidden'                             │           │
+│ │           │   ),                                               │           │
+│ │           │   Horizontal(id='workspace_shell'),                │           │
+│ │           │   Container(id='workspace_status_bar'),            │           │
+│ │           │   KeyBar(id='key_bar'),                            │           │
+│ │           │   Header(),                                        │           │
+│ │           │   Container(id='command_bar_slot'),                │           │
+│ │           │   Container(                                       │           │
+│ │           │   │   id='settings_menu',                          │           │
+│ │           │   │   classes='hidden'                             │           │
+│ │           │   ),                                               │           │
+│ │           │   Horizontal(id='workspace_shell'),                │           │
+│ │           │   ... +2                                           │           │
+│ │           )                                                    │           │
+│ ╰────────────────────────────────────────────────────────────────╯           │
+│                                                                              │
+│ /home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/wi │
+│ dget.py:1463 in mount                                                        │
+│                                                                              │
+│   1460 │   │   │   counter = Counter(ids_to_mount)                           │
+│   1461 │   │   │   for widget_id, count in counter.items():                  │
+│   1462 │   │   │   │   if count > 1:                                         │
+│ ❱ 1463 │   │   │   │   │   raise MountError(                                 │
+│   1464 │   │   │   │   │   │   f"Tried to insert {count!r} widgets with the  │
+│   1465 │   │   │   │   │   │   "Widget IDs must be unique."                  │
+│   1466 │   │   │   │   │   )                                                 │
+│                                                                              │
+│ ╭────────────────────────────── locals ───────────────────────────────╮      │
+│ │        after = None                                                 │      │
+│ │       before = None                                                 │      │
+│ │        count = 2                                                    │      │
+│ │      counter = Counter({                                            │      │
+│ │                │   'command_bar_slot': 2,                           │      │
+│ │                │   'settings_menu': 2,                              │      │
+│ │                │   'workspace_shell': 2,                            │      │
+│ │                │   'workspace_status_bar': 2,                       │      │
+│ │                │   'key_bar': 2                                     │      │
+│ │                })                                                   │      │
+│ │ ids_to_mount = [                                                    │      │
+│ │                │   'command_bar_slot',                              │      │
+│ │                │   'settings_menu',                                 │      │
+│ │                │   'workspace_shell',                               │      │
+│ │                │   'workspace_status_bar',                          │      │
+│ │                │   'key_bar',                                       │      │
+│ │                │   'command_bar_slot',                              │      │
+│ │                │   'settings_menu',                                 │      │
+│ │                │   'workspace_shell',                               │      │
+│ │                │   'workspace_status_bar',                          │      │
+│ │                │   'key_bar'                                        │      │
+│ │                ]                                                    │      │
+│ │         self = Screen(id='_default')                                │      │
+│ │    widget_id = 'command_bar_slot'                                   │      │
+│ │      widgets = (                                                    │      │
+│ │                │   Header(),                                        │      │
+│ │                │   Container(id='command_bar_slot'),                │      │
+│ │                │   Container(                                       │      │
+│ │                │   │   id='settings_menu',                          │      │
+│ │                │   │   classes='hidden'                             │      │
+│ │                │   ),                                               │      │
+│ │                │   Horizontal(id='workspace_shell'),                │      │
+│ │                │   Container(id='workspace_status_bar'),            │      │
+│ │                │   KeyBar(id='key_bar'),                            │      │
+│ │                │   Header(),                                        │      │
+│ │                │   Container(id='command_bar_slot'),                │      │
+│ │                │   Container(                                       │      │
+│ │                │   │   id='settings_menu',                          │      │
+│ │                │   │   classes='hidden'                             │      │
+│ │                │   ),                                               │      │
+│ │                │   Horizontal(id='workspace_shell'),                │      │
+│ │                │   ... +2                                           │      │
+│ │                )                                                    │      │
+│ ╰─────────────────────────────────────────────────────────────────────╯      │
+╰──────────────────────────────────────────────────────────────────────────────╯
+MountError: Tried to insert 2 widgets with the same ID 'command_bar_slot'. 
+Widget IDs must be unique.
+
+NOTE: 1 of 10 errors shown. Run with textual run --dev to see all errors.
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:713 read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+_ test_r_paste_31_3_4_linux_right_click_paste_ends_within_typed_key_time[multi] _
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-1020/test_r_paste_31_3_4_linux_righ1')
+box_kind = 'm'
+
+    @pytest.mark.serial_timing
+    @pytest.mark.parametrize("box_kind", ["a", "m"], ids=["single", "multi"])
+    def test_r_paste_31_3_4_linux_right_click_paste_ends_within_typed_key_time(
+        tmp_path: Path, box_kind: str
+    ) -> None:
+        """R-PASTE.31/3-4 (LinuxH): median right-click paste end ≤ typed-key time + bound."""
+        _assert_linuxh_headless()
+    
+        async def _drive() -> float:
+            app = S19TuiApp(base_dir=tmp_path)
+            app._clipboard = P1000
+            async with app.run_test(size=(160, 48)) as pilot:
+                await pilot.pause()
+                if box_kind == "a":
+                    app.action_show_screen("a2l")
+                    for _ in range(4):
+                        await pilot.pause()
+                    widget = app.query_one("#a2l_tags_filter_input", Input)
+                else:
+                    app.action_show_screen("patch")
+                    for _ in range(4):
+                        await pilot.pause()
+                    widget = app.query_one("#patch_paste_text", TextArea)
+                widget.focus()
+                await pilot.pause()
+                key_time = await typed_key_time(pilot, widget, app)
+                samples = []
+                for _ in range(10):
+                    _set_box(widget, "")
+                    await pilot.pause()
+                    start = time.monotonic()
+                    await right_click_app_route(app, widget)
+                    deadline = time.monotonic() + 10.0
+                    while time.monotonic() < deadline:
+                        await asyncio.sleep(0.005)
+                        await pilot.pause()
+                        if P1000[:10] in _box(widget):
+                            break
+                    samples.append(time.monotonic() - start)
+                samples.sort()
+                return key_time, samples[len(samples) // 2]
+    
+>       key_time, median = asyncio.run(_drive())
+                           ^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_clipboard_core.py:1664: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_clipboard_core.py:1633: in _drive
+    async with app.run_test(size=(160, 48)) as pilot:
+../../miniconda3/envs/s19ci/lib/python3.11/contextlib.py:217: in __aexit__
+    await anext(self.gen)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:2218: in run_test
+    raise self._exception
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:3493: in _process_messages
+    await run_process_messages()
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:3432: in run_process_messages
+    await self._dispatch_message(events.Compose())
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:727: in _dispatch_message
+    await self.on_event(message)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:4065: in on_event
+    await super().on_event(event)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:808: in on_event
+    await self._on_message(event)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:829: in _on_message
+    await invoke(method, message)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:58: in _invoke
+    result = await result
+             ^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:3554: in _on_compose
+    await self.mount_all(widgets)
+          ^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:2582: in mount_all
+    return self.mount(*widgets, before=before, after=after)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:2552: in mount
+    return self.screen.mount(*widgets, before=before, after=after)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Screen(id='_default'), before = None, after = None
+widgets = (Header(), Container(id='command_bar_slot'), Container(id='settings_menu', classes='hidden'), Horizontal(id='workspace_shell'), Container(id='workspace_status_bar'), KeyBar(id='key_bar'), ...)
+ids_to_mount = ['command_bar_slot', 'settings_menu', 'workspace_shell', 'workspace_status_bar', 'key_bar', 'command_bar_slot', ...]
+
+    def mount(
+        self,
+        *widgets: Widget,
+        before: int | str | Widget | None = None,
+        after: int | str | Widget | None = None,
+    ) -> AwaitMount:
+        """Mount widgets below this widget (making this widget a container).
+    
+        Args:
+            *widgets: The widget(s) to mount.
+            before: Optional location to mount before. An `int` is the index
+                of the child to mount before, a `str` is a `query_one` query to
+                find the widget to mount before.
+            after: Optional location to mount after. An `int` is the index
+                of the child to mount after, a `str` is a `query_one` query to
+                find the widget to mount after.
+    
+        Returns:
+            An awaitable object that waits for widgets to be mounted.
+    
+        Raises:
+            MountError: If there is a problem with the mount request.
+    
+        Note:
+            Only one of ``before`` or ``after`` can be provided. If both are
+            provided a ``MountError`` will be raised.
+        """
+        if self._closing or self._pruning:
+            return AwaitMount(self, [])
+        if not self.is_attached:
+            raise MountError(f"Can't mount widget(s) before {self!r} is mounted")
+        # Check for duplicate IDs in the incoming widgets
+        ids_to_mount = [
+            widget_id for widget in widgets if (widget_id := widget.id) is not None
+        ]
+        if len(set(ids_to_mount)) != len(ids_to_mount):
+            counter = Counter(ids_to_mount)
+            for widget_id, count in counter.items():
+                if count > 1:
+>                   raise MountError(
+                        f"Tried to insert {count!r} widgets with the same ID {widget_id!r}. "
+                        "Widget IDs must be unique."
+                    )
+E                   textual.widget.MountError: Tried to insert 2 widgets with the same ID 'command_bar_slot'. Widget IDs must be unique.
+
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/widget.py:1463: MountError
+----------------------------- Captured stderr call -----------------------------
+[?1049h[?1000h[?1003h[?1015h[?1006h[?25l[?1004h[>25u[?2048$p[?2004h[?7l[?1000h[?1003h[?1015h[?1006h[?2004l[?7h[?1000l[?1003l[?1015l[?1006l[<u[?1049l[?25h[?1004l]22;text]22;default[?1049h[?1000h[?1003h[?1015h[?1006h[?25l[?1004h[>25u[?2048$p[?2004h[?7l[?1000h[?1003h[?1015h[?1006h[?2004l[?7h[?1000l[?1003l[?1015l[?1006l[<u[?1049l[?25h[?1004l[?1049h[?1000h[?1003h[?1015h[?1006h[?25l[?1004h[>25u[?2048$p[?2004h[?7l[?1000h[?1003h[?1015h[?1006h[?2004l[?7h[?1000l[?1003l[?1015l[?1006l[<u[?1049l[?25h[?1004l[?1049h[?1000h[?1003h[?1015h[?1006h[?25l[?1004h[>25u[?2048$p[?2004h[?7l[?1000h[?1003h[?1015h[?1006h[?2004l[?7h[?1000l[?1003l[?1015l[?1006l[<u[?1049l[?25h[?1004l[?1049h[?1000h[?1003h[?1015h[?1006h[?25l[?1004h[>25u[?2048$p[?2004h[?7l[?1000h[?1003h[?1015h[?1006h[?2004l[?7h[?1000l[?1003l[?1015l[?1006l[<u[?1049l[?25h[?1004l[?1049h[?1000h[?1003h[?1015h[?1006h[?25l[?1004h[>25u[?2048$p[?2004h[?7l[?1000h[?1003h[?1015h[?1006h[?2004l[?7h[?1000l[?1003l[?1015l[?1006l[<u[?1049l[?25h[?1004l[?1049h[?1000h[?1003h[?1015h[?1006h[?25l[?1004h[>25u[?2048$p[?2004h[?7l[?1000h[?1003h[?1015h[?1006h[?2004l[?7h[?1000l[?1003l[?1015l[?1006l[<u[?1049l[?25h[?1004l[?1049h[?1000h[?1003h[?1015h[?1006h[?25l[?1004h[>25u[?2048$p[?2004h[?7l[?1000h[?1003h[?1015h[?1006h[?2004l[?7h[?1000l[?1003l[?1015l[?1006l[<u[?1049l[?25h[?1004l[?1049h[?1000h[?1003h[?1015h[?1006h[?25l[?1004h[>25u[?2048$p[?2004h[?7l[?1000h[?1003h[?1015h[?1006h[?2004l[?7h[?1000l[?1003l[?1015l[?1006l[<u[?1049l[?25h[?1004l[?1049h[?1000h[?1003h[?1015h[?1006h[?25l[?1004h[>25u[?2048$p[?2004h[?7l[?1000h[?1003h[?1015h[?1006h[?2004l[?7h[?1000l[?1003l[?1015l[?1006l[<u[?1049l[?25h[?1004l[?1000l[?1003l[?1015l[?1006l╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ /home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/ap │
+│ p.py:2582 in mount_all                                                       │
+│                                                                              │
+│   2579 │   │   │   Only one of `before` or `after` can be provided. If both  │
+│   2580 │   │   │   provided a `MountError` will be raised.                   │
+│   2581 │   │   """                                                           │
+│ ❱ 2582 │   │   return self.mount(*widgets, before=before, after=after)       │
+│   2583 │                                                                     │
+│   2584 │   def _init_mode(self, mode: str) -> AwaitMount:                    │
+│   2585 │   │   """Do internal initialization of a new screen stack mode.     │
+│                                                                              │
+│ ╭──────────────────────────── locals ────────────────────────────╮           │
+│ │   after = None                                                 │           │
+│ │  before = None                                                 │           │
+│ │    self = S19TuiApp(                                           │           │
+│ │           │   title='Hex Edit Tool',                           │           │
+│ │           │   classes={'-dark-mode'},                          │           │
+│ │           │   pseudo_classes={'dark', 'focus'}                 │           │
+│ │           )                                                    │           │
+│ │ widgets = [                                                    │           │
+│ │           │   Header(),                                        │           │
+│ │           │   Container(id='command_bar_slot'),                │           │
+│ │           │   Container(                                       │           │
+│ │           │   │   id='settings_menu',                          │           │
+│ │           │   │   classes='hidden'                             │           │
+│ │           │   ),                                               │           │
+│ │           │   Horizontal(id='workspace_shell'),                │           │
+│ │           │   Container(id='workspace_status_bar'),            │           │
+│ │           │   KeyBar(id='key_bar'),                            │           │
+│ │           │   Header(),                                        │           │
+│ │           │   Container(id='command_bar_slot'),                │           │
+│ │           │   Container(                                       │           │
+│ │           │   │   id='settings_menu',                          │           │
+│ │           │   │   classes='hidden'                             │           │
+│ │           │   ),                                               │           │
+│ │           │   Horizontal(id='workspace_shell'),                │           │
+│ │           │   ... +2                                           │           │
+│ │           ]                                                    │           │
+│ ╰────────────────────────────────────────────────────────────────╯           │
+│                                                                              │
+│ /home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/ap │
+│ p.py:2552 in mount                                                           │
+│                                                                              │
+│   2549 │   │   │   Only one of `before` or `after` can be provided. If both  │
+│   2550 │   │   │   provided a `MountError` will be raised.                   │
+│   2551 │   │   """                                                           │
+│ ❱ 2552 │   │   return self.screen.mount(*widgets, before=before, after=after │
+│   2553 │                                                                     │
+│   2554 │   def mount_all(                                                    │
+│   2555 │   │   self,                                                         │
+│                                                                              │
+│ ╭──────────────────────────── locals ────────────────────────────╮           │
+│ │   after = None                                                 │           │
+│ │  before = None                                                 │           │
+│ │    self = S19TuiApp(                                           │           │
+│ │           │   title='Hex Edit Tool',                           │           │
+│ │           │   classes={'-dark-mode'},                          │           │
+│ │           │   pseudo_classes={'dark', 'focus'}                 │           │
+│ │           )                                                    │           │
+│ │ widgets = (                                                    │           │
+│ │           │   Header(),                                        │           │
+│ │           │   Container(id='command_bar_slot'),                │           │
+│ │           │   Container(                                       │           │
+│ │           │   │   id='settings_menu',                          │           │
+│ │           │   │   classes='hidden'                             │           │
+│ │           │   ),                                               │           │
+│ │           │   Horizontal(id='workspace_shell'),                │           │
+│ │           │   Container(id='workspace_status_bar'),            │           │
+│ │           │   KeyBar(id='key_bar'),                            │           │
+│ │           │   Header(),                                        │           │
+│ │           │   Container(id='command_bar_slot'),                │           │
+│ │           │   Container(                                       │           │
+│ │           │   │   id='settings_menu',                          │           │
+│ │           │   │   classes='hidden'                             │           │
+│ │           │   ),                                               │           │
+│ │           │   Horizontal(id='workspace_shell'),                │           │
+│ │           │   ... +2                                           │           │
+│ │           )                                                    │           │
+│ ╰────────────────────────────────────────────────────────────────╯           │
+│                                                                              │
+│ /home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/wi │
+│ dget.py:1463 in mount                                                        │
+│                                                                              │
+│   1460 │   │   │   counter = Counter(ids_to_mount)                           │
+│   1461 │   │   │   for widget_id, count in counter.items():                  │
+│   1462 │   │   │   │   if count > 1:                                         │
+│ ❱ 1463 │   │   │   │   │   raise MountError(                                 │
+│   1464 │   │   │   │   │   │   f"Tried to insert {count!r} widgets with the  │
+│   1465 │   │   │   │   │   │   "Widget IDs must be unique."                  │
+│   1466 │   │   │   │   │   )                                                 │
+│                                                                              │
+│ ╭────────────────────────────── locals ───────────────────────────────╮      │
+│ │        after = None                                                 │      │
+│ │       before = None                                                 │      │
+│ │        count = 2                                                    │      │
+│ │      counter = Counter({                                            │      │
+│ │                │   'command_bar_slot': 2,                           │      │
+│ │                │   'settings_menu': 2,                              │      │
+│ │                │   'workspace_shell': 2,                            │      │
+│ │                │   'workspace_status_bar': 2,                       │      │
+│ │                │   'key_bar': 2                                     │      │
+│ │                })                                                   │      │
+│ │ ids_to_mount = [                                                    │      │
+│ │                │   'command_bar_slot',                              │      │
+│ │                │   'settings_menu',                                 │      │
+│ │                │   'workspace_shell',                               │      │
+│ │                │   'workspace_status_bar',                          │      │
+│ │                │   'key_bar',                                       │      │
+│ │                │   'command_bar_slot',                              │      │
+│ │                │   'settings_menu',                                 │      │
+│ │                │   'workspace_shell',                               │      │
+│ │                │   'workspace_status_bar',                          │      │
+│ │                │   'key_bar'                                        │      │
+│ │                ]                                                    │      │
+│ │         self = Screen(id='_default')                                │      │
+│ │    widget_id = 'command_bar_slot'                                   │      │
+│ │      widgets = (                                                    │      │
+│ │                │   Header(),                                        │      │
+│ │                │   Container(id='command_bar_slot'),                │      │
+│ │                │   Container(                                       │      │
+│ │                │   │   id='settings_menu',                          │      │
+│ │                │   │   classes='hidden'                             │      │
+│ │                │   ),                                               │      │
+│ │                │   Horizontal(id='workspace_shell'),                │      │
+│ │                │   Container(id='workspace_status_bar'),            │      │
+│ │                │   KeyBar(id='key_bar'),                            │      │
+│ │                │   Header(),                                        │      │
+│ │                │   Container(id='command_bar_slot'),                │      │
+│ │                │   Container(                                       │      │
+│ │                │   │   id='settings_menu',                          │      │
+│ │                │   │   classes='hidden'                             │      │
+│ │                │   ),                                               │      │
+│ │                │   Horizontal(id='workspace_shell'),                │      │
+│ │                │   ... +2                                           │      │
+│ │                )                                                    │      │
+│ ╰─────────────────────────────────────────────────────────────────────╯      │
+╰──────────────────────────────────────────────────────────────────────────────╯
+MountError: Tried to insert 2 widgets with the same ID 'command_bar_slot'. 
+Widget IDs must be unique.
+
+NOTE: 1 of 10 errors shown. Run with textual run --dev to see all errors.
+============================= QC-TM timing margins =============================
+LOW -1001.7%  3.293 s / 0.299 s  r_tui_043_10_1_m  tests/test_b103_clipboard_core.py::test_r_tui_043_10_1_3_4_linux_ctrl_v_ends_within_typed_key_time[multi]
+LOW -259.4%  1.158 s / 0.322 s  r_paste_11_3  tests/test_b103_clipboard_core.py::test_r_paste_11_3_linux_copy_ends_within_typed_key_time
+QC-TM: 2 bounds, 2 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b103_clipboard_core.py::test_r_tui_043_10_1_3_4_linux_ctrl_v_ends_within_typed_key_time[single]
+FAILED tests/test_b103_clipboard_core.py::test_r_tui_043_10_1_3_4_linux_ctrl_v_ends_within_typed_key_time[multi]
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_11_3_linux_copy_ends_within_typed_key_time
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_27_3_linux_right_click_copy_ends_within_typed_key_time
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_31_3_4_linux_right_click_paste_ends_within_typed_key_time[single]
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_31_3_4_linux_right_click_paste_ends_within_typed_key_time[multi]
+6 failed in 422.85s (0:07:02)

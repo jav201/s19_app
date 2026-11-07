@@ -1,0 +1,14 @@
+s19_app.__file__ = /tmp/b103-e5-4-corr/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5-4-corr/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 24564b32d53f142b85fb33825aed3c30a116fbaaf4808be45e4378b2d8bedb9b
+sec-e5-probe.py sha256 = 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+this probe sha256 = 5fd0b981d2b03082636db885b71632c8ebd7a3f5dfc6bee25018dde89dc8aeb4
+variant = A (A: walk every distinct token; C: A + switch at <= 512 candidate token occurrences, step 6 by the tier's rule)
+mode = check  python = 3.11.18  host = <runner>  load = (0.44, 0.54, 0.63)  cpus = 16
+HOME = /tmp/b103-e5-4-corr/<user>  LOCALAPPDATA = /tmp/b103-e5-4-corr/<user>/localappdata
+  REF     58 queries x 3 limits (1, 20, 200): 174 comparisons, 0 mismatches
+  REF6    49 queries x 3 limits (1, 20, 200): 147 comparisons, 0 mismatches
+  LONG     9 queries x 3 limits (1, 20, 200): 27 comparisons, 0 mismatches
+  CRAFT    5 queries x 3 limits (1, 20, 200): 15 comparisons, 0 mismatches
+  CRAFT 51-token query, limit 20: equal True, 20 entries, rules ['fuzzy'], edits [50]
+  TOTAL 364 comparisons, 0 mismatches (rank_v vs label_match.rank)

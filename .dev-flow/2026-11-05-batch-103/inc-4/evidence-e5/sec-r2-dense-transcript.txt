@@ -1,0 +1,84 @@
+runner sec-r2-run.sh sha256 01a6306bb691ca8ba9909f4f35ba0d442c21ea334e625d9331e6e9241c6bce63; probe sec-r2-probe.py sha256 86ef259a778cc3797e5e6312772d1edb6945d2d4732d4e94238565249ad2c47b
+s19_app.__file__ = /tmp/b103-e5-4-sec-r2/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5-4-sec-r2/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0
+tests module = /tmp/b103-e5-4-sec-r2/tree/tests/test_b103_label_match_perf.py
+mode = r2 dense  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = 766316025415449088
+host = <runner>  load = (1.37, 0.71, 1.4)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5-4-sec-r2/<user>  LOCALAPPDATA = /tmp/b103-e5-4-sec-r2/<user>/localappdata  PILOT_DIR = /tmp/b103-e5-4-sec-r2/pilot
+probe = sec-r2-probe.py sha256 86ef259a778cc3797e5e6312772d1edb6945d2d4732d4e94238565249ad2c47b; round-1 helpers = sec-e5-probe.py sha256 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+_FUZZY_SWITCH_CAP = 512
+
+=== U1: 50,000 names 'ab' + 4 letters (one distinct token each)
+    50,000 names, 300,000 characters in all (.40 scope: 50,000 names, <= 2,356,624); build 0.31 s [ok]; 50,000 distinct tokens; load (1.62, 0.78, 1.42)
+      143.7 ms [ok] median of 3; chars  12, tokens   4 (distinct   4); listed 20 ['fuzzy'] edits [3]; bad spans 0  4 distinct tokens (tables: 4, ids 200,000, postings 200,000)
+      walks 4, _prefix_distance 0, _classify 20; same list on {'map-only': True}
+      495.6 ms [ok] median of 3; chars  48, tokens  16 (distinct  16); listed 20 ['fuzzy'] edits [15]; bad spans 0  16 distinct tokens (tables: 16, ids 800,000, postings 800,000)
+      walks 16, _prefix_distance 0, _classify 20; same list on {'map-only': True}
+      993.5 ms [ok] median of 3; chars  96, tokens  32 (distinct  32); listed 20 ['fuzzy'] edits [31]; bad spans 0  32 distinct tokens (tables: 32, ids 1,600,000, postings 1,600,000)
+      walks 32, _prefix_distance 0, _classify 20
+     1406.9 ms [ok] median of 3; chars 156, tokens  52 (distinct  52); listed 20 ['fuzzy'] edits [51]; bad spans 0  > 1.0 s (.40)  52 distinct tokens (tables: 52, ids 2,600,000, postings 2,600,000)
+      walks 52, _prefix_distance 0, _classify 20
+     1959.9 ms [ok] median of 3; chars 228, tokens  76 (distinct  76); listed 20 ['fuzzy'] edits [75]; bad spans 0  > 1.0 s (.40)  76 distinct tokens (tables: 76, ids 3,800,000, postings 3,800,000)
+      walks 76, _prefix_distance 0, _classify 20
+
+=== U6: 50,000 names of 6 distinct 'ab'+4-letter tokens
+    50,000 names, 2,050,000 characters in all (.40 scope: 50,000 names, <= 2,356,624); build 1.92 s [ok]; 300,000 distinct tokens; load (2.51, 1.08, 1.5)
+       13.0 ms [ok] median of 3; chars  12, tokens   4 (distinct   4); listed 20 ['token'] edits [0]; bad spans 0  4 distinct tokens (tables: 0, ids 0, postings 0)
+      walks 0, _prefix_distance 0, _classify 20; same list on {'map-only': True}
+     1619.6 ms [ok] median of 3; chars  48, tokens  16 (distinct  16); listed 20 ['fuzzy'] edits [10]; bad spans 0  > 1.0 s (.40)  16 distinct tokens (tables: 16, ids 4,800,000, postings 4,800,000)
+      walks 16, _prefix_distance 0, _classify 20; same list on {'map-only': True}
+     3229.0 ms [ok] median of 3; chars  96, tokens  32 (distinct  32); listed 20 ['fuzzy'] edits [26]; bad spans 0  > 1.0 s (.40)  32 distinct tokens (tables: 32, ids 9,600,000, postings 9,600,000)
+      walks 32, _prefix_distance 0, _classify 20
+      (larger n skipped: already over 3 s)
+    76 tokens, one ranking under tracemalloc: peak 1470.38 MiB (396.43 s [ok])
+    cProfile (U6, 32 tokens), top by own time:
+         ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+              1    4.149    4.149    6.405    6.405 <tree>/s19_app/tui/services/label_match.py:511(_fuzzy_tier)
+        9600000    1.278    0.000    1.278    0.000 {method 'update' of 'set' objects}
+             32    0.830    0.026    0.831    0.026 <tree>/s19_app/tui/services/label_match.py:1076(_fuzzy_token_distances)
+        1355152    0.105    0.000    0.105    0.000 {method 'get' of 'dict' objects}
+              1    0.044    0.044    0.106    0.106 <tree>/s19_app/tui/services/label_match.py:448(_cut)
+              1    0.037    0.037    6.615    6.615 <tree>/s19_app/tui/services/label_match.py:224(rank)
+              1    0.036    0.036    0.040    0.040 {method 'sort' of 'list' objects}
+          50000    0.036    0.000    0.061    0.000 <tree>/s19_app/tui/services/label_match.py:282(add_group)
+
+=== S1: 50,000 names 'ab_' + number (one shared token 'ab')
+    50,000 names, 388,890 characters in all (.40 scope: 50,000 names, <= 2,356,624); build 0.42 s [ok]; 50,001 distinct tokens; load (3.59, 3.3, 2.41)
+       55.0 ms [ok] median of 3; chars  12, tokens   4 (distinct   4); listed 20 ['fuzzy'] edits [4]; bad spans 0  4 distinct tokens (tables: 4, ids 4, postings 200,000)
+      walks 4, _prefix_distance 0, _classify 20; same list on {'map-only': True}
+      148.5 ms [ok] median of 3; chars  48, tokens  16 (distinct  16); listed 20 ['fuzzy'] edits [16]; bad spans 0  16 distinct tokens (tables: 16, ids 16, postings 800,000)
+      walks 16, _prefix_distance 0, _classify 20; same list on {'map-only': True}
+      273.2 ms [ok] median of 3; chars  96, tokens  32 (distinct  32); listed 20 ['fuzzy'] edits [32]; bad spans 0  32 distinct tokens (tables: 32, ids 32, postings 1,600,000)
+      walks 32, _prefix_distance 0, _classify 20
+      438.8 ms [ok] median of 3; chars 156, tokens  52 (distinct  52); listed 20 ['fuzzy'] edits [52]; bad spans 0  52 distinct tokens (tables: 52, ids 52, postings 2,600,000)
+      walks 52, _prefix_distance 0, _classify 20
+      619.3 ms [ok] median of 3; chars 228, tokens  76 (distinct  76); listed 20 ['fuzzy'] edits [76]; bad spans 0  76 distinct tokens (tables: 76, ids 76, postings 3,800,000)
+      walks 76, _prefix_distance 0, _classify 20
+
+=== E2: 50,000 names 'abcd' + 4 letters (2-edit queries)
+    50,000 names, 400,000 characters in all (.40 scope: 50,000 names, <= 2,356,624); build 0.38 s [ok]; 50,000 distinct tokens; load (3.41, 3.27, 2.41)
+      141.7 ms [ok] median of 3; chars  24, tokens   4 (distinct   4); listed 20 ['fuzzy'] edits [3]; bad spans 0  4 distinct tokens (tables: 4, ids 200,000, postings 200,000)
+      walks 4, _prefix_distance 0, _classify 20; same list on {'map-only': True}
+      367.8 ms [ok] median of 3; chars  72, tokens  12 (distinct  12); listed 20 ['fuzzy'] edits [14]; bad spans 0  12 distinct tokens (tables: 12, ids 600,000, postings 600,000)
+      walks 12, _prefix_distance 0, _classify 20; same list on {'map-only': True}
+      703.4 ms [ok] median of 3; chars 144, tokens  24 (distinct  24); listed 20 ['fuzzy'] edits [37]; bad spans 0  24 distinct tokens (tables: 24, ids 1,200,000, postings 1,200,000)
+      walks 24, _prefix_distance 0, _classify 20
+     1007.8 ms [ok] median of 3; chars 216, tokens  36 (distinct  36); listed 20 ['fuzzy'] edits [59]; bad spans 0  > 1.0 s (.40)  36 distinct tokens (tables: 36, ids 1,800,000, postings 1,800,000)
+      walks 36, _prefix_distance 0, _classify 20
+
+=== M1: 25,000 U1 names + 25,000 REF names
+    50,000 names, 1,166,622 characters in all (.40 scope: 50,000 names, <= 2,356,624); build 1.16 s [ok]; 102,256 distinct tokens; load (3.32, 3.26, 2.42)
+       79.7 ms [ok] median of 3; chars  12, tokens   4 (distinct   4); listed 20 ['fuzzy'] edits [3]; bad spans 0  4 distinct tokens (tables: 4, ids 102,116, postings 104,861)
+      walks 4, _prefix_distance 0, _classify 20; same list on {'map-only': True}
+      282.2 ms [ok] median of 3; chars  48, tokens  16 (distinct  16); listed 20 ['fuzzy'] edits [14, 15]; bad spans 0  16 distinct tokens (tables: 16, ids 409,042, postings 420,738)
+      walks 16, _prefix_distance 0, _classify 20; same list on {'map-only': True}
+      567.9 ms [ok] median of 3; chars  96, tokens  32 (distinct  32); listed 20 ['fuzzy'] edits [30, 31]; bad spans 0  32 distinct tokens (tables: 32, ids 817,844, postings 841,164)
+      walks 32, _prefix_distance 0, _classify 20
+      848.7 ms [ok] median of 3; chars 156, tokens  52 (distinct  52); listed 20 ['fuzzy'] edits [50, 51]; bad spans 0  52 distinct tokens (tables: 52, ids 1,329,227, postings 1,367,297)
+      walks 52, _prefix_distance 0, _classify 20
+     1237.1 ms [ok] median of 3; chars 228, tokens  76 (distinct  76); listed 20 ['fuzzy'] edits [74, 75]; bad spans 0  > 1.0 s (.40)  76 distinct tokens (tables: 76, ids 1,943,080, postings 1,998,965)
+      walks 76, _prefix_distance 0, _classify 20
+
+load after = (3.1, 3.21, 2.42)
+probe exit 0

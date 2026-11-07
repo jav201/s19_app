@@ -1,0 +1,39 @@
+=== DIFF base -> M-15 (s19_app/tui/services/label_match.py) ===
+diff --git a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py b/M-15/s19_app/tui/services/label_match.py
+index d274de0..5f5ea88 100644
+--- a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py
++++ b/M-15/s19_app/tui/services/label_match.py
+@@ -348,13 +348,8 @@ def rank(query: str, index: LabelIndex, limit: int) -> list[LabelMatch]:
+             found += 1
+ 
+     if found < limit and parsed.keys:
+-        key_mask = _char_mask(parsed.keys)
+         for i in range(count):
+-            if i in taken:
+-                continue
+-            if key_mask & ~index._masks[i]:
+-                continue
+-            if _subsequence(parsed.keys, folded[i]) is not None:
++            if i not in taken:
+                 add_group(MatchRule.SUBSEQUENCE, 0, i)
+ 
+     result: list[LabelMatch] = []
+@@ -842,7 +837,7 @@ def _classify(query: _Query, name: str) -> tuple[MatchRule, int, tuple[tuple[int
+                 0,
+                 _join_spans([(o, o + 1) for o in offsets]),
+             )
+-    return None
++    return (MatchRule.SUBSEQUENCE, 0, ())
+ 
+ 
+ def _order_key(rule: MatchRule, key: int, name: str, case_exact: bool) -> tuple:
+
+=== PYTEST (tail) ===
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+/tmp/b103-e5-4-mutA/M-15/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.15/1: query 'temp_sensor_max' limit 20
+/tmp/b103-e5-4-mutA/M-15/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.15/2: query 'v' limit 20
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.15/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.15/2]
+2 failed, 127 deselected in 5.35s

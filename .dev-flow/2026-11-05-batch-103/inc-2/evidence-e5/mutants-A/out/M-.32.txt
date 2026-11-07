@@ -1,0 +1,52 @@
+# M-.32
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.32/s19_app/__init__.py
+# note: empty text instead of <raw> (no text)
+#   EDIT-OK: '        if form.default_display is not None:\n            return form.d'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..4d027b4f 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -1315,7 +1315,7 @@ def _enum_text(definition: Definition, stored: int | float) -> str:
+             return form.texts[pos]
+         if form.default_display is not None:
+             return form.default_display
+-        return f"{_raw_text(stored)} (no text)"
++        return ""
+     entry = _enum_entry_text(definition, stored)
+     if entry is not None:
+         return _clean(entry)
+
+# --- pytest (rc=1) ---
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+__________ test_r_a2l_def_32_1_unmatched_value_with_no_default_pairs ___________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...osed /begin sections detected.'], 'path': '/tmp/b103-e5-2-mutA/M-.32/examples/case_00_public/ASAP2_Demo_V171.a2l', ...}
+
+    def test_r_a2l_def_32_1_unmatched_value_with_no_default_pairs(v171):
+        """R-A2L-DEF.32/1 - ``1 (no text)``."""
+>       assert _v171_text(v171, V171_ENUM_NODEF, b"\x01\x00") == "1 (no text)"
+E       AssertionError: assert '' == '1 (no text)'
+E         
+E         - 1 (no text)
+
+../base/tests/test_b103_a2l_definition.py:946: AssertionError
+------------------------------ Captured log setup ------------------------------
+WARNING  s19_app.tui.a2l:a2l.py:250 A2L section tree has structural errors: path=/tmp/b103-e5-2-mutA/M-.32/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+__________ test_r_a2l_def_32_2_unmatched_value_with_no_default_ranges __________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...osed /begin sections detected.'], 'path': '/tmp/b103-e5-2-mutA/M-.32/examples/case_00_public/ASAP2_Demo_V171.a2l', ...}
+
+    def test_r_a2l_def_32_2_unmatched_value_with_no_default_ranges(v171):
+        """R-A2L-DEF.32/2 - ``10 (no text)``."""
+>       assert _v171_text(v171, V171_RANGE_NODEF, b"\x0a\x00") == "10 (no text)"
+E       AssertionError: assert '' == '10 (no text)'
+E         
+E         - 10 (no text)
+
+../base/tests/test_b103_a2l_definition.py:951: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_32_1_unmatched_value_with_no_default_pairs
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_32_2_unmatched_value_with_no_default_ranges
+2 failed, 189 deselected in 0.68s

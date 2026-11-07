@@ -1,0 +1,38 @@
+s19_app.__file__ = ~/work/b103-int2a/s19_app/__init__.py | python 3.11.18
+[C] combination (file 1644 KiB, parse 0.10 s; 7 shared sections of 256 KiB: MOD_COMMON, RL_U8, RL_AXO, CM_V, VT, AXO_00; 20 AXIS_PTS; 400 COM curves + 400 VALUEs) read once: Inc 2a describe 0.051 s + 3a 0.261 s = 0.312 s; stats {'layout_reads': 2, 'modc_reads': 1, 'axo_byte_order_reads': 20, 'conv_calls': 1200, 'method_reads': 1, 'table_reads': 1}; refusals {None: 800}
+[C] combination (file 1644 KiB, parse 0.10 s; 7 shared sections of 256 KiB: MOD_COMMON, RL_U8, RL_AXO, CM_V, VT, AXO_00; 20 AXIS_PTS; 400 COM curves + 400 VALUEs) per call : Inc 2a describe 16.235 s + 3a 101.414 s = 117.649 s; stats {'layout_reads': 800, 'modc_reads': 1200, 'axo_header_reads': 400, 'axo_byte_order_reads': 400, 'conv_calls': 1200, 'method_reads': 1200, 'table_reads': 1200}; refusals {None: 800}
+[O] combination (no fill, 40 + 40 objects, 4 AXIS_PTS): 80 model objects, one walk != fresh walk per name: forward 0, reversed 0; Inc 2a real describe (memoised) != per name: forward 0, reversed 0
+[X1] AXO at the .143 bound (max 1048575: record 1048576 bytes; body 1 MiB of DEPOSIT lines) shared by 400 COM curves of 1048575 UBYTE values: file 1.07 MiB, parse 0.04 s; Inc 2a describe 0.012 s + 3a 6.152 s (tracemalloc on, peak 10.6 MiB); stats {'layout_reads': 2, 'modc_reads': 1, 'axo_byte_order_reads': 1, 'conv_calls': 800, 'method_reads': 1}; refusals {None: 400}; first: shape (1048575,), byte length 1048575
+[X1] control, the AXO one point over (record 1 MiB + 1): refusals {'A2L-DEF-AXIS-REF-RECORD': 400}
+[X2] 400 curves sharing one 1 MiB layout (file 1.06 MiB, parse 1.31 s), read once: Inc 2a describe 0.012 s + 3a 0.074 s = 0.086 s; stats {'layout_reads': 1, 'modc_reads': 1, 'conv_calls': 800, 'method_reads': 1}; refusals {None: 400}
+[X2] 400 curves sharing one 1 MiB modcommon (file 1.06 MiB, parse 0.04 s), read once: Inc 2a describe 0.012 s + 3a 0.207 s = 0.219 s; stats {'layout_reads': 1, 'modc_reads': 1, 'conv_calls': 800, 'method_reads': 1}; refusals {None: 400}
+[X2] 400 curves sharing one 1 MiB axispts (file 1.07 MiB, parse 0.04 s), read once: Inc 2a describe 0.012 s + 3a 0.447 s = 0.459 s; stats {'layout_reads': 2, 'modc_reads': 1, 'axo_byte_order_reads': 1, 'conv_calls': 800, 'method_reads': 1}; refusals {None: 400}
+[X2] 400 curves sharing one 1 MiB method (file 1.06 MiB, parse 0.09 s), read once: Inc 2a describe 0.066 s + 3a 0.076 s = 0.143 s; stats {'layout_reads': 1, 'modc_reads': 1, 'conv_calls': 800, 'method_reads': 1}; refusals {None: 400}
+[X2] 400 curves sharing one 1 MiB vtab (file 1.06 MiB, parse 0.06 s), read once: Inc 2a describe 0.012 s + 3a 0.076 s = 0.088 s; stats {'layout_reads': 1, 'modc_reads': 1, 'conv_calls': 800, 'method_reads': 1, 'table_reads': 1}; refusals {None: 400}
+[X3] COMPU_VTAB of 65,536 entries (file 1.01 MiB) named by 400 enum VALUEs, Inc 2a describe memoised (E5): 2.824 s (tracemalloc on), peak 16.5 MiB, distinct enum_entries tuples 1, entries each 65536
+[X3] COMPU_VTAB of 65,536 entries (file 1.01 MiB) named by 50 enum VALUEs, Inc 2a describe as merged   : 139.348 s (tracemalloc on), peak 576.5 MiB, distinct enum_entries tuples 50, entries each 65536
+[H] 2500 MODULEs x (MOD_COMMON, 2 layouts, method, table, AXIS_PTS) and 2 COM curves each: 5000 curves, 15000 distinct shared sections; file 2.22 MiB, parse 1.25 s; Inc 2a describe 0.213 s (0.043 ms/object) + 3a 0.720 s (0.144 ms/object); reads entries 12500, tracemalloc peak 18.4 MiB; stats {'layout_reads': 5000, 'modc_reads': 2500, 'axo_byte_order_reads': 2500, 'conv_calls': 10000, 'method_reads': 2500, 'table_reads': 2500}; refusals {None: 5000}
+[H] 10000 MODULEs x (MOD_COMMON, 2 layouts, method, table, AXIS_PTS) and 2 COM curves each: 20000 curves, 60000 distinct shared sections; file 8.95 MiB, parse 47.51 s; Inc 2a describe 0.867 s (0.043 ms/object) + 3a 3.295 s (0.165 ms/object); reads entries 50000, tracemalloc peak 73.8 MiB; stats {'layout_reads': 20000, 'modc_reads': 10000, 'axo_byte_order_reads': 10000, 'conv_calls': 40000, 'method_reads': 10000, 'table_reads': 10000}; refusals {None: 20000}
+[O] many small (N = 200: 400 curves, 1,200 shared sections): 400 model objects, one walk != fresh walk per name: forward 0, reversed 0; Inc 2a real describe (memoised) != per name: forward 0, reversed 0
+A2L section tree has structural errors: path=~/work/s19_app/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+[O] V171: 87 model objects, one walk != fresh walk per name: forward 0, reversed 0; Inc 2a real describe (memoised) != per name: forward 0, reversed 0
+[O] P1: 2 model objects, one walk != fresh walk per name: forward 0, reversed 0; Inc 2a real describe (memoised) != per name: forward 0, reversed 0
+    P1 mutant owner-leak : forward 1, reversed 1
+    P1 mutant mutate     : forward 0, reversed 0
+    P1 mutant cache-check: forward 0, reversed 0
+[O] P2: 2 model objects, one walk != fresh walk per name: forward 0, reversed 0; Inc 2a real describe (memoised) != per name: forward 0, reversed 0
+    P2 mutant owner-leak : forward 0, reversed 0
+    P2 mutant mutate     : forward raises AttributeError, reversed raises AttributeError
+    P2 mutant cache-check: forward 0, reversed 0
+[O] P3: 2 model objects, one walk != fresh walk per name: forward 0, reversed 0; Inc 2a real describe (memoised) != per name: forward 0, reversed 0
+    P3 mutant owner-leak : forward 0, reversed 0
+    P3 mutant mutate     : forward raises AttributeError, reversed raises AttributeError
+    P3 mutant cache-check: forward 0, reversed 0
+[O] P4: 2 model objects, one walk != fresh walk per name: forward 0, reversed 0; Inc 2a real describe (memoised) != per name: forward 0, reversed 0
+    P4 mutant owner-leak : forward 0, reversed 0
+    P4 mutant mutate     : forward raises AttributeError, reversed raises AttributeError
+    P4 mutant cache-check: forward 1, reversed 1
+[O] P5: 2 model objects, one walk != fresh walk per name: forward 0, reversed 0; Inc 2a real describe (memoised) != per name: forward 0, reversed 0
+    P5 mutant owner-leak : forward 0, reversed 0
+    P5 mutant mutate     : forward raises AttributeError, reversed raises AttributeError
+    P5 mutant cache-check: forward 0, reversed 0

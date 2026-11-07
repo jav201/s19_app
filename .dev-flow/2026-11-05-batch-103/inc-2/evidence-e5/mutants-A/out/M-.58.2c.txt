@@ -1,0 +1,52 @@
+# M-.58.2c
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.58.2c/s19_app/__init__.py
+# note: NaN-x verdict left out
+#   EDIT-OK: '        if table_form.x_nan:\n            return Refusal(\n             '
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..a84336d6 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -1195,11 +1195,6 @@ def decode_definition(
+     if definition.method_name == "NO_COMPU_METHOD":
+         value: object = stored
+     elif isinstance(table_form, _TabForm):
+-        if table_form.x_nan:
+-            return Refusal(
+-                "A2L-DEF-DECODE",
+-                f"{name_echo}: the table {table_form.ref_echo} has an x that is not a number",
+-            )
+         value, table_error = _table_value(
+             table_form, stored, definition.conversion_type == "TAB_INTP"
+         )
+
+# --- pytest (rc=1) ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______ test_r_a2l_def_58_2_19_a_compu_tab_whose_x_holds_a_nan_is_refused _______
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-989/test_r_a2l_def_58_2_19_a_compu0')
+
+    def test_r_a2l_def_58_2_19_a_compu_tab_whose_x_holds_a_nan_is_refused(tmp_path):
+        """R-A2L-DEF.58.2/19 (E3S3-29) - a COMPU_TAB with a NaN x decodes to a refusal; the frozen parse's unordered sort never gives a value."""
+        a2l = _inline(
+            tmp_path,
+            _ctab("CT_N", "TAB_NOINTP", "0 0", "nan 5", "10 10"),
+            _cm("CM_NN", "TAB_NOINTP", fmt='"%.0"', ref="CT_N"),
+            _cm("CM_NI", "TAB_INTP", fmt='"%.0"', ref="CT_N"),
+            _val("NN", "0x10", LAYOUT["UBYTE"], "CM_NN", "0", "255"),
+            _val("NI", "0x11", LAYOUT["UBYTE"], "CM_NI", "0", "255"),
+        )
+        image = {0x10: 0x04, 0x11: 0x04}
+        for name in ("NN", "NI"):
+            d = describe_definition(name, a2l)
+            result = decode_definition(d, a2l, image)
+>           assert result == Refusal("A2L-DEF-DECODE", f"{name}: the table CT_N has an x that is not a number"), result
+E           AssertionError: Decoded(stored=4, value=5.0, text='5')
+E           assert Decoded(stored=4, value=5.0, text='5') == Refusal(code='A2L-DEF-DECODE', message='NN: the table CT_N has an x that is not a number')
+E            +  where Refusal(code='A2L-DEF-DECODE', message='NN: the table CT_N has an x that is not a number') = Refusal('A2L-DEF-DECODE', 'NN: the table CT_N has an x that is not a number')
+
+../base/tests/test_b103_a2l_definition.py:1879: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_19_a_compu_tab_whose_x_holds_a_nan_is_refused
+1 failed, 190 deselected in 0.53s

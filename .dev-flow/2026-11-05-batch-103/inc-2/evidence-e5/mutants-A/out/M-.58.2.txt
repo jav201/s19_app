@@ -1,0 +1,127 @@
+# M-.58.2
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.58.2/s19_app/__init__.py
+# note: count read as int(_to_float(n))
+#   EDIT-OK: '    if len(word) > 9:\n        return None\n    if any(ch not in _ASCII_'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..a5212bc2 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -273,11 +273,7 @@ def _read_count(word: Optional[str]) -> Optional[int]:
+     ``None`` (no ``int()``/``_to_float`` on it, E3S-03)."""
+     if word is None or not word:
+         return None
+-    if len(word) > 9:
+-        return None
+-    if any(ch not in _ASCII_DIGITS for ch in word):
+-        return None
+-    return int(word)
++    return int(_to_float(word))
+ 
+ 
+ def _mask_shift(mask: int) -> int:
+
+# --- pytest (rc=1) ---
+count_1e400(tmp_path):
+        """R-A2L-DEF.58.2/1."""
+>       _enum_count_object(tmp_path, "1e400")
+
+../base/tests/test_b103_a2l_definition.py:1148: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../base/tests/test_b103_a2l_definition.py:1140: in _enum_count_object
+    d = describe_definition("EE", a2l)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/a2l_definition.py:338: in describe_definition
+    return describe_definitions([name], a2l_data)[name]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/a2l_definition.py:392: in describe_definitions
+    result[name] = _describe_one(
+s19_app/tui/a2l_definition.py:493: in _describe_one
+    record = _read_method_record(
+s19_app/tui/a2l_definition.py:869: in _read_method_record
+    table_form = _read_enum_table(compu_tab_ref, compu_tables_by_name, reads)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/a2l_definition.py:1008: in _read_enum_table
+    count = _read_count(tokens[3])
+            ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+word = '1e400'
+
+    def _read_count(word: Optional[str]) -> Optional[int]:
+        """Read an enum table count: a run of ASCII digits of at most 9 digits, else
+        ``None`` (no ``int()``/``_to_float`` on it, E3S-03)."""
+        if word is None or not word:
+            return None
+>       return int(_to_float(word))
+               ^^^^^^^^^^^^^^^^^^^^
+E       OverflowError: cannot convert float infinity to integer
+
+s19_app/tui/a2l_definition.py:276: OverflowError
+_______________________ test_r_a2l_def_58_2_2_count_nan ________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-987/test_r_a2l_def_58_2_2_count_na0')
+
+    def test_r_a2l_def_58_2_2_count_nan(tmp_path):
+        """R-A2L-DEF.58.2/2."""
+>       _enum_count_object(tmp_path, "nan")
+
+../base/tests/test_b103_a2l_definition.py:1153: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../base/tests/test_b103_a2l_definition.py:1140: in _enum_count_object
+    d = describe_definition("EE", a2l)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/a2l_definition.py:338: in describe_definition
+    return describe_definitions([name], a2l_data)[name]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/a2l_definition.py:392: in describe_definitions
+    result[name] = _describe_one(
+s19_app/tui/a2l_definition.py:493: in _describe_one
+    record = _read_method_record(
+s19_app/tui/a2l_definition.py:869: in _read_method_record
+    table_form = _read_enum_table(compu_tab_ref, compu_tables_by_name, reads)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/a2l_definition.py:1008: in _read_enum_table
+    count = _read_count(tokens[3])
+            ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+word = 'nan'
+
+    def _read_count(word: Optional[str]) -> Optional[int]:
+        """Read an enum table count: a run of ASCII digits of at most 9 digits, else
+        ``None`` (no ``int()``/``_to_float`` on it, E3S-03)."""
+        if word is None or not word:
+            return None
+>       return int(_to_float(word))
+               ^^^^^^^^^^^^^^^^^^^^
+E       ValueError: cannot convert float NaN to integer
+
+s19_app/tui/a2l_definition.py:276: ValueError
+_______________________ test_r_a2l_def_58_2_4_count_2_5 ________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-987/test_r_a2l_def_58_2_4_count_2_0')
+
+    def test_r_a2l_def_58_2_4_count_2_5(tmp_path):
+        """R-A2L-DEF.58.2/4."""
+>       _enum_count_object(tmp_path, "2.5")
+
+../base/tests/test_b103_a2l_definition.py:1163: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-987/test_r_a2l_def_58_2_4_count_2_0')
+count = '2.5'
+
+    def _enum_count_object(tmp_path, count: str):
+        a2l = _inline(tmp_path, *_enum_blocks("CM_E", "VT_E", count, '0 "A"'), _val("EE", "0x10", "RL_U8", "CM_E"))
+        d = describe_definition("EE", a2l)
+>       assert d.refusal is not None and d.refusal.code == "A2L-DEF-TABLE-EMPTY"
+E       AssertionError: assert (None is not None)
+E        +  where None = Definition(name='EE', section='CHARACTERISTIC', char_type='VALUE', kind='enum', address=16, byte_length=1, datatype='U...0.0, raw_max=None, text='A'),), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref='VT_E', refusal=None).refusal
+
+../base/tests/test_b103_a2l_definition.py:1141: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_1_count_1e400
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_2_count_nan - V...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_4_count_2_5 - A...
+3 failed, 21 passed, 167 deselected in 1.02s

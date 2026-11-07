@@ -1,0 +1,43 @@
+runner sec-r2-run.sh sha256 01a6306bb691ca8ba9909f4f35ba0d442c21ea334e625d9331e6e9241c6bce63; probe sec-r2-probe.py sha256 97ba09572a2544759f9fe28d09e982244c15680c81b825065d58855a7e85cda9
+s19_app.__file__ = /tmp/b103-e5-4-sec-r2/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5-4-sec-r2/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0
+tests module = /tmp/b103-e5-4-sec-r2/tree/tests/test_b103_label_match_perf.py
+mode = r2 switch  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = -1170888202958126675
+host = <runner>  load = (4.7, 3.83, 2.74)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5-4-sec-r2/<user>  LOCALAPPDATA = /tmp/b103-e5-4-sec-r2/<user>/localappdata  PILOT_DIR = /tmp/b103-e5-4-sec-r2/pilot
+probe = sec-r2-probe.py sha256 97ba09572a2544759f9fe28d09e982244c15680c81b825065d58855a7e85cda9; round-1 helpers = sec-e5-probe.py sha256 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+_FUZZY_SWITCH_CAP = 512
+query '987654 kemq vbcq sdlq': head (0 edits, walked first) + 3 tokens, each 1 edit from a hit
+
+  target 511: 100 crafted names hold 511 occurrences -> switch fires; 50,000 names, 2,059,734 characters in all (.40 scope: 50,000 names, <= 2,356,624)
+        5.0 ms [ok] median of 7; chars  21, tokens   4 (distinct   4); listed 20 ['fuzzy'] edits [3]; bad spans 0  511 occurrences
+      walks 1, _prefix_distance 345, _classify 20; same list on {'map-only': True, 'per-id after walk 1': True}
+      reduced list (100 crafted + 900 REF): walks 1, _prefix_distance 345; rank == oracle True (0 s)
+
+  target 512: 100 crafted names hold 512 occurrences -> switch fires; 50,000 names, 2,059,738 characters in all (.40 scope: 50,000 names, <= 2,356,624)
+        5.0 ms [ok] median of 7; chars  21, tokens   4 (distinct   4); listed 20 ['fuzzy'] edits [3]; bad spans 0  512 occurrences
+      walks 1, _prefix_distance 348, _classify 20; same list on {'map-only': True, 'per-id after walk 1': True}
+      reduced list (100 crafted + 900 REF): walks 1, _prefix_distance 348; rank == oracle True (0 s)
+
+  target 513: 100 crafted names hold 513 occurrences -> switch does not fire; 50,000 names, 2,059,742 characters in all (.40 scope: 50,000 names, <= 2,356,624)
+       13.6 ms [ok] median of 7; chars  21, tokens   4 (distinct   4); listed 20 ['fuzzy'] edits [3]; bad spans 0  513 occurrences
+      walks 4, _prefix_distance 0, _classify 20; same list on {'map-only': True, 'per-id after walk 1': True}
+      reduced list (100 crafted + 900 REF): walks 4, _prefix_distance 0; rank == oracle True (0 s)
+
+=== the occurrence switch off with few candidates (2 names of 'Ab' x 300) while every walk's table is large
+  1 head name(s) with 302 occurrences (switch fires); 49,999 names, 300,597 characters in all (.40 scope: 50,000 names, <= 2,356,624)
+       11.0 ms [ok] median of 3; chars 232, tokens  76 (distinct  76); listed 1 ['fuzzy'] edits [75]; bad spans 0  1 head names: head + 74 distinct 3-letter tokens
+      walks 1, _prefix_distance 225, _classify 1; same list on {'map-only': True}
+  2 head name(s) with 604 occurrences (switch off); 50,000 names, 301,206 characters in all (.40 scope: 50,000 names, <= 2,356,624)
+     1261.7 ms [ok] median of 3; chars 232, tokens  76 (distinct  76); listed 2 ['fuzzy'] edits [75]; bad spans 0  > 1.0 s (.40)  2 head names: head + 74 distinct 3-letter tokens
+      walks 76, _prefix_distance 0, _classify 2; same list on {'map-only': True}
+
+=== _classify cost per listed FUZZY name (limit 20 x distinct tokens x name tokens): 40 names head + 'Ab' x 509 among REF
+        7.2 ms [ok] median of 7; chars 232, tokens  76 (distinct  76); listed 0 - edits -; bad spans 0  40 x 510-token names: head + 74 distinct 3-letter tokens
+      walks 1, _prefix_distance 0, _classify 0; same list on {'map-only': True}
+      limit 20: 7.4 ms [ok] listed -
+      limit 100: 7.7 ms [ok] listed -
+
+load after = (4.09, 3.77, 2.75)
+probe exit 0

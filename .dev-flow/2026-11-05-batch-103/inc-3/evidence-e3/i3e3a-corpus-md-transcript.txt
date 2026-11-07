@@ -1,0 +1,13 @@
+# i3e3a-corpus-md 2026-11-06T22:47:44-06:00 host <runner>
+CHARACTERISTIC ('ASCII', 'plain') 44 files 5
+CHARACTERISTIC ('CUBE_5', 'plain') 3 files 3
+CHARACTERISTIC ('CUBOID', 'plain') 1 files 1
+CHARACTERISTIC ('CURVE', 'plain') 3 files 2
+CHARACTERISTIC ('MAP', 'plain') 14 files 4
+CHARACTERISTIC ('VALUE', 'plain') 1 files 1
+CHARACTERISTIC ('VAL_BLK', 'nontrail1') 195 files 1
+CHARACTERISTIC ('VAL_BLK', 'plain') 2629 files 29
+('MEASUREMENT', 'all1') 34 files 1
+('MEASUREMENT', 'nontrail1') 317 files 6
+('MEASUREMENT', 'plain') 1077 files 33
+# exit 0

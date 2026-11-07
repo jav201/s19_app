@@ -1,0 +1,10 @@
+[C0] files 35, parsed 35, worker errors 0, wall 11.3 s
+[C1] array/curve/map objects built by the model: 561; exceptions: 0
+[C2] first refusal per object: {'none': 329, 'A2L-DEF-ADDRESS': 198, 'A2L-DEF-ALIGNMENT': 18, 'A2L-DEF-LAYOUT': 10, 'A2L-DEF-AXIS-KIND': 4, 'A2L-DEF-AXIS-PARTIAL': 1, 'A2L-DEF-AXIS-REF': 1}
+[C3] open branches reached (graph gives no result): {}
+[C4] largest real shapes: {'element_count': 5250, 'byte_length_ok': 1060, 'point_count': 53} | FIX axes built: 17 largest FIX point count: 6 | non-integral FIX points: 0
+[C5] VAL_BLK record layout components (readable layouts): {'FNC_VALUES': 113}
+[C6] NO_AXIS_PTS_X datatypes of COM axis objects: {'UBYTE': 8}
+[C7] MOD_COMMON ALIGNMENT lines: {'ALIGNMENT_BYTE 1': 20, 'ALIGNMENT_WORD 2': 18, 'ALIGNMENT_LONG 4': 18, 'ALIGNMENT_FLOAT32_IEEE 4': 18, 'ALIGNMENT_FLOAT64_IEEE 4': 2, 'ALIGNMENT_FLOAT64_IEEE 8': 2, 'ALIGNMENT_FLOAT16_IEEE 1': 1, 'ALIGNMENT_INT64 8': 1}
+[C8] slowest model runs (model s, parse s, file, objects): [(3.037, 6.149, 'firmware.a2l', 0), (0.395, 1.619, 'software_a.a2l', 466), (0.076, 0.065, 'ASAP2_Demo_V171.a2l', 35), (0.031, 0.025, 'ASAP2_Demo_V161.a2l', 18), (0.007, 0.009, 'software_b.a2l', 2), (0.006, 0.004, 'from_source.a2l', 28)]
+[C9] model seconds total 3.56, parse seconds total 7.9

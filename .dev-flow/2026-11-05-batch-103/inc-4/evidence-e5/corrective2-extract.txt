@@ -1,0 +1,42 @@
+# E5 corrective 2 - Code-Wire extractor run (inc-4, label_match.py, E5S-07/E5S-08 round-2 pass)
+# date: 2026-11-07 (corrective2)  host: Windows PC (extractor only; no s19_app import)
+# worktree HEAD: 2a1add714195a9e0df5b26378291e2c798a36d4d
+# worktree status (s19_app, tests, tools):
+ M s19_app/tui/services/label_match.py
+ M tests/test_b103_label_match.py
+ M tests/test_b103_label_match_perf.py
+# (end status)
+# code-wire: v3.1.0 e436a0812325e85a78ca2bdeaaf0fbfe39e8b4c5
+# copy: cp -r s19_app tests tools <scratch>/tree from the WORKTREE (corrective2 edits
+# uncommitted). __pycache__ removed from the copy.
+# scratch: /tmp/b103-inc4-corrective2.i207ED (Windows: C:\Users\<user>\AppData\Local\Temp\b103-inc4-corrective2.i207ED)
+# sha256 worktree s19_app/tui/services/label_match.py (corrective2):
+8f396c15d3c848ceb2c98ab74c112150bf9c09759abb662ea0f2162d1ca7c94d *<worktree>/s19_app/tui/services/label_match.py
+# marks: one '# node: <name>' line above each of the 17 new defs (copy only) and above
+# parse_a2l_file; _fuzzy_tier, _text_tiers, _token_tier, _subsequence_tier, _cut and
+# _is_word_char left unmarked (tier/site helpers, allowed by the graph)
+$ grep -rn '# node:' <copy>/s19_app
+s19_app/tui/a2l.py:2797:# node: parse_a2l_file
+s19_app/tui/services/label_match.py:104:    # node: LabelIndex.__len__
+s19_app/tui/services/label_match.py:118:# node: build_label_index
+s19_app/tui/services/label_match.py:243:# node: rank
+s19_app/tui/services/label_match.py:661:# node: _fold
+s19_app/tui/services/label_match.py:678:# node: _char_mask
+s19_app/tui/services/label_match.py:716:# node: _tokens
+s19_app/tui/services/label_match.py:750:# node: _allowed_edits
+s19_app/tui/services/label_match.py:773:# node: _prefix_distance
+s19_app/tui/services/label_match.py:828:# node: _join_spans
+s19_app/tui/services/label_match.py:856:# node: _at_boundary
+s19_app/tui/services/label_match.py:890:# node: _subsequence
+s19_app/tui/services/label_match.py:916:# node: _parse_query
+s19_app/tui/services/label_match.py:949:# node: _classify
+s19_app/tui/services/label_match.py:1052:# node: _order_key
+s19_app/tui/services/label_match.py:1075:# node: _token_range
+s19_app/tui/services/label_match.py:1102:# node: _build_trie
+s19_app/tui/services/label_match.py:1151:# node: _fuzzy_token_distances
+# mark count: 18
+$ python -m py_compile <copy>/s19_app/tui/services/label_match.py <copy>/s19_app/tui/a2l.py
+rc=0
+$ python C:/Users/<user>/Github/code-wire/tools/codewire_extract.py --repo <copy> --graph <inc-4>/codewire/graph-inc4.md --out <scratch>/out
+marks=18 graph_nodes=18 calls=23 findings=0 parse_failures=0
+===EXIT===

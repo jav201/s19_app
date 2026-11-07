@@ -1,0 +1,28 @@
+# probe v1 (sha256 0f468545b35852c9e50c7b293219ac892f0a12828da3b82ff867b724a29353b7, used by code-review-r2-all-0 and code-review-r2-det-4242) -> v2 (sha256 54541bc78f154ddeaa6de70518bacd9d77b1d96e3a608a847478c7406d42a84d, code-review-r2-probe.py, used by code-review-r2-det-random and code-review-r2-cd-0)
+$ diff v1 v2
+3c3,5
+< Mode `all` (Parts A-D) or `det` (Part A only, prints the sha256 of its results).
+---
+> Mode `all` (Parts A-D), `det` (Part A only, prints the sha256 of its results) or `cd` (Parts C, D only).
+> v2: Part C clamps a query token to 256 characters (R-A2L-MATCH.38: no query token longer than that
+> reaches the walk; v1 drew one 301-character token from a 301-character name token, outside the domain).
+356c358
+< TRIALS = 60
+---
+> TRIALS = 0 if MODE == "cd" else 60
+403c405
+< for trial in range(25):
+---
+> for trial in range(25 if MODE == "all" else 0):
+418c420
+< ref = (swa + [n + "_1" for n in swa] + [n + "_2" for n in swa] + [n + "_3" for n in swa])[:50000]
+---
+> ref = (swa + [n + "_1" for n in swa] + [n + "_2" for n in swa] + [n + "_3" for n in swa])[:50000 if MODE == "all" else 10]
+421c423
+< for _ in range(40):
+---
+> for _ in range(40 if MODE == "all" else 0):
+464c466
+<         qt = "".join(c for c in qt if is_letter(c) and c.isascii()) or "abc"
+---
+>         qt = ("".join(c for c in qt if is_letter(c) and c.isascii()) or "abc")[:256]  # v2: R-A2L-MATCH.38

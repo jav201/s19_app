@@ -1,0 +1,72 @@
+# i2e1 A2L shape census — 2026-11-06T16:09:57-06:00; worktree HEAD 332f8ca3 (product tree e07fb00); tracked *.a2l files: 35
+## keyword: files lines (git ls-files *.a2l | xargs grep)
+TAB_VERB                     10 files    378 lines
+begin COMPU_VTAB              9 files    107 lines
+begin COMPU_VTAB_RANGE        4 files     98 lines
+DEFAULT_VALUE                 6 files    272 lines
+DEFAULT_VALUE_NUMERIC         2 files      4 lines
+BIT_MASK                     10 files    272 lines
+BIT_OPERATION                 0 files      0 lines
+EXTENDED_LIMITS               2 files     78 lines
+PHYS_UNIT                     2 files    151 lines
+  FORMAT                      4 files   5116 lines
+ ASCII                        6 files     59 lines
+NUMBER                        7 files    195 lines
+ENCODING                      0 files      0 lines
+FLOAT16_IEEE                  1 files      1 lines
+STATUS_STRING_REF             2 files     23 lines
+## per file: COMPU_VTAB_RANGE sections / TAB_VERB lines / BIT_MASK lines / PHYS_UNIT lines
+examples/case_00_public/ASAP2_Demo_V161.a2l                       2   35    6    0
+examples/case_00_public/ASAP2_Demo_V171.a2l                       2   45    6   22
+examples/case_00_public/BalanceTube_STMicro.a2l                   0    6    9    0
+examples/case_00_public/software_a.a2l                           69  257  229  129
+examples/case_00_public/software_b.a2l                           25   25    0    0
+examples/case_00_public/update_test1.a2l                          0    2    3    0
+examples/case_00_public/update_test2.a2l                          0    0    3    0
+examples/case_00_public/update_typedef_test1.a2l                  0    2    4    0
+examples/case_00_public/update_typedef_test2.a2l                  0    2    4    0
+examples/case_00_public/update_typedef_test3.a2l                  0    2    4    0
+examples/case_00_public/update_typedef_test4.a2l                  0    2    4    0
+## display-format strings (quoted %...) across fixtures: count text
+   4975 "%.15"
+    147 "%.1"
+    138 "%6.2"
+    103 "%4.2"
+     93 "%.4"
+     68 "%.0"
+     62 "%.3"
+     46 "%5.0"
+     34 "%12.6"
+     26 "%8.4"
+     24 "%0.0"
+     13 "%3.0"
+     12 "%3.1"
+     11 "%8.3"
+     11 "%"
+     10 "%3.12"
+      6 "%8.2"
+      6 "%6.1"
+      5 "%12.4"
+      4 "%12.0"
+      3 "%1.0"
+      2 "%17.15"
+      2 "%11.8"
+      1 "%5.3"
+      1 "%4.4"
+      1 "%4.0"
+      1 "%10.0"
+      1 "%1.4"
+      1 "%.2"
+## BIT_MASK values in software_a.a2l (top 10)
+     22 BIT_MASK 0x80
+     22 BIT_MASK 0x40
+     20 BIT_MASK 0x20
+     19 BIT_MASK 0x8
+     19 BIT_MASK 0x4
+     19 BIT_MASK 0x10
+     18 BIT_MASK 0x3
+     17 BIT_MASK 0x3FF
+     16 BIT_MASK 0xFFFFFF
+     16 BIT_MASK 0xF0
+## datatype of the BIT_MASK 0xFFFFFF objects of software_a.a2l
+     16       ULONG

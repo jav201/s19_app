@@ -1,0 +1,30 @@
+=== DIFF base -> M-11 (s19_app/tui/services/label_match.py) ===
+diff --git a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py b/M-11/s19_app/tui/services/label_match.py
+index d274de0..5748324 100644
+--- a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py
++++ b/M-11/s19_app/tui/services/label_match.py
+@@ -571,10 +571,10 @@ def _allowed_edits(token: str) -> int:
+         int: The allowed edits (0, 1 or 2).
+     """
+     if "0" <= token[0] <= "9":
+-        return 0
++        return 1
+     n = len(token)
+     if n <= 2:
+-        return 0
++        return 1
+     if n <= 5:
+         return 1
+     return 2
+
+=== PYTEST (tail) ===
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+/tmp/b103-e5-4-mutA/M-11/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.11/1: query 'VALUE_0300' limit 20
+/tmp/b103-e5-4-mutA/M-11/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.11/2: query 'ab' limit 20
+/tmp/b103-e5-4-mutA/M-11/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.11/3: query 'ca' limit 20
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.11/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.11/2]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.11/3]
+3 failed, 126 deselected in 5.17s

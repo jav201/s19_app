@@ -1,0 +1,22 @@
+0c499784 batch-103 Inc 2a E5: 04-validation, batch evidence copies, audit column fixes (DeepSeek)
+TEST   R-A2L-DEF.138 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.40 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.41 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.42 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.43 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.44 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.45 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.46 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.47 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.48 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.49 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.50 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.51 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.52 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.53 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.54 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.55 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.56 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.57 is named by no file under tests, and neither is a TC/AT id it lists
+trace_check: 1 US, 72 active requirements (0 withdrawn), 19 gap(s)
+EXIT=1

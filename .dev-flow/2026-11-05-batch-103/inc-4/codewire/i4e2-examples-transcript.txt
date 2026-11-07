@@ -1,0 +1,161 @@
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+python = 3.11.18  host = <runner>
+
+=== A. _tokens (spans, then texts)
+  'VAL_BLK_0001'                           [(0, 3), (4, 7), (8, 12)]  ['VAL', 'BLK', '0001']
+  'model.MainClass.ledRing[0].red'         [(0, 5), (6, 10), (10, 15), (16, 19), (19, 23), (24, 25), (27, 30)]  ['model', 'Main', 'Class', 'led', 'Ring', '0', 'red']
+  'parameter_instance[0].Knife[1].x'       [(0, 9), (10, 18), (19, 20), (22, 27), (28, 29), (31, 32)]  ['parameter', 'instance', '0', 'Knife', '1', 'x']
+  'ABSValue'                               [(0, 3), (3, 8)]  ['ABS', 'Value']
+  'AValue'                                 [(0, 1), (1, 6)]  ['A', 'Value']
+  'Map3D'                                  [(0, 3), (3, 4), (4, 5)]  ['Map', '3', 'D']
+  'LukPvq.JXML_UPQ_BI.OKSAhwvcueaniy'      [(0, 3), (3, 6), (7, 11), (12, 15), (16, 18), (19, 22), (22, 33)]  ['Luk', 'Pvq', 'JXML', 'UPQ', 'BI', 'OKS', 'Ahwvcueaniy']
+  'Aabcx_GgrDwx_kaudIvm_ydmuH_uoz3._5_'    [(0, 5), (6, 9), (9, 12), (13, 17), (17, 20), (21, 25), (25, 26), (27, 30), (30, 31), (33, 34)]  ['Aabcx', 'Ggr', 'Dwx', 'kaud', 'Ivm', 'ydmu', 'H', 'uoz', '3', '5']
+  'Drück_Max'                              [(0, 5), (6, 9)]  ['Drück', 'Max']
+  'JVmL'                                   [(0, 1), (1, 3), (3, 4)]  ['J', 'Vm', 'L']
+  'knife.*'                                [(0, 5)]  ['knife']
+  '___'                                    []  []
+  ''                                       []  []
+  'blk val 00'                             [(0, 3), (4, 7), (8, 10)]  ['blk', 'val', '00']
+  '\xa0VALUE_0001'                         [(0, 6), (7, 11)]  ['\xa0VALUE', '0001']
+  '\x1cVALUE_0001'                         [(1, 6), (7, 11)]  ['VALUE', '0001']
+
+=== B. _allowed_edits
+  '0300'           0
+  '1'              0
+  'ab'             0
+  'x'              0
+  'maq'            1
+  'cuvre'          1
+  'drück'          1
+  'valuexx'        2
+  'curvee'         2
+  'measurementss'  2
+
+=== C. _prefix_distance (OSA to the nearest prefix, the empty prefix included)
+  'cuvre'          -> 'curve'          1
+  'valuee'         -> 'value'          1
+  'value'          -> 'val'            2
+  'mpa'            -> 'map'            1
+  'xmap'           -> 'map'            1
+  'maq'            -> 'map'            1
+  'cvure'          -> 'curve'          2
+  'maesu'          -> 'measurement'    1
+  'ab'             -> 'ba'             1
+  'ca'             -> 'abc'            1
+  'vblk'           -> 'blk'            1
+  'vblk'           -> 'val'            2
+  'valu'           -> 'val'            1
+  'valu'           -> 'value'          0
+  'curvee'         -> 'cuve'           2
+  'curvee'         -> 'curve'          1
+  'valuexx'        -> 'value'          2
+  'valuexxx'       -> 'value'          3
+  'drück'          -> 'druck'          1
+  'drück'          -> 'drÜck'          1
+  'measurementss'  -> 'measurement'    2
+  'jotfa'          -> 'jotaf'          1
+
+=== D. _join_spans
+  [(4, 7), (0, 3), (8, 10)] -> [(0, 3), (4, 7), (8, 10)]
+  [(0, 3), (3, 8)] -> [(0, 8)]
+  [(0, 1), (1, 6)] -> [(0, 6)]
+  [(0, 1), (3, 8)] -> [(0, 1), (3, 8)]
+  [(16, 30), (31, 36)] -> [(16, 30), (31, 36)]
+  [(0, 1), (2, 3)] -> [(0, 1), (2, 3)]
+  [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (6, 7), (7, 8), (9, 10)] -> [(0, 5), (6, 8), (9, 10)]
+
+=== E. _at_boundary: examples, then agreement with the oracle's boundary set
+  'DiscountCount'                                  offset  3 -> False
+  'DiscountCount'                                  offset  8 -> True
+  'MAP_0001'                                       offset  0 -> True
+  'MAP_0001'                                       offset  3 -> True
+  'MAP_0001'                                       offset  4 -> True
+  'MAP_0001'                                       offset  5 -> False
+  'timeCounter'                                    offset  4 -> True
+  'Encounter'                                      offset  2 -> False
+  'ABSValue'                                       offset  2 -> False
+  'ABSValue'                                       offset  3 -> True
+  'Map3D'                                          offset  3 -> True
+  'Map3D'                                          offset  4 -> True
+  'model.MainClass.ledController.sw.timeCounter'   offset 38 -> False
+  'LukPvq.JXML_UPQ_BI.OKSAhwvcueaniy'              offset 21 -> False
+  'LukPvq.JXML_UPQ_BI.OKSAhwvcueaniy'              offset 22 -> True
+  'Drück_Max'                                      offset  3 -> False
+  offsets checked 572,421: disagreements = 0
+
+=== F. fuzzy_walk over the sorted distinct tokens
+  C08 sorted distinct tokens (215), the letter tokens: ['ascii', 'blk', 'curve', 'map', 'measurement', 'val', 'value']
+  C08 'cuvre'  k=1 -> {'curve': 1}
+  C08 'maq'    k=1 -> {'map': 1}
+  C08 'mpa'    k=1 -> {'map': 1, 'measurement': 1}
+  C08 'xmap'   k=1 -> {'map': 1}
+  C08 'maesu'  k=1 -> {'measurement': 1}
+  C08 'vlaue'  k=1 -> {'value': 1}
+  C08 'vblk'   k=1 -> {'blk': 1}
+  C08 'valu'   k=1 -> {'val': 1, 'value': 0}
+  C08 'cvure'  k=1 -> {}
+  [CUVE, CURVE_0001] tokens ['0001', 'curve', 'cuve']  'curvee' k=2 -> {'curve': 1, 'cuve': 2}
+  REF 'cuvre'                    k=1  tokens within k:     0  walk == brute force: True
+  REF 'maq'                      k=1  tokens within k:   565  walk == brute force: True
+  REF 'mpa'                      k=1  tokens within k:   536  walk == brute force: True
+  REF 'xmap'                     k=1  tokens within k:    30  walk == brute force: True
+  REF 'maesu'                    k=1  tokens within k:     0  walk == brute force: True
+  REF 'vlaue'                    k=1  tokens within k:     0  walk == brute force: True
+  REF 'vblk'                     k=1  tokens within k:    24  walk == brute force: True
+  REF 'curvee'                   k=2  tokens within k:     1  walk == brute force: True
+  REF 'valuexx'                  k=2  tokens within k:     0  walk == brute force: True
+  REF 'aaaa'                     k=1  tokens within k:     9  walk == brute force: True
+  REF 'qqqq'                     k=1  tokens within k:    10  walk == brute force: True
+  REF 'zzzz'                     k=1  tokens within k:    11  walk == brute force: True
+  REF 'nzukij'                   k=2  tokens within k:     5  walk == brute force: True
+  REF 'ierxjr'                   k=2  tokens within k:     7  walk == brute force: True
+  REF 'eud'                      k=1  tokens within k:   602  walk == brute force: True
+  REF 'led'                      k=1  tokens within k:   581  walk == brute force: True
+  REF 'ring'                     k=1  tokens within k:    32  walk == brute force: True
+  REF 'pposbxiif'                k=2  tokens within k:     0  walk == brute force: True
+  REF 'temp'                     k=1  tokens within k:    31  walk == brute force: True
+  REF 'sensor'                   k=2  tokens within k:     5  walk == brute force: True
+  REF 'max'                      k=1  tokens within k:   529  walk == brute force: True
+  REF 'pposbxiifkdgfiajnbbpvb'   k=2  tokens within k:     0  walk == brute force: True
+  REF 'dyan'                     k=1  tokens within k:    26  walk == brute force: True
+  REF 'xvz'                      k=1  tokens within k:   523  walk == brute force: True
+  REF 'jotfa'                    k=1  tokens within k:     2  walk == brute force: True
+  REF 'vdo'                      k=1  tokens within k:   577  walk == brute force: True
+  REF 'oks'                      k=1  tokens within k:   561  walk == brute force: True
+  REF 'ahw'                      k=1  tokens within k:   553  walk == brute force: True
+  REF 'drück'                    k=1  tokens within k:     0  walk == brute force: True
+  REF 'xqzjvkw'                  k=2  tokens within k:     0  walk == brute force: True
+  REF 'cnt'                      k=1  tokens within k:   566  walk == brute force: True
+  REF 'jotaf'                    k=1  tokens within k:     2  walk == brute force: True
+  REF 'msrql'                    k=1  tokens within k:     2  walk == brute force: True
+  REF distinct tokens 77256; query tokens checked 33: mismatches = 0
+
+=== G. derived examples (rows .1, .17, purity), oracle and IndexC
+  C08 query='\xa0VALUE_0001': IndexC == oracle True  -> [('VALUE_0001', 'fuzzy', 1, [(0, 5), (6, 10)])]
+  C08 query='\x1cVALUE_0001': IndexC == oracle True  -> [('VALUE_0001', 'token', 0, [(0, 5), (6, 10)])]
+  C08 query='VALUE_0001\x1c': IndexC == oracle True  -> [('VALUE_0001', 'token', 0, [(0, 5), (6, 10)])]
+  C08i: 470 names, 469 distinct; IndexC(C08i).names has 469; first-occurrence order kept: True
+  purity: two rankings equal True; names list unchanged True
+
+=== H. more derived values (trie layout, character classes, cap, masks, empty index, token ranges)
+  build_nodes(['0001', 'curve', 'cuve']): chars '0001curveve' depth [1, 2, 3, 4, 1, 2, 3, 4, 5, 3, 4] first [0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 3] end [4, 4, 4, 4, 11, 11, 9, 9, 9, 11, 11]
+  '٣٣٣': tokens [(0, 3)]  allowed 1  str.isdigit() True  str.isalnum() True
+  '²': tokens [(0, 1)]  allowed 0  str.isdigit() True  str.isalnum() True
+  '\xa0': tokens [(0, 1)]  allowed 0  str.isdigit() False  str.isalnum() False
+  str.strip() removes U+001C: True; removes U+00A0: True; the six-character strip keeps both: True
+  prefix distance capped at cap + 1: 'cvure' -> 'curve' cap 1: 2
+  prefix distance capped at cap + 1: 'cuvre' -> 'curve' cap 1: 1
+  prefix distance capped at cap + 1: 'pposbxiif' -> 'xyz' cap 2: 3
+  prefix distance capped at cap + 1: 'valuexxx' -> 'value' cap 2: 3
+  prefix distance capped at cap + 1: 'value' -> 'val' cap 2: 2
+  _char_mask(_fold('MAP_0001')) = 1125900108206081
+  _char_mask(_fold('mp')) = 36864
+  _char_mask(_fold('mpz')) = 33591296
+  mask('mp') & ~mask('map_0001') = 0;  mask('mpz') & ~mask('map_0001') = 33554432
+  IndexC([]): names ()  rank('VALUE', 20) -> []
+  _token_range(C08 tokens, 'va') = (213, 215) -> ['val', 'value']
+  _token_range(C08 tokens, 'val') = (213, 215) -> ['val', 'value']
+  _token_range(C08 tokens, 'valu') = (214, 215) -> ['value']
+  _token_range(C08 tokens, 'm') = (211, 213) -> ['map', 'measurement']
+  _token_range(C08 tokens, 'zz') = (215, 215) -> []
+  _token_range(C08 tokens, '0') = (0, 208) -> ['0001', '0002', '...', '0208']

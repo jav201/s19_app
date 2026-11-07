@@ -1,0 +1,58 @@
+# M-.18
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.18/s19_app/__init__.py
+# note: mask read as decimal digits only
+#   EDIT-OK: '    if word[:2] in ("0x", "0X"):\n        digits = word[2:]\n        if '
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..eae0d1d7 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -254,13 +254,6 @@ def _parse_bit_mask(word: Optional[str]) -> Optional[int]:
+     """
+     if word is None or not word:
+         return None
+-    if word[:2] in ("0x", "0X"):
+-        digits = word[2:]
+-        if not 1 <= len(digits) <= 16:
+-            return None
+-        if any(ch not in "0123456789abcdefABCDEF" for ch in digits):
+-            return None
+-        return int(word, 16)
+     if not 1 <= len(word) <= 20:
+         return None
+     if any(ch not in _ASCII_DIGITS for ch in word):
+
+# --- pytest (rc=1) ---
+F.F                                                                      [100%]
+=================================== FAILURES ===================================
+_____________________ test_r_a2l_def_18_1_hexadecimal_mask _____________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...osed /begin sections detected.'], 'path': '/tmp/b103-e5-2-mutA/M-.18/examples/case_00_public/ASAP2_Demo_V171.a2l', ...}
+
+    def test_r_a2l_def_18_1_hexadecimal_mask(v171):
+        """R-A2L-DEF.18/1 - 0x0FF0 and its text."""
+        d = describe_definition(V171_M0FF0, v171)
+>       assert d.bit_mask == 0x0FF0 and d.bit_mask_text == "0x0FF0"
+E       AssertionError: assert (None == 4080)
+E        +  where None = Definition(name='ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0', section='CHARACTERISTIC', char_type='VALUE', kind='numbe...='A2L-DEF-MASK', message='ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0: the bit mask 0x0FF0 cannot be applied to UWORD')).bit_mask
+
+../base/tests/test_b103_a2l_definition.py:686: AssertionError
+------------------------------ Captured log setup ------------------------------
+WARNING  s19_app.tui.a2l:a2l.py:250 A2L section tree has structural errors: path=/tmp/b103-e5-2-mutA/M-.18/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+_________________ test_r_a2l_def_18_3_a_24_bit_mask_on_a_ulong _________________
+
+softa = {'compu_methods_by_name': {'AFI_TU_FXBD_XMC_KKWP_MMV.DQXN_O_IJX_MSK_UimufsteUejnmysraz': {'coeffs': None, 'coeffs_line...jjVfzjGyvl', ...}, ...}, 'errors': [], 'path': '/tmp/b103-e5-2-mutA/M-.18/examples/case_00_public/software_a.a2l', ...}
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-960/test_r_a2l_def_18_3_a_24_bit_m0')
+
+    def test_r_a2l_def_18_3_a_24_bit_mask_on_a_ulong(softa, tmp_path):
+        """R-A2L-DEF.18/3 - software_a (no address -> ADDRESS, not MASK) and INLINE ULONG."""
+        d = describe_definition("Adt_UhsihQwbpns._9_.NfwzbMcockRrbkj", softa)
+>       assert d.bit_mask == 16777215 and d.bit_mask_text == "0xFFFFFF"
+E       AssertionError: assert (None == 16777215)
+E        +  where None = Definition(name='Adt_UhsihQwbpns._9_.NfwzbMcockRrbkj', section='MEASUREMENT', char_type=None, kind='number', address=N...Refusal(code='A2L-DEF-ADDRESS', message='Adt_UhsihQwbpns._9_.NfwzbMcockRrbkj: the object has no address or no length')).bit_mask
+
+../base/tests/test_b103_a2l_definition.py:699: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_18_1_hexadecimal_mask
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_18_3_a_24_bit_mask_on_a_ulong
+2 failed, 1 passed, 188 deselected in 1.72s

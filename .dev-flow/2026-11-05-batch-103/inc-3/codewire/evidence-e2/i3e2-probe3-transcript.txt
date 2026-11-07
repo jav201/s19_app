@@ -1,0 +1,14 @@
+# i3e2-probe3 transcript 2026-11-06T18:25:37-06:00 host <runner>
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e2-3/home; no DISPLAY; no clipboard; stdin closed
+A2L section tree has structural errors: path=/home/<user>/work/s19_app/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+[R1 ASAM.C.CUBE_4.ROW_DIR] char_type CUBE_4 address 0x810590
+[R1 ASAM.C.CUBOID.ROW_DIR] char_type CUBOID address 0x810530
+[R2 INLINE CUBOID CB address 0xZZ] char_type CUBOID address None
+[R3 VAL_BLK_DEF_0001 stored] [737, 219, 636, -413, -395, -214] values [36.85, 10.950000000000001, 31.8, -20.650000000000002, -19.75, -10.700000000000001] texts (%.1) ['36.9', '11.0', '31.8', '-20.7', '-19.8', '-10.7']
+[R3 encode of the 17-significant-digit texts -> stored] [737, 219, 636, -413, -395, -214] equal True
+[R3 mutant: re-encode from the display texts -> stored] [738, 220, 636, -414, -396, -214] changed cells 4
+[R3 edit (1,1) -12.5 -> bytes] ff 06 stored -250
+[R3 edit 12.34 -> ] None the converted raw value 246.79999999999998 is not integral
+# exit 0

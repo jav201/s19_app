@@ -1,0 +1,28 @@
+runner sec-r2-run.sh sha256 01a6306bb691ca8ba9909f4f35ba0d442c21ea334e625d9331e6e9241c6bce63; probe sec-r2-probe.py sha256 97ba09572a2544759f9fe28d09e982244c15680c81b825065d58855a7e85cda9
+s19_app.__file__ = /tmp/b103-e5-4-sec-r2/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5-4-sec-r2/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0
+tests module = /tmp/b103-e5-4-sec-r2/tree/tests/test_b103_label_match_perf.py
+mode = r2 subkey  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = -6766235260803436745
+host = <runner>  load = (3.38, 3.64, 2.75)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5-4-sec-r2/<user>  LOCALAPPDATA = /tmp/b103-e5-4-sec-r2/<user>/localappdata  PILOT_DIR = /tmp/b103-e5-4-sec-r2/pilot
+probe = sec-r2-probe.py sha256 97ba09572a2544759f9fe28d09e982244c15680c81b825065d58855a7e85cda9; round-1 helpers = sec-e5-probe.py sha256 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+_FUZZY_SWITCH_CAP = 512
+the E5S-02 shapes cut to the row's scope (50,000 names, <= 2,356,624 characters)
+
+  substring key: 2,000 names 'x' + 'ab' * 509 + 'Q' + tag + 48,000 short names: 50,000 names, 2,336,000 characters in all (.40 scope: 50,000 names, <= 2,356,624)
+      478.3 ms [ok] median of 3; chars   2, tokens   1 (distinct   1); listed 20 ['substring'] edits [0]; bad spans 0  substring 'ba'
+      walks 0, _prefix_distance 0, _classify 20
+      477.9 ms [ok] median of 3; chars   3, tokens   1 (distinct   1); listed 20 ['substring'] edits [0]; bad spans 0  substring 'bab'
+      walks 0, _prefix_distance 0, _classify 20
+        4.7 ms [ok] median of 3; chars   2, tokens   1 (distinct   1); listed 20 ['prefix'] edits [0]; bad spans 0  substring 'xa'
+      walks 0, _prefix_distance 0, _classify 20
+
+  subsequence scan: 7,900 names 'ab' * 130 + 'z' + tag + 42,100 short names: 50,000 names, 2,346,100 characters in all (.40 scope: 50,000 names, <= 2,356,624)
+      208.0 ms [ok] median of 3; chars 255, tokens   1 (distinct   1); listed 0 - edits -; bad spans 0  subsequence len 255
+      walks 1, _prefix_distance 0, _classify 0
+      106.9 ms [ok] median of 3; chars 125, tokens   1 (distinct   1); listed 0 - edits -; bad spans 0  subsequence len 125
+      walks 1, _prefix_distance 0, _classify 0
+
+load after = (3.17, 3.58, 2.74)
+probe exit 0

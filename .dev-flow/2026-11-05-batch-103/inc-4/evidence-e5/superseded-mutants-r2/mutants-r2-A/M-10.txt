@@ -1,0 +1,66 @@
+# M-10  row R-A2L-MATCH.10
+
+control: edit distance without transpositions (plain Levenshtein) -> cuvre/maesurement/vlaue are 2 > 1
+edit: remove the transposition term from `_prefix_distance` and `_fuzzy_token_distances`
+
+s19_app.__file__: /tmp/b103-e5-4-mutr2A/M-10/s19_app/__init__.py
+
+== diff ==
+--- /tmp/b103-e5-4-mutr2A/base/s19_app/tui/services/label_match.py	2026-11-06 22:11:34.000000000 -0600
++++ /tmp/b103-e5-4-mutr2A/M-10/s19_app/tui/services/label_match.py	2026-11-06 22:43:07.520867807 -0600
+@@ -755,10 +755,6 @@
+             alt = new[i - 1] + 1
+             if alt < value:
+                 value = alt
+-            if i >= 2 and prev2 is not None and qi == name_token[j - 2] and query_token[i - 2] == c:
+-                alt = prev2[i - 2] + 1
+-                if alt < value:
+-                    value = alt
+             if value > limit:
+                 value = limit
+             new[i] = value
+@@ -1142,10 +1138,6 @@
+                 alt = new[ii - 1] + 1
+                 if alt < value:
+                     value = alt
+-                if ii > 1 and qi == pchar and q[ii - 2] == c:
+-                    alt = prev2[ii - 2] + 1
+-                    if alt < value:
+-                        value = alt
+                 if value > limit:
+                     value = limit
+                 new[ii] = value
+
+== pytest (returncode 1, KILLED) ==
+FFF...                                                                   [100%]
+=================================== FAILURES ===================================
+________________ test_ranked_list_is_exactly[R-A2L-MATCH.10/1] _________________
+tests/test_b103_label_match.py:391: in test_ranked_list_is_exactly
+    assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E   AssertionError: R-A2L-MATCH.10/1: query 'cuvre' limit 3
+E   assert [] == [('CURVE_0001...1, ((0, 5),))]
+E     
+E     Right contains 3 more items, first extra item: ('CURVE_0001', 'fuzzy', 1, ((0, 5),))
+E     Use -v to get more diff
+________________ test_ranked_list_is_exactly[R-A2L-MATCH.10/2] _________________
+tests/test_b103_label_match.py:391: in test_ranked_list_is_exactly
+    assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E   AssertionError: R-A2L-MATCH.10/2: query 'maesurement_0001' limit 20
+E   assert [('MEASUREMEN...), (12, 16)))] == [('MEASUREMEN...), (12, 16)))]
+E     
+E     At index 0 diff: ('MEASUREMENT_0001', 'fuzzy', 2, ((0, 11), (12, 16))) != ('MEASUREMENT_0001', 'fuzzy', 1, ((0, 11), (12, 16)))
+E     Use -v to get more diff
+________________ test_ranked_list_is_exactly[R-A2L-MATCH.10/3] _________________
+tests/test_b103_label_match.py:391: in test_ranked_list_is_exactly
+    assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E   AssertionError: R-A2L-MATCH.10/3: query 'vlaue_0001' limit 20
+E   assert [] == [('VALUE_0001...5), (6, 10)))]
+E     
+E     Right contains one more item: ('VALUE_0001', 'fuzzy', 1, ((0, 5), (6, 10)))
+E     Use -v to get more diff
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.10/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.10/2]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.10/3]
+3 failed, 3 passed, 123 deselected in 5.15s
+

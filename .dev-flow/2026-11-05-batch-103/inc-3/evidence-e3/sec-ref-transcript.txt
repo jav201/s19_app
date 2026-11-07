@@ -1,0 +1,5 @@
+s19_app.__file__ = /home/<user>/work/b103-int2a/s19_app/__init__.py
+[H] COM_AXIS AXIS_PTS_REF names the curve itself: 0.3 ms, {'C': ('A2L-DEF-AXIS-REF', ())}
+[H] COM_AXIS -> AXIS_PTS AXO (normal): 0.3 ms, {'C': (None, (4,))}
+[H] COM_AXIS -> missing AXO: 0.3 ms, {'C': ('A2L-DEF-AXIS-REF', ())}
+[H2] control char in layout name: model first refusal A2L-DEF-LAYOUT; _clean('RL{ESC}X') = 'RL�X'  (U+FFFD for the ESC)

@@ -1,0 +1,37 @@
+# i3e1-pilot.py transcript 2026-11-06T16:37:45-06:00 host <runner>
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed
+# python Python 3.11.18; HOME=/tmp/b103-e1-3/home LOCALAPPDATA=/tmp/b103-e1-3/home/<local> DISPLAY=unset
+A2L section tree has structural errors: path=/home/<user>/work/s19_app/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+make_release_case.__file__ = /home/<user>/work/s19_app/tools/synth/make_release_case.py
+[P1 ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR: matrix_dim/length/datatype] (3, None, None)
+[P1 ASAM.C.ARRAY.SWORD.MATRIX_DIM_6.ROW_DIR: matrix_dim/length/datatype] (6, None, None)
+[P1 ASAM.M.MATRIX_DIM_8_4_2.UBYTE.IDENTICAL: matrix_dim/length/datatype] (8, 8, 'UBYTE')
+[P1 ASAM.M.MATRIX_DIM_16_1.UBYTE.IDENTICAL: matrix_dim/length/datatype] (16, 16, 'UBYTE')
+[P4 software_a VAL_BLK: count / with length None / matrix_dim None] (101, 101, 101)
+[P5 V171 VAL_BLK 3x4 values 1..12: raw/physical/element_count/byte_size] (1, 1, 1, 2)
+[P6a V171 CURVE.STD_AXIS tag length / axis_meta max points] (25, ['8'])
+[P6b describe status / axis points_raw (memory order 70..0, INDEX_DECR) / values_raw] ('ok', [70, 60, 50, 40, 30, 20, 10, 0], [0, 100, 200, 300, 400, 500, 600, 700])
+[P6c same record with NO_AXIS_PTS_X = 5: status / points count / values count] ('ok', 8, 8)
+[P7a V171 CURVE.COM_AXIS tag length] None
+[P7b AXIS_PTS ASAM.C.AXIS_PTS.UBYTE_8 is a tag] False
+[P7c describe status / notes] ('axes_unresolved', ['axis point counts could not be resolved (external axis reference dangling or a non-numeric MaxAxisPoints) - the record shape is unknown'])
+[P8 ASAM.C.CURVE.FIX_AXIS.PAR_DIST: status / x of the points / notes] ('ok', [0, 1, 2, 3, 4, 5], ['axis 1: the layout deposits no axis points (NO_AXIS_PTS) - x is shown as the point index'])
+[P8 ASAM.C.CURVE.FIX_AXIS.PAR_LIST: status / x of the points / notes] ('ok', [0, 1, 2, 3, 4, 5], ['axis 1: the layout deposits no axis points (NO_AXIS_PTS) - x is shown as the point index'])
+[P9 V171 MAP.STD_AXIS.STD_AXIS: tag length / status / axis 2 points_phys / notes] (51, 'ok', [1, 2, 3, 4, 5], ['axis 2: point conversion failed: unsupported conversion type ', 'axis 2: point conversion failed: unsupported conversion type ', 'axis 2: point conversion failed: unsupported conversion type ', 'axis 2: point conversion failed: unsupported conversion type ', 'axis 2: point conversion failed: unsupported conversion type ', 'multi-axis MAP: the axes and the flattened value run are listed; a 2-D grid view is not part of this description yet'])
+[P10 software_a CURVE/MAP describe status (kind, status, length None) counts] [(('CURVE', 'axes_unresolved', True), 139), (('CURVE', 'layout_unresolved', True), 12), (('CURVE', 'no_memory', False), 7), (('MAP', 'axes_unresolved', True), 11)]
+[P11 walk of [AXIS_PTS_X, FNC_VALUES, FIX_NO_AXIS_PTS_X 5] with counts [5]] None
+[P11b walk of V171 RL.AXIS_PTS.RES_AXIS (RESERVED with a comment)] None
+[P12a encode 8 increasing axis points + 8 values: error / first 9 bytes] (None, (0, 0, 10, 20, 30, 40, 50, 60, 70))
+[P12b encode a non-monotonic axis (0 50 20 20 ...): error / accepted] (None, True)
+[P12c encode on the COM_AXIS curve: error] 'array values are not supported'
+[P12d encode a list on a VAL_BLK: error] 'array values are not supported'
+[P12e encode a number on a VAL_BLK: error] "characteristic type 'VAL_BLK' is not a scalar VALUE"
+[P13a case 08 VAL_BLK_0001: length / matrix_dim / layout lines / axis_meta] (256, None, ['      FNC_VALUES 1 UWORD COLUMN_DIR DIRECT'], [])
+[P13a case 08 CURVE_0001: length / matrix_dim / layout lines / axis_meta] (64, None, ['      FNC_VALUES 1 UWORD COLUMN_DIR DIRECT'], [['STD_AXIS', 'NO_INPUT', 'NO_COMPU_METHOD', '32', '0', '65535']])
+[P13a case 08 MAP_0001: length / matrix_dim / layout lines / axis_meta] (128, None, ['      FNC_VALUES 1 UWORD COLUMN_DIR DIRECT'], [['STD_AXIS', 'NO_INPUT', 'NO_COMPU_METHOD', '8', '0', '65535'], ['STD_AXIS', 'NO_INPUT', 'NO_COMPU_METHOD', '8', '0', '65535']])
+[P13b case 08 CURVE_0001: describe status / notes / first 3 values_raw] ('ok', ['axis 1: the layout deposits no axis points (NO_AXIS_PTS) - x is shown as the point index'], [57199, 57206, 57213])
+[P13b case 08 MAP_0001: describe status / notes / first 3 values_raw] ('ok', ['axis 1: the layout deposits no axis points (NO_AXIS_PTS) - x is shown as the point index', 'axis 2: the layout deposits no axis points (NO_AXIS_PTS) - x is shown as the point index', 'multi-axis MAP: the axes and the flattened value run are listed; a 2-D grid view is not part of this description yet'], [15412, 15423, 15434])
+[P13c case 08 firmware_issues.a2l tag kinds] [('ASCII', 10), ('CURVE', 60), ('MAP', 20), ('MEASUREMENT', 110), ('VALUE', 210), ('VAL_BLK', 60)]
+[P14 V171 CURVE.STD_AXIS (FNC_VALUES SWORD): tag-table decode_type / element_count / byte_size] ('UBYTE', 1, 1)
+[P15 software_a first VAL_BLK (NUMBER 4): length / matrix_dim] (None, None)

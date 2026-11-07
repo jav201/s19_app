@@ -1,0 +1,9 @@
+s19_app.__file__ = ~/work/b103-int2a/s19_app/__init__.py | python 3.11.18
+[layout/align] n=100 read once: file 267 KiB (parse 0.03 s); Inc 2a describe 0.003 s + 3a reads 0.742 s = 0.745 s (7.45 ms/object); 3a stats {'layout_reads': 1, 'modc_reads': 1, 'conv_calls': 100}; 2a method/table reads 0/0; refusals {None: 100}
+[layout/align] n=400 read once: file 299 KiB (parse 0.03 s); Inc 2a describe 0.013 s + 3a reads 2.895 s = 2.909 s (7.27 ms/object); 3a stats {'layout_reads': 1, 'modc_reads': 1, 'conv_calls': 400}; 2a method/table reads 0/0; refusals {None: 400}
+[modcommon/align] n=100 read once: file 267 KiB (parse 0.01 s); Inc 2a describe 0.003 s + 3a reads 1.382 s = 1.385 s (13.85 ms/object); 3a stats {'layout_reads': 1, 'modc_reads': 1, 'conv_calls': 100}; 2a method/table reads 0/0; refusals {None: 100}
+[modcommon/align] n=400 read once: file 299 KiB (parse 0.01 s); Inc 2a describe 0.012 s + 3a reads 5.357 s = 5.369 s (13.42 ms/object); 3a stats {'layout_reads': 1, 'modc_reads': 1, 'conv_calls': 400}; 2a method/table reads 0/0; refusals {None: 400}
+[first-line/end] 100 VALUEs sharing a layout whose first line is 256 KiB (datatype word last): file 266 KiB, parse 0.32 s; Inc 2a describe_definitions 0.616 s (6.16 ms/object), of which _resolve_datatype 0.613 s
+[first-line/none] 100 VALUEs sharing a layout whose first line is 256 KiB (datatype word absent): file 266 KiB, parse 0.32 s; Inc 2a describe_definitions 0.236 s (2.36 ms/object), of which _resolve_datatype 0.233 s
+[first-line/end] 400 VALUEs sharing a layout whose first line is 256 KiB (datatype word last): file 294 KiB, parse 1.02 s; Inc 2a describe_definitions 2.469 s (6.17 ms/object), of which _resolve_datatype 2.449 s
+[first-line/none] 400 VALUEs sharing a layout whose first line is 256 KiB (datatype word absent): file 294 KiB, parse 1.02 s; Inc 2a describe_definitions 0.944 s (2.36 ms/object), of which _resolve_datatype 0.934 s

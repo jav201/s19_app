@@ -1,0 +1,58 @@
+s19_app.__file__ = /tmp/b103-e5-4-sec/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5-4-sec/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 24564b32d53f142b85fb33825aed3c30a116fbaaf4808be45e4378b2d8bedb9b
+tests module = /tmp/b103-e5-4-sec/tree/tests/test_b103_label_match_perf.py
+mode = caps  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = -4165088979738600793
+host = <runner>  load = (0.17, 0.26, 0.34)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5-4-sec/<user>  LOCALAPPDATA = /tmp/b103-e5-4-sec/<user>/localappdata  PILOT_DIR = /tmp/b103-e5-4-sec/pilot
+
+=== A. R-A2L-MATCH.38: the 256-character cap runs before any parse (C08, 462 names, limit 20)
+  stripped len    256: result  1 entries; _parse_query calls 1; other matcher calls     359  .38/1 'VALUE_0001_' x 23 + 'VAL' (256)
+      -> [('VALUE_0001', 'token', 0, ((0, 5), (6, 10)))]
+  stripped len    257: result  0 entries; _parse_query calls 0; other matcher calls       0  .38/2 'VALUE_0001_' x 23 + 'VALU' (257)
+  stripped len    256: result  0 entries; _parse_query calls 1; other matcher calls     664  256 'a' + the six whitespace chars on both ends (stripped: 256)
+  stripped len    256: result  0 entries; _parse_query calls 1; other matcher calls     262  U+00A0 + 255 'a' (not stripped: 256)
+  stripped len    257: result  0 entries; _parse_query calls 0; other matcher calls       0  U+00A0 + 256 'a' (not stripped: 257)
+  stripped len    257: result  0 entries; _parse_query calls 0; other matcher calls       0  U+0085 + 256 'a' (not stripped: 257)
+  stripped len    256: result  0 entries; _parse_query calls 1; other matcher calls     262  256 x U+1F600 (astral, 256 code points)
+  stripped len    257: result  0 entries; _parse_query calls 0; other matcher calls       0  257 x U+1F600
+  stripped len  65483: result  0 entries; _parse_query calls 0; other matcher calls       0  64 KiB paste: 1604 SWA names joined by ',' (65483 chars)
+  stripped len  65535: result  0 entries; _parse_query calls 0; other matcher calls       0  'e ' x 32768 (65,536 chars)
+  stripped len  65536: result  0 entries; _parse_query calls 0; other matcher calls       0  '\x00' x 65536
+  stripped len  65536: result  0 entries; _parse_query calls 0; other matcher calls       0  '\ud800' x 65536 (lone surrogates)
+  stripped len      5: result 20 entries; _parse_query calls 1; other matcher calls     463  65,000 spaces + 'VALUE' (stripped: 5)
+      -> [('VALUE_0001', 'prefix', 0, ((0, 5),)), ('VALUE_0002', 'prefix', 0, ((0, 5),))]
+
+=== B. R-A2L-MATCH.39: the 1,024-character cap runs before fold, mask and tokenising (build)
+  names in [1024, 1025, 65536, 1000000, 10, 1024] -> len(index) 2; longest text seen by _fold 1024, _char_mask 1024, _tokens 1024; calls {'_fold': 2, '_char_mask': 2, '_tokens': 2, '_at_boundary': 1033}
+  rank('x') -> [(1024, 'prefix', ((0, 1),))]
+  rank('y') -> []
+  rank('z') -> []
+  rank('w') -> []
+  rank('short') -> [(10, 'prefix', ((0, 5),))]
+  build of one 10,000,000-char name + 1,000 x 1,025-char names: 0.5 ms [ok]
+
+=== C. A-2: duplicate query tokens collapsed (calls during one ranking)
+  REF  'cnt cnt cnt cnt cnt cnt '   query tokens  64 distinct  1: _token_range   1 (+0 in _classify); _fuzzy_token_distances   1; _prefix_distance      0 in the tier,    192 in _classify; listed 20
+  REF  '1a1a1a1a1a1a1a1a1a1a1a1a'   query tokens 256 distinct  2: _token_range   2 (+0 in _classify); _fuzzy_token_distances   0; _prefix_distance      0 in the tier,      0 in _classify; listed 20
+  REF  'e e e e e e e e e e e e '   query tokens 128 distinct  1: _token_range   1 (+0 in _classify); _fuzzy_token_distances   0; _prefix_distance      0 in the tier,      0 in _classify; listed 20
+  REF6 '0 0 0 0 0 0 0 0 0 0 0 0 '   query tokens 126 distinct  2: _token_range   3 (+0 in _classify); _fuzzy_token_distances   2; _prefix_distance      0 in the tier,   7560 in _classify; listed 20
+  REF6 'chr chr chr chr chr chr '   query tokens  64 distinct  1: _token_range   1 (+0 in _classify); _fuzzy_token_distances   1; _prefix_distance      0 in the tier,   3840 in _classify; listed 20
+  REF6 'c c c c c c c c c c c c '   query tokens 128 distinct  1: _token_range   1 (+0 in _classify); _fuzzy_token_distances   0; _prefix_distance      0 in the tier,      0 in _classify; listed 20
+
+=== D. step 4: the fuzzy tier stops when no candidate is left (walks = _fuzzy_token_distances calls)
+  walks  1; _prefix_distance     0; listed  0  first map empty ('qqqqx' first)
+  walks  2; _prefix_distance     0; listed  0  400 'alpha' candidates, then 'brvao' empties the set (2 walks, of 16 distinct)
+  walks  1; _prefix_distance     0; listed 20  one token, 400 candidates
+  walks  1; listed 1 ['prefix']  every fuzzy candidate already taken by the prefix tier ('alpah_z' over ['alpah_zz', 'other_name'])
+
+=== E. A-3: banded _prefix_distance equals the full OSA prefix distance (capped), and its cost
+  60000 (pair, cap) checks: banded _prefix_distance != full reference 0; pilot osa_prefix != full reference 0  []
+  _prefix_distance(len 256, len 1000, cap 2) = 1  median    1043.5 us
+  _prefix_distance(len 129, len 1020, cap 1) = 1  median     598.9 us
+  _prefix_distance(len   3, len 1020, cap 1) = 1  median     241.5 us
+  _prefix_distance(len   6, len 1020, cap 2) = 1  median     249.7 us
+  _prefix_distance(len   3, len    4, cap 1) = 1  median       4.0 us
+  _prefix_distance(len   3, len    2, cap 1) = 1  median       2.6 us
+
+load after = (0.49, 0.33, 0.36)

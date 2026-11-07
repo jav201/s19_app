@@ -1,0 +1,9 @@
+# host: <runner> | 2026-11-07T03:10:59-06:00 | load: 5.22 9.12 12.77
+# a2l_definition.py md5: f7fa38a5fe312dcf21ac684ea153b9ca  s19_app/tui/a2l_definition.py
+/tmp/b103-e5gt/tree/s19_app/__init__.py
+# python Python 3.11.18
+.                                                                        [100%]
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_b103_a2l_definition.py::test_r_a2l_def_149_5_cached_read_form_is_immutable
+1 passed, 174 deselected in 0.40s

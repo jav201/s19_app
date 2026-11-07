@@ -1,0 +1,15 @@
+[Z0] files 203, errors 0, array/curve/map objects 6379, wall 47 s
+[Z1] mutant None       : files where one walk != describe_definition per name: 0 (0 objects, max of the two orders)
+[Z1] mutant owner-leak : files where one walk != describe_definition per name: 0 (0 objects, max of the two orders)
+[Z1] mutant mutate     : files where one walk != describe_definition per name: 17 (117 objects, max of the two orders)
+      ASAP2_Demo_V161.a2l: forward/reversed [2, 2]; e.g. [('ASAM.C.CURVE.STD_AXIS.MONOTONY_STRICT_INCREASE', ('A2L-DEF-ALIGNMENT', "ASAM.C.CURVE.STD_AXIS.MONOTONY_STRICT_INCREASE: ('FNC_VALUES', 9, 10)", 9), (None, None, 10))]
+      ASAP2_Demo_V171.a2l: forward/reversed [10, 10]; e.g. [('ASAM.C.CURVE.STD_AXIS.DISCRETE', ('A2L-DEF-ALIGNMENT', "ASAM.C.CURVE.STD_AXIS.DISCRETE: ('FNC_VALUES', 9, 10)", 9), (None, None, 10))]
+      161.a2l: forward/reversed [21, 21]; e.g. [('Group_Two_D_2.Map_Mod', ('A2L-DEF-ALIGNMENT', "Group_Two_D_2.Map_Mod: ('AXIS_PTS_X', 2, 4)", 0), (None, None, 0))]
+      19.a2l: forward/reversed [2, 2]; e.g. [('ASAM.C.CURVE.STD_AXIS.MONOTONY_STRICT_INCREASE', ('A2L-DEF-ALIGNMENT', "ASAM.C.CURVE.STD_AXIS.MONOTONY_STRICT_INCREASE: ('FNC_VALUES', 9, 10)", 9), (None, None, 10))]
+      33.a2l: forward/reversed [2, 2]; e.g. [('ASAM.C.CURVE.STD_AXIS.MONOTONY_STRICT_INCREASE', ('A2L-DEF-ALIGNMENT', "ASAM.C.CURVE.STD_AXIS.MONOTONY_STRICT_INCREASE: ('FNC_VALUES', 9, 10)", 9), (None, None, 10))]
+      35.a2l: forward/reversed [10, 10]; e.g. [('ASAM.C.CURVE.STD_AXIS.DISCRETE', ('A2L-DEF-ALIGNMENT', "ASAM.C.CURVE.STD_AXIS.DISCRETE: ('FNC_VALUES', 9, 10)", 9), (None, None, 10))]
+      40.a2l: forward/reversed [10, 10]; e.g. [('ASAM.C.CURVE.STD_AXIS.DISCRETE', ('A2L-DEF-ALIGNMENT', "ASAM.C.CURVE.STD_AXIS.DISCRETE: ('FNC_VALUES', 9, 10)", 9), (None, None, 10))]
+      41.a2l: forward/reversed [10, 10]; e.g. [('ASAM.C.CURVE.STD_AXIS.DISCRETE', ('A2L-DEF-ALIGNMENT', "ASAM.C.CURVE.STD_AXIS.DISCRETE: ('FNC_VALUES', 9, 10)", 9), (None, None, 10))]
+[Z1] mutant cache-check: files where one walk != describe_definition per name: 0 (0 objects, max of the two orders)
+[Z2] ASAP2_Demo_V171.a2l: 31 objects; differing per mutant (forward, reversed) {'None': [0, 0], 'owner-leak': [0, 0], 'mutate': [10, 10], 'cache-check': [0, 0]}
+[Z2] software_a.a2l: 270 objects; differing per mutant (forward, reversed) {'None': [0, 0], 'owner-leak': [0, 0], 'mutate': [0, 0], 'cache-check': [0, 0]}

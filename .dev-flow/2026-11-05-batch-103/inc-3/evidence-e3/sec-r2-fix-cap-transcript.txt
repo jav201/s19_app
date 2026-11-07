@@ -1,0 +1,7 @@
+s19_app.__file__ = ~/work/b103-int2a/s19_app/__init__.py | python 3.11.18 | part cap
+A2L section tree has structural errors: path=~/work/b103-int2a/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+[X1] FIX_AXIS_PAR 0 0 1,048,576 (max 1,048,576): describe 0.41 ms, peak 0.004 MiB, refusal None, fixed_rule ('PAR', (0, 0, 1048576)), element count 1048576, byte length 1048576
+[X1] FIX_AXIS_PAR 0 0 1,048,577 (max 1,048,577): describe 0.29 ms, peak 0.004 MiB, refusal A2L-DEF-AXIS-MAX-N, fixed_rule None, element count None, byte length None
+[X2] _fixed_points alone, 1,048,576 points: 1.522 s, peak 48.0 MiB, kept 40.0 MiB; points 0..1048575 ok=True
+[X3] decode of that FIX axis (per point: _element_definition replace + _decode_stored + display_text): 8.81 s, peak 199 MiB, kept 191 MiB, non-Decoded 0, last text '1048575'
+[X4] decode of the curve's 1,048,576 values (same per-element loop): 9.86 s, peak 156 MiB, kept 156 MiB, non-Decoded 0

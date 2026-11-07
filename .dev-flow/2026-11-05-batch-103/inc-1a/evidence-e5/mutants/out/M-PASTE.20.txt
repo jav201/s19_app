@@ -1,0 +1,47 @@
+# M-PASTE.20
+# row: R-PASTE.20
+# s19_app.__file__ = /tmp/b103-e5-1a-mut/work/s19_app/__init__.py
+# note: runs-on set to ubuntu-latest (the static guard RED)
+# --- git diff ---
+diff --git a/.github/workflows/clipboard-windows.yml b/.github/workflows/clipboard-windows.yml
+index 26d65e98..6a140190 100644
+--- a/.github/workflows/clipboard-windows.yml
++++ b/.github/workflows/clipboard-windows.yml
+@@ -27,7 +27,7 @@ permissions:
+ 
+ jobs:
+   clipboard-windows:
+-    runs-on: windows-latest
++    runs-on: ubuntu-latest  # mutant
+     timeout-minutes: 30
+     steps:
+       - name: Check out repository
+
+# --- pytest (rc=1) ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________ test_r_paste_20_1_windows_workflow_runs_os_clipboard_tests __________
+
+    def test_r_paste_20_1_windows_workflow_runs_os_clipboard_tests() -> None:
+        """R-PASTE.20/1 (static): the pinned ``clipboard-windows.yml`` shape."""
+        from pathlib import Path as _Path
+    
+        from tests.test_suite_hygiene import _script_injections, _workflow_jobs
+    
+        repo = _Path(__file__).resolve().parents[1]
+        workflow = repo / ".github" / "workflows" / "clipboard-windows.yml"
+        text = workflow.read_text(encoding="utf-8")
+        jobs = _workflow_jobs(text)
+        assert list(jobs) == ["clipboard-windows"], jobs
+        # runs-on: windows-latest
+>       assert any("runs-on: windows-latest" in line for line in jobs["clipboard-windows"]), jobs
+E       AssertionError: {'clipboard-windows': ['    runs-on: ubuntu-latest  # mutant', '    timeout-minutes: 30', '    steps:', '      - name: Check out repository', '        uses: actions/checkout@v4', '        with:', ...]}
+E       assert False
+E        +  where False = any(<generator object test_r_paste_20_1_windows_workflow_runs_os_clipboard_tests.<locals>.<genexpr> at 0x7f84ebefe810>)
+
+tests/test_b103_clipboard_core.py:1729: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_20_1_windows_workflow_runs_os_clipboard_tests
+1 failed, 86 deselected in 0.21s
+
+===== stderr =====

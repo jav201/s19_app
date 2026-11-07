@@ -1,0 +1,52 @@
+# i11e2-corpus-shapes transcript 2026-11-06T22:35:43-06:00 host <runner>
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e2-11/<user>; no DISPLAY; no clipboard; stdin closed; load: 0.21 1.29 2.02
+A2L section tree has structural errors: path=/tmp/b103-e2-11/tmp/tmpihon29ed/K5.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/tmp/b103-e2-11/tmp/tmpihon29ed/K7b.a2l sample=Unclosed /begin sections detected.
+s19_app.__file__ = ~/work/s19_app/s19_app/__init__.py
+[K1] class 1: /begin MEASUREMENT alone on its line, one word per line (two such objects)
+      tag: name='UNKNOWN' section=MEASUREMENT kind=None address=None datatype=None length=None deposit=None desc=None
+      tag: name='UNKNOWN' section=MEASUREMENT kind=None address=None datatype=None length=None deposit=None desc=None
+      errors=[] duplicate issues=["A2L symbol 'unknown' is defined multiple times."] payload keys=['compu_methods_by_name', 'compu_tabs_by_name', 'errors', 'path', 'record_layouts_by_name', 'sections', 'tags']
+[K1c] class 1: /begin CHARACTERISTIC alone on its line, one word per line
+      tag: name='UNKNOWN' section=CHARACTERISTIC kind=VALUE address=0x2000 datatype=None length=2 deposit=RL_U16 desc=None
+      errors=[] duplicate issues=[] payload keys=['compu_methods_by_name', 'compu_tabs_by_name', 'errors', 'path', 'record_layouts_by_name', 'sections', 'tags']
+[K2] class 2: MEASUREMENT name on the /begin line, header one word per line
+      tag: name='XK2' section=MEASUREMENT kind=None address=0x1234 datatype=None length=None deposit=None desc=None
+      errors=[] duplicate issues=[] payload keys=['compu_methods_by_name', 'compu_tabs_by_name', 'errors', 'path', 'record_layouts_by_name', 'sections', 'tags']
+[K3] classes 3+4: CHARACTERISTIC header on the /begin line, ECU_ADDRESS_EXTENSION first in the body
+      tag: name='CK3' section=CHARACTERISTIC kind=ECU_ADDRESS_EXTENSION address=0x0 datatype=None length=None deposit=BYTE_ORDER desc='d'
+      errors=[] duplicate issues=[] payload keys=['compu_methods_by_name', 'compu_tabs_by_name', 'errors', 'path', 'record_layouts_by_name', 'sections', 'tags']
+[K4] class 4: extended kind CUBE_5 on the /begin line, NUMBER first in the body
+      tag: name='CK4' section=CHARACTERISTIC kind=NUMBER address=0x2710 datatype=None length=None deposit=READ_ONLY desc='d'
+      errors=[] duplicate issues=[] payload keys=['compu_methods_by_name', 'compu_tabs_by_name', 'errors', 'path', 'record_layouts_by_name', 'sections', 'tags']
+[K5] class 5: one-line MEASUREMENT, ECU_ADDRESS mid-line, a nested one-line IF_DATA, /end on the same line
+      tag: name='XK5' section=MEASUREMENT kind=None address=None datatype=None length=None deposit=None desc='d'
+      errors=['Unclosed /begin sections detected.'] duplicate issues=[] payload keys=['compu_methods_by_name', 'compu_tabs_by_name', 'errors', 'path', 'record_layouts_by_name', 'sections', 'tags']
+[K5b] class 5: a comment before ECU_ADDRESS on its line
+      tag: name='XK5B' section=MEASUREMENT kind=None address=None datatype=UWORD length=2 deposit=None desc=None
+      errors=[] duplicate issues=[] payload keys=['compu_methods_by_name', 'compu_tabs_by_name', 'errors', 'path', 'record_layouts_by_name', 'sections', 'tags']
+[K6] class 6: VAL_BLK on a project-named layout (no size in its name), MATRIX_DIM, header on its own line
+      tag: name='CK6' section=CHARACTERISTIC kind=VAL_BLK address=0x3000 datatype=None length=None deposit=RL_U16 desc=None
+      errors=[] duplicate issues=[] payload keys=['compu_methods_by_name', 'compu_tabs_by_name', 'errors', 'path', 'record_layouts_by_name', 'sections', 'tags']
+[K6b] class 6: VAL_BLK on a project-named layout, NUMBER (ASAP2 1.6 style), no MATRIX_DIM
+      tag: name='CK6B' section=CHARACTERISTIC kind=VAL_BLK address=0x3010 datatype=None length=None deposit=RL_U16 desc=None
+      errors=[] duplicate issues=[] payload keys=['compu_methods_by_name', 'compu_tabs_by_name', 'errors', 'path', 'record_layouts_by_name', 'sections', 'tags']
+[K6c] class 6: ASCII on a project-named layout, MATRIX_DIM (ASAP2 1.7 style), no NUMBER
+      tag: name='CK6C' section=CHARACTERISTIC kind=ASCII address=0x3020 datatype=None length=None deposit=RL_U8 desc=None
+      errors=[] duplicate issues=[] payload keys=['compu_methods_by_name', 'compu_tabs_by_name', 'errors', 'path', 'record_layouts_by_name', 'sections', 'tags']
+[K6d] class 6: VALUE on a project-named layout, header one word per line
+      tag: name='CK6D' section=CHARACTERISTIC kind=VALUE address=0x3030 datatype=None length=4 deposit=RL_U32 desc=None
+      errors=[] duplicate issues=[] payload keys=['compu_methods_by_name', 'compu_tabs_by_name', 'errors', 'path', 'record_layouts_by_name', 'sections', 'tags']
+[K7] class 7: a MEASUREMENT header with 4 of its 6 words
+      tag: name='XK7' section=MEASUREMENT kind=None address=0x10 datatype=None length=None deposit=None desc=None
+      errors=[] duplicate issues=[] payload keys=['compu_methods_by_name', 'compu_tabs_by_name', 'errors', 'path', 'record_layouts_by_name', 'sections', 'tags']
+[K7b] class 7: /begin INSTANCE after other words on its line
+      tag: name='XK7B' section=MEASUREMENT kind=None address=0x60 datatype=UWORD length=2 deposit=None desc=None
+      errors=['Unclosed /begin sections detected.'] duplicate issues=[] payload keys=['compu_methods_by_name', 'compu_tabs_by_name', 'errors', 'path', 'record_layouts_by_name', 'sections', 'tags']
+[L1] Latin-1 bytes 0xB0 in a comment, in a long identifier and in a name word
+      tag: name='XL1' section=MEASUREMENT kind=None address=0x70 datatype=UWORD length=2 deposit=None desc='Temp �C'
+      tag: name='XL1_�' section=MEASUREMENT kind=None address=0x72 datatype=UWORD length=2 deposit=None desc=None
+      errors=[]
+# exit 0 ; clone status after: 0 changed; load: 0.27 1.29 2.01
+# redaction (E2, sed): the runner's home path written as ~

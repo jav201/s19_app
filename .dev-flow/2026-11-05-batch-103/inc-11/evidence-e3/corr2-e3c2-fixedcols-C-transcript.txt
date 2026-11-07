@@ -1,0 +1,366 @@
+# e3c2-fixedcols transcript 2026-11-07T01:09:18-06:00 host <runner>
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e3c2-11/<user>; no DISPLAY; no clipboard; stdin closed; load: 2.52 1.80 2.03
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py | textual 8.2.8 | config C | reorder True | fixed_columns 0
+[C N20 W80 unscrolled] visible=38 scroll_x=0 max_scroll_x=109 fixed_w=0 cols: Address=16, Length=9, Tag=24, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 22 cells
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 22 cells
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 22 cells
+[C N20 W80 scrolled-right] visible=38 scroll_x=109 max_scroll_x=109 fixed_w=0 cols: Address=16, Length=9, Tag=24, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 22 cells
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 22 cells
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 22 cells
+[C N20 W80] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N20 W85 unscrolled] visible=41 scroll_x=0 max_scroll_x=106 fixed_w=0 cols: Address=16, Length=9, Tag=24, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 22 cells
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 22 cells
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 22 cells
+[C N20 W85 scrolled-right] visible=41 scroll_x=106 max_scroll_x=106 fixed_w=0 cols: Address=16, Length=9, Tag=24, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 22 cells
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 22 cells
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 22 cells
+[C N20 W85] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N20 W90 unscrolled] visible=44 scroll_x=0 max_scroll_x=103 fixed_w=0 cols: Address=16, Length=9, Tag=24, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 22 cells
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 22 cells
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 22 cells
+[C N20 W90 scrolled-right] visible=44 scroll_x=103 max_scroll_x=103 fixed_w=0 cols: Address=16, Length=9, Tag=24, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 22 cells
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 22 cells
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 22 cells
+[C N20 W90] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N20 W95 unscrolled] visible=46 scroll_x=0 max_scroll_x=101 fixed_w=0 cols: Address=16, Length=9, Tag=24, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 22 cells
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 22 cells
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 22 cells
+[C N20 W95 scrolled-right] visible=46 scroll_x=101 max_scroll_x=101 fixed_w=0 cols: Address=16, Length=9, Tag=24, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 22 cells
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 22 cells
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 22 cells
+[C N20 W95] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N20 W100 unscrolled] visible=49 scroll_x=0 max_scroll_x=98 fixed_w=0 cols: Address=16, Length=9, Tag=24, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 22 cells
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 22 cells
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 22 cells
+[C N20 W100 scrolled-right] visible=49 scroll_x=98 max_scroll_x=98 fixed_w=0 cols: Address=16, Length=9, Tag=24, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 22 cells
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 22 cells
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 22 cells
+[C N20 W100] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N20 W118 unscrolled] visible=60 scroll_x=0 max_scroll_x=87 fixed_w=0 cols: Address=16, Length=9, Tag=24, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 22 cells
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 22 cells
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 22 cells
+[C N20 W118 scrolled-right] visible=60 scroll_x=87 max_scroll_x=87 fixed_w=0 cols: Address=16, Length=9, Tag=24, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 22 cells
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 22 cells
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 22 cells
+[C N20 W118] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N20 W160 unscrolled] visible=73 scroll_x=0 max_scroll_x=74 fixed_w=0 cols: Address=16, Length=9, Tag=24, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 22 cells
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 22 cells
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 22 cells
+[C N20 W160 scrolled-right] visible=73 scroll_x=74 max_scroll_x=74 fixed_w=0 cols: Address=16, Length=9, Tag=24, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 22 cells
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 22 cells
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 22 cells
+[C N20 W160] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N20 W220 unscrolled] visible=108 scroll_x=0 max_scroll_x=39 fixed_w=0 cols: Address=16, Length=9, Tag=24, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 22 cells
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 22 cells
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 22 cells
+[C N20 W220 scrolled-right] visible=108 scroll_x=39 max_scroll_x=39 fixed_w=0 cols: Address=16, Length=9, Tag=24, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 22 cells
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 22 cells
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 22 cells
+[C N20 W220] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N28 W80 unscrolled] visible=38 scroll_x=0 max_scroll_x=117 fixed_w=0 cols: Address=16, Length=9, Tag=32, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 30 cells
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 30 cells
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 30 cells
+[C N28 W80 scrolled-right] visible=38 scroll_x=117 max_scroll_x=117 fixed_w=0 cols: Address=16, Length=9, Tag=32, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 30 cells
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 30 cells
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 30 cells
+[C N28 W80] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N28 W85 unscrolled] visible=41 scroll_x=0 max_scroll_x=114 fixed_w=0 cols: Address=16, Length=9, Tag=32, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 30 cells
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 30 cells
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 30 cells
+[C N28 W85 scrolled-right] visible=41 scroll_x=114 max_scroll_x=114 fixed_w=0 cols: Address=16, Length=9, Tag=32, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 30 cells
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 30 cells
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 30 cells
+[C N28 W85] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N28 W90 unscrolled] visible=44 scroll_x=0 max_scroll_x=111 fixed_w=0 cols: Address=16, Length=9, Tag=32, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 30 cells
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 30 cells
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 30 cells
+[C N28 W90 scrolled-right] visible=44 scroll_x=111 max_scroll_x=111 fixed_w=0 cols: Address=16, Length=9, Tag=32, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 30 cells
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 30 cells
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 30 cells
+[C N28 W90] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N28 W95 unscrolled] visible=46 scroll_x=0 max_scroll_x=109 fixed_w=0 cols: Address=16, Length=9, Tag=32, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 30 cells
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 30 cells
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 30 cells
+[C N28 W95 scrolled-right] visible=46 scroll_x=109 max_scroll_x=109 fixed_w=0 cols: Address=16, Length=9, Tag=32, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 30 cells
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 30 cells
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 30 cells
+[C N28 W95] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N28 W100 unscrolled] visible=49 scroll_x=0 max_scroll_x=106 fixed_w=0 cols: Address=16, Length=9, Tag=32, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 30 cells
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 30 cells
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 30 cells
+[C N28 W100 scrolled-right] visible=49 scroll_x=106 max_scroll_x=106 fixed_w=0 cols: Address=16, Length=9, Tag=32, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 30 cells
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 30 cells
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 30 cells
+[C N28 W100] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N28 W118 unscrolled] visible=60 scroll_x=0 max_scroll_x=95 fixed_w=0 cols: Address=16, Length=9, Tag=32, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 30 cells
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 30 cells
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 30 cells
+[C N28 W118 scrolled-right] visible=60 scroll_x=95 max_scroll_x=95 fixed_w=0 cols: Address=16, Length=9, Tag=32, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 30 cells
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 30 cells
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 30 cells
+[C N28 W118] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N28 W160 unscrolled] visible=73 scroll_x=0 max_scroll_x=82 fixed_w=0 cols: Address=16, Length=9, Tag=32, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 30 cells
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 30 cells
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 30 cells
+[C N28 W160 scrolled-right] visible=73 scroll_x=82 max_scroll_x=82 fixed_w=0 cols: Address=16, Length=9, Tag=32, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 30 cells
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 30 cells
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 30 cells
+[C N28 W160] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N28 W220 unscrolled] visible=108 scroll_x=0 max_scroll_x=47 fixed_w=0 cols: Address=16, Length=9, Tag=32, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 30 cells
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 30 cells
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 30 cells
+[C N28 W220 scrolled-right] visible=108 scroll_x=47 max_scroll_x=47 fixed_w=0 cols: Address=16, Length=9, Tag=32, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 30 cells
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 30 cells
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 30 cells
+[C N28 W220] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N34 W80 unscrolled] visible=38 scroll_x=0 max_scroll_x=123 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 36 cells
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 36 cells
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 36 cells
+[C N34 W80 scrolled-right] visible=38 scroll_x=123 max_scroll_x=123 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 36 cells
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 36 cells
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 36 cells
+[C N34 W80] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N34 W85 unscrolled] visible=41 scroll_x=0 max_scroll_x=120 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 36 cells
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 36 cells
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 36 cells
+[C N34 W85 scrolled-right] visible=41 scroll_x=120 max_scroll_x=120 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 36 cells
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 36 cells
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 36 cells
+[C N34 W85] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N34 W90 unscrolled] visible=44 scroll_x=0 max_scroll_x=117 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 36 cells
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 36 cells
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 36 cells
+[C N34 W90 scrolled-right] visible=44 scroll_x=117 max_scroll_x=117 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 36 cells
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 36 cells
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 36 cells
+[C N34 W90] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N34 W95 unscrolled] visible=46 scroll_x=0 max_scroll_x=115 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 36 cells
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 36 cells
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 36 cells
+[C N34 W95 scrolled-right] visible=46 scroll_x=115 max_scroll_x=115 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 36 cells
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 36 cells
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 36 cells
+[C N34 W95] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N34 W100 unscrolled] visible=49 scroll_x=0 max_scroll_x=112 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 36 cells
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 36 cells
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 36 cells
+[C N34 W100 scrolled-right] visible=49 scroll_x=112 max_scroll_x=112 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 36 cells
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 36 cells
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 36 cells
+[C N34 W100] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N34 W118 unscrolled] visible=60 scroll_x=0 max_scroll_x=101 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 36 cells
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 36 cells
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 36 cells
+[C N34 W118 scrolled-right] visible=60 scroll_x=101 max_scroll_x=101 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 36 cells
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 36 cells
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 36 cells
+[C N34 W118] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N34 W160 unscrolled] visible=73 scroll_x=0 max_scroll_x=88 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 36 cells
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 36 cells
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 36 cells
+[C N34 W160 scrolled-right] visible=73 scroll_x=88 max_scroll_x=88 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 36 cells
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 36 cells
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 36 cells
+[C N34 W160] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N34 W220 unscrolled] visible=108 scroll_x=0 max_scroll_x=53 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 36 cells
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 36 cells
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 36 cells
+[C N34 W220 scrolled-right] visible=108 scroll_x=53 max_scroll_x=53 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 36 cells
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 36 cells
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 36 cells
+[C N34 W220] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N48 W80 unscrolled] visible=38 scroll_x=0 max_scroll_x=123 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 36 cells with …
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 36 cells with …
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 36 cells with …
+[C N48 W80 scrolled-right] visible=38 scroll_x=123 max_scroll_x=123 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 36 cells with …
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 36 cells with …
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 36 cells with …
+[C N48 W80] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N48 W85 unscrolled] visible=41 scroll_x=0 max_scroll_x=120 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 36 cells with …
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 36 cells with …
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 36 cells with …
+[C N48 W85 scrolled-right] visible=41 scroll_x=120 max_scroll_x=120 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 36 cells with …
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 36 cells with …
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 36 cells with …
+[C N48 W85] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N48 W90 unscrolled] visible=44 scroll_x=0 max_scroll_x=117 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 36 cells with …
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 36 cells with …
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 36 cells with …
+[C N48 W90 scrolled-right] visible=44 scroll_x=117 max_scroll_x=117 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 36 cells with …
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 36 cells with …
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 36 cells with …
+[C N48 W90] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N48 W95 unscrolled] visible=46 scroll_x=0 max_scroll_x=115 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 36 cells with …
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 36 cells with …
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 36 cells with …
+[C N48 W95 scrolled-right] visible=46 scroll_x=115 max_scroll_x=115 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 36 cells with …
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 36 cells with …
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 36 cells with …
+[C N48 W95] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N48 W100 unscrolled] visible=49 scroll_x=0 max_scroll_x=112 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 36 cells with …
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 36 cells with …
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 36 cells with …
+[C N48 W100 scrolled-right] visible=49 scroll_x=112 max_scroll_x=112 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 36 cells with …
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 36 cells with …
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 36 cells with …
+[C N48 W100] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N48 W118 unscrolled] visible=60 scroll_x=0 max_scroll_x=101 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 36 cells with …
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 36 cells with …
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 36 cells with …
+[C N48 W118 scrolled-right] visible=60 scroll_x=101 max_scroll_x=101 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 36 cells with …
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 36 cells with …
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 36 cells with …
+[C N48 W118] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N48 W160 unscrolled] visible=73 scroll_x=0 max_scroll_x=88 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 36 cells with …
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 36 cells with …
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 36 cells with …
+[C N48 W160 scrolled-right] visible=73 scroll_x=88 max_scroll_x=88 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 36 cells with …
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 36 cells with …
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 36 cells with …
+[C N48 W160] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N48 W220 unscrolled] visible=108 scroll_x=0 max_scroll_x=53 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 36 cells with …
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 36 cells with …
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 36 cells with …
+[C N48 W220 scrolled-right] visible=108 scroll_x=53 max_scroll_x=53 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 36 cells with …
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 36 cells with …
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 36 cells with …
+[C N48 W220] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N100 W80 unscrolled] visible=38 scroll_x=0 max_scroll_x=123 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 36 cells with …
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 36 cells with …
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 36 cells with …
+[C N100 W80 scrolled-right] visible=38 scroll_x=123 max_scroll_x=123 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 36 cells with …
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 36 cells with …
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 36 cells with …
+[C N100 W80] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N100 W85 unscrolled] visible=41 scroll_x=0 max_scroll_x=120 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 36 cells with …
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 36 cells with …
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 36 cells with …
+[C N100 W85 scrolled-right] visible=41 scroll_x=120 max_scroll_x=120 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 36 cells with …
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 36 cells with …
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 36 cells with …
+[C N100 W85] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N100 W90 unscrolled] visible=44 scroll_x=0 max_scroll_x=117 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 36 cells with …
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 36 cells with …
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 36 cells with …
+[C N100 W90 scrolled-right] visible=44 scroll_x=117 max_scroll_x=117 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 36 cells with …
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 36 cells with …
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 36 cells with …
+[C N100 W90] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N100 W95 unscrolled] visible=46 scroll_x=0 max_scroll_x=115 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 36 cells with …
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 36 cells with …
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 36 cells with …
+[C N100 W95 scrolled-right] visible=46 scroll_x=115 max_scroll_x=115 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 36 cells with …
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 36 cells with …
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 36 cells with …
+[C N100 W95] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N100 W100 unscrolled] visible=49 scroll_x=0 max_scroll_x=112 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 36 cells with …
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 36 cells with …
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 36 cells with …
+[C N100 W100 scrolled-right] visible=49 scroll_x=112 max_scroll_x=112 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 36 cells with …
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 36 cells with …
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 36 cells with …
+[C N100 W100] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N100 W118 unscrolled] visible=60 scroll_x=0 max_scroll_x=101 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 36 cells with …
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 36 cells with …
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 36 cells with …
+[C N100 W118 scrolled-right] visible=60 scroll_x=101 max_scroll_x=101 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 36 cells with …
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 36 cells with …
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 36 cells with …
+[C N100 W118] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N100 W160 unscrolled] visible=73 scroll_x=0 max_scroll_x=88 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 36 cells with …
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 36 cells with …
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 36 cells with …
+[C N100 W160 scrolled-right] visible=73 scroll_x=88 max_scroll_x=88 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 36 cells with …
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 36 cells with …
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 36 cells with …
+[C N100 W160] rows=3 unscrolled_whole=True scrolled_whole=False
+[C N100 W220 unscrolled] visible=108 scroll_x=0 max_scroll_x=53 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':whole, Length='2266':whole, Tag cell 36 cells with …
+    row1: Address='0x1C2D3E004026':whole, Length='2':whole, Tag cell 36 cells with …
+    row2: Address='0x00001000':whole, Length='1048576':whole, Tag cell 36 cells with …
+[C N100 W220 scrolled-right] visible=108 scroll_x=53 max_scroll_x=53 fixed_w=0 cols: Address=16, Length=9, Tag=38, Source=9
+    row0: Address='0x1C2D3E00':not shown, Length='2266':not shown, Tag cell 36 cells with …
+    row1: Address='0x1C2D3E004026':not shown, Length='2':not shown, Tag cell 36 cells with …
+    row2: Address='0x00001000':not shown, Length='1048576':not shown, Tag cell 36 cells with …
+[C N100 W220] rows=3 unscrolled_whole=True scrolled_whole=False
+[C SUMMARY] cases=40 whole unscrolled=40/40 whole after scroll-right=0/40
+# exit 0 ; clone status after: 0 changed; load: 3.11 2.94 2.49

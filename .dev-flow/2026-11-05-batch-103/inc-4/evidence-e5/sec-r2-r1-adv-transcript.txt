@@ -1,0 +1,58 @@
+runner sec-r2-run.sh sha256 01a6306bb691ca8ba9909f4f35ba0d442c21ea334e625d9331e6e9241c6bce63; probe sec-e5-probe.py sha256 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+s19_app.__file__ = /tmp/b103-e5-4-sec-r2/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5-4-sec-r2/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0
+tests module = /tmp/b103-e5-4-sec-r2/tree/tests/test_b103_label_match_perf.py
+mode = adv  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = 1925366438575151857
+host = <runner>  load = (2.41, 3.26, 2.69)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5-4-sec-r2/<user>  LOCALAPPDATA = /tmp/b103-e5-4-sec-r2/<user>/localappdata  PILOT_DIR = /tmp/b103-e5-4-sec-r2/pilot
+
+=== A1. per-candidate check (step 4, <= 300 candidates) over crafted names + REF padding to 50,000
+
+  300 crafted names of 1024 chars (268 tokens each, junk distinct across names: True) + 49700 REF names: build 2.27 s [ok], 50,000 names, 139,856 distinct tokens; load (2.56, 3.25, 2.7)
+      4 query tokens ( 21 chars): median of 3      28.6 ms [ok] listed 20 ['fuzzy'] bad spans 0
+      8 query tokens ( 41 chars): median of 3      44.2 ms [ok] listed 20 ['fuzzy'] bad spans 0
+     16 query tokens ( 81 chars): median of 3      80.0 ms [ok] listed 20 ['fuzzy'] bad spans 0
+     32 query tokens (161 chars): median of 3     144.1 ms [ok] listed 20 ['fuzzy'] bad spans 0
+     51 query tokens (256 chars): median of 3     219.7 ms [ok] listed 20 ['fuzzy'] bad spans 0
+     51 tokens, counted: walks 51; _prefix_distance 0 in the tier, 0 in _classify (20 listed names)
+     51 tokens, one ranking under tracemalloc: peak       0.2 MiB  (2.6 s [ok])
+     16 tokens, one ranking under tracemalloc: peak       0.1 MiB  (0.8 s [ok])
+     cProfile (51 tokens), top by own time:
+          ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+              51    0.585    0.011    0.597    0.012 <tree>/s19_app/tui/services/label_match.py:1076(_fuzzy_token_distances)
+              20    0.068    0.003    0.126    0.006 <tree>/s19_app/tui/services/label_match.py:888(_classify)
+          290751    0.018    0.000    0.018    0.000 {method 'get' of 'dict' objects}
+           20615    0.017    0.000    0.025    0.000 <tree>/s19_app/tui/services/label_match.py:798(_at_boundary)
+           67357    0.013    0.000    0.013    0.000 <tree>/s19_app/tui/services/label_match.py:652(_is_word_char)
+          183493    0.012    0.000    0.012    0.000 {built-in method builtins.len}
+
+  2000 crafted names of 1024 chars (268 tokens each, junk distinct across names: False) + 48000 REF names: build 4.14 s [ok], 50,000 names, 329,257 distinct tokens; load (2.63, 3.24, 2.7)
+      4 query tokens ( 21 chars): median of 3      36.4 ms [ok] listed 20 ['fuzzy'] bad spans 0
+      8 query tokens ( 41 chars): median of 3      56.5 ms [ok] listed 20 ['fuzzy'] bad spans 0
+     16 query tokens ( 81 chars): median of 3     102.3 ms [ok] listed 20 ['fuzzy'] bad spans 0
+     32 query tokens (161 chars): median of 3     200.1 ms [ok] listed 20 ['fuzzy'] bad spans 0
+     51 query tokens (256 chars): median of 3     322.9 ms [ok] listed 20 ['fuzzy'] bad spans 0
+     51 tokens, counted: walks 51; _prefix_distance 0 in the tier, 0 in _classify (20 listed names)
+     51 tokens, one ranking under tracemalloc: peak       0.9 MiB  (0.6 s [ok])
+
+=== A2. _classify over listed names: repeated short tokens against one 1,020-character token (LONG)
+          6.9 ms [ok] listed 20; _prefix_distance     0 in the tier,     0 in _classify  'aaq ' x 64 (one 1-edit token, repeated)
+          5.3 ms [ok] listed 20; _prefix_distance     0 in the tier,     0 in _classify  'aaaq ' x 51
+         47.7 ms [ok] listed 20; _prefix_distance     0 in the tier,     0 in _classify  'aaaaaq ' x 36 (2-edit token, repeated)
+         69.8 ms [ok] listed 20; _prefix_distance     0 in the tier,     0 in _classify  'aab' .. 'aaz' x 2, cut 256 (distinct 1-edit tokens)
+          3.0 ms [ok] listed 20; _prefix_distance     0 in the tier,     0 in _classify  'aaq'
+          1.8 ms [ok] listed 20; _prefix_distance     0 in the tier,     0 in _classify  'a' x 256
+
+=== A3. substring key over every SUBSTRING name (residual E3S-03 (c)): names 'x' + 'ab' * 509 + 'Q' + tag (1,024 chars), query 'ba'
+  5,000 crafted + 45,000 REF names: build 4.86 s [ok] (.35 bound 5.0 s); load (2.84, 3.27, 2.71)
+     rank 'ba'   median of 3    1243.4 ms [ok] listed 20  > 1.0 s (.40)
+     rank 'bab'  median of 3    1225.3 ms [ok] listed 20  > 1.0 s (.40)
+     rank 'xa'   median of 3       8.1 ms [ok] listed 20
+  50,000 crafted + 0 REF names: build 31.18 s [ok] (.35 bound 5.0 s); load (3.18, 3.31, 2.75)
+     rank 'ba'   median of 3   11744.4 ms [ok] listed 20  > 1.0 s (.40)
+     rank 'bab'  median of 3   11729.9 ms [ok] listed 20  > 1.0 s (.40)
+     rank 'xa'   median of 3     138.1 ms [ok] listed 20
+
+load after = (2.56, 3.12, 2.73)
+probe exit 0

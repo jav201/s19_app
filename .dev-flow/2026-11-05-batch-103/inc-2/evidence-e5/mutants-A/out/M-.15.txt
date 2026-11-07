@@ -1,0 +1,72 @@
+# M-.15
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.15/s19_app/__init__.py
+# note: range table not read
+#   EDIT-OK: '    else:  # COMPU_VTAB_RANGE\n        count = _read_count(tokens[2]) i'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..905d4272 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -1012,7 +1012,7 @@ def _read_enum_table(
+             count = _read_count(tokens[3])
+         pos = 4
+     else:  # COMPU_VTAB_RANGE
+-        count = _read_count(tokens[2]) if len(tokens) > 2 else None
++        count = None
+         pos = 3
+ 
+     entries: list[EnumEntry] = []
+
+# --- pytest (rc=1) ---
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+____________ test_r_a2l_def_15_1_triples_of_a_v171_compu_vtab_range ____________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...osed /begin sections detected.'], 'path': '/tmp/b103-e5-2-mutA/M-.15/examples/case_00_public/ASAP2_Demo_V171.a2l', ...}
+
+    def test_r_a2l_def_15_1_triples_of_a_v171_compu_vtab_range(v171):
+        """R-A2L-DEF.15/1 - 11 triples; first (0, 1, Zero_to_one); last (105, 105, hundredfive)."""
+        d = describe_definition(V171_RANGE, v171)
+>       assert len(d.enum_entries) == 11
+E       AssertionError: assert 0 == 11
+E        +  where 0 = len(())
+E        +    where () = Definition(name='ASAM.C.SCALAR.SWORD.VTAB_RANGE_DEFAULT_VALUE', section='CHARACTERISTIC', char_type='VALUE', kind='enu...TY', message='ASAM.C.SCALAR.SWORD.VTAB_RANGE_DEFAULT_VALUE: the table CM.VTAB_RANGE.DEFAULT_VALUE.REF has no entries')).enum_entries
+
+../base/tests/test_b103_a2l_definition.py:626: AssertionError
+------------------------------ Captured log setup ------------------------------
+WARNING  s19_app.tui.a2l:a2l.py:250 A2L section tree has structural errors: path=/tmp/b103-e5-2-mutA/M-.15/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+___________________ test_r_a2l_def_15_2_a2ltool_range_table ____________________
+
+softa = {'compu_methods_by_name': {'AFI_TU_FXBD_XMC_KKWP_MMV.DQXN_O_IJX_MSK_UimufsteUejnmysraz': {'coeffs': None, 'coeffs_line...jjVfzjGyvl', ...}, ...}, 'errors': [], 'path': '/tmp/b103-e5-2-mutA/M-.15/examples/case_00_public/software_a.a2l', ...}
+softa_defs = {'AAB_CHYEAQ1_DXZTD_NLPMJIM_2_IGTLL_AWV_CHZTO.SwaxfqdawbZkcwtx': Definition(name='AAB_CHYEAQ1_DXZTD_NLPMJIM_2_IGTLL_AW...ode='A2L-DEF-ADDRESS', message='AAK_DD_2_GSC_AVRM_MYOLHLJ.PjrvfnbaLmjn: the object has no address or no length')), ...}
+
+    def test_r_a2l_def_15_2_a2ltool_range_table(softa, softa_defs):
+        """R-A2L-DEF.15/2 - the first COMPU_VTAB_RANGE of software_a: 5 entries, first (0, 0, text)."""
+        # Integration fix (orchestrator, 2026-11-07; diagnosis evidence-e4/diag-2a-transcript.txt):
+        # the side table holds only COMPU_VTAB sections, so the first COMPU_VTAB_RANGE is found
+        # by a pre-order walk of the section tree, its name read as the reader reads it.
+        from s19_app.tui.a2l import parse_begin_meta
+    
+        def _first_range(nodes):
+            for node in nodes:
+                if node.get("name") == "COMPU_VTAB_RANGE":
+                    return parse_begin_meta(node.get("meta", "") or "")[0]
+                found = _first_range(node.get("children") or [])
+                if found is not None:
+                    return found
+            return None
+    
+        table = _first_range(softa["sections"])
+        assert table is not None
+        d = next(x for x in softa_defs.values() if x.enum_table == table)
+        assert d.kind == "enum"
+>       assert len(d.enum_entries) == 5
+E       AssertionError: assert 0 == 5
+E        +  where 0 = len(())
+E        +    where () = Definition(name='MhiH.Szymzt_WN_MDB_PifFJDjfo_ZHE_2_Kvypjld_EgdrylBxtq.RPI_BfgPPFcmu', section='MEASUREMENT', char_typ...message='MhiH.Szymzt_WN_MDB_PifFJDjfo_ZHE_2_Kvypjld_EgdrylBxtq.RPI_BfgPPFcmu: the object has no address or no length')).enum_entries
+
+../base/tests/test_b103_a2l_definition.py:651: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_15_1_triples_of_a_v171_compu_vtab_range
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_15_2_a2ltool_range_table
+2 failed, 189 deselected in 4.31s

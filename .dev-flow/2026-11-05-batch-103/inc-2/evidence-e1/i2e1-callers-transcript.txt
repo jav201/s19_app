@@ -1,0 +1,66 @@
+# i2e1-callers transcript — 2026-11-06T15:43:54-06:00
+# base tree: git archive e07fb00 s19_app (throwaway copy in the scratchpad); code-wire v3.1.0 (e436a08); python Python 3.12.7
+files parsed: 86; parse failures: 0
+marks written: 1996
+extractor: marks=1996 graph_nodes=0 calls=3771 findings=2009 parse_failures=0
+
+== encode_physical_to_raw_bytes: 1 marked caller(s)
+   resolve_symbol_entry  <-  s19_app/tui/services/change_service.py:649
+
+== _invert_physical_to_raw: 2 marked caller(s)
+   _encode_curve_record_bytes  <-  s19_app/tui/a2l.py:2332
+   encode_physical_to_raw_bytes  <-  s19_app/tui/a2l.py:2512
+
+== _apply_compu_method: 3 marked caller(s)
+   _decode_external_axis_points  <-  s19_app/tui/a2l.py:3304
+   describe_curve_tag  <-  s19_app/tui/a2l.py:3155, s19_app/tui/a2l.py:3202
+   enrich_a2l_tags_with_values  <-  s19_app/tui/a2l.py:2909
+
+== _table_lookup: 2 marked caller(s)
+   _apply_compu_method  <-  s19_app/tui/a2l.py:1928
+   _reverse_table_lookup  <-  s19_app/tui/a2l.py:2094
+
+== _decode_raw_value: 1 marked caller(s)
+   enrich_a2l_tags_with_values  <-  s19_app/tui/a2l.py:2897
+
+== _decode_scalar: 2 marked caller(s)
+   _decode_component_run  <-  s19_app/tui/a2l.py:2975
+   _decode_raw_value  <-  s19_app/tui/a2l.py:1830, s19_app/tui/a2l.py:1834
+
+== _extract_raw_bytes: 3 marked caller(s)
+   _decode_external_axis_points  <-  s19_app/tui/a2l.py:3290
+   describe_curve_tag  <-  s19_app/tui/a2l.py:3112
+   enrich_a2l_tags_with_values  <-  s19_app/tui/a2l.py:2893
+
+== _resolve_record_layout: 3 marked caller(s)
+   _infer_length_characteristic  <-  s19_app/tui/a2l.py:1227
+   encode_physical_to_raw_bytes  <-  s19_app/tui/a2l.py:2490
+   enrich_a2l_tags_with_values  <-  s19_app/tui/a2l.py:2887
+
+== extract_compu_methods: 1 marked caller(s)
+   parse_a2l_file  <-  s19_app/tui/a2l.py:2832
+
+== extract_compu_tables: 1 marked caller(s)
+   parse_a2l_file  <-  s19_app/tui/a2l.py:2833
+
+== enrich_a2l_tags_with_values: 2 marked caller(s)
+   enrich_tags_and_render  <-  s19_app/tui/services/a2l_service.py:20
+   validate_characteristic  <-  s19_app/tui/a2l.py:3472
+
+== describe_curve_tag: 1 marked caller(s)
+   S19TuiApp.action_a2l_describe_tag  <-  s19_app/tui/app.py:9776
+
+== _short_decode_reason: 1 marked caller(s)
+   describe_curve_tag  <-  s19_app/tui/a2l.py:3073
+
+== parse_parameter_list: 1 marked caller(s)
+   BulkParameterAddScreen._apply_list  <-  s19_app/tui/screens.py:1019
+
+== resolve_symbol_entry: 1 marked caller(s)
+   ChangeService.add_symbol_entry  <-  s19_app/tui/services/change_service.py:1297
+
+== ChangeService.add_symbol_entry: 0 marked caller(s)
+
+== A2LParameterPicker.set_parameters: 2 marked caller(s)
+   CheckEditorPanel.set_a2l_parameters  <-  s19_app/tui/screens_directionb.py:7303
+   PatchEditorPanel.set_a2l_parameters  <-  s19_app/tui/screens_directionb.py:5388

@@ -1,0 +1,21 @@
+# probe design flood transcript 2026-11-07T02:58:56-06:00 host <runner>
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e3-12-S/<user>; no DISPLAY; no clipboard; stdin closed; load: 17.35 18.42 16.10
+s19_app.__file__ = /tmp/b103-e3-12-S/design/s19_app/__init__.py | textual 8.2.8 | rich 15.0.0 | variant design | scenario flood
+[design flood] start 220x60: cursor_row 150, scroll_x 50/50, scroll_y 117
+[design flood A] 41 Resize posted, no pause (0.2 ms)
+[design flood A (burst of 41, ends 100x54)] settled in 14.69 s; size (118, 54); cursor_row 150 (window start 0); scroll_x 40/98 scroll_y 117; card shows the cursor row's full name: yes; row/tag identity mismatches 0
+[design flood A (burst of 41, ends 100x54) (scroll_x set to 0 for the check)] visible=58 scroll_x=0/98 scroll_y=117 cols: Address=12, Length=8, Tag=38, Source=9 | w=34 | rows=200 cursor_row=150 | builds=0 fits=2 fit_rebuilds=0
+[design flood A (burst of 41, ends 100x54) (scroll_x set to 0 for the check)] ROWS OK 28/28
+[design flood B] 20 pilot.resize_terminal 80/220 alternating, one pause each: 71.06 s; builds 26 fits 65 fit_rebuilds 26
+[design flood B (ends 220x60)] settled in 11.44 s; size (220, 60); cursor_row 150 (window start 0); scroll_x 0/50 scroll_y 0; card shows the cursor row's full name: yes; row/tag identity mismatches 0
+[design flood B (ends 220x60) (scroll_x set to 0 for the check)] visible=106 scroll_x=0/50 scroll_y=0 cols: Address=12, Length=8, Tag=38, Source=9 | w=82 | rows=200 cursor_row=150 | builds=26 fits=65 fit_rebuilds=26
+[design flood B (ends 220x60) (scroll_x set to 0 for the check)] row0|  0x1C2D3E00  2266    ✓ SYN_MAP_LLLLLLLL…LLLLLLLLLLLLL_END  formula  1792  1792      yes    unknown  0..4095
+[design flood B (ends 220x60) (scroll_x set to 0 for the check)] row0: Address=0x1C2D3E00:whole; Length=2266:whole; Tag ends at 57 (inside)
+[design flood B (ends 220x60) (scroll_x set to 0 for the check)] ROWS OK 34/34
+[design flood C (bursts around a page change and a reload, ends 220x60)] settled in 13.47 s; size (95, 54); cursor_row 0 (window start 0); scroll_x 0/112 scroll_y 0; card shows the cursor row's full name: yes; row/tag identity mismatches 0
+[design flood C (bursts around a page change and a reload, ends 220x60) (scroll_x set to 0 for the check)] visible=44 scroll_x=0/112 scroll_y=0 cols: Address=12, Length=8, Tag=38, Source=9 | w=20 | rows=200 cursor_row=0 | builds=3 fits=6 fit_rebuilds=1
+[design flood C (bursts around a page change and a reload, ends 220x60) (scroll_x set to 0 for the check)] row0|  0x1C2D3E00  2266    ✓ SYN_MAP_L…LLLLLL_END
+[design flood C (bursts around a page change and a reload, ends 220x60) (scroll_x set to 0 for the check)] row0: Address=0x1C2D3E00:whole; Length=2266:whole; Tag ends at 43 (inside)
+[design flood C (bursts around a page change and a reload, ends 220x60) (scroll_x set to 0 for the check)] ROWS OK 28/28
+# exit 0 ; clone status after: 0 changed; load: 17.41 17.95 16.27

@@ -1,0 +1,32 @@
+runner sec-r3-run.sh sha256 8f70dd916038119faecd2d3ae51bc8e4ea5e6cc1ea06100f087bce044c077f84; probe sec-r3-probe.py sha256 174ceb2394741f8d5eb1e1426335f211483051e1700c42b0a8364de952b0868f
+s19_app.__file__ = /tmp/b103-e5r3-4-sec/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5r3-4-sec/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 8f396c15d3c848ceb2c98ab74c112150bf9c09759abb662ea0f2162d1ca7c94d
+tests module = /tmp/b103-e5r3-4-sec/tree/tests/test_b103_label_match_perf.py
+mode = r3 build37  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = 4603753492248542638
+host = <runner>  load = (7.93, 5.78, 3.42)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5r3-4-sec/<user>  LOCALAPPDATA = /tmp/b103-e5r3-4-sec/<user>/localappdata  PILOT_DIR = /tmp/b103-e5r3-4-sec/pilot
+probe = sec-r3-probe.py sha256 174ceb2394741f8d5eb1e1426335f211483051e1700c42b0a8364de952b0868f; round-1 helpers = sec-e5-probe.py sha256 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+_FUZZY_TOKEN_CAP = 20; _FUZZY_SWITCH_CAP = 512; T.ANY_QUERY_BOUND_S = 2.0; T.KEYSTROKE_BOUND_S = 0.2
+.37: 'a name list of 50,000 ASCII names that hold at most 2,062,041 characters in all ... at most 64 MiB'
+  REF (.37/1)
+    50,000 names, 2,062,041 characters in all (.40 scope: 50,000 names, <= 2,356,624; .35/.37 scope: <= 2,062,041); all ASCII True; longest name 104; in .37's scope True; build 2.11 s [ok] (raised: False); 77,256 distinct tokens; rank('BVO_PIPT') 21.6 ms [ok] listed 20, bad spans 0
+    tracemalloc peak 18,680,621 B = 17.8 MiB [ok]; 9.1 B per character; load (6.52, 5.66, 3.46)
+  B4MAX (.37/2, b4max_names())
+    50,000 names, 2,043,024 characters in all (.40 scope: 50,000 names, <= 2,356,624; .35/.37 scope: <= 2,062,041); all ASCII True; longest name 47; in .37's scope True; build 3.17 s [ok] (raised: False); 500,000 distinct tokens; rank('FnqrSjys') 24.8 ms [ok] listed 5, bad spans 0
+    tracemalloc peak 61,443,392 B = 58.6 MiB [ok]; 30.1 B per character; load (5.48, 5.48, 3.47)
+  B4MIX (513,699 distinct ASCII tokens)
+    50,000 names, 2,062,039 characters in all (.40 scope: 50,000 names, <= 2,356,624; .35/.37 scope: <= 2,062,041); all ASCII True; longest name 45; in .37's scope True; build 3.45 s [ok] (raised: False); 513,699 distinct tokens; rank('Eygb1534') 9.0 ms [ok] listed 1, bad spans 0
+    tracemalloc peak 62,372,161 B = 59.5 MiB [ok]; 30.2 B per character; load (5.11, 5.39, 3.5)
+  LAT1: 8 distinct 4-letter Latin-1 tokens per name (400,000 distinct; 1-byte strings, not ASCII)
+    50,000 names, 1,950,000 characters in all (.40 scope: 50,000 names, <= 2,356,624; .35/.37 scope: <= 2,062,041); all ASCII False; longest name 39; in .37's scope False; build 2.92 s [ok] (raised: False); 400,000 distinct tokens; rank('\xe4\xe7\xe1\xe0_\xe5\xe7\xe1') 13.8 ms [ok] listed 20, bad spans 0
+    tracemalloc peak 64,302,528 B = 61.3 MiB [ok]; 33.0 B per character; load (5.23, 5.39, 3.56)
+  CJK2: 12 distinct 2-letter CJK tokens per name (600,000 distinct)
+    50,000 names, 1,750,000 characters in all (.40 scope: 50,000 names, <= 2,356,624; .35/.37 scope: <= 2,062,041); all ASCII False; longest name 35; in .37's scope False; build 4.72 s [ok] (raised: False); 600,000 distinct tokens; rank('\u53c4\u4e00_\u53c5\u4e00_\u53c6\u4e00') 10.5 ms [ok] listed 1, bad spans 0
+    tracemalloc peak 128,692,606 B = 122.7 MiB [ok]  > 64 MiB; 73.5 B per character; load (4.9, 5.29, 3.6)
+  AST1: 20 distinct 1-character tokens above U+FFFF per name (1,000,000 distinct)
+    50,000 names, 1,950,000 characters in all (.40 scope: 50,000 names, <= 2,356,624; .35/.37 scope: <= 2,062,041); all ASCII False; longest name 39; in .37's scope False; build 3.79 s [ok] (raised: False); 1,000,000 distinct tokens; rank('\U0001099c_\U0001099d_\U0001099e_\U0001099f_') 17.0 ms [ok] listed 1, bad spans 0
+    tracemalloc peak 218,155,000 B = 208.0 MiB [ok]  > 64 MiB; 111.9 B per character; load (5.04, 5.23, 3.68)
+
+load after = (5.04, 5.23, 3.68)
+probe exit 0

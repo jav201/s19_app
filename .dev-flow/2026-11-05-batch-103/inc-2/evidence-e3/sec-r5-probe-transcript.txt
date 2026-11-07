@@ -1,0 +1,265 @@
+A2L section tree has structural errors: path=/tmp/b103-e3r5-2-security/scratch/tmpnwjdhw70/x.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/tmp/b103-e3r5-2-security/scratch/tmpnwjdhw70/x.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/tmp/b103-e3r5-2-security/scratch/tmpnwjdhw70/x.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/tmp/b103-e3r5-2-security/scratch/tmpnwjdhw70/x.a2l sample=Line 44: /end without /begin
+A2L section tree has structural errors: path=/tmp/b103-e3r5-2-security/scratch/tmpnwjdhw70/x.a2l sample=Line 44: /end without /begin
+A2L section tree has structural errors: path=/tmp/b103-e3r5-2-security/scratch/tmpnwjdhw70/x.a2l sample=Line 46: /end without /begin
+A2L section tree has structural errors: path=/tmp/b103-e3r5-2-security/scratch/tmpnwjdhw70/x.a2l sample=Line 48: /end without /begin
+A2L section tree has structural errors: path=/tmp/b103-e3r5-2-security/scratch/tmpnwjdhw70/x.a2l sample=Line 48: /end without /begin; Line 49: /end without /begin; Line 50: /end without /begin
+A2L section tree has structural errors: path=/tmp/b103-e3r5-2-security/scratch/tmpnwjdhw70/x.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/tmp/b103-e3r5-2-security/scratch/tmpnwjdhw70/x.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/tmp/b103-e3r5-2-security/scratch/tmpnwjdhw70/x.a2l sample=Line 44: /end without /begin
+A2L section tree has structural errors: path=/tmp/b103-e3r5-2-security/scratch/tmpcrmiglea/x.a2l sample=Unclosed /begin sections detected.
+s19_app.__file__ = ~/work/s19_app/s19_app/__init__.py
+
+== Part 1: round-3/4 shapes after a masked neighbour MN (UWORD at 0x10, BIT_MASK 0x000F read) ==
+[P1-A] model mask=0xff0 refusal=None | REF mask=0xff0 | encode 35: BYTES  writes {'0x10': '0xf', '0x11': '0xf0'} | clobber=none | lost-mask simulation: OVERLAP MN | BYTES
+[P1-B] model mask=None refusal=A2L-DEF-MASK | REF mask=0xff0 | encode 35: REFUSED A2L-DEF-MASK | clobber=none | lost-mask simulation: OVERLAP MN | LOST-MASK refused .19
+[P1-C] model mask=None refusal=A2L-DEF-MASK | REF mask=0xff0 | encode 35: REFUSED A2L-DEF-MASK | clobber=none | lost-mask simulation: OVERLAP MN | LOST-MASK refused .19
+[P1-D] model mask=None refusal=A2L-DEF-MASK | REF mask=0xff0 | encode 35: REFUSED A2L-DEF-MASK | clobber=none | lost-mask simulation: OVERLAP MN | LOST-MASK refused .19
+[P1-E] model mask=0xff0 refusal=None | REF mask=0xff0 | encode 35: BYTES  writes {'0x10': '0xf', '0x11': '0xf0'} | clobber=none | lost-mask simulation: OVERLAP MN | BYTES
+[P1-F] model mask=None refusal=A2L-DEF-MASK | REF mask=0xff0 | encode 35: REFUSED A2L-DEF-MASK | clobber=none | lost-mask simulation: OVERLAP MN | LOST-MASK refused .19
+[P1-G] model mask=None refusal=A2L-DEF-MASK | REF mask=0xff0 | encode 35: REFUSED A2L-DEF-MASK | clobber=none | lost-mask simulation: OVERLAP MN | LOST-MASK refused .19
+[P1-H] model mask=None refusal=A2L-DEF-MASK | REF mask=malformed: unterminated string | encode 35: REFUSED A2L-DEF-MASK | clobber=none | lost-mask simulation: OVERLAP MN | refused .19
+[P1-I] model mask=None refusal=A2L-DEF-MASK | REF mask=malformed: unterminated string | encode 35: REFUSED A2L-DEF-MASK | clobber=none | lost-mask simulation: OVERLAP MN | refused .19
+[P1-J] model mask=None refusal=A2L-DEF-MASK | REF mask=malformed: /end MEASUREMENT closes IF_DATA | encode 35: REFUSED A2L-DEF-MASK | clobber=none | lost-mask simulation: OVERLAP MN | refused .19
+[P1-J1] model mask=None refusal=A2L-DEF-MASK | REF mask=0xff0 | encode 35: REFUSED A2L-DEF-MASK | clobber=none | lost-mask simulation: OVERLAP MN | LOST-MASK refused .19
+[P1-K] model mask=None refusal=A2L-DEF-MASK | REF mask=none | encode 35: REFUSED A2L-DEF-MASK | clobber=none | lost-mask simulation: OVERLAP MN | refused .19
+[P1-L] model mask=None refusal=A2L-DEF-MASK | REF mask=0xff0 | encode 35: REFUSED A2L-DEF-MASK | clobber=none | lost-mask simulation: OVERLAP MN | LOST-MASK refused .19
+[P1-L2] model mask=None refusal=A2L-DEF-MASK | REF mask=0xff0 | encode 35: REFUSED A2L-DEF-MASK | clobber=none | lost-mask simulation: OVERLAP MN | LOST-MASK refused .19
+[P1-L5] model mask=None refusal=None | REF mask=malformed: /end IF_DATA closes MEASUREMENT | encode 35: OVERLAP MN | clobber=none | lost-mask simulation: OVERLAP MN | OVERLAP
+[P1-M] model mask=None refusal=A2L-DEF-MASK | REF mask=none | encode 35: REFUSED A2L-DEF-MASK | clobber=none | lost-mask simulation: OVERLAP MN | refused .19
+[P1-N] model mask=0xff0 refusal=None | REF mask=0xff0 | encode 35: BYTES  writes {'0x10': '0xf', '0x11': '0xf0'} | clobber=none | lost-mask simulation: OVERLAP MN | BYTES
+[P1-O] model mask=None refusal=A2L-DEF-MASK | REF mask=none | encode 35: REFUSED A2L-DEF-MASK | clobber=none | lost-mask simulation: OVERLAP MN | refused .19
+[P1-O2] model mask=None refusal=A2L-DEF-MASK | REF mask=none | encode 35: REFUSED A2L-DEF-MASK | clobber=none | lost-mask simulation: OVERLAP MN | refused .19
+[P1-P] model mask=None refusal=A2L-DEF-MASK | REF mask=0xf | encode 35: REFUSED A2L-DEF-MASK | clobber=none | lost-mask simulation: OVERLAP MN | LOST-MASK refused .19
+[P1-Q] model mask=None refusal=A2L-DEF-MASK | REF mask=none | encode 35: REFUSED A2L-DEF-MASK | clobber=none | lost-mask simulation: OVERLAP MN | refused .19
+[P1-R2] model mask=None refusal=A2L-DEF-MASK | REF mask=0xff0 | encode 35: REFUSED A2L-DEF-MASK | clobber=none | lost-mask simulation: OVERLAP MN | LOST-MASK refused .19
+[P1-S] model mask=0xff0 refusal=None | REF mask=0xff0 | encode 35: BYTES  writes {'0x10': '0xf', '0x11': '0xf0'} | clobber=none | lost-mask simulation: OVERLAP MN | BYTES
+[P1-T] model mask=0xff0 refusal=None | REF mask=0xff0 | encode 35: BYTES  writes {'0x10': '0xf', '0x11': '0xf0'} | clobber=none | lost-mask simulation: OVERLAP MN | BYTES
+[P1-U] model mask=0xff0 refusal=None | REF mask=0xff0 | encode 35: BYTES  writes {'0x10': '0xf', '0x11': '0xf0'} | clobber=none | lost-mask simulation: OVERLAP MN | BYTES
+[P1-W] model mask=None refusal=A2L-DEF-MASK | REF mask=none | encode 35: REFUSED A2L-DEF-MASK | clobber=none | lost-mask simulation: OVERLAP MN | refused .19
+[P1-L2C] model mask=None refusal=A2L-DEF-MASK | REF mask=0xff0 | encode 35: REFUSED A2L-DEF-MASK | clobber=none | lost-mask simulation: OVERLAP MN | LOST-MASK refused .19
+[P1-L2N] model mask=None refusal=A2L-DEF-MASK | REF mask=0xff0 | encode 35: REFUSED A2L-DEF-MASK | clobber=none | lost-mask simulation: OVERLAP MN | LOST-MASK refused .19
+[P1-L7] model mask=None refusal=A2L-DEF-MASK | REF mask=0xff0 | encode 35: REFUSED A2L-DEF-MASK | clobber=none | lost-mask simulation: OVERLAP MN | LOST-MASK refused .19
+[P1-J2] model mask=None refusal=A2L-DEF-MASK | REF mask=0xff0 | encode 35: REFUSED A2L-DEF-MASK | clobber=none | lost-mask simulation: OVERLAP MN | LOST-MASK refused .19
+[P1-J3] model mask=None refusal=A2L-DEF-MASK | REF mask=0xff0 | encode 35: REFUSED A2L-DEF-MASK | clobber=none | lost-mask simulation: OVERLAP MN | LOST-MASK refused .19
+[P1-J4] model mask=None refusal=A2L-DEF-MASK | REF mask=0xff0 | encode 35: REFUSED A2L-DEF-MASK | clobber=none | lost-mask simulation: OVERLAP MN | LOST-MASK refused .19
+[P1-J5] model mask=None refusal=A2L-DEF-MASK | REF mask=none | encode 35: REFUSED A2L-DEF-MASK | clobber=none | lost-mask simulation: OVERLAP MN | refused .19
+[P1-X] model mask=None refusal=None | REF mask=none | encode 35: OVERLAP MN | clobber=none | lost-mask simulation: OVERLAP MN | OVERLAP
+[P1-X2] model mask=None refusal=A2L-DEF-MASK | REF mask=none | encode 35: REFUSED A2L-DEF-MASK | clobber=none | lost-mask simulation: OVERLAP MN | refused .19
+[P1-N2] model mask=None refusal=None | REF mask=none | encode 35: OVERLAP MN | clobber=none | lost-mask simulation: OVERLAP MN | OVERLAP
+[P1-CMN] model mask=None refusal=A2L-DEF-MASK | REF mask=none | encode 35: REFUSED A2L-DEF-MASK | clobber=none | lost-mask simulation: OVERLAP MN | refused .19
+[P1-total] (REF mask lost by the model, outcome): (False, 'BYTES'): 6, (False, 'OVERLAP'): 3, (False, 'REFUSED'): 12, (True, 'REFUSED'): 16
+
+== Part 2: attacks on R-A2L-DEF.138 (X = the object encoded) ==
+
+-- A: the neighbour is not in the index --
+[A1] N's ECU_ADDRESS word glued to a comment: `ECU_ADDRESS 0x10/* moved */`
+     parse errors=[]
+     model objects: X@0x10+2 big mask=None kind=number/enum ref=None; N@None+2 big mask=None kind=number/enum ref=A2L-DEF-ADDRESS
+     REF objects:   X@0x10 1x2 big mask=None bits={'0x10': '0xff', '0x11': '0xff'}; N@0x10 1x2 big mask=None bits={'0x10': '0xff', '0x11': '0xff'}
+     encode X [POS]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> CLOBBER N
+     encode X [NAME]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> CLOBBER N
+     encode X [ANY]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> CLOBBER N
+     encode X [CLEAN]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> CLOBBER N
+[A2] a comment between ECU_ADDRESS and its word: `ECU_ADDRESS /* new */ 0x10`
+     parse errors=[]
+     model objects: X@0x10+2 big mask=None kind=number/enum ref=None; N@None+2 big mask=None kind=number/enum ref=A2L-DEF-ADDRESS
+     REF objects:   X@0x10 1x2 big mask=None bits={'0x10': '0xff', '0x11': '0xff'}; N@0x10 1x2 big mask=None bits={'0x10': '0xff', '0x11': '0xff'}
+     encode X [POS]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> CLOBBER N
+     encode X [NAME]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> CLOBBER N
+     encode X [ANY]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> CLOBBER N
+     encode X [CLEAN]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> CLOBBER N
+[A3] N: a one-line IF_DATA (V171 style) before its ECU_ADDRESS line
+     parse errors=['Unclosed /begin sections detected.']
+     model objects: X@0x10+2 big mask=None kind=number/enum ref=None; N@None+2 big mask=None kind=number/enum ref=A2L-DEF-ADDRESS
+     REF objects:   X@0x10 1x2 big mask=None bits={'0x10': '0xff', '0x11': '0xff'}; N@0x10 1x2 big mask=None bits={'0x10': '0xff', '0x11': '0xff'}
+     encode X [POS]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> CLOBBER N
+     encode X [NAME]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> CLOBBER N
+     encode X [ANY]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> CLOBBER N
+     encode X [CLEAN]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> CLOBBER N
+[A4] N CHARACTERISTIC, header address glued to a comment: `VALUE 0x10/* c */RL_U16 ...`
+     parse errors=[]
+     model objects: X@0x10+2 big mask=None kind=number/enum ref=None; N@None+None big mask=None kind=None ref=A2L-DEF-KIND
+     REF objects:   X@0x10 1x2 big mask=None bits={'0x10': '0xff', '0x11': '0xff'}; N@0x10 1x2 big mask=None bits={'0x10': '0xff', '0x11': '0xff'}
+     encode X [POS]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> CLOBBER N
+     encode X [NAME]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> CLOBBER N
+     encode X [ANY]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> CLOBBER N
+     encode X [CLEAN]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> CLOBBER N
+[A5] N in an /include file
+     parse errors=[]
+     model objects: X@0x10+2 big mask=None kind=number/enum ref=None
+     REF objects:   X@0x10 1x2 big mask=None bits={'0x10': '0xff', '0x11': '0xff'}; N@0x10 1x2 big mask=None bits={'0x10': '0xff', '0x11': '0xff'}
+     encode X [POS]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> CLOBBER N
+     encode X [NAME]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> CLOBBER N
+     encode X [ANY]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> CLOBBER N
+     encode X [CLEAN]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> CLOBBER N
+[A6] N an AXIS_PTS at 0x10 (4 points; ruled to Inc 3)
+     parse errors=[]
+     model objects: X@0x10+2 big mask=None kind=number/enum ref=None
+     REF objects:   X@0x10 1x2 big mask=None bits={'0x10': '0xff', '0x11': '0xff'}; N@0x10 4x2 big mask=None bits={'0x10': '0xff', '0x11': '0xff', '0x12': '0xff', '0x13': '0xff', '0x14': '0xff', '0x15': '0xff', '0x16': '0xff', '0x17': '0xff'}
+     encode X [POS]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> CLOBBER N
+     encode X [NAME]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> CLOBBER N
+     encode X [ANY]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> CLOBBER N
+     encode X [CLEAN]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> CLOBBER N
+[A7] N a BLOB at 0x10, 2 bytes
+     parse errors=[]
+     model objects: X@0x10+2 big mask=None kind=number/enum ref=None
+     REF objects:   X@0x10 1x2 big mask=None bits={'0x10': '0xff', '0x11': '0xff'}; N@0x10 2x1 big mask=None bits={'0x10': '0xff', '0x11': '0xff'}
+     encode X [POS]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> CLOBBER N
+     encode X [NAME]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> CLOBBER N
+     encode X [ANY]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> CLOBBER N
+     encode X [CLEAN]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> CLOBBER N
+[A8] N a VAL_BLK `NUMBER 4` at 0x10 (RL_U16: no length in the tag table); X at 0x14
+     parse errors=[]
+     model objects: X@0x14+2 big mask=None kind=number/enum ref=None; N@0x10+None big mask=None kind=None ref=A2L-DEF-KIND
+     REF objects:   X@0x14 1x2 big mask=None bits={'0x14': '0xff', '0x15': '0xff'}; N@0x10 4x2 big mask=None bits={'0x10': '0xff', '0x11': '0xff', '0x12': '0xff', '0x13': '0xff', '0x14': '0xff', '0x15': '0xff', '0x16': '0xff', '0x17': '0xff'}
+     encode X [POS]: BYTES  writes {'0x14': '0xff', '0x15': '0xff'} -> CLOBBER N
+     encode X [NAME]: BYTES  writes {'0x14': '0xff', '0x15': '0xff'} -> CLOBBER N
+     encode X [ANY]: BYTES  writes {'0x14': '0xff', '0x15': '0xff'} -> CLOBBER N
+     encode X [CLEAN]: BYTES  writes {'0x14': '0xff', '0x15': '0xff'} -> CLOBBER N
+[A9] N an INSTANCE of a UWORD typedef at 0x10
+     parse errors=[]
+     model objects: X@0x10+2 big mask=None kind=number/enum ref=None
+     REF objects:   X@0x10 1x2 big mask=None bits={'0x10': '0xff', '0x11': '0xff'}; N@0x10 1x2 big mask=None bits={'0x10': '0xff', '0x11': '0xff'}
+     encode X [POS]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> CLOBBER N
+     encode X [NAME]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> CLOBBER N
+     encode X [ANY]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> CLOBBER N
+     encode X [CLEAN]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> CLOBBER N
+
+-- B: the neighbour's span is wrong --
+[B1] N `MATRIX_DIM 1 4 1` (x = 1): the tag reads 1, a scalar of 2 bytes; X at 0x14
+     parse errors=[]
+     model objects: X@0x14+2 big mask=None kind=number/enum ref=None; N@0x10+2 big mask=None kind=number/enum ref=None
+     REF objects:   X@0x14 1x2 big mask=None bits={'0x14': '0xff', '0x15': '0xff'}; N@0x10 4x2 big mask=None bits={'0x10': '0xff', '0x11': '0xff', '0x12': '0xff', '0x13': '0xff', '0x14': '0xff', '0x15': '0xff', '0x16': '0xff', '0x17': '0xff'}
+     encode X [POS]: BYTES  writes {'0x14': '0xff', '0x15': '0xff'} -> CLOBBER N
+     encode X [NAME]: BYTES  writes {'0x14': '0xff', '0x15': '0xff'} -> CLOBBER N
+     encode X [ANY]: BYTES  writes {'0x14': '0xff', '0x15': '0xff'} -> CLOBBER N
+     encode X [CLEAN]: BYTES  writes {'0x14': '0xff', '0x15': '0xff'} -> CLOBBER N
+[B1n] the same N encoded (kind number from MATRIX_DIM 1 4 1)
+     parse errors=[]
+     model objects: X@0x40+2 big mask=None kind=number/enum ref=None; N@0x10+2 big mask=None kind=number/enum ref=None
+     REF objects:   X@0x40 1x2 big mask=None bits={'0x40': '0xff', '0x41': '0xff'}; N@0x10 4x2 big mask=None bits={'0x10': '0xff', '0x11': '0xff', '0x12': '0xff', '0x13': '0xff', '0x14': '0xff', '0x15': '0xff', '0x16': '0xff', '0x17': '0xff'}
+     encode N [POS]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> ok
+     encode N [NAME]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> ok
+     encode N [ANY]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> ok
+     encode N [CLEAN]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> ok
+[B2] N `MATRIX_DIM 2 2`: the tag reads 2 (4 bytes, REF 8); X at 0x16
+     parse errors=[]
+     model objects: X@0x16+2 big mask=None kind=number/enum ref=None; N@0x10+4 big mask=None kind=None ref=A2L-DEF-KIND
+     REF objects:   X@0x16 1x2 big mask=None bits={'0x16': '0xff', '0x17': '0xff'}; N@0x10 4x2 big mask=None bits={'0x10': '0xff', '0x11': '0xff', '0x12': '0xff', '0x13': '0xff', '0x14': '0xff', '0x15': '0xff', '0x16': '0xff', '0x17': '0xff'}
+     encode X [POS]: BYTES  writes {'0x16': '0xff', '0x17': '0xff'} -> CLOBBER N
+     encode X [NAME]: BYTES  writes {'0x16': '0xff', '0x17': '0xff'} -> CLOBBER N
+     encode X [ANY]: BYTES  writes {'0x16': '0xff', '0x17': '0xff'} -> CLOBBER N
+     encode X [CLEAN]: BYTES  writes {'0x16': '0xff', '0x17': '0xff'} -> CLOBBER N
+[B3] N: live `ECU_ADDRESS 0x20`, then an old `ECU_ADDRESS 0x10` inside a /* ... */ block; X at 0x20
+     parse errors=[]
+     model objects: X@0x20+2 big mask=None kind=number/enum ref=None; N@0x10+2 big mask=None kind=number/enum ref=None
+     REF objects:   X@0x20 1x2 big mask=None bits={'0x20': '0xff', '0x21': '0xff'}; N@0x20 1x2 big mask=None bits={'0x20': '0xff', '0x21': '0xff'}
+     encode X [POS]: BYTES  writes {'0x20': '0xff', '0x21': '0xff'} -> CLOBBER N
+     encode X [NAME]: BYTES  writes {'0x20': '0xff', '0x21': '0xff'} -> CLOBBER N
+     encode X [ANY]: BYTES  writes {'0x20': '0xff', '0x21': '0xff'} -> CLOBBER N
+     encode X [CLEAN]: BYTES  writes {'0x20': '0xff', '0x21': '0xff'} -> CLOBBER N
+[B3n] the same N encoded (alone at its old address)
+     parse errors=[]
+     model objects: X@0x40+2 big mask=None kind=number/enum ref=None; N@0x10+2 big mask=None kind=number/enum ref=None
+     REF objects:   X@0x40 1x2 big mask=None bits={'0x40': '0xff', '0x41': '0xff'}; N@0x20 1x2 big mask=None bits={'0x20': '0xff', '0x21': '0xff'}
+     encode N [POS]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> writes outside its own REF bits
+     encode N [NAME]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> writes outside its own REF bits
+     encode N [ANY]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> writes outside its own REF bitsA2L section tree has structural errors: path=/tmp/b103-e3r5-2-security/scratch/tmpcrmiglea/x.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/work/s19_app/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+
+     encode N [CLEAN]: BYTES  writes {'0x10': '0xff', '0x11': '0xff'} -> writes outside its own REF bits
+[B4] N: live `MATRIX_DIM 4`, then `MATRIX_DIM 1` inside a /* ... */ block; X at 0x14
+     parse errors=[]
+     model objects: X@0x14+2 big mask=None kind=number/enum ref=None; N@0x10+2 big mask=None kind=number/enum ref=None
+     REF objects:   X@0x14 1x2 big mask=None bits={'0x14': '0xff', '0x15': '0xff'}; N@0x10 4x2 big mask=None bits={'0x10': '0xff', '0x11': '0xff', '0x12': '0xff', '0x13': '0xff', '0x14': '0xff', '0x15': '0xff', '0x16': '0xff', '0x17': '0xff'}
+     encode X [POS]: BYTES  writes {'0x14': '0xff', '0x15': '0xff'} -> CLOBBER N
+     encode X [NAME]: BYTES  writes {'0x14': '0xff', '0x15': '0xff'} -> CLOBBER N
+     encode X [ANY]: BYTES  writes {'0x14': '0xff', '0x15': '0xff'} -> CLOBBER N
+     encode X [CLEAN]: BYTES  writes {'0x14': '0xff', '0x15': '0xff'} -> CLOBBER N
+[B5] N ASCII with `MATRIX_DIM 8` (1.7 style, no NUMBER) at 0x10; X UBYTE VALUE at 0x14
+     parse errors=[]
+     model objects: X@0x14+1 big mask=None kind=number/enum ref=None; N@0x10+None big mask=None kind=text ref=A2L-DEF-ADDRESS
+     REF objects:   X@0x14 1x1 big mask=None bits={'0x14': '0xff'}; N@0x10 8x1 big mask=None bits={'0x10': '0xff', '0x11': '0xff', '0x12': '0xff', '0x13': '0xff', '0x14': '0xff', '0x15': '0xff', '0x16': '0xff', '0x17': '0xff'}
+     encode X [POS]: BYTES  writes {'0x14': '0xff'} -> CLOBBER N
+     encode X [NAME]: BYTES  writes {'0x14': '0xff'} -> CLOBBER N
+     encode X [ANY]: BYTES  writes {'0x14': '0xff'} -> CLOBBER N
+     encode X [CLEAN]: BYTES  writes {'0x14': '0xff'} -> CLOBBER N
+
+-- C: both masks read, the exemption trusts a wrong frame or mask --
+[C1] N UWORD 0x000F: its `BYTE_ORDER MSB_LAST` line after a one-line IF_DATA (lost); X UBYTE 0x10 BIT_MASK 0x0F
+     parse errors=['Unclosed /begin sections detected.']
+     model objects: X@0x10+1 big mask=0xf kind=number/enum ref=None; N@0x10+2 big mask=0xf kind=number/enum ref=None
+     REF objects:   X@0x10 1x1 big mask=0xf bits={'0x10': '0xf'}; N@0x10 1x2 little mask=0xf bits={'0x10': '0xf'}
+     encode X [POS]: BYTES  writes {'0x10': '0xf'} -> CLOBBER N
+     encode X [NAME]: BYTES  writes {'0x10': '0xf'} -> CLOBBER N
+     encode X [ANY]: BYTES  writes {'0x10': '0xf'} -> CLOBBER N
+     encode X [CLEAN]: BYTES  writes {'0x10': '0xf'} -> CLOBBER N
+[C2] N UWORD 0x000F: live `BYTE_ORDER MSB_LAST`, then `BYTE_ORDER MSB_FIRST` in a /* ... */ block (last wins)
+     parse errors=[]
+     model objects: X@0x10+1 big mask=0xf kind=number/enum ref=None; N@0x10+2 big mask=0xf kind=number/enum ref=None
+     REF objects:   X@0x10 1x1 big mask=0xf bits={'0x10': '0xf'}; N@0x10 1x2 little mask=0xf bits={'0x10': '0xf'}
+     encode X [POS]: BYTES  writes {'0x10': '0xf'} -> CLOBBER N
+     encode X [NAME]: BYTES  writes {'0x10': '0xf'} -> CLOBBER N
+     encode X [ANY]: BYTES  writes {'0x10': '0xf'} -> CLOBBER N
+     encode X [CLEAN]: BYTES  writes {'0x10': '0xf'} -> CLOBBER N
+[C3] MOD_COMMON: `BYTE_ORDER MSB_LAST` inside /* ... */, then the live MSB_FIRST (first wins); X 0x000F, N 0x0F00, UWORDs at 0x10
+     parse errors=[]
+     model objects: X@0x10+2 little mask=0xf kind=number/enum ref=None; N@0x10+2 little mask=0xf00 kind=number/enum ref=None
+     REF objects:   X@0x10 1x2 big mask=0xf bits={'0x11': '0xf'}; N@0x10 1x2 big mask=0xf00 bits={'0x10': '0xf'}
+     encode X [POS]: BYTES  writes {'0x10': '0xf'} -> CLOBBER N
+     encode X [NAME]: BYTES  writes {'0x10': '0xf'} -> CLOBBER N
+     encode X [ANY]: BYTES  writes {'0x10': '0xf'} -> CLOBBER N
+     encode X [CLEAN]: BYTES  writes {'0x10': '0xf'} -> CLOBBER N
+[C4] a commented-out old copy of N (0x40, BIT_MASK 0xF000) above the live N (0x10, BIT_MASK 0x00F0); X UWORD 0x10 BIT_MASK 0x00F0
+     parse errors=[]
+     model objects: X@0x10+2 big mask=0xf0 kind=number/enum ref=None; N@0x40+2 big mask=0xf000 kind=number/enum ref=A2L-DEF-NAME(dup); N@0x10+2 big mask=0xf0 kind=number/enum ref=A2L-DEF-NAME(dup)
+     REF objects:   X@0x10 1x2 big mask=0xf0 bits={'0x11': '0xf0'}; N@0x10 1x2 big mask=0xf0 bits={'0x11': '0xf0'}
+     encode X [POS]: OVERLAP N  -> ok
+     encode X [NAME]: BYTES  writes {'0x11': '0xf0'} -> CLOBBER N
+     encode X [ANY]: OVERLAP N  -> ok
+     encode X [CLEAN]: OVERLAP N  -> ok
+[C5] N `BIT_MASK 0x000F/* nibble */0` (the base glues 0x000F0); X UWORD 0x10 BIT_MASK 0x000F
+     parse errors=[]
+     model objects: X@0x10+2 big mask=0xf kind=number/enum ref=None; N@0x10+2 big mask=0xf0 kind=number/enum ref=None
+     REF objects:   X@0x10 1x2 big mask=0xf bits={'0x11': '0xf'}; N@0x10 1x2 big mask=0xf bits={'0x11': '0xf'}
+     encode X [POS]: BYTES  writes {'0x11': '0xf'} -> CLOBBER N
+     encode X [NAME]: BYTES  writes {'0x11': '0xf'} -> CLOBBER N
+     encode X [ANY]: BYTES  writes {'0x11': '0xf'} -> CLOBBER N
+     encode X [CLEAN]: BYTES  writes {'0x11': '0xf'} -> CLOBBER N
+[C6] N a 2-element MEASUREMENT (`MATRIX_DIM 2`) with BIT_MASK 0x00FF at 0x10; X UWORD 0x10 BIT_MASK 0x00FF
+     parse errors=[]
+     model objects: X@0x10+2 big mask=0xff kind=number/enum ref=None; N@0x10+4 big mask=None kind=None ref=A2L-DEF-KIND
+     REF objects:   X@0x10 1x2 big mask=0xff bits={'0x11': '0xff'}; N@0x10 2x2 big mask=0xff bits={'0x11': '0xff', '0x13': '0xff'}
+     encode X [POS]: OVERLAP N  -> ok
+     encode X [NAME]: OVERLAP N  -> ok
+     encode X [ANY]: BYTES  writes {'0x11': '0xff'} -> CLOBBER N
+     encode X [CLEAN]: OVERLAP N  -> ok
+[C7] N `MATRIX_DIM 1 2 1` UWORD BIT_MASK 0x000F at 0x10 (kind number, span 2); X UBYTE 0x13 BIT_MASK 0x0F
+     parse errors=[]
+     model objects: X@0x13+1 big mask=0xf kind=number/enum ref=None; N@0x10+2 big mask=0xf kind=number/enum ref=None
+     REF objects:   X@0x13 1x1 big mask=0xf bits={'0x13': '0xf'}; N@0x10 2x2 big mask=0xf bits={'0x11': '0xf', '0x13': '0xf'}
+     encode X [POS]: BYTES  writes {'0x13': '0xf'} -> CLOBBER N
+     encode X [NAME]: BYTES  writes {'0x13': '0xf'} -> CLOBBER N
+     encode X [ANY]: BYTES  writes {'0x13': '0xf'} -> CLOBBER N
+     encode X [CLEAN]: BYTES  writes {'0x13': '0xf'} -> CLOBBER N
+
+-- D: a text object whose bytes are shared --
+[D1] X ASCII NUMBER 4 at 0x10, N UBYTE VALUE at 0x12
+     parse errors=[]
+     model objects: X@0x10+4 big mask=None kind=text ref=None; N@0x12+1 big mask=None kind=number/enum ref=None
+     REF objects:   X@0x10 4x1 big mask=None bits={'0x10': '0xff', '0x11': '0xff', '0x12': '0xff', '0x13': '0xff'}; N@0x12 1x1 big mask=None bits={'0x12': '0xff'}
+     encode X [POS]: OVERLAP N  -> ok
+     encode X [NAME]: OVERLAP N  -> ok
+     encode X [ANY]: OVERLAP N  -> ok
+     encode X [CLEAN]: OVERLAP N  -> ok
+
+== Part 3: the 35 fixture files ==
+[FX-total] matrix-dim-product-differs=14 declared-no-length=306 files=35 objects=234654 indexed=223743 pos-vs-clean-shared_with-differs=0
+[FX-lost-address] []
+[FX-byte-order] []
+[FX-matrix-dim] [('examples/case_00_public/ASAP2_Demo_V161.a2l', 'ASAM.M.MATRIX_DIM_8_2_1.UBYTE.IDENTICAL', ['8', '2', '1'], True), ('examples/case_00_public/ASAP2_Demo_V161.a2l', 'ASAM.M.MATRIX_DIM_8_4_2.UBYTE.IDENTICAL', ['8', '4', '2'], True), ('examples/case_00_public/ASAP2_Demo_V161.a2l', 'ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR', ['3', '4', '1'], True), ('examples/case_00_public/ASAP2_Demo_V161.a2l', 'ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.COLUMN_DIR', ['3', '4', '1'], True), ('examples/case_00_public/ASAP2_Demo_V171.a2l', 'ASAM.M.MATRIX_DIM_8_2.UBYTE.IDENTICAL', ['8', '2'], True), ('examples/case_00_public/ASAP2_Demo_V171.a2l', 'ASAM.M.MATRIX_DIM_8_4_2.UBYTE.IDENTICAL', ['8', '4', '2'], True), ('examples/case_00_public/ASAP2_Demo_V171.a2l', 'ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR', ['3', '4'], True), ('examples/case_00_public/ASAP2_Demo_V171.a2l', 'ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.COLUMN_DIR', ['3', '4'], True), ('examples/case_00_public/ASAP2_Demo_V171.a2l', 'ASAM.C.DEPENDENT.ARRAY_1', ['3', '4'], True), ('examples/case_00_public/ASAP2_Demo_V171.a2l', 'ASAM.C.DEPENDENT.ARRAY_2', ['3', '4'], True), ('examples/case_00_public/ASAP2_Demo_V171.a2l', 'ASAM.C.DEPENDENT.ARRAY_3', ['3', '4'], True), ('examples/case_00_public/ASAP2_Demo_V171.a2l', 'ASAM.C.DEPENDENT.ARRAY_4', ['3', '4'], True)]
+[FX-declared-no-length-inside] []
+[FX-exempt] [('examples/case_00_public/ASAP2_Demo_V161.a2l', 'ASAM.M.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0', '0xff0', 'ASAM.M.SCALAR.UWORD.IDENTICAL.BITMASK_0008', '0x8', None), ('examples/case_00_public/ASAP2_Demo_V161.a2l', 'ASAM.M.SCALAR.UWORD.IDENTICAL.BITMASK_0008', '0x8', 'ASAM.M.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0', '0xff0', None), ('examples/case_00_public/ASAP2_Demo_V161.a2l', 'ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0', '0xff0', 'ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0001', '0x1', None), ('examples/case_00_public/ASAP2_Demo_V161.a2l', 'ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0001', '0x1', 'ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0', '0xff0', None), ('examples/case_00_public/ASAP2_Demo_V161.a2l', 'ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0001', '0x1', 'ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0010', '0x10', None), ('examples/case_00_public/ASAP2_Demo_V161.a2l', 'ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0010', '0x10', 'ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0001', '0x1', None), ('examples/case_00_public/ASAP2_Demo_V171.a2l', 'ASAM.M.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0', '0xff0', 'ASAM.M.SCALAR.UWORD.IDENTICAL.BITMASK_0008', '0x8', None), ('examples/case_00_public/ASAP2_Demo_V171.a2l', 'ASAM.M.SCALAR.UWORD.IDENTICAL.BITMASK_0008', '0x8', 'ASAM.M.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0', '0xff0', None), ('examples/case_00_public/ASAP2_Demo_V171.a2l', 'ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0', '0xff0', 'ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0001', '0x1', None), ('examples/case_00_public/ASAP2_Demo_V171.a2l', 'ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0001', '0x1', 'ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0', '0xff0', None), ('examples/case_00_public/ASAP2_Demo_V171.a2l', 'ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0001', '0x1', 'ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0010', '0x10', None), ('examples/case_00_public/ASAP2_Demo_V171.a2l', 'ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0010', '0x10', 'ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0001', '0x1', None), ('examples/case_00_public/update_test1.a2l', 'Measurement_Bitfield_bits1', '0x1f', 'Measurement_Bitfield_bits2', '0xfffe0', None), ('examples/case_00_public/update_test1.a2l', 'Measurement_Bitfield_bits1', '0x1f', 'Measurement_Bitfield_bits3', '0xff00000', None), ('examples/case_00_public/update_test1.a2l', 'Measurement_Bitfield_bits2', '0xfffe0', 'Measurement_Bitfield_bits1', '0x1f', None), ('examples/case_00_public/update_test1.a2l', 'Measurement_Bitfield_bits2', '0xfffe0', 'Measurement_Bitfield_bits3', '0xff00000', None), ('examples/case_00_public/update_test1.a2l', 'Measurement_Bitfield_bits3', '0xff00000', 'Measurement_Bitfield_bits1', '0x1f', None), ('examples/case_00_public/update_test1.a2l', 'Measurement_Bitfield_bits3', '0xff00000', 'Measurement_Bitfield_bits2', '0xfffe0', None), ('examples/case_00_public/update_test2.a2l', 'Measurement_Bitfield_bits2', '0xfffe0', 'Measurement_Bitfield_bits3', '0xff00000', None), ('examples/case_00_public/update_test2.a2l', 'Measurement_Bitfield_bits3', '0xff00000', 'Measurement_Bitfield_bits2', '0xfffe0', None)]

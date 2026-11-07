@@ -1,0 +1,10 @@
+grep -rn 'R-A2L-MATCH\.41' (before this pass's record edits; 01-requirements.md edited only in definitions, edge cases and counts so far)
+== s19_app-b103-inc4-code @ 7a771e59
+s19_app-b103-inc4-code/.dev-flow/2026-11-05-batch-103/inc-4/evidence-e5/d2-probe.py:821:    print(f"\nR-A2L-MATCH.41 cases (pilot cap N = {cap}) and their negative control (shipped rank, no cap)")
+matches: 1
+== s19_app-b103-inc4-tests @ 889ab444
+matches: 0
+== s19_app-b103 @ 3d86eda0
+matches: 0
+== s19_app @ 09b4808a
+matches: 0

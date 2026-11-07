@@ -1,0 +1,41 @@
+# M-.29
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.29/s19_app/__init__.py
+# note: last entry wins (dict overwrite)
+#   EDIT-OK: '            if raw not in first_of:\n                first_of[raw] = po'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..b9370b39 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -911,8 +911,7 @@ def _build_enum_form(
+             raw = entry.raw
+             if isinstance(raw, float) and math.isnan(raw):
+                 continue
+-            if raw not in first_of:
+-                first_of[raw] = pos
++            first_of[raw] = pos
+         return _EnumForm(
+             section_kind=section_kind,
+             entries=entries,
+
+# --- pytest (rc=1) ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________ test_r_a2l_def_29_1_first_of_two_entries_with_one_raw _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-972/test_r_a2l_def_29_1_first_of_t0')
+
+    def test_r_a2l_def_29_1_first_of_two_entries_with_one_raw(tmp_path):
+        """R-A2L-DEF.29/1 - ``1 "A"`` ``1 "B"``, stored 1 -> A."""
+        a2l = _inline(tmp_path, *_enum_blocks("CM_D", "VT_D", "2", '1 "A"', '1 "B"'), _val("ED", "0x10", "RL_U8", "CM_D"))
+        d = describe_definition("ED", a2l)
+>       assert _decoded(d, a2l, _img(0x10, b"\x01")).text == "A"
+E       AssertionError: assert 'B' == 'A'
+E         
+E         - A
+E         + B
+
+../base/tests/test_b103_a2l_definition.py:906: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_29_1_first_of_two_entries_with_one_raw
+1 failed, 190 deselected in 0.45s

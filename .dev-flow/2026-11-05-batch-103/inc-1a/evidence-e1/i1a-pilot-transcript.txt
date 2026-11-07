@@ -1,0 +1,70 @@
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+write_os_clipboard: every strategy failed (cascade=['win32', 'tkinter', 'powershell'])
+OS clipboard write failed; retained Textual internal clipboard only
+write_os_clipboard: every strategy failed (cascade=['win32', 'tkinter', 'powershell'])
+OS clipboard write failed; retained Textual internal clipboard only
+write_os_clipboard: every strategy failed (cascade=['win32', 'tkinter', 'powershell'])
+OS clipboard write failed; retained Textual internal clipboard only
+write_os_clipboard: every strategy failed (cascade=['win32', 'tkinter', 'powershell'])
+OS clipboard write failed; retained Textual internal clipboard only
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+python = 3.11.18; platform = linux; DISPLAY=None; WAYLAND_DISPLAY=None
+textual = 8.2.8
+
+== P1 Tcl build ==
+TclVersion=8.6 patchlevel=8.6.13 threaded=1
+
+== P2 one Tcl call: main thread vs executor thread ==
+main thread    : 0.0 ms -> ok
+executor run 0 : 0.0 ms -> RuntimeError: Calling Tcl from different apartment
+executor run 1 : 0.0 ms -> RuntimeError: Calling Tcl from different apartment
+
+== P3 product _read_via_tk / read_os_clipboard with the Tcl stand-in root ==
+retry budget in code: _TK_RETRIES=3 _TK_RETRY_DELAY_S=0.05 _CTYPES_RETRIES=5 _POWERSHELL_TIMEOUT_S=2.0
+read cascade order: ['tkinter', 'ctypes-win32', 'powershell']; write cascade order: ['win32', 'tkinter', 'powershell']
+PowerShell argv[0] read: 'powershell' (literal in _read_via_powershell); write: 'powershell'
+_read_via_tk main thread      : 152.4 ms -> None
+_read_via_tk executor thread  : 3155.0 ms -> None
+read_os_clipboard executor    : 3158.5 ms -> None
+_write_via_tk main thread     : 0.1 ms -> False
+_write_via_tk executor thread : 1001.3 ms -> False
+as the host is (no display): _read_via_tk main = 2.6 ms -> None; _TK_ROOT unavailable=True
+
+== P4a Ctrl+V latency, host as is (Tk root cannot be created: no display) ==
+  OsClipboardInput  ctrl+v -> landed after     62.5 ms; content='SEED-from-app-clipboard'
+  CappedTextArea    ctrl+v -> landed after     63.8 ms; content='SEED-from-app-clipboard'
+
+== P4b Ctrl+V latency, Tcl stand-in as the shared root (the cross-thread call of D1) ==
+  OsClipboardInput  ctrl+v -> landed after   3160.5 ms; content='SEED-from-app-clipboard'
+  CappedTextArea    ctrl+v -> landed after   3162.6 ms; content='SEED-from-app-clipboard'
+
+== P5 copy / cut on Linux today ==
+  OsClipboardInput  ctrl+c: app clipboard='COPYME-1'; box now='COPYME-1'; notices=[('warning', 'Clipboard write failed — copied inside the app only.')]; OSC52 sequences sent=1 ['\x1b]52;c;Q09QWU1FLTE=\x07']; 497 ms window
+  CappedTextArea    ctrl+c: app clipboard='COPYME-2'; box now='COPYME-2'; notices=[('warning', 'Clipboard write failed — copied inside the app only.')]; OSC52 sequences sent=1 ['\x1b]52;c;Q09QWU1FLTI=\x07']; 499 ms window
+  OsClipboardInput  ctrl+x: app clipboard='COPYME-1'; box now=''; notices=[('warning', 'Clipboard write failed — copied inside the app only.')]; OSC52 sequences sent=1 ['\x1b]52;c;Q09QWU1FLTE=\x07']; 533 ms window
+  CappedTextArea    ctrl+x: app clipboard='COPYME-2'; box now=''; notices=[('warning', 'Clipboard write failed — copied inside the app only.')]; OSC52 sequences sent=1 ['\x1b]52;c;Q09QWU1FLTI=\x07']; 542 ms window
+  OsClipboardInput  ctrl+c, empty selection: app clipboard='BEFORE'
+
+== P6 / P7 / P8 ==
+  P6 terminal paste 'L1\nL2' into OsClipboardInput : 'L1' (26.1 ms)
+  P6 terminal paste 'L1\nL2' into CappedTextArea   : 'L1\nL2L1\nL2' (30.9 ms)
+  P6 terminal paste of 70,000 chars into OsClipboardInput : length 70000
+  P6 terminal paste of 70,000 chars into CappedTextArea   : length 131072
+  P7 ctrl+v, no OS reader, app clipboard 70,000 chars, into OsClipboardInput: length 70000
+  P8 log records of one ctrl+v (no OS reader):
+     ('s19_app.tui.os_clipboard_input', 'WARNING', "read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])")
+     ('s19_app.tui.os_clipboard_input', 'DEBUG', 'action_paste inserted 14 chars from internal clipboard')
+  P8 clipboard text in any log record: False
+
+== P9 real app ==
+  S19TuiApp #a2l_tags_filter_input ctrl+v (host as is) -> 357.9 ms; 'SEED-in-real-app'
+  S19TuiApp #a2l_tags_filter_input ctrl+v (Tcl stand-in root) -> 3252.0 ms; 'SEED-in-real-app'
+
+pilot done
