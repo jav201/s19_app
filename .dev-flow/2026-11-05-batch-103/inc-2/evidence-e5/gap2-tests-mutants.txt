@@ -1,0 +1,28 @@
+# mutant M1: plain bisect over ranges sorted by min replaces the segment index (.150/6)
+# host: cachyos-rtx | 2026-11-07T05:06:45-06:00 | load: 15.47 12.03 9.14
+# a2l_definition.py md5: 1297e5a370647e08052513f7622dcb07
+/tmp/b103-e5g2t/m1/s19_app/__init__.py
+# python Python 3.11.18
+F                                                                        [100%]
+=================================== FAILURES ===================================
+/tmp/b103-e5g2t/m1/tests/test_b103_a2l_definition.py:2143: AssertionError: [('HR', 1.0, ('x', 'x'), ('a', 'a')), ('HR', 2.5, ('x', 'x'), ('a', 'a')), ('HR', 4.0, ('x', 'x'), ('a', 'a')), ('HR', 5.0, ('b', 'b'), ('a', 'a')), ('HR', 6.0, (None, '6 (no text)'), ('a', 'a'))]
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_150_6_the_enum_form_lookup_is_the_linear_first_match
+1 failed, 181 deselected in 3.26s
+exit=1
+# mutant M2: _ECHO_LIMIT = 255 (.151)
+# host: cachyos-rtx | 2026-11-07T05:06:51-06:00 | load: 15.44 12.08 9.17
+# a2l_definition.py md5: f5836dfb632128955ecb57a1d7eaa179
+/tmp/b103-e5g2t/m2/s19_app/__init__.py
+# python Python 3.11.18
+FF.                                                                      [100%]
+=================================== FAILURES ===================================
+/tmp/b103-e5g2t/m2/tests/test_b103_a2l_definition.py:1903: AssertionError: ('NNNNNNNN', Refusal(code='A2L-DEF-METHOD', message='NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN...NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN…: the conversion method CM_GONE is not declared in the A2L'))
+/tmp/b103-e5g2t/m2/tests/test_b103_a2l_definition.py:1944: AssertionError: ('NNNNNNNN', Refusal(code='A2L-DEF-METHOD', message='NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN...NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN…: the conversion method CM_GONE is not declared in the A2L'))
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_b103_a2l_definition.py::test_r_a2l_def_151_3_each_character_outside_printable_ascii_is_written_as_u_fffd
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_151_1_a_word_of_256_characters_is_echoed_whole
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_151_2_a_word_of_257_characters_is_cut_at_describe_and_at_decode
+2 failed, 1 passed, 179 deselected in 1.34s
+exit=1

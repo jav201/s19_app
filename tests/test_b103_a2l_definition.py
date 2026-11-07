@@ -1621,39 +1621,623 @@ def test_at_b103_i2_3_case08_builds_and_decodes_with_the_model(c08):
     assert case08_file_digests(c08["dir"]) == CASE08_PIN_1MIB
 
 
-def test_r_a2l_def_149_5_cached_read_form_is_immutable(tmp_path):
-    """R-A2L-DEF.149 (E5 gap pass) - two objects sharing a method and a table decode as a fresh, uncached decode does.
+# --------------------------------------------------------------------------
+# E5 gap pass 2 (independent tester).  R-A2L-DEF.149/5 (immutability of every stored form),
+# .150/6 and .150/9 (the reduced lookups equal the linear / frozen ones), .151/1 ... /3 (the echo
+# of a file word in a refusal message), .58.2/18 and /19 (a refusal, not an exception).
+# The timed cases .149/6 ... /10 and .150/1 ... /5, /7, /8 are in test_b103_a2l_definition_perf.py.
+#
+# Private names are used only where the case itself names them (.149/5, .150/6, .150/9): they are
+# read through ``defmod`` at call time so that a module without them fails those cases alone.
+# --------------------------------------------------------------------------
 
-    A read form shared between objects must be immutable: touching what one object holds changes nothing for
-    the other, and describing the objects together equals describing each alone, in either order.
+import dataclasses  # noqa: E402
+import inspect  # noqa: E402
+import math  # noqa: E402
+import re  # noqa: E402
+from types import MappingProxyType  # noqa: E402
+
+import s19_app.tui.a2l_definition as defmod  # noqa: E402
+from s19_app.tui.a2l import parse_begin_meta  # noqa: E402
+
+ELLIPSIS = "…"
+
+
+def _echo256(word: str) -> str:
+    """Test-local statement of R-A2L-DEF.151: the first 256 characters, each outside U+0021 ... U+007E written as
+    U+FFFD, and an ellipsis after them when the word is longer."""
+    body = "".join(c if "!" <= c <= "~" else FFFD for c in word[:256])
+    return body + (ELLIPSIS if len(word) > 256 else "")
+
+
+def _ctab(name: str, kind: str, *pairs: str) -> str:
+    """A COMPU_TAB; each pair is the raw ``x y`` line text."""
+    body = [f'/begin COMPU_TAB {name} "" {kind} {len(pairs)}']
+    body += [f"  {p}" for p in pairs]
+    body.append("/end COMPU_TAB")
+    return "\n".join(body)
+
+
+def _vrange(name: str, count: str, *triples: str, default: str | None = None) -> str:
+    """A COMPU_VTAB_RANGE; each triple is the raw ``min max "text"`` line text."""
+    body = [f'/begin COMPU_VTAB_RANGE {name} "" {count}']
+    body += [f"  {t}" for t in triples]
+    if default is not None:
+        body.append(f'  DEFAULT_VALUE "{default}"')
+    body.append("/end COMPU_VTAB_RANGE")
+    return "\n".join(body)
+
+
+def _name_maps(a2l: dict) -> tuple[dict, dict]:
+    """The first COMPU_METHOD and the first COMPU_VTAB / COMPU_VTAB_RANGE of each name (what a walk builds)."""
+    methods: dict = {}
+    tables: dict = {}
+
+    def walk(nodes):
+        for node in nodes:
+            nm = node.get("name")
+            if nm == "COMPU_METHOD":
+                methods.setdefault(parse_begin_meta(node.get("meta", "") or "")[0], node)
+            elif nm in ("COMPU_VTAB", "COMPU_VTAB_RANGE"):
+                tables.setdefault(parse_begin_meta(node.get("meta", "") or "")[0], node)
+            walk(node.get("children") or [])
+
+    walk(a2l.get("sections") or [])
+    return methods, tables
+
+
+def _method_record(a2l: dict, name: str, reads: dict, methods: dict | None = None):
+    """``_read_method_record`` with the arguments of I-2's graph (the 3-argument form of the merged code when that
+    is what the module has)."""
+    found_methods, tables = _name_maps(a2l)
+    fn = defmod._read_method_record
+    if len(inspect.signature(fn).parameters) == 3:
+        return fn(name, methods if methods is not None else found_methods, reads)
+    return fn(name, methods if methods is not None else found_methods, tables, a2l.get("compu_tabs_by_name") or {}, reads)
+
+
+# ---- the immutability walker (.149/5) -------------------------------------------------------
+
+_SCALARS = (str, int, float, bool, type(None))
+
+
+def _assert_frozen_tree(value, path: str, seen: set | None = None) -> int:
+    """Every value is a scalar, a tuple, a frozen dataclass or a MappingProxyType of these, and a write into each
+    container raises.  Returns the number of containers visited."""
+    seen = set() if seen is None else seen
+    if isinstance(value, _SCALARS):
+        return 0
+    if id(value) in seen:
+        return 0
+    seen.add(id(value))
+    count = 1
+    if isinstance(value, tuple):
+        if value:
+            with pytest.raises(TypeError):
+                value[0] = value[0]                                  # type: ignore[index]
+        for i, item in enumerate(value):
+            count += _assert_frozen_tree(item, f"{path}[{i}]", seen)
+        return count
+    if isinstance(value, MappingProxyType):
+        with pytest.raises(TypeError):
+            value["__new_key__"] = 1                                 # type: ignore[index]
+        for key, item in value.items():
+            assert isinstance(key, _SCALARS), f"{path}: key {key!r}"
+            count += _assert_frozen_tree(item, f"{path}[{key!r}]", seen)
+        return count
+    if dataclasses.is_dataclass(value) and not isinstance(value, type):
+        assert value.__dataclass_params__.frozen, f"{path}: {type(value).__name__} is not frozen"
+        fields = dataclasses.fields(value)
+        if fields:
+            with pytest.raises(AttributeError):
+                setattr(value, fields[0].name, getattr(value, fields[0].name))
+        for f in fields:
+            count += _assert_frozen_tree(getattr(value, f.name), f"{path}.{f.name}", seen)
+        return count
+    pytest.fail(f"{path}: a {type(value).__name__} is a mutable or unlisted container")
+
+
+def test_r_a2l_def_149_5_cached_read_form_is_immutable(tmp_path):
+    """R-A2L-DEF.149/5 (E5 gap pass 2) - every stored form is immutable, the enum / table forms and their indexes included.
+
+    Eight objects share four methods and three tables.  Writes into the method record, the enum forms, the table form,
+    their tuples and index and a Definition all raise; the objects described together equal those described alone, in
+    either order; each decodes as it decodes alone; the two objects of a table hold the same form object.
     """
+    names = ["OBJ_A", "OBJ_B", "LIN_A", "LIN_B", "TAB_A", "TAB_B", "RNG_A", "RNG_B"]
     a2l = _inline(
         tmp_path,
-        *_enum_blocks("CM_E", "VT_E", "2", '0 "off"', '1 "on"'),
+        *_enum_blocks("CM_E", "VT_E", "2", '0 "off"', '1 "on"', default="none"),
+        _cm("CM_R", "TAB_VERB", fmt='"%.0"', ref="VR_E"),
+        _vrange("VR_E", "2", '0 1 "lo"', '2 3 "hi"'),
         _cm("CM_LIN", "LINEAR", "0.5", "2"),
+        _cm("CM_T", "TAB_NOINTP", fmt='"%.0"', ref="CT_T"),
+        _ctab("CT_T", "TAB_NOINTP", "0 10", "1 20"),
         _val("OBJ_A", "0x2000", LAYOUT["UBYTE"], "CM_E", "0", "1"),
         _val("OBJ_B", "0x2001", LAYOUT["UBYTE"], "CM_E", "0", "1"),
         _val("LIN_A", "0x2002", LAYOUT["UBYTE"], "CM_LIN", "0", "255"),
         _val("LIN_B", "0x2003", LAYOUT["UBYTE"], "CM_LIN", "0", "255"),
+        _val("RNG_A", "0x2004", LAYOUT["UBYTE"], "CM_R", "0", "3"),
+        _val("RNG_B", "0x2005", LAYOUT["UBYTE"], "CM_R", "0", "3"),
+        _val("TAB_A", "0x2006", LAYOUT["UBYTE"], "CM_T", "0", "255"),
+        _val("TAB_B", "0x2007", LAYOUT["UBYTE"], "CM_T", "0", "255"),
     )
-    fresh = {n: describe_definition(n, a2l) for n in ("OBJ_A", "OBJ_B", "LIN_A", "LIN_B")}
-    for order in (["OBJ_A", "OBJ_B", "LIN_A", "LIN_B"], ["LIN_B", "OBJ_B", "LIN_A", "OBJ_A"]):
+    image = {0x2000 + i: 1 for i in range(8)}
+    expect = {"OBJ": "on", "RNG": "lo", "LIN": "2.500", "TAB": "20"}
+
+    fresh = {n: describe_definition(n, a2l) for n in names}
+    for order in (names, list(reversed(names))):
         together = describe_definitions(order, a2l)
-        assert {n: together[n] for n in fresh} == fresh
-    together = describe_definitions(list(fresh), a2l)
-    a, b = together["OBJ_A"], together["OBJ_B"]
-    assert [e.text for e in a.enum_entries] == ["off", "on"] and a.enum_entries == b.enum_entries
-    # nothing a shared form holds can be written through: tuples, frozen entries, frozen definitions
+        assert {n: together[n] for n in names} == fresh
+    together = describe_definitions(names, a2l)
+    assert describe_definitions(names, a2l) == together                        # a second walk
+    for n in names:                                                            # decodes as it decodes alone
+        assert decode_definition(together[n], a2l, image) == decode_definition(fresh[n], a2l, image)
+        assert _decoded(together[n], a2l, image).text == expect[n[:3]], n
+
+    # the two objects of a table hold the same form
+    for a, b in (("OBJ_A", "OBJ_B"), ("RNG_A", "RNG_B"), ("TAB_A", "TAB_B")):
+        assert together[a]._table_form is not None and together[a]._table_form is together[b]._table_form
+    assert together["LIN_A"]._table_form is None
+
+    # the public pieces: tuples, frozen entries, frozen definitions
+    a = together["OBJ_A"]
     with pytest.raises((TypeError, AttributeError)):
-        a.enum_entries[0] = a.enum_entries[1]          # type: ignore[index]
+        a.enum_entries[0] = a.enum_entries[1]                                  # type: ignore[index]
     with pytest.raises(AttributeError):
-        a.enum_entries[0].text = "changed"             # type: ignore[misc]
-    lin = together["LIN_A"]
-    assert isinstance(lin.coeffs_linear, tuple)
-    with pytest.raises((TypeError, AttributeError)):
-        lin.coeffs_linear[0] = 9.0                     # type: ignore[index]
+        a.enum_entries[0].text = "changed"                                     # type: ignore[misc]
     with pytest.raises(AttributeError):
-        lin.unit = "changed"                           # type: ignore[misc]
-    # the second object, a new walk and the parsed payload see no change
-    assert together["OBJ_B"] == fresh["OBJ_B"] and together["LIN_B"] == fresh["LIN_B"]
-    assert describe_definitions(list(fresh), a2l) == together
+        a.unit = "changed"                                                     # type: ignore[misc]
+    with pytest.raises(AttributeError):
+        a._table_form = None                                                   # type: ignore[misc]
+
+    # the forms the walk stores: each walks as an immutable tree and refuses every write
+    methods, tables = _name_maps(a2l)
+    reads: dict = {}
+    for method in ("CM_E", "CM_R", "CM_LIN", "CM_T"):
+        record = _method_record(a2l, method, reads)
+        with pytest.raises(TypeError):
+            record["unit"] = "changed"                                         # a field
+        with pytest.raises(TypeError):
+            record["a_new_key"] = 1                                            # a new key
+        assert _assert_frozen_tree(record, f"record[{method}]") >= 1
+    for table in ("VT_E", "VR_E"):
+        form = defmod._read_enum_table(table, tables, {})
+        assert _assert_frozen_tree(form, f"enum form[{table}]") >= 3
+    enum_form, range_form = together["OBJ_A"]._table_form, together["RNG_A"]._table_form
+    tab_form = together["TAB_A"]._table_form
+    for form in (enum_form, range_form, tab_form):
+        with pytest.raises(AttributeError):
+            setattr(form, dataclasses.fields(form)[0].name, "changed")
+        assert _assert_frozen_tree(form, type(form).__name__) >= 2
+    # the COMPU_VTAB index is a read-only mapping; the range index and the table's x / y are tuples
+    assert any(isinstance(getattr(enum_form, f.name), MappingProxyType) for f in dataclasses.fields(enum_form))
+    assert any(isinstance(getattr(range_form, f.name), tuple) and len(getattr(range_form, f.name)) >= 2
+               for f in dataclasses.fields(range_form))
+    for definition in together.values():
+        assert _assert_frozen_tree(definition, f"definition {definition.name}") >= 1
+    # nothing the writes touched changed for a second object, a new walk or the parsed payload
+    assert describe_definitions(names, a2l) == together
+    assert together["LIN_A"].coeffs_linear == (0.5, 2.0)
+    assert {n: describe_definition(n, a2l) for n in names} == fresh
+
+
+# ---- .58.2/18, /19 : a refusal, not an exception -----------------------------------------------
+
+def test_r_a2l_def_58_2_18_a_table_conversion_that_gives_a_text_is_refused(tmp_path):
+    """R-A2L-DEF.58.2/18 (E3S3-28) - a VALUE whose TAB_NOINTP / TAB_INTP method names a COMPU_VTAB decodes to a refusal, not an exception."""
+    a2l = _inline(
+        tmp_path,
+        _vtab("VT_X", "2", '0 "OFF"', '1 "ON"'),
+        _cm("CM_XN", "TAB_NOINTP", fmt='"%.0"', ref="VT_X"),
+        _cm("CM_XI", "TAB_INTP", fmt='"%.0"', ref="VT_X"),
+        _val("XN", "0x10", LAYOUT["UBYTE"], "CM_XN", "0", "255"),
+        _val("XI", "0x11", LAYOUT["UBYTE"], "CM_XI", "0", "255"),
+    )
+    image = {0x10: 0x01, 0x11: 0x00}
+    for name in ("XN", "XI"):
+        d = describe_definition(name, a2l)
+        assert d.kind == "number" and d.refusal is None, (name, d.refusal)
+        result = decode_definition(d, a2l, image)                     # 0 exceptions
+        assert result == Refusal("A2L-DEF-DECODE", f"{name}: the table VT_X gives a value that is not a number"), result
+
+
+def test_r_a2l_def_58_2_19_a_compu_tab_whose_x_holds_a_nan_is_refused(tmp_path):
+    """R-A2L-DEF.58.2/19 (E3S3-29) - a COMPU_TAB with a NaN x decodes to a refusal; the frozen parse's unordered sort never gives a value."""
+    a2l = _inline(
+        tmp_path,
+        _ctab("CT_N", "TAB_NOINTP", "0 0", "nan 5", "10 10"),
+        _cm("CM_NN", "TAB_NOINTP", fmt='"%.0"', ref="CT_N"),
+        _cm("CM_NI", "TAB_INTP", fmt='"%.0"', ref="CT_N"),
+        _val("NN", "0x10", LAYOUT["UBYTE"], "CM_NN", "0", "255"),
+        _val("NI", "0x11", LAYOUT["UBYTE"], "CM_NI", "0", "255"),
+    )
+    image = {0x10: 0x04, 0x11: 0x04}
+    for name in ("NN", "NI"):
+        d = describe_definition(name, a2l)
+        result = decode_definition(d, a2l, image)
+        assert result == Refusal("A2L-DEF-DECODE", f"{name}: the table CT_N has an x that is not a number"), result
+
+
+# ---- .151 : the echo of a file word ---------------------------------------------------------------
+
+def _echo_file(tmp_path: Path, n: int) -> dict:
+    """The objects of .151/1 with each word of ``n`` characters (``n`` 256)."""
+    N, K, M, Z, G, E, F = ("N" * n, "K" * n, "M" * n, "Z" * n, "G" * n, "E" * n, "F" * n)
+    a2l = _inline(
+        tmp_path,
+        _val(N, "0x10", LAYOUT["UBYTE"], "CM_GONE", "0", "255"),
+        _char("KX", K, "0x11", LAYOUT["UBYTE"], "NO_COMPU_METHOD", "0", "255"),
+        _val("MX1", "0x12", LAYOUT["UBYTE"], M, "0", "255"),
+        _cm("CM_T1", Z),
+        _val("CT1", "0x13", LAYOUT["UBYTE"], "CM_T1", "0", "255"),
+        _cm("CM_R1", "TAB_VERB", fmt='"%.0"', ref=G),
+        _val("TR1", "0x14", LAYOUT["UBYTE"], "CM_R1", "0", "255"),
+        _cm("CM_E1", "TAB_VERB", fmt='"%.0"', ref=E),
+        f'/begin COMPU_VTAB {E} "" TAB_VERB 0\n/end COMPU_VTAB',
+        _val("TE1", "0x15", LAYOUT["UBYTE"], "CM_E1", "0", "255"),
+        _val("BM1", "0x16", LAYOUT["UWORD"], "NO_COMPU_METHOD", "0", "65535", f"BIT_MASK {F}"),
+    )
+    return a2l
+
+
+def _bound(d: Definition) -> None:
+    assert d.refusal is not None and len(d.refusal.message) <= 1024, d.refusal
+
+
+def test_r_a2l_def_151_1_a_word_of_256_characters_is_echoed_whole(tmp_path):
+    """R-A2L-DEF.151/1 - 256 characters are echoed whole, in every place a refusal message echoes a file word."""
+    a2l = _echo_file(tmp_path, 256)
+    N, K, M, Z, G, E, F = ("N" * 256, "K" * 256, "M" * 256, "Z" * 256, "G" * 256, "E" * 256, "F" * 256)
+    got = describe_definitions([N, "KX", "MX1", "CT1", "TR1", "TE1", "BM1"], a2l)
+    want = {
+        N: Refusal("A2L-DEF-METHOD", f"{N}: the conversion method CM_GONE is not declared in the A2L"),
+        "KX": Refusal("A2L-DEF-KIND", f"KX: the system has no definition for a {K} object"),
+        "MX1": Refusal("A2L-DEF-METHOD", f"MX1: the conversion method {M} is not declared in the A2L"),
+        "CT1": Refusal("A2L-DEF-CONVERSION", f"CT1: the conversion type {Z} of CM_T1 is not supported"),
+        "TR1": Refusal("A2L-DEF-TABLE", f"TR1: the table {G} of CM_R1 is not declared in the A2L"),
+        "TE1": Refusal("A2L-DEF-TABLE-EMPTY", f"TE1: the table {E} has no entries"),
+        "BM1": Refusal("A2L-DEF-MASK", f"BM1: the bit mask {F} cannot be applied to UWORD"),
+    }
+    for key, refusal in want.items():
+        assert got[key].refusal == refusal, (key[:8], got[key].refusal)
+        _bound(got[key])
+        assert ELLIPSIS not in got[key].refusal.message
+
+
+def test_r_a2l_def_151_2_a_word_of_257_characters_is_cut_at_describe_and_at_decode(tmp_path):
+    """R-A2L-DEF.151/2 - the first 256 characters and an ellipsis; describe and decode messages alike; each message <= 1,024."""
+    n = 257
+    N, K, M, Z, G, E, F = ("N" * n, "K" * n, "M" * n, "Z" * n, "G" * n, "E" * n, "F" * n)
+    # the 257-character forms of KX2 ... BM2, and the two decode objects
+    a2l = _inline(
+        tmp_path,
+        _val(N, "0x10", LAYOUT["UBYTE"], "CM_GONE", "0", "255"),
+        _char("KX2", K, "0x11", LAYOUT["UBYTE"], "NO_COMPU_METHOD", "0", "255"),
+        _val("MX2", "0x12", LAYOUT["UBYTE"], M, "0", "255"),
+        _cm("CM_T2", Z),
+        _val("CT2", "0x13", LAYOUT["UBYTE"], "CM_T2", "0", "255"),
+        _cm("CM_R2", "TAB_VERB", fmt='"%.0"', ref=G),
+        _val("TR2", "0x14", LAYOUT["UBYTE"], "CM_R2", "0", "255"),
+        _cm("CM_E2", "TAB_VERB", fmt='"%.0"', ref=E),
+        f'/begin COMPU_VTAB {E} "" TAB_VERB 0\n/end COMPU_VTAB',
+        _val("TE2", "0x15", LAYOUT["UBYTE"], "CM_E2", "0", "255"),
+        _val("BM2", "0x16", LAYOUT["UWORD"], "NO_COMPU_METHOD", "0", "65535", f"BIT_MASK {F}"),
+        _val("D" * n, "0x20", LAYOUT["UBYTE"], "NO_COMPU_METHOD", "0", "255"),
+        _cm("CM_XN2", "TAB_NOINTP", fmt='"%.0"', ref="V" * n),
+        f'/begin COMPU_VTAB {"V" * n} "" TAB_VERB 1\n  1 "ON"\n/end COMPU_VTAB',
+        _val("X" * n, "0x21", LAYOUT["UBYTE"], "CM_XN2", "0", "255"),
+    )
+    e = lambda w: w[:256] + ELLIPSIS                                      # noqa: E731
+    got = describe_definitions([N, "KX2", "MX2", "CT2", "TR2", "TE2", "BM2", "D" * n, "X" * n, "Q" * n], a2l)
+    want = {
+        N: Refusal("A2L-DEF-METHOD", f"{e(N)}: the conversion method CM_GONE is not declared in the A2L"),
+        "KX2": Refusal("A2L-DEF-KIND", f"KX2: the system has no definition for a {e(K)} object"),
+        "MX2": Refusal("A2L-DEF-METHOD", f"MX2: the conversion method {e(M)} is not declared in the A2L"),
+        "CT2": Refusal("A2L-DEF-CONVERSION", f"CT2: the conversion type {e(Z)} of CM_T2 is not supported"),
+        "TR2": Refusal("A2L-DEF-TABLE", f"TR2: the table {e(G)} of CM_R2 is not declared in the A2L"),
+        "TE2": Refusal("A2L-DEF-TABLE-EMPTY", f"TE2: the table {e(E)} has no entries"),
+        "BM2": Refusal("A2L-DEF-MASK", f"BM2: the bit mask {e(F)} cannot be applied to UWORD"),
+        "Q" * n: Refusal("A2L-DEF-NAME", f"{e('Q' * n)}: no tag of that name in the A2L"),
+    }
+    for key, refusal in want.items():
+        assert got[key].refusal == refusal, (key[:8], got[key].refusal)
+        _bound(got[key])
+    # decode: the bytes of D are not in the image; X names a table that gives a text
+    d_def, x_def = got["D" * n], got["X" * n]
+    assert d_def.refusal is None and x_def.refusal is None
+    image = {0x21: 0x01}
+    d_res = decode_definition(d_def, a2l, image)
+    assert d_res == Refusal("A2L-DEF-BYTES", f"{e('D' * n)}: 1 of its 1 bytes are not in the image")
+    x_res = decode_definition(x_def, a2l, image)
+    assert x_res == Refusal("A2L-DEF-DECODE", f"{e('X' * n)}: the table {e('V' * n)} gives a value that is not a number")
+    assert len(d_res.message) <= 1024 and len(x_res.message) <= 1024
+
+
+def test_r_a2l_def_151_3_each_character_outside_printable_ascii_is_written_as_u_fffd(tmp_path):
+    """R-A2L-DEF.151/3 - ESC, E-acute and DEL in an echoed word are each U+FFFD (not control characters only)."""
+    word = "{}\x1bÉ\x7f{}"
+    N, T, G, F = word.format("N", "X"), word.format("T", "X"), word.format("G", "X"), word.format("F", "X")
+    a2l = _inline(
+        tmp_path,
+        _val(N, "0x10", LAYOUT["UBYTE"], "CM_GONE", "0", "255"),
+        _cm("CM_T3", T),
+        _val("CT3", "0x11", LAYOUT["UBYTE"], "CM_T3", "0", "255"),
+        _cm("CM_R3", "TAB_VERB", fmt='"%.0"', ref=G),
+        _val("TR3", "0x12", LAYOUT["UBYTE"], "CM_R3", "0", "255"),
+        _val("BM3", "0x14", LAYOUT["UWORD"], "NO_COMPU_METHOD", "0", "65535", f"BIT_MASK {F}"),
+    )
+    got = describe_definitions([N, "CT3", "TR3", "BM3"], a2l)
+    ff = lambda w: w.replace("\x1b", FFFD).replace("É", FFFD).replace("\x7f", FFFD)          # noqa: E731
+    assert got[N].refusal == Refusal("A2L-DEF-METHOD", f"{ff(N)}: the conversion method CM_GONE is not declared in the A2L")
+    assert got["CT3"].refusal == Refusal("A2L-DEF-CONVERSION", f"CT3: the conversion type {ff(T)} of CM_T3 is not supported")
+    assert got["TR3"].refusal == Refusal("A2L-DEF-TABLE", f"TR3: the table {ff(G)} of CM_R3 is not declared in the A2L")
+    assert got["BM3"].refusal == Refusal("A2L-DEF-MASK", f"BM3: the bit mask {ff(F)} cannot be applied to UWORD")
+    assert got[N].refusal.message.startswith("N" + FFFD * 3 + "X: ")
+
+
+# ---- .150/6 and /9 : the reduced lookups equal the frozen ones ---------------------------------------
+# Oracles, copied verbatim from the frozen code and kept here as test-local functions:
+#   _oracle_enum_entry_text / _oracle_enum_text / _oracle_clean / _oracle_raw_text
+#       s19_app/tui/a2l_definition.py at 82f5f8e5 (Inc 2a as merged: the linear first match)
+#   _oracle_table_lookup
+#       s19_app/tui/a2l.py at 82f5f8e5, ``_table_lookup`` (the frozen COMPU_TAB lookup)
+
+def _oracle_clean(text):
+    if text is None:
+        return None
+    return "".join(
+        "�"
+        if ord(ch) <= 0x1F or ord(ch) == 0x7F or (0x80 <= ord(ch) <= 0x9F)
+        else ch
+        for ch in text
+    )
+
+
+def _oracle_raw_text(stored):
+    if isinstance(stored, float):
+        if math.isfinite(stored) and stored.is_integer():
+            return str(int(stored))
+        return f"{stored:.15g}"
+    return str(stored)
+
+
+def _oracle_enum_entry_text(definition, stored):
+    for entry in definition.enum_entries:
+        if entry.raw_max is None:
+            if entry.raw == stored:
+                return entry.text
+        elif entry.raw <= stored <= entry.raw_max:
+            return entry.text
+    return None
+
+
+def _oracle_enum_text(definition, stored):
+    entry = _oracle_enum_entry_text(definition, stored)
+    if entry is not None:
+        return _oracle_clean(entry)
+    if definition.default_text is not None:
+        return _oracle_clean(definition.default_text)
+    return f"{_oracle_raw_text(stored)} (no text)"
+
+
+def _oracle_to_float(value):
+    if value is None:
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _oracle_table_lookup(value, table, interpolate):
+    entries = table.get("entries") or []
+    if not entries:
+        return None, "lookup table is empty"
+    if not interpolate:
+        for raw_x, raw_y in entries:
+            if raw_x == value:
+                return raw_y, ""
+        nearest = min(entries, key=lambda item: abs(item[0] - value))
+        return nearest[1], ""
+    if value <= entries[0][0]:
+        return entries[0][1], ""
+    if value >= entries[-1][0]:
+        return entries[-1][1], ""
+    for left, right in zip(entries, entries[1:]):
+        lx, ly = left
+        rx, ry = right
+        if lx <= value <= rx:
+            lyf = _oracle_to_float(ly)
+            ryf = _oracle_to_float(ry)
+            if lyf is None or ryf is None:
+                return ly, ""
+            if rx == lx:
+                return lyf, ""
+            ratio = (value - lx) / (rx - lx)
+            return lyf + ratio * (ryf - lyf), ""
+    return None, "value outside interpolation range"
+
+
+_PROBE_BUDGET = 1_500_000        # probes x entries of the linear oracle, per table (a larger table is sampled by stride)
+
+
+def _enum_probes(entries) -> list:
+    """Each raw / min / max, the midpoint of each two neighbouring ends, each +-1, NaN, +inf and -inf; the
+    integral ones also as ints."""
+    ends = sorted({v for e in entries for v in (e.raw, e.raw_max) if v is not None and v == v})
+    finite = [v for v in ends if math.isfinite(v)]
+    pts = set(ends)
+    pts.update((a + b) / 2 for a, b in zip(finite, finite[1:]))
+    pts.update(v + 1 for v in finite)
+    pts.update(v - 1 for v in finite)
+    ordered = sorted(pts)
+    limit = max(8, _PROBE_BUDGET // max(1, 2 * len(entries)))
+    if len(ordered) > limit:
+        ordered = ordered[:: -(-len(ordered) // limit)]
+    probes: list = ordered + [math.nan, math.inf, -math.inf]
+    probes += [int(v) for v in ordered if math.isfinite(v) and v == int(v) and abs(v) < 2**63]
+    return probes
+
+
+def _check_enum_form(base: Definition, form, label: str, stats: dict) -> None:
+    d = dataclasses.replace(base, enum_entries=form.entries, default_text=form.default_text, _table_form=form)
+    for v in _enum_probes(form.entries):
+        want_entry, want_text = _oracle_enum_entry_text(d, v), _oracle_enum_text(d, v)
+        got_entry, got_text = defmod._enum_entry_text(d, v), defmod._enum_text(d, v)
+        stats["values"] += 1
+        if (got_entry, got_text) != (want_entry, want_text):
+            stats["diffs"].append((label, v, (got_entry, got_text), (want_entry, want_text)))
+
+
+def _enum_base(tmp_path: Path, *blocks: str) -> tuple[dict, Definition, dict]:
+    a2l = _inline(tmp_path, *blocks, _cm("CM_B", "TAB_VERB", fmt='"%.0"', ref="VT_B"),
+                  _vtab("VT_B", "1", '0 "z"'), _val("BASE", "0x10", LAYOUT["UBYTE"], "CM_B", "0", "255"))
+    base = describe_definition("BASE", a2l)
+    assert base.kind == "enum" and base.refusal is None
+    return a2l, base, _name_maps(a2l)[1]
+
+
+def _tracked_a2l_files() -> list:
+    found = sorted((REPO_ROOT / "examples").rglob("*.a2l")) + sorted((REPO_ROOT / "tests").rglob("*.a2l"))
+    out = []
+    for path in found:
+        data = path.read_bytes()
+        if b"COMPU_VTAB" in data or b"COMPU_TAB" in data:        # case 06 (37 MB) holds none: not parsed
+            out.append(path)
+    return out
+
+
+@pytest.fixture(scope="module")
+def corpus() -> list:
+    """(label, parse payload) of every tracked .a2l under examples/ and tests/ that holds a COMPU_ table."""
+    return [(p.relative_to(REPO_ROOT).as_posix(), parse_a2l_file(p)) for p in _tracked_a2l_files()]
+
+
+def test_r_a2l_def_150_6_the_enum_form_lookup_is_the_linear_first_match(tmp_path, corpus):
+    """R-A2L-DEF.150/6 (E3S3-30 a) - the form's lookup equals the linear first match of 82f5f8e5 for every corpus table and hostile table."""
+    base_a2l, base, _t = _enum_base(tmp_path)
+    stats: dict = {"values": 0, "diffs": [], "tables": 0}
+    for label, a2l in corpus:
+        _methods, tables = _name_maps(a2l)
+        for name in tables:
+            form = defmod._read_enum_table(name, tables, {})
+            _check_enum_form(base, form, f"{label}:{name}", stats)
+            stats["tables"] += 1
+    assert stats["tables"] >= 100 and stats["values"] >= 5000, stats          # the corpus is read, not skipped
+    assert stats["diffs"] == [], (len(stats["diffs"]), stats["diffs"][:5])
+
+    # INLINE hostile tables, each with and without a DEFAULT_VALUE
+    vt = ('1 "A"', '1 "B"', '-0.0 "Z"', '0 "Y"', 'nan "N"', '2 "C"')
+    rg = ('0 10 "a"', '5 15 "b"', '5 5 "c"', '-3 20 "d"', '0 10 "x"', '10 20 "e"', '12 11 "z"', 'nan 5 "n"', '30 30 "p"')
+    a2l, base, tables = _enum_base(
+        tmp_path,
+        _vtab("HV", "6", *vt), _vtab("HV_D", "6", *vt, default="dflt"),
+        _vrange("HR", "9", *rg), _vrange("HR_D", "9", *rg, default="dflt"),
+    )
+    hostile = {"values": 0, "diffs": []}
+    forms = {}
+    for name in ("HV", "HV_D", "HR", "HR_D"):
+        forms[name] = defmod._read_enum_table(name, tables, {})
+        _check_enum_form(base, forms[name], name, hostile)
+    assert hostile["values"] > 100 and hostile["diffs"] == [], hostile["diffs"][:5]
+
+    def text(name, v):
+        d = dataclasses.replace(base, enum_entries=forms[name].entries, default_text=forms[name].default_text,
+                                _table_form=forms[name])
+        return defmod._enum_entry_text(d, v), defmod._enum_text(d, v)
+
+    for v, want in ((5, "a"), (10, "a"), (10.5, "b"), (16, "d"), (25, None), (30, "p"), (math.nan, None)):
+        assert text("HR", v)[0] == want, (v, text("HR", v))
+        assert text("HR_D", v)[1] == (want if want is not None else "dflt"), (v, text("HR_D", v))
+    assert text("HR", 25)[1] == "25 (no text)" and text("HR", math.nan)[1] == "nan (no text)"
+    for v, want in ((1, "A"), (0, "Z"), (2, "C"), (math.nan, None)):
+        assert text("HV", v)[0] == want, (v, text("HV", v))
+        assert text("HV_D", v)[1] == (want if want is not None else "dflt"), (v, text("HV_D", v))
+
+
+def _same_result(a, b) -> bool:
+    (av, ae), (bv, be) = a, b
+    if ae != be:
+        return False
+    if isinstance(av, float) and isinstance(bv, float):
+        return (av != av and bv != bv) or av == bv
+    return type(av) is type(bv) and av == bv
+
+
+def _tab_probes(xs: list) -> list:
+    """Each x, each midpoint of two neighbouring x, each x +- 1 ulp, +-0, +-1e300, 2^53 + 1, NaN, +inf, -inf, 2^63,
+    2^64 - 1 (floats, and the integral ones also as ints: A_UINT64)."""
+    sample = xs
+    if len(sample) > 60:                                     # linear oracle: sample the table by stride, keep the ends
+        step = -(-len(sample) // 60)
+        sample = sorted(set(sample[::step]) | set(sample[:3]) | set(sample[-3:]))
+    pts = set(sample)
+    for a, b in zip(sample, sample[1:]):
+        if math.isfinite(a) and math.isfinite(b):
+            pts.add(a / 2 + b / 2)
+    for x in sample:
+        if math.isfinite(x):
+            pts.add(math.nextafter(x, math.inf))
+            pts.add(math.nextafter(x, -math.inf))
+    pts.update([0.0, -0.0, 1e300, -1e300, float(2**53 + 1), math.nan, math.inf, -math.inf, float(2**63), float(2**64 - 1)])
+    probes: list = list(pts)
+    probes += [int(v) for v in pts if math.isfinite(v) and v == int(v) and 0 <= v < 2**64]
+    probes += [2**53 + 1, 2**63, 2**64 - 1]
+    return probes
+
+
+def _check_tab_form(a2l: dict, table_name: str, form, stats: dict, label: str) -> None:
+    table = a2l["compu_tabs_by_name"][table_name]
+    xs = [x for x, _y in table.get("entries") or []]
+    for interpolate in (False, True):
+        for v in _tab_probes(xs):
+            want = _oracle_table_lookup(float(v), table, interpolate)
+            got = defmod._table_value(form, v, interpolate)
+            stats["pairs"] += 1
+            if not _same_result(got, want):
+                stats["diffs"].append((label, table_name, interpolate, v, got, want))
+
+
+def _tab_form_of(a2l: dict, table_name: str, kind: str, reads: dict):
+    """The table form a TAB_INTP / TAB_NOINTP method naming ``table_name`` holds (a synthetic method section)."""
+    section = {"name": "COMPU_METHOD", "meta": f'CMZ_{kind} "" {kind} "%.3" ""',
+               "lines": [f"COMPU_TAB_REF {table_name}"]}
+    record = _method_record(a2l, f"CMZ_{kind}", reads, {f"CMZ_{kind}": section})
+    return record["table_form"]
+
+
+def test_r_a2l_def_150_9_the_reduced_tab_lookup_equals_the_frozen_lookup(tmp_path, corpus):
+    """R-A2L-DEF.150/9 (E3S3-29, v2) - the form's lookup gives the frozen _table_lookup's value for every corpus table and hostile table."""
+    stats: dict = {"pairs": 0, "diffs": [], "tables": 0}
+    for label, a2l in corpus:
+        for name, table in (a2l.get("compu_tabs_by_name") or {}).items():
+            if re.search(r'[\s"]', name):
+                continue
+            for kind in ("TAB_INTP", "TAB_NOINTP"):
+                form = _tab_form_of(a2l, name, kind, {})
+                assert form is not None, (label, name)
+                if form.x_nan:
+                    continue                                    # such a table is refused at decode (.58.2/19)
+                _check_tab_form(a2l, name, form, stats, label)
+            stats["tables"] += 1
+    assert stats["tables"] >= 5 and stats["pairs"] >= 2000, stats
+    assert stats["diffs"] == [], (len(stats["diffs"]), stats["diffs"][:5])
+
+    # INLINE: the plain table and the table with a duplicate x
+    a2l = _inline(tmp_path, _ctab("H1", "TAB_NOINTP", "0 0", "10 100", "20 50"),
+                  _ctab("H2", "TAB_NOINTP", "0 0", "10 100", "10 7", "20 50"))
+    hostile = {"pairs": 0, "diffs": []}
+    forms = {}
+    for name in ("H1", "H2"):
+        for kind in ("TAB_INTP", "TAB_NOINTP"):
+            forms[name, kind] = _tab_form_of(a2l, name, kind, {})
+            _check_tab_form(a2l, name, forms[name, kind], hostile, "inline")
+    assert hostile["pairs"] > 100 and hostile["diffs"] == [], hostile["diffs"][:5]
+    nointp, intp = forms["H1", "TAB_NOINTP"], forms["H1", "TAB_INTP"]
+    for v, want in ((2.5, 0.0), (7.5, 100.0), (15, 100.0)):
+        assert defmod._table_value(nointp, v, False) == (want, ""), v
+    assert defmod._table_value(intp, 15, True) == (75.0, "")
+    assert defmod._table_value(intp, -1, True) == (0.0, "")
+    assert defmod._table_value(intp, math.nan, True) == (None, "value outside interpolation range")
+    assert defmod._table_value(nointp, math.nan, False) == (0.0, "")
