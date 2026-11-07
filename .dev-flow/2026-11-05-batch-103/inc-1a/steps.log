@@ -30,3 +30,4 @@
 2026-11-07T19:10:40Z E5 MUT inc-1a start deepseek-v4-pro — mutants on cachyos-rtx (copy /tmp/b103-e5-1a-mut), one per row of 01-requirements.md
 2026-11-07T19:16:40Z E5 MUT inc-1a end deepseek-v4-pro — 34 mutants applied (32 killed, 2 survived: M-PASTE.6 WinCI-only control, M-PASTE.10 WARNING-oracle gap) + 10 rows not realisable (Windows CI pending); evidence-e5/mutant-table.md + mutants/out/M-*.txt (34)
 2026-11-07T19:48:31Z E5 close inc-1a end deepseek-v4-pro — 04-validation.md: PASS-WITH-NOTES; final GREEN a=122 passed/75 skipped, b=54, laws=219 passed/1 failed (redaction gate, pre-push); mutants 33/34 killed (M-PASTE.10 re-killed, M-PASTE.6 pending WinCI) + 10 rows not realisable; open notes BD-1A-1 (Inc 12), BL-I1A-1, 54 WinCI arms + redaction gate (pre-push), AT-I1a-10/-11 (operator)
+2026-11-07T14:08:37-06:00 E5 close (orchestrator, claude-opus-5-5): trace_check 0 gaps (base 34f9f601); Inc 1a E5 CLOSED PASS-WITH-NOTES -> merge to batch-103
