@@ -181,7 +181,10 @@ from tools.id_registry import (
 # tests/test_b101_check_spec_keep.py); re-measured by the merge verification.
 # batch-101 Inc 6: 265 -> 267, measured at E4 integration (tests/test_b101_patch_lifecycle.py,
 # tests/test_b101_document_homes.py).
-EXPECTED_SCANNED_TEST_FILES = 267
+# batch-103 Inc 2a: 267 -> 270, MEASURED by the guard on the LAN Linux host
+# (tests/test_b103_a2l_definition.py, tests/test_b103_a2l_definition_perf.py,
+# tests/test_b103_synth_definitions.py; no support module).
+EXPECTED_SCANNED_TEST_FILES = 270
 """Test modules scanned, including this one.
 
 batch-101 Inc 11: 250 -> 253. ``tests/test_b101_a2l_blocks_and_segments.py``,
