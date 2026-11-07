@@ -300,3 +300,219 @@ Decode of the layout, MOD_COMMON and AXIS_PTS paths reads only the definitions' 
 - [✓] Verdict explicit: **FAIL**, because E3S3-22 and E3S3-23 are open with their evidence (steady CM-4 … CM-9, MC-7, MC-8, RL-7 … RL-15; VT-5, VT-6, VR-2). E3S3-17 and -19 are closed at design. Their cases (.148/1 … /9, .136/arr-4) must run GREEN, with the negative controls RED, at E5 before the closure counts as product evidence; .148/3 runs only after Inc 2a's E5.
 - [n/a] New tool or integration scope: none.
 - Probes: `evidence-e3/sec-r5-m3a.py` (model), `sec-r5-scale.py` (modes `main`, `steady`, `immut`, `corpus`), `sec-r5-census.py`, `sec-r5-run.sh`; transcripts `sec-r5-scale-run1-`, `sec-r5-scale-run2-`, `sec-r5-scale-steady-`, `sec-r5-immut-`, `sec-r5-corpus-`, `sec-r5-census-transcript.txt`.
+
+## Round 6 (2026-11-07T04:19:54-06:00)
+
+**Verdict: FAIL.** The round-5 correction does what it says for every path it names. All 52 path ids of the round-5 table run flat on the corrected model. So do four of the new paths: CT-3 and CT-4, and VT-8 and VT-9 under the general rule. In detail:
+- the 12 long-word paths of E3S3-22 (RL-7, -8, -9, -15, MC-7, -8, CM-4 … -9) take 29–106 µs per object at S, 2S and 8S (×0.99–1.01), with messages of 310–622 characters;
+- the enum paths of E3S3-23 hold one text object for all 400 elements at every size;
+- the table paths of E3S3-20 (VT-1 … -3, VR-1, CT-1 … -4) decode in 3–85 µs per object (×1.00–1.03).
+
+E3S3-20, -22, -23 and -24 are closed at design, and every negative control is RED. The class is still **not closed**. Three new MAJORs come from the same source: a text that many objects or elements reach, outside what the rule names.
+- **E3S3-25.** The ruling keeps `<layout>` at .137 because it is "a word of the object's own header". For a COM_AXIS curve it is not: it is word 5 of the shared AXIS_PTS. RL-16 copies it into every curve's message: 262,208 → 2,097,216 characters per definition, ×5.13 at 8S. RL-17 `_clean`s it per curve in the .89 message: 24.5 → 48.1 ms per object, and the 400 names take 9.9 s.
+- **E3S3-27.** At decode, each element's name is the object's name copied, and an element refusal `_clean`s it and keeps it. EN-1 takes 23.6 → 47.9 → 193 ms per element and keeps 256 KiB → 2 MiB per element.
+- **E3S3-28.** A TAB_INTP or TAB_NOINTP method whose table holds a text value makes decode **raise** `TypeError` in `display_text`. This happens in Inc 2a's real code, and in 3a's `_decode_stored`. One public corpus file has such a table, and the lookup returns text at 2 of 1,977 case points.
+
+Three MEDIUMs, one MINOR and one LOW follow (E3S3-26, -29, -30, -31, -32). The bisect census is clean on .150/arr-9's own value set. It is not clean on the values that set leaves out (E3S3-29).
+
+Scope: `git diff 3c33dee1 HEAD -- inc-3/` (32e4db90 and 71113bc0: `01-requirements.md`, `02-test-cases.md`, `codewire/graph-inc3.md`, `E3-rulings.md`, `steps.log`), judged against `E3-rulings.md` "Round 5 rulings" and the "Round-5 correction done" note (`:43-101`).
+
+Evidence key:
+- **R**: read on this PC.
+- **P**: a probe on cachyos-rtx (Python 3.11.18), in `/tmp/b103-e3r6-3-S/`, run through `sec-r6-run.sh` (`-I -B`; HOME, XDG and LOCALAPPDATA set to `…/zq_iso_user`; stdin `/dev/null`; no display).
+
+Trees and corpus:
+- Inc 2a tree `~/work/b103-int2a`, read-only: `a2l_definition.py` md5 `f7fa38a5…`, `a2l.py` `d6879216…`.
+- Corpus lists as in rounds 3 to 5: 35 fixtures and 168 public files, read-only. Only derived counts left the runner.
+- The host was shared, at a load of 2.3–6.6 on 16 cores. Every time below uses the steady measure.
+
+**Model.** `sec-r6-m3a.py` is the round-5 model with only the corrected nodes changed (its docstring lists them):
+- `echo()` is R-A2L-DEF.151 at 256 characters.
+- The layout refusal holds `<component>` / `<word>` as echoes and `<layout>` `_clean`ed once. MOD_COMMON holds the first unreadable word's echo.
+- The method record adds the type verdict, the type echo, the COMPU_TAB_REF echo and the decimals. The CONVERSION and TABLE messages are written from the record.
+- The .89 message still `_clean`s `<layout>` per call, as the graph writes it.
+- `_decode_stored` bisects TAB_INTP and TAB_NOINTP (`table_bisect` v1, the graph's text), and scalars decode through it too.
+
+"2a, as ruled" marks Inc 2a's parts, modelled the way the round-5 ruling says the 2a pass will make them:
+- each enum text and default is cleaned once per table;
+- COMPU_VTAB uses a dict from raw value to the first entry, and COMPU_VTAB_RANGE a bisect over first-in-file-order segments;
+- `_enum_text` returns the stored string;
+- `_display_decimals` runs once per format text;
+- the record that Inc 2a's `_describe_one` reads is a proxy, so its inline type and table steps cost O(1), and the messages come from 3a's `_conversion_fields`, which 3a's `_describe_one` calls;
+- `_resolve_datatype` runs once per layout.
+
+The negative controls:
+- `r5` is the round-5 model unchanged, which is the round-5 graph.
+- `every-pair`, `rd-per-object` and `per-call` are the round-5 mutants.
+- TE=`clean` reads TABLE-EMPTY as the node text writes it (E3S3-26).
+
+**Measure** (E3S3-24, as accepted):
+- One walk's maps are built and the first name is described. The 399 other names are then timed in that walk with `time.process_time()`.
+- S, 2S and 8S (256 KiB, 512 KiB, 2 MiB) are interleaved run by run, and each time is the least of 15 runs. When a run takes over 1 ms per object, the one run at S and at 2S is the measure.
+- Decode is timed per object and interleaved the same way.
+
+A path is GREEN when all of these hold:
+- ×2S ≤ 1.3 and ×8S ≤ 2.0, for describe and for decode;
+- the 400 names' walk at S takes ≤ 0.5 s;
+- every definition's message, its axes' points' included, holds ≤ 1,024 characters at every size;
+- the decoded text per object does not grow. A text all 400 elements share is counted once.
+
+Transcripts: `sec-r6-steady-transcript.txt` (one run, every path) and `sec-r6-neg-transcript.txt`. Every definition's public fields are the same at every size on every path.
+
+### Per-path table (400 objects; µs per object at S / 2S / 8S, ratios ×2S, ×8S; message = the longest definition's characters)
+
+Users: **VB** VAL_BLK, **VA** VALUE, **QB** CUBOID, **SC** STD_AXIS curve, **MP** STD × STD map, **CC** COM_AXIS curve. Owner: **3a** (3a's nodes), or **2a, as ruled** (Inc 2a's code as the 2a gap pass is ruled to make it, `E3-rulings.md:78`). Ids as in round 5; **new** marks round 6's own paths.
+
+| Path | Users | Shared content (fill to S) | Owner | Describe | Decode | Message | Verdict |
+|---|---|---|---|---|---|---|---|
+| RL-1 | VB | layout: ALIGNMENT_BYTE 1 lines (.148/1) | 3a | 80 / 81 / 81 (×1.01, ×1.01) | 11 / 11 / 11 (×1.01, ×1.00) | 0 / 0 / 0 | GREEN |
+| RL-2 | VB | layout: the 7 ALIGNMENT classes repeated | 3a | 83 / 83 / 83 (×1.00, ×1.00) | 11 / 10 / 11 (×0.98, ×1.00) | 0 / 0 / 0 | GREEN |
+| RL-3 | VB | layout: a block comment | 3a | 81 / 80 / 80 (×0.99, ×0.99) | 10 / 11 / 10 (×1.00, ×1.00) | 0 / 0 / 0 | GREEN |
+| RL-4 | VB | layout: DIRECT-only lines | 3a | 80 / 79 / 79 (×0.99, ×1.00) | 10 / 10 / 10 (×0.99, ×0.98) | 0 / 0 / 0 | GREEN |
+| RL-5 | SC | layout: FIX_NO_AXIS_PTS_X 4 lines (STD curve) | 3a | 86 / 85 / 85 (×0.99, ×0.99) | 79 / 79 / 78 (×1.00, ×1.00) | 0 / 0 / 0 | GREEN |
+| RL-6 | VB | layout: first line 256 KiB of words, datatype last (.148/2); LAYOUT-PART | 3a | 73 / 73 / 73 (×1.00, ×0.99) | refused | 71 / 71 / 71 | GREEN |
+| RL-7 | VB | layout: one part line, a single long word (.84 echo, .148/10); LAYOUT-PART | 3a | 70 / 70 / 70 (×1.00, ×1.00) | refused | 322 / 322 / 322 | GREEN |
+| RL-8 | VB | layout: long FNC_VALUES mode word (.85 echo); LAYOUT-MODE | 3a | 70 / 69 / 69 (×0.99, ×0.99) | refused | 337 / 337 / 337 | GREEN |
+| RL-9 | VB | layout: long FNC_VALUES datatype word (.86 echo); LAYOUT-DATATYPE | 3a | 68 / 69 / 69 (×1.00, ×1.01) | refused | 346 / 346 / 346 | GREEN |
+| RL-10 | VA | layout: long first line, datatype last (.148/3) | 2a, as ruled | 27 / 27 / 27 (×1.00, ×1.00) | 2 / 2 / 2 (×0.97, ×0.97) | 0 / 0 / 0 | GREEN |
+| RL-11 | QB | the same, CUBOID objects (kind refused); KIND | 2a, as ruled | 29 / 29 / 29 (×0.99, ×1.00) | — | 56 / 56 / 56 | GREEN |
+| RL-12 | SC | layout: ALIGNMENT_BYTE 1 lines (STD curve) | 3a | 87 / 86 / 87 (×0.99, ×1.00) | 81 / 81 / 80 (×1.00, ×0.99) | 0 / 0 / 0 | GREEN |
+| RL-13 | MP | layout: ALIGNMENT_BYTE 1 lines (STD x STD map) | 3a | 111 / 109 / 112 (×0.98, ×1.01) | 82 / 81 / 82 (×0.99, ×1.00) | 0 / 0 / 0 | GREEN |
+| RL-14 | CC | axis object's layout: ALIGNMENT_BYTE 1 lines | 3a | 103 / 102 / 102 (×0.99, ×0.99) | 88 / 88 / 88 (×1.00, ×1.00) | 0 / 0 / 0 | GREEN |
+| RL-15 | CC | axis object's layout: one part line, a single long word (.148/15); LAYOUT-PART | 3a | 66 / 66 / 65 (×1.00, ×1.00) | refused | 326 / 326 / 326 | GREEN |
+| RL-16 **new** | CC | axis object's layout NAME long (AXIS_PTS word 5), a short part word (.84 `<layout>`); LAYOUT-PART | 3a | 96 / 124 / 494 (×1.29, ×5.13) | refused | 262208 / 524352 / 2097216 | **RED (describe, message>1024)** |
+| RL-17 **new** | CC | axis object's layout NAME long, MOD_COMMON ALIGNMENT_BYTE 2 moves AXIS_PTS_X (.89 `<layout>`); ALIGNMENT | 3a | 24.5 ms / 48.1 ms (×1.96) | refused | 262241 / 524385 | **RED (describe, T400, message>1024)** |
+| MC-1 | VB | MOD_COMMON: ALIGNMENT_BYTE 1 lines (.148/4) | 3a | 90 / 89 / 90 (×0.99, ×1.00) | 11 / 11 / 11 (×1.00, ×1.00) | 0 / 0 / 0 | GREEN |
+| MC-2 | CC | MOD_COMMON: ALIGNMENT_BYTE 1 lines, COM axis object (.148/5) | 3a | 113 / 114 / 113 (×1.01, ×1.00) | 88 / 88 / 88 (×1.00, ×1.00) | 0 / 0 / 0 | GREEN |
+| MC-3 | VB | MOD_COMMON: the 7 classes repeated, UWORD values | 3a | 88 / 88 / 88 (×1.00, ×1.00) | 10 / 10 / 10 (×1.00, ×1.00) | 0 / 0 / 0 | GREEN |
+| MC-4 | VB | MOD_COMMON: DEPOSIT ABSOLUTE lines | 3a | 82 / 83 / 82 (×1.01, ×1.00) | 10 / 10 / 10 (×1.00, ×1.00) | 0 / 0 / 0 | GREEN |
+| MC-5 | CC | MOD_COMMON: BYTE_ORDER lines | 3a | 104 / 104 / 104 (×1.00, ×0.99) | 89 / 89 / 88 (×1.00, ×0.99) | 0 / 0 / 0 | GREEN |
+| MC-6 | VB | MOD_COMMON: ALIGNMENT_BYTE x lines (.144, short word); ALIGNMENT | 3a | 82 / 82 / 82 (×1.00, ×0.99) | refused | 59 / 59 / 59 | GREEN |
+| MC-7 | VB | MOD_COMMON: one ALIGNMENT_BYTE line, a long word (.144 echo, .148/11); ALIGNMENT | 3a | 83 / 83 / 83 (×0.99, ×1.00) | refused | 315 / 315 / 315 | GREEN |
+| MC-8 | CC | the same, on the axis object's layout; ALIGNMENT | 3a | 106 / 106 / 106 (×1.00, ×1.00) | refused | 315 / 315 / 315 | GREEN |
+| AX-1 | CC | AXIS_PTS: DEPOSIT ABSOLUTE lines (.148/6) | 3a | 106 / 106 / 106 (×1.00, ×1.00) | 92 / 92 / 92 (×1.00, ×1.00) | 0 / 0 / 0 | GREEN |
+| AX-2 | CC | AXIS_PTS: block comment | 3a | 107 / 108 / 106 (×1.01, ×0.99) | 92 / 92 / 92 (×1.00, ×1.00) | 0 / 0 / 0 | GREEN |
+| AX-3 | CC | AXIS_PTS: BYTE_ORDER lines | 3a | 106 / 106 / 106 (×1.00, ×1.00) | 92 / 93 / 92 (×1.01, ×1.00) | 0 / 0 / 0 | GREEN |
+| AX-4 | CC | AXIS_PTS: long identifier | 3a | 106 / 106 / 106 (×1.00, ×1.00) | 92 / 92 / 91 (×1.00, ×0.99) | 0 / 0 / 0 | GREEN |
+| AX-5 | CC | AXIS_PTS: long layout word, not declared; AXIS-LAYOUT | 3a | 68 / 68 / 68 (×1.00, ×1.00) | — | 0 / 0 / 0 | GREEN |
+| AX-6 | CC | AXIS_PTS: long max-axis-points word; AXIS-MAX | 3a | 70 / 70 / 69 (×0.99, ×0.99) | — | 0 / 0 / 0 | GREEN |
+| AX-7 | CC | AXIS_PTS: long address word; AXIS-REF | 3a | 68 / 68 / 68 (×0.99, ×0.99) | — | 0 / 0 / 0 | GREEN |
+| CM-1 | SC | COMPU_METHOD: DEPOSIT ABSOLUTE lines (.148/7) | 3a | 89 / 89 / 89 (×1.00, ×1.00) | 88 / 88 / 88 (×1.00, ×1.00) | 0 / 0 / 0 | GREEN |
+| CM-2 | VA | COMPU_METHOD: block comment (VALUEs) | 2a, as ruled | 30 / 29 / 30 (×0.99, ×1.00) | 3 / 3 / 3 (×1.00, ×1.00) | 0 / 0 / 0 | GREEN |
+| CM-3 | SC | COMPU_METHOD: COEFFS_LINEAR lines | 3a | 84 / 84 / 84 (×1.00, ×1.00) | 84 / 84 / 84 (×1.00, ×1.00) | 0 / 0 / 0 | GREEN |
+| CM-4 | SC | COMPU_METHOD: FORMAT word %+digits+.2 (.148/12) (3a + 2a, as ruled | object decimals) | 84 / 84 / 84 (×1.00, ×1.00) | 85 / 85 / 85 (×1.00, ×1.00) | 0 / 0 / 0 | GREEN |
+| CM-5 | VA | the same, VALUEs | 2a, as ruled | 29 / 29 / 28 (×1.00, ×0.99) | 3 / 3 / 3 (×0.99, ×1.00) | 0 / 0 / 0 | GREEN |
+| CM-6 | SC | COMPU_METHOD: long conversion type word (CONVERSION echo, .148/13); CONVERSION | 3a | 89 / 89 / 89 (×1.00, ×1.00) | — | 622 / 622 / 622 | GREEN |
+| CM-7 | VA | the same, VALUEs; CONVERSION | 2a, as ruled + 3a _conversion_fields | 41 / 41 / 41 (×1.00, ×1.00) | — | 310 / 310 / 310 | GREEN |
+| CM-8 | SC | COMPU_METHOD: long COMPU_TAB_REF, not declared (TABLE echo, .148/14); TABLE | 3a | 89 / 89 / 89 (×1.00, ×1.00) | — | 622 / 622 / 622 | GREEN |
+| CM-9 | VA | the same, VALUEs; TABLE | 2a, as ruled + 3a _conversion_fields | 41 / 41 / 41 (×1.00, ×1.00) | — | 310 / 310 / 310 | GREEN |
+| CM-10 | VA | COMPU_METHOD: long unit word (2a | by reference) | 29 / 29 / 29 (×1.00, ×1.00) | 3 / 3 / 3 (×1.00, ×0.99) | 0 / 0 / 0 | GREEN |
+| CM-11 | VB | COMPU_METHOD: TAB_INTP, long COMPU_TAB_REF, not declared | 3a | 80 / 80 / 80 (×1.00, ×0.99) | 14 / 14 / 14 (×1.01, ×1.00) | 0 / 0 / 0 | GREEN |
+| VT-1 | SC | COMPU_VTAB: entries (.148/8; .150/arr-1) | decode 2a, as ruled | 87 / 87 / 87 (×1.00, ×1.00) | 80 / 79 / 80 (×1.00, ×1.00) | 0 / 0 / 0 | GREEN |
+| VT-2 | VB | COMPU_VTAB: entries (.150/arr-2) | decode 2a, as ruled | 78 / 78 / 77 (×1.00, ×0.99) | 11 / 11 / 11 (×1.00, ×1.00) | 0 / 0 / 0 | GREEN |
+| VT-3 | VA | COMPU_VTAB: entries, enum VALUEs | decode 2a, as ruled | 31 / 31 / 31 (×1.00, ×1.00) | 3 / 3 / 3 (×1.03, ×1.02) | 0 / 0 / 0 | GREEN |
+| VT-4 | VB | COMPU_VTAB: block comment | 3a | 76 / 76 / 76 (×1.00, ×1.00) | 11 / 11 / 11 (×1.00, ×1.00) | 0 / 0 / 0 | GREEN |
+| VT-5 | VB | COMPU_VTAB: one entry, long text, matched (.150/arr-3) | decode 2a, as ruled | 77 / 76 / 76 (×1.00, ×0.99) | 11 / 11 / 11 (×1.00, ×1.00); 1 text object per 400 elements | 0 / 0 / 0 | GREEN (the sum of lengths counts one shared string 400×) |
+| VT-6 | VB | COMPU_VTAB: long DEFAULT_VALUE text, no match (.150/arr-4) | decode 2a, as ruled | 75 / 76 / 75 (×1.00, ×1.00) | 10 / 10 / 10 (×1.00, ×1.00); 1 text object per 400 elements | 0 / 0 / 0 | GREEN (the sum of lengths counts one shared string 400×) |
+| VT-7 | VB | COMPU_VTAB: count 0, entries after it (TABLE-EMPTY); TABLE-EMPTY | 3a | 77 / 77 / 77 (×1.01, ×1.00) | — | 35 / 35 / 35 | GREEN |
+| VT-8 **new** | SC | COMPU_VTAB named by a long word, count 0 (TABLE-EMPTY `<table>`); TABLE-EMPTY | 3a | 101 / 111 / 166 (×1.10, ×1.64) | — | 582 / 582 / 582 | GREEN |
+| VT-8 **new** TE=clean | SC | COMPU_VTAB named by a long word, count 0 (TABLE-EMPTY `<table>`); TABLE-EMPTY | 3a | 49.7 ms / 97.1 ms (×1.95) | — | 524356 / 1048644 | **RED (describe, T400, message>1024)** |
+| VT-9 **new** | VA | the same, VALUEs (3a _conversion_fields; TABLE-EMPTY | 2a :529) | 48 / 53 / 87 (×1.11, ×1.82) | — | 290 / 290 / 290 | GREEN |
+| VT-9 **new** TE=clean | VA | the same, VALUEs (3a _conversion_fields; TABLE-EMPTY | 2a :529) | 24.1 ms / 48.6 ms (×2.02) | — | 262177 / 524321 | **RED (describe, T400, message>1024)** |
+| VR-1 | SC | COMPU_VTAB_RANGE: entries (.148/9; .150/arr-5) | decode 2a, as ruled | 85 / 85 / 85 (×1.00, ×1.00) | 85 / 85 / 85 (×1.01, ×1.01) | 0 / 0 / 0 | GREEN |
+| VR-2 | VB | COMPU_VTAB_RANGE: one range, long text, matched (.150/arr-6) | decode 2a, as ruled | 76 / 76 / 75 (×1.00, ×1.00) | 11 / 11 / 11 (×1.00, ×1.00); 1 text object per 400 elements | 0 / 0 / 0 | GREEN (the sum of lengths counts one shared string 400×) |
+| CT-1 | VB | COMPU_TAB: entries, TAB_INTP, last interval (.150/arr-7) | 3a bisect | 75 / 75 / 74 (×1.00, ×0.99) | 12 / 12 / 12 (×1.00, ×1.01) | 0 / 0 / 0 | GREEN |
+| CT-2 | VB | COMPU_TAB: entries, TAB_NOINTP, no exact entry (.150/arr-8) | 3a bisect | 75 / 75 / 75 (×1.00, ×1.00) | 13 / 13 / 13 (×1.00, ×1.00) | 0 / 0 / 0 | GREEN |
+| CT-3 **new** | VA | COMPU_TAB: TAB_INTP, VALUEs (3a decode_definition -> _decode_stored | 2a alone: frozen) | 28 / 28 / 28 (×1.00, ×1.00) | 4 / 4 / 4 (×1.00, ×1.01) | 0 / 0 / 0 | GREEN |
+| CT-4 **new** | VA | COMPU_TAB: TAB_NOINTP, VALUEs (3a decode_definition -> _decode_stored | 2a alone: frozen) | 28 / 28 / 28 (×1.00, ×1.00) | 4 / 4 / 4 (×1.01, ×1.02) | 0 / 0 / 0 | GREEN |
+| EN-1 **new** | VB | one VAL_BLK of 64 elements, the object's NAME of S characters; TAB_INTP, its table not declared (each element `A2L-DEF-DECODE`) | 3a `_element_definition`, `_decode_stored` | — (one object) | **23.6 / 47.9 / 193.0 ms per element (×2.03, ×8.19)**; 256 / 512 / 2,048 KiB of message kept per element | — | **RED (decode)** |
+| EN-2 **new** | VB | the same, NO_COMPU_METHOD (each element accepted) | 3a `_element_definition` | — (one object) | 16 / 22 / 80 µs per element (×1.38, ×4.98); nothing kept | — | **RED (decode)** |
+
+**Negative controls** (each must turn RED; P `sec-r6-neg-transcript.txt`):
+
+| Path | Mutant | Describe | Decode | Message | Verdict |
+|---|---|---|---|---|---|
+| MC-1 | every-pair | 14.7 ms / 30.2 ms (×2.05) | 10 / 11 (×1.03) | 0 / 0 | **RED (describe, T400)** |
+| MC-2 | every-pair | 15.9 ms / 30.4 ms (×1.91) | 86 / 86 (×1.00) | 0 / 0 | **RED (describe, T400)** |
+| RL-10 | rd-per-object | 6.0 ms / 12.3 ms (×2.06) | 2 / 2 (×1.00) | 0 / 0 | **RED (describe, T400)** |
+| RL-11 | rd-per-object | 5.9 ms / 11.9 ms (×2.01) | — | 56 / 56 | **RED (describe, T400)** |
+| CM-2 | per-call | 14.0 ms / 27.6 ms (×1.97) | 3 / 3 (×1.00) | 0 / 0 | **RED (describe, T400)** |
+| VT-3 | per-call | 55.6 ms / 111.7 ms (×2.01) | 1.3 ms / 2.7 ms (×2.02) | 0 / 0 | **RED (describe, T400, decode)** |
+| RL-7 | r5 | 98 / 121 / 284 (×1.23, ×2.90) | refused | 262209 / 524353 / 2097217 | **RED (describe, message>1024)** |
+| RL-8 | r5 | 96 / 121 / 286 (×1.26, ×2.96) | refused | 262224 / 524368 / 2097232 | **RED (describe, message>1024)** |
+| RL-9 | r5 | 98 / 126 / 309 (×1.29, ×3.15) | refused | 262233 / 524377 / 2097241 | **RED (describe, message>1024)** |
+| RL-15 | r5 | 99 / 128 / 306 (×1.29, ×3.10) | refused | 262213 / 524357 / 2097221 | **RED (describe, message>1024)** |
+| MC-7 | r5 | 24.7 ms / 54.9 ms (×2.23) | refused | 262202 / 524346 | **RED (describe, T400, message>1024)** |
+| MC-8 | r5 | 28.4 ms / 53.4 ms (×1.88) | refused | 262202 / 524346 | **RED (describe, T400, message>1024)** |
+| CM-4 | r5 | 31.4 ms / 50.2 ms (×1.60) | 82 / 82 (×1.00) | 0 / 0 | **RED (describe, T400)** |
+| CM-5 | r5 | 13.7 ms / 26.0 ms (×1.89) | 3 / 3 (×1.00) | 0 / 0 | **RED (describe, T400)** |
+| CM-6 | r5 | 50.1 ms / 98.3 ms (×1.96) | — | 524396 / 1048684 | **RED (describe, T400, message>1024)** |
+| CM-7 | r5 | 24.5 ms / 49.5 ms (×2.02) | — | 262197 / 524341 | **RED (describe, T400, message>1024)** |
+| CM-8 | r5 | 47.8 ms / 95.6 ms (×2.00) | — | 524396 / 1048684 | **RED (describe, T400, message>1024)** |
+| CM-9 | r5 | 24.1 ms / 48.3 ms (×2.01) | — | 262197 / 524341 | **RED (describe, T400, message>1024)** |
+| VT-1 | r5 | 89 / 88 / 88 (×0.99, ×0.99) | 10.7 ms / 20.5 ms (×1.91) | 0 / 0 / 0 | **RED (decode)** |
+| VT-2 | r5 | 78 / 78 / 77 (×1.00, ×1.00) | 1.3 ms / 2.6 ms (×2.00) | 0 / 0 / 0 | **RED (decode)** |
+| VT-3 | r5 | 28 / 28 / 28 (×1.00, ×0.99) | 1.3 ms / 2.5 ms (×1.92) | 0 / 0 / 0 | **RED (decode)** |
+| VT-5 | r5 | 83 / 79 / 83 (×0.96, ×1.00) | 24.1 ms / 47.9 ms (×1.99); 400 text objects per 400 elements | 0 / 0 / 0 | **RED (decode)** |
+| VT-6 | r5 | 77 / 77 / 77 (×1.00, ×1.00) | 23.4 ms / 47.5 ms (×2.03); 400 text objects per 400 elements | 0 / 0 / 0 | **RED (decode)** |
+| VR-1 | r5 | 87 / 87 / 88 (×1.00, ×1.00) | 8.3 ms / 15.8 ms (×1.91) | 0 / 0 / 0 | **RED (decode)** |
+| VR-2 | r5 | 77 / 77 / 77 (×1.01, ×1.01) | 23.5 ms / 47.2 ms (×2.01); 400 text objects per 400 elements | 0 / 0 / 0 | **RED (decode)** |
+| CT-1 | r5 | 76 / 76 / 76 (×1.00, ×1.00) | 1.1 ms / 2.1 ms (×1.93) | 0 / 0 / 0 | **RED (decode)** |
+| CT-2 | r5 | 76 / 76 / 76 (×1.01, ×1.01) | 1.8 ms / 3.4 ms (×1.94) | 0 / 0 / 0 | **RED (decode)** |
+| CT-3 | r5 | 27 / 27 / 27 (×1.00, ×0.99) | 1.1 ms / 2.1 ms (×1.93) | 0 / 0 / 0 | **RED (decode)** |
+| CT-4 | r5 | 27 / 27 / 27 (×1.00, ×1.00) | 1.8 ms / 3.4 ms (×1.93) | 0 / 0 / 0 | **RED (decode)** |
+| RL-1 | every-pair | 7.6 ms / 17.2 ms (×2.26) | 10 / 10 (×1.00) | 0 / 0 | **RED (describe, T400)** |
+
+### Round-5 findings
+
+| Id | Round 5 | Round 6 | Evidence |
+|---|---|---|---|
+| E3S3-22 | MAJOR | **CLOSED for its 12 paths** (design; `executed` on the model). The reduced forms hold each echoed word as its .151 echo, the type verdict and the decimals (`graph-inc3.md:365`, `:480`, `:545`, `:134`). RL-7, -8, -9, -15, MC-7, -8 and CM-4 … -9 stay at 29–106 µs per object at S / 2S / 8S (×0.99–1.01), and each message holds 310–622 characters. The round-5 graph (`r5`) turns them RED: ×1.23–1.29 at 2S with ×2.90–3.15 at 8S, or ×1.60–2.23 at 2S. **The class stays open** at E3S3-25 (`<layout>` reached through an AXIS_PTS) and at E3S3-26 (TABLE-EMPTY). | P steady, neg |
+| E3S3-23 | MAJOR | **CLOSED** (2a, as ruled; `executed` on the model). VT-5, VT-6 and VR-2 decode in 10–11 µs per object at every size, and all 400 elements' texts are **one** string object, the reduced form's (`is`). The harness's sum of text lengths reads 256 → 2,048 KiB because it counts that one string 400 times. The round-5 code (`r5`) gives a private copy per element: 400 text objects per 400 elements, 23.4–24.1 ms per object, ×1.99–2.03 (VT-5, VT-6, VR-2). It lands with Inc 2a's gap pass (`.150/arr-3`, `/arr-4`, `/arr-6`). | P steady, neg; [I] (below) |
+| E3S3-20 | MEDIUM | **CLOSED** (design; `executed` on the model). VT-1 … -3 and VR-1 (2a, as ruled), CT-1 and CT-2 (3a's bisect), and the scalar CT-3 and CT-4 (3a's `decode_definition` → `_decode_stored`) are flat at 3–85 µs per object, ×1.00–1.03. `r5` turns them RED: VT-1 10.7 / 20.5 ms (×1.91), VT-2 and VT-3 1.3 / 2.5–2.6 ms (×1.92–2.00), VR-1 8.3 / 15.8 ms (×1.91), CT-1 … CT-4 1.1–1.8 / 2.1–3.4 ms (×1.93–1.94). For VALUEs, `r5` is Inc 2a alone, before 3a merges: CT-3 and CT-4 RED (×1.93), see E3S3-30 (b). The bisect's *values* are E3S3-29's. | P steady, neg |
+| E3S3-24 | MEDIUM | **CLOSED** (design). Case .148/1 states the measure for every .148 case, and .150/arr-1 reuses it (`02-test-cases.md:178`, `:312`): `process_time`, S / 2S / 8S interleaved, the least of ≥ 15 runs, ×2S ≤ 1.3 and ×8S ≤ 2.0, and the 1 KiB message bound. Run so here, it separates every path in one run. Flat paths sit at ×0.97–1.03; the paths that grow sit at ≥ ×1.23 at 2S with ≥ ×2.90 at 8S, or at ≥ ×1.60 at 2S. There were no false REDs. (VT-8 and VT-9 at ×1.64 and ×1.82 at 8S are a real but small growth, E3S3-31.) | P steady |
+| E3S3-18 | MAJOR | **3a CLOSED; Inc 2a's part GREEN as ruled** (RL-10, RL-11 flat; `rd-per-object` RED, ×2.01–2.06). Still owed by Inc 2a's E5. | P steady, neg |
+| E3S3-21 | INFO | carried (backlog, frozen file) | — |
+| E3S3-03, -04, -06 | MEDIUM, MEDIUM, MINOR | carried. E3S3-27 adds to E3S3-03's per-element budget. | R |
+
+### New findings (round 6)
+
+| Id | Severity | About | Defect | Fix |
+|---|---|---|---|---|
+| E3S3-25 | **MAJOR** | `E3-rulings.md:98` (".151's reach": "`<layout>` (a word of the object's own header) keep[s] .137"); `_read_axis` (`graph-inc3.md:558`: the COM layout is AXIS_PTS header word 5, "its other refusals pass"); `_read_record_layout` (`:480`, the stored refusal); `_describe_array` (`:384`, the .89 message); R-A2L-DEF.84 … .87 and .89 | **For a COM_AXIS curve, `<layout>` is a word of the shared AXIS_PTS, not of the object's header.** It names the axis object's record layout, and every curve that names that AXIS_PTS reaches it. (a) **RL-16.** The axis object's layout has a 256 KiB name and a refusal (PART here; MODE, DATATYPE and POSITION are the same). The stored owner-free refusal holds `<layout>` whole, and each curve's message is `<name>` plus that text. That is a private copy per curve: 262,208 → 524,352 → 2,097,216 characters per definition, and 96 / 124 / 494 µs per object (×1.29, **×5.13**). (b) **RL-17.** The MOD_COMMON moves the axis object's AXIS_PTS_X. `_describe_array` writes `<layout>` into the .89 message with `_clean` for each curve: **24.5 / 48.1 ms per object (×1.96)**, 9.9 s for the 400 names at S, and 262,241 characters per message. Each is E3S3-22's class on a word the ruling left out on a false premise. At the round-5 rates, a 5 MB file of 20,000 COM curves on a 1 MiB layout name costs ≈ 30 min of describe-all (RL-17) or ≈ 20 GiB of messages (RL-16). It is hostile-only: the longest real section name is 148 characters (round-5 census), so the 256 cap changes no real message (corpus below: 0 message differences). Owner 3a. (P steady RL-16, RL-17; [I] RL-16: a 65,594-character stored refusal at 64 KiB) | **Make .151's reach what its row's text says: every file word a refusal message echoes**, `<layout>` and `<name>` included (the row reads "a file word"; `01-requirements.md:264`). Each echo is computed once, at reduction, for the words of a shared section. That removes the exception the ruling made and also closes E3S3-27. No real message changes, because every measured name is ≤ 148 characters. Add .148 cases /16 (RL-16) and /17 (RL-17), each with its message ≤ 1 KiB at S / 2S / 8S. Negative control: the graph as written. Smaller alternative: cap only `<layout>` in the layout's stored refusal and in the .89 message. |
+| E3S3-26 | MEDIUM | `_conversion_fields` (`graph-inc3.md:365`: "So the CONVERSION and TABLE messages are `<name>` plus stored text"; TABLE-EMPTY is not named, and "messages as R-A2L-DEF.137"); Inc 2a's `_describe_one:529` (`the table {_clean(enum_table)} has no entries`), which is not in the 2a pass's line list (`E3-rulings.md:78`); .148 has no TABLE-EMPTY case | **TABLE-EMPTY echoes the method's COMPU_TAB_REF word, which names a declared, empty table.** That word is shared by every object the method converts. The general rule (*Lookups* `:134`, "a word a message echoes is held as its echo") covers it, but the node text, the 2a lines and the cases do not. Read the node as written, with `_clean` per call (TE=`clean`): VT-8 takes **49.7 / 97.1 ms per object (×1.95)**, VT-9 (VALUEs) **24.1 / 48.6 ms (×2.02)**, and each message holds 262,177 → 1,048,644 characters. Read under the general rule (the stored echo): both GREEN, 48–166 µs per object, messages of 290–582 characters. The outcome depends on a reading that the records leave open. | Name TABLE-EMPTY with CONVERSION and TABLE in `_conversion_fields` (`<table>` = the record's stored COMPU_TAB_REF echo). Add `:529` to the 2a pass's lines. Add .148/18: a COMPU_VTAB named by a 256 KiB word with count 0, for STD_AXIS curves and for VALUEs, message ≤ 1 KiB. Negative control: `_clean(<ref>)` per call → RED. |
+| E3S3-27 | **MAJOR** | `_element_definition` / `element_name` (`graph-inc3.md:648`, `:660`: each element's definition named `<name>[<i>]`); `_decode_stored` (`:764`: `A2L-DEF-DECODE` `<name>: <conversion error>` with the element's name); `decode_values` (`:672`); R-A2L-DEF.150 bounds the conversion table only; the ruled reach of .151 keeps `<name>` at .137 | **An element's decode costs the object's name length, and a refusal keeps a copy of the name per element.** `decode_values` builds each element's definition with the name `<name>[<i>]`, a copy of the object's name. When the conversion refuses the element (here TAB_INTP with an undeclared table, `lookup table missing`; also NaN on TAB_INTP, a RAT_FUNC with no root), `_decode_stored` `_clean`s that name and keeps it in the refusal. **EN-1** (one VAL_BLK of 64 elements, its name 256 KiB / 512 KiB / 2 MiB): **23.6 / 47.9 / 193 ms per element (×2.03, ×8.19)**, keeping 256 KiB / 512 KiB / 2 MiB per element. EN-2 (the same, accepted) still copies the name per element: 16 / 22 / 80 µs (×1.38, ×4.98). Within the system's own bounds, a VAL_BLK of 1,048,576 UBYTE elements (R-A2L-DEF.7.2) on a 1 MiB name (a 1 MiB file and a 1 MiB image) costs ≈ 27 h and ≈ 1 TiB of messages. 10,000 elements cost ≈ 16 min and 10 GiB. Off-UI-thread decoding (E3S3-03) does not bound it. Hostile-only (real names ≤ 148 characters). The object's name is shared by its elements as a section word is shared by objects; neither .150 (table size) nor .151 (as ruled) reaches it. Owner 3a. (P steady EN-1, EN-2) | Two O(1) steps per element, removing work rather than guarding it. (1) The definition carries its name's .151 echo, computed once at describe (E3S3-25's fix gives it). An element's refusal message is that echo + `[<i>]` + the error, so ≤ ~330 characters. (2) `decode_values` builds an element's full name only when a caller asks (`element_name`), not per decoded element: `_decode_stored` needs only the element's datatype, address and conversion fields. Add .150/arr-10: EN-1 and EN-2 at name sizes S / 2S / 8S, decode per element ×1.3 / ×2.0 at most, the message kept per element ≤ 1 KiB. Negative control: the graph as written → ×2.03 and 256 KiB per element → RED. |
+| E3S3-28 | **MAJOR** | Inc 2a's `decode_definition` → `display_text` (`a2l_definition.py:925-935`, `:1033`: `math.isfinite(value)`); 3a's `_decode_stored` (`graph-inc3.md:764`: the bisect gives "the value … the frozen `_apply_compu_method` gives"; then `display_text`); the frozen `extract_compu_tables` keeps a non-numeric y as text (`a2l.py:919-920`), and `_table_lookup` returns it (`a2l.py:1862-1889`); I-2 "never raises on file or image content" | **Decode raises `TypeError: must be real number, not str` when a TAB_INTP or TAB_NOINTP method's table holds a text value.** That happens when the method names a COMPU_VTAB (both kinds share `compu_tabs_by_name`), or a COMPU_TAB with a non-numeric y. The frozen lookup returns the text: on an exact or nearest entry for TAB_NOINTP, and on the left entry of an interval for TAB_INTP. `display_text` then calls `math.isfinite` on it. Reproduced: two VALUEs through Inc 2a's real `decode_definition`, and two VALUEs and two VAL_BLKs through the model's `_decode_stored`, all RAISE (P `sec-r6-raise-transcript.txt` [X]). Describe accepts these objects (no refusal checks a TAB_INTP / TAB_NOINTP table). **A real file has one:** of the 81 corpus COMPU_TABs that a TAB_INTP / TAB_NOINTP method names, 1 holds a non-numeric y, and the frozen lookup returns text at 2 of its 1,977 case points (P `sec-r6-census-transcript.txt` [C]). The same class as E3S3-09 (an exception at decode on file content), which was MAJOR. In 3a, one such element makes a whole `decode_values` raise. | Fail closed at decode, one test in `_decode_stored`: a conversion result that is not an `int` or `float` → `A2L-DEF-DECODE` `<name>: the table <ref> gives a value that is not a number` (`<ref>` as .151). Inc 2a's `decode_definition` (its scalar path, before 3a merges) gets the same test in its gap pass. Add cases: .150/arr-11 (a VAL_BLK and a VALUE, TAB_NOINTP and TAB_INTP naming a COMPU_VTAB; 0 exceptions, the refusal). Negative control: Inc 2a as merged → `TypeError` → RED. Alternative: refuse at describe a TAB_INTP / TAB_NOINTP method whose table holds a non-numeric y, with the verdict computed once per walk in the method record. |
+| E3S3-29 | MEDIUM | `_decode_stored` (`graph-inc3.md:764`: "one bisect … giving the value and conversion error the frozen `_apply_compu_method` gives, exact entries, ties and ends included"); case .150/arr-9 (`02-test-cases.md:320`: stored values "each entry's x, a quarter of the way from each x to the next, the first x − 1 and the last x + 1") | **The bisect the graph describes equals the frozen lookup on the case's values, but not on values the case does not try.** Census over every COMPU_TAB / COMPU_VTAB with entries in the 203 files: 1,668 tables, both TAB_INTP and TAB_NOINTP on each. v1 is the graph's text: exact entries via `bisect_left`, the nearest of the two neighbours with the lower duplicate's first entry, ties to the lower, the end clamps. **The case's values: 39,164 pairs, 0 differences.** Extended finite values (midpoints, x ± 1 ulp, ±0, ±1e300, 2^53 + 1, ±2^63, 2^64 − 1): **4,818 of 70,512 differ**. Non-finite (NaN, ±inf): **3,283 of 10,008 differ**. Two rules of the frozen function cause it, and neither is in the node text: (i) TAB_NOINTP keeps the **first** entry of the least *rounded* distance. When the stored value is far from the table, many distances round to one value and the frozen function answers the first entry, while v1 answers the nearest (A_UINT64 2^64 − 1, FLOAT32 above ~1e22, ±inf); (ii) TAB_INTP with NaN finds no interval and refuses with `value outside interpolation range`, while v1 answers a value (NaN shown as `nan`). Separately, a `nan` x (a legal float word) leaves the frozen parse's sort unordered, and every bisect then parts from the frozen scan (INLINE probe; 0 such tables in the corpus). A displayed value then differs from what the frozen reader shows for the same bytes, on FLOAT32/64 and 64-bit integer VAL_BLKs. (P `sec-r6-bisect-transcript.txt` [B]; [X] probes) | Pin both rules in `_decode_stored` (v2, still O(log n): one more bisect over the run of lower entries whose rounded distance equals the least, and the no-interval refusal for TAB_INTP). **v2 gives 0 differences on all 119,684 pairs.** Add to .150/arr-9 the stored values NaN, ±inf, 2^63 and 2^64 − 1 (FLOAT64 and A_UINT64 VAL_BLKs). Refuse at decode a table whose x holds a NaN (`A2L-DEF-DECODE`), or compute that verdict once per walk. |
+| E3S3-30 | MEDIUM | `E3-rulings.md:58` ("a bisect for COMPU_VTAB_RANGE"), `:97` (*Enum index*: "for the 2a pass to design"); Inc 2a's `_enum_entry_text` (`a2l_definition.py:972-983`: "the first entry in file order that holds `stored`"); `.150/arr-5`, `/arr-6` (no equality case for ranges); the 2a pass's line list (`:78`), which names no scalar table lookup although R-A2L-DEF.150 is Inc 2a's row | **Two gaps in what the 2a gap pass is told to build.** (a) **A plain bisect over the ranges gives other texts on real files.** COMPU_VTAB_RANGE ranges may overlap and come in any order, and the lookup is "the first in file order". Sorted by min, a bisect for the last range whose min ≤ v, then a check of its max, differs from Inc 2a's lookup on **780 of 7,752 points in 30 of the 219 corpus range tables** (P [C]). The modelled index, which keeps the first-in-file-order range per disjoint segment (O(n log n) once per table, O(log n) per element), gives **0 of 20,823** (P [B]), and the dict for COMPU_VTAB gives 0 too. The ruling leaves this design to the 2a pass with no equality case, so a natural reading would change displayed enum texts on 30 real tables. (b) **A VALUE's TAB_INTP / TAB_NOINTP decode still scans the shared COMPU_TAB in Inc 2a alone.** CT-3 and CT-4 take 1.1 / 2.1 and 1.8 / 3.4 ms per object (×1.93) through the frozen `_table_lookup`. They are flat (4 µs) only once 3a's `decode_definition` routes them through `_decode_stored`'s bisect. So .150, Inc 2a's own row, is RED in Inc 2a's code until 3a merges, and no 2a case shows it. (P neg CT-3, CT-4) | (a) Write into the 2a pass's records the segment index (first range in file order per segment) and an equality case like .150/arr-9: every corpus COMPU_VTAB / _RANGE table at each raw, min, max, midpoint, ±1, NaN and ±inf, against `_enum_entry_text` as merged. 0 differences; negative control: a plain bisect → 780 differences → RED. (b) Either add the scalar table lookup (with E3S3-29's two rules) to the 2a pass's lines with a .150 VALUE case, or record in .150 that its scalar TAB_INTP / TAB_NOINTP case runs GREEN only once 3a merges. |
+| E3S3-31 | MINOR | `_conversion_fields` (`graph-inc3.md:365`: the enum table is `reads[id(its COMPU_VTAB … section)]`, found by name per call); the same by-name step for the axis object's layout (`_read_axis`, word 5) | **Finding a shared section by a long name compares the whole name on every call.** The method record holds the COMPU_TAB_REF word, and `compu_tables_by_name[word]` has a key of equal text but another string object. So each lookup is a full comparison: VT-8 101 / 111 / 166 µs per object (×1.10, ×1.64), VT-9 48 / 53 / 87 µs (×1.11, ×1.82). That is within .148's bounds and ≈ 20 µs per object per MiB of name (about 1 s for 20,000 objects on a 1 MiB word), but it grows, and a 16S file would pass ×2. | The method record keeps, computed at reduction, the section its COMPU_TAB_REF names (or none). Likewise, the AXIS_PTS read form keeps its resolved layout. No per-call name lookup of a shared word remains. |
+| E3S3-32 | LOW | R-A2L-DEF.148's "every definition's message … at most 1 KiB" (`01-requirements.md:198`; cases `02-test-cases.md:178-192`) | **"1 KiB" does not say whether it counts characters or bytes.** A .151 echo of 256 U+FFFD characters is 768 UTF-8 bytes, and `…` is 3. This harness, and the brief, count characters. | Write "1,024 characters". |
+
+### Questions routed to round 6
+- *The steady scaling test over every path, the long-word fills of every echo family, every decode path and the negative controls.* Done: 52 round-5 path ids, 8 new paths and 30 negative controls (tables above). The fills for RL-7, -8, -9, -15, MC-7, -8, CM-4, -6, -8 and their VALUE twins CM-5, -7, -9 are all GREEN. VT-1 … -7, VR-1, -2, CT-1, -2 (and the new scalar CT-3, -4) are all GREEN, the Inc 2a parts as ruled. Every negative is RED. Every definition's public fields are the same at S, 2S and 8S on every path.
+- *The bisect gives the frozen `a2l._table_lookup`'s values on every corpus COMPU_TAB?* **Yes on the case's value set** (39,164 pairs, 0 differences). **No beyond it** (E3S3-29: 8,101 of 80,520 pairs). v2 matches all 119,684. This is a read-only census on the 203 files; 81 tables are named by a TAB_INTP / TAB_NOINTP method, and the census tries every table both ways. 0 tables have a duplicate x, a NaN x or an infinite x.
+- *Each definition's message ≤ 1,024 characters?* **On real files, yes.** The corrected model describes all 353,626 objects of the 203 files (6,379 arrays): 0 verdict or public-field differences from the round-5 model, **0 message differences**, longest message 283 characters, 0 above 1,024. Inc 2a's real `describe_definitions` and the 2a-as-ruled scalar path agree on every scalar's fields (P `sec-r6-corpus-transcript.txt` [E], `sec-r6-scalardiff-transcript.txt` [E2]). **On the scaling paths, yes** except RL-16 and RL-17 (E3S3-25) and VT-8 / VT-9 under the node text's reading (E3S3-26). The longest GREEN message is 622 characters (CM-6 and CM-8: the object's and the axis's).
+- *Immutability of the new reduced forms* ([I], P `sec-r6-immut-transcript.txt`): **yes.** It covers 65 forms on 22 paths: 16 layouts, 5 owner-free layout refusals, 13 MOD_COMMONs, 18 method records with the four new keys, 7 enum tables and 6 reduced enum forms (2a, as ruled: the cleaned texts, the dict / segment index). No form holds a list, dict, set or other mutable container. Assignment into a read-only mapping raises `TypeError`, and an `EnumEntry` refuses `setattr`. Two full decodes leave every form's deep digest and the `a2l_data` digest unchanged. Each type and reference echo is ≤ 257 characters. In VT-5, VT-6 and VR-2 the 800 long element texts of two decodes are **one** string object. The only out-of-bound form is RL-16's stored refusal (65,594 characters at 64 KiB): E3S3-25.
+- *Is the class "per-object work on shared content" closed for every node?* **No.** Node by node (3a's G1 nodes, `graph-inc3.md:242-243`):
+
+| Node | Shared content reached per object | Closed? |
+|---|---|---|
+| `describe_definitions` | the walk; maps built once; `reads` keyed by identity | yes |
+| `_describe_one` | method record (2a, as ruled), decimals (2a), `_resolve_datatype` (2a), conversion steps through `_conversion_fields` (RL-10, -11, CM-2, -5, -7, -9, -10, VT-3, -9) | yes, once Inc 2a's gap pass lands as ruled |
+| `_object_kind`, `_read_matrix_dim`, `_array_shape`, `_fixed_points`, `_element_offset`, `_point_offset`, `_current_count` | the object's own section, or O(1) | n/a / yes |
+| `_conversion_fields` | method record, enum table: CONVERSION, TABLE and decimals closed (CM-4, -6, -8); TABLE-EMPTY closed only under the general rule (VT-8, E3S3-26); the by-name lookup compares a long name per call (E3S3-31, minor) | **no, for TABLE-EMPTY as the node is written** |
+| `_describe_array` | .144 echo closed (MC-7, -8); **.89 message `_clean`s a COM axis object's `<layout>` per curve (RL-17)** | **no (E3S3-25)** |
+| `_read_record_layout` | `<component>` / `<word>` closed (RL-7, -8, -9, -15); **`<layout>` of a layout reached through an AXIS_PTS copied per curve (RL-16)** | **no (E3S3-25)** |
+| `_place_components`, `_check_module_alignment`, `_module_common` | one ALIGNMENT entry per class, the stored echo (RL-1 … -5, -12 … -14, MC-1 … -8) | yes |
+| `_read_axis`, `_find_axis_object` | AXIS_PTS header (10 words), byte order once (AX-1 … -7, MC-5); passes RL-16's refusal on | yes, but for E3S3-25 |
+| `decode_definition`, `_decode_stored`, `_decode_axis`, `decode_values` | conversion tables: bisect (CT-1 … -4) and enum lookups (2a, as ruled: VT-1, -2, -5, -6, VR-1, -2) closed; **per element, the object's name copied and `_clean`ed into a refusal (EN-1, EN-2)**; a text table value raises (E3S3-28, a different class) | **no, per element (E3S3-27)** |
+| `_element_definition`, `element_name` | the object's name, per element (EN-2) | **no (E3S3-27)** |
+| G2 synth nodes, a2l.py context nodes | the synth writes only definitions it builds (no file input); the frozen parse's per-tag layout span is E3S3-21 (backlog) | n/a |
+
+### Evidence checklist (round 6)
+- [✓] Each finding has what · where · why · fix: the two tables above.
+- [✓] Each finding has a severity. New: 3 MAJOR (E3S3-25, -27, -28), 3 MEDIUM (-26, -29, -30), 1 MINOR (-31), 1 LOW (-32). E3S3-20, -22 (its 12 paths), -23 and -24 closed. E3S3-18's 2a part is GREEN as ruled and still owed to Inc 2a's E5.
+- [✓] No secret values in this output. None were read or printed. Home paths are written as `~`. No corpus file left the runner, only derived counts: the runner's parse warnings, which name corpus files, are filtered out of the transcripts.
+- [✓] Verdict explicit: **FAIL**. E3S3-25, -27 and -28 are open with their evidence (P steady RL-16, RL-17, EN-1, EN-2; [X] raise; [C] census). The closures are at design and `executed` on the model. They count as product evidence only when their cases (.148/1 … /15, .150/arr-1 … /arr-9, .151/arr-1 … /arr-6) run GREEN with the negatives RED at E5, Inc 2a's parts after its gap pass.
+- [n/a] New tool or integration scope: none.
+- Probes: `evidence-e3/sec-r6-m3a.py` (model), `sec-r6-scale.py` (modes `steady`, `neg`, `immut`, `corpus`, `scalardiff`, `bisect`, `raise`), `sec-r6-census.py`, `sec-r6-run.sh`. Transcripts: `sec-r6-steady-`, `sec-r6-neg-`, `sec-r6-immut-`, `sec-r6-corpus-`, `sec-r6-scalardiff-`, `sec-r6-bisect-`, `sec-r6-census-` and `sec-r6-raise-transcript.txt`. A model slip found here: the first corpus run used the tag's method word, where Inc 2a fills a MEASUREMENT's from its header, and gave 5 scalar-field differences. It was fixed (`d2a.method_name`), and the rerun gives 0. The round-5 scratch `/tmp/b103-e3r5-3-S/` on the runner was left by round 5 and is not mine to delete. It is still there.

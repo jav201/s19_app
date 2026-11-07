@@ -99,3 +99,33 @@ New findings:
 - **The agent's `sed -i`:** checked. It was ASCII only, the file is valid UTF-8, no line starts with a stray backtick, and the diff holds only the intended lines.
 
 **Next:** round 6 security on the corrected records.
+
+## Round 6 rulings (2026-11-07, orchestrator Opus 5.5)
+
+Round 6 (security): **FAIL**.
+- **Closed at design:** E3S3-20, -22, -23 and -24. All 52 round-5 paths plus CT-3 and CT-4 are flat (×0.97–1.03), and the 30 negative controls are RED.
+- **Corpus:** 353,626 objects give 0 verdict and 0 message changes; the longest message is 283 characters.
+- **New:** E3S3-25, -27 and -28 MAJOR; E3S3-26, -29 and -30 MEDIUM; E3S3-31 MINOR; E3S3-32 LOW.
+
+Rulings, each applying the fix column unless the ruling says otherwise:
+- **E3S3-25: accept the main fix.** R-A2L-DEF.151 reaches **every file word a refusal message echoes**, `<name>` and `<layout>` included. This withdraws the orchestrator's round-5 reading that `<name>` and `<layout>` keep .137: `<layout>` of a COM_AXIS curve is a word of the shared AXIS_PTS.
+  - The echo of a shared word is computed at reduction.
+  - The echo of an object's own name is computed once at describe and carried by the definition.
+  - No real message changes, since every measured name is ≤ 148 characters.
+  - New cases: .148/16 (RL-16) and .148/17 (RL-17).
+- **E3S3-26: accept.** TABLE-EMPTY goes with CONVERSION and TABLE, and `<table>` is the stored echo. New case .148/18. Inc 2a's line `:529` joins the 2a pass.
+- **E3S3-27: accept.** Element refusals use the definition's name echo + `[<i>]`. `decode_values` builds an element's full name only when a caller asks. New case .150/arr-10.
+- **E3S3-28: accept the primary fix.** It is a real defect, reproduced on a public corpus file.
+  - Decode fails closed: a conversion result that is not an `int` or a `float` → `A2L-DEF-DECODE` `<name>: the table <ref> gives a value that is not a number`, with `<ref>` written as .151.
+  - The same test goes in Inc 2a's scalar `decode_definition` (2a pass).
+  - New case .150/arr-11. The describe-time alternative is not taken: the decode test is one check that covers every route.
+- **E3S3-29: accept v2**, the two frozen-lookup rules pinned, still O(log n): 0 differences on 119,684 pairs.
+  - .150/arr-9 gains the extended values: NaN, ±inf, 2^63, 2^64 − 1, midpoints and ±1 ulp.
+  - A table whose x holds a NaN is refused at decode, with the verdict computed once per walk in the reduced form.
+- **E3S3-30: accept (a) and the first option of (b).**
+  - The 2a pass builds the segment index (first range in file order per segment), with the equality case and value set of the fix column. Negative control: a plain bisect → 780 differences.
+  - The scalar TAB_INTP / TAB_NOINTP lookup, with v2's rules, joins the 2a pass with a .150 VALUE case, so Inc 2a is correct before Inc 3a merges.
+- **E3S3-31: accept.** Each reduced form keeps the section its reference word names, resolved at reduction; no per-call name lookup of a shared word remains.
+- **E3S3-32: accept.** The message bound is "1,024 characters" everywhere.
+
+**Next:** a narrow Opus correction of Inc 3a's records, then round 7 security on the same harness plus EN-*, RL-16/17, VT-8/9 and the raise cases. The 2a items go to the running 2a gap pass 2.
