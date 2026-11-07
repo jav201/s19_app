@@ -151,3 +151,83 @@ Reviewer: security-reviewer (Opus 5.5). This is a re-review of the blocking find
 | E3S-23 | MINOR | Example TC-B102-05 re-point (`graph:277`) against `_write_via_powershell` (`:272`) and `[Data: _POWERSHELL_WRITE_COMMAND]` (`:612`) | The example's argv omits the new `-NonInteractive` (E3S-06). An exact argv assertion would fail against the node's `func:`. | argv `C:\PS\powershell.exe`, `-NonInteractive`, `-NoProfile`, `-Command`, … |
 
 Time spent: about 17 min (01:28:34Z → 01:45Z, `steps.log`).
+
+## Round 3 (2026-11-07T02:22:24Z)
+
+**Verdict: PASS-WITH-NOTES.** The four round-2 MAJORs are closed: E3S-13 (strip order), E3S-14 (`restrict` boxes keep refusing), E3S-15 (`_UNSAFE_PASTE`) and E3S-16 (oracles on the value). E3S-19 is closed too: R-PASTE.36 is now a row, with cases and a node. The correction adds no HIGH or MAJOR. **New:** 2 MEDIUM and 2 INFO, none blocking:
+- **E3S-24:** the path box's exemption leaves lone surrogates and bidi controls through as well as C1, and the record names only C1.
+- **E3S-25:** the suite-wide clipboard guard got narrower in the correction.
+
+Reviewer: security-reviewer (Opus 5.5). This round re-checks the blocking findings only, plus what the round-2 correction touched (`git diff d73bb87f HEAD -- inc-1a/`; the correction is `d6722b35`).
+
+**Read:**
+- Rows: `01-requirements.md:25`, `:52`, `:59-60`, `:118`, `:121`, `:136`.
+- Cases: `02-test-cases.md:23`, `:40`, `:83`, `:90-98`, `:218`, `:246-247`.
+- Graph: `graph-inc1a.md:15-18`, `:169-171`, `:328-349`, `:352-363`, `:370-378`, `:384-392`, `:415-424`, `:426-439`, `:525-598`, `:678-679`, `:781-798`, and the pinned workflow (`:95-106`).
+- Slice: `E1-slice.md:95-96`, `:106`.
+- Base:
+  - `s19_app/utils.py:41`: `_CONTROL_SCRUB` is a `dict` keyed by `int`.
+  - `os_clipboard_input.py:275-300`, `:291`, `:409` (`ctypes.windll.user32` looked up at call time), `:547`, `:645`, `:894-937`.
+  - `capped_text_area.py:131-237`.
+  - `screens.py:401-406`. `grep restrict=` over `s19_app/` finds 1 hit: `#load_path` is the only `restrict` box. No other `_on_paste` or `action_paste` exists in `s19_app/`.
+- Tests: `tests/test_suite_hygiene.py:1916-2058` (the gate's forms, `_local_identity_names`, `_PLANTED_LEAKS`). The direct layer callers: `tests/test_loadfilescreen_input.py:490-614` and `tests/test_b102_clipboard.py:455-640`.
+- Textual 8.2.8 on cachyos-rtx:
+  - `widgets/_input.py:756-764`: the stock `_on_paste` guards `if event.text`, takes `splitlines()[0]` and stops the event.
+  - `:976-1012`: `replace` runs `re.fullmatch(self.restrict, new_value)` on the whole new value.
+  - `widgets/_text_area.py:1982-1988`.
+
+**Evidence:**
+- **R** = read.
+- **P** = one probe on cachyos-rtx, against the read-only clone at `e07fb00` (Python 3.11.18, textual 8.2.8).
+  - Setup: `DISPLAY` and `WAYLAND_DISPLAY` unset and asserted. `HOME`, `XDG_*`, `TMPDIR` and `LOCALAPPDATA` under `/tmp/b103-e3r3-1a-security/`.
+  - `[Data: _STRATEGIES]` set to the corrected cascade (`ctypes-win32`, `powershell`), which answers `None` at once off Windows. No clipboard was opened.
+  - **Method:** the base has no strip, so design **C** is a set of subclasses that do exactly what the corrected nodes' `func:` say:
+    - `_UNSAFE_PASTE` is built from the graph's literal expression;
+    - `_strip_paste_controls` follows its node;
+    - both `_on_paste` nodes and both `action_paste` nodes are the base bodies with the graph's changes (no Tk priming);
+    - the right-click route is the node's call of `action_paste`.
+  - Each negative control of the rows is its own subclass.
+  - Files: `evidence-e3/sec-r3-1a-probe.py`, run by `sec-r3-1a-run.sh`, gives `sec-r3-1a-probe-transcript.txt` (U1, S1–S2, M1–M2, L1–L2, D1, W1, E1; exit 0).
+- **G** = gate-form counts over the batch-103 records, ripgrep on this PC, counts only: `evidence-e3/sec-r3-1a-redaction-counts.txt`.
+- **Leak check:** none of the four `sec-r3-*` files holds a form of the gate. The gate's patterns, run over them, give 0 hits.
+- **Slip, reported:** on this PC I ran an empty `python3 -` once. It resolved to the Windows Store alias stub, which runs no interpreter, so nothing ran. No local Python ran a project file.
+
+### Round-2 findings
+
+| Id | Status | Why |
+|---|---|---|
+| E3S-13 MAJOR | **closed** | **The graph:** both single-line nodes take the first line **before** the strip:<br>• `_on_paste`: `_strip_paste_controls(event.text.splitlines()[0], …)` (`graph:430`);<br>• `action_paste`: `line = text.splitlines()[0]` first (`:332`).<br>The multi-line nodes use `_UNSAFE_PASTE_MULTI`, which keeps TAB, LF and CR (`:356`, `:388`). The edges carry the condition "on the first line, after the split" (`:782-785`).<br><br>**P S1:** 13/13 values as the rows say, over the terminal, Ctrl+V and right-click routes:<br>• `L1\nL2` → `L1` (R-PASTE.1);<br>• `ab` with the cursor between, then `P1 line\nsecond` → `aP1 lineb` (R-TUI-043.4, R-PASTE.29);<br>• P-CTRL-L → `L1[2J`.<br>**P M1:** 9/9, including `["aP1 line", "secondb"]` (R-TUI-044.3, R-PASTE.30).<br>**P S2, M2:** the negative controls turn RED: strip before the split → `L1[2JL2` and `P1 linesecond`; the bare `_CONTROL_SCRUB` → one line. |
+| E3S-14 MAJOR | **closed (as ruled)** | **Rows and graph:**<br>• R-PASTE.34 excludes the path box by name (`01-requirements.md:59`).<br>• Both single-line nodes skip the strip when `self.restrict` is set, so `Input.replace`'s `fullmatch` sees the raw line (`graph:332`, `:430`).<br>• Case R-PASTE.34/5 exists (`02-test-cases.md:94`).<br><br>**P L1:** `a\x00.s19` and `a\x1b[2K.s19` → `""` by all 3 routes (6/6). The negative control "strip before `restrict`" gives `a.s19` and `a[2K.s19` (RED, 4/4). A clean path still lands.<br><br>Residual: E3S-24. |
+| E3S-15 MAJOR | **closed** | **The table:** `[Data: _UNSAFE_PASTE]` is one literal (`graph:679`), and the CTX term is the same set (`01-requirements.md:25`).<br><br>**P U1:**<br>• int keys only, 2,122 entries (32 + 33 + 2,048 + 5 + 4);<br>• U+D800, U+DFFF, U+202E, U+2069, ESC, U+009B, NUL and DEL are in both tables;<br>• TAB is in neither; LF and CR are in the single-line table only.<br>• P1 (`😀` included) is unchanged.<br><br>**P D1:** round 1's P1 and P2 shapes leave no unsafe paste character in the value and none in the drawn line once SGR is removed. That holds in both classes and on all 3 routes (12/12).<br><br>**P W1:** a box without `restrict` turns `ok\ud800ok` into `okok`, so no surrogate is drawn.<br><br>The C0/C1-only negative control leaves U+202E and U+D800 → RED (S2, M2). |
+| E3S-16 MAJOR | **closed** | **Oracles:** every strip oracle reads `value` or `document.lines`, never the drawn line (`02-test-cases.md:40`, `:90-98`; `graph:392`, `:438`). The only "drawn" mentions say "never the drawn line".<br><br>**Expected values:** `A[13DBC`, `L1[2J`, `["A[13DBC\tD", "E"]`, and `["L1 Ñ€[2J", "L2 漢"]` for P2-ESC. P S1 and M1 give each of them exactly.<br><br>**WinCI arms:** they use the NUL-free twins, written by Own write in UTF-16 (`02-test-cases.md:23`). The coverage rows name P-CTRL and P-CTRL-M (`graph:169-170`). Note: E3S-26. |
+| E3S-17 MEDIUM | closed | The nodes `clipboard_isolated`, `os_clipboard_isolation` and `pytest_runtest_call` are in `module: tests/conftest.py` (`graph:537-588`), and the file is in G-T (`:18`) and in the slice (`E1-slice.md:96`, `:106`).<br>• The session fixture never calls `pytest.fail` (`graph:573`).<br>• The failure comes in the call phase, so the outcome is `failed` (`:584`). |
+| E3S-18 LOW | closed, with a new finding | The pass-through is applied (`graph:573`). But together with E3A-18's "stand-ins only in the tuple entries", the guard no longer covers a direct call of a Win32 leaf: E3S-25. |
+| E3S-19 MEDIUM | **closed** | **Applied:**<br>• R-PASTE.36 (`01-requirements.md:121`), cases /1 and /2 (`02-test-cases.md:246-247`), the node with the `_redaction_roots` seam (`graph:591-598`), and `tests/test_suite_hygiene.py` in G-T and the slice (`E1-slice.md:95`).<br>• The planted lines come from `_PLANTED_LEAKS` at run time, never from the records.<br><br>**G:** every occurrence of the host login in the batch-103 records today carries a form the gate names on any host:<br>• 67 files carry its posix home path, and the 4 lines with no home path also hold a LAN address;<br>• 0 lines hold the login bare (`sec-r3-1a-redaction-counts.txt`).<br>So "0 hits" on CI is a sound oracle for these records. The counts in the threshold and in case /2 (57 / 23 / 4) are round 2's and have moved (now 71 / 4 / 4 by grep). The oracle is "0 hits", so this is not a defect.<br><br>**Not enforced:** the rule that the first push waits for this gate is a step for the orchestrator, not a check. Run R-PASTE.36/2 locally before that push (the gate also scans untracked files). |
+| E3S-20 MEDIUM | closed | The case now fixes the block (70,000 non-NUL units up to `GlobalSize`) and the exact `65537` (`02-test-cases.md:83`; `graph:378`). See E3S-26 about its negative control. |
+| E3S-21 LOW | closed | `GlobalSize.argtypes` and `.restype` are declared (`graph:374`), and case /8 asserts the `restype`. |
+| E3S-22 MINOR | closed | The term is renamed *unsafe paste character* (`01-requirements.md:25`). The canon's *control character* keeps its meaning. |
+| E3S-23 MINOR | closed | The example's argv now holds `-NonInteractive` (TC-B102-05 re-point). |
+
+### What else the correction touched: checked, no HIGH or MAJOR
+
+- **The pinned workflow:** `permissions: contents: read`, and the checkout uses `persist-credentials: false` (`graph:95-106`).
+- **The strip is complete in `s19_app/`:**
+  - no paste entry point other than the four nodes (R, grep);
+  - `insert_text_at_cursor` is used once more (`app.py:10749`), but for a fixed key table, not for clipboard text;
+  - the flow-chain Paste uses an internal dict clipboard.
+- **No crash at the edges (P E1):**
+  - a paste of `"\n"` gives `''`;
+  - a C1 NEL or U+2028 ends the first line (`A`);
+  - text that strips to nothing raises nothing in either class.
+- **`_read_via_ctypes`:** the `''` and `GlobalSize` changes keep the layer fail-safe (R).
+
+### New findings
+
+| Id | Severity | About | Defect | Fix |
+|---|---|---|---|---|
+| E3S-24 | MEDIUM | The path box's exemption: R-PASTE.34 "Base" (`01-requirements.md:59`) · case R-PASTE.34/5's note (`02-test-cases.md:94`) · `_strip_paste_controls` (`graph:419`) · `screens.py:404` | **The record says the path box's `restrict` lets only C1 through. It lets all three classes through.**<br><br>**What P L2 shows:** the path box's `restrict` (`[^\x00-\x1f\x7f]*`) also accepts a lone surrogate (`a\ud800.s19`), RLO (`a‮91s.exe`) and LRI. Each is inserted by the terminal route and by Ctrl+V, and each is drawn.<br><br>**What P W1 shows:** `ok\ud800ok` pasted into the path box is drawn, and the drawn frame kills Textual's `WriterThread` under `strict` and under `surrogateescape`. `frame-3` is never written: on Windows the display freezes until restart. That is the reason the E3S-15 ruling gives for removing the surrogates, and it stays open in the box most likely to receive a pasted file path. NTFS names may hold unpaired UTF-16 units (R, not probed on Windows).<br><br>**Two more gaps:**<br>• The code exempts any box with `restrict`, but R-PASTE.34 names one box. The graph's rule, that a later `restrict` box's "own filter must then refuse the unsafe set" (`graph:419`), is not met by the one such box today, and nothing enforces it.<br>• Not introduced by Inc 1a: the base inserts all of these too. Inc 1a closes them in 46 of the 47 boxes. | **Preferred, inside the slice and still "not stripped, refused whole":** in both single-line nodes, when `self.restrict` is set and the first line holds an unsafe paste character, call `self.restricted()` and leave the box unchanged, before `replace`.<br>• R-LOADDLG.20's refusal then covers C1, the surrogates and the bidi controls.<br>• Case /5 gains `a\x9b31m.s19`, `a\ud800.s19` and `a‮.s19` → `""`.<br>• Negative control: without the check → inserted → RED.<br><br>**Minimum:** correct the Base column and case /5's note to name the lone surrogates and bidi controls, and add a backlog row for `screens.py:404`.<br><br>**Either way:** census case R-TUI-044.1/18 asserts that `#load_path` is the only `restrict=` construction. Today that is 1; a later one turns the case RED and forces a ruling.<br><br>**Backlog, outside Inc 1a:** any lone surrogate drawn anywhere stops the Windows writer. Hypothesis, not probed: a file name in `#load_list`. That needs a guard at the output, not at each input. |
+| E3S-25 | MEDIUM | The suite-wide guard `os_clipboard_isolation` (`graph:569-575`), narrowed at the round-2 correction (E3A-18 + E3S-18) · R-PASTE.21 "every test" (`01-requirements.md:118`) | **On a Windows host that is not isolated, the guard now stands in only in the `_STRATEGIES` and `_WRITE_STRATEGIES` entries and at `_system_powershell`. Three routes stay unguarded:**<br>(a) a direct call of `_read_via_ctypes()` or `_write_via_ctypes()` with the real `sys.platform`;<br>(b) `read_os_clipboard(strategies=…)` or `write_os_clipboard(…, strategies=…)` given the real leaf functions;<br>(c) a PowerShell layer under a pass-through `subprocess.run` spy. Such a spy is "not the real one", so the stand-in passes it through, and the spy then starts the real PowerShell.<br><br>Each route can read or overwrite the operator's clipboard, and a read can put what it holds into the test output.<br><br>**Exposure today: 0 (R).**<br>• The one direct Win32 leaf call fakes `sys.platform` `linux` (`tests/test_loadfilescreen_input.py:614`).<br>• The explicit cascades are fakes (`:656`, `:713`, `:726`; `tests/test_b102_clipboard.py:455-484`).<br>• The WinCI-only spies run on isolated hosts.<br><br>Inc 1b, 7, 8 and 9 test through I-1, so the gap is in the row: it says "every test", and the cases and negative control (R-PASTE.21/4) cover only the cascade route. | **(a) and (b):** on a host that is not isolated, also stand in at the OS boundary, at `ctypes.windll.user32.OpenClipboard`.<br>• Both Win32 leaves look it up at call time (`os_clipboard_input.py:291`, `:409`).<br>• The stand-in records the attempt and returns 0; the layer reads that as a held clipboard and returns `None` / `False`.<br>• A test that stubs ctypes replaces the boundary itself, so it never meets the stand-in.<br><br>**(c):** pass through only for a test that declares it (a marker such as `clipboard_stubbed` on the five direct PowerShell tests), not on "`subprocess.run` is not the real one".<br><br>**Case R-PASTE.21/5:** WinCI, pytester, the isolation variables removed. An inner test calls `_write_via_ctypes("x")` → `failed`, and `GetClipboardSequenceNumber()` is unchanged. Negative control: no boundary stand-in → the number changes → RED. |
+| E3S-26 | INFO | Own write (`02-test-cases.md:23`) · case R-TUI-044.2/7 (`:83`) | **(a)** The fixture does not name an encoding that carries a lone surrogate. `str.encode("utf-16-le")` raises on U+D800. `encode("utf-16-le", "surrogatepass")` and `ctypes.create_unicode_buffer` keep it (R).<br>**(b)** /7's negative control (the length bound dropped) reads past the heap block. It can end the worker with an access violation instead of returning ≥ 70,000 characters. That is still RED. | **(a)** Name `surrogatepass` (or `create_unicode_buffer`) in Own write.<br>**(b)** Word the control as "≥ 70,000, or the read faults → RED". |
+| E3S-27 | INFO | `OsClipboardInput.action_paste` (`graph:332`), `CappedTextArea.action_paste` (`:356`) against the stock terminal route | Not security. A paste that holds only unsafe paste characters, made over a selection:<br>• Ctrl+V and the right-click delete the selection (`replace('', …)`; P E1: `''`);<br>• the terminal route keeps it (the stock `if event.text:`; P E1: `ab`). | To the architect and the orchestrator: for example, a stripped empty line counts as nothing to paste. |
+
+Time spent: about 9 min (02:13:55Z → 02:22:24Z, `steps.log`).

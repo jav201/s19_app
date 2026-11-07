@@ -31,3 +31,16 @@ Round 2: architect **FAIL** (round-1 MAJORs closed; new MAJOR E3A-15, E3A-16 int
 - All other round-2 findings: accept with their fix columns.
 
 **Model change (skill: "when a model's work costs an extra pass, move that task up a class"):** the round-1 DeepSeek pass introduced E3A-15/16. This round's correction is done by **Opus**, one agent, targeted edits. Then round 3 by both reviewers, blocking findings only.
+
+## Round 3 rulings (2026-11-06T20:24:44-06:00, orchestrator Opus 5.5)
+
+Round 3: security **PASS-WITH-NOTES** (all round-2 MAJORs closed; MEDIUM E3S-24, E3S-25); architect **FAIL** (E3A-15, -16 closed; new MAJOR **E3A-25**: the strip removes the NUL that 12 existing tests paste into Flow Builder / Flow Execution path boxes, so a NUL path is added instead of refused — a silent transform; MEDIUM E3A-26, MINOR E3A-27, LOW E3A-28).
+
+| Finding | Ruling |
+|---|---|
+| E3A-25 MAJOR | accept the recommended fix: **NUL leaves the strip set**; a pasted NUL reaches the box and its consumer refuses it, as today (the 12 tests hold unchanged). Principle for the set: strip only what is dangerous to draw (ESC and the other controls that start terminal sequences, C1, lone surrogates, bidi controls); never silently transform what a consumer already refuses. |
+| E3S-24 MEDIUM | accept, fail closed: a `restrict` box (the Load path box) **refuses** a paste that holds a lone surrogate or a bidi control (paste refused, box unchanged, the existing refusal notice), instead of inserting it — a lone surrogate would freeze the Windows display. |
+| E3S-25 MEDIUM | accept: the suite-wide guard also covers the module's low-level Win32 write, so no direct call can write a non-isolated clipboard. |
+| E3A-26, E3A-27, E3A-28 | accept with their fix columns. E3A-24 (LOW) stays open until Inc 1b's E2. |
+
+**Correction by Opus** (narrow, targeted edits), then a **round-4 architect check** limited to E3A-25 and the parts touched; security has passed and re-checks only if the pass touches the strip set's dangerous members.
