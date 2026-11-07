@@ -14,6 +14,10 @@ Independent tester file (E4). Cases (``02-test-cases.md``):
   switch (BAND list): the banded distance keeps it fast, the no-band mutant does not.
 - R-A2L-MATCH.40/5 - FAMQ(20) and FAMQ(76) over U6, and (E5 round 2, the adversarial lists the row now names)
   the same family over D3, FAM6 over E2, one-token walks over W40 and the substring key over SUBO.
+- R-A2L-MATCH.42/1 .. /5 (E5 round 3, E5S-10) - the node budget (400,000 trie node visits per ranking): W40 with 2 and 6
+  query tokens, DEEP40 with 1 and 6, W12 with the 20-token T20; each median of 7 <= 2.0 s AND the exact budget-truncated
+  list (sha256 of repr of the (name, rule, edits, spans) list). Negative control: with the budget removed (a /tmp mutant
+  on the runner, never committed) /2 takes 5.5 s and /1 lists 3-edit fuzzy entries.
 - The R-A2L-MATCH.40 bound is 2.0 s (E3-rulings, E5 round-2 design rulings); R-A2L-MATCH.36 stays 200 ms.
 
 The timing arms carry ``serial_timing`` (run apart and serially); the memory
@@ -672,5 +676,170 @@ def test_r_a2l_match_40_substring_key_over_subo(subo_index):
         assert len(got) == 20
         assert {m.rule.value for m in got} == {"substring"}
         medians.append((f"R-A2L-MATCH.40 SUBO {query!r}", _median_of(7, lambda q=query: rank(q, subo_index, 20))))
+    print(_load("after"))
+    _check_all(medians, ANY_QUERY_BOUND_S)
+
+
+# ---------------------------------------------------------------------------
+# R-A2L-MATCH.42 - the per-ranking node budget (E5 round 3, E5S-10): lists W40 (above), DEEP40, W12
+# ---------------------------------------------------------------------------
+
+SUB25 = "bcdefghijklmnopqrstuvwxyz"  # 25 substitution letters (no 'a')
+W40_SHA256 = "467be34c6c101183e60c6ed948e95d4b49bec250a5bbfd676e7baf328083d95b"
+DEEP40_SHA256 = "2ce84fa31c55c2d7a457ebe01cfe0746acefb786b9253f221b219362107db0cc"
+W12_SHA256 = "ec97932cba99e45011580d70b86cbc140113b9aac8dd715faf948dd71bb79d37"
+
+
+def _pad(names):
+    names = list(names)
+    names += [f"s{i:05d}" for i in range(50000 - len(names))]
+    assert len(names) == len(set(names)) == 50000
+    return names
+
+
+def _two_sub_tokens(length, first):
+    """Every ``'a' * length`` with exactly two substitutions from SUB25 at positions i < j < first."""
+    out = []
+    for i in range(first):
+        for j in range(i + 1, first):
+            for c1 in SUB25:
+                for c2 in SUB25:
+                    t = ["a"] * length
+                    t[i], t[j] = c1, c2
+                    out.append("".join(t))
+    return out
+
+
+def _pack(tokens, per, seed, head=None):
+    toks = list(tokens)
+    random.Random(seed).shuffle(toks)
+    return ["_".join(([head] if head else []) + toks[k:k + per]) for k in range(0, len(toks), per)]
+
+
+def deep40_names():
+    """DEEP40: all 41,250 40-letter tokens with exactly 2 substitutions in their first 12 letters, 24 per name, padded."""
+    names = _pad(_pack(_two_sub_tokens(40, 12), 24, 20261201))
+    _check_scope(names)
+    return names
+
+
+def w12_names():
+    """W12: every 12-letter string with at most 2 substitutions from ``'a' * 12`` except ``'a' * 12`` itself, 23 per name,
+    each name led by ``'a' * 12`` (so every W12 name is within 1 edit of every T20 token), padded."""
+    toks = set()
+    for i in range(12):
+        for c1 in SUB25:
+            t = ["a"] * 12
+            t[i] = c1
+            toks.add("".join(t))
+    toks.update(_two_sub_tokens(12, 12))
+    names = _pad(_pack(sorted(toks), 23, 20261203, head="a" * 12))
+    _check_scope(names)
+    return names
+
+
+def _sha_names(names):
+    return hashlib.sha256("\n".join(names).encode("utf-8")).hexdigest()
+
+
+def _sha_list(got):
+    """sha256 of ``repr`` of the list projected onto (name, rule word, edits, spans), as the records pin it."""
+    return hashlib.sha256(repr([(m.name, m.rule.value, m.edits, m.spans) for m in got]).encode("utf-8")).hexdigest()
+
+
+def t20_query():
+    """T20: 20 distinct 11-letter tokens ``'a' * 10 + c`` (2 allowed edits each), space-joined (239 characters)."""
+    return " ".join("a" * 10 + c for c in SUB25[:20])
+
+
+def runs_query(lengths):
+    return " ".join("a" * k for k in lengths)
+
+
+@pytest.fixture(scope="module")
+def deep40_index():
+    names = deep40_names()
+    assert _sha_names(names) == DEEP40_SHA256  # fixture sanity
+    return build_label_index(names)
+
+
+@pytest.fixture(scope="module")
+def w12_index():
+    names = w12_names()
+    assert _sha_names(names) == W12_SHA256  # fixture sanity
+    return build_label_index(names)
+
+
+@pytest.fixture(scope="module")
+def w40_pinned_index():
+    names = w40_names()
+    assert _sha_names(names) == W40_SHA256  # fixture sanity
+    return build_label_index(names)
+
+
+def _check_budgeted(case_id, index, query, expected_rule, expected_edits, expected_sha):
+    """Exact budget-truncated list first (20 entries, one rule, pinned sha256), then the median of 7 <= 2.0 s."""
+    got = rank(query, index, 20)
+    assert len(got) == 20, case_id
+    assert {m.rule.value for m in got} == {expected_rule}, case_id
+    assert {m.edits for m in got} == {expected_edits}, case_id
+    assert _sha_list(got) == expected_sha, case_id
+    print(_load("before"))
+    medians = [(case_id, _median_of(7, lambda: rank(query, index, 20)))]
+    print(_load("after"))
+    _check_all(medians, ANY_QUERY_BOUND_S)
+    return got
+
+
+@pytest.mark.serial_timing
+def test_r_a2l_match_42_1_two_token_query_over_w40_lists_subsequence_entries(w40_pinned_index):
+    """R-A2L-MATCH.42/1: ``'a' * 40`` + space + ``'a' * 39`` over W40: the budget runs out in the first walk, the second query
+    token finds no name token, so the fuzzy rule lists nothing and 20 ``subsequence`` entries remain; median of 7 <= 2.0 s."""
+    query = runs_query((40, 39))
+    assert len(query) == 80
+    got = _check_budgeted("R-A2L-MATCH.42/1 W40 2 tokens", w40_pinned_index, query, "subsequence", 0,
+                          "29cb2305cae359f658d4f9d00644608ed26c83214fc09889ba8efd4076cb32cd")
+    assert got[0].name.startswith("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaci_ama") and len(got[0].name) == 983
+
+
+@pytest.mark.serial_timing
+def test_r_a2l_match_42_2_six_token_query_over_w40_the_budget_control(w40_pinned_index):
+    """R-A2L-MATCH.42/2: ``'a' * 40`` .. ``'a' * 35`` (230 characters, 6 distinct tokens) over W40: 20 ``subsequence`` entries,
+    median of 7 <= 2.0 s. The budget's negative control: with no budget the ranking takes 5.5 s and lists 3-edit ``fuzzy``."""
+    query = runs_query(range(40, 34, -1))
+    assert len(query) == 230
+    got = _check_budgeted("R-A2L-MATCH.42/2 W40 6 tokens", w40_pinned_index, query, "subsequence", 0,
+                          "4243a09dd1d9577dd3ceb5e710c17716a066f9bd4f8423c86684689bb8a1b3e7")
+    assert got[0].name.startswith("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaci_ama") and len(got[0].name) == 983
+
+
+@pytest.mark.serial_timing
+def test_r_a2l_match_42_3_one_token_walk_cut_by_the_budget_still_lists_what_it_found(deep40_index):
+    """R-A2L-MATCH.42/3: ``'a' * 40`` over DEEP40: the one walk stops after 400,000 visits, yet 20 ``fuzzy`` entries of 2 edits
+    are listed (the same 20 names as with no budget); entry 1 has the span (123, 163), its leftmost token found; median of 7 <= 2.0 s."""
+    got = _check_budgeted("R-A2L-MATCH.42/3 DEEP40 1 token", deep40_index, "a" * 40, "fuzzy", 2,
+                          "094071ae7a78cfda29d688955b846ef9984090df8b7133a136a3efe5579e350c")
+    assert got[0].name.startswith("agaaaaaazaaaaaaaaaaaaaaaaaaaaa") and len(got[0].name) == 737
+    assert got[0].spans == ((123, 163),)
+
+
+@pytest.mark.serial_timing
+def test_r_a2l_match_42_4_six_token_query_over_deep40(deep40_index):
+    """R-A2L-MATCH.42/4: ``'a' * 40`` .. ``'a' * 35`` (230 characters) over DEEP40: 20 ``subsequence`` entries (entry 1 the name of
+    /3), median of 7 <= 2.0 s; with no budget 20 ``fuzzy`` entries of 12 edits in 11.6 s."""
+    got = _check_budgeted("R-A2L-MATCH.42/4 DEEP40 6 tokens", deep40_index, runs_query(range(40, 34, -1)), "subsequence", 0,
+                          "c032a4c1c1816604f9fe0f37368a6fe3d96f2100e0a3da96667b36f787529ef2")
+    assert got[0].name.startswith("agaaaaaazaaaaaaaaaaaaaaaaaaaaa") and len(got[0].name) == 737
+
+
+@pytest.mark.serial_timing
+def test_r_a2l_match_42_5_twenty_distinct_tokens_over_w12_list_nothing(w12_index):
+    """R-A2L-MATCH.42/5: T20 (20 distinct tokens, 239 characters) over W12: [] (the budget runs out before the last walk; no
+    W12 name holds T20's key characters in order); median of 7 <= 2.0 s; with no budget 20 ``fuzzy`` entries in 4.7 s."""
+    query = t20_query()
+    assert len(query) == 239
+    assert rank(query, w12_index, 20) == []
+    print(_load("before"))
+    medians = [("R-A2L-MATCH.42/5 W12 T20", _median_of(7, lambda: rank(query, w12_index, 20)))]
     print(_load("after"))
     _check_all(medians, ANY_QUERY_BOUND_S)

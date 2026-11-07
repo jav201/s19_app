@@ -1,0 +1,10 @@
+# E5 corrective 3 - Code-Wire extractor run (inc-4, label_match.py, E5S-10 node budget + E5S-11 ASCII)
+# date: 2026-11-07  host: Windows PC (extractor only; no s19_app import)
+# code-wire: v3.1.0
+# copy with marks (18: LabelIndex.__len__, 16 new defs, parse_a2l_file), outside the worktree:
+#   C:\Users\jjgh8\AppData\Local\Temp\b103-inc4-corrective3.7TxpDu\tree
+$ python -m py_compile <copy>/s19_app/tui/services/label_match.py <copy>/s19_app/tui/a2l.py
+rc=0
+$ python C:/Users/jjgh8/Github/code-wire/tools/codewire_extract.py --repo <copy> --graph <inc-4>/codewire/graph-inc4.md --out <scratch>/out
+marks=18 graph_nodes=18 calls=23 findings=0 parse_failures=0
+===EXIT=== 0

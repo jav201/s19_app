@@ -9,14 +9,14 @@ pilots' code. The matcher is driven only through the public I-3 names
 Requirement -> test coverage (``R-A2L-MATCH.<n>/<k>`` = row n, alternative k):
 
 - ``test_ranked_list_is_exactly``: the cases whose expected result is a whole
-  ranked list - R-A2L-MATCH.1/1..4, .2/1..5, .3/1..3, .4/1..3, .5/1..2,
+  ranked list - R-A2L-MATCH.1/1..4, .2/1..5, .3/1..3, .4/1..4, .5/1..2,
   .6/1..3, .7/1..4, .8/1..9, .9/1..4, .10/1..6, .11/1..3, .12/3..4,
   .13/1..4, .14/1..2, .15/1..2, .16/1..3, .17/1..2, .18/3, .19/1..2,
   .20/2, .21/1..3, .22/1, .23/2, .24/2, .24/4, .25/3, .28/1, .32/1, .32/3,
-  .33/2..3, .34/1, .38/1..2, .39/1..2 (the case id is the pytest id).
+  .33/2..3, .34/1, .38/1..2, .39/1..2, .41/1..5, .43/1, .43/3 (the case id is the pytest id).
 - ``test_rows_*`` and the single tests below: the relational cases (an entry
   or a part of a list) - R-A2L-MATCH.5/3, .12/1..2, .18/1..2, .20/1, .20/3,
-  .23/1, .24/1, .24/3, .25/1..2, .26..31, .32/2, .33/1, .34/2..3.
+  .23/1, .24/1, .24/3, .25/1..2, .43/2, .26..31, .32/2, .33/1, .34/2..3.
 - ``test_at_b103_i4_1_*`` / ``test_at_b103_i4_2_*``: AT-B103-I4-1 and -2.
 - ``test_i3_*``: the I-3 interface checks (errors, purity, read-only, types).
 - The timing and memory cases R-A2L-MATCH.35/1, .36/1, .37/1, .40/1, .40/2
@@ -206,9 +206,9 @@ R_KNIFE_1_X = [  # R-A2L-MATCH.8/4
     E("parameter_instance[3].Knife[1].x", "token", (22, 27), (28, 29), (31, 32)),
 ]
 
-R_AT_MAP_DRUCK = [  # R-A2L-MATCH.4/1
-    E("Drück_Max", "prefix", (0, 5)),
-    E("DRÜCK_MAX", "fuzzy", (0, 5), e=1),
+# R-A2L-MATCH.4/1 and .4/2 (E5 round 3): the two non-ASCII names are left out of the prepared list
+# (R-A2L-MATCH.43), so `ü`/`Ü` are shown not to be `u` by `druck_max` being a fuzzy match, not a prefix match.
+R_AT_MAP_DRUCK = [
     E("druck_max", "fuzzy", (0, 5), e=1),
 ]
 
@@ -247,8 +247,7 @@ EXACT_CASES = [
      [E("rpm", "exact", (0, 3)), E("RPM", "exact", (0, 3)), E("Rpm", "exact", (0, 3))]),
     # --- R-A2L-MATCH.4 non-ASCII not folded; '-' != '_'
     ("R-A2L-MATCH.4/1", "NA", "drück", 20, R_AT_MAP_DRUCK),
-    ("R-A2L-MATCH.4/2", "NA", "DRÜCK", 20,
-     [E("DRÜCK_MAX", "prefix", (0, 5)), E("Drück_Max", "fuzzy", (0, 5), e=1), E("druck_max", "fuzzy", (0, 5), e=1)]),
+    ("R-A2L-MATCH.4/2", "NA", "DRÜCK", 20, R_AT_MAP_DRUCK),
     ("R-A2L-MATCH.4/3", "C08", "VALUE-0001", 20, [E("VALUE_0001", "token", (0, 5), (6, 10))]),
     # --- R-A2L-MATCH.5 exact
     ("R-A2L-MATCH.5/1", "C08", "VALUE_0001", 20, SPAN_00),
@@ -308,7 +307,13 @@ EXACT_CASES = [
     ("R-A2L-MATCH.11/3", ("abc",), "ca", 20, []),
     # --- R-A2L-MATCH.12 one edit
     ("R-A2L-MATCH.12/3", "C08", "cvure", 20, []),
-    ("R-A2L-MATCH.12/4", ("٣٣٣_X",), "٣٣٤", 20, [E("٣٣٣_X", "fuzzy", (0, 3), e=1)]),
+    ("R-A2L-MATCH.12/4", "C08", "ma٣", 3,
+     [E("MAP_0001", "fuzzy", (0, 3), e=1), E("MAP_0002", "fuzzy", (0, 3), e=1), E("MAP_0003", "fuzzy", (0, 3), e=1)]),
+    # R-A2L-MATCH.4/4 (E5 round 3): U+212A (KELVIN SIGN) is not `k`; str.lower() would make KEY an exact match.
+    ("R-A2L-MATCH.4/4", ("KEY",), "\u212aey", 20, [E("KEY", "fuzzy", (0, 3), e=1)]),
+    # R-A2L-MATCH.43/1 and /3: the last ASCII character is kept; only the ASCII names of a mixed list are ranked.
+    ("R-A2L-MATCH.43/1", ("VALUE\x7f",), "value", 20, [E("VALUE\x7f", "prefix", (0, 5))]),
+    ("R-A2L-MATCH.43/3", "NA", "max", 20, [E("druck_max", "substring", (6, 9))]),
     # --- R-A2L-MATCH.13 two edits
     ("R-A2L-MATCH.13/1", "C08", "valuexx_0001", 20, [E("VALUE_0001", "fuzzy", (0, 5), (6, 10), e=2)]),
     ("R-A2L-MATCH.13/2", "C08", "valuexxx_0001", 20, []),
@@ -398,14 +403,26 @@ def test_ranked_list_is_exactly(prep, case_id, key, query, limit, expected):
     """The ranked list is exactly the case's expected list (names, rules, edits, spans, order).
 
     Covers (the case id is the pytest id) R-A2L-MATCH.1/1 .1/2 .1/3 .1/4 .2/1 .2/2 .2/3 .2/4
-    .2/5 .3/1 .3/2 .3/3 .4/1 .4/2 .4/3 .5/1 .5/2 .6/1 .6/2 .6/3 .7/1 .7/2 .7/3 .7/4 .8/1 .8/2
+    .2/5 .3/1 .3/2 .3/3 .4/1 .4/2 .4/3 .4/4 .5/1 .5/2 .6/1 .6/2 .6/3 .7/1 .7/2 .7/3 .7/4 .8/1 .8/2
     .8/3 .8/4 .8/5 .8/6 .8/7 .8/8 .8/9 .9/1 .9/2 .9/3 .9/4 .10/1 .10/2 .10/3 .10/4 .10/5
     .10/6 .11/1 .11/2 .11/3 .12/3 .12/4 .13/1 .13/2 .13/3 .13/4 .14/1 .14/2 .15/1 .15/2
     .16/1 .16/2 .16/3 .17/1 .17/2 .18/3 .19/1 .19/2 .20/2 .21/1 .21/2 .21/3 .22/1 .23/2
-    .24/2 .24/4 .25/3 .28/1 .32/1 .32/3 .33/2 .33/3 .34/1 .38/1 .38/2 .39/1 .39/2 .41/1 .41/2 .41/3 .41/4 .41/5.
+    .24/2 .24/4 .25/3 .28/1 .32/1 .32/3 .33/2 .33/3 .34/1 .38/1 .38/2 .39/1 .39/2 .41/1 .41/2 .41/3 .41/4 .41/5 .43/1 .43/3.
     """
     got = proj(run(prep, key, query, limit))
     assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+
+
+def test_rows_43_2_a_name_above_u007f_is_left_out_of_the_prepared_list():
+    """R-A2L-MATCH.43/2: ``VALUE`` + U+0080 (the first character above U+007F) is not prepared: ``len(index)`` 0, ``value`` lists nothing."""
+    index = build_label_index(["VALUE\x80"])
+    assert len(index) == 0
+    assert rank("value", index, 20) == []
+
+
+def test_rows_43_3_only_the_ascii_names_of_a_mixed_list_are_prepared(prep):
+    """R-A2L-MATCH.43/3: of [Drück_Max, DRÜCK_MAX, druck_max] only ``druck_max`` is prepared (``len(index)`` 1)."""
+    assert len(prep("NA")) == 1
 
 
 # ---------------------------------------------------------------------------
@@ -492,10 +509,9 @@ def test_rows_24_1_case_exact_name_first_for_lowercase_query(prep):
 
 
 def test_rows_24_3_fuzzy_ties_fall_to_code_point_order(prep):
-    """R-A2L-MATCH.24/3: fuzzy names of one rule, key and length are not ordered by case-exactness: entry 2 is DRÜCK_MAX, entry 3 druck_max."""
-    got = run(prep, "NA", "drück")
-    assert [m.name for m in got] == ["Drück_Max", "DRÜCK_MAX", "druck_max"]
-    assert got[1].name == "DRÜCK_MAX" and got[2].name == "druck_max"
+    """R-A2L-MATCH.24/3: fuzzy names of one rule, key and length are not ordered by case-exactness: over [druck_max, DRUCK_MAX] (E5 round 3: DR) entry 1 is DRUCK_MAX, entry 2 druck_max."""
+    got = run(prep, ("druck_max", "DRUCK_MAX"), "drück")
+    assert proj(got) == [E("DRUCK_MAX", "fuzzy", (0, 5), e=1), E("druck_max", "fuzzy", (0, 5), e=1)]
 
 
 def test_rows_25_1_code_point_order_among_equals(prep):

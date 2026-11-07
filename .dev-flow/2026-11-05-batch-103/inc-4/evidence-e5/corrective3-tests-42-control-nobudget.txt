@@ -1,0 +1,5 @@
+load 1.37 0.79 1.35
+s19_app.__file__ = /tmp/b103-c3-red/tree/s19_app/__init__.py
+R-A2L-MATCH.42/2 W40 6 tokens (230 chars): times [5438.3, 5557.9, 5340.5] ms; median of 3 5438.3 ms; bound 2000 ms -> RED (> 2.0 s)
+rules: ['fuzzy'] edits: [3] list sha256 79d825739d1a02c4144ab4cb7532358fbd3e5330cfb505786cfe54d98f10b76c
+exit 0

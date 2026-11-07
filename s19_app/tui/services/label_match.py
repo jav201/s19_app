@@ -49,6 +49,12 @@ _FUZZY_SWITCH_CAP = 512
 # cheap text and token tiers). N = 20 by measurement (graph E5-2).
 _FUZZY_TOKEN_CAP = 20
 
+# The fuzzy tier's node budget (E5S-10, R-A2L-MATCH.42): the walks of one
+# ranking share this many trie node visits. The cap bounds how many walks run,
+# not what one walk visits; a walk that reaches the budget returns the runs it
+# found so far. A count, never a clock, so the lists are the same on every host.
+_FUZZY_NODE_BUDGET = 400_000
+
 
 class MatchRule(str, Enum):
     """Rank order of the match rules; declaration order == rank order (D-3 B)."""
@@ -122,8 +128,9 @@ def build_label_index(names: Iterable[str]) -> LabelIndex:
 
     Args:
         names (Iterable[str]): The names to index. A name longer than 1,024
-            characters is left out (R-A2L-MATCH.39); each distinct name is
-            kept once at its first occurrence (R-A2L-MATCH.17).
+            characters, or holding a character above U+007F, is left out
+            (R-A2L-MATCH.39, .43); each distinct name is kept once at its
+            first occurrence (R-A2L-MATCH.17).
 
     Returns:
         LabelIndex: The prepared index. ``len(index)`` is the number of
@@ -135,7 +142,8 @@ def build_label_index(names: Iterable[str]) -> LabelIndex:
             got <type>`` for an element that is not a ``str``.
 
     Data Flow:
-        - Validate the argument and each element; drop names over 1,024 chars.
+        - Validate the argument and each element; drop names over 1,024 chars
+          and names holding a non-ASCII character.
         - De-duplicate in first-occurrence order; fold each name and set its
           character mask.
         - Cut each name into tokens; assign every distinct folded token an id
@@ -162,7 +170,7 @@ def build_label_index(names: Iterable[str]) -> LabelIndex:
     for name in names:
         if not isinstance(name, str):
             raise TypeError(f"label names must be str, got {type(name).__name__}")
-        if len(name) > 1024:
+        if len(name) > 1024 or not name.isascii():
             continue
         if name not in seen:
             seen.add(name)
@@ -537,7 +545,9 @@ def _fuzzy_tier(
         E5S-07): a query of more than ``_FUZZY_TOKEN_CAP`` distinct query tokens
         gets no fuzzy name (the tier is skipped and the subsequence tier still
         runs); otherwise walk each distinct query token in ascending allowed
-        edits, intersect the candidates by postings, and return each candidate's
+        edits (the walks of one ranking share ``_FUZZY_NODE_BUDGET`` trie node
+        visits, R-A2L-MATCH.42; a spent walk keeps the runs it found), intersect
+        the candidates by postings, and return each candidate's
         total edits plus the per-token range tables ``rank`` step 6 reads the
         spans from. The walk returns sorted, disjoint runs ``(lo, hi, d)`` — one
         CSR postings slice per run, never one entry per token id — and the totals
@@ -576,6 +586,7 @@ def _fuzzy_tier(
     tokens = index._tokens
 
     tables: dict[str, tuple[list[int], list[int], list[int]]] = {}
+    left = _FUZZY_NODE_BUDGET
     candidates: set[int] | None = None
     totals: dict[int, int] = {}
     weights: dict[int, Counter] = {}
@@ -617,7 +628,8 @@ def _fuzzy_tier(
             if not candidates:
                 return {}, tables
             continue
-        runs = _fuzzy_token_distances(index, token, allowed)
+        runs, visits = _fuzzy_token_distances(index, token, allowed, left)
+        left -= visits
         if not runs:
             return {}, tables
         tables[token] = (
@@ -1133,8 +1145,8 @@ def _build_trie(tokens: tuple[str, ...]) -> tuple[str, array, array, array]:
 
 
 def _fuzzy_token_distances(
-    index: LabelIndex, query_token: str, allowed: int
-) -> list[tuple[int, int, int]]:
+    index: LabelIndex, query_token: str, allowed: int, budget: int
+) -> tuple[list[tuple[int, int, int]], int]:
     """
     Summary:
         The sorted, disjoint runs ``(lo, hi, d)`` that cover every distinct
@@ -1152,19 +1164,24 @@ def _fuzzy_token_distances(
         first[end[j]], best)`` (when the best is at most ``allowed``) and the
         walk jumps to ``end[j]``; a token that ends at a node the walk enters
         is the run of its one id. Pre-order keeps the runs sorted and disjoint.
+        The walk visits at most ``budget`` trie nodes (R-A2L-MATCH.42): before
+        computing a node it stops once ``budget`` visits are made and returns
+        the runs it emitted so far with its visit count.
 
     Args:
         index (LabelIndex): The prepared index.
         query_token (str): The folded query token.
         allowed (int): The allowed edits (0, 1 or 2).
+        budget (int): The most trie nodes the walk may visit.
 
     Returns:
-        list[tuple[int, int, int]]: The runs ``(lo, hi, d)``, sorted and
-            disjoint (possibly empty).
+        tuple[list[tuple[int, int, int]], int]: The runs ``(lo, hi, d)``,
+            sorted and disjoint (possibly empty), and the number of nodes
+            visited (0 for ``allowed`` 0 or ``budget`` 0).
     """
     if allowed == 0:
         lo, hi = _token_range(index._tokens, query_token)
-        return [(lo, hi, 0)] if lo < hi else []
+        return ([(lo, hi, 0)] if lo < hi else []), 0
 
     chars = index._trie_chars
     depth = index._trie_depth
@@ -1191,8 +1208,12 @@ def _fuzzy_token_distances(
     cols[0] = [i if i < limit else limit for i in range(m + 1)]
     best[0] = m if m < limit else limit
 
+    visits = 0
     j = 0
     while j < node_count:
+        if visits >= budget:
+            break
+        visits += 1
         dep = depth[j]
         if dep + 1 >= len(cols):
             cols.extend([None] * dep)
@@ -1252,4 +1273,4 @@ def _fuzzy_token_distances(
         if b2 <= k and len(tokens[first[j]]) == dep:
             emit(first[j], first[j] + 1, b2)
         j += 1
-    return result
+    return result, visits
