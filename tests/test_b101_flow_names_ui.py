@@ -146,7 +146,7 @@ async def _add_load_block(app, pilot, panel) -> None:
     await pilot.click(f"#flow_palette_{BLOCK_SOURCE}")
     await settled(
         pilot,
-        lambda: str(panel.query_one("#flow_kind", Select).value) == BLOCK_SOURCE,
+        lambda: panel.query_one(f"#flow_palette_{BLOCK_SOURCE}").has_class("chip-selected"),
         "the LOAD kind is chosen in the palette",
     )
     panel.query_one("#flow_ref", Input).value = "prg.s19"

@@ -1,0 +1,31 @@
+=== base commit ===
+2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+applied M1 OK
+=== mutation diff ===
+--- <HOME>/work/s19_i12bmut/s19_app/tui/flow_screens.py	2026-11-06 18:16:04.301575372 -0600
++++ s19_app/tui/flow_screens.py	2026-11-06 18:32:31.201579755 -0600
+@@ -2045,8 +2045,6 @@
+             # E3 S-1: the kind state accepts only a value of ``_KIND_OPTIONS``;
+             # a chip id outside them returns with nothing changed (the hidden
+             # select's options gave this check on the base).
+-            if kind not in dict(self._KIND_OPTIONS).values():
+-                return
+             self._kind = kind
+             self._sync_kind_dependent_visibility(kind)
+             # A notice about the previous kind no longer applies (ux L-a).
+=== grep landed ===
+2048:            self._kind = kind
+=== s19_app.__file__ ===
+<HOME>/work/s19_i12bmut_m01/s19_app/__init__.py
+=== pytest ===
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_r_fb_add_1_2_a_press_naming_no_kind_changes_nothing ___________
+../s19_i12bmut/tests/test_b101_flow_shown_widgets.py:319: in test_r_fb_add_1_2_a_press_naming_no_kind_changes_nothing
+    assert CHECK_TAG in after["tag"], after["tag"]
+E   AssertionError: · BOGUS
+E   assert '✓ CHECK' in '· BOGUS'
+=========================== short test summary info ============================
+FAILED tests/test_b101_flow_shown_widgets.py::test_r_fb_add_1_2_a_press_naming_no_kind_changes_nothing
+1 failed in 4.94s
+=== exit code: 1 ===

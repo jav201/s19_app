@@ -18,16 +18,19 @@ import inspect
 import textwrap
 from pathlib import Path
 
+from rich.text import Text
+from textual.content import Content
 from textual.widgets import Button, Select, Static
 
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.flow_screens import (
     FlowBuilderPanel,
     _BLOCK_STATUS_SEV_CLASS,
-    _flow_block_label,
     _make_flow_block,
     _memory_ribbon_text,
+    pipeline_text,
 )
+from s19_app.tui.insight_style import VALUE
 from s19_app.tui.services.flow_execution_service import run_flow
 from s19_app.tui.services.flow_model import (
     BLOCK_CHECK,
@@ -98,6 +101,17 @@ def _nodes(app: S19TuiApp):
 
 def _seps(app: S19TuiApp):
     return list(app.query("#flow_result .flow-sep"))
+
+
+async def _choose_kind_chip(app: S19TuiApp, pilot, kind: str) -> None:
+    """Press the kind's chip and wait for its ``chip-selected`` mark."""
+    chip = app.query_one(f"#flow_palette_{kind}", Button)
+    chip.press()
+    for _ in range(25):
+        await pilot.pause()
+        if chip.has_class("chip-selected"):
+            return
+    raise AssertionError(f"the {kind} chip did not become selected")
 
 
 # ===========================================================================
@@ -492,9 +506,18 @@ def test_at088b_every_render_sink_renders_hostile_literally(tmp_path: Path) -> N
 
 
 def test_at088b_check_ref_label_renders_literally(tmp_path: Path) -> None:
-    """AT-088b (LLR-088.6): the compose-list block ref-label sink
-    (``_flow_block_label`` via ``#flow_blocks``) neutralises a hostile CHECK
+    """AT-088b (LLR-088.6): the pipeline card's ref sink (``#flow_pipeline``,
+    which scrubs each ref with ``safe_text``) neutralises a hostile CHECK
     ``check_doc_ref`` — the payload appears literally and injects no span.
+
+    **RE-POINTED, batch-101 Inc 12b (E3 S-2, S2-2).** Read the removed
+    compose-list label; reads the card now. The whole hostile payload fits the
+    card at 80x24 (one card takes the rail), so the node keeps it whole: the
+    markup tags, the ESC byte (deleted on the way to the card) and the literal
+    brackets. The "no injected span" clause reads the spans at the input's
+    text in the card (rules and colours are legitimate card spans, so an empty
+    span list is no longer the oracle): no span cuts the text and exactly one
+    covers it, the card's value style, never one parsed out of the brackets.
 
     **PORTED, batch-77 Inc-2 (LLR-116.7).** Was ``_HOSTILE in plain``; the
     subject is now the payload's non-control projection, because the C0/C1
@@ -508,21 +531,35 @@ def test_at088b_check_ref_label_renders_literally(tmp_path: Path) -> None:
             await pilot.pause()
             await pilot.press("8")
             await pilot.pause()
-            app.query_one("#flow_kind", Select).value = BLOCK_CHECK
+            await _choose_kind_chip(app, pilot, BLOCK_CHECK)
             app.query_one("#flow_ref").value = _HOSTILE
             app.query_one("#flow_add", Button).press()
             await pilot.pause()
-            blocks_widget = app.query_one("#flow_blocks", Static)
-            return blocks_widget.render().plain, list(
-                blocks_widget.render().spans
-            )
+            chain = app.query_one("#flow_pipeline", Static)
+            # The card value rows' style (``VALUE``, the default of the card's
+            # ``row()``) as a rendered span holds it: appended as a span, as
+            # ``row()`` appends a value, and converted the same way.
+            value_style = Content.from_rich_text(Text().append("x", style=VALUE)).spans[0].style
+            return chain.render().plain, list(chain.render().spans), value_style
 
-    plain, spans = asyncio.run(_drive())
-    # Presence: the hostile label reached the sink with its markup intact.
-    assert _HOSTILE_SCRUBBED in plain
-    assert spans == []
+    plain, spans, value_style = asyncio.run(_drive())
+    # Presence: the hostile label reached the card's own ``in · doc`` value
+    # row with its markup intact. The origin note under the card's inputs
+    # repeats the ref through its own sink, so a containment in the whole
+    # pipeline passes on that note alone when the card row interprets the
+    # markup (Inc 12b E4 integration, I-D5).
+    rows = plain.split("\n")
+    doc_row = next(i for i, row in enumerate(rows) if "in · doc" in row) + 1
+    assert _HOSTILE_SCRUBBED in rows[doc_row], rows[doc_row]
+    # No injected span: the input's own text sits under exactly one style.
+    start = sum(len(row) + 1 for row in rows[:doc_row]) + rows[doc_row].index(_HOSTILE_SCRUBBED)
+    stop = start + len(_HOSTILE_SCRUBBED)
+    cutting = [s for s in spans if start < s.start < stop or start < s.end < stop]
+    exact = [s for s in spans if (s.start, s.end) == (start, stop)]
+    assert cutting == [] and len(exact) == 1, (cutting, exact)
+    assert exact[0].style == value_style, (exact[0].style, value_style)
     # Absence (LLR-116.7), co-asserted with the containment above. Scoped to
-    # exclude U+000A: this sink is a MULTI-ROW label and ``_flow_block_label``
+    # exclude U+000A: this sink is a MULTI-ROW painting and the pipeline
     # composes the row separator itself, so a newline here is developer
     # formatting, not file-derived. It cannot come from the payload — the
     # payload passes through ``safe_text``, which deletes U+000A along with the
@@ -576,7 +613,7 @@ def test_at088_gating_selector_appends_block_own_op_check(tmp_path: Path) -> Non
             await pilot.press("8")
             await pilot.pause()
             panel = app.query_one("#flow_panel", FlowBuilderPanel)
-            app.query_one("#flow_kind", Select).value = BLOCK_CHECK
+            await _choose_kind_chip(app, pilot, BLOCK_CHECK)
             app.query_one("#flow_gating", Select).value = CHECK_GATING_BLOCK_OWN
             app.query_one("#flow_ref").value = "gaps.json"
             app.query_one("#flow_add", Button).press()
@@ -590,7 +627,15 @@ def test_at088_gating_selector_appends_block_own_op_check(tmp_path: Path) -> Non
 
 
 def test_flow_block_label_covers_check(tmp_path: Path) -> None:
-    """_flow_block_label handles CheckBlock (was ``"?"`` pre-Inc-2) and labels
-    SOURCE as LOAD."""
-    assert _flow_block_label(CheckBlock("c.json")).startswith("CHECK")
-    assert _flow_block_label(SourceBlock("img.s19")).startswith("LOAD")
+    """The pipeline card handles CheckBlock (was ``"?"`` pre-Inc-2) and labels
+    SOURCE as LOAD.
+
+    **RE-POINTED, batch-101 Inc 12b.** Read the removed one-line block label;
+    reads the card text of ``pipeline_text`` now: the CHECK card is headed
+    ``CHECK`` and holds its doc ref, the SOURCE card is headed ``LOAD`` and
+    holds its image ref. (No hostile input here; the hostile CHECK ref is
+    AT-088b's.)"""
+    check_card = pipeline_text([CheckBlock("c.json")], 24).plain.splitlines()
+    source_card = pipeline_text([SourceBlock("img.s19")], 24).plain.splitlines()
+    assert "✓ CHECK" in check_card[1] and any("c.json" in line for line in check_card)
+    assert "◉ LOAD" in source_card[1] and any("img.s19" in line for line in source_card)

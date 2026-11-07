@@ -1,0 +1,37 @@
+# G-T3 oracle controls (mutants applied to a scratch copy of flow_screens.py on the remote worktree, restored after each run)
+=== MUTANT A: nul_add_refusal -> None
+=========================== short test summary info ============================
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[write_out.output_name]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[source.image_ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[check.check_doc_ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[crc.config_ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[patch.change_doc_ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[a2b.image_a.ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[a2b.image_b.ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[external_step.output_path]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[external_step.log_ref]
+FAILED tests/test_b97_flow_builder.py::test_at_b97_08_hostile_and_nul_refs_never_crash_or_inject
+10 failed in 21.38s
+=== MUTANT B: card refs through Text.from_markup
+bringing up nodes...
+bringing up nodes...
+
+FFFF                                                                     [100%]
+=========================== short test summary info ============================
+FAILED tests/test_tui_directionb.py::test_at_flow_block_label_markup_safe - A...
+FAILED tests/test_flow_builder_render.py::test_at088b_check_ref_label_renders_literally
+FAILED tests/test_b97_flow_builder.py::test_at_b97_08_hostile_and_nul_refs_never_crash_or_inject
+FAILED tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally
+4 failed in 8.88s
+=== MUTANT B (second look): card refs through Text.from_markup, test_at_flow_block_label_markup_safe alone
+'evil.s19'
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________________ test_at_flow_block_label_markup_safe _____________________
+tests/test_tui_directionb.py:5855: in test_at_flow_block_label_markup_safe
+    assert "evil[red].s19" in rows[file_row], rows[file_row]
+E   AssertionError: │ evil.s19                                                                                 │
+E   assert 'evil[red].s19' in '│ evil.s19                                                                                 │'
+=========================== short test summary info ============================
+FAILED tests/test_tui_directionb.py::test_at_flow_block_label_markup_safe - A...
+1 failed in 2.47s

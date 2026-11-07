@@ -364,7 +364,7 @@ Totals (counted by script, one per id; a row with several ids counts each): 317 
 
 | Id | Change | Rows | Status |
 |---|---|---|---|
-| D16-6 | Remove the hidden `#flow_help`, `#flow_canvas`, `#flow_blocks`, `#flow_ext_session`, `#fx_help` and their painters (`_canvas_text`, `_blocks_text`, `_flow_block_label`) | — | open |
+| D16-6 | Remove the hidden `#flow_help`, `#flow_canvas`, `#flow_blocks`, `#flow_ext_session`, `#fx_help` and their painters (`_canvas_text`, `_blocks_text`, `_flow_block_label`) | — | done (batch-101 Inc 12b) |
 | D16-10 | Builder: check each Add and + Add var with the flow loader's rules (refs, output names, funnel limits, block cap), as Paste does | R-FB-ADD.11, R-FB-VAR.6 | open |
 | D16-11 | Builder: declare Intel HEX for LOAD / WRITE-OUT names ending in `.hex` / `.ihex` | R-FB-ADD.12 | open |
 | D16-12 | Builder: refuse Run on an empty chain (`No blocks to run — add a block first.`) | R-FB-RUN.1 | open |

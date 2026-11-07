@@ -5725,11 +5725,19 @@ def _flow_project(app: "S19TuiApp") -> None:
     app.current_project = "proj"
 
 
-def _add_flow_block(app: "S19TuiApp", kind: str, ref: str) -> None:
-    """Drive the Flow Builder add row: set kind + ref, press Add."""
-    from textual.widgets import Button, Input, Select
+async def _add_flow_block(app: "S19TuiApp", pilot, kind: str, ref: str) -> None:
+    """Drive the Flow Builder add row: press the kind's chip (and wait for its
+    ``chip-selected`` mark), set the ref, press Add."""
+    from textual.widgets import Button, Input
 
-    app.query_one("#flow_kind", Select).value = kind
+    chip = app.query_one(f"#flow_palette_{kind}", Button)
+    chip.press()
+    for _ in range(25):
+        await pilot.pause()
+        if chip.has_class("chip-selected"):
+            break
+    else:
+        raise AssertionError(f"the {kind} chip did not become selected")
     app.query_one("#flow_ref", Input).value = ref
     app.query_one("#flow_add", Button).press()
 
@@ -5761,13 +5769,13 @@ def test_at_flow_add_blocks_and_run_renders_result(tmp_path: Path) -> None:
             app.action_show_screen("flow")
             await pilot.pause()
             visible = _visible_screens(app)
-            _add_flow_block(app, "source", "prg.s19")
+            await _add_flow_block(app, pilot, "source", "prg.s19")
             await pilot.pause()
-            _add_flow_block(app, "patch", "patch.json")
+            await _add_flow_block(app, pilot, "patch", "patch.json")
             await pilot.pause()
-            _add_flow_block(app, "write_out", "out.s19")
+            await _add_flow_block(app, pilot, "write_out", "out.s19")
             await pilot.pause()
-            blocks_text = _static_plain(app, "#flow_blocks")
+            blocks_text = _static_plain(app, "#flow_pipeline")
             app.query_one("#flow_run", Button).press()
             await pilot.pause()
             await pilot.pause()
@@ -5782,10 +5790,12 @@ def test_at_flow_add_blocks_and_run_renders_result(tmp_path: Path) -> None:
     visible, blocks_text, result_text = asyncio.run(_drive())
 
     assert visible == ["screen_flow"], f"rail-8 must show #screen_flow; {visible}"
-    # The composed flow lists all three blocks in order (SOURCE surfaced LOAD).
+    # The composed flow paints all three cards in order (SOURCE surfaced LOAD).
     assert "LOAD" in blocks_text and "prg.s19" in blocks_text
     assert "PATCH" in blocks_text and "patch.json" in blocks_text
     assert "WRITE-OUT" in blocks_text and "out.s19" in blocks_text
+    heads = [blocks_text.index(word) for word in ("LOAD", "PATCH", "WRITE-OUT")]
+    assert heads == sorted(heads), heads
     # Run succeeded (CLEAN banner) and the result names the written file.
     assert "CLEAN" in result_text, f"run should succeed; got {result_text!r}"
     assert "out.s19" in result_text, f"result must name the output; {result_text!r}"
@@ -5812,24 +5822,51 @@ def test_at_flow_rail_key_8_reaches_panel(tmp_path: Path) -> None:
 
 
 def test_at_flow_block_label_markup_safe(tmp_path: Path) -> None:
-    """AC-5: a block ref carrying hostile markup renders LITERALLY in the block
-    list — no Rich markup injection / MarkupError (the batch-27/43 class).
+    """AC-5: a block ref carrying hostile markup renders LITERALLY in the
+    pipeline card — no Rich markup injection / MarkupError (the batch-27/43
+    class), and the input adds no style span of its own.
+
+    Inc 12b re-pointed this node from the removed block list to the card,
+    which scrubs the ref with ``safe_text`` and clips it to the card width;
+    ``evil[red].s19`` fits the one card whole (E3 S-2, S2-2).
     """
 
-    async def _drive() -> str:
+    async def _drive():
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(120, 40)) as pilot:
             await pilot.pause()
             app.action_show_screen("flow")
             await pilot.pause()
-            _add_flow_block(app, "source", "evil[red].s19")
+            await _add_flow_block(app, pilot, "source", "evil[red].s19")
             await pilot.pause()
-            return _static_plain(app, "#flow_blocks")
+            from rich.text import Text
+            from textual.content import Content
+            from textual.widgets import Static
 
-    blocks_text = asyncio.run(_drive())
+            from s19_app.tui.insight_style import VALUE
+
+            rendered = app.query_one("#flow_pipeline", Static).render()
+            # The card value rows' style (``VALUE``, the default of the card's
+            # ``row()``) as a rendered span holds it: appended as a span, as
+            # ``row()`` appends a value, and converted the same way.
+            value_style = Content.from_rich_text(Text().append("x", style=VALUE)).spans[0].style
+            return rendered.plain, list(rendered.spans), value_style
+
+    blocks_text, spans, value_style = asyncio.run(_drive())
     assert "evil[red].s19" in blocks_text, (
         f"hostile ref must render literally; got {blocks_text!r}"
     )
+    # The card's own ``in · file`` value row holds it (the origin note below the
+    # card's inputs repeats the ref, so a bare containment would pass on that).
+    rows = blocks_text.split("\n")
+    file_row = next(i for i, row in enumerate(rows) if "in · file" in row) + 1
+    assert "evil[red].s19" in rows[file_row], rows[file_row]
+    start = sum(len(row) + 1 for row in rows[:file_row]) + rows[file_row].index("evil[red].s19")
+    stop = start + len("evil[red].s19")
+    cutting = [s for s in spans if start < s.start < stop or start < s.end < stop]
+    exact = [s for s in spans if (s.start, s.end) == (start, stop)]
+    assert cutting == [] and len(exact) == 1, (cutting, exact)
+    assert exact[0].style == value_style, (exact[0].style, value_style)
 
 
 # ---------------------------------------------------------------------------
