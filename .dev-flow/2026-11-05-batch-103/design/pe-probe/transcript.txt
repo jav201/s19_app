@@ -1,0 +1,61 @@
+s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+=== SCENE s19-118
+  apply_btn = {'region': 'Region(x=17, y=41, width=22, height=1)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': True, 'bad': [], 'screen': 'Size(width=116, height=52)', 'disabled': False, 'label': 'Apply loaded changes'}
+  validate_btn = {'region': 'Region(x=6, y=41, width=10, height=1)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': True, 'bad': [], 'screen': 'Size(width=116, height=52)', 'disabled': False, 'label': 'Validate'}
+  save_btn = {'region': 'Region(x=40, y=41, width=6, height=1)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': True, 'bad': [], 'screen': 'Size(width=116, height=52)', 'disabled': False, 'label': 'Save'}
+  click_ok = True
+  status_after_apply = Apply: 1 applied, 0 skipped, 0 blocked
+  saveback_row = {'region': 'Region(x=0, y=0, width=0, height=0)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': False, 'bad': ['hidden:patch_win_json'], 'screen': 'Size(width=116, height=52)', 'disabled': False, 'label': ''}
+  saveback_hidden_class = False
+  name_input = firmware-patched.s19
+  width_label0 = Width: 32 bytes/line
+  confirm_geom = {'region': 'Region(x=0, y=0, width=0, height=0)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': False, 'bad': ['hidden:patch_win_json'], 'screen': 'Size(width=116, height=52)', 'disabled': False, 'label': 'Write file'}
+  width_label1 = Width: 32 bytes/line
+  status_after_confirm = Apply: 1 applied, 0 skipped, 0 blocked
+  files = ['.s19tool/logs/s19tui.log', '.s19tool/workarea/temp/firmware.s19']
+  project_active = None
+=== SCENE s19-220
+  apply_btn = {'region': 'Region(x=35, y=47, width=22, height=1)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': True, 'bad': [], 'screen': 'Size(width=218, height=58)', 'disabled': False, 'label': 'Apply loaded changes'}
+  validate_btn = {'region': 'Region(x=24, y=47, width=10, height=1)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': True, 'bad': [], 'screen': 'Size(width=218, height=58)', 'disabled': False, 'label': 'Validate'}
+  save_btn = {'region': 'Region(x=58, y=47, width=6, height=1)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': True, 'bad': [], 'screen': 'Size(width=218, height=58)', 'disabled': False, 'label': 'Save'}
+  click_ok = True
+  status_after_apply = Apply: 1 applied, 0 skipped, 0 blocked
+  saveback_row = {'region': 'Region(x=0, y=0, width=0, height=0)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': False, 'bad': ['hidden:patch_win_json'], 'screen': 'Size(width=218, height=58)', 'disabled': False, 'label': ''}
+  saveback_hidden_class = False
+  name_input = firmware-patched.s19
+  width_label0 = Width: 32 bytes/line
+  confirm_geom = {'region': 'Region(x=0, y=0, width=0, height=0)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': False, 'bad': ['hidden:patch_win_json'], 'screen': 'Size(width=218, height=58)', 'disabled': False, 'label': 'Write file'}
+  width_label1 = Width: 32 bytes/line
+  status_after_confirm = Apply: 1 applied, 0 skipped, 0 blocked
+  files = ['.s19tool/logs/s19tui.log', '.s19tool/workarea/temp/firmware.s19']
+  project_active = None
+=== SCENE hex-118
+  apply_btn = {'region': 'Region(x=17, y=41, width=22, height=1)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': True, 'bad': [], 'screen': 'Size(width=116, height=52)', 'disabled': False, 'label': 'Apply loaded changes'}
+  validate_btn = {'region': 'Region(x=6, y=41, width=10, height=1)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': True, 'bad': [], 'screen': 'Size(width=116, height=52)', 'disabled': False, 'label': 'Validate'}
+  save_btn = {'region': 'Region(x=40, y=41, width=6, height=1)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': True, 'bad': [], 'screen': 'Size(width=116, height=52)', 'disabled': False, 'label': 'Save'}
+  click_ok = True
+  status_after_apply = Apply: 0 applied, 1 skipped, 0 blocked
+  saveback_row = {'region': 'Region(x=0, y=0, width=0, height=0)', 'visible_region': None, 'displayed': False, 'ancestors_all_displayed': False, 'bad': ['hidden:patch_saveback_row', 'hidden:patch_win_json'], 'screen': 'Size(width=116, height=52)', 'disabled': False, 'label': ''}
+  saveback_hidden_class = True
+  files = ['.s19tool/logs/s19tui.log', '.s19tool/workarea/temp/firmware.hex']
+  project_active = None
+=== SCENE hex-220
+  apply_btn = {'region': 'Region(x=35, y=47, width=22, height=1)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': True, 'bad': [], 'screen': 'Size(width=218, height=58)', 'disabled': False, 'label': 'Apply loaded changes'}
+  validate_btn = {'region': 'Region(x=24, y=47, width=10, height=1)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': True, 'bad': [], 'screen': 'Size(width=218, height=58)', 'disabled': False, 'label': 'Validate'}
+  save_btn = {'region': 'Region(x=58, y=47, width=6, height=1)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': True, 'bad': [], 'screen': 'Size(width=218, height=58)', 'disabled': False, 'label': 'Save'}
+  click_ok = True
+  status_after_apply = Apply: 0 applied, 1 skipped, 0 blocked
+  saveback_row = {'region': 'Region(x=0, y=0, width=0, height=0)', 'visible_region': None, 'displayed': False, 'ancestors_all_displayed': False, 'bad': ['hidden:patch_saveback_row', 'hidden:patch_win_json'], 'screen': 'Size(width=218, height=58)', 'disabled': False, 'label': ''}
+  saveback_hidden_class = True
+  files = ['.s19tool/logs/s19tui.log', '.s19tool/workarea/temp/firmware.hex']
+  project_active = None
+=== NO IMAGE loaded, entry added, apply
+  apply_btn = {'region': 'Region(x=17, y=41, width=22, height=1)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': True, 'bad': [], 'screen': 'Size(width=116, height=52)', 'disabled': False, 'label': 'Apply loaded changes'}
+  validate_btn = {'region': 'Region(x=6, y=41, width=10, height=1)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': True, 'bad': [], 'screen': 'Size(width=116, height=52)', 'disabled': False, 'label': 'Validate'}
+  save_btn = {'region': 'Region(x=40, y=41, width=6, height=1)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': True, 'bad': [], 'screen': 'Size(width=116, height=52)', 'disabled': False, 'label': 'Save'}
+  click_ok = True
+  status_after_apply = Apply: 0 applied, 1 skipped, 0 blocked
+  saveback_row = {'region': 'Region(x=0, y=0, width=0, height=0)', 'visible_region': None, 'displayed': False, 'ancestors_all_displayed': False, 'bad': ['hidden:patch_saveback_row', 'hidden:patch_win_json'], 'screen': 'Size(width=116, height=52)', 'disabled': False, 'label': ''}
+  saveback_hidden_class = True
+  files = ['.s19tool/logs/s19tui.log']
+  project_active = None

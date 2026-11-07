@@ -39,3 +39,4 @@
 2026-11-06T18:53:08-06:00 E3 round 2 start — Inc 2 architect + security (blocking findings + touched parts only); Opus 5.5
 2026-11-06T18:59:14-06:00 operator — new story US-103-06 (Patch Editor: apply visibly + export S19 16/32 bytes per line or Intel HEX); Inc 10 added to PLAN (W1, urgent); probe of today's path running (Sonnet, cachyos-rtx)
 2026-11-06T19:08:08-06:00 E3 round 2 done — Inc 2: architect PASS-WITH-NOTES (14 min), security FAIL (E3S-14 MAJOR, 12 min); rulings appended; round-2 correction (2 DeepSeek units) next, then security round 3
+2026-11-06T19:12:54-06:00 probe done — Patch Editor apply/save-back (Sonnet, cachyos-rtx): apply works; save-back prompt hidden inside the undisplayed JSON tab; format follows the source; design/pe-apply-probe.md; Inc 10 scope set in PLAN

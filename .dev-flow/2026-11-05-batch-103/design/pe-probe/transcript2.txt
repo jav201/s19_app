@@ -1,0 +1,88 @@
+s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+=== P2 s19 (118, 54)
+  loaded = ('s19', 'firmware.s19', 97, [(2147483648, 2147483681), (2147483712, 2147483776)])
+  byte_before = 60
+  tab_before_apply = patch_pane_inspector
+  status = Apply: 1 applied, 0 skipped, 0 blocked
+  byte_after = 222
+  tab_after_apply = patch_pane_inspector
+  saveback_hidden_class = False
+  saveback_geom_on_inspector_tab = {'region': 'Region(x=0, y=0, width=0, height=0)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': False, 'bad': ['hidden:patch_win_json'], 'screen': 'Size(width=116, height=52)', 'disabled': False, 'label': ''}
+  notifications = []
+  static:#patch_before_after_strip = ABSENT
+  static:#patch_strip = ABSENT
+  static:#patch_history_strip = ↶ 1 back  ↷ 0 fwd  1/20
+ctrl+z / ctrl+y
+  ids_strip_hex = ['ws_memstrip', 'hex_title', 'hex_controls', 'hex_scroll', 'hex_view', 'a2l_hex_pane', 'alt_hex_title', 'alt_hex_controls', 'alt_hex_scroll', 'alt_hex_view', 'mac_coverage_strip', 'mac_hex_pane', 'mac_hex_title', 'mac_hex_controls', 'mac_hex_scroll', 'mac_hex_view', 'issues_severity_strip', 'issues_hex_pane', 'patch_before_after_card', 'patch_history_strip', 'patch_before_after_row', 'patch_before_after_buttons', 'patch_before_after_button', 'patch_checks_strip', 'diff_hex_a', 'diff_hex_b', 'flow_name_strip', 'fx_name_strip', 'checks_aggregate_strip', 'checks_hex_pane']
+  tab_now = patch_win_json
+  saveback_geom_on_json_tab = {'region': 'Region(x=74, y=36, width=41, height=3)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': True, 'bad': [], 'screen': 'Size(width=116, height=52)', 'disabled': False, 'label': ''}
+  write_btn_geom = {'region': 'Region(x=96, y=37, width=12, height=1)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': True, 'bad': [], 'screen': 'Size(width=116, height=52)', 'disabled': False, 'label': 'Write file'}
+  width_btn_geom = {'region': 'Region(x=74, y=37, width=21, height=1)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': True, 'bad': [], 'screen': 'Size(width=116, height=52)', 'disabled': False, 'label': 'Width: 32 bytes/line'}
+  json_win = {'region': 'Region(x=74, y=7, width=41, height=32)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': True, 'bad': [], 'screen': 'Size(width=116, height=52)', 'disabled': False, 'label': ''}
+  w1 = True
+  width_label_after_click = Width: 16 bytes/line
+  name = firmware-patched.s19
+  w2 = True
+  status_after_write = Saved + verified: firmware-patched.s19 — 1 entry applied before this save (0x8000007C)
+  files_after_write = ['.s19tool/logs/s19tui.log', '.s19tool/workarea/firmware-patched.s19', '.s19tool/workarea/temp/firmware.s19']
+  notif2 = []
+  status_after_Save = Saved change-set to changes.json
+  files_after_Save = ['.s19tool/logs/s19tui.log', '.s19tool/workarea/firmware-patched.s19', '.s19tool/workarea/patches/changes.json', '.s19tool/workarea/temp/firmware.s19']
+=== P2 s19 (220, 60)
+  loaded = ('s19', 'firmware.s19', 97, [(2147483648, 2147483681), (2147483712, 2147483776)])
+  byte_before = 60
+  tab_before_apply = patch_pane_inspector
+  status = Apply: 1 applied, 0 skipped, 0 blocked
+  byte_after = 222
+  tab_after_apply = patch_pane_inspector
+  saveback_hidden_class = False
+  saveback_geom_on_inspector_tab = {'region': 'Region(x=0, y=0, width=0, height=0)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': False, 'bad': ['hidden:patch_win_json'], 'screen': 'Size(width=218, height=58)', 'disabled': False, 'label': ''}
+  notifications = []
+  static:#patch_before_after_strip = ABSENT
+  static:#patch_strip = ABSENT
+  static:#patch_history_strip = ↶ 1 back  ↷ 0 fwd  1/20
+ctrl+z / ctrl+y
+  ids_strip_hex = ['ws_memstrip', 'hex_title', 'hex_controls', 'hex_scroll', 'hex_view', 'a2l_hex_pane', 'alt_hex_title', 'alt_hex_controls', 'alt_hex_scroll', 'alt_hex_view', 'mac_coverage_strip', 'mac_hex_pane', 'mac_hex_title', 'mac_hex_controls', 'mac_hex_scroll', 'mac_hex_view', 'issues_severity_strip', 'issues_hex_pane', 'patch_before_after_card', 'patch_history_strip', 'patch_before_after_row', 'patch_before_after_buttons', 'patch_before_after_button', 'patch_checks_strip', 'diff_hex_a', 'diff_hex_b', 'flow_name_strip', 'fx_name_strip', 'checks_aggregate_strip', 'checks_hex_pane']
+  tab_now = patch_win_json
+  saveback_geom_on_json_tab = {'region': 'Region(x=142, y=42, width=75, height=3)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': True, 'bad': [], 'screen': 'Size(width=218, height=58)', 'disabled': False, 'label': ''}
+  write_btn_geom = {'region': 'Region(x=164, y=43, width=12, height=1)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': True, 'bad': [], 'screen': 'Size(width=218, height=58)', 'disabled': False, 'label': 'Write file'}
+  width_btn_geom = {'region': 'Region(x=142, y=43, width=21, height=1)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': True, 'bad': [], 'screen': 'Size(width=218, height=58)', 'disabled': False, 'label': 'Width: 32 bytes/line'}
+  json_win = {'region': 'Region(x=142, y=7, width=75, height=38)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': True, 'bad': [], 'screen': 'Size(width=218, height=58)', 'disabled': False, 'label': ''}
+  w1 = True
+  width_label_after_click = Width: 16 bytes/line
+  name = firmware-patched.s19
+  w2 = True
+  status_after_write = Saved + verified: firmware-patched.s19 — 1 entry applied before this save (0x8000007C)
+  files_after_write = ['.s19tool/logs/s19tui.log', '.s19tool/workarea/firmware-patched.s19', '.s19tool/workarea/temp/firmware.s19']
+  notif2 = []
+  status_after_Save = Saved change-set to changes.json
+  files_after_Save = ['.s19tool/logs/s19tui.log', '.s19tool/workarea/firmware-patched.s19', '.s19tool/workarea/patches/changes.json', '.s19tool/workarea/temp/firmware.s19']
+=== P2 hex (118, 54)
+  loaded = ('hex', 'firmware.hex', 95, [(2147483648, 2147483680), (2147483712, 2147483775)])
+  byte_before = 60
+  tab_before_apply = patch_pane_inspector
+  status = Apply: 0 applied, 1 skipped, 0 blocked
+  byte_after = 60
+  tab_after_apply = patch_pane_inspector
+  saveback_hidden_class = True
+  saveback_geom_on_inspector_tab = {'region': 'Region(x=0, y=0, width=0, height=0)', 'visible_region': None, 'displayed': False, 'ancestors_all_displayed': False, 'bad': ['hidden:patch_saveback_row', 'hidden:patch_win_json'], 'screen': 'Size(width=116, height=52)', 'disabled': False, 'label': ''}
+  notifications = []
+  static:#patch_before_after_strip = ABSENT
+  static:#patch_strip = ABSENT
+  static:#patch_history_strip = ↶ 1 back  ↷ 0 fwd  1/20
+ctrl+z / ctrl+y
+  ids_strip_hex = ['ws_memstrip', 'hex_title', 'hex_controls', 'hex_scroll', 'hex_view', 'a2l_hex_pane', 'alt_hex_title', 'alt_hex_controls', 'alt_hex_scroll', 'alt_hex_view', 'mac_coverage_strip', 'mac_hex_pane', 'mac_hex_title', 'mac_hex_controls', 'mac_hex_scroll', 'mac_hex_view', 'issues_severity_strip', 'issues_hex_pane', 'patch_before_after_card', 'patch_history_strip', 'patch_before_after_row', 'patch_before_after_buttons', 'patch_before_after_button', 'patch_checks_strip', 'diff_hex_a', 'diff_hex_b', 'flow_name_strip', 'fx_name_strip', 'checks_aggregate_strip', 'checks_hex_pane']
+  tab_now = patch_win_json
+  saveback_geom_on_json_tab = {'region': 'Region(x=0, y=0, width=0, height=0)', 'visible_region': None, 'displayed': False, 'ancestors_all_displayed': False, 'bad': ['hidden:patch_saveback_row'], 'screen': 'Size(width=116, height=52)', 'disabled': False, 'label': ''}
+  write_btn_geom = {'region': 'Region(x=0, y=0, width=0, height=0)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': False, 'bad': ['hidden:patch_saveback_row'], 'screen': 'Size(width=116, height=52)', 'disabled': False, 'label': 'Write file'}
+  width_btn_geom = {'region': 'Region(x=0, y=0, width=0, height=0)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': False, 'bad': ['hidden:patch_saveback_row'], 'screen': 'Size(width=116, height=52)', 'disabled': False, 'label': 'Width: 32 bytes/line'}
+  json_win = {'region': 'Region(x=74, y=7, width=41, height=32)', 'visible_region': None, 'displayed': True, 'ancestors_all_displayed': True, 'bad': [], 'screen': 'Size(width=116, height=52)', 'disabled': False, 'label': ''}
+  w1 = False
+  width_label_after_click = Width: 32 bytes/line
+  name = 
+  w2 = False
+  status_after_write = Apply: 0 applied, 1 skipped, 0 blocked
+  files_after_write = ['.s19tool/logs/s19tui.log', '.s19tool/workarea/temp/firmware.hex']
+  notif2 = []
+  status_after_Save = Saved change-set to changes.json
+  files_after_Save = ['.s19tool/logs/s19tui.log', '.s19tool/workarea/patches/changes.json', '.s19tool/workarea/temp/firmware.hex']

@@ -1,0 +1,41 @@
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+textual = 8.2.8 python = 3.11.18
+--- OsClipboardInput / terminal paste
+  value repr: 'A\x1b]0;PWNED-TITLE\x07B\x1b]52;c;SElKQUNL\x07C\x00D\u202eE\x1b[5;31mBLINKF\u2066G'
+  driver.write calls: 2 bytes: 23
+  OSC 0 title  in value=True  in rendered strip=True  in driver output=False
+  OSC 52 set   in value=True  in rendered strip=True  in driver output=False
+  SGR blink    in value=True  in rendered strip=True  in driver output=False
+  NUL          in value=True  in rendered strip=True  in driver output=False
+  RLO U+202E   in value=True  in rendered strip=True  in driver output=False
+  LRI U+2066   in value=True  in rendered strip=True  in driver output=False
+--- OsClipboardInput / ctrl+v app-clipboard fallback
+  value repr: 'A\x1b]0;PWNED-TITLE\x07B\x1b]52;c;SElKQUNL\x07C\x00D\u202eE\x1b[5;31mBLINKF\u2066G'
+  driver.write calls: 2 bytes: 23
+  OSC 0 title  in value=True  in rendered strip=True  in driver output=False
+  OSC 52 set   in value=True  in rendered strip=True  in driver output=False
+  SGR blink    in value=True  in rendered strip=True  in driver output=False
+  NUL          in value=True  in rendered strip=True  in driver output=False
+  RLO U+202E   in value=True  in rendered strip=True  in driver output=False
+  LRI U+2066   in value=True  in rendered strip=True  in driver output=False
+--- CappedTextArea / terminal paste
+  value repr: 'A\x1b]0;PWNED-TITLE\x07B\x1b]52;c;SElKQUNL\x07C\x00D\u202eE\x1b[5;31mBLINKF\u2066G'
+  driver.write calls: 2 bytes: 23
+  OSC 0 title  in value=True  in rendered strip=True  in driver output=False
+  OSC 52 set   in value=True  in rendered strip=True  in driver output=False
+  SGR blink    in value=True  in rendered strip=True  in driver output=False
+  NUL          in value=True  in rendered strip=True  in driver output=False
+  RLO U+202E   in value=True  in rendered strip=True  in driver output=False
+  LRI U+2066   in value=True  in rendered strip=True  in driver output=False
+--- CappedTextArea / ctrl+v app-clipboard fallback
+  value repr: 'A\x1b]0;PWNED-TITLE\x07B\x1b]52;c;SElKQUNL\x07C\x00D\u202eE\x1b[5;31mBLINKF\u2066G'
+  driver.write calls: 2 bytes: 23
+  OSC 0 title  in value=True  in rendered strip=True  in driver output=False
+  OSC 52 set   in value=True  in rendered strip=True  in driver output=False
+  SGR blink    in value=True  in rendered strip=True  in driver output=False
+  NUL          in value=True  in rendered strip=True  in driver output=False
+  RLO U+202E   in value=True  in rendered strip=True  in driver output=False
+  LRI U+2066   in value=True  in rendered strip=True  in driver output=False
+exit=0
