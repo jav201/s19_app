@@ -1,0 +1,36 @@
+=== Inc 10a E5 corrective run: mut-c-06
+date: 2026-11-07T06:01:09Z
+tree dir: <HOME>/work/s19_i10c_mut_mut-c-06
+checkout HEAD (base): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+main ref: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+index tree: 6cb142f114dea93b83e526ca5c29303554283466
+mutation: <HOME>/work/s19_i10c-helpers/mutation-mut-c-06.diff (printed at the end)
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10c_mut_mut-c-06/s19_app/__init__.py
+CMD: env -u NO_COLOR timeout 900 /data/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -q -n 6 --dist load -rfs --tb=line tests/test_b101_hex_jump.py -k tui_040_11_4 or tui_040_11_5 or tui_040_8_2 or tui_040_8_3
+bringing up nodes...
+bringing up nodes...
+
+.....F..                                                                 [100%]
+=================================== FAILURES ===================================
+[gw3] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: a2l after go-to 'zz': 1 marked line(s) ['> 0x00000050  00 C8 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|']
+<HOME>/work/s19_i10c_mut_mut-c-06/tests/support/timing.py:66: AssertionError: a2l after go-to 'zz': 1 marked line(s) ['> 0x00000050  00 C8 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|']
+=========================== short test summary info ============================
+FAILED tests/test_b101_hex_jump.py::test_r_tui_040_11_4_a2l_failed_goto_removes_marker[invalid]
+1 failed, 7 passed in 35.56s
+exit code: 1
+--- mutation diff (vs the staged clone) ---
+diff --git a/s19_app/tui/app.py b/s19_app/tui/app.py
+index cab4ee01..c45216cf 100644
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -21645,7 +21645,7 @@ class S19TuiApp(App):
+             addr = int(raw, 0)
+         except ValueError:
+             self.set_status("Invalid address format.")
+-            self._clear_goto_marker_keeping_window("alt")
++            self._alt_goto_focus_address = None
+             return
+         if not self._apply_goto("alt", addr):
+             self._clear_goto_marker_keeping_window("alt")

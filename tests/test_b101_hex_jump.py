@@ -4,7 +4,9 @@ Written by an independent tester from the approved design only:
 ``inc-10/01-requirements.md`` (rows and thresholds), ``02-test-cases.md`` (the
 cases with the wait rule and the window-switch rule), ``codewire/graph-inc10.md``
 (the examples, used as oracles) and ``E3-rulings.md``. No line of the Inc 10a
-implementation was read to decide what to assert.
+implementation was read to decide what to assert. The nodes and clauses marked
+"E5" were written by the E5 corrective pass, which had read it
+(``inc-10/E5-corrective-notes.md``).
 
 Group H: where a jump lands and what the ``> `` marker does.
 
@@ -44,7 +46,7 @@ from pathlib import Path
 
 import pytest
 from textual.containers import ScrollableContainer
-from textual.widgets import DataTable, Input, ListView, Static
+from textual.widgets import DataTable, Input, ListView, Static, TextArea
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SYNTH_DIR = REPO_ROOT / "tools" / "synth"
@@ -921,20 +923,38 @@ def test_r_tui_040_11_3_main_invalid_address_removes_marker(tmp_path, case08):
     drive(tmp_path, scenario)
 
 
-def test_r_tui_040_11_4_a2l_miss_removes_marker(tmp_path, case08):
-    """R-TUI-040.11/4: an A2L miss removes the marker."""
+#: The three failures of a go-to (box text, status), one per failure branch of
+#: each view's go-to handler (QA-3 at E5: the A2L and MAC branches need a node
+#: each).
+GOTO_FAILURES = {
+    "miss": ("0xFFFFFFF0", MISS),
+    "empty": ("", "Goto address is empty."),
+    "invalid": ("zz", "Invalid address format."),
+}
+
+
+@pytest.mark.parametrize("failure", ["miss", "empty", "invalid"])
+def test_r_tui_040_11_4_a2l_failed_goto_removes_marker(tmp_path, case08, failure):
+    """R-TUI-040.11/4 (``[miss]``), /6 (``[empty]``), /7 (``[invalid]``): each
+    failed A2L go-to removes the marker (/6, /7 and the parametrisation added
+    at E5, QA-3)."""
+    text, status = GOTO_FAILURES[failure]
 
     async def scenario(app, pilot, log):
-        await _marker_removed_by(pilot, app, log, case08, "a2l", "0xFFFFFFF0", MISS)
+        await _marker_removed_by(pilot, app, log, case08, "a2l", text, status)
 
     drive(tmp_path, scenario)
 
 
-def test_r_tui_040_11_5_mac_invalid_address_removes_marker(tmp_path, case08):
-    """R-TUI-040.11/5: a MAC invalid address removes the marker."""
+@pytest.mark.parametrize("failure", ["invalid", "empty", "miss"])
+def test_r_tui_040_11_5_mac_failed_goto_removes_marker(tmp_path, case08, failure):
+    """R-TUI-040.11/5 (``[invalid]``), /8 (``[empty]``), /9 (``[miss]``): each
+    failed MAC go-to removes the marker (/8, /9 and the parametrisation added
+    at E5, QA-3)."""
+    text, status = GOTO_FAILURES[failure]
 
     async def scenario(app, pilot, log):
-        await _marker_removed_by(pilot, app, log, case08, "mac", "zz", "Invalid address format.")
+        await _marker_removed_by(pilot, app, log, case08, "mac", text, status)
 
     drive(tmp_path, scenario)
 
@@ -1097,6 +1117,12 @@ def test_r_tui_007_5_1_next_page_keeps_a_window_holding_the_last_row(tmp_path):
         await wait_until(pilot, lambda: bool(hex_rows(app, "#hex_view")), "no rows painted")
         await goto(pilot, app, log, MAIN, f"0x{row_at(949):08X}", hit(row_at(949)))
         await wait_rows(pilot, app, MAIN, [row_at(948), row_at(949)], "go-to row 949")
+        # The precondition that makes "window kept" mean something (E5, CR-7):
+        # a text box focused here would take '.' as text and keep any window.
+        focused = app.default_screen.focused
+        assert not isinstance(focused, (Input, TextArea)), (
+            f"precondition: '.' would be typed into {type(focused).__name__}#{focused.id}"
+        )
         for press in (1, 2, 3):
             await pilot.press("period")
             assert addrs(app, "#hex_view", 1) == [row_at(948)], (

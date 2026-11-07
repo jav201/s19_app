@@ -2844,6 +2844,11 @@ class S19TuiApp(App):
         #: still sitting there to the target once it is shown. UI focus
         #: state, not session state (TC-B100-09).
         self._focus_landing_fallback: Optional[Widget] = None
+        #: Inc 10a (E5, CR-1): ``_hex_view_rows``' memo, ``((image generation,
+        #: MAC row set), view rows)``; the invalidation rule is in its docstring.
+        self._hex_view_rows_cache: Optional[
+            tuple[tuple[int, frozenset[int]], list[int]]
+        ] = None
         # N1: the active rail screen, so the Legend modal can scope its rows to
         # what THIS screen paints (updated by ``action_show_screen``).
         self._active_screen_key: str = "workspace"
@@ -10567,7 +10572,12 @@ class S19TuiApp(App):
                     and not isinstance(candidate, (Input, TextArea))
                 ):
                     return candidate
-        rail = self.query_one(Rail)
+        try:
+            rail = self.query_one(Rail)
+        except Exception:
+            # Inc 10a (E5, SE5-5): a landing that runs during teardown finds
+            # no rail; it must not raise at exit.
+            return target
         for item in rail.query(RailItem):
             if item.has_class("-active"):
                 return item
@@ -10791,7 +10801,8 @@ class S19TuiApp(App):
             trigger (Optional[Widget]): The widget focused when the landing
                 was scheduled (``None`` after a synchronous clear).
             switch (Optional[str]): The ``_active_screen_key`` the landing
-                was scheduled for; a stale value makes the landing a no-op.
+                was scheduled for (a switch and, since E5 CR-3, an unload); a
+                stale value makes the landing a no-op.
             on_switch (bool): ``True`` for a window switch (move when the
                 focus is still the trigger), ``False`` for an unload (move
                 when the focus is no longer the trigger).
@@ -10802,6 +10813,8 @@ class S19TuiApp(App):
             None
 
         Data Flow:
+            - A landing that runs once the tree is gone (``App.exit`` has
+              run) does nothing (E5, SE5-5).
             - An after-refresh callback can run before the layout that gives
               the window just shown its region (Inc 10a E4 integration
               I-D3: ``#screen_mac`` had area 0 at the landing of a two-key
@@ -10820,10 +10833,13 @@ class S19TuiApp(App):
 
         Dependencies:
             Uses:
-                - ``_focus_needs_rehome`` / ``_resolve_focus_target``
+                - ``_load_tree_gone`` / ``_focus_needs_rehome`` /
+                  ``_resolve_focus_target``
             Used by:
                 - ``action_show_screen`` / ``_apply_unload``
         """
+        if self._load_tree_gone():
+            return
         if switch is not None and switch != self._active_screen_key:
             return
         container_id = (
@@ -13656,6 +13672,10 @@ class S19TuiApp(App):
               -> the row 9 refusal (before the re-derive refusal, A3-13);
               else ``inventory_project_tree`` of the open project. Every
               other target passes no inventory (LLR-171.1g).
+            - A save as from a MAC-only session (``file_type == "mac"``: a
+              primary unload or a MAC-only load) drops the inventory's
+              top-level S19 / HEX files, so no S19 / HEX file reaches the
+              new project (R-WS-LOADED.19, Inc 10a E5 SE5-1).
             - The image row: the emitted bytes' digest (an emit) or the
               source file's (a copy); then the MAC and the A2L, each
               digested from its file. A refused decision plans no file.
@@ -13735,6 +13755,20 @@ class S19TuiApp(App):
                 else inventory_project_tree(source_dir)
             )
         loaded = self.current_file
+        if walked is not None and loaded is not None and loaded.file_type == "mac":
+            # Inc 10a (E5, SE5-1; R-WS-LOADED.19): with a MAC loaded and no
+            # S19 / HEX image, a save as copies none of the open project's
+            # top-level S19 / HEX files — after a primary unload one of them
+            # is the image the operator unloaded.
+            walked = replace(
+                walked,
+                top_level=tuple(
+                    item
+                    for item in walked.top_level
+                    if os.path.splitext(item.relative)[1].lower()
+                    not in PROJECT_PRIMARY_DATA_EXTENSIONS
+                ),
+            )
         files: list[PlannedFile] = []
         image = ""
 
@@ -14197,6 +14231,9 @@ class S19TuiApp(App):
         # parse's MAC merge sees no existing file (P-2's ``LEAK
         # mac_records``).
         self.current_file = None
+        # Inc 10a (E5, CR-1): a writer of `current_file` that bumps no image
+        # generation resets the view-row memo (`_hex_view_rows`).
+        self._hex_view_rows_cache = None
         # S2/S3: the A2L path and parsed payload — the two parse
         # fallbacks a loose-S19 reload would otherwise re-attach (P-2's
         # ``LEAK a2l_tags``; ``current_a2l_data``'s clearing writer is
@@ -18024,7 +18061,11 @@ class S19TuiApp(App):
         self._refresh_loaded_panel()
         self.set_file_status(f"Unloaded {label}.")
         self.set_status(f"Unloaded {label}.")
-        self.call_after_refresh(self._land_focus, trigger, None, on_switch=False)
+        # Inc 10a (E5, CR-3): stamped with the window shown now, so a rail
+        # key in the same burst makes this landing stale and its own wins.
+        self.call_after_refresh(
+            self._land_focus, trigger, self._active_screen_key, on_switch=False
+        )
 
     def _refresh_loaded_panel(self, project: Optional[str] = None) -> None:
         """
@@ -19939,13 +19980,48 @@ class S19TuiApp(App):
         return len(row_bases) - 1
 
     def _hex_view_rows(self) -> list[int]:
-        """Return the view rows the hex panes paint, memoised per render."""
+        """
+        Summary:
+            The view rows of the three hex views (I-5): the present rows plus
+            the rows R-TUI-004.3 adds for MAC records outside the image, in
+            address order. Window starts, page bounds and first visible rows
+            are indices into this list.
+
+        Args:
+            None
+
+        Returns:
+            list[int]: The view rows; ``[]`` without a file. With no MAC row
+            outside the image it is ``current_file.row_bases`` itself (no
+            copy).
+
+        Data Flow:
+            - Memoised in ``_hex_view_rows_cache`` under the key
+              ``(_image_generation, frozenset(MAC record addresses))``.
+            - Invalidation rule: every image install bumps
+              ``_image_generation``; a writer of ``current_file`` that does
+              not bump it (an unload, the project-load reset) must reset
+              ``_hex_view_rows_cache`` to ``None`` itself, or the old image's
+              rows are returned.
+            - The renderer is not given this list: ``render_hex_view_text``
+              rebuilds it from the same three inputs through
+              ``hex_row_bases``, so both lists agree by construction.
+
+        Dependencies:
+            Uses:
+                - ``hex_row_bases`` / ``_collect_mac_highlight_addresses``
+            Used by:
+                - ``update_hex_view`` / ``update_alt_hex_view`` /
+                  ``update_mac_hex_view`` / ``action_hex_page_next`` /
+                  ``_first_visible_hex_address`` /
+                  ``_clear_goto_marker_keeping_window``
+        """
         file = self.current_file
         if file is None:
             return []
         mac_set = self._collect_mac_highlight_addresses(file)
         key = (self._image_generation, frozenset(mac_set))
-        cached = getattr(self, "_hex_view_rows_cache", None)
+        cached = self._hex_view_rows_cache
         if cached is not None and cached[0] == key:
             return cached[1]
         rows = hex_row_bases(
@@ -21563,40 +21639,16 @@ class S19TuiApp(App):
         raw = self.query_one("#alt_goto_input", Input).value.strip()
         if not raw:
             self.set_status("Goto address is empty.")
-            if self._alt_goto_focus_address is not None:
-                self._alt_goto_focus_address = None
-                rows = self._hex_view_rows()
-                start = (
-                    rows.index(self._alt_first_visible_address)
-                    if self._alt_first_visible_address in rows
-                    else 0
-                )
-                self.update_alt_hex_view(start_row=start)
+            self._clear_goto_marker_keeping_window("alt")
             return
         try:
             addr = int(raw, 0)
         except ValueError:
             self.set_status("Invalid address format.")
-            if self._alt_goto_focus_address is not None:
-                self._alt_goto_focus_address = None
-                rows = self._hex_view_rows()
-                start = (
-                    rows.index(self._alt_first_visible_address)
-                    if self._alt_first_visible_address in rows
-                    else 0
-                )
-                self.update_alt_hex_view(start_row=start)
+            self._clear_goto_marker_keeping_window("alt")
             return
         if not self._apply_goto("alt", addr):
-            if self._alt_goto_focus_address is not None:
-                self._alt_goto_focus_address = None
-                rows = self._hex_view_rows()
-                start = (
-                    rows.index(self._alt_first_visible_address)
-                    if self._alt_first_visible_address in rows
-                    else 0
-                )
-                self.update_alt_hex_view(start_row=start)
+            self._clear_goto_marker_keeping_window("alt")
             return
         self.update_alt_hex_view(addr, near_top=True, reset_scroll=True)
         self.set_status(f"Goto 0x{addr:08X}")
@@ -21637,43 +21689,60 @@ class S19TuiApp(App):
         raw = self.query_one("#mac_goto_input", Input).value.strip()
         if not raw:
             self.set_status("Goto address is empty.")
-            if self._mac_goto_focus_address is not None:
-                self._mac_goto_focus_address = None
-                rows = self._hex_view_rows()
-                start = (
-                    rows.index(self._mac_first_visible_address)
-                    if self._mac_first_visible_address in rows
-                    else 0
-                )
-                self.update_mac_hex_view(start_row=start)
+            self._clear_goto_marker_keeping_window("mac")
             return
         try:
             addr = int(raw, 0)
         except ValueError:
             self.set_status("Invalid address format.")
-            if self._mac_goto_focus_address is not None:
-                self._mac_goto_focus_address = None
-                rows = self._hex_view_rows()
-                start = (
-                    rows.index(self._mac_first_visible_address)
-                    if self._mac_first_visible_address in rows
-                    else 0
-                )
-                self.update_mac_hex_view(start_row=start)
+            self._clear_goto_marker_keeping_window("mac")
             return
         if not self._apply_goto("mac", addr):
-            if self._mac_goto_focus_address is not None:
-                self._mac_goto_focus_address = None
-                rows = self._hex_view_rows()
-                start = (
-                    rows.index(self._mac_first_visible_address)
-                    if self._mac_first_visible_address in rows
-                    else 0
-                )
-                self.update_mac_hex_view(start_row=start)
+            self._clear_goto_marker_keeping_window("mac")
             return
         self.update_mac_hex_view(addr, near_top=True, reset_scroll=True)
         self.set_status(f"Goto 0x{addr:08X}")
+
+    def _clear_goto_marker_keeping_window(self, view: str) -> None:
+        """
+        Summary:
+            After a failed go-to in the A2L or MAC hex view, remove the view's
+            ``> `` marker and re-render it from the row it already shows
+            (R-TUI-040.11, R-TUI-040.8). With no marker set nothing renders.
+
+        Args:
+            view (str): ``"alt"`` (the A2L view) or ``"mac"``.
+
+        Returns:
+            None
+
+        Data Flow:
+            - The start index is the painted first row's place in the view
+              rows (``bisect_left``; an address no longer among them gives
+              the next row, which the render's clamp bounds).
+
+        Dependencies:
+            Uses:
+                - ``_hex_view_rows`` / ``update_alt_hex_view`` /
+                  ``update_mac_hex_view``
+            Used by:
+                - ``_handle_goto_alt`` / ``_handle_goto_mac`` (their three
+                  failure branches)
+        """
+        from bisect import bisect_left
+
+        if view == "alt":
+            if self._alt_goto_focus_address is None:
+                return
+            self._alt_goto_focus_address = None
+            first, render = self._alt_first_visible_address, self.update_alt_hex_view
+        else:
+            if self._mac_goto_focus_address is None:
+                return
+            self._mac_goto_focus_address = None
+            first, render = self._mac_first_visible_address, self.update_mac_hex_view
+        start = bisect_left(self._hex_view_rows(), first) if first is not None else 0
+        render(start_row=start)
 
     def set_status(self, message: str) -> None:
         self._append_log_line(message)

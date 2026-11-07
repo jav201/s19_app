@@ -1,0 +1,46 @@
+=== Inc 10a E5 corrective run: mut-c-18
+date: 2026-11-07T06:07:35Z
+tree dir: <HOME>/work/s19_i10c_mut_mut-c-18
+checkout HEAD (base): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+main ref: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+index tree: 6cb142f114dea93b83e526ca5c29303554283466
+mutation: <HOME>/work/s19_i10c-helpers/mutation-mut-c-18.diff (printed at the end)
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10c_mut_mut-c-18/s19_app/__init__.py
+CMD: env -u NO_COLOR timeout 900 /data/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -q -n 6 --dist load -rfs --tb=line tests/test_b101_unload_focus.py -k ws_loaded_16_1 or ws_loaded_16_3
+bringing up nodes...
+bringing up nodes...
+
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: Coverage: —
+      Ranges: 0
+      Errors: 0
+      Warnings: 400
+    assert -1 == 0
+     +  where -1 = loader_error_count(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}))
+<HOME>/work/s19_i10c_mut_mut-c-18/tests/test_b101_unload_focus.py:546: AssertionError: Coverage: —
+[gw1] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: reference: the loader facts read 'Coverage: —\nRanges: 0\nErrors: 0\nWarnings: 0'
+<HOME>/work/s19_i10c_mut_mut-c-18/tests/support/timing.py:66: AssertionError: reference: the loader facts read 'Coverage: —\nRanges: 0\nErrors: 0\nWarnings: 0'
+=========================== short test summary info ============================
+FAILED tests/test_b101_unload_focus.py::test_r_ws_loaded_16_1_primary_diagnostics_go_with_it
+FAILED tests/test_b101_unload_focus.py::test_r_ws_loaded_16_3_mac_diagnostics_stay_after_a_primary_unload
+2 failed in 15.39s
+exit code: 1
+--- mutation diff (vs the staged clone) ---
+diff --git a/s19_app/tui/app.py b/s19_app/tui/app.py
+index cab4ee01..5d2f4964 100644
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -19749,6 +19749,9 @@ class S19TuiApp(App):
+             if issue.severity is ValidationSeverity.WARNING
+         )
+         text = build_workspace_stats_text(stats, error_count, warning_count)
++        if self.current_file.file_type == "mac":
++            body.update(text)
++            return
+         text.append("\n")
+         text.append_text(
+             build_loader_facts_text(

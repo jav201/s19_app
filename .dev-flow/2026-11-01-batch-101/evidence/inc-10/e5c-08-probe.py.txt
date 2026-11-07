@@ -1,0 +1,43 @@
+"""Probe (E5 corrective, M-L): the rail key + Legend burst, landing calls and focus moves recorded."""
+from __future__ import annotations
+
+from pathlib import Path
+
+from tests.test_b101_unload_focus import case08, case_session, focus_report, run, settle  # noqa: F401
+from tests.support.timing import wait_until
+
+
+def test_probe_burst_3_then_legend(tmp_path: Path, case08: Path) -> None:
+    async def scenario(app, pilot, log):
+        await case_session(pilot, app, case08)
+        original = app._land_focus
+
+        def spy(*args, **kwargs):
+            # Pass the call through unchanged: the product's own default of layout_waits applies.
+            area = app.query_one("#screen_mac").region.area
+            waits = kwargs.get("layout_waits", "default")
+            print(f"PROBE call: waits={waits} area={area} screen={type(app.screen).__name__} before={focus_report(app)}", flush=True)
+            original(*args, **kwargs)
+            print(f"PROBE after call: {focus_report(app)}", flush=True)
+
+        app._land_focus = spy
+        screen = app.default_screen
+        set_focus = screen.set_focus
+
+        def record(widget, *args, **kwargs):
+            print(f"PROBE set_focus({getattr(widget, 'id', widget)}) screen={type(app.screen).__name__}", flush=True)
+            return set_focus(widget, *args, **kwargs)
+
+        screen.set_focus = record
+        app.action_show_screen("mac")
+        app.action_show_legend()
+        await wait_until(pilot, lambda: type(app.screen).__name__ == "LegendScreen", "legend", timeout=10)
+        await settle(pilot, 8)
+        print(f"PROBE under the Legend: {focus_report(app)}", flush=True)
+        await pilot.press("escape")
+        await wait_until(pilot, lambda: app.screen is app.default_screen, "closed", timeout=10)
+        await settle(pilot, 8)
+        print(f"PROBE after close: {focus_report(app)}", flush=True)
+        del screen.set_focus
+
+    run(tmp_path, scenario)

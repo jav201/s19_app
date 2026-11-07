@@ -1755,7 +1755,11 @@ class SplitJoinWindow(WindowSection):
         Textual asks this for every binding of the window (``␣``, ``a``, ``n``,
         ``t``, ``m``, ``g``, ``f``, ``p``, ``d``, ``e``, Esc, the arrows); a
         hidden window answers ``False`` so the key falls through to the app's
-        bindings and the window's action never runs.
+        bindings and the window's action never runs. Not refused here (E5,
+        SE5-3): ``_SegTable``'s own up / down / ``k`` / ``j`` (Textual asks the
+        table, which moves the cursor) and text typed into ``#sje_manual``;
+        neither writes anything, and both need a focus inside the hidden
+        window, which the focus rules keep out (R-SEG-OPEN.6).
 
         Args:
             action (str): The action name.

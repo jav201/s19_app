@@ -1,0 +1,30 @@
+=== Inc 10a E5 corrective run: mut-c-14c
+date: 2026-11-07T06:09:10Z
+tree dir: <HOME>/work/s19_i10c_mut_mut-c-14c
+checkout HEAD (base): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+main ref: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+index tree: 6cb142f114dea93b83e526ca5c29303554283466
+mutation: <HOME>/work/s19_i10c-helpers/mutation-mut-c-14c.diff (printed at the end)
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10c_mut_mut-c-14c/s19_app/__init__.py
+CMD: env -u NO_COLOR timeout 900 /data/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -q -n 6 --dist load -rfs --tb=line tests/test_b101_unload_focus.py -k shell_focus_2_7
+bringing up nodes...
+bringing up nodes...
+
+.                                                                        [100%]
+1 passed in 19.00s
+exit code: 0
+--- mutation diff (vs the staged clone) ---
+diff --git a/s19_app/tui/app.py b/s19_app/tui/app.py
+index cab4ee01..b838334c 100644
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -10788,7 +10788,7 @@ class S19TuiApp(App):
+         switch: Optional[str],
+         *,
+         on_switch: bool,
+-        layout_waits: int = 3,
++        layout_waits: int = 0,
+     ) -> None:
+         """
+         Summary:

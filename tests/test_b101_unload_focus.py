@@ -6,7 +6,9 @@ Written by the independent tester (E4) from the approved design only
 ``codewire/graph-inc10.md``). No line of the Inc 10a implementation was read.
 The nodes whose docstring says "written at E4 integration" (or "added at E4
 integration") were added by the integrator, who had read it
-(``inc-10/E4-integration-notes.md``).
+(``inc-10/E4-integration-notes.md``); the nodes and clauses marked "E5" were
+written by the E5 corrective pass, which had read it too
+(``inc-10/E5-corrective-notes.md``).
 
 Requirements observed (the case id is in each node's docstring):
 
@@ -47,7 +49,7 @@ if str(SYNTH_DIR) not in sys.path:
 
 import make_release_case as gen  # noqa: E402
 
-from s19_app.tui.screens import ConfirmQuestionScreen  # noqa: E402
+from s19_app.tui.screens import ConfirmQuestionScreen, LoadResultScreen  # noqa: E402
 from s19_app.tui.screens_directionb import (  # noqa: E402
     LoadedArtifactsPanel,
     PatchEditorPanel,
@@ -523,7 +525,8 @@ def test_r_ws_loaded_14_2_unload_all_in_an_a2l_only_session(tmp_path: Path, case
 # ---------------------------------------------------------------------------
 def test_r_ws_loaded_16_1_primary_diagnostics_go_with_it(tmp_path: Path, case08: Path) -> None:
     """R-WS-LOADED.16 case /1: a bad-checksum S19 plus the case 08 MAC; after
-    ``[u]`` on the primary the loader-facts line reads 0 errors and no
+    ``[u]`` on the primary the loader-facts line is painted and reads 0 errors
+    (a missing line fails: the MAC-only spine paints it, E5 CR-6) and no
     ``integrity notices`` text is painted (base: ``Loader 1 err``)."""
     bad = write_bad_checksum(tmp_path / "src" / "bad.s19")
 
@@ -540,7 +543,7 @@ def test_r_ws_loaded_16_1_primary_diagnostics_go_with_it(tmp_path: Path, case08:
         await press_unload(pilot, app, "primary")
         await wait_message(pilot, log, mark, "Unloaded primary image.")
         await settle(pilot, 4)
-        assert loader_error_count(app) in (0, -1), ws_stats(app)
+        assert loader_error_count(app) == 0, ws_stats(app)
         assert "bad.s19" not in " ".join(slot_texts(app)), slot_texts(app)
         assert "integrity notices" not in status_text(app)
         assert "integrity notices" not in newest_message(app)
@@ -693,6 +696,91 @@ def test_r_ws_loaded_19_2_save_without_unload_writes_the_image(
     run(tmp_path, scenario)
 
 
+async def open_project_ps(pilot, app, log, image: Path, mac: Path) -> None:
+    """Fixture three as ``unloaded_primary.s19`` plus the MAC saved as project
+    ``PS``, then ``PS`` loaded through the Load dialog (a project is open)."""
+    await load_image(pilot, app, image)
+    await load_mac(pilot, app, mac)
+    text = await save_unload_reload(pilot, app, log, "PS")
+    assert app.current_file is not None and app.current_file.file_type == "s19", (
+        f"setup: the PS load installed {app.current_file!r}; status {text!r}"
+    )
+    assert app.current_file.mac_path is not None, f"setup: PS installed no MAC; status {text!r}"
+    # The Load dialog's project load opens the Load-result panel; Esc closes it
+    # so the next keys reach the app.
+    await wait_until(
+        pilot,
+        lambda: isinstance(app.screen, LoadResultScreen),
+        lambda: f"setup: no Load-result panel; screen {type(app.screen).__name__}",
+        timeout=FOCUS_WAIT_S,
+    )
+    await pilot.press("escape")
+    await wait_until(
+        pilot,
+        lambda: app.screen is app.default_screen,
+        lambda: f"setup: the Load-result panel did not close; screen {type(app.screen).__name__}",
+        timeout=FOCUS_WAIT_S,
+    )
+
+
+def test_r_ws_loaded_19_3_save_as_after_primary_unload_carries_no_image(
+    tmp_path: Path, case08: Path
+) -> None:
+    """R-WS-LOADED.19 case /3 (added at E5, SE5-1): project ``PS`` (fixture three
+    as ``unloaded_primary.s19`` plus the case 08 MAC) loaded, ``[u]`` on the
+    primary, then Save project ``P9`` (a save as: ``P9`` does not exist and
+    ``PS`` is open). ``P9`` holds the MAC and no ``.s19`` / ``.hex`` file and no
+    file with the image's SHA-256, and loading ``P9`` installs no S19 / HEX
+    image (the tree before E5: the save as carried ``unloaded_primary.s19``
+    from ``PS``, so loading ``P9`` installed it as the primary)."""
+    image = write_three_ranges(tmp_path / "src" / "unloaded_primary.s19")
+    mac = copy_to(case08 / "firmware.mac", tmp_path / "src" / "firmware.mac")
+    image_digest = sha256(image)
+
+    async def scenario(app, pilot, log):
+        await open_project_ps(pilot, app, log, image, mac)
+        mark = len(log.messages)
+        await press_unload(pilot, app, "primary")
+        await wait_message(pilot, log, mark, "Unloaded primary image.")
+        await settle(pilot, 4)
+        assert app.current_file is not None and app.current_file.file_type == "mac"
+        messages = await save_and_wait(pilot, app, log, "P9")
+        assert any(m.startswith("Saved project to") for m in messages), messages
+        files = project_files(app, "P9")
+        assert "firmware.mac" in files, f"the MAC is not in P9: {sorted(files)}"
+        images = [n for n in files if n.lower().endswith((".s19", ".hex"))]
+        assert images == [], f"P9 holds image files: {images}"
+        assert image_digest not in files.values(), f"P9 holds the image's bytes: {sorted(files)}"
+        assert not any("unloaded_primary" in m for m in messages), messages
+        text = await unload_and_open(pilot, app, log, "P9")
+        installed = app.current_file
+        assert installed is None or installed.file_type == "mac", (
+            f"loading P9 installed {installed.file_type} {installed.path.name!r}; status {text!r}"
+        )
+
+    run(tmp_path, scenario)
+
+
+def test_r_ws_loaded_19_4_save_as_with_the_image_loaded_carries_it(
+    tmp_path: Path, case08: Path
+) -> None:
+    """R-WS-LOADED.19 case /4 (control, added at E5, SE5-1): as /3 without the
+    unload; ``P9`` holds ``unloaded_primary.s19`` with the image's SHA-256, so
+    the /3 oracle can fail."""
+    image = write_three_ranges(tmp_path / "src" / "unloaded_primary.s19")
+    mac = copy_to(case08 / "firmware.mac", tmp_path / "src" / "firmware.mac")
+    image_digest = sha256(image)
+
+    async def scenario(app, pilot, log):
+        await open_project_ps(pilot, app, log, image, mac)
+        messages = await save_and_wait(pilot, app, log, "P9")
+        assert any(m.startswith("Saved project to") for m in messages), messages
+        files = project_files(app, "P9")
+        assert files.get("unloaded_primary.s19") == image_digest, sorted(files)
+
+    run(tmp_path, scenario)
+
+
 def test_r_ws_loaded_20_1_load_question_names_the_mac_after_a_primary_unload(
     tmp_path: Path, case08: Path
 ) -> None:
@@ -776,9 +864,11 @@ def test_r_tui_012l_8_2_mac_name_of_the_plus_mac_arm_is_painted(
 ) -> None:
     """R-TUI-012L.8 case /2: with a MAC named ``m`` U+200B ``x.mac`` and fixture
     three both loaded, the load status of the arm that names the MAC ends
-    ``+MAC: mx.mac)`` with 0 Cc, Cf, Zl, Zp characters (base: U+200B kept). The
-    arm is reached by loading the MAC first and the image second: loading the
-    MAC onto an image paints ``(S19+MAC)`` without the MAC name."""
+    ``+MAC: mx.mac)`` with 0 Cc, Cf, Zl, Zp characters (base: U+200B kept), and
+    the newest message line is the same full line (E5, QA-4: the file status is
+    scrubbed again by its writer, so only the message line can show a raw
+    name). The arm is reached by loading the MAC first and the image second:
+    loading the MAC onto an image paints ``(S19+MAC)`` without the MAC name."""
     image = write_three_ranges(tmp_path / "src" / "three.s19")
     mac = copy_to(case08 / "firmware.mac", tmp_path / "src" / f"m{ZWSP}x.mac")
 
@@ -793,7 +883,9 @@ def test_r_tui_012l_8_2_mac_name_of_the_plus_mac_arm_is_painted(
         )
         await settle(pilot, 4)
         text = status_text(app)
-        assert text.endswith("+MAC: mx.mac)"), ascii(text)
+        expected = "Loaded three.s19 (S19+MAC: mx.mac)"
+        assert text == expected, ascii(text)
+        assert newest_message(app) == expected, ascii(newest_message(app))
         assert bad_chars(text + newest_message(app)) == []
 
     run(tmp_path, scenario)
@@ -801,18 +893,21 @@ def test_r_tui_012l_8_2_mac_name_of_the_plus_mac_arm_is_painted(
 
 def test_r_tui_012l_8_3_integrity_notice_arm_paints_the_name(tmp_path: Path) -> None:
     """R-TUI-012L.8 case /3: an S19 with a notice code (no terminator) and U+202E
-    in its name loads as ``Loaded <painted name> with integrity notices: `` and
-    carries no Cc, Cf, Zl, Zp character (base: U+202E kept)."""
+    in its name loads as ``Loaded <painted name> with integrity notices:
+    S19-NO-TERMINATOR`` in ``#status_text`` and in the newest message line (the
+    full line, E5 QA-4) and carries no Cc, Cf, Zl, Zp character (base: U+202E
+    kept)."""
     raw = f"fw{RLO}gpj.s19"
     image = write_three_ranges(tmp_path / "src" / raw, terminator=False)
 
     async def scenario(app, pilot, log):
         await load_image(pilot, app, image)
         await settle(pilot, 4)
-        prefix = f"Loaded {painted_name(raw)} with integrity notices: "
+        expected = f"Loaded {painted_name(raw)} with integrity notices: S19-NO-TERMINATOR"
         text = status_text(app)
         assert "integrity notices" in text, f"setup: no notice arm: {ascii(text)}"
-        assert text.startswith(prefix), ascii(text)
+        assert text == expected, ascii(text)
+        assert newest_message(app) == expected, ascii(newest_message(app))
         assert bad_chars(text + newest_message(app)) == []
 
     run(tmp_path, scenario)
@@ -859,6 +954,12 @@ async def save_unload_reload(pilot, app, log, name: str) -> str:
     """Save project ``name``, ``U``, load it through the Load dialog and return
     the painted file status once the project line is there."""
     await save_and_wait(pilot, app, log, name)
+    return await unload_and_open(pilot, app, log, name)
+
+
+async def unload_and_open(pilot, app, log, name: str) -> str:
+    """``U``, load project ``name`` through the Load dialog and return the
+    painted file status once the project line is there."""
     mark = len(log.messages)
     await pilot.press("U")
     await wait_message(pilot, log, mark, "Unloaded all artifacts.")
@@ -1117,6 +1218,39 @@ def test_r_shell_focus_2_7_the_later_of_two_rail_keys_wins(tmp_path: Path, case0
     run(tmp_path, scenario)
 
 
+@pytest.mark.parametrize(
+    ("unloaded", "key", "landing"),
+    [("mac", "a2l", "window_help_a2l"), ("a2l", "mac", "mac_page_prev_button")],
+    ids=["a2l", "mac"],
+)
+def test_r_shell_focus_2_8_a_rail_key_in_an_unload_burst_lands_on_the_switch_landing(
+    tmp_path: Path, case08: Path, unloaded: str, key: str, landing: str
+) -> None:
+    """R-SHELL-FOCUS.2 case /8 (added at E5, CR-3): case 08 S19 + A2L + MAC,
+    ``files_list`` focused; an unload (``[u]`` on the MAC slot, then ``2``; ``[u]``
+    on the A2L slot, then ``3``) and the rail key in one burst — the unload's
+    handler and the key's action with no await between, as when the key is
+    queued while the unload renders. The focus ends on the shown window's switch
+    landing, ``window_help_a2l`` / ``mac_page_prev_button``, so PgDn still pages
+    (the tree before E5: the unload's unstamped landing ran first and put the
+    focus on the window's table, ``a2l_tags_list`` / ``mac_records_list``, which
+    the switch landing then kept)."""
+    label = {"mac": "MAC", "a2l": "A2L"}[unloaded]
+
+    async def scenario(app, pilot, log):
+        await case_session(pilot, app, case08, mac=True, a2l=True)
+        mark = len(log.messages)
+        app._apply_unload(unloaded)
+        app.action_show_screen(key)
+        await wait_message(pilot, log, mark, f"Unloaded {label}.")
+        await wait_screen(pilot, app, key)
+        await wait_focus(pilot, app, landing)
+        await settle(pilot, 8)
+        assert focus_of(app) is not None and focus_of(app).id == landing, focus_report(app)
+
+    run(tmp_path, scenario)
+
+
 def mac_summary(app) -> str:
     """The painted MAC records summary (its first line holds the page)."""
     return plain_of(app.query_one("#mac_records_summary", Label))
@@ -1218,6 +1352,38 @@ def test_r_shell_focus_3_2_unload_with_nothing_focused_lands_on_the_target(tmp_p
     run(tmp_path, scenario)
 
 
+def test_r_shell_focus_3_3_a_landing_that_runs_after_exit_moves_no_focus(
+    tmp_path: Path, case08: Path
+) -> None:
+    """R-SHELL-FOCUS.3 case /3 (added at E5, SE5-5): case 08 S19 + MAC,
+    ``files_list`` focused; once ``App.exit`` has been called, an unload's
+    landing that still runs (scheduled after the refresh, as ``_apply_unload``
+    schedules it, with no focus left at its trigger) moves no focus: every
+    ``set_focus`` of the screen is recorded and none is made (the tree before
+    E5: the landing resolved the Workspace target and set the focus on the tree
+    being torn down — the crash-at-exit class of E4-R5)."""
+
+    async def scenario(app, pilot, log):
+        await case_session(pilot, app, case08)
+        screen = app.default_screen
+        taken = []
+        original = screen.set_focus
+
+        def record(widget, *args, **kwargs):
+            taken.append(widget)
+            return original(widget, *args, **kwargs)
+
+        screen.set_focus = record
+        try:
+            app.exit()
+            app._land_focus(None, app._active_screen_key, on_switch=False)
+        finally:
+            del screen.set_focus
+        assert taken == [], f"the landing after exit focused {[getattr(w, 'id', w) for w in taken]}"
+
+    run(tmp_path, scenario)
+
+
 def test_r_shell_focus_4_1_mac_unload_keeps_a_healthy_list_focus(tmp_path: Path, case08: Path) -> None:
     """R-SHELL-FOCUS.4 case /1 (changed at E4, E4-R2): case 08 S19 + MAC,
     ``files_list`` focused, ``[u]`` on the MAC slot keeps the focus on
@@ -1247,11 +1413,27 @@ def test_r_shell_focus_4_2_unload_all_keeps_a_rail_items_focus(tmp_path: Path) -
     async def scenario(app, pilot, log):
         await load_image(pilot, app, image)
         await put_focus(pilot, app, "rail_item_workspace")
-        mark = len(log.messages)
-        await pilot.press("U")
-        await wait_message(pilot, log, mark, "Unloaded all artifacts.")
-        await settle(pilot, 10)
-        await wait_focus(pilot, app, "rail_item_workspace")
+        # E5, CR-7: the focus is read once the unload's landing has run (a
+        # spy on it), not after a fixed number of pauses.
+        landings = []
+        original = app._land_focus
+
+        def spy(*args, **kwargs):
+            original(*args, **kwargs)
+            landings.append(args)
+
+        app._land_focus = spy
+        try:
+            mark = len(log.messages)
+            await pilot.press("U")
+            await wait_message(pilot, log, mark, "Unloaded all artifacts.")
+            await wait_until(
+                pilot, lambda: bool(landings), "the unload's focus landing never ran", timeout=FOCUS_WAIT_S
+            )
+            await settle(pilot, 4)
+        finally:
+            del app._land_focus
+        assert focus_of(app) is not None and focus_of(app).id == "rail_item_workspace", focus_report(app)
 
     run(tmp_path, scenario)
 
@@ -1484,12 +1666,16 @@ def test_r_seg_open_7_2_keys_after_unload_all_export_nothing(tmp_path: Path, cas
 def test_r_seg_open_7_3_keys_stay_inert_while_hidden_even_with_focus_inside(
     tmp_path: Path, case08: Path
 ) -> None:
-    """R-SEG-OPEN.7 case /3: Split / Join opened and closed with Esc, the focus
-    then put on ``#sje_table`` (the base's leak shape); ``a`` then ``e`` write 0
-    files and paint no ``Exported`` (base: 4 files)."""
+    """R-SEG-OPEN.7 case /3: case 08 S19 + MAC; Split / Join opened and closed
+    with Esc, the focus then put on ``#sje_table`` (the base's leak shape); ``a``
+    then ``e`` write 0 files and paint no ``Exported`` (base: 4 files), and the
+    window reopened shows ``nothing selected``: the hidden ``a`` ticked nothing
+    (E5, SE5-2: the export's own guard refuses every hidden export, so only the
+    selection shows the window's key guard; the MAC is loaded as the row's
+    threshold heads its arms, QA-10)."""
 
     async def scenario(app, pilot, log):
-        await case_session(pilot, app, case08, mac=False)
+        await case_session(pilot, app, case08)
         await open_split_join(pilot, app)
         await pilot.press("escape")
         await wait_screen(pilot, app, "workspace")
@@ -1503,18 +1689,23 @@ def test_r_seg_open_7_3_keys_stay_inert_while_hidden_even_with_focus_inside(
         await keys_a_e_then_sentinel(pilot, app)
         assert export_files(app) == [], export_files(app)
         assert exported_messages(log, mark) == [], exported_messages(log, mark)
+        await open_split_join(pilot, app)
+        await settle(pilot, 4)
+        stats = plain_of(app.query_one("#sje_stats", Static))
+        assert "nothing selected" in stats, f"the hidden window's 'a' ticked rows: {stats!r}"
 
     run(tmp_path, scenario)
 
 
 def test_r_seg_open_7_4_export_button_writes_nothing_while_hidden(tmp_path: Path, case08: Path) -> None:
-    """R-SEG-OPEN.7 case /4: Split / Join opened and every row ticked with ``a``
-    (asserted before the trigger), closed with Esc, the focus put on
-    ``#sje_export``; Enter writes 0 files, paints no ``Exported`` and no
-    ``nothing selected`` (base: the button runs the export)."""
+    """R-SEG-OPEN.7 case /4: case 08 S19 + MAC (the row's threshold, QA-10 at
+    E5); Split / Join opened and every row ticked with ``a`` (asserted before
+    the trigger), closed with Esc, the focus put on ``#sje_export``; Enter
+    writes 0 files, paints no ``Exported`` and no ``nothing selected`` (base:
+    the button runs the export)."""
 
     async def scenario(app, pilot, log):
-        await case_session(pilot, app, case08, mac=False)
+        await case_session(pilot, app, case08)
         await open_split_join(pilot, app)
         await pilot.press("a")
         await wait_until(

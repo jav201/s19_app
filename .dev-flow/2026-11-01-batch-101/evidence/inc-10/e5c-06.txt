@@ -1,0 +1,118 @@
+=== Inc 10a E5 corrective run: e5c-06
+date: 2026-11-07T06:16:02Z
+tree dir: <HOME>/work/s19_i10c_probe
+checkout HEAD (base): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+main ref: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+index tree: 6cb142f114dea93b83e526ca5c29303554283466
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10c_probe/s19_app/__init__.py
+CMD: env -u NO_COLOR timeout 1800 /data/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -q -s -p no:xdist tests/test_zz_probe_ml.py
+PROBE call fresh: shown=a2l stamp=a2l on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  fresh 2->a2l: WindowHelpChip#window_help_a2l (region area 3)
+PROBE call fresh: shown=mac stamp=mac on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  fresh 3->mac: Button#mac_page_prev_button (region area 48)
+PROBE call fresh: shown=map stamp=map on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  fresh 4->map: WindowHelpChip#window_help_map (region area 3)
+PROBE call fresh: shown=issues stamp=issues on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  fresh 5->issues: RailItem#rail_item_issues (region area 21)
+PROBE call fresh: shown=patch stamp=patch on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  fresh 6->patch: PatchEditorPanel#patch_editor_panel (region area 3936)
+PROBE call fresh: shown=check_editor stamp=check_editor on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  fresh equals_sign->check_editor: CheckEditorPanel#check_editor_panel (region area 3936)
+PROBE call fresh: shown=diff stamp=diff on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  fresh 7->diff: Button#diff_compare_button (region area 16)
+PROBE call fresh: shown=flow stamp=flow on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  fresh 8->flow: FlowBuilderPanel#flow_panel (region area 3936)
+PROBE call fresh: shown=flow_execution stamp=flow_execution on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  fresh right_square_bracket->flow_execution: FlowExecutionPanel#fx_panel (region area 3936)
+PROBE call fresh: shown=checks stamp=checks on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  fresh 9->checks: WindowHelpChip#window_help_checks (region area 3)
+PROBE call fresh: shown=crc_designer stamp=crc_designer on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  fresh 0->crc_designer: CrcDesignerPanel#crc_designer_panel (region area 3936)
+PROBE call fresh: shown=workspace stamp=workspace on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  fresh 1->workspace: WindowHelpChip#window_help_workspace (region area 3)
+.PROBE call first: shown=mac stamp=mac on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  first mac: Button#mac_page_prev_button (region area 48)
+.PROBE call fresh80: shown=a2l stamp=a2l on_switch=True waits=3 area=814 screen=Screen
+PROBE end  fresh80 2->a2l: WindowHelpChip#window_help_a2l (region area 3)
+PROBE call fresh80: shown=mac stamp=mac on_switch=True waits=3 area=814 screen=Screen
+PROBE end  fresh80 3->mac: Button#mac_page_prev_button (region area 48)
+PROBE call fresh80: shown=map stamp=map on_switch=True waits=3 area=814 screen=Screen
+PROBE end  fresh80 4->map: WindowHelpChip#window_help_map (region area 3)
+.PROBE call loaded: shown=a2l stamp=a2l on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  loaded 2->a2l: WindowHelpChip#window_help_a2l (region area 3)
+PROBE call loaded: shown=mac stamp=mac on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  loaded 3->mac: Button#mac_page_prev_button (region area 48)
+PROBE call loaded: shown=map stamp=map on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  loaded 4->map: MemoryMapPanel#memory_map_panel (region area 3666)
+PROBE call loaded: shown=issues stamp=issues on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  loaded 5->issues: GroupedIssuesPanel#validation_issues_groups (region area 2046)
+PROBE call loaded: shown=patch stamp=patch on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  loaded 6->patch: PatchEditorPanel#patch_editor_panel (region area 3936)
+PROBE call loaded: shown=check_editor stamp=check_editor on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  loaded equals_sign->check_editor: CheckEditorPanel#check_editor_panel (region area 3936)
+PROBE call loaded: shown=diff stamp=diff on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  loaded 7->diff: Button#diff_compare_button (region area 16)
+PROBE call loaded: shown=flow stamp=flow on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  loaded 8->flow: FlowBuilderPanel#flow_panel (region area 3936)
+PROBE call loaded: shown=flow_execution stamp=flow_execution on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  loaded right_square_bracket->flow_execution: FlowExecutionPanel#fx_panel (region area 3936)
+PROBE call loaded: shown=checks stamp=checks on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  loaded 9->checks: GroupedChecksPanel#checks_grouped (region area 2560)
+PROBE call loaded: shown=crc_designer stamp=crc_designer on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  loaded 0->crc_designer: CrcDesignerPanel#crc_designer_panel (region area 3936)
+PROBE call loaded: shown=workspace stamp=workspace on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  loaded 1->workspace: ListView#files_list (region area 216)
+.PROBE call burst ('a2l', 'mac'): shown=mac stamp=a2l on_switch=True waits=3 area=4128 screen=Screen
+PROBE call burst ('a2l', 'mac'): shown=mac stamp=mac on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  burst ('a2l', 'mac'): Button#mac_page_prev_button (region area 48)
+.PROBE call burst ('map', 'issues'): shown=issues stamp=map on_switch=True waits=3 area=4128 screen=Screen
+PROBE call burst ('map', 'issues'): shown=issues stamp=issues on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  burst ('map', 'issues'): GroupedIssuesPanel#validation_issues_groups (region area 2046)
+.PROBE call burst ('patch', 'flow'): shown=flow stamp=patch on_switch=True waits=3 area=4128 screen=Screen
+PROBE call burst ('patch', 'flow'): shown=flow stamp=flow on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  burst ('patch', 'flow'): FlowBuilderPanel#flow_panel (region area 3936)
+.PROBE call burst ('checks', 'crc_designer'): shown=crc_designer stamp=checks on_switch=True waits=3 area=4128 screen=Screen
+PROBE call burst ('checks', 'crc_designer'): shown=crc_designer stamp=crc_designer on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  burst ('checks', 'crc_designer'): CrcDesignerPanel#crc_designer_panel (region area 3936)
+.PROBE call burst ('mac', 'map'): shown=map stamp=mac on_switch=True waits=3 area=4128 screen=Screen
+PROBE call burst ('mac', 'map'): shown=map stamp=map on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  burst ('mac', 'map'): MemoryMapPanel#memory_map_panel (region area 3666)
+.PROBE call burst ('diff', 'a2l'): shown=a2l stamp=diff on_switch=True waits=3 area=4128 screen=Screen
+PROBE call burst ('diff', 'a2l'): shown=a2l stamp=a2l on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  burst ('diff', 'a2l'): WindowHelpChip#window_help_a2l (region area 3)
+.PROBE call keys: shown=a2l stamp=a2l on_switch=True waits=3 area=4128 screen=Screen
+PROBE call keys: shown=mac stamp=mac on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  keys ('2', '3'): Button#mac_page_prev_button (region area 48)
+PROBE call keys: shown=map stamp=map on_switch=True waits=3 area=4128 screen=Screen
+PROBE call keys: shown=issues stamp=issues on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  keys ('4', '5'): GroupedIssuesPanel#validation_issues_groups (region area 2046)
+PROBE call keys: shown=patch stamp=patch on_switch=True waits=3 area=4128 screen=Screen
+PROBE call keys: shown=flow stamp=flow on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  keys ('6', '8'): FlowBuilderPanel#flow_panel (region area 3936)
+PROBE call keys: shown=workspace stamp=workspace on_switch=True waits=3 area=4128 screen=Screen
+PROBE call keys: shown=map stamp=map on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  keys ('1', '4'): MemoryMapPanel#memory_map_panel (region area 3666)
+.PROBE call sje: shown=mac stamp=mac on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  sje 3: Button#mac_page_prev_button (region area 48)
+PROBE call sje: shown=map stamp=map on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  sje 4: MemoryMapPanel#memory_map_panel (region area 3666)
+PROBE call sje: shown=a2l stamp=a2l on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  sje 2: WindowHelpChip#window_help_a2l (region area 3)
+.PROBE call palette: shown=mac stamp=mac on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  palette MAC View: Button#mac_page_prev_button (region area 48)
+PROBE call palette: shown=map stamp=map on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  palette Memory Map: MemoryMapPanel#memory_map_panel (region area 3666)
+PROBE call palette: shown=a2l stamp=a2l on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  palette A2L Explorer: WindowHelpChip#window_help_a2l (region area 3)
+.PROBE call loadswitch: shown=map stamp=map on_switch=True waits=3 area=4128 screen=Screen
+PROBE end  loadswitch map: RegionRow#None (region area 39)
+PROBE end  loadswitch after load: RegionRow#None (region area 39)
+.PROBE modal open: screen=WindowHelpScreen
+PROBE call modal: shown=mac stamp=mac on_switch=True waits=3 area=0 screen=WindowHelpScreen
+PROBE call modal: shown=mac stamp=mac on_switch=True waits=2 area=4128 screen=WindowHelpScreen
+PROBE end  modal mac (under the modal): Button#mac_page_prev_button (region area 48)
+PROBE end  modal closed: Button#mac_page_prev_button (region area 48)
+.
+15 passed in 349.33s (0:05:49)
+exit code: 0

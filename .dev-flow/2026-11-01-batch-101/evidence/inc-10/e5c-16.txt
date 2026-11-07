@@ -1,0 +1,20 @@
+=== Inc 10a E5 corrective run: e5c-16
+date: 2026-11-07T07:12:23Z
+tree dir: <HOME>/work/s19_i10c
+checkout HEAD (base): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+main ref: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+index tree: 6cb142f114dea93b83e526ca5c29303554283466
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10c/s19_app/__init__.py
+CMD: env -u NO_COLOR timeout 1800 /data/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -q -m serial_timing -p no:xdist -rfs tests/test_b101_hex_jump.py tests/test_b101_unload_focus.py tests/test_b97_flow_execution.py tests/test_tui_goto_marker.py tests/test_tui_app.py tests/test_b100_workers.py tests/test_b100_focus.py tests/test_b100_session_reset.py tests/test_tui_commandbar.py tests/test_tui_hexview.py tests/test_unload_feature.py tests/test_segment_split_window.py tests/test_b101_inc11_acceptance.py tests/test_address_census.py tests/test_suite_hygiene.py tests/test_id_registry.py tests/test_engine_unchanged.py tests/test_docs_canon.py tests/test_b101_doc_hygiene.py tests/test_b101_help_legend_docs.py
+......                                                                   [100%]
+============================= QC-TM timing margins =============================
+49.6%  0.202 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+66.4%  0.505 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+93.1%  1.386 s / 20.000 s  stress load mac_first  tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[mac_first]
+93.4%  0.657 s / 10.000 s  end-to-end load pipeline  tests/test_tui_app.py::test_end_to_end_load_pipeline_under_budget
+93.7%  1.254 s / 20.000 s  stress load s19_first  tests/test_tui_app.py::test_stress_load_s19_then_a2l_then_mac[s19_first]
+97.5%  0.050 s / 2.000 s  MAC view cache  tests/test_tui_app.py::test_build_mac_view_cache_scales_under_load
+QC-TM: 6 bounds, 0 under 20 % margin
+6 passed, 760 deselected in 14.87s
+exit code: 0
