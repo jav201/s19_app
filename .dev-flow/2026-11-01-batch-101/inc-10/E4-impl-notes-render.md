@@ -22,7 +22,7 @@ none. Signature confirmed against G1: `S19TuiApp._hex_view_rows` calls `hex_row_
 Command (operator rule: byte-compilation only, no pytest / no import of `s19_app`):
 
 ```
-C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m py_compile s19_app/render/hexview.py
+<HOME>/anaconda3/envs/s19env/python.exe -m py_compile s19_app/render/hexview.py
 ```
 
 Output: empty (exit 0). Line endings: file remains CRLF throughout (437 CRLF terminators, 0 bare LF), matching the existing file.

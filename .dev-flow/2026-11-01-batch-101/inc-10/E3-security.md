@@ -10,7 +10,7 @@ Read: `01-requirements.md`, `E1-rulings.md` (with the orchestrator rulings), `E1
 
 ## Confirmation run (`executed`)
 
-All runs used the LAN Linux host, a detached worktree of `origin/main` = `98d94d72` (s19ci env), `run_test(size=(120, 56))`, with `LOCALAPPDATA` and XDG isolated and no clipboard. The worktree and `/tmp/i10e3s` were removed afterwards. The probe script lives outside the repository (`C:/Users/jjgh8/.claude/jobs/3f13b036/tmp/i10e3s/i10e3s-probe.py`). Fixture three is the one in `01-requirements.md`.
+All runs used the LAN Linux host, a detached worktree of `origin/main` = `98d94d72` (s19ci env), `run_test(size=(120, 56))`, with `LOCALAPPDATA` and XDG isolated and no clipboard. The worktree and `/tmp/i10e3s` were removed afterwards. The probe script lives outside the repository (`<HOME>/.claude/jobs/3f13b036/tmp/i10e3s/i10e3s-probe.py`). Fixture three is the one in `01-requirements.md`.
 
 | Probe | What | Result on `98d94d7` |
 |---|---|---|

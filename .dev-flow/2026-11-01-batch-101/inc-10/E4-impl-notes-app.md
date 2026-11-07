@@ -47,7 +47,7 @@ Supporting edits in the same file, required by the new attribute/import (not sli
 Command (operator rule: byte-compilation only, no pytest / no import of `s19_app`):
 
 ```
-C:/Users/jjgh8/anaconda3/envs/s19env/python.exe -m py_compile s19_app/tui/app.py
+<HOME>/anaconda3/envs/s19env/python.exe -m py_compile s19_app/tui/app.py
 ```
 
 Output: empty (exit 0).

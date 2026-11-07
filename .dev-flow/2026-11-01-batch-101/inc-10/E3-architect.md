@@ -6,7 +6,7 @@ Batch 2026-11-01-batch-101, increment 10, base `98d94d7` (branch `b101-inc10`). 
 
 ## Probe (design as written, on the base)
 
-LAN host, `s19ci` (py 3.11, Textual 8.2.8), detached worktree of `origin/main` = `98d94d72` at `/tmp/i10e3a/wt`, `LOCALAPPDATA`/XDG isolated; worktree and `/tmp/i10e3a` removed afterwards. No product file changed; the design steps are monkeypatched in the probe process only. Script and transcript are outside the repo (`C:/Users/jjgh8/AppData/Local/Temp/i10e3a/i10e3a-probe.py`, `i10e3a-probe.out.txt`); the orchestrator can commit them under `evidence-e3/` if wanted. Exit 0, `s19_app.__file__ = /tmp/i10e3a/wt/s19_app/__init__.py`.
+LAN host, `s19ci` (py 3.11, Textual 8.2.8), detached worktree of `origin/main` = `98d94d72` at `/tmp/i10e3a/wt`, `LOCALAPPDATA`/XDG isolated; worktree and `/tmp/i10e3a` removed afterwards. No product file changed; the design steps are monkeypatched in the probe process only. Script and transcript are outside the repo (`<HOME>/AppData/Local/Temp/i10e3a/i10e3a-probe.py`, `i10e3a-probe.out.txt`); the orchestrator can commit them under `evidence-e3/` if wanted. Exit 0, `s19_app.__file__ = /tmp/i10e3a/wt/s19_app/__init__.py`.
 
 | Arm | What it runs | Result |
 |---|---|---|
