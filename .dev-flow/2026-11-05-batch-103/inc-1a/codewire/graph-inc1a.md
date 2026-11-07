@@ -12,10 +12,10 @@ How to read it:
 
 | Group | Files | Owns |
 |---|---|---|
-| G1 single-line box and the layers | `s19_app/tui/os_clipboard_input.py` | removed `_create_tk_root`, `_TkRootSingleton.__init__`, `.get_or_create`, `.get_existing`, `_destroy_tk_root_singleton`, `_prime_tk_root`, `_read_via_tk`, `_write_via_tk`, `[Data: _TK_ROOT]`; changed `_read_via_powershell`, `_write_via_powershell`, `read_os_clipboard`, `write_os_clipboard` (docstring), `_mirror_and_write_os_clipboard`, `OsClipboardInput.action_paste`, `[Data: _STRATEGIES]`, `[Data: _WRITE_STRATEGIES]`, `[Data: _POWERSHELL_WRITE_COMMAND]`, the module and class docstrings; new `_system_directory`, `_system_powershell`, `OsClipboardInput._on_paste`, `.focus_on_click`, `._on_mouse_down`, `._on_mouse_up`, `._on_click`, `[Data: OsClipboardInput._press_cursor]` |
-| G2 multi-line box | `s19_app/tui/capped_text_area.py` | changed `CappedTextArea.action_paste`, the module docstring; new `CappedTextArea._on_mouse_down`, `._on_mouse_up`, `._on_click` |
+| G1 single-line box and the layers | `s19_app/tui/os_clipboard_input.py` | removed `_create_tk_root`, `_TkRootSingleton.__init__`, `.get_or_create`, `.get_existing`, `_destroy_tk_root_singleton`, `_prime_tk_root`, `_read_via_tk`, `_write_via_tk`, `[Data: _TK_ROOT]`; changed `_read_via_ctypes`, `_read_via_powershell`, `_write_via_powershell`, `read_os_clipboard`, `write_os_clipboard` (docstring), `_mirror_and_write_os_clipboard`, `OsClipboardInput.action_paste`, `[Data: _STRATEGIES]`, `[Data: _WRITE_STRATEGIES]`, `[Data: _POWERSHELL_WRITE_COMMAND]`, the module and class docstrings; new `_system_directory`, `_system_powershell`, `OsClipboardInput._on_paste`, `.focus_on_click`, `._on_mouse_down`, `._on_click`, `[Data: OsClipboardInput._press_cursor]` |
+| G2 multi-line box | `s19_app/tui/capped_text_area.py` | changed `CappedTextArea.action_paste`, `CappedTextArea._on_paste`, the module docstring; new `CappedTextArea._on_mouse_down`, `._on_click` |
 | G3 CI | `.github/workflows/clipboard-windows.yml` (config, new) | `[I/O: .github/workflows/clipboard-windows.yml]`, pinned below |
-| G-T testers | `tests/support/b103_clipboard.py` (new); the test files of `../E1-slice.md` §6 (`tests/test_b103_clipboard_core.py`, `_windows.py`, `_matrix.py`; E4 fixes the names); the retirements and re-points of `../E1-slice.md` §5 | `require_isolated_clipboard`, `clipboard_probe`, `os_clipboard_ready` |
+| G-T testers | `tests/support/b103_clipboard.py` (new); the test files of `../E1-slice.md` §6 (`tests/test_b103_clipboard_core.py`, `_windows.py`, `_matrix.py`; E4 fixes the names); the retirements and re-points of `../E1-slice.md` §5, plus the registry guard: a RETIRED row appended for TC-1815 and `EXPECTED_SCANNED_TEST_FILES` 267 → 270 (`tests/test_id_registry.py:184` and its comment line; retire 1 module, add the 3 test files + `tests/support/b103_clipboard.py`; the batch-103 increment that merges second re-measures) | `require_isolated_clipboard`, `clipboard_probe`, `os_clipboard_ready` |
 
 G1 and G2 are 2 source files (budget 4) and can be one implementer; G2 uses G1 only through I-1a. Order inside E4: G1 ∥ G2 ∥ G3; testers in parallel.
 
@@ -29,17 +29,17 @@ G1 and G2 are 2 source files (budget 4) and can be one implementer; G2 uses G1 o
 **I-1, what Inc 1a exposes** (Inc 1b's app-level seam calls these and must not write twice):
 1. `read_os_clipboard(strategies: Optional[tuple[tuple[str, Callable[[], Optional[str]]], ...]] = None) -> Optional[str]`. Blocking: callers run it in the default executor. Windows: the Win32 read (5 × 20 ms retries), then the system PowerShell (one start, ≤ 2.0 s); a layer's `''` counts as no text; the first text is cut to 65,536 characters; `None` when no layer gives text, with one WARNING `read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])`. Off Windows: `None` at once, no process started. Never raises.
 2. `write_os_clipboard(text: str, strategies: Optional[tuple[tuple[str, Callable[[str], bool]], ...]] = None) -> bool`. Blocking (executor). Cuts `text` to 65,536 first; Windows: Win32, then the system PowerShell (payload on stdin, ≤ 2.0 s); `True` at the first success; `False` with one WARNING `write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])`. Off Windows `False` at once. Never raises; shows no notice; does not touch the app clipboard.
-3. `async _mirror_and_write_os_clipboard(app: App, text: str) -> None`: **the one copy tail**. Every copy of Inc 1a (Ctrl+C, Ctrl+X with a selection, the multi-line line cut, the right-click copy) calls it exactly once. Per call: exactly one `app.copy_to_clipboard(text[:65536])` (the app clipboard and one OSC 52 request, stock `App.copy_to_clipboard`, textual `app.py:1770-1786`), exactly one `write_os_clipboard(text[:65536])` in the default executor, and on `False` exactly one notice (`_WRITE_FAIL_NOTIFICATION`, `severity="warning"`, `timeout=6.0`) and one WARNING `OS clipboard write failed; retained Textual internal clipboard only`; on `True` no notice (Inc 1a adds none, ruling I-1).
+3. `async _mirror_and_write_os_clipboard(app: App, text: str) -> None`: **the one copy tail**. Every copy of Inc 1a (Ctrl+C, Ctrl+X with a selection, the multi-line line cut, the right-click copy) calls it exactly once. Per call: exactly one call on the toolkit base `App.copy_to_clipboard(app, text[:65536])` (never an app override, so an `S19TuiApp.copy_to_clipboard` override is never re-entered; the app clipboard and one OSC 52 request, textual `app.py:1770-1786`), exactly one `write_os_clipboard(text[:65536])` in the default executor, and on `False` exactly one notice (`_WRITE_FAIL_NOTIFICATION`, `severity="warning"`, `timeout=6.0`) and one WARNING `OS clipboard write failed; retained Textual internal clipboard only`; on `True` no notice (Inc 1a adds none, ruling I-1).
 4. Constants unchanged: `_CLIPBOARD_CAP_CHARS = 65536`, `_CLIPBOARD_READ_CAP_CHARS` (alias), `_PASTE_FAIL_NOTIFICATION` = `Clipboard read failed — try Ctrl+Shift+V or type the path manually.`, `_WRITE_FAIL_NOTIFICATION` = `Clipboard write failed — copied inside the app only.`, `_POWERSHELL_TIMEOUT_S = 2.0`.
-5. Classes: `OsClipboardInput(Input)` and `CappedTextArea(TextArea)` keep their names, bases and constructors; `action_copy`, `action_cut`, `action_paste` keep their names (reached by the toolkit bindings `ctrl+c`, `ctrl+x`, `ctrl+v`). Callers outside the slice import only `OsClipboardInput`, `_CLIPBOARD_CAP_CHARS`, `_CLIPBOARD_READ_CAP_CHARS` (`../E1-slice.md` §3): no importer changes.
+5. Classes: `OsClipboardInput(Input)` and `CappedTextArea(TextArea)` keep their names, bases and constructors; `action_copy`, `action_cut`, `action_paste` keep their names (reached by the toolkit bindings `ctrl+c`, `ctrl+x`, `ctrl+v`). Callers outside the slice import only `OsClipboardInput`, `_CLIPBOARD_CAP_CHARS`, `_CLIPBOARD_READ_CAP_CHARS` (`../E1-slice.md` §3): no importer changes. A later subclass inherits the right-click through MRO dispatch: it must not `prevent_default()` button 3 in `_on_mouse_down` and must call `super().focus_on_click()` (E3A-14).
 6. Removed names (no product caller outside the two files; X, `git grep`): `_create_tk_root`, `_TkRootSingleton`, `_destroy_tk_root_singleton`, `_TK_ROOT`, `_prime_tk_root`, `_read_via_tk`, `_write_via_tk`, `_TK_RETRIES`, `_TK_RETRY_DELAY_S`.
-7. Right-click ownership (D-11 A, E1 A5): a button-3 `MouseDown`, `MouseUp` and `Click` on a text box are handled by the box and stopped; no ancestor and no App handler receives them. The press acts once; the release and the click act on nothing.
+7. Right-click ownership (D-11 A, E1 A5): a button-3 `MouseDown` and `Click` on a text box are handled by the box and stopped; no bubbled handler (an ancestor's, the screen's or `App.on_mouse_*`) receives them — `App.on_event` still sees every press first (textual `app.py:4066-4084`), so Inc 1b's entry-level handler must exclude text boxes itself (its #3b; the box's stop does not reach it). The press acts once; the click acts on nothing (the release is not stopped: D-11 A's "stop the release" is withdrawn, E3A-12).
 
 **PROPOSED for Inc 1b's E2** (Inc 1a does not decide them):
-- **P-1 Where the one copy notice lives.** The tail is the one call per copy and the only place that knows the result, so the success notice and the write failure warning fit there together. (a) Inc 1b changes `_mirror_and_write_os_clipboard` to show its copy notice on `True` and keeps the warning on `False`: every copy (text boxes, views) gets it with no call-site change. (b) The tail returns `bool` and Inc 1b's app-level seam notifies; then every text-box call site (`action_copy`, `action_cut` × 2 classes, through them the right-click) moves to the seam. Inc 1a ships (neither): the tail returns `None`.
-- **P-2 No second OS write.** An `S19TuiApp.copy_to_clipboard` override must not write the OS clipboard while the tail does: the tail calls `app.copy_to_clipboard` first (`:764`), so such an override would write the Windows clipboard twice per text-box copy (and notify twice if it notified). Moving the OS write into `copy_to_clipboard` means removing the tail's executor write in the same change.
+- **P-1 The one copy notice lives in the tail.** The tail is the one call per copy and the only place that knows the result, so the success notice and the write failure warning fit there together. Inc 1b's `copy_to_clipboard` override schedules the tail (never the reverse), and the success notice is one line the tail adds on `True` at Inc 1b — which therefore adds `os_clipboard_input.py` to its file list by ruling (P-1 a). Inc 1a ships without it: the tail returns `None` and shows no success notice (ruling I-1).
+- **P-2 The override calls the tail, never the reverse.** An `S19TuiApp.copy_to_clipboard` override must not write the OS clipboard itself; it schedules the tail once. Because the tail calls the toolkit base `App.copy_to_clipboard(app, …)` (item 3, never an override), the override is never re-entered: no loop and no second write (supersedes `E2-rulings.md` P-2).
 - **P-3** A copy from a view calls the tail once (`../E1-rulings.md` §5); on Linux it shows the write failure warning (D-2 A).
-- **P-4** Inc 1b's app-level right-click never receives a text box's right-click (item 7); a view that contains a text box needs no exclusion of its own.
+- **P-4** A text box's right-click stop reaches only bubbled handlers; `App.on_event` sees every press first, so Inc 1b's entry-level handler must exclude text boxes itself (its #3b) — a view that contains a text box does need its own exclusion.
 
 ### Baseline callers (X, run 1: 23 marks, 23 nodes, 0 findings, exit 0)
 
@@ -63,7 +63,7 @@ The extractor ran on a marked copy of `s19_app/` whose marks replace the blank l
 | `CappedTextArea.action_copy`, `.action_cut`, `.action_paste`, `._on_paste` | the `TextArea` bindings (`_text_area.py:374-391`) and the message pump on `events.Paste` (forwarded by `App.on_event`, textual `app.py:4142-4146`); after Inc 1a also `CappedTextArea._on_mouse_down` (copy, paste) | R |
 | class `OsClipboardInput` / `CappedTextArea` | 40 / 7 constructions in 8 modules (`JsonHighlightTextArea`, `json_highlight.py:261`, is the one subclass; no subclass defines a mouse handler or `focus_on_click`: `git grep` 0) | C; R |
 
-Tests that name changed or removed names (`../E1-slice.md` §5, re-read here): `tests/test_clipboard_tk_singleton.py` (retired); `tests/test_b102_clipboard.py:590`, `:628-640` and `tests/test_loadfilescreen_input.py:490`, `:528`, `:548`, `:603` call `_read_via_powershell` / `_write_via_powershell` directly (re-pointed through `_system_powershell`; `:603`, the non-Windows no-op, holds unchanged).
+Tests that name changed or removed names (`../E1-slice.md` §5, re-read here): `tests/test_clipboard_tk_singleton.py` (retired); `tests/test_b102_clipboard.py:590`, `:628-640` and `tests/test_loadfilescreen_input.py:490`, `:528`, `:548`, `:603` call `_read_via_powershell` / `_write_via_powershell` directly (re-pointed through `_system_powershell`; `:603`, the non-Windows no-op, holds unchanged). The registry guard re-point (E3A-09): `tests/test_id_registry.py:184` pins `EXPECTED_SCANNED_TEST_FILES = 267`; Inc 1a's retire-1/add-4 makes it 270, and TC-1815 needs a RETIRED row appended (`AT-TC-REGISTRY.jsonl:1505`).
 
 ### Pinned workflow (G3, R-PASTE.20; D-6 B with the orchestrator's triggers)
 
@@ -117,8 +117,11 @@ jobs:
           python -m pip install pytest
           python -m pip install -e .
 
+      - name: Print the toolkit version the design rests on (E3A-10 a)
+        run: python -c "import sys, textual; print(sys.version, textual.__version__)"
+
       - name: Run the OS clipboard tests (serial, every outcome listed)
-        run: pytest -v -rs tests/test_b103_clipboard_windows.py tests/test_b103_clipboard_matrix.py
+        run: pytest -v -rs --durations=20 tests/test_b103_clipboard_windows.py tests/test_b103_clipboard_matrix.py
 ```
 
 The two test-file names are `../E1-slice.md` §6's proposals; E4 keeps the `paths` list and the run line equal to the names it fixes (R-PASTE.20/1 reads both). No `-n` and no `-m`: the timing arms run serially and nothing is deselected. Actions and versions as `tui-ci.yml` (`actions/checkout@v4`, `actions/setup-python@v5`, Python 3.11). The `-v` replaces the slice's `-q` so that the log lists each test's outcome (R-PASTE.20/2).
@@ -127,9 +130,9 @@ The two test-file names are `../E1-slice.md` §6's proposals; E4 keeps the `path
 
 | Row | Nodes | Examples (case ids) |
 |---|---|---|
-| R-TUI-043.10.1 | `read_os_clipboard`, `[Data: _STRATEGIES]`, `_read_via_ctypes`, `OsClipboardInput.action_paste`, `CappedTextArea.action_paste`, `_create_tk_root`, `_read_via_tk` | /1, /2 (WinCI), /3, /4 (LinuxH), the neg (Tk restored); AT-I1a-9 |
+| R-TUI-043.10.1 | `read_os_clipboard`, `[Data: _STRATEGIES]`, `_read_via_ctypes`, `OsClipboardInput.action_paste`, `CappedTextArea.action_paste`, `_create_tk_root`, `_read_via_tk` | /1, /2 (WinCI), /3, /4 (LinuxH), /5, /6 (WinCI, file-drop/image clipboard, 0 starts), the neg (Tk restored); AT-I1a-9 |
 | R-TUI-043.10.2 | `_read_via_ctypes`, `_read_via_powershell`, `OsClipboardInput.action_paste`, `CappedTextArea.action_paste` | /1, /2 |
-| R-TUI-043.6 | `read_os_clipboard`, `OsClipboardInput.action_paste`, `CappedTextArea.action_paste`, `OsClipboardInput._on_mouse_down`, `CappedTextArea._on_mouse_down`, `_read_via_ctypes` | /1, /2, /3, /5 (/4 is LinuxX, blocked) |
+| R-TUI-043.6 | `read_os_clipboard`, `OsClipboardInput.action_paste`, `CappedTextArea.action_paste`, `OsClipboardInput._on_mouse_down`, `CappedTextArea._on_mouse_down`, `_read_via_ctypes` | /1, /2, /3 (adds 0 starts), /5 (/4 is LinuxX, blocked) |
 | R-PASTE.1 | `OsClipboardInput._on_paste` | /1, /2, the double-insert neg; AT-I1a-2, -6 |
 | R-PASTE.2 | `OsClipboardInput.action_copy`, `CappedTextArea.action_copy`, `_mirror_and_write_os_clipboard`, `write_os_clipboard`, `_write_via_ctypes`, `_write_via_tk` | /1, /2, both negs |
 | R-PASTE.3 | `_mirror_and_write_os_clipboard`, `OsClipboardInput.action_copy`, `CappedTextArea.action_copy` | /1, /2 |
@@ -150,7 +153,7 @@ The two test-file names are `../E1-slice.md` §6's proposals; E4 keeps the `path
 | R-PASTE.18 | `CappedTextArea.action_paste`, `CappedTextArea.action_copy`, `[Interface: text boxes]` | /1 … /8 |
 | R-PASTE.19 | `OsClipboardInput.action_copy`, `CappedTextArea.action_copy`, `[Interface: text boxes]` | /1, /2 |
 | R-PASTE.20 | `[I/O: .github/workflows/clipboard-windows.yml]` (examples in its `desc:`) | /1, /2 |
-| R-PASTE.21 | `require_isolated_clipboard`, `os_clipboard_ready` | /1, /2, /3 |
+| R-PASTE.21 | `require_isolated_clipboard`, `os_clipboard_ready` | /1 (a, b, c), /2, /3, /4 |
 | R-PASTE.22 | `os_clipboard_ready`, `clipboard_probe` | /1, /2 |
 | R-PASTE.23 | `clipboard_probe` | /1, /2 |
 | R-PASTE.24 | `OsClipboardInput._on_mouse_down`, `CappedTextArea._on_mouse_down` | /1, /2, /3; AT-I1a-16 … 27 |
@@ -158,18 +161,20 @@ The two test-file names are `../E1-slice.md` §6's proposals; E4 keeps the `path
 | R-PASTE.26 | `OsClipboardInput._on_mouse_down`, `CappedTextArea._on_mouse_down`, `OsClipboardInput.focus_on_click` | /1, /2, /3 |
 | R-PASTE.27 | `OsClipboardInput._on_mouse_down`, `CappedTextArea._on_mouse_down` | /1, /2, /3 |
 | R-PASTE.28 | `OsClipboardInput._on_mouse_down`, `CappedTextArea._on_mouse_down` | /1, /2 |
-| R-PASTE.29 | `OsClipboardInput.focus_on_click`, `OsClipboardInput._on_mouse_down`, `[Data: OsClipboardInput._press_cursor]`, `[Data: box selection]` | /1, /2, /3, both negs (D-9 B, D-10 A); AT-I1a-12, -14, -24, -26 |
+| R-PASTE.29 | `OsClipboardInput.focus_on_click`, `OsClipboardInput._on_mouse_down`, `[Data: OsClipboardInput._press_cursor]`, `[Data: box selection]` | /1, /2, /3, /4, both negs (D-9 B, D-10 A); AT-I1a-12, -14, -24, -26 |
 | R-PASTE.30 | `CappedTextArea._on_mouse_down` | /1, /2, the D-10 A neg; AT-I1a-13, -15, -25, -27 |
-| R-PASTE.31 | `OsClipboardInput._on_mouse_down`, `CappedTextArea._on_mouse_down` | /1 … /4; AT-I1a-9 |
+| R-PASTE.31 | `OsClipboardInput._on_mouse_down`, `CappedTextArea._on_mouse_down` | /1 … /6; AT-I1a-9 |
 | R-PASTE.32 | `OsClipboardInput._on_mouse_down`, `CappedTextArea._on_mouse_down` | /1, /2 |
-| R-PASTE.33 | both `_on_mouse_down`, both `_on_mouse_up`, both `_on_click`, `[Interface: text boxes]` | /1, /2 |
+| R-PASTE.33 | both `_on_mouse_down`, both `_on_click`, `[Interface: text boxes]` | /1, /2 |
+| R-PASTE.34 | `OsClipboardInput._on_paste`, `OsClipboardInput.action_paste` | the strip cases: the P1 payload through the terminal, Ctrl+V OS, fallback and right-click routes |
+| R-PASTE.35 | `CappedTextArea._on_paste`, `CappedTextArea.action_paste` | the strip cases: the P1 payload through the terminal, Ctrl+V OS, fallback and right-click routes |
 
 Cited canon rows that the changed nodes touch, with examples here: R-TUI-044.2 (D-5 A: `OsClipboardInput._on_paste`, `.action_paste`, `CappedTextArea._on_paste`, `_bound_clipboard_text`, `CappedTextArea._on_mouse_down`, `OsClipboardInput._on_mouse_down`; /1 … /6), R-TUI-043.9 (both `action_paste`; /1, /2), R-TUI-043.4 (/1), R-TUI-044.3 (/1), R-TUI-043.5 (/1 … /3), R-TUI-043.7 and .8 (/1, /2), R-TUI-043.11 (/1, /2), R-TUI-043.12 (/1, /3), R-TUI-043.13 (/1, /2), R-TUI-044.1 (/2, /11, /18), R-TUI-044.4 (/1). The acceptance matrix AT-I1a-1 … 8 sits on the copy and paste nodes it crosses; AT-I1a-10 and AT-I1a-11 are operator-run and have no graph example (they observe the operator's own terminal and clipboard, which no node models). **No active row lacks an example.**
 
 ### Size and deviations from the E1 slice
 
-- **Nodes: 36** — 13 new (10 product, 3 test support), 7 changed, 8 removed, 8 unchanged context; 15 entities, 30 edges, 6 findings (lint: `not read=0`). Product: 2 source files (budget 4), 1 config file, 1 test-support module. Under the 40-node cap: no split.
-- **Deviations** (each a finding below): `OsClipboardInput._on_focus` (slice §7) is replaced by `OsClipboardInput.focus_on_click` (E2-1); `_system_directory` is added beside `_system_powershell` as the system-folder seam R-PASTE.17/1 points at an empty folder; each class's `_on_mouse_up` and `_on_click` stay two handlers (two message types; the slice allowed folding them); the workflow's run line uses `-v`, not `-q` (R-PASTE.20/2). No slice file is added or dropped.
+- **Nodes: 34** — 11 new (8 product, 3 test support), 9 changed, 8 removed, 6 unchanged context; 15 entities, 30 edges, 6 findings (lint: `not read=0`). Product: 2 source files (budget 4), 1 config file, 1 test-support module. Under the 40-node cap: no split.
+- **Deviations** (each a finding below): `OsClipboardInput._on_focus` (slice §7) is replaced by `OsClipboardInput.focus_on_click` (E2-1); `_system_directory` is added beside `_system_powershell` as the system-folder seam R-PASTE.17/1 points at an empty folder; each class's `_on_mouse_up` is dropped (E3A-12: the release handlers guard nothing) while each `_on_click` stays; `_read_via_ctypes` is now changed (E3A-02, E3S-04) and `CappedTextArea._on_paste` is now changed (E3S-01); the workflow's run line uses `-v`, not `-q` (R-PASTE.20/2). No slice file is added or dropped.
 
 ## Nodes
 
@@ -250,10 +255,10 @@ _read_via_powershell
 req: R-PASTE.16, R-PASTE.17, R-TUI-043.10.2, R-TUI-043.11
 in:
 out: str? text
-func: changed (R-PASTE.16, .17). was: `subprocess.run(["powershell", "-NoProfile", "-Command", "[Console]::OutputEncoding=[System.Text.Encoding]::UTF8;Get-Clipboard -Raw"], …)` by the bare name, which Windows resolves through the running program's folder, the current folder and PATH before the system folder (R, `:358-368`); `FileNotFoundError` → "not on PATH" (`:372-374`). / now: off Windows `None` (as before); `program = _system_powershell()`; `None` → one DEBUG `_read_via_powershell: system PowerShell not found`, return `None`, start nothing; else `subprocess.run([program, "-NoProfile", "-Command", <the same command>], capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=_POWERSHELL_TIMEOUT_S, shell=False, creationflags=CREATE_NO_WINDOW)` under `_POWERSHELL_SUBPROCESS_LOCK`; `TimeoutExpired`, any `OSError` (a file gone between the check and the start included) or an exit code ≠ 0 → `None`; stdout without its trailing line end; `''` → `None`.
+func: changed (R-PASTE.16, .17). was: `subprocess.run(["powershell", "-NoProfile", "-Command", "[Console]::OutputEncoding=[System.Text.Encoding]::UTF8;Get-Clipboard -Raw"], …)` by the bare name, which Windows resolves through the running program's folder, the current folder and PATH before the system folder (R, `:358-368`); `FileNotFoundError` → "not on PATH" (`:372-374`). / now: off Windows `None` (as before); `program = _system_powershell()`; `None` → one DEBUG `_read_via_powershell: system PowerShell not found`, return `None`, start nothing; else `subprocess.run([program, "-NoProfile", "-NonInteractive", "-Command", <the same command>], capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=_POWERSHELL_TIMEOUT_S, shell=False, creationflags=CREATE_NO_WINDOW, cwd=<the `_system_directory()` folder>)` under `_POWERSHELL_SUBPROCESS_LOCK`; `TimeoutExpired`, any `OSError` (a file gone between the check and the start included) or an exit code ≠ 0 → `None`; a non-zero exit logs only the exit code and the stderr length (E3S-06); stdout without its trailing line end; `''` → `None`.
 module: s19_app/tui/os_clipboard_input.py
 modify: [I/O: system PowerShell] (append)
-examples: (R-PASTE.16/1) WinCI, Process spy, Other-program write `PS-READ`, Held clipboard (0.3 s) so that the Win32 read fails, `ctrl+v` in Box A → `1` start whose program equals `_system_powershell()` (case-insensitive), `C:\Windows\system32\WindowsPowerShell\v1.0\powershell.exe` on the hosted runner; Box A `PS-READ` (base: the program `powershell`, R `:361`)
+examples: (R-PASTE.16/1) WinCI, Process spy, Other-program write `PS-READ`, Held clipboard (event-driven: held until the Process spy records the start) so that the Win32 read fails, `ctrl+v` in Box A → `1` start whose program equals `_system_powershell()` (case-insensitive), `C:\Windows\system32\WindowsPowerShell\v1.0\powershell.exe` on the hosted runner; Box A `PS-READ` (base: the program `powershell`, R `:361`)
 examples: (R-PASTE.16/3) a decoy `powershell.exe` (a copy of `sys.executable`) in the test's current folder and in a folder first on PATH, as /1 → `0` starts of either decoy path; Box A `PS-READ` (base: the current-folder decoy runs and Box A gets no `PS-READ`)
 examples: (R-PASTE.17/1) WinCI, `_system_directory` pointed at an empty temporary folder, Held clipboard (8 s), app clipboard `APP-TEXT`, `ctrl+v` in Box A → `0` process starts; Box A `APP-TEXT` (R-TUI-043.6)
 examples: (R-PASTE.17/1 unit, LinuxH) `sys.platform` faked `win32`, `_system_powershell` → `None`, a `subprocess.run` spy → returns `None`; the spy counts `0` calls (base: `1` call, argv[0] `powershell`)
@@ -264,10 +269,10 @@ _write_via_powershell
 req: R-PASTE.16, R-PASTE.17, R-PASTE.13
 in: str text
 out: bool written
-func: changed (R-PASTE.16, .17). was: `subprocess.run(list(_POWERSHELL_WRITE_COMMAND), input=text, …)` with `"powershell"` as the command's first item (`:520-522`); `FileNotFoundError` → "not on PATH" (`:528-530`). / now: off Windows `False`; `program = _system_powershell()`; `None` → one DEBUG `_write_via_powershell: system PowerShell not found`, `False`, nothing started; else `subprocess.run([program, *_POWERSHELL_WRITE_COMMAND], input=text, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=2.0, shell=False, creationflags=CREATE_NO_WINDOW)` under the lock; `True` only for exit code `0`; timeout, `OSError` or another exit code → `False`. The payload stays on stdin, never in the command line.
+func: changed (R-PASTE.16, .17). was: `subprocess.run(list(_POWERSHELL_WRITE_COMMAND), input=text, …)` with `"powershell"` as the command's first item (`:520-522`); `FileNotFoundError` → "not on PATH" (`:528-530`). / now: off Windows `False`; `program = _system_powershell()`; `None` → one DEBUG `_write_via_powershell: system PowerShell not found`, `False`, nothing started; else `subprocess.run([program, "-NonInteractive", *_POWERSHELL_WRITE_COMMAND], input=text, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=2.0, shell=False, creationflags=CREATE_NO_WINDOW, cwd=<the `_system_directory()` folder>)` under the lock; `True` only for exit code `0`; timeout, `OSError` or another exit code → `False`; a non-zero exit logs only the exit code and the stderr length (E3S-06). The payload stays on stdin, never in the command line.
 module: s19_app/tui/os_clipboard_input.py
 modify: [I/O: system PowerShell] (append); [I/O: Windows clipboard] (replace)
-examples: (R-PASTE.16/2) WinCI, Process spy, Held clipboard (0.3 s), Box A `PS-WRITE`: Select, `ctrl+c` → `1` start, the system PowerShell's absolute path; Other-program read `PS-WRITE`
+examples: (R-PASTE.16/2) WinCI, Process spy, Held clipboard (event-driven: held until the Process spy records the start), Box A `PS-WRITE`: Select, `ctrl+c` → `1` start, the system PowerShell's absolute path; Other-program read `PS-WRITE`
 examples: (R-PASTE.17/2) WinCI, the system folder an empty temporary folder, Held clipboard (8 s), Box A: Select, `ctrl+c` → `0` process starts; the write failure warning `Clipboard write failed — copied inside the app only.`
 examples: (TC-B102-05 re-point, LinuxH) `sys.platform` faked `win32`, `_system_powershell` → `C:\PS\powershell.exe`, fake `subprocess.run` exit `0`, `_write_via_powershell("payload")` → `True`; argv `C:\PS\powershell.exe`, `-NoProfile`, `-Command`, `[Console]::InputEncoding=[System.Text.Encoding]::UTF8;$input | Set-Clipboard`; `input` `payload`; `payload` in no argv item; `shell` `False`; `timeout` `2.0`
 examples: (R-PASTE.13/1, budget) a held clipboard: ≤ `2.0` s, then `False`
@@ -276,15 +281,15 @@ read_os_clipboard
 req: R-TUI-043.6, R-TUI-043.10.1, R-TUI-043.10.2, R-TUI-043.12
 in: tuple[tuple[str, Callable[[], Optional[str]]], ...]? strategies = None
 out: str? text
-func: changed (D-1 A; R-TUI-043.6). was: runs `_STRATEGIES` (tkinter → ctypes-win32 → powershell) and returns the first value that `is not None` (`:652`), so a Win32 `''` (an empty Unicode text, `:324`) ends the cascade as if it were text. / now: runs the cascade (default `[Data: _STRATEGIES]`: ctypes-win32 → powershell); a layer that gives `None` or `''`, or raises, counts as no text and the next layer runs; the first non-empty text goes through `_bound_clipboard_text` and comes back with one DEBUG `read_os_clipboard succeeded via <layer> (len=<n>)`; no text → one WARNING `read_os_clipboard: every strategy failed (cascade=[…])` and `None`. Docstring: the cascade and the budget `0.1` s + `2.0` s.
+func: changed (D-1 A; R-TUI-043.6). was: runs `_STRATEGIES` (tkinter → ctypes-win32 → powershell) and returns the first value that `is not None` (`:652`), so a Win32 `''` (an empty Unicode text, `:324`) ends the cascade as if it were text. / now: runs the cascade (default `[Data: _STRATEGIES]`: ctypes-win32 → powershell); a layer that gives `None` (could not answer) or raises counts as no answer and the next layer runs; the first `str` ends the cascade — a `''` (answered, no text) → one WARNING `read_os_clipboard: every strategy failed (cascade=[…])` and `None`, so the paste falls back to the app clipboard (R-TUI-043.6); a non-empty text goes through `_bound_clipboard_text` and comes back with one DEBUG `read_os_clipboard succeeded via <layer> (len=<n>)`. Docstring: the cascade, the `''` contract and the budget `0.1` s + `2.0` s.
 module: s19_app/tui/os_clipboard_input.py
-examples: (R-TUI-043.6/3 unit, LinuxH) `strategies=(("a", lambda: ""), ("b", lambda: "B-TEXT"))` → `B-TEXT` (base: `''`)
-examples: (R-TUI-043.6/3 unit, LinuxH) `strategies=(("a", lambda: ""), ("b", lambda: None))` → `None` and one WARNING (base: `''`, no WARNING)
+examples: (R-TUI-043.6/3 unit, LinuxH) `strategies=(("a", lambda: ""), ("b", lambda: "B-TEXT"))` → `None` and one WARNING (the `''` ends the cascade; base: `''`)
+examples: (R-TUI-043.6/3 unit, LinuxH) `strategies=(("a", lambda: ""), ("b", lambda: None))` → `None` and one WARNING (the `''` ends the cascade; base: `''`, no WARNING)
 examples: (R-TUI-043.6/3) WinCI, Empty Unicode text, app clipboard `APP-TEXT`, `ctrl+v` in Box A, then in Box M → both `APP-TEXT`; no paste failure warning (base: the warning, and the box text selected, R `capped_text_area.py:213-218`)
 examples: (R-TUI-043.10.1/3, LinuxH) the default cascade on Linux → `None`; both layers return at once, no Tk wait (base with a stand-in Tcl root: `3,158.5` ms in the executor, B pilot P3)
 examples: (R-TUI-043.12/1) LinuxH, Log capture, app clipboard `APP-TEXT`, `ctrl+v` in Box A, then Box M → per paste ≥ `1` WARNING of `s19_app.tui.os_clipboard_input`: `read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])` (base: the cascade names `tkinter` first, B pilot P8)
 examples: (R-TUI-043.13/1) WinCI, Other-program write `SECRET-TEXT-42`, `ctrl+v` → the DEBUG line `read_os_clipboard succeeded via ctypes-win32 (len=14)`; no record holds `SECRET-TEXT-42`
-examples: (R-TUI-043.10.1/1 neg) `[Data: _STRATEGIES]` with the Tk pair restored first → Ctrl+V `+3,100` ms → RED wherever a Tk root can be created
+examples: (R-TUI-043.10.1/1 neg, E3A-03) LinuxH — the base cascade with a `tkinter.Tcl()` stand-in root on the main thread → Ctrl+V `+3,100` ms → RED; WinCI — a delay mutant (the answering layer sleeps 3 × `timing_bound(0.1)`) → RED by construction
 
 write_os_clipboard
 req: R-PASTE.2, R-PASTE.9, R-PASTE.10, R-PASTE.12, R-PASTE.13
@@ -303,7 +308,7 @@ _mirror_and_write_os_clipboard
 req: R-PASTE.3, R-PASTE.9, R-PASTE.10, R-PASTE.11, R-PASTE.12, R-PASTE.13, R-PASTE.14, R-PASTE.15
 in: App app; str text
 out: None
-func: changed (D-1 A, D-3 A; I-1 item 3). was: cut, `app.copy_to_clipboard`, `_prime_tk_root()` on the UI thread (`:767`), the executor write, the warning and the WARNING line (`:762-782`). / now: the same without the priming: `text = text[:_CLIPBOARD_CAP_CHARS]`; `app.copy_to_clipboard(text)` (the app clipboard and one OSC 52 request; an exception there is logged at DEBUG and the copy goes on); `await loop.run_in_executor(None, write_os_clipboard, text)`; `True` → return; `False` → `app.notify(_WRITE_FAIL_NOTIFICATION, severity="warning", timeout=6.0)` and one WARNING `OS clipboard write failed; retained Textual internal clipboard only`. Docstring: no priming.
+func: changed (D-1 A, D-3 A; I-1 item 3). was: cut, `app.copy_to_clipboard`, `_prime_tk_root()` on the UI thread (`:767`), the executor write, the warning and the WARNING line (`:762-782`). / now: the same without the priming: `text = text[:_CLIPBOARD_CAP_CHARS]`; `App.copy_to_clipboard(app, text)` on the toolkit base `textual.app.App` (never an app override; the app clipboard and one OSC 52 request; an exception there is logged at DEBUG and the copy goes on); `await loop.run_in_executor(None, write_os_clipboard, text)`; `True` → return; `False` → `app.notify(_WRITE_FAIL_NOTIFICATION, severity="warning", timeout=6.0)` and one WARNING `OS clipboard write failed; retained Textual internal clipboard only`. Docstring: no priming.
 module: s19_app/tui/os_clipboard_input.py
 modify: [Data: App._clipboard] (replace); [I/O: terminal] (append); [I/O: Windows clipboard] (replace)
 examples: (R-PASTE.3/1) LinuxH and WinCI, Box A `COPYME-1`, Select, `ctrl+c` → app clipboard `COPYME-1` (holds on base, B pilot P5)
@@ -316,14 +321,14 @@ examples: (R-PASTE.11/3) LinuxH, Box A → median time to the write failure warn
 examples: (R-PASTE.12/1) LinuxH and WinCI, OSC 52 spy, Box M holds P70k and Box A's value is P70k: Select, `ctrl+c` in each → the app clipboard `65536` characters; the decoded OSC 52 request `65536` characters (2/2)
 examples: (R-PASTE.13/1, /2) WinCI, Held clipboard (8 s), Box A Select + `ctrl+c`; Box M `f7` + `ctrl+x` → the warning ≤ bound(`2.5`) s after the key (base with a Tk root: up to `3.1` s)
 examples: (R-PASTE.14/1) WinCI, Held clipboard (8 s), Tick lateness armed, Box A Select + `ctrl+c` → ≥ `10` ticks before the end of the copy, each late by ≤ bound(`0.1`) s (neg: the write on the event loop's thread → ticks stall ≥ `1` s → RED)
-examples: (R-PASTE.11 neg) `[Data: _WRITE_STRATEGIES]` led by PowerShell → `+200` ms per copy (F §1.4: `192`–`232` ms) → RED on WinCI
+examples: (R-PASTE.11 neg, E3A-03) LinuxH — the base cascade with a `tkinter.Tcl()` stand-in root → the copy warning after ≥ `1,001` ms → RED; WinCI — a delay mutant (the answering layer sleeps 3 × `timing_bound(0.1)`) → RED by construction (a PowerShell-first order is informative only, recorded with `report_margin`)
 examples: (R-PASTE.2/1 neg) the tail without its executor write (the stock Textual copy) → the Other-program read gives the previous text → RED
 
 OsClipboardInput.action_paste
-req: R-TUI-043.6, R-TUI-043.10.1, R-TUI-043.10.2, R-TUI-044.2
+req: R-TUI-043.6, R-TUI-043.10.1, R-TUI-043.10.2, R-TUI-044.2, R-PASTE.34
 in:
 out: None
-func: changed (D-1 A, D-5 A). was: `_prime_tk_root()` and its comment (`:895-900`); `read_os_clipboard` in the executor; `None` → `self.app.clipboard` uncut (`:908-910`); empty → select all, the paste failure warning, a WARNING; else the first line replaces the selection (`:930-932`). / now: no priming; `text = await loop.run_in_executor(None, read_os_clipboard)`; `None` → `self.app.clipboard[:_CLIPBOARD_CAP_CHARS]` (cut before the first line is taken); empty → as before; else `self.replace(text.splitlines()[0], *self.selection)` — at the cursor when there is no selection, over it otherwise; a box with `max_length`, `restrict` or `type` still refuses a value it does not allow whole (textual `Input.replace`, `_input.py:976-1012`). Gains a caller: `OsClipboardInput._on_mouse_down`.
+func: changed (D-1 A, D-5 A). was: `_prime_tk_root()` and its comment (`:895-900`); `read_os_clipboard` in the executor; `None` → `self.app.clipboard` uncut (`:908-910`); empty → select all, the paste failure warning, a WARNING; else the first line replaces the selection (`:930-932`). / now: no priming; `text = await loop.run_in_executor(None, read_os_clipboard)`; `None` → `self.app.clipboard[:_CLIPBOARD_CAP_CHARS]` (cut before the first line is taken); the text (read or fallback) goes through the `_CONTROL_SCRUB` strip (E3S-01); empty → as before; else `self.replace(text.splitlines()[0], *self.selection)` — at the cursor when there is no selection, over it otherwise; a box with `max_length`, `restrict` or `type` still refuses a value it does not allow whole (textual `Input.replace`, `_input.py:976-1012`). Gains a caller: `OsClipboardInput._on_mouse_down`.
 module: s19_app/tui/os_clipboard_input.py
 modify: [Data: Input.selection] (replace)
 examples: (R-TUI-044.2/2) LinuxH, Box A empty, app clipboard P70k, `ctrl+v` → Box A `65536` characters (base `70,000`, B pilot P7)
@@ -339,10 +344,10 @@ examples: (R-TUI-044.1/2, /11) the walk in the A2L Explorer filter box and in th
 examples: (AT-I1a-1, AT-I1a-5) Box A → Box A' route 1 → Box A' P1; Box M → Box A' route 1 → Box A' `L1 Ñ€` (the first line)
 
 CappedTextArea.action_paste
-req: R-TUI-043.6, R-TUI-043.10.1, R-TUI-043.10.2, R-PASTE.18
+req: R-TUI-043.6, R-TUI-043.10.1, R-TUI-043.10.2, R-PASTE.18, R-PASTE.35
 in:
 out: None
-func: changed (D-1 A). was: read-only → return; `_os_clipboard_input._prime_tk_root()` (`:208-211`); the read in the executor through the module (`:212-213`); `None` → `self.app.clipboard`; empty → select all, the warning, a WARNING; else cut to 65,536 and `_replace_via_keyboard` over the selection, then `move_cursor` (`:214-237`). / now: the same without the priming and its comment; docstring (`:173-174`, `:191`, `:197`) without the Tk root. Gains a caller: `CappedTextArea._on_mouse_down`.
+func: changed (D-1 A). was: read-only → return; `_os_clipboard_input._prime_tk_root()` (`:208-211`); the read in the executor through the module (`:212-213`); `None` → `self.app.clipboard`; empty → select all, the warning, a WARNING; else cut to 65,536 and `_replace_via_keyboard` over the selection, then `move_cursor` (`:214-237`). / now: the same without the priming and its comment, plus the `_CONTROL_SCRUB` strip applied to the pasted text (read or fallback) before `_replace_via_keyboard` (E3S-01); docstring (`:173-174`, `:191`, `:197`) without the Tk root. Gains a caller: `CappedTextArea._on_mouse_down`.
 module: s19_app/tui/capped_text_area.py
 modify: [Data: TextArea.selection] (replace)
 examples: (R-TUI-043.6/1) LinuxH, real app, app clipboard `APP-TEXT`, `ctrl+v` in Box M → `APP-TEXT` (holds on base)
@@ -352,6 +357,29 @@ examples: (R-TUI-043.10.2/2) WinCI, Held clipboard (8 s), app clipboard `APP-TEX
 examples: (R-TUI-043.6/3) WinCI, Empty Unicode text, app clipboard `APP-TEXT` → Box M `APP-TEXT`, no warning (base: the warning, the whole buffer selected)
 examples: (R-PASTE.18/1 … /7) the walk in `#patch_paste_text`, `#sje_manual`, `#changeset_json_text`, `#entry_json_text`, `#bulk_param_text`, `#report_declared_regions`, `#operation_config`: Clear, `ctrl+v` after the copy step → the box holds `W<n>-` + P2 again
 examples: (I-1a) a test that patches `os_clipboard_input.read_os_clipboard` to return `PATCHED` → `ctrl+v` in Box M gives `PATCHED` (the module seam, as the batch-67 tests use it)
+
+_read_via_ctypes
+req: R-TUI-043.4, R-TUI-043.6, R-TUI-043.10.1, R-TUI-043.10.2, R-TUI-043.11
+in:
+out: str? text
+func: changed (E3A-02; E3S-04). Off Windows `None`. `OpenClipboard(NULL)` with 5 × 20 ms retries (`None` when another program holds it). When it opened: `GetClipboardData(CF_UNICODETEXT)` NULL (the clipboard holds no text — a file-drop list or an image) → `''` (was `None`; `:315-318`); else `n = GlobalSize(handle) // 2`, `ctypes.wstring_at(pointer, min(n, _CLIPBOARD_CAP_CHARS + 1))` cut at the first `\x00` (`:275-328`); an empty text → `''` (`:324`). A `GlobalLock` failure or `GlobalSize` 0 stays `None` (could not answer). The `''` ends the read cascade as "answered, no text" (E3A-02). Now the first read layer.
+module: s19_app/tui/os_clipboard_input.py
+examples: (F §1.4) Windows: `0.1`–`0.2` ms on either thread
+examples: (R-TUI-043.11/1) WinCI, Other-program write P1 → P1 with every code point equal; Box A and Box M (Clear between) hold P1 exactly
+examples: (R-TUI-043.6/3) WinCI, Empty Unicode text → `''`
+examples: (R-TUI-043.10.1/5, E3A-02) WinCI, the OS clipboard holds a file-drop list (no text format) → `''`, the cascade ends, `0` PowerShell starts (base: `None` → one start)
+examples: (E3S-04) WinCI, a `CF_UNICODETEXT` block filled to its `GlobalSize` with non-NUL characters and no terminator → at most `GlobalSize // 2` characters, then 65,536 in the box (neg: the length bound dropped → characters past the block → RED)
+examples: (R-TUI-043.10.2/1) WinCI, Held clipboard (8 s) → `None` after 5 attempts (≈ `0.1` s)
+
+CappedTextArea._on_paste
+req: R-TUI-044.2, R-TUI-044.4, R-PASTE.35
+in: events.Paste event
+out: None
+func: changed (E3S-01). Cuts `event.text` to 65,536 in place and applies the `_CONTROL_SCRUB` strip (U+0000–U+001F except TAB, LF and CR; U+007F–U+009F) so pasted control characters never reach the terminal; the stock `TextArea._on_paste` inserts it all at the selection (`:131-165`).
+module: s19_app/tui/capped_text_area.py
+examples: (R-TUI-044.2/3) LinuxH, Box M empty, Terminal paste P70k → `65536` characters (holds on base, B pilot3)
+examples: (R-TUI-044.4/1) LinuxH, Box M empty, Terminal paste `L1\nL2` → `L1\nL2`, once (holds on base; B pilot P6: posted to the box itself it would be inserted twice)
+examples: (R-PASTE.35) LinuxH, Box M empty, Terminal paste holding ESC or NUL → the value and the drawn line hold 0 code points of the scrub set (neg: the strip removed → ESC in the drawn line → RED)
 
 ### New
 
@@ -375,10 +403,10 @@ examples: (R-PASTE.17/1) `_system_directory` → an empty temporary folder `T` �
 examples: (LinuxH) → `None`
 
 OsClipboardInput._on_paste
-req: R-PASTE.1, R-TUI-044.2
+req: R-PASTE.1, R-TUI-044.2, R-PASTE.34
 in: events.Paste event
 out: None
-func: new (D-5 A). The terminal route into a single-line box: when `event.text` is longer than `_CLIPBOARD_CAP_CHARS` it is cut in place, nothing else. The stock `Input._on_paste` (textual `_input.py:756-764`) runs after it through the MRO dispatch (`message_pump.py:743-800`): it inserts the first line at the cursor (over the selection when there is one) and stops the event. It must not call `super()._on_paste` (the stock handler would insert twice; the `CappedTextArea._on_paste` rule, `capped_text_area.py:131-165`). Needs `from textual import events` in the module.
+func: new (D-5 A; E3S-01). The terminal route into a single-line box: when `event.text` is longer than `_CLIPBOARD_CAP_CHARS` it is cut in place, then the `_CONTROL_SCRUB` strip removes its control characters (U+0000–U+001F except TAB; U+007F–U+009F). The stock `Input._on_paste` (textual `_input.py:756-764`) runs after it through the MRO dispatch (`message_pump.py:743-800`): it inserts the first line at the cursor (over the selection when there is one) and stops the event. It must not call `super()._on_paste` (the stock handler would insert twice; the `CappedTextArea._on_paste` rule, `capped_text_area.py:131-165`). Needs `from textual import events` in the module.
 module: s19_app/tui/os_clipboard_input.py
 examples: (R-PASTE.1/1) LinuxH, Box A empty, Terminal paste `L1\nL2` → Box A `L1` (holds on base, B pilot3)
 examples: (R-PASTE.1/2) LinuxH, Terminal paste `Ñoño Ж 漢字 😀\nsecond` → Box A `Ñoño Ж 漢字 😀`
@@ -386,18 +414,21 @@ examples: (R-TUI-044.2/1) LinuxH, Box A empty, Terminal paste P70k → Box A `65
 examples: (R-TUI-044.2/5) LinuxH, the Load dialog (`ctrl+l`), `#load_path` empty, Terminal paste of 5,000 × `a` → `#load_path` `""`: refused whole by its `max_length=4096` (`screens.py:405`), not cut to 4,096
 examples: (R-TUI-043.5/3) LinuxH, Box A `AAAA-BBBB` with `AAAA` selected, Terminal paste `ZZ` → `ZZ-BBBB`
 examples: (R-PASTE.1/1 neg) the handler also calls `super()._on_paste(event)` → Box A `L1L1` → RED
+examples: (R-PASTE.34) LinuxH, Box A empty, Terminal paste holding ESC or NUL → the value and the drawn line hold 0 code points of the scrub set (neg: the strip removed → ESC in the drawn line → RED)
 examples: (AT-I1a-2, AT-I1a-6) WinCI: the Other-program read of the copy posted as a Terminal paste into Box A' → P1 (from Box A), `L1 Ñ€` (from Box M); LinuxH: the decoded OSC 52 request posted instead → the same
 
 OsClipboardInput.focus_on_click
 req: R-PASTE.29, R-PASTE.26
 in:
 out: bool focus
-func: new (D-9 A; the seam E2 picked, finding E2-1). The screen calls it synchronously for every mouse press on the box, before it sets the focus and before it forwards the press (textual `screen.py:1933-1946`; the method is `Widget.focus_on_click`, `widget.py:720-729`, and `screen.py:1937` is its only caller). It writes `[Data: OsClipboardInput._press_cursor]`: `None` when the box has the focus, else `self.cursor_position` (the end of its selection) — the cursor at the press, read before the stock `Input._on_focus` selects the whole text (`_input.py:736-740`). Returns `super().focus_on_click()` (`FOCUS_ON_CLICK`, `True`), so which widget gets the focus is unchanged.
+func: new (D-9 A; the seam E2 picked, finding E2-1). The screen calls it synchronously for every mouse press on the box, before it sets the focus and before it forwards the press (textual `screen.py:1933-1946`; the method is `Widget.focus_on_click`, `widget.py:720-729`, and `screen.py:1937` is its only caller). It writes `[Data: OsClipboardInput._press_cursor]`: `self.cursor_position` when `self.screen.focused is not self` (this press changes the focus), else `None` — the cursor at the press, read before the stock `Input._on_focus` selects the whole text (`_input.py:736-740`). Returns `super().focus_on_click()` (`FOCUS_ON_CLICK`, `True`), so which widget gets the focus is unchanged.
 module: s19_app/tui/os_clipboard_input.py
 modify: [Data: OsClipboardInput._press_cursor] (replace)
 examples: (R-PASTE.29/2) Box 1's value set to `ab` (cursor `2`), Unfocus, a press on `a` → `_press_cursor` `2`, returns `True`; the screen then focuses Box 1 and the stock focus handler selects `(0, 2)` (B pilot4 P13: unfocused `(9, 9)` → `(0, 9)` at the press)
 examples: (R-PASTE.29/1) Box 1 `ab`, focused, cursor `1` → `_press_cursor` `None`
 examples: (holds on base) a left press on an unfocused Box 1 → it gets the focus, the stock focus handler selects all, then the stock press handler puts the cursor at the click point (the left click as today)
+examples: (R-PASTE.29/4, E3A-05) Box 1 focused with `ab`; App route, back to back with no pause, a left press and release on `#other`, then a right press and release on `a` → `_press_cursor` records the cursor (`2`), Box 1 `abP1 line`, nothing copied (with `has_focus`: `ab` copied → RED)
+examples: (E3A-05 edge) while the mouse is captured the screen calls `focus_on_click` on the box under the pointer but delivers the press to the captured widget; the stale record is overwritten at that box's next press
 
 OsClipboardInput._on_mouse_down
 req: R-PASTE.24, R-PASTE.25, R-PASTE.26, R-PASTE.27, R-PASTE.28, R-PASTE.29, R-PASTE.31, R-PASTE.32, R-PASTE.33
@@ -427,15 +458,6 @@ examples: (R-TUI-043.9/2, R-PASTE.14/2) WinCI, Held clipboard (8 s), Tick latene
 examples: (D-11 A) a recording `on_mouse_down` on Box 1's parent → it receives `0` button-3 presses (base: `1`, the event bubbles, textual `events.py:581`); a left press reaches it as before
 examples: (R-PASTE.24 neg) the right-click left to the toolkit (the base) → the press moves the cursor and empties the selection; Other-program read gives the earlier text → RED
 examples: (AT-I1a-12, -14, -24, -26) a C1 or C2 copy from Box A (P1) or Box M (P2), then Right-click (App route) in the cleared Box A' → Box A' P1 or `L1 Ñ€`
-
-OsClipboardInput._on_mouse_up
-req: R-PASTE.33
-in: events.MouseUp event
-out: None
-func: new (D-11 A). Button 3 → `event.stop()` (the release does not bubble); the stock `Input._on_mouse_up` still runs: it only ends a mouse selection (`_input.py:803-804`), and button 3 never starts one. Other buttons: nothing.
-module: s19_app/tui/os_clipboard_input.py
-examples: (D-11 A) Right-click on Box 1 → a recording `on_mouse_up` on its parent receives `0` button-3 releases (base `1`)
-examples: (holds on base) a left drag from `A` to `B` in Box 1 → the selection ends at the left release as today
 
 OsClipboardInput._on_click
 req: R-PASTE.33, R-PASTE.26
@@ -467,14 +489,6 @@ examples: (R-TUI-043.6/5, R-TUI-044.2/6) LinuxH, empty Box M: app clipboard `APP
 examples: (D-11 A) a recording `on_mouse_down` on Box 2's parent → `0` button-3 presses; Box 2 has not captured the mouse after the right-click (base: captured by the stock press)
 examples: (AT-I1a-13, -15, -25, -27) a C1 or C2 copy from Box A or Box M, then Right-click (App route) in the cleared Box M' → Box M' P1 or P2
 
-CappedTextArea._on_mouse_up
-req: R-PASTE.33
-in: events.MouseUp event
-out: None
-func: new (D-11 A). Button 3 → `event.stop()`; the stock `TextArea._on_mouse_up` (`_text_area.py:1974-1976`, ends a mouse selection) still runs and finds none. Other buttons: nothing.
-module: s19_app/tui/capped_text_area.py
-examples: (D-11 A) Right-click on Box 2 → a recording `on_mouse_up` on its parent receives `0` button-3 releases (base `1`)
-
 CappedTextArea._on_click
 req: R-PASTE.33, R-PASTE.26
 in: events.Click event
@@ -487,20 +501,22 @@ examples: (D-11 A) Right-click on Box 2 → a recording `on_click` on its parent
 
 require_isolated_clipboard
 req: R-PASTE.21
-in: str kind; Mapping[str, str]? environ = None; str? platform = None
+in: str kind; Mapping[str, str]? environ = None; str? platform = None; str? account = None
 out: None
-func: new (test support; D-8 A). The isolation guard. `environ` defaults to `os.environ`, `platform` to `sys.platform`. kind `windows`: isolated iff platform `win32` and `GITHUB_ACTIONS` = `true` and `RUNNER_ENVIRONMENT` = `github-hosted`. kind `x`: isolated iff `DISPLAY` equals the display the session's own Xvfb fixture started (none until it starts; LinuxX, blocked). Not isolated → `pytest.fail("OS clipboard not isolated: <reason>")` (an outcome `failed`, never a skip) before anything opens a clipboard; it opens nothing itself. Callers: every helper that opens a clipboard (Other-program write / read, Own read, Held clipboard, Empty Unicode text, X seed / read) calls it first, and an autouse fixture of `tests/test_b103_clipboard_*.py` calls it with `windows` on every Windows host, because there the product's own Ctrl+V and Ctrl+C open the Windows clipboard (finding E2-4). The message text is design, not a row.
+func: new (test support; D-8 A; E3A-07, E3S-02, E3S-03). The isolation guard. `environ` defaults to `os.environ`, `platform` to `sys.platform`, `account` to the logged-on account (`GetUserNameW` / `os.getlogin()` on Windows, not `%USERNAME%`). kind `windows`: isolated iff platform `win32` and `GITHUB_ACTIONS` = `true` and `RUNNER_ENVIRONMENT` = `github-hosted` and `account` = `runneradmin`. kind `x`: isolated iff `DISPLAY` equals the display the session's own Xvfb fixture started (none until it starts; LinuxX, blocked). Not isolated → `pytest.fail("OS clipboard not isolated: <reason>")` (an outcome `failed`, never a skip) before anything opens a clipboard; it opens nothing itself. The guard is called by a suite-wide autouse session fixture in `tests/conftest.py` (beside the `LOCALAPPDATA` isolation, `conftest.py:66-98`): on a Windows host that is not isolated it replaces `_STRATEGIES`, `_WRITE_STRATEGIES` and the four leaf layers with stand-ins that open nothing and record the attempt, and a function fixture fails the test at teardown when an attempt was recorded — one place, every test file, Inc 1b's included (R-PASTE.21 says "every test"). The helpers keep their own call. The message text is design, not a row.
 module: tests/support/b103_clipboard.py
 examples: (R-PASTE.21/1) kind `windows`, platform `win32`, `GITHUB_ACTIONS` `true`, `RUNNER_ENVIRONMENT` `self-hosted` → the test fails with `OS clipboard not isolated: RUNNER_ENVIRONMENT='self-hosted'`; a spy on the clipboard-opening functions counts `0` calls; the same with `RUNNER_ENVIRONMENT` unset
+examples: (R-PASTE.21/1 c, E3S-03) both variables set, `account` `username_subject` → fails with `OS clipboard not isolated: account='username_subject'`; the spy counts `0`
 examples: (R-PASTE.21/2) LinuxH, kind `x`, `DISPLAY` `:99`, no Xvfb started by the session → fails before any open; the spy counts `0`; no X connection is attempted
-examples: (R-PASTE.21/3) WinCI, `GITHUB_ACTIONS` `true`, `RUNNER_ENVIRONMENT` `github-hosted` → returns `None`; the test goes on to the probe
+examples: (R-PASTE.21/3) WinCI, `GITHUB_ACTIONS` `true`, `RUNNER_ENVIRONMENT` `github-hosted`, `account` `runneradmin` → returns `None`; the test goes on to the probe
+examples: (R-PASTE.21/4, E3S-02) LinuxH, the guard's platform seam `win32`, not isolated: a test outside `tests/test_b103_clipboard_*` presses Ctrl+C in a real `OsClipboardInput` with a selection → the test fails with the message; the Win32 stand-in records `0` opens of a real clipboard (neg: the conftest fixture removed → the real layer is reached, spy `1` → RED)
 examples: (R-PASTE.21 neg) the guard skipped → the spy counts ≥ `1` open → RED
 
 clipboard_probe
 req: R-PASTE.22, R-PASTE.23
 in:
 out: tuple(bool usable, str result)
-func: new (test support; D-7 B made loud). Cached once per session. First `require_isolated_clipboard("windows")`; then writes a nonce `b103-probe-<32 hex>` with the test process's own Win32 write (test code, independent of the product under test) and reads it back with a separate system PowerShell `Get-Clipboard -Raw` (UTF-8 output, 10 s timeout); usable iff the read, without its line end, equals the nonce. `result` names each layer and what it gave, for example `win32 write ok, PowerShell read 'b103-probe-…'`, `win32 write ok, PowerShell read ''`, `win32 write failed: OpenClipboard error 5`, `win32 write ok, PowerShell timed out after 10 s`. Seam: a pytester run on LinuxH replaces its one-shot body (`_probe_once`) with a stand-in. The probe test (`test_runner_clipboard_probe`, in the Windows test file) calls it and, when not usable, `pytest.fail(f"runner clipboard unusable: {result}")` (R-PASTE.23); when usable it passes.
+func: new (test support; D-7 B made loud). Cached once per session. First `require_isolated_clipboard("windows")`; then writes a nonce `b103-probe-<32 hex>` with the test process's own Win32 write (test code, independent of the product under test) and reads it back with a separate system PowerShell `Get-Clipboard -Raw` (UTF-8 output, 10 s timeout); usable iff the read, without its line end, equals the nonce. `result` names each layer and what it gave, for example `win32 write ok, PowerShell read 'b103-probe-…'`, `win32 write ok, PowerShell read ''`, `win32 write failed: OpenClipboard error 5`, `win32 write ok, PowerShell timed out after 10 s`. Seam: a pytester run on LinuxH replaces its one-shot body (`_probe_once`) with a stand-in. The probe test (`test_runner_clipboard_probe`, in the Windows test file) calls it and, when not usable, `pytest.fail(f"runner clipboard unusable: {result}")` (R-PASTE.23); when usable it passes. The Windows test file is module-skipped off `win32` (`Windows only`), the probe test included (E3A-10 b).
 module: tests/support/b103_clipboard.py
 examples: (R-PASTE.23/1) LinuxH pytester, stand-in `(False, "win32 write ok, PowerShell read ''")` → the probe test's outcome `failed` with the message `runner clipboard unusable: win32 write ok, PowerShell read ''`; the job's conclusion would be `failure`
 examples: (R-PASTE.23/2) LinuxH pytester, stand-in `(True, "win32 write ok, PowerShell read 'b103-probe-0123'")` → the probe test `passed`
@@ -511,7 +527,7 @@ os_clipboard_ready
 req: R-PASTE.21, R-PASTE.22
 in:
 out: None
-func: new (test support): the fixture that every WinCI-arm test requests first. Off Windows → `pytest.skip("Windows only")`. On Windows → `require_isolated_clipboard("windows")` (a host that is not GitHub-hosted fails, never skips); then `clipboard_probe()`; not usable → `pytest.skip(f"runner clipboard unusable: {result}")`, so the dependent cases are `blocked` while the probe test itself fails (R-PASTE.23). The LinuxH arms do not request it; they assert `DISPLAY` and `WAYLAND_DISPLAY` unset instead (`02-test-cases.md` §Platforms).
+func: new (test support): the fixture that every WinCI-arm test requests first. Off Windows → `pytest.skip("Windows only")`. On Windows → `require_isolated_clipboard("windows")` (a host that is not GitHub-hosted fails, never skips); then `clipboard_probe()`; not usable → `pytest.skip(f"runner clipboard unusable: {result}")`, so the dependent cases are `blocked` while the probe test itself fails (R-PASTE.23). The LinuxH arms do not request it; they assert `DISPLAY` and `WAYLAND_DISPLAY` unset and are gated `sys.platform != "win32"` (E3A-10 c) (`02-test-cases.md` §Platforms).
 module: tests/support/b103_clipboard.py
 examples: (R-PASTE.22/1) LinuxH pytester, the host check made `True`, the isolation variables set, the probe stand-in `(False, "win32 write ok, PowerShell read ''")`, the OS clipboard test files collected and run → every OS clipboard test `skipped` with the reason `runner clipboard unusable: win32 write ok, PowerShell read ''`; `0` failed besides the probe test
 examples: (R-PASTE.22/1) the same with a passing stand-in → `0` tests skipped by it
@@ -519,17 +535,6 @@ examples: (R-PASTE.22 neg) the probe result ignored → the OS clipboard tests f
 examples: (R-PASTE.21/1) a Windows host with `RUNNER_ENVIRONMENT` `self-hosted` → the fixture fails the test (outcome `failed`, not `skipped`)
 
 ### Unchanged (context)
-
-_read_via_ctypes
-req: R-TUI-043.4, R-TUI-043.6, R-TUI-043.10.1, R-TUI-043.10.2, R-TUI-043.11
-in:
-out: str? text
-func: unchanged. Off Windows `None`. `OpenClipboard(NULL)` with 5 × 20 ms retries (`None` when another program holds it), then `CF_UNICODETEXT` → `ctypes.wstring_at` (`:275-328`): `''` for an empty text (`:324`), which `read_os_clipboard` now counts as no text; `None` when the clipboard holds no text format (`:315-318`). Now the first read layer.
-module: s19_app/tui/os_clipboard_input.py
-examples: (F §1.4) Windows: `0.1`–`0.2` ms on either thread
-examples: (R-TUI-043.11/1) WinCI, Other-program write P1 → P1 with every code point equal; Box A and Box M (Clear between) hold P1 exactly
-examples: (R-TUI-043.6/3) WinCI, Empty Unicode text → `''`
-examples: (R-TUI-043.10.2/1) WinCI, Held clipboard (8 s) → `None` after 5 attempts (≈ `0.1` s)
 
 _write_via_ctypes
 req: R-PASTE.2, R-PASTE.11, R-PASTE.13
@@ -573,15 +578,6 @@ examples: (R-PASTE.6/1) Box A `CUTME-1`: Select, `ctrl+x` → app clipboard `CUT
 examples: (R-PASTE.5/3) app clipboard `BEFORE`, Box A `KEEP`, no selection, `ctrl+x` → Box A `KEEP`; app clipboard `BEFORE`; WinCI Other-program read `OS-BEFORE`
 examples: (R-PASTE.15/2) LinuxH, OSC 52 spy, Box A P1: Select, `ctrl+x` → `1` request, decoding to P1
 
-CappedTextArea._on_paste
-req: R-TUI-044.2, R-TUI-044.4
-in: events.Paste event
-out: None
-func: unchanged. Cuts `event.text` to 65,536 in place; the stock `TextArea._on_paste` inserts it all at the selection (`:131-165`).
-module: s19_app/tui/capped_text_area.py
-examples: (R-TUI-044.2/3) LinuxH, Box M empty, Terminal paste P70k → `65536` characters (holds on base, B pilot3)
-examples: (R-TUI-044.4/1) LinuxH, Box M empty, Terminal paste `L1\nL2` → `L1\nL2`, once (holds on base; B pilot P6: posted to the box itself it would be inserted twice)
-
 CappedTextArea.action_copy
 req: R-PASTE.2, R-PASTE.3, R-PASTE.4, R-PASTE.5, R-PASTE.12, R-PASTE.15, R-PASTE.18, R-PASTE.19
 in:
@@ -608,10 +604,10 @@ examples: (R-PASTE.15/4, /5) LinuxH, OSC 52 spy: `f7` + `ctrl+x` on P2 → `1` r
 ## Entities
 
 [Data: _STRATEGIES]
-desc: changed (D-1 A). `os_clipboard_input.py:547-551`, the default read cascade. was: `(("tkinter", _read_via_tk), ("ctypes-win32", _read_via_ctypes), ("powershell", _read_via_powershell))`. now: `(("ctypes-win32", _read_via_ctypes), ("powershell", _read_via_powershell))`. Read by `read_os_clipboard` (`:645`) only; tests inject their own cascades (the loop contract, `../E1-slice.md` §5). Example (R-TUI-043.10.1 neg): the Tk pair restored first → Ctrl+V `+3,100` ms → RED where a Tk root exists; a PowerShell-first order → `+200` ms → RED on WinCI.
+desc: changed (D-1 A). `os_clipboard_input.py:547-551`, the default read cascade. was: `(("tkinter", _read_via_tk), ("ctypes-win32", _read_via_ctypes), ("powershell", _read_via_powershell))`. now: `(("ctypes-win32", _read_via_ctypes), ("powershell", _read_via_powershell))`. Read by `read_os_clipboard` (`:645`) only; tests inject their own cascades (the loop contract, `../E1-slice.md` §5). Example (R-TUI-043.10.1 neg, E3A-03): LinuxH — the base cascade with a `tkinter.Tcl()` stand-in root created on the main thread → Ctrl+V `+3,100` ms → RED (control 1); WinCI — a delay mutant (the answering layer sleeps 3 × `timing_bound(0.1)` before returning) → RED by construction (control 3); a PowerShell-first order is kept as an informative mutant recorded with `report_margin`, not the row's control (control 4).
 
 [Data: _WRITE_STRATEGIES]
-desc: changed (D-3 A). `:558-562`. was: `(("win32", _write_via_ctypes), ("tkinter", _write_via_tk), ("powershell", _write_via_powershell))`. now: `(("win32", _write_via_ctypes), ("powershell", _write_via_powershell))`. Read by `write_os_clipboard` (`:709`) only. Example (R-PASTE.11 neg): a PowerShell-first order → `+200` ms per copy → RED on WinCI; (R-PASTE.2 neg) the Tk write kept as owner after a Win32 failure → a later read `''` → RED.
+desc: changed (D-3 A). `:558-562`. was: `(("win32", _write_via_ctypes), ("tkinter", _write_via_tk), ("powershell", _write_via_powershell))`. now: `(("win32", _write_via_ctypes), ("powershell", _write_via_powershell))`. Read by `write_os_clipboard` (`:709`) only. Example (R-PASTE.11 neg, E3A-03): LinuxH — the base cascade with a `tkinter.Tcl()` stand-in root → the copy warning after ≥ `1,001` ms → RED (control 1); WinCI — a delay mutant (the answering layer sleeps 3 × `timing_bound(0.1)`) → RED by construction (control 3); a PowerShell-first order is informative, recorded with `report_margin` (control 4); (R-PASTE.2 neg) the Tk write kept as owner after a Win32 failure → a later read `''` → RED.
 
 [Data: _POWERSHELL_WRITE_COMMAND]
 desc: changed (R-PASTE.16). `:130-136`. was: `("powershell", "-NoProfile", "-Command", "[Console]::InputEncoding=[System.Text.Encoding]::UTF8;$input | Set-Clipboard")`. now: the same tuple without its first item; `_write_via_powershell` puts `_system_powershell()` before it at each call. Name kept: no reader outside the module (`git grep` of `s19_app/` and `tests/`: 0), so a rename would be free but is not needed.
@@ -620,7 +616,7 @@ desc: changed (R-PASTE.16). `:130-136`. was: `("powershell", "-NoProfile", "-Com
 desc: removed (D-1 A, D-3 A). The module's `_TkRootSingleton()` instance (`:228`), with `_TK_RETRIES` and `_TK_RETRY_DELAY_S` (`:100-101`) and their budget line (`:97`), the `atexit` import (`:76`) and its registration (`:207`). After Inc 1a the clipboard code holds no Tk state and imports no `tkinter`.
 
 [Data: OsClipboardInput._press_cursor]
-desc: new (D-9 A). `int?`, a class-level default `None` that each instance overrides: the cursor at the press when the box had no focus at the press, else `None`. Written by `OsClipboardInput.focus_on_click` at every press the screen forwards; read and cleared by `OsClipboardInput._on_mouse_down` for every button, so it never outlives the press that wrote it. A `MouseDown` posted to the box directly (not through the screen) finds `None` (finding E2-6). No `__init__` is added.
+desc: new (D-9 A). `int?`, a class-level default `None` that each instance overrides: the cursor at the press when `self.screen.focused is not self` at the press (the press changes the focus), else `None`. Written by `OsClipboardInput.focus_on_click` at every press the screen forwards; read and cleared by `OsClipboardInput._on_mouse_down` for every button, so it never outlives the press that wrote it. A `MouseDown` posted to the box directly (not through the screen) finds `None` (finding E2-6). No `__init__` is added.
 
 [Data: Input.selection]
 desc: the single-line box's `Selection(start, end)`; the cursor is its end (`cursor_position`, textual `_input.py:256-263`). Drawn only while the box has the focus (`_input.py:656-661`); the stock `Input._on_focus` sets `(0, len(value))` (`select_on_focus`, `_input.py:736-740`; no box of `s19_app/` changes it).
@@ -648,7 +644,7 @@ desc: the terminal. Receives the OSC 52 request `ESC ] 5 2 ; c ; <base64> BEL` t
 desc: `<the folder GetSystemDirectoryW reports>\WindowsPowerShell\v1.0\powershell.exe`, `C:\Windows\System32\…` on a default install. The only program the clipboard code starts (R-PASTE.16); none is started when it is missing (R-PASTE.17).
 
 [I/O: .github/workflows/clipboard-windows.yml]
-desc: new (D-6 B as ruled; R-PASTE.20). The text pinned in the preamble ("Pinned workflow"). Examples. (R-PASTE.20/1, static, LinuxH) the file read as text with `tests/test_suite_hygiene.py`'s parsers (`_workflow_jobs`, `_job_steps`, `_step_run`) → jobs `["clipboard-windows"]`; its `runs-on:` `windows-latest`; the `on:` block holds `workflow_dispatch:`, `push:` and `pull_request:`, each event's `paths:` names `s19_app/tui/os_clipboard_input.py`, `s19_app/tui/capped_text_area.py`, the OS clipboard test files and `.github/workflows/clipboard-windows.yml`, and no `branches:` line; `permissions:` `contents: read`; the checkout step has `persist-credentials: false`; one run line runs the OS clipboard test files with no `-n` and no `-m`; `_script_injections(text)` → `[]`; no `pull_request_target` or `workflow_run`; `tui-ci.yml` byte-equal to `e07fb00`'s. (R-PASTE.20/1 neg) `runs-on: ubuntu-latest` → RED; the `push:` trigger removed → RED. (R-PASTE.20/2, WinCI first run) the job log lists each OS clipboard test as `PASSED`, `FAILED` or `SKIPPED` (with the reason `runner clipboard unusable: <probe result>`), `0` deselected, and the probe test's outcome names the probe result.
+desc: new (D-6 B as ruled; R-PASTE.20). The text pinned in the preamble ("Pinned workflow"). Examples. (R-PASTE.20/1, static, LinuxH) the file read as text with `tests/test_suite_hygiene.py`'s parsers (`_workflow_jobs`, `_job_steps`, `_step_run`) → jobs `["clipboard-windows"]`; its `runs-on:` `windows-latest`; the `on:` block holds `workflow_dispatch:`, `push:` and `pull_request:`, each event's `paths:` names `s19_app/tui/os_clipboard_input.py`, `s19_app/tui/capped_text_area.py`, the OS clipboard test files and `.github/workflows/clipboard-windows.yml`, and no `branches:` line; `permissions:` `contents: read`; the checkout step has `persist-credentials: false`; one run line runs the OS clipboard test files with no `-n`, no `-m` and `--durations=20` (E3A-10 e), and R-PASTE.20/1 asserts through pytester that the run line's files collect `test_runner_clipboard_probe` (E3A-10 d); `_script_injections(text)` → `[]`; no `secrets.`, no job-level `permissions:`, no `cache`, no `upload-artifact` (E3S-07 b); no `pull_request_target` or `workflow_run`; `tui-ci.yml` byte-equal to `e07fb00`'s. (R-PASTE.20/1 neg) `runs-on: ubuntu-latest` → RED; the `push:` trigger removed → RED. (R-PASTE.20/2, WinCI first run) the job log lists each OS clipboard test as `PASSED`, `FAILED` or `SKIPPED` (with the reason `runner clipboard unusable: <probe result>`), `0` deselected, and the probe test's outcome names the probe result; the timeout is set from the first run (E3A-10 e). Notes (E3S-07): action pins by tag match the repo convention (SHA pinning is a backlog decision for all three files); `pip install pytest` unpinned as in `tui-ci.yml`; fork PR approval is confirmed in the repository settings (Settings → Actions → fork pull requests).
 
 [Outside: keys]
 desc: the keys a text box binds through the toolkit: `ctrl+v` → `action_paste`, `ctrl+c` → `action_copy`, `ctrl+x` → `action_cut` (textual `_input.py:138-140`, `_text_area.py:374-391`). Where Windows Terminal binds Ctrl+V to its own paste, Ctrl+V arrives as a terminal paste instead (CTX-PASTE, F §1.4 F2).
@@ -657,7 +653,7 @@ desc: the keys a text box binds through the toolkit: `ctrl+v` → `action_paste`
 desc: mouse button 3 over a text box, as the terminal reports it once the app turned mouse reporting on: a `MouseDown`, a `MouseUp` and the `Click` the App makes from them (textual `app.py:4060-4117`; `Pilot.click(button=3)` posts the same three, B pilot4 P12). A Shift+right-click in Windows Terminal is the terminal's own and does not arrive (E1 A1 finding 7).
 
 [Interface: text boxes]
-desc: the 47 text boxes of `s19_app/` (40 `OsClipboardInput`, 7 `CappedTextArea` with `JsonHighlightTextArea` among them; C) in the 24 places of the walk (9 rail windows, the command palette, 7 dialogs; Patch Editor paste buffer, Split / Join / Export, 5 dialogs). Census (R-TUI-044.1/18, R-PASTE.18/8, R-PASTE.19/1, R-PASTE.33/1): `0` stock `Input`, `0` editable stock `TextArea`, `47/47` of the two classes; a planted stock `Input` is reported. Walk (R-PASTE.19/2, R-PASTE.33/2): 24/24 places, a Ctrl+C / Ctrl+V round trip and a right-click round trip each.
+desc: the 47 text boxes of `s19_app/` (40 `OsClipboardInput`, 7 `CappedTextArea` with `JsonHighlightTextArea` among them; C) in the 24 places of the walk (9 rail windows, the command palette, 7 dialogs; Patch Editor paste buffer, Split / Join / Export, 5 dialogs). Census (R-TUI-044.1/18, R-PASTE.18/8, R-PASTE.19/1, R-PASTE.33/1): `0` stock `Input`, `0` editable stock `TextArea`, `47/47` of the two classes constructed by the system's windows and dialogs; a planted stock `Input` is reported. Textual's own command palette input (`ctrl+p`, a stock `CommandInput(Input)`, textual `command.py:518,797`) is the one operator-openable box outside this population — a known exception, so the `47/47` count stays honest (E3A-08; the `ctrl+k` palette named above is the app's own `OsClipboardInput`). Walk (R-PASTE.19/2, R-PASTE.33/2): 24/24 places, a Ctrl+C / Ctrl+V round trip and a right-click round trip each.
 offers: (R-TUI-044.1/2) "ctrl+v" → OsClipboardInput.action_paste
 offers: (R-PASTE.18/1) "ctrl+v" → CappedTextArea.action_paste
 offers: (R-PASTE.19/2) "ctrl+c" → OsClipboardInput.action_copy
@@ -731,28 +727,28 @@ anchor: read_os_clipboard
 seen: (R) `_read_via_ctypes` returns `None` both when the clipboard is held and when it opened but holds no text (an image, files copied in Explorer: no `CF_UNICODETEXT`, `os_clipboard_input.py:315-318`), and now its `''` also counts as no text; the cascade then starts the system PowerShell (`192`–`232` ms warm, up to `2.0` s cold, F §1.4) before the app-clipboard fallback
 cause: the Win32 layer does not tell "opened, no text" (an answer) from "could not open" (worth a rescue); the base does the same, after its Tk wait
 effect: such a Ctrl+V or right-click paste ends 0.2 to 2 s after the key; no row bounds it (R-TUI-043.10.1 measures a 1,000-character text) and R-TUI-043.6/3 pays it on WinCI
-decision: not changed here (`_read_via_ctypes` is unchanged in the slice, and a new return value would reach the loop-contract tests). For E3: keep, or let the Win32 layer end the cascade on "opened, no text"; if kept, a backlog row (proposed BL-I1a-7)
+decision: resolved at E3 (E3A-02): the layer contract becomes `None` = could not answer / `''` = answered, no text; `_read_via_ctypes` returns `''` when it opened the clipboard and found no `CF_UNICODETEXT`, and `read_os_clipboard` ends the cascade at the first `str`. The proposed BL-I1a-7 is dropped.
 
 finding E2-3 a second OS write if Inc 1b moves it into copy_to_clipboard
 anchor: _mirror_and_write_os_clipboard
 seen: (R) the tail calls the stock `app.copy_to_clipboard(text)` (`:764`) and then `write_os_clipboard` in the executor (`:768-769`), once each
 cause: Inc 1b's app-level seam for the one copy notice (orchestrator ruling I-1) is designed at Inc 1b's E2
 effect: an `S19TuiApp.copy_to_clipboard` override that also wrote the OS clipboard would write it twice for every text-box copy, and notify twice if it notified
-decision: I-1 item 3 pins one app-clipboard write, one OS write and at most one notice per tail call; P-1 and P-2 are PROPOSED for Inc 1b's E2
+decision: resolved at E3 (E3A-01): the tail calls the toolkit base `App.copy_to_clipboard(app, …)` (never an override), so an app override is never re-entered; P-2 is restated (the override calls the tail once, never the reverse) and P-1 puts the copy notice in the tail at Inc 1b (`os_clipboard_input.py` joins Inc 1b's file list).
 
 finding E2-4 on a Windows host every product-driving test opens the clipboard
 anchor: require_isolated_clipboard
 seen: (R) after Inc 1a a Ctrl+V or a Ctrl+C in a real `OsClipboardInput` or `CappedTextArea` opens the Windows clipboard (`_read_via_ctypes`, `_write_via_ctypes`), and the LinuxH cases of the new test files drive the product unstubbed
 cause: R-PASTE.21 speaks of a test about to open the OS clipboard; on a Windows host that is not GitHub-hosted, every product-driving test of the new files is one, not only the helpers
 effect: a run of the new files on a person's Windows PC would read and overwrite that person's clipboard
-decision: the guard is also an autouse fixture of `tests/test_b103_clipboard_*.py` on every Windows host and fails the test (never skips) unless the host is GitHub-hosted; the existing clipboard tests stub the cascade and need nothing
+decision: resolved at E3 (E3A-07, E3S-02): the guard moves to a suite-wide autouse session fixture in `tests/conftest.py` (beside the `LOCALAPPDATA` one) that, on a non-isolated Windows host, replaces the cascade tuples and the leaf layers with stand-ins that open nothing and record the attempt; a function fixture fails the test at teardown. One place, every file, Inc 1b's included.
 
 finding E2-5 a tag push also runs the Windows job
 anchor: [I/O: .github/workflows/clipboard-windows.yml]
 seen: (R, GitHub's workflow-syntax page, docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax, read 2026-11-07) "Path filters are not evaluated for pushes of tags."; with neither a branch nor a tag filter "the workflow will run for events affecting either branches or tags."
 cause: the ruled trigger set: `push` and `pull_request` with a `paths` filter and no branch filter
 effect: a tag push (for example `v1.0.0`) would run the job once; it writes nothing (read-only token, no secrets), so the cost is runner minutes on a public repository
-decision: kept as ruled; a `tags-ignore` would add a filter that R-PASTE.20/1 does not name, so it is the orchestrator's call at E3
+decision: resolved at E3 (E3A-13, E3S-08): keep the triggers as ruled; never `tags-ignore` alone (it silently drops the branch-push trigger). If tag runs are unwanted, use `push: branches: ["**"]` with the `paths` and change R-PASTE.20/1's "no branch filter" to "the branch filter `**` only".
 
 finding E2-6 a press posted to the box itself has no focus record
 anchor: OsClipboardInput._on_mouse_down

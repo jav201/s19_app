@@ -12,13 +12,15 @@ Every expected result was derived from the rows by hand and then compared with t
 - **BAL**, **SRC**, **SWB**, **SWA** — the names of `examples/case_00_public/BalanceTube_STMicro.a2l` (111), `from_source.a2l` (72), `software_b.a2l` (67), `software_a.a2l` (13,990), read the same way.
 - **TW** = [`RPM`, `rpm`, `Rpm`]; **TW2** = [`Rpm`, `rpm`, `RPM`]; **NA** = [`Drück_Max`, `DRÜCK_MAX`, `druck_max`]; **CUR** = [`ABSValue`, `AValue`, `engineSpeed`, `Map3D`].
 - **REF** — the SWA names in file order, then the SWA names each with `_1` appended, then with `_2`, then with `_3`; the first 50,000 (all unique).
-- **QSET** — the 22 queries `a`, `e`, `0`, `zz`, `ab`, `JotafVod_msrqlLzL_kh2C_rWl_pfue._0_`, `JotafVod_msr`, `srqlLzL_`, `0 jotaf`, `JVmL`, `xqzjvkw`, `qqqq zzzz`, `aaaa`, `e e e`, `Nzukij`, `Ierxjr_Eud`, `ledRing`, `pposbxiif`, `cnt`, `temp_sensor_max`, `x y z w v u`, `pposbxiifkdgfiajnbbpvb_dyan_xvz1` (they reach every rule, the empty result and the worst case the pilots found).
+- **REF6** — the first 50,000 names of `examples/case_06_large_nested_a2l/firmware.a2l` (every name 13 characters, `CHAR_00000_00` / `MEAS_00000_00`), read the same way. Its queries: `m`, `meas_`, `chr`, `mesa`, `cahr`, `cr0`, `char 1`, `0`, `chr 0`, `ch00`, `meas 1`, `c 0 1`.
+- **QSET** — 33 queries: `a`, `e`, `0`, `zz`, `ab`, `JotafVod_msrqlLzL_kh2C_rWl_pfue._0_`, `JotafVod_msr`, `srqlLzL_`, `0 jotaf`, `JVmL`, `xqzjvkw`, `qqqq zzzz`, `aaaa`, `e e e`, `Nzukij`, `Ierxjr_Eud`, `ledRing`, `pposbxiif`, `cnt`, `temp_sensor_max`, `x y z w v u`, `pposbxiifkdgfiajnbbpvb_dyan_xvz1` (they reach every rule, the empty result and the worst case the pilots found); `njraipjtbtu lsuakcoj hsxgibymjxu orfltalc uadvdygb zobnkw`, `votklbi fjblnabj qghque pdjxmq tiprdynotu djchlitjt`, `lmmwngodou jadkvqy khbnukc qomfrybiza evfwbqj` (E3A-02, multi-word); `e ` × 128, `a b c … z ` cut at 256, `0 ` × 128, `a` × 256, two seeded 256-character `,`-joined SWA name lists, the longest REF name whole and with a transposition (E3S-01).
 
 | Case | Objective | Class | Preconditions | Inputs | Expected result | Tests (full / partial) | Coverage | Result |
 |---|---|---|---|---|---|---|---|---|
 | R-A2L-MATCH.1/1 | Verify that leading and trailing spaces are not part of the query text | normal | C08 | `  VALUE_0001  ` | exactly [VALUE_0001 · exact · (0,10)] | | gap | not_run |
 | R-A2L-MATCH.1/2 | Verify that a leading tab and a trailing line feed are not part of the query text | normal | C08 | `\tVALUE_0001\n` | exactly [VALUE_0001 · exact · (0,10)] | | gap | not_run |
 | R-A2L-MATCH.1/3 | Verify that stripped whitespace counts in no span | normal | C08 | ` value_000 `, limit 5 | exactly [VALUE_0001 … VALUE_0005, each · prefix · (0,9)] | | gap | not_run |
+| R-A2L-MATCH.1/4 | Verify that a control character that is not defined whitespace is not stripped | robustness | C08 | U+001C followed by `VALUE_0001` | exactly [VALUE_0001 · token · (0,5),(6,10)] | | gap | not_run |
 | R-A2L-MATCH.2/1 | Verify that an empty query lists nothing | robustness | C08 | `` | [] | | gap | not_run |
 | R-A2L-MATCH.2/2 | Verify that a query of spaces lists nothing | robustness | C08 | `   ` | [] | | gap | not_run |
 | R-A2L-MATCH.2/3 | Verify that a query of tab and line feed lists nothing | robustness | C08 | `\t\n` | [] | | gap | not_run |
@@ -27,7 +29,7 @@ Every expected result was derived from the rows by hand and then compared with t
 | R-A2L-MATCH.3/1 | Verify that lowercase query letters match uppercase name letters | normal | C08 | `value_0001` | exactly [VALUE_0001 · exact · (0,10)] | | gap | not_run |
 | R-A2L-MATCH.3/2 | Verify that mixed-case query letters match | normal | C08 | `Value_0001` | exactly [VALUE_0001 · exact · (0,10)] | | gap | not_run |
 | R-A2L-MATCH.3/3 | Verify that names differing only in case all match | normal | TW | `rpm` | exactly [rpm · exact · (0,3); RPM · exact · (0,3); Rpm · exact · (0,3)] | | gap | not_run |
-| R-A2L-MATCH.4/1 | Verify that a non-ASCII letter is not folded | robustness | NA | `drück` | exactly [Drück_Max · prefix · (0,5); druck_max · fuzzy · (0,5) · e1; DRÜCK_MAX · fuzzy · (0,5) · e1] | | gap | not_run |
+| R-A2L-MATCH.4/1 | Verify that a non-ASCII letter is not folded | robustness | NA | `drück` | exactly [Drück_Max · prefix · (0,5); DRÜCK_MAX · fuzzy · (0,5) · e1; druck_max · fuzzy · (0,5) · e1] | | gap | not_run |
 | R-A2L-MATCH.4/2 | Verify the same with an uppercase non-ASCII query | robustness | NA | `DRÜCK` | exactly [DRÜCK_MAX · prefix · (0,5); Drück_Max · fuzzy · (0,5) · e1; druck_max · fuzzy · (0,5) · e1] | | gap | not_run |
 | R-A2L-MATCH.4/3 | Verify that `-` and `_` are different characters | robustness | C08 | `VALUE-0001` | exactly [VALUE_0001 · token · (0,5),(6,10)] | | gap | not_run |
 | R-A2L-MATCH.5/1 | Verify an exact match | normal | C08 | `VALUE_0001` | exactly [VALUE_0001 · exact · (0,10)] | | gap | not_run |
@@ -65,9 +67,11 @@ Every expected result was derived from the rows by hand and then compared with t
 | R-A2L-MATCH.12/1 | Verify that a 3-letter token allows 1 edit | normal | C08 | `maq`, limit 3 | 3 entries, each · fuzzy · e1 | | gap | not_run |
 | R-A2L-MATCH.12/2 | Verify that a 5-letter token allows 1 edit | normal | C08 | `cuvre`, limit 3 | 3 entries, each · fuzzy · e1 | | gap | not_run |
 | R-A2L-MATCH.12/3 | Verify that a 5-letter token allows no second edit | normal | C08 | `cvure` | [] | | gap | not_run |
+| R-A2L-MATCH.12/4 | Verify that a non-ASCII digit is a letter, not a digit token | robustness | [`٣٣٣_X`] | `٣٣٤` | exactly [٣٣٣_X · fuzzy · (0,3) · e1] | | gap | not_run |
 | R-A2L-MATCH.13/1 | Verify that a 7-letter token allows 2 edits | normal | C08 | `valuexx_0001` | exactly [VALUE_0001 · fuzzy · (0,5),(6,10) · e2] | | gap | not_run |
 | R-A2L-MATCH.13/2 | Verify that an 8-letter token allows no third edit | normal | C08 | `valuexxx_0001` | [] | | gap | not_run |
 | R-A2L-MATCH.13/3 | Verify that a 6-letter token allows 1 and 2 edits | normal | [`CUVE`, `CURVE_0001`] | `curvee` | exactly [CURVE_0001 · fuzzy · (0,5) · e1; CUVE · fuzzy · (0,4) · e2] | | gap | not_run |
+| R-A2L-MATCH.13/4 | Verify that a 6-letter token at OSA distance 3 gives no match | normal | C08 | `crxuve` | [] | | gap | not_run |
 | R-A2L-MATCH.14/1 | Verify that every match is listed | normal | C08 | `value_000`, limit 100 | exactly 20 entries: VALUE_0001 … VALUE_0009 · prefix · (0,9), then VALUE_0010, 0020, 0030, 0040, 0050, 0060, 0070, 0080, 0090 · subsequence · (0,5),(6,8),(9,10), then VALUE_0100, VALUE_0200 · subsequence · (0,5),(6,7),(8,10) | | gap | not_run |
 | R-A2L-MATCH.14/2 | Verify the same for substring matches | normal | C08 | `0001`, limit 100 | exactly the 6 entries of R-A2L-MATCH.7/1 | | gap | not_run |
 | R-A2L-MATCH.15/1 | Verify that a name that meets no rule is left out | robustness | C08 | `temp_sensor_max` | [] | | gap | not_run |
@@ -93,7 +97,7 @@ Every expected result was derived from the rows by hand and then compared with t
 | R-A2L-MATCH.23/2 | Verify length before case-exactness | normal | [`rpm_x`, `RPMX`] | `rpm` | exactly [RPMX · prefix · (0,3); rpm_x · prefix · (0,3)] | | gap | not_run |
 | R-A2L-MATCH.24/1 | Verify the case-exact name first (lowercase query) | normal | TW | `rpm` | entry 1 is `rpm` (R-A2L-MATCH.3/3) | | gap | not_run |
 | R-A2L-MATCH.24/2 | Verify the case-exact name first (uppercase query) | normal | TW | `RPM` | exactly [RPM · exact · (0,3); Rpm · exact · (0,3); rpm · exact · (0,3)] | | gap | not_run |
-| R-A2L-MATCH.24/3 | Verify case-exactness among fuzzy names | robustness | NA | `drück` | entry 2 is druck_max and entry 3 is DRÜCK_MAX (R-A2L-MATCH.4/1) | | gap | not_run |
+| R-A2L-MATCH.24/3 | Verify that fuzzy names of one rule, key and length fall to code-point order, not case-exactness | robustness | NA | `drück` | entry 2 is DRÜCK_MAX and entry 3 is druck_max (R-A2L-MATCH.4/1) | | gap | not_run |
 | R-A2L-MATCH.25/1 | Verify code-point order | normal | C08 | `0001` | entries 2–4 are ASCII_0001, CURVE_0001, VALUE_0001 in that order | | gap | not_run |
 | R-A2L-MATCH.25/2 | Verify that the input order decides nothing | normal | C08r | `0001` | the same 6 entries as R-A2L-MATCH.7/1, in the same order | | gap | not_run |
 | R-A2L-MATCH.25/3 | Verify code-point order of case twins | normal | TW2 | `rpm` | exactly [rpm · exact · (0,3); RPM · exact · (0,3); Rpm · exact · (0,3)] | | gap | not_run |
@@ -104,8 +108,8 @@ Every expected result was derived from the rows by hand and then compared with t
 | R-A2L-MATCH.27/3 | Verify that the span counts the query text, not the whitespace | normal | C08 | ` value_000 `, limit 5 | each entry (0,9) | | gap | not_run |
 | R-A2L-MATCH.28/1 | Verify the boundary occurrence, not the leftmost | normal | [`DiscountCount`] | `count` | exactly [DiscountCount · substring · (8,13)] | | gap | not_run |
 | R-A2L-MATCH.28/2 | Verify a boundary span after a separator | normal | C08 | `0001` | MAP_0001's spans are exactly (4,8) | | gap | not_run |
-| R-A2L-MATCH.29/1 | Verify the span with no boundary occurrence | robustness | BAL | `ounter`, limit 4 | model.MainClass.ledController.sw.timeCounter's spans are exactly (38,44) | | gap | not_run |
-| R-A2L-MATCH.29/2 | Verify the same inside an uppercase run | robustness | SWB | `sahw` | entry 1 is LukPvq.JXML_UPQ_BI.OKSAhwvcueaniy · substring · (21,25) | | gap | not_run |
+| R-A2L-MATCH.29/1 | Verify the span with no boundary occurrence | normal | BAL | `ounter`, limit 4 | model.MainClass.ledController.sw.timeCounter's spans are exactly (38,44) | | gap | not_run |
+| R-A2L-MATCH.29/2 | Verify the same inside an uppercase run | normal | SWB | `sahw` | entry 1 is LukPvq.JXML_UPQ_BI.OKSAhwvcueaniy · substring · (21,25) | | gap | not_run |
 | R-A2L-MATCH.30/1 | Verify token spans | normal | C08 | `blk val 00`, limit 3 | each entry (0,3),(4,7),(8,10) | | gap | not_run |
 | R-A2L-MATCH.30/2 | Verify that a query token takes the leftmost name token it starts | normal | SRC | `knife 1 x` | parameter_instance[1].Knife[0].x's spans are exactly (19,20),(22,27),(31,32) | | gap | not_run |
 | R-A2L-MATCH.30/3 | Verify a one-letter token span | normal | CUR | `a value` | ABSValue's spans are exactly (0,1),(3,8) | | gap | not_run |
@@ -122,9 +126,13 @@ Every expected result was derived from the rows by hand and then compared with t
 | R-A2L-MATCH.34/2 | Verify spans in offset order whatever the query order | normal | C08 | `blk val 00`, limit 1 | VAL_BLK_0001's spans are exactly (0,3),(4,7),(8,10), in that order | | gap | not_run |
 | R-A2L-MATCH.34/3 | Verify joined spans of two tokens | normal | CUR | `a value` | AValue's spans are exactly (0,6) | | gap | not_run |
 | R-A2L-MATCH.35/1 | Verify the preparation time of 50,000 names | normal | cachyos-rtx, Python 3.11.18; host load printed before and after | prepare REF 3 times | the median of the 3 preparation times ≤ 5.0 s | | gap | not_run |
-| R-A2L-MATCH.36/1 | Verify the ranking time per keystroke | normal | REF prepared once; cachyos-rtx, Python 3.11.18; host load printed | each query of QSET, limit 20, ranked 7 times in a row | for every query the median of its 7 times ≤ 200 ms | | gap | not_run |
+| R-A2L-MATCH.36/1 | Verify the ranking time per keystroke | normal | REF prepared once and REF6 prepared once; cachyos-rtx, Python 3.11.18; host load printed | each query of QSET over REF and each query of REF6, limit 20, ranked 7 times in a row | for every query the median of its 7 times ≤ 200 ms | | gap | not_run |
 | R-A2L-MATCH.37/1 | Verify that the prepared reference list stays within 64 MiB | normal | REF (50,000 names); cachyos-rtx, Python 3.11.18 | prepare REF once under tracemalloc | the tracemalloc peak ≤ 67,108,864 bytes (64 MiB) | | gap | not_run |
+| R-A2L-MATCH.38/1 | Verify that a query at the cap is ranked | robustness | C08 | `'VALUE_0001_' * 23 + 'VAL'` (256 characters) | exactly [VALUE_0001 · token · (0,5),(6,10)] | | gap | not_run |
+| R-A2L-MATCH.38/2 | Verify that a query over the cap lists nothing | robustness | C08 | `'VALUE_0001_' * 23 + 'VALU'` (257 characters) | [] | | gap | not_run |
+| R-A2L-MATCH.39/1 | Verify that a name of 1,024 characters is indexed and listed | robustness | one name of 1,024 `x` characters | `x` | exactly [the name · prefix · (0,1)] | | gap | not_run |
+| R-A2L-MATCH.39/2 | Verify that a name of 1,025 characters is left out | robustness | one name of 1,025 `x` characters | `x` | [] | | gap | not_run |
 | AT-B103-I4-1 | Verify through I-3, over real case-08 names, that typing a name keystroke by keystroke gives the expected list at each step (US-I4-1) | normal | C08, limit 5 | `m`, `ma`, `map`, `map_`, `map_00`, `map_002`, `map_0020`, ranked in turn on the same prepared list | the first five steps: exactly [MAP_0001 … MAP_0005, each · prefix · (0,k)] with k = 1, 2, 3, 4, 6; `map_002`: exactly [MAP_0020 · prefix · (0,7); MAP_0002 · subsequence · (0,3),(4,6),(7,8); MAP_0012 · subsequence · (0,3),(4,6),(7,8)]; `map_0020`: exactly [MAP_0020 · exact · (0,8)] — rows .5, .6, .9, .18, .23, .25, .27, .31 | | gap | not_run |
 | AT-B103-I4-2 | Verify through I-3, over the 13,990 real-shape names, that a name is found first from its whole text, its start, its middle, its end, two of its words in either order and a typo (the operator's words, US-I4-1) | normal | SWA, limit 5; target `JotafVod_msrqlLzL_kh2C_rWl_pfue._0_` | the target, `jotafvod`, `msrqlLzL`, `pfue._0_`, `jotaf vod`, `vod jotaf`, `jotfa vod`, `jotaf_vdo` | in each list entry 1 is the target, as: exact (0,35); prefix (0,8); substring (9,17); substring (27,35); token (0,8); token (0,8); fuzzy (0,8) e1; fuzzy (0,8) e1 — rows .5–.8, .10, .20 (under the handoff order, D-3 A, `jotfa vod` puts the target third, `evidence-e1/i4e1-at-examples-transcript.txt`) | | gap | not_run |
 
-**Counts:** 108 coverage items over the 37 rows (.1 3, .2 5, .3 3, .4 3, .5 3, .6 3, .7 4, .8 9, .9 4, .10 6, .11 3, .12 3, .13 3, .14 2, .15 2, .16 3, .17 2, .18 3, .19 2, .20 3, .21 3, .22 1, .23 2, .24 3, .25 3, .26 2, .27 3, .28 2, .29 2, .30 3, .31 3, .32 3, .33 3, .34 3, .35 1, .36 1, .37 1) and 2 black-box cases: 110 cases (G-T1 107, G-T2 3). Negative controls (one or two per row, run at E5 in a copy of the tree): `01-requirements.md`, column "Negative control".
+**Counts:** 115 coverage items over the 39 rows (.1 4, .2 5, .3 3, .4 3, .5 3, .6 3, .7 4, .8 9, .9 4, .10 6, .11 3, .12 4, .13 4, .14 2, .15 2, .16 3, .17 2, .18 3, .19 2, .20 3, .21 3, .22 1, .23 2, .24 3, .25 3, .26 2, .27 3, .28 2, .29 2, .30 3, .31 3, .32 3, .33 3, .34 3, .35 1, .36 1, .37 1, .38 2, .39 2) and 2 black-box cases: 117 cases (G-T1 115, G-T2 2). Negative controls (one or two per row, run at E5 in a copy of the tree): `01-requirements.md`, column "Negative control".

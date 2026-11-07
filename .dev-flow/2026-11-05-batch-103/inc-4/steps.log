@@ -7,3 +7,5 @@
 2026-11-07T00:45:12Z E3 start claude-opus-5-5 (security, inc-4 label matcher)
 2026-11-07T01:04:25Z E3 end claude-opus-5-5 (security, inc-4): FAIL - 2 MAJOR (E3S-01 unbounded query, E3S-02 case-exact pass over whole groups breaks .36 on case_06), 2 MEDIUM, 1 MINOR, 2 LOW, 1 INFO; probes on cachyos-rtx /tmp/b103-e3-4-security/
 2026-11-07T01:13:24Z E3 end claude-opus-5-5 (architect, inc-4): FAIL — 2 MAJOR (E3A-01 case-exactness over unbounded same-length groups: case_06 50k up to 717 ms; E3A-02 one trie walk per long query word: 5-6 words 244-297 ms on REF), 2 MEDIUM, 3 MINOR, 2 LOW, 2 INFO; E2 pilot re-run confirms 0 mismatches, 18,940,597 B, build 1.768 s, worst rank 61.6 ms; both fixes measured (85.5 / 71.2 ms)
+2026-11-07T01:21:48Z E3 correction unit R (rows, cases) — deepseek-v4-pro via pi — 10 findings applied
+2026-11-07T01:24:44Z E3 correction unit G (graph) — deepseek-v4-pro via pi — 14 findings applied

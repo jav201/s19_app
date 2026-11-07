@@ -6,9 +6,9 @@ Base `e07fb00`. Line numbers are "as of `e07fb00`". Rows: `01-requirements.md`; 
 
 | File | Functions | Rows |
 |---|---|---|
-| `s19_app/tui/services/label_match.py` (**new**, D-11 A) | 3 types, 2 public functions, 7 private helpers | R-A2L-MATCH.1 … .37 |
+| `s19_app/tui/services/label_match.py` (**new**, D-11 A) | 4 types, 2 public functions, 15 private helpers | R-A2L-MATCH.1 … .39 |
 
-**Totals:** **1 source file of the 4 allowed** (new). 12 graph nodes (PLAN estimate ~8). 0 changed, 0 removed functions: nothing in `e07fb00` changes. Not source: none (the user guide gains the autocomplete with Inc 7). Tests (not capped): 2 new files (§4).
+**Totals:** **1 source file of the 4 allowed** (new). 17 functions, 4 types, 18 graph nodes (PLAN estimate ~8). 0 changed, 0 removed functions: nothing in `e07fb00` changes. Not source: none (the user guide gains the autocomplete with Inc 7). Tests (not capped): 2 new files (§4).
 
 ## 2. Function map
 
@@ -17,17 +17,26 @@ Base `e07fb00`. Line numbers are "as of `e07fb00`". Rows: `01-requirements.md`; 
 | `MatchRule` | `str` enum | six members in rank order: `exact`, `prefix`, `substring`, `token`, `fuzzy`, `subsequence` | .5–.10, .16, .20 |
 | `LabelMatch` | frozen dataclass | `name: str`, `rule: MatchRule`, `edits: int` (total edits for `fuzzy`, else 0), `spans: tuple[tuple[int, int], ...]` | .16, .26–.34 |
 | `LabelIndex` | immutable class (opaque) | the prepared name list: distinct names in first-occurrence order, their folded forms, their tokens, their boundary offsets, and a structure of the distinct folded tokens for the token and fuzzy steps | .17, .35, .37 |
-| `build_label_index(names: Iterable[str]) -> LabelIndex` | public | de-duplicates, folds, tokenises, indexes; `TypeError` for a non-`str` name (I-3) | .17, .35, .37 |
-| `rank(query: str, index: LabelIndex, limit: int) -> list[LabelMatch]` | public | strips the query (.1); `[]` for no letter or digit (.2) or a limit below 1 (.19); finds each name's first rule (.14–.16), orders (.20–.25), cuts at the limit (.18); `TypeError` for a non-`str` query or a non-`int` limit (I-3) | .1, .2, .14–.16, .18–.25, .36 |
+| `_Query` | NamedTuple | the parsed query: `text: str` (folded), `tokens: tuple[str, ...]` (folded token strings), `keys: str` (folded) | — |
+| `build_label_index(names: Iterable[str]) -> LabelIndex` | public | de-duplicates, folds, tokenises, indexes; leaves out a name longer than 1,024 characters (.39); `TypeError` for a non-`str` name or a `str`/`bytes` argument (I-3) | .17, .35, .37, .39 |
+| `rank(query: str, index: LabelIndex, limit: int) -> list[LabelMatch]` | public | strips the query (.1); `[]` for no letter or digit (.2), a limit below 1 (.19) or a stripped query longer than 256 characters (.38); finds each name's first rule (.14–.16), orders (.20–.25), cuts at the limit (.18); `TypeError` for a non-`str` query or a non-`int` limit (I-3) | .1, .2, .14–.16, .18–.25, .36, .38 |
 | `_fold(text: str) -> str` | private | `A`–`Z` → `a`–`z`, every other character kept (same length) | .3, .4 |
 | `_tokens(text: str) -> tuple[tuple[int, int], ...]` | private | the token spans of CTX-A2L-MATCH *token*, read on the unfolded text (the case cuts need the case) | .8, .10, .21, .28–.30, .32 |
 | `_allowed_edits(token: str) -> int` | private | 0 for digits or 1–2 letters, 1 for 3–5 letters, 2 for 6 or more | .11–.13 |
 | `_prefix_distance(query_token: str, name_token: str, cap: int) -> int` | private | the optimal string alignment distance to the nearest prefix, with an early exit above `cap` | .10, .13, .22, .33 |
-| `_classify(query, name, folded: bool) -> tuple[MatchRule, int, tuple] \| None` | private | the first rule in rank order the name meets, its rule key and its spans; with `folded=False` it answers case-exactness (.24) | .5–.10, .16, .21, .22, .24, .26–.32 |
+| `_classify(query: _Query, name: str) -> tuple[MatchRule, int, tuple] \| None` | private | the first rule in rank order the name meets, its rule key and its spans (case-exactness is decided in `rank` by string comparison, not here) | .5–.10, .15, .16, .21, .26–.33 |
 | `_join_spans(spans) -> tuple[tuple[int, int], ...]` | private | the fewest spans in offset order covering the same offsets | .34 |
 | `_order_key(match, case_exact: bool) -> tuple` | private | (rank of the rule, rule key, length, 0 if case-exact else 1, name) | .20–.25 |
+| `LabelIndex.__len__(self) -> int` | private | the number of distinct names the index holds: `len(self.names)` | .17 |
+| `_char_mask(text: str) -> int` | private | the OR of one bit per character of an already folded `text`: `a`–`z` bits 0–25, `0`–`9` bits 26–35, any other `c` bit `36 + ord(c) % 27` | .9, .36 |
+| `_at_boundary(name: str, offset: int) -> bool` | private | whether `offset` is a CTX-A2L-MATCH boundary offset (0; a separator; or a token start, read on the unfolded name); the single source of the token cut rules | .21, .28, .29 |
+| `_subsequence(keys: str, text: str) -> tuple[int, ...] \| None` | private | the leftmost offsets of the key characters in `text`, each after the one before, or `None` | .9, .31 |
+| `_parse_query(query: str) -> _Query \| None` | private | strips exactly the six CTX whitespace characters (never `str.strip`); `None` when no letter or digit; else text folded, tokens folded, keys folded | .1–.3, .8 |
+| `_token_range(tokens: tuple[str, ...], prefix: str) -> tuple[int, int]` | private | the contiguous id range of the sorted distinct tokens that start with `prefix` | .8, .11, .30 |
+| `_build_trie(tokens: tuple[str, ...]) -> tuple[str, array, array, array]` | private | the pre-order array trie of the sorted distinct tokens (chars, depth, first, end) | .35–.37 |
+| `_fuzzy_token_distances(index: LabelIndex, query_token: str, allowed: int) -> dict[int, int]` | private | `{token id: prefix distance}` for every distinct token within `allowed` edits, one trie walk | .10–.13, .36 |
 
-Design note for E2, not a requirement: the pilot's index (`evidence-e1/i4e1-pilot3.py`, `IndexB`) resolves the rules tier by tier and stops once `limit` names are found; it finds fuzzy candidates by walking a trie of the distinct folded tokens with one alignment column per node, pruned above the allowed edits. That meets .35/.36 on cachyos-rtx (2.00 s, ≤ 122.6 ms) but its dict trie costs ~137 MiB at 50,000 names (D-12, BL-I4-4); a sorted list of distinct tokens with shared-prefix columns gives the same walk with far less memory. The definitional oracle (`evaluate_b`, `naive_rank_b`) is the reference the testers' expected values were checked against, not code to copy.
+Design note: superseded by the graph's compact index (`codewire/graph-inc4.md`, finding E2-1) — flat `array` buffers, a pre-order array trie and a sorted tuple of distinct tokens in place of the pilot's dict trie and bitmasks; the definitional oracle (`evaluate_b`, `naive_rank_b`) is the reference the testers' expected values were checked against, not code to copy.
 
 ## 3. Callers read (rule 8: read before you write)
 
