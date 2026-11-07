@@ -1,0 +1,50 @@
+base commit: 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+mutant: M4
+
+mutation:
+==== NEW FILE s19_app/_e5_m4_mutant.py ====
+"""E5 M4: a plain, never-reached class with an unbound action_copy."""
+
+
+class _E5PlainCard:
+    def action_copy(self) -> None:
+        return None
+
+
+s19_app.__file__: <HOME>/work/s19_i12mut_m4/s19_app/__init__.py
+
+--- landed grep M4: 's19_app/_e5_m4_mutant.py' marker='def action_copy' expected=present found=present OK=True ---
+5:    def action_copy(self) -> None:
+
+
+nodes (1):
+  tests/test_b101_reach_and_reports_escape.py::test_r_shell_keys_3_1_every_action_has_a_reach
+
+
+--- pytest ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________________ test_r_shell_keys_3_1_every_action_has_a_reach ________________
+
+tree = {'s19_app/__init__.py': '', 's19_app/_e5_m4_mutant.py': '"""E5 M4: a plain, never-reached class with an unbound action...  close_run()\n\n    stats = DiffStats(run_counts=run_counts, byte_counts=byte_counts)\n    return runs, stats\n', ...}
+tree_census = Census(dialogs={'BulkParameterAddScreen', 'SaveProjectScreen', 'LoadDialog', 'FileRefChooserScreen', 'FlowBlockEditScr...ring'}, 'WindowSection.action_show_window_usage_help': {'string'}}, actions_without_reach=['_E5PlainCard.action_copy'])
+
+    def test_r_shell_keys_3_1_every_action_has_a_reach(tree: Dict[str, str], tree_census: Census) -> None:
+        """R-SHELL-KEYS.3/1: 0 actions without a reach; at least 80 actions censused;
+        the six clipboard overrides reached through the toolkit's bindings. Negative
+        controls (synthetic mutants of the base's shapes): a dead chain (an alias whose
+        only call lies in a function no reached function calls), a lone dead alias, an
+        unbound ``action_copy`` on a class that is not a toolkit widget, and an action
+        whose name is only a widget id and a comparison literal (E3A-R2-1)."""
+        assert len(tree_census.actions) >= 80, len(tree_census.actions)
+>       assert tree_census.actions_without_reach == [], tree_census.actions_without_reach
+E       AssertionError: ['_E5PlainCard.action_copy']
+E       assert ['_E5PlainCard.action_copy'] == []
+E         
+E         Left contains one more item: '_E5PlainCard.action_copy'
+E         Use -v to get more diff
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:554: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_reach_and_reports_escape.py::test_r_shell_keys_3_1_every_action_has_a_reach
+1 failed in 1.53s

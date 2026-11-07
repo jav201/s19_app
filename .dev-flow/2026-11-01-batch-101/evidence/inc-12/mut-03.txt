@@ -1,0 +1,57 @@
+base commit: 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+mutant: M3
+
+mutation:
+==== diff -u s19_app/tui/app.py ====
+--- <HOME>/work/s19_i12mut/s19_app/tui/app.py	2026-11-07 05:38:44.570960736 -0600
++++ <HOME>/work/s19_i12mut_m3/s19_app/tui/app.py	2026-11-07 06:09:29.830242590 -0600
+@@ -11102,6 +11102,10 @@
+         event.stop()
+         event.prevent_default()
+ 
++    def action_view_mac(self) -> None:
++        """Legacy alias: activate the MAC View rail screen (superseded by key ``3``)."""
++        self.action_show_screen("mac")
++
+     def action_cycle_density(self) -> None:
+         """
+         Summary:
+
+
+s19_app.__file__: <HOME>/work/s19_i12mut_m3/s19_app/__init__.py
+
+--- landed grep M3: 's19_app/tui/app.py' marker='def action_view_mac' expected=present found=present OK=True ---
+11105:    def action_view_mac(self) -> None:
+
+
+nodes (1):
+  tests/test_b101_reach_and_reports_escape.py::test_r_shell_keys_3_1_every_action_has_a_reach
+
+
+--- pytest ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________________ test_r_shell_keys_3_1_every_action_has_a_reach ________________
+
+tree = {'s19_app/__init__.py': '', 's19_app/cli.py': 'import argparse\nimport logging\nfrom pathlib import Path\nfrom .core i... + 1][0]\n                print(f"  [GAP]  0x{end:08X} - 0x{next_start - 1:08X} ({next_start - end} bytes)")\n\n', ...}
+tree_census = Census(dialogs={'SaveFlowScreen', '_QuitQuestionScreen', 'ChangeSetJsonScreen', 'WindowHelpScreen', 'FileRefChooserScr...ing'}, 'WindowSection.action_show_window_usage_help': {'string'}}, actions_without_reach=['S19TuiApp.action_view_mac'])
+
+    def test_r_shell_keys_3_1_every_action_has_a_reach(tree: Dict[str, str], tree_census: Census) -> None:
+        """R-SHELL-KEYS.3/1: 0 actions without a reach; at least 80 actions censused;
+        the six clipboard overrides reached through the toolkit's bindings. Negative
+        controls (synthetic mutants of the base's shapes): a dead chain (an alias whose
+        only call lies in a function no reached function calls), a lone dead alias, an
+        unbound ``action_copy`` on a class that is not a toolkit widget, and an action
+        whose name is only a widget id and a comparison literal (E3A-R2-1)."""
+        assert len(tree_census.actions) >= 80, len(tree_census.actions)
+>       assert tree_census.actions_without_reach == [], tree_census.actions_without_reach
+E       AssertionError: ['S19TuiApp.action_view_mac']
+E       assert ['S19TuiApp.action_view_mac'] == []
+E         
+E         Left contains one more item: 'S19TuiApp.action_view_mac'
+E         Use -v to get more diff
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:554: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_reach_and_reports_escape.py::test_r_shell_keys_3_1_every_action_has_a_reach
+1 failed in 1.60s
