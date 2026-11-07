@@ -51,7 +51,7 @@ func: changed (on Inc 6's version). was: Checks-run end, Patch Editor load tail,
 module: s19_app/tui/app.py
 calls: CheckEditorPanel.clear_check_results, S19TuiApp._refresh_hex_views_after_write, S19TuiApp._refresh_a2l_values_after_write, SplitJoinWindow.note_image_bytes_written
 examples: (R-SEG-PREV.21/1) fixture three, join-fill pick displayed, a Save project commit writes `0x8015`, `0x8016` = `BB CC` → band `data 8 · fill 13 · conflict 2 · fill 9 · data 8`, state `⚠ 2 B would clobber source — abort on export` (base P: `conflict 1` at offset 19)
-examples: (R-SEG-PREV.22/1) `sje_table` focused before the commit → `sje_table` focused after
+examples: (R-SEG-PREV.22/1) `#sje_export` focused before the commit (the open leaves `sje_table` focused; `tab`) → `#sje_export` focused after; the window's open refresh would focus `sje_table` (E4 integration I-D5: the E1 example started on `sje_table`, which that negative control cannot change)
 examples: (A10-08) no `#check_editor_panel` mounted → the three notices still run (Inc 6's body: they would be skipped)
 
 S19TuiApp._refresh_hex_views_after_write

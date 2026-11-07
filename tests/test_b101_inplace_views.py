@@ -1216,18 +1216,27 @@ def test_r_seg_prev_21_2_hidden_write_shows_on_the_next_open(tmp_path: Path) -> 
 
 
 def test_r_seg_prev_22_1_preview_refresh_keeps_the_focus(tmp_path: Path) -> None:
-    """R-SEG-PREV.22 case /1: as R-SEG-PREV.21/1 with ``sje_table`` focused
-    before ``ctrl+s`` -> the focused widget after the dialog equals the one
-    before it.
+    """R-SEG-PREV.22 case /1: as R-SEG-PREV.21/1; the open leaves ``sje_table``
+    focused and ``tab`` moves the focus to the window's ``EXPORT`` button
+    (``#sje_export``) before ``ctrl+s`` -> the focused widget after the dialog
+    equals the one before it.
 
     The node first waits for the re-planned band (the refresh itself), so base
     is RED there; its focus clause is first observable with the fix.
-    Negative control: the notice calls the window's open refresh (it moves the
-    focus off ``sje_table``) -> RED."""
+    Negative control: the notice calls the window's open refresh, which
+    focuses ``#sje_table`` -> RED. The focus starts off ``#sje_table`` because
+    the open's refresh already put it there: with ``#sje_table`` focused the
+    control cannot be told apart (E4 integration I-D5)."""
 
     async def scenario(app, pilot, log):
         await sj_scene(pilot, app, log, tmp_path)
         assert app.focused is not None and app.focused.id == "sje_table", app.focused
+        await pilot.press("tab")
+        await wait_until(
+            pilot,
+            lambda: app.focused is not None and app.focused.id == "sje_export",
+            lambda: f"tab did not move the focus to #sje_export: {app.focused!r}",
+        )
         before = app.focused.id
         await save_project(pilot, app, log)
         await wait_until(

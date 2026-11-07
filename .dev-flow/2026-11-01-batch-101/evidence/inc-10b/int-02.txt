@@ -1,0 +1,161 @@
+=== Inc 10b E4 integration run: int-02
+date: 2026-11-07T09:09:24Z
+host: LAN Linux laptop, 8 cores
+clone: git clone --shared, own branch main checked out
+base (HEAD = main): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+refs/remotes/origin/main in this clone: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+index tree with the increment staged: 9cf01b0259cf241f968e9b38159988af7171accf
+staged files vs base: 11
+unstaged changes vs index: 0
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10bint/s19_app/__init__.py
+CMD: env -u NO_COLOR PYTHONPATH=<clone> timeout 5400 python -m pytest -q -p no:cacheprovider -n 6 --dist load -m not serial_timing -rfs --tb=short tests/test_a2l_multiline_headers.py tests/test_b100_active_variant.py tests/test_b100_announce.py tests/test_b100_busy.py tests/test_b100_focus.py tests/test_b100_load_dialog.py tests/test_b100_load_question.py tests/test_b100_project_homes.py tests/test_b100_reuse.py tests/test_b100_save_dialog.py tests/test_b100_save_guards.py tests/test_b100_save_image.py tests/test_b100_workers.py tests/test_b101_designer_recompute.py tests/test_b101_document_homes.py tests/test_b101_hex_jump.py tests/test_b101_inc13_perf.py tests/test_b101_split_join_band.py tests/test_b101_unload_focus.py tests/test_b102_parameter_picker.py tests/test_b102_patch_picker.py tests/test_b97_chips_help.py tests/test_b97_key_bar.py tests/test_b97_patch_editor.py tests/test_b99_a2l_encode.py tests/test_b99_bytes_field.py tests/test_b99_editor_image.py tests/test_b99_export.py tests/test_b99_s0.py tests/test_b99_staging.py tests/test_before_after_report.py tests/test_change_service.py tests/test_changes_apply.py tests/test_changes_symbol_entries.py tests/test_crc_designer_view.py tests/test_legend_n8.py tests/test_loadfilescreen_input.py tests/test_report_logging.py tests/test_tui_a2l.py tests/test_tui_a2l_issue_recolor.py tests/test_tui_commandbar.py tests/test_tui_goto_marker.py tests/test_tui_mac_layout.py tests/test_tui_patch_chips.py tests/test_tui_patch_editor_v2.py tests/test_tui_patch_layout.py tests/test_tui_patch_variant.py tests/test_tui_public_api.py tests/test_tui_report_filter_surface.py tests/test_tui_snapshot.py tests/test_tui_workspace_layout.py tests/test_validation_service_supplemental.py tests/test_variant_execution.py tests/test_verify_on_save.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  3%]
+...........................................................s.........s.. [  7%]
+...............ss.s..................................................... [ 10%]
+.........................s............s...........................s..... [ 14%]
+.....sss.ss.....s...............................ss...................s.. [ 17%]
+........ss................s............................................. [ 21%]
+...............s....s...........s....ssssssss........................... [ 24%]
+................ss...........s.......................................... [ 28%]
+..s..s........s...........s............................................. [ 32%]
+...................................................s....sssss........... [ 35%]
+.................s.s..s.........................ssss............s....... [ 39%]
+........ssss.......s.ssssss.....s.............................s....s.... [ 42%]
+........ss....s...................s...................s.........s...s..s [ 46%]
+ssss.ss.....s....s.....sss.........................s.................... [ 49%]
+............................................................x........... [ 53%]
+........................................................................ [ 56%]
+........................................................................ [ 60%]
+........................................................................ [ 64%]
+........................................................................ [ 67%]
+........................................................................ [ 71%]
+........................................................................ [ 74%]
+........................................................................ [ 78%]
+........................................................................ [ 81%]
+........................................................................ [ 85%]
+.......................................................F................ [ 89%]
+........................................................................ [ 92%]
+............................................x..............sssssssssssss [ 96%]
+ssssssssssss..ssss.F.................................................... [ 99%]
+......                                                                   [100%]
+=================================== FAILURES ===================================
+______ test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact _______
+[gw4] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+tests/test_tui_commandbar.py:2727: in test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+    assert observed_pre_change == list(expected), (
+E   AssertionError: the pre-change palette action set must equal the Inc-0 freeze.
+E     missing: []
+E     unexpected: ['a2l_describe_tag', 'confirm_attention']
+E   assert ['focus_palet...us_goto', ...] == ['focus_palet...us_goto', ...]
+E     
+E     At index 13 diff: 'a2l_describe_tag' != 'view_reports'
+E     Left contains 2 more items, first extra item: 'open_settings_menu'
+E     Use -v to get more diff
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3015 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-450/popen-gw4/test_at_b78_03_the_palette_act0 workarea=/tmp/pytest-of-<user>/pytest-450/popen-gw4/test_at_b78_03_the_palette_act0/.s19tool/workarea
+INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.011
+________ test_at_056e_a2b_diff_report_byte_identical_despite_selection _________
+[gw5] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+tests/test_tui_report_filter_surface.py:775: in test_at_056e_a2b_diff_report_byte_identical_despite_selection
+    assert set(baseline) == expected, f"baseline wrote {sorted(baseline)}"
+E   AssertionError: baseline wrote []
+E   assert set() == {'20260710T12...ff-report.md'}
+E     
+E     Extra items in the right set:
+E     '20260710T120000Z-diff-report.html'
+E     '20260710T120000Z-diff-report.md'
+E     Use -v to get more diff
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3015 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-450/popen-gw5/test_at_056e_a2b_diff_report_b0/base workarea=/tmp/pytest-of-<user>/pytest-450/popen-gw5/test_at_056e_a2b_diff_report_b0/base/.s19tool/workarea
+INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.010
+WARNING  s19tui:app.py:14756 Project proj: no digests saved project.json (None)
+INFO     s19tui:app.py:15001 Load phase boundary: parse_branch_entry path=a.s19 suffix=.s19
+INFO     s19tui:app.py:19737 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-450/popen-gw5/test_at_056e_a2b_diff_report_b0/base/.s19tool/workarea/proj/a.s19 addresses=4 range_count=1 range_bytes=4 errors=0
+INFO     s19tui:app.py:15018 Load phase boundary: parse_branch_done path=a.s19 branch=s19
+INFO     s19tui:app.py:19182 Load phase boundary: apply_install_state path=a.s19 precomputed=False
+INFO     s19tui:app.py:14954 Project loaded. name=proj file=/tmp/pytest-of-<user>/pytest-450/popen-gw5/test_at_056e_a2b_diff_report_b0/base/.s19tool/workarea/proj/a.s19 mac=None
+INFO     s19tui:app.py:19865 Sections updated. count=1 rendered_ranges=1 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19203 Load phase boundary: apply_sections_done path=a.s19
+INFO     s19tui:app.py:19217 Load phase boundary: apply_hex_done path=a.s19
+INFO     s19tui:app.py:20960 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18547 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18602 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.013
+INFO     s19tui:app.py:20474 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.015
+INFO     s19tui:app.py:19232 Load phase boundary: apply_a2l_done path=a.s19
+INFO     s19tui:app.py:20092 Memory Map updated. ranges=1
+INFO     s19tui:app.py:19255 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-450/popen-gw5/test_at_056e_a2b_diff_report_b0/base/.s19tool/workarea/proj/a.s19 file_type=s19 elapsed_seconds=0.567 has_mac=False precomputed=False
+INFO     s19tui:app.py:3015 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-450/popen-gw5/test_at_056e_a2b_diff_report_b0/sel workarea=/tmp/pytest-of-<user>/pytest-450/popen-gw5/test_at_056e_a2b_diff_report_b0/sel/.s19tool/workarea
+INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.013
+WARNING  s19tui:app.py:14756 Project proj: no digests saved project.json (None)
+INFO     s19tui:app.py:15001 Load phase boundary: parse_branch_entry path=a.s19 suffix=.s19
+INFO     s19tui:app.py:19737 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-450/popen-gw5/test_at_056e_a2b_diff_report_b0/sel/.s19tool/workarea/proj/a.s19 addresses=4 range_count=1 range_bytes=4 errors=0
+INFO     s19tui:app.py:15018 Load phase boundary: parse_branch_done path=a.s19 branch=s19
+INFO     s19tui:app.py:19182 Load phase boundary: apply_install_state path=a.s19 precomputed=False
+INFO     s19tui:app.py:14954 Project loaded. name=proj file=/tmp/pytest-of-<user>/pytest-450/popen-gw5/test_at_056e_a2b_diff_report_b0/sel/.s19tool/workarea/proj/a.s19 mac=None
+INFO     s19tui:app.py:19865 Sections updated. count=1 rendered_ranges=1 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19203 Load phase boundary: apply_sections_done path=a.s19
+INFO     s19tui:app.py:19217 Load phase boundary: apply_hex_done path=a.s19
+INFO     s19tui:app.py:20960 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18547 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18602 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.014
+INFO     s19tui:app.py:20474 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.016
+INFO     s19tui:app.py:19232 Load phase boundary: apply_a2l_done path=a.s19
+INFO     s19tui:app.py:20092 Memory Map updated. ranges=1
+INFO     s19tui:app.py:19255 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-450/popen-gw5/test_at_056e_a2b_diff_report_b0/sel/.s19tool/workarea/proj/a.s19 file_type=s19 elapsed_seconds=0.566 has_mac=False precomputed=False
+INFO     s19tui:app.py:6363 View reports action. project=proj count=0
+INFO     s19tui:app.py:6441 Report filter selected: /tmp/pytest-of-<user>/pytest-450/popen-gw5/test_at_056e_a2b_diff_report_b0/sel/.s19tool/workarea/proj/filters/f.json
+INFO     s19tui:screens.py:3480 ReportViewerScreen dismissed by close.
+=========================== short test summary info ============================
+FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+SKIPPED [1] tests/test_b100_load_dialog.py:3666: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only
+SKIPPED [1] tests/test_b100_load_dialog.py:3811: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only
+SKIPPED [40] tests/support/b100_links.py:30: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_active_variant.py:766: a read-only file blocks a replace only on Windows (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_load_dialog.py:1956: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_load_dialog.py:2450: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only
+SKIPPED [1] tests/test_b100_load_dialog.py:2576: Windows strips a trailing dot from a file name, so fw.s19. opens fw.s19; on posix fw.s19. is a distinct, missing name (fix round 1, CI9b-4)
+SKIPPED [1] tests/test_b100_load_dialog.py:2599: case-insensitive file system arm; Windows only
+SKIPPED [2] tests/test_b100_load_dialog.py:2642: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [2] tests/test_b100_project_homes.py:790: trailing-dot names are a Windows-only arm
+SKIPPED [1] tests/test_b100_load_dialog.py:2766: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_load_dialog.py:774: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only
+SKIPPED [1] tests/test_b100_load_question.py:2017: an exclusively held file is a Windows-only arm (reported not run elsewhere)
+SKIPPED [1] tests/test_b100_project_homes.py:1269: not run: the upper-case spelling needs a case-insensitive file system (Windows)
+SKIPPED [1] tests/test_b100_save_dialog.py:517: Windows-only test arm (junction / case-insensitive volume); not run here
+SKIPPED [2] tests/test_b100_save_dialog.py:805: Windows-only arm; not run here
+SKIPPED [1] tests/test_b100_save_guards.py:2539: share-mode locks are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [3] tests/test_b100_project_homes.py:2170: reserved device names are a Windows-only arm
+SKIPPED [1] tests/test_b100_project_homes.py:2200: trailing-dot names are a Windows-only arm
+SKIPPED [1] tests/test_b100_save_dialog.py:1023: Windows-only test arm (junction / case-insensitive volume); not run here
+SKIPPED [1] tests/test_b100_save_image.py:960: msvcrt byte-range lock
+SKIPPED [1] tests/test_b100_project_homes.py:2346: not run: a con.json file needs the Windows extended spelling
+SKIPPED [1] tests/test_b100_reuse.py:259: case-folding of candidate names is a Windows arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_reuse.py:1125: WinError 123 invalid-spelling arm is Windows-only (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_reuse.py:1145: case-insensitive anchor names are a Windows arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_reuse.py:1166: 8.3 short-name anchors are a Windows arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_reuse.py:1194: case-folded group word is a Windows arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_save_dialog.py:1291: Windows-only test arm (junction / case-insensitive volume); not run here
+SKIPPED [2] tests/test_b100_save_dialog.py:2992: Windows-only test arm (junction / case-insensitive volume); not run here
+SKIPPED [2] tests/test_b100_save_dialog.py:1423: Windows-only arm; not run here
+SKIPPED [1] tests/test_b100_save_guards.py:1080: icacls deny-read is a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b101_hex_jump.py:608: the main pane is 1 line(s) high at 80 x 24: no second row can lie inside it
+SKIPPED [1] tests/test_b100_save_guards.py:1226: icacls deny-read is a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_save_guards.py:1451: case-insensitive names are a Windows-only arm (PDR C-QA-6)
+SKIPPED [2] tests/test_b100_save_guards.py:1505: case-insensitive names are a Windows-only arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_save_guards.py:1709: an open handle blocks a replace only on Windows (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_save_guards.py:1732: an open handle blocks a replace only on Windows (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_save_guards.py:1791: an open handle blocks a replace only on Windows (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_save_guards.py:1991: an open handle blocks a replace only on Windows (PDR C-QA-6)
+SKIPPED [29] tests/test_tui_snapshot.py:1184: pytest-textual-snapshot not installed (dev-only optional extra)
+2 failed, 1903 passed, 115 skipped, 2 xfailed in 3480.15s (0:58:00)
+exit: 1

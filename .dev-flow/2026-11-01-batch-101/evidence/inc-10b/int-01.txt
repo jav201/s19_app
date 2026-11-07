@@ -1,0 +1,24 @@
+=== Inc 10b E4 integration run: int-01
+date: 2026-11-07T08:51:07Z
+host: LAN Linux laptop, 8 cores
+clone: git clone --shared, own branch main checked out
+base (HEAD = main): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+refs/remotes/origin/main in this clone: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+index tree with the increment staged: 5a4fdd38bec27eda2213ae4b7cafc07402bd4e14
+staged files vs base: 11
+unstaged changes vs index: 0
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10bint/s19_app/__init__.py
+CMD: env -u NO_COLOR PYTHONPATH=<clone> timeout 3000 python -m pytest -q -p no:cacheprovider -n 6 --dist load -m not serial_timing -rfs --tb=short tests/test_b101_inplace_views.py tests/test_id_registry.py tests/test_segment_split_window.py tests/test_b102_a2l_refresh.py tests/test_tui_a2l_detail.py tests/test_b101_inc11_acceptance.py tests/test_b100_session_reset.py tests/test_tui_app.py tests/test_tui_directionb.py tests/test_b101_designer_writes.py tests/test_b101_check_spec_keep.py tests/test_b101_patch_lifecycle.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 15%]
+.............................................x.......................... [ 31%]
+........................................................................ [ 46%]
+........................................................................ [ 62%]
+........................................................................ [ 78%]
+........................................................................ [ 93%]
+.............................                                            [100%]
+460 passed, 1 xfailed in 920.96s (0:15:20)
+exit: 0

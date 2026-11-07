@@ -1,0 +1,205 @@
+=== Inc 10b E4 integration: int-06 — the negative controls of the rows whose base RED is at the repaint sign (I-D6), one mutant at a time in a copy
+
+=== mutant M-A (2026-11-07T10:17:08Z)
+copy: <HOME>/work/s19_i10bint_mut (cp -a of the clone); base (HEAD = main): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+index tree (the integrated tree before the mutant): 9cf01b0259cf241f968e9b38159988af7171accf
+test file blob: fc9a09a2e8f6a1c40c9f38d9fef5ff695b203c94
+M-A: 1 edit(s) applied to s19_app/tui/app.py
+mutated files vs index:
+   s19_app/tui/app.py | 2 ++
+   1 file changed, 2 insertions(+)
+  +        self.update_a2l_tags_view(self._a2l_filtered_tags)  # MUTANT M-A
+  +        return
+s19_app.__file__ = <HOME>/work/s19_i10bint_mut/s19_app/__init__.py
+CMD: env -u NO_COLOR PYTHONPATH=<copy> timeout 1200 python -m pytest -q -p no:cacheprovider -n 6 --dist load -m 'not serial_timing' -rfs --tb=line tests/test_b101_inplace_views.py -k '049_1 or 049_2 or 105_1'
+bringing up nodes...
+bringing up nodes...
+
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+[gw0] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+E   AssertionError: the first shown row moved: scroll_y 0, was 30
+    assert 0 == 30
+     +  where 0 = int(0)
+     +    where 0 = DataTable(id='a2l_tags_list').scroll_y
+<HOME>/work/s19_i10bint_mut/tests/test_b101_inplace_views.py:798: AssertionError: the first shown row moved: scroll_y 0, was 30
+[gw2] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+E   AssertionError: the cursor moved to row 0
+    assert 0 == 40
+     +  where 0 = DataTable(id='a2l_tags_list').cursor_row
+<HOME>/work/s19_i10bint_mut/tests/test_b101_inplace_views.py:877: AssertionError: the cursor moved to row 0
+[gw1] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+E   AssertionError: the first shown row moved: scroll_y 0, was 30
+    assert 0 == 30
+     +  where 0 = int(0)
+     +    where 0 = DataTable(id='a2l_tags_list').scroll_y
+<HOME>/work/s19_i10bint_mut/tests/test_b101_inplace_views.py:798: AssertionError: the first shown row moved: scroll_y 0, was 30
+=========================== short test summary info ============================
+FAILED tests/test_b101_inplace_views.py::test_r_a2l_049_1_first_shown_row_is_kept
+FAILED tests/test_b101_inplace_views.py::test_r_a2l_105_1_highlighted_row_is_kept
+FAILED tests/test_b101_inplace_views.py::test_r_a2l_049_2_first_shown_row_is_kept_with_a_value_filter
+3 failed in 25.89s
+exit: 1
+
+=== mutant M-B (2026-11-07T10:17:34Z)
+copy: <HOME>/work/s19_i10bint_mut (cp -a of the clone); base (HEAD = main): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+index tree (the integrated tree before the mutant): 9cf01b0259cf241f968e9b38159988af7171accf
+test file blob: fc9a09a2e8f6a1c40c9f38d9fef5ff695b203c94
+M-B: 3 edit(s) applied to s19_app/tui/app.py
+mutated files vs index:
+   s19_app/tui/app.py | 5 +++--
+   1 file changed, 3 insertions(+), 2 deletions(-)
+  +        self._reset_scroll_to_top("#hex_scroll")  # MUTANT M-B
+  -        self.update_alt_hex_view(start_row=start)
+  +        self.update_alt_hex_view(start_row=start, reset_scroll=True)  # MUTANT M-B
+  -        self.update_mac_hex_view(start_row=start)
+  +        self.update_mac_hex_view(start_row=start, reset_scroll=True)  # MUTANT M-B
+s19_app.__file__ = <HOME>/work/s19_i10bint_mut/s19_app/__init__.py
+CMD: env -u NO_COLOR PYTHONPATH=<copy> timeout 1200 python -m pytest -q -p no:cacheprovider -n 6 --dist load -m 'not serial_timing' -rfs --tb=line tests/test_b101_inplace_views.py -k '004_8'
+bringing up nodes...
+bringing up nodes...
+
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+[gw0] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+E   AssertionError: the scroll changed: (0, 0), was (10, 40)
+    assert (0, 0) == (10, 40)
+      
+      At index 0 diff: 0 != 10
+      Use -v to get more diff
+<HOME>/work/s19_i10bint_mut/tests/test_b101_inplace_views.py:1081: AssertionError: the scroll changed: (0, 0), was (10, 40)
+[gw1] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+E   AssertionError: the scroll changed: (0.0, 0), was (0.0, 40)
+    assert (0.0, 0) == (0.0, 40)
+      
+      At index 1 diff: 0 != 40
+      Use -v to get more diff
+<HOME>/work/s19_i10bint_mut/tests/test_b101_inplace_views.py:1081: AssertionError: the scroll changed: (0.0, 0), was (0.0, 40)
+[gw2] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+E   AssertionError: the scroll changed: (0.0, 0), was (0.0, 40)
+    assert (0.0, 0) == (0.0, 40)
+      
+      At index 1 diff: 0 != 40
+      Use -v to get more diff
+<HOME>/work/s19_i10bint_mut/tests/test_b101_inplace_views.py:1081: AssertionError: the scroll changed: (0.0, 0), was (0.0, 40)
+=========================== short test summary info ============================
+FAILED tests/test_b101_inplace_views.py::test_r_tui_004_8_shown_window_is_kept[main]
+FAILED tests/test_b101_inplace_views.py::test_r_tui_004_8_shown_window_is_kept[a2l]
+FAILED tests/test_b101_inplace_views.py::test_r_tui_004_8_shown_window_is_kept[mac]
+3 failed in 23.20s
+exit: 1
+
+=== mutant M-C1 (2026-11-07T10:17:58Z)
+copy: <HOME>/work/s19_i10bint_mut (cp -a of the clone); base (HEAD = main): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+index tree (the integrated tree before the mutant): 9cf01b0259cf241f968e9b38159988af7171accf
+test file blob: fc9a09a2e8f6a1c40c9f38d9fef5ff695b203c94
+M-C1: 1 edit(s) applied to s19_app/tui/app.py
+mutated files vs index:
+   s19_app/tui/app.py | 2 +-
+   1 file changed, 1 insertion(+), 1 deletion(-)
+  -        self.update_hex_view()
+  +        self.update_hex_view(self._hex_view_rows()[self._hex_window_start])  # MUTANT M-C1
+s19_app.__file__ = <HOME>/work/s19_i10bint_mut/s19_app/__init__.py
+CMD: env -u NO_COLOR PYTHONPATH=<copy> timeout 1200 python -m pytest -q -p no:cacheprovider -n 6 --dist load -m 'not serial_timing' -rfs --tb=line tests/test_b101_inplace_views.py -k '004_9'
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+[gw0] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+E   AssertionError: #hex_view: marked lines []
+    assert [] == [2400]
+      
+      Right contains one more item: 2400
+      Use -v to get more diff
+<HOME>/work/s19_i10bint_mut/tests/test_b101_inplace_views.py:1135: AssertionError: #hex_view: marked lines []
+=========================== short test summary info ============================
+FAILED tests/test_b101_inplace_views.py::test_r_tui_004_9_1_markers_survive_a_write
+1 failed in 30.42s
+exit: 1
+
+=== mutant M-C2 (2026-11-07T10:18:28Z)
+copy: <HOME>/work/s19_i10bint_mut (cp -a of the clone); base (HEAD = main): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+index tree (the integrated tree before the mutant): 9cf01b0259cf241f968e9b38159988af7171accf
+test file blob: fc9a09a2e8f6a1c40c9f38d9fef5ff695b203c94
+M-C2: 1 edit(s) applied to s19_app/tui/app.py
+mutated files vs index:
+   s19_app/tui/app.py | 2 +-
+   1 file changed, 1 insertion(+), 1 deletion(-)
+  -        self.update_alt_hex_view(start_row=start)
+  +        self.update_alt_hex_view(rows[start] if start is not None else None, start_row=start)  # MUTANT M-C2
+s19_app.__file__ = <HOME>/work/s19_i10bint_mut/s19_app/__init__.py
+CMD: env -u NO_COLOR PYTHONPATH=<copy> timeout 1200 python -m pytest -q -p no:cacheprovider -n 6 --dist load -m 'not serial_timing' -rfs --tb=line tests/test_b101_inplace_views.py -k '004_9'
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+[gw0] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+E   AssertionError: #alt_hex_view: marked lines []
+    assert [] == [2400]
+      
+      Right contains one more item: 2400
+      Use -v to get more diff
+<HOME>/work/s19_i10bint_mut/tests/test_b101_inplace_views.py:1135: AssertionError: #alt_hex_view: marked lines []
+=========================== short test summary info ============================
+FAILED tests/test_b101_inplace_views.py::test_r_tui_004_9_1_markers_survive_a_write
+1 failed in 30.58s
+exit: 1
+
+=== mutant M-C3 (2026-11-07T10:18:59Z)
+copy: <HOME>/work/s19_i10bint_mut (cp -a of the clone); base (HEAD = main): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+index tree (the integrated tree before the mutant): 9cf01b0259cf241f968e9b38159988af7171accf
+test file blob: fc9a09a2e8f6a1c40c9f38d9fef5ff695b203c94
+M-C3: 1 edit(s) applied to s19_app/tui/app.py
+mutated files vs index:
+   s19_app/tui/app.py | 2 +-
+   1 file changed, 1 insertion(+), 1 deletion(-)
+  -        self.update_mac_hex_view(start_row=start)
+  +        self.update_mac_hex_view(rows[start] if start is not None else None, start_row=start)  # MUTANT M-C3
+s19_app.__file__ = <HOME>/work/s19_i10bint_mut/s19_app/__init__.py
+CMD: env -u NO_COLOR PYTHONPATH=<copy> timeout 1200 python -m pytest -q -p no:cacheprovider -n 6 --dist load -m 'not serial_timing' -rfs --tb=line tests/test_b101_inplace_views.py -k '004_9'
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+[gw0] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+E   AssertionError: #mac_hex_view: marked lines []
+    assert [] == [2400]
+      
+      Right contains one more item: 2400
+      Use -v to get more diff
+<HOME>/work/s19_i10bint_mut/tests/test_b101_inplace_views.py:1135: AssertionError: #mac_hex_view: marked lines []
+=========================== short test summary info ============================
+FAILED tests/test_b101_inplace_views.py::test_r_tui_004_9_1_markers_survive_a_write
+1 failed in 31.37s
+exit: 1
+
+=== mutant M-F (2026-11-07T10:19:31Z)
+copy: <HOME>/work/s19_i10bint_mut (cp -a of the clone); base (HEAD = main): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+index tree (the integrated tree before the mutant): 9cf01b0259cf241f968e9b38159988af7171accf
+test file blob: fc9a09a2e8f6a1c40c9f38d9fef5ff695b203c94
+M-F: 1 edit(s) applied to s19_app/tui/app.py
+mutated files vs index:
+   s19_app/tui/app.py | 5 +----
+   1 file changed, 1 insertion(+), 4 deletions(-)
+  -        self._a2l_filtered_tags = [
+  -            new[position_by_tag[id(tag)]] for tag in self._a2l_filtered_tags
+  -        ]
+  -        self._repaint_a2l_tag_cells()
+  +        self._refresh_a2l_filtered_tags(preserve_anchor=True)  # MUTANT M-F
+s19_app.__file__ = <HOME>/work/s19_i10bint_mut/s19_app/__init__.py
+CMD: env -u NO_COLOR PYTHONPATH=<copy> timeout 1200 python -m pytest -q -p no:cacheprovider -n 6 --dist load -m 'not serial_timing' -rfs --tb=line tests/test_b101_inplace_views.py -k '106_1'
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+[gw0] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+E   AssertionError: VALUE_0001 paints None, expected ('147', '147')
+<HOME>/work/s19_i10bint_mut/tests/support/timing.py:66: AssertionError: VALUE_0001 paints None, expected ('147', '147')
+=========================== short test summary info ============================
+FAILED tests/test_b101_inplace_views.py::test_r_a2l_106_1_value_filter_rows_stay_listed
+1 failed in 35.98s
+exit: 1
