@@ -3771,7 +3771,14 @@ def extract_declared_spans(
             return None
         if kind == "TYPEDEF_CHARACTERISTIC":
             char_type = header[0] if header else None
-            deposit = header[2] if len(header) > 2 else None
+            # ASAP2 1.7.1 has no MemoryAddress in a TYPEDEF_CHARACTERISTIC
+            # (Type, Deposit, MaxDiff, Conversion, LowerLimit, UpperLimit);
+            # ASAP2 1.6 keeps one (Type, Address, Deposit, …). Read the deposit
+            # as header[1], unless header[1] is a number (an address), then
+            # header[2].
+            deposit = header[1] if len(header) > 1 else None
+            if deposit is not None and _number_word(deposit) is not None:
+                deposit = header[2] if len(header) > 2 else None
             if char_type in ("VALUE", "VAL_BLK", "ASCII"):
                 hdr = {"char_type": char_type, "deposit": deposit}
                 kw_texts = [text for text, _line in kw_lines]
