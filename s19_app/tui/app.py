@@ -10538,7 +10538,8 @@ class S19TuiApp(App):
 
         Returns:
             Widget: The fallback widget — never an ``Input`` /
-            ``TextArea``.
+            ``TextArea``; ``target`` itself when the app has no ``Rail``
+            (a landing during teardown).
 
         Data Flow:
             - The window is the focused-out ancestor whose id is in
@@ -10549,6 +10550,9 @@ class S19TuiApp(App):
               is skipped, exactly like the declared target.
             - The rail's active entry is the ``RailItem`` carrying the
               ``-active`` marker (LLR-001.2).
+            - With no ``Rail`` in the tree (a landing that runs while the
+              app exits, SE5-5) the lookup is guarded and ``target`` — the
+              widget that failed the visibility check — is returned.
 
         Dependencies:
             Uses:
@@ -10628,8 +10632,9 @@ class S19TuiApp(App):
             ``_focus_needs_rehome``, move the focus to the active window's
             declared target (``_FOCUS_TARGETS``); a healthy focus is left
             untouched. ``watch_current_file`` re-focuses the Split / Join
-            table on every install, so without this the tail of every load
-            leaves the focus on a hidden zero-area widget (CW-U-2).
+            table (``refresh_window`` does it only while that window is
+            shown), so without this the tail of a load can leave the focus
+            on a hidden zero-area widget (CW-U-2).
 
         Args:
             None
@@ -10696,9 +10701,32 @@ class S19TuiApp(App):
         self._note_focus_landing(target)
 
     def _note_focus_landing(self, target: Widget) -> None:
-        """Inc 10a E4-R3: remember a landing that did not reach the shown
-        window's declared target (a fallback, or E4-R4's A2L switch landing),
-        so a completed load can still move it there once it is shown."""
+        """
+        Summary:
+            Inc 10a E4-R3: remember a landing that did not reach the shown
+            window's declared target (a fallback, or E4-R4's A2L switch
+            landing), so a completed load can still move it there once it
+            is shown.
+
+        Args:
+            target (Widget): The widget the landing focused.
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``_focus_landing_fallback`` becomes ``None`` when ``target``
+              carries the shown window's declared id (``_FOCUS_TARGETS``),
+              else ``target`` itself (the declared-vs-fallback rule).
+
+        Dependencies:
+            Uses:
+                - ``_FOCUS_TARGETS`` / ``_active_screen_key``
+            Used by:
+                - ``_rehome_focus_after_load``,
+                  ``_rehome_placeholder_focus_after_load`` and
+                  ``_land_focus``
+        """
         declared = self._FOCUS_TARGETS.get(self._active_screen_key)
         self._focus_landing_fallback = None if target.id == declared else target
 
@@ -10729,8 +10757,10 @@ class S19TuiApp(App):
               its fallback: a target that stays hidden keeps the focus where
               it is.
             - While the target has no region the call re-schedules itself
-              after a refresh, at most ``layout_waits`` times, and only while
-              the focus has not moved (E4-R5 guard included).
+              after a refresh, at most ``layout_waits`` times; each call
+              acts only while the focus is still a ``RailItem`` or the
+              recorded fallback (``_focus_landing_fallback``), and returns
+              first when the tree is gone (E4-R5 guard included).
 
         Dependencies:
             Uses:
@@ -10771,11 +10801,34 @@ class S19TuiApp(App):
             )
 
     def _load_tree_gone(self) -> bool:
-        """Inc 10a E4-R5 (I-D17): ``True`` once the default screen a deferred
-        load step renders into is no longer attached — Textual reports every
-        node detached once ``App.exit`` has run, and a pruned screen has no
-        parent. A tree that never mounted (the headless chain test) is not
-        gone: its steps still run."""
+        """
+        Summary:
+            Inc 10a E4-R5 (I-D17): ``True`` once the default screen a
+            deferred load step renders into is no longer attached — Textual
+            reports every node detached once ``App.exit`` has run, and a
+            pruned screen has no parent. A tree that never mounted (the
+            headless chain test) is not gone: its steps still run.
+
+        Args:
+            None
+
+        Returns:
+            bool: ``True`` when the default screen is detached, else
+            ``False`` (also when the screen cannot be read).
+
+        Data Flow:
+            - Reads ``default_screen.is_attached``; an exception reading
+              it counts as not gone.
+
+        Dependencies:
+            Uses:
+                - ``default_screen``
+            Used by:
+                - ``_rehome_placeholder_focus_after_load``,
+                  ``_land_focus`` and the four deferred steps of
+                  ``_apply_prepared_load`` (``_step_sections``,
+                  ``_step_hex``, ``_step_a2l``, ``_step_finalize``)
+        """
         try:
             screen = self.default_screen
         except Exception:
@@ -13755,11 +13808,14 @@ class S19TuiApp(App):
                 else inventory_project_tree(source_dir)
             )
         loaded = self.current_file
-        if walked is not None and loaded is not None and loaded.file_type == "mac":
-            # Inc 10a (E5, SE5-1; R-WS-LOADED.19): with a MAC loaded and no
-            # S19 / HEX image, a save as copies none of the open project's
-            # top-level S19 / HEX files — after a primary unload one of them
-            # is the image the operator unloaded.
+        if walked is not None and (
+            loaded is None or loaded.file_type not in {"s19", "hex"}
+        ):
+            # Inc 10a (E5, SE5-1, RR-1; R-WS-LOADED.19): with no S19 / HEX
+            # image loaded (a MAC spine, or nothing with or without an A2L),
+            # a save as copies none of the open project's top-level S19 / HEX
+            # files — after a primary unload one of them is the image the
+            # operator unloaded.
             walked = replace(
                 walked,
                 top_level=tuple(
@@ -14179,7 +14235,8 @@ class S19TuiApp(App):
             last CRC template (S7), the last comparison and check spec
             (S8), the last flow run and execution (S9/S10), the report
             filter (S11), the A2L derived views (S12), the MAC view
-            caches, the validation report and issues and the row-key maps
+            caches, the view-row memo (``_hex_view_rows_cache``, CR-1),
+            the validation report and issues and the row-key maps
             (S13 plus A-07's eleven probe names). The change service is
             REBOUND to a new object (S4) — nothing outside this module
             holds the old one (P-26), so a new ``ChangeService()`` is
@@ -14201,7 +14258,8 @@ class S19TuiApp(App):
         Data Flow:
             - Reset S1-S13 in place (S4 last but for the rebind, S13
               through ``_invalidate_mac_view_cache`` plus the four probe
-              names the invalidator does not own).
+              names the invalidator does not own), and ``None`` the
+              view-row memo ``_hex_view_rows_cache`` with S1.
             - Repaint the Patch panel through ``refresh_entries`` — the
               reset is the one place a load can leave the panel holding a
               previous project's document, and the panel's retain
@@ -14231,8 +14289,8 @@ class S19TuiApp(App):
         # parse's MAC merge sees no existing file (P-2's ``LEAK
         # mac_records``).
         self.current_file = None
-        # Inc 10a (E5, CR-1): a writer of `current_file` that bumps no image
-        # generation resets the view-row memo (`_hex_view_rows`).
+        # Inc 10a (E5, CR-1): a writer of ``current_file`` that bumps no image
+        # generation resets the view-row memo (``_hex_view_rows``).
         self._hex_view_rows_cache = None
         # S2/S3: the A2L path and parsed payload — the two parse
         # fallbacks a loose-S19 reload would otherwise re-attach (P-2's
@@ -17953,13 +18011,19 @@ class S19TuiApp(App):
               file is loaded, dispatch to ``_unload_primary``/``_unload_mac``/
               ``_unload_a2l`` over ``current_file``. With nothing loaded the
               per-artifact path is a status-line no-op.
-            - Install the rebuilt (or ``None``) snapshot, invalidate the MAC
+            - Install the rebuilt (or ``None``) snapshot, reset the view-row
+              memo (``_hex_view_rows_cache``, CR-1), invalidate the MAC
               view cache, toggle the empty-state panels, then re-run the same
               renderer set the load path uses (``update_sections`` →
               ``update_hex_view``/``update_alt_hex_view``/``update_mac_hex_view``
               → ``update_a2l_view`` (which drives ``update_mac_view``) →
               ``update_project_labels`` → ``update_memory_map``).
-            - Set a status line naming what was unloaded.
+            - Set a status line naming what was unloaded, on the file
+              status (``set_file_status``) and the message log
+              (``set_status``).
+            - Schedule ``_land_focus`` after a refresh, stamped with the
+              window shown now, so a rail key in the same burst makes it
+              stale (CR-3).
 
         Dependencies:
             Uses:
@@ -19061,9 +19125,10 @@ class S19TuiApp(App):
                 self.update_project_labels()
                 self.update_memory_map()
                 self._refresh_loaded_panel()
-                # LLR-166.1: the install re-focused the Split / Join table
-                # through ``watch_current_file``; land the focus on the
-                # displayed window's target.
+                # LLR-166.1: the install may have re-focused the Split / Join
+                # table through ``watch_current_file`` (``refresh_window``
+                # does so only while that window is shown); land the focus
+                # on the displayed window's target.
                 self._rehome_focus_after_load()
                 # Inc 10a E4-R3 (HLR-166): a rail-item or fallback focus
                 # moves to the target once the loaded view shows it.

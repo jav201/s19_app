@@ -185,7 +185,7 @@ def hex_row_bases(
 
     Example:
         >>> hex_row_bases([0x8000, 0x8010, 0x8020], extra_addresses={0x1000})
-        [0x1000, 0x8000, 0x8010, 0x8020]
+        [4096, 32768, 32784, 32800]
     """
     extra = extra_addresses or set()
     if not extra:

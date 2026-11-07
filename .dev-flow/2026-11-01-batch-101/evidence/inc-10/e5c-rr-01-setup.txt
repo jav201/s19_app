@@ -1,0 +1,8 @@
+# LAN Linux laptop run: setup (clone --shared, main = origin/main 09b4808, local diff applied)
+CMD: git clone --shared <HOME>/work/s19_app <HOME>/work/s19_i10rr; git checkout -B main 09b4808; git apply --binary s19_i10rr.patch  (patch = git diff --binary 09b4808 -- s19_app tests docs README.md of the local tree); git add -A s19_app tests docs README.md
+main: 09b4808a0344de05d9d64cd55362ac7058a8c17f  origin/main(laptop): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+base HEAD: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+staged tree: d5beaa3e4f07a1be90300618b308106d2874e812
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10rr/s19_app/__init__.py
+mutant copy s19_i10rr_mut: the clone with the RR-1 condition put back to the old one: if walked is not None and loaded is not None and loaded.file_type == "mac":  (1 file, 1 insertion, 3 deletions)

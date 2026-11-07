@@ -706,8 +706,12 @@ async def open_project_ps(pilot, app, log, image: Path, mac: Path) -> None:
         f"setup: the PS load installed {app.current_file!r}; status {text!r}"
     )
     assert app.current_file.mac_path is not None, f"setup: PS installed no MAC; status {text!r}"
-    # The Load dialog's project load opens the Load-result panel; Esc closes it
-    # so the next keys reach the app.
+    await close_load_result_panel(pilot, app)
+
+
+async def close_load_result_panel(pilot, app) -> None:
+    """The Load dialog's project load opens the Load-result panel; Esc closes it
+    so the next keys reach the app."""
     await wait_until(
         pilot,
         lambda: isinstance(app.screen, LoadResultScreen),
@@ -729,8 +733,8 @@ def test_r_ws_loaded_19_3_save_as_after_primary_unload_carries_no_image(
     """R-WS-LOADED.19 case /3 (added at E5, SE5-1): project ``PS`` (fixture three
     as ``unloaded_primary.s19`` plus the case 08 MAC) loaded, ``[u]`` on the
     primary, then Save project ``P9`` (a save as: ``P9`` does not exist and
-    ``PS`` is open). ``P9`` holds the MAC and no ``.s19`` / ``.hex`` file and no
-    file with the image's SHA-256, and loading ``P9`` installs no S19 / HEX
+    ``PS`` is open). ``P9`` holds the MAC and no top-level ``.s19`` / ``.hex``
+    file and no file with the image's SHA-256, and loading ``P9`` installs no S19 / HEX
     image (the tree before E5: the save as carried ``unloaded_primary.s19``
     from ``PS``, so loading ``P9`` installed it as the primary)."""
     image = write_three_ranges(tmp_path / "src" / "unloaded_primary.s19")
@@ -748,8 +752,8 @@ def test_r_ws_loaded_19_3_save_as_after_primary_unload_carries_no_image(
         assert any(m.startswith("Saved project to") for m in messages), messages
         files = project_files(app, "P9")
         assert "firmware.mac" in files, f"the MAC is not in P9: {sorted(files)}"
-        images = [n for n in files if n.lower().endswith((".s19", ".hex"))]
-        assert images == [], f"P9 holds image files: {images}"
+        images = [n for n in files if "/" not in n and n.lower().endswith((".s19", ".hex"))]
+        assert images == [], f"P9 holds top-level image files: {images}"
         assert image_digest not in files.values(), f"P9 holds the image's bytes: {sorted(files)}"
         assert not any("unloaded_primary" in m for m in messages), messages
         text = await unload_and_open(pilot, app, log, "P9")
@@ -777,6 +781,51 @@ def test_r_ws_loaded_19_4_save_as_with_the_image_loaded_carries_it(
         assert any(m.startswith("Saved project to") for m in messages), messages
         files = project_files(app, "P9")
         assert files.get("unloaded_primary.s19") == image_digest, sorted(files)
+
+    run(tmp_path, scenario)
+
+
+def test_r_ws_loaded_19_5_save_as_after_primary_unload_without_mac_carries_no_image(
+    tmp_path: Path, case08: Path
+) -> None:
+    """R-WS-LOADED.19 case /5 (added at E5, RR-1): project ``PS`` (fixture three
+    as ``unloaded_primary.s19`` plus the case 08 A2L, no MAC) loaded, ``[u]`` on
+    the primary (no spine is left, the A2L stays), then Save project ``P9`` (a
+    save as). ``P9`` holds the A2L, no top-level ``.s19`` / ``.hex`` file and no
+    file with the image's SHA-256, and loading ``P9`` installs no primary (the
+    tree before RR-1: the filter covered a MAC spine only, so ``P9`` carried
+    ``unloaded_primary.s19``)."""
+    image = write_three_ranges(tmp_path / "src" / "unloaded_primary.s19")
+    a2l = copy_to(case08 / "firmware.a2l", tmp_path / "src" / "firmware.a2l")
+    image_digest = sha256(image)
+
+    async def scenario(app, pilot, log):
+        await load_image(pilot, app, image)
+        await load_a2l(pilot, app, a2l)
+        text = await save_unload_reload(pilot, app, log, "PS")
+        assert app.current_file is not None and app.current_file.file_type == "s19", (
+            f"setup: the PS load installed {app.current_file!r}; status {text!r}"
+        )
+        await close_load_result_panel(pilot, app)
+        mark = len(log.messages)
+        await press_unload(pilot, app, "primary")
+        await wait_message(pilot, log, mark, "Unloaded primary image.")
+        await settle(pilot, 4)
+        assert app.current_file is None, f"setup: a spine is left: {app.current_file!r}"
+        assert app.current_a2l_path is not None, "setup: the A2L did not stay loaded"
+        messages = await save_and_wait(pilot, app, log, "P9")
+        assert any(m.startswith("Saved project to") for m in messages), messages
+        files = project_files(app, "P9")
+        assert "firmware.a2l" in files, f"the A2L is not in P9: {sorted(files)}"
+        images = [n for n in files if "/" not in n and n.lower().endswith((".s19", ".hex"))]
+        assert images == [], f"P9 holds top-level image files: {images}"
+        assert image_digest not in files.values(), f"P9 holds the image's bytes: {sorted(files)}"
+        assert not any("unloaded_primary" in m for m in messages), messages
+        text = await unload_and_open(pilot, app, log, "P9")
+        installed = app.current_file
+        assert installed is None, (
+            f"loading P9 installed {installed.file_type} {installed.path.name!r}; status {text!r}"
+        )
 
     run(tmp_path, scenario)
 

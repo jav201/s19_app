@@ -81,6 +81,43 @@ M-L, found surviving by this pass before the addendum named it (mut-c-14, 14b, 1
 
 Teardown: on the laptop the run clone `s19_i10c`, every mutant and probe copy and the helper folder `s19_i10c-helpers` were removed (`~/work`: 0 `s19_i10c` entries); the laptop repo's `main` is untouched (`f9f3cb09`) and its `git worktree list` holds its two earlier entries only; the DeepSeek battery's `s19_i10mut` copies on host 2 were not touched. The local scratch helpers were deleted. Nothing that imports `s19_app` ran on the Windows PC (`py_compile`, git plumbing, text scripts and `trace_check` only); the OS clipboard was not used.
 
+## 3b. Re-review rulings applied (2026-11-07, `E5-rulings.md` "Re-review rulings", `E5-code-review.md` "Re-review of the corrective")
+
+Base `09b4808`; branch `b101-inc10`; run clone on the LAN Linux laptop, staged tree `d5beaa3e…` (`09b4808` + the local diff, e5c-rr-01-setup); removed after the runs.
+
+**RR-1 applied.**
+- Change: `s19_app/tui/app.py:13811-13821` `_plan_project_save`: the save-as filter now runs when `walked is not None and (loaded is None or loaded.file_type not in {"s19", "hex"})` (was: `loaded is not None and loaded.file_type == "mac"`). R-WS-LOADED.19's text in `01-requirements.md:68` is widened to "while no S19 or HEX image is loaded", marked "(changed at E5, RR-1)"; the same row gains the A2L-only example.
+- New case R-WS-LOADED.19/5 (`02-test-cases.md`), node `tests/test_b101_unload_focus.py::test_r_ws_loaded_19_5_save_as_after_primary_unload_without_mac_carries_no_image` beside /19/3 and /19/4: S19 + case 08 A2L project, `[u]` on the primary, save as `P9` through the shipped dialog. Its setup shares `close_load_result_panel` (split out of `open_project_ps`).
+- RED / GREEN: **RED** on a copy of the clone with the old condition put back (e5c-rr-02): `P9 holds top-level image files: ['unloaded_primary.s19']`, `1 failed, 4 passed` (/19/1 … /19/4 GREEN). **GREEN** with the new condition (e5c-rr-03): `5 passed`.
+- Forward to the requirements session: the R-WS-LOADED.19 text change (widened state, top-level wording).
+
+**RR-2 applied.**
+- Change: R-WS-LOADED.19's text and case /19/3's expected column say "top-level" (`01-requirements.md:68`, `02-test-cases.md` /19/3); the /19/3 and /19/5 oracles ignore image files below the top level (`"/" not in n`), so a Split / Join export under `splits/` cannot turn them RED. No product change; the exports are not filtered.
+- GREEN: e5c-rr-03 (`5 passed`).
+
+**RR-3 applied** (comments and docstrings only; no code change). In `s19_app/tui/app.py`, by function name (the lines moved with the edit):
+1. `_rehome_focus_after_load` Summary: `refresh_window` focuses the Split / Join table only while that window is shown.
+2. `_apply_prepared_load`'s `_step_finalize` comment: same correction.
+3. `_rehome_placeholder_focus_after_load` Data Flow: each call acts only while the focus is a `RailItem` or the recorded fallback, and returns first when the tree is gone.
+4. `s19_app/render/hexview.py:188` `hex_row_bases` example: `[4096, 32768, 32784, 32800]`.
+5. `_note_focus_landing`: house sections (Summary, Args, Returns, Data Flow, Dependencies with its three callers).
+6. `_load_tree_gone`: house sections (Returns, Data Flow, Dependencies with its six callers).
+7. `_apply_unload` Data Flow: the view-row memo reset, the file-status write, the stamped focus landing.
+8. `_fallback_focus_target` Returns and Data Flow: the no-rail teardown branch returns `target`.
+9. `_reset_project_session` Summary and Data Flow: the view-row memo; the comment's backticks made double.
+
+Runs (LAN Linux laptop; transcripts `evidence/inc-10/e5c-rr-01-setup.txt` … `e5c-rr-05.txt`):
+
+| id | what | result |
+|---|---|---|
+| `e5c-rr-01-setup` | the clone, the diff, tree, `__file__` | tree `d5beaa3e…` |
+| `e5c-rr-02` | old condition (mutant copy), `-k ws_loaded_19_` | **RED**: `1 failed, 4 passed` (/19/5 only) |
+| `e5c-rr-03` | the fix, `-k ws_loaded_19_` | `5 passed` |
+| `e5c-rr-04` | `tests/test_b101_unload_focus.py` and `tests/test_b101_hex_jump.py`, `-n 6 --dist load -m "not serial_timing"` | `103 passed, 1 skipped` (the 80 x 24 main arm, BL-I10-2) |
+| `e5c-rr-05` | the 7 law guards, `-n 6 --dist load` | `219 passed` (`test_at_b78_03` passed too) |
+
+`trace_check.py` (imports no `s19_app`): EVID gap only. Windows: `not-run` (operator rule; no Windows-only arm). The case count is now 92 (90 `full`, 2 `partial`, 0 `gap`).
+
 ## 4. Final marks
 
 91 cases (83 + R-TUI-040.11/6 … /9, R-WS-LOADED.19/3, /4, R-SHELL-FOCUS.2/8, /3/3): **89 `full`, 2 `partial`** (R-TUI-040.12/7, R-TUI-007.3/2: unit nodes reading a field), **0 `gap`**; 48 normal or regression, 43 robustness. Results: 91 `executed 3/3 (linux, e5c-11 … 13)` on the final tree; Windows `not-run` (no Windows-only arm). Row thresholds: R-TUI-040.11 now 9 of 9 arms (QA-3); R-TUI-012L.8's `+MAC:` and notice arms assert the newest message line (QA-4); 3/3 runs met for every row on the final tree (QA-1). Mutants this pass ran (§1): 25 runs over 20 mutations — all RED on their targets except M-L (`mut-c-14`, `14b`, `14c`, `21`; the probes `mut-c-22`, `23`), equivalent on every reachable route found (E-15); M23 now killed (`mut-c-13`); M28 killed since SE5-2 (`mut-c-04`). Backlog added: BL-I10-3 (CR-5), BL-I10-4 (CR-8), S-6's addition (SE5-6). Requirement texts unchanged; four thresholds gain an arm, marked.
