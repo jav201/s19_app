@@ -1,0 +1,19 @@
+== e5c-rr-03  2026-11-07T12:09:00Z  host: LAN Linux laptop
+base commit (HEAD): 6f1743c1ad54ff7db89e8fcd4e96266414950f42  main: 6f1743c1ad54ff7db89e8fcd4e96266414950f42  origin/main: 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+staged tree (index): 3e43288889bc1d9f0c42848531081e532b187c92
+working tree = index (no mutant edit)
+python: Python 3.11.18
+s19_app.__file__: <HOME>/work/s19_i10brr/s19_app/__init__.py
+CMD: cd <HOME>/work/s19_i10brr && env -u NO_COLOR timeout 1800 <CONDA>/envs/s19ci/bin/python -m pytest -n 6 --dist load -m not serial_timing -p no:cacheprovider tests/test_b101_inplace_views.py
+--- pytest output
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0
+rootdir: <HOME>/work/s19_i10brr
+configfile: pyproject.toml
+plugins: platformdirs-4.14.3, xdist-3.8.0
+created: 6/6 workers
+6 workers [21 items]
+
+.....................                                                    [100%]
+======================== 21 passed in 96.48s (0:01:36) =========================
+exit: 0  end 2026-11-07T12:10:37Z

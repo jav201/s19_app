@@ -48,6 +48,7 @@ from pathlib import Path
 
 import pytest
 from textual.containers import ScrollableContainer
+from textual.coordinate import Coordinate
 from textual.widgets import Button, DataTable, Input, Label, ListView, Static
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -907,6 +908,27 @@ def test_r_a2l_048_5_a_write_on_the_second_page_shows_there(tmp_path: Path, case
         assert summary_span(app) == "tags 201-400 / 462", summary_span(app)
         assert [row_name(app, i) for i in range(table.row_count)] == names, "the row names changed"
         assert table.cursor_row == 45 and row_name(app, 45) == "VAL_BLK_0002", table.cursor_row
+        # E5 RR-4: the row key of page row 45 (``a2l:245``) maps to the new dict;
+        # the card for that row is the one the highlight resolves through it.
+        row_key = table.coordinate_to_cell_key(Coordinate(45, 0)).row_key.value
+        assert row_key == "a2l:245", row_key
+        assert str(app._a2l_row_key_to_tag[row_key]["raw_value"]) == "17677", (
+            app._a2l_row_key_to_tag[row_key]["raw_value"]
+        )
+        table.move_cursor(row=44, animate=False)
+        await wait_until(
+            pilot, lambda: "VAL_BLK_0001" in card_text(app), lambda: card_text(app)
+        )
+        table.move_cursor(row=45, animate=False)
+        await wait_until(
+            pilot,
+            lambda: "VAL_BLK_0002" in card_text(app),
+            lambda: f"the card for row 45 reads {card_text(app)!r}",
+        )
+        # E5 RR-1: the recomputed list is the one installed - a filter on the new
+        # Raw value lists the written tag, built from ``_a2l_enriched_tags``.
+        await filter_raw(pilot, app, "17677")
+        assert raw_phys(app, "VAL_BLK_0002") == ("17677", "17677"), raw_phys(app, "VAL_BLK_0002")
 
     drive(tmp_path, scenario)
 
@@ -1526,7 +1548,7 @@ def test_r_seg_exp_15_2_hidden_write_disarms_the_confirm(tmp_path: Path) -> None
 # QC-TM-10b-1 (E3 A10-12, not a coverage item) - the cost of the A2L refresh
 # ---------------------------------------------------------------------------
 #: The largest A2L the repo ships (E5 R-1): 37.7 MB, 220,040 tags over about
-#: 1 KiB of image (``examples/case_06_large_nested_a2l/README.txt``).
+#: 1 KiB of image (the counts printed in ``evidence/inc-10b/e5c-02.txt``).
 CASE06 = REPO_ROOT / "examples" / "case_06_large_nested_a2l"
 
 #: Inside case_06's image: the second byte of the multi-byte characteristics

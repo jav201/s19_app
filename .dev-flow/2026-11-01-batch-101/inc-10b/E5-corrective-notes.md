@@ -90,3 +90,19 @@ Teardown: on the laptop the clone `s19_i10bc`, the mutant copy `s19_i10bc_mut` a
 ## 6. Final marks
 
 21 cases (19 + R-A2L-048/4, /5): **21 `full`, 0 `partial`, 0 `gap`**. Results: 21 `verified (linux, e5c-06, e5c-07, e5c-08: 3/3)` on the final tree `43e7fcaf…`; R-SEG-OPEN.6/3 3/3 (e5c-09 … 11); QC-TM-10b-1 within its bound with 65.0 % margin on 220,040 tags. Windows: `not_run` for the 21 (operator rule; no Windows-only arm). Controls this pass ran: base (mut-c-01) and M-c02 … M-c12, all RED on their target nodes; none survived. Backlog added: BL-I10b-1 (R-3, flagged for the batch-end review page), BL-I10b-2 (R-5).
+
+## 7. Re-review RR-1 ... RR-5 applied
+
+Orchestrator rulings on the re-review (`E5-review.md`, "Re-review of the corrective"). Final tree `3e432888…` (base `6f1743c` + the local diff). All runs on the LAN Linux laptop, clone `s19_i10brr`.
+
+| Item | Change | File:line | RED / GREEN |
+|---|---|---|---|
+| RR-1 | After the value wait, /5 filters Raw by `17677` (`filter_raw`) and asserts the written tag is listed with Raw/Physical `17677`; the filter reads the installed `_a2l_enriched_tags` | `tests/test_b101_inplace_views.py:928-931` | RED under M-c05 (the recomputed list not installed): `the table does not list only Raw cells holding '17677' (0 rows)` (e5c-rr-01); GREEN e5c-rr-03 ... 05 |
+| RR-3 | The pane guard sets `mounted` instead of returning; the recompute, the install and the filtered-list re-point always run; only the summary paint, the re-filter and the cell repaint are skipped when unmounted. Shipped routes unchanged (every pane is composed at startup) | `s19_app/tui/app.py:18936-18942`, `:18967-18977` (+ docstring) | no node reaches the unmounted case (no shipped route does); the 21 nodes GREEN (e5c-rr-03 ... 05) |
+| RR-4 | /5 reads the table's row key of page row 45 (`a2l:245`), asserts `_a2l_row_key_to_tag` maps it to Raw `17677`, then moves the cursor to row 44 and back and waits for the card to name each tag. Deviation from the ruling: the detail card (`_a2l_detail_card_text`) prints no Raw value, so the card alone cannot tell a stale dict; the map entry is the check, the card follows the highlight | `tests/test_b101_inplace_views.py:911-927` | RED under the row key `a2l:{i}`: `- 17677 + 47629` (e5c-rr-02); GREEN as above |
+| RR-5 | The comment cites `evidence/inc-10b/e5c-02.txt` (the printed counts), not the README | `tests/test_b101_inplace_views.py:1550-1551` | n/a (comment) |
+| RR-2 | Design note below | this file | n/a (record) |
+
+**RR-2 design note.** A duplicated `(section, name)` group goes through the service merge (`enrich_tags_and_render`, `services/a2l_service.py:22-25`): every row of the group carries the group's last tag's check row, so a write into any member of the group must recompute the group as a whole. The partial path flags a tag by its own `raw_bytes`; that stays equal to a full recompute only while the merge takes the whole last row. No fixture has a duplicate (case_06's 220,040 names and case 08's are unique); a later change of the merge must add that fixture first.
+
+Runs (final tree `3e432888…`): `tests/test_b101_inplace_views.py` (`-n 6 --dist load`, `-m "not serial_timing"`) 21 passed x3 (e5c-rr-03, -04, -05); the 7 law guards 218 passed (e5c-rr-06); `-m serial_timing -p no:xdist` on that file: 1 passed, QC-TM-10b-1 0.360 s / 1.000 s, 64.0 % (e5c-rr-07). Not run: Windows (operator rule). Teardown: `~/work/s19_i10brr*` removed; nothing that imports `s19_app` ran on the Windows PC; no OS clipboard.

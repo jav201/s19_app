@@ -120,3 +120,143 @@ R-2 … R-6 are MINOR recommendations.
 ## Packet §4b cell
 
 `code-reviewer · FAIL (BLOCK-UNTIL: R-1) · no HIGH; R-1 (MAJOR) open — QC-TM-10b-1 owed on case_06 (A10-12), then the D-10b-6 ruling; R-2 … R-6 MINOR, recommendations`
+
+## Re-review of the corrective (code + security)
+
+Reviewer: code-reviewer, independent of the corrective's author (Opus); I wrote none of it. Scope, changed items only: `git diff 0e57d66 3060eaf -- s19_app tests` (`s19_app/tui/app.py`: the hook, `_refresh_hex_views_after_write`, `_refresh_a2l_values_after_write`; `tests/test_b101_inplace_views.py`: `press_shown`, R-A2L-048/4, /5, R-TUI-004.8, QC-TM-10b-1) and the records it changed (`01-requirements.md`, `02-test-cases.md`, `E1-rulings.md` §4, `codewire/graph-inc10b.md`, `E5-corrective-notes.md`, `steps.log`). Head `9a6f2e2`: the commit after `3060eaf` adds only the DeepSeek mutant table and its transcripts, with no `s19_app` or `tests` change.
+
+Nothing that imports `s19_app` ran on this PC. Local checks were `git diff` and `grep` over the code and over `examples/case_06_large_nested_a2l` (tag shapes, names, address density, image ranges), plus `python -I` with `struct` only (the 048/4 value text, the 048/5 value). Run claims come from `E5-corrective-notes.md` and the transcripts `e5c-*` and `mut-c-*`, read, not re-run.
+
+### Verdict
+
+**PASS-WITH-NOTES.** R-1 is discharged on two grounds.
+- **By reading:** the partial recompute changes exactly the rows a full recompute would change, on all three write routes (the apply, the save-back and the Save project commit; derivation below).
+- **By measurement:** on case_06, 3.952 s → 0.350 s against 1 s (65 % margin), with the enriched list equal to a full recompute (e5c-02, e5c-13). The three mutants on that node are RED (mut-c-02, -03, -05).
+
+R-2, R-4, R-6, QA-2 and QA-4 are applied as ruled. There is no HIGH and no MAJOR. RR-1 is MINOR (a test gap); RR-2 … RR-5 are NITs. None blocks.
+
+### R-1: is the partial set exactly what a full recompute changes?
+
+Derivation (read, not run). A row of `enrich_tags_and_render` (`services/a2l_service.py:10-27`) is built from four inputs:
+- **(a) A2L metadata:** the tag's parse fields and the A2L's `record_layouts_by_name`, `compu_methods_by_name` and `compu_tabs_by_name` (`a2l.py:2878-2945`).
+- **(b) The tag's own bytes:** `[address, address + byte_size)` (`_extract_raw_bytes`, `a2l.py:1838-1859`).
+- **(c) The image's key set:** `in_memory` (`validate_a2l_tags`, `a2l.py:3553-3610`).
+- **(d) A duplicated `(section, name)` group:** each row takes the group's last tag's whole checked row (the merge, `a2l_service.py:22-25`).
+
+No row reads another tag's bytes. A full recompute therefore changes exactly the rows whose own bytes changed, as long as (a) and (c) are unchanged, and the cache key guards both.
+
+| Case | Holds? | Why |
+|---|---|---|
+| Bytes unchanged, value depends on another tag (external axis, COMPU_TAB, record layout) | yes | Rows hold no cross-tag value. The external-axis decode lives only in `describe_curve_tag`, which runs live at `d` from the current `mem_map` (`app.py:9825-9826`) and is not cached. |
+| Scaling from a referenced record or compu method | yes | This is metadata from `current_a2l_data`. It changes only through `_replace_current_a2l`, which bumps the generation: cache miss, full path. |
+| Tag spanning a write boundary | yes | Every byte of the row's `raw_bytes` is compared (`app.py:18949-18951`). M-c03 (first byte only) is RED on /5 and on QC-TM. |
+| Overlapping tags | yes | Each row is compared on its own. case_06 has 58 RL_U16 characteristics and 58 UBYTE measurements at `0x80100004` (counted); the 58 RL_U16 rows are exactly the ones M-c03 and M-c05 leave stale. |
+| Tag partly or wholly outside the image | yes | `raw_bytes` is `None` when any byte is missing (`a2l.py:1854`), so the row is skipped. A full run also gives `None`, because no write adds an address (next row). |
+| A write adds or removes addresses | n/a on shipped routes | The apply writes only `INSIDE` entries, after reading each address (`changes/apply.py:337-341`). The journal restore and `adopt_rederived` write only addresses captured from, or present in, `mem_map` (`services/change_service.py:1845-1846`, `:2355-2364`). A size change would also miss the cache (`mem_size` is in the key): full path. |
+| `raw_bytes` never saved (first refresh after a load or an attach) | yes | The key is `None` or stale, so `_compute_a2l_enriched_tags()` misses and returns a new list, not `old`: full path. On the apply and the save-back, the handler has already called `_compute_a2l_enriched_tags()` before the write (`app.py:4842`, `:5097`), so the hook hits a key for this image. |
+| Reload between the write and the refresh | yes | An install bumps `_image_generation` (`app.py:19100`): miss, full path. A stale listing then re-filters (R-2). |
+| Endianness or byte order changed between writes | n/a | `effective_byte_order` is set at parse time only (`a2l.py:2682-2761`). There is no runtime override in `app.py`: its `endian` hits are display and sort fields. |
+| Duplicated `(section, name)` group | yes, by reading | The merge gives every row of a group the last tag's `address` and `raw_bytes`, so the per-row test flags all of the group or none of it, and the sub-list's last member is the group's last. No fixture has such a group (RR-2). |
+| A byte changed by a route that does not call the hook | yes, better than the key | The next hooked write compares `raw_bytes` with the image as it is now, so it catches that byte too. |
+
+**How strong is the test's equality?** It compares all 220,040 rows with a full recompute (`tests/test_b101_inplace_views.py:1595-1604`). The write is covered by 58 rows that M-c03 and M-c05 leave stale, so the check is not vacuous. It can only catch the dependency classes its fixture contains: one shape (RL_U16, `CM_IDENT`), one write, no duplicate group, and no partly-outside tag at the write. The only further class in the code is the duplicate group (d), which is RR-2. The equality runs only in the serial lane (RR-1).
+
+**Cost observation (estimate, not run).** The partial cost grows with the number of changed rows. On case_06, about 20,840 tags start inside the image (`0x80100000-0x801003FF` and `0x80102000-0x80102050`, 1,105 bytes). A write over the whole image would therefore recompute about 9.5 % of the rows. Scaling from e5c-02, that is about 0.37 s plus the 0.35 s scan, so about 0.7 s, within the bound. No action.
+
+### The other ruled items
+
+- **R-2: applied.**
+  - The Split / Join notice is the hook's first statement (`app.py:18786-18791`). `_bump` and `_sync` read only `current_file.mem_map` and the window's state, and `_a2l_rows` reads the A2L's sections, not the enriched tags. So no later step feeds it.
+  - On a miss, the re-point re-filters from the newly installed list and returns (`app.py:18966-18970`); there is no `KeyError`.
+  - In the original review's window, the apply's call at `:4842` recomputes for the new image, the hook hits the cache and recomputes the changed rows, and the stale listing misses and re-filters.
+  - Note: on shipped routes a raise inside the hook still ends the app (Textual), so the order matters only for a raise that is caught. Accepted as ruled.
+- **R-4: applied.**
+  - /5 (`tests/...:862-911`) pages to `tags 201-400 / 462` and writes `VAL_BLK_0002`'s second byte (`0D 45` little-endian = 17677, checked).
+  - It asserts the cells, the summary, the row names and the cursor. M-c06 (`tags[i]`) and M-c03 are RED.
+  - The row-key arm is still uncovered (RR-4).
+- **R-6: applied.**
+  - Both refreshes guard their panes in one `try` (`app.py:18854-18859`, `:18934-18939`).
+  - The queried types match the compose: `Static` at `:3534`, `:3545`, `:8593` and `:8678`; `DataTable` at `:8567`; `Label` at `:8572`.
+  - The hook's docstring now matches the code. Where the A2L guard sits is RR-3.
+- **QA-2: applied, and the case text follows the node.**
+  - `02-test-cases.md` R-A2L-048/4 and the graph's R2-7 example both say FLOAT32 `EA A3 64 C6` → `-9.876539885039906e+25`, 22 characters (checked with `struct`). The audit's `FF FF` → `65535` wording is gone from both.
+  - The change and its reason are recorded as E-5: the columns stay 18 cells wide after page 1.
+  - The node calibrates its painted-cell reader on the pre-write value first (`tests/...:823`). M-c07 is RED with the columns at 18 / 18 (mut-c-07).
+- **QA-4: applied.**
+  - R-TUI-004.8's threshold (`01-requirements.md:39`) names (10, 40) for main and (0, 40) for the A2L and MAC views, marked "(changed at E5, QA-4)".
+  - The node pins those values (`tests/...:1211`) and asserts the window, then the byte, then the scroll. M-c08 and M-c09 are RED at the window clause.
+- **QC-TM-10b-1: correct form.**
+  - `report_margin` sits inline in the first assert (`tests/...:1592`), the form the law guard accepts (E-9; e5c-12, 218 passed). The equality check comes after it.
+  - The write address is real: no tag starts at `0x80100005`, and 58 RL_U16 tags cover it.
+- **Security lens: nothing new.**
+  - The corrective adds no new input, path, clipboard or export surface.
+  - The disarm (S-7) now runs before any step that could fault.
+  - `bytes.fromhex` reads only hex that the service itself wrote. The per-tag scan is bounded by `MAX_A2L_DECODE_BYTES` (`a2l.py:62`), as the load already is.
+  - The corrective's records and transcripts use placeholders (`<HOME>`, `<CONDA>`), not real home paths.
+
+### Findings
+
+#### RR-1 — the cache install is guarded only by the case_06 timing node  [MINOR · test-gap]
+- **Where:** `app.py:18962` (`self._a2l_enriched_tags = new`). Its only oracle is the equality in QC-TM-10b-1 (`tests/test_b101_inplace_views.py:1595-1604`), a `serial_timing` node.
+- **Scenario:**
+  - M-c05 drops the install (mut-c-05). The table still paints the written values, because `_a2l_filtered_tags` is re-pointed to the local list.
+  - By reading, every normal-lane node passes. They read the painted cells, and none of them re-filters or reads `_a2l_enriched_tags` after a write: the filters are set before the write (`tests/...:924`, `:1049`). M-c05 was run only against QC-TM.
+  - On shipped routes, a filter typed after the write rebuilds from the stale list (`app.py:20889`) and paints the pre-write values again.
+  - Reports, check runs and the editors' pickers read `_compute_a2l_enriched_tags()`. A write does not change its key, so they get pre-write values.
+- **Why it matters:** the oracle for the data that reports and checks read sits behind a 37.7 MB load and a timing bound. A timing RED hides it, and the normal lane cannot see it.
+- **Fix (either):**
+  - In R-A2L-048/5 (or /1), after the value wait, type a name filter for the written tag (`VAL_BLK_0002`) and assert Raw `17677`.
+  - Or, on case 08 (462 tags, cheap), assert that `app._a2l_enriched_tags` equals `enrich_tags_and_render(app.current_a2l_data, app.current_file.mem_map)[0]`.
+  - Then run M-c05 against the new assertion; it must be RED.
+
+#### RR-2 — the duplicate-group argument has no fixture  [NIT · test-gap]
+- **Where:** `app.py:18941-18962` and its docstring (`:18898-18913`), which rest on the merge at `services/a2l_service.py:22-25`.
+- **Scenario:**
+  - The code is correct today (see the table above).
+  - Suppose a later merge took only the validation fields from the group's last row. Each row would then keep its own `raw_bytes`.
+  - A write into a non-last member would recompute only that member, and its sub-run would merge its own check row instead of the last one. The result would differ from a full run.
+  - No node would notice: case_06's 220,040 names are unique (checked), and the case 08 nodes write unique tags.
+- **Fix:** add one node on a small A2L with a duplicated name pair. Write into the first member's range, then into the last's, and assert the enriched list equals a full recompute. Or record this as a design note in the graph.
+
+#### RR-3 — the A2L pane guard also skips the cache refresh  [NIT · robustness, security lens]
+- **Where:** `app.py:18934-18939`, which runs before the recompute.
+- **Scenario:**
+  - If a table pane is not mounted, the guard returns before `_a2l_enriched_tags` is refreshed. No shipped route gets here: every pane is composed at startup (`:3545`, `:8567`, `:8572`).
+  - After an in-place write this method is the only thing that refreshes the cached values, so reports and checks would read pre-write values.
+  - The old notices this guard imitates only paint.
+- **Fix:** run the recompute and the install first, and guard only the paints (`_update_a2l_summary_buffer`, the re-filter and `_repaint_a2l_tag_cells`).
+
+#### RR-4 — R-4's row-key arm still has no node  [NIT · test-gap, residual]
+- **Where:** `app.py:21138` (`_a2l_row_key_to_tag[f"a2l:{absolute_index}"]`).
+- **Scenario:**
+  - /5 reads the cells through `get_row_at`, not through the row-key map.
+  - Under the mutant `a2l:{i}`, page 2's row key `a2l:245` keeps the pre-write dict, so the detail card and `d` for that row show Raw `47629`.
+  - The ruling scoped R-4 to the cells, so this is a residual, not a miss.
+- **Fix:** in /5, move the cursor off row 45 and back, then assert the detail card reads `17677`. Run the `a2l:{i}` mutant against it.
+
+#### RR-5 — the QC-TM comment cites a README that holds neither fact  [NIT · record]
+- **Where:** `tests/test_b101_inplace_views.py:1527-1529`.
+- **Scenario:** the comment cites `examples/case_06_large_nested_a2l/README.txt` for "220,040 tags over about 1 KiB of image". The README says only "~35 MB" and the expected uses. The facts themselves are right: 220,040 tags counted, 1,105 image bytes.
+- **Fix:** cite e5c-02's printed count, or drop the citation.
+
+### Evidence checklist (re-review)
+
+- ✓ **Diff read in full:** `app.py:18737-18972`; tests `:299-350`, `:769-911`, `:1189-1248` and `:1525-1606`; the records listed in the scope.
+- ✓ **Correctness pass:** the case table above. I read the writers on all three write routes (`changes/apply.py:337-341`, `change_service.py:1845-1846`, `:2355-2364`), the R-2 fallback and the pane guards.
+- ✓ **Simplicity pass:** the partial path is one loop and one sub-run, with no new abstraction.
+- ✓ **Reuse:** it calls the service's own `enrich_tags_and_render` and does not copy the enrichment.
+- ✓ **Tests reviewed for intent:** the equality is not vacuous (58 rows). Gaps: RR-1, RR-2 and RR-4.
+- ✓ **Verdict explicit:** PASS-WITH-NOTES; no HIGH.
+
+**Evidence states**
+
+| Item | State | Basis |
+|---|---|---|
+| R-1 discharge | `executed` | e5c-02, -03 and -13; mut-c-02, -03 and -05. Run by the corrective's author; read here, not re-run. |
+| Route-equivalence derivation | `executed` | Reading only. |
+| RR-1: M-c05 survives the normal lane | `not-run` | By reading only. |
+| Windows | `not-run` | Operator rule. |
+
+### Packet §4b cell (re-review)
+
+`code-reviewer · PASS-WITH-NOTES · no HIGH; R-1 discharged (partial recompute = full recompute on the three write routes by reading; case_06 3.952 s → 0.350 s / 1 s, equal to a full recompute, mut-c-02/-03/-05 RED); RR-1 MINOR (cache install guarded only by the serial QC-TM node); RR-2 … RR-5 NIT`

@@ -18893,8 +18893,9 @@ class S19TuiApp(App):
 
         Data Flow:
             - No image or no A2L -> return (nothing was written that a tag
-              reads). The tag-table panes not mounted -> return (the hook's
-              guard idiom, E5 R-6).
+              reads). The tag-table panes not mounted -> the cache and the
+              filtered list still refresh; only the paints are skipped
+              (E5 RR-3).
             - ``old = _a2l_enriched_tags``. When ``_compute_a2l_enriched_tags``
               returns ``old`` itself, the cache describes this image's
               layout, and a write keeps that layout (it writes only addresses
@@ -18935,8 +18936,9 @@ class S19TuiApp(App):
             self.query_one("#a2l_view", Static)
             self.query_one("#a2l_tags_list", DataTable)
             self.query_one("#a2l_tags_summary", Label)
+            mounted = True
         except Exception:
-            return
+            mounted = False
         old = self._a2l_enriched_tags
         if self._compute_a2l_enriched_tags() is old:
             mem_map = self.current_file.mem_map
@@ -18962,14 +18964,17 @@ class S19TuiApp(App):
             self._a2l_enriched_tags = new
         else:
             new = self._a2l_enriched_tags
-            self._update_a2l_summary_buffer()
+            if mounted:
+                self._update_a2l_summary_buffer()
         position_by_tag = {id(tag): i for i, tag in enumerate(old)}
         positions = [position_by_tag.get(id(tag)) for tag in self._a2l_filtered_tags]
         if None in positions:
-            self._refresh_a2l_filtered_tags(preserve_anchor=True)
+            if mounted:
+                self._refresh_a2l_filtered_tags(preserve_anchor=True)
             return
         self._a2l_filtered_tags = [new[i] for i in positions]
-        self._repaint_a2l_tag_cells()
+        if mounted:
+            self._repaint_a2l_tag_cells()
 
     def watch_current_file(self) -> None:
         """
