@@ -1,0 +1,96 @@
+=== base commit: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+=== python: Python 3.11.18
+=== mutation applied: M14 (file s19_app/tui/app.py)
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -18022,7 +18022,7 @@
+         self.update_project_labels()
+         self.update_memory_map()
+         self._refresh_loaded_panel()
+-        self.set_file_status(f"Unloaded {label}.")
++        self.set_status(f"Unloaded {label}.")
+         self.set_status(f"Unloaded {label}.")
+         self.call_after_refresh(self._land_focus, trigger, None, on_switch=False)
+ 
+LANDED M14: 'self.set_status(f"Unloaded {label}.")' x2
+=== s19_app.__file__ ===
+<HOME>/work/s19_i10mut_m16/s19_app/__init__.py
+=== CMD ===
+env -u NO_COLOR <HOME>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -rf  tests/test_b101_unload_focus.py::test_r_ws_loaded_13_1_unload_messages_are_unchanged
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________ test_r_ws_loaded_13_1_unload_messages_are_unchanged ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-654/test_r_ws_loaded_13_1_unload_m0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-654/b101_i10f_case080')
+
+    def test_r_ws_loaded_13_1_unload_messages_are_unchanged(tmp_path: Path, case08: Path) -> None:
+        """R-WS-LOADED.13 case /1 (regression, written at E4 integration): ``[u]``
+        on the MAC slot, then ``U``: the newest message line is ``Unloaded MAC.``,
+        then ``Unloaded all artifacts.``, each painted once (the file-status write
+        of R-WS-LOADED.18 adds no message line). Fails if a message is removed,
+        changed or painted twice."""
+    
+        async def scenario(app, pilot, log):
+            await case_session(pilot, app, case08)
+            mark = len(log.messages)
+            await press_unload(pilot, app, "mac")
+            await wait_message(pilot, log, mark, "Unloaded MAC.")
+            await settle(pilot, 4)
+            assert newest_message(app) == "Unloaded MAC.", newest_message(app)
+            assert list(app.log_lines).count("Unloaded MAC.") == 1, list(app.log_lines)
+            mark = len(log.messages)
+            await pilot.press("U")
+            await wait_message(pilot, log, mark, "Unloaded all artifacts.")
+            await settle(pilot, 4)
+            assert newest_message(app) == "Unloaded all artifacts.", newest_message(app)
+            lines = list(app.log_lines)
+            assert (lines.count("Unloaded MAC."), lines.count("Unloaded all artifacts.")) == (1, 1), lines
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:472: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f1b32525590>
+
+    async def scenario(app, pilot, log):
+        await case_session(pilot, app, case08)
+        mark = len(log.messages)
+        await press_unload(pilot, app, "mac")
+        await wait_message(pilot, log, mark, "Unloaded MAC.")
+        await settle(pilot, 4)
+        assert newest_message(app) == "Unloaded MAC.", newest_message(app)
+>       assert list(app.log_lines).count("Unloaded MAC.") == 1, list(app.log_lines)
+E       AssertionError: ['Loaded firmware.s19 (S19 only)', 'Loaded firmware.mac (S19+MAC)', 'Unloaded MAC.', 'Unloaded MAC.']
+E       assert 2 == 1
+E        +  where 2 = <built-in method count of list object at 0x7f1b2afe8b80>('Unloaded MAC.')
+E        +    where <built-in method count of list object at 0x7f1b2afe8b80> = ['Loaded firmware.s19 (S19 only)', 'Loaded firmware.mac (S19+MAC)', 'Unloaded MAC.', 'Unloaded MAC.'].count
+E        +      where ['Loaded firmware.s19 (S19 only)', 'Loaded firmware.mac (S19+MAC)', 'Unloaded MAC.', 'Unloaded MAC.'] = list(deque(['Loaded firmware.s19 (S19 only)', 'Loaded firmware.mac (S19+MAC)', 'Unloaded MAC.', 'Unloaded MAC.']))
+E        +        where deque(['Loaded firmware.s19 (S19 only)', 'Loaded firmware.mac (S19+MAC)', 'Unloaded MAC.', 'Unloaded MAC.']) = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}).log_lines
+
+../s19_i10mut/tests/test_b101_unload_focus.py:463: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_unload_focus.py::test_r_ws_loaded_13_1_unload_messages_are_unchanged
+1 failed in 13.67s
