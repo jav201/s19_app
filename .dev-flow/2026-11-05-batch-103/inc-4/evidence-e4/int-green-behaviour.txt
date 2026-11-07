@@ -1,0 +1,7 @@
+/home/javiergr/work/b103-int4/s19_app/__init__.py
+fatal: cannot change to '/tmp/b103-int4/home/work/b103-int4': No such file or directory
+ 20:36:27 up 1 day, 12:08,  2 users,  load average: 0.01, 0.04, 0.33
+........................................................................ [ 55%]
+.........................................................                [100%]
+129 passed in 5.98s
+EXIT=0

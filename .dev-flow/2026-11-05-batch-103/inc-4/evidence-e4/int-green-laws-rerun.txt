@@ -1,0 +1,5 @@
+/home/javiergr/work/b103-int4/s19_app/__init__.py
+HOME basename: zq_iso_user
+..                                                                       [100%]
+2 passed in 1.93s
+EXIT=0

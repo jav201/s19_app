@@ -1,0 +1,9 @@
+/home/javiergr/work/b103-inc4-base/s19_app/__init__.py
+e07fb00f batch-101: atlas regenerated after the increment-006 decision
+
+tests/test_b101_doc_hygiene.py:1277: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_suite_hygiene.py::test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_archive_4_1_archive_holds_no_local_identity
+2 failed in 2.14s
+EXIT=1

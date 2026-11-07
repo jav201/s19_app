@@ -1,0 +1,32 @@
+/home/javiergr/work/b103-int4/s19_app/__init__.py
+        assert not absent, f"archive files not tracked, nothing to scan: {absent}"
+        hits = []
+        for rel in files:
+            text = _read(rel)
+            if text is None:
+                continue
+            hits += [f"{rel}: {h}" for h in _local_identity_hits(text)]
+>       assert not hits, "local identities in the archive folder:\n" + "\n".join(hits)
+E       AssertionError: local identities in the archive folder:
+E         .dev-flow/design/archive/architecture-batch-declarations-88-100.md: local account or host name: home
+E         .dev-flow/design/archive/architecture-batch-declarations-88-100.md: local account or host name: home
+E         .dev-flow/design/archive/architecture-batch-declarations-88-100.md: local account or host name: home
+E         .dev-flow/design/archive/architecture-batch-declarations-88-100.md: local account or host name: home
+E         .dev-flow/design/archive/architecture-batch-declarations-88-100.md: local account or host name: home
+E         .dev-flow/design/archive/architecture-batch-declarations-88-100.md: local account or host name: home
+E         .dev-flow/design/archive/architecture-batch-declarations-88-100.md: local account or host name: home
+E         .dev-flow/design/archive/architecture-batch-declarations-88-100.md: local account or host name: home
+E         .dev-flow/design/archive/architecture-batch-declarations-88-100.md: local account or host name: home
+E         .dev-flow/design/archive/synth-case08-release-demo-VERIFY.md: local account or host name: HOME
+E       assert not ['.dev-flow/design/archive/architecture-batch-declarations-88-100.md: local account or host name: home', '.dev-flow/de...me: home', '.dev-flow/design/archive/architecture-batch-declarations-88-100.md: local account or host name: home', ...]
+
+tests/test_b101_doc_hygiene.py:1277: AssertionError
+============================= QC-TM timing margins =============================
+49.8%  0.201 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+66.5%  0.503 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 2 bounds, 0 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_suite_hygiene.py::test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses
+FAILED tests/test_b101_doc_hygiene.py::test_r_doc_archive_4_1_archive_holds_no_local_identity
+2 failed, 217 passed in 311.63s (0:05:11)
+EXIT=1
