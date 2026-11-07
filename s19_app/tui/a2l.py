@@ -705,7 +705,7 @@ def _lex_a2l_lines(lines: Iterable[str], errors: Any) -> Iterator[tuple[int, str
             and '"' not in body
             and "/" not in body
         ):
-            text = body.strip(" ")
+            text = " ".join(body.split())
             if text:
                 yield line, text
             line += 1
@@ -3771,7 +3771,7 @@ def extract_declared_spans(
             return None
         if kind == "TYPEDEF_CHARACTERISTIC":
             char_type = header[0] if header else None
-            deposit = header[1] if len(header) > 1 else None
+            deposit = header[2] if len(header) > 2 else None
             if char_type in ("VALUE", "VAL_BLK", "ASCII"):
                 hdr = {"char_type": char_type, "deposit": deposit}
                 kw_texts = [text for text, _line in kw_lines]
