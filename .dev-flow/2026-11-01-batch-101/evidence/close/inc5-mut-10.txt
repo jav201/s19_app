@@ -1,0 +1,64 @@
+# Mutant M10 — batch-end re-run on the final tree (b982846)
+BASE_COMMIT=b982846ce33ccc20b1774f91b1091af4b42dff73
+BASE_TREE=detached worktree at 7d641d9 + git diff --binary 7d641d9 b982846 -- s19_app tests docs README.md AT-TC-REGISTRY.jsonl applied
+s19_app.__file__=<HOME>/work/s19_i5rm_m10/s19_app/__init__.py
+mutation: R-CHKED-054 post-Write refresh clears the picks
+mutation diff:
+diff --git a<HOME>/work/s19_i5rm/s19_app/tui/app.py b<HOME>/work/s19_i5rm_m10/s19_app/tui/app.py
+index 18795c7..bf3e464 100644
+--- a<HOME>/work/s19_i5rm/s19_app/tui/app.py
++++ b<HOME>/work/s19_i5rm_m10/s19_app/tui/app.py
+@@ -7869,6 +7869,7 @@ class S19TuiApp(App):
+                     f"({len(document.entries)} fields, kind=check)."
+                 )
+                 # The new spec joins the suffix-distinguished listings.
++                panel._picker.clear_picks()
+                 self._prefill_check_editor()
+                 self._prefill_patch_change_files()
+                 self._prefill_diff_check_files()
+verify:
+grep s19_app/tui/app.py: replaced -> '# The new spec joins the suffix-distinguished listings.' FOUND
+guard nodes (1):
+  tests/test_b101_check_spec_keep.py::test_r_chked_054_1_write_keeps_the_field_set
+
+--- pytest ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________________ test_r_chked_054_1_write_keeps_the_field_set _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-529/test_r_chked_054_1_write_keeps0')
+facts = Facts(case=PosixPath('/tmp/pytest-of-<user>/pytest-529/b101_inc5_case080'), image={0: 108, 1: 49, 2: 57, 3: 84, 4: 79...ram(name='VALUE_0002', address=20, size=2), v3=Param(name='VALUE_0003', address=40, size=4), serial=12587004, moved=32)
+
+    def test_r_chked_054_1_write_keeps_the_field_set(tmp_path: Path, facts: Facts) -> None:
+        """Case R-CHKED-054/1 (F-26): as R-CHKED-010/1; Write as
+        ``pilot_fields.chk.json`` -> status ``Check Editor: wrote
+        pilot_fields.chk.json (3 fields, kind=check).``; afterwards the included
+        parameters are exactly ``[VALUE_0001, VALUE_0002]``, the memory table holds
+        one row (``SERIAL``, ``u32``) and the head line is the one before the
+        Write.
+    
+        Standing guard: holds on the base (batch-102's picker; F-26 is not
+        reproduced on ``c2cba35``, E1 D-2); it keeps the R-CHKED-010 fix from
+        bringing F-26 back. Negative control: the post-Write refresh repopulating
+        the ledger with no signature -> ``1 field: 0 params · 1 memory row`` ->
+        RED."""
+    
+        async def scenario(app, pilot, log):
+            await picked_session(pilot, app, log, facts, tmp_path)
+            before = head(app)
+            lines, _entries = await write_spec(pilot, app, log, PILOT)
+            return before, lines, included(app), mem_rows(app), head(app)
+    
+        before, lines, picks, rows, after = run(tmp_path, scenario)
+        assert f"Check Editor: wrote {PILOT} (3 fields, kind=check)." in lines, lines
+>       assert picks == [facts.v1.name, facts.v2.name], picks
+E       AssertionError: []
+E       assert [] == ['VALUE_0001', 'VALUE_0002']
+E         
+E         Right contains 2 more items, first extra item: 'VALUE_0001'
+E         Use -v to get more diff
+
+tests/test_b101_check_spec_keep.py:693: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_054_1_write_keeps_the_field_set
+1 failed in 21.16s

@@ -1,0 +1,182 @@
+# Mutant M06 — batch-end re-run on the final tree (b982846)
+BASE_COMMIT=b982846ce33ccc20b1774f91b1091af4b42dff73
+BASE_TREE=detached worktree at 7d641d9 + git diff --binary 7d641d9 b982846 -- s19_app tests docs README.md AT-TC-REGISTRY.jsonl applied
+s19_app.__file__=<HOME>/work/s19_i5rm_m06/s19_app/__init__.py
+mutation: addendum 2a (SEC5-2): save-back hook under result.ok
+mutation diff:
+diff --git a<HOME>/work/s19_i5rm/s19_app/tui/app.py b<HOME>/work/s19_i5rm_m06/s19_app/tui/app.py
+index 18795c7..549cd4c 100644
+--- a<HOME>/work/s19_i5rm/s19_app/tui/app.py
++++ b<HOME>/work/s19_i5rm_m06/s19_app/tui/app.py
+@@ -5102,9 +5102,9 @@ class S19TuiApp(App):
+         # in place — ``save_patched`` adopts the re-derived bytes before it
+         # possibly refuses a blocked save — so tell the CRC Designer whatever
+         # ``result.ok`` (R-CRC-PREVIEW-002.5/7).
+-        self._note_image_bytes_written()
+         self._report_change_result(result)
+         if result.ok:
++            self._note_image_bytes_written()
+             # LLR-167.5: a successful save-back records the saved image.
+             self._change_service.mark_saved(loaded.mem_map)
+             # LLR-168.2: a save-back into the open project becomes its
+verify:
+grep s19_app/tui/app.py: replaced -> 'self._report_change_result(result)' FOUND
+guard nodes (1):
+  tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_7_blocked_save_back_still_refreshes
+
+--- pytest ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________ test_r_crc_preview_002_5_7_blocked_save_back_still_refreshes _________
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+before = 9, expect = (2623261629, 713701712)
+what = 'blocked save-back then display'
+
+    async def _expect_refresh(pilot, app, before: int, expect: Tuple[int, int], what: str) -> None:
+        """After the display that follows an in-place write: exactly one recompute,
+        the painted CRCs equal ``zlib.crc32`` of the session bytes and the literal
+        values the case states, and window line 2 says the same."""
+        try:
+>           await wait_designer_recompute(pilot, app, before, timeout=RECOMPUTE_TIMEOUT_S)
+
+tests/test_b101_designer_writes.py:372: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b101_designer.py:89: in wait_designer_recompute
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function wait_designer_recompute.<locals>.<lambda> at 0x7fb96a1d27a0>
+failure = <function wait_designer_recompute.<locals>.<lambda> at 0x7fb96a1d36a0>
+timeout = 20.0, pause_first = True
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: no settled recompute: count 9 (snapshot 9), pending None
+
+tests/support/timing.py:66: AssertionError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-525/test_r_crc_preview_002_5_7_blo0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fb96be6bb50>
+
+    def test_r_crc_preview_002_5_7_blocked_save_back_still_refreshes(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Verifies R-CRC-PREVIEW-002.5/7 (E3 SEC5-2): after the apply of ``AA`` and
+        one display (``0x08DAAFB7``), a second entry ``0x8002`` = ``11 22`` (it
+        overlaps ``0x8003``) and *Save patched image as* ``fixture-blocked.s19``
+        confirmed, the save ends ``Patched image not saved - 2 entries blocked - see
+        issues``, writes no file, and leaves ``0x8002`` / ``0x8003`` at ``02`` /
+        ``03``; the first display afterwards shows ``0x9C5BCBBD`` / ``0x2A8A3950``.
+    
+        Why: the refused save-back has already adopted the re-derived bytes (the
+        revert), so a hook gated on the save's ``ok`` leaves the designer painting
+        the AA value of an image that no longer holds it. Base: the designer keeps
+        ``0x08DAAFB7`` -> RED. Negative control: hook under ``if result.ok`` -> RED."""
+        _set_quiet(monkeypatch, QUIET_SHORT_S)
+    
+        def make(folder: Path, image: Path):
+            async def scenario(app, pilot, log):
+                await _load_image_by_dialog(pilot, app, image)
+                await _load_document(pilot, app, log, folder, "d.changes.json", [AA_ENTRY])
+                assert await _apply(pilot, app, log, "Apply:") == "Apply: 1 applied, 0 skipped, 0 blocked"
+                await _fresh_designer_display(pilot, app, AFTER_AA)
+                await _entry_op(
+                    pilot, app, log, "#patch_entry_add_button", "0x8002", "11 22", "Patch Editor: entry added."
+                )
+                before = designer_recomputes()  # E5 C-3: before the trigger
+                lines = await _save_back(
+                    pilot,
+                    app,
+                    log,
+                    "fixture-blocked.s19",
+                    "Patched image not saved - 2 entries blocked - see issues",
+                )
+                assert any(m == "Patched image not saved - 2 entries blocked - see issues" for m in lines), lines
+                await _quiet(pilot, 3)
+                assert not list((folder / "app").rglob("fixture-blocked.s19")), "a blocked save-back wrote a file"
+                mem = app.current_file.mem_map
+                assert (mem[0x8002], mem[0x8003]) == (0x02, 0x03), (mem[0x8002], mem[0x8003])
+                await _quiet(pilot)
+                assert designer_recomputes() == before, "a hidden CRC Designer recomputed"
+                await _press_rail(pilot, app, "0")
+                await _expect_refresh(pilot, app, before, PRE, "blocked save-back then display")
+    
+            return scenario
+    
+>       _reps(tmp_path, make)
+
+tests/test_b101_designer_writes.py:621: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_designer_writes.py:408: in _reps
+    results.append(_run(base, make_scenario(folder, image)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_designer_writes.py:396: in _run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_designer_writes.py:617: in scenario
+    await _expect_refresh(pilot, app, before, PRE, "blocked save-back then display")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+before = 9, expect = (2623261629, 713701712)
+what = 'blocked save-back then display'
+
+    async def _expect_refresh(pilot, app, before: int, expect: Tuple[int, int], what: str) -> None:
+        """After the display that follows an in-place write: exactly one recompute,
+        the painted CRCs equal ``zlib.crc32`` of the session bytes and the literal
+        values the case states, and window line 2 says the same."""
+        try:
+            await wait_designer_recompute(pilot, app, before, timeout=RECOMPUTE_TIMEOUT_S)
+        except AssertionError as exc:
+>           raise AssertionError(
+                f"{what}: the CRC Designer never recomputed (count {designer_recomputes()}, "
+                f"snapshot {before}) - stale coverage; it paints {_preview_lines(app)[1:]!r}, "
+                f"the session bytes give concat 0x{oracle(app.current_file.mem_map)[0]:08X}"
+            ) from exc
+E           AssertionError: blocked save-back then display: the CRC Designer never recomputed (count 9, snapshot 9) - stale coverage; it paints ['concat: 0x08DAAFB7', 'fill:   0x35D90BC3'], the session bytes give concat 0x9C5BCBBD
+
+tests/test_b101_designer_writes.py:374: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_7_blocked_save_back_still_refreshes
+1 failed in 52.67s

@@ -1,0 +1,183 @@
+# Mutant M05 — batch-end re-run on the final tree (b982846)
+BASE_COMMIT=b982846ce33ccc20b1774f91b1091af4b42dff73
+BASE_TREE=detached worktree at 7d641d9 + git diff --binary 7d641d9 b982846 -- s19_app tests docs README.md AT-TC-REGISTRY.jsonl applied
+s19_app.__file__=<HOME>/work/s19_i5rm_m05/s19_app/__init__.py
+mutation: 002.5/6 hook in the success branch only
+mutation diff:
+diff --git a<HOME>/work/s19_i5rm/s19_app/tui/app.py b<HOME>/work/s19_i5rm_m05/s19_app/tui/app.py
+index 18795c7..f31d6dc 100644
+--- a<HOME>/work/s19_i5rm/s19_app/tui/app.py
++++ b<HOME>/work/s19_i5rm_m05/s19_app/tui/app.py
+@@ -4920,6 +4920,7 @@ class S19TuiApp(App):
+                     f"Apply: {counts['applied']} applied, "
+                     f"{skipped} skipped, {counts['blocked']} blocked"
+                 )
++                self._note_image_bytes_written()
+                 if counts["applied"] > 0 and loaded is not None:
+                     if loaded.file_type in ("s19", "hex"):
+                         suffix = ".hex" if loaded.file_type == "hex" else ".s19"
+@@ -4964,12 +4965,6 @@ class S19TuiApp(App):
+         except (ValueError, KeyError) as exc:
+             self.set_status(f"Patch Editor: {exc}")
+ 
+-        # Inc 5 D-4: an apply wrote the loaded image's bytes in place (also
+-        # when it raises after the journal restore, and when 0 applied
+-        # restored an earlier apply), so tell the CRC Designer on both
+-        # outcomes — never gated on ``applied > 0`` (R-CRC-PREVIEW-002.5/8).
+-        if event.action == "apply_doc":
+-            self._note_image_bytes_written()
+ 
+         # batch-48 (LLR-080.2) — site 1 of 5: push the image's memory map so
+         # the before/after card can read its "before" bytes. `mem_map` is
+verify:
+grep s19_app/tui/app.py: deleted -> "Inc 5 D-4: an apply wrote the loaded image's bytes in place (also" GONE
+grep s19_app/tui/app.py: replaced -> 'self.set_status(' FOUND
+guard nodes (1):
+  tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_6_apply_error_still_refreshes
+
+--- pytest ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________ test_r_crc_preview_002_5_6_apply_error_still_refreshes ____________
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+before = 8, expect = (148549559, 903416771), what = 'apply error then display'
+
+    async def _expect_refresh(pilot, app, before: int, expect: Tuple[int, int], what: str) -> None:
+        """After the display that follows an in-place write: exactly one recompute,
+        the painted CRCs equal ``zlib.crc32`` of the session bytes and the literal
+        values the case states, and window line 2 says the same."""
+        try:
+>           await wait_designer_recompute(pilot, app, before, timeout=RECOMPUTE_TIMEOUT_S)
+
+tests/test_b101_designer_writes.py:372: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b101_designer.py:89: in wait_designer_recompute
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function wait_designer_recompute.<locals>.<lambda> at 0x7fd336ed9080>
+failure = <function wait_designer_recompute.<locals>.<lambda> at 0x7fd336edae80>
+timeout = 20.0, pause_first = True
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: no settled recompute: count 8 (snapshot 8), pending None
+
+tests/support/timing.py:66: AssertionError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-524/test_r_crc_preview_002_5_6_app0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fd33980b810>
+
+    def test_r_crc_preview_002_5_6_apply_error_still_refreshes(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Verifies R-CRC-PREVIEW-002.5/6 (partial: the fault is injected): an apply
+        that ends ``Patch Editor: 'probe'`` after the engine wrote ``AA`` still makes
+        the coverage stale; the first display afterwards shows ``0x08DAAFB7`` /
+        ``0x35D90BC3``, 1 recompute.
+    
+        Why: ``ChangeService.apply`` restores and writes in place before the engine
+        can raise; an error status does not mean 'nothing written'. Base: the
+        designer keeps ``0x9C5BCBBD`` -> RED. Negative control: the hook in the
+        success branch only -> RED."""
+        _set_quiet(monkeypatch, QUIET_SHORT_S)
+        original = change_service_module.apply_change_document
+    
+        def wrote_then_failed(*args, **kwargs):
+            original(*args, **kwargs)
+            raise KeyError("probe")
+    
+        monkeypatch.setattr(change_service_module, "apply_change_document", wrote_then_failed)
+    
+        def make(folder: Path, image: Path):
+            async def scenario(app, pilot, log):
+                await _load_image_by_dialog(pilot, app, image)
+                await _first_display(pilot, app, PRE)
+                await _load_document(pilot, app, log, folder, "d.changes.json", [AA_ENTRY])
+                before = designer_recomputes()  # E5 C-3: before the trigger
+                status = await _apply(pilot, app, log, "Patch Editor:")
+                assert status == "Patch Editor: 'probe'", status
+                assert app.current_file.mem_map[0x8003] == 0xAA, "the engine wrote nothing before it raised"
+                await _quiet(pilot)
+                assert designer_recomputes() == before, "a hidden CRC Designer recomputed"
+                await _press_rail(pilot, app, "0")
+                await _expect_refresh(pilot, app, before, AFTER_AA, "apply error then display")
+    
+            return scenario
+    
+>       _reps(tmp_path, make)
+
+tests/test_b101_designer_writes.py:570: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_designer_writes.py:408: in _reps
+    results.append(_run(base, make_scenario(folder, image)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_designer_writes.py:396: in _run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_designer_writes.py:566: in scenario
+    await _expect_refresh(pilot, app, before, AFTER_AA, "apply error then display")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+before = 8, expect = (148549559, 903416771), what = 'apply error then display'
+
+    async def _expect_refresh(pilot, app, before: int, expect: Tuple[int, int], what: str) -> None:
+        """After the display that follows an in-place write: exactly one recompute,
+        the painted CRCs equal ``zlib.crc32`` of the session bytes and the literal
+        values the case states, and window line 2 says the same."""
+        try:
+            await wait_designer_recompute(pilot, app, before, timeout=RECOMPUTE_TIMEOUT_S)
+        except AssertionError as exc:
+>           raise AssertionError(
+                f"{what}: the CRC Designer never recomputed (count {designer_recomputes()}, "
+                f"snapshot {before}) - stale coverage; it paints {_preview_lines(app)[1:]!r}, "
+                f"the session bytes give concat 0x{oracle(app.current_file.mem_map)[0]:08X}"
+            ) from exc
+E           AssertionError: apply error then display: the CRC Designer never recomputed (count 8, snapshot 8) - stale coverage; it paints ['concat: 0x9C5BCBBD', 'fill:   0x2A8A3950'], the session bytes give concat 0x08DAAFB7
+
+tests/test_b101_designer_writes.py:374: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_6_apply_error_still_refreshes
+1 failed in 42.26s
