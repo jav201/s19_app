@@ -37,11 +37,15 @@ Definition(                                                         frozen datac
     display_format: str | None, decimals: int | None, unit: str,
     limits: Limits, extended_limits: Limits | None,
     enum_table: str | None, enum_entries: tuple[EnumEntry, ...], default_text: str | None,
+    coeffs_linear: tuple[float | None, float | None] | None,          <- E3A-03: the method record's coefficients / table reference (defaulted)
+    coeffs: tuple[float | None, ...] | None,
+    compu_tab_ref: str | None,
     refusal: Refusal | None)
 Decoded(stored: int | float | None, value: int | float | str | None, text: str)      frozen dataclass
 Encoded(address: int, data: bytes, notices: tuple[str, ...])                          frozen dataclass
 
 describe_definition(name: str, a2l_data: dict) -> Definition
+describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Definition]
 decode_definition(definition: Definition, a2l_data: dict, image: Mapping[int, int]) -> Decoded | Refusal
 encode_definition(definition: Definition, a2l_data: dict, text: str, image: Mapping[int, int]) -> Encoded | Refusal
 display_text(definition: Definition, value: int | float) -> str
@@ -52,6 +56,7 @@ Values pinned by this graph (meanings the §4 text left open; no name or type ch
 - `section` is `"MEASUREMENT"` or `"CHARACTERISTIC"`, `""` for `A2L-DEF-NAME`. `byte_order` is `"big"` or `"little"` (`"little"` for `A2L-DEF-NAME`, R-A2L-027).
 - `Limits.lower_text` / `upper_text` hold the word as the file writes it when `_to_float` reads it as a number, else `""` — so a message composes `<lower>..<upper>` from them directly (R-A2L-DEF.43/3 `..100`). No limit words: `Limits(None, None, "", "")`.
 - `method_name` is the conversion word of the object (`"NO_COMPU_METHOD"` included); `conversion_type` is the record's type word, `None` for `NO_COMPU_METHOD` and for a record with no type word.
+- `coeffs_linear`, `coeffs` and `compu_tab_ref` hold the method record's `COEFFS_LINEAR` / `COEFFS` words and its `COMPU_TAB_REF` word (E3A-03); they default to `None`, and decode / encode read them instead of walking `sections` (an enum's `compu_tab_ref` equals `enum_table`).
 - `decimals` is the display format's decimals capped at 17 (R-A2L-DEF.36), `None` when it gives none.
 - `Decoded`: number → `stored` the stored value (the masked field under a bit mask), `value` the physical value, `text` = `display_text(definition, value)`; enum → `stored` the stored value, `value` the matched entry's text or `None`, `text` the display text (entry, default, or `<raw> (no text)`); text → `stored` `None`, `value` and `text` the decoded string.
 - `Encoded.address` = `definition.address`; `data` = the whole span (`byte_length` bytes); `notices` = the R-A2L-DEF.44 notice when one applies, else `()`.
@@ -65,11 +70,13 @@ Values pinned by this graph (meanings the §4 text left open; no name or type ch
 - Inc 3 adds its kinds to CTX-A2L-DEF's *defined object* list; `A2L-DEF-KIND` and its message `<name>: the system has no definition for a <kind> object` stay for every kind still outside it. Inc 3 inserts its own checks into the refusal order without reordering Inc 2's codes.
 - New functions decode or encode one element or axis; the four I-2 functions keep their signatures; `display_text` stays the one number display rule (Inc 3 calls it per element). Inc 3 reuses the private helpers of this module freely; they are not part of I-2.
 - Inc 6 reads `byte_length`, `datatype` and `kind` even from a refused definition (this graph fills them for every refusal but `A2L-DEF-NAME`; a VAL_BLK reads `kind` `""` until Inc 3). Inc 8 and Inc 9 call `describe_definition` once per edited parameter, `decode_definition` to show it, `encode_definition` to stage it; they never call `a2l.encode_physical_to_raw_bytes` for a masked object (ruling: the BIT_MASK whole-word write, BL-I2-1).
-- Cost (B2 P4g): `describe_definition` walks the section tree about four times (one object walk, one method lookup, up to two table lookups); on software_a (13 990 tags) one walk costs 3.9 – 9.1 ms, so one call costs about 20 ms. A consumer must not call it for every row of a whole A2L (14 000 × 20 ms ≈ 5 min). Recorded as finding E2-10 for E3 and for Inc 6.
+- Consumer note (E3A-07, E3S-08): "For a definition with a bit mask, `Encoded.data` keeps the bits outside the mask as `image` holds them: a consumer encodes each further field of the word over an overlay that holds the earlier staged bytes, and re-encodes the later fields of a word when it drops an earlier one." When another edit touches a staged masked edit's span, encode that masked edit again.
+- Consumer note (E3S-04a): "every `str` field and message is plain text and may hold `[`, `]` and any character of the A2L or the operator; a consumer renders it with markup off (`markup=False` or `Content(text)`) or through `escape`."
+- Cost (E3A-01; B2 P1b, P1c, P1e): `describe_definitions` builds the name maps in one walk of `a2l_data["sections"]` — 40.4 ms on software_a (P1b); tokenizing every object's record, method and table once is 483.8 ms for all 13,990 (P1c), so a batch describe is ≈ 0.52 s. `describe_definition` delegates to it and compares first words cheaply, parsing only a match (the bare walk is 3.75 ms, P1e). R-A2L-DEF.136 carries the speed row; Inc 6's E1 owns the picker's row-count budget.
 
 **I-5** (label-list parser): not consumed and not changed by Inc 2 (`parse_parameter_list` is baseline context only).
 
-**I-D (G2 → the testers, test data only).** The DEFC object list (`build_definition_objects` output) has one dict per object with the keys of case 08's list (`name`, `section`, `kind`, `datatype`, `conversion`, `address`, `length`, `big_endian`, `raw_bytes`, `physical`, `low`, `high`) plus `bit_mask` (`int` or `None`), `planned_stored` and `planned_text` (the display text the model must give for the planned bytes). The files are `firmware.s19` and `firmware.a2l` in `--out`.
+**I-D (G2 → the testers, test data only).** The DEFC object list (`build_definition_objects` output) has one dict per object with the keys of case 08's list (`name`, `section`, `kind`, `datatype`, `conversion`, `address`, `length`, `big_endian`, `raw_bytes`, `physical`, `low`, `high`) plus `bit_mask` (`int` or `None`), `planned_stored` and `planned_text` (the display text the model must give for the planned bytes). The files are `definitions.s19` and `definitions.a2l` in `--out`.
 
 ### The definitions case (DEFC), pinned (D-5 A, D-6 A; R-A2L-DEF.60 … .63)
 
@@ -114,51 +121,53 @@ Every row has at least one concrete example; none is uncovered. Example ids are 
 | R-A2L-DEF.1 | `describe_definition`, `_object_kind` | .1/1 … /4 |
 | R-A2L-DEF.2 | `describe_definition`, `_object_kind`, `_read_method_record`, `_read_object_lines` (TUBE fill) | .2/1 … /3 |
 | R-A2L-DEF.3 | `_object_kind`, `describe_definition` | .3/1, /2 |
-| R-A2L-DEF.4 | `_object_kind`, `describe_definition` | .4/1 … /7 |
+| R-A2L-DEF.4 | `_object_kind`, `describe_definition` | .4/1 … /8 |
 | R-A2L-DEF.5, .6 | `_find_tag`, `describe_definition` | .5/1, /2; .6/1, /2 |
-| R-A2L-DEF.7 | `describe_definition` | .7/1, /2 |
+| R-A2L-DEF.7.1, .7.2 | `describe_definition` | .7.1/1, /2; .7.2/1 … /5 |
 | R-A2L-DEF.8, .9 | `_resolve_datatype`, `describe_definition` | .8/1, /2 (corrected, E2-6); .9/1 |
 | R-A2L-DEF.10 … .12 | `_read_method_record`, `describe_definition` | .10/1 … /4; .11/1; .12/1 … /3 |
 | R-A2L-DEF.13 … .17 | `_read_enum_table`, `describe_definition` | .13/1, /2; .14/1 … /3; .15/1, /2; .16/1, /2; .17/1, /2 |
-| R-A2L-DEF.18, .19 | `_read_object_lines`, `_check_bit_mask`, `describe_definition` | .18/1 … /3 (/3 corrected, E2-4); .19/1 … /3 |
-| R-A2L-DEF.20 … .23 | `_read_object_lines`, `_display_decimals`, `describe_definition` | .20/1, /2; .21/1, /2; .22/1, /2; .23/1, /2 |
+| R-A2L-DEF.18, .19 | `_read_object_lines`, `_check_bit_mask`, `describe_definition` | .18/1 … /3 (/3 corrected, E2-4); .19/1 … /6 |
+| R-A2L-DEF.20 … .23 | `_read_object_lines`, `_display_decimals`, `describe_definition` | .20/1, /2; .21/1, /2, /3; .22/1, /2; .23/1, /2 |
 | R-A2L-DEF.24, .25 | `describe_definition`, `decode_definition`, `encode_definition` | .24/1 … /3; .25/1, /2 |
-| R-A2L-DEF.26, .27 | `_read_stored_value`, `_merge_bit_mask` | .26/1, /2; .27/1 … /3 |
+| R-A2L-DEF.26, .27 | `_read_stored_value`, `_merge_bit_mask`, `encode_definition` | .26/1, /2, /3; .27/1 … /3 |
 | R-A2L-DEF.28 | `decode_definition` | .28/1, /2, /3 (corrected, E2-5) |
 | R-A2L-DEF.29 … .32 | `_enum_text` | .29/1; .30/1 … /4; .31/1, /2; .32/1, /2 |
 | R-A2L-DEF.33, .34 | `_ascii_text`, `decode_definition` | .33/1 … /3; .34/1, /2 |
 | R-A2L-DEF.35 … .39 | `display_text`, `_display_decimals` | .35/1 … /4; .36/1; .37/1 … /4; .38/1 (corrected, E2-4), /2; .39/1 … /3 |
-| R-A2L-DEF.40 | `_parse_number_text`, `encode_definition` | .40/1 … /7 |
+| R-A2L-DEF.40 | `_parse_number_text`, `encode_definition` | .40/1 … /9 |
 | R-A2L-DEF.41, .42 | `_encode_number`, `encode_definition` | .41/1 … /6 (/4 and /6 corrected, E2-7); .42/1 … /11 |
-| R-A2L-DEF.43 … .45 | `_check_limits` | .43/1 … /4; .44/1, /2; .45/1, /2 |
-| R-A2L-DEF.46, .47 | `_merge_bit_mask`, `encode_definition` | .46/1 … /3; .47/1 … /3 |
+| R-A2L-DEF.43 … .45 | `_check_limits`, `encode_definition` | .43/1 … /4; .44/1, /2; .45/1, /2, /3 |
+| R-A2L-DEF.46, .47 | `_merge_bit_mask`, `encode_definition` | .46/1 … /4; .47/1 … /3 |
 | R-A2L-DEF.48, .49 | `_encode_enum` | .48/1 … /3; .49/1 … /3 |
 | R-A2L-DEF.50 … .52 | `_encode_ascii` | .50/1 … /3; .51/1; .52/1 … /3 |
 | R-A2L-DEF.53 | `encode_definition` | .53/1 … /4 |
-| R-A2L-DEF.54, .55 | `encode_definition`, `_agrees_at_display_precision` | .54/1, /2; .55/1 |
+| R-A2L-DEF.54, .55 | `encode_definition`, `_agrees_at_display_precision` | .54/1 … /4; .55/1 |
 | R-A2L-DEF.56 | `encode_definition`, `decode_definition` | .56/1 |
 | R-A2L-DEF.57 | `encode_definition` | .57/1 … /3 |
-| R-A2L-DEF.58 | `describe_definition`, `decode_definition`, `encode_definition` | .58/1, /2 |
+| R-A2L-DEF.58.1, .58.2 | `describe_definition`, `decode_definition`, `encode_definition`, `_read_enum_table`, `_display_decimals`, `_check_bit_mask` | .58.1/1, /2; .58.2/1 … /14 |
 | R-A2L-DEF.59 | `main`, `generate` | .59/1, /2 |
 | R-A2L-DEF.60 … .62 | `build_definition_objects`, `emit_definitions_a2l` | .60/1; .61/1; .62/1 |
 | R-A2L-DEF.63 | `generate_definitions_case`, `main` | .63/1 |
+| R-A2L-DEF.136 | `describe_definitions` | .136/1 |
+| R-A2L-DEF.137 | `decode_definition`, `_enum_text`, `encode_definition`, `describe_definition` | .137/1 … /4 |
 | cited R-A2L-010, 011, 022 … 027, 030, 031, 033 | `describe_definition`, `_resolve_datatype`, `_read_object_lines`, `_read_method_record` | each row's `/def-k` |
 | cited R-A2L-040, 043 … 045 | `_read_stored_value` | each row's `/def-k` |
 | cited R-A2L-051, 053 … 058.3, 061 … 063, 059 | `decode_definition`, `_enum_text` | each row's `/def-k` (058.3 corrected, E2-5) |
 | cited R-A2L-014 (PROPOSED, E2-1) | `describe_definition` | TUBE fill |
 | AT-B103-I2-1 … -3 | the four I-2 nodes; G2 for -2 | AT-B103-I2-1 (corrected expectation, E2-8), -2, -3 |
 
-**Node count:** 40 nodes in this graph — 25 new (22 in `a2l_definition.py`, 3 in the synth), 1 changed (`main`), 0 removed, 14 unchanged context (10 of `a2l.py`, 1 of `a2l_parameter_picker.py`, 3 of the synth: `generate`, `emit_s19`, `_pack_scalar`). The slice (new + changed) is 26, as E1 counted; under the cap of 40. Entities 10, edges 14.
+**Node count:** 41 nodes in this graph — 26 new (23 in `a2l_definition.py`, 3 in the synth), 1 changed (`main`), 0 removed, 14 unchanged context (10 of `a2l.py`, 1 of `a2l_parameter_picker.py`, 3 of the synth: `generate`, `emit_s19`, `_pack_scalar`). The slice (new + changed) is 27 (E1's 26 + `describe_definitions`), under the cap of 40. Entities 10, edges 18.
 
 **Checked against the base code** (`evidence-e2/i2e2-extract-check-transcript.txt`): the Code-Wire v3.1.0 extractor over a throwaway copy of `e07fb00` with a mark on each of the 15 existing nodes (the 14 unchanged ones and `main`) and `--path` on the four files → `0` contract drifts (inputs, types, defaults, outputs, modules all match); the `25` findings are all "Graph node without mark (no code yet)", the 25 new nodes — so the run exits 1 until E4 writes them, as the method expects. `codewire_lint.py` on this file (`evidence-e2/i2e2-lint-transcript.txt`): `nodes=40 entities=10 edges=14 findings=15 not read=0`. Real callers: `evidence-e2/i2e2-extract-census-transcript.txt` (every def of the copy marked, base line numbers).
 
 ## Nodes
 
 describe_definition
-req: R-A2L-DEF.1, R-A2L-DEF.2, R-A2L-DEF.3, R-A2L-DEF.4, R-A2L-DEF.5, R-A2L-DEF.6, R-A2L-DEF.7, R-A2L-DEF.8, R-A2L-DEF.9, R-A2L-DEF.11, R-A2L-DEF.12, R-A2L-DEF.13, R-A2L-DEF.17, R-A2L-DEF.19, R-A2L-DEF.23, R-A2L-DEF.24, R-A2L-DEF.58, R-A2L-010, R-A2L-011, R-A2L-014, R-A2L-022, R-A2L-023, R-A2L-024, R-A2L-025, R-A2L-026, R-A2L-027, R-A2L-030, R-A2L-031
+req: R-A2L-DEF.1, R-A2L-DEF.2, R-A2L-DEF.3, R-A2L-DEF.4, R-A2L-DEF.5, R-A2L-DEF.6, R-A2L-DEF.7.1, R-A2L-DEF.7.2, R-A2L-DEF.8, R-A2L-DEF.9, R-A2L-DEF.11, R-A2L-DEF.12, R-A2L-DEF.13, R-A2L-DEF.17, R-A2L-DEF.19, R-A2L-DEF.23, R-A2L-DEF.24, R-A2L-DEF.58.1, R-A2L-DEF.58.2, R-A2L-DEF.137, R-A2L-010, R-A2L-011, R-A2L-014, R-A2L-022, R-A2L-023, R-A2L-024, R-A2L-025, R-A2L-026, R-A2L-027, R-A2L-030, R-A2L-031
 in: str name; dict a2l_data
 out: Definition definition
-func: new (I-2 entry). `_find_tag(name, a2l_data)`; none → refused `A2L-DEF-NAME` `<name>: no tag of that name in the A2L` (other fields empty, `kind` `""`). Else reads every field it can: the object record (`_read_object_lines(section)`); for a MEASUREMENT whose tag lacks them, the header words fill `datatype`, the conversion word, the limit words and, with a datatype, the length = size × MATRIX_DIM (1 when absent) (E2-1; R-A2L-014); `address` and `byte_length` from the tag; `datatype` = `_resolve_datatype`; `byte_order` = the tag's `effective_byte_order` (R-A2L-024 … 027 as the tag table applies them); `method_name` = the tag's conversion word; the record `_read_method_record(method_name, sections)` unless `NO_COMPU_METHOD`; `conversion_type` = its type word; `kind` = `_object_kind`; `display_format` = the object's FORMAT word, else the record's format (R-A2L-DEF.22, .23); `decimals` = `_display_decimals`; `unit` = the object's first PHYS_UNIT or UNIT word, else the record's unit, else `""`; `limits`, `extended_limits` (two number words, else `None`); for kind number or enum `bit_mask` = the BIT_MASK word read as `0x` + hex digits or decimal digits (E2-12), `bit_mask_text` = the word; for kind enum `enum_table` = the record's COMPU_TAB_REF word and `_read_enum_table(enum_table, sections)` → `enum_entries`, `default_text`. Then the first refusal of the refusal order: kind → `A2L-DEF-KIND` `<name>: the system has no definition for a <kind> object`; no address or no length → `A2L-DEF-ADDRESS` `<name>: the object has no address or no length`; number/enum without a datatype → `A2L-DEF-DATATYPE` `<name>: the object declares no datatype the system can read`; number/enum length ≠ the datatype's size → `A2L-DEF-LENGTH` `<name>: its length <length> differs from the <size> bytes of <datatype>`; a method other than `NO_COMPU_METHOD` with no record → `A2L-DEF-METHOD` `<name>: the conversion method <method> is not declared in the A2L`; a type outside IDENTICAL, LINEAR, RAT_FUNC, TAB_INTP, TAB_NOINTP, TAB_VERB (FORM, unknown, none) → `A2L-DEF-CONVERSION` `<name>: the conversion type <type> of <method> is not supported` (`<type>` `(none)` for no word); enum with no table word or no such COMPU_VTAB / COMPU_VTAB_RANGE → `A2L-DEF-TABLE` `<name>: the table <table> of <method> is not declared in the A2L` (`<table>` `(none)`); enum with no entries → `A2L-DEF-TABLE-EMPTY` `<name>: the table <table> has no entries`; `_check_bit_mask` false → `A2L-DEF-MASK` `<name>: the bit mask <mask> cannot be applied to <datatype>`. Reads `a2l_data` and never writes it (the tag is copied before the MEASUREMENT fill).
+func: new (I-2 entry). `describe_definitions([name], a2l_data)[name]` — one code path; every rule lives in `describe_definitions` (E3A-01). Reads `a2l_data` and never writes it.
 module: s19_app/tui/a2l_definition.py
 examples: (R-A2L-DEF.1/1, R-A2L-010/def-1, R-A2L-022/def-1, R-A2L-026/def-1) V171 `ASAM.C.SCALAR.SWORD.IDENTICAL` → kind `number`, address `0x810004`, byte length `2`, datatype `SWORD`, byte order `little`, method `CM.IDENTICAL`, conversion type `IDENTICAL`, display format `%3.0`, unit `hours`, limits `-10000`..`20000`, extended `-32268`..`32267`, refusal `None` (B2 P2, P3)
 examples: (R-A2L-DEF.1/2, R-A2L-011/def-1, R-A2L-DEF.22/2) V171 `ASAM.M.SCALAR.UBYTE.IDENTICAL` → kind `number`, section `MEASUREMENT`, address `0x13A00`, datatype `UBYTE`, display format `%5.0` (the FORMAT word, its trailing comment left out)
@@ -174,8 +183,11 @@ examples: (R-A2L-DEF.4/2, /3) C08 `CURVE_0001` → `CURVE_0001: the system has n
 examples: (R-A2L-DEF.4/4) V171 `ASAM.C.CUBOID.COM_AXIS.FIX_AXIS.STD_AXIS` → `ASAM.C.CUBOID.COM_AXIS.FIX_AXIS.STD_AXIS: the system has no definition for a CUBOID object` (B2 P2y)
 examples: (R-A2L-DEF.4/5, /6) INLINE `MB` (MAP_BLOCK) → `MB: the system has no definition for a MAP_BLOCK object`; `VK` (kind `DIRECT_X` at 0x10) → `VK: the system has no definition for a DIRECT_X object`, address `0x10`
 examples: (R-A2L-DEF.4/7) V171 `ASAM.M.MATRIX_DIM_16_1.UBYTE.IDENTICAL` → `ASAM.M.MATRIX_DIM_16_1.UBYTE.IDENTICAL: the system has no definition for a MATRIX_DIM 16 MEASUREMENT object`; address `0x13A30`, byte length `16`
+examples: (R-A2L-DEF.4/8) case_07 `CHAR_000000` (a CHARACTERISTIC whose header gave no kind) → `CHAR_000000: the system has no definition for a (none) object`, address `0x08011400`, byte length `4`
 examples: (R-A2L-DEF.6/1, /2) V171 `NO_SUCH_TAG` → refusal `A2L-DEF-NAME` `NO_SUCH_TAG: no tag of that name in the A2L`, kind `""`, address `None`; C08 clean `value_0001` → `value_0001: no tag of that name in the A2L`
-examples: (R-A2L-DEF.7/1, /2) INLINE MEASUREMENT `NA` (UBYTE, no ECU_ADDRESS) → refusal `A2L-DEF-ADDRESS` `NA: the object has no address or no length`; ASCII `NL` at 0x10 (deposit `RL_U8`, no NUMBER/MATRIX_DIM/LENGTH) → `NL: the object has no address or no length`
+examples: (R-A2L-DEF.7.1/1, /2) INLINE MEASUREMENT `NA` (UBYTE, no ECU_ADDRESS) → refusal `A2L-DEF-ADDRESS` `NA: the object has no address or no length`; ASCII `NL` at 0x10 (deposit `RL_U8`, no NUMBER/MATRIX_DIM/LENGTH) → `NL: the object has no address or no length`
+examples: (R-A2L-DEF.7.2/1 … /5) INLINE ASCII `SP0` at 0x10 with `NUMBER 0` → `A2L-DEF-ADDRESS` `SP0: its span of 0 bytes at 0x10 cannot be read`; `NUMBER -5` → `SP0: its span of -5 bytes at 0x10 cannot be read`; `NUMBER 1048577` → `SP0: its span of 1048577 bytes at 0x10 cannot be read`; INLINE UBYTE VALUE `SPN` with `ECU_ADDRESS -0x10` → `SPN: its span of 1 bytes at -0x10 cannot be read`; INLINE UBYTE VALUE `SPX` at `0xFFFFFF00` with `LENGTH 256` → `SPX: its span of 256 bytes at 0xFFFFFF00 cannot be read`
+examples: (R-A2L-DEF.7.2/1 neg) mutant: the bound removed → `NUMBER 1048577` gives a definition → RED
 examples: (R-A2L-DEF.8/1, /2, E2-6) INLINE VALUE `ND` at 0x10 with `LENGTH 2` whose RECORD_LAYOUT `RL_X` holds `FNC_VALUES 1 FOO ROW_DIR DIRECT` → refusal `A2L-DEF-DATATYPE` `ND: the object declares no datatype the system can read`; MEASUREMENT `NM` `FOO NO_COMPU_METHOD 0 0 0 1`, ECU_ADDRESS 0x10, `LENGTH 1` → `NM: the object declares no datatype the system can read` (without the LENGTH line both give `A2L-DEF-ADDRESS` first: no datatype, no length)
 examples: (R-A2L-DEF.9/1) INLINE UWORD VALUE `LX` at 0x10 with `LENGTH 4` → refusal `A2L-DEF-LENGTH` `LX: its length 4 differs from the 2 bytes of UWORD`
 examples: (R-A2L-DEF.11/1) C08 `firmware_issues.a2l` `MISSING_CM` → refusal `A2L-DEF-METHOD` `MISSING_CM: the conversion method CM_MISSING is not declared in the A2L`; datatype `UBYTE`, address `0xC00000` (base: identity, B1 lines 32, 34)
@@ -184,6 +196,11 @@ examples: (R-A2L-DEF.13/1, /2) INLINE `EN` naming `CM_V` (`TAB_VERB "%.0" ""`, n
 examples: (R-A2L-DEF.17/1, /2) INLINE `E0` on `VT_0 "" TAB_VERB 0` → `A2L-DEF-TABLE-EMPTY` `E0: the table VT_0 has no entries`; `EN2` on `VT_N "" TAB_VERB X` then `0 "A"` → `EN2: the table VT_N has no entries`
 examples: (R-A2L-DEF.18/3, E2-4) SOFTA `Adt_UhsihQwbpns._9_.NfwzbMcockRrbkj` (MEASUREMENT ULONG, `BIT_MASK 0xFFFFFF`) → bit mask `16777215`, bit mask text `0xFFFFFF`, refusal `A2L-DEF-ADDRESS` (not `A2L-DEF-MASK`); INLINE ULONG VALUE `M24` at 0x10 with `BIT_MASK 0xFFFFFF` → bit mask `16777215`, refusal `None` (no software_a object with that mask has an address, B2 P4j)
 examples: (R-A2L-DEF.19/1 … /3) INLINE UWORD `M0` `BIT_MASK 0` → `A2L-DEF-MASK` `M0: the bit mask 0 cannot be applied to UWORD`; UBYTE `MW` `BIT_MASK 0x100` → `MW: the bit mask 0x100 cannot be applied to UBYTE`; FLOAT32_IEEE `MF` `BIT_MASK 0x1` → `MF: the bit mask 0x1 cannot be applied to FLOAT32_IEEE`
+examples: (R-A2L-DEF.19/4, E2-12) INLINE UWORD `MZ` with `BIT_MASK 0xZZ` → `A2L-DEF-MASK` `MZ: the bit mask 0xZZ cannot be applied to UWORD` (the word does not read as a number)
+examples: (R-A2L-DEF.19/5) INLINE ASCII `MA2` at 0x10 with `BIT_MASK 0x1` → `A2L-DEF-MASK` (a text object with a BIT_MASK line refuses, fail closed)
+examples: (R-A2L-DEF.19/6) INLINE UWORD `MB3` whose tag holds `bit_org` `0x0FF0` while its header loses the `BIT_MASK` keyword → `A2L-DEF-MASK` `MB3: the bit mask 0x0FF0 cannot be applied to UWORD` (the cross-check)
+examples: (R-A2L-DEF.19/6 neg) mutant: the `bit_org` cross-check removed → `MB3` encodes the whole word → RED
+examples: (R-A2L-DEF.137/3) INLINE `MS` whose name holds an ESC (U+001B) → the `A2L-DEF-*` message echoes the name with U+FFFD in place of the ESC
 examples: (R-A2L-DEF.23/1, R-A2L-031/def-1) V171 `ASAM.C.SCALAR.UBYTE.IDENTICAL` (no FORMAT, no PHYS_UNIT; `CM.IDENTICAL` `%3.0` `hours`) → display format `%3.0`, unit `hours`, decimals `0`
 examples: (R-A2L-DEF.24/1 … /3) INLINE MEASUREMENT `MA` (`MATRIX_DIM 4`, no ECU_ADDRESS) → `A2L-DEF-KIND`; MEASUREMENT `AM` (no ECU_ADDRESS, names `CM_GONE`) → `A2L-DEF-ADDRESS`; UBYTE VALUE `TM` naming `CM_V` (`COMPU_TAB_REF VT_GONE`) with `BIT_MASK 0` → `A2L-DEF-TABLE`
 examples: (R-A2L-DEF.24/2 neg) mutant: the method checked before the address → `AM` gives `A2L-DEF-METHOD` → RED
@@ -191,19 +208,28 @@ examples: (R-A2L-023/def-1) INLINE VALUE `DS` with deposit `__SWORD_Z` and a REC
 examples: (R-A2L-025/def-1, R-A2L-027/def-1) INLINE VALUE on `RL_BL` (`BYTE_ORDER MSB_LAST`) → byte order `little`; INLINE with no BYTE_ORDER anywhere → `little`
 examples: (R-A2L-030/def-1, /def-2) SOFTA `BcpGxvlbvneyoAudnMhl.DRCDJ_XNIFM_DSURLVD_VSJMQJBMW` (`PHYS_UNIT "V"`) → unit `V` (base: tag unit `None`, B2 P4f); INLINE `PHYS_UNIT "deg C"` → unit `deg C`
 examples: (R-A2L-033/def-1) INLINE VALUE naming `/begin COMPU_METHOD CM_B "d" LINEAR "%.1" "km/h"` with `COEFFS_LINEAR 1 0` → unit `km/h`, display format `%.1`
-examples: (R-A2L-DEF.58/1, /2) V171 and C08 clean: a deep copy of `a2l_data` taken before building every defined object equals `a2l_data` after → `True` (the MEASUREMENT fill works on a copy of the tag)
+examples: (R-A2L-DEF.58.1/1, /2) V171 and C08 clean: a deep copy of `a2l_data` taken before building every defined object equals `a2l_data` after → `True` (the MEASUREMENT fill works on a copy of the tag)
+
+describe_definitions
+req: R-A2L-DEF.136
+in: Iterable[str] names; dict a2l_data
+out: dict[str, Definition] definitions
+func: new (I-2 entry; E3A-01 B, E3A-13). Built over one walk of `a2l_data["sections"]`, which maps the first MEASUREMENT / CHARACTERISTIC section of each name (by `parse_begin_meta`), the first COMPU_METHOD record of each name and the first COMPU_VTAB / COMPU_VTAB_RANGE of each name, plus one pass over `a2l_data["tags"]` that maps the first tag of each name. For each name in `names` (order kept, duplicates kept): `_find_tag(name, tags_by_name, object_sections_by_name)`; no tag → refused `A2L-DEF-NAME` `<name>: no tag of that name in the A2L` (other fields empty, `kind` `""`). Else it reads every field it can: the object record (`_read_object_lines(section)`); for a MEASUREMENT whose tag lacks them, the header words fill `datatype`, the conversion word, the limit words and, with a datatype, the length = size × MATRIX_DIM (1 when absent) (E2-1; R-A2L-014); `address` and `byte_length` from the tag; `datatype` = `_resolve_datatype`; `byte_order` = the tag's `effective_byte_order` (R-A2L-024 … 027 as the tag table applies them); `method_name` = the tag's conversion word; the record `_read_method_record(method_name, compu_methods_by_name)` unless `NO_COMPU_METHOD`; `conversion_type` = its type word; `coeffs_linear`, `coeffs`, `compu_tab_ref` = the record's words (E3A-03); `kind` = `_object_kind`; `display_format` = the object's FORMAT word, else the record's format (R-A2L-DEF.22, .23); `decimals` = `_display_decimals`; `unit` = the object's first PHYS_UNIT or UNIT word, else the record's unit, else `""`; `limits`, `extended_limits` (two number words, else `None`); the mask: a BIT_MASK word that does not read as a number, or longer than 20 decimal or 16 hex digits (refused with no `int()` on it, E3S-03) → refused `A2L-DEF-MASK` (E3S-01); a kind `text` object with a BIT_MASK line → the same refusal; the tag's `bit_org` set while the definition has no mask → the same refusal; else for kind number or enum `bit_mask` = the word read as `0x` + hex digits or decimal digits (E2-12), `bit_mask_text` = the word; for kind enum `enum_table` = the record's COMPU_TAB_REF word and `_read_enum_table(enum_table, compu_tables_by_name)` → `enum_entries`, `default_text`. Then the first refusal of the refusal order: kind → `A2L-DEF-KIND` `<name>: the system has no definition for a <kind> object`; no address or no length → `A2L-DEF-ADDRESS` `<name>: the object has no address or no length`; length below 1 or above 1,048,576 bytes (`MAX_A2L_DECODE_BYTES`, E3S-02), or a negative address, or a span ending above 0xFFFFFFFF → `A2L-DEF-ADDRESS` `<name>: its span of <length> bytes at <address> cannot be read`; number/enum without a datatype → `A2L-DEF-DATATYPE` `<name>: the object declares no datatype the system can read`; number/enum length ≠ the datatype's size → `A2L-DEF-LENGTH` `<name>: its length <length> differs from the <size> bytes of <datatype>`; a method other than `NO_COMPU_METHOD` with no record → `A2L-DEF-METHOD` `<name>: the conversion method <method> is not declared in the A2L`; a type outside IDENTICAL, LINEAR, RAT_FUNC, TAB_INTP, TAB_NOINTP, TAB_VERB (FORM, unknown, none) → `A2L-DEF-CONVERSION` `<name>: the conversion type <type> of <method> is not supported` (`<type>` `(none)` for no word); enum with no table word or no such COMPU_VTAB / COMPU_VTAB_RANGE → `A2L-DEF-TABLE` `<name>: the table <table> of <method> is not declared in the A2L` (`<table>` `(none)`); enum with no entries → `A2L-DEF-TABLE-EMPTY` `<name>: the table <table> has no entries`; `_check_bit_mask` false → `A2L-DEF-MASK` `<name>: the bit mask <mask> cannot be applied to <datatype>`. Reads `a2l_data` and never writes it (the tag is copied before the MEASUREMENT fill). Every message echoes a file or operator word with U+FFFD for U+0000–U+001F, U+007F and U+0080–U+009F (R-A2L-DEF.137). Traces to R-A2L-DEF.1 … .25 and the cited rows (same behaviour, many names).
+module: s19_app/tui/a2l_definition.py
+examples: (R-A2L-DEF.136/1) `describe_definitions(every tag name, a2l_data)` equals `{n: describe_definition(n, a2l_data)}` on V171 (`118` names) and C08 clean (`322`); software_a (13,990 names) in one walk ≤ 2.0 s on cachyos-rtx (measured 0.52 s, B2 P1b/P1c)
+examples: (R-A2L-DEF.136/1 neg) mutant: one walk per name (per-name `_collect_sections_by_name`) → software_a > 2.0 s → RED
 
 _find_tag
 req: R-A2L-DEF.5, R-A2L-DEF.6
-in: str name; dict a2l_data
-out: tuple[dict, dict | None] | None found
-func: new (D-10 A). The first tag of `a2l_data["tags"]` whose `name` equals `name`, case included, and its own section: the MEASUREMENT / CHARACTERISTIC section at the same position in file order (`_collect_sections_by_name` for both names, sorted by `start_line` — the order `extract_a2l_tags` walks); the section is `None` when that position's section names another object (`parse_begin_meta`). `None` when no tag has the name. Reads only.
+in: str name; dict tags_by_name; dict object_sections_by_name
+out: tuple[dict, dict] | None found
+func: new (D-10 A). A lookup in the two name maps that `describe_definitions` builds (E3A-01): the first tag of `name` (case included) from `tags_by_name`, paired with `object_sections_by_name[name]` (the first MEASUREMENT / CHARACTERISTIC section of that name). The position pairing, its sort and its `None`-section fallback go (E3A-13): the section is found by name, so it cannot name another object. `None` when no tag has the name. Reads only.
 module: s19_app/tui/a2l_definition.py
 examples: (R-A2L-DEF.5/1) INLINE with two UWORD VALUEs `DUP` at 0x10 and 0x20 → the tag with address `0x10` and the section of the first `DUP`
 examples: (R-A2L-DEF.5/1 neg) mutant: the last tag of the name → address `0x20` → RED
 examples: (R-A2L-DEF.5/2, E2-9) C08 `firmware_issues.a2l` `VALUE_0001` (declared twice) → the first tag, address `0x0` (the duplicate has the same address `0x0`, B2 P5h, so this case cannot tell first from last; /1 carries the row)
 examples: (R-A2L-DEF.6/2) C08 clean `value_0001` → `None` (B2 P5i: 0 tags of that spelling)
-examples: (holds on base) the pairing: V171 `118` tags, `118` object sections, `118` with the same name at the same position; SOFTA `13990` of `13990`; TUBE `111` of `111` (B2 P0)
+examples: (E3A-13) the name-map pairing: the section is `object_sections_by_name[name]`, so the position sort and the `None`-section fallback are gone — a name's section cannot name another object
 
 _object_kind
 req: R-A2L-DEF.1, R-A2L-DEF.2, R-A2L-DEF.3, R-A2L-DEF.4
@@ -231,22 +257,23 @@ examples: (R-A2L-DEF.8/2) INLINE MEASUREMENT `NM` with datatype `FOO` → `None`
 
 _read_method_record
 req: R-A2L-DEF.10, R-A2L-DEF.11, R-A2L-DEF.12, R-A2L-DEF.23, R-A2L-031, R-A2L-033
-in: str method_name; list[dict] sections
+in: str method_name; dict compu_methods_by_name
 out: dict | None record
-func: new (D-2 A). The first COMPU_METHOD section in file order whose first record word is `method_name`, read as the *conversion method record*: the words of `_flatten_body_tokens([meta] + lines)` (comments left out, the /begin line's words first) — `<name> <long identifier> <type> <format> <unit>`, then the keyword groups `COEFFS` + 6 words, `COEFFS_LINEAR` + 2 words, `COMPU_TAB_REF` + 1 (a word that is not a number gives `None`, as `_to_float` reads it). Returns a dict of `extract_compu_methods`' keys (`name`, `long_identifier`, `conversion_type`, `format`, `unit`, `coeffs_linear`, `coeffs`, `compu_tab_ref`, `formula` `None`, `lines`) so `_apply_compu_method` and `encode_physical_to_raw_bytes` take it unchanged; a missing positional word is `None`. `None` when no section has the name.
+func: new (D-2 A; E3A-01). A lookup in the `compu_methods_by_name` map that `describe_definitions` builds — the first COMPU_METHOD of `method_name` in file order, read as the *conversion method record*: the words of `_flatten_body_tokens([meta] + lines)` (comments left out, the /begin line's words first) — `<name> <long identifier> <type> <format> <unit>`, then the keyword groups `COEFFS` + 6 words, `COEFFS_LINEAR` + 2 words, `COMPU_TAB_REF` + 1 (a word that `_to_float` does not read as a finite number gives `None`, E3S-10). Returns a dict of `extract_compu_methods`' keys (`name`, `long_identifier`, `conversion_type`, `format`, `unit`, `coeffs_linear`, `coeffs`, `compu_tab_ref`, `formula` `None`, `lines`) so `_apply_compu_method` and `encode_physical_to_raw_bytes` take it unchanged; a missing positional word is `None`. `None` when no map entry has the name.
 module: s19_app/tui/a2l_definition.py
 examples: (R-A2L-DEF.10/1) V171 `CM.TAB_VERB.DEFAULT_VALUE` (long identifier on its own line) → conversion type `TAB_VERB`, format `%12.0`, unit `""`, COMPU_TAB_REF `CM.TAB_VERB.DEFAULT_VALUE.REF` (B2 P3; base: `None`, B1 line 6)
 examples: (R-A2L-DEF.10/2) V171 `CM.IDENTICAL` → `IDENTICAL`, format `%3.0`, unit `hours`
 examples: (R-A2L-DEF.10/4) TUBE `esdl_model_GameControllerStatemachineStates` (`/* type */ TAB_VERB` …) → `TAB_VERB`, format `%12.4`, unit `""`, COMPU_TAB_REF `esdl_model_GameControllerStatemachineStates_vtab` (B2 P1c; the side table gives `None` for all four, B2 P1d)
 examples: (R-A2L-DEF.10/1 neg) mutant: the type read per line from the first word (`a2l.py`'s) → `CM.TAB_VERB.DEFAULT_VALUE` type `None` → RED
 examples: (R-A2L-055/def-1) INLINE `COEFFS_LINEAR 2` (one word) → coeffs_linear [`2.0`, `None`] (b missing → 0 in the conversion)
+examples: (E3S-10) INLINE `COEFFS nan inf 0 0 0 1` → coeffs [`None`, `None`, `0.0`, `0.0`, `0.0`, `1.0`] (the non-finite words are not numbers)
 examples: (R-A2L-DEF.11/1) C08 issues `CM_MISSING` → `None`
 
 _read_enum_table
-req: R-A2L-DEF.13, R-A2L-DEF.14, R-A2L-DEF.15, R-A2L-DEF.16, R-A2L-DEF.17
-in: str table_name; list[dict] sections
+req: R-A2L-DEF.13, R-A2L-DEF.14, R-A2L-DEF.15, R-A2L-DEF.16, R-A2L-DEF.17, R-A2L-DEF.58.2
+in: str table_name; dict compu_tables_by_name
 out: tuple[str, tuple[EnumEntry, ...], str | None] | None table
-func: new (D-2 A, D-4 A). The first COMPU_VTAB or COMPU_VTAB_RANGE section in file order whose first record word is `table_name`, read as the *enum table* from its record words (`_flatten_body_tokens([meta] + lines)`): COMPU_VTAB `<name> <long id> TAB_VERB <n>` then pairs `<raw> <text>`; COMPU_VTAB_RANGE `<name> <long id> <n>` then triples `<min> <max> <text>`; entries read in file order, at most `n`, stopping at a `DEFAULT_VALUE` word or the end; an entry whose raw, min or max `_to_float` does not read is skipped; a count that is not a number gives no entries; the text is kept as text (never a float). The word after `DEFAULT_VALUE` is the default text. Returns (section kind, entries, default text), or `None` when no such section.
+func: new (D-2 A, D-4 A; E3A-01). A lookup in the `compu_tables_by_name` map that `describe_definitions` builds — the first COMPU_VTAB or COMPU_VTAB_RANGE of `table_name` in file order, read as the *enum table* from its record words (`_flatten_body_tokens([meta] + lines)`): COMPU_VTAB `<name> <long id> TAB_VERB <n>` then pairs `<raw> <text>`; COMPU_VTAB_RANGE `<name> <long id> <n>` then triples `<min> <max> <text>`. The count `<n>` is a run of ASCII digits of at most 9 digits, else there are no entries (no `int()`/`_to_float` on it — `1e400`, `nan`, `-3`, `2.5`, a 5,000-digit run all give no entries, E3S-03). Entries read in file order, count-driven, at most `n`; a `DEFAULT_VALUE` word is recognised only where a raw, min or max is expected, so an entry text `DEFAULT_VALUE` stays a text (E3A-16); an entry whose raw, min or max `_to_float` does not read is skipped; the text is kept as text (never a float). The word after `DEFAULT_VALUE` is the default text. Returns (section kind, entries, default text), or `None` when no map entry has the name.
 module: s19_app/tui/a2l_definition.py
 examples: (R-A2L-DEF.14/1, R-A2L-DEF.16/1) V171 `CM.TAB_VERB.DEFAULT_VALUE.REF` → (`COMPU_VTAB`, (EnumEntry(`1.0`, `None`, `SawTooth`), EnumEntry(`2.0`, `None`, `Square`), EnumEntry(`3.0`, `None`, `Sinus`)), `unknown signal type`) (B2 P3)
 examples: (R-A2L-DEF.14/2) SOFTA `zIzbovMkwaNungk_ZHDJ` (used by MEASUREMENT `QUUU_Ywjznkkjwj.AuooouPgqj`, refused `A2L-DEF-ADDRESS`) → first entry raw `-1.0`, text `NMUF_MSWGZ_SPTKAGRI` (B2 P4c)
@@ -255,50 +282,57 @@ examples: (R-A2L-DEF.14/3 neg) mutant: the side table (sorted by raw, numeric te
 examples: (R-A2L-DEF.15/1, R-A2L-DEF.16/2) V171 `CM.VTAB_RANGE.DEFAULT_VALUE.REF` → (`COMPU_VTAB_RANGE`, `11` entries, first EnumEntry(`0.0`, `1.0`, `Zero_to_one`), last EnumEntry(`105.0`, `105.0`, `hundredfive`)), default text `out of range value`
 examples: (R-A2L-DEF.15/2) SOFTA the first range table `AET_ES_RLBM_AjzY.Ruffte_MG_WIN_JljHYWzox_RBR_2_Lolzhsf_RdzyhoEgzz.UQA_SscVOMjkb` → `5` entries, first (`0.0`, `0.0`, `BPQ_UQKPL_XLDM_EM_SPFMDDQDOEMCT`) (B2 P4d)
 examples: (R-A2L-DEF.17/1, /2) INLINE `VT_0 "" TAB_VERB 0` → entries `()`; `VT_N "" TAB_VERB X` then `0 "A"` → entries `()`
+examples: (R-A2L-DEF.58.2/1) INLINE counts `1e400`, `nan`, `-3`, `2.5`, a 5,000-digit run → entries `()` (the table then refuses `A2L-DEF-TABLE-EMPTY`), 0 exceptions
+examples: (E3A-16) INLINE `VT_X "" TAB_VERB 2` `0 "DEFAULT_VALUE"` `1 "A"` `DEFAULT_VALUE "d"` → entries (`0.0`, `DEFAULT_VALUE`), (`1.0`, `A`), default `d` — the quoted text stays a text, count-driven (the keyword is only read where a raw is expected)
 examples: (R-A2L-DEF.13/2) INLINE `VT_GONE` → `None`
 
 _read_object_lines
 req: R-A2L-DEF.2, R-A2L-DEF.18, R-A2L-DEF.20, R-A2L-DEF.21, R-A2L-DEF.22, R-A2L-030
 in: dict | None section
 out: dict lines
-func: new (D-2 A; extended at E2, E2-1). The *object record*: the words of `_flatten_body_tokens([meta] + lines)` of the object's section, comments left out. Gives `header` (the first 8 words of a MEASUREMENT: name, long identifier, datatype, conversion, resolution, accuracy, lower, upper; the first 9 of a CHARACTERISTIC: name, long identifier, kind, address, deposit, max diff, conversion, lower, upper), and, from the words after the header, the first of each: `format` (the word after FORMAT), `extended_limits` (the two words after EXTENDED_LIMITS when `_to_float` reads both, else `None`), `unit` (the word after the first PHYS_UNIT or UNIT, quotes left out, R-A2L-030), `bit_mask` (the word after BIT_MASK). Section `None` → every key empty. Child sections (IF_DATA, ANNOTATION, AXIS_DESCR) are not in the words.
+func: new (D-2 A; extended at E2, E2-1). The *object record*: the words of `_flatten_body_tokens([meta] + lines)` of the object's section, comments left out. Gives `header` (the first 8 words of a MEASUREMENT: name, long identifier, datatype, conversion, resolution, accuracy, lower, upper; the first 9 of a CHARACTERISTIC: name, long identifier, kind, address, deposit, max diff, conversion, lower, upper), and, from the words after the header, the first of each: `format` (the word after FORMAT), `extended_limits` (the two words after EXTENDED_LIMITS when `_to_float` reads both as finite numbers, else `None` — a non-finite word is not a number, E3S-10), `unit` (the word after the first PHYS_UNIT or UNIT, quotes left out, R-A2L-030), `bit_mask` (the word after BIT_MASK, kept raw — readable or not, and for every kind — so `describe_definitions` can refuse an unreadable word and a text object with a BIT_MASK line, E3S-01). Section `None` → every key empty. Child sections (IF_DATA, ANNOTATION, AXIS_DESCR) are not in the words.
 module: s19_app/tui/a2l_definition.py
 examples: (R-A2L-DEF.18/1) V171 `ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0` → bit mask word `0x0FF0`, format `%5.0`, extended limits (`0`, `65535`) (B2 P2)
 examples: (R-A2L-DEF.18/2) INLINE `MD` with `BIT_MASK 16` → bit mask word `16` (the definition: `16`)
 examples: (R-A2L-DEF.20/1, R-A2L-DEF.22/1) V171 `ASAM.C.SCALAR.SBYTE.IDENTICAL` → extended limits (`-128`, `127`), format `%6.1` (the method's is `%3.0`)
 examples: (R-A2L-DEF.20/2) V171 `ASAM.C.SCALAR.FLOAT64_IEEE.IDENTICAL` → extended limits (`-10000.0`, `20000.0`) (B2 P2z)
 examples: (R-A2L-DEF.21/1, /2) INLINE `XL1` with `EXTENDED_LIMITS 0` (the next word is a keyword) → extended limits `None`; `XL2` with `EXTENDED_LIMITS a b` → `None`
+examples: (R-A2L-DEF.21/3, E3S-10) INLINE `XL3` with `EXTENDED_LIMITS nan nan` → extended limits `None` (a non-finite word is not a number; the encode then gives `A2L-DEF-LIMITS`)
 examples: (R-A2L-DEF.22/2) V171 `ASAM.M.SCALAR.UBYTE.IDENTICAL` (`FORMAT "%5.0"    /* Note: … */`) → format `%5.0`
 examples: (R-A2L-030/def-2) V171 `ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0001` (`PHYS_UNIT ""`) → unit `""` (the method's `hours` is not used)
 examples: (E2-1) TUBE `model.MainClass.gameController.sm` → header words `UBYTE`, `esdl_model_GameControllerStatemachineStates`, `1`, `100.0`, `0`, `3` after the name and `""` (B2 P1b)
 
 _check_bit_mask
-req: R-A2L-DEF.19
+req: R-A2L-DEF.19, R-A2L-DEF.58.2
 in: int mask; str datatype
 out: bool fits
-func: new. True when `mask > 0`, the datatype is not FLOAT16_IEEE, FLOAT32_IEEE or FLOAT64_IEEE, and `mask < 1 << (8 × DATATYPE_SIZES[datatype])`. (E1's slice had it return the refusal; it returns the test and `describe_definition` writes the message, which needs the name and the mask word — E2-14.)
+func: new. True when `mask > 0`, the datatype is not FLOAT16_IEEE, FLOAT32_IEEE or FLOAT64_IEEE, `mask < 1 << (8 × DATATYPE_SIZES[datatype])`, and, for a signed datatype (SBYTE, SWORD, SLONG, A_INT64), the mask does not hold both bit 0 and the sign bit (bit `8 × size − 1`) (E3A-14). Only reached with a resolved datatype — the refusal order stops at `A2L-DEF-DATATYPE` first, so `DATATYPE_SIZES[None]` is never read (E3S-03). (E1's slice had it return the refusal; it returns the test and `describe_definition` writes the message, which needs the name and the mask word — E2-14.)
 module: s19_app/tui/a2l_definition.py
 examples: (R-A2L-DEF.19/1) `0`, `UWORD` → `False`
 examples: (R-A2L-DEF.19/2) `0x100`, `UBYTE` → `False`
 examples: (R-A2L-DEF.19/2 neg) mutant: the bits at or above the width dropped (`mask & 0xFF`) → `0x100` on UBYTE accepted → RED
 examples: (R-A2L-DEF.19/3) `0x1`, `FLOAT32_IEEE` → `False`
 examples: (R-A2L-DEF.18/3) `0xFFFFFF`, `ULONG` → `True`; `0xFFFF`, `UWORD` (V171 `ASAM.C.SCALAR.UWORD.IDENTICAL`) → `True`
+examples: (E3A-14) `0xFF`, `SBYTE` → `False` (bit 0 and the sign bit 7 both held)
+examples: (E3A-14 neg) mutant: the signed check removed → `0xFF` on SBYTE accepted → RED
+examples: (R-A2L-DEF.58.2/1) a masked object with no datatype → the refusal order gives `A2L-DEF-DATATYPE` before `_check_bit_mask` runs (no `KeyError`)
 
 _display_decimals
-req: R-A2L-DEF.35, R-A2L-DEF.36, R-A2L-DEF.37
+req: R-A2L-DEF.35, R-A2L-DEF.36, R-A2L-DEF.37, R-A2L-DEF.58.2
 in: str | None display_format
 out: int | None decimals
-func: new. Reads the *display format* `%[<length>][.<decimals>]` optionally ended by `f` (ASCII digits); gives `min(<decimals>, 17)`; `None` when the text gives no decimals or is not of that form.
+func: new. Reads the *display format* `%[<length>][.<decimals>]` optionally ended by `f` (ASCII digits); a decimals run of more than 2 digits gives `17` (no `int()` on a long run, E3S-03); else gives `min(<decimals>, 17)`; `None` when the text gives no decimals or is not of that form.
 module: s19_app/tui/a2l_definition.py
 examples: (R-A2L-DEF.35/1) `%4.2` → `2`; (R-A2L-054/def-1) `%.1f` → `1`; `%0.0` → `0`
 examples: (R-A2L-DEF.36/1) `%.40` → `17`
+examples: (R-A2L-DEF.58.2/1) `%.` + 5,000 digits → `17` (no `int()` of the run)
 examples: (R-A2L-DEF.37/1 … /4) `None` → `None`; `%` → `None`; `%12` → `None`; `x5.1` → `None`
 
 decode_definition
-req: R-A2L-DEF.25, R-A2L-DEF.26, R-A2L-DEF.28, R-A2L-DEF.33, R-A2L-DEF.56, R-A2L-DEF.58, R-A2L-040, R-A2L-051, R-A2L-053, R-A2L-054, R-A2L-055, R-A2L-056, R-A2L-057, R-A2L-058.1, R-A2L-058.2, R-A2L-058.3, R-A2L-061, R-A2L-062, R-A2L-063
+req: R-A2L-DEF.25, R-A2L-DEF.26, R-A2L-DEF.28, R-A2L-DEF.33, R-A2L-DEF.56, R-A2L-DEF.58.1, R-A2L-DEF.58.2, R-A2L-DEF.137, R-A2L-040, R-A2L-051, R-A2L-053, R-A2L-054, R-A2L-055, R-A2L-056, R-A2L-057, R-A2L-058.1, R-A2L-058.2, R-A2L-058.3, R-A2L-061, R-A2L-062, R-A2L-063
 in: Definition definition; dict a2l_data; Mapping[int, int] image
 out: Decoded | Refusal result
-func: new (I-2). The definition's refusal when it has one (R-A2L-DEF.25). Else `_read_stored_value(definition, image)` (a refusal passes through). Text → `Decoded(None, s, s)` with `s = _ascii_text(raw)`. Enum → `Decoded(stored, the entry text or None, _enum_text(definition, stored))`. Number → `value = stored` for `NO_COMPU_METHOD`, else `_apply_compu_method(stored, the record, a2l_data["compu_tabs_by_name"], (limits.lower, limits.upper))` with the record of `_read_method_record`; a status `error` → `A2L-DEF-DECODE` `<name>: <conversion error>`; else `Decoded(stored, value, display_text(definition, value))`. Reads `image` and `a2l_data` only.
+func: new (I-2). The definition's refusal when it has one (R-A2L-DEF.25). Else `_read_stored_value(definition, image)` (a refusal passes through). Text → `Decoded(None, s, s)` with `s = _ascii_text(raw)`. Enum → `Decoded(stored, the entry text or None, _enum_text(definition, stored))`. Number → `value = stored` for `NO_COMPU_METHOD`, else `_apply_compu_method(stored, the method record built from the definition's fields — `conversion_type`, `coeffs_linear`, `coeffs`, `compu_tab_ref` (never `_read_method_record` or `sections`, E3A-03), a2l_data["compu_tabs_by_name"], (limits.lower, limits.upper))`; a status `error` → `A2L-DEF-DECODE` `<name>: <conversion error>`; else `Decoded(stored, value, display_text(definition, value))`. `Decoded.text` gives U+FFFD for U+0000–U+001F, U+007F and U+0080–U+009F in a word taken from the file; `EnumEntry.text` stays raw, so matching is unchanged (R-A2L-DEF.137). Reads `image` and `a2l_data` only.
 module: s19_app/tui/a2l_definition.py
 examples: (R-A2L-040/def-1) V171 `ASAM.C.SCALAR.SWORD.IDENTICAL`, image 34 12 at 0x810004 → stored `4660`, text `4660`
 examples: (R-A2L-044/def-1, R-A2L-053/def-1) the same, image FB FF → `-5`; image 07 00 → value `7`, text `7`
@@ -319,6 +353,7 @@ examples: (R-A2L-DEF.25/1 neg) mutant: a refused definition decoded by identity 
 examples: (R-A2L-DEF.33/1) V171 `UNKNOWN`, image `Hello ASAM` + 32 × 00 at 0x810200 → `Decoded(None, "Hello ASAM", "Hello ASAM")`
 examples: (R-A2L-DEF.33/2) C08 clean `ASCII_0001` → text `HW_REV=00.01.00.00` (B2 P5d)
 examples: (R-A2L-059/def-1) V171 `ASAM.C.SCALAR.SWORD.TAB_VERB_DEFAULT_VALUE`, image 02 00 at 0x810004 → `Decoded(2, "Square", "Square")` (base: raw 2, unknown method, B1 line 11)
+examples: (R-A2L-DEF.137/1) INLINE COMPU_VTAB entry text `"A\x1b[2J"` (an ESC, U+001B), stored on it → `Decoded(stored, the entry text, "A�[2J")` — `text` gives U+FFFD for the ESC, `EnumEntry.text` stays raw
 examples: (AT-B103-I2-3) C08 clean: every one of the `322` defined objects (B2 P5f) builds and decodes with `0` refusals; `firmware_issues.a2l`: `1` `A2L-DEF-METHOD` (`MISSING_CM`) at build and `5` `A2L-DEF-BYTES` at decode — `OUT_OF_RANGE_1: 1 of its 1 bytes are not in the image`, `OUT_OF_RANGE_2: …`, `OUT_OF_RANGE_3: …`, `SPAN_OVER_1: 2 of its 4 bytes are not in the image`, `SPAN_OVER_2: 3 of its 4 bytes are not in the image` (B2 P5g)
 
 _read_stored_value
@@ -338,10 +373,10 @@ examples: (R-A2L-045/def-1 … /def-3) INLINE (big) FLOAT16_IEEE, image 3C 00 �
 examples: (R-A2L-DEF.39/1 … /3) INLINE (big) FLOAT32 `F1`, image 7F C0 00 00 / 7F 80 00 00 / FF 80 00 00 → `nan` / `inf` / `-inf` as floats (B2 P7)
 
 _enum_text
-req: R-A2L-DEF.29, R-A2L-DEF.30, R-A2L-DEF.31, R-A2L-DEF.32, R-A2L-059
+req: R-A2L-DEF.29, R-A2L-DEF.30, R-A2L-DEF.31, R-A2L-DEF.32, R-A2L-DEF.137, R-A2L-059
 in: Definition definition; int | float stored
 out: str text
-func: new. The text of the first entry in file order that holds `stored`: a pair whose raw equals it, or a range with `min ≤ stored ≤ max` (both ends included; D-4 A, E3 to confirm the upper end). No entry → the default text when there is one, else `<raw> (no text)` with `<raw>` the integer text of an integral stored value, else its `%.15g` text.
+func: new. The text of the first entry in file order that holds `stored`: a pair whose raw equals it, or a range with `min ≤ stored ≤ max` (both ends included; D-4 A, E3 to confirm the upper end). No entry → the default text when there is one, else `<raw> (no text)` with `<raw>` the integer text of an integral stored value, else its `%.15g` text. The returned display text gives U+FFFD for U+0000–U+001F, U+007F and U+0080–U+009F; `EnumEntry.text` stays raw, so matching is unchanged (R-A2L-DEF.137).
 module: s19_app/tui/a2l_definition.py
 examples: (R-A2L-DEF.29/1) INLINE `VT_D` `1 "A"` `1 "B"`, stored 1 → `A`
 examples: (R-A2L-DEF.29/1 neg) mutant: a dict built in file order (the last wins) → `B` → RED
@@ -349,6 +384,7 @@ examples: (R-A2L-DEF.30/1 … /4) V171 `…VTAB_RANGE_DEFAULT_VALUE`, stored 0 �
 examples: (R-A2L-DEF.30/2 neg) mutant: the max excluded → stored 1 gives `out of range value` → RED
 examples: (R-A2L-DEF.31/1, /2) V171 `…TAB_VERB_DEFAULT_VALUE`, stored 9 → `unknown signal type`; `…VTAB_RANGE_DEFAULT_VALUE`, stored 10 → `out of range value`
 examples: (R-A2L-DEF.32/1, /2) V171 `…TAB_VERB_NO_DEFAULT_VALUE` (entries 2 … 7), stored 1 → `1 (no text)`; `…VTAB_RANGE_NO_DEFAULT_VALUE`, stored 10 → `10 (no text)`
+examples: (R-A2L-DEF.137/2) INLINE COMPU_VTAB entry text `"A\x00B"` (a NUL, U+0000), stored on it → display text `A�B` (the raw entry text keeps the NUL for matching)
 examples: (R-A2L-059/def-2) INLINE (big) UWORD enum `ME` with `BIT_MASK 0x00F0` on `VT_M` (`0 "OFF"`, `1 "ON"`), image 00 10 → stored `1` → `ON`
 
 _ascii_text
@@ -367,12 +403,13 @@ display_text
 req: R-A2L-DEF.35, R-A2L-DEF.36, R-A2L-DEF.37, R-A2L-DEF.38, R-A2L-DEF.39
 in: Definition definition; int | float value
 out: str text
-func: new (I-2; Inc 3 calls it per element). In this order: a value that is not finite → `nan`, `inf`, `-inf`; an integer datatype (not FLOAT16/32/64) whose conversion is `NO_COMPU_METHOD` or IDENTICAL → the integer text, no point (R-A2L-DEF.38); `decimals` not `None` → exactly that many digits after the point, rounded to nearest, a tie to even (Python's `f"{value:.{d}f}"` on the binary value), no padding; else the 15-significant-digit text (`"%.15g" % value`). No unit.
+func: new (I-2; Inc 3 calls it per element). In this order (E3A-04): a value that is not finite → `nan`, `inf`, `-inf`; an integer datatype (not FLOAT16/32/64) whose conversion is `NO_COMPU_METHOD` or IDENTICAL → the integer text, no point (R-A2L-DEF.38, now a `When`); `decimals` not `None` and the definition has a float datatype or a conversion other than none and IDENTICAL (the narrowed R-A2L-DEF.35) → exactly `d` digits after the point, no padding; for d ≥ 15 first round the value to 15 significant digits, then write the d decimals (E3A-06; FLOAT32 keeps its true stored digits to 15 significant digits); else the 15-significant-digit text (`"%.15g" % value`). No unit.
 module: s19_app/tui/a2l_definition.py
 examples: (R-A2L-DEF.35/1) LINEAR a = 0.1, UWORD, `%4.2`, value of stored 123 (`12.3`) → `12.30`
 examples: (R-A2L-DEF.35/1 neg) mutant: the length used as padding → `12.30` with a leading space → RED; `%g` → `12.3` → RED
 examples: (R-A2L-DEF.35/2 … /4) FLOAT64 `%.0`, `2.5` → `2`; `%8.4`, `3.14159` → `3.1416`; `%.2`, `0.125` → `0.12` (B2 P7)
-examples: (R-A2L-DEF.36/1) FLOAT64 `%.40`, `0.1` → `0.10000000000000001`
+examples: (R-A2L-DEF.36/1, E3A-06) FLOAT64 `%.40`, `0.1` → `0.10000000000000000` (round to 15 significant digits, then 17 decimals)
+examples: (E3A-06) UWORD LINEAR 0.1, `%.15`, value of stored 41 (`4.1000000000000005`) → `4.100000000000000`
 examples: (R-A2L-DEF.37/1 … /4) LINEAR 0.1 UWORD, no format, `0.30000000000000004` → `0.3`; FLOAT64 `%`, `1234567.0` → `1234567`; `%12`, `1e-07` → `1e-07`; `x5.1`, `12.5` → `12.5`
 examples: (R-A2L-DEF.37/1 neg) mutant: `repr` → `0.30000000000000004` → RED
 examples: (R-A2L-DEF.38/1, E2-4) SOFTA `AlyjmQyfk.GrsaEjbkyQmicdevPjq_GpqJraTjkq._1_` (SWORD, `NO_COMPU_METHOD`, `FORMAT "%.15"`, at `0x0`), image FB FF → `-5`
@@ -382,30 +419,36 @@ examples: (R-A2L-DEF.39/1 … /3) FLOAT32 `%.2`, NaN / +inf / −inf → `nan` /
 examples: (R-A2L-DEF.54/1) `MEASUREMENT_0001` with `%.3`, `5.1` → `5.100`
 
 encode_definition
-req: R-A2L-DEF.25, R-A2L-DEF.26, R-A2L-DEF.40, R-A2L-DEF.47, R-A2L-DEF.53, R-A2L-DEF.54, R-A2L-DEF.55, R-A2L-DEF.56, R-A2L-DEF.57, R-A2L-DEF.58
+req: R-A2L-DEF.25, R-A2L-DEF.26, R-A2L-DEF.40, R-A2L-DEF.46, R-A2L-DEF.47, R-A2L-DEF.53, R-A2L-DEF.54, R-A2L-DEF.55, R-A2L-DEF.56, R-A2L-DEF.57, R-A2L-DEF.58.1, R-A2L-DEF.58.2, R-A2L-DEF.137
 in: Definition definition; dict a2l_data; str text; Mapping[int, int] image
 out: Encoded | Refusal result
-func: new (I-2). The *encode order*: (1) the definition's refusal; (2) kind text → `_encode_ascii(definition, text)` (spaces kept) → `Encoded(address, data, ())`; else `t` = `text` without the spaces (U+0020) at both ends; (3) number → `_parse_number_text(t)`, `None` → `A2L-DEF-NUMBER` `<name>: '<t>' is not a number`; enum → `_encode_enum(definition, t)` (a refusal passes through); the result is the *limit value*; (4) `_check_limits(definition, limit value, t)` (a refusal passes through; a text is the notice); (5) `_encode_number(definition, a2l_data, limit value)` (a refusal passes through); (6) a bit mask → `field = _decode_scalar(bytes, datatype, byte_order)` and `data = _merge_bit_mask(definition, field, t, image)` (a refusal passes through) — the bytes of step 5 are never the result for a masked definition (BL-I2-1, E2-11); else `data` = those bytes; (7) number → `decode_definition(definition, a2l_data, {address + i: b})` over the new bytes only; a refusal or a value that `_agrees_at_display_precision` rejects → `A2L-DEF-PRECISION` `<name>: <t> cannot be stored at the display precision — the nearest stored value is <stored>` (`<stored>` = `display_text` of the decoded value); (8) `Encoded(address, data, notices)`. Reads `image` and `a2l_data`; writes neither.
+func: new (I-2). The *encode order*: (1) the definition's refusal; (2) kind text → `_encode_ascii(definition, text)` (spaces kept) → `Encoded(address, data, ())`; else `t` = `text` without the spaces (U+0020) at both ends (`strip(" ")`, not `strip()`, E3S-11); (3) number → `_parse_number_text(t)`, `None` → `A2L-DEF-NUMBER` `<name>: '<t>' is not a number`; enum → `_encode_enum(definition, t)` (a refusal passes through); the result is the *limit value*; (4) `_check_limits(definition, limit value, t)` (a refusal passes through; a text is the notice); (5) `_encode_number(definition, a2l_data, limit value)` (a refusal passes through); (6) the image must hold the span, for every kind — the `_read_stored_value` byte check: `n` of the `byte_length` addresses not in `image` → `A2L-DEF-BYTES` `<name>: <n> of its <length> bytes are not in the image` (E3S-05, R-A2L-DEF.26/3); (7) a bit mask → `field = _decode_scalar(bytes, datatype, byte_order)` and `data = _merge_bit_mask(definition, field, t, image)` (a refusal passes through) — the bytes of step 5 are never the result for a masked definition (BL-I2-1, E2-11); else `data` = those bytes; (8) number → `p` = the decoded value of the new bytes (`decode_definition(definition, a2l_data, {address + i: b})`); a refusal or a value `_agrees_at_display_precision` rejects → `A2L-DEF-PRECISION` `<name>: <t> cannot be stored at the display precision — the nearest stored value is <stored>` (`<stored>` = `display_text` of the decoded value); for an integer datatype with no conversion or IDENTICAL, `decimal.Decimal(t)` ≠ the exact decoded integer → the same refusal (E3S-09); else `_check_limits(definition, p, display_text(definition, p))` with `<text>` = `<stored>`: a refusal (`A2L-DEF-LIMITS` / `A2L-DEF-EXTENDED`) passes through, a notice (p outside the limits only) joins the notices (E3S-06); (9) `Encoded(address, data, notices)`. Every message gives U+FFFD for control characters in a word from the operator or the file (R-A2L-DEF.137). Reads `image` and `a2l_data`; writes neither.
 module: s19_app/tui/a2l_definition.py
 examples: (R-A2L-DEF.40/1 … /7) V171 `ASAM.C.SCALAR.SWORD.IDENTICAL`, `` / `abc` / `1,5` / `1_000` / `nan` / `inf` / `0x10` → refusal `A2L-DEF-NUMBER` `ASAM.C.SCALAR.SWORD.IDENTICAL: '' is not a number` / `…: 'abc' is not a number` / `…: '1,5' is not a number` / `…: '1_000' is not a number` / `…: 'nan' is not a number` / `…: 'inf' is not a number` / `…: '0x10' is not a number`
+examples: (R-A2L-DEF.40/8, /9, E3S-11) V171 `ASAM.C.SCALAR.SWORD.IDENTICAL`, `１２` (fullwidth digits) → `A2L-DEF-NUMBER`; `\t5` (a tab, not trimmed by `strip(" ")`) → `A2L-DEF-NUMBER` (ASCII digits only, `[0-9]`/`re.ASCII`)
 examples: (R-A2L-DEF.41/2) V171 `ASAM.C.SCALAR.SWORD.IDENTICAL`, `  -5 ` → `Encoded(0x810004, FB FF, ())`
 examples: (R-A2L-DEF.53/1, /2) INLINE (big) UWORD `B1` at 0x20, `4660` → address `0x20`, data `12 34`; INLINE UWORD `B2` at 0x20 with `BYTE_ORDER MSB_LAST`, `4660` → data `34 12` (B2 P6)
 examples: (R-A2L-DEF.53/3) V171 `UNKNOWN`, `ABC` → address `0x810200`, `42` bytes
 examples: (R-A2L-DEF.53/4, R-A2L-DEF.46/1) V171 `…BITMASK_0FF0`, image 0F F0 at 0x810002, `35` → address `0x810002`, data `3F F2` (word `0xF23F`), 2 bytes (base: `23 00`, B1 line 17)
 examples: (R-A2L-DEF.46/1 neg) mutant: the bytes of `_encode_number` returned for a masked definition (the whole-word write) → `23 00` → RED
 examples: (R-A2L-DEF.26/2) V171 `…BITMASK_0FF0`, an empty image, `35` → refusal `A2L-DEF-BYTES` `ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0: 2 of its 2 bytes are not in the image`
+examples: (R-A2L-DEF.26/3, E3S-05) INLINE (big) UWORD `B3` at 0x20 (no mask), an empty image, `4660` → refusal `A2L-DEF-BYTES` `B3: 2 of its 2 bytes are not in the image` (the image check runs for every kind, not only masked)
 examples: (R-A2L-DEF.25/2) C08 issues `MISSING_CM`, `7` → the `A2L-DEF-METHOD` refusal, no bytes
 examples: (R-A2L-DEF.54/1) C08 clean `MEASUREMENT_0001` (`CM_TAB_INTP`, limits `0`..`50`) with `FORMAT "%.3"` added to its MEASUREMENT, `5.07` → the encode gives stored 51 (B2 P5j) → decoded `5.1` → `|5.1 − 5.07|` = 0.03 > 0.0005 → refusal `A2L-DEF-PRECISION` `MEASUREMENT_0001: 5.07 cannot be stored at the display precision — the nearest stored value is 5.100`
 examples: (R-A2L-DEF.54/1 neg) mutant: step 7 left out (the flagged write of the reused encode) → bytes `00 33` → RED
 examples: (R-A2L-DEF.54/2) the same object as generated (method format `%.1f`), `5.07` → `Encoded(0x50, 00 33, ())` (0.03 ≤ 0.05)
-examples: (R-A2L-DEF.55/1) grid instances: FLOAT32 IDENTICAL, no format, `0.1` → stored `0.10000000149011612`, accepted (its `%.6g` text `0.1` equals, B2 P7); UWORD LINEAR 0.1, `%8.4`, `12.3` → stored `123`, accepted; UWORD mask `0x0FF0` IDENTICAL, `35` → accepted, decodes `35`; UWORD LINEAR 0.1, `12.34` → refusal `A2L-DEF-ENCODE` (`the converted raw value 123.4 is not integral`), not counted as accepted; ≥ `300` accepted, `0` that do not agree
+examples: (R-A2L-DEF.54/3, E3S-07) FLOAT64 LINEAR a = 1, b = 1e10, no decimals, `1.0000001` → refusal `A2L-DEF-PRECISION` `…: 1.0000001 cannot be stored at the display precision — the nearest stored value is 1` (no `%.6g` clause for FLOAT64)
+examples: (R-A2L-DEF.54/4, E3S-09) INLINE A_UINT64 IDENTICAL, `9007199254740993` → refusal `A2L-DEF-PRECISION` (`decimal.Decimal("9007199254740993")` ≠ the stored `9007199254740992`)
+examples: (R-A2L-DEF.55/1) grid instances: FLOAT32 IDENTICAL, no format, `0.1` → stored `0.10000000149011612`, accepted (its `%.6g` text `0.1` equals, FLOAT32 only, B2 P7); UWORD LINEAR 0.1, `%.15`, `4.1` → stored `41` → `4.1000000000000005`, accepted (both `%.15g` texts `4.1`, E3A-02); UWORD LINEAR 0.1, `%8.4`, `12.3` → stored `123`, accepted; UWORD mask `0x0FF0` IDENTICAL, `35` → accepted, decodes `35`; UWORD LINEAR 0.1, `12.34` → refusal `A2L-DEF-ENCODE` (`the converted raw value 123.4 is not integral`), not counted as accepted; ≥ `300` accepted, `0` that do not agree
 examples: (R-A2L-DEF.55/1 neg) mutants: the bytes packed in the opposite byte order → decoded ≠ value → refused for precision → RED; the mask shift off by one → RED; LINEAR inverted as (x + b) / a → RED
 examples: (R-A2L-DEF.56/1) V171 `…TAB_VERB_DEFAULT_VALUE` `Square` → `02 00` → decodes `Square`; C08 `ASCII_0001` `HW_REV=00.01.00.00` → its 18 bytes + 14 × 00 → decodes `HW_REV=00.01.00.00`; ≥ `32` texts, `0` that come back different
 examples: (R-A2L-DEF.57/1) V171 `UNKNOWN`, a 43-character text holding `é` → `A2L-DEF-TEXT-LENGTH`
 examples: (R-A2L-DEF.57/2) INLINE SWORD `L1` (LINEAR a = 2, limits −100..100, no extended), `301` → `A2L-DEF-LIMITS` (not `A2L-DEF-ENCODE` for 150.5)
 examples: (R-A2L-DEF.57/3) INLINE SWORD `MN` (mask `0x00F0`, limits −100..100), an empty image, `-1` → `A2L-DEF-BYTES` (not `A2L-DEF-MASK-VALUE`)
 examples: (R-A2L-DEF.57/3 neg) mutant: the mask checked before the image bytes → `A2L-DEF-MASK-VALUE` → RED
-examples: (R-A2L-DEF.58/1, /2) V171 and C08: each defined object encoded with its own decoded text over the image → a deep copy of the image and of `a2l_data` taken before equals both after → `True`
+examples: (R-A2L-DEF.45/3, E3S-06) INLINE UWORD TAB_INTP over a COMPU_TAB `0 0.0`, `10 1.0`, `FORMAT "%.1"`, limits `0 0.55`, `EXTENDED_LIMITS 0 0.55`, `0.55` → step 8 decodes `p` = `0.6` (raw 5.5 rounds to 6), outside the extended limits → refusal `A2L-DEF-EXTENDED` `…: 0.6 is outside the extended limits 0..0.55` (the written value is checked, not only the typed one)
+examples: (R-A2L-DEF.137/4) INLINE UWORD `B4`, an operator text holding an ESC → the `A2L-DEF-NUMBER` message echoes the text with U+FFFD in place of the ESC
+examples: (R-A2L-DEF.58.1/1, /2) V171 and C08: each defined object encoded with its own decoded text over the image → a deep copy of the image and of `a2l_data` taken before equals both after → `True`
 examples: (AT-B103-I2-1, E2-8) V171, image `Hello ASAM`+32 × 00 at 0x810200, 34 12 at 0x810002, 02 00 at 0x810004, 00 at 0x810000 and 0x810001; in this order, each: decode, encode, apply the bytes, decode: `…TAB_VERB_DEFAULT_VALUE` `Square` → `Sinus` (03 00); `…TAB_VERB_NO_DEFAULT_VALUE` `orange` → `violet` (07 00); `…VTAB_RANGE_DEFAULT_VALUE` `four_to_seven` → `hundred` (64 00); `…BITMASK_0FF0` `35` → `200` (word `0x1C84`); `…BITMASK_0001` `0` → `1` (`0x1C85`); `…BITMASK_0010` `0` → `1` (`0x1C95`); `UNKNOWN` `Hello ASAM` → `ABC`; `ASAM.C.SCALAR.SBYTE.IDENTICAL` `0` → `120` (78, with the notice); `ASAM.C.SCALAR.UBYTE.IDENTICAL` `0` → `20` (14); `ASAM.C.SCALAR.SWORD.IDENTICAL` `100` → `-5` (FB FF). After the three mask writes every bit outside each write's mask is unchanged; `…BITMASK_0FF0` then decodes `201` (its mask holds bit 4, which `…BITMASK_0010` set)
 examples: (AT-B103-I2-2) DEFC: `ENUM_0001` `IDLE` → `FAULT` (`03`); `MASK_FIELD_0001` `174` → `3` (word `0x1037`), `MASK_BIT_0001` still `1`; `MASK_BIT_0001` `1` → `0` (`0x1036`); `DISPLAY_0001` `143.5` → `-12.5` (`FF E7`); every other byte of the region unchanged
 
@@ -413,9 +456,10 @@ _parse_number_text
 req: R-A2L-DEF.40, R-A2L-DEF.41
 in: str text
 out: float | None value
-func: new. The *number text* grammar on the whole (already trimmed) text: `[+|-]` then ASCII digits with an optional point and digits, or a point and digits, then optionally `e`/`E`, an optional sign and digits; the value is `float(text)`; anything else → `None` (no `float()` grammar: no `_`, `,`, hex, `nan`, `inf`, no Unicode digits).
+func: new. The *number text* grammar on the whole (already trimmed) text: `[+|-]` then ASCII digits (`[0-9]` / `re.ASCII`, not `\d` or `str.isdigit`) with an optional point and digits, or a point and digits, then optionally `e`/`E`, an optional sign and digits; the value is `float(text)`; anything else → `None` (no `float()` grammar: no `_`, `,`, hex, `nan`, `inf`, no Unicode digits). The caller trims only U+0020 (`strip(" ")`), so a tab or newline stays in the text and fails the grammar (E3S-11).
 module: s19_app/tui/a2l_definition.py
 examples: (R-A2L-DEF.40/1 … /7) `` / `abc` / `1,5` / `1_000` / `nan` / `inf` / `0x10` → `None`
+examples: (R-A2L-DEF.40/8, /9, E3S-11) `１２` (fullwidth digits) → `None`; `\t5` → `None` (the tab is not a space)
 examples: (R-A2L-DEF.40/4 neg) mutant: `float()` grammar → `1_000` gives `1000.0` → RED
 examples: (R-A2L-DEF.41/6) `+1.5e2` → `150.0`; `.5` → `0.5`; `1.` → `1.0`; `+2e1` → `20.0`; `-5` → `-5.0`
 
@@ -423,7 +467,7 @@ _check_limits
 req: R-A2L-DEF.43, R-A2L-DEF.44, R-A2L-DEF.45
 in: Definition definition; float limit_value; str text
 out: Refusal | str | None outcome
-func: new (D-7 A). `outside` = below a declared lower limit or above a declared upper limit. In order: outside and no extended limits → `A2L-DEF-LIMITS` `<name>: <text> is outside the limits <lower>..<upper>`; extended limits and the value outside them → `A2L-DEF-EXTENDED` `<name>: <text> is outside the extended limits <elower>..<eupper>`; outside (and inside the extended limits) → the notice `<name>: <text> is outside the limits <lower>..<upper> and inside the extended limits <elower>..<eupper>`; else `None`. Texts from `Limits.*_text`.
+func: new (D-7 A). `outside` = below a declared lower limit or above a declared upper limit. For a FLOAT32_IEEE datatype the value and each limit are compared packed as FLOAT32, so a limit FLOAT32 cannot hold exactly still accepts its nearest value (E3S-06). In order: outside and no extended limits → `A2L-DEF-LIMITS` `<name>: <text> is outside the limits <lower>..<upper>`; extended limits and the value outside them → `A2L-DEF-EXTENDED` `<name>: <text> is outside the extended limits <elower>..<eupper>`; outside (and inside the extended limits) → the notice `<name>: <text> is outside the limits <lower>..<upper> and inside the extended limits <elower>..<eupper>`; else `None`. Texts from `Limits.*_text`.
 module: s19_app/tui/a2l_definition.py
 examples: (R-A2L-DEF.43/1, /2) INLINE SWORD `L1` (LINEAR a = 2, limits −100..100), `-101` → `A2L-DEF-LIMITS` `L1: -101 is outside the limits -100..100`; `200` → `L1: 200 is outside the limits -100..100`
 examples: (R-A2L-DEF.43/1 neg) mutant: flag and proceed (the reused encode's limb) → bytes → RED
@@ -432,12 +476,14 @@ examples: (R-A2L-DEF.43/4) V171 `ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE
 examples: (R-A2L-DEF.44/1, /2) V171 `ASAM.C.SCALAR.SBYTE.IDENTICAL` (limits −100..100, extended −128..127), `120` → the notice `ASAM.C.SCALAR.SBYTE.IDENTICAL: 120 is outside the limits -100..100 and inside the extended limits -128..127`, then data `78`; `-128` → `…: -128 is outside the limits -100..100 and inside the extended limits -128..127`, data `80`
 examples: (R-A2L-DEF.45/1, /2) the same object, `-129` → `A2L-DEF-EXTENDED` `ASAM.C.SCALAR.SBYTE.IDENTICAL: -129 is outside the extended limits -128..127`; V171 `ASAM.C.SCALAR.UBYTE.IDENTICAL` (extended 0..256), `257` → `ASAM.C.SCALAR.UBYTE.IDENTICAL: 257 is outside the extended limits 0..256`
 examples: (R-A2L-DEF.45/2 neg) mutant: the extended limits ignored → `257` refused by the UBYTE range (`A2L-DEF-ENCODE`) → RED
+examples: (R-A2L-DEF.21/3, E3S-10) INLINE UBYTE `XL3` (limits `0`..`100`), `EXTENDED_LIMITS nan nan` read as no extended limits, `101` → `A2L-DEF-LIMITS` `XL3: 101 is outside the limits 0..100` (not `A2L-DEF-EXTENDED`)
+examples: (E3S-06) FLOAT32_IEEE, limits `0`..`0.1`, value `0.10000000149011612` (the nearest FLOAT32 to `0.1`) → `None` (the limit packs to the same FLOAT32)
 
 _encode_number
 req: R-A2L-DEF.41, R-A2L-DEF.42
 in: Definition definition; dict a2l_data; float value
 out: bytes | Refusal data
-func: new (D-3 A). The encode direction, through the unchanged `encode_physical_to_raw_bytes` on a tag view built from the definition — `char_type` `None`, `matrix_dim` `None`, `datatype`, `length` = `byte_length`, `effective_byte_order` = `byte_order`, `compu_method_name` = `method_name` (`NO_COMPU_METHOD` for kind enum: the stored value is the entry's raw, BL-I2-2), `lower_limit` / `upper_limit` `None` (its limits flag and its TAB_INTP flag are not used: .43 … .45 and .54 replace them) — with `{method_name: the record}` as its method table, `a2l_data["compu_tabs_by_name"]`, and no record layouts. Its bytes (the stored value as the datatype, in the byte order) or `A2L-DEF-ENCODE` `<name>: <reason>` with its reason verbatim.
+func: new (D-3 A). The encode direction, through the unchanged `encode_physical_to_raw_bytes` on a tag view built from the definition — `char_type` `None`, `matrix_dim` `None`, `datatype`, `length` = `byte_length`, `effective_byte_order` = `byte_order`, `compu_method_name` = `method_name` (`NO_COMPU_METHOD` for kind enum: the stored value is the entry's raw, BL-I2-2), `lower_limit` / `upper_limit` `None` (its limits flag and its TAB_INTP flag are not used: .43 … .45 and .54 replace them) — with `{method_name: the record built from the definition's fields — `conversion_type`, `coeffs_linear`, `coeffs`, `compu_tab_ref` (never `_read_method_record` or `sections`, E3A-03)}` as its method table, `a2l_data["compu_tabs_by_name"]`, and no record layouts. Its bytes (the stored value as the datatype, in the byte order) or `A2L-DEF-ENCODE` `<name>: <reason>` with its reason verbatim.
 module: s19_app/tui/a2l_definition.py
 examples: (R-A2L-DEF.41/1) INLINE UBYTE `N0`, `NO_COMPU_METHOD`, `7.0` → `07`
 examples: (R-A2L-DEF.41/2) V171 SWORD IDENTICAL, `-5.0` → `FB FF` (B2 P6)
@@ -460,6 +506,8 @@ module: s19_app/tui/a2l_definition.py
 examples: (R-A2L-DEF.46/1) V171 `…BITMASK_0FF0` (little), image 0F F0 (word `0xF00F`), field `35` → `3F F2` (word `0xF23F`, B2 P7)
 examples: (R-A2L-DEF.46/2) V171 `…BITMASK_0001`, image 34 12, field `1` → `35 12` (word `0x1235`)
 examples: (R-A2L-DEF.46/3) DEFC `MASK_FIELD_0001` (big), the planned word `0x1AE7`, field `3` → `10 37`; then `MASK_BIT_0001` decodes `1` and `MASK_FIELD_0001` decodes `3`
+examples: (R-A2L-DEF.46/4, E3A-11) INLINE (big) UWORD enum `ME` with `BIT_MASK 0x00F0` on `VT_M` (`0 "OFF"`, `1 "ON"`), image 12 34, field `1` (the raw of `ON`) → data `12 14` (word `0x1214`); the masked enum merges the mask like a number
+examples: (R-A2L-DEF.46/4 neg) mutant: the whole word written for a masked enum → `00 01` → RED
 examples: (R-A2L-DEF.47/1) V171 `…BITMASK_0FF0`, image 0F F0, `256` (limits 0..255: the extended-limits notice, then) → `A2L-DEF-MASK-VALUE` `ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0: 256 does not fit the bit mask 0x0FF0`
 examples: (R-A2L-DEF.47/1 neg) mutant: the field cut to the mask (`& mask`) → writes `0` → RED
 examples: (R-A2L-DEF.47/2) INLINE SWORD `MN` mask `0x00F0`, image 00 00, `-1` (the encode's bytes FF FF read back as `-1`) → `MN: -1 does not fit the bit mask 0x00F0`
@@ -493,11 +541,13 @@ _agrees_at_display_precision
 req: R-A2L-DEF.54, R-A2L-DEF.55
 in: Definition definition; float decoded; float value
 out: bool agrees
-func: new (D-3 A). The CTX-A2L-DEF rule: `decimals` = d not `None` → `|decoded − value| ≤ 0.5 × 10^(−d)`; else their `%.15g` texts are equal; for FLOAT32_IEEE and FLOAT64_IEEE also true when the `%.6g` texts or the `%.15g` texts are equal.
+func: new (D-3 A). The CTX-A2L-DEF rule (E3A-02, E3S-07): a decoded value `p` agrees with an accepted value `x` when `|p − x| ≤ 0.5 × 10^(−d)`, computed in IEEE 754 double precision on `p` and the value of the number text, and the display format gives `d` decimals (d capped at 17); **or** when their 15-significant-digit texts are equal (every datatype); and, for FLOAT32_IEEE only, also when their 6-significant-digit texts are equal. FLOAT64 never at 6 digits.
 module: s19_app/tui/a2l_definition.py
 examples: (R-A2L-DEF.54/1) d = 3, `5.1`, `5.07` → `False`
 examples: (R-A2L-DEF.54/2) d = 1, `5.1`, `5.07` → `True`
-examples: (R-A2L-DEF.55/1) FLOAT32, d = 15 (`%.15`), `0.10000000149011612`, `0.1` → `True` (`%.6g` both `0.1`; B1 line 33)
+examples: (E3A-02) UWORD LINEAR 0.1, `%.15` (d = 15), `4.1000000000000005`, `4.1` → `True` (both `%.15g` texts `4.1`)
+examples: (R-A2L-DEF.55/1) FLOAT32, d = 15 (`%.15`), `0.10000000149011612`, `0.1` → `True` (`%.6g` both `0.1`; FLOAT32 only; B1 line 33)
+examples: (R-A2L-DEF.54/3, E3S-07) FLOAT64 LINEAR a = 1, b = 1e10, no decimals, `1.0`, `1.0000001` → `False` (`%.15g` differ; no `%.6g` clause for FLOAT64)
 examples: (R-A2L-DEF.55/1) SWORD, no decimals, `-5`, `-5.0` → `True`
 
 build_definition_objects
@@ -527,9 +577,9 @@ generate_definitions_case
 req: R-A2L-DEF.60, R-A2L-DEF.61, R-A2L-DEF.62, R-A2L-DEF.63
 in: Path out_dir; int seed
 out: dict[str, Path] paths
-func: new (G2). Creates `out_dir`; `build_definition_objects(random.Random(seed))`; writes `firmware.s19` (`emit_s19(regions, BOOT_BASE)`, unchanged) and `firmware.a2l` (`emit_definitions_a2l`) with `Path.write_text(…, encoding="utf-8")`; returns `{"s19": …, "a2l": …}`. No wall clock, no file of case 08.
+func: new (G2). Creates `out_dir`; `build_definition_objects(random.Random(seed))`; writes `definitions.s19` (`emit_s19(regions, BOOT_BASE)`, unchanged) and `definitions.a2l` (`emit_definitions_a2l`) with `Path.write_text(…, encoding="utf-8")`; returns `{"s19": …, "a2l": …}`. No wall clock, no file of case 08. (E3S-12: the names are `definitions.*`, not case 08's `firmware.*`.)
 module: tools/synth/make_release_case.py
-examples: (R-A2L-DEF.63/1) seed 20260001 into two folders → `firmware.s19` and `firmware.a2l` byte-identical across the two (`2` of `2` files)
+examples: (R-A2L-DEF.63/1) seed 20260001 into two folders → `definitions.s19` and `definitions.a2l` byte-identical across the two (`2` of `2` files)
 examples: (R-A2L-DEF.63/1 neg) mutant: a date written into the A2L header → RED
 examples: (AT-B103-I2-2) the files loaded by the app's A2L parser and `S19File` → the image holds `256` bytes at `0x800000 … 0x8000FF`; each object decodes to its planned text (`IDLE`, `1`, `174`, `143.5`)
 
@@ -542,13 +592,13 @@ module: tools/synth/make_release_case.py
 examples: (R-A2L-DEF.59/1) `--out <tmp> --seed 20260001 --size-mb 1`, no `--case` → the 11 files with the 1 MiB pin digests, `firmware.s19` `f5592b511a561c463bf89679b784aea9d9fa552d5aa9b06a17f8e91cd87ea49b` … `README.txt` `1ac1b52e1ddb13ffc0fcf45113ec01ce759992bde87730bfae63c647924506ed` (C1 hash transcript, the `1 |` rows), each over the bytes with CR LF read as LF
 examples: (R-A2L-DEF.59/2) `--size-mb 10` → the 11 `10 |` digests, `firmware.s19` `cb0cd7f1a07488aecbcb0928d75b4ae57bb5373f2ff4c097147aac41e2a7c2d9` … (`slow`)
 examples: (R-A2L-DEF.59/1 neg) mutant: one object added to case 08's inventory → the S19, HEX, A2L and MAC digests change → RED
-examples: (R-A2L-DEF.63/1) `--case definitions --out <tmp>` → `0`; the folder holds `firmware.s19` and `firmware.a2l` only
+examples: (R-A2L-DEF.63/1) `--case definitions --out <tmp>` → `0`; the folder holds `definitions.s19` and `definitions.a2l` only
 
 encode_physical_to_raw_bytes
 req: R-A2L-DEF.41, R-A2L-DEF.42, R-A2L-DEF.53
 in: dict tag; Any physical_value; Optional[dict] compu_methods_by_name = None; Optional[dict] compu_tabs_by_name = None; Optional[dict] record_layouts_by_name = None
 out: tuple[Optional[tuple[int, ...]], Optional[str], list[str]] result
-func: unchanged (frozen `a2l.py:2368`). The encode direction per conversion type, the refusal reasons, packing in the tag's byte order; flags (not refusals) for a value outside the tag's limits and for an off-grid TAB_INTP write. It ignores BIT_MASK: a masked tag is written whole (BL-I2-1). Real callers (C2): `resolve_symbol_entry` (`services/change_service.py:649`) ← `ChangeService.add_symbol_entry` (`:1297`) ← no product caller (C1). After Inc 2 also `_encode_number`, always with a mask-free tag view and limits `None`.
+func: unchanged (frozen `a2l.py:2368`). The encode direction per conversion type, the refusal reasons, packing in the tag's byte order; flags (not refusals) for a value outside the tag's limits and for an off-grid TAB_INTP write. It ignores BIT_MASK: a masked tag is written whole (BL-I2-1). Real callers (C2): `resolve_symbol_entry` (`services/change_service.py:649`) ← `ChangeService.add_symbol_entry` (`:1297`) ← no product caller (C1). After Inc 2 also `_encode_number`, always with a mask-free tag view and limits `None`. E3A-17: its call shape joins the D-9 signature pin (5 parameters, passed positionally, a 3-tuple result).
 module: s19_app/tui/a2l.py
 examples: (holds on base, B2 P5j) C08 `VALUE_0019`, `150.0`, limits removed → (`(0, 50)`, `None`, `[]`); `MEASUREMENT_0001`, `5.07` → (`(0, 51)`, `None`, [`the value 5.07 is not a table value - the write proceeds as 5.1`])
 examples: (holds on base, BL-I2-1, B2 P6) a UWORD IDENTICAL tag, little, `35.0` → (`(35, 0)`, `None`, `[]`): the whole word, the field unshifted — the write the graph never returns for a masked definition
@@ -574,7 +624,7 @@ parse_begin_meta
 req: R-A2L-DEF.5
 in: str meta
 out: tuple[str, Optional[str]] parsed
-func: unchanged (frozen `a2l.py:255`, public). The section name and long identifier of a /begin line's rest; `UNKNOWN` for an empty rest. Used by `_find_tag` to check the pairing. Real callers (C2): `extract_a2l_tags.<locals>.walk` (`a2l.py:2601`, `:2732`), `extract_compu_methods` (`:859`), `extract_compu_tables` (`:903`), `extract_record_layouts` (`:715`).
+func: unchanged (frozen `a2l.py:255`, public). The section name and long identifier of a /begin line's rest; `UNKNOWN` for an empty rest. Used by `describe_definitions` to name each section in the one walk (E3A-01). Real callers (C2): `extract_a2l_tags.<locals>.walk` (`a2l.py:2601`, `:2732`), `extract_compu_methods` (`:859`), `extract_compu_tables` (`:903`), `extract_record_layouts` (`:715`). E3A-17: its call shape joins the D-9 signature pin.
 module: s19_app/tui/a2l.py
 examples: (holds on base, B2 P2) V171's ASCII object, rest `""` → (`UNKNOWN`, `None`)
 
@@ -598,7 +648,7 @@ _collect_sections_by_name
 req: R-A2L-DEF.5, R-A2L-DEF.10, R-A2L-DEF.14
 in: list[dict] sections; str target_name
 out: list[dict] found
-func: unchanged (frozen `a2l.py:698`, private, D-9 A). Every section of that name, pre-order. Used by `_find_tag`, `_read_method_record`, `_read_enum_table`. Real callers (C2): `extract_compu_methods` (`:846`), `extract_compu_tables` (`:902`), `extract_record_layouts` (`:714`).
+func: unchanged (frozen `a2l.py:698`, private, D-9 A). Every section of that name, pre-order. No longer used by the new module — `describe_definitions` builds the name maps in one walk (E3A-01), so it leaves D-9's import list and its rename guard. Real callers (C2): `extract_compu_methods` (`:846`), `extract_compu_tables` (`:902`), `extract_record_layouts` (`:714`).
 module: s19_app/tui/a2l.py
 examples: (holds on base, B2 P4g) software_a, `COMPU_METHOD` → `3.91` ms per call; the two object kinds walked and sorted → `9.13` ms
 
@@ -680,7 +730,7 @@ desc: I-2 `Decoded(stored, value, text)`, per kind as pinned above.
 desc: I-2 `Encoded(address, data, notices)`: the whole span from the address; the caller applies it (the module writes nothing).
 
 [Data: a2l_data]
-desc: the `parse_a2l_file` payload; the model reads `tags`, `sections`, `record_layouts_by_name`, `compu_tabs_by_name` and never writes (R-A2L-DEF.58). It does not read `compu_methods_by_name` (D-2 A: it reads the records itself).
+desc: the `parse_a2l_file` payload; the model reads `tags`, `sections`, `record_layouts_by_name`, `compu_tabs_by_name` and never writes (R-A2L-DEF.58.1). It does not read `compu_methods_by_name` (D-2 A: it reads the records itself).
 
 [Data: image]
 desc: any `Mapping[int, int]` address → byte (a loaded file's `mem_map`, or an editor's staging overlay); read only.
@@ -689,22 +739,26 @@ desc: any `Mapping[int, int]` address → byte (a loaded file's `mem_map`, or an
 desc: the 11 files `generate` writes; pinned by R-A2L-DEF.59 (22 SHA-256 digests, CR LF read as LF); no Inc 2 node writes them.
 
 [I/O: DEFC files]
-desc: `firmware.s19` and `firmware.a2l` that `generate_definitions_case` writes into `--out`; read by the testers through the app's loaders.
+desc: `definitions.s19` and `definitions.a2l` that `generate_definitions_case` writes into `--out`; read by the testers through the app's loaders.
 
 ## Edges
 
 [Data: a2l_data] ──▶ describe_definition
-[Data: a2l_data].sections ──▶ _find_tag
-[Data: a2l_data].tags ──▶ _find_tag
-[Data: a2l_data].sections ──▶ _read_method_record
-[Data: a2l_data].sections ──▶ _read_enum_table
+[Data: a2l_data] ──▶ describe_definitions
+[Data: a2l_data].tags ──▶ describe_definitions
+[Data: a2l_data].sections ──▶ describe_definitions
+describe_definitions ──▶ _find_tag
+describe_definitions ──▶ _read_method_record
+describe_definitions ──▶ _read_enum_table
 [Data: a2l_data].record_layouts_by_name ──▶ _resolve_datatype
 [Data: a2l_data].compu_tabs_by_name ──▶ decode_definition
 [Data: a2l_data].compu_tabs_by_name ──▶ _encode_number
 describe_definition ──▶ [Data: Definition]
+describe_definitions ──▶ [Data: Definition]
 [Data: image] ──▶ _read_stored_value
 [Data: image] ──▶ _merge_bit_mask
-when: the definition has a bit mask (an unmasked encode never reads the image)
+[Data: image] ──▶ encode_definition
+when: `_merge_bit_mask` reads the image only for a masked definition; `encode_definition` reads the span for every kind at its image step (E3S-05)
 generate_definitions_case ──▶ [I/O: DEFC files]
 generate ──▶ [I/O: case 08 files]
 main ──▶ generate
@@ -805,9 +859,9 @@ decision: the graph writes `(none)`, as `<type>` and `<table>` do; E3 to confirm
 
 finding E2-14 deviations from the E1 slice
 anchor: describe_definition
-seen: `_check_bit_mask` returns `bool` (the message needs the name and the mask word, which `describe_definition` holds); `_merge_bit_mask` gains `text` (the `A2L-DEF-MASK-VALUE` message); `_encode_enum` returns `float` (EnumEntry raw is a float in I-2); `_read_object_lines` reads the header words (E2-1); `encode_definition` reuses `decode_definition` for the precision decode (no extra node); D-9's import list holds 6 private helpers (`_split_line_respecting_quotes` is not called by any new node) plus the public `parse_begin_meta`, `encode_physical_to_raw_bytes`, `DATATYPE_SIZES` — `DATATYPE_STRUCT_CODES` and `MAX_A2L_DECODE_BYTES` are not used
+seen: `_check_bit_mask` returns `bool` (the message needs the name and the mask word, which `describe_definition` holds); `_merge_bit_mask` gains `text` (the `A2L-DEF-MASK-VALUE` message); `_encode_enum` returns `float` (EnumEntry raw is a float in I-2); `_read_object_lines` reads the header words (E2-1); `encode_definition` reuses `decode_definition` for the precision decode (no extra node); D-9's import list holds 5 private helpers (`_split_line_respecting_quotes` is not called by any new node, and `_collect_sections_by_name` leaves with E3A-01's name maps) plus the public `parse_begin_meta`, `encode_physical_to_raw_bytes`, `DATATYPE_SIZES`, `MAX_A2L_DECODE_BYTES` (E3S-02) — `DATATYPE_STRUCT_CODES` is not used
 cause: writing the examples
-effect: node count unchanged (22 + 4); the rename guard of D-9 covers the 6
+effect: node count unchanged (22 + 4); the rename guard of D-9 covers the 5 private helpers plus the call shapes of `encode_physical_to_raw_bytes` and `parse_begin_meta` (E3A-17)
 decision: for E3 to accept with the graph
 
 finding E2-15 the existing emit_s19 needs all four region keys
