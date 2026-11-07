@@ -945,6 +945,152 @@ def test_r_paste_13_1_2_held_clipboard_copy_ends_within_2_5(
 
 
 # ---------------------------------------------------------------------------
+# Held-clipboard responsiveness (WinCI) — R-PASTE.14, R-TUI-043.9
+# ---------------------------------------------------------------------------
+
+
+async def _held_clipboard_tick_lateness(
+    app, pilot, widget, mode: str, *, right_click: bool
+) -> tuple:
+    """Arm tick lateness; wrap the OS read/write entry with a pass-through
+    marker; fire the key or the App-route right-click and wait until the
+    held-clipboard read/write ends. Returns ``(marker, lateness)``."""
+    from s19_app.tui import os_clipboard_input as mod
+    from tests.support.b103_clipboard import arm_tick_lateness
+
+    marker = {"started": False, "ended": False}
+    if mode == "read":
+        original = mod.read_os_clipboard
+
+        def _wrap(*args, **kwargs):
+            marker["started"] = True
+            try:
+                return original(*args, **kwargs)
+            finally:
+                marker["ended"] = True
+
+        mod.read_os_clipboard = _wrap
+    else:
+        original = mod.write_os_clipboard
+
+        def _wrap(text, *args, **kwargs):
+            marker["started"] = True
+            try:
+                return original(text, *args, **kwargs)
+            finally:
+                marker["ended"] = True
+
+        mod.write_os_clipboard = _wrap
+    try:
+        async for lateness in arm_tick_lateness(app, app.screen, marker):
+            if right_click:
+                await right_click_app_route(app, pilot, widget)
+            else:
+                await pilot.press("ctrl+v" if mode == "read" else "ctrl+c")
+            deadline = time.monotonic() + 10.0
+            while time.monotonic() < deadline and not marker["ended"]:
+                await asyncio.sleep(0.005)
+                await pilot.pause()
+            if not marker["ended"]:
+                raise AssertionError(f"{mode} never ended against the held clipboard")
+    finally:
+        if mode == "read":
+            mod.read_os_clipboard = original
+        else:
+            mod.write_os_clipboard = original
+    return marker, lateness
+
+
+async def _drive_box1_held_lateness(
+    box_value: str, *, mode: str, right_click: bool
+) -> tuple:
+    """Drive Box 1 (the one-box app) through a held-clipboard read/write
+    under armed tick lateness; return ``(marker, lateness)``."""
+    from tests.support.b103_clipboard import _OneBoxApp
+
+    app = _OneBoxApp("input")
+    async with app.run_test(size=(80, 30)) as pilot:
+        await pilot.pause()
+        widget = app.query_one("#box")
+        widget.focus()
+        if box_value:
+            _set_box(widget, box_value)
+            _select(widget)
+        await pilot.pause()
+        return await _held_clipboard_tick_lateness(
+            app, pilot, widget, mode, right_click=right_click
+        )
+
+
+def _assert_ticks_on_time(label: str, marker: dict, lateness: list) -> None:
+    """R-PASTE.14 / R-TUI-043.9 oracle: ≥ 10 ticks fired, every tick ≤ bound."""
+    assert marker["started"] is True, "clipboard read/write never started (vacuous)"
+    assert len(lateness) >= 10, f"only {len(lateness)} ticks fired"
+    bound = timing_bound(0.1)
+    assert max(lateness) <= report_margin(label, max(lateness), bound), lateness
+
+
+@pytest.mark.serial_timing
+def test_r_tui_043_9_1_held_read_ctrl_v_stays_responsive(
+    tmp_path: Path, os_clipboard_ready
+) -> None:
+    """R-TUI-043.9/1 (WinCI): the screen stays responsive while a read waits on a held clipboard."""
+    _held = _hold_clipboard(8.0)
+    try:
+        marker, lateness = asyncio.run(
+            _drive_box1_held_lateness("", mode="read", right_click=False)
+        )
+    finally:
+        _held["release"].set()
+    _assert_ticks_on_time("r_tui_043_9_1", marker, lateness)
+
+
+@pytest.mark.serial_timing
+def test_r_paste_14_1_held_write_ctrl_c_stays_responsive(
+    tmp_path: Path, os_clipboard_ready
+) -> None:
+    """R-PASTE.14/1 (WinCI): the screen stays responsive while a write waits on a held clipboard."""
+    _held = _hold_clipboard(8.0)
+    try:
+        marker, lateness = asyncio.run(
+            _drive_box1_held_lateness("AAAA-BBBB", mode="write", right_click=False)
+        )
+    finally:
+        _held["release"].set()
+    _assert_ticks_on_time("r_paste_14_1", marker, lateness)
+
+
+@pytest.mark.serial_timing
+def test_r_paste_14_2_held_write_right_click_stays_responsive(
+    tmp_path: Path, os_clipboard_ready
+) -> None:
+    """R-PASTE.14/2 (WinCI): the screen stays responsive while a right-click write waits on a held clipboard."""
+    _held = _hold_clipboard(8.0)
+    try:
+        marker, lateness = asyncio.run(
+            _drive_box1_held_lateness("AAAA-BBBB", mode="write", right_click=True)
+        )
+    finally:
+        _held["release"].set()
+    _assert_ticks_on_time("r_paste_14_2", marker, lateness)
+
+
+@pytest.mark.serial_timing
+def test_r_tui_043_9_2_held_read_right_click_stays_responsive(
+    tmp_path: Path, os_clipboard_ready
+) -> None:
+    """R-TUI-043.9/2 (WinCI): the screen stays responsive while a right-click read waits on a held clipboard."""
+    _held = _hold_clipboard(8.0)
+    try:
+        marker, lateness = asyncio.run(
+            _drive_box1_held_lateness("", mode="read", right_click=True)
+        )
+    finally:
+        _held["release"].set()
+    _assert_ticks_on_time("r_tui_043_9_2", marker, lateness)
+
+
+# ---------------------------------------------------------------------------
 # Right-click (WinCI)
 # ---------------------------------------------------------------------------
 

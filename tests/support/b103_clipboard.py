@@ -514,7 +514,10 @@ async def arm_tick_lateness(app: App, screen, marker: dict, interval: float = 0.
     due = time.monotonic() + interval
 
     def _tick():
-        lateness.append(time.monotonic() - due)
+        nonlocal due
+        now = time.monotonic()
+        lateness.append(now - due)
+        due = now + interval
 
     # Re-arm a repeating timer via the screen's ``set_interval``.
     timer = screen.set_interval(interval, _tick)
