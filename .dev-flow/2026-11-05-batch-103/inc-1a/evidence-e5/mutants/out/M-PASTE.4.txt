@@ -1,0 +1,71 @@
+# M-PASTE.4
+# row: R-PASTE.4
+# s19_app.__file__ = /tmp/b103-e5-1a-mut/work/s19_app/__init__.py
+# note: copy acting as cut
+# --- git diff ---
+diff --git a/s19_app/tui/capped_text_area.py b/s19_app/tui/capped_text_area.py
+index 42582b4d..9fe0acd2 100644
+--- a/s19_app/tui/capped_text_area.py
++++ b/s19_app/tui/capped_text_area.py
+@@ -267,6 +267,7 @@ class CappedTextArea(TextArea):
+         selected_text = self.selected_text
+         if not selected_text:
+             raise SkipAction()
++        self._delete_via_keyboard(*self.selection)  # mutant: copy acts as cut
+         await _mirror_and_write_os_clipboard(self.app, selected_text)
+ 
+     async def action_cut(self) -> None:
+diff --git a/s19_app/tui/os_clipboard_input.py b/s19_app/tui/os_clipboard_input.py
+index ad2f7240..8ed54ec2 100644
+--- a/s19_app/tui/os_clipboard_input.py
++++ b/s19_app/tui/os_clipboard_input.py
+@@ -908,6 +908,7 @@ class OsClipboardInput(Input):
+         selected_text = self.selected_text
+         if not selected_text:
+             raise SkipAction()
++        self.delete_selection()  # mutant: copy acts as cut
+         await _mirror_and_write_os_clipboard(self.app, selected_text)
+ 
+     async def action_cut(self) -> None:
+
+# --- pytest (rc=1) ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________________ test_r_paste_4_copy_leaves_box_unchanged ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10023/test_r_paste_4_copy_leaves_box0')
+
+    def test_r_paste_4_copy_leaves_box_unchanged(tmp_path: Path) -> None:
+        """R-PASTE.4/1-2 (LinuxH): Ctrl+C leaves the box text unchanged."""
+        _assert_linuxh_headless()
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(160, 48)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("a2l")
+                for _ in range(4):
+                    await pilot.pause()
+                box = app.query_one("#a2l_tags_filter_input", Input)
+                box.value = "COPYME-1"
+                box.selection = (0, len(box.value))
+                box.focus()
+                await pilot.pause()
+                await pilot.press("ctrl+c")
+                await pilot.pause()
+                return box.value
+    
+>       assert asyncio.run(_drive()) == "COPYME-1"
+E       AssertionError: assert '' == 'COPYME-1'
+E         
+E         - COPYME-1
+
+tests/test_b103_clipboard_core.py:805: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:686 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:747 OS clipboard write failed; retained Textual internal clipboard only
+=========================== short test summary info ============================
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_4_copy_leaves_box_unchanged
+1 failed, 86 deselected in 2.53s
+
+===== stderr =====

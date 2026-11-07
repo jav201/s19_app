@@ -1,0 +1,93 @@
+# M-PASTE.1
+# row: R-PASTE.1
+# s19_app.__file__ = /tmp/b103-e5-1a-mut/work/s19_app/__init__.py
+# note: the last line inserted (instead of the first)
+# --- git diff ---
+diff --git a/s19_app/tui/os_clipboard_input.py b/s19_app/tui/os_clipboard_input.py
+index ad2f7240..23dc5a05 100644
+--- a/s19_app/tui/os_clipboard_input.py
++++ b/s19_app/tui/os_clipboard_input.py
+@@ -843,7 +843,7 @@ class OsClipboardInput(Input):
+         if len(event.text) > _CLIPBOARD_CAP_CHARS:
+             event.text = event.text[:_CLIPBOARD_CAP_CHARS]
+         if event.text:
+-            first_line = event.text.splitlines()[0]
++            first_line = event.text.splitlines()[-1]  # mutant: last line inserted
+             if self.restrict:
+                 if _strip_paste_controls(first_line, multiline=False) != first_line:
+                     self.restricted()
+
+# --- pytest (rc=1) ---
+40> was created in a different Context")>
+Traceback (most recent call last):
+  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 2210, in run_test
+    yield pilot
+  File "/tmp/b103-e5-1a-mut/work/tests/test_b103_clipboard_core.py", line 103, in _box_a
+    yield app, pilot, widget
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/tmp/b103-e5-1a-mut/work/tests/test_b103_clipboard_core.py", line 95, in _box_a
+    async with app.run_test(size=(160, 48)) as pilot:
+  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/contextlib.py", line 231, in __aexit__
+    await self.gen.athrow(typ, value, traceback)
+  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 2205, in run_test
+    with app._context():
+  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/contextlib.py", line 158, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 1107, in _context
+    active_message_pump.reset(message_pump_reset_token)
+ValueError: <Token var=<ContextVar name='active_message_pump' at 0x7fb2be002980> at 0x7fb2bce45f40> was created in a different Context
+___________ test_r_paste_1_2_terminal_paste_first_line_non_codepage ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10016/test_r_paste_1_2_terminal_past0')
+
+    def test_r_paste_1_2_terminal_paste_first_line_non_codepage(tmp_path: Path) -> None:
+        """R-PASTE.1/2 (LinuxH): the first line with emoji/CJK lands unchanged."""
+        _assert_linuxh_headless()
+    
+        async def _drive() -> str:
+            async for app, pilot, widget in _box_a(tmp_path):
+                await terminal_paste(app, "Ñoño Ж 漢字 😀\nsecond")
+                await pilot.pause()
+                return widget.value
+    
+>       assert asyncio.run(_drive()) == "Ñoño Ж 漢字 😀"
+E       AssertionError: assert 'second' == 'Ñoño Ж 漢字 😀'
+E         
+E         - Ñoño Ж 漢字 😀
+E         + second
+
+tests/test_b103_clipboard_core.py:354: AssertionError
+------------------------------ Captured log call -------------------------------
+ERROR    asyncio:base_events.py:1785 unhandled exception during asyncio.run() shutdown
+task: <Task finished name='Task-5116' coro=<<async_generator_athrow without __name__>()> exception=ValueError("<Token var=<ContextVar name='active_message_pump' at 0x7fb2be002980> at 0x7fb2bba26840> was created in a different Context")>
+Traceback (most recent call last):
+  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 2210, in run_test
+    yield pilot
+  File "/tmp/b103-e5-1a-mut/work/tests/test_b103_clipboard_core.py", line 103, in _box_a
+    yield app, pilot, widget
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/tmp/b103-e5-1a-mut/work/tests/test_b103_clipboard_core.py", line 95, in _box_a
+    async with app.run_test(size=(160, 48)) as pilot:
+  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/contextlib.py", line 231, in __aexit__
+    await self.gen.athrow(typ, value, traceback)
+  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 2205, in run_test
+    with app._context():
+  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/contextlib.py", line 158, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 1107, in _context
+    active_message_pump.reset(message_pump_reset_token)
+ValueError: <Token var=<ContextVar name='active_message_pump' at 0x7fb2be002980> at 0x7fb2bba26840> was created in a different Context
+=========================== short test summary info ============================
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_1_1_terminal_paste_single_line_takes_first_line
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_1_2_terminal_paste_first_line_non_codepage
+2 failed, 85 deselected in 4.86s
+
+===== stderr =====

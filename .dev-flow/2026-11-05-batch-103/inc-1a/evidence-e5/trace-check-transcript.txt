@@ -1,0 +1,4 @@
+TEST   R-PASTE.14 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-TUI-043.9 is named by no file under tests, and neither is a TC/AT id it lists
+trace_check: 1 US, 43 active requirements (0 withdrawn), 2 gap(s)
+EXIT=1

@@ -1,0 +1,60 @@
+# M-PASTE.12
+# row: R-PASTE.12
+# s19_app.__file__ = /tmp/b103-e5-1a-mut/work/s19_app/__init__.py
+# note: the copy cap removed -> 70,000
+# --- git diff ---
+diff --git a/s19_app/tui/os_clipboard_input.py b/s19_app/tui/os_clipboard_input.py
+index ad2f7240..5dcf0d7e 100644
+--- a/s19_app/tui/os_clipboard_input.py
++++ b/s19_app/tui/os_clipboard_input.py
+@@ -727,7 +727,7 @@ async def _mirror_and_write_os_clipboard(app: App, text: str) -> None:
+             - :meth:`s19_app.tui.capped_text_area.CappedTextArea.action_copy`
+             - :meth:`s19_app.tui.capped_text_area.CappedTextArea.action_cut`
+     """
+-    text = text[:_CLIPBOARD_CAP_CHARS]
++    pass  # mutant: copy cap removed
+     try:
+         App.copy_to_clipboard(app, text)
+     except Exception:  # pragma: no cover — mirror is best-effort.
+
+# --- pytest (rc=1) ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________ test_r_paste_12_1_copy_over_limit_keeps_first_65536 ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10031/test_r_paste_12_1_copy_over_li0')
+
+    def test_r_paste_12_1_copy_over_limit_keeps_first_65536(tmp_path: Path) -> None:
+        """R-PASTE.12/1 (LinuxH): a 70,000-char copy → 65,536 in app + OSC 52."""
+        _assert_linuxh_headless()
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(160, 48)) as pilot:
+                await pilot.pause()
+                osc = install_osc52_spy(app)
+                await show_patch_paste(app, pilot)
+                ta = app.query_one("#patch_paste_text", TextArea)
+                ta.text = P70K
+                ta.select_all()
+                ta.focus()
+                await pilot.pause()
+                await pilot.press("ctrl+c")
+                await pilot.pause()
+                await pilot.pause()
+                return len(app.clipboard), [len(r) for r in osc]
+    
+        clip_len, osc_lens = asyncio.run(_drive())
+>       assert clip_len == CAP, clip_len
+E       AssertionError: 70000
+E       assert 70000 == 65536
+
+tests/test_b103_clipboard_core.py:1005: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:686 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:747 OS clipboard write failed; retained Textual internal clipboard only
+=========================== short test summary info ============================
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_12_1_copy_over_limit_keeps_first_65536
+1 failed, 86 deselected in 3.78s
+
+===== stderr =====

@@ -1,0 +1,707 @@
+/home/javiergr/work/b103-int1a/s19_app/__init__.py
+====RUN-A====
+...............F........................................F......F........ [ 36%]
+............ss.........................F............ssssssssssssssssssss [ 73%]
+sssssssssssssssssssssssssssssssssssssssssssssssssssss                    [100%]
+=================================== FAILURES ===================================
+____________ test_r_paste_34_4_right_click_paste_single_line_strips ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10009/test_r_paste_34_4_right_click_0')
+
+    def test_r_paste_34_4_right_click_paste_single_line_strips(tmp_path: Path) -> None:
+        """R-PASTE.34/4 (LinuxH): a right-click paste strips as /1."""
+        _assert_linuxh_headless()
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(160, 48)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("a2l")
+                for _ in range(4):
+                    await pilot.pause()
+                widget = app.query_one("#a2l_tags_filter_input", Input)
+                widget.focus()
+                app._clipboard = P_CTRL
+                await pilot.pause()
+                await right_click_app_route(app, pilot, widget)
+                await pilot.pause()
+                first = widget.value
+                widget.value = ""
+                app._clipboard = P_CTRL_L
+                await pilot.pause()
+                await right_click_app_route(app, pilot, widget)
+                await pilot.pause()
+                return first, widget.value
+    
+>       first, second = asyncio.run(_drive())
+                        ^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_clipboard_core.py:528: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_clipboard_core.py:509: in _drive
+    async with app.run_test(size=(160, 48)) as pilot:
+../../miniconda3/envs/s19ci/lib/python3.11/contextlib.py:217: in __aexit__
+    await anext(self.gen)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:2218: in run_test
+    raise self._exception
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:702: in _flush_next_callbacks
+    await invoke(callback.callback)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:56: in _invoke
+    result = callback(*params[:parameter_count])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/app.py:20665: in _apply_filter
+    self._refresh_a2l_filtered_tags(preserve_anchor=False)
+s19_app/tui/app.py:20217: in _refresh_a2l_filtered_tags
+    self.update_a2l_tags_view(
+s19_app/tui/app.py:20330: in update_a2l_tags_view
+    a2l_table = self.query_one("#a2l_tags_list", DataTable)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+selector = '#a2l_tags_list'
+expect_type = <class 'textual.widgets._data_table.DataTable'>
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#a2l_tags_list' on Screen(id='_default')
+
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/dom.py:1505: NoMatches
+----------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ /home/javiergr/work/b103-int1a/s19_app/tui/app.py:20665 in _apply_filter     │
+│                                                                              │
+│   20662 │   │   def _apply_filter() -> None:                                 │
+│   20663 │   │   │   if expected_token != self._a2l_filter_debounce_token:    │
+│   20664 │   │   │   │   return                                               │
+│ ❱ 20665 │   │   │   self._refresh_a2l_filtered_tags(preserve_anchor=False)   │
+│   20666 │   │                                                                │
+│   20667 │   │   self.set_timer(0.15, _apply_filter)                          │
+│   20668                                                                      │
+│                                                                              │
+│ ╭─────────────────────── locals ────────────────────────╮                    │
+│ │ expected_token = 3                                    │                    │
+│ │           self = S19TuiApp(                           │                    │
+│ │                  │   title='Hex Edit Tool',           │                    │
+│ │                  │   classes={'-dark-mode'},          │                    │
+│ │                  │   pseudo_classes={                 │                    │
+│ │                  │   │   'focus',                     │                    │
+│ │                  │   │   'dark'                       │                    │
+│ │                  │   }                                │                    │
+│ │                  )                                    │                    │
+│ ╰───────────────────────────────────────────────────────╯                    │
+│                                                                              │
+│ /home/javiergr/work/b103-int1a/s19_app/tui/app.py:20217 in                   │
+│ _refresh_a2l_filtered_tags                                                   │
+│                                                                              │
+│   20214 │   │   │   self._a2l_window_start = self._a2l_clamp_page_start(len( │
+│   20215 │   │   filter_text = self.a2l_tags_filter_text                      │
+│   20216 │   │   if not self._a2l_filtered_tags and filter_text:              │
+│ ❱ 20217 │   │   │   self.update_a2l_tags_view(                               │
+│   20218 │   │   │   │   self._a2l_filtered_tags,                             │
+│   20219 │   │   │   │   empty_message=f"No A2L tags match '{filter_text}'.", │
+│   20220 │   │   │   )                                                        │
+│                                                                              │
+│ ╭──────────────────────── locals ────────────────────────╮                   │
+│ │     filter_text = 'L1[2J'                              │                   │
+│ │ preserve_anchor = False                                │                   │
+│ │            self = S19TuiApp(                           │                   │
+│ │                   │   title='Hex Edit Tool',           │                   │
+│ │                   │   classes={'-dark-mode'},          │                   │
+│ │                   │   pseudo_classes={                 │                   │
+│ │                   │   │   'focus',                     │                   │
+│ │                   │   │   'dark'                       │                   │
+│ │                   │   }                                │                   │
+│ │                   )                                    │                   │
+│ ╰────────────────────────────────────────────────────────╯                   │
+│                                                                              │
+│ /home/javiergr/work/b103-int1a/s19_app/tui/app.py:20330 in                   │
+│ update_a2l_tags_view                                                         │
+│                                                                              │
+│   20327 │   │   │   │   - A2L tag paging and find actions                    │
+│   20328 │   │   """                                                          │
+│   20329 │   │   populate_started = time.perf_counter()                       │
+│ ❱ 20330 │   │   a2l_table = self.query_one("#a2l_tags_list", DataTable)      │
+│   20331 │   │   summary_label = self.query_one("#a2l_tags_summary", Label)   │
+│   20332 │   │   self._a2l_row_key_to_tag = {}                                │
+│   20333 │   │   a2l_table.clear(columns=False)                               │
+│                                                                              │
+│ ╭──────────────────────── locals ─────────────────────────╮                  │
+│ │    empty_message = "No A2L tags match 'L1[2J'."         │                  │
+│ │ populate_started = 169550.703987724                     │                  │
+│ │             self = S19TuiApp(                           │                  │
+│ │                    │   title='Hex Edit Tool',           │                  │
+│ │                    │   classes={'-dark-mode'},          │                  │
+│ │                    │   pseudo_classes={                 │                  │
+│ │                    │   │   'focus',                     │                  │
+│ │                    │   │   'dark'                       │                  │
+│ │                    │   }                                │                  │
+│ │                    )                                    │                  │
+│ │             tags = []                                   │                  │
+│ ╰─────────────────────────────────────────────────────────╯                  │
+╰──────────────────────────────────────────────────────────────────────────────╯
+NoMatches: No nodes match '#a2l_tags_list' on Screen(id='_default')
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+___________ test_r_tui_043_12_3_warning_line_on_right_click_no_text ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10009/test_r_tui_043_12_3_warning_li0')
+
+    def test_r_tui_043_12_3_warning_line_on_right_click_no_text(tmp_path: Path) -> None:
+        """R-TUI-043.12/3 (LinuxH): ≥ 1 WARNING of os_clipboard_input per right-click."""
+        _assert_linuxh_headless()
+    
+        async def _drive() -> int:
+            app = S19TuiApp(base_dir=tmp_path)
+            app._clipboard = "APP-TEXT"
+            async with app.run_test(size=(160, 48)) as pilot:
+                await pilot.pause()
+                records = install_log_capture()
+                app.action_show_screen("a2l")
+                for _ in range(4):
+                    await pilot.pause()
+                box = app.query_one("#a2l_tags_filter_input", Input)
+                box.focus()
+                await pilot.pause()
+                await right_click_app_route(app, pilot, box)
+                await pilot.pause()
+                warnings = [
+                    r for r in records
+                    if r[0] == "s19_app.tui.os_clipboard_input" and r[1] == "WARNING"
+                ]
+                remove_log_capture(records)
+                return len(warnings)
+    
+>       assert asyncio.run(_drive()) >= 1
+               ^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_clipboard_core.py:1400: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_clipboard_core.py:1382: in _drive
+    async with app.run_test(size=(160, 48)) as pilot:
+../../miniconda3/envs/s19ci/lib/python3.11/contextlib.py:217: in __aexit__
+    await anext(self.gen)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:2218: in run_test
+    raise self._exception
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:702: in _flush_next_callbacks
+    await invoke(callback.callback)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:56: in _invoke
+    result = callback(*params[:parameter_count])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/app.py:20665: in _apply_filter
+    self._refresh_a2l_filtered_tags(preserve_anchor=False)
+s19_app/tui/app.py:20217: in _refresh_a2l_filtered_tags
+    self.update_a2l_tags_view(
+s19_app/tui/app.py:20330: in update_a2l_tags_view
+    a2l_table = self.query_one("#a2l_tags_list", DataTable)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+selector = '#a2l_tags_list'
+expect_type = <class 'textual.widgets._data_table.DataTable'>
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#a2l_tags_list' on Screen(id='_default')
+
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/dom.py:1505: NoMatches
+----------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ /home/javiergr/work/b103-int1a/s19_app/tui/app.py:20665 in _apply_filter     │
+│                                                                              │
+│   20662 │   │   def _apply_filter() -> None:                                 │
+│   20663 │   │   │   if expected_token != self._a2l_filter_debounce_token:    │
+│   20664 │   │   │   │   return                                               │
+│ ❱ 20665 │   │   │   self._refresh_a2l_filtered_tags(preserve_anchor=False)   │
+│   20666 │   │                                                                │
+│   20667 │   │   self.set_timer(0.15, _apply_filter)                          │
+│   20668                                                                      │
+│                                                                              │
+│ ╭─────────────────────── locals ────────────────────────╮                    │
+│ │ expected_token = 1                                    │                    │
+│ │           self = S19TuiApp(                           │                    │
+│ │                  │   title='Hex Edit Tool',           │                    │
+│ │                  │   classes={'-dark-mode'},          │                    │
+│ │                  │   pseudo_classes={                 │                    │
+│ │                  │   │   'focus',                     │                    │
+│ │                  │   │   'dark'                       │                    │
+│ │                  │   }                                │                    │
+│ │                  )                                    │                    │
+│ ╰───────────────────────────────────────────────────────╯                    │
+│                                                                              │
+│ /home/javiergr/work/b103-int1a/s19_app/tui/app.py:20217 in                   │
+│ _refresh_a2l_filtered_tags                                                   │
+│                                                                              │
+│   20214 │   │   │   self._a2l_window_start = self._a2l_clamp_page_start(len( │
+│   20215 │   │   filter_text = self.a2l_tags_filter_text                      │
+│   20216 │   │   if not self._a2l_filtered_tags and filter_text:              │
+│ ❱ 20217 │   │   │   self.update_a2l_tags_view(                               │
+│   20218 │   │   │   │   self._a2l_filtered_tags,                             │
+│   20219 │   │   │   │   empty_message=f"No A2L tags match '{filter_text}'.", │
+│   20220 │   │   │   )                                                        │
+│                                                                              │
+│ ╭──────────────────────── locals ────────────────────────╮                   │
+│ │     filter_text = 'APP-TEXT'                           │                   │
+│ │ preserve_anchor = False                                │                   │
+│ │            self = S19TuiApp(                           │                   │
+│ │                   │   title='Hex Edit Tool',           │                   │
+│ │                   │   classes={'-dark-mode'},          │                   │
+│ │                   │   pseudo_classes={                 │                   │
+│ │                   │   │   'focus',                     │                   │
+│ │                   │   │   'dark'                       │                   │
+│ │                   │   }                                │                   │
+│ │                   )                                    │                   │
+│ ╰────────────────────────────────────────────────────────╯                   │
+│                                                                              │
+│ /home/javiergr/work/b103-int1a/s19_app/tui/app.py:20330 in                   │
+│ update_a2l_tags_view                                                         │
+│                                                                              │
+│   20327 │   │   │   │   - A2L tag paging and find actions                    │
+│   20328 │   │   """                                                          │
+│   20329 │   │   populate_started = time.perf_counter()                       │
+│ ❱ 20330 │   │   a2l_table = self.query_one("#a2l_tags_list", DataTable)      │
+│   20331 │   │   summary_label = self.query_one("#a2l_tags_summary", Label)   │
+│   20332 │   │   self._a2l_row_key_to_tag = {}                                │
+│   20333 │   │   a2l_table.clear(columns=False)                               │
+│                                                                              │
+│ ╭──────────────────────── locals ─────────────────────────╮                  │
+│ │    empty_message = "No A2L tags match 'APP-TEXT'."      │                  │
+│ │ populate_started = 169681.951143416                     │                  │
+│ │             self = S19TuiApp(                           │                  │
+│ │                    │   title='Hex Edit Tool',           │                  │
+│ │                    │   classes={'-dark-mode'},          │                  │
+│ │                    │   pseudo_classes={                 │                  │
+│ │                    │   │   'focus',                     │                  │
+│ │                    │   │   'dark'                       │                  │
+│ │                    │   }                                │                  │
+│ │                    )                                    │                  │
+│ │             tags = []                                   │                  │
+│ ╰─────────────────────────────────────────────────────────╯                  │
+╰──────────────────────────────────────────────────────────────────────────────╯
+NoMatches: No nodes match '#a2l_tags_list' on Screen(id='_default')
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+_ test_r_paste_31_3_4_linux_right_click_paste_ends_within_typed_key_time[single] _
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10009/test_r_paste_31_3_4_linux_righ0')
+box_kind = 'a'
+
+    @pytest.mark.serial_timing
+    @pytest.mark.parametrize("box_kind", ["a", "m"], ids=["single", "multi"])
+    def test_r_paste_31_3_4_linux_right_click_paste_ends_within_typed_key_time(
+        tmp_path: Path, box_kind: str
+    ) -> None:
+        """R-PASTE.31/3-4 (LinuxH): median right-click paste end ≤ typed-key time + bound."""
+        _assert_linuxh_headless()
+    
+        async def _drive() -> float:
+            app = S19TuiApp(base_dir=tmp_path)
+            app._clipboard = P1000
+            async with app.run_test(size=(160, 48)) as pilot:
+                await pilot.pause()
+                if box_kind == "a":
+                    app.action_show_screen("a2l")
+                    for _ in range(4):
+                        await pilot.pause()
+                    widget = app.query_one("#a2l_tags_filter_input", Input)
+                else:
+                    await show_patch_paste(app, pilot)
+                    widget = app.query_one("#patch_paste_text", TextArea)
+                widget.focus()
+                await pilot.pause()
+                key_time = await typed_key_time(pilot, widget, app)
+                samples = []
+                for _ in range(10):
+                    _set_box(widget, "")
+                    await pilot.pause()
+                    start = time.monotonic()
+                    await right_click_app_route(app, pilot, widget)
+                    deadline = time.monotonic() + 10.0
+                    while time.monotonic() < deadline:
+                        await asyncio.sleep(0.005)
+                        await pilot.pause()
+                        if P1000[:10] in _box(widget):
+                            break
+                    samples.append(time.monotonic() - start)
+                samples.sort()
+                return key_time, samples[len(samples) // 2]
+    
+>       key_time, median = asyncio.run(_drive())
+                           ^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_clipboard_core.py:1637: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b103_clipboard_core.py:1608: in _drive
+    async with app.run_test(size=(160, 48)) as pilot:
+../../miniconda3/envs/s19ci/lib/python3.11/contextlib.py:217: in __aexit__
+    await anext(self.gen)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:2218: in run_test
+    raise self._exception
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:702: in _flush_next_callbacks
+    await invoke(callback.callback)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:56: in _invoke
+    result = callback(*params[:parameter_count])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/app.py:20665: in _apply_filter
+    self._refresh_a2l_filtered_tags(preserve_anchor=False)
+s19_app/tui/app.py:20217: in _refresh_a2l_filtered_tags
+    self.update_a2l_tags_view(
+s19_app/tui/app.py:20330: in update_a2l_tags_view
+    a2l_table = self.query_one("#a2l_tags_list", DataTable)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+selector = '#a2l_tags_list'
+expect_type = <class 'textual.widgets._data_table.DataTable'>
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+>           raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E           textual.css.query.NoMatches: No nodes match '#a2l_tags_list' on Screen(id='_default')
+
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/dom.py:1505: NoMatches
+----------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ /home/javiergr/work/b103-int1a/s19_app/tui/app.py:20665 in _apply_filter     │
+│                                                                              │
+│   20662 │   │   def _apply_filter() -> None:                                 │
+│   20663 │   │   │   if expected_token != self._a2l_filter_debounce_token:    │
+│   20664 │   │   │   │   return                                               │
+│ ❱ 20665 │   │   │   self._refresh_a2l_filtered_tags(preserve_anchor=False)   │
+│   20666 │   │                                                                │
+│   20667 │   │   self.set_timer(0.15, _apply_filter)                          │
+│   20668                                                                      │
+│                                                                              │
+│ ╭─────────────────────── locals ────────────────────────╮                    │
+│ │ expected_token = 39                                   │                    │
+│ │           self = S19TuiApp(                           │                    │
+│ │                  │   title='Hex Edit Tool',           │                    │
+│ │                  │   classes={'-dark-mode'},          │                    │
+│ │                  │   pseudo_classes={                 │                    │
+│ │                  │   │   'focus',                     │                    │
+│ │                  │   │   'dark'                       │                    │
+│ │                  │   }                                │                    │
+│ │                  )                                    │                    │
+│ ╰───────────────────────────────────────────────────────╯                    │
+│                                                                              │
+│ /home/javiergr/work/b103-int1a/s19_app/tui/app.py:20217 in                   │
+│ _refresh_a2l_filtered_tags                                                   │
+│                                                                              │
+│   20214 │   │   │   self._a2l_window_start = self._a2l_clamp_page_start(len( │
+│   20215 │   │   filter_text = self.a2l_tags_filter_text                      │
+│   20216 │   │   if not self._a2l_filtered_tags and filter_text:              │
+│ ❱ 20217 │   │   │   self.update_a2l_tags_view(                               │
+│   20218 │   │   │   │   self._a2l_filtered_tags,                             │
+│   20219 │   │   │   │   empty_message=f"No A2L tags match '{filter_text}'.", │
+│   20220 │   │   │   )                                                        │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │     filter_text = '0123456789012345678901234567890123456789012345678901… │ │
+│ │ preserve_anchor = False                                                  │ │
+│ │            self = S19TuiApp(                                             │ │
+│ │                   │   title='Hex Edit Tool',                             │ │
+│ │                   │   classes={'-dark-mode'},                            │ │
+│ │                   │   pseudo_classes={'focus', 'dark'}                   │ │
+│ │                   )                                                      │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /home/javiergr/work/b103-int1a/s19_app/tui/app.py:20330 in                   │
+│ update_a2l_tags_view                                                         │
+│                                                                              │
+│   20327 │   │   │   │   - A2L tag paging and find actions                    │
+│   20328 │   │   """                                                          │
+│   20329 │   │   populate_started = time.perf_counter()                       │
+│ ❱ 20330 │   │   a2l_table = self.query_one("#a2l_tags_list", DataTable)      │
+│   20331 │   │   summary_label = self.query_one("#a2l_tags_summary", Label)   │
+│   20332 │   │   self._a2l_row_key_to_tag = {}                                │
+│   20333 │   │   a2l_table.clear(columns=False)                               │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │    empty_message = "No A2L tags match                                    │ │
+│ │                    '012345678901234567890123456789012345678901234567890… │ │
+│ │ populate_started = 169742.970766533                                      │ │
+│ │             self = S19TuiApp(                                            │ │
+│ │                    │   title='Hex Edit Tool',                            │ │
+│ │                    │   classes={'-dark-mode'},                           │ │
+│ │                    │   pseudo_classes={'focus', 'dark'}                  │ │
+│ │                    )                                                     │ │
+│ │             tags = []                                                    │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+╰──────────────────────────────────────────────────────────────────────────────╯
+NoMatches: No nodes match '#a2l_tags_list' on Screen(id='_default')
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+___________ test_r_tui_044_1_walk_single_line_round_trip[workspace] ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10009/test_r_tui_044_1_walk_single_l0')
+place = ('workspace', '#search_input', False)
+
+    @pytest.mark.parametrize(
+        "place", _single_line_places(), ids=[p[0] for p in _single_line_places()]
+    )
+    def test_r_tui_044_1_walk_single_line_round_trip(tmp_path: Path, place: tuple) -> None:
+        """R-TUI-044.1/1-6,9 (LinuxH): a Ctrl+C/Ctrl+V and a right-click round trip."""
+        if not _LINUXH:
+            pytest.skip("Windows only")
+        screen_key, widget_id, _ = place
+    
+        async def _drive() -> tuple:
+            async for app, pilot in _app_with(tmp_path):
+                await _activate(app, pilot, screen_key)
+                widget = app.query_one(widget_id, Input)
+                widget.focus()
+                await pilot.pause()
+                # Ctrl round trip
+                widget.value = f"W1-{P1}"
+                widget.selection = (0, len(widget.value))
+                await pilot.pause()
+                await pilot.press("ctrl+c")
+                await pilot.pause()
+                copied = app.clipboard
+                widget.value = ""
+                await pilot.pause()
+                await pilot.press("ctrl+v")
+                await pilot.pause()
+                ctrl_value = widget.value
+                # Right-click round trip
+                widget.value = f"R1-{P1}"
+                widget.selection = (0, len(widget.value))
+                await pilot.pause()
+                await right_click_app_route(app, pilot, widget)
+                await pilot.pause()
+                rc_copied = app.clipboard
+                widget.value = ""
+                await pilot.pause()
+                await right_click_app_route(app, pilot, widget)
+                await pilot.pause()
+                return copied, ctrl_value, rc_copied, widget.value
+    
+        copied, ctrl_value, rc_copied, rc_value = asyncio.run(_drive())
+        assert copied == f"W1-{P1}", copied
+        assert ctrl_value == f"W1-{P1}", ctrl_value
+>       assert rc_copied == f"R1-{P1}", rc_copied
+E       AssertionError: W1-COPY-1 Ñoño Ж 漢字 😀
+E       assert 'W1-COPY-1 Ñoño Ж 漢字 😀' == 'R1-COPY-1 Ñoño Ж 漢字 😀'
+E         
+E         - R1-COPY-1 Ñoño Ж 漢字 😀
+E         ? ^
+E         + W1-COPY-1 Ñoño Ж 漢字 😀
+E         ? ^
+
+tests/test_b103_clipboard_matrix.py:255: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:686 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:747 OS clipboard write failed; retained Textual internal clipboard only
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+ERROR    asyncio:base_events.py:1785 unhandled exception during asyncio.run() shutdown
+task: <Task finished name='Task-239351' coro=<<async_generator_athrow without __name__>()> exception=ValueError("<Token var=<ContextVar name='active_message_pump' at 0x7fcab020a980> at 0x7fcaa6e76480> was created in a different Context")>
+Traceback (most recent call last):
+  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 2210, in run_test
+    yield pilot
+  File "/home/javiergr/work/b103-int1a/tests/test_b103_clipboard_matrix.py", line 64, in _app_with
+    yield app, pilot
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/javiergr/work/b103-int1a/tests/test_b103_clipboard_matrix.py", line 62, in _app_with
+    async with app.run_test(size=(160, 48)) as pilot:
+  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/contextlib.py", line 231, in __aexit__
+    await self.gen.athrow(typ, value, traceback)
+  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 2205, in run_test
+    with app._context():
+  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/contextlib.py", line 158, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 1107, in _context
+    active_message_pump.reset(message_pump_reset_token)
+ValueError: <Token var=<ContextVar name='active_message_pump' at 0x7fcab020a980> at 0x7fcaa6e76480> was created in a different Context
+============================= QC-TM timing margins =============================
+24.6%  0.243 s / 0.322 s  r_tui_043_10_1_a  tests/test_b103_clipboard_core.py::test_r_tui_043_10_1_3_4_linux_ctrl_v_ends_within_typed_key_time[single]
+24.7%  0.232 s / 0.308 s  r_tui_043_10_1_m  tests/test_b103_clipboard_core.py::test_r_tui_043_10_1_3_4_linux_ctrl_v_ends_within_typed_key_time[multi]
+35.4%  0.222 s / 0.344 s  r_paste_11_3  tests/test_b103_clipboard_core.py::test_r_paste_11_3_linux_copy_ends_within_typed_key_time
+37.0%  0.198 s / 0.315 s  r_paste_31_m  tests/test_b103_clipboard_core.py::test_r_paste_31_3_4_linux_right_click_paste_ends_within_typed_key_time[multi]
+41.0%  0.195 s / 0.330 s  r_paste_27_3  tests/test_b103_clipboard_core.py::test_r_paste_27_3_linux_right_click_copy_ends_within_typed_key_time
+QC-TM: 5 bounds, 0 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_34_4_right_click_paste_single_line_strips
+FAILED tests/test_b103_clipboard_core.py::test_r_tui_043_12_3_warning_line_on_right_click_no_text
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_31_3_4_linux_right_click_paste_ends_within_typed_key_time[single]
+FAILED tests/test_b103_clipboard_matrix.py::test_r_tui_044_1_walk_single_line_round_trip[workspace]
+4 failed, 118 passed, 75 skipped in 449.14s (0:07:29)
+====RUN-A-XVFB====
+..                                                                       [100%]
+2 passed in 5.77s

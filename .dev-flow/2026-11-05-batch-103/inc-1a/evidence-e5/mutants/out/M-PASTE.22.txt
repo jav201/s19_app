@@ -1,0 +1,59 @@
+# M-PASTE.22
+# row: R-PASTE.22
+# s19_app.__file__ = /tmp/b103-e5-1a-mut/work/s19_app/__init__.py
+# note: the probe result ignored (no skip on a failed probe)
+# --- git diff ---
+diff --git a/tests/support/b103_clipboard.py b/tests/support/b103_clipboard.py
+index b0d9a36f..0d49d1ca 100644
+--- a/tests/support/b103_clipboard.py
++++ b/tests/support/b103_clipboard.py
+@@ -221,9 +221,7 @@ def os_clipboard_ready() -> None:
+     if host_platform() != "win32":
+         pytest.skip("Windows only")
+     require_isolated_clipboard("windows")
+-    usable, result = clipboard_probe()
+-    if not usable:
+-        pytest.skip(f"runner clipboard unusable: {result}")
++    clipboard_probe()  # mutant: probe result ignored
+ 
+ 
+ # ---------------------------------------------------------------------------
+
+# --- pytest (rc=1) ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_r_paste_22_1_failed_probe_skips_os_clipboard_tests ____________
+
+pytester = <Pytester PosixPath('/tmp/pytest-of-javiergr/pytest-10044/test_r_paste_22_1_failed_probe_skips_os_clipboard_tests0')>
+
+    def test_r_paste_22_1_failed_probe_skips_os_clipboard_tests(pytester) -> None:
+        """R-PASTE.22/1 (LinuxH): a failed probe skips with the exact reason."""
+        _assert_linuxh_headless()
+        result = _probe_pytester(pytester, (False, "win32 write ok, PowerShell read ''"))
+>       result.assert_outcomes(skipped=1)
+E       AssertionError: assert {'errors': 0,...pped': 0, ...} == {'errors': 0,...pped': 1, ...}
+E         
+E         Omitting 4 identical items, use -vv to show
+E         Differing items:
+E         {'passed': 1} != {'passed': 0}
+E         {'skipped': 0} != {'skipped': 1}
+E         Use -v to get more diff
+
+/tmp/b103-e5-1a-mut/work/tests/test_b103_clipboard_core.py:1910: AssertionError
+----------------------------- Captured stdout call -----------------------------
+running: /home/javiergr/miniconda3/envs/s19ci/bin/python -mpytest --basetemp=/tmp/pytest-of-javiergr/pytest-10044/test_r_paste_22_1_failed_probe_skips_os_clipboard_tests0/runpytest-0 -p no:cacheprovider -rs
+     in: /tmp/pytest-of-javiergr/pytest-10044/test_r_paste_22_1_failed_probe_skips_os_clipboard_tests0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: /tmp/pytest-of-javiergr/pytest-10044/test_r_paste_22_1_failed_probe_skips_os_clipboard_tests0
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+test_win.py .                                                            [100%]
+
+============================== 1 passed in 0.01s ===============================
+=========================== short test summary info ============================
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_22_1_failed_probe_skips_os_clipboard_tests
+1 failed, 86 deselected in 0.71s
+
+===== stderr =====

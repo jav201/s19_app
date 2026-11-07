@@ -1,0 +1,58 @@
+# M-PASTE.21
+# row: R-PASTE.21
+# s19_app.__file__ = /tmp/b103-e5-1a-mut/work/s19_app/__init__.py
+# note: the isolation guard skipped (predicate always isolated)
+# --- git diff ---
+diff --git a/tests/support/b103_clipboard.py b/tests/support/b103_clipboard.py
+index b0d9a36f..1d44ba5b 100644
+--- a/tests/support/b103_clipboard.py
++++ b/tests/support/b103_clipboard.py
+@@ -128,6 +128,7 @@ def clipboard_isolated(
+     Returns:
+         tuple: ``(isolated: bool, reason: str)``.
+     """
++    return True, ""  # mutant: isolation guard always passes
+     env = os.environ if environ is None else environ
+     plat = host_platform() if platform is None else platform
+     if kind == "windows":
+
+# --- pytest (rc=1) ---
+FF.                                                                      [100%]
+=================================== FAILURES ===================================
+________ test_r_paste_21_1_windows_not_github_hosted_stops_before_open _________
+
+    def test_r_paste_21_1_windows_not_github_hosted_stops_before_open() -> None:
+        """R-PASTE.21/1 (a/b/c): the predicate fails before any open."""
+        from tests.support.b103_clipboard import clipboard_isolated
+    
+        ok, reason = clipboard_isolated(
+            "windows",
+            environ={"GITHUB_ACTIONS": "true", "RUNNER_ENVIRONMENT": "self-hosted"},
+            platform="win32",
+            account="runneradmin",
+        )
+>       assert ok is False and "RUNNER_ENVIRONMENT='self-hosted'" == reason, (ok, reason)
+E       AssertionError: (True, '')
+E       assert (True is False)
+
+tests/test_b103_clipboard_core.py:1770: AssertionError
+___________ test_r_paste_21_2_x_display_session_did_not_start_stops ____________
+
+    def test_r_paste_21_2_x_display_session_did_not_start_stops() -> None:
+        """R-PASTE.21/2 (LinuxH): a DISPLAY the session did not start fails."""
+        from tests.support.b103_clipboard import clipboard_isolated
+    
+        ok, reason = clipboard_isolated(
+            "x", environ={"DISPLAY": ":99"}, platform="linux"
+        )
+>       assert ok is False and "session" in reason, (ok, reason)
+E       AssertionError: (True, '')
+E       assert (True is False)
+
+tests/test_b103_clipboard_core.py:1796: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_21_1_windows_not_github_hosted_stops_before_open
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_21_2_x_display_session_did_not_start_stops
+2 failed, 1 passed, 84 deselected in 0.15s
+
+===== stderr =====

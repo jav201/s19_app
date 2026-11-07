@@ -1,0 +1,94 @@
+# M-PASTE.29
+# row: R-PASTE.29
+# s19_app.__file__ = /tmp/b103-e5-1a-mut/work/s19_app/__init__.py
+# note: no right-click paste
+# --- git diff ---
+diff --git a/s19_app/tui/os_clipboard_input.py b/s19_app/tui/os_clipboard_input.py
+index ad2f7240..6a1dce5d 100644
+--- a/s19_app/tui/os_clipboard_input.py
++++ b/s19_app/tui/os_clipboard_input.py
+@@ -875,7 +875,7 @@ class OsClipboardInput(Input):
+         else:
+             if press is not None:
+                 self.cursor_position = press
+-            await self.action_paste()
++            pass  # mutant: right-click paste removed
+ 
+     def _on_click(self, event: events.Click) -> None:
+         """Stop a button-3 click before the widget's text select runs."""
+
+# --- pytest (rc=1) ---
+essage_pump.reset(message_pump_reset_token)
+ValueError: <Token var=<ContextVar name='active_message_pump' at 0x7f47d2a06b60> at 0x7f47d1421cc0> was created in a different Context
+________ test_r_paste_29_4_blur_back_to_back_pastes_and_copies_nothing _________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10036/test_r_paste_29_4_blur_back_to0')
+
+    def test_r_paste_29_4_blur_back_to_back_pastes_and_copies_nothing(
+        tmp_path: Path,
+    ) -> None:
+        """R-PASTE.29/4 (LinuxH): a left press on #other then a right press on the
+        box back to back pastes at the cursor and copies nothing."""
+        _assert_linuxh_headless()
+    
+        async def _drive() -> tuple:
+            async for app, pilot, widget in _one_box_app("input"):
+                widget.value = "ab"
+                widget.selection = (2, 2)
+                widget.focus()
+                app._clipboard = "P1 line\nsecond"
+                await pilot.pause()
+                other = app.query_one("#other", Button)
+                await pilot.click(other)
+                region = widget.region
+                x = region.x + min(2, max(0, region.width - 1))
+                y = region.y
+                down = events.MouseDown(widget=widget, x=x, y=y, button=3, delta_x=0, delta_y=0, shift=False, meta=False, ctrl=False, screen_x=x, screen_y=y, style=None)
+                up = events.MouseUp(widget=widget, x=x, y=y, button=3, delta_x=0, delta_y=0, shift=False, meta=False, ctrl=False, screen_x=x, screen_y=y, style=None)
+                app.post_message(down)
+                app.post_message(up)
+                await pilot.pause()
+                await pilot.pause()
+                return widget.value, app.clipboard
+    
+        value, clip = asyncio.run(_drive())
+>       assert value == "abP1 line", value
+E       AssertionError: ab
+E       assert 'ab' == 'abP1 line'
+E         
+E         - abP1 line
+E         + ab
+
+tests/test_b103_clipboard_core.py:2115: AssertionError
+------------------------------ Captured log call -------------------------------
+ERROR    asyncio:base_events.py:1785 unhandled exception during asyncio.run() shutdown
+task: <Task finished name='Task-140' coro=<<async_generator_athrow without __name__>()> exception=ValueError("<Token var=<ContextVar name='active_message_pump' at 0x7f47d2a06b60> at 0x7f47d13803c0> was created in a different Context")>
+Traceback (most recent call last):
+  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 2210, in run_test
+    yield pilot
+  File "/tmp/b103-e5-1a-mut/work/tests/test_b103_clipboard_core.py", line 1077, in _one_box_app
+    yield app, pilot, widget
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/tmp/b103-e5-1a-mut/work/tests/test_b103_clipboard_core.py", line 1072, in _one_box_app
+    async with app.run_test(size=(80, 30)) as pilot:
+  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/contextlib.py", line 231, in __aexit__
+    await self.gen.athrow(typ, value, traceback)
+  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 2205, in run_test
+    with app._context():
+  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/contextlib.py", line 158, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 1107, in _context
+    active_message_pump.reset(message_pump_reset_token)
+ValueError: <Token var=<ContextVar name='active_message_pump' at 0x7f47d2a06b60> at 0x7f47d13803c0> was created in a different Context
+=========================== short test summary info ============================
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_29_1_right_click_no_selection_pastes_at_cursor
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_29_3_right_click_empty_box_pastes
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_29_2_unfocused_single_line_pastes_at_cursor
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_29_4_blur_back_to_back_pastes_and_copies_nothing
+4 failed, 83 deselected in 1.08s
+
+===== stderr =====
