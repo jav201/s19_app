@@ -20,6 +20,7 @@ import math
 import struct
 from dataclasses import dataclass, replace
 from decimal import Decimal
+from types import MappingProxyType
 from typing import Iterable, Mapping, Optional
 
 from .a2l import (
@@ -272,7 +273,10 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
     kept, a repeated name maps once) it reads every field it can and applies
     the refusal order (name, kind, address and length, datatype, length against
     datatype, conversion method, conversion type, enum table, entries, bit
-    mask).
+    mask).  A ``reads`` map (one per call, keyed by the ``id()`` of a section
+    an object names) holds the method record, enum table and layout datatype
+    each read once, so a name's time does not grow with the size of a section
+    it shares (R-A2L-DEF.149); the map is dropped when the call returns.
 
     Args:
         names (Iterable[str]): The names to describe.
@@ -307,6 +311,7 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
     _walk(a2l_data.get("sections") or [])
 
     result: dict[str, Definition] = {}
+    reads: dict[int, object] = {}
     for name in names:
         if name in result:
             continue
@@ -317,6 +322,7 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
             compu_methods_by_name,
             compu_tables_by_name,
             a2l_data,
+            reads,
         )
     return result
 
@@ -328,6 +334,7 @@ def _describe_one(
     compu_methods_by_name: dict[str, dict],
     compu_tables_by_name: dict[str, dict],
     a2l_data: dict,
+    reads: dict[int, object],
 ) -> Definition:
     """Read every field and the refusal for one name (the body of
     :func:`describe_definitions`)."""
@@ -398,15 +405,15 @@ def _describe_one(
 
     address = tag.get("address")
     byte_length = tag.get("length")
-    datatype = _resolve_datatype(tag, a2l_data)
+    datatype = _resolve_datatype(tag, a2l_data, reads)
     byte_order = tag.get("effective_byte_order") or "little"
     char_type = tag.get("char_type")
     section_name = tag.get("section") or ""
 
     method_name = tag.get("conversion")
-    record: Optional[dict] = None
+    record: Optional[Mapping] = None
     if method_name is not None and method_name != "NO_COMPU_METHOD":
-        record = _read_method_record(method_name, compu_methods_by_name)
+        record = _read_method_record(method_name, compu_methods_by_name, reads)
 
     if record is not None:
         conversion_type = record.get("conversion_type")
@@ -454,7 +461,7 @@ def _describe_one(
     if kind == "enum":
         enum_table = compu_tab_ref
         if compu_tab_ref is not None:
-            table_read = _read_enum_table(compu_tab_ref, compu_tables_by_name)
+            table_read = _read_enum_table(compu_tab_ref, compu_tables_by_name, reads)
             if table_read is not None:
                 _section_kind, enum_entries, default_text = table_read
 
@@ -628,24 +635,44 @@ def _object_kind(tag: dict, conversion_type: Optional[str]) -> tuple[Optional[st
     return None, "(none)"
 
 
-def _resolve_datatype(tag: dict, a2l_data: dict) -> Optional[str]:
+def _resolve_datatype(
+    tag: dict, a2l_data: dict, reads: dict[int, object]
+) -> Optional[str]:
     """The datatype: the tag's own word, else the record layout's ``decode_type``
     when that word is in the layout's tokens (R-A2L-022), else the datatype the
     deposit name spells (R-A2L-023; wraps BL-I2-13), else ``None``.
+
+    The layout step is read once per walk (R-A2L-DEF.149): its result is
+    ``reads[id(entry)]``, computed at the first object of the walk that names
+    the layout and returned as stored at every later call, so the layout's
+    first line is scanned once per walk, not once per object.
     """
     datatype = tag.get("datatype")
     if datatype in DATATYPE_SIZES:
         return datatype
     layouts = a2l_data.get("record_layouts_by_name") or {}
     layout_name = tag.get("record_layout_name") or tag.get("deposit")
-    layout = _resolve_record_layout(layout_name, layouts)
-    if layout is not None:
-        decode_type = layout.get("decode_type")
-        if decode_type and decode_type in DATATYPE_SIZES:
-            raw_layout = layouts.get(layout_name) if layout_name else None
-            tokens = (raw_layout or {}).get("tokens") or []
-            if any(token in DATATYPE_SIZES for token in tokens):
-                return decode_type
+    entry = layouts.get(layout_name) if layout_name else None
+    if entry is not None:
+        key = id(entry)
+        if key in reads:
+            resolved = reads[key]
+        else:
+            resolved = None
+            layout = _resolve_record_layout(layout_name, layouts)
+            if layout is not None:
+                decode_type = layout.get("decode_type")
+                if (
+                    decode_type
+                    and decode_type in DATATYPE_SIZES
+                    and any(
+                        token in DATATYPE_SIZES for token in (entry.get("tokens") or [])
+                    )
+                ):
+                    resolved = decode_type
+            reads[key] = resolved
+        if resolved is not None:
+            return resolved
     deposit = str(tag.get("deposit") or "")
     upper = deposit.upper()
     for dt in DATATYPE_SIZES:
@@ -655,25 +682,32 @@ def _resolve_datatype(tag: dict, a2l_data: dict) -> Optional[str]:
 
 
 def _read_method_record(
-    method_name: str, compu_methods_by_name: dict[str, dict]
-) -> Optional[dict]:
+    method_name: str, compu_methods_by_name: dict[str, dict], reads: dict[int, object]
+) -> Optional[Mapping]:
     """Read the first COMPU_METHOD of ``method_name`` as the conversion method
     record (the words of ``_flatten_body_tokens([meta] + lines)``, comments
     left out): ``<name> <long identifier> <type> <format> <unit>`` then the
     keyword groups ``COEFFS`` + 6, ``COEFFS_LINEAR`` + 2, ``COMPU_TAB_REF`` + 1.
-    Returns a dict of ``extract_compu_methods``' keys so the reused conversion
-    takes it unchanged; a missing positional word is ``None``; a coefficient
-    word that is not a finite number is ``None`` (E3S-10).  ``None`` when no
-    map entry has the name.
+
+    Read once per walk (R-A2L-DEF.149): the record is ``reads[id(section)]``,
+    computed at the first call that names the section and returned as stored at
+    every later call.  The stored form is a read-only
+    :class:`types.MappingProxyType` of the 6 fields an object reads
+    (``conversion_type``, ``format``, ``unit``, ``coeffs_linear`` and ``coeffs``
+    as tuples or ``None``, ``compu_tab_ref``); it holds no ``name``,
+    ``long_identifier``, ``formula`` or ``lines``.  A missing positional word is
+    ``None``; a coefficient word that is not a finite number is ``None``
+    (E3S-10).  ``None`` when no map entry has the name.
     """
     section = compu_methods_by_name.get(method_name)
     if section is None:
         return None
+    key = id(section)
+    if key in reads:
+        return reads[key]
     tokens = _flatten_body_tokens(
         [section.get("meta", "") or ""] + (section.get("lines") or [])
     )
-    name = tokens[0] if len(tokens) > 0 else "UNKNOWN"
-    long_identifier = tokens[1] if len(tokens) > 1 else None
     conversion_type = tokens[2] if len(tokens) > 2 else None
     fmt = tokens[3] if len(tokens) > 3 else None
     unit = tokens[4] if len(tokens) > 4 else None
@@ -699,26 +733,30 @@ def _read_method_record(
             i += 2
             continue
         i += 1
-    return {
-        "name": name,
-        "long_identifier": long_identifier,
-        "conversion_type": conversion_type,
-        "format": fmt,
-        "unit": unit,
-        "coeffs_linear": coeffs_linear,
-        "coeffs": coeffs,
-        "compu_tab_ref": compu_tab_ref,
-        "formula": None,
-        "lines": section.get("lines") or [],
-    }
+    form: Mapping = MappingProxyType(
+        {
+            "conversion_type": conversion_type,
+            "format": fmt,
+            "unit": unit,
+            "coeffs_linear": None if coeffs_linear is None else tuple(coeffs_linear),
+            "coeffs": None if coeffs is None else tuple(coeffs),
+            "compu_tab_ref": compu_tab_ref,
+        }
+    )
+    reads[key] = form
+    return form
 
 
 def _read_enum_table(
-    table_name: str, compu_tables_by_name: dict[str, dict]
-) -> Optional[tuple[str, tuple[EnumEntry, ...], Optional[str]]]:
+    table_name: str, compu_tables_by_name: dict[str, dict], reads: dict[int, object]
+) -> Optional[tuple[str, tuple[EnumEntry, ...], str | None]]:
     """Read the first COMPU_VTAB / COMPU_VTAB_RANGE of ``table_name`` as the
     enum table: ``(section kind, entries, default text)``, or ``None`` when no
     map entry has the name.
+
+    Read once per walk (R-A2L-DEF.149): the table is ``reads[id(section)]``,
+    read at the first call that names the section and returned as stored (the
+    same tuple, held by reference) at every later call.
 
     The count is a run of ASCII digits of at most 9 digits, else there are no
     entries.  Entries are read in file order, count-driven, at most ``n``; an
@@ -729,6 +767,9 @@ def _read_enum_table(
     section = compu_tables_by_name.get(table_name)
     if section is None:
         return None
+    key = id(section)
+    if key in reads:
+        return reads[key]
     section_kind = section.get("name")
     tokens = _flatten_body_tokens(
         [section.get("meta", "") or ""] + (section.get("lines") or [])
@@ -773,7 +814,9 @@ def _read_enum_table(
     if i < n and tokens[i] == "DEFAULT_VALUE":
         if i + 1 < n:
             default_text = tokens[i + 1]
-    return section_kind, tuple(entries), default_text
+    form = (section_kind, tuple(entries), default_text)
+    reads[key] = form
+    return form
 
 
 def _read_object_lines(section: Optional[dict]) -> dict:
