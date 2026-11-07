@@ -29,3 +29,5 @@
 2026-11-06T18:29:11-06:00 E2 start — Inc 1a (graph, incl. right-click and the Windows workflow); Opus 5.5
 2026-11-06T18:33:29-06:00 E1 addendum done — Inc 1b keys and quit dialog: 20 active rows (R-COPY.12..22 new; .4/.6/.7 rewritten; .3/.5 withdrawn), 96 cases + AT-I1b-8; A-1..A-11 ruled; app.py only; E2 waits for G2 and b101 Inc 10a/12; Opus 5.5, 27 min
 2026-11-06T18:33:29-06:00 process note — commit f937667 caught Inc 1b's addendum half-written (orchestrator committed the batch folder while the agent was still writing); from now on commits add only the folders of finished agents
+2026-11-06T18:34:20-06:00 G2 start — prototype round 2 (pe mix, av mix + autocomplete, quit dialog + copy/cut notices) at 118x54 and 220x60; real WT captures on the main PC (G1 exception); page prototypes/b103_ux/round2/b103_ux_r2.html; Opus 5.5
+2026-11-06T18:35:34-06:00 E2 done — Inc 3 graph (delta on Inc 2): 33 nodes (25 module, 3 synth, 5 context), every row exemplified; P-2, E2-1, E2-6 accepted; E2-3/7/10 to E3; rebase on Inc 2's E3 corrections required before Inc 3's E3; Opus 5.5, 30 min

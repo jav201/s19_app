@@ -1,0 +1,73 @@
+# i3e2-extract check transcript 2026-11-06T18:34:07-06:00 host cachyos-rtx
+# copy: git archive e07fb00 s19_app tools/synth -> /tmp/b103-e2-3/copy-check (clone e07fb00f9fc13afd314d0334fac683fe33b29b6c, status 0 changed)
+# code-wire: code-wire v3.1.0 e436a08; codewire_extract.py sha256 78d54439f2c95b6e35f31f02b1ed9564b160774622c253624f78e155f23a8599; python Python 3.11.18
+marks written: 5 (the baseline nodes of the graph)
+extractor: marks=5 graph_nodes=33 calls=2 findings=28 parse_failures=0 exit 1
+# Code-Wire extractor report
+
+- Marks found: 5
+- Graph nodes parsed: 33
+- Real calls between marked nodes: 2
+- Findings: 28 (28 drift, 0 info)
+- Ambiguous call resolutions (a name matched several defs): 3
+- Files that failed to parse: 0
+
+Type normalisation: spaces and quotes dropped; `List/Dict/Tuple/Set` -> builtins; `X | None` and graph `X?` -> `Optional[X]`; graph `(Callable) A->B` -> `Callable[[A], B]`; graph `tuple(A a, B b)` -> `tuple[A, B]`. A bare graph container (`dict`) against a parameterised code type (`dict[str, Any]`) is info (loose match), not drift.
+
+Call resolution is name-based (`f()`, `Class()` -> `__init__`, `self.m()`, `x.m()` -> top-level `m` or a marked method `m`); dynamic calls and callables passed as values are not seen. Tests excluded.
+
+## Counts
+
+| Kind | Count |
+|---|---|
+| Graph node without mark (no code yet) | 28 |
+
+## Real calls between marked nodes
+
+| Caller | Callee | Sites |
+|---|---|---|
+| `_byte_order_from_section_lines` | `_split_line_respecting_quotes` | s19_app/tui/a2l.py:314 |
+| `_encode_curve_record_bytes` | `_walk_record_layout_components` | s19_app/tui/a2l.py:2285 |
+
+Top-level sites (no marked node above them):
+
+- `_byte_order_from_section_lines`: s19_app/tui/a2l.py:2592, s19_app/tui/a2l.py:726
+- `_encode_curve_record_bytes`: s19_app/tui/a2l.py:2467
+- `_split_line_respecting_quotes`: s19_app/tui/a2l.py:2717, s19_app/tui/a2l.py:459, s19_app/tui/a2l.py:485, s19_app/tui/a2l.py:616, s19_app/tui/a2l.py:677, s19_app/tui/a2l.py:721, s19_app/tui/a2l.py:798, s19_app/tui/a2l.py:851, s19_app/tui/a2l.py:876, s19_app/tui/a2l.py:912, s19_app/tui/a2l.py:916
+- `_strip_a2l_comments`: s19_app/tui/a2l.py:459
+- `_walk_record_layout_components`: s19_app/tui/a2l.py:1744, s19_app/tui/a2l.py:1809, s19_app/tui/a2l.py:3283
+
+## Graph node without mark (no code yet)
+
+- `s19_app/tui/a2l_definition.py` — `describe_definition`
+- `s19_app/tui/a2l_definition.py` — `_object_kind`
+- `s19_app/tui/a2l_definition.py` — `decode_definition`
+- `s19_app/tui/a2l_definition.py` — `encode_definition`
+- `s19_app/tui/a2l_definition.py` — `_conversion_fields`
+- `s19_app/tui/a2l_definition.py` — `_describe_array`
+- `s19_app/tui/a2l_definition.py` — `_read_matrix_dim`
+- `s19_app/tui/a2l_definition.py` — `_array_shape`
+- `s19_app/tui/a2l_definition.py` — `_read_record_layout`
+- `s19_app/tui/a2l_definition.py` — `_place_components`
+- `s19_app/tui/a2l_definition.py` — `_check_module_alignment`
+- `s19_app/tui/a2l_definition.py` — `_module_common`
+- `s19_app/tui/a2l_definition.py` — `_read_axis`
+- `s19_app/tui/a2l_definition.py` — `_find_axis_object`
+- `s19_app/tui/a2l_definition.py` — `_fixed_points`
+- `s19_app/tui/a2l_definition.py` — `_element_definition`
+- `s19_app/tui/a2l_definition.py` — `element_name`
+- `s19_app/tui/a2l_definition.py` — `decode_values`
+- `s19_app/tui/a2l_definition.py` — `_element_offset`
+- `s19_app/tui/a2l_definition.py` — `_point_offset`
+- `s19_app/tui/a2l_definition.py` — `_current_count`
+- `s19_app/tui/a2l_definition.py` — `_decode_axis`
+- `s19_app/tui/a2l_definition.py` — `_decode_stored`
+- `s19_app/tui/a2l_definition.py` — `encode_values`
+- `s19_app/tui/a2l_definition.py` — `_breaking_point`
+- `tools/synth/make_release_case.py` — `build_definition_objects`
+- `tools/synth/make_release_case.py` — `emit_definitions_a2l`
+- `tools/synth/make_release_case.py` — `_definition_array_objects`
+
+finding kinds: {'graph_node_without_mark': 28}
+drift other than 'graph node without mark (no code yet)': none
+# exit 0
