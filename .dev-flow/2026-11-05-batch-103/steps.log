@@ -25,3 +25,7 @@
 2026-11-06T18:10:18-06:00 E2 case corrections done — Inc 2: 8 cases (E2-4..E2-8) + R-A2L-014 cited (E2-1); deepseek-v4-pro via pi, exit 0; diff checked (column counts unchanged)
 2026-11-06T18:27:20-06:00 E3 round 1 done — Inc 2: architect FAIL (2 MAJOR), security FAIL (1 HIGH, 2 MAJOR); all findings accepted with fixes, inc-2/E3-rulings.md; Opus 5.5, 21 + 13 min
 2026-11-06T18:27:20-06:00 E1 addendum done — Inc 1a right-click: +10 rows (R-PASTE.24..33; 36 active), 171 cases; D-9 A, D-10 B, D-11 A; Opus 5.5, 20 min
+2026-11-06T18:29:11-06:00 E3 correction start — Inc 2: units A (rows) and B (cases) in parallel, then C1 → C2 (graph) in sequence; deepseek-v4-pro via pi, timeout 1500 each; briefs design/E3-corr-2-*.md
+2026-11-06T18:29:11-06:00 E2 start — Inc 1a (graph, incl. right-click and the Windows workflow); Opus 5.5
+2026-11-06T18:33:29-06:00 E1 addendum done — Inc 1b keys and quit dialog: 20 active rows (R-COPY.12..22 new; .4/.6/.7 rewritten; .3/.5 withdrawn), 96 cases + AT-I1b-8; A-1..A-11 ruled; app.py only; E2 waits for G2 and b101 Inc 10a/12; Opus 5.5, 27 min
+2026-11-06T18:33:29-06:00 process note — commit f937667 caught Inc 1b's addendum half-written (orchestrator committed the batch folder while the agent was still writing); from now on commits add only the folders of finished agents
