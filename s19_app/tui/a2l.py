@@ -275,6 +275,10 @@ _ECHO_CAP = 256
 #: C-level scan per word, not a per-character alternation.
 _SLOW_WORD_RE = re.compile(r'(?:[^ \t\x0b\x0c"/\r\n]|/(?![/*]))+')
 
+#: A non-printable character (outside U+0021 .. U+007E), for the lexer's
+#: per-word diagnostics (R-A2L-READ.4; one C-level scan, not a char loop).
+_NONPRINTABLE_RE = re.compile(r'[^\x21-\x7e]')
+
 #: A file holding a NUL byte is refused with this one error (R-A2L-READ.55).
 #: Split so the text is not a single literal shared with the reference oracle.
 _UTF8_NUL_REFUSAL = "File is not UTF-8 text; save it as UTF-8 " + "and load it again."
@@ -658,11 +662,10 @@ def _lex_word_diagnostics(word: str, line: int, errors: Any) -> None:
     """Append the stray-``*/`` and unexpected-character errors of one word."""
     if "*/" in word:
         errors.append(f"Line {line}: */ without /*")
-    for ch in word:
-        code = ord(ch)
-        if not (_ECHO_OK_MIN <= code <= _ECHO_OK_MAX):
-            errors.append(f"Line {line}: unexpected character U+{code:04X}")
-            break
+    m = _NONPRINTABLE_RE.search(word)
+    if m:
+        code = ord(m.group(0))
+        errors.append(f"Line {line}: unexpected character U+{code:04X}")
 
 
 def _lex_a2l_lines(lines: Iterable[str], errors: Any) -> Iterator[tuple[int, str]]:
