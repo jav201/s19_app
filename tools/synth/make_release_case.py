@@ -952,6 +952,297 @@ def derive_v2(regions: dict[str, tuple[int, bytearray]], rng: random.Random) -> 
 
 
 # ---------------------------------------------------------------------------
+# Definitions case (D6): a small calibration region whose four objects
+# exercise the enum, bit-mask and display-format model behaviour.
+# ---------------------------------------------------------------------------
+
+#: Long identifier per definitions-case CHARACTERISTIC (the /begin line's text).
+DEFINITIONS_LONG_IDS = {
+    "ENUM_0001": "synthetic enum",
+    "MASK_BIT_0001": "synthetic one-bit field",
+    "MASK_FIELD_0001": "synthetic multi-bit field",
+    "DISPLAY_0001": "synthetic display object",
+}
+
+#: Extra body lines (after the VALUE header and any BIT_MASK line) per object.
+DEFINITIONS_EXTRA_LINES = {
+    "DISPLAY_0001": (
+        "EXTENDED_LIMITS -50 200",
+        'FORMAT "%.1"',
+        'PHYS_UNIT "deg C"',
+    ),
+}
+
+
+def build_definition_objects(rng: random.Random) -> tuple[dict[str, tuple[int, bytearray]], list[dict]]:
+    """
+    Summary:
+        Build the definitions case's one calibration region and its four-object
+        inventory (an enum, two masked fields of one word, and a display object).
+
+    Args:
+        rng (random.Random): Seeded generator; draws the fill bytes and the
+            planned values in the pinned order.
+
+    Returns:
+        tuple[dict[str, tuple[int, bytearray]], list[dict]]:
+            ``(regions, objects)``. ``regions`` maps ``boot`` / ``app`` /
+            ``cal`` / ``config`` to ``(base, bytearray)`` — ``cal`` is the
+            256-byte region at ``CAL_BASE``, the other three are empty so
+            :func:`emit_s19` writes the case unchanged. ``objects`` is the
+            four-object list carrying the I-D keys (``name``, ``section``,
+            ``kind``, ``datatype``, ``conversion``, ``address``, ``length``,
+            ``big_endian``, ``raw_bytes``, ``physical``, ``low``, ``high``,
+            ``bit_mask``, ``planned_stored``, ``planned_text``).
+
+    Data Flow:
+        - Fill the 256-byte calibration region with seeded random bytes.
+        - Draw the four planned values (enum raw, one-bit field, multi-bit
+          field, display raw) in the pinned order.
+        - Overlay the enum byte, the two masked fields of the word at +0x10,
+          and the display SWORD at +0x20 into the region.
+        - Emit the four object dicts with the I-D keys and the planned texts.
+
+    Dependencies:
+        Uses:
+            - _pack_scalar
+        Used by:
+            - generate_definitions_case
+
+    Example:
+        With ``random.Random(20260001)`` the enum raw is ``1``, the one-bit
+        field ``1``, the multi-bit field ``174`` and the display raw ``287``;
+        the planned word at ``+0x10`` is ``0x1AE7`` (bytes ``1a e7``) and the
+        display bytes are ``01 1f``.
+    """
+    cal = bytearray(rng.randrange(256) for _ in range(256))
+    enum_raw = rng.choice([0, 1, 2, 3])
+    one_bit = rng.randrange(2)
+    field = rng.randrange(256)
+    display_raw = rng.randint(-80, 300)
+
+    cal[0x00] = enum_raw
+    # The two masked fields share the big-endian word at +0x10: bit 0 holds
+    # the one-bit field and bits 4..11 the multi-bit field, the other bits
+    # kept from the fill.
+    word = (cal[0x10] << 8) | cal[0x11]
+    word = (word & ~(0x0001 | 0x0FF0)) | one_bit | (field << 4)
+    cal[0x10] = (word >> 8) & 0xFF
+    cal[0x11] = word & 0xFF
+    display_bytes = _pack_scalar("SWORD", display_raw, True)
+    cal[0x20:0x22] = display_bytes
+
+    regions = {
+        "boot": (BOOT_BASE, bytearray()),
+        "app": (APP_BASE, bytearray()),
+        "cal": (CAL_BASE, cal),
+        "config": (CONFIG_BASE, bytearray()),
+    }
+    word_bytes = bytes((cal[0x10], cal[0x11]))
+    objects = [
+        {
+            "name": "ENUM_0001",
+            "section": "CHARACTERISTIC",
+            "kind": "VALUE",
+            "datatype": "UBYTE",
+            "conversion": "CM_DEF_ENUM",
+            "address": CAL_BASE + 0x00,
+            "length": 1,
+            "big_endian": True,
+            "raw_bytes": bytes((enum_raw,)),
+            "physical": enum_raw,
+            "low": "0",
+            "high": "3",
+            "bit_mask": None,
+            "planned_stored": enum_raw,
+            "planned_text": "IDLE",
+        },
+        {
+            "name": "MASK_BIT_0001",
+            "section": "CHARACTERISTIC",
+            "kind": "VALUE",
+            "datatype": "UWORD",
+            "conversion": "CM_DEF_IDENT",
+            "address": CAL_BASE + 0x10,
+            "length": 2,
+            "big_endian": True,
+            "raw_bytes": word_bytes,
+            "physical": one_bit,
+            "low": "0",
+            "high": "1",
+            "bit_mask": 0x0001,
+            "planned_stored": one_bit,
+            "planned_text": str(one_bit),
+        },
+        {
+            "name": "MASK_FIELD_0001",
+            "section": "CHARACTERISTIC",
+            "kind": "VALUE",
+            "datatype": "UWORD",
+            "conversion": "CM_DEF_IDENT",
+            "address": CAL_BASE + 0x10,
+            "length": 2,
+            "big_endian": True,
+            "raw_bytes": word_bytes,
+            "physical": field,
+            "low": "0",
+            "high": "255",
+            "bit_mask": 0x0FF0,
+            "planned_stored": field,
+            "planned_text": str(field),
+        },
+        {
+            "name": "DISPLAY_0001",
+            "section": "CHARACTERISTIC",
+            "kind": "VALUE",
+            "datatype": "SWORD",
+            "conversion": "CM_DEF_LIN",
+            "address": CAL_BASE + 0x20,
+            "length": 2,
+            "big_endian": True,
+            "raw_bytes": display_bytes,
+            "physical": display_raw * 0.5,
+            "low": "-40",
+            "high": "150",
+            "bit_mask": None,
+            "planned_stored": display_raw,
+            "planned_text": f"{display_raw * 0.5:.1f}",
+        },
+    ]
+    return regions, objects
+
+
+def emit_definitions_a2l(regions: dict[str, tuple[int, bytearray]], objects: list[dict]) -> str:
+    """
+    Summary:
+        Emit the definitions case's A2L text (own PROJECT, MODULE, MOD_COMMON,
+        RECORD_LAYOUTs, COMPU_METHODs, one COMPU_VTAB and the four objects).
+
+    Args:
+        regions (dict[str, tuple[int, bytearray]]): Region map whose ``cal``
+            entry gives the MEMORY_SEGMENT address and byte length.
+        objects (list[dict]): The four-object list from
+            :func:`build_definition_objects`, in file order.
+
+    Returns:
+        str: The A2L text with ``\n`` line ends, each keyword on its own line
+            and each CHARACTERISTIC header on its own body line after its
+            /begin line.
+
+    Data Flow:
+        - Write the PROJECT / MODULE / MOD_COMMON header and the one
+          MEMORY_SEGMENT for the calibration region.
+        - Write the RECORD_LAYOUTs RL_U8 / RL_U16 / RL_S16.
+        - Write the COMPU_METHODs and the COMPU_VTAB with its four pairs and
+          DEFAULT_VALUE.
+        - Write the four CHARACTERISTICs from the object list, with the
+          BIT_MASK line and the DISPLAY_0001 extra lines.
+
+    Dependencies:
+        Uses:
+            - _fmt_addr
+            - RECORD_LAYOUT_NAMES
+            - DATATYPE_META
+        Used by:
+            - generate_definitions_case
+    """
+    cal_base, cal_buf = regions["cal"]
+    out = [
+        "ASAP2_VERSION 1 71",
+        '/begin PROJECT SYNTH_DEFINITIONS_DEMO "Synthetic definitions demo project"',
+        '  /begin MODULE ECU_DEFINITIONS "Synthetic definitions demo module"',
+        '    /begin MOD_COMMON ""',
+        "      BYTE_ORDER MSB_FIRST",
+        "      ALIGNMENT_BYTE 1",
+        "      ALIGNMENT_WORD 2",
+        "    /end MOD_COMMON",
+        "    /begin MEMORY_SEGMENT cal DATA FLASH INTERN FLASH "
+        f"{_fmt_addr(cal_base)} 0x{len(cal_buf):06X}",
+        "    /end MEMORY_SEGMENT",
+    ]
+    for layout, datatype in (("RL_U8", "UBYTE"), ("RL_U16", "UWORD"), ("RL_S16", "SWORD")):
+        out.append(f"    /begin RECORD_LAYOUT {layout}")
+        out.append(f"      FNC_VALUES 1 {datatype} COLUMN_DIR DIRECT")
+        out.append("    /end RECORD_LAYOUT")
+    out += [
+        '    /begin COMPU_METHOD CM_DEF_ENUM "synthetic verbal conversion"',
+        '      TAB_VERB "%.0" ""',
+        "      COMPU_TAB_REF VT_DEF_STATE",
+        "    /end COMPU_METHOD",
+        '    /begin COMPU_VTAB VT_DEF_STATE "synthetic states"',
+        "      TAB_VERB 4",
+        '      0 "OFF"',
+        '      1 "IDLE"',
+        '      2 "RUN"',
+        '      3 "FAULT"',
+        '      DEFAULT_VALUE "UNKNOWN_STATE"',
+        "    /end COMPU_VTAB",
+        '    /begin COMPU_METHOD CM_DEF_IDENT "synthetic IDENTICAL conversion"',
+        '      IDENTICAL "%.0" ""',
+        "    /end COMPU_METHOD",
+        '    /begin COMPU_METHOD CM_DEF_LIN "synthetic LINEAR conversion"',
+        '      LINEAR "%.3" "units"',
+        "      COEFFS_LINEAR 0.5 0",
+        "    /end COMPU_METHOD",
+    ]
+    for obj in objects:
+        long_id = DEFINITIONS_LONG_IDS[obj["name"]]
+        deposit = RECORD_LAYOUT_NAMES[obj["datatype"]]
+        out.append(f'    /begin CHARACTERISTIC {obj["name"]} "{long_id}"')
+        out.append(
+            f"      VALUE {_fmt_addr(obj['address'])} {deposit} 0 "
+            f"{obj['conversion']} {obj['low']} {obj['high']}"
+        )
+        if obj["bit_mask"] is not None:
+            width = 2 * DATATYPE_META[obj["datatype"]]["size"]
+            out.append(f"      BIT_MASK 0x{obj['bit_mask']:0{width}X}")
+        for line in DEFINITIONS_EXTRA_LINES.get(obj["name"], ()):
+            out.append(f"      {line}")
+        out.append("    /end CHARACTERISTIC")
+    out += ["  /end MODULE", "/end PROJECT"]
+    return "\n".join(out) + "\n"
+
+
+def generate_definitions_case(out_dir: Path, seed: int) -> dict[str, Path]:
+    """
+    Summary:
+        Write the definitions case's ``definitions.s19`` and
+        ``definitions.a2l`` into ``out_dir``.
+
+    Args:
+        out_dir (Path): Output directory (created if absent).
+        seed (int): Deterministic seed for the image and object planning.
+
+    Returns:
+        dict[str, Path]: ``{"s19": ..., "a2l": ...}`` paths of the two files.
+
+    Data Flow:
+        - Build the regions and object list from the seeded generator.
+        - Serialize the image with :func:`emit_s19` and the A2L with
+          :func:`emit_definitions_a2l`.
+        - Write both files as UTF-8 text (no wall clock, no case 08 file).
+
+    Dependencies:
+        Uses:
+            - build_definition_objects
+            - emit_s19
+            - emit_definitions_a2l
+        Used by:
+            - main
+    """
+    out_dir.mkdir(parents=True, exist_ok=True)
+    rng = random.Random(seed)
+    regions, objects = build_definition_objects(rng)
+    paths = {
+        "s19": out_dir / "definitions.s19",
+        "a2l": out_dir / "definitions.a2l",
+    }
+    paths["s19"].write_text(emit_s19(regions, BOOT_BASE), encoding="utf-8")
+    paths["a2l"].write_text(emit_definitions_a2l(regions, objects), encoding="utf-8")
+    return paths
+
+
+# ---------------------------------------------------------------------------
 # README and entry point.
 # ---------------------------------------------------------------------------
 
@@ -1046,13 +1337,42 @@ def generate(out_dir: Path, seed: int, size_mb: float) -> dict[str, Path]:
 
 
 def main(argv: list[str]) -> int:
+    """
+    Summary:
+        Run the synthetic case generator for the chosen case and print one
+        line per written file.
+
+    Args:
+        argv (list[str]): Command-line arguments without the program name.
+
+    Returns:
+        int: Process exit code (0 on success).
+
+    Data Flow:
+        - Parse ``--out``, ``--seed``, ``--size-mb`` and ``--case``.
+        - Run ``release`` (the default, case 08) through :func:`generate`, or
+          ``definitions`` through :func:`generate_definitions_case`.
+        - Print each written file's size and name.
+
+    Dependencies:
+        Uses:
+            - generate
+            - generate_definitions_case
+        Used by:
+            - the ``__main__`` guard
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", required=True, help="output directory")
     parser.add_argument("--seed", type=int, default=20260001, help="deterministic seed")
     parser.add_argument("--size-mb", type=float, default=10.0, help="target S19 size in MiB")
+    parser.add_argument("--case", choices=("release", "definitions"), default="release",
+                        help="case to generate (default: release)")
     args = parser.parse_args(argv)
 
-    paths = generate(Path(args.out), args.seed, args.size_mb)
+    if args.case == "definitions":
+        paths = generate_definitions_case(Path(args.out), args.seed)
+    else:
+        paths = generate(Path(args.out), args.seed, args.size_mb)
     for label, path in sorted(paths.items()):
         print(f"{label:8s} {path.stat().st_size:>10d}  {path.name}")
     return 0
