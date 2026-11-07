@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 102 requirement files | corpus digest: 46340dbdb0bc5c3b -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 102 requirement files | corpus digest: 8815ba97796a3abb -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
@@ -3673,7 +3673,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `US-086` | batches, tests |
 | `US-087` | batches, tests |
 | `US-088` | batches, tests |
-| `US-101.1` | batches |
+| `US-101.1` | batches, canon |
 | `US-102` | batches |
 | `US-102-01` | batches |
 | `US-102-02` | batches |
@@ -3810,7 +3810,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `US-B75-1` | batches |
 | `US-B75-2` | batches |
 | `US-B75-3` | batches |
-| `US-BAR-1` | batches |
+| `US-BAR-1` | batches, canon |
 | `US-C` | batches |
 | `US-C52-1` | batches |
 | `US-C52-1..6` | batches |
@@ -3821,19 +3821,19 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `US-C52-4b` | batches |
 | `US-C52-5` | batches |
 | `US-C52-6` | batches |
-| `US-CHK-KEEP-1` | batches, tests |
-| `US-CHK-SPEC-1` | batches, tests |
-| `US-CRC-FRESH-1` | batches |
-| `US-CRC-FRESH-2` | batches, tests |
-| `US-CRC-RESP-1` | batches |
+| `US-CHK-KEEP-1` | batches, canon, tests |
+| `US-CHK-SPEC-1` | batches, canon, tests |
+| `US-CRC-FRESH-1` | batches, canon |
+| `US-CRC-FRESH-2` | batches, canon, tests |
+| `US-CRC-RESP-1` | batches, canon |
 | `US-CRC1` | batches |
 | `US-CRC2` | batches |
 | `US-CRC3` | batches |
 | `US-CRC4` | batches |
 | `US-D` | batches |
-| `US-DOC-HYG-1` | batches |
-| `US-DOC-HYG-2` | batches |
-| `US-DOC-HYG-3` | batches |
+| `US-DOC-HYG-1` | batches, canon |
+| `US-DOC-HYG-2` | batches, canon |
+| `US-DOC-HYG-3` | batches, canon |
 | `US-DoS` | batches |
 | `US-E4` | batches |
 | `US-E5` | batches |
@@ -3842,30 +3842,30 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `US-FBP2-1` | batches |
 | `US-FBP2-2` | batches |
 | `US-FND` | batches, tests |
-| `US-FOCUS-2` | batches |
-| `US-FRESH-3` | batches |
-| `US-GUIDE-1` | batches |
+| `US-FOCUS-2` | batches, canon |
+| `US-FRESH-3` | batches, canon |
+| `US-GUIDE-1` | batches, canon |
 | `US-H` | batches |
-| `US-HELP-1` | batches |
-| `US-HEXNAV-1` | batches |
-| `US-HEXWIN-1` | batches |
+| `US-HELP-1` | batches, canon |
+| `US-HEXNAV-1` | batches, canon |
+| `US-HEXWIN-1` | batches, canon |
 | `US-I` | batches |
-| `US-I11-1` | batches |
-| `US-I11-2` | batches |
-| `US-I11-3` | batches |
-| `US-I11-4` | batches |
-| `US-I12-1` | batches, tests |
-| `US-I12-2` | batches, tests |
-| `US-I12-3` | batches, tests |
-| `US-I12b-1` | batches, tests |
-| `US-I8-1` | batches |
-| `US-I8-2` | batches |
-| `US-I8-3` | batches |
-| `US-I8-4` | batches |
-| `US-I9-1` | batches, tests |
+| `US-I11-1` | batches, canon |
+| `US-I11-2` | batches, canon |
+| `US-I11-3` | batches, canon |
+| `US-I11-4` | batches, canon |
+| `US-I12-1` | batches, canon, tests |
+| `US-I12-2` | batches, canon, tests |
+| `US-I12-3` | batches, canon, tests |
+| `US-I12b-1` | batches, canon, tests |
+| `US-I8-1` | batches, canon |
+| `US-I8-2` | batches, canon |
+| `US-I8-3` | batches, canon |
+| `US-I8-4` | batches, canon |
+| `US-I9-1` | batches, canon, tests |
 | `US-I9-1..3` | batches |
-| `US-I9-2` | batches, tests |
-| `US-I9-3` | batches, tests |
+| `US-I9-2` | batches, canon, tests |
+| `US-I9-3` | batches, canon, tests |
 | `US-J` | batches |
 | `US-K` | batches |
 | `US-L1` | batches |
@@ -3874,10 +3874,10 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `US-L3` | batches |
 | `US-L4` | batches |
 | `US-L5` | batches |
-| `US-LEGEND-1` | batches |
+| `US-LEGEND-1` | batches, canon |
 | `US-MAC` | batches, tests |
 | `US-MAP` | batches, tests |
-| `US-MDESC-1` | batches |
+| `US-MDESC-1` | batches, canon |
 | `US-ML1` | batches |
 | `US-ML2` | batches |
 | `US-N-N` | batches |
@@ -3897,29 +3897,29 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `US-P4` | batches, tests |
 | `US-P5` | batches, tests |
 | `US-P6` | batches, tests |
-| `US-PE-LIFE-1` | batches |
-| `US-PE-LIFE-2` | batches |
-| `US-PE-LIFE-3` | batches |
-| `US-PE-LIFE-4` | batches |
-| `US-PROJ-SAVE-1` | batches |
-| `US-PROJ-SYNC-1` | batches |
-| `US-README-1` | batches |
-| `US-REL-1` | batches |
-| `US-SEC-1` | batches |
-| `US-SEG-RESP-1` | batches |
-| `US-SYM-1` | batches |
-| `US-SYM-2` | batches |
-| `US-SYM-3` | batches |
-| `US-TST-1` | batches |
-| `US-TST-15` | batches |
-| `US-TST-16` | batches |
-| `US-TST-2` | batches |
-| `US-TST-3` | batches |
-| `US-TST-4` | batches |
-| `US-TST-5` | batches, tests |
-| `US-TST-PAINT-1` | batches |
+| `US-PE-LIFE-1` | batches, canon |
+| `US-PE-LIFE-2` | batches, canon |
+| `US-PE-LIFE-3` | batches, canon |
+| `US-PE-LIFE-4` | batches, canon |
+| `US-PROJ-SAVE-1` | batches, canon |
+| `US-PROJ-SYNC-1` | batches, canon |
+| `US-README-1` | batches, canon |
+| `US-REL-1` | batches, canon |
+| `US-SEC-1` | batches, canon |
+| `US-SEG-RESP-1` | batches, canon |
+| `US-SYM-1` | batches, canon |
+| `US-SYM-2` | batches, canon |
+| `US-SYM-3` | batches, canon |
+| `US-TST-1` | batches, canon |
+| `US-TST-15` | batches, canon |
+| `US-TST-16` | batches, canon |
+| `US-TST-2` | batches, canon |
+| `US-TST-3` | batches, canon |
+| `US-TST-4` | batches, canon |
+| `US-TST-5` | batches, canon, tests |
+| `US-TST-PAINT-1` | batches, canon |
 | `US-U8` | batches, tests |
-| `US-UNLOAD-1` | batches |
+| `US-UNLOAD-1` | batches, canon |
 | `US-V1` | batches |
 | `US-V1..V8` | batches |
 | `US-V2` | batches |

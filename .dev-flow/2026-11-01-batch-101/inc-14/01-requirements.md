@@ -117,7 +117,7 @@ As a reader of the user guide, I want the passages about behaviour that batch-10
 
 ## Requirements
 
-### US-HELP-1 — help sections (S7)
+### Rows of US-HELP-1 — help sections (S7)
 
 | Id | Form | Requirement | Threshold | Negative control | US | Base |
 |---|---|---|---|---|---|---|
@@ -135,14 +135,14 @@ As a reader of the user guide, I want the passages about behaviour that batch-10
 | R-WHELP.25 | U | The system shall state in the Flow Builder help section that the CRC template field names the CRC config file a CRC block reads. **new** (BL-I8-2, text half) | Flow Builder step 12 equals Help copy I14 (1/1); the TC-B97-32 flow arm still finds one `CRC template — …` line (1/1) | restore the base step 12 (`the CRC configuration a CRC block stamps`) → /1 RED | US-HELP-1 | Partly: "the CRC configuration a CRC block stamps" names no file kind; the block reads a CRC config file (R-FLOW-CRC.1) |
 | R-WHELP.26 | U | The system shall state in the Flow Builder help section that a CRC block refuses a template the CRC Designer saves. **new** (BL-I8-2; R-CRC-CONFIG-001.16) | Flow Builder step 12 holds `a template the CRC Designer saves is not a CRC config and is refused` (1/1); the claim holds: a CRC block naming a Designer template stops the flow with a cause that contains `a CRC Designer template is not a CRC config - it has no regions or groups` (1/1, Inc 8's R-FLOW-CRC.4/1) | delete the clause → /1 RED | US-HELP-1 | No: no help line says so (B) |
 
-### US-LEGEND-1 — the Memory Map legend sheet (S3, S4)
+### Rows of US-LEGEND-1 — the Memory Map legend sheet (S3, S4)
 
 | Id | Form | Requirement | Threshold | Negative control | US | Base |
 |---|---|---|---|---|---|---|
 | R-TUI-062.10.1 | U | The system shall name in the Memory Map's key line only keys that the Memory Map handles. **changed** (split of R-TUI-062.10, E7; `.10.2` inspector subtitle and `.10.3` row glyphs are recorded in `E1-rulings.md` §2) | the key line equals Legend copy I14 (1/1); each action it names is the handled one: ↑/↓ on a region row move the focus to the next / previous row and leave the inspector's region unchanged (2/2), Enter and a single click inspect (post `Activated(chain=1)`, 2/2), a double click opens the Workspace hex view at the region start (1/1) | restore the base line → /1 RED; make Enter post `chain=2` (open hex) with the new line kept → /2 RED | US-LEGEND-1 | No: `j k select` (`j`, `k` are not consumed by the row and reach `dump_a2l_json` / `show_legend`, `screens_directionb.py:1457-1490`, `app.py:2692`, `:2699`) and `↵ open hex` (Enter posts `Activated(chain=1)`, inspect, `screens_directionb.py:1481-1486`) |
 | R-LEGEND-011 | U | The system shall show the legend rows of CTX-LEGEND. (canon, unchanged; in scope for the map sheet's region-row field line only, CTX-LEGEND's map sheet changed per Legend copy I14, D-6; the A2L, MAC and Issues rows of D3-19 stay out, D-10) | the map sheet shows the region-row field line of Legend copy I14 (1/1) and both changed lines measure ≤ 72 cells (2/2) | restore `↵ opens hex` → /1 RED | US-LEGEND-1 | No for the field line: `↵ opens hex` (`legend.py:484-486`). Partly for the rest (D3-19), unchanged by this increment |
 
-### US-README-1 — the README (S0)
+### Rows of US-README-1 — the README (S0)
 
 | Id | Form | Requirement | Threshold | Negative control | US | Base |
 |---|---|---|---|---|---|---|
@@ -150,14 +150,14 @@ As a reader of the user guide, I want the passages about behaviour that batch-10
 | R-DOC-README.3 | U | The system shall list each key of CTX-README in its README with its action. (canon, unchanged) | each of the 26 CTX-KEYS rows has a README table row naming its key(s) and a non-empty action, 26/26 (base 21/26); every single-key cell of a README key table is a key the app binds (test_at285, extended per D-9 as amended [A-5]: the inherited keys come from `S19TuiApp._merged_bindings`, and `ctrl+p` counts only while `S19TuiApp.ENABLE_COMMAND_PALETTE` is true) | delete the `` `c` `` row → RED; add a row for an unbound key `` `h` `` → test_at285 RED; `ENABLE_COMMAND_PALETTE = False` (monkeypatch) with the README `Ctrl+P` row kept → test_at285 RED [A-5] | US-README-1 | No: `=`, `]`, `Ctrl+Q`, `Ctrl+P`, `d`, `c` missing (D0-10; `Ctrl+P` is listed although D0-10 says not to, D-11) |
 | R-DOC-README.4 | U | The system shall describe in its README no window, key, command or file that the system does not provide. (canon, unchanged) | 0 of the 11 stale claims of `02-test-cases.md` R-DOC-README.4/1; the Check Editor section says that Write .chk.json writes into the common `.s19tool/workarea/patches/` folder with or without a project (1/1, present phrase; `app.py:7338`, `tui/changes/io.py:1504`) [A-2]; every document and folder the README links exists in the tree (all links); the Operations section names `extract` and `split_by_segment` as listed but not implemented (1/1) | restore "ten single-context screens" → /1 RED; restore the `project.toml` bullet → /1 RED | US-README-1 | No: 11 stale claims (B) |
 
-### US-SEC-1 — security policy (S0)
+### Rows of US-SEC-1 — security policy (S0)
 
 | Id | Form | Requirement | Threshold | Negative control | US | Base |
 |---|---|---|---|---|---|---|
 | R-DOC-SECURITY.1 | U | The system shall include a `SECURITY.md` that gives a private path to report a vulnerability. **new** | `SECURITY.md` exists at the repository root (1/1) and names GitHub private vulnerability reporting (the repository's Security tab, Report a vulnerability) as the path (1/1); the path is open: `gh api repos/<owner>/<repo>/private-vulnerability-reporting` returns `"enabled":true` (1/1, evidence at E5 after the operator's setting, D-1) — a **merge precondition for `SECURITY.md`** [A-6, S-1]: the dated E5 transcript is the evidence; if the setting is still off at merge, `SECURITY.md` is held out of the merge (the rest of Inc 14 merges) and re-checked at the batch end; no public-issue fallback text | delete `SECURITY.md` → RED | US-SEC-1 | No: no `SECURITY.md`; private vulnerability reporting `"enabled":false` (probe 2026-11-05) |
 | R-DOC-SECURITY.2 | U | The system shall state in its `SECURITY.md` which versions receive security fixes. **new** | a table names `1.0.x` as receiving fixes and every earlier version (0.x and the 1.0.0 release candidates) as not (2/2 lines); `SECURITY.md` ships with the 1.0.0 release [S-6] | delete the table → RED | US-SEC-1 | No |
 
-### US-REL-1 — release notes (S0)
+### Rows of US-REL-1 — release notes (S0)
 
 | Id | Form | Requirement | Threshold | Negative control | US | Base |
 |---|---|---|---|---|---|---|
@@ -176,7 +176,7 @@ As a reader of the user guide, I want the passages about behaviour that batch-10
 | R-DOC-RELNOTE.13 | U | The system shall state in the release notes of 1.0.0 that a diff or before/after report writes a control or direction-override character of a name as a visible replacement character. **new** (Inc 7 R-CMP-004.9.1, R-CMP-004.15, R-BEFORE-AFTER-REPORT-001.21) [A-14, S-3] | the `### Reports` subsection holds the rule, the replacement `�` (U+FFFD) and the tab / line-break exception (one space) (3/3; `_strip_ctl`, `diff_report_service.py:240-262`) | write "control characters are removed" → RED | US-REL-1 | No |
 | R-DOC-RELNOTE.14 | U | The system shall state in the release notes of 1.0.0 that an interrupted write of a diff or before/after report can leave a `.part` file that is safe to delete. **new** (Inc 7 C-1) [A-14, S-3] | the `### Reports` subsection holds the name form `<file name>.<hex>.part` and "safe to delete" (2/2; `diff_report_service.py:342-349`); no text says why the staging name is random (0) | delete "safe to delete" → RED | US-REL-1 | No |
 
-### US-GUIDE-1 — user guide (S0)
+### Rows of US-GUIDE-1 — user guide (S0)
 
 | Id | Form | Requirement | Threshold | Negative control | US | Base |
 |---|---|---|---|---|---|---|

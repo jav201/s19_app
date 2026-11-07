@@ -159,6 +159,7 @@ Committed: `git diff --stat main...HEAD` (88 files, +18 466 / −127). Uncommitt
 | `tests/test_report_addendum_bound.py` | test | US-TST-5 | Golden read through `canonical_report_bytes` |
 | `tests/test_report_service.py` | test | US-TST-5 | Golden comparisons canonicalized; the at288 capture tokenizes only `Tool version: ` + version (F11) |
 | `tests/test_suite_hygiene.py` | test | US-TST-1 | New guard host: 65 nodes over R-TST-001 … 082 + E5 additions (049 guard, widened redaction gate, injection ratchet) |
+| `tests/test_flow_report_service.py` | test | US-TST-1 | `test_tc016b_exception_diagnostics_do_not_leak_absolute_paths`: the account-name redaction reads `USERNAME`, `USER` and the home basename, skipping an unset/empty name (Inc 2 CI fix 93a73ad8) |
 | `tests/test_tui_app.py` | test | US-TST-1 | Timing arms marked `serial_timing`, bounds wrapped |
 
 | Count | Value |

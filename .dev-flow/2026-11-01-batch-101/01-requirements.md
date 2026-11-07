@@ -93,21 +93,21 @@
 
 ## 3. High-level requirements (HLR)
 
-### HLR-001 — `<Short title>`
-- **Traceability:** US-001
+### HLR-001 — Ship 1.0.0 with every non-UI user-guide finding fixed or ruled
+- **Traceability:** US-101.1 … US-DOC-HYG-3 (the batch-101 user-story index below)
 - **Ledger:** none
-- **Statement:** When `<trigger>`, the system shall `<response>`. *(Current state only. If you are about to write "because measured …", stop: the obligation belongs here, the measurement belongs in a ledger entry.)*
-- **Rationale (informative):** *(why this requirement exists — `should` may technically be used here informally, but avoid it to prevent confusion.)*
-- **Validation:** `test` | `demo` | `inspection` | `analysis`
-- **Executed verification:** *(required if `test`/`analysis`. e.g. `npm run typecheck`, `vitest run TC-001`, `worst-case gain-staging sum analysis`.)*
-- **Numeric pass threshold:** *(required if `test`/`analysis`. e.g. `0 errors`, `peak post-limiter ≤ −6 dBFS`.)*
-- **Priority:** high | medium | low
+- **Statement:** The system shall ship as version 1.0.0 with every non-UI user-guide finding fixed or ruled, the help and README describing the app as shipped, the Save project margin measured and fixed or re-ruled, the test suite running reliably in parallel with the timing arms run apart, batch-100's deferred CI confirmation recorded, and the requirement base as the strict-EARS canon with the test-case records.
+- **Rationale (informative):** the batch objective, taken from `PLAN.md` §Objective — make v1.0.0 releasable on its non-UI defects.
+- **Validation:** inspection
+- **Executed verification:** the batch-end gate battery on the final tree (`evidence/close/full-suite-final.txt`; lane 1 and the `serial_timing` lane both green with the known failures named).
+- **Numeric pass threshold:** 0 blocker fails at the close gate.
+- **Priority:** high
 - **Acceptance (black-box) — the user-verified outcome (the WHAT):**
-  - **Observable outcome:** *(what the user observes)*
-  - **Shipped surface:** *(the handler / screen / CLI that produces it)*
-  - **Acceptance test(s):** AT-001
-  - **Boundary catalog (QC-3):** `<☐ empty ☐ boundary ☐ invalid ☐ error — tick each class that gets an AT/TC, or: none — and the reason no input class applies>`
-  - **Negative control:** `<the executed input on which this verification GOES RED, or: none — and why it has no executed RED side>`
+  - **Observable outcome:** v1.0.0 ships with the non-UI findings fixed or ruled and the help/README describing the shipped app.
+  - **Shipped surface:** the release tag `v1.0.0`.
+  - **Acceptance test(s):** AT-101 (the batch-end battery and the doc-pass guards).
+  - **Boundary catalog (QC-3):** none — the batch's acceptance is a whole-tree gate, not a per-input class.
+  - **Negative control:** the same battery on the base tree goes RED (the canon guards and doc-pass guards fail before the increments).
 
 ---
 
@@ -116,15 +116,15 @@
 > Each LLR decomposes an HLR into a verifiable property at the implementation level.
 > Same regime: EARS syntax owed in `full`, recommended in `core`. ID format: `LLR-<HLR>.<M>`.
 
-### LLR-001.1 — `<Short title>`
+### LLR-001.1 — the user guide's findings table marks exactly the batch's fixed findings
 - **Traceability:** HLR-001
 - **Ledger:** none
-- **Statement:** The `<component>` shall `<verifiable technical response>`.
-- **Validation:** `test (unit)` | `test (integration)` | `test (e2e)` | `inspection` | `analysis`
-- **Executed verification:** *(required if `test`/`analysis`. e.g. `vitest run src/lib/audio/masterBus.test.ts -t TC-001`; `gain-sum analysis vs the compressor threshold`.)*
-- **Numeric pass threshold:** *(required if `test`/`analysis`. e.g. `assert exit code 0`; `peak ≤ −6 dBFS`; `RMS error < 0.01`.)*
-- **Negative control:** `<the executed input on which this verification goes RED, or: none — and why it has no executed RED side>`
-- **Boundary catalog:** `<☐ empty ☐ boundary ☐ invalid ☐ error — tick each class that gets an AT/TC, or: none — and the reason no input class applies>`
+- **Statement:** The user guide's findings table shall mark every finding fixed in this batch `fixed in 1.0.0`, and only those.
+- **Validation:** test (unit)
+- **Executed verification:** `python -m pytest tests/test_b101_help_legend_docs.py -q`
+- **Numeric pass threshold:** 0 failed (the `_FIXED` tuple of 17 findings is exactly the marked set).
+- **Negative control:** adding a finding to `_FIXED` that the table does not mark goes RED.
+- **Boundary catalog:** none — the verification is a pinned-set equality, not an input class.
 
 ### Information Flow Contract (IFC) — C-54
 
@@ -227,6 +227,231 @@ _No entries yet. The first amendment to the live contract writes the first one, 
 shape the field guide's §7 shows (`req-template.part2.md` in the guide directory init prints), and nothing
 above this line is ever edited._
 ```
+
+
+## Batch-101 user stories — the requirement index
+
+> One block per user story the increments declare, with the Statement copied verbatim from the increment's `### US-…` heading and the increment file named.
+
+### Rows of US-101.1 — As the engineer who changes s19_app, I read and change one requirements file in which every requirement is a single strict EARS sentence with a stable id, so that each requirement can be tested on its own and traced to its tests.
+- **Statement:** As the engineer who changes s19_app, I read and change one requirements file in which every requirement is a single strict EARS sentence with a stable id, so that each requirement can be tested on its own and traced to its tests.
+- **Increment:** `inc-1/01-requirements.md`
+
+### Rows of US-TST-1 — a release gate without false timing failures
+- **Statement:** a release gate without false timing failures
+- **Increment:** `inc-2/01-requirements.md`
+
+### Rows of US-TST-2 — CI runs what the local gate runs
+- **Statement:** CI runs what the local gate runs
+- **Increment:** `inc-2/01-requirements.md`
+
+### Rows of US-TST-3 — wait and timing rules that a guard enforces
+- **Statement:** wait and timing rules that a guard enforces
+- **Increment:** `inc-2/01-requirements.md`
+
+### Rows of US-TST-4 — no unread CI result in the v1.0.0 baseline
+- **Statement:** no unread CI result in the v1.0.0 baseline
+- **Increment:** `inc-2/01-requirements.md`
+
+### Rows of US-TST-5 — a version bump keeps the report goldens
+- **Statement:** a version bump keeps the report goldens
+- **Increment:** `inc-2/01-requirements.md`
+
+### Rows of US-PROJ-SAVE-1 — Save project keeps its time bound with room to spare
+- **Statement:** Save project keeps its time bound with room to spare
+- **Increment:** `inc-3/01-requirements.md`
+
+### Rows of US-PROJ-SYNC-1 — a deleted project folder is not silently brought back
+- **Statement:** a deleted project folder is not silently brought back
+- **Increment:** `inc-3/01-requirements.md`
+
+### Rows of US-TST-PAINT-1 — the panel and append timing arms measure what the app paints
+- **Statement:** the panel and append timing arms measure what the app paints
+- **Increment:** `inc-3/01-requirements.md`
+
+### Rows of US-SYM-1 — documents I open resolve their symbols through the A2L I loaded
+- **Statement:** documents I open resolve their symbols through the A2L I loaded
+- **Increment:** `inc-4/01-requirements.md`
+
+### Rows of US-SYM-2 — a variant run uses the project's A2L and nothing implicit
+- **Statement:** a variant run uses the project's A2L and nothing implicit
+- **Increment:** `inc-4/01-requirements.md`
+
+### Rows of US-SYM-3 — the per-entry JSON edit works on a symbol entry and says plainly when it cannot
+- **Statement:** the per-entry JSON edit works on a symbol entry and says plainly when it cannot
+- **Increment:** `inc-4/01-requirements.md`
+
+### Rows of US-CRC-FRESH-2 — the CRC Designer's coverage follows bytes written into the image
+- **Statement:** the CRC Designer's coverage follows bytes written into the image
+- **Increment:** `inc-5/01-requirements.md`
+
+### Rows of US-CHK-KEEP-1 — my included parameters survive a Write and a return to the Check Editor
+- **Statement:** my included parameters survive a Write and a return to the Check Editor
+- **Increment:** `inc-5/01-requirements.md`
+
+### Rows of US-CHK-SPEC-1 — a spec I load back is the spec I wrote
+- **Statement:** a spec I load back is the spec I wrote
+- **Increment:** `inc-5/01-requirements.md`
+
+### Rows of US-PE-LIFE-1 — no report offer I cannot use
+- **Statement:** no report offer I cannot use
+- **Increment:** `inc-6/01-requirements.md`
+
+### Rows of US-PE-LIFE-2 — what I save in a project is in the lists
+- **Statement:** what I save in a project is in the lists
+- **Increment:** `inc-6/01-requirements.md`
+
+### Rows of US-PE-LIFE-3 — the Checks views show the run I have now
+- **Statement:** the Checks views show the run I have now
+- **Increment:** `inc-6/01-requirements.md`
+
+### Rows of US-PE-LIFE-4 — a new document starts clean
+- **Statement:** a new document starts clean
+- **Increment:** `inc-6/01-requirements.md`
+
+### Rows of US-BAR-1 — the before/after report names itself and its inputs
+- **Statement:** the before/after report names itself and its inputs
+- **Increment:** `inc-7/01-requirements.md`
+
+### Rows of US-HEXWIN-1 — a written report carries every hex window whole
+- **Statement:** a written report carries every hex window whole
+- **Increment:** `inc-7/01-requirements.md`
+
+### Rows of US-MDESC-1 — names and paths stay plain text in the Markdown report
+- **Statement:** names and paths stay plain text in the Markdown report
+- **Increment:** `inc-7/01-requirements.md`
+
+### Rows of US-I8-1 — a Designer template given to a Flow CRC block is named as such (F-28)
+- **Statement:** a Designer template given to a Flow CRC block is named as such (F-28)
+- **Increment:** `inc-8/01-requirements.md`
+
+### Rows of US-I8-2 — a CRC config error names its field (D13-23)
+- **Statement:** a CRC config error names its field (D13-23)
+- **Increment:** `inc-8/01-requirements.md`
+
+### Rows of US-I8-3 — one CRC for one set of parameters (D13-20)
+- **Statement:** one CRC for one set of parameters (D13-20)
+- **Increment:** `inc-8/01-requirements.md`
+
+### Rows of US-I8-4 — a later block reads this run's external output (F-49, D15-17)
+- **Statement:** a later block reads this run's external output (F-49, D15-17)
+- **Increment:** `inc-8/01-requirements.md`
+
+### Rows of US-I9-1 — a confirm re-run's report says what ran (F-45)
+- **Statement:** a confirm re-run's report says what ran (F-45)
+- **Increment:** `inc-9/01-requirements.md`
+
+### Rows of US-I9-2 — a saved flow keeps its own name (F-46)
+- **Statement:** a saved flow keeps its own name (F-46)
+- **Increment:** `inc-9/01-requirements.md`
+
+### Rows of US-I9-3 — flow and chain-set saves stay in the work area (D15-18)
+- **Statement:** flow and chain-set saves stay in the work area (D15-18)
+- **Increment:** `inc-9/01-requirements.md`
+
+### Rows of US-HEXNAV-1 — a jump shows me its target
+- **Statement:** a jump shows me its target
+- **Increment:** `inc-10/01-requirements.md`
+
+### Rows of US-UNLOAD-1 — the status line describes what is loaded
+- **Statement:** the status line describes what is loaded
+- **Increment:** `inc-10/01-requirements.md`
+
+### Rows of US-FOCUS-2 — the keys reach the window I see
+- **Statement:** the keys reach the window I see
+- **Increment:** `inc-10/01-requirements.md`
+
+### Rows of US-FRESH-3 — views over the image follow bytes written into it
+- **Statement:** views over the image follow bytes written into it
+- **Increment:** `inc-10b/01-requirements.md`
+
+### Rows of US-I11-1 — a valid A2L raises no "unrecognized block" (F-02, D3-12)
+- **Statement:** a valid A2L raises no "unrecognized block" (F-02, D3-12)
+- **Increment:** `inc-11/01-requirements.md`
+
+### Rows of US-I11-2 — the Issues screen shows each issue under its own severity, errors first (F-03, F-39)
+- **Statement:** the Issues screen shows each issue under its own severity, errors first (F-03, F-39)
+- **Increment:** `inc-11/01-requirements.md`
+
+### Rows of US-I11-3 — a CURVE without axis points says so once (F-21)
+- **Statement:** a CURVE without axis points says so once (F-21)
+- **Increment:** `inc-11/01-requirements.md`
+
+### Rows of US-I11-4 — every MEMORY_SEGMENT that states a base and a size is read (F-29)
+- **Statement:** every MEMORY_SEGMENT that states a base and a size is read (F-29)
+- **Increment:** `inc-11/01-requirements.md`
+
+### Rows of US-I12-1 — every dialog opens and every action runs from somewhere (F-33, F-34)
+- **Statement:** every dialog opens and every action runs from somewhere (F-33, F-34)
+- **Increment:** `inc-12/01-requirements.md`
+
+### Rows of US-I12-2 — every widget of the Check Editor is shown in some state (F-35, the Check Editor half)
+- **Statement:** every widget of the Check Editor is shown in some state (F-35, the Check Editor half)
+- **Increment:** `inc-12/01-requirements.md`
+
+### Rows of US-I12-3 — Escape closes the Reports dialog (F-51)
+- **Statement:** Escape closes the Reports dialog (F-51)
+- **Increment:** `inc-12/01-requirements.md`
+
+### Rows of US-I12b-1 — every widget of the Flow Builder and Flow Execution is shown in some state (F-35, the `#flow_kind` half; D16-6)
+- **Statement:** every widget of the Flow Builder and Flow Execution is shown in some state (F-35, the `#flow_kind` half; D16-6)
+- **Increment:** `inc-12b/01-requirements.md`
+
+### Rows of US-CRC-RESP-1 — the CRC Designer stays usable with the 10 MB demo image
+- **Statement:** the CRC Designer stays usable with the 10 MB demo image
+- **Increment:** `inc-13/01-requirements.md`
+
+### Rows of US-CRC-FRESH-1 — the CRC Designer's coverage follows the loaded image
+- **Statement:** the CRC Designer's coverage follows the loaded image
+- **Increment:** `inc-13/01-requirements.md`
+
+### Rows of US-SEG-RESP-1 — the Split/Join preview stays usable with the 10 MB demo image
+- **Statement:** the Split/Join preview stays usable with the 10 MB demo image
+- **Increment:** `inc-13/01-requirements.md`
+
+### Rows of US-HELP-1 — each help window describes what its window does
+- **Statement:** each help window describes what its window does
+- **Increment:** `inc-14/01-requirements.md`
+
+### Rows of US-LEGEND-1 — the Memory Map legend names the keys the map handles
+- **Statement:** the Memory Map legend names the keys the map handles
+- **Increment:** `inc-14/01-requirements.md`
+
+### Rows of US-README-1 — the README describes the shipped app
+- **Statement:** the README describes the shipped app
+- **Increment:** `inc-14/01-requirements.md`
+
+### Rows of US-SEC-1 — a security policy says how to report a vulnerability
+- **Statement:** a security policy says how to report a vulnerability
+- **Increment:** `inc-14/01-requirements.md`
+
+### Rows of US-REL-1 — the 1.0.0 release notes state what changed in written results
+- **Statement:** the 1.0.0 release notes state what changed in written results
+- **Increment:** `inc-14/01-requirements.md`
+
+### Rows of US-GUIDE-1 — the user guide describes 1.0.0
+- **Statement:** the user guide describes 1.0.0
+- **Increment:** `inc-14/01-requirements.md`
+
+### Rows of US-TST-15 — a Windows run reports the product, not the host's clock
+- **Statement:** a Windows run reports the product, not the host's clock
+- **Increment:** `inc-15/01-requirements.md`
+
+### Rows of US-TST-16 — a no-op arm proves the press was handled
+- **Statement:** a no-op arm proves the press was handled
+- **Increment:** `inc-15/01-requirements.md`
+
+### Rows of US-DOC-HYG-1 — a contributor finds only paths, links and commands that exist
+- **Statement:** a contributor finds only paths, links and commands that exist
+- **Increment:** `inc-16/01-requirements.md`
+
+### Rows of US-DOC-HYG-2 — the developer documents describe the shipped app
+- **Statement:** the developer documents describe the shipped app
+- **Increment:** `inc-16/01-requirements.md`
+
+### Rows of US-DOC-HYG-3 — finished notes leave the living documents, with their history kept
+- **Statement:** finished notes leave the living documents, with their history kept
+- **Increment:** `inc-16/01-requirements.md`
 
 
 ## Batch-101 increments — requirement homes
