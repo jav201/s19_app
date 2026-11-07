@@ -192,3 +192,7 @@ open_items_next: 34
 
 - **Human perimeter:** what to build and in what order (the P0/ARQ approvals and the serial `app.py` chain); the iteration-cap rulings; the 2026-11-06 test-scope override (partial merge verification per increment, full suite once at batch end); the two open operator decisions in `STATUS-for-operator.md` (the redaction pass over older `.dev-flow/` records, and the `.chk.json` grammar change); and the release decision (tag `v1.0.0` on the review page's OK).
 - **Human review ledger:** `none — this batch recorded no human review yet: the operator has not reviewed the close records; the review page close/review-b101.html is the instrument for that review, and its §6 verdict form has no default`
+
+## Operator decision (2026-11-07)
+
+The operator gave the go-ahead **in advance** for the v1.0.0 tag ("Te doy el OK por adelantado", 2026-11-07 ~12:45 local), before leaving for an extended period, without reading the review page `close/review-b101.html`. Read as: the v1.0.0 tag is approved, and the open reservations listed on that page (BL-I10b-1, BL-I12-5, BL-I12-6, R-DLG.2 Partly, BL-I9-9, BL-I10b-2, BL-I12-1 … 3) are accepted for 1.0.0 and carried in `BACKLOG-CODE.md`. The human review ledger above stays at depth `none`: no human has audited the batch's records; the review page remains the instrument for that review after the fact. The package version moves `1.0.0rc1` → `1.0.0` (`pyproject.toml`, `s19_app/version.py`) in the close commit that carries this note.
