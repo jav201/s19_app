@@ -48,3 +48,12 @@ Round 3 (security): **PASS-WITH-NOTES** — E3S-18, -19, -21, -22, -23, -25 clos
 - MINOR / INFO: fix columns.
 - **Addenda applied** (2026-11-07T02:08:27-06:00, Opus, 23 min): 79 rows (new R-A2L-READ.68), 265 cases + 2 AT, 37 nodes; E3S-24 hex-like surplus words (`0x1C2D 3E00`, next-line `3E00`, `E00`, `2D3E00`, `_4026`, `BIT_MASK 0x0F F0`) → error, no value; E3S-27 BYTE_ORDER outside the four → no address; E3S-28 streaming words: peak memory 1.04–1.19× the base reader (the 19.8 MB corpus file 1.11×, was 6.7×).
 - **Ruling on the time of the largest file:** the design model reads the 19.8 MB corpus file in 4.6 s against the base reader's 0.75 s (6×). Real ECU A2L files are often this size, so **R-A2L-READ.52's 1.5× time bound holds for every file, the largest included**: the lexer tokenises each line with a compiled regular expression (C-level), keeping cross-line state only for an open block comment or string; a synthetic 20 MB file of the same shape joins READ.52's cases (the corpus file stays evidence). E4 measures it first; if 1.5× is not reachable the implementer stops and the orchestrator rules with the measurement.
+
+## Orchestrator addendum (2026-11-07, from Inc 3a's round-5 rulings)
+
+- **R-A2L-READ.66 echo cap 64 → 256 characters.**
+  - Measured: 1,993 real section names exceed 64 characters, in 28 files; 0 exceed 256; the longest is 148.
+  - One echo rule for parse errors and definition refusals (R-A2L-DEF.151).
+  - READ.66/1's bound is now 312 characters, and /2's cases are 256 and 257 characters.
+  - Authority: `../inc-3/E3-rulings.md`, round-5 correction note.
+- **R-A2L-READ.69** was added from Inc 12's E3 rulings (E3A-07). It follows .38 and .60 in giving no address without a parse error.

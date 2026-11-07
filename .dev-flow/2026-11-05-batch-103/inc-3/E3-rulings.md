@@ -83,3 +83,19 @@ New findings:
 - CT-1 and CT-2 leave the frozen `_table_lookup` through 3a's bisect. E3S3-21 stays in the backlog (frozen file).
 
 **Next:** after the correction, run round 6 security on the same 49-path harness. Add the long-word fills of every echo family, plus the decode paths, against the corrected model.
+
+**Round-5 correction done** (Opus, 21 min). .148 is now 15/15; cases `.150/arr-1…9` and `.151/arr-1…6`; the completed rule is in the graph. Orchestrator rulings on what it reported:
+- **Echo cap 256, not 64.** This applies to R-A2L-DEF.151 and also to Inc 11's R-A2L-READ.66, one rule for both.
+  - Measured on cachyos-rtx over the public corpus plus `examples/` and `tests/`, read-only, derived counts only:
+    - section names longer than 64 characters: 1,993, in 28 files;
+    - longer than 128: 16;
+    - longer than 256: 0;
+    - longest: 148 (a COMPU_METHOD);
+    - reference words longer than 64: 85.
+  - A 64-character echo would cut real names in the messages the operator reads to find an object, and 256 keeps every measured name whole. The cost per object is still constant in the section size.
+  - Applied in place in `inc-3/` and `inc-11/` (23 lines). READ.66/1's bound becomes 312 characters: `Line <n>: /include ` + 257 + ` is not read`, with the old margin.
+- **Enum index.** The public `enum_entries: tuple[EnumEntry, ...]` of I-2 stays as pinned. The dict (VTAB) and bisect keys (ranges) are a private, immutable part of the per-walk reduced enum table, shared by reference. For the 2a pass to design.
+- **.151's reach:** accepted as read, meaning the shared-section words `<component>` and `<word>`. `<name>` (the object's own) and `<layout>` (a word of the object's own header) keep .137: each costs the object's own text, not a shared section.
+- **The agent's `sed -i`:** checked. It was ASCII only, the file is valid UTF-8, no line starts with a stray backtick, and the diff holds only the intended lines.
+
+**Next:** round 6 security on the corrected records.
