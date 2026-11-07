@@ -522,7 +522,7 @@ def test_r_paste_34_4_right_click_paste_single_line_strips(tmp_path: Path) -> No
             app._clipboard = P_CTRL_L
             await pilot.pause()
             await right_click_app_route(app, pilot, widget)
-            await pilot.pause()
+            await pilot.pause(0.2)
             return first, widget.value
 
     first, second = asyncio.run(_drive())
@@ -977,7 +977,7 @@ def test_r_paste_10_1_warning_line_per_failed_copy_without_text(tmp_path: Path) 
 
     records = asyncio.run(_drive())
     warnings = [m for level, m in records if level == "WARNING"]
-    assert warnings, records
+    assert "OS clipboard write failed; retained Textual internal clipboard only" in warnings, records
     assert not any("SECRET-COPY-43" in m for m in [m for _, m in records]), records
 
 
@@ -1239,7 +1239,7 @@ def test_r_paste_10_2_warning_line_per_failed_right_click_copy(tmp_path: Path) -
 
     records = asyncio.run(_drive())
     warnings = [m for level, m in records if level == "WARNING"]
-    assert warnings, records
+    assert "OS clipboard write failed; retained Textual internal clipboard only" in warnings, records
     assert not any("SECRET-RC-44" in m for m in [m for _, m in records]), records
 
 
@@ -1389,7 +1389,7 @@ def test_r_tui_043_12_3_warning_line_on_right_click_no_text(tmp_path: Path) -> N
             box.focus()
             await pilot.pause()
             await right_click_app_route(app, pilot, box)
-            await pilot.pause()
+            await pilot.pause(0.2)
             warnings = [
                 r for r in records
                 if r[0] == "s19_app.tui.os_clipboard_input" and r[1] == "WARNING"
@@ -1631,6 +1631,8 @@ def test_r_paste_31_3_4_linux_right_click_paste_ends_within_typed_key_time(
                     if P1000[:10] in _box(widget):
                         break
                 samples.append(time.monotonic() - start)
+            if box_kind == "a":
+                await pilot.pause(0.2)
             samples.sort()
             return key_time, samples[len(samples) // 2]
 
@@ -1750,6 +1752,8 @@ def test_r_paste_20_1_windows_workflow_runs_os_clipboard_tests() -> None:
     assert "upload-artifact" not in text
     assert "pull_request_target" not in text
     assert "workflow_run" not in text
+    assert "cache:" not in text
+    assert text.replace("\r\n", "\n").count("permissions:") == 1
 
 
 # ---------------------------------------------------------------------------

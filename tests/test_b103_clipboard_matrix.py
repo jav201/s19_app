@@ -56,6 +56,12 @@ _M = ("patch", "#patch_paste_text", "textarea")
 _A_PRIME = ("diff", "#diff_path_a", "input")
 _M_PRIME = ("sje", "#sje_manual", "textarea")
 
+# The workspace rail shows its empty state (and hides ``#search_input``) until
+# a ``LoadedFile`` is present; the walk loads the tracked case-01 image first
+# (the ``needs_project`` place flag).
+_EXAMPLES_DIR = Path(__file__).resolve().parents[1] / "examples"
+_CASE01_S19 = _EXAMPLES_DIR / "case_01_basic_valid" / "firmware.s19"
+
 
 async def _app_with(tmp_path: Path):
     app = S19TuiApp(base_dir=tmp_path)
@@ -200,7 +206,7 @@ def test_at_i1a_matrix_copy_then_paste(tmp_path: Path, cell: dict) -> None:
 def _single_line_places():
     """(screen_key, widget_id, needs_project) for R-TUI-044.1/1-17."""
     return [
-        ("workspace", "#search_input", False),
+        ("workspace", "#search_input", True),
         ("a2l", "#a2l_tags_filter_input", False),
         ("mac", "#mac_search_input", False),
         ("patch", "#patch_entry_address_input", False),
@@ -216,10 +222,14 @@ def test_r_tui_044_1_walk_single_line_round_trip(tmp_path: Path, place: tuple) -
     """R-TUI-044.1/1-6,9 (LinuxH): a Ctrl+C/Ctrl+V and a right-click round trip."""
     if not _LINUXH:
         pytest.skip("Windows only")
-    screen_key, widget_id, _ = place
+    screen_key, widget_id, needs_project = place
 
     async def _drive() -> tuple:
         async for app, pilot in _app_with(tmp_path):
+            if needs_project:
+                app.load_selected_file(_CASE01_S19)
+                for _ in range(4):
+                    await pilot.pause()
             await _activate(app, pilot, screen_key)
             widget = app.query_one(widget_id, Input)
             widget.focus()

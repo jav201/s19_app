@@ -593,7 +593,7 @@ def _own_write(text: str) -> bool:
     kernel32.GlobalLock.restype = ctypes.c_void_p
     kernel32.GlobalUnlock.argtypes = [wintypes.HGLOBAL]
     kernel32.GlobalUnlock.restype = wintypes.BOOL
-    data = text.encode("utf-16-le") + b"\x00\x00"
+    data = text.encode("utf-16-le", "surrogatepass") + b"\x00\x00"
     handle = kernel32.GlobalAlloc(0x0002, len(data))
     if not handle:
         return False
