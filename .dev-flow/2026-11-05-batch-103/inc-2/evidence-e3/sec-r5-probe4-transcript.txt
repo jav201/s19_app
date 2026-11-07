@@ -1,0 +1,5 @@
+s19_app.__file__ = ~/work/s19_app/s19_app/__init__.py
+[H1] H1 ASCII NUMBER 10^12: tag address=16 length=1000000000000 matrix_dim=None | pages the index files it under=3,906,250,001 | R-A2L-DEF.7.2 refuses its own definition: True
+[H2] H2 MEASUREMENT MATRIX_DIM 2^32: tag address=16 length=8589934592 matrix_dim=4294967296 | pages the index files it under=33,554,433 | R-A2L-DEF.7.2 refuses its own definition: True
+[H3] H3 VALUE with a LENGTH line 10^11: tag address=16 length=99999999999 matrix_dim=None | pages the index files it under=390,625,001 | R-A2L-DEF.7.2 refuses its own definition: True
+[H4] H4 MEASUREMENT DATA_SIZE 0x7FFFFFFFFFFF: tag address=16 length=140737488355327 matrix_dim=None | pages the index files it under=549,755,813,889 | R-A2L-DEF.7.2 refuses its own definition: True
