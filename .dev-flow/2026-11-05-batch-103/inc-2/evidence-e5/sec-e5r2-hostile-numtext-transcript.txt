@@ -1,0 +1,4 @@
+s19_app.__file__ = /tmp/b103-e5r2-2a-sec/tree/s19_app/__init__.py | python 3.11.18 | a2l_definition md5 f661674b | control 0691 md5 820a4c3a | mutation lists md5 030c3f2f | load 12.04 6.19 5.25 | mode numtext
+[numtext] 60 calls over 15 magnitudes x 2 signs x 2 forms: exceptions 0, equal to the rule 60, differs 0, longest 257 chars, over 257 0
+end | load 12.04 6.19 5.25
+exit=0 seconds=1
