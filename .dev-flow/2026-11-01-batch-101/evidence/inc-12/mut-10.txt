@@ -1,0 +1,322 @@
+base commit: 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+mutant: M10
+
+mutation:
+==== NEW FILE conftest.py ====
+"""E5 M10: Escape on the open SelectOverlay applies the highlighted option."""
+from textual.widgets._select import SelectOverlay
+
+_orig_action_dismiss = SelectOverlay.action_dismiss
+
+
+def _action_dismiss_apply(self) -> None:
+    if self.highlighted is not None:
+        self.post_message(self.UpdateSelection(self.highlighted))
+    _orig_action_dismiss(self)
+
+
+SelectOverlay.action_dismiss = _action_dismiss_apply
+
+
+s19_app.__file__: <HOME>/work/s19_i12mut_m10/s19_app/__init__.py
+
+--- landed grep M10: 'conftest.py' marker='UpdateSelection' expected=present found=present OK=True ---
+9:        self.post_message(self.UpdateSelection(self.highlighted))
+
+
+nodes (3):
+  tests/test_b101_reach_and_reports_escape.py::test_r_dlg_15_1_escape_with_the_dropdown_open_closes_only_the_list
+  tests/test_b101_reach_and_reports_escape.py::test_r_dlg_15_2_escape_with_the_gating_dropdown_open_closes_only_the_list
+  tests/test_b101_reach_and_reports_escape.py::test_at_i12_1_escape_closes_reports_from_list_box_and_dropdown
+
+
+--- pytest ---
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+______ test_r_dlg_15_1_escape_with_the_dropdown_open_closes_only_the_list ______
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-888/test_r_dlg_15_1_escape_with_th0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f6989583d90>
+
+    def test_r_dlg_15_1_escape_with_the_dropdown_open_closes_only_the_list(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """R-DLG.15/1: Escape with the Reports filter dropdown open (highlight on
+        ``f1.json``) closes only its list: the dialog stays, the dropdown stays blank and
+        no ``Report filter:`` status shows; a second Escape closes the dialog and a
+        reopening shows the dropdown blank."""
+        statuses = record_statuses(monkeypatch)
+    
+        async def scenario(app, pilot) -> None:
+            await _reports_project(app, pilot)
+            screen = await _open_reports(app, pilot)
+            select = await _focus(app, pilot, "report_filter_select")
+            await pilot.press("enter")
+            await settled(pilot, lambda: select.expanded, "the filter list opens", timeout=CLOSE_WAIT_S)
+            await pilot.press("down")
+            await settle(pilot)
+            assert "f1.json" in _highlighted_prompt(select), _highlighted_prompt(select)
+            mark = len(statuses)
+            await pilot.press("escape")
+            await settled(pilot, lambda: not select.expanded, "the filter list closed", timeout=CLOSE_WAIT_S)
+            await settle(pilot)
+            assert app.screen is screen and isinstance(app.screen, ReportViewerScreen), _stack(app)
+            assert select.value is Select.NULL, select.value
+            assert [m for m in statuses[mark:] if m.startswith("Report filter:")] == []
+            assert [m for m in app.log_lines if m.startswith("Report filter:")] == []
+            await pilot.press("escape")
+            await _await_closed(app, pilot, "the second escape")
+            screen = await _open_reports(app, pilot)
+            assert screen.query_one("#report_filter_select", Select).value is Select.NULL
+    
+>       _run(tmp_path, scenario)
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:940: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:680: in _run
+    asyncio.run(_go())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:678: in _go
+    await scenario(app, pilot)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+
+    async def scenario(app, pilot) -> None:
+        await _reports_project(app, pilot)
+        screen = await _open_reports(app, pilot)
+        select = await _focus(app, pilot, "report_filter_select")
+        await pilot.press("enter")
+        await settled(pilot, lambda: select.expanded, "the filter list opens", timeout=CLOSE_WAIT_S)
+        await pilot.press("down")
+        await settle(pilot)
+        assert "f1.json" in _highlighted_prompt(select), _highlighted_prompt(select)
+        mark = len(statuses)
+        await pilot.press("escape")
+        await settled(pilot, lambda: not select.expanded, "the filter list closed", timeout=CLOSE_WAIT_S)
+        await settle(pilot)
+        assert app.screen is screen and isinstance(app.screen, ReportViewerScreen), _stack(app)
+>       assert select.value is Select.NULL, select.value
+E       AssertionError: f1.json
+E       assert 'f1.json' is Select.NULL
+E        +  where 'f1.json' = Select(id='report_filter_select').value
+E        +  and   Select.NULL = Select.NULL
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:932: AssertionError
+__ test_r_dlg_15_2_escape_with_the_gating_dropdown_open_closes_only_the_list ___
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-888/test_r_dlg_15_2_escape_with_th0')
+
+    def test_r_dlg_15_2_escape_with_the_gating_dropdown_open_closes_only_the_list(tmp_path: Path) -> None:
+        """R-DLG.15/2: Escape with the Edit block gating dropdown of a CHECK block open
+        (highlight on ``block-own-op``) closes only its list and leaves the gating
+        ``advisory``; a second Escape closes Edit block and the block keeps ``advisory``."""
+    
+        async def scenario(app, pilot) -> None:
+            await fx_project(app)
+            panel = await open_flow_builder(app, pilot)
+            panel.query_one("#flow_palette_check").press()
+            await settle(pilot)
+            panel.query_one("#flow_ref").value = "baseline.chk.json"
+            panel.query_one("#flow_add").press()
+            await settled(pilot, lambda: len(panel.current_flow.blocks) == 1, "the CHECK block added", timeout=CLOSE_WAIT_S)
+            assert panel.current_flow.blocks[0].gating == "advisory"
+            panel.query_one("#flow_pick").value = "1"
+            panel.query_one("#flow_edit").press()
+            await settled(
+                pilot, lambda: isinstance(app.screen, FlowBlockEditScreen), "Edit block opens", timeout=CLOSE_WAIT_S
+            )
+            await settle(pilot)
+            gating = await _focus(app, pilot, "flow_edit_gating")
+            assert gating.value == "advisory"
+            await pilot.press("enter")
+            await settled(pilot, lambda: gating.expanded, "the gating list opens", timeout=CLOSE_WAIT_S)
+            await pilot.press("down")
+            await settle(pilot)
+            assert "block-own-op" in _highlighted_prompt(gating), _highlighted_prompt(gating)
+            await pilot.press("escape")
+            await settled(pilot, lambda: not gating.expanded, "the gating list closed", timeout=CLOSE_WAIT_S)
+            await settle(pilot)
+            assert isinstance(app.screen, FlowBlockEditScreen), _stack(app)
+            assert gating.value == "advisory", gating.value
+            await pilot.press("escape")
+            await settled(
+                pilot, lambda: not isinstance(app.screen, FlowBlockEditScreen), "Edit block closed", timeout=CLOSE_WAIT_S
+            )
+            await settle(pilot)
+            assert panel.current_flow.blocks[0].gating == "advisory"
+    
+>       _run(tmp_path, scenario)
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:982: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:680: in _run
+    asyncio.run(_go())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:678: in _go
+    await scenario(app, pilot)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+
+    async def scenario(app, pilot) -> None:
+        await fx_project(app)
+        panel = await open_flow_builder(app, pilot)
+        panel.query_one("#flow_palette_check").press()
+        await settle(pilot)
+        panel.query_one("#flow_ref").value = "baseline.chk.json"
+        panel.query_one("#flow_add").press()
+        await settled(pilot, lambda: len(panel.current_flow.blocks) == 1, "the CHECK block added", timeout=CLOSE_WAIT_S)
+        assert panel.current_flow.blocks[0].gating == "advisory"
+        panel.query_one("#flow_pick").value = "1"
+        panel.query_one("#flow_edit").press()
+        await settled(
+            pilot, lambda: isinstance(app.screen, FlowBlockEditScreen), "Edit block opens", timeout=CLOSE_WAIT_S
+        )
+        await settle(pilot)
+        gating = await _focus(app, pilot, "flow_edit_gating")
+        assert gating.value == "advisory"
+        await pilot.press("enter")
+        await settled(pilot, lambda: gating.expanded, "the gating list opens", timeout=CLOSE_WAIT_S)
+        await pilot.press("down")
+        await settle(pilot)
+        assert "block-own-op" in _highlighted_prompt(gating), _highlighted_prompt(gating)
+        await pilot.press("escape")
+        await settled(pilot, lambda: not gating.expanded, "the gating list closed", timeout=CLOSE_WAIT_S)
+        await settle(pilot)
+        assert isinstance(app.screen, FlowBlockEditScreen), _stack(app)
+>       assert gating.value == "advisory", gating.value
+E       AssertionError: block-own-op
+E       assert 'block-own-op' == 'advisory'
+E         
+E         - advisory
+E         + block-own-op
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:974: AssertionError
+________ test_at_i12_1_escape_closes_reports_from_list_box_and_dropdown ________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-888/test_at_i12_1_escape_closes_re0')
+
+    def test_at_i12_1_escape_closes_reports_from_list_box_and_dropdown(tmp_path: Path) -> None:
+        """AT-I12-1 (US-I12-3; rows R-DLG.2, R-DLG.15): through the keys, Escape closes
+        the dialog from the rendered list and from the path box with ``abc`` typed (the
+        focus and window as before ``t``, nothing applied), and with the filter list
+        open Escape closes the list alone and the next one the dialog."""
+    
+        async def scenario(app, pilot) -> None:
+            project = await _reports_project(app, pilot)
+            known = _known(app)
+            two = ["20261106T100000Z-report.md", "20261106T110000Z-report.md"]
+            screen = await _open_reports(app, pilot)
+            await pilot.press("enter")
+            await settled(pilot, lambda: screen.selected_path is not None, "a report rendered", timeout=CLOSE_WAIT_S)
+            await pilot.press("escape")
+            await _await_closed(app, pilot, "first escape")
+            assert (app.focused, app._active_screen_key) == known
+            screen = await _open_reports(app, pilot)
+            await _tab_to(app, pilot, "report_filter_path")
+            await pilot.press("a", "b", "c")
+            await settle(pilot)
+            assert screen.query_one("#report_filter_path").value == "abc"
+            await pilot.press("escape")
+            await _await_closed(app, pilot, "second escape")
+            assert (app.focused, app._active_screen_key) == known
+            screen = await _open_reports(app, pilot)
+            assert screen.query_one("#report_filter_path").value == ""
+            select = screen.query_one("#report_filter_select", Select)
+            assert select.value is Select.NULL
+            await _tab_to(app, pilot, "report_filter_select")
+            await pilot.press("enter")
+            await settled(pilot, lambda: select.expanded, "the filter list opens", timeout=CLOSE_WAIT_S)
+            await pilot.press("down")
+            await settle(pilot)
+            await pilot.press("escape")
+            await settled(pilot, lambda: not select.expanded, "the filter list closed", timeout=CLOSE_WAIT_S)
+            await settle(pilot)
+            assert app.screen is screen and select.value is Select.NULL
+            await pilot.press("escape")
+            await _await_closed(app, pilot, "last escape")
+            assert _report_files(project) == two
+    
+>       _run(tmp_path, scenario)
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:1041: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:680: in _run
+    asyncio.run(_go())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:678: in _go
+    await scenario(app, pilot)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+
+    async def scenario(app, pilot) -> None:
+        project = await _reports_project(app, pilot)
+        known = _known(app)
+        two = ["20261106T100000Z-report.md", "20261106T110000Z-report.md"]
+        screen = await _open_reports(app, pilot)
+        await pilot.press("enter")
+        await settled(pilot, lambda: screen.selected_path is not None, "a report rendered", timeout=CLOSE_WAIT_S)
+        await pilot.press("escape")
+        await _await_closed(app, pilot, "first escape")
+        assert (app.focused, app._active_screen_key) == known
+        screen = await _open_reports(app, pilot)
+        await _tab_to(app, pilot, "report_filter_path")
+        await pilot.press("a", "b", "c")
+        await settle(pilot)
+        assert screen.query_one("#report_filter_path").value == "abc"
+        await pilot.press("escape")
+        await _await_closed(app, pilot, "second escape")
+        assert (app.focused, app._active_screen_key) == known
+        screen = await _open_reports(app, pilot)
+        assert screen.query_one("#report_filter_path").value == ""
+        select = screen.query_one("#report_filter_select", Select)
+        assert select.value is Select.NULL
+        await _tab_to(app, pilot, "report_filter_select")
+        await pilot.press("enter")
+        await settled(pilot, lambda: select.expanded, "the filter list opens", timeout=CLOSE_WAIT_S)
+        await pilot.press("down")
+        await settle(pilot)
+        await pilot.press("escape")
+        await settled(pilot, lambda: not select.expanded, "the filter list closed", timeout=CLOSE_WAIT_S)
+        await settle(pilot)
+>       assert app.screen is screen and select.value is Select.NULL
+E       AssertionError: assert (ReportViewerScreen() is ReportViewerScreen() and 'f1.json' is Select.NULL)
+E        +  where ReportViewerScreen() = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}).screen
+E        +  and   'f1.json' = Select(id='report_filter_select').value
+E        +  and   Select.NULL = Select.NULL
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:1036: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_reach_and_reports_escape.py::test_r_dlg_15_1_escape_with_the_dropdown_open_closes_only_the_list
+FAILED tests/test_b101_reach_and_reports_escape.py::test_r_dlg_15_2_escape_with_the_gating_dropdown_open_closes_only_the_list
+FAILED tests/test_b101_reach_and_reports_escape.py::test_at_i12_1_escape_closes_reports_from_list_box_and_dropdown
+3 failed in 19.06s

@@ -1,0 +1,143 @@
+base commit: 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+mutant: M15
+
+mutation:
+==== diff -u s19_app/tui/app.py ====
+--- <HOME>/work/s19_i12mut/s19_app/tui/app.py	2026-11-07 05:38:44.570960736 -0600
++++ <HOME>/work/s19_i12mut_m15/s19_app/tui/app.py	2026-11-07 06:05:18.742282864 -0600
+@@ -17474,7 +17474,6 @@
+             Used by:
+                 - Textual message dispatch (from ``IssueRow``)
+         """
+-        self._update_issues_hex_pane(event.address)
+ 
+     def on_check_row_selected(self, event: "CheckRow.Selected") -> None:
+         """
+
+
+s19_app.__file__: <HOME>/work/s19_i12mut_m15/s19_app/__init__.py
+
+--- landed grep M15: 's19_app/tui/app.py' marker='_update_issues_hex_pane(event.address)' expected=absent found=absent OK=True ---
+
+
+nodes (1):
+  tests/test_b101_reach_and_reports_escape.py::test_at_i12_2_rail_keys_and_issue_peek_after_the_aliases_go
+
+
+--- pytest ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________ test_at_i12_2_rail_keys_and_issue_peek_after_the_aliases_go __________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-893/test_at_i12_2_rail_keys_and_is0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-893/b101_i12_case080')
+
+    def test_at_i12_2_rail_keys_and_issue_peek_after_the_aliases_go(tmp_path: Path, case08: Path) -> None:
+        """AT-I12-2 (US-I12-1; rows R-SHELL-KEYS.3, R-TUI-021.3, R-ISSUES-HEXPANE-001.1):
+        keys ``2``, ``3``, ``1`` show the A2L Explorer, the MAC View and the Workspace;
+        Enter on the first Issues row whose address lies in the image keeps the Issues
+        window shown and paints that address's hex row in the peek."""
+    
+        async def scenario(app, pilot) -> None:
+            image = case08 / "firmware.s19"
+            app.load_selected_file(image)
+            await wait_until(
+                pilot,
+                lambda: app.current_file is not None and app.current_file.path.name == image.name,
+                "the image load did not finish", timeout=LOAD_WAIT_S,
+            )
+            await settle_workers(pilot)
+            app.load_a2l_from_path(case08 / "firmware_issues.a2l")
+            await wait_until(
+                pilot, lambda: app.current_a2l_data is not None, "the A2L load did not finish", timeout=LOAD_WAIT_S
+            )
+            await settle_workers(pilot)
+            await wait_until(
+                pilot, lambda: len(app._validation_issues) > 0, "no validation issues after the loads",
+                timeout=LOAD_WAIT_S,
+            )
+            await settle(pilot)
+            for key, window in (("2", "a2l"), ("3", "mac"), ("1", "workspace")):
+                await pilot.press(key)
+                await settled(
+                    pilot, lambda: app._active_screen_key == window,
+                    f"key {key} shows {window}; shown {app._active_screen_key}", timeout=CLOSE_WAIT_S,
+                )
+            await pilot.press("5")
+            await settled(
+                pilot, lambda: app._active_screen_key == "issues" and bool(list(app.query(IssueRow))),
+                "the Issues window lists rows", timeout=CLOSE_WAIT_S,
+            )
+            mem_map = app.current_file.mem_map
+            rows = [r for r in app.query(IssueRow) if isinstance(r.issue.address, int) and r.issue.address in mem_map]
+            assert rows, "no listed issue has an address inside the image"
+            row = rows[0]
+            address = row.issue.address
+            pane = app.query_one("#issues_hex_pane")
+            before = str(pane.render())
+            wanted = f"{address - address % 16:08X}"
+            assert wanted not in before, before
+            row.focus()
+            await settle(pilot)
+            await pilot.press("enter")
+            await settled(
+                pilot, lambda: wanted in str(pane.render()),
+                f"the peek paints the row {wanted}; it shows {str(pane.render())!r}", timeout=CLOSE_WAIT_S,
+            )
+            assert app._active_screen_key == "issues"
+    
+>       _run(tmp_path, scenario)
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:1106: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:680: in _run
+    asyncio.run(_go())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:678: in _go
+    await scenario(app, pilot)
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:1100: in scenario
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_at_i12_2_rail_keys_and_issue_peek_after_the_aliases_go.<locals>.scenario.<locals>.<lambda> at 0x7f3916f379c0>
+failure = "did not settle: the peek paints the row 00C00FF0; it shows ''"
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: did not settle: the peek paints the row 00C00FF0; it shows ''
+
+tests/support/timing.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_reach_and_reports_escape.py::test_at_i12_2_rail_keys_and_issue_peek_after_the_aliases_go
+1 failed in 22.70s

@@ -1,0 +1,17 @@
+=== Inc 12 E5 corrective: e5c-13-law-guards
+date: 2026-11-07T12:30:31Z  host: LAN Linux host 2  python: Python 3.11.18
+base: 6f1743c1ad54ff7db89e8fcd4e96266414950f42  main: 6f1743c1ad54ff7db89e8fcd4e96266414950f42  staged tree: de2521d3285fdc05eb7ea84b03caa4f68bf5d285
+s19_app.__file__ = <HOME>/work/s19_i12c/s19_app/__init__.py
+CMD: env -u NO_COLOR PYTHONPATH=<HOME>/work/s19_i12c python -m pytest -q -p no:cacheprovider -n 8 -rf tests/test_address_census.py tests/test_suite_hygiene.py tests/test_id_registry.py tests/test_engine_unchanged.py tests/test_docs_canon.py tests/test_b101_doc_hygiene.py tests/test_b101_help_legend_docs.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 32%]
+........................................................................ [ 65%]
+........................................................................ [ 97%]
+.....                                                                    [100%]
+============================= QC-TM timing margins =============================
+49.6%  0.202 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+66.1%  0.508 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 2 bounds, 0 under 20 % margin
+221 passed in 148.64s (0:02:28)

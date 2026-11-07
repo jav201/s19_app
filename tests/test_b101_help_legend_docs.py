@@ -1830,6 +1830,15 @@ _GUIDE_PASSAGES = (
     ("ch21-html-reports.md",
      ("names and paths carry a backslash",),
      ("`CAL\\_A`", "paths stay as written", "a plain-text search")),
+    # batch-101 Inc 12 (R-DOC-GUIDE.1/13 and /14; E3 U-5): the Reports dialog
+    # closes with Escape, so ch16.1 splits Close from the chips and ch18.5
+    # drops the finding id from the user's text.
+    ("ch16-reports.md",
+     ("Open reports/, `?`, Close",),
+     ("| Close | button / `esc` |", "| Open reports/, `?` | chips |")),
+    ("ch18-flow-execution.md",
+     ("`esc` does not close this viewer",),
+     ("**Close** or `esc`.",)),
 )
 
 
@@ -1922,10 +1931,12 @@ def test_r_doc_guide_1_12_capture_notes_beside_their_captures() -> None:
 #: supersession with F-05, F-06 and F-40, the three findings it fixes
 #: (8 -> 11); F-47 stays unmarked (carried, not reproduced). batch-101 Inc 9
 #: extends it by named supersession with F-45 and F-46, the two findings it
-#: fixes (11 -> 13).
+#: fixes (11 -> 13). batch-101 Inc 12 extends it by named supersession with
+#: F-33, F-34, F-35 and F-51, the four findings it fixes (13 -> 17); F-35 is
+#: marked here because Inc 12b (its other half) is on main before Inc 12.
 _FIXED = (
-    "F-05", "F-06", "F-16", "F-28", "F-30", "F-37", "F-38", "F-40", "F-41",
-    "F-42", "F-45", "F-46", "F-49",
+    "F-05", "F-06", "F-16", "F-28", "F-30", "F-33", "F-34", "F-35", "F-37",
+    "F-38", "F-40", "F-41", "F-42", "F-45", "F-46", "F-49", "F-51",
 )
 
 
@@ -1942,7 +1953,7 @@ def _findings_rows() -> Dict[str, str]:
 
 def test_r_doc_guide_2_1_fixed_rows_marked() -> None:
     rows = _findings_rows()
-    assert len(_FIXED) == 13
+    assert len(_FIXED) == 17
     unmarked = [
         f for f in _FIXED if not rows.get(f, "").endswith(_FIXED_MARK.get(f, "fixed in 1.0.0"))
     ]

@@ -1,0 +1,33 @@
+=== Inc 12 E5 corrective: mutant M14b
+date: 2026-11-07T12:25:47Z  host: LAN Linux host 2  python: Python 3.11.18
+base: 6f1743c1ad54ff7db89e8fcd4e96266414950f42  staged tree: de2521d3285fdc05eb7ea84b03caa4f68bf5d285
+mutation M14b applied
+ s19_app/tui/screens.py | 1 +
+ 1 file changed, 1 insertion(+)
+s19_app.__file__ = <HOME>/work/s19_i12c_mut/s19_app/__init__.py
+CMD: env -u NO_COLOR PYTHONPATH=<HOME>/work/s19_i12c_mut python -m pytest -q -p no:cacheprovider -p no:xdist tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_1_escape_on_the_report_list_closes_reports tests/test_b101_reach_and_reports_escape.py::test_at_i12_1_escape_closes_reports_from_list_box_and_dropdown
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+
+    async def scenario(app, pilot) -> None:
+        project = await _reports_project(app, pilot)
+        known = await _known_off_default(app, pilot)
+        two = ["20261106T100000Z-report.md", "20261106T110000Z-report.md"]
+        screen = await _open_reports(app, pilot)
+        await pilot.press("enter")
+        await settled(pilot, lambda: screen.selected_path is not None, "a report rendered", timeout=CLOSE_WAIT_S)
+        await pilot.press("escape")
+        await _await_closed(app, pilot, "first escape")
+>       assert (app.focused, app._active_screen_key) == known
+E       AssertionError: assert (ListView(id=..., 'workspace') == (ListView(id=..., 'workspace')
+E         
+E         At index 0 diff: ListView(id='files_list') != ListView(id='sections_list')
+E         Use -v to get more diff
+
+../s19_i12c/tests/test_b101_reach_and_reports_escape.py:1039: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_1_escape_on_the_report_list_closes_reports
+FAILED tests/test_b101_reach_and_reports_escape.py::test_at_i12_1_escape_closes_reports_from_list_box_and_dropdown
+2 failed in 10.27s

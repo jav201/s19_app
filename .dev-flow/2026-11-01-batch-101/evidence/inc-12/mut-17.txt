@@ -1,0 +1,105 @@
+base commit: 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+mutant: M17
+
+mutation:
+==== diff -u s19_app/tui/window_help.py ====
+--- <HOME>/work/s19_i12mut/s19_app/tui/window_help.py	2026-11-07 05:38:44.498937965 -0600
++++ <HOME>/work/s19_i12mut_m17/s19_app/tui/window_help.py	2026-11-07 06:07:55.126766355 -0600
+@@ -744,7 +744,8 @@
+ 
+     def action_close_window_help(self) -> None:
+         logger.info("WindowHelpScreen dismissed by escape.")
+-        self.dismiss(None)
++        self.app.pop_screen()
++        self.app.pop_screen()
+ 
+     def on_button_pressed(self, event: Button.Pressed) -> None:
+         if event.button.id == "window_help_close":
+
+
+s19_app.__file__: <HOME>/work/s19_i12mut_m17/s19_app/__init__.py
+
+--- landed grep M17: 's19_app/tui/window_help.py' marker='pop_screen' expected=present found=present OK=True ---
+747:        self.app.pop_screen()
+748:        self.app.pop_screen()
+
+
+nodes (1):
+  tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_12_escape_in_its_help_window_keeps_reports_open
+
+
+--- pytest ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________ test_r_dlg_2_12_escape_in_its_help_window_keeps_reports_open _________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-895/test_r_dlg_2_12_escape_in_its_0')
+
+    def test_r_dlg_2_12_escape_in_its_help_window_keeps_reports_open(tmp_path: Path) -> None:
+        """R-DLG.2/12: Escape in the help window opened from the Reports dialog closes
+        that window alone (it holds on the base)."""
+    
+        async def scenario(app, pilot) -> None:
+            await _reports_project(app, pilot)
+            await _open_reports(app, pilot)
+            await _focus(app, pilot, "report_list")
+            await pilot.press("question_mark")
+            await settled(
+                pilot, lambda: isinstance(app.screen, WindowHelpScreen), "the Reports help window opens",
+                timeout=CLOSE_WAIT_S,
+            )
+            assert _stack(app)[-2:] == ["ReportViewerScreen", "WindowHelpScreen"], _stack(app)
+            await pilot.press("escape")
+            await settled(
+                pilot, lambda: not any(isinstance(s, WindowHelpScreen) for s in app.screen_stack),
+                "the help window closed", timeout=CLOSE_WAIT_S,
+            )
+            assert isinstance(app.screen, ReportViewerScreen), _stack(app)
+    
+>       _run(tmp_path, scenario)
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:900: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:680: in _run
+    asyncio.run(_go())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:678: in _go
+    await scenario(app, pilot)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+
+    async def scenario(app, pilot) -> None:
+        await _reports_project(app, pilot)
+        await _open_reports(app, pilot)
+        await _focus(app, pilot, "report_list")
+        await pilot.press("question_mark")
+        await settled(
+            pilot, lambda: isinstance(app.screen, WindowHelpScreen), "the Reports help window opens",
+            timeout=CLOSE_WAIT_S,
+        )
+        assert _stack(app)[-2:] == ["ReportViewerScreen", "WindowHelpScreen"], _stack(app)
+        await pilot.press("escape")
+        await settled(
+            pilot, lambda: not any(isinstance(s, WindowHelpScreen) for s in app.screen_stack),
+            "the help window closed", timeout=CLOSE_WAIT_S,
+        )
+>       assert isinstance(app.screen, ReportViewerScreen), _stack(app)
+E       AssertionError: ['Screen']
+E       assert False
+E        +  where False = isinstance(Screen(id='_default'), ReportViewerScreen)
+E        +    where Screen(id='_default') = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}).screen
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:898: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_12_escape_in_its_help_window_keeps_reports_open
+1 failed in 4.64s

@@ -1,0 +1,65 @@
+base commit: 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+mutant: M13
+
+mutation:
+==== diff -u docs/user-guide/DOSSIER.md ====
+--- <HOME>/work/s19_i12mut/docs/user-guide/DOSSIER.md	2026-11-07 05:38:44.569938871 -0600
++++ <HOME>/work/s19_i12mut_m13/docs/user-guide/DOSSIER.md	2026-11-07 06:04:12.510423082 -0600
+@@ -757,7 +757,7 @@
+ | F-48 | gap, code + live | A later block cannot reference an external step's output: there is no `#n` reference, binding or `${NAME}` for it. The only way is to type the copy's file name as an ordinary project-relative ref (17.11). The block's docstring says "downstream blocks reference THAT copy". | `flow_model.ExternalStepBlock`, `flow_execution_service.run_flow` (`ExternalStepBlock` branch); ch18-17 |
+ | F-49 | defect, live · fixed in 1.0.0 | When a later run's external output differs, the copy is stored as `<name>_1.<ext>` (no overwrite) but a later block that names the copy still reads the first file: `terminal_out.s19` kept `BENCH=OK` after the step produced `BENCH=V2`. | driver log of the 18.9 run (`step_patch.changes_1.json` written, `terminal_out.s19` unchanged) |
+ | F-50 | limitation, live + code | The Flow Builder pauses at an external step (*PAUSED – WAITING FOR A HUMAN*) but offers no Confirm; the run can only continue from Flow Execution. In Terminal mode the app never runs the command and does not see its exit code — only the existence of the log and output files is checked. | `app.py:on_flow_builder_panel_run_requested` (`FlowContext` without confirmations); ch17-18, ch18-16 |
+-| F-51 | usability, live · fixed in 1.0.0 | `esc` does not close the Reports viewer; only **Close** does (its bindings hold `?` only). | `screens.py:ReportViewerScreen.BINDINGS`; driver log of the 18.9 run |
++| F-51 | usability, live | `esc` does not close the Reports viewer; only **Close** does (its bindings hold `?` only). | `screens.py:ReportViewerScreen.BINDINGS`; driver log of the 18.9 run |
+ 
+ ## 6. Live checks requested
+ 
+
+
+s19_app.__file__: <HOME>/work/s19_i12mut_m13/s19_app/__init__.py
+
+--- landed grep M13: 'docs/user-guide/DOSSIER.md' marker='| F-51 | usability, live |' expected=present found=present OK=True ---
+760:| F-51 | usability, live | `esc` does not close the Reports viewer; only **Close** does (its bindings hold `?` only). | `screens.py:ReportViewerScreen.BINDINGS`; driver log of the 18.9 run |
+
+
+nodes (2):
+  tests/test_b101_help_legend_docs.py::test_r_doc_guide_2_1_fixed_rows_marked
+  tests/test_b101_help_legend_docs.py::test_r_doc_guide_2_2_no_other_row_marked
+
+
+--- pytest ---
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+____________________ test_r_doc_guide_2_1_fixed_rows_marked ____________________
+
+    def test_r_doc_guide_2_1_fixed_rows_marked() -> None:
+        rows = _findings_rows()
+        assert len(_FIXED) == 17
+        unmarked = [
+            f for f in _FIXED if not rows.get(f, "").endswith(_FIXED_MARK.get(f, "fixed in 1.0.0"))
+        ]
+>       assert unmarked == [], f"rows without the fixed mark: {unmarked}"
+E       AssertionError: rows without the fixed mark: ['F-51']
+E       assert ['F-51'] == []
+E         
+E         Left contains one more item: 'F-51'
+E         Use -v to get more diff
+
+../s19_i12mut/tests/test_b101_help_legend_docs.py:1960: AssertionError
+___________________ test_r_doc_guide_2_2_no_other_row_marked ___________________
+
+    def test_r_doc_guide_2_2_no_other_row_marked() -> None:
+        rows = _findings_rows()
+        marked = sorted(f for f, kind in rows.items() if "fixed in 1.0.0" in kind)
+>       assert marked == sorted(_FIXED), f"marked set is not the pinned set: {marked}"
+E       AssertionError: marked set is not the pinned set: ['F-05', 'F-06', 'F-16', 'F-28', 'F-30', 'F-33', 'F-34', 'F-35', 'F-37', 'F-38', 'F-40', 'F-41', 'F-42', 'F-45', 'F-46', 'F-49']
+E       assert ['F-05', 'F-0..., 'F-33', ...] == ['F-05', 'F-0..., 'F-33', ...]
+E         
+E         Right contains one more item: 'F-51'
+E         Use -v to get more diff
+
+../s19_i12mut/tests/test_b101_help_legend_docs.py:1976: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_guide_2_1_fixed_rows_marked
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_guide_2_2_no_other_row_marked
+2 failed in 0.25s

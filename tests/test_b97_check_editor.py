@@ -173,9 +173,10 @@ async def _settled_delay(pilot, predicate, description: str, attempts: int = 120
 
 @pytest.mark.parametrize("size", [(118, 54), (118, 53)])
 def test_tc_b97_08_census_rows_and_one_docked_row(tmp_path: Path, size) -> None:
-    """TC-B97-08 (LLR-145.1): the 36 shipped ids stay (31 of 9c7beaf plus the
+    """TC-B97-08 (LLR-145.1): the 35 shipped ids stay (30 of 9c7beaf plus the
     four batch-102 Inc 3 picker ids, E3 ruling 6, and the batch-102 Inc 4
-    ``#check_param_bulk_button``, E3 ruling 5), the ledger holds the 75
+    ``#check_param_bulk_button``, E3 ruling 5; batch-101 Inc 12 removed the
+    hidden addendum toggle, D-3), the ledger holds the 75
     A2L rows, and Validate, Write, the APPLY ghost and the field count share
     ONE row inside the panel; no apply action exists. The 118x53 arm is the
     body height 118x54 keeps once the two-row key bar lands (PC-24).
@@ -194,7 +195,7 @@ def test_tc_b97_08_census_rows_and_one_docked_row(tmp_path: Path, size) -> None:
         )
 
     ids, rows, docked, panel_region, applies = run(tmp_path, size, body)
-    assert len(CE_IDS_9C7BEAF) == 36
+    assert len(CE_IDS_9C7BEAF) == 35
     assert CE_IDS_9C7BEAF - ids == set(), sorted(CE_IDS_9C7BEAF - ids)
     assert rows == 75
     assert len({r.y for r in docked.values()}) == 1, {i: r.y for i, r in docked.items()}
@@ -983,19 +984,18 @@ def test_tc_b97_61_every_control_displayed_in_its_home(tmp_path: Path, size) -> 
     """TC-B97-61 (LLR-145.10): per tab state each control and read-out of the
     table is displayed inside its home when its condition holds, every
     displayed, enabled control is in the focus chain (18 controls counting the
-    two disabled page controls, 8 read-outs), every control-typed shipped id
-    but the toggle is in the table (16), and ``#check_preview_toggle_button``
-    is mounted and not displayed. The batch-102 Inc 4 bulk-add button (E3
-    ruling 5) homes in the ledger column, after Include.
+    two disabled page controls, 8 read-outs), and every control-typed shipped
+    id is in the table (16). The batch-102 Inc 4 bulk-add button (E3
+    ruling 5) homes in the ledger column, after Include. A control mounted and
+    never shown is the guard of R-CHKED-058/1 (the walk in
+    ``tests/test_b101_shown_widgets.py``).
 
-    RED on main: the toggle is displayed. Mutation: a control left under a
-    hidden pane; a shipped control dropped from the table.
+    Mutation: a control left under a hidden pane; a shipped control dropped
+    from the table.
     """
     from textual.widgets import TextArea
 
     async def body(app, pilot, panel):
-        toggle = panel.query_one("#check_preview_toggle_button")
-        toggle_displayed = is_displayed(toggle)
         typed = {
             i for i in CE_IDS_9C7BEAF
             if isinstance(app.query_one(f"#{i}"), (Button, Input, Select, TextArea, DataTable))
@@ -1032,15 +1032,13 @@ def test_tc_b97_61_every_control_displayed_in_its_home(tmp_path: Path, size) -> 
                             problems.append((chip_id, wid, "not in focus chain"))
                     else:
                         seen_readouts.add(wid)
-        return toggle_displayed, typed, seen_controls, seen_readouts, problems
+        return typed, seen_controls, seen_readouts, problems
 
-    toggle_displayed, typed, controls, readouts, problems = run(tmp_path, size, body)
-    assert toggle_displayed is False, "the addendum toggle is mounted, not displayed"
+    typed, controls, readouts, problems = run(tmp_path, size, body)
     assert problems == [], problems[:5]
     assert len(controls) == 18 and len(readouts) == 8, (len(controls), len(readouts))
     column = {c for home in HOMES.values() for c in home[0]}
-    shipped = typed - {"check_preview_toggle_button"}
-    assert len(shipped) == 16 and shipped <= column, sorted(shipped - column)
+    assert len(typed) == 16 and typed <= column, sorted(typed - column)
 
 
 # --------------------------------------------------------------------------- #
