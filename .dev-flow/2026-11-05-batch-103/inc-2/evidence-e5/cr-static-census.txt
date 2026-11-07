@@ -1,0 +1,47 @@
+# static census, a2l_definition.py at HEAD 069171cd (md5 below): every a2l_data access and every by-name map lookup
+820a4c3afd6c56a65a2f89c95ab682d0 *s19_app/tui/a2l_definition.py
+## a2l_data accesses
+323:    ``a2l_data["tags"]`` maps the tags of each name.  For each name (order
+343:    for tag in a2l_data.get("tags") or []:
+362:    _walk(a2l_data.get("sections") or [])
+474:            a2l_data.get("compu_tabs_by_name") or {},
+729:    layouts = a2l_data.get("record_layouts_by_name") or {}
+1193:            a2l_data.get("compu_tabs_by_name") or {},
+## by-name lookups of section maps (then keyed in reads by id())
+675:    tags = tags_by_name.get(name) or []
+676:    sections = object_sections_by_name.get(name) or []
+731:    entry = layouts.get(layout_name) if layout_name else None
+734:        if key in reads:
+735:            resolved = reads[key]
+749:            reads[key] = resolved
+765:    entry = compu_tabs_by_name.get(ref)
+769:    if key in reads:
+770:        return reads[key]
+776:    reads[key] = form
+804:    section = compu_methods_by_name.get(method_name)
+808:    if key in reads:
+809:        return reads[key]
+868:    reads[key] = form
+974:    section = compu_tables_by_name.get(table_name)
+978:    if key in reads:
+979:        return reads[key]
+1025:    reads[key] = form
+## the TAB_NOINTP run walk
+1338:            while lo > 0 and xs[lo - 1] == xs[lo]:
+## the MATRIX_DIM text and its echo bypass
+4:CHARACTERISTIC, an ASCII CHARACTERISTIC, or a MEASUREMENT whose MATRIX_DIM is
+439:    # datatype, the length = size × MATRIX_DIM (1 when absent).
+546:        if kind_text != "(none)" and not kind_text.startswith("MATRIX_DIM "):
+710:        return None, f"MATRIX_DIM {matrix_dim} MEASUREMENT"
+## raw type word compared (kind, interpolate, display)
+700:            kind = "enum" if conversion_type == "TAB_VERB" else "number"
+708:            kind = "enum" if conversion_type == "TAB_VERB" else "number"
+841:        type_verdict = upper if upper in _SUPPORTED_CONVERSION_TYPES else None
+1179:            table_form, stored, definition.conversion_type == "TAB_INTP"
+1415:        and conversion in (None, "IDENTICAL")
+1420:        or conversion not in (None, "IDENTICAL")
+## generator planned_text
+1058:            "planned_text": "IDLE",
+1075:            "planned_text": str(one_bit),
+1092:            "planned_text": str(field),
+1109:            "planned_text": f"{display_raw * 0.5:.1f}",

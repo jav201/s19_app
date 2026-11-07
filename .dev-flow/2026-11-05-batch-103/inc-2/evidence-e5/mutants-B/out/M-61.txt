@@ -1,0 +1,38 @@
+===== mutant M-61 (2026-11-07T13:23:06Z) =====
+--- unified diff ---
+diff --git a/tools/synth/make_release_case.py b/tools/synth/make_release_case.py
+index 7b843b64..e316c42e 100644
+--- a/tools/synth/make_release_case.py
++++ b/tools/synth/make_release_case.py
+@@ -1090,7 +1090,7 @@ def build_definition_objects(rng: random.Random) -> tuple[dict[str, tuple[int, b
+             "physical": field,
+             "low": "0",
+             "high": "255",
+-            "bit_mask": 0x0FF0,
++            "bit_mask": 0x0FF1,
+             "planned_stored": field,
+             "planned_text": str(field),
+         },
+--- pytest ---
+s19_app.__file__ = /tmp/b103-e5-2-mutB/M-M-61/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________ test_r_a2l_def_61_1_two_disjoint_masks_at_one_address _____________
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...CHARACTERISTIC\n  /end MODULE\n/end PROJECT\n', 'dir': PosixPath('/tmp/pytest-of-javiergr/pytest-932/b103_defc0'), ...}
+
+    def test_r_a2l_def_61_1_two_disjoint_masks_at_one_address(defc):
+        """R-A2L-DEF.61/1 - MASK_BIT_0001 and MASK_FIELD_0001: one address, disjoint masks, popcounts 1 and >= 2."""
+        m = _model()
+        Decoded, decode_definition, describe_definition = m.Decoded, m.decode_definition, m.describe_definition
+        objs = defc["objs"]
+        bit, field = objs["MASK_BIT_0001"], objs["MASK_FIELD_0001"]
+        assert bit["address"] == field["address"] == 0x800010
+>       assert bit["bit_mask"] & field["bit_mask"] == 0
+E       assert (1 & 4081) == 0
+
+tests/test_b103_synth_definitions.py:215: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_synth_definitions.py::test_r_a2l_def_61_1_two_disjoint_masks_at_one_address
+1 failed, 8 deselected in 0.65s
+pytest exit code: 1

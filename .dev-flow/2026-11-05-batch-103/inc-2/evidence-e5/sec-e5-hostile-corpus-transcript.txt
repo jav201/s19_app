@@ -1,0 +1,86 @@
+s19_app.__file__ = /tmp/b103-e5-2a-sec/tree/s19_app/__init__.py | python 3.11.18 | a2l_definition md5 820a4c3a | load 2.99 2.63 2.60 | mode corpus
+A2L section tree has structural errors: path=~/a2l-corpus/fixtures/2.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/103.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/111.a2l sample=Line 4279: /end without /begin
+A2L section tree has structural errors: path=~/a2l-corpus/files/112.a2l sample=Line 1546: /end without /begin
+A2L section tree has structural errors: path=~/a2l-corpus/files/113.a2l sample=Line 3177: /end without /begin
+A2L section tree has structural errors: path=~/a2l-corpus/files/114.a2l sample=Line 574: /end without /begin
+A2L section tree has structural errors: path=~/a2l-corpus/files/124.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/125.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/126.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/14.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/15.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/166.a2l sample=Line 11012: /end without /begin
+A2L section tree has structural errors: path=~/a2l-corpus/files/16.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/17.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/18.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/20.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/21.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/2.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/32.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/35.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/3.a2l sample=Line 936: /end without /begin
+A2L section tree has structural errors: path=~/a2l-corpus/files/40.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/41.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/42.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/43.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/44.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/45.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/46.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/47.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/4.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/60.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/62.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/66.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/6.a2l sample=Line 20: /end without /begin
+A2L section tree has structural errors: path=~/a2l-corpus/files/71.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/75.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/79.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/80.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/81.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/82.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/83.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/84.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/89.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/96.a2l sample=Unclosed /begin sections detected.
+concurrent.futures.process._RemoteTraceback: 
+"""
+Traceback (most recent call last):
+  File "~/miniconda3/envs/s19ci/lib/python3.11/concurrent/futures/process.py", line 261, in _process_worker
+    r = call_item.fn(*call_item.args, **call_item.kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/miniconda3/envs/s19ci/lib/python3.11/concurrent/futures/process.py", line 210, in _process_chunk
+    return [fn(*args) for args in chunk]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/miniconda3/envs/s19ci/lib/python3.11/concurrent/futures/process.py", line 210, in <listcomp>
+    return [fn(*args) for args in chunk]
+            ^^^^^^^^^
+  File "/tmp/b103-e5-2a-sec/sec-e5-hostile.py", line 353, in corpus_one
+    before = hashlib.md5(pickle.dumps(data, protocol=4)).hexdigest()
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RecursionError: maximum recursion depth exceeded while pickling an object
+"""
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/tmp/b103-e5-2a-sec/sec-e5-hostile.py", line 491, in <module>
+    report(pool_run(corpus_one, files), "c")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/b103-e5-2a-sec/sec-e5-hostile.py", line 470, in pool_run
+    for r in ex.map(fn, items, chunksize=1):
+  File "~/miniconda3/envs/s19ci/lib/python3.11/concurrent/futures/process.py", line 620, in _chain_from_iterable_of_lists
+    for element in iterable:
+  File "~/miniconda3/envs/s19ci/lib/python3.11/concurrent/futures/_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/miniconda3/envs/s19ci/lib/python3.11/concurrent/futures/_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+  File "~/miniconda3/envs/s19ci/lib/python3.11/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "~/miniconda3/envs/s19ci/lib/python3.11/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+RecursionError: maximum recursion depth exceeded while pickling an object
+exit=0

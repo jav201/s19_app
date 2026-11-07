@@ -1,0 +1,41 @@
+===== mutant M-60 (2026-11-07T13:23:01Z) =====
+--- unified diff ---
+diff --git a/tools/synth/make_release_case.py b/tools/synth/make_release_case.py
+index 7b843b64..a9c5de83 100644
+--- a/tools/synth/make_release_case.py
++++ b/tools/synth/make_release_case.py
+@@ -1169,7 +1169,7 @@ def emit_definitions_a2l(regions: dict[str, tuple[int, bytearray]], objects: lis
+         out.append("    /end RECORD_LAYOUT")
+     out += [
+         '    /begin COMPU_METHOD CM_DEF_ENUM "synthetic verbal conversion"',
+-        '      TAB_VERB "%.0" ""',
++        '      TAB_NOINTP "%.0" ""',
+         "      COMPU_TAB_REF VT_DEF_STATE",
+         "    /end COMPU_METHOD",
+         '    /begin COMPU_VTAB VT_DEF_STATE "synthetic states"',
+--- pytest ---
+s19_app.__file__ = /tmp/b103-e5-2-mutB/M-M-60/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____ test_r_a2l_def_60_1_the_definitions_case_has_an_enum_with_a_default ______
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...CHARACTERISTIC\n  /end MODULE\n/end PROJECT\n', 'dir': PosixPath('/tmp/pytest-of-javiergr/pytest-931/b103_defc0'), ...}
+
+    def test_r_a2l_def_60_1_the_definitions_case_has_an_enum_with_a_default(defc):
+        """R-A2L-DEF.60/1 - ENUM_0001: kind enum, >= 3 pairs, a DEFAULT_VALUE, decodes to the planned pair's text."""
+        m = _model()
+        Decoded, decode_definition, describe_definition = m.Decoded, m.decode_definition, m.describe_definition
+        obj = defc["objs"]["ENUM_0001"]
+        d = describe_definition("ENUM_0001", defc["a2l"])
+>       assert d.refusal is None and d.kind == "enum"
+E       AssertionError: assert (None is None and 'number' == 'enum'
+E        +  where None = Definition(name='ENUM_0001', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=8388608, byte_length=...=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref='VT_DEF_STATE', refusal=None).refusal
+E         
+E         - enum
+E         + number)
+
+tests/test_b103_synth_definitions.py:198: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_synth_definitions.py::test_r_a2l_def_60_1_the_definitions_case_has_an_enum_with_a_default
+1 failed, 8 deselected in 0.64s
+pytest exit code: 1

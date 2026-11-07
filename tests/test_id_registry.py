@@ -183,10 +183,11 @@ from tools.id_registry import (
 # tests/test_b101_document_homes.py).
 # batch-103 Inc 4 E4: 267 -> 269 (tests/test_b103_label_match.py,
 # tests/test_b103_label_match_perf.py); re-measured at integration.
-# batch-103 Inc 1a E4: 269 -> 272 (retire tests/test_clipboard_tk_singleton.py;
-# add tests/test_b103_clipboard_core.py, _windows.py, _matrix.py and
-# tests/support/b103_clipboard.py); re-measured at integration.
-EXPECTED_SCANNED_TEST_FILES = 272
+# batch-103 Inc 1a E4: +3 net (retire tests/test_clipboard_tk_singleton.py; add
+# tests/test_b103_clipboard_core.py, _windows.py, _matrix.py and tests/support/b103_clipboard.py).
+# batch-103 Inc 2a: +3 (tests/test_b103_a2l_definition.py, tests/test_b103_a2l_definition_perf.py,
+# tests/test_b103_synth_definitions.py). Merged: 269 + 3 + 3 = 275; re-measured at integration.
+EXPECTED_SCANNED_TEST_FILES = 275
 """Test modules scanned, including this one.
 
 batch-101 Inc 11: 250 -> 253. ``tests/test_b101_a2l_blocks_and_segments.py``,

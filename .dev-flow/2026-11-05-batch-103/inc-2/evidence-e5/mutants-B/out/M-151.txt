@@ -1,0 +1,194 @@
+===== mutant M-151 (2026-11-07T13:23:53Z) =====
+--- unified diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..42d4a532 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -193,11 +193,7 @@ def _echo(word: str) -> str:
+     """Write a file word into a message: its first 256 characters, each
+     character outside U+0021-U+007E written as U+FFFD, and ``…`` after them
+     when the word is longer (R-A2L-DEF.151)."""
+-    cut = len(word) > _ECHO_LIMIT
+-    body = word[:_ECHO_LIMIT]
+-    return "".join(
+-        ch if 0x21 <= ord(ch) <= 0x7E else "\uFFFD" for ch in body
+-    ) + (_ELLIPSIS if cut else "")
++    return _clean(word) or ""
+ 
+ 
+ def _finite_number(word: object) -> Optional[float]:
+--- pytest ---
+s19_app.__file__ = /tmp/b103-e5-2-mutB/M-M-151/s19_app/__init__.py
+.FFFFF                                                                   [100%]
+=================================== FAILURES ===================================
+_ test_r_a2l_def_151_2_a_word_of_257_characters_is_cut_at_describe_and_at_decode _
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-938/test_r_a2l_def_151_2_a_word_of0')
+
+    def test_r_a2l_def_151_2_a_word_of_257_characters_is_cut_at_describe_and_at_decode(tmp_path):
+        """R-A2L-DEF.151/2 - the first 256 characters and an ellipsis; describe and decode messages alike; each message <= 1,024."""
+        n = 257
+        N, K, M, Z, G, E, F = ("N" * n, "K" * n, "M" * n, "Z" * n, "G" * n, "E" * n, "F" * n)
+        # the 257-character forms of KX2 ... BM2, and the two decode objects
+        a2l = _inline(
+            tmp_path,
+            _val(N, "0x10", LAYOUT["UBYTE"], "CM_GONE", "0", "255"),
+            _char("KX2", K, "0x11", LAYOUT["UBYTE"], "NO_COMPU_METHOD", "0", "255"),
+            _val("MX2", "0x12", LAYOUT["UBYTE"], M, "0", "255"),
+            _cm("CM_T2", Z),
+            _val("CT2", "0x13", LAYOUT["UBYTE"], "CM_T2", "0", "255"),
+            _cm("CM_R2", "TAB_VERB", fmt='"%.0"', ref=G),
+            _val("TR2", "0x14", LAYOUT["UBYTE"], "CM_R2", "0", "255"),
+            _cm("CM_E2", "TAB_VERB", fmt='"%.0"', ref=E),
+            f'/begin COMPU_VTAB {E} "" TAB_VERB 0\n/end COMPU_VTAB',
+            _val("TE2", "0x15", LAYOUT["UBYTE"], "CM_E2", "0", "255"),
+            _val("BM2", "0x16", LAYOUT["UWORD"], "NO_COMPU_METHOD", "0", "65535", f"BIT_MASK {F}"),
+            _val("D" * n, "0x20", LAYOUT["UBYTE"], "NO_COMPU_METHOD", "0", "255"),
+            _cm("CM_XN2", "TAB_NOINTP", fmt='"%.0"', ref="V" * n),
+            f'/begin COMPU_VTAB {"V" * n} "" TAB_VERB 1\n  1 "ON"\n/end COMPU_VTAB',
+            _val("X" * n, "0x21", LAYOUT["UBYTE"], "CM_XN2", "0", "255"),
+        )
+        e = lambda w: w[:256] + ELLIPSIS                                      # noqa: E731
+        got = describe_definitions([N, "KX2", "MX2", "CT2", "TR2", "TE2", "BM2", "D" * n, "X" * n, "Q" * n], a2l)
+        want = {
+            N: Refusal("A2L-DEF-METHOD", f"{e(N)}: the conversion method CM_GONE is not declared in the A2L"),
+            "KX2": Refusal("A2L-DEF-KIND", f"KX2: the system has no definition for a {e(K)} object"),
+            "MX2": Refusal("A2L-DEF-METHOD", f"MX2: the conversion method {e(M)} is not declared in the A2L"),
+            "CT2": Refusal("A2L-DEF-CONVERSION", f"CT2: the conversion type {e(Z)} of CM_T2 is not supported"),
+            "TR2": Refusal("A2L-DEF-TABLE", f"TR2: the table {e(G)} of CM_R2 is not declared in the A2L"),
+            "TE2": Refusal("A2L-DEF-TABLE-EMPTY", f"TE2: the table {e(E)} has no entries"),
+            "BM2": Refusal("A2L-DEF-MASK", f"BM2: the bit mask {e(F)} cannot be applied to UWORD"),
+            "Q" * n: Refusal("A2L-DEF-NAME", f"{e('Q' * n)}: no tag of that name in the A2L"),
+        }
+        for key, refusal in want.items():
+>           assert got[key].refusal == refusal, (key[:8], got[key].refusal)
+E           AssertionError: ('NNNNNNNN', Refusal(code='A2L-DEF-METHOD', message='NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN...NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN: the conversion method CM_GONE is not declared in the A2L'))
+E           assert Refusal(code=...d in the A2L') == Refusal(code=...d in the A2L')
+E             
+E             Omitting 1 identical items, use -vv to show
+E             Differing attributes:
+E             ['message']
+E             
+E             Drill down into differing attribute message:
+E               message: 'NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN: the conversion method CM_GONE is not declared in the A2L' != 'NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN...
+E             
+E             ...Full output truncated (7 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:1964: AssertionError
+_ test_r_a2l_def_151_3_each_character_outside_printable_ascii_is_written_as_u_fffd _
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-938/test_r_a2l_def_151_3_each_char0')
+
+    def test_r_a2l_def_151_3_each_character_outside_printable_ascii_is_written_as_u_fffd(tmp_path):
+        """R-A2L-DEF.151/3 - ESC, E-acute and DEL in an echoed word are each U+FFFD (not control characters only)."""
+        word = "{}\x1bÉ\x7f{}"
+        N, T, G, F = word.format("N", "X"), word.format("T", "X"), word.format("G", "X"), word.format("F", "X")
+        a2l = _inline(
+            tmp_path,
+            _val(N, "0x10", LAYOUT["UBYTE"], "CM_GONE", "0", "255"),
+            _cm("CM_T3", T),
+            _val("CT3", "0x11", LAYOUT["UBYTE"], "CM_T3", "0", "255"),
+            _cm("CM_R3", "TAB_VERB", fmt='"%.0"', ref=G),
+            _val("TR3", "0x12", LAYOUT["UBYTE"], "CM_R3", "0", "255"),
+            _val("BM3", "0x14", LAYOUT["UWORD"], "NO_COMPU_METHOD", "0", "65535", f"BIT_MASK {F}"),
+        )
+        got = describe_definitions([N, "CT3", "TR3", "BM3"], a2l)
+        ff = lambda w: w.replace("\x1b", FFFD).replace("É", FFFD).replace("\x7f", FFFD)          # noqa: E731
+>       assert got[N].refusal == Refusal("A2L-DEF-METHOD", f"{ff(N)}: the conversion method CM_GONE is not declared in the A2L")
+E       AssertionError: assert Refusal(code=...d in the A2L') == Refusal(code=...d in the A2L')
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['message']
+E         
+E         Drill down into differing attribute message:
+E           message: 'N�É�X: the conversion method CM_GONE is not declared in the A2L' != 'N���X: the conversion method CM_GONE is not declared in the A2L'...
+E         
+E         ...Full output truncated (5 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:1992: AssertionError
+____ test_r_a2l_def_151_4_a_matrix_dim_number_is_written_by_the_number_rule ____
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-938/test_r_a2l_def_151_4_a_matrix_0')
+
+    def test_r_a2l_def_151_4_a_matrix_dim_number_is_written_by_the_number_rule(tmp_path):
+        """R-A2L-DEF.151/4 (CR-3, E5S-03) - 4,000 decimal digits and 1,000 hexadecimal digits: `0x` form, 256 characters, bounded."""
+        a2l = _inline(
+            tmp_path,
+            _meas("MD4", "UBYTE", "NO_COMPU_METHOD", "0", "255", "MATRIX_DIM " + "9" * 4000, addr="0x10"),
+            _meas("MD5", "UBYTE", "NO_COMPU_METHOD", "0", "255", "MATRIX_DIM 0x" + "F" * 1000, addr="0x11"),
+        )
+        got = describe_definitions(["MD4", "MD5"], a2l)
+        t4 = "0x" + format(10 ** 4000 - 1, "X")[:254] + ELLIPSIS
+>       assert got["MD4"].refusal == Refusal("A2L-DEF-KIND", f"MD4: the system has no definition for a MATRIX_DIM {t4} MEASUREMENT object")
+E       AssertionError: assert Refusal(code=...EMENT object') == Refusal(code=...EMENT object')
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['message']
+E         
+E         Drill down into differing attribute message:
+E           message: 'MD4: the system has no definition for a MATRIX_DIM 0xD1BA8323FE558C610D5C82A286614F3EC25558230C550F78093088D8CC8F6622EF1868022598032266E9D7634A67F99423027A9815E6F4ADEAD564CFAC38AA43C0EB52D95D4FE7143249F10899ECF0064FC09C5C88F6584B42B658F4BEBE13DAC16FDC5CA41A2AC382ECAFFDD43A2BC0661615EB40F940C0334F5931F59706C5A69897427DB56257F77385911DC5C93BF22B9468A39F09A31CBD678253805C46EE9140D5DA1DA4443968748A1F80BA0E16E6ECDDF2EE4F2D8E9DC036462487C88FF9F9AE...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2372: AssertionError
+_ test_r_a2l_def_151_5_the_number_rule_for_an_address_and_a_length_at_its_bound _
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-938/test_r_a2l_def_151_5_the_numbe0')
+
+    def test_r_a2l_def_151_5_the_number_rule_for_an_address_and_a_length_at_its_bound(tmp_path):
+        """R-A2L-DEF.151/5 (E5S-03) - addresses of 1,500 hex digits are cut; 2^64 - 1 stays decimal and 2^64 is `0x` form."""
+        a2l = _inline(
+            tmp_path,
+            _meas("AH", "UBYTE", "NO_COMPU_METHOD", "0", "255", addr="0x" + "F" * 1500),
+            _val("CH", "0x" + "F" * 1500, LAYOUT["UBYTE"], "NO_COMPU_METHOD", "0", "255"),
+            _ascii("B1", "0x10", "18446744073709551615"),
+            _ascii("B2", "0x20", "18446744073709551616"),
+        )
+        got = describe_definitions(["AH", "CH", "B1", "B2"], a2l)
+>       assert got["AH"].refusal == Refusal("A2L-DEF-ADDRESS", f"AH: its span of 1 bytes at {HEX256} cannot be read")
+E       AssertionError: assert Refusal(code=...nnot be read') == Refusal(code=...nnot be read')
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['message']
+E         
+E         Drill down into differing attribute message:
+E           message: 'AH: its span of 1 bytes at 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2388: AssertionError
+_ test_r_a2l_def_151_6_a_quoted_kind_word_starting_with_matrix_dim_is_echoed_as_a_file_word _
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-938/test_r_a2l_def_151_6_a_quoted_0')
+
+    def test_r_a2l_def_151_6_a_quoted_kind_word_starting_with_matrix_dim_is_echoed_as_a_file_word(tmp_path):
+        """R-A2L-DEF.151/6 (CR-5) - the kind word `MATRIX_DIM <2,000 Z>` is a file word: 256 characters and an ellipsis."""
+        a2l = _inline(tmp_path, _char("QK", '"MATRIX_DIM ' + "Z" * 2000 + '"', "0x10", "RL_U8"))
+        word = next(t["char_type"] for t in a2l["tags"] if t["name"] == "QK")
+        assert len(word) == 2011 and word.startswith("MATRIX_DIM "), len(word)          # the parsed kind word, as the row says
+        d = describe_definition("QK", a2l)
+>       assert d.refusal == Refusal("A2L-DEF-KIND", f"QK: the system has no definition for a {_echo256(word)} object"), d.refusal
+E       AssertionError: Refusal(code='A2L-DEF-KIND', message='QK: the system has no definition for a MATRIX_DIM ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ...ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ object')
+E       assert Refusal(code=...ZZZZZ object') == Refusal(code=...ZZZZ… object')
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['message']
+E         
+E         Drill down into differing attribute message:
+E           message: 'QK: the system has no definition for a MATRIX_DIM ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2402: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_151_2_a_word_of_257_characters_is_cut_at_describe_and_at_decode
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_151_3_each_character_outside_printable_ascii_is_written_as_u_fffd
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_151_4_a_matrix_dim_number_is_written_by_the_number_rule
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_151_5_the_number_rule_for_an_address_and_a_length_at_its_bound
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_151_6_a_quoted_kind_word_starting_with_matrix_dim_is_echoed_as_a_file_word
+5 failed, 1 passed, 185 deselected in 1.45s
+pytest exit code: 1

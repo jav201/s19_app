@@ -1,0 +1,9 @@
+/home/javiergr/work/b103-int2a/s19_app/__init__.py
+ 22:22:46 up 1 day, 13:54,  5 users,  load average: 2.20, 3.26, 2.59
+============================= QC-TM timing margins =============================
+50.0%  1.000 s / 2.000 s  R-A2L-DEF.136 describe 13990  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_136_1_describing_every_object_is_fast
+QC-TM: 1 bounds, 0 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_suite_hygiene.py::test_r_tst_002_every_timing_arm_carries_serial_timing
+1 failed, 13 passed in 48.51s
+EXIT=1

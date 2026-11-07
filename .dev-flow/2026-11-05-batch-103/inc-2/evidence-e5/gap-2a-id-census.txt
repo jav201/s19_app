@@ -1,0 +1,45 @@
+# Inc 2a E5 gap pass: id census for the new scaling row (2026-11-07). Read only.
+## highest R-A2L-DEF id in each working tree (grep -rhoE 'R-A2L-DEF\.[0-9]+' over *.md *.py *.json *.txt)
+s19_app-b103: .148
+s19_app-b103-inc2a-code: .139 (outside this pass's own probe, evidence-e5/gap-2a-probe.py)
+s19_app-b103-inc2a-tests: .139
+s19_app-b103-inc4-code: .139
+s19_app-b103-inc4-tests: .139
+## ids .149 and above in those trees
+matches: 2, both in this pass's own probe (evidence-e5/gap-2a-probe.py, written before the census); 0 elsewhere
+## every branch of the repo (git grep over refs/heads and refs/remotes, b101*, b103*, batch-*, main)
+b101-canon: .none
+b101-inc10: .none
+b101-inc11: .none
+b101-inc12: .none
+b101-inc12b: .none
+b101-inc13: .none
+b101-inc14: .none
+b101-inc15: .none
+b101-inc16: .none
+b101-inc2: .none
+b101-inc3: .none
+b101-inc4: .none
+b101-inc5: .none
+b101-inc6: .none
+b101-inc7: .none
+b101-inc8: .none
+b101-inc9: .none
+b101-p0: .none
+b103-inc2a-code: .139
+b103-inc2a-tests: .139
+b103-inc4-code: .139
+b103-inc4-tests: .139
+batch-102-hotfixes: .none
+batch-103: .148
+claude/batch-82-lane-a-scoping: .none
+claude/batch-90-green-signals: .none
+kimi/batch-94-flows-and-editors: .none
+main: .none
+origin/b101-inc2: .none
+origin/batch-102-hotfixes: .none
+origin/claude/batch-82-lane-a-scoping: .none
+origin/claude/batch-90-green-signals: .none
+origin/kimi/batch-94-flows-and-editors: .none
+origin/main: .none
+## result: .148 is the highest id used (Inc 3a, R-A2L-DEF.148); .149 is used nowhere -> R-A2L-DEF.149

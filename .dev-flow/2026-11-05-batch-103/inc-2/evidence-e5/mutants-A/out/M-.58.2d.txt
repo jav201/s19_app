@@ -1,0 +1,114 @@
+# M-.58.2d
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.58.2d/s19_app/__init__.py
+# note: number written by str(n)
+#   EDIT-OK: '    if number.bit_length() <= 64:\n        return _fmt_address(number) '
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..9696e2a6 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -241,9 +241,7 @@ def _number_text(number: int, address: bool = False) -> str:
+     Raises:
+         None.
+     """
+-    if number.bit_length() <= 64:
+-        return _fmt_address(number) if address else str(number)
+-    return _echo(_fmt_address(number))
++    return _fmt_address(number) if address else str(number)
+ 
+ 
+ def _parse_bit_mask(word: Optional[str]) -> Optional[int]:
+
+# --- pytest (rc=1) ---
+[ValueError('Exceeds the limit (4300 digits) for integer string conversion; use sys.set_int_max_str_digits() to increase the limit') raised in repr()] int object at 0x55f8a3dce150>
+address = False
+
+    def _number_text(number: int, address: bool = False) -> str:
+        """Write a number the file holds into a message (R-A2L-DEF.151).
+    
+        A number whose magnitude is at most 2^64 - 1 is written as
+        :func:`_fmt_address` when ``address`` is true, else as its decimal text.
+        A larger number is written as the .151 echo of its ``0x`` / ``-0x``
+        hexadecimal word (cut at 256 characters, then ``…``), so no message can
+        raise on a decimal conversion of a huge int and none exceeds 1,024
+        characters.
+    
+        Args:
+            number (int): The number the file wrote (a length, a MATRIX_DIM or an
+                address).
+            address (bool): True to write an address placeholder (``0x…``) for a
+                number within the bound.
+    
+        Returns:
+            str: The message text for the number.
+    
+        Raises:
+            None.
+        """
+>       return _fmt_address(number) if address else str(number)
+                                                    ^^^^^^^^^^^
+E       ValueError: Exceeds the limit (4300 digits) for integer string conversion; use sys.set_int_max_str_digits() to increase the limit
+
+s19_app/tui/a2l_definition.py:244: ValueError
+_ test_r_a2l_def_58_2_23_a_matrix_dim_of_5000_hex_digits_is_a_refusal_not_an_exception _
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-990/test_r_a2l_def_58_2_23_a_matri0')
+
+    def test_r_a2l_def_58_2_23_a_matrix_dim_of_5000_hex_digits_is_a_refusal_not_an_exception(tmp_path):
+        """R-A2L-DEF.58.2/23 (E5S-01, CR-2) - MATRIX_DIM 0x + 5,000 F on a UBYTE MEASUREMENT: A2L-DEF-KIND, bounded."""
+        a2l = _inline(tmp_path, _meas("MD", "UBYTE", "NO_COMPU_METHOD", "0", "255", "MATRIX_DIM 0x" + "F" * 5000,
+                                      addr="0x10"))
+>       d = describe_definition("MD", a2l)                                         # 0 exceptions
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+../base/tests/test_b103_a2l_definition.py:2310: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+s19_app/tui/a2l_definition.py:340: in describe_definition
+    return describe_definitions([name], a2l_data)[name]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/a2l_definition.py:394: in describe_definitions
+    result[name] = _describe_one(
+s19_app/tui/a2l_definition.py:530: in _describe_one
+    kind, kind_text = _object_kind(tag, conversion_type)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/a2l_definition.py:734: in _object_kind
+    return None, f"MATRIX_DIM {_number_text(matrix_dim)} MEASUREMENT"
+                               ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+number = <[ValueError('Exceeds the limit (4300 digits) for integer string conversion; use sys.set_int_max_str_digits() to increase the limit') raised in repr()] int object at 0x55f8a3dd3690>
+address = False
+
+    def _number_text(number: int, address: bool = False) -> str:
+        """Write a number the file holds into a message (R-A2L-DEF.151).
+    
+        A number whose magnitude is at most 2^64 - 1 is written as
+        :func:`_fmt_address` when ``address`` is true, else as its decimal text.
+        A larger number is written as the .151 echo of its ``0x`` / ``-0x``
+        hexadecimal word (cut at 256 characters, then ``…``), so no message can
+        raise on a decimal conversion of a huge int and none exceeds 1,024
+        characters.
+    
+        Args:
+            number (int): The number the file wrote (a length, a MATRIX_DIM or an
+                address).
+            address (bool): True to write an address placeholder (``0x…``) for a
+                number within the bound.
+    
+        Returns:
+            str: The message text for the number.
+    
+        Raises:
+            None.
+        """
+>       return _fmt_address(number) if address else str(number)
+                                                    ^^^^^^^^^^^
+E       ValueError: Exceeds the limit (4300 digits) for integer string conversion; use sys.set_int_max_str_digits() to increase the limit
+
+s19_app/tui/a2l_definition.py:244: ValueError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_20_a_length_of_5000_hex_digits_is_a_refusal_not_an_exception
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_21_a_data_size_of_5000_hex_digits_is_a_refusal_not_an_exception
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_22_a_number_of_5000_hex_digits_is_a_refusal_not_an_exception
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_23_a_matrix_dim_of_5000_hex_digits_is_a_refusal_not_an_exception
+4 failed, 187 deselected in 1.25s

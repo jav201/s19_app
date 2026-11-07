@@ -1,0 +1,47 @@
+# M-.12b
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.12b/s19_app/__init__.py
+# note: type word upper-cased before the test (CR-4)
+#   EDIT-OK: '    type_verdict = (\n        conversion_type if conversion_type in _SU'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..eec748d0 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -863,7 +863,9 @@ def _read_method_record(
+         i += 1
+     decimals = _display_decimals(fmt)
+     type_verdict = (
+-        conversion_type if conversion_type in _SUPPORTED_CONVERSION_TYPES else None
++        conversion_type
++        if conversion_type is not None and conversion_type.upper() in _SUPPORTED_CONVERSION_TYPES
++        else None
+     )
+     type_echo = _echo(conversion_type) if conversion_type else "(none)"
+     table_echo = _echo(compu_tab_ref) if compu_tab_ref else "(none)"
+
+# --- pytest (rc=1) ---
+...F                                                                     [100%]
+=================================== FAILURES ===================================
+__ test_r_a2l_def_12_4_a_listed_type_in_another_letter_case_is_not_supported ___
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-953/test_r_a2l_def_12_4_a_listed_t0')
+
+    def test_r_a2l_def_12_4_a_listed_type_in_another_letter_case_is_not_supported(tmp_path):
+        """R-A2L-DEF.12/4 (E5 fix pass, CR-4 = E5S-05) - ``tab_intp`` is not ``TAB_INTP``: describe and decode refuse it."""
+        a2l = _inline(
+            tmp_path,
+            _cm("CM_LC", "tab_intp", fmt='"%.0"', ref="CT_LC"),
+            '/begin COMPU_TAB CT_LC "" TAB_INTP 2\n  0 0\n  100 100\n/end COMPU_TAB',
+            _val("LC", "0x10", LAYOUT["UBYTE"], "CM_LC", "0", "255"),
+        )
+        d = describe_definition("LC", a2l)
+        want = Refusal("A2L-DEF-CONVERSION", "LC: the conversion type tab_intp of CM_LC is not supported")
+>       assert d.refusal == want, d.refusal
+E       AssertionError: None
+E       assert None == Refusal(code='A2L-DEF-CONVERSION', message='LC: the conversion type tab_intp of CM_LC is not supported')
+E        +  where None = Definition(name='LC', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=1, datatype=...m_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref='CT_LC', refusal=None).refusal
+
+../base/tests/test_b103_a2l_definition.py:579: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_12_4_a_listed_type_in_another_letter_case_is_not_supported
+1 failed, 3 passed, 187 deselected in 0.47s

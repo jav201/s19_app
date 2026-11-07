@@ -1,0 +1,40 @@
+===== mutant M-62 (2026-11-07T13:23:12Z) =====
+--- unified diff ---
+diff --git a/tools/synth/make_release_case.py b/tools/synth/make_release_case.py
+index 7b843b64..1e6956a9 100644
+--- a/tools/synth/make_release_case.py
++++ b/tools/synth/make_release_case.py
+@@ -972,7 +972,7 @@ DEFINITIONS_EXTRA_LINES = {
+     "DISPLAY_0001": (
+         "EXTENDED_LIMITS -50 200",
+         'FORMAT "%.1"',
+-        'PHYS_UNIT "deg C"',
++        'UNIT "deg C"',
+     ),
+ }
+ 
+--- pytest ---
+s19_app.__file__ = /tmp/b103-e5-2-mutB/M-M-62/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_r_a2l_def_62_1_the_display_object_has_format_unit_and_wider_extended_limits _
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...CHARACTERISTIC\n  /end MODULE\n/end PROJECT\n', 'dir': PosixPath('/tmp/pytest-of-javiergr/pytest-933/b103_defc0'), ...}
+
+    def test_r_a2l_def_62_1_the_display_object_has_format_unit_and_wider_extended_limits(defc):
+        """R-A2L-DEF.62/1 - DISPLAY_0001: FORMAT, PHYS_UNIT, EXTENDED_LIMITS wider than the limits."""
+        describe_definition = _model().describe_definition
+        block = re.search(r"/begin CHARACTERISTIC DISPLAY_0001.*?/end CHARACTERISTIC", defc["a2l_text"], re.S)
+        assert block, "DISPLAY_0001 is not in definitions.a2l"
+        text = block.group(0)
+        assert re.search(r"^\s*FORMAT\s+\"[^\"]+\"", text, re.M)
+        unit = re.search(r"^\s*PHYS_UNIT\s+\"([^\"]*)\"", text, re.M)
+>       assert unit, "no PHYS_UNIT line"
+E       AssertionError: no PHYS_UNIT line
+E       assert None
+
+tests/test_b103_synth_definitions.py:235: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_synth_definitions.py::test_r_a2l_def_62_1_the_display_object_has_format_unit_and_wider_extended_limits
+1 failed, 8 deselected in 0.68s
+pytest exit code: 1

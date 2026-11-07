@@ -1,0 +1,53 @@
+# M-.16
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.16/s19_app/__init__.py
+# note: DEFAULT_VALUE skipped
+#   EDIT-OK: '    if i < n and tokens[i] == "DEFAULT_VALUE":\n        if i + 1 < n:\n '
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..27a6cd02 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -1042,9 +1042,6 @@ def _read_enum_table(
+                 if raw_min is not None and raw_max is not None:
+                     entries.append(EnumEntry(raw_min, raw_max, text))
+             read += 1
+-    if i < n and tokens[i] == "DEFAULT_VALUE":
+-        if i + 1 < n:
+-            default_text = tokens[i + 1]
+     form = _build_enum_form(section_kind, tuple(entries), default_text)
+     reads[key] = form
+     return form
+
+# --- pytest (rc=1) ---
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_______________ test_r_a2l_def_16_1_default_text_of_a_compu_vtab _______________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...osed /begin sections detected.'], 'path': '/tmp/b103-e5-2-mutA/M-.16/examples/case_00_public/ASAP2_Demo_V171.a2l', ...}
+
+    def test_r_a2l_def_16_1_default_text_of_a_compu_vtab(v171):
+        """R-A2L-DEF.16/1."""
+>       assert describe_definition(V171_ENUM, v171).default_text == "unknown signal type"
+E       AssertionError: assert None == 'unknown signal type'
+E        +  where None = Definition(name='ASAM.C.SCALAR.SWORD.TAB_VERB_DEFAULT_VALUE', section='CHARACTERISTIC', char_type='VALUE', kind='enum'...us')), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref='CM.TAB_VERB.DEFAULT_VALUE.REF', refusal=None).default_text
+E        +    where Definition(name='ASAM.C.SCALAR.SWORD.TAB_VERB_DEFAULT_VALUE', section='CHARACTERISTIC', char_type='VALUE', kind='enum'...us')), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref='CM.TAB_VERB.DEFAULT_VALUE.REF', refusal=None) = describe_definition('ASAM.C.SCALAR.SWORD.TAB_VERB_DEFAULT_VALUE', {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...osed /begin sections detected.'], 'path': '/tmp/b103-e5-2-mutA/M-.16/examples/case_00_public/ASAP2_Demo_V171.a2l', ...})
+
+../base/tests/test_b103_a2l_definition.py:658: AssertionError
+------------------------------ Captured log setup ------------------------------
+WARNING  s19_app.tui.a2l:a2l.py:250 A2L section tree has structural errors: path=/tmp/b103-e5-2-mutA/M-.16/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+______________ test_r_a2l_def_16_2_default_text_of_a_range_table _______________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...osed /begin sections detected.'], 'path': '/tmp/b103-e5-2-mutA/M-.16/examples/case_00_public/ASAP2_Demo_V171.a2l', ...}
+
+    def test_r_a2l_def_16_2_default_text_of_a_range_table(v171):
+        """R-A2L-DEF.16/2."""
+>       assert describe_definition(V171_RANGE, v171).default_text == "out of range value"
+E       AssertionError: assert None == 'out of range value'
+E        +  where None = Definition(name='ASAM.C.SCALAR.SWORD.VTAB_RANGE_DEFAULT_VALUE', section='CHARACTERISTIC', char_type='VALUE', kind='enu...')), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref='CM.VTAB_RANGE.DEFAULT_VALUE.REF', refusal=None).default_text
+E        +    where Definition(name='ASAM.C.SCALAR.SWORD.VTAB_RANGE_DEFAULT_VALUE', section='CHARACTERISTIC', char_type='VALUE', kind='enu...')), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref='CM.VTAB_RANGE.DEFAULT_VALUE.REF', refusal=None) = describe_definition('ASAM.C.SCALAR.SWORD.VTAB_RANGE_DEFAULT_VALUE', {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...osed /begin sections detected.'], 'path': '/tmp/b103-e5-2-mutA/M-.16/examples/case_00_public/ASAP2_Demo_V171.a2l', ...})
+
+../base/tests/test_b103_a2l_definition.py:663: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_16_1_default_text_of_a_compu_vtab
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_16_2_default_text_of_a_range_table
+2 failed, 189 deselected in 0.46s

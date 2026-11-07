@@ -1,0 +1,56 @@
+# M-.22
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.22/s19_app/__init__.py
+# note: method's format kept over the FORMAT line
+#   EDIT-OK: '    display_format = object_format if object_format is not None else r'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..b38b5b8f 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -532,7 +532,7 @@ def _describe_one(
+     kind, kind_text = _object_kind(tag, conversion_type)
+ 
+     object_format = object_lines.get("format")
+-    display_format = object_format if object_format is not None else record_format
++    display_format = record_format
+     if object_format is not None:
+         decimals = _display_decimals(object_format)
+     else:
+
+# --- pytest (rc=1) ---
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+____________ test_r_a2l_def_22_1_format_overrides_the_method_format ____________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...osed /begin sections detected.'], 'path': '/tmp/b103-e5-2-mutA/M-.22/examples/case_00_public/ASAP2_Demo_V171.a2l', ...}
+
+    def test_r_a2l_def_22_1_format_overrides_the_method_format(v171):
+        """R-A2L-DEF.22/1 - %6.1 over %3.0."""
+>       assert describe_definition(V171_SBYTE, v171).display_format == "%6.1"
+E       AssertionError: assert '%3.0' == '%6.1'
+E         
+E         - %6.1
+E         + %3.0
+
+../base/tests/test_b103_a2l_definition.py:789: AssertionError
+------------------------------ Captured log setup ------------------------------
+WARNING  s19_app.tui.a2l:a2l.py:250 A2L section tree has structural errors: path=/tmp/b103-e5-2-mutA/M-.22/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+______________ test_r_a2l_def_22_2_format_with_a_trailing_comment ______________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...osed /begin sections detected.'], 'path': '/tmp/b103-e5-2-mutA/M-.22/examples/case_00_public/ASAP2_Demo_V171.a2l', ...}
+
+    def test_r_a2l_def_22_2_format_with_a_trailing_comment(v171):
+        """R-A2L-DEF.22/2 - ``FORMAT "%5.0"    /* Note ... */``."""
+>       assert describe_definition("ASAM.M.SCALAR.UBYTE.IDENTICAL", v171).display_format == "%5.0"
+E       AssertionError: assert '%3.0' == '%5.0'
+E         
+E         - %5.0
+E         ?  ^
+E         + %3.0
+E         ?  ^
+
+../base/tests/test_b103_a2l_definition.py:794: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_22_1_format_overrides_the_method_format
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_22_2_format_with_a_trailing_comment
+2 failed, 189 deselected in 0.83s

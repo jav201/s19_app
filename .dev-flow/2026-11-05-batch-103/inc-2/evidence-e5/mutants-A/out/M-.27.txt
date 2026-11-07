@@ -1,0 +1,74 @@
+# M-.27
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.27/s19_app/__init__.py
+# note: mask ignored (whole word decoded)
+#   EDIT-OK: '    if definition.bit_mask is not None:\n        word = int.from_bytes('
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..acf5e9bf 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -1262,9 +1262,6 @@ def _read_stored_value(
+     raw = bytes(values)
+     if definition.kind == "text":
+         return raw
+-    if definition.bit_mask is not None:
+-        word = int.from_bytes(raw, definition.byte_order)
+-        return (word & definition.bit_mask) >> _mask_shift(definition.bit_mask)
+     if definition.datatype == "FLOAT16_IEEE":
+         return _decode_binary16(raw, definition.byte_order)
+     return _decode_scalar(raw, definition.datatype, definition.byte_order)
+
+# --- pytest (rc=1) ---
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_____________________ test_r_a2l_def_27_1_multi_bit_field ______________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...osed /begin sections detected.'], 'path': '/tmp/b103-e5-2-mutA/M-.27/examples/case_00_public/ASAP2_Demo_V171.a2l', ...}
+
+    def test_r_a2l_def_27_1_multi_bit_field(v171):
+        """R-A2L-DEF.27/1 - word 0x1234, mask 0x0FF0 -> 35 (base: 4660)."""
+        d = describe_definition(V171_M0FF0, v171)
+        res = _decoded(d, v171, _img(0x810002, bytes([0x34, 0x12])))
+>       assert res.stored == 35 and res.text == "35"
+E       AssertionError: assert (4660 == 35)
+E        +  where 4660 = Decoded(stored=4660, value=4660, text='4660').stored
+
+../base/tests/test_b103_a2l_definition.py:862: AssertionError
+------------------------------ Captured log setup ------------------------------
+WARNING  s19_app.tui.a2l:a2l.py:250 A2L section tree has structural errors: path=/tmp/b103-e5-2-mutA/M-.27/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+_____________________ test_r_a2l_def_27_2_single_bit_field _____________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...osed /begin sections detected.'], 'path': '/tmp/b103-e5-2-mutA/M-.27/examples/case_00_public/ASAP2_Demo_V171.a2l', ...}
+
+    def test_r_a2l_def_27_2_single_bit_field(v171):
+        """R-A2L-DEF.27/2 - word 0x0010, mask 0x0010 -> 1."""
+        d = describe_definition(V171_M0010, v171)
+>       assert _decoded(d, v171, _img(0x810002, bytes([0x10, 0x00]))).stored == 1
+E       AssertionError: assert 16 == 1
+E        +  where 16 = Decoded(stored=16, value=16, text='16').stored
+E        +    where Decoded(stored=16, value=16, text='16') = _decoded(Definition(name='ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0010', section='CHARACTERISTIC', char_type='VALUE', kind='numbe...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None), {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...osed /begin sections detected.'], 'path': '/tmp/b103-e5-2-mutA/M-.27/examples/case_00_public/ASAP2_Demo_V171.a2l', ...}, {8454146: 16, 8454147: 0})
+E        +      where {8454146: 16, 8454147: 0} = _img(8454146, b'\x10\x00')
+E        +        where b'\x10\x00' = bytes([16, 0])
+
+../base/tests/test_b103_a2l_definition.py:868: AssertionError
+__________ test_r_a2l_def_27_3_field_of_a_signed_datatype_is_unsigned __________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-969/test_r_a2l_def_27_3_field_of_a0')
+
+    def test_r_a2l_def_27_3_field_of_a_signed_datatype_is_unsigned(tmp_path):
+        """R-A2L-DEF.27/3 - SWORD, mask 0xFF00, word F0 F0 -> 240."""
+        a2l = _inline(tmp_path, _val("SM", "0x10", "RL_S16", "NO_COMPU_METHOD", "-32768", "32767", "BIT_MASK 0xFF00"))
+        d = describe_definition("SM", a2l)
+>       assert _decoded(d, a2l, _img(0x10, bytes([0xF0, 0xF0]))).stored == 240
+E       AssertionError: assert -3856 == 240
+E        +  where -3856 = Decoded(stored=-3856, value=-3856, text='-3856').stored
+E        +    where Decoded(stored=-3856, value=-3856, text='-3856') = _decoded(Definition(name='SM', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-javiergr/pytest-969/test_r_a2l_def_27_3_field_of_a0/inline_1.a2l', ...}, {16: 240, 17: 240})
+E        +      where {16: 240, 17: 240} = _img(16, b'\xf0\xf0')
+E        +        where b'\xf0\xf0' = bytes([240, 240])
+
+../base/tests/test_b103_a2l_definition.py:875: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_27_1_multi_bit_field
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_27_2_single_bit_field
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_27_3_field_of_a_signed_datatype_is_unsigned
+3 failed, 188 deselected in 0.83s

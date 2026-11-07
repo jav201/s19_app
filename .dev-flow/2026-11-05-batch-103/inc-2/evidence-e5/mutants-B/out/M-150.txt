@@ -1,0 +1,311 @@
+===== mutant M-150 (2026-11-07T13:57:14Z) =====
+--- unified diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..27f889a5 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -1290,10 +1290,6 @@ def _enum_entry_text(definition: Definition, stored: int | float) -> Optional[st
+     """The raw text of the first entry in file order that holds ``stored``: one
+     lookup in the enum form (the text by reference), else the linear first match
+     of a hand-built definition (``_table_form`` ``None``)."""
+-    form = definition._table_form
+-    if isinstance(form, _EnumForm):
+-        pos = _enum_position(form, stored)
+-        return form.entries[pos].text if pos is not None else None
+     for entry in definition.enum_entries:
+         if entry.raw_max is None:
+             if entry.raw == stored:
+@@ -1308,14 +1304,6 @@ def _enum_text(definition: Definition, stored: int | float) -> str:
+     cleaned text, else the default's, else ``<raw> (no text)``.  With the enum
+     form the text is its stored string (cleaned once, by reference); without it
+     the linear match is ``_clean``ed per call (R-A2L-DEF.137)."""
+-    form = definition._table_form
+-    if isinstance(form, _EnumForm):
+-        pos = _enum_position(form, stored)
+-        if pos is not None:
+-            return form.texts[pos]
+-        if form.default_display is not None:
+-            return form.default_display
+-        return f"{_raw_text(stored)} (no text)"
+     entry = _enum_entry_text(definition, stored)
+     if entry is not None:
+         return _clean(entry)
+--- pytest ---
+s19_app.__file__ = /tmp/b103-e5-2-mutB/M-M-150/s19_app/__init__.py
+..FFFFF...                                                               [100%]
+=================================== FAILURES ===================================
+_______ test_r_a2l_def_150_1_shared_vtab_size_costs_nothing_per_element ________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-997/test_r_a2l_def_150_1_shared_vt0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_150_1_shared_vtab_size_costs_nothing_per_element(tmp_path):
+        """R-A2L-DEF.150/1 - decoding 400 elements that name one COMPU_VTAB of S ... 8S entries: the entries are not scanned per element."""
+        def check(kib, c, result):
+            assert result == [Decoded(250, None, "250 (no text)")] * N_OBJECTS
+    
+>       _gp2_run(tmp_path, "vtab", "150/1 COMPU_VTAB decode", _decode_all, check, image_byte=250)
+
+tests/test_b103_a2l_definition_perf.py:574: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-997/test_r_a2l_def_150_1_shared_vt0')
+case = 'vtab', label = '150/1 COMPU_VTAB decode'
+work = <function _decode_all at 0x7feb3c1227a0>
+check = <function test_r_a2l_def_150_1_shared_vtab_size_costs_nothing_per_element.<locals>.check at 0x7feb3c173920>
+image_byte = 250, steady = None
+
+    def _gp2_run(tmp_path: Path, case: str, label: str, work: Callable[[_Loaded], Any],
+                 check: Callable[[int, _Loaded, Any], None], image_byte: Optional[int] = None,
+                 steady: Optional[Callable[[_Loaded], tuple]] = None) -> None:
+        """Absolute bound at S (400 calls within 0.5 s, wall clock, the least of 7 runs) then the scaling bound.
+    
+        A describe case passes ``steady`` (E5-3): it returns (the CPU interval of the 399 names after the first, read
+        inside one fresh walk, that walk's result) and the per-object part is the least of >= 15 interleaved rounds of
+        that interval.  A decode case keeps one interval: the process CPU time of ``work`` itself."""
+        loaded = {kib: _gp2_load(tmp_path, case, kib, image_byte) for kib in SIZES_KIB}
+        runs, result = [], None
+        for _ in range(LEAST_OF):
+            seconds, result = _timed(lambda: work(loaded[SIZE_S_KIB]))
+            runs.append(seconds)
+            if seconds > HOPELESS_S:
+                break
+        least = min(runs)
+>       assert least <= report_margin(f"R-A2L-DEF.{label} 400 calls at 256 KiB", least, timing_bound(ABS_BOUND_S)), runs
+E       AssertionError: [1.1809843000082765, 0.7417157610179856, 0.6959409989940468, 0.7947203869989607, 1.0232079909765162, 1.2132045490143355, ...]
+E       assert 0.6959409989940468 <= 0.5
+E        +  where 0.5 = report_margin('R-A2L-DEF.150/1 COMPU_VTAB decode 400 calls at 256 KiB', 0.6959409989940468, 0.5)
+E        +    where 0.5 = timing_bound(0.5)
+
+tests/test_b103_a2l_definition_perf.py:440: AssertionError
+____ test_r_a2l_def_150_2_long_matched_entry_text_is_referenced_not_copied _____
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-997/test_r_a2l_def_150_2_long_matc0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_150_2_long_matched_entry_text_is_referenced_not_copied(tmp_path):
+        """R-A2L-DEF.150/2 - a matched entry text of S ... 8S characters is one string object for all 400 decodes."""
+        def check(kib, c, result):
+            text = "t" * (kib * 1024)
+            assert all(isinstance(r, Decoded) and r.stored == 0 and r.value == text and r.text == text for r in result)
+            assert _same_object(r.value for r in result) and _same_object(r.text for r in result)
+    
+>       _gp2_run(tmp_path, "vtab_text", "150/2 matched entry text", _decode_all, check, image_byte=0)
+
+tests/test_b103_a2l_definition_perf.py:585: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-997/test_r_a2l_def_150_2_long_matc0')
+case = 'vtab_text', label = '150/2 matched entry text'
+work = <function _decode_all at 0x7feb3c1227a0>
+check = <function test_r_a2l_def_150_2_long_matched_entry_text_is_referenced_not_copied.<locals>.check at 0x7feb3c123b00>
+image_byte = 0, steady = None
+
+    def _gp2_run(tmp_path: Path, case: str, label: str, work: Callable[[_Loaded], Any],
+                 check: Callable[[int, _Loaded, Any], None], image_byte: Optional[int] = None,
+                 steady: Optional[Callable[[_Loaded], tuple]] = None) -> None:
+        """Absolute bound at S (400 calls within 0.5 s, wall clock, the least of 7 runs) then the scaling bound.
+    
+        A describe case passes ``steady`` (E5-3): it returns (the CPU interval of the 399 names after the first, read
+        inside one fresh walk, that walk's result) and the per-object part is the least of >= 15 interleaved rounds of
+        that interval.  A decode case keeps one interval: the process CPU time of ``work`` itself."""
+        loaded = {kib: _gp2_load(tmp_path, case, kib, image_byte) for kib in SIZES_KIB}
+        runs, result = [], None
+        for _ in range(LEAST_OF):
+            seconds, result = _timed(lambda: work(loaded[SIZE_S_KIB]))
+            runs.append(seconds)
+            if seconds > HOPELESS_S:
+                break
+        least = min(runs)
+>       assert least <= report_margin(f"R-A2L-DEF.{label} 400 calls at 256 KiB", least, timing_bound(ABS_BOUND_S)), runs
+E       AssertionError: [14.336376669991296]
+E       assert 14.336376669991296 <= 0.5
+E        +  where 0.5 = report_margin('R-A2L-DEF.150/2 matched entry text 400 calls at 256 KiB', 14.336376669991296, 0.5)
+E        +    where 0.5 = timing_bound(0.5)
+
+tests/test_b103_a2l_definition_perf.py:440: AssertionError
+_______ test_r_a2l_def_150_3_long_default_text_is_referenced_not_copied ________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-997/test_r_a2l_def_150_3_long_defa0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_150_3_long_default_text_is_referenced_not_copied(tmp_path):
+        """R-A2L-DEF.150/3 - a DEFAULT_VALUE text of S ... 8S characters is one display string for all 400 decodes."""
+        def check(kib, c, result):
+            text = "d" * (kib * 1024)
+            assert all(isinstance(r, Decoded) and r.stored == 250 and r.value is None and r.text == text for r in result)
+            assert _same_object(r.text for r in result)
+    
+>       _gp2_run(tmp_path, "vtab_default", "150/3 default text", _decode_all, check, image_byte=250)
+
+tests/test_b103_a2l_definition_perf.py:596: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-997/test_r_a2l_def_150_3_long_defa0')
+case = 'vtab_default', label = '150/3 default text'
+work = <function _decode_all at 0x7feb3c1227a0>
+check = <function test_r_a2l_def_150_3_long_default_text_is_referenced_not_copied.<locals>.check at 0x7feb3a2fc0e0>
+image_byte = 250, steady = None
+
+    def _gp2_run(tmp_path: Path, case: str, label: str, work: Callable[[_Loaded], Any],
+                 check: Callable[[int, _Loaded, Any], None], image_byte: Optional[int] = None,
+                 steady: Optional[Callable[[_Loaded], tuple]] = None) -> None:
+        """Absolute bound at S (400 calls within 0.5 s, wall clock, the least of 7 runs) then the scaling bound.
+    
+        A describe case passes ``steady`` (E5-3): it returns (the CPU interval of the 399 names after the first, read
+        inside one fresh walk, that walk's result) and the per-object part is the least of >= 15 interleaved rounds of
+        that interval.  A decode case keeps one interval: the process CPU time of ``work`` itself."""
+        loaded = {kib: _gp2_load(tmp_path, case, kib, image_byte) for kib in SIZES_KIB}
+        runs, result = [], None
+        for _ in range(LEAST_OF):
+            seconds, result = _timed(lambda: work(loaded[SIZE_S_KIB]))
+            runs.append(seconds)
+            if seconds > HOPELESS_S:
+                break
+        least = min(runs)
+>       assert least <= report_margin(f"R-A2L-DEF.{label} 400 calls at 256 KiB", least, timing_bound(ABS_BOUND_S)), runs
+E       AssertionError: [15.173133560019778]
+E       assert 15.173133560019778 <= 0.5
+E        +  where 0.5 = report_margin('R-A2L-DEF.150/3 default text 400 calls at 256 KiB', 15.173133560019778, 0.5)
+E        +    where 0.5 = timing_bound(0.5)
+
+tests/test_b103_a2l_definition_perf.py:440: AssertionError
+____ test_r_a2l_def_150_4_shared_range_table_size_costs_nothing_per_element ____
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-997/test_r_a2l_def_150_4_shared_ra0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_150_4_shared_range_table_size_costs_nothing_per_element(tmp_path):
+        """R-A2L-DEF.150/4 - decoding 400 elements that name one COMPU_VTAB_RANGE of S ... 8S ranges: no scan per element."""
+        def check(kib, c, result):
+            assert result == [Decoded(250, None, "250 (no text)")] * N_OBJECTS
+    
+>       _gp2_run(tmp_path, "range", "150/4 COMPU_VTAB_RANGE decode", _decode_all, check, image_byte=250)
+
+tests/test_b103_a2l_definition_perf.py:605: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-997/test_r_a2l_def_150_4_shared_ra0')
+case = 'range', label = '150/4 COMPU_VTAB_RANGE decode'
+work = <function _decode_all at 0x7feb3c1227a0>
+check = <function test_r_a2l_def_150_4_shared_range_table_size_costs_nothing_per_element.<locals>.check at 0x7feb3c123b00>
+image_byte = 250, steady = None
+
+    def _gp2_run(tmp_path: Path, case: str, label: str, work: Callable[[_Loaded], Any],
+                 check: Callable[[int, _Loaded, Any], None], image_byte: Optional[int] = None,
+                 steady: Optional[Callable[[_Loaded], tuple]] = None) -> None:
+        """Absolute bound at S (400 calls within 0.5 s, wall clock, the least of 7 runs) then the scaling bound.
+    
+        A describe case passes ``steady`` (E5-3): it returns (the CPU interval of the 399 names after the first, read
+        inside one fresh walk, that walk's result) and the per-object part is the least of >= 15 interleaved rounds of
+        that interval.  A decode case keeps one interval: the process CPU time of ``work`` itself."""
+        loaded = {kib: _gp2_load(tmp_path, case, kib, image_byte) for kib in SIZES_KIB}
+        runs, result = [], None
+        for _ in range(LEAST_OF):
+            seconds, result = _timed(lambda: work(loaded[SIZE_S_KIB]))
+            runs.append(seconds)
+            if seconds > HOPELESS_S:
+                break
+        least = min(runs)
+        assert least <= report_margin(f"R-A2L-DEF.{label} 400 calls at 256 KiB", least, timing_bound(ABS_BOUND_S)), runs
+        check(SIZE_S_KIB, loaded[SIZE_S_KIB], result)
+    
+        part = {kib: float("inf") for kib in SIZES_KIB}
+        results = {}
+        for _ in range(SCALE_ROUNDS):
+            slow = False
+            for kib in SIZES_KIB:                    # interleaved: S, 2S, 8S in turn within every round
+                if steady is not None:
+                    t_outer, (interval, results[kib]) = _timed(lambda: steady(loaded[kib]), time.process_time)
+                else:
+                    t_outer, results[kib] = _timed(lambda: work(loaded[kib]), time.process_time)
+                    interval = t_outer
+                part[kib] = min(part[kib], interval)
+                slow = slow or t_outer > SLOW_RUN_S
+            if slow:
+                break
+        if steady is not None:
+            assert part[SIZE_S_KIB] >= NON_VACUITY_S, part
+        else:
+            part = {kib: max(t, 1e-3) for kib, t in part.items()}      # floor: 1 ms is timer noise
+        ratio_2s = part[2 * SIZE_S_KIB] / part[SIZE_S_KIB]
+        ratio_8s = part[SIZE_8S_KIB] / part[SIZE_S_KIB]
+>       assert ratio_2s <= report_margin(f"R-A2L-DEF.{label} per-object part 2S/S", ratio_2s,
+                                         timing_bound(RATIO_BOUND_2S)), part
+E       AssertionError: {256: 0.45439937199999747, 512: 1.7080092469999997, 2048: 5.998700894999999}
+E       assert 3.7588283616730203 <= 1.5
+E        +  where 1.5 = report_margin('R-A2L-DEF.150/4 COMPU_VTAB_RANGE decode per-object part 2S/S', 3.7588283616730203, 1.5)
+E        +    where 1.5 = timing_bound(1.5)
+
+tests/test_b103_a2l_definition_perf.py:463: AssertionError
+____ test_r_a2l_def_150_5_long_matched_range_text_is_referenced_not_copied _____
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-997/test_r_a2l_def_150_5_long_matc0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_150_5_long_matched_range_text_is_referenced_not_copied(tmp_path):
+        """R-A2L-DEF.150/5 - a matched range text of S ... 8S characters is one string object for all 400 decodes."""
+        def check(kib, c, result):
+            text = "t" * (kib * 1024)
+            assert all(isinstance(r, Decoded) and r.stored == 0 and r.value == text and r.text == text for r in result)
+            assert _same_object(r.value for r in result) and _same_object(r.text for r in result)
+    
+>       _gp2_run(tmp_path, "range_text", "150/5 matched range text", _decode_all, check, image_byte=0)
+
+tests/test_b103_a2l_definition_perf.py:616: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-997/test_r_a2l_def_150_5_long_matc0')
+case = 'range_text', label = '150/5 matched range text'
+work = <function _decode_all at 0x7feb3c1227a0>
+check = <function test_r_a2l_def_150_5_long_matched_range_text_is_referenced_not_copied.<locals>.check at 0x7feb3a2fc180>
+image_byte = 0, steady = None
+
+    def _gp2_run(tmp_path: Path, case: str, label: str, work: Callable[[_Loaded], Any],
+                 check: Callable[[int, _Loaded, Any], None], image_byte: Optional[int] = None,
+                 steady: Optional[Callable[[_Loaded], tuple]] = None) -> None:
+        """Absolute bound at S (400 calls within 0.5 s, wall clock, the least of 7 runs) then the scaling bound.
+    
+        A describe case passes ``steady`` (E5-3): it returns (the CPU interval of the 399 names after the first, read
+        inside one fresh walk, that walk's result) and the per-object part is the least of >= 15 interleaved rounds of
+        that interval.  A decode case keeps one interval: the process CPU time of ``work`` itself."""
+        loaded = {kib: _gp2_load(tmp_path, case, kib, image_byte) for kib in SIZES_KIB}
+        runs, result = [], None
+        for _ in range(LEAST_OF):
+            seconds, result = _timed(lambda: work(loaded[SIZE_S_KIB]))
+            runs.append(seconds)
+            if seconds > HOPELESS_S:
+                break
+        least = min(runs)
+>       assert least <= report_margin(f"R-A2L-DEF.{label} 400 calls at 256 KiB", least, timing_bound(ABS_BOUND_S)), runs
+E       AssertionError: [14.319809939013794]
+E       assert 14.319809939013794 <= 0.5
+E        +  where 0.5 = report_margin('R-A2L-DEF.150/5 matched range text 400 calls at 256 KiB', 14.319809939013794, 0.5)
+E        +    where 0.5 = timing_bound(0.5)
+
+tests/test_b103_a2l_definition_perf.py:440: AssertionError
+============================= QC-TM timing margins =============================
+LOW -2934.6%  15.173 s / 0.500 s  R-A2L-DEF.150/3 default text 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_3_long_default_text_is_referenced_not_copied
+LOW -2767.3%  14.336 s / 0.500 s  R-A2L-DEF.150/2 matched entry text 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_2_long_matched_entry_text_is_referenced_not_copied
+LOW -2764.0%  14.320 s / 0.500 s  R-A2L-DEF.150/5 matched range text 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_5_long_matched_range_text_is_referenced_not_copied
+LOW -150.6%  3.759 s / 1.500 s  R-A2L-DEF.150/4 COMPU_VTAB_RANGE decode per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_4_shared_range_table_size_costs_nothing_per_element
+LOW -39.2%  0.696 s / 0.500 s  R-A2L-DEF.150/1 COMPU_VTAB decode 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_1_shared_vtab_size_costs_nothing_per_element
+LOW 9.8%  0.451 s / 0.500 s  R-A2L-DEF.150/4 COMPU_VTAB_RANGE decode 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_4_shared_range_table_size_costs_nothing_per_element
+32.8%  1.008 s / 1.500 s  R-A2L-DEF.150/8 TAB_NOINTP decode per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_8_shared_tab_nointp_size_costs_nothing_per_element
+33.0%  1.005 s / 1.500 s  R-A2L-DEF.150/7 TAB_INTP decode per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_7_shared_tab_intp_size_costs_nothing_per_element
+33.4%  0.999 s / 1.500 s  R-A2L-DEF.150/10 TAB_NOINTP run of repeated x decode per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_10_a_run_of_repeated_x_below_the_stored_value_costs_nothing_per_element
+49.0%  1.019 s / 2.000 s  R-A2L-DEF.150/8 TAB_NOINTP decode per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_8_shared_tab_nointp_size_costs_nothing_per_element
+49.4%  1.013 s / 2.000 s  R-A2L-DEF.150/7 TAB_INTP decode per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_7_shared_tab_intp_size_costs_nothing_per_element
+50.0%  1.001 s / 2.000 s  R-A2L-DEF.150/10 TAB_NOINTP run of repeated x decode per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_10_a_run_of_repeated_x_below_the_stored_value_costs_nothing_per_element
+99.7%  0.002 s / 0.500 s  R-A2L-DEF.150/7 TAB_INTP decode 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_7_shared_tab_intp_size_costs_nothing_per_element
+99.7%  0.002 s / 0.500 s  R-A2L-DEF.150/8 TAB_NOINTP decode 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_8_shared_tab_nointp_size_costs_nothing_per_element
+99.7%  0.002 s / 0.500 s  R-A2L-DEF.150/10 TAB_NOINTP run of repeated x decode 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_10_a_run_of_repeated_x_below_the_stored_value_costs_nothing_per_element
+QC-TM: 15 bounds, 6 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_1_shared_vtab_size_costs_nothing_per_element
+FAILED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_2_long_matched_entry_text_is_referenced_not_copied
+FAILED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_3_long_default_text_is_referenced_not_copied
+FAILED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_4_shared_range_table_size_costs_nothing_per_element
+FAILED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_5_long_matched_range_text_is_referenced_not_copied
+5 failed, 5 passed, 203 deselected in 94.64s (0:01:34)
+pytest exit code: 1

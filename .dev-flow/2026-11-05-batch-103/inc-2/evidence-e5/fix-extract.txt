@@ -1,0 +1,49 @@
+# E5 fix pass extractor transcript â€” Inc 2a (batch-103), the number rule and the bisect fixes
+# code-wire: v3.1.0 e436a08; python: 3.12.7 (Windows host, this PC)
+# repo: b103-inc2a-code (worktree; read-only) â€” marks written only into a THROWAWAY copy under <scratch>
+# scratch: C:/Users/jjgh8/AppData/Local/Temp/b103-e5-fix (copy of s19_app/ + marks + subset graph + extractor out)
+# subset graph: graph-inc2.md filtered to the 6 nodes the E5 fix pass touches (describe_definitions, _object_kind, _read_method_record, decode_definition, _read_stored_value, _table_value)
+# command: python -I <scratch>/make_extract.py <scratch>  (runs codewire_extract.py --repo <copy> --graph graph-subset.md --path s19_app/tui/a2l_definition.py --out out)
+
+marking: {345: 'describe_definitions', 710: '_object_kind', 806: '_read_method_record', 1154: 'decode_definition', 1237: '_read_stored_value', 1341: '_table_value'} | missing: []
+subset nodes: ['describe_definitions', '_object_kind', '_read_method_record', 'decode_definition', '_read_stored_value', '_table_value']
+extractor stdout: marks=6 graph_nodes=6 calls=4 findings=4 parse_failures=0
+exit 0
+# Code-Wire extractor report
+
+- Marks found: 6
+- Graph nodes parsed: 6
+- Real calls between marked nodes: 4
+- Findings: 4 (0 drift, 4 info)
+- Ambiguous call resolutions (a name matched several defs): 3
+- Files that failed to parse: 0
+
+Type normalisation: spaces and quotes dropped; `List/Dict/Tuple/Set` -> builtins; `X | None` and graph `X?` -> `Optional[X]`; graph `(Callable) A->B` -> `Callable[[A], B]`; graph `tuple(A a, B b)` -> `tuple[A, B]`. A bare graph container (`dict`) against a parameterised code type (`dict[str, Any]`) is info (loose match), not drift.
+
+Call resolution is name-based (`f()`, `Class()` -> `__init__`, `self.m()`, `x.m()` -> top-level `m` or a marked method `m`); dynamic calls and callables passed as values are not seen. Tests excluded.
+
+## Counts
+
+| Kind | Count |
+|---|---|
+| Info: graph names the bare container only (loose match) | 4 |
+
+## Real calls between marked nodes
+
+| Caller | Callee | Sites |
+|---|---|---|
+| `decode_definition` | `_read_stored_value` | s19_app/tui/a2l_definition.py:1189 |
+| `decode_definition` | `_table_value` | s19_app/tui/a2l_definition.py:1207 |
+| `describe_definitions` | `_object_kind` | s19_app/tui/a2l_definition.py:533 |
+| `describe_definitions` | `_read_method_record` | s19_app/tui/a2l_definition.py:498 |
+
+Top-level sites (no marked node above them):
+
+- `describe_definitions`: s19_app/tui/a2l_definition.py:342
+
+## Info: graph names the bare container only (loose match)
+
+- `s19_app/tui/a2l_definition.py:808` — `compu_methods_by_name`: graph `dict` vs code `dict[str, dict]`
+- `s19_app/tui/a2l_definition.py:808` — `compu_tables_by_name`: graph `dict` vs code `dict[str, dict]`
+- `s19_app/tui/a2l_definition.py:808` — `compu_tabs_by_name`: graph `dict` vs code `dict[str, dict]`
+- `s19_app/tui/a2l_definition.py:808` — `reads`: graph `dict` vs code `dict[int, object]`

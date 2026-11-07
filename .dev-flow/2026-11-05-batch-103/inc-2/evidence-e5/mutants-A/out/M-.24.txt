@@ -1,0 +1,47 @@
+# M-.24
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.24/s19_app/__init__.py
+# note: checks run in another order (method before address)
+#   EDIT-OK: '    elif address is None or byte_length is None:\n        refusal = Ref'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..00f7f4fd 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -573,6 +573,16 @@ def _describe_one(
+             "A2L-DEF-KIND",
+             f"{name_echo}: the system has no definition for a {kind_text} object",
+         )
++    elif (
++        method_name is not None
++        and method_name != "NO_COMPU_METHOD"
++        and record is None
++    ):
++        refusal = Refusal(
++            "A2L-DEF-METHOD",
++            f"{name_echo}: the conversion method {method_echo} "
++            "is not declared in the A2L",
++        )
+     elif address is None or byte_length is None:
+         refusal = Refusal(
+             "A2L-DEF-ADDRESS", f"{name_echo}: the object has no address or no length"
+
+# --- pytest (rc=1) ---
+.F..                                                                     [100%]
+=================================== FAILURES ===================================
+_______________ test_r_a2l_def_24_2_address_comes_before_method ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-966/test_r_a2l_def_24_2_address_co0')
+
+    def test_r_a2l_def_24_2_address_comes_before_method(tmp_path):
+        """R-A2L-DEF.24/2 - no address and an undeclared method: ADDRESS."""
+        a2l = _inline(tmp_path, _meas("AM", "UBYTE", "CM_GONE", "0", "255"))
+>       assert describe_definition("AM", a2l).refusal.code == "A2L-DEF-ADDRESS"
+E       AssertionError: assert 'A2L-DEF-METHOD' == 'A2L-DEF-ADDRESS'
+E         
+E         - A2L-DEF-ADDRESS
+E         + A2L-DEF-METHOD
+
+../base/tests/test_b103_a2l_definition.py:817: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_24_2_address_comes_before_method
+1 failed, 3 passed, 187 deselected in 0.41s

@@ -107,3 +107,10 @@ Source files and consumers:
 Tests (§5):
 - **2a** creates `tests/test_b103_a2l_definition.py` with its 2a cases, and `tests/test_b103_synth_definitions_case.py` with S2.7d and AT-B103-I2-2's 2a arm.
 - **2b** adds its cases to the first file and AT-B103-I2-2's encode arm to the second.
+
+E5 gap pass (Inc 3a's E3 `inc-3/E3-rulings.md` "Round 3 rulings" and "Round 4 rulings"; `inc-3/E3-security.md` E3S3-13's COMPU part, E3S3-18). It changes four 2a contracts and adds no function, so the counts above do not change. The rule: every section an object names that 2a reads is read once per walk and reduced to the fixed-size form an object needs, stored as an immutable value in one map per walk (`reads`, keyed by `id()` of the section; `codewire/graph-inc2.md` `[Data: reads]`). The new scaling row R-A2L-DEF.149 checks it: 400 objects sharing 256 KiB describe within 0.5 s, and with the shared size doubled the time beyond the first object's describe rises at most 1.3×.
+- **`describe_definitions`** starts `reads` for each call and passes it to the three readers of every name.
+- **#5 `_read_method_record`** (gains `reads`) stores the method record once per COMPU_METHOD: its 6 fields (`conversion_type`, `format`, `unit`, `coeffs_linear`, `coeffs`, `compu_tab_ref`) as a read-only mapping with tuple coefficients, with no `lines` or `formula`.
+- **#6 `_read_enum_table`** (gains `reads`) stores the table once per COMPU_VTAB or COMPU_VTAB_RANGE; every definition that names it holds that one tuple by reference.
+- **#4 `_resolve_datatype`** (gains `reads`) stores each layout's resolved datatype once, so the frozen `_resolve_record_layout` and the token test run once per layout per walk.
+- Inc 3a's `reads` (its `_conversion_fields`, `_read_axis`, `_read_record_layout`) extends this one map; 3a's E4 takes this key form and these signatures.

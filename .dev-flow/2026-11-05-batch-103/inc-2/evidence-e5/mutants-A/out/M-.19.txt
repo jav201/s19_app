@@ -1,0 +1,49 @@
+# M-.19
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.19/s19_app/__init__.py
+# note: out-of-width bits dropped silently
+#   EDIT-OK: '    if mask >= (1 << (8 * size)):\n        return False\n'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..4bc3d0cf 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -1111,8 +1111,6 @@ def _check_bit_mask(mask: int, datatype: str) -> bool:
+     size = DATATYPE_SIZES.get(datatype)
+     if size is None:
+         return False
+-    if mask >= (1 << (8 * size)):
+-        return False
+     if datatype in _SIGNED_DATATYPES:
+         sign_bit = 1 << (8 * size - 1)
+         if (mask & 1) and (mask & sign_bit):
+
+# --- pytest (rc=1) ---
+.F....                                                                   [100%]
+=================================== FAILURES ===================================
+_________ test_r_a2l_def_19_2_mask_wider_than_the_datatype_is_refused __________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-961/test_r_a2l_def_19_2_mask_wider0')
+
+    def test_r_a2l_def_19_2_mask_wider_than_the_datatype_is_refused(tmp_path):
+        """R-A2L-DEF.19/2 - 0x100 on a UBYTE."""
+        d = _mask_case(tmp_path, "MW", _val("MW", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255", "BIT_MASK 0x100"))
+>       _is_refused(d, "A2L-DEF-MASK", "MW: the bit mask 0x100 cannot be applied to UBYTE")
+
+../base/tests/test_b103_a2l_definition.py:719: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='MW', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=1, datatype=...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None)
+code = 'A2L-DEF-MASK'
+message = 'MW: the bit mask 0x100 cannot be applied to UBYTE'
+
+    def _is_refused(d: Definition, code: str, message: str) -> None:
+>       assert d.refusal == Refusal(code, message), d.refusal
+E       AssertionError: None
+E       assert None == Refusal(code='A2L-DEF-MASK', message='MW: the bit mask 0x100 cannot be applied to UBYTE')
+E        +  where None = Definition(name='MW', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=1, datatype=...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None).refusal
+E        +  and   Refusal(code='A2L-DEF-MASK', message='MW: the bit mask 0x100 cannot be applied to UBYTE') = Refusal('A2L-DEF-MASK', 'MW: the bit mask 0x100 cannot be applied to UBYTE')
+
+../base/tests/test_b103_a2l_definition.py:165: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_19_2_mask_wider_than_the_datatype_is_refused
+1 failed, 5 passed, 185 deselected in 0.36s

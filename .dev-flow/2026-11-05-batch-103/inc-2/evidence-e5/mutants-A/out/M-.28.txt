@@ -1,0 +1,63 @@
+# M-.28
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.28/s19_app/__init__.py
+# note: stored value shown as the value (no DECODE refusal)
+#   EDIT-OK: '        if status == "error":\n            return Refusal("A2L-DEF-DECO'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..ed01159f 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -1219,7 +1219,7 @@ def decode_definition(
+             (definition.limits.lower, definition.limits.upper),
+         )
+         if status == "error":
+-            return Refusal("A2L-DEF-DECODE", f"{name_echo}: {error}")
++            value = stored
+     if not isinstance(value, (int, float)):
+         if isinstance(table_form, _TabForm):
+             ref_echo = table_form.ref_echo
+
+# --- pytest (rc=1) ---
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+___________________ test_r_a2l_def_28_1_rat_func_no_solution ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-971/test_r_a2l_def_28_1_rat_func_n0')
+
+    def test_r_a2l_def_28_1_rat_func_no_solution(tmp_path):
+        """R-A2L-DEF.28/1."""
+        _d, res = _rat(tmp_path, "R1", "0 0 5 0 0 1", bytes([0, 7]))
+>       assert res == Refusal("A2L-DEF-DECODE", "R1: RAT_FUNC has no solution for this value")
+E       AssertionError: assert Decoded(stored=7, value=7, text='7.000') == Refusal(code='A2L-DEF-DECODE', message='R1: RAT_FUNC has no solution for this value')
+E        +  where Refusal(code='A2L-DEF-DECODE', message='R1: RAT_FUNC has no solution for this value') = Refusal('A2L-DEF-DECODE', 'R1: RAT_FUNC has no solution for this value')
+
+../base/tests/test_b103_a2l_definition.py:887: AssertionError
+__________________ test_r_a2l_def_28_2_rat_func_no_real_root ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-971/test_r_a2l_def_28_2_rat_func_n0')
+
+    def test_r_a2l_def_28_2_rat_func_no_real_root(tmp_path):
+        """R-A2L-DEF.28/2."""
+        _d, res = _rat(tmp_path, "R2", "1 0 1 0 0 1", bytes([0, 0]))
+>       assert res == Refusal("A2L-DEF-DECODE", "R2: RAT_FUNC has no real root for this value")
+E       AssertionError: assert Decoded(stored=0, value=0, text='0.000') == Refusal(code='A2L-DEF-DECODE', message='R2: RAT_FUNC has no real root for this value')
+E        +  where Refusal(code='A2L-DEF-DECODE', message='R2: RAT_FUNC has no real root for this value') = Refusal('A2L-DEF-DECODE', 'R2: RAT_FUNC has no real root for this value')
+
+../base/tests/test_b103_a2l_definition.py:893: AssertionError
+________________ test_r_a2l_def_28_3_rat_func_zero_denominator _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-971/test_r_a2l_def_28_3_rat_func_z0')
+
+    def test_r_a2l_def_28_3_rat_func_zero_denominator(tmp_path):
+        """R-A2L-DEF.28/3."""
+        _d, res = _rat(tmp_path, "R3", "0 1 1 0 1 1", bytes([0, 2]))
+>       assert res == Refusal("A2L-DEF-DECODE", "R3: RAT_FUNC root has a zero denominator")
+E       AssertionError: assert Decoded(stored=2, value=2, text='2.000') == Refusal(code='A2L-DEF-DECODE', message='R3: RAT_FUNC root has a zero denominator')
+E        +  where Refusal(code='A2L-DEF-DECODE', message='R3: RAT_FUNC root has a zero denominator') = Refusal('A2L-DEF-DECODE', 'R3: RAT_FUNC root has a zero denominator')
+
+../base/tests/test_b103_a2l_definition.py:899: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_28_1_rat_func_no_solution
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_28_2_rat_func_no_real_root
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_28_3_rat_func_zero_denominator
+3 failed, 188 deselected in 0.63s
