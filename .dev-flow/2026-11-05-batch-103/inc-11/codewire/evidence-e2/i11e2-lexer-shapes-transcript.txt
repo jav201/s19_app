@@ -1,0 +1,19 @@
+# i11e2-pilot-time2 transcript 2026-11-06T22:22:36-06:00 host cachyos-rtx
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e2-11/zq_iso_user; no DISPLAY; no clipboard; stdin closed; load: 2.23 3.30 2.60
+[READ.7/1] 'MAP 0x1C2D3E00/*c*/4026 RL 0 CM 0 1' -> [(1, 'MAP 0x1C2D3E00 4026 RL 0 CM 0 1')] errors=[]
+[READ.7/2] 'MAP 0x1C2D3E00/* old\n */4026 RL' -> [(1, 'MAP 0x1C2D3E00 4026 RL')] errors=[]
+[READ.2/2] 'ECU_ADDRESS\t0x1234\nECU_ADDRESS\x0b0x1234\nECU_ADDRESS\x0c0x1234' -> [(1, 'ECU_ADDRESS 0x1234'), (2, 'ECU_ADDRESS 0x1234'), (3, 'ECU_ADDRESS 0x1234')] errors=[]
+[READ.3/1] 'ECU_ADDRESS 0x1234\xa0\nECU_ADDRESS 0x1234\u2028' -> [(1, 'ECU_ADDRESS 0x1234\xa0'), (2, 'ECU_ADDRESS 0x1234\u2028')] errors=['Line 1: unexpected character U+00A0', 'Line 2: unexpected character U+2028']
+[READ.1/4] 'A\r\r\nB\r\nC\rD' -> [(1, 'A'), (3, 'B'), (4, 'C'), (5, 'D')] errors=[]
+[001.3.2/1] '/begin CHARACTERISTIC X "C:\\\\"\n VALUE 0x2000' -> [(1, '/begin CHARACTERISTIC X "C:\\\\"'), (2, 'VALUE 0x2000')] errors=[]
+[001.3.2/2] '"a\\"b" X' -> [(1, '"a\\"b" X')] errors=[]
+[READ.14/1] 'A "x\n/end ANNOTATION_TEXT\ny" BIT_MASK 0x0FF0' -> [(1, 'A "x\n/end ANNOTATION_TEXT\ny" BIT_MASK 0x0FF0')] errors=[]
+[READ.16/1] '/begin MEASUREMENT X"long"' -> [(1, '/begin MEASUREMENT X "long"')] errors=[]
+[READ.8/2] '/* a /* b */ c */ ECU_ADDRESS 0x1234' -> [(1, 'c */ ECU_ADDRESS 0x1234')] errors=['Line 1: */ without /*']
+[READ.9/3] '// c\rECU_ADDRESS 0x1234' -> [(2, 'ECU_ADDRESS 0x1234')] errors=[]
+[READ.10/1] 'A\n/* never closed\nECU_ADDRESS 0x1234' -> [(1, 'A')] errors=['Line 2: comment not closed']
+[READ.15/1] 'A\nFORMAT "%5.0\nB' -> [(1, 'A'), (2, 'FORMAT')] errors=['Line 2: quoted string not closed']
+[READ.13/1] 'FORMAT "/* x" ECU_ADDRESS 0x1234' -> [(1, 'FORMAT "/* x" ECU_ADDRESS 0x1234')] errors=[]
+[BOM] '\ufeffASAP2_VERSION 1 71' -> [(1, 'ASAP2_VERSION 1 71')] errors=[]
+# exit 0 ; clone status after: 0 changed; load: 2.23 3.30 2.60

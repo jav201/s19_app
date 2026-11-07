@@ -74,3 +74,4 @@
 2026-11-06T22:10:40-06:00 rebase done — Inc 3 (Opus, 21 min): split 3a 61/179/29, 3b 11/36/4 (+ .140); coverage pass before 3a's E3
 2026-11-06T22:31:59-06:00 corpus done (Sonnet, 26 min): 168 public A2L files (158 unique, 255,734 objects, 65 repos; licenses mixed — only derived data in design/a2l-corpus/); current reader anomalies at scale: 137,243 objects named UNKNOWN (header split across lines), 121,299 MEASUREMENT datatype None, 805 wrong addresses, 729 ECU_ADDRESS mid-line lost, 657 kinds misread, 17,000 CHARACTERISTIC lengths None; field case: 51 MAP/CURVE would show exactly 4 extra digits under the padding glue
 2026-11-06T22:36:14-06:00 coverage pass done — Inc 3 (Opus, 25 min): 3a 64 rows / 211 cases / 29 nodes; 3b 12 / 42 (+ .140); ids .140–.143; E3 for 3a next (architect + security, Opus)
+2026-11-06T22:45:43-06:00 E2 done — Inc 11 (Opus, 34 min): 32 nodes; I-11.1/.2/.5/.8 accepted; CG-1..6 ruled (READ.53 new; CG-4 → Inc 3a; CG-5 A); E1 addendum then E3

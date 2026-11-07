@@ -1,0 +1,30 @@
+# i11e2-pilot-time2 transcript 2026-11-06T22:22:46-06:00 host cachyos-rtx
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e2-11/zq_iso_user; no DISPLAY; no clipboard; stdin closed; load: 2.20 3.26 2.59
+python 3.11.18; runs per mode 3; interleaved baseTree, baseFull, cand; one process per run
+[run 1] firmware.a2l {"mode": "baseTree", "s": 1.028, "objects": 220040, "sections": 242103, "errors": [], "file": "~/work/s19_app/s19_app/tui/a2l.py", "maxrss_mb": 257.4}
+[run 1] firmware.a2l {"mode": "baseFull", "s": 6.029, "tags": 220040, "errors": [], "file": "~/work/s19_app/s19_app/tui/a2l.py", "maxrss_mb": 535.6}
+[run 1] firmware.a2l {"mode": "cand", "s": 3.176, "objects": 220040, "sections": 242103, "errors": [], "maxrss_mb": 388.1}
+[run 2] firmware.a2l {"mode": "baseTree", "s": 0.989, "objects": 220040, "sections": 242103, "errors": [], "file": "~/work/s19_app/s19_app/tui/a2l.py", "maxrss_mb": 257.6}
+[run 2] firmware.a2l {"mode": "baseFull", "s": 5.853, "tags": 220040, "errors": [], "file": "~/work/s19_app/s19_app/tui/a2l.py", "maxrss_mb": 535.5}
+[run 2] firmware.a2l {"mode": "cand", "s": 3.236, "objects": 220040, "sections": 242103, "errors": [], "maxrss_mb": 388.1}
+[run 3] firmware.a2l {"mode": "baseTree", "s": 1.025, "objects": 220040, "sections": 242103, "errors": [], "file": "~/work/s19_app/s19_app/tui/a2l.py", "maxrss_mb": 257.4}
+[run 3] firmware.a2l {"mode": "baseFull", "s": 5.898, "tags": 220040, "errors": [], "file": "~/work/s19_app/s19_app/tui/a2l.py", "maxrss_mb": 535.5}
+[run 3] firmware.a2l {"mode": "cand", "s": 3.22, "objects": 220040, "sections": 242103, "errors": [], "maxrss_mb": 388.0}
+[median s] firmware.a2l: baseTree 1.025, baseFull 5.898, cand 3.22; base rest (full - tree) 4.873
+[projection] firmware.a2l: cand tree + base rest = 8.093 s = 1.37 x base parse (bound 1.50); cand tree alone = 3.14 x base tree; budget left for the new tag walk at 1.50x: 5.627 s (base rest 4.873 s)
+[maxrss median MB] firmware.a2l: baseTree 257.4, baseFull 535.5, cand 388.1
+[run 1] software_a.a2l {"mode": "baseTree", "s": 0.075, "objects": 13990, "sections": 22866, "errors": [], "file": "~/work/s19_app/s19_app/tui/a2l.py", "maxrss_mb": 73.5}
+[run 1] software_a.a2l {"mode": "baseFull", "s": 0.67, "tags": 13990, "errors": [], "file": "~/work/s19_app/s19_app/tui/a2l.py", "maxrss_mb": 95.8}
+[run 1] software_a.a2l {"mode": "cand", "s": 0.299, "objects": 13990, "sections": 22866, "errors": [], "maxrss_mb": 56.0}
+[run 2] software_a.a2l {"mode": "baseTree", "s": 0.075, "objects": 13990, "sections": 22866, "errors": [], "file": "~/work/s19_app/s19_app/tui/a2l.py", "maxrss_mb": 73.5}
+[run 2] software_a.a2l {"mode": "baseFull", "s": 0.653, "tags": 13990, "errors": [], "file": "~/work/s19_app/s19_app/tui/a2l.py", "maxrss_mb": 95.9}
+[run 2] software_a.a2l {"mode": "cand", "s": 0.3, "objects": 13990, "sections": 22866, "errors": [], "maxrss_mb": 55.9}
+[run 3] software_a.a2l {"mode": "baseTree", "s": 0.074, "objects": 13990, "sections": 22866, "errors": [], "file": "~/work/s19_app/s19_app/tui/a2l.py", "maxrss_mb": 73.4}
+[run 3] software_a.a2l {"mode": "baseFull", "s": 0.642, "tags": 13990, "errors": [], "file": "~/work/s19_app/s19_app/tui/a2l.py", "maxrss_mb": 95.9}
+[run 3] software_a.a2l {"mode": "cand", "s": 0.308, "objects": 13990, "sections": 22866, "errors": [], "maxrss_mb": 56.0}
+[median s] software_a.a2l: baseTree 0.075, baseFull 0.653, cand 0.3; base rest (full - tree) 0.578
+[projection] software_a.a2l: cand tree + base rest = 0.878 s = 1.34 x base parse (bound 1.50); cand tree alone = 4.00 x base tree; budget left for the new tag walk at 1.50x: 0.679 s (base rest 0.578 s)
+[maxrss median MB] software_a.a2l: baseTree 73.5, baseFull 95.9, cand 56.0
+# exit 0 ; clone status after: 0 changed; load: 3.16 3.37 2.66
+# redaction (E2, sed): the runner's home path written as ~

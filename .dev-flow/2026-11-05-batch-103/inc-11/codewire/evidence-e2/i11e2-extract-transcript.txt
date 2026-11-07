@@ -1,0 +1,136 @@
+# transcript: i11e2-extract.sh, run 2026-11-07T04:44:33Z
+# code-wire: v3.1.0 e436a08; copy: git archive e07fb00 s19_app (worktree HEAD 531cb2ac; git diff e07fb00 -- s19_app: 0 lines)
+# python: Python 3.12.7
+
+## marks (each replaces the blank line above its def)
+mark build_section_tree -> s19_app/tui/a2l.py:153 (def at 154)
+mark parse_begin_meta -> s19_app/tui/a2l.py:254 (def at 255)
+mark _parse_first_field -> s19_app/tui/a2l.py:268 (def at 269)
+mark _byte_order_from_section_lines -> s19_app/tui/a2l.py:310 (def at 311)
+mark _split_line_respecting_quotes -> s19_app/tui/a2l.py:318 (def at 319)
+mark _strip_a2l_comments -> s19_app/tui/a2l.py:352 (def at 353)
+mark _flatten_body_tokens -> s19_app/tui/a2l.py:421 (def at 422)
+mark parse_measurement_header -> s19_app/tui/a2l.py:479 (def at 480)
+mark _characteristic_from_tokens -> s19_app/tui/a2l.py:497 (def at 498)
+mark _extended_kind_anchor -> s19_app/tui/a2l.py:580 (def at 581)
+mark parse_characteristic_header -> s19_app/tui/a2l.py:610 (def at 611)
+mark assemble_characteristic_header -> s19_app/tui/a2l.py:615 (def at 616)
+mark _first_header_line -> s19_app/tui/a2l.py:655 (def at 656)
+mark _memory_segment_record_words -> s19_app/tui/a2l.py:981 (def at 982)
+mark _infer_length_measurement -> s19_app/tui/a2l.py:1163 (def at 1164)
+mark _infer_length_characteristic -> s19_app/tui/a2l.py:1186 (def at 1187)
+mark extract_a2l_tags -> s19_app/tui/a2l.py:2571 (def at 2572)
+mark parse_a2l_file -> s19_app/tui/a2l.py:2796 (def at 2797)
+mark iter_section_lines -> s19_app/tui/a2l.py:3626 (def at 3627)
+mark render_a2l_view -> s19_app/tui/a2l.py:3643 (def at 3644)
+mark S19TuiApp._compose_screen_a2l -> s19_app/tui/app.py:8455 (def at 8456)
+mark validate_a2l_structure -> s19_app/validation/rules.py:462 (def at 463)
+
+## line count unchanged by the marks
+s19_app/tui/a2l.py: base 3716 / marked copy 3716
+s19_app/tui/app.py: base 21664 / marked copy 21664
+s19_app/validation/rules.py: base 565 / marked copy 565
+
+## baseline subset: 22 nodes
+build_section_tree _parse_first_field parse_begin_meta _split_line_respecting_quotes _strip_a2l_comments _flatten_body_tokens parse_measurement_header _characteristic_from_tokens _extended_kind_anchor _memory_segment_record_words _infer_length_measurement _infer_length_characteristic extract_a2l_tags parse_a2l_file _first_header_line assemble_characteristic_header parse_characteristic_header _byte_order_from_section_lines validate_a2l_structure iter_section_lines render_a2l_view S19TuiApp._compose_screen_a2l 
+
+## run 1: baseline subset (expected: drift only on the PROPOSED signature of extract_a2l_tags)
+marks=22 graph_nodes=22 calls=29 findings=1 parse_failures=0
+exit=1
+
+# Code-Wire extractor report
+
+- Marks found: 22
+- Graph nodes parsed: 22
+- Real calls between marked nodes: 29
+- Findings: 1 (1 drift, 0 info)
+- Ambiguous call resolutions (a name matched several defs): 3
+- Files that failed to parse: 0
+
+Type normalisation: spaces and quotes dropped; `List/Dict/Tuple/Set` -> builtins; `X | None` and graph `X?` -> `Optional[X]`; graph `(Callable) A->B` -> `Callable[[A], B]`; graph `tuple(A a, B b)` -> `tuple[A, B]`. A bare graph container (`dict`) against a parameterised code type (`dict[str, Any]`) is info (loose match), not drift.
+
+Call resolution is name-based (`f()`, `Class()` -> `__init__`, `self.m()`, `x.m()` -> top-level `m` or a marked method `m`); dynamic calls and callables passed as values are not seen. Tests excluded.
+
+## Counts
+
+| Kind | Count |
+|---|---|
+| Input in graph, not a parameter in code | 1 |
+
+## Real calls between marked nodes
+
+| Caller | Callee | Sites |
+|---|---|---|
+| `_byte_order_from_section_lines` | `_split_line_respecting_quotes` | s19_app/tui/a2l.py:313 |
+| `_characteristic_from_tokens` | `_extended_kind_anchor` | s19_app/tui/a2l.py:559 |
+| `_first_header_line` | `parse_characteristic_header` | s19_app/tui/a2l.py:665 |
+| `_first_header_line` | `parse_measurement_header` | s19_app/tui/a2l.py:663 |
+| `_flatten_body_tokens` | `_split_line_respecting_quotes` | s19_app/tui/a2l.py:456 |
+| `_flatten_body_tokens` | `_strip_a2l_comments` | s19_app/tui/a2l.py:456 |
+| `assemble_characteristic_header` | `_characteristic_from_tokens` | s19_app/tui/a2l.py:653 |
+| `assemble_characteristic_header` | `_flatten_body_tokens` | s19_app/tui/a2l.py:653 |
+| `extract_a2l_tags` | `_byte_order_from_section_lines` | s19_app/tui/a2l.py:2587 |
+| `extract_a2l_tags` | `_first_header_line` | s19_app/tui/a2l.py:2603 |
+| `extract_a2l_tags` | `_flatten_body_tokens` | s19_app/tui/a2l.py:2729 |
+| `extract_a2l_tags` | `_infer_length_characteristic` | s19_app/tui/a2l.py:2723 |
+| `extract_a2l_tags` | `_infer_length_measurement` | s19_app/tui/a2l.py:2721 |
+| `extract_a2l_tags` | `_memory_segment_record_words` | s19_app/tui/a2l.py:1091 |
+| `extract_a2l_tags` | `_split_line_respecting_quotes` | s19_app/tui/a2l.py:2712, s19_app/tui/a2l.py:674 |
+| `extract_a2l_tags` | `assemble_characteristic_header` | s19_app/tui/a2l.py:2608 |
+| `extract_a2l_tags` | `parse_begin_meta` | s19_app/tui/a2l.py:2601, s19_app/tui/a2l.py:2732 |
+| `extract_a2l_tags` | `parse_measurement_header` | s19_app/tui/a2l.py:2604 |
+| `parse_a2l_file` | `_byte_order_from_section_lines` | s19_app/tui/a2l.py:723 |
+| `parse_a2l_file` | `_memory_segment_record_words` | s19_app/tui/a2l.py:1091 |
+| `parse_a2l_file` | `_split_line_respecting_quotes` | s19_app/tui/a2l.py:718, s19_app/tui/a2l.py:795, s19_app/tui/a2l.py:848, s19_app/tui/a2l.py:873, s19_app/tui/a2l.py:909, s19_app/tui/a2l.py:913 |
+| `parse_a2l_file` | `build_section_tree` | s19_app/tui/a2l.py:2829 |
+| `parse_a2l_file` | `extract_a2l_tags` | s19_app/tui/a2l.py:2834 |
+| `parse_a2l_file` | `parse_begin_meta` | s19_app/tui/a2l.py:715, s19_app/tui/a2l.py:859, s19_app/tui/a2l.py:903 |
+| `parse_begin_meta` | `_parse_first_field` | s19_app/tui/a2l.py:260, s19_app/tui/a2l.py:263 |
+| `parse_characteristic_header` | `_characteristic_from_tokens` | s19_app/tui/a2l.py:613 |
+| `parse_characteristic_header` | `_split_line_respecting_quotes` | s19_app/tui/a2l.py:613 |
+| `parse_measurement_header` | `_split_line_respecting_quotes` | s19_app/tui/a2l.py:482 |
+| `render_a2l_view` | `iter_section_lines` | s19_app/tui/a2l.py:3657 |
+
+Top-level sites (no marked node above them):
+
+- `S19TuiApp._compose_screen_a2l`: s19_app/tui/app.py:3385
+- `parse_a2l_file`: s19_app/tui/app.py:948, s19_app/tui/app.py:950, s19_app/tui/services/flow_execution_service.py:381, s19_app/tui/services/flow_execution_service.py:500, s19_app/tui/services/variant_execution_service.py:2665
+- `render_a2l_view`: s19_app/tui/services/a2l_service.py:26
+- `validate_a2l_structure`: s19_app/tui/a2l.py:3716, s19_app/validation/engine.py:71
+
+## Input in graph, not a parameter in code
+
+- `s19_app/tui/a2l.py:2571` — graph input `errors` not a parameter of `extract_a2l_tags`
+
+## run 2: whole graph (expected exit 1: run 1's drift plus NEW nodes without marks)
+marks=22 graph_nodes=32 calls=29 findings=11 parse_failures=0
+exit=1
+
+## Counts
+
+| Kind | Count |
+|---|---|
+| Graph node without mark (no code yet) | 10 |
+| Input in graph, not a parameter in code | 1 |
+
+## Real calls between marked nodes
+## Graph node without mark (no code yet)
+
+- `s19_app/tui/a2l.py` — `_lex_a2l_lines`
+- `s19_app/tui/a2l.py` — `_line_words`
+- `s19_app/tui/a2l.py` — `_section_words`
+- `s19_app/tui/a2l.py` — `_tag_header`
+- `s19_app/tui/a2l.py` — `_tag_keyword_lines`
+- `s19_app/tui/a2l.py` — `_number_word`
+- `s19_app/tui/a2l.py` — `_bounded_length`
+- `s19_app/tui/a2l.py` — `extract_declared_spans`
+- `tests/support/b103_a2l_ref.py` — `ref_read_a2l`
+- `.dev-flow/2026-11-05-batch-103/inc-11/evidence-e5/i11e5-corpus.py` — `run_corpus_differential`
+
+## Input in graph, not a parameter in code
+
+- `s19_app/tui/a2l.py:2571` — graph input `errors` not a parameter of `extract_a2l_tags`
+
+## lint: whole graph (a record, not a gate)
+nodes=32 entities=11 edges=19 findings=8 not read=0
+exit=0
