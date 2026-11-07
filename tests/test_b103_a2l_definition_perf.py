@@ -22,6 +22,7 @@ import pytest
 
 from s19_app.tui.a2l_definition import Definition, describe_definitions
 from s19_app.tui.a2l_parse import parse_a2l_file
+from tests.support.timing import report_margin, timing_bound
 
 SOFTA = Path(__file__).resolve().parent.parent / "examples" / "case_00_public" / "software_a.a2l"
 BOUND_SECONDS = 2.0
@@ -44,4 +45,7 @@ def test_r_a2l_def_136_1_describing_every_object_is_fast():
     # the walk really built definitions (a constant refusal would also be fast)
     built = [d for d in result.values() if d.refusal is None]
     assert any(d.kind == "number" for d in built) and any(d.kind == "enum" for d in built)
-    assert statistics.median(runs) <= BOUND_SECONDS, runs
+    # Integration fix (orchestrator, 2026-11-07): the bound goes through the repo's
+    # timing helpers so the R-TST-002 census sees a timing arm and QC-TM reports it.
+    median = statistics.median(runs)
+    assert median <= report_margin("R-A2L-DEF.136 describe 13990", median, timing_bound(BOUND_SECONDS)), runs

@@ -19,6 +19,7 @@ from __future__ import annotations
 import math
 import struct
 from dataclasses import dataclass, replace
+from decimal import Decimal
 from typing import Iterable, Mapping, Optional
 
 from .a2l import (
@@ -811,7 +812,9 @@ def _read_object_lines(section: Optional[dict]) -> dict:
             hi = _finite_number(body[i + 2])
             if lo is not None and hi is not None:
                 result["extended_limits"] = Limits(lo, hi, body[i + 1], body[i + 2])
-            i += 2
+                i += 2
+            # A line that does not hold two numbers consumes only its keyword, so the
+            # next keyword (e.g. FORMAT) is still read (R-A2L-DEF.21/1, .22).
         elif word in ("PHYS_UNIT", "UNIT") and result["unit"] is None and i + 1 < n:
             result["unit"] = body[i + 1]
             i += 1
@@ -1044,8 +1047,9 @@ def display_text(definition: Definition, value: int | float) -> str:
         or conversion not in (None, "IDENTICAL")
     ):
         d = definition.decimals
-        rounded = value
         if d >= 15:
-            rounded = float(f"{value:.15g}")
-        return f"{rounded:.{d}f}"
+            # Round to 15 significant digits, then write exactly d decimals of that
+            # decimal value (E3A-06); a float round-trip would bring back binary digits.
+            return format(Decimal(f"{value:.15g}"), f".{d}f")
+        return f"{value:.{d}f}"
     return f"{value:.15g}"

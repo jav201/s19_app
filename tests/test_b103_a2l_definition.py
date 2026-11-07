@@ -615,7 +615,22 @@ def test_r_a2l_def_15_1_triples_of_a_v171_compu_vtab_range(v171):
 
 def test_r_a2l_def_15_2_a2ltool_range_table(softa, softa_defs):
     """R-A2L-DEF.15/2 - the first COMPU_VTAB_RANGE of software_a: 5 entries, first (0, 0, text)."""
-    table = next(n for n, t in softa["compu_tabs_by_name"].items() if t["section"] == "COMPU_VTAB_RANGE")
+    # Integration fix (orchestrator, 2026-11-07; diagnosis evidence-e4/diag-2a-transcript.txt):
+    # the side table holds only COMPU_VTAB sections, so the first COMPU_VTAB_RANGE is found
+    # by a pre-order walk of the section tree, its name read as the reader reads it.
+    from s19_app.tui.a2l import parse_begin_meta
+
+    def _first_range(nodes):
+        for node in nodes:
+            if node.get("name") == "COMPU_VTAB_RANGE":
+                return parse_begin_meta(node.get("meta", "") or "")[0]
+            found = _first_range(node.get("children") or [])
+            if found is not None:
+                return found
+        return None
+
+    table = _first_range(softa["sections"])
+    assert table is not None
     d = next(x for x in softa_defs.values() if x.enum_table == table)
     assert d.kind == "enum"
     assert len(d.enum_entries) == 5
