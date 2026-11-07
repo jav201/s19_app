@@ -227,3 +227,15 @@ Authority: `../inc-3/E3-rulings.md` "Round 6 rulings" (main worktree `s19_app-b1
 - **No new case for RL-10 or CM-2:** accepted. .149/4 already is RL-10, and CM-2 is covered by /1's reader, memo and negative control.
 - **The fail-closed cases sit under R-A2L-DEF.58.2 (/18, /19):** accepted, since .58.2 is the row for refusing instead of raising. /18's message matches Inc 3a's ruling. /19's wording, `<name>: the table <ref> has an x that is not a number`, is accepted, and Inc 3a uses the same wording for its arrays.
 - **.149/1's Expected measure** was updated in place by the orchestrator to the ruled one; /2–/4 read "as /1's bounds".
+
+### Gap pass 2 — GREEN (2026-11-07, orchestrator Opus 5.5)
+
+- **Code:** `6071a385`, md5 `820a4c3a`, DeepSeek. **Tests:** `e9bad3ca`, independent Sonnet tester.
+- **Main file:** 182 passed.
+- **Perf, 12 new cases:** 12/12 in run 3, plus 4/4 reruns at load < 2. Runs 1 and 2 at load 15 failed 4 and 1 ratio checks.
+- **Mutants:** a plain bisect and a cut at 255 both go RED.
+- **RED on `eb750c6f`:** 7 tests fail in the main file and 11 in the perf file; the absolute-bound failures run 4.6–15.9 s against a 0.5 s bound.
+- **Open item for Inc 2a's E5 (test review) — E5-3:** the scaling measure is the difference of two walks (the 400-name walk minus a 1-name walk), so a per-object part of 10–130 ms is swamped by host load. Under a shared load of 15, from another session's 12-worker run, the ratios fail.
+  - Fix, choose one: time the 399 names inside one fresh walk through the module's per-name step (the steady form), or raise the object count until the per-object part dominates (e.g. 4,000 names).
+  - Until then the timed cases are decided on a quiet host: load < 2 at start, nothing else on the runner. That is how the batch-end battery runs them.
+- **The integrated tree** `~/work/b103-int2a` on cachyos-rtx is rebuilt at `e9bad3ca`, as a `--shared` clone of `~/work/s19_app` on branch `b103-inc2a-code`. It is read-only for E5 agents.
