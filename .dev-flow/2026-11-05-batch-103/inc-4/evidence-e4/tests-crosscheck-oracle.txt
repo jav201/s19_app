@@ -1,0 +1,20 @@
+# cross-check: tests vs the E1/E3 throwaway rows-oracle behind the I-3 signatures (runner-only copy under /tmp; never committed)
+2026-11-06T20:21:30-06:00
+ 20:21:30 up 1 day, 11:53,  2 users,  load average: 0.30, 0.17, 0.81
+/tmp/b103-e4-4-tests/shimtree/s19_app/__init__.py
+........................................................................ [ 55%]
+........................................................F                [100%]
+=================================== FAILURES ===================================
+_______________ test_i3_module_imports_the_standard_library_only _______________
+tests/test_b103_label_match.py:753: in test_i3_module_imports_the_standard_library_only
+    assert roots <= {"__future__", "array", "bisect", "dataclasses", "enum", "typing"}, sorted(roots)
+E   AssertionError: ['dataclasses', 'enum', 'os', 'runpy']
+E   assert {'dataclasses...'os', 'runpy'} <= {'__future__'...um', 'typing'}
+E     
+E     Extra items in the left set:
+E     'runpy'
+E     'os'
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_i3_module_imports_the_standard_library_only
+1 failed, 128 passed in 16.38s
+exit code: 1

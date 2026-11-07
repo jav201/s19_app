@@ -1,0 +1,299 @@
+# RED against an empty-result stub (runner-only copy of base e07fb00 under /tmp; never committed)
+2026-11-06T20:19:55-06:00
+ 20:19:55 up 1 day, 11:51,  2 users,  load average: 0.00, 0.09, 0.86
+/tmp/b103-e4-4-tests/stubtree/s19_app/__init__.py
+tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+tests/test_b103_label_match_perf.py::test_r_a2l_match_40_2_long_queries_against_1020_character_tokens
+
+136 tests collected in 0.53s
+FFFF.....FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF....FF.F.FF.FFFFFFF..FFFFFFFF [ 52%]
+FFFFFFFF.F.FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF...FF.FF..F............         [100%]
+=================================== FAILURES ===================================
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.1/1: query '  VALUE_0001  ' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.1/2: query '\tVALUE_0001\n' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.1/3: query ' value_000 ' limit 5
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.1/4: query '\x1cVALUE_0001' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.3/1: query 'value_0001' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.3/2: query 'Value_0001' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.3/3: query 'rpm' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.4/1: query 'drück' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.4/2: query 'DRÜCK' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.4/3: query 'VALUE-0001' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.5/1: query 'VALUE_0001' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.5/2: query 'map_0020' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.6/1: query 'value_000' limit 5
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.6/2: query 'span' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.6/3: query 'LIMIT' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.7/1: query '0001' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.7/2: query 'knife[1]' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.7/3: query '[0].Spoon' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.7/4: query 'ledRing[1]' limit 4
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.8/1: query 'blk val 00' limit 3
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.8/2: query 'stop watch' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.8/3: query 'oks ahw' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.8/4: query 'knife 1 x' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.8/5: query 'out range' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.8/6: query 'knife.*' limit 4
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.8/7: query 'a value' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.8/8: query 'map 3 d' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.8/9: query 'VALUE_0001_VALUE_0001' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.9/1: query 'mp' limit 3
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.9/2: query 'ascii 1' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.9/3: query 'map 20' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.9/4: query 'gamecontroller timer' limit 3
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.10/1: query 'cuvre' limit 3
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.10/2: query 'maesurement_0001' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.10/3: query 'vlaue_0001' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.10/4: query 'mpa' limit 3
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.10/5: query 'xmap' limit 3
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.10/6: query 'maq' limit 3
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.12/4: query '٣٣٤' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.13/1: query 'valuexx_0001' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.13/3: query 'curvee' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.14/1: query 'value_000' limit 100
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.14/2: query '0001' limit 100
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.15/2: query 'v' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.16/1: query 'value_000' limit 1
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.16/2: query 'valu_0001' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.16/3: query 'vale_0001' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.17/1: query 'VALUE_0001' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.17/2: query 'value_000' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.18/3: query 'value_000' limit 1
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.20/2: query 'gamecontroller.timer' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.21/1: query 'counter' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.21/2: query '_0001' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.21/3: query 'ounter' limit 4
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.22/1: query 'curvee' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.23/2: query 'rpm' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.24/2: query 'RPM' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.24/4: query 'count' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.25/3: query 'rpm' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.28/1: query 'count' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.32/1: query 'maesu' limit 3
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.32/3: query 'vblk' limit 2
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.33/2: query 'measurementss_0001' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.33/3: query 'cuvre maq' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.34/1: query 'abs value' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.38/1: query 'VALUE_0001_VALUE_0001_VALUE_0001_VALUE_0001_VALUE_0001_VALUE_0001_VALUE_0001_VALUE_0001_VALUE_0001_VALUE_0001_VALUE_0001_VALUE_0001_VALUE_0001_VALUE_0001_VALUE_0001_VALUE_0001_VALUE_0001_VALUE_0001_VALUE_0001_VALUE_0001_VALUE_0001_VALUE_0001_VALUE_0001_VAL' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.39/1: query 'x' limit 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:402: assert 0 == 3
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:410: assert 0 == 3
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:410: assert 0 == 3
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:416: AssertionError: assert [] == [('VALUE_0001...0, ((0, 9),))]
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:421: AssertionError: assert [] == [('MAP_0001',... ((12, 16),))]
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:427: assert 0 == 20
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:436: AssertionError: assert [] == [('LukPvq.JXM...), (56, 57)))]
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:443: assert 0 == 6
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:452: IndexError: list index out of range
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:458: AssertionError: assert [] == ['Drück_Max',..., 'druck_max']
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:465: AssertionError: assert [] == ['ASCII_0001'... 'VALUE_0001']
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:470: AssertionError: assert [] == [('MAP_0001',... ((12, 16),))]
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:82: AssertionError: 'VALUE_0001' listed 0 times in []
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:481: assert [] == [((0, 9),), (...,), ((0, 9),)]
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:82: AssertionError: 'MAP_0001' listed 0 times in []
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:82: AssertionError: 'model.MainClass.ledController.sw.timeCounter' listed 0 times in []
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:501: assert [] == [((0, 3), (4,... 7), (8, 10))]
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:509: assert [] == [((0, 1), (2,..., 1), (2, 3))]
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:82: AssertionError: 'VAL_BLK_0001' listed 0 times in []
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:524: AssertionError: assert [] == [('MEASUREMENT_0001', 1)]
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:530: AssertionError: assert [] == ['VAL_BLK_0001']
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:560: AssertionError: m
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:585: AssertionError: nothing listed for 'JotafVod_msrqlLzL_kh2C_rWl_pfue._0_'
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:585: AssertionError: nothing listed for 'jotafvod'
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:585: AssertionError: nothing listed for 'msrqlLzL'
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:585: AssertionError: nothing listed for 'pfue._0_'
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:585: AssertionError: nothing listed for 'jotaf vod'
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:585: AssertionError: nothing listed for 'vod jotaf'
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:585: AssertionError: nothing listed for 'jotfa vod'
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:585: AssertionError: nothing listed for 'jotaf_vdo'
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:630: Failed: DID NOT RAISE <class 'TypeError'>
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:639: Failed: DID NOT RAISE <class 'TypeError'>
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:661: AssertionError: assert [] == [('MAP_0002',...0, ((0, 8),))]
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:667: AssertionError: assert ('VALUE_0001'...NT_0002', ...) == ('VALUE_0001'...NT_0002', ...)
+/tmp/b103-e4-4-tests/stubtree/tests/test_b103_label_match.py:687: Failed: DID NOT RAISE <class 'TypeError'>
+============================= QC-TM timing margins =============================
+100.0%  0.000 s / 5.000 s  R-A2L-MATCH.35 prepare REF  tests/test_b103_label_match_perf.py::test_r_a2l_match_35_1_preparing_50000_names
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF 'a'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF 'e'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF '0'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF 'zz'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF 'ab'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF 'JotafVod_msrqlLzL_kh2C_rWl_pfue._0_'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF 'JotafVod_msr'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF 'srqlLzL_'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF '0 jotaf'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF 'JVmL'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF 'xqzjvkw'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF 'qqqq zzzz'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF 'aaaa'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF 'e e e'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF 'Nzukij'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF 'Ierxjr_Eud'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF 'ledRing'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF 'pposbxiif'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF 'cnt'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF 'temp_sensor_max'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF 'x y z w v u'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF 'pposbxiifkdgfiajnbbpvb_dyan_xvz1'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF 'njraipjtbtu lsuakcoj hsxgibymjxu orfltal'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF 'votklbi fjblnabj qghque pdjxmq tiprdynot'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF 'lmmwngodou jadkvqy khbnukc qomfrybiza ev'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF 'e e e e e e e e e e e e e e e e e e e e '  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF 'a b c d e f g h i j k l m n o p q r s t '  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF '0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 '  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF 'FCA_NPUK_SMM.RWG_TjsPHIoim_SNX_TVC_2_ewh'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF 'RUX_ARV_LFS_QM_GJWTDMS_WDGTH.Fgathduhjd,'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF 'HRR_WOL.TNY_U_ZmyrXSZTPeyoMsdpWwbcUtd_Dw'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF 'RHR_WOL.TNY_U_ZmyrXSZTPeyoMsdpWwbcUtd_Dw'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF6 'm'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF6 'meas_'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF6 'chr'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF6 'mesa'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF6 'cahr'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF6 'cr0'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF6 'char 1'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF6 '0'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF6 'chr 0'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF6 'ch00'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF6 'meas 1'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+100.0%  0.000 s / 0.200 s  R-A2L-MATCH.36 REF6 'c 0 1'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+100.0%  0.000 s / 1.000 s  R-A2L-MATCH.40 REF qzx x64  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+100.0%  0.000 s / 1.000 s  R-A2L-MATCH.40 REF qza..qzz x3  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+100.0%  0.000 s / 1.000 s  R-A2L-MATCH.40 REF cnt x64  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+100.0%  0.000 s / 1.000 s  R-A2L-MATCH.40 REF 1a x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+100.0%  0.000 s / 1.000 s  R-A2L-MATCH.40 REF rat x64  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+100.0%  0.000 s / 1.000 s  R-A2L-MATCH.40 REF e x120 + rat  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+100.0%  0.000 s / 1.000 s  R-A2L-MATCH.40 REF6 chr x64  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+100.0%  0.000 s / 1.000 s  R-A2L-MATCH.40 REF6 cahr x51  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+100.0%  0.000 s / 1.000 s  R-A2L-MATCH.40 REF6 0 x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+100.0%  0.000 s / 1.000 s  R-A2L-MATCH.40 REF6 00 x85  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+100.0%  0.000 s / 1.000 s  R-A2L-MATCH.40 REF6 c 0 x64  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+100.0%  0.000 s / 1.000 s  R-A2L-MATCH.40 REF6 c x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+100.0%  0.000 s / 1.000 s  R-A2L-MATCH.40 REF6 m x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+100.0%  0.000 s / 1.000 s  R-A2L-MATCH.40 REF6 1 x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+100.0%  0.000 s / 1.000 s  R-A2L-MATCH.40 REF6 c x125 + chax  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+100.0%  0.000 s / 1.000 s  R-A2L-MATCH.40 REF6 0 x125 + chax  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+100.0%  0.000 s / 1.000 s  R-A2L-MATCH.40 REF6 chax x52  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+100.0%  0.000 s / 1.000 s  R-A2L-MATCH.40 REF6 mesa x52  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+100.0%  0.000 s / 1.000 s  R-A2L-MATCH.40 REF6 near tokens  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+100.0%  0.000 s / 1.000 s  R-A2L-MATCH.40 REF6 cha..chz x3  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+100.0%  0.000 s / 1.000 s  R-A2L-MATCH.40 REF6 51 typos of char  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+100.0%  0.000 s / 1.000 s  R-A2L-MATCH.40 REF6 E3S-01 e x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+100.0%  0.000 s / 1.000 s  R-A2L-MATCH.40 REF6 E3S-01 a..z  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+100.0%  0.000 s / 1.000 s  R-A2L-MATCH.40 REF6 E3S-01 0 x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+100.0%  0.000 s / 1.000 s  R-A2L-MATCH.40 REF6 E3S-01 a x256  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+100.0%  0.000 s / 1.000 s  R-A2L-MATCH.40 REF6 E3S-01 pool join  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+100.0%  0.000 s / 1.000 s  R-A2L-MATCH.40 REF6 E3S-01 pool[200:] join  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+100.0%  0.000 s / 1.000 s  R-A2L-MATCH.40 REF6 E3S-01 longest REF name  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+100.0%  0.000 s / 1.000 s  R-A2L-MATCH.40 REF6 E3S-01 longest swapped  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+100.0%  0.000 s / 1.000 s  R-A2L-MATCH.40 LONG a x255 + b  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_2_long_queries_against_1020_character_tokens
+100.0%  0.000 s / 1.000 s  R-A2L-MATCH.40 LONG a x254 + bb  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_2_long_queries_against_1020_character_tokens
+100.0%  0.000 s / 1.000 s  R-A2L-MATCH.40 LONG a x128 + b  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_2_long_queries_against_1020_character_tokens
+QC-TM: 78 bounds, 0 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.1/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.1/2]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.1/3]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.1/4]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.3/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.3/2]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.3/3]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.4/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.4/2]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.4/3]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.5/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.5/2]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.6/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.6/2]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.6/3]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.7/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.7/2]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.7/3]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.7/4]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.8/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.8/2]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.8/3]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.8/4]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.8/5]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.8/6]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.8/7]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.8/8]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.8/9]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.9/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.9/2]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.9/3]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.9/4]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.10/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.10/2]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.10/3]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.10/4]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.10/5]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.10/6]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.12/4]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.13/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.13/3]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.14/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.14/2]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.15/2]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.16/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.16/2]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.16/3]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.17/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.17/2]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.18/3]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.20/2]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.21/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.21/2]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.21/3]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.22/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.23/2]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.24/2]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.24/4]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.25/3]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.28/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.32/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.32/3]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.33/2]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.33/3]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.34/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.38/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.39/1]
+FAILED tests/test_b103_label_match.py::test_rows_5_3_three_exact_matches_are_all_listed
+FAILED tests/test_b103_label_match.py::test_rows_12_one_edit_for_3_and_5_letter_tokens[R-A2L-MATCH.12/1]
+FAILED tests/test_b103_label_match.py::test_rows_12_one_edit_for_3_and_5_letter_tokens[R-A2L-MATCH.12/2]
+FAILED tests/test_b103_label_match.py::test_rows_18_1_limit_cut_is_the_head_of_the_full_list
+FAILED tests/test_b103_label_match.py::test_rows_18_2_limit_above_the_count_lists_them_all
+FAILED tests/test_b103_label_match.py::test_rows_20_1_prefix_before_subsequence
+FAILED tests/test_b103_label_match.py::test_rows_20_3_token_then_fuzzy_then_subsequence
+FAILED tests/test_b103_label_match.py::test_rows_23_1_shorter_name_first - as...
+FAILED tests/test_b103_label_match.py::test_rows_24_1_case_exact_name_first_for_lowercase_query
+FAILED tests/test_b103_label_match.py::test_rows_24_3_fuzzy_ties_fall_to_code_point_order
+FAILED tests/test_b103_label_match.py::test_rows_25_1_code_point_order_among_equals
+FAILED tests/test_b103_label_match.py::test_rows_25_2_input_order_decides_nothing
+FAILED tests/test_b103_label_match.py::test_rows_26_exact_span - AssertionErr...
+FAILED tests/test_b103_label_match.py::test_rows_27_prefix_span_counts_the_query_text_not_whitespace
+FAILED tests/test_b103_label_match.py::test_rows_28_2_boundary_span_after_a_separator
+FAILED tests/test_b103_label_match.py::test_rows_29_span_with_no_boundary_occurrence
+FAILED tests/test_b103_label_match.py::test_rows_30_token_spans - assert [] =...
+FAILED tests/test_b103_label_match.py::test_rows_31_subsequence_spans - asser...
+FAILED tests/test_b103_label_match.py::test_rows_32_2_fuzzy_spans_of_two_query_tokens
+FAILED tests/test_b103_label_match.py::test_rows_33_1_total_edits_one - Asser...
+FAILED tests/test_b103_label_match.py::test_rows_34_spans_in_offset_order_and_joined
+FAILED tests/test_b103_label_match.py::test_at_b103_i4_1_typing_a_name_keystroke_by_keystroke
+FAILED tests/test_b103_label_match.py::test_at_b103_i4_2_a_real_shape_name_is_found_first[whole]
+FAILED tests/test_b103_label_match.py::test_at_b103_i4_2_a_real_shape_name_is_found_first[start]
+FAILED tests/test_b103_label_match.py::test_at_b103_i4_2_a_real_shape_name_is_found_first[middle]
+FAILED tests/test_b103_label_match.py::test_at_b103_i4_2_a_real_shape_name_is_found_first[end]
+FAILED tests/test_b103_label_match.py::test_at_b103_i4_2_a_real_shape_name_is_found_first[words]
+FAILED tests/test_b103_label_match.py::test_at_b103_i4_2_a_real_shape_name_is_found_first[words-reversed]
+FAILED tests/test_b103_label_match.py::test_at_b103_i4_2_a_real_shape_name_is_found_first[typo-words]
+FAILED tests/test_b103_label_match.py::test_at_b103_i4_2_a_real_shape_name_is_found_first[typo-underscore]
+FAILED tests/test_b103_label_match.py::test_i3_build_refuses_a_bare_string_and_bytes
+FAILED tests/test_b103_label_match.py::test_i3_build_refuses_an_element_that_is_not_a_str
+FAILED tests/test_b103_label_match.py::test_i3_build_accepts_any_iterable_of_str
+FAILED tests/test_b103_label_match.py::test_i3_index_holds_distinct_names_in_first_occurrence_order
+FAILED tests/test_b103_label_match.py::test_i3_rank_type_errors_query_first_then_limit
+102 failed, 34 passed in 12.14s
+exit code: 1
