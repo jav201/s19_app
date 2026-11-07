@@ -6644,11 +6644,11 @@ def test_tc011_every_pre_batch_action_keeps_a_keyboard_path(tmp_path: Path) -> N
 
     # The Workspace / A2L / MAC screens behind the retired view_* actions are
     # reachable via the rail's show_screen actions (batch-101 Inc 12 removed
-    # the legacy view_* alias methods). Either path satisfies reachability.
+    # the legacy view_* alias methods).
     view_action_aliases = {
-        "view_main": ("show_screen('workspace')", "view_main"),
-        "view_alt": ("show_screen('a2l')", "view_alt"),
-        "view_mac": ("show_screen('mac')", "view_mac"),
+        "view_main": ("show_screen('workspace')",),
+        "view_alt": ("show_screen('a2l')",),
+        "view_mac": ("show_screen('mac')",),
     }
 
     for key, action in _PRE_BATCH_BINDINGS:
@@ -6658,7 +6658,6 @@ def test_tc011_every_pre_batch_action_keeps_a_keyboard_path(tmp_path: Path) -> N
             reachable = (
                 any(c in current_actions for c in candidates)
                 or any(c in palette for c in candidates)
-                or hasattr(S19TuiApp, f"action_{action}")
             )
             assert reachable, (
                 f"pre-batch action '{action}' (key '{key}') lost every "

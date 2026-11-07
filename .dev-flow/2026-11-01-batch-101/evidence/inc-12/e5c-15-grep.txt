@@ -1,0 +1,6 @@
+=== Inc 12 E5 corrective: e5c-15 I-3 grep
+base: 6f1743c1ad54ff7db89e8fcd4e96266414950f42 staged tree: de2521d3285fdc05eb7ea84b03caa4f68bf5d285
+CMD: git grep --cached -n -w -e VariantHelpScreen -e VARIANT_HELP_TEXT -e action_view_main -e action_view_alt -e action_view_mac -e action_a2l_tag_find_next -e _jump_to_validation_issue -e _jump_to_validation_issue_object -e _format_validation_issue_line -e check_preview_toggle_button -- s19_app tests
+s19_app/tui/window_help.py:12:The modal is the shipped :class:`~s19_app.tui.screens.VariantHelpScreen`
+s19_app/tui/window_help.py:627:    sequence. Joined with blank paragraphs, the VariantHelpScreen voice.
+s19_app/tui/window_help.py:661:        Generalizes the shipped :class:`VariantHelpScreen` pattern from

@@ -632,7 +632,7 @@ def test_filter_a2l_tags_supports_raw_and_physical_value_fields(tmp_path: Path):
     assert [tag["name"] for tag in app._filter_a2l_tags(tags)] == ["LOAD"]
 
 
-def test_validation_issue_filtering_and_format(tmp_path: Path):
+def test_validation_issue_filtering(tmp_path: Path):
     app = S19TuiApp(base_dir=tmp_path)
     app._validation_issues = [
         ValidationIssue(

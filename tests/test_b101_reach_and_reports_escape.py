@@ -42,7 +42,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
 
 import pytest
-from textual.widgets import Select
+from textual.widgets import Input, Select, TextArea
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SYNTH_DIR = REPO_ROOT / "tools" / "synth"
@@ -617,6 +617,22 @@ def _known(app) -> tuple:
     return app.focused, app._active_screen_key
 
 
+async def _known_off_default(app, pilot) -> tuple:
+    """The Known focus (U-2), placed where Textual's own fallback would not put it.
+
+    A screen that resumes with nothing focused gives the focus to its first
+    focusable widget. Start from ``#sections_list``, a non-input control that is
+    not that widget, so a restore that is only that fallback cannot pass."""
+    target = app.screen.query_one("#sections_list")
+    target.focus()
+    await settle(pilot)
+    assert app.focused is target, f"the precondition focus did not hold: {app.focused!r}"
+    first = next(w for w in app.screen.query("*") if w.focusable)
+    assert target is not first, "the Known focus is the toolkit's fallback widget"
+    assert not isinstance(target, (Input, TextArea)), target
+    return _known(app)
+
+
 def _report_files(project: Path) -> List[str]:
     folder = project / "reports"
     return sorted(p.name for p in folder.iterdir()) if folder.is_dir() else []
@@ -687,7 +703,7 @@ def test_r_dlg_2_1_escape_on_the_report_list_closes_reports(tmp_path: Path) -> N
 
     async def scenario(app, pilot) -> None:
         project = await _reports_project(app, pilot)
-        known = _known(app)
+        known = await _known_off_default(app, pilot)
         await _open_reports(app, pilot)
         status = list(app.log_lines)
         assert app.focused is app.screen.query_one("#report_list")
@@ -860,18 +876,25 @@ def test_r_dlg_2_10_escape_on_the_help_chip_opens_no_help(tmp_path: Path) -> Non
     _run(tmp_path, scenario)
 
 
-def test_r_dlg_2_11_escape_closes_the_empty_reports_dialog(tmp_path: Path) -> None:
-    """R-DLG.2/11: Escape closes the Reports dialog of a project with no report."""
+def test_r_dlg_2_11_escape_closes_the_empty_reports_dialog(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """R-DLG.2/11: Escape closes the Reports dialog of a project with no report,
+    writes no file and sets no status line."""
+    statuses = record_statuses(monkeypatch)
 
     async def scenario(app, pilot) -> None:
-        await _reports_project(app, pilot, name="proj2", with_reports=False)
+        project = await _reports_project(app, pilot, name="proj2", with_reports=False)
         known = _known(app)
         screen = await _open_reports(app, pilot)
         assert screen.query("#report_empty_state"), "the dialog does not show the empty text"
         assert app.focused is screen.query_one("#window_help_reports")
+        mark = len(statuses)
         await pilot.press("escape")
         await _await_closed(app, pilot, "escape on the empty dialog")
         assert (app.focused, app._active_screen_key) == known
+        assert _report_files(project) == [], _report_files(project)
+        assert statuses[mark:] == [], statuses[mark:]
 
     _run(tmp_path, scenario)
 
@@ -895,6 +918,7 @@ def test_r_dlg_2_12_escape_in_its_help_window_keeps_reports_open(tmp_path: Path)
             pilot, lambda: not any(isinstance(s, WindowHelpScreen) for s in app.screen_stack),
             "the help window closed", timeout=CLOSE_WAIT_S,
         )
+        await settle(pilot)
         assert isinstance(app.screen, ReportViewerScreen), _stack(app)
 
     _run(tmp_path, scenario)
@@ -1005,7 +1029,7 @@ def test_at_i12_1_escape_closes_reports_from_list_box_and_dropdown(tmp_path: Pat
 
     async def scenario(app, pilot) -> None:
         project = await _reports_project(app, pilot)
-        known = _known(app)
+        known = await _known_off_default(app, pilot)
         two = ["20261106T100000Z-report.md", "20261106T110000Z-report.md"]
         screen = await _open_reports(app, pilot)
         await pilot.press("enter")
@@ -1030,6 +1054,7 @@ def test_at_i12_1_escape_closes_reports_from_list_box_and_dropdown(tmp_path: Pat
         await settled(pilot, lambda: select.expanded, "the filter list opens", timeout=CLOSE_WAIT_S)
         await pilot.press("down")
         await settle(pilot)
+        assert "f1.json" in _highlighted_prompt(select), _highlighted_prompt(select)
         await pilot.press("escape")
         await settled(pilot, lambda: not select.expanded, "the filter list closed", timeout=CLOSE_WAIT_S)
         await settle(pilot)

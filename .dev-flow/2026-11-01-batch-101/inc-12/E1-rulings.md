@@ -74,6 +74,7 @@ No other canon row changes. Cited and unchanged: R-DLG.9 (Close changes nothing 
 - **BL-I12-3** (D-9, with D7-31; widened at E3, U-8): nothing in the app shows that `esc` closes the Reports dialog — the Close button shows no key (R-DLG.11), and the Reports help section has no keys block (`HELP_KEY_WINDOW["reports"] = None`, `window_help.py`) and no step that says how to close; D7-31 must cover both places.
 - **BL-I12-4** (D-2 B or C only): if `_jump_to_validation_issue*` stays, it remains code no route runs (D3-7 stays open).
 - **BL-I12-5** (E3A-06, with D7-20): seven dialogs still ignore Escape — Select variant, Save flow, Load flow, Discard unsaved flow edits?, Edit entry JSON, the CRC write confirmation, Operations; R-DLG.2 stays `Partly` until they answer it.
+- **BL-I12-6** (E5, R-7; pre-existing, toolkit-wide): a dismissing handler should return early when its screen is no longer active (`not self.is_active`). A Generate press already in flight when Escape lands, or a double click on Generate, runs the handler on a popped dialog: it posts `GenerateRequested` (a report is written) and then its `dismiss` raises `ScreenStackError` (`screens.py:3404-3427`; probe in `E5-review.md` R-7). One guard with a test that queues two presses; name it with D7-20's remaining dialogs.
 
 ## Orchestrator rulings (2026-11-06, under the operator's standing commission)
 

@@ -460,8 +460,9 @@ def test_duplicate_stem_ids_are_filenames(tmp_path: Path) -> None:
 # batch-94 Inc-001 (HLR-006, US-002 annotation 4) RETIRED the variant selector
 # and its help affordance: ``#patch_variant_select``,
 # ``#patch_variant_info_button`` and the ``PatchEditorPanel.
-# VariantHelpRequested`` message are gone from the shipped surface. The three
-# tests below observed that retired machinery THROUGH this file — the P1/R-6
+# VariantHelpRequested`` message are gone from the shipped surface. The tests
+# below (three until batch-101 Inc 12 removed the orphan-modal geometry node)
+# observed that retired machinery THROUGH this file — the P1/R-6
 # census assigned this file to the DO-NOT-TOUCH group on its app-level
 # patterns (``action_select_variant`` / ``SelectVariantScreen``), and the
 # retired-pattern re-run at the Inc-001 cut (V43) found these three nodes

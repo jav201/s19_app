@@ -7710,7 +7710,8 @@ class CheckEditorPanel(ScrollableContainer):
 
         Every row below the two columns is one terminal row; the ledger is
         the panel's growing region (design §3, Check Editor tree). The shipped
-        ids are all kept (LLR-145.1).
+        ids are kept (LLR-145.1), except the hidden addendum toggle, which
+        batch-101 Inc 12 removed (R-CHKED-058).
         """
         with Horizontal(id="check_columns"):
             with Vertical(id="check_left_column") as left:
