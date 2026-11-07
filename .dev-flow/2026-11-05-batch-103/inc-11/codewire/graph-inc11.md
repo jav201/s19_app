@@ -188,6 +188,7 @@ Ruled at E2 (`../E2-rulings.md`) and applied by the E1 addendum (2026-11-06): CG
 | R-A2L-READ.35 | `_number_word` | READ.35/1, /2 |
 | R-A2L-READ.36 | `_number_word`, `_characteristic_from_tokens`, `_extended_kind_anchor` | READ.36/1–/3, READ.7/1 |
 | R-A2L-READ.63 | `extract_a2l_tags`, `_number_word` | READ.63/1–/5 |
+| R-A2L-READ.69 | `_number_word` | READ.69/1–/3 (both address words: ECU_ADDRESS /1, /2, a CHARACTERISTIC's header address /3; Inc 12 E3A-13 = E3S-13) |
 | R-A2L-READ.37 | `_tag_keyword_lines`, `_infer_length_measurement`, `_infer_length_characteristic` | READ.37/1, /2, READ.29/4 |
 | R-A2L-READ.38 | `_bounded_length`, `extract_a2l_tags`, `_describe_one` | READ.38/1–/4 |
 | R-A2L-READ.39 | `extract_a2l_tags` | READ.39/1 (4/4; F-E2-3 ruled at E2) |
@@ -446,7 +447,7 @@ examples: (holds as base, R-A2L-READ.58/5) `ECU_ADDRESS 0x10 SIG_X` → `("ECU_A
 examples: (R-A2L-READ.52/3, E3S-28) READ.52/3's `ECU_ADDRESS 0x10` followed by 4.8 million words `ab1` … `ab8` (hex-like) → one item `("ECU_ADDRESS 0x10 ab1", 11)`; errors `Line 11: ECU_ADDRESS has 4800001 of its 1 arguments`; at most 1 item held (E3R3: peak 126.1 MB, the list form 752.7 MB)
 
 _number_word
-req: R-A2L-READ.3, R-A2L-READ.34, R-A2L-READ.35, R-A2L-READ.36
+req: R-A2L-READ.3, R-A2L-READ.34, R-A2L-READ.35, R-A2L-READ.36, R-A2L-READ.69
 in: str word
 out: Optional[int] value
 func: new. `0x` or `0X` followed by 1 to 16 ASCII hex digits → that value; 1 to 20 ASCII decimal digits → that value in base 10, leading zeros included; any other word (a sign, `_`, `0b`/`0o`, a non-ASCII digit, a longer run, a quoted word) → `None`. Replaces `int(x, 0)` for every address, length and count word of a tag or span. The test is `re.fullmatch(r"0[xX][0-9A-Fa-f]{1,16}|[0-9]{1,20}", word)` before `int` (ASCII classes only, never `\d` or `isdigit()`, E3S-06 [M2]).
@@ -457,6 +458,7 @@ examples: (R-A2L-READ.36/1) `0x12_34` → `None`; `0x1C2D3E00_4026` → `None` (
 examples: (R-A2L-READ.36/2, /3) `-0x10`, `+16`, `１２` (fullwidth), `0b101` → `None` each
 examples: (R-A2L-READ.3/1) `0x1234<U+00A0>` → `None`
 examples: (R-A2L-READ.38, H3) `99999999999` (11 digits) → `99999999999` (a number; the cap removes it)
+examples: (R-A2L-READ.69/1, /3, Inc 12 E3A-13 = E3S-13) `18446744073709551616` and `99999999999999999999` (20 digits) → those values (number words; above 0xFFFFFFFFFFFFFFFF, so as either address word, the ECU_ADDRESS argument word or a CHARACTERISTIC's header address, they give the tag no address); (R-A2L-READ.69/2) `18446744073709551615` → `18446744073709551615` (kept: address 0xFFFFFFFFFFFFFFFF); neg: the bound only on the ECU_ADDRESS path → the header address `99999999999999999999` keeps 0x56BC75E2D630FFFFF → RED
 
 _bounded_length
 req: R-A2L-READ.38, R-A2L-READ.46

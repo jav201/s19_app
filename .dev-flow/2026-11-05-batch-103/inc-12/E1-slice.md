@@ -1,5 +1,7 @@
 # Inc 12 — E1 slice: the file and functions to change, counted and mapped
 
+**Superseded by `codewire/graph-inc12.md` (E2, E3 correction; E3A-17).**
+
 Base: product tree `e07fb00`; line numbers are as of `e07fb00` (`git show e07fb00:s19_app/tui/app.py`). Rows are in `01-requirements.md` and decisions in `E1-rulings.md` §3; the slice follows each recommended option.
 
 Real callers come from `evidence-e1/i12e1-callers-transcript.txt`: the Code-Wire v3.1.0 extractor (`git -C C:\Users\jjgh8\Github\code-wire describe --tags` = `v3.1.0`, commit `e436a08`) over a throwaway `git archive e07fb00 s19_app` copy in the scratchpad, with one `# node:` mark per def (1,996 marks, 3,771 calls, 0 parse failures). The script is `evidence-e1/i12e1-callers.py`, Inc 11's `e1-callers.py` with Inc 12's targets. The copy was deleted after the run.
