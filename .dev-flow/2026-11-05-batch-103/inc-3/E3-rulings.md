@@ -134,3 +134,25 @@ Rulings, each applying the fix column unless the ruling says otherwise:
   - **The `Definition` private fields** `_name_echo` and `_table_form` were accepted in Inc 2a's P-2 ruling, as `field(compare=False, repr=False)`: I-2's public names, equality and repr are unchanged.
   - **The NaN-x message** is `<name>: the table <ref> has an x that is not a number`, the wording of Inc 2a's R-A2L-DEF.58.2/19, so it is no longer PROPOSED. Applied in place.
   - **Next:** round 7 security, on the corrected records only (RL-16/17, VT-8/9, EN-1/2, the raise cases, CT-*, and the v2 bisect equality).
+
+## Round 7 rulings (2026-11-07, orchestrator Opus 5.5)
+
+Round 7 (security): **FAIL**.
+- **Closed at design:** E3S3-25 … -29, -31 and -32. On the model, RL-16/17, VT-8/9, EN-1/2 and CT-1 … 4 are flat (×0.97–1.06), the raise cases give 0 exceptions, and every negative that ran is RED.
+- **New:** E3S3-33 MAJOR (the COMPU_TAB form keyed per method), -34 MEDIUM (a warm walk hid -33), -35 MINOR, -36 LOW, -37 INFO.
+- **Evidence gap, stated plainly:** a `pkill -f` slip lost the raw round-7 transcripts. The scripts `evidence-e3/sec-r7-*` are kept, but the round-7 numbers have no transcript. The v2 bisect census and the range-index equality did **not** run. Round 8 runs both, and the correction cites round-7 numbers as "reported, transcript lost".
+
+Rulings:
+- **E3S3-33 + E3S3-36: reuse Inc 2a's form, as implemented.** Inc 2a's gap-pass-2 code (`6071a385`, `_build_tab_form`) already builds the COMPU_TAB form as the ruling asks:
+  - keyed by `id()` of the COMPU_TAB entry in `reads`;
+  - `xs`, `ys` as tuples;
+  - the NaN-x verdict computed once;
+  - `ref_echo`.
+
+  Inc 3a's graph names that function and `_TabForm` and builds no second one. COMPU_TAB joins the read-once list (`01-requirements.md:267`, graph `:42`, `:149`) and CTX *shared section* ("names" includes a section named through a COMPU_METHOD). The TAB_VERB record holds the enum read form, not the section dict.
+- **The completed rule gets an explicit, closed list.** The kinds an object reaches by name, directly or through another section, are RECORD_LAYOUT, MOD_COMMON, AXIS_PTS, COMPU_METHOD, COMPU_TAB, COMPU_VTAB and COMPU_VTAB_RANGE. **E5 code review checks that the list is closed:** every `a2l_data` section lookup in `a2l_definition.py` goes through `reads`.
+- **E3S3-34: accept.** For .148 (and Inc 2a's .149), each run builds its own walk from scratch and times the 399 names described for the first time in it. Recorded for Inc 2a's tests too.
+- **E3S3-35: accept the count.** Counting mappings around `record_layouts_by_name`, `compu_tables_by_name` and `compu_tabs_by_name` in .148/16 … /18 and in .150/arr-7 must show 0 lookups by the 399 names after the first. Negative control: by-name lookup per object → RED.
+- **E3S3-37:** recorded for 3b's re-review.
+
+**Next:** a narrow Opus correction, then round 8: the census and equality runs that did not happen, plus CT-5 and CT-6, with the fresh-walk measure. Every round-8 kill is by PID, never `pkill -f`.
