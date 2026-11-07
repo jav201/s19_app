@@ -126,3 +126,14 @@ Inc 1a's `01-requirements.md` (E1 draft) appeared at the end of this E1 and was 
 | D-8 | **A** | S7.3b / CTX-COPY. |
 | D-9 | **backlog** | |
 | D-10 | **A** | 7 sources. |
+
+## Operator rulings 2 (2026-11-06T18:03:39-06:00) — supersede D-2, D-3, D-6 and D-7 above
+
+The operator ruled that Ctrl+C is the terminal's quit key and must not be the general copy key.
+- **Copy from a view = right-click on a selection** (the toolkit's mouse selection). Right-click on a view with no selection does nothing (no notice). D-2 (whole-view copy) is withdrawn.
+- **Ctrl+C with a selection** (a text box's or the screen's) copies it — orchestrator extension of the operator's text-box answer, for one rule everywhere; flagged to the operator.
+- **Ctrl+C with no selection** opens a quit confirmation dialog: y quits, n (and Escape) closes it and changes nothing (key-letter buttons, repo modal standard). It replaces the toolkit's quit hint (D-7's override point now opens the dialog). D-6's nothing notice is withdrawn.
+- **Right-click in a text box** (copy / paste) is Inc 1a's; the copy notice `Copied <n> lines to the clipboard.` (D-5) comes from this increment's seam for every copy (I-1).
+- **Prototype round 2 (G2)** shows the quit dialog and the copy notice before this increment's E2 (it waits for batch-101 Inc 10a/12 anyway).
+- Batch-101 Inc 12's dialog census (R-DLG.14, "every dialog has an opener"; its count of dialogs) grows by this dialog: note it for the integration.
+- Action: an E1 addendum rewrites the key rows, adds the dialog rows (opener, y, n, Escape, exact title/body text), withdraws D-2/D-6 rows, and re-cuts the matrix (sources reached by right-click).

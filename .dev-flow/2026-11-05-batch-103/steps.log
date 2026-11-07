@@ -15,3 +15,6 @@
 2026-11-06T16:21:28-06:00 E1 start — Inc 3 (arrays and axes, R-A2L-DEF.64+); model Opus 5.5
 2026-11-06T16:29:56-06:00 E1 correction done — Inc 1a (R-PASTE.20 triggers, new R-PASTE.23, counts) and Inc 4 (S2.8, new R-A2L-MATCH.37, counts); deepseek-v4-pro via pi, exit 0 both, ~2 min each; diffs checked by orchestrator (10-column rows intact)
 2026-11-06T16:29:56-06:00 operator answers — P-1/D-2: Ctrl+C must not be the copy key (terminal convention = quit): Ctrl+C asks a quit confirmation; copy and paste by right-click, paste also Ctrl+V; push of batch-103 approved with path redaction (or tests on the main PC, not taken: those tests write the OS clipboard)
+2026-11-06T18:03:39-06:00 E2 done — Inc 2 graph: 40 nodes (25 new, 1 changed, 14 context), every row has an example; findings E2-1, E2-4..8 accepted (case fixes), P-1 accepted, E2-10..14 to E3; Opus 5.5, 31 min
+2026-11-06T18:03:39-06:00 E1 done — Inc 3: 72 new rows (R-A2L-DEF.64..135), 213 cases, 26 slice nodes; rulings appended (D-7 C, rest A; D-14 changes carried in Inc 3); Opus 5.5, 37 min
+2026-11-06T18:03:39-06:00 rulings — operator rulings 2 recorded in inc-1a and inc-1b E1-rulings (right-click copy/paste, Ctrl+C = copy with selection / quit confirmation without, quit dialog + copy notice to G2)

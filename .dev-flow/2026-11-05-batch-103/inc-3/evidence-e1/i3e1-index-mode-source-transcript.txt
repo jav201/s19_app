@@ -1,0 +1,22 @@
+# i3e1-index-mode-source.py transcript 2026-11-06T16:37:57-06:00 host cachyos-rtx
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed
+# python Python 3.11.18; HOME=/tmp/b103-e1-3/home LOCALAPPDATA=/tmp/b103-e1-3/home/local DISPLAY=unset
+url: https://guide.intrepidcs.com/docs/asap2/main-toolbar/edit-tools/create-edit-record-layouts/
+bytes: 32348; text lines: 148
+   79: Y1
+   80: a11 a12 a13
+   81: == Example of map a with Y-Axis points.
+   82: Y2
+   83: a21 a22 a23
+   84: X1 X2 X3 == X-Axis points common to examples above.
+   85: COLUMN_DIR - store values by column. Applying this mode gives:
+   87: Map 'a' (a11, a21, a12, a22, a13, a23)
+   88: ROW_DIR - store values by row. Applying this mode gives:
+   90: Map 'a' (a11, a12, a13, a21, a22, a23)
+   92: Curve 'a' (a1, X1, a2, X2, a3, X3)
+   93: Map 'a' (a11, a21, X1, a12, a22, X2, a13, a23, X3)
+   96: Map 'a' (a11, a12, a13, Y1, a21, a22, a23, Y2)
+   98: Curves 'a' and 'b' (a1, b1, X1, a2, b2, X2, a3, b3, X3)
+  113: Determines the axis point sequence in the memory.
+  114: INDEX_INCR - increasing index with increasing address.
+  115: INDEX_DECR - decreasing index with increasing address.

@@ -1,0 +1,167 @@
+# i3e1-shapes.py transcript 2026-11-06T16:31:40-06:00 host cachyos-rtx
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed
+# python Python 3.11.18; HOME=/tmp/b103-e1-3/home LOCALAPPDATA=/tmp/b103-e1-3/home/local DISPLAY=unset
+A2L section tree has structural errors: path=/home/javiergr/work/s19_app/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+tracked .a2l files: 35
+
+## per file
+  examples/case_00_public/ASAP2_Demo_V161.a2l                    CURVE=10   MAP=2    VAL_BLK=3    MEAS-array=3    AXIS_PTS=2   
+  examples/case_00_public/ASAP2_Demo_V171.a2l                    CURVE=16   MAP=8    VAL_BLK=7    MEAS-array=4    AXIS_PTS=2   
+  examples/case_00_public/check_test.a2l                         CURVE=1    MAP=0    VAL_BLK=0    MEAS-array=0    AXIS_PTS=0   
+  examples/case_00_public/from_source.a2l                        CURVE=4    MAP=0    VAL_BLK=4    MEAS-array=20   AXIS_PTS=4   
+  examples/case_00_public/remove_test.a2l                        CURVE=0    MAP=0    VAL_BLK=0    MEAS-array=0    AXIS_PTS=1   
+  examples/case_00_public/software_a.a2l                         CURVE=158  MAP=11   VAL_BLK=101  MEAS-array=196  AXIS_PTS=66  
+  examples/case_00_public/software_b.a2l                         CURVE=0    MAP=0    VAL_BLK=0    MEAS-array=2    AXIS_PTS=0   
+  examples/case_00_public/update_test1.a2l                       CURVE=2    MAP=2    VAL_BLK=1    MEAS-array=1    AXIS_PTS=3   
+  examples/case_00_public/update_test2.a2l                       CURVE=2    MAP=2    VAL_BLK=1    MEAS-array=0    AXIS_PTS=4   
+
+## CHARACTERISTIC kinds and MEASUREMENT (all files)
+  120854  MEASUREMENT
+  113412  VALUE
+     193  CURVE
+     117  VAL_BLK
+      45  ASCII
+      25  MAP
+       4  CUBOID
+       2  CUBE_4
+       2  other
+
+## MATRIX_DIM: (owner, number count, real dimensions, product)
+     197  ('MEASUREMENT', 3, '1-D', 'prod>1')
+      23  ('MEASUREMENT', 1, '1-D', 'prod>1')
+       6  ('VAL_BLK', 1, '1-D', 'prod>1')
+       6  ('VAL_BLK', 2, '2-D', 'prod>1')
+       2  ('MEASUREMENT', 2, '2-D', 'prod>1')
+       2  ('MEASUREMENT', 3, '3-D', 'prod>1')
+       2  ('VAL_BLK', 3, '2-D', 'prod>1')
+       1  ('MEASUREMENT', 2, '1-D', 'prod>1')
+       1  ('MEASUREMENT', 3, '2-D', 'prod>1')
+       1  ('VAL_BLK', 3, '1-D', 'prod>1')
+       1  ('VAL_BLK', 3, '3-D', 'prod>1')
+
+## MATRIX_DIM lines whose words are not all numbers: 0
+
+## VAL_BLK size source lines present
+     101  NUMBER
+      16  MATRIX_DIM
+
+## ASCII CHARACTERISTICs with MATRIX_DIM: 0
+
+## MEASUREMENT LAYOUT word
+       2  ROW_DIR
+
+## AXIS_DESCR count per object (kind, axes)
+     193  ('CURVE', 1)
+      25  ('MAP', 2)
+       4  ('CUBOID', 3)
+       2  ('CUBE_4', 4)
+
+## AXIS_DESCR kinds
+     182  COM_AXIS
+      58  STD_AXIS
+      19  FIX_AXIS
+       2  CURVE_AXIS
+       2  RES_AXIS
+
+## AXIS_DESCR optional keywords
+     184  AXIS_PTS_REF
+      17  FIX_AXIS_PAR_DIST
+      16  MONOTONY
+       5  DEPOSIT
+       2  CURVE_AXIS_REF
+       2  FIX_AXIS_PAR_LIST (block)
+       1  READ_ONLY
+
+## AXIS_DESCR MONOTONY values
+      14  STRICT_INCREASE
+       2  STRICT_DECREASE
+
+## FIX_AXIS parameters (all)
+  examples/case_00_public/ASAP2_Demo_V161.a2l: ASAM.C.CURVE.FIX_AXIS.PAR_DIST axis 1 FIX_AXIS_PAR_DIST 1 1 6 max=6
+  examples/case_00_public/ASAP2_Demo_V161.a2l: ASAM.C.CURVE.FIX_AXIS.PAR axis 1 FIX_AXIS_PAR_DIST 0 4 6 max=6
+  examples/case_00_public/ASAP2_Demo_V161.a2l: ASAM.C.CURVE.FIX_AXIS.PAR_LIST axis 1 FIX_AXIS_PAR_LIST -1 4 6 8 9 10 max=6
+  examples/case_00_public/ASAP2_Demo_V161.a2l: ASAM.C.MAP.COM_AXIS.FIX_AXIS axis 2 FIX_AXIS_PAR_DIST 1 1 3 max=3
+  examples/case_00_public/ASAP2_Demo_V161.a2l: ASAM.C.CUBOID.COM_AXIS.FIX_AXIS.STD_AXIS axis 2 FIX_AXIS_PAR_DIST 1 1 3 max=3
+  examples/case_00_public/ASAP2_Demo_V171.a2l: ASAM.C.CURVE.FIX_AXIS.PAR_DIST axis 1 FIX_AXIS_PAR_DIST 1 1 6 max=6
+  examples/case_00_public/ASAP2_Demo_V171.a2l: ASAM.C.CURVE.FIX_AXIS.PAR axis 1 FIX_AXIS_PAR_DIST 0 4 6 max=6
+  examples/case_00_public/ASAP2_Demo_V171.a2l: ASAM.C.CURVE.FIX_AXIS.PAR_LIST axis 1 FIX_AXIS_PAR_LIST -1 4 6 8 9 10 max=6
+  examples/case_00_public/ASAP2_Demo_V171.a2l: ASAM.C.MAP.COM_AXIS.FIX_AXIS axis 2 FIX_AXIS_PAR_DIST 1 1 3 max=3
+  examples/case_00_public/ASAP2_Demo_V171.a2l: ASAM.C.CUBOID.COM_AXIS.FIX_AXIS.STD_AXIS axis 2 FIX_AXIS_PAR_DIST 1 1 3 max=3
+  examples/case_00_public/ASAP2_Demo_V171.a2l: ASAM.C.MAP.COM_AXIS.FIX_AXIS_2 axis 2 FIX_AXIS_PAR_DIST 1 1 3 max=3
+  examples/case_00_public/ASAP2_Demo_V171.a2l: ASAM.C.DEPENDENT.MAP_4 axis 2 FIX_AXIS_PAR_DIST 1 1 3 max=3
+  examples/case_00_public/software_a.a2l: Ffg2_Vow0_Osc_WOM.EejVrbbc_NbiFc axis 1 FIX_AXIS_PAR_DIST 0 1 3 max=3
+  examples/case_00_public/software_a.a2l: Hav2_Wcn0_Lql_GZG.UpkAlhiw_KikfdGs axis 1 FIX_AXIS_PAR_DIST 0 1 3 max=3
+  examples/case_00_public/software_a.a2l: Jwk2_Zwk0_Hie_UOC.FbgXtcve_RxePy axis 1 FIX_AXIS_PAR_DIST 0 1 3 max=3
+  examples/case_00_public/software_a.a2l: Lmc2_Iap0_Bvz_ZNC.LarZtefv_EcekmFm axis 1 FIX_AXIS_PAR_DIST 0 1 3 max=3
+  examples/case_00_public/software_a.a2l: Myd2_Peg0_Qfd_WGP.IliUiqcz_GsrhyJh axis 1 FIX_AXIS_PAR_DIST 0 1 3 max=3
+  examples/case_00_public/software_a.a2l: SawraDdcu.ZlspvXjowctpZvz_GexCxjIifu axis 1 FIX_AXIS_PAR_DIST 0 1 4 max=4
+  examples/case_00_public/software_a.a2l: Ymu2_Dyx0_Ifs_GXI.XypEiduy_RrqIw axis 1 FIX_AXIS_PAR_DIST 0 1 3 max=3
+
+## AXIS_PTS_REF resolves to
+     181  AXIS_PTS section
+       3  dangling
+
+## COM_AXIS: AXIS_DESCR conversion vs the AXIS_PTS conversion
+     181  same
+
+## AXIS_PTS optional keywords
+      34  DEPOSIT ABSOLUTE
+
+## RECORD_LAYOUT first words
+     178  FNC_VALUES
+      51  AXIS_PTS_X
+      22  FIX_NO_AXIS_PTS_X
+      12  NO_AXIS_PTS_X
+       9  AXIS_PTS_Y
+       6  AXIS_PTS_Z
+       6  NO_AXIS_PTS_Y
+       6  NO_AXIS_PTS_Z
+       4  ALIGNMENT_FLOAT32_IEEE
+       4  ALIGNMENT_FLOAT64_IEEE
+       4  ALIGNMENT_LONG
+       3  FIX_NO_AXIS_PTS_Y
+       2  AXIS_PTS_4
+       2  AXIS_RESCALE_X
+       2  NO_AXIS_PTS_4
+       2  NO_RESCALE_X
+       2  RESERVED
+
+## FNC_VALUES index mode
+      91  ROW_DIR
+      87  COLUMN_DIR
+
+## FNC_VALUES address type
+     178  DIRECT
+
+## AXIS_PTS_<x> index order
+      62  INDEX_INCR
+       6  INDEX_DECR
+
+## AXIS_PTS_<x> address type
+      68  DIRECT
+
+## FIX_NO_AXIS_PTS_<x>
+      22  FIX_NO_AXIS_PTS_X
+       3  FIX_NO_AXIS_PTS_Y
+
+## RECORD_LAYOUT line order vs position numbers
+     209  lines in position order
+
+## axis kind vs the object's record layout
+     169  ('COM_AXIS', 'no AXIS_PTS_X in layout')
+      38  ('STD_AXIS', 'AXIS_PTS_X in layout')
+      13  ('COM_AXIS', 'no AXIS_PTS_Y in layout')
+      13  ('FIX_AXIS', 'no AXIS_PTS_X in layout')
+      12  ('STD_AXIS', 'AXIS_PTS_Y in layout')
+       6  ('FIX_AXIS', 'no AXIS_PTS_Y in layout')
+       6  ('STD_AXIS', 'AXIS_PTS_Z in layout')
+       2  ('CURVE_AXIS', 'no AXIS_PTS_X in layout')
+       2  ('RES_AXIS', 'no AXIS_PTS_X in layout')
+       2  ('STD_AXIS', 'AXIS_PTS_4 in layout')
+
+## samples: STD_AXIS without its AXIS_PTS component, or another kind with one
+
+## TAB_VERB conversion on array values
+
+## BIT_MASK on arrays

@@ -138,3 +138,12 @@ Proposed for the batch-end canon fold: add the six ids to S0.2 ("Retired batch i
 | D-7 | **B, made loud** | The runner-clipboard probe is its own test and FAILS when the clipboard is unusable (the job goes red with the probe result); the dependent OS-clipboard tests skip citing the probe, their cases are `blocked`, and the validation record lists them as not run. A green job must never mean "skipped". R-PASTE.22 and its cases change to say this. |
 | D-8 | **A** | |
 | I-1 (with Inc 1b) | pinned | Every copy writes the OS clipboard once and shows one notice. Inc 1a does not add a copy notice; Inc 1b's app-level seam brings it to every copy, text boxes included. The mechanism is pinned at Inc 1b's E2. |
+
+## Operator rulings 2 (2026-11-06T18:03:39-06:00)
+
+The operator ruled on the copy and paste keys (Inc 1b's P-1 / D-2 question): Ctrl+C is the terminal's quit key, so it must not be the general copy key.
+- **Ctrl+C in a text box that holds a selection** copies it (as today; R-PASTE.11 stands).
+- **Ctrl+C with no selection** asks to confirm quitting the app (a y/n dialog). That dialog is Inc 1b's (app level, `app.py`); in a text box the copy action passes the key on, as today (R-PASTE.5 holds).
+- **Right-click** in a text box: with a selection, copies it; with none, pastes the OS clipboard as Ctrl+V does (same read path, same caps, same timings). **Ctrl+V** stays a paste key.
+- The copy notice and the quit dialog go to prototype round 2 (G2) with Inc 1b; Inc 1a adds no visible element and continues now.
+- Action for this increment: an E1 addendum adds the right-click rows and cases for both text-box classes (copy with a selection; paste without one; both paste routes stay), and the matrix arms they need.
