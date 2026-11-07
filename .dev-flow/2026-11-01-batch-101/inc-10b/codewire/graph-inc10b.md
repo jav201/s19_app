@@ -47,18 +47,18 @@ S19TuiApp._note_image_bytes_written
 req: R-A2L-048, R-A2L-049, R-A2L-105, R-A2L-106, R-TUI-004.7, R-TUI-004.8, R-TUI-004.9, R-SEG-PREV.21, R-SEG-PREV.22, R-SEG-EXP.15
 in: —
 out: None
-func: changed (on Inc 6's version). was: Checks-run end, Patch Editor load tail, `update_checks_view`, CRC Designer notice, then `try: checks = query_one(...) except Exception: return` and `checks.clear_check_results()`. / now: identical up to the Check Editor query, which becomes `except Exception: checks = None` with `if checks is not None: checks.clear_check_results()`; then `self._refresh_hex_views_after_write()`, `self._refresh_a2l_values_after_write()`, then the Split / Join window (queried in its own `try`; missing → skip) `note_image_bytes_written()` (I-1). No `refresh_window`, no focus call. A fault inside a notice is not swallowed (each call sits outside its `try`).
+func: changed (on Inc 6's version). was: Checks-run end, Patch Editor load tail, `update_checks_view`, CRC Designer notice, then `try: checks = query_one(...) except Exception: return` and `checks.clear_check_results()`. / now: **first** the Split / Join window (queried in its own `try`; missing → skip) `note_image_bytes_written()` (I-1), so a fault later in the hook cannot leave the confirm armed (E5 R-2; E4 had it last); then Inc 6's body unchanged up to the Check Editor query, which becomes `except Exception: checks = None` with `if checks is not None: checks.clear_check_results()`; then `self._refresh_hex_views_after_write()`, `self._refresh_a2l_values_after_write()`, each guarding its panes (E5 R-6). No `refresh_window`, no focus call. A fault inside a notice is not swallowed (each call sits outside its `try`).
 module: s19_app/tui/app.py
 calls: CheckEditorPanel.clear_check_results, S19TuiApp._refresh_hex_views_after_write, S19TuiApp._refresh_a2l_values_after_write, SplitJoinWindow.note_image_bytes_written
 examples: (R-SEG-PREV.21/1) fixture three, join-fill pick displayed, a Save project commit writes `0x8015`, `0x8016` = `BB CC` → band `data 8 · fill 13 · conflict 2 · fill 9 · data 8`, state `⚠ 2 B would clobber source — abort on export` (base P: `conflict 1` at offset 19)
 examples: (R-SEG-PREV.22/1) `#sje_export` focused before the commit (the open leaves `sje_table` focused; `tab`) → `#sje_export` focused after; the window's open refresh would focus `sje_table` (E4 integration I-D5: the E1 example started on `sje_table`, which that negative control cannot change)
-examples: (A10-08) no `#check_editor_panel` mounted → the three notices still run (Inc 6's body: they would be skipped)
+examples: (A10-08, design note: no case) no `#check_editor_panel` mounted → the notices after it still run (Inc 6's body: they would be skipped). No shipped route reaches the arm: the panel is composed once at startup (`app.py:4779`) and `App.query_one` searches the default screen (Textual 8.2.8 `app.py:941-943`), so its mutant is equivalent on every shipped route (E5 QA-3)
 
 S19TuiApp._refresh_hex_views_after_write
 req: R-TUI-004.7, R-TUI-004.8, R-TUI-004.9
 in: —
 out: None
-func: new. No `current_file` → return. `update_hex_view()` (no focus: window, marker and scroll kept, 10a I-3). `rows = self._hex_view_rows()`; for the A2L view: `start = bisect_left(rows, _alt_first_visible_address)` when that address is set, else `None`; `update_alt_hex_view(start_row=start)`; the same for the MAC view with `_mac_first_visible_address`. No `reset_scroll`, no focus address, so no marker change. Hidden views re-render too.
+func: new. No `current_file` → return. A hex pane not mounted (`#hex_view`, `#alt_hex_view`, `#mac_hex_view` queried in one `try`) → return (E5 R-6). `update_hex_view()` (no focus: window, marker and scroll kept, 10a I-3). `rows = self._hex_view_rows()`; for the A2L view: `start = bisect_left(rows, _alt_first_visible_address)` when that address is set, else `None`; `update_alt_hex_view(start_row=start)`; the same for the MAC view with `_mac_first_visible_address`. No `reset_scroll`, no focus address, so no marker change. Hidden views re-render too.
 module: s19_app/tui/app.py
 calls: S19TuiApp.update_hex_view, S19TuiApp._hex_view_rows, S19TuiApp.update_alt_hex_view, S19TuiApp.update_mac_hex_view
 examples: (R-TUI-004.7/1) fixture three, apply `0x8013` = `AA`, key `1` → `#hex_view` row `0x00008010` = `FF FF FF AA FF FF FF FF` (base P1: `FF FF FF FF …`)
@@ -74,14 +74,17 @@ S19TuiApp._refresh_a2l_values_after_write
 req: R-A2L-048, R-A2L-049, R-A2L-105, R-A2L-106
 in: —
 out: None
-func: new. No `current_a2l_data` → return. `old = self._a2l_enriched_tags`; `self._a2l_enriched_key = None`; `new = self._compute_a2l_enriched_tags()` (one dict per tag, same order as `old`); `self._a2l_filtered_tags` = for each listed tag, the recomputed dict at its position in `old` (same tags, same order, no `_filter_a2l_tags` call); `self._update_a2l_summary_buffer()` (S-8: the stored lines and `#a2l_view` agree; `_a2l_summary_start` is 0 on every path, D-10b-3); `self._repaint_a2l_tag_cells()`. Not `update_a2l_view()` and not `_refresh_a2l_filtered_tags` (both repaint through `update_a2l_tags_view`, whose `clear()` resets cursor and scroll, P4).
+func: new; **changed at E5 (R-1, R-2, R-6)**. No `current_file` or no `current_a2l_data` → return (an Apply with no image wrote nothing a tag reads). A tag-table pane not mounted (`#a2l_view`, `#a2l_tags_list`, `#a2l_tags_summary`) → return. `old = self._a2l_enriched_tags`. **Partial recompute** when `self._compute_a2l_enriched_tags() is old` (the cache describes this image's layout; a write keeps it, it writes only addresses already in `mem_map`): `changed` = the positions whose `raw_bytes` (the bytes the row was computed from) differ from `mem_map` at `[address, address + len)` now; none → return; else `enrich_tags_and_render({**current_a2l_data, "tags": [tags[i] for i in changed]}, mem_map)` and `new = old` with those positions replaced (a duplicated `(section, name)` group is flagged whole: every row of it carries the group's last tag's range, so the merge picks the same check row as a full run); `_a2l_enriched_tags = new`; the summary lines are kept (they read no byte value, D-10b-3). Otherwise (the cache did not describe this image) the full recompute and `_update_a2l_summary_buffer()` (S-8). Then `_a2l_filtered_tags` = for each listed tag, the new dict at its position in `old` (same tags, same order, no `_filter_a2l_tags` call); a listed tag not in `old` → `_refresh_a2l_filtered_tags(preserve_anchor=True)` and return, never a `KeyError` (R-2); `self._repaint_a2l_tag_cells()`. Not `update_a2l_view()` and not `_refresh_a2l_filtered_tags` on the normal path (both repaint through `update_a2l_tags_view`, whose `clear()` resets cursor and scroll, P4). (E4: `_a2l_enriched_key = None` and a full recompute at every write: 3.952 s for case_06's 220,040 tags, e5c-02.)
 module: s19_app/tui/app.py
-calls: S19TuiApp._compute_a2l_enriched_tags, S19TuiApp._update_a2l_summary_buffer, S19TuiApp._repaint_a2l_tag_cells
+calls: S19TuiApp._compute_a2l_enriched_tags, enrich_tags_and_render, S19TuiApp._update_a2l_summary_buffer, S19TuiApp._refresh_a2l_filtered_tags, S19TuiApp._repaint_a2l_tag_cells
 examples: (R-A2L-048/1) `VALUE_0001` `6C` → `93` applied; key `2` → Raw `147`, Physical `147` (base P: `108` / `108`, cache key unchanged, uncached `147`)
 examples: (R-A2L-048/2) entry edited to `55`, Save project commit while the A2L Explorer is displayed → Raw `85`, Physical `85`
 examples: (R-A2L-048/3) save-back of `55` → Raw `85`, Physical `85`
 examples: (R-A2L-106/1) filter Raw `108`, `VALUE_0001` listed; apply `93` → `_a2l_filtered_tags` still holds `VALUE_0001` (now Raw `147`), the same count `T`
-examples: (no A2L) → nothing computed, nothing painted
+examples: (no A2L, design note: no case) → nothing computed, nothing painted; executed by every node that loads no A2L, with no observable beyond "no raise" (E5 QA-3)
+examples: (R-A2L-048/5) page 2, `VAL_BLK_0002` (`0x00800108`, little-endian, `0D BA`, Raw `47629`): `0x00800109` = `45` → only the tags whose range holds `0x00800109` are recomputed → Raw `17677`, Physical `17677`
+examples: (QC-TM-10b-1) case_06, 220,040 tags, `0x80100005` written (the second byte of the multi-byte tags at `0x80100004`) → the enriched list equals a full recompute; 0.370 s (e5c-03) against 1 s
+examples: (R-2, design note: no case) a listed tag not in `old` (the reviewer's reload window: an A2L re-parse with no data, an Apply before `_step_a2l`) → the filter re-runs, no `KeyError`; no deterministic route reaches it (defensive)
 
 S19TuiApp._repaint_a2l_tag_cells
 req: R-A2L-048, R-A2L-049, R-A2L-105
@@ -94,7 +97,8 @@ examples: (R-A2L-049/1) first shown row = page row 30 before → page row 30 aft
 examples: (R-A2L-049/2) filter on Raw, text `1`, first shown row page row 30 → page row 30 after
 examples: (R-A2L-105/1) cursor on page row 40 → cursor on page row 40, the detail card names the same tag (P4: cursor 40 → 0)
 examples: (R-A2L-048/1) the `VALUE_0001` row: Raw and Physical cells `108` → `147`; its other 14 cells unchanged, so not written
-examples: (R2-7) a written Raw value `108` → `1000` (wider than its column's widest cell) → `update_cell_at(..., update_width=True)` marks the column dimensions for update; the value is not clipped, no cursor or scroll moves
+examples: (R2-7, R-A2L-048/4) `VALUE_0007` (FLOAT32, big-endian, `0x00040028`), Raw `85.6589584350586` in an 18-cell column (the widest value it has painted; Textual keeps column widths across the page refill) → `EA A3 64 C6` written → Raw `-9.876539885039906e+25` (22 characters) → `update_cell_at(..., update_width=True)` widens the column; the painted cell holds the whole value, no cursor or scroll moves
+examples: (R-A2L-048/5) page 2 (`start` 200): page row 45 is written from `_a2l_filtered_tags[245]` (`VAL_BLK_0002`), key `a2l:245`; the summary keeps `tags 201-400 / 462`
 
 ## Nodes — G2 split-join
 
@@ -125,4 +129,4 @@ SplitJoinWindow._bump — req: R-SEG-EXP.15 — `_armed = False`, then `_sync()`
 SplitJoinWindow._sync — req: R-SEG-PREV.21 — reads `current_file.mem_map` live; `build_plan` → `_conflict_marks` (Inc 13).
 CheckEditorPanel.clear_check_results — req: (R-CHKED-057, Inc 5) — unchanged; now reached through the `checks = None` idiom.
 
-QC-TM-10b-1 (A10-12): `_refresh_a2l_values_after_write` timed on the largest synth A2L; bound `timing_bound(1.0)`; example: case 08's 462 tags recompute once per write (E1 D-4 cost note).
+QC-TM-10b-1 (A10-12; re-pointed at E5 R-1): `_refresh_a2l_values_after_write` timed on case_06 (`examples/case_06_large_nested_a2l`, 220,040 tags, the largest A2L the repo ships), serial lane; bound `timing_bound(1.0)` with ≥ 20 % margin; E4's full refresh 3.952 s (e5c-02), the partial recompute 0.370 s (e5c-03) and 0.350 s on the final tree (e5c-13). (At E4: case 08's 462 tags, 0.023 s.)

@@ -299,12 +299,21 @@ async def open_patch(pilot, app) -> None:
     await settle(pilot)
 
 
+async def press_shown(pilot, button: Button) -> None:
+    """Press ``button`` once it is laid out on the screen (E5 QA-7: the route
+    the press stands for is shown, as ``write_file`` checks its button)."""
+    await wait_until(
+        pilot, lambda: button.region.width > 0, f"#{button.id} is not shown on the screen"
+    )
+    button.press()
+
+
 async def load_doc(pilot, app, log, path: Path) -> None:
     """Type the document's path, press Load, wait for the load line."""
     mark = len(log.messages)
     p = panel(app)
     p.query_one("#patch_doc_path_input", Input).value = str(path)
-    p.query_one("#patch_doc_load_button", Button).press()
+    await press_shown(pilot, p.query_one("#patch_doc_load_button", Button))
     await wait_until(
         pilot,
         lambda: any(m.startswith("Loaded change:") for m in log.since(mark)),
@@ -316,7 +325,7 @@ async def load_doc(pilot, app, log, path: Path) -> None:
 async def apply_loaded(pilot, app, log) -> None:
     """Press Apply; wait for ``Apply: <n> applied``."""
     mark = len(log.messages)
-    panel(app).query_one("#patch_doc_apply_button", Button).press()
+    await press_shown(pilot, panel(app).query_one("#patch_doc_apply_button", Button))
     await wait_until(
         pilot,
         lambda: any(re.match(r"Apply: [1-9]\d* applied", m) for m in log.since(mark)),
@@ -331,7 +340,7 @@ async def edit_entry(pilot, app, log, address: str, data: str) -> None:
     p = panel(app)
     p.query_one("#patch_entry_address_input", Input).value = address
     p.query_one("#patch_entry_bytes_input", Input).value = data
-    p.query_one("#patch_entry_edit_button", Button).press()
+    await press_shown(pilot, p.query_one("#patch_entry_edit_button", Button))
     await wait_until(
         pilot,
         lambda: "Patch Editor: entry updated." in log.since(mark),
@@ -760,6 +769,148 @@ def test_r_a2l_048_3_save_back_shows_in_the_tag_table(tmp_path: Path, case08: Pa
     drive(tmp_path, scenario)
 
 
+def painted_cell(app, index: int, column: int) -> str:
+    """The text the tag table paints in its row ``index`` and ``column`` (the
+    rendered line cut at the column's painted width; the header is line 0)."""
+    table = tag_table(app)
+    line = table.render_line(1 + index - int(table.scroll_y)).text
+    columns = table.ordered_columns
+    start = sum(c.get_render_width(table) for c in columns[:column]) - int(table.scroll_x)
+    return line[start:start + columns[column].get_render_width(table)].strip()
+
+
+#: R-A2L-048/4: four bytes that make ``VALUE_0007`` (a big-endian FLOAT32 at
+#: ``0x00040028``) read a 22-character value.
+WIDE_FLOAT = bytes.fromhex("EAA364C6")
+
+
+def test_r_a2l_048_4_a_wider_value_is_painted_whole(tmp_path: Path, case08: Path) -> None:
+    """R-A2L-048 case /4 (robustness, E5 QA-2): case 08 and its A2L, key ``2``
+    (page 1; the Raw and Physical columns are 18 cells wide, the widest value
+    they have painted); the cursor on ``VALUE_0007`` (row 14, Raw
+    ``85.6589584350586``) and the table scrolled right so Raw is its first shown
+    column (the table is 50 cells wide); key ``6``, ``0x00040028`` = ``EA A3 64 C6`` applied;
+    key ``2`` -> the row paints its Raw cell ``-9.876539885039906e+25`` whole
+    (22 characters) and its Physical cell whole, both columns are at least 22
+    cells wide, and the scroll and the cursor are unchanged.
+
+    The table's columns only widen (Textual keeps their widths across the
+    page refill), so the case needs a written value wider than any value the
+    column has painted, not only wider than the cells on screen.
+
+    Why: a written value wider than its column is painted at the old width
+    unless the cell write widens the column (R2-7), so the screen would show
+    a cut number while the stored cell holds the written one. Base: Raw
+    ``85.6589584350586`` -> RED at the value wait. Negative control: the cells
+    written with ``update_width=False`` (the call's default) -> the painted
+    cells are cut at 18 -> RED."""
+    import struct
+
+    expected_raw = str(struct.unpack(">f", WIDE_FLOAT)[0])
+
+    async def scenario(app, pilot, log):
+        await load_case(pilot, app, case08, a2l=True)
+        await show_a2l(pilot, app)
+        table = tag_table(app)
+        raw_column, phys_column = table.ordered_columns[4], table.ordered_columns[5]
+        assert (str(raw_column.label), str(phys_column.label)) == ("Raw", "Physical")
+        assert row_name(app, 14) == "VALUE_0007", row_name(app, 14)
+        assert raw_phys(app, "VALUE_0007") == ("85.6589584350586", "185.6589584350586")
+        # the table is narrower than its columns: scroll it so Raw is its first shown column
+        raw_x = sum(c.get_render_width(table) for c in table.ordered_columns[:4])
+        table.scroll_to(x=raw_x, animate=False)
+        await wait_until(pilot, lambda: table.scroll_x == raw_x, lambda: f"scroll_x {table.scroll_x}")
+        assert painted_cell(app, 14, 4) == "85.6589584350586", painted_cell(app, 14, 4)
+        assert max(raw_column.content_width, phys_column.content_width) < len(expected_raw), (
+            f"the columns are already {raw_column.content_width} / "
+            f"{phys_column.content_width} cells wide"
+        )
+        table.move_cursor(row=14, animate=False)
+        await wait_until(
+            pilot, lambda: table.cursor_row == 14, lambda: f"cursor row {table.cursor_row}"
+        )
+        first, cursor = (int(table.scroll_x), int(table.scroll_y)), table.cursor_row
+        await patch_apply(pilot, app, log, tmp_path / "docs", "d.json", [(0x40028, WIDE_FLOAT)])
+        assert bytes(mem_at(app, 0x40028 + i) for i in range(4)) == WIDE_FLOAT, "no write"
+        await show_a2l(pilot, app)
+        await wait_until(
+            pilot,
+            lambda: (raw_phys(app, "VALUE_0007") or ("",))[0] == expected_raw,
+            lambda: f"VALUE_0007 holds {raw_phys(app, 'VALUE_0007')!r}, expected Raw "
+            f"{expected_raw!r}",
+            timeout=FIX_WAIT,
+        )
+        stored_phys = raw_phys(app, "VALUE_0007")[1]
+        assert len(stored_phys) >= len(expected_raw), stored_phys
+        await wait_until(
+            pilot,
+            lambda: (painted_cell(app, 14, 4), painted_cell(app, 14, 5))
+            == (expected_raw, stored_phys),
+            lambda: f"the row paints Raw {painted_cell(app, 14, 4)!r}, Physical "
+            f"{painted_cell(app, 14, 5)!r}; columns {raw_column.content_width} / "
+            f"{phys_column.content_width} cells",
+            timeout=FIX_WAIT,
+        )
+        assert raw_column.content_width >= len(expected_raw), raw_column.content_width
+        assert phys_column.content_width >= len(stored_phys), phys_column.content_width
+        assert ((int(table.scroll_x), int(table.scroll_y)), table.cursor_row) == (first, cursor)
+        assert row_name(app, 14) == "VALUE_0007"
+
+    drive(tmp_path, scenario)
+
+
+def test_r_a2l_048_5_a_write_on_the_second_page_shows_there(tmp_path: Path, case08: Path) -> None:
+    """R-A2L-048 case /5 (robustness, E5 R-4): case 08 and its A2L, key ``2``,
+    ``+`` (page 2: ``tags 201-400 / 462``); the cursor on page row 45
+    (``VAL_BLK_0002``: a 2-byte little-endian tag at ``0x00800108``, bytes
+    ``0D BA``, Raw ``47629``); key ``6``, ``0x00800109`` = ``45`` (the tag's
+    second byte) applied; key ``2`` -> the row reads Raw ``17677``, Physical
+    ``17677``; the summary still reads ``tags 201-400 / 462``; the page's row
+    names are unchanged and the cursor stays on row 45.
+
+    Why: the repaint writes page row ``i`` from the listed tag ``start + i``;
+    one that reads tag ``i`` paints page 1's tags over page 2 (every other A2L
+    node stays on page 1), and a changed-byte test that reads only a tag's
+    first byte misses a write into its second (E5 R-1). Base: Raw ``47629`` ->
+    RED. Negative controls: ``tags[i]`` -> ``VAL_BLK_0002`` is no longer painted
+    and the row names change -> RED; the first byte only -> Raw ``47629`` ->
+    RED."""
+
+    async def scenario(app, pilot, log):
+        await load_case(pilot, app, case08, a2l=True)
+        await show_a2l(pilot, app)
+        await pilot.press("plus")
+        await wait_until(
+            pilot,
+            lambda: summary_span(app) == "tags 201-400 / 462",
+            lambda: f"+ did not page: the summary reads {summary_span(app)!r}",
+        )
+        await settle(pilot)
+        table = tag_table(app)
+        assert row_name(app, 45) == "VAL_BLK_0002", row_name(app, 45)
+        assert raw_phys(app, "VAL_BLK_0002") == ("47629", "47629"), raw_phys(app, "VAL_BLK_0002")
+        assert (mem_at(app, 0x800108), mem_at(app, 0x800109)) == (0x0D, 0xBA)
+        table.move_cursor(row=45, animate=False)
+        await wait_until(
+            pilot, lambda: table.cursor_row == 45, lambda: f"cursor row {table.cursor_row}"
+        )
+        names = [row_name(app, i) for i in range(table.row_count)]
+        await patch_apply(pilot, app, log, tmp_path / "docs", "d.json", [(0x800109, b"\x45")])
+        assert mem_at(app, 0x800109) == 0x45, "the apply did not write"
+        await show_a2l(pilot, app)
+        await wait_until(
+            pilot,
+            lambda: raw_phys(app, "VAL_BLK_0002") == ("17677", "17677"),
+            lambda: f"VAL_BLK_0002 paints {raw_phys(app, 'VAL_BLK_0002')!r}, expected 17677",
+            timeout=FIX_WAIT,
+        )
+        assert summary_span(app) == "tags 201-400 / 462", summary_span(app)
+        assert [row_name(app, i) for i in range(table.row_count)] == names, "the row names changed"
+        assert table.cursor_row == 45 and row_name(app, 45) == "VAL_BLK_0002", table.cursor_row
+
+    drive(tmp_path, scenario)
+
+
 # ---------------------------------------------------------------------------
 # R-A2L-049 / .105 / .106 - the table keeps its place and its tags
 # ---------------------------------------------------------------------------
@@ -1038,11 +1189,18 @@ def test_r_tui_004_8_shown_window_is_kept(tmp_path: Path, case08: Path, view_nam
     byte at ``0x00000965`` applied; the view shown again -> first hex row
     ``0x00000950`` and the same scroll.
 
+    The scroll reached before the write is pinned: (10, 40) in the main pane,
+    (0, 40) in the A2L and MAC panes, which have no horizontal range at 118 x
+    54 (E5 QA-4).
+
     Why: a re-render that takes the written address as a jump target moves the
-    window and resets the scroll. The node waits for the re-render itself (the
-    written byte painted at ``0x960``) first: base never re-renders, so it is
-    RED there. Negative control: the re-render takes the written address as a
-    jump target -> the window moves, the scroll resets -> RED."""
+    window and resets the scroll. The node waits until the pane changed after
+    the write (the written byte painted at ``0x960``, or the window moved):
+    base never re-renders, so it is RED at that wait; a re-render from another
+    window is RED at the window clause (M-B2, E5 QA-4), one that resets the
+    scroll at the scroll clause (M-B). Negative control: the re-render takes
+    the written address as a jump target -> the window moves, the scroll
+    resets -> RED."""
     view = VIEWS[view_name]
     _key, _screen, hex_id, scroll_id, _goto = view
 
@@ -1050,6 +1208,9 @@ def test_r_tui_004_8_shown_window_is_kept(tmp_path: Path, case08: Path, view_nam
         await load_case(pilot, app, case08, **loads_for(view_name))
         await goto_960(pilot, app, log, view)
         scroll = await scroll_away(pilot, app, scroll_id, need_x=(view_name == "main"))
+        assert scroll == ((10, 40) if view_name == "main" else (0, 40)), (
+            f"{scroll_id} reached {scroll} before the write"
+        )
         old_row = row_bytes(app, hex_id, 0x960)
         assert old_row is not None
         old = mem_at(app, 0x965)
@@ -1070,13 +1231,17 @@ def test_r_tui_004_8_shown_window_is_kept(tmp_path: Path, case08: Path, view_nam
         expected = " ".join(tokens)
         await wait_until(
             pilot,
-            lambda: row_bytes(app, hex_id, 0x960) == expected,
+            lambda: row_bytes(app, hex_id, 0x960) == expected
+            or addrs(app, hex_id, 2) != [0x950, 0x960],
             lambda: f"{hex_id} row 0x960 paints {row_bytes(app, hex_id, 0x960)!r}, "
             f"expected {expected!r}",
             timeout=FIX_WAIT,
         )
         assert addrs(app, hex_id, 2) == [0x950, 0x960], (
             f"the shown window moved: first rows {fmt(addrs(app, hex_id, 2))}"
+        )
+        assert row_bytes(app, hex_id, 0x960) == expected, (
+            f"{hex_id} row 0x960 paints {row_bytes(app, hex_id, 0x960)!r}, expected {expected!r}"
         )
         assert scroll_of(app, scroll_id) == scroll, (
             f"the scroll changed: {scroll_of(app, scroll_id)}, was {scroll}"
@@ -1360,32 +1525,41 @@ def test_r_seg_exp_15_2_hidden_write_disarms_the_confirm(tmp_path: Path) -> None
 # ---------------------------------------------------------------------------
 # QC-TM-10b-1 (E3 A10-12, not a coverage item) - the cost of the A2L refresh
 # ---------------------------------------------------------------------------
-LARGE_SIZE_MB = 10.0  # the release cases' default size: their largest A2L
+#: The largest A2L the repo ships (E5 R-1): 37.7 MB, 220,040 tags over about
+#: 1 KiB of image (``examples/case_06_large_nested_a2l/README.txt``).
+CASE06 = REPO_ROOT / "examples" / "case_06_large_nested_a2l"
 
-
-@pytest.fixture(scope="module")
-def large_case(tmp_path_factory) -> Path:
-    """A release case at the generator's default size (10 MB), the largest A2L
-    of the ``tools/synth`` release cases."""
-    folder = tmp_path_factory.mktemp("b101_i10bw_large")
-    gen.generate(folder, SEED, LARGE_SIZE_MB)
-    return folder
+#: Inside case_06's image: the second byte of the multi-byte characteristics
+#: at ``0x80100004`` (a write the first byte of no such tag covers).
+CASE06_WRITE = 0x80100005
 
 
 @pytest.mark.serial_timing
-def test_qc_tm_10b_1_a2l_refresh_cost_on_the_largest_a2l(tmp_path: Path, large_case: Path) -> None:
+def test_qc_tm_10b_1_a2l_refresh_cost_on_the_largest_a2l(tmp_path: Path) -> None:
     """QC-TM-10b-1: the UI-thread time of one in-place write's A2L refresh
-    (``_refresh_a2l_values_after_write``) on the largest synth A2L stays under
-    ``timing_bound(1.0)``; the tag count is in the QC-TM label.
+    (``_refresh_a2l_values_after_write``) on the largest A2L the repo ships
+    (case_06, re-pointed at E5 R-1) stays under ``timing_bound(1.0)``; the tag
+    count is in the QC-TM label.
 
     The refresh is timed where the write notice calls it (the method wrapped on
-    the app instance, one real apply of ``0x0`` = ``93`` through the Patch
-    Editor). Base: the method does not exist -> RED. Above the bound the
-    orchestrator rules the fallback (recompute on the A2L Explorer's show)."""
+    the app instance, one real apply of the complement of the byte at
+    ``0x80100005`` through the Patch Editor). After the bound, the enriched
+    tags must equal a full recompute over the written image (the partial
+    recompute of R-1 must describe the same bytes). Negative controls: the full refresh at
+    every write -> above the bound -> RED; a changed-byte test that reads only
+    a tag's first byte -> the tags covering ``0x80100005`` keep their old
+    values -> RED."""
+    from s19_app.tui.services.a2l_service import enrich_tags_and_render
 
     async def scenario(app, pilot, log):
-        await load_image(pilot, app, large_case / "firmware.s19", timeout=240.0)
-        await load_a2l(pilot, app, large_case / "firmware.a2l", timeout=240.0)
+        await load_image(pilot, app, CASE06 / "firmware.s19", timeout=240.0)
+        await load_a2l(pilot, app, CASE06 / "firmware.a2l", timeout=240.0)
+        await wait_until(
+            pilot,
+            lambda: app._a2l_enriched_key is not None and len(app._a2l_enriched_tags) > 0,
+            "the case_06 tags were never enriched",
+            timeout=240.0,
+        )
         assert hasattr(app, "_refresh_a2l_values_after_write"), (
             "the write notice has no A2L refresh to time"
         )
@@ -1401,11 +1575,32 @@ def test_qc_tm_10b_1_a2l_refresh_cost_on_the_largest_a2l(tmp_path: Path, large_c
 
         app._refresh_a2l_values_after_write = timed
         tags = len(app._a2l_enriched_tags)
-        await patch_apply(pilot, app, log, tmp_path / "docs", "d.json", [(0x0, b"\x93")])
-        await wait_until(pilot, lambda: bool(spans), "the write notice never ran the A2L refresh")
+        old = mem_at(app, CASE06_WRITE)
+        assert old is not None, "0x80100005 is not in the case_06 image"
+        await patch_apply(
+            pilot, app, log, tmp_path / "docs", "d.json", [(CASE06_WRITE, bytes([old ^ 0xFF]))]
+        )
+        assert mem_at(app, CASE06_WRITE) == old ^ 0xFF, "the apply did not write"
+        await wait_until(
+            pilot,
+            lambda: bool(spans),
+            "the write notice never ran the A2L refresh",
+            timeout=240.0,
+        )
         elapsed = spans[0]
+        print(f"QC-TM-10b-1 case_06: {tags} tags, {elapsed:.3f} s")
         assert elapsed < report_margin(
             f"QC-TM-10b-1 A2L refresh {tags} tags", elapsed, timing_bound(1.0)
         ), f"{tags} tags: {elapsed:.3f} s"
+        full, _lines = enrich_tags_and_render(
+            app.current_a2l_data, app.current_file.mem_map, max_tag_lines=500
+        )
+        differ = [
+            i for i, (got, want) in enumerate(zip(app._a2l_enriched_tags, full)) if got != want
+        ]
+        assert len(app._a2l_enriched_tags) == len(full) and not differ, (
+            f"{len(differ)} enriched tags differ from a full recompute "
+            f"(first {differ[:3]}; {len(app._a2l_enriched_tags)} vs {len(full)} tags)"
+        )
 
     drive(tmp_path, scenario)
