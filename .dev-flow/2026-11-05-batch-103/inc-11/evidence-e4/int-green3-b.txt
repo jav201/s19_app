@@ -1,0 +1,684 @@
+/home/javiergr/work/b103-int11/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+.................................FF........FFFF..............F.......... [ 36%]
+.F.....F....FF..................F....FF.....F..........................F [ 72%]
+..F.................FFFFF.FF............................                 [100%]
+=================================== FAILURES ===================================
+____________ test_r_a2l_def_9_1_length_not_the_datatypes_is_refused ____________
+[gw5] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw5/test_r_a2l_def_9_1_length_not_0')
+
+    def test_r_a2l_def_9_1_length_not_the_datatypes_is_refused(tmp_path):
+        """R-A2L-DEF.9/1 - UWORD with LENGTH 4."""
+        a2l = _inline(tmp_path, _val("LX", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "LENGTH 4"))
+>       _is_refused(describe_definition("LX", a2l), "A2L-DEF-LENGTH", "LX: its length 4 differs from the 2 bytes of UWORD")
+
+tests/test_b103_a2l_definition.py:507: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='LX', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=None, dataty...one, compu_tab_ref=None, refusal=Refusal(code='A2L-DEF-ADDRESS', message='LX: the object has no address or no length'))
+code = 'A2L-DEF-LENGTH'
+message = 'LX: its length 4 differs from the 2 bytes of UWORD'
+
+    def _is_refused(d: Definition, code: str, message: str) -> None:
+>       assert d.refusal == Refusal(code, message), d.refusal
+E       AssertionError: Refusal(code='A2L-DEF-ADDRESS', message='LX: the object has no address or no length')
+E       assert Refusal(code=...or no length') == Refusal(code=...tes of UWORD')
+E         
+E         Differing attributes:
+E         ['code', 'message']
+E         
+E         Drill down into differing attribute code:
+E           code: 'A2L-DEF-ADDRESS' != 'A2L-DEF-LENGTH'
+E           - A2L-DEF-LENGTH...
+E         
+E         ...Full output truncated (6 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:165: AssertionError
+_________________ test_r_a2l_def_7_2_1_length_zero_is_refused __________________
+[gw4] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw4/test_r_a2l_def_7_2_1_length_ze0')
+
+    def test_r_a2l_def_7_2_1_length_zero_is_refused(tmp_path):
+        """R-A2L-DEF.7.2/1 - NUMBER 0."""
+        a2l = _inline(tmp_path, _ascii("Z0", "0x10", "0"))
+>       _is_refused(describe_definition("Z0", a2l), "A2L-DEF-ADDRESS", "Z0: its span of 0 bytes at 0x10 cannot be read")
+
+tests/test_b103_a2l_definition.py:450: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='Z0', section='CHARACTERISTIC', char_type='ASCII', kind='text', address=16, byte_length=None, datatype...one, compu_tab_ref=None, refusal=Refusal(code='A2L-DEF-ADDRESS', message='Z0: the object has no address or no length'))
+code = 'A2L-DEF-ADDRESS'
+message = 'Z0: its span of 0 bytes at 0x10 cannot be read'
+
+    def _is_refused(d: Definition, code: str, message: str) -> None:
+>       assert d.refusal == Refusal(code, message), d.refusal
+E       AssertionError: Refusal(code='A2L-DEF-ADDRESS', message='Z0: the object has no address or no length')
+E       assert Refusal(code=...or no length') == Refusal(code=...nnot be read')
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['message']
+E         
+E         Drill down into differing attribute message:
+E           message: 'Z0: the object has no address or no length' != 'Z0: its span of 0 bytes at 0x10 cannot be read'
+E           - Z0: its span of 0 bytes at 0x10 cannot be read
+E           + Z0: the object has no address or no length
+
+tests/test_b103_a2l_definition.py:165: AssertionError
+_______________ test_r_a2l_def_7_2_2_negative_length_is_refused ________________
+[gw4] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw4/test_r_a2l_def_7_2_2_negative_0')
+
+    def test_r_a2l_def_7_2_2_negative_length_is_refused(tmp_path):
+        """R-A2L-DEF.7.2/2 - NUMBER -5."""
+        a2l = _inline(tmp_path, _ascii("ZN", "0x10", "-5"))
+>       _is_refused(describe_definition("ZN", a2l), "A2L-DEF-ADDRESS", "ZN: its span of -5 bytes at 0x10 cannot be read")
+
+tests/test_b103_a2l_definition.py:456: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='ZN', section='CHARACTERISTIC', char_type='ASCII', kind='text', address=16, byte_length=None, datatype...one, compu_tab_ref=None, refusal=Refusal(code='A2L-DEF-ADDRESS', message='ZN: the object has no address or no length'))
+code = 'A2L-DEF-ADDRESS'
+message = 'ZN: its span of -5 bytes at 0x10 cannot be read'
+
+    def _is_refused(d: Definition, code: str, message: str) -> None:
+>       assert d.refusal == Refusal(code, message), d.refusal
+E       AssertionError: Refusal(code='A2L-DEF-ADDRESS', message='ZN: the object has no address or no length')
+E       assert Refusal(code=...or no length') == Refusal(code=...nnot be read')
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['message']
+E         
+E         Drill down into differing attribute message:
+E           message: 'ZN: the object has no address or no length' != 'ZN: its span of -5 bytes at 0x10 cannot be read'
+E           - ZN: its span of -5 bytes at 0x10 cannot be read
+E           + ZN: the object has no address or no length
+
+tests/test_b103_a2l_definition.py:165: AssertionError
+______________ test_r_a2l_def_3_1_ascii_characteristic_is_a_text _______________
+[gw1] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_3_1_ascii_characteristic_is_a_text(v171):
+        """R-A2L-DEF.3/1 - V171 ASCII object (the parser names it UNKNOWN)."""
+        d = describe_definition(V171_ASCII, v171)
+>       assert d.kind == "text" and d.byte_length == 42 and d.address == 0x810200
+E       AssertionError: assert ('' == 'text'
+E         
+E         - text)
+
+tests/test_b103_a2l_definition.py:302: AssertionError
+_____________ test_r_a2l_def_7_2_3_length_above_one_mib_is_refused _____________
+[gw4] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw4/test_r_a2l_def_7_2_3_length_ab0')
+
+    def test_r_a2l_def_7_2_3_length_above_one_mib_is_refused(tmp_path):
+        """R-A2L-DEF.7.2/3 - NUMBER 1048577 (one past the bound)."""
+        a2l = _inline(tmp_path, _ascii("ZH", "0x10", "1048577"))
+>       _is_refused(describe_definition("ZH", a2l), "A2L-DEF-ADDRESS", "ZH: its span of 1048577 bytes at 0x10 cannot be read")
+
+tests/test_b103_a2l_definition.py:462: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='ZH', section='CHARACTERISTIC', char_type='ASCII', kind='text', address=16, byte_length=None, datatype...one, compu_tab_ref=None, refusal=Refusal(code='A2L-DEF-ADDRESS', message='ZH: the object has no address or no length'))
+code = 'A2L-DEF-ADDRESS'
+message = 'ZH: its span of 1048577 bytes at 0x10 cannot be read'
+
+    def _is_refused(d: Definition, code: str, message: str) -> None:
+>       assert d.refusal == Refusal(code, message), d.refusal
+E       AssertionError: Refusal(code='A2L-DEF-ADDRESS', message='ZH: the object has no address or no length')
+E       assert Refusal(code=...or no length') == Refusal(code=...nnot be read')
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['message']
+E         
+E         Drill down into differing attribute message:
+E           message: 'ZH: the object has no address or no length' != 'ZH: its span of 1048577 bytes at 0x10 cannot be read'
+E           - ZH: its span of 1048577 bytes at 0x10 cannot be read
+E           + ZH: the object has no address or no length
+
+tests/test_b103_a2l_definition.py:165: AssertionError
+_______________ test_r_a2l_def_7_2_4_negative_address_is_refused _______________
+[gw4] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw4/test_r_a2l_def_7_2_4_negative_0')
+
+    def test_r_a2l_def_7_2_4_negative_address_is_refused(tmp_path):
+        """R-A2L-DEF.7.2/4 - address -0x10 (a UWORD object)."""
+        a2l = _inline(tmp_path, _meas("NA2", "UWORD", addr="-0x10"))
+>       _is_refused(describe_definition("NA2", a2l), "A2L-DEF-ADDRESS", "NA2: its span of 2 bytes at -0x10 cannot be read")
+
+tests/test_b103_a2l_definition.py:468: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='NA2', section='MEASUREMENT', char_type=None, kind='number', address=None, byte_length=2, datatype='UW...ne, compu_tab_ref=None, refusal=Refusal(code='A2L-DEF-ADDRESS', message='NA2: the object has no address or no length'))
+code = 'A2L-DEF-ADDRESS'
+message = 'NA2: its span of 2 bytes at -0x10 cannot be read'
+
+    def _is_refused(d: Definition, code: str, message: str) -> None:
+>       assert d.refusal == Refusal(code, message), d.refusal
+E       AssertionError: Refusal(code='A2L-DEF-ADDRESS', message='NA2: the object has no address or no length')
+E       assert Refusal(code=...or no length') == Refusal(code=...nnot be read')
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['message']
+E         
+E         Drill down into differing attribute message:
+E           message: 'NA2: the object has no address or no length' != 'NA2: its span of 2 bytes at -0x10 cannot be read'
+E           - NA2: its span of 2 bytes at -0x10 cannot be read
+E           + NA2: the object has no address or no length
+
+tests/test_b103_a2l_definition.py:165: AssertionError
+___________________ test_r_a2l_def_33_1_text_ended_by_a_nul ____________________
+[gw4] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_33_1_text_ended_by_a_nul(v171):
+        """R-A2L-DEF.33/1 - ``Hello ASAM`` + 32 x 00 (base: 72)."""
+        d = describe_definition(V171_ASCII, v171)
+>       res = _decoded(d, v171, _img(0x810200, b"Hello ASAM" + bytes(32)))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition.py:957: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='UNKNOWN', section='', char_type=None, kind='', address=None, byte_length=None, datatype=None, byte_or...effs=None, compu_tab_ref=None, refusal=Refusal(code='A2L-DEF-NAME', message='UNKNOWN: no tag of that name in the A2L'))
+a2l = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+image = {8454656: 72, 8454657: 101, 8454658: 108, 8454659: 108, ...}
+
+    def _decoded(d: Definition, a2l: dict, image: Mapping[int, int]) -> Decoded:
+        res = decode_definition(d, a2l, image)
+>       assert isinstance(res, Decoded), res
+E       AssertionError: Refusal(code='A2L-DEF-NAME', message='UNKNOWN: no tag of that name in the A2L')
+E       assert False
+E        +  where False = isinstance(Refusal(code='A2L-DEF-NAME', message='UNKNOWN: no tag of that name in the A2L'), Decoded)
+
+tests/test_b103_a2l_definition.py:170: AssertionError
+__ test_r_a2l_def_139_3_commented_out_old_copy_counts_as_a_second_declaration __
+[gw3] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw3/test_r_a2l_def_139_3_commented0')
+
+    def test_r_a2l_def_139_3_commented_out_old_copy_counts_as_a_second_declaration(tmp_path):
+        """R-A2L-DEF.139/3 - the builder opens the commented-out copy: two tags."""
+        old = "\n".join(["/*", '/begin MEASUREMENT X "old"', "  UWORD CM_ID 0 0 0 65535", "  ECU_ADDRESS 0x10",
+                         "/end MEASUREMENT", "*/"])
+        a2l = _inline(tmp_path, _cm("CM_ID", "IDENTICAL"), old, _meas("X", "UWORD", "CM_ID", addr="0x20"))
+>       _is_refused(describe_definition("X", a2l), "A2L-DEF-NAME", "X: the A2L declares that name more than once")
+
+tests/test_b103_a2l_definition.py:423: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='X', section='MEASUREMENT', char_type=None, kind='number', address=32, byte_length=2, datatype='UWORD'...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None)
+code = 'A2L-DEF-NAME', message = 'X: the A2L declares that name more than once'
+
+    def _is_refused(d: Definition, code: str, message: str) -> None:
+>       assert d.refusal == Refusal(code, message), d.refusal
+E       AssertionError: None
+E       assert None == Refusal(code='A2L-DEF-NAME', message='X: the A2L declares that name more than once')
+E        +  where None = Definition(name='X', section='MEASUREMENT', char_type=None, kind='number', address=32, byte_length=2, datatype='UWORD'...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None).refusal
+E        +  and   Refusal(code='A2L-DEF-NAME', message='X: the A2L declares that name more than once') = Refusal('A2L-DEF-NAME', 'X: the A2L declares that name more than once')
+
+tests/test_b103_a2l_definition.py:165: AssertionError
+_____________ test_r_a2l_def_34_2_bytes_above_0x7e_show_as_u_fffd ______________
+[gw3] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_34_2_bytes_above_0x7e_show_as_u_fffd(v171):
+        """R-A2L-DEF.34/2 - C3 A9 (UTF-8 for e-acute) -> two U+FFFD (Latin-1 would give two letters)."""
+        d = describe_definition(V171_ASCII, v171)
+        data = b"\xc3\xa9" + bytes(40)
+>       assert _decoded(d, v171, _img(0x810200, data)).text == FFFD + FFFD
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition.py:985: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='UNKNOWN', section='', char_type=None, kind='', address=None, byte_length=None, datatype=None, byte_or...effs=None, compu_tab_ref=None, refusal=Refusal(code='A2L-DEF-NAME', message='UNKNOWN: no tag of that name in the A2L'))
+a2l = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+image = {8454656: 195, 8454657: 169, 8454658: 0, 8454659: 0, ...}
+
+    def _decoded(d: Definition, a2l: dict, image: Mapping[int, int]) -> Decoded:
+        res = decode_definition(d, a2l, image)
+>       assert isinstance(res, Decoded), res
+E       AssertionError: Refusal(code='A2L-DEF-NAME', message='UNKNOWN: no tag of that name in the A2L')
+E       assert False
+E        +  where False = isinstance(Refusal(code='A2L-DEF-NAME', message='UNKNOWN: no tag of that name in the A2L'), Decoded)
+
+tests/test_b103_a2l_definition.py:170: AssertionError
+____________ test_r_a2l_def_58_1_1_v171_and_its_image_are_unchanged ____________
+[gw3] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_58_1_1_v171_and_its_image_are_unchanged(v171):
+        """R-A2L-DEF.58.1/1 - build and decode every V171 object; payload and image unchanged."""
+        before = copy.deepcopy(v171)
+        defs = describe_definitions([t["name"] for t in v171["tags"]], v171)
+        image = _zero_image(defs.values())
+        image_before = dict(image)
+        for d in defs.values():
+            _no_exception_triplet(d, v171, image)
+        assert v171 == before
+        assert image == image_before
+        for name in (V171_SWORD, V171_ENUM, V171_M0FF0, V171_ASCII):    # the objects really were built
+>           assert defs[name].refusal is None and isinstance(decode_definition(defs[name], v171, image), Decoded)
+                   ^^^^^^^^^^
+E           KeyError: 'UNKNOWN'
+
+tests/test_b103_a2l_definition.py:1123: KeyError
+____________________ test_r_a2l_def_4_1_val_blk_is_refused _____________________
+[gw1] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp... declares the sizes 2 and 256', 'Line 1260: CHARACTERISTIC VAL_BLK_0006 declares the sizes 2 and 256', ...], ...}, ...}
+
+    def test_r_a2l_def_4_1_val_blk_is_refused(c08):
+        """R-A2L-DEF.4/1 - VAL_BLK refused; address and byte length 256 still given."""
+        d = describe_definition("VAL_BLK_0001", c08["a2l"])
+        _is_refused(d, *_kind_msg("VAL_BLK_0001", "VAL_BLK"))
+>       assert d.byte_length == 256
+E       AssertionError: assert None == 256
+E        +  where None = Definition(name='VAL_BLK_0001', section='CHARACTERISTIC', char_type='VAL_BLK', kind='', address=8388608, byte_length=N...=None, refusal=Refusal(code='A2L-DEF-KIND', message='VAL_BLK_0001: the system has no definition for a VAL_BLK object')).byte_length
+
+tests/test_b103_a2l_definition.py:324: AssertionError
+___________________ test_r_a2l_def_137_1_nul_in_an_enum_text ___________________
+[gw3] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw3/test_r_a2l_def_137_1_nul_in_an0')
+
+    def test_r_a2l_def_137_1_nul_in_an_enum_text(tmp_path):
+        """R-A2L-DEF.137/1 - NUL in the entry text shows as U+FFFD."""
+>       assert _vtab_nul(tmp_path, "N1", "A\x00B", "VT_C1").text == "A" + FFFD + "B"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition.py:1285: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_definition.py:1280: in _vtab_nul
+    return _decoded(d, a2l, _img(0x10, b"\x00"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='N1', section='', char_type=None, kind='', address=None, byte_length=None, datatype=None, byte_order='...e, coeffs=None, compu_tab_ref=None, refusal=Refusal(code='A2L-DEF-NAME', message='N1: no tag of that name in the A2L'))
+a2l = {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': ['File is not UTF-8 text; save it as UTF-8 and load it again.'], ...}
+image = {16: 0}
+
+    def _decoded(d: Definition, a2l: dict, image: Mapping[int, int]) -> Decoded:
+        res = decode_definition(d, a2l, image)
+>       assert isinstance(res, Decoded), res
+E       AssertionError: Refusal(code='A2L-DEF-NAME', message='N1: no tag of that name in the A2L')
+E       assert False
+E        +  where False = isinstance(Refusal(code='A2L-DEF-NAME', message='N1: no tag of that name in the A2L'), Decoded)
+
+tests/test_b103_a2l_definition.py:170: AssertionError
+______ test_r_a2l_def_58_2_14_esc_and_unterminated_quote_in_an_entry_text ______
+[gw1] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw1/test_r_a2l_def_58_2_14_esc_and0')
+
+    def test_r_a2l_def_58_2_14_esc_and_unterminated_quote_in_an_entry_text(tmp_path):
+        """R-A2L-DEF.58.2/14 - ESC shows as U+FFFD; no exception on an unterminated quote."""
+        pairs = ('0 "A\x1bB', )
+        a2l = _inline(tmp_path, *_enum_blocks("CM_Q", "VT_Q", "1", *pairs), _val("T14", "0x10", "RL_U8", "CM_Q"))
+        d = describe_definition("T14", a2l)
+>       assert d.kind == "enum" and d.refusal is None
+E       AssertionError: assert ('' == 'enum'
+E         
+E         - enum)
+
+tests/test_b103_a2l_definition.py:1243: AssertionError
+__________________ test_r_a2l_def_58_2_15_v171_unclosed_begin __________________
+[gw1] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_58_2_15_v171_unclosed_begin(v171):
+        """R-A2L-DEF.58.2/15 - V171 parses with 'Unclosed /begin'; every object still describes and decodes."""
+>       assert v171["errors"]
+E       assert []
+
+tests/test_b103_a2l_definition.py:1251: AssertionError
+_____________________ test_r_a2l_def_33_3_text_with_no_nul _____________________
+[gw4] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_33_3_text_with_no_nul(v171):
+        """R-A2L-DEF.33/3 - 42 x ``A``."""
+        d = describe_definition(V171_ASCII, v171)
+>       assert _decoded(d, v171, _img(0x810200, b"A" * 42)).text == "A" * 42
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition.py:971: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='UNKNOWN', section='', char_type=None, kind='', address=None, byte_length=None, datatype=None, byte_or...effs=None, compu_tab_ref=None, refusal=Refusal(code='A2L-DEF-NAME', message='UNKNOWN: no tag of that name in the A2L'))
+a2l = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+image = {8454656: 65, 8454657: 65, 8454658: 65, 8454659: 65, ...}
+
+    def _decoded(d: Definition, a2l: dict, image: Mapping[int, int]) -> Decoded:
+        res = decode_definition(d, a2l, image)
+>       assert isinstance(res, Decoded), res
+E       AssertionError: Refusal(code='A2L-DEF-NAME', message='UNKNOWN: no tag of that name in the A2L')
+E       assert False
+E        +  where False = isinstance(Refusal(code='A2L-DEF-NAME', message='UNKNOWN: no tag of that name in the A2L'), Decoded)
+
+tests/test_b103_a2l_definition.py:170: AssertionError
+_______________ test_r_a2l_def_34_1_control_byte_shows_as_u_fffd _______________
+[gw4] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_34_1_control_byte_shows_as_u_fffd(v171):
+        """R-A2L-DEF.34/1."""
+        d = describe_definition(V171_ASCII, v171)
+        data = b"AB\x07C" + bytes(38)
+>       assert _decoded(d, v171, _img(0x810200, data)).text == "AB" + FFFD + "C"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition.py:978: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='UNKNOWN', section='', char_type=None, kind='', address=None, byte_length=None, datatype=None, byte_or...effs=None, compu_tab_ref=None, refusal=Refusal(code='A2L-DEF-NAME', message='UNKNOWN: no tag of that name in the A2L'))
+a2l = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+image = {8454656: 65, 8454657: 66, 8454658: 7, 8454659: 67, ...}
+
+    def _decoded(d: Definition, a2l: dict, image: Mapping[int, int]) -> Decoded:
+        res = decode_definition(d, a2l, image)
+>       assert isinstance(res, Decoded), res
+E       AssertionError: Refusal(code='A2L-DEF-NAME', message='UNKNOWN: no tag of that name in the A2L')
+E       assert False
+E        +  where False = isinstance(Refusal(code='A2L-DEF-NAME', message='UNKNOWN: no tag of that name in the A2L'), Decoded)
+
+tests/test_b103_a2l_definition.py:170: AssertionError
+__ test_at_b103_i2_1_asam_demo_scalar_kinds_decode_to_the_text_the_a2l_gives ___
+[gw1] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_at_b103_i2_1_asam_demo_scalar_kinds_decode_to_the_text_the_a2l_gives(v171):
+        """AT-B103-I2-1 (2a arm) - the ten V171 objects: build and decode over the demo image.
+    
+        Rows .2, .3, .14, .15, .27, .30, .33 and cited R-A2L-059. The encode, apply
+        and re-decode arm and the seven A2L-DEF-OVERLAP refusals wait for 2b.
+        """
+        image: dict[int, int] = {}
+        image.update(_img(0x810000, bytes([0, 0])))                    # UBYTE, SBYTE
+        image.update(_img(0x810002, bytes([0x34, 0x12])))              # the UWORD word 0x1234
+        image.update(_img(0x810004, bytes([2, 0])))                    # the SWORD
+        image.update(_img(0x810200, b"Hello ASAM" + bytes(32)))        # the ASCII object
+        expected = {
+            V171_ENUM: "Square",
+            V171_ENUM_NODEF: "red",
+            V171_RANGE: "two_to_three",
+            V171_M0FF0: "35",
+            V171_M0001: "0",
+            V171_M0010: "1",
+            V171_ASCII: "Hello ASAM",
+            V171_SBYTE: "0",
+            V171_UBYTE: "0",
+            V171_SWORD: "2",
+        }
+        for name, text in expected.items():
+            d = describe_definition(name, v171)
+>           assert d.refusal is None, (name, d.refusal)
+E           AssertionError: ('UNKNOWN', Refusal(code='A2L-DEF-NAME', message='UNKNOWN: no tag of that name in the A2L'))
+E           assert Refusal(code='A2L-DEF-NAME', message='UNKNOWN: no tag of that name in the A2L') is None
+E            +  where Refusal(code='A2L-DEF-NAME', message='UNKNOWN: no tag of that name in the A2L') = Definition(name='UNKNOWN', section='', char_type=None, kind='', address=None, byte_length=None, datatype=None, byte_or...effs=None, compu_tab_ref=None, refusal=Refusal(code='A2L-DEF-NAME', message='UNKNOWN: no tag of that name in the A2L')).refusal
+
+tests/test_b103_a2l_definition.py:1588: AssertionError
+_ test_r_a2l_def_58_2_20_a_length_of_5000_hex_digits_is_a_refusal_not_an_exception _
+[gw7] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw7/test_r_a2l_def_58_2_20_a_lengt0')
+
+    def test_r_a2l_def_58_2_20_a_length_of_5000_hex_digits_is_a_refusal_not_an_exception(tmp_path):
+        """R-A2L-DEF.58.2/20 (E5S-01, CR-2) - LENGTH 0x + 5,000 F on a UWORD VALUE."""
+>       _huge_span_case(tmp_path, "HL", _val("HL", "0x10", LAYOUT["UWORD"], "NO_COMPU_METHOD", "0", "65535",
+                                             "LENGTH 0x" + "F" * 5000))
+
+tests/test_b103_a2l_definition.py:2291: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw7/test_r_a2l_def_58_2_20_a_lengt0')
+name = 'HL'
+block = '/begin CHARACTERISTIC HL ""\n  VALUE 0x10 RL_U16 0 NO_COMPU_METHOD 0 65535\n  LENGTH 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF...FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF\n/end CHARACTERISTIC'
+
+    def _huge_span_case(tmp_path: Path, name: str, block: str) -> None:
+        """One 58.2/20-22 object: its describe refusal, the 1,024-character bound, and the decode of the same refusal."""
+        a2l = _inline(tmp_path, block)
+        d = describe_definition(name, a2l)                                         # 0 exceptions
+        want = Refusal("A2L-DEF-ADDRESS", f"{name}: its span of {HEX256} bytes at 0x10 cannot be read")
+>       assert d.refusal == want, d.refusal
+E       AssertionError: Refusal(code='A2L-DEF-ADDRESS', message='HL: the object has no address or no length')
+E       assert Refusal(code=...or no length') == Refusal(code=...nnot be read')
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['message']
+E         
+E         Drill down into differing attribute message:
+E           message: 'HL: the object has no address or no length' != 'HL: its span of 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF… bytes at 0x10 cannot be read'...
+E         
+E         ...Full output truncated (2 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2284: AssertionError
+_ test_r_a2l_def_58_2_21_a_data_size_of_5000_hex_digits_is_a_refusal_not_an_exception _
+[gw7] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw7/test_r_a2l_def_58_2_21_a_data_0')
+
+    def test_r_a2l_def_58_2_21_a_data_size_of_5000_hex_digits_is_a_refusal_not_an_exception(tmp_path):
+        """R-A2L-DEF.58.2/21 (E5S-01) - DATA_SIZE 0x + 5,000 F on a UBYTE MEASUREMENT."""
+>       _huge_span_case(tmp_path, "HD", _meas("HD", "UBYTE", "NO_COMPU_METHOD", "0", "255",
+                                              "DATA_SIZE 0x" + "F" * 5000, addr="0x10"))
+
+tests/test_b103_a2l_definition.py:2297: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw7/test_r_a2l_def_58_2_21_a_data_0')
+name = 'HD'
+block = '/begin MEASUREMENT HD ""\n  UBYTE NO_COMPU_METHOD 0 0 0 255\n  ECU_ADDRESS 0x10\n  DATA_SIZE 0xFFFFFFFFFFFFFFFFFFFFFF...FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF\n/end MEASUREMENT'
+
+    def _huge_span_case(tmp_path: Path, name: str, block: str) -> None:
+        """One 58.2/20-22 object: its describe refusal, the 1,024-character bound, and the decode of the same refusal."""
+        a2l = _inline(tmp_path, block)
+        d = describe_definition(name, a2l)                                         # 0 exceptions
+        want = Refusal("A2L-DEF-ADDRESS", f"{name}: its span of {HEX256} bytes at 0x10 cannot be read")
+>       assert d.refusal == want, d.refusal
+E       AssertionError: Refusal(code='A2L-DEF-ADDRESS', message='HD: the object has no address or no length')
+E       assert Refusal(code=...or no length') == Refusal(code=...nnot be read')
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['message']
+E         
+E         Drill down into differing attribute message:
+E           message: 'HD: the object has no address or no length' != 'HD: its span of 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF… bytes at 0x10 cannot be read'...
+E         
+E         ...Full output truncated (2 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2284: AssertionError
+_ test_r_a2l_def_58_2_22_a_number_of_5000_hex_digits_is_a_refusal_not_an_exception _
+[gw1] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw1/test_r_a2l_def_58_2_22_a_numbe0')
+
+    def test_r_a2l_def_58_2_22_a_number_of_5000_hex_digits_is_a_refusal_not_an_exception(tmp_path):
+        """R-A2L-DEF.58.2/22 (E5S-01) - NUMBER 0x + 5,000 F on an ASCII CHARACTERISTIC."""
+>       _huge_span_case(tmp_path, "HN", _ascii("HN", "0x10", "0x" + "F" * 5000))
+
+tests/test_b103_a2l_definition.py:2303: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw1/test_r_a2l_def_58_2_22_a_numbe0')
+name = 'HN'
+block = '/begin CHARACTERISTIC HN ""\n  ASCII 0x10 RL_U8 0 NO_COMPU_METHOD 0 255\n  NUMBER 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF...FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF\n/end CHARACTERISTIC'
+
+    def _huge_span_case(tmp_path: Path, name: str, block: str) -> None:
+        """One 58.2/20-22 object: its describe refusal, the 1,024-character bound, and the decode of the same refusal."""
+        a2l = _inline(tmp_path, block)
+        d = describe_definition(name, a2l)                                         # 0 exceptions
+        want = Refusal("A2L-DEF-ADDRESS", f"{name}: its span of {HEX256} bytes at 0x10 cannot be read")
+>       assert d.refusal == want, d.refusal
+E       AssertionError: Refusal(code='A2L-DEF-ADDRESS', message='HN: the object has no address or no length')
+E       assert Refusal(code=...or no length') == Refusal(code=...nnot be read')
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['message']
+E         
+E         Drill down into differing attribute message:
+E           message: 'HN: the object has no address or no length' != 'HN: its span of 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF… bytes at 0x10 cannot be read'...
+E         
+E         ...Full output truncated (2 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2284: AssertionError
+_ test_r_a2l_def_58_2_23_a_matrix_dim_of_5000_hex_digits_is_a_refusal_not_an_exception _
+[gw1] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw1/test_r_a2l_def_58_2_23_a_matri0')
+
+    def test_r_a2l_def_58_2_23_a_matrix_dim_of_5000_hex_digits_is_a_refusal_not_an_exception(tmp_path):
+        """R-A2L-DEF.58.2/23 (E5S-01, CR-2) - MATRIX_DIM 0x + 5,000 F on a UBYTE MEASUREMENT: A2L-DEF-KIND, bounded."""
+        a2l = _inline(tmp_path, _meas("MD", "UBYTE", "NO_COMPU_METHOD", "0", "255", "MATRIX_DIM 0x" + "F" * 5000,
+                                      addr="0x10"))
+        d = describe_definition("MD", a2l)                                         # 0 exceptions
+        want = Refusal("A2L-DEF-KIND", f"MD: the system has no definition for a MATRIX_DIM {HEX256} MEASUREMENT object")
+>       assert d.refusal == want, d.refusal
+E       AssertionError: Refusal(code='A2L-DEF-ADDRESS', message='MD: the object has no address or no length')
+E       assert Refusal(code=...or no length') == Refusal(code=...EMENT object')
+E         
+E         Differing attributes:
+E         ['code', 'message']
+E         
+E         Drill down into differing attribute code:
+E           code: 'A2L-DEF-ADDRESS' != 'A2L-DEF-KIND'
+E           - A2L-DEF-KIND...
+E         
+E         ...Full output truncated (6 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2312: AssertionError
+_ test_r_a2l_def_151_5_the_number_rule_for_an_address_and_a_length_at_its_bound _
+[gw1] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw1/test_r_a2l_def_151_5_the_numbe0')
+
+    def test_r_a2l_def_151_5_the_number_rule_for_an_address_and_a_length_at_its_bound(tmp_path):
+        """R-A2L-DEF.151/5 (E5S-03) - addresses of 1,500 hex digits are cut; 2^64 - 1 stays decimal and 2^64 is `0x` form."""
+        a2l = _inline(
+            tmp_path,
+            _meas("AH", "UBYTE", "NO_COMPU_METHOD", "0", "255", addr="0x" + "F" * 1500),
+            _val("CH", "0x" + "F" * 1500, LAYOUT["UBYTE"], "NO_COMPU_METHOD", "0", "255"),
+            _ascii("B1", "0x10", "18446744073709551615"),
+            _ascii("B2", "0x20", "18446744073709551616"),
+        )
+        got = describe_definitions(["AH", "CH", "B1", "B2"], a2l)
+>       assert got["AH"].refusal == Refusal("A2L-DEF-ADDRESS", f"AH: its span of 1 bytes at {HEX256} cannot be read")
+E       AssertionError: assert Refusal(code=...or no length') == Refusal(code=...nnot be read')
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['message']
+E         
+E         Drill down into differing attribute message:
+E           message: 'AH: the object has no address or no length' != 'AH: its span of 1 bytes at 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF… cannot be read'...
+E         
+E         ...Full output truncated (2 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2388: AssertionError
+_ test_r_a2l_def_58_2_24_deep_nesting_does_not_raise_and_the_walk_keeps_file_order _
+[gw7] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw7/test_r_a2l_def_58_2_24_deep_ne0')
+
+    def test_r_a2l_def_58_2_24_deep_nesting_does_not_raise_and_the_walk_keeps_file_order(tmp_path):
+        """R-A2L-DEF.58.2/24 (E5S-04) - (N) 980 nested sections: 0 exceptions, same definition, same decode;
+        (O) the first COMPU_METHOD of a name in file order wins (each section before its children, children in order)."""
+        nested_block = "\n".join(['/begin GROUP G%d ""' % k for k in range(NEST_DEPTH)] + ["/end GROUP"] * NEST_DEPTH)
+        obj = _val("DN", "0x10", LAYOUT["UBYTE"], "NO_COMPU_METHOD", "0", "255")
+        flat = _inline(tmp_path, obj)
+        nested = _fresh_thread(lambda: _inline(tmp_path, obj, nested_block))     # the parser reads the depth itself
+        alone = describe_definition("DN", flat)
+        assert alone.refusal is None and alone.kind == "number" and alone.address == 0x10
+        # described and decoded 50 frames deep in a fresh thread: a recursive walk needs 980 more frames
+        got = _fresh_thread(lambda: describe_definitions(["DN"], nested)["DN"], padding=50)       # 0 exceptions
+>       assert got == alone
+E       AssertionError: assert Definition(na... in the A2L')) == Definition(na... refusal=None)
+E         
+E         Omitting 14 identical items, use -vv to show
+E         Differing attributes:
+E         ['section',
+E          'char_type',
+E          'kind',
+E          'address',...
+E         
+E         ...Full output truncated (57 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2351: AssertionError
+____ test_r_a2l_def_151_4_a_matrix_dim_number_is_written_by_the_number_rule ____
+[gw7] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10082/popen-gw7/test_r_a2l_def_151_4_a_matrix_0')
+
+    def test_r_a2l_def_151_4_a_matrix_dim_number_is_written_by_the_number_rule(tmp_path):
+        """R-A2L-DEF.151/4 (CR-3, E5S-03) - 4,000 decimal digits and 1,000 hexadecimal digits: `0x` form, 256 characters, bounded."""
+        a2l = _inline(
+            tmp_path,
+            _meas("MD4", "UBYTE", "NO_COMPU_METHOD", "0", "255", "MATRIX_DIM " + "9" * 4000, addr="0x10"),
+            _meas("MD5", "UBYTE", "NO_COMPU_METHOD", "0", "255", "MATRIX_DIM 0x" + "F" * 1000, addr="0x11"),
+        )
+        got = describe_definitions(["MD4", "MD5"], a2l)
+        t4 = "0x" + format(10 ** 4000 - 1, "X")[:254] + ELLIPSIS
+>       assert got["MD4"].refusal == Refusal("A2L-DEF-KIND", f"MD4: the system has no definition for a MATRIX_DIM {t4} MEASUREMENT object")
+E       AssertionError: assert Refusal(code=...or no length') == Refusal(code=...EMENT object')
+E         
+E         Differing attributes:
+E         ['code', 'message']
+E         
+E         Drill down into differing attribute code:
+E           code: 'A2L-DEF-ADDRESS' != 'A2L-DEF-KIND'
+E           - A2L-DEF-KIND...
+E         
+E         ...Full output truncated (6 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2372: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_9_1_length_not_the_datatypes_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_7_2_1_length_zero_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_7_2_2_negative_length_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_3_1_ascii_characteristic_is_a_text
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_7_2_3_length_above_one_mib_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_7_2_4_negative_address_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_33_1_text_ended_by_a_nul
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_139_3_commented_out_old_copy_counts_as_a_second_declaration
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_34_2_bytes_above_0x7e_show_as_u_fffd
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_1_1_v171_and_its_image_are_unchanged
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_4_1_val_blk_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_137_1_nul_in_an_enum_text
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_14_esc_and_unterminated_quote_in_an_entry_text
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_15_v171_unclosed_begin
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_33_3_text_with_no_nul
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_34_1_control_byte_shows_as_u_fffd
+FAILED tests/test_b103_a2l_definition.py::test_at_b103_i2_1_asam_demo_scalar_kinds_decode_to_the_text_the_a2l_gives
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_20_a_length_of_5000_hex_digits_is_a_refusal_not_an_exception
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_21_a_data_size_of_5000_hex_digits_is_a_refusal_not_an_exception
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_22_a_number_of_5000_hex_digits_is_a_refusal_not_an_exception
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_23_a_matrix_dim_of_5000_hex_digits_is_a_refusal_not_an_exception
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_151_5_the_number_rule_for_an_address_and_a_length_at_its_bound
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_24_deep_nesting_does_not_raise_and_the_walk_keeps_file_order
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_151_4_a_matrix_dim_number_is_written_by_the_number_rule
+24 failed, 176 passed in 8.94s
+EXIT=1

@@ -1,0 +1,183 @@
+--- uptime BEFORE ---
+ 14:49:13 up 2 days,  6:20,  2 users,  load average: 0.84, 1.54, 1.49
+/home/javiergr/work/b103-int11/s19_app/__init__.py
+FFFFFFF.......................                                           [100%]
+=================================== FAILURES ===================================
+________________________ test_r_a2l_read_52_case06_time ________________________
+
+big_files = {'case06': PosixPath('/home/javiergr/work/b103-int11/examples/case_06_large_nested_a2l/firmware.a2l'), 'software_a': P..._reader_perf0/string.a2l'), 'words': PosixPath('/tmp/pytest-of-javiergr/pytest-10086/b103_a2l_reader_perf0/words.a2l')}
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_read_52_case06_time(big_files: dict) -> None:
+        elapsed = _min_time(big_files["case06"])
+        bound = BASE_CASE06_S * 1.5
+>       assert elapsed < report_margin("R-A2L-READ.52/1 case_06 time", elapsed, timing_bound(bound)), elapsed
+E       AssertionError: 11.908923384995433
+E       assert 11.908923384995433 < 8.847
+E        +  where 8.847 = report_margin('R-A2L-READ.52/1 case_06 time', 11.908923384995433, 8.847)
+E        +    where 8.847 = timing_bound(8.847)
+
+tests/test_b103_a2l_reader_perf.py:158: AssertionError
+______________________ test_r_a2l_read_52_software_a_time ______________________
+
+big_files = {'case06': PosixPath('/home/javiergr/work/b103-int11/examples/case_06_large_nested_a2l/firmware.a2l'), 'software_a': P..._reader_perf0/string.a2l'), 'words': PosixPath('/tmp/pytest-of-javiergr/pytest-10086/b103_a2l_reader_perf0/words.a2l')}
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_read_52_software_a_time(big_files: dict) -> None:
+        elapsed = _min_time(big_files["software_a"])
+        bound = BASE_SOFTWAREA_S * 1.5
+>       assert elapsed < report_margin("R-A2L-READ.52/1 software_a time", elapsed, timing_bound(bound)), elapsed
+E       AssertionError: 1.4331030170142185
+E       assert 1.4331030170142185 < 0.9795
+E        +  where 0.9795 = report_margin('R-A2L-READ.52/1 software_a time', 1.4331030170142185, 0.9795)
+E        +    where 0.9795 = timing_bound(0.9795)
+
+tests/test_b103_a2l_reader_perf.py:165: AssertionError
+________________________ test_r_a2l_read_52_string_time ________________________
+
+big_files = {'case06': PosixPath('/home/javiergr/work/b103-int11/examples/case_06_large_nested_a2l/firmware.a2l'), 'software_a': P..._reader_perf0/string.a2l'), 'words': PosixPath('/tmp/pytest-of-javiergr/pytest-10086/b103_a2l_reader_perf0/words.a2l')}
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_read_52_string_time(big_files: dict) -> None:
+        elapsed = _min_time(big_files["string"])
+        bound = BASE_STRING_S * 1.5
+>       assert elapsed < report_margin("R-A2L-READ.52/2 string time", elapsed, timing_bound(bound)), elapsed
+E       AssertionError: 0.5069279289746191
+E       assert 0.5069279289746191 < 0.11249999999999999
+E        +  where 0.11249999999999999 = report_margin('R-A2L-READ.52/2 string time', 0.5069279289746191, 0.11249999999999999)
+E        +    where 0.11249999999999999 = timing_bound(0.11249999999999999)
+
+tests/test_b103_a2l_reader_perf.py:172: AssertionError
+_______________________ test_r_a2l_read_52_case06_memory _______________________
+
+big_files = {'case06': PosixPath('/home/javiergr/work/b103-int11/examples/case_06_large_nested_a2l/firmware.a2l'), 'software_a': P..._reader_perf0/string.a2l'), 'words': PosixPath('/tmp/pytest-of-javiergr/pytest-10086/b103_a2l_reader_perf0/words.a2l')}
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_read_52_case06_memory(big_files: dict) -> None:
+        peak = _peak_mb(big_files["case06"])
+        bound = BASE_CASE06_MB * 2.0
+>       assert peak < report_margin("R-A2L-READ.52/1 case_06 peak RSS", peak, timing_bound(bound)), peak
+E       AssertionError: 6428.19921875
+E       assert 6428.19921875 < 1070.0
+E        +  where 1070.0 = report_margin('R-A2L-READ.52/1 case_06 peak RSS', 6428.19921875, 1070.0)
+E        +    where 1070.0 = timing_bound(1070.0)
+
+tests/test_b103_a2l_reader_perf.py:179: AssertionError
+_____________________ test_r_a2l_read_52_software_a_memory _____________________
+
+big_files = {'case06': PosixPath('/home/javiergr/work/b103-int11/examples/case_06_large_nested_a2l/firmware.a2l'), 'software_a': P..._reader_perf0/string.a2l'), 'words': PosixPath('/tmp/pytest-of-javiergr/pytest-10086/b103_a2l_reader_perf0/words.a2l')}
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_read_52_software_a_memory(big_files: dict) -> None:
+        peak = _peak_mb(big_files["software_a"])
+        bound = BASE_SOFTWAREA_MB * 2.0
+>       assert peak < report_margin("R-A2L-READ.52/1 software_a peak RSS", peak, timing_bound(bound)), peak
+E       AssertionError: 6428.19921875
+E       assert 6428.19921875 < 190.0
+E        +  where 190.0 = report_margin('R-A2L-READ.52/1 software_a peak RSS', 6428.19921875, 190.0)
+E        +    where 190.0 = timing_bound(190.0)
+
+tests/test_b103_a2l_reader_perf.py:186: AssertionError
+_______________________ test_r_a2l_read_52_string_memory _______________________
+
+big_files = {'case06': PosixPath('/home/javiergr/work/b103-int11/examples/case_06_large_nested_a2l/firmware.a2l'), 'software_a': P..._reader_perf0/string.a2l'), 'words': PosixPath('/tmp/pytest-of-javiergr/pytest-10086/b103_a2l_reader_perf0/words.a2l')}
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_read_52_string_memory(big_files: dict) -> None:
+        peak = _peak_mb(big_files["string"])
+        bound = BASE_STRING_MB * 2.0
+>       assert peak < report_margin("R-A2L-READ.52/2 string peak RSS", peak, timing_bound(bound)), peak
+E       AssertionError: 6428.19921875
+E       assert 6428.19921875 < 141.8
+E        +  where 141.8 = report_margin('R-A2L-READ.52/2 string peak RSS', 6428.19921875, 141.8)
+E        +    where 141.8 = timing_bound(141.8)
+
+tests/test_b103_a2l_reader_perf.py:193: AssertionError
+_______________________ test_r_a2l_read_52_words_memory ________________________
+
+big_files = {'case06': PosixPath('/home/javiergr/work/b103-int11/examples/case_06_large_nested_a2l/firmware.a2l'), 'software_a': P..._reader_perf0/string.a2l'), 'words': PosixPath('/tmp/pytest-of-javiergr/pytest-10086/b103_a2l_reader_perf0/words.a2l')}
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_read_52_words_memory(big_files: dict) -> None:
+        peak = _peak_mb(big_files["words"])
+        bound = BASE_WORDS_MB * 2.0
+>       assert peak < report_margin("R-A2L-READ.52/3 words peak RSS", peak, timing_bound(bound)), peak
+E       AssertionError: 6428.19921875
+E       assert 6428.19921875 < 228.0
+E        +  where 228.0 = report_margin('R-A2L-READ.52/3 words peak RSS', 6428.19921875, 228.0)
+E        +    where 228.0 = timing_bound(228.0)
+
+tests/test_b103_a2l_reader_perf.py:200: AssertionError
+============================= QC-TM timing margins =============================
+LOW -4433.3%  6428.199 s / 141.800 s  R-A2L-READ.52/2 string peak RSS  tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_string_memory
+LOW -3283.3%  6428.199 s / 190.000 s  R-A2L-READ.52/1 software_a peak RSS  tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_software_a_memory
+LOW -2719.4%  6428.199 s / 228.000 s  R-A2L-READ.52/3 words peak RSS  tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_words_memory
+LOW -500.8%  6428.199 s / 1070.000 s  R-A2L-READ.52/1 case_06 peak RSS  tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_case06_memory
+LOW -350.6%  0.507 s / 0.112 s  R-A2L-READ.52/2 string time  tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_string_time
+LOW -46.3%  1.433 s / 0.980 s  R-A2L-READ.52/1 software_a time  tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_software_a_time
+LOW -34.6%  11.909 s / 8.847 s  R-A2L-READ.52/1 case_06 time  tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_case06_time
+32.4%  1.014 s / 1.500 s  R-A2L-DEF.150/4 COMPU_VTAB_RANGE decode per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_4_shared_range_table_size_costs_nothing_per_element
+32.8%  1.008 s / 1.500 s  R-A2L-DEF.149 /4 RECORD_LAYOUT per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_4_scaling_layout
+32.8%  1.007 s / 1.500 s  R-A2L-DEF.150/10 TAB_NOINTP run of repeated x decode per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_10_a_run_of_repeated_x_below_the_stored_value_costs_nothing_per_element
+32.9%  1.007 s / 1.500 s  R-A2L-DEF.150/7 TAB_INTP decode per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_7_shared_tab_intp_size_costs_nothing_per_element
+33.0%  1.005 s / 1.500 s  R-A2L-DEF.149/8 COMPU_TAB_REF word per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_8_long_table_ref_word_costs_nothing_per_object
+33.2%  1.002 s / 1.500 s  R-A2L-DEF.149 /2 COMPU_VTAB per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_2_scaling_enum_table
+33.2%  1.002 s / 1.500 s  R-A2L-DEF.149/7 conversion type word per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_7_long_conversion_type_word_costs_nothing_per_object
+33.3%  1.000 s / 1.500 s  R-A2L-DEF.149 /1 COMPU_METHOD per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_1_scaling_method
+33.3%  1.001 s / 1.500 s  R-A2L-DEF.149/9 CUBOID layout per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid
+33.3%  1.000 s / 1.500 s  R-A2L-DEF.150/1 COMPU_VTAB decode per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_1_shared_vtab_size_costs_nothing_per_element
+33.3%  1.000 s / 1.500 s  R-A2L-DEF.150/2 matched entry text per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_2_long_matched_entry_text_is_referenced_not_copied
+33.3%  1.000 s / 1.500 s  R-A2L-DEF.150/3 default text per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_3_long_default_text_is_referenced_not_copied
+33.3%  1.000 s / 1.500 s  R-A2L-DEF.150/5 matched range text per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_5_long_matched_range_text_is_referenced_not_copied
+33.5%  0.997 s / 1.500 s  R-A2L-DEF.149 /3 COMPU_VTAB_RANGE per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_3_scaling_range_table
+33.6%  0.996 s / 1.500 s  R-A2L-DEF.149/10 empty table name per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object
+33.7%  0.994 s / 1.500 s  R-A2L-DEF.149/6 FORMAT word per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_6_long_format_word_of_a_shared_method_costs_nothing_per_object
+34.7%  0.979 s / 1.500 s  R-A2L-DEF.150/8 TAB_NOINTP decode per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_8_shared_tab_nointp_size_costs_nothing_per_element
+48.3%  1.035 s / 2.000 s  R-A2L-DEF.150/4 COMPU_VTAB_RANGE decode per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_4_shared_range_table_size_costs_nothing_per_element
+48.7%  1.026 s / 2.000 s  R-A2L-DEF.149 /4 RECORD_LAYOUT per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_4_scaling_layout
+49.1%  1.019 s / 2.000 s  R-A2L-DEF.150/10 TAB_NOINTP run of repeated x decode per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_10_a_run_of_repeated_x_below_the_stored_value_costs_nothing_per_element
+49.2%  1.015 s / 2.000 s  R-A2L-DEF.149/6 FORMAT word per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_6_long_format_word_of_a_shared_method_costs_nothing_per_object
+49.2%  1.017 s / 2.000 s  R-A2L-DEF.149/8 COMPU_TAB_REF word per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_8_long_table_ref_word_costs_nothing_per_object
+49.2%  1.016 s / 2.000 s  R-A2L-DEF.150/8 TAB_NOINTP decode per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_8_shared_tab_nointp_size_costs_nothing_per_element
+49.3%  1.014 s / 2.000 s  R-A2L-DEF.150/7 TAB_INTP decode per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_7_shared_tab_intp_size_costs_nothing_per_element
+49.6%  1.008 s / 2.000 s  R-A2L-DEF.149/9 CUBOID layout per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid
+49.8%  1.005 s / 2.000 s  R-A2L-DEF.149/10 empty table name per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object
+49.9%  1.002 s / 2.000 s  R-A2L-DEF.149 /2 COMPU_VTAB per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_2_scaling_enum_table
+49.9%  1.002 s / 2.000 s  R-A2L-DEF.149 /3 COMPU_VTAB_RANGE per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_3_scaling_range_table
+49.9%  1.001 s / 2.000 s  R-A2L-DEF.149/7 conversion type word per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_7_long_conversion_type_word_costs_nothing_per_object
+50.0%  1.000 s / 2.000 s  R-A2L-DEF.150/1 COMPU_VTAB decode per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_1_shared_vtab_size_costs_nothing_per_element
+50.0%  1.000 s / 2.000 s  R-A2L-DEF.150/2 matched entry text per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_2_long_matched_entry_text_is_referenced_not_copied
+50.0%  1.000 s / 2.000 s  R-A2L-DEF.150/3 default text per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_3_long_default_text_is_referenced_not_copied
+50.0%  1.000 s / 2.000 s  R-A2L-DEF.150/5 matched range text per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_5_long_matched_range_text_is_referenced_not_copied
+50.2%  0.996 s / 2.000 s  R-A2L-DEF.149 /1 COMPU_METHOD per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_1_scaling_method
+58.4%  0.833 s / 2.000 s  R-A2L-DEF.136 describe 13990  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_136_1_describing_every_object_is_fast
+73.4%  0.133 s / 0.500 s  R-A2L-DEF.149 /3 COMPU_VTAB_RANGE 400 names at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_3_shared_range_table_size_costs_nothing_per_object
+74.4%  0.128 s / 0.500 s  R-A2L-DEF.149 /2 COMPU_VTAB 400 names at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_2_shared_enum_table_size_costs_nothing_per_object
+89.2%  0.054 s / 0.500 s  R-A2L-DEF.149/10 empty table name 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object
+92.0%  0.040 s / 0.500 s  R-A2L-DEF.149 /1 COMPU_METHOD 400 names at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_1_shared_method_size_costs_nothing_per_object
+92.3%  0.038 s / 0.500 s  R-A2L-DEF.149/7 conversion type word 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_7_long_conversion_type_word_costs_nothing_per_object
+92.7%  0.037 s / 0.500 s  R-A2L-DEF.149/6 FORMAT word 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_6_long_format_word_of_a_shared_method_costs_nothing_per_object
+96.4%  0.018 s / 0.500 s  R-A2L-DEF.149/9 CUBOID layout 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid
+96.5%  0.018 s / 0.500 s  R-A2L-DEF.149 /4 RECORD_LAYOUT 400 names at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_4_shared_layout_first_line_costs_nothing_per_object
+97.3%  0.013 s / 0.500 s  R-A2L-DEF.149/8 COMPU_TAB_REF word 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_8_long_table_ref_word_costs_nothing_per_object
+99.7%  0.001 s / 0.500 s  R-A2L-DEF.150/7 TAB_INTP decode 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_7_shared_tab_intp_size_costs_nothing_per_element
+99.7%  0.001 s / 0.500 s  R-A2L-DEF.150/8 TAB_NOINTP decode 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_8_shared_tab_nointp_size_costs_nothing_per_element
+99.7%  0.001 s / 0.500 s  R-A2L-DEF.150/10 TAB_NOINTP run of repeated x decode 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_10_a_run_of_repeated_x_below_the_stored_value_costs_nothing_per_element
+99.8%  0.001 s / 0.500 s  R-A2L-DEF.150/1 COMPU_VTAB decode 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_1_shared_vtab_size_costs_nothing_per_element
+99.8%  0.001 s / 0.500 s  R-A2L-DEF.150/4 COMPU_VTAB_RANGE decode 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_4_shared_range_table_size_costs_nothing_per_element
+99.8%  0.001 s / 0.500 s  R-A2L-DEF.150/5 matched range text 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_5_long_matched_range_text_is_referenced_not_copied
+99.9%  0.001 s / 0.500 s  R-A2L-DEF.150/2 matched entry text 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_2_long_matched_entry_text_is_referenced_not_copied
+99.9%  0.001 s / 0.500 s  R-A2L-DEF.150/3 default text 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_3_long_default_text_is_referenced_not_copied
+QC-TM: 59 bounds, 7 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_case06_time - A...
+FAILED tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_software_a_time
+FAILED tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_string_time - A...
+FAILED tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_case06_memory
+FAILED tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_software_a_memory
+FAILED tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_string_memory
+FAILED tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_words_memory - ...
+7 failed, 23 passed in 555.15s (0:09:15)
+PERF_EXIT=1
+--- uptime AFTER ---
+ 14:58:29 up 2 days,  6:30,  2 users,  load average: 1.01, 1.11, 1.27
