@@ -1,0 +1,42 @@
+=== base commit ===
+2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+applied M5e OK
+=== mutation diff ===
+--- <HOME>/work/s19_i12bmut/s19_app/tui/flow_screens.py	2026-11-06 18:16:04.301575372 -0600
++++ s19_app/tui/flow_screens.py	2026-11-06 18:35:47.330447277 -0600
+@@ -1484,6 +1484,7 @@
+             yield FlowChip("+ Add var", id="flow_funnel_add")
+         yield Static("", id="flow_funnel_list", markup=False)
+         yield Static("", id="flow_wiring_notice", markup=False)
++        yield Static(f"session: {RIBBON_NO_SESSION}", id="flow_ext_session", markup=False)  # MUTANT M5e: restored #flow_ext_session
+         with Horizontal(id="flow_run_row"):
+             yield FlowChip("Run", id="flow_run", classes="fill-accent")
+             yield FlowChip("Clear", id="flow_clear")
+@@ -2129,6 +2130,7 @@
+         # for SOURCE (default), PATCH, WRITE-OUT, CRC and A2B; the A2B binding
+         # inputs show only for A2B, the single ref for every other kind.
+         self._sync_kind_dependent_visibility(self._kind)
++        self.query_one("#flow_ext_session").display = False  # MUTANT M5e
+         # batch-96 B1: the funnel editor starts COLLAPSED (a declaration
+         # table, not a canvas element) — the toggle opens it.
+         self.query_one("#flow_funnel_editor").display = False
+=== grep landed ===
+1487:        yield Static(f"session: {RIBBON_NO_SESSION}", id="flow_ext_session", markup=False)  # MUTANT M5e: restored #flow_ext_session
+2133:        self.query_one("#flow_ext_session").display = False  # MUTANT M5e
+=== s19_app.__file__ ===
+<HOME>/work/s19_i12bmut_m09/s19_app/__init__.py
+=== pytest ===
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______ test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state _______
+../s19_i12bmut/tests/test_b101_flow_shown_widgets.py:191: in test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state
+    assert never == [], f"mounted and never shown: {never}"
+E   AssertionError: mounted and never shown: ['flow_ext_session']
+E   assert ['flow_ext_session'] == []
+E     
+E     Left contains one more item: 'flow_ext_session'
+E     Use -v to get more diff
+=========================== short test summary info ============================
+FAILED tests/test_b101_flow_shown_widgets.py::test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state
+1 failed in 5.80s
+=== exit code: 1 ===

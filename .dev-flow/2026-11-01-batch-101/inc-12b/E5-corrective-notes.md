@@ -69,3 +69,12 @@ Teardown: on host 2 the worktrees `s19_i12bc` and `s19_i12bc_mut` were removed (
 - **Windows results:** 4 `verified (win-01, 092fffd)`, with the final-tree re-run owed.
 - **Controls this pass ran:** C1 … C6 and C4a, all killed on the strengthened form. Each of C1, C2, C3, C4, C5 and C6 survives the `092fffd` form.
 - **Still open:** R-1 (E-1), back to the orchestrator.
+
+## 5. R-1 (orchestrator ruling)
+
+Ruling after E-1: bound the painted cards by the width they are sized for, read before the first block, instead of the vacuous `len(line) <= chain_width` (`#flow_pipeline` is `width: auto`).
+
+- **Change** (`tests/test_tui_flow_builder_b94.py`, tests only, no product edit): AT-B94-15 (`:170` read, `:213` assert) and TC-B94-20 (`:510` read, `:556` assert) read `#flow_pipeline_scroll.scrollable_content_region.width` after the empty-chain check and before the first `_add_ref_block` (92 at 120x30), and assert `sized_for > 0 and every painted card line <= sized_for`. A comment cites BL-I12b-1: the 2-cell overflow once the panel scrollbar appears is a known pre-existing defect, not asserted. The vacuous clause, `rail_width <= 96` and every other assertion are kept.
+- **RED** (`e5c-07`, LAN Linux host 2, base `2f54c7d` + local tree, staged tree `e381ff17...`): (a) card renderer one cell wider (`pipeline_layout` returns `card_w + 1`): both nodes RED at the new assert (`AssertionError: 92`); (b) bound one less (`<= sized_for - 1`): both RED, same message. Restored after each (unstaged 0).
+- **GREEN** (`e5c-07`): the two nodes `2 passed`; `tests/test_tui_flow_builder_b94.py` + `tests/test_address_census.py` + `tests/test_suite_hygiene.py` (`-n 6 --dist loadfile -m "not serial_timing"`) `94 passed`.
+- **Status:** the reviewer's R-1 is closed for the test side; the product defect is backlog BL-I12b-1 (`E1-rulings.md` section 5). The Windows re-run of the final tree stays owed.

@@ -1,0 +1,48 @@
+=== base commit ===
+2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+applied M6 OK
+=== mutation diff ===
+--- <HOME>/work/s19_i12bmut/s19_app/tui/flow_screens.py	2026-11-06 18:16:04.301575372 -0600
++++ s19_app/tui/flow_screens.py	2026-11-06 18:36:03.811221008 -0600
+@@ -2849,6 +2849,13 @@
+                 yield FlowChip("Import…", id="fx_import")
+                 yield ModeToggle(id="fx_mode")
+                 yield FlowChip("Run", id="fx_run", classes="fill-accent")
++        yield Label(
++            "Flow Execution: Import… adds a chain lane from a saved flow; bind "
++            "each lane's inputs; Run (sequential default, parallel per chain); "
++            "Save Set persists chains + inputs + outputs.",
++            id="fx_help",
++            markup=False,
++        )  # MUTANT M6: restored #fx_help
+         with Horizontal(id="fx_set_row"):
+             yield Label("set name", classes="fx-field-label")
+             yield OsClipboardInput(placeholder="set name", id="fx_set_name", compact=True)
+@@ -2873,6 +2880,7 @@
+     def on_mount(self) -> None:
+         self.query_one("#fx_set_name", Input).value = self._set_name
+         self.query_one("#fx_required").display = False
++        self.query_one("#fx_help").display = False  # MUTANT M6
+         self._show_notice("")
+         self._refresh_frame_title()
+         self.call_after_refresh(self._apply_layout)
+=== grep landed ===
+2858:        )  # MUTANT M6: restored #fx_help
+2883:        self.query_one("#fx_help").display = False  # MUTANT M6
+=== s19_app.__file__ ===
+<HOME>/work/s19_i12bmut_m10/s19_app/__init__.py
+=== pytest ===
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______ test_r_fx_scr_4_1_every_flow_execution_widget_is_shown_in_a_state _______
+../s19_i12bmut/tests/test_b101_flow_shown_widgets.py:247: in test_r_fx_scr_4_1_every_flow_execution_widget_is_shown_in_a_state
+    assert never == [], f"mounted and never shown: {never}"
+E   AssertionError: mounted and never shown: ['fx_help']
+E   assert ['fx_help'] == []
+E     
+E     Left contains one more item: 'fx_help'
+E     Use -v to get more diff
+=========================== short test summary info ============================
+FAILED tests/test_b101_flow_shown_widgets.py::test_r_fx_scr_4_1_every_flow_execution_widget_is_shown_in_a_state
+1 failed in 5.10s
+=== exit code: 1 ===

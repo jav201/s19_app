@@ -1,0 +1,92 @@
+=== base commit ===
+2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+applied M4 OK
+=== mutation diff ===
+--- <HOME>/work/s19_i12bmut/s19_app/tui/flow_screens.py	2026-11-06 18:16:04.301575372 -0600
++++ s19_app/tui/flow_screens.py	2026-11-06 18:33:47.523304017 -0600
+@@ -621,14 +621,7 @@
+             - ``FlowBuilderPanel.on_button_pressed`` (the ``flow_add`` branch,
+               before any block is built)
+     """
+-    for input_id, field_label in _ADD_PATH_INPUTS.get(kind, ()):
+-        if "\x00" in values.get(input_id, ""):
+-            kind_label = _KIND_LOOK.get(kind, ("", kind.upper(), "", ""))[1]
+-            return (
+-                f"Add refused: [{fps.FLOW_UNSAFE_REF}] {kind_label} {field_label} "
+-                "holds a NUL character - not a path"
+-            )
+-    return None
++    return None  # MUTANT M4: the NUL refusal is gone
+ 
+ 
+ def clip_head(text: str, width: int) -> str:
+=== grep landed ===
+624:    return None  # MUTANT M4: the NUL refusal is gone
+=== s19_app.__file__ ===
+<HOME>/work/s19_i12bmut_m04/s19_app/__init__.py
+=== pytest ===
+FFFFFFFFFF                                                               [100%]
+=================================== FAILURES ===================================
+___ test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[source.image_ref] ___
+../s19_i12bmut/tests/test_b97_flow_builder.py:1480: in test_tc_b97_62_nul_pasted_into_the_add_form_is_refused
+    assert after == before, f"a NUL {field} was added ({before} -> {after})"
+E   AssertionError: a NUL LOAD image file was added (1 -> 2)
+E   assert 2 == 1
+_ test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[patch.change_doc_ref] _
+../s19_i12bmut/tests/test_b97_flow_builder.py:1480: in test_tc_b97_62_nul_pasted_into_the_add_form_is_refused
+    assert after == before, f"a NUL {field} was added ({before} -> {after})"
+E   AssertionError: a NUL PATCH change doc was added (1 -> 2)
+E   assert 2 == 1
+_ test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[check.check_doc_ref] __
+../s19_i12bmut/tests/test_b97_flow_builder.py:1480: in test_tc_b97_62_nul_pasted_into_the_add_form_is_refused
+    assert after == before, f"a NUL {field} was added ({before} -> {after})"
+E   AssertionError: a NUL CHECK check doc was added (1 -> 2)
+E   assert 2 == 1
+____ test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[crc.config_ref] ____
+../s19_i12bmut/tests/test_b97_flow_builder.py:1480: in test_tc_b97_62_nul_pasted_into_the_add_form_is_refused
+    assert after == before, f"a NUL {field} was added ({before} -> {after})"
+E   AssertionError: a NUL CRC CRC template was added (1 -> 2)
+E   assert 2 == 1
+_ test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[write_out.output_name] _
+../s19_i12bmut/tests/test_b97_flow_builder.py:1480: in test_tc_b97_62_nul_pasted_into_the_add_form_is_refused
+    assert after == before, f"a NUL {field} was added ({before} -> {after})"
+E   AssertionError: a NUL WRITE-OUT output file was added (1 -> 2)
+E   assert 2 == 1
+___ test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[a2b.image_a.ref] ____
+../s19_i12bmut/tests/test_b97_flow_builder.py:1480: in test_tc_b97_62_nul_pasted_into_the_add_form_is_refused
+    assert after == before, f"a NUL {field} was added ({before} -> {after})"
+E   AssertionError: a NUL A2B-DIFF image A was added (1 -> 2)
+E   assert 2 == 1
+___ test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[a2b.image_b.ref] ____
+../s19_i12bmut/tests/test_b97_flow_builder.py:1480: in test_tc_b97_62_nul_pasted_into_the_add_form_is_refused
+    assert after == before, f"a NUL {field} was added ({before} -> {after})"
+E   AssertionError: a NUL A2B-DIFF image B was added (1 -> 2)
+E   assert 2 == 1
+_ test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[external_step.log_ref] _
+../s19_i12bmut/tests/test_b97_flow_builder.py:1480: in test_tc_b97_62_nul_pasted_into_the_add_form_is_refused
+    assert after == before, f"a NUL {field} was added ({before} -> {after})"
+E   AssertionError: a NUL EXT-STEP log was added (1 -> 2)
+E   assert 2 == 1
+_ test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[external_step.output_path] _
+../s19_i12bmut/tests/test_b97_flow_builder.py:1480: in test_tc_b97_62_nul_pasted_into_the_add_form_is_refused
+    assert after == before, f"a NUL {field} was added ({before} -> {after})"
+E   AssertionError: a NUL EXT-STEP output file was added (1 -> 2)
+E   assert 2 == 1
+__________ test_at_b97_08_hostile_and_nul_refs_never_crash_or_inject ___________
+../s19_i12bmut/tests/test_b97_flow_builder.py:1624: in test_at_b97_08_hostile_and_nul_refs_never_crash_or_inject
+    assert after == before and len(refusal) == 1 and fps.FLOW_UNSAFE_REF in refusal[0], (before, after, refusal)
+E   AssertionError: (4, 5, [])
+E   assert (5 == 4)
+=========================== short test summary info ============================
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[source.image_ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[patch.change_doc_ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[check.check_doc_ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[crc.config_ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[write_out.output_name]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[a2b.image_a.ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[a2b.image_b.ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[external_step.log_ref]
+FAILED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[external_step.output_path]
+FAILED tests/test_b97_flow_builder.py::test_at_b97_08_hostile_and_nul_refs_never_crash_or_inject
+10 failed in 72.75s (0:01:12)
+=== exit code: 1 ===

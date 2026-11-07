@@ -36,4 +36,6 @@ Cited and unchanged: R-FB-ADD.1, .2, .3 (the kind chips and Add, which carry `#f
 
 ## 5. Backlog
 
-None of its own.
+| Id | Item | Source |
+|---|---|---|
+| BL-I12b-1 | Pre-existing layout defect (same on base `2f54c7d`): at 120x30 the Flow Builder rail's content is 92 wide with no card and 90 from the first card, because `#flow_panel` gains a vertical scrollbar and `FlowBuilderPanel._apply_layout` does not re-run (keyed on the panel's resize/show). Cards stay sized for 92 and paint 92 cells, so the rail scrolls sideways by 2. Fix idea: re-run the layout pass when `#flow_pipeline_scroll` resizes. Not asserted by AT-B94-15 / TC-B94-20, which bound by the pre-card width (92). | E5-corrective-notes E-1, R-1 |

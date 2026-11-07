@@ -155,7 +155,7 @@ def test_at_b94_15_fb_a_surface_and_wired_patch_run(tmp_path: Path) -> None:
     """
     project = _project(tmp_path)
 
-    async def _drive() -> "tuple[list[str], str, tuple[int, int], int]":
+    async def _drive() -> "tuple[list[str], str, tuple[int, int], tuple[int, int, int]]":
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(120, 30)) as pilot:
             await pilot.pause()
@@ -166,6 +166,8 @@ def test_at_b94_15_fb_a_surface_and_wired_patch_run(tmp_path: Path) -> None:
             ]
             empty_chain, _ = _painted_static(app, "#flow_pipeline")
             assert "No blocks yet" in empty_chain
+            # The width the cards are sized for: read before the first block.
+            sized_for = app.query_one("#flow_pipeline_scroll").scrollable_content_region.width
 
             await _add_ref_block(app, pilot, "source", "prg.s19")
             await pilot.pause()
@@ -186,10 +188,12 @@ def test_at_b94_15_fb_a_surface_and_wired_patch_run(tmp_path: Path) -> None:
                 palette_kinds,
                 canvas,
                 (screen.region.width, screen.region.height),
-                (rail_width, chain_width),
+                (rail_width, chain_width, sized_for),
             )
 
-    palette_kinds, canvas, screen_box, (rail_width, chain_width) = asyncio.run(_drive())
+    palette_kinds, canvas, screen_box, (rail_width, chain_width, sized_for) = asyncio.run(
+        _drive()
+    )
 
     # batch-97 Inc-5 (LLR-146.2, named supersession): the palette offers every
     # kind of ``_KIND_OPTIONS`` in its order (was the four fb_a types).
@@ -204,6 +208,9 @@ def test_at_b94_15_fb_a_surface_and_wired_patch_run(tmp_path: Path) -> None:
     assert "─" in canvas and "│" in canvas and "▶" in canvas  # the cable run
     assert canvas.count("╭") == 3 and canvas.count("▶") == 2  # 3 cards, 2 cables
     assert all(len(line) <= chain_width for line in canvas.splitlines())
+    # BL-I12b-1: the 2-cell overflow after the panel's scrollbar appears is a known
+    # pre-existing defect (same on 2f54c7d), not asserted here.
+    assert sized_for > 0 and all(len(line) <= sized_for for line in canvas.splitlines()), sized_for
     # The boxed budget: the screen is the measured 96x18 at 120x30 and the
     # chain paints inside it (C-23 measured, C-32 painted oracle).
     # batch-97 Inc-8 (LLR-150.6, named supersession): the two-row key bar costs one row: 96x17.
@@ -488,7 +495,7 @@ def test_tc_b94_20_fb_a_composition_census(tmp_path: Path) -> None:
     no exception)."""
     project = _project(tmp_path)
 
-    async def _drive(size: "tuple[int, int]") -> "tuple[int, int, int, str, int]":
+    async def _drive(size: "tuple[int, int]") -> "tuple[int, int, int, str, tuple[int, int, int]]":
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=size) as pilot:
             await pilot.pause()
@@ -499,6 +506,8 @@ def test_tc_b94_20_fb_a_composition_census(tmp_path: Path) -> None:
             if size == (120, 30):
                 empty_chain, _ = _painted_static(app, "#flow_pipeline")
                 assert "No blocks yet" in empty_chain
+            # The width the cards are sized for: read before the first block.
+            sized_for = app.query_one("#flow_pipeline_scroll").scrollable_content_region.width
             await _add_ref_block(app, pilot, "source", "prg.s19")
             await pilot.pause()
             await _add_ref_block(app, pilot, "patch", "hotfix.json")
@@ -512,12 +521,16 @@ def test_tc_b94_20_fb_a_composition_census(tmp_path: Path) -> None:
                 palette_buttons,
                 canvas_count,
                 canvas,
-                (rail.region.width, app.query_one("#flow_pipeline").region.width),
+                (rail.region.width, app.query_one("#flow_pipeline").region.width, sized_for),
             )
 
-    palette_count, palette_buttons, canvas_count, canvas, (rail_width, chain_width) = asyncio.run(
-        _drive((120, 30))
-    )
+    (
+        palette_count,
+        palette_buttons,
+        canvas_count,
+        canvas,
+        (rail_width, chain_width, sized_for),
+    ) = asyncio.run(_drive((120, 30)))
     assert palette_count == 1  # one palette rail…
     # batch-97 Inc-5 (LLR-146.2, named supersession): …carrying one chip per
     # kind of ``_KIND_OPTIONS`` (was the four fb_a types of ``_PALETTE_TYPES``,
@@ -538,6 +551,9 @@ def test_tc_b94_20_fb_a_composition_census(tmp_path: Path) -> None:
     assert canvas.count("╭") == 3 and canvas.count("▶") == 2
     assert rail_width <= 96
     assert all(len(line) <= chain_width for line in canvas.splitlines())
+    # BL-I12b-1: the 2-cell overflow after the panel's scrollbar appears is a known
+    # pre-existing defect (same on 2f54c7d), not asserted here.
+    assert sized_for > 0 and all(len(line) <= sized_for for line in canvas.splitlines()), sized_for
     # The 80x24 floor composes and paints without exception (run_test raises
     # on mount/paint errors).
     small_palette, small_buttons, small_canvas, small_text, _ = asyncio.run(
