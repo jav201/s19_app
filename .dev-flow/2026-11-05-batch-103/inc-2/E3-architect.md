@@ -117,3 +117,116 @@ s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
 ```
 
 (P2f's three example names are shortened here; the transcript holds them in full. The `[P3 …]` labels after the first are shortened the same way.)
+
+## Round 2 (2026-11-06T19:04:16-06:00)
+
+**Verdict: PASS-WITH-NOTES.** No open finding is MAJOR or worse. Both round-1 MAJORs are closed in the graph, CTX-A2L-DEF and the cases: E3A-01 and E3A-02. Of the 20 round-1 findings, 16 are closed and 2 INFO are noted. 2 stay open, both non-blocking: E3A-12 (MINOR, the graph's wording) and one count of E3A-10 (LOW). Eight closed findings leave a residue, filed below as new findings: E3A-01, -02, -03, -04, -06, -08, -14 and -15. The new findings are 2 MEDIUM, 7 MINOR and 3 LOW. Each one is fixed by editing a record; none needs a redesign.
+
+**Scope** (the brief: a re-review checks only what was blocking): my round-1 findings as `E3-rulings.md` rules them, and the rows, cases and nodes the correction pass touched. The pass is the diff `f9376670..9acf0bc9` of `01-requirements.md`, `02-test-cases.md` and `codewire/graph-inc2.md`.
+
+**Read:** the rulings; that diff; the three current files; `../inc-3/E2-rulings.md`; the lookup nodes of `../inc-3/codewire/graph-inc3.md` (`_conversion_fields`, `_module_common`, `_find_axis_object`).
+
+**Checked by a local read-only script:**
+- Every case id names an existing row, and every row has a case.
+- Every row's N/N threshold equals its case count. The one exception is .59, whose 22/22 counts digests.
+- The section counts are 74 / 41 / 85 / 7, plus 33 cited cases of 29 rows: 243 cases in total. This matches `02-test-cases.md:232`.
+
+**Run on cachyos-rtx:** `i2e3ar2-probe.py`, tag `[R…]`; the cited lines are in §R2.4.
+- Setup: the clone at `e07fb00` (0 changed files), Python 3.11.18, HOME/XDG/LOCALAPPDATA under `/tmp/b103-e3r2-2-architect/home`, no display, stdin closed, load 4.1 on 16 cores.
+- Transcript: `/tmp/b103-e3r2-2-architect/out/i2e3ar2-probe-transcript.txt`. Script: `C:\Users\jjgh8\AppData\Local\Temp\claude\107abb51e32da120\c57f44a4-8a42-42ee-9fb3-80f699575124\scratchpad\i2e3ar2-probe.py`.
+- What it runs: a cost prototype of the corrected `describe_definitions` (the graph's one walk, its field reads and its refusal order). It also runs the reused `a2l.py` conversion on the inputs of the new cases.
+
+### R2.1 Round-1 findings
+
+| Id | Status | Why |
+|---|---|---|
+| E3A-01 MAJOR | **closed** | **The design.** I-2 gains `describe_definitions`, built over one walk (`graph-inc2.md:48`, node `:213-217`). `describe_definition` delegates to it (`:166`), and `_find_tag` is a lookup in the name maps. R-A2L-DEF.136 bounds the time at ≤ 2.0 s and has a negative control (`01-requirements.md:143`; case `02-test-cases.md:219`). **Re-measured,** because the graph adds work per object. A prototype of the corrected walk describes all 13 990 software_a names in **0.817 s** (median of 3, R1); the walk alone takes 36 ms (R2). That is 2.4× inside the bound. The graph's estimate of 0.52 s leaves out the reads of each object's fields. Residues: E3A-29. |
+| E3A-02 MAJOR | **closed** as ruled | **What changed.** CTX (`01-requirements.md:67-70`) is the ruling's text: IEEE double, the 15-digit clause for every datatype, the 6-digit clause for FLOAT32 only. `_agrees_at_display_precision` and its E3A-02 example match it. Case .55/1 adds `%.15` and "0 refused among typed decimals on the stored grid" (`02-test-cases.md:190`), and case .54/3 is added. **Verified (R6), the E3A-02 example.** `4.1` on LINEAR 0.1 UWORD stores 41, which decodes to p = 4.1000000000000005. \|p − x\| ≤ 0.5e-15 is False, and both `%.15g` texts are `4.1`, so only the 15-digit clause accepts it. **Verified (R6), case .54/3.** It decodes to p = 1.0. The `%.6g` texts are equal and the `%.15g` texts differ, so the value is refused only because FLOAT64 no longer has the 6-digit clause, as ruled. **Residue:** the row's own text (E3A-21). |
+| E3A-03 MEDIUM | **closed** | `Definition` carries `coeffs_linear`, `coeffs` and `compu_tab_ref` (`graph-inc2.md:40-42`, `:59`). `decode_definition` and `_encode_number` build the record from those fields, never with `_read_method_record` and never from `sections`. **The fields suffice:** the reused conversion and encode read only `conversion_type`, `coeffs_linear`, `coeffs` and `compu_tab_ref` (`a2l.py:1910, 1914, 1924, 1951, 1977, 2163, 2167, 2180`). Residue: E3A-22. |
+| E3A-04 MEDIUM | **closed** | .35 is narrowed (`:160`) and .38 is a `When` (`:163`). Cases .38/1 and /2 are class normal, and `display_text`'s order matches. A neighbouring row the pass left unchanged still overlaps .38: E3A-23. |
+| E3A-05 MEDIUM | **closed** | .56 is the fix column's text word for word. |
+| E3A-06 MEDIUM | **closed** as ruled | **What changed.** .35 holds the d ≥ 15 rule, .36/1 expects `0.10000000000000000`, and the graph gains the example `4.100000000000000`. **Note.** The ruled rule starts at d = 15, so `%.13` and `%.14` can still show one binary digit on values with 3 or 4 integer digits (1234.1 at `%.14` gives `1234.10000000000014`). This is acceptable, because the 15-digit clause still accepts the typed value. It is recorded here so that Inc 8 does not treat it as a defect. **Residue:** the new clause has no case (E3A-24). |
+| E3A-07 MEDIUM | **closed** | The I-2 consumer note is the fix column's text verbatim (`graph-inc2.md:73`). |
+| E3A-08 MINOR | **closed** | .19 gains the alternative of a word that does not read as a number. Case .19/4 (`MX`, `0b11`) turns the `int(word, 0)` mutant RED. `_read_object_lines` keeps the word raw. Residues: E3A-28 (its place in the refusal order) and E3A-30 (the graph's /4 example differs from the case). |
+| E3A-09 MINOR | **closed** | `<kind>` gives `(none)` (`01-requirements.md:100`). Case .4/8 and its graph example are added. |
+| E3A-10 MINOR | **closed, but one count is still open (LOW)** | Case `R-A2L-014/def-1` is added, and the counts of `02-test-cases.md` (29 / 33 / 243) are verified. `01-requirements.md:225` still says "Cited canon rows with cases here: 28"; it should say 29 (E3A-30). |
+| E3A-11 MINOR | **closed** | Case .46/4, its graph example and its negative control (`00 01`) are added. |
+| E3A-12 MINOR | **open (graph only)** | The row is fixed (`01-requirements.md:129`). The func of `describe_definitions` (`graph-inc2.md:217`) keeps the round-1 wording "a type outside IDENTICAL … TAB_VERB (FORM, unknown, none) → `A2L-DEF-CONVERSION`", which still reads as covering NO_COMPU_METHOD. **Fix** (as in round 1): "a record whose type word is outside …". |
+| E3A-13 LOW | **closed** | Resolved by E3A-01: `_find_tag` is a lookup, and the fallback is gone. |
+| E3A-14 LOW | **closed in the design; no case** | .19's condition and `_check_bit_mask` have it (`0xFF` on SBYTE → False, with a mutant). .19's threshold of 6/6 has no case for it: E3A-24. |
+| E3A-15 LOW | **closed, with a note** | Case .59/3 is added. Where its pin comes from is still open: E3A-27. |
+| E3A-16 LOW | **closed** | The table read is count-driven, and `DEFAULT_VALUE` is recognised only where a raw is expected; an example is added. |
+| E3A-17 LOW | **closed** | E2-14's effect line pins the 5 private helpers plus the two call shapes. `MAX_A2L_DECODE_BYTES` joins the imports. |
+| E3A-18 INFO | **closed** | The CTX line *range bounds* is added (`01-requirements.md:42-43`). |
+| E3A-19, E3A-20 INFO | noted | — |
+
+### R2.2 Is I-2, as now pinned, still extendable by Inc 3? Yes, on two conditions
+
+**What already works:**
+- **Element and point definitions.** Inc 3 builds them with `replace`, so they keep the conversion fields of E3A-03, and their decode never walks.
+- **Axes.** An axis's points definition must fill the three fields from the axis's own method record. Today `_conversion_fields` in `graph-inc3.md` returns `record`; after the rebase it must return those fields.
+- **Field order.** Inc 3's defaulted fields after `refusal` stay valid once E3A-22 is fixed.
+
+**Condition 1, cost (E3A-32).** Inc 3's graph still finds things by walking the tree:
+- `_conversion_fields` calls `_read_method_record(method_name, sections)`, which now takes `compu_methods_by_name`.
+- `_find_axis_object` walks `_collect_sections_by_name(sections, "AXIS_PTS")`: 3.96 ms per call (R5).
+- `_module_common` walks the tree by identity, at about the same cost.
+
+On software_a this matters, because it has 270 objects of Inc 3's kinds (158 CURVE, 101 VAL_BLK, 11 MAP), 180 AXIS_DESCR and one MODULE (R5).
+- One `_module_common` walk per array object adds about 270 × 4 ms ≈ 1.1 s.
+- Two AXIS_PTS walks per COM axis add up to 180 × 2 × 4 ms ≈ 1.4 s.
+- With the 0.82 s of today's walk, that is ≈ 3.3 s, and R-A2L-DEF.136 goes RED at Inc 3.
+
+So the rebase must move both lookups into `describe_definitions`'s single walk: the AXIS_PTS sections by name, and each object's MOD_COMMON, taken from the enclosing MODULE (a stack in the pre-order walk, matched by identity). The I-2 extension text should say so.
+
+**Condition 2, the interface itself (E3A-22).** The `Definition` that I-2 now pins cannot be declared in Python.
+
+### R2.3 New findings
+
+| Id | Severity | Row / node / case | Defect | Fix |
+|---|---|---|---|---|
+| E3A-21 | MINOR | R-A2L-DEF.55 (`01-requirements.md:188`) · CTX *agree at the display precision* (`:67-70`) | **The row text was only half updated (E3A-02's residue).** **Row .55.** Its threshold opens with "(formats include `%.15` and typed values, E3A-02)". The rest still lists only "the formats `%.0`, `%8.4` and none". It lacks case /1's clause "0 refused among typed decimals on the stored grid". Its negative control has no mutant that drops the 15-digit clause. The case and the graph example carry the test's teeth, but this row is what goes to the canon. **CTX.** The ruled text dropped "and the display format gives d decimals", so the first clause has no defined d when the format gives none. The graph keeps those words (`graph-inc2.md` `_agrees_at_display_precision`). | **1. The row's threshold** becomes the text of case .55/1 (`%.15` in the format list; the typed-decimal clause). **2. Its negative control** gains "the 15-significant-digit clause left out → `4.1` on LINEAR 0.1 UWORD `%.15` refused → RED". **3. CTX** reads "…≤ 0.5 × 10^(−d) in IEEE double, where the display format gives d decimals (d capped at 17), or …". |
+| E3A-22 | MINOR | I-2 `Definition` (`graph-inc2.md:40-43`, `:59`) | **The pinned class cannot be declared.** `coeffs_linear`, `coeffs` and `compu_tab_ref` "default to `None`" and come before `refusal`, which has no default. A dataclass raises `TypeError: non-default argument 'refusal' follows default argument` when the class is defined. The ruling's "fields with defaults, before `refusal`" causes it. My round-1 fix asked for "before `refusal`, like P-1", and P-1 has no default. | **Drop the three defaults.** This fails closed: every `Definition` must state its conversion fields. That costs nothing. Only `describe_definitions` constructs one, and Inc 3 derives its definitions with `replace`. **Do not** default `refusal` instead: a construction that forgets it would read as an accepted definition. |
+| E3A-23 | LOW | R-A2L-DEF.37 (`01-requirements.md:162`) vs .38 (`:163`) | **E3A-04's contradiction survives at one edge.** It applies to an integer datatype with no conversion or IDENTICAL, an integral value ≥ 10^15 (A_UINT64 or A_INT64), and a format that gives no decimals. .37 gives `9.00719925474099e+15` and .38 gives `9007199254740992` (R6). The graph decides by order (.38 first), and no case reaches it: `CM(…)` writes `%.3`, so .54/4 is ruled by .38. | Narrow .37's trigger as .35's was: "If the display format of a number definition with a float datatype or a conversion other than none and IDENTICAL gives no decimals, …". |
+| E3A-24 | MINOR | .19 (`:136`), .35 (`:160`), .43 / .44 (`:176-177`); cases `02-test-cases.md:70-75`, `:113-116`, `:151-154` | **The pass added three alternatives that no case covers, so a mutant that leaves each one out stays GREEN.** **.19:** the signed mask (E3A-14); the graph has an example, but there is no case. **.35:** the d ≥ 15 rule (E3A-06); .36/1 reaches the rule only through the cap at 17, so an implementation that rounds to 15 digits only when capping passes. **.43 / .44:** the written value (E3S-06); only .45/3 checks it. | **Add three cases:** **.19/7** — SBYTE VALUE `BIT_MASK 0xFF` → `…: the bit mask 0xFF cannot be applied to SBYTE`. **.35/5** — UWORD LINEAR 0.1 `%.15`, stored 41 → `4.100000000000000`. **.35/6** — FLOAT32 `%.15`, the bytes of 0.1 → `0.100000001490116`. **.43/5** — .45/3's object without its EXTENDED_LIMITS line, `0.55` → `L4: 0.6 is outside the limits 0..0.55`. The thresholds become 7/7, 6/6 and 5/5. .43/5 belongs to the security re-review. |
+| E3A-25 | MEDIUM | R-A2L-DEF.137 (`01-requirements.md:165`) vs `decode_definition` / `_enum_text` (`graph-inc2.md`, "`EnumEntry.text` stays raw") | **The row states more than the design does** (the same class as E3A-05). The row says U+FFFD replaces control characters "in every text and message it returns". The ruling (E3S-04 b) and the graph do it only in `Decoded.text` and in messages: `EnumEntry.text`, `Decoded.value`, `default_text` and `unit` keep the raw character. So the row is false while its four cases pass. A consumer that reads the canon row would also skip escaping the raw fields. | **The row takes the ruling's words:** "…the system shall give U+FFFD in its place in the display text of a decoded value and in every message it returns." I-2's note already says that every other `str` is plain, unsanitised text, so nothing else changes. |
+| E3A-26 | MEDIUM | Cases R-A2L-DEF.40/9 (`02-test-cases.md:135`) and .52/2 (`:180`) vs .137 and `encode_definition` ("Every message gives U+FFFD for control characters") | **The expected texts contradict .137.** A tab is U+0009, a control character. .40/9 expects `'\t5' is not a number`. .52/2 expects `'\t'` and says "(the tab character itself between the quotes)". Under .137 both messages hold `�`, so either these two cases or the .137 rule fail as written. | **.40/9** expects `…: '�5' is not a number`. **.52/2** expects `<name>: '�' is not a printable ASCII character`, and the words "the tab character itself" are deleted. |
+| E3A-27 | MINOR | Case R-A2L-DEF.59/3 (`02-test-cases.md:214`) | **The new pin can be vacuous.** The case says the digest "equals the value pinned at E4". A digest taken at E4, after the generator has changed, pins the new code against itself. | Take the digest on the base tree `e07fb00`: either now, or at E4 from a clean checkout before any edit. Record it, with its transcript, in the evidence folder, as .59/1's 22 digests are recorded. |
+| E3A-28 | MINOR | `describe_definitions` func (`graph-inc2.md:217`) vs R-A2L-DEF.24 | **Three mask refusals are written outside the refusal order.** They are: a word that does not read as a number, a text object with a BIT_MASK line, and the `bit_org` cross-check. The func writes them as "→ refused `A2L-DEF-MASK`" while it reads the fields, before "Then the first refusal of the refusal order". .24 puts MASK last. **Consequence.** An implementation that refuses at once returns MASK for an ASCII object that has no length and a BIT_MASK line, where ADDRESS is expected. It does the same for a VAL_BLK with a BIT_MASK, where KIND is expected. The text reads that way: my own prototype implemented it that way. | **1. Say that** these three conditions are recorded while the fields are read, and give `A2L-DEF-MASK` at its place in the order. **2. Add case .24/4:** an ASCII CHARACTERISTIC with no NUMBER and with `BIT_MASK 0x1` → `A2L-DEF-ADDRESS`. |
+| E3A-29 | LOW | E3A-01 residues: the cost note (`graph-inc2.md:75`), .136 (`01-requirements.md:143`), the `describe_definitions` node (`:213-217`), the edges (`:745-757`) | **(a) The cost note is wrong.** It says `describe_definition` "compares first words cheaply, parsing only a match". The func is `describe_definitions([name])[name]`, which builds every map: **39.8 ms** per call (R3), not the ≈ 5 ms of a first-word walk (R4). This is harmless for Inc 8 and Inc 9, which describe once per edited parameter. **(b) The 67 s is the wrong count.** .136's negative control and Base say "about 67 s". Walks per name over all 13 990 names take ≈ 295 s at round 1's 21 ms each; 67 s was the 3 189 addressed tags. The mutant is still RED. **(c) Trace.** `req:` of `describe_definitions` lists only .136, although its func now holds every rule of .1 … .25, .58.1, .58.2 and .137. The edge `describe_definition ──▶ describe_definitions` is also missing. **(d) Wording.** The func says "duplicates kept", but a `dict` holds a repeated name once. | **(a)** Write the measured cost (≈ 40 ms per call). **(b)** Write "≈ 295 s". **(c)** Copy `describe_definition`'s `req:` list into `describe_definitions` and add the edge. **(d)** Write "a repeated name maps once". |
+| E3A-30 | LOW | Cross-references of the pass | **The pass's cross-reference slips** (DeepSeek's expected rate of about 1 in 50): graph examples whose id or input does not match their case. **.19/4:** the graph has `MZ` with `0xZZ`, the case `MX` with `0b11`. Only the case kills the `int(word, 0)` mutant. **.137/1 and /2 are swapped:** the graph's /1 is the ESC, the case's /1 is the NUL. **.137/3 and /4:** the graph has an object's name with an ESC and an operator text with an ESC; the cases have a requested name with a NUL and one with an ESC. **.21/3:** the graph has UBYTE, the case SWORD. **Counts:** `01-requirements.md:225` says 28 cited rows; there are 29. | Align the ids and inputs of the graph examples with the cases; write 29. |
+| E3A-31 | MINOR | R-A2L-DEF.7.2 (`01-requirements.md:124`) · graph examples .7.2/1 … /5 (`graph-inc2.md:189`) · the CTX placeholders (`:99-104`) | **The upper boundary is off by one in the graph, and two placeholders are undefined.** **Boundary.** The graph's /5 example refuses `SPX` at 0xFFFFFF00 with `LENGTH 256`. Its last byte is 0xFFFFFFFF, which the row allows: "its span ends above 0xFFFFFFFF", and the row's own example "a span ending at 0x100000001" reads "ends" as the last byte. An implementer who copies the example writes `address + length > 0xFFFFFFFF` and refuses a readable span. **Placeholders.** `<address>` and `<length>` are not in CTX's list. So the exact message text is not defined: the cases write `0x10`, `-0x10` and `0xFFFFFFFF` (upper-case hex digits, unlike Python's `hex()`). | **1.** Move `SPX` to 0xFFFFFF01 with `LENGTH 256`, or add a case: a span whose last byte is 0xFFFFFFFF → no `A2L-DEF-ADDRESS`. **2.** Add to the placeholders: "`<address>` the address as `0x` and upper-case hexadecimal digits, `-0x…` when negative · `<length>` the length as a decimal integer". **Owner:** the row is E3S-02's, flagged for the security re-review. |
+| E3A-32 | MINOR | I-2's extension text (`graph-inc2.md:67-75`) · `graph-inc3.md` `_conversion_fields`, `_find_axis_object`, `_module_common` · R-A2L-DEF.136 | **I-2 does not say that Inc 3's lookups must join the one walk** (R2.2). Inc 3's per-object walks would add about 1.1 s plus up to 1.4 s on software_a. .136 would then go RED at Inc 3: ≈ 3.3 s against 2.0 s. | **Add an I-2 extension bullet:** "Inc 3's lookups (the method record, the AXIS_PTS sections by name, and an object's MOD_COMMON, found by identity from its enclosing MODULE) are maps built in `describe_definitions`'s one walk. No describe walks the tree per object, so R-A2L-DEF.136 holds for Inc 3's kinds." Inc 3's rebase pass applies it. |
+
+### R2.4 Probe lines cited (verbatim)
+
+```text
+# i2e3ar2-probe transcript 2026-11-06T19:00:39-06:00 host cachyos-rtx
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; load 4.12 5.13 3.32
+s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+[R0 software_a tags / distinct names] (13990, 13990)
+[R1 describe_definitions prototype over every name: runs s / median s] ([0.817, 0.757, 0.823], 0.817)
+[R1 kinds of the prototype's definitions] [('', 270), ('enum', 2124), ('number', 11570), ('text', 26)]
+[R1 refusals of the prototype (rough)] [('A2L-DEF-ADDRESS', 10538), ('A2L-DEF-CONVERSION', 1), ('A2L-DEF-KIND', 270)]
+[R2 the one walk + tags pass alone, median ms] 36.24
+[R3 describe_definition via the full walk, ms per call] 39.83
+[R4 one cheap first-word walk (objects only), ms per call] 5.19
+[R5 software_a CHARACTERISTIC kinds] [('VALUE', 3156), ('CURVE', 158), ('VAL_BLK', 101), ('ASCII', 26), ('MAP', 11)]
+[R5 AXIS_DESCR by kind / MODULE count] ([('(none)', 180)], 1)
+[R5 one AXIS_PTS walk (_collect_sections_by_name), ms] 3.96
+[R6 inline methods / tables] (['CM_BIG', 'CM_L01', 'CM_T4'], ['TAB_T4'])
+[R6 .45/3 TAB_INTP 0.55 -> encode result / raw / decode] (((0, 6), None, ['the value 0.55 is not a table value - the write proceeds as 0.6']), 6, (0.6, 'ok', ''))
+[R6 .45/3 p, %.1f text, |p-0.55| <= 0.05] (0.6, '0.6', True)
+[R6 E3A-02 LINEAR 0.1 4.1 -> raw / p / %.15g / |p-x|<=0.5e-15] (41, 4.1000000000000005, '4.1', False)
+[R6 .54/3 FLOAT64 LINEAR 1 1e10 1.0000001 -> raw / p / %.15g / %.6g] (-9999999999.0, 1.0, '1', '1')
+[R6 .54/4 A_UINT64 9007199254740993 -> encode result] ((0, 32, 0, 0, 0, 0, 0, 0), None, [])
+[R6 .37 vs .38: '%.15g' of 9007199254740992 / int text] ('9.00719925474099e+15', '9007199254740992')
+# exit 0
+```
+
+**Notes on the run.** The R1 refusal counts are those of my prototype, not of the model: it refuses a mask early, as E3A-28 describes. The large ADDRESS count is real, because most software_a objects have no address. The R5 AXIS_DESCR kind is `(none)` because the kind word sits on the line after `/begin`, so the COM count is an upper bound. **R6 confirms the new cases:**
+- .45/3: raw 6 and p = 0.6. The value agrees at `%.1`, then the written-value check refuses it: case and graph are right.
+- .54/3 and .54/4: as expected.
+- E3A-02's example: as expected.
+
+The orchestrator may copy the transcript into `inc-2/evidence-e3/`.

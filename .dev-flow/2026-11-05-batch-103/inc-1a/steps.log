@@ -1,0 +1,9 @@
+2026-11-06T21:36:13Z E1 inc-1a start claude-opus-5-5
+2026-11-06T22:14:03Z E1 inc-1a end claude-opus-5-5 — records written: 01-requirements.md (25 rows), 02-test-cases.md (111 cases), E1-rulings.md (D-1..D-8 PROPOSED), E1-slice.md; evidence-e1/ census + 3 pilots on cachyos-rtx + Code-Wire callers
+2026-11-06T22:21:47Z E1 correction — model deepseek-v4-pro via pi — orchestrator rulings D-6/D-7 applied (R-PASTE.20 triggers, R-PASTE.22 status, new R-PASTE.23, counts)
+2026-11-07T00:05:51Z E1 addendum (right-click) inc-1a start claude-opus-5-5
+2026-11-07T00:26:13Z E1 addendum (right-click) inc-1a end claude-opus-5-5 — rows R-PASTE.24..33 new (36 active), cases 171 (+41 coverage, +17 AT: AT-I1a-11..27; AT-I1a-9 and the walk changed), D-9/D-10/D-11 PROPOSED; evidence-e1/i1a-pilot4.py + transcript (cachyos-rtx)
+2026-11-07T00:29:51Z E2 inc-1a start claude-opus-5-5
+2026-11-07T00:51:51Z E2 inc-1a end claude-opus-5-5 — codewire/graph-inc1a.md: 36 nodes (13 new incl. 3 test-support, 7 changed, 8 removed, 8 context), 15 entities, 30 edges, 6 findings; every active row has an example; extractor run 1 exit 0 (23 baseline nodes, 0 drift), run 2 exit 1 = the 13 new nodes only; lint not read=0; I-1 pinned, P-1..P-4 PROPOSED for Inc 1b
+2026-11-07T00:52:49Z E3 inc-1a architect start claude-opus-5-5
+2026-11-07T00:52:49Z E3 security inc-1a start claude-opus-5-5

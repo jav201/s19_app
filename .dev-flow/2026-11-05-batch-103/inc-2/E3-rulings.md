@@ -28,3 +28,20 @@ Round 1: `E3-architect.md` **FAIL** (2 MAJOR, 5 MEDIUM, 5 MINOR, 5 LOW, 3 INFO);
 **Backlog added:** Inc 6/8/9 E1 rows for markup-off rendering (E3S-04a) and masked staging (E3A-07/E3S-08); Inc 8: shorten long `<text>` (E3S-11); ASAM float range reading (E3A-18).
 
 **Next:** one correction pass (targeted edits; records and graph), then round 2 re-checks only the blocking findings (E3S-01, -02, -03, E3A-01, -02) and the rows the pass touched.
+
+## Round 2 rulings (2026-11-06T19:07:42-06:00, orchestrator Opus 5.5)
+
+Round 2: architect **PASS-WITH-NOTES** (round-1 MAJORs closed; new 2 MEDIUM, 7 MINOR, 3 LOW); security **FAIL** (new MAJOR E3S-14, the residue of round 1's HIGH; 1 MEDIUM, 6 MINOR, 1 LOW, 1 INFO). Every round-2 finding is **accepted with its fix column**, with these rulings:
+
+| Finding | Ruling |
+|---|---|
+| E3S-14 MAJOR | accept: fail closed on the BIT_MASK **keyword** — R-A2L-DEF.19 gains "or the object's record holds a BIT_MASK keyword from which the system read no bit mask" (`<mask>` = the next word, or `(none)`); cases .19/7 and .19/8 per the fix column (renumber against E3A-24's .19/7: the SBYTE 0xFF case becomes .19/9). |
+| E3A-25 + E3S-19 (scope of .137) | accept the narrowing: R-A2L-DEF.137 covers the display text of a decoded value and every refusal message and notice, as round 1 ruled; every other `str` field is a raw file word, and the I-2 consumer note says a consumer that renders one replaces control characters as .137 does. |
+| E3S-15 + E3A-26 | accept: .137 governs; .40/9 and .52/2 expect U+FFFD. |
+| E3A-22 | accept: drop the three defaults; `Definition` states its conversion fields (fail closed). |
+| E3A-27 | the .59/3 digest is taken at E4 on a clean checkout of the base tree `e07fb00` before any edit, recorded with its transcript. |
+| E3A-32 | accept; it also goes into Inc 3's rebase brief. |
+| E3S-22 | done by the orchestrator: PLAN rows of Inc 6, 8 and 9 carry the three consumer obligations. |
+| all other round-2 findings (E3A-21, -23, -24, -28 … -31; E3S-16, -17, -18, -20, -21) | accept with their fix columns. |
+
+**Next:** one correction pass (records and graph), then a round-3 security re-check of E3S-14 and the parts the pass touched. The architect does not re-review (PASS-WITH-NOTES; its notes are applied in the same pass).

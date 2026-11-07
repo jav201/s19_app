@@ -35,3 +35,7 @@
 2026-11-06T18:38:12-06:00 E3 start — Inc 4 architect + security; Opus 5.5
 2026-11-06T18:52:33-06:00 E2 done — Inc 1a graph: 36 nodes (13 new, 7 changed, 8 removed, 8 context), every row exemplified; I-1 pinned (P-2), P-1/3/4 to Inc 1b E2; E2-1/2/5 to E3; Opus 5.5, 22 min
 2026-11-06T18:53:03-06:00 E3 correction done — Inc 2: units A (rows: 67 active), B (cases: 243), C1 + C2 (graph: 41 nodes); deepseek-v4-pro via pi, exit 0 ×4; orchestrator fixed 5 thresholds unit B flagged (.4/.45/.46/.54/.55)
+2026-11-06T18:53:08-06:00 E3 start — Inc 1a architect + security; Opus 5.5
+2026-11-06T18:53:08-06:00 E3 round 2 start — Inc 2 architect + security (blocking findings + touched parts only); Opus 5.5
+2026-11-06T18:59:14-06:00 operator — new story US-103-06 (Patch Editor: apply visibly + export S19 16/32 bytes per line or Intel HEX); Inc 10 added to PLAN (W1, urgent); probe of today's path running (Sonnet, cachyos-rtx)
+2026-11-06T19:08:08-06:00 E3 round 2 done — Inc 2: architect PASS-WITH-NOTES (14 min), security FAIL (E3S-14 MAJOR, 12 min); rulings appended; round-2 correction (2 DeepSeek units) next, then security round 3
