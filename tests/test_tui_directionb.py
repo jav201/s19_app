@@ -5839,12 +5839,20 @@ def test_at_flow_block_label_markup_safe(tmp_path: Path) -> None:
             await pilot.pause()
             await _add_flow_block(app, pilot, "source", "evil[red].s19")
             await pilot.pause()
+            from rich.text import Text
+            from textual.content import Content
             from textual.widgets import Static
 
-            rendered = app.query_one("#flow_pipeline", Static).render()
-            return rendered.plain, list(rendered.spans)
+            from s19_app.tui.insight_style import VALUE
 
-    blocks_text, spans = asyncio.run(_drive())
+            rendered = app.query_one("#flow_pipeline", Static).render()
+            # The card value rows' style (``VALUE``, the default of the card's
+            # ``row()``) as a rendered span holds it: appended as a span, as
+            # ``row()`` appends a value, and converted the same way.
+            value_style = Content.from_rich_text(Text().append("x", style=VALUE)).spans[0].style
+            return rendered.plain, list(rendered.spans), value_style
+
+    blocks_text, spans, value_style = asyncio.run(_drive())
     assert "evil[red].s19" in blocks_text, (
         f"hostile ref must render literally; got {blocks_text!r}"
     )
@@ -5858,6 +5866,7 @@ def test_at_flow_block_label_markup_safe(tmp_path: Path) -> None:
     cutting = [s for s in spans if start < s.start < stop or start < s.end < stop]
     exact = [s for s in spans if (s.start, s.end) == (start, stop)]
     assert cutting == [] and len(exact) == 1, (cutting, exact)
+    assert exact[0].style == value_style, (exact[0].style, value_style)
 
 
 # ---------------------------------------------------------------------------

@@ -1219,11 +1219,11 @@ class FlowBuilderPanel(ScrollableContainer):
               ``S19TuiApp.on_flow_builder_panel_run_requested``
     """
 
-    #: The dropdown block-kind options (label, ``kind`` value). SOURCE is
-    #: surfaced as "Load" (LLR-088.7 / D1) but keeps the ``BLOCK_SOURCE``
-    #: ("source") discriminator so batch-53 persistence is unaffected. The A2B
-    #: entry rides the same single-select; its two bindings use the dedicated
-    #: ``#flow_ref_a`` / ``#flow_ref_b`` inputs (visible only for A2B).
+    #: The kind chips' options (label, ``kind`` value), one chip per entry in
+    #: palette order. SOURCE is surfaced as "Load" (LLR-088.7 / D1) but keeps
+    #: the ``BLOCK_SOURCE`` ("source") discriminator so batch-53 persistence is
+    #: unaffected. The A2B entry is one chip; its two bindings use the
+    #: dedicated ``#flow_ref_a`` / ``#flow_ref_b`` inputs (visible only for A2B).
     _KIND_OPTIONS = [
         ("Load (image)", BLOCK_SOURCE),
         ("Patch (change doc)", BLOCK_PATCH),
@@ -1348,7 +1348,7 @@ class FlowBuilderPanel(ScrollableContainer):
         #: the ribbon (LLR-146.11); set by the app via :meth:`set_session_dir`.
         self._session_dir: Optional[str] = None
         #: The flow-level FUNNEL table (batch-96 B1) — ordered (name, value)
-        #: pairs declared beside the canvas; rides ``current_flow`` into
+        #: pairs declared beside the pipeline; rides ``current_flow`` into
         #: Run/Save and is restored by ``set_blocks``.
         self._funnel: List[Tuple[str, str]] = []
         #: The block COPY/PASTE clipboard (batch-96 B2) — the WIRE dict of
@@ -1551,8 +1551,8 @@ class FlowBuilderPanel(ScrollableContainer):
         Summary:
             Swap in the loaded blocks, set the display name (the on-disk stem
             when the app passes ``name``, else the envelope name), clear the
-            dirty flag (a just-loaded flow is clean), repaint the canvas +
-            ledger strip + name strip, and clear any prior run/quarantine output.
+            dirty flag (a just-loaded flow is clean), repaint the pipeline and
+            the name strip, and clear any prior run/quarantine output.
 
         Args:
             flow (Flow): The validated, loaded flow.
@@ -1561,7 +1561,7 @@ class FlowBuilderPanel(ScrollableContainer):
         """
         self._blocks = list(flow.blocks)
         self._flow_name = name if name is not None else flow.name
-        #: batch-96 B1: a loaded flow's funnel table replaces the canvas one.
+        #: batch-96 B1: a loaded flow's funnel table replaces the panel's one.
         self._funnel = list(flow.funnel)
         self._dirty = False
         self.query_one("#flow_pipeline_scroll").border_subtitle = None
@@ -1598,7 +1598,7 @@ class FlowBuilderPanel(ScrollableContainer):
             Mount a bordered ``sev-error`` quarantine card into ``#flow_result``
             with a header, one markup-safe line per finding, and a
             ``Current flow unchanged.`` footer. ``set_blocks`` is NOT called, so
-            the canvas + ledger and name strip are unchanged (LLR-003.5 / C-32).
+            the pipeline and the name strip are unchanged (LLR-003.5 / C-32).
             Every file-derived string (the picked name, each finding message) is
             rendered ``safe_text`` + ``markup=False`` (C-17).
 
@@ -2130,7 +2130,7 @@ class FlowBuilderPanel(ScrollableContainer):
         # inputs show only for A2B, the single ref for every other kind.
         self._sync_kind_dependent_visibility(self._kind)
         # batch-96 B1: the funnel editor starts COLLAPSED (a declaration
-        # table, not a canvas element) — the toggle opens it.
+        # table, not a chain element) — the toggle opens it.
         self.query_one("#flow_funnel_editor").display = False
         self.query_one("#flow_funnel_list").display = False
         self._refresh_funnel_list()
@@ -3972,8 +3972,9 @@ def _block_ref_noun(block: FlowBlock) -> Tuple[str, str]:
 
 
 def _join_lines(lines: List[Text]) -> Text:
-    """Join painted grid lines into one multi-line ``Text`` (markup-safe:
-    built by append, never markup-parsed)."""
+    """Join painted lines (the pipeline's card rows, the run log's lines)
+    into one multi-line ``Text`` (markup-safe: built by append, never
+    markup-parsed)."""
     out = Text()
     for i, line in enumerate(lines):
         if i:

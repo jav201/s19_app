@@ -12,11 +12,14 @@ import asyncio
 import json
 from pathlib import Path
 
+from rich.text import Text
+from textual.content import Content
 from textual.widgets import Button, Input, Static
 
 from s19_app.core import S19File
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.flow_screens import FlowBuilderPanel
+from s19_app.tui.insight_style import VALUE
 from s19_app.tui.services import flow_persistence_service as fps
 from s19_app.tui.services.flow_model import (
     BLOCK_A2B,
@@ -129,6 +132,14 @@ def _painted_static(app: S19TuiApp, selector: str) -> "tuple[str, object]":
     widget = app.query_one(selector, Static)
     rendered = widget.render()
     return rendered.plain, rendered.spans
+
+
+def _value_style():
+    """The card value rows' style (``VALUE``, the default of the card's
+    ``row()``) as a rendered ``Content`` span holds it: appended as a span, as
+    ``row()`` appends a value, and converted the same way; call it inside the
+    running app."""
+    return Content.from_rich_text(Text().append("x", style=VALUE)).spans[0].style
 
 
 # --------------------------------------------------------------------------- #
@@ -366,7 +377,7 @@ def test_at_b94_18_hostile_names_render_literally(tmp_path: Path) -> None:
         {"prg.s19": _S19, _HOSTILE_FILE_NAME: _S19, "hotfix.json": _patch_json()},
     )
 
-    async def _drive_canvas() -> "tuple[str, list]":
+    async def _drive_canvas() -> "tuple[str, list, object]":
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(120, 30)) as pilot:
             await pilot.pause()
@@ -387,7 +398,7 @@ def test_at_b94_18_hostile_names_render_literally(tmp_path: Path) -> None:
             await pilot.pause()
             # The whole scrubbed payload fits the card at 120x30 (two cards),
             # so the card holds it uncut (E3 S2-2); the node checks that below.
-            return _painted_static(app, "#flow_pipeline")
+            return (*_painted_static(app, "#flow_pipeline"), _value_style())
 
     async def _drive_report() -> str:
         app = S19TuiApp(base_dir=tmp_path)
@@ -409,7 +420,7 @@ def test_at_b94_18_hostile_names_render_literally(tmp_path: Path) -> None:
             assert reports, "the runnable hostile-name arm must emit a report"
             return reports[-1].read_bytes().decode("utf-8")
 
-    canvas, canvas_spans = asyncio.run(_drive_canvas())
+    canvas, canvas_spans, value_style = asyncio.run(_drive_canvas())
     report_text = asyncio.run(_drive_report())
 
     # Pipeline card: sentinel visible, brackets literal, 0 control bytes. (The
@@ -417,21 +428,28 @@ def test_at_b94_18_hostile_names_render_literally(tmp_path: Path) -> None:
     # markup census is the AST scan in test_tc_042_10; here the input's own
     # text must sit under ONE span style, never a style it parsed out of the
     # brackets.) The input's text is cut by no span, and one span covers it
-    # exactly (the card's value style).
+    # exactly: the card's value style.
     # The control bytes are deleted on the way to the card (C0, DEL, C1); the
     # markup text and the sentinel stay.
     scrubbed = "".join(
         c for c in _HOSTILE_SYMBOL if not (ord(c) < 0x20 or 0x7F <= ord(c) < 0xA0)
     )
-    assert _SENTINEL in canvas
-    assert "_evil[red]" in canvas  # literal brackets, never parsed
-    assert scrubbed in canvas, "the scrubbed payload is not whole on the card"
+    # The A2B card's own ``in · B`` value row holds the payload. The origin
+    # note under the card's inputs repeats the ref through its own sink, so a
+    # containment in the whole pipeline would rest on how that note is
+    # clipped (Inc 12b E5 R-2; AT-088b's I-D5 anchor).
+    rows = canvas.split("\n")
+    b_row = next(i for i, row in enumerate(rows) if "in · B" in row) + 1
+    assert _SENTINEL in rows[b_row], rows[b_row]
+    assert "_evil[red]" in rows[b_row], rows[b_row]  # literal brackets, never parsed
+    assert scrubbed in rows[b_row], "the scrubbed payload is not whole on the card's in · B row"
     assert _control_bytes(canvas) == []
-    start = canvas.index(scrubbed)
+    start = sum(len(row) + 1 for row in rows[:b_row]) + rows[b_row].index(scrubbed)
     stop = start + len(scrubbed)
     cutting = [s for s in canvas_spans if start < s.start < stop or start < s.end < stop]
     exact = [s for s in canvas_spans if (s.start, s.end) == (start, stop)]
     assert cutting == [] and len(exact) == 1, (cutting, exact)
+    assert exact[0].style == value_style, (exact[0].style, value_style)
     # Report: sentinel visible, the Mode-A label escaped, 0 control bytes
     # (over the newline-normalized bytes — the CRLF convention is the
     # producer's own).

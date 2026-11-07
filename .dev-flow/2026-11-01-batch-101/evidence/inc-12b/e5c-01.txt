@@ -1,0 +1,393 @@
+=== Inc 12b E5 corrective: e5c-01 — setup and the measure-first probes (R-1 / QA-3, R-2 geometry)
+Executor: E5 corrective pass (Opus), LAN Linux host 2. Local (Windows, git plumbing only, no s19_app import): git diff --binary 2f54c7d -- s19_app tests docs README.md of the local tree, applied to a scratch index on 2f54c7d (scratch object directory, the repo's objects as alternates): local tree aec9f8386e2334f2a96d00ed17879186148953e2, 17 files (this probe's tree: the flow_screens.py comments and the walk file edited; the b94 file is the 092fffd blob, and the probe calls only its helpers).
+
+--- setup (setup.sh, then sync.sh), as printed:
+clone main: 2f54c7dea27d826483e5c5e596421b8b3a68bb2f  origin/main: 2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+<HOME>/work/s19_i12bc_clone 2f54c7de [main]
+<HOME>/work/s19_i12bc       2f54c7de (detached HEAD)
+<HOME>/work/s19_i12bc_mut   2f54c7de (detached HEAD)
+synced <HOME>/work/s19_i12bc: HEAD 2f54c7dea27d826483e5c5e596421b8b3a68bb2f staged tree aec9f8386e2334f2a96d00ed17879186148953e2 staged files 17 unstaged 0
+(the host clone <HOME>/work/s19_app and its main ref were not touched; the first probe call failed on shell quoting before running anything, exit 127, and was re-issued as a script on stdin)
+
+--- 1. probe_widths.py: rail widths and the painted chain at 120x30 / 80x24, and the LOAD + A2B card (AT-B94-18)
+=== Inc 12b E5 corrective run: e5c-01-probe
+date: 2026-11-07T00:41:07Z
+host: LAN Linux host 2
+worktree: <HOME>/work/s19_i12bc
+worktree HEAD (base): 2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+main ref seen here: 2f54c7dea27d826483e5c5e596421b8b3a68bb2f (origin/main 2f54c7dea27d826483e5c5e596421b8b3a68bb2f)
+index tree (base + the corrective diff, staged): aec9f8386e2334f2a96d00ed17879186148953e2
+staged files vs base: 17
+unstaged changes vs index: 0
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i12bc/s19_app/__init__.py
+CMD: env -u NO_COLOR $PY -m pytest -q -p no:cacheprovider -p no:xdist -p tests.conftest -s --rootdir . -c pyproject.toml ~/work/s19_i12bc-helpers/probe_widths.py
+PROBE (120, 30) 0 cards: rail.region.width=96 rail.content_region.width=92 rail.scrollable_content_region.width=92 pipeline.region.width=90 longest painted line=90 lines=1 card_w=21 spare=0 layout_key=(92, 94)
+PROBE (120, 30) 1 cards: rail.region.width=94 rail.content_region.width=90 rail.scrollable_content_region.width=90 pipeline.region.width=92 longest painted line=92 lines=12 card_w=92 spare=0 layout_key=(92, 94)
+PROBE (120, 30) 2 cards: rail.region.width=94 rail.content_region.width=90 rail.scrollable_content_region.width=90 pipeline.region.width=92 longest painted line=92 lines=12 card_w=44 spare=0 layout_key=(92, 94)
+PROBE (120, 30) 3 cards: rail.region.width=94 rail.content_region.width=90 rail.scrollable_content_region.width=90 pipeline.region.width=92 longest painted line=92 lines=12 card_w=28 spare=0 layout_key=(92, 94)
+PROBE (80, 24) 0 cards: rail.region.width=72 rail.content_region.width=68 rail.scrollable_content_region.width=68 pipeline.region.width=90 longest painted line=90 lines=1 card_w=21 spare=0 layout_key=(68, 70)
+PROBE (80, 24) 1 cards: rail.region.width=72 rail.content_region.width=68 rail.scrollable_content_region.width=68 pipeline.region.width=68 longest painted line=68 lines=12 card_w=68 spare=0 layout_key=(68, 70)
+PROBE (80, 24) 2 cards: rail.region.width=72 rail.content_region.width=68 rail.scrollable_content_region.width=68 pipeline.region.width=68 longest painted line=68 lines=12 card_w=32 spare=0 layout_key=(68, 70)
+PROBE (80, 24) 3 cards: rail.region.width=72 rail.content_region.width=68 rail.scrollable_content_region.width=68 pipeline.region.width=71 longest painted line=71 lines=12 card_w=21 spare=0 layout_key=(68, 70)
+PROBE (120, 30) LOAD + A2B (AT-B94-18): rail.region.width=94 rail.content_region.width=90 rail.scrollable_content_region.width=90 pipeline.region.width=92 longest painted line=92 lines=12 card_w=44 spare=0 layout_key=(92, 94)
+PROBE row  0: '╭─ 1 ──────────────────────────────────────╮    ╭─ 2 ──────────────────────────────────────╮'
+PROBE row  1: '│ ◉ LOAD                                   │    │ ⏚ A2B-DIFF                               │'
+PROBE row  2: '│ reads an image                           │    │ diffs two images                         │'
+PROBE row  3: '│ in · file                                │    │ in · A                                   │'
+PROBE row  4: '│ prg.s19                                  │    │ #1.out                                   │'
+PROBE row  5: '│ in · fmt                                 │    │ in · B                                   │'
+PROBE row  6: '│ s19                                      │    │ b77hostilemark[31m_evil[red]1m8;;u       │'
+PROBE row  7: '│ ↳ project: prg.s19                       │    │ missing: b77hostilemark[31m_evil[red…    │'
+PROBE row  8: '│                                          │    │                                          │'
+PROBE row  9: '│ out                                      │    │ out                                      │'
+PROBE row 10: '│ image                                    │───▶│ report                                   │'
+PROBE row 11: '╰──────────────────────────────────────────╯    ╰──────────────────────────────────────────╯'
+.
+1 passed in 8.79s
+=== exit code: 0
+
+--- 2. probe_settle.py on the corrective tree and on the base: does the 120x30 chain settle inside the rail with more frames; what narrows the rail
+(the first base attempt below failed in the probe itself: it called the base's sync 3-argument helper with 4 arguments; fixed in the probe, re-run in part 3)
+=== Inc 12b E5 corrective run: e5c-01-settle-base
+date: 2026-11-07T00:42:08Z
+host: LAN Linux host 2
+worktree: <HOME>/work/s19_i12bc_mut
+worktree HEAD (base): 2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+main ref seen here: 2f54c7dea27d826483e5c5e596421b8b3a68bb2f (origin/main 2f54c7dea27d826483e5c5e596421b8b3a68bb2f)
+index tree (base + the corrective diff, staged): 337d9f8a43a966a21065a1ff6f52840beae805a5
+staged files vs base: 0
+unstaged changes vs index: 0
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i12bc_mut/s19_app/__init__.py
+CMD: env -u NO_COLOR $PY -m pytest -q -p no:cacheprovider -p no:xdist -p tests.conftest -s --rootdir . -c pyproject.toml ~/work/s19_i12bc-helpers/probe_settle.py
+PROBE (120, 30) 0 cards: rail.region.width=96 rail.scrollable_content_region.width=92 longest painted line=90 card_w=21 layout_key=(92, 94) rail.hbar=False | flow_panel:w=96,vbar=False screen_flow:w=96,vbar=False workspace_body:w=96,vbar=False workspace_shell:w=118,vbar=False
+F
+=================================== FAILURES ===================================
+______________________________ test_probe_settle _______________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-463/test_probe_settle0')
+
+    def test_probe_settle(tmp_path):
+        project = b94._project(tmp_path)
+    
+        async def add(app, pilot, kind, ref):
+            result = b94._add_ref_block(app, pilot, kind, ref)
+            if inspect.isawaitable(result):
+                await result
+    
+        async def chain(size):
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=size) as pilot:
+                await pilot.pause()
+                await b94._show_flow(app, pilot, project)
+                _line(app, f"{size} 0 cards")
+                for n, (kind, ref) in enumerate((("source", "prg.s19"), ("patch", "hotfix.json"), ("write_out", "out.s19")), 1):
+                    await add(app, pilot, kind, ref)
+                    await pilot.pause()
+                    _line(app, f"{size} {n} cards, 1 pause")
+                for k in (5, 20, 60):
+                    for _ in range(k):
+                        await pilot.pause()
+                    _line(app, f"{size} 3 cards, +{k} pauses")
+                await pilot.resize_terminal(size[0] + 1, size[1])
+                for _ in range(10):
+                    await pilot.pause()
+                await pilot.resize_terminal(*size)
+                for _ in range(10):
+                    await pilot.pause()
+                _line(app, f"{size} 3 cards, after a resize out and back")
+    
+>       asyncio.run(chain((120, 30)))
+
+../s19_i12bc-helpers/probe_settle.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i12bc-helpers/probe_settle.py:48: in chain
+    await add(app, pilot, kind, ref)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+kind = 'source', ref = 'prg.s19'
+
+    async def add(app, pilot, kind, ref):
+>       result = b94._add_ref_block(app, pilot, kind, ref)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: _add_ref_block() takes 3 positional arguments but 4 were given
+
+../s19_i12bc-helpers/probe_settle.py:37: TypeError
+=========================== short test summary info ============================
+FAILED ::test_probe_settle - TypeError: _add_ref_block() takes 3 positional a...
+1 failed in 2.36s
+=== exit code: 1
+=== Inc 12b E5 corrective run: e5c-01-settle
+date: 2026-11-07T00:42:11Z
+host: LAN Linux host 2
+worktree: <HOME>/work/s19_i12bc
+worktree HEAD (base): 2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+main ref seen here: 2f54c7dea27d826483e5c5e596421b8b3a68bb2f (origin/main 2f54c7dea27d826483e5c5e596421b8b3a68bb2f)
+index tree (base + the corrective diff, staged): aec9f8386e2334f2a96d00ed17879186148953e2
+staged files vs base: 17
+unstaged changes vs index: 0
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i12bc/s19_app/__init__.py
+CMD: env -u NO_COLOR $PY -m pytest -q -p no:cacheprovider -p no:xdist -p tests.conftest -s --rootdir . -c pyproject.toml ~/work/s19_i12bc-helpers/probe_settle.py
+PROBE (120, 30) 0 cards: rail.region.width=96 rail.scrollable_content_region.width=92 longest painted line=90 card_w=21 layout_key=(92, 94) rail.hbar=False | flow_panel:w=96,vbar=False screen_flow:w=96,vbar=False workspace_body:w=96,vbar=False workspace_shell:w=118,vbar=False
+PROBE (120, 30) 1 cards, 1 pause: rail.region.width=96 rail.scrollable_content_region.width=92 longest painted line=92 card_w=92 layout_key=(92, 94) rail.hbar=False | flow_panel:w=96,vbar=True screen_flow:w=96,vbar=False workspace_body:w=96,vbar=False workspace_shell:w=118,vbar=False
+PROBE (120, 30) 2 cards, 1 pause: rail.region.width=94 rail.scrollable_content_region.width=90 longest painted line=92 card_w=44 layout_key=(92, 94) rail.hbar=True | flow_panel:w=96,vbar=True screen_flow:w=96,vbar=False workspace_body:w=96,vbar=False workspace_shell:w=118,vbar=False
+PROBE (120, 30) 3 cards, 1 pause: rail.region.width=94 rail.scrollable_content_region.width=90 longest painted line=92 card_w=28 layout_key=(92, 94) rail.hbar=True | flow_panel:w=96,vbar=True screen_flow:w=96,vbar=False workspace_body:w=96,vbar=False workspace_shell:w=118,vbar=False
+PROBE (120, 30) 3 cards, +5 pauses: rail.region.width=94 rail.scrollable_content_region.width=90 longest painted line=92 card_w=28 layout_key=(92, 94) rail.hbar=True | flow_panel:w=96,vbar=True screen_flow:w=96,vbar=False workspace_body:w=96,vbar=False workspace_shell:w=118,vbar=False
+PROBE (120, 30) 3 cards, +20 pauses: rail.region.width=94 rail.scrollable_content_region.width=90 longest painted line=92 card_w=28 layout_key=(92, 94) rail.hbar=True | flow_panel:w=96,vbar=True screen_flow:w=96,vbar=False workspace_body:w=96,vbar=False workspace_shell:w=118,vbar=False
+PROBE (120, 30) 3 cards, +60 pauses: rail.region.width=94 rail.scrollable_content_region.width=90 longest painted line=92 card_w=28 layout_key=(92, 94) rail.hbar=True | flow_panel:w=96,vbar=True screen_flow:w=96,vbar=False workspace_body:w=96,vbar=False workspace_shell:w=118,vbar=False
+PROBE (120, 30) 3 cards, after a resize out and back: rail.region.width=94 rail.scrollable_content_region.width=90 longest painted line=90 card_w=27 layout_key=(90, 92) rail.hbar=False | flow_panel:w=96,vbar=True screen_flow:w=96,vbar=False workspace_body:w=96,vbar=False workspace_shell:w=118,vbar=False
+PROBE (118, 54) 0 cards: rail.region.width=112 rail.scrollable_content_region.width=108 longest painted line=90 card_w=21 layout_key=(108, 110) rail.hbar=False | flow_panel:w=112,vbar=False screen_flow:w=112,vbar=False workspace_body:w=112,vbar=False workspace_shell:w=116,vbar=False
+PROBE (118, 54) 1 cards, 1 pause: rail.region.width=112 rail.scrollable_content_region.width=108 longest painted line=108 card_w=108 layout_key=(108, 110) rail.hbar=False | flow_panel:w=112,vbar=False screen_flow:w=112,vbar=False workspace_body:w=112,vbar=False workspace_shell:w=116,vbar=False
+PROBE (118, 54) 2 cards, 1 pause: rail.region.width=112 rail.scrollable_content_region.width=108 longest painted line=108 card_w=52 layout_key=(108, 110) rail.hbar=False | flow_panel:w=112,vbar=False screen_flow:w=112,vbar=False workspace_body:w=112,vbar=False workspace_shell:w=116,vbar=False
+PROBE (118, 54) 3 cards, 1 pause: rail.region.width=112 rail.scrollable_content_region.width=108 longest painted line=108 card_w=33 layout_key=(108, 110) rail.hbar=False | flow_panel:w=112,vbar=False screen_flow:w=112,vbar=False workspace_body:w=112,vbar=False workspace_shell:w=116,vbar=False
+PROBE (118, 54) 3 cards, +5 pauses: rail.region.width=112 rail.scrollable_content_region.width=108 longest painted line=108 card_w=33 layout_key=(108, 110) rail.hbar=False | flow_panel:w=112,vbar=False screen_flow:w=112,vbar=False workspace_body:w=112,vbar=False workspace_shell:w=116,vbar=False
+PROBE (118, 54) 3 cards, +20 pauses: rail.region.width=112 rail.scrollable_content_region.width=108 longest painted line=108 card_w=33 layout_key=(108, 110) rail.hbar=False | flow_panel:w=112,vbar=False screen_flow:w=112,vbar=False workspace_body:w=112,vbar=False workspace_shell:w=116,vbar=False
+PROBE (118, 54) 3 cards, +60 pauses: rail.region.width=112 rail.scrollable_content_region.width=108 longest painted line=108 card_w=33 layout_key=(108, 110) rail.hbar=False | flow_panel:w=112,vbar=False screen_flow:w=112,vbar=False workspace_body:w=112,vbar=False workspace_shell:w=116,vbar=False
+PROBE (118, 54) 3 cards, after a resize out and back: rail.region.width=112 rail.scrollable_content_region.width=108 longest painted line=108 card_w=33 layout_key=(108, 110) rail.hbar=False | flow_panel:w=112,vbar=False screen_flow:w=112,vbar=False workspace_body:w=112,vbar=False workspace_shell:w=116,vbar=False
+.
+1 passed in 21.30s
+=== exit code: 0
+
+--- 3. probe_settle.py on the base 2f54c7d (nothing applied), fixed probe
+=== Inc 12b E5 corrective run: e5c-01-settle-base
+date: 2026-11-07T00:43:13Z
+host: LAN Linux host 2
+worktree: <HOME>/work/s19_i12bc_mut
+worktree HEAD (base): 2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+main ref seen here: 2f54c7dea27d826483e5c5e596421b8b3a68bb2f (origin/main 2f54c7dea27d826483e5c5e596421b8b3a68bb2f)
+index tree (base + the corrective diff, staged): 337d9f8a43a966a21065a1ff6f52840beae805a5
+staged files vs base: 0
+unstaged changes vs index: 0
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i12bc_mut/s19_app/__init__.py
+CMD: env -u NO_COLOR $PY -m pytest -q -p no:cacheprovider -p no:xdist -p tests.conftest -s --rootdir . -c pyproject.toml ~/work/s19_i12bc-helpers/probe_settle.py
+PROBE (120, 30) 0 cards: rail.region.width=96 rail.scrollable_content_region.width=92 longest painted line=90 card_w=21 layout_key=(92, 94) rail.hbar=False | flow_panel:w=96,vbar=False screen_flow:w=96,vbar=False workspace_body:w=96,vbar=False workspace_shell:w=118,vbar=False
+PROBE (120, 30) 1 cards, 1 pause: rail.region.width=96 rail.scrollable_content_region.width=92 longest painted line=92 card_w=92 layout_key=(92, 94) rail.hbar=False | flow_panel:w=96,vbar=True screen_flow:w=96,vbar=False workspace_body:w=96,vbar=False workspace_shell:w=118,vbar=False
+PROBE (120, 30) 2 cards, 1 pause: rail.region.width=94 rail.scrollable_content_region.width=90 longest painted line=92 card_w=44 layout_key=(92, 94) rail.hbar=True | flow_panel:w=96,vbar=True screen_flow:w=96,vbar=False workspace_body:w=96,vbar=False workspace_shell:w=118,vbar=False
+PROBE (120, 30) 3 cards, 1 pause: rail.region.width=94 rail.scrollable_content_region.width=90 longest painted line=92 card_w=28 layout_key=(92, 94) rail.hbar=True | flow_panel:w=96,vbar=True screen_flow:w=96,vbar=False workspace_body:w=96,vbar=False workspace_shell:w=118,vbar=False
+PROBE (120, 30) 3 cards, +5 pauses: rail.region.width=94 rail.scrollable_content_region.width=90 longest painted line=92 card_w=28 layout_key=(92, 94) rail.hbar=True | flow_panel:w=96,vbar=True screen_flow:w=96,vbar=False workspace_body:w=96,vbar=False workspace_shell:w=118,vbar=False
+PROBE (120, 30) 3 cards, +20 pauses: rail.region.width=94 rail.scrollable_content_region.width=90 longest painted line=92 card_w=28 layout_key=(92, 94) rail.hbar=True | flow_panel:w=96,vbar=True screen_flow:w=96,vbar=False workspace_body:w=96,vbar=False workspace_shell:w=118,vbar=False
+PROBE (120, 30) 3 cards, +60 pauses: rail.region.width=94 rail.scrollable_content_region.width=90 longest painted line=92 card_w=28 layout_key=(92, 94) rail.hbar=True | flow_panel:w=96,vbar=True screen_flow:w=96,vbar=False workspace_body:w=96,vbar=False workspace_shell:w=118,vbar=False
+PROBE (120, 30) 3 cards, after a resize out and back: rail.region.width=94 rail.scrollable_content_region.width=90 longest painted line=90 card_w=27 layout_key=(90, 92) rail.hbar=False | flow_panel:w=96,vbar=True screen_flow:w=96,vbar=False workspace_body:w=96,vbar=False workspace_shell:w=118,vbar=False
+PROBE (118, 54) 0 cards: rail.region.width=112 rail.scrollable_content_region.width=108 longest painted line=90 card_w=21 layout_key=(108, 110) rail.hbar=False | flow_panel:w=112,vbar=False screen_flow:w=112,vbar=False workspace_body:w=112,vbar=False workspace_shell:w=116,vbar=False
+PROBE (118, 54) 1 cards, 1 pause: rail.region.width=112 rail.scrollable_content_region.width=108 longest painted line=108 card_w=108 layout_key=(108, 110) rail.hbar=False | flow_panel:w=112,vbar=False screen_flow:w=112,vbar=False workspace_body:w=112,vbar=False workspace_shell:w=116,vbar=False
+PROBE (118, 54) 2 cards, 1 pause: rail.region.width=112 rail.scrollable_content_region.width=108 longest painted line=108 card_w=52 layout_key=(108, 110) rail.hbar=False | flow_panel:w=112,vbar=False screen_flow:w=112,vbar=False workspace_body:w=112,vbar=False workspace_shell:w=116,vbar=False
+PROBE (118, 54) 3 cards, 1 pause: rail.region.width=112 rail.scrollable_content_region.width=108 longest painted line=108 card_w=33 layout_key=(108, 110) rail.hbar=False | flow_panel:w=112,vbar=False screen_flow:w=112,vbar=False workspace_body:w=112,vbar=False workspace_shell:w=116,vbar=False
+PROBE (118, 54) 3 cards, +5 pauses: rail.region.width=112 rail.scrollable_content_region.width=108 longest painted line=108 card_w=33 layout_key=(108, 110) rail.hbar=False | flow_panel:w=112,vbar=False screen_flow:w=112,vbar=False workspace_body:w=112,vbar=False workspace_shell:w=116,vbar=False
+PROBE (118, 54) 3 cards, +20 pauses: rail.region.width=112 rail.scrollable_content_region.width=108 longest painted line=108 card_w=33 layout_key=(108, 110) rail.hbar=False | flow_panel:w=112,vbar=False screen_flow:w=112,vbar=False workspace_body:w=112,vbar=False workspace_shell:w=116,vbar=False
+PROBE (118, 54) 3 cards, +60 pauses: rail.region.width=112 rail.scrollable_content_region.width=108 longest painted line=108 card_w=33 layout_key=(108, 110) rail.hbar=False | flow_panel:w=112,vbar=False screen_flow:w=112,vbar=False workspace_body:w=112,vbar=False workspace_shell:w=116,vbar=False
+PROBE (118, 54) 3 cards, after a resize out and back: rail.region.width=112 rail.scrollable_content_region.width=108 longest painted line=108 card_w=33 layout_key=(108, 110) rail.hbar=False | flow_panel:w=112,vbar=False screen_flow:w=112,vbar=False workspace_body:w=112,vbar=False workspace_shell:w=116,vbar=False
+.
+1 passed in 20.96s
+=== exit code: 0
+
+--- helper source: setup.sh (removed after the runs)
+#!/usr/bin/env bash
+# Inc 12b E5 corrective: a --shared clone of the host's clone with main = origin/main = 2f54c7d,
+# and two detached worktrees from it (the run tree and the mutant tree).
+set -eu
+BASE=2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+cd ~/work
+git clone -q --shared --no-checkout ~/work/s19_app s19_i12bc_clone
+cd s19_i12bc_clone
+git update-ref refs/heads/main $BASE
+git update-ref refs/remotes/origin/main $BASE
+git worktree add -q --detach ~/work/s19_i12bc $BASE
+git worktree add -q --detach ~/work/s19_i12bc_mut $BASE
+echo "clone main: $(git rev-parse main)  origin/main: $(git rev-parse origin/main)"
+git worktree list
+
+--- helper source: sync.sh (removed after the runs)
+#!/usr/bin/env bash
+# Reset a worktree to the base and stage the local diff (the corrective tree).
+# Usage: sync.sh <worktree> <diff file>
+set -eu
+BASE=2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+cd "$1"
+git checkout -q -f --detach $BASE
+git clean -fdq -- s19_app tests docs README.md
+git apply --index "$2"
+echo "synced $1: HEAD $(git rev-parse HEAD) staged tree $(git write-tree) staged files $(git diff --cached --name-only HEAD | wc -l) unstaged $(git diff --name-only | wc -l)"
+
+--- helper source: run.sh (removed after the runs)
+#!/usr/bin/env bash
+# Usage: run.sh <label> <worktree> "<command>"  (PY is exported for the command)
+set -u
+label=$1; wt=$2; cmd=$3
+export PY=~/miniconda3/envs/s19ci/bin/python
+cd "$wt" || exit 2
+echo "=== Inc 12b E5 corrective run: $label"
+echo "date: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+echo "host: LAN Linux host 2"
+echo "worktree: $wt"
+echo "worktree HEAD (base): $(git rev-parse HEAD)"
+echo "main ref seen here: $(git rev-parse main) (origin/main $(git rev-parse origin/main))"
+echo "index tree (base + the corrective diff, staged): $(git write-tree)"
+echo "staged files vs base: $(git diff --cached --name-only HEAD | wc -l)"
+echo "unstaged changes vs index: $(git diff --name-only | wc -l)"
+echo "untracked files: $(git ls-files --others --exclude-standard | paste -sd' ' -)"
+if [ -n "$(git diff --name-only)" ]; then echo "--- unstaged diff (the one-off mutation):"; git diff; echo "---"; fi
+echo "python: $($PY --version 2>&1)"
+echo "s19_app.__file__ = $(env -u NO_COLOR $PY -c 'import s19_app; print(s19_app.__file__)')"
+echo "CMD: $cmd"
+bash -c "$cmd"
+rc=$?
+echo "=== exit code: $rc"
+
+--- helper source: localtree.sh (removed after the runs)
+#!/usr/bin/env bash
+# Local: the corrective diff and the tree it gives on the base, computed in a
+# scratch index and a scratch object directory (the repo's objects as alternates).
+set -eu
+S="$1"; cd <HOME>/Github/s19_app-b101-inc12b
+git diff --binary 2f54c7d -- s19_app tests docs README.md > "$S/i12bc.diff"
+rm -rf "$S/objs" "$S/idx"; mkdir -p "$S/objs"
+export GIT_OBJECT_DIRECTORY="$S/objs" GIT_ALTERNATE_OBJECT_DIRECTORIES="$(git rev-parse --path-format=absolute --git-common-dir)/objects" GIT_INDEX_FILE="$S/idx"
+git read-tree 2f54c7d
+git apply --cached "$S/i12bc.diff"
+echo "local tree: $(git write-tree)  files: $(git diff --cached --name-only 2f54c7d | wc -l)"
+
+--- helper source: probe_widths.py (removed after the runs)
+"""Read-only probe, Inc 12b E5 corrective (R-1 / QA-3: measure first; R-2: the
+A2B card geometry). Drives AT-B94-15's and AT-B94-18's setups and prints the
+rail's widths, the painted chain width and the A2B card's rows. Asserts nothing."""
+import asyncio
+
+from textual.widgets import Button, Input
+
+from s19_app.tui.app import S19TuiApp
+import tests.test_tui_flow_builder_b94 as b94
+
+
+def _measure(app, label):
+    rail = app.query_one("#flow_pipeline_scroll")
+    pipe = app.query_one("#flow_pipeline")
+    panel = app.query_one("#flow_panel")
+    lines = pipe.render().plain.split("\n")
+    print(
+        f"PROBE {label}: rail.region.width={rail.region.width}"
+        f" rail.content_region.width={rail.content_region.width}"
+        f" rail.scrollable_content_region.width={rail.scrollable_content_region.width}"
+        f" pipeline.region.width={pipe.region.width}"
+        f" longest painted line={max(len(line) for line in lines)} lines={len(lines)}"
+        f" card_w={panel._card_w} spare={panel._spare} layout_key={panel._layout_key}"
+    )
+    return lines
+
+
+def test_probe_rail_widths(tmp_path):
+    project = b94._project(tmp_path)
+
+    async def chain(size):
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            await b94._show_flow(app, pilot, project)
+            _measure(app, f"{size} 0 cards")
+            blocks = (("source", "prg.s19"), ("patch", "hotfix.json"), ("write_out", "out.s19"))
+            for n, (kind, ref) in enumerate(blocks, 1):
+                await b94._add_ref_block(app, pilot, kind, ref)
+                await pilot.pause()
+                _measure(app, f"{size} {n} cards")
+
+    async def a2b(size):
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            await b94._show_flow(app, pilot, project)
+            await b94._add_ref_block(app, pilot, "source", "prg.s19")
+            await pilot.pause()
+            app.query_one("#flow_palette_a2b", Button).press()
+            await pilot.pause()
+            app.query_one("#flow_ref_a", Input).value = "#1"
+            app.query_one("#flow_ref_b", Input).value = b94._HOSTILE_SYMBOL.replace("\x00", "")
+            app.query_one("#flow_add", Button).press()
+            await pilot.pause()
+            lines = _measure(app, f"{size} LOAD + A2B (AT-B94-18)")
+            for i, line in enumerate(lines):
+                print(f"PROBE row {i:2d}: {line!r}")
+
+    asyncio.run(chain((120, 30)))
+    asyncio.run(chain((80, 24)))
+    asyncio.run(a2b((120, 30)))
+
+--- helper source: probe_settle.py (removed after the runs)
+"""Read-only probe, Inc 12b E5 corrective (R-1 / QA-3): does the 120x30 chain of
+3 cards settle inside the rail's content width with more frames, and what
+narrows the rail? Works on the base tree and on the corrective tree (the
+module's chip helper is sync on base, async after Inc 12b). Asserts nothing."""
+import asyncio
+import inspect
+
+from textual.widgets import Button, Input, Select
+
+from s19_app.tui.app import S19TuiApp
+import tests.test_tui_flow_builder_b94 as b94
+
+
+def _line(app, label):
+    rail = app.query_one("#flow_pipeline_scroll")
+    pipe = app.query_one("#flow_pipeline")
+    panel = app.query_one("#flow_panel")
+    lines = pipe.render().plain.split("\n")
+    chain = [panel, *panel.ancestors_with_self][1:]
+    bars = [
+        f"{getattr(w, 'id', None) or type(w).__name__}:w={w.region.width},vbar={w.show_vertical_scrollbar}"
+        for w in [panel, *list(panel.ancestors)[:3]]
+    ]
+    print(
+        f"PROBE {label}: rail.region.width={rail.region.width}"
+        f" rail.scrollable_content_region.width={rail.scrollable_content_region.width}"
+        f" longest painted line={max(len(line) for line in lines)}"
+        f" card_w={getattr(panel, '_card_w', '?')} layout_key={getattr(panel, '_layout_key', '?')}"
+        f" rail.hbar={rail.show_horizontal_scrollbar} | {' '.join(bars)}"
+    )
+
+
+def test_probe_settle(tmp_path):
+    project = b94._project(tmp_path)
+
+    async def add(app, pilot, kind, ref):
+        if len(inspect.signature(b94._add_ref_block).parameters) == 3:
+            b94._add_ref_block(app, kind, ref)  # base: sets the kind select
+        else:
+            await b94._add_ref_block(app, pilot, kind, ref)
+
+    async def chain(size):
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            await b94._show_flow(app, pilot, project)
+            _line(app, f"{size} 0 cards")
+            for n, (kind, ref) in enumerate((("source", "prg.s19"), ("patch", "hotfix.json"), ("write_out", "out.s19")), 1):
+                await add(app, pilot, kind, ref)
+                await pilot.pause()
+                _line(app, f"{size} {n} cards, 1 pause")
+            for k in (5, 20, 60):
+                for _ in range(k):
+                    await pilot.pause()
+                _line(app, f"{size} 3 cards, +{k} pauses")
+            await pilot.resize_terminal(size[0] + 1, size[1])
+            for _ in range(10):
+                await pilot.pause()
+            await pilot.resize_terminal(*size)
+            for _ in range(10):
+                await pilot.pause()
+            _line(app, f"{size} 3 cards, after a resize out and back")
+
+    asyncio.run(chain((120, 30)))
+    asyncio.run(chain((118, 54)))
+

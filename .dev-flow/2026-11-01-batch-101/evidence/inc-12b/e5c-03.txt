@@ -1,0 +1,410 @@
+=== Inc 12b E5 corrective: e5c-03 — one-off mutants C0 ... C6 (each strengthened node beside its 092fffd version)
+Executor: E5 corrective pass (Opus), LAN Linux host 2, in the mutant worktree <HOME>/work/s19_i12bc_mut (the same corrective tree staged; each mutation unstaged, restored from the index after its run). The 092fffd versions of the five strengthened test files ran as untracked modules tests/test_zz_old092_<name>.py (git show 092fffd:tests/test_<name>.py), removed at the end.
+
+synced <HOME>/work/s19_i12bc: HEAD 2f54c7dea27d826483e5c5e596421b8b3a68bb2f staged tree 7c89fe9ef26e61b6a60b943fef23738bcacfdb1d staged files 17 unstaged 0
+synced <HOME>/work/s19_i12bc_mut: HEAD 2f54c7dea27d826483e5c5e596421b8b3a68bb2f staged tree 7c89fe9ef26e61b6a60b943fef23738bcacfdb1d staged files 17 unstaged 0
+=== Inc 12b E5 corrective run: e5c-03 C0 (each node beside its 092fffd version, test_zz_old092_*)
+date: 2026-11-07T00:50:15Z
+host: LAN Linux host 2
+worktree: <HOME>/work/s19_i12bc_mut
+worktree HEAD (base): 2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+main ref seen here: 2f54c7dea27d826483e5c5e596421b8b3a68bb2f (origin/main 2f54c7dea27d826483e5c5e596421b8b3a68bb2f)
+index tree (base + the corrective diff, staged): 7c89fe9ef26e61b6a60b943fef23738bcacfdb1d
+staged files vs base: 17
+unstaged changes vs index: 0
+untracked files: tests/test_zz_old092_b101_flow_shown_widgets.py tests/test_zz_old092_flow_builder_render.py tests/test_zz_old092_tui_directionb.py tests/test_zz_old092_tui_flow_builder_b94.py tests/test_zz_old092_tui_flow_persistence_ui.py
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i12bc_mut/s19_app/__init__.py
+CMD: env -u NO_COLOR $PY -m pytest -q -p no:cacheprovider -n 6 --tb=line -rA tests/test_b101_flow_shown_widgets.py::test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state tests/test_zz_old092_b101_flow_shown_widgets.py::test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state tests/test_b101_flow_shown_widgets.py::test_r_fx_scr_4_1_every_flow_execution_widget_is_shown_in_a_state tests/test_zz_old092_b101_flow_shown_widgets.py::test_r_fx_scr_4_1_every_flow_execution_widget_is_shown_in_a_state tests/test_b101_flow_shown_widgets.py::test_at_i12b_1_kind_chip_add_and_ribbon_by_keys tests/test_zz_old092_b101_flow_shown_widgets.py::test_at_i12b_1_kind_chip_add_and_ribbon_by_keys tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally tests/test_zz_old092_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally tests/test_flow_builder_render.py::test_at088b_check_ref_label_renders_literally tests/test_zz_old092_flow_builder_render.py::test_at088b_check_ref_label_renders_literally tests/test_tui_directionb.py::test_at_flow_block_label_markup_safe tests/test_zz_old092_tui_directionb.py::test_at_flow_block_label_markup_safe tests/test_tui_flow_persistence_ui.py::test_at006_report_bearing_flow_shows_report_row tests/test_zz_old092_tui_flow_persistence_ui.py::test_at006_report_bearing_flow_shows_report_row 
+bringing up nodes...
+bringing up nodes...
+
+..............                                                           [100%]
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_tui_directionb.py::test_at_flow_block_label_markup_safe
+PASSED tests/test_flow_builder_render.py::test_at088b_check_ref_label_renders_literally
+PASSED tests/test_zz_old092_tui_directionb.py::test_at_flow_block_label_markup_safe
+PASSED tests/test_b101_flow_shown_widgets.py::test_r_fx_scr_4_1_every_flow_execution_widget_is_shown_in_a_state
+PASSED tests/test_b101_flow_shown_widgets.py::test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state
+PASSED tests/test_zz_old092_flow_builder_render.py::test_at088b_check_ref_label_renders_literally
+PASSED tests/test_tui_flow_persistence_ui.py::test_at006_report_bearing_flow_shows_report_row
+PASSED tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally
+PASSED tests/test_zz_old092_tui_flow_persistence_ui.py::test_at006_report_bearing_flow_shows_report_row
+PASSED tests/test_zz_old092_b101_flow_shown_widgets.py::test_r_fx_scr_4_1_every_flow_execution_widget_is_shown_in_a_state
+PASSED tests/test_zz_old092_b101_flow_shown_widgets.py::test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state
+PASSED tests/test_b101_flow_shown_widgets.py::test_at_i12b_1_kind_chip_add_and_ribbon_by_keys
+PASSED tests/test_zz_old092_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally
+PASSED tests/test_zz_old092_b101_flow_shown_widgets.py::test_at_i12b_1_kind_chip_add_and_ribbon_by_keys
+14 passed in 30.91s
+=== exit code: 0
+restored: unstaged 0, index tree 7c89fe9ef26e61b6a60b943fef23738bcacfdb1d
+
+mutant C1 applied
+=== Inc 12b E5 corrective run: e5c-03 C1 (each node beside its 092fffd version, test_zz_old092_*)
+date: 2026-11-07T00:50:47Z
+host: LAN Linux host 2
+worktree: <HOME>/work/s19_i12bc_mut
+worktree HEAD (base): 2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+main ref seen here: 2f54c7dea27d826483e5c5e596421b8b3a68bb2f (origin/main 2f54c7dea27d826483e5c5e596421b8b3a68bb2f)
+index tree (base + the corrective diff, staged): 7c89fe9ef26e61b6a60b943fef23738bcacfdb1d
+staged files vs base: 17
+unstaged changes vs index: 1
+untracked files: tests/test_zz_old092_b101_flow_shown_widgets.py tests/test_zz_old092_flow_builder_render.py tests/test_zz_old092_tui_directionb.py tests/test_zz_old092_tui_flow_builder_b94.py tests/test_zz_old092_tui_flow_persistence_ui.py
+--- unstaged diff (the one-off mutation):
+diff --git a/s19_app/tui/open_folder_chip.py b/s19_app/tui/open_folder_chip.py
+index 33f3930d..3a80e585 100644
+--- a/s19_app/tui/open_folder_chip.py
++++ b/s19_app/tui/open_folder_chip.py
+@@ -103,6 +103,7 @@ class OpenFolderChip(Button):
+     def on_mount(self) -> None:
+         """Resolve the target so the initial dimmed/tooltip state renders."""
+         self.refresh_target()
++        self.display = False
+ 
+     def refresh_target(self) -> None:
+         """Re-resolve the target and re-render the label and dimmed state.
+---
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i12bc_mut/s19_app/__init__.py
+CMD: env -u NO_COLOR $PY -m pytest -q -p no:cacheprovider -n 6 --tb=line -rA tests/test_b101_flow_shown_widgets.py::test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state tests/test_zz_old092_b101_flow_shown_widgets.py::test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state tests/test_b101_flow_shown_widgets.py::test_r_fx_scr_4_1_every_flow_execution_widget_is_shown_in_a_state tests/test_zz_old092_b101_flow_shown_widgets.py::test_r_fx_scr_4_1_every_flow_execution_widget_is_shown_in_a_state 
+bringing up nodes...
+bringing up nodes...
+
+F..F                                                                     [100%]
+=================================== FAILURES ===================================
+<HOME>/work/s19_i12bc_mut/tests/test_b101_flow_shown_widgets.py:254: AssertionError: mounted and never shown: ['open_folder_session']
+<HOME>/work/s19_i12bc_mut/tests/test_b101_flow_shown_widgets.py:197: AssertionError: mounted and never shown: ['open_folder_flows']
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_zz_old092_b101_flow_shown_widgets.py::test_r_fx_scr_4_1_every_flow_execution_widget_is_shown_in_a_state
+PASSED tests/test_zz_old092_b101_flow_shown_widgets.py::test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state
+FAILED tests/test_b101_flow_shown_widgets.py::test_r_fx_scr_4_1_every_flow_execution_widget_is_shown_in_a_state
+FAILED tests/test_b101_flow_shown_widgets.py::test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state
+2 failed, 2 passed in 7.46s
+=== exit code: 1
+restored: unstaged 0, index tree 7c89fe9ef26e61b6a60b943fef23738bcacfdb1d
+
+mutant C2 applied
+=== Inc 12b E5 corrective run: e5c-03 C2 (each node beside its 092fffd version, test_zz_old092_*)
+date: 2026-11-07T00:50:55Z
+host: LAN Linux host 2
+worktree: <HOME>/work/s19_i12bc_mut
+worktree HEAD (base): 2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+main ref seen here: 2f54c7dea27d826483e5c5e596421b8b3a68bb2f (origin/main 2f54c7dea27d826483e5c5e596421b8b3a68bb2f)
+index tree (base + the corrective diff, staged): 7c89fe9ef26e61b6a60b943fef23738bcacfdb1d
+staged files vs base: 17
+unstaged changes vs index: 1
+untracked files: tests/test_zz_old092_b101_flow_shown_widgets.py tests/test_zz_old092_flow_builder_render.py tests/test_zz_old092_tui_directionb.py tests/test_zz_old092_tui_flow_builder_b94.py tests/test_zz_old092_tui_flow_persistence_ui.py
+--- unstaged diff (the one-off mutation):
+diff --git a/s19_app/tui/flow_screens.py b/s19_app/tui/flow_screens.py
+index 86782c54..232e3d33 100644
+--- a/s19_app/tui/flow_screens.py
++++ b/s19_app/tui/flow_screens.py
+@@ -1401,6 +1401,9 @@ class FlowBuilderPanel(ScrollableContainer):
+         self._refresh_name_strip()
+ 
+     def compose(self) -> ComposeResult:
++        _c2 = Static("", id="label")
++        _c2.display = False
++        yield _c2
+         with Horizontal(id="flow_ribbon"):
+             yield Static(
+                 self._name_strip_text(),
+---
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i12bc_mut/s19_app/__init__.py
+CMD: env -u NO_COLOR $PY -m pytest -q -p no:cacheprovider -n 6 --tb=line -rA tests/test_b101_flow_shown_widgets.py::test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state tests/test_zz_old092_b101_flow_shown_widgets.py::test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state 
+bringing up nodes...
+bringing up nodes...
+
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+<HOME>/work/s19_i12bc_mut/tests/test_b101_flow_shown_widgets.py:197: AssertionError: mounted and never shown: ['label']
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_zz_old092_b101_flow_shown_widgets.py::test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state
+FAILED tests/test_b101_flow_shown_widgets.py::test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state
+1 failed, 1 passed in 7.40s
+=== exit code: 1
+restored: unstaged 0, index tree 7c89fe9ef26e61b6a60b943fef23738bcacfdb1d
+
+mutant C3 applied
+=== Inc 12b E5 corrective run: e5c-03 C3 (each node beside its 092fffd version, test_zz_old092_*)
+date: 2026-11-07T00:51:03Z
+host: LAN Linux host 2
+worktree: <HOME>/work/s19_i12bc_mut
+worktree HEAD (base): 2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+main ref seen here: 2f54c7dea27d826483e5c5e596421b8b3a68bb2f (origin/main 2f54c7dea27d826483e5c5e596421b8b3a68bb2f)
+index tree (base + the corrective diff, staged): 7c89fe9ef26e61b6a60b943fef23738bcacfdb1d
+staged files vs base: 17
+unstaged changes vs index: 1
+untracked files: tests/test_zz_old092_b101_flow_shown_widgets.py tests/test_zz_old092_flow_builder_render.py tests/test_zz_old092_tui_directionb.py tests/test_zz_old092_tui_flow_builder_b94.py tests/test_zz_old092_tui_flow_persistence_ui.py
+--- unstaged diff (the one-off mutation):
+diff --git a/s19_app/tui/flow_screens.py b/s19_app/tui/flow_screens.py
+index 86782c54..4420c516 100644
+--- a/s19_app/tui/flow_screens.py
++++ b/s19_app/tui/flow_screens.py
+@@ -1011,7 +1011,7 @@ def ribbon_text(
+     right_w = min(len(right_full), max(len("session ") + 12, width * 2 // 5))
+     right = Text("session ", style=_S_DIM)
+     if path:
+-        right.append(clip_tail(path, right_w - len("session ")), style=_S_OUT)
++        right.append(clip_head(path, right_w - len("session ")), style=_S_OUT)
+     else:
+         right.append(clip_tail(RIBBON_NO_SESSION, right_w - len("session ")), style=_S_DIM)
+     left = Text(prefix)
+---
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i12bc_mut/s19_app/__init__.py
+CMD: env -u NO_COLOR $PY -m pytest -q -p no:cacheprovider -n 6 --tb=line -rA tests/test_b101_flow_shown_widgets.py::test_at_i12b_1_kind_chip_add_and_ribbon_by_keys tests/test_zz_old092_b101_flow_shown_widgets.py::test_at_i12b_1_kind_chip_add_and_ribbon_by_keys 
+bringing up nodes...
+bringing up nodes...
+
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+<HOME>/work/s19_i12bc_mut/tests/test_b101_flow_shown_widgets.py:408: AssertionError: ('/tmp/pytest-of-<user>/pytest-472/', 'proj1')
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_zz_old092_b101_flow_shown_widgets.py::test_at_i12b_1_kind_chip_add_and_ribbon_by_keys
+FAILED tests/test_b101_flow_shown_widgets.py::test_at_i12b_1_kind_chip_add_and_ribbon_by_keys
+1 failed, 1 passed in 14.76s
+=== exit code: 1
+restored: unstaged 0, index tree 7c89fe9ef26e61b6a60b943fef23738bcacfdb1d
+
+mutant C4 applied
+=== Inc 12b E5 corrective run: e5c-03 C4 (each node beside its 092fffd version, test_zz_old092_*)
+date: 2026-11-07T00:51:18Z
+host: LAN Linux host 2
+worktree: <HOME>/work/s19_i12bc_mut
+worktree HEAD (base): 2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+main ref seen here: 2f54c7dea27d826483e5c5e596421b8b3a68bb2f (origin/main 2f54c7dea27d826483e5c5e596421b8b3a68bb2f)
+index tree (base + the corrective diff, staged): 7c89fe9ef26e61b6a60b943fef23738bcacfdb1d
+staged files vs base: 17
+unstaged changes vs index: 1
+untracked files: tests/test_zz_old092_b101_flow_shown_widgets.py tests/test_zz_old092_flow_builder_render.py tests/test_zz_old092_tui_directionb.py tests/test_zz_old092_tui_flow_builder_b94.py tests/test_zz_old092_tui_flow_persistence_ui.py
+--- unstaged diff (the one-off mutation):
+diff --git a/s19_app/tui/flow_screens.py b/s19_app/tui/flow_screens.py
+index 86782c54..7b1ae44c 100644
+--- a/s19_app/tui/flow_screens.py
++++ b/s19_app/tui/flow_screens.py
+@@ -734,7 +734,7 @@ def _card_rows(blocks: Sequence[FlowBlock], index: int) -> Tuple[List[Tuple[str,
+     card. Values are clipped by kind of text: a command keeps its head, every
+     ref and path its tail (LLR-146.4); file-derived text is scrubbed (C-17)."""
+     block = blocks[index]
+-    scrub = lambda s: safe_text(s).plain  # noqa: E731 - the one sink guard
++    scrub = lambda s: Text.from_markup(safe_text(s).plain).plain  # noqa: E731 - the one sink guard
+     prev = ("image", f"← #{index}" if index > 0 else "—")
+     if isinstance(block, SourceBlock):
+         return [("file", scrub(block.image_ref)), ("fmt", block.file_type)], ("out", "image"), ""
+@@ -818,7 +818,7 @@ def _card_annotation(
+             line.append(f"{label} ", style=_S_DIM)
+         source = resolver(ref)
+         if source == "missing":
+-            name = clip_head(safe_text(ref).plain, max(6, width - 12))
++            name = safe_text(ref).plain
+             line.append("missing: ", style=_S_MISSING)
+             line.append(name, style=_S_MISSING)
+         else:
+---
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i12bc_mut/s19_app/__init__.py
+CMD: env -u NO_COLOR $PY -m pytest -q -p no:cacheprovider -n 6 --tb=line -rA tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally tests/test_zz_old092_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally 
+bringing up nodes...
+bringing up nodes...
+
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+<HOME>/work/s19_i12bc_mut/tests/test_tui_flow_builder_b94.py:444: AssertionError: │ s19                                      │    │ b77hostilemark[31m_evil1m8;;u            │
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_zz_old092_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally
+FAILED tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally
+1 failed, 1 passed in 8.97s
+=== exit code: 1
+restored: unstaged 0, index tree 7c89fe9ef26e61b6a60b943fef23738bcacfdb1d
+
+mutant C4a applied
+=== Inc 12b E5 corrective run: e5c-03 C4a (each node beside its 092fffd version, test_zz_old092_*)
+date: 2026-11-07T00:51:28Z
+host: LAN Linux host 2
+worktree: <HOME>/work/s19_i12bc_mut
+worktree HEAD (base): 2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+main ref seen here: 2f54c7dea27d826483e5c5e596421b8b3a68bb2f (origin/main 2f54c7dea27d826483e5c5e596421b8b3a68bb2f)
+index tree (base + the corrective diff, staged): 7c89fe9ef26e61b6a60b943fef23738bcacfdb1d
+staged files vs base: 17
+unstaged changes vs index: 1
+untracked files: tests/test_zz_old092_b101_flow_shown_widgets.py tests/test_zz_old092_flow_builder_render.py tests/test_zz_old092_tui_directionb.py tests/test_zz_old092_tui_flow_builder_b94.py tests/test_zz_old092_tui_flow_persistence_ui.py
+--- unstaged diff (the one-off mutation):
+diff --git a/s19_app/tui/flow_screens.py b/s19_app/tui/flow_screens.py
+index 86782c54..44f7272c 100644
+--- a/s19_app/tui/flow_screens.py
++++ b/s19_app/tui/flow_screens.py
+@@ -734,7 +734,7 @@ def _card_rows(blocks: Sequence[FlowBlock], index: int) -> Tuple[List[Tuple[str,
+     card. Values are clipped by kind of text: a command keeps its head, every
+     ref and path its tail (LLR-146.4); file-derived text is scrubbed (C-17)."""
+     block = blocks[index]
+-    scrub = lambda s: safe_text(s).plain  # noqa: E731 - the one sink guard
++    scrub = lambda s: Text.from_markup(safe_text(s).plain).plain  # noqa: E731 - the one sink guard
+     prev = ("image", f"← #{index}" if index > 0 else "—")
+     if isinstance(block, SourceBlock):
+         return [("file", scrub(block.image_ref)), ("fmt", block.file_type)], ("out", "image"), ""
+---
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i12bc_mut/s19_app/__init__.py
+CMD: env -u NO_COLOR $PY -m pytest -q -p no:cacheprovider -n 6 --tb=line -rA tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally tests/test_zz_old092_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally 
+bringing up nodes...
+bringing up nodes...
+
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+<HOME>/work/s19_i12bc_mut/tests/test_zz_old092_tui_flow_builder_b94.py:427: AssertionError: assert '_evil[red]' in '╭─ 1 ──────────────────────────────────────╮    ╭─ 2 ──────────────────────────────────────╮\n│ ◉ LOAD               ...                       │\n╰──────────────────────────────────────────╯    ╰──────────────────────────────────────────╯'
+<HOME>/work/s19_i12bc_mut/tests/test_tui_flow_builder_b94.py:444: AssertionError: │ s19                                      │    │ b77hostilemark[31m_evil1m8;;u            │
+=========================== short test summary info ============================
+FAILED tests/test_zz_old092_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally
+FAILED tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally
+2 failed in 8.74s
+=== exit code: 1
+restored: unstaged 0, index tree 7c89fe9ef26e61b6a60b943fef23738bcacfdb1d
+
+mutant C5 applied
+=== Inc 12b E5 corrective run: e5c-03 C5 (each node beside its 092fffd version, test_zz_old092_*)
+date: 2026-11-07T00:51:37Z
+host: LAN Linux host 2
+worktree: <HOME>/work/s19_i12bc_mut
+worktree HEAD (base): 2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+main ref seen here: 2f54c7dea27d826483e5c5e596421b8b3a68bb2f (origin/main 2f54c7dea27d826483e5c5e596421b8b3a68bb2f)
+index tree (base + the corrective diff, staged): 7c89fe9ef26e61b6a60b943fef23738bcacfdb1d
+staged files vs base: 17
+unstaged changes vs index: 1
+untracked files: tests/test_zz_old092_b101_flow_shown_widgets.py tests/test_zz_old092_flow_builder_render.py tests/test_zz_old092_tui_directionb.py tests/test_zz_old092_tui_flow_builder_b94.py tests/test_zz_old092_tui_flow_persistence_ui.py
+--- unstaged diff (the one-off mutation):
+diff --git a/s19_app/tui/flow_screens.py b/s19_app/tui/flow_screens.py
+index 86782c54..ff82fd05 100644
+--- a/s19_app/tui/flow_screens.py
++++ b/s19_app/tui/flow_screens.py
+@@ -872,7 +872,7 @@ def _card_lines(
+             name, value = ins[slot]
+             keep = clip_head if ext and name in ("cmd", "instr") else clip_tail
+             lines.append(row(clip_head(f"in · {name}", inner), _S_DIM))
+-            lines.append(row(keep(value, inner)))
++            lines.append(row(keep(value, inner), HILITE if "[" in value else VALUE))
+         else:
+             lines.extend([row(), row()])
+     if annotation_row:
+---
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i12bc_mut/s19_app/__init__.py
+CMD: env -u NO_COLOR $PY -m pytest -q -p no:cacheprovider -n 6 --tb=line -rA tests/test_flow_builder_render.py::test_at088b_check_ref_label_renders_literally tests/test_zz_old092_flow_builder_render.py::test_at088b_check_ref_label_renders_literally tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally tests/test_zz_old092_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally tests/test_tui_directionb.py::test_at_flow_block_label_markup_safe tests/test_zz_old092_tui_directionb.py::test_at_flow_block_label_markup_safe 
+bringing up nodes...
+bringing up nodes...
+
+.F.FF.                                                                   [100%]
+=================================== FAILURES ===================================
+<HOME>/work/s19_i12bc_mut/tests/test_tui_directionb.py:5869: AssertionError: (Style(foreground=Color(145, 171, 236)), Style(foreground=Color(233, 233, 233)))
+<HOME>/work/s19_i12bc_mut/tests/test_flow_builder_render.py:560: AssertionError: (Style(foreground=Color(145, 171, 236)), Style(foreground=Color(233, 233, 233)))
+<HOME>/work/s19_i12bc_mut/tests/test_tui_flow_builder_b94.py:452: AssertionError: (Style(foreground=Color(145, 171, 236)), Style(foreground=Color(233, 233, 233)))
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_zz_old092_tui_directionb.py::test_at_flow_block_label_markup_safe
+PASSED tests/test_zz_old092_flow_builder_render.py::test_at088b_check_ref_label_renders_literally
+PASSED tests/test_zz_old092_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally
+FAILED tests/test_tui_directionb.py::test_at_flow_block_label_markup_safe - A...
+FAILED tests/test_flow_builder_render.py::test_at088b_check_ref_label_renders_literally
+FAILED tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally
+3 failed, 3 passed in 9.38s
+=== exit code: 1
+restored: unstaged 0, index tree 7c89fe9ef26e61b6a60b943fef23738bcacfdb1d
+
+mutant C6 applied
+=== Inc 12b E5 corrective run: e5c-03 C6 (each node beside its 092fffd version, test_zz_old092_*)
+date: 2026-11-07T00:51:47Z
+host: LAN Linux host 2
+worktree: <HOME>/work/s19_i12bc_mut
+worktree HEAD (base): 2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+main ref seen here: 2f54c7dea27d826483e5c5e596421b8b3a68bb2f (origin/main 2f54c7dea27d826483e5c5e596421b8b3a68bb2f)
+index tree (base + the corrective diff, staged): 7c89fe9ef26e61b6a60b943fef23738bcacfdb1d
+staged files vs base: 17
+unstaged changes vs index: 1
+untracked files: tests/test_zz_old092_b101_flow_shown_widgets.py tests/test_zz_old092_flow_builder_render.py tests/test_zz_old092_tui_directionb.py tests/test_zz_old092_tui_flow_builder_b94.py tests/test_zz_old092_tui_flow_persistence_ui.py
+--- unstaged diff (the one-off mutation):
+diff --git a/s19_app/tui/flow_screens.py b/s19_app/tui/flow_screens.py
+index 86782c54..cdce8313 100644
+--- a/s19_app/tui/flow_screens.py
++++ b/s19_app/tui/flow_screens.py
+@@ -554,7 +554,6 @@ _KIND_LOOK: Mapping[str, Tuple[str, str, str, str]] = {
+     BLOCK_WRITE_OUT: ("▼", "WRITE-OUT", GREEN, "writes the image"),
+     BLOCK_A2B: ("⏚", "A2B-DIFF", PURPLE, "diffs two images"),
+     BLOCK_EXTERNAL_STEP: ("»", "EXT-STEP", LBLUE, "human: log + file"),
+-    BLOCK_REPORT: ("≡", "REPORT", DGRAY, "report marker"),
+ }
+ 
+ #: The single-ref input's field label and placeholder, per kind (fb_A: the
+---
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i12bc_mut/s19_app/__init__.py
+CMD: env -u NO_COLOR $PY -m pytest -q -p no:cacheprovider -n 6 --tb=line -rA tests/test_tui_flow_persistence_ui.py::test_at006_report_bearing_flow_shows_report_row tests/test_zz_old092_tui_flow_persistence_ui.py::test_at006_report_bearing_flow_shows_report_row 
+bringing up nodes...
+bringing up nodes...
+
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+<HOME>/work/s19_i12bc_mut/tests/test_tui_flow_persistence_ui.py:243: AssertionError: assert '≡ REPORT' in '╭─ 1 ──────────────────────────╮    ╭─ 2 ──────────────────────────╮\n│ ◉ LOAD                       │    │ · REPORT ...           │───▶│ report marker                │\n╰──────────────────────────────╯    ╰──────────────────────────────╯'
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_zz_old092_tui_flow_persistence_ui.py::test_at006_report_bearing_flow_shows_report_row
+FAILED tests/test_tui_flow_persistence_ui.py::test_at006_report_bearing_flow_shows_report_row
+1 failed, 1 passed in 4.37s
+=== exit code: 1
+restored: unstaged 0, index tree 7c89fe9ef26e61b6a60b943fef23738bcacfdb1d
+
+old copies removed; untracked now: 
+
+--- mutate.py (<HOME>/work/s19_i12bc-helpers/mutate.py, removed after the runs):
+"""One-off mutants of Inc 12b E5 corrective, applied to the mutant worktree
+(unstaged; the staged index is the corrective tree). Usage: mutate.py <name>."""
+import pathlib
+import sys
+
+FS = "s19_app/tui/flow_screens.py"
+OFC = "s19_app/tui/open_folder_chip.py"
+MUTANTS = {
+    # QA-1: a header widget of both windows hidden (outside each panel).
+    "C1": [(OFC,
+            '        """Resolve the target so the initial dimmed/tooltip state renders."""\n        self.refresh_target()\n',
+            '        """Resolve the target so the initial dimmed/tooltip state renders."""\n        self.refresh_target()\n        self.display = False\n')],
+    # QA-7: a hidden widget whose id a shown widget also holds (Textual's Select label).
+    "C2": [(FS,
+            '    def compose(self) -> ComposeResult:\n        with Horizontal(id="flow_ribbon"):\n',
+            '    def compose(self) -> ComposeResult:\n        _c2 = Static("", id="label")\n        _c2.display = False\n        yield _c2\n        with Horizontal(id="flow_ribbon"):\n')],
+    # QA-6: the ribbon keeps the session path's head, not its tail.
+    "C3": [(FS,
+            '        right.append(clip_tail(path, right_w - len("session ")), style=_S_OUT)',
+            '        right.append(clip_head(path, right_w - len("session ")), style=_S_OUT)')],
+    # R-2: the card value rows interpret markup (M2) and the origin note is not clipped.
+    "C4": [(FS,
+            '    scrub = lambda s: safe_text(s).plain  # noqa: E731 - the one sink guard',
+            '    scrub = lambda s: Text.from_markup(safe_text(s).plain).plain  # noqa: E731 - the one sink guard'),
+           (FS,
+            '            name = clip_head(safe_text(ref).plain, max(6, width - 12))',
+            '            name = safe_text(ref).plain')],
+    # R-2 control: M2 alone (the note clipped as shipped).
+    "C4a": [(FS,
+             '    scrub = lambda s: safe_text(s).plain  # noqa: E731 - the one sink guard',
+             '    scrub = lambda s: Text.from_markup(safe_text(s).plain).plain  # noqa: E731 - the one sink guard')],
+    # R-3: a value row takes a style from its input (one exact span, another style).
+    "C5": [(FS,
+            '            lines.append(row(keep(value, inner)))',
+            '            lines.append(row(keep(value, inner), HILITE if "[" in value else VALUE))')],
+    # R-4: the REPORT entry of the card look removed (the title falls back to "· REPORT").
+    "C6": [(FS,
+            '    BLOCK_REPORT: ("≡", "REPORT", DGRAY, "report marker"),\n',
+            '')],
+}
+
+for path, old, new in MUTANTS[sys.argv[1]]:
+    p = pathlib.Path(path)
+    s = p.read_text(encoding="utf-8")
+    assert s.count(old) == 1, (sys.argv[1], path, s.count(old))
+    p.write_text(s.replace(old, new), encoding="utf-8")
+print(f"mutant {sys.argv[1]} applied")

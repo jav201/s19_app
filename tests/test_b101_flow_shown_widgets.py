@@ -8,13 +8,19 @@ press that names no block kind changes nothing) and the acceptance case
 AT-I12b-1, one node per case of ``inc-12b/02-test-cases.md``.
 
 The two walks drive the product's own controls (chip presses, Variables, Add,
-Import, Run, Save Set), collect after every state the ids of the window's
-widgets that are shown (``tests.b97_probes.is_displayed``) and assert that no
-id of the population (the union of the ids mounted over the walked states) is
-never shown. Each walk asserts its population size first, so a vacuous walk
-fails. Everything is read off what the app paints or its widgets display; the
-kind is read through the kind tag, the chip marks and the inputs shown, never
-through the panel's own attribute. No product file is edited here and the OS
+Import, Run, Save Set) and collect after every state the window's widgets that
+carry an id, over the whole window (``#screen_flow``, ``#screen_flow_execution``:
+its header, the window itself and its panel). The population is the union of
+those widgets over the walked states, counted by widget identity, so two
+widgets that share an id are two members and one shown cannot hide the other.
+A widget is *shown* when ``display`` holds on it and on every widget that
+holds it, up to the screen (``tests.b97_probes.is_displayed``, CTX-SHELL's
+"displayed"); ``visibility`` and the region's size are not read. Each walk
+asserts its population size first, so a vacuous walk fails, and then that no
+member is never shown. Everything is read off what the app paints or its
+widgets display; the kind is read through the kind tag, the chip marks and the
+inputs shown, never through the panel's own attribute. No product file is
+edited here and the OS
 clipboard is never touched (the per-test ``LOCALAPPDATA`` isolation is the
 shared one).
 
@@ -82,32 +88,32 @@ def _drive(tmp_path: Path, body):
     return asyncio.run(_run())
 
 
-def _population(panel) -> set:
-    """The ids of the widgets mounted in the window now (panel included)."""
-    return {w.id for w in (panel, *panel.query("*")) if w.id}
-
-
 def _shown(panel) -> set:
-    """The ids of the window's widgets that are shown now."""
+    """The ids of the panel's widgets that are shown now (panel included)."""
     return {w.id for w in (panel, *panel.query("*")) if w.id and is_displayed(w)}
 
 
 class _Walk:
-    """Accumulates the population and the shown set over the walked states."""
+    """Accumulates, over the walked states, the window's widgets with an id
+    (keyed by identity; the walk holds each widget, so no key is reused) and
+    the keys of those shown in at least one state."""
 
-    def __init__(self, panel) -> None:
-        self.panel = panel
-        self.population: set = set()
+    def __init__(self, window) -> None:
+        self.window = window
+        self.population: dict = {}
         self.shown: set = set()
         self.states: list = []
 
     def collect(self, state: str) -> None:
-        self.population |= _population(self.panel)
-        self.shown |= _shown(self.panel)
+        for widget in (self.window, *self.window.query("*")):
+            if widget.id:
+                self.population[id(widget)] = widget
+                if is_displayed(widget):
+                    self.shown.add(id(widget))
         self.states.append(state)
 
     def never_shown(self) -> list:
-        return sorted(self.population - self.shown)
+        return sorted(w.id for key, w in self.population.items() if key not in self.shown)
 
 
 def _painted(app, widget) -> str:
@@ -137,10 +143,10 @@ async def _press_kind_chip(app, pilot, panel, kind: str, tag: str) -> None:
 
 
 def test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state(tmp_path: Path) -> None:
-    """R-TUI-059.25 (case /1): walk [opened; each of the 7 kind chips pressed;
-    Variables opened and closed; the Add notice (LOAD, empty image file, Add);
-    3 x (prg.s19, Add)] -> 0 ids never shown, at least 45 ids in the
-    population.
+    """R-TUI-059.25 (case /1): walk the window ``#screen_flow`` over [opened;
+    each of the 7 kind chips pressed; Variables opened and closed; the Add
+    notice (LOAD, empty image file, Add); 3 x (prg.s19, Add)] -> 0 widgets
+    with an id never shown, at least 45 in the population.
 
     RED on base: five widgets (the help sentence, the grid canvas, the
     numbered list, the kind dropdown and the session line) are mounted and
@@ -149,7 +155,7 @@ def test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state(tmp_path: 
 
     async def body(app, pilot, project_dir):
         panel = await open_flow_builder(app, pilot)
-        walk = _Walk(panel)
+        walk = _Walk(app.query_one("#screen_flow"))
         await settled(pilot, lambda: _tag(app, panel) != "", "the kind tag is painted")
         walk.collect("opened")
 
@@ -197,10 +203,11 @@ def test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state(tmp_path: 
 
 
 def test_r_fx_scr_4_1_every_flow_execution_widget_is_shown_in_a_state(tmp_path: Path) -> None:
-    """R-FX-SCR.4 (case /1): walk [Flow Execution shown, no lane;
-    ``flash_chain`` imported; Run, until ``#fx_required`` is shown; set name
-    ``s``, Save Set, until ``#fx_notice`` is shown] -> 0 ids never shown, at
-    least 30 ids in the population (the lane widgets mount on the import).
+    """R-FX-SCR.4 (case /1): walk the window ``#screen_flow_execution`` over
+    [Flow Execution shown, no lane; ``flash_chain`` imported; Run, until
+    ``#fx_required`` is shown; set name ``s``, Save Set, until ``#fx_notice``
+    is shown] -> 0 widgets with an id never shown, at least 30 in the
+    population (the lane widgets mount on the import).
 
     RED on base: the help sentence is mounted and never shown; the failure
     message lists its id.
@@ -208,7 +215,7 @@ def test_r_fx_scr_4_1_every_flow_execution_widget_is_shown_in_a_state(tmp_path: 
 
     async def body(app, pilot, project_dir):
         panel = await open_flow_execution(app, pilot)
-        walk = _Walk(panel)
+        walk = _Walk(app.query_one("#screen_flow_execution"))
         await settled(pilot, lambda: panel.lane_count() == 0, "no lane yet")
         walk.collect("no lane")
 
@@ -338,7 +345,7 @@ def test_at_i12b_1_kind_chip_add_and_ribbon_by_keys(tmp_path: Path) -> None:
     field; ``tab`` to ``+ Add``; ``enter``. The kind tag reads ``CHECK``, the
     gating control is shown, the pipeline paints one CHECK card, and the
     ribbon ``#flow_name_strip`` shows ``session`` with the project folder's
-    path tail.
+    path tail, which ends with the folder's name.
 
     The ribbon part holds on base; the walk nodes carry the removed widgets.
     """
@@ -384,15 +391,18 @@ def test_at_i12b_1_kind_chip_add_and_ribbon_by_keys(tmp_path: Path) -> None:
             _painted(app, panel.query_one("#flow_name_strip")),
             # The ribbon paints the OS path string (backslashes on Windows).
             str(project_dir),
+            project_dir.name,
         )
 
-    tag, gating_shown, pipeline, ribbon, project = _drive(tmp_path, body)
+    tag, gating_shown, pipeline, ribbon, project, folder = _drive(tmp_path, body)
     assert CHECK_TAG in tag, tag
     assert gating_shown is True
     assert pipeline.count(CHECK_TAG) == 1, pipeline
     assert "session" in ribbon, ribbon
-    # The ribbon keeps the tail of the project folder's path (clipped with an
-    # ellipsis at the head, and by the painted width at the end): what follows
-    # ``session`` is a stretch of that path.
+    # The ribbon keeps the tail of the project folder's path, clipped with an
+    # ellipsis at the head: what follows ``session`` is a stretch of that path
+    # and ends with the project folder's name (118x54 paints it whole, e.g.
+    # ``session …/.s19tool/workarea/proj1``).
     shown_path = ribbon.split("session", 1)[1].strip().strip("…").strip()
     assert len(shown_path) >= 8 and shown_path in project, (shown_path, project)
+    assert shown_path.endswith(folder), (shown_path, folder)

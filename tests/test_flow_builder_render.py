@@ -18,6 +18,8 @@ import inspect
 import textwrap
 from pathlib import Path
 
+from rich.text import Text
+from textual.content import Content
 from textual.widgets import Button, Select, Static
 
 from s19_app.tui.app import S19TuiApp
@@ -28,6 +30,7 @@ from s19_app.tui.flow_screens import (
     _memory_ribbon_text,
     pipeline_text,
 )
+from s19_app.tui.insight_style import VALUE
 from s19_app.tui.services.flow_execution_service import run_flow
 from s19_app.tui.services.flow_model import (
     BLOCK_CHECK,
@@ -533,9 +536,13 @@ def test_at088b_check_ref_label_renders_literally(tmp_path: Path) -> None:
             app.query_one("#flow_add", Button).press()
             await pilot.pause()
             chain = app.query_one("#flow_pipeline", Static)
-            return chain.render().plain, list(chain.render().spans)
+            # The card value rows' style (``VALUE``, the default of the card's
+            # ``row()``) as a rendered span holds it: appended as a span, as
+            # ``row()`` appends a value, and converted the same way.
+            value_style = Content.from_rich_text(Text().append("x", style=VALUE)).spans[0].style
+            return chain.render().plain, list(chain.render().spans), value_style
 
-    plain, spans = asyncio.run(_drive())
+    plain, spans, value_style = asyncio.run(_drive())
     # Presence: the hostile label reached the card's own ``in · doc`` value
     # row with its markup intact. The origin note under the card's inputs
     # repeats the ref through its own sink, so a containment in the whole
@@ -550,6 +557,7 @@ def test_at088b_check_ref_label_renders_literally(tmp_path: Path) -> None:
     cutting = [s for s in spans if start < s.start < stop or start < s.end < stop]
     exact = [s for s in spans if (s.start, s.end) == (start, stop)]
     assert cutting == [] and len(exact) == 1, (cutting, exact)
+    assert exact[0].style == value_style, (exact[0].style, value_style)
     # Absence (LLR-116.7), co-asserted with the containment above. Scoped to
     # exclude U+000A: this sink is a MULTI-ROW painting and the pipeline
     # composes the row separator itself, so a newline here is developer

@@ -523,15 +523,17 @@ def notice_lines(app, panel) -> List[str]:
 
 def test_tc_b97_13_pipeline_cards_and_cables_replace_list_and_canvas(tmp_path: Path) -> None:
     """TC-B97-13 (LLR-146.1): with ``patch_chain`` loaded at 118x54 the
-    numbered list and the grid canvas are not displayed, and the pipeline
-    paints 4 cards on one band (all four tops on one row, all four bottoms on
-    one row) joined by 3 cables on one row, the kinds in block order. Empty
-    arm: with no blocks the pipeline paints one line.
+    pipeline paints 4 cards on one band (all four tops on one row, all four
+    bottoms on one row) joined by 3 cables on one row, the kinds in block
+    order. Empty arm: with no blocks the pipeline paints one line.
 
-    RED on main (main-observable clause first, PC-11): the numbered list
-    displayed at (5, 37, 110, 5). Mutation: a cable left out between two cards.
-    The list and canvas are gone from the screen: that absence is guarded by
-    the walks R-TUI-059.25/1 (``tests/test_b101_flow_shown_widgets.py``).
+    RED on main at batch-97 (PC-11), by the clause Inc 12b dropped with the
+    widgets: the numbered list displayed at (5, 37, 110, 5). Mutation: a cable
+    left out between two cards. Inc 12b removed the numbered list and the grid
+    canvas; this node no longer reads them. A copy of either restored hidden
+    is caught by the walks R-TUI-059.25/1
+    (``tests/test_b101_flow_shown_widgets.py``); one restored displayed has no
+    standing guard (accepted residual, Inc 12b E5 QA-4).
     """
 
     async def body(app, pilot, panel, project_dir):
@@ -1008,7 +1010,9 @@ def test_tc_b97_49_session_on_the_ribbon(tmp_path: Path, arm: str) -> None:
 
     RED on main: the session sat in a displayed line of its own
     (``flow_screens.py:764``). Mutation: the ribbon keeping the path's head.
-    That the old line is gone is guarded by the walks R-TUI-059.25/1.
+    Inc 12b removed the old session line; a copy restored hidden is caught by
+    the walks R-TUI-059.25/1, one restored displayed has no standing guard
+    (accepted residual, Inc 12b E5 QA-4).
     """
 
     async def body(app, pilot, panel, project_dir):

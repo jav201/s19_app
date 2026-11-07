@@ -54,7 +54,7 @@ in:
 out: ComposeResult widgets
 func: changed (D-4 A, D-5 A). was: also yields the help label `#flow_help` (`:1607-1612`), `#flow_canvas` and `#flow_blocks` painted from `_canvas_text()` / `_blocks_text()` (`:1619-1620`), the select `#flow_kind` as the first child of `#flow_add_row` (`:1627`) and `#flow_ext_session` (`:1692-1693`). / now: none of the five; every other part in the order of CTX-BUILDER (R-TUI-059.21).
 module: s19_app/tui/flow_screens.py
-examples: (R-TUI-059.25/1) walk [opened; the 7 kind chips; Variables open; the Add notice; 3 LOAD blocks] → 0 ids never shown; `48` ids in the population (the union of the ids mounted over the walked states, E3A-03)
+examples: (R-TUI-059.25/1) walk [opened; the 7 kind chips; Variables open; the Add notice; 3 LOAD blocks] → 0 ids never shown; `48` ids in the population (the union of the ids mounted over the walked states, E3A-03; E5 QA-1, QA-7: the walk counts the whole window by widget, `53` = these 48 + `screen_flow`, `window_help_flow`, `open_folder_flows` + Textual's internal `label` of the two Selects, `e5c-02`)
 examples: (R-TUI-059.25/1 neg, the base) the same walk → never shown: `flow_blocks`, `flow_canvas`, `flow_ext_session`, `flow_help`, `flow_kind` (B line 25)
 
 FlowBuilderPanel._refresh_blocks
@@ -172,7 +172,7 @@ in:
 out: ComposeResult widgets
 func: changed (D-5 A). was: also yields the help label `#fx_help` (`:3320-3326`) between the run row and the set row. / now: without it; the parts in the order of CTX-FXSCREEN (R-FX-SCR.2).
 module: s19_app/tui/flow_screens.py
-examples: (R-FX-SCR.4/1) walk [no lane; `flash_chain` imported; its Run waiting; the set saved as `s`] → 0 ids never shown; `34` ids in the population (the union over the walked states; the lane widgets mount on the import, E3A-03)
+examples: (R-FX-SCR.4/1) walk [no lane; `flash_chain` imported; its Run waiting; the set saved as `s`] → 0 ids never shown; `34` ids in the population (the union over the walked states; the lane widgets mount on the import, E3A-03; E5 QA-1, QA-7: the walk counts the whole window by widget, `38` = these 34 + `screen_flow_execution`, `window_help_flow_execution`, `open_folder_session` + Textual's internal `label` of the one Select, `e5c-02`)
 examples: (R-FX-SCR.4/1 neg, the base) the same walk → never shown: `fx_help` (B line 27)
 
 FlowExecutionPanel.on_mount

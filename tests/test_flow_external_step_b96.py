@@ -8,9 +8,9 @@ refuse the block); execution WITHOUT a confirmation PAUSES the run
 ("paused - waiting for a human") and skips every downstream block, WITH one it validates
 the log + output evidence, COPIES the output into the session artifact
 folder (``copy_into_workarea`` — the copied path rides ``written_paths``)
-and the chain goes on; the builder exposes the kind on the palette + the
-kind select, gates its config row, and the fx lane mounts the confirm
-button that re-runs the paused lane.
+and the chain goes on; the builder exposes the kind as a chip on the
+palette, gates its config row, and the fx lane mounts the confirm button
+that re-runs the paused lane.
 """
 
 from __future__ import annotations

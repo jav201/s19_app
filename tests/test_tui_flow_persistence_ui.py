@@ -15,8 +15,9 @@ markup-safety):
 - AT-004 (list arm) — a flow copied into ``flows/`` appears in the Load list
   (the filedialog→copy step itself is service-covered by AT-P1-10, C-12, which
   cannot run headless).
-- AT-006 / AMD-2 — a loaded report-bearing flow renders a ``REPORT`` row (the
-  pipeline card's REPORT arm is non-vacuous; Inc 12b re-pointed it from the
+- AT-006 / AMD-2 — a loaded report-bearing flow renders a ``≡ REPORT`` card
+  title (the REPORT entry's glyph, so the arm is non-vacuous: a kind with no
+  entry paints the fallback ``· REPORT``; Inc 12b re-pointed it from the
   removed block list).
 - AT-006 / TC-016 — quarantine card PAINTED ``sev-error`` on a rejected load,
   one line per finding, hostile ref rendered literally (no injected span), and
@@ -238,7 +239,8 @@ def test_at006_report_bearing_flow_shows_report_row(tmp_path: Path) -> None:
             return app.query_one("#flow_pipeline", Static).render().plain
 
     blocks_text = asyncio.run(_drive())
-    assert "REPORT" in blocks_text
+    # The REPORT entry's glyph: a kind with no entry paints ``· REPORT``.
+    assert "≡ REPORT" in blocks_text
 
 
 # --------------------------------------------------------------------------- #
