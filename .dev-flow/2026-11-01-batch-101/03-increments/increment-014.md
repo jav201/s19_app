@@ -76,6 +76,7 @@ Committed: `git diff --stat main...HEAD` (51 files, +5693 / −405). Uncommitted
 | `tests/test_docs_canon.py` | test | US-README-1 | AT-285 helpers extended: `=` / `]` glyphs, inherited keys from `_merged_bindings`, palette-conditioned `ctrl+p` + monkeypatch negative control |
 | `tests/test_id_registry.py` | test | US-HELP-1 | TC-607 `EXPECTED_SCANNED_TEST_FILES` 250 → 252 (measured) |
 | `tests/test_window_usage_help.py` | test | US-HELP-1 | tc707 nodes re-bodied (copy, numbering, census, boundary); stale docstrings refreshed (F5) |
+| `s19_app/version.py` | source | US-REL-1 | version `1.0.0rc1` → `1.0.0` at the batch close, with `pyproject.toml`, for the v1.0.0 tag (operator's advance approval, `05-close.md`) |
 
 | Count | Value |
 |---|---|

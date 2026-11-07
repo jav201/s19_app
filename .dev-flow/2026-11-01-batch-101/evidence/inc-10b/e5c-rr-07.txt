@@ -1,0 +1,23 @@
+== e5c-rr-07  2026-11-07T12:16:11Z  host: LAN Linux laptop
+base commit (HEAD): 6f1743c1ad54ff7db89e8fcd4e96266414950f42  main: 6f1743c1ad54ff7db89e8fcd4e96266414950f42  origin/main: 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+staged tree (index): 3e43288889bc1d9f0c42848531081e532b187c92
+working tree = index (no mutant edit)
+python: Python 3.11.18
+s19_app.__file__: <HOME>/work/s19_i10brr/s19_app/__init__.py
+CMD: cd <HOME>/work/s19_i10brr && env -u NO_COLOR timeout 1800 <CONDA>/envs/s19ci/bin/python -m pytest -m serial_timing -p no:xdist -p no:cacheprovider tests/test_b101_inplace_views.py
+--- pytest output
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0
+rootdir: <HOME>/work/s19_i10brr
+configfile: pyproject.toml
+plugins: platformdirs-4.14.3, xdist-3.8.0
+collected 22 items / 21 deselected / 1 selected
+
+tests/test_b101_inplace_views.py QC-TM-10b-1 case_06: 220040 tags, 0.360 s
+.                                       [100%]
+============================= QC-TM timing margins =============================
+64.0%  0.360 s / 1.000 s  QC-TM-10b-1 A2L refresh 220040 tags  tests/test_b101_inplace_views.py::test_qc_tm_10b_1_a2l_refresh_cost_on_the_largest_a2l
+QC-TM: 1 bounds, 0 under 20 % margin
+
+====================== 1 passed, 21 deselected in 31.15s =======================
+exit: 0  end 2026-11-07T12:16:45Z

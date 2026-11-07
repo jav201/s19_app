@@ -1,0 +1,333 @@
+# e5c-07 — R-1 (orchestrator ruling): width bound measured before the first card. LAN Linux host 2, Python 3.11.18, env -u NO_COLOR. Run 2 of 2 (run 1 had a script restore bug that left the bound mutant in the tree for the last command; discarded, this is the clean one-script rerun).
+== base: 2f54c7dea27d826483e5c5e596421b8b3a68bb2f  main: 2f54c7dea27d826483e5c5e596421b8b3a68bb2f  origin/main: 2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+== staged tree: e381ff175da67579e56c398e6d7346ab748afc66
+== unstaged: 0 untracked: 0
+== s19_app.__file__: <HOME>/work/s19_i12br1_wt/s19_app/__init__.py
+######## GREEN final tree: the two nodes
+---- CMD: env -u NO_COLOR python -m pytest tests/test_tui_flow_builder_b94.py::test_at_b94_15_fb_a_surface_and_wired_patch_run tests/test_tui_flow_builder_b94.py::test_tc_b94_20_fb_a_composition_census -rA --tb=short -p no:xdist -p no:cacheprovider
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: <HOME>/work/s19_i12br1_wt
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 2 items
+
+tests/test_tui_flow_builder_b94.py ..                                    [100%]
+
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_tui_flow_builder_b94.py::test_at_b94_15_fb_a_surface_and_wired_patch_run
+PASSED tests/test_tui_flow_builder_b94.py::test_tc_b94_20_fb_a_composition_census
+============================== 2 passed in 11.50s ==============================
+exit=0
+######## MUTANT 1: card renderer one cell wider (pipeline_layout card_w + 1)
+ s19_app/tui/flow_screens.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+---- CMD: env -u NO_COLOR python -m pytest tests/test_tui_flow_builder_b94.py::test_at_b94_15_fb_a_surface_and_wired_patch_run tests/test_tui_flow_builder_b94.py::test_tc_b94_20_fb_a_composition_census -rA --tb=short -p no:xdist -p no:cacheprovider
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: <HOME>/work/s19_i12br1_wt
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 2 items
+
+tests/test_tui_flow_builder_b94.py FF                                    [100%]
+
+=================================== FAILURES ===================================
+_______________ test_at_b94_15_fb_a_surface_and_wired_patch_run ________________
+tests/test_tui_flow_builder_b94.py:213: in test_at_b94_15_fb_a_surface_and_wired_patch_run
+    assert sized_for > 0 and all(len(line) <= sized_for for line in canvas.splitlines()), sized_for
+E   AssertionError: 92
+E   assert (92 > 0 and False)
+E    +  where False = all(<generator object test_at_b94_15_fb_a_surface_and_wired_patch_run.<locals>.<genexpr> at 0x7fb326a44f20>)
+____________________ test_tc_b94_20_fb_a_composition_census ____________________
+tests/test_tui_flow_builder_b94.py:556: in test_tc_b94_20_fb_a_composition_census
+    assert sized_for > 0 and all(len(line) <= sized_for for line in canvas.splitlines()), sized_for
+E   AssertionError: 92
+E   assert (92 > 0 and False)
+E    +  where False = all(<generator object test_tc_b94_20_fb_a_composition_census.<locals>.<genexpr> at 0x7fb325cc4660>)
+=========================== short test summary info ============================
+FAILED tests/test_tui_flow_builder_b94.py::test_at_b94_15_fb_a_surface_and_wired_patch_run
+FAILED tests/test_tui_flow_builder_b94.py::test_tc_b94_20_fb_a_composition_census
+============================== 2 failed in 7.81s ===============================
+exit=1
+== restored; unstaged: 0
+######## MUTANT 2: bound one less (<= sized_for - 1)
+ tests/test_tui_flow_builder_b94.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+---- CMD: env -u NO_COLOR python -m pytest tests/test_tui_flow_builder_b94.py::test_at_b94_15_fb_a_surface_and_wired_patch_run tests/test_tui_flow_builder_b94.py::test_tc_b94_20_fb_a_composition_census -rA --tb=short -p no:xdist -p no:cacheprovider
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: <HOME>/work/s19_i12br1_wt
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 2 items
+
+tests/test_tui_flow_builder_b94.py FF                                    [100%]
+
+=================================== FAILURES ===================================
+_______________ test_at_b94_15_fb_a_surface_and_wired_patch_run ________________
+tests/test_tui_flow_builder_b94.py:213: in test_at_b94_15_fb_a_surface_and_wired_patch_run
+    assert sized_for > 0 and all(len(line) <= sized_for - 1 for line in canvas.splitlines()), sized_for
+E   AssertionError: 92
+E   assert (92 > 0 and False)
+E    +  where False = all(<generator object test_at_b94_15_fb_a_surface_and_wired_patch_run.<locals>.<genexpr> at 0x7f2e98bfbe60>)
+____________________ test_tc_b94_20_fb_a_composition_census ____________________
+tests/test_tui_flow_builder_b94.py:556: in test_tc_b94_20_fb_a_composition_census
+    assert sized_for > 0 and all(len(line) <= sized_for - 1 for line in canvas.splitlines()), sized_for
+E   AssertionError: 92
+E   assert (92 > 0 and False)
+E    +  where False = all(<generator object test_tc_b94_20_fb_a_composition_census.<locals>.<genexpr> at 0x7f2e97defd80>)
+=========================== short test summary info ============================
+FAILED tests/test_tui_flow_builder_b94.py::test_at_b94_15_fb_a_surface_and_wired_patch_run
+FAILED tests/test_tui_flow_builder_b94.py::test_tc_b94_20_fb_a_composition_census
+============================== 2 failed in 7.84s ===============================
+exit=1
+== restored; unstaged: 0
+######## GREEN: whole files
+---- CMD: env -u NO_COLOR python -m pytest tests/test_tui_flow_builder_b94.py tests/test_address_census.py tests/test_suite_hygiene.py -rA --tb=short -n 6 --dist loadfile -m not serial_timing -p no:cacheprovider
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: <HOME>/work/s19_i12br1_wt
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+created: 6/6 workers
+6 workers [94 items]
+
+........................................................................ [ 76%]
+......................                                                   [100%]
+==================================== PASSES ====================================
+___________ test_at_b83_05_address_params_equals_the_live_derivation ___________
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+----------------------------- Captured stdout call -----------------------------
+sleep=66.7ms clock=66.7ms diff=0.00%
+sleep=50.0ms clock=50.0ms diff=0.00%
+sleep=40.0ms clock=40.0ms diff=0.00%
+sleep=33.3ms clock=33.3ms diff=0.00%
+sleep=28.6ms clock=28.6ms diff=0.00%
+sleep=25.0ms clock=25.0ms diff=0.00%
+sleep=22.2ms clock=22.2ms diff=0.00%
+sleep=20.0ms clock=20.0ms diff=0.00%
+sleep=18.2ms clock=18.2ms diff=0.00%
+sleep=16.7ms clock=16.7ms diff=0.00%
+sleep=15.4ms clock=15.4ms diff=0.00%
+sleep=14.3ms clock=14.3ms diff=0.00%
+sleep=13.3ms clock=13.3ms diff=0.00%
+sleep=12.5ms clock=12.5ms diff=0.32%
+sleep=11.8ms clock=11.8ms diff=0.00%
+sleep=11.1ms clock=11.1ms diff=0.00%
+sleep=10.5ms clock=10.5ms diff=0.00%
+sleep=10.0ms clock=10.0ms diff=0.01%
+sleep=9.5ms clock=9.6ms diff=0.52%
+sleep=9.1ms clock=9.1ms diff=0.00%
+sleep=8.7ms clock=8.7ms diff=0.01%
+_______________ test_r_tst_042_margin_report_is_a_test_property ________________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+----------------------------- Captured stdout call -----------------------------
+running: <HOME>/miniconda3/envs/s19ci/bin/python -mpytest --basetemp=/tmp/pytest-of-<user><USER>/pytest-487/popen-gw0/test_r_tst_042_margin_report_is_a_test_property0/runpytest-0 -p no:cacheprovider --junitxml=junit.xml
+     in: /tmp/pytest-of-<user><USER>/pytest-487/popen-gw0/test_r_tst_042_margin_report_is_a_test_property0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: /tmp/pytest-of-<user><USER>/pytest-487/popen-gw0/test_r_tst_042_margin_report_is_a_test_property0
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+test_margin_property.py .                                                [100%]
+
+- generated xml file: /tmp/pytest-of-<user><USER>/pytest-487/popen-gw0/test_r_tst_042_margin_report_is_a_test_property0/junit.xml -
+============================= QC-TM timing margins =============================
+LOW 15.0%  0.850 s / 1.000 s  p  test_margin_property.py::test_arm
+QC-TM: 1 bounds, 1 under 20 % margin
+============================== 1 passed in 0.01s ===============================
+_______________ test_r_tst_043_045_qc_tm_section_rows_and_count ________________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+----------------------------- Captured stdout call -----------------------------
+running: <HOME>/miniconda3/envs/s19ci/bin/python -mpytest --basetemp=/tmp/pytest-of-<user><USER>/pytest-487/popen-gw0/test_r_tst_043_045_qc_tm_section_rows_and_count0/runpytest-0 -p no:cacheprovider
+     in: /tmp/pytest-of-<user><USER>/pytest-487/popen-gw0/test_r_tst_043_045_qc_tm_section_rows_and_count0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: /tmp/pytest-of-<user><USER>/pytest-487/popen-gw0/test_r_tst_043_045_qc_tm_section_rows_and_count0
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 3 items
+
+test_qc_tm_rows.py ...                                                   [100%]
+============================= QC-TM timing margins =============================
+LOW 15.0%  0.850 s / 1.000 s  b  test_qc_tm_rows.py::test_b
+25.0%  0.750 s / 1.000 s  c  test_qc_tm_rows.py::test_c
+40.0%  0.600 s / 1.000 s  a  test_qc_tm_rows.py::test_a
+QC-TM: 3 bounds, 1 under 20 % margin
+
+============================== 3 passed in 0.01s ===============================
+_____________ test_r_tst_043_2_teardown_error_report_gives_one_row _____________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+----------------------------- Captured stdout call -----------------------------
+running: <HOME>/miniconda3/envs/s19ci/bin/python -mpytest --basetemp=/tmp/pytest-of-<user><USER>/pytest-487/popen-gw0/test_r_tst_043_2_teardown_error_report_gives_one_row0/runpytest-0 -p no:cacheprovider
+     in: /tmp/pytest-of-<user><USER>/pytest-487/popen-gw0/test_r_tst_043_2_teardown_error_report_gives_one_row0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: /tmp/pytest-of-<user><USER>/pytest-487/popen-gw0/test_r_tst_043_2_teardown_error_report_gives_one_row0
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+test_teardown_row.py .E                                                  [100%]
+
+==================================== ERRORS ====================================
+________________________ ERROR at teardown of test_arm _________________________
+
+    @pytest.fixture
+    def _boom():
+        yield
+>       raise RuntimeError("teardown boom")
+E       RuntimeError: teardown boom
+
+test_teardown_row.py:7: RuntimeError
+============================= QC-TM timing margins =============================
+LOW 15.0%  0.850 s / 1.000 s  e  test_teardown_row.py::test_arm
+QC-TM: 1 bounds, 1 under 20 % margin
+=========================== short test summary info ============================
+ERROR test_teardown_row.py::test_arm - RuntimeError: teardown boom
+========================== 1 passed, 1 error in 0.03s ==========================
+_______________________ test_r_tst_044_low_margin_prefix _______________________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+----------------------------- Captured stdout call -----------------------------
+running: <HOME>/miniconda3/envs/s19ci/bin/python -mpytest --basetemp=/tmp/pytest-of-<user><USER>/pytest-487/popen-gw0/test_r_tst_044_low_margin_prefix0/runpytest-0 -p no:cacheprovider
+     in: /tmp/pytest-of-<user><USER>/pytest-487/popen-gw0/test_r_tst_044_low_margin_prefix0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: /tmp/pytest-of-<user><USER>/pytest-487/popen-gw0/test_r_tst_044_low_margin_prefix0
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 2 items
+
+test_low_prefix.py ..                                                    [100%]
+============================= QC-TM timing margins =============================
+LOW 15.0%  0.850 s / 1.000 s  b  test_low_prefix.py::test_b
+20.0%  0.800 s / 1.000 s  d  test_low_prefix.py::test_d
+QC-TM: 2 bounds, 1 under 20 % margin
+
+============================== 2 passed in 0.01s ===============================
+_________________ test_r_tst_046_over_bound_arm_still_reports __________________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+----------------------------- Captured stdout call -----------------------------
+running: <HOME>/miniconda3/envs/s19ci/bin/python -mpytest --basetemp=/tmp/pytest-of-<user><USER>/pytest-487/popen-gw0/test_r_tst_046_over_bound_arm_still_reports0/runpytest-0 -p no:cacheprovider
+     in: /tmp/pytest-of-<user><USER>/pytest-487/popen-gw0/test_r_tst_046_over_bound_arm_still_reports0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: /tmp/pytest-of-<user><USER>/pytest-487/popen-gw0/test_r_tst_046_over_bound_arm_still_reports0
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+test_over_bound.py F                                                     [100%]
+
+=================================== FAILURES ===================================
+__________________________________ test_over ___________________________________
+
+    def test_over():
+        from tests.support.timing import report_margin
+>       assert 1.2 < report_margin("o", 1.2, 1.0)
+E       AssertionError: assert 1.2 < 1.0
+E        +  where 1.0 = <function report_margin at 0x7f7bd05deac0>('o', 1.2, 1.0)
+
+test_over_bound.py:3: AssertionError
+============================= QC-TM timing margins =============================
+LOW -20.0%  1.200 s / 1.000 s  o  test_over_bound.py::test_over
+QC-TM: 1 bounds, 1 under 20 % margin
+=========================== short test summary info ============================
+FAILED test_over_bound.py::test_over - AssertionError: assert 1.2 < 1.0
+============================== 1 failed in 0.03s ===============================
+=========================== short test summary info ============================
+PASSED tests/test_address_census.py::test_at_b83_01_computed_address_is_recognised
+PASSED tests/test_address_census.py::test_at_b83_02_format_spec_is_not_a_selector
+PASSED tests/test_address_census.py::test_at_b83_02_hex_colour_is_classified_not_dropped
+PASSED tests/test_address_census.py::test_at_b83_03_prose_is_not_a_selector[title = f"## Variant: {name}"]
+PASSED tests/test_address_census.py::test_at_b83_03_prose_is_not_a_selector[msg = f"... {n} more ranges (see log)"]
+PASSED tests/test_address_census.py::test_at_b83_03_prose_is_not_a_selector[head = f"# Report {name}"]
+PASSED tests/test_address_census.py::test_at_b83_03_criterion_requires_identifier_or_interpolation
+PASSED tests/test_address_census.py::test_at_b83_04_taxonomy_does_not_collapse_the_hard_cases
+PASSED tests/test_suite_hygiene.py::test_r_tst_001_serial_timing_marker_is_registered
+PASSED tests/test_tui_flow_builder_b94.py::test_at_b94_15_fb_a_surface_and_wired_patch_run
+PASSED tests/test_tui_flow_builder_b94.py::test_at_b94_16_a2b_wiring_rule_and_report_provenance
+PASSED tests/test_address_census.py::test_at_b83_05_address_params_equals_the_live_derivation
+PASSED tests/test_address_census.py::test_at_b83_05_derivation_is_not_empty
+PASSED tests/test_address_census.py::test_at_b83_06_derivation_still_reaches_the_formerly_hand_declared_six
+PASSED tests/test_address_census.py::test_at_b83_06_type_addressing_is_not_an_address
+PASSED tests/test_address_census.py::test_at_b83_07_keyword_arguments_are_scanned[app.query_one(selector=f"#{widget_id}")]
+PASSED tests/test_address_census.py::test_at_b83_07_keyword_arguments_are_scanned[await pilot.click(widget=f"#{button_id}")]
+PASSED tests/test_address_census.py::test_at_b83_08_assembled_selectors_are_flagged_on_a_fixture[app.query_one("#" + name)-other:BinOp]
+PASSED tests/test_address_census.py::test_at_b83_08_assembled_selectors_are_flagged_on_a_fixture[app.query_one("#%s" % n)-other:BinOp]
+PASSED tests/test_address_census.py::test_at_b83_08_assembled_selectors_are_flagged_on_a_fixture[app.query_one("#{}".format(n))-other:Call]
+PASSED tests/test_tui_flow_builder_b94.py::test_at_b94_17_template_save_listing_import_and_dedup
+PASSED tests/test_address_census.py::test_at_b83_08_tree_holds_no_assembled_selectors
+PASSED tests/test_address_census.py::test_at_b83_10_indirect_address_is_detected_on_a_fixture
+PASSED tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally
+PASSED tests/test_address_census.py::test_at_b83_10_tree_holds_no_indirect_addresses
+PASSED tests/test_address_census.py::test_at_b83_11_every_derived_name_obeys_the_exclusion_rules
+PASSED tests/test_tui_flow_builder_b94.py::test_tc_b94_20_fb_a_composition_census
+PASSED tests/test_address_census.py::test_at_b83_12_bare_name_rows_carry_their_identifier
+PASSED tests/test_address_census.py::test_at_b83_09_bare_names_are_split_by_measurement
+PASSED tests/test_suite_hygiene.py::test_r_tst_002_every_timing_arm_carries_serial_timing
+PASSED tests/test_suite_hygiene.py::test_r_tst_002_2_parallel_lane_collection_prints_no_qc_tm_text
+PASSED tests/test_suite_hygiene.py::test_r_tst_003_an_unmarked_timing_arm_is_named
+PASSED tests/test_suite_hygiene.py::test_r_tst_004_a_marked_non_arm_is_named
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form1]
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form2]
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form3]
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form4]
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form5]
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form6]
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form7]
+PASSED tests/test_suite_hygiene.py::test_r_tst_006_detector_ignores_intervals_no_assert_reads
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-007]
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-030]
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-047]
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-048]
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-052]
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-060]
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-158]
+PASSED tests/test_suite_hygiene.py::test_r_tst_010_pull_request_runs_two_lanes
+PASSED tests/test_suite_hygiene.py::test_r_tst_010_2_injection_ratchet_reads_every_run_line_of_every_job
+PASSED tests/test_suite_hygiene.py::test_r_tst_011_push_runs_two_lanes
+PASSED tests/test_suite_hygiene.py::test_r_tst_012_serial_lane_runs_after_a_red_lane
+PASSED tests/test_suite_hygiene.py::test_r_tst_013_014_ci_checks_out_full_history
+PASSED tests/test_suite_hygiene.py::test_r_tst_013_snapshot_job_changes_only_persist_credentials
+PASSED tests/test_suite_hygiene.py::test_r_tst_015_016_017_ci_time_limits
+PASSED tests/test_suite_hygiene.py::test_r_tst_018_ci_installs_pinned_xdist
+PASSED tests/test_suite_hygiene.py::test_r_tst_020_021_shared_helpers_delegate_to_the_one_wait
+PASSED tests/test_suite_hygiene.py::test_r_tst_021_shared_wait_yields_between_checks
+PASSED tests/test_suite_hygiene.py::test_r_tst_022_settled_pauses_before_its_first_check
+PASSED tests/test_suite_hygiene.py::test_r_tst_023_shared_wait_signatures_are_kept
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W1]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W2]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W3]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W4]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W5]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W6]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W7]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W8]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W9]
+PASSED tests/test_suite_hygiene.py::test_r_tst_025_load_project_clock_stops_at_the_install_callback
+PASSED tests/test_suite_hygiene.py::test_r_tst_031_032_post_press_and_dwell_arms_keep_their_forms
+PASSED tests/test_suite_hygiene.py::test_r_tst_040_report_margin_returns_the_bound
+PASSED tests/test_suite_hygiene.py::test_r_tst_040_2_report_margin_refuses_unsafe_labels
+PASSED tests/test_suite_hygiene.py::test_r_tst_049_wrap_drift_detector_names_a_dropped_assertion
+PASSED tests/test_suite_hygiene.py::test_r_tst_049_wrapped_arms_change_nothing_else
+PASSED tests/test_suite_hygiene.py::test_r_tst_040_041_every_upper_timing_bound_is_reported
+PASSED tests/test_suite_hygiene.py::test_r_tst_040_1_base_tree_reports_its_37_bounds
+PASSED tests/test_suite_hygiene.py::test_r_tst_041_margin_guard_names_each_raw_bound
+PASSED tests/test_suite_hygiene.py::test_r_tst_040_3_counts_and_lower_bounds_are_not_bounds
+PASSED tests/test_suite_hygiene.py::test_r_tst_040_4_appended_and_conditional_reads_are_bounds
+PASSED tests/test_suite_hygiene.py::test_r_tst_042_margin_report_is_a_test_property
+PASSED tests/test_suite_hygiene.py::test_r_tst_043_045_qc_tm_section_rows_and_count
+PASSED tests/test_suite_hygiene.py::test_r_tst_043_2_teardown_error_report_gives_one_row
+PASSED tests/test_suite_hygiene.py::test_r_tst_044_low_margin_prefix
+PASSED tests/test_suite_hygiene.py::test_r_tst_046_over_bound_arm_still_reports
+PASSED tests/test_suite_hygiene.py::test_r_tst_050_status_log_keeps_every_painted_line
+PASSED tests/test_suite_hygiene.py::test_r_tst_051_newest_line_waits_do_not_grow
+PASSED tests/test_suite_hygiene.py::test_r_tst_051_all_line_reader_counts_only_under_minus_one
+PASSED tests/test_suite_hygiene.py::test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses
+PASSED tests/test_suite_hygiene.py::test_r_tst_070_3_redaction_gate_names_each_leak_form
+PASSED tests/test_suite_hygiene.py::test_r_tst_080_report_goldens_hold_no_tool_version
+PASSED tests/test_suite_hygiene.py::test_r_tst_081_golden_takes_the_package_version
+PASSED tests/test_suite_hygiene.py::test_r_tst_082_wrong_version_still_differs
+PASSED tests/test_suite_hygiene.py::test_r_tst_154_155_inc15_arms_wait_through_settled
+======================== 94 passed in 189.11s (0:03:09) ========================
+exit=0

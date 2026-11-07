@@ -3,21 +3,21 @@ Inc-003 fx_a).
 
 This module is the R8 home of the flow family: the reworked fb_a
 :class:`FlowBuilderPanel` (Inc-002) and the fx_a
-:class:`FlowExecutionPanel` (Inc-003 — US-007, HLR-017…021). Pure view layer —
-the panels and their ``ActionRequested``-kin message types; flow execution
-SEMANTICS stays in ``services/flow_*`` (messages out, services never called
-directly; the one declared data edge ``flow_screens → services/flow_model``
-is read-only constants/dataclasses per ``docs/architecture.md`` §10).
+:class:`FlowExecutionPanel` (Inc-003 — US-007, HLR-017…021). Presentational —
+the panels post messages and never call the executor
+(``services/flow_execution_service``); the module reads
+``services/flow_model`` (the block and flow data types and constants) and
+``services/flow_persistence_service`` (the wire serializer and the loader, for
+copy and paste, and the unsafe-ref finding code).
 
 fb_a doctrine (the ratified spike graduation call, ``flow_bench.NOTES.md`` —
-"connectivity is the builder's job"): a block palette rail, a framed canvas
-with sparse grid dots, full-cell box-drawn blocks (header bar, typed ``in`` /
-``out`` IO rows, ``┤├`` stubs) and ``─│└┐`` cable runs between stubs; the
-fb_c audit precision folds in as the numbered ledger strip (``#flow_blocks``).
-The A2B diff block binds each image input to a flow output (``#<n>`` — an
-upstream block of the CURRENT flow) or a project-relative file, with ≥1 input
-from this flow enforced at wiring time (HLR-014); SOURCE blocks render as file
-chips dropping onto the next block's image row.
+"connectivity is the builder's job"): a block palette rail of kind chips, the
+chain as ONE row of cards joined by cables (``pipeline_text``), and an add
+form showing only the chosen kind's inputs. The A2B diff block binds each
+image input to a flow output (``#<n>`` — an upstream block of the CURRENT
+flow) or a project-relative file, with ≥1 input from this flow enforced at
+wiring time (HLR-014); SOURCE blocks render as load cards feeding the next
+block's image input.
 
 fx_A doctrine (batch-97 Inc-6, HLR-147; batch-94 fx_a before it): imported
 templates mount one lane per chain, stacked; each lane is one row of block
@@ -29,8 +29,10 @@ posts the lane payloads to the app, the app runs the service's chain-set
 runner and hands the record back for painting; Save Set / Load Set post the
 same way. Every file-derived string renders through ``safe_text`` (C-17).
 
-No engine code is imported beyond the read-only flow-model data types; every
-file-derived string renders through ``safe_text`` (C-17).
+The two service edges above are the measured ones — the module reads the
+read-only flow-model data types and the persistence serializer/loader, and
+calls no other service; no ``docs/architecture.md`` section is cited for an
+import rule.
 
 batch-96 B1/B2 additions: the FUNNEL table editor (a flow-level name→value
 declaration, batch-96 B1) and block COPY/PASTE (batch-96 B2) reuse the real
@@ -38,8 +40,8 @@ persistence serializer/loader (``flow_persistence_service.flow_to_dict`` /
 ``dict_to_flow``) — the clipboard stores the WIRE projection of one block,
 never a live instance, and paste re-validates the wire dict through the
 hardened loader against the current flow's own blocks. That is the second
-declared ``flow_screens → services`` edge; both are pure
-serialize/validate, no execution semantics.
+``flow_screens → services`` edge; both are pure serialize/validate, no
+execution semantics.
 
 batch-102 Inc 6 (US-102-06): the copy/paste strip grows ``Edit`` / ``Remove``
 chips acting on the SAME ``#flow_pick`` ledger number (empty is INVALID for
@@ -106,7 +108,6 @@ from .insight_style import (
     DGRAY,
     GREEN,
     HILITE,
-    LABEL,
     LBLUE,
     PURPLE,
     RED,
@@ -370,34 +371,6 @@ def _binding_label(binding) -> str:
     return binding.ref
 
 
-def _flow_block_label(block: FlowBlock) -> str:
-    """One-line display label for a block (plain text — rendered markup-safe)."""
-    if isinstance(block, SourceBlock):
-        return f"LOAD  {block.image_ref}  ({block.file_type})"
-    if isinstance(block, PatchBlock):
-        return f"PATCH   {block.change_doc_ref}"
-    if isinstance(block, CheckBlock):
-        return f"CHECK  {block.check_doc_ref}  ({block.gating})"
-    if isinstance(block, WriteOutBlock):
-        return f"WRITE-OUT  {block.output_name}  ({block.fmt})"
-    if isinstance(block, CrcBlock):
-        return f"CRC  {block.config_ref}"
-    if isinstance(block, A2BBlock):
-        return (
-            f"A2B-DIFF  {_binding_label(block.image_a)}  "
-            f"vs  {_binding_label(block.image_b)}"
-        )
-    if isinstance(block, ExternalStepBlock):
-        noun = "CMD" if block.mode == EXTERNAL_MODE_TERMINAL else "INSTR"
-        return (
-            f"EXT-STEP ({block.mode})  {noun} {block.instruction}  "
-            f"log {block.log_ref}  ->  {block.output_path}"
-        )
-    if isinstance(block, ReportBlock):
-        return "REPORT  (generation deferred - FB-P1b)"
-    return "?"
-
-
 #: Block-status → frozen ``sev-*`` CSS class (LLR-088.1). Lives HERE, not in
 #: the frozen ``color_policy.py`` (D4): the flow render maps a block STATUS
 #: token to an existing ``.sev-*`` class directly, it does not route through
@@ -535,188 +508,19 @@ def _ribbon_caption(ranges: Sequence[Tuple[int, int]]) -> str:
     return f"{len(ranges)} range{plural} · 0x{low:X}‥ 0x{high:X}"
 
 
-# ---------------------------------------------------------------------------
-# fb_a canvas — the painted grid (single-style-per-cell discipline, the
-# ``flow_bench.proto.py`` Grid ported to the production panel).
-# ---------------------------------------------------------------------------
-
-#: Painted canvas grid width. The canvas is painted at a FIXED width so its
-#: oracle is layout-independent (C-32): 88 cells clear the measured 92-cell
-#: ``#screen_flow`` content width at 120×30 with margin, and the scrollable
-#: panel carries narrower regimes (74 cells at 80×24) without overflow.
-_CANVAS_COLS = 88
-
-#: PLC block geometry: full-cell box width (the spike's 24-cell block).
-_BLOCK_W = 24
-
-#: External-step block geometry (prototype v3): the block carries the mode,
-#: the instruction/command, the MANDATORY log row and the output row — 24
-#: cells clip every real value, so the human-gated block paints wider (the
-#: same box composer, just a wider cell budget).
-_EXT_BLOCK_W = 44
-
-
-def _block_width(block: FlowBlock) -> int:
-    """The canvas cell budget of one block's box (EXT-STEP paints wider)."""
-    if isinstance(block, ExternalStepBlock):
-        return _EXT_BLOCK_W
-    return _BLOCK_W
-
-
-def _short_ext(text: str, width: int) -> str:
-    """Ellipsis-tail fit for a painted row (the lane-paint ``[:w-4]`` idiom,
-    but keeping the TAIL — paths keep their name, not their root)."""
-    if len(text) <= width:
-        return text
-    return "…" + text[-(width - 1):]
-
-#: Canvas styles — real palette hexes (``insight_style`` / ``render.format``
-#: tokens); one char + one style per cell, no cell carries two free variables.
+#: Shared style tokens — real palette hexes (``insight_style`` /
+#: ``render.format``). ``_S_RULE`` / ``_S_DIM`` frame the pipeline cards and
+#: the lane boxes; ``_S_OUT`` marks outputs; ``_S_ERR`` marks failures.
 _S_RULE = DEPTH_BORDER
-_S_WIRE = LBLUE
 _S_DIM = DGRAY
-_S_LABEL = LABEL
-_S_VALUE = VALUE
 _S_OUT = CYAN
-_S_HEAD = "bold " + VALUE
 _S_ERR = RED
-
-
-class _Grid:
-    """Single-style-per-cell character grid → aligned Textual ``Text`` lines."""
-
-    def __init__(self, w: int, h: int) -> None:
-        self.w, self.h = w, h
-        self.ch = [[" "] * w for _ in range(h)]
-        self.st = [[""] * w for _ in range(h)]
-
-    def put(self, x: int, y: int, s: str, style: str = "") -> None:
-        for i, c in enumerate(s):
-            xx = x + i
-            if 0 <= xx < self.w and 0 <= y < self.h:
-                self.ch[y][xx] = c
-                self.st[y][xx] = style
-
-    def puts(self, x: int, y: int, *segs: Tuple[str, str]) -> None:
-        for s, style in segs:
-            self.put(x, y, s, style)
-            x += len(s)
-
-    def box(self, x: int, y: int, w: int, h: int, style: str = _S_RULE) -> None:
-        self.put(x, y, "┌" + "─" * (w - 2) + "┐", style)
-        for r in range(y + 1, y + h - 1):
-            self.put(x, r, "│", style)
-            self.put(x + w - 1, r, "│", style)
-        self.put(x, y + h - 1, "└" + "─" * (w - 2) + "┘", style)
-
-    def fill(self, x: int, y: int, n: int, ch: str, style: str = "") -> None:
-        self.put(x, y, ch * n, style)
-
-    def text(self, x: int, y: int, s: str, style: str = _S_VALUE) -> None:
-        """Label inside a box row (bounded by the block's inner width)."""
-        self.put(x, y, s[: max(0, self.w - x)], style)
-
-    def lines(self) -> List[Text]:
-        out: List[Text] = []
-        for y in range(self.h):
-            txt, x = Text(), 0
-            while x < self.w:
-                c, s = self.ch[y][x], self.st[y][x]
-                x2 = x
-                while x2 < self.w and self.ch[y][x2] == c and self.st[y][x2] == s:
-                    x2 += 1
-                if c == " " and not s:
-                    txt.append(" " * (x2 - x))
-                else:
-                    txt.append(c * (x2 - x), style=s or None)
-                x = x2
-            out.append(txt)
-        return out
-
-
-def _plc_block(
-    g: _Grid,
-    x: int,
-    y: int,
-    w: int,
-    title: str,
-    rows: Sequence[Tuple[str, str, str]],
-) -> int:
-    """Full-cell fb_a block: header bar on the top edge, typed IO rows inside.
-
-    Returns the block's total height in rows (header + IO rows + bottom).
-    """
-    inner = f"[ {title} ]"
-    g.put(x, y, "┌─" + inner + "─" * max(0, w - 3 - len(inner)) + "┐", _S_DIM)
-    g.put(x + 4, y, title, _S_HEAD)
-    for i, (io, text_, tstyle) in enumerate(rows):
-        yy = y + 1 + i
-        left = f"│ {io:<3} {text_}"
-        g.put(x, yy, left + " " * max(0, w - 1 - len(left)) + "│", _S_DIM)
-        g.put(x + 2, yy, io, _S_LABEL if io in ("in", "out") else _S_ERR)
-        g.put(x + 6, yy, text_, tstyle)
-    g.put(x, y + len(rows) + 1, "└" + "─" * (w - 2) + "┘", _S_DIM)
-    return len(rows) + 2
-
-
-def _chip(g: _Grid, x: int, y: int, label: str, w: int) -> int:
-    """Source chip (a file feeding a block); returns the drop column."""
-    g.put(x, y, "┌" + "─" * (w - 2) + "┐", _S_DIM)
-    g.put(x, y + 1, "│" + label[: w - 2].ljust(w - 2) + "│", _S_DIM)
-    g.put(x, y + 2, "└" + "─" * (w - 2) + "┘", _S_DIM)
-    g.put(x + 1, y + 1, label[: w - 2], _S_LABEL)
-    return x + w // 2
-
-
-def _wire_bend(g: _Grid, x_from: int, y_out: int, x_to: int, y_in: int) -> None:
-    """─│└┐ line run: right-edge out stub -> bend column -> next in stub."""
-    if x_to <= x_from + 1:
-        return
-    xv = (x_from + x_to) // 2
-    g.put(x_from, y_out, "┤", _S_WIRE)
-    g.fill(x_from + 1, y_out, xv - x_from - 1, "─", _S_WIRE)
-    g.put(xv, y_out, "┘", _S_WIRE)
-    if y_out - y_in > 1:
-        for yy in range(y_in + 1, y_out):
-            g.put(xv, yy, "│", _S_WIRE)
-    g.put(xv, y_in, "└", _S_WIRE)
-    g.fill(xv + 1, y_in, x_to - xv - 1, "─", _S_WIRE)
-    g.put(x_to, y_in, "├", _S_WIRE)
-
-
-def _wire_drop(
-    g: _Grid,
-    x_from: int,
-    y_out: int,
-    col_in: int,
-    y_dest: int,
-) -> None:
-    """Band-wrap drop (the chip-drop idiom): the next block wrapped to a new
-    band, so the threaded-image cable leaves the out stub, steps right one
-    cell, drops to the free row above the destination band and lands on the
-    block's TOP edge (``┬``, ``col_in`` clear of the title) — never crossing
-    a block cell."""
-    xv = x_from + 1
-    if col_in >= xv:
-        return  # no honest path — leave the blocks uncabled
-    y_tramo = y_dest - 1
-    g.put(x_from, y_out, "┤", _S_WIRE)
-    g.put(xv, y_out, "┐", _S_WIRE)
-    for yy in range(y_out + 1, y_tramo):
-        g.put(xv, yy, "│", _S_WIRE)
-    g.put(xv, y_tramo, "┘", _S_WIRE)
-    g.fill(col_in + 1, y_tramo, xv - col_in - 1, "─", _S_WIRE)
-    # Landing elbow: arriving from the right, turning DOWN into the block's
-    # top edge — ┌ (right+down). (A backwards └ here drew a spurious up-stub
-    # that read as a doubled line; caught in the operator's 2026-10-18 review.)
-    g.put(col_in, y_tramo, "┌", _S_WIRE)
-    g.put(col_in, y_dest, "┬", _S_WIRE)
 
 
 # ---------------------------------------------------------------------------
 # batch-97 Inc-5 — the pipeline rail (fb_A, HLR-146): vocabularies and the
-# pure painters. The rail replaces the grid canvas and the numbered list on
-# screen (both stay mounted and repainted, not displayed — LLR-146.1).
+# pure painters. The rail replaced the grid canvas and the numbered list
+# (LLR-146.1).
 # ---------------------------------------------------------------------------
 
 #: Block-kind glyphs (D7, one meaning each; the help entry names them). ``≡``
@@ -1283,7 +1087,7 @@ class KindChip(FlowChip):
     Data Flow:
         - ``enter`` / ``space`` / click → ``Button.Pressed`` →
           ``FlowBuilderPanel.on_button_pressed`` (``flow_palette_<kind>``) →
-          ``#flow_kind`` set → the add form shows that kind's inputs.
+          the panel's kind set → the add form shows that kind's inputs.
 
     Dependencies:
         Uses:
@@ -1386,9 +1190,7 @@ class FlowBuilderPanel(ScrollableContainer):
         and the batch-102 Inc-6 Edit / Remove pair — with
         ``Variables (n)``, the foot row with Run as the one
         filled action, and the result area under Run as the growing region.
-        The batch-94 grid canvas and numbered list (``#flow_canvas``,
-        ``#flow_blocks``) stay mounted and painted, not displayed. The A2B
-        diff block (HLR-014) binds each
+        The A2B diff block (HLR-014) binds each
         image input to a flow output (``#<n>``) or a file, refused at wiring
         time when both inputs are external / the reference is downstream / the
         target produces no image — a refused binding never enters the flow, so
@@ -1400,25 +1202,28 @@ class FlowBuilderPanel(ScrollableContainer):
 
     Data Flow:
         - Kind chip / Add → block appended to ``self._blocks`` → pipeline,
-          ribbon and legend repaint (the hidden canvas and list too).
+          ribbon and legend repaint.
         - Run → ``RunRequested(Flow(blocks=self._blocks), FLOW_SCOPE_SINGLE)``
           → app → ``run_flow`` → :meth:`render_result`.
 
     Dependencies:
         Uses:
             - ``flow_model`` (block dataclasses + the A2B binding grammar,
-              read-only per the R8 declared edge)
+              read-only)
+            - ``flow_persistence_service`` (``flow_to_dict`` /
+              ``dict_to_flow`` for copy and paste, the ``FLOW_UNSAFE_REF``
+              code)
             - ``safe_text`` (markup-safe render)
         Used by:
             - ``S19TuiApp._compose_screen_flow`` /
               ``S19TuiApp.on_flow_builder_panel_run_requested``
     """
 
-    #: The dropdown block-kind options (label, ``kind`` value). SOURCE is
-    #: surfaced as "Load" (LLR-088.7 / D1) but keeps the ``BLOCK_SOURCE``
-    #: ("source") discriminator so batch-53 persistence is unaffected. The A2B
-    #: entry rides the same single-select; its two bindings use the dedicated
-    #: ``#flow_ref_a`` / ``#flow_ref_b`` inputs (visible only for A2B).
+    #: The kind chips' options (label, ``kind`` value), one chip per entry in
+    #: palette order. SOURCE is surfaced as "Load" (LLR-088.7 / D1) but keeps
+    #: the ``BLOCK_SOURCE`` ("source") discriminator so batch-53 persistence is
+    #: unaffected. The A2B entry is one chip; its two bindings use the
+    #: dedicated ``#flow_ref_a`` / ``#flow_ref_b`` inputs (visible only for A2B).
     _KIND_OPTIONS = [
         ("Load (image)", BLOCK_SOURCE),
         ("Patch (change doc)", BLOCK_PATCH),
@@ -1531,6 +1336,10 @@ class FlowBuilderPanel(ScrollableContainer):
     def __init__(self) -> None:
         super().__init__(id="flow_panel")
         self._blocks: List[FlowBlock] = []
+        #: The block kind the chips chose (I-2): ``BLOCK_SOURCE`` at
+        #: construction, read by ``+ Add`` and the first sync, written only
+        #: with a value of ``_KIND_OPTIONS`` (S-1).
+        self._kind: str = BLOCK_SOURCE
         #: Display name shown in the name strip; identity is the FILENAME on save.
         self._flow_name: str = "flow"
         #: Unsaved-edits flag — glyph ``●`` (dirty) / ``✓`` (saved), C-10 primary.
@@ -1539,7 +1348,7 @@ class FlowBuilderPanel(ScrollableContainer):
         #: the ribbon (LLR-146.11); set by the app via :meth:`set_session_dir`.
         self._session_dir: Optional[str] = None
         #: The flow-level FUNNEL table (batch-96 B1) — ordered (name, value)
-        #: pairs declared beside the canvas; rides ``current_flow`` into
+        #: pairs declared beside the pipeline; rides ``current_flow`` into
         #: Run/Save and is restored by ``set_blocks``.
         self._funnel: List[Tuple[str, str]] = []
         #: The block COPY/PASTE clipboard (batch-96 B2) — the WIRE dict of
@@ -1589,11 +1398,6 @@ class FlowBuilderPanel(ScrollableContainer):
         self._session_dir = path or None
         if not self.is_mounted:
             return
-        self.query_one("#flow_ext_session", Static).update(
-            safe_text(f"session: {path} — on confirm, the output file is copied here")
-            if path
-            else safe_text(f"session: {RIBBON_NO_SESSION}")
-        )
         self._refresh_name_strip()
 
     def compose(self) -> ComposeResult:
@@ -1604,27 +1408,18 @@ class FlowBuilderPanel(ScrollableContainer):
                 markup=False,
                 classes=self._name_strip_class(),
             )
-        yield Label(
-            "Flow Builder: pick a block kind, enter its refs, Add; wire A2B "
-            "inputs as a file name or #<n> (a flow output).",
-            id="flow_help",
-            markup=False,
-        )
         with ScrollableContainer(id="flow_pipeline_scroll"):
             yield Static(
                 pipeline_text(self._blocks, self._card_w),
                 id="flow_pipeline",
                 classes="nowrap-pipeline",
             )
-        yield Static(self._canvas_text(), id="flow_canvas", markup=False)
-        yield Static(self._blocks_text(), id="flow_blocks", markup=False)
         with Horizontal(id="flow_palette"):
             yield Label("add block", classes="flow-field-label")
             for _label, kind in self._KIND_OPTIONS:
                 glyph, name, _colour, _does = _KIND_LOOK[kind]
                 yield KindChip(f"{glyph} {name}", id=f"flow_palette_{kind}", classes="kind-chip")
         with Horizontal(id="flow_add_row"):
-            yield Select(self._KIND_OPTIONS, value=BLOCK_SOURCE, allow_blank=False, id="flow_kind")
             yield Static("", classes="flow-kind-tag")
             with Vertical(classes="flow-add-fields"):
                 with Horizontal(classes="flow-add-line"):
@@ -1689,8 +1484,6 @@ class FlowBuilderPanel(ScrollableContainer):
             yield FlowChip("+ Add var", id="flow_funnel_add")
         yield Static("", id="flow_funnel_list", markup=False)
         yield Static("", id="flow_wiring_notice", markup=False)
-        #: Kept mounted, never displayed: the session rides the ribbon now.
-        yield Static(f"session: {RIBBON_NO_SESSION}", id="flow_ext_session", markup=False)
         with Horizontal(id="flow_run_row"):
             yield FlowChip("Run", id="flow_run", classes="fill-accent")
             yield FlowChip("Clear", id="flow_clear")
@@ -1758,8 +1551,8 @@ class FlowBuilderPanel(ScrollableContainer):
         Summary:
             Swap in the loaded blocks, set the display name (the on-disk stem
             when the app passes ``name``, else the envelope name), clear the
-            dirty flag (a just-loaded flow is clean), repaint the canvas +
-            ledger strip + name strip, and clear any prior run/quarantine output.
+            dirty flag (a just-loaded flow is clean), repaint the pipeline and
+            the name strip, and clear any prior run/quarantine output.
 
         Args:
             flow (Flow): The validated, loaded flow.
@@ -1768,7 +1561,7 @@ class FlowBuilderPanel(ScrollableContainer):
         """
         self._blocks = list(flow.blocks)
         self._flow_name = name if name is not None else flow.name
-        #: batch-96 B1: a loaded flow's funnel table replaces the canvas one.
+        #: batch-96 B1: a loaded flow's funnel table replaces the panel's one.
         self._funnel = list(flow.funnel)
         self._dirty = False
         self.query_one("#flow_pipeline_scroll").border_subtitle = None
@@ -1805,7 +1598,7 @@ class FlowBuilderPanel(ScrollableContainer):
             Mount a bordered ``sev-error`` quarantine card into ``#flow_result``
             with a header, one markup-safe line per finding, and a
             ``Current flow unchanged.`` footer. ``set_blocks`` is NOT called, so
-            the canvas + ledger and name strip are unchanged (LLR-003.5 / C-32).
+            the pipeline and the name strip are unchanged (LLR-003.5 / C-32).
             Every file-derived string (the picked name, each finding message) is
             rendered ``safe_text`` + ``markup=False`` (C-17).
 
@@ -1852,262 +1645,8 @@ class FlowBuilderPanel(ScrollableContainer):
             Container(*children, classes="flow-quarantine sev-error")
         )
 
-    # -- fb_a canvas + ledger -------------------------------------------------
-
-    def _block_rows(self, block: FlowBlock, index: int) -> List[Tuple[str, str, str]]:
-        """The typed IO rows of one canvas block: (io, text, style) triples.
-
-        Every file-derived label is scrubbed through ``safe_text`` (C-17 — the
-        painted grid is a ``.plain`` surface, so control bytes must not survive
-        into it); the structural tokens are author constants.
-        """
-        scrub = lambda s: safe_text(s).plain  # noqa: E731 - one-line sink guard
-        chain_in = ("in", "← image", _S_VALUE)
-        if isinstance(block, PatchBlock):
-            return [
-                chain_in,
-                ("in", scrub(block.change_doc_ref), _S_VALUE),
-                ("out", "image →", _S_OUT),
-            ]
-        if isinstance(block, CrcBlock):
-            return [
-                chain_in,
-                ("in", scrub(block.config_ref), _S_VALUE),
-                ("out", "image →", _S_OUT),
-            ]
-        if isinstance(block, CheckBlock):
-            return [
-                chain_in,
-                ("in", scrub(block.check_doc_ref), _S_VALUE),
-                ("out", "image →", _S_OUT),
-            ]
-        if isinstance(block, WriteOutBlock):
-            return [
-                chain_in,
-                ("out", scrub(f"{block.output_name} ({block.fmt})"), _S_OUT),
-            ]
-        if isinstance(block, ExternalStepBlock):
-            # prototype v3 (spec "paso externo"): the block shows the mode's
-            # payload (the exact command for TERMINAL, the instruction for
-            # MANUAL), the MANDATORY log row and the output row. Rows are
-            # tail-fitted to the wider EXT-STEP box (paths keep their name).
-            inner = _EXT_BLOCK_W - 8
-            noun = "cmd" if block.mode == EXTERNAL_MODE_TERMINAL else "instr"
-            return [
-                chain_in,
-                ("in", scrub(f"{noun} {_short_ext(block.instruction, inner)}"), _S_VALUE),
-                ("out", scrub(f"log → {_short_ext(block.log_ref, inner - 5)}"), _S_OUT),
-                ("out", scrub(f"file → {_short_ext(block.output_path, inner - 7)}"), _S_OUT),
-            ]
-        if isinstance(block, A2BBlock):
-            return [
-                ("in", scrub(_binding_label(block.image_a)), _S_VALUE),
-                ("in", scrub(_binding_label(block.image_b)), _S_VALUE),
-                ("out", "report →", _S_OUT),
-            ]
-        if isinstance(block, ReportBlock):
-            return [("out", "report marker", _S_OUT)]
-        return [("in", "?", _S_ERR)]
-
-    def _layout(
-        self,
-    ) -> Tuple[List[Tuple[int, int, int, int, int]], dict[int, Tuple[int, int, int]], int]:
-        """Walk the composed chain and lay out the fb_a canvas geometry.
-
-        Returns:
-            Tuple: ``(positions, chips, height)`` — ``positions`` holds one
-            ``(x, y, height, out_row, width)`` per NON-source block in block
-            order (``width`` is the block's own box budget — EXT-STEP paints
-            wider); ``chips`` maps source-block indices to ``(x, y, width)``;
-            ``height`` is the grid row count. Bands wrap left→right; every
-            caller of this layout paints the SAME geometry (the canvas text
-            and its height can never diverge).
-        """
-        blocks = self._blocks
-        positions: List[Tuple[int, int, int, int, int]] = []  # x, y, h, out_row, w
-        chips: dict[int, Tuple[int, int, int]] = {}
-        y = 4
-        x = 2
-        band_bottom = y
-        for index, block in enumerate(blocks):
-            if isinstance(block, SourceBlock):
-                label = safe_text(block.image_ref).plain
-                label = f"{label} ({block.file_type})"
-                w = max(10, len(label) + 2)
-                if x > 2 and x + w > _CANVAS_COLS - 1:
-                    x = 2
-                    y = band_bottom + 2
-                chips[index] = (x, y, w)
-                x += w + 6
-                continue
-            bw = _block_width(block)
-            h = len(self._block_rows(block, index)) + 2
-            if x > 2 and x + bw > _CANVAS_COLS - 1:
-                x = 2
-                y = band_bottom + 2
-            out_row = y + h - 2  # the last IO row carries the block's output
-            positions.append((x, y, h, out_row, bw))
-            band_bottom = max(band_bottom, y + h)
-            x += bw + 6
-        height = max(band_bottom + 2, 6)
-        return positions, chips, height
-
-    def _canvas_text(self) -> Text:
-        """Paint the fb_a canvas: framed grid, source chips, box blocks, cables.
-
-        Pure projection of ``self._blocks`` — the composed chain IS the model
-        (SOURCE blocks paint as file chips, everything else as box-drawn
-        blocks with typed in/out stubs), so the canvas can never disagree
-        with what Run executes. All file-derived labels ride ``safe_text``
-        into the grid (C-17).
-        """
-        blocks = self._blocks
-        positions, chips, height = self._layout()
-        g = _Grid(_CANVAS_COLS, height)
-        g.box(0, 0, _CANVAS_COLS, height)
-        g.put(
-            2,
-            0,
-            f" canvas · grid on · {len(blocks)} block"
-            f"{'' if len(blocks) == 1 else 's'} ",
-            _S_DIM,
-        )
-        for yy in (2, height - 2):
-            if 0 < yy < height - 1:
-                for xx in range(4, _CANVAS_COLS - 2, 8):
-                    if g.ch[yy][xx] == " ":
-                        g.put(xx, yy, "·", _S_RULE)
-        if not blocks:
-            g.puts(
-                4,
-                height // 2,
-                ("(empty canvas — place a block from the palette)", _S_DIM),
-            )
-            return _join_lines(g.lines())
-
-        live = [i for i in range(len(blocks)) if i not in chips]
-        pos_of = dict(zip(live, positions))
-
-        # Block pass: box-drawn blocks (header bar on the top edge, typed IO
-        # rows inside, ``┤├`` stubs where cables land).
-        titles = {
-            BLOCK_PATCH: "PATCH",
-            BLOCK_CRC: "CRC",
-            BLOCK_CHECK: "CHECK",
-            BLOCK_WRITE_OUT: "WRITE-OUT",
-            BLOCK_A2B: "A2B-DIFF",
-        }
-        for index in live:
-            block = blocks[index]
-            x, y, h, _out_row, w = pos_of[index]
-            rows = self._block_rows(block, index)
-            if isinstance(block, ExternalStepBlock):
-                mode_tag = (
-                    "TERMINAL" if block.mode == EXTERNAL_MODE_TERMINAL
-                    else "MANUAL"
-                )
-                title = f"EXT-STEP · {mode_tag}"
-            else:
-                title = titles.get(block.kind, block.kind.upper())
-            _plc_block(g, x, y, w, title, rows)
-
-        # Chip pass: source file chips with their drop onto the next block.
-        for index, (cx, cy, w) in chips.items():
-            label = safe_text(blocks[index].image_ref).plain
-            label = f"{label} ({blocks[index].file_type})"
-            col = _chip(g, cx, cy, label, w)
-            if index + 1 < len(blocks) and (index + 1) in pos_of:
-                nxt_x, nxt_y, _h, _o, _w = pos_of[index + 1]
-                if nxt_y > cy + 3:
-                    for yy in range(cy + 3, nxt_y):
-                        g.put(col, yy, "│", _S_WIRE)
-                g.put(col, nxt_y, "┬", _S_WIRE)
-
-        # Cable pass: threaded-image cables between consecutive blocks (never
-        # INTO an A2B — its image inputs are explicit bindings), plus explicit
-        # A2B binding cables from the producing block's out stub. A block that
-        # wrapped to a NEW band takes the chip-drop cable (_wire_drop), not
-        # the in-stub bend.
-        for index in live:
-            if index == 0:
-                continue
-            pos = pos_of[index]
-            block = blocks[index]
-            if not isinstance(block, A2BBlock) and (index - 1) in pos_of:
-                prev_pos = pos_of[index - 1]
-                if prev_pos[1] != pos[1]:
-                    if isinstance(block, ExternalStepBlock):
-                        mode_tag = (
-                            "TERMINAL"
-                            if block.mode == EXTERNAL_MODE_TERMINAL
-                            else "MANUAL"
-                        )
-                        dest_title = f"[ EXT-STEP · {mode_tag} ]"
-                    else:
-                        dest_title = f"[ {titles.get(block.kind, block.kind.upper())} ]"
-                    drop_col = max(
-                        pos[0] + len(dest_title) + 3,
-                        pos[0] + pos[4] // 2,
-                    )
-                    _wire_drop(
-                        g,
-                        prev_pos[0] + prev_pos[4] - 1,
-                        prev_pos[3],
-                        drop_col,
-                        pos[1],
-                    )
-                else:
-                    _wire_bend(
-                        g,
-                        prev_pos[0] + prev_pos[4] - 1,
-                        prev_pos[3],
-                        pos[0],
-                        pos[1] + 1,
-                    )
-            if isinstance(block, A2BBlock):
-                for binding, row in (
-                    (block.image_a, 1),
-                    (block.image_b, 2),
-                ):
-                    if binding.source != A2B_INPUT_FLOW:
-                        continue
-                    src = int(binding.ref)
-                    if src in pos_of:
-                        src_pos = pos_of[src]
-                        _wire_bend(
-                            g,
-                            src_pos[0] + src_pos[4] - 1,
-                            src_pos[3],
-                            pos[0],
-                            pos[1] + row,
-                        )
-                    elif src in chips:
-                        # A flow binding onto a source chip: drop onto the row.
-                        cx, cy, w = chips[src]
-                        col = cx + w // 2
-                        target_row = pos[1] + row
-                        if target_row > cy + 3:
-                            for yy in range(cy + 3, target_row):
-                                g.put(col, yy, "│", _S_WIRE)
-                        g.put(col, target_row, "┬", _S_WIRE)
-
-        return _join_lines(g.lines())
-
-    def _blocks_text(self) -> Text:
-        if not self._blocks:
-            return safe_text("(no blocks yet)")
-        text = Text()
-        for position, block in enumerate(self._blocks, start=1):
-            text.append(f"{position}. ")
-            text.append(safe_text(_flow_block_label(block)))
-            text.append("\n")
-        return text
-
     def _refresh_blocks(self) -> None:
-        """Repaint the pipeline, its frame title, the legend and the ribbon;
-        the hidden canvas and list are repainted too (their readers stay)."""
-        self.query_one("#flow_blocks", Static).update(self._blocks_text())
-        self.query_one("#flow_canvas", Static).update(self._canvas_text())
+        """Repaint the pipeline, its frame title, the legend and the ribbon."""
         if self._layout_key is not None:
             self._card_w, self._spare = pipeline_layout(self._layout_key[0], len(self._blocks))
         self.query_one("#flow_pipeline", Static).update(
@@ -2503,7 +2042,12 @@ class FlowBuilderPanel(ScrollableContainer):
             "flow_palette_"
         ):
             kind = event.button.id.removeprefix("flow_palette_")
-            self.query_one("#flow_kind", Select).value = kind
+            # E3 S-1: the kind state accepts only a value of ``_KIND_OPTIONS``;
+            # a chip id outside them returns with nothing changed (the hidden
+            # select's options gave this check on the base).
+            if kind not in dict(self._KIND_OPTIONS).values():
+                return
+            self._kind = kind
             self._sync_kind_dependent_visibility(kind)
             # A notice about the previous kind no longer applies (ux L-a).
             self._show_wiring_notice("")
@@ -2512,7 +2056,7 @@ class FlowBuilderPanel(ScrollableContainer):
             self._browse_ref(_BROWSE_INPUTS[event.button.id])
             return
         if event.button.id == "flow_add":
-            kind = str(self.query_one("#flow_kind", Select).value)
+            kind = self._kind
             # S4-1 (LLR-146.14): a NUL in a path-bearing input refuses the
             # Add before any block is built; the inputs keep their text.
             refusal = nul_add_refusal(
@@ -2581,20 +2125,12 @@ class FlowBuilderPanel(ScrollableContainer):
             self._remove_block()
 
     def on_mount(self) -> None:
-        # batch-97 Inc-5 (LLR-146.1, 146.11): the help sentence, the grid
-        # canvas, the numbered list, the kind select and the session line stay
-        # mounted, not displayed — the pipeline, the chips and the ribbon carry
-        # them.
-        for hidden in ("#flow_help", "#flow_canvas", "#flow_blocks", "#flow_kind", "#flow_ext_session"):
-            self.query_one(hidden).display = False
         # F3 (LLR-094.3): the per-block gating control is CHECK-only — hidden
         # for SOURCE (default), PATCH, WRITE-OUT, CRC and A2B; the A2B binding
         # inputs show only for A2B, the single ref for every other kind.
-        self._sync_kind_dependent_visibility(
-            str(self.query_one("#flow_kind", Select).value)
-        )
+        self._sync_kind_dependent_visibility(self._kind)
         # batch-96 B1: the funnel editor starts COLLAPSED (a declaration
-        # table, not a canvas element) — the toggle opens it.
+        # table, not a chain element) — the toggle opens it.
         self.query_one("#flow_funnel_editor").display = False
         self.query_one("#flow_funnel_list").display = False
         self._refresh_funnel_list()
@@ -2604,11 +2140,8 @@ class FlowBuilderPanel(ScrollableContainer):
         self.call_after_refresh(self._apply_layout)
 
     def on_select_changed(self, event: Select.Changed) -> None:
-        # The block-kind selector toggles the add form; the EXT-STEP mode
-        # renames the command field.
-        if event.select.id == "flow_kind":
-            self._sync_kind_dependent_visibility(str(event.value))
-        elif event.select.id == "flow_ext_mode":
+        # The EXT-STEP mode renames the command field.
+        if event.select.id == "flow_ext_mode":
             terminal = event.value == EXTERNAL_MODE_TERMINAL
             self.query_one(".flow-instruction-label", Label).update("command" if terminal else "instruction")
             self.query_one("#flow_ext_instruction", Input).placeholder = (
@@ -3068,9 +2601,8 @@ FX_NO_LANES_RUN = "No chains to run — Import… adds a lane first."
 class FxLaneSpec:
     """The panel-side lane payload posted to the app (Run / Save Set).
 
-    The app translates it into the service's ``ChainSpec`` / ``ChainSetEntry``
-    — the panel never imports the execution/persistence modules (the declared
-    ``flow_screens → services/flow_model`` edge stays read-only dataclasses).
+    The app translates it into the service's ``ChainSpec`` / ``ChainSetEntry``;
+    the panel never calls the executor.
 
     Args:
         name (str): The lane name (unique inside the set).
@@ -3198,7 +2730,7 @@ class FlowExecutionPanel(ScrollableContainer):
 
     Dependencies:
         Uses:
-            - ``flow_model`` (read-only dataclasses, the declared R8 edge)
+            - ``flow_model`` (read-only dataclasses)
             - ``safe_text``, ``clip_head`` / ``clip_tail``, ``lane_layout``
         Used by:
             - ``S19TuiApp._compose_screen_flow_execution`` + the
@@ -3317,13 +2849,6 @@ class FlowExecutionPanel(ScrollableContainer):
                 yield FlowChip("Import…", id="fx_import")
                 yield ModeToggle(id="fx_mode")
                 yield FlowChip("Run", id="fx_run", classes="fill-accent")
-        yield Label(
-            "Flow Execution: Import… adds a chain lane from a saved flow; bind "
-            "each lane's inputs; Run (sequential default, parallel per chain); "
-            "Save Set persists chains + inputs + outputs.",
-            id="fx_help",
-            markup=False,
-        )
         with Horizontal(id="fx_set_row"):
             yield Label("set name", classes="fx-field-label")
             yield OsClipboardInput(placeholder="set name", id="fx_set_name", compact=True)
@@ -3347,7 +2872,6 @@ class FlowExecutionPanel(ScrollableContainer):
 
     def on_mount(self) -> None:
         self.query_one("#fx_set_name", Input).value = self._set_name
-        self.query_one("#fx_help").display = False
         self.query_one("#fx_required").display = False
         self._show_notice("")
         self._refresh_frame_title()
@@ -4448,8 +3972,9 @@ def _block_ref_noun(block: FlowBlock) -> Tuple[str, str]:
 
 
 def _join_lines(lines: List[Text]) -> Text:
-    """Join painted grid lines into one multi-line ``Text`` (markup-safe:
-    built by append, never markup-parsed)."""
+    """Join painted lines (the pipeline's card rows, the run log's lines)
+    into one multi-line ``Text`` (markup-safe: built by append, never
+    markup-parsed)."""
     out = Text()
     for i, line in enumerate(lines):
         if i:

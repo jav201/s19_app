@@ -1,0 +1,141 @@
+base commit: 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+mutant: M1
+
+mutation:
+==== diff -u s19_app/tui/screens.py ====
+--- <HOME>/work/s19_i12mut/s19_app/tui/screens.py	2026-11-07 05:38:44.571238593 -0600
++++ <HOME>/work/s19_i12mut_m1/s19_app/tui/screens.py	2026-11-07 05:53:20.959453702 -0600
+@@ -1067,6 +1067,94 @@
+         return width if width > 0 else 76
+ 
+ 
++
++
++#: Static help copy for the variant-selector info modal (US-067 / LLR-067.3).
++#: One paragraph per idea, joined with blank lines. Authored free of Rich /
++#: console-markup metacharacters (``[`` / ``]`` / ``link=``) and rendered
++#: through a ``markup=False`` ``Static`` — the text is a fixed constant with NO
++#: untrusted interpolation, so it can never carry a markup or style leak
++#: (C-17). The required content tokens (``picks which firmware image loads`` /
++#: ``at least two firmware images`` / ``project directory``) are asserted by
++#: AT-067a + TC-337, so a copy edit that drops the explanation trips the tests.
++VARIANT_HELP_TEXT: str = "\n\n".join(
++    (
++        "The variant selector picks which firmware image loads.",
++        "Each option is one firmware image found in the current project "
++        "directory. Choosing an option reloads that image, so you can inspect "
++        "or patch a different build without leaving the project.",
++        "The selector appears only when the project directory holds at least "
++        "two firmware images. With a single image there is nothing to switch "
++        "between, so the control stays empty and disabled.",
++    )
++)
++
++
++class VariantHelpScreen(ModalScreen[None]):
++    """Read-only help modal explaining the variant selector (HLR-067).
++
++    Summary:
++        Static discovery help for the Patch Editor's ``#patch_variant_select``
++        dropdown (LLR-067.3), opened by the always-rendered
++        ``#patch_variant_info_button`` beside it. The body renders the fixed
++        :data:`VARIANT_HELP_TEXT` — what the selector does (picks which
++        firmware image loads) and when it appears (>=2 images in the project
++        directory) — through a ``markup=False`` ``Static`` so a stray
++        metacharacter could never be interpreted (C-17); the copy is a constant
++        with no interpolation. Reuses the shared ``.modal-dialog`` box model
++        (``height: auto`` fits the short help text at both 80x24 and 120x30 —
++        pilot-measured, C-23), so no new CSS rule is added. Dismissed by Close
++        (self-handled, no app-side dispatch) — the same idiom as
++        :class:`LegendScreen`.
++
++    Data Flow:
++        - ``compose`` builds a ``.modal-dialog`` with a title, the
++          ``#variant_help_body`` ``Static`` seeded from ``VARIANT_HELP_TEXT``,
++          and a Close button.
++        - ``on_button_pressed`` dismisses with ``None`` on Close.
++
++    Dependencies:
++        Uses:
++            - ``Static`` / ``Button`` / the shared ``.modal-dialog`` classes
++            - :data:`VARIANT_HELP_TEXT`
++        Used by:
++            - ``S19TuiApp.on_patch_editor_panel_variant_help_requested``
++            - tests/test_tui_variants.py
++
++    Example:
++        >>> screen = VariantHelpScreen()  # doctest: +SKIP
++    """
++
++    def compose(self) -> ComposeResult:
++        yield Container(
++            Label("About the variant selector", classes="modal-title"),
++            Static(
++                VARIANT_HELP_TEXT,
++                id="variant_help_body",
++                markup=False,
++            ),
++            Container(
++                Button(
++                    "Close",
++                    id="variant_help_close",
++                    classes="modal-confirm",
++                ),
++                id="variant_help_buttons",
++                classes="modal-buttons",
++            ),
++            id="variant_help_dialog",
++            classes="modal-dialog",
++        )
++
++    def on_mount(self) -> None:
++        self.query_one("#variant_help_close", Button).focus()
++
++    def on_button_pressed(self, event: Button.Pressed) -> None:
++        if event.button.id == "variant_help_close":
++            logger.info("VariantHelpScreen dismissed by close.")
++            self.dismiss(None)
++
++
+ #: Debounce window for the save-plan recompute: one run 150 ms after the
+ #: last keystroke (LLR-175.5a).
+ SAVE_RECOMPUTE_S = 0.150
+
+
+s19_app.__file__: <HOME>/work/s19_i12mut_m1/s19_app/__init__.py
+
+--- landed grep M1: 's19_app/tui/screens.py' marker='VariantHelpScreen' expected=present found=present OK=True ---
+1093:class VariantHelpScreen(ModalScreen[None]):
+1125:        >>> screen = VariantHelpScreen()  # doctest: +SKIP
+1154:            logger.info("VariantHelpScreen dismissed by close.")
+
+
+nodes (1):
+  tests/test_b101_reach_and_reports_escape.py::test_r_dlg_14_1_every_dialog_has_an_opener
+
+
+--- pytest ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________________ test_r_dlg_14_1_every_dialog_has_an_opener __________________
+
+tree = {'s19_app/__init__.py': '', 's19_app/cli.py': 'import argparse\nimport logging\nfrom pathlib import Path\nfrom .core i... + 1][0]\n                print(f"  [GAP]  0x{end:08X} - 0x{next_start - 1:08X} ({next_start - end} bytes)")\n\n', ...}
+tree_census = Census(dialogs={'ReportViewerScreen', 'LoadFlowScreen', 'FlowBlockEditScreen', 'ConfirmQuestionScreen', 'LegendScreen'...n_close_window_help': {'string'}, 'WindowSection.action_show_window_usage_help': {'string'}}, actions_without_reach=[])
+
+    def test_r_dlg_14_1_every_dialog_has_an_opener(tree: Dict[str, str], tree_census: Census) -> None:
+        """R-DLG.14/1: 0 dialogs without an opener; at least 21 dialogs censused; the
+        census finds the dead shapes it must (an orphan dialog, a dialog built only in
+        a function no reached function calls, E3A-02) and passes the live ones (a
+        dialog opened in a toolkit handler, a base opened through its subclass)."""
+        assert len(tree_census.dialogs) >= 21, sorted(tree_census.dialogs)
+>       assert tree_census.dialogs_without_opener == [], tree_census.dialogs_without_opener
+E       AssertionError: ['VariantHelpScreen']
+E       assert ['VariantHelpScreen'] == []
+E         
+E         Left contains one more item: 'VariantHelpScreen'
+E         Use -v to get more diff
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:537: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_reach_and_reports_escape.py::test_r_dlg_14_1_every_dialog_has_an_opener
+1 failed in 1.68s

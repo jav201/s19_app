@@ -1,0 +1,18 @@
+=== Inc 10a E5 corrective run: e5c-10
+date: 2026-11-07T06:31:20Z
+tree dir: <HOME>/work/s19_i10c_probe_final
+checkout HEAD (base): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+main ref: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+index tree: 6cb142f114dea93b83e526ca5c29303554283466
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10c_probe_final/s19_app/__init__.py
+CMD: env -u NO_COLOR timeout 600 /data/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -q -s -p no:xdist tests/test_zz_probe_ml4.py
+PROBE show_legend: dialog LegendScreen, key 3 -> shown window workspace, landings 0, screen LegendScreen
+PROBE show_legend: dialog LegendScreen, key 4 -> shown window workspace, landings 0, screen LegendScreen
+PROBE show_legend: dialog LegendScreen, key 2 -> shown window workspace, landings 0, screen LegendScreen
+.PROBE operations_view: dialog OperationsScreen, key 3 -> shown window workspace, landings 0, screen OperationsScreen
+PROBE operations_view: dialog OperationsScreen, key 4 -> shown window workspace, landings 0, screen OperationsScreen
+PROBE operations_view: dialog OperationsScreen, key 2 -> shown window workspace, landings 0, screen OperationsScreen
+.
+2 passed in 25.37s
+exit code: 0

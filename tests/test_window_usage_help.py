@@ -5,7 +5,7 @@ The help sections ship operator-editable from ONE home —
 ``window_help.WINDOW_HELP_SECTIONS`` (twelve code-authored sections; since
 batch-101 Inc 14, ruling D-3, none is ported from the operator's
 ``help_sections.md`` draft and no test reads it) — and render on the shipped
-``VariantHelpScreen`` pattern: a per-window modal with numbered steps in plain
+modal pattern: a per-window modal with numbered steps in plain
 prose, no markup parsing (``Static(markup=False)``), dismissed by Close and
 Esc. Each shipped window seats a ``?`` ghost chip beside its title (never
 displacing the change-2 ``📂 Open folder`` chip) and claims the ``?`` key while
@@ -623,7 +623,8 @@ def test_tc706_seat_census_header_row_and_window_section(tmp_path: Path) -> None
         "open_folder_reports",
     ]
     assert observed["reports"]["bindings"] == [
-        ("question_mark", "show_window_usage_help", False)
+        ("question_mark", "show_window_usage_help", False),
+        ("escape", "close_reports", False),
     ]
 
 

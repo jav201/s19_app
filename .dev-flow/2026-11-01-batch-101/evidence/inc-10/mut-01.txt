@@ -1,0 +1,653 @@
+=== base commit: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+=== python: Python 3.11.18
+=== mutation applied: M1 (file s19_app/tui/app.py)
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -19967,9 +19967,9 @@
+         rows = self._hex_view_rows()
+         page_size = self._clamp_viewer_page_size(self.hex_rows_page_size)
+         if isinstance(focus_address, int):
+-            start = self._row_start_for_near_top_focus(focus_address, row_bases, rows)
+-            if start is not None:
+-                self._hex_window_start = start
++            focus_index = self._snapped_focus_row_index(focus_address, row_bases)
++            if focus_index is not None:
++                self._hex_window_start = (focus_index // page_size) * page_size
+         self._hex_window_start = max(0, min(self._hex_window_start, len(rows) - 1))
+         if focus_address is not None and focus_address != self._goto_focus_address:
+             self._goto_focus_address = None
+LANDED M1: '(focus_index // page_size) * page_size' x1
+=== s19_app.__file__ ===
+<HOME>/work/s19_i10mut_m01/s19_app/__init__.py
+=== CMD ===
+env -u NO_COLOR <HOME>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -rf -n 4 --dist load tests/test_b101_hex_jump.py::test_r_tui_018_1_1_main_goto_target_is_second_row tests/test_b101_hex_jump.py::test_r_tui_018_1_2_main_find_next_hit_is_second_row tests/test_b101_hex_jump.py::test_r_tui_018_1_3_section_jump_shows_range_start_second tests/test_b101_hex_jump.py::test_r_tui_018_1_4_map_open_in_hex_snapped_row_second tests/test_b101_hex_jump.py::test_r_tui_018_1_11_jump_to_last_present_row_still_second tests/test_b101_hex_jump.py::test_r_tui_018_1_12_mac_row_below_image_counts_as_row_above tests/test_b101_hex_jump.py::test_r_tui_018_1_13b_main_target_row_inside_pane_at_100x30 tests/test_b101_hex_jump.py::test_r_tui_040_4_1_main_goto_target_row_second_and_marked
+bringing up nodes...
+bringing up nodes...
+
+FFFFFFFF                                                                 [100%]
+=================================== FAILURES ===================================
+___________ test_r_tui_018_1_3_section_jump_shows_range_start_second ___________
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-639/popen-gw1/test_r_tui_018_1_3_section_jum0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-639/popen-gw1/case080')
+
+    def test_r_tui_018_1_3_section_jump_shows_range_start_second(tmp_path, case08):
+        """R-TUI-018.1/3: a section jump shows the range start as the second row."""
+    
+        async def scenario(app, pilot, log):
+            view = await start(pilot, app, case08, "main")
+            sections = app.query_one("#sections_list", ListView)
+            await wait_until(pilot, lambda: len(sections.children) >= 2, "the Data Sections list is empty")
+            assert sections.children[1].data[0] == 0x00040000, "the second section must start at 0x00040000"
+            sections.focus()
+            await wait_until(pilot, lambda: app.default_screen.focused is sections, "the section list did not take the focus")
+            sections.index = 1
+            await wait_until(pilot, lambda: sections.index == 1, "the section cursor did not move")
+            shown_before = addrs(app, "#hex_view", 1)
+            await pilot.press("enter")
+            # The positive sign of the jump: the window moved (no section status exists).
+            await wait_until(pilot, lambda: addrs(app, "#hex_view", 1) != shown_before, "the section jump did not move the window")
+            bases = app.current_file.row_bases
+            above = bases[bisect_left(bases, 0x00040000) - 1]
+            await wait_rows(pilot, app, view, [above, 0x00040000], "section jump to 0x00040000")
+    
+>       drive(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_hex_jump.py:473: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_hex_jump.py:137: in drive
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_hex_jump.py:471: in scenario
+    await wait_rows(pilot, app, view, [above, 0x00040000], "section jump to 0x00040000")
+../s19_i10mut/tests/test_b101_hex_jump.py:207: in wait_rows
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function wait_rows.<locals>.<lambda> at 0x7f66ead90400>
+failure = <function wait_rows.<locals>.<lambda> at 0x7f66e5fda7a0>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: section jump to 0x00040000: first rows [0x0000FA00, 0x0000FA10], expected [0x0000FFF0, 0x00040000]
+
+tests/support/timing.py:66: AssertionError
+__________ test_r_tui_018_1_11_jump_to_last_present_row_still_second ___________
+[gw2] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-639/popen-gw2/test_r_tui_018_1_11_jump_to_la0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-639/popen-gw2/case080')
+
+    def test_r_tui_018_1_11_jump_to_last_present_row_still_second(tmp_path, case08):
+        """R-TUI-018.1/11: a jump to the last present row shows it second; 2 rows."""
+    
+        async def scenario(app, pilot, log):
+            view = await start(pilot, app, case08, "main")
+            bases = app.current_file.row_bases
+            assert bases[-1] == LAST_ROW and bases[-2] == LAST_ROW - 0x10
+            await goto(pilot, app, log, view, f"0x{LAST_ROW:08X}", hit(LAST_ROW))
+            await wait_rows(pilot, app, view, [LAST_ROW - 0x10, LAST_ROW], "jump to the last present row")
+            assert len(hex_rows(app, "#hex_view")) == 2, hex_rows(app, "#hex_view")
+            assert not any("window limited" in n for n in notices(app, "#hex_view")), notices(app, "#hex_view")
+    
+>       drive(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_hex_jump.py:572: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_hex_jump.py:137: in drive
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_hex_jump.py:568: in scenario
+    await wait_rows(pilot, app, view, [LAST_ROW - 0x10, LAST_ROW], "jump to the last present row")
+../s19_i10mut/tests/test_b101_hex_jump.py:207: in wait_rows
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function wait_rows.<locals>.<lambda> at 0x7f01dcc73100>
+failure = <function wait_rows.<locals>.<lambda> at 0x7f01e0cc4400>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: jump to the last present row: first rows [0x00C006E0, 0x00C006F0], expected [0x00C00FE0, 0x00C00FF0]
+
+tests/support/timing.py:66: AssertionError
+______________ test_r_tui_018_1_1_main_goto_target_is_second_row _______________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-639/popen-gw0/test_r_tui_018_1_1_main_goto_t0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-639/popen-gw0/case080')
+
+    def test_r_tui_018_1_1_main_goto_target_is_second_row(tmp_path, case08):
+        """R-TUI-018.1/1: a main go-to shows its target as the second row."""
+    
+        async def scenario(app, pilot, log):
+            view = await start(pilot, app, case08, "main")
+            await goto(pilot, app, log, view, "0x00000960", hit(0x960))
+            await wait_rows(pilot, app, view, [0x950, 0x960], "main go-to 0x00000960")
+            shown = notices(app, "#hex_view")
+            assert any(n.startswith("... showing from 0x00000950") for n in shown), shown
+    
+>       drive(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_hex_jump.py:439: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_hex_jump.py:137: in drive
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_hex_jump.py:435: in scenario
+    await wait_rows(pilot, app, view, [0x950, 0x960], "main go-to 0x00000960")
+../s19_i10mut/tests/test_b101_hex_jump.py:207: in wait_rows
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function wait_rows.<locals>.<lambda> at 0x7f8732f7a340>
+failure = <function wait_rows.<locals>.<lambda> at 0x7f8733880d60>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: main go-to 0x00000960: first rows [0x00000000, 0x00000010], expected [0x00000950, 0x00000960]
+
+tests/support/timing.py:66: AssertionError
+__________ test_r_tui_018_1_13b_main_target_row_inside_pane_at_100x30 __________
+[gw3] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-639/popen-gw3/test_r_tui_018_1_13b_main_targ0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-639/popen-gw3/case080')
+
+    def test_r_tui_018_1_13b_main_target_row_inside_pane_at_100x30(tmp_path, case08):
+        """R-TUI-018.1/13 (extension, finding F-1): the main arm that 80 x 24 cannot
+        hold, at the smallest measured size whose Workspace pane has 7 lines."""
+    
+        async def scenario(app, pilot, log):
+            view = await start(pilot, app, case08, "main")
+            sc = app.query_one("#hex_scroll", ScrollableContainer)
+            assert sc.region.height >= 4, f"the pane is {sc.region.height} line(s) high at 100 x 30"
+            await goto(pilot, app, log, view, "0x00000960", hit(0x960))
+            await wait_rows(pilot, app, view, [0x950, 0x960], "main go-to at 100 x 30")
+            st = app.query_one("#hex_view", Static)
+    
+            await wait_until(
+                pilot,
+                lambda: line_inside_pane(sc, st, 0x960),
+                lambda: f"target line not inside the pane; scroll_y {sc.scroll_y}, pane {sc.region}, content {st.region}",
+                timeout=FIX_WAIT,
+            )
+    
+>       drive(tmp_path, scenario, size=(100, 30))
+
+../s19_i10mut/tests/test_b101_hex_jump.py:640: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_hex_jump.py:137: in drive
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_hex_jump.py:630: in scenario
+    await wait_rows(pilot, app, view, [0x950, 0x960], "main go-to at 100 x 30")
+../s19_i10mut/tests/test_b101_hex_jump.py:207: in wait_rows
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function wait_rows.<locals>.<lambda> at 0x7f5eef9dce00>
+failure = <function wait_rows.<locals>.<lambda> at 0x7f5eeeeec360>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: main go-to at 100 x 30: first rows [0x00000000, 0x00000010], expected [0x00000950, 0x00000960]
+
+tests/support/timing.py:66: AssertionError
+_________ test_r_tui_018_1_12_mac_row_below_image_counts_as_row_above __________
+[gw2] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-639/popen-gw2/test_r_tui_018_1_12_mac_row_be0')
+
+    def test_r_tui_018_1_12_mac_row_below_image_counts_as_row_above(tmp_path):
+        """R-TUI-018.1/12: a MAC record below the image is a row above the target
+        in each of the three views (base: 0x00008020 third)."""
+    
+        async def scenario(app, pilot, log):
+            await load_three(pilot, app, tmp_path, mac=True)
+            for view_name in ("main", "a2l", "mac"):
+                view = VIEWS[view_name]
+                await show(pilot, app, view)
+                # The MAC row is the first view row before the jump (so it can count).
+                await wait_rows(pilot, app, view, [0x1000, 0x8000, 0x8010], f"{view_name} rows before the jump")
+                await goto(pilot, app, log, view, "0x00008020", hit(0x8020))
+                await wait_rows(pilot, app, view, [0x8010, 0x8020], f"{view_name} go-to 0x00008020")
+    
+>       drive(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_hex_jump.py:589: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_hex_jump.py:137: in drive
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_hex_jump.py:587: in scenario
+    await wait_rows(pilot, app, view, [0x8010, 0x8020], f"{view_name} go-to 0x00008020")
+../s19_i10mut/tests/test_b101_hex_jump.py:207: in wait_rows
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function wait_rows.<locals>.<lambda> at 0x7f01e0fe1bc0>
+failure = <function wait_rows.<locals>.<lambda> at 0x7f01e2ac1e40>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: main go-to 0x00008020: first rows [0x00001000, 0x00008000], expected [0x00008010, 0x00008020]
+
+tests/support/timing.py:66: AssertionError
+_____________ test_r_tui_018_1_2_main_find_next_hit_is_second_row ______________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-639/popen-gw0/test_r_tui_018_1_2_main_find_n0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-639/popen-gw0/case080')
+
+    def test_r_tui_018_1_2_main_find_next_hit_is_second_row(tmp_path, case08):
+        """R-TUI-018.1/2: a main Find Next hit is the second row."""
+    
+        async def scenario(app, pilot, log):
+            view = await start(pilot, app, case08, "main")
+            await search(pilot, app, log, view, "BUILD_ID", "Found at 0x00C00050")
+            await wait_rows(pilot, app, view, [0x00C00040, 0x00C00050], "main Find Next BUILD_ID")
+    
+>       drive(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_hex_jump.py:450: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_hex_jump.py:137: in drive
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_hex_jump.py:448: in scenario
+    await wait_rows(pilot, app, view, [0x00C00040, 0x00C00050], "main Find Next BUILD_ID")
+../s19_i10mut/tests/test_b101_hex_jump.py:207: in wait_rows
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function wait_rows.<locals>.<lambda> at 0x7f87382f32e0>
+failure = <function wait_rows.<locals>.<lambda> at 0x7f87338b22a0>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: main Find Next BUILD_ID: first rows [0x0081FA60, 0x0081FA70], expected [0x00C00040, 0x00C00050]
+
+tests/support/timing.py:66: AssertionError
+__________ test_r_tui_040_4_1_main_goto_target_row_second_and_marked ___________
+[gw3] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-639/popen-gw3/test_r_tui_040_4_1_main_goto_t0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-639/popen-gw3/case080')
+
+    def test_r_tui_040_4_1_main_goto_target_row_second_and_marked(tmp_path, case08):
+        """R-TUI-040.4/1: the main go-to target row is second, marked '> '."""
+    
+        async def scenario(app, pilot, log):
+            await _goto_inside_row(pilot, app, log, case08, "main")
+    
+>       drive(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_hex_jump.py:795: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_hex_jump.py:137: in drive
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_hex_jump.py:793: in scenario
+    await _goto_inside_row(pilot, app, log, case08, "main")
+../s19_i10mut/tests/test_b101_hex_jump.py:785: in _goto_inside_row
+    await wait_rows(pilot, app, view, [0x950, 0x960], f"{view_name} go-to 0x00000965")
+../s19_i10mut/tests/test_b101_hex_jump.py:207: in wait_rows
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function wait_rows.<locals>.<lambda> at 0x7f5eec2c5800>
+failure = <function wait_rows.<locals>.<lambda> at 0x7f5eea776020>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: main go-to 0x00000965: first rows [0x00000000, 0x00000010], expected [0x00000950, 0x00000960]
+
+tests/support/timing.py:66: AssertionError
+____________ test_r_tui_018_1_4_map_open_in_hex_snapped_row_second _____________
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-639/popen-gw1/test_r_tui_018_1_4_map_open_in0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-639/popen-gw1/case080')
+
+    def test_r_tui_018_1_4_map_open_in_hex_snapped_row_second(tmp_path, case08):
+        """R-TUI-018.1/4: a Memory Map open-in-hex shows the snapped target row second."""
+        from s19_app.tui.screens_directionb import MemoryMapPanel
+    
+        async def scenario(app, pilot, log):
+            view = await start(pilot, app, case08, "main")
+            await pilot.press("4")
+            panel = app.query_one("#memory_map_panel", MemoryMapPanel)
+            await wait_until(pilot, lambda: len(panel._live_region_rows()) >= 2, "the map lists fewer than two regions")
+            chosen = panel._live_region_rows()[1].region_start
+            bases = app.current_file.row_bases
+            assert chosen > bases[0], "the chosen region must not start at the first view row"
+            await _double_click_region_row(pilot, app, lambda r: r.region_start == chosen)
+            await wait_until(
+                pilot,
+                lambda: app.query_one("#hex_scroll", ScrollableContainer).region.height > 0,
+                "the Workspace was not shown by the open-in-hex",
+            )
+            index = bisect_left(bases, chosen - chosen % 16)
+            await wait_rows(pilot, app, view, [bases[index - 1], bases[index]], f"open-in-hex of 0x{chosen:08X}")
+    
+>       drive(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_hex_jump.py:497: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_hex_jump.py:137: in drive
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_hex_jump.py:495: in scenario
+    await wait_rows(pilot, app, view, [bases[index - 1], bases[index]], f"open-in-hex of 0x{chosen:08X}")
+../s19_i10mut/tests/test_b101_hex_jump.py:207: in wait_rows
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function wait_rows.<locals>.<lambda> at 0x7f66e71780e0>
+failure = <function wait_rows.<locals>.<lambda> at 0x7f66e76b7600>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: open-in-hex of 0x00000100: first rows [0x00000000, 0x00000010], expected [0x000000F0, 0x00000100]
+
+tests/support/timing.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_hex_jump.py::test_r_tui_018_1_3_section_jump_shows_range_start_second
+FAILED tests/test_b101_hex_jump.py::test_r_tui_018_1_11_jump_to_last_present_row_still_second
+FAILED tests/test_b101_hex_jump.py::test_r_tui_018_1_1_main_goto_target_is_second_row
+FAILED tests/test_b101_hex_jump.py::test_r_tui_018_1_13b_main_target_row_inside_pane_at_100x30
+FAILED tests/test_b101_hex_jump.py::test_r_tui_018_1_12_mac_row_below_image_counts_as_row_above
+FAILED tests/test_b101_hex_jump.py::test_r_tui_018_1_2_main_find_next_hit_is_second_row
+FAILED tests/test_b101_hex_jump.py::test_r_tui_040_4_1_main_goto_target_row_second_and_marked
+FAILED tests/test_b101_hex_jump.py::test_r_tui_018_1_4_map_open_in_hex_snapped_row_second
+8 failed in 39.01s

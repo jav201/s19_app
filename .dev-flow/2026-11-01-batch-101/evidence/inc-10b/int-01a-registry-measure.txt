@@ -1,0 +1,21 @@
+=== Inc 10b E4 integration run: int-01a-registry-measure
+date: 2026-11-07T08:50:03Z
+host: LAN Linux laptop, 8 cores
+clone: git clone --shared, own branch main checked out
+base (HEAD = main): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+refs/remotes/origin/main in this clone: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+index tree with the increment staged: 298f77feeaf18943205fd77f42bc5c0c63a00947
+staged files vs base: 11
+unstaged changes vs index: 0
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10bint/s19_app/__init__.py
+CMD: env -u NO_COLOR PYTHONPATH=<clone> timeout 600 python -m pytest -q -p no:cacheprovider -p no:xdist -rfs --tb=line tests/test_id_registry.py -k scanned_corpus
+F                                                                        [100%]
+=================================== FAILURES ===================================
+E   AssertionError: the guard scanned 273 test modules, not the declared 272. If tests/ legitimately grew, bump EXPECTED_SCANNED_TEST_FILES in the same PR so the bound stays a decision rather than a rubber stamp.
+    assert 273 == 272
+<HOME>/work/s19_i10bint/tests/test_id_registry.py:533: AssertionError: the guard scanned 273 test modules, not the declared 272. If tests/ legitimately grew, bump EXPECTED_SCANNED_TEST_FILES in the same PR so the bound stays a decision rather than a rubber stamp.
+=========================== short test summary info ============================
+FAILED tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound
+1 failed, 11 deselected in 5.27s
+exit: 1

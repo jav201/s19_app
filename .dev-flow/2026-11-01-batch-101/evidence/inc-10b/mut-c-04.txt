@@ -1,0 +1,237 @@
+== mut-c-04  2026-11-07T11:13:40Z  host: LAN Linux laptop
+base commit (HEAD): 6f1743c1ad54ff7db89e8fcd4e96266414950f42  main: 6f1743c1ad54ff7db89e8fcd4e96266414950f42  origin/main: 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+staged tree (index): f60e3b2df551b8ca5ed438916a0ff14c8f4571b3
+--- working-tree edits over the index (mutant):
+diff --git a/s19_app/tui/app.py b/s19_app/tui/app.py
+index e21dc3ea..07ed8546 100644
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -18949,7 +18949,7 @@ class S19TuiApp(App):
+                 now = [mem_map.get(address) for address in range(start, start + len(raw) // 2)]
+                 if now != list(bytes.fromhex(raw)):
+                     changed.append(index)
+-            if not changed:
++            if True:
+                 return
+             source = self.current_a2l_data.get("tags", [])
+             fresh, _lines = enrich_tags_and_render(
+--- end of edits
+python: 3.11.18
+s19_app.__file__: <HOME>/work/s19_i10bc_mut/s19_app/__init__.py
+CMD: cd <HOME>/work/s19_i10bc_mut && env -u NO_COLOR timeout 1200 <CONDA>/envs/s19ci/bin/python -m pytest -n 4 -m not serial_timing -p no:cacheprovider tests/test_b101_inplace_views.py -k a2l_ -rfs --tb=line
+--- pytest output
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0
+rootdir: <HOME>/work/s19_i10bc_mut
+configfile: pyproject.toml
+plugins: platformdirs-4.14.3, xdist-3.8.0
+created: 4/4 workers
+4 workers [10 items]
+
+FFFFFFFF.F                                                               [100%]
+=================================== FAILURES ===================================
+[gw0] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+E   AssertionError: VALUE_0001 paints ('108', '108'), expected ('147', '147')
+<HOME>/work/s19_i10bc_mut/tests/support/timing.py:66: AssertionError: VALUE_0001 paints ('108', '108'), expected ('147', '147')
+[gw2] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+E   AssertionError: VAL_BLK_0002 paints ('47629', '47629'), expected 17677
+<HOME>/work/s19_i10bc_mut/tests/support/timing.py:66: AssertionError: VAL_BLK_0002 paints ('47629', '47629'), expected 17677
+[gw1] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+E   AssertionError: VALUE_0001 paints ('108', '108'), expected ('85', '85')
+<HOME>/work/s19_i10bc_mut/tests/support/timing.py:66: AssertionError: VALUE_0001 paints ('108', '108'), expected ('85', '85')
+[gw3] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+E   AssertionError: the repaint did not happen: VALUE_0001 paints ('108', '108') (before ('108', '108'))
+<HOME>/work/s19_i10bc_mut/tests/support/timing.py:66: AssertionError: the repaint did not happen: VALUE_0001 paints ('108', '108') (before ('108', '108'))
+[gw1] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+E   AssertionError: VALUE_0007 holds ('85.6589584350586', '185.6589584350586'), expected Raw '-9.876539885039906e+25'
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3015 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-480/popen-gw1/test_r_a2l_048_4_a_wider_value0/app workarea=/tmp/pytest-of-<user>/pytest-480/popen-gw1/test_r_a2l_048_4_a_wider_value0/app/.s19tool/workarea
+INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:18694 Loading file: path=/tmp/pytest-of-<user>/pytest-480/popen-gw1/b101_i10bw_case080/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:15001 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:19796 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-480/popen-gw1/b101_i10bw_case080/firmware.s19 addresses=424736 range_count=4 range_bytes=424736 errors=0
+INFO     s19tui:app.py:15018 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:19241 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:19924 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19262 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:19276 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:21019 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18547 MAC validation computed: records=0 issues=0 elapsed_seconds=0.778
+INFO     s19tui:app.py:18602 MAC row cache built: records=0 elapsed_seconds=0.778
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.012
+INFO     s19tui:app.py:20533 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.790
+INFO     s19tui:app.py:19291 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:20151 Memory Map updated. ranges=4
+INFO     s19tui:app.py:19314 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-480/popen-gw1/b101_i10bw_case080/firmware.s19 file_type=s19 elapsed_seconds=2.308 has_mac=False precomputed=False
+INFO     s19tui:app.py:16525 A2L copy complete: path=/tmp/pytest-of-<user>/pytest-480/popen-gw1/test_r_a2l_048_4_a_wider_value0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347 copy_seconds=0.012
+INFO     s19tui:app.py:951 A2L cache miss: path=/tmp/pytest-of-<user>/pytest-480/popen-gw1/test_r_a2l_048_4_a_wider_value0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347
+WARNING  s19tui:app.py:16563 Recent sources not updated: '/tmp/pytest-of-<user>/pytest-480/popen-gw1/b101_i10bw_case080/firmware.a2l'
+INFO     s19tui:app.py:8830 Workarea refreshed. files=1
+INFO     s19tui:app.py:19743 A2L parse summary: path=/tmp/pytest-of-<user>/pytest-480/popen-gw1/test_r_a2l_048_4_a_wider_value0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.055 sections=1 tags=462 errors=0
+INFO     s19tui:app.py:18547 MAC validation computed: records=0 issues=462 elapsed_seconds=0.848
+INFO     s19tui:app.py:18602 MAC row cache built: records=0 elapsed_seconds=0.849
+INFO     s19tui:app.py:17470 Load phase boundary: populate_issues_table_done rows=40 total=462 elapsed=0.036
+INFO     s19tui:app.py:20533 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.887
+INFO     s19tui:app.py:21060 Load phase boundary: populate_a2l_table_done rows=200 total=462 elapsed=0.013
+INFO     s19tui:app.py:16582 A2L view refresh complete: path=/tmp/pytest-of-<user>/pytest-480/popen-gw1/test_r_a2l_048_4_a_wider_value0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.914
+INFO     s19tui:app.py:16591 A2L loaded: /tmp/pytest-of-<user>/pytest-480/popen-gw1/test_r_a2l_048_4_a_wider_value0/app/.s19tool/workarea/temp/firmware.a2l
+<HOME>/work/s19_i10bc_mut/tests/support/timing.py:66: AssertionError: VALUE_0007 holds ('85.6589584350586', '185.6589584350586'), expected Raw '-9.876539885039906e+25'
+[gw2] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+E   AssertionError: the repaint did not happen: VALUE_0001 paints ('108', '108') (before ('108', '108'))
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3015 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-480/popen-gw2/test_r_a2l_049_1_first_shown_r0/app workarea=/tmp/pytest-of-<user>/pytest-480/popen-gw2/test_r_a2l_049_1_first_shown_r0/app/.s19tool/workarea
+INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:18694 Loading file: path=/tmp/pytest-of-<user>/pytest-480/popen-gw2/b101_i10bw_case080/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:15001 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:19796 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-480/popen-gw2/b101_i10bw_case080/firmware.s19 addresses=424736 range_count=4 range_bytes=424736 errors=0
+INFO     s19tui:app.py:15018 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:19241 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:19924 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19262 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:19276 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:21019 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18547 MAC validation computed: records=0 issues=0 elapsed_seconds=0.959
+INFO     s19tui:app.py:18602 MAC row cache built: records=0 elapsed_seconds=0.959
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:20533 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.970
+INFO     s19tui:app.py:19291 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:20151 Memory Map updated. ranges=4
+INFO     s19tui:app.py:19314 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-480/popen-gw2/b101_i10bw_case080/firmware.s19 file_type=s19 elapsed_seconds=2.208 has_mac=False precomputed=False
+INFO     s19tui:app.py:16525 A2L copy complete: path=/tmp/pytest-of-<user>/pytest-480/popen-gw2/test_r_a2l_049_1_first_shown_r0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347 copy_seconds=0.025
+INFO     s19tui:app.py:951 A2L cache miss: path=/tmp/pytest-of-<user>/pytest-480/popen-gw2/test_r_a2l_049_1_first_shown_r0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347
+WARNING  s19tui:app.py:16563 Recent sources not updated: '/tmp/pytest-of-<user>/pytest-480/popen-gw2/b101_i10bw_case080/firmware.a2l'
+INFO     s19tui:app.py:8830 Workarea refreshed. files=1
+INFO     s19tui:app.py:19743 A2L parse summary: path=/tmp/pytest-of-<user>/pytest-480/popen-gw2/test_r_a2l_049_1_first_shown_r0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.130 sections=1 tags=462 errors=0
+INFO     s19tui:app.py:18547 MAC validation computed: records=0 issues=462 elapsed_seconds=1.159
+INFO     s19tui:app.py:18602 MAC row cache built: records=0 elapsed_seconds=1.160
+INFO     s19tui:app.py:17470 Load phase boundary: populate_issues_table_done rows=40 total=462 elapsed=0.043
+INFO     s19tui:app.py:20533 Load phase boundary: populate_mac_table_done rows=0 elapsed=1.205
+INFO     s19tui:app.py:21060 Load phase boundary: populate_a2l_table_done rows=200 total=462 elapsed=0.014
+INFO     s19tui:app.py:16582 A2L view refresh complete: path=/tmp/pytest-of-<user>/pytest-480/popen-gw2/test_r_a2l_049_1_first_shown_r0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=1.235
+INFO     s19tui:app.py:16591 A2L loaded: /tmp/pytest-of-<user>/pytest-480/popen-gw2/test_r_a2l_049_1_first_shown_r0/app/.s19tool/workarea/temp/firmware.a2l
+<HOME>/work/s19_i10bc_mut/tests/support/timing.py:66: AssertionError: the repaint did not happen: VALUE_0001 paints ('108', '108') (before ('108', '108'))
+[gw0] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+E   AssertionError: VALUE_0001 paints ('108', '108'), expected ('85', '85')
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3015 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-480/popen-gw0/test_r_a2l_048_2_save_project_0/app workarea=/tmp/pytest-of-<user>/pytest-480/popen-gw0/test_r_a2l_048_2_save_project_0/app/.s19tool/workarea
+INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:18694 Loading file: path=/tmp/pytest-of-<user>/pytest-480/popen-gw0/b101_i10bw_case080/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:15001 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:19796 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-480/popen-gw0/b101_i10bw_case080/firmware.s19 addresses=424736 range_count=4 range_bytes=424736 errors=0
+INFO     s19tui:app.py:15018 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:19241 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:19924 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19262 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:19276 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:21019 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18547 MAC validation computed: records=0 issues=0 elapsed_seconds=0.870
+INFO     s19tui:app.py:18602 MAC row cache built: records=0 elapsed_seconds=0.870
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.011
+INFO     s19tui:app.py:20533 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.882
+INFO     s19tui:app.py:19291 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:20151 Memory Map updated. ranges=4
+INFO     s19tui:app.py:19314 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-480/popen-gw0/b101_i10bw_case080/firmware.s19 file_type=s19 elapsed_seconds=2.251 has_mac=False precomputed=False
+INFO     s19tui:app.py:16525 A2L copy complete: path=/tmp/pytest-of-<user>/pytest-480/popen-gw0/test_r_a2l_048_2_save_project_0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347 copy_seconds=0.013
+INFO     s19tui:app.py:951 A2L cache miss: path=/tmp/pytest-of-<user>/pytest-480/popen-gw0/test_r_a2l_048_2_save_project_0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347
+WARNING  s19tui:app.py:16563 Recent sources not updated: '/tmp/pytest-of-<user>/pytest-480/popen-gw0/b101_i10bw_case080/firmware.a2l'
+INFO     s19tui:app.py:8830 Workarea refreshed. files=1
+INFO     s19tui:app.py:19743 A2L parse summary: path=/tmp/pytest-of-<user>/pytest-480/popen-gw0/test_r_a2l_048_2_save_project_0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.070 sections=1 tags=462 errors=0
+INFO     s19tui:app.py:18547 MAC validation computed: records=0 issues=462 elapsed_seconds=1.006
+INFO     s19tui:app.py:18602 MAC row cache built: records=0 elapsed_seconds=1.007
+INFO     s19tui:app.py:17470 Load phase boundary: populate_issues_table_done rows=40 total=462 elapsed=0.039
+INFO     s19tui:app.py:20533 Load phase boundary: populate_mac_table_done rows=0 elapsed=1.048
+INFO     s19tui:app.py:21060 Load phase boundary: populate_a2l_table_done rows=200 total=462 elapsed=0.014
+INFO     s19tui:app.py:16582 A2L view refresh complete: path=/tmp/pytest-of-<user>/pytest-480/popen-gw0/test_r_a2l_048_2_save_project_0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=1.074
+INFO     s19tui:app.py:16591 A2L loaded: /tmp/pytest-of-<user>/pytest-480/popen-gw0/test_r_a2l_048_2_save_project_0/app/.s19tool/workarea/temp/firmware.a2l
+INFO     s19tui:app.py:8912 Save project action triggered for /tmp/pytest-of-<user>/pytest-480/popen-gw0/b101_i10bw_case080/firmware.s19
+INFO     s19tui:app.py:12948 Project saved image. name=P file=/tmp/pytest-of-<user>/pytest-480/popen-gw0/test_r_a2l_048_2_save_project_0/app/.s19tool/workarea/P/firmware.s19
+INFO     s19tui:app.py:12948 Project saved a2l. name=P file=/tmp/pytest-of-<user>/pytest-480/popen-gw0/test_r_a2l_048_2_save_project_0/app/.s19tool/workarea/P/firmware.a2l
+INFO     s19tui:app.py:8830 Workarea refreshed. files=1
+<HOME>/work/s19_i10bc_mut/tests/support/timing.py:66: AssertionError: VALUE_0001 paints ('108', '108'), expected ('85', '85')
+[gw3] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+E   AssertionError: the repaint did not happen: VALUE_0001 paints ('108', '108')
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3015 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-480/popen-gw3/test_r_a2l_105_1_highlighted_r0/app workarea=/tmp/pytest-of-<user>/pytest-480/popen-gw3/test_r_a2l_105_1_highlighted_r0/app/.s19tool/workarea
+INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:18694 Loading file: path=/tmp/pytest-of-<user>/pytest-480/popen-gw3/b101_i10bw_case080/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:15001 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:19796 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-480/popen-gw3/b101_i10bw_case080/firmware.s19 addresses=424736 range_count=4 range_bytes=424736 errors=0
+INFO     s19tui:app.py:15018 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:19241 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:19924 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19262 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:19276 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:21019 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18547 MAC validation computed: records=0 issues=0 elapsed_seconds=0.937
+INFO     s19tui:app.py:18602 MAC row cache built: records=0 elapsed_seconds=0.937
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:20533 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.948
+INFO     s19tui:app.py:19291 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:20151 Memory Map updated. ranges=4
+INFO     s19tui:app.py:19314 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-480/popen-gw3/b101_i10bw_case080/firmware.s19 file_type=s19 elapsed_seconds=2.121 has_mac=False precomputed=False
+INFO     s19tui:app.py:16525 A2L copy complete: path=/tmp/pytest-of-<user>/pytest-480/popen-gw3/test_r_a2l_105_1_highlighted_r0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347 copy_seconds=0.018
+INFO     s19tui:app.py:951 A2L cache miss: path=/tmp/pytest-of-<user>/pytest-480/popen-gw3/test_r_a2l_105_1_highlighted_r0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347
+WARNING  s19tui:app.py:16563 Recent sources not updated: '/tmp/pytest-of-<user>/pytest-480/popen-gw3/b101_i10bw_case080/firmware.a2l'
+INFO     s19tui:app.py:8830 Workarea refreshed. files=1
+INFO     s19tui:app.py:19743 A2L parse summary: path=/tmp/pytest-of-<user>/pytest-480/popen-gw3/test_r_a2l_105_1_highlighted_r0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.102 sections=1 tags=462 errors=0
+INFO     s19tui:app.py:18547 MAC validation computed: records=0 issues=462 elapsed_seconds=1.131
+INFO     s19tui:app.py:18602 MAC row cache built: records=0 elapsed_seconds=1.131
+INFO     s19tui:app.py:17470 Load phase boundary: populate_issues_table_done rows=40 total=462 elapsed=0.038
+INFO     s19tui:app.py:20533 Load phase boundary: populate_mac_table_done rows=0 elapsed=1.171
+INFO     s19tui:app.py:21060 Load phase boundary: populate_a2l_table_done rows=200 total=462 elapsed=0.014
+INFO     s19tui:app.py:16582 A2L view refresh complete: path=/tmp/pytest-of-<user>/pytest-480/popen-gw3/test_r_a2l_105_1_highlighted_r0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=1.196
+INFO     s19tui:app.py:16591 A2L loaded: /tmp/pytest-of-<user>/pytest-480/popen-gw3/test_r_a2l_105_1_highlighted_r0/app/.s19tool/workarea/temp/firmware.a2l
+<HOME>/work/s19_i10bc_mut/tests/support/timing.py:66: AssertionError: the repaint did not happen: VALUE_0001 paints ('108', '108')
+[gw0] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+E   AssertionError: VALUE_0001 paints ('108', '108'), expected ('147', '147')
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3015 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-480/popen-gw0/test_r_a2l_106_1_value_filter_0/app workarea=/tmp/pytest-of-<user>/pytest-480/popen-gw0/test_r_a2l_106_1_value_filter_0/app/.s19tool/workarea
+INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:18694 Loading file: path=/tmp/pytest-of-<user>/pytest-480/popen-gw0/b101_i10bw_case080/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:15001 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:19796 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-480/popen-gw0/b101_i10bw_case080/firmware.s19 addresses=424736 range_count=4 range_bytes=424736 errors=0
+INFO     s19tui:app.py:15018 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:19241 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:19924 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19262 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:19276 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:21019 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:18547 MAC validation computed: records=0 issues=0 elapsed_seconds=0.871
+INFO     s19tui:app.py:18602 MAC row cache built: records=0 elapsed_seconds=0.871
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:20533 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.882
+INFO     s19tui:app.py:19291 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:20151 Memory Map updated. ranges=4
+INFO     s19tui:app.py:19314 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-480/popen-gw0/b101_i10bw_case080/firmware.s19 file_type=s19 elapsed_seconds=2.189 has_mac=False precomputed=False
+INFO     s19tui:app.py:16525 A2L copy complete: path=/tmp/pytest-of-<user>/pytest-480/popen-gw0/test_r_a2l_106_1_value_filter_0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347 copy_seconds=0.014
+INFO     s19tui:app.py:951 A2L cache miss: path=/tmp/pytest-of-<user>/pytest-480/popen-gw0/test_r_a2l_106_1_value_filter_0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347
+WARNING  s19tui:app.py:16563 Recent sources not updated: '/tmp/pytest-of-<user>/pytest-480/popen-gw0/b101_i10bw_case080/firmware.a2l'
+INFO     s19tui:app.py:8830 Workarea refreshed. files=1
+INFO     s19tui:app.py:19743 A2L parse summary: path=/tmp/pytest-of-<user>/pytest-480/popen-gw0/test_r_a2l_106_1_value_filter_0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.029 sections=1 tags=462 errors=0
+INFO     s19tui:app.py:18547 MAC validation computed: records=0 issues=462 elapsed_seconds=0.773
+INFO     s19tui:app.py:18602 MAC row cache built: records=0 elapsed_seconds=0.773
+INFO     s19tui:app.py:17470 Load phase boundary: populate_issues_table_done rows=40 total=462 elapsed=0.036
+INFO     s19tui:app.py:20533 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.811
+INFO     s19tui:app.py:21060 Load phase boundary: populate_a2l_table_done rows=200 total=462 elapsed=0.013
+INFO     s19tui:app.py:16582 A2L view refresh complete: path=/tmp/pytest-of-<user>/pytest-480/popen-gw0/test_r_a2l_106_1_value_filter_0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.834
+INFO     s19tui:app.py:16591 A2L loaded: /tmp/pytest-of-<user>/pytest-480/popen-gw0/test_r_a2l_106_1_value_filter_0/app/.s19tool/workarea/temp/firmware.a2l
+INFO     s19tui:app.py:21060 Load phase boundary: populate_a2l_table_done rows=200 total=462 elapsed=0.013
+INFO     s19tui:app.py:21060 Load phase boundary: populate_a2l_table_done rows=2 total=2 elapsed=0.001
+<HOME>/work/s19_i10bc_mut/tests/support/timing.py:66: AssertionError: VALUE_0001 paints ('108', '108'), expected ('147', '147')
+=========================== short test summary info ============================
+FAILED tests/test_b101_inplace_views.py::test_r_a2l_048_1_apply_shows_in_the_tag_table
+FAILED tests/test_b101_inplace_views.py::test_r_a2l_048_5_a_write_on_the_second_page_shows_there
+FAILED tests/test_b101_inplace_views.py::test_r_a2l_048_3_save_back_shows_in_the_tag_table
+FAILED tests/test_b101_inplace_views.py::test_r_a2l_049_2_first_shown_row_is_kept_with_a_value_filter
+FAILED tests/test_b101_inplace_views.py::test_r_a2l_048_4_a_wider_value_is_painted_whole
+FAILED tests/test_b101_inplace_views.py::test_r_a2l_049_1_first_shown_row_is_kept
+FAILED tests/test_b101_inplace_views.py::test_r_a2l_048_2_save_project_commit_shows_in_the_tag_table
+FAILED tests/test_b101_inplace_views.py::test_r_a2l_105_1_highlighted_row_is_kept
+FAILED tests/test_b101_inplace_views.py::test_r_a2l_106_1_value_filter_rows_stay_listed
+=================== 9 failed, 1 passed in 112.00s (0:01:52) ====================
+exit: 1  end 2026-11-07T11:15:33Z

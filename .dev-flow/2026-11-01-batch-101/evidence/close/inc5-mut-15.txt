@@ -1,0 +1,75 @@
+# Mutant M15 — batch-end re-run on the final tree (b982846)
+BASE_COMMIT=b982846ce33ccc20b1774f91b1091af4b42dff73
+BASE_TREE=detached worktree at 7d641d9 + git diff --binary 7d641d9 b982846 -- s19_app tests docs README.md AT-TC-REGISTRY.jsonl applied
+s19_app.__file__=<HOME>/work/s19_i5rm_m15/s19_app/__init__.py
+mutation: R-CHKED-041.2/.3 size ignored (address only)
+mutation diff:
+diff --git a<HOME>/work/s19_i5rm/s19_app/tui/screens_directionb.py b<HOME>/work/s19_i5rm_m15/s19_app/tui/screens_directionb.py
+index b05226d..7d01ba9 100644
+--- a<HOME>/work/s19_i5rm/s19_app/tui/screens_directionb.py
++++ b<HOME>/work/s19_i5rm_m15/s19_app/tui/screens_directionb.py
+@@ -7328,7 +7328,7 @@ class CheckEditorPanel(ScrollableContainer):
+         by_key: dict = {}
+         for name, (address, size, _fmt) in self._param_rows.items():
+             if isinstance(address, int):
+-                by_key.setdefault((address, size), []).append(name)
++                by_key.setdefault(address, []).append(name)
+         taken: set = set()
+         named: list = []
+         for item in items:
+@@ -7408,7 +7408,7 @@ class CheckEditorPanel(ScrollableContainer):
+             if self._param_rows[symbol][:2] == (address, size) and symbol not in taken:
+                 return symbol
+             return None
+-        names = by_key.get((address, size), [])
++        names = by_key.get(address, [])
+         if len(names) == 1 and names[0] not in taken:
+             return names[0]
+         return None
+verify:
+grep s19_app/tui/screens_directionb.py: replaced -> 'by_key.setdefault(address, []).append(name)' FOUND
+grep s19_app/tui/screens_directionb.py: replaced -> 'names = by_key.get(address, [])' FOUND
+guard nodes (1):
+  tests/test_b101_check_spec_keep.py::test_r_chked_041_3_3_size_mismatch_memory_row
+
+--- pytest ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________________ test_r_chked_041_3_3_size_mismatch_memory_row _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-534/test_r_chked_041_3_3_size_mism0')
+facts = Facts(case=PosixPath('/tmp/pytest-of-<user>/pytest-534/b101_inc5_case080'), image={0: 108, 1: 49, 2: 57, 3: 84, 4: 79...ram(name='VALUE_0002', address=20, size=2), v3=Param(name='VALUE_0003', address=40, size=4), serial=12587004, moved=32)
+
+    def test_r_chked_041_3_3_size_mismatch_memory_row(tmp_path: Path, facts: Facts) -> None:
+        """Case R-CHKED-041.3/3: case 08 and its A2L loaded; a spec of one entry at
+        ``VALUE_0002``'s address with 1 byte picked -> 0 included, 1 memory row at
+        that address (``u8``). Control in the same session: the pilot spec then
+        picked includes ``VALUE_0001`` and ``VALUE_0002``, so the mismatch result
+        is not a resolution that never runs.
+    
+        Negative control: the size ignored -> ``VALUE_0002`` included -> RED; no
+        resolution at all (the base) -> the control pick includes nothing -> RED."""
+        one_byte = spec_doc([(facts.v2.address, facts.image_bytes(facts.v2.address, 1))])
+    
+        async def scenario(app, pilot, log):
+            await open_session(
+                pilot, app, facts,
+                specs={"short.chk.json": one_byte, PILOT: spec_doc(pilot_entries(facts))},
+            )
+            await pick_spec(pilot, app, log, "short.chk.json")
+            first = (included(app), mem_rows(app))
+            await pick_spec(pilot, app, log, PILOT)
+            return first, included(app)
+    
+        (picks, rows), control = run(tmp_path, scenario)
+>       assert picks == [], picks
+E       AssertionError: ['VALUE_0002']
+E       assert ['VALUE_0002'] == []
+E         
+E         Left contains one more item: 'VALUE_0002'
+E         Use -v to get more diff
+
+tests/test_b101_check_spec_keep.py:849: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_041_3_3_size_mismatch_memory_row
+1 failed in 23.86s

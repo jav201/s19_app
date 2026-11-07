@@ -45,7 +45,39 @@ Committed: `git diff --stat main...HEAD` (134 files). Uncommitted: the E5 re-aud
 | `docs/diagrams/architecture.md` | doc |  | `git rm` (R-DOC-ARCHIVE.3) |
 | `examples/case_00_public/from_source_input.txt` | doc |  | `git rm` (R-DOC-ARCHIVE.3) |
 | `examples/case_00_public/s19_sample.txt` | doc |  | `git rm` (R-DOC-ARCHIVE.3) |
-| `.fast-dev-flow/` — `ADR-flow-builder-tracer.md` + 32 `archive/*.md` spec files (`2026-06-19` … `2026-08-21`, `batch-40` … `batch-43`) | doc |  | `git rm -r`, 33 files (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/ADR-flow-builder-tracer.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/archive/2026-06-19-crc-footer-spec.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/archive/2026-06-24-audit-gaps-followup-spec.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/archive/2026-06-25-spec.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/archive/2026-07-06-batch-25-snapshot-spec.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/archive/2026-07-07-sections-label-spec.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/archive/2026-07-09-batch-30-r043-3-spec.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/archive/2026-07-09-batch-31-quick-strike-spec.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/archive/2026-07-10-batch-34-spec.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/archive/2026-07-13-batch-39-untrusted-text-spec.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/archive/2026-07-14-batch44-flow-builder-spec.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/archive/2026-07-18-a2l-missing-length-fix-spec.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/archive/2026-07-18-a2l-record-layout-length-spec.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/archive/2026-07-18-issues-paging-stride-spec.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/archive/2026-07-18-json-editor-fill-height-spec.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/archive/2026-07-18-spec.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/archive/2026-07-20-memmap-entropy-spec.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/archive/2026-07-20-unload-feature-spec.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/archive/2026-07-21-n3-report-logging-spec.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/archive/2026-07-23-n1-n2-spec.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/archive/2026-07-23-n6-n7-spec.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/archive/2026-07-24-batch-61-spec.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/archive/2026-07-28-batch-67-spec.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/archive/2026-07-28-batch-68-spec.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/archive/2026-07-28-batch-69-fbp2-design-spec.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/archive/2026-07-31-at-tc-registry-lane-a-spec.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/archive/2026-08-15-batch-83-address-census-spec.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/archive/2026-08-17-batch-84-assembled-selector-census-spec.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/archive/2026-08-21-batch-85-ifc-pilot-promoted-spec.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/archive/batch-40-spec.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/archive/batch-41-spec.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/archive/batch-42-spec.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
+| `.fast-dev-flow/archive/batch-43-spec.md` | doc |  | `git rm` — retired fast-dev-flow workflow (R-DOC-ARCHIVE.3, R-DOC-REF.3, R-DOC-REF.4) |
 | `tests/test_b101_doc_hygiene.py` | test | US-DOC-HYG-1 · US-DOC-HYG-2 · US-DOC-HYG-3 | new: 45 standing guards (44 at E4 + R-DOC-DEV.8/2 added at E5), text and `git ls-files` only, no import of `s19_app` |
 | `tests/test_docs_canon.py` | test | US-DOC-HYG-1 | the AT-285 arm widened from 3 files to every repository document (node name kept); occurrence shapes split out (C-8) |
 | `tests/test_id_registry.py` | test | US-DOC-HYG-1 · US-DOC-HYG-2 · US-DOC-HYG-3 | `EXPECTED_SCANNED_TEST_FILES` 262 → 263 (one new test module, measured) |

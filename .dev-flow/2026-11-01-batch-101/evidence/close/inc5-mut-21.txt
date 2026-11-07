@@ -1,0 +1,65 @@
+# Mutant M21 — batch-end re-run on the final tree (b982846)
+BASE_COMMIT=b982846ce33ccc20b1774f91b1091af4b42dff73
+BASE_TREE=detached worktree at 7d641d9 + git diff --binary 7d641d9 b982846 -- s19_app tests docs README.md AT-TC-REGISTRY.jsonl applied
+s19_app.__file__=<HOME>/work/s19_i5rm_m21/s19_app/__init__.py
+mutation: R-CHKED-026/4 spec bytes dropped on every repopulation
+mutation diff:
+diff --git a<HOME>/work/s19_i5rm/s19_app/tui/screens_directionb.py b<HOME>/work/s19_i5rm_m21/s19_app/tui/screens_directionb.py
+index b05226d..9a4d0fd 100644
+--- a<HOME>/work/s19_i5rm/s19_app/tui/screens_directionb.py
++++ b<HOME>/work/s19_i5rm_m21/s19_app/tui/screens_directionb.py
+@@ -7302,6 +7302,7 @@ class CheckEditorPanel(ScrollableContainer):
+         kept = list(self._picker.picked_params)
+         if not self._picker.set_parameters(rows, signature):
+             return
++        self._spec_bytes = {}
+         rows_before = len(self._memory_rows)
+         kept = self._demote_moved_spec_params(kept)
+         if kept:
+verify:
+grep s19_app/tui/screens_directionb.py: replaced -> 'kept = list(self._picker.picked_params)' FOUND
+guard nodes (1):
+  tests/test_b101_check_spec_keep.py::test_r_chked_026_4_spec_bytes_survive_same_range_reload
+
+--- pytest ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_r_chked_026_4_spec_bytes_survive_same_range_reload ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-540/test_r_chked_026_4_spec_bytes_0')
+facts = Facts(case=PosixPath('/tmp/pytest-of-<user>/pytest-540/b101_inc5_case080'), image={0: 108, 1: 49, 2: 57, 3: 84, 4: 79...ram(name='VALUE_0002', address=20, size=2), v3=Param(name='VALUE_0003', address=40, size=4), serial=12587004, moved=32)
+
+    def test_r_chked_026_4_spec_bytes_survive_same_range_reload(
+        tmp_path: Path, facts: Facts
+    ) -> None:
+        """Case R-CHKED-026/4 (E3 SEC5-1: the key is name, address and size): as
+        /1 (``0x0`` set to ``93``, the pilot spec picked); key ``1``;
+        ``firmware.a2l`` loaded again through the Load dialog; key ``=``; Write as
+        ``reloaded.chk.json`` -> included ``[VALUE_0001, VALUE_0002]``; entries
+        ``0x0`` ``6C``, ``0x14`` ``A0 BE``, ``0xC00FFC`` ``FF FF FF FF``.
+    
+        Negative control: the spec's bytes dropped on every repopulation -> ``0x0``
+        ``93`` -> RED."""
+    
+        async def scenario(app, pilot, log):
+            await patched_pick(pilot, app, log, facts, tmp_path, facts.v1.address, bytes([PATCH_BYTE]))
+            await go_workspace(pilot, app)
+            await load_a2l_file(pilot, app, facts.case / "firmware.a2l")
+            await enter_check_editor(pilot, app)
+            picks = included(app)
+            _lines, entries = await write_spec(pilot, app, log, "reloaded.chk.json")
+            return picks, entries
+    
+        picks, entries = run(tmp_path, scenario)
+        assert picks == [facts.v1.name, facts.v2.name], picks
+>       assert entries == pilot_entries(facts), entries
+E       AssertionError: [(0, b'\x93'), (20, b'\xa0\xbe'), (12587004, b'\xff\xff\xff\xff')]
+E       assert [(0, b'\x93')...xff\xff\xff')] == [(0, b'l'), (...xff\xff\xff')]
+E         
+E         At index 0 diff: (0, b'\x93') != (0, b'l')
+E         Use -v to get more diff
+
+tests/test_b101_check_spec_keep.py:1149: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_026_4_spec_bytes_survive_same_range_reload
+1 failed in 32.83s

@@ -1,0 +1,88 @@
+base commit: 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+mutant: M6
+
+mutation:
+==== diff -u s19_app/tui/screens_directionb.py ====
+--- <HOME>/work/s19_i12mut/s19_app/tui/screens_directionb.py	2026-11-07 05:38:44.571302663 -0600
++++ <HOME>/work/s19_i12mut_m6/s19_app/tui/screens_directionb.py	2026-11-07 05:58:20.465464315 -0600
+@@ -7824,6 +7824,13 @@
+                 )
+             with Horizontal(id="check_actions_row2", classes="patch-docked-row"):
+                 yield Static("", id="check_fields_count", markup=False)
++                toggle = Button(
++                    "Addendum preview",
++                    id="check_preview_toggle_button",
++                    classes="patch-chip",
++                )
++                toggle.display = False
++                yield toggle
+             yield Static(
+                 Text(self._APPLY_HINT, style=DGRAY),
+                 id="check_apply_hint",
+
+
+s19_app.__file__: <HOME>/work/s19_i12mut_m6/s19_app/__init__.py
+
+--- landed grep M6: 's19_app/tui/screens_directionb.py' marker='check_preview_toggle_button' expected=present found=present OK=True ---
+7829:                    id="check_preview_toggle_button",
+
+
+nodes (4):
+  tests/test_b101_shown_widgets.py::test_r_chked_058_1_every_check_editor_widget_is_shown_in_a_state
+  tests/test_b97_check_editor.py::test_tc_b97_08_census_rows_and_one_docked_row
+  tests/test_b97_check_editor.py::test_tc_b97_08_tab_chips_nine_activations
+  tests/test_b97_check_editor.py::test_tc_b97_61_every_control_displayed_in_its_home
+
+
+--- pytest ---
+F.....                                                                   [100%]
+=================================== FAILURES ===================================
+_______ test_r_chked_058_1_every_check_editor_widget_is_shown_in_a_state _______
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-884/test_r_chked_058_1_every_check0')
+
+    def test_r_chked_058_1_every_check_editor_widget_is_shown_in_a_state(tmp_path: Path) -> None:
+        """R-CHKED-058 (case /1): walk the window ``#screen_check_editor`` over
+        [opened with the demo A2L; ``#check_tab_fields``, ``#check_tab_json``,
+        ``#check_tab_addendum`` pressed in turn] -> 0 widgets with an id never
+        shown, at least 45 in the population, and the Addendum state shows
+        ``#check_addendum_preview``.
+    
+        RED on base: the hidden ``Addendum preview`` button is mounted and never
+        shown in any of the four states; the failure message lists its id.
+        """
+    
+        async def body(app, pilot, panel):
+            walk = _Walk(app.query_one("#screen_check_editor"))
+            await settled(pilot, lambda: _shown_panes(panel) == ["check_pane_fields"], "opened on the Fields tab")
+            walk.collect("opened")
+            addendum_state = None
+    
+            for chip_id, pane in TABS:
+                panel.query_one(f"#{chip_id}", Button).press()
+                await settled(
+                    pilot,
+                    lambda: _shown_panes(panel) == [pane] and panel.query_one(f"#{chip_id}").has_class("chip-selected"),
+                    f"the {chip_id} tab is shown alone and its chip marked",
+                )
+                walk.collect(chip_id)
+                if chip_id == "check_tab_addendum":
+                    addendum_state = is_displayed(panel.query_one("#check_addendum_preview"))
+    
+            return len(walk.population), walk.never_shown(), walk.states, addendum_state
+    
+        size, never, states, addendum_state = _drive(tmp_path, body)
+        assert states == ["opened", "check_tab_fields", "check_tab_json", "check_tab_addendum"], states
+        assert size >= 45, (size, states)
+        assert addendum_state is True, "the Addendum tab state does not show #check_addendum_preview"
+>       assert never == [], f"mounted and never shown: {never}"
+E       AssertionError: mounted and never shown: ['check_preview_toggle_button']
+E       assert ['check_previ...oggle_button'] == []
+E         
+E         Left contains one more item: 'check_preview_toggle_button'
+E         Use -v to get more diff
+
+../s19_i12mut/tests/test_b101_shown_widgets.py:129: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_shown_widgets.py::test_r_chked_058_1_every_check_editor_widget_is_shown_in_a_state
+1 failed, 5 passed in 31.49s

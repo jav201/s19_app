@@ -1,0 +1,91 @@
+=== base commit: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+=== python: Python 3.11.18
+=== mutation applied: M5 (file s19_app/tui/app.py)
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -20010,7 +20010,7 @@
+         if i is None:
+             return None
+         j = bisect_left(view_rows, row_bases[i])
+-        return max(0, j - max(0, context_rows))
++        return j - max(0, context_rows)
+ 
+     def _reset_scroll_to_top(self, container_id: str) -> None:
+         """Best-effort scroll reset for a hex scroll container."""
+LANDED M5: 'return j - max(0, context_rows)' x1
+=== s19_app.__file__ ===
+<HOME>/work/s19_i10mut_m05/s19_app/__init__.py
+=== CMD ===
+env -u NO_COLOR <HOME>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -rf  tests/test_b101_hex_jump.py::test_r_tui_018_4_1_first_view_row_shown_first_and_miss_keeps_it
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_r_tui_018_4_1_first_view_row_shown_first_and_miss_keeps_it ________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-643/test_r_tui_018_4_1_first_view_0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-643/case080')
+
+    def test_r_tui_018_4_1_first_view_row_shown_first_and_miss_keeps_it(tmp_path, case08):
+        """R-TUI-018.4/1: a go-to of 0x00000000 shows it as the first row with no
+        'showing from' line in each view, and a later miss keeps the first row."""
+    
+        async def scenario(app, pilot, log):
+            await load_case(pilot, app, case08, a2l="firmware.a2l", mac="firmware.mac")
+            for view_name in ("main", "a2l", "mac"):
+                view = VIEWS[view_name]
+                _key, hex_id, _scroll, _goto, _search, _field = view
+                await show(pilot, app, view)
+                await goto(pilot, app, log, view, "0x00000000", hit(0))
+                await wait_rows(pilot, app, view, [0x0], f"{view_name} go-to 0x00000000")
+                assert not any(n.startswith("... showing from") for n in notices(app, hex_id)), notices(app, hex_id)
+                await goto(pilot, app, log, view, "0xFFFFFFF0", MISS)
+                assert addrs(app, hex_id, 1) == [0x0], f"{view_name}: first row {fmt(addrs(app, hex_id, 1))} after the miss"
+    
+>       drive(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_hex_jump.py:773: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_hex_jump.py:137: in drive
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f7bca005b10>
+
+    async def scenario(app, pilot, log):
+        await load_case(pilot, app, case08, a2l="firmware.a2l", mac="firmware.mac")
+        for view_name in ("main", "a2l", "mac"):
+            view = VIEWS[view_name]
+            _key, hex_id, _scroll, _goto, _search, _field = view
+            await show(pilot, app, view)
+            await goto(pilot, app, log, view, "0x00000000", hit(0))
+            await wait_rows(pilot, app, view, [0x0], f"{view_name} go-to 0x00000000")
+            assert not any(n.startswith("... showing from") for n in notices(app, hex_id)), notices(app, hex_id)
+            await goto(pilot, app, log, view, "0xFFFFFFF0", MISS)
+>           assert addrs(app, hex_id, 1) == [0x0], f"{view_name}: first row {fmt(addrs(app, hex_id, 1))} after the miss"
+E           AssertionError: a2l: first row [0x00C00FF0] after the miss
+E           assert [12586992] == [0]
+E             
+E             At index 0 diff: 12586992 != 0
+E             Use -v to get more diff
+
+../s19_i10mut/tests/test_b101_hex_jump.py:771: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_hex_jump.py::test_r_tui_018_4_1_first_view_row_shown_first_and_miss_keeps_it
+1 failed in 17.28s

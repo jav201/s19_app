@@ -121,6 +121,9 @@ SNAPSHOT_EXCLUSIONS: dict[str, str] = {
     "_busy": "progress indicator run state; main-thread UI state, not session state (Inc 12a)",
     # Inc 12b (interfaces S-c, C12b-49): the one new app attribute.
     "_quit_pending": "quit confirmed while a session action runs; UI control state, not session state (Inc 12b)",
+    # Inc 10a E4-R3: the widget a focus landing last chose instead of the
+    # window's target; a widget reference, never carried across a load-over.
+    "_focus_landing_fallback": "the focus landing's fallback widget; UI focus state, not session state (Inc 10a E4-R3)",
 }
 
 # The K1/K2 allow-list (ARQ §2.2): names a load-over may differ in BY
@@ -1035,6 +1038,12 @@ def test_tc_b100_10_reset_leaves_the_patch_editor_clean_for_the_next_load(
 #: The live source census at the Inc 12b base (71376a3: main + Inc 11 +
 #: Inc 12a), frozen by the E4 tester with :func:`_source_census`'s rule.
 #: Inc 12b may add exactly one name to it (P1-83, C12b-49).
+#: Re-frozen at batch-101 Inc 10a's E4 integration: ``_hex_view_rows_cache``
+#: (the view-row memo of ``_hex_view_rows``) joins the census; it is in
+#: ``_SESSION_SNAPSHOT_NAMES``, so Inc 12b's one-name rule is unchanged.
+#: Re-frozen again at Inc 10a's E4 rulings (E4-R3): ``_focus_landing_fallback``
+#: (the widget a focus landing chose when the window's target was not shown)
+#: joins it; it is classified in ``SNAPSHOT_EXCLUSIONS`` with its reason.
 _CENSUS_AT_12B_BASE = frozenset({
     '_a2l_cache_data',
     '_a2l_cache_key',
@@ -1059,7 +1068,9 @@ _CENSUS_AT_12B_BASE = frozenset({
     '_diff_check_spec_name',
     '_diff_compare_generation',
     '_diff_last_result',
+    '_focus_landing_fallback',
     '_goto_focus_address',
+    '_hex_view_rows_cache',
     '_hex_window_start',
     '_image_generation',
     '_last_execution',

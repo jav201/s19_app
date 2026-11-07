@@ -1,0 +1,103 @@
+=== base commit: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+=== python: Python 3.11.18
+=== mutation applied: M-W (file s19_app/tui/app.py)
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -19970,7 +19970,8 @@
+             start = self._row_start_for_near_top_focus(focus_address, row_bases, rows)
+             if start is not None:
+                 self._hex_window_start = start
+-        self._hex_window_start = max(0, min(self._hex_window_start, len(rows) - 1))
++        max_start = max(0, ((len(rows) - 1) // page_size) * page_size)
++        self._hex_window_start = max(0, min(self._hex_window_start, max_start))
+         if focus_address is not None and focus_address != self._goto_focus_address:
+             self._goto_focus_address = None
+         highlight = None
+LANDED M-W: 'max_start = max(0, ((len(rows) - 1) // page_size) * page_size)' x1
+=== s19_app.__file__ ===
+<HOME>/work/s19_i10mut_m13/s19_app/__init__.py
+=== CMD ===
+env -u NO_COLOR <HOME>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -rf  tests/test_b101_hex_jump.py::test_r_tui_040_8_4_miss_after_jump_to_last_row_keeps_window
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________ test_r_tui_040_8_4_miss_after_jump_to_last_row_keeps_window __________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-651/test_r_tui_040_8_4_miss_after_0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-651/case080')
+
+    def test_r_tui_040_8_4_miss_after_jump_to_last_row_keeps_window(tmp_path, case08):
+        """R-TUI-040.8/4: a miss after a jump to the last present row leaves the
+        rows unchanged: the window still starts at row 26 544 (base: 26 400)."""
+    
+        async def scenario(app, pilot, log):
+            view = await start(pilot, app, case08, "main")
+            bases = app.current_file.row_bases
+            assert len(bases) == 26546
+            await goto(pilot, app, log, view, f"0x{LAST_ROW:08X}", hit(LAST_ROW))
+            await wait_rows(pilot, app, view, [bases[26544], bases[26545]], "jump to the last present row")
+            before = [r[2:] for r in hex_rows(app, "#hex_view")]
+            await goto(pilot, app, log, view, "0xFFFFFFF0", MISS)
+            after = [r[2:] for r in hex_rows(app, "#hex_view")]
+            assert after == before, f"the miss moved the window: {len(before)} rows before, {len(after)} after"
+            assert addrs(app, "#hex_view", 1) == [bases[26544]], fmt(addrs(app, "#hex_view", 1))
+    
+>       drive(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_hex_jump.py:876: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_hex_jump.py:137: in drive
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_hex_jump.py:869: in scenario
+    await wait_rows(pilot, app, view, [bases[26544], bases[26545]], "jump to the last present row")
+../s19_i10mut/tests/test_b101_hex_jump.py:207: in wait_rows
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function wait_rows.<locals>.<lambda> at 0x7f2960380040>
+failure = <function wait_rows.<locals>.<lambda> at 0x7f295bb3aca0>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: jump to the last present row: first rows [0x00C006E0, 0x00C006F0], expected [0x00C00FE0, 0x00C00FF0]
+
+tests/support/timing.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_hex_jump.py::test_r_tui_040_8_4_miss_after_jump_to_last_row_keeps_window
+1 failed in 17.05s

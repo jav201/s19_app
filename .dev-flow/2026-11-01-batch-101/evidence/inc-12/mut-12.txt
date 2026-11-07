@@ -1,0 +1,54 @@
+base commit: 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+mutant: M12
+
+mutation:
+==== diff -u docs/user-guide/ch18-flow-execution.md ====
+--- <HOME>/work/s19_i12mut/docs/user-guide/ch18-flow-execution.md	2026-11-07 05:38:44.570960736 -0600
++++ <HOME>/work/s19_i12mut_m12/docs/user-guide/ch18-flow-execution.md	2026-11-07 06:04:11.252697646 -0600
+@@ -170,7 +170,7 @@
+ 5. **The record.** `t` opens the Reports viewer; the newest chain-set report lists,
+    under *Written files*, the copy in the project
+    (`…\workarea\demo\step_patch.changes.json`) and `terminal_out.s19`. Close it with
+-   **Close** or `esc`.
++   **Close** — `esc` does not close this viewer (finding F-51).
+ 
+    ![Chain-set report](img/ch18-18-terminal-chain-set-report.png)
+ 
+
+
+s19_app.__file__: <HOME>/work/s19_i12mut_m12/s19_app/__init__.py
+
+--- landed grep M12: 'docs/user-guide/ch18-flow-execution.md' marker='does not close this viewer' expected=present found=present OK=True ---
+173:   **Close** — `esc` does not close this viewer (finding F-51).
+
+
+nodes (1):
+  tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-13]
+
+
+--- pytest ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________ test_r_doc_guide_1_passages_describe_1_0_0[passage-13] ____________
+
+number = 13
+
+    @pytest.mark.parametrize(
+        "number", range(1, len(_GUIDE_PASSAGES) + 1), ids=lambda n: f"passage-{n}"
+    )
+    def test_r_doc_guide_1_passages_describe_1_0_0(number: int) -> None:
+        name, absent, present = _GUIDE_PASSAGES[number - 1]
+        text = _flat(_doc(f"docs/user-guide/{name}"))
+        stale = [p for p in absent if _flat(p) in text]
+        missing = [p for p in present if _flat(p) not in text]
+>       assert stale == [], f"{name}: stale text still present: {stale}"
+E       AssertionError: ch18-flow-execution.md: stale text still present: ['`esc` does not close this viewer']
+E       assert ['`esc` does ... this viewer'] == []
+E         
+E         Left contains one more item: '`esc` does not close this viewer'
+E         Use -v to get more diff
+
+../s19_i12mut/tests/test_b101_help_legend_docs.py:1853: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-13]
+1 failed in 0.23s

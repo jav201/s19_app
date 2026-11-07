@@ -1,0 +1,122 @@
+=== Inc 10a E5 corrective run: e5c-04
+date: 2026-11-07T05:54:26Z
+tree dir: <HOME>/work/s19_i10c
+checkout HEAD (base): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+main ref: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+index tree: 64701e3efad376490ec2f169b47c9ec69bc6c1c9
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10c/s19_app/__init__.py
+CMD: env -u NO_COLOR timeout 900 /data/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -q -n 2 --dist load -rfs tests/test_b101_unload_focus.py::test_r_ws_loaded_19_3_save_as_after_primary_unload_carries_no_image tests/test_b101_unload_focus.py::test_r_ws_loaded_19_4_save_as_with_the_image_loaded_carries_it
+bringing up nodes...
+bringing up nodes...
+
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+_____ test_r_ws_loaded_19_3_save_as_after_primary_unload_carries_no_image ______
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-386/popen-gw0/test_r_ws_loaded_19_3_save_as_0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-386/popen-gw0/b101_i10f_case080')
+
+    def test_r_ws_loaded_19_3_save_as_after_primary_unload_carries_no_image(
+        tmp_path: Path, case08: Path
+    ) -> None:
+        """R-WS-LOADED.19 case /3 (added at E5, SE5-1): project ``PS`` (fixture three
+        as ``unloaded_primary.s19`` plus the case 08 MAC) loaded, ``[u]`` on the
+        primary, then Save project ``P9`` (a save as: ``P9`` does not exist and
+        ``PS`` is open). ``P9`` holds the MAC and no ``.s19`` / ``.hex`` file and no
+        file with the image's SHA-256, and loading ``P9`` installs no S19 / HEX
+        image (the tree before E5: the save as carried ``unloaded_primary.s19``
+        from ``PS``, so loading ``P9`` installed it as the primary)."""
+        image = write_three_ranges(tmp_path / "src" / "unloaded_primary.s19")
+        mac = copy_to(case08 / "firmware.mac", tmp_path / "src" / "firmware.mac")
+        image_digest = sha256(image)
+    
+        async def scenario(app, pilot, log):
+            await open_project_ps(pilot, app, log, image, mac)
+            mark = len(log.messages)
+            await press_unload(pilot, app, "primary")
+            await wait_message(pilot, log, mark, "Unloaded primary image.")
+            await settle(pilot, 4)
+            assert app.current_file is not None and app.current_file.file_type == "mac"
+            messages = await save_and_wait(pilot, app, log, "P9")
+            assert any(m.startswith("Saved project to") for m in messages), messages
+            files = project_files(app, "P9")
+            assert "firmware.mac" in files, f"the MAC is not in P9: {sorted(files)}"
+            images = [n for n in files if n.lower().endswith((".s19", ".hex"))]
+            assert images == [], f"P9 holds image files: {images}"
+            assert image_digest not in files.values(), f"P9 holds the image's bytes: {sorted(files)}"
+            assert not any("unloaded_primary" in m for m in messages), messages
+            # The `U` key must reach the app after the Save dialog closed.
+            await put_focus(pilot, app, "files_list")
+            text = await unload_and_open(pilot, app, log, "P9")
+            installed = app.current_file
+            assert installed is None or installed.file_type == "mac", (
+                f"loading P9 installed {installed.file_type} {installed.path.name!r}; status {text!r}"
+            )
+    
+>       run(tmp_path, scenario)
+
+tests/test_b101_unload_focus.py:748: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_unload_focus.py:374: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_unload_focus.py:742: in scenario
+    text = await unload_and_open(pilot, app, log, "P9")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_unload_focus.py:952: in unload_and_open
+    await wait_message(pilot, log, mark, "Unloaded all artifacts.")
+tests/test_b101_unload_focus.py:256: in wait_message
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function wait_message.<locals>.<lambda> at 0x7fd09b150ae0>
+failure = <function wait_message.<locals>.<lambda> at 0x7fd0a1daefc0>
+timeout = 20.0, pause_first = False
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: timed out waiting for the message 'Unloaded all artifacts.'; got []
+
+tests/support/timing.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_unload_focus.py::test_r_ws_loaded_19_3_save_as_after_primary_unload_carries_no_image
+1 failed, 1 passed in 35.85s
+exit code: 1

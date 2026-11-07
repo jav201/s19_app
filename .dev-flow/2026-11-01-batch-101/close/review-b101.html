@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Batch-101 · revisión de cierre · v1.0.0</title>
+<style>
+:root{
+  --bg:#f7f6f3; --fg:#1c1b18; --muted:#6b675f; --line:#ddd8cf;
+  --card:#ffffff; --accent:#1f6feb; --ok:#1a7f37; --warn:#9a6700; --bad:#b42318;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#121212; --fg:#e8e6e1; --muted:#a09b92; --line:#2a2a2a;
+    --card:#1b1b1b; --accent:#58a6ff; --ok:#3fb950; --warn:#d29922; --bad:#f85149;
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+.wrap{max-width:880px;margin:0 auto;padding:16px 18px 96px}
+header.hero{padding:28px 0 8px;border-bottom:2px solid var(--line);margin-bottom:8px}
+header.hero h1{font-size:26px;margin:0 0 6px;letter-spacing:-.01em}
+header.hero p{color:var(--muted);margin:0}
+nav.toc{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--line);padding:8px 0;display:flex;flex-wrap:wrap;gap:8px;z-index:5}
+nav.toc a{color:var(--accent);text-decoration:none;font-size:13.5px;border:1px solid var(--line);border-radius:999px;padding:3px 11px;background:var(--card)}
+section{margin-top:34px;scroll-margin-top:52px}
+section > h2{font-size:20px;border-bottom:1px solid var(--line);padding-bottom:6px;margin:0 0 12px;letter-spacing:-.01em}
+.lede{font-size:17px;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;padding:12px 14px;margin:12px 0}
+.lede.verdict{border-left-color:var(--ok)}
+.lede.warn{border-left-color:var(--warn)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:12px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:12px 0}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.stat b{display:block;font-size:24px;font-variant-numeric:tabular-nums}
+.stat span{color:var(--muted);font-size:13px}
+code,.mono{font-family:var(--mono);font-size:.9em}
+code{background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:1px 5px;color:inherit;word-break:break-word}
+.src{display:block;font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:6px;word-break:break-all}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14.5px}
+th,td{text-align:left;vertical-align:top;padding:8px 9px;border-bottom:1px solid var(--line)}
+th{font-size:12.5px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);border-bottom:2px solid var(--line)}
+tr:last-child td{border-bottom:none}
+td .id{font-family:var(--mono);font-weight:600;font-size:13px}
+.arrow{color:var(--muted);white-space:nowrap}
+.tag{display:inline-block;font-size:11.5px;font-weight:600;border-radius:5px;padding:1px 7px;margin-right:4px;vertical-align:1px}
+.tag.ok{background:rgba(26,127,55,.12);color:var(--ok)}
+.tag.warn{background:rgba(154,103,0,.14);color:var(--warn)}
+.tag.bad{background:rgba(180,35,24,.12);color:var(--bad)}
+.tag.inf{background:rgba(31,111,235,.12);color:var(--accent)}
+.dec{margin:12px 0;padding-left:14px;border-left:3px solid var(--line)}
+.dec h3{margin:0 0 4px;font-size:15.5px}
+.dec p{margin:4px 0}
+.dec .why{color:var(--muted);font-size:14px}
+.dl{display:grid;grid-template-columns:max-content 1fr;gap:2px 14px;font-size:14.5px;margin:8px 0}
+.dl dt{font-family:var(--mono);color:var(--muted);font-size:13px;padding-top:1px}
+.dl dd{margin:0}
+fieldset{border:1px solid var(--line);border-radius:10px;margin:14px 0;padding:12px 16px;background:var(--card)}
+fieldset legend{font-weight:600;font-size:15px;padding:0 6px}
+.opt{display:flex;gap:18px;flex-wrap:wrap;margin-top:8px}
+.opt label{display:flex;align-items:center;gap:7px;font-size:15px;cursor:pointer}
+.opt input{accent-color:var(--accent);width:17px;height:17px}
+textarea{width:100%;min-height:110px;margin-top:10px;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:10px;font:inherit;resize:vertical}
+button.export{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:12px 20px;font-size:15px;font-weight:600;cursor:pointer;margin-top:6px}
+button.export:hover{filter:brightness(1.08)}
+.hint{color:var(--muted);font-size:13px;margin-top:6px}
+.note{font-size:13.5px;color:var(--muted)}
+hr{border:0;border-top:1px solid var(--line);margin:22px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>Batch-101 — revisión de cierre · v1.0.0</h1>
+  <p>Página para la decisión del operador: etiquetar <code>v1.0.0</code> o no. Una pantalla por sección; cada sección abre con su conclusión. Idioma del operador; ids, rutas y código quedan como están.</p>
+</header>
+
+<nav class="toc" aria-label="secciones">
+  <a href="#s1">1 · Veredicto</a>
+  <a href="#s2">2 · Qué cambia</a>
+  <a href="#s3">3 · Decisiones por ti</a>
+  <a href="#s4">4 · Reservas</a>
+  <a href="#s5">5 · Pendiente fuera del código</a>
+  <a href="#s6">6 · Tu decisión</a>
+</nav>
+
+<!-- ============ 1. VEREDICTO ============ -->
+<section id="s1">
+  <h2>1 · Veredicto propuesto</h2>
+  <div class="lede verdict">
+    <strong>Listo para etiquetar <code>v1.0.0</code>, con estas reservas:</strong> 4 fallos conocidos sin efecto de producto, 1 flake de carga que pasa aislado, y las reservas abiertas de la sección 4 (las más visibles: el Hex Peek con bytes pre-escritura, la carrera de doble cierre al generar un reporte, y 7 diálogos que todavía ignoran Escape).
+  </div>
+
+  <div class="grid">
+    <div class="stat"><b>16</b><span>incrementos entregados (1–16; el 10 en 10a/10b y el 12 en 12/12b), fusionados y empujados a <code>main</code>.</span></div>
+    <div class="stat"><b>6113</b><span>pruebas pasadas en la suite completa del árbol final.</span></div>
+    <div class="stat"><b>6</b><span>fallos en esa corrida: 4 conocidos + 2 brazos del flake de carga.</span></div>
+    <div class="stat"><b>0</b><span>límites de tiempo bajo el 20 % de margen (QC-TM: 95 límites).</span></div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0">Suite completa, árbol final</h3>
+    <div class="dl">
+      <dt>lane 1 (paralela)</dt><dd><code>6 failed, 6113 passed, 182 skipped, 4 xfailed</code> en 3540 s.</dd>
+      <dt>lane 2 (serial)</dt><dd><code>69 passed, 2 skipped</code> · <code>QC-TM: 95 bounds, 0 under 20 % margin</code>.</dd>
+      <dt>snapshots</dt><dd>31 pasados, 2 fallidos (los mismos 2 <code>tc016s</code> conocidos), venv de la receta CI.</dd>
+      <dt>doc-pass</dt><dd>196 pasados (guardas de ley de documentación).</dd>
+      <dt>Windows Inc 6</dt><dd>82 pasados (brazos Windows-only con ids de nodo).</dd>
+    </div>
+    <span class="src">.dev-flow/2026-11-01-batch-101/evidence/close/full-suite-final.txt · snapshots-final.txt · docpass-guards.txt · win-inc6-final.txt</span>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0">Los 4 fallos conocidos (cada uno, una línea de por qué es conocido)</h3>
+    <table>
+      <tr><th>Nodo</th><th>Por qué es conocido</th></tr>
+      <tr><td><code class="id">test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact</code></td><td>Congelado de la paleta: espera <code>a2l_describe_tag</code>/<code>confirm_attention</code>; falla en la base y en toda corrida, y ningún incremento tocó bindings.<span class="src">.dev-flow/BACKLOG-CODE.md (fila "known failures", Inc 7)</span></td></tr>
+      <tr><td><code class="id">test_at_056e_a2b_diff_report_byte_identical_despite_selection</code></td><td>Devuelve <code>baseline wrote []</code> en la base; enrutado en el cierre de Inc 7, sin corregir (no toca reportes de diff).<span class="src">.dev-flow/BACKLOG-CODE.md (misma fila)</span></td></tr>
+      <tr><td><code class="id">test_tc016s_density_layout_snapshot[patch-comfortable-80x24]</code> y <code>[patch-comfortable-120x30]</code></td><td>Drift preexistente de snapshots de densidad (celda "patch-comfortable", familia batch-58/59); el lane de snapshot de CI es advisory (<code>continue-on-error</code>) y la regeneración es acción CI, nunca <code>--snapshot-update</code> local.<span class="src">.dev-flow/BACKLOG-CODE.md (rows tc016s / snapshot regen) · evidence/close/snapshots-final.txt</span></td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0">El flake de carga</h3>
+    <p><code class="id">test_tc_b100_53_workarea_data_pick_parses_on_the_file_load_worker[files_list, load_dialog]</code>: los 2 brazos fallaron bajo <code>-n 12</code>; re-ejecutados solos en serie sobre el mismo árbol dieron <code>2 passed</code> (4:41 y 4:44). Flake de carga, no regresión — mismo comportamiento que en los merges de Inc 6 e Inc 10a.</p>
+    <span class="src">.dev-flow/2026-11-01-batch-101/evidence/close/full-suite-final.txt (classificación del orquestador)</span>
+  </div>
+</section>
+
+<!-- ============ 2. QUÉ CAMBIA ============ -->
+<section id="s2">
+  <h2>2 · Qué cambia para el usuario</h2>
+  <div class="lede">Un renglón por incremento, en términos de antes → después. Los ids, nombres de archivo y código quedan en inglés.</div>
+
+  <table>
+    <tr><th style="width:92px">Incremento</th><th>Antes → después (lo que ve o hace el usuario)</th></tr>
+    <tr><td><span class="id">Inc 1</span></td><td>Sin cambio visible: el canon de requisitos pasa a <code>REQUIREMENTS.md</code> estricto-EARS (2623 filas). <span class="src">03-increments/increment-001.md</span></td></tr>
+    <tr><td><span class="id">Inc 2</span></td><td>Sin cambio visible: disciplina de tests (marca <code>serial_timing</code>, márgenes QC-TM, goldens agnósticos de versión, guarda de redacción). <span class="src">03-increments/increment-002.md</span></td></tr>
+    <tr><td><span class="id">Inc 3</span></td><td><span class="arrow">→</span> Cargar en un proyecto cuya carpeta fue borrada fuera de la app ya no la recrea: se rechaza con <code>… sync NOT done …</code>; Save project sobre composiciones grandes no repite chequeos de disco por nombre. <span class="src">03-increments/increment-003.md</span></td></tr>
+    <tr><td><span class="id">Inc 4</span></td><td><span class="arrow">→</span> Los documentos de cambio con entradas <code>symbol</code> ya no se rechazan: se resuelven contra el A2L cargado (sesión) o el A2L del proyecto (ejecución de variante/reporte). <span class="src">03-increments/increment-004.md</span></td></tr>
+    <tr><td><span class="id">Inc 5</span></td><td><span class="arrow">→</span> El CRC Designer refresca su cobertura tras un apply/save-back/Save project (antes mostraba un CRC viejo); el Check Editor conserva picks, nombres y bytes de spec, y limpia resultados de Validate tras una escritura en sitio. <span class="src">03-increments/increment-005.md</span></td></tr>
+    <tr><td><span class="id">Inc 6</span></td><td><span class="arrow">→</span> El save-back ofrece el reporte before/after solo con proyecto abierto; las listas muestran <code>patches/&lt;n&gt;</code>, <code>checks/&lt;n&gt;</code> y luego <code>library/&lt;n&gt;</code>; Write cae en el proyecto y no sobrescribe. <span class="src">03-increments/increment-006.md</span></td></tr>
+    <tr><td><span class="id">Inc 7</span></td><td><span class="arrow">→</span> Los reportes diff/before-after escriben ventanas hex completas (antes cortaban a 512 filas), escapan nombres/enlaces, y escriben de forma atómica (todo o nada). <span class="src">03-increments/increment-007.md</span></td></tr>
+    <tr><td><span class="id">Inc 8</span></td><td><span class="arrow">→</span> El CRC con <code>reverse: true</code> arranca el registro en <code>init</code> tal cual (antes daba un resultado distinto); un bloque CRC con template de Designer se rechaza con razón nombrada; un paso externo lee la copia actual de su salida y lo dice con el sufijo <code>· read &lt;copy&gt; in place of &lt;ref&gt;</code>. <span class="src">03-increments/increment-008.md</span></td></tr>
+    <tr><td><span class="id">Inc 9</span></td><td><span class="arrow">→</span> El re-run de confirmación escribe su reporte con <code>Mode: confirm re-run</code>; un flujo/chain-set guardado conserva el nombre del archivo (recortado a 64); los guardados rechazan homes que pasan por un enlace o salen del work area y nunca escriben un byte a través de un enlace. <span class="src">03-increments/increment-009.md</span></td></tr>
+    <tr><td><span class="id">Inc 10a</span></td><td><span class="arrow">→</span> Un salto hex muestra la fila objetivo como segunda fila; descargar pinta <code>Unloaded …</code> como estado; el foco aterriza en una ventana visible tras cargar/descargar; Save project ya no escribe de vuelta una imagen descargada. <span class="src">03-increments/increment-010.md</span></td></tr>
+    <tr><td><span class="id">Inc 10b</span></td><td><span class="arrow">→</span> Tras una escritura en sitio, los tres panes hex, la columna de valores A2L y Split/Join muestran los bytes escritos (A2L: recomputa solo las tags cambiadas, 3.952 s → 0.350 s), y un export armado se desarma. <span class="src">03-increments/increment-010b.md</span></td></tr>
+    <tr><td><span class="id">Inc 11</span></td><td><span class="arrow">→</span> Un A2L válido ya no alza avisos "unrecognized block" (el demo limpio pasa de 102 a 0); los issues se ordenan por severidad (ERROR→WARNING→INFO); la curva sin puntos de eje muestra una línea de índice; los segmentos MEMORY_SEGMENT anclados muestran Region <code>flash</code> y Split/Join lista los 4 segmentos. <span class="src">03-increments/increment-011.md</span></td></tr>
+    <tr><td><span class="id">Inc 12</span></td><td><span class="arrow">→</span> Escape cierra el visor de Reports igual que Close (sin escribir reporte ni aplicar filtro); se retira superficie muerta sin cambio visible (código/alías/botón oculto sin alcance). <span class="src">03-increments/increment-012.md</span></td></tr>
+    <tr><td><span class="id">Inc 12b</span></td><td><span class="arrow">→</span> Sin cambio visible: los widgets ocultos del Flow Builder/Execution se eliminan (antes se repintaban invisibles en cada cambio de cadena). <span class="src">03-increments/increment-012b.md</span></td></tr>
+    <tr><td><span class="id">Inc 13</span></td><td><span class="arrow">→</span> El CRC Designer ya no se congela en la imagen demo de 10 MB (recalcula una vez, con debounce de 150 ms; vista previa ≤ 2.5 s). <span class="src">03-increments/increment-013.md</span></td></tr>
+    <tr><td><span class="id">Inc 14</span></td><td><span class="arrow">→</span> La ayuda en-app, la leyenda y el README describen la app real (sin features ausentes); se agregan <code>SECURITY.md</code> y <code>CHANGELOG.md</code> con notas de <code>1.0.0</code>. <span class="src">03-increments/increment-014.md</span></td></tr>
+    <tr><td><span class="id">Inc 15</span></td><td><span class="arrow">→</span> Sin cambio de producto: 4 pruebas que flaqueaban solo en Windows ahora esperan a que la app maneje la tecla (0 archivos de producto). <span class="src">03-increments/increment-015.md</span></td></tr>
+    <tr><td><span class="id">Inc 16</span></td><td><span class="arrow">→</span> Sin cambio de producto: documentación viva corregida; se retiran la carpeta retirada <code>.fast-dev-flow/</code>, el diagrama obsoleto, <code>REQ-crc.md</code> y dos archivos sueltos; notas archivadas con la ruta de unidad redactada. <span class="src">03-increments/increment-016.md</span></td></tr>
+  </table>
+</section>
+
+<!-- ============ 3. DECISIONES ============ -->
+<section id="s3">
+  <h2>3 · Decisiones que tomé por ti y sus consecuencias</h2>
+  <div class="lede">Cada decisión: qué decidí, por qué, y qué ve o hace el usuario como consecuencia.</div>
+
+  <div class="dec">
+    <h3>Inc 12 · D-2 — eliminé el salto al issue de validación</h3>
+    <p>Quité <code>_jump_to_validation_issue</code>, <code>_jump_to_validation_issue_object</code> y <code>_format_validation_issue_line</code> (trío D3-7). <span class="why">Por qué: no tenían ningún alcance (código muerto); el censo de acciones llegó a 80 acciones, cada una con un reach.</span></p>
+    <p><strong>Consecuencia:</strong> el usuario no pierde nada — el "saltar al issue" no era alcanzable. Trazado vía <code>R-SHELL-KEYS.3</code>.</p>
+    <span class="src">03-increments/increment-012.md · inc-12/E1-rulings.md (D-2)</span>
+  </div>
+
+  <div class="dec">
+    <h3>Inc 10a · E4-R3 — re-hago foco tras una carga (HLR-166)</h3>
+    <p>Tras una carga el foco aterriza en un widget visible de la ventana mostrada, nunca en uno oculto, sin tamaño o removido.</p>
+    <p><strong>Consecuencia:</strong> al cargar un archivo ya no queda un foco fantasma en una ventana oculta; la tecla siguiente actúa sobre lo que el usuario ve.</p>
+    <span class="src">03-increments/increment-010.md · inc-10/E4-rulings.md (E4-R3)</span>
+  </div>
+
+  <div class="dec">
+    <h3>Inc 10a · E4-R6 — Enter justo después de <code>3</code> presiona Page Prev</h3>
+    <p>En la vista MAC, Enter inmediatamente después de cambiar a esa ventana retrocede una página. Lo acepté como está (E5 CR-4).</p>
+    <p><strong>Consecuencia:</strong> solo lectura, nada escribe; si estás en la página 1 no hace nada. Es un atajo de navegación, no un defecto de escritura.</p>
+    <span class="src">03-increments/increment-010.md (§5 Riesgos, I-D23/CR-4)</span>
+  </div>
+
+  <div class="dec">
+    <h3>Inc 9 · E4-R1 / E4-R3 — seguridad del guardado y modo de archivo</h3>
+    <p><strong>E4-R1:</strong> la reclamación de un nombre compara el padre real del archivo con el home ya resuelto, y nunca vuelve a resolver el home (un home cambiado por un enlace entre la guarda y la creación no cuela el payload fuera). <strong>E4-R3:</strong> el archivo se crea con modo <code>0o666</code> (el de <code>write_text</code>), no ejecutable.</p>
+    <p><strong>Consecuencia:</strong> un flujo o chain-set guardado no cae fuera del work area a través de un enlace, y no se crean archivos con bit de ejecución.</p>
+    <span class="src">03-increments/increment-009.md · inc-9/E4-rulings.md (E4-R1, E4-R3)</span>
+  </div>
+
+  <div class="dec">
+    <h3>Inc 10b · R-1 — recomputo A2L parcial (solo las tags cambiadas)</h3>
+    <p>En vez de un enrich completo tras cada escritura en sitio, recomputo únicamente las tags cuyo rango intersecta los bytes cambiados.</p>
+    <p><strong>Consecuencia:</strong> la columna de valores A2L se actualiza en ~0.350 s (antes 3.952 s sobre 220 040 tags) — sin el parón de ~4 s tras un apply.</p>
+    <span class="src">03-increments/increment-010b.md · inc-10b/04-validation.md</span>
+  </div>
+
+  <div class="dec">
+    <h3>Inc 10a · SE5-1 / RR-1 — Save project "as" nunca arrastra una imagen descargada</h3>
+    <p>Amplié <code>R-WS-LOADED.19</code> a "sin imagen S19/HEX cargada" y lo acoté a archivos de nivel superior: <code>_plan_project_save</code> descarta los S19/HEX del proyecto abierto cuando no hay imagen.</p>
+    <p><strong>Consecuencia:</strong> guardar un proyecto tras descargar la imagen ya no escribe de vuelta una imagen que el usuario descartó.</p>
+    <span class="src">03-increments/increment-010.md · close/FORWARD-requirements-session.md (R-WS-LOADED.19)</span>
+  </div>
+
+  <div class="dec">
+    <h3>Inc 12b — eliminé los widgets ocultos del Flow Builder</h3>
+    <p>Quité <code>#flow_help</code>, <code>#flow_canvas</code>, <code>#flow_blocks</code>, <code>#flow_kind</code>, <code>#flow_ext_session</code> y <code>#fx_help</code> con sus pintores; el tipo de bloque vive en <code>FlowBuilderPanel._kind</code>, puesto solo por los chips.</p>
+    <p><strong>Consecuencia:</strong> sin cambio visible; ya no se repinta una copia oculta de la pantalla en cada cambio de cadena, y ningún test prueba un widget que el usuario nunca ve.</p>
+    <span class="src">03-increments/increment-012b.md</span>
+  </div>
+</section>
+
+<!-- ============ 4. RESERVAS ============ -->
+<section id="s4">
+  <h2>4 · Reservas abiertas que debes conocer</h2>
+  <div class="lede warn">Backlog con efecto visible para el usuario. Cada una: qué pasa, cuán probable, y en qué batch sugiero cerrarla.</div>
+
+  <div class="card">
+    <h3 style="margin-top:0"><span class="tag bad">visible</span> BL-I10b-1 — los panes Hex Peek conservan bytes pre-escritura</h3>
+    <p>Tras una escritura en sitio (apply / save-back / Save project), los panes "Hex Peek" de Issues y Checks siguen mostrando los bytes viejos hasta que se vuelve a seleccionar la fila. Los tres hex views, los valores A2L y Split/Join sí siguen la escritura; nada exporta estos panes.</p>
+    <p><strong>Probabilidad:</strong> baja-media (solo si el usuario mira esos panes justo después de escribir). <strong>Sugerido:</strong> batch-102 o siguiente (depende de no tocar otro archivo).</p>
+    <span class="src">inc-10b/E1-rulings.md (BL-I10b-1) · 03-increments/increment-010b.md (§5)</span>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0"><span class="tag bad">visible</span> BL-I12-6 — cerrar mientras un Generate está en vuelo alza un error (y el doble clic también)</h3>
+    <p>Si Escape llega con un Generate ya en curso — o haces doble clic en Generate — el handler corre sobre un diálogo ya cerrado: escribe el reporte y luego su <code>dismiss</code> lanza <code>ScreenStackError</code>. La guarda (salir temprano si la pantalla ya no está activa) es backlog.</p>
+    <p><strong>Probabilidad:</strong> baja, pero el doble clic en Generate es un gesto real. <strong>Sugerido:</strong> batch-102 (guarda a nivel de toolkit + test que encola dos pulsaciones).</p>
+    <span class="src">inc-12/E1-rulings.md (BL-I12-6) · 03-increments/increment-012.md (§5)</span>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0"><span class="tag warn">visible</span> BL-I12-5 — 7 diálogos todavía ignoran Escape (R-DLG.2 queda "Partly")</h3>
+    <p>Escape cierra Reports, pero estos 7 no responden: Select variant, Save flow, Load flow, Discard unsaved flow edits?, Edit entry JSON, la confirmación de escritura CRC y Operations. En el canon, <code>R-DLG.2</code> queda registrado <code>Partly</code>.</p>
+    <p><strong>Probabilidad:</strong> cada vez que el usuario intente Escape en uno de esos diálogos. <strong>Sugerido:</strong> batch-102 (misma familia D7-20).</p>
+    <span class="src">inc-12/E1-rulings.md (BL-I12-5, E3A-06) · close/FORWARD-requirements-session.md (R-DLG.2)</span>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0"><span class="tag warn">visible</span> BL-I9-9 — nombres de flujo muy largos que chocan</h3>
+    <p>Un archivo guardado con stem largo puede conservar un <code>name</code> igual al stem de otro archivo (p. ej. <code>&lt;"C"×64&gt;_2.json</code> guarda <code>"C"×64</code>, el stem del primero). El loader carga ambos; el recorte que conserva el sufijo es un cambio de diseño en backlog.</p>
+    <p><strong>Probabilidad:</strong> solo con stems de más de 64 caracteres que compartan prefijo. <strong>Sugerido:</strong> batch-102 (cambio de diseño, no defecto).</p>
+    <span class="src">03-increments/increment-009.md (§5, BL-I9-9)</span>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0"><span class="tag inf">interna</span> BL-I10b-2 — el repintado A2L copia límites/estilo/resumen</h3>
+    <p><code>_repaint_a2l_tag_cells</code> duplica los límites de página, el estilo de fila y el resumen de <code>update_a2l_tags_view</code>; dos pintores pueden derivar. Solo se chequea el span <code>tags a-b / T</code>.</p>
+    <p><strong>Probabilidad:</strong> riesgo de mantenimiento, no visible hoy. <strong>Sugerido:</strong> refactor en el siguiente batch.</p>
+    <span class="src">inc-10b/E1-rulings.md (BL-I10b-2)</span>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0"><span class="tag inf">interna</span> BL-I12-1 … BL-I12-3 — deuda menor del visor de Reports</h3>
+    <ul style="margin:6px 0 0;padding-left:18px">
+      <li><strong>BL-I12-1:</strong> tres docstrings de <code>window_help.py</code> nombran la clase eliminada <code>VariantHelpScreen</code>. Sin efecto de usuario.</li>
+      <li><strong>BL-I12-2:</strong> el diálogo Reports de un proyecto sin reporte abre con el foco en el chip <code>?</code>; ningún canon decide dónde debería aterrizar.</li>
+      <li><strong>BL-I12-3:</strong> nada en la app muestra que <code>esc</code> cierra Reports (el botón Close no muestra tecla y la sección de ayuda de Reports no tiene bloque de teclas).</li>
+    </ul>
+    <span class="src">inc-12/E1-rulings.md (BL-I12-1…3) · inc-12/04-validation.md</span>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0"><span class="tag inf">menores</span> otras filas de backlog con efecto visible</h3>
+    <ul style="margin:6px 0 0;padding-left:18px">
+      <li><strong>BL-I10-1:</strong> cargar/descargar el MAC puede desplazar la ventana (la mitad de re-anclaje del MAC queda).</li>
+      <li><strong>BL-I10-2:</strong> el pane principal a 80×24 es de una línea; ningún salto puede ser "segunda fila" a ese tamaño.</li>
+      <li><strong>BL-I10-3:</strong> el guard <code>check_action</code> no cubre las teclas up/down/<code>k</code>/<code>j</code> que la tabla oculta se liga a sí misma (mueve el cursor oculto; nada se escribe).</li>
+      <li><strong>BL-I10-4:</strong> un salto de registro MAC con columna solo-MAC centra con 64 filas de contexto.</li>
+      <li><strong>BL-I12b-1:</strong> el rail a 120×30 se desplaza lateral 2 celdas (preexistente, idéntico en base).</li>
+      <li><strong>BL-I14-5 / BL-I14-6:</strong> capturas de la guía con texto pre-1.0.0 por re-tomar; división del home del Check Editor.</li>
+    </ul>
+    <span class="src">03-increments/increment-010.md (§5) · increment-012b.md (§5) · increment-014.md (§6)</span>
+  </div>
+</section>
+
+<!-- ============ 5. PENDIENTE FUERA DEL CÓDIGO ============ -->
+<section id="s5">
+  <h2>5 · Lo que dejo pendiente fuera del código</h2>
+
+  <div class="card">
+    <h3 style="margin-top:0">Documento forward para la sesión de requisitos (273 filas)</h3>
+    <p>El fold del canon en <code>REQUIREMENTS.md</code> está preparado y pendiente de la sesión de requisitos: <strong>234 nuevas, 29 cambiadas, 8 retiradas, 2 traídas</strong> (273 filas en total). <strong>Quién lo ejecuta:</strong> la sesión de requisitos ("s19_app Requirement re-write"), no este batch.</p>
+    <p class="note">Incluye además: la corrección <code>R-DOC-DEV.2</code> (forma <code>python -m s19_app.cli &lt;command&gt; &lt;file&gt;</code>) y el pendiente viejo de Inc 13 (<code>S17-ears-strict.md</code> / D17-27, orden de línea de estado).</p>
+    <span class="src">.dev-flow/2026-11-01-batch-101/close/FORWARD-requirements-session.md</span>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0">Dos decisiones tuyas aún abiertas (de STATUS-for-operator)</h3>
+    <ol style="margin:6px 0 0;padding-left:20px">
+      <li><strong>Redacción de registros antiguos con datos locales (repo público):</strong> 48 archivos de lotes anteriores en <code>.dev-flow/</code> llevan una ruta de unidad y 14 el nombre de la cuenta local; <code>BACKLOG-CODE.md</code> tiene dos líneas con una ruta de nube. La limpieza — y si se reescribe la historia — es tuya.</li>
+      <li><strong>Cambio de gramática <code>.chk.json</code>:</strong> para que vuelvan las etiquetas de filas de memoria (<code>SERIAL</code>) tras recargar (Inc 5, D-3). Es una puerta de un solo sentido para archivos guardados.</li>
+    </ol>
+    <span class="src">.dev-flow/2026-11-01-batch-101/STATUS-for-operator.md</span>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0">El batch B103 espera este cierre</h3>
+    <p>El siguiente batch (B103) queda en espera de que esta página se resuelva y se etiquete <code>v1.0.0</code>. Tras el cierre, <code>/dev-flow</code> pasa a ser la skill v3.</p>
+    <span class="src">.dev-flow/2026-11-01-batch-101/HANDOFF-2026-11-06.md (Pending items to carry)</span>
+  </div>
+</section>
+
+<!-- ============ 6. TU DECISIÓN ============ -->
+<section id="s6">
+  <h2>6 · Tu decisión</h2>
+  <div class="lede">Nada viene preseleccionado. Marca cada punto y exporta el resultado como JSON (descarga local, sin red).</div>
+
+  <form id="verdictForm" onsubmit="return false">
+
+    <fieldset data-name="tag-v1.0.0">
+      <legend>Etiqueta v1.0.0</legend>
+      <div class="opt">
+        <label><input type="radio" name="tag-v1.0.0" value="etiquetar"> Etiquetar v1.0.0</label>
+        <label><input type="radio" name="tag-v1.0.0" value="no-etiquetar-todavia"> No etiquetar todavía</label>
+      </div>
+    </fieldset>
+
+    <fieldset data-name="res-BL-I10b-1">
+      <legend>BL-I10b-1 · Hex Peek con bytes pre-escritura</legend>
+      <div class="opt">
+        <label><input type="radio" name="res-BL-I10b-1" value="acepto-1.0.0"> Acepto para 1.0.0</label>
+        <label><input type="radio" name="res-BL-I10b-1" value="arreglar-antes-del-tag"> La quiero arreglada antes del tag</label>
+      </div>
+    </fieldset>
+
+    <fieldset data-name="res-BL-I12-6">
+      <legend>BL-I12-6 · Doble cierre / doble clic en Generate</legend>
+      <div class="opt">
+        <label><input type="radio" name="res-BL-I12-6" value="acepto-1.0.0"> Acepto para 1.0.0</label>
+        <label><input type="radio" name="res-BL-I12-6" value="arreglar-antes-del-tag"> La quiero arreglada antes del tag</label>
+      </div>
+    </fieldset>
+
+    <fieldset data-name="res-BL-I12-5">
+      <legend>BL-I12-5 · 7 diálogos ignoran Escape (R-DLG.2 "Partly")</legend>
+      <div class="opt">
+        <label><input type="radio" name="res-BL-I12-5" value="acepto-1.0.0"> Acepto para 1.0.0</label>
+        <label><input type="radio" name="res-BL-I12-5" value="arreglar-antes-del-tag"> La quiero arreglada antes del tag</label>
+      </div>
+    </fieldset>
+
+    <fieldset data-name="res-BL-I9-9">
+      <legend>BL-I9-9 · Nombres de flujo muy largos que chocan</legend>
+      <div class="opt">
+        <label><input type="radio" name="res-BL-I9-9" value="acepto-1.0.0"> Acepto para 1.0.0</label>
+        <label><input type="radio" name="res-BL-I9-9" value="arreglar-antes-del-tag"> La quiero arreglada antes del tag</label>
+      </div>
+    </fieldset>
+
+    <fieldset data-name="res-BL-I10b-2">
+      <legend>BL-I10b-2 · Repintado A2L duplica límites/estilo/resumen</legend>
+      <div class="opt">
+        <label><input type="radio" name="res-BL-I10b-2" value="acepto-1.0.0"> Acepto para 1.0.0</label>
+        <label><input type="radio" name="res-BL-I10b-2" value="arreglar-antes-del-tag"> La quiero arreglada antes del tag</label>
+      </div>
+    </fieldset>
+
+    <fieldset data-name="res-BL-I12-123">
+      <legend>BL-I12-1 … BL-I12-3 · Deuda menor del visor de Reports</legend>
+      <div class="opt">
+        <label><input type="radio" name="res-BL-I12-123" value="acepto-1.0.0"> Acepto para 1.0.0</label>
+        <label><input type="radio" name="res-BL-I12-123" value="arreglar-antes-del-tag"> La quiero arreglada antes del tag</label>
+      </div>
+    </fieldset>
+
+    <fieldset data-name="decision-redaccion">
+      <legend>Decisión abierta · Redacción de registros antiguos (ruta de unidad / cuenta local)</legend>
+      <div class="opt">
+        <label><input type="radio" name="decision-redaccion" value="redactar"> Sí, redactar los registros antiguos</label>
+        <label><input type="radio" name="decision-redaccion" value="dejar-como-estan"> No, dejarlos como están</label>
+      </div>
+    </fieldset>
+
+    <fieldset data-name="decision-chkjson">
+      <legend>Decisión abierta · Cambio de gramática <code>.chk.json</code> (etiquetas de filas de memoria)</legend>
+      <div class="opt">
+        <label><input type="radio" name="decision-chkjson" value="cambiar-gramatica"> Sí, cambiar la gramática</label>
+        <label><input type="radio" name="decision-chkjson" value="mantener-gramatica"> No, mantener la gramática</label>
+      </div>
+    </fieldset>
+
+    <fieldset data-name="notas">
+      <legend>Notas generales / peticiones nuevas</legend>
+      <textarea id="notes" placeholder="Escribe aquí cualquier nota o petición nueva…"></textarea>
+    </fieldset>
+
+    <button class="export" type="button" onclick="exportVerdict()">Exportar decisión (JSON)</button>
+    <div class="hint">Descarga <code>b101-review-verdict.json</code> con tus respuestas. Sin llamadas de red.</div>
+  </form>
+</section>
+
+</div>
+
+<script>
+function exportVerdict(){
+  var data = {generated: new Date().toISOString()};
+  var fieldsets = document.querySelectorAll('#verdictForm fieldset[data-name]');
+  fieldsets.forEach(function(fs){
+    var name = fs.getAttribute('data-name');
+    if(name === 'notas'){ return; }
+    var checked = fs.querySelector('input[type=radio]:checked');
+    data[name] = checked ? checked.value : null;
+  });
+  var notes = document.getElementById('notes').value;
+  data['notas-generales'] = notes.trim() ? notes.trim() : null;
+  var blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'b101-review-verdict.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>

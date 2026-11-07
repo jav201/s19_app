@@ -1,0 +1,91 @@
+# Mutant M23 — batch-end re-run on the final tree (b982846)
+BASE_COMMIT=b982846ce33ccc20b1774f91b1091af4b42dff73
+BASE_TREE=detached worktree at 7d641d9 + git diff --binary 7d641d9 b982846 -- s19_app tests docs README.md AT-TC-REGISTRY.jsonl applied
+s19_app.__file__=<HOME>/work/s19_i5rm_m23/s19_app/__init__.py
+mutation: R-CHKED-056/3 byte count left out of the key
+mutation diff:
+diff --git a<HOME>/work/s19_i5rm/s19_app/tui/screens_directionb.py b<HOME>/work/s19_i5rm_m23/s19_app/tui/screens_directionb.py
+index b05226d..0555148 100644
+--- a<HOME>/work/s19_i5rm/s19_app/tui/screens_directionb.py
++++ b<HOME>/work/s19_i5rm_m23/s19_app/tui/screens_directionb.py
+@@ -7435,7 +7435,7 @@ class CheckEditorPanel(ScrollableContainer):
+         result: list = []
+         for name in kept:
+             spec = self._spec_bytes.get(name)
+-            if spec is None or self._param_rows.get(name, (None, None, ""))[:2] == spec[:2]:
++            if spec is None or self._param_rows.get(name, (None, None, ""))[:1] == spec[:1]:
+                 result.append(name)
+                 continue
+             self._memory_rows.append(
+@@ -7452,7 +7452,7 @@ class CheckEditorPanel(ScrollableContainer):
+             name: spec
+             for name, spec in self._spec_bytes.items()
+             if name in picked
+-            and self._param_rows.get(name, (None, None, ""))[:2] == spec[:2]
++            and self._param_rows.get(name, (None, None, ""))[:1] == spec[:1]
+         }
+ 
+     def _widths(self) -> CheckLayout:
+@@ -7499,7 +7499,7 @@ class CheckEditorPanel(ScrollableContainer):
+         for name in self._picked_params:
+             address, size, _fmt = self._param_rows.get(name, (None, 1, ""))
+             spec = self._spec_bytes.get(name)
+-            if spec is not None and spec[:2] == (address, size):
++            if spec is not None and spec[:1] == (address,):
+                 expected = spec[2]
+             else:
+                 expected = None
+verify:
+grep s19_app/tui/screens_directionb.py: replaced -> 'if spec is None or self._param_rows.get(name, (None, None, ""))[:1] == spec[:1]:' FOUND
+grep s19_app/tui/screens_directionb.py: replaced -> 'and self._param_rows.get(name, (None, None, ""))[:1] == spec[:1]' FOUND
+grep s19_app/tui/screens_directionb.py: replaced -> 'if spec is not None and spec[:1] == (address,):' FOUND
+guard nodes (1):
+  tests/test_b101_check_spec_keep.py::test_r_chked_056_3_resized_parameter_keeps_the_declared_entry
+
+--- pytest ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_r_chked_056_3_resized_parameter_keeps_the_declared_entry _________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-542/test_r_chked_056_3_resized_par0')
+facts = Facts(case=PosixPath('/tmp/pytest-of-<user>/pytest-542/b101_inc5_case080'), image={0: 108, 1: 49, 2: 57, 3: 84, 4: 79...ram(name='VALUE_0002', address=20, size=2), v3=Param(name='VALUE_0003', address=40, size=4), serial=12587004, moved=32)
+
+    def test_r_chked_056_3_resized_parameter_keeps_the_declared_entry(
+        tmp_path: Path, facts: Facts
+    ) -> None:
+        """Case R-CHKED-056/3: as /1 with the planted resized A2L (``VALUE_0001`` at
+        ``0x00000000``, 2 bytes) -> as /1; the entry at ``0x0`` is the 1 byte
+        ``6C`` and no 2-byte entry is written at ``0x0``.
+    
+        Negative control: the byte count left out of the key -> a 2-byte entry at
+        ``0x0`` read from the image -> RED."""
+        planted = planted_resized(facts, tmp_path)
+    
+        async def scenario(app, pilot, log):
+            return await relayout_and_write(pilot, app, log, facts, tmp_path, planted)
+    
+        state, lines, entries = run(tmp_path, scenario)
+>       assert_declared_entry_kept(facts, state, lines, entries)
+
+tests/test_b101_check_spec_keep.py:1288: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+f = Facts(case=PosixPath('/tmp/pytest-of-<user>/pytest-542/b101_inc5_case080'), image={0: 108, 1: 49, 2: 57, 3: 84, 4: 79...ram(name='VALUE_0002', address=20, size=2), v3=Param(name='VALUE_0003', address=40, size=4), serial=12587004, moved=32)
+state = (['VALUE_0001', 'VALUE_0002'], [('0x00C00FFC', '—', 'u32')], '3 fields: 2 params · 1 memory row')
+lines = ['Check Editor: wrote kept.chk.json (3 fields, kind=check).']
+entries = [(0, b'\x931'), (20, b'\xa0\xbe'), (12587004, b'\xff\xff\xff\xff')]
+
+    def assert_declared_entry_kept(f: Facts, state, lines, entries) -> None:
+        picks, rows, line = state
+>       assert picks == [f.v2.name], picks
+E       AssertionError: ['VALUE_0001', 'VALUE_0002']
+E       assert ['VALUE_0001', 'VALUE_0002'] == ['VALUE_0002']
+E         
+E         At index 0 diff: 'VALUE_0001' != 'VALUE_0002'
+E         Left contains one more item: 'VALUE_0002'
+E         Use -v to get more diff
+
+tests/test_b101_check_spec_keep.py:1219: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_056_3_resized_parameter_keeps_the_declared_entry
+1 failed in 33.82s

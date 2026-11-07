@@ -1,0 +1,129 @@
+=== base commit: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+=== python: Python 3.11.18
+=== mutation applied: M22 (file s19_app/tui/app.py)
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -10125,13 +10125,6 @@
+         # layout), so single keys reach the app bindings until the landing.
+         try:
+             focused = self.default_screen.focused
+-            if focused is not None:
+-                for ancestor in focused.ancestors:
+-                    if ancestor.id in self._WINDOW_CONTAINER_IDS:
+-                        if ancestor.has_class("hidden"):
+-                            self.default_screen.set_focus(None)
+-                            focused = None
+-                        break
+         except Exception:
+             focused = None
+         if changed:
+LANDED M22: 'self.default_screen.set_focus(None)' x0
+=== s19_app.__file__ ===
+<HOME>/work/s19_i10mut_m24/s19_app/__init__.py
+=== CMD ===
+env -u NO_COLOR <HOME>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -rf  tests/test_b101_unload_focus.py::test_r_shell_focus_2_6_synchronous_clear_decides_and_enter_runs_nothing
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ test_r_shell_focus_2_6_synchronous_clear_decides_and_enter_runs_nothing ____
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-662/test_r_shell_focus_2_6_synchro0')
+
+    def test_r_shell_focus_2_6_synchronous_clear_decides_and_enter_runs_nothing(
+        tmp_path: Path,
+    ) -> None:
+        """R-SHELL-FOCUS.2 case /6: with a Patch Editor button focused, running ``1``'s
+        action clears the focus before any await, an Enter pressed at once runs no
+        Patch Editor control (no ``Validate:`` message), and the focus lands on
+        ``files_list`` (base: the button keeps the focus and Enter paints
+        ``Validate: 1 entry, 0 error(s), 0 warning(s)``)."""
+        image = write_three_ranges(tmp_path / "src" / "three.s19")
+    
+        async def scenario(app, pilot, log):
+            await load_image(pilot, app, image)
+            await pilot.press("6")
+            await wait_screen(pilot, app, "patch")
+            await settle(pilot, 6)
+            doc = change_doc(app._patches_dir(), "i10f.changes.json", 0x8013, 0xAA)
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            mark = len(log.messages)
+            panel.post_message(PatchEditorPanel.ActionRequested("load_doc", path_text=str(doc)))
+            await wait_until(
+                pilot,
+                lambda: any(m.startswith("Loaded change") for m in log.since(mark)),
+                lambda: f"setup: the document did not load: {log.since(mark)!r}",
+                timeout=MESSAGE_WAIT_S,
+            )
+            await put_focus(pilot, app, "patch_doc_validate_button")
+            assert not any(m.startswith("Validate:") for m in log.since(mark)), "setup"
+            mark = len(log.messages)
+            app.action_show_screen("workspace")
+            # No await since the action returned: the clear is synchronous.
+            assert focus_of(app) is None, (
+                f"the focus was not cleared synchronously: {focus_report(app)}"
+            )
+            await pilot.press("enter")
+            await wait_screen(pilot, app, "workspace")
+            await wait_focus(pilot, app, "files_list")
+            await settle(pilot, 4)
+            validated = [m for m in log.since(mark) if m.startswith("Validate:")]
+            assert validated == [], validated
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:1098: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7fdf909ddb50>
+
+    async def scenario(app, pilot, log):
+        await load_image(pilot, app, image)
+        await pilot.press("6")
+        await wait_screen(pilot, app, "patch")
+        await settle(pilot, 6)
+        doc = change_doc(app._patches_dir(), "i10f.changes.json", 0x8013, 0xAA)
+        panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+        mark = len(log.messages)
+        panel.post_message(PatchEditorPanel.ActionRequested("load_doc", path_text=str(doc)))
+        await wait_until(
+            pilot,
+            lambda: any(m.startswith("Loaded change") for m in log.since(mark)),
+            lambda: f"setup: the document did not load: {log.since(mark)!r}",
+            timeout=MESSAGE_WAIT_S,
+        )
+        await put_focus(pilot, app, "patch_doc_validate_button")
+        assert not any(m.startswith("Validate:") for m in log.since(mark)), "setup"
+        mark = len(log.messages)
+        app.action_show_screen("workspace")
+        # No await since the action returned: the clear is synchronous.
+>       assert focus_of(app) is None, (
+            f"the focus was not cleared synchronously: {focus_report(app)}"
+        )
+E       AssertionError: the focus was not cleared synchronously: Button#patch_doc_validate_button (region area 10)
+E       assert Button(id='patch_doc_validate_button', classes='patch-chip -style-default') is None
+E        +  where Button(id='patch_doc_validate_button', classes='patch-chip -style-default') = focus_of(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'}))
+
+../s19_i10mut/tests/test_b101_unload_focus.py:1088: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_unload_focus.py::test_r_shell_focus_2_6_synchronous_clear_decides_and_enter_runs_nothing
+1 failed in 4.31s

@@ -1,0 +1,19 @@
+=== Inc 10a E5 corrective run: e5c-09
+date: 2026-11-07T06:30:27Z
+tree dir: <HOME>/work/s19_i10c_probe_final
+checkout HEAD (base): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+main ref: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+index tree: 6cb142f114dea93b83e526ca5c29303554283466
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10c_probe_final/s19_app/__init__.py
+CMD: env -u NO_COLOR timeout 600 /data/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -q -s -p no:xdist tests/test_zz_probe_ml3.py
+PROBE dialog current: LegendScreen; rail key 3 under it reaches no app binding, so the switch is a direct call
+PROBE call: waits=default area=0 screen=LegendScreen before=no widget focused
+PROBE after call: no widget focused
+PROBE call: waits=2 area=4128 screen=LegendScreen before=no widget focused
+PROBE after call: Button#mac_page_prev_button (region area 48)
+PROBE under the dialog: Button#mac_page_prev_button (region area 48)
+PROBE after close: Button#mac_page_prev_button (region area 48)
+.
+1 passed in 15.65s
+exit code: 0

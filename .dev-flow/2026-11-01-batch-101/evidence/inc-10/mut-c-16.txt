@@ -1,0 +1,46 @@
+=== Inc 10a E5 corrective run: mut-c-16
+date: 2026-11-07T06:06:56Z
+tree dir: <HOME>/work/s19_i10c_mut_mut-c-16
+checkout HEAD (base): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+main ref: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+index tree: 6cb142f114dea93b83e526ca5c29303554283466
+mutation: <HOME>/work/s19_i10c-helpers/mutation-mut-c-16.diff (printed at the end)
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10c_mut_mut-c-16/s19_app/__init__.py
+CMD: env -u NO_COLOR timeout 900 /data/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -q -n 6 --dist load -rfs --tb=line tests/test_b101_unload_focus.py -k shell_focus_3_1 or shell_focus_3_2 or seg_open_6_1
+bringing up nodes...
+bringing up nodes...
+
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+[gw1] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: the focus never landed on #window_help_workspace; it is no widget focused
+<HOME>/work/s19_i10c_mut_mut-c-16/tests/support/timing.py:66: AssertionError: the focus never landed on #window_help_workspace; it is no widget focused
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: the focus never landed on #window_help_workspace; it is Button#ws_load_project_button (region area 0)
+<HOME>/work/s19_i10c_mut_mut-c-16/tests/support/timing.py:66: AssertionError: the focus never landed on #window_help_workspace; it is Button#ws_load_project_button (region area 0)
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: the focus never landed on #files_list; it is WindowHelpChip#window_help_workspace (region area 3)
+<HOME>/work/s19_i10c_mut_mut-c-16/tests/support/timing.py:66: AssertionError: the focus never landed on #files_list; it is WindowHelpChip#window_help_workspace (region area 3)
+=========================== short test summary info ============================
+FAILED tests/test_b101_unload_focus.py::test_r_shell_focus_3_2_unload_with_nothing_focused_lands_on_the_target
+FAILED tests/test_b101_unload_focus.py::test_r_seg_open_6_1_unload_keeps_the_focus_out_of_the_hidden_window
+FAILED tests/test_b101_unload_focus.py::test_r_shell_focus_3_1_unload_that_removes_the_focused_button_rehomes_focus
+3 failed in 26.15s
+exit code: 1
+--- mutation diff (vs the staged clone) ---
+diff --git a/s19_app/tui/app.py b/s19_app/tui/app.py
+index cab4ee01..85a91b18 100644
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -18063,9 +18063,7 @@ class S19TuiApp(App):
+         self.set_status(f"Unloaded {label}.")
+         # Inc 10a (E5, CR-3): stamped with the window shown now, so a rail
+         # key in the same burst makes this landing stale and its own wins.
+-        self.call_after_refresh(
+-            self._land_focus, trigger, self._active_screen_key, on_switch=False
+-        )
++        pass
+ 
+     def _refresh_loaded_panel(self, project: Optional[str] = None) -> None:
+         """

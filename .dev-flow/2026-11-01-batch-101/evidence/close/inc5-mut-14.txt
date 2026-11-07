@@ -1,0 +1,62 @@
+# Mutant M14 — batch-end re-run on the final tree (b982846)
+BASE_COMMIT=b982846ce33ccc20b1774f91b1091af4b42dff73
+BASE_TREE=detached worktree at 7d641d9 + git diff --binary 7d641d9 b982846 -- s19_app tests docs README.md AT-TC-REGISTRY.jsonl applied
+s19_app.__file__=<HOME>/work/s19_i5rm_m14/s19_app/__init__.py
+mutation: R-CHKED-041.2 symbol ignored
+mutation diff:
+diff --git a<HOME>/work/s19_i5rm/s19_app/tui/screens_directionb.py b<HOME>/work/s19_i5rm_m14/s19_app/tui/screens_directionb.py
+index b05226d..9aacf64 100644
+--- a<HOME>/work/s19_i5rm/s19_app/tui/screens_directionb.py
++++ b<HOME>/work/s19_i5rm_m14/s19_app/tui/screens_directionb.py
+@@ -7404,10 +7404,6 @@ class CheckEditorPanel(ScrollableContainer):
+                 none, it is ambiguous or taken, or the symbol names a listed
+                 parameter at another range.
+         """
+-        if isinstance(symbol, str) and symbol and symbol in self._param_rows:
+-            if self._param_rows[symbol][:2] == (address, size) and symbol not in taken:
+-                return symbol
+-            return None
+         names = by_key.get((address, size), [])
+         if len(names) == 1 and names[0] not in taken:
+             return names[0]
+verify:
+grep s19_app/tui/screens_directionb.py: replaced -> 'names = by_key.get((address, size), [])' FOUND
+guard nodes (1):
+  tests/test_b101_check_spec_keep.py::test_r_chked_041_2_3_symbol_disambiguates
+
+--- pytest ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________________ test_r_chked_041_2_3_symbol_disambiguates ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-533/test_r_chked_041_2_3_symbol_di0')
+facts = Facts(case=PosixPath('/tmp/pytest-of-<user>/pytest-533/b101_inc5_case080'), image={0: 108, 1: 49, 2: 57, 3: 84, 4: 79...ram(name='VALUE_0002', address=20, size=2), v3=Param(name='VALUE_0003', address=40, size=4), serial=12587004, moved=32)
+
+    def test_r_chked_041_2_3_symbol_disambiguates(tmp_path: Path, facts: Facts) -> None:
+        """Case R-CHKED-041.2/3: the planted twin A2L (``ALPHA`` and ``BETA``, both
+        ``0x14``, 2 bytes) loaded with the case 08 image; a spec of one entry
+        ``0x14`` ``A0 BE`` with symbol ``BETA`` picked -> included exactly
+        ``[BETA]``, 0 memory rows.
+    
+        Negative control: the symbol ignored -> a memory row, or the first match
+        taken -> ``ALPHA`` -> RED."""
+        twin = planted_twin(facts, tmp_path)
+        spec = spec_doc([(0x14, facts.image_bytes(0x14, 2), "BETA")])
+    
+        async def scenario(app, pilot, log):
+            await open_session(pilot, app, facts, specs={"beta.chk.json": spec}, a2l=twin)
+            await pick_spec(pilot, app, log, "beta.chk.json")
+            return included(app), mem_rows(app)
+    
+        picks, rows = run(tmp_path, scenario)
+>       assert picks == ["BETA"], picks
+E       AssertionError: []
+E       assert [] == ['BETA']
+E         
+E         Right contains one more item: 'BETA'
+E         Use -v to get more diff
+
+tests/test_b101_check_spec_keep.py:780: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_041_2_3_symbol_disambiguates
+1 failed in 21.68s

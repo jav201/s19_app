@@ -1,0 +1,99 @@
+=== base commit: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+=== python: Python 3.11.18
+=== mutation applied: M9 (file s19_app/tui/app.py)
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -21507,7 +21507,7 @@
+             self.set_status("Goto address is empty.")
+             if self._goto_focus_address is not None:
+                 self._goto_focus_address = None
+-                self.update_hex_view()
++                self.update_hex_view(0)
+             return
+         try:
+             addr = int(raw, 0)
+@@ -21515,12 +21515,12 @@
+             self.set_status("Invalid address format.")
+             if self._goto_focus_address is not None:
+                 self._goto_focus_address = None
+-                self.update_hex_view()
++                self.update_hex_view(0)
+             return
+         if not self._apply_goto("main", addr):
+             if self._goto_focus_address is not None:
+                 self._goto_focus_address = None
+-                self.update_hex_view()
++                self.update_hex_view(0)
+             return
+         self.update_hex_view(addr)
+         self.set_status(f"Goto 0x{addr:08X}")
+LANDED M9: 'self.update_hex_view(0)' x3
+=== s19_app.__file__ ===
+<HOME>/work/s19_i10mut_m09/s19_app/__init__.py
+=== CMD ===
+env -u NO_COLOR <HOME>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -rf  tests/test_b101_hex_jump.py::test_r_tui_040_8_1_main_miss_leaves_rows
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________________ test_r_tui_040_8_1_main_miss_leaves_rows ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-647/test_r_tui_040_8_1_main_miss_l0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-647/case080')
+
+    def test_r_tui_040_8_1_main_miss_leaves_rows(tmp_path, case08):
+        """R-TUI-040.8/1: a main go-to miss leaves the rows unchanged (a standing
+        guard on base: it fails if the miss re-renders from another window)."""
+    
+        async def scenario(app, pilot, log):
+            await _miss_leaves_rows(pilot, app, log, case08, "main")
+    
+>       drive(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_hex_jump.py:839: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_hex_jump.py:137: in drive
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_hex_jump.py:837: in scenario
+    await _miss_leaves_rows(pilot, app, log, case08, "main")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+log = <tests.support.b100_projects.StatusLog object at 0x7ff1dd711450>
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-647/case080')
+view_name = 'main'
+
+    async def _miss_leaves_rows(pilot, app, log, case08, view_name) -> None:
+        view = await start(pilot, app, case08, view_name)
+        _key, hex_id, _scroll, _goto, _search, _field = view
+        await goto(pilot, app, log, view, "0x00000050", hit(0x50))
+        await wait_until(pilot, lambda: len(marked_rows(app, hex_id)) == 1, "the go-to painted no marker")
+        before = [r[2:] for r in hex_rows(app, hex_id)]
+        await goto(pilot, app, log, view, "0xFFFFFFF0", MISS)
+        after = [r[2:] for r in hex_rows(app, hex_id)]
+>       assert after == before, f"{view_name}: the miss changed the rows ({len(before)} before, {len(after)} after)"
+E       AssertionError: main: the miss changed the rows (200 before, 200 after)
+E       assert ['0x00000000 .........|', ...] == ['0x00000040 .........|', ...]
+E         
+E         At index 0 diff: '0x00000000  6C 31 39 54 4F 4F 4C 20 42 4F 4F 54 20 76 31 2E  |l19TOOL BOOT v1.|' != '0x00000040  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|'
+E         Use -v to get more diff
+
+../s19_i10mut/tests/test_b101_hex_jump.py:829: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_hex_jump.py::test_r_tui_040_8_1_main_miss_leaves_rows
+1 failed in 8.41s

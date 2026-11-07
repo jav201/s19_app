@@ -1,0 +1,67 @@
+# Mutant M16 — batch-end re-run on the final tree (b982846)
+BASE_COMMIT=b982846ce33ccc20b1774f91b1091af4b42dff73
+BASE_TREE=detached worktree at 7d641d9 + git diff --binary 7d641d9 b982846 -- s19_app tests docs README.md AT-TC-REGISTRY.jsonl applied
+s19_app.__file__=<HOME>/work/s19_i5rm_m16/s19_app/__init__.py
+mutation: R-CHKED-041.3/4 first match on an ambiguity
+mutation diff:
+diff --git a<HOME>/work/s19_i5rm/s19_app/tui/screens_directionb.py b<HOME>/work/s19_i5rm_m16/s19_app/tui/screens_directionb.py
+index b05226d..a84c13f 100644
+--- a<HOME>/work/s19_i5rm/s19_app/tui/screens_directionb.py
++++ b<HOME>/work/s19_i5rm_m16/s19_app/tui/screens_directionb.py
+@@ -7409,7 +7409,7 @@ class CheckEditorPanel(ScrollableContainer):
+                 return symbol
+             return None
+         names = by_key.get((address, size), [])
+-        if len(names) == 1 and names[0] not in taken:
++        if names and names[0] not in taken:
+             return names[0]
+         return None
+ 
+verify:
+grep s19_app/tui/screens_directionb.py: replaced -> 'if names and names[0] not in taken:' FOUND
+guard nodes (1):
+  tests/test_b101_check_spec_keep.py::test_r_chked_041_3_4_ambiguous_memory_row
+
+--- pytest ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________________ test_r_chked_041_3_4_ambiguous_memory_row ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-535/test_r_chked_041_3_4_ambiguous0')
+facts = Facts(case=PosixPath('/tmp/pytest-of-<user>/pytest-535/b101_inc5_case080'), image={0: 108, 1: 49, 2: 57, 3: 84, 4: 79...ram(name='VALUE_0002', address=20, size=2), v3=Param(name='VALUE_0003', address=40, size=4), serial=12587004, moved=32)
+
+    def test_r_chked_041_3_4_ambiguous_memory_row(tmp_path: Path, facts: Facts) -> None:
+        """Case R-CHKED-041.3/4: the planted twin A2L loaded; a spec of one entry
+        ``0x14`` ``A0 BE`` with no symbol picked -> 0 included (neither ``ALPHA``
+        nor ``BETA``), 1 memory row ``0x00000014``. Control in the same session: a
+        spec naming ``BETA`` then picked includes ``BETA``.
+    
+        Negative control: first match taken on an ambiguity -> ``ALPHA`` included
+        -> RED; no resolution at all (the base) -> the control pick includes
+        nothing -> RED."""
+        twin = planted_twin(facts, tmp_path)
+        data = facts.image_bytes(0x14, 2)
+        specs = {
+            "plain.chk.json": spec_doc([(0x14, data)]),
+            "beta.chk.json": spec_doc([(0x14, data, "BETA")]),
+        }
+    
+        async def scenario(app, pilot, log):
+            await open_session(pilot, app, facts, specs=specs, a2l=twin)
+            await pick_spec(pilot, app, log, "plain.chk.json")
+            first = (included(app), mem_rows(app))
+            await pick_spec(pilot, app, log, "beta.chk.json")
+            return first, included(app)
+    
+        (picks, rows), control = run(tmp_path, scenario)
+>       assert picks == [], picks
+E       AssertionError: ['ALPHA']
+E       assert ['ALPHA'] == []
+E         
+E         Left contains one more item: 'ALPHA'
+E         Use -v to get more diff
+
+tests/test_b101_check_spec_keep.py:878: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_041_3_4_ambiguous_memory_row
+1 failed in 24.32s
