@@ -31,3 +31,10 @@ Round 2: architect **FAIL** (all 16 round-1 findings closed; the named-kind rule
 | all other round-2 findings | accept with their fix columns. |
 
 **Next:** an Opus correction (records and graph), then round 3 by both reviewers on these items only.
+
+## Round-2 correction rulings (2026-11-07T01:16:25-06:00, orchestrator Opus 5.5)
+
+Correction applied (Opus, 27 min): 80 rows, 262 cases + 3 AT, 39 nodes; E3S-18 (no length → no enriched `byte_size`; **visible consequence:** 187 tracked CURVE/MAP tags show blank Raw/Physical in the A2L Explorer until Inc 3a's lengths land — more honest than today's first-element value; shown to the operator with the E5 captures), E3S-19, E3S-21 … -25, E3A-18, -19, -22, -23 applied; READ.52's peak memory ≤ 2× the base reader's. `fixed_columns=2` checked on cachyos-rtx: Address/Length whole 40/40 from 80 to 220 columns (scrolled too) vs 13/40 today.
+- **Split accepted:** the tag-table view rows (R-TUI-042a.2 padding, .3 Tag cap, .4 Address/Length first and fixed — E3A-17 = E3S-20) leave Inc 11 for a **new Inc 12 — A2L tag table: no glued or cut values** (`app.py` only; visible change; the operator approves its before/after captures). Inc 11 is the reader only: `a2l.py`, `a2l_extract.py`, `a2l_definition.py`. Inc 12 also owns the open item "at 80–118 columns the capped Tag is cut unmarked — size the cap from the width left".
+- **Open in Inc 11:** `3E00` (no number word) still slips past E3S-24 — round 3 checks it.
+**Next:** round 3 on Inc 11 (reader items only), and Inc 12's E1 from the moved rows.
