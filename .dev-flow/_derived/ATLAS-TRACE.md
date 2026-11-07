@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 102 requirement files | corpus digest: cc693fc1dfd79c35 -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 102 requirement files | corpus digest: 46340dbdb0bc5c3b -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
@@ -3854,9 +3854,9 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `US-I11-2` | batches |
 | `US-I11-3` | batches |
 | `US-I11-4` | batches |
-| `US-I12-1` | batches |
-| `US-I12-2` | batches |
-| `US-I12-3` | batches |
+| `US-I12-1` | batches, tests |
+| `US-I12-2` | batches, tests |
+| `US-I12-3` | batches, tests |
 | `US-I12b-1` | batches, tests |
 | `US-I8-1` | batches |
 | `US-I8-2` | batches |
@@ -3969,7 +3969,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `R-CHKED-018` | canon |
 | `R-CHKED-019` | canon |
 | `R-CHKED-020` | canon |
-| `R-CHKED-021` | batches, canon |
+| `R-CHKED-021` | batches, canon, tests |
 | `R-CHKED-022` | canon |
 | `R-CHKED-023` | canon |
 | `R-CHKED-024` | batches, canon |
@@ -4006,7 +4006,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `R-CHKED-055` | batches, tests |
 | `R-CHKED-056` | batches, tests |
 | `R-CHKED-057` | batches, tests |
-| `R-CHKED-058` | batches |
+| `R-CHKED-058` | batches, tests |
 | `R-CHKS-001` | batches, canon, tests |
 | `R-CHKS-002` | canon |
 | `R-CHKS-003` | canon |
@@ -4356,7 +4356,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `R-TUI-018` | batches, canon, tests |
 | `R-TUI-019` | batches, canon |
 | `R-TUI-020` | batches, canon, tests |
-| `R-TUI-021` | batches, canon |
+| `R-TUI-021` | batches, canon, tests |
 | `R-TUI-022` | batches, canon |
 | `R-TUI-023` | batches, canon |
 | `R-TUI-024` | batches, canon |
