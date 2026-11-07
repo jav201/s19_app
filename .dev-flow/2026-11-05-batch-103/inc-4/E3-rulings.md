@@ -38,3 +38,14 @@ Security round 2 **FAIL**: E5S-01 closed (CRAFT 51 tokens 226 ms; switch boundar
 - **E5S-07 — remove the multiplicative factor (prefer removing over guarding):** range tables (measured) **and** a cap: **if the query holds more than N distinct tokens, the fuzzy rule is left out** (exact, prefix, substring, token and subsequence rules still run). Long queries are pasted names; the cheap tiers find them. The design pass picks N by measurement so the worst case of R-A2L-MATCH.40's scope stays ≤ 0.5 s, reports the share of corpus and fixture names with more than N tokens (`../../design/a2l-corpus/`), and writes the row (next free R-A2L-MATCH id) with cases and a negative control.
 - **E5S-08:** .37 must hold for every list in its scope: a compact build (the range tables or a cheaper staging) or, if not reachable, the scope stated by total characters with the measured bound — no silent loosening.
 - Then: code (DeepSeek), tests (Sonnet), GREEN, mutant table re-run, security round 3 on E5S-07/-08.
+
+## E5 round-2 design rulings (2026-11-06T23:56:49-06:00, orchestrator Opus 5.5)
+
+Design pass (Opus, 50 min): **N = 20** distinct query tokens (range tables + C-level totals); worst at 20 tokens 370 ms (U6), 325 ms (D3), 300 ms (E2); past the cap every stress list ≤ 8.8 ms; names past 20 tokens: 0.019 % of fixtures, 0.040 % of the public corpus; new row R-A2L-MATCH.41 (5 cases) and case .40/5; .37 compact build 56.7 MiB (was 71.0) with its scope narrowed to ASCII names. Two adversarial lists still pass 1.0 s: a one-token walk over W40 (1.08–1.23 s) and the substring key over SUBO (0.94–1.00 s).
+
+| Item | Ruling |
+|---|---|
+| R-A2L-MATCH.40's bound | **2.0 s** for its adversarial scope (was 1.0 s). The 1.0 s figure was the orchestrator's choice at A-2, not an operator requirement; its purpose — the UI never freezes — is met better by the consumer: **Inc 7 ranks off the UI thread and a newer keystroke discards an older ranking** (PLAN row 7 obligation). The typed-name bound R-A2L-MATCH.36 (200 ms) is unchanged. W40 and SUBO join .40's cases. |
+| R-A2L-MATCH.41's negative control | **behavioural**, not timing: with the cap removed, a query of more than 20 distinct tokens lists a name only the fuzzy rule finds → RED (the 1.22× timing margin was too thin to be a control). |
+| .37 scope narrowed to ASCII names | **accepted**: ASAP2 identifiers are ASCII; a non-ASCII name is not a valid identifier (the reader records it, Inc 11). The row states the scope. |
+| Next | code (DeepSeek: range tables, C-level totals, the N = 20 cap, the compact build), tests (Sonnet: .40/3–5 with W40 and SUBO, .41's cases, .37's scope), GREEN, mutant table, security round 3 on E5S-07 / -08 only. |
