@@ -4,7 +4,7 @@ Batch: 2026-11-01-batch-101 · base `e273181` · branch `b101-canon` · flow: de
 
 ## User story
 
-**US-101.1** — As the engineer who changes s19_app, I read and change one requirements file in which every requirement is a single strict EARS sentence with a stable id, so that each requirement can be tested on its own and traced to its tests.
+### US-101.1 — As the engineer who changes s19_app, I read and change one requirements file in which every requirement is a single strict EARS sentence with a stable id, so that each requirement can be tested on its own and traced to its tests.
 
 Source: the strict EARS review of the 18 requirement modules (S0 … S17), accepted by the operator on 2026-10-30, reconciled with batch-100 at `570b4b5` and delta-checked to `e279c8b` on 2026-11-01 (no product code changed between `e279c8b` and `e273181`).
 

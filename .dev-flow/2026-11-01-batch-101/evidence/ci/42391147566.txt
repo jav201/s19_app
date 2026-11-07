@@ -1,0 +1,7 @@
+gh run 42391147566 (main 15e90c4, every increment merged) — failed set (lane logs)
+failure | tui-ci
+FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-80x24]
+Compared with run 42361116559 (Inc 10a): identical failed set (the batch's 4 known failures); no new failure. The final batch tree is CI-clean apart from the known set.

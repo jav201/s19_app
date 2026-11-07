@@ -84,8 +84,8 @@ slides are built only after this dossier is approved.
 ## 4. Window inventory (from the code)
 
 Conventions: **Reach** = how the user gets there. Keys are written as the key
-bar paints them (`^K` = Ctrl+K). "palette" = the app's own command palette
-(`^K`), whose entries are built 1:1 from `S19TuiApp.BINDINGS` plus two extra
+bar paints them (`^k` = Ctrl+K). "palette" = the app's own command palette
+(`^k`), whose entries are built 1:1 from `S19TuiApp.BINDINGS` plus two extra
 entries (`app.py:_build_palette_entries`, `EXTRA_PALETTE_ENTRIES`). Every rail
 screen is also reachable by clicking its rail row (`rail.py:RailItem` →
 `app.py:on_rail_selected` → `app.py:action_show_screen`).
@@ -102,11 +102,11 @@ Reach: always present. Startup: `s19tui` or `s19tui --load <path>`
 | 3 | Header title "Hex Edit Tool" | — | `app.py:S19TuiApp.TITLE`, `compose` |
 | 4 | Activity rail, 12 rows, glyph + label, active marker | click a row | `app.py:RAIL_ENTRIES_B94`, `rail.py:Rail.set_active` |
 | 5 | Rail keys `1`–`6`, `=`, `7`, `8`, `]`, `9`, `0` | key | `app.py:S19TuiApp.BINDINGS` (`show_screen(...)`), `action_show_screen` |
-| 6 | Command palette: open, type to filter, Enter/click runs | `^K` | `command_bar.py:CommandBar.open_palette/on_input_changed/on_input_submitted/on_list_view_selected`, `app.py:action_focus_palette`, `on_command_bar_palette_action` |
-| 7 | Palette entry "Viewer settings" | `^K` → Viewer settings | `app.py:EXTRA_PALETTE_ENTRIES`, `action_open_settings_menu` |
-| 8 | Palette entry "Split / Join / Export" | `^K` → Split / Join / Export | `app.py:EXTRA_PALETTE_ENTRIES`, `action_open_split_join_export` |
+| 6 | Command palette: open, type to filter, Enter/click runs | `^k` | `command_bar.py:CommandBar.open_palette/on_input_changed/on_input_submitted/on_list_view_selected`, `app.py:action_focus_palette`, `on_command_bar_palette_action` |
+| 7 | Palette entry "Viewer settings" | `^k` → Viewer settings | `app.py:EXTRA_PALETTE_ENTRIES`, `action_open_settings_menu` |
+| 8 | Palette entry "Split / Join / Export" | `^k` → Split / Join / Export | `app.py:EXTRA_PALETTE_ENTRIES`, `action_open_split_join_export` |
 | 9 | Viewer settings menu: page size 25/50/100/150/200 for Hex rows, A2L tags, MAC rows | pick a row | `app.py:_update_settings_menu`, `on_list_view_selected`, `_apply_viewer_setting` |
-| 10 | Layout density compact ⇄ comfortable | `^D` | `app.py:action_cycle_density` |
+| 10 | Layout density compact ⇄ comfortable | `^d` | `app.py:action_cycle_density` |
 | 11 | Find: focus the active screen's ASCII search (Workspace, A2L, MAC only; elsewhere one status line) | `/` | `app.py:action_focus_find`, `_focus_local_input`, `_FIND_GOTO_INPUTS` |
 | 12 | Go-to: focus the active screen's address field (same three screens) | `g` | `app.py:action_focus_goto`, `_focus_local_input` |
 | 13 | Escape releases a find/go-to field | `esc` | `app.py:on_key` |
@@ -121,16 +121,16 @@ Reach: always present. Startup: `s19tui` or `s19tui --load <path>`
 | 22 | Per-window help (`?` chip in a window title, or `?` with focus in that window) | `?` / click `?` | `window_help.py:WindowHelpChip`, `WindowSection.action_show_window_usage_help`, `open_window_help` → W30 |
 | 23 | Legend for the active screen | `k` | `app.py:action_show_legend` → W10 |
 | 24 | Operations modal | `x` | `app.py:action_operations_view` → W19 |
-| 25 | Load (typed path first) | `^L` / `l` | `app.py:action_load_file` → W01 |
+| 25 | Load (typed path first) | `^l` / `l` | `app.py:action_load_file` → W01 |
 | 26 | Load project (list first) | `p` | `app.py:action_load_project` → W01 |
-| 27 | Save project | `^S` / `s` | `app.py:action_save_project` → W22 |
+| 27 | Save project | `^s` / `s` | `app.py:action_save_project` → W22 |
 | 28 | Reports viewer | `t` | `app.py:action_view_reports` → W24 |
-| 29 | Textual command palette (theme, keys, screenshot, quit …) | `^P` (key bar "palette") | Textual `App.COMMAND_PALETTE_BINDING` = `ctrl+p` (textual 8.2.8), painted by `window_help.py:global_tokens` |
-| 30 | Quit | `q` (also Textual `^Q`) | `app.py:action_quit` (asks W31 only while a load/save runs) |
+| 29 | Textual command palette (theme, keys, screenshot, quit …) | `^p` (key bar "palette") | Textual `App.COMMAND_PALETTE_BINDING` = `ctrl+p` (textual 8.2.8), painted by `window_help.py:global_tokens` |
+| 30 | Quit | `q` (also Textual `^q`) | `app.py:action_quit` (asks W31 only while a load/save runs) |
 
 ### W01 — Load dialog · 14 features
 
-Reach: `^L` / `l` (opens with the path field focused), `p` or the Workspace
+Reach: `^l` / `l` (opens with the path field focused), `p` or the Workspace
 "Load project (p)" button (opens with the list focused). `screens.py:LoadDialog`,
 rows/verdict/preview from `app.py:_load_dialog_rows/_load_dialog_verdict/_load_dialog_preview`,
 routed by `app.py:_handle_load_dialog`.
@@ -326,8 +326,8 @@ actions routed by `app.py:on_patch_editor_panel_action_requested` (set `PATCH_AC
 | 17 | Parse pasted | button | `parse_paste` |
 | 18 | Edit JSON (JSON tab) → W12 | button | `app.py:on_patch_editor_panel_edit_json_requested` |
 | 19 | History strip | — | `#patch_history_strip` |
-| 20 | Undo | button / `^Z` | `app.py:action_patch_undo`, `on_patch_editor_panel_undo_requested` |
-| 21 | Redo | button / `^Y` | `app.py:action_patch_redo`, `on_patch_editor_panel_redo_requested` |
+| 20 | Undo | button / `^z` | `app.py:action_patch_undo`, `on_patch_editor_panel_undo_requested` |
+| 21 | Redo | button / `^y` | `app.py:action_patch_redo`, `on_patch_editor_panel_redo_requested` |
 | 22 | Scope: cycle variants for Execute scope | button | `#patch_execute_scope_button` |
 | 23 | Execute scope (apply over chosen variants) + scope line | button | `execute_scope` → `app.py:_trigger_execute_scope` |
 | 24 | Select variant | `v` (key bar, when variants exist) | `app.py:action_select_variant` → W23 |
@@ -515,7 +515,7 @@ Reach: Operations → Write CRC. `screens.py:ConfirmWriteScreen`.
 
 ### W21 — Split / Join / Export · 17 features
 
-Reach: palette only — `^K` → "Split / Join / Export" (no rail key). `app.py:action_open_split_join_export`,
+Reach: palette only — `^k` → "Split / Join / Export" (no rail key). `app.py:action_open_split_join_export`,
 `segment_split_view.py:SplitJoinWindow`. Window keys work while focus is inside it.
 
 | # | Feature | How | Code proof |
@@ -540,7 +540,7 @@ Reach: palette only — `^K` → "Split / Join / Export" (no rail key). `app.py:
 
 ### W22 — Save project · 7 features
 
-Reach: `^S` / `s` (needs a loaded file or A2L; else one status line). `app.py:action_save_project`, `screens.py:SaveProjectScreen`, `app.py:_handle_save_dialog`.
+Reach: `^s` / `s` (needs a loaded file or A2L; else one status line). `app.py:action_save_project`, `screens.py:SaveProjectScreen`, `app.py:_handle_save_dialog`.
 
 | # | Feature | How | Code proof |
 |---|---|---|---|
@@ -707,7 +707,7 @@ app during the captures; "code" = read in the code.
 
 | ID | Kind | Finding | Evidence |
 |---|---|---|---|
-| F-01 | defect, live + code | The Patch Editor (dropdown or typed Load) and the Check Editor (Spec dropdown) parse change/check documents without the loaded A2L, so every entry with a `symbol` is refused (`CHG-SYMBOL-UNRESOLVED … no A2L context is declared`) even with the A2L loaded. The case documents `demo_patch.changes.json`, `demo_check.chk.json`, `demo_check_fails.chk.json` cannot be used as delivered. Project Execute scope does resolve them. | `app.py:_patch_editor_load` calls `service.load(path_text, self.base_dir)` with no `a2l_context`; ch08-02, ch08-03 |
+| F-01 | defect, live + code | The Patch Editor (dropdown or typed Load) and the Check Editor (Spec dropdown) parse change/check documents without the loaded A2L, so every entry with a `symbol` is refused (`CHG-SYMBOL-UNRESOLVED … no A2L context is declared`) even with the A2L loaded. The case documents `demo_patch.changes.json`, `demo_check.chk.json`, `demo_check_fails.chk.json` cannot be used as delivered. Project Execute scope does not resolve them either (a variant run passes no A2L, so the change document is blocked). | `app.py:_patch_editor_load` calls `service.load(path_text, self.base_dir)` with no `a2l_context`; ch08-02, ch08-03 |
 | F-02 | known defect, live | Clean A2L reports 102 `A2L_UNRECOGNIZED_BLOCK` for `MOD_PAR`, `MOD_COMMON`, `AXIS_DESCR` (shown as Info); the Info heading cites an internal "Cambio4 triage". | ch07-01 |
 | F-03 | defect, live | Issues **Warnings** filter also lists the 102 Info rows (379 rows); the legend says Info rows appear only under All. | ch07-05, ch07-07 |
 | F-04 | usability, live | After **Apply loaded changes** on the Inspector tab, the "Save patched image as" prompt appears only on the JSON tab; nothing on the visible tab says so. | ch08-07, ch08-08 |
@@ -772,7 +772,7 @@ app during the captures; "code" = read in the code.
 |---|---|---|
 | `firmware.s19`, `firmware.hex`, `firmware_v2.s19`, `firmware.a2l`, `firmware.mac` | case 08 | all chapters |
 | `firmware_issues.a2l`, `firmware_issues.mac` (faulty variant) | case 08 | Chapter 7 only |
-| `demo_patch.changes.json`, `demo_check.chk.json`, `demo_check_fails.chk.json` | case 08 | Chapter 8 (refused, F-01), Chapter 9 (dropdown), project batch assignment |
+| `demo_patch.changes.json`, `demo_check.chk.json`, `demo_check_fails.chk.json` | case 08 | Chapter 8 (resolved in 1.0.0, F-01), Chapter 9 (dropdown), project batch assignment |
 | `guide_patch_nosym.changes.json` | written for the guide: `demo_patch.changes.json` without its two `symbol` entries | Chapters 8, 17, 18 |
 | `guide_check_mixed.chk.json` | written for the guide: the case check entries without `symbol`, plus `BUILD_ID=SYNTH_9999` at `0x00C00118` (fails) and 2 bytes at `0x00500000` (outside the image) | Chapters 8, 9, 11, 17 |
 | project `demo` | assembled for the guide: the four case files plus a minimal `project.json` (Chapter 8 adds a batch assignment) | Chapters 2, 8, 9, 15–18 |

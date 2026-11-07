@@ -1,0 +1,160 @@
+# Mutant M12 — batch-end re-run on the final tree (b982846)
+BASE_COMMIT=b982846ce33ccc20b1774f91b1091af4b42dff73
+BASE_TREE=detached worktree at 7d641d9 + git diff --binary 7d641d9 b982846 -- s19_app tests docs README.md AT-TC-REGISTRY.jsonl applied
+s19_app.__file__=<HOME>/work/s19_i5rm_m12/s19_app/__init__.py
+mutation: R-CHKED-041.1 an entry dropped
+mutation diff:
+diff --git a<HOME>/work/s19_i5rm/s19_app/tui/screens_directionb.py b<HOME>/work/s19_i5rm_m12/s19_app/tui/screens_directionb.py
+index b05226d..b237a21 100644
+--- a<HOME>/work/s19_i5rm/s19_app/tui/screens_directionb.py
++++ b<HOME>/work/s19_i5rm_m12/s19_app/tui/screens_directionb.py
+@@ -7331,6 +7331,7 @@ class CheckEditorPanel(ScrollableContainer):
+                 by_key.setdefault((address, size), []).append(name)
+         taken: set = set()
+         named: list = []
++        items = list(items)[:-1]
+         for item in items:
+             address = item.get("address")
+             if address is None:
+verify:
+grep s19_app/tui/screens_directionb.py: replaced -> 'named: list = []' FOUND
+guard nodes (2):
+  tests/test_b101_check_spec_keep.py::test_r_chked_041_1_pick_replaces_the_field_set
+  tests/test_b101_check_spec_keep.py::test_r_chked_041_2_1_written_spec_names_come_back
+
+--- pytest ---
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+________________ test_r_chked_041_1_pick_replaces_the_field_set ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-531/test_r_chked_041_1_pick_replac0')
+facts = Facts(case=PosixPath('/tmp/pytest-of-<user>/pytest-531/b101_inc5_case080'), image={0: 108, 1: 49, 2: 57, 3: 84, 4: 79...ram(name='VALUE_0002', address=20, size=2), v3=Param(name='VALUE_0003', address=40, size=4), serial=12587004, moved=32)
+
+    def test_r_chked_041_1_pick_replaces_the_field_set(tmp_path: Path, facts: Facts) -> None:
+        """Case R-CHKED-041.1/1: case 08 and its A2L loaded, the pilot spec in the
+        patches folder, the field set ``VALUE_0003`` included and two memory rows;
+        the pilot spec picked in the Spec dropdown (click, arrows, enter) -> 3
+        fields (included parameters + memory rows), neither ``VALUE_0003`` nor the
+        two earlier rows remain, status ``Check Editor: loaded
+        'pilot_fields.chk.json' (3 fields).``
+    
+        Standing guard on the count (base: 3 memory rows, E1 base column "Yes");
+        it guards "earlier fields kept" (6 fields) and "an entry dropped" (2
+        fields). The names that come back are R-CHKED-041.2's."""
+        old_rows = [(0x1000, "OLD_A", 2), (0x1010, "OLD_B", 1)]
+    
+        async def scenario(app, pilot, log):
+            await open_session(pilot, app, facts, specs={PILOT: spec_doc(pilot_entries(facts))})
+            await include_by_space(pilot, app, facts.v3.name)
+            for address, label, size in old_rows:
+                await add_memory_row(pilot, app, address, label, size)
+            assert included(app) == [facts.v3.name] and len(mem_rows(app)) == 2
+            lines = await pick_spec(pilot, app, log, PILOT)
+            return lines, included(app), mem_rows(app), fields_lines(app)
+    
+        lines, picks, rows, flines = run(tmp_path, scenario)
+        assert lines[-1] == f"Check Editor: loaded '{PILOT}' (3 fields).", lines
+>       assert len(picks) + len(rows) == 3, (picks, rows)
+E       AssertionError: (['VALUE_0001', 'VALUE_0002'], [])
+E       assert (2 + 0) == 3
+E        +  where 2 = len(['VALUE_0001', 'VALUE_0002'])
+E        +  and   0 = len([])
+
+tests/test_b101_check_spec_keep.py:727: AssertionError
+______________ test_r_chked_041_2_1_written_spec_names_come_back _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-531/test_r_chked_041_2_1_written_s0')
+facts = Facts(case=PosixPath('/tmp/pytest-of-<user>/pytest-531/b101_inc5_case080'), image={0: 108, 1: 49, 2: 57, 3: 84, 4: 79...ram(name='VALUE_0002', address=20, size=2), v3=Param(name='VALUE_0003', address=40, size=4), serial=12587004, moved=32)
+
+    def test_r_chked_041_2_1_written_spec_names_come_back(tmp_path: Path, facts: Facts) -> None:
+        """Case R-CHKED-041.2/1 (F-27): case 08 and its A2L loaded, the pilot spec,
+        an empty field set; the pilot spec picked -> included exactly
+        ``[VALUE_0001, VALUE_0002]``, both ``✓`` in the ledger, Fields lines
+        ``◆ 0x00000000 VALUE_0001``, ``◆ 0x00000014 VALUE_0002``, ``▪ 0x00C00FFC
+        u32 memory row``, head line ``3 fields: 2 params · 1 memory row``.
+    
+        Negative control: resolution removed (the base) -> ``3 fields: 0 params ·
+        3 memory rows`` -> RED."""
+    
+        async def scenario(app, pilot, log):
+            await open_session(pilot, app, facts, specs={PILOT: spec_doc(pilot_entries(facts))})
+            await pick_spec(pilot, app, log, PILOT)
+            return (
+                included(app), mark_of(app, facts.v1.name), mark_of(app, facts.v2.name),
+                fields_lines(app),
+            )
+    
+        picks, mark1, mark2, lines = run(tmp_path, scenario)
+        assert picks == [facts.v1.name, facts.v2.name], picks
+        assert (mark1, mark2) == ("✓", "✓"), (mark1, mark2)
+>       assert lines == [
+            HEAD_3,
+            f"◆ 0x{facts.v1.address:08X} {facts.v1.name}",
+            f"◆ 0x{facts.v2.address:08X} {facts.v2.name}",
+            f"▪ 0x{facts.serial:08X} u32 memory row",
+        ], lines
+E       AssertionError: ['2 fields: 2 params · 0 memory rows', '◆ 0x00000000 VALUE_0001', '◆ 0x00000014 VALUE_0002']
+E       assert ['2 fields: 2...4 VALUE_0002'] == ['3 fields: 2...2 memory row']
+E         
+E         At index 0 diff: '2 fields: 2 params · 0 memory rows' != '3 fields: 2 params · 1 memory row'
+E         Right contains one more item: '▪ 0x00C00FFC u32 memory row'
+E         Use -v to get more diff
+
+tests/test_b101_check_spec_keep.py:755: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3015 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-531/test_r_chked_041_2_1_written_s0/app workarea=/tmp/pytest-of-<user>/pytest-531/test_r_chked_041_2_1_written_s0/app/.s19tool/workarea
+INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+INFO     s19tui:app.py:17354 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.007
+INFO     s19tui:app.py:8839 Load file action triggered.
+INFO     s19tui:app.py:16280 Load phase boundary: modal_dismiss_scheduled kind=path value='/tmp/pytest-of-<user>/pytest-531/b101_inc5_case080/firmware.s19'
+INFO     s19tui:app.py:16325 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<user>/pytest-531/b101_inc5_case080/firmware.s19
+INFO     s19tui:app.py:16346 Load phase boundary: copy_started path=/tmp/pytest-of-<user>/pytest-531/b101_inc5_case080/firmware.s19
+INFO     s19tui:app.py:16359 Load phase boundary: copy_done path=firmware.s19 elapsed=0.005s
+WARNING  s19tui:app.py:16378 Recent sources not updated: '/tmp/pytest-of-<user>/pytest-531/b101_inc5_case080/firmware.s19'
+INFO     s19tui:app.py:8830 Workarea refreshed. files=1
+INFO     s19tui:app.py:16396 File copied to temp: path=/tmp/pytest-of-<user>/pytest-531/test_r_chked_041_2_1_written_s0/app/.s19tool/workarea/temp/firmware.s19 size_bytes=1048633 copy_seconds=0.005
+INFO     s19tui:app.py:16402 Load phase boundary: worker_spawned path=firmware.s19
+INFO     s19tui:app.py:19501 Load phase boundary: worker_parse_start path=firmware.s19
+INFO     s19tui:app.py:18610 Loading file: path=/tmp/pytest-of-<user>/pytest-531/test_r_chked_041_2_1_written_s0/app/.s19tool/workarea/temp/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14985 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:19717 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-531/test_r_chked_041_2_1_written_s0/app/.s19tool/workarea/temp/firmware.s19 addresses=424736 range_count=4 range_bytes=424736 errors=0
+INFO     s19tui:app.py:15002 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:19520 Load phase boundary: worker_parse_done path=firmware.s19 elapsed=0.518s
+INFO     s19tui:app.py:19344 Load phase boundary: prepare_entry path=firmware.s19 file_type=s19
+INFO     s19tui:app.py:19379 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:18463 MAC validation computed: records=0 issues=0 elapsed_seconds=0.879
+INFO     s19tui:app.py:19388 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:19408 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:19415 Load phase boundary: prepare_bases_done row_bases=26546
+INFO     s19tui:app.py:19425 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:19431 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:19553 Load phase boundary: worker_compute_done path=firmware.s19 precomputed=True elapsed=0.880s
+INFO     s19tui:app.py:19560 Load phase boundary: call_from_thread_apply_dispatched path=firmware.s19
+INFO     s19tui:app.py:19162 Load phase boundary: apply_install_state path=firmware.s19 precomputed=True
+INFO     s19tui:app.py:19845 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19183 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:19197 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:20940 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:17354 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:20454 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:19212 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:20072 Memory Map updated. ranges=4
+INFO     s19tui:app.py:19235 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-531/test_r_chked_041_2_1_written_s0/app/.s19tool/workarea/temp/firmware.s19 file_type=s19 elapsed_seconds=1.943 has_mac=False precomputed=True
+INFO     s19tui:app.py:8839 Load file action triggered.
+INFO     s19tui:app.py:16280 Load phase boundary: modal_dismiss_scheduled kind=path value='/tmp/pytest-of-<user>/pytest-531/b101_inc5_case080/firmware.a2l'
+INFO     s19tui:app.py:16509 A2L copy complete: path=/tmp/pytest-of-<user>/pytest-531/test_r_chked_041_2_1_written_s0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347 copy_seconds=0.001
+INFO     s19tui:app.py:951 A2L cache miss: path=/tmp/pytest-of-<user>/pytest-531/test_r_chked_041_2_1_written_s0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347
+WARNING  s19tui:app.py:16547 Recent sources not updated: '/tmp/pytest-of-<user>/pytest-531/b101_inc5_case080/firmware.a2l'
+INFO     s19tui:app.py:8830 Workarea refreshed. files=2
+INFO     s19tui:app.py:19664 A2L parse summary: path=/tmp/pytest-of-<user>/pytest-531/test_r_chked_041_2_1_written_s0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.019 sections=1 tags=462 errors=0
+INFO     s19tui:app.py:18463 MAC validation computed: records=0 issues=462 elapsed_seconds=0.808
+INFO     s19tui:app.py:18518 MAC row cache built: records=0 elapsed_seconds=0.808
+INFO     s19tui:app.py:17386 Load phase boundary: populate_issues_table_done rows=40 total=462 elapsed=0.035
+INFO     s19tui:app.py:20454 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.845
+INFO     s19tui:app.py:20981 Load phase boundary: populate_a2l_table_done rows=200 total=462 elapsed=0.013
+INFO     s19tui:app.py:16566 A2L view refresh complete: path=/tmp/pytest-of-<user>/pytest-531/test_r_chked_041_2_1_written_s0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.868
+INFO     s19tui:app.py:16575 A2L loaded: /tmp/pytest-of-<user>/pytest-531/test_r_chked_041_2_1_written_s0/app/.s19tool/workarea/temp/firmware.a2l
+=========================== short test summary info ============================
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_041_1_pick_replaces_the_field_set
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_041_2_1_written_spec_names_come_back
+2 failed in 43.43s

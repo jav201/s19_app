@@ -1,0 +1,535 @@
+# Mutant M01 — batch-end re-run on the final tree (b982846)
+BASE_COMMIT=b982846ce33ccc20b1774f91b1091af4b42dff73
+BASE_TREE=detached worktree at 7d641d9 + git diff --binary 7d641d9 b982846 -- s19_app tests docs README.md AT-TC-REGISTRY.jsonl applied
+s19_app.__file__=<HOME>/work/s19_i5rm_m01/s19_app/__init__.py
+mutation: 002.5 hook absent (apply site)
+mutation diff:
+diff --git a<HOME>/work/s19_i5rm/s19_app/tui/app.py b<HOME>/work/s19_i5rm_m01/s19_app/tui/app.py
+index 18795c7..7194733 100644
+--- a<HOME>/work/s19_i5rm/s19_app/tui/app.py
++++ b<HOME>/work/s19_i5rm_m01/s19_app/tui/app.py
+@@ -4964,12 +4964,6 @@ class S19TuiApp(App):
+         except (ValueError, KeyError) as exc:
+             self.set_status(f"Patch Editor: {exc}")
+ 
+-        # Inc 5 D-4: an apply wrote the loaded image's bytes in place (also
+-        # when it raises after the journal restore, and when 0 applied
+-        # restored an earlier apply), so tell the CRC Designer on both
+-        # outcomes — never gated on ``applied > 0`` (R-CRC-PREVIEW-002.5/8).
+-        if event.action == "apply_doc":
+-            self._note_image_bytes_written()
+ 
+         # batch-48 (LLR-080.2) — site 1 of 5: push the image's memory map so
+         # the before/after card can read its "before" bytes. `mem_map` is
+verify:
+grep s19_app/tui/app.py: deleted -> "Inc 5 D-4: an apply wrote the loaded image's bytes in place (also" GONE
+guard nodes (3):
+  tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_3_apply_then_display
+  tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_6_apply_error_still_refreshes
+  tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_8_zero_applied_restore_still_refreshes
+
+--- pytest ---
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+________________ test_r_crc_preview_002_5_3_apply_then_display _________________
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+before = 8, expect = (148549559, 903416771), what = 'apply then display'
+
+    async def _expect_refresh(pilot, app, before: int, expect: Tuple[int, int], what: str) -> None:
+        """After the display that follows an in-place write: exactly one recompute,
+        the painted CRCs equal ``zlib.crc32`` of the session bytes and the literal
+        values the case states, and window line 2 says the same."""
+        try:
+>           await wait_designer_recompute(pilot, app, before, timeout=RECOMPUTE_TIMEOUT_S)
+
+tests/test_b101_designer_writes.py:372: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b101_designer.py:89: in wait_designer_recompute
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function wait_designer_recompute.<locals>.<lambda> at 0x7f34e4098180>
+failure = <function wait_designer_recompute.<locals>.<lambda> at 0x7f34e4098720>
+timeout = 20.0, pause_first = True
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: no settled recompute: count 8 (snapshot 8), pending None
+
+tests/support/timing.py:66: AssertionError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-520/test_r_crc_preview_002_5_3_app0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f34e6b3bbd0>
+
+    def test_r_crc_preview_002_5_3_apply_then_display(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Verifies R-CRC-PREVIEW-002.5/3 (and the S13 *loaded image changes*
+        sentence for a Patch Editor apply): the CRC Designer, not displayed during
+        the apply of one ``bytes`` entry ``0x8003`` = ``AA``, shows on its first
+        display afterwards the CRCs of the applied bytes.
+    
+        Why: the operator copies the painted CRC into a release record; a stale
+        pre-apply value is a wrong checksum (SEC-3). Observable: 0 recomputes
+        before key ``0``, exactly 1 after, concat/fill equal to ``zlib.crc32`` of
+        the post-apply session bytes. Base: ``concat: 0x9C5BCBBD`` stays and no
+        recompute comes (pilot D4) -> RED. Negative controls: hook absent ->
+        RED; hook recomputing while hidden -> 1 recompute before key ``0`` -> RED."""
+        _set_quiet(monkeypatch, QUIET_SHORT_S)
+    
+        def make(folder: Path, image: Path):
+            async def scenario(app, pilot, log):
+                await _load_image_by_dialog(pilot, app, image)
+                await _first_display(pilot, app, PRE)
+                await _load_document(pilot, app, log, folder, "d.changes.json", [AA_ENTRY])
+                before = designer_recomputes()  # E5 C-3: before the trigger
+                status = await _apply(pilot, app, log, "Apply:")
+                assert status == "Apply: 1 applied, 0 skipped, 0 blocked", status
+                assert app.current_file.mem_map[0x8003] == 0xAA
+                await _quiet(pilot)
+                assert designer_recomputes() == before, "a hidden CRC Designer recomputed"
+                await _press_rail(pilot, app, "0")
+                await _expect_refresh(pilot, app, before, AFTER_AA, "apply then display")
+    
+            return scenario
+    
+>       _reps(tmp_path, make)
+
+tests/test_b101_designer_writes.py:447: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_designer_writes.py:408: in _reps
+    results.append(_run(base, make_scenario(folder, image)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_designer_writes.py:396: in _run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_designer_writes.py:443: in scenario
+    await _expect_refresh(pilot, app, before, AFTER_AA, "apply then display")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+before = 8, expect = (148549559, 903416771), what = 'apply then display'
+
+    async def _expect_refresh(pilot, app, before: int, expect: Tuple[int, int], what: str) -> None:
+        """After the display that follows an in-place write: exactly one recompute,
+        the painted CRCs equal ``zlib.crc32`` of the session bytes and the literal
+        values the case states, and window line 2 says the same."""
+        try:
+            await wait_designer_recompute(pilot, app, before, timeout=RECOMPUTE_TIMEOUT_S)
+        except AssertionError as exc:
+>           raise AssertionError(
+                f"{what}: the CRC Designer never recomputed (count {designer_recomputes()}, "
+                f"snapshot {before}) - stale coverage; it paints {_preview_lines(app)[1:]!r}, "
+                f"the session bytes give concat 0x{oracle(app.current_file.mem_map)[0]:08X}"
+            ) from exc
+E           AssertionError: apply then display: the CRC Designer never recomputed (count 8, snapshot 8) - stale coverage; it paints ['concat: 0x9C5BCBBD', 'fill:   0x2A8A3950'], the session bytes give concat 0x08DAAFB7
+
+tests/test_b101_designer_writes.py:374: AssertionError
+____________ test_r_crc_preview_002_5_6_apply_error_still_refreshes ____________
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+before = 8, expect = (148549559, 903416771), what = 'apply error then display'
+
+    async def _expect_refresh(pilot, app, before: int, expect: Tuple[int, int], what: str) -> None:
+        """After the display that follows an in-place write: exactly one recompute,
+        the painted CRCs equal ``zlib.crc32`` of the session bytes and the literal
+        values the case states, and window line 2 says the same."""
+        try:
+>           await wait_designer_recompute(pilot, app, before, timeout=RECOMPUTE_TIMEOUT_S)
+
+tests/test_b101_designer_writes.py:372: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b101_designer.py:89: in wait_designer_recompute
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function wait_designer_recompute.<locals>.<lambda> at 0x7f34de823880>
+failure = <function wait_designer_recompute.<locals>.<lambda> at 0x7f34e5fba3e0>
+timeout = 20.0, pause_first = True
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: no settled recompute: count 8 (snapshot 8), pending None
+
+tests/support/timing.py:66: AssertionError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-520/test_r_crc_preview_002_5_6_app0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f34dfe28750>
+
+    def test_r_crc_preview_002_5_6_apply_error_still_refreshes(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Verifies R-CRC-PREVIEW-002.5/6 (partial: the fault is injected): an apply
+        that ends ``Patch Editor: 'probe'`` after the engine wrote ``AA`` still makes
+        the coverage stale; the first display afterwards shows ``0x08DAAFB7`` /
+        ``0x35D90BC3``, 1 recompute.
+    
+        Why: ``ChangeService.apply`` restores and writes in place before the engine
+        can raise; an error status does not mean 'nothing written'. Base: the
+        designer keeps ``0x9C5BCBBD`` -> RED. Negative control: the hook in the
+        success branch only -> RED."""
+        _set_quiet(monkeypatch, QUIET_SHORT_S)
+        original = change_service_module.apply_change_document
+    
+        def wrote_then_failed(*args, **kwargs):
+            original(*args, **kwargs)
+            raise KeyError("probe")
+    
+        monkeypatch.setattr(change_service_module, "apply_change_document", wrote_then_failed)
+    
+        def make(folder: Path, image: Path):
+            async def scenario(app, pilot, log):
+                await _load_image_by_dialog(pilot, app, image)
+                await _first_display(pilot, app, PRE)
+                await _load_document(pilot, app, log, folder, "d.changes.json", [AA_ENTRY])
+                before = designer_recomputes()  # E5 C-3: before the trigger
+                status = await _apply(pilot, app, log, "Patch Editor:")
+                assert status == "Patch Editor: 'probe'", status
+                assert app.current_file.mem_map[0x8003] == 0xAA, "the engine wrote nothing before it raised"
+                await _quiet(pilot)
+                assert designer_recomputes() == before, "a hidden CRC Designer recomputed"
+                await _press_rail(pilot, app, "0")
+                await _expect_refresh(pilot, app, before, AFTER_AA, "apply error then display")
+    
+            return scenario
+    
+>       _reps(tmp_path, make)
+
+tests/test_b101_designer_writes.py:570: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_designer_writes.py:408: in _reps
+    results.append(_run(base, make_scenario(folder, image)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_designer_writes.py:396: in _run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_designer_writes.py:566: in scenario
+    await _expect_refresh(pilot, app, before, AFTER_AA, "apply error then display")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+before = 8, expect = (148549559, 903416771), what = 'apply error then display'
+
+    async def _expect_refresh(pilot, app, before: int, expect: Tuple[int, int], what: str) -> None:
+        """After the display that follows an in-place write: exactly one recompute,
+        the painted CRCs equal ``zlib.crc32`` of the session bytes and the literal
+        values the case states, and window line 2 says the same."""
+        try:
+            await wait_designer_recompute(pilot, app, before, timeout=RECOMPUTE_TIMEOUT_S)
+        except AssertionError as exc:
+>           raise AssertionError(
+                f"{what}: the CRC Designer never recomputed (count {designer_recomputes()}, "
+                f"snapshot {before}) - stale coverage; it paints {_preview_lines(app)[1:]!r}, "
+                f"the session bytes give concat 0x{oracle(app.current_file.mem_map)[0]:08X}"
+            ) from exc
+E           AssertionError: apply error then display: the CRC Designer never recomputed (count 8, snapshot 8) - stale coverage; it paints ['concat: 0x9C5BCBBD', 'fill:   0x2A8A3950'], the session bytes give concat 0x08DAAFB7
+
+tests/test_b101_designer_writes.py:374: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3015 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-520/test_r_crc_preview_002_5_6_app0/rep0/app workarea=/tmp/pytest-of-<user>/pytest-520/test_r_crc_preview_002_5_6_app0/rep0/app/.s19tool/workarea
+INFO     s19tui:app.py:8824 Workarea refreshed. files=0
+INFO     s19tui:app.py:17348 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:8833 Load file action triggered.
+INFO     s19tui:app.py:16274 Load phase boundary: modal_dismiss_scheduled kind=path value='/tmp/pytest-of-<user>/pytest-520/test_r_crc_preview_002_5_6_app0/rep0/fixture.s19'
+INFO     s19tui:app.py:16319 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<user>/pytest-520/test_r_crc_preview_002_5_6_app0/rep0/fixture.s19
+INFO     s19tui:app.py:16340 Load phase boundary: copy_started path=/tmp/pytest-of-<user>/pytest-520/test_r_crc_preview_002_5_6_app0/rep0/fixture.s19
+INFO     s19tui:app.py:16353 Load phase boundary: copy_done path=fixture.s19 elapsed=0.001s
+WARNING  s19tui:app.py:16372 Recent sources not updated: '/tmp/pytest-of-<user>/pytest-520/test_r_crc_preview_002_5_6_app0/rep0/fixture.s19'
+INFO     s19tui:app.py:8824 Workarea refreshed. files=1
+INFO     s19tui:app.py:16390 File copied to temp: path=/tmp/pytest-of-<user>/pytest-520/test_r_crc_preview_002_5_6_app0/rep0/app/.s19tool/workarea/temp/fixture.s19 size_bytes=76 copy_seconds=0.001
+INFO     s19tui:app.py:16396 Load phase boundary: worker_spawned path=fixture.s19
+INFO     s19tui:app.py:19495 Load phase boundary: worker_parse_start path=fixture.s19
+INFO     s19tui:app.py:18604 Loading file: path=/tmp/pytest-of-<user>/pytest-520/test_r_crc_preview_002_5_6_app0/rep0/app/.s19tool/workarea/temp/fixture.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14979 Load phase boundary: parse_branch_entry path=fixture.s19 suffix=.s19
+INFO     s19tui:app.py:19711 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-520/test_r_crc_preview_002_5_6_app0/rep0/app/.s19tool/workarea/temp/fixture.s19 addresses=16 range_count=2 range_bytes=16 errors=0
+INFO     s19tui:app.py:14996 Load phase boundary: parse_branch_done path=fixture.s19 branch=s19
+INFO     s19tui:app.py:19514 Load phase boundary: worker_parse_done path=fixture.s19 elapsed=0.008s
+INFO     s19tui:app.py:19338 Load phase boundary: prepare_entry path=fixture.s19 file_type=s19
+INFO     s19tui:app.py:19373 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:18457 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:19382 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:19402 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:19409 Load phase boundary: prepare_bases_done row_bases=2
+INFO     s19tui:app.py:19419 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:19425 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:19547 Load phase boundary: worker_compute_done path=fixture.s19 precomputed=True elapsed=0.001s
+INFO     s19tui:app.py:19554 Load phase boundary: call_from_thread_apply_dispatched path=fixture.s19
+INFO     s19tui:app.py:19156 Load phase boundary: apply_install_state path=fixture.s19 precomputed=True
+INFO     s19tui:app.py:19839 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19177 Load phase boundary: apply_sections_done path=fixture.s19
+INFO     s19tui:app.py:19191 Load phase boundary: apply_hex_done path=fixture.s19
+INFO     s19tui:app.py:20934 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:17348 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:20448 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:19206 Load phase boundary: apply_a2l_done path=fixture.s19
+INFO     s19tui:app.py:20066 Memory Map updated. ranges=2
+INFO     s19tui:app.py:19229 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-520/test_r_crc_preview_002_5_6_app0/rep0/app/.s19tool/workarea/temp/fixture.s19 file_type=s19 elapsed_seconds=0.165 has_mac=False precomputed=True
+_______ test_r_crc_preview_002_5_8_zero_applied_restore_still_refreshes ________
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+before = 9, expect = (2623261629, 713701712)
+what = 'zero-applied apply then display'
+
+    async def _expect_refresh(pilot, app, before: int, expect: Tuple[int, int], what: str) -> None:
+        """After the display that follows an in-place write: exactly one recompute,
+        the painted CRCs equal ``zlib.crc32`` of the session bytes and the literal
+        values the case states, and window line 2 says the same."""
+        try:
+>           await wait_designer_recompute(pilot, app, before, timeout=RECOMPUTE_TIMEOUT_S)
+
+tests/test_b101_designer_writes.py:372: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b101_designer.py:89: in wait_designer_recompute
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function wait_designer_recompute.<locals>.<lambda> at 0x7f34e5131260>
+failure = <function wait_designer_recompute.<locals>.<lambda> at 0x7f34e51313a0>
+timeout = 20.0, pause_first = True
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: no settled recompute: count 9 (snapshot 9), pending None
+
+tests/support/timing.py:66: AssertionError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-520/test_r_crc_preview_002_5_8_zer0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f34e5b59e50>
+
+    def test_r_crc_preview_002_5_8_zero_applied_restore_still_refreshes(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Verifies R-CRC-PREVIEW-002.5/8 (E3 A-2): after the apply of ``AA`` and one
+        display (``0x08DAAFB7``), the entry moved to ``0x9000`` (outside the image)
+        and Apply pressed, the status is ``Apply: 0 applied, 1 skipped, 0 blocked``,
+        ``0x8003`` is back at ``03`` (the apply's journal restore), and the first
+        display afterwards shows ``0x9C5BCBBD`` / ``0x2A8A3950``.
+    
+        Why: an apply that applies nothing has still undone the earlier apply in
+        place. Base: the designer keeps ``0x08DAAFB7`` -> RED. Negative control: the
+        hook gated on ``applied > 0`` -> RED. Drive note: the entry editor changes
+        an entry by its address, so 'the address edited' is the Remove of the
+        ``0x8003`` entry and the Add of ``0x9000`` = ``AA`` (same document)."""
+        _set_quiet(monkeypatch, QUIET_SHORT_S)
+    
+        def make(folder: Path, image: Path):
+            async def scenario(app, pilot, log):
+                await _load_image_by_dialog(pilot, app, image)
+                await _load_document(pilot, app, log, folder, "d.changes.json", [AA_ENTRY])
+                assert await _apply(pilot, app, log, "Apply:") == "Apply: 1 applied, 0 skipped, 0 blocked"
+                await _fresh_designer_display(pilot, app, AFTER_AA)
+                await _entry_op(
+                    pilot, app, log, "#patch_entry_remove_button", "0x8003", "", "Patch Editor: entry removed."
+                )
+                await _entry_op(
+                    pilot, app, log, "#patch_entry_add_button", "0x9000", "AA", "Patch Editor: entry added."
+                )
+                before = designer_recomputes()  # E5 C-3: before the trigger
+                status = await _apply(pilot, app, log, "Apply:")
+                assert status == "Apply: 0 applied, 1 skipped, 0 blocked", status
+                assert app.current_file.mem_map[0x8003] == 0x03, "the journal restore did not run"
+                await _quiet(pilot)
+                assert designer_recomputes() == before, "a hidden CRC Designer recomputed"
+                await _press_rail(pilot, app, "0")
+                await _expect_refresh(pilot, app, before, PRE, "zero-applied apply then display")
+    
+            return scenario
+    
+>       _reps(tmp_path, make)
+
+tests/test_b101_designer_writes.py:666: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_designer_writes.py:408: in _reps
+    results.append(_run(base, make_scenario(folder, image)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_designer_writes.py:396: in _run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_designer_writes.py:662: in scenario
+    await _expect_refresh(pilot, app, before, PRE, "zero-applied apply then display")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+before = 9, expect = (2623261629, 713701712)
+what = 'zero-applied apply then display'
+
+    async def _expect_refresh(pilot, app, before: int, expect: Tuple[int, int], what: str) -> None:
+        """After the display that follows an in-place write: exactly one recompute,
+        the painted CRCs equal ``zlib.crc32`` of the session bytes and the literal
+        values the case states, and window line 2 says the same."""
+        try:
+            await wait_designer_recompute(pilot, app, before, timeout=RECOMPUTE_TIMEOUT_S)
+        except AssertionError as exc:
+>           raise AssertionError(
+                f"{what}: the CRC Designer never recomputed (count {designer_recomputes()}, "
+                f"snapshot {before}) - stale coverage; it paints {_preview_lines(app)[1:]!r}, "
+                f"the session bytes give concat 0x{oracle(app.current_file.mem_map)[0]:08X}"
+            ) from exc
+E           AssertionError: zero-applied apply then display: the CRC Designer never recomputed (count 9, snapshot 9) - stale coverage; it paints ['concat: 0x08DAAFB7', 'fill:   0x35D90BC3'], the session bytes give concat 0x9C5BCBBD
+
+tests/test_b101_designer_writes.py:374: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3015 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-520/test_r_crc_preview_002_5_8_zer0/rep0/app workarea=/tmp/pytest-of-<user>/pytest-520/test_r_crc_preview_002_5_8_zer0/rep0/app/.s19tool/workarea
+INFO     s19tui:app.py:8824 Workarea refreshed. files=0
+INFO     s19tui:app.py:17348 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:8833 Load file action triggered.
+INFO     s19tui:app.py:16274 Load phase boundary: modal_dismiss_scheduled kind=path value='/tmp/pytest-of-<user>/pytest-520/test_r_crc_preview_002_5_8_zer0/rep0/fixture.s19'
+INFO     s19tui:app.py:16319 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<user>/pytest-520/test_r_crc_preview_002_5_8_zer0/rep0/fixture.s19
+INFO     s19tui:app.py:16340 Load phase boundary: copy_started path=/tmp/pytest-of-<user>/pytest-520/test_r_crc_preview_002_5_8_zer0/rep0/fixture.s19
+INFO     s19tui:app.py:16353 Load phase boundary: copy_done path=fixture.s19 elapsed=0.001s
+WARNING  s19tui:app.py:16372 Recent sources not updated: '/tmp/pytest-of-<user>/pytest-520/test_r_crc_preview_002_5_8_zer0/rep0/fixture.s19'
+INFO     s19tui:app.py:8824 Workarea refreshed. files=1
+INFO     s19tui:app.py:16390 File copied to temp: path=/tmp/pytest-of-<user>/pytest-520/test_r_crc_preview_002_5_8_zer0/rep0/app/.s19tool/workarea/temp/fixture.s19 size_bytes=76 copy_seconds=0.001
+INFO     s19tui:app.py:16396 Load phase boundary: worker_spawned path=fixture.s19
+INFO     s19tui:app.py:19495 Load phase boundary: worker_parse_start path=fixture.s19
+INFO     s19tui:app.py:18604 Loading file: path=/tmp/pytest-of-<user>/pytest-520/test_r_crc_preview_002_5_8_zer0/rep0/app/.s19tool/workarea/temp/fixture.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14979 Load phase boundary: parse_branch_entry path=fixture.s19 suffix=.s19
+INFO     s19tui:app.py:19711 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-520/test_r_crc_preview_002_5_8_zer0/rep0/app/.s19tool/workarea/temp/fixture.s19 addresses=16 range_count=2 range_bytes=16 errors=0
+INFO     s19tui:app.py:14996 Load phase boundary: parse_branch_done path=fixture.s19 branch=s19
+INFO     s19tui:app.py:19514 Load phase boundary: worker_parse_done path=fixture.s19 elapsed=0.007s
+INFO     s19tui:app.py:19338 Load phase boundary: prepare_entry path=fixture.s19 file_type=s19
+INFO     s19tui:app.py:19373 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:18457 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:19382 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:19402 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:19409 Load phase boundary: prepare_bases_done row_bases=2
+INFO     s19tui:app.py:19419 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:19425 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:19547 Load phase boundary: worker_compute_done path=fixture.s19 precomputed=True elapsed=0.001s
+INFO     s19tui:app.py:19554 Load phase boundary: call_from_thread_apply_dispatched path=fixture.s19
+INFO     s19tui:app.py:19156 Load phase boundary: apply_install_state path=fixture.s19 precomputed=True
+INFO     s19tui:app.py:19839 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19177 Load phase boundary: apply_sections_done path=fixture.s19
+INFO     s19tui:app.py:19191 Load phase boundary: apply_hex_done path=fixture.s19
+INFO     s19tui:app.py:20934 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:17348 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:20448 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:19206 Load phase boundary: apply_a2l_done path=fixture.s19
+INFO     s19tui:app.py:20066 Memory Map updated. ranges=2
+INFO     s19tui:app.py:19229 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-520/test_r_crc_preview_002_5_8_zer0/rep0/app/.s19tool/workarea/temp/fixture.s19 file_type=s19 elapsed_seconds=0.308 has_mac=False precomputed=True
+=========================== short test summary info ============================
+FAILED tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_3_apply_then_display
+FAILED tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_6_apply_error_still_refreshes
+FAILED tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_8_zero_applied_restore_still_refreshes
+3 failed in 135.12s (0:02:15)

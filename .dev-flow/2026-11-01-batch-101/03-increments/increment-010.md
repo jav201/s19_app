@@ -36,6 +36,7 @@ Committed: `git diff --stat 09b4808 HEAD -- s19_app tests docs README.md` (10 fi
 | `tests/test_b97_flow_execution.py` | test | US-FOCUS-2 | TC-B97-64 named supersession: `]` lands on `fx_panel`; `c` still confirms 1 |
 | `tests/test_id_registry.py` | test | US-HEXNAV-1 · US-UNLOAD-1 · US-FOCUS-2 | `EXPECTED_SCANNED_TEST_FILES` 270 → 272 (the two new test modules, measured) |
 | `tests/test_tui_commandbar.py` | test | US-FOCUS-2 | TC-008: the sweep waits for the landing, then `/` keeps or moves the focus per screen |
+| `tests/test_b101_inplace_views.py` | test | US-FRESH-3 | Inc 10b file (its packet `increment-010b.md` is outside V59's `increment-\d+.md` packet read): new file, 21 non-serial nodes + the QC-TM-10b-1 `serial_timing` node — the value/table/hex/preview/disarm, repaint sign, R-A2L-048/4 and /5, RR-1/RR-4 cases |
 | `.dev-flow/2026-11-01-batch-101/inc-10/*.md` | doc |  | the E1–E5 records, the codewire graph, `04-validation.md` and `steps.log` (uncommitted records listed here) |
 | `.dev-flow/2026-11-01-batch-101/evidence/inc-10/*.txt` | generated | US-HEXNAV-1 · US-UNLOAD-1 · US-FOCUS-2 | 144 transcripts and probes (int-01 … int-23, e5c-01 … e5c-16, e5c-rr-01 … e5c-rr-05, e5s-probe, mut-01 … mut-38, mut-c-01 … mut-c-23, red-01 ×2) |
 

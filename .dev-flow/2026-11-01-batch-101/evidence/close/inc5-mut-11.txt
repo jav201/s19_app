@@ -1,0 +1,67 @@
+# Mutant M11 — batch-end re-run on the final tree (b982846)
+BASE_COMMIT=b982846ce33ccc20b1774f91b1091af4b42dff73
+BASE_TREE=detached worktree at 7d641d9 + git diff --binary 7d641d9 b982846 -- s19_app tests docs README.md AT-TC-REGISTRY.jsonl applied
+s19_app.__file__=<HOME>/work/s19_i5rm_m11/s19_app/__init__.py
+mutation: R-CHKED-041.1 earlier fields kept
+mutation diff:
+diff --git a<HOME>/work/s19_i5rm/s19_app/tui/screens_directionb.py b<HOME>/work/s19_i5rm_m11/s19_app/tui/screens_directionb.py
+index b05226d..ac56c27 100644
+--- a<HOME>/work/s19_i5rm/s19_app/tui/screens_directionb.py
++++ b<HOME>/work/s19_i5rm_m11/s19_app/tui/screens_directionb.py
+@@ -7322,9 +7322,7 @@ class CheckEditorPanel(ScrollableContainer):
+         one becomes an unlabelled memory row carrying the spec's bytes.
+         ``app.py`` read the document; this only mirrors it.
+         """
+-        self._picker.clear_picks()
+         self._spec_bytes = {}
+-        self._memory_rows = []
+         by_key: dict = {}
+         for name, (address, size, _fmt) in self._param_rows.items():
+             if isinstance(address, int):
+verify:
+grep s19_app/tui/screens_directionb.py: replaced -> 'self._spec_bytes = {}' FOUND
+guard nodes (1):
+  tests/test_b101_check_spec_keep.py::test_r_chked_041_1_pick_replaces_the_field_set
+
+--- pytest ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________________ test_r_chked_041_1_pick_replaces_the_field_set ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-530/test_r_chked_041_1_pick_replac0')
+facts = Facts(case=PosixPath('/tmp/pytest-of-<user>/pytest-530/b101_inc5_case080'), image={0: 108, 1: 49, 2: 57, 3: 84, 4: 79...ram(name='VALUE_0002', address=20, size=2), v3=Param(name='VALUE_0003', address=40, size=4), serial=12587004, moved=32)
+
+    def test_r_chked_041_1_pick_replaces_the_field_set(tmp_path: Path, facts: Facts) -> None:
+        """Case R-CHKED-041.1/1: case 08 and its A2L loaded, the pilot spec in the
+        patches folder, the field set ``VALUE_0003`` included and two memory rows;
+        the pilot spec picked in the Spec dropdown (click, arrows, enter) -> 3
+        fields (included parameters + memory rows), neither ``VALUE_0003`` nor the
+        two earlier rows remain, status ``Check Editor: loaded
+        'pilot_fields.chk.json' (3 fields).``
+    
+        Standing guard on the count (base: 3 memory rows, E1 base column "Yes");
+        it guards "earlier fields kept" (6 fields) and "an entry dropped" (2
+        fields). The names that come back are R-CHKED-041.2's."""
+        old_rows = [(0x1000, "OLD_A", 2), (0x1010, "OLD_B", 1)]
+    
+        async def scenario(app, pilot, log):
+            await open_session(pilot, app, facts, specs={PILOT: spec_doc(pilot_entries(facts))})
+            await include_by_space(pilot, app, facts.v3.name)
+            for address, label, size in old_rows:
+                await add_memory_row(pilot, app, address, label, size)
+            assert included(app) == [facts.v3.name] and len(mem_rows(app)) == 2
+            lines = await pick_spec(pilot, app, log, PILOT)
+            return lines, included(app), mem_rows(app), fields_lines(app)
+    
+        lines, picks, rows, flines = run(tmp_path, scenario)
+        assert lines[-1] == f"Check Editor: loaded '{PILOT}' (3 fields).", lines
+>       assert len(picks) + len(rows) == 3, (picks, rows)
+E       AssertionError: (['VALUE_0003', 'VALUE_0001', 'VALUE_0002'], [('0x00001000', 'OLD_A', 'u16'), ('0x00001010', 'OLD_B', 'u8'), ('0x00C00FFC', '—', 'u32')])
+E       assert (3 + 3) == 3
+E        +  where 3 = len(['VALUE_0003', 'VALUE_0001', 'VALUE_0002'])
+E        +  and   3 = len([('0x00001000', 'OLD_A', 'u16'), ('0x00001010', 'OLD_B', 'u8'), ('0x00C00FFC', '—', 'u32')])
+
+tests/test_b101_check_spec_keep.py:727: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_041_1_pick_replaces_the_field_set
+1 failed in 22.78s

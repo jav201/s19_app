@@ -129,8 +129,8 @@ The global keys (the full set lives in `S19TuiApp.BINDINGS`,
 | `q` / `Ctrl+Q` | quit |
 
 Two rows at the bottom of every window show the keys: row 1 the global keys
-(`^K` Palette · `^D` Density · `^L` Load · `^S` Save project · `x` Operations ·
-`?` Help · `q` Quit · `^P` palette), row 2 the shown window's own keys. `?`
+(`^k` Palette · `^d` Density · `^l` Load · `^s` Save project · `x` Operations ·
+`?` Help · `q` Quit · `^p` palette), row 2 the shown window's own keys. `?`
 opens the help of the window that has the focus — its numbered steps, then its
 keys; with the focus outside a window that has help, it opens the panel that
 lists every active key.

@@ -1,0 +1,174 @@
+# Mutant M07 — batch-end re-run on the final tree (b982846)
+BASE_COMMIT=b982846ce33ccc20b1774f91b1091af4b42dff73
+BASE_TREE=detached worktree at 7d641d9 + git diff --binary 7d641d9 b982846 -- s19_app tests docs README.md AT-TC-REGISTRY.jsonl applied
+s19_app.__file__=<HOME>/work/s19_i5rm_m07/s19_app/__init__.py
+mutation: addendum 2b (A-2): apply hook under applied > 0
+mutation diff:
+diff --git a<HOME>/work/s19_i5rm/s19_app/tui/app.py b<HOME>/work/s19_i5rm_m07/s19_app/tui/app.py
+index 18795c7..759c917 100644
+--- a<HOME>/work/s19_i5rm/s19_app/tui/app.py
++++ b<HOME>/work/s19_i5rm_m07/s19_app/tui/app.py
+@@ -4968,7 +4968,7 @@ class S19TuiApp(App):
+         # when it raises after the journal restore, and when 0 applied
+         # restored an earlier apply), so tell the CRC Designer on both
+         # outcomes — never gated on ``applied > 0`` (R-CRC-PREVIEW-002.5/8).
+-        if event.action == "apply_doc":
++        if event.action == "apply_doc" and counts["applied"] > 0:
+             self._note_image_bytes_written()
+ 
+         # batch-48 (LLR-080.2) — site 1 of 5: push the image's memory map so
+verify:
+grep s19_app/tui/app.py: replaced -> 'if event.action == "apply_doc" and counts["applied"] > 0:' FOUND
+guard nodes (1):
+  tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_8_zero_applied_restore_still_refreshes
+
+--- pytest ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_r_crc_preview_002_5_8_zero_applied_restore_still_refreshes ________
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+before = 9, expect = (2623261629, 713701712)
+what = 'zero-applied apply then display'
+
+    async def _expect_refresh(pilot, app, before: int, expect: Tuple[int, int], what: str) -> None:
+        """After the display that follows an in-place write: exactly one recompute,
+        the painted CRCs equal ``zlib.crc32`` of the session bytes and the literal
+        values the case states, and window line 2 says the same."""
+        try:
+>           await wait_designer_recompute(pilot, app, before, timeout=RECOMPUTE_TIMEOUT_S)
+
+tests/test_b101_designer_writes.py:372: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b101_designer.py:89: in wait_designer_recompute
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function wait_designer_recompute.<locals>.<lambda> at 0x7f91c7769580>
+failure = <function wait_designer_recompute.<locals>.<lambda> at 0x7f91c776afc0>
+timeout = 20.0, pause_first = True
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: no settled recompute: count 9 (snapshot 9), pending None
+
+tests/support/timing.py:66: AssertionError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-526/test_r_crc_preview_002_5_8_zer0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f91ca5b3f50>
+
+    def test_r_crc_preview_002_5_8_zero_applied_restore_still_refreshes(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Verifies R-CRC-PREVIEW-002.5/8 (E3 A-2): after the apply of ``AA`` and one
+        display (``0x08DAAFB7``), the entry moved to ``0x9000`` (outside the image)
+        and Apply pressed, the status is ``Apply: 0 applied, 1 skipped, 0 blocked``,
+        ``0x8003`` is back at ``03`` (the apply's journal restore), and the first
+        display afterwards shows ``0x9C5BCBBD`` / ``0x2A8A3950``.
+    
+        Why: an apply that applies nothing has still undone the earlier apply in
+        place. Base: the designer keeps ``0x08DAAFB7`` -> RED. Negative control: the
+        hook gated on ``applied > 0`` -> RED. Drive note: the entry editor changes
+        an entry by its address, so 'the address edited' is the Remove of the
+        ``0x8003`` entry and the Add of ``0x9000`` = ``AA`` (same document)."""
+        _set_quiet(monkeypatch, QUIET_SHORT_S)
+    
+        def make(folder: Path, image: Path):
+            async def scenario(app, pilot, log):
+                await _load_image_by_dialog(pilot, app, image)
+                await _load_document(pilot, app, log, folder, "d.changes.json", [AA_ENTRY])
+                assert await _apply(pilot, app, log, "Apply:") == "Apply: 1 applied, 0 skipped, 0 blocked"
+                await _fresh_designer_display(pilot, app, AFTER_AA)
+                await _entry_op(
+                    pilot, app, log, "#patch_entry_remove_button", "0x8003", "", "Patch Editor: entry removed."
+                )
+                await _entry_op(
+                    pilot, app, log, "#patch_entry_add_button", "0x9000", "AA", "Patch Editor: entry added."
+                )
+                before = designer_recomputes()  # E5 C-3: before the trigger
+                status = await _apply(pilot, app, log, "Apply:")
+                assert status == "Apply: 0 applied, 1 skipped, 0 blocked", status
+                assert app.current_file.mem_map[0x8003] == 0x03, "the journal restore did not run"
+                await _quiet(pilot)
+                assert designer_recomputes() == before, "a hidden CRC Designer recomputed"
+                await _press_rail(pilot, app, "0")
+                await _expect_refresh(pilot, app, before, PRE, "zero-applied apply then display")
+    
+            return scenario
+    
+>       _reps(tmp_path, make)
+
+tests/test_b101_designer_writes.py:666: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_designer_writes.py:408: in _reps
+    results.append(_run(base, make_scenario(folder, image)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_designer_writes.py:396: in _run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_designer_writes.py:662: in scenario
+    await _expect_refresh(pilot, app, before, PRE, "zero-applied apply then display")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+before = 9, expect = (2623261629, 713701712)
+what = 'zero-applied apply then display'
+
+    async def _expect_refresh(pilot, app, before: int, expect: Tuple[int, int], what: str) -> None:
+        """After the display that follows an in-place write: exactly one recompute,
+        the painted CRCs equal ``zlib.crc32`` of the session bytes and the literal
+        values the case states, and window line 2 says the same."""
+        try:
+            await wait_designer_recompute(pilot, app, before, timeout=RECOMPUTE_TIMEOUT_S)
+        except AssertionError as exc:
+>           raise AssertionError(
+                f"{what}: the CRC Designer never recomputed (count {designer_recomputes()}, "
+                f"snapshot {before}) - stale coverage; it paints {_preview_lines(app)[1:]!r}, "
+                f"the session bytes give concat 0x{oracle(app.current_file.mem_map)[0]:08X}"
+            ) from exc
+E           AssertionError: zero-applied apply then display: the CRC Designer never recomputed (count 9, snapshot 9) - stale coverage; it paints ['concat: 0x08DAAFB7', 'fill:   0x35D90BC3'], the session bytes give concat 0x9C5BCBBD
+
+tests/test_b101_designer_writes.py:374: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_designer_writes.py::test_r_crc_preview_002_5_8_zero_applied_restore_still_refreshes
+1 failed in 49.69s

@@ -118,7 +118,7 @@ CTX-IFACE — the interface contracts of `docs/architecture.md` §11; a declarat
 
 Columns: Id · Form · Requirement · Pass threshold · Negative control (mutant that turns the guard RED) · US · Base (`c2cba35`).
 
-### US-DOC-HYG-1 — references (all repository documents and comments)
+### Rows of US-DOC-HYG-1 — references (all repository documents and comments)
 
 | Id | Form | Requirement | Pass threshold | Negative control | US | Base |
 |---|---|---|---|---|---|---|
@@ -130,7 +130,7 @@ Columns: Id · Form · Requirement · Pass threshold · Negative control (mutant
 | R-DOC-REF.6 | U | The system shall name CDFX in its repository documents only on a line that carries a removal mark. **new** (widens the AT-285 CDFX arm from 3 files to every repository document) | 0 unmarked `CDFX` or `CDF 2.0` tokens (word, any case) over every repository document | restore `` `cdfx/` package `` in the architecture row of `docs/README.md` → RED | US-DOC-HYG-1 | No: 5 lines in `docs/README.md` (:3, :14, :15, :33, :34) and 22 in `docs/diagrams/architecture.md` |
 | R-DOC-README.4 | U | The system shall describe in its README no window, key, command or file that the system does not provide. (canon, unchanged; in scope as the guard of the README's documentation table after `docs/diagrams/architecture.md` goes) | Inc 14's thresholds hold (`tests/test_b101_help_legend_docs.py::test_r_doc_readme_4_1_no_stale_claim`, `::test_r_doc_readme_4_2_linked_documents_exist`); the documentation table has no `docs/diagrams/architecture.md` row (0) and still links `docs/architecture.md` (1/1) | keep the diagrams row with the file deleted → `test_r_doc_readme_4_2` RED | US-DOC-HYG-1 | Yes (row at `README.md:465` links an existing file today) |
 
-### US-DOC-HYG-2 — developer documents (D1, D2, D3, D5)
+### Rows of US-DOC-HYG-2 — developer documents (D1, D2, D3, D5)
 
 | Id | Form | Requirement | Pass threshold | Negative control | US | Base |
 |---|---|---|---|---|---|---|
@@ -150,7 +150,7 @@ Columns: Id · Form · Requirement · Pass threshold · Negative control (mutant
 | R-DOC-DEV.14 | U | The system shall state in `docs/overview.md` that the Operations modal lists `extract` and `split_by_segment` without running them. **new** (same fact as R-DOC-README.4's Operations phrase) | the Operations bullet names `extract` and `split_by_segment` as listed but not implemented (1/1); 0 occurrences of "executable from the in-app Operations modal" | restore the base bullet → RED | US-DOC-HYG-2 | No: "A deterministic registry (`crc`, `extract`, `split_by_segment`) executable from the in-app Operations modal" (`docs/overview.md:43`); `extract` and `split_by_segment` answer `placeholder: <name> not yet implemented` (`README.md:247-248`, `s19_app/tui/operations/placeholders.py`) |
 | R-DOC-DEV.15 | U | The system shall list in `examples/case_00_public/MANIFEST.md` each example case folder of `examples/`. **new** | 15/15: the 8 top-level `case_0n_*` folders other than `case_00_public` (case_01 … case_08) and the 7 folders of `examples/professional_validation/`, each named once by its path relative to `examples/`, so `case_03_overlapping_records` and `professional_validation/case_03_overlapping_records` are two entries (E3 A16-8); computed from the tree | delete the `case_08_release_demo` entry → RED | US-DOC-HYG-2 | No: 7/15 (case_01 … case_07; `case_08_release_demo` and the 7 professional-validation cases missing) |
 
-### US-DOC-HYG-2 — the architecture map (D3)
+### Rows of US-DOC-HYG-2 — the architecture map (D3)
 
 | Id | Form | Requirement | Pass threshold | Negative control | US | Base |
 |---|---|---|---|---|---|---|
@@ -161,7 +161,7 @@ Columns: Id · Form · Requirement · Pass threshold · Negative control (mutant
 | R-DOC-ARCH.5 | U | The system shall list the contracts of CTX-IFACE in one Interfaces table in §11 of `docs/architecture.md`. **new** (E3 ruling A16-5: every landed contract stays) | §11 holds exactly 1 table, with the header `Interface \| Owner module \| Consumers \| Shape \| Frozen?` (the architecture template's, 1/1); its first column holds the 12 named contracts and the 46 source tags of CTX-IFACE (58/58; a later contract is an added row, `E1-rulings.md` §6); no `Current` or `After` column and 0 `.py:<line>` citations in the table; the rail-invariant row states twelve rail items (1/1); the Shape cell of each of the 5 saved-file contracts says `saved file` (5/5); each `Frozen?` cell reads `no` or names the open batch, the `batch_id` of `.dev-flow/state.json` (n/n; no open batch has frozen one at `c2cba35`) | delete the `B100-I16` (`derived_from`) row → RED | US-DOC-HYG-2 | No: six tables (Part B "frozen for `2026-08-24-batch-88`", batch-92, batch-94 with rail "exactly ten … became twelve", then the batch-97, batch-99 and batch-100 change tables with `Current \| After` or "planned" columns and file:line) (`:585-684`) |
 | R-DOC-ARCH.6 | U | The system shall state in `docs/architecture.md` that an increment changes at most 4 source files. **new** | §9 states the cap as `≤ 4 source files` (1/1); 0 occurrences of `≤ 5 files` | restore "capped at ≤ 5 files" → RED | US-DOC-HYG-2 | No: "supervised increments capped at ≤ 5 files" (`docs/architecture.md:174`); `CLAUDE.md` global rule and the flow use 4 source files |
 
-### US-DOC-HYG-3 — archive and removal (D4, D5, D6)
+### Rows of US-DOC-HYG-3 — archive and removal (D4, D5, D6)
 
 | Id | Form | Requirement | Pass threshold | Negative control | US | Base |
 |---|---|---|---|---|---|---|
