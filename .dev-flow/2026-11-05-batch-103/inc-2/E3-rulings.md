@@ -171,3 +171,40 @@ Notes for the 2b re-review:
 Applied (Opus, 50 min): one `reads` map per walk keyed by section identity, every value immutable (COMPU_METHOD → its 6 fields read-only; COMPU_VTAB / _RANGE → the table tuple by reference; RECORD_LAYOUT → its resolved datatype); new row **R-A2L-DEF.149** (cases /1–/4). Measured: the **current 2a code** takes 42.1 / 57.5 / 52.3 / 6.0 s with 400 objects sharing 256 KiB (> 60 s at 512 KiB) — a real DoS on a hostile A2L; the model 0.032–0.135 s (256 KiB), 0.044–0.218 s (512 KiB); 0 differences on the 35 fixtures.
 - **E5-1 (the 1.3× ratio is timing noise at host load 13–16):** the scaling clause of **.148 and .149** is restated to be robust: sizes **S and 8S**, median of 7 **interleaved** runs, the per-object part may grow by at most **2.0×** (a per-object walk of shared content grows ≥ 6×), `serial_timing` lane. Inc 3a's .148 takes the same wording at its E4.
 - Next: code (DeepSeek, Sonnet if its API fails) ∥ tests (Sonnet) for .149, GREEN, then Inc 2a's E5 reviews (code, security), mutants, coverage audit.
+
+## Inc 2a E5 — gap pass 2 rulings (2026-11-07, orchestrator Opus 5.5)
+
+**Gap pass 1 is done:**
+- the .149 read-once map is code `eb750c6f` (`f2f955aa`);
+- its tests are `37168255`;
+- the tests are RED on `82f5f8e5` and 8/8 GREEN in 3 of 3 runs.
+
+**Measure ruling for .148, .149 and .150:**
+- the timed part runs with `gc.collect()` and then `gc.disable()`, as `timeit` does;
+- ×2S ≤ **1.5** and ×8S ≤ 2.0, least of ≥ 15 interleaved runs, process CPU time;
+- the 2S bound was relaxed from 1.3 after 3 runs with GC off still measured ×1.2–1.4 on flat code. A per-object walk gives ≥ ×1.78 at 2S and ≥ ×3.2 at 8S.
+
+**Gap pass 2: Inc 2a's lines of Inc 3a's E3 security round 5.** The authority is `../inc-3/E3-rulings.md`, "Round 5 rulings" and the "Round-5 correction done" note; the paths are defined in `../inc-3/E3-security.md`, "## Round 5". It runs before Inc 2a's E5 reviews.
+- **The completed rule** holds for Inc 2a's nodes too. Each shared section is reduced once per walk to a form of fixed size, with each word in its final form: echoes at most 256 characters (.151), display texts cleaned once, derived values computed (the FORMAT's decimals in the method record). Definitions and decoded values reference shared texts and never copy them.
+- **R-A2L-DEF.150 (U), new, owned here.** "The system shall decode each element in a time and a retained size that do not grow with the size of the conversion table it names."
+  - Inc 2a's cases are scalar VALUEs: VT-3 (COMPU_VTAB entries), the VALUE forms of VT-5 (a long matched entry text), VT-6 (a long DEFAULT_VALUE text), VR-1 (COMPU_VTAB_RANGE entries) and VR-2 (a long range text).
+  - Design: the enum table's reduced form holds each entry's display text and the default's, each cleaned once. It also holds a private, immutable index, shared by reference: for COMPU_VTAB, a dict from raw value to the **first** entry in file order; for COMPU_VTAB_RANGE, a segmentation built once per table, a sweep over the range ends that gives each segment the first range in file order covering it, then a bisect per element.
+  - Pin the design with an equality case against the linear first-match oracle (Inc 2a's `_enum_entry_text` at `82f5f8e5`) on every corpus and tracked enum table, plus hostile overlapping and duplicate ranges.
+  - The public `enum_entries: tuple[EnumEntry, ...]` of I-2 stays as pinned.
+- **R-A2L-DEF.151 (U), new, owned here.** "The system shall write a file word into a refusal message as at most its first 256 characters, each character outside U+0021 … U+007E written as U+FFFD, and `…` after it when the word is longer."
+  - It applies to the shared-section words of Inc 2a's METHOD, CONVERSION (the type word), TABLE (the COMPU_TAB_REF word) and TABLE-EMPTY messages. `<name>` and `<layout>` keep .137.
+  - The cap is 256 because 1,993 real names exceed 64 characters, 0 exceed 256, and the longest is 148 (corpus measure in `../inc-3/E3-rulings.md`).
+  - Cases: 256 characters kept whole, 257 cut, and U+FFFD for each character outside U+0021 … U+007E. Each message is ≤ 1,024 characters.
+- **R-A2L-DEF.149 gains cases, same text:**
+  - CM-5: a long `%…` FORMAT word, with decimals derived once in the method record;
+  - CM-7: a long conversion-type word, echoed at reduction;
+  - CM-9: a long COMPU_TAB_REF word, echoed at reduction;
+  - RL-10 / RL-11: `_resolve_datatype` memoised per layout, for VALUE and CUBOID;
+  - CM-2: a method block comment, if pass 1 does not already cover it.
+  - Each case uses the measure above and asserts the ≤ 1,024-character message bound.
+- **Immutability:** the new reduced forms and the index are immutable values (tuples, frozen dataclasses, `MappingProxyType`). Add a case like .149/5.
+- **Owners and order:**
+  1. records + graph (Opus);
+  2. code (DeepSeek; Sonnet if its API fails) ∥ tests (an independent Sonnet tester);
+  3. GREEN on cachyos-rtx;
+  4. Inc 2a's E5 reviews (code, security), mutants and the coverage audit.
