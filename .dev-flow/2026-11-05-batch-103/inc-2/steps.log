@@ -15,3 +15,5 @@
 2026-11-06T18:53:14-06:00 E3 round-2 start inc-2 claude-opus-5-5 (security-reviewer agent)
 2026-11-06T19:05:27-06:00 E3 round-2 end inc-2 claude-opus-5-5 (security-reviewer agent): FAIL - 1 MAJOR (E3S-14 residual mask path), 1 MEDIUM, 6 MINOR, 1 LOW, 1 INFO; E3S-02/-03 closed, E3S-01 narrowed; E3-security.md; probe cachyos-rtx /tmp/b103-e3r2-2-security
 2026-11-06T19:06:45-06:00 E3 round-2 end inc-2 claude-opus-5-5 (architect agent): PASS-WITH-NOTES — 0 MAJOR+ open; round-1: 16 closed, 2 noted, 2 open non-blocking (E3A-10 count LOW, E3A-12 MINOR); new 2 MEDIUM, 7 MINOR, 3 LOW (E3A-21..32); describe_definitions prototype 0.817 s on software_a (cachyos-rtx /tmp/b103-e3r2-2-architect)
+2026-11-06T19:16:53-06:00 E3 round-2 correction unit R (rows, cases) — deepseek-v4-pro via pi — 16 findings applied
+2026-11-06T19:18:16-06:00 E3 round-2 correction unit G (graph) — deepseek-v4-pro via pi — 15 findings applied

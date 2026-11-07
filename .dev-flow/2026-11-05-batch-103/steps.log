@@ -42,3 +42,6 @@
 2026-11-06T19:12:54-06:00 probe done — Patch Editor apply/save-back (Sonnet, cachyos-rtx): apply works; save-back prompt hidden inside the undisplayed JSON tab; format follows the source; design/pe-apply-probe.md; Inc 10 scope set in PLAN
 2026-11-06T19:14:01-06:00 E3 done — Inc 1a: architect FAIL (3 MAJOR, 20 min), security FAIL (2 MAJOR, 18 min); all accepted, inc-1a/E3-rulings.md; I-1 re-pinned (Inc 1b adds os_clipboard_input.py)
 2026-11-06T19:14:41-06:00 E3 done — Inc 4: architect FAIL (2 MAJOR, 36 min), security FAIL (2 MAJOR, 20 min); all accepted, inc-4/E3-rulings.md; R-A2L-MATCH.38 (256-char cap)
+2026-11-06T19:15:13-06:00 E3 correction start — Inc 1a and Inc 4 (units R and G each, 4 in parallel); deepseek-v4-pro via pi
+2026-11-06T19:15:13-06:00 E1 start — Inc 10 (Patch Editor apply visibly + export S19 16/32 or HEX; R-PE-EXPORT); Opus 5.5
+2026-11-06T19:18:51-06:00 E3 round-2 correction done — Inc 2: unit R (16 findings, 253 cases), unit G (graph 41 nodes); deepseek-v4-pro via pi, exit 0 both; thresholds .19 9/9, .137 4/4 checked

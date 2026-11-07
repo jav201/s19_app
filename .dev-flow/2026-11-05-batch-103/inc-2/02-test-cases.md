@@ -42,6 +42,7 @@ Common fixtures:
 | R-A2L-DEF.7.2/3 | Verify the refusal for a length above 1 MiB | robustness | INLINE: an ASCII CHARACTERISTIC `ZH` at 0x10 with `NUMBER 1048577` | `ZH` | `ZH: its span of 1048577 bytes at 0x10 cannot be read` | | gap | not_run |
 | R-A2L-DEF.7.2/4 | Verify the refusal for a negative address | robustness | INLINE: a UWORD VALUE `NA2` with `ECU_ADDRESS -0x10` | `NA2` | `NA2: its span of 2 bytes at -0x10 cannot be read` | | gap | not_run |
 | R-A2L-DEF.7.2/5 | Verify the refusal for a span ending above 0xFFFFFFFF | robustness | INLINE: an ASCII CHARACTERISTIC `ZS` at 0xFFFFFFFF with `NUMBER 3` | `ZS` | `ZS: its span of 3 bytes at 0xFFFFFFFF cannot be read` | | gap | not_run |
+| R-A2L-DEF.7.2/6 | Verify that a span whose last byte is 0xFFFFFFFF is readable | robustness | INLINE: an ASCII CHARACTERISTIC `ZB` at 0xFFFFFF00 with `NUMBER 256` | the definition | no refusal; address 0xFFFFFF00, byte length 256 | | gap | not_run |
 | R-A2L-DEF.8/1 | Verify the refusal for an unreadable layout datatype | robustness | INLINE: a VALUE `ND` at 0x10 with `LENGTH 2` whose RECORD_LAYOUT `RL_X` has `FNC_VALUES 1 FOO ROW_DIR DIRECT` | `ND` | refusal `A2L-DEF-DATATYPE`, `ND: the object declares no datatype the system can read` | | gap | not_run |
 | R-A2L-DEF.8/2 | Verify the refusal for an unknown MEASUREMENT datatype | robustness | INLINE: MEASUREMENT `NM` `FOO NO_COMPU_METHOD 0 0 0 1`, ECU_ADDRESS 0x10, `LENGTH 1` | `NM` | `NM: the object declares no datatype the system can read` | | gap | not_run |
 | R-A2L-DEF.9/1 | Verify the refusal for a length that is not the datatype's | robustness | INLINE: a UWORD VALUE `LX` at 0x10 with `LENGTH 4` | `LX` | refusal `A2L-DEF-LENGTH`, `LX: its length 4 differs from the 2 bytes of UWORD` | | gap | not_run |
@@ -72,7 +73,10 @@ Common fixtures:
 | R-A2L-DEF.19/3 | Verify the refusal for a mask on a float | robustness | INLINE: FLOAT32_IEEE VALUE `MF` with `BIT_MASK 0x1` | `MF` | `MF: the bit mask 0x1 cannot be applied to FLOAT32_IEEE` | | gap | not_run |
 | R-A2L-DEF.19/4 | Verify the refusal for a mask word the system cannot read | robustness | INLINE: UWORD VALUE `MX` with `BIT_MASK 0b11` | `MX` | refusal `A2L-DEF-MASK`, `MX: the bit mask 0b11 cannot be applied to UWORD` | | gap | not_run |
 | R-A2L-DEF.19/5 | Verify the refusal for a mask on a text object | robustness | INLINE: an ASCII CHARACTERISTIC `MT` at 0x10 with `NUMBER 4` and `BIT_MASK 0x1` | `MT` | refusal `A2L-DEF-MASK`, `MT: the bit mask 0x1 cannot be applied to ASCII` | | gap | not_run |
-| R-A2L-DEF.19/6 | Verify the refusal when the header loses the mask keyword | robustness | INLINE: a UWORD VALUE whose short header swallows `BIT_MASK 0x0FF0` into a positional word (the tag keeps `bit_org`) | the definition | refusal `A2L-DEF-MASK`, `<name>: the bit mask 0x0FF0 cannot be applied to UWORD` | | gap | not_run |
+| R-A2L-DEF.19/6 | Verify the refusal when the header loses the mask keyword | robustness | INLINE: `/begin CHARACTERISTIC MB3 "" VALUE 0x10 RL_U16 0 CM_ID 0`, then `BIT_MASK 0x0FF0` on its own line (8 header words, the 9th is `BIT_MASK`; the tag keeps `bit_org`) | the definition | refusal `A2L-DEF-MASK`, `MB3: the bit mask 0x0FF0 cannot be applied to UWORD` | | gap | not_run |
+| R-A2L-DEF.19/7 | Verify the refusal for a BIT_MASK keyword on the header line | robustness | INLINE: MEASUREMENT `MC` with the body line `UWORD CM_ID 0 0 0 BIT_MASK 0x0FF0` and `ECU_ADDRESS 0x10` | the definition | refusal `A2L-DEF-MASK`, `MC: the bit mask 0x0FF0 cannot be applied to UWORD` | | gap | not_run |
+| R-A2L-DEF.19/8 | Verify the refusal for a BIT_MASK keyword behind a comment | robustness | INLINE: MEASUREMENT `MC` with `ECU_ADDRESS 0x10` and `/* mask */ BIT_MASK 0x0FF0` on its own line | the definition | refusal `A2L-DEF-MASK`, `MC: the bit mask 0x0FF0 cannot be applied to UWORD` | | gap | not_run |
+| R-A2L-DEF.19/9 | Verify the refusal for a signed mask holding bit 0 and the sign bit | robustness | INLINE: SBYTE VALUE `MS` with `BIT_MASK 0xFF` | the definition | refusal `A2L-DEF-MASK`, `MS: the bit mask 0xFF cannot be applied to SBYTE` | | gap | not_run |
 | R-A2L-DEF.20/1 | Verify integer extended limits | normal | V171 | `ASAM.C.SCALAR.SBYTE.IDENTICAL` | extended limits −128..127; limits −100..100 | | gap | not_run |
 | R-A2L-DEF.20/2 | Verify decimal extended limits | normal | V171 | the first object with `EXTENDED_LIMITS -10000.0 20000.0` | extended limits −10000.0..20000.0 | | gap | not_run |
 | R-A2L-DEF.21/1 | Verify that one number gives no extended limits | robustness | INLINE: `XL1` with `EXTENDED_LIMITS 0` | `XL1` | no extended limits | | gap | not_run |
@@ -85,11 +89,13 @@ Common fixtures:
 | R-A2L-DEF.24/1 | Verify kind before address | robustness | INLINE: MEASUREMENT `MA` with `MATRIX_DIM 4`, no ECU_ADDRESS | `MA` | `A2L-DEF-KIND` | | gap | not_run |
 | R-A2L-DEF.24/2 | Verify address before method | robustness | INLINE: MEASUREMENT `AM` with no ECU_ADDRESS naming `CM_GONE` | `AM` | `A2L-DEF-ADDRESS` | | gap | not_run |
 | R-A2L-DEF.24/3 | Verify table before mask | robustness | INLINE: UBYTE VALUE `TM` naming `CM_V` (`COMPU_TAB_REF VT_GONE`) with `BIT_MASK 0` | `TM` | `A2L-DEF-TABLE` | | gap | not_run |
+| R-A2L-DEF.24/4 | Verify address before the mask | robustness | INLINE: an ASCII CHARACTERISTIC `MA2` at 0x10 with `BIT_MASK 0x1` and no NUMBER, MATRIX_DIM or LENGTH | the definition | refusal `A2L-DEF-ADDRESS`, `MA2: the object has no address or no length` | | gap | not_run |
 | R-A2L-DEF.25/1 | Verify that decode gives the definition's refusal | robustness | C08 `firmware_issues.a2l` with the clean image | decode `MISSING_CM` | the `A2L-DEF-METHOD` refusal of R-A2L-DEF.11/1; no value | | gap | not_run |
 | R-A2L-DEF.25/2 | Verify that encode gives the definition's refusal | robustness | as /1 | encode `7` | the same refusal; no bytes | | gap | not_run |
 | R-A2L-DEF.26/1 | Verify the refusal for a missing byte at decode | robustness | INLINE: UWORD VALUE `MB2` at 0x10; image holds 0x10 only | decode | refusal `A2L-DEF-BYTES`, `MB2: 1 of its 2 bytes are not in the image` | | gap | not_run |
 | R-A2L-DEF.26/2 | Verify the refusal for missing bytes at a masked encode | robustness | V171; an empty image | encode `35` on `ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0` | `ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0: 2 of its 2 bytes are not in the image` | | gap | not_run |
 | R-A2L-DEF.26/3 | Verify the refusal for missing bytes at an unmasked encode | robustness | INLINE: UWORD VALUE `B3` at 0x10; an empty image | encode `7` | refusal `A2L-DEF-BYTES`, `B3: 2 of its 2 bytes are not in the image` | | gap | not_run |
+| R-A2L-DEF.26/4 | Verify the refusal for missing bytes at a text encode | robustness | V171; an empty image | encode `ABC` on the ASCII object (`UNKNOWN`) | refusal `A2L-DEF-BYTES`, `UNKNOWN: 42 of its 42 bytes are not in the image` | | gap | not_run |
 | R-A2L-DEF.27/1 | Verify a multi-bit field | normal | V171; image 34 12 at 0x810002 (word 0x1234) | decode `…BITMASK_0FF0` | stored value 35; display text `35` (base: 4660, B line 16) | | gap | not_run |
 | R-A2L-DEF.27/2 | Verify a single-bit field | normal | V171; image 10 00 at 0x810002 | decode `…BITMASK_0010` | stored value 1 | | gap | not_run |
 | R-A2L-DEF.27/3 | Verify that the field of a signed datatype is unsigned | normal | INLINE (big-endian): SWORD VALUE `SM` at 0x10, `BIT_MASK 0xFF00`, method none; image F0 F0 | decode | stored value 240 | | gap | not_run |
@@ -114,6 +120,8 @@ Common fixtures:
 | R-A2L-DEF.35/2 | Verify zero decimals, a tie | normal | INLINE: FLOAT64 `D2`, method none, `FORMAT "%.0"`; image of 2.5 | decode | `2` | | gap | not_run |
 | R-A2L-DEF.35/3 | Verify four decimals | normal | INLINE: FLOAT64 `D3`, `FORMAT "%8.4"`; image of 3.14159 | decode | `3.1416` | | gap | not_run |
 | R-A2L-DEF.35/4 | Verify an exact binary tie | normal | INLINE: FLOAT64 `D4`, `FORMAT "%.2"`; image of 0.125 | decode | `0.12` | | gap | not_run |
+| R-A2L-DEF.35/5 | Verify the d ≥ 15 rule | normal | INLINE: UWORD `D10` with `CM(LINEAR 0.1 0)`, `FORMAT "%.15"`; image 00 29 (stored 41) | decode | `4.100000000000000` | | gap | not_run |
+| R-A2L-DEF.35/6 | Verify FLOAT32 at 15 decimals | normal | INLINE: FLOAT32_IEEE `D11`, `FORMAT "%.15"`; image 3D CC CC CD (0.1) | decode | `0.100000001490116` | | gap | not_run |
 | R-A2L-DEF.36/1 | Verify the cap at 17 decimals | robustness | INLINE: FLOAT64 `D5`, `FORMAT "%.40"`; image of 0.1 | decode | `0.10000000000000000` | | gap | not_run |
 | R-A2L-DEF.37/1 | Verify no format | robustness | INLINE: UWORD `D6` with `CM(LINEAR 0.1 0)` whose format word is `""`; image 00 03 | decode | `0.3` | | gap | not_run |
 | R-A2L-DEF.37/2 | Verify `%` | robustness | INLINE: FLOAT64 `D7`, `FORMAT "%"`; image of 1234567.0 | decode | `1234567` | | gap | not_run |
@@ -132,7 +140,7 @@ Common fixtures:
 | R-A2L-DEF.40/6 | Verify inf | robustness | as /1 | `inf` | `…: 'inf' is not a number` | | gap | not_run |
 | R-A2L-DEF.40/7 | Verify hexadecimal | robustness | as /1 | `0x10` | `…: '0x10' is not a number` | | gap | not_run |
 | R-A2L-DEF.40/8 | Verify fullwidth digits | robustness | as /1 | `１２` | `…: '１２' is not a number` | | gap | not_run |
-| R-A2L-DEF.40/9 | Verify a tab | robustness | as /1 | `\t5` | `…: '\t5' is not a number` | | gap | not_run |
+| R-A2L-DEF.40/9 | Verify a tab | robustness | as /1 | `\t5` | `…: '�5' is not a number` | | gap | not_run |
 | R-A2L-DEF.41/1 | Verify no conversion | normal | INLINE: UBYTE `N0` at 0x10, `NO_COMPU_METHOD`, limits 0..255; image 00 at 0x10 | encode `7` | bytes 07 | | gap | not_run |
 | R-A2L-DEF.41/2 | Verify IDENTICAL, with spaces and a sign | normal | V171; image 00 00 at 0x810004 | encode `  -5 ` on `ASAM.C.SCALAR.SWORD.IDENTICAL` | bytes FB FF (stored −5) | | gap | not_run |
 | R-A2L-DEF.41/3 | Verify LINEAR with an offset | normal | C08 clean | encode `150` on the first UWORD object with `CM_LIN_OFF` (a = 1, b = 100) | stored 50 | | gap | not_run |
@@ -177,7 +185,7 @@ Common fixtures:
 | R-A2L-DEF.50/3 | Verify an empty text | normal | V171; image 42 × 00 at 0x810200 | encode `` | 42 × 00 | | gap | not_run |
 | R-A2L-DEF.51/1 | Verify the refusal for a text too long | robustness | V171 | encode a 43-character text | refusal `A2L-DEF-TEXT-LENGTH`, `<name>: the text has 43 characters — at most 42 fit` | | gap | not_run |
 | R-A2L-DEF.52/1 | Verify a non-ASCII letter | robustness | V171 | encode `café` | refusal `A2L-DEF-TEXT-CHAR`, `<name>: 'é' is not a printable ASCII character` | | gap | not_run |
-| R-A2L-DEF.52/2 | Verify a tab | robustness | V171 | encode `A\tB` | `<name>: '\t' is not a printable ASCII character` (the tab character itself between the quotes) | | gap | not_run |
+| R-A2L-DEF.52/2 | Verify a tab | robustness | V171 | encode `A\tB` | `<name>: '�' is not a printable ASCII character` | | gap | not_run |
 | R-A2L-DEF.52/3 | Verify U+FFFD | robustness | V171 | encode `A�` | `<name>: '�' is not a printable ASCII character` | | gap | not_run |
 | R-A2L-DEF.53/1 | Verify the span of a big-endian UWORD | normal | INLINE (big-endian): UWORD `B1` at 0x20; image 00 00 at 0x20 | encode `4660` | address 0x20, bytes 12 34 | | gap | not_run |
 | R-A2L-DEF.53/2 | Verify the span of a little-endian UWORD | normal | INLINE: UWORD `B2` at 0x20 with `BYTE_ORDER MSB_LAST`; image 00 00 at 0x20 | encode `4660` | address 0x20, bytes 34 12 | | gap | not_run |
@@ -209,6 +217,8 @@ Common fixtures:
 | R-A2L-DEF.58.2/13 | Verify the refusal for an all-zero RAT_FUNC | robustness | INLINE: a VALUE with `CM(RAT_FUNC 0 0 0 0 0 0)` | encode `3` | refusal `A2L-DEF-ENCODE` `…: RAT_FUNC denominator is zero`; 0 exceptions | | gap | not_run |
 | R-A2L-DEF.58.2/14 | Verify an ESC and an unterminated quote in an entry text | robustness | INLINE: a COMPU_VTAB whose entry text holds ESC and an unterminated quote | describe, decode, encode | the ESC shows as U+FFFD; the unterminated quote read to end of line; 0 exceptions | | gap | not_run |
 | R-A2L-DEF.58.2/15 | Verify V171's unclosed /begin | robustness | V171 | describe, decode and encode a defined object | a definition or refusal; 0 exceptions (the unclosed-section warning is not an exception) | | gap | not_run |
+| R-A2L-DEF.58.2/16 | Verify a float enum with a non-finite stored value | robustness | INLINE: a FLOAT32_IEEE TAB_VERB VALUE `EF` with a table of one pair `0 "Zero"` and no DEFAULT_VALUE; images 7F 80 00 00 and 7F C0 00 00 | decode | `inf (no text)` and `nan (no text)`; 0 exceptions | | gap | not_run |
+| R-A2L-DEF.58.2/17 | Verify a masked object with no datatype | robustness | INLINE: the `ND` of R-A2L-DEF.8/1 (`LENGTH 2`, `RL_X` with `FNC_VALUES 1 FOO ROW_DIR DIRECT`) plus `BIT_MASK 0x0FF0` | describe, decode, encode | refusal `A2L-DEF-DATATYPE`, `ND: the object declares no datatype the system can read`; 0 exceptions | | gap | not_run |
 | R-A2L-DEF.59/1 | Verify the 1 MiB pin | normal | the generator of the tree under test | seed 20260001, `--size-mb 1`, no case option, into `tmp_path` | the 11 SHA-256 values of the `1 \|` rows of `evidence-e1/i2e1-case08-hashes-transcript.txt`, each over the bytes with CR LF read as LF (PR lane) | | gap | not_run |
 | R-A2L-DEF.59/2 | Verify the 10 MiB pin | normal | as /1 | `--size-mb 10` | the 11 values of the `10 \|` rows (`slow`) | | gap | not_run |
 | R-A2L-DEF.59/3 | Verify the in-process object list pin | normal | the generator of the tree under test | `build_objects(...)` at 1 MiB, seed 20260001 | the SHA-256 digest of `repr` of the object list equals the value pinned at E4 (PR lane) | | gap | not_run |
@@ -268,4 +278,4 @@ Common fixtures:
 | AT-B103-I2-2 | Verify the definitions case through the app's loaders (US-103-05) | normal | DEFC | each object of the case: build, decode, encode its planned value's text and a second value, apply, decode | each decodes first to its planned value, then to the second value; the image outside the written spans is unchanged — rows R-A2L-DEF.60, .61, .62 and .46, .55, .56 | | gap | not_run |
 | AT-B103-I2-3 | Verify case 08 with the model (US-103-05) | normal | C08 clean and issues | build and decode every defined object of both A2Ls | 0 refusals on the clean A2L; on the issues A2L exactly one A2L-DEF-METHOD (`MISSING_CM`) and the A2L-DEF-BYTES refusals of the objects outside the image; the 22 case files equal the pin — rows R-A2L-DEF.11, .26, .58.1, .59 | | gap | not_run |
 
-**Counts:** 207 cases of the 67 rows (S2.7a 74, S2.7b 41, S2.7c 85, S2.7d 7), 33 cases of 29 cited canon rows, and 3 acceptance cases: 243 cases. Negative controls (the mutant of each row, run at E5 in a copy of the tree): `01-requirements.md`, column "Negative control".
+**Counts:** 217 cases of the 67 rows (S2.7a 79, S2.7b 44, S2.7c 87, S2.7d 7), 33 cases of 29 cited canon rows, and 3 acceptance cases: 253 cases. Negative controls (the mutant of each row, run at E5 in a copy of the tree): `01-requirements.md`, column "Negative control".
