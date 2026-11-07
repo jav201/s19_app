@@ -1,0 +1,72 @@
+===== mutant M-136 (2026-11-07T13:53:47Z) =====
+--- unified diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..d12c5334 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -367,32 +367,31 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
+     Raises:
+         None.
+     """
+-    tags_by_name: dict[str, list[dict]] = {}
+-    for tag in a2l_data.get("tags") or []:
+-        tags_by_name.setdefault(tag.get("name"), []).append(tag)
+-
+-    object_sections_by_name: dict[str, list[dict]] = {}
+-    compu_methods_by_name: dict[str, dict] = {}
+-    compu_tables_by_name: dict[str, dict] = {}
+-
+-    stack = list(reversed(a2l_data.get("sections") or []))
+-    while stack:
+-        node = stack.pop()
+-        node_name = node.get("name")
+-        parsed = parse_begin_meta(node.get("meta", "") or "")
+-        if node_name in ("MEASUREMENT", "CHARACTERISTIC"):
+-            object_sections_by_name.setdefault(parsed[0], []).append(node)
+-        elif node_name == "COMPU_METHOD":
+-            compu_methods_by_name.setdefault(parsed[0], node)
+-        elif node_name in ("COMPU_VTAB", "COMPU_VTAB_RANGE"):
+-            compu_tables_by_name.setdefault(parsed[0], node)
+-        stack.extend(reversed(node.get("children") or []))
+-
+     result: dict[str, Definition] = {}
+-    reads: dict[int, object] = {}
+     for name in names:
+         if name in result:
+             continue
++        tags_by_name: dict[str, list[dict]] = {}
++        for tag in a2l_data.get("tags") or []:
++            tags_by_name.setdefault(tag.get("name"), []).append(tag)
++
++        object_sections_by_name: dict[str, list[dict]] = {}
++        compu_methods_by_name: dict[str, dict] = {}
++        compu_tables_by_name: dict[str, dict] = {}
++
++        stack = list(reversed(a2l_data.get("sections") or []))
++        while stack:
++            node = stack.pop()
++            node_name = node.get("name")
++            parsed = parse_begin_meta(node.get("meta", "") or "")
++            if node_name in ("MEASUREMENT", "CHARACTERISTIC"):
++                object_sections_by_name.setdefault(parsed[0], []).append(node)
++            elif node_name == "COMPU_METHOD":
++                compu_methods_by_name.setdefault(parsed[0], node)
++            elif node_name in ("COMPU_VTAB", "COMPU_VTAB_RANGE"):
++                compu_tables_by_name.setdefault(parsed[0], node)
++            stack.extend(reversed(node.get("children") or []))
++
+         result[name] = _describe_one(
+             name,
+             tags_by_name,
+@@ -400,7 +399,7 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
+             compu_methods_by_name,
+             compu_tables_by_name,
+             a2l_data,
+-            reads,
++            {},
+         )
+     return result
+ 
+--- pytest ---
+s19_app.__file__ = /tmp/b103-e5-2-mutB/M-M-136/s19_app/__init__.py
+.pytest exit code: 124
