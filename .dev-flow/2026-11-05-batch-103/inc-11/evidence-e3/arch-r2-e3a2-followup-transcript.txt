@@ -1,0 +1,25 @@
+# e3a2-followup transcript 2026-11-07T00:33:32-06:00 host cachyos-rtx
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e3-11-A2/zq_iso_user; no DISPLAY; no clipboard; stdin closed; load: 5.11 3.15 1.98
+[corpus] files 158
+[RL begin] FNC datatype read = 1930
+[RL begin] all = 2867
+[RL begin] not read: component words on the name's line (moved into meta by the named-kind rule) = 121
+[RL begin] not read: first component ALIGNMENT_BYTE (base first-line rule) = 3
+[RL begin] not read: first component ALIGNMENT_FLOAT32_IEEE (base first-line rule) = 3
+[RL begin] not read: first component ALIGNMENT_LONG (base first-line rule) = 3
+[RL begin] not read: first component ALIGNMENT_WORD (base first-line rule) = 3
+[RL begin] not read: first component AXIS_PTS_X (base first-line rule) = 667
+[RL begin] not read: first component FIX_NO_AXIS_PTS_X (base first-line rule) = 10
+[RL begin] not read: first component NO_AXIS_PTS_X (base first-line rule) = 109
+[RL begin] not read: first component NO_AXIS_PTS_Z (base first-line rule) = 8
+[RL begin] not read: first component NO_RESCALE_X (base first-line rule) = 8
+[RL begin] not read: first component SRC_ADDR_X (base first-line rule) = 1
+[RL begin] not read: other = 1
+[RL later] FNC datatype read = 91
+[RL later] all = 144
+[RL later] not read: first component AXIS_PTS_X (base first-line rule) = 53
+[tracked] files 35
+[tracked] class: ARRAY_SIZE on MEASUREMENT = 1
+[tracked] tags = 234654
+# exit 0 ; clone status after: 0 changed; load: 5.75 3.46 2.11

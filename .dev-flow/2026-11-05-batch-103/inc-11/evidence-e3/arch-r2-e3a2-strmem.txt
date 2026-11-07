@@ -1,0 +1,12 @@
+[base] e3s14_string_200k.a2l: 0.086 s, result 1, peak RSS 70.9 MB
+[alt] e3s14_string_200k.a2l: 0.385 s, result 8488896, peak RSS 1005.8 MB
+[unrolled] e3s14_string_200k.a2l: 0.059 s, result 8488896, peak RSS 29.2 MB
+[perline] e3s14_string_200k.a2l: 0.062 s, result 8488894, peak RSS 41.0 MB
+[base] e3s14_string_200k.a2l: 0.084 s, result 1, peak RSS 70.9 MB
+[alt] e3s14_string_200k.a2l: 0.386 s, result 8488896, peak RSS 1005.1 MB
+[unrolled] e3s14_string_200k.a2l: 0.057 s, result 8488896, peak RSS 29.2 MB
+[perline] e3s14_string_200k.a2l: 0.057 s, result 8488894, peak RSS 41.0 MB
+[base] e3s14_string_200k.a2l: 0.089 s, result 1, peak RSS 70.8 MB
+[alt] e3s14_string_200k.a2l: 0.382 s, result 8488896, peak RSS 1004.3 MB
+[unrolled] e3s14_string_200k.a2l: 0.058 s, result 8488896, peak RSS 29.1 MB
+[perline] e3s14_string_200k.a2l: 0.058 s, result 8488894, peak RSS 41.0 MB

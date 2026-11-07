@@ -17,3 +17,17 @@ Round 1: architect **FAIL** (1 HIGH, 3 MAJOR, 4 MEDIUM, 5 MINOR, 1 LOW, 2 INFO; 
 | E3S-07 (cap on echoed words) and all others | accept with their fix columns; INFO noted. |
 
 **Next:** an Opus correction pass (records and graph; Inc 11's source files become `a2l.py`, `app.py`, `a2l_extract.py`, `a2l_definition.py`), then a round-2 re-check by both reviewers.
+
+## Round 2 rulings (2026-11-07T00:50:01-06:00, orchestrator Opus 5.5)
+
+Round 2: architect **FAIL** (all 16 round-1 findings closed; the named-kind rule names all 8,422 COMPU_METHODs / 4,338 COMPU_VTABs / 144 RECORD_LAYOUTs, identity fallbacks 136,592 → 878; 0 tracked tags change; READ.52 1.38× / 1.31×; new MAJOR **E3A-17**; 1 MEDIUM, 1 MINOR, 4 INFO); security **FAIL** (E3S-02, -04 closed; -01, -03, -05 closed as ruled with residuals; new MAJORs **E3S-18**, **E3S-19**, **E3S-20**; 4 MEDIUM, 1 MINOR, 1 INFO). Accepted with their fix columns, ruled:
+
+| Finding | Ruling |
+|---|---|
+| E3A-17 = E3S-20 (Address/Length still cut below 100 columns; a 64-bit address cut at 118) | **Address and Length become the first two columns of the tag table and stay fixed** (they never scroll out); their widths fit their longest content, 64-bit addresses included; the Tag cell takes what is left, with its `…` cap. A row: at every width from 80 to 220 columns the Address and Length cells show whole. **Visible change (column order):** the E5 real Windows Terminal captures before/after at 80, 118 and 220 columns go to the operator for approval before the merge. |
+| E3S-18 (a refused CHARACTERISTIC length comes back as the layout's element size via `enrich_a2l_tags_with_values`, `a2l.py:2890`) | accept: the enrichment never sets a size the reader refused (no length → no `byte_size`); a case through "Use parameter" and the Check Editor size. |
+| E3S-19 (DATA_SIZE vs LENGTH never compared when no datatype size is known) | accept: the two are compared directly whenever both appear; disagreement → no length + error (D-6 revised). |
+| Architect's MEDIUM (the pilot's string regex takes ~1 GB on READ.52/3's file) | accept: READ.52 gains a memory clause — the reader's peak memory stays within a stated multiple of the file's size (the fix column's figure, measured); no whole-file regex. |
+| all other round-2 findings | accept with their fix columns. |
+
+**Next:** an Opus correction (records and graph), then round 3 by both reviewers on these items only.

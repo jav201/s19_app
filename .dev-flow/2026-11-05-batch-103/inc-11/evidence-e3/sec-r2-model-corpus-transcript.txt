@@ -1,0 +1,17 @@
+s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+[CORP] addr_both_differ=255 addr_model_value_base_none=553 addr_same=117682 cmp_tags=118490 cmp_unmatched=137244 curvemap_with_length=0 curvemap_with_length_disagree=0 disagree_addr=0 disagree_size=8 dropped_after_ECU_ADDRESS=7 dropped_after_args=28 dropped_before_kw=1714 dup_files=10 dup_kw=0 errors_raw=286 files=158 flag_hdr_addr_nonnum=241 flag_refused_but_span_pass_as_base=4 flag_span_by_layout=11967 len_both_differ=56 len_curvemap_not_modeled=3621 len_model_none_base_value=5 len_model_value_base_none=72377 len_same=42431 missing_arg=0 not_closed=0 short_char_header=4 tags=255734
+[CORP-maxdepth] files>0=154 top5=[(7, '92'), (7, '91'), (7, '89'), (7, '87'), (7, '86')]
+[CORP-errors_raw] files>0=33 top5=[(88, '158'), (62, '156'), (61, '155'), (30, '157'), (6, '143')]
+[CORP-missing_arg] files>0=0 top5=[]
+[CORP-dup_kw] files>0=0 top5=[]
+[CORP-disagree_addr] files>0=0 top5=[]
+[CORP-disagree_size] files>0=5 top5=[(2, '126'), (2, '125'), (2, '124'), (1, '88'), (1, '32')]
+[CORP-not_closed] files>0=0 top5=[]
+[CORP-dropped_after_args] files>0=2 top5=[(11, '63'), (3, '2')]
+[CORP-dropped_before_kw] files>0=5 top5=[(700, '155'), (636, '156'), (235, '158'), (140, '157'), (3, '66')]
+[CORP-curvemap_with_length] files>0=0 top5=[]
+[CORP-refused] files=0 top5=[]
+[CORP-addr_model_none] files=0 top5=[]
+[CORP-addr_differ] files=4 top5=[('74', 252), ('124', 1), ('125', 1), ('126', 1)]
+[CORP-len_model_none] files=5 top5=[('110', 1), ('124', 1), ('125', 1), ('126', 1), ('32', 1)]
+[CORP-len_differ] files=12 top5=[('160', 18), ('159', 15), ('19', 3), ('91', 3), ('78', 3)]

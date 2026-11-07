@@ -1,0 +1,96 @@
+# e3a2-cap transcript 2026-11-07T00:34:04-06:00 host cachyos-rtx
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e3-11-A2/zq_iso_user; no DISPLAY; no clipboard; stdin closed; load: 5.72 3.53 2.15
+s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py | textual 8.2.8 | pad 1
+name length 48
+
+[P1 W220] table size=Size(width=108, height=30) visible=108 virtual=169 cell_padding=1 columns=16 total_render_width=169
+[P1 N48 W220] column render widths: Tag=52, Address=12, Length=8, Source=9, Raw=6, Physical=10, InMem=7, Region=9, Limits=9, Unit=6, Bits=6, Endian=8, Virt=6, Func=6, Access=8, Dtype=7
+[P1 N48 W220] fully visible (7): Tag, Address, Length, Source, Raw, Physical, InMem
+[P1 N48 W220] first cut column: Region (4 of 9 cells shown)
+[P1 N48 W220] painted|  Tag                                                 Address     Length  Source   Raw   Physical  InMem  Reg
+[P1 N48 W220] painted|  ✓ SYN_MAP_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCD  0x1C2D3E00  2266    formula  1792  1792      yes    unk
+[C0 P1 N48 W220] visible=108 Tag col=52 Address col=12 Length col=8 | Address cell painted=' 0x1C2D3E00 ' Length cell painted=' 2266   ' | address whole=True partial-prefix=False length whole=True
+[P1 N48 W220] reader address=0x1c2d3e00 length=2266; '0x1C2D3E002266' painted 0; 'SYN_MAP_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCD0x1C2D3E00' painted 0; '17921792' painted 0; 'unknown0..' painted 0; '0x1C2D3E00' painted True; '2266' painted True
+
+[P1 W160] table size=Size(width=73, height=30) visible=73 virtual=169 cell_padding=1 columns=16 total_render_width=169
+[P1 N48 W160] column render widths: Tag=52, Address=12, Length=8, Source=9, Raw=6, Physical=10, InMem=7, Region=9, Limits=9, Unit=6, Bits=6, Endian=8, Virt=6, Func=6, Access=8, Dtype=7
+[P1 N48 W160] fully visible (3): Tag, Address, Length
+[P1 N48 W160] first cut column: Source (1 of 9 cells shown)
+[P1 N48 W160] painted|  Tag                                                 Address     Length
+[P1 N48 W160] painted|  ✓ SYN_MAP_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCD  0x1C2D3E00  2266
+[C0 P1 N48 W160] visible=73 Tag col=52 Address col=12 Length col=8 | Address cell painted=' 0x1C2D3E00 ' Length cell painted=' 2266' | address whole=True partial-prefix=False length whole=True
+[P1 N48 W160] reader address=0x1c2d3e00 length=2266; '0x1C2D3E002266' painted 0; 'SYN_MAP_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCD0x1C2D3E00' painted 0; '17921792' painted 0; 'unknown0..' painted 0; '0x1C2D3E00' painted True; '2266' painted True
+
+[P1 W130] table size=Size(width=56, height=30) visible=56 virtual=169 cell_padding=1 columns=16 total_render_width=169
+[P1 N48 W130] column render widths: Tag=52, Address=12, Length=8, Source=9, Raw=6, Physical=10, InMem=7, Region=9, Limits=9, Unit=6, Bits=6, Endian=8, Virt=6, Func=6, Access=8, Dtype=7
+[P1 N48 W130] fully visible (1): Tag
+[P1 N48 W130] first cut column: Address (4 of 12 cells shown)
+[P1 N48 W130] painted|  Tag                                                 Add
+[P1 N48 W130] painted|  ✓ SYN_MAP_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCD  0x1
+[C0 P1 N48 W130] visible=56 Tag col=52 Address col=12 Length col=8 | Address cell painted=' 0x1' Length cell painted='' | address whole=False partial-prefix=True length whole=False
+[P1 N48 W130] reader address=0x1c2d3e00 length=2266; '0x1C2D3E002266' painted 0; 'SYN_MAP_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCD0x1C2D3E00' painted 0; '17921792' painted 0; 'unknown0..' painted 0; '0x1C2D3E00' painted False; '2266' painted False
+
+[P1 W118] table size=Size(width=60, height=30) visible=60 virtual=169 cell_padding=1 columns=16 total_render_width=169
+[P1 N48 W118] column render widths: Tag=52, Address=12, Length=8, Source=9, Raw=6, Physical=10, InMem=7, Region=9, Limits=9, Unit=6, Bits=6, Endian=8, Virt=6, Func=6, Access=8, Dtype=7
+[P1 N48 W118] fully visible (1): Tag
+[P1 N48 W118] first cut column: Address (8 of 12 cells shown)
+[P1 N48 W118] painted|  Tag                                                 Address
+[P1 N48 W118] painted|  ✓ SYN_MAP_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCD  0x1C2D3
+[C0 P1 N48 W118] visible=60 Tag col=52 Address col=12 Length col=8 | Address cell painted=' 0x1C2D3' Length cell painted='' | address whole=False partial-prefix=True length whole=False
+[P1 N48 W118] reader address=0x1c2d3e00 length=2266; '0x1C2D3E002266' painted 0; 'SYN_MAP_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCD0x1C2D3E00' painted 0; '17921792' painted 0; 'unknown0..' painted 0; '0x1C2D3E00' painted False; '2266' painted False
+
+[P1 W110] table size=Size(width=55, height=30) visible=55 virtual=169 cell_padding=1 columns=16 total_render_width=169
+[P1 N48 W110] column render widths: Tag=52, Address=12, Length=8, Source=9, Raw=6, Physical=10, InMem=7, Region=9, Limits=9, Unit=6, Bits=6, Endian=8, Virt=6, Func=6, Access=8, Dtype=7
+[P1 N48 W110] fully visible (1): Tag
+[P1 N48 W110] first cut column: Address (3 of 12 cells shown)
+[P1 N48 W110] painted|  Tag                                                 Ad
+[P1 N48 W110] painted|  ✓ SYN_MAP_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCD  0x
+[C0 P1 N48 W110] visible=55 Tag col=52 Address col=12 Length col=8 | Address cell painted=' 0x' Length cell painted='' | address whole=False partial-prefix=True length whole=False
+[P1 N48 W110] reader address=0x1c2d3e00 length=2266; '0x1C2D3E002266' painted 0; 'SYN_MAP_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCD0x1C2D3E00' painted 0; '17921792' painted 0; 'unknown0..' painted 0; '0x1C2D3E00' painted False; '2266' painted False
+
+[P1 W100] table size=Size(width=49, height=30) visible=49 virtual=169 cell_padding=1 columns=16 total_render_width=169
+[P1 N48 W100] column render widths: Tag=52, Address=12, Length=8, Source=9, Raw=6, Physical=10, InMem=7, Region=9, Limits=9, Unit=6, Bits=6, Endian=8, Virt=6, Func=6, Access=8, Dtype=7
+[P1 N48 W100] fully visible (0): 
+[P1 N48 W100] first cut column: Tag (49 of 52 cells shown)
+[P1 N48 W100] painted|  Tag
+[P1 N48 W100] painted|  ✓ SYN_MAP_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789AB
+[C0 P1 N48 W100] visible=49 Tag col=52 Address col=12 Length col=8 | Address cell painted='' Length cell painted='' | address whole=False partial-prefix=False length whole=False
+[P1 N48 W100] reader address=0x1c2d3e00 length=2266; '0x1C2D3E002266' painted 0; 'SYN_MAP_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCD0x1C2D3E00' painted 0; '17921792' painted 0; 'unknown0..' painted 0; '0x1C2D3E00' painted False; '2266' painted False
+
+[P1 W95] table size=Size(width=46, height=30) visible=46 virtual=169 cell_padding=1 columns=16 total_render_width=169
+[P1 N48 W95] column render widths: Tag=52, Address=12, Length=8, Source=9, Raw=6, Physical=10, InMem=7, Region=9, Limits=9, Unit=6, Bits=6, Endian=8, Virt=6, Func=6, Access=8, Dtype=7
+[P1 N48 W95] fully visible (0): 
+[P1 N48 W95] first cut column: Tag (46 of 52 cells shown)
+[P1 N48 W95] painted|  Tag
+[P1 N48 W95] painted|  ✓ SYN_MAP_ABCDEFGHIJKLMNOPQRSTUVWXYZ012345678
+[C0 P1 N48 W95] visible=46 Tag col=52 Address col=12 Length col=8 | Address cell painted='' Length cell painted='' | address whole=False partial-prefix=False length whole=False
+[P1 N48 W95] reader address=0x1c2d3e00 length=2266; '0x1C2D3E002266' painted 0; 'SYN_MAP_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCD0x1C2D3E00' painted 0; '17921792' painted 0; 'unknown0..' painted 0; '0x1C2D3E00' painted False; '2266' painted False
+
+[P1 W90] table size=Size(width=44, height=30) visible=44 virtual=169 cell_padding=1 columns=16 total_render_width=169
+[P1 N48 W90] column render widths: Tag=52, Address=12, Length=8, Source=9, Raw=6, Physical=10, InMem=7, Region=9, Limits=9, Unit=6, Bits=6, Endian=8, Virt=6, Func=6, Access=8, Dtype=7
+[P1 N48 W90] fully visible (0): 
+[P1 N48 W90] first cut column: Tag (44 of 52 cells shown)
+[P1 N48 W90] painted|  Tag
+[P1 N48 W90] painted|  ✓ SYN_MAP_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456
+[C0 P1 N48 W90] visible=44 Tag col=52 Address col=12 Length col=8 | Address cell painted='' Length cell painted='' | address whole=False partial-prefix=False length whole=False
+[P1 N48 W90] reader address=0x1c2d3e00 length=2266; '0x1C2D3E002266' painted 0; 'SYN_MAP_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCD0x1C2D3E00' painted 0; '17921792' painted 0; 'unknown0..' painted 0; '0x1C2D3E00' painted False; '2266' painted False
+
+[P1 W85] table size=Size(width=41, height=30) visible=41 virtual=169 cell_padding=1 columns=16 total_render_width=169
+[P1 N48 W85] column render widths: Tag=52, Address=12, Length=8, Source=9, Raw=6, Physical=10, InMem=7, Region=9, Limits=9, Unit=6, Bits=6, Endian=8, Virt=6, Func=6, Access=8, Dtype=7
+[P1 N48 W85] fully visible (0): 
+[P1 N48 W85] first cut column: Tag (41 of 52 cells shown)
+[P1 N48 W85] painted|  Tag
+[P1 N48 W85] painted|  ✓ SYN_MAP_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123
+[C0 P1 N48 W85] visible=41 Tag col=52 Address col=12 Length col=8 | Address cell painted='' Length cell painted='' | address whole=False partial-prefix=False length whole=False
+[P1 N48 W85] reader address=0x1c2d3e00 length=2266; '0x1C2D3E002266' painted 0; 'SYN_MAP_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCD0x1C2D3E00' painted 0; '17921792' painted 0; 'unknown0..' painted 0; '0x1C2D3E00' painted False; '2266' painted False
+
+[P1 W80] table size=Size(width=38, height=30) visible=38 virtual=169 cell_padding=1 columns=16 total_render_width=169
+[P1 N48 W80] column render widths: Tag=52, Address=12, Length=8, Source=9, Raw=6, Physical=10, InMem=7, Region=9, Limits=9, Unit=6, Bits=6, Endian=8, Virt=6, Func=6, Access=8, Dtype=7
+[P1 N48 W80] fully visible (0): 
+[P1 N48 W80] first cut column: Tag (38 of 52 cells shown)
+[P1 N48 W80] painted|  Tag
+[P1 N48 W80] painted|  ✓ SYN_MAP_ABCDEFGHIJKLMNOPQRSTUVWXYZ0
+[C0 P1 N48 W80] visible=38 Tag col=52 Address col=12 Length col=8 | Address cell painted='' Length cell painted='' | address whole=False partial-prefix=False length whole=False
+[P1 N48 W80] reader address=0x1c2d3e00 length=2266; '0x1C2D3E002266' painted 0; 'SYN_MAP_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCD0x1C2D3E00' painted 0; '17921792' painted 0; 'unknown0..' painted 0; '0x1C2D3E00' painted False; '2266' painted False
+# exit 0 ; clone status after: 0 changed; load: 5.61 4.02 2.44
