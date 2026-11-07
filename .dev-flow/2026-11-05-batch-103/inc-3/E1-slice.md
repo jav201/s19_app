@@ -6,7 +6,7 @@ Base `9ae92c3` (product tree `e07fb00`). Line numbers are as of `e07fb00`. Rows:
 
 | File | Functions | Rows |
 |---|---|---|
-| `s19_app/tui/a2l_definition.py` (Inc 2's new module; the one source file of this increment) | 19 new functions, 3 new frozen dataclasses, `Definition` gains 6 fields with defaults; 4 of Inc 2's functions changed (§2) | R-A2L-DEF.64 … .132; cited R-A2L-DEF.5 … .7, .26, .58, R-A2L-010, 011, 019, 024 … 027 |
+| `s19_app/tui/a2l_definition.py` (Inc 2's new module; the one source file of this increment) | 19 new functions, 3 new frozen dataclasses, `Definition` gains 6 fields with defaults; 4 of Inc 2's functions changed (§2) | R-A2L-DEF.64 … .132, .140 … .143; cited R-A2L-DEF.5 … .7, .26, .58, .137, R-A2L-010, 011, 019, 024 … 027 |
 | `tools/synth/make_release_case.py` (test-data tooling, not counted toward the source cap: PLAN D6) | 1 new function; 2 of Inc 2's new functions changed (§4) | R-A2L-DEF.133 … .135; cited .59, .63 |
 | `s19_app/tui/a2l.py` and every other source file | **unchanged** (`a2l.py` frozen; private helpers reused, §3) | — |
 
@@ -28,9 +28,9 @@ Types (frozen dataclasses, no logic; I-2 §4): `AxisDefinition`, `DecodedAxis`, 
 | 8 | `_read_record_layout(name, a2l_data, owner) -> RecordLayout \| Refusal` | new | the RECORD_LAYOUT lines comments left out: components, layout keywords (FIX_NO_AXIS_PTS, ALIGNMENT, DIRECT), index modes, point orders, address types, datatypes, positions | .82 … .87, .90 |
 | 9 | `_place_components(layout, counts) -> dict[str, int] \| Refusal` | new | the offsets, by `_walk_record_layout_components` on a cleaned layout (components in position order + the layout's ALIGNMENT lines) | .75, .77, .88 |
 | 10 | `_check_module_alignment(layout, counts, section, a2l_data) -> Refusal \| None` | new | MOD_COMMON's ALIGNMENT lines of the object's module; the offsets again with them; the refusal when an offset moves (D-7 C: withdrawn under A or B) | .89 |
-| 11 | `_read_axis(axis_section, letter, layout, a2l_data) -> AxisDefinition \| Refusal` | new | the axis header words; kind; point count; STD component / FIX points / COM object; MONOTONY; the point element definition through Inc 2's builders | .91 … .103 |
+| 11 | `_read_axis(axis_section, letter, layout, a2l_data) -> AxisDefinition \| Refusal` | new | the axis header words; kind; point count; STD component / FIX points / COM object; MONOTONY; the point element definition through Inc 2's builders | .91 … .103, .141 … .143 |
 | 12 | `_find_axis_object(ref, a2l_data) -> tuple[dict, list[str]] \| None` | new | the AXIS_PTS section of that name in a pre-order walk of `a2l_data["sections"]`, and its header words | .94, .96, .97, .113 |
-| 13 | `_fixed_points(axis_words, axis_section) -> tuple[float, ...] \| None` | new | FIX_AXIS_PAR, FIX_AXIS_PAR_DIST, FIX_AXIS_PAR_LIST (D-10 A) | .98, .99, .110 … .112 |
+| 13 | `_fixed_points(axis_words, axis_section) -> tuple[float, ...] \| None` | new | FIX_AXIS_PAR, FIX_AXIS_PAR_DIST, FIX_AXIS_PAR_LIST (D-10 A) | .98, .99, .110 … .112, .141, .142 |
 | 14 | `_element_definition(definition, position) -> Definition` | new | the element definition of one element or axis point: Inc 2's scalar fields, the component datatype, the element name, the address of its bytes | .105, .121, .122 |
 | 15 | `decode_values(definition, a2l_data, image) -> DecodedValues \| Refusal` | new (I-2) | the definition's refusal, the record's bytes (Inc 2's A2L-DEF-BYTES), current counts, every element and axis point in element order | .105, .119, .124; cited .26, .58 |
 | 16 | `_element_offset(definition, index) -> int` | new | ROW_DIR and COLUMN_DIR (D-2 A) | .106, .107 |
@@ -93,13 +93,14 @@ Amendment A2 (`../PLAN.md`) splits the increment as it splits Inc 2. **3a**, the
 - **#12 `_find_axis_object`** and E2's **`_module_common`** are lookups in maps that `describe_definitions`'s one walk builds (`axis_pts_by_name`, `mod_common_of`), not walks per object (E3A-32); `_collect_sections_by_name` is no longer reused (§3).
 - E2's **`_conversion_fields`** reads Inc 2's `compu_methods_by_name` / `compu_tables_by_name` and returns the method record's `coeffs_linear`, `coeffs`, `compu_tab_ref` (E3A-03); **#14 `_element_definition`** is a `dataclasses.replace` of the object's definition (E3A-22).
 - **#20 `_decode_stored`** converts from the definition's method fields, never from `sections` (E3A-03).
+- The coverage pass before 3a's E3 (`E2-rulings.md`, orchestrator rulings on the rebase and split) changed one more: **#13 `_fixed_points`** gains `point_count` and gives, beside the points and `None` (.98), `"unreadable"` (.141) and the count it gives when that is not the point count (.99), so it never builds more than 1,048,576 points (.142). #11 `_read_axis` gains .141 … .143. No function is added; the counts below do not change.
 
 | Side | Functions (§2 number, or added at E2) | Count |
 |---|---|---|
 | 3a | #1 `describe_definitions` (changed), #2 `_object_kind` (changed), #3 `decode_definition` (changed), #5 `_describe_array`, #6 `_read_matrix_dim`, #7 `_array_shape`, #8 `_read_record_layout`, #9 `_place_components`, #10 `_check_module_alignment`, #11 `_read_axis`, #12 `_find_axis_object`, #13 `_fixed_points`, #14 `_element_definition`, #15 `decode_values`, #16 `_element_offset`, #17 `_point_offset`, #18 `_current_count`, #19 `_decode_axis`, #20 `_decode_stored`, #23 `element_name`, `_conversion_fields` (E2), `_module_common` (E2) | 22 |
 | 3a, synth (§4) | S1 `build_definition_objects`, S2 `emit_definitions_a2l` (changed), S5 `_definition_array_objects` | 3 |
 | 3b | #4 `encode_definition` (changed; Inc 2b's function), #21 `encode_values`, #22 `_breaking_point` | 3 |
-| 3b, added inside a 3a function | `describe_definitions`: the AXIS_PTS entries of R-A2L-DEF.138's span index (Inc 2 E3 census ruling; proposed R-A2L-DEF.140, `01-requirements.md` "Split (amendment A2)") | — |
+| 3b, added inside a 3a function | `describe_definitions`: the AXIS_PTS entries of R-A2L-DEF.138's span index (Inc 2 E3 census ruling; R-A2L-DEF.140, counted, `01-requirements.md` S2.7h) | — |
 
 What each side reuses from §3:
 - **3a** imports, beyond Inc 2a's list, `_walk_record_layout_components`, `_strip_a2l_comments`, `_split_line_respecting_quotes` (back in D-9's list, graph baseline), `_byte_order_from_section_lines`, `_DATATYPE_ALIGNMENT_DIRECTIVE`, `_ALIGNMENT_DIRECTIVES`, `MAX_A2L_DECODE_BYTES`.
