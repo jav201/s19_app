@@ -61,3 +61,4 @@
 2026-11-06T20:45:47-06:00 E4 done — Inc 4 GREEN (see inc-4/steps.log in branch b103-inc4-code, commit 885634b)
 2026-11-06T20:45:47-06:00 E5 start — Inc 4: mutants A/B (deepseek-v4-pro via pi), code review (Opus), security review (Opus, probes on the real code), coverage re-audit (Sonnet)
 2026-11-06T20:58:14-06:00 E3 done — Inc 1a: architect round 4 PASS-WITH-NOTES (12 min), security round 3 PASS-WITH-NOTES; addenda R-LOADDLG.20/3, /4 by the orchestrator; note: a Python write with a lone surrogate truncated inc-1a/02-test-cases.md — restored from HEAD 0821d17 (identical, 289 lines) before the addenda; edits with surrogates go through the Edit tool
+2026-11-06T21:00:22-06:00 census re-run — Inc 2 (Opus, 15 min): 223,524 refusals, all declared overlaps; guard stands; AXIS_PTS spans → Inc 3; round 5 security next
