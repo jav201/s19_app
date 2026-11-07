@@ -224,18 +224,17 @@ def test_tc_b100_73_one_argument_callers_outside_the_app_are_unchanged() -> None
 
 
 def test_tc_b100_73_a2l_py_is_listed_in_the_frozen_engine_guard() -> None:
-    """LLR-176.4b (D12b-05): ``s19_app/tui/a2l.py`` is an entry of
-    ``tests/test_engine_unchanged.py::_ENGINE_PATHS`` again (1 assertion).
-    TC-027 itself compares against ``main``, where ``a2l.py`` differs until
-    the increment merges, so its full run is owed after the merge
-    (declared, E1 LLR-176.4b note).
+    """LLR-176.4b (D12b-05) / batch-103 Inc 11: ``s19_app/tui/a2l.py`` is NOT an
+    entry of ``tests/test_engine_unchanged.py::_ENGINE_PATHS`` while batch-103
+    Inc 11 rewrites the A2L reader (the unfreeze removes it from the guard set;
+    a separate post-merge PR re-freezes it and this assertion flips back).
 
     Why: the parser is a frozen engine; 12b's crossing is named and then
-    closed again. Negative control (code read, base): the entry is commented
-    out since batch-95 → RED."""
+    closed again. Negative control (code read): the entry present during
+    batch-103 Inc 11 → RED."""
     from tests.test_engine_unchanged import _ENGINE_PATHS
 
-    assert "s19_app/tui/a2l.py" in _ENGINE_PATHS, sorted(_ENGINE_PATHS)
+    assert "s19_app/tui/a2l.py" not in _ENGINE_PATHS, sorted(_ENGINE_PATHS)
 
 
 # ===========================================================================

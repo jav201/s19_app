@@ -1,0 +1,37 @@
+== changed tests on base ==
+FF..                                                                     [100%]
+=================================== FAILURES ===================================
+_______________ test_tc097_strip_removes_block_and_line_comments _______________
+
+    def test_tc097_strip_removes_block_and_line_comments() -> None:
+        # Spanning block comment (across the newline sentinel) removed as one unit.
+        assert _strip_a2l_comments("A /* c\n more c */ B") == "A  B"
+        # Adjacent (no-space) block comment is a word break (R-A2L-READ.7).
+>       assert _strip_a2l_comments("CURVE/*c*/0x1") == "CURVE 0x1"
+E       AssertionError: assert 'CURVE0x1' == 'CURVE 0x1'
+E         
+E         - CURVE 0x1
+E         ?      -
+E         + CURVE0x1
+
+tests/test_a2l_multiline_headers.py:389: AssertionError
+____________________ test_r_val_032_3_v171_one_line_if_data ____________________
+
+    def test_r_val_032_3_v171_one_line_if_data() -> None:
+        """Why: a one-line IF_DATA closes on its line (R-A2L-READ.17), so V171 has
+        0 parse errors; the IF_DATA exemption must still hold."""
+        data = parse_a2l_file(REPO_ROOT / "examples" / "case_00_public" / "ASAP2_Demo_V171.a2l")
+        issues = validate_a2l_structure(data)
+        assert _unrecognized(issues) == []
+>       assert data["errors"] == []
+E       AssertionError: assert ['Unclosed /b...ns detected.'] == []
+E         
+E         Left contains one more item: 'Unclosed /begin sections detected.'
+E         Use -v to get more diff
+
+tests/test_b101_a2l_blocks_and_segments.py:287: AssertionError
+------------------------------ Captured log call -------------------------------
+=========================== short test summary info ============================
+FAILED tests/test_a2l_multiline_headers.py::test_tc097_strip_removes_block_and_line_comments
+FAILED tests/test_b101_a2l_blocks_and_segments.py::test_r_val_032_3_v171_one_line_if_data
+2 failed, 2 passed in 0.59s

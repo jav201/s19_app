@@ -101,7 +101,7 @@ _BROKEN_REF_A2L = (
 # genuine file-derived hostile symbol reaches the grouped panel's ``.issue-detail``
 # node — no constructed ``ValidationIssue``.
 _HOSTILE_MARKUP_REF = "MAP_Model[bold]"  # Rich style tag -> MarkupError if parsed
-_HOSTILE_LINK_REF = "x[link=file:///etc]"  # OSC-8 link token -> consumed if parsed
+_HOSTILE_LINK_REF = "x[link=https:x]"  # OSC-8 link token -> consumed if parsed
 _HOSTILE_REF_A2L = (
     "/begin PROJECT Demo\n"
     "  /begin MODULE Engine\n"
@@ -340,7 +340,7 @@ def test_at_043_c17_file_derived_hostile_ref_symbol_renders_literal(
     hostile GROUP-REF symbol renders LITERAL in the grouped ``.issue-detail`` node.
 
     Intent: load an A2L whose GROUP names two hostile no-whitespace ghost symbols
-    (``MAP_Model[bold]`` and ``x[link=file:///etc]``) through the SHIPPED load
+    (``MAP_Model[bold]`` and ``x[link=https:x]``) through the SHIPPED load
     chain (``_parse_loaded_file`` -> ``_prepare_load_payload`` ->
     ``_apply_prepared_load`` -> ``update_validation_issues_view`` ->
     ``GroupedIssuesPanel``). The frozen ``a2l.py`` lexer +
@@ -353,19 +353,19 @@ def test_at_043_c17_file_derived_hostile_ref_symbol_renders_literal(
 
     Assert: the run raises NO ``rich.errors.MarkupError``, and the combined
     ``.issue-detail`` plain text contains the LITERAL ``MAP_Model[bold]``
-    (brackets intact) and the LITERAL ``x[link=file:///etc]`` / ``[link=...]``
+    (brackets intact) and the LITERAL ``x[link=https:x]`` / ``[link=...]``
     token (NOT consumed -> no OSC-8 hyperlink, no style leak).
 
     Counterfactual (discriminates the fix): if ``.issue-detail`` parsed Rich
     markup instead of using ``safe_text``, mounting would either raise
-    ``MarkupError`` on ``[bold]`` or SILENTLY CONSUME the ``[link=file:///etc]``
+    ``MarkupError`` on ``[bold]`` or SILENTLY CONSUME the ``[link=https:x]``
     token into an OSC-8 hyperlink — the literal-bracket assertions below would
     then fail. Asserting the brackets survive verbatim is exactly what makes this
     non-vacuous.
 
     Frozen-lexer note: Phase-3 probe confirmed the frozen ``a2l.py`` chain
     preserves BOTH hostile tokens verbatim (``issue.symbol ==
-    'MAP_Model[bold]'`` and ``'x[link=file:///etc]'``), so no fallback token was
+    'MAP_Model[bold]'`` and ``'x[link=https:x]'``), so no fallback token was
     needed — the strongest hostile tokens the spec names are the ones exercised.
 
     # AT-043
@@ -404,7 +404,7 @@ def test_at_043_c17_file_derived_hostile_ref_symbol_renders_literal(
             f"file-derived symbol must render brackets literally in "
             f".issue-detail; details={details!r}"
         )
-        assert "[link=file:///etc]" in combined, (
+        assert "[link=https:x]" in combined, (
             f"the [link=...] token must survive as literal text (no OSC-8 "
             f"parse); details={details!r}"
         )
@@ -433,7 +433,7 @@ OVERSIZED_CODE = "A2L_ADDRESS_EXCEEDS_32BIT"
 # brackets, an OSC-8-style [link=...] token, and a raw ANSI CSI escape. All
 # survive the whitespace-split name parser; the addresses parse via int(_, 0).
 _HOSTILE_BRACKET_NAME = "MARK_[red]evil[/red]"
-_HOSTILE_LINK_NAME = "LINK_x[link=file:///etc]"
+_HOSTILE_LINK_NAME = "LINK_x[link=https:x]"
 _HOSTILE_ANSI_NAME = "ANSI_\x1b[31mHACK"
 _HOSTILE_OVERSIZED_A2L = (
     "/begin PROJECT Demo\n"
@@ -483,7 +483,7 @@ def test_at_066b_oversized_hostile_tag_name_renders_safely(tmp_path: Path) -> No
         bracket_msg = by_symbol[_HOSTILE_BRACKET_NAME].issue.message
         link_msg = by_symbol[_HOSTILE_LINK_NAME].issue.message
         assert "[red]evil[/red]" in bracket_msg, bracket_msg
-        assert "[link=file:///etc]" in link_msg, link_msg
+        assert "[link=https:x]" in link_msg, link_msg
 
         # (ii) ANSI CSI is NEUTRALIZED (NOT verbatim): __post_init__ strips the
         # CSI from ``message`` (model.py:71), so neither the raw ESC nor the
@@ -504,7 +504,7 @@ def test_at_066b_oversized_hostile_tag_name_renders_safely(tmp_path: Path) -> No
             by_symbol[_HOSTILE_LINK_NAME].query_one(".issue-detail").render().plain
         )
         assert "[red]evil[/red]" in bracket_detail, repr(bracket_detail)
-        assert "[link=file:///etc]" in link_detail, repr(link_detail)
+        assert "[link=https:x]" in link_detail, repr(link_detail)
 
     _drive_load(tmp_path, s19_path, a2l_path, _observe)
 
