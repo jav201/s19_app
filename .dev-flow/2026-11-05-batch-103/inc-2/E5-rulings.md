@@ -20,7 +20,7 @@ What holds:
 | CR-2 + E5S-01 (MAJOR) + E5S-03 (MINOR) + CR-3 + CR-5 | **Accept, as one rule for numbers in messages.** A number the system writes into a refusal message or a kind text (`<n>`, `<byte length>`, the MATRIX_DIM and address placeholders) is written in decimal (addresses as now) when it is at most 2^64 − 1. Above that, it is written as the .151 echo of its file word. No message can then raise, and no message exceeds 1,024 characters. Extend R-A2L-DEF.151's text to say this; fix the CTX placeholders (CR-3) and the graph's "at most 1,024 characters whatever the file holds". The MATRIX_DIM kind text goes through the same rule (CR-5). Cases: the four E5S-01 shapes (hex LENGTH, DATA_SIZE, NUMBER, MATRIX_DIM of 5,000 digits) → a refusal, 0 exceptions, message ≤ 1,024 characters; the E5S-03 hex-address shapes ≤ 1,024 characters. Negative control: `str(n)` → `ValueError` → RED. |
 | CR-4 = E5S-05 (MEDIUM / MINOR) | **Accept: conversion type words are case-sensitive**, as A2L keywords are. A type word that is not exactly one of the known types gets the existing CONVERSION refusal. The verdict and every reader of the type word use the same exact comparison: `:700`, `:708`, `:1179`, `:1415`, `:1420`. Measured: 0 of 560 corpus methods use another letter case, so a silent 0.0 is worse than a refusal. Case: `tab_intp` → the CONVERSION refusal. Negative control: upper-casing kept → 0.0 or 50.0 → RED. |
 | E5S-04 (MINOR, impl) | **Accept.** `_walk` becomes iterative (an explicit stack), so deep nesting that the frozen parser still reads cannot raise `RecursionError`. Inc 11 caps nesting at 32 later; Inc 2a merges first. Case: the hostile nesting shape → 0 exceptions. |
-| E5S-06 (LOW, design-gap) | **Backlog, not this pass.** Bidi and separator characters (Cf, Zl, Zp) in display texts are a consumer matter: the views render through `safe_text`, the residue is recorded (Inc 12 E3S-04), and the views of Inc 5–9 owe it. Recorded as BL-I2-1. |
+| E5S-06 (LOW, design-gap) | **Backlog, not this pass.** Bidi and separator characters (Cf, Zl, Zp) in display texts are a consumer matter: the views render through `safe_text`, the residue is recorded (Inc 12 E3S-04), and the views of Inc 5–9 owe it. Recorded as BL-I2-18 (BL-I2-1 … -17 are taken). |
 | E5S-07 (INFO) | As ruled at E3: no change. |
 | CR-6 (MINOR, synth) | Apply the review's fix (`planned_text`). |
 | CR-7 (MINOR, test) | Add the missing test the review names. |
@@ -42,3 +42,10 @@ What holds:
 5. Mutants (DeepSeek).
 6. Coverage audit (qa-reviewer).
 7. `04-validation.md`, then the merge to `batch-103`.
+
+## Fix-pass records — done (Opus, 16 min); orchestrator rulings on what it reported
+
+- **BL-I2-18**, not BL-I2-1, which is taken: the bidi and separator residue (E5S-06). The backlog home is this file until the batch-end backlog sweep.
+- **CR-6's seeds test:** the tester places it under R-A2L-DEF.59's synth cases as the next free case id, with a threshold (seeds 1 … 5 each give a valid case) and a negative control.
+- **"Its file word" above 2^64 − 1:** accepted as read. The frozen parser keeps only the number, so the system writes the `0x` form, through the .151 echo (≤ 256 characters). The bound is on the magnitude, so huge negative numbers are covered too.
+- **Stale .149 Result columns:** the tester rewrites them when it re-runs GREEN in E5-3's form.
