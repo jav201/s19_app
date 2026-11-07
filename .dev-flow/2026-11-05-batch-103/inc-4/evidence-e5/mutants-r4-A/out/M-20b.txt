@@ -1,0 +1,37 @@
+=== s19_app.__file__ ===
+/tmp/b103-e5-4-mutr4A/M-20b/s19_app/__init__.py
+
+=== DIFF base -> M-20b (s19_app/tui/services/label_match.py) ===
+--- /tmp/b103-e5-4-mutr4A/base/s19_app/tui/services/label_match.py	2026-11-07 01:32:51.000000000 -0600
++++ /tmp/b103-e5-4-mutr4A/M-20b/s19_app/tui/services/label_match.py	2026-11-07 02:05:50.027425853 -0600
+@@ -63,8 +63,8 @@
+     PREFIX = "prefix"
+     SUBSTRING = "substring"
+     TOKEN = "token"
+-    FUZZY = "fuzzy"
+     SUBSEQUENCE = "subsequence"
++    FUZZY = "fuzzy"
+ 
+ 
+ _RULE_RANK = {rule: pos for pos, rule in enumerate(MatchRule)}
+
+=== PYTEST (tail, rc=1) ===
+..F                                                                      [100%]
+=================================== FAILURES ===================================
+_______________ test_rows_20_3_token_then_fuzzy_then_subsequence _______________
+
+prep = <function prep.<locals>.get at 0x7fe6587ffc40>
+
+    def test_rows_20_3_token_then_fuzzy_then_subsequence(prep):
+        """R-A2L-MATCH.20/3: the three entries of R-A2L-MATCH.8/3, token, then fuzzy, then subsequence."""
+        got = proj(run(prep, "SWB", "oks ahw"))
+>       assert got == R_OKS_AHW
+E       AssertionError: assert [('LukPvq.JXM...), (19, 27)))] == [('LukPvq.JXM...), (56, 57)))]
+E         
+E         At index 1 diff: ('OotGyt.FmcP_UGL_SgvHhu_MME_GEH_kdfba.VsvL_BILR_GtnWga_HGW_RKK_eroog', 'subsequence', 0, ((0, 1), (31, 32), (38, 39), (52, 53), (54, 55), (56, 57))) != ('AwsQdc.VXAO_CSP_KH.NkshfehlTcyfkjea_IPNR', 'fuzzy', 2, ((0, 3), (19, 27)))
+E         Use -v to get more diff
+
+tests/test_b103_label_match.py:492: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_rows_20_3_token_then_fuzzy_then_subsequence
+1 failed, 2 passed, 142 deselected in 5.10s

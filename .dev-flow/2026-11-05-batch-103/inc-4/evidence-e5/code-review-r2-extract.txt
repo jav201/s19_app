@@ -1,0 +1,125 @@
+# E5 code review round 2 - Code-Wire extractor re-run (inc-4, label_match.py)
+# date: 2026-11-07T08:42:03Z  host: Windows PC (extractor only; no s19_app import)
+# worktree HEAD: 08a703cfb79e5143e0022d9f9043dab6d662dcee
+# code-wire: v3.1.0 e436a08
+$ git -C <worktree> archive HEAD s19_app tests tools | tar x -C <scratch>/cw-r2/tree
+rc=0
+# sha256 copy (CR stripped) vs committed blob:
+b97d19ebfe11dd47f096ded2ae6d7dd5f12f6fa02c42d8b9d5f782056bd79ecc *-
+b97d19ebfe11dd47f096ded2ae6d7dd5f12f6fa02c42d8b9d5f782056bd79ecc *-
+# python files in copy: 366
+# marks: one '# node: <name>' line above each of the 17 new defs and parse_a2l_file; tier helpers _text_tiers, _token_tier, _fuzzy_tier, _subsequence_tier, _cut, _is_word_char left unmarked
+$ grep -rn "# node:" <copy>/s19_app
+s19_app/tui/a2l.py:2797:# node: parse_a2l_file
+s19_app/tui/services/label_match.py:110:    # node: LabelIndex.__len__
+s19_app/tui/services/label_match.py:124:# node: build_label_index
+s19_app/tui/services/label_match.py:251:# node: rank
+s19_app/tui/services/label_match.py:673:# node: _fold
+s19_app/tui/services/label_match.py:690:# node: _char_mask
+s19_app/tui/services/label_match.py:728:# node: _tokens
+s19_app/tui/services/label_match.py:762:# node: _allowed_edits
+s19_app/tui/services/label_match.py:785:# node: _prefix_distance
+s19_app/tui/services/label_match.py:840:# node: _join_spans
+s19_app/tui/services/label_match.py:868:# node: _at_boundary
+s19_app/tui/services/label_match.py:902:# node: _subsequence
+s19_app/tui/services/label_match.py:928:# node: _parse_query
+s19_app/tui/services/label_match.py:961:# node: _classify
+s19_app/tui/services/label_match.py:1064:# node: _order_key
+s19_app/tui/services/label_match.py:1087:# node: _token_range
+s19_app/tui/services/label_match.py:1114:# node: _build_trie
+s19_app/tui/services/label_match.py:1163:# node: _fuzzy_token_distances
+# mark count: 18
+$ python -m py_compile <copy>/s19_app/tui/services/label_match.py <copy>/s19_app/tui/a2l.py
+rc=0
+$ python C:/Users/jjgh8/Github/code-wire/tools/codewire_extract.py --repo <copy> --graph <inc-4>/codewire/graph-inc4.md --out <scratch>/cw-r2/out
+marks=18 graph_nodes=18 calls=23 findings=0 parse_failures=0
+extract rc=0
+===== <out>/diff-report.md =====
+# Code-Wire extractor report
+
+- Marks found: 18
+- Graph nodes parsed: 18
+- Real calls between marked nodes: 23
+- Findings: 0 (0 drift, 0 info)
+- Ambiguous call resolutions (a name matched several defs): 3
+- Files that failed to parse: 0
+
+Type normalisation: spaces and quotes dropped; `List/Dict/Tuple/Set` -> builtins; `X | None` and graph `X?` -> `Optional[X]`; graph `(Callable) A->B` -> `Callable[[A], B]`; graph `tuple(A a, B b)` -> `tuple[A, B]`. A bare graph container (`dict`) against a parameterised code type (`dict[str, Any]`) is info (loose match), not drift.
+
+Call resolution is name-based (`f()`, `Class()` -> `__init__`, `self.m()`, `x.m()` -> top-level `m` or a marked method `m`); dynamic calls and callables passed as values are not seen. Tests excluded.
+
+## Counts
+
+| Kind | Count |
+|---|---|
+
+## Real calls between marked nodes
+
+| Caller | Callee | Sites |
+|---|---|---|
+| `_classify` | `_at_boundary` | s19_app/tui/services/label_match.py:1007 |
+| `_classify` | `_fold` | s19_app/tui/services/label_match.py:994 |
+| `_classify` | `_join_spans` | s19_app/tui/services/label_match.py:1029, s19_app/tui/services/label_match.py:1056, s19_app/tui/services/label_match.py:1061 |
+| `_classify` | `_subsequence` | s19_app/tui/services/label_match.py:1058 |
+| `_classify` | `_tokens` | s19_app/tui/services/label_match.py:1013 |
+| `_fuzzy_token_distances` | `_token_range` | s19_app/tui/services/label_match.py:1200 |
+| `_parse_query` | `_fold` | s19_app/tui/services/label_match.py:953 |
+| `_parse_query` | `_tokens` | s19_app/tui/services/label_match.py:954 |
+| `_tokens` | `_at_boundary` | s19_app/tui/services/label_match.py:755 |
+| `build_label_index` | `_build_trie` | s19_app/tui/services/label_match.py:233 |
+| `build_label_index` | `_char_mask` | s19_app/tui/services/label_match.py:186 |
+| `build_label_index` | `_fold` | s19_app/tui/services/label_match.py:185 |
+| `build_label_index` | `_tokens` | s19_app/tui/services/label_match.py:202 |
+| `rank` | `_allowed_edits` | s19_app/tui/services/label_match.py:583 (ref), s19_app/tui/services/label_match.py:599 |
+| `rank` | `_at_boundary` | s19_app/tui/services/label_match.py:382 |
+| `rank` | `_char_mask` | s19_app/tui/services/label_match.py:464 |
+| `rank` | `_classify` | s19_app/tui/services/label_match.py:528 |
+| `rank` | `_fuzzy_token_distances` | s19_app/tui/services/label_match.py:634 |
+| `rank` | `_order_key` | s19_app/tui/services/label_match.py:314, s19_app/tui/services/label_match.py:524 |
+| `rank` | `_parse_query` | s19_app/tui/services/label_match.py:305 |
+| `rank` | `_prefix_distance` | s19_app/tui/services/label_match.py:617 |
+| `rank` | `_subsequence` | s19_app/tui/services/label_match.py:471 |
+| `rank` | `_token_range` | s19_app/tui/services/label_match.py:415 |
+
+Top-level sites (no marked node above them):
+
+- `parse_a2l_file`: s19_app/tui/app.py:948, s19_app/tui/app.py:950, s19_app/tui/services/flow_execution_service.py:381, s19_app/tui/services/flow_execution_service.py:500, s19_app/tui/services/variant_execution_service.py:2665
+# ===== the script that produced this transcript (bash, Windows PC; sha256 ead54dbba277e041f0c61167d1203fb55a3b128df734b5a1aef8c2e5e3c516b8) =====
+#!/bin/bash
+# E5 code review round 2: extractor re-run on a throwaway copy (Windows PC, no s19_app import)
+WT="C:/Users/jjgh8/Github/s19_app-b103-inc4-code"
+S="C:/Users/jjgh8/AppData/Local/Temp/claude/107abb51e32da120/c57f44a4-8a42-42ee-9fb3-80f699575124/scratchpad/cw-r2"
+INC="$WT/.dev-flow/2026-11-05-batch-103/inc-4"
+rm -rf "$S/tree" "$S/out"; mkdir -p "$S/tree" "$S/out"
+echo "# E5 code review round 2 - Code-Wire extractor re-run (inc-4, label_match.py)"
+echo "# date: $(date -u +%Y-%m-%dT%H:%M:%SZ)  host: Windows PC (extractor only; no s19_app import)"
+echo "# worktree HEAD: $(git -C "$WT" rev-parse HEAD)"
+echo "# code-wire: $(git -C C:/Users/jjgh8/Github/code-wire describe --tags --always 2>/dev/null) $(git -C C:/Users/jjgh8/Github/code-wire rev-parse --short HEAD)"
+echo '$ git -C <worktree> archive HEAD s19_app tests tools | tar x -C <scratch>/cw-r2/tree'
+git -C "$WT" archive HEAD s19_app tests tools | tar x -C "$S/tree"; echo "rc=$?"
+F="$S/tree/s19_app/tui/services/label_match.py"
+A="$S/tree/s19_app/tui/a2l.py"
+# archive applies autocrlf; strip CR from the two marked files so they equal the committed blobs
+for f in "$F" "$A"; do tr -d '\r' < "$f" > "$f.lf" && mv "$f.lf" "$f"; done
+echo "# sha256 copy (CR stripped) vs committed blob:"
+sha256sum < "$F"
+git -C "$WT" show HEAD:s19_app/tui/services/label_match.py | sha256sum
+echo "# python files in copy: $(find "$S/tree" -name '*.py' | wc -l)"
+# marks
+sed -i 's/^    def __len__(self) -> int:$/    # node: LabelIndex.__len__\n    def __len__(self) -> int:/' "$F"
+for n in build_label_index rank _fold _char_mask _tokens _allowed_edits _prefix_distance _join_spans _at_boundary _subsequence _parse_query _classify _order_key _token_range _build_trie _fuzzy_token_distances; do
+  sed -i "s/^def $n(/# node: $n\ndef $n(/" "$F"
+done
+sed -i 's/^def parse_a2l_file(/# node: parse_a2l_file\ndef parse_a2l_file(/' "$A"
+echo "# marks: one '# node: <name>' line above each of the 17 new defs and parse_a2l_file; tier helpers _text_tiers, _token_tier, _fuzzy_tier, _subsequence_tier, _cut, _is_word_char left unmarked"
+echo '$ grep -rn "# node:" <copy>/s19_app'
+grep -rn "# node:" "$S/tree/s19_app" | sed "s#$S/tree/##"
+echo "# mark count: $(grep -rn '# node:' "$S/tree/s19_app" | wc -l)"
+echo '$ python -m py_compile <copy>/s19_app/tui/services/label_match.py <copy>/s19_app/tui/a2l.py'
+python -m py_compile "$F" "$A"; echo "rc=$?"
+echo '$ python C:/Users/jjgh8/Github/code-wire/tools/codewire_extract.py --repo <copy> --graph <inc-4>/codewire/graph-inc4.md --out <scratch>/cw-r2/out'
+python C:/Users/jjgh8/Github/code-wire/tools/codewire_extract.py --repo "$S/tree" --graph "$INC/codewire/graph-inc4.md" --out "$S/out"
+echo "extract rc=$?"
+echo "===== <out>/diff-report.md ====="
+cat "$S/out/diff-report.md"
+# ===== end of script; the marked copy <scratch>/cw-r2 was deleted after the run =====

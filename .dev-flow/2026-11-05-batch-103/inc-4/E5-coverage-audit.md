@@ -35,3 +35,44 @@ None. (A table of changed cases would be empty; the corrected Coverage values to
 ## Coverage values to apply
 
 All 120 rows of `02-test-cases.md` keep Coverage = `covered` and their `(full)` / `(full; bound valid on cachyos-rtx only)` marks. Re-open only if note 1 is ruled otherwise or a mutant in note 2 survives.
+
+## Round 2 (2026-11-07T02:42:23-06:00)
+
+Mode: validation (read-only on this PC; nothing run by me). Auditor: qa-reviewer (claude-sonnet-5-5). Scope: only the 18 new and 9 changed cases. Run consumed: `evidence-e5/corrective3-tests-green-full.txt` (165 passed in 182 s, exit 0, QC-TM 102 bounds / 0 under 20 %; label_match sha256 b97d19eb...; executed by the orchestrator/integrator on cachyos-rtx, not by me).
+
+### Counts (138 cases)
+
+| Result | Cases |
+|---|---|
+| Agree (`full` / `covered`) | 138 (120 round 1 + 18 new/re-derived re-checked) |
+| Changed to `partial` | 0 |
+| Changed to `gap` | 0 |
+
+### Changed marks
+
+None (table empty). Per-case verdicts for the cases re-checked:
+
+| Case | Test | Check | Mark |
+|---|---|---|---|
+| .4/1, .4/2 | `test_ranked_list_is_exactly[...]` | expected `[druck_max fuzzy (0,5) e1]` = row; `ü`/`Ü` non-ASCII names left out | agree |
+| .4/4 | same, `KEY`, query U+212A+`ey` | list `[KEY fuzzy (0,3) e1]` pinned by value; Unicode-fold control | agree |
+| .12/4 | same, `ma٣`, limit 3 | MAP_0001-3 fuzzy (0,3) e1 = row | agree |
+| .24/3 | `test_rows_24_3_...` | `[DRUCK_MAX, druck_max]` fuzzy (0,5) e1 by value = row | agree |
+| .37/2 | `test_r_a2l_match_37_2_...` | B4MAX built before `tracemalloc.start()`, sha256 asserted (afe7fad0...), 2,043,024 chars, ASCII, len(index) 50,000; peak <= 67,108,864; GREEN 61,443,368 B | agree |
+| .40/3 | `test_r_a2l_match_40_3_...` | 4/20-token: 20 entries, all fuzzy, edits n-1; 51-token `== []`; median of 7 vs `report_margin(..., timing_bound(2.0))` via `_check_all` | agree |
+| .40/4 | `test_r_a2l_match_40_4_...` | 20 entries, fuzzy, 1 edit, all among the 225; median of 7 <= 2.0 s; no-band control cited | agree |
+| .40/5 | `test_r_a2l_match_40_5_...` | FAMQ(20): 20 fuzzy e14; FAMQ(76) `[]`; median of 7 <= 2.0 s | agree |
+| .41/1-.41/5 | EXACT_CASES items + `cap_boundary[18..25]` | lists by value (e20, [], e21, exact 101 chars, 14-span token list); boundary test is the behavioural control for .41/2-3 | agree |
+| .42/1-.42/4 | `_check_budgeted` | 20 entries, one rule, edits, sha256 of (name, rule, edits, spans) pinned (fixture sha asserted for W40/DEEP40), first-name prefix + length, median of 7 <= 2.0 s through `_check_all`; the shas match the independent probe (`d3-cases-transcript.txt`, `sec-r4-probe.py`, `graph-inc4.md`); mutant (budget removed) 5/5 RED | agree |
+| .42/5 | `test_r_a2l_match_42_5_...` | `== []` (an empty list needs no sha), median of 7 <= 2.0 s | agree |
+| .43/1, .43/3 | EXACT_CASES (+ len(index)==1 for /3) | `VALUE\x7f` prefix (0,5); only `druck_max` substring (6,9) | agree |
+| .43/2 | `test_rows_43_2_...` | `len(index)==0`, `rank == []` | agree |
+
+Withdrawn .40 controls: no longer cited by any test or row; nothing to mark.
+
+### Notes (no mark changed)
+
+1. INFO, record defect, `impl` (record): rows .4/4, .42/1-.42/5 and .43/1-.43/3 in `02-test-cases.md` have no Expected cell (7 cells instead of 8; the Tests text sits under Expected). I derived each expected result from the title and the requirement; the tests' values agree. The shas of .42/1-.42/4 are in the graph and probes, not in the row. Fix: add an Expected cell (the list or the sha256) to those rows.
+2. INFO: the GREEN transcript is dots with `-s`, so a case id is not visible in it; coverage rests on 165 passed / exit 0 of the two whole files plus the test ids. It does not record the test files' sha256, so run-to-file identity is by timeline only (git shows both files unmodified). Fix: print `sha256sum` of the test files in the next transcript.
+3. INFO: `report_margin(timing_bound(...))` is inline in the shared helper `_check_all`, not inline in each test; same effect.
+4. Round-1 notes 1-5 stand unchanged.

@@ -268,3 +268,119 @@ Count (round 3): 0 CRITICAL, 0 HIGH, **1 MAJOR** (E5S-10), 1 MINOR (E5S-11), 1 L
 - [x] No secret values appear here: none exist in the diff, and none were read.
 - [x] The verdict is explicit: **FAIL**, with E5S-10 MAJOR open and its mitigation `planned` (piloted and measured in fixb, not applied). No HIGH is present.
 - [x] New tool or integration: none. The module has no external action surface.
+
+## Round 4 (2026-11-07T02:37:56-06:00)
+
+Re-review of E5S-10, E5S-11 and E5S-12 as `E3-rulings.md` "E5 round-3 rulings" rules them (with its design-pass-3 line): the per-ranking budget of 400,000 trie-node visits (R-A2L-MATCH.42), non-ASCII names left out of the prepared list (R-A2L-MATCH.43), and the 2.0 s texts. Code: `label_match.py` sha256 `b97d19eb…9ecc` (corrective 3, by Sonnet; diff `1c5314ec..HEAD -- s19_app tests`, HEAD `08a703cf`). GREEN: `evidence-e5/green-after-corrective3.txt` (behaviour 145, perf 20, law guards 219). Reviewer: security-reviewer (Opus 5.5), read-only toward the code and the records.
+
+**Probes (state `executed`).**
+- **Where:** cachyos-rtx, Python 3.11.18, an 8 GiB address-space cap and a per-case alarm, against `/tmp/b103-e5r4-4-sec/tree`.
+  - **The tree** is a copy of the read-only `~/work/b103-int4` without `.dev-flow/`, `docs/` and `.git`. The runner's `/tmp` had 0.7 GiB free, and the probe reads none of the three.
+  - **Isolation:** HOME, XDG and LOCALAPPDATA pointed to `/tmp/b103-e5r4-4-sec/zq_iso_user`, with `PYTHONDONTWRITEBYTECODE=1`.
+  - **Every transcript** prints `s19_app.__file__` and the module sha256.
+- **New probe:** `sec-r4-probe.py` loads the round-3 probe (`9cf29242`, unchanged), which loads the round-1 probe (`8700b63b`, unchanged).
+  - **No instrumented copy is needed:** the shipped walk now returns its own visit count.
+  - **Pass-through wrappers** log each walk (token, budget passed, visits, runs) and each tier's time, on one extra ranking.
+  - **Timing medians** use the unwrapped module.
+- **Probe versions:**
+  - `3cbaf0fb` ran shapes4, dear, cheap, boundary, nonascii, check4 and det4.
+  - `21c82297` is that version plus the modes detx and rerun; no earlier mode changed.
+  - **Two earlier detx runs were discarded:** one failed to load the round-3 module; the other retyped P.det's queries and lost their Unicode form. detx now calls P.det itself.
+- **Host load:**
+  - **1.8–4.0** for shapes4, dear, cheap (until COMBO's last query) and the check modes.
+  - **14–17 from 02:15 on**, while another batch's mutant and worker-pool runs shared the host. Boundary, r1 perf, paste and mem, and rerun ran under it.
+  - **Every transcript** prints the load.
+
+### Verdict
+
+**PASS-WITH-NOTES.** E5S-10 (MAJOR), E5S-11 and E5S-12 are closed. No new HIGH or MAJOR. Notes: E5S-13 INFO (updated), E5S-14 INFO, E5S-15 LOW.
+
+**The closing question — is one `rank` call now bounded by a constant over every input in scope? Yes.**
+- **The walks.** All of one ranking's walks share 400,000 visits, and the boundary is exact. One visit costs at most 1.96 µs measured, at m = 256 (the longest query token the 256-character cap allows). So the walks stay under about 0.8 s: 785 ms measured, DEEP40 `'a' * 256`.
+- **Every other tier is bounded by the list, not by the query's shape.** The list's terms: N = 50,000 names, C ≤ 2,356,624 characters, postings P ≤ C. The caps: 256 characters, 20 distinct tokens, the 512 switch, limit 20.
+  - text: one C-level `in` per name, plus a Python scan of the non-boundary occurrences in the names that contain the query (≤ C);
+  - token: C-level postings slices; nested prefixes keep their sum ≤ C;
+  - fuzzy postings: ≤ 20 × P, C-level;
+  - the switch: ≤ 20 × 512 banded `_prefix_distance` calls;
+  - subsequence: ≤ N + C `find` calls;
+  - cut: ≤ N log N, plus limit × `_classify`.
+- **An expensive substring tier never adds to a walk.** It lists every name it scans, so it reaches the limit and every later tier is skipped.
+- **Measured worst on a quiet host** (load 2.8–4.0; `sec-r4-cheap`, `sec-r4-dear`):
+
+  | Shape | Median | Where the time goes |
+  |---|---|---|
+  | SUBMAX `'a'` | 1,439.4 ms (1.39× under 2.0 s) | the substring tier; no walk |
+  | COMBO | 1,233–1,258 ms | the budget + 19 walks of about 600,000 postings each |
+  | INWD | 952.2 ms | the budget at m = 256 + the worst `in` |
+  | DEEP40 `'a' * 256` | 857.8 ms | the budget at m = 256 |
+
+- **The constant is the measured maximum, not a proof.** It is the worst of the shapes tried here. Each tier's own maximum needs its own share of the 2,356,624 characters, and the two shapes that combine tiers (COMBO, INWD) stay at or under 1.26 s.
+- **Under host load 14–17 the same shapes take about twice as long:** E5S-14.
+
+Count (round 4): 0 CRITICAL, 0 HIGH, 0 MAJOR, 0 MEDIUM, 0 MINOR, 1 LOW (E5S-15), 2 INFO (E5S-13 updated, E5S-14). E5S-10's and E5S-11's mitigations are `executed` and verified here. This verdict covers the Inc 4 E5 security gate and authorizes nothing beyond it.
+
+### Round-3 findings
+
+| Id | State | Why (evidence) |
+|---|---|---|
+| E5S-10 MAJOR | **closed** | **Every round-3 attack is bounded now, and removing the budget brings back the round-3 cost** (`sec-r4-shapes4`, `sec-r4-dear`, `sec-r4-boundary`).<br>• **The round-3 shapes,** medians of 7, load 1.8–3.6 (round 3 in brackets):<br>  – W40: 2 tokens 683.1 ms (2,241 ms); 6 tokens 706.7 ms (5.6–6.6 s); `'a' * 39` + b … g 631.5 ms (6,580 ms)<br>  – DEEP40: 1 token 672.6 ms (2,295 ms); 6 tokens 731.2 ms (12,051 ms)<br>  – DEEP258, `'a' * 128` + `'a' * 127`: 786.6 ms (2,902 ms)<br>  – W12 T20: 542.7 ms (4,676–4,722 ms)<br>  – the 76-token FAMQ query: U6 7.3 ms, D3 6.8 ms, U1 5.7 ms; FAMQ(20): U6 418.2 ms, D3 318.4 ms<br>• **Each spends exactly 400,000 visits.** Later walks receive what is left (W12 T20: 400,000 → 226,228 → 52,456 → 0) and the fuzzy rule lists what was found.<br>• **One visit costs 1.40–1.96 µs.** The cost grows with the query token's length: the walks take 607 ms at m = 40 and 785 ms at m = 256. On these shapes one ranking peaks at at most 1.54 MiB.<br>• **Budget removed** (`_FUZZY_NODE_BUDGET = 10**9`): W40 6 tokens 5,633 ms (3,494,116 visits), DEEP40 6 tokens 12,592 ms, W12 T20 4,770 ms, each listing `fuzzy` entries again. So the control turns RED as ruled.<br>• **The boundary is exact** (12,333 DEEP tokens; 27, 28 or 29 one-visit fillers; a sentinel token last in pre-order, `zz` + `'a' * 38`):<br>  – walks of 399,999 and 400,000 visits complete: the sentinel is listed first and the list equals the no-budget list;<br>  – a walk of 400,001 visits stops one visit short: the sentinel is missing, and the list differs;<br>  – on all three lists, the 2-token query `'a' * 40` + `'a' * 39` lists no fuzzy name: its second walk gets at most 1 visit.<br>• **Deterministic** (`sec-r4-det4-*`):<br>  – det4 (W40, DEEP40, W12, DEEP258, INWD and COMBO; 42 rankings, 13 of its 14 queries at the budget) gives `f6a86408…f2fb` under PYTHONHASHSEED 0, 1, 4242 and `random`;<br>  – 0 repeated calls differ;<br>  – .42/1–/4 equal the sha256 values the tests pin, and .42/5 is `[]`, under every seed. |
+| E5S-11 MINOR | **closed** | **No non-ASCII name reaches the prepared list** (`sec-r4-nonascii`).<br>• **One such character, at the start, the middle or the end of a name, leaves the name out:** U+0080, U+00E9, U+00FF, U+0100, U+0130, U+2028, U+FEFF, U+FFFF, U+10000, U+10FFFF, a lone U+D800 and U+212A. A name with U+007F is kept.<br>• **All-non-ASCII lists:** AST1 and LAT1 (50,000 names, 1,950,000 characters each) prepare 0 names in 0.00 s, with a peak of 2,000 B (round 3: AST1 208.0 MiB).<br>• **Mixed lists keep exactly the ASCII names, in first-occurrence order:**<br>  – ONE (each name with one trailing `é`): 0 names<br>  – HALF: 25,000<br>  – REF with every 7th name made non-ASCII: 42,857 (16.5 MiB)<br>  – duplicates around non-ASCII twins: 3<br>  – a `str` subclass, an iterator and a generator behave the same<br>• **Ranking** these indexes with ASCII, non-ASCII and astral queries gives 0 exceptions, 0 bad spans and no non-ASCII name.<br>• **R-A2L-MATCH.43 is the only change of any list since round 3** (`sec-r4-detx-0`, `sec-r4-r1-det-r3tree`; P.det's own queries):<br>  – the round-3 module (`8f396c15`) still gives round 3's `132f1e9e…712e` on the hostile list as it is;<br>  – on its ASCII names only, it gives `e658b979…2d53`, the value of this code. |
+| E5S-12 LOW | **closed** | **The records match the 2.0 s ruling.**<br>• R-A2L-MATCH.40 reads "within 2.0 s" (`01-requirements.md:166`), and cases .40/1–/5 read "≤ 2.0 s" (`02-test-cases.md:147-151`).<br>• .41 dropped its timing control (`01-requirements.md:167`).<br>• The "1.0 s" strings left are history notes, such as "RED against the 1.0 s of A-2". |
+| E5S-13 INFO | continues, updated below | |
+
+### New findings
+
+| Id | Severity | Tag | Where · row | Defect (measured) | Fix |
+|---|---|---|---|---|---|
+| E5S-13 (updated) | INFO | design-gap | `_text_tiers`, `label_match.py:374-384` (the occurrence loop) · R-A2L-MATCH.40 (its cases name SUBO only) | **The substring tier is now the dearest path in .40's scope, and the budget does not reach it** (`sec-r4-cheap`).<br>• **Its cost** is the non-boundary occurrences in the names that contain the query: at most the list's characters.<br>• **SUBMAX** (50,000 names: a 4-letter upper-case tag + `'A' * 43`; 2,350,000 characters; 2,150,000 non-boundary occurrences of `a`): **1,439.4 ms**, median of 7 at load 2.8 (text 1,380 ms, cut 58 ms). That is 1.39× under 2.0 s, a 28 % margin.<br>• **The other substring lists:** SUBU 1,347.4 ms, SUBD (digits) 1,175.5 ms, SUBO (the row's case) 964.1 ms.<br>• **Not measured:** a 3-letter tag would add about 5 % more occurrences (an estimate).<br>• **What contains it:** the tier lists every name it scans, so it never runs beside a walk. | Optional, as in round 3: test only a name's boundary offsets (at most its tokens) instead of every occurrence. Otherwise add SUBMAX to .40's cases; its 28 % margin is above QC-TM's 20 %. |
+| E5S-14 | INFO | design-gap | `rank` (no cancellation point) · R-A2L-MATCH.40 (`serial_timing`) · Inc 7 PLAN row 7 (ranking off the UI thread, stale results dropped) | **The 2.0 s bound holds on a quiet host only** (`sec-r4-rerun`, `sec-r4-boundary`, `sec-r4-r1-perf`). At load 14–17 on 16 cores:<br>• SUBMAX 2,948 ms, SUBU 2,439 ms, COMBO 2,895–2,934 ms: over 2.0 s.<br>• INWD 1,685 ms, DEEP40 `'a' * 256` 1,404 ms.<br>• One 400,000-visit walk: 1.34–1.40 s.<br>• r1 perf: REF6 `0` 226 ms, over .36's 200 ms.<br>At load 1.8–4.0 the same shapes take 0.71–1.44 s, so the code is not the cause. The ranking is bounded either way: a stale ranking now ends in about 1.5 s (quiet) to 3 s (loaded), where round 3 found 5–12 s. | For Inc 7's E1: keep the ruled off-thread ranking that drops stale results. Optionally have `rank` check a cancellation flag between tiers, so a superseded ranking stops early. No change in Inc 4. |
+| E5S-15 | LOW | impl | `label_match.py:13-14` (the module docstring lists five standard-library modules; `collections.Counter` is imported at `:23`) · `rank`'s Data Flow at `:274-277` (it names .41's cap, not .42's node budget) | **The docstrings lag the code.** | Add `collections` to the module docstring. Add the node budget to `rank`'s Data Flow: "the fuzzy walks of one ranking share 400,000 trie-node visits, R-A2L-MATCH.42". |
+
+### Checked and clear (round 4)
+
+- **The cheap tiers, and shapes that combine them with the walk** (`sec-r4-cheap`; medians of 5–7; load 2.8–4.0, rising to 13.8 during COMBO's last query):
+  - **INW** (2,114 names of 1,024 characters): INWQ (`'a' * 253 + 'b' + 'aa'`) makes `str.__contains__` compare 254 characters per window. 214.3 ms, of which the text tier takes 124 ms.
+  - **INWD** (600 DEEP names + 1,538 INW names): INWQ spends the budget at m = 256, 952.2 ms; `'a' * 256` takes 907.3 ms in the substring tier.
+  - **COMBO** (600 DEEP names + 49,400 names of camel `Ab` + X tokens; 602,800 postings): 19 three-letter query tokens each read every posting, then the 20th spends the budget.
+    - 19 camel tokens + `'a' * 198`: 1,233.0 ms
+    - the same tokens spaced, + `'a' * 180`: 1,258.1 ms
+    - 10 tokens + `'a' * 225`: 1,085.9 ms
+    - 19 tokens + `'a' * 40`: 1,215.1 ms, listing 20 `fuzzy` entries
+  - **Peaks:** one ranking peaks at at most 26.1 MiB (COMBO). U6 FAMQ(20) peaks at 19.0 MiB.
+- **Exceptions, spans and the oracle** (`sec-r4-check4`; the round-3 check, with its oracle given only the ASCII names):
+  - **Hostile set:** 3,123 queries × 3 limits, 15,309 entries: 0 exceptions, 0 bad spans, 0 mismatches.
+  - **Randomized:** 1,600 rankings, 202 of them past 20 distinct tokens: 0 exceptions, 0 bad spans, 0 mismatches, and the forced switch paths agree.
+  - **.41's control:** with the cap removed, /2 lists 3 × `fuzzy` e21.
+  - **The oracle has no budget, so the walk log checks it still applies:** no walk in these sets spent the budget. The most visits in one walk were 9,937, and at least 380,600 were left after any walk.
+  - **Unchanged since round 3:** the I-3 `TypeError` texts, and the index buffers and the argument list after the rankings.
+- **Paste** (`sec-r4-r1-paste`, at load 17): every 64 KiB paste that is over 256 characters after the strip returns `[]`, in at most 0.024 ms with a peak of at most 64.2 KiB. A 257-character query returns `[]` too.
+- **Fixtures:**
+  - **Memory** (`sec-r4-r1-mem`): the REF build peaks at 17.8 MiB; one ranking peaks at at most 11.5 MiB (REF6).
+  - **Timing** (`sec-r4-r1-perf`, at load 17): every case is under 2.0 s. REF6 `0` takes 226 ms, over .36's 200 ms under that load (round 3, at a quiet time: 102.1 ms; the GREEN run passes).
+  - **Determinism** (`sec-r4-r1-det-*`): the round-1 det set gives `e658b979…` under all four seeds.
+- **Outside every row's scope**, for the record:
+  - 1,000,000 short names: `'sig'` takes 1.85 s (BL-I4-5).
+  - Limits above 20 (E5S-09).
+- **Isolation:** the corrective adds no import and no I/O. Neither the diff nor the transcripts hold a secret, a home path or the operator's name.
+
+### Evidence (round 4)
+
+`evidence-e5/`, with sha256 prefixes:
+- **Probe and scripts:** `sec-r4-probe.py` (`21c82297`), runner `sec-r4-run.sh` (`7225a0c0`), chain `sec-r4-chain.sh` (`40487054`).
+- **Transcripts of the new probe** (each `sec-r4-<mode>-transcript.txt`):
+  - shapes4 (`a132db6e`), dear (`0bf81eab`), cheap (`d9b3d6f1`)
+  - boundary (`d81e8c9e`), rerun (`8d0f8d61`)
+  - nonascii (`479d0b3b`), check4 (`e5b29e27`), detx-0 (`ec161e3c`)
+  - det4-{0,1,4242,random} (`4d249391`, `259f40de`, `f39ad892`, `65625688`)
+- **Transcripts of the round-1 probe** (each `sec-r4-r1-<mode>-transcript.txt`):
+  - perf (`390d2450`), paste (`a02e7191`), mem (`9c0f7917`)
+  - det-{0,1,4242,random} (`69af35eb`, `526b3e24`, `19a28a0a`, `f027e835`)
+  - det-r3tree (`c78d90c0`), run on the round-3 tree copy, read-only
+- **Not run:** the Windows PC and CI (the brief's rule); CPython 3.12. The scratch `/tmp/b103-e5r4-4-sec` is kept on cachyos-rtx until this evidence is committed.
+
+### Evidence checklist (round 4)
+
+- [x] Each finding has a severity, `file:line`, the row, a fix and a tag: the table above.
+- [x] No secret values appear here: none exist in the diff, and none were read.
+- [x] The verdict is explicit: **PASS-WITH-NOTES**, with no HIGH or MAJOR open. E5S-10's mitigation is applied (`executed`) and verified here, with its control and its exact boundary.
+- [x] New tool or integration: none. The module has no external action surface.

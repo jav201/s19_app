@@ -1,0 +1,174 @@
+=== s19_app.__file__ ===
+/home/javiergr/mutr4B-work/s19_app/__init__.py
+
+=== DIFF base -> M-36b (s19_app/tui/services/label_match.py) ===
+--- /tmp/b103-e5-4-mutr4B/base/s19_app/tui/services/label_match.py	2026-11-07 01:32:51.000000000 -0600
++++ /home/javiergr/mutr4B-work/s19_app/tui/services/label_match.py	2026-11-07 02:47:42.632416421 -0600
+@@ -1179,9 +1179,13 @@
+             sorted and disjoint (possibly empty), and the number of nodes
+             visited (0 for ``allowed`` 0 or ``budget`` 0).
+     """
+-    if allowed == 0:
+-        lo, hi = _token_range(index._tokens, query_token)
+-        return ([(lo, hi, 0)] if lo < hi else []), 0
++    if True:
++        out = []
++        for _tid, _tok in enumerate(index._tokens):
++            _d = _prefix_distance(query_token, _tok, allowed)
++            if _d <= allowed:
++                out.append((_tid, _tid + 1, _d))
++        return out, len(index._tokens)
+ 
+     chars = index._trie_chars
+     depth = index._trie_depth
+
+=== uptime before ===
+02:47:42 up 1 day, 18:19,  4 users,  load average: 13.76, 13.93, 13.25
+
+=== uptime after ===
+02:50:03 up 1 day, 18:21,  8 users,  load average: 14.76, 14.10, 13.40
+
+=== PYTEST (tail, rc=1) ===
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_____________ test_r_a2l_match_36_1_ranking_per_keystroke_over_ref _____________
+
+ref_index = <s19_app.tui.services.label_match.LabelIndex object at 0x7f91f6a230c0>
+qset_ref = ['a', 'e', '0', 'zz', 'ab', 'JotafVod_msrqlLzL_kh2C_rWl_pfue._0_', ...]
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_match_36_1_ranking_per_keystroke_over_ref(ref_index, qset_ref):
+        """R-A2L-MATCH.36/1: each query of QSET over REF, limit 20, median of 7 rankings <= 200 ms."""
+        print(_load("before"))
+        medians = []
+        for query in qset_ref:
+            medians.append((f"R-A2L-MATCH.36 REF {query[:40]!r}", _median_of(7, lambda q=query: rank(q, ref_index, 20))))
+        print(_load("after"))
+>       _check_all(medians, KEYSTROKE_BOUND_S)
+
+tests/test_b103_label_match_perf.py:304: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+medians = [("R-A2L-MATCH.36 REF 'a'", 0.09101072102203034), ("R-A2L-MATCH.36 REF 'e'", 0.0926655950024724), ("R-A2L-MATCH.36 REF...EF 'ab'", 0.01066572600393556), ("R-A2L-MATCH.36 REF 'JotafVod_msrqlLzL_kh2C_rWl_pfue._0_'", 0.11352985101984814), ...]
+bound_s = 0.2
+
+    def _check_all(medians, bound_s):
+        """Print EVERY margin line (no truncation, whatever the reporter or a ``tail`` keeps), then assert each
+        median against ``report_margin(..., timing_bound(bound_s))``; the failure names its label."""
+        bound = timing_bound(bound_s)
+        for label_, median in medians:
+            print(f"  {median * 1000:9.2f} ms  {(bound - median) / bound * 100:6.1f} % margin  {label_}")
+        for label_, median in medians:
+>           assert median <= report_margin(label_, median, timing_bound(bound_s)), f"{label_}: median {median:.4f} s"
+E           AssertionError: R-A2L-MATCH.36 REF 'JotafVod_msr': median 0.5508 s
+E           assert 0.5508352640026715 <= 0.2
+E            +  where 0.2 = report_margin("R-A2L-MATCH.36 REF 'JotafVod_msr'", 0.5508352640026715, 0.2)
+E            +    where 0.2 = timing_bound(0.2)
+
+tests/test_b103_label_match_perf.py:261: AssertionError
+----------------------------- Captured stdout call -----------------------------
+host load before: 13.62 13.90 13.24
+host load after: 14.09 13.95 13.33
+      91.01 ms    54.5 % margin  R-A2L-MATCH.36 REF 'a'
+      92.67 ms    53.7 % margin  R-A2L-MATCH.36 REF 'e'
+      19.69 ms    90.2 % margin  R-A2L-MATCH.36 REF '0'
+       9.18 ms    95.4 % margin  R-A2L-MATCH.36 REF 'zz'
+      10.67 ms    94.7 % margin  R-A2L-MATCH.36 REF 'ab'
+     113.53 ms    43.2 % margin  R-A2L-MATCH.36 REF 'JotafVod_msrqlLzL_kh2C_rWl_pfue._0_'
+     550.84 ms  -175.4 % margin  R-A2L-MATCH.36 REF 'JotafVod_msr'
+     674.57 ms  -237.3 % margin  R-A2L-MATCH.36 REF 'srqlLzL_'
+     670.57 ms  -235.3 % margin  R-A2L-MATCH.36 REF '0 jotaf'
+       4.20 ms    97.9 % margin  R-A2L-MATCH.36 REF 'JVmL'
+     845.01 ms  -322.5 % margin  R-A2L-MATCH.36 REF 'xqzjvkw'
+     399.21 ms   -99.6 % margin  R-A2L-MATCH.36 REF 'qqqq zzzz'
+     564.62 ms  -182.3 % margin  R-A2L-MATCH.36 REF 'aaaa'
+      19.92 ms    90.0 % margin  R-A2L-MATCH.36 REF 'e e e'
+     897.41 ms  -348.7 % margin  R-A2L-MATCH.36 REF 'Nzukij'
+    1298.08 ms  -549.0 % margin  R-A2L-MATCH.36 REF 'Ierxjr_Eud'
+    1055.88 ms  -427.9 % margin  R-A2L-MATCH.36 REF 'ledRing'
+    1133.04 ms  -466.5 % margin  R-A2L-MATCH.36 REF 'pposbxiif'
+       3.31 ms    98.3 % margin  R-A2L-MATCH.36 REF 'cnt'
+    1055.83 ms  -427.9 % margin  R-A2L-MATCH.36 REF 'temp_sensor_max'
+     255.78 ms   -27.9 % margin  R-A2L-MATCH.36 REF 'x y z w v u'
+    1028.27 ms  -414.1 % margin  R-A2L-MATCH.36 REF 'pposbxiifkdgfiajnbbpvb_dyan_xvz1'
+     814.33 ms  -307.2 % margin  R-A2L-MATCH.36 REF 'njraipjtbtu lsuakcoj hsxgibymjxu orfltal'
+     766.62 ms  -283.3 % margin  R-A2L-MATCH.36 REF 'votklbi fjblnabj qghque pdjxmq tiprdynot'
+     803.48 ms  -301.7 % margin  R-A2L-MATCH.36 REF 'lmmwngodou jadkvqy khbnukc qomfrybiza ev'
+      15.76 ms    92.1 % margin  R-A2L-MATCH.36 REF 'e e e e e e e e e e e e e e e e e e e e '
+      18.25 ms    90.9 % margin  R-A2L-MATCH.36 REF 'a b c d e f g h i j k l m n o p q r s t '
+       8.61 ms    95.7 % margin  R-A2L-MATCH.36 REF '0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 '
+    2225.35 ms  -1012.7 % margin  R-A2L-MATCH.36 REF 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+      13.86 ms    93.1 % margin  R-A2L-MATCH.36 REF 'FCA_NPUK_SMM.RWG_TjsPHIoim_SNX_TVC_2_ewh'
+      12.91 ms    93.5 % margin  R-A2L-MATCH.36 REF 'RUX_ARV_LFS_QM_GJWTDMS_WDGTH.Fgathduhjd,'
+      14.49 ms    92.8 % margin  R-A2L-MATCH.36 REF 'HRR_WOL.TNY_U_ZmyrXSZTPeyoMsdpWwbcUtd_Dw'
+      13.19 ms    93.4 % margin  R-A2L-MATCH.36 REF 'RHR_WOL.TNY_U_ZmyrXSZTPeyoMsdpWwbcUtd_Dw'
+____________ test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6 _____________
+
+ref6_index = <s19_app.tui.services.label_match.LabelIndex object at 0x7f91f7b88540>
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6(ref6_index):
+        """R-A2L-MATCH.36/1: each query of the REF6 query set over REF6, limit 20, median of 7 <= 200 ms."""
+        print(_load("before"))
+        medians = []
+        for query in REF6_QUERIES:
+            medians.append((f"R-A2L-MATCH.36 REF6 {query!r}", _median_of(7, lambda q=query: rank(q, ref6_index, 20))))
+        print(_load("after"))
+>       _check_all(medians, KEYSTROKE_BOUND_S)
+
+tests/test_b103_label_match_perf.py:315: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+medians = [("R-A2L-MATCH.36 REF6 'm'", 0.06403338600648567), ("R-A2L-MATCH.36 REF6 'meas_'", 0.0642383840167895), ("R-A2L-MATCH....401205003), ("R-A2L-MATCH.36 REF6 'cahr'", 0.11799931799760088), ("R-A2L-MATCH.36 REF6 'cr0'", 0.138982557982672), ...]
+bound_s = 0.2
+
+    def _check_all(medians, bound_s):
+        """Print EVERY margin line (no truncation, whatever the reporter or a ``tail`` keeps), then assert each
+        median against ``report_margin(..., timing_bound(bound_s))``; the failure names its label."""
+        bound = timing_bound(bound_s)
+        for label_, median in medians:
+            print(f"  {median * 1000:9.2f} ms  {(bound - median) / bound * 100:6.1f} % margin  {label_}")
+        for label_, median in medians:
+>           assert median <= report_margin(label_, median, timing_bound(bound_s)), f"{label_}: median {median:.4f} s"
+E           AssertionError: R-A2L-MATCH.36 REF6 '0': median 0.2569 s
+E           assert 0.2569391180004459 <= 0.2
+E            +  where 0.2 = report_margin("R-A2L-MATCH.36 REF6 '0'", 0.2569391180004459, 0.2)
+E            +    where 0.2 = timing_bound(0.2)
+
+tests/test_b103_label_match_perf.py:261: AssertionError
+----------------------------- Captured stdout call -----------------------------
+host load before: 14.25 13.98 13.35
+host load after: 14.76 14.10 13.40
+      64.03 ms    68.0 % margin  R-A2L-MATCH.36 REF6 'm'
+      64.24 ms    67.9 % margin  R-A2L-MATCH.36 REF6 'meas_'
+      91.49 ms    54.3 % margin  R-A2L-MATCH.36 REF6 'chr'
+      92.28 ms    53.9 % margin  R-A2L-MATCH.36 REF6 'mesa'
+     118.00 ms    41.0 % margin  R-A2L-MATCH.36 REF6 'cahr'
+     138.98 ms    30.5 % margin  R-A2L-MATCH.36 REF6 'cr0'
+      46.53 ms    76.7 % margin  R-A2L-MATCH.36 REF6 'char 1'
+     256.94 ms   -28.5 % margin  R-A2L-MATCH.36 REF6 '0'
+     165.49 ms    17.3 % margin  R-A2L-MATCH.36 REF6 'chr 0'
+      79.70 ms    60.1 % margin  R-A2L-MATCH.36 REF6 'ch00'
+      64.58 ms    67.7 % margin  R-A2L-MATCH.36 REF6 'meas 1'
+      55.16 ms    72.4 % margin  R-A2L-MATCH.36 REF6 'c 0 1'
+============================= QC-TM timing margins =============================
+LOW -175.4%  0.551 s / 0.200 s  R-A2L-MATCH.36 REF 'JotafVod_msr'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+LOW -28.5%  0.257 s / 0.200 s  R-A2L-MATCH.36 REF6 '0'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+30.5%  0.139 s / 0.200 s  R-A2L-MATCH.36 REF6 'cr0'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+41.0%  0.118 s / 0.200 s  R-A2L-MATCH.36 REF6 'cahr'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+43.2%  0.114 s / 0.200 s  R-A2L-MATCH.36 REF 'JotafVod_msrqlLzL_kh2C_rWl_pfue._0_'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+53.7%  0.093 s / 0.200 s  R-A2L-MATCH.36 REF 'e'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+53.9%  0.092 s / 0.200 s  R-A2L-MATCH.36 REF6 'mesa'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+54.3%  0.091 s / 0.200 s  R-A2L-MATCH.36 REF6 'chr'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+54.5%  0.091 s / 0.200 s  R-A2L-MATCH.36 REF 'a'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+67.9%  0.064 s / 0.200 s  R-A2L-MATCH.36 REF6 'meas_'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+68.0%  0.064 s / 0.200 s  R-A2L-MATCH.36 REF6 'm'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+76.7%  0.047 s / 0.200 s  R-A2L-MATCH.36 REF6 'char 1'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+90.2%  0.020 s / 0.200 s  R-A2L-MATCH.36 REF '0'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+94.7%  0.011 s / 0.200 s  R-A2L-MATCH.36 REF 'ab'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+95.4%  0.009 s / 0.200 s  R-A2L-MATCH.36 REF 'zz'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+QC-TM: 15 bounds, 2 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+FAILED tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+2 failed, 18 deselected in 139.66s (0:02:19)

@@ -46,3 +46,11 @@
 2026-11-07T01:30:08-06:00 E5 corrective 3 code — DeepSeek run 1 failed with an API 500 (no change made); retrying once
 2026-11-07T01:32:02-06:00 E5 corrective 3 code — DeepSeek run 2 failed (stream ended without finish_reason); falling back to Sonnet (memory rule: Sonnet backs DeepSeek when it hangs or fails)
 2026-11-07T01:45:34-06:00 E5 corrective 3 GREEN — sha256 b97d19eb: behaviour 145, perf 20 (102 bounds, 0 under 20 %), 7 law guards 219; mutants round 4 + security round 4 next
+2026-11-07T02:03:05-06:00 E5 security round 4 start claude-opus-5-5 (security-reviewer, inc-4; re-review of E5S-10/-11/-12 as E3-rulings 'E5 round-3 rulings' rules them; label_match.py b97d19eb; probes in /tmp/b103-e5r4-4-sec on cachyos-rtx)
+2026-11-07T02:03:00-06:00 E5 mutants-A round-4 start deepseek-v4-pro (mutA, inc-4 rows R-A2L-MATCH.1-.20, corrected code b97d19eb, cachyos-rtx /tmp/b103-e5-4-mutr4A)
+2026-11-07T02:06:00-06:00 E5 mutants-A round-4 end deepseek-v4-pro (mutA): 21 killed / 0 survived / 0 not realisable
+2026-11-07T02:40:19-06:00 E5 security round 4 end claude-opus-5-5 (security-reviewer, inc-4): PASS-WITH-NOTES; E5S-10 closed (round-3 attacks 543-787 ms, budget exact at 399,999/400,000/400,001, 4 hash seeds equal, budget removed W40 6 tokens 5.6 s RED), E5S-11 closed (non-ASCII names left out, AST1 2,000 B), E5S-12 closed; worst found SUBMAX 1,439 ms in the substring tier (E5S-13 INFO), COMBO 1,233-1,258 ms; E5S-14 INFO (host load 14-17 doubles the times, up to 2.95 s), E5S-15 LOW docstrings; evidence-e5/sec-r4-*
+2026-11-07T02:40:57-06:00 E5 coverage re-audit round 2 start qa-reviewer (inc-4; read-only)
+2026-11-07T08:41:02Z E5 round-2 start claude-opus-5-5 (code review, inc-4 label_match.py b97d19eb, delta 2e975987..HEAD)
+2026-11-07T02:42:23-06:00 E5 coverage re-audit round 2 end qa-reviewer (inc-4): 138 agree / 0 partial / 0 gap; notes: rows .4/4,.42,.43 lack Expected cell
+2026-11-07T03:05:45-06:00 E5 mutants round 4 — on b97d19eb: unit A 21/21 killed (DeepSeek), unit B 32/32 killed (DeepSeek's remote driver; pi timed out locally; table compiled by the orchestrator from the transcripts) — 53/53 killed, 0 survived; runner scratch deleted

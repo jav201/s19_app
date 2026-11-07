@@ -1,0 +1,183 @@
+=== s19_app.__file__ ===
+/home/javiergr/mutr4B-work/s19_app/__init__.py
+
+=== DIFF base -> M-42 (s19_app/tui/services/label_match.py) ===
+--- /tmp/b103-e5-4-mutr4B/base/s19_app/tui/services/label_match.py	2026-11-07 01:32:51.000000000 -0600
++++ /home/javiergr/mutr4B-work/s19_app/tui/services/label_match.py	2026-11-07 03:03:52.748976435 -0600
+@@ -53,7 +53,7 @@
+ # ranking share this many trie node visits. The cap bounds how many walks run,
+ # not what one walk visits; a walk that reaches the budget returns the runs it
+ # found so far. A count, never a clock, so the lists are the same on every host.
+-_FUZZY_NODE_BUDGET = 400_000
++_FUZZY_NODE_BUDGET = 10**12
+ 
+ 
+ class MatchRule(str, Enum):
+
+=== uptime before ===
+03:03:52 up 1 day, 18:35,  9 users,  load average: 13.89, 16.94, 16.18
+
+=== uptime after ===
+03:04:35 up 1 day, 18:36,  8 users,  load average: 11.71, 16.00, 15.90
+
+=== PYTEST (tail, rc=1) ===
+        token finds no name token, so the fuzzy rule lists nothing and 20 ``subsequence`` entries remain; median of 7 <= 2.0 s."""
+        query = runs_query((40, 39))
+        assert len(query) == 80
+>       got = _check_budgeted("R-A2L-MATCH.42/1 W40 2 tokens", w40_pinned_index, query, "subsequence", 0,
+                              "29cb2305cae359f658d4f9d00644608ed26c83214fc09889ba8efd4076cb32cd")
+
+tests/test_b103_label_match_perf.py:800: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+case_id = 'R-A2L-MATCH.42/1 W40 2 tokens'
+index = <s19_app.tui.services.label_match.LabelIndex object at 0x7f8ae13f6a40>
+query = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+expected_rule = 'subsequence', expected_edits = 0
+expected_sha = '29cb2305cae359f658d4f9d00644608ed26c83214fc09889ba8efd4076cb32cd'
+
+    def _check_budgeted(case_id, index, query, expected_rule, expected_edits, expected_sha):
+        """Exact budget-truncated list first (20 entries, one rule, pinned sha256), then the median of 7 <= 2.0 s."""
+        got = rank(query, index, 20)
+        assert len(got) == 20, case_id
+>       assert {m.rule.value for m in got} == {expected_rule}, case_id
+E       AssertionError: R-A2L-MATCH.42/1 W40 2 tokens
+E       assert {'fuzzy'} == {'subsequence'}
+E         
+E         Extra items in the left set:
+E         'fuzzy'
+E         Extra items in the right set:
+E         'subsequence'
+E         Use -v to get more diff
+
+tests/test_b103_label_match_perf.py:784: AssertionError
+______ test_r_a2l_match_42_2_six_token_query_over_w40_the_budget_control _______
+
+w40_pinned_index = <s19_app.tui.services.label_match.LabelIndex object at 0x7f8ae13f6a40>
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_match_42_2_six_token_query_over_w40_the_budget_control(w40_pinned_index):
+        """R-A2L-MATCH.42/2: ``'a' * 40`` .. ``'a' * 35`` (230 characters, 6 distinct tokens) over W40: 20 ``subsequence`` entries,
+        median of 7 <= 2.0 s. The budget's negative control: with no budget the ranking takes 5.5 s and lists 3-edit ``fuzzy``."""
+        query = runs_query(range(40, 34, -1))
+        assert len(query) == 230
+>       got = _check_budgeted("R-A2L-MATCH.42/2 W40 6 tokens", w40_pinned_index, query, "subsequence", 0,
+                              "4243a09dd1d9577dd3ceb5e710c17716a066f9bd4f8423c86684689bb8a1b3e7")
+
+tests/test_b103_label_match_perf.py:811: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+case_id = 'R-A2L-MATCH.42/2 W40 6 tokens'
+index = <s19_app.tui.services.label_match.LabelIndex object at 0x7f8ae13f6a40>
+query = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+expected_rule = 'subsequence', expected_edits = 0
+expected_sha = '4243a09dd1d9577dd3ceb5e710c17716a066f9bd4f8423c86684689bb8a1b3e7'
+
+    def _check_budgeted(case_id, index, query, expected_rule, expected_edits, expected_sha):
+        """Exact budget-truncated list first (20 entries, one rule, pinned sha256), then the median of 7 <= 2.0 s."""
+        got = rank(query, index, 20)
+        assert len(got) == 20, case_id
+>       assert {m.rule.value for m in got} == {expected_rule}, case_id
+E       AssertionError: R-A2L-MATCH.42/2 W40 6 tokens
+E       assert {'fuzzy'} == {'subsequence'}
+E         
+E         Extra items in the left set:
+E         'fuzzy'
+E         Extra items in the right set:
+E         'subsequence'
+E         Use -v to get more diff
+
+tests/test_b103_label_match_perf.py:784: AssertionError
+_ test_r_a2l_match_42_3_one_token_walk_cut_by_the_budget_still_lists_what_it_found _
+
+deep40_index = <s19_app.tui.services.label_match.LabelIndex object at 0x7f8ae1367f40>
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_match_42_3_one_token_walk_cut_by_the_budget_still_lists_what_it_found(deep40_index):
+        """R-A2L-MATCH.42/3: ``'a' * 40`` over DEEP40: the one walk stops after 400,000 visits, yet 20 ``fuzzy`` entries of 2 edits
+        are listed (the same 20 names as with no budget); entry 1 has the span (123, 163), its leftmost token found; median of 7 <= 2.0 s."""
+>       got = _check_budgeted("R-A2L-MATCH.42/3 DEEP40 1 token", deep40_index, "a" * 40, "fuzzy", 2,
+                              "094071ae7a78cfda29d688955b846ef9984090df8b7133a136a3efe5579e350c")
+
+tests/test_b103_label_match_perf.py:820: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+case_id = 'R-A2L-MATCH.42/3 DEEP40 1 token'
+index = <s19_app.tui.services.label_match.LabelIndex object at 0x7f8ae1367f40>
+query = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', expected_rule = 'fuzzy'
+expected_edits = 2
+expected_sha = '094071ae7a78cfda29d688955b846ef9984090df8b7133a136a3efe5579e350c'
+
+    def _check_budgeted(case_id, index, query, expected_rule, expected_edits, expected_sha):
+        """Exact budget-truncated list first (20 entries, one rule, pinned sha256), then the median of 7 <= 2.0 s."""
+        got = rank(query, index, 20)
+        assert len(got) == 20, case_id
+        assert {m.rule.value for m in got} == {expected_rule}, case_id
+        assert {m.edits for m in got} == {expected_edits}, case_id
+>       assert _sha_list(got) == expected_sha, case_id
+E       AssertionError: R-A2L-MATCH.42/3 DEEP40 1 token
+E       assert '7ca343eeb228...d49c2d47556c1' == '094071ae7a78...3efe5579e350c'
+E         
+E         - 094071ae7a78cfda29d688955b846ef9984090df8b7133a136a3efe5579e350c
+E         + 7ca343eeb2287415b244fe0e6a1e24c59f6aa75b44b6737145ad49c2d47556c1
+
+tests/test_b103_label_match_perf.py:786: AssertionError
+______________ test_r_a2l_match_42_4_six_token_query_over_deep40 _______________
+
+deep40_index = <s19_app.tui.services.label_match.LabelIndex object at 0x7f8ae1367f40>
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_match_42_4_six_token_query_over_deep40(deep40_index):
+        """R-A2L-MATCH.42/4: ``'a' * 40`` .. ``'a' * 35`` (230 characters) over DEEP40: 20 ``subsequence`` entries (entry 1 the name of
+        /3), median of 7 <= 2.0 s; with no budget 20 ``fuzzy`` entries of 12 edits in 11.6 s."""
+>       got = _check_budgeted("R-A2L-MATCH.42/4 DEEP40 6 tokens", deep40_index, runs_query(range(40, 34, -1)), "subsequence", 0,
+                              "c032a4c1c1816604f9fe0f37368a6fe3d96f2100e0a3da96667b36f787529ef2")
+
+tests/test_b103_label_match_perf.py:830: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+case_id = 'R-A2L-MATCH.42/4 DEEP40 6 tokens'
+index = <s19_app.tui.services.label_match.LabelIndex object at 0x7f8ae1367f40>
+query = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+expected_rule = 'subsequence', expected_edits = 0
+expected_sha = 'c032a4c1c1816604f9fe0f37368a6fe3d96f2100e0a3da96667b36f787529ef2'
+
+    def _check_budgeted(case_id, index, query, expected_rule, expected_edits, expected_sha):
+        """Exact budget-truncated list first (20 entries, one rule, pinned sha256), then the median of 7 <= 2.0 s."""
+        got = rank(query, index, 20)
+        assert len(got) == 20, case_id
+>       assert {m.rule.value for m in got} == {expected_rule}, case_id
+E       AssertionError: R-A2L-MATCH.42/4 DEEP40 6 tokens
+E       assert {'fuzzy'} == {'subsequence'}
+E         
+E         Extra items in the left set:
+E         'fuzzy'
+E         Extra items in the right set:
+E         'subsequence'
+E         Use -v to get more diff
+
+tests/test_b103_label_match_perf.py:784: AssertionError
+______ test_r_a2l_match_42_5_twenty_distinct_tokens_over_w12_list_nothing ______
+
+w12_index = <s19_app.tui.services.label_match.LabelIndex object at 0x7f8ae1502dc0>
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_match_42_5_twenty_distinct_tokens_over_w12_list_nothing(w12_index):
+        """R-A2L-MATCH.42/5: T20 (20 distinct tokens, 239 characters) over W12: [] (the budget runs out before the last walk; no
+        W12 name holds T20's key characters in order); median of 7 <= 2.0 s; with no budget 20 ``fuzzy`` entries in 4.7 s."""
+        query = t20_query()
+        assert len(query) == 239
+>       assert rank(query, w12_index, 20) == []
+E       AssertionError: assert [LabelMatch(n..., 246))), ...] == []
+E         
+E         Left contains 20 more items, first extra item: LabelMatch(name='aaaaaaaaaaaa_aaaaaaxuaaaa_acaagaaaaaaa_aaaaaaaaaadi_aaaaaaaaaany_caaaauaaaaaa_aaxaaaagaaaa_aaaadaoaaa...aaaqaaaaaaka_aaraaapaaaaa', rule=<MatchRule.FUZZY: 'fuzzy'>, edits=17, spans=((0, 12), (39, 51), (52, 64), (117, 129)))
+E         Use -v to get more diff
+
+tests/test_b103_label_match_perf.py:841: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match_perf.py::test_r_a2l_match_42_1_two_token_query_over_w40_lists_subsequence_entries
+FAILED tests/test_b103_label_match_perf.py::test_r_a2l_match_42_2_six_token_query_over_w40_the_budget_control
+FAILED tests/test_b103_label_match_perf.py::test_r_a2l_match_42_3_one_token_walk_cut_by_the_budget_still_lists_what_it_found
+FAILED tests/test_b103_label_match_perf.py::test_r_a2l_match_42_4_six_token_query_over_deep40
+FAILED tests/test_b103_label_match_perf.py::test_r_a2l_match_42_5_twenty_distinct_tokens_over_w12_list_nothing
+5 failed, 15 deselected in 41.82s
