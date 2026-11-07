@@ -19,7 +19,8 @@ to share with a worker thread. Deterministic: no ``hash()``-dependent order.
 from __future__ import annotations
 
 from array import array
-from bisect import bisect_left
+from bisect import bisect_left, bisect_right
+from collections import Counter
 from dataclasses import dataclass
 from enum import Enum
 from typing import Callable, Iterable, Mapping, NamedTuple, Sequence
@@ -41,6 +42,12 @@ _TRIE_PREFIX = 258
 # all, each remaining distinct query token is computed with _prefix_distance
 # on those candidates' token ids only (one call per (query token, token id)).
 _FUZZY_SWITCH_CAP = 512
+
+# The fuzzy tier's cap (E5S-07, R-A2L-MATCH.41): a query holding more than
+# this many distinct query tokens gets no fuzzy name at all — the tier is
+# skipped and the subsequence tier still runs (a pasted name is found by the
+# cheap text and token tiers). N = 20 by measurement (graph E5-2).
+_FUZZY_TOKEN_CAP = 20
 
 
 class MatchRule(str, Enum):
@@ -160,33 +167,43 @@ def build_label_index(names: Iterable[str]) -> LabelIndex:
         if name not in seen:
             seen.add(name)
             uniq.append(name)
+    del seen
 
     names_tuple = tuple(uniq)
-    count = len(uniq)
-    folded = tuple(_fold(name) for name in uniq)
+    del uniq
+    count = len(names_tuple)
+    folded = tuple(_fold(name) for name in names_tuple)
     masks = array("Q", (_char_mask(text) for text in folded))
 
-    token_map: dict[str, int] = {}
-    name_token_ids = array("I")
+    # Compact staging (E5S-08, graph D2 p_build2): one tokenising pass collects
+    # every distinct folded token in a set and keeps each occurrence's start and
+    # end in two flat array('I') buffers; the set is sorted into the token tuple
+    # and dropped (with its bound add method, which otherwise keeps the set
+    # alive); each occurrence's id is then bisect_left(tokens, folded[start:end])
+    # and the span buffers are dropped. No token-to-id dict, no per-name token
+    # tuple (the 77.9 MiB of v3; E2-1).
+    distinct: set[str] = set()
+    add = distinct.add
+    span_start = array("I")
+    span_end = array("I")
     name_token_starts = array("I", [0])
     for i in range(count):
-        for start, end in _tokens(uniq[i]):
-            token = folded[i][start:end]
-            token_id = token_map.get(token)
-            if token_id is None:
-                token_id = len(token_map)
-                token_map[token] = token_id
-            name_token_ids.append(token_id)
-        name_token_starts.append(len(name_token_ids))
-
-    tokens = tuple(sorted(token_map))
-    remap = array("I", [0]) * len(tokens)
-    for sorted_id, token in enumerate(tokens):
-        remap[token_map[token]] = sorted_id
-    del token_map
-    for j in range(len(name_token_ids)):
-        name_token_ids[j] = remap[name_token_ids[j]]
-    del remap
+        text = folded[i]
+        for start, end in _tokens(names_tuple[i]):
+            add(text[start:end])
+            span_start.append(start)
+            span_end.append(end)
+        name_token_starts.append(len(span_start))
+    del add
+    tokens = tuple(sorted(distinct))
+    del distinct
+    find = bisect_left
+    name_token_ids = array("I", [0]) * len(span_start)
+    for i in range(count):
+        text = folded[i]
+        for j in range(name_token_starts[i], name_token_starts[i + 1]):
+            name_token_ids[j] = find(tokens, text[span_start[j]:span_end[j]])
+    del span_start, span_end
 
     ntok = len(tokens)
     posting_starts = array("I", [0]) * (ntok + 1)
@@ -247,8 +264,10 @@ def rank(query: str, index: LabelIndex, limit: int) -> list[LabelMatch]:
     Data Flow:
         - Type checks; strip; length cap; parse the query (fold, tokens, keys).
         - Run the rule tiers in rank order — text (exact / prefix / substring),
-          token, fuzzy and subsequence — stopping after the tier at which
-          ``limit`` names are found, each name grouped by rule, key and length.
+          token, fuzzy (skipped for a query of more than 20 distinct query
+          tokens, R-A2L-MATCH.41) and subsequence — stopping after the tier at
+          which ``limit`` names are found, each name grouped by rule, key and
+          length.
         - Order each group by case-exactness and name, then emit ``LabelMatch``
           entries with ``_classify`` spans until ``limit``.
 
@@ -287,7 +306,7 @@ def rank(query: str, index: LabelIndex, limit: int) -> list[LabelMatch]:
     found = _text_tiers(parsed, index, taken, add_group)
     if found < limit and parsed.tokens:
         found += _token_tier(parsed, index, taken, add_group)
-    tables: dict[str, dict[int, int]] = {}
+    tables: dict[str, tuple[list[int], list[int], list[int]]] = {}
     if found < limit and parsed.tokens:
         fuzzy, tables = _fuzzy_tier(parsed, index, taken)
         for name_id, total in fuzzy.items():
@@ -450,7 +469,7 @@ def _cut(
     raw: str,
     index: LabelIndex,
     groups: dict[tuple, list[int]],
-    tables: dict[str, dict[int, int]],
+    tables: Mapping[str, tuple[Sequence[int], Sequence[int], Sequence[int]]],
     limit: int,
 ) -> list[LabelMatch]:
     """
@@ -466,8 +485,9 @@ def _cut(
         raw (str): The stripped-but-unfolded query, for case-exactness.
         index (LabelIndex): The prepared name list.
         groups (dict[tuple, list[int]]): Name ids grouped by (rule, key, length).
-        tables (dict[str, dict[int, int]]): The fuzzy tier's per-token distance
-            tables (step 4); empty for the other rules.
+        tables (Mapping[str, tuple[Sequence[int], Sequence[int], Sequence[int]]]):
+            The fuzzy tier's per-token range tables (step 4); empty for the
+            other rules.
         limit (int): The largest number of names to return.
 
     Returns:
@@ -510,17 +530,24 @@ def _cut(
 
 def _fuzzy_tier(
     query: _Query, index: LabelIndex, taken: set[int]
-) -> tuple[dict[int, int], dict[str, dict[int, int]]]:
+) -> tuple[dict[int, int], dict[str, tuple[list[int], list[int], list[int]]]]:
     """
     Summary:
-        Run the fuzzy tier (R-A2L-MATCH.10–.13, .33, .40; E5S-01 variant C):
-        walk each distinct query token in ascending allowed edits, intersect
-        the candidates by postings, and return each candidate's total edits
-        plus the per-token distance tables ``rank`` step 6 reads the spans
-        from. Once at most ``_FUZZY_SWITCH_CAP`` candidates remain holding at
-        most that many name-token occurrences in all, each remaining token's
-        table is computed with ``_prefix_distance`` on those candidates' token
-        ids only (one call per (query token, token id)).
+        Run the fuzzy tier (R-A2L-MATCH.10–.13, .33, .40, .41; E5S-01 variant C,
+        E5S-07): a query of more than ``_FUZZY_TOKEN_CAP`` distinct query tokens
+        gets no fuzzy name (the tier is skipped and the subsequence tier still
+        runs); otherwise walk each distinct query token in ascending allowed
+        edits, intersect the candidates by postings, and return each candidate's
+        total edits plus the per-token range tables ``rank`` step 6 reads the
+        spans from. The walk returns sorted, disjoint runs ``(lo, hi, d)`` — one
+        CSR postings slice per run, never one entry per token id — and the totals
+        are counted at C level: the names whose smallest distance is ``d >= 1``
+        go into one ``Counter`` per weight ``d * count`` (``Counter.update``), so
+        a repeated query token still counts its edits once per occurrence. Once
+        at most ``_FUZZY_SWITCH_CAP`` candidates remain holding at most that many
+        name-token occurrences in all, each remaining token's table is computed
+        with ``_prefix_distance`` on those candidates' token ids only (one call
+        per (query token, token id), each kept id as a run of one).
 
     Args:
         query (_Query): The parsed query.
@@ -528,14 +555,18 @@ def _fuzzy_tier(
         taken (set[int]): Name ids already listed by an earlier tier.
 
     Returns:
-        tuple[dict[int, int], dict[str, dict[int, int]]]: ``(name id ->
-        total edits, distinct query token -> token id -> prefix distance)``.
-        The tables keep every token id within its token's allowed edits, for
-        step 6; both are empty when the tier finds nothing.
+        tuple[dict[int, int], dict[str, tuple[list[int], list[int], list[int]]]]:
+            ``(name id -> total edits, distinct query token -> (los, his, ds))``.
+            The three parallel lists of each table cover the token ids at a
+            prefix distance of at most the token's allowed edits; a token id
+            ``t`` is at distance ``ds[i]`` when ``los[i] <= t < his[i]``. Both
+            are empty when the tier finds nothing (including past the cap).
     """
     counts: dict[str, int] = {}
     for token in query.tokens:
         counts[token] = counts.get(token, 0) + 1
+    if len(counts) > _FUZZY_TOKEN_CAP:
+        return {}, {}
     distinct = sorted(counts, key=_allowed_edits)
 
     posting_starts = index._posting_starts
@@ -544,9 +575,10 @@ def _fuzzy_tier(
     ids_all = index._name_token_ids
     tokens = index._tokens
 
-    tables: dict[str, dict[int, int]] = {}
+    tables: dict[str, tuple[list[int], list[int], list[int]]] = {}
     candidates: set[int] | None = None
     totals: dict[int, int] = {}
+    weights: dict[int, Counter] = {}
     switched = False
 
     for token in distinct:
@@ -575,20 +607,27 @@ def _fuzzy_tier(
                 if best is not None:
                     kept.add(name_id)
                     totals[name_id] = totals.get(name_id, 0) + best * count
-            tables[token] = {t: v for t, v in seen.items() if v <= allowed}
+            kept_ids = sorted(t for t, v in seen.items() if v <= allowed)
+            tables[token] = (
+                kept_ids,
+                [t + 1 for t in kept_ids],
+                [seen[t] for t in kept_ids],
+            )
             candidates = kept
             if not candidates:
                 return {}, tables
             continue
-        distances = _fuzzy_token_distances(index, token, allowed)
-        tables[token] = distances
-        if not distances:
+        runs = _fuzzy_token_distances(index, token, allowed)
+        if not runs:
             return {}, tables
+        tables[token] = (
+            [run[0] for run in runs],
+            [run[1] for run in runs],
+            [run[2] for run in runs],
+        )
         layers = [set() for _ in range(allowed + 1)]
-        for token_id, d in distances.items():
-            layers[d].update(
-                postings[posting_starts[token_id]:posting_starts[token_id + 1]]
-            )
+        for lo, hi, d in runs:
+            layers[d].update(postings[posting_starts[lo]:posting_starts[hi]])
         reached = layers[0].union(*layers[1:])
         if candidates is None:
             candidates = reached
@@ -599,10 +638,20 @@ def _fuzzy_tier(
             return {}, tables
         lower = layers[0]
         for d in range(1, allowed + 1):
-            for name_id in (layers[d] & candidates) - lower:
-                totals[name_id] = totals.get(name_id, 0) + d * count
+            diff = (layers[d] & candidates) - lower
+            if diff:
+                weights.setdefault(d * count, Counter()).update(diff)
             if d < allowed:
                 lower = lower | layers[d]
+    if weights:
+        return (
+            {
+                name_id: totals.get(name_id, 0)
+                + sum(weight * counter[name_id] for weight, counter in weights.items())
+                for name_id in candidates
+            },
+            tables,
+        )
     return {name_id: totals.get(name_id, 0) for name_id in candidates}, tables
 
 
@@ -890,7 +939,7 @@ def _classify(
     name: str,
     rule: MatchRule,
     token_ids: Sequence[int],
-    tables: Mapping[str, Mapping[int, int]],
+    tables: Mapping[str, tuple[Sequence[int], Sequence[int], Sequence[int]]],
 ) -> tuple[tuple[int, int], ...]:
     """
     Summary:
@@ -906,8 +955,9 @@ def _classify(
         name (str): The unfolded name.
         rule (MatchRule): The rule the name's tier found.
         token_ids (Sequence[int]): The name's token ids, in name order.
-        tables (Mapping[str, Mapping[int, int]]): The fuzzy tier's per-token
-            distance tables (step 4); empty for the other rules.
+        tables (Mapping[str, tuple[Sequence[int], Sequence[int], Sequence[int]]]):
+            The fuzzy tier's per-token range tables (step 4), each
+            ``(los, his, ds)``; empty for the other rules.
 
     Returns:
         tuple[tuple[int, int], ...]: The joined match spans.
@@ -954,21 +1004,30 @@ def _classify(
         return _join_spans(token_spans)
 
     if rule is MatchRule.FUZZY:
+        first_pos: dict[int, int] = {}
+        for pos, token_id in enumerate(token_ids):
+            if token_id not in first_pos:
+                first_pos[token_id] = pos
         fuzzy_spans: list[tuple[int, int]] = []
         for query_token in counts:
             table = tables.get(query_token)
             if table is None:
                 raise ValueError(f"fuzzy: {name!r} does not meet its tier")
+            los, his, ds = table
             best: int | None = None
-            best_span: tuple[int, int] | None = None
-            for (start, end), token_id in zip(name_spans, token_ids):
-                value = table.get(token_id)
-                if value is not None and (best is None or value < best):
-                    best = value
-                    best_span = (start, end)
+            best_pos: int | None = None
+            for token_id, pos in first_pos.items():
+                i = bisect_right(los, token_id) - 1
+                if i >= 0 and token_id < his[i]:
+                    value = ds[i]
+                    if best is None or value < best or (
+                        value == best and pos < best_pos
+                    ):
+                        best = value
+                        best_pos = pos
             if best is None:
                 raise ValueError(f"fuzzy: {name!r} does not meet its tier")
-            fuzzy_spans.append(best_span)
+            fuzzy_spans.append(name_spans[best_pos])
         return _join_spans(fuzzy_spans)
 
     offsets = _subsequence(query.keys, folded)
@@ -1073,19 +1132,26 @@ def _build_trie(tokens: tuple[str, ...]) -> tuple[str, array, array, array]:
     return "".join(chars), depth, first, end
 
 
-def _fuzzy_token_distances(index: LabelIndex, query_token: str, allowed: int) -> dict[int, int]:
+def _fuzzy_token_distances(
+    index: LabelIndex, query_token: str, allowed: int
+) -> list[tuple[int, int, int]]:
     """
     Summary:
-        ``{token id: prefix distance}`` for every distinct token of ``index``
-        at a prefix distance of at most ``allowed`` from ``query_token``
-        (R-A2L-MATCH.10–.13, .36, .40). For ``allowed`` 0 every id of
-        ``_token_range`` with distance 0; otherwise one walk of the trie arrays
-        in pre-order, each node's alignment column from its parent's (and its
-        grandparent's, for a transposition), capped at ``allowed + 1`` on the
-        band ``|row - depth| <= allowed``; the best prefix distance carried
-        down the path; when the column minimum is above ``allowed`` or not below
-        the best, every token under the node gets the best and the walk jumps
-        to ``end[j]``.
+        The sorted, disjoint runs ``(lo, hi, d)`` that cover every distinct
+        token of ``index`` at a prefix distance ``d`` of at most ``allowed``
+        from ``query_token`` (R-A2L-MATCH.10–.13, .36, .40): the ids
+        ``lo`` … ``hi − 1`` are each at distance ``d``; a run that ends where
+        the next one starts with the same ``d`` is joined to it. For ``allowed``
+        0 the one run of ``_token_range`` with distance 0 (none when the range
+        is empty); otherwise one walk of the trie arrays in pre-order, each
+        node's alignment column from its parent's (and its grandparent's, for a
+        transposition), capped at ``allowed + 1`` on the band
+        ``|row − depth| <= allowed``; the best prefix distance carried down the
+        path; when the column minimum is above ``allowed`` or not below the
+        best, every token under the node is the run ``(first[j],
+        first[end[j]], best)`` (when the best is at most ``allowed``) and the
+        walk jumps to ``end[j]``; a token that ends at a node the walk enters
+        is the run of its one id. Pre-order keeps the runs sorted and disjoint.
 
     Args:
         index (LabelIndex): The prepared index.
@@ -1093,11 +1159,12 @@ def _fuzzy_token_distances(index: LabelIndex, query_token: str, allowed: int) ->
         allowed (int): The allowed edits (0, 1 or 2).
 
     Returns:
-        dict[int, int]: Token id to prefix distance (at most ``allowed``).
+        list[tuple[int, int, int]]: The runs ``(lo, hi, d)``, sorted and
+            disjoint (possibly empty).
     """
     if allowed == 0:
         lo, hi = _token_range(index._tokens, query_token)
-        return {token_id: 0 for token_id in range(lo, hi)}
+        return [(lo, hi, 0)] if lo < hi else []
 
     chars = index._trie_chars
     depth = index._trie_depth
@@ -1108,7 +1175,14 @@ def _fuzzy_token_distances(index: LabelIndex, query_token: str, allowed: int) ->
     m = len(q)
     k = allowed
     limit = k + 1
-    result: dict[int, int] = {}
+    result: list[tuple[int, int, int]] = []
+
+    def emit(lo: int, hi: int, d: int) -> None:
+        if result and result[-1][1] == lo and result[-1][2] == d:
+            result[-1] = (result[-1][0], hi, d)
+        else:
+            result.append((lo, hi, d))
+
     node_count = len(depth)
 
     cols: list[list[int] | None] = [None] * 66
@@ -1169,14 +1243,13 @@ def _fuzzy_token_distances(index: LabelIndex, query_token: str, allowed: int) ->
         b2 = bd if bd < new[m] else new[m]
         if low > k or low >= b2:
             if b2 <= k:
-                for token_id in range(first[j], first[end[j]]):
-                    result[token_id] = b2
+                emit(first[j], first[end[j]], b2)
             j = end[j]
             continue
         cols[dep] = new
         best[dep] = b2
         prev_char[dep] = c
         if b2 <= k and len(tokens[first[j]]) == dep:
-            result[first[j]] = b2
+            emit(first[j], first[j] + 1, b2)
         j += 1
     return result

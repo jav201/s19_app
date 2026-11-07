@@ -20,7 +20,8 @@ Requirement -> test coverage (``R-A2L-MATCH.<n>/<k>`` = row n, alternative k):
 - ``test_at_b103_i4_1_*`` / ``test_at_b103_i4_2_*``: AT-B103-I4-1 and -2.
 - ``test_i3_*``: the I-3 interface checks (errors, purity, read-only, types).
 - The timing and memory cases R-A2L-MATCH.35/1, .36/1, .37/1, .40/1, .40/2
-  live in ``tests/test_b103_label_match_perf.py``.
+  live in ``tests/test_b103_label_match_perf.py``; the R-A2L-MATCH.41/1..5 cases are in EXACT_CASES above,
+  with a boundary control sweep (18 .. 25 distinct tokens).
 
 Every test marked ``full`` in the records asserts the matcher's own output;
 none asserts a stand-in's text. Fixtures: case 08 is generated into a tmp
@@ -213,6 +214,14 @@ R_AT_MAP_DRUCK = [  # R-A2L-MATCH.4/1
 
 R_LUK_SAHW = "LukPvq.JXML_UPQ_BI.OKSAhwvcueaniy"
 
+# R-A2L-MATCH.41: the 20 one-edit variants of ``curve`` (``curv`` + each letter but ``e``, in order), and the
+# SWA name with the most distinct query tokens (26 tokens, 101 characters) with its tokens reversed.
+CURV20 = " ".join("curv" + c for c in "abcdfghijklmnopqrstu")
+SWA_PASTED = "HRR_WOL.TNY_U_ZmyrXSZTPeyoMsdpWwbcUtd_Dwvrap_YAL_o8gk5143_Tw_WjPcscmtzpCrxe_GFV_TVY3_YES_AyxwevsxrDBB"
+SWA_PASTED_REVERSED = (
+    "dbb ayxwevsxr yes 3 tvy gfv crxe pcscmtzp wj tw 5143 gk 8 o yal dwvrap utd wwbc msdp peyo xszt zmyr u tny wol hrr"
+)
+
 SPAN_00 = [E("VALUE_0001", "exact", (0, 10))]
 
 # ---------------------------------------------------------------------------
@@ -369,6 +378,14 @@ EXACT_CASES = [
     # --- R-A2L-MATCH.39 name cap
     ("R-A2L-MATCH.39/1", ("x" * 1024,), "x", 20, [E("x" * 1024, "prefix", (0, 1))]),
     ("R-A2L-MATCH.39/2", ("x" * 1025,), "x", 20, []),
+    # --- R-A2L-MATCH.41 fuzzy cap at 20 distinct query tokens (E5 round 2, E5S-07)
+    ("R-A2L-MATCH.41/1", "C08", CURV20, 3, seq("CURVE_{:04d}", range(1, 4), "fuzzy", (0, 5), e=20)),
+    ("R-A2L-MATCH.41/2", "C08", CURV20 + " curvv", 3, []),
+    ("R-A2L-MATCH.41/3", "C08", "curva " + CURV20, 3, seq("CURVE_{:04d}", range(1, 4), "fuzzy", (0, 5), e=21)),
+    ("R-A2L-MATCH.41/4", "SWA", SWA_PASTED, 5, [E(SWA_PASTED, "exact", (0, 101))]),
+    ("R-A2L-MATCH.41/5", "SWA", SWA_PASTED_REVERSED, 5,
+     [E(SWA_PASTED, "token", (0, 3), (4, 7), (8, 11), (12, 13), (14, 37), (38, 44), (45, 48), (49, 57),
+        (58, 60), (61, 75), (76, 79), (80, 84), (85, 88), (89, 101))]),
 ]
 
 
@@ -385,10 +402,32 @@ def test_ranked_list_is_exactly(prep, case_id, key, query, limit, expected):
     .8/3 .8/4 .8/5 .8/6 .8/7 .8/8 .8/9 .9/1 .9/2 .9/3 .9/4 .10/1 .10/2 .10/3 .10/4 .10/5
     .10/6 .11/1 .11/2 .11/3 .12/3 .12/4 .13/1 .13/2 .13/3 .13/4 .14/1 .14/2 .15/1 .15/2
     .16/1 .16/2 .16/3 .17/1 .17/2 .18/3 .19/1 .19/2 .20/2 .21/1 .21/2 .21/3 .22/1 .23/2
-    .24/2 .24/4 .25/3 .28/1 .32/1 .32/3 .33/2 .33/3 .34/1 .38/1 .38/2 .39/1 .39/2.
+    .24/2 .24/4 .25/3 .28/1 .32/1 .32/3 .33/2 .33/3 .34/1 .38/1 .38/2 .39/1 .39/2 .41/1 .41/2 .41/3 .41/4 .41/5.
     """
     got = proj(run(prep, key, query, limit))
     assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+
+
+# ---------------------------------------------------------------------------
+# R-A2L-MATCH.41 behavioural negative control
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("n_distinct", [18, 19, 20, 21, 22, 25])
+def test_r_a2l_match_41_cap_boundary_is_exactly_20_distinct_tokens(prep, n_distinct):
+    """R-A2L-MATCH.41 (control for /1../3): a query of up to 20 distinct tokens may list a name only the fuzzy
+    rule finds (CURVE_0001, one edit per token); a query of more than 20 distinct tokens never lists one.
+    Behavioural, not timing: with the cap removed the 21, 22 and 25 token queries list the fuzzy names."""
+    letters = [c for c in "abcdefghijklmnopqrstuvwxyz" if c != "e"]
+    query = " ".join("curv" + c for c in letters[:n_distinct])
+    got = run(prep, "C08", query, 3)
+    if n_distinct <= 20:
+        assert [(m.name, m.rule.value, m.edits) for m in got] == [
+            (f"CURVE_{i:04d}", "fuzzy", n_distinct) for i in range(1, 4)
+        ]
+    else:
+        assert not [m for m in got if m.rule.value == "fuzzy"], [m.name for m in got]
+        assert got == []
 
 
 # ---------------------------------------------------------------------------
@@ -740,7 +779,7 @@ def test_i3_ranking_is_independent_of_input_order(lists):
 
 
 def test_i3_module_imports_the_standard_library_only():
-    """I-3 / graph header: the matcher imports array, bisect, dataclasses, enum, typing (and __future__) only - no Textual, no s19_app module."""
+    """I-3 / graph header: the matcher imports array, bisect, collections, dataclasses, enum, typing (and __future__) only - no Textual, no s19_app module."""
     import s19_app.tui.services.label_match as module
 
     tree = ast.parse(Path(module.__file__).read_text(encoding="utf-8"))
@@ -750,4 +789,4 @@ def test_i3_module_imports_the_standard_library_only():
             roots.update(a.name.split(".")[0] for a in node.names)
         elif isinstance(node, ast.ImportFrom):
             roots.add((node.module or "").split(".")[0])
-    assert roots <= {"__future__", "array", "bisect", "dataclasses", "enum", "typing"}, sorted(roots)
+    assert roots <= {"__future__", "array", "bisect", "collections", "dataclasses", "enum", "typing"}, sorted(roots)

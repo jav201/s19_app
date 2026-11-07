@@ -5,12 +5,16 @@ Independent tester file (E4). Cases (``02-test-cases.md``):
 - R-A2L-MATCH.35/1 - preparing 50,000 names: median of 3 <= 5.0 s.
 - R-A2L-MATCH.36/1 - ranking per keystroke: for every query of QSET over REF and
   of the REF6 query set, limit 20, the median of 7 consecutive rankings <= 200 ms.
-- R-A2L-MATCH.37/1 - the tracemalloc peak of preparing REF <= 64 MiB.
-- R-A2L-MATCH.40/1 - every pathological PSET query over its list: median of 7 <= 1.0 s.
-- R-A2L-MATCH.40/2 - the three LONG queries over LONG: median of 7 <= 1.0 s.
-- R-A2L-MATCH.40/3 - the 4-token and the 51-token CRAFT queries over CRAFT (E5S-01).
+- R-A2L-MATCH.37/1, /2 - the tracemalloc peak of preparing REF, and B4MAX (500,000 distinct ASCII tokens),
+  <= 64 MiB each.
+- R-A2L-MATCH.40/1 - every pathological PSET query over its list: median of 7 <= 2.0 s.
+- R-A2L-MATCH.40/2 - the three LONG queries over LONG: median of 7 <= 2.0 s.
+- R-A2L-MATCH.40/3 - the 4-, 20- and 51-token CRAFT queries over CRAFT (E5S-01; the 51-token one is past the cap).
 - R-A2L-MATCH.40/4 - a query that still reaches ``_prefix_distance`` after the posting
   switch (BAND list): the banded distance keeps it fast, the no-band mutant does not.
+- R-A2L-MATCH.40/5 - FAMQ(20) and FAMQ(76) over U6, and (E5 round 2, the adversarial lists the row now names)
+  the same family over D3, FAM6 over E2, one-token walks over W40 and the substring key over SUBO.
+- The R-A2L-MATCH.40 bound is 2.0 s (E3-rulings, E5 round-2 design rulings); R-A2L-MATCH.36 stays 200 ms.
 
 The timing arms carry ``serial_timing`` (run apart and serially); the memory
 bound R-A2L-MATCH.37/1 is a byte bound and carries none. The bounds are stated
@@ -44,7 +48,7 @@ CASE6_PATH = REPO_ROOT / "examples" / "case_06_large_nested_a2l" / "firmware.a2l
 
 PREP_BOUND_S = 5.0  # R-A2L-MATCH.35
 KEYSTROKE_BOUND_S = 0.200  # R-A2L-MATCH.36
-ANY_QUERY_BOUND_S = 1.0  # R-A2L-MATCH.40
+ANY_QUERY_BOUND_S = 2.0  # R-A2L-MATCH.40 (E5 round-2 ruling: 2.0 s, was 1.0 s)
 MEMORY_BOUND_BYTES = 64 * 1024 * 1024  # R-A2L-MATCH.37 = 67,108,864
 
 
@@ -211,6 +215,29 @@ LONG_QUERIES = [
 ]
 
 
+def _b26(value, width):
+    out = []
+    for _ in range(width):
+        value, rem = divmod(value, 26)
+        out.append(_LOWER[rem])
+    return "".join(out)
+
+
+B4MAX_SHA256 = "afe7fad05aa652d882d30278315fb5832249cd42a9826c28e5798ea8fd36dfd0"
+
+
+def b4max_names():
+    """B4MAX: all 456,976 4-letter strings and the first 43,024 5-letter ones (base 26, least significant letter
+    first), shuffled by ``Random(20261109)``; name i is tokens 10i .. 10i+9, capitalised, joined with no separator."""
+    toks = [_b26(i, 4) for i in range(26 ** 4)] + [_b26(i, 5) for i in range(500000 - 26 ** 4)]
+    random.Random(20261109).shuffle(toks)
+    names = ["".join(t.capitalize() for t in toks[i * 10:(i + 1) * 10]) for i in range(50000)]
+    assert sum(len(n) for n in names) == 2043024 and len(set(names)) == 50000  # fixture sanity
+    assert hashlib.sha256("\n".join(names).encode("utf-8")).hexdigest() == B4MAX_SHA256
+    assert all(n.isascii() for n in names)
+    return names
+
+
 def _median_of(n, call):
     times = []
     for _ in range(n):
@@ -227,7 +254,7 @@ def _check_all(medians, bound_s):
     for label_, median in medians:
         print(f"  {median * 1000:9.2f} ms  {(bound - median) / bound * 100:6.1f} % margin  {label_}")
     for label_, median in medians:
-        assert median <= report_margin(label_, median, bound), f"{label_}: median {median:.4f} s"
+        assert median <= report_margin(label_, median, timing_bound(bound_s)), f"{label_}: median {median:.4f} s"
 
 
 # ---------------------------------------------------------------------------
@@ -298,9 +325,25 @@ def test_r_a2l_match_37_1_prepared_list_stays_within_64_mib(ref_names):
     assert peak <= MEMORY_BOUND_BYTES, f"peak {peak} > {MEMORY_BOUND_BYTES}"
 
 
+def test_r_a2l_match_37_2_densest_ascii_list_stays_within_64_mib():
+    """R-A2L-MATCH.37/2: the tracemalloc peak while preparing B4MAX (50,000 ASCII names of 10 camel tokens,
+    500,000 distinct tokens, 2,043,024 characters) is <= 67,108,864 bytes; the memory follows the distinct tokens."""
+    names = b4max_names()  # built before tracemalloc starts
+    gc.collect()
+    tracemalloc.start()
+    try:
+        index = build_label_index(names)
+        _, peak = tracemalloc.get_traced_memory()
+    finally:
+        tracemalloc.stop()
+    assert len(index) == 50000
+    print(f"B4MAX tracemalloc peak {peak} bytes ({peak / 1048576:.1f} MiB)")
+    assert peak <= MEMORY_BOUND_BYTES, f"peak {peak} > {MEMORY_BOUND_BYTES}"
+
+
 @pytest.mark.serial_timing
 def test_r_a2l_match_40_1_pathological_queries_over_ref(ref_index):
-    """R-A2L-MATCH.40/1: the six PSET shapes over REF, limit 20, median of 7 <= 1.0 s."""
+    """R-A2L-MATCH.40/1: the six PSET shapes over REF, limit 20, median of 7 <= 2.0 s."""
     print(_load("before"))
     medians = []
     for label, query in pset_ref():
@@ -312,7 +355,7 @@ def test_r_a2l_match_40_1_pathological_queries_over_ref(ref_index):
 
 @pytest.mark.serial_timing
 def test_r_a2l_match_40_1_pathological_queries_over_ref6(ref6_index, swa):
-    """R-A2L-MATCH.40/1: the PSET shapes over REF6 (repeated, near tokens, 256-character, E3S-01), median of 7 <= 1.0 s."""
+    """R-A2L-MATCH.40/1: the PSET shapes over REF6 (repeated, near tokens, 256-character, E3S-01), median of 7 <= 2.0 s."""
     print(_load("before"))
     medians = []
     for label, query in pset_ref6(swa):
@@ -324,7 +367,7 @@ def test_r_a2l_match_40_1_pathological_queries_over_ref6(ref6_index, swa):
 
 @pytest.mark.serial_timing
 def test_r_a2l_match_40_2_long_queries_against_1020_character_tokens(long_index):
-    """R-A2L-MATCH.40/2: the three LONG queries over LONG (names of one 1,020-character token), median of 7 <= 1.0 s."""
+    """R-A2L-MATCH.40/2: the three LONG queries over LONG (names of one 1,020-character token), median of 7 <= 2.0 s."""
     print(_load("before"))
     medians = []
     for label, query in LONG_QUERIES:
@@ -389,18 +432,23 @@ def craft_index(ref_names):
 
 @pytest.mark.serial_timing
 def test_r_a2l_match_40_3_crafted_stress_list(craft_index):
-    """R-A2L-MATCH.40/3: the 4-token and the 51-token CRAFT queries (300 names of 1,024 characters, 268 tokens
-    each, every query token matching within its allowed edits) over the prepared list CRAFT, limit 20, median of 7
-    <= 1.0 s; the list holds 20 entries, each fuzzy (the 51-token list: 50 edits each)."""
+    """R-A2L-MATCH.40/3: the 4-, 20- and 51-token CRAFT queries (300 names of 1,024 characters, 268 tokens each,
+    every query token matching within its allowed edits) over the prepared list CRAFT, limit 20, median of 7
+    <= 2.0 s. Up to 20 distinct tokens: 20 entries, each fuzzy with n - 1 edits (one per hit-and-q token, none for
+    the head). The 51-token query is past the R-A2L-MATCH.41 cap: no fuzzy entry, so the list is empty (before the
+    cap it held 20 entries of 50 edits; the cap is the E5 round-2 change)."""
     print(_load("before"))
     medians = []
-    for n_tokens in (4, 51):
+    for n_tokens in (4, 20, 51):
         query = craft_query(n_tokens)
         assert len(query) <= 256 and len(query.split()) == n_tokens
         got = rank(query, craft_index, 20)
-        assert len(got) == 20
-        assert {m.rule.value for m in got} == {"fuzzy"}
-        assert {m.edits for m in got} == {n_tokens - 1}  # one edit per hit-and-q token, none for the head
+        if n_tokens <= 20:
+            assert len(got) == 20
+            assert {m.rule.value for m in got} == {"fuzzy"}
+            assert {m.edits for m in got} == {n_tokens - 1}
+        else:
+            assert got == []
         medians.append((f"R-A2L-MATCH.40/3 CRAFT {n_tokens} tokens", _median_of(7, lambda q=query: rank(q, craft_index, 20))))
     print(_load("after"))
     _check_all(medians, ANY_QUERY_BOUND_S)
@@ -427,7 +475,7 @@ def test_r_a2l_match_40_4_prefix_distance_band_after_the_switch(band_index):
     """R-A2L-MATCH.40/4: a two-token query whose first token (``987654``, 0 edits) leaves 225 candidates holding
     450 token occurrences (<= 512: the posting switch) and whose second token (248 ``a`` and a ``b``) is then
     scored against each 1,002-character candidate token by ``_prefix_distance``; ranked 7 times, limit 20,
-    median <= 1.0 s. Without the band the 225 alignments cost about 249 x 250 cells each (seconds)."""
+    median <= 2.0 s. Without the band the 225 alignments cost about 249 x 250 cells each (seconds)."""
     query = BAND_HEAD + " " + "a" * 248 + "b"
     assert len(query) == 256
     got = rank(query, band_index, 20)
@@ -438,5 +486,191 @@ def test_r_a2l_match_40_4_prefix_distance_band_after_the_switch(band_index):
     assert {m.edits for m in got} == {1}  # the final 'b' replaces one 'a' of the name's token
     print(_load("before"))
     medians = [("R-A2L-MATCH.40/4 BAND head + 249-character token", _median_of(7, lambda: rank(query, band_index, 20)))]
+    print(_load("after"))
+    _check_all(medians, ANY_QUERY_BOUND_S)
+
+
+# ---------------------------------------------------------------------------
+# R-A2L-MATCH.40/5 and the adversarial lists named by the E5 round-2 rulings (U6, D3, E2, W40, SUBO)
+# ---------------------------------------------------------------------------
+
+LET25 = [c for c in _LOWER if c != "q"]
+U6_SHA256 = "3540f73d2c12242674453036becd9db53f3536c42b7e7ac03625c4b4c3811532"
+FAM3 = ["ab" + c for c in _LOWER] + ["a" + c + "b" for c in _LOWER if c != "b"] + [c + "ab" for c in _LOWER if c != "a"]
+FAMQ = ["abq"] + [t for t in FAM3 if t != "abq"]  # 76 distinct 3-letter tokens; 'abq' starts no U6 token
+FAM6 = ["abcd" + x + y for x in "efghijklmnopr" for y in "stuvwxyz"]  # 6 letters: 2 allowed edits
+assert len(FAMQ) == 76 and len(set(FAMQ)) == 76
+CHARS_BOUND = 2356624  # R-A2L-MATCH.40: the row's scope
+
+
+def fam_query(fam, n):
+    """The first token as is, then the next n - 1 tokens capitalised, joined with no separator (n distinct tokens)."""
+    return fam[0] + "".join(t.capitalize() for t in fam[1:n])
+
+
+def _check_scope(names):
+    assert len(names) == len(set(names)) == 50000 and sum(len(n) for n in names) <= CHARS_BOUND
+
+
+def u6_names():
+    """U6: name i is the six tokens ``ab`` + the 4-letter base-25 numeral of 6i + t (t = 0 .. 5), joined by ``_``."""
+    names = []
+    for i in range(50000):
+        names.append("_".join("ab" + _base25(6 * i + t, 4, LET25) for t in range(6)))
+    _check_scope(names)
+    assert sum(len(n) for n in names) == 2050000
+    assert hashlib.sha256("\n".join(names).encode("utf-8")).hexdigest() == U6_SHA256
+    return names
+
+
+def d3_names():
+    """D3: 27,000 names of the 25 camel tokens ``Ab`` + c and a decimal tag, padded with ``s`` + 5-digit names."""
+    body = "".join("Ab" + c for c in LET25)
+    names = [body + str(i) for i in range(27000)] + [f"s{i:05d}" for i in range(23000)]
+    _check_scope(names)
+    return names
+
+
+def e2_names():
+    """E2: 50,000 names ``abcd`` + a 4-letter base-25 numeral (2-edit queries)."""
+    names = [f"abcd{_base25(i, 4, LET25)}" for i in range(50000)]
+    _check_scope(names)
+    return names
+
+
+def w40_names():
+    """W40: 50,016 distinct 40-letter tokens within 2 substitutions of ``'a' * 40`` (24 per name, ``_`` joined),
+    padded with ``s`` + 5-digit names: the one-token query ``'a' * 40`` walks the whole trie."""
+    al = "bcdefghijklmnoprstuvwxyz"
+    rng = random.Random(20261111)
+    toks = set()
+    while len(toks) < 50016:
+        i, j = sorted(rng.sample(range(40), 2))
+        toks.add("a" * i + rng.choice(al) + "a" * (j - i - 1) + rng.choice(al) + "a" * (39 - j))
+    toks = sorted(toks)
+    rng.shuffle(toks)
+    names = ["_".join(toks[k:k + 24]) for k in range(0, len(toks), 24)]
+    names += [f"s{i:05d}" for i in range(50000 - len(names))]
+    _check_scope(names)
+    return names
+
+
+def subo_names():
+    """SUBO: 2,000 names ``x`` + 1,017 ``a`` + ``Q`` + a 4-letter tag (overlapping substring occurrences of ``aa``),
+    padded with ``s`` + 5-digit names."""
+    names = ["x" + "a" * 1017 + "Q" + _base25(i, 4, "cdefghijklmnop") for i in range(2000)]
+    names += [f"s{i:05d}" for i in range(48000)]
+    _check_scope(names)
+    return names
+
+
+@pytest.fixture(scope="module")
+def u6_index():
+    return build_label_index(u6_names())
+
+
+@pytest.fixture(scope="module")
+def d3_index():
+    return build_label_index(d3_names())
+
+
+@pytest.fixture(scope="module")
+def e2_index():
+    return build_label_index(e2_names())
+
+
+@pytest.fixture(scope="module")
+def w40_index():
+    return build_label_index(w40_names())
+
+
+@pytest.fixture(scope="module")
+def subo_index():
+    return build_label_index(subo_names())
+
+
+@pytest.mark.serial_timing
+def test_r_a2l_match_40_5_famq_over_u6_dense_list(u6_index):
+    """R-A2L-MATCH.40/5: FAMQ(20) (60 characters) and FAMQ(76) (228 characters) over U6 (300,000 postings every FAMQ
+    token reaches within 1 edit), limit 20, median of 7 <= 2.0 s. FAMQ(20): 20 fuzzy entries of 14 edits each;
+    FAMQ(76): [] (more than 20 distinct query tokens, R-A2L-MATCH.41)."""
+    print(_load("before"))
+    medians = []
+    for n_tokens in (20, 76):
+        query = fam_query(FAMQ, n_tokens)
+        assert len(query) == 3 * n_tokens
+        got = rank(query, u6_index, 20)
+        if n_tokens == 20:
+            assert len(got) == 20
+            assert {m.rule.value for m in got} == {"fuzzy"}
+            assert {m.edits for m in got} == {14}
+        else:
+            assert got == []
+        medians.append((f"R-A2L-MATCH.40/5 U6 FAMQ({n_tokens})", _median_of(7, lambda q=query: rank(q, u6_index, 20))))
+    print(_load("after"))
+    _check_all(medians, ANY_QUERY_BOUND_S)
+
+
+@pytest.mark.serial_timing
+def test_r_a2l_match_40_famq_over_d3_densest_postings_list(d3_index):
+    """R-A2L-MATCH.40 (adversarial list D3, E5 round-2 design pass): FAMQ(n) over the densest postings shape found for
+    one 1-edit 3-letter query token, n = 4, 12, 20, 76, limit 20, median of 7 <= 2.0 s; past 20 distinct tokens no
+    fuzzy entry is listed."""
+    print(_load("before"))
+    medians = []
+    for n_tokens in (4, 12, 20, 76):
+        query = fam_query(FAMQ, n_tokens)
+        got = rank(query, d3_index, 20)
+        assert len(got) <= 20
+        if n_tokens > 20:
+            assert "fuzzy" not in {m.rule.value for m in got}
+        medians.append((f"R-A2L-MATCH.40 D3 FAMQ({n_tokens})", _median_of(7, lambda q=query: rank(q, d3_index, 20))))
+    print(_load("after"))
+    _check_all(medians, ANY_QUERY_BOUND_S)
+
+
+@pytest.mark.serial_timing
+def test_r_a2l_match_40_fam6_over_e2_two_edit_list(e2_index):
+    """R-A2L-MATCH.40 (adversarial list E2, E5 round-2 design pass): FAM6(n) (6-letter tokens, 2 allowed edits) over
+    E2, n = 4, 12, 24, 36, limit 20, median of 7 <= 2.0 s; past 20 distinct tokens no fuzzy entry is listed."""
+    print(_load("before"))
+    medians = []
+    for n_tokens in (4, 12, 24, 36):
+        query = fam_query(FAM6, n_tokens)
+        assert len(query) <= 256
+        got = rank(query, e2_index, 20)
+        assert len(got) <= 20
+        if n_tokens > 20:
+            assert "fuzzy" not in {m.rule.value for m in got}
+        medians.append((f"R-A2L-MATCH.40 E2 FAM6({n_tokens})", _median_of(7, lambda q=query: rank(q, e2_index, 20))))
+    print(_load("after"))
+    _check_all(medians, ANY_QUERY_BOUND_S)
+
+
+@pytest.mark.serial_timing
+def test_r_a2l_match_40_one_token_walk_over_w40(w40_index):
+    """R-A2L-MATCH.40 (adversarial list W40, E5 round-2 ruling): the one-token queries ``'a' * 40`` and ``'a' * 64``
+    over 50,016 40-letter tokens within 2 substitutions (753,276 trie nodes), limit 20, median of 7 <= 2.0 s."""
+    print(_load("before"))
+    medians = []
+    for query in ("a" * 40, "a" * 64):
+        got = rank(query, w40_index, 20)
+        assert len(got) == 20
+        medians.append((f"R-A2L-MATCH.40 W40 {len(query)} a", _median_of(7, lambda q=query: rank(q, w40_index, 20))))
+    print(_load("after"))
+    _check_all(medians, ANY_QUERY_BOUND_S)
+
+
+@pytest.mark.serial_timing
+def test_r_a2l_match_40_substring_key_over_subo(subo_index):
+    """R-A2L-MATCH.40 (adversarial list SUBO, E5 round-2 ruling): the queries ``aa``, ``aaa`` and ``aaaaaaaa`` over
+    2,000 names holding 1,016 overlapping occurrences each, limit 20, median of 7 <= 2.0 s; 20 substring entries."""
+    print(_load("before"))
+    medians = []
+    for query in ("aa", "aaa", "aaaaaaaa"):
+        got = rank(query, subo_index, 20)
+        assert len(got) == 20
+        assert {m.rule.value for m in got} == {"substring"}
+        medians.append((f"R-A2L-MATCH.40 SUBO {query!r}", _median_of(7, lambda q=query: rank(q, subo_index, 20))))
     print(_load("after"))
     _check_all(medians, ANY_QUERY_BOUND_S)
