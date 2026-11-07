@@ -8,8 +8,8 @@ Unsaved changes will be lost (W14), Select variant (W23).
 documents (in the scratch copy, never in the case folder):
 
 - `guide_patch_nosym.changes.json` — `demo_patch.changes.json` without its two
-  `symbol` entries (5 entries), because the Patch Editor refuses symbol entries
-  (finding F-01);
+  `symbol` entries (5 entries); the captures were taken before 1.0.0, when the
+  Patch Editor refused symbol entries (finding F-01);
 - `guide_check_mixed.chk.json` — a check document with 2 pass, 2 fail and 1
   uncheckable entry, built from the case check documents (symbol entries removed)
   plus one entry outside the image.
@@ -41,20 +41,24 @@ of changes.
   not in the image).
 - Header: `?` help and **📂 Open patches/** (opens the folder in the file manager).
 
-### 8.2 A change-set with symbol entries is refused
+### 8.2 A change-set with symbol entries resolves them
 
 ![Symbol entries refused](img/ch08-02-patch-symbol-entries-refused.png)
 
-Picking `demo_patch.changes.json` in the dropdown loads it at once. Its two entries
-that name an A2L `symbol` are dropped with `CHG-SYMBOL-UNRESOLVED … no A2L context
-is declared`, although `firmware.a2l` is loaded (finding F-01). The other 5 entries
-are listed.
+Picking `demo_patch.changes.json` in the dropdown loads it at once. With
+`firmware.a2l` loaded, its two entries that name an A2L `symbol` are resolved to
+their tags, so the document loads whole (*Loaded change: 7 entries, 0 error(s)*).
+(capture taken before 1.0.0: it shows the earlier refusal — the two symbol
+entries dropped with `CHG-SYMBOL-UNRESOLVED … no A2L context is declared` although
+the A2L was loaded, finding F-01)
 
-### 8.3 The faults on the Checks tab
+### 8.3 The faults the refusal left
 
 ![Declaration faults](img/ch08-03-patch-declaration-faults.png)
 
-The **Checks** tab lists the declaration faults in full.
+The **Checks** tab lists the declaration faults in full. (capture taken before 1.0.0:
+these are the faults of the two refused symbol entries; with the A2L loaded 1.0.0
+resolves them and this tab stays clear)
 
 ### 8.4 Load a clean change-set
 
