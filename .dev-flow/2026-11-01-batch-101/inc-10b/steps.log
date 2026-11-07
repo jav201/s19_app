@@ -2,3 +2,4 @@ E1 (split from inc-10) start 2026-11-06T15:00Z end 2026-11-06T15:26Z model=opus 
 E3 correction round 2 2026-11-06T15:51:43Z model=deepseek-v4-pro
 E4 start 2026-11-07T08:14Z Inc 10b implementers model=deepseek-v4-pro (G1 app.py, G2 segment_split_view.py) tester=sonnet (W tests/test_b101_inplace_views.py); branch at main 569e446 (Inc 10a in; its merge verification running)
 E4 implementers end 2026-11-07T08:20Z model=deepseek-v4-pro (G1, G2: exit 0, 0 deviations)
+E4 tester end 2026-11-07T08:44Z model=sonnet W 20 nodes (18 RED + QC-TM RED, 1 standing guard)
