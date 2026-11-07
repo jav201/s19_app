@@ -1,0 +1,55 @@
+# probe base syn transcript 2026-11-07T02:31:11-06:00 host cachyos-rtx
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e2-12/zq_iso_user; no DISPLAY; no clipboard; stdin closed; load: 14.92 15.19 11.66
+s19_app.__file__ = ~/work/s19_app/s19_app/__init__.py | textual 8.2.8 | variant base | scenario syn
+[base SYNMAP W220 220x50 unscrolled] visible=108 vbar=False scroll_x=0/0 scroll_y=0 fixed_columns=0 padding=0 cols: Tag=11, Address=10, Length=6, Source=7 | w=85 | rows=1 cursor_row=0 | builds=2 fits=0 fit_rebuilds=0
+[base SYNMAP W220 220x50 unscrolled] header| Tag        Address   LengthSource Raw PhysicalInMemRegion Limits UnitBitsEndianVirtFuncAccessDtype
+[base SYNMAP W220 220x50 unscrolled] row0| ✓ SYN_MAP_W0x1C2D3E002266  formula17921792    yes  unknown0..4095%.0           no
+[base SYNMAP W220 220x50 unscrolled] row0: Address=0x1C2D3E00:whole; Length=2266:whole; Tag='✓ SYN_MAP_W' (11 cells, ends at 12, inside, form=ok)
+[base SYNMAP W220 220x50 unscrolled] ROWS OK 1/1 | painted 0x runs not declared: ['0x1C2D3E002266']
+[base SYNMAP W220] card width=78
+[base SYNMAP W220] card| ✓ SYN_MAP_W  0x1C2D3E00
+[base SYNMAP W220] card| desc synthetic map
+[base SYNMAP W220] card| unit — · conv CM_SYN
+[base SYNMAP W220] card| layout RL_SYN_MAP
+[base SYNMAP W160 160x50 unscrolled] visible=73 vbar=False scroll_x=0/25 scroll_y=0 fixed_columns=0 padding=0 cols: Tag=11, Address=10, Length=6, Source=7 | w=50 | rows=1 cursor_row=0 | builds=2 fits=0 fit_rebuilds=0
+[base SYNMAP W160 160x50 unscrolled] header| Tag        Address   LengthSource Raw PhysicalInMemRegion Limits UnitBits
+[base SYNMAP W160 160x50 unscrolled] row0| ✓ SYN_MAP_W0x1C2D3E002266  formula17921792    yes  unknown0..4095%.0
+[base SYNMAP W160 160x50 unscrolled] row0: Address=0x1C2D3E00:whole; Length=2266:whole; Tag='✓ SYN_MAP_W' (11 cells, ends at 12, inside, form=ok)
+[base SYNMAP W160 160x50 unscrolled] ROWS OK 1/1 | painted 0x runs not declared: ['0x1C2D3E002266']
+[base SYNMAP W160] card width=53
+[base SYNMAP W160] card| ✓ SYN_MAP_W  0x1C2D3E00
+[base SYNMAP W160] card| desc synthetic map
+[base SYNMAP W160] card| unit — · conv CM_SYN
+[base SYNMAP W160] card| layout RL_SYN_MAP
+[base SYNMAP W118 118x50 unscrolled] visible=60 vbar=False scroll_x=0/38 scroll_y=0 fixed_columns=0 padding=0 cols: Tag=11, Address=10, Length=6, Source=7 | w=37 | rows=1 cursor_row=0 | builds=2 fits=0 fit_rebuilds=0
+[base SYNMAP W118 118x50 unscrolled] header| Tag        Address   LengthSource Raw PhysicalInMemRegion Li
+[base SYNMAP W118 118x50 unscrolled] row0| ✓ SYN_MAP_W0x1C2D3E002266  formula17921792    yes  unknown0.
+[base SYNMAP W118 118x50 unscrolled] row0: Address=0x1C2D3E00:whole; Length=2266:whole; Tag='✓ SYN_MAP_W' (11 cells, ends at 12, inside, form=ok)
+[base SYNMAP W118 118x50 unscrolled] ROWS OK 1/1 | painted 0x runs not declared: ['0x1C2D3E002266']
+[base SYNMAP W118] card width=42
+[base SYNMAP W118] card| ✓ SYN_MAP_W  0x1C2D3E00
+[base SYNMAP W118] card| desc synthetic map
+[base SYNMAP W118] card| unit — · conv CM_SYN
+[base SYNMAP W118] card| layout RL_SYN_MAP
+[base SYNMAP W100 100x50 unscrolled] visible=49 vbar=False scroll_x=0/49 scroll_y=0 fixed_columns=0 padding=0 cols: Tag=11, Address=10, Length=6, Source=7 | w=26 | rows=1 cursor_row=0 | builds=2 fits=0 fit_rebuilds=0
+[base SYNMAP W100 100x50 unscrolled] header| Tag        Address   LengthSource Raw PhysicalInM
+[base SYNMAP W100 100x50 unscrolled] row0| ✓ SYN_MAP_W0x1C2D3E002266  formula17921792    yes
+[base SYNMAP W100 100x50 unscrolled] row0: Address=0x1C2D3E00:whole; Length=2266:whole; Tag='✓ SYN_MAP_W' (11 cells, ends at 12, inside, form=ok)
+[base SYNMAP W100 100x50 unscrolled] ROWS OK 1/1 | painted 0x runs not declared: ['0x1C2D3E002266']
+[base SYNMAP W100] card width=35
+[base SYNMAP W100] card| ✓ SYN_MAP_W  0x1C2D3E00
+[base SYNMAP W100] card| desc synthetic map
+[base SYNMAP W100] card| unit — · conv CM_SYN
+[base SYNMAP W100] card| layout RL_SYN_MAP
+[base SYNMAP W80 80x50 unscrolled] visible=38 vbar=False scroll_x=0/60 scroll_y=0 fixed_columns=0 padding=0 cols: Tag=11, Address=10, Length=6, Source=7 | w=15 | rows=1 cursor_row=0 | builds=2 fits=0 fit_rebuilds=0
+[base SYNMAP W80 80x50 unscrolled] header| Tag        Address   LengthSource Raw
+[base SYNMAP W80 80x50 unscrolled] row0| ✓ SYN_MAP_W0x1C2D3E002266  formula1792
+[base SYNMAP W80 80x50 unscrolled] row0: Address=0x1C2D3E00:whole; Length=2266:whole; Tag='✓ SYN_MAP_W' (11 cells, ends at 12, inside, form=ok)
+[base SYNMAP W80 80x50 unscrolled] ROWS OK 1/1 | painted 0x runs not declared: ['0x1C2D3E002266']
+[base SYNMAP W80] card width=26
+[base SYNMAP W80] card| ✓ SYN_MAP_W  0x1C2D3E00
+[base SYNMAP W80] card| desc synthetic map
+[base SYNMAP W80] card| unit — · conv CM_SYN
+[base SYNMAP W80] card| layout RL_SYN_MAP
+# exit 0 ; clone status after: 0 changed; load: 16.14 15.56 12.09

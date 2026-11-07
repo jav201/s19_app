@@ -91,3 +91,5 @@
 2026-11-07T01:45:35-06:00 E3 done — Inc 11: security round 3 PASS-WITH-NOTES; E3A-17 moved to Inc 12; addenda (E3S-24 surplus rule, -27, -28) before E4
 2026-11-07T01:55:25-06:00 E3 round-4 correction done — Inc 3a (Opus): .148 scaling row (ratio on the per-object part, accepted); security round 5 next
 2026-11-07T02:08:27-06:00 Inc 11 addenda done (79 rows); ruling: READ.52 1.5× time holds on the largest files (C-level line regex lexer); Inc 11 E4 waits for Inc 2a's E5 and merge (it edits a2l_definition.py)
+2026-11-07T02:34:39-06:00 E2 done — Inc 12 (Opus, 62 min): 13 nodes; I-12.1 accepted; E2-4..7 to E3
+2026-11-07T02:34:39-06:00 runner — /tmp on cachyos-rtx is a 16 GB tmpfs and was 100 % full (superseded mutant copies ~8 GB); finished and superseded scratch dirs deleted (evidence already committed), running stages' dirs kept; 23 % used after

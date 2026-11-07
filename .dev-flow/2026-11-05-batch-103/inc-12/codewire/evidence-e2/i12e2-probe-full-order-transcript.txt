@@ -1,0 +1,7 @@
+# probe full order transcript 2026-11-07T01:46:42-06:00 host cachyos-rtx
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e2-12/zq_iso_user; no DISPLAY; no clipboard; stdin closed; load: 2.12 2.51 1.97
+s19_app.__file__ = /tmp/b103-e2-12/full/s19_app/__init__.py | textual 8.2.8 | variant full | scenario order
+[full order] ordered_columns labels (16): ['Address', 'Length', 'Tag', 'Source', 'Raw', 'Physical', 'InMem', 'Region', 'Limits', 'Unit', 'Bits', 'Endian', 'Virt', 'Func', 'Access', 'Dtype']
+[full order] header line starts with 'Address' at column 1 | header|  Address     Length  Tag          Source   Raw   Physical  I
+# exit 0 ; clone status after: 0 changed; load: 3.47 2.79 2.07

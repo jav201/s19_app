@@ -1,0 +1,20 @@
+# probe design flipbar transcript 2026-11-07T02:01:29-06:00 host cachyos-rtx
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e2-12/zq_iso_user; no DISPLAY; no clipboard; stdin closed; load: 1.03 2.00 2.08
+s19_app.__file__ = /tmp/b103-e2-12/design/s19_app/__init__.py | textual 8.2.8 | variant design | scenario flipbar
+[design flipbar page1 (200 rows) 80x54] visible=36 vbar=True scroll_x=0/120 scroll_y=0 fixed_columns=2 padding=1 cols: Address=12, Length=8, Tag=38, Source=9 | w=12 | rows=200 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[design flipbar page1 (200 rows) 80x54] header|  Address     Length  Tag
+[design flipbar page1 (200 rows) 80x54] row0|  0x1C2D3E00  2266    ✓ SYN_M…LL_END
+[design flipbar page1 (200 rows) 80x54] row0: Address=0x1C2D3E00:whole; Length=2266:whole; Tag='✓ SYN_M…LL_END' (14 cells, ends at 35, inside, form=ok)
+[design flipbar page1 (200 rows) 80x54] ROWS OK 28/28 | painted 0x runs not declared: none
+[design flipbar page2 (20 rows) 80x54] visible=38 vbar=False scroll_x=0/118 scroll_y=0 fixed_columns=2 padding=1 cols: Address=12, Length=8, Tag=38, Source=9 | w=14 | rows=20 cursor_row=0 | builds=5 fits=5 fit_rebuilds=2
+[design flipbar page2 (20 rows) 80x54] header|  Address     Length  Tag
+[design flipbar page2 (20 rows) 80x54] row0|  0x0000218E  2       · SYN_M1…6789ABC
+[design flipbar page2 (20 rows) 80x54] row0: Address=0x0000218E:whole; Length=2:whole; Tag='· SYN_M1…6789ABC' (16 cells, ends at 37, inside, form=ok)
+[design flipbar page2 (20 rows) 80x54] ROWS OK 20/20 | painted 0x runs not declared: none
+[design flipbar back to page1 (200 rows) 80x54] visible=36 vbar=True scroll_x=0/120 scroll_y=0 fixed_columns=2 padding=1 cols: Address=12, Length=8, Tag=38, Source=9 | w=12 | rows=200 cursor_row=0 | builds=7 fits=7 fit_rebuilds=3
+[design flipbar back to page1 (200 rows) 80x54] header|  Address     Length  Tag
+[design flipbar back to page1 (200 rows) 80x54] row0|  0x1C2D3E00  2266    ✓ SYN_M…LL_END
+[design flipbar back to page1 (200 rows) 80x54] row0: Address=0x1C2D3E00:whole; Length=2266:whole; Tag='✓ SYN_M…LL_END' (14 cells, ends at 35, inside, form=ok)
+[design flipbar back to page1 (200 rows) 80x54] ROWS OK 28/28 | painted 0x runs not declared: none
+# exit 0 ; clone status after: 0 changed; load: 2.47 2.28 2.17

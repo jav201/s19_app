@@ -1,0 +1,27 @@
+# probe full p64w transcript 2026-11-07T01:46:42-06:00 host cachyos-rtx
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e2-12/zq_iso_user; no DISPLAY; no clipboard; stdin closed; load: 2.12 2.51 1.97
+s19_app.__file__ = /tmp/b103-e2-12/full/s19_app/__init__.py | textual 8.2.8 | variant full | scenario p64w
+[full PAGE64W(48) 80x54 unscrolled] visible=38 vbar=False scroll_x=0/127 scroll_y=0 fixed_columns=2 padding=1 cols: Address=20, Length=9, Tag=38, Source=9 | w=5 | rows=4 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64W(48) 80x54 unscrolled] header|  Address             Length   Tag
+[full PAGE64W(48) 80x54 unscrolled] row0|  0x1C2D3E00          2266     ✓ SY…CD
+[full PAGE64W(48) 80x54 unscrolled] row0: Address=0x1C2D3E00:whole; Length=2266:whole; Tag='✓ SY…CD' (7 cells, ends at 37, inside, form=ok)
+[full PAGE64W(48) 80x54 unscrolled] row1|  0x1C2D3E004026      2        · SY…CD
+[full PAGE64W(48) 80x54 unscrolled] row1: Address=0x1C2D3E004026:whole; Length=2:whole; Tag='· SY…CD' (7 cells, ends at 37, inside, form=ok)
+[full PAGE64W(48) 80x54 unscrolled] row2|  0x00001000          1048576  · SY…CD
+[full PAGE64W(48) 80x54 unscrolled] row2: Address=0x00001000:whole; Length=1048576:whole; Tag='· SY…CD' (7 cells, ends at 37, inside, form=ok)
+[full PAGE64W(48) 80x54 unscrolled] row3|  0xFEDCBA9876543210  2        · SY…CD
+[full PAGE64W(48) 80x54 unscrolled] row3: Address=0xFEDCBA9876543210:whole; Length=2:whole; Tag='· SY…CD' (7 cells, ends at 37, inside, form=ok)
+[full PAGE64W(48) 80x54 unscrolled] ROWS OK 4/4 | painted 0x runs not declared: none
+[full PAGE64W(48) 80x54 scrolled-right] visible=38 vbar=False scroll_x=127/127 scroll_y=0 fixed_columns=2 padding=1 cols: Address=20, Length=9, Tag=38, Source=9 | w=5 | rows=4 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64W(48) 80x54 scrolled-right] header|  Address             Length  s  Dtype
+[full PAGE64W(48) 80x54 scrolled-right] row0|  0x1C2D3E00          2266
+[full PAGE64W(48) 80x54 scrolled-right] row0: Address=0x1C2D3E00:whole; Length=2266:whole; Tag='✓ SY…CD' (7 cells, ends at -90, inside, -)
+[full PAGE64W(48) 80x54 scrolled-right] row1|  0x1C2D3E004026      2          UWORD
+[full PAGE64W(48) 80x54 scrolled-right] row1: Address=0x1C2D3E004026:whole; Length=2:whole; Tag='· SY…CD' (7 cells, ends at -90, inside, -)
+[full PAGE64W(48) 80x54 scrolled-right] row2|  0x00001000          1048576    UBYTE
+[full PAGE64W(48) 80x54 scrolled-right] row2: Address=0x00001000:whole; Length=1048576:whole; Tag='· SY…CD' (7 cells, ends at -90, inside, -)
+[full PAGE64W(48) 80x54 scrolled-right] row3|  0xFEDCBA9876543210  2          UWORD
+[full PAGE64W(48) 80x54 scrolled-right] row3: Address=0xFEDCBA9876543210:whole; Length=2:whole; Tag='· SY…CD' (7 cells, ends at -90, inside, -)
+[full PAGE64W(48) 80x54 scrolled-right] ROWS OK 4/4 | painted 0x runs not declared: none
+# exit 0 ; clone status after: 0 changed; load: 3.91 2.89 2.11

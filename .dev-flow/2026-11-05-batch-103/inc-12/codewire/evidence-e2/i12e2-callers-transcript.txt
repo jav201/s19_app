@@ -1,0 +1,41 @@
+# i12e2-callers transcript — 2026-11-07T02:29:09-06:00
+# base tree: git archive e07fb00 s19_app (throwaway copy in the scratchpad); code-wire v3.1.0 (e436a08); python Python 3.12.7
+files parsed: 86; parse failures: 0
+marks written: 1996
+extractor: marks=1996 graph_nodes=0 calls=3771 findings=2009 parse_failures=0
+
+== S19TuiApp._compose_screen_a2l: 1 marked caller(s)
+   S19TuiApp.compose  <-  s19_app/tui/app.py:3385
+
+== S19TuiApp._setup_datatable_columns: 1 marked caller(s)
+   S19TuiApp.on_mount  <-  s19_app/tui/app.py:8644
+
+== S19TuiApp._build_a2l_table_cells: 1 marked caller(s)
+   S19TuiApp.update_a2l_tags_view  <-  s19_app/tui/app.py:20357
+
+== S19TuiApp.update_a2l_tags_view: 6 marked caller(s)
+   S19TuiApp._apply_viewer_setting  <-  s19_app/tui/app.py:20605
+   S19TuiApp._focus_a2l_tag_absolute_index  <-  s19_app/tui/app.py:16603
+   S19TuiApp._refresh_a2l_filtered_tags  <-  s19_app/tui/app.py:20217, s19_app/tui/app.py:20222
+   S19TuiApp.action_a2l_tags_page_next  <-  s19_app/tui/app.py:11102
+   S19TuiApp.action_a2l_tags_page_prev  <-  s19_app/tui/app.py:11128
+   S19TuiApp.update_a2l_view  <-  s19_app/tui/app.py:20269
+
+== S19TuiApp.on_resize: 0 marked caller(s)
+
+== S19TuiApp.action_show_screen: 6 marked caller(s)
+   S19TuiApp.action_view_alt  <-  s19_app/tui/app.py:10759
+   S19TuiApp.action_view_mac  <-  s19_app/tui/app.py:10763
+   S19TuiApp.action_view_main  <-  s19_app/tui/app.py:10755
+   S19TuiApp.on_memory_map_panel_open_in_hex_requested  <-  s19_app/tui/app.py:19577
+   S19TuiApp.on_rail_selected  <-  s19_app/tui/app.py:10308
+   SplitJoinWindow.action_close_window  <-  s19_app/tui/segment_split_view.py:2199
+
+== S19TuiApp.on_data_table_row_highlighted: 0 marked caller(s)
+
+== _a2l_detail_card_text: 2 marked caller(s)
+   A2LDetailCard.show_tag  <-  s19_app/tui/app.py:1402
+   S19TuiApp._compose_screen_a2l  <-  s19_app/tui/app.py:8528
+
+== S19TuiApp._clip_to: 1 marked caller(s)
+   S19TuiApp._compose_context_line  <-  s19_app/tui/app.py:20928, s19_app/tui/app.py:20929

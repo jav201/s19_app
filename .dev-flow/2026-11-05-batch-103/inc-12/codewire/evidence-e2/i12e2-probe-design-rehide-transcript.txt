@@ -1,0 +1,18 @@
+# probe design rehide transcript 2026-11-07T02:01:29-06:00 host cachyos-rtx
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e2-12/zq_iso_user; no DISPLAY; no clipboard; stdin closed; load: 1.03 2.00 2.08
+s19_app.__file__ = /tmp/b103-e2-12/design/s19_app/__init__.py | textual 8.2.8 | variant design | scenario rehide
+[design rehide shown 80x54] visible=38 vbar=False scroll_x=0/117 scroll_y=0 fixed_columns=2 padding=1 cols: Address=12, Length=8, Tag=38, Source=9 | w=14 | rows=1 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[design rehide shown 80x54] header|  Address     Length  Tag
+[design rehide shown 80x54] row0|  0x1C2D3E00  2266    ✓ SYN_MA…LLL_END
+[design rehide shown 80x54] row0: Address=0x1C2D3E00:whole; Length=2266:whole; Tag='✓ SYN_MA…LLL_END' (16 cells, ends at 37, inside, form=ok)
+[design rehide shown 80x54] ROWS OK 1/1 | painted 0x runs not declared: none
+[design rehide] hidden: region width 0, size (0, 0)
+[design rehide] reloaded while hidden: Tag cell '✓ SYN_MAP_LLLLLLLL…LLLLLLLLLLLLL_END' builds=4
+[design rehide shown again 80x54] visible=38 vbar=False scroll_x=0/117 scroll_y=0 fixed_columns=2 padding=1 cols: Address=12, Length=8, Tag=38, Source=9 | w=14 | rows=1 cursor_row=0 | builds=5 fits=6 fit_rebuilds=2
+[design rehide shown again 80x54] header|  Address     Length  Tag
+[design rehide shown again 80x54] row0|  0x1C2D3E00  2266    ✓ SYN_MA…LLL_END
+[design rehide shown again 80x54] row0: Address=0x1C2D3E00:whole; Length=2266:whole; Tag='✓ SYN_MA…LLL_END' (16 cells, ends at 37, inside, form=ok)
+[design rehide shown again 80x54] ROWS OK 1/1 | painted 0x runs not declared: none
+[design rehide] table Resize events after the first paint (size, visible): [((38, 30), 38)]
+# exit 0 ; clone status after: 0 changed; load: 2.33 2.25 2.16
