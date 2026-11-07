@@ -1,0 +1,6 @@
+s19_app.__file__ = ~/work/b103-int2a/s19_app/__init__.py | python 3.11.18 | part decode
+A2L section tree has structural errors: path=~/work/b103-int2a/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+[X9] CC: describe refusal None, point count 1048572, axis object record end 1048576, element count 1048572, byte length 1048572
+[X9] CC2: describe refusal A2L-DEF-AXIS-REF-RECORD, point count None, axis object record end None, element count None, byte length None
+[X10] _current_count on that record: 1048572
+[X11] decode loop over the 1,048,572 COM points (per point replace + _read_stored_value + _decode_stored): 9.42 s, peak 156 MiB, kept 156 MiB, non-Decoded 0

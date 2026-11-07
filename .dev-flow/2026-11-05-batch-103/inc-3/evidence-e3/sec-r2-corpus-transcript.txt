@@ -1,0 +1,5 @@
+[Q0] files 203, parsed 203, worker errors 0, wall 37.4 s
+[Q1] array/curve/map objects described by the corrected model: 6379; exceptions: 0
+[Q2] first refusal per object: {'none': 6316, 'A2L-DEF-AXIS-KIND': 32, 'A2L-DEF-LAYOUT': 16, 'A2L-DEF-AXIS-FIX-COUNT': 5, 'A2L-DEF-LAYOUT-MODE': 2, 'A2L-DEF-AXIS-MAX': 2, 'A2L-DEF-MATRIX': 2, 'A2L-DEF-AXIS-PARTIAL': 1, 'A2L-DEF-AXIS-REF': 1, 'A2L-DEF-LAYOUT-PART': 1, 'A2L-DEF-LAYOUT-POSITION': 1}
+[Q3] NO_AXIS_PTS datatypes of admitted axes (STD and COM): {'UBYTE': 296, 'UWORD': 99}
+[Q4] FIX axes with a fixed_rule: {'PAR_DIST': 375, 'PAR_LIST': 16, 'PAR': 2}; points built at decode 41554; literal == float arithmetic (value and type) for 393, different for 0; decode exceptions 0

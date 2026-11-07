@@ -16,3 +16,11 @@ Round 1 (3a scope): architect **FAIL** (1 MAJOR, 2 MEDIUM, 7 MINOR, 9 LOW, 4 INF
 | all others | accept with their fix columns; INFO noted. |
 
 **Next:** an Opus correction pass (records and graph), then a round-2 re-check of the blocking findings by both reviewers.
+
+## Round 2 rulings (2026-11-06T23:59:07-06:00, orchestrator Opus 5.5)
+
+Round 2: architect **PASS-WITH-NOTES** (E3A-01 … -03 closed; .142/5's 100 objects describe in 0.012 s; 1 M FIX points at decode 0.94 s / 40 MiB; 2 MINOR, 5 LOW, 1 INFO); security **FAIL** (E3S3-01, -02, -05 closed — 0 exceptions over 3.7 M count values; 7,000 FIX axes describe in 1.78 s / 8 MiB — but three new MAJORs in the nodes the correction changed). Accepted with their fix columns, ruled:
+- **E3S3-09** (FIX_AXIS_PAR shift ≥ 1024 passes describe, OverflowError at decode) and **E3S3-10** (FIX_AXIS_PAR_DIST checked in floating point, computed in exact integers): **one fail-closed rule at describe** — the first and last FIX points are computed in exact integer arithmetic from the parameters, and the axis is refused (the existing FIX refusal code, its own message) when either magnitude exceeds 2^53 (the largest integer a double holds exactly) or the shift exceeds 62. Decode then cannot overflow. Cases for both shapes and the boundary (2^53 accepted, 2^53 + 1 refused).
+- **E3S3-11** (each object re-reads the shared RECORD_LAYOUT / MOD_COMMON: 400 objects sharing a 256 KiB section take 5.3 s / 19.1 s): each RECORD_LAYOUT and MOD_COMMON is parsed **once per walk** (a map in `describe_definitions`'s one walk, keyed by section identity), as E3A-32 already asks for lookups; a case with 400 objects sharing one large layout (≤ the .136 budget).
+- E3S3-08, the architect's notes (E3A-24 refused definitions carry no unread count; E3A-25 a PAR_LIST case): applied in the same pass; the rest are E4 addenda.
+**Next:** a narrow Opus correction, then security round 3 on E3S3-09 … -11 only.
