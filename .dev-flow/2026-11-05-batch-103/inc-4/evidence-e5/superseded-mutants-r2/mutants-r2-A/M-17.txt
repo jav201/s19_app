@@ -1,0 +1,46 @@
+# M-17  row R-A2L-MATCH.17
+
+control: no de-duplication -> `VALUE_0001` twice
+edit: `build_label_index`: append every name (drop the `seen` de-dup)
+
+s19_app.__file__: /tmp/b103-e5-4-mutr2A/M-17/s19_app/__init__.py
+
+== diff ==
+--- /tmp/b103-e5-4-mutr2A/base/s19_app/tui/services/label_match.py	2026-11-06 22:11:34.000000000 -0600
++++ /tmp/b103-e5-4-mutr2A/M-17/s19_app/tui/services/label_match.py	2026-11-06 22:43:50.240488742 -0600
+@@ -157,9 +157,7 @@
+             raise TypeError(f"label names must be str, got {type(name).__name__}")
+         if len(name) > 1024:
+             continue
+-        if name not in seen:
+-            seen.add(name)
+-            uniq.append(name)
++        uniq.append(name)
+ 
+     names_tuple = tuple(uniq)
+     count = len(uniq)
+
+== pytest (returncode 1, KILLED) ==
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+________________ test_ranked_list_is_exactly[R-A2L-MATCH.17/1] _________________
+tests/test_b103_label_match.py:391: in test_ranked_list_is_exactly
+    assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E   AssertionError: R-A2L-MATCH.17/1: query 'VALUE_0001' limit 20
+E   assert [('VALUE_0001..., ((0, 10),))] == [('VALUE_0001..., ((0, 10),))]
+E     
+E     Left contains one more item: ('VALUE_0001', 'exact', 0, ((0, 10),))
+E     Use -v to get more diff
+________________ test_ranked_list_is_exactly[R-A2L-MATCH.17/2] _________________
+tests/test_b103_label_match.py:391: in test_ranked_list_is_exactly
+    assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E   AssertionError: R-A2L-MATCH.17/2: query 'value_000' limit 20
+E   assert [('VALUE_0001...0, 9),)), ...] == [('VALUE_0001...0, 9),)), ...]
+E     
+E     At index 1 diff: ('VALUE_0001', 'prefix', 0, ((0, 9),)) != ('VALUE_0002', 'prefix', 0, ((0, 9),))
+E     Use -v to get more diff
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.17/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.17/2]
+2 failed, 127 deselected in 5.21s
+

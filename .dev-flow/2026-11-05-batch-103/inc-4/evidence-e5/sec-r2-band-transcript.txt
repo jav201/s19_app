@@ -1,0 +1,36 @@
+runner sec-r2-run.sh sha256 01a6306bb691ca8ba9909f4f35ba0d442c21ea334e625d9331e6e9241c6bce63; probe sec-r2-probe.py sha256 97ba09572a2544759f9fe28d09e982244c15680c81b825065d58855a7e85cda9
+s19_app.__file__ = /tmp/b103-e5-4-sec-r2/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5-4-sec-r2/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0
+tests module = /tmp/b103-e5-4-sec-r2/tree/tests/test_b103_label_match_perf.py
+mode = r2 band  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = -5450271984167729589
+host = cachyos-rtx  load = (5.99, 3.9, 2.71)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5-4-sec-r2/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5-4-sec-r2/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5-4-sec-r2/pilot
+probe = sec-r2-probe.py sha256 97ba09572a2544759f9fe28d09e982244c15680c81b825065d58855a7e85cda9; round-1 helpers = sec-e5-probe.py sha256 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+_FUZZY_SWITCH_CAP = 512
+BAND: 50,000 names, 2,279,697 characters in all (.40 scope: 50,000 names, <= 2,356,624)
+      119.9 ms [ok] median of 7; chars 256, tokens   2 (distinct   2); listed 20 ['fuzzy'] edits [1]; bad spans 0  BAND .40/4 query (head + 249-char token)
+      walks 1, _prefix_distance 226, _classify 20; same list on {'map-only': True, 'per-id after walk 1': True}
+       11.7 ms [ok] median of 7; chars 256, tokens   2 (distinct   2); listed 20 ['token'] edits [0]; bad spans 0  BAND head + 249 'a' (0 edits)
+      walks 0, _prefix_distance 0, _classify 20; same list on {'map-only': True, 'per-id after walk 1': True}
+       89.2 ms [ok] median of 7; chars 256, tokens   2 (distinct   2); listed 0 - edits -; bad spans 0  BAND head + 249 'b' (no match: candidates emptied)
+      walks 1, _prefix_distance 226, _classify 0; same list on {'map-only': True, 'per-id after walk 1': True}
+      103.5 ms [ok] median of 7; chars 256, tokens   3 (distinct   3); listed 20 ['fuzzy'] edits [2]; bad spans 0  BAND head + two ~124-char tokens
+      walks 1, _prefix_distance 452, _classify 20; same list on {'map-only': True, 'per-id after walk 1': True}
+
+=== SW-MAX: the most distinct long tokens the switch admits (<= 512 occurrences): 102 names = head + 4 tokens of 252 chars
+    (510 occurrences, 408 distinct long tokens; BAND has 225) + REF padding; query head + 249-char token
+    50,000 names, 2,161,656 characters in all (.40 scope: 50,000 names, <= 2,356,624); name length 1018
+    crafted occurrences 510
+      205.5 ms [ok] median of 7; chars 256, tokens   2 (distinct   2); listed 20 ['fuzzy'] edits [1]; bad spans 0  SW-MAX head + 248 'a' + 'b'
+      walks 1, _prefix_distance 409, _classify 20; same list on {'map-only': True, 'per-id after walk 1': True}
+      158.3 ms [ok] median of 7; chars 256, tokens   2 (distinct   2); listed 0 - edits -; bad spans 0  SW-MAX head + 249-char 'abcd..p' cycle (no match: candidates emptied, then the subsequence scan)
+      walks 1, _prefix_distance 409, _classify 0
+    one ranking under tracemalloc: peak 0.08 MiB (0.61 s [ok])
+
+=== oracle (E1 evaluate_b, uncapped OSA) on reduced lists (the switch depends on the candidates only)
+  BAND 225 + 275 REF: rank == oracle True (15 s); listed 20
+  SW-MAX 102 + 398 REF: rank == oracle True (5 s); listed 20
+
+load after = (4.7, 3.83, 2.74)
+probe exit 0

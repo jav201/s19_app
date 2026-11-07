@@ -1,0 +1,187 @@
+runner sec-r2-run.sh sha256 01a6306bb691ca8ba9909f4f35ba0d442c21ea334e625d9331e6e9241c6bce63; probe sec-e5-probe.py sha256 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+s19_app.__file__ = /tmp/b103-e5-4-sec-r2/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5-4-sec-r2/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0
+tests module = /tmp/b103-e5-4-sec-r2/tree/tests/test_b103_label_match_perf.py
+mode = perf  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = -1982001190166649339
+host = cachyos-rtx  load = (3.17, 3.58, 2.74)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5-4-sec-r2/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5-4-sec-r2/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5-4-sec-r2/pilot
+REF built in 1.80 s [ok]
+REF6 built in 0.61 s [ok]
+LONG built in 1.92 s [ok]
+
+=== REF: QSET (33, .36/1); limit 20, median of 7; bound 200 ms; load (2.99, 3.53, 2.73)
+         51.0 ms [ok] n=20  chars=1    '00 a'
+         51.8 ms [ok] n=20  chars=1    '01 e'
+         10.8 ms [ok] n=20  chars=1    '02 0'
+          5.0 ms [ok] n=20  chars=2    '03 zz'
+          5.8 ms [ok] n=20  chars=2    '04 ab'
+         10.6 ms [ok] n=4   chars=35   '05 JotafVod_msrqlLzL_kh2C_rWl_pfue._0_'
+         13.7 ms [ok] n=4   chars=12   '06 JotafVod_msr'
+         19.7 ms [ok] n=20  chars=8    '07 srqlLzL_'
+         13.9 ms [ok] n=20  chars=7    '08 0 jotaf'
+          3.9 ms [ok] n=20  chars=4    '09 JVmL'
+         57.7 ms [ok] n=20  chars=7    '10 xqzjvkw'
+         22.4 ms [ok] n=13  chars=9    '11 qqqq zzzz'
+          5.9 ms [ok] n=20  chars=4    '12 aaaa'
+          9.1 ms [ok] n=20  chars=5    '13 e e e'
+         58.9 ms [ok] n=20  chars=6    '14 Nzukij'
+         61.7 ms [ok] n=4   chars=10   '15 Ierxjr_Eud'
+         20.0 ms [ok] n=20  chars=7    '16 ledRing'
+         52.2 ms [ok] n=4   chars=9    '17 pposbxiif'
+          3.1 ms [ok] n=20  chars=3    '18 cnt'
+         16.2 ms [ok] n=0   chars=15   '19 temp_sensor_max'
+         24.9 ms [ok] n=20  chars=11   '20 x y z w v u'
+         17.1 ms [ok] n=4   chars=32   '21 pposbxiifkdgfiajnbbpvb_dyan_xvz1'
+         54.9 ms [ok] n=4   chars=57   '22 njraipjtbtu lsuakcoj hsxgibymjxu orfltalc ua'
+         55.3 ms [ok] n=4   chars=51   '23 votklbi fjblnabj qghque pdjxmq tiprdynotu dj'
+         51.4 ms [ok] n=3   chars=45   '24 lmmwngodou jadkvqy khbnukc qomfrybiza evfwbq'
+          8.7 ms [ok] n=20  chars=255  '25 e e e e e e e e e e e e e e e e e e e e e e '
+         20.4 ms [ok] n=0   chars=255  '26 a b c d e f g h i j k l m n o p q r s t u v '
+          5.0 ms [ok] n=20  chars=255  '27 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 '
+         67.9 ms [ok] n=0   chars=256  '28 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          9.4 ms [ok] n=0   chars=256  '29 FCA_NPUK_SMM.RWG_TjsPHIoim_SNX_TVC_2_ewhpkdt'
+          7.4 ms [ok] n=0   chars=256  '30 RUX_ARV_LFS_QM_GJWTDMS_WDGTH.Fgathduhjd,Wrh_'
+         12.2 ms [ok] n=1   chars=103  '31 HRR_WOL.TNY_U_ZmyrXSZTPeyoMsdpWwbcUtd_Dwvrap'
+         13.5 ms [ok] n=1   chars=103  '32 RHR_WOL.TNY_U_ZmyrXSZTPeyoMsdpWwbcUtd_Dwvrap'
+  worst 67.9 ms (28 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa); non-ok 0; bad spans 0; over the bound 0 of 33; load (2.84, 3.48, 2.72)
+
+=== REF: PSET over REF (.40/1); limit 20, median of 7; bound 1000 ms; load (2.84, 3.48, 2.72)
+          7.1 ms [ok] n=20  chars=255  'qzx x64'
+         86.0 ms [ok] n=20  chars=255  'qza..qzz x3'
+          7.7 ms [ok] n=20  chars=255  'cnt x64'
+          6.8 ms [ok] n=20  chars=256  '1a x128'
+          7.1 ms [ok] n=20  chars=255  'rat x64'
+          7.7 ms [ok] n=20  chars=243  'e x120 + rat'
+  worst 86.0 ms (qza..qzz x3); non-ok 0; bad spans 0; over the bound 0 of 6; load (2.84, 3.48, 2.72)
+
+=== REF: E3 extra shapes (beyond the tests); limit 20, median of 7; bound 1000 ms; load (2.84, 3.48, 2.72)
+          6.8 ms [ok] n=20  chars=256  "'1a' x 128"
+          2.9 ms [ok] n=20  chars=256  "'aB' x 128"
+         10.9 ms [ok] n=20  chars=256  "'aBcd' x 64"
+         24.2 ms [ok] n=10  chars=255  "'x y z w v u ' cut 256"
+         67.5 ms [ok] n=0   chars=255  "'a' x 255"
+         67.7 ms [ok] n=0   chars=255  "'e' x 255"
+         66.0 ms [ok] n=0   chars=255  "'z' x 255"
+         73.7 ms [ok] n=0   chars=255  "'ab' x 127 + 'a'"
+          6.8 ms [ok] n=0   chars=256  "'0123456789' cut 256"
+          9.2 ms [ok] n=0   chars=256  "'0' x 256"
+          4.1 ms [ok] n=20  chars=255  "'1 2 3 ' cut 256"
+         41.4 ms [ok] n=0   chars=256  "'é' x 256"
+          6.7 ms [ok] n=0   chars=255  "'é ' x 128"
+          7.6 ms [ok] n=0   chars=256  "'漢字 ' cut 256"
+         42.1 ms [ok] n=0   chars=256  "'Ä' x 256"
+         42.7 ms [ok] n=0   chars=256  "'İ' x 256"
+         17.1 ms [ok] n=0   chars=255  "'U+1F600 ' x 128"
+         10.4 ms [ok] n=0   chars=256  "'drück ' cut 256"
+          7.6 ms [ok] n=20  chars=255  "'cnt ' x 64"
+  worst 73.7 ms ('ab' x 127 + 'a'); non-ok 0; bad spans 0; over the bound 0 of 19; load (2.71, 3.43, 2.72)
+
+=== REF6: REF6 queries (12, .36/1); limit 20, median of 7; bound 200 ms; load (2.71, 3.43, 2.72)
+         31.3 ms [ok] n=20  chars=1    'm'
+         31.8 ms [ok] n=20  chars=5    'meas_'
+         36.5 ms [ok] n=20  chars=3    'chr'
+         36.8 ms [ok] n=20  chars=4    'mesa'
+         36.7 ms [ok] n=20  chars=4    'cahr'
+         50.8 ms [ok] n=20  chars=3    'cr0'
+         18.4 ms [ok] n=20  chars=6    'char 1'
+        100.1 ms [ok] n=20  chars=1    '0'
+         40.6 ms [ok] n=20  chars=5    'chr 0'
+         27.8 ms [ok] n=20  chars=4    'ch00'
+         18.4 ms [ok] n=20  chars=6    'meas 1'
+         19.8 ms [ok] n=20  chars=5    'c 0 1'
+  worst 100.1 ms (0); non-ok 0; bad spans 0; over the bound 0 of 12; load (2.65, 3.41, 2.71)
+
+=== REF6: PSET over REF6 (.40/1); limit 20, median of 7; bound 1000 ms; load (2.65, 3.41, 2.71)
+         37.7 ms [ok] n=20  chars=255  'chr x64'
+         38.0 ms [ok] n=20  chars=254  'cahr x51'
+         76.7 ms [ok] n=20  chars=255  '0 x128'
+         62.7 ms [ok] n=20  chars=254  '00 x85'
+         34.6 ms [ok] n=20  chars=255  'c 0 x64'
+         32.6 ms [ok] n=20  chars=255  'c x128'
+         32.5 ms [ok] n=20  chars=255  'm x128'
+         37.8 ms [ok] n=20  chars=255  '1 x128'
+         39.3 ms [ok] n=20  chars=254  'c x125 + chax'
+         40.7 ms [ok] n=20  chars=254  '0 x125 + chax'
+         39.5 ms [ok] n=20  chars=256  'chax x52'
+         39.5 ms [ok] n=20  chars=256  'mesa x52'
+        308.4 ms [ok] n=20  chars=255  'near tokens'
+        145.7 ms [ok] n=20  chars=255  'cha..chz x3'
+        259.1 ms [ok] n=20  chars=254  '51 typos of char'
+         14.1 ms [ok] n=0   chars=255  'E3S-01 e x128'
+          7.1 ms [ok] n=0   chars=255  'E3S-01 a..z'
+         75.6 ms [ok] n=20  chars=255  'E3S-01 0 x128'
+         20.0 ms [ok] n=0   chars=256  'E3S-01 a x256'
+          7.3 ms [ok] n=0   chars=256  'E3S-01 pool join'
+          7.4 ms [ok] n=0   chars=256  'E3S-01 pool[200:] join'
+          7.2 ms [ok] n=0   chars=103  'E3S-01 longest REF name'
+          7.2 ms [ok] n=0   chars=103  'E3S-01 longest swapped'
+  worst 308.4 ms (near tokens); non-ok 0; bad spans 0; over the bound 0 of 23; load (2.62, 3.38, 2.71)
+
+=== REF6: E3 REF6 shapes (beyond the tests); limit 20, median of 7; bound 1000 ms; load (2.62, 3.38, 2.71)
+         31.9 ms [ok] n=20  chars=255  "'c ' x 128"
+         32.6 ms [ok] n=20  chars=255  "'m ' x 128"
+         76.1 ms [ok] n=20  chars=255  "'0 ' x 128"
+         37.7 ms [ok] n=20  chars=255  "'1 ' x 128"
+         34.2 ms [ok] n=20  chars=256  "'char ' cut 256"
+         39.1 ms [ok] n=20  chars=256  "'chax ' cut 256"
+         39.3 ms [ok] n=20  chars=256  "'mesa ' cut 256"
+         39.6 ms [ok] n=20  chars=254  "'c ' x 125 + 'chax'"
+         40.4 ms [ok] n=20  chars=254  "'0 ' x 125 + 'chax'"
+         19.7 ms [ok] n=0   chars=256  "'1a' x 128"
+          6.7 ms [ok] n=0   chars=256  "REF6 names joined by ','"
+          7.1 ms [ok] n=0   chars=255  "'a b c ... z ' cut 256"
+         14.7 ms [ok] n=0   chars=255  "'e ' x 128"
+         20.6 ms [ok] n=0   chars=256  "'a' x 256"
+  worst 76.1 ms ('0 ' x 128); non-ok 0; bad spans 0; over the bound 0 of 14; load (2.57, 3.35, 2.71)
+
+=== REF6: E3 extra shapes over REF6 (beyond the tests); limit 20, median of 7; bound 1000 ms; load (2.57, 3.35, 2.71)
+         18.2 ms [ok] n=0   chars=256  "'1a' x 128"
+          6.6 ms [ok] n=0   chars=256  "'aB' x 128"
+          7.2 ms [ok] n=0   chars=256  "'aBcd' x 64"
+          6.5 ms [ok] n=0   chars=255  "'x y z w v u ' cut 256"
+         21.3 ms [ok] n=0   chars=255  "'a' x 255"
+         14.7 ms [ok] n=0   chars=255  "'e' x 255"
+          7.3 ms [ok] n=0   chars=255  "'z' x 255"
+          7.1 ms [ok] n=0   chars=255  "'ab' x 127 + 'a'"
+          7.4 ms [ok] n=0   chars=256  "'0123456789' cut 256"
+         30.6 ms [ok] n=0   chars=256  "'0' x 256"
+         10.0 ms [ok] n=0   chars=255  "'1 2 3 ' cut 256"
+          6.7 ms [ok] n=0   chars=256  "'é' x 256"
+          6.5 ms [ok] n=0   chars=255  "'é ' x 128"
+          7.4 ms [ok] n=0   chars=256  "'漢字 ' cut 256"
+          7.4 ms [ok] n=0   chars=256  "'Ä' x 256"
+          7.4 ms [ok] n=0   chars=256  "'İ' x 256"
+          7.2 ms [ok] n=0   chars=255  "'U+1F600 ' x 128"
+          6.6 ms [ok] n=0   chars=256  "'drück ' cut 256"
+          6.6 ms [ok] n=0   chars=255  "'cnt ' x 64"
+  worst 30.6 ms ('0' x 256); non-ok 0; bad spans 0; over the bound 0 of 19; load (2.53, 3.33, 2.7)
+
+=== LONG: LONG queries (.40/2); limit 20, median of 7; bound 1000 ms; load (2.53, 3.33, 2.7)
+         59.0 ms [ok] n=20  chars=256  'a x255 + b'
+         59.8 ms [ok] n=20  chars=256  'a x254 + bb'
+         52.5 ms [ok] n=20  chars=129  'a x128 + b'
+  worst 59.8 ms (a x254 + bb); non-ok 0; bad spans 0; over the bound 0 of 3; load (2.53, 3.33, 2.7)
+
+=== LONG: short-token shapes over LONG (beyond the tests); limit 20, median of 7; bound 1000 ms; load (2.53, 3.33, 2.7)
+          6.7 ms [ok] n=20  chars=255  "'aaq ' x 64 (one 1-edit token, repeated)"
+          5.1 ms [ok] n=20  chars=254  "'aaaq ' x 51"
+         47.2 ms [ok] n=20  chars=251  "'aaaaaq ' x 36 (2-edit token, repeated)"
+         71.2 ms [ok] n=20  chars=255  "'aab' .. 'aaz' x 2, cut 256 (distinct 1-edit tokens)"
+          2.9 ms [ok] n=20  chars=3    "'aaq'"
+          1.8 ms [ok] n=20  chars=256  "'a' x 256"
+  worst 71.2 ms ('aab' .. 'aaz' x 2, cut 256 (distinct 1-edit tokens)); non-ok 0; bad spans 0; over the bound 0 of 6; load (2.53, 3.33, 2.7)
+
+=== summary
+  REF  QSET (33, .36/1)                                 worst     67.9 ms (28 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa); non-ok 0; bad spans 0; over 0/33
+  REF  PSET over REF (.40/1)                            worst     86.0 ms (qza..qzz x3); non-ok 0; bad spans 0; over 0/6
+  REF  E3 extra shapes (beyond the tests)               worst     73.7 ms ('ab' x 127 + 'a'); non-ok 0; bad spans 0; over 0/19
+  REF6 REF6 queries (12, .36/1)                         worst    100.1 ms (0); non-ok 0; bad spans 0; over 0/12
+  REF6 PSET over REF6 (.40/1)                           worst    308.4 ms (near tokens); non-ok 0; bad spans 0; over 0/23
+  REF6 E3 REF6 shapes (beyond the tests)                worst     76.1 ms ('0 ' x 128); non-ok 0; bad spans 0; over 0/14
+  REF6 E3 extra shapes over REF6 (beyond the tests)     worst     30.6 ms ('0' x 256); non-ok 0; bad spans 0; over 0/19
+  LONG LONG queries (.40/2)                             worst     59.8 ms (a x254 + bb); non-ok 0; bad spans 0; over 0/3
+  LONG short-token shapes over LONG (beyond the tests)  worst     71.2 ms ('aab' .. 'aaz' x 2, cut 256 (distinct 1-); non-ok 0; bad spans 0; over 0/6
+
+load after = (2.53, 3.33, 2.7)
+probe exit 0

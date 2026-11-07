@@ -1,0 +1,44 @@
+runner sec-r2-run.sh sha256 01a6306bb691ca8ba9909f4f35ba0d442c21ea334e625d9331e6e9241c6bce63; probe sec-r2-probe.py sha256 97ba09572a2544759f9fe28d09e982244c15680c81b825065d58855a7e85cda9
+s19_app.__file__ = /tmp/b103-e5-4-sec-r2/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5-4-sec-r2/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0
+tests module = /tmp/b103-e5-4-sec-r2/tree/tests/test_b103_label_match_perf.py
+mode = r2 fixcheck  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = -5290263365416824594
+host = cachyos-rtx  load = (4.09, 3.77, 2.75)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5-4-sec-r2/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5-4-sec-r2/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5-4-sec-r2/pilot
+probe = sec-r2-probe.py sha256 97ba09572a2544759f9fe28d09e982244c15680c81b825065d58855a7e85cda9; round-1 helpers = sec-e5-probe.py sha256 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+_FUZZY_SWITCH_CAP = 512
+real = lm._fuzzy_tier (shipped); ranges = same walk, a (lo, hi, d) table, one postings slice per range, C-level totals
+
+=== U1: 50,000 names 'ab' + 4 letters (one distinct token each): 50,000 names, 300,000 characters in all (.40 scope: 50,000 names, <= 2,356,624)
+  real    843.1 ms | ranges    325.9 ms (of which the walks     8.8 ms, 656 ranges) | candidates 50,000; equal totals True  'abaAbbAbcAbdAbeAbfAbgAbhAbiAbjAbkAblAbmAbnAb'
+  real   1857.4 ms | ranges    751.1 ms (of which the walks     1.1 ms, 700 ranges) | candidates 50,000; equal totals True  'abaAbbAbcAbdAbeAbfAbgAbhAbiAbjAbkAblAbmAbnAb'
+
+=== U6: 50,000 names of 6 distinct 'ab'+4-letter tokens: 50,000 names, 2,050,000 characters in all (.40 scope: 50,000 names, <= 2,356,624)
+  real   3402.2 ms | ranges    546.3 ms (of which the walks     1.0 ms, 656 ranges) | candidates 50,000; equal totals True  'abaAbbAbcAbdAbeAbfAbgAbhAbiAbjAbkAblAbmAbnAb'
+  real   7438.4 ms | ranges   1350.1 ms (of which the walks     1.2 ms, 700 ranges) | candidates 50,000; equal totals True  'abaAbbAbcAbdAbeAbfAbgAbhAbiAbjAbkAblAbmAbnAb'
+
+=== S1: 50,000 names 'ab_' + number (one shared token 'ab'): 50,000 names, 388,890 characters in all (.40 scope: 50,000 names, <= 2,356,624)
+  real    610.2 ms | ranges    320.3 ms (of which the walks     3.8 ms, 32 ranges) | candidates 50,000; equal totals True  'abaAbbAbcAbdAbeAbfAbgAbhAbiAbjAbkAblAbmAbnAb'
+  real    758.6 ms | ranges    728.6 ms (of which the walks     8.9 ms, 76 ranges) | candidates 50,000; equal totals True  'abaAbbAbcAbdAbeAbfAbgAbhAbiAbjAbkAblAbmAbnAb'
+
+=== E2: 50,000 names 'abcd' + 4 letters (2-edit queries): 50,000 names, 400,000 characters in all (.40 scope: 50,000 names, <= 2,356,624)
+  real   1034.5 ms | ranges    556.0 ms (of which the walks    56.3 ms, 41,508 ranges) | candidates 50,000; equal totals True  'abcdesAbcdetAbcdeuAbcdevAbcdewAbcdexAbcdeyAb'
+
+=== M1: 25,000 U1 names + 25,000 REF names: 50,000 names, 1,166,622 characters in all (.40 scope: 50,000 names, <= 2,356,624)
+  real    549.2 ms | ranges    292.8 ms (of which the walks    97.6 ms, 2,719 ranges) | candidates 25,255; equal totals True  'abaAbbAbcAbdAbeAbfAbgAbhAbiAbjAbkAblAbmAbnAb'
+  real   1271.8 ms | ranges    650.2 ms (of which the walks   217.2 ms, 6,506 ranges) | candidates 25,255; equal totals True  'abaAbbAbcAbdAbeAbfAbgAbhAbiAbjAbkAblAbmAbnAb'
+
+=== REF6 (case 06, first 50,000): 50,000 names, 650,000 characters in all (.40 scope: 50,000 names, <= 2,356,624)
+  real     30.3 ms | ranges     54.4 ms (of which the walks     0.5 ms, 1 ranges) | candidates 25,000; equal totals True  'chr chr chr chr chr chr chr chr chr chr chr '
+  real      5.1 ms | ranges     43.6 ms (of which the walks     0.1 ms, 1 ranges) | candidates 25,000; equal totals True  'cahr cahr cahr cahr cahr cahr cahr cahr cahr'
+  real      5.8 ms | ranges      6.3 ms (of which the walks     0.0 ms, 1 ranges) | candidates 50,000; equal totals True  '0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 '
+  real      4.5 ms | ranges      4.7 ms (of which the walks     0.0 ms, 1 ranges) | candidates 40,500; equal totals True  '00 00 00 00 00 00 00 00 00 00 00 00 00 00 00'
+  real      7.3 ms | ranges      7.0 ms (of which the walks     0.0 ms, 2 ranges) | candidates 25,000; equal totals True  'c 0 c 0 c 0 c 0 c 0 c 0 c 0 c 0 c 0 c 0 c 0 '
+  real      2.5 ms | ranges      2.8 ms (of which the walks     0.0 ms, 1 ranges) | candidates 25,000; equal totals True  'c c c c c c c c c c c c c c c c c c c c c c '
+
+=== CRAFT: 50,000 names, 2,356,624 characters in all (.40 scope: 50,000 names, <= 2,356,624)
+  real    195.1 ms | ranges    198.4 ms (of which the walks   193.9 ms, 1,067 ranges) | candidates 300; equal totals True  '987654 kemq vbcq sdlq tbrq gbcq nncq nbtq dh'
+
+load after = (3.38, 3.64, 2.75)
+probe exit 0
