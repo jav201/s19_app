@@ -1,0 +1,45 @@
+TEST   R-CHG-003.1 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-CHG-003.2 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-CHG-003.5 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-HEX-EMIT-001.2 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-HEX-EMIT-001.3 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-HEX-SAVE-001.1 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-HEX-SAVE-001.2 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-HEX-VERIFY-001.1 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-HEX-VERIFY-002.1 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-HEX-VERIFY-002.3 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-IMG-WRITE.2 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-PE-EXPORT.1 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-PE-EXPORT.10 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-PE-EXPORT.11 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-PE-EXPORT.12 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-PE-EXPORT.13 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-PE-EXPORT.14 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-PE-EXPORT.15 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-PE-EXPORT.16 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-PE-EXPORT.2 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-PE-EXPORT.3 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-PE-EXPORT.4 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-PE-EXPORT.5 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-PE-EXPORT.6 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-PE-EXPORT.7 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-PE-EXPORT.8 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-PE-EXPORT.9 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-S19-EMIT.11 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-S19-EMIT.3 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-S19-EMIT.4 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-S19-EMIT.5 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-S19-S0HEADER-001.1 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-S19-S0HEADER-001.2 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-S19-S0HEADER-001.3 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-S19-SAVE-REUSE-001.1 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-S19-WIDTH-001.1 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-S19-WIDTH-001.2 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-TUI-049.1 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-TUI-063.1 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-TUI-064.1 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-TUI-064.2 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+TEST   R-TUI-064.4 is named by no file under /tmp/b103-e1-10/trace/emptytests, and neither is a TC/AT id it lists
+EVID   no 04-validation.md beside ../../../../tmp/b103-e1-10/trace/inc-10/01-requirements.md
+trace_check: 3 US, 42 active requirements (0 withdrawn), 43 gap(s)
+exit=1
