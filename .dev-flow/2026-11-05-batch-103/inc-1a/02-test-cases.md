@@ -289,3 +289,46 @@ Addendum re-cut (right-click): copy way **C1** `ctrl+c` (AT-I1a-1 … 8, 12 … 
 | AT-I1a-27 | … C2 multi-line → multi-line by right-click | normal | real app | Box M → Box M', C2, route 3 | Box M' P2 — R-PASTE.30 | | gap | not_run |
 
 **Counts (after the E1 addendum and the E3 corrections, rounds 1 to 3):** 194 cases: 167 coverage items over the 40 active rows and the 12 cited rows (R-LOADDLG.20 2; R-TUI-043.10.1 6, .10.2 2, .9 2, .6 5, .4 1, R-TUI-044.3 1, R-TUI-043.5 3, .7 2, .8 2, .11 2, .12 3, .13 2; R-PASTE.1 2, R-TUI-044.4 1, R-TUI-044.2 8; R-PASTE.2 2, .3 2, .4 2, .5 3, .6 2, .7 2, .8 1, .9 4, .10 2, .11 3, .12 3, .13 2, .14 2, .15 7; R-PASTE.16 3, .17 2; R-TUI-044.1 18, R-PASTE.18 8, .19 2; R-PASTE.20 2, .21 5, .22 2, .23 2; R-PASTE.24 3, .25 3, .26 3, .27 3, .28 2, .29 4, .30 2, .31 6, .32 2, .33 2; R-PASTE.34 6, .35 4, .36 2) and 27 acceptance cases. By platform (a case "as /1" takes /1's platform): 62 LinuxH only (runnable now; R-PASTE.36/2 is RED until the batch records are redacted); 74 on both LinuxH and WinCI (their LinuxH arm runnable now; the 24 walk cases, AT-I1a-1 … 8 and 12 … 27, the copy rules, the right-click placement cases); 54 WinCI only (blocked until a push and the probe); 2 LinuxX only (R-TUI-043.6/4, R-PASTE.9/3; blocked until Xvfb and xclip, as are the X half of R-PASTE.21/3 and the Linux RED-on-base runs of R-TUI-043.10.1, R-PASTE.11, R-PASTE.27 and R-PASTE.31 (now on LinuxH with a `tkinter.Tcl()` stand-in root, E3A-03)); 2 operator-run (AT-I1a-10, AT-I1a-11). Addendum delta: + 41 coverage items (27 on R-PASTE.24 … .33; 14 right-click cases of rows whose trigger is any copy or paste: R-PASTE.9/4, .10/2, .12/3, .14/2, .15/6, .15/7, R-TUI-043.6/5, .7/2, .8/2, .9/2, .11/2, .12/3, .13/2, R-TUI-044.2/6), + 17 acceptance cases (AT-I1a-11 … 27); changed: AT-I1a-9 (the right-click route) and the walk procedure (each of the 24 walk cases gains a right-click round trip). E3 round 2 delta: + 4 coverage items, all LinuxH only (R-PASTE.34/5, R-TUI-044.2/8, R-PASTE.36/1, /2); changed: the strip cases R-PASTE.34/1 … /4 and R-PASTE.35/1 … /4 (value oracles, exact expected values, the WinCI arms by Own write), R-TUI-044.2/7, R-TUI-043.10.1/5, R-PASTE.31/5 (an image arm), R-TUI-043.6/3 (base note), R-PASTE.21/4. E3 round 3 delta: + 4 coverage items, 3 LinuxH only (R-PASTE.34/6, E3A-25; R-LOADDLG.20/1, /2, E3S-24, E3A-26) and 1 WinCI only (R-PASTE.21/5, E3S-25); changed: the NUL kept in the LinuxH arms of R-PASTE.34/1, /3, /4 and R-PASTE.35/1, /3, /4 (the WinCI arms' NUL-free twins unchanged), R-PASTE.34/5's negative control and note, R-PASTE.22/1 and R-PASTE.23/1, /2 (the skip at setup, E3A-28). Before the addendum: 113 cases (103 + 10; 34 / 44 / 32 / 2 / 1). Negative controls (the mutant of each row, run at E5 in a copy of the tree): `01-requirements.md`, column "Negative control".
+
+---
+
+## E4 test fill (independent tester; appended at E4, not the E1 table)
+
+The **Tests / Coverage / Result** columns of the rows above are filled here
+per case id, because the table was written at E1 before any test existed.
+Each test function name carries its case id (`r_tui_043_6_1`, `r_paste_1_1`,
+`at_i1a_matrix_copy_then_paste[<cell>]`, …), so `trace_check.py` resolves every
+active requirement. Files: G-T1 `tests/test_b103_clipboard_core.py` (87 tests),
+G-T2 `tests/test_b103_clipboard_windows.py` (57 tests, skip `Windows only`),
+G-T3 `tests/test_b103_clipboard_matrix.py` (53 tests); support
+`tests/support/b103_clipboard.py`; the suite-wide isolation in
+`tests/conftest.py`; the redaction-gate roots in `tests/test_suite_hygiene.py`.
+Total collected on base: **197**.
+
+- **full (verified on base, RED where the base lacks the behaviour).** The
+  LinuxH cases of the paste/copy/cut rules, the terminal route, the paste
+  limit, the unsafe-character strip (R-PASTE.34/.35, R-LOADDLG.20), the OSC 52
+  copy (R-PASTE.15), the right-click (LinuxH arms), the censuses
+  (R-TUI-044.1/18, R-PASTE.18/8, .19/1, .33/1), the workflow guard
+  (R-PASTE.20/1), the isolation predicate (R-PASTE.21/1-3) and the probe
+  skip/fail pytester cases (R-PASTE.22/1, .23/1-2), the redaction root case
+  (R-PASTE.36/1). RED on base: `AttributeError` for `_system_powershell` /
+  `_strip_paste_controls` / the right-click handlers / `focus_on_click`; the
+  workflow test RED because `clipboard-windows.yml` does not exist on base;
+  the walk's right-click round trip RED because the base has no right-click.
+  Result on base: **70 failed, 48 passed, 57 skipped, 22 deselected** (the
+  skipped are the 54 WinCI arms + 2 LinuxX + 1; the deselected are the
+  `serial_timing` arms).
+- **partial (Windows CI pending).** The 54 WinCI-only arms (G-T2): every test
+  skips off Windows with `Windows only`; they run only in the
+  `windows-latest` job after the orchestrator's redacted push (R-PASTE.20).
+- **partial (unit of a private layer).** R-TUI-044.2/8 (fake-`ctypes`
+  `_read_via_ctypes` bound by `GlobalSize`); it calls the private
+  `_read_via_ctypes`.
+- **partial (RED mutant).** The LinuxH timing arms (R-TUI-043.10.1/3-4,
+  R-PASTE.11/3, .27/3, .31/3-4) are `serial_timing` arms; their RED-on-base
+  run needs the `tkinter.Tcl()` stand-in root (E3A-03) — run separately, not
+  in the transcript above (which deselected `serial_timing`).
+- **not covered by me (operator-run).** AT-I1a-10, AT-I1a-11.
+- **not covered by me (WinCI first-run log).** R-PASTE.20/2, R-PASTE.22/2 are
+  observed in the Windows job log, not a test on this host.

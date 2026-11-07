@@ -17,6 +17,7 @@ import hashlib
 import os
 import random
 import re
+import sys
 from pathlib import Path
 from typing import TYPE_CHECKING, Optional
 
@@ -32,6 +33,168 @@ from tests.support.timing import (  # noqa: E402
 if TYPE_CHECKING:
     from s19_app.tui.changes import ChangeDocument
     from s19_app.tui.models import LoadedFile
+
+
+# ---------------------------------------------------------------------------
+# Suite-wide OS-clipboard isolation (batch-103 Inc 1a, R-PASTE.21; E3S-02,
+# E3S-17, E3S-25). One place for every test file, Inc 1b's included: on a
+# Windows host that is not an isolated clipboard the product's OS boundary
+# is stood in, so no test opens a person's clipboard; the call-phase wrapper
+# then fails the test that reached it. Off Windows this patches nothing.
+# ---------------------------------------------------------------------------
+
+from tests.support.b103_clipboard import (  # noqa: E402
+    clipboard_isolated,
+    host_platform,
+)
+
+#: The reason ``clipboard_isolated("windows")`` gave, when not isolated; ``""``
+#: while isolated or off Windows.
+_CLIP_ISOLATION_REASON = ""
+
+#: ``nodeid -> [layer names]`` of OS-boundary attempts recorded by the
+#: stand-ins during each test's call phase.
+_CLIP_ISOLATION_ATTEMPTS: dict = {}
+
+
+def _clipboard_nodeid() -> str:
+    """The current test node id (``PYTEST_CURRENT_TEST`` during the call)."""
+    return os.environ.get("PYTEST_CURRENT_TEST", "").split(" ")[0]
+
+
+@pytest.fixture(scope="session", autouse=True)
+def os_clipboard_isolation():
+    """Stand in at the product's OS boundary on a non-isolated Windows host.
+
+    Summary:
+        When ``host_platform()`` is ``win32`` and
+        :func:`clipboard_isolated("windows")` is ``False``, replaces the
+        entries of ``os_clipboard_input._STRATEGIES`` /
+        ``_WRITE_STRATEGIES`` (the only way ``read_os_clipboard`` /
+        ``write_os_clipboard`` call the layers) and ``_system_powershell``
+        with stand-ins that open nothing and record ``(layer, node id)``;
+        on a real Windows host it also stands in at
+        ``ctypes.windll.user32.OpenClipboard`` so a direct low-level Win32
+        call opens nothing either (E3S-25). A stand-in passes through to
+        the original only when that call cannot reach the OS (E3S-18).
+
+    Data Flow:
+        - Computes the isolation verdict once at session start and stores
+          the reason for the call-phase wrapper.
+        - Patches only on a non-isolated Windows host; yields; restores at
+          session end. Never calls ``pytest.fail`` (session scope).
+
+    Dependencies:
+        Uses:
+            - :func:`clipboard_isolated` / :func:`host_platform`
+        Used by:
+            - every test file (autouse); the ``pytest_runtest_call`` wrapper
+              below reads its attempt record.
+    """
+    global _CLIP_ISOLATION_REASON
+    _CLIP_ISOLATION_REASON = ""
+    _CLIP_ISOLATION_ATTEMPTS.clear()
+    if host_platform() != "win32":
+        yield
+        return
+    ok, reason = clipboard_isolated("windows")
+    if ok:
+        yield
+        return
+    _CLIP_ISOLATION_REASON = reason
+
+    import subprocess as _subprocess
+
+    from s19_app.tui import os_clipboard_input as _mod
+
+    real_run = _subprocess.run
+    restored: list = []
+
+    def _record(name: str) -> None:
+        nodeid = _clipboard_nodeid()
+        _CLIP_ISOLATION_ATTEMPTS.setdefault(nodeid, []).append(name)
+
+    def _wrap(original, name: str, *, kind: str):
+        """A stand-in that passes through when it cannot reach the OS."""
+
+        def _standin(*args, **kwargs):
+            if kind == "win32":
+                if sys.platform != "win32":
+                    return original(*args, **kwargs)
+            elif _mod.subprocess.run is not real_run:
+                return original(*args, **kwargs)
+            _record(name)
+            if kind == "write":
+                return False
+            return None
+
+        return _standin
+
+    new_read = []
+    for name, reader in list(_mod._STRATEGIES):
+        if name == "powershell":
+            new_read.append((name, _wrap(reader, name, kind="powershell")))
+        else:
+            new_read.append((name, _wrap(reader, name, kind="win32")))
+    restored.append(("_STRATEGIES", _mod._STRATEGIES))
+    _mod._STRATEGIES = tuple(new_read)
+
+    new_write = []
+    for name, writer in list(_mod._WRITE_STRATEGIES):
+        if name == "powershell":
+            new_write.append((name, _wrap(writer, name, kind="powershell")))
+        else:
+            new_write.append((name, _wrap(writer, name, kind="win32")))
+    restored.append(("_WRITE_STRATEGIES", _mod._WRITE_STRATEGIES))
+    _mod._WRITE_STRATEGIES = tuple(new_write)
+
+    original_system_powershell = _mod._system_powershell
+    restored.append(("_system_powershell", original_system_powershell))
+    _mod._system_powershell = _wrap(  # type: ignore[assignment]
+        original_system_powershell, "system-powershell", kind="powershell"
+    )
+
+    # The OS boundary ``OpenClipboard`` (real Windows host only): a direct
+    # low-level Win32 call opens nothing; the layer reads a held clipboard.
+    boundary_restore = None
+    try:
+        import ctypes as _ctypes
+
+        if hasattr(_ctypes, "windll"):
+            user32 = _ctypes.windll.user32
+            original_open = user32.OpenClipboard
+
+            def _standin_open(hwnd):
+                _record("win32-open")
+                return 0
+
+            user32.OpenClipboard = _standin_open  # type: ignore[attr-defined]
+            boundary_restore = (user32, "OpenClipboard", original_open)
+    except Exception:  # pragma: no cover - Linux has no windll
+        pass
+
+    try:
+        yield
+    finally:
+        for attr, value in restored:
+            setattr(_mod, attr, value)
+        if boundary_restore is not None:
+            obj, name, original = boundary_restore
+            setattr(obj, name, original)
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_call(item):
+    """Fail the call phase (outcome ``failed``, never ``error``) when the
+    isolation stand-ins recorded an OS-boundary attempt for this item."""
+    _CLIP_ISOLATION_ATTEMPTS.pop(item.nodeid, None)
+    yield
+    attempts = _CLIP_ISOLATION_ATTEMPTS.get(item.nodeid)
+    if attempts:
+        pytest.fail(
+            f"OS clipboard not isolated: {_CLIP_ISOLATION_REASON}; "
+            f"attempted {sorted(set(attempts))}"
+        )
 
 
 # ---------------------------------------------------------------------------
