@@ -1,0 +1,25 @@
+s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+python = 3.11.18  host = cachyos-rtx
+
+=== query, name -> folded (rule, key, spans) | case-sensitive (rule, key, spans) | case-exact | order key
+  'value_000'        'VALUE_0001'                                     -> ('prefix', 0, [(0, 9)]) | None | case-exact False | order key (1, 0, 10, 1, 'VALUE_0001')
+  'vale_0001'        'VALUE_0001'                                     -> ('fuzzy', 1, [(0, 5), (6, 10)]) | None | case-exact False | order key (4, 1, 10, 1, 'VALUE_0001')
+  'valu_0001'        'VAL_BLK_0001'                                   -> ('fuzzy', 1, [(0, 3), (8, 12)]) | None | case-exact False | order key (4, 1, 12, 1, 'VAL_BLK_0001')
+  'count'            'DiscountCount'                                  -> ('substring', 0, [(8, 13)]) | ('substring', 1, [(3, 8)]) | case-exact True | order key (2, 0, 13, 0, 'DiscountCount')
+  'ounter'           'model.MainClass.ledController.sw.timeCounter'   -> ('substring', 1, [(38, 44)]) | ('substring', 1, [(38, 44)]) | case-exact True | order key (2, 1, 44, 0, 'model.MainClass.ledController.sw.timeCounter')
+  'counter'          'timeCounter'                                    -> ('substring', 0, [(4, 11)]) | ('fuzzy', 1, [(4, 11)]) | case-exact False | order key (2, 0, 11, 1, 'timeCounter')
+  'counter'          'Encounter'                                      -> ('substring', 1, [(2, 9)]) | ('substring', 1, [(2, 9)]) | case-exact True | order key (2, 1, 9, 0, 'Encounter')
+  'drück'            'druck_max'                                      -> ('fuzzy', 1, [(0, 5)]) | ('fuzzy', 1, [(0, 5)]) | case-exact True | order key (4, 1, 9, 0, 'druck_max')
+  'drück'            'DRÜCK_MAX'                                      -> ('fuzzy', 1, [(0, 5)]) | None | case-exact False | order key (4, 1, 9, 1, 'DRÜCK_MAX')
+  'drück'            'Drück_Max'                                      -> ('prefix', 0, [(0, 5)]) | ('fuzzy', 1, [(0, 5)]) | case-exact False | order key (1, 0, 9, 1, 'Drück_Max')
+  'rpm'              'RPMX'                                           -> ('prefix', 0, [(0, 3)]) | None | case-exact False | order key (1, 0, 4, 1, 'RPMX')
+  'rpm'              'rpm_x'                                          -> ('prefix', 0, [(0, 3)]) | ('prefix', 0, [(0, 3)]) | case-exact True | order key (1, 0, 5, 0, 'rpm_x')
+  'RPM'              'RPM'                                            -> ('exact', 0, [(0, 3)]) | ('exact', 0, [(0, 3)]) | case-exact True | order key (0, 0, 3, 0, 'RPM')
+  'RPM'              'Rpm'                                            -> ('exact', 0, [(0, 3)]) | None | case-exact False | order key (0, 0, 3, 1, 'Rpm')
+  'RPM'              'rpm'                                            -> ('exact', 0, [(0, 3)]) | None | case-exact False | order key (0, 0, 3, 1, 'rpm')
+  'curvee'           'CURVE_0001'                                     -> ('fuzzy', 1, [(0, 5)]) | None | case-exact False | order key (4, 1, 10, 1, 'CURVE_0001')
+  'curvee'           'CUVE'                                           -> ('fuzzy', 2, [(0, 4)]) | None | case-exact False | order key (4, 2, 4, 1, 'CUVE')
+  'mp'               'MAP_0001'                                       -> ('subsequence', 0, [(0, 1), (2, 3)]) | None | case-exact False | order key (5, 0, 8, 1, 'MAP_0001')
+  'map 20'           'MAP_0020'                                       -> ('subsequence', 0, [(0, 3), (6, 8)]) | None | case-exact False | order key (5, 0, 8, 1, 'MAP_0020')
+  'temp_sensor_max'  'VALUE_0001'                                     -> None | None | case-exact False | order key None
+  'knife 1 x'        'parameter_instance[1].Knife[0].x'               -> ('token', 0, [(19, 20), (22, 27), (31, 32)]) | ('fuzzy', 1, [(19, 20), (22, 27), (31, 32)]) | case-exact False | order key (3, 0, 32, 1, 'parameter_instance[1].Knife[0].x')

@@ -80,7 +80,7 @@ Differences from PLAN-DRAFT, with their reasons:
 |---|---|---|
 | I-1 | OS clipboard read/write (Inc 1a) and the copy action for non-input views (Inc 1b) | Inc 1a → Inc 1b, Inc 7 (paste modal), Inc 8/9 (editors) |
 | I-2 | Definition model: decode / encode / describe one A2L object | Inc 2/3 → Inc 6 (array length), Inc 8/9 |
-| I-3 | Matcher: `rank(query, names, limit)` → ordered matches, each with the rule that matched | Inc 4 → Inc 7 |
+| I-3 | Matcher: `build_label_index(names)` once per name list, then `rank(query, index, limit)` → ordered matches, each with the rule that matched and its spans (Inc 4 D-1 B, pinned in `inc-4/codewire/graph-inc4.md`) | Inc 4 → Inc 7 |
 | I-4 | A2L refresh contract (load generation reaches every A2L view) | Inc 5 → Inc 6, 7 |
 | I-5 | Label-list parser (batch-102 bulk parser in `a2l_parameter_picker.py`) | existing → Inc 6 (Patch bulk include), Inc 7 (modal) |
 

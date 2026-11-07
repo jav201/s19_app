@@ -1,0 +1,2 @@
+nodes=18 entities=5 edges=7 findings=0 not read=0
+lint rc=0

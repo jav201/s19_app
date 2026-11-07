@@ -94,7 +94,7 @@ Consumer (Inc 7): build once per A2L load generation (I-4), off the UI thread; r
 - **Inc 7** (W2, after G2): the only consumer of I-3; also uses I-4 (Inc 5) to rebuild the index after a load and I-5 (the batch-102 bulk parser) for the paste modal. Inc 4 pins I-3 at its E2; Inc 7 proposes changes there, never alone.
 - **Inc 1a, 1b, 2, 3, 5, 6, 8, 9:** no shared file or function (Inc 4 adds one new file).
 - **Batch-101 (in flight):** no shared file; the module reads no case-08 file at run time (only its tests do, through `tools/synth/make_release_case.py` into a temporary folder, which Amendment A1 keeps byte-stable for batch-101).
-- **To the requirements session (canon fold at batch end):** new subsection S2.7, context note CTX-A2L-MATCH, rows R-A2L-MATCH.1 … .36.
+- **To the requirements session (canon fold at batch end):** new subsection S2.7, context note CTX-A2L-MATCH, rows R-A2L-MATCH.1 … .37 (S2.8 per the D-10 ruling).
 
 ## 7. Backlog rows proposed (for the batch end)
 
@@ -115,7 +115,10 @@ Consumer (Inc 7): build once per A2L load generation (I-4), off the UI thread; r
 
 | Decision | Ruling | Reason / change to the rows |
 |---|---|---|
-| D-1 | **A** | `build_label_index` + `rank`; a stateless rank misses the bound by 45×. |
+| D-1 | **B** (corrected 2026-11-06 at E2: the earlier text said A, its reason was B) | `build_label_index` + `rank`; a stateless rank misses the bound by 45×. |
 | D-2 … D-9, D-11, D-13 | **A** | D-3 (fuzzy before subsequence) is accepted on the measured 46/60 vs 9/60; it changes the handoff's proposed order, not an operator rule. |
 | D-10 | **S2.8**, not S2.7 | Inc 2 takes S2.7 ("A value by its A2L definition"); this increment folds into **S2.8 · Label matching (CTX-A2L-MATCH)**. Rows and notes renumber. |
 | D-12 | **A + D** | Keep A's time bounds and add a memory row: the prepared index of 50,000 names takes ≤ 64 MiB (tracemalloc peak during `build_label_index`, cachyos-rtx). The pilot's dict trie (~137 MiB) does not meet it; E2 picks a compact structure. If E2 cannot meet 64 MiB with rank ≤ 200 ms, it escalates instead of loosening the row. |
+
+## Erratum (2026-11-06T18:37:50-06:00, orchestrator)
+§1, §2 and §6 above were written before the rulings: read **S2.8** for S2.7 and **37 rows** (R-A2L-MATCH.1 … .37) for 36. R-A2L-MATCH.37's negative control and base cite the v3 index at 77.9 MiB (tracemalloc), not the 137 MiB RSS figure (E2-2).
