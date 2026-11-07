@@ -20,3 +20,8 @@ Worktree `C:\Users\jjgh8\Github\s19_app-b103-inc2a-code`, folder `.dev-flow/2026
 4. Add one line to `inc-2/steps.log`. Do not commit. Run no tests and nothing that imports `s19_app`. Never write the operator's name.
 
 Report in at most 100 words: the files you wrote and the verdict.
+
+5. **Fix the two record defects found by the coverage audit** (`E5-coverage-audit.md`), changing columns only:
+   - In `02-test-cases.md`, set the Result column of every 2a row that reads `not_run` but is GREEN in `evidence-e4/int-green-run2.txt` or `evidence-e5/fix-tests-green-main.txt` to the result the transcript shows.
+   - Correct the split tally to 2a 216 / total 325, which adds `.59/4`.
+   - Keep every table's column count, and record `wc -l` before and after.
