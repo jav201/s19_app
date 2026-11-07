@@ -87,3 +87,4 @@
 2026-11-07T00:59:46-06:00 E3 round-3 correction done — Inc 3a (Opus, 17 min): six by-name kinds read once per walk (AXIS_PTS 0.152 s vs 25.16 s; METHOD 0.050 vs 15.98; VTAB 0.051 vs 10.98; RANGE 0.051 vs 10.76); immutable read forms; cases 286 (3a 244); security round 4 next
 2026-11-07T01:16:25-06:00 Inc 11 round-2 correction done (Opus, 27 min); split: tag-table view rows → new Inc 12 (app.py, visible, operator approves captures); Inc 11 = reader only; round 3 next
 2026-11-07T01:26:53-06:00 E3 round 4 — Inc 3a security FAIL (E3S3-17 ALIGNMENT walk; E3S3-18 2a datatype re-scan); ruled: shared sections reduced once to fixed-size forms + a scaling row (×2 shared size ≤ 1.3× time), also for 2a's E5
+2026-11-07T01:30:38-06:00 E1 done — Inc 12 (split from Inc 11; Opus, 13 min): 4 rows (R-TUI-042a.2–.5), 16 cases + 2 AT; D-1..D-3 A; Inc 11 now 78 rows / 256 cases + 2 AT / 3 files
