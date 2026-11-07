@@ -1,0 +1,775 @@
+=== Inc 10a E4 integration run: int-08b (the confirmed-quit nodes: no mutant, M-L, M-R; cp -a copy of the integrated worktree)
+date: 2026-11-07T01:15:52Z
+copied from: worktree at base 2f54c7dea27d826483e5c5e596421b8b3a68bb2f, staged tree b3b7935e38e8774d8d67d46ce90002b30602a7d7
+s19_app.__file__ = <HOME>/work/s19_i10int_mut/s19_app/__init__.py
+
+--- no mutant
+CMD: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -p no:xdist -rfs --tb=line tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_waits_for_the_end[project] tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_during_a_routed_project_load_exits_cleanly
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+E   textual.widget.MountError: Can't mount widget(s) before Container(id='ws_memstrip') is mounted
+----------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ <HOME>/work/s19_i10int_mut/s19_app/tui/app.py:18843 in _step_sections │
+│                                                                              │
+│   18840 │   │   │   │   if precomputed_oor is not None:                      │
+│   18841 │   │   │   │   │   self.update_sections(precomputed_out_of_range=pr │
+│   18842 │   │   │   │   else:                                                │
+│ ❱ 18843 │   │   │   │   │   self.update_sections()                           │
+│   18844 │   │   │   finally:                                                 │
+│   18845 │   │   │   │   self.logger.info(                                    │
+│   18846 │   │   │   │   │   "Load phase boundary: apply_sections_done path=% │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │            path = PosixPath('/tmp/pytest-of-<user>/pytest-350/test_tc_… │ │
+│ │ precomputed_oor = None                                                   │ │
+│ │            self = S19TuiApp(                                             │ │
+│ │                   │   title='Hex Edit Tool',                             │ │
+│ │                   │   classes={'-dark-mode'},                            │ │
+│ │                   │   pseudo_classes={'focus', 'dark'}                   │ │
+│ │                   )                                                      │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ <HOME>/work/s19_i10int_mut/s19_app/tui/app.py:19431 in                │
+│ update_sections                                                              │
+│                                                                              │
+│   19428 │   │   sections = self.query_one("#sections_list", ListView)        │
+│   19429 │   │   sections.clear()                                             │
+│   19430 │   │   self.update_workspace_stats()                                │
+│ ❱ 19431 │   │   self.update_memory_strip()                                   │
+│   19432 │   │   if not self.current_file:                                    │
+│   19433 │   │   │   return                                                   │
+│   19434 │   │   ranges = self.current_file.ranges                            │
+│                                                                              │
+│ ╭──────────────────────────── locals ─────────────────────────────╮          │
+│ │ precomputed_out_of_range = None                                 │          │
+│ │                 sections = ListView(id='sections_list')         │          │
+│ │                     self = S19TuiApp(                           │          │
+│ │                            │   title='Hex Edit Tool',           │          │
+│ │                            │   classes={'-dark-mode'},          │          │
+│ │                            │   pseudo_classes={                 │          │
+│ │                            │   │   'focus',                     │          │
+│ │                            │   │   'dark'                       │          │
+│ │                            │   }                                │          │
+│ │                            )                                    │          │
+│ ╰─────────────────────────────────────────────────────────────────╯          │
+│                                                                              │
+│ <HOME>/work/s19_i10int_mut/s19_app/tui/app.py:19679 in                │
+│ update_memory_strip                                                          │
+│                                                                              │
+│   19676 │   │   │   │   )                                                    │
+│   19677 │   │   │   )                                                        │
+│   19678 │   │   if cells:                                                    │
+│ ❱ 19679 │   │   │   band.mount(*cells)                                       │
+│   19680 │                                                                    │
+│   19681 │   def update_memory_map(self) -> None:                             │
+│   19682 │   │   """                                                          │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │        _meaning = 'calibration / data'                                   │ │
+│ │            band = Container(id='ws_memstrip')                            │ │
+│ │      band_class = 'band-medium'                                          │ │
+│ │      band_label = 'medium'                                               │ │
+│ │        cell_end = 2147483776                                             │ │
+│ │      cell_start = 2147483870                                             │ │
+│ │           cells = [                                                      │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   ... +102                                           │ │
+│ │                   ]                                                      │ │
+│ │            cols = 112                                                    │ │
+│ │           count = 112                                                    │ │
+│ │             end = 2147483776                                             │ │
+│ │ entropy_windows = [                                                      │ │
+│ │                   │   EntropyWindow(                                     │ │
+│ │                   │   │   start=2147483648,                              │ │
+│ │                   │   │   end=2147483681,                                │ │
+│ │                   │   │   sample_count=33,                               │ │
+│ │                   │   │   entropy=4.68075775572209,                      │ │
+│ │                   │   │   band='low',                                    │ │
+│ │                   │   │   low_confidence=True                            │ │
+│ │                   │   ),                                                 │ │
+│ │                   │   EntropyWindow(                                     │ │
+│ │                   │   │   start=2147483712,                              │ │
+│ │                   │   │   end=2147483776,                                │ │
+│ │                   │   │   sample_count=64,                               │ │
+│ │                   │   │   entropy=6.0,                                   │ │
+│ │                   │   │   band='medium',                                 │ │
+│ │                   │   │   low_confidence=False                           │ │
+│ │                   │   )                                                  │ │
+│ │                   ]                                                      │ │
+│ │           glyph = '▒'                                                    │ │
+│ │           index = 111                                                    │ │
+│ │        is_valid = True                                                   │ │
+│ │         ordered = [                                                      │ │
+│ │                   │   (2147483648, 2147483681, True),                    │ │
+│ │                   │   (2147483712, 2147483776, True)                     │ │
+│ │                   ]                                                      │ │
+│ │        per_cell = 2                                                      │ │
+│ │          ranges = [(2147483648, 2147483681), (2147483712, 2147483776)]   │ │
+│ │            self = S19TuiApp(                                             │ │
+│ │                   │   title='Hex Edit Tool',                             │ │
+│ │                   │   classes={'-dark-mode'},                            │ │
+│ │                   │   pseudo_classes={'focus', 'dark'}                   │ │
+│ │                   )                                                      │ │
+│ │            size = Size(width=112, height=1)                              │ │
+│ │            span = 128                                                    │ │
+│ │        span_end = 2147483776                                             │ │
+│ │      span_start = 2147483648                                             │ │
+│ │           start = 2147483712                                             │ │
+│ │          status = 'gap'                                                  │ │
+│ │        validity = [True, True]                                           │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /data/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/widget.py:1 │
+│ 454 in mount                                                                 │
+│                                                                              │
+│   1451 │   │   if self._closing or self._pruning:                            │
+│   1452 │   │   │   return AwaitMount(self, [])                               │
+│   1453 │   │   if not self.is_attached:                                      │
+│ ❱ 1454 │   │   │   raise MountError(f"Can't mount widget(s) before {self!r}  │
+│   1455 │   │   # Check for duplicate IDs in the incoming widgets             │
+│   1456 │   │   ids_to_mount = [                                              │
+│   1457 │   │   │   widget_id for widget in widgets if (widget_id := widget.i │
+│                                                                              │
+│ ╭─────────────────────── locals ───────────────────────╮                     │
+│ │   after = None                                       │                     │
+│ │  before = None                                       │                     │
+│ │    self = Container(id='ws_memstrip')                │                     │
+│ │ widgets = (                                          │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   ... +102                               │                     │
+│ │           )                                          │                     │
+│ ╰──────────────────────────────────────────────────────╯                     │
+╰──────────────────────────────────────────────────────────────────────────────╯
+MountError: Can't mount widget(s) before Container(id='ws_memstrip') is mounted
+/data/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/widget.py:1454: textual.widget.MountError: Can't mount widget(s) before Container(id='ws_memstrip') is mounted
+E   textual.widget.MountError: Can't mount widget(s) before Container(id='ws_memstrip') is mounted
+----------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ <HOME>/work/s19_i10int_mut/s19_app/tui/app.py:18843 in _step_sections │
+│                                                                              │
+│   18840 │   │   │   │   if precomputed_oor is not None:                      │
+│   18841 │   │   │   │   │   self.update_sections(precomputed_out_of_range=pr │
+│   18842 │   │   │   │   else:                                                │
+│ ❱ 18843 │   │   │   │   │   self.update_sections()                           │
+│   18844 │   │   │   finally:                                                 │
+│   18845 │   │   │   │   self.logger.info(                                    │
+│   18846 │   │   │   │   │   "Load phase boundary: apply_sections_done path=% │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │            path = PosixPath('/tmp/pytest-of-<user>/pytest-350/test_tc_… │ │
+│ │ precomputed_oor = None                                                   │ │
+│ │            self = S19TuiApp(                                             │ │
+│ │                   │   title='Hex Edit Tool',                             │ │
+│ │                   │   classes={'-dark-mode'},                            │ │
+│ │                   │   pseudo_classes={'focus', 'dark'}                   │ │
+│ │                   )                                                      │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ <HOME>/work/s19_i10int_mut/s19_app/tui/app.py:19431 in                │
+│ update_sections                                                              │
+│                                                                              │
+│   19428 │   │   sections = self.query_one("#sections_list", ListView)        │
+│   19429 │   │   sections.clear()                                             │
+│   19430 │   │   self.update_workspace_stats()                                │
+│ ❱ 19431 │   │   self.update_memory_strip()                                   │
+│   19432 │   │   if not self.current_file:                                    │
+│   19433 │   │   │   return                                                   │
+│   19434 │   │   ranges = self.current_file.ranges                            │
+│                                                                              │
+│ ╭──────────────────────────── locals ─────────────────────────────╮          │
+│ │ precomputed_out_of_range = None                                 │          │
+│ │                 sections = ListView(id='sections_list')         │          │
+│ │                     self = S19TuiApp(                           │          │
+│ │                            │   title='Hex Edit Tool',           │          │
+│ │                            │   classes={'-dark-mode'},          │          │
+│ │                            │   pseudo_classes={                 │          │
+│ │                            │   │   'focus',                     │          │
+│ │                            │   │   'dark'                       │          │
+│ │                            │   }                                │          │
+│ │                            )                                    │          │
+│ ╰─────────────────────────────────────────────────────────────────╯          │
+│                                                                              │
+│ <HOME>/work/s19_i10int_mut/s19_app/tui/app.py:19679 in                │
+│ update_memory_strip                                                          │
+│                                                                              │
+│   19676 │   │   │   │   )                                                    │
+│   19677 │   │   │   )                                                        │
+│   19678 │   │   if cells:                                                    │
+│ ❱ 19679 │   │   │   band.mount(*cells)                                       │
+│   19680 │                                                                    │
+│   19681 │   def update_memory_map(self) -> None:                             │
+│   19682 │   │   """                                                          │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │        _meaning = 'calibration / data'                                   │ │
+│ │            band = Container(id='ws_memstrip')                            │ │
+│ │      band_class = 'band-medium'                                          │ │
+│ │      band_label = 'medium'                                               │ │
+│ │        cell_end = 2147483776                                             │ │
+│ │      cell_start = 2147483870                                             │ │
+│ │           cells = [                                                      │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   ... +102                                           │ │
+│ │                   ]                                                      │ │
+│ │            cols = 112                                                    │ │
+│ │           count = 112                                                    │ │
+│ │             end = 2147483776                                             │ │
+│ │ entropy_windows = [                                                      │ │
+│ │                   │   EntropyWindow(                                     │ │
+│ │                   │   │   start=2147483648,                              │ │
+│ │                   │   │   end=2147483681,                                │ │
+│ │                   │   │   sample_count=33,                               │ │
+│ │                   │   │   entropy=4.68075775572209,                      │ │
+│ │                   │   │   band='low',                                    │ │
+│ │                   │   │   low_confidence=True                            │ │
+│ │                   │   ),                                                 │ │
+│ │                   │   EntropyWindow(                                     │ │
+│ │                   │   │   start=2147483712,                              │ │
+│ │                   │   │   end=2147483776,                                │ │
+│ │                   │   │   sample_count=64,                               │ │
+│ │                   │   │   entropy=6.0,                                   │ │
+│ │                   │   │   band='medium',                                 │ │
+│ │                   │   │   low_confidence=False                           │ │
+│ │                   │   )                                                  │ │
+│ │                   ]                                                      │ │
+│ │           glyph = '▒'                                                    │ │
+│ │           index = 111                                                    │ │
+│ │        is_valid = True                                                   │ │
+│ │         ordered = [                                                      │ │
+│ │                   │   (2147483648, 2147483681, True),                    │ │
+│ │                   │   (2147483712, 2147483776, True)                     │ │
+│ │                   ]                                                      │ │
+│ │        per_cell = 2                                                      │ │
+│ │          ranges = [(2147483648, 2147483681), (2147483712, 2147483776)]   │ │
+│ │            self = S19TuiApp(                                             │ │
+│ │                   │   title='Hex Edit Tool',                             │ │
+│ │                   │   classes={'-dark-mode'},                            │ │
+│ │                   │   pseudo_classes={'focus', 'dark'}                   │ │
+│ │                   )                                                      │ │
+│ │            size = Size(width=112, height=1)                              │ │
+│ │            span = 128                                                    │ │
+│ │        span_end = 2147483776                                             │ │
+│ │      span_start = 2147483648                                             │ │
+│ │           start = 2147483712                                             │ │
+│ │          status = 'gap'                                                  │ │
+│ │        validity = [True, True]                                           │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /data/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/widget.py:1 │
+│ 454 in mount                                                                 │
+│                                                                              │
+│   1451 │   │   if self._closing or self._pruning:                            │
+│   1452 │   │   │   return AwaitMount(self, [])                               │
+│   1453 │   │   if not self.is_attached:                                      │
+│ ❱ 1454 │   │   │   raise MountError(f"Can't mount widget(s) before {self!r}  │
+│   1455 │   │   # Check for duplicate IDs in the incoming widgets             │
+│   1456 │   │   ids_to_mount = [                                              │
+│   1457 │   │   │   widget_id for widget in widgets if (widget_id := widget.i │
+│                                                                              │
+│ ╭─────────────────────── locals ───────────────────────╮                     │
+│ │   after = None                                       │                     │
+│ │  before = None                                       │                     │
+│ │    self = Container(id='ws_memstrip')                │                     │
+│ │ widgets = (                                          │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   ... +102                               │                     │
+│ │           )                                          │                     │
+│ ╰──────────────────────────────────────────────────────╯                     │
+╰──────────────────────────────────────────────────────────────────────────────╯
+MountError: Can't mount widget(s) before Container(id='ws_memstrip') is mounted
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3004 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-350/test_tc_b100_53_confirmed_quit1/app workarea=/tmp/pytest-of-<user>/pytest-350/test_tc_b100_53_confirmed_quit1/app/.s19tool/workarea
+INFO     s19tui:app.py:8819 Workarea refreshed. files=0
+INFO     s19tui:app.py:17218 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.007
+WARNING  s19tui:app.py:14537 Project P2: no project.json project.json (None)
+INFO     s19tui:app.py:951 A2L cache miss: path=/tmp/pytest-of-<user>/pytest-350/test_tc_b100_53_confirmed_quit1/app/.s19tool/workarea/P2/firmware.a2l size_bytes=1391
+INFO     s19tui:app.py:14782 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:19369 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-350/test_tc_b100_53_confirmed_quit1/app/.s19tool/workarea/P2/firmware.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14799 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:14782 Load phase boundary: parse_branch_entry path=firmware.mac suffix=.mac
+INFO     s19tui:app.py:17471 Load phase boundary: mac_parse_entry path=firmware.mac
+INFO     s19tui:app.py:17477 Load phase boundary: mac_parse_done path=firmware.mac rows=2 diagnostics=1 elapsed=0.000s
+INFO     s19tui:app.py:17491 MAC parse summary (mirrored): path=/tmp/pytest-of-<user>/pytest-350/test_tc_b100_53_confirmed_quit1/app/.s19tool/workarea/P2/firmware.mac rows=2 parse_ok=1 diagnostics=1 valid_addresses=1
+INFO     s19tui:app.py:17512 Load phase boundary: mac_a2l_resolve_entry path=firmware.mac a2l_path=/tmp/pytest-of-<user>/pytest-350/test_tc_b100_53_confirmed_quit1/app/.s19tool/workarea/P2/firmware.a2l
+INFO     s19tui:app.py:17518 Load phase boundary: mac_a2l_resolve_done path=firmware.mac has_a2l_data=True
+INFO     s19tui:app.py:17524 MAC parse summary: path=/tmp/pytest-of-<user>/pytest-350/test_tc_b100_53_confirmed_quit1/app/.s19tool/workarea/P2/firmware.mac total_records=2 parse_ok=1 diagnostics=1 valid_addresses=1 a2l_path=/tmp/pytest-of-<user>/pytest-350/test_tc_b100_53_confirmed_quit1/app/.s19tool/workarea/P2/firmware.a2l elapsed_seconds=0.006
+INFO     s19tui:app.py:14824 Load phase boundary: mac_merge_entry path=firmware.mac has_primary=True
+INFO     s19tui:app.py:14831 Load phase boundary: mac_merge_done path=firmware.mac file_type=s19
+INFO     s19tui:app.py:19369 Load summary: file_type=s19+mac path=/tmp/pytest-of-<user>/pytest-350/test_tc_b100_53_confirmed_quit1/app/.s19tool/workarea/P2/firmware.mac addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14853 Load phase boundary: parse_branch_done path=firmware.mac branch=mac
+INFO     s19tui:app.py:18829 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:18829 Load phase boundary: apply_install_state path=firmware.mac precomputed=False
+INFO     s19tui:app.py:14735 Project loaded. name=P2 file=/tmp/pytest-of-<user>/pytest-350/test_tc_b100_53_confirmed_quit1/app/.s19tool/workarea/P2/firmware.s19 mac=/tmp/pytest-of-<user>/pytest-350/test_tc_b100_53_confirmed_quit1/app/.s19tool/workarea/P2/firmware.mac
+INFO     s19tui:app.py:18845 Load phase boundary: apply_sections_done path=firmware.s19
+/data/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/widget.py:1454: textual.widget.MountError: Can't mount widget(s) before Container(id='ws_memstrip') is mounted
+=========================== short test summary info ============================
+FAILED tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_waits_for_the_end[project]
+FAILED tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_during_a_routed_project_load_exits_cleanly
+2 failed in 15.47s
+=== exit code: 1
+
+--- mutant M-L applied to <HOME>/work/s19_i10int_mut/s19_app/tui/app.py: 'layout_waits: int = 3,' -> 'layout_waits: int = 0,'
+CMD: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -p no:xdist -rfs --tb=line tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_waits_for_the_end[project] tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_during_a_routed_project_load_exits_cleanly
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+E   textual.widget.MountError: Can't mount widget(s) before Container(id='ws_memstrip') is mounted
+----------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ <HOME>/work/s19_i10int_mut/s19_app/tui/app.py:18843 in _step_sections │
+│                                                                              │
+│   18840 │   │   │   │   if precomputed_oor is not None:                      │
+│   18841 │   │   │   │   │   self.update_sections(precomputed_out_of_range=pr │
+│   18842 │   │   │   │   else:                                                │
+│ ❱ 18843 │   │   │   │   │   self.update_sections()                           │
+│   18844 │   │   │   finally:                                                 │
+│   18845 │   │   │   │   self.logger.info(                                    │
+│   18846 │   │   │   │   │   "Load phase boundary: apply_sections_done path=% │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │            path = PosixPath('/tmp/pytest-of-<user>/pytest-351/test_tc_… │ │
+│ │ precomputed_oor = None                                                   │ │
+│ │            self = S19TuiApp(                                             │ │
+│ │                   │   title='Hex Edit Tool',                             │ │
+│ │                   │   classes={'-dark-mode'},                            │ │
+│ │                   │   pseudo_classes={'dark', 'focus'}                   │ │
+│ │                   )                                                      │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ <HOME>/work/s19_i10int_mut/s19_app/tui/app.py:19431 in                │
+│ update_sections                                                              │
+│                                                                              │
+│   19428 │   │   sections = self.query_one("#sections_list", ListView)        │
+│   19429 │   │   sections.clear()                                             │
+│   19430 │   │   self.update_workspace_stats()                                │
+│ ❱ 19431 │   │   self.update_memory_strip()                                   │
+│   19432 │   │   if not self.current_file:                                    │
+│   19433 │   │   │   return                                                   │
+│   19434 │   │   ranges = self.current_file.ranges                            │
+│                                                                              │
+│ ╭──────────────────────────── locals ─────────────────────────────╮          │
+│ │ precomputed_out_of_range = None                                 │          │
+│ │                 sections = ListView(id='sections_list')         │          │
+│ │                     self = S19TuiApp(                           │          │
+│ │                            │   title='Hex Edit Tool',           │          │
+│ │                            │   classes={'-dark-mode'},          │          │
+│ │                            │   pseudo_classes={                 │          │
+│ │                            │   │   'dark',                      │          │
+│ │                            │   │   'focus'                      │          │
+│ │                            │   }                                │          │
+│ │                            )                                    │          │
+│ ╰─────────────────────────────────────────────────────────────────╯          │
+│                                                                              │
+│ <HOME>/work/s19_i10int_mut/s19_app/tui/app.py:19679 in                │
+│ update_memory_strip                                                          │
+│                                                                              │
+│   19676 │   │   │   │   )                                                    │
+│   19677 │   │   │   )                                                        │
+│   19678 │   │   if cells:                                                    │
+│ ❱ 19679 │   │   │   band.mount(*cells)                                       │
+│   19680 │                                                                    │
+│   19681 │   def update_memory_map(self) -> None:                             │
+│   19682 │   │   """                                                          │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │        _meaning = 'calibration / data'                                   │ │
+│ │            band = Container(id='ws_memstrip')                            │ │
+│ │      band_class = 'band-medium'                                          │ │
+│ │      band_label = 'medium'                                               │ │
+│ │        cell_end = 2147483776                                             │ │
+│ │      cell_start = 2147483870                                             │ │
+│ │           cells = [                                                      │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   ... +102                                           │ │
+│ │                   ]                                                      │ │
+│ │            cols = 112                                                    │ │
+│ │           count = 112                                                    │ │
+│ │             end = 2147483776                                             │ │
+│ │ entropy_windows = [                                                      │ │
+│ │                   │   EntropyWindow(                                     │ │
+│ │                   │   │   start=2147483648,                              │ │
+│ │                   │   │   end=2147483681,                                │ │
+│ │                   │   │   sample_count=33,                               │ │
+│ │                   │   │   entropy=4.68075775572209,                      │ │
+│ │                   │   │   band='low',                                    │ │
+│ │                   │   │   low_confidence=True                            │ │
+│ │                   │   ),                                                 │ │
+│ │                   │   EntropyWindow(                                     │ │
+│ │                   │   │   start=2147483712,                              │ │
+│ │                   │   │   end=2147483776,                                │ │
+│ │                   │   │   sample_count=64,                               │ │
+│ │                   │   │   entropy=6.0,                                   │ │
+│ │                   │   │   band='medium',                                 │ │
+│ │                   │   │   low_confidence=False                           │ │
+│ │                   │   )                                                  │ │
+│ │                   ]                                                      │ │
+│ │           glyph = '▒'                                                    │ │
+│ │           index = 111                                                    │ │
+│ │        is_valid = True                                                   │ │
+│ │         ordered = [                                                      │ │
+│ │                   │   (2147483648, 2147483681, True),                    │ │
+│ │                   │   (2147483712, 2147483776, True)                     │ │
+│ │                   ]                                                      │ │
+│ │        per_cell = 2                                                      │ │
+│ │          ranges = [(2147483648, 2147483681), (2147483712, 2147483776)]   │ │
+│ │            self = S19TuiApp(                                             │ │
+│ │                   │   title='Hex Edit Tool',                             │ │
+│ │                   │   classes={'-dark-mode'},                            │ │
+│ │                   │   pseudo_classes={'dark', 'focus'}                   │ │
+│ │                   )                                                      │ │
+│ │            size = Size(width=112, height=1)                              │ │
+│ │            span = 128                                                    │ │
+│ │        span_end = 2147483776                                             │ │
+│ │      span_start = 2147483648                                             │ │
+│ │           start = 2147483712                                             │ │
+│ │          status = 'gap'                                                  │ │
+│ │        validity = [True, True]                                           │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /data/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/widget.py:1 │
+│ 454 in mount                                                                 │
+│                                                                              │
+│   1451 │   │   if self._closing or self._pruning:                            │
+│   1452 │   │   │   return AwaitMount(self, [])                               │
+│   1453 │   │   if not self.is_attached:                                      │
+│ ❱ 1454 │   │   │   raise MountError(f"Can't mount widget(s) before {self!r}  │
+│   1455 │   │   # Check for duplicate IDs in the incoming widgets             │
+│   1456 │   │   ids_to_mount = [                                              │
+│   1457 │   │   │   widget_id for widget in widgets if (widget_id := widget.i │
+│                                                                              │
+│ ╭─────────────────────── locals ───────────────────────╮                     │
+│ │   after = None                                       │                     │
+│ │  before = None                                       │                     │
+│ │    self = Container(id='ws_memstrip')                │                     │
+│ │ widgets = (                                          │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   ... +102                               │                     │
+│ │           )                                          │                     │
+│ ╰──────────────────────────────────────────────────────╯                     │
+╰──────────────────────────────────────────────────────────────────────────────╯
+MountError: Can't mount widget(s) before Container(id='ws_memstrip') is mounted
+/data/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/widget.py:1454: textual.widget.MountError: Can't mount widget(s) before Container(id='ws_memstrip') is mounted
+E   textual.widget.MountError: Can't mount widget(s) before Container(id='ws_memstrip') is mounted
+----------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ <HOME>/work/s19_i10int_mut/s19_app/tui/app.py:18843 in _step_sections │
+│                                                                              │
+│   18840 │   │   │   │   if precomputed_oor is not None:                      │
+│   18841 │   │   │   │   │   self.update_sections(precomputed_out_of_range=pr │
+│   18842 │   │   │   │   else:                                                │
+│ ❱ 18843 │   │   │   │   │   self.update_sections()                           │
+│   18844 │   │   │   finally:                                                 │
+│   18845 │   │   │   │   self.logger.info(                                    │
+│   18846 │   │   │   │   │   "Load phase boundary: apply_sections_done path=% │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │            path = PosixPath('/tmp/pytest-of-<user>/pytest-351/test_tc_… │ │
+│ │ precomputed_oor = None                                                   │ │
+│ │            self = S19TuiApp(                                             │ │
+│ │                   │   title='Hex Edit Tool',                             │ │
+│ │                   │   classes={'-dark-mode'},                            │ │
+│ │                   │   pseudo_classes={'dark', 'focus'}                   │ │
+│ │                   )                                                      │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ <HOME>/work/s19_i10int_mut/s19_app/tui/app.py:19431 in                │
+│ update_sections                                                              │
+│                                                                              │
+│   19428 │   │   sections = self.query_one("#sections_list", ListView)        │
+│   19429 │   │   sections.clear()                                             │
+│   19430 │   │   self.update_workspace_stats()                                │
+│ ❱ 19431 │   │   self.update_memory_strip()                                   │
+│   19432 │   │   if not self.current_file:                                    │
+│   19433 │   │   │   return                                                   │
+│   19434 │   │   ranges = self.current_file.ranges                            │
+│                                                                              │
+│ ╭──────────────────────────── locals ─────────────────────────────╮          │
+│ │ precomputed_out_of_range = None                                 │          │
+│ │                 sections = ListView(id='sections_list')         │          │
+│ │                     self = S19TuiApp(                           │          │
+│ │                            │   title='Hex Edit Tool',           │          │
+│ │                            │   classes={'-dark-mode'},          │          │
+│ │                            │   pseudo_classes={                 │          │
+│ │                            │   │   'dark',                      │          │
+│ │                            │   │   'focus'                      │          │
+│ │                            │   }                                │          │
+│ │                            )                                    │          │
+│ ╰─────────────────────────────────────────────────────────────────╯          │
+│                                                                              │
+│ <HOME>/work/s19_i10int_mut/s19_app/tui/app.py:19679 in                │
+│ update_memory_strip                                                          │
+│                                                                              │
+│   19676 │   │   │   │   )                                                    │
+│   19677 │   │   │   )                                                        │
+│   19678 │   │   if cells:                                                    │
+│ ❱ 19679 │   │   │   band.mount(*cells)                                       │
+│   19680 │                                                                    │
+│   19681 │   def update_memory_map(self) -> None:                             │
+│   19682 │   │   """                                                          │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │        _meaning = 'calibration / data'                                   │ │
+│ │            band = Container(id='ws_memstrip')                            │ │
+│ │      band_class = 'band-medium'                                          │ │
+│ │      band_label = 'medium'                                               │ │
+│ │        cell_end = 2147483776                                             │ │
+│ │      cell_start = 2147483870                                             │ │
+│ │           cells = [                                                      │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   ... +102                                           │ │
+│ │                   ]                                                      │ │
+│ │            cols = 112                                                    │ │
+│ │           count = 112                                                    │ │
+│ │             end = 2147483776                                             │ │
+│ │ entropy_windows = [                                                      │ │
+│ │                   │   EntropyWindow(                                     │ │
+│ │                   │   │   start=2147483648,                              │ │
+│ │                   │   │   end=2147483681,                                │ │
+│ │                   │   │   sample_count=33,                               │ │
+│ │                   │   │   entropy=4.68075775572209,                      │ │
+│ │                   │   │   band='low',                                    │ │
+│ │                   │   │   low_confidence=True                            │ │
+│ │                   │   ),                                                 │ │
+│ │                   │   EntropyWindow(                                     │ │
+│ │                   │   │   start=2147483712,                              │ │
+│ │                   │   │   end=2147483776,                                │ │
+│ │                   │   │   sample_count=64,                               │ │
+│ │                   │   │   entropy=6.0,                                   │ │
+│ │                   │   │   band='medium',                                 │ │
+│ │                   │   │   low_confidence=False                           │ │
+│ │                   │   )                                                  │ │
+│ │                   ]                                                      │ │
+│ │           glyph = '▒'                                                    │ │
+│ │           index = 111                                                    │ │
+│ │        is_valid = True                                                   │ │
+│ │         ordered = [                                                      │ │
+│ │                   │   (2147483648, 2147483681, True),                    │ │
+│ │                   │   (2147483712, 2147483776, True)                     │ │
+│ │                   ]                                                      │ │
+│ │        per_cell = 2                                                      │ │
+│ │          ranges = [(2147483648, 2147483681), (2147483712, 2147483776)]   │ │
+│ │            self = S19TuiApp(                                             │ │
+│ │                   │   title='Hex Edit Tool',                             │ │
+│ │                   │   classes={'-dark-mode'},                            │ │
+│ │                   │   pseudo_classes={'dark', 'focus'}                   │ │
+│ │                   )                                                      │ │
+│ │            size = Size(width=112, height=1)                              │ │
+│ │            span = 128                                                    │ │
+│ │        span_end = 2147483776                                             │ │
+│ │      span_start = 2147483648                                             │ │
+│ │           start = 2147483712                                             │ │
+│ │          status = 'gap'                                                  │ │
+│ │        validity = [True, True]                                           │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /data/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/widget.py:1 │
+│ 454 in mount                                                                 │
+│                                                                              │
+│   1451 │   │   if self._closing or self._pruning:                            │
+│   1452 │   │   │   return AwaitMount(self, [])                               │
+│   1453 │   │   if not self.is_attached:                                      │
+│ ❱ 1454 │   │   │   raise MountError(f"Can't mount widget(s) before {self!r}  │
+│   1455 │   │   # Check for duplicate IDs in the incoming widgets             │
+│   1456 │   │   ids_to_mount = [                                              │
+│   1457 │   │   │   widget_id for widget in widgets if (widget_id := widget.i │
+│                                                                              │
+│ ╭─────────────────────── locals ───────────────────────╮                     │
+│ │   after = None                                       │                     │
+│ │  before = None                                       │                     │
+│ │    self = Container(id='ws_memstrip')                │                     │
+│ │ widgets = (                                          │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   ... +102                               │                     │
+│ │           )                                          │                     │
+│ ╰──────────────────────────────────────────────────────╯                     │
+╰──────────────────────────────────────────────────────────────────────────────╯
+MountError: Can't mount widget(s) before Container(id='ws_memstrip') is mounted
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3004 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-351/test_tc_b100_53_confirmed_quit1/app workarea=/tmp/pytest-of-<user>/pytest-351/test_tc_b100_53_confirmed_quit1/app/.s19tool/workarea
+INFO     s19tui:app.py:8819 Workarea refreshed. files=0
+INFO     s19tui:app.py:17218 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.007
+WARNING  s19tui:app.py:14537 Project P2: no project.json project.json (None)
+INFO     s19tui:app.py:951 A2L cache miss: path=/tmp/pytest-of-<user>/pytest-351/test_tc_b100_53_confirmed_quit1/app/.s19tool/workarea/P2/firmware.a2l size_bytes=1391
+INFO     s19tui:app.py:14782 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:19369 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-351/test_tc_b100_53_confirmed_quit1/app/.s19tool/workarea/P2/firmware.s19 addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14799 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:14782 Load phase boundary: parse_branch_entry path=firmware.mac suffix=.mac
+INFO     s19tui:app.py:17471 Load phase boundary: mac_parse_entry path=firmware.mac
+INFO     s19tui:app.py:17477 Load phase boundary: mac_parse_done path=firmware.mac rows=2 diagnostics=1 elapsed=0.000s
+INFO     s19tui:app.py:17491 MAC parse summary (mirrored): path=/tmp/pytest-of-<user>/pytest-351/test_tc_b100_53_confirmed_quit1/app/.s19tool/workarea/P2/firmware.mac rows=2 parse_ok=1 diagnostics=1 valid_addresses=1
+INFO     s19tui:app.py:17512 Load phase boundary: mac_a2l_resolve_entry path=firmware.mac a2l_path=/tmp/pytest-of-<user>/pytest-351/test_tc_b100_53_confirmed_quit1/app/.s19tool/workarea/P2/firmware.a2l
+INFO     s19tui:app.py:17518 Load phase boundary: mac_a2l_resolve_done path=firmware.mac has_a2l_data=True
+INFO     s19tui:app.py:17524 MAC parse summary: path=/tmp/pytest-of-<user>/pytest-351/test_tc_b100_53_confirmed_quit1/app/.s19tool/workarea/P2/firmware.mac total_records=2 parse_ok=1 diagnostics=1 valid_addresses=1 a2l_path=/tmp/pytest-of-<user>/pytest-351/test_tc_b100_53_confirmed_quit1/app/.s19tool/workarea/P2/firmware.a2l elapsed_seconds=0.000
+INFO     s19tui:app.py:14824 Load phase boundary: mac_merge_entry path=firmware.mac has_primary=True
+INFO     s19tui:app.py:14831 Load phase boundary: mac_merge_done path=firmware.mac file_type=s19
+INFO     s19tui:app.py:19369 Load summary: file_type=s19+mac path=/tmp/pytest-of-<user>/pytest-351/test_tc_b100_53_confirmed_quit1/app/.s19tool/workarea/P2/firmware.mac addresses=97 range_count=2 range_bytes=97 errors=0
+INFO     s19tui:app.py:14853 Load phase boundary: parse_branch_done path=firmware.mac branch=mac
+INFO     s19tui:app.py:18829 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:18829 Load phase boundary: apply_install_state path=firmware.mac precomputed=False
+INFO     s19tui:app.py:14735 Project loaded. name=P2 file=/tmp/pytest-of-<user>/pytest-351/test_tc_b100_53_confirmed_quit1/app/.s19tool/workarea/P2/firmware.s19 mac=/tmp/pytest-of-<user>/pytest-351/test_tc_b100_53_confirmed_quit1/app/.s19tool/workarea/P2/firmware.mac
+INFO     s19tui:app.py:18845 Load phase boundary: apply_sections_done path=firmware.s19
+/data/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/widget.py:1454: textual.widget.MountError: Can't mount widget(s) before Container(id='ws_memstrip') is mounted
+=========================== short test summary info ============================
+FAILED tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_waits_for_the_end[project]
+FAILED tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_during_a_routed_project_load_exits_cleanly
+2 failed in 15.03s
+=== exit code: 1
+
+--- mutant M-R applied: SplitJoinWindow.refresh_window focuses #sje_table also while hidden (the base line)
+CMD: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -p no:xdist -rfs --tb=line tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_waits_for_the_end[project] tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_during_a_routed_project_load_exits_cleanly
+..                                                                       [100%]
+2 passed in 8.61s
+=== exit code: 0
+=== done

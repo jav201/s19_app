@@ -183,7 +183,9 @@ from tools.id_registry import (
 # tests/test_b101_document_homes.py).
 # batch-101 Inc 9: 267 -> 269, measured at E4 integration (tests/test_b101_flow_saves.py,
 # tests/test_b101_flow_names_ui.py).
-EXPECTED_SCANNED_TEST_FILES = 269
+# batch-101 Inc 10a: 269 -> 271, measured at E4 integration (tests/test_b101_hex_jump.py,
+# tests/test_b101_unload_focus.py).
+EXPECTED_SCANNED_TEST_FILES = 271
 """Test modules scanned, including this one.
 
 batch-101 Inc 11: 250 -> 253. ``tests/test_b101_a2l_blocks_and_segments.py``,

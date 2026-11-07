@@ -1601,10 +1601,17 @@ def test_tc_b97_64_arriving_with_bracket_c_confirms(tmp_path: Path, monkeypatch,
     the Workspace, then arrive with ``]`` — the focus left on the rail, or
     with no focus at all — and ``c`` after the dwell confirms 1.
 
-    Why: ``]`` moves no focus, so a binding on the screen's section would be
-    dead on the commonest arrival path while the REQUIRED line says ``press
-    c``. RED by mutation: ``c`` bound on the section (the sealed D10) → 0.
+    Why: the arrival must not leave ``c`` dead while the REQUIRED line says
+    ``press c``. RED by mutation: ``c`` bound on the section (the sealed D10)
+    → 0.
+
+    Named supersession (batch-101 Inc 10a, ruling D-2, R-SHELL-FOCUS.2/4):
+    ``]`` now lands the focus on the window's target ``fx_panel`` once the
+    window is laid out (it was "``]`` moves no focus"); the focus is polled
+    until it lands (E3 A10-10), and ``c`` still confirms 1.
     """
+    from tests.support.timing import wait_until
+
     confirms = ConfirmSpy(monkeypatch)
 
     async def body(app, pilot, panel, project_dir):
@@ -1620,6 +1627,12 @@ def test_tc_b97_64_arriving_with_bracket_c_confirms(tmp_path: Path, monkeypatch,
             await poll(pilot, lambda: app.focused is None)
         await pilot.press("right_square_bracket")
         await poll(pilot, lambda: not app.query_one("#screen_flow_execution").has_class("hidden"))
+        await wait_until(
+            pilot,
+            lambda: app.focused is not None and app.focused.id == "fx_panel",
+            lambda: f"the focus never landed on #fx_panel; it is {app.focused!r}",
+            timeout=10.0,
+        )
         focused = app.focused.id if app.focused else None
         # F3 (gate fold): the dwell base is stamped after the attention paint;
         # wait for it, so the 0.6 s step measures the dwell, not the paint.
@@ -1630,7 +1643,7 @@ def test_tc_b97_64_arriving_with_bracket_c_confirms(tmp_path: Path, monkeypatch,
         return focused, list(confirms.posts)
 
     focused, posts = run_fx(tmp_path, (118, 54), body, stems=THREE, run=True, evidence=True)
-    assert focused == ("rail_item_workspace" if arrival == "rail" else None), focused
+    assert focused == "fx_panel", focused
     assert posts == [(1, 2)], posts
 
 

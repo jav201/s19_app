@@ -4,6 +4,9 @@ Written by the independent tester (E4) from the approved design only
 (``inc-10/01-requirements.md``, ``02-test-cases.md``, ``E1-slice.md``,
 ``E1-rulings.md``, ``E3-rulings.md``, ``E3-security.md`` and
 ``codewire/graph-inc10.md``). No line of the Inc 10a implementation was read.
+The nodes whose docstring says "written at E4 integration" (or "added at E4
+integration") were added by the integrator, who had read it
+(``inc-10/E4-integration-notes.md``).
 
 Requirements observed (the case id is in each node's docstring):
 
@@ -434,6 +437,35 @@ def test_r_ws_loaded_18_4_unload_a2l_slot_sets_file_status(tmp_path: Path, case0
 
 
 # ---------------------------------------------------------------------------
+# R-WS-LOADED.13 - the unload messages (regression)
+# ---------------------------------------------------------------------------
+def test_r_ws_loaded_13_1_unload_messages_are_unchanged(tmp_path: Path, case08: Path) -> None:
+    """R-WS-LOADED.13 case /1 (regression, written at E4 integration): ``[u]``
+    on the MAC slot, then ``U``: the newest message line is ``Unloaded MAC.``,
+    then ``Unloaded all artifacts.``, each painted once (the file-status write
+    of R-WS-LOADED.18 adds no message line). Fails if a message is removed,
+    changed or painted twice."""
+
+    async def scenario(app, pilot, log):
+        await case_session(pilot, app, case08)
+        mark = len(log.messages)
+        await press_unload(pilot, app, "mac")
+        await wait_message(pilot, log, mark, "Unloaded MAC.")
+        await settle(pilot, 4)
+        assert newest_message(app) == "Unloaded MAC.", newest_message(app)
+        assert list(app.log_lines).count("Unloaded MAC.") == 1, list(app.log_lines)
+        mark = len(log.messages)
+        await pilot.press("U")
+        await wait_message(pilot, log, mark, "Unloaded all artifacts.")
+        await settle(pilot, 4)
+        assert newest_message(app) == "Unloaded all artifacts.", newest_message(app)
+        lines = list(app.log_lines)
+        assert (lines.count("Unloaded MAC."), lines.count("Unloaded all artifacts.")) == (1, 1), lines
+
+    run(tmp_path, scenario)
+
+
+# ---------------------------------------------------------------------------
 # R-WS-LOADED.14 - U with nothing loaded
 # ---------------------------------------------------------------------------
 def test_r_ws_loaded_14_1_unload_all_with_nothing_loaded(tmp_path: Path) -> None:
@@ -505,6 +537,29 @@ def test_r_ws_loaded_16_1_primary_diagnostics_go_with_it(tmp_path: Path, case08:
         assert "bad.s19" not in " ".join(slot_texts(app)), slot_texts(app)
         assert "integrity notices" not in status_text(app)
         assert "integrity notices" not in newest_message(app)
+
+    run(tmp_path, scenario)
+
+
+def test_r_ws_loaded_16_2_primary_unload_without_mac_clears_the_session(tmp_path: Path) -> None:
+    """R-WS-LOADED.16 case /2 (regression, written at E4 integration): the
+    bad-checksum S19 with no MAC; after ``[u]`` on the primary no file is
+    loaded and the three hex views paint ``No file loaded.``"""
+    bad = write_bad_checksum(tmp_path / "src" / "bad.s19")
+
+    async def scenario(app, pilot, log):
+        await load_image(pilot, app, bad)
+        assert app.current_file is not None and app.current_file.mac_path is None
+        mark = len(log.messages)
+        await press_unload(pilot, app, "primary")
+        await wait_message(pilot, log, mark, "Unloaded primary image.")
+        await settle(pilot, 4)
+        assert app.current_file is None
+        painted = {
+            view_id: plain_of(app.query_one(view_id, Static))
+            for view_id in ("#hex_view", "#alt_hex_view", "#mac_hex_view")
+        }
+        assert set(painted.values()) == {"No file loaded."}, painted
 
     run(tmp_path, scenario)
 
@@ -691,10 +746,13 @@ def test_r_tui_012l_8_1_load_status_drops_a_cf_character(tmp_path: Path) -> None
 
     async def scenario(app, pilot, log):
         await load_image(pilot, app, image)
+        # The load line reaches the message lines directly (not through
+        # ``set_status``), so the wait reads every painted line, never the
+        # newest alone (R-TST-050 / QC-OR; fixed at E4 integration, I-D8).
         await wait_until(
             pilot,
-            lambda: newest_message(app).startswith("Loaded "),
-            lambda: f"no load message; newest is {ascii(newest_message(app))}",
+            lambda: any(line.startswith("Loaded ") for line in app.log_lines),
+            lambda: f"no load message; painted lines {ascii(list(app.log_lines)[-4:])}",
             timeout=MESSAGE_WAIT_S,
         )
         await settle(pilot, 4)
@@ -749,6 +807,40 @@ def test_r_tui_012l_8_3_integrity_notice_arm_paints_the_name(tmp_path: Path) -> 
         assert "integrity notices" in text, f"setup: no notice arm: {ascii(text)}"
         assert text.startswith(prefix), ascii(text)
         assert bad_chars(text + newest_message(app)) == []
+
+    run(tmp_path, scenario)
+
+
+def test_r_tui_012l_8_4_plain_name_is_unchanged(tmp_path: Path, case08: Path) -> None:
+    """R-TUI-012L.8 case /4 (regression, written at E4 integration): case 08's
+    ``firmware.s19`` loads as ``Loaded firmware.s19 (S19 only)`` in
+    ``#status_text`` and in the message lines: the scrub leaves a plain name
+    alone. The load line is written to the message lines directly (not
+    through ``set_status``), so the painted lines are read."""
+
+    async def scenario(app, pilot, log):
+        await load_image(pilot, app, case08 / "firmware.s19")
+        await settle(pilot, 4)
+        expected = "Loaded firmware.s19 (S19 only)"
+        assert status_text(app) == expected, status_text(app)
+        assert expected in list(app.log_lines), list(app.log_lines)
+
+    run(tmp_path, scenario)
+
+
+def test_r_tui_012l_8_5_a_long_name_is_clipped_to_120(tmp_path: Path) -> None:
+    """R-TUI-012L.8 case /5 (added at E4 integration: the threshold's E3 A10-06
+    arm had no case): a 130-character file name loads as ``Loaded`` + its
+    first 119 characters + ``...`` (U+2026) + `` (S19 only)`` in
+    ``#status_text`` (base: the whole name)."""
+    raw = "n" * 126 + ".s19"
+    image = write_three_ranges(tmp_path / "src" / raw)
+
+    async def scenario(app, pilot, log):
+        await load_image(pilot, app, image)
+        await settle(pilot, 4)
+        expected = f"Loaded {raw[:119]}… (S19 only)"
+        assert status_text(app) == expected, status_text(app)
 
     run(tmp_path, scenario)
 
@@ -832,6 +924,10 @@ def test_r_shell_focus_2_1_key_2_puts_focus_on_the_tag_table(tmp_path: Path, cas
 
 
 async def open_split_join(pilot, app) -> None:
+    """Open Split / Join through the palette entry's action and wait for
+    ``#sje_table`` to hold the focus with a region: R-SEG-OPEN.1 case /1 (the
+    open path still focuses the table), checked by every node that opens the
+    window (E4 integration, I-D9)."""
     app.action_open_split_join_export()
     await wait_focus(pilot, app, "sje_table")
     assert not split_join_hidden(app), "setup: Split / Join is not shown"
@@ -879,6 +975,36 @@ def focus_matches_target(app, target_id: str) -> bool:
     if widget is None or widget.region.area <= 0:
         return False
     return widget.id == target_id or inside(widget, target_id)
+
+
+def window_fallback_id(app, container_id: str, rail_id: str) -> str:
+    """R-SHELL-FOCUS.5's landing when the window's target is not shown: the
+    first shown focusable widget of the window that is not a text box, else
+    the window's rail item (written from the requirement, as in /5/1)."""
+    shown = [
+        widget
+        for widget in app.query_one(f"#{container_id}").query("*")
+        if widget.can_focus
+        and widget.focusable
+        and widget.region.area > 0
+        and not isinstance(widget, (Input, TextArea))
+    ]
+    return shown[0].id if shown else rail_id
+
+
+async def wait_empty_workspace_landing(pilot, app) -> str:
+    """After ``U`` the empty state hides the Workspace panes (LLR-002.3), so
+    ``files_list`` is not shown and R-SHELL-FOCUS.3 / .5 land the focus on the
+    Workspace's fallback; wait for it and return its id."""
+    await wait_until(
+        pilot,
+        lambda: app.query_one("#files_list").region.area == 0,
+        "setup: files_list is still shown after U",
+        timeout=FOCUS_WAIT_S,
+    )
+    expected = window_fallback_id(app, "screen_workspace", "rail_item_workspace")
+    await wait_focus(pilot, app, expected)
+    return expected
 
 
 @pytest.mark.parametrize(
@@ -1001,7 +1127,10 @@ def test_r_shell_focus_3_1_unload_that_removes_the_focused_button_rehomes_focus(
 
 def test_r_shell_focus_3_2_unload_with_nothing_focused_lands_on_the_target(tmp_path: Path) -> None:
     """R-SHELL-FOCUS.3 case /2: the Workspace with no focus; ``U`` lands the focus
-    on ``files_list`` (base: ``sje_table``, hidden)."""
+    on the shown window's landing (base: ``sje_table``, hidden). After ``U``
+    the empty state hides the Workspace panes and ``files_list`` with them
+    (LLR-002.3), so the landing is R-SHELL-FOCUS.5's fallback of the Workspace
+    (corrected at E4 integration, I-D6: the node expected ``files_list``)."""
     image = write_three_ranges(tmp_path / "src" / "three.s19")
 
     async def scenario(app, pilot, log):
@@ -1013,7 +1142,8 @@ def test_r_shell_focus_3_2_unload_with_nothing_focused_lands_on_the_target(tmp_p
         mark = len(log.messages)
         await pilot.press("U")
         await wait_message(pilot, log, mark, "Unloaded all artifacts.")
-        await wait_focus(pilot, app, "files_list")
+        await wait_empty_workspace_landing(pilot, app)
+        assert not inside(focus_of(app), "screen_split_join"), focus_report(app)
 
     run(tmp_path, scenario)
 
@@ -1087,7 +1217,9 @@ def test_r_shell_focus_5_1_empty_state_window_uses_the_fallback(tmp_path: Path) 
 def test_r_seg_open_6_1_unload_keeps_the_focus_out_of_the_hidden_window(tmp_path: Path) -> None:
     """R-SEG-OPEN.6 case /1: ``files_list`` focused, ``U``; once the focus has
     landed no focused widget has ``#screen_split_join`` as an ancestor (base:
-    ``sje_table``)."""
+    ``sje_table``). The positive wait is the landing on the empty Workspace's
+    fallback (corrected at E4 integration, I-D6: it waited for ``files_list``,
+    which the empty state hides after ``U``, LLR-002.3)."""
     image = write_three_ranges(tmp_path / "src" / "three.s19")
 
     async def scenario(app, pilot, log):
@@ -1097,8 +1229,48 @@ def test_r_seg_open_6_1_unload_keeps_the_focus_out_of_the_hidden_window(tmp_path
         mark = len(log.messages)
         await pilot.press("U")
         await wait_message(pilot, log, mark, "Unloaded all artifacts.")
-        await wait_focus(pilot, app, "files_list")
+        await wait_empty_workspace_landing(pilot, app)
         await settle(pilot, 6)
+        assert not inside(focus_of(app), "screen_split_join"), focus_report(app)
+
+    run(tmp_path, scenario)
+
+
+def test_r_seg_open_6_2_load_keeps_the_focus_out_of_the_hidden_window(tmp_path: Path) -> None:
+    """R-SEG-OPEN.6 case /2 (written at E4 integration): fixture three loaded
+    (so the Workspace panes are shown), ``files_list`` focused and Split / Join
+    hidden; a second load of fixture three puts the focus inside
+    ``#screen_split_join`` at no point: every focus the screen takes during the
+    load is recorded, none sits in the window, and the focus ends on
+    ``files_list``. Base: the load's ``refresh_window`` focuses the hidden
+    ``#sje_table`` and the load tail's re-home moves it back, so the end state
+    alone could not fail. (With nothing loaded the empty state hides the
+    panes, LLR-002.3, so ``files_list`` is focused after a first load.)"""
+    image = write_three_ranges(tmp_path / "src" / "three.s19")
+    again = write_three_ranges(tmp_path / "src" / "three_again.s19")
+
+    async def scenario(app, pilot, log):
+        await load_image(pilot, app, image)
+        await put_focus(pilot, app, "files_list")
+        await wait_focus(pilot, app, "files_list")
+        assert split_join_hidden(app)
+        screen = app.default_screen
+        taken = []
+        original = screen.set_focus
+
+        def record(widget, *args, **kwargs):
+            taken.append(widget)
+            return original(widget, *args, **kwargs)
+
+        screen.set_focus = record
+        try:
+            await load_image(pilot, app, again)
+            await wait_focus(pilot, app, "files_list")
+            await settle(pilot, 6)
+        finally:
+            del screen.set_focus
+        leaked = [widget.id for widget in taken if inside(widget, "screen_split_join")]
+        assert leaked == [], f"the load focused {leaked} inside the hidden window"
         assert not inside(focus_of(app), "screen_split_join"), focus_report(app)
 
     run(tmp_path, scenario)

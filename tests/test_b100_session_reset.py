@@ -1035,6 +1035,9 @@ def test_tc_b100_10_reset_leaves_the_patch_editor_clean_for_the_next_load(
 #: The live source census at the Inc 12b base (71376a3: main + Inc 11 +
 #: Inc 12a), frozen by the E4 tester with :func:`_source_census`'s rule.
 #: Inc 12b may add exactly one name to it (P1-83, C12b-49).
+#: Re-frozen at batch-101 Inc 10a's E4 integration: ``_hex_view_rows_cache``
+#: (the view-row memo of ``_hex_view_rows``) joins the census; it is in
+#: ``_SESSION_SNAPSHOT_NAMES``, so Inc 12b's one-name rule is unchanged.
 _CENSUS_AT_12B_BASE = frozenset({
     '_a2l_cache_data',
     '_a2l_cache_key',
@@ -1060,6 +1063,7 @@ _CENSUS_AT_12B_BASE = frozenset({
     '_diff_compare_generation',
     '_diff_last_result',
     '_goto_focus_address',
+    '_hex_view_rows_cache',
     '_hex_window_start',
     '_image_generation',
     '_last_execution',

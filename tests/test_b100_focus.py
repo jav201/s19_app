@@ -558,7 +558,13 @@ def test_tc_b100_12_hidden_map_row_is_rehomed(tmp_path: Path) -> None:
     ``up`` / ``down`` / ``enter``; an A2L load then runs its tail and the
     focus must land on the Workspace target. RED with a ``RegionRow``
     exemption in ``_focus_needs_rehome``: the focus stays on the hidden
-    row."""
+    row.
+
+    Batch-101 Inc 10a (R-SHELL-FOCUS.2, D-8): the rail key itself now clears
+    a focus left in the window it hides and lands on the Workspace target,
+    so the hidden row no longer keeps the focus through ``1``; the arm puts
+    it back on the hidden row (the stale shape the finding names) after the
+    switch has landed, and the A2L load tail must still re-home it."""
 
     async def _drive() -> None:
         app = S19TuiApp(base_dir=tmp_path)
@@ -575,10 +581,14 @@ def test_tc_b100_12_hidden_map_row_is_rehomed(tmp_path: Path) -> None:
             await pilot.press("4")  # the Map rail screen
             await _flush(pilot)
             await _wait_for_map_row_landing(pilot, app)
+            row = app.focused
             await pilot.press("1")  # the Workspace rail screen; Map hides
             await _flush(pilot)
-            # The precondition the finding names: the hidden row still
-            # holds the focus with no painted region.
+            await _wait_for_focus_on_target(pilot, app, "files_list")
+            app.screen.set_focus(row)
+            await _wait_for(pilot, lambda: app.focused is row, "the stale row focus")
+            # The precondition the finding names: the hidden row holds the
+            # focus with no painted region.
             assert isinstance(app.focused, RegionRow), app.focused
             assert app.focused.region.area == 0
             app.load_a2l_from_path(CASE01_DIR / "firmware.a2l")

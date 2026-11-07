@@ -10670,6 +10670,7 @@ class S19TuiApp(App):
         switch: Optional[str],
         *,
         on_switch: bool,
+        layout_waits: int = 3,
     ) -> None:
         """
         Summary:
@@ -10686,11 +10687,18 @@ class S19TuiApp(App):
             on_switch (bool): ``True`` for a window switch (move when the
                 focus is still the trigger), ``False`` for an unload (move
                 when the focus is no longer the trigger).
+            layout_waits (int): How many more refreshes the landing may wait
+                for the shown window to get its region.
 
         Returns:
             None
 
         Data Flow:
+            - An after-refresh callback can run before the layout that gives
+              the window just shown its region (Inc 10a E4 integration
+              I-D3: ``#screen_mac`` had area 0 at the landing of a two-key
+              burst); while the shown window has no region the landing
+              re-schedules itself, at most ``layout_waits`` times.
             - Reads ``default_screen.focused`` — never ``self.focused`` —
               so a dialog's own focus is never judged or moved.
             - Resolves the target through ``_resolve_focus_target`` (which
@@ -10705,6 +10713,25 @@ class S19TuiApp(App):
         """
         if switch is not None and switch != self._active_screen_key:
             return
+        container_id = (
+            "screen_split_join"
+            if self._active_screen_key == "split_join"
+            else self.SCREEN_CONTAINER_IDS.get(self._active_screen_key)
+        )
+        if layout_waits > 0 and container_id is not None:
+            try:
+                laid_out = self.query_one(f"#{container_id}").region.area > 0
+            except Exception:
+                laid_out = True
+            if not laid_out:
+                self.call_after_refresh(
+                    self._land_focus,
+                    trigger,
+                    switch,
+                    on_switch=on_switch,
+                    layout_waits=layout_waits - 1,
+                )
+                return
         try:
             focused = self.default_screen.focused
         except Exception:
