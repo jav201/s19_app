@@ -1,0 +1,58 @@
+# M-.33b
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.33b/s19_app/__init__.py
+# note: 0x00 bytes kept
+#   EDIT-OK: '        if byte == 0:\n            break\n        if 0x20 <= byte <= 0x7'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..2159c987 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -1391,8 +1391,6 @@ def _ascii_text(raw: bytes) -> str:
+     as its ASCII character and every other byte as U+FFFD."""
+     out: list[str] = []
+     for byte in raw:
+-        if byte == 0:
+-            break
+         if 0x20 <= byte <= 0x7E:
+             out.append(chr(byte))
+         else:
+
+# --- pytest (rc=1) ---
+FF.                                                                      [100%]
+=================================== FAILURES ===================================
+___________________ test_r_a2l_def_33_1_text_ended_by_a_nul ____________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...sed /begin sections detected.'], 'path': '/tmp/b103-e5-2-mutA/M-.33b/examples/case_00_public/ASAP2_Demo_V171.a2l', ...}
+
+    def test_r_a2l_def_33_1_text_ended_by_a_nul(v171):
+        """R-A2L-DEF.33/1 - ``Hello ASAM`` + 32 x 00 (base: 72)."""
+        d = describe_definition(V171_ASCII, v171)
+        res = _decoded(d, v171, _img(0x810200, b"Hello ASAM" + bytes(32)))
+>       assert (res.stored, res.value, res.text) == (None, "Hello ASAM", "Hello ASAM")
+E       AssertionError: assert (None, 'Hello...������������') == (None, 'Hello... 'Hello ASAM')
+E         
+E         At index 1 diff: 'Hello ASAM��������������������������������' != 'Hello ASAM'
+E         Use -v to get more diff
+
+../base/tests/test_b103_a2l_definition.py:958: AssertionError
+------------------------------ Captured log setup ------------------------------
+WARNING  s19_app.tui.a2l:a2l.py:250 A2L section tree has structural errors: path=/tmp/b103-e5-2-mutA/M-.33b/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+_______________________ test_r_a2l_def_33_2_case08_text ________________________
+
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp...BL_NOINTP', ...}}, 'errors': [], 'path': '/tmp/pytest-of-javiergr/pytest-978/b103_c080/firmware_issues.a2l', ...}, ...}
+
+    def test_r_a2l_def_33_2_case08_text(c08):
+        """R-A2L-DEF.33/2 - ASCII_0001 decodes to the planned string."""
+        d = describe_definition("ASCII_0001", c08["a2l"])
+        planned = c08["by_name"]["ASCII_0001"]["raw_bytes"].split(b"\x00")[0].decode("ascii")
+>       assert planned and _decoded(d, c08["a2l"], c08["mem"]).text == planned
+E       AssertionError: assert ('HW_REV=00.01.00.00' and 'HW_REV=00.01...�������������' == 'HW_REV=00.01.00.00'
+E         
+E         - HW_REV=00.01.00.00
+E         + HW_REV=00.01.00.00��������������)
+
+../base/tests/test_b103_a2l_definition.py:965: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_33_1_text_ended_by_a_nul
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_33_2_case08_text - A...
+2 failed, 1 passed, 188 deselected in 1.33s

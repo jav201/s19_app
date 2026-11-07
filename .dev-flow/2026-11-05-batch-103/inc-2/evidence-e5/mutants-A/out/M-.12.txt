@@ -1,0 +1,52 @@
+# M-.12
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.12/s19_app/__init__.py
+# note: FORM treated as identity (added to supported types)
+#   EDIT-OK: '    {"IDENTICAL", "LINEAR", "RAT_FUNC", "TAB_INTP", "TAB_NOINTP", "TAB'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..23a34d92 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -161,7 +161,7 @@ _SIGNED_DATATYPES = frozenset({"SBYTE", "SWORD", "SLONG", "A_INT64"})
+ 
+ #: The conversion type words the definition model supports (R-A2L-DEF.12).
+ _SUPPORTED_CONVERSION_TYPES = frozenset(
+-    {"IDENTICAL", "LINEAR", "RAT_FUNC", "TAB_INTP", "TAB_NOINTP", "TAB_VERB"}
++    {"IDENTICAL", "LINEAR", "RAT_FUNC", "TAB_INTP", "TAB_NOINTP", "TAB_VERB", "FORM"}
+ )
+ 
+ _ASCII_DIGITS = frozenset("0123456789")
+
+# --- pytest (rc=1) ---
+F...                                                                     [100%]
+=================================== FAILURES ===================================
+__________________ test_r_a2l_def_12_1_form_is_not_supported ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-952/test_r_a2l_def_12_1_form_is_no0')
+
+    def test_r_a2l_def_12_1_form_is_not_supported(tmp_path):
+        """R-A2L-DEF.12/1 - FORM."""
+        form = ('/begin COMPU_METHOD CM_F ""\n  FORM "%.1" ""\n  /begin FORMULA\n    "X1*2"\n  /end FORMULA\n'
+                '/end COMPU_METHOD')
+        a2l = _inline(tmp_path, form, _val("FX", "0x10", "RL_U16", "CM_F"))
+>       _is_refused(describe_definition("FX", a2l), "A2L-DEF-CONVERSION",
+                    "FX: the conversion type FORM of CM_F is not supported")
+
+../base/tests/test_b103_a2l_definition.py:551: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='FX', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None)
+code = 'A2L-DEF-CONVERSION'
+message = 'FX: the conversion type FORM of CM_F is not supported'
+
+    def _is_refused(d: Definition, code: str, message: str) -> None:
+>       assert d.refusal == Refusal(code, message), d.refusal
+E       AssertionError: None
+E       assert None == Refusal(code='A2L-DEF-CONVERSION', message='FX: the conversion type FORM of CM_F is not supported')
+E        +  where None = Definition(name='FX', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None).refusal
+E        +  and   Refusal(code='A2L-DEF-CONVERSION', message='FX: the conversion type FORM of CM_F is not supported') = Refusal('A2L-DEF-CONVERSION', 'FX: the conversion type FORM of CM_F is not supported')
+
+../base/tests/test_b103_a2l_definition.py:165: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_12_1_form_is_not_supported
+1 failed, 3 passed, 187 deselected in 0.35s

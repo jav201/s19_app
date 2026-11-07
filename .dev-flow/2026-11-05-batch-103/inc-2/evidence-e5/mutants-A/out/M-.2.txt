@@ -1,0 +1,81 @@
+# M-.2
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.2/s19_app/__init__.py
+# note: kind read from a2l.py conversion_type (None for all three)
+#   EDIT-OK: '            kind = "enum" if conversion_type == "TAB_VERB" else "numbe'
+#   EDIT-OK: '            kind = "enum" if conversion_type == "TAB_VERB" else "numbe'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..70ca4dcc 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -723,7 +723,7 @@ def _object_kind(tag: dict, conversion_type: Optional[str]) -> tuple[str | None,
+         if char_type == "ASCII":
+             return "text", "ASCII"
+         if char_type == "VALUE":
+-            kind = "enum" if conversion_type == "TAB_VERB" else "number"
++            kind = "number"
+             return kind, "VALUE"
+         if char_type is None:
+             return None, "(none)"
+@@ -731,7 +731,7 @@ def _object_kind(tag: dict, conversion_type: Optional[str]) -> tuple[str | None,
+     if section == "MEASUREMENT":
+         matrix_dim = tag.get("matrix_dim")
+         if matrix_dim is None or matrix_dim == 1:
+-            kind = "enum" if conversion_type == "TAB_VERB" else "number"
++            kind = "number"
+             return kind, "MEASUREMENT"
+         return None, f"MATRIX_DIM {_number_text(matrix_dim)} MEASUREMENT"
+     return None, "(none)"
+
+# --- pytest (rc=1) ---
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_ test_r_a2l_def_2_1_tab_verb_with_long_identifier_on_its_own_line_is_an_enum __
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...losed /begin sections detected.'], 'path': '/tmp/b103-e5-2-mutA/M-.2/examples/case_00_public/ASAP2_Demo_V171.a2l', ...}
+
+    def test_r_a2l_def_2_1_tab_verb_with_long_identifier_on_its_own_line_is_an_enum(v171):
+        """R-A2L-DEF.2/1 - the method's long identifier on its own line (base: type None)."""
+        d = describe_definition(V171_ENUM, v171)
+>       assert d.kind == "enum" and d.conversion_type == "TAB_VERB"
+E       AssertionError: assert ('number' == 'enum'
+E         
+E         - enum
+E         + number)
+
+../base/tests/test_b103_a2l_definition.py:284: AssertionError
+------------------------------ Captured log setup ------------------------------
+WARNING  s19_app.tui.a2l:a2l.py:250 A2L section tree has structural errors: path=/tmp/b103-e5-2-mutA/M-.2/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+________________ test_r_a2l_def_2_2_a2ltool_tab_verb_is_an_enum ________________
+
+softa = {'compu_methods_by_name': {'AFI_TU_FXBD_XMC_KKWP_MMV.DQXN_O_IJX_MSK_UimufsteUejnmysraz': {'coeffs': None, 'coeffs_line...HjjVfzjGyvl', ...}, ...}, 'errors': [], 'path': '/tmp/b103-e5-2-mutA/M-.2/examples/case_00_public/software_a.a2l', ...}
+
+    def test_r_a2l_def_2_2_a2ltool_tab_verb_is_an_enum(softa):
+        """R-A2L-DEF.2/2 - a2ltool shape (long identifier on the /begin line)."""
+        d = describe_definition("ACN_ULWY.FVH_MUGP_O_SBW_RTD_NJZ_MKE_WODEYLMQXZ46_OXATIRMZ_YOQJZI", softa)
+>       assert d.kind == "enum" and d.conversion_type == "TAB_VERB"
+E       AssertionError: assert ('number' == 'enum'
+E         
+E         - enum
+E         + number)
+
+../base/tests/test_b103_a2l_definition.py:290: AssertionError
+___________ test_r_a2l_def_2_3_commented_tab_verb_header_is_an_enum ____________
+
+tube = {'compu_methods_by_name': {'esdl_f0_00392156862745098': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None,...es_vtab', ...}}, 'errors': [], 'path': '/tmp/b103-e5-2-mutA/M-.2/examples/case_00_public/BalanceTube_STMicro.a2l', ...}
+
+    def test_r_a2l_def_2_3_commented_tab_verb_header_is_an_enum(tube):
+        """R-A2L-DEF.2/3 - TUBE: the type sits in a comment on the header."""
+        d = describe_definition("model.MainClass.gameController.sm", tube)
+>       assert d.kind == "enum" and d.conversion_type == "TAB_VERB"
+E       AssertionError: assert ('number' == 'enum'
+E         
+E         - enum
+E         + number)
+
+../base/tests/test_b103_a2l_definition.py:296: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_2_1_tab_verb_with_long_identifier_on_its_own_line_is_an_enum
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_2_2_a2ltool_tab_verb_is_an_enum
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_2_3_commented_tab_verb_header_is_an_enum
+3 failed, 188 deselected in 3.88s

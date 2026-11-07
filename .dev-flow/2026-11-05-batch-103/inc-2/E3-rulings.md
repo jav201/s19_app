@@ -165,3 +165,77 @@ Notes for the 2b re-review:
 - **Inc 2a's open findings** (E3S-36, -38, -40, -43, the lost-mask shapes E3S-14/-24/-26/-30/-33, corr4-2 commented-out object) are **inherited reader defects**: 2a shows what the A2L views show today, with no write path. They are **ruled non-blocking for 2a** and owned by Inc 11 (reader fix); 2a's acceptance after Inc 11 lands re-runs their shapes. E3S-39 is 2b-only (span index).
 - E3A-27 (.59/3 text) and E3A-29 (b) are E4 addenda for 2a's tester.
 - **Inc 2a goes to E4** (50 rows, 181 cases, 32 nodes). **Inc 2b** (19 rows, 109 cases, 11 nodes) waits for Inc 11 and a security re-review against the fixed reader.
+
+## Inc 2a E5 — known design gaps (2026-11-07T02:56:10-06:00, orchestrator Opus 5.5)
+
+Applied (Opus, 50 min): one `reads` map per walk keyed by section identity, every value immutable (COMPU_METHOD → its 6 fields read-only; COMPU_VTAB / _RANGE → the table tuple by reference; RECORD_LAYOUT → its resolved datatype); new row **R-A2L-DEF.149** (cases /1–/4). Measured: the **current 2a code** takes 42.1 / 57.5 / 52.3 / 6.0 s with 400 objects sharing 256 KiB (> 60 s at 512 KiB) — a real DoS on a hostile A2L; the model 0.032–0.135 s (256 KiB), 0.044–0.218 s (512 KiB); 0 differences on the 35 fixtures.
+- **E5-1 (the 1.3× ratio is timing noise at host load 13–16):** the scaling clause of **.148 and .149** is restated to be robust: sizes **S and 8S**, median of 7 **interleaved** runs, the per-object part may grow by at most **2.0×** (a per-object walk of shared content grows ≥ 6×), `serial_timing` lane. Inc 3a's .148 takes the same wording at its E4.
+- Next: code (DeepSeek, Sonnet if its API fails) ∥ tests (Sonnet) for .149, GREEN, then Inc 2a's E5 reviews (code, security), mutants, coverage audit.
+
+## Inc 2a E5 — gap pass 2 rulings (2026-11-07, orchestrator Opus 5.5)
+
+**Gap pass 1 is done:**
+- the .149 read-once map is code `eb750c6f` (`f2f955aa`);
+- its tests are `37168255`;
+- the tests are RED on `82f5f8e5` and 8/8 GREEN in 3 of 3 runs.
+
+**Measure ruling for .148, .149 and .150:**
+- the timed part runs with `gc.collect()` and then `gc.disable()`, as `timeit` does;
+- ×2S ≤ **1.5** and ×8S ≤ 2.0, least of ≥ 15 interleaved runs, process CPU time;
+- the 2S bound was relaxed from 1.3 after 3 runs with GC off still measured ×1.2–1.4 on flat code. A per-object walk gives ≥ ×1.78 at 2S and ≥ ×3.2 at 8S.
+
+**Gap pass 2: Inc 2a's lines of Inc 3a's E3 security round 5.** The authority is `../inc-3/E3-rulings.md`, "Round 5 rulings" and the "Round-5 correction done" note; the paths are defined in `../inc-3/E3-security.md`, "## Round 5". It runs before Inc 2a's E5 reviews.
+- **The completed rule** holds for Inc 2a's nodes too. Each shared section is reduced once per walk to a form of fixed size, with each word in its final form: echoes at most 256 characters (.151), display texts cleaned once, derived values computed (the FORMAT's decimals in the method record). Definitions and decoded values reference shared texts and never copy them.
+- **R-A2L-DEF.150 (U), new, owned here.** "The system shall decode each element in a time and a retained size that do not grow with the size of the conversion table it names."
+  - Inc 2a's cases are scalar VALUEs: VT-3 (COMPU_VTAB entries), the VALUE forms of VT-5 (a long matched entry text), VT-6 (a long DEFAULT_VALUE text), VR-1 (COMPU_VTAB_RANGE entries) and VR-2 (a long range text).
+  - Design: the enum table's reduced form holds each entry's display text and the default's, each cleaned once. It also holds a private, immutable index, shared by reference: for COMPU_VTAB, a dict from raw value to the **first** entry in file order; for COMPU_VTAB_RANGE, a segmentation built once per table, a sweep over the range ends that gives each segment the first range in file order covering it, then a bisect per element.
+  - Pin the design with an equality case against the linear first-match oracle (Inc 2a's `_enum_entry_text` at `82f5f8e5`) on every corpus and tracked enum table, plus hostile overlapping and duplicate ranges.
+  - The public `enum_entries: tuple[EnumEntry, ...]` of I-2 stays as pinned.
+- **R-A2L-DEF.151 (U), new, owned here.** "The system shall write a file word into a refusal message as at most its first 256 characters, each character outside U+0021 … U+007E written as U+FFFD, and `…` after it when the word is longer."
+  - It applies to the shared-section words of Inc 2a's METHOD, CONVERSION (the type word), TABLE (the COMPU_TAB_REF word) and TABLE-EMPTY messages. `<name>` and `<layout>` keep .137.
+  - The cap is 256 because 1,993 real names exceed 64 characters, 0 exceed 256, and the longest is 148 (corpus measure in `../inc-3/E3-rulings.md`).
+  - Cases: 256 characters kept whole, 257 cut, and U+FFFD for each character outside U+0021 … U+007E. Each message is ≤ 1,024 characters.
+- **R-A2L-DEF.149 gains cases, same text:**
+  - CM-5: a long `%…` FORMAT word, with decimals derived once in the method record;
+  - CM-7: a long conversion-type word, echoed at reduction;
+  - CM-9: a long COMPU_TAB_REF word, echoed at reduction;
+  - RL-10 / RL-11: `_resolve_datatype` memoised per layout, for VALUE and CUBOID;
+  - CM-2: a method block comment, if pass 1 does not already cover it.
+  - Each case uses the measure above and asserts the ≤ 1,024-character message bound.
+- **Immutability:** the new reduced forms and the index are immutable values (tuples, frozen dataclasses, `MappingProxyType`). Add a case like .149/5.
+- **Owners and order:**
+  1. records + graph (Opus);
+  2. code (DeepSeek; Sonnet if its API fails) ∥ tests (an independent Sonnet tester);
+  3. GREEN on cachyos-rtx;
+  4. Inc 2a's E5 reviews (code, security), mutants and the coverage audit.
+
+### Gap pass 2 — addendum from Inc 3a's E3 security round 6 (2026-11-07, orchestrator Opus 5.5)
+
+Authority: `../inc-3/E3-rulings.md` "Round 6 rulings" (main worktree `s19_app-b103`); the findings are in `../inc-3/E3-security.md` "## Round 6". The Inc 2a items join gap pass 2:
+- **.151's reach is every file word a refusal message echoes**, `<name>` and `<layout>` included (E3S3-25). This replaces the ".137 for `<name>`/`<layout>`" line above. A shared word's echo is computed at reduction; the object's own name echo is computed once at describe and carried.
+- **TABLE-EMPTY** (`a2l_definition.py:529`) echoes the stored COMPU_TAB_REF echo, like CONVERSION and TABLE (E3S3-26).
+- **Decode fails closed** in `decode_definition` (E3S3-28): a conversion result that is not an `int` or a `float` → `A2L-DEF-DECODE` `<name>: the table <ref> gives a value that is not a number`. Case: a VALUE whose TAB_NOINTP / TAB_INTP method names a COMPU_VTAB → the refusal, 0 exceptions. Negative control: `82f5f8e5` → `TypeError` → RED.
+- **The scalar TAB_INTP / TAB_NOINTP lookup** (E3S3-29, -30 (b)) moves to Inc 2a's reduced form: O(log n), with v2's two rules pinned (see the round-6 fix column of E3S3-29). The equality case against the frozen `a2l._table_lookup` runs over every corpus table at the extended values: NaN, ±inf, 2^63, 2^64 − 1, midpoints and ±1 ulp. A table whose x holds a NaN is refused at decode, with the verdict computed once per walk.
+- **The range index** (E3S3-30 (a)) is the segment index of the rulings above. The equality case runs over every corpus COMPU_VTAB / _RANGE table at each raw value, min, max, midpoint, ±1, NaN and ±inf, against `_enum_entry_text` at `82f5f8e5`, and gives 0 differences. Negative control: a plain bisect → 780 differences in 30 tables → RED.
+- **References resolved at reduction** (E3S3-31): the method record keeps the section its COMPU_TAB_REF names, or none. No per-call name lookup of a shared word remains.
+- **The message bound** is "1,024 characters" (E3S3-32).
+
+### Gap pass 2 — records done (Opus, 31 min); orchestrator rulings on what it reported
+
+- **P-2: accept.** `Definition` gets two private fields, `_name_echo` and `_table_form`, each `field(compare=False, repr=False)`. I-2's public names, equality and repr do not change. No consumer reads them except through Inc 2a's own functions; Inc 3a reads them through the helpers its graph names.
+- **.149/5:** accepted. The cached-forms immutability test becomes a row case and is extended to `_EnumForm` and `_TabForm`.
+- **No new case for RL-10 or CM-2:** accepted. .149/4 already is RL-10, and CM-2 is covered by /1's reader, memo and negative control.
+- **The fail-closed cases sit under R-A2L-DEF.58.2 (/18, /19):** accepted, since .58.2 is the row for refusing instead of raising. /18's message matches Inc 3a's ruling. /19's wording, `<name>: the table <ref> has an x that is not a number`, is accepted, and Inc 3a uses the same wording for its arrays.
+- **.149/1's Expected measure** was updated in place by the orchestrator to the ruled one; /2–/4 read "as /1's bounds".
+
+### Gap pass 2 — GREEN (2026-11-07, orchestrator Opus 5.5)
+
+- **Code:** `6071a385`, md5 `820a4c3a`, DeepSeek. **Tests:** `e9bad3ca`, independent Sonnet tester.
+- **Main file:** 182 passed.
+- **Perf, 12 new cases:** 12/12 in run 3, plus 4/4 reruns at load < 2. Runs 1 and 2 at load 15 failed 4 and 1 ratio checks.
+- **Mutants:** a plain bisect and a cut at 255 both go RED.
+- **RED on `eb750c6f`:** 7 tests fail in the main file and 11 in the perf file; the absolute-bound failures run 4.6–15.9 s against a 0.5 s bound.
+- **Open item for Inc 2a's E5 (test review) — E5-3:** the scaling measure is the difference of two walks (the 400-name walk minus a 1-name walk), so a per-object part of 10–130 ms is swamped by host load. Under a shared load of 15, from another session's 12-worker run, the ratios fail.
+  - Fix, choose one: time the 399 names inside one fresh walk through the module's per-name step (the steady form), or raise the object count until the per-object part dominates (e.g. 4,000 names).
+  - Until then the timed cases are decided on a quiet host: load < 2 at start, nothing else on the runner. That is how the batch-end battery runs them.
+- **The integrated tree** `~/work/b103-int2a` on cachyos-rtx is rebuilt at `e9bad3ca`, as a `--shared` clone of `~/work/s19_app` on branch `b103-inc2a-code`. It is read-only for E5 agents.

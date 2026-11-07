@@ -1,0 +1,16 @@
+== 1: side table sections and first COMPU_VTAB_RANGE in the section tree
+side-table section values: ['COMPU_VTAB']
+COMPU_VTAB_RANGE sections in tree: 69
+first range table: AET_ES_RLBM_AjzY.Ruffte_MG_WIN_JljHYWzox_RBR_2_Lolzhsf_RdzyhoEgzz.UQA_SscVOMjkb
+entries: 5 EnumEntry(raw=0.0, raw_max=0.0, text='BPQ_UQKPL_XLDM_EM_SPFMDDQDOEMCT')
+objects using it: 1
+enum 5 EnumEntry(raw=0.0, raw_max=0.0, text='BPQ_UQKPL_XLDM_EM_SPFMDDQDOEMCT')
+== 2: EXTENDED_LIMITS 0 + FORMAT
+body tokens consumed: ['XL1', '', 'UWORD', 'NM', '0', '0', '0', '65535', 'EXTENDED_LIMITS', '0', 'FORMAT', '%5.0']
+display_format: None ext: None
+FORMAT first: %5.0
+== 3/4: decimals 17 on 0.1
+float round trip   : 0.10000000000000001
+Decimal of 15g text: 0.10000000000000000
+4.1 d=15 float     : 4.100000000000000  Decimal: 4.100000000000000
+1e20 d=17 Decimal  : 100000000000000000000.00000000000000000

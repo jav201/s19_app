@@ -1,0 +1,2792 @@
+# host: cachyos-rtx | 2026-11-07T06:29:02-06:00 | load: 6.66 3.12 2.00
+# a2l_definition.py md5: 820a4c3afd6c56a65a2f89c95ab682d0  make_release_case.py md5: 77e8b021e160e1a35ab53b9ac0913823
+# cmd: python -m pytest -q -p no:cacheprovider tests/test_b103_a2l_definition.py tests/test_b103_synth_definitions.py -k not 59_2
+/tmp/b103-e5fix/red/s19_app/__init__.py
+Python 3.11.18
+...........................................F............................ [ 36%]
+........................................................................ [ 72%]
+.......................................FFFFFFFF..F.....                  [100%]
+=================================== FAILURES ===================================
+__ test_r_a2l_def_12_4_a_listed_type_in_another_letter_case_is_not_supported ___
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-912/test_r_a2l_def_12_4_a_listed_t0')
+
+    def test_r_a2l_def_12_4_a_listed_type_in_another_letter_case_is_not_supported(tmp_path):
+        """R-A2L-DEF.12/4 (E5 fix pass, CR-4 = E5S-05) - ``tab_intp`` is not ``TAB_INTP``: describe and decode refuse it."""
+        a2l = _inline(
+            tmp_path,
+            _cm("CM_LC", "tab_intp", fmt='"%.0"', ref="CT_LC"),
+            '/begin COMPU_TAB CT_LC "" TAB_INTP 2\n  0 0\n  100 100\n/end COMPU_TAB',
+            _val("LC", "0x10", LAYOUT["UBYTE"], "CM_LC", "0", "255"),
+        )
+        d = describe_definition("LC", a2l)
+        want = Refusal("A2L-DEF-CONVERSION", "LC: the conversion type tab_intp of CM_LC is not supported")
+>       assert d.refusal == want, d.refusal
+E       AssertionError: None
+E       assert None == Refusal(code='A2L-DEF-CONVERSION', message='LC: the conversion type tab_intp of CM_LC is not supported')
+E        +  where None = Definition(name='LC', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=1, datatype=...m_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref='CT_LC', refusal=None).refusal
+
+tests/test_b103_a2l_definition.py:579: AssertionError
+_ test_r_a2l_def_58_2_20_a_length_of_5000_hex_digits_is_a_refusal_not_an_exception _
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-912/test_r_a2l_def_58_2_20_a_lengt0')
+
+    def test_r_a2l_def_58_2_20_a_length_of_5000_hex_digits_is_a_refusal_not_an_exception(tmp_path):
+        """R-A2L-DEF.58.2/20 (E5S-01, CR-2) - LENGTH 0x + 5,000 F on a UWORD VALUE."""
+>       _huge_span_case(tmp_path, "HL", _val("HL", "0x10", LAYOUT["UWORD"], "NO_COMPU_METHOD", "0", "65535",
+                                             "LENGTH 0x" + "F" * 5000))
+
+tests/test_b103_a2l_definition.py:2291: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_definition.py:2282: in _huge_span_case
+    d = describe_definition(name, a2l)                                         # 0 exceptions
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/a2l_definition.py:314: in describe_definition
+    return describe_definitions([name], a2l_data)[name]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/a2l_definition.py:369: in describe_definitions
+    result[name] = _describe_one(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'HL'
+tags_by_name = {'HL': [{'access': None, 'address': 16, 'axis_meta': [], 'bit_org': None, ...}]}
+object_sections_by_name = {'HL': [{'children': [], 'end_line': 34, 'lines': ['  VALUE 0x10 RL_U16 0 NO_COMPU_METHOD 0 65535', '  LENGTH 0xFFFFFF...FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'], 'meta': 'HL ""', ...}]}
+compu_methods_by_name = {}, compu_tables_by_name = {}
+a2l_data = {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-javiergr/pytest-912/test_r_a2l_def_58_2_20_a_lengt0/inline_108.a2l', ...}
+reads = {139689717087360: 'UWORD'}
+
+    def _describe_one(
+        name: str,
+        tags_by_name: dict[str, list[dict]],
+        object_sections_by_name: dict[str, list[dict]],
+        compu_methods_by_name: dict[str, dict],
+        compu_tables_by_name: dict[str, dict],
+        a2l_data: dict,
+        reads: dict[int, object],
+    ) -> Definition:
+        """Read every field and the refusal for one name (the body of
+        :func:`describe_definitions`)."""
+        name_echo = _echo(name)
+        empty = Definition(
+            name=name,
+            section="",
+            char_type=None,
+            kind="",
+            address=None,
+            byte_length=None,
+            datatype=None,
+            byte_order="little",
+            bit_mask=None,
+            bit_mask_text=None,
+            conversion_type=None,
+            method_name=None,
+            display_format=None,
+            decimals=None,
+            unit="",
+            limits=Limits(None, None, "", ""),
+            extended_limits=None,
+            enum_table=None,
+            enum_entries=(),
+            default_text=None,
+            coeffs_linear=None,
+            coeffs=None,
+            compu_tab_ref=None,
+            refusal=None,
+            _name_echo=name_echo,
+            _table_form=None,
+        )
+    
+        found = _find_tag(name, tags_by_name, object_sections_by_name)
+        if found is None:
+            return _with_refusal(
+                empty, Refusal("A2L-DEF-NAME", f"{name_echo}: no tag of that name in the A2L")
+            )
+        if isinstance(found, Refusal):
+            return _with_refusal(empty, found)
+    
+        tag, section = found
+    
+        # Copy the tag so the MEASUREMENT fill never mutates the parse payload
+        # (R-A2L-DEF.58.1).
+        tag = dict(tag)
+        object_lines = _read_object_lines(section)
+    
+        # E2-1 / R-A2L-014: a MEASUREMENT whose tag lacks them is filled from the
+        # header words (datatype, conversion word, limit words) and, with a
+        # datatype, the length = size × MATRIX_DIM (1 when absent).
+        if tag.get("section") == "MEASUREMENT":
+            header = object_lines.get("header") or []
+            if tag.get("datatype") is None and len(header) > 2:
+                tag["datatype"] = header[2]
+            if tag.get("conversion") is None and len(header) > 3:
+                tag["conversion"] = header[3]
+            if tag.get("lower_limit") is None and len(header) > 6:
+                tag["lower_limit"] = header[6]
+            if tag.get("upper_limit") is None and len(header) > 7:
+                tag["upper_limit"] = header[7]
+            if tag.get("length") is None and tag.get("datatype") in DATATYPE_SIZES:
+                matrix_dim = tag.get("matrix_dim")
+                mult = (
+                    matrix_dim
+                    if isinstance(matrix_dim, int) and not isinstance(matrix_dim, bool)
+                    else 1
+                )
+                tag["length"] = DATATYPE_SIZES[tag["datatype"]] * mult
+    
+        address = tag.get("address")
+        byte_length = tag.get("length")
+        datatype = _resolve_datatype(tag, a2l_data, reads)
+        byte_order = tag.get("effective_byte_order") or "little"
+        char_type = tag.get("char_type")
+        section_name = tag.get("section") or ""
+    
+        method_name = tag.get("conversion")
+        method_echo = _echo(method_name) if method_name is not None else "(none)"
+        record: Optional[Mapping] = None
+        if method_name is not None and method_name != "NO_COMPU_METHOD":
+            record = _read_method_record(
+                method_name,
+                compu_methods_by_name,
+                compu_tables_by_name,
+                a2l_data.get("compu_tabs_by_name") or {},
+                reads,
+            )
+    
+        if record is not None:
+            conversion_type = record.get("conversion_type")
+            coeffs_linear: Optional[tuple[Optional[float], Optional[float]]] = (
+                tuple(record["coeffs_linear"])
+                if record.get("coeffs_linear") is not None
+                else None
+            )
+            coeffs: Optional[tuple[Optional[float], ...]] = (
+                tuple(record["coeffs"]) if record.get("coeffs") is not None else None
+            )
+            compu_tab_ref = record.get("compu_tab_ref")
+            record_format = record.get("format")
+            record_unit = record.get("unit")
+            type_verdict = record.get("type_verdict")
+            type_echo = record.get("type_echo")
+            table_echo = record.get("table_echo")
+        else:
+            conversion_type = None
+            coeffs_linear = None
+            coeffs = None
+            compu_tab_ref = None
+            record_format = None
+            record_unit = None
+            type_verdict = None
+            type_echo = "(none)"
+            table_echo = "(none)"
+    
+        kind, kind_text = _object_kind(tag, conversion_type)
+    
+        object_format = object_lines.get("format")
+        display_format = object_format if object_format is not None else record_format
+        if object_format is not None:
+            decimals = _display_decimals(object_format)
+        else:
+            decimals = record.get("decimals") if record is not None else None
+        unit = object_lines.get("unit")
+        if unit is None:
+            unit = record_unit or ""
+        unit = unit or ""
+    
+        limits = _read_limits(tag.get("lower_limit"), tag.get("upper_limit"))
+        extended_limits = object_lines.get("extended_limits")
+    
+        mask_word = object_lines.get("bit_mask")
+        mask_number: Optional[int] = None
+        if kind in ("number", "enum") and mask_word is not None:
+            mask_number = _parse_bit_mask(mask_word)
+    
+        enum_table: Optional[str] = None
+        enum_entries: tuple[EnumEntry, ...] = ()
+        default_text: Optional[str] = None
+        table_form: Optional[_EnumForm | _TabForm] = None
+        if kind == "enum":
+            enum_table = compu_tab_ref
+            enum_form = record.get("table_form") if record is not None else None
+            if isinstance(enum_form, _EnumForm):
+                table_form = enum_form
+                enum_entries = enum_form.entries
+                default_text = enum_form.default_text
+        elif kind == "number" and type_verdict in ("TAB_INTP", "TAB_NOINTP"):
+            tab_form = record.get("table_form") if record is not None else None
+            if isinstance(tab_form, _TabForm):
+                table_form = tab_form
+    
+        # ---- the refusal order -------------------------------------------------
+        refusal: Optional[Refusal] = None
+        if kind is None:
+            kind_echo = kind_text
+            if kind_text != "(none)" and not kind_text.startswith("MATRIX_DIM "):
+                kind_echo = _echo(kind_text)
+            refusal = Refusal(
+                "A2L-DEF-KIND",
+                f"{name_echo}: the system has no definition for a {kind_echo} object",
+            )
+        elif address is None or byte_length is None:
+            refusal = Refusal(
+                "A2L-DEF-ADDRESS", f"{name_echo}: the object has no address or no length"
+            )
+        elif (
+            byte_length < 1
+            or byte_length > MAX_A2L_DECODE_BYTES
+            or address < 0
+            or address + byte_length - 1 > 0xFFFFFFFF
+        ):
+            refusal = Refusal(
+                "A2L-DEF-ADDRESS",
+>               f"{name_echo}: its span of {byte_length} bytes at "
+                f"{_fmt_address(address)} cannot be read",
+E               ValueError: Exceeds the limit (4300 digits) for integer string conversion; use sys.set_int_max_str_digits() to increase the limit
+
+s19_app/tui/a2l_definition.py:564: ValueError
+_ test_r_a2l_def_58_2_21_a_data_size_of_5000_hex_digits_is_a_refusal_not_an_exception _
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-912/test_r_a2l_def_58_2_21_a_data_0')
+
+    def test_r_a2l_def_58_2_21_a_data_size_of_5000_hex_digits_is_a_refusal_not_an_exception(tmp_path):
+        """R-A2L-DEF.58.2/21 (E5S-01) - DATA_SIZE 0x + 5,000 F on a UBYTE MEASUREMENT."""
+>       _huge_span_case(tmp_path, "HD", _meas("HD", "UBYTE", "NO_COMPU_METHOD", "0", "255",
+                                              "DATA_SIZE 0x" + "F" * 5000, addr="0x10"))
+
+tests/test_b103_a2l_definition.py:2297: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_definition.py:2282: in _huge_span_case
+    d = describe_definition(name, a2l)                                         # 0 exceptions
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/a2l_definition.py:314: in describe_definition
+    return describe_definitions([name], a2l_data)[name]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/a2l_definition.py:369: in describe_definitions
+    result[name] = _describe_one(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'HD'
+tags_by_name = {'HD': [{'access': None, 'address': 16, 'axis_meta': [], 'bit_org': None, ...}]}
+object_sections_by_name = {'HD': [{'children': [], 'end_line': 35, 'lines': ['  UBYTE NO_COMPU_METHOD 0 0 0 255', '  ECU_ADDRESS 0x10', '  DATA_...FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'], 'meta': 'HD ""', ...}]}
+compu_methods_by_name = {}, compu_tables_by_name = {}
+a2l_data = {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-javiergr/pytest-912/test_r_a2l_def_58_2_21_a_data_0/inline_109.a2l', ...}
+reads = {}
+
+    def _describe_one(
+        name: str,
+        tags_by_name: dict[str, list[dict]],
+        object_sections_by_name: dict[str, list[dict]],
+        compu_methods_by_name: dict[str, dict],
+        compu_tables_by_name: dict[str, dict],
+        a2l_data: dict,
+        reads: dict[int, object],
+    ) -> Definition:
+        """Read every field and the refusal for one name (the body of
+        :func:`describe_definitions`)."""
+        name_echo = _echo(name)
+        empty = Definition(
+            name=name,
+            section="",
+            char_type=None,
+            kind="",
+            address=None,
+            byte_length=None,
+            datatype=None,
+            byte_order="little",
+            bit_mask=None,
+            bit_mask_text=None,
+            conversion_type=None,
+            method_name=None,
+            display_format=None,
+            decimals=None,
+            unit="",
+            limits=Limits(None, None, "", ""),
+            extended_limits=None,
+            enum_table=None,
+            enum_entries=(),
+            default_text=None,
+            coeffs_linear=None,
+            coeffs=None,
+            compu_tab_ref=None,
+            refusal=None,
+            _name_echo=name_echo,
+            _table_form=None,
+        )
+    
+        found = _find_tag(name, tags_by_name, object_sections_by_name)
+        if found is None:
+            return _with_refusal(
+                empty, Refusal("A2L-DEF-NAME", f"{name_echo}: no tag of that name in the A2L")
+            )
+        if isinstance(found, Refusal):
+            return _with_refusal(empty, found)
+    
+        tag, section = found
+    
+        # Copy the tag so the MEASUREMENT fill never mutates the parse payload
+        # (R-A2L-DEF.58.1).
+        tag = dict(tag)
+        object_lines = _read_object_lines(section)
+    
+        # E2-1 / R-A2L-014: a MEASUREMENT whose tag lacks them is filled from the
+        # header words (datatype, conversion word, limit words) and, with a
+        # datatype, the length = size × MATRIX_DIM (1 when absent).
+        if tag.get("section") == "MEASUREMENT":
+            header = object_lines.get("header") or []
+            if tag.get("datatype") is None and len(header) > 2:
+                tag["datatype"] = header[2]
+            if tag.get("conversion") is None and len(header) > 3:
+                tag["conversion"] = header[3]
+            if tag.get("lower_limit") is None and len(header) > 6:
+                tag["lower_limit"] = header[6]
+            if tag.get("upper_limit") is None and len(header) > 7:
+                tag["upper_limit"] = header[7]
+            if tag.get("length") is None and tag.get("datatype") in DATATYPE_SIZES:
+                matrix_dim = tag.get("matrix_dim")
+                mult = (
+                    matrix_dim
+                    if isinstance(matrix_dim, int) and not isinstance(matrix_dim, bool)
+                    else 1
+                )
+                tag["length"] = DATATYPE_SIZES[tag["datatype"]] * mult
+    
+        address = tag.get("address")
+        byte_length = tag.get("length")
+        datatype = _resolve_datatype(tag, a2l_data, reads)
+        byte_order = tag.get("effective_byte_order") or "little"
+        char_type = tag.get("char_type")
+        section_name = tag.get("section") or ""
+    
+        method_name = tag.get("conversion")
+        method_echo = _echo(method_name) if method_name is not None else "(none)"
+        record: Optional[Mapping] = None
+        if method_name is not None and method_name != "NO_COMPU_METHOD":
+            record = _read_method_record(
+                method_name,
+                compu_methods_by_name,
+                compu_tables_by_name,
+                a2l_data.get("compu_tabs_by_name") or {},
+                reads,
+            )
+    
+        if record is not None:
+            conversion_type = record.get("conversion_type")
+            coeffs_linear: Optional[tuple[Optional[float], Optional[float]]] = (
+                tuple(record["coeffs_linear"])
+                if record.get("coeffs_linear") is not None
+                else None
+            )
+            coeffs: Optional[tuple[Optional[float], ...]] = (
+                tuple(record["coeffs"]) if record.get("coeffs") is not None else None
+            )
+            compu_tab_ref = record.get("compu_tab_ref")
+            record_format = record.get("format")
+            record_unit = record.get("unit")
+            type_verdict = record.get("type_verdict")
+            type_echo = record.get("type_echo")
+            table_echo = record.get("table_echo")
+        else:
+            conversion_type = None
+            coeffs_linear = None
+            coeffs = None
+            compu_tab_ref = None
+            record_format = None
+            record_unit = None
+            type_verdict = None
+            type_echo = "(none)"
+            table_echo = "(none)"
+    
+        kind, kind_text = _object_kind(tag, conversion_type)
+    
+        object_format = object_lines.get("format")
+        display_format = object_format if object_format is not None else record_format
+        if object_format is not None:
+            decimals = _display_decimals(object_format)
+        else:
+            decimals = record.get("decimals") if record is not None else None
+        unit = object_lines.get("unit")
+        if unit is None:
+            unit = record_unit or ""
+        unit = unit or ""
+    
+        limits = _read_limits(tag.get("lower_limit"), tag.get("upper_limit"))
+        extended_limits = object_lines.get("extended_limits")
+    
+        mask_word = object_lines.get("bit_mask")
+        mask_number: Optional[int] = None
+        if kind in ("number", "enum") and mask_word is not None:
+            mask_number = _parse_bit_mask(mask_word)
+    
+        enum_table: Optional[str] = None
+        enum_entries: tuple[EnumEntry, ...] = ()
+        default_text: Optional[str] = None
+        table_form: Optional[_EnumForm | _TabForm] = None
+        if kind == "enum":
+            enum_table = compu_tab_ref
+            enum_form = record.get("table_form") if record is not None else None
+            if isinstance(enum_form, _EnumForm):
+                table_form = enum_form
+                enum_entries = enum_form.entries
+                default_text = enum_form.default_text
+        elif kind == "number" and type_verdict in ("TAB_INTP", "TAB_NOINTP"):
+            tab_form = record.get("table_form") if record is not None else None
+            if isinstance(tab_form, _TabForm):
+                table_form = tab_form
+    
+        # ---- the refusal order -------------------------------------------------
+        refusal: Optional[Refusal] = None
+        if kind is None:
+            kind_echo = kind_text
+            if kind_text != "(none)" and not kind_text.startswith("MATRIX_DIM "):
+                kind_echo = _echo(kind_text)
+            refusal = Refusal(
+                "A2L-DEF-KIND",
+                f"{name_echo}: the system has no definition for a {kind_echo} object",
+            )
+        elif address is None or byte_length is None:
+            refusal = Refusal(
+                "A2L-DEF-ADDRESS", f"{name_echo}: the object has no address or no length"
+            )
+        elif (
+            byte_length < 1
+            or byte_length > MAX_A2L_DECODE_BYTES
+            or address < 0
+            or address + byte_length - 1 > 0xFFFFFFFF
+        ):
+            refusal = Refusal(
+                "A2L-DEF-ADDRESS",
+>               f"{name_echo}: its span of {byte_length} bytes at "
+                f"{_fmt_address(address)} cannot be read",
+E               ValueError: Exceeds the limit (4300 digits) for integer string conversion; use sys.set_int_max_str_digits() to increase the limit
+
+s19_app/tui/a2l_definition.py:564: ValueError
+_ test_r_a2l_def_58_2_22_a_number_of_5000_hex_digits_is_a_refusal_not_an_exception _
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-912/test_r_a2l_def_58_2_22_a_numbe0')
+
+    def test_r_a2l_def_58_2_22_a_number_of_5000_hex_digits_is_a_refusal_not_an_exception(tmp_path):
+        """R-A2L-DEF.58.2/22 (E5S-01) - NUMBER 0x + 5,000 F on an ASCII CHARACTERISTIC."""
+>       _huge_span_case(tmp_path, "HN", _ascii("HN", "0x10", "0x" + "F" * 5000))
+
+tests/test_b103_a2l_definition.py:2303: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_definition.py:2282: in _huge_span_case
+    d = describe_definition(name, a2l)                                         # 0 exceptions
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/a2l_definition.py:314: in describe_definition
+    return describe_definitions([name], a2l_data)[name]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/a2l_definition.py:369: in describe_definitions
+    result[name] = _describe_one(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'HN'
+tags_by_name = {'HN': [{'access': None, 'address': 16, 'axis_meta': [], 'bit_org': None, ...}]}
+object_sections_by_name = {'HN': [{'children': [], 'end_line': 34, 'lines': ['  ASCII 0x10 RL_U8 0 NO_COMPU_METHOD 0 255', '  NUMBER 0xFFFFFFFFF...FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'], 'meta': 'HN ""', ...}]}
+compu_methods_by_name = {}, compu_tables_by_name = {}
+a2l_data = {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-javiergr/pytest-912/test_r_a2l_def_58_2_22_a_numbe0/inline_110.a2l', ...}
+reads = {139689708542720: 'UBYTE'}
+
+    def _describe_one(
+        name: str,
+        tags_by_name: dict[str, list[dict]],
+        object_sections_by_name: dict[str, list[dict]],
+        compu_methods_by_name: dict[str, dict],
+        compu_tables_by_name: dict[str, dict],
+        a2l_data: dict,
+        reads: dict[int, object],
+    ) -> Definition:
+        """Read every field and the refusal for one name (the body of
+        :func:`describe_definitions`)."""
+        name_echo = _echo(name)
+        empty = Definition(
+            name=name,
+            section="",
+            char_type=None,
+            kind="",
+            address=None,
+            byte_length=None,
+            datatype=None,
+            byte_order="little",
+            bit_mask=None,
+            bit_mask_text=None,
+            conversion_type=None,
+            method_name=None,
+            display_format=None,
+            decimals=None,
+            unit="",
+            limits=Limits(None, None, "", ""),
+            extended_limits=None,
+            enum_table=None,
+            enum_entries=(),
+            default_text=None,
+            coeffs_linear=None,
+            coeffs=None,
+            compu_tab_ref=None,
+            refusal=None,
+            _name_echo=name_echo,
+            _table_form=None,
+        )
+    
+        found = _find_tag(name, tags_by_name, object_sections_by_name)
+        if found is None:
+            return _with_refusal(
+                empty, Refusal("A2L-DEF-NAME", f"{name_echo}: no tag of that name in the A2L")
+            )
+        if isinstance(found, Refusal):
+            return _with_refusal(empty, found)
+    
+        tag, section = found
+    
+        # Copy the tag so the MEASUREMENT fill never mutates the parse payload
+        # (R-A2L-DEF.58.1).
+        tag = dict(tag)
+        object_lines = _read_object_lines(section)
+    
+        # E2-1 / R-A2L-014: a MEASUREMENT whose tag lacks them is filled from the
+        # header words (datatype, conversion word, limit words) and, with a
+        # datatype, the length = size × MATRIX_DIM (1 when absent).
+        if tag.get("section") == "MEASUREMENT":
+            header = object_lines.get("header") or []
+            if tag.get("datatype") is None and len(header) > 2:
+                tag["datatype"] = header[2]
+            if tag.get("conversion") is None and len(header) > 3:
+                tag["conversion"] = header[3]
+            if tag.get("lower_limit") is None and len(header) > 6:
+                tag["lower_limit"] = header[6]
+            if tag.get("upper_limit") is None and len(header) > 7:
+                tag["upper_limit"] = header[7]
+            if tag.get("length") is None and tag.get("datatype") in DATATYPE_SIZES:
+                matrix_dim = tag.get("matrix_dim")
+                mult = (
+                    matrix_dim
+                    if isinstance(matrix_dim, int) and not isinstance(matrix_dim, bool)
+                    else 1
+                )
+                tag["length"] = DATATYPE_SIZES[tag["datatype"]] * mult
+    
+        address = tag.get("address")
+        byte_length = tag.get("length")
+        datatype = _resolve_datatype(tag, a2l_data, reads)
+        byte_order = tag.get("effective_byte_order") or "little"
+        char_type = tag.get("char_type")
+        section_name = tag.get("section") or ""
+    
+        method_name = tag.get("conversion")
+        method_echo = _echo(method_name) if method_name is not None else "(none)"
+        record: Optional[Mapping] = None
+        if method_name is not None and method_name != "NO_COMPU_METHOD":
+            record = _read_method_record(
+                method_name,
+                compu_methods_by_name,
+                compu_tables_by_name,
+                a2l_data.get("compu_tabs_by_name") or {},
+                reads,
+            )
+    
+        if record is not None:
+            conversion_type = record.get("conversion_type")
+            coeffs_linear: Optional[tuple[Optional[float], Optional[float]]] = (
+                tuple(record["coeffs_linear"])
+                if record.get("coeffs_linear") is not None
+                else None
+            )
+            coeffs: Optional[tuple[Optional[float], ...]] = (
+                tuple(record["coeffs"]) if record.get("coeffs") is not None else None
+            )
+            compu_tab_ref = record.get("compu_tab_ref")
+            record_format = record.get("format")
+            record_unit = record.get("unit")
+            type_verdict = record.get("type_verdict")
+            type_echo = record.get("type_echo")
+            table_echo = record.get("table_echo")
+        else:
+            conversion_type = None
+            coeffs_linear = None
+            coeffs = None
+            compu_tab_ref = None
+            record_format = None
+            record_unit = None
+            type_verdict = None
+            type_echo = "(none)"
+            table_echo = "(none)"
+    
+        kind, kind_text = _object_kind(tag, conversion_type)
+    
+        object_format = object_lines.get("format")
+        display_format = object_format if object_format is not None else record_format
+        if object_format is not None:
+            decimals = _display_decimals(object_format)
+        else:
+            decimals = record.get("decimals") if record is not None else None
+        unit = object_lines.get("unit")
+        if unit is None:
+            unit = record_unit or ""
+        unit = unit or ""
+    
+        limits = _read_limits(tag.get("lower_limit"), tag.get("upper_limit"))
+        extended_limits = object_lines.get("extended_limits")
+    
+        mask_word = object_lines.get("bit_mask")
+        mask_number: Optional[int] = None
+        if kind in ("number", "enum") and mask_word is not None:
+            mask_number = _parse_bit_mask(mask_word)
+    
+        enum_table: Optional[str] = None
+        enum_entries: tuple[EnumEntry, ...] = ()
+        default_text: Optional[str] = None
+        table_form: Optional[_EnumForm | _TabForm] = None
+        if kind == "enum":
+            enum_table = compu_tab_ref
+            enum_form = record.get("table_form") if record is not None else None
+            if isinstance(enum_form, _EnumForm):
+                table_form = enum_form
+                enum_entries = enum_form.entries
+                default_text = enum_form.default_text
+        elif kind == "number" and type_verdict in ("TAB_INTP", "TAB_NOINTP"):
+            tab_form = record.get("table_form") if record is not None else None
+            if isinstance(tab_form, _TabForm):
+                table_form = tab_form
+    
+        # ---- the refusal order -------------------------------------------------
+        refusal: Optional[Refusal] = None
+        if kind is None:
+            kind_echo = kind_text
+            if kind_text != "(none)" and not kind_text.startswith("MATRIX_DIM "):
+                kind_echo = _echo(kind_text)
+            refusal = Refusal(
+                "A2L-DEF-KIND",
+                f"{name_echo}: the system has no definition for a {kind_echo} object",
+            )
+        elif address is None or byte_length is None:
+            refusal = Refusal(
+                "A2L-DEF-ADDRESS", f"{name_echo}: the object has no address or no length"
+            )
+        elif (
+            byte_length < 1
+            or byte_length > MAX_A2L_DECODE_BYTES
+            or address < 0
+            or address + byte_length - 1 > 0xFFFFFFFF
+        ):
+            refusal = Refusal(
+                "A2L-DEF-ADDRESS",
+>               f"{name_echo}: its span of {byte_length} bytes at "
+                f"{_fmt_address(address)} cannot be read",
+E               ValueError: Exceeds the limit (4300 digits) for integer string conversion; use sys.set_int_max_str_digits() to increase the limit
+
+s19_app/tui/a2l_definition.py:564: ValueError
+_ test_r_a2l_def_58_2_23_a_matrix_dim_of_5000_hex_digits_is_a_refusal_not_an_exception _
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-912/test_r_a2l_def_58_2_23_a_matri0')
+
+    def test_r_a2l_def_58_2_23_a_matrix_dim_of_5000_hex_digits_is_a_refusal_not_an_exception(tmp_path):
+        """R-A2L-DEF.58.2/23 (E5S-01, CR-2) - MATRIX_DIM 0x + 5,000 F on a UBYTE MEASUREMENT: A2L-DEF-KIND, bounded."""
+        a2l = _inline(tmp_path, _meas("MD", "UBYTE", "NO_COMPU_METHOD", "0", "255", "MATRIX_DIM 0x" + "F" * 5000,
+                                      addr="0x10"))
+>       d = describe_definition("MD", a2l)                                         # 0 exceptions
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition.py:2310: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+s19_app/tui/a2l_definition.py:314: in describe_definition
+    return describe_definitions([name], a2l_data)[name]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/a2l_definition.py:369: in describe_definitions
+    result[name] = _describe_one(
+s19_app/tui/a2l_definition.py:505: in _describe_one
+    kind, kind_text = _object_kind(tag, conversion_type)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tag = {'access': None, 'address': 16, 'axis_meta': [], 'bit_org': None, ...}
+conversion_type = None
+
+    def _object_kind(tag: dict, conversion_type: Optional[str]) -> tuple[Optional[str], str]:
+        """The scalar kind and its text: ``(kind, kind_text)``.
+    
+        A CHARACTERISTIC of ``char_type`` ASCII → ``("text", "ASCII")``; VALUE →
+        ``("enum"/"number", "VALUE")``; a MEASUREMENT whose matrix_dim is None or 1
+        → ``("enum"/"number", "MEASUREMENT")``; every other object → ``(None, the
+        <kind> text)``.
+        """
+        section = tag.get("section")
+        char_type = tag.get("char_type")
+        if section == "CHARACTERISTIC":
+            if char_type == "ASCII":
+                return "text", "ASCII"
+            if char_type == "VALUE":
+                kind = "enum" if conversion_type == "TAB_VERB" else "number"
+                return kind, "VALUE"
+            if char_type is None:
+                return None, "(none)"
+            return None, str(char_type)
+        if section == "MEASUREMENT":
+            matrix_dim = tag.get("matrix_dim")
+            if matrix_dim is None or matrix_dim == 1:
+                kind = "enum" if conversion_type == "TAB_VERB" else "number"
+                return kind, "MEASUREMENT"
+>           return None, f"MATRIX_DIM {matrix_dim} MEASUREMENT"
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           ValueError: Exceeds the limit (4300 digits) for integer string conversion; use sys.set_int_max_str_digits() to increase the limit
+
+s19_app/tui/a2l_definition.py:710: ValueError
+_ test_r_a2l_def_58_2_24_deep_nesting_does_not_raise_and_the_walk_keeps_file_order _
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-912/test_r_a2l_def_58_2_24_deep_ne0')
+
+    def test_r_a2l_def_58_2_24_deep_nesting_does_not_raise_and_the_walk_keeps_file_order(tmp_path):
+        """R-A2L-DEF.58.2/24 (E5S-04) - (N) 980 nested sections: 0 exceptions, same definition, same decode;
+        (O) the first COMPU_METHOD of a name in file order wins (each section before its children, children in order)."""
+        nested_block = "\n".join(['/begin GROUP G%d ""' % k for k in range(NEST_DEPTH)] + ["/end GROUP"] * NEST_DEPTH)
+        obj = _val("DN", "0x10", LAYOUT["UBYTE"], "NO_COMPU_METHOD", "0", "255")
+        flat = _inline(tmp_path, obj)
+        nested = _fresh_thread(lambda: _inline(tmp_path, obj, nested_block))     # the parser reads the depth itself
+        alone = describe_definition("DN", flat)
+        assert alone.refusal is None and alone.kind == "number" and alone.address == 0x10
+        # described and decoded 50 frames deep in a fresh thread: a recursive walk needs 980 more frames
+>       got = _fresh_thread(lambda: describe_definitions(["DN"], nested)["DN"], padding=50)       # 0 exceptions
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition.py:2350: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_definition.py:2333: in _fresh_thread
+    raise box["error"]
+tests/test_b103_a2l_definition.py:2325: in deeper
+    box["value"] = fn()
+                   ^^^^
+tests/test_b103_a2l_definition.py:2350: in <lambda>
+    got = _fresh_thread(lambda: describe_definitions(["DN"], nested)["DN"], padding=50)       # 0 exceptions
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/a2l_definition.py:362: in describe_definitions
+    _walk(a2l_data.get("sections") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:360: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:353: in _walk
+    parsed = parse_begin_meta(node.get("meta", "") or "")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/a2l.py:260: in parse_begin_meta
+    name, rest = _parse_first_field(meta)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+meta = 'G939 ""'
+
+    def _parse_first_field(meta: str) -> tuple[str, str]:
+        """Return first identifier or quoted string, and remainder."""
+        meta = meta.strip()
+        if not meta:
+            return "", ""
+        if meta[0] == '"':
+            end = 1
+            while end < len(meta):
+                if meta[end] == '"' and meta[end - 1] != "\\":
+                    return meta[1:end], meta[end + 1 :].lstrip()
+                end += 1
+            return meta[1:], ""
+>       parts = meta.split(maxsplit=1)
+                ^^^^^^^^^^^^^^^^^^^^^^
+E       RecursionError: maximum recursion depth exceeded while calling a Python object
+
+s19_app/tui/a2l.py:281: RecursionError
+____ test_r_a2l_def_151_4_a_matrix_dim_number_is_written_by_the_number_rule ____
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-912/test_r_a2l_def_151_4_a_matrix_0')
+
+    def test_r_a2l_def_151_4_a_matrix_dim_number_is_written_by_the_number_rule(tmp_path):
+        """R-A2L-DEF.151/4 (CR-3, E5S-03) - 4,000 decimal digits and 1,000 hexadecimal digits: `0x` form, 256 characters, bounded."""
+        a2l = _inline(
+            tmp_path,
+            _meas("MD4", "UBYTE", "NO_COMPU_METHOD", "0", "255", "MATRIX_DIM " + "9" * 4000, addr="0x10"),
+            _meas("MD5", "UBYTE", "NO_COMPU_METHOD", "0", "255", "MATRIX_DIM 0x" + "F" * 1000, addr="0x11"),
+        )
+        got = describe_definitions(["MD4", "MD5"], a2l)
+        t4 = "0x" + format(10 ** 4000 - 1, "X")[:254] + ELLIPSIS
+>       assert got["MD4"].refusal == Refusal("A2L-DEF-KIND", f"MD4: the system has no definition for a MATRIX_DIM {t4} MEASUREMENT object")
+E       AssertionError: assert Refusal(code=...EMENT object') == Refusal(code=...EMENT object')
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['message']
+E         
+E         Drill down into differing attribute message:
+E           message: 'MD4: the system has no definition for a MATRIX_DIM 9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2372: AssertionError
+_ test_r_a2l_def_151_5_the_number_rule_for_an_address_and_a_length_at_its_bound _
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-912/test_r_a2l_def_151_5_the_numbe0')
+
+    def test_r_a2l_def_151_5_the_number_rule_for_an_address_and_a_length_at_its_bound(tmp_path):
+        """R-A2L-DEF.151/5 (E5S-03) - addresses of 1,500 hex digits are cut; 2^64 - 1 stays decimal and 2^64 is `0x` form."""
+        a2l = _inline(
+            tmp_path,
+            _meas("AH", "UBYTE", "NO_COMPU_METHOD", "0", "255", addr="0x" + "F" * 1500),
+            _val("CH", "0x" + "F" * 1500, LAYOUT["UBYTE"], "NO_COMPU_METHOD", "0", "255"),
+            _ascii("B1", "0x10", "18446744073709551615"),
+            _ascii("B2", "0x20", "18446744073709551616"),
+        )
+        got = describe_definitions(["AH", "CH", "B1", "B2"], a2l)
+>       assert got["AH"].refusal == Refusal("A2L-DEF-ADDRESS", f"AH: its span of 1 bytes at {HEX256} cannot be read")
+E       AssertionError: assert Refusal(code=...nnot be read') == Refusal(code=...nnot be read')
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['message']
+E         
+E         Drill down into differing attribute message:
+E           message: 'AH: its span of 1 bytes at 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2388: AssertionError
+_ test_r_a2l_def_151_6_a_quoted_kind_word_starting_with_matrix_dim_is_echoed_as_a_file_word _
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-912/test_r_a2l_def_151_6_a_quoted_0')
+
+    def test_r_a2l_def_151_6_a_quoted_kind_word_starting_with_matrix_dim_is_echoed_as_a_file_word(tmp_path):
+        """R-A2L-DEF.151/6 (CR-5) - the kind word `MATRIX_DIM <2,000 Z>` is a file word: 256 characters and an ellipsis."""
+        a2l = _inline(tmp_path, _char("QK", '"MATRIX_DIM ' + "Z" * 2000 + '"', "0x10", "RL_U8"))
+        word = next(t["char_type"] for t in a2l["tags"] if t["name"] == "QK")
+        assert len(word) == 2011 and word.startswith("MATRIX_DIM "), len(word)          # the parsed kind word, as the row says
+        d = describe_definition("QK", a2l)
+>       assert d.refusal == Refusal("A2L-DEF-KIND", f"QK: the system has no definition for a {_echo256(word)} object"), d.refusal
+E       AssertionError: Refusal(code='A2L-DEF-KIND', message='QK: the system has no definition for a MATRIX_DIM ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ...ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ object')
+E       assert Refusal(code=...ZZZZZ object') == Refusal(code=...ZZZZ… object')
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['message']
+E         
+E         Drill down into differing attribute message:
+E           message: 'QK: the system has no definition for a MATRIX_DIM ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ...
+E         
+E         ...Full output truncated (4 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2402: AssertionError
+_ test_r_a2l_def_59_4_every_seed_of_the_definitions_case_builds_and_decodes_to_its_plan _
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-912/test_r_a2l_def_59_4_every_seed0')
+
+    def test_r_a2l_def_59_4_every_seed_of_the_definitions_case_builds_and_decodes_to_its_plan(tmp_path):
+        """R-A2L-DEF.59/4 (CR-6; E5 fix pass) - seeds 1 ... 5: the enum's planned text is the text the model decodes.
+    
+        The enum raw is drawn from the seed; its planned text must follow the draw.  Non-vacuity: the five seeds do not
+        all draw one raw (a fixed planned text would pass for the seeds that draw it).
+        """
+        m = _model()
+        seen_texts = set()
+        for seed in range(1, 6):
+            folder = tmp_path / f"seed_{seed}"
+            result = _run_cli(folder, "--seed", str(seed), "--case", "definitions")
+            assert result.returncode == 0, (seed, result.stderr)
+            a2l = parse_a2l_file(folder / "definitions.a2l")
+            image = S19File(str(folder / "definitions.s19")).get_memory_map()
+            _regions, objects = gen.build_definition_objects(random.Random(seed))
+            for obj in objects:
+                d = m.describe_definition(obj["name"], a2l)
+                assert d.refusal is None, (seed, obj["name"], d.refusal)
+                res = m.decode_definition(d, a2l, image)
+                assert isinstance(res, m.Decoded), (seed, obj["name"], res)
+>               assert res.text == obj["planned_text"], (seed, obj["name"], res.text, obj["planned_text"])
+E               AssertionError: (2, 'ENUM_0001', 'OFF', 'IDLE')
+E               assert 'OFF' == 'IDLE'
+E                 
+E                 - IDLE
+E                 + OFF
+
+tests/test_b103_synth_definitions.py:164: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_12_4_a_listed_type_in_another_letter_case_is_not_supported
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_20_a_length_of_5000_hex_digits_is_a_refusal_not_an_exception
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_21_a_data_size_of_5000_hex_digits_is_a_refusal_not_an_exception
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_22_a_number_of_5000_hex_digits_is_a_refusal_not_an_exception
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_23_a_matrix_dim_of_5000_hex_digits_is_a_refusal_not_an_exception
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_24_deep_nesting_does_not_raise_and_the_walk_keeps_file_order
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_151_4_a_matrix_dim_number_is_written_by_the_number_rule
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_151_5_the_number_rule_for_an_address_and_a_length_at_its_bound
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_151_6_a_quoted_kind_word_starting_with_matrix_dim_is_echoed_as_a_file_word
+FAILED tests/test_b103_synth_definitions.py::test_r_a2l_def_59_4_every_seed_of_the_definitions_case_builds_and_decodes_to_its_plan
+10 failed, 189 passed, 1 deselected in 19.47s
+# exit: 1
+# load after: 7.17 3.47 2.14

@@ -1,0 +1,84 @@
+# M-.8
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.8/s19_app/__init__.py
+# note: missing datatype read as UBYTE
+#   EDIT-OK: '    datatype = _resolve_datatype(tag, a2l_data, reads)'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..036849dc 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -485,7 +485,7 @@ def _describe_one(
+ 
+     address = tag.get("address")
+     byte_length = tag.get("length")
+-    datatype = _resolve_datatype(tag, a2l_data, reads)
++    datatype = _resolve_datatype(tag, a2l_data, reads) or "UBYTE"
+     byte_order = tag.get("effective_byte_order") or "little"
+     char_type = tag.get("char_type")
+     section_name = tag.get("section") or ""
+
+# --- pytest (rc=1) ---
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+___________ test_r_a2l_def_8_1_unreadable_layout_datatype_is_refused ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-948/test_r_a2l_def_8_1_unreadable_0')
+
+    def test_r_a2l_def_8_1_unreadable_layout_datatype_is_refused(tmp_path):
+        """R-A2L-DEF.8/1 - RECORD_LAYOUT RL_X with datatype FOO."""
+        rl = '/begin RECORD_LAYOUT RL_X\n  FNC_VALUES 1 FOO ROW_DIR DIRECT\n/end RECORD_LAYOUT'
+        a2l = _inline(tmp_path, rl, _val("ND", "0x10", "RL_X", "NO_COMPU_METHOD", "0", "65535", "LENGTH 2"))
+>       _is_refused(describe_definition("ND", a2l), "A2L-DEF-DATATYPE",
+                    "ND: the object declares no datatype the system can read")
+
+../base/tests/test_b103_a2l_definition.py:493: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='ND', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...mpu_tab_ref=None, refusal=Refusal(code='A2L-DEF-LENGTH', message='ND: its length 2 differs from the 1 bytes of UBYTE'))
+code = 'A2L-DEF-DATATYPE'
+message = 'ND: the object declares no datatype the system can read'
+
+    def _is_refused(d: Definition, code: str, message: str) -> None:
+>       assert d.refusal == Refusal(code, message), d.refusal
+E       AssertionError: Refusal(code='A2L-DEF-LENGTH', message='ND: its length 2 differs from the 1 bytes of UBYTE')
+E       assert Refusal(code=...tes of UBYTE') == Refusal(code=...tem can read')
+E         
+E         Differing attributes:
+E         ['code', 'message']
+E         
+E         Drill down into differing attribute code:
+E           code: 'A2L-DEF-LENGTH' != 'A2L-DEF-DATATYPE'
+E           - A2L-DEF-DATATYPE...
+E         
+E         ...Full output truncated (6 lines hidden), use '-vv' to show
+
+../base/tests/test_b103_a2l_definition.py:165: AssertionError
+__________ test_r_a2l_def_8_2_unknown_measurement_datatype_is_refused __________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-948/test_r_a2l_def_8_2_unknown_mea0')
+
+    def test_r_a2l_def_8_2_unknown_measurement_datatype_is_refused(tmp_path):
+        """R-A2L-DEF.8/2 - MEASUREMENT datatype FOO."""
+        a2l = _inline(tmp_path, _meas("NM", "FOO", "NO_COMPU_METHOD", "0", "1", "LENGTH 1", addr="0x10"))
+>       _is_refused(describe_definition("NM", a2l), "A2L-DEF-DATATYPE",
+                    "NM: the object declares no datatype the system can read")
+
+../base/tests/test_b103_a2l_definition.py:500: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='NM', section='MEASUREMENT', char_type=None, kind='number', address=16, byte_length=1, datatype='UBYTE...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None)
+code = 'A2L-DEF-DATATYPE'
+message = 'NM: the object declares no datatype the system can read'
+
+    def _is_refused(d: Definition, code: str, message: str) -> None:
+>       assert d.refusal == Refusal(code, message), d.refusal
+E       AssertionError: None
+E       assert None == Refusal(code='A2L-DEF-DATATYPE', message='NM: the object declares no datatype the system can read')
+E        +  where None = Definition(name='NM', section='MEASUREMENT', char_type=None, kind='number', address=16, byte_length=1, datatype='UBYTE...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None).refusal
+E        +  and   Refusal(code='A2L-DEF-DATATYPE', message='NM: the object declares no datatype the system can read') = Refusal('A2L-DEF-DATATYPE', 'NM: the object declares no datatype the system can read')
+
+../base/tests/test_b103_a2l_definition.py:165: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_8_1_unreadable_layout_datatype_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_8_2_unknown_measurement_datatype_is_refused
+2 failed, 189 deselected in 0.66s

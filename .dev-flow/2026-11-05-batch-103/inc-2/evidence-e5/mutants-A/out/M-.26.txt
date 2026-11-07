@@ -1,0 +1,47 @@
+# M-.26
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.26/s19_app/__init__.py
+# note: missing byte read as 0
+#   EDIT-OK: '        if current not in image:\n            missing += 1\n        else'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..15ec139f 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -1250,15 +1250,9 @@ def _read_stored_value(
+     for offset in range(length):
+         current = address + offset
+         if current not in image:
+-            missing += 1
++            values.append(0)
+         else:
+             values.append(image[current] & 0xFF)
+-    if missing:
+-        return Refusal(
+-            "A2L-DEF-BYTES",
+-            f"{name_echo}: {_number_text(missing)} of its "
+-            f"{_number_text(length)} bytes are not in the image",
+-        )
+     raw = bytes(values)
+     if definition.kind == "text":
+         return raw
+
+# --- pytest (rc=1) ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_r_a2l_def_26_1_a_missing_byte_is_refused_at_decode ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-968/test_r_a2l_def_26_1_a_missing_0')
+
+    def test_r_a2l_def_26_1_a_missing_byte_is_refused_at_decode(tmp_path):
+        """R-A2L-DEF.26/1 - UWORD at 0x10, image holds 0x10 only."""
+        a2l = _inline(tmp_path, _val("MB2", "0x10", "RL_U16"))
+        d = describe_definition("MB2", a2l)
+        res = decode_definition(d, a2l, {0x10: 0})
+>       assert res == Refusal("A2L-DEF-BYTES", "MB2: 1 of its 2 bytes are not in the image")
+E       AssertionError: assert Decoded(stored=0, value=0, text='0') == Refusal(code='A2L-DEF-BYTES', message='MB2: 1 of its 2 bytes are not in the image')
+E        +  where Refusal(code='A2L-DEF-BYTES', message='MB2: 1 of its 2 bytes are not in the image') = Refusal('A2L-DEF-BYTES', 'MB2: 1 of its 2 bytes are not in the image')
+
+../base/tests/test_b103_a2l_definition.py:850: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_26_1_a_missing_byte_is_refused_at_decode
+1 failed, 190 deselected in 0.39s

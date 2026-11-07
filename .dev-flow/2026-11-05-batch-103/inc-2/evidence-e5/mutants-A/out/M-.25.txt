@@ -1,0 +1,38 @@
+# M-.25
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.25/s19_app/__init__.py
+# note: decode of a refused definition falls back to identity
+#   EDIT-OK: '    if definition.refusal is not None:\n        return definition.refus'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..bdc35bee 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -1175,8 +1175,6 @@ def decode_definition(
+     Raises:
+         None.
+     """
+-    if definition.refusal is not None:
+-        return definition.refusal
+     name_echo = (
+         definition._name_echo
+         if definition._name_echo is not None
+
+# --- pytest (rc=1) ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_r_a2l_def_25_1_decode_gives_the_definitions_refusal ___________
+
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp...BL_NOINTP', ...}}, 'errors': [], 'path': '/tmp/pytest-of-javiergr/pytest-967/b103_c080/firmware_issues.a2l', ...}, ...}
+
+    def test_r_a2l_def_25_1_decode_gives_the_definitions_refusal(c08):
+        """R-A2L-DEF.25/1 - MISSING_CM decodes to its A2L-DEF-METHOD refusal, no value."""
+        d = describe_definition("MISSING_CM", c08["issues"])
+        res = decode_definition(d, c08["issues"], c08["mem"])
+>       assert isinstance(res, Refusal) and res == d.refusal and res.code == "A2L-DEF-METHOD"
+E       AssertionError: assert (False)
+E        +  where False = isinstance(Decoded(stored=72, value=72, text='72'), Refusal)
+
+../base/tests/test_b103_a2l_definition.py:842: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_25_1_decode_gives_the_definitions_refusal
+1 failed, 190 deselected in 1.16s

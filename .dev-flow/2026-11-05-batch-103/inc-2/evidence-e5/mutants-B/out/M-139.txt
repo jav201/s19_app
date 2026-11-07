@@ -1,0 +1,100 @@
+===== mutant M-139 (2026-11-07T13:23:41Z) =====
+--- unified diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..1250d092 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -700,10 +700,6 @@ def _find_tag(
+     sections = object_sections_by_name.get(name) or []
+     if not tags:
+         return None
+-    if len(tags) > 1 or len(sections) > 1:
+-        return Refusal(
+-            "A2L-DEF-NAME", f"{_echo(name)}: the A2L declares that name more than once"
+-        )
+     return tags[0], sections[0] if sections else None
+ 
+ 
+--- pytest ---
+s19_app.__file__ = /tmp/b103-e5-2-mutB/M-M-139/s19_app/__init__.py
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_____________ test_r_a2l_def_139_1_name_declared_twice_is_refused ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-936/test_r_a2l_def_139_1_name_decl0')
+
+    def test_r_a2l_def_139_1_name_declared_twice_is_refused(tmp_path):
+        """R-A2L-DEF.139/1 - two VALUEs named DUP."""
+        a2l = _inline(tmp_path, _val("DUP", "0x10", "RL_U16"), _val("DUP", "0x20", "RL_U16"))
+>       _is_refused(describe_definition("DUP", a2l), "A2L-DEF-NAME", "DUP: the A2L declares that name more than once")
+
+tests/test_b103_a2l_definition.py:409: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='DUP', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None)
+code = 'A2L-DEF-NAME'
+message = 'DUP: the A2L declares that name more than once'
+
+    def _is_refused(d: Definition, code: str, message: str) -> None:
+>       assert d.refusal == Refusal(code, message), d.refusal
+E       AssertionError: None
+E       assert None == Refusal(code='A2L-DEF-NAME', message='DUP: the A2L declares that name more than once')
+E        +  where None = Definition(name='DUP', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None).refusal
+E        +  and   Refusal(code='A2L-DEF-NAME', message='DUP: the A2L declares that name more than once') = Refusal('A2L-DEF-NAME', 'DUP: the A2L declares that name more than once')
+
+tests/test_b103_a2l_definition.py:165: AssertionError
+_________________ test_r_a2l_def_139_2_case08_issues_duplicate _________________
+
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp...BL_NOINTP', ...}}, 'errors': [], 'path': '/tmp/pytest-of-javiergr/pytest-936/b103_c080/firmware_issues.a2l', ...}, ...}
+
+    def test_r_a2l_def_139_2_case08_issues_duplicate(c08):
+        """R-A2L-DEF.139/2 - firmware_issues.a2l declares VALUE_0001 twice."""
+        d = describe_definition("VALUE_0001", c08["issues"])
+>       _is_refused(d, "A2L-DEF-NAME", "VALUE_0001: the A2L declares that name more than once")
+
+tests/test_b103_a2l_definition.py:415: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='VALUE_0001', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=0, byte_length=1, da...ies=(), default_text=None, coeffs_linear=None, coeffs=(0.0, 1.0, 0.0, 0.0, 0.0, 1.0), compu_tab_ref=None, refusal=None)
+code = 'A2L-DEF-NAME'
+message = 'VALUE_0001: the A2L declares that name more than once'
+
+    def _is_refused(d: Definition, code: str, message: str) -> None:
+>       assert d.refusal == Refusal(code, message), d.refusal
+E       AssertionError: None
+E       assert None == Refusal(code='A2L-DEF-NAME', message='VALUE_0001: the A2L declares that name more than once')
+E        +  where None = Definition(name='VALUE_0001', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=0, byte_length=1, da...ies=(), default_text=None, coeffs_linear=None, coeffs=(0.0, 1.0, 0.0, 0.0, 0.0, 1.0), compu_tab_ref=None, refusal=None).refusal
+E        +  and   Refusal(code='A2L-DEF-NAME', message='VALUE_0001: the A2L declares that name more than once') = Refusal('A2L-DEF-NAME', 'VALUE_0001: the A2L declares that name more than once')
+
+tests/test_b103_a2l_definition.py:165: AssertionError
+__ test_r_a2l_def_139_3_commented_out_old_copy_counts_as_a_second_declaration __
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-936/test_r_a2l_def_139_3_commented0')
+
+    def test_r_a2l_def_139_3_commented_out_old_copy_counts_as_a_second_declaration(tmp_path):
+        """R-A2L-DEF.139/3 - the builder opens the commented-out copy: two tags."""
+        old = "\n".join(["/*", '/begin MEASUREMENT X "old"', "  UWORD CM_ID 0 0 0 65535", "  ECU_ADDRESS 0x10",
+                         "/end MEASUREMENT", "*/"])
+        a2l = _inline(tmp_path, _cm("CM_ID", "IDENTICAL"), old, _meas("X", "UWORD", "CM_ID", addr="0x20"))
+>       _is_refused(describe_definition("X", a2l), "A2L-DEF-NAME", "X: the A2L declares that name more than once")
+
+tests/test_b103_a2l_definition.py:423: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='X', section='MEASUREMENT', char_type=None, kind='number', address=16, byte_length=2, datatype='UWORD'...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None)
+code = 'A2L-DEF-NAME', message = 'X: the A2L declares that name more than once'
+
+    def _is_refused(d: Definition, code: str, message: str) -> None:
+>       assert d.refusal == Refusal(code, message), d.refusal
+E       AssertionError: None
+E       assert None == Refusal(code='A2L-DEF-NAME', message='X: the A2L declares that name more than once')
+E        +  where None = Definition(name='X', section='MEASUREMENT', char_type=None, kind='number', address=16, byte_length=2, datatype='UWORD'...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None).refusal
+E        +  and   Refusal(code='A2L-DEF-NAME', message='X: the A2L declares that name more than once') = Refusal('A2L-DEF-NAME', 'X: the A2L declares that name more than once')
+
+tests/test_b103_a2l_definition.py:165: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_139_1_name_declared_twice_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_139_2_case08_issues_duplicate
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_139_3_commented_out_old_copy_counts_as_a_second_declaration
+3 failed, 188 deselected in 2.90s
+pytest exit code: 1

@@ -1,0 +1,39 @@
+# M-.14
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.14/s19_app/__init__.py
+# note: entries sorted by raw (a2l.py's side table)
+#   EDIT-OK: '    form = _build_enum_form(section_kind, tuple(entries), default_text'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..74120c77 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -1045,6 +1045,7 @@ def _read_enum_table(
+     if i < n and tokens[i] == "DEFAULT_VALUE":
+         if i + 1 < n:
+             default_text = tokens[i + 1]
++    entries.sort(key=lambda entry: entry.raw)
+     form = _build_enum_form(section_kind, tuple(entries), default_text)
+     reads[key] = form
+     return form
+
+# --- pytest (rc=1) ---
+..F                                                                      [100%]
+=================================== FAILURES ===================================
+_______ test_r_a2l_def_14_3_file_order_and_numeric_text_stay_as_written ________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-955/test_r_a2l_def_14_3_file_order0')
+
+    def test_r_a2l_def_14_3_file_order_and_numeric_text_stay_as_written(tmp_path):
+        """R-A2L-DEF.14/3 - ``2 "B"`` then ``1 "10"``: not sorted, text not a float."""
+        a2l = _inline(tmp_path, *_enum_blocks("CM_A", "VT_A", "2", '2 "B"', '1 "10"'), _val("EA", "0x10", "RL_U8", "CM_A"))
+        d = describe_definition("EA", a2l)
+>       assert _entries(d) == [(2.0, None, "B"), (1.0, None, "10")]
+E       AssertionError: assert [(1.0, None, ...0, None, 'B')] == [(2.0, None, ..., None, '10')]
+E         
+E         At index 0 diff: (1.0, None, '10') != (2.0, None, 'B')
+E         Use -v to get more diff
+
+../base/tests/test_b103_a2l_definition.py:619: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_14_3_file_order_and_numeric_text_stay_as_written
+1 failed, 2 passed, 188 deselected in 1.82s

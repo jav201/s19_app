@@ -183,7 +183,10 @@ from tools.id_registry import (
 # tests/test_b101_document_homes.py).
 # batch-103 Inc 4 E4: 267 -> 269 (tests/test_b103_label_match.py,
 # tests/test_b103_label_match_perf.py); re-measured at integration.
-EXPECTED_SCANNED_TEST_FILES = 269
+# batch-103 Inc 2a: +3 (tests/test_b103_a2l_definition.py, tests/test_b103_a2l_definition_perf.py,
+# tests/test_b103_synth_definitions.py; no support module); merged count 272, to be
+# re-measured by the guard on the LAN Linux host at the next integrated run.
+EXPECTED_SCANNED_TEST_FILES = 272
 """Test modules scanned, including this one.
 
 batch-101 Inc 11: 250 -> 253. ``tests/test_b101_a2l_blocks_and_segments.py``,
