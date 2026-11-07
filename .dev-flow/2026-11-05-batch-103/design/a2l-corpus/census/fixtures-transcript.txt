@@ -1,0 +1,51 @@
+reader module: /home/javiergr/work/s19_app/s19_app/tui/a2l.py python 3.11.18
+1	157606	ascii	LF	v1.61	objs=75	parse=0.008s
+A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/fixtures/2.a2l sample=Unclosed /begin sections detected.
+2	241699	utf-8	LF	v1.71	objs=118	parse=0.016s
+3	64103	utf-8	LF	v1.70	objs=111	parse=0.005s
+4	542	ascii	LF	v1.71	objs=1	parse=0.0s
+5	2685	ascii	LF	v1.71	objs=0	parse=0.0s
+6	21100	ascii	LF	v1.71	objs=72	parse=0.003s
+7	5346	ascii	LF	v1.71	objs=0	parse=0.0s
+8	142	ascii	LF	vnone	objs=1	parse=0.0s
+9	1601	ascii	LF	vnone	objs=0	parse=0.0s
+10	147	ascii	LF	v1.71	objs=0	parse=0.0s
+11	1654	ascii	LF	v1.71	objs=2	parse=0.0s
+12	5078623	utf-8	LF	v1.60	objs=13990	parse=0.712s
+13	114539	utf-8	LF	v1.71	objs=67	parse=0.005s
+14	8942	ascii	LF	v1.71	objs=12	parse=0.001s
+15	10452	ascii	LF	v1.71	objs=14	parse=0.001s
+16	6678	ascii	LF	v1.71	objs=0	parse=0.0s
+17	6544	ascii	LF	v1.71	objs=0	parse=0.0s
+18	8074	ascii	LF	v1.71	objs=0	parse=0.0s
+19	10468	ascii	LF	v1.71	objs=0	parse=0.0s
+20	70878	ascii	LF	v1.71	objs=0	parse=0.001s
+21	1391	ascii	LF	vnone	objs=3	parse=0.0s
+22	1396	ascii	LF	vnone	objs=3	parse=0.0s
+23	1231	ascii	LF	vnone	objs=2	parse=0.0s
+24	983	ascii	LF	vnone	objs=1	parse=0.0s
+25	1604	ascii	LF	vnone	objs=4	parse=0.0s
+26	36702962	ascii	LF	vnone	objs=220040	parse=6.526s
+27	2446	ascii	LF	v1.71	objs=12	parse=0.0s
+28	1382	ascii	LF	vnone	objs=3	parse=0.0s
+29	1828	ascii	LF	vnone	objs=6	parse=0.0s
+30	1388	ascii	LF	vnone	objs=3	parse=0.0s
+31	984	ascii	LF	vnone	objs=1	parse=0.0s
+32	1461	ascii	LF	vnone	objs=3	parse=0.0s
+33	1564	ascii	LF	vnone	objs=4	parse=0.0s
+34	15265	ascii	LF	vnone	objs=100	parse=0.002s
+35	3401	ascii	LF	vnone	objs=6	parse=0.0s
+A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/fixtures/2.a2l sample=Unclosed /begin sections detected.
+identical-content duplicates skipped (n, same as n): []
+# census summary: 35 files, 234654 MEASUREMENT/CHARACTERISTIC objects
+encoding: ascii=31, utf-8=4
+bom: none=33, utf8=2
+eol: LF=35
+asap2_version: 1.71=16, none=16, 1.61=1, 1.70=1, 1.60=1
+files with: mixed_eol=0 tabs=2 formfeeds=0 nbsp=0 nul=0 other_separators=0 non-spec-python-whitespace=0 replacement_chars=0 no_final_newline=16
+size bytes: min=142 median=2685 max=36702962 total=42551109
+parse seconds max=6.526 ; largest-5 (name, bytes, seconds, tracemalloc peak bytes): [('26.a2l', 36702962, 33.22, 477502063), ('12.a2l', 5078623, 3.62, 42527595), ('2.a2l', 241699, 0.1, 963612), ('1.a2l', 157606, 0.05, 605089), ('13.a2l', 114539, 0.03, 566409)]
+
+## reader/oracle comparison totals (counts of objects)
+CHAR_KIND_DIFFERENT	2
+LEN_NONE_CHAR_CUBE_4	2
