@@ -41,6 +41,8 @@ from tests.support.b103_clipboard import (
     _set_box,
     install_osc52_spy,
     right_click_app_route,
+    show_patch_paste,
+    show_sje_manual,
     terminal_paste,
 )
 
@@ -73,20 +75,25 @@ async def _activate(app, pilot, screen_key: str) -> None:
 
 
 async def _source_widget(app, pilot, source: tuple):
-    await _activate(app, pilot, source[0])
-    if source[2] == "input":
-        return app.query_one(source[1], Input)
-    return app.query_one(source[1], TextArea)
+    screen_key, widget_id, kind = source
+    if widget_id == "#patch_paste_text":
+        await show_patch_paste(app, pilot)
+    else:
+        await _activate(app, pilot, screen_key)
+    if kind == "input":
+        return app.query_one(widget_id, Input)
+    return app.query_one(widget_id, TextArea)
 
 
 async def _target_widget(app, pilot, target: tuple):
-    if target[0] == "sje":
-        app.action_open_split_join_export()
+    screen_key, widget_id, kind = target
+    if screen_key == "sje":
+        await show_sje_manual(app, pilot)
     else:
-        await _activate(app, pilot, target[0])
-    if target[2] == "input":
-        return app.query_one(target[1], Input)
-    return app.query_one(target[1], TextArea)
+        await _activate(app, pilot, screen_key)
+    if kind == "input":
+        return app.query_one(widget_id, Input)
+    return app.query_one(widget_id, TextArea)
 
 
 def _payload_for(source: tuple, *, right: bool = False) -> str:
@@ -158,7 +165,7 @@ def test_at_i1a_matrix_copy_then_paste(tmp_path: Path, cell: dict) -> None:
             if cell["copy"] == "ctrl_c":
                 await pilot.press("ctrl+c")
             else:
-                await right_click_app_route(app, source)
+                await right_click_app_route(app, pilot, source)
             await pilot.pause()
             await pilot.pause()
             # Target
@@ -174,7 +181,7 @@ def test_at_i1a_matrix_copy_then_paste(tmp_path: Path, cell: dict) -> None:
                 else:
                     await terminal_paste(app, app.clipboard)
             else:
-                await right_click_app_route(app, target)
+                await right_click_app_route(app, pilot, target)
             await pilot.pause()
             await pilot.pause()
             return _box(target)
@@ -233,12 +240,12 @@ def test_r_tui_044_1_walk_single_line_round_trip(tmp_path: Path, place: tuple) -
             widget.value = f"R1-{P1}"
             widget.selection = (0, len(widget.value))
             await pilot.pause()
-            await right_click_app_route(app, widget)
+            await right_click_app_route(app, pilot, widget)
             await pilot.pause()
             rc_copied = app.clipboard
             widget.value = ""
             await pilot.pause()
-            await right_click_app_route(app, widget)
+            await right_click_app_route(app, pilot, widget)
             await pilot.pause()
             return copied, ctrl_value, rc_copied, widget.value
 
@@ -326,7 +333,9 @@ def test_r_paste_18_walk_multi_line_round_trip(tmp_path: Path, place: tuple) -> 
     async def _drive() -> tuple:
         async for app, pilot in _app_with(tmp_path):
             if screen_key == "sje":
-                app.action_open_split_join_export()
+                await show_sje_manual(app, pilot)
+            elif widget_id == "#patch_paste_text":
+                await show_patch_paste(app, pilot)
             else:
                 await _activate(app, pilot, screen_key)
             widget = app.query_one(widget_id, TextArea)
@@ -346,12 +355,12 @@ def test_r_paste_18_walk_multi_line_round_trip(tmp_path: Path, place: tuple) -> 
             widget.text = f"R1-{P2}"
             widget.select_all()
             await pilot.pause()
-            await right_click_app_route(app, widget)
+            await right_click_app_route(app, pilot, widget)
             await pilot.pause()
             rc_copied = app.clipboard
             widget.text = ""
             await pilot.pause()
-            await right_click_app_route(app, widget)
+            await right_click_app_route(app, pilot, widget)
             await pilot.pause()
             return copied, ctrl_value, rc_copied, widget.text
 

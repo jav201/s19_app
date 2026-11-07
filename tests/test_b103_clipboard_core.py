@@ -63,6 +63,7 @@ from tests.support.b103_clipboard import (
     install_osc52_spy,
     remove_log_capture,
     right_click_app_route,
+    show_patch_paste,
     terminal_paste,
     typed_key_time,
 )
@@ -138,9 +139,7 @@ def _run_m(tmp_path: Path, body):
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(160, 48)) as pilot:
             await pilot.pause()
-            app.action_show_screen("patch")
-            for _ in range(4):
-                await pilot.pause()
+            await show_patch_paste(app, pilot)
             widget = app.query_one("#patch_paste_text", TextArea)
             widget.text = ""
             widget.focus()
@@ -191,10 +190,9 @@ def test_r_tui_043_6_1_linux_ctrl_v_pastes_app_clipboard(tmp_path: Path) -> None
             await pilot.pause()
             await pilot.pause()
             a_value = box_a.value
-            app.action_show_screen("patch")
-            for _ in range(4):
-                await pilot.pause()
+            await show_patch_paste(app, pilot)
             box_m = app.query_one("#patch_paste_text", TextArea)
+            box_m.text = ""
             box_m.focus()
             await pilot.pause()
             await pilot.press("ctrl+v")
@@ -231,9 +229,7 @@ def test_r_tui_043_7_1_and_043_8_1_neither_clipboard_warns_and_selects(
                     await pilot.pause()
                 widget = app.query_one("#a2l_tags_filter_input", Input)
             else:
-                app.action_show_screen("patch")
-                for _ in range(4):
-                    await pilot.pause()
+                await show_patch_paste(app, pilot)
                 widget = app.query_one("#patch_paste_text", TextArea)
             _set_box(widget, "KEEP")
             widget.focus()
@@ -278,9 +274,7 @@ def test_r_tui_043_12_1_warning_line_when_no_text_read_on_linux(
                     await pilot.pause()
                 widget = app.query_one("#a2l_tags_filter_input", Input)
             else:
-                app.action_show_screen("patch")
-                for _ in range(4):
-                    await pilot.pause()
+                await show_patch_paste(app, pilot)
                 widget = app.query_one("#patch_paste_text", TextArea)
             widget.focus()
             await pilot.pause()
@@ -521,13 +515,13 @@ def test_r_paste_34_4_right_click_paste_single_line_strips(tmp_path: Path) -> No
             widget.focus()
             app._clipboard = P_CTRL
             await pilot.pause()
-            await right_click_app_route(app, widget)
+            await right_click_app_route(app, pilot, widget)
             await pilot.pause()
             first = widget.value
             widget.value = ""
             app._clipboard = P_CTRL_L
             await pilot.pause()
-            await right_click_app_route(app, widget)
+            await right_click_app_route(app, pilot, widget)
             await pilot.pause()
             return first, widget.value
 
@@ -595,10 +589,9 @@ def test_r_paste_35_3_app_clipboard_fallback_multi_line_strips(tmp_path: Path) -
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(160, 48)) as pilot:
             await pilot.pause()
-            app.action_show_screen("patch")
-            for _ in range(4):
-                await pilot.pause()
+            await show_patch_paste(app, pilot)
             widget = app.query_one("#patch_paste_text", TextArea)
+            widget.text = ""
             widget.focus()
             app._clipboard = P_CTRL_M
             await pilot.pause()
@@ -617,14 +610,13 @@ def test_r_paste_35_4_right_click_paste_multi_line_strips(tmp_path: Path) -> Non
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(160, 48)) as pilot:
             await pilot.pause()
-            app.action_show_screen("patch")
-            for _ in range(4):
-                await pilot.pause()
+            await show_patch_paste(app, pilot)
             widget = app.query_one("#patch_paste_text", TextArea)
+            widget.text = ""
             widget.focus()
             app._clipboard = P_CTRL_M
             await pilot.pause()
-            await right_click_app_route(app, widget)
+            await right_click_app_route(app, pilot, widget)
             await pilot.pause()
             return _box_lines(widget)
 
@@ -705,7 +697,7 @@ def test_r_loaddlg_20_3_right_click_path_box_refuses_unsafe(tmp_path: Path) -> N
                 widget.focus()
                 app._clipboard = payload
                 await pilot.pause()
-                await right_click_app_route(app, widget)
+                await right_click_app_route(app, pilot, widget)
                 await pilot.pause()
                 values.append(widget.value)
             return values
@@ -774,9 +766,7 @@ def test_r_paste_3_copy_puts_selection_on_app_clipboard(tmp_path: Path) -> None:
             await pilot.pause()
             await pilot.pause()
             single = app.clipboard
-            app.action_show_screen("patch")
-            for _ in range(4):
-                await pilot.pause()
+            await show_patch_paste(app, pilot)
             ta = app.query_one("#patch_paste_text", TextArea)
             ta.text = "COPYME-2"
             ta.select_all()
@@ -826,9 +816,7 @@ def test_r_paste_5_no_selection_changes_no_clipboard(tmp_path: Path, action: str
         async with app.run_test(size=(160, 48)) as pilot:
             await pilot.pause()
             if action == "x_multi":
-                app.action_show_screen("patch")
-                for _ in range(4):
-                    await pilot.pause()
+                await show_patch_paste(app, pilot)
                 widget = app.query_one("#patch_paste_text", TextArea)
                 widget.text = "KEEP"
                 widget.selection = ((0, 4), (0, 4))
@@ -840,9 +828,10 @@ def test_r_paste_5_no_selection_changes_no_clipboard(tmp_path: Path, action: str
                 for _ in range(4):
                     await pilot.pause()
                 widget = app.query_one("#a2l_tags_filter_input", Input)
+                widget.focus()
+                await pilot.pause()
                 widget.value = "KEEP"
                 widget.selection = (4, 4)
-                widget.focus()
                 await pilot.pause()
                 await pilot.press(action)
             await pilot.pause()
@@ -888,9 +877,10 @@ def test_r_paste_7_cut_removes_selection(tmp_path: Path) -> None:
             for _ in range(4):
                 await pilot.pause()
             box = app.query_one("#a2l_tags_filter_input", Input)
+            box.focus()
+            await pilot.pause()
             box.value = "DE AD BE EF"
             box.selection = (0, 5)
-            box.focus()
             await pilot.pause()
             await pilot.press("ctrl+x")
             await pilot.pause()
@@ -909,9 +899,7 @@ def test_r_paste_8_no_selection_cut_cuts_cursor_line(tmp_path: Path) -> None:
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(160, 48)) as pilot:
             await pilot.pause()
-            app.action_show_screen("patch")
-            for _ in range(4):
-                await pilot.pause()
+            await show_patch_paste(app, pilot)
             ta = app.query_one("#patch_paste_text", TextArea)
             ta.text = "first\nline_to_cut\nthird"
             ta.selection = ((1, 2), (1, 2))
@@ -1002,9 +990,7 @@ def test_r_paste_12_1_copy_over_limit_keeps_first_65536(tmp_path: Path) -> None:
         async with app.run_test(size=(160, 48)) as pilot:
             await pilot.pause()
             osc = install_osc52_spy(app)
-            app.action_show_screen("patch")
-            for _ in range(4):
-                await pilot.pause()
+            await show_patch_paste(app, pilot)
             ta = app.query_one("#patch_paste_text", TextArea)
             ta.text = P70K
             ta.select_all()
@@ -1046,9 +1032,7 @@ def test_r_paste_15_one_osc52_request_per_copy(tmp_path: Path, action: str, box_
                 await pilot.press("ctrl+c" if action == "copy" else "ctrl+x")
                 await pilot.pause()
                 return len(osc), osc[0] if osc else None
-            app.action_show_screen("patch")
-            for _ in range(4):
-                await pilot.pause()
+            await show_patch_paste(app, pilot)
             ta = app.query_one("#patch_paste_text", TextArea)
             if action == "line_cut":
                 ta.text = "first\nline_to_cut\nthird"
@@ -1108,11 +1092,12 @@ def test_r_paste_25_right_click_puts_selection_on_app_clipboard(
             for _ in range(4):
                 await pilot.pause()
             box = app.query_one("#a2l_tags_filter_input", Input)
-            box.value = "AAAA-BBBB"
-            box.selection = (0, 4)
             box.focus()
             await pilot.pause()
-            await right_click_app_route(app, box)
+            box.value = "AAAA-BBBB"
+            box.selection = (0, 4)
+            await pilot.pause()
+            await right_click_app_route(app, pilot, box)
             await pilot.pause()
             return app.clipboard
 
@@ -1135,11 +1120,12 @@ def test_r_paste_26_right_click_copy_leaves_text_and_selection(
             for _ in range(4):
                 await pilot.pause()
             box = app.query_one("#a2l_tags_filter_input", Input)
-            box.value = "AAAA-BBBB"
-            box.selection = (0, 4)
             box.focus()
             await pilot.pause()
-            await right_click_app_route(app, box)
+            box.value = "AAAA-BBBB"
+            box.selection = (0, 4)
+            await pilot.pause()
+            await right_click_app_route(app, pilot, box)
             await pilot.pause()
             return box.value, box.selection
 
@@ -1159,7 +1145,7 @@ def test_r_paste_29_1_right_click_no_selection_pastes_at_cursor(tmp_path: Path) 
             widget.focus()
             app._clipboard = "P1 line\nsecond"
             await pilot.pause()
-            await right_click_app_route(app, widget)
+            await right_click_app_route(app, pilot, widget)
             await pilot.pause()
             return widget.value
 
@@ -1174,7 +1160,7 @@ def test_r_paste_29_3_right_click_empty_box_pastes(tmp_path: Path) -> None:
         async for app, pilot, widget in _one_box_app("input"):
             app._clipboard = "P1 line\nsecond"
             await pilot.pause()
-            await right_click_app_route(app, widget)
+            await right_click_app_route(app, pilot, widget)
             await pilot.pause()
             return widget.value
 
@@ -1192,7 +1178,7 @@ def test_r_paste_30_1_right_click_multi_line_pastes_all(tmp_path: Path) -> None:
             widget.focus()
             app._clipboard = "P1 line\nsecond"
             await pilot.pause()
-            await right_click_app_route(app, widget)
+            await right_click_app_route(app, pilot, widget)
             await pilot.pause()
             return widget.text
 
@@ -1212,11 +1198,12 @@ def test_r_paste_9_4_write_failure_warning_after_right_click_copy(tmp_path: Path
             for _ in range(4):
                 await pilot.pause()
             box = app.query_one("#a2l_tags_filter_input", Input)
-            box.value = "AAAA-BBBB"
-            box.selection = (0, 4)
             box.focus()
             await pilot.pause()
-            await right_click_app_route(app, box)
+            box.value = "AAAA-BBBB"
+            box.selection = (0, 4)
+            await pilot.pause()
+            await right_click_app_route(app, pilot, box)
             await pilot.pause()
             await pilot.pause()
             return notices
@@ -1244,7 +1231,7 @@ def test_r_paste_10_2_warning_line_per_failed_right_click_copy(tmp_path: Path) -
             box.selection = (0, len(box.value))
             box.focus()
             await pilot.pause()
-            await right_click_app_route(app, box)
+            await right_click_app_route(app, pilot, box)
             await pilot.pause()
             await pilot.pause()
             remove_log_capture(records)
@@ -1265,15 +1252,13 @@ def test_r_paste_12_3_right_click_copy_over_limit(tmp_path: Path) -> None:
         async with app.run_test(size=(160, 48)) as pilot:
             await pilot.pause()
             osc = install_osc52_spy(app)
-            app.action_show_screen("patch")
-            for _ in range(4):
-                await pilot.pause()
+            await show_patch_paste(app, pilot)
             ta = app.query_one("#patch_paste_text", TextArea)
             ta.text = P70K
             ta.select_all()
             ta.focus()
             await pilot.pause()
-            await right_click_app_route(app, ta)
+            await right_click_app_route(app, pilot, ta)
             await pilot.pause()
             await pilot.pause()
             return len(app.clipboard), [len(r) for r in osc]
@@ -1303,15 +1288,13 @@ def test_r_paste_15_6_7_one_osc52_request_for_right_click_copy(
                 widget.value = P1
                 widget.selection = (0, len(P1))
             else:
-                app.action_show_screen("patch")
-                for _ in range(4):
-                    await pilot.pause()
+                await show_patch_paste(app, pilot)
                 widget = app.query_one("#patch_paste_text", TextArea)
                 widget.text = P2
                 widget.select_all()
             widget.focus()
             await pilot.pause()
-            await right_click_app_route(app, widget)
+            await right_click_app_route(app, pilot, widget)
             await pilot.pause()
             return len(osc), osc[0] if osc else None
 
@@ -1337,16 +1320,15 @@ def test_r_tui_043_6_5_right_click_no_selection_pastes_app_clipboard(
             box_a = app.query_one("#a2l_tags_filter_input", Input)
             box_a.focus()
             await pilot.pause()
-            await right_click_app_route(app, box_a)
+            await right_click_app_route(app, pilot, box_a)
             await pilot.pause()
             a_value = box_a.value
-            app.action_show_screen("patch")
-            for _ in range(4):
-                await pilot.pause()
+            await show_patch_paste(app, pilot)
             box_m = app.query_one("#patch_paste_text", TextArea)
+            box_m.text = ""
             box_m.focus()
             await pilot.pause()
-            await right_click_app_route(app, box_m)
+            await right_click_app_route(app, pilot, box_m)
             await pilot.pause()
             return a_value, box_m.text
 
@@ -1374,14 +1356,13 @@ def test_r_tui_043_7_2_and_043_8_2_right_click_warns_and_selects(
                     await pilot.pause()
                 widget = app.query_one("#a2l_tags_filter_input", Input)
             else:
-                app.action_show_screen("patch")
-                for _ in range(4):
-                    await pilot.pause()
+                await show_patch_paste(app, pilot)
                 widget = app.query_one("#patch_paste_text", TextArea)
-            _set_box(widget, "KEEP")
             widget.focus()
             await pilot.pause()
-            await right_click_app_route(app, widget)
+            _set_box(widget, "KEEP")
+            await pilot.pause()
+            await right_click_app_route(app, pilot, widget)
             await pilot.pause()
             return notices, widget.selected_text, _box(widget)
 
@@ -1407,7 +1388,7 @@ def test_r_tui_043_12_3_warning_line_on_right_click_no_text(tmp_path: Path) -> N
             box = app.query_one("#a2l_tags_filter_input", Input)
             box.focus()
             await pilot.pause()
-            await right_click_app_route(app, box)
+            await right_click_app_route(app, pilot, box)
             await pilot.pause()
             warnings = [
                 r for r in records
@@ -1435,12 +1416,12 @@ def test_r_tui_043_13_2_no_clipboard_text_in_log_on_right_click(tmp_path: Path) 
             box = app.query_one("#a2l_tags_filter_input", Input)
             box.focus()
             await pilot.pause()
-            await right_click_app_route(app, box)
+            await right_click_app_route(app, pilot, box)
             await pilot.pause()
             box.value = "SECRET-COPY-46"
             box.selection = (0, len(box.value))
             await pilot.pause()
-            await right_click_app_route(app, box)
+            await right_click_app_route(app, pilot, box)
             await pilot.pause()
             remove_log_capture(records)
             return [m for _, _, m in records]
@@ -1465,16 +1446,15 @@ def test_r_tui_044_2_6_right_click_paste_capped(tmp_path: Path) -> None:
             box_a = app.query_one("#a2l_tags_filter_input", Input)
             box_a.focus()
             await pilot.pause()
-            await right_click_app_route(app, box_a)
+            await right_click_app_route(app, pilot, box_a)
             await pilot.pause()
             a_len = len(box_a.value)
-            app.action_show_screen("patch")
-            for _ in range(4):
-                await pilot.pause()
+            await show_patch_paste(app, pilot)
             box_m = app.query_one("#patch_paste_text", TextArea)
+            box_m.text = ""
             box_m.focus()
             await pilot.pause()
-            await right_click_app_route(app, box_m)
+            await right_click_app_route(app, pilot, box_m)
             await pilot.pause()
             return a_len, len(box_m.text)
 
@@ -1506,9 +1486,7 @@ def test_r_tui_043_10_1_3_4_linux_ctrl_v_ends_within_typed_key_time(
                     await pilot.pause()
                 widget = app.query_one("#a2l_tags_filter_input", Input)
             else:
-                app.action_show_screen("patch")
-                for _ in range(4):
-                    await pilot.pause()
+                await show_patch_paste(app, pilot)
                 widget = app.query_one("#patch_paste_text", TextArea)
             widget.focus()
             await pilot.pause()
@@ -1531,9 +1509,8 @@ def test_r_tui_043_10_1_3_4_linux_ctrl_v_ends_within_typed_key_time(
             return key_time, median
 
     key_time, median = asyncio.run(_drive())
-    bound = timing_bound(0.1)
-    assert median <= key_time + report_margin(
-        f"r_tui_043_10_1_{box_kind}", median, key_time + bound
+    assert median <= report_margin(
+        f"r_tui_043_10_1_{box_kind}", median, key_time + timing_bound(0.1)
     ), (key_time, median)
 
 
@@ -1573,8 +1550,7 @@ def test_r_paste_11_3_linux_copy_ends_within_typed_key_time(tmp_path: Path) -> N
             return key_time, samples[len(samples) // 2]
 
     key_time, median = asyncio.run(_drive())
-    bound = timing_bound(0.1)
-    assert median <= key_time + report_margin("r_paste_11_3", median, key_time + bound), (key_time, median)
+    assert median <= report_margin("r_paste_11_3", median, key_time + timing_bound(0.1)), (key_time, median)
 
 
 @pytest.mark.serial_timing
@@ -1603,7 +1579,7 @@ def test_r_paste_27_3_linux_right_click_copy_ends_within_typed_key_time(
                 await pilot.pause()
                 before = len(notices)
                 start = time.monotonic()
-                await right_click_app_route(app, box)
+                await right_click_app_route(app, pilot, box)
                 deadline = time.monotonic() + 10.0
                 while time.monotonic() < deadline:
                     await asyncio.sleep(0.005)
@@ -1615,8 +1591,7 @@ def test_r_paste_27_3_linux_right_click_copy_ends_within_typed_key_time(
             return key_time, samples[len(samples) // 2]
 
     key_time, median = asyncio.run(_drive())
-    bound = timing_bound(0.1)
-    assert median <= key_time + report_margin("r_paste_27_3", median, key_time + bound), (key_time, median)
+    assert median <= report_margin("r_paste_27_3", median, key_time + timing_bound(0.1)), (key_time, median)
 
 
 @pytest.mark.serial_timing
@@ -1638,9 +1613,7 @@ def test_r_paste_31_3_4_linux_right_click_paste_ends_within_typed_key_time(
                     await pilot.pause()
                 widget = app.query_one("#a2l_tags_filter_input", Input)
             else:
-                app.action_show_screen("patch")
-                for _ in range(4):
-                    await pilot.pause()
+                await show_patch_paste(app, pilot)
                 widget = app.query_one("#patch_paste_text", TextArea)
             widget.focus()
             await pilot.pause()
@@ -1650,7 +1623,7 @@ def test_r_paste_31_3_4_linux_right_click_paste_ends_within_typed_key_time(
                 _set_box(widget, "")
                 await pilot.pause()
                 start = time.monotonic()
-                await right_click_app_route(app, widget)
+                await right_click_app_route(app, pilot, widget)
                 deadline = time.monotonic() + 10.0
                 while time.monotonic() < deadline:
                     await asyncio.sleep(0.005)
@@ -1662,9 +1635,8 @@ def test_r_paste_31_3_4_linux_right_click_paste_ends_within_typed_key_time(
             return key_time, samples[len(samples) // 2]
 
     key_time, median = asyncio.run(_drive())
-    bound = timing_bound(0.1)
-    assert median <= key_time + report_margin(
-        f"r_paste_31_{box_kind}", median, key_time + bound
+    assert median <= report_margin(
+        f"r_paste_31_{box_kind}", median, key_time + timing_bound(0.1)
     ), (key_time, median)
 
 
@@ -1847,6 +1819,7 @@ def test_r_paste_21_4_outside_clipboard_files_fails_before_open(pytester) -> Non
         "os.environ['B103_HOST_PLATFORM'] = 'win32'\n"
         "os.environ['GITHUB_ACTIONS'] = 'true'\n"
         "os.environ['RUNNER_ENVIRONMENT'] = 'self-hosted'\n"
+        "pytest_plugins = ['tests.conftest']\n"
     )
     (pytester.path / "test_clip.py").write_text(
         "import sys\n"
@@ -1898,6 +1871,7 @@ def _probe_pytester(pytester, result: tuple, *, probe_test: bool = False) -> obj
         "import tests.support.b103_clipboard as sc\n"
         f"sc._probe_once = lambda: {standalone}\n"
         "sc._probe_cache = None\n"
+        "sc._logged_account = lambda: 'runneradmin'\n"
     )
     if probe_test:
         (pytester.path / "test_probe.py").write_text(
@@ -2007,16 +1981,16 @@ def test_r_tui_043_5_3_terminal_paste_replaces_selection(tmp_path: Path, box_kin
                 for _ in range(4):
                     await pilot.pause()
                 widget = app.query_one("#a2l_tags_filter_input", Input)
+                widget.focus()
+                await pilot.pause()
                 widget.value = "AAAA-BBBB"
                 widget.selection = (0, 4)
             else:
-                app.action_show_screen("patch")
-                for _ in range(4):
-                    await pilot.pause()
+                await show_patch_paste(app, pilot)
                 widget = app.query_one("#patch_paste_text", TextArea)
+                widget.focus()
                 widget.text = "AAAA-BBBB"
                 widget.selection = ((0, 0), (0, 4))
-            widget.focus()
             await pilot.pause()
             await terminal_paste(app, "ZZ")
             await pilot.pause()
@@ -2077,7 +2051,7 @@ def test_r_paste_25_3_and_26_3_multi_line_unfocused_right_click_copies(
             widget.focus()
             await pilot.pause()
             await _unfocus(app, pilot)
-            await right_click_app_route(app, widget)
+            await right_click_app_route(app, pilot, widget)
             await pilot.pause()
             return app.clipboard, widget.text, widget.selection, widget.has_focus
 
@@ -2100,7 +2074,7 @@ def test_r_paste_29_2_unfocused_single_line_pastes_at_cursor(tmp_path: Path) -> 
             app._clipboard = "P1 line\nsecond"
             await pilot.pause()
             await _unfocus(app, pilot)
-            await right_click_app_route(app, widget)
+            await right_click_app_route(app, pilot, widget)
             await pilot.pause()
             return widget.value, widget.has_focus, app.clipboard
 
@@ -2129,11 +2103,11 @@ def test_r_paste_29_4_blur_back_to_back_pastes_and_copies_nothing(
             region = widget.region
             x = region.x + min(2, max(0, region.width - 1))
             y = region.y
-            down = events.MouseDown(x=x, y=y, button=3, delta_x=0, delta_y=0, shift=False, meta=False, ctrl=False, screen_x=x, screen_y=y, style=None)
-            up = events.MouseUp(x=x, y=y, button=3, delta_x=0, delta_y=0, shift=False, meta=False, ctrl=False, screen_x=x, screen_y=y, style=None)
+            down = events.MouseDown(widget=widget, x=x, y=y, button=3, delta_x=0, delta_y=0, shift=False, meta=False, ctrl=False, screen_x=x, screen_y=y, style=None)
+            up = events.MouseUp(widget=widget, x=x, y=y, button=3, delta_x=0, delta_y=0, shift=False, meta=False, ctrl=False, screen_x=x, screen_y=y, style=None)
             app.post_message(down)
             app.post_message(up)
-            await app._process_messages()
+            await pilot.pause()
             await pilot.pause()
             return widget.value, app.clipboard
 
@@ -2154,7 +2128,7 @@ def test_r_paste_30_2_unfocused_multi_line_pastes_at_cursor(tmp_path: Path) -> N
             app._clipboard = "P1 line\nsecond"
             await pilot.pause()
             await _unfocus(app, pilot)
-            await right_click_app_route(app, widget)
+            await right_click_app_route(app, pilot, widget)
             await pilot.pause()
             return widget.text, widget.has_focus
 
@@ -2259,31 +2233,38 @@ def test_r_tui_044_2_8_win32_read_bounded_by_global_size(monkeypatch) -> None:
         HANDLE = 4
         HGLOBAL = 5
 
-    class _FakeUser32:
-        def OpenClipboard(self, hwnd):
-            recorded["open"] = True
-            return 1
+    def _open_clipboard(hwnd):
+        recorded["open"] = True
+        return 1
 
-        def CloseClipboard(self):
-            return 1
+    def _close_clipboard():
+        return 1
 
-        def GetClipboardData(self, fmt):
-            return 0x1234
+    def _get_clipboard_data(fmt):
+        return 0x1234
 
-    class _FakeKernel32:
-        def GlobalLock(self, handle):
-            return 0xABCD
+    def _global_lock(handle):
+        return 0xABCD
 
-        def GlobalUnlock(self, handle):
-            return 1
+    def _global_unlock(handle):
+        return 1
 
-        def GlobalSize(self, handle):
-            return 2000
+    def _global_size(handle):
+        return 2000
 
+    # Plain functions (not bound methods), so the product's
+    # ``OpenClipboard.argtypes = ...`` assignments land (bound methods
+    # reject attribute assignment).
     fake_ctypes = type(sys)("fake_ctypes")
     fake_ctypes.windll = type(sys)("windll")
-    fake_ctypes.windll.user32 = _FakeUser32()
-    fake_ctypes.windll.kernel32 = _FakeKernel32()
+    fake_ctypes.windll.user32 = type(sys)("user32")
+    fake_ctypes.windll.user32.OpenClipboard = _open_clipboard
+    fake_ctypes.windll.user32.CloseClipboard = _close_clipboard
+    fake_ctypes.windll.user32.GetClipboardData = _get_clipboard_data
+    fake_ctypes.windll.kernel32 = type(sys)("kernel32")
+    fake_ctypes.windll.kernel32.GlobalLock = _global_lock
+    fake_ctypes.windll.kernel32.GlobalUnlock = _global_unlock
+    fake_ctypes.windll.kernel32.GlobalSize = _global_size
     fake_ctypes.wintypes = _FakeWintypes()
     fake_ctypes.c_size_t = int
     fake_ctypes.c_void_p = int

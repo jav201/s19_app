@@ -302,12 +302,41 @@ async def terminal_paste(app: App, text: str) -> None:
     app.post_message(events.Paste(text))
 
 
-async def right_click_app_route(app: App, widget: object, *, back_to_back: bool = False) -> None:
-    """Deliver the App-route right-click: a button-3 ``MouseDown`` then
-    ``MouseUp`` posted to the App, back to back (no pause), so
-    ``App.on_event`` makes the ``Click`` (E3A-11 d; the matrix/walk/timing
-    cases use this route). The ``widget`` argument gives the target so the
-    App's hit-testing resolves the same box for the press and the release."""
+async def show_sje_manual(app: App, pilot) -> None:
+    """Open Split/Join/Export and switch to the manual-localities tab.
+
+    ``#sje_manual`` starts hidden on the default ranges tab; pressing ``t``
+    cycles to the manual tab, which lays the box out and focuses it."""
+    app.action_open_split_join_export()
+    for _ in range(4):
+        await pilot.pause()
+    await pilot.press("t")
+    for _ in range(4):
+        await pilot.pause()
+
+
+async def show_patch_paste(app: App, pilot) -> None:
+    """Show the Patch screen's JSON tab so ``#patch_paste_text`` is laid out.
+
+    ``#patch_paste_text`` lives on the Patch screen's JSON tab and stays
+    unmounted (region 0x0) until the ``#patch_tab_json`` chip is pressed;
+    key-based paste reaches it through the focus, but a mouse right-click
+    needs the box to be visible."""
+    app.action_show_screen("patch")
+    for _ in range(4):
+        await pilot.pause()
+    await pilot.click("#patch_tab_json")
+    for _ in range(4):
+        await pilot.pause()
+
+
+async def right_click_app_route(app: App, pilot, widget: object) -> None:
+    """Deliver the right-click through the App route: a button-3
+    ``MouseDown`` then ``MouseUp`` posted to the App back to back (no
+    pause), so ``App.on_event`` hit-tests the box and makes the ``Click``
+    (E3A-11 d). The post is followed by ``pilot.pause()`` so the App's own
+    run loop dispatches the pair — never ``app._process_messages()``, which
+    re-composes the screen and raises ``MountError``."""
     region = widget.region
     x = region.x + max(0, min(2, region.width - 1))
     y = region.y
@@ -315,7 +344,7 @@ async def right_click_app_route(app: App, widget: object, *, back_to_back: bool 
     up = events.MouseUp(widget, x, y, 0, 0, 3, False, False, False, x, y, None)
     app.post_message(down)
     app.post_message(up)
-    await app._process_messages()
+    await pilot.pause()
 
 
 async def pilot_right_click(pilot, widget: object, *, offset: tuple = (2, 1)) -> None:

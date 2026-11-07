@@ -674,13 +674,13 @@ def test_r_paste_34_4_win_right_click_strips_single_line(
             widget.focus()
             _own_write(P_CTRL_W)
             await pilot.pause()
-            await right_click_app_route(app, widget)
+            await right_click_app_route(app, pilot, widget)
             await pilot.pause()
             first = widget.value
             widget.value = ""
             _own_write(P_CTRL_L)
             await pilot.pause()
-            await right_click_app_route(app, widget)
+            await right_click_app_route(app, pilot, widget)
             await pilot.pause()
             return first, widget.value
 
@@ -724,7 +724,7 @@ def test_r_paste_35_4_win_right_click_strips_multi_line(
             widget.focus()
             _own_write(P_CTRL_MW)
             await pilot.pause()
-            await right_click_app_route(app, widget)
+            await right_click_app_route(app, pilot, widget)
             await pilot.pause()
             return _box_lines(widget)
 
@@ -961,7 +961,7 @@ def test_r_paste_24_1_2_five_right_click_copies(tmp_path: Path, os_clipboard_rea
                 _select(widget)
                 widget.focus()
                 await pilot.pause()
-                await right_click_app_route(app, widget)
+                await right_click_app_route(app, pilot, widget)
                 await pilot.pause()
                 await pilot.pause()
                 reads.append(other_program_read())
@@ -988,7 +988,7 @@ def test_r_paste_24_3_unfocused_multi_line_right_click_copies(
             widget.focus()
             await pilot.pause()
             await pilot.click("#other")
-            await right_click_app_route(app, widget)
+            await right_click_app_route(app, pilot, widget)
             await pilot.pause()
             return widget.has_focus
 
@@ -1012,7 +1012,7 @@ def test_r_paste_25_26_win_right_click_copy_app_clipboard(
                 widget.selection = ((0, 0), (0, 4))
             widget.focus()
             await pilot.pause()
-            await right_click_app_route(app, widget)
+            await right_click_app_route(app, pilot, widget)
             await pilot.pause()
             return app.clipboard, _box(widget), widget.selection
 
@@ -1040,7 +1040,7 @@ def test_r_paste_27_1_2_right_click_copy_ends_within_typed_key_time(
                 await pilot.pause()
                 before = clipboard_sequence_number()
                 start = time.monotonic()
-                await right_click_app_route(app, widget)
+                await right_click_app_route(app, pilot, widget)
                 deadline = time.monotonic() + 10.0
                 while time.monotonic() < deadline:
                     await asyncio.sleep(0.005)
@@ -1075,7 +1075,7 @@ def test_r_paste_28_1_2_held_right_click_copy_ends_within_2_5(
             await pilot.pause()
             before = len(notices)
             start = time.monotonic()
-            await right_click_app_route(app, widget)
+            await right_click_app_route(app, pilot, widget)
             deadline = time.monotonic() + 10.0
             while time.monotonic() < deadline:
                 await asyncio.sleep(0.005)
@@ -1113,7 +1113,7 @@ def test_r_paste_29_30_win_right_click_paste_placement(
                 widget.selection = ((0, 1), (0, 1))
             widget.focus()
             await pilot.pause()
-            await right_click_app_route(app, widget)
+            await right_click_app_route(app, pilot, widget)
             await pilot.pause()
             return _box(widget)
 
@@ -1139,7 +1139,7 @@ def test_r_paste_31_1_2_right_click_paste_ends_within_typed_key_time(
                 _set_box(widget, "")
                 await pilot.pause()
                 start = time.monotonic()
-                await right_click_app_route(app, widget)
+                await right_click_app_route(app, pilot, widget)
                 samples.append(await _wait_for_box(pilot, widget, P1000))
             return key_time, _median(samples)
 
@@ -1176,7 +1176,7 @@ def test_r_paste_31_5_6_right_click_no_text_no_powershell(
                     widget = app.query_one("#patch_paste_text", TextArea)
                 widget.focus()
                 await pilot.pause()
-                await right_click_app_route(app, widget)
+                await right_click_app_route(app, pilot, widget)
                 await pilot.pause()
                 return _box(widget)
 
@@ -1211,7 +1211,7 @@ def test_r_paste_32_1_2_held_right_click_paste_ends_within_2_5(
             widget.focus()
             await pilot.pause()
             start = time.monotonic()
-            await right_click_app_route(app, widget)
+            await right_click_app_route(app, pilot, widget)
             elapsed = await _wait_for_box(pilot, widget, "APP-TEXT")
             return elapsed
 
@@ -1245,7 +1245,7 @@ def test_r_tui_043_6_5_win_right_click_pastes_app_clipboard(
                 widget = app.query_one("#patch_paste_text", TextArea)
             widget.focus()
             await pilot.pause()
-            await right_click_app_route(app, widget)
+            await right_click_app_route(app, pilot, widget)
             await pilot.pause()
             return _box(widget)
 
@@ -1261,7 +1261,7 @@ def test_r_tui_043_11_2_right_click_keeps_code_page(tmp_path: Path, os_clipboard
         async for app, pilot, widget in (_box_a(tmp_path) if box_kind == "a" else _box_m(tmp_path)):
             widget.focus()
             await pilot.pause()
-            await right_click_app_route(app, widget)
+            await right_click_app_route(app, pilot, widget)
             await pilot.pause()
             return _box(widget)
 
@@ -1286,7 +1286,7 @@ def test_r_tui_043_12_3_win_right_click_held_logs_warning(tmp_path: Path, os_cli
             box = app.query_one("#a2l_tags_filter_input", Input)
             box.focus()
             await pilot.pause()
-            await right_click_app_route(app, box)
+            await right_click_app_route(app, pilot, box)
             await pilot.pause()
             n = sum(1 for r in records if r[0] == "s19_app.tui.os_clipboard_input" and r[1] == "WARNING")
             remove_log_capture(records)
@@ -1316,12 +1316,12 @@ def test_r_tui_043_13_2_win_right_click_no_log_leak(tmp_path: Path, os_clipboard
             box = app.query_one("#a2l_tags_filter_input", Input)
             box.focus()
             await pilot.pause()
-            await right_click_app_route(app, box)
+            await right_click_app_route(app, pilot, box)
             await pilot.pause()
             box.value = "SECRET-COPY-46"
             box.selection = (0, len(box.value))
             await pilot.pause()
-            await right_click_app_route(app, box)
+            await right_click_app_route(app, pilot, box)
             await pilot.pause()
             remove_log_capture(records)
             return [m for _, _, m in records]
@@ -1340,7 +1340,7 @@ def test_r_tui_044_2_6_win_right_click_paste_capped(tmp_path: Path, os_clipboard
         async for app, pilot, widget in (_box_a(tmp_path) if box_kind == "a" else _box_m(tmp_path)):
             widget.focus()
             await pilot.pause()
-            await right_click_app_route(app, widget)
+            await right_click_app_route(app, pilot, widget)
             await pilot.pause()
             return len(_box(widget))
 
@@ -1356,7 +1356,7 @@ def test_r_paste_12_3_win_right_click_copy_over_limit(tmp_path: Path, os_clipboa
             _select(widget)
             widget.focus()
             await pilot.pause()
-            await right_click_app_route(app, widget)
+            await right_click_app_route(app, pilot, widget)
             await pilot.pause()
             await pilot.pause()
 
@@ -1377,7 +1377,7 @@ def test_r_paste_10_2_win_right_click_copy_logs_warning(tmp_path: Path, os_clipb
             widget.selection = (0, len(widget.value))
             widget.focus()
             await pilot.pause()
-            await right_click_app_route(app, widget)
+            await right_click_app_route(app, pilot, widget)
             await pilot.pause()
             await pilot.pause()
             n = sum(1 for r in records if r[1] == "WARNING")
