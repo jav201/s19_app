@@ -54,8 +54,8 @@ The trigger evaluation `state.json`'s `triggers.record` points at: one row per t
 ## Where we are
 
 - **Station:** P3 (increments), 2026-11-06.
-- **Merged and pushed:** Incs 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12b, 13, 14, 15, 16 (decisions in `state.json`; merge evidence `evidence/merge/`).
-- **In E4:** Inc 10a (`b101-inc10`; rulings E4-R1 … R5 being applied). **Ready for E4 (E1–E3 closed):** Inc 10b (`inc-10b/`); Inc 12 (`inc-12/`, `b101-inc12`; split at E3 from 12b, D-5 B). Merge order: 10a → 10b → 12. **Merge verification (operator order 2026-11-06):** partial sets only (new/edited files, QC-BC, other importers, law guards, serial_timing); the full suite runs once at batch end.
+- **Merged and pushed:** Incs 1, 2, 3, 4, 5, 6, 7, 8, 9, 10a, 11, 12b, 13, 14, 15, 16 (decisions in `state.json`; merge evidence `evidence/merge/`).
+- **In E4:** Inc 10b (`inc-10b/`, branch `b101-inc10`). **Ready for E4 (E1–E3 closed):** Inc 12 (`inc-12/`, `b101-inc12`; split at E3 from 12b, D-5 B). Merge order: 10b → 12. **Merge verification (operator order 2026-11-06):** partial sets only (new/edited files, QC-BC, other importers, law guards, serial_timing); the full suite runs once at batch end.
 - **Next:** the serial `app.py` chain 5 → 6 → 9 → 10 → 12; before Inc 10's E1, the LAN check of Inc 5 ruling D-4 (A2L explorer value column and Split/Join after an in-place write).
 - **Batch end:** full battery, canon fold, review page, v1.0.0 tag.
 
