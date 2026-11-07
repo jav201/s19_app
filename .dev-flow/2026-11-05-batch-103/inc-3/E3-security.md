@@ -728,3 +728,231 @@ Decode is not bounded where every object is refused at describe.
 - [✗] Transcripts: the raw transcripts of this round are **lost** (the `pkill -f` slip, stated above). The scripts are in `evidence-e3/sec-r7-*`, and the cited numbers are the probe output as this session received it.
 - [n/a] New tool or integration scope: none.
 - Runner scratch `/tmp/b103-e3r7-3-S/` deleted. No round-7 process is left on cachyos-rtx (checked with `ps`).
+
+## Round 8 (2026-11-07T06:13:57-06:00)
+
+**Verdict: FAIL.** The round-7 correction closes E3S3-33 … -36 at design, and on Inc 2a's real code every in-scope path runs flat. **The class "per-object work on shared content" is closed for every node of 3a's graph** on this model (node table below). The FAIL comes from a new defect of a different class. Only running 3a's model on 2a's real code shows it (E3S3-38, MAJOR):
+- One `reads` map holds two different read forms under one key. The graph keys 3a's RECORD_LAYOUT read form by `id()` of the `record_layouts_by_name` entry (`graph-inc3.md:509`). The same map holds Inc 2a's `_resolve_datatype` result under that same key (`graph-inc3.md:156`, `:337`; `a2l_definition.py:729-749` at `e9bad3ca`).
+- So when a VALUE and a VAL_BLK, CURVE or MAP name one layout in one walk, the second of them reads the other's form. On V171, .136/arr-4's own file, one walk of its 118 names raises on 16 names in file order, and on 16 in reverse order. In the product, the first raise aborts the whole `describe_definitions` call. A smaller shape gives a wrong refusal and no exception.
+- Keyed apart (`("RL", id())`), the same walks give 0 exceptions and 0 differences from a fresh walk per name.
+
+In-scope results. All run on 2a's real forms, and each run is a fresh walk:
+- **CT-5 / CT-6 (E3S3-33):** 112.6 / 112.7 / 112.3 and 45.1 / 45.4 / 45.2 µs per object (×1.00 / ×1.00 and ×1.01 / ×1.00). Each walk holds one `_TabForm`, and every definition carries it.
+- **RL-16 / RL-17 (E3S3-25 holds):** 69.7 / 69.5 / 69.2 and 126.3 / 127.9 / 126.5 µs (×0.99–1.01), with messages of 321 and 354 characters.
+- **EN-1 / EN-2 (E3S3-27 holds):** 10.4 / 10.4 / 10.5 and 9.6 / 9.6 / 9.6 µs per element (×1.00–1.01). Each EN-1 element keeps 283 characters.
+- **Counting mappings (E3S3-35):** 0 lookups by the shared word after the first name, on .148/16, /17, /18 (VT-8 and VT-9) and .150/arr-7, at every size. `byname` gives 399–799 → RED.
+- **Negative controls:** all 8 are RED (table below).
+- **Table pass:** one pass over every id of round 7's harness, which covers round 6's 54: 62 describe paths plus EN-1 and EN-2. All 64 are GREEN, with describe ×0.98–1.05, decode ×0.98–1.01 and 0 exceptions. The longest message holds 622 characters. On the scalar paths that refuse (CM-7, CM-9, VT-9), 3a's `_conversion_fields` and Inc 2a's real messages agree on all 19,200 compared refusals of each path.
+
+**Not run, as ruled:** the v2 lookup census and the range segment index equality. They belong to Inc 2a's E5 security review on the real code. That review started at 05:39:52 on `069171cd` and has recorded no result yet: `inc-2/steps.log` has its start line only, and there is no `E5-security.md`. So round 8 cites no number for them. Round 6's figures (0 of 119,684 and 0 of 20,823) remain the latest, and they came from a model.
+
+Scope:
+- `git diff b82f8c02 HEAD -- inc-3/`, the round-7 correction (`25c13dec`);
+- judged against E3S3-33 … -37 and against `E3-rulings.md` "Round 7 rulings" with its "Round-7 correction done" note. Reading 1 of that note applies: only lookups keyed by a shared section's word are counted.
+
+Runner:
+- cachyos-rtx, Python 3.11.18, in `/tmp/b103-e3r8-3-S/` (deleted at the end);
+- `-I -B`, with HOME, XDG and LOCALAPPDATA under `…/zq_iso_user`, and stdin `/dev/null` (`sec-r8-run.sh`);
+- the Inc 2a tree was **copied** from `~/work/b103-int2a` and made read-only. The original was only read: HEAD `e9bad3ca`, and its `a2l_definition.py` md5 `820a4c3a` and `a2l.py` md5 `d6879216` match `git show e9bad3ca:` on this PC and in the copy;
+- host load 2.0–3.8 on 16 cores (each transcript line records it). The 12 workers of the other session did not show during the runs: at most 2–3 other processes were busy.
+- Every process ran in the foreground under `timeout`. None needed a kill, and no `pkill` was used. Transcripts were written on this PC as each run streamed (`tee`).
+
+**Model** (`sec-r8-m3a.py`). It is the round-7 model with one rule changed: **no Inc 2a function is wrapped or replaced.**
+- Rounds 4–7 patched `_read_method_record`, `_read_enum_table`, `_resolve_datatype`, `_display_decimals`, `_enum_entry_text` and `_enum_text` with "2a, as ruled" proxies. Here the model calls Inc 2a's real `_describe_one(..., reads)` and `_read_method_record(..., compu_tabs_by_name, reads)`, which hold `_TabForm` from `_build_tab_form` and `_EnumForm` from `_read_enum_table`. It also calls the real `_table_value`, `_enum_entry_text`, `_enum_text`, `_read_stored_value` and `display_text`.
+- 3a's `_conversion_fields` takes the record from `_read_method_record` and builds no second form. For scalars, 3a's `_conversion_fields` refusal is compared with Inc 2a's: 0 differences.
+- An array kind takes its base fields from Inc 2a's `_describe_one` with a map of its own, because 3a does not run `_resolve_datatype` for these kinds. Its `_describe_array` uses the walk's `reads`.
+
+The knobs:
+- `byname`: the shared word looked up by name per call or per element;
+- `r6`: the round-5 correction's graph, as the cases' negatives name it;
+- `named`: element names built per element;
+- `TF=method`: `_build_tab_form` given a throwaway map, so the form is built with each method record;
+- `KEY=bare` | `tuple`: how 3a's layout read form is keyed.
+
+**Measure** (`sec-r8-scale.py`; the path builders are round 7's, unchanged):
+- `process_time`, GC off, S, 2S and 8S interleaved;
+- **each run a fresh walk** (E3S3-34): Inc 2a's four name maps, 3a's maps and `reads` built from scratch, then the 399 names after the first timed;
+- the least of 15. The in-scope paths ran in mode `full` (15 at every size, no shortcut). Negatives taking ≥ 1 ms per object ran once each at S and 2S;
+- decode: the least of 15 interleaved passes.
+
+GREEN when all of these hold:
+- ×2S ≤ 1.5 and ×8S ≤ 2.0;
+- the 400 names at S take ≤ 0.5 s;
+- every message holds ≤ 1,024 characters;
+- the decoded text does not grow through private copies.
+
+### In-scope paths (400 objects; µs per object at S / 2S / 8S, ×2S, ×8S) — `sec-r8-steady-transcript.txt`
+
+| Path | Case | Describe | Decode | Message | Shared form | Verdict |
+|---|---|---|---|---|---|---|
+| CT-5 | .148/19 (VAL_BLKs, own TAB_NOINTP methods, one COMPU_TAB) | 112.6 / 112.7 / 112.3 (×1.00, ×1.00); T400 0.051 s | 13.0 / 13.0 / 12.9 (×1.00, ×0.99) | 0 | carried forms 1; `_TabForm` in `reads` 1 | GREEN |
+| CT-6 | .148/19 (VALUEs, own TAB_INTP methods) | 45.1 / 45.4 / 45.2 (×1.01, ×1.00); T400 0.022 s | 4.2 / 4.2 / 4.2 (×1.00, ×1.00) | 0 | carried forms 1; `_TabForm` in `reads` 1 | GREEN |
+| RL-16 | .148/16 | 69.7 / 69.5 / 69.2 (×1.00, ×0.99); T400 0.107 s | refused | 321 | — | GREEN |
+| RL-17 | .148/17 | 126.3 / 127.9 / 126.5 (×1.01, ×1.00); T400 0.128 s | refused | 354 | — | GREEN |
+| EN-1 | .150/arr-10 | one object | 10.4 / 10.4 / 10.5 per element (×1.00, ×1.00); 283 characters kept per element (`VNN…NNN…[1]: lookup table missing`) | 282 | — | GREEN |
+| EN-2 | .150/arr-10 | one object | 9.6 / 9.6 / 9.6 per element (×1.00, ×1.01); nothing kept | — | — | GREEN |
+
+### Negative controls — `sec-r8-neg-transcript.txt`
+
+| Path | Mutant | Result | Verdict |
+|---|---|---|---|
+| CT-5 | `TF=method` (the round-6 graph: the form with each method record) | 4,608 / 9,192 µs (×1.99), T400 1.85 s; 400 carried forms | **RED** |
+| CT-6 | `TF=method` | 2,314 / 4,441 µs (×1.92), T400 0.93 s; 400 carried forms | **RED** |
+| RL-16 | `r6` (`<layout>` whole in the stored refusal) | 160.7 / 242.4 / 754.4 µs (×1.51, ×4.69); messages 262,208 → 2,097,216 characters | **RED** |
+| RL-17 | `r6` (`<layout>` `_clean`ed into .89 per call) | 24.8 / 49.6 ms (×2.00), T400 10.0 s; messages 262,241 / 524,385 | **RED** |
+| EN-1 | `r6` (element named `<name>[<i>]`, refusal `_clean`s it) | 24.6 / 49.1 / 194.2 ms per element (×1.99, ×7.88); 262,170 → 2,097,178 characters kept per element | **RED** |
+| EN-2 | `r6` | 16.8 / 24.0 / 83.7 µs (×1.43, ×4.97) | **RED** |
+| EN-1 | `named` | 17.3 / 24.5 / 85.6 µs (×1.42, ×4.95); 283 characters kept | **RED** |
+| EN-2 | `named` | 16.9 / 24.0 / 90.0 µs (×1.42, ×5.33) | **RED** |
+
+The CT-5 / CT-6 negatives are heavier than round 7's reported 817 / 802 µs at S, for two reasons. On the real code `_build_tab_form` also builds the `xs` / `ys` tuples. And this model reads an array's method record twice (its base fields and 3a's `reads`). With these transcripts, .148/19's negative can cite measured numbers instead of "reported in round 7, transcript lost".
+
+One field of the EN-1 `r6` line was trimmed. The harness's sample printed the last 261,894 characters of that mutant's message, a run of `N`. That run is elided in the saved transcript, and the elision is marked in place; the line's counts are unchanged.
+
+### Counting mappings (E3S3-35) — `sec-r8-count-transcript.txt`
+
+The walk's `record_layouts_by_name`, `compu_tables_by_name` (Inc 2a's map, which the harness builds as .148/1's measure does) and `compu_tabs_by_name` were wrapped. Each counts the lookups whose key is the shared word, per phase: walk, first name, the 399 after it, decode.
+
+| Case (path) | Shared word | Corrected model: after the first name | `byname`: after the first name | Verdict |
+|---|---|---|---|---|
+| .148/16 (RL-16) | the AXIS_PTS layout word, 256 KiB … 2 MiB | 0 / 0 / 0 (1 lookup, in the walk, when it files the AXIS_PTS) | 399 / 399 / 399 | GREEN; negative **RED** |
+| .148/17 (RL-17) | the same | 0 / 0 / 0 (walk 1, first name 1: the axis object's byte order, once) | 399 / 399 / 399 | GREEN; negative **RED** |
+| .148/18 (VT-8, curves) | the COMPU_TAB_REF word | 0 / 0 / 0 (first name 2: the object's and the axis's method record, once each map) | 798 / 798 / 798 | GREEN; negative **RED** |
+| .148/18 (VT-9, VALUEs) | the same | 0 / 0 / 0 (first name 1) | 399 / 399 / 399 | GREEN; negative **RED** |
+| .150/arr-7 (CT-1) | `CT` | 0 / 0 / 0, describe and decode (first name 2) | 799 / 799 / 799 (399 describe + 400 decode) | GREEN; negative **RED** |
+| .148/19 (CT-5, CT-6) | `CT`, a word of each object's **own** method | 798 / 399 per walk: one per method record (CT-5 counts two maps in this model) | 1,597 / 1,198 | not counted under reading 1 (E3S3-39, INFO) |
+
+### [K] One `reads` for Inc 2a and 3a (E3S3-38) — `sec-r8-collide-transcript.txt`
+
+The harness describes every name in one walk, in file order and reversed, and compares each against a fresh walk per name. An array is compared by its public view and message, and a scalar by its whole `Definition`.
+
+| Shape | `KEY=bare` (the graph) | `KEY=tuple` |
+|---|---|---|
+| K1: a VALUE and a VAL_BLK on one layout, `FNC_VALUES 1 SWORD ROW_DIR DIRECT` | in file order, the VAL_BLK raises `TypeError: string indices must be integers` in `_describe_array`: its layout read is the string `SWORD` that Inc 2a stored. Reversed, the VALUE raises `TypeError: unhashable type: 'mappingproxy'` at `a2l_definition.py:573`: its `_resolve_datatype` returned 3a's layout form as the datatype | 0 exceptions, 0 differences, both orders |
+| K2: the same, on a layout whose first line holds no datatype word | in file order, no exception: the VAL_BLK is refused `A2L-DEF-LAYOUT` "the record layout RL_N is not declared in the A2L", where a fresh walk describes it as shape `(4,)`, SWORD. Reversed, the VALUE's `datatype` is 3a's layout form behind its ADDRESS refusal | 0 / 0 |
+| K3: a VALUE and a CURVE on one layout | as K1, both orders | 0 / 0 |
+| V171 (118 names; `RL.FNC.SWORD.ROW_DIR` is named by 33 such objects) | 16 exceptions in file order, 16 reversed | 0 exceptions, 0 differences, both orders (0 names raise in a fresh walk) |
+
+Prevalence: of the 35 tracked `.a2l` files under `examples/` and `tests/` of the copy, 3 hold such a layout (10 layouts in all), and V171 is one of them. This is a static count from the parse payload: CHARACTERISTIC VALUEs whose tag has no datatype, and VAL_BLK / CURVE / MAP, naming one `record_layouts_by_name` entry.
+
+### Table pass (one pass, fresh walks; the round-7 ids) — `sec-r8-table-transcript.txt`
+
+| Path | Users | Shared content (fill to S) | Owner | Describe | Decode | Message | Verdict |
+|---|---|---|---|---|---|---|---|
+| RL-1 | VB | layout: ALIGNMENT_BYTE 1 lines (.148/1) | 3a | 82 / 82 / 82 (×1.00, ×1.00) | 10 / 10 / 10 (×0.99, ×1.00) | 0 | GREEN |
+| RL-2 | VB | layout: the 7 ALIGNMENT classes repeated | 3a | 85 / 85 / 85 (×1.00, ×1.00) | 11 / 11 / 11 (×1.00, ×1.00) | 0 | GREEN |
+| RL-3 | VB | layout: a block comment | 3a | 81 / 81 / 81 (×1.00, ×1.00) | 10 / 10 / 10 (×1.00, ×1.00) | 0 | GREEN |
+| RL-4 | VB | layout: DIRECT-only lines | 3a | 81 / 80 / 81 (×1.00, ×1.00) | 10 / 10 / 10 (×0.99, ×1.00) | 0 | GREEN |
+| RL-5 | SC | layout: FIX_NO_AXIS_PTS_X 4 lines (STD curve) | 3a | 88 / 87 / 88 (×1.00, ×1.00) | 83 / 83 / 83 (×1.00, ×1.00) | 0 | GREEN |
+| RL-6 | VB | layout: first line 256 KiB of words, datatype last (.148/2) | 3a | 75 / 74 / 75 (×0.99, ×1.00) | refused | 71 | GREEN |
+| RL-7 | VB | layout: one part line, a single long word (.84 echo, .148/10) | 3a | 72 / 72 / 72 (×1.00, ×1.00) | refused | 322 | GREEN |
+| RL-8 | VB | layout: long FNC_VALUES mode word (.85 echo) | 3a | 72 / 72 / 72 (×0.99, ×1.00) | refused | 337 | GREEN |
+| RL-9 | VB | layout: long FNC_VALUES datatype word (.86 echo) | 3a | 73 / 73 / 73 (×1.00, ×1.00) | refused | 346 | GREEN |
+| RL-10 | VA | layout: long first line, datatype last (.148/3) | 2a, as ruled | 28 / 28 / 28 (×1.00, ×1.01) | 1.8 / 1.8 / 1.8 (×1.00, ×0.99) | 0 | GREEN |
+| RL-11 | QB | the same, CUBOID objects (kind refused) | 2a, as ruled | 29 / 29 / 29 (×1.00, ×1.01) | — | 56 | GREEN |
+| RL-12 | SC | layout: ALIGNMENT_BYTE 1 lines (STD curve) | 3a | 88 / 88 / 88 (×1.00, ×1.00) | 84 / 84 / 83 (×1.00, ×1.00) | 0 | GREEN |
+| RL-13 | MP | layout: ALIGNMENT_BYTE 1 lines (STD x STD map) | 3a | 112 / 112 / 112 (×1.00, ×1.01) | 87 / 87 / 86 (×1.00, ×1.00) | 0 | GREEN |
+| RL-14 | CC | axis object's layout: ALIGNMENT_BYTE 1 lines | 3a | 105 / 105 / 105 (×1.00, ×1.00) | 90 / 90 / 90 (×1.00, ×1.00) | 0 | GREEN |
+| RL-15 | CC | axis object's layout: one part line, a single long word (.148/15) | 3a | 68 / 68 / 68 (×1.00, ×1.00) | refused | 326 | GREEN |
+| RL-16 | CC | axis object's layout NAME long (AXIS_PTS word 5), a short part word (.84 <layout>) | 3a | 68 / 68 / 68 (×1.00, ×1.00) | refused | 321 | GREEN |
+| RL-17 | CC | axis object's layout NAME long, MOD_COMMON ALIGNMENT_BYTE 2 moves AXIS_PTS_X (.89 <layout>) | 3a | 125 / 125 / 125 (×1.00, ×1.00) | refused | 354 | GREEN |
+| MC-1 | VB | MOD_COMMON: ALIGNMENT_BYTE 1 lines (.148/4) | 3a | 91 / 91 / 91 (×1.00, ×1.01) | 10 / 11 / 10 (×1.01, ×1.00) | 0 | GREEN |
+| MC-2 | CC | MOD_COMMON: ALIGNMENT_BYTE 1 lines, COM axis object (.148/5) | 3a | 116 / 116 / 116 (×1.00, ×1.00) | 92 / 92 / 92 (×1.00, ×1.00) | 0 | GREEN |
+| MC-3 | VB | MOD_COMMON: the 7 classes repeated, UWORD values | 3a | 91 / 91 / 91 (×1.00, ×1.00) | 11 / 11 / 11 (×1.00, ×1.00) | 0 | GREEN |
+| MC-4 | VB | MOD_COMMON: DEPOSIT ABSOLUTE lines | 3a | 83 / 83 / 83 (×0.99, ×1.00) | 10 / 10 / 10 (×1.00, ×1.00) | 0 | GREEN |
+| MC-5 | CC | MOD_COMMON: BYTE_ORDER lines | 3a | 104 / 104 / 104 (×1.00, ×1.00) | 90 / 89 / 90 (×1.00, ×1.00) | 0 | GREEN |
+| MC-6 | VB | MOD_COMMON: ALIGNMENT_BYTE x lines (.144, short word) | 3a | 84 / 83 / 84 (×0.99, ×1.00) | refused | 59 | GREEN |
+| MC-7 | VB | MOD_COMMON: one ALIGNMENT_BYTE line, a long word (.144 echo, .148/11) | 3a | 84 / 84 / 84 (×1.00, ×0.99) | refused | 315 | GREEN |
+| MC-8 | CC | the same, on the axis object's layout | 3a | 106 / 106 / 106 (×1.00, ×1.00) | refused | 315 | GREEN |
+| AX-1 | CC | AXIS_PTS: DEPOSIT ABSOLUTE lines (.148/6) | 3a | 107 / 104 / 106 (×0.98, ×0.99) | 91 / 91 / 91 (×0.99, ×1.00) | 0 | GREEN |
+| AX-2 | CC | AXIS_PTS: block comment | 3a | 106 / 105 / 106 (×0.99, ×1.00) | 95 / 96 / 95 (×1.01, ×1.00) | 0 | GREEN |
+| AX-3 | CC | AXIS_PTS: BYTE_ORDER lines | 3a | 107 / 107 / 106 (×1.00, ×1.00) | 92 / 91 / 91 (×0.99, ×0.99) | 0 | GREEN |
+| AX-4 | CC | AXIS_PTS: long identifier | 3a | 105 / 105 / 104 (×1.00, ×0.99) | 90 / 90 / 90 (×1.00, ×1.00) | 0 | GREEN |
+| AX-5 | CC | AXIS_PTS: long layout word, not declared | 3a | 67 / 67 / 67 (×1.00, ×1.00) | — | 0 | GREEN |
+| AX-6 | CC | AXIS_PTS: long max-axis-points word | 3a | 70 / 70 / 70 (×0.99, ×0.99) | — | 0 | GREEN |
+| AX-7 | CC | AXIS_PTS: long address word | 3a | 66 / 66 / 66 (×0.99, ×1.00) | — | 0 | GREEN |
+| CM-1 | SC | COMPU_METHOD: DEPOSIT ABSOLUTE lines (.148/7) | 3a | 87 / 86 / 86 (×1.00, ×1.00) | 88 / 88 / 88 (×1.00, ×1.00) | 0 | GREEN |
+| CM-2 | VA | COMPU_METHOD: block comment (VALUEs) | 2a, as ruled | 28 / 28 / 28 (×0.99, ×1.01) | 3.5 / 3.5 / 3.5 (×1.00, ×1.00) | 0 | GREEN |
+| CM-3 | SC | COMPU_METHOD: COEFFS_LINEAR lines | 3a | 86 / 86 / 86 (×1.00, ×1.00) | 89 / 88 / 88 (×0.99, ×1.00) | 0 | GREEN |
+| CM-4 | SC | COMPU_METHOD: FORMAT word %+digits+.2 (.148/12) | 3a + 2a, as ruled (object decimals) | 87 / 87 / 87 (×1.00, ×1.00) | 88 / 88 / 88 (×1.00, ×1.00) | 0 | GREEN |
+| CM-5 | VA | the same, VALUEs | 2a, as ruled | 28 / 28 / 28 (×1.00, ×1.00) | 3.4 / 3.3 / 3.3 (×0.99, ×0.99) | 0 | GREEN |
+| CM-6 | SC | COMPU_METHOD: long conversion type word (CONVERSION echo, .148/13) | 3a | 90 / 90 / 90 (×1.00, ×1.00) | — | 622 | GREEN |
+| CM-7 | VA | the same, VALUEs; scalar 3a/2a refusals compared 19200, differ 0 | 2a, as ruled + 3a _conversion_fields | 31 / 31 / 31 (×1.00, ×1.00) | — | 310 | GREEN |
+| CM-8 | SC | COMPU_METHOD: long COMPU_TAB_REF, not declared (TABLE echo, .148/14) | 3a | 91 / 90 / 90 (×1.00, ×1.00) | — | 622 | GREEN |
+| CM-9 | VA | the same, VALUEs; scalar 3a/2a refusals compared 19200, differ 0 | 2a, as ruled + 3a _conversion_fields | 31 / 32 / 32 (×1.00, ×1.01) | — | 310 | GREEN |
+| CM-10 | VA | COMPU_METHOD: long unit word | 2a (by reference) | 28 / 28 / 28 (×1.01, ×1.01) | 3.4 / 3.4 / 3.4 (×1.00, ×1.00) | 0 | GREEN |
+| CM-11 | VB | COMPU_METHOD: TAB_INTP, long COMPU_TAB_REF, not declared | 3a | 78 / 78 / 78 (×1.00, ×1.00) | 10 / 10 / 10 (×1.00, ×1.00) | 0 | GREEN |
+| VT-1 | SC | COMPU_VTAB: entries (.148/8; .150/arr-1); carried forms [1, 1, 1] | decode 2a, as ruled | 88 / 89 / 89 (×1.00, ×1.00) | 76 / 76 / 76 (×1.01, ×1.00) | 0 | GREEN |
+| VT-2 | VB | COMPU_VTAB: entries (.150/arr-2); carried forms [1, 1, 1] | decode 2a, as ruled | 79 / 80 / 80 (×1.01, ×1.02) | 11 / 11 / 11 (×1.00, ×1.00) | 0 | GREEN |
+| VT-3 | VA | COMPU_VTAB: entries, enum VALUEs; carried forms [1, 1, 1] | decode 2a, as ruled | 29 / 29 / 29 (×1.01, ×1.01) | 2.1 / 2.2 / 2.2 (×1.01, ×1.01) | 0 | GREEN |
+| VT-4 | VB | COMPU_VTAB: block comment; carried forms [1, 1, 1] | 3a | 78 / 78 / 79 (×1.00, ×1.01) | 11 / 11 / 11 (×1.00, ×1.00) | 0 | GREEN |
+| VT-5 | VB | COMPU_VTAB: one entry, long text, matched (.150/arr-3); carried forms [1, 1, 1] | decode 2a, as ruled | 79 / 79 / 80 (×1.00, ×1.02) | 10 / 10 / 10 (×1.00, ×1.00); long text objects [1, 1, 1] | 0 | GREEN |
+| VT-6 | VB | COMPU_VTAB: long DEFAULT_VALUE text, no match (.150/arr-4); carried forms [1, 1, 1] | decode 2a, as ruled | 79 / 79 / 78 (×1.00, ×1.00) | 10 / 10 / 10 (×1.00, ×1.00); long text objects [1, 1, 1] | 0 | GREEN |
+| VT-7 | VB | COMPU_VTAB: count 0, entries after it (TABLE-EMPTY); carried forms [1, 1, 1] | 3a | 79 / 78 / 79 (×1.00, ×1.00) | — | 35 | GREEN |
+| VT-8 | SC | COMPU_VTAB named by a long word, count 0 (TABLE-EMPTY <table>); carried forms [1, 1, 1] | 3a | 88 / 88 / 87 (×1.00, ×0.99) | — | 582 | GREEN |
+| VT-9 | VA | the same, VALUEs; carried forms [1, 1, 1]; scalar 3a/2a refusals compared 19200, differ 0 | 3a _conversion_fields (2a :529) | 30 / 30 / 30 (×1.00, ×1.00) | — | 290 | GREEN |
+| VR-1 | SC | COMPU_VTAB_RANGE: entries (.148/9; .150/arr-5); carried forms [1, 1, 1] | decode 2a, as ruled | 87 / 87 / 87 (×1.00, ×1.00) | 83 / 84 / 84 (×1.00, ×1.01) | 0 | GREEN |
+| VR-2 | VB | COMPU_VTAB_RANGE: one range, long text, matched (.150/arr-6); carried forms [1, 1, 1] | decode 2a, as ruled | 78 / 79 / 78 (×1.00, ×1.00) | 11 / 11 / 11 (×1.00, ×1.00); long text objects [1, 1, 1] | 0 | GREEN |
+| CT-1 | VB | COMPU_TAB: entries, TAB_INTP, last interval (.150/arr-7); carried forms [1, 1, 1] | 3a bisect | 78 / 78 / 78 (×1.01, ×1.01) | 13 / 13 / 13 (×1.00, ×1.00) | 0 | GREEN |
+| CT-2 | VB | COMPU_TAB: entries, TAB_NOINTP, no exact entry (.150/arr-8); carried forms [1, 1, 1] | 3a bisect | 78 / 78 / 78 (×1.00, ×1.00) | 13 / 13 / 13 (×1.00, ×1.00) | 0 | GREEN |
+| CT-3 | VA | COMPU_TAB: TAB_INTP, VALUEs; carried forms [1, 1, 1] | 3a decode_definition -> _decode_stored (2a alone: frozen) | 28 / 28 / 29 (×1.01, ×1.02) | 4.0 / 4.0 / 4.0 (×1.00, ×1.01) | 0 | GREEN |
+| CT-4 | VA | COMPU_TAB: TAB_NOINTP, VALUEs; carried forms [1, 1, 1] | 3a decode_definition -> _decode_stored (2a alone: frozen) | 28 / 28 / 28 (×1.01, ×1.01) | 3.6 / 3.6 / 3.6 (×1.00, ×1.01) | 0 | GREEN |
+| CT-5 | VB | COMPU_TAB of entries named by 400 TAB_NOINTP methods, one per object (the table form); carried forms [1, 1, 1] | 3a | 109 / 109 / 109 (×1.00, ×1.00) | 12 / 12 / 12 (×1.00, ×1.00) | 0 | GREEN |
+| CT-6 | VA | the same, VALUEs (3a _conversion_fields via 3a's _describe_one); carried forms [1, 1, 1] | 3a | 43 / 43 / 44 (×1.00, ×1.01) | 3.9 / 3.9 / 3.9 (×1.00, ×1.01) | 0 | GREEN |
+| CT-7 | VB | COMPU_TAB named by a long word (3 entries), TAB_NOINTP (decode: the resolved table); carried forms [1, 1, 1] | 3a | 78 / 78 / 78 (×1.00, ×1.00) | 12 / 12 / 12 (×1.00, ×1.00) | 0 | GREEN |
+| VT-10 | VB | COMPU_VTAB of entries named by 400 TAB_VERB methods, one per object; carried forms [1, 1, 1] | 3a (2a, as ruled: the proxy's table read once) | 111 / 117 / 113 (×1.05, ×1.02) | 11 / 11 / 11 (×0.99, ×1.00) | 0 | GREEN |
+| EN-1 | VB | one VAL_BLK of 64 elements, NAME long | 3a | — (one object) | 9.7 / 9.7 / 9.8 (×1.01, ×1.01) per element; 283 characters kept | — | GREEN |
+| EN-2 | VB | one VAL_BLK of 64 elements, NAME long | 3a | — (one object) | 9.1 / 9.3 / 9.1 (×1.02, ×1.00) per element; 0 characters kept | — | GREEN |
+
+### Round-7 findings
+
+| Id | Round 7 | Round 8 | Evidence |
+|---|---|---|---|
+| E3S3-33 | MAJOR | **CLOSED** (design; `executed` on the model, on Inc 2a's real `_build_tab_form`). COMPU_TAB is in the read-once list and CTX *shared section* (`01-requirements.md:78`, `:270`; graph `:156`). The graph reuses Inc 2a's `_TabForm` / `_build_tab_form` / `_read_method_record` (`:80`, `:149`, `:389`), and they are what the model ran. CT-5: 112.6 / 112.7 / 112.3 µs; CT-6: 45.1 / 45.4 / 45.2 µs; both ×1.00–1.01, with one `_TabForm` per walk carried by every definition (`is`). `TF=method` → ×1.99 / ×1.92 and 400 forms → RED. | steady, neg |
+| E3S3-34 | MEDIUM | **CLOSED** (records: .148/1's measure says "each run a fresh walk", `02-test-cases.md:178`; graph `:83`). This harness ran every timed path that way, and the fresh-walk measure turns `TF=method` RED (×1.99). | R; steady, neg |
+| E3S3-35 | MINOR | **CLOSED** (design and evidence). The four counted cases give 0 after the first name at every size, and `byname` gives ≥ 399 → RED. For .148/19, see E3S3-39. | count |
+| E3S3-36 | LOW | **CLOSED** (design; read in the code). Inc 2a's `_TabForm` holds `xs` / `ys` as tuples (`a2l_definition.py:97-105`, `:772-773`). The TAB_VERB record holds `_EnumForm` (`:847-849`). The record is a `MappingProxyType` of 11 fields (`:853-867`), and no alias of `a2l_data` is kept. .136/arr-4's [I1] check was not re-run (not in round 8's list). | R |
+| E3S3-37 | INFO | carried for 3b's re-review | — |
+| E3S3-25, -27 | MAJOR (closed in round 7) | **hold on the real code**: RL-16 / RL-17, EN-1 / EN-2 flat; `r6` / `named` RED | steady, neg |
+| E3S3-28, -29, -30 | — | the scalar number test and the v2 / segment-index lookups are Inc 2a's code now. Their census is Inc 2a's E5 (pending); the table pass's CT-1 … CT-4 and VT / VR decode rows run on them | table |
+| E3S3-18 | MAJOR (3a closed) | Inc 2a's real `_resolve_datatype` reads once per walk (`a2l_definition.py:731-749`); RL-10 / RL-11 in the table pass | table |
+| E3S3-03, -04, -06, -21 | — | carried | — |
+
+### New findings (round 8)
+
+| Id | Severity | About | Defect | Fix |
+|---|---|---|---|---|
+| E3S3-38 | **MAJOR** | The walk's `reads` map: graph *Lookups* (`graph-inc3.md:156`: "`reads` holds the read form of each, keyed by `id()` of the section: a RECORD_LAYOUT's … and the layout's resolved datatype for Inc 2a's `_resolve_datatype`"); `_describe_one` (`:337`: "keyed by `id()` of the `record_layouts_by_name` entry … (3a's `reads` holds it)"); `_read_record_layout` (`:509`: "`maps["reads"][id(that section)]`", that section = `a2l_data["record_layouts_by_name"][name]`); the cited .136 text (`01-requirements.md:270`: "keyed by the section's own identity"); Inc 2a's `_resolve_datatype` (`a2l_definition.py:729-749` at `e9bad3ca`: `reads[id(entry)]` = the resolved datatype, `str` or `None`) | **Two read forms share one key.** Since the round-7 ruling, 3a takes its method records from Inc 2a's code "as implemented", with one `reads` per walk. In that map, Inc 2a stores a layout's resolved datatype under `id()` of the `record_layouts_by_name` entry, and 3a's `_read_record_layout` stores that layout's read form under the same key. Whichever object comes second in the walk reads the other's form. K1 and K3: a VALUE and a VAL_BLK or CURVE on one layout. In file order, `_describe_array` gets the string `SWORD` as its layout → `TypeError`. Reversed, Inc 2a's `_describe_one` gets 3a's layout form as the datatype → `TypeError: unhashable type: 'mappingproxy'` (`a2l_definition.py:573`). K2: a layout with no datatype word on its first line. Here the VAL_BLK is silently refused `A2L-DEF-LAYOUT` ("not declared") where a fresh walk describes it. V171, the reference demo and .136/arr-4's file: 16 of 118 names raise in one walk, in either order. In the product the first raise ends the whole `describe_definitions` call (I-2: "Raises: None"). 3 of the 35 tracked `.a2l` files hold such a layout. Keyed apart, every shape and V171 give 0 exceptions and 0 differences. No wrong acceptance was seen: each outcome is a raise or a refusal. So this is MAJOR, not HIGH. .136/arr-4 (V171, every name in one walk, both orders) would turn RED at E5, but the graph as written instructs the defect. The text predates round 7 (it is already at `0db7c4b7`). Earlier models never showed it, because they kept Inc 2a's reads in separate memos. (P `sec-r8-collide-transcript.txt`) | Give each read form a key no other read form can take, and remove the shared key rather than guard its type. 3a's read forms are keyed by the form's kind and the section's identity, e.g. `reads[("layout", id(entry))]`, `("mod_common", id(section))`, `("axis_byte_order", id(section))`, while Inc 2a's bare `id()` keys stay as implemented. In the read-once rule (`01-requirements.md:270`, graph `:156`, `:509`), "keyed by the section's identity" becomes "keyed by the read form's kind and the section's identity; no two read forms share a key". Case: add K1, K2 and K3 to .136/arr-4: every name in one walk, file order and reversed, 0 exceptions, every definition equal to a fresh walk's. V171 is already its file. Negative control: the layout form keyed by bare `id()` → K1 `TypeError` in each order and K2 a wrong `A2L-DEF-LAYOUT` → RED. E5 code review: every `reads[...]` key in `a2l_definition.py` names its form kind or is Inc 2a's. |
+| E3S3-39 | INFO | .148/19 (CT-5, CT-6) and reading 1 (`E3-rulings.md` "Round-7 correction done" 1; `01-requirements.md:341`) | **A count on /19 would be RED on a correct design.** Each object's own method names `CT`, so Inc 2a's `_read_method_record` → `_build_tab_form` looks `CT` up once per method record: 399 lookups after the first name per map. Under reading 1 these are not counted (a word of the object's own method, O(1) in the shared COMPU_TAB). /19 rightly asserts identity and one build instead of a count. | None owed. A tester who reuses /16's counting mappings on /19 counts only words of a shared section. Optional: say so in /19's measure column. |
+
+### Questions routed to round 8
+- *CT-5 and CT-6 under the fresh-walk measure, on Inc 2a's real forms.* Done: flat, with one `_TabForm` per walk carried by every definition. The negative is RED.
+- *The counting-mapping cases (.148/16 – /19, .150/arr-7).* Done. /16, /17, /18 and .150/arr-7 give 0 lookups by the shared word after the first name at every size, and `byname` is RED. /19's lookups are of each object's own method word, which reading 1 does not count (E3S3-39).
+- *RL-16, RL-17, EN-1, EN-2 and their negatives.* Done: all GREEN, and the 8 negatives are RED.
+- *One pass of the 54-path table.* Done on all 64 ids: 62 describe paths plus EN-1 and EN-2, a superset of round 6's 54. Every id is GREEN and no path regressed on Inc 2a's real code. AX-1 and CM-2, which round 7 read as noise, are flat here. VT-5, VT-6 and VR-2 keep one shared text object at every size.
+- *The v2 lookup census and the range-index equality.* Not run, as ruled. Inc 2a's E5 security review has no result recorded yet.
+- *Is the class "per-object work on shared content" closed for every node of Inc 3a's graph?* **Yes, on this model, for every node** (table). E3S3-38 is not of that class: it is a correctness defect of the shared map that the class's fix created, and it blocks the design on its own.
+
+| Node | Shared content reached per object | Closed? |
+|---|---|---|
+| `describe_definitions` | the walk; Inc 2a's four maps and 3a's two built once; `reads` read once per section; the name's echo once per name | yes (the key: E3S3-38) |
+| `_describe_one` | Inc 2a's real per-name code with `reads`: method record, `_EnumForm`, `_TabForm`, `_resolve_datatype` once per walk (CT-6, VT-3, -9, RL-10, CM-2, -5, -7, -9, -10) | yes |
+| `_object_kind`, `_read_matrix_dim`, `_array_shape`, `_fixed_points`, `_element_offset`, `_point_offset`, `_current_count` | the object's own section, or O(1) | n/a / yes |
+| `_conversion_fields` | Inc 2a's record from `_read_method_record`, with the table form keyed by the table's own entry: one `_TabForm` per COMPU_TAB per walk (CT-5, CT-6), one `_EnumForm` per table (VT-10); stored echoes for CONVERSION, TABLE and TABLE-EMPTY (CM-6, -8, VT-8, -9) | **yes** (was no in round 7: E3S3-33) |
+| `_describe_array` | .144 and .89 from stored echoes (RL-17, MC-7, -8) | yes |
+| `_read_record_layout` | `<layout>`, `<component>`, `<word>` stored as echoes; the axis object's layout from the AXIS_PTS entry (RL-7 … -9, -15, -16; the count) | yes (its key: E3S3-38) |
+| `_place_components`, `_check_module_alignment`, `_module_common` | one ALIGNMENT entry per class (RL-1 … -5, -12 … -14, MC-1 … -8) | yes |
+| `_read_axis`, `_find_axis_object` | the ten-word header and the layout resolved by the walk; byte order once (AX-1 … -7, MC-5, RL-16, -17; the count) | yes |
+| `decode_definition`, `_decode_stored`, `_decode_axis`, `decode_values` | the carried `_TabForm` through Inc 2a's `_table_value` (CT-1 … -7); `_EnumForm` lookups (VT, VR); refusals from the name echo (EN-1); no name built per element (EN-2) | yes |
+| `_element_definition`, `element_name` | the object's name, echo and table form by reference | yes |
+| G2 synth nodes, a2l.py context nodes | as round 6 | n/a |
+| 3b's `encode_values`, `_breaking_point` | not in 3a's scope (E3S3-37) | for 3b |
+
+### Evidence checklist (round 8)
+- [✓] Each finding has what · where · why · fix: the table above.
+- [✓] Each finding has a severity. New: 1 MAJOR (E3S3-38) and 1 INFO (E3S3-39). Closed: E3S3-33 … -36.
+- [✓] No secret values in this output. Home paths are written as `~`, no person's name appears, and the corpus was not read for content: only derived counts of the tracked example files left the runner.
+- [✓] Verdict explicit: **FAIL** (E3S3-38 open, `executed` on the model: `sec-r8-collide-transcript.txt`). The closures are `executed` on the model; they count as product evidence only at E5.
+- [✓] Transcripts: `evidence-e3/sec-r8-{collide,steady,neg,count,table}-transcript.txt`, written as each run streamed, with the scripts `sec-r8-m3a.py`, `sec-r8-scale.py` and `sec-r8-run.sh`. The model also loads `sec-r2-m3a.py` … `sec-r6-m3a.py`, unchanged.
+- [n/a] New tool or integration scope: none.
+- Runner scratch `/tmp/b103-e3r8-3-S/` deleted, the Inc 2a copy with it. `ps` shows no process of this round left on cachyos-rtx. The original `~/work/b103-int2a` was only read.

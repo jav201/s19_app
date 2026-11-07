@@ -161,3 +161,24 @@ Rulings:
   2. CT-5 and CT-6 as one case, .148/19: accepted.
   3. `_conversion_fields` takes `compu_tabs_by_name`, and the method-record example shows Inc 2a's 11 keys: accepted (both follow Inc 2a's code at `6071a385`).
 - **Round 8 is narrow.** The v2 lookup census and the range-index equality run on Inc 2a's **real** code in Inc 2a's E5 security review (in progress); round 8 cites that result and does not repeat it. Round 8 runs only the paths specific to Inc 3a, on the model with Inc 2a's real forms imported from `~/work/b103-int2a`: CT-5, CT-6, the counting-mapping cases, RL-16/17, EN-1/2, and one flat pass of the 54-path table with the fresh-walk measure.
+
+## Round 8 rulings (2026-11-07, orchestrator Opus 5.5)
+
+**Round 8 (security): FAIL, on one MAJOR.**
+- **Closed:** E3S3-33 … -36, at design.
+- **The reviewer states that the class "per-object work on shared content" is closed for every node of Inc 3a's graph.** Measured on Inc 2a's real forms with a fresh walk per run:
+  - CT-5, CT-6, RL-16/17 and EN-1/2 are flat;
+  - the counting cases make 0 lookups after the first name;
+  - 8 of 8 negative controls are RED.
+- **E3S3-38 MAJOR:** Inc 3a's layout read form and Inc 2a's resolved datatype share one `reads` key, `id()` of the same layout. On V171 one walk raises for 16 of 118 names. With separate keys: 0 exceptions, 0 differences (executed on the model).
+
+Rulings:
+- **E3S3-38: accept the fix as written.** Inc 3a's read forms are keyed by the form's kind and the section's identity: `("layout", id(entry))`, `("mod_common", id(section))`, `("axis_byte_order", id(section))`, and so on. Inc 2a's bare `id()` keys stay as implemented; a tuple key never equals an int key.
+  - The read-once rule (`01-requirements.md:270`, graph `:156`, `:509`) becomes "keyed by the read form's kind and the section's identity; no two read forms share a key".
+  - .136/arr-4 gains K1–K3: every name in one walk, in file order and reversed, 0 exceptions, every definition equal to a fresh walk's.
+- **E3S3-39 INFO:** add the optional note to .148/19's measure column.
+- **Measure (Inc 2a E5-3, `../inc-2/E5-rulings.md` in the 2a worktree):** every timed case of Inc 3a times `names[1:]` inside one fresh walk, through a generator passed as `names`, and never as the difference of two walks. Restate the measure text of .148 and .150/arr-*.
+- **Gate:**
+  - After this correction, which is records-only and applies a fix the reviewer already executed on the model, **Inc 3a's E3 closes: PASS-WITH-NOTES by orchestrator ruling.**
+  - The census and range equality are taken from Inc 2a's E5 security review: 0 differences over the full corpus and 8,000 hostile tables (`../inc-2/E5-security.md` in the 2a worktree).
+  - Inc 3a's E4 waits for Inc 2a to merge into `batch-103`.
