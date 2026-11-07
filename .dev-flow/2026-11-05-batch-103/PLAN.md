@@ -175,6 +175,7 @@ Overlap with batch-101 that must not be fixed twice:
    - the 64 KiB bulk notice;
    - the TOCTOU note.
 5. A2L Explorer at 118 columns: hex rows wrap and the Length column is empty. This goes into Inc 7 if the chosen layout touches it.
+   - Inc 12 E3 (E3A-05, E3A-04): under a horizontal scroll the cell after Length is cut on its left with no mark (Raw `1792` shows as `92`; exists on `e07fb00` at the pane edge). Snap the scroll to column starts or mark a left-cut cell. Below about 100 columns, give the tags pane more width if the operator objects to shortened names that read alike at AT-B103-I12-2.
 6. CachyOS: remove the s19_app pip install from conda `base` (needs the operator's OK).
 7. A probe damaged the operator's recent-files store on 2026-11-05.
    - The incident was disclosed and cleaned.
