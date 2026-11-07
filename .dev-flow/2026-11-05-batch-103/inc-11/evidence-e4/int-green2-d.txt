@@ -1,0 +1,70 @@
+=== (d) timed tests, one at a time (-m serial_timing) ===
+--- uptime BEFORE ---
+ 14:05:33 up 2 days,  5:37,  3 users,  load average: 2.63, 2.04, 1.58
+/home/javiergr/work/b103-int11/s19_app/__init__.py
+=== tester perf file: test_b103_a2l_reader_perf.py (READ.52) ===
+FFFFFFF.                                                                 [100%]
+=================================== FAILURES ===================================
+________________________ test_r_a2l_read_52_case06_time ________________________
+tests/test_b103_a2l_reader_perf.py:158: in test_r_a2l_read_52_case06_time
+    assert elapsed < report_margin("R-A2L-READ.52/1 case_06 time", elapsed, timing_bound(bound)), elapsed
+E   AssertionError: 11.925383815017994
+E   assert 11.925383815017994 < 8.847
+E    +  where 8.847 = report_margin('R-A2L-READ.52/1 case_06 time', 11.925383815017994, 8.847)
+E    +    where 8.847 = timing_bound(8.847)
+______________________ test_r_a2l_read_52_software_a_time ______________________
+tests/test_b103_a2l_reader_perf.py:165: in test_r_a2l_read_52_software_a_time
+    assert elapsed < report_margin("R-A2L-READ.52/1 software_a time", elapsed, timing_bound(bound)), elapsed
+E   AssertionError: 1.3990087270212825
+E   assert 1.3990087270212825 < 0.9795
+E    +  where 0.9795 = report_margin('R-A2L-READ.52/1 software_a time', 1.3990087270212825, 0.9795)
+E    +    where 0.9795 = timing_bound(0.9795)
+________________________ test_r_a2l_read_52_string_time ________________________
+tests/test_b103_a2l_reader_perf.py:172: in test_r_a2l_read_52_string_time
+    assert elapsed < report_margin("R-A2L-READ.52/2 string time", elapsed, timing_bound(bound)), elapsed
+E   AssertionError: 0.5061897030100226
+E   assert 0.5061897030100226 < 0.11249999999999999
+E    +  where 0.11249999999999999 = report_margin('R-A2L-READ.52/2 string time', 0.5061897030100226, 0.11249999999999999)
+E    +    where 0.11249999999999999 = timing_bound(0.11249999999999999)
+_______________________ test_r_a2l_read_52_case06_memory _______________________
+tests/test_b103_a2l_reader_perf.py:179: in test_r_a2l_read_52_case06_memory
+    assert peak < report_margin("R-A2L-READ.52/1 case_06 peak RSS", peak, timing_bound(bound)), peak
+E   AssertionError: 6427.51953125
+E   assert 6427.51953125 < 1070.0
+E    +  where 1070.0 = report_margin('R-A2L-READ.52/1 case_06 peak RSS', 6427.51953125, 1070.0)
+E    +    where 1070.0 = timing_bound(1070.0)
+_____________________ test_r_a2l_read_52_software_a_memory _____________________
+tests/test_b103_a2l_reader_perf.py:186: in test_r_a2l_read_52_software_a_memory
+    assert peak < report_margin("R-A2L-READ.52/1 software_a peak RSS", peak, timing_bound(bound)), peak
+E   AssertionError: 6427.51953125
+E   assert 6427.51953125 < 190.0
+E    +  where 190.0 = report_margin('R-A2L-READ.52/1 software_a peak RSS', 6427.51953125, 190.0)
+E    +    where 190.0 = timing_bound(190.0)
+_______________________ test_r_a2l_read_52_string_memory _______________________
+tests/test_b103_a2l_reader_perf.py:193: in test_r_a2l_read_52_string_memory
+    assert peak < report_margin("R-A2L-READ.52/2 string peak RSS", peak, timing_bound(bound)), peak
+E   AssertionError: 6427.51953125
+E   assert 6427.51953125 < 141.8
+E    +  where 141.8 = report_margin('R-A2L-READ.52/2 string peak RSS', 6427.51953125, 141.8)
+E    +    where 141.8 = timing_bound(141.8)
+_______________________ test_r_a2l_read_52_words_memory ________________________
+tests/test_b103_a2l_reader_perf.py:200: in test_r_a2l_read_52_words_memory
+    assert peak < report_margin("R-A2L-READ.52/3 words peak RSS", peak, timing_bound(bound)), peak
+E   AssertionError: 6427.51953125
+E   assert 6427.51953125 < 228.0
+E    +  where 228.0 = report_margin('R-A2L-READ.52/3 words peak RSS', 6427.51953125, 228.0)
+E    +    where 228.0 = timing_bound(228.0)
+============================= QC-TM timing margins =============================
+LOW -4432.8%  6427.520 s / 141.800 s  R-A2L-READ.52/2 string peak RSS  tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_string_memory
+LOW -3282.9%  6427.520 s / 190.000 s  R-A2L-READ.52/1 software_a peak RSS  tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_software_a_memory
+LOW -2719.1%  6427.520 s / 228.000 s  R-A2L-READ.52/3 words peak RSS  tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_words_memory
+LOW -500.7%  6427.520 s / 1070.000 s  R-A2L-READ.52/1 case_06 peak RSS  tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_case06_memory
+LOW -349.9%  0.506 s / 0.112 s  R-A2L-READ.52/2 string time  tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_string_time
+LOW -42.8%  1.399 s / 0.980 s  R-A2L-READ.52/1 software_a time  tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_software_a_time
+LOW -34.8%  11.925 s / 8.847 s  R-A2L-READ.52/1 case_06 time  tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_case06_time
+QC-TM: 7 bounds, 7 under 20 % margin
+7 failed, 1 passed in 298.35s (0:04:58)
+READER_PERF_EXIT=1
+--- uptime AFTER ---
+ 14:10:32 up 2 days,  5:42,  2 users,  load average: 1.06, 1.56, 1.53
+PERF_DONE
