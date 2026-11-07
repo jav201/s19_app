@@ -1619,3 +1619,41 @@ def test_at_b103_i2_3_case08_builds_and_decodes_with_the_model(c08):
     from tests.test_b103_synth_definitions import CASE08_PIN_1MIB, case08_file_digests
 
     assert case08_file_digests(c08["dir"]) == CASE08_PIN_1MIB
+
+
+def test_r_a2l_def_149_5_cached_read_form_is_immutable(tmp_path):
+    """R-A2L-DEF.149 (E5 gap pass) - two objects sharing a method and a table decode as a fresh, uncached decode does.
+
+    A read form shared between objects must be immutable: touching what one object holds changes nothing for
+    the other, and describing the objects together equals describing each alone, in either order.
+    """
+    a2l = _inline(
+        tmp_path,
+        *_enum_blocks("CM_E", "VT_E", "2", '0 "off"', '1 "on"'),
+        _cm("CM_LIN", "LINEAR", "0.5", "2"),
+        _val("OBJ_A", "0x2000", LAYOUT["UBYTE"], "CM_E", "0", "1"),
+        _val("OBJ_B", "0x2001", LAYOUT["UBYTE"], "CM_E", "0", "1"),
+        _val("LIN_A", "0x2002", LAYOUT["UBYTE"], "CM_LIN", "0", "255"),
+        _val("LIN_B", "0x2003", LAYOUT["UBYTE"], "CM_LIN", "0", "255"),
+    )
+    fresh = {n: describe_definition(n, a2l) for n in ("OBJ_A", "OBJ_B", "LIN_A", "LIN_B")}
+    for order in (["OBJ_A", "OBJ_B", "LIN_A", "LIN_B"], ["LIN_B", "OBJ_B", "LIN_A", "OBJ_A"]):
+        together = describe_definitions(order, a2l)
+        assert {n: together[n] for n in fresh} == fresh
+    together = describe_definitions(list(fresh), a2l)
+    a, b = together["OBJ_A"], together["OBJ_B"]
+    assert [e.text for e in a.enum_entries] == ["off", "on"] and a.enum_entries == b.enum_entries
+    # nothing a shared form holds can be written through: tuples, frozen entries, frozen definitions
+    with pytest.raises((TypeError, AttributeError)):
+        a.enum_entries[0] = a.enum_entries[1]          # type: ignore[index]
+    with pytest.raises(AttributeError):
+        a.enum_entries[0].text = "changed"             # type: ignore[misc]
+    lin = together["LIN_A"]
+    assert isinstance(lin.coeffs_linear, tuple)
+    with pytest.raises((TypeError, AttributeError)):
+        lin.coeffs_linear[0] = 9.0                     # type: ignore[index]
+    with pytest.raises(AttributeError):
+        lin.unit = "changed"                           # type: ignore[misc]
+    # the second object, a new walk and the parsed payload see no change
+    assert together["OBJ_B"] == fresh["OBJ_B"] and together["LIN_B"] == fresh["LIN_B"]
+    assert describe_definitions(list(fresh), a2l) == together
