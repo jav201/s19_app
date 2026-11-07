@@ -6,7 +6,7 @@ Base `9ae92c3` (product tree `e07fb00`). Line numbers are as of `e07fb00`. Rows:
 
 | File | Functions | Rows |
 |---|---|---|
-| `s19_app/tui/a2l_definition.py` (Inc 2's new module; the one source file of this increment) | 19 new functions, 3 new frozen dataclasses, `Definition` gains 6 fields with defaults; 4 of Inc 2's functions changed (§2) | R-A2L-DEF.64 … .132, .140 … .146 (.116, .117 split into .1 and .2 at E3); cited R-A2L-DEF.5 … .7, .26, .58, .137, R-A2L-010, 011, 019, 024 … 027 |
+| `s19_app/tui/a2l_definition.py` (Inc 2's new module; the one source file of this increment) | 19 new functions, 3 new frozen dataclasses, `Definition` gains 6 fields with defaults; 4 of Inc 2's functions changed (§2) | R-A2L-DEF.64 … .132, .140 … .147 (.116, .117 split into .1 and .2 at E3; .147 at E3 round 2); cited R-A2L-DEF.5 … .7, .26, .58, .137, R-A2L-010, 011, 019, 024 … 027 |
 | `tools/synth/make_release_case.py` (test-data tooling, not counted toward the source cap: PLAN D6) | 1 new function; 2 of Inc 2's new functions changed (§4) | R-A2L-DEF.133 … .135; cited .59, .63 |
 | `s19_app/tui/a2l.py` and every other source file | **unchanged** (`a2l.py` frozen; private helpers reused, §3) | — |
 
@@ -100,6 +100,10 @@ Amendment A2 (`../PLAN.md`) splits the increment as it splits Inc 2. **3a**, the
   - **#10 `_check_module_alignment`** reports an unreadable MOD_COMMON ALIGNMENT line (R-A2L-DEF.144, E3A-09).
   - **#8 `_read_record_layout`** refuses a float NO_AXIS_PTS datatype (.86) and a component line with extra words (.84/7).
   - **`_describe_one`**, Inc 2a's per-name function (`a2l_definition.py:324-572` at `82f5f8e5`), joins the changed 3a functions (E3A-04). It holds the kind branch to #5, the VALUE's R-A2L-DEF.145 check and the element count `None` of a kind `""` definition. `_conversion_fields` takes its `:406-430` and `:496-530`, with Inc 2a's tests as the guard and no 2a test edited for it.
+- The E3 round-2 correction (`E3-rulings.md`, "Round 2 rulings") changes eight contracts and adds no function (the counts below do not change):
+  - **#11 `_read_axis`** computes a FIX axis's first and last points exactly from its parameters and refuses a magnitude above 2^53 or a shift that is not a whole number of at most 62 (R-A2L-DEF.147, E3S3-09, -10). **#13 `_fixed_points`** computes every point the same exact way, so the decode cannot overflow.
+  - **#1 `describe_definitions`** starts `reads`, a map keyed by section identity. **#8 `_read_record_layout`** (gains `maps`) and E2's **`_module_common`** (takes `maps`, gives the MOD_COMMON's read form) read each RECORD_LAYOUT and MOD_COMMON once per walk; **#10 `_check_module_alignment`** reads that form and no line (E3S3-11). #8 also gives `<word>` `(none)` for a missing datatype word (E3S3-08).
+  - **#5 `_describe_array`** and **`_describe_one`** give shape `()`, no element count and no byte length to a map with an axis not read and to a definition refused by .145 (E3A-24).
 
 | Side | Functions (§2 number, or added at E2) | Count |
 |---|---|---|
