@@ -40,7 +40,7 @@ ref_names = ['AAD_UTRQ.HWV_VIUF_C_PposBXIIFfkdGfiaJnbbPvb_DYAN_XVZ1_Ierxjr_Eud_Y
 E       AssertionError: peak 72794916 > 67108864
 E       assert 72794916 <= 67108864
 
-/home/javiergr/work/b103-int4/tests/test_b103_label_match_perf.py:290: AssertionError
+/home/<user>/work/b103-int4/tests/test_b103_label_match_perf.py:290: AssertionError
 ----------------------------- Captured stdout call -----------------------------
 tracemalloc peak 72794916 bytes (69.4 MiB)
 =========================== short test summary info ============================

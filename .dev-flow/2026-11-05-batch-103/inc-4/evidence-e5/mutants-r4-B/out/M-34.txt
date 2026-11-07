@@ -1,9 +1,9 @@
 === s19_app.__file__ ===
-/home/javiergr/mutr4B-work/s19_app/__init__.py
+/home/<user>/mutr4B-work/s19_app/__init__.py
 
 === DIFF base -> M-34 (s19_app/tui/services/label_match.py) ===
 --- /tmp/b103-e5-4-mutr4B/base/s19_app/tui/services/label_match.py	2026-11-07 01:32:51.000000000 -0600
-+++ /home/javiergr/mutr4B-work/s19_app/tui/services/label_match.py	2026-11-07 02:11:27.378566407 -0600
++++ /home/<user>/mutr4B-work/s19_app/tui/services/label_match.py	2026-11-07 02:11:27.378566407 -0600
 @@ -844,7 +844,7 @@
      """
      if not spans:

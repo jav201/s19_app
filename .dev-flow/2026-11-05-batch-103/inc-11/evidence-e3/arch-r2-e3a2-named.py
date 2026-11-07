@@ -1,5 +1,5 @@
 """Inc 11 E3 architect round 2 (batch-103): does the named-kind rule (R-A2L-READ.54, DE-3 as revised) give the
-e07fb00 line readers the name AND the content of a section whose /begin stands alone? Run on cachyos-rtx only.
+e07fb00 line readers the name AND the content of a section whose /begin stands alone? Run on <runner> only.
 
     python -I e3a2-named.py <repo> <files_dir> <manifest.tsv> <scratch>
 

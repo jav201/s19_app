@@ -43,7 +43,7 @@ E
 E         Left contains one more item: ('VALUE_0001', 'token', 0, ((0, 5), (6, 10)))
 E         Use -v to get more diff
 
-/home/javiergr/work/b103-int4/tests/test_b103_label_match.py:391: AssertionError
+/home/<user>/work/b103-int4/tests/test_b103_label_match.py:391: AssertionError
 =========================== short test summary info ============================
 FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.38/2]
 1 failed, 1 passed, 127 deselected in 4.87s

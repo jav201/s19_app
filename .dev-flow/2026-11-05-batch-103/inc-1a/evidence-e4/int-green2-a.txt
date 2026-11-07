@@ -1,4 +1,4 @@
-/home/javiergr/work/b103-int1a/s19_app/__init__.py
+/home/<user>/work/b103-int1a/s19_app/__init__.py
 ====RUN-A====
 ...............F........................................F......F........ [ 36%]
 ............ss.........................F............ssssssssssssssssssss [ 73%]
@@ -6,7 +6,7 @@ sssssssssssssssssssssssssssssssssssssssssssssssssssss                    [100%]
 =================================== FAILURES ===================================
 ____________ test_r_paste_34_4_right_click_paste_single_line_strips ____________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10009/test_r_paste_34_4_right_click_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10009/test_r_paste_34_4_right_click_0')
 
     def test_r_paste_34_4_right_click_paste_single_line_strips(tmp_path: Path) -> None:
         """R-PASTE.34/4 (LinuxH): a right-click paste strips as /1."""
@@ -123,7 +123,7 @@ E           textual.css.query.NoMatches: No nodes match '#a2l_tags_list' on Scre
 ../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/dom.py:1505: NoMatches
 ----------------------------- Captured stderr call -----------------------------
 ╭───────────────────── Traceback (most recent call last) ──────────────────────╮
-│ /home/javiergr/work/b103-int1a/s19_app/tui/app.py:20665 in _apply_filter     │
+│ /home/<user>/work/b103-int1a/s19_app/tui/app.py:20665 in _apply_filter     │
 │                                                                              │
 │   20662 │   │   def _apply_filter() -> None:                                 │
 │   20663 │   │   │   if expected_token != self._a2l_filter_debounce_token:    │
@@ -145,7 +145,7 @@ E           textual.css.query.NoMatches: No nodes match '#a2l_tags_list' on Scre
 │ │                  )                                    │                    │
 │ ╰───────────────────────────────────────────────────────╯                    │
 │                                                                              │
-│ /home/javiergr/work/b103-int1a/s19_app/tui/app.py:20217 in                   │
+│ /home/<user>/work/b103-int1a/s19_app/tui/app.py:20217 in                   │
 │ _refresh_a2l_filtered_tags                                                   │
 │                                                                              │
 │   20214 │   │   │   self._a2l_window_start = self._a2l_clamp_page_start(len( │
@@ -169,7 +169,7 @@ E           textual.css.query.NoMatches: No nodes match '#a2l_tags_list' on Scre
 │ │                   )                                    │                   │
 │ ╰────────────────────────────────────────────────────────╯                   │
 │                                                                              │
-│ /home/javiergr/work/b103-int1a/s19_app/tui/app.py:20330 in                   │
+│ /home/<user>/work/b103-int1a/s19_app/tui/app.py:20330 in                   │
 │ update_a2l_tags_view                                                         │
 │                                                                              │
 │   20327 │   │   │   │   - A2L tag paging and find actions                    │
@@ -200,7 +200,7 @@ WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipbo
 WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
 ___________ test_r_tui_043_12_3_warning_line_on_right_click_no_text ____________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10009/test_r_tui_043_12_3_warning_li0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10009/test_r_tui_043_12_3_warning_li0')
 
     def test_r_tui_043_12_3_warning_line_on_right_click_no_text(tmp_path: Path) -> None:
         """R-TUI-043.12/3 (LinuxH): ≥ 1 WARNING of os_clipboard_input per right-click."""
@@ -317,7 +317,7 @@ E           textual.css.query.NoMatches: No nodes match '#a2l_tags_list' on Scre
 ../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/dom.py:1505: NoMatches
 ----------------------------- Captured stderr call -----------------------------
 ╭───────────────────── Traceback (most recent call last) ──────────────────────╮
-│ /home/javiergr/work/b103-int1a/s19_app/tui/app.py:20665 in _apply_filter     │
+│ /home/<user>/work/b103-int1a/s19_app/tui/app.py:20665 in _apply_filter     │
 │                                                                              │
 │   20662 │   │   def _apply_filter() -> None:                                 │
 │   20663 │   │   │   if expected_token != self._a2l_filter_debounce_token:    │
@@ -339,7 +339,7 @@ E           textual.css.query.NoMatches: No nodes match '#a2l_tags_list' on Scre
 │ │                  )                                    │                    │
 │ ╰───────────────────────────────────────────────────────╯                    │
 │                                                                              │
-│ /home/javiergr/work/b103-int1a/s19_app/tui/app.py:20217 in                   │
+│ /home/<user>/work/b103-int1a/s19_app/tui/app.py:20217 in                   │
 │ _refresh_a2l_filtered_tags                                                   │
 │                                                                              │
 │   20214 │   │   │   self._a2l_window_start = self._a2l_clamp_page_start(len( │
@@ -363,7 +363,7 @@ E           textual.css.query.NoMatches: No nodes match '#a2l_tags_list' on Scre
 │ │                   )                                    │                   │
 │ ╰────────────────────────────────────────────────────────╯                   │
 │                                                                              │
-│ /home/javiergr/work/b103-int1a/s19_app/tui/app.py:20330 in                   │
+│ /home/<user>/work/b103-int1a/s19_app/tui/app.py:20330 in                   │
 │ update_a2l_tags_view                                                         │
 │                                                                              │
 │   20327 │   │   │   │   - A2L tag paging and find actions                    │
@@ -393,7 +393,7 @@ NoMatches: No nodes match '#a2l_tags_list' on Screen(id='_default')
 WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
 _ test_r_paste_31_3_4_linux_right_click_paste_ends_within_typed_key_time[single] _
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10009/test_r_paste_31_3_4_linux_righ0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10009/test_r_paste_31_3_4_linux_righ0')
 box_kind = 'a'
 
     @pytest.mark.serial_timing
@@ -526,7 +526,7 @@ E           textual.css.query.NoMatches: No nodes match '#a2l_tags_list' on Scre
 ../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/dom.py:1505: NoMatches
 ----------------------------- Captured stderr call -----------------------------
 ╭───────────────────── Traceback (most recent call last) ──────────────────────╮
-│ /home/javiergr/work/b103-int1a/s19_app/tui/app.py:20665 in _apply_filter     │
+│ /home/<user>/work/b103-int1a/s19_app/tui/app.py:20665 in _apply_filter     │
 │                                                                              │
 │   20662 │   │   def _apply_filter() -> None:                                 │
 │   20663 │   │   │   if expected_token != self._a2l_filter_debounce_token:    │
@@ -548,7 +548,7 @@ E           textual.css.query.NoMatches: No nodes match '#a2l_tags_list' on Scre
 │ │                  )                                    │                    │
 │ ╰───────────────────────────────────────────────────────╯                    │
 │                                                                              │
-│ /home/javiergr/work/b103-int1a/s19_app/tui/app.py:20217 in                   │
+│ /home/<user>/work/b103-int1a/s19_app/tui/app.py:20217 in                   │
 │ _refresh_a2l_filtered_tags                                                   │
 │                                                                              │
 │   20214 │   │   │   self._a2l_window_start = self._a2l_clamp_page_start(len( │
@@ -569,7 +569,7 @@ E           textual.css.query.NoMatches: No nodes match '#a2l_tags_list' on Scre
 │ │                   )                                                      │ │
 │ ╰──────────────────────────────────────────────────────────────────────────╯ │
 │                                                                              │
-│ /home/javiergr/work/b103-int1a/s19_app/tui/app.py:20330 in                   │
+│ /home/<user>/work/b103-int1a/s19_app/tui/app.py:20330 in                   │
 │ update_a2l_tags_view                                                         │
 │                                                                              │
 │   20327 │   │   │   │   - A2L tag paging and find actions                    │
@@ -606,7 +606,7 @@ WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipbo
 WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
 ___________ test_r_tui_044_1_walk_single_line_round_trip[workspace] ____________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10009/test_r_tui_044_1_walk_single_l0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10009/test_r_tui_044_1_walk_single_l0')
 place = ('workspace', '#search_input', False)
 
     @pytest.mark.parametrize(
@@ -669,24 +669,24 @@ WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipbo
 ERROR    asyncio:base_events.py:1785 unhandled exception during asyncio.run() shutdown
 task: <Task finished name='Task-239351' coro=<<async_generator_athrow without __name__>()> exception=ValueError("<Token var=<ContextVar name='active_message_pump' at 0x7fcab020a980> at 0x7fcaa6e76480> was created in a different Context")>
 Traceback (most recent call last):
-  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 2210, in run_test
+  File "/home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 2210, in run_test
     yield pilot
-  File "/home/javiergr/work/b103-int1a/tests/test_b103_clipboard_matrix.py", line 64, in _app_with
+  File "/home/<user>/work/b103-int1a/tests/test_b103_clipboard_matrix.py", line 64, in _app_with
     yield app, pilot
 asyncio.exceptions.CancelledError
 
 During handling of the above exception, another exception occurred:
 
 Traceback (most recent call last):
-  File "/home/javiergr/work/b103-int1a/tests/test_b103_clipboard_matrix.py", line 62, in _app_with
+  File "/home/<user>/work/b103-int1a/tests/test_b103_clipboard_matrix.py", line 62, in _app_with
     async with app.run_test(size=(160, 48)) as pilot:
-  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/contextlib.py", line 231, in __aexit__
+  File "/home/<user>/miniconda3/envs/s19ci/lib/python3.11/contextlib.py", line 231, in __aexit__
     await self.gen.athrow(typ, value, traceback)
-  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 2205, in run_test
+  File "/home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 2205, in run_test
     with app._context():
-  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/contextlib.py", line 158, in __exit__
+  File "/home/<user>/miniconda3/envs/s19ci/lib/python3.11/contextlib.py", line 158, in __exit__
     self.gen.throw(typ, value, traceback)
-  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 1107, in _context
+  File "/home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 1107, in _context
     active_message_pump.reset(message_pump_reset_token)
 ValueError: <Token var=<ContextVar name='active_message_pump' at 0x7fcab020a980> at 0x7fcaa6e76480> was created in a different Context
 ============================= QC-TM timing margins =============================

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """batch-103 Inc 4 E5 design-gap pass, round 2 (E5S-07, E5S-08, E5S-09). THROWAWAY EVIDENCE, NOT PRODUCT CODE.
 
-Runs on cachyos-rtx only (python -I -B), against the REAL module s19_app/tui/services/label_match.py
+Runs on <runner> only (python -I -B), against the REAL module s19_app/tui/services/label_match.py
 (sha256 394bf2f9...) of a COPY of the read-only integrated tree (env TREE). It loads the security
 round-2 probe (sec-r2-probe.py, same directory), which loads the round-1 probe, for the fixtures, the
 dense lists and the timing helpers.

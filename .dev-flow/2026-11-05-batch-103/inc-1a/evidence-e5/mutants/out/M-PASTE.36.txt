@@ -23,7 +23,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 ___ test_r_paste_36_1_redaction_gate_scans_batch_103_and_names_planted_leaks ___
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10046/test_r_paste_36_1_redaction_ga0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10046/test_r_paste_36_1_redaction_ga0')
 
     def test_r_paste_36_1_redaction_gate_scans_batch_103_and_names_planted_leaks(
         tmp_path: Path,
@@ -49,10 +49,10 @@ tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10046/test_r_paste_36_1_red
             shape / ".dev-flow" / "2026-11-01-batch-101",
             shape / ".dev-flow" / "2026-11-05-batch-103",
         ], roots
-E       AssertionError: [PosixPath('/tmp/pytest-of-javiergr/pytest-10046/test_r_paste_36_1_redaction_ga0/shape/.dev-flow/2026-11-01-batch-101')]
+E       AssertionError: [PosixPath('/tmp/pytest-of-<user>/pytest-10046/test_r_paste_36_1_redaction_ga0/shape/.dev-flow/2026-11-01-batch-101')]
 E       assert [PosixPath('/...1-batch-101')] == [PosixPath('/...5-batch-103')]
 E         
-E         Right contains one more item: PosixPath('/tmp/pytest-of-javiergr/pytest-10046/test_r_paste_36_1_redaction_ga0/shape/.dev-flow/2026-11-05-batch-103')
+E         Right contains one more item: PosixPath('/tmp/pytest-of-<user>/pytest-10046/test_r_paste_36_1_redaction_ga0/shape/.dev-flow/2026-11-05-batch-103')
 E         Use -v to get more diff
 
 tests/test_b103_clipboard_core.py:1956: AssertionError

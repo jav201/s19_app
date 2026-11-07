@@ -1,5 +1,5 @@
 """Inc 11 E3 architect (batch-103): how many parse errors does the graph's lexer contract give on a file that is not
-UTF-8 A2L text, and what do the base consumers of `errors` cost for that many? Run on cachyos-rtx only:
+UTF-8 A2L text, and what do the base consumers of `errors` cost for that many? Run on <runner> only:
 
     python -I e3a-flood.py <repo> <scratch>
 

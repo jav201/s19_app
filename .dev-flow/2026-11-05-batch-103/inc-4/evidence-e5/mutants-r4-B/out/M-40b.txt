@@ -1,9 +1,9 @@
 === s19_app.__file__ ===
-/home/javiergr/mutr4B-work/s19_app/__init__.py
+/home/<user>/mutr4B-work/s19_app/__init__.py
 
 === DIFF base -> M-40b (s19_app/tui/services/label_match.py) ===
 --- /tmp/b103-e5-4-mutr4B/base/s19_app/tui/services/label_match.py	2026-11-07 01:32:51.000000000 -0600
-+++ /home/javiergr/mutr4B-work/s19_app/tui/services/label_match.py	2026-11-07 03:00:53.969801196 -0600
++++ /home/<user>/mutr4B-work/s19_app/tui/services/label_match.py	2026-11-07 03:00:53.969801196 -0600
 @@ -53,7 +53,7 @@
  # ranking share this many trie node visits. The cap bounds how many walks run,
  # not what one walk visits; a walk that reaches the budget returns the runs it

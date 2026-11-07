@@ -9,7 +9,7 @@ contract shape, written here, importing nothing from s19_app in the candidate pa
   Q2  what does storing every section's own words (variant W) cost in memory against storing only the canonical
       lines plus their line numbers (variant L)?
 
-Usage (cachyos-rtx only):  python -I i11e2-pilot-time.py drive <repo> <runs>
+Usage (<runner> only):  python -I i11e2-pilot-time.py drive <repo> <runs>
                            python -I i11e2-pilot-time.py base|candW|candL <repo> <file>     (one run, JSON line)
 """
 from __future__ import annotations

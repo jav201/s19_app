@@ -15,7 +15,7 @@ walk costs exactly what the base tag walk costs. This script re-runs the three m
              the AXIS_DESCR capture as the graph writes it (the child's canonical lines through the lexer and _line_words).
 
 Model: new parse = cand tree + (base parse - base tree) - baseFront + candFront. Not product code, not a stub: a
-throwaway feasibility model run on cachyos-rtx only; the candidate path imports nothing from s19_app.
+throwaway feasibility model run on <runner> only; the candidate path imports nothing from s19_app.
 
 Usage: python -I e3a-time.py drive <repo> <runs> <file> [<file> ...]
        python -I e3a-time.py <mode> <repo> <file>          (one run, JSON on the last line)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """batch-103 Inc 4 E1: ranked lists of the two black-box cases AT-B103-I4-1 and -2.
 
-THROWAWAY EVIDENCE. Run on cachyos-rtx next to i4e1-pilot.py (v1); uses its
+THROWAWAY EVIDENCE. Run on <runner> next to i4e1-pilot.py (v1); uses its
 naive oracle. AT-1: a typing sequence over the case-08 names. AT-2: the
 operator's words (start, middle, end of a name, words, a typo) over the
 13,990 real-shape names of software_a.a2l.

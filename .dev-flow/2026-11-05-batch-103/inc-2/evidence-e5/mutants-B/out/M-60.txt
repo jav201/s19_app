@@ -19,7 +19,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 _____ test_r_a2l_def_60_1_the_definitions_case_has_an_enum_with_a_default ______
 
-defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...CHARACTERISTIC\n  /end MODULE\n/end PROJECT\n', 'dir': PosixPath('/tmp/pytest-of-javiergr/pytest-931/b103_defc0'), ...}
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA...CHARACTERISTIC\n  /end MODULE\n/end PROJECT\n', 'dir': PosixPath('/tmp/pytest-of-<user>/pytest-931/b103_defc0'), ...}
 
     def test_r_a2l_def_60_1_the_definitions_case_has_an_enum_with_a_default(defc):
         """R-A2L-DEF.60/1 - ENUM_0001: kind enum, >= 3 pairs, a DEFAULT_VALUE, decodes to the planned pair's text."""

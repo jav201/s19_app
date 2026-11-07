@@ -1,9 +1,9 @@
 set -e
-REAL=/home/javiergr
+REAL=/home/<user>
 B=/tmp/b103-e1-3
 PY=$REAL/miniconda3/envs/s19ci/bin/python
 CLONE=$REAL/work/s19_app
-export HOME=$B/home XDG_CONFIG_HOME=$B/home/.config XDG_DATA_HOME=$B/home/.local/share XDG_CACHE_HOME=$B/home/.cache LOCALAPPDATA=$B/home/local
+export HOME=$B/home XDG_CONFIG_HOME=$B/home/.config XDG_DATA_HOME=$B/home/.local/share XDG_CACHE_HOME=$B/home/.cache LOCALAPPDATA=$B/home/<local>
 unset DISPLAY
 cd $B
 SCRIPT=$1; shift

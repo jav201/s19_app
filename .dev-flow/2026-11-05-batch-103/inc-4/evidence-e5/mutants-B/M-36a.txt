@@ -33,7 +33,7 @@ E           assert 0.6348626890103333 <= 0.2
 E            +  where 0.2 = report_margin("R-A2L-MATCH.36 REF6 'm'", 0.6348626890103333, 0.2)
 E            +    where 0.2 = timing_bound(0.2)
 
-/home/javiergr/work/b103-int4/tests/test_b103_label_match_perf.py:276: AssertionError
+/home/<user>/work/b103-int4/tests/test_b103_label_match_perf.py:276: AssertionError
 ----------------------------- Captured stdout call -----------------------------
 host load before: 2.26 2.05 1.50
 host load after: 2.10 2.04 1.54

@@ -1,4 +1,4 @@
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
 === P2 hex (118, 54)
   loaded = ('hex', 'firmware.hex', 97, [(2147483648, 2147483681), (2147483712, 2147483776)])
   byte_before = 60

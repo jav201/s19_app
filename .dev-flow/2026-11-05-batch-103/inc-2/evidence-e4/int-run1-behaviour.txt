@@ -1,11 +1,11 @@
-/home/javiergr/work/b103-int2a/s19_app/__init__.py
+/home/<user>/work/b103-int2a/s19_app/__init__.py
  22:09:19 up 1 day, 13:41,  3 users,  load average: 1.07, 0.85, 0.83
 E        +  and   None = Definition(name='XL1', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None).display_format
 
 tests/test_b103_a2l_definition.py:734: AssertionError
 ________________ test_r_a2l_def_36_1_decimals_are_capped_at_17 _________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-565/test_r_a2l_def_36_1_decimals_a0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-565/test_r_a2l_def_36_1_decimals_a0')
 
     def test_r_a2l_def_36_1_decimals_are_capped_at_17(tmp_path):
         """R-A2L-DEF.36/1 - %.40 on 0.1 -> 17 decimals."""
@@ -20,7 +20,7 @@ E         ?                   ^
 tests/test_b103_a2l_definition.py:1007: AssertionError
 __________ test_r_a2l_def_58_2_6_a_5000_digit_decimals_run_is_capped ___________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-565/test_r_a2l_def_58_2_6_a_5000_d0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-565/test_r_a2l_def_58_2_6_a_5000_d0')
 
     def test_r_a2l_def_58_2_6_a_5000_digit_decimals_run_is_capped(tmp_path):
         """R-A2L-DEF.58.2/6 - %.<5000 digits> on 0.1 -> 17 decimals."""

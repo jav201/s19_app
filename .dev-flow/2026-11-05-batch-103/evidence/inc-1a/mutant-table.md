@@ -1,11 +1,11 @@
 # E5 mutant table — Inc 1a clipboard core (R-PASTE.1 … .36, R-TUI-043.6/.10, R-LOADDLG.20)
 
-Base: HEAD `e7d157f6`, read-only tree `/home/javiergr/work/b103-int1a` on cachyos-rtx, copied to
+Base: HEAD `e7d157f6`, read-only tree `/home/<user>/work/b103-int1a` on <runner>, copied to
 `/tmp/b103-e5-1a-mut/work`. Each mutant is the smallest edit to the product file the row's Negative
 control names, applied to the copy, reverted after the run (`git checkout`). Tests run with
-`/home/javiergr/miniconda3/envs/s19ci/bin/python -I -m pytest -q -p no:cacheprovider
+`/home/<user>/miniconda3/envs/s19ci/bin/python -I -m pytest -q -p no:cacheprovider
 tests/test_b103_clipboard_core.py -k "<ids>"` under an isolated HOME/XDG/LOCALAPPDATA
-(`zq_iso_user`), `PYTHONDONTWRITEBYTECODE=1`, `DISPLAY`/`WAYLAND_DISPLAY`/`CI` unset. Timing rows
+(`<user>`), `PYTHONDONTWRITEBYTECODE=1`, `DISPLAY`/`WAYLAND_DISPLAY`/`CI` unset. Timing rows
 (`serial_timing`) run one `-k` selector at a time, so they are serial by construction. Evidence
 (diff + pytest tail) in `evidence-e5/mutants/out/M-*.txt`. Rows whose tests live only in
 `tests/test_b103_clipboard_windows.py` (skip `Windows only`) are `not realisable (Windows CI pending)`.

@@ -1,4 +1,4 @@
-# scripts/sec-r3-p_r3_model.py tracked 2026-11-07T01:35:59-06:00 host cachyos-rtx clone e07fb00f status 0 changed; corpus files 168 (read-only); load 0.94 0.81 1.24
+# scripts/sec-r3-p_r3_model.py tracked 2026-11-07T01:35:59-06:00 host <runner> clone e07fb00f status 0 changed; corpus files 168 (read-only); load 0.94 0.81 1.24
 [CORP3] files=35 utf16_bom=0 tags=234654 with_address=224049 with_length=234418 own_words_max=22 refused={} exceptions=0 s=52
 [CORP3] 3 x ('byte_order_arg', 'ok')
 [CORP3] 20 x ('byte_order_arg_in_MOD_COMMON', 'ok')

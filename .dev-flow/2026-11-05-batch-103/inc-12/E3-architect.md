@@ -9,9 +9,9 @@ Batch 2026-11-05-batch-103, increment 12 (A2L tag table: no glued or cut values)
 **Toolkit read (textual 8.2.8, on the runner, text only):** `message_pump.py:785-800` (one of `_on_x` / `on_x` per class of the MRO), `app.py:4345-4356`, `:5018-5040` (the 1/120 s resize timer, `_check_resize`), `scroll_view.py:86-115` (a ScrollView's Resize only on a size or container-size change), `widgets/_data_table.py:915-930` (`update_cell_at`), `:1133-1134` (`DataTable._on_resize`), `:1195-1215` (cursor watcher: `call_after_refresh(_scroll_cursor_into_view)` while dimensions are pending), `:1365-1441` (widths: grow on new rows; `update_width=True` recomputes the column when a cell shrinks), `:1582-1609` (`clear`: cursor (0, 0), scroll 0), `:1870-1890` (`_on_idle`).
 
 **Run (executed):**
-- On this PC: the E2 caller census `codewire/evidence-e2/i12e2-callers.py` (Code-Wire `v3.1.0`) over throwaway `git archive` copies of `b101-inc10` (`aedeaddf`) and `main` (`569e4468`), in the session scratchpad. Each run had 86 files parsed and 0 parse failures. To reproduce: `python -I i12e2-callers.py <archive> C:\Users\jjgh8\Github\code-wire <out>`. The copies are deleted.
-- On cachyos-rtx (Python 3.11.18, textual 8.2.8, clone `e07fb00`, 0 changed files before and after every run; HOME/XDG/LOCALAPPDATA under `/tmp/b103-e3-12-A/zq_iso_user`; no DISPLAY, no clipboard, stdin closed): two `git archive e07fb00` copies, `base` and `design` (the E2 prototype written by `codewire/evidence-e2/i12e2-mkproto.py … design`, 88 changed lines, `py_compile` ok, as E2's setup). Probe `e3a12-order.py` (scenarios order, deep, drag, height, repaint10b, inplace, partial, find, dec20), census `e3a12-collide.py`, and pytest on both copies (§4).
-- Scripts and transcripts are in the session scratchpad, `C:\Users\jjgh8\AppData\Local\Temp\claude\107abb51e32da120\c57f44a4-8a42-42ee-9fb3-80f699575124\scratchpad\e3a12\` (`transcripts\`). They are review instruments, not committed evidence; the runner folder was deleted after the copy. Tags below: `[O <scenario>]` = `probe-design-<scenario>-transcript.txt`, `[C]` = `collide-base-transcript.txt`, `[T]` = the pytest transcripts.
+- On this PC: the E2 caller census `codewire/evidence-e2/i12e2-callers.py` (Code-Wire `v3.1.0`) over throwaway `git archive` copies of `b101-inc10` (`aedeaddf`) and `main` (`569e4468`), in the session scratchpad. Each run had 86 files parsed and 0 parse failures. To reproduce: `python -I i12e2-callers.py <archive> C:\Users\<user>\Github\code-wire <out>`. The copies are deleted.
+- On <runner> (Python 3.11.18, textual 8.2.8, clone `e07fb00`, 0 changed files before and after every run; HOME/XDG/LOCALAPPDATA under `/tmp/b103-e3-12-A/<user>`; no DISPLAY, no clipboard, stdin closed): two `git archive e07fb00` copies, `base` and `design` (the E2 prototype written by `codewire/evidence-e2/i12e2-mkproto.py … design`, 88 changed lines, `py_compile` ok, as E2's setup). Probe `e3a12-order.py` (scenarios order, deep, drag, height, repaint10b, inplace, partial, find, dec20), census `e3a12-collide.py`, and pytest on both copies (§4).
+- Scripts and transcripts are in the session scratchpad, `C:\Users\<user>\AppData\Local\Temp\claude\107abb51e32da120\c57f44a4-8a42-42ee-9fb3-80f699575124\scratchpad\e3a12\` (`transcripts\`). They are review instruments, not committed evidence; the runner folder was deleted after the copy. Tags below: `[O <scenario>]` = `probe-design-<scenario>-transcript.txt`, `[C]` = `collide-base-transcript.txt`, `[T]` = the pytest transcripts.
 
 ## Verdict: FAIL
 
@@ -79,7 +79,7 @@ Batch 2026-11-05-batch-103, increment 12 (A2L tag table: no glued or cut values)
 
 ## 4. Tests that read the tag table by position (E2-6)
 
-**Executed** on cachyos-rtx, `design` copy (`[T]` `pytest-design-pos-transcript.txt`, xdist `-n 6`). Files run: the five E2-6 files plus `tests/test_b101_inc11_acceptance.py`, `test_b100_session_reset.py::test_tc_b100_09_twelve_b_adds_exactly_the_quit_flag` (I-12.3) and `test_b100_focus.py::test_tc_b100_13_a2l_only_load_with_no_image`. Result: **16 failed, 36 passed**. The same 16 nodes on the `base` copy: **16 passed** (`pytest-base-pos16-transcript.txt`). So every failure is the design's: the new order or the padding.
+**Executed** on <runner>, `design` copy (`[T]` `pytest-design-pos-transcript.txt`, xdist `-n 6`). Files run: the five E2-6 files plus `tests/test_b101_inc11_acceptance.py`, `test_b100_session_reset.py::test_tc_b100_09_twelve_b_adds_exactly_the_quit_flag` (I-12.3) and `test_b100_focus.py::test_tc_b100_13_a2l_only_load_with_no_image`. Result: **16 failed, 36 passed**. The same 16 nodes on the `base` copy: **16 passed** (`pytest-base-pos16-transcript.txt`). So every failure is the design's: the new order or the padding.
 
 | File | RED on the design (green on base) | E2-6 reading |
 |---|---|---|
@@ -192,9 +192,9 @@ Batch 2026-11-05-batch-103, increment 12 (A2L tag table: no glued or cut values)
 - **Executed:** the caller census `i12e2-callers.py`, with three targets added (`_card_field`, `_repaint_a2l_tag_cells`, `_refresh_a2l_values_after_write`).
   - Tool: Code-Wire `v3.1.0`.
   - Input: throwaway `git archive` copies of `e07fb00` and `b101-inc10`, in the session scratchpad. Each run: 86 files, 0 parse failures.
-  - Transcripts: `C:\Users\jjgh8\AppData\Local\Temp\claude\107abb51e32da120\c57f44a4-8a42-42ee-9fb3-80f699575124\scratchpad\e3a12r2\census-{e07fb00,b101-inc10}-transcript.txt`. The copies are deleted.
+  - Transcripts: `C:\Users\<user>\AppData\Local\Temp\claude\107abb51e32da120\c57f44a4-8a42-42ee-9fb3-80f699575124\scratchpad\e3a12r2\census-{e07fb00,b101-inc10}-transcript.txt`. The copies are deleted.
 - **Executed:** Grep over the 35 tracked `.a2l`: 0 long identifiers spanning a line end, 0 TABs in quoted strings, 0 tag names with a non-ASCII character.
-- **`not-run`:** no probe on cachyos-rtx. Every claim rests on reading, the extractor or Grep, so no runner folder was made.
+- **`not-run`:** no probe on <runner>. Every claim rests on reading, the extractor or Grep, so no runner folder was made.
 
 **What would make this PASS-WITH-NOTES:** the ruling of E3A-11. E3A-12 … E3A-17 do not block.
 

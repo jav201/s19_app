@@ -22,7 +22,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 _____________ test_r_paste_3_copy_puts_selection_on_app_clipboard ______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10022/test_r_paste_3_copy_puts_selec0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10022/test_r_paste_3_copy_puts_selec0')
 
     def test_r_paste_3_copy_puts_selection_on_app_clipboard(tmp_path: Path) -> None:
         """R-PASTE.3/1-2 (LinuxH): Ctrl+C puts the selection on the app clipboard."""

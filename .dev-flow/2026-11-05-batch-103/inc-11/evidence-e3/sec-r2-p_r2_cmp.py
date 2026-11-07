@@ -6,11 +6,11 @@ the tag carries. Files are read as bytes, never copied."""
 import sys, hashlib, collections, runpy
 sys.argv = ["p_r2_model.py", "none"]
 M = runpy.run_path("/tmp/b103-e3r2-11-S/scripts/p_r2_model.py")
-sys.path.insert(0, "/home/javiergr/work/s19_app")
+sys.path.insert(0, "/home/<user>/work/s19_app")
 from pathlib import Path
 from s19_app.tui import a2l as A
 rel = collections.Counter(); seen = set()
-for f in sorted(Path("/home/javiergr/a2l-corpus/files").iterdir()):
+for f in sorted(Path("/home/<user>/a2l-corpus/files").iterdir()):
     raw = f.read_bytes(); sha = hashlib.sha256(raw).hexdigest()
     if sha in seen or raw[:2] in (b"\xff\xfe", b"\xfe\xff"):
         continue

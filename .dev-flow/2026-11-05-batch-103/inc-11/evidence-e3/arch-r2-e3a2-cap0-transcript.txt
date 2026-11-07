@@ -1,7 +1,7 @@
-# e3a2-cap transcript 2026-11-07T00:34:04-06:00 host cachyos-rtx
+# e3a2-cap transcript 2026-11-07T00:34:04-06:00 host <runner>
 # clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
-# HOME/XDG/LOCALAPPDATA under /tmp/b103-e3-11-A2/zq_iso_user; no DISPLAY; no clipboard; stdin closed; load: 5.72 3.53 2.15
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py | textual 8.2.8 | pad 1
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e3-11-A2/<user>; no DISPLAY; no clipboard; stdin closed; load: 5.72 3.53 2.15
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py | textual 8.2.8 | pad 1
 name length 48
 
 [P1 W220] table size=Size(width=108, height=30) visible=108 virtual=169 cell_padding=1 columns=16 total_render_width=169

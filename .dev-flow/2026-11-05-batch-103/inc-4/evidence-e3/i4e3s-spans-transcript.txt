@@ -1,7 +1,7 @@
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
 python = 3.11.18  PYTHONHASHSEED = None
-host = cachyos-rtx  load = (0.13330078125, 0.25244140625, 0.70458984375)  cpus = 16  RLIMIT_AS = 8 GiB
-HOME = /tmp/b103-e3-4-security/home  LOCALAPPDATA = /tmp/b103-e3-4-security/home/localappdata  PILOT_DIR = /tmp/b103-e3-4-security/pilot
+host = <runner>  load = (0.13330078125, 0.25244140625, 0.70458984375)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e3-4-security/home  LOCALAPPDATA = /tmp/b103-e3-4-security/home/<localappdata>  PILOT_DIR = /tmp/b103-e3-4-security/pilot
 queries 3077 x 3 limits; listed entries 21904; exceptions 0; spans outside the name, unsorted, touching or empty 0; IndexC != oracle 0; entries whose name is the very input object 21904
 names whose str.lower() changes their length (a span hazard the A-Z fold avoids): ['\u0130stanbul_MAP']
   rank('[b]') -> [('Map[b]x', 'substring', 0, [(3, 6)]), ('bell\x07x', 'token', 0, [(0, 1)]), ('A[/x]B', 'token', 0, [(5, 6)])]

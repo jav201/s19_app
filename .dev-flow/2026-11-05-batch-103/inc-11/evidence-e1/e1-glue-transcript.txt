@@ -1,5 +1,5 @@
-host=cachyos-rtx date=2026-11-06T21:53:54-06:00 clone=e07fb00f9fc13afd314d0334fac683fe33b29b6c changed=0
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+host=<runner> date=2026-11-06T21:53:54-06:00 clone=e07fb00f9fc13afd314d0334fac683fe33b29b6c changed=0
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
 [G0] baseline: the header on one body line: name='Synthetic map' address shown=0x1C2D3E00 length=4026 axis max points=['33', '61'] errors=[]
 [H2a] a block comment glued between the address word and digits: 0x1C2D3E00/*c*/4026: name='Synthetic map' address shown=0x1C2D3E004026 length=4026 axis max points=['33', '61'] errors=[]
 [H2b] a block comment from the address word to the next line, digits glued after */: name='Synthetic map' address shown=0x1C2D3E004026 length=4026 axis max points=['33', '61'] errors=[]

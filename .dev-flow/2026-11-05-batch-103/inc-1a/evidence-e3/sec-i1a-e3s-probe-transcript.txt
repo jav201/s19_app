@@ -1,6 +1,6 @@
 read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
 read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
 textual = 8.2.8 python = 3.11.18
 --- OsClipboardInput / terminal paste
   value repr: 'A\x1b]0;PWNED-TITLE\x07B\x1b]52;c;SElKQUNL\x07C\x00D\u202eE\x1b[5;31mBLINKF\u2066G'

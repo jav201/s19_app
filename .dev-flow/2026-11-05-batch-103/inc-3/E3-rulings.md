@@ -86,7 +86,7 @@ New findings:
 
 **Round-5 correction done** (Opus, 21 min). .148 is now 15/15; cases `.150/arr-1…9` and `.151/arr-1…6`; the completed rule is in the graph. Orchestrator rulings on what it reported:
 - **Echo cap 256, not 64.** This applies to R-A2L-DEF.151 and also to Inc 11's R-A2L-READ.66, one rule for both.
-  - Measured on cachyos-rtx over the public corpus plus `examples/` and `tests/`, read-only, derived counts only:
+  - Measured on <runner> over the public corpus plus `examples/` and `tests/`, read-only, derived counts only:
     - section names longer than 64 characters: 1,993, in 28 files;
     - longer than 128: 16;
     - longer than 256: 0;

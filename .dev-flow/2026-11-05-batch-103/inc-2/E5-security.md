@@ -10,10 +10,10 @@ The two MAJORs both have one-line fixes:
 
 **Scope.** The real code at HEAD `069171cd`, `git diff a2043cfd HEAD -- s19_app tools tests`. `a2l_definition.py` has md5 `820a4c3a` (code commit `6071a385`), and `a2l.py` is unchanged.
 
-**Runner.** Everything ran on cachyos-rtx, in `/tmp/b103-e5-2a-sec`, which is now deleted:
+**Runner.** Everything ran on <runner>, in `/tmp/b103-e5-2a-sec`, which is now deleted:
 - the tree was copied from `~/work/b103-int2a` (`e9bad3ca`);
 - Python 3.11.18, run with `-I -B`;
-- HOME, XDG and LOCALAPPDATA were set to `…/zq_iso_user`, and stdin was `/dev/null`.
+- HOME, XDG and LOCALAPPDATA were set to `…/<user>`, and stdin was `/dev/null`.
 
 **Negative controls.** These are the earlier versions of the module, taken read-only with `git show` as `a2l_definition_82f5` (md5 `f7fa38a5`) and `a2l_definition_f2f9` (md5 `eb750c6f`).
 
@@ -81,8 +81,8 @@ The two MAJORs both have one-line fixes:
 - Authority: `E5-rulings.md`, whole.
 
 **Runner.**
-- Everything ran on cachyos-rtx in `/tmp/b103-e5r2-2a-sec`, copied from `~/work/b103-int2a` (`26d3e309`, md5 checked). That scratch is now deleted, and no process of this review is left (`pgrep`).
-- Python 3.11.18 ran with `-I -B`. HOME, XDG_* and LOCALAPPDATA were set to `…/zq_iso_user`, and stdin was `/dev/null`.
+- Everything ran on <runner> in `/tmp/b103-e5r2-2a-sec`, copied from `~/work/b103-int2a` (`26d3e309`, md5 checked). That scratch is now deleted, and no process of this review is left (`pgrep`).
+- Python 3.11.18 ran with `-I -B`. HOME, XDG_* and LOCALAPPDATA were set to `…/<user>`, and stdin was `/dev/null`.
 - The controls were taken read-only with `git show` into the copy: `069171cd` (round 1's code, md5 `820a4c3a`), `82f5f8e5` (`f7fa38a5`) and `f2f955aa` (`eb750c6f`).
 - The corpus was read-only: 35 fixtures and 168 public files. Only derived counts left the runner, and home paths are written `~`.
 

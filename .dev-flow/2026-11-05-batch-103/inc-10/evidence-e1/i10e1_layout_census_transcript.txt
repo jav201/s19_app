@@ -1,4 +1,4 @@
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
 === SIZE (118, 54)
   screen (116, 52) status 'Apply: 1 applied, 0 skipped, 0 blocked'
   notices after apply []

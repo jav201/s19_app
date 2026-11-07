@@ -3,7 +3,7 @@ R-TUI-042a.3 applied by runtime wrappers in this process only; the e07fb00 clone
 length: a VALUE carrying LENGTH 2266, which the e07fb00 reader takes. Question: is the Length cell painted whole or
 not at all at 100 and 80 columns?"""
 import asyncio, pathlib, sys
-sys.path.insert(0, "/home/javiergr/work/s19_app")
+sys.path.insert(0, "/home/<user>/work/s19_app")
 from rich.cells import cell_len
 from rich.text import Text
 from s19_app.tui.app import S19TuiApp

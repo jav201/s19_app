@@ -4,8 +4,8 @@ label_match.__file__ = /tmp/b103-e5d2-4/tree/s19_app/tui/services/label_match.py
 label_match sha256 = 394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0
 tests module = /tmp/b103-e5d2-4/tree/tests/test_b103_label_match_perf.py
 mode = d2 examples N=20  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = -6815505074980682622
-host = cachyos-rtx  load = (2.23, 2.1, 2.3)  cpus = 16  RLIMIT_AS = 8 GiB
-HOME = /tmp/b103-e5d2-4/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5d2-4/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5d2-4/pilot
+host = <runner>  load = (2.23, 2.1, 2.3)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5d2-4/<user>  LOCALAPPDATA = /tmp/b103-e5d2-4/<user>/localappdata  PILOT_DIR = /tmp/b103-e5d2-4/pilot
 C08: 462 names from pilot/case08-names.txt (sha256 9a213d094842b504)
 
 _fuzzy_token_distances as runs (ids written as their tokens: first .. last, count, d) vs the shipped dict

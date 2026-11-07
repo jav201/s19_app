@@ -4,8 +4,8 @@ label_match.__file__ = /tmp/b103-e5-4-sec-r2/tree/s19_app/tui/services/label_mat
 label_match sha256 = 394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0
 tests module = /tmp/b103-e5-4-sec-r2/tree/tests/test_b103_label_match_perf.py
 mode = r2 band  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = -5450271984167729589
-host = cachyos-rtx  load = (5.99, 3.9, 2.71)  cpus = 16  RLIMIT_AS = 8 GiB
-HOME = /tmp/b103-e5-4-sec-r2/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5-4-sec-r2/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5-4-sec-r2/pilot
+host = <runner>  load = (5.99, 3.9, 2.71)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5-4-sec-r2/<user>  LOCALAPPDATA = /tmp/b103-e5-4-sec-r2/<user>/localappdata  PILOT_DIR = /tmp/b103-e5-4-sec-r2/pilot
 probe = sec-r2-probe.py sha256 97ba09572a2544759f9fe28d09e982244c15680c81b825065d58855a7e85cda9; round-1 helpers = sec-e5-probe.py sha256 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
 _FUZZY_SWITCH_CAP = 512
 BAND: 50,000 names, 2,279,697 characters in all (.40 scope: 50,000 names, <= 2,356,624)

@@ -22,7 +22,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 _______________ test_r_paste_8_no_selection_cut_cuts_cursor_line _______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10027/test_r_paste_8_no_selection_cu0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10027/test_r_paste_8_no_selection_cu0')
 
     def test_r_paste_8_no_selection_cut_cuts_cursor_line(tmp_path: Path) -> None:
         """R-PASTE.8/1 (LinuxH): a no-selection cut removes the cursor line."""

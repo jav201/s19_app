@@ -6,7 +6,7 @@ Usage: sec3-corpus2.py worker <file> | sec3-corpus2.py main <list file>
 import json, os, subprocess, sys
 from collections import Counter
 
-TREE = "/home/javiergr/work/b103-int2a"
+TREE = "/home/<user>/work/b103-int2a"
 
 
 def worker(path):

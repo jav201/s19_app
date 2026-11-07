@@ -4,8 +4,8 @@ label_match.__file__ = /tmp/b103-e5d3-4/tree/s19_app/tui/services/label_match.py
 label_match sha256 = 8f396c15d3c848ceb2c98ab74c112150bf9c09759abb662ea0f2162d1ca7c94d
 tests module = /tmp/b103-e5d3-4/tree/tests/test_b103_label_match_perf.py
 mode = d3 det  python = 3.11.18  PYTHONHASHSEED = random  hash('abc') = 2930958793547663900
-host = cachyos-rtx  load = (3.83, 2.96, 2.46)  cpus = 16  RLIMIT_AS = 8 GiB
-HOME = /tmp/b103-e5d3-4/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5d3-4/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5d3-4/pilot
+host = <runner>  load = (3.83, 2.96, 2.46)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5d3-4/<user>  LOCALAPPDATA = /tmp/b103-e5d3-4/<user>/localappdata  PILOT_DIR = /tmp/b103-e5d3-4/pilot
 probe = sec-r3-probe.py sha256 9cf292424ce8f1a335da4da39354d86b2b99bb480f5b41f0d387f608e52ceefa; round-1 helpers = sec-e5-probe.py sha256 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
 _FUZZY_TOKEN_CAP = 20; _FUZZY_SWITCH_CAP = 512; T.ANY_QUERY_BOUND_S = 2.0; T.KEYSTROKE_BOUND_S = 0.2
 d3 probe = d3-probe.py sha256 82b97c3fed7a935ec05ced6e176e15af34b806b6a9752e0326581c835ad93ff2; d3 pilot = d3-pilot.py sha256 825c53630deb68482d5b9f7ed8c77da5333e41947e3bc451c4560581b053a661; budget 400,000

@@ -36,7 +36,7 @@ E
 E         At index 0 diff: ('rpm_x', 'prefix', 0, ((0, 3),)) != ('RPMX', 'prefix', 0, ((0, 3),))
 E         Use -v to get more diff
 
-/home/javiergr/work/b103-int4/tests/test_b103_label_match.py:391: AssertionError
+/home/<user>/work/b103-int4/tests/test_b103_label_match.py:391: AssertionError
 ______________________ test_rows_23_1_shorter_name_first _______________________
 
 prep = <function prep.<locals>.get at 0x7f70f84f0f40>
@@ -51,7 +51,7 @@ E
 E         - MAP_0001
 E         + ASCII_0001)
 
-/home/javiergr/work/b103-int4/tests/test_b103_label_match.py:444: AssertionError
+/home/<user>/work/b103-int4/tests/test_b103_label_match.py:444: AssertionError
 =========================== short test summary info ============================
 FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.23/2]
 FAILED tests/test_b103_label_match.py::test_rows_23_1_shorter_name_first - As...

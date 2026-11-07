@@ -3,7 +3,7 @@
 # Marks go ONLY into a throwaway copy of s19_app/ (scratchpad), never into a worktree.
 # Usage: bash i1a-codewire-marks.sh <scratch dir> <repo root at e07fb00> <code-wire clone at v3.1.0>
 # Run on 2026-11-06 as these same commands, inline, with the scratch dir under the session scratchpad,
-# the repo root C:/Users/jjgh8/Github/s19_app-b103 and the clone C:/Users/jjgh8/Github/code-wire.
+# the repo root C:/Users/<user>/Github/s19_app-b103 and the clone C:/Users/<user>/Github/code-wire.
 set -euo pipefail
 S="$1"; SRC="$2"; CW="$3"
 rm -rf "$S"; mkdir -p "$S/repo" "$S/out"

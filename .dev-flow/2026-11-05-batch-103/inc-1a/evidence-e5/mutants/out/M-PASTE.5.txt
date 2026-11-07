@@ -64,7 +64,7 @@ WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:686 write_os_clipb
 WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:747 OS clipboard write failed; retained Textual internal clipboard only
 _____________ test_r_paste_5_no_selection_changes_no_clipboard[x] ______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10024/test_r_paste_5_no_selection_ch1')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10024/test_r_paste_5_no_selection_ch1')
 action = 'ctrl+x'
 
     @pytest.mark.parametrize("action", ["ctrl+c", "ctrl+x", "ctrl+x_multi"], ids=["c", "x", "x_multi"])

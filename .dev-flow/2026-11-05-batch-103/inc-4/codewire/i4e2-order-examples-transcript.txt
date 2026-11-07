@@ -1,5 +1,5 @@
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
-python = 3.11.18  host = cachyos-rtx
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+python = 3.11.18  host = <runner>
 
 === query, name -> folded (rule, key, spans) | case-sensitive (rule, key, spans) | case-exact | order key
   'value_000'        'VALUE_0001'                                     -> ('prefix', 0, [(0, 9)]) | None | case-exact False | order key (1, 0, 10, 1, 'VALUE_0001')

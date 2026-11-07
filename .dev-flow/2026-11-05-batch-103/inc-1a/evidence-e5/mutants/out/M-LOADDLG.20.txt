@@ -59,7 +59,7 @@ WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipbo
 WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
 ___________ test_r_loaddlg_20_3_right_click_path_box_refuses_unsafe ____________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10020/test_r_loaddlg_20_3_right_clic0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10020/test_r_loaddlg_20_3_right_clic0')
 
     def test_r_loaddlg_20_3_right_click_path_box_refuses_unsafe(tmp_path: Path) -> None:
         """R-LOADDLG.20/3 (LinuxH): a right-click paste with no selection refuses as /1."""

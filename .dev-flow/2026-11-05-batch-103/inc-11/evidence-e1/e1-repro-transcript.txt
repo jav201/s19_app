@@ -1,6 +1,6 @@
-host=cachyos-rtx date=2026-11-06T21:49:29-06:00 clone=e07fb00f9fc13afd314d0334fac683fe33b29b6c changed=0 HOME=/tmp/b103-e1-11/zq_iso_user
+host=<runner> date=2026-11-06T21:49:29-06:00 clone=e07fb00f9fc13afd314d0334fac683fe33b29b6c changed=0 HOME=/tmp/b103-e1-11/<user>
 A2L section tree has structural errors: path=/tmp/b103-e1-11/scratch/tmpj7ekhg8v/x.a2l sample=Line 36: /end without /begin
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
 python = 3.11.18 | mode = repro
 == [RP] reproduction matrix: line ends, blanks, encodings, comment adjacency (X = the object checked) ==
 [RP-base] LF reading: XM addr=0x1234 len=2 dt=UWORD bo=little desc=None; XC addr=0x2000 len=2 dt=None bo=big desc=None; XH addr=None len=None dt=None bo=big desc='one-line header'; XA addr=0x4000 len=8 dt=UWORD bo=big desc=None

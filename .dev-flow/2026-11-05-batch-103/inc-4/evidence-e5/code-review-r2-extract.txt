@@ -31,7 +31,7 @@ s19_app/tui/services/label_match.py:1163:# node: _fuzzy_token_distances
 # mark count: 18
 $ python -m py_compile <copy>/s19_app/tui/services/label_match.py <copy>/s19_app/tui/a2l.py
 rc=0
-$ python C:/Users/jjgh8/Github/code-wire/tools/codewire_extract.py --repo <copy> --graph <inc-4>/codewire/graph-inc4.md --out <scratch>/cw-r2/out
+$ python C:/Users/<user>/Github/code-wire/tools/codewire_extract.py --repo <copy> --graph <inc-4>/codewire/graph-inc4.md --out <scratch>/cw-r2/out
 marks=18 graph_nodes=18 calls=23 findings=0 parse_failures=0
 extract rc=0
 ===== <out>/diff-report.md =====
@@ -87,14 +87,14 @@ Top-level sites (no marked node above them):
 # ===== the script that produced this transcript (bash, Windows PC; sha256 ead54dbba277e041f0c61167d1203fb55a3b128df734b5a1aef8c2e5e3c516b8) =====
 #!/bin/bash
 # E5 code review round 2: extractor re-run on a throwaway copy (Windows PC, no s19_app import)
-WT="C:/Users/jjgh8/Github/s19_app-b103-inc4-code"
-S="C:/Users/jjgh8/AppData/Local/Temp/claude/107abb51e32da120/c57f44a4-8a42-42ee-9fb3-80f699575124/scratchpad/cw-r2"
+WT="C:/Users/<user>/Github/s19_app-b103-inc4-code"
+S="C:/Users/<user>/AppData/Local/Temp/claude/107abb51e32da120/c57f44a4-8a42-42ee-9fb3-80f699575124/scratchpad/cw-r2"
 INC="$WT/.dev-flow/2026-11-05-batch-103/inc-4"
 rm -rf "$S/tree" "$S/out"; mkdir -p "$S/tree" "$S/out"
 echo "# E5 code review round 2 - Code-Wire extractor re-run (inc-4, label_match.py)"
 echo "# date: $(date -u +%Y-%m-%dT%H:%M:%SZ)  host: Windows PC (extractor only; no s19_app import)"
 echo "# worktree HEAD: $(git -C "$WT" rev-parse HEAD)"
-echo "# code-wire: $(git -C C:/Users/jjgh8/Github/code-wire describe --tags --always 2>/dev/null) $(git -C C:/Users/jjgh8/Github/code-wire rev-parse --short HEAD)"
+echo "# code-wire: $(git -C C:/Users/<user>/Github/code-wire describe --tags --always 2>/dev/null) $(git -C C:/Users/<user>/Github/code-wire rev-parse --short HEAD)"
 echo '$ git -C <worktree> archive HEAD s19_app tests tools | tar x -C <scratch>/cw-r2/tree'
 git -C "$WT" archive HEAD s19_app tests tools | tar x -C "$S/tree"; echo "rc=$?"
 F="$S/tree/s19_app/tui/services/label_match.py"
@@ -117,8 +117,8 @@ grep -rn "# node:" "$S/tree/s19_app" | sed "s#$S/tree/##"
 echo "# mark count: $(grep -rn '# node:' "$S/tree/s19_app" | wc -l)"
 echo '$ python -m py_compile <copy>/s19_app/tui/services/label_match.py <copy>/s19_app/tui/a2l.py'
 python -m py_compile "$F" "$A"; echo "rc=$?"
-echo '$ python C:/Users/jjgh8/Github/code-wire/tools/codewire_extract.py --repo <copy> --graph <inc-4>/codewire/graph-inc4.md --out <scratch>/cw-r2/out'
-python C:/Users/jjgh8/Github/code-wire/tools/codewire_extract.py --repo "$S/tree" --graph "$INC/codewire/graph-inc4.md" --out "$S/out"
+echo '$ python C:/Users/<user>/Github/code-wire/tools/codewire_extract.py --repo <copy> --graph <inc-4>/codewire/graph-inc4.md --out <scratch>/cw-r2/out'
+python C:/Users/<user>/Github/code-wire/tools/codewire_extract.py --repo "$S/tree" --graph "$INC/codewire/graph-inc4.md" --out "$S/out"
 echo "extract rc=$?"
 echo "===== <out>/diff-report.md ====="
 cat "$S/out/diff-report.md"

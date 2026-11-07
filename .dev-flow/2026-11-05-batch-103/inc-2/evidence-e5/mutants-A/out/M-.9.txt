@@ -26,7 +26,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 ____________ test_r_a2l_def_9_1_length_not_the_datatypes_is_refused ____________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-949/test_r_a2l_def_9_1_length_not_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-949/test_r_a2l_def_9_1_length_not_0')
 
     def test_r_a2l_def_9_1_length_not_the_datatypes_is_refused(tmp_path):
         """R-A2L-DEF.9/1 - UWORD with LENGTH 4."""

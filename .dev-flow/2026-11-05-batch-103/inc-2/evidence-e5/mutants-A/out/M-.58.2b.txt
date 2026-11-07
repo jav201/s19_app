@@ -31,7 +31,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 ____ test_r_a2l_def_58_2_18_a_table_conversion_that_gives_a_text_is_refused ____
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-988/test_r_a2l_def_58_2_18_a_table0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-988/test_r_a2l_def_58_2_18_a_table0')
 
     def test_r_a2l_def_58_2_18_a_table_conversion_that_gives_a_text_is_refused(tmp_path):
         """R-A2L-DEF.58.2/18 (E3S3-28) - a VALUE whose TAB_NOINTP / TAB_INTP method names a COMPU_VTAB decodes to a refusal, not an exception."""

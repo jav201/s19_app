@@ -1,6 +1,6 @@
 # E5 gap pass 2 — Inc 2a code
 
-Worktree `C:\Users\jjgh8\Github\s19_app-b103-inc2a-code` (branch `b103-inc2a-code`).
+Worktree `C:\Users\<user>\Github\s19_app-b103-inc2a-code` (branch `b103-inc2a-code`).
 
 **Rules:** `.dev-flow/2026-11-05-batch-103/inc-2/E4-handoff-impl-2a.md`, sections 1, 3 (unit A: only `s19_app/tui/a2l_definition.py`), 4 and 5. **On this PC run only `python -m py_compile` and `codewire_extract.py`. Do not run pytest or any Python that imports or loads the module or `s19_app`.**
 

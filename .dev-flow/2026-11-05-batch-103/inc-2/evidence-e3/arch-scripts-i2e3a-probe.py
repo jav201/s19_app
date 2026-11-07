@@ -1,6 +1,6 @@
 """Inc 2 E3 architect probe (batch-103): facts the architect review cites, read from the base tree.
 
-Runs on the LAN host (cachyos-rtx) against the read-only clone at e07fb00. Imports ``s19_app`` from the
+Runs on the LAN host (<runner>) against the read-only clone at e07fb00. Imports ``s19_app`` from the
 clone and drives PURE functions only (parse, tokenizer, section walk, the reused conversion): no Textual
 app, no display, no clipboard, no write anywhere. It does not implement the definition model.
 

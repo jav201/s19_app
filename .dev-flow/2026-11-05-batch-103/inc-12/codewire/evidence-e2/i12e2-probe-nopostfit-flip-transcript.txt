@@ -1,6 +1,6 @@
-# probe nopostfit flip transcript 2026-11-07T01:57:00-06:00 host cachyos-rtx
+# probe nopostfit flip transcript 2026-11-07T01:57:00-06:00 host <runner>
 # clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
-# HOME/XDG/LOCALAPPDATA under /tmp/b103-e2-12/zq_iso_user; no DISPLAY; no clipboard; stdin closed; load: 1.03 1.56 1.89
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e2-12/<user>; no DISPLAY; no clipboard; stdin closed; load: 1.03 1.56 1.89
 s19_app.__file__ = /tmp/b103-e2-12/nopostfit/s19_app/__init__.py | textual 8.2.8 | variant nopostfit | scenario flip
 [nopostfit flip page1 (200 rows) 80x54] visible=36 vbar=True scroll_x=0/120 scroll_y=0 fixed_columns=2 padding=1 cols: Address=12, Length=8, Tag=38, Source=9 | w=12 | rows=200 cursor_row=0 | builds=3 fits=1 fit_rebuilds=1
 [nopostfit flip page1 (200 rows) 80x54] header|  Address     Length  Tag

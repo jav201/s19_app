@@ -1,4 +1,4 @@
-# i3e2-extract census transcript 2026-11-06T18:25:08-06:00 host cachyos-rtx
+# i3e2-extract census transcript 2026-11-06T18:25:08-06:00 host <runner>
 # copy: git archive e07fb00 s19_app tools/synth -> /tmp/b103-e2-3/copy-census (clone e07fb00f9fc13afd314d0334fac683fe33b29b6c, status 0 changed)
 # code-wire: code-wire v3.1.0 e436a08; codewire_extract.py sha256 78d54439f2c95b6e35f31f02b1ed9564b160774622c253624f78e155f23a8599; python Python 3.11.18
 marks written: 2044

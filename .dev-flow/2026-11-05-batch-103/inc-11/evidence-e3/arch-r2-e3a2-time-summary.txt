@@ -2,21 +2,21 @@
 [run 1] firmware.a2l {"mode": "baseFull", "s": 5.99, "tags": 220040, "errors": [], "maxrss_mb": 535.0}
 [run 1] firmware.a2l {"mode": "cand", "s": 3.429, "objects": 220040, "sections": 242103, "errors": [], "maxrss_mb": 388.4}
 [run 1] firmware.a2l {"mode": "cand3", "s": 3.477, "objects": 220040, "sections": 242103, "errors": [], "named_meta_filled": 0, "maxrss_mb": 388.4}
-[run 1] firmware.a2l {"mode": "baseFront", "front_s": 2.846, "objects": 220040, "a2l_file": "/home/javiergr/work/s19_app/s19_app/tui/a2l.py", "maxrss_mb": 256.5}
+[run 1] firmware.a2l {"mode": "baseFront", "front_s": 2.846, "objects": 220040, "a2l_file": "/home/<user>/work/s19_app/s19_app/tui/a2l.py", "maxrss_mb": 256.5}
 [run 1] firmware.a2l {"mode": "candFront", "front_s": 1.971, "objects": 220040, "maxrss_mb": 388.9}
 [run 1] firmware.a2l {"mode": "candFront2", "front_s": 5.375, "objects": 220040, "tag_errors_kept": 0, "tag_errors_dropped": 0, "maxrss_mb": 388.5}
 [run 2] firmware.a2l {"mode": "baseTree", "s": 1.903, "objects": 220040, "sections": 242103, "errors": [], "maxrss_mb": 255.9}
 [run 2] firmware.a2l {"mode": "baseFull", "s": 10.847, "tags": 220040, "errors": [], "maxrss_mb": 534.0}
 [run 2] firmware.a2l {"mode": "cand", "s": 3.509, "objects": 220040, "sections": 242103, "errors": [], "maxrss_mb": 388.8}
 [run 2] firmware.a2l {"mode": "cand3", "s": 3.615, "objects": 220040, "sections": 242103, "errors": [], "named_meta_filled": 0, "maxrss_mb": 389.0}
-[run 2] firmware.a2l {"mode": "baseFront", "front_s": 2.822, "objects": 220040, "a2l_file": "/home/javiergr/work/s19_app/s19_app/tui/a2l.py", "maxrss_mb": 257.1}
+[run 2] firmware.a2l {"mode": "baseFront", "front_s": 2.822, "objects": 220040, "a2l_file": "/home/<user>/work/s19_app/s19_app/tui/a2l.py", "maxrss_mb": 257.1}
 [run 2] firmware.a2l {"mode": "candFront", "front_s": 2.002, "objects": 220040, "maxrss_mb": 388.5}
 [run 2] firmware.a2l {"mode": "candFront2", "front_s": 5.294, "objects": 220040, "tag_errors_kept": 0, "tag_errors_dropped": 0, "maxrss_mb": 388.2}
 [run 3] firmware.a2l {"mode": "baseTree", "s": 1.828, "objects": 220040, "sections": 242103, "errors": [], "maxrss_mb": 256.4}
 [run 3] firmware.a2l {"mode": "baseFull", "s": 10.652, "tags": 220040, "errors": [], "maxrss_mb": 534.3}
 [run 3] firmware.a2l {"mode": "cand", "s": 3.503, "objects": 220040, "sections": 242103, "errors": [], "maxrss_mb": 388.5}
 [run 3] firmware.a2l {"mode": "cand3", "s": 3.578, "objects": 220040, "sections": 242103, "errors": [], "named_meta_filled": 0, "maxrss_mb": 388.9}
-[run 3] firmware.a2l {"mode": "baseFront", "front_s": 2.73, "objects": 220040, "a2l_file": "/home/javiergr/work/s19_app/s19_app/tui/a2l.py", "maxrss_mb": 257.0}
+[run 3] firmware.a2l {"mode": "baseFront", "front_s": 2.73, "objects": 220040, "a2l_file": "/home/<user>/work/s19_app/s19_app/tui/a2l.py", "maxrss_mb": 257.0}
 [run 3] firmware.a2l {"mode": "candFront", "front_s": 1.959, "objects": 220040, "maxrss_mb": 388.9}
 [run 3] firmware.a2l {"mode": "candFront2", "front_s": 2.612, "objects": 220040, "tag_errors_kept": 0, "tag_errors_dropped": 0, "maxrss_mb": 388.8}
 [median s] firmware.a2l: baseTree 1.828, baseFull 10.652, cand 3.503, baseFront 2.822, candFront 1.971
@@ -27,21 +27,21 @@
 [run 1] software_a.a2l {"mode": "baseFull", "s": 0.756, "tags": 13990, "errors": [], "maxrss_mb": 95.3}
 [run 1] software_a.a2l {"mode": "cand", "s": 0.311, "objects": 13990, "sections": 22866, "errors": [], "maxrss_mb": 56.6}
 [run 1] software_a.a2l {"mode": "cand3", "s": 0.32, "objects": 13990, "sections": 22866, "errors": [], "named_meta_filled": 3, "maxrss_mb": 56.4}
-[run 1] software_a.a2l {"mode": "baseFront", "front_s": 0.208, "objects": 13990, "a2l_file": "/home/javiergr/work/s19_app/s19_app/tui/a2l.py", "maxrss_mb": 73.0}
+[run 1] software_a.a2l {"mode": "baseFront", "front_s": 0.208, "objects": 13990, "a2l_file": "/home/<user>/work/s19_app/s19_app/tui/a2l.py", "maxrss_mb": 73.0}
 [run 1] software_a.a2l {"mode": "candFront", "front_s": 0.157, "objects": 13990, "maxrss_mb": 56.5}
 [run 1] software_a.a2l {"mode": "candFront2", "front_s": 0.192, "objects": 13990, "tag_errors_kept": 0, "tag_errors_dropped": 0, "maxrss_mb": 56.6}
 [run 2] software_a.a2l {"mode": "baseTree", "s": 0.076, "objects": 13990, "sections": 22866, "errors": [], "maxrss_mb": 72.9}
 [run 2] software_a.a2l {"mode": "baseFull", "s": 0.659, "tags": 13990, "errors": [], "maxrss_mb": 95.5}
 [run 2] software_a.a2l {"mode": "cand", "s": 0.311, "objects": 13990, "sections": 22866, "errors": [], "maxrss_mb": 56.5}
 [run 2] software_a.a2l {"mode": "cand3", "s": 0.323, "objects": 13990, "sections": 22866, "errors": [], "named_meta_filled": 3, "maxrss_mb": 56.7}
-[run 2] software_a.a2l {"mode": "baseFront", "front_s": 0.212, "objects": 13990, "a2l_file": "/home/javiergr/work/s19_app/s19_app/tui/a2l.py", "maxrss_mb": 72.9}
+[run 2] software_a.a2l {"mode": "baseFront", "front_s": 0.212, "objects": 13990, "a2l_file": "/home/<user>/work/s19_app/s19_app/tui/a2l.py", "maxrss_mb": 72.9}
 [run 2] software_a.a2l {"mode": "candFront", "front_s": 0.16, "objects": 13990, "maxrss_mb": 56.5}
 [run 2] software_a.a2l {"mode": "candFront2", "front_s": 0.199, "objects": 13990, "tag_errors_kept": 0, "tag_errors_dropped": 0, "maxrss_mb": 56.6}
 [run 3] software_a.a2l {"mode": "baseTree", "s": 0.074, "objects": 13990, "sections": 22866, "errors": [], "maxrss_mb": 72.8}
 [run 3] software_a.a2l {"mode": "baseFull", "s": 0.772, "tags": 13990, "errors": [], "maxrss_mb": 95.3}
 [run 3] software_a.a2l {"mode": "cand", "s": 0.308, "objects": 13990, "sections": 22866, "errors": [], "maxrss_mb": 56.6}
 [run 3] software_a.a2l {"mode": "cand3", "s": 0.316, "objects": 13990, "sections": 22866, "errors": [], "named_meta_filled": 3, "maxrss_mb": 56.6}
-[run 3] software_a.a2l {"mode": "baseFront", "front_s": 0.236, "objects": 13990, "a2l_file": "/home/javiergr/work/s19_app/s19_app/tui/a2l.py", "maxrss_mb": 73.2}
+[run 3] software_a.a2l {"mode": "baseFront", "front_s": 0.236, "objects": 13990, "a2l_file": "/home/<user>/work/s19_app/s19_app/tui/a2l.py", "maxrss_mb": 73.2}
 [run 3] software_a.a2l {"mode": "candFront", "front_s": 0.157, "objects": 13990, "maxrss_mb": 56.5}
 [run 3] software_a.a2l {"mode": "candFront2", "front_s": 0.188, "objects": 13990, "tag_errors_kept": 0, "tag_errors_dropped": 0, "maxrss_mb": 56.7}
 [median s] software_a.a2l: baseTree 0.074, baseFull 0.756, cand 0.311, baseFront 0.212, candFront 0.157
@@ -52,21 +52,21 @@
 [run 1] e3s14_string_200k.a2l {"mode": "baseFull", "s": 0.086, "tags": 1, "errors": [], "maxrss_mb": 72.1}
 [run 1] e3s14_string_200k.a2l {"mode": "cand", "s": 0.559, "objects": 1, "sections": 5, "errors": [], "maxrss_mb": 1416.5}
 [run 1] e3s14_string_200k.a2l {"mode": "cand3", "s": 0.558, "objects": 1, "sections": 5, "errors": [], "named_meta_filled": 0, "maxrss_mb": 1415.8}
-[run 1] e3s14_string_200k.a2l {"mode": "baseFront", "front_s": 0.0, "objects": 1, "a2l_file": "/home/javiergr/work/s19_app/s19_app/tui/a2l.py", "maxrss_mb": 72.2}
+[run 1] e3s14_string_200k.a2l {"mode": "baseFront", "front_s": 0.0, "objects": 1, "a2l_file": "/home/<user>/work/s19_app/s19_app/tui/a2l.py", "maxrss_mb": 72.2}
 [run 1] e3s14_string_200k.a2l {"mode": "candFront", "front_s": 0.0, "objects": 1, "maxrss_mb": 1416.0}
 [run 1] e3s14_string_200k.a2l {"mode": "candFront2", "front_s": 0.0, "objects": 1, "tag_errors_kept": 0, "tag_errors_dropped": 0, "maxrss_mb": 1419.3}
 [run 2] e3s14_string_200k.a2l {"mode": "baseTree", "s": 0.086, "objects": 1, "sections": 5, "errors": [], "maxrss_mb": 72.3}
 [run 2] e3s14_string_200k.a2l {"mode": "baseFull", "s": 0.087, "tags": 1, "errors": [], "maxrss_mb": 72.2}
 [run 2] e3s14_string_200k.a2l {"mode": "cand", "s": 0.55, "objects": 1, "sections": 5, "errors": [], "maxrss_mb": 1417.1}
 [run 2] e3s14_string_200k.a2l {"mode": "cand3", "s": 0.54, "objects": 1, "sections": 5, "errors": [], "named_meta_filled": 0, "maxrss_mb": 1415.6}
-[run 2] e3s14_string_200k.a2l {"mode": "baseFront", "front_s": 0.0, "objects": 1, "a2l_file": "/home/javiergr/work/s19_app/s19_app/tui/a2l.py", "maxrss_mb": 72.3}
+[run 2] e3s14_string_200k.a2l {"mode": "baseFront", "front_s": 0.0, "objects": 1, "a2l_file": "/home/<user>/work/s19_app/s19_app/tui/a2l.py", "maxrss_mb": 72.3}
 [run 2] e3s14_string_200k.a2l {"mode": "candFront", "front_s": 0.0, "objects": 1, "maxrss_mb": 1417.1}
 [run 2] e3s14_string_200k.a2l {"mode": "candFront2", "front_s": 0.0, "objects": 1, "tag_errors_kept": 0, "tag_errors_dropped": 0, "maxrss_mb": 1418.4}
 [run 3] e3s14_string_200k.a2l {"mode": "baseTree", "s": 0.088, "objects": 1, "sections": 5, "errors": [], "maxrss_mb": 72.3}
 [run 3] e3s14_string_200k.a2l {"mode": "baseFull", "s": 0.088, "tags": 1, "errors": [], "maxrss_mb": 72.3}
 [run 3] e3s14_string_200k.a2l {"mode": "cand", "s": 0.572, "objects": 1, "sections": 5, "errors": [], "maxrss_mb": 1416.5}
 [run 3] e3s14_string_200k.a2l {"mode": "cand3", "s": 0.584, "objects": 1, "sections": 5, "errors": [], "named_meta_filled": 0, "maxrss_mb": 1416.3}
-[run 3] e3s14_string_200k.a2l {"mode": "baseFront", "front_s": 0.0, "objects": 1, "a2l_file": "/home/javiergr/work/s19_app/s19_app/tui/a2l.py", "maxrss_mb": 72.2}
+[run 3] e3s14_string_200k.a2l {"mode": "baseFront", "front_s": 0.0, "objects": 1, "a2l_file": "/home/<user>/work/s19_app/s19_app/tui/a2l.py", "maxrss_mb": 72.2}
 [run 3] e3s14_string_200k.a2l {"mode": "candFront", "front_s": 0.0, "objects": 1, "maxrss_mb": 1414.7}
 [run 3] e3s14_string_200k.a2l {"mode": "candFront2", "front_s": 0.0, "objects": 1, "tag_errors_kept": 0, "tag_errors_dropped": 0, "maxrss_mb": 1417.6}
 [median s] e3s14_string_200k.a2l: baseTree 0.086, baseFull 0.087, cand 0.559, baseFront 0.0, candFront 0.0

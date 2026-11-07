@@ -1,4 +1,4 @@
-# i12e2-shorten transcript 2026-11-07T02:22:53-06:00 host cachyos-rtx; python Python 3.11.18
+# i12e2-shorten transcript 2026-11-07T02:22:53-06:00 host <runner>; python Python 3.11.18
 rich ?
 [shorten] len=44 cells=44 w=34 -> 'ASAM.C.ARRAY.SWO…IM_3_4.COLUMN_DIR' (34 cells)
 [shorten] len=44 cells=44 w=31 -> 'ASAM.C.ARRAY.SW…_3_4.COLUMN_DIR' (31 cells)

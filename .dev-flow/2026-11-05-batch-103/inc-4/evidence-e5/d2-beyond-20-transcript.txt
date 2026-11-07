@@ -4,8 +4,8 @@ label_match.__file__ = /tmp/b103-e5d2-4/tree/s19_app/tui/services/label_match.py
 label_match sha256 = 394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0
 tests module = /tmp/b103-e5d2-4/tree/tests/test_b103_label_match_perf.py
 mode = d2 beyond N=20  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = -2580387290645165551
-host = cachyos-rtx  load = (2.31, 2.14, 2.31)  cpus = 16  RLIMIT_AS = 8 GiB
-HOME = /tmp/b103-e5d2-4/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5d2-4/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5d2-4/pilot
+host = <runner>  load = (2.31, 2.14, 2.31)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5d2-4/<user>  LOCALAPPDATA = /tmp/b103-e5d2-4/<user>/localappdata  PILOT_DIR = /tmp/b103-e5d2-4/pilot
 shapes inside .40's scope (50,000 names, <= 2,356,624 characters, queries <= 256) whose cost does not depend on N
 
 === W16: 16-letter tokens within 2 substitutions of 'a' * 16, 60 per name: 50,000 names, 1,466,976 characters in all (.40 scope: 50,000 names, <= 2,356,624); 117,969 distinct tokens, 448,850 trie nodes; load (2.31, 2.14, 2.31)

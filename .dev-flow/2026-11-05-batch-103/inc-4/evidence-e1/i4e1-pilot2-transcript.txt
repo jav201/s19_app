@@ -1,7 +1,7 @@
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
 python = 3.11.18
-host = cachyos-rtx  load = (11.58349609375, 10.35400390625, 5.9970703125)  cpus = 16
-HOME = /tmp/b103-e1-4/home  LOCALAPPDATA = /tmp/b103-e1-4/home/localappdata
+host = <runner>  load = (11.58349609375, 10.35400390625, 5.9970703125)  cpus = 16
+HOME = /tmp/b103-e1-4/home  LOCALAPPDATA = /tmp/b103-e1-4/home/<localappdata>
 
 === 1. v2 index vs v1 naive oracle (same pool and queries as v1, seed 20261106)
   pool 944 names, 409 queries x 4 limits: mismatches = 0

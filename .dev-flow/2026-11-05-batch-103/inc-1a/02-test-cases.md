@@ -6,8 +6,8 @@ One case per coverage item `<requirement id>/<n>` of `01-requirements.md`, for i
 
 **Platforms.**
 - **WinCI** — the Windows job (`E1-rulings.md` D-6) on a GitHub-hosted runner. Every WinCI case first passes the isolation guard (R-PASTE.21) and is skipped by the probe rule when the probe fails (R-PASTE.22). **Blocked until** a branch is pushed (operator approval) and the probe passes.
-- **LinuxH** — cachyos-rtx headless or the `ubuntu-latest` CI job: `DISPLAY` and `WAYLAND_DISPLAY` unset (the test asserts it), no OS clipboard reachable. Runs now.
-- **LinuxX** — cachyos-rtx with a private Xvfb display started by the test session (`-nolisten tcp`, a private auth file) and `xclip`. **Blocked until** the operator installs `xorg-server-xvfb` and `xclip`.
+- **LinuxH** — <runner> headless or the `ubuntu-latest` CI job: `DISPLAY` and `WAYLAND_DISPLAY` unset (the test asserts it), no OS clipboard reachable. Runs now.
+- **LinuxX** — <runner> with a private Xvfb display started by the test session (`-nolisten tcp`, a private auth file) and `xclip`. **Blocked until** the operator installs `xorg-server-xvfb` and `xclip`.
 
 **Apps and boxes.**
 - **Real app** — `S19TuiApp(base_dir=<tmp>)` under `run_test(size=(160, 48))`; `LOCALAPPDATA` isolated by `tests/conftest.py`.

@@ -19,7 +19,7 @@ s19_app.__file__ = /tmp/b103-e5-2-mutB/M-M-59b/s19_app/__init__.py
 =================================== FAILURES ===================================
 _ test_r_a2l_def_59_4_every_seed_of_the_definitions_case_builds_and_decodes_to_its_plan _
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-930/test_r_a2l_def_59_4_every_seed0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-930/test_r_a2l_def_59_4_every_seed0')
 
     def test_r_a2l_def_59_4_every_seed_of_the_definitions_case_builds_and_decodes_to_its_plan(tmp_path):
         """R-A2L-DEF.59/4 (CR-6; E5 fix pass) - seeds 1 ... 5: the enum's planned text is the text the model decodes.

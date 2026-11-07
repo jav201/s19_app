@@ -25,18 +25,18 @@ During handling of the above exception, another exception occurred:
 Traceback (most recent call last):
   File "/tmp/b103-e5-1a-mut/work/tests/test_b103_clipboard_core.py", line 1072, in _one_box_app
     async with app.run_test(size=(80, 30)) as pilot:
-  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/contextlib.py", line 231, in __aexit__
+  File "/home/<user>/miniconda3/envs/s19ci/lib/python3.11/contextlib.py", line 231, in __aexit__
     await self.gen.athrow(typ, value, traceback)
-  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 2205, in run_test
+  File "/home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 2205, in run_test
     with app._context():
-  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/contextlib.py", line 158, in __exit__
+  File "/home/<user>/miniconda3/envs/s19ci/lib/python3.11/contextlib.py", line 158, in __exit__
     self.gen.throw(typ, value, traceback)
-  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 1107, in _context
+  File "/home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 1107, in _context
     active_message_pump.reset(message_pump_reset_token)
 ValueError: <Token var=<ContextVar name='active_message_pump' at 0x7f04312ee9d0> at 0x7f0430072500> was created in a different Context
 ___________ test_r_paste_30_2_unfocused_multi_line_pastes_at_cursor ____________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10037/test_r_paste_30_2_unfocused_mu0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10037/test_r_paste_30_2_unfocused_mu0')
 
     def test_r_paste_30_2_unfocused_multi_line_pastes_at_cursor(tmp_path: Path) -> None:
         """R-PASTE.30/2 (LinuxH): an unfocused Box 2 pastes all at its cursor."""
@@ -68,7 +68,7 @@ tests/test_b103_clipboard_core.py:2136: AssertionError
 ERROR    asyncio:base_events.py:1785 unhandled exception during asyncio.run() shutdown
 task: <Task finished name='Task-68' coro=<<async_generator_athrow without __name__>()> exception=ValueError("<Token var=<ContextVar name='active_message_pump' at 0x7f04312ee9d0> at 0x7f042ff0ac00> was created in a different Context")>
 Traceback (most recent call last):
-  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 2210, in run_test
+  File "/home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 2210, in run_test
     yield pilot
   File "/tmp/b103-e5-1a-mut/work/tests/test_b103_clipboard_core.py", line 1077, in _one_box_app
     yield app, pilot, widget
@@ -79,13 +79,13 @@ During handling of the above exception, another exception occurred:
 Traceback (most recent call last):
   File "/tmp/b103-e5-1a-mut/work/tests/test_b103_clipboard_core.py", line 1072, in _one_box_app
     async with app.run_test(size=(80, 30)) as pilot:
-  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/contextlib.py", line 231, in __aexit__
+  File "/home/<user>/miniconda3/envs/s19ci/lib/python3.11/contextlib.py", line 231, in __aexit__
     await self.gen.athrow(typ, value, traceback)
-  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 2205, in run_test
+  File "/home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 2205, in run_test
     with app._context():
-  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/contextlib.py", line 158, in __exit__
+  File "/home/<user>/miniconda3/envs/s19ci/lib/python3.11/contextlib.py", line 158, in __exit__
     self.gen.throw(typ, value, traceback)
-  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 1107, in _context
+  File "/home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 1107, in _context
     active_message_pump.reset(message_pump_reset_token)
 ValueError: <Token var=<ContextVar name='active_message_pump' at 0x7f04312ee9d0> at 0x7f042ff0ac00> was created in a different Context
 =========================== short test summary info ============================

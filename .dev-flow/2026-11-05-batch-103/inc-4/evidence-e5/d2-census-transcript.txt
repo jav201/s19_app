@@ -1,52 +1,52 @@
 runner d2-run.sh sha256 94e6d48eb8c2d94620ad6b3db9d0f17471ad14f3e16c44b00d9babce4534ccba; probe d2-probe.py sha256 c2e1f38d5b2e5528e2dea230e9db28ecd9d16b15863a02141cca5e43a4e4c414; sec-r2-probe.py ecda78d650657c1f9395592572e8091e60432d4e8328363807afa8eb2c772233; sec-e5-probe.py 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/fixtures/2.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/2.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/3.a2l sample=Line 936: /end without /begin
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/4.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/6.a2l sample=Line 20: /end without /begin
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/14.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/15.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/16.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/17.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/18.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/20.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/21.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/32.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/35.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/41.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/43.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/44.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/45.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/46.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/47.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/60.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/62.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/66.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/71.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/75.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/79.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/80.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/81.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/82.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/83.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/84.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/96.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/103.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/111.a2l sample=Line 4279: /end without /begin
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/112.a2l sample=Line 1546: /end without /begin
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/113.a2l sample=Line 3177: /end without /begin
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/114.a2l sample=Line 574: /end without /begin
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/124.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/125.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/126.a2l sample=Unclosed /begin sections detected.
-A2L section tree has structural errors: path=/home/javiergr/a2l-corpus/files/166.a2l sample=Line 11012: /end without /begin
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/fixtures/2.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/2.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/3.a2l sample=Line 936: /end without /begin
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/4.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/6.a2l sample=Line 20: /end without /begin
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/14.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/15.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/16.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/17.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/18.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/20.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/21.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/32.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/35.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/41.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/43.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/44.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/45.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/46.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/47.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/60.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/62.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/66.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/71.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/75.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/79.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/80.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/81.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/82.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/83.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/84.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/96.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/103.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/111.a2l sample=Line 4279: /end without /begin
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/112.a2l sample=Line 1546: /end without /begin
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/113.a2l sample=Line 3177: /end without /begin
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/114.a2l sample=Line 574: /end without /begin
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/124.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/125.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/126.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/166.a2l sample=Line 11012: /end without /begin
 s19_app.__file__ = /tmp/b103-e5d2-4/tree/s19_app/__init__.py
 label_match.__file__ = /tmp/b103-e5d2-4/tree/s19_app/tui/services/label_match.py
 label_match sha256 = 394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0
 tests module = /tmp/b103-e5d2-4/tree/tests/test_b103_label_match_perf.py
 mode = d2 census  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = -1121298340213713044
-host = cachyos-rtx  load = (1.97, 1.87, 1.67)  cpus = 16  RLIMIT_AS = 8 GiB
-HOME = /tmp/b103-e5d2-4/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5d2-4/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5d2-4/pilot
+host = <runner>  load = (1.97, 1.87, 1.67)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5d2-4/<user>  LOCALAPPDATA = /tmp/b103-e5d2-4/<user>/localappdata  PILOT_DIR = /tmp/b103-e5d2-4/pilot
 
 === fixtures (35 tracked): 35 distinct files of 35; 234,654 distinct names per file, summed; reader errors 0; names over 256 characters 0; no letter or digit 0; non-ASCII names 0
     distinct query tokens per name (as a query): max 36, median 3.0

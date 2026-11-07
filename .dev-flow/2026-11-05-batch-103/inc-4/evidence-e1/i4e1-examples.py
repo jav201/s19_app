@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """batch-103 Inc 4 E1: ranked lists of the curated cases of 02-test-cases.md.
 
-THROWAWAY EVIDENCE. Run on cachyos-rtx next to i4e1-pilot.py (v1), whose
+THROWAWAY EVIDENCE. Run on <runner> next to i4e1-pilot.py (v1), whose
 naive oracle (the proposed rules written directly) it loads with runpy. The
 expected results in 02-test-cases.md were derived from the rules by hand and
 then compared with this transcript; a difference is a defect of the rules'

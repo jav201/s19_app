@@ -1,6 +1,6 @@
-# probe design flipbar transcript 2026-11-07T02:01:29-06:00 host cachyos-rtx
+# probe design flipbar transcript 2026-11-07T02:01:29-06:00 host <runner>
 # clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
-# HOME/XDG/LOCALAPPDATA under /tmp/b103-e2-12/zq_iso_user; no DISPLAY; no clipboard; stdin closed; load: 1.03 2.00 2.08
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e2-12/<user>; no DISPLAY; no clipboard; stdin closed; load: 1.03 2.00 2.08
 s19_app.__file__ = /tmp/b103-e2-12/design/s19_app/__init__.py | textual 8.2.8 | variant design | scenario flipbar
 [design flipbar page1 (200 rows) 80x54] visible=36 vbar=True scroll_x=0/120 scroll_y=0 fixed_columns=2 padding=1 cols: Address=12, Length=8, Tag=38, Source=9 | w=12 | rows=200 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
 [design flipbar page1 (200 rows) 80x54] header|  Address     Length  Tag

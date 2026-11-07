@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """batch-103 Inc 4 E2: _classify (folded and case-sensitive) and _order_key values the graph quotes.
 
-THROWAWAY EVIDENCE, NOT PRODUCT CODE. Run on cachyos-rtx in PILOT_DIR next to
+THROWAWAY EVIDENCE, NOT PRODUCT CODE. Run on <runner> in PILOT_DIR next to
 the E1 pilots. Uses the E1 oracle's evaluate_b only: evaluate_b(q, name) is
 the graph's _classify on the folded query, evaluate_b(q, name, folded=False)
 its case-sensitive call; case-exact = the two give the same rule.

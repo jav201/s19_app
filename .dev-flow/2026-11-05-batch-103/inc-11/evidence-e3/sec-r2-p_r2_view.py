@@ -6,7 +6,7 @@ Synthetic VALUE tags whose names are N characters long. Question: with both rule
 Length cell) painted whole or not at all, at every width the product supports (R-TUI-042a.2 tests 220, 160, 118,
 100 and 80)?"""
 import asyncio, pathlib, sys
-sys.path.insert(0, "/home/javiergr/work/s19_app")
+sys.path.insert(0, "/home/<user>/work/s19_app")
 import s19_app, textual
 print("s19_app.__file__ =", s19_app.__file__, "| textual", textual.__version__)
 from rich.cells import cell_len

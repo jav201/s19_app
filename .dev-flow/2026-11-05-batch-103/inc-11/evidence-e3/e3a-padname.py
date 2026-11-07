@@ -1,5 +1,5 @@
 """Inc 11 E3 architect (batch-103): the A2L Explorer tag table at 5 widths with cell_padding 0 (e07fb00) and 1
-(R-TUI-042a.2 as changed), on the REAL app driven headless. Run on cachyos-rtx only:
+(R-TUI-042a.2 as changed), on the REAL app driven headless. Run on <runner> only:
 
     python -I e3a-pad.py <repo> <scratch> <pad>        pad = 0 | 1
 

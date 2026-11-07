@@ -1,4 +1,4 @@
-/home/javiergr/work/b103-inc1a-base/s19_app/__init__.py
+/home/<user>/work/b103-inc1a-base/s19_app/__init__.py
 F........FF..FFF.FFFFFF...FF..F..........FFFFFFFFFFFFFFFFFF.FFF...FF...F [ 41%]
 ..FFFFssFFsssssssssssssssssssssssssssssssssssssssssssssssssssssssF.F.FFF [ 82%]
 .F.FFF.F.FFF.F.FFFFFFFFF..FF...                                          [100%]

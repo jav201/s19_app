@@ -1,4 +1,4 @@
-/home/javiergr/work/b103-int2a/s19_app/__init__.py
+/home/<user>/work/b103-int2a/s19_app/__init__.py
  22:24:42 up 1 day, 13:56,  4 users,  load average: 2.78, 3.22, 2.66
 ============================= QC-TM timing margins =============================
 49.8%  0.201 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock

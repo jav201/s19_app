@@ -1,6 +1,6 @@
 """Inc 11 E3 architect round 2: of the corpus tags whose conversion word names a method, how many name a COMPU_METHOD
 that the file does not declare at all (REF's own words)? Compares with e3a2-named's residual 878 identity fallbacks on
-CANON2. Counts only. Run on cachyos-rtx only.
+CANON2. Counts only. Run on <runner> only.
 
     python -I e3a2-undeclared.py <scripts dir> <files_dir> <manifest.tsv>
 """

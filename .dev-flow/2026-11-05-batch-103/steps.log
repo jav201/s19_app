@@ -2,8 +2,8 @@
 2026-11-05T11:10:56-06:00 E0 ruling — clipboard partial resolved by copy→paste matrix; Linux runs on CachyOS (private Xvfb), Win32 layer in new windows-latest CI job (operator choice); nothing runs on main PC
 2026-11-05T11:10:56-06:00 E0 draft — PLAN.md: 9 increments (draft Inc 2 split in two by cap estimate); awaiting G1
 2026-11-05T11:27:55-06:00 G1 approved — Q1 apruebo (9 increments), Q2 WT captures on the main PC (isolated LOCALAPPDATA, no clipboard, close windows), Q3 accept app.py overlap with b101-inc3/inc7; verdict design/G1-e0-verdict.json
-2026-11-05T11:28:49-06:00 E0 done — test host = cachyos-rtx (javiergr@192.168.1.67): no Xvfb, no conda env, no clone yet
-2026-11-05T11:32:09-06:00 runner ready — cachyos-rtx env s19ci py3.11.18 tk8.6 textual 8.2.8 at main 9f9f6af; Xvfb/xclip missing (needs operator sudo pacman)
+2026-11-05T11:28:49-06:00 E0 done — test host = <runner> (<user>@<runner-ip>): no Xvfb, no conda env, no clone yet
+2026-11-05T11:32:09-06:00 runner ready — <runner> env s19ci py3.11.18 tk8.6 textual 8.2.8 at main 9f9f6af; Xvfb/xclip missing (needs operator sudo pacman)
 2026-11-05T11:32:09-06:00 E1 start — Inc 1, 2, 4 in parallel; model Opus (architect agents); outputs inc-N/01-requirements.md + design/E1-rulings-incN.md
 2026-11-05T11:40:57-06:00 PAUSED by operator — 'dejemos que el batch 101 termine'; E1 agents (Inc 1, 2, 4) stopped while still reading, no E1 files written; resume from E1 after batch-101 closes
 2026-11-06T15:32:42-06:00 RESUMED — operator approved amendment A1 (design/G1-amendment-A1.json): rebase, Inc 2-4 full cycle, Inc 1 split 1a/1b, no merge before v1.0.0; DeepSeek unthrottled; test scope = modified+new between increments, full suite at batch end only
@@ -37,9 +37,9 @@
 2026-11-06T18:53:03-06:00 E3 correction done — Inc 2: units A (rows: 67 active), B (cases: 243), C1 + C2 (graph: 41 nodes); deepseek-v4-pro via pi, exit 0 ×4; orchestrator fixed 5 thresholds unit B flagged (.4/.45/.46/.54/.55)
 2026-11-06T18:53:08-06:00 E3 start — Inc 1a architect + security; Opus 5.5
 2026-11-06T18:53:08-06:00 E3 round 2 start — Inc 2 architect + security (blocking findings + touched parts only); Opus 5.5
-2026-11-06T18:59:14-06:00 operator — new story US-103-06 (Patch Editor: apply visibly + export S19 16/32 bytes per line or Intel HEX); Inc 10 added to PLAN (W1, urgent); probe of today's path running (Sonnet, cachyos-rtx)
+2026-11-06T18:59:14-06:00 operator — new story US-103-06 (Patch Editor: apply visibly + export S19 16/32 bytes per line or Intel HEX); Inc 10 added to PLAN (W1, urgent); probe of today's path running (Sonnet, <runner>)
 2026-11-06T19:08:08-06:00 E3 round 2 done — Inc 2: architect PASS-WITH-NOTES (14 min), security FAIL (E3S-14 MAJOR, 12 min); rulings appended; round-2 correction (2 DeepSeek units) next, then security round 3
-2026-11-06T19:12:54-06:00 probe done — Patch Editor apply/save-back (Sonnet, cachyos-rtx): apply works; save-back prompt hidden inside the undisplayed JSON tab; format follows the source; design/pe-apply-probe.md; Inc 10 scope set in PLAN
+2026-11-06T19:12:54-06:00 probe done — Patch Editor apply/save-back (Sonnet, <runner>): apply works; save-back prompt hidden inside the undisplayed JSON tab; format follows the source; design/pe-apply-probe.md; Inc 10 scope set in PLAN
 2026-11-06T19:14:01-06:00 E3 done — Inc 1a: architect FAIL (3 MAJOR, 20 min), security FAIL (2 MAJOR, 18 min); all accepted, inc-1a/E3-rulings.md; I-1 re-pinned (Inc 1b adds os_clipboard_input.py)
 2026-11-06T19:14:41-06:00 E3 done — Inc 4: architect FAIL (2 MAJOR, 36 min), security FAIL (2 MAJOR, 20 min); all accepted, inc-4/E3-rulings.md; R-A2L-MATCH.38 (256-char cap)
 2026-11-06T19:15:13-06:00 E3 correction start — Inc 1a and Inc 4 (units R and G each, 4 in parallel); deepseek-v4-pro via pi
@@ -69,7 +69,7 @@
 2026-11-06T21:48:09-06:00 split — Inc 2 into 2a (50 rows / 181 cases / 32 nodes) and 2b (19 / 109 / 11) by Opus, 15 min; 2a E3 done by ruling (open findings are inherited reader defects → Inc 11); 2a to E4
 2026-11-06T21:48:58-06:00 E4 start — Inc 2a: DeepSeek implementer units A (a2l_definition.py) and B (synth) in worktree s19_app-b103-inc2a-code ∥ Sonnet tester in s19_app-b103-inc2a-tests
 2026-11-06T21:50:28-06:00 operator — field case: address shown with 4 extra hex digits appended (MAP with FIX_AXIS descriptions); sample not stored (operator's request); passed to Inc 11 E1 as primary reproduction target with 4 hypotheses (non-whitespace separator glued by a cleanup, comment/quote adjacency, shifted header words, viewer formatting)
-2026-11-06T22:05:11-06:00 operator — asked for a public A2L corpus to check our cases and parsing are complete; launched (Sonnet): gh search code + raw downloads to cachyos-rtx ~/a2l-corpus (untrusted, outside repos), manifest with licenses, shape census, current-reader anomaly scan; only derived data comes back to design/a2l-corpus/, no third-party files committed
+2026-11-06T22:05:11-06:00 operator — asked for a public A2L corpus to check our cases and parsing are complete; launched (Sonnet): gh search code + raw downloads to <runner> ~/a2l-corpus (untrusted, outside repos), manifest with licenses, shape census, current-reader anomaly scan; only derived data comes back to design/a2l-corpus/, no third-party files committed
 2026-11-06T22:10:40-06:00 E1 done — Inc 11 (Opus, 95 min): 60 rows (51 new R-A2L-READ, 7 canon changed), 150 cases + 3 AT; operator's symptom reproduced as a view defect (cell_padding=0 glues Address+Length); reader glue on comment/underscore; D-1..D-12 accepted
 2026-11-06T22:10:40-06:00 rebase done — Inc 3 (Opus, 21 min): split 3a 61/179/29, 3b 11/36/4 (+ .140); coverage pass before 3a's E3
 2026-11-06T22:31:59-06:00 corpus done (Sonnet, 26 min): 168 public A2L files (158 unique, 255,734 objects, 65 repos; licenses mixed — only derived data in design/a2l-corpus/); current reader anomalies at scale: 137,243 objects named UNKNOWN (header split across lines), 121,299 MEASUREMENT datatype None, 805 wrong addresses, 729 ECU_ADDRESS mid-line lost, 657 kinds misread, 17,000 CHARACTERISTIC lengths None; field case: 51 MAP/CURVE would show exactly 4 extra digits under the padding glue
@@ -92,4 +92,4 @@
 2026-11-07T01:55:25-06:00 E3 round-4 correction done — Inc 3a (Opus): .148 scaling row (ratio on the per-object part, accepted); security round 5 next
 2026-11-07T02:08:27-06:00 Inc 11 addenda done (79 rows); ruling: READ.52 1.5× time holds on the largest files (C-level line regex lexer); Inc 11 E4 waits for Inc 2a's E5 and merge (it edits a2l_definition.py)
 2026-11-07T02:34:39-06:00 E2 done — Inc 12 (Opus, 62 min): 13 nodes; I-12.1 accepted; E2-4..7 to E3
-2026-11-07T02:34:39-06:00 runner — /tmp on cachyos-rtx is a 16 GB tmpfs and was 100 % full (superseded mutant copies ~8 GB); finished and superseded scratch dirs deleted (evidence already committed), running stages' dirs kept; 23 % used after
+2026-11-07T02:34:39-06:00 runner — /tmp on <runner> is a 16 GB tmpfs and was 100 % full (superseded mutant copies ~8 GB); finished and superseded scratch dirs deleted (evidence already committed), running stages' dirs kept; 23 % used after

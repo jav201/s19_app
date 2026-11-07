@@ -33,7 +33,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 ___________________ test_r_paste_4_copy_leaves_box_unchanged ___________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10023/test_r_paste_4_copy_leaves_box0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10023/test_r_paste_4_copy_leaves_box0')
 
     def test_r_paste_4_copy_leaves_box_unchanged(tmp_path: Path) -> None:
         """R-PASTE.4/1-2 (LinuxH): Ctrl+C leaves the box text unchanged."""

@@ -1,7 +1,7 @@
 # i2e1 id census — 2026-11-06T15:54:47-06:00; worktree HEAD 332f8ca3
 ## grep -c 'R-A2L-DEF' REQUIREMENTS.md docs/requirements/review/*.md
 (no file holds the id)
-## grep -rl 'R-A2L-DEF' C:/Users/jjgh8/Github/s19w/review/
+## grep -rl 'R-A2L-DEF' C:/Users/<user>/Github/s19w/review/
 (none)
 ## grep -rl 'R-A2L-DEF' .dev-flow/ (excluding this increment's folder)
 (none)

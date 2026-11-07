@@ -1,6 +1,6 @@
 """Inc 11 E3 architect round 2 (batch-103): the A2L Explorer tag table with cell_padding 1 (R-TUI-042a.2) AND the
 Tag-cell cap of R-TUI-042a.3 (a name wider than 34 cells shown as its first 16 cells, an ellipsis and its last 17
-cells), on the REAL app driven headless. Run on cachyos-rtx only:
+cells), on the REAL app driven headless. Run on <runner> only:
 
     python -I e3a2-cap.py <repo> <scratch> <pad> <name lengths csv> <widths csv> <cap 0|1>
 

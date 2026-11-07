@@ -1,6 +1,6 @@
-# probe full p64 transcript 2026-11-07T01:46:42-06:00 host cachyos-rtx
+# probe full p64 transcript 2026-11-07T01:46:42-06:00 host <runner>
 # clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
-# HOME/XDG/LOCALAPPDATA under /tmp/b103-e2-12/zq_iso_user; no DISPLAY; no clipboard; stdin closed; load: 2.12 2.51 1.97
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e2-12/<user>; no DISPLAY; no clipboard; stdin closed; load: 2.12 2.51 1.97
 s19_app.__file__ = /tmp/b103-e2-12/full/s19_app/__init__.py | textual 8.2.8 | variant full | scenario p64
 [full PAGE64(20) 80x54 unscrolled] visible=38 vbar=False scroll_x=0/109 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=24, Source=9 | w=9 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
 [full PAGE64(20) 80x54 unscrolled] header|  Address         Length   Tag

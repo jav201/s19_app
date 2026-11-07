@@ -21,7 +21,7 @@ index 7b4d1416..b3419b76 100644
 =================================== FAILURES ===================================
 _____________ test_r_a2l_def_7_2_3_length_above_one_mib_is_refused _____________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-947/test_r_a2l_def_7_2_3_length_ab0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-947/test_r_a2l_def_7_2_3_length_ab0')
 
     def test_r_a2l_def_7_2_3_length_above_one_mib_is_refused(tmp_path):
         """R-A2L-DEF.7.2/3 - NUMBER 1048577 (one past the bound)."""

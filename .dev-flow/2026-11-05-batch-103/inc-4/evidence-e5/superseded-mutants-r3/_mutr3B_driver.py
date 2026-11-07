@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""E5 mutant unit B (round 3) driver — runs on cachyos-rtx only.
+"""E5 mutant unit B (round 3) driver — runs on <runner> only.
 
 Copies /tmp/b103-e5-4-mutr3B/base to a per-mutant dir, applies the smallest
 edit that realises each row's Negative control, saves the unified diff and the
@@ -13,7 +13,7 @@ import sys
 BASE = "/tmp/b103-e5-4-mutr3B/base"
 OUT = "/tmp/b103-e5-4-mutr3B/out"
 PY = os.path.expanduser("~/miniconda3/envs/s19ci/bin/python")
-ISO = "/tmp/b103-e5-4-mutr3B/zq_iso_user"
+ISO = "/tmp/b103-e5-4-mutr3B/<user>"
 LABEL = "s19_app/tui/services/label_match.py"
 BEH = "tests/test_b103_label_match.py"
 PERF = "tests/test_b103_label_match_perf.py"

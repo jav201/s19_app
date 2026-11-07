@@ -1,6 +1,6 @@
 # E5 code review round 2 probe transcript (inc-4 label_match) - generated, not typed
 # runner code-review-r2-run.sh sha256 81ee47c78fa30819e0188f4f2ceffd9af2c0f799cb48dcaba1470d0457dddc9f; probe code-review-r2-probe.py sha256 54541bc78f154ddeaa6de70518bacd9d77b1d96e3a608a847478c7406d42a84d
-# host cachyos-rtx; HOME=/tmp/b103-e5r2-4-code/zq_iso_user; load before 16.94 17.92 16.21; nproc 16
+# host <runner>; HOME=/tmp/b103-e5r2-4-code/<user>; load before 16.94 17.92 16.21; nproc 16
 s19_app.__file__ = /tmp/b103-e5r2-4-code/tree/s19_app/__init__.py
 label_match.__file__ = /tmp/b103-e5r2-4-code/tree/s19_app/tui/services/label_match.py
 python 3.11.18 mode det PYTHONHASHSEED random

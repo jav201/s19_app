@@ -19,7 +19,7 @@ FF..                                                                     [100%]
 =================================== FAILURES ===================================
 ____________ test_r_a2l_def_37_1_no_format_gives_the_15_digit_text _____________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-983/test_r_a2l_def_37_1_no_format_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-983/test_r_a2l_def_37_1_no_format_0')
 
     def test_r_a2l_def_37_1_no_format_gives_the_15_digit_text(tmp_path):
         """R-A2L-DEF.37/1 - format word ``""``: 0.30000000000000004 -> ``0.3``."""
@@ -33,7 +33,7 @@ E         + 0.30000000000000004
 ../base/tests/test_b103_a2l_definition.py:1043: AssertionError
 _____________ test_r_a2l_def_37_2_percent_alone_gives_no_decimals ______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-983/test_r_a2l_def_37_2_percent_al0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-983/test_r_a2l_def_37_2_percent_al0')
 
     def test_r_a2l_def_37_2_percent_alone_gives_no_decimals(tmp_path):
         """R-A2L-DEF.37/2 - ``%`` on 1234567.0 -> ``1234567``."""

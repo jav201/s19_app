@@ -24,7 +24,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 ___________ test_r_paste_22_1_failed_probe_skips_os_clipboard_tests ____________
 
-pytester = <Pytester PosixPath('/tmp/pytest-of-javiergr/pytest-10044/test_r_paste_22_1_failed_probe_skips_os_clipboard_tests0')>
+pytester = <Pytester PosixPath('/tmp/pytest-of-<user>/pytest-10044/test_r_paste_22_1_failed_probe_skips_os_clipboard_tests0')>
 
     def test_r_paste_22_1_failed_probe_skips_os_clipboard_tests(pytester) -> None:
         """R-PASTE.22/1 (LinuxH): a failed probe skips with the exact reason."""
@@ -41,11 +41,11 @@ E         Use -v to get more diff
 
 /tmp/b103-e5-1a-mut/work/tests/test_b103_clipboard_core.py:1910: AssertionError
 ----------------------------- Captured stdout call -----------------------------
-running: /home/javiergr/miniconda3/envs/s19ci/bin/python -mpytest --basetemp=/tmp/pytest-of-javiergr/pytest-10044/test_r_paste_22_1_failed_probe_skips_os_clipboard_tests0/runpytest-0 -p no:cacheprovider -rs
-     in: /tmp/pytest-of-javiergr/pytest-10044/test_r_paste_22_1_failed_probe_skips_os_clipboard_tests0
+running: /home/<user>/miniconda3/envs/s19ci/bin/python -mpytest --basetemp=/tmp/pytest-of-<user>/pytest-10044/test_r_paste_22_1_failed_probe_skips_os_clipboard_tests0/runpytest-0 -p no:cacheprovider -rs
+     in: /tmp/pytest-of-<user>/pytest-10044/test_r_paste_22_1_failed_probe_skips_os_clipboard_tests0
 ============================= test session starts ==============================
 platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
-rootdir: /tmp/pytest-of-javiergr/pytest-10044/test_r_paste_22_1_failed_probe_skips_os_clipboard_tests0
+rootdir: /tmp/pytest-of-<user>/pytest-10044/test_r_paste_22_1_failed_probe_skips_os_clipboard_tests0
 plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
 collected 1 item
 

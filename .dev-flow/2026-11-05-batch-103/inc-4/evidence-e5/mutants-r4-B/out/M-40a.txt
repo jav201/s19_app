@@ -1,9 +1,9 @@
 === s19_app.__file__ ===
-/home/javiergr/mutr4B-work/s19_app/__init__.py
+/home/<user>/mutr4B-work/s19_app/__init__.py
 
 === DIFF base -> M-40a (s19_app/tui/services/label_match.py) ===
 --- /tmp/b103-e5-4-mutr4B/base/s19_app/tui/services/label_match.py	2026-11-07 01:32:51.000000000 -0600
-+++ /home/javiergr/mutr4B-work/s19_app/tui/services/label_match.py	2026-11-07 02:55:54.888423554 -0600
++++ /home/<user>/mutr4B-work/s19_app/tui/services/label_match.py	2026-11-07 02:55:54.888423554 -0600
 @@ -599,8 +599,6 @@
              not switched
              and candidates is not None

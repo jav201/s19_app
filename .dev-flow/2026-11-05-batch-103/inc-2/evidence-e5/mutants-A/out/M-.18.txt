@@ -42,7 +42,7 @@ WARNING  s19_app.tui.a2l:a2l.py:250 A2L section tree has structural errors: path
 _________________ test_r_a2l_def_18_3_a_24_bit_mask_on_a_ulong _________________
 
 softa = {'compu_methods_by_name': {'AFI_TU_FXBD_XMC_KKWP_MMV.DQXN_O_IJX_MSK_UimufsteUejnmysraz': {'coeffs': None, 'coeffs_line...jjVfzjGyvl', ...}, ...}, 'errors': [], 'path': '/tmp/b103-e5-2-mutA/M-.18/examples/case_00_public/software_a.a2l', ...}
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-960/test_r_a2l_def_18_3_a_24_bit_m0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-960/test_r_a2l_def_18_3_a_24_bit_m0')
 
     def test_r_a2l_def_18_3_a_24_bit_mask_on_a_ulong(softa, tmp_path):
         """R-A2L-DEF.18/3 - software_a (no address -> ADDRESS, not MASK) and INLINE ULONG."""

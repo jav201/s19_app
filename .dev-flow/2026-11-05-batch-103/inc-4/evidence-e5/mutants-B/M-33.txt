@@ -36,7 +36,7 @@ E
 E         At index 0 diff: ('Curve_Map_X', 'fuzzy', 0, ((0, 5), (6, 9))) != ('Curve_Map_X', 'fuzzy', 2, ((0, 5), (6, 9)))
 E         Use -v to get more diff
 
-/home/javiergr/work/b103-int4/tests/test_b103_label_match.py:391: AssertionError
+/home/<user>/work/b103-int4/tests/test_b103_label_match.py:391: AssertionError
 ________________________ test_rows_33_1_total_edits_one ________________________
 
 prep = <function prep.<locals>.get at 0x7f9e425b8f40>
@@ -50,7 +50,7 @@ E
 E         At index 0 diff: ('MEASUREMENT_0001', 0) != ('MEASUREMENT_0001', 1)
 E         Use -v to get more diff
 
-/home/javiergr/work/b103-int4/tests/test_b103_label_match.py:524: AssertionError
+/home/<user>/work/b103-int4/tests/test_b103_label_match.py:524: AssertionError
 =========================== short test summary info ============================
 FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.33/2]
 FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.33/3]

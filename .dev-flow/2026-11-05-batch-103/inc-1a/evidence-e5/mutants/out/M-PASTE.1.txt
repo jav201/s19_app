@@ -20,7 +20,7 @@ index ad2f7240..23dc5a05 100644
 # --- pytest (rc=1) ---
 40> was created in a different Context")>
 Traceback (most recent call last):
-  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 2210, in run_test
+  File "/home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 2210, in run_test
     yield pilot
   File "/tmp/b103-e5-1a-mut/work/tests/test_b103_clipboard_core.py", line 103, in _box_a
     yield app, pilot, widget
@@ -31,18 +31,18 @@ During handling of the above exception, another exception occurred:
 Traceback (most recent call last):
   File "/tmp/b103-e5-1a-mut/work/tests/test_b103_clipboard_core.py", line 95, in _box_a
     async with app.run_test(size=(160, 48)) as pilot:
-  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/contextlib.py", line 231, in __aexit__
+  File "/home/<user>/miniconda3/envs/s19ci/lib/python3.11/contextlib.py", line 231, in __aexit__
     await self.gen.athrow(typ, value, traceback)
-  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 2205, in run_test
+  File "/home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 2205, in run_test
     with app._context():
-  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/contextlib.py", line 158, in __exit__
+  File "/home/<user>/miniconda3/envs/s19ci/lib/python3.11/contextlib.py", line 158, in __exit__
     self.gen.throw(typ, value, traceback)
-  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 1107, in _context
+  File "/home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 1107, in _context
     active_message_pump.reset(message_pump_reset_token)
 ValueError: <Token var=<ContextVar name='active_message_pump' at 0x7fb2be002980> at 0x7fb2bce45f40> was created in a different Context
 ___________ test_r_paste_1_2_terminal_paste_first_line_non_codepage ____________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10016/test_r_paste_1_2_terminal_past0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10016/test_r_paste_1_2_terminal_past0')
 
     def test_r_paste_1_2_terminal_paste_first_line_non_codepage(tmp_path: Path) -> None:
         """R-PASTE.1/2 (LinuxH): the first line with emoji/CJK lands unchanged."""
@@ -65,7 +65,7 @@ tests/test_b103_clipboard_core.py:354: AssertionError
 ERROR    asyncio:base_events.py:1785 unhandled exception during asyncio.run() shutdown
 task: <Task finished name='Task-5116' coro=<<async_generator_athrow without __name__>()> exception=ValueError("<Token var=<ContextVar name='active_message_pump' at 0x7fb2be002980> at 0x7fb2bba26840> was created in a different Context")>
 Traceback (most recent call last):
-  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 2210, in run_test
+  File "/home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 2210, in run_test
     yield pilot
   File "/tmp/b103-e5-1a-mut/work/tests/test_b103_clipboard_core.py", line 103, in _box_a
     yield app, pilot, widget
@@ -76,13 +76,13 @@ During handling of the above exception, another exception occurred:
 Traceback (most recent call last):
   File "/tmp/b103-e5-1a-mut/work/tests/test_b103_clipboard_core.py", line 95, in _box_a
     async with app.run_test(size=(160, 48)) as pilot:
-  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/contextlib.py", line 231, in __aexit__
+  File "/home/<user>/miniconda3/envs/s19ci/lib/python3.11/contextlib.py", line 231, in __aexit__
     await self.gen.athrow(typ, value, traceback)
-  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 2205, in run_test
+  File "/home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 2205, in run_test
     with app._context():
-  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/contextlib.py", line 158, in __exit__
+  File "/home/<user>/miniconda3/envs/s19ci/lib/python3.11/contextlib.py", line 158, in __exit__
     self.gen.throw(typ, value, traceback)
-  File "/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 1107, in _context
+  File "/home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 1107, in _context
     active_message_pump.reset(message_pump_reset_token)
 ValueError: <Token var=<ContextVar name='active_message_pump' at 0x7fb2be002980> at 0x7fb2bba26840> was created in a different Context
 =========================== short test summary info ============================

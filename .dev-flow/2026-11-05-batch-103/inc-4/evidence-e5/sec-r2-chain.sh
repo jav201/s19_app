@@ -1,5 +1,5 @@
 #!/bin/bash
-# Round-2 chains on cachyos-rtx. usage: sec-r2-chain.sh timing|check
+# Round-2 chains on <runner>. usage: sec-r2-chain.sh timing|check
 # timing: the timing modes one after another (serial); check: correctness modes (exceptions, spans, oracle, seeds).
 cd /tmp/b103-e5-4-sec-r2 || exit 1
 if [ "$1" = timing ]; then

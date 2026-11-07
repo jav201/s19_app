@@ -1,4 +1,4 @@
-# host: cachyos-rtx | 2026-11-07T03:54:20-06:00 | load: 0.94 1.36 2.28
+# host: <runner> | 2026-11-07T03:54:20-06:00 | load: 0.94 1.36 2.28
 # a2l_definition.py md5: f7fa38a5fe312dcf21ac684ea153b9ca  s19_app/tui/a2l_definition.py
 /tmp/b103-e5gt/tree/s19_app/__init__.py
 # python Python 3.11.18
@@ -6,7 +6,7 @@ FFFFFFFF                                                                 [100%]
 =================================== FAILURES ===================================
 _______ test_r_a2l_def_149_1_shared_method_size_costs_nothing_per_object _______
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-845/test_r_a2l_def_149_1_shared_me0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-845/test_r_a2l_def_149_1_shared_me0')
 
     @pytest.mark.serial_timing
     def test_r_a2l_def_149_1_shared_method_size_costs_nothing_per_object(tmp_path):
@@ -16,7 +16,7 @@ tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-845/test_r_a2l_def_149_1_sh
 tests/test_b103_a2l_definition_perf.py:228: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-845/test_r_a2l_def_149_1_shared_me0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-845/test_r_a2l_def_149_1_shared_me0')
 case = 'method', label = '/1 COMPU_METHOD'
 
     def _absolute(tmp_path: Path, case: str, label: str) -> None:
@@ -38,7 +38,7 @@ E        +    where 0.5 = timing_bound(0.5)
 tests/test_b103_a2l_definition_perf.py:188: AssertionError
 _____ test_r_a2l_def_149_2_shared_enum_table_size_costs_nothing_per_object _____
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-845/test_r_a2l_def_149_2_shared_en0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-845/test_r_a2l_def_149_2_shared_en0')
 
     @pytest.mark.serial_timing
     def test_r_a2l_def_149_2_shared_enum_table_size_costs_nothing_per_object(tmp_path):
@@ -48,7 +48,7 @@ tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-845/test_r_a2l_def_149_2_sh
 tests/test_b103_a2l_definition_perf.py:234: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-845/test_r_a2l_def_149_2_shared_en0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-845/test_r_a2l_def_149_2_shared_en0')
 case = 'vtab', label = '/2 COMPU_VTAB'
 
     def _absolute(tmp_path: Path, case: str, label: str) -> None:
@@ -70,7 +70,7 @@ E        +    where 0.5 = timing_bound(0.5)
 tests/test_b103_a2l_definition_perf.py:188: AssertionError
 ____ test_r_a2l_def_149_3_shared_range_table_size_costs_nothing_per_object _____
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-845/test_r_a2l_def_149_3_shared_ra0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-845/test_r_a2l_def_149_3_shared_ra0')
 
     @pytest.mark.serial_timing
     def test_r_a2l_def_149_3_shared_range_table_size_costs_nothing_per_object(tmp_path):
@@ -80,7 +80,7 @@ tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-845/test_r_a2l_def_149_3_sh
 tests/test_b103_a2l_definition_perf.py:240: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-845/test_r_a2l_def_149_3_shared_ra0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-845/test_r_a2l_def_149_3_shared_ra0')
 case = 'range', label = '/3 COMPU_VTAB_RANGE'
 
     def _absolute(tmp_path: Path, case: str, label: str) -> None:
@@ -102,7 +102,7 @@ E        +    where 0.5 = timing_bound(0.5)
 tests/test_b103_a2l_definition_perf.py:188: AssertionError
 ____ test_r_a2l_def_149_4_shared_layout_first_line_costs_nothing_per_object ____
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-845/test_r_a2l_def_149_4_shared_la0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-845/test_r_a2l_def_149_4_shared_la0')
 
     @pytest.mark.serial_timing
     def test_r_a2l_def_149_4_shared_layout_first_line_costs_nothing_per_object(tmp_path):
@@ -112,7 +112,7 @@ tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-845/test_r_a2l_def_149_4_sh
 tests/test_b103_a2l_definition_perf.py:246: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-845/test_r_a2l_def_149_4_shared_la0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-845/test_r_a2l_def_149_4_shared_la0')
 case = 'layout', label = '/4 RECORD_LAYOUT'
 
     def _absolute(tmp_path: Path, case: str, label: str) -> None:
@@ -186,7 +186,7 @@ tests/test_b103_a2l_definition_perf.py:90: _Timeout
 
 During handling of the above exception, another exception occurred:
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-845/test_r_a2l_def_149_1_scaling_m0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-845/test_r_a2l_def_149_1_scaling_m0')
 
     @pytest.mark.serial_timing
     def test_r_a2l_def_149_1_scaling_method(tmp_path):
@@ -281,7 +281,7 @@ tests/test_b103_a2l_definition_perf.py:90: _Timeout
 
 During handling of the above exception, another exception occurred:
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-845/test_r_a2l_def_149_2_scaling_e0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-845/test_r_a2l_def_149_2_scaling_e0')
 
     @pytest.mark.serial_timing
     def test_r_a2l_def_149_2_scaling_enum_table(tmp_path):
@@ -373,7 +373,7 @@ tests/test_b103_a2l_definition_perf.py:90: _Timeout
 
 During handling of the above exception, another exception occurred:
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-845/test_r_a2l_def_149_3_scaling_r0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-845/test_r_a2l_def_149_3_scaling_r0')
 
     @pytest.mark.serial_timing
     def test_r_a2l_def_149_3_scaling_range_table(tmp_path):
@@ -416,7 +416,7 @@ E           Failed: R-A2L-DEF.149: a describe call timed out at 60 s (the shared
 tests/test_b103_a2l_definition_perf.py:101: Failed
 _____________________ test_r_a2l_def_149_4_scaling_layout ______________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-845/test_r_a2l_def_149_4_scaling_l0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-845/test_r_a2l_def_149_4_scaling_l0')
 
     @pytest.mark.serial_timing
     def test_r_a2l_def_149_4_scaling_layout(tmp_path):
@@ -426,7 +426,7 @@ tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-845/test_r_a2l_def_149_4_sc
 tests/test_b103_a2l_definition_perf.py:270: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-845/test_r_a2l_def_149_4_scaling_l0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-845/test_r_a2l_def_149_4_scaling_l0')
 case = 'layout', label = '/4 RECORD_LAYOUT'
 
     def _scaling(tmp_path: Path, case: str, label: str) -> None:

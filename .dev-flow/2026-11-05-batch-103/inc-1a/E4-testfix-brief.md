@@ -1,6 +1,6 @@
 # Inc 1a E4: test-fix pass (DeepSeek v4 Pro, tester role)
 
-Worktree `C:\Users\jjgh8\Github\s19_app-b103-inc1a-code` (branch `b103-inc1a-code`). The integration run found 53 + 3 failures, and its report classed each as a **test fault** (see `pi-1a-int` in `inc-1a/evidence-e4/int-green-*.txt` and below). Fix **only test files**. Never touch `s19_app/` or `.github/`. Your rules are those of `inc-1a/E4-handoff-tests-1a.md`; read it whole.
+Worktree `C:\Users\<user>\Github\s19_app-b103-inc1a-code` (branch `b103-inc1a-code`). The integration run found 53 + 3 failures, and its report classed each as a **test fault** (see `pi-1a-int` in `inc-1a/evidence-e4/int-green-*.txt` and below). Fix **only test files**. Never touch `s19_app/` or `.github/`. Your rules are those of `inc-1a/E4-handoff-tests-1a.md`; read it whole.
 
 Faults to fix:
 1. About 30 right-click, matrix and walk tests fail. The helper `right_click_app_route` calls `await app._process_messages()`, which re-composes and raises `MountError` or does nothing. Drive the app through the Pilot API instead (`pilot.click`, `pilot.pause`), as the repo's other TUI tests do.
@@ -12,7 +12,7 @@ Faults to fix:
    - In R-TST-002, `timing_bound` and `report_margin` must sit on one line, as `report_margin(timing_bound(...))`.
    - The redaction law (E3S-05) fails because the batch records still hold account paths. That is **expected until the pre-push redaction**. Leave it failing and mark it in the transcript. Do not weaken the law.
 
-Then re-run on cachyos-rtx in the existing tree `~/work/b103-int1a`:
+Then re-run on <runner> in the existing tree `~/work/b103-int1a`:
 - Update the tree with a bundle of the branch after your local edits. Commit your edits first: `batch-103 Inc 1a E4: test fixes after integration (DeepSeek tester)`, with a `Co-Authored-By: DeepSeek V4 Pro` line.
 - Run (a), (b) and (c) of `inc-1a/E4-integration-brief.md`, under `xvfb-run -a` with isolation.
 - Save the transcripts as `inc-1a/evidence-e4/int-green2-{a,b,laws}.txt` and commit them.

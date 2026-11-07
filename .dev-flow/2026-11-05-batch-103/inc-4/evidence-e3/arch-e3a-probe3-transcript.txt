@@ -1,6 +1,6 @@
 rc=0
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
-python = 3.11.18  host = cachyos-rtx
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+python = 3.11.18  host = <runner>
 === R-A2L-MATCH.37 two-structure mutants on REF (bound 67,108,864; 32 MiB = 33,554,432)
   M2+M3 dict trie + token tuples     peak   79,390,164 =  75.7 MiB -> RED at 64 MiB
   M1+M3 lists + token tuples         peak   91,418,020 =  87.2 MiB -> RED at 64 MiB

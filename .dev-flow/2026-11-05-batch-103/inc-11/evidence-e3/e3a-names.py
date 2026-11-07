@@ -1,4 +1,4 @@
-"""Inc 11 E3 architect (batch-103): where do section names stand? Run on cachyos-rtx only.
+"""Inc 11 E3 architect (batch-103): where do section names stand? Run on <runner> only.
 
     python -I e3a-names.py <repo> <files_dir> <manifest.tsv>
 

@@ -2,11 +2,11 @@
 e07fb00f batch-101: atlas regenerated after the increment-006 decision
 2026-11-06T20:19:38-06:00
  20:19:38 up 1 day, 11:51,  2 users,  load average: 0.00, 0.09, 0.87
-/home/javiergr/work/b103-inc4-base/s19_app/__init__.py
+/home/<user>/work/b103-inc4-base/s19_app/__init__.py
 
 ==================================== ERRORS ====================================
 _______________ ERROR collecting tests/test_b103_label_match.py ________________
-ImportError while importing test module '/home/javiergr/work/b103-inc4-base/tests/test_b103_label_match.py'.
+ImportError while importing test module '/home/<user>/work/b103-inc4-base/tests/test_b103_label_match.py'.
 Hint: make sure your test modules/packages have valid Python names.
 Traceback:
 ../../miniconda3/envs/s19ci/lib/python3.11/importlib/__init__.py:126: in import_module
@@ -16,7 +16,7 @@ tests/test_b103_label_match.py:42: in <module>
     from s19_app.tui.services.label_match import (
 E   ModuleNotFoundError: No module named 's19_app.tui.services.label_match'
 _____________ ERROR collecting tests/test_b103_label_match_perf.py _____________
-ImportError while importing test module '/home/javiergr/work/b103-inc4-base/tests/test_b103_label_match_perf.py'.
+ImportError while importing test module '/home/<user>/work/b103-inc4-base/tests/test_b103_label_match_perf.py'.
 Hint: make sure your test modules/packages have valid Python names.
 Traceback:
 ../../miniconda3/envs/s19ci/lib/python3.11/importlib/__init__.py:126: in import_module

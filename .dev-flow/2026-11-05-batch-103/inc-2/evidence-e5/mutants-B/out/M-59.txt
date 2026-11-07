@@ -19,7 +19,7 @@ FFF.                                                                     [100%]
 =================================== FAILURES ===================================
 ______________ test_r_a2l_def_59_1_case08_at_1_mib_equals_its_pin ______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-929/test_r_a2l_def_59_1_case08_at_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-929/test_r_a2l_def_59_1_case08_at_0')
 
     def test_r_a2l_def_59_1_case08_at_1_mib_equals_its_pin(tmp_path):
         """R-A2L-DEF.59/1 - seed 20260001, --size-mb 1, no case option: the 11 digests."""
@@ -39,7 +39,7 @@ E         ...Full output truncated (9 lines hidden), use '-vv' to show
 tests/test_b103_synth_definitions.py:126: AssertionError
 _____________ test_r_a2l_def_59_2_case08_at_10_mib_equals_its_pin ______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-929/test_r_a2l_def_59_2_case08_at_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-929/test_r_a2l_def_59_2_case08_at_0')
 
     @pytest.mark.slow
     def test_r_a2l_def_59_2_case08_at_10_mib_equals_its_pin(tmp_path):

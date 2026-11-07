@@ -30,7 +30,7 @@ index 7b4d1416..00f7f4fd 100644
 =================================== FAILURES ===================================
 _______________ test_r_a2l_def_24_2_address_comes_before_method ________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-966/test_r_a2l_def_24_2_address_co0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-966/test_r_a2l_def_24_2_address_co0')
 
     def test_r_a2l_def_24_2_address_comes_before_method(tmp_path):
         """R-A2L-DEF.24/2 - no address and an undeclared method: ADDRESS."""

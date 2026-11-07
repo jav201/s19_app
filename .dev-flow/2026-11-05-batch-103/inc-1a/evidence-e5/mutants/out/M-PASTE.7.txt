@@ -21,7 +21,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 _____________________ test_r_paste_7_cut_removes_selection _____________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10026/test_r_paste_7_cut_removes_sel0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10026/test_r_paste_7_cut_removes_sel0')
 
     def test_r_paste_7_cut_removes_selection(tmp_path: Path) -> None:
         """R-PASTE.7/1-2 (LinuxH): ``DE AD BE EF`` with ``DE AD`` selected → `` BE EF``."""

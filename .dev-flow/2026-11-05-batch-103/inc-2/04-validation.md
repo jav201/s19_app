@@ -2,7 +2,7 @@
 
 **Verdict: PASS-WITH-NOTES.** No MAJOR, HIGH or worse is open. All 216 2a cases are `covered` and `verified` on the final code. Code under test: `s19_app/tui/a2l_definition.py` and `tools/synth/make_release_case.py`, at the final fix pass (md5 `7bd4064983dbcefac4523b1792f1838e` / `82fba4c34fb9cad1888a30d06025a725`, as the final GREEN runs it). Written 2026-11-07.
 
-**Platform limit.** Every run below is on cachyos-rtx, Python 3.11.18, platform Linux. The perf bounds (R-A2L-DEF.136, .149, .150) are valid on that host only; Windows was not run.
+**Platform limit.** Every run below is on <runner>, Python 3.11.18, platform Linux. The perf bounds (R-A2L-DEF.136, .149, .150) are valid on that host only; Windows was not run.
 
 ## Runs (evidence copied into the batch evidence folder)
 
@@ -48,7 +48,7 @@ E3 (design) closed earlier: architect and security both FAIL in round 1, PASS-WI
 
 ## Not run
 
-- **Windows:** no run; the perf bounds are valid on cachyos-rtx only.
+- **Windows:** no run; the perf bounds are valid on <runner> only.
 - **Full test suite:** batch end.
 - **The 2b arms:** the 109 2b cases (encode, the write guards, the `.138` span index) and every encode arm of a mixed 2a case wait for Inc 11 and their own re-review.
 
@@ -75,7 +75,7 @@ Copies of the decisive transcripts, cited above by their path from this record s
 
 ## Trace check (orchestrator)
 
-**Run:** `evidence-e5/trace-check-transcript.txt`, executed on cachyos-rtx from a committed `--shared` clone at `0c499784`, with `--base e07fb00 --src s19_app tools`.
+**Run:** `evidence-e5/trace-check-transcript.txt`, executed on <runner> from a committed `--shared` clone at `0c499784`, with `--base e07fb00 --src s19_app tools`.
 
 **Result:** 1 US, 72 active requirements, 19 gaps.
 - **All 19 gaps are `TEST`, on exactly the 19 rows the "Split (amendment A2)" table assigns to 2b: R-A2L-DEF.40 … .57 and .138** (encode messages, write guards). This is by design: these rows are owed by Inc 2b, which waits for Inc 11.

@@ -1,4 +1,4 @@
-"""E5 code-review round-2 probe, inc-4 label_match (cachyos-rtx, a /tmp copy only).
+"""E5 code-review round-2 probe, inc-4 label_match (<runner>, a /tmp copy only).
 
 Mode `all` (Parts A-D), `det` (Part A only, prints the sha256 of its results) or `cd` (Parts C, D only).
 v2: Part C clamps a query token to 256 characters (R-A2L-MATCH.38: no query token longer than that

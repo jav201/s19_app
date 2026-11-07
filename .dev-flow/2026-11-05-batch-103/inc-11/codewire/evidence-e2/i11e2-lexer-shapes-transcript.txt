@@ -1,6 +1,6 @@
-# i11e2-pilot-time2 transcript 2026-11-06T22:22:36-06:00 host cachyos-rtx
+# i11e2-pilot-time2 transcript 2026-11-06T22:22:36-06:00 host <runner>
 # clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
-# HOME/XDG/LOCALAPPDATA under /tmp/b103-e2-11/zq_iso_user; no DISPLAY; no clipboard; stdin closed; load: 2.23 3.30 2.60
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e2-11/<user>; no DISPLAY; no clipboard; stdin closed; load: 2.23 3.30 2.60
 [READ.7/1] 'MAP 0x1C2D3E00/*c*/4026 RL 0 CM 0 1' -> [(1, 'MAP 0x1C2D3E00 4026 RL 0 CM 0 1')] errors=[]
 [READ.7/2] 'MAP 0x1C2D3E00/* old\n */4026 RL' -> [(1, 'MAP 0x1C2D3E00 4026 RL')] errors=[]
 [READ.2/2] 'ECU_ADDRESS\t0x1234\nECU_ADDRESS\x0b0x1234\nECU_ADDRESS\x0c0x1234' -> [(1, 'ECU_ADDRESS 0x1234'), (2, 'ECU_ADDRESS 0x1234'), (3, 'ECU_ADDRESS 0x1234')] errors=[]

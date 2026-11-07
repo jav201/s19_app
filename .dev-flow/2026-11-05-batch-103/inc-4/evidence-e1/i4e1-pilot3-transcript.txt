@@ -1,7 +1,7 @@
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
 python = 3.11.18
-host = cachyos-rtx  load = (3.18505859375, 6.6640625, 6.66259765625)  cpus = 16
-HOME = /tmp/b103-e1-4/home  LOCALAPPDATA = /tmp/b103-e1-4/home/localappdata
+host = <runner>  load = (3.18505859375, 6.6640625, 6.66259765625)  cpus = 16
+HOME = /tmp/b103-e1-4/home  LOCALAPPDATA = /tmp/b103-e1-4/home/<localappdata>
 names: case08 462  case08_issues 470  software_a 13990  software_b 67  BalanceTube 111  from_source 72
 
 === 1. examples of 02-test-cases.md under order B (naive oracle)

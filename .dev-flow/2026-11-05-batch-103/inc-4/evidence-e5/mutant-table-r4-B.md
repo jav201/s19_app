@@ -1,6 +1,6 @@
 # Mutant table round 4 — unit B (R-A2L-MATCH.21 … .43), code sha256 b97d19eb
 
-Run by DeepSeek's driver on cachyos-rtx (`mutants-r4-B/driver2.py`); pi timed out locally while the remote driver finished; table compiled by the orchestrator from the per-mutant transcripts in `mutants-r4-B/out/` (2026-11-07T03:05:30-06:00). A mutant is killed when at least one of its row's tests fails.
+Run by DeepSeek's driver on <runner> (`mutants-r4-B/driver2.py`); pi timed out locally while the remote driver finished; table compiled by the orchestrator from the per-mutant transcripts in `mutants-r4-B/out/` (2026-11-07T03:05:30-06:00). A mutant is killed when at least one of its row's tests fails.
 
 | Mutant | Result | Pytest tail |
 |---|---|---|

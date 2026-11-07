@@ -22,7 +22,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 _____________ test_r_paste_12_1_copy_over_limit_keeps_first_65536 ______________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10031/test_r_paste_12_1_copy_over_li0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10031/test_r_paste_12_1_copy_over_li0')
 
     def test_r_paste_12_1_copy_over_limit_keeps_first_65536(tmp_path: Path) -> None:
         """R-PASTE.12/1 (LinuxH): a 70,000-char copy → 65,536 in app + OSC 52."""

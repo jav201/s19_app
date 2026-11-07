@@ -45,7 +45,7 @@ E
 E         At index 0 diff: ('DiscouNTCount', 'substring', 0, ((8, 13),)) != ('DiscountCount', 'substring', 0, ((8, 13),))
 E         Use -v to get more diff
 
-/home/javiergr/work/b103-int4/tests/test_b103_label_match.py:391: AssertionError
+/home/<user>/work/b103-int4/tests/test_b103_label_match.py:391: AssertionError
 ___________ test_rows_24_1_case_exact_name_first_for_lowercase_query ___________
 
 prep = <function prep.<locals>.get at 0x7ff5f349cf40>
@@ -58,7 +58,7 @@ E
 E         - rpm
 E         + RPM
 
-/home/javiergr/work/b103-int4/tests/test_b103_label_match.py:452: AssertionError
+/home/<user>/work/b103-int4/tests/test_b103_label_match.py:452: AssertionError
 =========================== short test summary info ============================
 FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.24/4]
 FAILED tests/test_b103_label_match.py::test_rows_24_1_case_exact_name_first_for_lowercase_query

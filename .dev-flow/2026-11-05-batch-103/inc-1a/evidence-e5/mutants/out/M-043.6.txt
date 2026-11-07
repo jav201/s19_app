@@ -37,7 +37,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 _____________ test_r_tui_043_6_1_linux_ctrl_v_pastes_app_clipboard _____________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10015/test_r_tui_043_6_1_linux_ctrl_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10015/test_r_tui_043_6_1_linux_ctrl_0')
 
     def test_r_tui_043_6_1_linux_ctrl_v_pastes_app_clipboard(tmp_path: Path) -> None:
         """R-TUI-043.6/1 (LinuxH): Ctrl+V pastes the app clipboard, both classes."""

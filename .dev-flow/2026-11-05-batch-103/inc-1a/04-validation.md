@@ -2,7 +2,7 @@
 
 **Verdict: PASS-WITH-NOTES.** No MAJOR, HIGH or worse is open in the slice's product code. The one MEDIUM (SEC-1, the WinCI test fixture `_own_write` encoding a lone surrogate without `surrogatepass`) and the two LOWs (SEC-2, SEC-3) are resolved in the tests or routed to backlog. The final GREEN holds on all three arms: RUN-A 122 passed, 75 skipped; RUN-B 54 passed; laws 219 passed, 1 failed. The single law failure is the redaction gate, RED by design until the pre-push sweep. 33 of the 34 applied mutants are killed; M-PASTE.6 is the only survivor and is pending the Windows CI arm. Written 2026-11-07.
 
-**Platform limit.** Every run below is on cachyos-rtx (Linux, Python 3.11.18). The 54 WinCI-only cases (`tests/test_b103_clipboard_windows.py`) and the OS-text / right-click behaviours they prove were not run: they wait for the push (R-PASTE.20).
+**Platform limit.** Every run below is on <runner> (Linux, Python 3.11.18). The 54 WinCI-only cases (`tests/test_b103_clipboard_windows.py`) and the OS-text / right-click behaviours they prove were not run: they wait for the push (R-PASTE.20).
 
 ## Runs (evidence under `inc-1a/evidence-e4/`, `inc-1a/evidence-e5/`)
 
@@ -31,7 +31,7 @@ E5 rulings (orchestrator): SEC-1 and SEC-2 are fixed in the tests; SEC-3 goes to
 |---|---|
 | BD-1A-1 | The A2L filter debounce fires after teardown (`NoMatches '#a2l_tags_list'`). Product defect outside the slice, routed to Inc 12 (guard the refresh when the table is absent, add a case, check against the base code). |
 | BL-I1A-1 | SEC-3 LOW backlog: the E3S-25(c) marker is missing (exposure 0 today). |
-| Windows CI arms (54) | The 54 WinCI-only cases wait for the push; not run on cachyos-rtx. |
+| Windows CI arms (54) | The 54 WinCI-only cases wait for the push; not run on <runner>. |
 | M-PASTE.6 | The cut's OS write is unobservable on LinuxH; the WinCI arm kills it. Pending the Windows CI run. |
 | Redaction gate | RED until the pre-push redaction sweep (expected; the only law failure). |
 | AT-I1a-10 / AT-I1a-11 | Operator-run checks: Ctrl+V vs Ctrl+Shift+V and a copy into Notepad (AT-I1a-10); the right-click check in Windows Terminal (AT-I1a-11). |

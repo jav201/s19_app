@@ -1,8 +1,8 @@
-A2L section tree has structural errors: path=/home/javiergr/work/s19_app/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
-python = 3.11.18  executable = /home/javiergr/miniconda3/envs/s19ci/bin/python
+A2L section tree has structural errors: path=/home/<user>/work/s19_app/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+python = 3.11.18  executable = /home/<user>/miniconda3/envs/s19ci/bin/python
 repo HEAD = e07fb00f
-HOME = /tmp/b103-e1-4/home  LOCALAPPDATA = /tmp/b103-e1-4/home/localappdata
+HOME = /tmp/b103-e1-4/home  LOCALAPPDATA = /tmp/b103-e1-4/home/<localappdata>
 
 --- make_release_case.py --out /tmp/b103-e1-4/out --seed 20260001  rc = 0
 a2l           97340  firmware.a2l

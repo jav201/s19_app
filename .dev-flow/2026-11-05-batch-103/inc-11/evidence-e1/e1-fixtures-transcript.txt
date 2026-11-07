@@ -1,6 +1,6 @@
-host=cachyos-rtx date=2026-11-06T21:49:29-06:00 clone=e07fb00f9fc13afd314d0334fac683fe33b29b6c changed=0 HOME=/tmp/b103-e1-11/zq_iso_user
-A2L section tree has structural errors: path=/home/javiergr/work/s19_app/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+host=<runner> date=2026-11-06T21:49:29-06:00 clone=e07fb00f9fc13afd314d0334fac683fe33b29b6c changed=0 HOME=/tmp/b103-e1-11/<user>
+A2L section tree has structural errors: path=/home/<user>/work/s19_app/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
 python = 3.11.18 | mode = fixtures
 files = 35
 == [FX] e07fb00 reader on each tracked file against the same reader on CANON(file) ==

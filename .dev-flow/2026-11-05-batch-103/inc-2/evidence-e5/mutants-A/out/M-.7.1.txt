@@ -22,7 +22,7 @@ index 7b4d1416..0e18076d 100644
 =================================== FAILURES ===================================
 __________________ test_r_a2l_def_7_1_2_no_length_is_refused ___________________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-946/test_r_a2l_def_7_1_2_no_length0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-946/test_r_a2l_def_7_1_2_no_length0')
 
     def test_r_a2l_def_7_1_2_no_length_is_refused(tmp_path):
         """R-A2L-DEF.7.1/2 - ASCII CHARACTERISTIC with no NUMBER, MATRIX_DIM or LENGTH."""

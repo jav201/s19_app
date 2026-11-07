@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """batch-103 Inc 4 E3 security probes. THROWAWAY EVIDENCE, NOT PRODUCT CODE.
 
-Runs on cachyos-rtx only, next to an unchanged copy of the E2 pilot files
+Runs on <runner> only, next to an unchanged copy of the E2 pilot files
 (PILOT_DIR). It drives IndexC (the compact index the graph pins; it classifies
 each listed name with the E1 oracle evaluate_b) with pathological queries and
 name lists. Every case runs under an address-space cap and a per-case alarm.

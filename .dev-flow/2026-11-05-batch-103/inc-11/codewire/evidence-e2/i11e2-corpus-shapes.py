@@ -1,6 +1,6 @@
 """Inc 11 E2 probe (batch-103): synthetic reductions of the public-corpus anomaly classes 1-7 and the Latin-1 input
 (`design/a2l-corpus/anomalies.md`), read by the e07fb00 reader. Each shape is written from the class's structure
-description only: no corpus file content, name or value is used. Run on cachyos-rtx only.
+description only: no corpus file content, name or value is used. Run on <runner> only.
 
 Usage: python -I i11e2-corpus-shapes.py <repo> <scratch dir>
 """

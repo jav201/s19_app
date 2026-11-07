@@ -23,7 +23,7 @@ FF                                                                       [100%]
 =================================== FAILURES ===================================
 _________ test_r_paste_10_1_warning_line_per_failed_copy_without_text __________
 
-tmp_path = PosixPath('/tmp/b103-e5-1a/zq_iso_user/tmp/pytest-of-javiergr/pytest-4/test_r_paste_10_1_warning_line0')
+tmp_path = PosixPath('/tmp/b103-e5-1a/<user>/tmp/pytest-of-<user>/pytest-4/test_r_paste_10_1_warning_line0')
 
     def test_r_paste_10_1_warning_line_per_failed_copy_without_text(tmp_path: Path) -> None:
         """R-PASTE.10/1 (LinuxH): ≥ 1 WARNING per failed copy; no copied text."""
@@ -59,7 +59,7 @@ tests/test_b103_clipboard_core.py:980: AssertionError
 WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:686 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
 __________ test_r_paste_10_2_warning_line_per_failed_right_click_copy __________
 
-tmp_path = PosixPath('/tmp/b103-e5-1a/zq_iso_user/tmp/pytest-of-javiergr/pytest-4/test_r_paste_10_2_warning_line0')
+tmp_path = PosixPath('/tmp/b103-e5-1a/<user>/tmp/pytest-of-<user>/pytest-4/test_r_paste_10_2_warning_line0')
 
     def test_r_paste_10_2_warning_line_per_failed_right_click_copy(tmp_path: Path) -> None:
         """R-PASTE.10/2 (LinuxH): ≥ 1 WARNING per right-click copy, no copied text."""

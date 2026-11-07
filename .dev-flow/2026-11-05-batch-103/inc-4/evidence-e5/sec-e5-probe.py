@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """batch-103 Inc 4 E5 security probe. THROWAWAY EVIDENCE, NOT PRODUCT CODE.
 
-Runs on cachyos-rtx only, against the REAL module s19_app/tui/services/label_match.py
+Runs on <runner> only, against the REAL module s19_app/tui/services/label_match.py
 of a read-only COPY of the integrated tree (env TREE, first on PYTHONPATH). Adapted
 from the E3 probes (evidence-e3/i4e3s-probe.py, sec-r2-probe.py, sec-r2-band.py):
 their pilot classes IndexC / R2 are replaced by build_label_index + rank. The

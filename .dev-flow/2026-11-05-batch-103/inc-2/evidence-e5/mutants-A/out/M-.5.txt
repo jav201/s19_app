@@ -32,7 +32,7 @@ F.                                                                       [100%]
 =================================== FAILURES ===================================
 ________ test_r_a2l_def_5_1_the_one_tag_of_a_name_is_used_case_included ________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-944/test_r_a2l_def_5_1_the_one_tag0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-944/test_r_a2l_def_5_1_the_one_tag0')
 
     def test_r_a2l_def_5_1_the_one_tag_of_a_name_is_used_case_included(tmp_path):
         """R-A2L-DEF.5/1 - DUP at 0x20, dup at 0x10: DUP is the 0x20 object."""

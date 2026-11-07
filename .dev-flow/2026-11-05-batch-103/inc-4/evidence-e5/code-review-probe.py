@@ -1,4 +1,4 @@
-"""E5 code-review probe, inc-4 label_match (runs on cachyos-rtx in a /tmp copy only).
+"""E5 code-review probe, inc-4 label_match (runs on <runner> in a /tmp copy only).
 
 Part A: an independent oracle written from the rows' definitions (01-requirements.md),
         sharing no helper with the module, compared with rank() on random inputs.

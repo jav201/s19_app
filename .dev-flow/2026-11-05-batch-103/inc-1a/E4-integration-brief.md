@@ -1,14 +1,14 @@
 # Inc 1a E4 integration GREEN (DeepSeek v4 Pro)
 
-Worktree `C:\Users\jjgh8\Github\s19_app-b103-inc1a-code`, branch `b103-inc1a-code`, HEAD `e719d7fc`. It holds the implementer, the tester and `batch-103` merged together. **Do not edit any product or test file.**
+Worktree `C:\Users\<user>\Github\s19_app-b103-inc1a-code`, branch `b103-inc1a-code`, HEAD `e719d7fc`. It holds the implementer, the tester and `batch-103` merged together. **Do not edit any product or test file.**
 
 1. **Build the runner tree.**
    - On this PC: `git bundle create <scratchpad>/i1a.bundle e07fb00..b103-inc1a-code`.
-   - Pipe it over ssh to cachyos-rtx.
-   - There: `git clone -q --shared /home/javiergr/work/s19_app /home/javiergr/work/b103-int1a`, fetch the bundle's `b103-inc1a-code`, and check it out.
-   - Use `ssh -o BatchMode=yes javiergr@192.168.1.67 "bash -lc '…'"` and the Python `/home/javiergr/miniconda3/envs/s19ci/bin/python`, as an absolute path.
+   - Pipe it over ssh to <runner>.
+   - There: `git clone -q --shared /home/<user>/work/s19_app /home/<user>/work/b103-int1a`, fetch the bundle's `b103-inc1a-code`, and check it out.
+   - Use `ssh -o BatchMode=yes <user>@<runner-ip> "bash -lc '…'"` and the Python `/home/<user>/miniconda3/envs/s19ci/bin/python`, as an absolute path.
 2. **Run with isolation and Xvfb.**
-   - Set HOME, XDG_CONFIG_HOME and LOCALAPPDATA to `/tmp/b103-int1a/zq_iso_user`, with `PYTHONDONTWRITEBYTECODE=1` and stdin `/dev/null`.
+   - Set HOME, XDG_CONFIG_HOME and LOCALAPPDATA to `/tmp/b103-int1a/<user>`, with `PYTHONDONTWRITEBYTECODE=1` and stdin `/dev/null`.
    - Run every clipboard test inside `xvfb-run -a`, on a private display. Never use the host display or clipboard.
    - Run:
      - (a) `tests/test_b103_clipboard_core.py tests/test_b103_clipboard_matrix.py tests/test_b103_clipboard_windows.py` (the Windows arms skip);

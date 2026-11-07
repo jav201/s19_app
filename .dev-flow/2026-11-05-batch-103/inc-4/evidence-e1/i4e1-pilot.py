@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """batch-103 Inc 4 E1 pilot: are the proposed matcher rules unambiguous and fast enough?
 
-THROWAWAY EVIDENCE, NOT PRODUCT CODE. Run on cachyos-rtx only (it imports
+THROWAWAY EVIDENCE, NOT PRODUCT CODE. Run on <runner> only (it imports
 s19_app to read A2L names with the app's own parser).
 
 It holds two implementations of the E1 proposal (01-requirements.md,

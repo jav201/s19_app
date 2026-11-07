@@ -1,7 +1,7 @@
-# i2e1-case08-hashes transcript 2026-11-06T15:54:18-06:00 host cachyos-rtx
+# i2e1-case08-hashes transcript 2026-11-06T15:54:18-06:00 host <runner>
 # clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
 # (the generator is stdlib only and imports no s19_app; no s19_app.__file__ applies)
-tool: /home/javiergr/work/s19_app/tools/synth/make_release_case.py
+tool: /home/<user>/work/s19_app/tools/synth/make_release_case.py
 tool sha256: 0d594a28c37707f065673e72fdd1d2dd0174cfeda4f52b14b9a3a69ee28923f2
 
 # --size-mb 10 run a: exit 0

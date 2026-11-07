@@ -1,4 +1,4 @@
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py | textual 8.2.8
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py | textual 8.2.8
 [V2 w=80 name_len=9] table_width=38 tag_cell=whole address: full | length '2': whole | row tail='  0x1C2D3E00  2       form'
 [V2 w=80 name_len=20] table_width=38 tag_cell=whole address: full | length '2': whole | row tail='  0x1C2D3E00  2'
 [V2 w=80 name_len=24] table_width=38 tag_cell=whole address: CUT '0x1C2D3E0' | length '2': absent | row tail='  0x1C2D3E0'

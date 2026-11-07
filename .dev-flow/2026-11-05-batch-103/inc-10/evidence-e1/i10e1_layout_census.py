@@ -4,7 +4,7 @@ Headless Pilot at 118x54 and 220x60 (the probe sizes). Loads case01 firmware.s19
 one inside entry through the panel, presses Apply, then shows each inspector tab in turn and measures the prompt
 row, its Write file button, the widget actually under that button's centre (a non-mutating hit test), and the
 vertical budget of the screen. Then: a second apply that applies nothing (the entry replaced by one outside the
-image) — is the prompt hidden? No Write file press, no clipboard. Run on cachyos-rtx with HOME/XDG/LOCALAPPDATA
+image) — is the prompt hidden? No Write file press, no clipboard. Run on <runner> with HOME/XDG/LOCALAPPDATA
 under /tmp/b103-e1-10/.
 """
 import asyncio
@@ -13,7 +13,7 @@ import shutil
 import sys
 from pathlib import Path
 
-ROOT = Path("/home/javiergr/work/s19_app")  # absolute: HOME is isolated
+ROOT = Path("/home/<user>/work/s19_app")  # absolute: HOME is isolated
 sys.path.insert(0, str(ROOT))
 import s19_app  # noqa: E402
 

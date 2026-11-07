@@ -42,7 +42,7 @@ s19_app/tui/services/label_match.py:960:# node: _fuzzy_token_distances
 # mark count: 18
 $ python -m py_compile <copy>/s19_app/tui/services/label_match.py <copy>/s19_app/tui/a2l.py
 rc=0
-$ python C:/Users/jjgh8/Github/code-wire/tools/codewire_extract.py --repo <copy> --graph <inc-4>/codewire/graph-inc4.md --out <scratch>/cw-e5-inc4/out
+$ python C:/Users/<user>/Github/code-wire/tools/codewire_extract.py --repo <copy> --graph <inc-4>/codewire/graph-inc4.md --out <scratch>/cw-e5-inc4/out
 marks=18 graph_nodes=18 calls=25 findings=1 parse_failures=0
 extract rc=1
 $ ls <out>

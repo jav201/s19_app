@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Inc 12 E2 runner (batch-103) for the LAN host cachyos-rtx. Copied from Inc 11's corr2-e3c2-run.sh; the scratch
+# Inc 12 E2 runner (batch-103) for the LAN host <runner>. Copied from Inc 11's corr2-e3c2-run.sh; the scratch
 # folder, the transcript naming and the copy set-up differ.
 #   bash i12e2-run.sh setup                      -> fresh throwaway copies under /tmp/b103-e2-12/<variant>/ from
 #                                                   `git archive e07fb00` of the read-only clone (design: the product,
@@ -9,14 +9,14 @@
 #                                                   transcript /tmp/b103-e2-12/out/probe-<variant>-<scenario>-transcript.txt
 #   bash i12e2-run.sh pytest <variant> <tests..> -> python -m pytest in the copy (cwd = copy, so the copy's s19_app is
 #                                                   imported; its __file__ is printed first)
-# HOME/XDG/LOCALAPPDATA isolated under /tmp/b103-e2-12/zq_iso_user (basename is not `home`), no DISPLAY, closed
+# HOME/XDG/LOCALAPPDATA isolated under /tmp/b103-e2-12/<user> (basename is not `home`), no DISPLAY, closed
 # stdin, a timeout. The clone ~/work/s19_app is only read (git archive, sys.path); its status is printed before and
 # after every run.
 set -u
 base=/tmp/b103-e2-12
 py="$HOME/miniconda3/envs/s19ci/bin/python"
 clone="$HOME/work/s19_app"
-iso="$base/zq_iso_user"
+iso="$base/<user>"
 mkdir -p "$iso/lad" "$base/out" "$base/scratch"
 mode="$1"; shift
 isoenv=(env -i PATH=/usr/bin:/bin HOME="$iso" XDG_CONFIG_HOME="$iso/.config" XDG_DATA_HOME="$iso/.local/share"

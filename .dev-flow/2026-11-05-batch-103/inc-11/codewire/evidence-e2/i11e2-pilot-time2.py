@@ -14,7 +14,7 @@ with 2.5x the base tree's peak memory. This pilot models the shape the graph pin
 
 NOT product code and NOT a stub: a throwaway feasibility model, importing nothing from s19_app in the candidate path.
 
-Usage (cachyos-rtx only):  python -I i11e2-pilot-time2.py drive <repo> <runs>
+Usage (<runner> only):  python -I i11e2-pilot-time2.py drive <repo> <runs>
                            python -I i11e2-pilot-time2.py baseTree|baseFull|cand <repo> <file>   (one run, JSON)
                            python -I i11e2-pilot-time2.py shapes                                   (contract examples)
 """

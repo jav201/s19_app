@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """batch-103 Inc 4 E1 pilot v2: can an index meet a tight per-keystroke bound?
 
-THROWAWAY EVIDENCE, NOT PRODUCT CODE. Run on cachyos-rtx only, next to
+THROWAWAY EVIDENCE, NOT PRODUCT CODE. Run on <runner> only, next to
 i4e1-pilot.py (v1), whose naive oracle and rule helpers it loads with runpy.
 
 v1 showed that the rules are implementable without ambiguity (naive == index

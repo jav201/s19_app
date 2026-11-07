@@ -25,7 +25,7 @@ F                                                                        [100%]
 =================================== FAILURES ===================================
 ______ test_r_a2l_def_58_2_19_a_compu_tab_whose_x_holds_a_nan_is_refused _______
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-989/test_r_a2l_def_58_2_19_a_compu0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-989/test_r_a2l_def_58_2_19_a_compu0')
 
     def test_r_a2l_def_58_2_19_a_compu_tab_whose_x_holds_a_nan_is_refused(tmp_path):
         """R-A2L-DEF.58.2/19 (E3S3-29) - a COMPU_TAB with a NaN x decodes to a refusal; the frozen parse's unordered sort never gives a value."""

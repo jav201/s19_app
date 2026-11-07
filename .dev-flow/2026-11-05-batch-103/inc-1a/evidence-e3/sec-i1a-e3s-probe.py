@@ -1,4 +1,4 @@
-"""E3 security probe, batch-103 Inc 1a (cachyos-rtx, headless, no clipboard).
+"""E3 security probe, batch-103 Inc 1a (<runner>, headless, no clipboard).
 
 Question: does text that arrives by a paste (the terminal route, and the
 app-clipboard fallback of Ctrl+V, the route a right-click paste shares) keep

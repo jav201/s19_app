@@ -6,7 +6,7 @@ Read-only trees; no file is written outside /tmp/b103-e3-3-security.
 import gc, hashlib, math, os, pathlib, subprocess, sys, time, tracemalloc
 from dataclasses import dataclass, replace
 
-TREE = "/home/javiergr/work/b103-int2a"
+TREE = "/home/<user>/work/b103-int2a"
 sys.path.insert(0, TREE)
 sys.path.insert(1, "/tmp/b103-e3-3-security")
 import s19_app, s19_app.tui.a2l as a  # noqa: E402

@@ -1,8 +1,8 @@
 import sys, pathlib
-sys.path.insert(0, "/home/javiergr/work/b103-int2a")
+sys.path.insert(0, "/home/<user>/work/b103-int2a")
 import s19_app, s19_app.tui.a2l as a
 print("s19_app.__file__ =", s19_app.__file__)
-d = a.parse_a2l_file(pathlib.Path("/home/javiergr/work/b103-int2a/examples/case_00_public/ASAP2_Demo_V171.a2l"))
+d = a.parse_a2l_file(pathlib.Path("/home/<user>/work/b103-int2a/examples/case_00_public/ASAP2_Demo_V171.a2l"))
 print(sorted(d.keys()))
 def walk(ns, out):
     for n in ns:

@@ -22,7 +22,7 @@ FF                                                                       [100%]
 =================================== FAILURES ===================================
 ___________ test_r_a2l_def_8_1_unreadable_layout_datatype_is_refused ___________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-948/test_r_a2l_def_8_1_unreadable_0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-948/test_r_a2l_def_8_1_unreadable_0')
 
     def test_r_a2l_def_8_1_unreadable_layout_datatype_is_refused(tmp_path):
         """R-A2L-DEF.8/1 - RECORD_LAYOUT RL_X with datatype FOO."""
@@ -55,7 +55,7 @@ E         ...Full output truncated (6 lines hidden), use '-vv' to show
 ../base/tests/test_b103_a2l_definition.py:165: AssertionError
 __________ test_r_a2l_def_8_2_unknown_measurement_datatype_is_refused __________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-948/test_r_a2l_def_8_2_unknown_mea0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-948/test_r_a2l_def_8_2_unknown_mea0')
 
     def test_r_a2l_def_8_2_unknown_measurement_datatype_is_refused(tmp_path):
         """R-A2L-DEF.8/2 - MEASUREMENT datatype FOO."""

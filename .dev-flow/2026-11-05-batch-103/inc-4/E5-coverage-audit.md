@@ -1,6 +1,6 @@
 # Inc 4 - E5 coverage re-audit (independent of the tester)
 
-Mode: validation (read-only; no test was run on this PC). Auditor: qa-reviewer (claude-sonnet-5-5). Inputs: `02-test-cases.md` (120 cases), `tests/test_b103_label_match.py` (G-T1, 129 items GREEN in `evidence-e4/int-green-behaviour.txt`), `tests/test_b103_label_match_perf.py` (7 items GREEN, 78 bounds, 0 under 20 % margin, `evidence-e4/int-green-perf.txt`; executed by the E4 integrator on cachyos-rtx, not by me).
+Mode: validation (read-only; no test was run on this PC). Auditor: qa-reviewer (claude-sonnet-5-5). Inputs: `02-test-cases.md` (120 cases), `tests/test_b103_label_match.py` (G-T1, 129 items GREEN in `evidence-e4/int-green-behaviour.txt`), `tests/test_b103_label_match_perf.py` (7 items GREEN, 78 bounds, 0 under 20 % margin, `evidence-e4/int-green-perf.txt`; executed by the E4 integrator on <runner>, not by me).
 
 ## Counts
 
@@ -34,11 +34,11 @@ None. (A table of changed cases would be empty; the corrected Coverage values to
 
 ## Coverage values to apply
 
-All 120 rows of `02-test-cases.md` keep Coverage = `covered` and their `(full)` / `(full; bound valid on cachyos-rtx only)` marks. Re-open only if note 1 is ruled otherwise or a mutant in note 2 survives.
+All 120 rows of `02-test-cases.md` keep Coverage = `covered` and their `(full)` / `(full; bound valid on <runner> only)` marks. Re-open only if note 1 is ruled otherwise or a mutant in note 2 survives.
 
 ## Round 2 (2026-11-07T02:42:23-06:00)
 
-Mode: validation (read-only on this PC; nothing run by me). Auditor: qa-reviewer (claude-sonnet-5-5). Scope: only the 18 new and 9 changed cases. Run consumed: `evidence-e5/corrective3-tests-green-full.txt` (165 passed in 182 s, exit 0, QC-TM 102 bounds / 0 under 20 %; label_match sha256 b97d19eb...; executed by the orchestrator/integrator on cachyos-rtx, not by me).
+Mode: validation (read-only on this PC; nothing run by me). Auditor: qa-reviewer (claude-sonnet-5-5). Scope: only the 18 new and 9 changed cases. Run consumed: `evidence-e5/corrective3-tests-green-full.txt` (165 passed in 182 s, exit 0, QC-TM 102 bounds / 0 under 20 %; label_match sha256 b97d19eb...; executed by the orchestrator/integrator on <runner>, not by me).
 
 ### Counts (138 cases)
 

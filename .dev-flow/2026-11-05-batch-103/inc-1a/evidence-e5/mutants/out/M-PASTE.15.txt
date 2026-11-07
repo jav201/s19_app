@@ -46,7 +46,7 @@ WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:686 write_os_clipb
 WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:747 OS clipboard write failed; retained Textual internal clipboard only
 ______ test_r_paste_15_6_7_one_osc52_request_for_right_click_copy[multi] _______
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10032/test_r_paste_15_6_7_one_osc52_1')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10032/test_r_paste_15_6_7_one_osc52_1')
 box_kind = 'textarea'
 
     @pytest.mark.parametrize("box_kind", ["input", "textarea"], ids=["single", "multi"])

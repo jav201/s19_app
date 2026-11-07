@@ -7,7 +7,7 @@ Round 1: `E3-architect.md` **FAIL** (2 MAJOR, 5 MEDIUM, 5 MINOR, 5 LOW, 3 INFO);
 | E3S-01 HIGH (+ E3A-08, E2-12) | accept, fail closed | R-A2L-DEF.19's condition gains "or a BIT_MASK line whose word the system cannot read as a number"; the same refusal for a text object with a BIT_MASK line; `describe_definition` cross-checks the tag's `bit_org` (`a2l.py:2683-2684`): set while the definition has no mask → the same refusal. Case .19/4 (E3A-08) and a text-with-mask case. **Never edit an object whose mask the system did not read.** |
 | E3S-02 MAJOR | accept | Split R-A2L-DEF.7 into .7.1 (as written) and .7.2: `If an object's length is below 1 or above 1,048,576 bytes, or its address is negative, or its span ends above 0xFFFFFFFF, then the system shall give its definition the refusal A2L-DEF-ADDRESS with the message `<name>: its span of <length> bytes at <address> cannot be read`.` Reuse `MAX_A2L_DECODE_BYTES` (add it to the D-9 import list). Cases from the fix column. |
 | E3S-03 MAJOR | accept | Split R-A2L-DEF.58 into .58.1 (as written) and .58.2: `If the A2L payload or the image holds content the system cannot read, then the system shall give a refusal in place of an exception.` Threshold: the hostile corpus of the fix column (≥ 14 shapes) through describe, decode and encode, N/N with 0 exceptions; negative control: remove one guard (e.g. the count `int()` guard) → an exception → RED. |
-| E3A-01 MAJOR (E2-10) | accept **B, in Inc 2** | I-2 gains `describe_definitions(names, a2l_data) -> dict[str, Definition]` over one walk; `describe_definition` delegates; `_find_tag` becomes a name-map lookup (E3A-13 falls out). Add a row with a numeric bound: describing all objects of software_a (13,990) ≤ 2.0 s on cachyos-rtx (measured 0.52 s); negative control: per-name walks → RED. |
+| E3A-01 MAJOR (E2-10) | accept **B, in Inc 2** | I-2 gains `describe_definitions(names, a2l_data) -> dict[str, Definition]` over one walk; `describe_definition` delegates; `_find_tag` becomes a name-map lookup (E3A-13 falls out). Add a row with a numeric bound: describing all objects of software_a (13,990) ≤ 2.0 s on <runner> (measured 0.52 s); negative control: per-name walks → RED. |
 | E3A-02 MAJOR + E3S-07 MEDIUM | accept both | CTX *agree at the display precision*: `|p − x| ≤ 0.5 × 10^(−d)` in IEEE double (d capped at 17), **or** their 15-significant-digit texts are equal (every datatype), **or**, for FLOAT32_IEEE only, their 6-significant-digit texts are equal. FLOAT64 never at 6 digits. Cases: E3A-02's `%.15` and typed values in .55's grid; .54/3 (E3S-07's example). |
 | E3A-03 MEDIUM | accept | `Definition` carries the method record's coefficients / table reference (fields with defaults, before `refusal`); decode and encode never walk `sections`. |
 | E3A-04 MEDIUM | accept fix 1 + 2 | Narrow .35's trigger; .38 becomes a `When` row; its cases become class normal. |
@@ -206,7 +206,7 @@ Applied (Opus, 50 min): one `reads` map per walk keyed by section identity, ever
 - **Owners and order:**
   1. records + graph (Opus);
   2. code (DeepSeek; Sonnet if its API fails) ∥ tests (an independent Sonnet tester);
-  3. GREEN on cachyos-rtx;
+  3. GREEN on <runner>;
   4. Inc 2a's E5 reviews (code, security), mutants and the coverage audit.
 
 ### Gap pass 2 — addendum from Inc 3a's E3 security round 6 (2026-11-07, orchestrator Opus 5.5)
@@ -238,4 +238,4 @@ Authority: `../inc-3/E3-rulings.md` "Round 6 rulings" (main worktree `s19_app-b1
 - **Open item for Inc 2a's E5 (test review) — E5-3:** the scaling measure is the difference of two walks (the 400-name walk minus a 1-name walk), so a per-object part of 10–130 ms is swamped by host load. Under a shared load of 15, from another session's 12-worker run, the ratios fail.
   - Fix, choose one: time the 399 names inside one fresh walk through the module's per-name step (the steady form), or raise the object count until the per-object part dominates (e.g. 4,000 names).
   - Until then the timed cases are decided on a quiet host: load < 2 at start, nothing else on the runner. That is how the batch-end battery runs them.
-- **The integrated tree** `~/work/b103-int2a` on cachyos-rtx is rebuilt at `e9bad3ca`, as a `--shared` clone of `~/work/s19_app` on branch `b103-inc2a-code`. It is read-only for E5 agents.
+- **The integrated tree** `~/work/b103-int2a` on <runner> is rebuilt at `e9bad3ca`, as a `--shared` clone of `~/work/s19_app` on branch `b103-inc2a-code`. It is read-only for E5 agents.

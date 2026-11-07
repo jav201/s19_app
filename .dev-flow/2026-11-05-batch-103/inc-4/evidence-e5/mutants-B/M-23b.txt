@@ -60,7 +60,7 @@ E
 E         At index 0 diff: ('rpm_x', 'prefix', 0, ((0, 3),)) != ('RPMX', 'prefix', 0, ((0, 3),))
 E         Use -v to get more diff
 
-/home/javiergr/work/b103-int4/tests/test_b103_label_match.py:391: AssertionError
+/home/<user>/work/b103-int4/tests/test_b103_label_match.py:391: AssertionError
 =========================== short test summary info ============================
 FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.23/2]
 1 failed, 1 passed, 127 deselected in 4.89s

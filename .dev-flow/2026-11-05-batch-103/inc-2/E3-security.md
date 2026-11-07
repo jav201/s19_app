@@ -11,7 +11,7 @@ Read: `01-requirements.md`, `02-test-cases.md` (after the E2 case-correction pas
 
 Evidence states:
 - **R** = read (grep and file reads).
-- **P** = one probe on cachyos-rtx: Python 3.11.18 and textual 8.2.8, stdlib and textual only, **no `s19_app` import**, HOME/XDG/LOCALAPPDATA under `/tmp/b103-e3-2-security/home`, stdin closed, no clipboard, no display. The transcript is `/tmp/b103-e3-2-security/probe-transcript.txt` on that host. It is cited by tag (`[S1]` …, `[T1]` …) and is not committed, because this review may write one file only.
+- **P** = one probe on <runner>: Python 3.11.18 and textual 8.2.8, stdlib and textual only, **no `s19_app` import**, HOME/XDG/LOCALAPPDATA under `/tmp/b103-e3-2-security/home`, stdin closed, no clipboard, no display. The transcript is `/tmp/b103-e3-2-security/probe-transcript.txt` on that host. It is cited by tag (`[S1]` …, `[T1]` …) and is not committed, because this review may write one file only.
 
 ## Findings
 
@@ -57,7 +57,7 @@ Scope: the round-1 security findings as `E3-rulings.md` ruled them, and the rows
 
 Evidence:
 - **R** = read in the records and in `a2l.py` at `9acf0bc` (the product tree is still `e07fb00`).
-- **P2** = one probe on cachyos-rtx: Python 3.11.18 (`s19ci`), HOME/XDG/LOCALAPPDATA under `/tmp/b103-e3r2-2-security/home`, no display, stdin closed, no clipboard.
+- **P2** = one probe on <runner>: Python 3.11.18 (`s19ci`), HOME/XDG/LOCALAPPDATA under `/tmp/b103-e3r2-2-security/home`, no display, stdin closed, no clipboard.
   - It imports the base parser from the read-only clone `~/work/s19_app` at `e07fb00` (0 changed files). It mimics the graph's `_read_object_lines` header split (the first 8 words of `_flatten_body_tokens([meta] + lines)`), since the model does not exist yet.
   - Transcript: `/tmp/b103-e3r2-2-security/probe-transcript.txt` on that host, cited by tag. It is not committed.
 
@@ -114,7 +114,7 @@ Scope: E3S-14, and the round-2 MEDIUM and MINOR findings as "Round 2 rulings" ru
 
 Evidence:
 - **R** = read in the records and in `a2l.py` (the product tree is `e07fb00`).
-- **P3** = two probes on cachyos-rtx. Setup: Python 3.11.18 (`s19ci`); the base parser imported from the read-only clone `~/work/s19_app` at `e07fb00` (0 changed files); HOME/XDG/LOCALAPPDATA under `/tmp/b103-e3r3-2-security/home`; stdin closed, no display, no clipboard.
+- **P3** = two probes on <runner>. Setup: Python 3.11.18 (`s19ci`); the base parser imported from the read-only clone `~/work/s19_app` at `e07fb00` (0 changed files); HOME/XDG/LOCALAPPDATA under `/tmp/b103-e3r3-2-security/home`; stdin closed, no display, no clipboard.
   - `evidence-e3/sec-r3-probe.py` emulates the corrected graph's mask rules over 27 shapes and 35 fixture files: the `_read_object_lines` header split, `bit_mask_keyword`, the unreadable word, the `bit_org` cross-check, and the refusals that come before the mask.
   - **REF** in that probe is a reader written for it. It applies the C rule (a comment separates two words) and matches `/begin` and `/end` by name. It is an approximation, not a2ltool, which is installed on neither host.
   - `sec-r3-v171.py` finds V171's unclosed sections.
@@ -157,7 +157,7 @@ Scope: round 3's findings, as "Round 3 rulings" rules them, and the pass `git di
 
 Evidence:
 - **R** = read in the records and in `a2l.py` (product tree `e07fb00`).
-- **P4** = two probes on cachyos-rtx, set up as in round 3:
+- **P4** = two probes on <runner>, set up as in round 3:
   - Python 3.11.18 (`s19ci`). The base parser is imported from the read-only clone `~/work/s19_app` at `e07fb00`, with 0 changed files after the run.
   - HOME, XDG and LOCALAPPDATA are under `/tmp/b103-e3r4-2-security/home`. Stdin is closed; there is no display and no clipboard.
   - The probes write the INLINE header of `02-test-cases.md:11`, with `BYTE_ORDER MSB_FIRST`.
@@ -219,7 +219,7 @@ Evidence:
   - `_byte_order_from_section_lines` takes the first raw BYTE_ORDER line (`:311-315`).
   - `_infer_length_*` takes the first number of MATRIX_DIM and caps no length (`:1164-1236`).
   - The tags hold no INSTANCE, BLOB or AXIS_PTS, and nothing in the base reads `/include`.
-- **P5** = four probes on cachyos-rtx: Python 3.11.18 (`s19ci`), the read-only clone `~/work/s19_app` at `e07fb00` (0 changed files after the runs), HOME, XDG and LOCALAPPDATA under `/tmp/b103-e3r5-2-security/hdir`, stdin closed, no display and no clipboard. The INLINE header of `02-test-cases.md:11` (MSB_FIRST).
+- **P5** = four probes on <runner>: Python 3.11.18 (`s19ci`), the read-only clone `~/work/s19_app` at `e07fb00` (0 changed files after the runs), HOME, XDG and LOCALAPPDATA under `/tmp/b103-e3r5-2-security/hdir`, stdin closed, no display and no clipboard. The INLINE header of `02-test-cases.md:11` (MSB_FIRST).
   - `evidence-e3/sec-r5-probe.py` models the records after the 4b pass:
     - .19 as now written (reading W, open per section, mid-line `/begin`, "not at all");
     - the span index from the tag address and length (R-A2L-014 fill);

@@ -1,13 +1,13 @@
 # E4 handoff — Inc 2a implementer (DeepSeek v4 Pro): A2L definition model, read side
 
 ## 1. Reference (dev-flow v3 + Code-Wire v3.1; latest as of 2026-11-07)
-s19_app (Textual 8.2.8 / rich 15), batch `batch-103`, records under `.dev-flow/2026-11-05-batch-103/` (start with `PLAN.md`, amendment A2). Versions: **dev-flow v3 beta** `C:\Users\jjgh8\.claude\skills\dev-flow-v3-beta\SKILL.md` (commit `d858a9a`; read stage E4 whole); **Code-Wire v3.1.0** `C:\Users\jjgh8\Github\code-wire` tag `v3.1.0` = `e436a08` (core only: examples from the requirements; `tools/codewire_extract.py` finds callers and drift; testers turn examples into failing tests). **tui-design:** not used.
+s19_app (Textual 8.2.8 / rich 15), batch `batch-103`, records under `.dev-flow/2026-11-05-batch-103/` (start with `PLAN.md`, amendment A2). Versions: **dev-flow v3 beta** `C:\Users\<user>\.claude\skills\dev-flow-v3-beta\SKILL.md` (commit `d858a9a`; read stage E4 whole); **Code-Wire v3.1.0** `C:\Users\<user>\Github\code-wire` tag `v3.1.0` = `e436a08` (core only: examples from the requirements; `tools/codewire_extract.py` finds callers and drift; testers turn examples into failing tests). **tui-design:** not used.
 
 ## 2. Role
 **E4 implementer: implement the approved graph's 2a side; do not write tests.** An independent tester writes the tests in parallel in another worktree.
 
 ## 3. Where you work
-- Worktree `C:\Users\jjgh8\Github\s19_app-b103-inc2a-code` (branch `b103-inc2a-code`). Only there.
+- Worktree `C:\Users\<user>\Github\s19_app-b103-inc2a-code` (branch `b103-inc2a-code`). Only there.
 - Your unit's files (the orchestrator tells you which unit you are, A or B):
   - **Unit A:** `s19_app/tui/a2l_definition.py` (new) — the 2a nodes only.
   - **Unit B:** `tools/synth/make_release_case.py` — the `--case definitions` option and its 3 new functions (case 08 byte-identical).
@@ -24,7 +24,7 @@ s19_app (Textual 8.2.8 / rich 15), batch `batch-103`, records under `.dev-flow/2
 
 ## 5. Rules
 - English code, comments, docstrings; match the repo's style. Standard library only. Unit A is pure: no Textual import, no I/O beyond the `a2l_data` and image it is given, no global mutable state, deterministic.
-- **On this PC you may run only** `python -m py_compile <your file>` and `python C:\Users\jjgh8\Github\code-wire\tools\codewire_extract.py`. **Do not run pytest, the app, or any Python that imports or loads your module or `s19_app`** (not even through `importlib`; a previous run did that and it was a rule breach). The orchestrator runs every test on the Linux runner.
+- **On this PC you may run only** `python -m py_compile <your file>` and `python C:\Users\<user>\Github\code-wire\tools\codewire_extract.py`. **Do not run pytest, the app, or any Python that imports or loads your module or `s19_app`** (not even through `importlib`; a previous run did that and it was a rule breach). The orchestrator runs every test on the Linux runner.
 - Never push, merge, force, `reset --hard`, delete a branch, or commit. Never write the operator's name. No secrets.
 - If the graph or a requirement looks wrong, write it down as a deviation. Never change a requirement or a pinned interface to match your code.
 

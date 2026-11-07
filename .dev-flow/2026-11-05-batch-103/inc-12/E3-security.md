@@ -7,11 +7,11 @@ Batch 2026-11-05-batch-103, increment 12 (A2L tag table: no glued or cut values)
 Read: `01-requirements.md`, `02-test-cases.md`, `E1-rulings.md` (with its orchestrator rulings), `E1-slice.md`, `E2-rulings.md`, `codewire/graph-inc12.md`, `codewire/evidence-e2/i12e2-mkproto.py` (the prototype that E2 measured), `../inc-11/01-requirements.md` (READ.3, .4, .34–.39, .51, .66) and `../inc-11/E3-security.md`. Code at base: `app.py` `_a2l_detail_card_text` / `_card_field` (`:1245-1341`), `update_a2l_tags_view` / `_build_a2l_table_cells` (`:20286-20473`), `_clip_to` (`:20829`), row actions (`:9725-9777`, `:16300-16359`). Also `utils.py:32-99` (`safe_text`), `a2l_parameter_picker.py:109` (`_clip_to_cells`), `tests/test_tui_a2l_detail.py:43-62`, `:271-339`, and `pyproject.toml:52` (`textual>=8.2.8,<9`). Textual 8.2.8 and rich 15.0.0 were read on the runner: `app.py:4344-4356`, `:5023-5037`, `:3821-3857`; `content.py:55-70`; `rich/control.py:9-18`; `rich/cells.py`.
 
 **Evidence states.**
-- **C** = run on cachyos-rtx (Python 3.11.18, textual 8.2.8, rich 15.0.0). The runner was loaded (load average 13–22 from other jobs), so timings are noisy. Ratios and orders of growth hold; the absolute milliseconds do not.
+- **C** = run on <runner> (Python 3.11.18, textual 8.2.8, rich 15.0.0). The runner was loaded (load average 13–22 from other jobs), so timings are noisy. Ratios and orders of growth hold; the absolute milliseconds do not.
   - `design` = a throwaway `git archive e07fb00 s19_app` copy patched by E2's `i12e2-mkproto.py design`, 88 changed lines, the same as E2's setup. This is the graph's prototype, not the E4 code.
   - `base` = the read-only clone at `e07fb00`, 0 changed files before and after every run.
-  - HOME, XDG and LOCALAPPDATA were isolated (`zq_iso_user`). There was no DISPLAY, no clipboard and stdin was closed. All names are synthetic. The corpus census prints counts only.
-  - Scripts: `C:\Users\jjgh8\AppData\Local\Temp\claude\107abb51e32da120\c57f44a4-8a42-42ee-9fb3-80f699575124\scratchpad\i12e3s\i12e3s-probe.py` and `…\i12e3s\i12e3s-run.sh`. Transcripts are copied to `…\i12e3s\out\`. The runner scratch `/tmp/b103-e3-12-S/` is deleted. Tags: [U] units, [H] hostile, [Z] zwcost, [F] flood, [K] collide.
+  - HOME, XDG and LOCALAPPDATA were isolated (`<user>`). There was no DISPLAY, no clipboard and stdin was closed. All names are synthetic. The corpus census prints counts only.
+  - Scripts: `C:\Users\<user>\AppData\Local\Temp\claude\107abb51e32da120\c57f44a4-8a42-42ee-9fb3-80f699575124\scratchpad\i12e3s\i12e3s-probe.py` and `…\i12e3s\i12e3s-run.sh`. Transcripts are copied to `…\i12e3s\out\`. The runner scratch `/tmp/b103-e3-12-S/` is deleted. Tags: [U] units, [H] hostile, [Z] zwcost, [F] flood, [K] collide.
   - The scripts and transcripts are not committed, because this brief allows one output file. The orchestrator may commit them under `inc-12/evidence-e3/`.
 - **R** = read in the records or the code, not run.
 
@@ -72,14 +72,14 @@ Records at `a102c160` (the E3 correction; authority `E3-rulings.md`). Product tr
 - **E3S-02 (HIGH) stays `planned`** until E3S-08 lands. This clearance covers the E3 design gate only and authorizes nothing.
 
 **Evidence states.**
-- **C** = run on cachyos-rtx: Python 3.11.18, textual 8.2.8, rich 15.0.0, load 1–2, so the timings are clean this round.
+- **C** = run on <runner>: Python 3.11.18, textual 8.2.8, rich 15.0.0, load 1–2, so the timings are clean this round.
   - The variants are throwaway `git archive e07fb00 s19_app` copies:
     - `design` is E2's `i12e2-mkproto.py design`, 88 changed lines, as in round 1.
     - `corr` is `design` plus the corrected nodes, written by `i12e3s2-mkcorr.py` (95 lines). The cut projects to U+FFFD and then slices, as in `graph-inc12.md:107`. Every file-derived card value goes through `safe_text`, as in `:197`. The fit keeps E2's rebuild form, because `_repaint_a2l_tag_cells` is not on `e07fb00`.
     - `corrpart` is `corr` with only the card header and `_card_field` through `safe_text`.
     - `base` is the read-only clone, with 0 changed files after every run.
   - HOME, XDG and LOCALAPPDATA were isolated. There was no DISPLAY and no clipboard. All names are synthetic, and the census prints counts only.
-  - Scripts: `C:\Users\jjgh8\AppData\Local\Temp\claude\107abb51e32da120\c57f44a4-8a42-42ee-9fb3-80f699575124\scratchpad\i12e3s2\` (`i12e3s2-run.sh`, `i12e3s2-mkcorr.py`, `i12e3s2-probe.py`). Transcripts are in its `out\`, with home paths masked. They are not committed, because this brief allows one output file. The orchestrator may commit them under `evidence-e3/`.
+  - Scripts: `C:\Users\<user>\AppData\Local\Temp\claude\107abb51e32da120\c57f44a4-8a42-42ee-9fb3-80f699575124\scratchpad\i12e3s2\` (`i12e3s2-run.sh`, `i12e3s2-mkcorr.py`, `i12e3s2-probe.py`). Transcripts are in its `out\`, with home paths masked. They are not committed, because this brief allows one output file. The orchestrator may commit them under `evidence-e3/`.
   - The runner scratch `/tmp/b103-e3-12-S2/` is deleted. Tags: [U2] units2, [N2] census2, [H2] hostile2, [Z2] zwcost / zwcard, [T2] at069c.
 - **R** = read in the records or the code, not run. `b101-inc10` was read with `git show` only.
 

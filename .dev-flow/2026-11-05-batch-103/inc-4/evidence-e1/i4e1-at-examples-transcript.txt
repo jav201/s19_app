@@ -1,5 +1,5 @@
 rc=0
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
 case08 462  software_a 13990  software_a[1234] = 'JotafVod_msrqlLzL_kh2C_rWl_pfue._0_'
 
 === AT-1 typing over case08, limit 5

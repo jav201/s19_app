@@ -1,10 +1,10 @@
 # Inc 1a E5: three DeepSeek roles (code review, security review, mutants)
 
-**Common rules.** Read in full `C:\Users\jjgh8\Github\s19_app-b103\.dev-flow\2026-11-05-batch-103\design\E5-brief-common.md`, with N = `1a`.
-- **Code worktree:** `C:\Users\jjgh8\Github\s19_app-b103-inc1a-code`, branch `b103-inc1a-code`, HEAD `e7d157f6`. The diff to validate is `git diff e07fb00 HEAD -- s19_app .github tests`, limited to Inc 1a's files (`E1-slice.md`). Changes from batch-101 and Inc 2a/4 arrived through merges and are out of scope.
-- **Runner tree:** `/home/javiergr/work/b103-int1a`, at the same HEAD. It is read-only: run `cp -a` into `/tmp/b103-e5-1a-<role>/` before using it.
+**Common rules.** Read in full `C:\Users\<user>\Github\s19_app-b103\.dev-flow\2026-11-05-batch-103\design\E5-brief-common.md`, with N = `1a`.
+- **Code worktree:** `C:\Users\<user>\Github\s19_app-b103-inc1a-code`, branch `b103-inc1a-code`, HEAD `e7d157f6`. The diff to validate is `git diff e07fb00 HEAD -- s19_app .github tests`, limited to Inc 1a's files (`E1-slice.md`). Changes from batch-101 and Inc 2a/4 arrived through merges and are out of scope.
+- **Runner tree:** `/home/<user>/work/b103-int1a`, at the same HEAD. It is read-only: run `cp -a` into `/tmp/b103-e5-1a-<role>/` before using it.
 - **Records:** in `inc-1a/`, read `01-requirements.md`, `02-test-cases.md`, every section of `E1/E2/E3-rulings.md`, `E1-slice.md`, `codewire/graph-*.md` and `evidence-e4/int-green2-*.txt`.
-- **Runner settings:** cachyos-rtx only. Use the Python at `/home/javiergr/miniconda3/envs/s19ci/bin/python` (absolute path). Set HOME, XDG and LOCALAPPDATA to `…/zq_iso_user`. Use stdin `/dev/null`. Run every clipboard test inside `xvfb-run -a`, never against the host display or clipboard. Kill processes by PID only. Delete your `/tmp` folder at the end.
+- **Runner settings:** <runner> only. Use the Python at `/home/<user>/miniconda3/envs/s19ci/bin/python` (absolute path). Set HOME, XDG and LOCALAPPDATA to `…/<user>`. Use stdin `/dev/null`. Run every clipboard test inside `xvfb-run -a`, never against the host display or clipboard. Kill processes by PID only. Delete your `/tmp` folder at the end.
 - **On this PC:** run only git and ssh. Run no Python and do not commit. Never write the operator's name.
 - **Every finding** carries a severity, `file:line`, the row or case it concerns, a fix, and a tag: `impl` or `design-gap`.
 

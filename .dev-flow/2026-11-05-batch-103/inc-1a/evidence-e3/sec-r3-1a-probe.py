@@ -1,4 +1,4 @@
-"""E3 round-3 security probe, batch-103 Inc 1a (cachyos-rtx, headless, no clipboard).
+"""E3 round-3 security probe, batch-103 Inc 1a (<runner>, headless, no clipboard).
 
 Question: does the round-2 correction (graph-inc1a.md at d6722b35) close
 E3S-13 (strip order), E3S-14 (`restrict` boxes keep refusing), E3S-15 (the

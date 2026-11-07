@@ -4,8 +4,8 @@ label_match.__file__ = /tmp/b103-e5d2-4/tree/s19_app/tui/services/label_match.py
 label_match sha256 = 394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0
 tests module = /tmp/b103-e5d2-4/tree/tests/test_b103_label_match_perf.py
 mode = d2 curve totals=counter lists=U1,U6,S1,E2,M1,D3,SWC,X40,CRAFT,SEQ  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = 5284561843935062555
-host = cachyos-rtx  load = (7.95, 4.94, 2.95)  cpus = 16  RLIMIT_AS = 8 GiB
-HOME = /tmp/b103-e5d2-4/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5d2-4/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5d2-4/pilot
+host = <runner>  load = (7.95, 4.94, 2.95)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5d2-4/<user>  LOCALAPPDATA = /tmp/b103-e5d2-4/<user>/localappdata  PILOT_DIR = /tmp/b103-e5d2-4/pilot
 per query: P = pilot uncapped (range tables, cap off); F = pilot with the fuzzy tier left out (cap 0); S = shipped rank (dict tables), run only where cheap; medians of 3, limit 20
 
 === CRAFT: 50,000 names, 2,356,624 characters in all (.40 scope: 50,000 names, <= 2,356,624); 139,856 distinct tokens, 543,123 postings; built in 2.49 s; load (7.87, 5.03, 3.0)

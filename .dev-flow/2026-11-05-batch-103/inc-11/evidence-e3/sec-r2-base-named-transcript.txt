@@ -1,2 +1,2 @@
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
 [NK] compu_methods_by_name_gained=7964 compu_tabs_by_name_gained=4130 files_with_joins=33 joins=151242 record_layouts_by_name_gained=116 exceptions=0

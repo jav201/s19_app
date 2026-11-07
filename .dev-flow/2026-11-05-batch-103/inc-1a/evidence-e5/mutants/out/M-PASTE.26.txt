@@ -29,7 +29,7 @@ index ad2f7240..c6315b9b 100644
              await self.action_copy()
 
 # --- pytest (rc=1) ---
-est-of-javiergr/pytest-10034/test_r_paste_26_right_click_co0')
+est-of-<user>/pytest-10034/test_r_paste_26_right_click_co0')
 box_kind = 'input'
 
     @pytest.mark.parametrize("box_kind", ["input", "textarea"], ids=["single", "multi"])
@@ -72,7 +72,7 @@ WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:686 write_os_clipb
 WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:747 OS clipboard write failed; retained Textual internal clipboard only
 ______ test_r_paste_26_right_click_copy_leaves_text_and_selection[multi] _______
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10034/test_r_paste_26_right_click_co1')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10034/test_r_paste_26_right_click_co1')
 box_kind = 'textarea'
 
     @pytest.mark.parametrize("box_kind", ["input", "textarea"], ids=["single", "multi"])

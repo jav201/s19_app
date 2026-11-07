@@ -4,7 +4,7 @@ A2L section tree has structural errors: path=/tmp/b103-e3-11-security/work/H3.a2
 A2L section tree has structural errors: path=/tmp/b103-e3-11-security/work/H5.a2l sample=Unclosed /begin sections detected.
 A2L section tree has structural errors: path=/tmp/b103-e3-11-security/work/H10.a2l sample=Line 13: /end without /begin; Line 14: /end without /begin; Line 15: /end without /begin
 A2L section tree has structural errors: path=/tmp/b103-e3-11-security/work/H13.a2l sample=Unclosed /begin sections detected.
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
 python 3.11.18 recursionlimit 1000
 [B1] comment glue in CHARACTERISTIC header (TC-097 class) | tags=[('XG', [{'address': '0x1c2d3e004026', 'length': 2, 'bit_org': None, 'effective_byte_order': 'little', 'matrix_dim': None, 'char_type': 'VALUE', 'deposit': 'RL_U16'}])] | errors=[] n_err=0 | 0.000s
 [B2] underscore glue in header address (int(x,0)) | tags=[('XU', [{'address': '0x1c2d3e004026', 'length': 2, 'bit_org': None, 'effective_byte_order': 'little', 'matrix_dim': None, 'char_type': 'VALUE', 'deposit': 'RL_U16'}])] | errors=[] n_err=0 | 0.000s

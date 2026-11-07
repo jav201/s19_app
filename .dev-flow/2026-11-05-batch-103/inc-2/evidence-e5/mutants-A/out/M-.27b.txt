@@ -41,7 +41,7 @@ E        +  where 0 = Decoded(stored=0, value=0, text='0').stored
 WARNING  s19_app.tui.a2l:a2l.py:250 A2L section tree has structural errors: path=/tmp/b103-e5-2-mutA/M-.27b/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
 __________ test_r_a2l_def_27_3_field_of_a_signed_datatype_is_unsigned __________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-970/test_r_a2l_def_27_3_field_of_a0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-970/test_r_a2l_def_27_3_field_of_a0')
 
     def test_r_a2l_def_27_3_field_of_a_signed_datatype_is_unsigned(tmp_path):
         """R-A2L-DEF.27/3 - SWORD, mask 0xFF00, word F0 F0 -> 240."""
@@ -50,7 +50,7 @@ tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-970/test_r_a2l_def_27_3_fie
 >       assert _decoded(d, a2l, _img(0x10, bytes([0xF0, 0xF0]))).stored == 240
 E       AssertionError: assert 1 == 240
 E        +  where 1 = Decoded(stored=1, value=1, text='1').stored
-E        +    where Decoded(stored=1, value=1, text='1') = _decoded(Definition(name='SM', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-javiergr/pytest-970/test_r_a2l_def_27_3_field_of_a0/inline_1.a2l', ...}, {16: 240, 17: 240})
+E        +    where Decoded(stored=1, value=1, text='1') = _decoded(Definition(name='SM', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype=...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None), {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-<user>/pytest-970/test_r_a2l_def_27_3_field_of_a0/inline_1.a2l', ...}, {16: 240, 17: 240})
 E        +      where {16: 240, 17: 240} = _img(16, b'\xf0\xf0')
 E        +        where b'\xf0\xf0' = bytes([240, 240])
 

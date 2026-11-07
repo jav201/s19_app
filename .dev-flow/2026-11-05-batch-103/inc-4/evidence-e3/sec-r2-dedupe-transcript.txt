@@ -1,7 +1,7 @@
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
 python = 3.11.18  PYTHONHASHSEED = None
-host = cachyos-rtx  load = (2.19970703125, 2.98583984375, 4.11279296875)  cpus = 16  RLIMIT_AS = 8 GiB
-HOME = /tmp/b103-e3r2-4-security/home  LOCALAPPDATA = /tmp/b103-e3r2-4-security/home/localappdata  PILOT_DIR = /tmp/b103-e3r2-4-security/pilot
+host = <runner>  load = (2.19970703125, 2.98583984375, 4.11279296875)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e3r2-4-security/home  LOCALAPPDATA = /tmp/b103-e3r2-4-security/home/<localappdata>  PILOT_DIR = /tmp/b103-e3r2-4-security/pilot
 
 === REF6; limit 20, median of 7; R2 (graph) vs R2D (identical query tokens de-duplicated in the fuzzy tier); load (2.24267578125, 2.9697265625, 4.0947265625)
    graph    319.9 ms | dedupe     41.6 ms | same list True | qtok 128 distinct 1 | walks None->None cand None tokint 127 | "'0 ' x 128"

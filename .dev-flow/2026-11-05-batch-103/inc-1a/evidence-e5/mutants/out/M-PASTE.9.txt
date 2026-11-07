@@ -33,7 +33,7 @@ WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:686 write_os_clipb
 WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:740 OS clipboard write failed; retained Textual internal clipboard only
 ____________ test_r_paste_9_1_write_failure_warning_on_linux[multi] ____________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10028/test_r_paste_9_1_write_failure1')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10028/test_r_paste_9_1_write_failure1')
 kind = 'm'
 
     @pytest.mark.parametrize("kind", ["a", "m"], ids=["single", "multi"])

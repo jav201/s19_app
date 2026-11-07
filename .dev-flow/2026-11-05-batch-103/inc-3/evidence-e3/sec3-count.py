@@ -4,7 +4,7 @@ count and iterates `range(count)`. `_read_record_layout` admits any datatype CTX
 checks what `_decode_scalar` + the graph's count rule do for a float count datatype. Inc 2a code; read-only trees.
 """
 import sys
-sys.path.insert(0, "/home/javiergr/work/b103-int2a")
+sys.path.insert(0, "/home/<user>/work/b103-int2a")
 import s19_app, s19_app.tui.a2l as a  # noqa: E402
 
 print("s19_app.__file__ =", s19_app.__file__)

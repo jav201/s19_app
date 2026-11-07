@@ -1,5 +1,5 @@
-host=cachyos-rtx date=2026-11-06T22:02:27-06:00 clone=e07fb00f9fc13afd314d0334fac683fe33b29b6c changed=0 HOME=/tmp/b103-e1-11/zq_iso_user
-s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py | textual 8.2.8
+host=<runner> date=2026-11-06T22:02:27-06:00 clone=e07fb00f9fc13afd314d0334fac683fe33b29b6c changed=0 HOME=/tmp/b103-e1-11/<user>
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py | textual 8.2.8
 [W220] table size=Size(width=108, height=26) rows=1 reader address=0x1c2d3e00 length=2266
 [W220] table| Tag        Address   LengthSource Raw PhysicalInMemRegion Limits UnitBitsEndianVirtFuncAccessDtype
 [W220] table| ✓ SYN_MAP_W0x1C2D3E002266  formula17921792    yes  unknown0..4095%.0           no

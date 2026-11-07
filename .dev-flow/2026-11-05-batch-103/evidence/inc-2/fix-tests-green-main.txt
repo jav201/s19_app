@@ -1,4 +1,4 @@
-# host: cachyos-rtx | 2026-11-07T06:35:17-06:00 | load: 8.79 7.85 4.58
+# host: <runner> | 2026-11-07T06:35:17-06:00 | load: 8.79 7.85 4.58
 # a2l_definition.py md5: 7bd4064983dbcefac4523b1792f1838e  make_release_case.py md5: 82fba4c34fb9cad1888a30d06025a725
 # cmd: python -m pytest -q -p no:cacheprovider tests/test_b103_a2l_definition.py tests/test_b103_synth_definitions.py -k not 59_2
 /tmp/b103-e5fix/green/s19_app/__init__.py

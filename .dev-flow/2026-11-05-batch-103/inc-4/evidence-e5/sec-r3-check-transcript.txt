@@ -4,8 +4,8 @@ label_match.__file__ = /tmp/b103-e5r3-4-sec/tree/s19_app/tui/services/label_matc
 label_match sha256 = 8f396c15d3c848ceb2c98ab74c112150bf9c09759abb662ea0f2162d1ca7c94d
 tests module = /tmp/b103-e5r3-4-sec/tree/tests/test_b103_label_match_perf.py
 mode = r3 check  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = 3469267207182703842
-host = cachyos-rtx  load = (1.77, 1.22, 1.19)  cpus = 16  RLIMIT_AS = 8 GiB
-HOME = /tmp/b103-e5r3-4-sec/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5r3-4-sec/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5r3-4-sec/pilot
+host = <runner>  load = (1.77, 1.22, 1.19)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5r3-4-sec/<user>  LOCALAPPDATA = /tmp/b103-e5r3-4-sec/<user>/localappdata  PILOT_DIR = /tmp/b103-e5r3-4-sec/pilot
 probe = sec-r3-probe.py sha256 eb161db9dae675bf29146e1ee26edf0a0fd0344791761bd264485f2c879403da; round-1 helpers = sec-e5-probe.py sha256 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
 _FUZZY_TOKEN_CAP = 20; _FUZZY_SWITCH_CAP = 512; T.ANY_QUERY_BOUND_S = 2.0; T.KEYSTROKE_BOUND_S = 0.2
 === A. hostile set (round-1 spans mode) with the R-A2L-MATCH.41-capped oracle
@@ -14,8 +14,8 @@ label_match.__file__ = /tmp/b103-e5r3-4-sec/tree/s19_app/tui/services/label_matc
 label_match sha256 = 8f396c15d3c848ceb2c98ab74c112150bf9c09759abb662ea0f2162d1ca7c94d
 tests module = /tmp/b103-e5r3-4-sec/tree/tests/test_b103_label_match_perf.py
 mode = spans  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = 3469267207182703842
-host = cachyos-rtx  load = (1.77, 1.22, 1.19)  cpus = 16  RLIMIT_AS = 8 GiB
-HOME = /tmp/b103-e5r3-4-sec/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5r3-4-sec/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5r3-4-sec/pilot
+host = <runner>  load = (1.77, 1.22, 1.19)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5r3-4-sec/<user>  LOCALAPPDATA = /tmp/b103-e5r3-4-sec/<user>/localappdata  PILOT_DIR = /tmp/b103-e5r3-4-sec/pilot
 hostile names 57; indexed 56 (duplicates and names over 1,024 characters left out)
 queries 3123 x 3 limits (84 s); listed entries 26401; exceptions 0; bad spans (empty, outside [0, len(name)), unsorted or touching) 0; rank != oracle 0; entries whose name is the input object 26401
 

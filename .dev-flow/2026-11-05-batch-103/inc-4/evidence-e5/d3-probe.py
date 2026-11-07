@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """batch-103 Inc 4 E5 round-3 DESIGN probe (d3). THROWAWAY EVIDENCE, NOT PRODUCT CODE.
 
-Runs on cachyos-rtx only, against the REAL module s19_app/tui/services/label_match.py (sha256 8f396c15...) of a
+Runs on <runner> only, against the REAL module s19_app/tui/services/label_match.py (sha256 8f396c15...) of a
 COPY of the read-only integrated tree (env TREE, first on PYTHONPATH). It loads the security reviewer's round-3
 probe (sec-r3-probe.py, unchanged, same directory; it loads sec-e5-probe.py) for its fixtures, builders, node
 counter (COUNTED_WALK), address-space cap and alarm, and the d3 pilot (d3-pilot.py) for the two round-3 rulings:

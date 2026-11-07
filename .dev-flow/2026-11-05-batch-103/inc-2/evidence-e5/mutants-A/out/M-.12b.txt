@@ -24,7 +24,7 @@ index 7b4d1416..eec748d0 100644
 =================================== FAILURES ===================================
 __ test_r_a2l_def_12_4_a_listed_type_in_another_letter_case_is_not_supported ___
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-953/test_r_a2l_def_12_4_a_listed_t0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-953/test_r_a2l_def_12_4_a_listed_t0')
 
     def test_r_a2l_def_12_4_a_listed_type_in_another_letter_case_is_not_supported(tmp_path):
         """R-A2L-DEF.12/4 (E5 fix pass, CR-4 = E5S-05) - ``tab_intp`` is not ``TAB_INTP``: describe and decode refuse it."""

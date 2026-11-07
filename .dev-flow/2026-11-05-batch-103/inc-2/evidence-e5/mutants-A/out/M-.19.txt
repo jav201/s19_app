@@ -22,7 +22,7 @@ index 7b4d1416..4bc3d0cf 100644
 =================================== FAILURES ===================================
 _________ test_r_a2l_def_19_2_mask_wider_than_the_datatype_is_refused __________
 
-tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-961/test_r_a2l_def_19_2_mask_wider0')
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-961/test_r_a2l_def_19_2_mask_wider0')
 
     def test_r_a2l_def_19_2_mask_wider_than_the_datatype_is_refused(tmp_path):
         """R-A2L-DEF.19/2 - 0x100 on a UBYTE."""

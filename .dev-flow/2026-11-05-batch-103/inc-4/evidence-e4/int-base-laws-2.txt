@@ -1,4 +1,4 @@
-/home/javiergr/work/b103-inc4-base/s19_app/__init__.py
+/home/<user>/work/b103-inc4-base/s19_app/__init__.py
 e07fb00f batch-101: atlas regenerated after the increment-006 decision
 
 tests/test_b101_doc_hygiene.py:1277: AssertionError
