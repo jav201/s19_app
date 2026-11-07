@@ -129,3 +129,8 @@ Rulings, each applying the fix column unless the ruling says otherwise:
 - **E3S3-32: accept.** The message bound is "1,024 characters" everywhere.
 
 **Next:** a narrow Opus correction of Inc 3a's records, then round 7 security on the same harness plus EN-*, RL-16/17, VT-8/9 and the raise cases. The 2a items go to the running 2a gap pass 2.
+- **Round-6 correction done** (Opus, 19 min). .148 is 18/18; new cases .150/arr-10 and /arr-11; arr-9 is extended. Orchestrator rulings on what it reported:
+  - **The 2S bound is 1.5, not 1.3, for .148 and .150.** This is the measure ruling recorded in Inc 2a's `E3-rulings.md` ("gap pass 2 rulings"): GC off, ×2S ≤ 1.5, ×8S ≤ 2.0. Three GREEN runs of .149 on flat code measured ×1.2–1.4 at 2S with GC off; a per-object walk gives ≥ ×1.78 at 2S and ≥ ×3.2 at 8S. The orchestrator applied it in place to the current case and node texts (01:199, :318; 02:178, :315, :324; graph :66, :313, :315, :716, :717, :792). The historical quotes of the round-4 rule stay as written.
+  - **The `Definition` private fields** `_name_echo` and `_table_form` were accepted in Inc 2a's P-2 ruling, as `field(compare=False, repr=False)`: I-2's public names, equality and repr are unchanged.
+  - **The NaN-x message** is `<name>: the table <ref> has an x that is not a number`, the wording of Inc 2a's R-A2L-DEF.58.2/19, so it is no longer PROPOSED. Applied in place.
+  - **Next:** round 7 security, on the corrected records only (RL-16/17, VT-8/9, EN-1/2, the raise cases, CT-*, and the v2 bisect equality).
