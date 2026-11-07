@@ -1,0 +1,61 @@
+=== base commit ===
+2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+applied M3 OK
+=== mutation diff ===
+--- <HOME>/work/s19_i12bmut/s19_app/tui/flow_screens.py	2026-11-06 18:16:04.301575372 -0600
++++ s19_app/tui/flow_screens.py	2026-11-06 18:31:53.927700949 -0600
+@@ -872,7 +872,7 @@
+             name, value = ins[slot]
+             keep = clip_head if ext and name in ("cmd", "instr") else clip_tail
+             lines.append(row(clip_head(f"in · {name}", inner), _S_DIM))
+-            lines.append(row(keep(value, inner)))
++            _v = keep(value, inner); _r = row(_v); _r.stylize("red", 2, 2 + max(1, len(_v) // 2)); lines.append(_r)  # MUTANT M3
+         else:
+             lines.extend([row(), row()])
+     if annotation_row:
+=== grep landed ===
+875:            _v = keep(value, inner); _r = row(_v); _r.stylize("red", 2, 2 + max(1, len(_v) // 2)); lines.append(_r)  # MUTANT M3
+=== s19_app.__file__ ===
+<HOME>/work/s19_i12bmut_m03/s19_app/__init__.py
+=== pytest ===
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+________________ test_at088b_check_ref_label_renders_literally _________________
+../s19_i12bmut/tests/test_flow_builder_render.py:552: in test_at088b_check_ref_label_renders_literally
+    assert cutting == [] and len(exact) == 1, (cutting, exact)
+E   AssertionError: ([Span(416, 440, style=Style(foreground=Color(0, 0, 0, ansi=1)))], [Span(416, 465, style=Style(foreground=Color(233, 233, 233)))])
+E   assert ([Span(416, 44... 0, ansi=1)))] == []
+E     
+E     Left contains one more item: Span(416, 440, style=Style(foreground=Color(0, 0, 0, ansi=1)))
+E     Use -v to get more diff)
+________________ test_at_b94_18_hostile_names_render_literally _________________
+../s19_i12bmut/tests/test_tui_flow_builder_b94.py:434: in test_at_b94_18_hostile_names_render_literally
+    assert cutting == [] and len(exact) == 1, (cutting, exact)
+E   AssertionError: ([Span(608, 625, style=Style(foreground=Color(0, 0, 0, ansi=1)))], [Span(608, 642, style=Style(foreground=Color(233, 233, 233)))])
+E   assert ([Span(608, 62... 0, ansi=1)))] == []
+E     
+E     Left contains one more item: Span(608, 625, style=Style(foreground=Color(0, 0, 0, ansi=1)))
+E     Use -v to get more diff)
+__________ test_at_b97_08_hostile_and_nul_refs_never_crash_or_inject ___________
+../s19_i12bmut/tests/test_b97_flow_builder.py:1620: in test_at_b97_08_hostile_and_nul_refs_never_crash_or_inject
+    assert spans and _foreign(spans) == [], sorted(set(_foreign(spans)))
+E   AssertionError: ['#800000 | ansi_red']
+E   assert (['#1b233a | rgb(27,35,58)', '#969aad | rgb(150,154,173)', '#1b233a | rgb(27,35,58)', '#1b233a | rgb(27,35,58)', '#969aad | rgb(150,154,173)', '#1b233a | rgb(27,35,58)', ...] and ['#800000 | a...nsi_red', ...] == []
+E     
+E     Left contains 8 more items, first extra item: '#800000 | ansi_red'
+E     Use -v to get more diff)
+_____________________ test_at_flow_block_label_markup_safe _____________________
+../s19_i12bmut/tests/test_tui_directionb.py:5860: in test_at_flow_block_label_markup_safe
+    assert cutting == [] and len(exact) == 1, (cutting, exact)
+E   AssertionError: ([Span(374, 380, style=Style(foreground=Color(0, 0, 0, ansi=1)))], [Span(374, 387, style=Style(foreground=Color(233, 233, 233)))])
+E   assert ([Span(374, 38... 0, ansi=1)))] == []
+E     
+E     Left contains one more item: Span(374, 380, style=Style(foreground=Color(0, 0, 0, ansi=1)))
+E     Use -v to get more diff)
+=========================== short test summary info ============================
+FAILED tests/test_flow_builder_render.py::test_at088b_check_ref_label_renders_literally
+FAILED tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally
+FAILED tests/test_b97_flow_builder.py::test_at_b97_08_hostile_and_nul_refs_never_crash_or_inject
+FAILED tests/test_tui_directionb.py::test_at_flow_block_label_markup_safe - A...
+4 failed in 19.90s
+=== exit code: 1 ===

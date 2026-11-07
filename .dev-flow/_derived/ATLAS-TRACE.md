@@ -1,5 +1,5 @@
 <!-- DERIVED — DO NOT EDIT. Regenerate: devflow-validate.py --atlas --write -->
-<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 97 requirement files | corpus digest: 949f014225bdf8af -->
+<!-- flow_version: 2026-10-12-rev102 | flow_hash: 6f99c414f39c84d9 | corpus: 100 requirement files | corpus digest: d1ff5031d9970667 -->
 
 # ATLAS-TRACE — where does every id live, and what is its state?
 
@@ -1522,7 +1522,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `TC-79c` | LIVE | seed |  |
 | `TC-79d` | LIVE | seed |  |
 
-## family US/HLR/LLR — 2394 unique id(s)
+## family US/HLR/LLR — 2402 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -3851,10 +3851,18 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `US-I11-2` | batches |
 | `US-I11-3` | batches |
 | `US-I11-4` | batches |
+| `US-I12-1` | batches |
+| `US-I12-2` | batches |
+| `US-I12-3` | batches |
+| `US-I12b-1` | batches, tests |
 | `US-I8-1` | batches |
 | `US-I8-2` | batches |
 | `US-I8-3` | batches |
 | `US-I8-4` | batches |
+| `US-I9-1` | batches, tests |
+| `US-I9-1..3` | batches |
+| `US-I9-2` | batches, tests |
+| `US-I9-3` | batches, tests |
 | `US-J` | batches |
 | `US-K` | batches |
 | `US-L1` | batches |
@@ -3921,7 +3929,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `US-less` | batches |
 | `US-nnn` | batches |
 
-## family R — 551 unique id(s)
+## family R — 552 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -3957,7 +3965,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `R-CHKED-018` | canon |
 | `R-CHKED-019` | canon |
 | `R-CHKED-020` | canon |
-| `R-CHKED-021` | canon |
+| `R-CHKED-021` | batches, canon |
 | `R-CHKED-022` | canon |
 | `R-CHKED-023` | canon |
 | `R-CHKED-024` | batches, canon |
@@ -3994,6 +4002,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `R-CHKED-055` | batches, tests |
 | `R-CHKED-056` | batches, tests |
 | `R-CHKED-057` | batches, tests |
+| `R-CHKED-058` | batches |
 | `R-CHKS-001` | batches, canon, tests |
 | `R-CHKS-002` | canon |
 | `R-CHKS-003` | canon |
@@ -4477,7 +4486,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `R-VAR-003` | batches |
 | `R-VER-001` | canon |
 
-## family AT/TC — 2016 unique id(s)
+## family AT/TC — 2017 unique id(s)
 
 | id | seen in |
 |---|---|
@@ -4782,6 +4791,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `AT-087a` | batches, tests |
 | `AT-087b` | batches, tests |
 | `AT-087c` | batches |
+| `AT-088` | batches |
 | `AT-088a` | batches, tests |
 | `AT-088b` | batches, tests |
 | `AT-09` | batches |
@@ -5644,7 +5654,7 @@ registry: 1514 rows — BURNED 422 · LIVE 992 · RESERVED 75 · RETIRED 25
 | `TC-1811` | batches, tests |
 | `TC-1815` | batches, tests |
 | `TC-1816` | batches, tests |
-| `TC-1817` | tests |
+| `TC-1817` | batches, tests |
 | `TC-1818` | batches, tests |
 | `TC-1819` | tests |
 | `TC-1820` | batches, tests |

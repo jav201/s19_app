@@ -29,7 +29,7 @@ Committed: `git diff --stat e07fb00 HEAD -- s19_app tests docs README.md` (11 fi
 | `s19_app/tui/services/flow_execution_service.py` | source | US-I9-1 | `CHAIN_RUN_CONFIRM_RERUN = "confirm re-run"` beside `CHAIN_RUN_MODES`; `run_chain_set` accepts the token (dispatch unchanged: lane order like `sequential`), `ChainSetRunRecord(mode=mode)` keeps it, so `compose_chain_set_report` prints it; three docstrings name the token (E3A-07) |
 | `s19_app/tui/services/flow_persistence_service.py` | source | US-I9-2 · US-I9-3 | `save_flow_json` / `save_chain_set` gain `workarea_root`; `_guarded_destination` before the `mkdir` (a refusal raises and creates nothing), then the new private `_create_new_json` (the house claim: `lexists` → render → exclusive create → the check after the claim → write); `_unlink_own_claim` (E5 SE5-2); `render` writes the stem cut to the format cap; `save_chain_set` gains its Data Flow / Dependencies; docstrings (CR-05, CR-06) |
 | `s19_app/tui/app.py` | source | US-I9-1 · US-I9-3 | `on_flow_execution_panel_external_step_confirmed` passes `mode=CHAIN_RUN_CONFIRM_RERUN`; `_do_save` and the FX save handler pass `workarea_root=self.workarea` inside `try`, and on `WorkareaContainmentError` paint the two exact I-3 status texts and return (no `mark_saved`) |
-| `s19_app/tui/flow_screens.py` | source | — (A16-4) | module docstring only: the measured edges (panels post messages and never call the executor; the module reads `flow_model` and `flow_persistence_service`); no `docs/architecture.md` section cited (D-8) |
+| `s19_app/tui/flow_screens.py` | source | US-I9-1, US-I9-2 (A16-4: the module docstring states the edges the two stories' handlers use) | module docstring only: the measured edges (panels post messages and never call the executor; the module reads `flow_model` and `flow_persistence_service`); no `docs/architecture.md` section cited (D-8) |
 | `tests/test_b101_flow_saves.py` | test | US-I9-2 · US-I9-3 | new file, 38 nodes: the name/stem cases, the guard, the claim's eleven defences /14/1 … /14/11 and /8/1 … /8/9, the error arms, the mode |
 | `tests/test_b101_flow_names_ui.py` | test | US-I9-1 · US-I9-2 · US-I9-3 | new file, 10 nodes: the confirm's report, the after-Clear save, the lane-report title, the two refusal statuses, AT-I9-1 … AT-I9-3 |
 | `tests/test_b101_help_legend_docs.py` | test | US-I9-1 · US-I9-2 | `_FIXED` 11 → 13 rows by named supersession (F-45, F-46) |
@@ -112,18 +112,60 @@ Details: `inc-9/04-validation.md`.
 
 ### Evidence files — bytes at a declared home, verbatim, hash-verified (C-59)
 
-The transcripts live in `.dev-flow/2026-11-01-batch-101/evidence/inc-9/` and the pilot in `inc-9/evidence-e1/`. Each transcript prints the base commit, the staged tree, `s19_app.__file__` and (the corrective) the exact command line; home paths and account names are redacted.
+Digests: SHA-256 of the bytes at the cited path, taken 2026-11-06. The transcripts live in `.dev-flow/2026-11-01-batch-101/evidence/inc-9/` and the pilot in `inc-9/evidence-e1/`. Each transcript prints the base commit, the staged tree, `s19_app.__file__` and (the corrective) the exact command line; home paths and account names are redacted.
 
-| Evidence artifact | Path — under `.dev-flow/2026-11-01-batch-101/` |
-|---|---|
-| i9e1-pilot-transcript.txt | inc-9/evidence-e1/i9e1-pilot-transcript.txt |
-| int-01.txt … int-08.txt, int-09-e4r3.txt | evidence/inc-9/int-01.txt … evidence/inc-9/int-09-e4r3.txt |
-| e5c-01.txt … e5c-07.txt | evidence/inc-9/e5c-01.txt … evidence/inc-9/e5c-07.txt |
-| e5s-probe.txt, e5s-probe.py.txt | evidence/inc-9/e5s-probe.txt, evidence/inc-9/e5s-probe.py.txt |
-| mut-01.txt … mut-21.txt | evidence/inc-9/mut-01.txt … evidence/inc-9/mut-21.txt |
-| mut-r-11.txt … mut-r-21.txt (mut-r-14b.txt) | evidence/inc-9/mut-r-11.txt … evidence/inc-9/mut-r-21.txt (mut-r-14b.txt) |
-| red-01-tester1-base.txt, red-01-tester2-base.txt | evidence/inc-9/red-01-tester1-base.txt, evidence/inc-9/red-01-tester2-base.txt |
-| win-01.txt, win-02.txt | evidence/inc-9/win-01.txt, evidence/inc-9/win-02.txt |
+| Evidence artifact | Path — under `.dev-flow/2026-11-01-batch-101/` | SHA-256 |
+|---|---|---|
+| i9e1-pilot-transcript.txt | inc-9/evidence-e1/i9e1-pilot-transcript.txt | b42943a2cc3820c305b10a254d8dacfe431036e0de4450468332a8c0a222d6ab |
+| e5c-01.txt | evidence/inc-9/e5c-01.txt | ed9f35c467828a258414193893477de4ac4c46403ed04069da452cfb9821135d |
+| e5c-02.txt | evidence/inc-9/e5c-02.txt | f7425f919266174f0ba9f34f34d36375ce0fb3b275f1112ef0be6307357c2342 |
+| e5c-03.txt | evidence/inc-9/e5c-03.txt | 1b808c76b56f7a4dea955290e4291030a2980a03ad76e96b6cfc322e9eb494af |
+| e5c-04.txt | evidence/inc-9/e5c-04.txt | f44a55864d1a5e3719ee72bc8a01d518266864071c7343f71e21341f2e0d7ad6 |
+| e5c-05.txt | evidence/inc-9/e5c-05.txt | e6948882e2d1a8d2f6dcf53baece57cd7bf97d161559b6ff8679d7c80902e531 |
+| e5c-06.txt | evidence/inc-9/e5c-06.txt | fb6be6c63576f5a97f2cc205f096635465d03293788aff61f655cb85ccb79dce |
+| e5c-07.txt | evidence/inc-9/e5c-07.txt | f6d6422aa4078b0daee21f545a33d016e96cad87445c84a9b9a861df76909797 |
+| e5s-probe.py.txt | evidence/inc-9/e5s-probe.py.txt | ba04e89072637e8f3cbb71df33e6d398327fb9f540f7dabb49aa4c207d9b709b |
+| e5s-probe.txt | evidence/inc-9/e5s-probe.txt | 0e95de320b86bbcaf43bd4f3fdc72ad79e67d598b1775612bd25f5defbaf5342 |
+| int-01.txt | evidence/inc-9/int-01.txt | 7cc767080ee5151f4935d74321f6f0982c4ea088b2e067768cec88f92bd11d6b |
+| int-02.txt | evidence/inc-9/int-02.txt | b49a1f1905ad9978586b19013e64e0c7e61aaabc022c30ceed23097e85d63ce3 |
+| int-03.txt | evidence/inc-9/int-03.txt | b5387841193dbb9aa16c4232b6cc49e680dc6046c3c6efe2d911f7007b1fcf56 |
+| int-04.txt | evidence/inc-9/int-04.txt | 9ddbd6583f86d59b78905fbe68f7628e8fda15ba119f5b389155ee0e1e8e21f6 |
+| int-05.txt | evidence/inc-9/int-05.txt | d498d02e4483d2e852928b3e32ae40f291964602bae60695add52ac9aaabeba7 |
+| int-06.txt | evidence/inc-9/int-06.txt | c28d8aabc42101a50be8f638d27d1045b49edde5e7ac4bb34e6aa25dd27eab68 |
+| int-07.txt | evidence/inc-9/int-07.txt | 6a47e817bd74f516b7d2eaaa801679708ea3c79ccf733700631ab45216d4e7de |
+| int-08.txt | evidence/inc-9/int-08.txt | 01e664cfdffee5d978ce93bbf429ae38559f91acd36fab93fd9a3602e20993b9 |
+| int-09-e4r3.txt | evidence/inc-9/int-09-e4r3.txt | 322c883d084078d4c674a26e1dbe8da488fd4aaf84326fdafa76636b931e9e82 |
+| mut-01.txt | evidence/inc-9/mut-01.txt | bbba8c1935ece4af50d07eb70327efcca8acc6b72064afb99979f5a937ed02a4 |
+| mut-02.txt | evidence/inc-9/mut-02.txt | 2d16f2f588c718d23eec1ac83d6143509a29c0a8f31545d59dbca045a2240189 |
+| mut-03.txt | evidence/inc-9/mut-03.txt | b6842b8ab66d8ff12827fe0d06cc6ce8e88b8f7d7d9c03fda3711d682cef41e3 |
+| mut-04.txt | evidence/inc-9/mut-04.txt | c54fdad90f62204adc594c5246656313ea29d7503b21310430f00ba2530c4ecb |
+| mut-05.txt | evidence/inc-9/mut-05.txt | 31992f06b9fb89b5ef5b2e801d5f1a489f97ba4f1ab0a7dab9a7efec4bc010c2 |
+| mut-06.txt | evidence/inc-9/mut-06.txt | e4387c9e1af70a25f322a3e3652a6a754ef596869224e8730e28889139993c3b |
+| mut-07.txt | evidence/inc-9/mut-07.txt | 2a307682b6e691b64732e587251692244d341889de2034472efd1596e3015e1b |
+| mut-08.txt | evidence/inc-9/mut-08.txt | 6dee3a71a18adbd24211f288f9ef7be5fa1681e66069a03cdd39b0788de2aa1b |
+| mut-09.txt | evidence/inc-9/mut-09.txt | 7eba324a65d046d63b70f11ae9de8df6f17ce6b9b653d20301df73420e016719 |
+| mut-10.txt | evidence/inc-9/mut-10.txt | 9b9a33ff3fd1f83a6a86b84236dda0faba558e049da235bf775d47733a70f620 |
+| mut-11.txt | evidence/inc-9/mut-11.txt | 4d12c57632bab86e15eb13234dc3a9d5c6a1c80614c6e9ad7bcdd3ada17959b1 |
+| mut-12.txt | evidence/inc-9/mut-12.txt | 7e40ccb9c4558db95c3cae7b22d23d559e1f2c23832363b1992b1198dfc60201 |
+| mut-13.txt | evidence/inc-9/mut-13.txt | 46b15c742773e3a76c7fdc98558899a18da4e3ede54cd35210089d221a78c159 |
+| mut-14.txt | evidence/inc-9/mut-14.txt | f461527948df82d631505151fe828959c832b04c4d18da7b85486b1698a8eed3 |
+| mut-15.txt | evidence/inc-9/mut-15.txt | c0a6f133771498cd109ebb29760bd6f2adf899c98b40ad2edfb4a3883c2f109d |
+| mut-16.txt | evidence/inc-9/mut-16.txt | cc3988f4524065b6ba923688331515943fb50a011724d3f566bd9f69d333ecd7 |
+| mut-17.txt | evidence/inc-9/mut-17.txt | 44df5d17da137f8895baf95f7465b75aa0cb97cf356a04315000d3be5fe84435 |
+| mut-18.txt | evidence/inc-9/mut-18.txt | 9689d0004392596b21bad7ce6ae3b255c11ca64f64f827eae1679fa576f36ab3 |
+| mut-19.txt | evidence/inc-9/mut-19.txt | e68b6da491fdbcab22c449cb1b421b4047d0a38edbfc4cbc0c22b546a1e482ee |
+| mut-20.txt | evidence/inc-9/mut-20.txt | f5481c5dce43d9166628d0cc9dba154b7ddac42aa35d599ce89f54b759eadba9 |
+| mut-21.txt | evidence/inc-9/mut-21.txt | b186dc8f7ae483393d171e1704a586f8b88b8be5ba4007a970568942e7c8abe0 |
+| mut-r-11.txt | evidence/inc-9/mut-r-11.txt | 938169201809bdc0697b51595661920544c20479c161a00dd745e59d3412c969 |
+| mut-r-12.txt | evidence/inc-9/mut-r-12.txt | 59245e4fb3e445649e49847c6ffacd77ef66a0806f2cecc47bdb535165022520 |
+| mut-r-13.txt | evidence/inc-9/mut-r-13.txt | 8832371714363c1c9cda189d66a0050e30f68b72a0b361add1c0aa6948a1f17a |
+| mut-r-14.txt | evidence/inc-9/mut-r-14.txt | f841916afc8f43be6109d06b72dbbc218aa3e2d90a18bd25d7c0dc0b8fb0348a |
+| mut-r-14b.txt | evidence/inc-9/mut-r-14b.txt | 444ed56f94666be4c3fb6b257b4658c83f7ae3b2b90d4cf4434667621311ec15 |
+| mut-r-21.txt | evidence/inc-9/mut-r-21.txt | 5f6a73b054fff7f318864a95057c0c2393e1a8db2851dad48760a813ea0c897b |
+| red-01-tester1-base.txt | evidence/inc-9/red-01-tester1-base.txt | df99ff71ff47d53c8c9a9f9a15ee23bf0ba2604a6f532eee0a72b77132158466 |
+| red-01-tester2-base.txt | evidence/inc-9/red-01-tester2-base.txt | 169fe12daa560b7f2ff205f3e99c11510b6e699f17382db1aef82eb3916250b6 |
+| win-01.txt | evidence/inc-9/win-01.txt | 1ee63d48bdb132c6ae840d2d5ae8d021152dbbc873de3b1568458a0b5f2414e2 |
+| win-02.txt | evidence/inc-9/win-02.txt | 939b315f7aeb521c7cab07f8de8e34f653ae3e41580f4ac373d2494cabbdb2d9 |
 
 | Field | Value |
 |---|---|

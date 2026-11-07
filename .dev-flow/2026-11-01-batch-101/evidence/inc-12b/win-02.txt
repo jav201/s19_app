@@ -1,0 +1,15 @@
+win-02 (Inc 12b E5, after the corrective): Windows PC; worktree head 2904376d; LOCALAPPDATA isolated; OS clipboard not used; command: python -m pytest -p no:cacheprovider -p no:xdist -v -rfEs tests/test_b101_flow_shown_widgets.py
+s19_app.__file__ = <HOME>\Github\s19_app-b101-inc12b\s19_app\__init__.py
+============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-8.4.2, pluggy-1.6.0 -- <HOME>\anaconda3\envs\s19env\python.exe
+rootdir: <HOME>\Github\s19_app-b101-inc12b
+configfile: pyproject.toml
+plugins: textual-snapshot-1.1.0, syrupy-4.8.0
+collecting ... collected 4 items
+
+tests/test_b101_flow_shown_widgets.py::test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state PASSED [ 25%]
+tests/test_b101_flow_shown_widgets.py::test_r_fx_scr_4_1_every_flow_execution_widget_is_shown_in_a_state PASSED [ 50%]
+tests/test_b101_flow_shown_widgets.py::test_r_fb_add_1_2_a_press_naming_no_kind_changes_nothing PASSED [ 75%]
+tests/test_b101_flow_shown_widgets.py::test_at_i12b_1_kind_chip_add_and_ribbon_by_keys PASSED [100%]
+
+============================= 4 passed in 24.54s ==============================

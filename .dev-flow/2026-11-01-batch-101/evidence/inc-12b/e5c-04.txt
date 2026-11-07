@@ -1,0 +1,921 @@
+=== Inc 12b E5 corrective: e5c-04 — the final tree: the three pinned I-3 commands, then the new file, the 13 re-pointed files and the 7 law guards (-rA: one line per node)
+Executor: E5 corrective pass (Opus), LAN Linux host 2. The final tree 7c89fe9ef26e61b6a60b943fef23738bcacfdb1d equals the tree computed locally from the same diff (scratch index, 17 files). The FAILED / ERROR lines inside the PASSED sections are the captured output of test_suite_hygiene's own inner pytest runs (their fixtures), not nodes of this run; this run has 0 failed, 0 errors.
+
+=== Inc 12b E5 corrective: the three pinned I-3 commands (graph-inc12b.md) on the final tree, worktree = index 7c89fe9ef26e61b6a60b943fef23738bcacfdb1d
+$ git grep -n -w -e flow_help -e flow_canvas -e flow_blocks -e flow_kind -e flow_ext_session -e fx_help -e _flow_block_label -e _blocks_text -e _canvas_text -e _block_rows -e _Grid -e _plc_block -e _chip -e _wire_bend -e _wire_drop -e _block_width -e _short_ext -e _CANVAS_COLS -e _BLOCK_W -e _EXT_BLOCK_W -e _S_WIRE -e _S_LABEL -e _S_VALUE -e _S_HEAD -- s19_app tests
+(exit 1)
+$ git grep -n -e 'def _layout(' -e 'self\._layout(' -- s19_app/tui/flow_screens.py
+(exit 1)
+$ git grep -n -e '\._layout(' -- tests
+(exit 1)
+
+=== Inc 12b E5 corrective run: e5c-04
+date: 2026-11-07T00:52:41Z
+host: LAN Linux host 2
+worktree: <HOME>/work/s19_i12bc
+worktree HEAD (base): 2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+main ref seen here: 2f54c7dea27d826483e5c5e596421b8b3a68bb2f (origin/main 2f54c7dea27d826483e5c5e596421b8b3a68bb2f)
+index tree (base + the corrective diff, staged): 7c89fe9ef26e61b6a60b943fef23738bcacfdb1d
+staged files vs base: 17
+unstaged changes vs index: 0
+untracked files: 
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i12bc/s19_app/__init__.py
+CMD: env -u NO_COLOR $PY -m pytest -q -p no:cacheprovider -n 6 --dist loadfile -m 'not serial_timing' -rA tests/test_b101_flow_shown_widgets.py tests/test_b100_project_homes.py tests/test_b101_flow_names_ui.py tests/test_b102_flow_file_chooser.py tests/test_b97_chips_help.py tests/test_b97_flow_builder.py tests/test_flow_builder_render.py tests/test_flow_crc_ribbon.py tests/test_flow_crc_ui.py tests/test_flow_external_step_b96.py tests/test_flow_funnel_b96.py tests/test_tui_directionb.py tests/test_tui_flow_builder_b94.py tests/test_tui_flow_persistence_ui.py tests/test_address_census.py tests/test_suite_hygiene.py tests/test_id_registry.py tests/test_engine_unchanged.py tests/test_docs_canon.py tests/test_b101_doc_hygiene.py tests/test_b101_help_legend_docs.py
+bringing up nodes...
+bringing up nodes...
+
+...........................................sss.ss....................... [  9%]
+........................................................................ [ 19%]
+...............................ss....................................... [ 29%]
+........................................................................ [ 39%]
+........................................................................ [ 48%]
+..........................................................s..........sss [ 58%]
+sssss................................................................... [ 68%]
+...................ss................................................... [ 78%]
+...............................................................s........ [ 87%]
+.........sssss....................s.....................ssss............ [ 97%]
+..................                                                       [100%]
+==================================== PASSES ====================================
+___________________ test_tc_b100_31_copy_ceiling_2000_files ____________________
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+----------------------------- Captured stdout call -----------------------------
+[timing] save as with a 2 000-file copy list: 13.37 s
+____________ test_tc022_mac_paging_advances_through_restyled_screen ____________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+ERROR    s19_app.core:core.py:361 File not found: /tmp/pytest-of-<user>/pytest-477/popen-gw0/test_tc022_mac_paging_advances0/many.s19
+_______________ test_r_tst_042_margin_report_is_a_test_property ________________
+[gw5] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+----------------------------- Captured stdout call -----------------------------
+running: <HOME>/miniconda3/envs/s19ci/bin/python -mpytest --basetemp=/tmp/pytest-of-<user>/pytest-477/popen-gw5/test_r_tst_042_margin_report_is_a_test_property0/runpytest-0 -p no:cacheprovider --junitxml=junit.xml
+     in: /tmp/pytest-of-<user>/pytest-477/popen-gw5/test_r_tst_042_margin_report_is_a_test_property0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: /tmp/pytest-of-<user>/pytest-477/popen-gw5/test_r_tst_042_margin_report_is_a_test_property0
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+test_margin_property.py .                                                [100%]
+
+- generated xml file: /tmp/pytest-of-<user>/pytest-477/popen-gw5/test_r_tst_042_margin_report_is_a_test_property0/junit.xml -
+============================= QC-TM timing margins =============================
+LOW 15.0%  0.850 s / 1.000 s  p  test_margin_property.py::test_arm
+QC-TM: 1 bounds, 1 under 20 % margin
+============================== 1 passed in 0.01s ===============================
+_______________ test_r_tst_043_045_qc_tm_section_rows_and_count ________________
+[gw5] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+----------------------------- Captured stdout call -----------------------------
+running: <HOME>/miniconda3/envs/s19ci/bin/python -mpytest --basetemp=/tmp/pytest-of-<user>/pytest-477/popen-gw5/test_r_tst_043_045_qc_tm_section_rows_and_count0/runpytest-0 -p no:cacheprovider
+     in: /tmp/pytest-of-<user>/pytest-477/popen-gw5/test_r_tst_043_045_qc_tm_section_rows_and_count0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: /tmp/pytest-of-<user>/pytest-477/popen-gw5/test_r_tst_043_045_qc_tm_section_rows_and_count0
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 3 items
+
+test_qc_tm_rows.py ...                                                   [100%]
+============================= QC-TM timing margins =============================
+LOW 15.0%  0.850 s / 1.000 s  b  test_qc_tm_rows.py::test_b
+25.0%  0.750 s / 1.000 s  c  test_qc_tm_rows.py::test_c
+40.0%  0.600 s / 1.000 s  a  test_qc_tm_rows.py::test_a
+QC-TM: 3 bounds, 1 under 20 % margin
+
+============================== 3 passed in 0.01s ===============================
+_____________ test_r_tst_043_2_teardown_error_report_gives_one_row _____________
+[gw5] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+----------------------------- Captured stdout call -----------------------------
+running: <HOME>/miniconda3/envs/s19ci/bin/python -mpytest --basetemp=/tmp/pytest-of-<user>/pytest-477/popen-gw5/test_r_tst_043_2_teardown_error_report_gives_one_row0/runpytest-0 -p no:cacheprovider
+     in: /tmp/pytest-of-<user>/pytest-477/popen-gw5/test_r_tst_043_2_teardown_error_report_gives_one_row0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: /tmp/pytest-of-<user>/pytest-477/popen-gw5/test_r_tst_043_2_teardown_error_report_gives_one_row0
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+test_teardown_row.py .E                                                  [100%]
+
+==================================== ERRORS ====================================
+________________________ ERROR at teardown of test_arm _________________________
+
+    @pytest.fixture
+    def _boom():
+        yield
+>       raise RuntimeError("teardown boom")
+E       RuntimeError: teardown boom
+
+test_teardown_row.py:7: RuntimeError
+============================= QC-TM timing margins =============================
+LOW 15.0%  0.850 s / 1.000 s  e  test_teardown_row.py::test_arm
+QC-TM: 1 bounds, 1 under 20 % margin
+=========================== short test summary info ============================
+ERROR test_teardown_row.py::test_arm - RuntimeError: teardown boom
+========================== 1 passed, 1 error in 0.03s ==========================
+_______________________ test_r_tst_044_low_margin_prefix _______________________
+[gw5] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+----------------------------- Captured stdout call -----------------------------
+running: <HOME>/miniconda3/envs/s19ci/bin/python -mpytest --basetemp=/tmp/pytest-of-<user>/pytest-477/popen-gw5/test_r_tst_044_low_margin_prefix0/runpytest-0 -p no:cacheprovider
+     in: /tmp/pytest-of-<user>/pytest-477/popen-gw5/test_r_tst_044_low_margin_prefix0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: /tmp/pytest-of-<user>/pytest-477/popen-gw5/test_r_tst_044_low_margin_prefix0
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 2 items
+
+test_low_prefix.py ..                                                    [100%]
+============================= QC-TM timing margins =============================
+LOW 15.0%  0.850 s / 1.000 s  b  test_low_prefix.py::test_b
+20.0%  0.800 s / 1.000 s  d  test_low_prefix.py::test_d
+QC-TM: 2 bounds, 1 under 20 % margin
+
+============================== 2 passed in 0.01s ===============================
+_________________ test_r_tst_046_over_bound_arm_still_reports __________________
+[gw5] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+----------------------------- Captured stdout call -----------------------------
+running: <HOME>/miniconda3/envs/s19ci/bin/python -mpytest --basetemp=/tmp/pytest-of-<user>/pytest-477/popen-gw5/test_r_tst_046_over_bound_arm_still_reports0/runpytest-0 -p no:cacheprovider
+     in: /tmp/pytest-of-<user>/pytest-477/popen-gw5/test_r_tst_046_over_bound_arm_still_reports0
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: /tmp/pytest-of-<user>/pytest-477/popen-gw5/test_r_tst_046_over_bound_arm_still_reports0
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 1 item
+
+test_over_bound.py F                                                     [100%]
+
+=================================== FAILURES ===================================
+__________________________________ test_over ___________________________________
+
+    def test_over():
+        from tests.support.timing import report_margin
+>       assert 1.2 < report_margin("o", 1.2, 1.0)
+E       AssertionError: assert 1.2 < 1.0
+E        +  where 1.0 = <function report_margin at 0x7fb9fdfe2ac0>('o', 1.2, 1.0)
+
+test_over_bound.py:3: AssertionError
+============================= QC-TM timing margins =============================
+LOW -20.0%  1.200 s / 1.000 s  o  test_over_bound.py::test_over
+QC-TM: 1 bounds, 1 under 20 % margin
+=========================== short test summary info ============================
+FAILED test_over_bound.py::test_over - AssertionError: assert 1.2 < 1.0
+============================== 1 failed in 0.03s ===============================
+___________ test_at_b83_05_address_params_equals_the_live_derivation ___________
+[gw5] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+----------------------------- Captured stdout call -----------------------------
+sleep=66.7ms clock=66.7ms diff=0.07%
+sleep=50.0ms clock=50.0ms diff=0.00%
+sleep=40.0ms clock=40.0ms diff=0.00%
+sleep=33.3ms clock=33.3ms diff=0.00%
+sleep=28.6ms clock=28.6ms diff=0.08%
+sleep=25.0ms clock=25.0ms diff=0.00%
+sleep=22.2ms clock=22.2ms diff=0.00%
+sleep=20.0ms clock=20.0ms diff=0.00%
+sleep=18.2ms clock=18.2ms diff=0.00%
+sleep=16.7ms clock=16.7ms diff=0.00%
+sleep=15.4ms clock=15.4ms diff=0.00%
+sleep=14.3ms clock=14.3ms diff=0.00%
+sleep=13.3ms clock=13.3ms diff=0.00%
+sleep=12.5ms clock=12.5ms diff=0.00%
+sleep=11.8ms clock=11.8ms diff=0.00%
+sleep=11.1ms clock=11.1ms diff=0.00%
+sleep=10.5ms clock=10.5ms diff=0.00%
+sleep=10.0ms clock=10.0ms diff=0.00%
+sleep=9.5ms clock=9.5ms diff=0.01%
+sleep=9.1ms clock=9.1ms diff=0.00%
+sleep=8.7ms clock=8.7ms diff=0.01%
+___________________ test_tc_b102_file_07_logs_carry_no_paths ___________________
+[gw4] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+------------------------------ Captured log call -------------------------------
+DEBUG    asyncio:selector_events.py:54 Using selector: EpollSelector
+INFO     s19_app.core:core.py:402 S19 load summary: path=/tmp/pytest-of-<user>/pytest-477/popen-gw4/test_tc_b102_file_07_logs_carr0/.s19tool/workarea/proj1/prg.s19 records=134 errors=0 validation_errors=0 parse_errors=0
+DEBUG    s19_app.core:core.py:441 [Autodetect] big score: 138, little score: 138
+INFO     s19_app.core:core.py:281 Endian auto-detected as: big
+INFO     s19_app.core:core.py:283 File loaded: /tmp/pytest-of-<user>/pytest-477/popen-gw4/test_tc_b102_file_07_logs_carr0/.s19tool/workarea/proj1/prg.s19
+INFO     s19_app.core:core.py:284 134 records parsed.
+INFO     s19_app.core:core.py:286 134 valid out of 134 total records.
+INFO     s19_app.core:core.py:484 No S0 header record found.
+INFO     s19_app.core:core.py:402 S19 load summary: path=/tmp/pytest-of-<user>/pytest-477/popen-gw4/test_tc_b102_file_07_logs_carr0/.s19tool/workarea/proj1/prg.s19 records=134 errors=0 validation_errors=0 parse_errors=0
+DEBUG    s19_app.core:core.py:441 [Autodetect] big score: 138, little score: 138
+INFO     s19_app.core:core.py:281 Endian auto-detected as: big
+INFO     s19_app.core:core.py:283 File loaded: /tmp/pytest-of-<user>/pytest-477/popen-gw4/test_tc_b102_file_07_logs_carr0/.s19tool/workarea/proj1/prg.s19
+INFO     s19_app.core:core.py:284 134 records parsed.
+INFO     s19_app.core:core.py:286 134 valid out of 134 total records.
+INFO     s19_app.core:core.py:484 No S0 header record found.
+DEBUG    s19_app.tui.services.validation_service:validation_service.py:347 Validation report produced with no hard errors.
+=========================== short test summary info ============================
+PASSED tests/test_b97_chips_help.py::test_tc_b97_27_flows_family_targets_project_flows_dir
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_clean_arms_flow_loads
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_in_each_block_field_refuses_the_flow[image_ref]
+PASSED tests/test_b97_chips_help.py::test_tc_b97_27_flows_folder_name_imported_never_redeclared
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_in_each_block_field_refuses_the_flow[change_doc_ref]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_in_each_block_field_refuses_the_flow[output_name]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_in_each_block_field_refuses_the_flow[check_doc_ref]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_in_each_block_field_refuses_the_flow[config_ref]
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_12_1_quoted_keys_act_on_the_window
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_in_each_block_field_refuses_the_flow[a2b_binding_ref]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_in_each_block_field_refuses_the_flow[log_ref]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_in_each_block_field_refuses_the_flow[output_path]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_a2l_ref_refuses_the_flow
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_p36_nul_flow_file_refused
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_p36_run_flow_over_nul_ref_is_a_block_error
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_p36_nul_template_refuses_the_set
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_p36_nul_input_ref_refuses_the_set
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_p36_p50_manifest_guard_refuses_nul_entry
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_p50_bound_lane_input_is_a_block_error
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_manifest_nul_entry_skipped_others_kept
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_in_the_file_path_is_refused_at_stat[load_flow_json]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_in_the_file_path_is_refused_at_stat[load_chain_set]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_18_waiting_and_crc_tokens_declared_apart
+PASSED tests/test_suite_hygiene.py::test_r_tst_001_serial_timing_marker_is_registered
+PASSED tests/test_tui_directionb.py::test_tc003_only_one_screen_visible_at_startup
+PASSED tests/test_b97_chips_help.py::test_tc_b97_27_missing_flows_created_inside_project_then_opened
+PASSED tests/test_b97_chips_help.py::test_tc_b97_28_session_family_targets_project_dir
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_13_pipeline_cards_and_cables_replace_list_and_canvas
+PASSED tests/test_b100_project_homes.py::test_tc_b100_31_save_as_copies_every_subfolder_file
+PASSED tests/test_tui_directionb.py::test_tc003_show_screen_swaps_to_each_rail_screen
+PASSED tests/test_b97_chips_help.py::test_tc_b97_28_session_never_creates_a_removed_project_dir
+PASSED tests/test_b97_chips_help.py::test_tc_b97_29_no_project_reason_names_each_family_folder
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_14_palette_offers_every_kind_in_order
+PASSED tests/test_tui_directionb.py::test_tc003_rail_keys_1_to_9_route_screens
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_12_2_named_controls_exist
+PASSED tests/test_b100_project_homes.py::test_tc_b100_31_save_as_copies_the_top_level_files_but_not_the_backups
+PASSED tests/test_tui_directionb.py::test_tc015_startup_density_is_comfortable
+PASSED tests/test_tui_directionb.py::test_tc014_ctrl_d_cycles_density
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_15_add_form_shows_exactly_the_kind_inputs
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_16_clip_head_and_clip_tail
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_16_cards_clip_every_line_to_the_card
+PASSED tests/test_b97_chips_help.py::test_tc_b97_29_no_project_chips_disabled_with_their_own_reason
+PASSED tests/test_b100_project_homes.py::test_tc_b100_31_save_as_with_no_subfolder_copies_none
+PASSED tests/test_b100_project_homes.py::test_tc_b100_31_painted_names_clip_scrub_and_count
+PASSED tests/test_tui_directionb.py::test_tc014_cycle_density_action_toggles
+PASSED tests/test_tui_directionb.py::test_tc037_empty_state_panel_prompts_to_load
+PASSED tests/test_b97_chips_help.py::test_tc_b97_29_no_status_line_at_startup_without_a_project
+PASSED tests/test_tui_directionb.py::test_tc037_memory_map_shows_empty_state_with_no_file
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_7_2_question_mark_paints_the_approved_copy
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_12_3_no_stale_claim
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_13_1_no_reference_to_unopenable_things
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_13_2_named_folders_are_the_apps
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_14_1_no_markdown_marks
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_18_1_reports_step_names_one_markdown_file
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_19_1_reports_step_names_saved_regions
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_20_1_a2l_step_names_the_ascii_search
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_21_1_split_step_names_the_loaded_image
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_22_1_split_step_names_the_file_names
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_23_1_checks_step_names_outcome_groups
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_24_1_crc_step_names_typed_ranges
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_25_1_crc_template_line_names_a_crc_config
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_26_1_flow_help_says_designer_template_refused
+PASSED tests/test_b97_chips_help.py::test_tc_b97_30_check_editor_chip_unique_and_opens_checks_home
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_family_root_is_project_dir_else_tool_root
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_guard_unit_arms
+PASSED tests/test_tui_directionb.py::test_tc037_scaffold_screens_carry_empty_state
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_17_run_is_the_one_filled_action_on_one_foot_row
+PASSED tests/test_tui_directionb.py::test_tc001_rail_composes_nine_ordered_items
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_chip_press_guarded_in_a_loaded_project[file-checks]
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_18_2_generate_writes_markdown_only
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_18_crc_card_painted_in_the_crc_colour
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_18_tcss_mirrors_equal_their_tokens
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_19_builder_reach_guard_on_9c7beaf
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_19_builder_constants_carry_no_spanish
+PASSED tests/test_b100_project_homes.py::test_tc_b100_31_merge_and_save_into_itself_copy_no_subfolder
+PASSED tests/test_suite_hygiene.py::test_r_tst_002_every_timing_arm_carries_serial_timing
+PASSED tests/test_tui_directionb.py::test_tc001_rail_keys_1_to_9_route_through_rail_items
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_chip_press_guarded_in_a_loaded_project[file-flows]
+PASSED tests/test_tui_directionb.py::test_tc002_workspace_active_at_startup
+PASSED tests/test_b100_project_homes.py::test_tc_b100_31_save_as_carries_the_open_projects_records
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_20_hostile_refs_render_literally
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_chip_press_guarded_in_a_loaded_project[junction-checks]
+PASSED tests/test_b100_project_homes.py::test_tc_b100_31_empty_selection_keeps_batch_for_every_target
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_19_2_declared_regions_come_from_the_project
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_47_copy_paste_strip_on_one_row_inside
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_chip_press_guarded_in_a_loaded_project[junction-flows]
+PASSED tests/test_tui_directionb.py::test_tc002_active_marker_moves_and_clears_previous
+PASSED tests/test_suite_hygiene.py::test_r_tst_002_2_parallel_lane_collection_prints_no_qc_tm_text
+PASSED tests/test_suite_hygiene.py::test_r_tst_003_an_unmarked_timing_arm_is_named
+PASSED tests/test_suite_hygiene.py::test_r_tst_004_a_marked_non_arm_is_named
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form1]
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form2]
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form3]
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form4]
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form5]
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form6]
+PASSED tests/test_suite_hygiene.py::test_r_tst_005_detector_finds_each_timing_arm_form[form7]
+PASSED tests/test_tui_directionb.py::test_tc035_unicode_glyphs_match_normative_mapping
+PASSED tests/test_tui_directionb.py::test_tc035_each_item_has_a_distinct_defined_ascii_fallback
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_48_variables_chip_counts_and_toggles
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_chip_press_guarded_in_a_loaded_project[real-checks]
+PASSED tests/test_tui_directionb.py::test_tc035_ascii_fallback_mode_renders_ascii_set
+PASSED tests/test_b100_project_homes.py::test_tc_b100_31_gather_takes_names_from_the_recorded_batch_and_assignments
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_19_3_declared_regions_keep_the_last_generate
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_49_session_on_the_ribbon[project]
+PASSED tests/test_tui_directionb.py::test_tc001_equals_sign_routes_check_editor_screen
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_chip_press_guarded_in_a_loaded_project[real-flows]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_49_session_on_the_ribbon[no_project]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_49_ribbon_saved_state_is_a_word
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_20_2_slash_focuses_ascii_search
+PASSED tests/test_tui_directionb.py::test_tc006_command_bar_present_on_every_screen
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_chip_press_guarded_in_a_loaded_project[missing-checks]
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_21_2_ranges_come_from_the_loaded_image
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_49_ribbon_paints_saved_then_unsaved
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_chip_press_guarded_in_a_loaded_project[missing-flows]
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_22_2_naming_line_split_and_join
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_23_2_checks_group_order
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_58_add_with_an_empty_field_says_what_it_needs[source-image file]
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_no_project_patch_common_home_opens
+PASSED tests/test_b101_help_legend_docs.py::test_r_whelp_24_2_coverage_reads_typed_ranges
+PASSED tests/test_tui_directionb.py::test_tc010_ctrl_k_opens_palette_from_every_screen
+PASSED tests/test_suite_hygiene.py::test_r_tst_006_detector_ignores_intervals_no_assert_reads
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-007]
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-030]
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-047]
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-048]
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-052]
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-060]
+PASSED tests/test_suite_hygiene.py::test_r_tst_007_conventions_hold_each_test_rule[R-TST-158]
+PASSED tests/test_suite_hygiene.py::test_r_tst_010_pull_request_runs_two_lanes
+PASSED tests/test_suite_hygiene.py::test_r_tst_010_2_injection_ratchet_reads_every_run_line_of_every_job
+PASSED tests/test_suite_hygiene.py::test_r_tst_011_push_runs_two_lanes
+PASSED tests/test_suite_hygiene.py::test_r_tst_012_serial_lane_runs_after_a_red_lane
+PASSED tests/test_suite_hygiene.py::test_r_tst_013_014_ci_checks_out_full_history
+PASSED tests/test_suite_hygiene.py::test_r_tst_013_snapshot_job_changes_only_persist_credentials
+PASSED tests/test_suite_hygiene.py::test_r_tst_015_016_017_ci_time_limits
+PASSED tests/test_suite_hygiene.py::test_r_tst_018_ci_installs_pinned_xdist
+PASSED tests/test_suite_hygiene.py::test_r_tst_020_021_shared_helpers_delegate_to_the_one_wait
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_reparse_point_above_the_root_is_not_the_guards
+PASSED tests/test_b101_help_legend_docs.py::test_r_tui_062_10_1_1_map_key_line_text
+PASSED tests/test_suite_hygiene.py::test_r_tst_021_shared_wait_yields_between_checks
+PASSED tests/test_suite_hygiene.py::test_r_tst_022_settled_pauses_before_its_first_check
+PASSED tests/test_suite_hygiene.py::test_r_tst_023_shared_wait_signatures_are_kept
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W1]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W2]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W3]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W4]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W5]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W6]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W7]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W8]
+PASSED tests/test_suite_hygiene.py::test_r_tst_024_shared_wait_failure_texts[W9]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_58_add_with_an_empty_field_says_what_it_needs[check-check doc]
+PASSED tests/test_b97_chips_help.py::test_tc_b97_57_reparse_point_at_the_root_is_refused
+PASSED tests/test_tui_directionb.py::test_tc036_palette_type_to_filter_narrows_and_restores
+PASSED tests/test_b100_project_homes.py::test_tc_b100_31_copy_ceiling_2000_files
+PASSED tests/test_b101_help_legend_docs.py::test_r_tui_062_10_1_2_named_actions_are_the_handled_ones
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_58_add_with_an_empty_field_says_what_it_needs[write_out-output file]
+PASSED tests/test_tui_directionb.py::test_tc038_project_a2l_labels_render_in_command_bar
+PASSED tests/test_b97_chips_help.py::test_tc_b97_65_shipped_chips_labelled_with_folder_and_status_path
+PASSED tests/test_b100_project_homes.py::test_tc_b100_31_depth_ceiling[32]
+PASSED tests/test_b101_help_legend_docs.py::test_r_legend_011_1_region_row_field_line
+PASSED tests/test_tui_directionb.py::test_tc017_workspace_three_panes_fixed_regime
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_58_add_notice_clears_on_kind_change_and_run[kind change]
+PASSED tests/test_b97_chips_help.py::test_tc_b97_65_no_project_checks_chip_names_the_folder_it_opens
+PASSED tests/test_tui_directionb.py::test_tc017_workspace_pane_order_left_to_right
+PASSED tests/test_suite_hygiene.py::test_r_tst_025_load_project_clock_stops_at_the_install_callback
+PASSED tests/test_b101_help_legend_docs.py::test_r_tui_062_10_1_3_k_paints_the_map_keys_line
+PASSED tests/test_tui_directionb.py::test_tc017_workspace_three_panes_proportional_regime
+PASSED tests/test_b100_project_homes.py::test_tc_b100_31_depth_ceiling[33]
+PASSED tests/test_tui_directionb.py::test_tc018_workspace_panes_populate_from_loaded_file
+PASSED tests/test_tui_directionb.py::test_tc018_workspace_hex_render_caps_unchanged
+PASSED tests/test_b101_help_legend_docs.py::test_r_legend_011_2_changed_lines_fit_the_floor
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_readme_2_1_one_section_per_window
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_readme_2_2_rail_table
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_readme_3_1_every_ctx_key_listed
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_readme_4_1_no_stale_claim
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_readme_4_2_linked_documents_exist
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_readme_4_3_operations_names_placeholders
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_security_1_1_policy_names_private_path
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_security_2_1_supported_versions
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_security_1_3_readme_links_the_policy
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_1_1_crc_change_stated
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_1_2_stated_value_is_the_engines
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_2_1_remedy_stated
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_2_2_remedy_restores_old_value
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_3_1_before_after_report_stated
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_4_1_external_copy_stated
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_5_1_markdown_escaping_stated
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_6_1_whole_hex_windows_stated
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_7_1_deleted_project_folder_stated
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_8_1_climbing_path_refusal_stated
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_9_1_relative_output_under_project_stated
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_10_1_reports_name_the_copy_stated
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_11_1_crc_config_reasons_stated
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_12_1_failed_write_leaves_nothing_stated
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_13_1_visible_replacements_stated
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_relnote_14_1_part_file_safe_to_delete_stated
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-1]
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-2]
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-3]
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-4]
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-5]
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-6]
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-7]
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-8]
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-9]
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-10]
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-11]
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_9_named_bullets_hold_the_1_0_0_phrases
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_12_capture_notes_beside_their_captures
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_guide_2_1_fixed_rows_marked
+PASSED tests/test_b101_help_legend_docs.py::test_r_doc_guide_2_2_no_other_row_marked
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_ref_1_1_named_paths_exist
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_ref_1_2_path_scan_reports_a_missing_path
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_ref_2_1_relative_links_resolve
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_ref_2_2_no_link_to_the_diagrams_file
+PASSED tests/test_b97_chips_help.py::test_tc_b97_65_no_project_session_chip_disabled_with_exact_reason
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_58_add_notice_clears_on_kind_change_and_run[Run]
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_ref_3_1_no_fast_dev_flow_path
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_ref_3_2_no_prototypes_path
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_ref_3_3_exemptions_are_by_file_and_text
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_ref_4_1_retired_workflow_named_only_as_retired
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_ref_4_2_exempt_lines_skipped
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_1_1_claude_lists_declared_console_scripts
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_2_1_cli_examples_run_the_module
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_3_1_ci_sentence_matches_the_workflow
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_4_1_no_tui_hexview_path
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_4_2_hex_renderer_named_at_render
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_5_1_claude_states_no_module_size
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_6_1_claude_cites_no_line_numbers
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_7_1_rules_cite_no_memory_file
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_8_1_requirements_txt_equals_runtime_dependencies
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_8_2_architecture_states_dependencies_and_markers
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_9_1_docs_index_links_every_entry
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_9_2_index_rule_follows_the_tree
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_10_1_docs_index_states_no_project_state
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_11_1_overview_names_every_window
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_12_1_rail_counted_as_twelve
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_12_2_predicates_on_fixed_lines
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_13_1_no_test_count
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_14_1_overview_names_placeholder_operations
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_dev_15_1_manifest_lists_every_case
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_arch_1_1_module_table_covers_python_folders
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_arch_2_1_no_empty_module_prefix
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_arch_3_1_no_amendment_note
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_arch_3_2_no_batch_declaration_heading
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_arch_3_3_no_batch_interface_amendment
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_arch_4_1_submodules_declared
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_arch_4_2_no_broken_import_rule_restated
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_arch_5_1_one_interfaces_table
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_arch_5_2_rail_saved_files_and_frozen_cells
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_arch_6_1_increment_cap_is_four_source_files
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_archive_1_1_notes_only_in_the_archive
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_archive_3_1_no_fast_dev_flow_folder
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_archive_3_2_no_diagrams_file
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_archive_3_3_no_req_crc_in_package
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_archive_3_4_no_unused_example_txt
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_archive_4_1_archive_holds_no_local_identity
+PASSED tests/test_b101_doc_hygiene.py::test_r_doc_archive_4_2_scan_reports_a_local_path
+PASSED tests/test_tui_directionb.py::test_tc018_workspace_hex_output_bounded_by_max_rows
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_50_run_requests_the_single_image_scope
+PASSED tests/test_b100_project_homes.py::test_tc_b100_31_failed_copy_rolls_back_in_user_terms
+PASSED tests/test_b97_chips_help.py::test_tc_b97_31_check_editor_header_carries_both_chips
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_01_card_origin_annotation[project]
+PASSED tests/test_tui_directionb.py::test_tc019_a2l_hex_pane_three_sevenths_at_wide_sizes
+PASSED tests/test_tui_directionb.py::test_tc019_a2l_hex_pane_three_sevenths_at_min_size
+PASSED tests/test_b97_chips_help.py::test_tc_b97_32_check_editor_help_names_every_label
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_01_card_origin_annotation[temp]
+PASSED tests/test_tui_directionb.py::test_tc019_a2l_pane_order_table_then_hex
+PASSED tests/test_b100_project_homes.py::test_tc_b100_31_flow_session_folder_follows_q
+PASSED tests/test_tui_directionb.py::test_tc021_mac_two_panes_fixed_regime
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_01_card_origin_annotation[external]
+PASSED tests/test_b97_chips_help.py::test_tc_b97_33_check_glyphs_closed_and_in_the_legend
+PASSED tests/test_b97_chips_help.py::test_tc_b97_33_check_glyphs_are_narrow_in_windows_terminal
+PASSED tests/test_tui_directionb.py::test_tc021_mac_two_panes_floor_below_minimum
+PASSED tests/test_b100_project_homes.py::test_tc_b100_32_a2l_only_project_opens_with_its_own_a2l
+PASSED tests/test_suite_hygiene.py::test_r_tst_031_032_post_press_and_dwell_arms_keep_their_forms
+PASSED tests/test_suite_hygiene.py::test_r_tst_040_report_margin_returns_the_bound
+PASSED tests/test_suite_hygiene.py::test_r_tst_040_2_report_margin_refuses_unsafe_labels
+PASSED tests/test_suite_hygiene.py::test_r_tst_049_wrap_drift_detector_names_a_dropped_assertion
+PASSED tests/test_b97_chips_help.py::test_tc_b97_58_check_editor_region_states[no_a2l]
+PASSED tests/test_tui_directionb.py::test_tc021_mac_pane_order_table_then_hex
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_01_card_origin_annotation[missing]
+PASSED tests/test_suite_hygiene.py::test_r_tst_049_wrapped_arms_change_nothing_else
+PASSED tests/test_tui_directionb.py::test_tc020_a2l_renderers_populate_through_restyled_screen
+PASSED tests/test_b97_chips_help.py::test_tc_b97_58_check_editor_region_states[nothing_included]
+PASSED tests/test_b100_project_homes.py::test_tc_b100_32_a2l_only_load_clears_the_previous_data_file
+PASSED tests/test_tui_directionb.py::test_tc020_a2l_filtering_narrows_through_restyled_screen
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_01_missing_paints_in_the_alert_colour
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_01_classifier_states_and_precedence[dir-calib.json-project]
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_01_classifier_states_and_precedence[dir-trial.a2l-temp]
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_01_classifier_states_and_precedence[dir-demo.a2l-loaded]
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_01_classifier_states_and_precedence[dir-ghost.bin-missing]
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_01_classifier_states_and_precedence[dir-external/exp.json-external]
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_01_classifier_states_and_precedence[dir-both.json-project]
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_01_classifier_states_and_precedence[dir-mix.json-temp]
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_01_classifier_states_and_precedence[none-trial.a2l-temp]
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_01_classifier_states_and_precedence[none-demo.a2l-loaded]
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_01_classifier_states_and_precedence[none-ghost.bin-missing]
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_01_classifier_textual_absolute_dotdot_nul
+PASSED tests/test_tui_directionb.py::test_tc020_a2l_paging_advances_through_restyled_screen
+PASSED tests/test_b97_chips_help.py::test_tc_b97_58_check_editor_region_states[write_dir]
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_01_annotation_matrix_by_kind[source]
+PASSED tests/test_tui_directionb.py::test_tc020_a2l_jump_to_address_through_restyled_screen
+PASSED tests/test_b100_project_homes.py::test_tc_b100_32_data_file_loaded_into_a2l_only_project_is_recorded
+PASSED tests/test_tui_directionb.py::test_tc022_mac_renderers_populate_through_restyled_screen
+PASSED tests/test_b97_chips_help.py::test_tc_b97_58_check_editor_region_states[write_readonly]
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_01_annotation_matrix_by_kind[patch]
+PASSED tests/test_tui_directionb.py::test_tc022_mac_paging_advances_through_restyled_screen
+PASSED tests/test_tui_directionb.py::test_tc022_mac_jump_to_address_through_restyled_screen
+PASSED tests/test_b100_project_homes.py::test_tc_b100_32_empty_folder_is_refused_before_any_reset[no data or A2L file]
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_01_annotation_matrix_by_kind[check]
+PASSED tests/test_tui_directionb.py::test_tc023_grouped_panel_is_primary_content_of_screen_issues
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_51_keyboard_order_keys_and_chip_states
+PASSED tests/test_tui_directionb.py::test_tc023_issues_not_nested_in_workspace_and_carryover_gone
+PASSED tests/test_b97_chips_help.py::test_tc_b97_32_patch_help_names_every_label
+PASSED tests/test_tui_directionb.py::test_at043a_datatable_retired_grouped_panel_populated
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_01_annotation_matrix_by_kind[crc]
+PASSED tests/test_b100_project_homes.py::test_tc_b100_32_empty_folder_is_refused_before_any_reset[no project.json]
+PASSED tests/test_suite_hygiene.py::test_r_tst_040_041_every_upper_timing_bound_is_reported
+PASSED tests/test_tui_directionb.py::test_at043b_selection_preserved_after_retirement
+PASSED tests/test_b100_project_homes.py::test_tc_b100_32_a2l_guard_of_an_a2l_only_folder[link]
+PASSED tests/test_tui_directionb.py::test_at043c_no_datatable_orphan_on_any_screen
+PASSED tests/test_b97_chips_help.py::test_tc_b97_33_patch_glyphs_closed_and_in_the_legend
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_01_annotation_matrix_by_kind[write_out]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_51_space_presses_every_builder_button_group
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_refusal_helper_names_kind_and_field[source.image_ref]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_refusal_helper_names_kind_and_field[patch.change_doc_ref]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_refusal_helper_names_kind_and_field[check.check_doc_ref]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_refusal_helper_names_kind_and_field[crc.config_ref]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_refusal_helper_names_kind_and_field[write_out.output_name]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_refusal_helper_names_kind_and_field[a2b.image_a.ref]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_refusal_helper_names_kind_and_field[a2b.image_b.ref]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_refusal_helper_names_kind_and_field[external_step.log_ref]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_refusal_helper_names_kind_and_field[external_step.output_path]
+PASSED tests/test_b100_project_homes.py::test_tc_b100_32_a2l_guard_of_an_a2l_only_folder[over cap]
+PASSED tests/test_b100_project_homes.py::test_tc_b100_32_a2l_guard_of_an_a2l_only_folder[at cap]
+PASSED tests/test_b97_chips_help.py::test_tc_b97_58_patch_editor_region_states[ledger_empty]
+PASSED tests/test_tui_directionb.py::test_tc023_status_widgets_persist_across_screens
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_01_annotation_matrix_by_kind[external_step]
+PASSED tests/test_b100_project_homes.py::test_tc_b100_32_a2l_admission_refuses_any_reparse_point[reparse point]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[source.image_ref]
+PASSED tests/test_b100_project_homes.py::test_tc_b100_32_a2l_admission_refuses_any_reparse_point[regular]
+PASSED tests/test_tui_directionb.py::test_tc024_issues_severity_filters_narrow_through_dedicated_screen
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_01_annotation_matrix_by_kind[report]
+PASSED tests/test_b97_chips_help.py::test_tc_b97_58_patch_editor_region_states[ledger_refused]
+PASSED tests/test_tui_directionb.py::test_tc024_issues_filter_buttons_route_through_dedicated_screen
+PASSED tests/test_b100_project_homes.py::test_tc_b100_32_over_cap_a2l_beside_a_data_file_is_left_out
+PASSED tests/test_b97_chips_help.py::test_tc_b97_58_patch_editor_region_states[strip_no_image]
+PASSED tests/test_tui_directionb.py::test_tc024_issues_paging_advances_through_dedicated_screen
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[patch.change_doc_ref]
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_01_annotation_matrix_by_kind[a2b_flow_bindings]
+PASSED tests/test_tui_directionb.py::test_tc024_issues_severity_color_round_trips
+PASSED tests/test_b97_chips_help.py::test_tc_b97_58_patch_editor_region_states[strip_no_entries]
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_01_annotation_matrix_by_kind[a2b_file_binding]
+PASSED tests/test_tui_directionb.py::test_tc024_issues_row_select_jumps_to_source
+PASSED tests/test_b100_project_homes.py::test_tc_b100_32_unreadable_a2l_row_paints_the_true_next_step
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[check.check_doc_ref]
+PASSED tests/test_tui_directionb.py::test_tc037_workspace_shows_empty_state_with_no_file
+PASSED tests/test_b97_chips_help.py::test_tc_b97_58_patch_editor_region_states[json_no_document]
+PASSED tests/test_b100_project_homes.py::test_tc_b100_33_foreign_parent_is_refused_before_any_folder[other work area]
+PASSED tests/test_suite_hygiene.py::test_r_tst_040_1_base_tree_reports_its_37_bounds
+PASSED tests/test_suite_hygiene.py::test_r_tst_041_margin_guard_names_each_raw_bound
+PASSED tests/test_suite_hygiene.py::test_r_tst_040_3_counts_and_lower_bounds_are_not_bounds
+PASSED tests/test_suite_hygiene.py::test_r_tst_040_4_appended_and_conditional_reads_are_bounds
+PASSED tests/test_tui_directionb.py::test_tc037_issues_shows_empty_state_with_no_file
+PASSED tests/test_suite_hygiene.py::test_r_tst_042_margin_report_is_a_test_property
+PASSED tests/test_suite_hygiene.py::test_r_tst_043_045_qc_tm_section_rows_and_count
+PASSED tests/test_suite_hygiene.py::test_r_tst_043_2_teardown_error_report_gives_one_row
+PASSED tests/test_suite_hygiene.py::test_r_tst_044_low_margin_prefix
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_02_browse_posts_request_and_chooser_lists_all_sources
+PASSED tests/test_suite_hygiene.py::test_r_tst_046_over_bound_arm_still_reports
+PASSED tests/test_tui_directionb.py::test_tc037_workspace_empty_state_clears_when_file_loads
+PASSED tests/test_tui_directionb.py::test_tc033_modals_use_only_calm_dark_tokens_no_hardcoded_color
+PASSED tests/test_tui_directionb.py::test_tc033_modal_block_uses_single_accent_and_no_light_theme
+PASSED tests/test_b100_project_homes.py::test_tc_b100_33_foreign_parent_is_refused_before_any_folder[outside]
+PASSED tests/test_b97_chips_help.py::test_tc_b97_58_patch_editor_region_states[checks_no_run]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[crc.config_ref]
+PASSED tests/test_tui_directionb.py::test_tc033_modals_render_with_calm_dark_tokens
+PASSED tests/test_tui_directionb.py::test_tc033_no_severity_class_misuse_in_modal_block
+PASSED tests/test_tui_directionb.py::test_tc034_validate_project_files_cardinality_unchanged
+PASSED tests/test_tui_directionb.py::test_tc034_copy_into_workarea_containment_unchanged
+PASSED tests/test_tui_directionb.py::test_tc034_path_traversal_input_stays_contained
+PASSED tests/test_tui_directionb.py::test_tc034_resolve_input_path_returns_none_for_traversal_miss
+PASSED tests/test_b100_project_homes.py::test_tc_b100_33_foreign_parent_is_refused_before_any_folder[W/patches]
+PASSED tests/test_suite_hygiene.py::test_r_tst_050_status_log_keeps_every_painted_line
+PASSED tests/test_suite_hygiene.py::test_r_tst_051_newest_line_waits_do_not_grow
+PASSED tests/test_suite_hygiene.py::test_r_tst_051_all_line_reader_counts_only_under_minus_one
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_02_browse_beside_every_ref_field
+PASSED tests/test_suite_hygiene.py::test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses
+PASSED tests/test_suite_hygiene.py::test_r_tst_070_3_redaction_gate_names_each_leak_form
+PASSED tests/test_suite_hygiene.py::test_r_tst_080_report_goldens_hold_no_tool_version
+PASSED tests/test_suite_hygiene.py::test_r_tst_081_golden_takes_the_package_version
+PASSED tests/test_suite_hygiene.py::test_r_tst_082_wrong_version_still_differs
+PASSED tests/test_suite_hygiene.py::test_r_tst_154_155_inc15_arms_wait_through_settled
+PASSED tests/test_address_census.py::test_at_b83_01_computed_address_is_recognised
+PASSED tests/test_address_census.py::test_at_b83_02_format_spec_is_not_a_selector
+PASSED tests/test_address_census.py::test_at_b83_02_hex_colour_is_classified_not_dropped
+PASSED tests/test_address_census.py::test_at_b83_03_prose_is_not_a_selector[title = f"## Variant: {name}"]
+PASSED tests/test_address_census.py::test_at_b83_03_prose_is_not_a_selector[msg = f"... {n} more ranges (see log)"]
+PASSED tests/test_address_census.py::test_at_b83_03_prose_is_not_a_selector[head = f"# Report {name}"]
+PASSED tests/test_address_census.py::test_at_b83_03_criterion_requires_identifier_or_interpolation
+PASSED tests/test_address_census.py::test_at_b83_04_taxonomy_does_not_collapse_the_hard_cases
+PASSED tests/test_tui_directionb.py::test_tc034_modals_behavior_methods_intact
+PASSED tests/test_tui_directionb.py::test_tc041_1_cell_status_derivation
+PASSED tests/test_tui_directionb.py::test_tc041_2_auto_scale_cell_count_and_zero_span
+PASSED tests/test_tui_directionb.py::test_tc041_3_invalid_cell_carries_sev_error_class
+PASSED tests/test_tui_directionb.py::test_tc041_11_markup_safe_render_of_hostile_text
+PASSED tests/test_b97_chips_help.py::test_tc_b97_31_flow_builder_header_carries_both_chips
+PASSED tests/test_b100_project_homes.py::test_tc_b100_33_work_area_under_another_spelling_saves_there[trailing separator]
+PASSED tests/test_tui_directionb.py::test_at035_map_shows_band_bar_and_summary_header
+PASSED tests/test_tui_directionb.py::test_tc041_4_build_detail_text_content
+PASSED tests/test_tui_directionb.py::test_symbols_in_window_matching_point_and_hostile_shapes
+PASSED tests/test_tui_directionb.py::test_at_r3_detail_region_named_by_a2l_symbols
+PASSED tests/test_tui_directionb.py::test_at_r3_detail_hostile_symbol_name_rendered_literally
+PASSED tests/test_tui_directionb.py::test_at_r3_detail_no_a2l_region_bounds_only
+PASSED tests/test_tui_directionb.py::test_tc041_5_cell_issue_join_boundary_and_negative
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_02_project_links_omitted_from_chooser
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[write_out.output_name]
+PASSED tests/test_b100_project_homes.py::test_tc_b100_33_work_area_under_another_spelling_saves_there[dot-dot segment]
+PASSED tests/test_tui_directionb.py::test_tc041_6_region_activation_focus_equals_region_start
+PASSED tests/test_b97_chips_help.py::test_tc_b97_32_flow_help_names_every_label
+PASSED tests/test_tui_directionb.py::test_at036b_region_click_reveals_hex_at_region_start
+PASSED tests/test_tui_directionb.py::test_tc041_4c_gap_cell_detail_no_region
+PASSED tests/test_tui_directionb.py::test_tc041_4d_hostile_issue_symbol_rendered_literally
+PASSED tests/test_tui_directionb.py::test_tc041_8_coverage_stats_exact_case_02_literals
+PASSED tests/test_tui_directionb.py::test_tc041_8_single_range_full_coverage_no_gaps
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_03_project_pick_fills_field_only
+PASSED tests/test_tui_directionb.py::test_tc041_9_empty_state_stats_neutral_no_exception
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[a2b.image_a.ref]
+PASSED tests/test_address_census.py::test_at_b83_05_address_params_equals_the_live_derivation
+PASSED tests/test_address_census.py::test_at_b83_05_derivation_is_not_empty
+PASSED tests/test_address_census.py::test_at_b83_06_derivation_still_reaches_the_formerly_hand_declared_six
+PASSED tests/test_address_census.py::test_at_b83_06_type_addressing_is_not_an_address
+PASSED tests/test_address_census.py::test_at_b83_07_keyword_arguments_are_scanned[app.query_one(selector=f"#{widget_id}")]
+PASSED tests/test_address_census.py::test_at_b83_07_keyword_arguments_are_scanned[await pilot.click(widget=f"#{button_id}")]
+PASSED tests/test_address_census.py::test_at_b83_08_assembled_selectors_are_flagged_on_a_fixture[app.query_one("#" + name)-other:BinOp]
+PASSED tests/test_address_census.py::test_at_b83_08_assembled_selectors_are_flagged_on_a_fixture[app.query_one("#%s" % n)-other:BinOp]
+PASSED tests/test_address_census.py::test_at_b83_08_assembled_selectors_are_flagged_on_a_fixture[app.query_one("#{}".format(n))-other:Call]
+PASSED tests/test_b97_chips_help.py::test_tc_b97_33_flow_glyphs_closed_and_in_the_legend[patch_chain]
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_03_temp_pick_imports_executable_ref
+PASSED tests/test_b100_project_homes.py::test_at_b100_09_save_as_copies_the_project_and_q_lists_its_flow[size0]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[a2b.image_b.ref]
+PASSED tests/test_b97_chips_help.py::test_tc_b97_33_flow_glyphs_closed_and_in_the_legend[report_block]
+PASSED tests/test_b97_chips_help.py::test_tc_b97_33_flow_glyphs_are_narrow_in_windows_terminal
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_03_loaded_pick_inside_project_writes_relative_ref
+PASSED tests/test_tui_directionb.py::test_tc041_10_reflow_class_toggles_at_119_vs_120
+PASSED tests/test_b97_chips_help.py::test_tc_b97_58_flow_builder_region_states[pipeline_empty]
+PASSED tests/test_address_census.py::test_at_b83_08_tree_holds_no_assembled_selectors
+PASSED tests/test_address_census.py::test_at_b83_10_indirect_address_is_detected_on_a_fixture
+PASSED tests/test_b100_project_homes.py::test_at_b100_09_save_as_copies_the_project_and_q_lists_its_flow[size1]
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_03_edit_modal_browse_routes_back_to_the_host
+PASSED tests/test_tui_directionb.py::test_at037_stats_strip_matches_case_02_coverage
+PASSED tests/test_b97_chips_help.py::test_tc_b97_58_flow_builder_region_states[ribbon_no_session]
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[external_step.log_ref]
+PASSED tests/test_address_census.py::test_at_b83_10_tree_holds_no_indirect_addresses
+PASSED tests/test_address_census.py::test_at_b83_11_every_derived_name_obeys_the_exclusion_rules
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_04_external_import_via_chooser
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_04_import_external_ref_service
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_04_import_external_ref_refusals
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_04_import_external_ref_link_sources
+PASSED tests/test_b97_chips_help.py::test_tc_b97_58_flow_builder_region_states[load_refused]
+PASSED tests/test_tui_directionb.py::test_b77_stats_strip_dual_readout_and_four_digit_coverage
+PASSED tests/test_b97_chips_help.py::test_tc_b97_29_session_chip_silent_at_startup
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[external_step.output_path]
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_05_no_project_refusal[external_path]
+PASSED tests/test_tui_directionb.py::test_tc_b77_10_no_file_stats_strip_is_positively_empty
+PASSED tests/test_tui_directionb.py::test_tc_b77_11_full_coverage_strip_reads_100_and_a_zero_gap
+PASSED tests/test_tui_directionb.py::test_tc_b77_12_one_byte_image_strip
+PASSED tests/test_tui_directionb.py::test_tc_b77_13_zero_span_strip_divides_by_nothing
+PASSED tests/test_b97_chips_help.py::test_tc_b97_30_every_chip_id_unique_with_the_reports_modal_open
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_05_no_project_refusal[temp_candidate]
+PASSED tests/test_tui_directionb.py::test_at069_high_region_renders_high_band
+PASSED tests/test_b97_flow_builder.py::test_at_b97_06_chain_on_screen_and_run_writes_the_image[118x54]
+PASSED tests/test_tui_directionb.py::test_at070_constant_vs_high_bands_differ
+PASSED tests/test_b100_project_homes.py::test_at_b100_10_a2l_only_project_saves_and_reopens[size0]
+PASSED tests/test_b97_chips_help.py::test_tc_b97_31_flow_execution_header_carries_both_chips
+PASSED tests/test_address_census.py::test_at_b83_12_bare_name_rows_carry_their_identifier
+PASSED tests/test_address_census.py::test_at_b83_09_bare_names_are_split_by_measurement
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_06_unreadable_external_refusal
+PASSED tests/test_tui_directionb.py::test_at071_region_list_rows_addr_size_band
+PASSED tests/test_b97_flow_builder.py::test_at_b97_06_chain_on_screen_and_run_writes_the_image[118x53]
+PASSED tests/test_tui_directionb.py::test_at071b_disjoint_same_band_regions_stay_separate
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_07_hostile_names_render_literally
+PASSED tests/test_tui_directionb.py::test_map_band_view_survives_rerender
+PASSED tests/test_b97_chips_help.py::test_tc_b97_32_flow_execution_help_names_every_label
+PASSED tests/test_id_registry.py::test_tc600_g1_every_named_node_id_is_registered
+PASSED tests/test_id_registry.py::test_tc601_g2_live_entries_name_existing_nodes
+PASSED tests/test_id_registry.py::test_tc602_g3_every_citation_is_registered
+PASSED tests/test_id_registry.py::test_tc604_g5_grammar_holds_or_is_registered_legacy
+PASSED tests/test_id_registry.py::test_tc605_g6_normalized_keys_are_unique
+PASSED tests/test_id_registry.py::test_tc606_g7_no_stem_exceeds_the_high_water_mark
+PASSED tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound
+PASSED tests/test_id_registry.py::test_tc608_tokenizer_and_normalizer_edge_cases
+PASSED tests/test_id_registry.py::test_tc609_registry_file_is_well_formed
+PASSED tests/test_id_registry.py::test_tc610_reservations_are_recorded_and_respected
+PASSED tests/test_id_registry.py::test_at280_registry_and_repository_agree_in_both_directions
+PASSED tests/test_id_registry.py::test_at281_every_guard_rule_can_fail
+PASSED tests/test_tui_directionb.py::test_at074_single_click_repositions_hex
+PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_07_logs_carry_no_paths
+PASSED tests/test_flow_builder_render.py::test_tc088_1_status_class_map_covers_every_status
+PASSED tests/test_tui_directionb.py::test_tc062_1_region_activation_posts_single_open_in_hex
+PASSED tests/test_b97_chips_help.py::test_tc_b97_33_flow_execution_glyphs_closed_and_in_the_legend
+PASSED tests/test_b97_chips_help.py::test_tc_b97_33_flow_execution_glyphs_are_narrow_in_windows_terminal
+PASSED tests/test_b101_flow_names_ui.py::test_r_flow_chain_19_1_confirm_writes_one_lane_report
+PASSED tests/test_b100_project_homes.py::test_at_b100_10_a2l_only_project_saves_and_reopens[size1]
+PASSED tests/test_tui_directionb.py::test_b01_region_click_snaps_hex_to_far_range
+PASSED tests/test_b97_flow_builder.py::test_at_b97_07_each_kind_its_inputs_and_an_ext_step_card
+PASSED tests/test_b97_chips_help.py::test_tc_b97_58_flow_execution_region_states[lanes_empty]
+PASSED tests/test_tui_directionb.py::test_at_r3_region_click_detail_names_a2l_symbol_literally
+PASSED tests/test_tui_directionb.py::test_tc061_1_band_histogram_counts
+PASSED tests/test_tui_directionb.py::test_tc061_2_sparkline_ramp_mapping
+PASSED tests/test_flow_builder_render.py::test_at088a_pipeline_ledger_structure_all_three_banners
+PASSED tests/test_tui_directionb.py::test_at072_histogram_per_band_counts
+PASSED tests/test_b101_flow_names_ui.py::test_r_flow_chain_20_1_parallel_confirm_mode_line
+PASSED tests/test_b97_chips_help.py::test_tc_b97_58_flow_execution_region_states[log_empty]
+PASSED tests/test_b100_project_homes.py::test_e4_r2_r11_call_order_of_a_save_as
+PASSED tests/test_flow_builder_render.py::test_at088a_single_block_has_no_dangling_separator
+PASSED tests/test_b97_flow_builder.py::test_at_b97_08_hostile_and_nul_refs_never_crash_or_inject
+PASSED tests/test_tui_directionb.py::test_at073_sparkline_tracks_profile
+PASSED tests/test_flow_builder_render.py::test_at085a_notices_load_shows_warning_gutter
+PASSED tests/test_b97_chips_help.py::test_tc_b97_58_flow_execution_region_states[run_raised]
+PASSED tests/test_b101_flow_names_ui.py::test_r_flow_chain_20_2_sequential_confirm_mode_line
+PASSED tests/test_tui_directionb.py::test_at073b_glance_geometry_fits_and_reflows
+PASSED tests/test_b100_project_homes.py::test_e4_r2_pasted_document_beside_a_different_p_file_lands_changes_1
+PASSED tests/test_flow_builder_render.py::test_ribbon_geometry_measured_no_overflow
+PASSED tests/test_flow_builder_render.py::test_tc088_4_ribbon_encodes_footprint
+PASSED tests/test_b97_chips_help.py::test_tc_b97_58_flow_execution_region_states[import_refused]
+PASSED tests/test_tui_directionb.py::test_at075_e_key_opens_no_modal_map_has_legend
+PASSED tests/test_flow_builder_render.py::test_at088b_every_render_sink_renders_hostile_literally
+PASSED tests/test_b101_flow_names_ui.py::test_r_flow_file_12_1_save_after_clear_holds_own_name
+PASSED tests/test_tui_directionb.py::test_b77_legend_is_not_resident_in_the_map_body
+PASSED tests/test_b97_chips_help.py::test_tc_b97_58_flow_execution_region_states[set_refused]
+PASSED tests/test_b97_flow_builder.py::test_at_b97_19_first_task_from_the_keyboard
+PASSED tests/test_b97_flow_builder.py::test_tc_b97_flow_css_shared_rules_byte_equal_and_section_scoped
+PASSED tests/test_flow_external_step_b96.py::test_tc1804_persistence_roundtrip_field_by_field
+PASSED tests/test_flow_external_step_b96.py::test_tc1804_parser_refuses_missing_mandatory_fields
+PASSED tests/test_flow_external_step_b96.py::test_tc1804_parser_output_path_shape
+PASSED tests/test_flow_external_step_b96.py::test_tc1804_unconfirmed_run_pauses_and_skips_downstream
+PASSED tests/test_flow_external_step_b96.py::test_tc1804_confirmed_run_copies_output_into_session
+PASSED tests/test_flow_external_step_b96.py::test_tc1804_confirmed_run_refuses_missing_evidence
+PASSED tests/test_flow_builder_render.py::test_at088b_check_ref_label_renders_literally
+PASSED tests/test_flow_builder_render.py::test_tc088_7_dropdown_offers_check_and_load_keeps_source_tag
+PASSED tests/test_tui_directionb.py::test_b77_legend_screen_still_lists_every_band
+PASSED tests/test_flow_external_step_b96.py::test_tc1804_builder_palette_select_and_config_row_gate
+PASSED tests/test_b100_project_homes.py::test_e4_r11_f8_identical_firmware_1_in_p_is_copied_not_reused
+PASSED tests/test_flow_builder_render.py::test_at088_gating_selector_appends_block_own_op_check
+PASSED tests/test_flow_builder_render.py::test_flow_block_label_covers_check
+PASSED tests/test_tui_directionb.py::test_tc_b77_14_no_file_has_no_legend_and_no_strip_either
+PASSED tests/test_b101_flow_names_ui.py::test_r_flow_file_12_5_lane_report_reads_the_saved_name
+PASSED tests/test_b97_chips_help.py::test_tc_b97_58_flow_execution_region_states[nul_bind]
+PASSED tests/test_tui_flow_persistence_ui.py::test_at002_name_strip_glyph_dirty_then_saved
+PASSED tests/test_tui_directionb.py::test_tc_b77_15_legend_opened_from_the_map_and_dismissed
+PASSED tests/test_tui_directionb.py::test_at076_entropy_screen_and_action_removed
+PASSED tests/test_b101_flow_names_ui.py::test_r_fb_save_8_1_refused_home_status
+PASSED tests/test_tui_flow_persistence_ui.py::test_at003_save_overwrite_notice_fires_on_existing_name
+PASSED tests/test_tui_directionb.py::test_tc025_memory_map_empty_state_with_no_file
+PASSED tests/test_b100_project_homes.py::test_e4_r11_a3r2_5_top_level_copy_reusing_the_image_row_aborts
+PASSED tests/test_b100_project_homes.py::test_e4_r14_top_level_copy_counted_once_in_the_plan_total
+PASSED tests/test_tui_directionb.py::test_tc025_memory_map_empty_state_clears_when_file_loads
+PASSED tests/test_flow_external_step_b96.py::test_tc1804_fx_lane_pause_confirm_rerun
+PASSED tests/test_flow_funnel_b96.py::test_tc1816_funnel_persistence_roundtrip
+PASSED tests/test_flow_funnel_b96.py::test_tc1816_substitution_unit_exact_token
+PASSED tests/test_flow_funnel_b96.py::test_tc1817_execution_substitution_and_named_notice
+PASSED tests/test_flow_funnel_b96.py::test_tc1817_no_funnel_doc_passes_unchanged
+PASSED tests/test_tui_flow_persistence_ui.py::test_at003_load_screen_lists_saved_flow_stems
+PASSED tests/test_b97_chips_help.py::test_tc_b97_65_seven_chips_labelled_and_the_four_screen_chips_open_their_folder
+PASSED tests/test_b101_flow_names_ui.py::test_r_fx_set_15_1_refused_home_status
+PASSED tests/test_tui_directionb.py::test_at_flow_add_blocks_and_run_renders_result
+PASSED tests/test_flow_funnel_b96.py::test_tc1817_builder_funnel_table_edits
+PASSED tests/test_tui_flow_persistence_ui.py::test_at006_report_bearing_flow_shows_report_row
+PASSED tests/test_tui_directionb.py::test_at_flow_rail_key_8_reaches_panel
+PASSED tests/test_b97_chips_help.py::test_tc_b97_65_session_header_chip_names_its_reason_after_a_drop
+PASSED tests/test_b100_project_homes.py::test_e4_r14_top_level_copy_at_the_free_space_boundary_saves
+PASSED tests/test_flow_funnel_b96.py::test_tc1818_copy_paste_duplicates_config_via_wire
+PASSED tests/test_tui_flow_persistence_ui.py::test_at006_quarantine_card_painted_and_flow_unchanged
+PASSED tests/test_tui_directionb.py::test_at_flow_block_label_markup_safe
+PASSED tests/test_tui_directionb.py::test_tc028_screens_directionb_imports_no_processing_libs
+PASSED tests/test_tui_directionb.py::test_tc028_no_new_processing_module_added_outside_view_layer
+PASSED tests/test_tui_directionb.py::test_tc028_memory_map_renderer_adds_no_coverage_computation
+PASSED tests/test_flow_funnel_b96.py::test_tc1819_paste_empty_clipboard_is_friendly_noop
+PASSED tests/test_flow_crc_ribbon.py::test_llr0941_twin_shared_axis_growth_adds_filled_cells
+PASSED tests/test_tui_directionb.py::test_tc028_scaffold_screens_activate_without_error
+PASSED tests/test_tui_directionb.py::test_tc026_patch_editor_panel_is_presentational
+PASSED tests/test_flow_crc_ribbon.py::test_at129_twin_ribbon_after_larger_when_crc_grew
+PASSED tests/test_b100_project_homes.py::test_e4_llr_171_5_unrecorded_gathered_rows_are_named[1]
+PASSED tests/test_tui_directionb.py::test_tc026_patch_editor_shows_empty_state
+PASSED tests/test_tui_flow_persistence_ui.py::test_tc018_no_project_save_and_load_render_error_card
+PASSED tests/test_b101_flow_names_ui.py::test_at_i9_1_confirm_report_says_confirm_rerun
+PASSED tests/test_b97_chips_help.py::test_at_b97_12_four_chips_open_their_folder_or_refuse[real]
+PASSED tests/test_tui_directionb.py::test_tc027_ab_diff_renders_three_columns
+PASSED tests/test_tui_directionb.py::test_tc027_ab_diff_has_no_placeholder_constants
+PASSED tests/test_flow_crc_ribbon.py::test_tc360_no_before_strip_when_crc_did_not_grow
+PASSED tests/test_tui_directionb.py::test_tc027_ab_diff_renders_inline_selection_surface
+PASSED tests/test_tui_directionb.py::test_tc027_ab_diff_panel_routes_through_service
+PASSED tests/test_tui_flow_persistence_ui.py::test_at005_dirty_guard_cancel_keeps_blocks_confirm_replaces
+PASSED tests/test_flow_crc_ribbon.py::test_tc361_gating_control_hidden_for_non_check
+PASSED tests/test_tui_directionb.py::test_ab_diff_blank_select_yields_none_variant
+PASSED tests/test_tui_directionb.py::test_tc028_screens_directionb_imports_no_processing_libs_after_inc10
+PASSED tests/test_tui_directionb.py::test_tc028_no_new_processing_module_added_outside_view_layer_inc10
+PASSED tests/test_tui_directionb.py::test_tc028_processing_libs_absent_from_pyproject
+PASSED tests/test_tui_directionb.py::test_tc028_patch_editor_renderer_invokes_no_patch_logic
+PASSED tests/test_tui_directionb.py::test_tc028_diff_renderer_invokes_no_diff_logic
+PASSED tests/test_b100_project_homes.py::test_e4_llr_171_5_unrecorded_gathered_rows_are_named[12]
+PASSED tests/test_flow_crc_ribbon.py::test_tc358_empty_flow_renders_without_crash
+PASSED tests/test_flow_crc_ui.py::test_tc356_crc_in_dropdown_and_builder
+PASSED tests/test_b101_flow_names_ui.py::test_at_i9_2_resaved_flow_and_long_set_keep_own_names
+PASSED tests/test_tui_directionb.py::test_tc028_every_scaffold_screen_activates_without_error
+PASSED tests/test_tui_flow_builder_b94.py::test_at_b94_15_fb_a_surface_and_wired_patch_run
+PASSED tests/test_b97_chips_help.py::test_at_b97_12_four_chips_open_their_folder_or_refuse[absent]
+PASSED tests/test_tui_directionb.py::test_tc011_every_pre_batch_action_keeps_a_keyboard_path
+PASSED tests/test_flow_crc_ui.py::test_at128_crc_node_renders_and_shows_status
+PASSED tests/test_docs_canon.py::test_at285_every_readme_named_key_exists_in_the_seat
+PASSED tests/test_docs_canon.py::test_at285_no_live_cdfx_or_s19tool_console_script_token
+PASSED tests/test_engine_unchanged.py::test_tc027_engine_modules_unchanged_vs_main
+PASSED tests/test_b100_project_homes.py::test_e4_llr_171_2g_linked_a2l_beside_a_mac_is_never_parsed
+PASSED tests/test_tui_directionb.py::test_tc011_supersession_recorded_not_a_regression
+PASSED tests/test_tui_flow_builder_b94.py::test_at_b94_16_a2b_wiring_rule_and_report_provenance
+PASSED tests/test_b100_project_homes.py::test_e4_llr_171_1m_document_inside_p_follows_its_copy
+PASSED tests/test_b101_flow_names_ui.py::test_at_i9_3_linked_homes_refuse_saves
+PASSED tests/test_tui_directionb.py::test_tc029_rail_items_reachable_by_keyboard
+PASSED tests/test_b97_chips_help.py::test_at_b97_12_four_chips_open_their_folder_or_refuse[file]
+PASSED tests/test_tui_flow_builder_b94.py::test_at_b94_17_template_save_listing_import_and_dedup
+PASSED tests/test_tui_directionb.py::test_tc029_command_bar_inputs_reachable_by_keyboard
+PASSED tests/test_b101_flow_shown_widgets.py::test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state
+PASSED tests/test_tui_directionb.py::test_tc029_density_toggle_reachable_by_keyboard
+PASSED tests/test_b100_project_homes.py::test_e4_llr_171_1m_rebind_only_to_a_plan_entry[dot-dot]
+PASSED tests/test_b101_flow_shown_widgets.py::test_r_fx_scr_4_1_every_flow_execution_widget_is_shown_in_a_state
+PASSED tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally
+PASSED tests/test_tui_directionb.py::test_tc029_single_keys_suppressed_during_input_focus
+PASSED tests/test_b97_chips_help.py::test_at_b97_12_four_chips_open_their_folder_or_refuse[junction]
+PASSED tests/test_b100_project_homes.py::test_e4_llr_171_1m_rebind_only_to_a_plan_entry[outside P]
+PASSED tests/test_b101_flow_shown_widgets.py::test_r_fb_add_1_2_a_press_naming_no_kind_changes_nothing
+PASSED tests/test_tui_flow_builder_b94.py::test_tc_b94_20_fb_a_composition_census
+PASSED tests/test_tui_directionb.py::test_tc030_global_footer_set_present_on_every_screen
+PASSED tests/test_b97_chips_help.py::test_at_b97_12_four_chips_open_their_folder_or_refuse[seam_raises]
+PASSED tests/test_b100_project_homes.py::test_e4_llr_171_1k_unlistable_folder_refuses_the_save
+PASSED tests/test_tui_directionb.py::test_tc030_per_screen_paging_bindings_in_footer
+PASSED tests/test_b97_chips_help.py::test_at_b97_13_no_project_flow_chips_disabled_and_name_their_folder
+PASSED tests/test_b100_project_homes.py::test_tc_b100_31_open_project_folder_gone_saves_without_a_copy[gone, save as P]
+PASSED tests/test_b101_flow_shown_widgets.py::test_at_i12b_1_kind_chip_add_and_ribbon_by_keys
+PASSED tests/test_tui_directionb.py::test_tc030_footer_updates_and_reflects_active_screen
+PASSED tests/test_b100_project_homes.py::test_tc_b100_31_open_project_folder_gone_saves_without_a_copy[gone, save as Q]
+PASSED tests/test_b97_chips_help.py::test_at_b97_14_help_chip_opens_a_body_covering_the_screen[patch]
+PASSED tests/test_tui_directionb.py::test_tc030_operations_binding_shown_in_footer
+PASSED tests/test_tui_directionb.py::test_tc031_engine_modules_have_no_diff_vs_main
+PASSED tests/test_tui_directionb.py::test_tc031_engine_modules_have_no_name_only_diff_vs_main
+PASSED tests/test_tui_directionb.py::test_tc031_engine_imports_still_resolve
+PASSED tests/test_tui_directionb.py::test_tc032_engine_test_files_unmodified_vs_main
+PASSED tests/test_tui_directionb.py::test_tc032_no_engine_test_function_is_skipped
+PASSED tests/test_tui_directionb.py::test_tc032_directionb_tests_do_not_monkeypatch_engine_functions
+PASSED tests/test_tui_directionb.py::test_sections_label_shows_end_address_not_clipped
+PASSED tests/test_b100_project_homes.py::test_tc_b100_31_open_project_folder_gone_saves_without_a_copy[present, save as Q]
+PASSED tests/test_tui_directionb.py::test_sections_label_two_line_format
+PASSED tests/test_b97_chips_help.py::test_at_b97_14_help_chip_opens_a_body_covering_the_screen[check_editor]
+PASSED tests/test_tui_directionb.py::test_mac_out_of_range_label_full_address
+PASSED tests/test_b100_project_homes.py::test_tc_b100_32_unload_of_an_a2l_only_session_clears_the_a2l
+PASSED tests/test_tui_directionb.py::test_sections_item_data_and_colour_preserved
+PASSED tests/test_tui_directionb.py::test_at_038a_a2l_table_owns_scroll_header_fixed
+PASSED tests/test_tui_directionb.py::test_at_038b_a2l_pane_carries_density_compact_class
+PASSED tests/test_b97_chips_help.py::test_at_b97_14_help_chip_opens_a_body_covering_the_screen[flow]
+PASSED tests/test_b100_project_homes.py::test_tc_b100_31_unrecorded_name_reason_is_not_too_long
+PASSED tests/test_tui_directionb.py::test_at_038c_a2l_error_row_keeps_severity_style
+PASSED tests/test_tui_directionb.py::test_at_038d_a2l_empty_state_no_file
+PASSED tests/test_tui_directionb.py::test_tc_042_2_density_class_text_cells_and_paging
+PASSED tests/test_b100_project_homes.py::test_tc_b100_31_identical_copy_mismatch_names_a_true_step
+PASSED tests/test_tui_directionb.py::test_at_039a_group_headers_carry_whole_filtered_counts_and_chips
+PASSED tests/test_b97_chips_help.py::test_at_b97_14_help_chip_opens_a_body_covering_the_screen[flow_execution]
+PASSED tests/test_tui_directionb.py::test_at_039b_groups_render_in_error_warning_info_order
+PASSED tests/test_b100_project_homes.py::test_tc_b100_31_document_with_an_identical_sibling_follows_its_landing
+PASSED tests/test_tui_directionb.py::test_at_039c_real_click_repaints_hex_peek_and_none_is_neutral
+PASSED tests/test_b97_chips_help.py::test_at_b97_23_each_failed_region_says_so_in_one_line[patch_missing_load]
+PASSED tests/test_tui_directionb.py::test_at_039d_zero_issues_empty_state_and_neutral_peek
+PASSED tests/test_b100_project_homes.py::test_tc_b100_62_folder_check_permission_error_has_its_own_text[load]
+PASSED tests/test_tui_directionb.py::test_at_039e_c17_hostile_code_symbol_message_render_literal
+PASSED tests/test_b97_chips_help.py::test_at_b97_23_each_failed_region_says_so_in_one_line[check_write_dir]
+PASSED tests/test_tui_directionb.py::test_at_039f_dos_bound_large_issue_list_mounts_one_window
+PASSED tests/test_b100_project_homes.py::test_tc_b100_62_folder_check_permission_error_has_its_own_text[save target]
+PASSED tests/test_tui_directionb.py::test_tc_042_3_group_order_and_header_counts
+PASSED tests/test_b97_chips_help.py::test_at_b97_23_each_failed_region_says_so_in_one_line[check_write_readonly]
+PASSED tests/test_tui_directionb.py::test_tc_042_4_chip_colour_via_policy_no_hardcoded_hex
+PASSED tests/test_tui_directionb.py::test_tc_042_5_selection_handler_drives_peek
+PASSED tests/test_b97_chips_help.py::test_at_b97_23_each_failed_region_says_so_in_one_line[flow_refused]
+PASSED tests/test_b100_project_homes.py::test_tc_b100_31_linked_project_json_is_not_carried
+PASSED tests/test_b100_project_homes.py::test_tc_b100_59_merge_and_open_targets_plan_no_copy
+PASSED tests/test_b100_project_homes.py::test_tc_b100_31_walker_stops_before_sorting_a_huge_folder
+PASSED tests/test_tui_directionb.py::test_tc_042_6_paging_window_preserved_and_filter_scopes
+PASSED tests/test_tui_directionb.py::test_at_039g_tc_042_6b_full_page_render_is_row_capped_and_settles
+PASSED tests/test_b97_chips_help.py::test_at_b97_23_each_failed_region_says_so_in_one_line[fx_import_refused]
+PASSED tests/test_tui_directionb.py::test_tc_042_10_markup_safe_renderables_and_no_from_markup
+PASSED tests/test_tui_directionb.py::test_tc_042_9_stat_pane_values_pure
+PASSED tests/test_b97_chips_help.py::test_at_b97_23_each_failed_region_says_so_in_one_line[fx_nul_bind]
+PASSED tests/test_tui_directionb.py::test_at040a_per_range_micro_bar_colour_and_width
+PASSED tests/test_tui_directionb.py::test_at040c_stat_pane_values_match_image
+PASSED tests/test_tui_directionb.py::test_at040d_stat_pane_neutral_when_no_file
+PASSED tests/test_tui_directionb.py::test_at040e_stat_pane_has_no_entropy_element
+PASSED tests/test_tui_directionb.py::test_at040_workspace_geometry_no_clip_80_and_120
+PASSED tests/test_tui_directionb.py::test_at040b_memory_strip_valid_and_gap_cells
+PASSED tests/test_tui_directionb.py::test_at040b_memory_strip_is_workspace_only
+PASSED tests/test_tui_directionb.py::test_at040b_memory_strip_empty_when_no_file
+PASSED tests/test_tui_directionb.py::test_at040b_memory_strip_cell_count_is_bounded
+PASSED tests/test_tui_directionb.py::test_tc_042_8_strip_colour_is_pure_reuse_of_batch27_helpers
+PASSED tests/test_tui_directionb.py::test_tc_042_12_memory_strip_touches_no_frozen_path
+PASSED tests/test_tui_directionb.py::test_ac5_files_list_grows_beyond_legacy_cap
+PASSED tests/test_tui_directionb.py::test_ac3_issues_pgdn_pgup_page_the_grouped_panel
+PASSED tests/test_tui_directionb.py::test_ac7_workspace_load_project_button
+PASSED tests/test_tui_directionb.py::test_at065a_change_doc_label_reads_as_dropdown_alternative
+PASSED tests/test_tui_directionb.py::test_tc332_change_doc_copy_pins_verbatim
+SKIPPED [21] tests/support/b100_links.py:30: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [2] tests/test_b100_project_homes.py:790: trailing-dot names are a Windows-only arm
+SKIPPED [1] tests/test_b100_project_homes.py:1269: not run: the upper-case spelling needs a case-insensitive file system (Windows)
+SKIPPED [3] tests/test_b100_project_homes.py:2170: reserved device names are a Windows-only arm
+SKIPPED [1] tests/test_b100_project_homes.py:2200: trailing-dot names are a Windows-only arm
+SKIPPED [1] tests/test_b100_project_homes.py:2346: not run: a con.json file needs the Windows extended spelling
+709 passed, 29 skipped in 491.80s (0:08:11)
+=== exit code: 0

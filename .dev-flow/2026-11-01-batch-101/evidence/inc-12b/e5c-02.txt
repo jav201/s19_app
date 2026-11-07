@@ -1,0 +1,90 @@
+=== Inc 12b E5 corrective: e5c-02 — the strengthened nodes GREEN on the final tree, with a read-only probe (QA-1 / QA-7 re-measure, QA-6 ribbon)
+Executor: E5 corrective pass (Opus), LAN Linux host 2. Local tree of the same diff: 7c89fe9ef26e61b6a60b943fef23738bcacfdb1d (17 files).
+An earlier form of this run (tree 528bb400...) failed the three new style clauses: the oracle built its sample as Text("x", style=VALUE), whose base style Content keeps as the raw string '#e9e9e9' (AssertionError: (Style(foreground=Color(233, 233, 233)), '#e9e9e9')); the card's row() appends the value as a span, so the sample is now built the same way (Text().append("x", style=VALUE)). That transcript was overwritten by this one.
+
+synced <HOME>/work/s19_i12bc: HEAD 2f54c7dea27d826483e5c5e596421b8b3a68bb2f staged tree 7c89fe9ef26e61b6a60b943fef23738bcacfdb1d staged files 17 unstaged 0
+=== Inc 12b E5 corrective run: e5c-02
+date: 2026-11-07T00:49:15Z
+host: LAN Linux host 2
+worktree: <HOME>/work/s19_i12bc
+worktree HEAD (base): 2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+main ref seen here: 2f54c7dea27d826483e5c5e596421b8b3a68bb2f (origin/main 2f54c7dea27d826483e5c5e596421b8b3a68bb2f)
+index tree (base + the corrective diff, staged): 7c89fe9ef26e61b6a60b943fef23738bcacfdb1d
+staged files vs base: 17
+unstaged changes vs index: 0
+untracked files: 
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i12bc/s19_app/__init__.py
+CMD: PYTHONPATH=~/work/s19_i12bc-helpers env -u NO_COLOR $PY -m pytest -q -p no:cacheprovider -p no:xdist -p s19_i12bc_walkprobe -s -rA tests/test_b101_flow_shown_widgets.py tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally tests/test_flow_builder_render.py::test_at088b_check_ref_label_renders_literally tests/test_tui_directionb.py::test_at_flow_block_label_markup_safe tests/test_tui_flow_persistence_ui.py::test_at006_report_bearing_flow_shows_report_row
+
+PROBE test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state: window #screen_flow: 53 widgets with an id (52 distinct ids); under the panel 50 widgets (49 distinct ids); outside the panel ['open_folder_flows', 'screen_flow', 'window_help_flow']; ids held by more than one widget ['label']
+PROBE test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state: ids ['flow_add', 'flow_add_row', 'flow_browse', 'flow_clear', 'flow_clip_row', 'flow_clip_status', 'flow_copy', 'flow_edit', 'flow_ext_instruction', 'flow_ext_log', 'flow_ext_mode', 'flow_ext_output', 'flow_ext_row', 'flow_funnel_add', 'flow_funnel_editor', 'flow_funnel_list', 'flow_funnel_name', 'flow_funnel_toggle', 'flow_funnel_value', 'flow_gating', 'flow_legend', 'flow_load', 'flow_name_strip', 'flow_palette', 'flow_palette_a2b', 'flow_palette_check', 'flow_palette_crc', 'flow_palette_external_step', 'flow_palette_patch', 'flow_palette_source', 'flow_palette_write_out', 'flow_panel', 'flow_paste', 'flow_pick', 'flow_pipeline', 'flow_pipeline_scroll', 'flow_ref', 'flow_ref_a', 'flow_ref_a_browse', 'flow_ref_b', 'flow_ref_b_browse', 'flow_remove', 'flow_result', 'flow_ribbon', 'flow_run', 'flow_run_row', 'flow_save', 'flow_wiring_notice', 'label', 'label', 'open_folder_flows', 'screen_flow', 'window_help_flow']
+PROBE test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state: states ['opened', 'chip source', 'chip patch', 'chip check', 'chip crc', 'chip write_out', 'chip a2b', 'chip external_step', 'variables open', 'variables closed', 'add notice', '1 LOAD block(s)', '2 LOAD block(s)', '3 LOAD block(s)']
+PROBE test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state: never shown []
+.
+PROBE test_r_fx_scr_4_1_every_flow_execution_widget_is_shown_in_a_state: window #screen_flow_execution: 38 widgets with an id (38 distinct ids); under the panel 35 widgets (35 distinct ids); outside the panel ['open_folder_session', 'screen_flow_execution', 'window_help_flow_execution']; ids held by more than one widget []
+PROBE test_r_fx_scr_4_1_every_flow_execution_widget_is_shown_in_a_state: ids ['fx_bind_0_0', 'fx_cable_0_0', 'fx_cable_0_1', 'fx_cable_0_2', 'fx_card_0_0', 'fx_card_0_1', 'fx_card_0_2', 'fx_card_0_3', 'fx_confirm_0', 'fx_empty', 'fx_import', 'fx_in_0_0', 'fx_lane_0', 'fx_lane_0_edit_0', 'fx_lane_0_head', 'fx_lane_0_pending', 'fx_lane_0_row', 'fx_lanes', 'fx_lanes_scroll', 'fx_legend', 'fx_load', 'fx_log', 'fx_mode', 'fx_name_strip', 'fx_notice', 'fx_panel', 'fx_required', 'fx_ribbon', 'fx_run', 'fx_run_row', 'fx_save', 'fx_set_name', 'fx_set_row', 'fx_set_select', 'label', 'open_folder_session', 'screen_flow_execution', 'window_help_flow_execution']
+PROBE test_r_fx_scr_4_1_every_flow_execution_widget_is_shown_in_a_state: states ['no lane', 'flash_chain imported', 'run waiting', 'set saved']
+PROBE test_r_fx_scr_4_1_every_flow_execution_widget_is_shown_in_a_state: never shown []
+..
+PROBE test_at_i12b_1_kind_chip_add_and_ribbon_by_keys: ribbon ' Flow: flow  · unsaved  CHECK                                      session …chip_add_a0/.s19tool/workarea/proj1'; folder 'proj1'
+.....
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_b101_flow_shown_widgets.py::test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state
+PASSED tests/test_b101_flow_shown_widgets.py::test_r_fx_scr_4_1_every_flow_execution_widget_is_shown_in_a_state
+PASSED tests/test_b101_flow_shown_widgets.py::test_r_fb_add_1_2_a_press_naming_no_kind_changes_nothing
+PASSED tests/test_b101_flow_shown_widgets.py::test_at_i12b_1_kind_chip_add_and_ribbon_by_keys
+PASSED tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally
+PASSED tests/test_flow_builder_render.py::test_at088b_check_ref_label_renders_literally
+PASSED tests/test_tui_directionb.py::test_at_flow_block_label_markup_safe
+PASSED tests/test_tui_flow_persistence_ui.py::test_at006_report_bearing_flow_shows_report_row
+8 passed in 47.36s
+=== exit code: 0
+
+--- the probe plugin (<HOME>/work/s19_i12bc-helpers/s19_i12bc_walkprobe.py, on PYTHONPATH; read-only, removed after the runs):
+"""Read-only probe, Inc 12b E5 corrective (QA-1 / QA-7 re-measure; QA-6): wraps
+the G-T4 module's ``_Walk.never_shown`` and ``_drive`` and prints what the
+nodes measure (no assertion changed, nothing written)."""
+import pytest
+
+
+@pytest.fixture(autouse=True)
+def _i12bc_walk_probe(request, monkeypatch):
+    mod = request.module
+    if not mod.__name__.endswith("test_b101_flow_shown_widgets"):
+        yield
+        return
+    base = mod._Walk
+
+    class ProbeWalk(base):
+        def never_shown(self):
+            members = list(self.population.values())
+            ids = sorted(w.id for w in members)
+            distinct = sorted(set(ids))
+            shared = sorted({i for i in ids if ids.count(i) > 1})
+            panel = next((w for w in members if w.id in ("flow_panel", "fx_panel")), None)
+            under = [w for w in members if w is panel or panel in w.ancestors]
+            outside = sorted(w.id for w in members if not any(w is u for u in under))
+            name = request.node.name
+            print(f"\nPROBE {name}: window #{self.window.id}: {len(members)} widgets with an id"
+                  f" ({len(distinct)} distinct ids); under the panel {len(under)} widgets"
+                  f" ({len({w.id for w in under})} distinct ids); outside the panel {outside};"
+                  f" ids held by more than one widget {shared}")
+            print(f"PROBE {name}: ids {ids}")
+            print(f"PROBE {name}: states {self.states}")
+            result = super().never_shown()
+            print(f"PROBE {name}: never shown {result}")
+            return result
+
+    original_drive = mod._drive
+
+    def drive(tmp_path, body):
+        result = original_drive(tmp_path, body)
+        if request.node.name.startswith("test_at_i12b_1"):
+            print(f"\nPROBE {request.node.name}: ribbon {result[3]!r}; folder {result[5]!r}")
+        return result
+
+    monkeypatch.setattr(mod, "_Walk", ProbeWalk)
+    monkeypatch.setattr(mod, "_drive", drive)
+    yield

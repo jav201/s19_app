@@ -1,0 +1,50 @@
+=== base commit ===
+2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+applied M2 OK
+=== mutation diff ===
+--- <HOME>/work/s19_i12bmut/s19_app/tui/flow_screens.py	2026-11-06 18:16:04.301575372 -0600
++++ s19_app/tui/flow_screens.py	2026-11-06 18:32:39.028644432 -0600
+@@ -734,7 +734,7 @@
+     card. Values are clipped by kind of text: a command keeps its head, every
+     ref and path its tail (LLR-146.4); file-derived text is scrubbed (C-17)."""
+     block = blocks[index]
+-    scrub = lambda s: safe_text(s).plain  # noqa: E731 - the one sink guard
++    scrub = lambda s: Text.from_markup(safe_text(s).plain).plain  # noqa: E731 - MUTANT M2
+     prev = ("image", f"← #{index}" if index > 0 else "—")
+     if isinstance(block, SourceBlock):
+         return [("file", scrub(block.image_ref)), ("fmt", block.file_type)], ("out", "image"), ""
+=== grep landed ===
+737:    scrub = lambda s: Text.from_markup(safe_text(s).plain).plain  # noqa: E731 - MUTANT M2
+=== s19_app.__file__ ===
+<HOME>/work/s19_i12bmut_m02/s19_app/__init__.py
+=== pytest ===
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+________________ test_at088b_check_ref_label_renders_literally _________________
+../s19_i12bmut/tests/test_flow_builder_render.py:546: in test_at088b_check_ref_label_renders_literally
+    assert _HOSTILE_SCRUBBED in rows[doc_row], rows[doc_row]
+E   AssertionError: │ sensor[31mx                                                      │
+E   assert '[bold red]sensor[31m[/]x[link=file:///etc/passwd]' in '│ sensor[31mx                                                      │'
+________________ test_at_b94_18_hostile_names_render_literally _________________
+../s19_i12bmut/tests/test_tui_flow_builder_b94.py:427: in test_at_b94_18_hostile_names_render_literally
+    assert "_evil[red]" in canvas  # literal brackets, never parsed
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: assert '_evil[red]' in '╭─ 1 ──────────────────────────────────────╮    ╭─ 2 ──────────────────────────────────────╮\n│ ◉ LOAD               ...                       │\n╰──────────────────────────────────────────╯    ╰──────────────────────────────────────────╯'
+__________ test_at_b97_08_hostile_and_nul_refs_never_crash_or_inject ___________
+../s19_i12bmut/tests/test_b97_flow_builder.py:1618: in test_at_b97_08_hostile_and_nul_refs_never_crash_or_inject
+    assert fs.clip_tail(payload, inner) in painted and fs.clip_tail(payload, inner).startswith("…")
+E   AssertionError: assert ('…31m_evil[red]1m8;;u' in '╭─ 1 ──────────────────╮    ╭─ 2 ──────────────────╮    ╭─ 3 ──────────────────╮    ╭─ 4 ──────────────────╮\n│ ◉ LOA...py.s19 │\n╰──────────────────────╯    ╰──────────────────────╯    ╰──────────────────────╯    ╰──────────────────────╯')
+E    +  where '…31m_evil[red]1m8;;u' = <function clip_tail at 0x7f7dc412eb60>('b97[bold]x[/]y[red]z[link=https://e.invalid]l[/link][@click=app.quit]qb77hostilemark[31m_evil[red]1m8;;u', 20)
+E    +    where <function clip_tail at 0x7f7dc412eb60> = fs.clip_tail
+_____________________ test_at_flow_block_label_markup_safe _____________________
+../s19_i12bmut/tests/test_tui_directionb.py:5855: in test_at_flow_block_label_markup_safe
+    assert "evil[red].s19" in rows[file_row], rows[file_row]
+E   AssertionError: │ evil.s19                                                                                 │
+E   assert 'evil[red].s19' in '│ evil.s19                                                                                 │'
+=========================== short test summary info ============================
+FAILED tests/test_flow_builder_render.py::test_at088b_check_ref_label_renders_literally
+FAILED tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally
+FAILED tests/test_b97_flow_builder.py::test_at_b97_08_hostile_and_nul_refs_never_crash_or_inject
+FAILED tests/test_tui_directionb.py::test_at_flow_block_label_markup_safe - A...
+4 failed in 20.16s
+=== exit code: 1 ===

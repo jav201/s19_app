@@ -1,0 +1,81 @@
+=== base commit ===
+2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+applied M7 OK
+=== mutation diff ===
+--- <HOME>/work/s19_i12bmut/s19_app/tui/flow_screens.py	2026-11-06 18:16:04.301575372 -0600
++++ s19_app/tui/flow_screens.py	2026-11-06 18:36:11.910654331 -0600
+@@ -2056,7 +2056,7 @@
+             self._browse_ref(_BROWSE_INPUTS[event.button.id])
+             return
+         if event.button.id == "flow_add":
+-            kind = self._kind
++            kind = BLOCK_SOURCE  # MUTANT M7: Add reads the default kind
+             # S4-1 (LLR-146.14): a NUL in a path-bearing input refuses the
+             # Add before any block is built; the inputs keep their text.
+             refusal = nul_add_refusal(
+=== grep landed ===
+2059:            kind = BLOCK_SOURCE  # MUTANT M7: Add reads the default kind
+=== s19_app.__file__ ===
+<HOME>/work/s19_i12bmut_m11/s19_app/__init__.py
+=== pytest ===
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+_______________ test_at_i12b_1_kind_chip_add_and_ribbon_by_keys ________________
+../s19_i12bmut/tests/test_b101_flow_shown_widgets.py:392: in test_at_i12b_1_kind_chip_add_and_ribbon_by_keys
+    assert pipeline.count(CHECK_TAG) == 1, pipeline
+E   AssertionError: ╭─ 1 ──────────────────────────────────────────────────────────────────────────────────────────────────────╮
+E     │ ◉ LOAD                                                                                                   │
+E     │ reads an image                                                                                           │
+E     │ in · file                                                                                                │
+E     │ baseline.chk.json                                                                                        │
+E     │ in · fmt                                                                                                 │
+E     │ s19                                                                                                      │
+E     │ ↳ project: baseline.chk.json                                                                             │
+E     │                                                                                                          │
+E     │ out                                                                                                      │
+E     │ image                                                                                                    │
+E     ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+E   assert 0 == 1
+E    +  where 0 = <built-in method count of str object at 0x55e2d242c6c0>('✓ CHECK')
+E    +    where <built-in method count of str object at 0x55e2d242c6c0> = '╭─ 1 ──────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ ◉ LOA...       │\n╰──────────────────────────────────────────────────────────────────────────────────────────────────────────╯'.count
+___________ test_r_fb_add_1_2_a_press_naming_no_kind_changes_nothing ___________
+../s19_i12bmut/tests/test_b101_flow_shown_widgets.py:326: in test_r_fb_add_1_2_a_press_naming_no_kind_changes_nothing
+    assert pipeline.count(CHECK_TAG) == 1, pipeline
+E   AssertionError: ╭─ 1 ──────────────────────────────────────────────────────────────────────────────────────────────────────╮
+E     │ ◉ LOAD                                                                                                   │
+E     │ reads an image                                                                                           │
+E     │ in · file                                                                                                │
+E     │ baseline.chk.json                                                                                        │
+E     │ in · fmt                                                                                                 │
+E     │ s19                                                                                                      │
+E     │ ↳ project: baseline.chk.json                                                                             │
+E     │                                                                                                          │
+E     │ out                                                                                                      │
+E     │ image                                                                                                    │
+E     ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+E   assert 0 == 1
+E    +  where 0 = <built-in method count of str object at 0x55e2d2340dd0>('✓ CHECK')
+E    +    where <built-in method count of str object at 0x55e2d2340dd0> = '╭─ 1 ──────────────────────────────────────────────────────────────────────────────────────────────────────╮\n│ ◉ LOA...       │\n╰──────────────────────────────────────────────────────────────────────────────────────────────────────────╯'.count
+___________ test_at_b97_07_each_kind_its_inputs_and_an_ext_step_card ___________
+../s19_i12bmut/tests/test_b97_flow_builder.py:1563: in test_at_b97_07_each_kind_its_inputs_and_an_ext_step_card
+    assert len(refusal) == 1 and "log" in refusal[0] and not ES_MARKER_RE.search(refusal[0]), refusal
+E   AssertionError: ['Add needs image file — nothing added']
+E   assert (1 == 1 and 'log' in 'Add needs image file — nothing added')
+E    +  where 1 = len(['Add needs image file — nothing added'])
+____________ test_at088_gating_selector_appends_block_own_op_check _____________
+../s19_i12bmut/tests/test_flow_builder_render.py:617: in test_at088_gating_selector_appends_block_own_op_check
+    assert isinstance(blocks[0], CheckBlock)
+E   AssertionError: assert False
+E    +  where False = isinstance(SourceBlock(image_ref='gaps.json', file_type='s19', a2l_ref=None, kind='source'), CheckBlock)
+________________ test_at_flow_add_blocks_and_run_renders_result ________________
+../s19_i12bmut/tests/test_tui_directionb.py:5795: in test_at_flow_add_blocks_and_run_renders_result
+    assert "PATCH" in blocks_text and "patch.json" in blocks_text
+E   AssertionError: assert ('PATCH' in '╭─ 1 ──────────────────────╮    ╭─ 2 ──────────────────────╮    ╭─ 3 ──────────────────────╮\n│ ◉ LOAD               ...age                    │\n╰──────────────────────────╯    ╰──────────────────────────╯    ╰──────────────────────────╯')
+=========================== short test summary info ============================
+FAILED tests/test_b101_flow_shown_widgets.py::test_at_i12b_1_kind_chip_add_and_ribbon_by_keys
+FAILED tests/test_b101_flow_shown_widgets.py::test_r_fb_add_1_2_a_press_naming_no_kind_changes_nothing
+FAILED tests/test_b97_flow_builder.py::test_at_b97_07_each_kind_its_inputs_and_an_ext_step_card
+FAILED tests/test_flow_builder_render.py::test_at088_gating_selector_appends_block_own_op_check
+FAILED tests/test_tui_directionb.py::test_at_flow_add_blocks_and_run_renders_result
+5 failed in 42.79s
+=== exit code: 1 ===

@@ -1,0 +1,57 @@
+# Inc 12b — validation (E5)
+
+**Verdict: PASS-WITH-NOTES.** The Flow Builder and Flow Execution windows hold only widgets that some state of the window shows: the five hidden Flow Builder widgets (`#flow_help`, `#flow_canvas`, `#flow_blocks`, `#flow_kind`, `#flow_ext_session`) and the Flow Execution help sentence (`#fx_help`) are removed with their painters, the block kind is `FlowBuilderPanel._kind` written only by the kind chips with a value of `_KIND_OPTIONS` (S-1), and every test that read the hidden widgets now reads the visible pipeline, ribbon and chips. The two walks find 0 never-shown widgets over populations of 53 and 38 widgets with an id (the whole window, keyed by widget identity), the mutant battery killed 7/7 rows (11/11 runs), the pinned I-3 commands return empty, and the review chain closed green. No BLOCKER / HIGH / MAJOR is open. The notes are records-only: the one backlog row BL-I12b-1 (the pre-existing 120×30 rail 2-cell overflow), the merge-time full suite, and the canon ids to forward. Branch `b101-inc12b` at `9087b8ab` plus the uncommitted E5 records, this file and the increment packet. Platform: the LAN Linux hosts for every run; the Windows PC ran only the Windows-only arms (`win-01`, `win-02`) with isolated app-state folders and no clipboard (operator rule).
+
+## Runs
+
+| Run | Result | Evidence |
+|---|---|---|
+| E1 pilot on base `e07fb00` (Inc 12's E1, B lines 17-27) | F-35's Flow Builder half and D16-6 reproduced: never shown `flow_blocks`, `flow_canvas`, `flow_ext_session`, `flow_help`, `flow_kind` over the driven Builder states and `fx_help` over the Execution states; 3 hidden-canvas and 3 hidden-list repaints for 3 Adds | `../inc-12/evidence-e1/i12e1-pilot-transcript.txt` |
+| Tester G-T4 RED on base `2f54c7d` | **3 failed, 1 passed**; the Builder walk failed at its own negative control (the five ids, size clause passed first), the Execution walk at `['fx_help']`, R-FB-ADD.1/2 by `InvalidSelectValueError: Illegal select value 'bogus'`; AT-I12b-1 passed (standing guard) | `../evidence/inc-12b/red-01-g-t4-base.txt` |
+| Tester G-T3 base run (`-v`, 54 items) | **54 passed** on base; the 39 re-pointed nodes read the visible oracles (pipeline, ribbon, chip mark) | `../evidence/inc-12b/base-01-g-t3.txt` |
+| Tester G-T3 oracle controls (scratch copy, restored after each) | `nul_add_refusal` returns `None` → 10 RED (9 TC-B97-62 params + AT-B97-08); card refs through `Text.from_markup` → 4 RED | `../evidence/inc-12b/base-01-g-t3-mutants.txt` |
+| Integration int-00 … int-08, LAN Linux host 2, trees `94891ee2…` / `e0ec6b20…` / `e7f05497…` / `29cc1952…` on `2f54c7d` | **GREEN for the right reasons**: int-00 the three pinned I-3 commands empty ×3 and the registry guard 270 vs 269; int-01 `491 passed, 29 skipped` (new file + 13 re-pointed); int-02 `511 passed, 4 skipped` (QC-BC 13 files); int-03 `182 passed, 10 skipped, 2 failed` (the 2 known `tc016s` patch-comfortable snapshots); int-04 `218 passed` (law guards); int-05 `4 passed, 1 skipped, 1447 deselected` (serial_timing); int-06 the probe `4 passed` with populations 49 / 35 and never shown `[]` / `[]`; int-07 and int-07b the oracle controls M0 … M3; int-08 `233 passed` (final tree) | `../evidence/inc-12b/int-00.txt`, `../evidence/inc-12b/int-01.txt`, `../evidence/inc-12b/int-02.txt`, `../evidence/inc-12b/int-03.txt`, `../evidence/inc-12b/int-04.txt`, `../evidence/inc-12b/int-05.txt`, `../evidence/inc-12b/int-06.txt`, `../evidence/inc-12b/int-07.txt`, `../evidence/inc-12b/int-07b.txt`, `../evidence/inc-12b/int-08.txt` |
+| int-base-01 (the 2 failed snapshot nodes on base `2f54c7d`, nothing applied) | **2 failed**, the same `tc016s` nodes | `../evidence/inc-12b/int-base-01.txt` |
+| Corrective e5c-01 … e5c-07, LAN Linux host 2, final tree `7c89fe9e…` on `2f54c7d` | e5c-01 setup + the R-1 measure-first probes (rail 96 with 0 cards, 94 from 1 card on, chain 92, base identical); e5c-02 `8 passed` with populations 53 / 38 and the ribbon ending `…/workarea/proj1`; e5c-03 C0 `14 passed` and C1 … C6, C4a each RED on the strengthened clause, GREEN on its `092fffd` form (C4a RED both); e5c-04 the three I-3 commands empty ×3 then `709 passed, 29 skipped`; e5c-05 `3 passed, 1 skipped, 738 deselected` (serial_timing); e5c-06 `2 passed` (import census); e5c-07 the R-1 ruling: the bound RED ×2 (card renderer +1, bound −1) and GREEN `94 passed` | `../evidence/inc-12b/e5c-01.txt`, `../evidence/inc-12b/e5c-02.txt`, `../evidence/inc-12b/e5c-03.txt`, `../evidence/inc-12b/e5c-04.txt`, `../evidence/inc-12b/e5c-05.txt`, `../evidence/inc-12b/e5c-06.txt`, `../evidence/inc-12b/e5c-07.txt` |
+| Mutant battery M1 … M7, LAN Linux host 2, one mutant per copy | mut-00 the guard nodes GREEN first (`20 passed`); M1 … M7 **7/7 rows killed** (11/11 runs: M5 once per removed widget) | `../evidence/inc-12b/mut-00.txt`, `../evidence/inc-12b/mut-01.txt`, `../evidence/inc-12b/mut-02.txt`, `../evidence/inc-12b/mut-03.txt`, `../evidence/inc-12b/mut-04.txt`, `../evidence/inc-12b/mut-05.txt`, `../evidence/inc-12b/mut-06.txt`, `../evidence/inc-12b/mut-07.txt`, `../evidence/inc-12b/mut-08.txt`, `../evidence/inc-12b/mut-09.txt`, `../evidence/inc-12b/mut-10.txt`, `../evidence/inc-12b/mut-11.txt` |
+| Windows PC win-01 (head `092fffd`) | `95 passed, 0 skipped`: the 4 cases plus the whole of `test_b100_project_homes.py` (all 29 Windows-only skips of int-01 and TC-B100-31), each node named, I-D7's backslash arm included | `../evidence/inc-12b/win-01.txt` |
+| Windows PC win-02 (the final tree, after the corrective) | `4 passed`: the walk file re-run on Windows after the corrective | `../evidence/inc-12b/win-02.txt` |
+
+Every integration transcript prints the base commit, the staged tree and `s19_app.__file__` (the detached worktree or clone); the corrective transcripts print the same plus the landed diff and the exact command line; the mutant transcripts print the mutation diff and `s19_app.__file__` inside the copy. Home paths, account and host names are redacted.
+
+## Per requirement
+
+| Row | Verdict | Cases | Evidence — Linux | Evidence — Windows | Residual |
+|---|---|---|---|---|---|
+| R-TUI-059.25 (US-I12b-1) | met — 1/1 | TUI-059.25/1, AT-I12b-1 | int-01, int-06, int-08, e5c-04; base RED (the five ids, `red-01-g-t4-base.txt`); M5a … M5e killed | win-01, win-02 | — (a widget restored displayed is the accepted QA-4 residual, carried by no standing node) |
+| R-FX-SCR.4 (US-I12b-1) | met — 1/1 | FX-SCR.4/1 | int-01, int-06, int-08, e5c-04; base RED (`['fx_help']`); M6 killed | win-01, win-02 | — |
+
+**4 cases: 4 `full`, 0 `partial`, 0 `gap`** (marks changed: 0). The robustness case R-FB-ADD.1/2 checks the S-1 guard of the cited R-FB-ADD.1 (M1 killed, `int-07b`); AT-I12b-1 is the Flow Builder half of Inc 12's former AT-I12-3 and its ribbon clause was strengthened at the corrective (QA-6, ends with the project folder's name; C3 RED). The two walks collect over the whole window and count the population by widget identity (QA-1, QA-7); the thresholds ≥ 45 / ≥ 30 hold at 53 / 38 with 0 never shown (`e5c-02`).
+
+## Mutant score
+
+**7 / 7 killed** (11 / 11 runs), 0 survivors, 100 %. M1 (the S-1 guard removed) turns R-FB-ADD.1/2 RED at its first painted-tag assertion; M2 (card refs through `Text.from_markup`) and M3 (a span over half the value row) turn the four markup nodes RED; M4 (`nul_add_refusal` → `None`) turns the 9 TC-B97-62 params and AT-B97-08 RED; M5a … M5e (each hidden Flow Builder widget restored hidden at mount) and M6 (`#fx_help` restored) turn their walk RED by id; M7 (`flow_add` reads `BLOCK_SOURCE`) turns the five Add nodes of non-SOURCE kinds RED. The corrective's one-off controls C1 … C6 and C4a each turned their strengthened clause RED and left the `092fffd` form GREEN (C4a RED both). Details: `E5-mutants.md`, `E5-corrective-notes.md` §1; transcripts `../evidence/inc-12b/mut-00.txt` … `mut-11.txt`, `../evidence/inc-12b/e5c-03.txt`, `../evidence/inc-12b/e5c-07.txt`.
+
+## Reviews
+
+- **E3 design (code-free):** `architect` **FAIL** in round 1 (1 MAJOR E3A-01, 7 MINOR) and `security-reviewer` **PASS-WITH-NOTES** (3 MINOR); after the split and the correction, round 2 re-check: `architect` **PASS-WITH-NOTES** for 12b (E3A-03, E3A-05 and the split verified; note E3A-R2-4) and `security-reviewer` **PASS-WITH-NOTES** (S-1, S-2 closed; S2-1, S2-2 LOW). The reviews live in `../inc-12/E3-architect.md`, `../inc-12/E3-security.md`; the rulings in `../inc-12/E3-rulings.md` and `inc-12b/E3-rulings.md`.
+- **E5 code + security review:** `code-reviewer` (one agent, both lenses) **PASS-WITH-NOTES** (0 HIGH — R-1 MEDIUM, R-2 … R-5 LOW). The kind state is closed on every path, no removal leaves a reader, the I-3 commands are empty ×3, and hostile refs reach the cards only as plain text. R-1 closed at the corrective (test side), the product defect carried as BL-I12b-1. `E5-review.md`.
+- **Coverage audit:** `qa-reviewer` **PASS-WITH-NOTES** (QA-1 … QA-3 MINOR, QA-4 … QA-9 NIT): 4 `full`, 0 `partial`, 0 `gap`, marks changed 0. `E5-coverage-audit.md`.
+- **Orchestrator rulings:** `E5-rulings.md`; the corrective applied R-2 … R-5 and QA-1 … QA-9, stopped R-1 (E-1, a product question) and re-ruled it test-side (§5 of `E5-corrective-notes.md`).
+
+## Admitted visible changes
+
+None. Every removed widget was set to `display = False` at compose or mount and never shown again, and each one's work has a visible owner (the kind chips with their kind tag, the pipeline cards, the ribbon, the `?` help body). What changes underneath: no hidden canvas or list is repainted on a chain change, and the tests that read hidden widgets read the visible ones. The operator can notice nothing.
+
+## Owed
+
+Open residuals and carry-overs:
+
+- **BL-I12b-1** (E-1, R-1; `E1-rulings.md` §5): a pre-existing layout defect, identical on base `2f54c7d` — at 120×30 the Flow Builder rail's content is 92 wide with no card and 90 from the first card on, because `#flow_panel` gains a vertical scrollbar and `FlowBuilderPanel._apply_layout` does not re-run, so the rail scrolls sideways by 2. Fix idea: re-run the layout pass when `#flow_pipeline_scroll` resizes. Not asserted by AT-B94-15 / TC-B94-20, which now bound by the width read before the first card (the R-1 ruling).
+- **Merge-time full suite:** this increment ran its slice, the 13 re-pointed files, the QC-BC set, the other importers, the law guards and the serial lane on the LAN Linux hosts, but not all nodes in one lane; the batch-end battery runs the full suite once.
+- **Canon ids to forward to the requirements session:** the 2 new rows R-TUI-059.25 and R-FX-SCR.4 (moved from Inc 12 with their ids, thresholds re-pinned to the whole-window populations 53 / 38), the CTX-SHELL terms *shown widget* and *state of a window* (identical text in Inc 12; the first of the two to merge folds them), and CODE-CHANGES D16-6 (marked `done (batch-101 Inc 12b)` at integration, I-D10).
+- **Inc 12 (merging last) owns the DOSSIER marks and `_FIXED`:** Inc 12b marks no DOSSIER row and edits no user-guide passage (E3A-04 + U-1). Inc 12 owns F-33, F-34, F-35, F-51 and the pinned set `_FIXED`, and marks F-35 because it merges after 12b; if the merge order flips, the increment that merges second marks F-35.
+
+## Trace
+
+`trace_check.py --req 01-requirements.md --base 2f54c7d --src s19_app` at close: `trace_check: 1 US, 2 active requirements (0 withdrawn), 0 gap(s)`. Every evidence citation in this record is a full committed path under the batch's evidence home.

@@ -1,0 +1,79 @@
+=== Inc 12b E4 integration run: int-00 (checks before the GREEN run, on the integrated tree)
+host: LAN Linux host 2; clone <HOME>/work/s19_i12bint (git clone --shared of the host's s19_app clone, detached at origin/main; its main ref set equal to origin/main, see E4-integration-notes.md I-D2)
+staged blobs vs local git hash-object: equal, 16 files (tree 94891ee2..., before the registry edit) and 17 files (tree e0ec6b20..., after it)
+
+--- 1. I-3 pinned commands (graph-inc12b.md), tree 94891ee2...
+worktree HEAD (base): 2f54c7dea27d826483e5c5e596421b8b3a68bb2f; index tree: 94891ee2d779a8264574d8c4b222fcd6d763a02c; unstaged: 0
+$ git grep -n -w -e flow_help -e flow_canvas -e flow_blocks -e flow_kind -e flow_ext_session -e fx_help -e _flow_block_label -e _blocks_text -e _canvas_text -e _block_rows -e _Grid -e _plc_block -e _chip -e _wire_bend -e _wire_drop -e _block_width -e _short_ext -e _CANVAS_COLS -e _BLOCK_W -e _EXT_BLOCK_W -e _S_WIRE -e _S_LABEL -e _S_VALUE -e _S_HEAD -- s19_app tests
+(exit 1; lines printed above, none = empty)
+$ git grep -n -e 'def _layout(' -e 'self\._layout(' -- s19_app/tui/flow_screens.py
+(exit 1)
+$ git grep -n -e '\._layout(' -- tests
+(exit 1)
+--- control: the same command (1) on the base commit HEAD (expected 145 lines)
+146
+--- control: command (2) on the base commit HEAD (expected 2 + 0)
+2
+0
+
+--- 2. EXPECTED_SCANNED_TEST_FILES measured by the guard (tree 94891ee2..., the registry still at 269)
+=== Inc 12b E4 integration run: int-00-registry
+date: 2026-11-06T23:03:13Z
+worktree: <HOME>/work/s19_i12bint
+worktree HEAD (base): 2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+main ref in this clone: 2f54c7dea27d826483e5c5e596421b8b3a68bb2f (= origin/main 2f54c7dea27d826483e5c5e596421b8b3a68bb2f)
+index tree with the increment staged: 94891ee2d779a8264574d8c4b222fcd6d763a02c
+staged files vs base: 16
+unstaged changes vs index: 0
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i12bint/s19_app/__init__.py
+CMD: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -p no:xdist -rfs tests/test_id_registry.py
+......F.....                                                             [100%]
+=================================== FAILURES ===================================
+_____________ test_tc607_scanned_corpus_matches_the_declared_bound _____________
+
+corpus = <tests.test_id_registry._Corpus object at 0x7fb0f6525790>
+
+    def test_tc607_scanned_corpus_matches_the_declared_bound(corpus: _Corpus) -> None:
+        """TC-607 — the guard's corpus is bounded by a declared, executable constant.
+    
+        Asserting *how many files the guard opens* is deterministic where a
+        wall-clock budget would be flaky. Widening the scan — most obviously to
+        ``.dev-flow/``, which would make the guard's verdict depend on batch prose —
+        moves this count and turns the threshold red immediately.
+        """
+        actual = len(corpus.test_files)
+>       assert actual == EXPECTED_SCANNED_TEST_FILES, (
+            f"the guard scanned {actual} test modules, not the declared "
+            f"{EXPECTED_SCANNED_TEST_FILES}. If tests/ legitimately grew, bump "
+            f"EXPECTED_SCANNED_TEST_FILES in the same PR so the bound stays a "
+            f"decision rather than a rubber stamp."
+        )
+E       AssertionError: the guard scanned 270 test modules, not the declared 269. If tests/ legitimately grew, bump EXPECTED_SCANNED_TEST_FILES in the same PR so the bound stays a decision rather than a rubber stamp.
+E       assert 270 == 269
+
+tests/test_id_registry.py:530: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound
+1 failed, 11 passed in 4.80s
+=== exit code: 1
+
+--- 3. Census re-run on the merged base (graph I-3 / E1-slice §5: tests that Inc 9, 10a or 10b add are in it then)
+$ git grep -n -w <command (1)'s 24 patterns> e07fb00 -- s19_app tests | wc -l      (the records' base tree)
+145
+$ git grep -c -w <command (1)'s 24 patterns> 2f54c7d -- s19_app tests                (the merged base: Inc 9 in; Inc 10a, 10b not on main)
+s19_app/tui/flow_screens.py:88
+tests/test_b100_project_homes.py:1
+tests/test_b101_flow_names_ui.py:1
+tests/test_b102_flow_file_chooser.py:1
+tests/test_b97_chips_help.py:2
+tests/test_b97_flow_builder.py:14
+tests/test_flow_builder_render.py:9
+tests/test_flow_crc_ribbon.py:2
+tests/test_flow_crc_ui.py:4
+tests/test_flow_external_step_b96.py:4
+tests/test_flow_funnel_b96.py:1
+tests/test_tui_directionb.py:3
+tests/test_tui_flow_builder_b94.py:10
+tests/test_tui_flow_persistence_ui.py:6
+(146 = 88 product + 58 in exactly G-T3's 13 files; the +1 over 145 is Inc 9's _add_load_block line. No other test file names a removed id or family member.)

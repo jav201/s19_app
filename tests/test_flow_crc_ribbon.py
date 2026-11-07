@@ -160,17 +160,25 @@ def test_tc361_gating_control_hidden_for_non_check(tmp_path: Path) -> None:
             await pilot.pause()
             await pilot.press("8")
             await pilot.pause()
-            kind = app.query_one("#flow_kind", Select)
             gating = app.query_one("#flow_gating", Select)
             out = {}
-            kind.value = BLOCK_SOURCE
-            await pilot.pause()
+
+            async def choose(kind: str) -> None:
+                # The kind chip, pressed as a user does; its ``chip-selected``
+                # mark is the sign that the add form followed.
+                chip = app.query_one(f"#flow_palette_{kind}")
+                chip.press()
+                for _ in range(25):
+                    await pilot.pause()
+                    if chip.has_class("chip-selected"):
+                        return
+                raise AssertionError(f"the {kind} chip did not become selected")
+
+            await choose(BLOCK_SOURCE)
             out["source"] = gating.display
-            kind.value = BLOCK_CRC
-            await pilot.pause()
+            await choose(BLOCK_CRC)
             out["crc"] = gating.display
-            kind.value = BLOCK_CHECK
-            await pilot.pause()
+            await choose(BLOCK_CHECK)
             out["check"] = gating.display
             return out
 
@@ -195,7 +203,7 @@ def test_tc358_empty_flow_renders_without_crash(tmp_path: Path) -> None:
             # empty flow list + an empty-result render must not raise
             panel.render_result(FlowRunResult(status="ok"))
             await pilot.pause()
-            return panel.query_one("#flow_blocks", Static).render().plain
+            return panel.query_one("#flow_pipeline", Static).render().plain
 
     blocks_text = asyncio.run(_drive())
-    assert "no blocks yet" in blocks_text
+    assert "No blocks yet" in blocks_text

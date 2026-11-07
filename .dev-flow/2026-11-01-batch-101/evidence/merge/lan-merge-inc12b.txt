@@ -1,0 +1,14 @@
+LAN host 2, merged tree f481e8a (main + Inc 12b merge) — PARTIAL merge verification by operator order 2026-11-06 (full suite once at batch end): the new and edited test files, QC-BC (int-02), other importers (int-03), law guards (int-04), 37 files; then serial_timing over the same files. Files: tests/test_address_census.py tests/test_b100_load_dialog.py tests/test_b100_load_question.py tests/test_b100_project_homes.py tests/test_b101_doc_hygiene.py tests/test_b101_flow_ext_copy.py tests/test_b101_flow_names_ui.py tests/test_b101_flow_shown_widgets.py tests/test_b101_help_legend_docs.py tests/test_b102_flow_block_edit.py tests/test_b102_flow_file_chooser.py tests/test_b97_chips_help.py tests/test_b97_flow_builder.py tests/test_b97_flow_execution.py tests/test_b97_key_bar.py tests/test_b97_width.py tests/test_b99_patch_truth.py tests/test_b99_staging.py tests/test_changes_file_notation_help.py tests/test_docs_canon.py tests/test_engine_unchanged.py tests/test_flow_builder_render.py tests/test_flow_crc_ribbon.py tests/test_flow_crc_ui.py tests/test_flow_external_step_b96.py tests/test_flow_funnel_b96.py tests/test_flow_multi_image_ui.py tests/test_flow_report_ui.py tests/test_id_registry.py tests/test_import_census.py tests/test_suite_hygiene.py tests/test_tui_directionb.py tests/test_tui_flow_builder_b94.py tests/test_tui_flow_execution_b94.py tests/test_tui_flow_persistence_ui.py tests/test_tui_snapshot.py tests/test_window_usage_help.py 
+HEAD 2f54c7de (origin/main 2f54c7d + git diff 2f54c7d f481e8a applied); staged tree e381ff175da67579e56c398e6d7346ab748afc66
+<HOME>/work/s19_m12b/s19_app/__init__.py
+--- lane 1: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -rfs -n 12 --dist loadfile -m 'not serial_timing' <37 files: the new and edited files, QC-BC (int-02), other importers (int-03), law guards (int-04)>
+FAILED tests/test_b97_key_bar.py::test_tc_b97_69_page_keys_do_nothing_where_disabled
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-120x30]
+3 failed, 1401 passed, 43 skipped in 1377.76s (0:22:57)
+--- lane 2: -m serial_timing -p no:xdist over the same files
+============================= QC-TM timing margins =============================
+QC-TM: 3 bounds, 0 under 20 % margin
+4 passed, 1 skipped, 1447 deselected in 24.98s
+exit=0
+--- classification of the non-known failure (orchestrator): tests/test_b97_key_bar.py::test_tc_b97_69_page_keys_do_nothing_where_disabled re-run alone, serial: merged tree 1 passed x3 (28 s each); base origin/main 2f54c7d 1 passed x2 -> load flake under -n 12 (same family Inc 13 measured, e5c-b97-69-r1..r3), not a regression. The 2 tc016s snapshot failures are the batch's known failures.
