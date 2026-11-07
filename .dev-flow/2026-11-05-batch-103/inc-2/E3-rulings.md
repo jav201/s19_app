@@ -219,3 +219,11 @@ Authority: `../inc-3/E3-rulings.md` "Round 6 rulings" (main worktree `s19_app-b1
 - **The range index** (E3S3-30 (a)) is the segment index of the rulings above. The equality case runs over every corpus COMPU_VTAB / _RANGE table at each raw value, min, max, midpoint, ±1, NaN and ±inf, against `_enum_entry_text` at `82f5f8e5`, and gives 0 differences. Negative control: a plain bisect → 780 differences in 30 tables → RED.
 - **References resolved at reduction** (E3S3-31): the method record keeps the section its COMPU_TAB_REF names, or none. No per-call name lookup of a shared word remains.
 - **The message bound** is "1,024 characters" (E3S3-32).
+
+### Gap pass 2 — records done (Opus, 31 min); orchestrator rulings on what it reported
+
+- **P-2: accept.** `Definition` gets two private fields, `_name_echo` and `_table_form`, each `field(compare=False, repr=False)`. I-2's public names, equality and repr do not change. No consumer reads them except through Inc 2a's own functions; Inc 3a reads them through the helpers its graph names.
+- **.149/5:** accepted. The cached-forms immutability test becomes a row case and is extended to `_EnumForm` and `_TabForm`.
+- **No new case for RL-10 or CM-2:** accepted. .149/4 already is RL-10, and CM-2 is covered by /1's reader, memo and negative control.
+- **The fail-closed cases sit under R-A2L-DEF.58.2 (/18, /19):** accepted, since .58.2 is the row for refusing instead of raising. /18's message matches Inc 3a's ruling. /19's wording, `<name>: the table <ref> has an x that is not a number`, is accepted, and Inc 3a uses the same wording for its arrays.
+- **.149/1's Expected measure** was updated in place by the orchestrator to the ruled one; /2–/4 read "as /1's bounds".
