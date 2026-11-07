@@ -1,0 +1,127 @@
+base commit (origin/main): 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+base worktree: <HOME>/work/s19_i10bmut (main == origin/main == 6f1743c, + the Inc 10b product and test diff applied)
+mutant: M8 - bisect dropped (A2L/MAC views re-render from the first row)
+
+=== MUTANT M8 ===
+edit: 2 edits
+grep output:
+1
+
+mutation diff:
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -18855,13 +18855,13 @@
+             if self._alt_first_visible_address is not None
+             else None
+         )
+-        self.update_alt_hex_view(start_row=start)
++        self.update_alt_hex_view(start_row=None)
+         start = (
+             bisect_left(rows, self._mac_first_visible_address)
+             if self._mac_first_visible_address is not None
+             else None
+         )
+-        self.update_mac_hex_view(start_row=start)
++        self.update_mac_hex_view(start_row=None)
+ 
+     def _refresh_a2l_values_after_write(self) -> None:
+         """
+
+s19_app.__file__ = <HOME>/work/s19_i10bmut_m8/s19_app/__init__.py
+pytest output:
+.FF                                                                      [100%]
+=================================== FAILURES ===================================
+E   AssertionError: the shown window moved: first rows [0x00000000, 0x00000010]
+    assert [0, 16] == [2384, 2400]
+      
+      At index 0 diff: 0 != 2384
+      Use -v to get more diff
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3015 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-469/test_r_tui_004_8_shown_window_1/app workarea=/tmp/pytest-of-<user>/pytest-469/test_r_tui_004_8_shown_window_1/app/.s19tool/workarea
+INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.007
+INFO     s19tui:app.py:18694 Loading file: path=/tmp/pytest-of-<user>/pytest-469/b101_i10bw_case080/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:15001 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:19737 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-469/b101_i10bw_case080/firmware.s19 addresses=424736 range_count=4 range_bytes=424736 errors=0
+INFO     s19tui:app.py:15018 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:19182 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:19865 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19203 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:19217 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:20960 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:18547 MAC validation computed: records=0 issues=0 elapsed_seconds=0.771
+INFO     s19tui:app.py:18602 MAC row cache built: records=0 elapsed_seconds=0.771
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:20474 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.781
+INFO     s19tui:app.py:19232 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:20092 Memory Map updated. ranges=4
+INFO     s19tui:app.py:19255 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-469/b101_i10bw_case080/firmware.s19 file_type=s19 elapsed_seconds=1.852 has_mac=False precomputed=False
+INFO     s19tui:app.py:16525 A2L copy complete: path=/tmp/pytest-of-<user>/pytest-469/test_r_tui_004_8_shown_window_1/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347 copy_seconds=0.010
+INFO     s19tui:app.py:951 A2L cache miss: path=/tmp/pytest-of-<user>/pytest-469/test_r_tui_004_8_shown_window_1/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347
+WARNING  s19tui:app.py:16563 Recent sources not updated: '/tmp/pytest-of-<user>/pytest-469/b101_i10bw_case080/firmware.a2l'
+INFO     s19tui:app.py:8830 Workarea refreshed. files=1
+INFO     s19tui:app.py:19684 A2L parse summary: path=/tmp/pytest-of-<user>/pytest-469/test_r_tui_004_8_shown_window_1/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.028 sections=1 tags=462 errors=0
+INFO     s19tui:app.py:18547 MAC validation computed: records=0 issues=462 elapsed_seconds=0.817
+INFO     s19tui:app.py:18602 MAC row cache built: records=0 elapsed_seconds=0.818
+INFO     s19tui:app.py:17470 Load phase boundary: populate_issues_table_done rows=40 total=462 elapsed=0.035
+INFO     s19tui:app.py:20474 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.855
+INFO     s19tui:app.py:21001 Load phase boundary: populate_a2l_table_done rows=200 total=462 elapsed=0.013
+INFO     s19tui:app.py:16582 A2L view refresh complete: path=/tmp/pytest-of-<user>/pytest-469/test_r_tui_004_8_shown_window_1/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.888
+INFO     s19tui:app.py:16591 A2L loaded: /tmp/pytest-of-<user>/pytest-469/test_r_tui_004_8_shown_window_1/app/.s19tool/workarea/temp/firmware.a2l
+<HOME>/work/s19_i10bmut_m8/tests/test_b101_inplace_views.py:1078: AssertionError: the shown window moved: first rows [0x00000000, 0x00000010]
+E   AssertionError: the shown window moved: first rows [0x00000000, 0x00000010]
+    assert [0, 16] == [2384, 2400]
+      
+      At index 0 diff: 0 != 2384
+      Use -v to get more diff
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3015 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-469/test_r_tui_004_8_shown_window_2/app workarea=/tmp/pytest-of-<user>/pytest-469/test_r_tui_004_8_shown_window_2/app/.s19tool/workarea
+INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:18694 Loading file: path=/tmp/pytest-of-<user>/pytest-469/b101_i10bw_case080/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:15001 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:19737 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-469/b101_i10bw_case080/firmware.s19 addresses=424736 range_count=4 range_bytes=424736 errors=0
+INFO     s19tui:app.py:15018 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:19182 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:19865 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19203 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:19217 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:20960 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:18547 MAC validation computed: records=0 issues=0 elapsed_seconds=0.757
+INFO     s19tui:app.py:18602 MAC row cache built: records=0 elapsed_seconds=0.757
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:20474 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.767
+INFO     s19tui:app.py:19232 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:20092 Memory Map updated. ranges=4
+INFO     s19tui:app.py:19255 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-469/b101_i10bw_case080/firmware.s19 file_type=s19 elapsed_seconds=1.909 has_mac=False precomputed=False
+INFO     s19tui:app.py:18694 Loading file: path=/tmp/pytest-of-<user>/pytest-469/b101_i10bw_case080/firmware.mac suffix=.mac project=None
+INFO     s19tui:app.py:15001 Load phase boundary: parse_branch_entry path=firmware.mac suffix=.mac
+INFO     s19tui:app.py:17691 Load phase boundary: mac_parse_entry path=firmware.mac
+INFO     s19tui:app.py:17697 Load phase boundary: mac_parse_done path=firmware.mac rows=200 diagnostics=0 elapsed=0.000s
+INFO     s19tui:app.py:17711 MAC parse summary (mirrored): path=/tmp/pytest-of-<user>/pytest-469/b101_i10bw_case080/firmware.mac rows=200 parse_ok=200 diagnostics=0 valid_addresses=200
+INFO     s19tui:app.py:17732 Load phase boundary: mac_a2l_resolve_entry path=firmware.mac a2l_path=None
+INFO     s19tui:app.py:17738 Load phase boundary: mac_a2l_resolve_done path=firmware.mac has_a2l_data=False
+INFO     s19tui:app.py:17744 MAC parse summary: path=/tmp/pytest-of-<user>/pytest-469/b101_i10bw_case080/firmware.mac total_records=200 parse_ok=200 diagnostics=0 valid_addresses=200 a2l_path=None elapsed_seconds=0.001
+INFO     s19tui:app.py:15043 Load phase boundary: mac_merge_entry path=firmware.mac has_primary=True
+INFO     s19tui:app.py:15050 Load phase boundary: mac_merge_done path=firmware.mac file_type=s19
+INFO     s19tui:app.py:19737 Load summary: file_type=s19+mac path=/tmp/pytest-of-<user>/pytest-469/b101_i10bw_case080/firmware.mac addresses=424736 range_count=4 range_bytes=424736 errors=0
+INFO     s19tui:app.py:15072 Load phase boundary: parse_branch_done path=firmware.mac branch=mac
+INFO     s19tui:app.py:19182 Load phase boundary: apply_install_state path=firmware.mac precomputed=False
+INFO     s19tui:app.py:19865 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19203 Load phase boundary: apply_sections_done path=firmware.mac
+INFO     s19tui:app.py:19217 Load phase boundary: apply_hex_done path=firmware.mac
+INFO     s19tui:app.py:20960 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18547 MAC validation computed: records=200 issues=200 elapsed_seconds=0.787
+INFO     s19tui:app.py:18602 MAC row cache built: records=200 elapsed_seconds=0.788
+INFO     s19tui:app.py:17470 Load phase boundary: populate_issues_table_done rows=40 total=200 elapsed=0.038
+INFO     s19tui:app.py:20525 Load phase boundary: populate_mac_table_done rows=100 total=200 elapsed=0.831
+INFO     s19tui:app.py:19232 Load phase boundary: apply_a2l_done path=firmware.mac
+INFO     s19tui:app.py:20092 Memory Map updated. ranges=4
+INFO     s19tui:app.py:19255 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-469/b101_i10bw_case080/firmware.mac file_type=s19 elapsed_seconds=1.757 has_mac=True precomputed=False
+<HOME>/work/s19_i10bmut_m8/tests/test_b101_inplace_views.py:1078: AssertionError: the shown window moved: first rows [0x00000000, 0x00000010]
+=========================== short test summary info ============================
+FAILED tests/test_b101_inplace_views.py::test_r_tui_004_8_shown_window_is_kept[a2l]
+FAILED tests/test_b101_inplace_views.py::test_r_tui_004_8_shown_window_is_kept[mac]
+2 failed, 1 passed, 17 deselected in 55.76s
+
+pytest exit code: 1

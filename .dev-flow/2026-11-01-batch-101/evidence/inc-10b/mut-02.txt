@@ -1,0 +1,143 @@
+base commit (origin/main): 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+base worktree: <HOME>/work/s19_i10bmut (main == origin/main == 6f1743c, + the Inc 10b product and test diff applied)
+mutant: M2 - remove the A2L value refresh from the write notice
+
+=== MUTANT M2 ===
+edit: 1 edit
+grep output:
+0
+
+mutation diff:
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -18805,7 +18805,6 @@
+         if checks is not None:
+             checks.clear_check_results()
+         self._refresh_hex_views_after_write()
+-        self._refresh_a2l_values_after_write()
+         try:
+             split_window = self.query_one("#screen_split_join", SplitJoinWindow)
+         except Exception:
+
+s19_app.__file__ = <HOME>/work/s19_i10bmut_m2/s19_app/__init__.py
+pytest output:
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+E   AssertionError: VALUE_0001 paints ('108', '108'), expected ('147', '147')
+<HOME>/work/s19_i10bmut_m2/tests/support/timing.py:66: AssertionError: VALUE_0001 paints ('108', '108'), expected ('147', '147')
+E   AssertionError: VALUE_0001 paints ('108', '108'), expected ('85', '85')
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3015 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-463/test_r_a2l_048_2_save_project_0/app workarea=/tmp/pytest-of-<user>/pytest-463/test_r_a2l_048_2_save_project_0/app/.s19tool/workarea
+INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:18694 Loading file: path=/tmp/pytest-of-<user>/pytest-463/b101_i10bw_case080/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:15001 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:19736 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-463/b101_i10bw_case080/firmware.s19 addresses=424736 range_count=4 range_bytes=424736 errors=0
+INFO     s19tui:app.py:15018 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:19181 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:19864 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19202 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:19216 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:20959 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:18547 MAC validation computed: records=0 issues=0 elapsed_seconds=0.790
+INFO     s19tui:app.py:18602 MAC row cache built: records=0 elapsed_seconds=0.791
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:20473 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.800
+INFO     s19tui:app.py:19231 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:20091 Memory Map updated. ranges=4
+INFO     s19tui:app.py:19254 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-463/b101_i10bw_case080/firmware.s19 file_type=s19 elapsed_seconds=1.783 has_mac=False precomputed=False
+INFO     s19tui:app.py:16525 A2L copy complete: path=/tmp/pytest-of-<user>/pytest-463/test_r_a2l_048_2_save_project_0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347 copy_seconds=0.010
+INFO     s19tui:app.py:951 A2L cache miss: path=/tmp/pytest-of-<user>/pytest-463/test_r_a2l_048_2_save_project_0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347
+WARNING  s19tui:app.py:16563 Recent sources not updated: '/tmp/pytest-of-<user>/pytest-463/b101_i10bw_case080/firmware.a2l'
+INFO     s19tui:app.py:8830 Workarea refreshed. files=1
+INFO     s19tui:app.py:19683 A2L parse summary: path=/tmp/pytest-of-<user>/pytest-463/test_r_a2l_048_2_save_project_0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.024 sections=1 tags=462 errors=0
+INFO     s19tui:app.py:18547 MAC validation computed: records=0 issues=462 elapsed_seconds=0.829
+INFO     s19tui:app.py:18602 MAC row cache built: records=0 elapsed_seconds=0.830
+INFO     s19tui:app.py:17470 Load phase boundary: populate_issues_table_done rows=40 total=462 elapsed=0.035
+INFO     s19tui:app.py:20473 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.866
+INFO     s19tui:app.py:21000 Load phase boundary: populate_a2l_table_done rows=200 total=462 elapsed=0.013
+INFO     s19tui:app.py:16582 A2L view refresh complete: path=/tmp/pytest-of-<user>/pytest-463/test_r_a2l_048_2_save_project_0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.890
+INFO     s19tui:app.py:16591 A2L loaded: /tmp/pytest-of-<user>/pytest-463/test_r_a2l_048_2_save_project_0/app/.s19tool/workarea/temp/firmware.a2l
+INFO     s19tui:app.py:8912 Save project action triggered for /tmp/pytest-of-<user>/pytest-463/b101_i10bw_case080/firmware.s19
+INFO     s19tui:app.py:12948 Project saved image. name=P file=/tmp/pytest-of-<user>/pytest-463/test_r_a2l_048_2_save_project_0/app/.s19tool/workarea/P/firmware.s19
+INFO     s19tui:app.py:12948 Project saved a2l. name=P file=/tmp/pytest-of-<user>/pytest-463/test_r_a2l_048_2_save_project_0/app/.s19tool/workarea/P/firmware.a2l
+INFO     s19tui:app.py:8830 Workarea refreshed. files=1
+<HOME>/work/s19_i10bmut_m2/tests/support/timing.py:66: AssertionError: VALUE_0001 paints ('108', '108'), expected ('85', '85')
+E   AssertionError: VALUE_0001 paints ('108', '108'), expected ('85', '85')
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3015 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-463/test_r_a2l_048_3_save_back_sho0/app workarea=/tmp/pytest-of-<user>/pytest-463/test_r_a2l_048_3_save_back_sho0/app/.s19tool/workarea
+INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:18694 Loading file: path=/tmp/pytest-of-<user>/pytest-463/b101_i10bw_case080/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:15001 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:19736 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-463/b101_i10bw_case080/firmware.s19 addresses=424736 range_count=4 range_bytes=424736 errors=0
+INFO     s19tui:app.py:15018 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:19181 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:19864 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19202 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:19216 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:20959 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:18547 MAC validation computed: records=0 issues=0 elapsed_seconds=0.784
+INFO     s19tui:app.py:18602 MAC row cache built: records=0 elapsed_seconds=0.785
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:20473 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.794
+INFO     s19tui:app.py:19231 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:20091 Memory Map updated. ranges=4
+INFO     s19tui:app.py:19254 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-463/b101_i10bw_case080/firmware.s19 file_type=s19 elapsed_seconds=1.777 has_mac=False precomputed=False
+INFO     s19tui:app.py:16525 A2L copy complete: path=/tmp/pytest-of-<user>/pytest-463/test_r_a2l_048_3_save_back_sho0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347 copy_seconds=0.011
+INFO     s19tui:app.py:951 A2L cache miss: path=/tmp/pytest-of-<user>/pytest-463/test_r_a2l_048_3_save_back_sho0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347
+WARNING  s19tui:app.py:16563 Recent sources not updated: '/tmp/pytest-of-<user>/pytest-463/b101_i10bw_case080/firmware.a2l'
+INFO     s19tui:app.py:8830 Workarea refreshed. files=1
+INFO     s19tui:app.py:19683 A2L parse summary: path=/tmp/pytest-of-<user>/pytest-463/test_r_a2l_048_3_save_back_sho0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.030 sections=1 tags=462 errors=0
+INFO     s19tui:app.py:18547 MAC validation computed: records=0 issues=462 elapsed_seconds=0.734
+INFO     s19tui:app.py:18602 MAC row cache built: records=0 elapsed_seconds=0.735
+INFO     s19tui:app.py:17470 Load phase boundary: populate_issues_table_done rows=40 total=462 elapsed=0.037
+INFO     s19tui:app.py:20473 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.773
+INFO     s19tui:app.py:21000 Load phase boundary: populate_a2l_table_done rows=200 total=462 elapsed=0.013
+INFO     s19tui:app.py:16582 A2L view refresh complete: path=/tmp/pytest-of-<user>/pytest-463/test_r_a2l_048_3_save_back_sho0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.796
+INFO     s19tui:app.py:16591 A2L loaded: /tmp/pytest-of-<user>/pytest-463/test_r_a2l_048_3_save_back_sho0/app/.s19tool/workarea/temp/firmware.a2l
+<HOME>/work/s19_i10bmut_m2/tests/support/timing.py:66: AssertionError: VALUE_0001 paints ('108', '108'), expected ('85', '85')
+E   AssertionError: VALUE_0001 paints ('108', '108'), expected ('147', '147')
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3015 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-463/test_r_a2l_106_1_value_filter_0/app workarea=/tmp/pytest-of-<user>/pytest-463/test_r_a2l_106_1_value_filter_0/app/.s19tool/workarea
+INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:18694 Loading file: path=/tmp/pytest-of-<user>/pytest-463/b101_i10bw_case080/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:15001 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:19736 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-463/b101_i10bw_case080/firmware.s19 addresses=424736 range_count=4 range_bytes=424736 errors=0
+INFO     s19tui:app.py:15018 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:19181 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:19864 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19202 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:19216 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:20959 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:18547 MAC validation computed: records=0 issues=0 elapsed_seconds=0.674
+INFO     s19tui:app.py:18602 MAC row cache built: records=0 elapsed_seconds=0.674
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:20473 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.684
+INFO     s19tui:app.py:19231 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:20091 Memory Map updated. ranges=4
+INFO     s19tui:app.py:19254 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-463/b101_i10bw_case080/firmware.s19 file_type=s19 elapsed_seconds=1.919 has_mac=False precomputed=False
+INFO     s19tui:app.py:16525 A2L copy complete: path=/tmp/pytest-of-<user>/pytest-463/test_r_a2l_106_1_value_filter_0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347 copy_seconds=0.011
+INFO     s19tui:app.py:951 A2L cache miss: path=/tmp/pytest-of-<user>/pytest-463/test_r_a2l_106_1_value_filter_0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347
+WARNING  s19tui:app.py:16563 Recent sources not updated: '/tmp/pytest-of-<user>/pytest-463/b101_i10bw_case080/firmware.a2l'
+INFO     s19tui:app.py:8830 Workarea refreshed. files=1
+INFO     s19tui:app.py:19683 A2L parse summary: path=/tmp/pytest-of-<user>/pytest-463/test_r_a2l_106_1_value_filter_0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.025 sections=1 tags=462 errors=0
+INFO     s19tui:app.py:18547 MAC validation computed: records=0 issues=462 elapsed_seconds=0.794
+INFO     s19tui:app.py:18602 MAC row cache built: records=0 elapsed_seconds=0.795
+INFO     s19tui:app.py:17470 Load phase boundary: populate_issues_table_done rows=40 total=462 elapsed=0.035
+INFO     s19tui:app.py:20473 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.832
+INFO     s19tui:app.py:21000 Load phase boundary: populate_a2l_table_done rows=200 total=462 elapsed=0.013
+INFO     s19tui:app.py:16582 A2L view refresh complete: path=/tmp/pytest-of-<user>/pytest-463/test_r_a2l_106_1_value_filter_0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.855
+INFO     s19tui:app.py:16591 A2L loaded: /tmp/pytest-of-<user>/pytest-463/test_r_a2l_106_1_value_filter_0/app/.s19tool/workarea/temp/firmware.a2l
+INFO     s19tui:app.py:21000 Load phase boundary: populate_a2l_table_done rows=200 total=462 elapsed=0.014
+INFO     s19tui:app.py:21000 Load phase boundary: populate_a2l_table_done rows=2 total=2 elapsed=0.001
+<HOME>/work/s19_i10bmut_m2/tests/support/timing.py:66: AssertionError: VALUE_0001 paints ('108', '108'), expected ('147', '147')
+=========================== short test summary info ============================
+FAILED tests/test_b101_inplace_views.py::test_r_a2l_048_1_apply_shows_in_the_tag_table
+FAILED tests/test_b101_inplace_views.py::test_r_a2l_048_2_save_project_commit_shows_in_the_tag_table
+FAILED tests/test_b101_inplace_views.py::test_r_a2l_048_3_save_back_shows_in_the_tag_table
+FAILED tests/test_b101_inplace_views.py::test_r_a2l_106_1_value_filter_rows_stay_listed
+4 failed, 16 deselected in 139.80s (0:02:19)
+
+pytest exit code: 1

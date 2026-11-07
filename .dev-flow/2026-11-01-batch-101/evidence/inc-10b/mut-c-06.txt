@@ -1,0 +1,39 @@
+== mut-c-06  2026-11-07T11:16:09Z  host: LAN Linux laptop
+base commit (HEAD): 6f1743c1ad54ff7db89e8fcd4e96266414950f42  main: 6f1743c1ad54ff7db89e8fcd4e96266414950f42  origin/main: 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+staged tree (index): f60e3b2df551b8ca5ed438916a0ff14c8f4571b3
+--- working-tree edits over the index (mutant):
+diff --git a/s19_app/tui/app.py b/s19_app/tui/app.py
+index e21dc3ea..e92893fe 100644
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -21116,7 +21116,7 @@ class S19TuiApp(App):
+         issue_severity_map = _a2l_issue_severity_map(self._validation_issues)
+         for i in range(end - start):
+             absolute_index = start + i
+-            tag = tags[absolute_index]
++            tag = tags[i]
+             cells = self._build_a2l_table_cells(tag)
+             severity = _a2l_tag_row_severity(tag, issue_severity_map)
+             style = _severity_style(severity)
+--- end of edits
+python: 3.11.18
+s19_app.__file__: <HOME>/work/s19_i10bc_mut/s19_app/__init__.py
+CMD: cd <HOME>/work/s19_i10bc_mut && env -u NO_COLOR timeout 1200 <CONDA>/envs/s19ci/bin/python -m pytest -n 4 -m not serial_timing -p no:cacheprovider tests/test_b101_inplace_views.py -k a2l_ -rfs --tb=line
+--- pytest output
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0
+rootdir: <HOME>/work/s19_i10bc_mut
+configfile: pyproject.toml
+plugins: platformdirs-4.14.3, xdist-3.8.0
+created: 4/4 workers
+4 workers [10 items]
+
+...F......                                                               [100%]
+=================================== FAILURES ===================================
+[gw2] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+E   AssertionError: VAL_BLK_0002 paints None, expected 17677
+<HOME>/work/s19_i10bc_mut/tests/support/timing.py:66: AssertionError: VAL_BLK_0002 paints None, expected 17677
+=========================== short test summary info ============================
+FAILED tests/test_b101_inplace_views.py::test_r_a2l_048_5_a_write_on_the_second_page_shows_there
+==================== 1 failed, 9 passed in 67.21s (0:01:07) ====================
+exit: 1  end 2026-11-07T11:17:17Z

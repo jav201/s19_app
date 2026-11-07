@@ -24,3 +24,10 @@ No layout changes. What changes on screen after an apply, a save-back or a Save 
 - **D-10b-4 — the confirm is disarmed by every in-place write (S-7 / A10-09).** While displayed the notice runs `_bump()` (disarm and one sync, the window's own idiom for every state change, R-SEG-EXP.8 … .11); while hidden it clears the arm only (the next open re-syncs, D-6). Reason: a confirm given against other bytes must not carry to the next `e`.
 - **D-10b-5 — the hook keeps running after a missing Check Editor (A10-08).** Inc 6's body ends with `except Exception: return` around the Check Editor query; 10b switches that block to the `checks = None` idiom the CRC Designer block uses, so the three notices appended after it always run. Agreed through the shared-interface rule: Inc 6 merges first, 10b's E4 writes on main after it.
 - **D-10b-6 — the A2L refresh cost is measured, not assumed (A10-12).** QC-TM-10b-1 (`02-test-cases.md`) on the largest synth A2L, LAN host, against 1 s; the fallback (recompute on the A2L Explorer's show) is ruled at E4 only if the bound fails.
+
+## 4. Backlog (added at E5, `E5-rulings.md`)
+
+| Id | Item | Origin | Route |
+|---|---|---|---|
+| BL-I10b-1 | The Issues and Checks *Hex Peek* panes (`#issues_hex_pane`, `#checks_hex_pane`) keep the pre-write bytes after an in-place write until their row is selected again; the three hex views, the A2L values and Split / Join follow the write (the S-1 class: bytes painted that the image no longer holds; nothing exports these panes). **Flagged for the batch-end review page.** | E5 R-3 | Fold into Inc 12 only if its integrator can do it without touching another file (`_update_issues_hex_pane` is changed by Inc 12, in flight); otherwise the next batch |
+| BL-I10b-2 | `_repaint_a2l_tag_cells` copies `update_a2l_tags_view`'s page bounds, row styling and summary text; share them (for example `_a2l_tags_summary_text(...)` and `_styled_a2l_cells(...)`) so the two painters cannot drift. | E5 R-5 | Refactor, next batch (`update_a2l_tags_view` is outside 10b's slice) |

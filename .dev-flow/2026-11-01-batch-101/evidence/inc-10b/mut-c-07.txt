@@ -1,0 +1,71 @@
+== mut-c-07  2026-11-07T11:17:17Z  host: LAN Linux laptop
+base commit (HEAD): 6f1743c1ad54ff7db89e8fcd4e96266414950f42  main: 6f1743c1ad54ff7db89e8fcd4e96266414950f42  origin/main: 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+staged tree (index): f60e3b2df551b8ca5ed438916a0ff14c8f4571b3
+--- working-tree edits over the index (mutant):
+diff --git a/s19_app/tui/app.py b/s19_app/tui/app.py
+index e21dc3ea..e81f6ac8 100644
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -21133,7 +21133,7 @@ class S19TuiApp(App):
+                     style_changed = True
+                 if text_changed or style_changed:
+                     table.update_cell_at(
+-                        Coordinate(i, column), cell, update_width=True
++                        Coordinate(i, column), cell, update_width=False
+                     )
+             self._a2l_row_key_to_tag[f"a2l:{absolute_index}"] = tag
+         page_num = start // page_size + 1
+--- end of edits
+python: 3.11.18
+s19_app.__file__: <HOME>/work/s19_i10bc_mut/s19_app/__init__.py
+CMD: cd <HOME>/work/s19_i10bc_mut && env -u NO_COLOR timeout 1200 <CONDA>/envs/s19ci/bin/python -m pytest -n 4 -m not serial_timing -p no:cacheprovider tests/test_b101_inplace_views.py -k a2l_ -rfs --tb=line
+--- pytest output
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0
+rootdir: <HOME>/work/s19_i10bc_mut
+configfile: pyproject.toml
+plugins: platformdirs-4.14.3, xdist-3.8.0
+created: 4/4 workers
+4 workers [10 items]
+
+........F.                                                               [100%]
+=================================== FAILURES ===================================
+[gw1] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+E   AssertionError: the row paints Raw '-9.876539885039906', Physical '-9.876539885039906'; columns 18 / 18 cells
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3015 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-483/popen-gw1/test_r_a2l_048_4_a_wider_value0/app workarea=/tmp/pytest-of-<user>/pytest-483/popen-gw1/test_r_a2l_048_4_a_wider_value0/app/.s19tool/workarea
+INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:18694 Loading file: path=/tmp/pytest-of-<user>/pytest-483/popen-gw1/b101_i10bw_case080/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:15001 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:19796 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-483/popen-gw1/b101_i10bw_case080/firmware.s19 addresses=424736 range_count=4 range_bytes=424736 errors=0
+INFO     s19tui:app.py:15018 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:19241 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:19924 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19262 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:19276 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:21019 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18547 MAC validation computed: records=0 issues=0 elapsed_seconds=0.790
+INFO     s19tui:app.py:18602 MAC row cache built: records=0 elapsed_seconds=0.790
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.012
+INFO     s19tui:app.py:20533 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.803
+INFO     s19tui:app.py:19291 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:20151 Memory Map updated. ranges=4
+INFO     s19tui:app.py:19314 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-483/popen-gw1/b101_i10bw_case080/firmware.s19 file_type=s19 elapsed_seconds=2.145 has_mac=False precomputed=False
+INFO     s19tui:app.py:16525 A2L copy complete: path=/tmp/pytest-of-<user>/pytest-483/popen-gw1/test_r_a2l_048_4_a_wider_value0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347 copy_seconds=0.014
+INFO     s19tui:app.py:951 A2L cache miss: path=/tmp/pytest-of-<user>/pytest-483/popen-gw1/test_r_a2l_048_4_a_wider_value0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347
+WARNING  s19tui:app.py:16563 Recent sources not updated: '/tmp/pytest-of-<user>/pytest-483/popen-gw1/b101_i10bw_case080/firmware.a2l'
+INFO     s19tui:app.py:8830 Workarea refreshed. files=1
+INFO     s19tui:app.py:19743 A2L parse summary: path=/tmp/pytest-of-<user>/pytest-483/popen-gw1/test_r_a2l_048_4_a_wider_value0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.022 sections=1 tags=462 errors=0
+INFO     s19tui:app.py:18547 MAC validation computed: records=0 issues=462 elapsed_seconds=0.971
+INFO     s19tui:app.py:18602 MAC row cache built: records=0 elapsed_seconds=0.972
+INFO     s19tui:app.py:17470 Load phase boundary: populate_issues_table_done rows=40 total=462 elapsed=0.038
+INFO     s19tui:app.py:20533 Load phase boundary: populate_mac_table_done rows=0 elapsed=1.011
+INFO     s19tui:app.py:21060 Load phase boundary: populate_a2l_table_done rows=200 total=462 elapsed=0.013
+INFO     s19tui:app.py:16582 A2L view refresh complete: path=/tmp/pytest-of-<user>/pytest-483/popen-gw1/test_r_a2l_048_4_a_wider_value0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=1.036
+INFO     s19tui:app.py:16591 A2L loaded: /tmp/pytest-of-<user>/pytest-483/popen-gw1/test_r_a2l_048_4_a_wider_value0/app/.s19tool/workarea/temp/firmware.a2l
+<HOME>/work/s19_i10bc_mut/tests/support/timing.py:66: AssertionError: the row paints Raw '-9.876539885039906', Physical '-9.876539885039906'; columns 18 / 18 cells
+=========================== short test summary info ============================
+FAILED tests/test_b101_inplace_views.py::test_r_a2l_048_4_a_wider_value_is_painted_whole
+==================== 1 failed, 9 passed in 66.18s (0:01:06) ====================
+exit: 1  end 2026-11-07T11:18:23Z
