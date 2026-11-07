@@ -202,6 +202,7 @@ The encode reuses the encode direction of `a2l.py` (`encode_physical_to_raw_byte
 |---|---|---|
 | address | R-A2L-010, R-A2L-011 | the definition's address |
 | datatype | R-A2L-022, R-A2L-023 | the definition's datatype: the record layout's, else the datatype the deposit name spells out (the model meets R-A2L-023, whose D2-8 defect stays in the tag table: `E1-rulings.md` D-2, BL-I2-13) |
+| length | R-A2L-014 | the definition's length when the tag lacks it: the size of its datatype × its MATRIX_DIM (1 when absent) |
 | byte order | R-A2L-024 … R-A2L-027 | the definition's byte order (`effective_byte_order` of the parse) |
 | unit | R-A2L-030, R-A2L-031, R-A2L-033 | the definition's unit: PHYS_UNIT or UNIT whole text, no quotes, else the record's unit |
 | raw read | R-A2L-040, R-A2L-043, R-A2L-044, R-A2L-045 | the stored value's read, FLOAT16_IEEE included |

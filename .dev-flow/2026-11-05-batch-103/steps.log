@@ -18,3 +18,8 @@
 2026-11-06T18:03:39-06:00 E2 done — Inc 2 graph: 40 nodes (25 new, 1 changed, 14 context), every row has an example; findings E2-1, E2-4..8 accepted (case fixes), P-1 accepted, E2-10..14 to E3; Opus 5.5, 31 min
 2026-11-06T18:03:39-06:00 E1 done — Inc 3: 72 new rows (R-A2L-DEF.64..135), 213 cases, 26 slice nodes; rulings appended (D-7 C, rest A; D-14 changes carried in Inc 3); Opus 5.5, 37 min
 2026-11-06T18:03:39-06:00 rulings — operator rulings 2 recorded in inc-1a and inc-1b E1-rulings (right-click copy/paste, Ctrl+C = copy with selection / quit confirmation without, quit dialog + copy notice to G2)
+2026-11-06T18:05:35-06:00 E2 case corrections start — Inc 2 (design/E2-corr-2.md); deepseek-v4-pro via pi
+2026-11-06T18:05:35-06:00 E3 start — Inc 2 architect + security (design/E3-brief-common.md); Opus 5.5
+2026-11-06T18:05:35-06:00 E2 start — Inc 4 (memory row: compact index ≤ 64 MiB) and Inc 3 (delta on Inc 2's graph); Opus 5.5
+2026-11-06T18:05:35-06:00 E1 addendum start — Inc 1a (right-click in text boxes) and Inc 1b (right-click copy, Ctrl+C rules, quit dialog); Opus 5.5
+2026-11-06T18:10:18-06:00 E2 case corrections done — Inc 2: 8 cases (E2-4..E2-8) + R-A2L-014 cited (E2-1); deepseek-v4-pro via pi, exit 0; diff checked (column counts unchanged)
