@@ -1,0 +1,165 @@
+=== Inc 12b E4 integration run: int-07 (oracle controls, mutant copy)
+date: 2026-11-06T23:57:55Z
+copy: <HOME>/work/s19_i12bint_mut; HEAD (base) 2f54c7dea27d826483e5c5e596421b8b3a68bb2f; index tree e7f05497140dc23dedae1aa68925390fe08f5671 (= the final integrated tree)
+s19_app.__file__ = <HOME>/work/s19_i12bint_mut/s19_app/__init__.py
+flow_screens.py blob before the mutants: 00b1c3b003918f3858f0db14302a8a71e0d5a003 (staged: 00b1c3b003918f3858f0db14302a8a71e0d5a003)
+
+################ M0
+--- git diff of the mutant (vs the staged final tree):
+CMD: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -p no:xdist --tb=short -rfs tests/test_b101_flow_shown_widgets.py
+....                                                                     [100%]
+4 passed in 37.69s
+=== exit code: 0
+
+################ M1
+applied M1: 'if kind not in dict(self._KIND_OPTIONS).values():\n                return\n            self._kind = kind' -> 'self._kind = kind'
+--- git diff of the mutant (vs the staged final tree):
+diff --git a/s19_app/tui/flow_screens.py b/s19_app/tui/flow_screens.py
+index 00b1c3b0..2d6e24de 100644
+--- a/s19_app/tui/flow_screens.py
++++ b/s19_app/tui/flow_screens.py
+@@ -2045,8 +2045,6 @@ class FlowBuilderPanel(ScrollableContainer):
+             # E3 S-1: the kind state accepts only a value of ``_KIND_OPTIONS``;
+             # a chip id outside them returns with nothing changed (the hidden
+             # select's options gave this check on the base).
+-            if kind not in dict(self._KIND_OPTIONS).values():
+-                return
+             self._kind = kind
+             self._sync_kind_dependent_visibility(kind)
+             # A notice about the previous kind no longer applies (ux L-a).
+CMD: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -p no:xdist --tb=short -rfs tests/test_b101_flow_shown_widgets.py
+..F.                                                                     [100%]
+=================================== FAILURES ===================================
+___________ test_r_fb_add_1_2_a_press_naming_no_kind_changes_nothing ___________
+tests/test_b101_flow_shown_widgets.py:319: in test_r_fb_add_1_2_a_press_naming_no_kind_changes_nothing
+    assert CHECK_TAG in after["tag"], after["tag"]
+E   AssertionError: · BOGUS
+E   assert '✓ CHECK' in '· BOGUS'
+=========================== short test summary info ============================
+FAILED tests/test_b101_flow_shown_widgets.py::test_r_fb_add_1_2_a_press_naming_no_kind_changes_nothing
+1 failed, 3 passed in 35.54s
+=== exit code: 1
+
+################ M2
+applied M2: 'scrub = lambda s: safe_text(s).plain  # noqa: E731 - the one sink guard' -> 'scrub = lambda s: Text.from_markup(safe_text(s).plain).plain  # noqa: E731 - MUTANT M2'
+--- git diff of the mutant (vs the staged final tree):
+diff --git a/s19_app/tui/flow_screens.py b/s19_app/tui/flow_screens.py
+index 00b1c3b0..095b7d7a 100644
+--- a/s19_app/tui/flow_screens.py
++++ b/s19_app/tui/flow_screens.py
+@@ -734,7 +734,7 @@ def _card_rows(blocks: Sequence[FlowBlock], index: int) -> Tuple[List[Tuple[str,
+     card. Values are clipped by kind of text: a command keeps its head, every
+     ref and path its tail (LLR-146.4); file-derived text is scrubbed (C-17)."""
+     block = blocks[index]
+-    scrub = lambda s: safe_text(s).plain  # noqa: E731 - the one sink guard
++    scrub = lambda s: Text.from_markup(safe_text(s).plain).plain  # noqa: E731 - MUTANT M2
+     prev = ("image", f"← #{index}" if index > 0 else "—")
+     if isinstance(block, SourceBlock):
+         return [("file", scrub(block.image_ref)), ("fmt", block.file_type)], ("out", "image"), ""
+CMD: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -n 4 --dist load --tb=short -rfs tests/test_flow_builder_render.py::test_at088b_check_ref_label_renders_literally tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally tests/test_b97_flow_builder.py::test_at_b97_08_hostile_and_nul_refs_never_crash_or_inject tests/test_tui_directionb.py::test_at_flow_block_label_markup_safe
+bringing up nodes...
+bringing up nodes...
+
+F.FF                                                                     [100%]
+=================================== FAILURES ===================================
+_____________________ test_at_flow_block_label_markup_safe _____________________
+[gw3] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+tests/test_tui_directionb.py:5855: in test_at_flow_block_label_markup_safe
+    assert "evil[red].s19" in rows[file_row], rows[file_row]
+E   AssertionError: │ evil.s19                                                                                 │
+E   assert 'evil[red].s19' in '│ evil.s19                                                                                 │'
+__________ test_at_b97_08_hostile_and_nul_refs_never_crash_or_inject ___________
+[gw2] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+tests/test_b97_flow_builder.py:1618: in test_at_b97_08_hostile_and_nul_refs_never_crash_or_inject
+    assert fs.clip_tail(payload, inner) in painted and fs.clip_tail(payload, inner).startswith("…")
+E   AssertionError: assert ('…31m_evil[red]1m8;;u' in '╭─ 1 ──────────────────╮    ╭─ 2 ──────────────────╮    ╭─ 3 ──────────────────╮    ╭─ 4 ──────────────────╮\n│ ◉ LOA...py.s19 │\n╰──────────────────────╯    ╰──────────────────────╯    ╰──────────────────────╯    ╰──────────────────────╯')
+E    +  where '…31m_evil[red]1m8;;u' = <function clip_tail at 0x7f6006fc6520>('b97[bold]x[/]y[red]z[link=https://e.invalid]l[/link][@click=app.quit]qb77hostilemark[31m_evil[red]1m8;;u', 20)
+E    +    where <function clip_tail at 0x7f6006fc6520> = fs.clip_tail
+________________ test_at_b94_18_hostile_names_render_literally _________________
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+tests/test_tui_flow_builder_b94.py:427: in test_at_b94_18_hostile_names_render_literally
+    assert "_evil[red]" in canvas  # literal brackets, never parsed
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: assert '_evil[red]' in '╭─ 1 ──────────────────────────────────────╮    ╭─ 2 ──────────────────────────────────────╮\n│ ◉ LOAD               ...                       │\n╰──────────────────────────────────────────╯    ╰──────────────────────────────────────────╯'
+=========================== short test summary info ============================
+FAILED tests/test_tui_directionb.py::test_at_flow_block_label_markup_safe - A...
+FAILED tests/test_b97_flow_builder.py::test_at_b97_08_hostile_and_nul_refs_never_crash_or_inject
+FAILED tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally
+3 failed, 1 passed in 12.62s
+=== exit code: 1
+
+################ M3
+applied M3: 'lines.append(row(keep(value, inner)))' -> '_v = keep(value, inner); _r = row(_v); _r.stylize("red", 2, 2 + max(1, len(_v) // 2)); lines.append(_r)  # MUTANT M3'
+--- git diff of the mutant (vs the staged final tree):
+diff --git a/s19_app/tui/flow_screens.py b/s19_app/tui/flow_screens.py
+index 00b1c3b0..76b88609 100644
+--- a/s19_app/tui/flow_screens.py
++++ b/s19_app/tui/flow_screens.py
+@@ -872,7 +872,7 @@ def _card_lines(
+             name, value = ins[slot]
+             keep = clip_head if ext and name in ("cmd", "instr") else clip_tail
+             lines.append(row(clip_head(f"in · {name}", inner), _S_DIM))
+-            lines.append(row(keep(value, inner)))
++            _v = keep(value, inner); _r = row(_v); _r.stylize("red", 2, 2 + max(1, len(_v) // 2)); lines.append(_r)  # MUTANT M3
+         else:
+             lines.extend([row(), row()])
+     if annotation_row:
+CMD: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -n 4 --dist load --tb=short -rfs tests/test_flow_builder_render.py::test_at088b_check_ref_label_renders_literally tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally tests/test_b97_flow_builder.py::test_at_b97_08_hostile_and_nul_refs_never_crash_or_inject tests/test_tui_directionb.py::test_at_flow_block_label_markup_safe
+bringing up nodes...
+bringing up nodes...
+
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+_____________________ test_at_flow_block_label_markup_safe _____________________
+[gw3] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+tests/test_tui_directionb.py:5860: in test_at_flow_block_label_markup_safe
+    assert cutting == [] and len(exact) == 1, (cutting, exact)
+E   AssertionError: ([Span(374, 380, style=Style(foreground=Color(0, 0, 0, ansi=1)))], [Span(374, 387, style=Style(foreground=Color(233, 233, 233)))])
+E   assert ([Span(374, 38... 0, ansi=1)))] == []
+E     
+E     Left contains one more item: Span(374, 380, style=Style(foreground=Color(0, 0, 0, ansi=1)))
+E     Use -v to get more diff)
+________________ test_at088b_check_ref_label_renders_literally _________________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+tests/test_flow_builder_render.py:546: in test_at088b_check_ref_label_renders_literally
+    assert cutting == [] and len(exact) == 1, (cutting, exact)
+E   AssertionError: ([Span(416, 440, style=Style(foreground=Color(0, 0, 0, ansi=1)))], [Span(416, 465, style=Style(foreground=Color(233, 233, 233)))])
+E   assert ([Span(416, 44... 0, ansi=1)))] == []
+E     
+E     Left contains one more item: Span(416, 440, style=Style(foreground=Color(0, 0, 0, ansi=1)))
+E     Use -v to get more diff)
+__________ test_at_b97_08_hostile_and_nul_refs_never_crash_or_inject ___________
+[gw2] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+tests/test_b97_flow_builder.py:1620: in test_at_b97_08_hostile_and_nul_refs_never_crash_or_inject
+    assert spans and _foreign(spans) == [], sorted(set(_foreign(spans)))
+E   AssertionError: ['#800000 | ansi_red']
+E   assert (['#1b233a | rgb(27,35,58)', '#969aad | rgb(150,154,173)', '#1b233a | rgb(27,35,58)', '#1b233a | rgb(27,35,58)', '#969aad | rgb(150,154,173)', '#1b233a | rgb(27,35,58)', ...] and ['#800000 | a...nsi_red', ...] == []
+E     
+E     Left contains 8 more items, first extra item: '#800000 | ansi_red'
+E     Use -v to get more diff)
+________________ test_at_b94_18_hostile_names_render_literally _________________
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+tests/test_tui_flow_builder_b94.py:434: in test_at_b94_18_hostile_names_render_literally
+    assert cutting == [] and len(exact) == 1, (cutting, exact)
+E   AssertionError: ([Span(608, 625, style=Style(foreground=Color(0, 0, 0, ansi=1)))], [Span(608, 642, style=Style(foreground=Color(233, 233, 233)))])
+E   assert ([Span(608, 62... 0, ansi=1)))] == []
+E     
+E     Left contains one more item: Span(608, 625, style=Style(foreground=Color(0, 0, 0, ansi=1)))
+E     Use -v to get more diff)
+=========================== short test summary info ============================
+FAILED tests/test_tui_directionb.py::test_at_flow_block_label_markup_safe - A...
+FAILED tests/test_flow_builder_render.py::test_at088b_check_ref_label_renders_literally
+FAILED tests/test_b97_flow_builder.py::test_at_b97_08_hostile_and_nul_refs_never_crash_or_inject
+FAILED tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally
+4 failed in 11.12s
+=== exit code: 1
+
+################ M0 (no mutant) on the 4 security nodes
+CMD: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -n 4 --dist load --tb=short -rfs tests/test_flow_builder_render.py::test_at088b_check_ref_label_renders_literally tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally tests/test_b97_flow_builder.py::test_at_b97_08_hostile_and_nul_refs_never_crash_or_inject tests/test_tui_directionb.py::test_at_flow_block_label_markup_safe
+bringing up nodes...
+bringing up nodes...
+
+....                                                                     [100%]
+4 passed in 11.22s
+=== exit code: 0
+flow_screens.py blob after restore: 00b1c3b003918f3858f0db14302a8a71e0d5a003 (staged: 00b1c3b003918f3858f0db14302a8a71e0d5a003); git diff lines: 0

@@ -382,7 +382,8 @@ def test_at_i12b_1_kind_chip_add_and_ribbon_by_keys(tmp_path: Path) -> None:
             gating_shown,
             _painted(app, panel.query_one("#flow_pipeline")),
             _painted(app, panel.query_one("#flow_name_strip")),
-            project_dir.as_posix(),
+            # The ribbon paints the OS path string (backslashes on Windows).
+            str(project_dir),
         )
 
     tag, gating_shown, pipeline, ribbon, project = _drive(tmp_path, body)

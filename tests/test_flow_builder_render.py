@@ -536,10 +536,16 @@ def test_at088b_check_ref_label_renders_literally(tmp_path: Path) -> None:
             return chain.render().plain, list(chain.render().spans)
 
     plain, spans = asyncio.run(_drive())
-    # Presence: the hostile label reached the sink with its markup intact.
-    assert _HOSTILE_SCRUBBED in plain
+    # Presence: the hostile label reached the card's own ``in · doc`` value
+    # row with its markup intact. The origin note under the card's inputs
+    # repeats the ref through its own sink, so a containment in the whole
+    # pipeline passes on that note alone when the card row interprets the
+    # markup (Inc 12b E4 integration, I-D5).
+    rows = plain.split("\n")
+    doc_row = next(i for i, row in enumerate(rows) if "in · doc" in row) + 1
+    assert _HOSTILE_SCRUBBED in rows[doc_row], rows[doc_row]
     # No injected span: the input's own text sits under exactly one style.
-    start = plain.index(_HOSTILE_SCRUBBED)
+    start = sum(len(row) + 1 for row in rows[:doc_row]) + rows[doc_row].index(_HOSTILE_SCRUBBED)
     stop = start + len(_HOSTILE_SCRUBBED)
     cutting = [s for s in spans if start < s.start < stop or start < s.end < stop]
     exact = [s for s in spans if (s.start, s.end) == (start, stop)]
