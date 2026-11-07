@@ -65,3 +65,4 @@
 2026-11-06T21:30:40-06:00 operator — amendment A2: Inc 2 split into 2a (read side, to E4 now) and 2b (write side, waits for Inc 11); new Inc 11 A2L reader fix (a2l.py unfrozen); Inc 3 splits likewise; verdict design/A2-inc2-split.json
 2026-11-06T21:30:40-06:00 E3 round 5 — Inc 2 security FAIL (E3S-36..39: misread byte order, INSTANCE/BLOB not indexed, commented ECU_ADDRESS, uncapped tag length) — all reader-rooted; routed to Inc 2b / Inc 11 by A2
 2026-11-06T21:30:40-06:00 E5 — Inc 4: mutants 47/47 killed (1 not realisable), code review PASS-WITH-NOTES (F1 MEDIUM annotation drift), coverage audit 120/120 agree, security FAIL (E5S-01 MAJOR design-gap: crafted 1,024-char names break .40)
+2026-11-06T21:32:03-06:00 operator — report on the A2L reader (addresses seen with an adjacent line break, never reproduced; rigour asked): design/operator-report-a2l-reader.md; Inc 11 E1 starts with it as US-103-07
