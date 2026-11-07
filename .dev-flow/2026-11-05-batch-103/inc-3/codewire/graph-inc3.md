@@ -2,13 +2,25 @@
 
 Stage E2 of the design-first flow (`dev-flow-v3-beta`). Graph only: no stub, mark or declaration in any tree. Base `batch-103` at `3404110` (product tree `e07fb00`). Requirements `../01-requirements.md` (R-A2L-DEF.64 … .135), cases `../02-test-cases.md`, rulings `../E1-rulings.md` (orchestrator rulings at its end: D-1 A … D-17, D-7 **C**, D-14 carried here), slice `../E1-slice.md`, plan `../../PLAN.md` (I-2, A1). Notation: Code-Wire v3.1.0 (`e436a08`, `docs/Notation-Grammar.md`), as in `../../inc-2/codewire/graph-inc2.md`.
 
-**This is a delta file.** Its base is Inc 2's design, which is not code yet: `../../inc-2/codewire/graph-inc2.md` (40 nodes) with `../../inc-2/E2-rulings.md` (P-1 `bit_mask_text` accepted; the I-2 extension D-1 pinned). This file holds only the nodes Inc 3 adds or changes, plus five unchanged `a2l.py` functions Inc 3 newly reuses or reads. Every other Inc 2 node is cited by name and keeps its Inc 2 contract and examples (for example `_read_method_record`, `_read_enum_table`, `_read_stored_value`, `_enum_text`, `display_text`, `_encode_number`, `_merge_bit_mask`, `_encode_enum`, `_check_limits`, `_check_bit_mask`, `_display_decimals`, `_parse_number_text`, `_agrees_at_display_precision`, `_find_tag`, `_resolve_datatype`, `_read_object_lines`, `generate_definitions_case`, `main`, and the `a2l.py` context `_flatten_body_tokens`, `_collect_sections_by_name`, `_decode_scalar`, `_apply_compu_method`, `parse_begin_meta`, `_to_float`). Inc 2 is in E3 review in parallel; nothing here edits its files.
+**This is a delta file.** Its base is Inc 2's design, which is not code yet: `../../inc-2/codewire/graph-inc2.md` (43 nodes, as corrected by Inc 2's E3 rounds 1–5 and split by amendment A2) with `../../inc-2/E2-rulings.md` (P-1 `bit_mask_text` accepted; the I-2 extension D-1 pinned) and `../../inc-2/E3-rulings.md` (this file is rebased on it: "Rebase on Inc 2's E3" below). This file holds only the nodes Inc 3 adds or changes, plus five unchanged `a2l.py` functions Inc 3 newly reuses or reads. Every other Inc 2 node is cited by name and keeps its Inc 2 contract and examples (for example `_read_method_record`, `_read_enum_table`, `_read_stored_value`, `_enum_text`, `display_text`, `_encode_number`, `_merge_bit_mask`, `_encode_enum`, `_check_limits`, `_check_bit_mask`, `_display_decimals`, `_parse_number_text`, `_agrees_at_display_precision`, `_find_tag`, `_resolve_datatype`, `_read_object_lines`, `describe_definition` (it delegates to `describe_definitions`, Inc 2's E3A-01), `generate_definitions_case`, `main`, and the `a2l.py` context `_flatten_body_tokens`, `_decode_scalar`, `_apply_compu_method`, `parse_begin_meta`, `_to_float`). Inc 2a is at E4 and Inc 2b waits for Inc 11; nothing here edits Inc 2's files.
 
 How to read it:
 - Every node's `func:` starts with **unchanged** (baseline context), **changed** ("was: … / now: …"; the base is Inc 2's graph) or **new**. `a2l.py` is frozen: no node of it changes.
 - Example sources are the case ids of `../02-test-cases.md` (`R-A2L-DEF.N/k`, `R-A2L-0NN/arr-k`, `AT-B103-I3-k`) and, for the Inc 2 cases this increment changes (D-14), Inc 2's ids marked **changed**. Evidence (all tool output, `evidence-e2/`): **B3** = probe 1 (`i3e2-probe-transcript.txt`, tags `[P…]`), **B3b** = probe 2 (`i3e2-probe2-transcript.txt`, `[Q…]`), **B3c** = probe 3 (`i3e2-probe3-transcript.txt`, `[R…]`), **C3** = this stage's caller census (`i3e2-extract-census-transcript.txt`), **B1** / **C1** = the E1 pilot and census (`../evidence-e1/`), **R** = read in the code at `e07fb00`. The probes parse every fixture with the app's own parser and run a **throwaway simulation** of this graph's rules (in the probe files only) — so an example value is the fixture's real content passed through the rule written here. All runs: LAN host cachyos-rtx, Python 3.11.18, read-only clone at `e07fb00`, HOME/XDG/LOCALAPPDATA under `/tmp/b103-e2-3/home`, no display, no clipboard.
 - Fixtures as in `../02-test-cases.md`: **V171** (little-endian; MOD_COMMON `ALIGNMENT_BYTE 1`, `ALIGNMENT_WORD 2`, `ALIGNMENT_LONG 4`, `ALIGNMENT_FLOAT32_IEEE 4`, `ALIGNMENT_FLOAT64_IEEE 4`), **SOFTA**, **CHECK**, **UPD1**, **UPD2**, **C08** (1 MiB, seed 20260001), **DEFC** (pinned below), **INLINE3** (MOD_COMMON `MSB_FIRST`, no ALIGNMENT; INLINE methods have format `%.3`). **AX8(c, p…)** is the V171 axis object's 9-byte record. An image is an address → byte mapping.
 - An example whose E1 case cannot hold on a correct model is written with the corrected input or the PROPOSED reading and listed in `## Findings`.
+
+### Rebase on Inc 2's E3 (2026-11-06, `../E2-rulings.md` "Rebase on Inc 2's E3 corrections")
+
+What this pass changed, against Inc 2's I-2 as `graph-inc2.md` now pins it (targeted edits; the rows of `../01-requirements.md` keep their text):
+- **The changed describe node is `describe_definitions`** (E3A-01): `describe_definition` is now `describe_definitions([name], a2l_data)[name]` and every rule lives in the batch walk, so Inc 3's change lands there; `describe_definition` is unchanged and every example below is written per name, through it.
+- **Lookups in the one walk (E3A-32).** The AXIS_PTS sections by name and each object's MOD_COMMON (by identity, from the enclosing MODULE) are maps built in `describe_definitions`'s single walk, beside Inc 2's method and table maps; `_find_axis_object`, `_module_common` and `_conversion_fields` are lookups in them. Cost measured (Interfaces, *Lookups*): ≈ 1.0 s for software_a against R-A2L-DEF.136's 2.0 s.
+- **The method record on the definition (E3A-03, E3A-22).** `coeffs_linear`, `coeffs` and `compu_tab_ref` have no defaults: `_conversion_fields` returns them, an axis's points definition carries its own method's, every element definition is a `dataclasses.replace` of its object's, and `_decode_stored` converts from those fields, never from `sections`.
+- **Rows split by Inc 2's E3:** R-A2L-DEF.7 → .7.1 / .7.2 (an array's byte length meets .7.2's bounds), .58 → .58.1 / .58.2; the cited cases `.7/arr-k`, `.58/arr-k` are now `.7.1/arr-k`, `.58.1/arr-k`.
+- **R-A2L-DEF.139 replaces the first-tag rule (E3S-35):** case R-A2L-DEF.5/arr-1 changes and R-A2L-DEF.139/arr-1 is added (finding R-1).
+- **R-A2L-DEF.137 (U+FFFD):** every Inc 3 message echoes a file or operator word as Inc 2's do.
+- **E2 rulings applied:** P-2 `count_datatype` and E2-1 accepted; E2-6 accepted.
+- **Split (amendment A2):** 3a / 3b, section "Split (amendment A2)" below. The findings of Inc 2's E3 that apply to this design are listed, with their coverage, in `../E2-rulings.md` (facts; the orchestrator rules).
 
 ### Groups for E4 (file ownership)
 
@@ -17,7 +29,7 @@ How to read it:
 | G1 model | `s19_app/tui/a2l_definition.py` (Inc 2's new module); tests `tests/test_b103_a2l_definition_arrays.py` (tester G-T1: S2.7e … h, the cited-row cases, AT-B103-I3-1, -3, -4) and the Inc 2 tests D-14 changes (`tests/test_b103_a2l_definition.py`: R-A2L-DEF.4/1, /2, /3, /7, .24/1, AT-B103-I2-3) | the 25 module nodes below: 4 changed, 21 new |
 | G2 synth | `tools/synth/make_release_case.py` (additive, A1 rule 2); tests: additions to `tests/test_b103_synth_definitions_case.py` (tester G-T2: S2.7i, AT-B103-I3-2) | `build_definition_objects`, `emit_definitions_a2l`, `_definition_array_objects` |
 
-As in Inc 2, one implementer can cover G1 and G2 (no G2 node imports `s19_app`; the seam is the DEFC object list, I-D below). **Order:** Inc 3's E4 starts on the tree that holds Inc 2's implemented module (Inc 3 extends four of its functions); D-9's rename guard test gains the private `a2l.py` names of the baseline table.
+As in Inc 2, one implementer can cover G1 and G2 (no G2 node imports `s19_app`; the seam is the DEFC object list, I-D below). **Order:** Inc 3a's E4 starts on the tree that holds Inc 2a's implemented module (3a extends three of its functions); Inc 3b's E4 on the tree that holds Inc 2b's (after Inc 11; 3b extends `encode_definition`); D-9's rename guard test gains the private `a2l.py` names of the baseline table.
 
 ### Baseline — existing code in scope, with real callers
 
@@ -27,7 +39,7 @@ As in Inc 2, one implementer can cover G1 and G2 (no G2 node imports `s19_app`; 
 | `_strip_a2l_comments` (`:353`) | **reused** to clean layout and object lines while keeping line ends | `_flatten_body_tokens` (`:456`) |
 | `_split_line_respecting_quotes` (`:319`) | **reused** to split a cleaned line (back in D-9's import list; Inc 2 dropped it, its E2-14) | 10 functions of `a2l.py` (`:313`, `:456`, `:482`, `:613`, `:674`, `:718`, `:795`, `:848`, `:873`, `:909`, `:913`, `:2712`) |
 | `_byte_order_from_section_lines` (`:311`) | **reused** for the axis object's and the module's byte order (R-A2L-024 … 027, R-A2L-DEF.114) | `extract_a2l_tags.<locals>._module_byte_order` (`:2587`), `extract_record_layouts` (`:723`) |
-| `_collect_sections_by_name`, `_flatten_body_tokens`, `_decode_scalar` (Inc 2 context) | reused: AXIS_PTS lookup, axis header words, the count component | as in Inc 2's graph (C3 confirms: `:714`, `:846`, `:902`; `:653`, `:2729`; `:1830`, `:1834`, `:2975`) |
+| `_flatten_body_tokens`, `_decode_scalar` (Inc 2 context; `_collect_sections_by_name` is no longer reused: the AXIS_PTS lookup is a map of `describe_definitions`'s walk, E3A-32) | reused: AXIS_PTS and axis header words, the count component | as in Inc 2's graph (C3 confirms: `:714`, `:846`, `:902`; `:653`, `:2729`; `:1830`, `:1834`, `:2975`) |
 | `_encode_curve_record_bytes` (`:2195`) | **not reused** (D-12 A; BL-I3-7) | `encode_physical_to_raw_bytes` (`:2462`) ← `resolve_symbol_entry` (`services/change_service.py:649`) ← no product caller (C1) |
 | `describe_curve_tag`, `_axis_counts_resolving_external`, `_decode_external_axis_points`, `_inline_axis_counts`, `_infer_length_*` | **not reused** (D-12 A; BL-I3-1 … -6) | E1's census (`../evidence-e1/i3e1-callers-transcript.txt`); `describe_curve_tag` ← `S19TuiApp.action_a2l_describe_tag` (`app.py:9776`, C3) |
 | `A2LParameterPicker.set_parameters` (`a2l_parameter_picker.py:526`) | not touched; Inc 6 replaces its 1-element size with `element_count` / `byte_length` | `CheckEditorPanel.set_a2l_parameters` (`screens_directionb.py:7303`), `PatchEditorPanel.set_a2l_parameters` (`:5388`) (C3) |
@@ -37,7 +49,7 @@ As in Inc 2, one implementer can cover G1 and G2 (no G2 node imports `s19_app`; 
 **I-2 extension (D-1 A, pinned in `../../inc-2/E2-rulings.md`).** Module `s19_app/tui/a2l_definition.py`; imports the standard library and `s19_app.tui.a2l` only; pure; never raises on file or image content. Added exactly as the ruling pins (§4 of `../E1-rulings.md`):
 
 ```text
-Definition gains, after refusal, with defaults (Inc 2's fields unchanged):
+Definition gains, after refusal, with defaults (Inc 2's fields unchanged, `coeffs_linear`, `coeffs`, `compu_tab_ref` and 2b's `shared_with` included, as graph-inc2.md pins them):
     shape: tuple[int, ...] = ()
     element_count: int = 1
     index_mode: str | None = None
@@ -46,7 +58,7 @@ Definition gains, after refusal, with defaults (Inc 2's fields unchanged):
     axes: tuple[AxisDefinition, ...] = ()
 AxisDefinition(letter, axis_kind, point_count, points, point_order, offset, count_offset, fixed_count,
                fixed_points, axis_object, axis_object_address, axis_object_record, monotony, has_points,
-               count_datatype = None)                                    <- count_datatype: PROPOSED P-2
+               count_datatype = None)                                    <- count_datatype: P-2, accepted (../E2-rulings.md)
 DecodedAxis(letter: str, points: tuple[Decoded | Refusal, ...] | None)
 DecodedValues(values: tuple[Decoded | Refusal, ...], axes: tuple[DecodedAxis, ...])
 Position = tuple[int, ...] | tuple[str, int]
@@ -59,16 +71,18 @@ element_name(definition: Definition, position: Position) -> str
 
 Values pinned by this graph (meanings the ruling left open; no name or type changes):
 - `kind` gains `"array"`, `"curve"`, `"map"`; `""` stays for `A2L-DEF-NAME` and for the kinds still outside (CUBOID, CUBE_4, CUBE_5, MAP_BLOCK, vendor kinds).
-- On an array, curve or map: `datatype` = the FNC_VALUES component's datatype (the MEASUREMENT header's for a MEASUREMENT array); `byte_length` = R-A2L-DEF.74 / .75's (the layout reading's end on an `A2L-DEF-ALIGNMENT` refusal; `None` when it cannot be computed or exceeds `MAX_A2L_DECODE_BYTES`, E2-7); `shape` `()` and `element_count` `0` when no shape could be read (E2-11); `index_mode` the FNC_VALUES word, or the MEASUREMENT's LAYOUT word, else `"ROW_DIR"` for a MEASUREMENT; `values_offset` the FNC_VALUES offset (`0` for a MEASUREMENT); `record_layout` the layout name (`None` for a MEASUREMENT); `axes` X first, those built before a refusal. The conversion fields (`conversion_type` … `default_text`, `bit_mask`, `bit_mask_text`, limits, format, unit) are the object's: the fields every element definition takes.
-- `AxisDefinition.points` is a `Definition` of the axis's points: `name` `<name>.X`, `section` `"AXIS_DESCR"`, `char_type` `None`, `kind` `"number"` or `"enum"` (TAB_VERB), `address` `None` (each point's comes from `_element_definition`), `byte_length` the point datatype's size (`None` for FIX), `datatype` the AXIS_PTS component's (the axis object's AXIS_PTS_X for COM; `None` for FIX), `byte_order` the object's (the axis object's for COM, R-A2L-DEF.114), the conversion fields of the axis header's method (`_conversion_fields`), `limits` the axis header's two limit words, `extended_limits` `None`, `bit_mask` `None`, `display_format` the axis FORMAT else the method's, `unit` the method's else `""`, `refusal` the R-A2L-DEF.103 candidate or `None`.
-- `point_order` `None` for FIX; `offset`, `count_offset` are offsets in the object's record (STD, FIX) or in the axis object's record (COM), `None` when absent; `fixed_count` the FIX_NO_AXIS_PTS line of the same layout; `fixed_points` FIX only, an `int` where the point is integral, else a `float`; `axis_object_record` (COM) a `Definition` with `name` the AXIS_PTS name, `section` `"AXIS_PTS"`, `kind` `""`, `address`, `byte_length` the end of its record, `byte_order`, `record_layout` its layout, every other field empty; `monotony` `"STRICT_MON"` when absent; `has_points` `False` only for R-A2L-DEF.100 (a FIX axis has points that are not in memory).
-- **P-2 PROPOSED** (needs an orchestrator ruling; the graph is written for it): `AxisDefinition` gains `count_datatype: str | None = None` last, the NO_AXIS_PTS component's datatype. Reason: the current count (R-A2L-DEF.115) is read from bytes whose datatype the pinned fields do not hold — V171's count is UBYTE, DEFC's UWORD (B3b Q6). Consumers read fields by name and never construct one. Alternative if refused: `_current_count` re-reads the layout from `a2l_data` at decode (the definition then does not describe its own record).
+- On an array, curve or map: `datatype` = the FNC_VALUES component's datatype (the MEASUREMENT header's for a MEASUREMENT array); `byte_length` = R-A2L-DEF.74 / .75's (the layout reading's end on an `A2L-DEF-ALIGNMENT` refusal; an array's product as computed, which R-A2L-DEF.7.2 refuses above 1,048,576 bytes; `None` when it cannot be computed — a curve or map whose walk stops past `MAX_A2L_DECODE_BYTES`, E2-7, then refused by .7.1); `shape` `()` and `element_count` `0` when no shape could be read (E2-11); `index_mode` the FNC_VALUES word, or the MEASUREMENT's LAYOUT word, else `"ROW_DIR"` for a MEASUREMENT; `values_offset` the FNC_VALUES offset (`0` for a MEASUREMENT); `record_layout` the layout name (`None` for a MEASUREMENT); `axes` X first, those built before a refusal. The conversion fields (`conversion_type` … `default_text`, `coeffs_linear`, `coeffs`, `compu_tab_ref`, `bit_mask`, `bit_mask_text`, limits, format, unit) are the object's: the fields every element definition takes, by `dataclasses.replace` (E3A-03, E3A-22).
+- `AxisDefinition.points` is a `Definition` of the axis's points: `name` `<name>.X`, `section` `"AXIS_DESCR"`, `char_type` `None`, `kind` `"number"` or `"enum"` (TAB_VERB), `address` `None` (each point's comes from `_element_definition`), `byte_length` the point datatype's size (`None` for FIX), `datatype` the AXIS_PTS component's (the axis object's AXIS_PTS_X for COM; `None` for FIX), `byte_order` the object's (the axis object's for COM, R-A2L-DEF.114), the conversion fields of the axis header's method (`_conversion_fields`, with that method record's `coeffs_linear`, `coeffs`, `compu_tab_ref`: Inc 2 E3 R2.2), `bit_mask_text` `None`, `shared_with` (2b) `None`, `limits` the axis header's two limit words, `extended_limits` `None`, `bit_mask` `None`, `display_format` the axis FORMAT else the method's, `unit` the method's else `""`, `refusal` the R-A2L-DEF.103 candidate or `None`.
+- `point_order` `None` for FIX; `offset`, `count_offset` are offsets in the object's record (STD, FIX) or in the axis object's record (COM), `None` when absent; `fixed_count` the FIX_NO_AXIS_PTS line of the same layout; `fixed_points` FIX only, an `int` where the point is integral, else a `float`; `axis_object_record` (COM) a `Definition` with `name` the AXIS_PTS name, `section` `"AXIS_PTS"`, `kind` `""`, `address`, `byte_length` the end of its record, `byte_order`, `record_layout` its layout, every other field empty (`None`, `""` or `()`, each stated: no Inc 2 field has a default, E3A-22); `monotony` `"STRICT_MON"` when absent; `has_points` `False` only for R-A2L-DEF.100 (a FIX axis has points that are not in memory).
+- **P-2, accepted** (`../E2-rulings.md`): `AxisDefinition` gains `count_datatype: str | None = None` last, the NO_AXIS_PTS component's datatype. Reason: the current count (R-A2L-DEF.115) is read from bytes whose datatype the pinned fields do not hold — V171's count is UBYTE, DEFC's UWORD (B3b Q6). Consumers read fields by name and never construct one. Alternative if refused: `_current_count` re-reads the layout from `a2l_data` at decode (the definition then does not describe its own record).
 - `Position`: an element index is a tuple of `len(shape)` ints (a curve's `(x,)`); an axis point is `("X", k)` or `("Y", k)`. A position of any other form is not an element index (`A2L-DEF-INDEX`, R-A2L-DEF.125), its `<position>` text `<name>[` + its items joined by `,` + `]`.
 - *Edit order* (CTX-A2L-DEF) as the order of the dict keys sorted by: axis points first, X before Y, by point index; then element indexes, the last index most significant (element order); a malformed position sorts after all of them, in the edit's own order. `encode_values` checks positions (R-A2L-DEF.125) in this order.
 - `Encoded` unchanged: `address` the record's address, `data` the whole record (`byte_length` bytes), `notices` the elements' notices in edit order, each naming its element (R-A2L-DEF.121). An empty edit gives the record as the image holds it.
 - New refusal codes (27; E1's "25" miscounts, E2-12): `A2L-DEF-SHAPE`, `-MATRIX`, `-INDEX-MODE`, `-LAYOUT`, `-LAYOUT-VALUES`, `-LAYOUT-PART`, `-LAYOUT-MODE`, `-LAYOUT-DATATYPE`, `-LAYOUT-POSITION`, `-ALIGNMENT`, `-AXES`, `-AXIS-KIND`, `-AXIS-MAX`, `-AXIS-REF`, `-AXIS-LAYOUT`, `-AXIS-FIX`, `-AXIS-FIX-COUNT`, `-LAYOUT-AXIS`, `-AXIS-CURRENT`, `-AXIS-PARTIAL` (describe or decode); `-AXIS-BYTES` (decode); `-ELEMENTS`, `-INDEX`, `-AXIS-FIXED`, `-AXIS-SHARED`, `-AXIS-NONE`, `-MONOTONY` (encode; `-ELEMENTS` also the single decode). `A2L-DEF-LENGTH` is reused with the array message of R-A2L-DEF.76. Messages are the rows' texts exactly.
 - `decode_values` / `encode_values` on a definition of kind `number`, `enum` or `text` (no row; E2-5): the decode gives `DecodedValues((decode_definition(…),), ())`; the encode takes only the position `(0,)` → `encode_definition`, any other position `A2L-DEF-INDEX`.
-- Consumers: Inc 6 reads `kind`, `element_count`, `byte_length`, `shape` (also from a refused definition); Inc 9 reads `shape`, `index_mode`, `axes`, `DecodedValues` and builds `edit` from the operator's cells; neither calls `a2l._encode_curve_record_bytes` (BL-I3-7).
+- Consumers: Inc 6 reads `kind`, `element_count`, `byte_length`, `shape` (also from a refused definition); Inc 9 reads `shape`, `index_mode`, `axes`, `DecodedValues` and builds `edit` from the operator's cells; neither calls `a2l._encode_curve_record_bytes` (BL-I3-7). Inc 2's consumer notes hold for every Inc 3 string (markup off, E3S-04a; raw file words, E3A-25 / E3S-19) and, in 3b, for `shared_with` (E3S-45 (iii)).
+- **Messages (R-A2L-DEF.137, Inc 2).** Every Inc 3 refusal message echoes a word from the file or the operator (`<layout>`, `<component>`, `<word>`, `<ref>`, `<dims>`, `<name>` and the element and axis names built from it) with U+FFFD for U+0000–U+001F, U+007F and U+0080–U+009F, as `describe_definitions` does; each element's display text comes from `_decode_stored`, which keeps Inc 2's replacement.
+- **Lookups (E3A-32).** `describe_definitions`'s one walk of `a2l_data["sections"]` builds, beside Inc 2's maps (objects, `compu_methods_by_name`, `compu_tables_by_name`), two more, passed to Inc 3's nodes as `maps`: `axis_pts_by_name` (each AXIS_PTS section in file order, filed under the first word of its *AXIS_PTS header*, `_flatten_body_tokens([meta] + lines)`) and `mod_common_of` (each MEASUREMENT, CHARACTERISTIC and AXIS_PTS section, by identity, → the MOD_COMMON child of the MODULE the walk is in, taken from the MODULE's children when the walk enters it; `None` outside a MODULE). The method and table records come from Inc 2's maps. No Inc 3 node walks the tree per object, so R-A2L-DEF.136 holds for Inc 3's kinds. Measured on cachyos-rtx (Python 3.11.18, clone `e07fb00`; throwaway cost prototype `i3reb-cost-probe.py`, transcript cited in `../E2-rulings.md`), software_a: the walk with the two maps `43.78` ms (Inc 2's walk alone `34.63` ms); Inc 3's per-object reads through the maps (every object's MATRIX_DIM line; for its 101 VAL_BLK, 158 CURVE, 11 MAP the record layout read and placed twice, 180 AXIS_DESCR headers, 161 COM axis objects' headers and layouts; 196 MEASUREMENT arrays) median `0.247` s; Inc 2's describe prototype (`../../inc-2/evidence-e3/arch-r2-probe.py`) median `0.740` s; together ≈ `0.995` s against .136's `2.0` s. With the per-object walks of the E2 graph the estimate was ≈ 3.3 s (E3A-32).
 
 **I-D (G2 → the testers, test data only), extended.** Each Inc 3 DEFC object dict has Inc 2's keys (`name`, `section`, `kind`, `datatype`, `conversion`, `address`, `length`, `big_endian`, `raw_bytes`, `physical`, `low`, `high`, `bit_mask`) with `section` `"CHARACTERISTIC"` or `"AXIS_PTS"`, `kind` `"CURVE"`, `"MAP"`, `"VAL_BLK"` or `"AXIS_PTS"`, `length` the record's bytes, `raw_bytes` the record, `physical` `None`, `bit_mask` `None`; and `shape` (tuple), `planned_stored` and `planned_text` as tuples in element order (an AXIS_PTS object: its points), `axes` (a tuple of dicts `letter`, `axis_kind`, `planned_stored`, `planned_text`, `axis_object`). Inc 2's four objects keep their scalar keys.
 
@@ -108,12 +122,13 @@ Inc 2's region, MOD_COMMON (`MSB_FIRST`, `ALIGNMENT_BYTE 1`, `ALIGNMENT_WORD 2`)
 
 | Inc 2 case | Inc 2 expectation | Inc 3 expectation (node) |
 |---|---|---|
-| R-A2L-DEF.4/1, /2, /3 (C08 `VAL_BLK_0001`, `CURVE_0001`, `MAP_0001`) | `A2L-DEF-KIND` | withdrawn: kinds `array`, `curve`, `map` (R-A2L-DEF.64/5, .65/3, .66/2; `describe_definition`) |
+| R-A2L-DEF.4/1, /2, /3 (C08 `VAL_BLK_0001`, `CURVE_0001`, `MAP_0001`) | `A2L-DEF-KIND` | withdrawn: kinds `array`, `curve`, `map` (R-A2L-DEF.64/5, .65/3, .66/2; `describe_definitions`) |
 | R-A2L-DEF.4/7 (V171 `ASAM.M.MATRIX_DIM_16_1.UBYTE.IDENTICAL`) | `A2L-DEF-KIND` `… MATRIX_DIM 16 MEASUREMENT object` | withdrawn: kind `array`, shape `(16,)` (R-A2L-DEF.67/4) |
 | R-A2L-DEF.4 new case (D-14) | — | V171 `ASAM.C.CUBE_4.ROW_DIR` → `A2L-DEF-KIND` `ASAM.C.CUBE_4.ROW_DIR: the system has no definition for a CUBE_4 object` (the tag gives `char_type` `CUBE_4`, address `0x810590`, B3c R1); threshold 4/4 with /4, /5, /6 |
 | R-A2L-DEF.24/1 (INLINE MEASUREMENT `MA`, `MATRIX_DIM 4`, no ECU_ADDRESS) | `A2L-DEF-KIND` | input becomes INLINE3 CUBOID `CB` whose address word is `0xZZ` (the tag gives `char_type` `CUBOID`, address `None`, B3c R2) → `A2L-DEF-KIND` (kind before address); `MA` itself is now an array and gives `A2L-DEF-ADDRESS` (R-A2L-DEF.7/arr-2) |
-| AT-B103-I2-3 (C08: every defined object builds and decodes, 0 refusals) | 322 objects | scoped to the kinds `number`, `enum`, `text` (the same 322); the 140 arrays, curves and maps give `A2L-DEF-ELEMENTS` on a single decode and are AT-B103-I3-3's |
-| R-A2L-DEF.58/1, /2 | unchanged in effect | still hold: the single calls on arrays return a refusal value and leave both inputs unchanged; R-A2L-DEF.58/arr-1, /arr-2 cover the array calls |
+| AT-B103-I2-3 (C08 clean and issues: every defined object builds and decodes) | clean: 322 objects, 0 refusals; issues: 1 `A2L-DEF-METHOD`, 1 `A2L-DEF-NAME` (R-A2L-DEF.139), the `A2L-DEF-BYTES` refusals | scoped to the kinds `number`, `enum`, `text` (the same 322 and the same issues refusals); the 140 arrays, curves and maps of each A2L give `A2L-DEF-ELEMENTS` on a single decode and are AT-B103-I3-3's |
+| R-A2L-DEF.58.1/1, /2 | unchanged in effect | still hold: the single calls on arrays return a refusal value and leave both inputs unchanged; R-A2L-DEF.58.1/arr-1, /arr-2 cover the array calls |
+| R-A2L-DEF.5/1, .139/1 … /3 | unchanged | hold; Inc 3's own R-A2L-DEF.5/arr-1 changes with them (finding R-1) |
 
 ### Coverage — every requirement → nodes and examples
 
@@ -121,7 +136,7 @@ Every row has at least one concrete example; none is uncovered. Example ids are 
 
 | Rows | Nodes | Examples |
 |---|---|---|
-| R-A2L-DEF.64 … .66 | `describe_definition`, `_object_kind` | .64/1 … /5; .65/1 … /3; .66/1 … /3 |
+| R-A2L-DEF.64 … .66 | `describe_definitions`, `_object_kind` | .64/1 … /5; .65/1 … /3; .66/1 … /3 |
 | R-A2L-DEF.67, .71 | `_read_matrix_dim`, `_describe_array` | .67/1 … /5; .71/1 … /4 |
 | R-A2L-DEF.68 … .70, .76 | `_array_shape`, `_describe_array` | .68/1, /2; .69/1, /2; .70/1; .76/1, /2 |
 | R-A2L-DEF.72 … .75, .77 | `_describe_array`, `_place_components` | .72/1 … /3; .73/1 … /8; .74/1 … /4; .75/1 … /4; .77/1 … /3 |
@@ -148,26 +163,60 @@ Every row has at least one concrete example; none is uncovered. Example ids are 
 | R-A2L-DEF.122 … .130 | `encode_values`, `_breaking_point` | .122/1 … /4; .123/1 … /4; .124/1 … /3; .125/1 … /3; .126/1, /2; .127/1, /2; .128/1; .129/1 … /9; .130/1 … /3 |
 | R-A2L-DEF.131, .132 | `encode_values`, `decode_values` | .131/1; .132/1 (with the DEFC instances) |
 | R-A2L-DEF.133 … .135 | `_definition_array_objects`, `build_definition_objects`, `emit_definitions_a2l` | .133/1; .134/1; .135/1 |
-| cited R-A2L-DEF.5, .6, .7, R-A2L-010, 011, 024, 026 | `describe_definition`, `_describe_array` | .5/arr-1; .6/arr-1; .7/arr-1, /arr-2; 010/arr-1; 011/arr-1; 024/arr-1; 026/arr-1 |
-| cited R-A2L-DEF.26, .58 | `decode_values`, `encode_values` | .26/arr-1; .58/arr-1, /arr-2 |
+| cited R-A2L-DEF.5, .6, .139, .7.1, R-A2L-010, 011, 024, 026 | `describe_definitions`, `_describe_array` | .5/arr-1; .6/arr-1; .139/arr-1; .7.1/arr-1, /arr-2; 010/arr-1; 011/arr-1; 024/arr-1; 026/arr-1 |
+| cited R-A2L-DEF.136 | `describe_definitions` (the walk's maps, E3A-32) | .136/arr-1 |
+| cited R-A2L-DEF.26, .58.1 | `decode_values`, `encode_values` | .26/arr-1; .58.1/arr-1, /arr-2 |
 | cited R-A2L-DEF.59, .63 | `build_definition_objects` (case 08 untouched) | .59/arr-1; .63/arr-1 |
 | cited R-A2L-019 | `_read_axis` | 019/arr-1 |
-| Inc 2 cases changed (D-14) | `describe_definition`, `_object_kind`, `decode_definition` | R-A2L-DEF.4 (new CUBE_4 case), .24/1, AT-B103-I2-3 (table above) |
-| AT-B103-I3-1 … -4 | `describe_definition`, `decode_values`, `encode_values`; G2 for -2 | each AT's example lines |
+| Inc 2 cases changed (D-14) | `describe_definitions`, `_object_kind`, `decode_definition` | R-A2L-DEF.4 (new CUBE_4 case), .24/1, AT-B103-I2-3 (table above) |
+| AT-B103-I3-1 … -4 | `describe_definitions`, `decode_values`, `encode_values`; G2 for -2 | each AT's example lines |
 
-**Node count:** 33 nodes in this file — 21 new in the module (the slice's 19 plus `_conversion_fields` and `_module_common`, E2-3), 4 changed Inc 2 nodes (`describe_definition`, `_object_kind`, `decode_definition`, `encode_definition`), 1 new and 2 changed Inc 2 nodes in the synth, 0 removed, 5 unchanged `a2l.py` context nodes. The slice (new + changed) is 28 (E1 counted 26; +2, E2-3). Inc 2's 40 + Inc 3's 28 slice nodes = 66 for the module and synth together, which is why this is a delta file. Entities 9, edges 13. Under the cap of 40 for this file.
+**Node count:** 33 nodes in this file — 21 new in the module (the slice's 19 plus `_conversion_fields` and `_module_common`, E2-3), 4 changed Inc 2 nodes (`describe_definitions` — the E2 graph changed `describe_definition`, which now delegates to it, E3A-01 —, `_object_kind`, `decode_definition`, `encode_definition`), 1 new and 2 changed Inc 2 nodes in the synth, 0 removed, 5 unchanged `a2l.py` context nodes. The slice (new + changed) is 28 (E1 counted 26; +2, E2-3). Inc 2's 43 + Inc 3's 28 slice nodes = 71 for the module and synth together, which is why this is a delta file. Entities 9, edges 13. Under the cap of 40 for this file. Per side: "Split (amendment A2)" below.
 
 **Checked against the base code** (`evidence-e2/i3e2-extract-check-transcript.txt`): the Code-Wire v3.1.0 extractor over a throwaway copy of `e07fb00` with a mark on each of the 5 existing nodes of this file and `--path` on the slice files → `0` contract drifts (inputs, types, defaults, outputs, modules of the 5 match); the `28` findings are all "Graph node without mark (no code yet)", the 28 slice nodes — so the run exits 1 until E4 writes them, as the method expects. `codewire_lint.py` on this file (`evidence-e2/i3e2-lint-transcript.txt`): `nodes=33 entities=9 edges=13 findings=15 not read=0`. Real callers: `evidence-e2/i3e2-extract-census-transcript.txt` (every def of the copy marked, base line numbers).
+
+### Split (amendment A2): nodes, edges and I-2 per side
+
+Amendment A2 (`../../PLAN.md`) splits Inc 3 as it splits Inc 2. **3a** is the read side: describe, decode and display of arrays, curves, maps and VAL_BLKs, the synth objects, and the element count and byte length Inc 6 needs; it runs on Inc 2a and today's reader. **3b** is the write side: the encode of elements and axis points, the monotony on an edit, and the AXIS_PTS spans in R-A2L-DEF.138's index; it waits for Inc 2b and Inc 11 and is re-reviewed with 2b's guards. Rows and cases per side: `../01-requirements.md` and `../02-test-cases.md`, "Split (amendment A2)". The node texts describe the whole of Inc 3; where a 3a node holds a 3b part, the list after the table names it.
+
+| Side | Nodes | Count |
+|---|---|---|
+| 3a, changed (G1) | `describe_definitions`, `_object_kind`, `decode_definition` | 3 |
+| 3a, new (G1) | `_conversion_fields`, `_describe_array`, `_read_matrix_dim`, `_array_shape`, `_read_record_layout`, `_place_components`, `_check_module_alignment`, `_module_common`, `_read_axis`, `_find_axis_object`, `_fixed_points`, `_element_definition`, `element_name`, `decode_values`, `_element_offset`, `_point_offset`, `_current_count`, `_decode_axis`, `_decode_stored` | 19 |
+| 3a, new and changed (G2) | `build_definition_objects`, `emit_definitions_a2l` (changed); `_definition_array_objects` (new) | 3 |
+| 3a, unchanged context | `_walk_record_layout_components`, `_strip_a2l_comments`, `_split_line_respecting_quotes`, `_byte_order_from_section_lines` | 4 |
+| 3b, changed (G1) | `encode_definition` (2b's node) | 1 |
+| 3b, new (G1) | `encode_values`, `_breaking_point` | 2 |
+| 3b, unchanged context | `_encode_curve_record_bytes` (the oracle of R-A2L-DEF.123/4's and .132's negative controls) | 1 |
+
+That is 33 nodes: 29 in 3a and 4 in 3b. The slice (new and changed nodes) is 28: 25 in 3a and 3 in 3b.
+
+**What 3b adds to 3a nodes** (they keep their name, inputs and outputs):
+- **`describe_definitions`.** 2b's span index and `shared_with` (Inc 2's), plus the AXIS_PTS spans of the round-4b census ruling (`../../inc-2/E3-rulings.md`: "AXIS_PTS spans join the index in Inc 3"): every AXIS_PTS whose address the A2L declares, with the span of its record as `_read_axis` places it, filed as 2b files a tag. **No row states it yet:** `../01-requirements.md` "Split (amendment A2)" gives the proposed text (R-A2L-DEF.140, not counted). The index entries of Inc 3's own kinds keep the tag's byte length as 2b writes it (the tag table's first MATRIX_DIM number, BL-I3-2; none for a NUMBER-sized VAL_BLK, BL-I3-3): E3S-40's index part, listed in `../E2-rulings.md`.
+- **`_read_axis`.** The `monotony` field is read in 3a (it is part of `AxisDefinition`); only 3b's `_breaking_point` uses it.
+- **`_element_definition`.** In 3b it is the input of each element's `encode_definition`; as a `replace` of the object's definition it carries 2b's `shared_with`, so 2b's step 9 refuses every element of an object that shares bytes (`encode_definition` below).
+- **`decode_values`.** 3b's encode order starts with it (R-A2L-DEF.124), and the round trip reads with it (.131, .132).
+- **Examples.** An example on a 3a node waits for 3b when it cites a 3b row or case or an edit arm: `_element_definition`'s .126/1 and .127/1 inputs; `element_name`'s .121/1, .121/2, .125/1 … /3 and .121/1 neg; the edit arm of .58.1/arr-1 and /arr-2 on `describe_definitions` and `decode_values`; the edit arm of AT-B103-I3-1 … -3.
+
+**Edges and entities.** 2 edges are 3b: `[Data: image] ──▶ encode_values` and `encode_values ──▶ _breaking_point`; the other 11 are 3a. The 9 entities are 3a (`Encoded` is Inc 2b's).
+
+**E4 groups.** G1 splits as the table does: 3a's tester G-T1 takes S2.7e, S2.7f, the 3a cases of S2.7g, the cited cases, the build-and-decode arms of AT-B103-I3-1 and -3, AT-B103-I3-4 and the D-14 Inc 2 cases; 3b's tester takes S2.7h, the encode cases of .120 and .121 and the edit arms. G2 is all 3a; AT-B103-I3-2's edit arms wait for 3b.
+
+**3a's I-2 extension:** `Definition`'s six defaulted fields; `AxisDefinition` (`count_datatype` included), `DecodedAxis`, `DecodedValues`, `Position`; `decode_values` (also on a scalar kind, E2-5) and `element_name`; `describe_definition(s)` and `decode_definition` on the new kinds (`decode_definition` gives `A2L-DEF-ELEMENTS`); the codes `-SHAPE`, `-MATRIX`, `-INDEX-MODE`, `-LAYOUT`, `-LAYOUT-VALUES`, `-LAYOUT-PART`, `-LAYOUT-MODE`, `-LAYOUT-DATATYPE`, `-LAYOUT-POSITION`, `-ALIGNMENT`, `-AXES`, `-AXIS-KIND`, `-AXIS-MAX`, `-AXIS-REF`, `-AXIS-LAYOUT`, `-AXIS-FIX`, `-AXIS-FIX-COUNT`, `-LAYOUT-AXIS`, `-AXIS-CURRENT`, `-AXIS-PARTIAL`, `-AXIS-BYTES`, `-ELEMENTS` (22), and `A2L-DEF-LENGTH`'s array message.
+
+**What 3b adds to I-2:** `encode_values` (also on a scalar kind, E2-5); `encode_definition` on the new kinds (`-ELEMENTS`); the codes `-INDEX`, `-AXIS-FIXED`, `-AXIS-SHARED`, `-AXIS-NONE`, `-MONOTONY` (5); the *edit order* and the `Encoded` of a whole record; the AXIS_PTS index entries.
+
+**Interface note.** 3b changes no name, type, value or meaning that 3a defines; it adds a function, codes and refusals. Inc 3's defaulted fields follow `refusal`, so they stay valid next to 2b's `shared_with` whichever lands first. No 3a function writes: a 3a consumer (Inc 6) only describes, decodes and displays.
 
 ## Nodes
 
 ### Changed Inc 2 nodes (`s19_app/tui/a2l_definition.py`)
 
-describe_definition
-req: R-A2L-DEF.64, R-A2L-DEF.65, R-A2L-DEF.66, R-A2L-DEF.4, R-A2L-DEF.5, R-A2L-DEF.6, R-A2L-DEF.24, R-A2L-DEF.58, R-A2L-010, R-A2L-011, R-A2L-024, R-A2L-026
-in: str name; dict a2l_data
-out: Definition definition
-func: changed. was: Inc 2's (`graph-inc2.md` `describe_definition`): the lookup, the scalar fields, Inc 2's refusal order; every kind but number, enum and text refused `A2L-DEF-KIND`. / now: the same lookup and scalar fields, the method and table fields read through `_conversion_fields` (the same values, the same refusals in the same order); `_read_matrix_dim(section)` gives the MATRIX_DIM words; `kind` = `_object_kind(tag, conversion_type, words)`; for `array`, `curve` or `map` it returns `_describe_array(tag, section, a2l_data, base)`, `base` = the Definition of those scalar fields with that kind and refusal `None` (Inc 2's refusal order is not applied to these kinds). Every other kind exactly as Inc 2.
+describe_definitions
+req: R-A2L-DEF.64, R-A2L-DEF.65, R-A2L-DEF.66, R-A2L-DEF.4, R-A2L-DEF.5, R-A2L-DEF.6, R-A2L-DEF.139, R-A2L-DEF.24, R-A2L-DEF.58.1, R-A2L-DEF.136, R-A2L-DEF.137, R-A2L-010, R-A2L-011, R-A2L-024, R-A2L-026
+in: Iterable[str] names; dict a2l_data
+out: dict[str, Definition] definitions
+func: changed (rebased on Inc 2's E3: E3A-01, E3A-32). was: Inc 2's (`graph-inc2.md` `describe_definitions`): one walk that builds the name maps; per name `_find_tag`, the scalar fields, Inc 2's refusal order; every kind but number, enum and text refused `A2L-DEF-KIND`. / now: the same walk also builds `axis_pts_by_name` and `mod_common_of` (Interfaces, *Lookups*), handed with Inc 2's method and table maps to Inc 3's nodes as `maps`; per name the same lookup (R-A2L-DEF.5, .6, .139) and scalar fields, the method and table fields read through `_conversion_fields` (the same values, the same refusals in the same order); `_read_matrix_dim(section)` gives the MATRIX_DIM words; `kind` = `_object_kind(tag, conversion_type, words)`; for `array`, `curve` or `map` the definition is `_describe_array(tag, section, a2l_data, base, maps)`, `base` = the Definition of those scalar fields (the method record's `coeffs_linear`, `coeffs`, `compu_tab_ref` included) with that kind, the mask refusal recorded while reading the object record, and refusal `None` (Inc 2's refusal order is not applied to these kinds; the array refusal order is). Every other kind exactly as Inc 2. Messages as R-A2L-DEF.137. `describe_definition(name, a2l_data)` is unchanged (`describe_definitions([name], a2l_data)[name]`): the examples below are written per name, through it. 3b's part (the AXIS_PTS index entries): "Split (amendment A2)".
 module: s19_app/tui/a2l_definition.py
 examples: (R-A2L-DEF.64/1) V171 `ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR` → kind `array`, refusal `None` (Inc 2: `A2L-DEF-KIND`)
 examples: (R-A2L-DEF.64/2, /3) V171 `ASAM.C.ARRAY.SWORD.MATRIX_DIM_6.ROW_DIR` → `array`; `ASAM.M.MATRIX_DIM_8_4_2.UBYTE.IDENTICAL` → `array`, section `MEASUREMENT` (B3 P5)
@@ -178,11 +227,14 @@ examples: (R-A2L-DEF.65/1 … /3, changed R-A2L-DEF.4/2) V171 `ASAM.C.CURVE.COM_
 examples: (R-A2L-DEF.66/1 … /3, changed R-A2L-DEF.4/3) V171 `ASAM.C.MAP.COM_AXIS.FIX_AXIS`, C08 `MAP_0001`, DEFC `MAP_DEF_0001` → kind `map`
 examples: (R-A2L-DEF.4 new case, D-14) V171 `ASAM.C.CUBE_4.ROW_DIR` → refusal `A2L-DEF-KIND` `ASAM.C.CUBE_4.ROW_DIR: the system has no definition for a CUBE_4 object`, kind `""`, address `0x810590` (B3c R1); Inc 2's /4 CUBOID, /5 `MB`, /6 `VK` unchanged
 examples: (changed R-A2L-DEF.24/1, D-14) INLINE3 CUBOID `CB` with address word `0xZZ` → `A2L-DEF-KIND` `CB: the system has no definition for a CUBOID object` (address `None`, B3c R2: kind before address)
-examples: (R-A2L-DEF.5/arr-1) INLINE3 two VAL_BLKs `DUPA` (`MATRIX_DIM 2`) at 0x10 and 0x20 → address `0x10`
+examples: (R-A2L-DEF.5/arr-1, rebased, finding R-1) INLINE3 a VAL_BLK `DUPA` (`MATRIX_DIM 2`) at 0x20 and a VAL_BLK `dupa` (`MATRIX_DIM 2`) at 0x10 → for `DUPA` address `0x20`, kind `array`, refusal `None` (`dupa` is another name)
+examples: (R-A2L-DEF.139/arr-1) INLINE3 two VAL_BLKs `DUPA` (`MATRIX_DIM 2`) at 0x10 and 0x20 → refusal `A2L-DEF-NAME` `DUPA: the A2L declares that name more than once`, kind `""` (the E2 graph gave the first tag, `0x10`: the rule E3S-35 removed)
+examples: (R-A2L-DEF.136/arr-1) SOFTA, `describe_definitions` of every tag name (13,990) with Inc 3's kinds → ≤ 2.0 s (median of 3, cachyos-rtx); the cost prototype gives ≈ `0.995` s (Interfaces, *Lookups*)
+examples: (R-A2L-DEF.136/arr-1 neg) mutant: `_find_axis_object` and `_module_common` as per-object walks (the E2 graph) → ≈ 3.3 s (E3A-32) → RED
 examples: (R-A2L-DEF.6/arr-1) C08 clean `curve_0001` → refusal `A2L-DEF-NAME` `curve_0001: no tag of that name in the A2L`
 examples: (R-A2L-010/arr-1, R-A2L-026/arr-1) V171 `…MATRIX_DIM_3_4.ROW_DIR` → address `0x810100`, byte order `little` (MOD_COMMON `MSB_LAST`); (R-A2L-011/arr-1) `…MATRIX_DIM_8_4_2…` → address `0x13A30` (B3 P1)
 examples: (R-A2L-024/arr-1) C08 `VAL_BLK_0001` → byte order `big` (its `BYTE_ORDER MSB_FIRST` line, B3 P7)
-examples: (R-A2L-DEF.58/arr-1, /arr-2) V171 and C08 clean: a deep copy of `a2l_data` before building every array, curve and map equals it after → `True`
+examples: (R-A2L-DEF.58.1/arr-1, /arr-2) V171 and C08 clean: a deep copy of `a2l_data` before building every array, curve and map equals it after → `True`
 
 _object_kind
 req: R-A2L-DEF.64, R-A2L-DEF.65, R-A2L-DEF.66, R-A2L-DEF.4
@@ -198,22 +250,22 @@ examples: (holds from Inc 2, R-A2L-DEF.1/2) MEASUREMENT, no MATRIX_DIM line, `ID
 examples: (R-A2L-DEF.4 new case) `CUBE_4` → (`None`, `CUBE_4`); (R-A2L-DEF.4/4) `CUBOID` → (`None`, `CUBOID`)
 
 decode_definition
-req: R-A2L-DEF.120, R-A2L-DEF.25
+req: R-A2L-DEF.120, R-A2L-DEF.25, R-A2L-DEF.137
 in: Definition definition; dict a2l_data; Mapping[int, int] image
 out: Decoded | Refusal result
-func: changed. was: Inc 2's: the definition's refusal; `_read_stored_value`; then the text / enum / number conversion. / now: the definition's refusal (R-A2L-DEF.25); then, for kind `array`, `curve` or `map`, `A2L-DEF-ELEMENTS` `<name>: it holds <n> values — decode and encode it value by value` (`<n>` = `element_count`); then `_read_stored_value` (a refusal passes through) and `_decode_stored(definition, a2l_data, stored)` — the conversion half moved there unchanged (slice #20, decided here). Every Inc 2 example of this node holds.
+func: changed. was: Inc 2's: the definition's refusal; `_read_stored_value`; then the text / enum / number conversion (the number from the definition's method fields, E3A-03; `Decoded.text` with U+FFFD, R-A2L-DEF.137). / now: the definition's refusal (R-A2L-DEF.25); then, for kind `array`, `curve` or `map`, `A2L-DEF-ELEMENTS` `<name>: it holds <n> values — decode and encode it value by value` (`<n>` = `element_count`); then `_read_stored_value` (a refusal passes through) and `_decode_stored(definition, a2l_data, stored)` — the conversion half moved there unchanged (slice #20, decided here). Every Inc 2 example of this node holds.
 module: s19_app/tui/a2l_definition.py
 examples: (R-A2L-DEF.120/1) V171 `ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR`, image SWORD 1 … 12 at 0x810100 → refusal `A2L-DEF-ELEMENTS` `ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR: it holds 12 values — decode and encode it value by value` (base: the tag table's raw `1`, B1 line 12)
 examples: (R-A2L-DEF.120/1 neg) mutant: the first element decoded as the value → `Decoded(1, 1, "1")` → RED
 examples: (R-A2L-DEF.25 on an array) V171 `ASAM.C.CURVE.STD_AXIS` → its `A2L-DEF-ALIGNMENT` refusal, not `A2L-DEF-ELEMENTS`
-examples: (changed AT-B103-I2-3) C08 clean: the `322` objects of kind number, enum or text decode with `0` refusals (Inc 2's B2 P5f); each of the `140` arrays, curves and maps gives `A2L-DEF-ELEMENTS`
+examples: (changed AT-B103-I2-3) C08 clean: the `322` objects of kind number, enum or text decode with `0` refusals (Inc 2's B2 P5f); each of the `140` arrays, curves and maps gives `A2L-DEF-ELEMENTS`; `firmware_issues.a2l`: Inc 2's refusals unchanged (`1` `A2L-DEF-METHOD`, `1` `A2L-DEF-NAME` `VALUE_0001: the A2L declares that name more than once`, `5` `A2L-DEF-BYTES`), its `140` arrays, curves and maps `A2L-DEF-ELEMENTS`
 examples: (holds from Inc 2, R-A2L-040/def-1) V171 `ASAM.C.SCALAR.SWORD.IDENTICAL`, image 34 12 → stored `4660`, text `4660`
 
 encode_definition
 req: R-A2L-DEF.120, R-A2L-DEF.25
 in: Definition definition; dict a2l_data; str text; Mapping[int, int] image
 out: Encoded | Refusal result
-func: changed. was: Inc 2's encode order (1) … (8). / now: (1) the definition's refusal; (1b) kind `array`, `curve` or `map` → `A2L-DEF-ELEMENTS` (the R-A2L-DEF.120 message); then Inc 2's (2) … (8) unchanged. `encode_values` calls it once per edited element on that element's definition (kind number or enum).
+func: changed (3b; it is 2b's node). was: Inc 2's encode order (1) … (10) (step 9 the shared-bytes refusal of R-A2L-DEF.138). / now: (1) the definition's refusal; (1b) kind `array`, `curve` or `map` → `A2L-DEF-ELEMENTS` (the R-A2L-DEF.120 message); then Inc 2's (2) … (10) unchanged. `encode_values` calls it once per edited element on that element's definition (kind number or enum); that definition carries its object's `shared_with` (a `replace`), so step 9 refuses the element of an object that shares bytes, `<name>` its element name and `<address>` its own address (a reading for 3b's re-review, `../E2-rulings.md`).
 module: s19_app/tui/a2l_definition.py
 examples: (R-A2L-DEF.120/2) V171 `…MATRIX_DIM_3_4.ROW_DIR`, `5` → `A2L-DEF-ELEMENTS` `ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR: it holds 12 values — decode and encode it value by value`; no bytes
 examples: (holds from Inc 2, R-A2L-DEF.41/2) V171 `ASAM.C.SCALAR.SWORD.IDENTICAL`, `  -5 ` → `Encoded(0x810004, FB FF, ())`
@@ -222,24 +274,25 @@ examples: (holds from Inc 2, R-A2L-DEF.41/2) V171 `ASAM.C.SCALAR.SWORD.IDENTICAL
 
 _conversion_fields
 req: R-A2L-DEF.81, R-A2L-DEF.102, R-A2L-DEF.103
-in: str name; str | None method_name; dict a2l_data
+in: str name; str | None method_name; dict compu_methods_by_name; dict compu_tables_by_name
 out: tuple[dict, Refusal | None] conversion
-func: new (E2-3: factored out of Inc 2's `describe_definition`, so an object and each axis read a method one way). `method_name` `None` or `NO_COMPU_METHOD` → fields `conversion_type` `None`, `kind` `number`, no table, refusal `None`. Else `_read_method_record(method_name, sections)`; `None` → `A2L-DEF-METHOD` `<name>: the conversion method <method> is not declared in the A2L`; a type word outside IDENTICAL, LINEAR, RAT_FUNC, TAB_INTP, TAB_NOINTP, TAB_VERB → `A2L-DEF-CONVERSION`; TAB_VERB → `kind` `enum`, the COMPU_TAB_REF word as `enum_table`, `_read_enum_table` → `None` → `A2L-DEF-TABLE`, no entries → `A2L-DEF-TABLE-EMPTY`. Gives the fields `conversion_type`, `kind`, `record`, `record_format`, `record_unit`, `enum_table`, `enum_entries`, `default_text` and the first refusal (Inc 2's order: METHOD, CONVERSION, TABLE, TABLE-EMPTY), `<name>` as given.
+func: new (E2-3: factored out of Inc 2's `describe_definitions`, so an object and each axis read a method one way; rebased: lookups in the walk's maps, E3A-32). `method_name` `None` or `NO_COMPU_METHOD` → fields `conversion_type` `None`, `kind` `number`, `coeffs_linear` / `coeffs` / `compu_tab_ref` `None`, no table, refusal `None`. Else `_read_method_record(method_name, compu_methods_by_name)`; `None` → `A2L-DEF-METHOD` `<name>: the conversion method <method> is not declared in the A2L`; a type word outside IDENTICAL, LINEAR, RAT_FUNC, TAB_INTP, TAB_NOINTP, TAB_VERB → `A2L-DEF-CONVERSION`; TAB_VERB → `kind` `enum`, the COMPU_TAB_REF word as `enum_table`, `_read_enum_table(enum_table, compu_tables_by_name)` → `None` → `A2L-DEF-TABLE`, no entries → `A2L-DEF-TABLE-EMPTY`. Gives the fields `conversion_type`, `kind`, `coeffs_linear`, `coeffs`, `compu_tab_ref` (the record's words, E3A-03: an axis's points definition carries its own method's), `record_format`, `record_unit`, `enum_table`, `enum_entries`, `default_text` and the first refusal (Inc 2's order: METHOD, CONVERSION, TABLE, TABLE-EMPTY), `<name>` as given, messages as R-A2L-DEF.137.
 module: s19_app/tui/a2l_definition.py
 examples: (R-A2L-DEF.103/1) `CA.X`, `CM_GONE` → refusal `A2L-DEF-METHOD` `CA.X: the conversion method CM_GONE is not declared in the A2L`
 examples: (R-A2L-DEF.103/1 neg) mutant: the object's name passed for an axis → `CA: the conversion method CM_GONE is not declared in the A2L` → RED
 examples: (R-A2L-DEF.103/2) `MA.Y`, `CM_V` (`TAB_VERB "%.0" ""`, no COMPU_TAB_REF) → `A2L-DEF-TABLE` `MA.Y: the table (none) of CM_V is not declared in the A2L`
 examples: (R-A2L-DEF.102/1) `ASAM.C.MAP.STD_AXIS.STD_AXIS.Y`, `CM.TAB_VERB.NO_DEFAULT_VALUE` → kind `enum`, enum table `CM.TAB_VERB.NO_DEFAULT_VALUE.REF`, refusal `None` (V171 `:3091-3094`)
 examples: (R-A2L-DEF.81/1, /2) `VC`, `CM_GONE` → `VC: the conversion method CM_GONE is not declared in the A2L`; `VT`, `CM_V` with `COMPU_TAB_REF VT_GONE` → `VT: the table VT_GONE of CM_V is not declared in the A2L`
-examples: (holds from Inc 2, R-A2L-DEF.11/1, .12/1, .13/1, .17/1) the same inputs give the same refusals through `describe_definition`
+examples: (holds from Inc 2, R-A2L-DEF.11/1, .12/1, .13/1, .17/1) the same inputs give the same refusals through `describe_definitions`
+examples: (R-A2L-DEF.102/4, rebased) INLINE3 COM_AXIS naming `CM_A` (`CM(LINEAR 2 0)`) → `coeffs_linear` (`2.0`, `0.0`) — the axis method's, not the axis object's `CM_B` (`3`, `0`) — so `_decode_stored` converts the points without `sections` (E3A-03)
 
 _describe_array
-req: R-A2L-DEF.67, R-A2L-DEF.68, R-A2L-DEF.69, R-A2L-DEF.70, R-A2L-DEF.71, R-A2L-DEF.72, R-A2L-DEF.73, R-A2L-DEF.74, R-A2L-DEF.75, R-A2L-DEF.76, R-A2L-DEF.77, R-A2L-DEF.78, R-A2L-DEF.79, R-A2L-DEF.80, R-A2L-DEF.81, R-A2L-DEF.82, R-A2L-DEF.83, R-A2L-DEF.89, R-A2L-DEF.91, R-A2L-DEF.103, R-A2L-DEF.104, R-A2L-DEF.7
-in: dict tag; dict | None section; dict a2l_data; Definition base
+req: R-A2L-DEF.67, R-A2L-DEF.68, R-A2L-DEF.69, R-A2L-DEF.70, R-A2L-DEF.71, R-A2L-DEF.72, R-A2L-DEF.73, R-A2L-DEF.74, R-A2L-DEF.75, R-A2L-DEF.76, R-A2L-DEF.77, R-A2L-DEF.78, R-A2L-DEF.79, R-A2L-DEF.80, R-A2L-DEF.81, R-A2L-DEF.82, R-A2L-DEF.83, R-A2L-DEF.89, R-A2L-DEF.91, R-A2L-DEF.103, R-A2L-DEF.104, R-A2L-DEF.7.1, R-A2L-DEF.7.2
+in: dict tag; dict | None section; dict a2l_data; Definition base; dict maps
 out: Definition definition
-func: new. Builds an array, curve or map in the *array refusal order*, each step filling its fields when its inputs exist and the definition keeping the first refusal: (1) MATRIX_DIM: words malformed → `A2L-DEF-MATRIX` `<name>: MATRIX_DIM <dims> is not 1 to 3 whole numbers of at least 1`; (1b, E2-1 PROPOSED) a MEASUREMENT array without a datatype → `A2L-DEF-DATATYPE`; (2) VAL_BLK, curve, map: `_read_record_layout(tag record layout, a2l_data, name)`: `None` → `A2L-DEF-LAYOUT` `<name>: the record layout <layout> is not declared in the A2L`; a refusal (positions, parts, modes, component datatypes) passes; no FNC_VALUES → `A2L-DEF-LAYOUT-VALUES` `<name>: the record layout <layout> holds no FNC_VALUES`; `datatype` and `index_mode` from FNC_VALUES. A MEASUREMENT: `datatype` the header's, `index_mode` its LAYOUT word else `ROW_DIR`, no layout; (3) curve, map: not 1 / 2 AXIS_DESCR children → `A2L-DEF-AXES` `<name>: a <kind> needs <m> axes and it declares <n>`; `_read_axis(name, letter, axis section, layout, a2l_data)` for X then Y (a refusal passes); `shape` = the point counts, X first. Array: `shape` = `_array_shape(tag, section, datatype, matrix)`; (4) three dimensions and COLUMN_DIR → `A2L-DEF-INDEX-MODE` `<name>: the system cannot read COLUMN_DIR in three dimensions`; (5) `element_count` = the product of `shape`; VAL_BLK, curve, map: `_place_components(layout, shape)` → `values_offset`, STD axes' `offset` / `count_offset` / `count_datatype` / `fixed_count`; `_check_module_alignment` on the layout and on each COM axis object's layout → `A2L-DEF-ALIGNMENT` `<name>: <component> of the record layout <layout> lies at offset <a>, or at <b> under the MOD_COMMON alignment`; `byte_length` = element count × the datatype's size (array, R-A2L-DEF.74) or the walk's end (curve, map, R-A2L-DEF.75); (6) `_array_shape`'s `A2L-DEF-SHAPE` or `A2L-DEF-LENGTH`; (7) no address, or no byte length → `A2L-DEF-ADDRESS` (R-A2L-DEF.7); (8) the values' refusals (R-A2L-DEF.81): the conversion refusal of `base` (`_conversion_fields`), then a bit mask `_check_bit_mask` rejects on `datatype` → `A2L-DEF-MASK`; (9) the axis points' refusals, X then Y (`points.refusal`, R-A2L-DEF.103). Returns `base` with the array fields and that refusal.
+func: new. Builds an array, curve or map in the *array refusal order*, each step filling its fields when its inputs exist and the definition keeping the first refusal: (1) MATRIX_DIM: words malformed → `A2L-DEF-MATRIX` `<name>: MATRIX_DIM <dims> is not 1 to 3 whole numbers of at least 1`; (1b, E2-1 accepted) a MEASUREMENT array without a datatype → `A2L-DEF-DATATYPE`; (2) VAL_BLK, curve, map: `_read_record_layout(tag record layout, a2l_data, name)`: `None` → `A2L-DEF-LAYOUT` `<name>: the record layout <layout> is not declared in the A2L`; a refusal (positions, parts, modes, component datatypes) passes; no FNC_VALUES → `A2L-DEF-LAYOUT-VALUES` `<name>: the record layout <layout> holds no FNC_VALUES`; `datatype` and `index_mode` from FNC_VALUES. A MEASUREMENT: `datatype` the header's, `index_mode` its LAYOUT word else `ROW_DIR`, no layout; (3) curve, map: not 1 / 2 AXIS_DESCR children → `A2L-DEF-AXES` `<name>: a <kind> needs <m> axes and it declares <n>`; `_read_axis(name, letter, axis section, layout, a2l_data, maps)` for X then Y (a refusal passes); `shape` = the point counts, X first. Array: `shape` = `_array_shape(tag, section, datatype, matrix)`; (4) three dimensions and COLUMN_DIR → `A2L-DEF-INDEX-MODE` `<name>: the system cannot read COLUMN_DIR in three dimensions`; (5) `element_count` = the product of `shape`; VAL_BLK, curve, map: `_place_components(layout, shape)` → `values_offset`, STD axes' `offset` / `count_offset` / `count_datatype` / `fixed_count`; `_check_module_alignment` on the layout (with `_module_common(section, maps["mod_common_of"])`) and on each COM axis object's layout (with its axis object's) → `A2L-DEF-ALIGNMENT` `<name>: <component> of the record layout <layout> lies at offset <a>, or at <b> under the MOD_COMMON alignment`; `byte_length` = element count × the datatype's size (array, R-A2L-DEF.74) or the walk's end (curve, map, R-A2L-DEF.75); (6) `_array_shape`'s `A2L-DEF-SHAPE` or `A2L-DEF-LENGTH`; (7) no address, or no byte length → `A2L-DEF-ADDRESS` `<name>: the object has no address or no length` (R-A2L-DEF.7.1); then Inc 2's span bounds on the address and the byte length (R-A2L-DEF.7.2: below 1 or above 1,048,576 bytes, a negative address, or a last byte above 0xFFFFFFFF) → `A2L-DEF-ADDRESS` `<name>: its span of <length> bytes at <address> cannot be read`; (8) the values' refusals (R-A2L-DEF.81): the conversion refusal of `base` (`_conversion_fields`), then the mask refusal `describe_definitions` recorded while reading the object record (2a's R-A2L-DEF.19 clauses; 2b's join when 2b lands), or `_check_bit_mask` false on `datatype` → `A2L-DEF-MASK` `<name>: the bit mask <mask> cannot be applied to <datatype>`; (9) the axis points' refusals, X then Y (`points.refusal`, R-A2L-DEF.103). Returns `dataclasses.replace(base, …)` with the array fields and that refusal (every Inc 2 field kept, E3A-22).
 module: s19_app/tui/a2l_definition.py
-examples: (R-A2L-DEF.67/1, .73/1, .74/1, .77/1, .7/arr-1) V171 `ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR` → shape `(3, 4)`, element count `12`, byte length `24`, datatype `SWORD`, index mode `ROW_DIR`, values offset `0`, record layout `RL.FNC.SWORD.ROW_DIR`, refusal `None` (base: matrix_dim `3`, length `None`, element count `1`, B3 P1, B1 line 12)
+examples: (R-A2L-DEF.67/1, .73/1, .74/1, .77/1, .7.1/arr-1) V171 `ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR` → shape `(3, 4)`, element count `12`, byte length `24`, datatype `SWORD`, index mode `ROW_DIR`, values offset `0`, record layout `RL.FNC.SWORD.ROW_DIR`, refusal `None` (base: matrix_dim `3`, length `None`, element count `1`, B3 P1, B1 line 12)
 examples: (R-A2L-DEF.67/1 neg) mutant: the first number only (`a2l.py`'s) → shape `(3,)` → RED
 examples: (R-A2L-DEF.77/2) `…MATRIX_DIM_3_4.COLUMN_DIR` → datatype `SWORD`, index mode `COLUMN_DIR`, values offset `0`
 examples: (R-A2L-DEF.67/2) `…MATRIX_DIM_6.ROW_DIR` → shape `(6,)`, byte length `12`
@@ -272,7 +325,7 @@ examples: (R-A2L-DEF.83/1) INLINE3 `CF` (layout `RL_AX` = `AXIS_PTS_X 1 UBYTE IN
 examples: (R-A2L-DEF.91/1 … /3) INLINE3 CURVE `C2` with two `STD(2)` axes → `A2L-DEF-AXES` `C2: a CURVE needs 1 axes and it declares 2`; MAP `M1` with one → `M1: a MAP needs 2 axes and it declares 1`; CURVE `C0` with none → `C0: a CURVE needs 1 axes and it declares 0`
 examples: (R-A2L-DEF.91/2 neg) mutant: a MAP's single axis used as X with Y of count 1 → shape `(n, 1)` → RED
 examples: (R-A2L-DEF.104/2, /3) INLINE3 `VQ` (`MATRIX_DIM 0`, layout `RL_GONE`) → `A2L-DEF-MATRIX`; a CURVE with a RES_AXIS whose layout holds `RESERVED 2 BYTE` → `A2L-DEF-LAYOUT-PART`
-examples: (R-A2L-DEF.7/arr-2) INLINE3 UBYTE MEASUREMENT `MA0` (`MATRIX_DIM 4`, no ECU_ADDRESS) → `A2L-DEF-ADDRESS` `MA0: the object has no address or no length`, shape `(4,)`
+examples: (R-A2L-DEF.7.1/arr-2) INLINE3 UBYTE MEASUREMENT `MA0` (`MATRIX_DIM 4`, no ECU_ADDRESS) → `A2L-DEF-ADDRESS` `MA0: the object has no address or no length`, shape `(4,)`
 examples: (R-A2L-DEF.89/1, /2) V171 `ASAM.C.CURVE.STD_AXIS` → `A2L-DEF-ALIGNMENT` `ASAM.C.CURVE.STD_AXIS: FNC_VALUES of the record layout RL.CURVE.SWORD.SBYTE.DECR lies at offset 9, or at 10 under the MOD_COMMON alignment`; `ASAM.C.MAP.STD_AXIS.STD_AXIS` → `ASAM.C.MAP.STD_AXIS.STD_AXIS: FNC_VALUES of the record layout RL.MAP.SWORD.SBYTE.SBYTE.INCR lies at offset 11, or at 12 under the MOD_COMMON alignment` (B3 P3, P5)
 examples: (AT-B103-I3-1, build) V171's 40 VAL_BLK, MATRIX_DIM MEASUREMENT, CURVE, MAP, CUBOID and CUBE_4 objects → 11 arrays, 6 curves and 3 maps with no refusal; 8 curves and 5 maps `A2L-DEF-ALIGNMENT` (every STD_AXIS record: `…CURVE.STD_AXIS`, `.DISCRETE`, `ASAM.C.CURVE_AXIS`, the two MONOTONY curves, `DEPENDENT.CURVE_1 … _3`; `…MAP.STD_AXIS.STD_AXIS`, `.DISCRETE`, `DEPENDENT.MAP_1 … _3`); 2 curves `A2L-DEF-AXIS-KIND` (`CURVE_AXIS`, `RES_AXIS`); 5 `A2L-DEF-KIND` (3 CUBOID, 2 CUBE_4) (B3 P5 tally)
 examples: (AT-B103-I3-3, build) C08 `firmware.a2l` and `firmware_issues.a2l` → each `60` VAL_BLK (element count `128`), `60` CURVE (`32`), `20` MAP (`64`), `0` refusals (B3 P7)
@@ -347,11 +400,11 @@ examples: (holds on base) V171 `RL.CURVE.SWORD.SBYTE.DECR`, `(8,)` → `0`, `1`,
 
 _check_module_alignment
 req: R-A2L-DEF.89
-in: dict layout; tuple[int, ...] counts; dict section; dict a2l_data
+in: dict layout; tuple[int, ...] counts; dict | None mod_common
 out: tuple[str, int, int] | None moved
-func: new (D-7 C). `_module_common(section, sections)`'s ALIGNMENT lines (whole numbers of at least 1; others left out, E2-7) for the classes the layout declares none of; none → `None`. Else `_place_components` on the layout with those lines added; the first component in position order whose offset differs → (component, offset under the layout's lines, offset under MOD_COMMON's); none differs → `None`. `_describe_array` writes the message. (E1's slice had `Refusal | None`; the message needs the object's name, E2-10.)
+func: new (D-7 C; rebased: it takes the MOD_COMMON that `_module_common` looked up, E3A-32). `mod_common`'s ALIGNMENT lines (whole numbers of at least 1; others left out, E2-7) for the classes the layout declares none of; none → `None`. Else `_place_components` on the layout with those lines added; the first component in position order whose offset differs → (component, offset under the layout's lines, offset under MOD_COMMON's); none differs → `None`. `_describe_array` writes the message. (E1's slice had `Refusal | None`; the message needs the object's name, E2-10.)
 module: s19_app/tui/a2l_definition.py
-examples: (R-A2L-DEF.89/1) V171 `RL.CURVE.SWORD.SBYTE.DECR`, `(8,)`, `ASAM.C.CURVE.STD_AXIS`'s section → (`FNC_VALUES`, `9`, `10`) (B3 P3: end `25` vs `26`)
+examples: (R-A2L-DEF.89/1) V171 `RL.CURVE.SWORD.SBYTE.DECR`, `(8,)`, `ASAM.C.CURVE.STD_AXIS`'s MOD_COMMON → (`FNC_VALUES`, `9`, `10`) (B3 P3: end `25` vs `26`)
 examples: (R-A2L-DEF.89/1 neg) mutant: the check left out → a definition with values at `9` → RED
 examples: (R-A2L-DEF.89/2) V171 `RL.MAP.SWORD.SBYTE.SBYTE.INCR`, `(4, 5)` → (`FNC_VALUES`, `11`, `12`)
 examples: (R-A2L-DEF.89/3) C08 `CURVE_0001` (`RL_U16`, `(32,)`, MOD_COMMON `ALIGNMENT_WORD 2`) → `None` (FNC_VALUES at `0` both ways)
@@ -359,19 +412,20 @@ examples: (holds on base) V171 `RL.AXIS_PTS.SBYTE.DECR`, `(8,)` (UBYTE, SBYTE) �
 
 _module_common
 req: R-A2L-DEF.89, R-A2L-DEF.114
-in: dict section; list[dict] sections
+in: dict section; dict mod_common_of
 out: dict | None mod_common
-func: new (E2-3, E2-8). The MOD_COMMON child of the MODULE in whose subtree `section` lies, found by identity in a pre-order walk of `sections` (never by line numbers: V171's MODULE has no `end_line`, B3 P0); `None` when the section lies under no MODULE or the MODULE has no MOD_COMMON. Read by `_check_module_alignment` (its ALIGNMENT lines) and by `_read_axis` (the module byte order of an axis object, R-A2L-026).
+func: new (E2-3, E2-8; rebased, E3A-32). A lookup by identity, `mod_common_of[id(section)]`, in the map that `describe_definitions`'s one walk builds: the MOD_COMMON child of the MODULE in whose subtree `section` lies, carried down the pre-order walk from the MODULE's children (never by line numbers: V171's MODULE has no `end_line`, B3 P0; the E2 graph walked the tree per call, about 4 ms each on software_a, E3A-32); `None` when the section lies under no MODULE or the MODULE has no MOD_COMMON. Read by `_check_module_alignment` (its ALIGNMENT lines) and by `_read_axis` (the module byte order of an axis object, R-A2L-026).
 module: s19_app/tui/a2l_definition.py
 examples: (R-A2L-DEF.89/1) V171, the section of `ASAM.C.CURVE.STD_AXIS` → the MOD_COMMON holding `BYTE_ORDER MSB_LAST`, `ALIGNMENT_BYTE 1`, `ALIGNMENT_WORD 2`, `ALIGNMENT_LONG 4`, `ALIGNMENT_FLOAT32_IEEE 4`, `ALIGNMENT_FLOAT64_IEEE 4` (B3 P2)
 examples: (R-A2L-DEF.114/2) INLINE3, the section of `AXO` → the MOD_COMMON holding `BYTE_ORDER MSB_FIRST` and no ALIGNMENT line
 examples: (holds on base) V171's 28 MEASUREMENT sections never closed (one-line `/begin IF_DATA … /end IF_DATA`, E2-8) nest later objects under them; the walk still finds the one MODULE above them (B3 P0)
+examples: (rebased, cost) SOFTA: the one walk files `14,056` sections under their MOD_COMMON (`i3reb-cost-probe` Q2)
 
 _read_axis
 req: R-A2L-DEF.90, R-A2L-DEF.92, R-A2L-DEF.93, R-A2L-DEF.94, R-A2L-DEF.95, R-A2L-DEF.96, R-A2L-DEF.97, R-A2L-DEF.98, R-A2L-DEF.99, R-A2L-DEF.100, R-A2L-DEF.101, R-A2L-DEF.102, R-A2L-DEF.114, R-A2L-DEF.116, R-A2L-DEF.117, R-A2L-019
-in: str name; str letter; dict axis_section; dict layout; dict a2l_data
+in: str name; str letter; dict axis_section; dict layout; dict a2l_data; dict maps
 out: AxisDefinition | Refusal axis
-func: new (D-4 A, D-8 A, D-9, D-10 A, D-11 A). The axis header = `_flatten_body_tokens(axis lines)` (child sections not in it); `<axis name>` = `<name>.<letter>`. In this order (E2-4): kind word not STD_AXIS, FIX_AXIS, COM_AXIS → `A2L-DEF-AXIS-KIND` `<axis name>: the system cannot read an axis of the kind <word>`. COM: no AXIS_PTS_REF, `_find_axis_object` `None`, or its address word (`int(word, 0)`) not a number → `A2L-DEF-AXIS-REF` `<axis name>: the A2L declares no axis object <ref> with an address`; its layout (header word 5) through `_read_record_layout(…, name)`: `None` or no AXIS_PTS_X → `A2L-DEF-AXIS-LAYOUT` `<axis name>: the axis object <ref> has no record layout with AXIS_PTS_X` (its other refusals pass). The *max axis points* — the header's (STD, FIX) or the axis object's (COM, word 8) — not a whole number of at least 1 → `A2L-DEF-AXIS-MAX` `<axis name>: the axis declares no point count the system can read`; else `point_count`. FIX: `_fixed_points` `None` → `A2L-DEF-AXIS-FIX` `<axis name>: the fixed axis gives no points`; not `point_count` of them → `A2L-DEF-AXIS-FIX-COUNT` `<axis name>: the fixed axis gives <k> points and declares <n>`. The object's layout holds `AXIS_PTS_<letter>` and the kind is not STD → `A2L-DEF-LAYOUT-AXIS` `<name>: the record layout <layout> holds AXIS_PTS_<letter> for an axis of the kind <word>`; STD without it → `has_points` `False`. The fixed count (the object's layout; the axis object's for COM) 0 or above `point_count` → `A2L-DEF-AXIS-CURRENT` `<axis name>: the record holds <c> points, outside 1 to <n>`; below → `A2L-DEF-AXIS-PARTIAL` `<axis name>: the record holds <c> of its <n> points — a record with fewer points than its maximum is not supported`. Then `points` (the pinned element Definition) with `_conversion_fields(<axis name>, the header's method word, a2l_data)`, the header's limits and FORMAT, the component's datatype; the MONOTONY word; COM: the axis object's address, its record placed by `_place_components(its layout, (point_count,))` → `offset`, `count_offset`, `count_datatype` in that record, `axis_object_record` with its byte order (its BYTE_ORDER line, else its layout's, else `_module_common`'s, else `little`).
+func: new (D-4 A, D-8 A, D-9, D-10 A, D-11 A; rebased: lookups in `maps`, E3A-32). The axis header = `_flatten_body_tokens(axis lines)` (child sections not in it); `<axis name>` = `<name>.<letter>`. In this order (E2-4): kind word not STD_AXIS, FIX_AXIS, COM_AXIS → `A2L-DEF-AXIS-KIND` `<axis name>: the system cannot read an axis of the kind <word>`. COM: no AXIS_PTS_REF, `_find_axis_object(ref, maps["axis_pts_by_name"])` `None`, or its address word (`int(word, 0)`) not a number → `A2L-DEF-AXIS-REF` `<axis name>: the A2L declares no axis object <ref> with an address`; its layout (header word 5) through `_read_record_layout(…, name)`: `None` or no AXIS_PTS_X → `A2L-DEF-AXIS-LAYOUT` `<axis name>: the axis object <ref> has no record layout with AXIS_PTS_X` (its other refusals pass). The *max axis points* — the header's (STD, FIX) or the axis object's (COM, word 8) — not a whole number of at least 1 → `A2L-DEF-AXIS-MAX` `<axis name>: the axis declares no point count the system can read`; else `point_count`. FIX: `_fixed_points` `None` → `A2L-DEF-AXIS-FIX` `<axis name>: the fixed axis gives no points`; not `point_count` of them → `A2L-DEF-AXIS-FIX-COUNT` `<axis name>: the fixed axis gives <k> points and declares <n>`. The object's layout holds `AXIS_PTS_<letter>` and the kind is not STD → `A2L-DEF-LAYOUT-AXIS` `<name>: the record layout <layout> holds AXIS_PTS_<letter> for an axis of the kind <word>`; STD without it → `has_points` `False`. The fixed count (the object's layout; the axis object's for COM) 0 or above `point_count` → `A2L-DEF-AXIS-CURRENT` `<axis name>: the record holds <c> points, outside 1 to <n>`; below → `A2L-DEF-AXIS-PARTIAL` `<axis name>: the record holds <c> of its <n> points — a record with fewer points than its maximum is not supported`. Then `points` (the pinned element Definition) with `_conversion_fields(<axis name>, the header's method word, maps["compu_methods_by_name"], maps["compu_tables_by_name"])` (its `coeffs_linear`, `coeffs`, `compu_tab_ref` included; every field stated, E3A-22), the header's limits and FORMAT, the component's datatype; the MONOTONY word; COM: the axis object's address, its record placed by `_place_components(its layout, (point_count,))` → `offset`, `count_offset`, `count_datatype` in that record, `axis_object_record` with its byte order (its BYTE_ORDER line, else its layout's, else that of `_module_common(its section, maps["mod_common_of"])`, else `little`).
 module: s19_app/tui/a2l_definition.py
 examples: (R-A2L-DEF.92/1, /2) V171 `ASAM.C.CURVE.CURVE_AXIS` → `A2L-DEF-AXIS-KIND` `ASAM.C.CURVE.CURVE_AXIS.X: the system cannot read an axis of the kind CURVE_AXIS`; `ASAM.C.CURVE.RES_AXIS` → `ASAM.C.CURVE.RES_AXIS.X: the system cannot read an axis of the kind RES_AXIS` (B3 P5)
 examples: (R-A2L-DEF.92/2 neg) mutant: RES_AXIS read as COM_AXIS through its AXIS_PTS_REF → an axis object `ASAM.C.AXIS_PTS.RESCALE` → RED
@@ -405,9 +459,9 @@ examples: (R-A2L-DEF.90/2) UPD1 `Map_InternalAxis` → Y fixed count `3`, shape 
 
 _find_axis_object
 req: R-A2L-DEF.94, R-A2L-DEF.96, R-A2L-DEF.97, R-A2L-DEF.113
-in: str ref; dict a2l_data
+in: str ref; dict axis_pts_by_name
 out: tuple[dict, list[str]] | None found
-func: new (BL-I3-1 wrapped). The first section of `_collect_sections_by_name(a2l_data["sections"], "AXIS_PTS")` whose *AXIS_PTS header* (`_flatten_body_tokens([meta] + lines)`) starts with `ref`, and that header; `None` when none. The tags are not searched (an AXIS_PTS section is not a tag).
+func: new (BL-I3-1 wrapped; rebased, E3A-32). A lookup in the `axis_pts_by_name` map that `describe_definitions`'s one walk builds (each AXIS_PTS section in file order, filed under the first word of its *AXIS_PTS header*, `_flatten_body_tokens([meta] + lines)`): the first section of `ref` and that header; `None` when the map has no `ref`. (The E2 graph walked `_collect_sections_by_name(sections, "AXIS_PTS")` per call: 3.96 ms each on software_a, E3A-32.) The tags are not searched (an AXIS_PTS section is not a tag).
 module: s19_app/tui/a2l_definition.py
 examples: (R-A2L-DEF.113/1) V171 `ASAM.C.AXIS_PTS.UBYTE_8` → header `ASAM.C.AXIS_PTS.UBYTE_8`, `Common axis for `, `0x810340`, `ASAM.M.SCALAR.UBYTE.IDENTICAL`, `RL.AXIS_PTS.SBYTE.DECR`, `0`, `CM.IDENTICAL`, `8`, `0`, `255`, … (B3 P3)
 examples: (R-A2L-DEF.113/1, holds on base) the same name among the tags → `False` (B3 P3; why `a2l.py` never resolves it, BL-I3-1)
@@ -431,7 +485,7 @@ _element_definition
 req: R-A2L-DEF.105, R-A2L-DEF.121, R-A2L-DEF.122
 in: Definition definition; tuple[int, ...] | tuple[str, int] position
 out: Definition element
-func: new. An element index → `definition` with `name` = `element_name(definition, index)`, `kind` `enum` for a TAB_VERB conversion else `number`, `address` = `definition.address + _element_offset(definition, index)`, `byte_length` = the datatype's size, the array fields at their defaults, `refusal` `None`. An axis point `(letter, k)` → that axis's `points` with `name` = `element_name(…)` and `address` = the object's address (STD) or the axis object's (COM) + `_point_offset(axis, k)`; `None` for FIX.
+func: new (rebased: a `dataclasses.replace`, so every other field — the method fields `coeffs_linear`, `coeffs`, `compu_tab_ref` and 2b's `shared_with` included — is the object's, E3A-03, E3A-22). An element index → `definition` with `name` = `element_name(definition, index)`, `kind` `enum` for a TAB_VERB conversion else `number`, `address` = `definition.address + _element_offset(definition, index)`, `byte_length` = the datatype's size, the array fields at their defaults, `refusal` `None`. An axis point `(letter, k)` → that axis's `points` (a `replace` likewise) with `name` = `element_name(…)` and `address` = the object's address (STD) or the axis object's (COM) + `_point_offset(axis, k)`; `None` for FIX.
 module: s19_app/tui/a2l_definition.py
 examples: (R-A2L-DEF.105/1) V171 `…MATRIX_DIM_3_4.ROW_DIR`, `(1, 0)` → name `ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR[1,0]`, kind `number`, address `0x810102`, byte length `2`, datatype `SWORD`, limits `-400`..`400`, extended `-1000`..`1000`, display format `%8.4`
 examples: (R-A2L-DEF.107/1) `…COLUMN_DIR`, `(1, 0)` → address `0x810128`
@@ -452,7 +506,7 @@ examples: (R-A2L-DEF.121/1 neg) mutant: the object's name used → `V: 'abc' is 
 ### New nodes: decoding
 
 decode_values
-req: R-A2L-DEF.105, R-A2L-DEF.106, R-A2L-DEF.107, R-A2L-DEF.119, R-A2L-DEF.121, R-A2L-DEF.26, R-A2L-DEF.58, R-A2L-DEF.131, R-A2L-DEF.132
+req: R-A2L-DEF.105, R-A2L-DEF.106, R-A2L-DEF.107, R-A2L-DEF.119, R-A2L-DEF.121, R-A2L-DEF.26, R-A2L-DEF.58.1, R-A2L-DEF.131, R-A2L-DEF.132
 in: Definition definition; dict a2l_data; Mapping[int, int] image
 out: DecodedValues | Refusal result
 func: new (I-2). The definition's refusal; (a scalar kind: E2-5). The record `address … address + byte_length − 1`: `n` addresses not in the image → `A2L-DEF-BYTES` `<name>: <n> of its <length> bytes are not in the image` (Inc 2's message). Each axis, X then Y: `_decode_axis` (a refusal is the result). Then each element in element order: `_element_definition`, `_read_stored_value`, `_decode_stored` — a refusal in that element's place (R-A2L-DEF.119). `DecodedValues(values, axes)`. Reads `image` and `a2l_data` only.
@@ -476,7 +530,7 @@ examples: (R-A2L-DEF.134/1, .108/2) DEFC `MAP_DEF_0001` → axis X `224`, `577`,
 examples: (R-A2L-DEF.135/1) DEFC `VAL_BLK_DEF_0001` → (0,0) `36.9`, (1,0) `11.0`, (2,0) `31.8`, (0,1) `-20.7`, (1,1) `-19.8`, (2,1) `-10.7` (B3c R3)
 examples: (R-A2L-DEF.135/1 neg) mutant: read as COLUMN_DIR → `4` of `6` cells differ from the plan → RED (B3b Q6)
 examples: (AT-B103-I3-1, decode) V171 with the AT's image → the 20 objects with no refusal decode; the 3×4 twins read the same bytes in the two orders; `ASAM.C.CURVE.COM_AXIS`, `_2` and the COM/FIX maps read one axis `0` … `70`; the FIX curves `1` … `6`, `0` … `20`, `-1` … `10`
-examples: (R-A2L-DEF.58/arr-1) V171 with every record and both axis objects in the image: a deep copy of `a2l_data` and of the image before decoding every array, curve and map equals both after → `True`
+examples: (R-A2L-DEF.58.1/arr-1) V171 with every record and both axis objects in the image: a deep copy of `a2l_data` and of the image before decoding every array, curve and map equals both after → `True`
 
 _element_offset
 req: R-A2L-DEF.106, R-A2L-DEF.107
@@ -538,10 +592,10 @@ examples: (R-A2L-DEF.118/1 neg) mutant: missing points read as 0 (`_extract_raw_
 examples: (R-A2L-DEF.119/2) INLINE3 MAP with enum axis Y (`VT_E`), Y stored 1, 7 → Y[0] `ON`, Y[1] `7 (no text)`; every value decoded
 
 _decode_stored
-req: R-A2L-DEF.105, R-A2L-DEF.110, R-A2L-DEF.111, R-A2L-DEF.112, R-A2L-DEF.119
+req: R-A2L-DEF.105, R-A2L-DEF.110, R-A2L-DEF.111, R-A2L-DEF.112, R-A2L-DEF.119, R-A2L-DEF.137
 in: Definition definition; dict a2l_data; int | float | bytes stored
 out: Decoded | Refusal result
-func: new (slice #20: the second half of Inc 2's `decode_definition`, moved unchanged). Text → `Decoded(None, s, s)`, `s = _ascii_text(stored)`; enum → `Decoded(stored, the entry text or None, _enum_text(definition, stored))`; number → `value = stored` for `NO_COMPU_METHOD`, else `_apply_compu_method(stored, the record, a2l_data["compu_tabs_by_name"], (limits.lower, limits.upper))`; status `error` → `A2L-DEF-DECODE` `<name>: <conversion error>`; else `Decoded(stored, value, display_text(definition, value))`. The one place a FIX_AXIS point (a stored value with no bytes) becomes a `Decoded`.
+func: new (slice #20: the second half of Inc 2's `decode_definition`, moved unchanged). Text → `Decoded(None, s, s)`, `s = _ascii_text(stored)`; enum → `Decoded(stored, the entry text or None, _enum_text(definition, stored))`; number → `value = stored` for `NO_COMPU_METHOD`, else `_apply_compu_method(stored, the method record built from the definition's fields — `conversion_type`, `coeffs_linear`, `coeffs`, `compu_tab_ref` (never `_read_method_record` or `sections`, E3A-03; an axis point's are its axis method's), a2l_data["compu_tabs_by_name"], (limits.lower, limits.upper))`; status `error` → `A2L-DEF-DECODE` `<name>: <conversion error>`; else `Decoded(stored, value, display_text(definition, value))`; `Decoded.text` with U+FFFD as R-A2L-DEF.137 (Inc 2's rule, moved with the code). The one place a FIX_AXIS point (a stored value with no bytes) becomes a `Decoded`.
 module: s19_app/tui/a2l_definition.py
 examples: (R-A2L-DEF.111/1) `ASAM.C.CURVE.FIX_AXIS.PAR_DIST.X[0]` (`CM.IDENTICAL`, no datatype), stored `1` → `Decoded(1, 1, "1")`
 examples: (R-A2L-DEF.112/1) the PAR_LIST point `-1` → text `-1`
@@ -552,7 +606,7 @@ examples: (holds from Inc 2, R-A2L-054/def-1) C08 `VALUE_0019`, stored `12830` �
 ### New nodes: encoding
 
 encode_values
-req: R-A2L-DEF.121, R-A2L-DEF.122, R-A2L-DEF.123, R-A2L-DEF.124, R-A2L-DEF.125, R-A2L-DEF.126, R-A2L-DEF.127, R-A2L-DEF.128, R-A2L-DEF.129, R-A2L-DEF.130, R-A2L-DEF.131, R-A2L-DEF.132, R-A2L-DEF.58
+req: R-A2L-DEF.121, R-A2L-DEF.122, R-A2L-DEF.123, R-A2L-DEF.124, R-A2L-DEF.125, R-A2L-DEF.126, R-A2L-DEF.127, R-A2L-DEF.128, R-A2L-DEF.129, R-A2L-DEF.130, R-A2L-DEF.131, R-A2L-DEF.132, R-A2L-DEF.58.1
 in: Definition definition; dict a2l_data; Mapping[tuple[int, ...] | tuple[str, int], str] edit; Mapping[int, int] image
 out: Encoded | Refusal result
 func: new (I-2; D-4 A, D-5 A). The *array encode order*: (1) `decode_values` — a refusal is the result (R-A2L-DEF.124); (2) positions in edit order: not an element index of `shape` nor a point index of one of its axes → `A2L-DEF-INDEX` `<name>: <position> is not a value or axis point of it` (`<position>` = `element_name`); (3) the record = its image bytes; each edit in edit order: a FIX point → `A2L-DEF-AXIS-FIXED` `<axis point name>: the points of a fixed axis are not stored in the image`; a COM point → `A2L-DEF-AXIS-SHARED` `<axis point name>: the points of the common axis <ref> are not edited through <name>`; a point of an axis with no points → `A2L-DEF-AXIS-NONE` `<axis point name>: the record layout <layout> holds no points for this axis`; else `encode_definition(_element_definition(definition, position), a2l_data, text, the image under the record so far)` — a refusal is the result; its bytes go to the element's offset; its notices kept; (4) for axis X, then Y, when the edit changes one of its points: the stored points of the new record in point index order → `_breaking_point` → k → `A2L-DEF-MONOTONY` `<axis point name>: <point text> breaks the <rule> order of the axis` (point k's name, its display text decoded from the new record); (5) `Encoded(address, the record, notices)`. Reads `image` and `a2l_data`; writes neither.
@@ -592,7 +646,7 @@ examples: (R-A2L-DEF.132/1) every edit of .131/1 → `0` unedited elements or po
 examples: (R-A2L-DEF.132/1 neg) mutant: the whole record re-encoded from every element's display text → DEFC `VAL_BLK_DEF_0001` stores `738`, `220`, `636`, `-414`, `-396`, `-214` (`4` cells drift) → RED (B3c R3)
 examples: (AT-B103-I3-2) DEFC through the app's loaders: `MAP_DEF_0001` {(`X`, `1`): `600`} → bytes `02 58` at 0x800072, axis `224`, `600`, `648`, `909`; {(`X`, `2`): `100`} → `MAP_DEF_0001.X[2]: 100 breaks the STRICT_INCREASE order of the axis` (B3b Q6); the common-axis edit as /127/2
 examples: (AT-B103-I3-1, edit) V171: one value of each of the 20 decodable objects, its own decoded text plus 1 → applied, decoded: the new value there, every other value unchanged; the 3×4 twins' (1,0) edit lands at offsets 2 and 8
-examples: (R-A2L-DEF.58/arr-1, /arr-2) V171 and C08: one cell each edited to its own decoded text → deep copies of `a2l_data` and the image before equal both after → `True`
+examples: (R-A2L-DEF.58.1/arr-1, /arr-2) V171 and C08: one cell each edited to its own decoded text → deep copies of `a2l_data` and the image before equal both after → `True`
 
 _breaking_point
 req: R-A2L-DEF.129
@@ -689,10 +743,10 @@ examples: (holds on base, B1 P12b, P12c) a non-monotonic axis → accepted; `ASA
 ## Entities
 
 [Data: Definition]
-desc: I-2's frozen dataclass with Inc 3's six defaulted fields (pinned above). Built only by `describe_definition` (through `_describe_array` for the Inc 3 kinds) and by `_element_definition` (one element or point); read by every decode and encode node; consumers read it by field name.
+desc: I-2's frozen dataclass with Inc 3's six defaulted fields (pinned above). Built only by `describe_definitions` (through `_describe_array` for the Inc 3 kinds) and by `_element_definition` (one element or point); read by every decode and encode node; consumers read it by field name.
 
 [Data: AxisDefinition]
-desc: I-2's frozen dataclass of one axis (pinned above; `count_datatype` PROPOSED P-2); built by `_read_axis`, its offsets completed by `_describe_array`.
+desc: I-2's frozen dataclass of one axis (pinned above; `count_datatype` P-2, accepted); built by `_read_axis`, its offsets completed by `_describe_array`.
 
 [Data: DecodedAxis]
 desc: I-2 `DecodedAxis(letter, points)`; `points` `None` for an axis with no points (R-A2L-DEF.100).
@@ -704,7 +758,7 @@ desc: I-2 `DecodedValues(values, axes)`; `values` in element order, each a `Deco
 desc: the dict `_read_record_layout` gives: `name`, `components` (word tuples in position order), `alignment`, `fixed`; private to the module.
 
 [Data: a2l_data]
-desc: the `parse_a2l_file` payload; Inc 3 reads `tags`, `sections` (object lines, AXIS_DESCR and FIX_AXIS_PAR_LIST children, AXIS_PTS sections, MODULE / MOD_COMMON), `record_layouts_by_name` (lines, byte order), `compu_tabs_by_name`; never writes (R-A2L-DEF.58).
+desc: the `parse_a2l_file` payload; Inc 3 reads `tags`, `sections` (object lines, AXIS_DESCR and FIX_AXIS_PAR_LIST children; the AXIS_PTS sections and MODULE / MOD_COMMON only through the maps of `describe_definitions`'s one walk, E3A-32), `record_layouts_by_name` (lines, byte order), `compu_tabs_by_name`; never writes (R-A2L-DEF.58).
 
 [Data: image]
 desc: any `Mapping[int, int]` address → byte; read only; `Encoded` is applied by the caller.
@@ -718,11 +772,14 @@ desc: the 22 pinned digests (R-A2L-DEF.59); no Inc 3 node writes them.
 ## Edges
 
 [Data: a2l_data].sections ──▶ _read_matrix_dim
-[Data: a2l_data].sections ──▶ _find_axis_object
-[Data: a2l_data].sections ──▶ _module_common
+describe_definitions ──▶ _find_axis_object
+when: through `axis_pts_by_name`, built in the one walk of `sections` (E3A-32)
+describe_definitions ──▶ _module_common
+when: through `mod_common_of`, built in the one walk of `sections` (E3A-32)
 [Data: a2l_data].record_layouts_by_name ──▶ _read_record_layout
-[Data: a2l_data].sections ──▶ _conversion_fields
-describe_definition ──▶ [Data: Definition]
+describe_definitions ──▶ _conversion_fields
+when: through Inc 2's `compu_methods_by_name` and `compu_tables_by_name` (E3A-32)
+describe_definitions ──▶ [Data: Definition]
 _read_axis ──▶ [Data: AxisDefinition]
 [Data: image] ──▶ decode_values
 [Data: image] ──▶ _decode_axis
@@ -740,20 +797,20 @@ anchor: _describe_array
 seen: R-A2L-DEF.81/4 (`MF`: MEASUREMENT `FOO`, `ECU_ADDRESS 0x10`, `MATRIX_DIM 4`) expects `A2L-DEF-DATATYPE`; an array's byte length is element count × the datatype's size (R-A2L-DEF.74), so with no datatype there is no length and "address and length (.7)", which CTX-A2L-DEF places before "the values' refusals (.81)", gives `A2L-DEF-ADDRESS` first — the same shape as Inc 2's E2-6, but here no LENGTH line can fix the fixture (the length is computed, not read)
 cause: the array refusal order puts R-A2L-DEF.8's check among the values' refusals, after a step that needs the datatype
 effect: as written, R-A2L-DEF.81's `.8` alternative is unreachable for a MEASUREMENT array (a VAL_BLK's datatype is R-A2L-DEF.86's); /4 fails on a correct model
-decision: PROPOSED for E3 — the graph is written for it: a MEASUREMENT array's datatype (R-A2L-DEF.8) is checked right after MATRIX_DIM (.71) in the array refusal order (CTX-A2L-DEF gains that one item); /4 then holds as written. Alternative: keep the order and change /4's expected result to `A2L-DEF-ADDRESS` (and drop `.8` from R-A2L-DEF.81's text)
+decision: PROPOSED for E3 — the graph is written for it: a MEASUREMENT array's datatype (R-A2L-DEF.8) is checked right after MATRIX_DIM (.71) in the array refusal order (CTX-A2L-DEF gains that one item); /4 then holds as written. Alternative: keep the order and change /4's expected result to `A2L-DEF-ADDRESS` (and drop `.8` from R-A2L-DEF.81's text). Ruled: accepted (`../E2-rulings.md`)
 
 finding E2-2 the current count needs the count component's datatype, which AxisDefinition does not hold
 anchor: _current_count
 seen: R-A2L-DEF.115 reads NO_AXIS_PTS_X / _Y from the image; V171's count is UBYTE, DEFC's UWORD (B3b Q6), and the pinned `AxisDefinition` fields give the count's offset but not its datatype
 cause: the I-2 extension pinned by the orchestrator omits it
 effect: without it `_current_count` must re-read the layout from `a2l_data` at decode
-decision: PROPOSED P-2 (Interfaces): `count_datatype: str | None = None`, last, defaulted; the graph is written for it
+decision: PROPOSED P-2 (Interfaces): `count_datatype: str | None = None`, last, defaulted; the graph is written for it. Ruled: accepted (`../E2-rulings.md`)
 
 finding E2-3 two nodes beyond the slice
 anchor: _conversion_fields
-seen: an axis builds its points' definition from a method word exactly as an object does (R-A2L-DEF.102, .103 with the axis name); Inc 2's `describe_definition` does it inline. The axis object's byte order (R-A2L-026) and the MOD_COMMON alignment (R-A2L-DEF.89) both need the object's MODULE, which the section dict cannot give (no parent link)
+seen: an axis builds its points' definition from a method word exactly as an object does (R-A2L-DEF.102, .103 with the axis name); Inc 2's `describe_definitions` does it inline. The axis object's byte order (R-A2L-026) and the MOD_COMMON alignment (R-A2L-DEF.89) both need the object's MODULE, which the section dict cannot give (no parent link)
 cause: writing the examples of `_read_axis` and `_check_module_alignment`
-effect: `_conversion_fields` (new, factored from Inc 2's `describe_definition`, which keeps every example) and `_module_common` (new); the slice grows from 26 to 28 nodes
+effect: `_conversion_fields` (new, factored from Inc 2's `describe_definitions`, which keeps every example) and `_module_common` (new); the slice grows from 26 to 28 nodes
 decision: for E3 to accept with the graph; the alternative to `_conversion_fields` repeats Inc 2's METHOD → CONVERSION → TABLE → TABLE-EMPTY sequence inside `_read_axis` (two copies of one refusal order)
 
 finding E2-4 the axis checks run axis by axis
@@ -782,7 +839,7 @@ anchor: _read_record_layout
 seen: 0 tracked uses of each (C1 shapes, B3 P5/P6): a malformed FIX_AXIS_PAR / _PAR_DIST / _PAR_LIST word (→ `A2L-DEF-AXIS-FIX`); a FIX_NO_AXIS_PTS or ALIGNMENT line with a bad number, or a second line of one component (→ `A2L-DEF-LAYOUT-PART` naming it); an AXIS_PTS_<letter> component for an axis the object does not have, or in a VAL_BLK's layout (→ `A2L-DEF-LAYOUT-AXIS` with `<word>` `(none)`); a malformed NUMBER word (passed over: the LENGTH rule applies); a MEASUREMENT `LAYOUT` word other than ROW_DIR / COLUMN_DIR (→ `A2L-DEF-LAYOUT-MODE` with `<layout>` `(none)`, `<component>` `LAYOUT`); a malformed MOD_COMMON ALIGNMENT line (left out); a MEASUREMENT `MATRIX_DIM` that is malformed (an array, so R-A2L-DEF.71 refuses it, not a scalar); a record longer than `MAX_A2L_DECODE_BYTES` (no byte length → `A2L-DEF-ADDRESS`; the cap bounds the decode of a hostile MATRIX_DIM); a NO_AXIS_PTS component in the object's own layout for a COM axis (placed, not read)
 cause: the rows cover the tracked shapes
 effect: each is decided here, not by an implementer
-decision: for E3 (the security reviewer for the size cap); a ruling that wants rows sends them to E1
+decision: for E3 (the security reviewer for the size cap); a ruling that wants rows sends them to E1. Rebase: the size cap is now Inc 2's R-A2L-DEF.7.2 for an array (its byte length as computed, refused above 1,048,576 bytes); a curve or map whose walk stops past the cap has no byte length (.7.1). The hostile shapes Inc 3 adds are listed in `../E2-rulings.md` (rebase list)
 
 finding E2-8 V171's section tree nests 28 MEASUREMENTs
 anchor: _module_common
@@ -796,7 +853,7 @@ anchor: _read_axis
 seen: Inc 2's E2-10: one walk of software_a's sections costs 3.9 – 9.1 ms; an Inc 3 definition adds `_module_common` (one walk) and, per COM axis, `_find_axis_object` (one walk) and the alignment's second `_find_axis_object`
 cause: I-2 takes the parse payload, which has no index by name (pure module)
 effect: about 35 ms per COM_AXIS curve on software_a; Inc 6 must describe only the rows it shows (Inc 2's E2-10 A)
-decision: for E3 with Inc 2's E2-10
+decision: for E3 with Inc 2's E2-10. Rebased (Inc 2's E3A-01, E3A-32): every lookup is a map of `describe_definitions`'s one walk; software_a in one batch describe ≈ `0.995` s (Interfaces, *Lookups*), so Inc 6 may describe every row at once
 
 finding E2-10 deviations from the E1 slice
 anchor: _describe_array
@@ -813,7 +870,7 @@ effect: with 1, Inc 6 would show a refused array as one element — PE-D1 again
 decision: pinned `shape` `()` and `element_count` `0` for that case; Inc 6 reads `0` as unknown
 
 finding E2-12 E1 counts 25 refusal codes; the rows define 27
-anchor: describe_definition
+anchor: describe_definitions
 seen: `grep` over `01-requirements.md` gives 28 distinct codes in Inc 3's rows, `A2L-DEF-LENGTH` reused
 cause: a count in E1's rulings §1 and the slice
 effect: none on the design
@@ -839,3 +896,10 @@ seen: (C3 check) `marks=5 graph_nodes=33 calls=2 findings=28`, every finding "Gr
 cause: the method's two tool checks
 effect: the contracts of the reused frozen helpers are the code's; the 28 slice nodes exist only here
 decision: E4 marks the new and changed nodes in a throwaway copy and reruns `i3e2-extract.sh check`; done = `0` drifts and every example a test that fails before and passes after
+
+finding R-1 (rebase) R-A2L-DEF.5/arr-1 expected the first tag of a name declared twice
+anchor: describe_definitions
+seen: the E2 example gave two VAL_BLKs `DUPA` at 0x10 and 0x20 the address `0x10`; Inc 2's E3 removed the first-tag rule (E3S-35): R-A2L-DEF.5 now uses the one tag of a name, and R-A2L-DEF.139 refuses a name declared more than once (`A2L-DEF-NAME` `<name>: the A2L declares that name more than once`)
+cause: the case was written against Inc 2's E1 rows
+effect: on a correct model the case fails; for an array the hazard is the one E3S-35 names (a commented-out old copy is a live tag and the first of its name)
+decision: rebased — R-A2L-DEF.5/arr-1 becomes `DUPA` at 0x20 beside `dupa` at 0x10 (case included); the old input becomes R-A2L-DEF.139/arr-1 (`../02-test-cases.md`; cited rows in `../01-requirements.md`). The same first-of-the-name lookup remains for the AXIS_PTS map and the parser's record-layout map (last of the name): listed in `../E2-rulings.md`

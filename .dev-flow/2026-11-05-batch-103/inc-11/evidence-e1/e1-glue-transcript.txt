@@ -1,0 +1,23 @@
+host=cachyos-rtx date=2026-11-06T21:53:54-06:00 clone=e07fb00f9fc13afd314d0334fac683fe33b29b6c changed=0
+s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+[G0] baseline: the header on one body line: name='Synthetic map' address shown=0x1C2D3E00 length=4026 axis max points=['33', '61'] errors=[]
+[H2a] a block comment glued between the address word and digits: 0x1C2D3E00/*c*/4026: name='Synthetic map' address shown=0x1C2D3E004026 length=4026 axis max points=['33', '61'] errors=[]
+[H2b] a block comment from the address word to the next line, digits glued after */: name='Synthetic map' address shown=0x1C2D3E004026 length=4026 axis max points=['33', '61'] errors=[]
+[H2c] a line comment after the address word, digits on the next line: name='Synthetic map' address shown=0x1C2D3E00 length=None axis max points=['33', '61'] errors=[]
+[H2d] a quoted string glued after the address word: 0x1C2D3E00"4026": name='Synthetic map' address shown=n/a length=4026 axis max points=['33', '61'] errors=[]
+[H2e] an underscore between address digits and more digits: 0x1C2D3E00_4026: name='Synthetic map' address shown=0x1C2D3E004026 length=4026 axis max points=['33', '61'] errors=[]
+[H2f] an ECU_ADDRESS word glued to a comment and digits: ECU_ADDRESS 0x1C2D3E00/*c*/4026: name='Synthetic map' address shown=n/a length=4026 axis max points=['33', '61'] errors=[]
+[H1a] NUL between the address word and digits: name='Synthetic map' address shown=n/a length=4026 axis max points=['33', '61'] errors=[]
+[H1b] U+200B ZERO WIDTH SPACE between the address word and digits: name='Synthetic map' address shown=n/a length=4026 axis max points=['33', '61'] errors=[]
+[H1c] U+FEFF between the address word and digits: name='Synthetic map' address shown=n/a length=4026 axis max points=['33', '61'] errors=[]
+[H1d] a lone CR between the address word and digits: name='Synthetic map' address shown=0x1C2D3E00 length=None axis max points=['33', '61'] errors=[]
+[H1e] VT between the address word and digits: name='Synthetic map' address shown=0x1C2D3E00 length=None axis max points=['33', '61'] errors=[]
+[H1f] NBSP U+00A0 between the address word and digits: name='Synthetic map' address shown=0x1C2D3E00 length=None axis max points=['33', '61'] errors=[]
+[H3a] the name missing (a quoted string where the name stands) and no long identifier: name='Synthetic map' address shown=0x1C2D3E00 length=4026 axis max points=['33', '61'] errors=[]
+[H3b] a long identifier on a body line before the header: name='SYN_MAP_B' address shown=0x1C2D3E00 length=4026 axis max points=['33', '61'] errors=[]
+[H3c] the header one word short (no lower limit): name='Synthetic map' address shown=n/a length=None axis max points=['33', '61'] errors=[]
+[H3d] the kind word missing (an extended or absent kind): name='Synthetic map' address shown=n/a length=None axis max points=['33', '61'] errors=[]
+[H3e] AXIS_DESCR headers on their /begin lines (FIX_AXIS_PAR alone in the body): name='Synthetic map' address shown=0x1C2D3E00 length=None axis max points=['7', '9'] errors=[]
+[H3f] an AXIS_DESCR whose FIX_AXIS_PAR count differs from its MaxAxisPoints: name='Synthetic map' address shown=0x1C2D3E00 length=4026 axis max points=['33', '61'] errors=[]
+[H3g] a third AXIS_DESCR with one word and no axis kind: name='Synthetic map' address shown=0x1C2D3E00 length=None axis max points=['33', '61', None] errors=[]
+exit=0 clone_changed_after=0

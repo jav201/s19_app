@@ -1,0 +1,107 @@
+host=cachyos-rtx date=2026-11-06T21:49:29-06:00 clone=e07fb00f9fc13afd314d0334fac683fe33b29b6c changed=0 HOME=/tmp/b103-e1-11/zq_iso_user
+A2L section tree has structural errors: path=/home/javiergr/work/s19_app/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+python = 3.11.18 | mode = fixtures
+files = 35
+== [FX] e07fb00 reader on each tracked file against the same reader on CANON(file) ==
+[FX] examples/case_00_public/ASAP2_Demo_V161.a2l: tags=75 canon=75 key6_diff=1 other_field_diff=73 phantom(only reader)=1 missing(only canon)=1 errors=[] canon_errors=[] ref_diags=[] t=0.03s
+[FX] examples/case_00_public/ASAP2_Demo_V171.a2l: tags=118 canon=118 key6_diff=1 other_field_diff=116 phantom(only reader)=1 missing(only canon)=1 errors=['Unclosed /begin sections detected.'] canon_errors=[] ref_diags=[] t=0.06s
+[FX] examples/case_00_public/BalanceTube_STMicro.a2l: tags=111 canon=111 key6_diff=104 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=0.02s
+[FX] examples/case_00_public/check_test.a2l: tags=1 canon=1 key6_diff=0 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=0.0s
+[FX] examples/case_00_public/cleanup_test.a2l: tags=0 canon=0 key6_diff=0 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=0.0s
+[FX] examples/case_00_public/from_source.a2l: tags=72 canon=72 key6_diff=0 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=0.01s
+[FX] examples/case_00_public/from_source_structs.a2l: tags=0 canon=0 key6_diff=0 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=0.0s
+[FX] examples/case_00_public/included.a2l: tags=1 canon=1 key6_diff=0 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=0.0s
+[FX] examples/case_00_public/memorysegment.a2l: tags=0 canon=0 key6_diff=0 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=0.0s
+[FX] examples/case_00_public/merge_inc_test.a2l: tags=0 canon=0 key6_diff=0 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=0.0s
+[FX] examples/case_00_public/remove_test.a2l: tags=2 canon=2 key6_diff=0 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=0.0s
+[FX] examples/case_00_public/software_a.a2l: tags=13990 canon=13990 key6_diff=0 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=2.49s
+[FX] examples/case_00_public/software_b.a2l: tags=67 canon=67 key6_diff=0 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=0.07s
+[FX] examples/case_00_public/update_test1.a2l: tags=12 canon=12 key6_diff=0 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=0.0s
+[FX] examples/case_00_public/update_test2.a2l: tags=14 canon=14 key6_diff=0 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=0.0s
+[FX] examples/case_00_public/update_typedef_test1.a2l: tags=0 canon=0 key6_diff=0 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=0.0s
+[FX] examples/case_00_public/update_typedef_test2.a2l: tags=0 canon=0 key6_diff=0 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=0.0s
+[FX] examples/case_00_public/update_typedef_test3.a2l: tags=0 canon=0 key6_diff=0 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=0.0s
+[FX] examples/case_00_public/update_typedef_test4.a2l: tags=0 canon=0 key6_diff=0 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=0.0s
+[FX] examples/case_00_public/xcp_test.a2l: tags=0 canon=0 key6_diff=0 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=0.01s
+[FX] examples/case_01_basic_valid/firmware.a2l: tags=3 canon=3 key6_diff=0 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=0.0s
+[FX] examples/case_02_gaps_and_patch_targets/firmware.a2l: tags=3 canon=3 key6_diff=0 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=0.0s
+[FX] examples/case_03_overlapping_records/firmware.a2l: tags=2 canon=2 key6_diff=0 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=0.0s
+[FX] examples/case_04_bad_checksums/firmware.a2l: tags=1 canon=1 key6_diff=0 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=0.0s
+[FX] examples/case_05_dense_mixed_content/firmware.a2l: tags=4 canon=4 key6_diff=0 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=0.0s
+[FX] examples/case_06_large_nested_a2l/firmware.a2l: tags=220040 canon=220040 key6_diff=0 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=23.23s
+[FX] examples/case_07_stress_smoke/firmware.a2l: tags=12 canon=12 key6_diff=0 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=0.4s
+[FX] examples/professional_validation/case_01_baseline_valid/firmware.a2l: tags=3 canon=3 key6_diff=0 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=0.0s
+[FX] examples/professional_validation/case_02_patch_targets_and_gaps/firmware.a2l: tags=6 canon=6 key6_diff=0 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=0.0s
+[FX] examples/professional_validation/case_03_overlapping_records/firmware.a2l: tags=3 canon=3 key6_diff=0 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=0.0s
+[FX] examples/professional_validation/case_04_bad_checksums/firmware.a2l: tags=1 canon=1 key6_diff=0 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=0.0s
+[FX] examples/professional_validation/case_05_out_of_order_and_mixed/firmware.a2l: tags=3 canon=3 key6_diff=0 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=0.0s
+[FX] examples/professional_validation/case_07_cross_reference_inconsistencies/firmware.a2l: tags=4 canon=4 key6_diff=0 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=0.0s
+[FX] examples/professional_validation/case_08_heavy_fragmentation/firmware.a2l: tags=100 canon=100 key6_diff=0 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=0.01s
+[FX] tests/fixtures/synth/synth_a2l.a2l: tags=6 canon=6 key6_diff=0 other_field_diff=0 phantom(only reader)=0 missing(only canon)=0 errors=[] canon_errors=[] ref_diags=[] t=0.0s
+[FX-total] matrix_dim_product_differs=14 files=35 tags=234654 key6=106 other=189 phantom=2 missing=2 instance_of:TYPEDEF_CHARACTERISTIC=26 instance_rows=12 instance_of:TYPEDEF_AXIS=1 instance_of:TYPEDEF_STRUCTURE=52 blob=7 meta_with_comment=1 ref_INSTANCE=82 instance_typedef_ref=82 ref_BLOB=7 instance_of:UNKNOWN_TYPEDEF=2 instance_of:TYPEDEF_BLOB=1 no_long_identifier=12
+[FX-fields] case_00_public/ASAP2_Demo_V161.a2l:conversion=1 case_00_public/ASAP2_Demo_V161.a2l:datatype=1 case_00_public/ASAP2_Demo_V161.a2l:description=74 case_00_public/ASAP2_Demo_V161.a2l:display_identifier=1 case_00_public/ASAP2_Demo_V161.a2l:length=1 case_00_public/ASAP2_Demo_V161.a2l:lower_limit=1 case_00_public/ASAP2_Demo_V161.a2l:upper_limit=1 case_00_public/ASAP2_Demo_V171.a2l:conversion=1 case_00_public/ASAP2_Demo_V171.a2l:datatype=1 case_00_public/ASAP2_Demo_V171.a2l:description=117 case_00_public/ASAP2_Demo_V171.a2l:display_identifier=5 case_00_public/ASAP2_Demo_V171.a2l:length=1 case_00_public/ASAP2_Demo_V171.a2l:lower_limit=1 case_00_public/ASAP2_Demo_V171.a2l:upper_limit=1 case_00_public/BalanceTube_STMicro.a2l:conversion=104 case_00_public/BalanceTube_STMicro.a2l:datatype=104 case_00_public/BalanceTube_STMicro.a2l:length=104 case_00_public/BalanceTube_STMicro.a2l:lower_limit=104 case_00_public/BalanceTube_STMicro.a2l:upper_limit=104
+[FX-list] 110 defect rows written to fx-defects.jsonl; first 40:
+    ('examples/case_00_public/ASAP2_Demo_V161.a2l', 'MEASUREMENT', 'ASAM.M.VIRTUAL.SCALAR.SWORD.PHYSICAL', {'length': ('None', '2'), 'datatype': ("'CM.VIRTUAL.EXTERNAL_VALUE'", "'SWORD'")})
+    ('examples/case_00_public/ASAP2_Demo_V161.a2l', 'CHARACTERISTIC', 'UNKNOWN', {'only_in_reader': ('0x810200', 'absent in REF')})
+    ('examples/case_00_public/ASAP2_Demo_V161.a2l', 'CHARACTERISTIC', 'ASAM.C.ASCII.UBYTE.NUMBER_42', {'missing_in_reader': ('absent', '0x810200')})
+    ('examples/case_00_public/ASAP2_Demo_V171.a2l', 'MEASUREMENT', 'ASAM.M.VIRTUAL.SCALAR.SWORD.PHYSICAL', {'length': ('None', '2'), 'datatype': ("'CM.VIRTUAL.EXTERNAL_VALUE'", "'SWORD'")})
+    ('examples/case_00_public/ASAP2_Demo_V171.a2l', 'CHARACTERISTIC', 'UNKNOWN', {'only_in_reader': ('0x810200', 'absent in REF')})
+    ('examples/case_00_public/ASAP2_Demo_V171.a2l', 'CHARACTERISTIC', 'ASAM.C.ASCII.UBYTE.NUMBER_42', {'missing_in_reader': ('absent', '0x810200')})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.gameController.sm', {'length': ('None', '1'), 'datatype': ('None', "'UBYTE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.gameController.timer.timeCounter', {'length': ('None', '4'), 'datatype': ('None', "'FLOAT32_IEEE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.gameController.stopWatch.timeCounter', {'length': ('None', '4'), 'datatype': ('None', "'FLOAT32_IEEE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.gameController.edgeDetect.buffer', {'length': ('None', '1'), 'datatype': ('None', "'UBYTE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.gameController.edgeDetect.oldSignal', {'length': ('None', '1'), 'datatype': ('None', "'UBYTE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.gameController.ballPosition', {'length': ('None', '4'), 'datatype': ('None', "'FLOAT32_IEEE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.gameController.startGame', {'length': ('None', '1'), 'datatype': ('None', "'UBYTE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.gameController.score', {'length': ('None', '4'), 'datatype': ('None', "'FLOAT32_IEEE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.ledController.sm', {'length': ('None', '1'), 'datatype': ('None', "'UBYTE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.ledController.gameState', {'length': ('None', '1'), 'datatype': ('None', "'UBYTE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.ledController.gameTime', {'length': ('None', '4'), 'datatype': ('None', "'FLOAT32_IEEE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.ledController.ledRing[0].red', {'length': ('None', '1'), 'datatype': ('None', "'UBYTE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.ledController.ledRing[0].green', {'length': ('None', '1'), 'datatype': ('None', "'UBYTE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.ledController.ledRing[0].blue', {'length': ('None', '1'), 'datatype': ('None', "'UBYTE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.ledController.ledRing[1].red', {'length': ('None', '1'), 'datatype': ('None', "'UBYTE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.ledController.ledRing[1].green', {'length': ('None', '1'), 'datatype': ('None', "'UBYTE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.ledController.ledRing[1].blue', {'length': ('None', '1'), 'datatype': ('None', "'UBYTE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.ledController.ledRing[2].red', {'length': ('None', '1'), 'datatype': ('None', "'UBYTE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.ledController.ledRing[2].green', {'length': ('None', '1'), 'datatype': ('None', "'UBYTE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.ledController.ledRing[2].blue', {'length': ('None', '1'), 'datatype': ('None', "'UBYTE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.ledController.ledRing[3].red', {'length': ('None', '1'), 'datatype': ('None', "'UBYTE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.ledController.ledRing[3].green', {'length': ('None', '1'), 'datatype': ('None', "'UBYTE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.ledController.ledRing[3].blue', {'length': ('None', '1'), 'datatype': ('None', "'UBYTE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.ledController.ledRing[4].red', {'length': ('None', '1'), 'datatype': ('None', "'UBYTE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.ledController.ledRing[4].green', {'length': ('None', '1'), 'datatype': ('None', "'UBYTE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.ledController.ledRing[4].blue', {'length': ('None', '1'), 'datatype': ('None', "'UBYTE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.ledController.ledRing[5].red', {'length': ('None', '1'), 'datatype': ('None', "'UBYTE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.ledController.ledRing[5].green', {'length': ('None', '1'), 'datatype': ('None', "'UBYTE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.ledController.ledRing[5].blue', {'length': ('None', '1'), 'datatype': ('None', "'UBYTE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.ledController.ledRing[6].red', {'length': ('None', '1'), 'datatype': ('None', "'UBYTE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.ledController.ledRing[6].green', {'length': ('None', '1'), 'datatype': ('None', "'UBYTE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.ledController.ledRing[6].blue', {'length': ('None', '1'), 'datatype': ('None', "'UBYTE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.ledController.ledRing[7].red', {'length': ('None', '1'), 'datatype': ('None', "'UBYTE'")})
+    ('examples/case_00_public/BalanceTube_STMicro.a2l', 'MEASUREMENT', 'model.MainClass.ledController.ledRing[7].green', {'length': ('None', '1'), 'datatype': ('None', "'UBYTE'")})
+[FX-classes] ASAP2_Demo_V161.a2l ['datatype', 'length']: 1; ASAP2_Demo_V161.a2l ['missing_in_reader']: 1; ASAP2_Demo_V161.a2l ['only_in_reader']: 1; ASAP2_Demo_V171.a2l ['datatype', 'length']: 1; ASAP2_Demo_V171.a2l ['missing_in_reader']: 1; ASAP2_Demo_V171.a2l ['only_in_reader']: 1; BalanceTube_STMicro.a2l ['datatype', 'length']: 104
+[FX-other] 189 rows (fields outside name/address/length/datatype/byte order/mask) in fx-other-fields.jsonl: ASAP2_Demo_V161.a2l ['description']: 72; ASAP2_Demo_V161.a2l ['description', 'display_identifier']: 1; ASAP2_Demo_V171.a2l ['description']: 111; ASAP2_Demo_V171.a2l ['description', 'display_identifier']: 5
+    ["examples/case_00_public/ASAP2_Demo_V161.a2l", "MEASUREMENT", "ASAM.M.SCALAR.UBYTE.IDENTICAL", {"description": ["None", "'Scalar measurement'"], "display_identifier": ["'DI.ASAM.M.SCALAR.UBYTE.IDENTICAL    /* optional display identifier */'", "'DI.ASAM.M.SCALAR.UBYTE.IDENTICAL'"]}]
+    ["examples/case_00_public/ASAP2_Demo_V161.a2l", "MEASUREMENT", "ASAM.M.SCALAR.UBYTE.TAB_VERB_DEFAULT_VALUE", {"description": ["None", "'Scalar measurement with verbal conversion and default value'"]}]
+    ["examples/case_00_public/ASAP2_Demo_V161.a2l", "MEASUREMENT", "ASAM.M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_VALUE", {"description": ["None", "'Scalar measurement with verbal conversion'"]}]
+    ["examples/case_00_public/ASAP2_Demo_V161.a2l", "MEASUREMENT", "ASAM.M.SCALAR.UBYTE.VTAB_RANGE_DEFAULT_VALUE", {"description": ["None", "'Scalar measurement with verbal conversion and default value'"]}]
+    ["examples/case_00_public/ASAP2_Demo_V161.a2l", "MEASUREMENT", "ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE", {"description": ["None", "'Scalar measurement with verbal conversion and default value'"]}]
+    ["examples/case_00_public/ASAP2_Demo_V161.a2l", "MEASUREMENT", "ASAM.M.SCALAR.UBYTE.TAB_INTP_DEFAULT_VALUE", {"description": ["None", "'Scalar measurement with verbal conversion and default value'"]}]
+[FX-extra] 34 rows in fx-extra.jsonl: blob: 7; instance: 12; matrix_dim_product: 14; meta_with_comment: 1
+    ["examples/case_00_public/ASAP2_Demo_V161.a2l", "matrix_dim_product", "MEASUREMENT", "ASAM.M.MATRIX_DIM_8_2_1.UBYTE.IDENTICAL", [8, 2, 1]]
+    ["examples/case_00_public/ASAP2_Demo_V161.a2l", "matrix_dim_product", "MEASUREMENT", "ASAM.M.MATRIX_DIM_8_4_2.UBYTE.IDENTICAL", [8, 4, 2]]
+    ["examples/case_00_public/ASAP2_Demo_V161.a2l", "matrix_dim_product", "CHARACTERISTIC", "ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR", [3, 4, 1]]
+    ["examples/case_00_public/ASAP2_Demo_V161.a2l", "matrix_dim_product", "CHARACTERISTIC", "ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.COLUMN_DIR", [3, 4, 1]]
+    ["examples/case_00_public/ASAP2_Demo_V171.a2l", "instance", ["ASAM_I_SCALAR_VALUE_UWORD_SINGLE", "single scalar instance", "TYPE_VALUE_UWORD_CM.LINEAR.MUL_2", "0x810000"], "TYPEDEF_CHARACTERISTIC", ["TYPE_VALUE_UWORD_CM.LINEAR.MUL_2", "Base type for VALUE with UWORD", "VALUE", "RL.FNC.UWORD.ROW_DIR"
+    ["examples/case_00_public/ASAP2_Demo_V171.a2l", "instance", ["ASAM_I_SCALAR_VALUE_UWORD_ARRAY_5", "array of 5 scalars", "TYPE_VALUE_UWORD_CM.LINEAR.MUL_2", "0x810002"], "TYPEDEF_CHARACTERISTIC", ["TYPE_VALUE_UWORD_CM.LINEAR.MUL_2", "Base type for VALUE with UWORD", "VALUE", "RL.FNC.UWORD.ROW_DIR", "
+    ["examples/case_00_public/ASAP2_Demo_V171.a2l", "instance", ["ASAM_I_AXIS_PTS_UBYTE_8", "axis points", "TYPE_AXIS_UBYTE_CM.IDENTICAL", "0x810010"], "TYPEDEF_AXIS", ["TYPE_AXIS_UBYTE_CM.IDENTICAL", "typedef for axis points", "ASAM.M.SCALAR.UBYTE.IDENTICAL", "RL.AXIS.UBYTE", "100.0", "CM.IDENTICAL"]]
+    ["examples/case_00_public/ASAP2_Demo_V171.a2l", "instance", ["ASAM_I_MAP_COM_AXIS_FIX_AXIS", "Instance of Map with COM_AXIS and FIX_AXIS", "TYPE_MAP_COM_AXIS.FIX_AXIS_CM.LINEAR.MUL_2", "0x810030"], "TYPEDEF_CHARACTERISTIC", ["TYPE_MAP_COM_AXIS.FIX_AXIS_CM.LINEAR.MUL_2", "Base type for VALUE with UWO
+    ["examples/case_00_public/ASAP2_Demo_V171.a2l", "blob", ["ASAM.C.BLOB.TRANSFORMER_TEST", "binary blob for transformer test", "0x812000", "16"]]
+    ["examples/case_00_public/ASAP2_Demo_V171.a2l", "meta_with_comment", "INSTANCE", 5560, "ASAM_S_EXAMPLE          // dots not allowed in instance names"]
+    ["examples/case_00_public/remove_test.a2l", "blob", ["Blob_1", "", "0x5000", "128"]]
+    ["examples/case_00_public/update_test1.a2l", "blob", ["Blob_1", "", "0x0", "128"]]
+    ["examples/case_00_public/update_test1.a2l", "blob", ["Blob_2", "", "0x0", "256"]]
+exit=0 clone_changed_after=0

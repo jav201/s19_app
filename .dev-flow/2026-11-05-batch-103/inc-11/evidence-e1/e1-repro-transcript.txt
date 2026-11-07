@@ -1,0 +1,414 @@
+host=cachyos-rtx date=2026-11-06T21:49:29-06:00 clone=e07fb00f9fc13afd314d0334fac683fe33b29b6c changed=0 HOME=/tmp/b103-e1-11/zq_iso_user
+A2L section tree has structural errors: path=/tmp/b103-e1-11/scratch/tmpj7ekhg8v/x.a2l sample=Line 36: /end without /begin
+s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+python = 3.11.18 | mode = repro
+== [RP] reproduction matrix: line ends, blanks, encodings, comment adjacency (X = the object checked) ==
+[RP-base] LF reading: XM addr=0x1234 len=2 dt=UWORD bo=little desc=None; XC addr=0x2000 len=2 dt=None bo=big desc=None; XH addr=None len=None dt=None bo=big desc='one-line header'; XA addr=0x4000 len=8 dt=UWORD bo=big desc=None
+[RP-base] errors=[]
+-- A: the same file with other line ends and encodings (expected: identical to LF) --
+[RP-A1] SAME-AS-LF | CRLF everywhere | diffs={} extra=[] errors=[] view ctrl chars=[] broken summary lines=[]
+[RP-A2] SAME-AS-LF | lone CR everywhere (classic Mac) | diffs={} extra=[] errors=[] view ctrl chars=[] broken summary lines=[]
+[RP-A3] SAME-AS-LF | mixed CRLF / CR / LF | diffs={} extra=[] errors=[] view ctrl chars=[] broken summary lines=[]
+[RP-A4] SAME-AS-LF | CR CR LF (a CRLF file converted twice) | diffs={} extra=[] errors=[] view ctrl chars=[] broken summary lines=[]
+[RP-A5] SAME-AS-LF | a trailing CR on the ECU_ADDRESS line only (CRLF there, LF elsewhere) | diffs={} extra=[] errors=[] view ctrl chars=[] broken summary lines=[]
+[RP-A6] SAME-AS-LF | trailing blanks and tabs after every word line | diffs={} extra=[] errors=[] view ctrl chars=[] broken summary lines=[]
+[RP-A7] DIFFERS | tabs as separators everywhere | diffs={'XH': {'description': ("'one-line\\theader'", "'one-line header'")}} extra=[] errors=[] view ctrl chars=[('XH', ('U+0009',))] broken summary lines=[]
+[RP-A8] SAME-AS-LF | UTF-8 BOM, first line ASAP2_VERSION | diffs={} extra=[] errors=[] view ctrl chars=[] broken summary lines=[]
+[RP-A9] DIFFERS | UTF-8 BOM, file starts with /begin PROJECT (no ASAP2_VERSION line) | diffs={} extra=[] errors=['Line 36: /end without /begin'] view ctrl chars=[] broken summary lines=[]
+[RP-A10] DIFFERS | UTF-16 LE with BOM (Windows 'Unicode' save) | diffs={'XM': {'name': ('None', "'XM'"), 'address': ('None', '0x1234'), 'length': ('None', '2'), 'datatype': ('None', "'UWORD'"), 'effective_byte_order': ('None', "'little'"), 'endian': ('None', "'MSB_LAST'"), 'conversion': ('None', "'CM_ID'"), 'lower_limit': ('None', "'0'"), 'upper_limit': ('None', "'65535'"), 'virtual': ('None', 'False'), 'memory_region': ('None', "'unknown'")}, 'XC': {'name': ('None', "'XC'"), 'address': ('None', '0x2000'), 'length': ('None', '2'), 'effective_byte_order': ('None', "'big'"), 'char_type': ('None', "'VALUE'"), 'deposit': ('None', "'RL_U16'"), 'conversion': ('None', "'CM_ID'"), 'lower_limit': ('None', "'0'"), 'upper_limit': ('None', "'65535'"), 'virtual': ('None', 'False'), 'memory_region': ('None', "'unknown'")}, 'XH': {'name': ('None', "'XH'"), 'description': ('None', "'one-line header'"), 'effective_byte_order': ('None', "'big'"), 'virtual': ('None', 'False'), 'memory_region': ('None', "'unknown'")}, 'XA': {'name': ('None', "'XA'"), 'address': ('None', '0x4000'), 'length': ('None', '8'), 'datatype': ('None', "'UWORD'"), 'effective_byte_order': ('None', "'big'"), 'matrix_dim': ('None', '4'), 'conversion': ('None', "'CM_ID'"), 'lower_limit': ('None', "'0'"), 'upper_limit': ('None', "'65535'"), 'virtual': ('None', 'False'), 'memory_region': ('None', "'unknown'")}} extra=[] errors=[] view ctrl chars=[] broken summary lines=[]
+[RP-A11] DIFFERS | UTF-16 LE with BOM and CRLF | diffs={'XM': {'name': ('None', "'XM'"), 'address': ('None', '0x1234'), 'length': ('None', '2'), 'datatype': ('None', "'UWORD'"), 'effective_byte_order': ('None', "'little'"), 'endian': ('None', "'MSB_LAST'"), 'conversion': ('None', "'CM_ID'"), 'lower_limit': ('None', "'0'"), 'upper_limit': ('None', "'65535'"), 'virtual': ('None', 'False'), 'memory_region': ('None', "'unknown'")}, 'XC': {'name': ('None', "'XC'"), 'address': ('None', '0x2000'), 'length': ('None', '2'), 'effective_byte_order': ('None', "'big'"), 'char_type': ('None', "'VALUE'"), 'deposit': ('None', "'RL_U16'"), 'conversion': ('None', "'CM_ID'"), 'lower_limit': ('None', "'0'"), 'upper_limit': ('None', "'65535'"), 'virtual': ('None', 'False'), 'memory_region': ('None', "'unknown'")}, 'XH': {'name': ('None', "'XH'"), 'description': ('None', "'one-line header'"), 'effective_byte_order': ('None', "'big'"), 'virtual': ('None', 'False'), 'memory_region': ('None', "'unknown'")}, 'XA': {'name': ('None', "'XA'"), 'address': ('None', '0x4000'), 'length': ('None', '8'), 'datatype': ('None', "'UWORD'"), 'effective_byte_order': ('None', "'big'"), 'matrix_dim': ('None', '4'), 'conversion': ('None', "'CM_ID'"), 'lower_limit': ('None', "'0'"), 'upper_limit': ('None', "'65535'"), 'virtual': ('None', 'False'), 'memory_region': ('None', "'unknown'")}} extra=[] errors=[] view ctrl chars=[] broken summary lines=[]
+[RP-A12] SAME-AS-LF | form feed between objects (page break line) | diffs={} extra=[] errors=[] view ctrl chars=[] broken summary lines=[]
+[RP-A13] SAME-AS-LF | form feed as the separator before the address word | diffs={} extra=[] errors=[] view ctrl chars=[] broken summary lines=[]
+[RP-A14] SAME-AS-LF | NBSP U+00A0 (UTF-8) as the separator before the address word | diffs={} extra=[] errors=[] view ctrl chars=[] broken summary lines=[]
+[RP-A15] DIFFERS | cp1252 NBSP byte 0xA0 after the address word (ANSI file) | diffs={'XM': {'address': ('None', '0x1234')}} extra=[] errors=[] view ctrl chars=[] broken summary lines=[]
+[RP-A16] DIFFERS | NUL after the address word | diffs={'XM': {'address': ('None', '0x1234')}} extra=[] errors=[] view ctrl chars=[] broken summary lines=[]
+[RP-A17] SAME-AS-LF | NUL padding at the end of the file (a truncated copy) | diffs={} extra=[] errors=[] view ctrl chars=[] broken summary lines=[]
+[RP-A18] SAME-AS-LF | U+2028 LINE SEPARATOR after the address word | diffs={} extra=[] errors=[] view ctrl chars=[] broken summary lines=[]
+[RP-A19] SAME-AS-LF | U+0085 NEL inside the one-line CHARACTERISTIC header | diffs={} extra=[] errors=[] view ctrl chars=[] broken summary lines=['RL_U32 0 CM_ID 0 100 (lines 29-30)']
+[RP-A20] SAME-AS-LF | VT U+000B inside the one-line CHARACTERISTIC header | diffs={} extra=[] errors=[] view ctrl chars=[] broken summary lines=['RL_U32 0 CM_ID 0 100 (lines 29-30)']
+[RP-A21] DIFFERS | U+001E (record separator) inside the long identifier of XH | diffs={'XH': {'description': ("'one-line\\x1eheader'", "'one-line header'")}} extra=[] errors=[] view ctrl chars=[('XH', ('U+001E',))] broken summary lines=['header" VALUE 0x00003000 RL_U32 0 CM_ID 0 100 (lines 29-30)']
+[RP-A22] DIFFERS | U+FEFF (zero-width no-break space) after the address word | diffs={'XM': {'address': ('None', '0x1234')}} extra=[] errors=[] view ctrl chars=[] broken summary lines=[]
+[RP-A23] DIFFERS | ESC sequence in the long identifier of XC | diffs={'XC': {'description': ("'a\\x1b[2Jb'", 'None')}} extra=[] errors=[] view ctrl chars=[('XC', ('U+001B',))] broken summary lines=[]
+[RP-A24] SAME-AS-LF | FF U+000C as the separator after the address word of the one-line CHARACTERISTIC header | diffs={} extra=[] errors=[] view ctrl chars=[] broken summary lines=['RL_U32 0 CM_ID 0 100 (lines 29-30)']
+[RP-A25] SAME-AS-LF | U+2028 as the separator after the address word of the one-line CHARACTERISTIC header | diffs={} extra=[] errors=[] view ctrl chars=[] broken summary lines=['RL_U32 0 CM_ID 0 100 (lines 29-30)']
+[RP-A26] SAME-AS-LF | U+001C as the separator after the address word of the one-line CHARACTERISTIC header | diffs={} extra=[] errors=[] view ctrl chars=[] broken summary lines=['RL_U32 0 CM_ID 0 100 (lines 29-30)']
+[RP-A26b] SAME-AS-LF | VT U+000B as the separator after the address word of the one-line CHARACTERISTIC header | diffs={} extra=[] errors=[] view ctrl chars=[] broken summary lines=['RL_U32 0 CM_ID 0 100 (lines 29-30)']
+[RP-A26c] SAME-AS-LF | NEL U+0085 as the separator after the address word of the one-line CHARACTERISTIC header | diffs={} extra=[] errors=[] view ctrl chars=[] broken summary lines=['RL_U32 0 CM_ID 0 100 (lines 29-30)']
+[RP-A27] SAME-AS-LF | a comment glued after the address word of the one-line CHARACTERISTIC header | diffs={} extra=[] errors=[] view ctrl chars=[] broken summary lines=[]
+[RP-A28] SAME-AS-LF | a CRLF file whose one-line header holds a lone CR after the address word | diffs={} extra=[] errors=[] view ctrl chars=[] broken summary lines=[]
+[RP-A29] DIFFERS | DISPLAY_IDENTIFIER with a trailing comment on XM | diffs={'XM': {'display_identifier': ("'XM_disp /* shown name */'", 'None')}} extra=[] errors=[] view ctrl chars=[] broken summary lines=[]
+-- B: comment and line adjacency (expected: REF's reading) --
+[RP-B1] WRONG | ECU_ADDRESS 0x1234/*c*/ (comment glued after the address)
+      reader: [{'address': 'None', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'X', 'longid': '', 'address': 4660, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT X "" (lines 20-23)', '- MEASUREMENT X: n/a len=2 mem=unknown ERR (missing address/length)'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B2] WRONG | ECU_ADDRESS 0x1234//c (line comment glued)
+      reader: [{'address': 'None', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'X', 'longid': '', 'address': 4660, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT X "" (lines 20-23)', '- MEASUREMENT X: n/a len=2 mem=unknown ERR (missing address/length)'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B3] WRONG | ECU_ADDRESS /*c*/ 0x1234
+      reader: [{'address': 'None', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'X', 'longid': '', 'address': 4660, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT X "" (lines 20-23)', '- MEASUREMENT X: n/a len=2 mem=unknown ERR (missing address/length)'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B4] WRONG | ECU_ADDRESS/*c*/0x1234 (glued both sides)
+      reader: [{'address': 'None', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'X', 'longid': '', 'address': 4660, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT X "" (lines 20-23)', '- MEASUREMENT X: n/a len=2 mem=unknown ERR (missing address/length)'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B5] WRONG | address on the next line: ECU_ADDRESS / 0x1234
+      reader: [{'address': 'None', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'X', 'longid': '', 'address': 4660, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT X "" (lines 20-24)', '- MEASUREMENT X: n/a len=2 mem=unknown ERR (missing address/length)'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B6] WRONG | address two lines down, a comment line between
+      reader: [{'address': 'None', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'X', 'longid': '', 'address': 4660, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT X "" (lines 20-25)', '- MEASUREMENT X: n/a len=2 mem=unknown ERR (missing address/length)'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B7] WRONG | a live ECU_ADDRESS, then an old one inside /* ... */
+      reader: [{'address': '0x9999', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'X', 'longid': '', 'address': 4660, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT X "" (lines 20-26)', '- MEASUREMENT X: 0x00009999 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B8] OK | an old ECU_ADDRESS behind //
+      reader: [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'X', 'longid': '', 'address': 4660, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT X "" (lines 20-24)', '- MEASUREMENT X: 0x00001234 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B9] WRONG | an old ECU_ADDRESS behind /* ... */ on one line, first
+      reader: [{'address': 'None', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'X', 'longid': '', 'address': 4660, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT X "" (lines 20-23)', '- MEASUREMENT X: n/a len=2 mem=unknown ERR (missing address/length)'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B10] WRONG | a comment inside the address word: 0x12/*c*/34
+      reader: [{'address': 'None', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '18', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'X', 'longid': '', 'address': 18, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT X "" (lines 20-23)', '- MEASUREMENT X: n/a len=2 mem=unknown ERR (missing address/length)'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B11] OK | a line break inside the address word (CR): 0x12<CR>34
+      reader: [{'address': '18', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '18', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'X', 'longid': '', 'address': 18, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]A2L section tree has structural errors: path=/tmp/b103-e1-11/scratch/tmpj7ekhg8v/x.a2l sample=Unclosed /begin sections detected.
+
+      views:  summary lines naming it=['    - MEASUREMENT X "" (lines 20-24)', '- MEASUREMENT X: 0x00000012 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B12] WRONG | two keywords on one line: ECU_ADDRESS 0x1234 BYTE_ORDER MSB_LAST
+      reader: [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'little'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'X', 'longid': '', 'address': 4660, 'datatype': 'UWORD', 'byte_order': 'MSB_LAST', 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT X "" (lines 20-23)', '- MEASUREMENT X: 0x00001234 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B13] WRONG | a one-line IF_DATA before the ECU_ADDRESS line (V171 style)
+      reader: [{'address': 'None', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=['Unclosed /begin sections detected.']
+      REF:    [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'X', 'longid': '', 'address': 4660, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=[] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B14] WRONG | the MEASUREMENT header on the /begin line
+      reader: [{'address': '0x1234', 'length': 'None', 'datatype': 'None', 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'X', 'longid': '', 'address': 4660, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT X "" UWORD CM_ID 0 0 0 65535 (lines 20-22)', '- MEASUREMENT X: 0x00001234 len=n/a mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B15] WRONG | the MEASUREMENT header spread over lines with comments (BalanceTube style)
+      reader: [{'address': '0x1234', 'length': 'None', 'datatype': 'None', 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'X', 'longid': '', 'address': 4660, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT X "" (lines 20-28)', '- MEASUREMENT X: 0x00001234 len=n/a mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B16] LOST | the name on the line after /begin MEASUREMENT
+      reader: [] errors=[]
+      REF:    [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'X', 'longid': '', 'address': 4660, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=[] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B17] WRONG | the long identifier on the line after the name
+      reader: [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': "'long id'"}] ref_diags=[] ref_words=[{'name': 'X', 'longid': 'long id', 'address': 4660, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT X (lines 20-24)', '- MEASUREMENT X: 0x00001234 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B18] LOST | a comment glued to the name: X/*c*/
+      reader: [] errors=[]
+      REF:    [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'X', 'longid': '', 'address': 4660, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT X/*c*/ "" (lines 20-23)', '- MEASUREMENT X/*c*/: 0x00001234 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B19] LOST | a comment between /begin MEASUREMENT and the name
+      reader: [] errors=[]
+      REF:    [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'X', 'longid': '', 'address': 4660, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT /* c */ X "" (lines 20-23)'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B20] LOST | the long identifier glued to the name: X"long"
+      reader: [] errors=[]
+      REF:    [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': "'long'"}] ref_diags=[] ref_words=[{'name': 'X', 'longid': 'long', 'address': 4660, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT X"long" (lines 20-23)', '- MEASUREMENT X"long": 0x00001234 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B21] WRONG | CHARACTERISTIC header address glued to a comment: VALUE 0x2000/*c*/RL_U16
+      reader: [{'address': 'None', 'length': 'None', 'datatype': 'None', 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '0x2000', 'length': '2', 'datatype': 'None', 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'X', 'longid': '', 'address': 8192, 'datatype': None, 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - CHARACTERISTIC X "" (lines 20-22)', '- CHARACTERISTIC X: n/a len=n/a mem=unknown ERR (missing address/length)'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B22] WRONG | CHARACTERISTIC header address, block comment to the next line, glued
+      reader: [{'address': 'None', 'length': 'None', 'datatype': 'None', 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '0x2000', 'length': '2', 'datatype': 'None', 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'X', 'longid': '', 'address': 8192, 'datatype': None, 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - CHARACTERISTIC X "" (lines 20-23)', '- CHARACTERISTIC X: n/a len=n/a mem=unknown ERR (missing address/length)'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B23] WRONG | CHARACTERISTIC header on the /begin line
+      reader: [{'address': 'None', 'length': 'None', 'datatype': 'None', 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': "'d'"}] errors=[]
+      REF:    [{'address': '0x2000', 'length': '2', 'datatype': 'None', 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': "'d'"}] ref_diags=[] ref_words=[{'name': 'X', 'longid': 'd', 'address': 8192, 'datatype': None, 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]A2L section tree has structural errors: path=/tmp/b103-e1-11/scratch/tmpj7ekhg8v/c.a2l sample=Unclosed /begin sections detected.
+
+      views:  summary lines naming it=['    - CHARACTERISTIC X "d" VALUE 0x2000 RL_U16 0 CM_ID 0 65535 (lines 20-21)', '- CHARACTERISTIC X: n/a len=n/a mem=unknown ERR (missing address/length)'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B24] WRONG(ref) | CHARACTERISTIC long identifier with an escaped backslash at its end: "C:\\"
+      reader: [{'address': '0x2000', 'length': '2', 'datatype': 'None', 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': '\'C:\\\\\\\\"\''}] errors=[]
+      REF:    [{'ref_mismatch': [('description', 'C:\\\\"', 'C:\\\\')]}] ref_diags=[] ref_words=[{'name': 'X', 'longid': 'C:\\\\', 'address': 8192, 'datatype': None, 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - CHARACTERISTIC X "C:\\\\" (lines 20-22)', '- CHARACTERISTIC X: 0x00002000 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B25] WRONG | LENGTH glued to a comment: DATA_SIZE 0x10/*c*/
+      reader: [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '0x1234', 'length': '16', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'X', 'longid': '', 'address': 4660, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT X "" (lines 20-24)', '- MEASUREMENT X: 0x00001234 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B26] OK | MATRIX_DIM 2 2 (two numbers)
+      reader: [{'address': '0x1234', 'length': '4', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': '2', 'description': 'None'}] errors=[]
+      REF:    [{'address': '0x1234', 'length': '4', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': '2', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'X', 'longid': '', 'address': 4660, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': 4}]
+      views:  summary lines naming it=['    - MEASUREMENT X "" (lines 20-24)', '- MEASUREMENT X: 0x00001234 len=4 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B27] WRONG | a live MATRIX_DIM 4, then MATRIX_DIM 1 inside a comment block
+      reader: [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': '1', 'description': 'None'}] errors=[]
+      REF:    [{'address': '0x1234', 'length': '8', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': '4', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'X', 'longid': '', 'address': 4660, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': 4}]
+      views:  summary lines naming it=['    - MEASUREMENT X "" (lines 20-27)', '- MEASUREMENT X: 0x00001234 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B28] PHANTOM | a commented-out old copy of X above the live X
+      reader: [{'address': '0x9999', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}, {'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'X', 'longid': '', 'address': 4660, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT X "" (lines 21-24)', '    - MEASUREMENT X "" (lines 26-29)', '- MEASUREMENT X: 0x00009999 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B29] PHANTOM | a commented-out X with no live copy
+      reader: [{'address': '0x9999', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [] ref_diags=[] ref_words=[]
+      views:  summary lines naming it=['    - MEASUREMENT X "" (lines 21-24)', '- MEASUREMENT X: 0x00009999 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B30] OK | a commented-out X behind // on every line
+      reader: [] errors=[]
+      REF:    [] ref_diags=[] ref_words=[]
+      views:  summary lines naming it=[] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B31] OK | glued keyword /beginMEASUREMENT
+      reader: [] errors=[]
+      REF:    [] ref_diags=[('/end MEASUREMENT does not close /begin MODULE', 23), ('/end MODULE does not close /begin PROJECT', 24)] ref_words=[]
+      views:  summary lines naming it=['    - X "" (lines 20-23)'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B32] WRONG(ref) | address word 010 (leading zero)
+      reader: [{'address': 'None', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'ref_mismatch': [('address', 'None', '10')]}] ref_diags=[] ref_words=[{'name': 'X', 'longid': '', 'address': 10, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT X "" (lines 20-23)', '- MEASUREMENT X: n/a len=2 mem=unknown ERR (missing address/length)'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B33] WRONG(ref) | address word 0x12_34 (underscore)
+      reader: [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'ref_mismatch': [('address', '0x1234', 'None')]}] ref_diags=[] ref_words=[{'name': 'X', 'longid': '', 'address': None, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT X "" (lines 20-23)', '- MEASUREMENT X: 0x00001234 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B34] WRONG(ref) | address word with fullwidth digits
+      reader: [{'address': '12', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'ref_mismatch': [('address', '12', 'None')]}] ref_diags=[] ref_words=[{'name': 'X', 'longid': '', 'address': None, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT X "" (lines 20-23)', '- MEASUREMENT X: 0x0000000C len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B35] WRONG(ref) | address word -0x10
+      reader: [{'address': '-16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'ref_mismatch': [('address', '-16', 'None')]}] ref_diags=[] ref_words=[{'name': 'X', 'longid': '', 'address': None, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT X "" (lines 20-23)', '- MEASUREMENT X: 0x-0000010 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B36] OK | address word 0X1234 (capital X)
+      reader: [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'X', 'longid': '', 'address': 4660, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT X "" (lines 20-23)', '- MEASUREMENT X: 0x00001234 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B37] WRONG | BYTE_ORDER inside a comment block after the live one
+      reader: [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'little'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'X', 'longid': '', 'address': 4660, 'datatype': 'UWORD', 'byte_order': 'MSB_LAST', 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT X "" (lines 20-27)', '- MEASUREMENT X: 0x00001234 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B38] WRONG | BIT_MASK glued to a comment: BIT_MASK 0x0FF0/*c*/
+      reader: [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': "'0x0FF0/*c*/'", 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': "'0x0FF0'", 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'X', 'longid': '', 'address': 4660, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': '0x0FF0', 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT X "" (lines 20-24)', '- MEASUREMENT X: 0x00001234 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B39] WRONG | an unterminated quote in a body line before ECU_ADDRESS
+      reader: [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': 'None', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[('string not closed', 22), ('unclosed', 20)] ref_words=[{'name': 'X', 'longid': '', 'address': None, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT X "" (lines 20-24)', '- MEASUREMENT X: 0x00001234 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-B40] OK | a nested comment: /* a /* b */ c */ before the address
+      reader: [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '0x1234', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[('stray */', 22)] ref_words=[{'name': 'X', 'longid': '', 'address': 4660, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT X "" (lines 20-24)', '- MEASUREMENT X: 0x00001234 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+-- C: the Inc 2 E3 security shapes (sec-r5-probe.py P1, after a masked neighbour MN) --
+[RP-C-A] OK | Inc 2 E3 shape A
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': "'0x0FF0'", 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': "'0x0FF0'", 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': '0x0FF0', 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT SX "" (lines 25-29)', '- MEASUREMENT SX: 0x00000010 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-B] WRONG(ref) | Inc 2 E3 shape B
+      reader: [{'address': '16', 'length': 'None', 'datatype': 'None', 'effective_byte_order': "'big'", 'bit_org': "'0x0FF0'", 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'ref_mismatch': [('datatype', None, 'UWORD')]}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': '0x0FF0', 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT SX "" (lines 25-29)', '- MEASUREMENT SX: 0x00000010 len=n/a mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-C] WRONG | Inc 2 E3 shape C
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '16', 'length': 'None', 'datatype': 'None', 'effective_byte_order': "'big'", 'bit_org': "'0x0FF0'", 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': '0x0FF0', 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT SX "" (lines 25-28)', '- MEASUREMENT SX: 0x00000010 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-D] WRONG | Inc 2 E3 shape D
+      reader: [{'address': '16', 'length': 'None', 'datatype': 'None', 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '16', 'length': 'None', 'datatype': 'None', 'effective_byte_order': "'big'", 'bit_org': "'0x0FF0'", 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': '0x0FF0', 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT SX "" (lines 25-29)', '- MEASUREMENT SX: 0x00000010 len=n/a mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-E] WRONG | Inc 2 E3 shape E
+      reader: [{'address': '16', 'length': 'None', 'datatype': 'None', 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': "'0x0FF0'", 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': '0x0FF0', 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT SX "" UWORD CM_ID 0 0 0 65535 BIT_MASK 0x0FF0 (lines 25-27)', '- MEASUREMENT SX: 0x00000010 len=n/a mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-F] WRONG | Inc 2 E3 shape F
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': "'0x0FF0'", 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': '0x0FF0', 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT SX "" (lines 25-28)', '- MEASUREMENT SX: 0x00000010 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-G] WRONG | Inc 2 E3 shape G
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': "'0x0FF0'", 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': '0x0FF0', 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT SX "" (lines 25-29)', '- MEASUREMENT SX: 0x00000010 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]A2L section tree has structural errors: path=/tmp/b103-e1-11/scratch/tmpj7ekhg8v/x.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/tmp/b103-e1-11/scratch/tmpj7ekhg8v/x.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/tmp/b103-e1-11/scratch/tmpj7ekhg8v/x.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/tmp/b103-e1-11/scratch/tmpj7ekhg8v/x.a2l sample=Line 33: /end without /begin
+A2L section tree has structural errors: path=/tmp/b103-e1-11/scratch/tmpj7ekhg8v/x.a2l sample=Line 33: /end without /begin
+
+[RP-C-H] WRONG | Inc 2 E3 shape H
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': "'0x0FF0'", 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[('string not closed', 28), ('unclosed', 25)] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT SX "" (lines 25-30)', '- MEASUREMENT SX: 0x00000010 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-I] OK | Inc 2 E3 shape I
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[('string not closed', 28), ('unclosed', 25)] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT SX "" (lines 25-30)', '- MEASUREMENT SX: 0x00000010 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-J] OK | Inc 2 E3 shape J
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=['Unclosed /begin sections detected.']
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[('/end MEASUREMENT does not close /begin IF_DATA', 30), ('/end MODULE does not close /begin MEASUREMENT', 31)] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=[] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-J1] WRONG | Inc 2 E3 shape J1
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=['Unclosed /begin sections detected.']
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': "'0x0FF0'", 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': '0x0FF0', 'matrix_dim': None}]
+      views:  summary lines naming it=[] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-K] OK | Inc 2 E3 shape K
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT SX "" (lines 25-31)', '- MEASUREMENT SX: 0x00000010 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-L] WRONG | Inc 2 E3 shape L
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=['Unclosed /begin sections detected.']
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': "'0x0FF0'", 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': '0x0FF0', 'matrix_dim': None}]
+      views:  summary lines naming it=[] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-L2] WRONG | Inc 2 E3 shape L2
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=['Line 33: /end without /begin']
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': "'0x0FF0'", 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': '0x0FF0', 'matrix_dim': None}]
+      views:  summary lines naming it=[] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-L5] OK | Inc 2 E3 shape L5
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=['Line 33: /end without /begin']
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[('/end IF_DATA does not close /begin MEASUREMENT', 29), ('/end MEASUREMENT does not close /begin MODULE', 31)] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=[] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-M] OK | Inc 2 E3 shape M
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT SX "" (lines 25-29)', '- MEASUREMENT SX: 0x00000010 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-N] WRONG | Inc 2 E3 shape N
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': "'0x0FF0'", 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': '0x0FF0', 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT SX "" (lines 25-30)', '- MEASUREMENT SX: 0x00000010 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-O] OK | Inc 2 E3 shape O
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': 'ECU_ADDRESS', 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT SX "" (lines 25-29)', '- MEASUREMENT SX: 0x00000010 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-O2] OK | Inc 2 E3 shape O2
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': "'0x0FF0'", 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': "'0x0FF0'", 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': 'BIT_MASK', 'matrix_dim': None}]A2L section tree has structural errors: path=/tmp/b103-e1-11/scratch/tmpj7ekhg8v/x.a2l sample=Line 35: /end without /begin
+A2L section tree has structural errors: path=/tmp/b103-e1-11/scratch/tmpj7ekhg8v/x.a2l sample=Line 37: /end without /begin
+A2L section tree has structural errors: path=/tmp/b103-e1-11/scratch/tmpj7ekhg8v/x.a2l sample=Line 37: /end without /begin; Line 38: /end without /begin; Line 39: /end without /begin
+A2L section tree has structural errors: path=/tmp/b103-e1-11/scratch/tmpj7ekhg8v/c.a2l sample=Line 37: /end without /begin; Line 38: /end without /begin; Line 39: /end without /begin
+A2L section tree has structural errors: path=/tmp/b103-e1-11/scratch/tmpj7ekhg8v/x.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/tmp/b103-e1-11/scratch/tmpj7ekhg8v/x.a2l sample=Unclosed /begin sections detected.
+
+      views:  summary lines naming it=['    - MEASUREMENT SX "" (lines 25-30)', '- MEASUREMENT SX: 0x00000010 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-P] OK | Inc 2 E3 shape P
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': "'0x0FF0'", 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': "'0x0FF0'", 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': '0x000F', 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT SX "" (lines 25-30)', '- MEASUREMENT SX: 0x00000010 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-Q] OK | Inc 2 E3 shape Q
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT SX "" (lines 25-29)', '- MEASUREMENT SX: 0x00000010 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-R2] OK | Inc 2 E3 shape R2
+      reader: [{'address': '16', 'length': '2', 'datatype': 'None', 'effective_byte_order': "'big'", 'bit_org': "'0x0FF0'", 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '16', 'length': '2', 'datatype': 'None', 'effective_byte_order': "'big'", 'bit_org': "'0x0FF0'", 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': None, 'byte_order': None, 'bit_mask': '0x0FF0', 'matrix_dim': None}]
+      views:  summary lines naming it=['    - CHARACTERISTIC SX "" (lines 25-28)', '- CHARACTERISTIC SX: 0x00000010 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-S] OK | Inc 2 E3 shape S
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': "'0x0FF0'", 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': "'0x0FF0'", 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': '0x0FF0', 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT SX "" (lines 25-29)', '- MEASUREMENT SX: 0x00000010 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-T] WRONG | Inc 2 E3 shape T
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': "'0x0FF0'", 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': '0x0FF0', 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT SX "" (lines 25-28)', '- MEASUREMENT SX: 0x00000010 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-U] WRONG | Inc 2 E3 shape U
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': "'0x0FF0'", 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': '0x0FF0', 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT SX "" (lines 25-29)', '- MEASUREMENT SX: 0x00000010 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-W] OK | Inc 2 E3 shape W
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT SX "" (lines 25-33)', '- MEASUREMENT SX: 0x00000010 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-L2C] WRONG | Inc 2 E3 shape L2C
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=['Line 35: /end without /begin']
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': "'0x0FF0'", 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': '0x0FF0', 'matrix_dim': None}]
+      views:  summary lines naming it=[] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-L2N] WRONG | Inc 2 E3 shape L2N
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=['Line 37: /end without /begin']
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': "'0x0FF0'", 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': '0x0FF0', 'matrix_dim': None}]
+      views:  summary lines naming it=[] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-L7] OK | Inc 2 E3 shape L7
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=['Line 37: /end without /begin', 'Line 38: /end without /begin']
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': '0x0FF0', 'matrix_dim': None}]
+      views:  summary lines naming it=[] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-J2] WRONG | Inc 2 E3 shape J2
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=['Unclosed /begin sections detected.']
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': "'0x0FF0'", 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': '0x0FF0', 'matrix_dim': None}]
+      views:  summary lines naming it=[] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-J3] WRONG | Inc 2 E3 shape J3
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=['Unclosed /begin sections detected.']
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': "'0x0FF0'", 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': '0x0FF0', 'matrix_dim': None}]A2L section tree has structural errors: path=/tmp/b103-e1-11/scratch/tmpj7ekhg8v/x.a2l sample=Line 33: /end without /begin
+A2L section tree has structural errors: path=/tmp/b103-e1-11/scratch/tmpj7ekhg8v/x.a2l sample=Unclosed /begin sections detected.
+
+      views:  summary lines naming it=[] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-J4] WRONG | Inc 2 E3 shape J4
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=['Line 33: /end without /begin']
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': "'0x0FF0'", 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': '0x0FF0', 'matrix_dim': None}]
+      views:  summary lines naming it=[] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-J5] OK | Inc 2 E3 shape J5
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT SX "" (lines 25-28)', '- MEASUREMENT SX: 0x00000010 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-X] WRONG | Inc 2 E3 shape X
+      reader: [{'address': '16', 'length': 'None', 'datatype': 'None', 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT SX "" (lines 25-29)', '- MEASUREMENT SX: 0x00000010 len=n/a mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-X2] OK | Inc 2 E3 shape X2
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT SX "" (lines 25-29)', '- MEASUREMENT SX: 0x00000010 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-N2] OK | Inc 2 E3 shape N2
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SIG.BIT_MASK.A', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT SIG.BIT_MASK.A "" (lines 25-28)', '- MEASUREMENT SIG.BIT_MASK.A: 0x00000010 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-C5] WRONG | Inc 2 E3 shape C5
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': "'0x000F/*'", 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': "'0x000F'", 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': '0x000F', 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT SX "" (lines 25-29)', '- MEASUREMENT SX: 0x00000010 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-B3] WRONG | Inc 2 E3 shape B3
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '32', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 32, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT SX "" (lines 25-31)', '- MEASUREMENT SX: 0x00000010 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-A1] WRONG | Inc 2 E3 shape A1
+      reader: [{'address': 'None', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT SX "" (lines 25-28)', '- MEASUREMENT SX: n/a len=2 mem=unknown ERR (missing address/length)'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-A2] WRONG | Inc 2 E3 shape A2
+      reader: [{'address': 'None', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT SX "" (lines 25-28)', '- MEASUREMENT SX: n/a len=2 mem=unknown ERR (missing address/length)'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-A3] WRONG | Inc 2 E3 shape A3
+      reader: [{'address': 'None', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=['Unclosed /begin sections detected.']
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=[] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-A4] WRONG | Inc 2 E3 shape A4
+      reader: [{'address': 'None', 'length': 'None', 'datatype': 'None', 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '16', 'length': '2', 'datatype': 'None', 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': None, 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - CHARACTERISTIC SX "" (lines 25-27)', '- CHARACTERISTIC SX: n/a len=n/a mem=unknown ERR (missing address/length)'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-C2] WRONG | Inc 2 E3 shape C2
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'little'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': 'MSB_LAST', 'bit_mask': None, 'matrix_dim': None}]A2L section tree has structural errors: path=/tmp/b103-e1-11/scratch/tmpj7ekhg8v/x.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/tmp/b103-e1-11/scratch/tmpj7ekhg8v/x.a2l sample=Line 23: /end without /begin
+
+      views:  summary lines naming it=['    - MEASUREMENT SX "" (lines 25-32)', '- MEASUREMENT SX: 0x00000010 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-C1] WRONG | Inc 2 E3 shape C1
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=['Unclosed /begin sections detected.']
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'little'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': 'MSB_LAST', 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=[] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-B1] OK | Inc 2 E3 shape B1
+      reader: [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': '1', 'description': 'None'}] errors=[]
+      REF:    [{'address': '16', 'length': '2', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': '1', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': 4}]
+      views:  summary lines naming it=['    - MEASUREMENT SX "" (lines 25-29)', '- MEASUREMENT SX: 0x00000010 len=2 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-H1] OK | Inc 2 E3 shape H1
+      reader: [{'address': '16', 'length': '0xe8d4a51000', 'datatype': 'None', 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '16', 'length': '0xe8d4a51000', 'datatype': 'None', 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': None, 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - CHARACTERISTIC SX "" (lines 25-28)', '- CHARACTERISTIC SX: 0x00000010 len=1000000000000 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+[RP-C-H3] OK | Inc 2 E3 shape H3
+      reader: [{'address': '16', 'length': '0x174876e7ff', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] errors=[]
+      REF:    [{'address': '16', 'length': '0x174876e7ff', 'datatype': "'UWORD'", 'effective_byte_order': "'big'", 'bit_org': 'None', 'matrix_dim': 'None', 'description': 'None'}] ref_diags=[] ref_words=[{'name': 'SX', 'longid': '', 'address': 16, 'datatype': 'UWORD', 'byte_order': None, 'bit_mask': None, 'matrix_dim': None}]
+      views:  summary lines naming it=['    - MEASUREMENT SX "" (lines 25-29)', '- MEASUREMENT SX: 0x00000010 len=99999999999 mem=unknown'] broken summary lines=[] ctrl chars in cells/card=[]
+-- D: INSTANCE and BLOB (the reader lists no span for either) --
+[RP-D1] BLOB at 0x10, 2 bytes | reader: tags=[] BLOB/INSTANCE sections in tree=['BLOB'] payload keys=['compu_methods_by_name', 'compu_tabs_by_name', 'errors', 'path', 'record_layouts_by_name', 'sections', 'tags'] | REF spans=[('BLOB', ['B1', '', '0x10', '2'])]
+[RP-D2] INSTANCE of TYPEDEF_MEASUREMENT T_U16 at 0x10 | reader: tags=[] BLOB/INSTANCE sections in tree=['INSTANCE'] payload keys=['compu_methods_by_name', 'compu_tabs_by_name', 'errors', 'path', 'record_layouts_by_name', 'sections', 'tags'] | REF spans=[('INSTANCE', ['I1', '', 'T_U16', '0x10'])]
+[RP-D3] INSTANCE with MATRIX_DIM 5 | reader: tags=[] BLOB/INSTANCE sections in tree=['INSTANCE'] payload keys=['compu_methods_by_name', 'compu_tabs_by_name', 'errors', 'path', 'record_layouts_by_name', 'sections', 'tags'] | REF spans=[('INSTANCE', ['I2', '', 'T_U16', '0x20', 'MATRIX_DIM', '5'])]
+[RP-D4] a commented-out BLOB | reader: tags=[] BLOB/INSTANCE sections in tree=[] payload keys=['compu_methods_by_name', 'compu_tabs_by_name', 'errors', 'path', 'record_layouts_by_name', 'sections', 'tags'] | REF spans=[]
+[RP-total] DIFFERS=10 LOST=4 OK=27 PHANTOM=2 SAME-AS-LF=21 WRONG=48 WRONG(ref)=6
+[RP-classes] line-end/encoding: ['RP-A7', 'RP-A9', 'RP-A10', 'RP-A11', 'RP-A15', 'RP-A16', 'RP-A19', 'RP-A20', 'RP-A21', 'RP-A22', 'RP-A23', 'RP-A24', 'RP-A25', 'RP-A26', 'RP-A26b', 'RP-A26c', 'RP-A29']; WRONG: ['RP-B1', 'RP-B2', 'RP-B3', 'RP-B4', 'RP-B5', 'RP-B6', 'RP-B7', 'RP-B9', 'RP-B10', 'RP-B12', 'RP-B13', 'RP-B14', 'RP-B15', 'RP-B17', 'RP-B21', 'RP-B22', 'RP-B23', 'RP-B25', 'RP-B27', 'RP-B37', 'RP-B38', 'RP-B39', 'C-C', 'C-D', 'C-E', 'C-F', 'C-G', 'C-H', 'C-J1', 'C-L', 'C-L2', 'C-N', 'C-T', 'C-U', 'C-L2C', 'C-L2N', 'C-J2', 'C-J3', 'C-J4', 'C-X', 'C-C5', 'C-B3', 'C-A1', 'C-A2', 'C-A3', 'C-A4', 'C-C2', 'C-C1']; LOST: ['RP-B16', 'RP-B18', 'RP-B19', 'RP-B20']; WRONG(ref): ['RP-B24', 'RP-B32', 'RP-B33', 'RP-B34', 'RP-B35', 'C-B']; PHANTOM: ['RP-B28', 'RP-B29']
+exit=0 clone_changed_after=0

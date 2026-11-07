@@ -1,0 +1,115 @@
+# e1-callers transcript — 2026-11-06T21:56:36-06:00
+# base tree: git archive e07fb00 s19_app (throwaway copy in the scratchpad); code-wire v3.1.0 (e436a08); python Python 3.12.7
+files parsed: 86; parse failures: 0
+marks written: 1996
+extractor: marks=1996 graph_nodes=0 calls=3771 findings=2009 parse_failures=0
+
+== build_section_tree: 1 marked caller(s)
+   parse_a2l_file  <-  s19_app/tui/a2l.py:2829
+
+== parse_begin_meta: 4 marked caller(s)
+   extract_a2l_tags.<locals>.walk  <-  s19_app/tui/a2l.py:2601, s19_app/tui/a2l.py:2732
+   extract_compu_methods  <-  s19_app/tui/a2l.py:859
+   extract_compu_tables  <-  s19_app/tui/a2l.py:903
+   extract_record_layouts  <-  s19_app/tui/a2l.py:715
+
+== _parse_first_field: 1 marked caller(s)
+   parse_begin_meta  <-  s19_app/tui/a2l.py:260, s19_app/tui/a2l.py:263
+
+== _split_line_respecting_quotes: 10 marked caller(s)
+   _byte_order_from_section_lines  <-  s19_app/tui/a2l.py:313
+   _flatten_body_tokens  <-  s19_app/tui/a2l.py:456
+   _parse_compu_method_conversion_from_body  <-  s19_app/tui/a2l.py:795
+   _parse_link_map_line  <-  s19_app/tui/a2l.py:674
+   extract_a2l_tags.<locals>.walk  <-  s19_app/tui/a2l.py:2712
+   extract_compu_methods  <-  s19_app/tui/a2l.py:848, s19_app/tui/a2l.py:873
+   extract_compu_tables  <-  s19_app/tui/a2l.py:909, s19_app/tui/a2l.py:913
+   extract_record_layouts  <-  s19_app/tui/a2l.py:718
+   parse_characteristic_header  <-  s19_app/tui/a2l.py:613
+   parse_measurement_header  <-  s19_app/tui/a2l.py:482
+
+== _strip_a2l_comments: 1 marked caller(s)
+   _flatten_body_tokens  <-  s19_app/tui/a2l.py:456
+
+== _flatten_body_tokens: 2 marked caller(s)
+   assemble_characteristic_header  <-  s19_app/tui/a2l.py:653
+   extract_a2l_tags.<locals>.walk  <-  s19_app/tui/a2l.py:2729
+
+== _byte_order_from_section_lines: 2 marked caller(s)
+   extract_a2l_tags.<locals>._module_byte_order  <-  s19_app/tui/a2l.py:2587
+   extract_record_layouts  <-  s19_app/tui/a2l.py:723
+
+== parse_measurement_header: 2 marked caller(s)
+   _first_header_line  <-  s19_app/tui/a2l.py:663
+   extract_a2l_tags.<locals>.walk  <-  s19_app/tui/a2l.py:2604
+
+== _characteristic_from_tokens: 2 marked caller(s)
+   assemble_characteristic_header  <-  s19_app/tui/a2l.py:653
+   parse_characteristic_header  <-  s19_app/tui/a2l.py:613
+
+== _extended_kind_anchor: 1 marked caller(s)
+   _characteristic_from_tokens  <-  s19_app/tui/a2l.py:559
+
+== parse_characteristic_header: 1 marked caller(s)
+   _first_header_line  <-  s19_app/tui/a2l.py:665
+
+== assemble_characteristic_header: 1 marked caller(s)
+   extract_a2l_tags.<locals>.walk  <-  s19_app/tui/a2l.py:2608
+
+== _first_header_line: 1 marked caller(s)
+   extract_a2l_tags.<locals>.walk  <-  s19_app/tui/a2l.py:2603
+
+== _memory_segment_record_words: 1 marked caller(s)
+   extract_memory_segments.<locals>.walk  <-  s19_app/tui/a2l.py:1091
+
+== extract_memory_segments: 3 marked caller(s)
+   SplitJoinWindow._a2l_rows  <-  s19_app/tui/segment_split_view.py:1620
+   extract_a2l_tags  <-  s19_app/tui/a2l.py:2579
+   parse_a2l_file  <-  s19_app/tui/a2l.py:2842
+
+== extract_record_layouts: 1 marked caller(s)
+   parse_a2l_file  <-  s19_app/tui/a2l.py:2831
+
+== extract_compu_methods: 1 marked caller(s)
+   parse_a2l_file  <-  s19_app/tui/a2l.py:2832
+
+== extract_a2l_tags: 1 marked caller(s)
+   parse_a2l_file  <-  s19_app/tui/a2l.py:2834
+
+== _infer_length_measurement: 1 marked caller(s)
+   extract_a2l_tags.<locals>.walk  <-  s19_app/tui/a2l.py:2721
+
+== _infer_length_characteristic: 1 marked caller(s)
+   extract_a2l_tags.<locals>.walk  <-  s19_app/tui/a2l.py:2723
+
+== parse_a2l_file: 3 marked caller(s)
+   execute_variant_plan  <-  s19_app/tui/services/variant_execution_service.py:2665
+   parse_a2l_cached  <-  s19_app/tui/app.py:948, s19_app/tui/app.py:950
+   run_flow  <-  s19_app/tui/services/flow_execution_service.py:381, s19_app/tui/services/flow_execution_service.py:500
+
+== iter_section_lines: 1 marked caller(s)
+   render_a2l_view  <-  s19_app/tui/a2l.py:3657
+
+== render_a2l_view: 1 marked caller(s)
+   enrich_tags_and_render  <-  s19_app/tui/services/a2l_service.py:26
+
+== _a2l_number: 1 marked caller(s)
+   extract_memory_segments.<locals>.walk  <-  s19_app/tui/a2l.py:1101, s19_app/tui/a2l.py:1104, s19_app/tui/a2l.py:1116
+
+== enrich_tags_and_render: 5 marked caller(s)
+   S19TuiApp._compute_a2l_enriched_tags  <-  s19_app/tui/app.py:20136
+   S19TuiApp._prepare_load_payload  <-  s19_app/tui/app.py:18844
+   _a2l_addresses  <-  s19_app/tui/services/compare_service.py:305
+   _execute_one_variant  <-  s19_app/tui/services/variant_execution_service.py:2553
+   run_flow  <-  s19_app/tui/services/flow_execution_service.py:399
+
+== S19TuiApp._compose_screen_a2l: 1 marked caller(s)
+   S19TuiApp.compose  <-  s19_app/tui/app.py:3385
+
+== collect_link_maps: 1 marked caller(s)
+   extract_a2l_tags.<locals>.walk  <-  s19_app/tui/a2l.py:2716
+
+== _collect_sections_by_name: 3 marked caller(s)
+   extract_compu_methods  <-  s19_app/tui/a2l.py:846
+   extract_compu_tables  <-  s19_app/tui/a2l.py:902
+   extract_record_layouts  <-  s19_app/tui/a2l.py:714

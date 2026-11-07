@@ -1,0 +1,43 @@
+host=cachyos-rtx date=2026-11-06T22:02:27-06:00 clone=e07fb00f9fc13afd314d0334fac683fe33b29b6c changed=0 HOME=/tmp/b103-e1-11/zq_iso_user
+s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py | textual 8.2.8
+[W220] table size=Size(width=108, height=26) rows=1 reader address=0x1c2d3e00 length=2266
+[W220] table| Tag        Address   LengthSource Raw PhysicalInMemRegion Limits UnitBitsEndianVirtFuncAccessDtype
+[W220] table| ✓ SYN_MAP_W0x1C2D3E002266  formula17921792    yes  unknown0..4095%.0           no
+[W220] card | ✓ SYN_MAP_W  0x1C2D3E00
+[W220] card | desc synthetic map
+[W220] card | unit — · conv CM_SYN
+[W220] card | layout RL_SYN_MAP
+[W220] '0x1C2D3E002266' painted in the table: True | address text painted whole: True | 'unknown0..' painted: True
+[W160] table size=Size(width=73, height=26) rows=1 reader address=0x1c2d3e00 length=2266
+[W160] table| Tag        Address   LengthSource Raw PhysicalInMemRegion Limits UnitBits
+[W160] table| ✓ SYN_MAP_W0x1C2D3E002266  formula17921792    yes  unknown0..4095%.0
+[W160] card | ✓ SYN_MAP_W  0x1C2D3E00
+[W160] card | desc synthetic map
+[W160] card | unit — · conv CM_SYN
+[W160] card | layout RL_SYN_MAP
+[W160] '0x1C2D3E002266' painted in the table: True | address text painted whole: True | 'unknown0..' painted: True
+[W118] table size=Size(width=60, height=26) rows=1 reader address=0x1c2d3e00 length=2266
+[W118] table| Tag        Address   LengthSource Raw PhysicalInMemRegion Li
+[W118] table| ✓ SYN_MAP_W0x1C2D3E002266  formula17921792    yes  unknown0.
+[W118] card | ✓ SYN_MAP_W  0x1C2D3E00
+[W118] card | desc synthetic map
+[W118] card | unit — · conv CM_SYN
+[W118] card | layout RL_SYN_MAP
+[W118] '0x1C2D3E002266' painted in the table: True | address text painted whole: True | 'unknown0..' painted: False
+[W100] table size=Size(width=49, height=26) rows=1 reader address=0x1c2d3e00 length=2266
+[W100] table| Tag        Address   LengthSource Raw PhysicalInM
+[W100] table| ✓ SYN_MAP_W0x1C2D3E002266  formula17921792    yes
+[W100] card | ✓ SYN_MAP_W  0x1C2D3E00
+[W100] card | desc synthetic map
+[W100] card | unit — · conv CM_SYN
+[W100] card | layout RL_SYN_MAP
+[W100] '0x1C2D3E002266' painted in the table: True | address text painted whole: True | 'unknown0..' painted: False
+[W80] table size=Size(width=38, height=26) rows=1 reader address=0x1c2d3e00 length=2266
+[W80] table| Tag        Address   LengthSource Raw
+[W80] table| ✓ SYN_MAP_W0x1C2D3E002266  formula1792
+[W80] card | ✓ SYN_MAP_W  0x1C2D3E00
+[W80] card | desc synthetic map
+[W80] card | unit — · conv CM_SYN
+[W80] card | layout RL_SYN_MAP
+[W80] '0x1C2D3E002266' painted in the table: True | address text painted whole: True | 'unknown0..' painted: False
+exit=0 clone_changed_after=0

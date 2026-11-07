@@ -1,9 +1,9 @@
 # Inc 3 — A2L definition model II: arrays and axes (pure module): requirements (E1)
 
-Batch 2026-11-05-batch-103, increment 3. Base: branch `batch-103` at `9ae92c3` (product tree `e07fb00`: `s19_app/`, `tools/`, `tests/` identical). Stage E1 of the design-first flow (`dev-flow-v3-beta`). Plan row: `../PLAN.md` Inc 3 (US-103-05; the module `s19_app/tui/a2l_definition.py` that Inc 2 creates, `a2l.py` frozen, the D6 synth extension under amendment A1 rule 2). This increment **extends** Inc 2 (`../inc-2/01-requirements.md`, rows `R-A2L-DEF.1` … `.63`, its rulings accepted 2026-11-06): no Inc 2 row is restated or changed here; the changes Inc 3 needs in Inc 2's records are PROPOSED in `E1-rulings.md` D-14. Scope, decisions and reasons: `E1-rulings.md` (every open decision is **PROPOSED — awaiting orchestrator ruling**; the rows are written for the recommended option of each). Slice: `E1-slice.md`. Test cases: `02-test-cases.md`. Interface I-2 extension: `E1-rulings.md` §4.
+Batch 2026-11-05-batch-103, increment 3. Base: branch `batch-103` at `9ae92c3` (product tree `e07fb00`: `s19_app/`, `tools/`, `tests/` identical). Stage E1 of the design-first flow (`dev-flow-v3-beta`). Plan row: `../PLAN.md` Inc 3 (US-103-05; the module `s19_app/tui/a2l_definition.py` that Inc 2 creates, `a2l.py` frozen, the D6 synth extension under amendment A1 rule 2). This increment **extends** Inc 2 (`../inc-2/01-requirements.md`, rows `R-A2L-DEF.1` … `.63` and, from its E3, `.136` … `.139`, its rulings accepted 2026-11-06; rebased on Inc 2's E3 and split by amendment A2, "Split (amendment A2)" below): no Inc 2 row is restated or changed here; the changes Inc 3 needs in Inc 2's records are PROPOSED in `E1-rulings.md` D-14. Scope, decisions and reasons: `E1-rulings.md` (every open decision is **PROPOSED — awaiting orchestrator ruling**; the rows are written for the recommended option of each). Slice: `E1-slice.md`. Test cases: `02-test-cases.md`. Interface I-2 extension: `E1-rulings.md` §4.
 
 Form column: U = ubiquitous, When = event, If = unwanted behaviour. "Base" column: what `e07fb00` does today, and how it is known. **B** = the E1 pilot (`evidence-e1/i3e1-pilot.py`, transcript `evidence-e1/i3e1-pilot-transcript.txt`, cited by line: LAN Linux host cachyos-rtx, Python 3.11.18, the read-only clone at `e07fb00`, HOME/XDG/LOCALAPPDATA under `/tmp/b103-e1-3/home`, no display, no clipboard; pure functions only). **C** = a census: `evidence-e1/i3e1-shapes-transcript.txt` (the array and axis shapes of the 35 tracked `.a2l` files, cited by line), `evidence-e1/i3e1-counts-transcript.txt` (point counts per CURVE/MAP), `evidence-e1/i3e1-callers-transcript.txt` (Code-Wire v3.1.0 extractor, real callers), `evidence-e1/i3e1-index-mode-source-transcript.txt` (the public description of ROW_DIR / COLUMN_DIR / INDEX_DECR, D-2), `evidence-e1/i3e1-id-census.txt` (ids). **R** = read in the code at `e07fb00`, not run.
-Row status: every row is **new** (ids `R-A2L-DEF.64` … `.135`; the range `.64` … `.149` is unused everywhere the brief names, `evidence-e1/i3e1-id-census.txt` — its only hits are Inc 2's notes that Inc 3 continues at `.64`). No canon row is changed (`E1-rulings.md` §2). A row ruled out is marked `— Withdrawn` and keeps its id.
+Row status: every row is **new** (ids `R-A2L-DEF.64` … `.135`; the range `.64` … `.149` is unused everywhere the brief names, `evidence-e1/i3e1-id-census.txt` — its only hits are Inc 2's notes that Inc 3 continues at `.64`; Inc 2's E3 later took `.136` … `.139`, which Inc 3's ids do not touch, and `.140` is reserved for the proposed 3b row of "Split (amendment A2)"). No canon row is changed (`E1-rulings.md` §2). A row ruled out is marked `— Withdrawn` and keeps its id.
 Canon home (proposed, `E1-rulings.md` D-13): S2.7 · *A value by its A2L definition* gains five blocks after Inc 2's S2.7a … S2.7d: **S2.7e** arrays, curves and maps, **S2.7f** record layouts and axes, **S2.7g** decoding by element, **S2.7h** encoding an edit, **S2.7i** test data (arrays and axes).
 
 ## User stories
@@ -81,12 +81,13 @@ edit            A set of pairs (position, operator text) for one array, curve or
                 element index, or an axis letter (X or Y) and a point index.
 edit order      The points of axis X by point index, then those of axis Y, then the elements in element
                 order.
-array refusal order   name (R-A2L-DEF.6), kind (.4), MATRIX_DIM (.71), record layout (.82), positions (.87),
+array refusal order   name (R-A2L-DEF.6, .139), kind (.4), MATRIX_DIM (.71), a MEASUREMENT's datatype (.8, E2-1),
+                record layout (.82), positions (.87),
                 parts (.84), modes (.85), component datatypes (.86), FNC_VALUES (.83), axis count (.91),
                 axis kind (.92), axis object (.96), axis object layout (.97), point count (.95), fixed
                 points (.98), fixed point count (.99), axis component (.101), FIX_NO current count
                 (.116, .117), three-dimension COLUMN_DIR (.80), alignment (.89), shape from the length
-                (.70), length (.76), address and length (.7), the values' refusals (.81, in Inc 2's
+                (.70), length (.76), address and length (.7.1, .7.2), the values' refusals (.81, in Inc 2's
                 refusal order), the axis points' refusals (.103, axis X before axis Y).
 array encode order    the record's decode (.124), positions (.125), then each edit in edit order: fixed
                 axis (.126), common axis (.127), no points (.128), then Inc 2's encode order for its
@@ -194,7 +195,7 @@ Terms reused without change: Inc 2's CTX-A2L-DEF (definition, refusal, notice, d
 | R-A2L-DEF.131 | U | The system shall give every edit it accepts bytes in which each edited element and axis point decodes to a value that agrees with its operator text at the display precision of its element definition. | property: ≥ 200 accepted edits over V171 3×4 ROW_DIR and COLUMN_DIR, V171 `ASAM.C.MAP.COM_AXIS.FIX_AXIS` values, the INLINE INDEX_DECR curve's points, the definitions case's MAP (COLUMN_DIR values, STD_AXIS points) and VAL_BLK (LINEAR, `%.1`), each with 1 to 3 positions per edit, values = the 17-significant-digit texts of decoded stored values plus typed decimals; 0 that do not agree | a COLUMN_DIR edit written at the ROW_DIR offset → RED; INDEX_DECR written as INDEX_INCR → RED | US-103-05 | new | **No** (R: no model) |
 | R-A2L-DEF.132 | U | The system shall give every edit it accepts bytes in which every element and axis point the edit does not name decodes to the stored value it had before the edit. | property: the edits of R-A2L-DEF.131: 0 unedited elements or points whose stored value changes; every byte of the record outside the edited bytes equal to the image's | the whole record re-encoded from the display texts of every element (the definitions case VAL_BLK's `%.1` LINEAR drifts) → RED; zero-fill of unedited components → RED | US-103-05 | new | **No** (B line 25: the base re-encodes the whole record from the values given) |
 
-The record's bytes missing at decode give Inc 2's `A2L-DEF-BYTES` refusal (R-A2L-DEF.26, unchanged: the span is the byte length); the A2L data and the image are left unchanged by building, decoding and encoding arrays as R-A2L-DEF.58 requires; their cases on these kinds are in `02-test-cases.md` (cited rows).
+The record's bytes missing at decode give Inc 2's `A2L-DEF-BYTES` refusal (R-A2L-DEF.26, unchanged: the span is the byte length); the A2L data and the image are left unchanged by building, decoding and encoding arrays as R-A2L-DEF.58.1 requires; their cases on these kinds are in `02-test-cases.md` (cited rows).
 
 ### S2.7i · Test data: arrays and axes in the definitions case (D6; amendment A1 rule 2)
 
@@ -210,10 +211,11 @@ Case 08 stays byte-identical: Inc 2's R-A2L-DEF.59 pins its 22 digests, and the 
 
 | Use | Row | What the model does under it |
 |---|---|---|
-| lookup by name | R-A2L-DEF.5, .6 (Inc 2) | the first tag of the name, case included, for arrays, curves and maps too |
-| address and length | R-A2L-DEF.7 (Inc 2) | the length is the byte length of R-A2L-DEF.74 / .75 (CTX-A2L-DEF *byte length*) |
+| lookup by name | R-A2L-DEF.5, .6, .139 (Inc 2) | the one tag of the name, case included; a name declared more than once refused (.139, E3S-35), for arrays, curves and maps too |
+| address and length | R-A2L-DEF.7.1 (Inc 2) | the length is the byte length of R-A2L-DEF.74 / .75 (CTX-A2L-DEF *byte length*); .7.2's span bounds apply to it too (no Inc 3 case: `E2-rulings.md`, rebase list) |
 | bytes missing | R-A2L-DEF.26 (Inc 2) | the object's whole record |
-| unchanged inputs | R-A2L-DEF.58 (Inc 2) | building, decoding and encoding arrays, curves and maps |
+| unchanged inputs | R-A2L-DEF.58.1 (Inc 2) | building, decoding and encoding arrays, curves and maps |
+| describe speed | R-A2L-DEF.136 (Inc 2) | every object of software_a described in one walk, Inc 3's kinds and lookups included (E3A-32: the AXIS_PTS and MOD_COMMON maps of the one walk) |
 | case 08 pin, determinism | R-A2L-DEF.59, .63 (Inc 2) | the definitions case with this increment's objects |
 | address, byte order | R-A2L-010, R-A2L-011, R-A2L-024 … R-A2L-027 | the object's address and byte order; the axis object's (R-A2L-DEF.114) |
 | axis points of another section | R-A2L-019 | a COM_AXIS counts its axis object's points (R-A2L-DEF.94) |
@@ -224,4 +226,33 @@ Pure model, no window: the acceptance cases are black-box at the model's interfa
 
 ## Counts
 
-72 rows, all new: S2.7e 18 (R-A2L-DEF.64 … .81), S2.7f 23 (.82 … .104), S2.7g 17 (.105 … .121), S2.7h 11 (.122 … .132), S2.7i 3 (.133 … .135); 0 changed, 0 retired. Cited rows with cases here: 12 rows, 14 cases (above; `02-test-cases.md`). A MEASUREMENT array's elements take the datatype of its header, as Inc 2's scalar MEASUREMENT does (the tag's datatype; case R-A2L-DEF.74/2). Context note: CTX-A2L-DEF gains the Inc 3 terms above; no other note changes. Rows that depend on an open ruling: D-2 (.80, .106, .107), D-3 (.117), D-4 (.127), D-5 (.129), D-6 (.68 … .70), D-7 (.89), D-8 (.100, .128), D-9 (.92), D-10 (.110 … .112), D-11 (.94, .102), D-15 (.133 … .135); a ruled-out row is marked `— Withdrawn`, keeping its id.
+72 rows, all new: S2.7e 18 (R-A2L-DEF.64 … .81), S2.7f 23 (.82 … .104), S2.7g 17 (.105 … .121), S2.7h 11 (.122 … .132), S2.7i 3 (.133 … .135); 0 changed, 0 retired. Cited rows with cases here: 14 rows, 16 cases (above; `02-test-cases.md`; the rebase added .139 and .136 and renamed .7 → .7.1, .58 → .58.1). A MEASUREMENT array's elements take the datatype of its header, as Inc 2's scalar MEASUREMENT does (the tag's datatype; case R-A2L-DEF.74/2). Context note: CTX-A2L-DEF gains the Inc 3 terms above; no other note changes. Rows that depend on an open ruling: D-2 (.80, .106, .107), D-3 (.117), D-4 (.127), D-5 (.129), D-6 (.68 … .70), D-7 (.89), D-8 (.100, .128), D-9 (.92), D-10 (.110 … .112), D-11 (.94, .102), D-15 (.133 … .135); a ruled-out row is marked `— Withdrawn`, keeping its id.
+
+## Split (amendment A2)
+
+Amendment A2 (`../PLAN.md` "Amendment A2") splits this increment as it splits Inc 2. **Inc 3a** is the read side: describe, decode and display of arrays, curves, maps and VAL_BLKs, the CTX terms they need, the synth objects, and the element count and byte length Inc 6 needs (PE-D1). It runs on Inc 2a and today's reader. **Inc 3b** is the write side: the encode of elements and axis points, the monotony on an edit, and the AXIS_PTS spans in R-A2L-DEF.138's index (Inc 2's E3 round-4b census ruling). It waits for Inc 2b and Inc 11, and is re-reviewed with 2b's guards. No row text changes. A row that serves both sides stays in 3a and names the clauses that wait for 3b. The cases are split in `02-test-cases.md` "Split (amendment A2)", the nodes and I-2 in `codewire/graph-inc3.md` "Split (amendment A2)", the functions in `E1-slice.md` §7, and the Inc 2 E3 findings that apply to each side in `E2-rulings.md` "Rebase on Inc 2's E3".
+
+| Rows | Side | Clauses that wait for 3b (3a row), or what makes the row 3b |
+|---|---|---|
+| R-A2L-DEF.64 … .81 (S2.7e, 18) | 3a | — (.73 … .75 are the element count and byte length Inc 6 reads) |
+| R-A2L-DEF.82 … .104 (S2.7f, 23) | 3a | — (the MONOTONY word is read with the axis, CTX *monotony rule*, but only 3b's .129 uses it) |
+| R-A2L-DEF.105 … .119 (15) | 3a | — |
+| R-A2L-DEF.120 | 3a | "or to encode one operator text for it" (case /2) |
+| R-A2L-DEF.121 | 3a | the refusals and notices of an encode (cases /1, /2); /3 is a decode refusal |
+| R-A2L-DEF.122 … .130 (9) | 3b | the encode of an edit: its bytes, its refusals, the monotony on an edit |
+| R-A2L-DEF.131, .132 | 3b | the encode round trip |
+| R-A2L-DEF.133 … .135 (S2.7i, 3) | 3a | — (the generator; .134's MONOTONY line is what 3b's .129 checks in AT-B103-I3-2) |
+| cited R-A2L-DEF.5, .6, .139, .7.1, .26, .59, .63, .136, R-A2L-010, 011, 024, 026, 019 | 3a | — |
+| cited R-A2L-DEF.58.1 | 3a | "and encoding" (the edit arm of /arr-1, /arr-2) |
+
+**Counts.** 3a: 61 rows (S2.7e 18, S2.7f 23, S2.7g 17, S2.7i 3). 3b: 11 rows (S2.7h). Total 72, unchanged. Cited rows: 14, all 3a; .58.1's edit arm waits.
+
+**AXIS_PTS spans in R-A2L-DEF.138's index: no row yet.** The census ruling (`../inc-2/E3-rulings.md`, round-4 census re-run: "AXIS_PTS spans join the index in Inc 3") puts it in 3b. No Inc 3 row states it, so it is not counted. Proposed text, for the orchestrator to rule when 3b re-opens against the re-reviewed .138 (E3S-37's BLOB and INSTANCE spans and E3S-40's index lengths concern the same index, `E2-rulings.md`):
+
+| Id | Form | Requirement | Threshold | Negative control | US | Status | Base |
+|---|---|---|---|---|---|---|---|
+| R-A2L-DEF.140 | When | When the system builds the span index of R-A2L-DEF.138, the system shall add to it every AXIS_PTS object whose address the A2L declares and whose record the system can place, with the span of that record. | 3/3 INLINE3: an AXIS_PTS `AXS` at 0x10 (layout `NO_AXIS_PTS_X 1 UBYTE`, `AXIS_PTS_X 2 UBYTE INDEX_INCR DIRECT`, max 4: bytes 0x10 … 0x14) and a UBYTE VALUE `VS` at 0x14 → `VS`: `shared_with` `AXS`, its encode refused `A2L-DEF-OVERLAP` `VS: its bytes at 0x14 are shared with AXS`; the same VALUE at 0x15 → `shared_with` `None`; `AXS` with the address word `0xZZ` and `VS` at 0x10 → `shared_with` `None` | AXIS_PTS left out of the index (2b as written) → /1 `shared_with` `None` → RED | US-103-05 | PROPOSED (Inc 2 E3 census ruling) | **No** (R: the index holds MEASUREMENT and CHARACTERISTIC tags only; an AXIS_PTS is not a tag, BL-I3-1). Fixtures: 82 AXIS_PTS, 77 of them at an address inside an indexed span — every one in a span already refused (`../inc-2/evidence-e3/corr4b-overlap-census-transcript.txt:54`; E3S-45 (iv)) |
+
+**Where the line is drawn.** .120 and .121 stay in 3a because 3a's single decode of an array must refuse (A2L-DEF-ELEMENTS) and 3a's decode refusals name the element (.121/3). The orchestrator may draw it elsewhere: the MONOTONY word could also wait for 3b (3b would then add a field to `AxisDefinition` after `count_datatype`; no row and no 3a case reads it).
+
+3a inherits today's reader limits, as 2a does (commented-out copies are live tags, one-line IF_DATA nesting, E2-8 / BL-I3-11); 3a writes nothing. What each limit costs 3a, and which findings of Inc 2's E3 apply to which side, is listed in `E2-rulings.md`.

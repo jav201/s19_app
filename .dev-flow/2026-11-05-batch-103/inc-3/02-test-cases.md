@@ -214,13 +214,15 @@ Common fixtures (Inc 2's V171, SOFTA, C08 and DEFC as defined in `../inc-2/02-te
 
 | Case | Objective | Class | Preconditions | Inputs | Expected result | Tests | Coverage | Result |
 |---|---|---|---|---|---|---|---|---|
-| R-A2L-DEF.5/arr-1 | Verify the first tag of a name for an array | normal | INLINE3: two VAL_BLKs `DUPA` (MATRIX_DIM 2) at 0x10 and 0x20 | the definition of `DUPA` | address 0x10 | | gap | not_run |
+| R-A2L-DEF.5/arr-1 | Verify that the one tag of an array's name is used, case included | normal | INLINE3: a VAL_BLK `DUPA` (MATRIX_DIM 2) at 0x20 and a VAL_BLK `dupa` (MATRIX_DIM 2) at 0x10 | the definition of `DUPA` | address 0x20, kind array, no refusal (`dupa` is another name; rebased: the first-tag rule is gone, E3S-35) | | gap | not_run |
+| R-A2L-DEF.139/arr-1 | Verify the refusal for an array name declared twice | robustness | INLINE3: two VAL_BLKs `DUPA` (MATRIX_DIM 2) at 0x10 and 0x20 | the definition of `DUPA` | refusal `A2L-DEF-NAME`, `DUPA: the A2L declares that name more than once` (the input of E1's .5/arr-1) | | gap | not_run |
 | R-A2L-DEF.6/arr-1 | Verify the name's case for a curve | robustness | C08 clean | `curve_0001` | `curve_0001: no tag of that name in the A2L` | | gap | not_run |
-| R-A2L-DEF.7/arr-1 | Verify that an array's length is its byte length | robustness | V171 (the tag has no length, B line 7) | `…3_4.ROW_DIR` | no A2L-DEF-ADDRESS refusal; byte length 24 | | gap | not_run |
-| R-A2L-DEF.7/arr-2 | Verify an array with no address | robustness | INLINE3: UBYTE MEASUREMENT `MA0`, `MATRIX_DIM 4`, no ECU_ADDRESS | `MA0` | `MA0: the object has no address or no length` | | gap | not_run |
+| R-A2L-DEF.7.1/arr-1 | Verify that an array's length is its byte length | robustness | V171 (the tag has no length, B line 7) | `…3_4.ROW_DIR` | no A2L-DEF-ADDRESS refusal; byte length 24 | | gap | not_run |
+| R-A2L-DEF.7.1/arr-2 | Verify an array with no address | robustness | INLINE3: UBYTE MEASUREMENT `MA0`, `MATRIX_DIM 4`, no ECU_ADDRESS | `MA0` | `MA0: the object has no address or no length` | | gap | not_run |
 | R-A2L-DEF.26/arr-1 | Verify missing record bytes | robustness | V171; image of 23 of the 24 bytes at 0x810100 | decode `…3_4.ROW_DIR` | `ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR: 1 of its 24 bytes are not in the image` | | gap | not_run |
-| R-A2L-DEF.58/arr-1 | Verify unchanged inputs on V171 | normal | V171 with an image holding every array, curve and map record and both axis objects | build, decode and edit (one cell each, its own decoded text) every array, curve and map | a deep copy of the parse payload and of the image taken before equals both after | | gap | not_run |
-| R-A2L-DEF.58/arr-2 | Verify unchanged inputs on case 08 | normal | C08 clean | as /arr-1 over its 140 arrays, curves and maps | as /arr-1 | | gap | not_run |
+| R-A2L-DEF.58.1/arr-1 | Verify unchanged inputs on V171 | normal | V171 with an image holding every array, curve and map record and both axis objects | build, decode and edit (one cell each, its own decoded text) every array, curve and map | a deep copy of the parse payload and of the image taken before equals both after | | gap | not_run |
+| R-A2L-DEF.58.1/arr-2 | Verify unchanged inputs on case 08 | normal | C08 clean | as /arr-1 over its 140 arrays, curves and maps | as /arr-1 | | gap | not_run |
+| R-A2L-DEF.136/arr-1 | Verify that describing every object stays fast with Inc 3's kinds (E3A-32) | normal | SOFTA | `describe_definitions` of every tag name (13,990): 101 VAL_BLK, 158 CURVE (161 COM axes), 11 MAP and 196 MEASUREMENT arrays among them | finishes within 2.0 s (median of 3 runs, cachyos-rtx, Python 3.11.18, `serial_timing`); the rebase's cost prototype gives about 1.0 s | | gap | not_run |
 | R-A2L-DEF.59/arr-1 | Verify case 08's pin with Inc 3's synth | normal | the generator of the tree under test | Inc 2's R-A2L-DEF.59/1 and /2 | the 22 pinned digests | | gap | not_run |
 | R-A2L-DEF.63/arr-1 | Verify the extended definitions case is deterministic | normal | the generator | the definitions case twice into two folders | every file byte-identical | | gap | not_run |
 | R-A2L-010/arr-1 | Verify a VAL_BLK address | normal | V171 | `…3_4.ROW_DIR` | address 0x810100 | | gap | not_run |
@@ -238,4 +240,31 @@ Common fixtures (Inc 2's V171, SOFTA, C08 and DEFC as defined in `../inc-2/02-te
 | AT-B103-I3-3 | Verify case 08's arrays with the model (US-103-05) | normal | C08 clean and issues | build, decode and edit (one value each) every VAL_BLK, CURVE and MAP of both A2Ls | 60 VAL_BLK, 60 CURVE, 20 MAP per A2L, 0 refusals; element counts 128, 32, 64; decodes = the plan (MAP COLUMN_DIR); edits land and keep the other cells; the 22 case files equal the pin — rows R-A2L-DEF.69, .73, .100, .107, .123, .131, .132, R-A2L-DEF.59 | | gap | not_run |
 | AT-B103-I3-4 | Verify the element counts Inc 6 reads on the a2ltool file (US-103-05, PE-D1) | normal | SOFTA (no image) | build every VAL_BLK, CURVE and MAP | for each: element count = the count the test takes from the file text (NUMBER, or the axis object's max axis points for a COM_AXIS, or the AXIS_DESCR's); 0 A2L-DEF-AXIS-REF and 0 A2L-DEF-LAYOUT-PART refusals; every refusal listed by code in the test's log — rows R-A2L-DEF.64, .68, .73, .74, .90, .94 | | gap | not_run |
 
-**Counts:** 195 cases of the 72 rows (S2.7e 58, S2.7f 61, S2.7g 40, S2.7h 33, S2.7i 3), 14 cases of 12 cited rows, and 4 acceptance cases: 213 cases. Negative controls (the mutant of each row, run at E5 in a copy of the tree): `01-requirements.md`, column "Negative control".
+**Counts:** 195 cases of the 72 rows (S2.7e 58, S2.7f 61, S2.7g 40, S2.7h 33, S2.7i 3), 16 cases of 14 cited rows (the rebase on Inc 2's E3 added R-A2L-DEF.139/arr-1 and .136/arr-1 and renamed `.7/arr-k` → `.7.1/arr-k`, `.58/arr-k` → `.58.1/arr-k`), and 4 acceptance cases: 215 cases. Negative controls (the mutant of each row, run at E5 in a copy of the tree): `01-requirements.md`, column "Negative control".
+
+## Split (amendment A2)
+
+The cases split by side, following `01-requirements.md` "Split (amendment A2)": **3a** is the read side, which runs on Inc 2a; **3b** is the write side, which waits for Inc 2b and Inc 11. A case that serves both sides stays in 3a, and its edit arm waits for 3b. A 3b case keeps **Tests** empty, **Coverage** `gap` and **Result** `not_run` until 3b's E4. Thresholds do not change: a 3a row whose cases wait reaches its N/N at 3b (.120 has 1 of 2 cases in 3a, .121 1 of 3).
+
+| Rows | 3a cases | 3b cases |
+|---|---|---|
+| R-A2L-DEF.64 … .81 (S2.7e) | every case (58) | — |
+| R-A2L-DEF.82 … .104 (S2.7f) | every case (61) | — |
+| R-A2L-DEF.105 … .119 | every case (35) | — |
+| R-A2L-DEF.120 | /1 (single decode) | /2 (single encode) |
+| R-A2L-DEF.121 | /3 (decode refusal) | /1, /2 (edit refusals) |
+| R-A2L-DEF.122 … .132 (S2.7h) | — | every case (33) |
+| R-A2L-DEF.133 … .135 (S2.7i) | every case (3) | — |
+| cited R-A2L-DEF.5, .6, .139, .7.1, .26, .59, .63, .136, R-A2L-010, 011, 024, 026, 019 | every `/arr-k` case (14) | — |
+| cited R-A2L-DEF.58.1 | /arr-1, /arr-2 (the edit arm waits) | — |
+| AT-B103-I3-1 | 3a arm: build every array, curve, map, CUBOID and CUBE_4 of V171 and decode those without a refusal (the twins, the shared axis, the three FIX forms, the refusals by code) | waiting arm: edit one value of each, apply, decode (rows .123, .131, .132) |
+| AT-B103-I3-2 | 3a arm: build and decode each DEFC array, curve and map to the plan (rows .133 … .135) | waiting arm: the edits, the common-axis refusal (.127), the out-of-order refusal (.129), .131, .132 |
+| AT-B103-I3-3 | 3a arm: build and decode every VAL_BLK, CURVE and MAP of both A2Ls (60, 60, 20 each, 0 refusals, element counts 128, 32, 64, decodes = the plan) | waiting arm: the edits land and keep the other cells (rows .123, .131, .132) |
+| AT-B103-I3-4 | the whole case (building only; Inc 6's element counts) | — |
+
+The Inc 2 cases that D-14 changes (R-A2L-DEF.4's case list, .24/1, AT-B103-I2-3; `codewire/graph-inc3.md` "Inc 2 cases this increment changes") describe and decode only: they are 3a.
+
+**Split counts.**
+- **3a: 179 cases.** These are 159 cases of the 61 3a rows (S2.7e 58, S2.7f 61, S2.7g 37, S2.7i 3), the 16 cited cases and the 4 acceptance cases. In 5 of them an arm waits for 3b: .58.1/arr-1, .58.1/arr-2, AT-B103-I3-1, -2 and -3.
+- **3b: 36 cases.** S2.7g 3 (.120/2, .121/1, .121/2) and S2.7h 33 (.122 … .132). The proposed R-A2L-DEF.140 (`01-requirements.md`) would add 3 cases to 3b.
+- **Total: 215 cases** (213 at E2, plus the rebase's .139/arr-1 and .136/arr-1).

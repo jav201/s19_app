@@ -85,3 +85,30 @@ Proposed: `tests/test_b103_a2l_definition_arrays.py` (S2.7e … S2.7h, the cited
 | Inc 2's records | Inc 2's next record pass | the case changes of `E1-rulings.md` D-14 |
 | consumers of I-2 | Inc 6, Inc 9 | they call §2's #1, #15, #21, #23 |
 | any file of Inc 1a, 1b, 4 or batch-101 | — | none shared |
+
+## 7. Split (amendment A2)
+
+Amendment A2 (`../PLAN.md`) splits the increment as it splits Inc 2. **3a**, the read side, runs on Inc 2a. **3b**, the write side, waits for Inc 2b and Inc 11. The current contracts are the graph's (`codewire/graph-inc3.md`, "Rebase on Inc 2's E3" and "Split (amendment A2)"); §2's table is E1's. The rebase on Inc 2's E3 changed four entries of it:
+- **#1** is now `describe_definitions` (Inc 2's E3A-01: `describe_definition` delegates to it and is unchanged).
+- **#12 `_find_axis_object`** and E2's **`_module_common`** are lookups in maps that `describe_definitions`'s one walk builds (`axis_pts_by_name`, `mod_common_of`), not walks per object (E3A-32); `_collect_sections_by_name` is no longer reused (§3).
+- E2's **`_conversion_fields`** reads Inc 2's `compu_methods_by_name` / `compu_tables_by_name` and returns the method record's `coeffs_linear`, `coeffs`, `compu_tab_ref` (E3A-03); **#14 `_element_definition`** is a `dataclasses.replace` of the object's definition (E3A-22).
+- **#20 `_decode_stored`** converts from the definition's method fields, never from `sections` (E3A-03).
+
+| Side | Functions (§2 number, or added at E2) | Count |
+|---|---|---|
+| 3a | #1 `describe_definitions` (changed), #2 `_object_kind` (changed), #3 `decode_definition` (changed), #5 `_describe_array`, #6 `_read_matrix_dim`, #7 `_array_shape`, #8 `_read_record_layout`, #9 `_place_components`, #10 `_check_module_alignment`, #11 `_read_axis`, #12 `_find_axis_object`, #13 `_fixed_points`, #14 `_element_definition`, #15 `decode_values`, #16 `_element_offset`, #17 `_point_offset`, #18 `_current_count`, #19 `_decode_axis`, #20 `_decode_stored`, #23 `element_name`, `_conversion_fields` (E2), `_module_common` (E2) | 22 |
+| 3a, synth (§4) | S1 `build_definition_objects`, S2 `emit_definitions_a2l` (changed), S5 `_definition_array_objects` | 3 |
+| 3b | #4 `encode_definition` (changed; Inc 2b's function), #21 `encode_values`, #22 `_breaking_point` | 3 |
+| 3b, added inside a 3a function | `describe_definitions`: the AXIS_PTS entries of R-A2L-DEF.138's span index (Inc 2 E3 census ruling; proposed R-A2L-DEF.140, `01-requirements.md` "Split (amendment A2)") | — |
+
+What each side reuses from §3:
+- **3a** imports, beyond Inc 2a's list, `_walk_record_layout_components`, `_strip_a2l_comments`, `_split_line_respecting_quotes` (back in D-9's list, graph baseline), `_byte_order_from_section_lines`, `_DATATYPE_ALIGNMENT_DIRECTIVE`, `_ALIGNMENT_DIRECTIVES`, `MAX_A2L_DECODE_BYTES`.
+- **3b** reuses Inc 2b's encode functions per element; `_encode_curve_record_bytes` stays unused (it is the oracle of the negative controls of R-A2L-DEF.123/4 and .132).
+
+Source files and consumers:
+- **Source files.** Each side touches 1 source file, `s19_app/tui/a2l_definition.py`. The synth tool is 3a only and is not counted (PLAN D6).
+- **Consumers (§6).** Inc 6 needs only 3a (#1's `element_count`, `byte_length`, `kind`, `shape`). Inc 9 also needs #21, which is 3b.
+
+Tests (§5):
+- **3a** adds its cases to `tests/test_b103_a2l_definition_arrays.py` (S2.7e, S2.7f, S2.7g's 3a cases, the cited cases, AT-B103-I3-1's and -3's 3a arms, AT-B103-I3-4), updates the Inc 2 tests D-14 changes, and adds S2.7i and AT-B103-I3-2's 3a arm to `tests/test_b103_synth_definitions_case.py`.
+- **3b** adds S2.7h, .120/2, .121/1, .121/2 and the edit arms to the same two files.
