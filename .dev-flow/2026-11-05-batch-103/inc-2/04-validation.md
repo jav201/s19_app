@@ -72,3 +72,12 @@ Copies of the decisive transcripts, cited above by their path from this record s
 - `../evidence/inc-2/mutant-table-A.md`, `../evidence/inc-2/mutant-table-B.md` — 63 killed / 0 survived / 1 not realisable on the final code.
 - `../evidence/inc-2/sec-e5r2-census-transcript.txt`, `../evidence/inc-2/sec-e5r2-hostile-mutate-transcript.txt` — the security round-2 census and mutation runs.
 - `../evidence/inc-2/E5-coverage-audit.md` — the coverage audit (216 agree / 0 partial / 0 gap).
+
+## Trace check (orchestrator)
+
+**Run:** `evidence-e5/trace-check-transcript.txt`, executed on cachyos-rtx from a committed `--shared` clone at `0c499784`, with `--base e07fb00 --src s19_app tools`.
+
+**Result:** 1 US, 72 active requirements, 19 gaps.
+- **All 19 gaps are `TEST`, on exactly the 19 rows the "Split (amendment A2)" table assigns to 2b: R-A2L-DEF.40 … .57 and .138** (encode messages, write guards). This is by design: these rows are owed by Inc 2b, which waits for Inc 11.
+- **0 gaps on any 2a row:** no SLICE, EVID, CASE or TRACE gap.
+- The batch-end trace must reach 0 gaps once 2b's tests exist.
