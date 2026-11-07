@@ -486,11 +486,12 @@ def test_powershell_layer_does_not_require_wt_or_windows_terminal(
 
     monkeypatch.setattr(os_clip_mod.subprocess, "run", _fake_run)
     monkeypatch.setattr(os_clip_mod.sys, "platform", "win32")
+    monkeypatch.setattr(os_clip_mod, "_system_powershell", lambda: "C:\\PS\\powershell.exe")
 
     text = os_clip_mod._read_via_powershell()
     assert text == "PS_CLIPBOARD_TEXT"
-    assert captured["argv"][0] == "powershell", (  # type: ignore[index]
-        f"PowerShell layer must invoke `powershell` (not `wt` or `pwsh`); "
+    assert captured["argv"][0] == "C:\\PS\\powershell.exe", (  # type: ignore[index]
+        f"PowerShell layer must invoke the system PowerShell (not `wt`, `pwsh` or a bare name); "
         f"got {captured['argv']!r}"
     )
     kwargs = captured["kwargs"]
@@ -524,6 +525,7 @@ def test_powershell_layer_swallows_timeout_expired(
 
     monkeypatch.setattr(os_clip_mod.subprocess, "run", _timeout_run)
     monkeypatch.setattr(os_clip_mod.sys, "platform", "win32")
+    monkeypatch.setattr(os_clip_mod, "_system_powershell", lambda: "C:\\PS\\powershell.exe")
 
     assert os_clip_mod._read_via_powershell() is None
 
@@ -544,6 +546,9 @@ def test_powershell_layer_swallows_file_not_found(
 
     monkeypatch.setattr(os_clip_mod.subprocess, "run", _missing_run)
     monkeypatch.setattr(os_clip_mod.sys, "platform", "win32")
+    # The system PowerShell vanished between the check and the start (the
+    # FileNotFoundError the subprocess launcher raises for that).
+    monkeypatch.setattr(os_clip_mod, "_system_powershell", lambda: "C:\\PS\\powershell.exe")
 
     assert os_clip_mod._read_via_powershell() is None
 

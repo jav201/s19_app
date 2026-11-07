@@ -2014,18 +2014,43 @@ def _git_ignored(root: Path) -> frozenset:
     return frozenset(REPO_ROOT / name for name in out.decode("utf-8").split("\0") if name)
 
 
+def _redaction_roots(repo_root: Path) -> list:
+    """The two batch record folders the redaction gate scans (R-PASTE.36).
+
+    Summary:
+        The seam R-PASTE.36/1 calls with a temporary repository shape:
+        ``.dev-flow/2026-11-01-batch-101`` and
+        ``.dev-flow/2026-11-05-batch-103``, in that order.
+
+    Returns:
+        list: The two ``Path`` roots.
+    """
+    return [
+        repo_root / ".dev-flow" / "2026-11-01-batch-101",
+        repo_root / ".dev-flow" / "2026-11-05-batch-103",
+    ]
+
+
 def test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses() -> None:
-    """E3S-2 / E5S-1: every text file of the batch folder (records and
-    evidence, not git-ignored) holds no home path, account or host name,
-    junit host attribute, shell prompt, UNC host path or LAN address."""
+    """E3S-2 / E5S-1 / R-PASTE.36: every text file of both batch folders
+    (records and evidence, not git-ignored) holds no home path, account or
+    host name, junit host attribute, shell prompt, UNC host path or LAN
+    address. A root missing from the checkout fails the test."""
     inc2_dir = EVIDENCE_ROOT / "inc-2"
     if not inc2_dir.is_dir():
         pytest.fail(
             "the increment's evidence folder is missing from this checkout; "
             "the redaction gate has nothing it is responsible for"
         )
-    hits = _redaction_hits(BATCH_ROOT, _local_identity_names(), _git_ignored(BATCH_ROOT))
-    assert not hits, "unredacted batch records or evidence:\n" + "\n".join(hits)
+    all_hits = []
+    for root in _redaction_roots(REPO_ROOT):
+        if not root.is_dir():
+            pytest.fail(
+                f"the redaction root {root} is missing from this checkout; "
+                "the gate has nothing it is responsible for"
+            )
+        all_hits.extend(_redaction_hits(root, _local_identity_names(), _git_ignored(root)))
+    assert not all_hits, "unredacted batch records or evidence:\n" + "\n".join(all_hits)
 
 
 _PLANTED_LEAKS = {
