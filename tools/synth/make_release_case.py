@@ -964,6 +964,9 @@ DEFINITIONS_LONG_IDS = {
     "DISPLAY_0001": "synthetic display object",
 }
 
+#: Display text per COMPU_VTAB raw value (also the enum's planned text).
+DEFINITIONS_ENUM_TEXTS = ("OFF", "IDLE", "RUN", "FAULT")
+
 #: Extra body lines (after the VALUE header and any BIT_MASK line) per object.
 DEFINITIONS_EXTRA_LINES = {
     "DISPLAY_0001": (
@@ -1055,7 +1058,7 @@ def build_definition_objects(rng: random.Random) -> tuple[dict[str, tuple[int, b
             "high": "3",
             "bit_mask": None,
             "planned_stored": enum_raw,
-            "planned_text": "IDLE",
+            "planned_text": DEFINITIONS_ENUM_TEXTS[enum_raw],
         },
         {
             "name": "MASK_BIT_0001",
@@ -1171,10 +1174,10 @@ def emit_definitions_a2l(regions: dict[str, tuple[int, bytearray]], objects: lis
         "    /end COMPU_METHOD",
         '    /begin COMPU_VTAB VT_DEF_STATE "synthetic states"',
         "      TAB_VERB 4",
-        '      0 "OFF"',
-        '      1 "IDLE"',
-        '      2 "RUN"',
-        '      3 "FAULT"',
+        f'      0 "{DEFINITIONS_ENUM_TEXTS[0]}"',
+        f'      1 "{DEFINITIONS_ENUM_TEXTS[1]}"',
+        f'      2 "{DEFINITIONS_ENUM_TEXTS[2]}"',
+        f'      3 "{DEFINITIONS_ENUM_TEXTS[3]}"',
         '      DEFAULT_VALUE "UNKNOWN_STATE"',
         "    /end COMPU_VTAB",
         '    /begin COMPU_METHOD CM_DEF_IDENT "synthetic IDENTICAL conversion"',

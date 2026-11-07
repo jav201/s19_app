@@ -219,6 +219,33 @@ def _fmt_address(address: int) -> str:
     return f"0x{address:X}"
 
 
+def _number_text(number: int, address: bool = False) -> str:
+    """Write a number the file holds into a message (R-A2L-DEF.151).
+
+    A number whose magnitude is at most 2^64 - 1 is written as
+    :func:`_fmt_address` when ``address`` is true, else as its decimal text.
+    A larger number is written as the .151 echo of its ``0x`` / ``-0x``
+    hexadecimal word (cut at 256 characters, then ``…``), so no message can
+    raise on a decimal conversion of a huge int and none exceeds 1,024
+    characters.
+
+    Args:
+        number (int): The number the file wrote (a length, a MATRIX_DIM or an
+            address).
+        address (bool): True to write an address placeholder (``0x…``) for a
+            number within the bound.
+
+    Returns:
+        str: The message text for the number.
+
+    Raises:
+        None.
+    """
+    if number.bit_length() <= 64:
+        return _fmt_address(number) if address else str(number)
+    return _echo(_fmt_address(number))
+
+
 def _parse_bit_mask(word: Optional[str]) -> Optional[int]:
     """Read a BIT_MASK word as ``0x`` + hex digits or decimal digits.
 
@@ -301,8 +328,9 @@ def describe_definition(name: str, a2l_data: dict) -> Definition:
     Args:
         name (str): The A2L object name, case included.
         a2l_data (dict): The parse payload of ``parse_a2l_file`` (``sections``,
-            ``tags``, ``record_layouts_by_name``, ``compu_methods_by_name``,
-            ``compu_tabs_by_name``).  Read, never written.
+            ``tags``, ``record_layouts_by_name``, ``compu_tabs_by_name``).
+            Read, never written.  ``compu_methods_by_name`` is built from
+            ``sections``, not read.
 
     Returns:
         Definition: The definition of the name (a refusal carries every field
@@ -347,19 +375,18 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
     compu_methods_by_name: dict[str, dict] = {}
     compu_tables_by_name: dict[str, dict] = {}
 
-    def _walk(nodes: list[dict]) -> None:
-        for node in nodes:
-            node_name = node.get("name")
-            parsed = parse_begin_meta(node.get("meta", "") or "")
-            if node_name in ("MEASUREMENT", "CHARACTERISTIC"):
-                object_sections_by_name.setdefault(parsed[0], []).append(node)
-            elif node_name == "COMPU_METHOD":
-                compu_methods_by_name.setdefault(parsed[0], node)
-            elif node_name in ("COMPU_VTAB", "COMPU_VTAB_RANGE"):
-                compu_tables_by_name.setdefault(parsed[0], node)
-            _walk(node.get("children") or [])
-
-    _walk(a2l_data.get("sections") or [])
+    stack = list(reversed(a2l_data.get("sections") or []))
+    while stack:
+        node = stack.pop()
+        node_name = node.get("name")
+        parsed = parse_begin_meta(node.get("meta", "") or "")
+        if node_name in ("MEASUREMENT", "CHARACTERISTIC"):
+            object_sections_by_name.setdefault(parsed[0], []).append(node)
+        elif node_name == "COMPU_METHOD":
+            compu_methods_by_name.setdefault(parsed[0], node)
+        elif node_name in ("COMPU_VTAB", "COMPU_VTAB_RANGE"):
+            compu_tables_by_name.setdefault(parsed[0], node)
+        stack.extend(reversed(node.get("children") or []))
 
     result: dict[str, Definition] = {}
     reads: dict[int, object] = {}
@@ -542,12 +569,9 @@ def _describe_one(
     # ---- the refusal order -------------------------------------------------
     refusal: Optional[Refusal] = None
     if kind is None:
-        kind_echo = kind_text
-        if kind_text != "(none)" and not kind_text.startswith("MATRIX_DIM "):
-            kind_echo = _echo(kind_text)
         refusal = Refusal(
             "A2L-DEF-KIND",
-            f"{name_echo}: the system has no definition for a {kind_echo} object",
+            f"{name_echo}: the system has no definition for a {kind_text} object",
         )
     elif address is None or byte_length is None:
         refusal = Refusal(
@@ -561,8 +585,8 @@ def _describe_one(
     ):
         refusal = Refusal(
             "A2L-DEF-ADDRESS",
-            f"{name_echo}: its span of {byte_length} bytes at "
-            f"{_fmt_address(address)} cannot be read",
+            f"{name_echo}: its span of {_number_text(byte_length)} bytes at "
+            f"{_number_text(address, address=True)} cannot be read",
         )
     elif kind in ("number", "enum"):
         if datatype is None:
@@ -573,7 +597,7 @@ def _describe_one(
         elif byte_length != DATATYPE_SIZES[datatype]:
             refusal = Refusal(
                 "A2L-DEF-LENGTH",
-                f"{name_echo}: its length {byte_length} differs from the "
+                f"{name_echo}: its length {_number_text(byte_length)} differs from the "
                 f"{DATATYPE_SIZES[datatype]} bytes of {datatype}",
             )
 
@@ -683,13 +707,15 @@ def _find_tag(
     return tags[0], sections[0] if sections else None
 
 
-def _object_kind(tag: dict, conversion_type: Optional[str]) -> tuple[Optional[str], str]:
+def _object_kind(tag: dict, conversion_type: Optional[str]) -> tuple[str | None, str]:
     """The scalar kind and its text: ``(kind, kind_text)``.
 
     A CHARACTERISTIC of ``char_type`` ASCII → ``("text", "ASCII")``; VALUE →
     ``("enum"/"number", "VALUE")``; a MEASUREMENT whose matrix_dim is None or 1
     → ``("enum"/"number", "MEASUREMENT")``; every other object → ``(None, the
-    <kind> text)``.
+    <kind> text as the message writes it: an echoed CHARACTERISTIC kind word,
+    or ``MATRIX_DIM <n> MEASUREMENT`` with ``<n>`` through
+    :func:`_number_text`)``.
     """
     section = tag.get("section")
     char_type = tag.get("char_type")
@@ -701,13 +727,13 @@ def _object_kind(tag: dict, conversion_type: Optional[str]) -> tuple[Optional[st
             return kind, "VALUE"
         if char_type is None:
             return None, "(none)"
-        return None, str(char_type)
+        return None, _echo(str(char_type))
     if section == "MEASUREMENT":
         matrix_dim = tag.get("matrix_dim")
         if matrix_dim is None or matrix_dim == 1:
             kind = "enum" if conversion_type == "TAB_VERB" else "number"
             return kind, "MEASUREMENT"
-        return None, f"MATRIX_DIM {matrix_dim} MEASUREMENT"
+        return None, f"MATRIX_DIM {_number_text(matrix_dim)} MEASUREMENT"
     return None, "(none)"
 
 
@@ -836,11 +862,9 @@ def _read_method_record(
             continue
         i += 1
     decimals = _display_decimals(fmt)
-    if conversion_type:
-        upper = str(conversion_type).upper()
-        type_verdict = upper if upper in _SUPPORTED_CONVERSION_TYPES else None
-    else:
-        type_verdict = None
+    type_verdict = (
+        conversion_type if conversion_type in _SUPPORTED_CONVERSION_TYPES else None
+    )
     type_echo = _echo(conversion_type) if conversion_type else "(none)"
     table_echo = _echo(compu_tab_ref) if compu_tab_ref else "(none)"
     table_form = None
@@ -1134,9 +1158,10 @@ def decode_definition(
     refusal when it has one, R-A2L-DEF.25).
 
     Text → ``Decoded(None, s, s)``; enum → ``Decoded(stored, entry text or
-    None, _enum_text(...))``; number → the physical value via
-    ``_apply_compu_method`` (identity for ``NO_COMPU_METHOD``), a status
-    ``error`` → ``A2L-DEF-DECODE``.  Reads ``image`` and ``a2l_data`` only.
+    None, _enum_text(...))``; number → the stored value for
+    ``NO_COMPU_METHOD``, ``_table_value`` for a TAB form, else
+    ``_apply_compu_method``; a value that is not a number, or a status
+    ``error``, → ``A2L-DEF-DECODE``.  Reads ``image`` and ``a2l_data`` only.
 
     Args:
         definition (Definition): The definition to decode.
@@ -1157,7 +1182,7 @@ def decode_definition(
         if definition._name_echo is not None
         else _echo(definition.name)
     )
-    stored = _read_stored_value(definition, image)
+    stored = _read_stored_value(definition, image, name_echo)
     if isinstance(stored, Refusal):
         return stored
     if definition.kind == "text":
@@ -1210,7 +1235,7 @@ def decode_definition(
 
 
 def _read_stored_value(
-    definition: Definition, image: Mapping[int, int]
+    definition: Definition, image: Mapping[int, int], name_echo: str
 ) -> int | float | bytes | Refusal:
     """Read the span's bytes and the stored value.
 
@@ -1229,15 +1254,10 @@ def _read_stored_value(
         else:
             values.append(image[current] & 0xFF)
     if missing:
-        name_echo = (
-            definition._name_echo
-            if definition._name_echo is not None
-            else _echo(definition.name)
-        )
         return Refusal(
             "A2L-DEF-BYTES",
-            f"{name_echo}: {missing} of its {length} bytes "
-            "are not in the image",
+            f"{name_echo}: {_number_text(missing)} of its "
+            f"{_number_text(length)} bytes are not in the image",
         )
     raw = bytes(values)
     if definition.kind == "text":
@@ -1334,9 +1354,7 @@ def _table_value(form: _TabForm, stored: int | float, interpolate: bool) -> tupl
         lo: Optional[int] = None
         hi: Optional[int] = None
         if i > 0:
-            lo = i - 1
-            while lo > 0 and xs[lo - 1] == xs[lo]:
-                lo -= 1
+            lo = bisect_left(xs, xs[i - 1])
         if i < n:
             hi = i
         if lo is None:
