@@ -39,3 +39,47 @@ Round 4 (security): **FAIL** — E3S3-13 … -15 closed (each by-name kind read 
 - E3S3-17: accept the fix column (one entry per class). E3S3-19: accept. E3S3-20: noted for the owner the review names.
 **Next:** a narrow Opus correction, then round 5 security — asked to run the scaling test over every 3a node path, not only the shapes found so far.
 - **Round-4 correction done** (2026-11-07T01:55:25-06:00, Opus, 30 min): seven shared reads reduced to fixed forms (layout / MOD_COMMON one ALIGNMENT entry per class; AXIS_PTS its 10 header words; method record 6 fields; enum table by reference; `_resolve_datatype` skipped for arrays; the 2a parts for 2a's E5). **Ruling on R-A2L-DEF.148:** the total-time ratio cannot hold on any design (the one read of each shared section grows with it, ×1.35–1.76), so the row keeps the 0.5 s total bound and takes the **1.3× ratio on the time beyond the first object's describe** (the per-object part, which is what the class is about) — accepted as the intent of the round-4 ruling. Model: 0.017–0.144 s, ×0.93–1.13; 9/9 GREEN, 9/9 negatives RED.
+
+## Round 5 rulings (2026-11-07, orchestrator Opus 5.5)
+
+Round 5 (security): **FAIL**. E3S3-17 and -19 are closed, and E3S3-18 is closed for 3a's kinds: 37 of 49 paths are flat and the reduced forms differ from the walk on 0 of 6,379 corpus objects.
+New findings:
+- **E3S3-22 MAJOR:** one long *word* of a shared section is cleaned, scanned or copied once per object (12 describe paths, 22–100 ms per object).
+- **E3S3-23 MAJOR:** each decoded enum element gets its own cleaned copy of the shared text.
+- **E3S3-20:** confirmed (6 decode paths scan a shared table per element).
+- **E3S3-24 MEDIUM:** .148's measure is too noisy on a shared host and blind to per-object copies.
+
+**Closing the class.** The round-4 rule fixed the number of entries a reduced form holds but not the size of each entry. The completed rule follows; it replaces the round-4 wording.
+- **Every shared section is reduced once per walk to a form of fixed size.** That means a fixed number of entries, and each word held in its final form, computed at reduction:
+  - a word a message echoes is held as its echo (see R-A2L-DEF.151);
+  - a text shown in a value is held cleaned once;
+  - a derived value is held computed, e.g. the FORMAT's decimals in the method record.
+- An object's definition and its decoded values **reference** a shared text, never copy it.
+- **Decode is one lookup per element:** a dict from raw value to the first text for COMPU_VTAB, and a bisect for COMPU_VTAB_RANGE and for 3a's own TAB_INTP / TAB_NOINTP path. The frozen `a2l._table_lookup` is not called from the decode path any more. A corpus equality case pins the bisect to the frozen function's values.
+- Then per object, both the work and the retained bytes are O(1) in every shared section's size.
+
+**Rows** (next free ids, checked: .140–.149 used):
+- **R-A2L-DEF.150 (U), owned by Inc 2a:** "The system shall decode each element in a time and a retained size that do not grow with the size of the conversion table it names."
+  - Inc 2a's cases: scalar VALUEs, e.g. VT-3 and VT-5's VALUE form.
+  - Inc 3a's cases: `.150/arr-*` (VT-1, -2, -5, -6, VR-1, -2, CT-1, -2).
+  - Plus the equality case for the bisect against `a2l._table_lookup`.
+- **R-A2L-DEF.151 (U), owned by Inc 2a:** "The system shall write a file word into a refusal message as at most its first 64 characters, each character outside U+0021 … U+007E written as U+FFFD, and `…` after it when the word is longer." This is READ.66's echo rule; the display text of a decoded value keeps .137. Inc 3a's .84, .85, .86 and .144 messages cite it, with cases `.151/arr-*`.
+- **R-A2L-DEF.148** keeps its text and bounds and gains cases:
+  - one long-word fill per echo family: RL-7, MC-7, CM-4, CM-6, CM-8, RL-15;
+  - an assertion that each definition's message holds ≤ 1 KiB.
+
+**Measure (E3S3-24): accept, for .148, .149 and .150.**
+- Time only the per-object part: one walk's maps, the first name described, then the 399 remaining names, with `time.process_time()`.
+- Interleave S, 2S and 8S run by run, and take the least of ≥ 15 runs.
+- Pass when ×2S ≤ 1.3 and ×8S ≤ 2.0, the 0.5 s total holds, and each negative control is RED.
+
+**Owners.**
+- Inc 3a's E3 correction (Opus) covers the rule, the graph nodes (`_describe_array`, `_conversion_fields`, `_read_record_layout`'s owner-free refusal, `_module_common`, `_decode_stored`), the .148 cases and the 3a cases of .150 / .151.
+- Inc 2a's lines (CM-5, CM-7, CM-9, VT-1 … -3, VR-1, VT-5, VT-6, VR-2, RL-10, RL-11, CM-2) go to a 2a gap pass, run before 2a's E5 review:
+  - records: Opus;
+  - code: DeepSeek;
+  - tests: an independent tester.
+  - It starts once the .149 tester finishes.
+- CT-1 and CT-2 leave the frozen `_table_lookup` through 3a's bisect. E3S3-21 stays in the backlog (frozen file).
+
+**Next:** after the correction, run round 6 security on the same 49-path harness. Add the long-word fills of every echo family, plus the decode paths, against the corrected model.
