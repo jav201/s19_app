@@ -1,7 +1,7 @@
 # E5 fix pass extractor transcript — Inc 2a (batch-103), the number rule and the bisect fixes
 # code-wire: v3.1.0 e436a08; python: 3.12.7 (Windows host, this PC)
 # repo: b103-inc2a-code (worktree; read-only) — marks written only into a THROWAWAY copy under <scratch>
-# scratch: C:/Users/jjgh8/AppData/Local/Temp/b103-e5-fix (copy of s19_app/ + marks + subset graph + extractor out)
+# scratch: C:/Users/<user>/AppData/Local/Temp/b103-e5-fix (copy of s19_app/ + marks + subset graph + extractor out)
 # subset graph: graph-inc2.md filtered to the 6 nodes the E5 fix pass touches (describe_definitions, _object_kind, _read_method_record, decode_definition, _read_stored_value, _table_value)
 # command: python -I <scratch>/make_extract.py <scratch>  (runs codewire_extract.py --repo <copy> --graph graph-subset.md --path s19_app/tui/a2l_definition.py --out out)
 
