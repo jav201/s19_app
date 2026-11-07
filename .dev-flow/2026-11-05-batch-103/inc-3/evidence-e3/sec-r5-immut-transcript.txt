@@ -1,0 +1,19 @@
+s19_app.__file__ = ~/work/b103-int2a/s19_app/__init__.py | python 3.11.18 | a2l_definition md5 f7fa38a5
+[I] RL-1: read forms {'layout': 1, 'mod_common': 1}, headers 0; mutable or mutated: none; a2l_data digest unchanged by describe + decode: True
+[I] RL-2: read forms {'layout': 1, 'mod_common': 1}, headers 0; mutable or mutated: none; a2l_data digest unchanged by describe + decode: True
+[I] RL-7: read forms {'layout-refusal': 1}, headers 0; mutable or mutated: none; a2l_data digest unchanged by describe + decode: True
+[I] RL-14: read forms {'layout': 2, 'mod_common': 1, 'method': 1}, headers 1; mutable or mutated: none; a2l_data digest unchanged by describe + decode: True
+[I] MC-3: read forms {'layout': 1, 'mod_common': 1}, headers 0; mutable or mutated: none; a2l_data digest unchanged by describe + decode: True
+[I] MC-6: read forms {'layout': 1, 'mod_common': 1}, headers 0; mutable or mutated: none; a2l_data digest unchanged by describe + decode: True
+[I] MC-7: read forms {'layout': 1, 'mod_common': 1}, headers 0; mutable or mutated: none; a2l_data digest unchanged by describe + decode: True
+[I] AX-1: read forms {'layout': 2, 'mod_common': 1, 'method': 1}, headers 1; mutable or mutated: none; a2l_data digest unchanged by describe + decode: True
+[I] AX-4: read forms {'layout': 2, 'mod_common': 1, 'method': 1}, headers 1; mutable or mutated: none; a2l_data digest unchanged by describe + decode: True
+[I] CM-1: read forms {'layout': 1, 'method': 1, 'mod_common': 1}, headers 0; mutable or mutated: none; a2l_data digest unchanged by describe + decode: True
+[I] CM-6: read forms {'layout': 1, 'method': 1, 'mod_common': 1}, headers 0; mutable or mutated: none; a2l_data digest unchanged by describe + decode: True
+[I] CM-8: read forms {'layout': 1, 'method': 1, 'mod_common': 1}, headers 0; mutable or mutated: none; a2l_data digest unchanged by describe + decode: True
+[I] VT-1: read forms {'layout': 1, 'method': 1, 'enum-table': 1, 'mod_common': 1}, headers 0; mutable or mutated: none; a2l_data digest unchanged by describe + decode: True
+[I] VT-6: read forms {'layout': 1, 'mod_common': 1, 'method': 1, 'enum-table': 1}, headers 0; mutable or mutated: none; a2l_data digest unchanged by describe + decode: True
+[I] VR-1: read forms {'layout': 1, 'method': 1, 'enum-table': 1, 'mod_common': 1}, headers 0; mutable or mutated: none; a2l_data digest unchanged by describe + decode: True
+[I] CT-1: read forms {'layout': 1, 'mod_common': 1, 'method': 1}, headers 0; mutable or mutated: none; a2l_data digest unchanged by describe + decode: True
+[I] total read forms by kind {'layout': 18, 'mod_common': 15, 'layout-refusal': 1, 'method': 10, 'enum-table': 3}
+exit=0
