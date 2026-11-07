@@ -85,3 +85,83 @@ The round-4 correction (Opus, 25 min) applied E3S-30 … -35 and R-A2L-DEF.138 /
 
 **Next:** a narrow Opus pass (the index refinement in the row, CTX and graph; census re-run; the 8 cases), then round 5 security on E3S-30, E3S-35 and .138.
 - **Census re-run** (2026-11-06T21:00:22-06:00, `evidence-e3/corr4b-overlap-census*`): the refinement removes nothing — the tag table already takes addresses only from declarations (0 of 234,654 differ; the 10,605 objects with no declared address were never indexed). The 223,524 refusals are **declared overlaps**: case_06 (stress file), software_a / from_source / BalanceTube (objects that declare `0x0` as a placeholder), V171 / V161 (declared overlaps plus 4 each from shared mask bits), small validation fixtures; release case 08: 0 (issues variant 6, by design). **Ruled: the guard stands.** Objects that declare the same bytes are aliases in the image; an edit of one changes the others, so refusing is the safe answer, and the message names the other object. Placeholder-address files cannot be patched meaningfully anyway. **Accepted readings:** case_07's ECU_ADDRESS-only CHARACTERISTICs keep R-A2L-011's address (the one the encode writes); **AXIS_PTS spans join the index in Inc 3** (Inc 3 knows the axis lengths) — added to Inc 3's rebase brief.
+
+## Split status (amendment A2) (2026-11-06T21:46:00-06:00, architect agent, Opus 5.5)
+
+This section states facts only; the orchestrator rules. It draws on `E3-architect.md` (rounds 1–2), `E3-security.md` (rounds 1–5), the rulings above (rounds 1–4b) and the records as they stand now. The sides are those of `01-requirements.md` "Split (amendment A2)": 2a has 50 rows, 2b has 19. Two words are used with fixed meanings below:
+- **closed**: a reviewer re-checked the finding;
+- **applied**: a correction pass applied it, and no reviewer re-checked it. The round-2 ruling says "the architect does not re-review".
+
+### 2a: E3 findings that touch a 2a row
+
+**Closed, with no residue in a 2a row:**
+- **Security:** E3S-01 (1) and (2), -02, -03, -04, -10 and -12 (round 2); E3S-17, -18, -19, -21 and -22 (round 3); E3S-28 (round 4); E3S-31 and E3S-35 (round 5; -35 closed as ruled, with the known limit below).
+- **Architect:** E3A-01, -03, -04, -06, -08, -09, -13, -14, -15, -16, -17 and -18 (round 2); E3A-19 and -20 are noted.
+
+**Applied, and in the records now:**
+- **E3A-10:** the count reads 29.
+- **E3A-12:** the `describe_definitions` func says "(E3A-12)".
+- **E3A-22:** no defaults (`codewire/graph-inc2.md:40-44`).
+- **E3A-23:** .37 is narrowed.
+- **E3A-24:** cases .19/9, .35/5 and .35/6 exist.
+- **E3A-25:** .137 is narrowed.
+- **E3A-28:** the mask refusal sits at its place in the order, and case .24/4 exists.
+- **E3A-29 (a) and (c).**
+- **E3A-30:** the 2a items are aligned (.19/4, .137/1 … /4, the count).
+- **E3A-31:** case .7.2/6 exists, and `<address>` and `<length>` are in CTX.
+- **E3A-32:** the Inc 3 lookups (`codewire/graph-inc2.md:74`).
+
+**Findings the split re-opens for 2a.** These were closed by R-A2L-DEF.19 clauses that now wait for 2b:
+- the shapes of E3S-01 (3) and its path (d);
+- the shapes of E3S-14, -24, -26, -30 and -33;
+- not their cases: E3S-25, -27 and -32 concern cases that are now 2b;
+- not E3A-14's case: .19/9 stays in 2a.
+
+In 2a, the shapes of these findings reach decode with no refusal. A lost mask decodes as the whole word, and two BIT_MASK lines decode the field of the first one. Today's A2L views show the whole word, because they apply no mask (`E1-slice.md:60`). 2a writes nothing. On the 35 fixture files these clauses refuse 0 objects (`01-requirements.md` "Split (amendment A2)").
+
+**Open, or a known limit, touching a 2a row:**
+
+| Finding | 2a rows it touches | State | Why it does not block a read-only change |
+|---|---|---|---|
+| E3S-38 MAJOR (round 5) | cited R-A2L-010, 011, 014 (address and length from the tag); CTX *defined object* and .1 … .4 (a commented `MATRIX_DIM 1` makes an array a scalar of kind number, B4); .7.1 (its fix column puts the cross-check there) | open | 2a takes address and length from the same tag table that the A2L views decode today (`describe_definitions`, `codewire/graph-inc2.md:253`; `enrich_a2l_tags_with_values`, `E1-slice.md:60`). A decode therefore shows the address the views show, and writes nothing. Shapes A1, A2 and A4 (address lost) are already refused by .7.1. Fixtures: 0 objects [FX-lost-address]. The cause is today's reader, which Inc 11 fixes. The operator's report (`../design/operator-report-a2l-reader.md`) describes this class. |
+| E3S-36 MAJOR (round 5) | cited R-A2L-024 … 027 (the byte order, from the tag) | open | The hazard is the .138 exemption, which is 2b. With a misread byte order, 2a's decode shows the value in the same frame as today's views (E3S-45 (v)). It writes nothing. Fixtures: 0 shapes [FX3-total]. The fix column's .19 byte-order clause is a 2b guard. |
+| E3S-40 MEDIUM (round 5) | CTX *defined object* (MATRIX_DIM 1), `_object_kind`, .4 | open | `MATRIX_DIM 1 4 1` is read as 1, so 2a decodes element 0 as a scalar. That is the same first-number reading as the tag table (`a2l.py:1174-1177`, `:2702-2705`). It writes nothing. Fixtures: 14 multi-number objects, 0 of them edited as a scalar [FX3-total]. |
+| E3S-43 LOW (round 5) | .18 (the mask read) | open | `BIT_MASK 0x000F/* nibble */0` is read as `0x000F0`, so 2a decodes the field of that mask. Today's views show the whole word instead. It writes nothing. Fixtures: 0 of the 256 read masks [FX3-total]. The cause is the tokenizer (a comment is not a word break), which Inc 11 fixes. The fix column's .19 clause is a 2b guard. |
+| E3S-39 MAJOR (round 5) | .58.2 and .136, but only through the span index | open | The split puts the span index in 2b. 2a's describe has no per-page structure, so the hostile lengths [H1] … [H4] reach 2a only as tags whose definitions .7.2 refuses. The base parser returns those tags (`sec-r5-probe4`). In 2b, the finding stands as filed. |
+| E3S-45 INFO (ii), (v) (round 5) | .136; the byte order | noted | (ii) Every describe builds the whole-file maps, about 40 ms; .136 was measured at 0.52 s and 0.817 s. (v) A misread byte order with no mask stays with the reader fix. |
+| corr4-2, the known limit of E3S-35 (`codewire/graph-inc2.md:976-981`) | .5, .139 | known limit (round-4 ruling) | A commented-out object with no live copy is still a tag, so 2a decodes it at an address the file no longer declares. Today's A2L views show it as a live tag too (PLAN A2, Inc 11). It writes nothing. |
+| E3A-27 MINOR (architect round 2) | .59 (case .59/3) | ruled (line 42 above) | The digest is taken at E4 on a clean checkout of `e07fb00`, before any edit. That step lives only in this record: the case still reads "equals the value pinned at E4", with the precondition "the generator of the tree under test". |
+| E3A-29 (b) LOW (architect round 2) | .136 | applied in part | .136's negative control and Base still say "about 67 s" / "≈ 67 s"; the architect counts about 295 s. Either way the mutant (one walk per name) exceeds 2.0 s, so the negative control still turns RED. |
+
+**E3S-37 MAJOR touches no 2a row.** It concerns the .138 index (2b) and AT-B103-I2-1's encode arm (2b). In 2a, AT-B103-I2-1 only decodes the UBYTE and SBYTE objects that V171's INSTANCE also declares, and it applies nothing. E3S-41, -42 and -44 are 2b only.
+
+### 2b: every open finding (waits for Inc 11 and a re-review against the fixed reader)
+
+The security round-5 verdict, FAIL with 4 MAJOR, stands for 2b. None of its findings is ruled yet.
+
+| Finding | 2b rows / nodes | Fix column, in brief |
+|---|---|---|
+| E3S-36 MAJOR | .138's exemption; CTX *bits an object selects*; `_selected_bits` | a .19 clause that refuses a masked definition whose byte order text holds BYTE_ORDER more than once (or once with no own line); `mask_of` CLEAN |
+| E3S-37 MAJOR | .138's index; AT-B103-I2-1's encode arm | (a) index BLOBs and sized INSTANCEs, and refuse every encode of a file that holds `/include`; or (b) rule them into Inc 3 with AXIS_PTS and write the limit down ("safe only if Inc 3 closes the index before Inc 8 or 9 exposes the write path") |
+| E3S-38 MAJOR | the index addresses; the fix column's cross-check goes into .7.1, a 2a row (the orchestrator rules its side) | a C-rule cross-check of address and length against the tag; the index files an object under every address it may have |
+| E3S-39 MAJOR | the span index in `describe_definitions` (2b part); .58.2 and .136 in 2b | page-file only spans within .7.2's bounds; keep others as intervals; add H1 … H4 to the .58.2 corpus |
+| E3S-40 MEDIUM | CTX *span* × MATRIX_DIM; the index lengths | the MATRIX_DIM product; product ≠ 1 → `A2L-DEF-KIND` |
+| E3S-41 MINOR | `mask_of` | CLEAN: a mask counts only when the other definition carries no refusal |
+| E3S-42 MINOR | encode step 2 (text kind); .138 cases | write step 9 into step 2; case .138/20 (ASCII beside a UBYTE) |
+| E3S-43 LOW | .19 (2b clause); the exemption | a .19 clause: the BIT_MASK word read with comments as word breaks differs from the word read |
+| E3S-44 LOW | `_shared_with` scan sentence | "…up to the first whose span overlaps and that is not left out" |
+| E3S-45 INFO (iii) | I-2 consumer note for `shared_with` | a consumer never clears `shared_with` and re-describes after the A2L or its file changes (Inc 6, Inc 10) |
+| E3A-24 residue (architect round 2, applied in part) | .43 / .44 (the written value) | case .43/5 (.45/3's object without EXTENDED_LIMITS, `0.55`) is not in `02-test-cases.md` |
+| E3A-30 residue (architect round 2, applied in part) | `_check_limits` example .21/3 | `codewire/graph-inc2.md:571` says UBYTE `XL3`; case .21/3 (`02-test-cases.md:98`) says SWORD |
+
+Notes for the 2b re-review:
+- **Clauses tied to the reader.** The .19 clauses on the text of the object, .138 and the write gate of .139 all rest on the frozen reader. E3S-30's fix column says the open-section and `/begin` clauses can be removed once the reader is fixed (BL-I2-12, now Inc 11).
+- **AXIS_PTS.** AXIS_PTS spans join the index in Inc 3 (the round-4 census ruling).
+- **Last scope.** The round-5 review covered the records at `0821d17f` and `05ec5ebf`.
+
+## Split rulings (2026-11-06T21:48:09-06:00, orchestrator Opus 5.5) — Inc 2a E3 done
+
+- **Cut of R-A2L-DEF.19 accepted as recorded:** the unreadable-word and text-object clauses stay in 2a (they refuse a definition, which protects the display too); the text-of-object clauses (letters, open comment/quote, `/begin`) go to 2b.
+- **Inc 2a's open findings** (E3S-36, -38, -40, -43, the lost-mask shapes E3S-14/-24/-26/-30/-33, corr4-2 commented-out object) are **inherited reader defects**: 2a shows what the A2L views show today, with no write path. They are **ruled non-blocking for 2a** and owned by Inc 11 (reader fix); 2a's acceptance after Inc 11 lands re-runs their shapes. E3S-39 is 2b-only (span index).
+- E3A-27 (.59/3 text) and E3A-29 (b) are E4 addenda for 2a's tester.
+- **Inc 2a goes to E4** (50 rows, 181 cases, 32 nodes). **Inc 2b** (19 rows, 109 cases, 11 nodes) waits for Inc 11 and a security re-review against the fixed reader.

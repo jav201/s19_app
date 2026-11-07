@@ -83,3 +83,27 @@ Proposed: `tests/test_b103_a2l_definition.py` (S2.7a … c, the cited rows, AT-B
 | consumers of I-2 | Inc 6, Inc 8, Inc 9 | they call §2's #1, #10, #14, #15 only |
 | case 08 outputs | batch-101 Inc 10, 11, 12 tests (another session) | read-only fixtures; .59 pins them |
 | any other file of Inc 1a, 1b, 4 or batch-101 | — | none shared |
+
+## 7. Split (amendment A2)
+
+Amendment A2 (`../PLAN.md`) splits the increment. **2a**, the read side, goes to E4 now. **2b**, the write side, waits for Inc 11. The current contracts are the graph's (`codewire/graph-inc2.md`, "Split (amendment A2)"). §2's table is E1's, and E3 added three functions to it: `describe_definitions` (E3A-01), and `_shared_with` and `_selected_bits` (the round-4 ruling, R-A2L-DEF.138). Rows per side: `01-requirements.md` "Split (amendment A2)".
+
+| Side | Functions (§2 number, or added at E3) | Count |
+|---|---|---|
+| 2a | #1 `describe_definition`, `describe_definitions` (E3), #2 `_find_tag`, #3 `_object_kind`, #4 `_resolve_datatype`, #5 `_read_method_record`, #6 `_read_enum_table`, #7 `_read_object_lines` (the object record's words), #8 `_check_bit_mask`, #9 `_display_decimals`, #10 `decode_definition`, #11 `_read_stored_value`, #12 `_enum_text`, #13 `_ascii_text`, #14 `display_text` | 15 |
+| 2a, synth (§4) | S1 `build_definition_objects`, S2 `emit_definitions_a2l`, S3 `generate_definitions_case`, S4 `main` (changed) | 4 |
+| 2b | #15 `encode_definition`, #16 `_parse_number_text`, #17 `_check_limits`, #18 `_encode_number`, #19 `_merge_bit_mask`, #20 `_encode_enum`, #21 `_encode_ascii`, #22 `_agrees_at_display_precision`, `_shared_with` (E3), `_selected_bits` (E3) | 10 |
+| 2b, added inside 2a functions | `describe_definitions`: the span index, `mask_of`, `shared_with`, and R-A2L-DEF.19's clauses on the text of the object. #7: the text-of-object pass (`bit_mask_letters`, `ends_open`, `begin_inside`) | — |
+
+What each side reuses from §3:
+- **2a** imports `parse_begin_meta`, `_flatten_body_tokens`, `_apply_compu_method`, `_decode_scalar`, `_resolve_record_layout`, `_to_float`, and the constants of §3's last row that its functions read.
+- **2b** adds `encode_physical_to_raw_bytes` (#18) and its call shape in the D-9 guard. It reuses `_decode_scalar` at encode step 7.
+- **Neither side** imports `_split_line_respecting_quotes` or `_collect_sections_by_name` (E2-14, E3A-01).
+
+Source files and consumers:
+- **Source files.** Each side touches 1 source file, `s19_app/tui/a2l_definition.py`: 2a creates it and 2b adds to it. The synth tool is 2a only, and is not counted (PLAN D6).
+- **Consumers (§6).** Inc 6 needs only 2a (#1, #10, #14). Inc 8 and Inc 9 also need #15, which is 2b.
+
+Tests (§5):
+- **2a** creates `tests/test_b103_a2l_definition.py` with its 2a cases, and `tests/test_b103_synth_definitions_case.py` with S2.7d and AT-B103-I2-2's 2a arm.
+- **2b** adds its cases to the first file and AT-B103-I2-2's encode arm to the second.

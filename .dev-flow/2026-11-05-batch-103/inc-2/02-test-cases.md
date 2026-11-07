@@ -318,3 +318,36 @@ Common fixtures:
 **Counts:** 254 cases of the 69 rows (S2.7a 96, S2.7b 44, S2.7c 107, S2.7d 7), 33 cases of 29 cited canon rows, and 3 acceptance cases: 290 cases.
 
 **Ruled — R-A2L-DEF.138 census (round-4 census ruling: the cases follow the row; `01-requirements.md`, the note under S2.7c; re-run `evidence-e3/corr4b-overlap-census*`).** V171 places several objects on one declared address, so under R-A2L-DEF.138 the accepted encodes of these cases are refused `A2L-DEF-OVERLAP` (shared bytes are last in the encode order, so every case that expects a refusal keeps it); each now expects that refusal, naming the first object in file order it shares with (the census list), and verifies its own row on the same definition with `shared_with` cleared (`dataclasses.replace(d, shared_with=None)`, as R-A2L-DEF.138/1 clears the refusal); AT-B103-I2-1 expects the seven refusals and edits only the three objects alone on their bytes: R-A2L-DEF.41/2 (`ASAM.C.SCALAR.SWORD.IDENTICAL`, 13 objects at 0x810004), .46/1 and .53/4 (`…BITMASK_0FF0`), .46/2 (`…BITMASK_0001`; at 0x810002 `ASAM.C.SCALAR.UWORD.IDENTICAL` declares `BIT_MASK 0xFFFF`), .48/1 (`…SWORD.TAB_VERB_DEFAULT_VALUE`), .48/2 (`…SWORD.VTAB_RANGE_DEFAULT_VALUE`), .56/1 (its V171 entry texts: each scalar object using those three tables shares its address, at 0x810004 or 0x13A00) and AT-B103-I2-1 (seven of its ten objects). Not affected: the V171 ASCII object `UNKNOWN`, `ASAM.C.SCALAR.SBYTE.IDENTICAL`, `ASAM.C.SCALAR.UBYTE.IDENTICAL` (each alone on its bytes), every INLINE, C08 clean and DEFC case. Negative controls (the mutant of each row, run at E5 in a copy of the tree): `01-requirements.md`, column "Negative control".
+
+## Split (amendment A2)
+
+The cases split by side, following `01-requirements.md` "Split (amendment A2)": **2a** is the read side, at E4 now; **2b** is the write side, which waits for Inc 11. A case that serves both sides stays in 2a, and its encode arm waits for 2b. A 2b case keeps **Tests** empty, **Coverage** `gap` and **Result** `not_run` until 2b's E4. Thresholds do not change: a 2a row whose cases or arms wait reaches its N/N at 2b. For example, .19 has 6 of 23 cases in 2a, .25 has 1 of 2 and .26 has 1 of 4.
+
+| Rows | 2a cases | 2b cases |
+|---|---|---|
+| R-A2L-DEF.1 … .6, .139, .7.1, .7.2, .8 … .18, .20, .22, .23, .24 | every case (67) | — |
+| R-A2L-DEF.19 | /1 … /5, /9 (6: the record-word clauses) | /6 … /8, /10 … /23 (17: the clauses on the text of the object) |
+| R-A2L-DEF.21 | /1, /2, /3 (3) | — (/3's encode arm waits) |
+| R-A2L-DEF.25 | /1 (decode) | /2 (encode) |
+| R-A2L-DEF.136 | /1 (it is re-run when 2b extends the walk) | — |
+| R-A2L-DEF.26 | /1 (decode) | /2, /3, /4 (encode) |
+| R-A2L-DEF.27 … .39, .137 | every case (40) | — |
+| R-A2L-DEF.40 … .57, .138 | — | every case (88) |
+| R-A2L-DEF.58.1 | /1, /2 (encode arm waits) | — |
+| R-A2L-DEF.58.2 | /1 … /17 (the encode arm of /1 … /5, /7 … /15 and /17 waits; /6 and /16 decode only) | — |
+| R-A2L-DEF.59 … .63 | every case (7) | — |
+| cited R-A2L-010 … R-A2L-063 | every `/def-k` case (33: describe or decode) | — |
+| AT-B103-I2-1 | 2a arm: build and decode the ten objects, each to the text its A2L gives the bytes | waiting arm: encode, apply, decode again, and the seven `A2L-DEF-OVERLAP` refusals (rows .44, .50, .55, .56, .138) |
+| AT-B103-I2-2 | 2a arm: build and decode each DEFC object to its planned value (rows .60, .61, .62) | waiting arm: encode the planned text and a second value, apply, decode (rows .46, .48, .55, .56) |
+| AT-B103-I2-3 | the whole case | — |
+
+What each mixed 2a case runs in 2a, and what waits:
+- **.21/3.** 2a checks that the definition has no extended limits (`codewire/graph-inc2.md:346`). The case's encode of `101` waits.
+- **.136/1.** 2a measures the describe without the span index. It is re-run when 2b adds the index, `shared_with` and the text-of-object pass to the same walk.
+- **.58.1/1 and /2.** 2a builds and decodes. The encode waits.
+- **.58.2.** 2a describes and decodes each shape with 0 exceptions, as the row's threshold says ("each through describe, decode and encode"). The encode waits, including the encode inputs of /11 and /13.
+
+**Split counts.**
+- **2a: 181 cases.** These are 145 cases of the 50 2a rows (S2.7a 78, S2.7b 41, S2.7c 19, S2.7d 7), the 33 cited cases and the 3 acceptance cases. In 21 of them an arm waits for 2b: .21/3, .136/1, .58.1/1, .58.1/2, 15 of the .58.2 cases, AT-B103-I2-1 and AT-B103-I2-2.
+- **2b: 109 cases.** S2.7a 18 (.19's 17 and .25/2), S2.7b 3 (.26/2 … /4) and S2.7c 88 (.40 … .57 and .138).
+- **Total: 290 cases**, unchanged.

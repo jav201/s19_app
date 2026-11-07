@@ -174,6 +174,51 @@ Every row has at least one concrete example; none is uncovered. Example ids are 
 
 **Checked against the base code** (`evidence-e2/i2e2-extract-check-transcript.txt`): the Code-Wire v3.1.0 extractor over a throwaway copy of `e07fb00` with a mark on each of the 15 existing nodes (the 14 unchanged ones and `main`) and `--path` on the four files → `0` contract drifts (inputs, types, defaults, outputs, modules all match); the `25` findings are all "Graph node without mark (no code yet)", the 25 new nodes — so the run exits 1 until E4 writes them, as the method expects. `codewire_lint.py` on this file (`evidence-e2/i2e2-lint-transcript.txt`): `nodes=40 entities=10 edges=14 findings=15 not read=0`. Real callers: `evidence-e2/i2e2-extract-census-transcript.txt` (every def of the copy marked, base line numbers).
 
+### Split (amendment A2): nodes, edges and I-2 per side
+
+Amendment A2 (`../../PLAN.md`) splits Inc 2. **2a** is the read side and goes to E4 now on today's reader. **2b** is the write side; it waits for Inc 11 and a re-review of its guards against the fixed reader. The rows and cases of each side are in `../01-requirements.md` and `../02-test-cases.md`, under "Split (amendment A2)". The node texts below describe the whole of Inc 2. Where a 2a node holds a 2b part, the list after the table names it.
+
+| Side | Nodes | Count |
+|---|---|---|
+| 2a, new (G1) | `describe_definition`, `describe_definitions`, `_find_tag`, `_object_kind`, `_resolve_datatype`, `_read_method_record`, `_read_enum_table`, `_read_object_lines`, `_check_bit_mask`, `_display_decimals`, `decode_definition`, `_read_stored_value`, `_enum_text`, `_ascii_text`, `display_text` | 15 |
+| 2a, new and changed (G2) | `build_definition_objects`, `emit_definitions_a2l`, `generate_definitions_case`; `main` (changed) | 4 |
+| 2a, unchanged context | `parse_begin_meta`, `_flatten_body_tokens`, `_apply_compu_method`, `_decode_scalar`, `_resolve_record_layout`, `_to_float`, `_split_line_respecting_quotes`, `_collect_sections_by_name`, `describe_curve_tag`, `parse_parameter_list`, `generate`, `emit_s19`, `_pack_scalar` | 13 |
+| 2b, new (G1) | `encode_definition`, `_parse_number_text`, `_check_limits`, `_encode_number`, `_merge_bit_mask` (the merge), `_encode_enum`, `_encode_ascii`, `_agrees_at_display_precision`, `_shared_with` and `_selected_bits` (the overlap guard) | 10 |
+| 2b, unchanged context | `encode_physical_to_raw_bytes` | 1 |
+
+That is 43 nodes in all: 32 in 2a and 11 in 2b. The slice (new and changed nodes) is 29: 19 in 2a and 10 in 2b.
+
+**What 2b adds to 2a nodes.** These nodes keep their name, inputs and outputs:
+- **`describe_definitions`.** 2b adds the span index over the tags, `mask_of`, `shared_with` (through `_shared_with`), and the R-A2L-DEF.19 clauses on the text of the object (`bit_mask_letters`, `ends_open`, `begin_inside`) with their two messages. In 2a, the walk builds the name, method and table maps and every field, and applies the refusal order with 2a's .19 clauses.
+- **`_read_object_lines`.** 2b adds the text-of-object pass, which gives `bit_mask_letters`, `ends_open` and `begin_inside`. In 2a the node gives the object record's words: `header`, `format`, `extended_limits`, `unit` and the `bit_mask` word.
+- **Examples.** An example on a 2a node waits for 2b when it cites a 2b row, a 2b case or an encode arm. These are: the .138 examples of `describe_definitions`; the .19/17 … /23 examples of `_read_object_lines`; and the encode arm of .58.1 and .58.2.
+
+**Edges and entities.**
+- 5 edges are 2b: `describe_definitions ──▶ _shared_with`, `_shared_with ──▶ _selected_bits`, `[Data: a2l_data].compu_tabs_by_name ──▶ _encode_number`, `[Data: image] ──▶ _merge_bit_mask` and `[Data: image] ──▶ encode_definition`.
+- The other 16 edges are 2a.
+- `[Data: Encoded]` is 2b; the other 9 entities are 2a.
+
+**E4 groups.** G1 splits as the table does. 2a's tester G-T1 takes S2.7a, S2.7b, the cited rows, the describe-and-decode arms of .58.1 and .58.2, AT-B103-I2-1's 2a arm and AT-B103-I2-3; G-T2 takes S2.7d and AT-B103-I2-2's 2a arm. The D-9 rename guard pins what each side imports; `encode_physical_to_raw_bytes`'s call shape joins the guard in 2b. G2 is all 2a: no G2 node is 2b.
+
+**2a's I-2:**
+- the types `Refusal`, `Limits`, `EnumEntry`, `Definition` and `Decoded`. `Definition` has every pinned field except `shared_with`, in the pinned order (… `compu_tab_ref`, `refusal`); `bit_mask_text` is included (P-1, accepted in `../E2-rulings.md`);
+- the functions `describe_definition`, `describe_definitions`, `decode_definition` and `display_text`;
+- the codes `A2L-DEF-NAME` (both messages), `-KIND`, `-ADDRESS` (both messages), `-DATATYPE`, `-LENGTH`, `-METHOD`, `-CONVERSION`, `-TABLE`, `-TABLE-EMPTY`, `-MASK` (message `<name>: the bit mask <mask> cannot be applied to <datatype>`), `-BYTES` and `-DECODE`;
+- the consumer notes on markup-off rendering (E3S-04a), raw file words (E3A-25, E3S-19) and the fields a refused definition still carries (Inc 6).
+
+**What 2b adds to I-2:**
+- `Encoded` and `encode_definition`;
+- `Definition.shared_with`, inserted at its pinned place (after `compu_tab_ref`, before `refusal`), with no default;
+- the encode codes `-NUMBER`, `-ENCODE`, `-LIMITS`, `-EXTENDED`, `-MASK-VALUE`, `-ENUM`, `-TEXT-LENGTH`, `-TEXT-CHAR`, `-PRECISION` and `-OVERLAP`, and `-BYTES` on encode;
+- the two `-MASK` messages of the .19 clauses that wait;
+- the consumer note on masked staging (E3A-07, E3S-08), and Inc 8 and Inc 9's calls of `encode_definition`.
+
+**Interface note: 2a's I-2 is stable, and 2b only adds to it.**
+- **Names and types.** 2b changes no name, type, signature, value or meaning that 2a defines.
+- **Field order.** Inserting `shared_with` moves `refusal` one place later in the field order. No consumer constructs a `Definition` or reads one by position (the reason given for P-1 above), so the move reaches no consumer. Inc 3's defaulted fields go after `refusal`, so they stay valid next to `shared_with` whichever of 2b and Inc 3a lands first.
+- **Behaviour.** The only change 2b makes to what 2a returns is new refusals. Its .19 clauses refuse some definitions that 2a describes without a refusal: the hostile shapes of E3 rounds 2–5. On the fixtures that is 0 of the 234,654 objects in the 35 files (`../01-requirements.md` "Split (amendment A2)").
+- **No writes in 2a.** A 2a consumer only describes, decodes and displays; no I-2 function of 2a writes.
+
 ## Nodes
 
 describe_definition

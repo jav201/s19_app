@@ -244,3 +244,102 @@ This increment is a pure model with no window, so its acceptance cases are black
 ## Counts
 
 69 rows, all new: S2.7a 28 (R-A2L-DEF.1 … .25 with .7 as .7.1/.7.2, plus .136, .139), S2.7b 15 (.26 … .39, plus .137), S2.7c 21 (.40 … .58 with .58 as .58.1/.58.2, plus .138), S2.7d 5 (.59 … .63); 0 changed, 0 retired. Cited canon rows with cases here: 29 (above). Context notes: CTX-A2L-DEF new; CTX-A2L-VALUE one line (D-4 A). Rows that depend on an open ruling: D-3 (.54), D-4 (.15, .30), D-5 (.60, .61, .63), D-6 (.62), D-7 (.43, .44, .45); a ruled-out row is marked `— Withdrawn`, keeping its id.
+
+## Split (amendment A2)
+
+Amendment A2 (`../PLAN.md` "Amendment A2", `../design/A2-inc2-split.json`) splits this increment in two. **Inc 2a** is the read side: describe, decode, display, the CTX terms they need, the definitions case and the case 08 pin. It goes to E4 now on today's reader. **Inc 2b** is the write side: encode, the merge into the image, the write guards, and the limit and precision checks that only an encode runs. It waits for Inc 11 (the A2L reader) and a re-review of its guards against the fixed reader. No row text changes. A row that serves both sides stays in 2a and names the clauses that wait for 2b. The cases are split in `02-test-cases.md` "Split (amendment A2)", the nodes and I-2 in `codewire/graph-inc2.md` "Split (amendment A2)", the functions in `E1-slice.md` §7, and the E3 status of each side in `E3-rulings.md` "Split status (amendment A2)".
+
+**Where R-A2L-DEF.19 is cut.** 2a keeps the clauses that read the object record's words: a mask of 0; a 1 bit at or above the datatype's width; a float datatype; a word the system cannot read as a number; bit 0 together with the sign bit on a signed datatype; and a text object with a BIT_MASK line. These give the message `<name>: the bit mask <mask> cannot be applied to <datatype>`. The clauses built on *the text of the object* are the mask-write guards that rest on the frozen section builder, and they wait for 2b:
+- the letters BIT_MASK appear more than once, or once while no mask was read, or not at all while one was read;
+- a section ends inside an open comment or quote;
+- a `/begin` stands outside comments and quoted strings.
+
+Their two messages wait with them. These clauses were added after E3 rounds 2–4 (E3S-14, -24, -30, -33). E3S-30's fix column says that once the reader is fixed (BL-I2-12), the open-section and `/begin` clauses can be removed. On the 35 fixture files the mask clauses refuse 0 objects: every `[FX]` line of `evidence-e3/sec-r3-probe-transcript.txt` shows `'REFUSE': 0`, and `evidence-e3/sec-r4-probe-transcript.txt:246` shows `extra=0` for every reading. So when 2b adds its clauses, no fixture object's 2a result changes.
+
+The orchestrator may draw the line elsewhere. The alternative is to move the unreadable-word clause and the text-object clause (E3S-01 (1) and (2)) to 2b as well. 2a would then decode such an object as the whole word, as the A2L views do today (they apply no mask: `E1-slice.md:60`). Cases .19/4, .19/5, .58.2/5 and .58.2/7 would move with those clauses.
+
+| Row | Side | Clauses that wait for 2b (2a row), or what makes the row 2b |
+|---|---|---|
+| R-A2L-DEF.1 | 2a | — |
+| R-A2L-DEF.2 | 2a | — |
+| R-A2L-DEF.3 | 2a | — |
+| R-A2L-DEF.4 | 2a | — |
+| R-A2L-DEF.5 | 2a | — |
+| R-A2L-DEF.6 | 2a | — |
+| R-A2L-DEF.139 | 2a | describe refuses the name, and decode gives that refusal (.25). What waits is where it gates writes: the encode refusal, through .25's "or encode" |
+| R-A2L-DEF.7.1 | 2a | — |
+| R-A2L-DEF.7.2 | 2a | — |
+| R-A2L-DEF.8 | 2a | — |
+| R-A2L-DEF.9 | 2a | — |
+| R-A2L-DEF.10 | 2a | — |
+| R-A2L-DEF.11 | 2a | — |
+| R-A2L-DEF.12 | 2a | — |
+| R-A2L-DEF.13 | 2a | — |
+| R-A2L-DEF.14 | 2a | — |
+| R-A2L-DEF.15 | 2a | — |
+| R-A2L-DEF.16 | 2a | — |
+| R-A2L-DEF.17 | 2a | — |
+| R-A2L-DEF.18 | 2a | — (decode needs the mask; 2b's merge reads the same field) |
+| R-A2L-DEF.19 | 2a | the clauses on *the text of the object* (above) and their messages `<name>: its record ends inside a comment or a quoted string` and `<name>: its text holds a /begin that does not start its line` |
+| R-A2L-DEF.20 | 2a | — (the checks that use the extended limits are .43 … .45, in 2b) |
+| R-A2L-DEF.21 | 2a | — (case /3 checks it through an encode; that arm waits) |
+| R-A2L-DEF.22 | 2a | — |
+| R-A2L-DEF.23 | 2a | — |
+| R-A2L-DEF.24 | 2a | — (2b's .19 clauses join the order at its bit-mask place) |
+| R-A2L-DEF.25 | 2a | "or encode" |
+| R-A2L-DEF.136 | 2a | the re-measure after 2b adds the span index, `shared_with` and the text-of-object pass to the same walk (the .136 example counts them: `codewire/graph-inc2.md:257`) |
+| R-A2L-DEF.26 | 2a | "or encodes" |
+| R-A2L-DEF.27 | 2a | — |
+| R-A2L-DEF.28 | 2a | — |
+| R-A2L-DEF.29 | 2a | — |
+| R-A2L-DEF.30 | 2a | — |
+| R-A2L-DEF.31 | 2a | — |
+| R-A2L-DEF.32 | 2a | — |
+| R-A2L-DEF.33 | 2a | — |
+| R-A2L-DEF.34 | 2a | — |
+| R-A2L-DEF.35 | 2a | — |
+| R-A2L-DEF.36 | 2a | — |
+| R-A2L-DEF.37 | 2a | — |
+| R-A2L-DEF.38 | 2a | — |
+| R-A2L-DEF.39 | 2a | — |
+| R-A2L-DEF.137 | 2a | a word from the operator, and a notice (both appear only in encode messages: .40 … .52) |
+| R-A2L-DEF.40 | 2b | encode: the number text |
+| R-A2L-DEF.41 | 2b | encode: the encode direction |
+| R-A2L-DEF.42 | 2b | encode: its refusal reasons |
+| R-A2L-DEF.43 | 2b | a limit check that only an encode runs |
+| R-A2L-DEF.44 | 2b | a notice of an encode |
+| R-A2L-DEF.45 | 2b | a limit check that only an encode runs |
+| R-A2L-DEF.46 | 2b | the merge into the image |
+| R-A2L-DEF.47 | 2b | the merge's mask-value check |
+| R-A2L-DEF.48 | 2b | encode: enum |
+| R-A2L-DEF.49 | 2b | encode: enum |
+| R-A2L-DEF.50 | 2b | encode: text |
+| R-A2L-DEF.51 | 2b | encode: text |
+| R-A2L-DEF.52 | 2b | encode: text |
+| R-A2L-DEF.53 | 2b | the bytes to write |
+| R-A2L-DEF.138 | 2b | the overlap guard; the span index and `Definition.shared_with` come with it |
+| R-A2L-DEF.54 | 2b | a precision check that only an encode runs |
+| R-A2L-DEF.55 | 2b | the encode round trip |
+| R-A2L-DEF.56 | 2b | the encode round trip |
+| R-A2L-DEF.57 | 2b | the encode order |
+| R-A2L-DEF.58.1 | 2a | "or encodes a value" |
+| R-A2L-DEF.58.2 | 2a | the encode arm of each shape (cases /11 and /13 give only an encode input) |
+| R-A2L-DEF.59 | 2a | — (the case 08 pin) |
+| R-A2L-DEF.60 | 2a | — (the definitions case) |
+| R-A2L-DEF.61 | 2a | — |
+| R-A2L-DEF.62 | 2a | — |
+| R-A2L-DEF.63 | 2a | — |
+
+**Split counts.**
+- **2a: 50 rows.** S2.7a 28, S2.7b 15, S2.7c 2 (.58.1, .58.2) and S2.7d 5. Eight of them name clauses that wait: .19, .25, .26, .58.1, .58.2, .136, .137 and .139.
+- **2b: 19 rows.** .40 … .57 and .138.
+- **Total: 69 rows**, unchanged.
+- **Cited canon rows: 29, all 2a.** They are the definition's address, datatype, length, byte order and unit, the raw read, the conversion and the enum text, all of which describe or decode.
+
+**CTX-A2L-DEF by side.** The note stays whole and unchanged; 2b's terms remain in it.
+- **2a uses:**
+  - the terms: defined object, definition, kind, refusal, conversion method record, enum table, enum entry, range bounds, default text, bit mask, mask shift, object record, *span* (its first two sentences), stored value, extended limits, display format, decimals, 15-significant-digit text, display text, printable ASCII, refusal order, case 08 pin and definitions case;
+  - the placeholders `<name>`, `<kind>`, `<address>`, `<length>`, `<method>`, `<type>`, `<table>`, `<mask>` and `<raw>`.
+- **Only 2b uses:**
+  - the terms: notice, operator text, number text, limit value, agree at the display precision, encode direction, encode reasons, encode order, the text of the object, bits an object selects, and *span*'s last sentence (the span index);
+  - the placeholders `<other>`, `<lower>`, `<upper>`, `<elower>`, `<eupper>`, `<text>` and `<stored>`.
