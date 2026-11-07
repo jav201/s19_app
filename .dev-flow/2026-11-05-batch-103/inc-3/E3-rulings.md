@@ -24,3 +24,10 @@ Round 2: architect **PASS-WITH-NOTES** (E3A-01 … -03 closed; .142/5's 100 obje
 - **E3S3-11** (each object re-reads the shared RECORD_LAYOUT / MOD_COMMON: 400 objects sharing a 256 KiB section take 5.3 s / 19.1 s): each RECORD_LAYOUT and MOD_COMMON is parsed **once per walk** (a map in `describe_definitions`'s one walk, keyed by section identity), as E3A-32 already asks for lookups; a case with 400 objects sharing one large layout (≤ the .136 budget).
 - E3S3-08, the architect's notes (E3A-24 refused definitions carry no unread count; E3A-25 a PAR_LIST case): applied in the same pass; the rest are E4 addenda.
 **Next:** a narrow Opus correction, then security round 3 on E3S3-09 … -11 only.
+
+## Round 3 rulings (2026-11-07T00:42:34-06:00, orchestrator Opus 5.5)
+
+Round 3 (security): **FAIL** — E3S3-08 … -11 closed (57 FIX shapes × 10 conversions, 0 exceptions; 1 M-point axes with 0 points above 2^53; .136/arr-2 0.087 s); new **E3S3-13 MAJOR** (shared AXIS_PTS via COM_AXIS, COMPU_METHOD and COMPU_VTAB still read once per object: 400 objects × 256 KiB take 4.3–24.9 s / 5.7 s / 5.7 s — the COMPU part is in Inc 2a's code too), **E3S3-14 MEDIUM** (no rule keeps cached read forms unchanged).
+- **One general rule** replaces the per-kind fixes: **every section an object references by name (RECORD_LAYOUT, MOD_COMMON, AXIS_PTS, COMPU_METHOD, COMPU_VTAB, COMPU_VTAB_RANGE) is read once per walk**, keyed by section identity; and **a cached read form is an immutable value** (tuples / frozen dataclasses), so one object's decode can never change another's. Cases: 400 objects sharing each kind (within R-A2L-DEF.136's budget); two objects sharing a curve's AXIS_PTS decode to the same values as a fresh, uncached decode.
+- **Inc 2a:** the COMPU part of E3S3-13 is a design gap in Inc 2a's implemented code; it is fixed in **Inc 2a's E5** (records: a case under R-A2L-DEF.136 with 400 objects sharing one COMPU_VTAB / COMPU_METHOD; code: the read-once map) before 2a merges.
+**Next:** a narrow Opus correction of Inc 3a's records/graph, then security round 4 on E3S3-13/-14 only.
