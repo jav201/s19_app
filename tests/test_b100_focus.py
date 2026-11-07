@@ -375,6 +375,42 @@ def test_tc_b100_12_workarea_files_pick_rehomes_focus(tmp_path: Path) -> None:
     asyncio.run(_drive())
 
 
+def test_tc_b100_12_first_load_from_the_startup_rail_focus_lands_on_the_target(
+    tmp_path: Path,
+) -> None:
+    """Batch-101 Inc 10a E4-R3 (HLR-166's first load): a fresh session starts
+    with the focus on the Workspace rail item (Textual's first focusable
+    widget); the first image load lands it on the Workspace target
+    ``files_list`` once the loaded view shows it, and ``p`` reaches the Load
+    project dialog. With the P-16 steal gone (R-SEG-OPEN.6) nothing stale is
+    left for the tail to re-home, so this arm pins the rail-item half of
+    E4-R3, which the fallback-shape arms above do not. RED on the Inc 10a
+    tree before E4-R3 (the focus stays on ``rail_item_workspace``, int-11)."""
+
+    async def _drive() -> None:
+        app = S19TuiApp(base_dir=tmp_path)
+        _seed_project_p1(app.workarea)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await _wait_for(
+                pilot,
+                lambda: app.focused is not None
+                and app.focused.id == "rail_item_workspace",
+                "the startup focus on the Workspace rail item",
+            )
+            app.load_selected_file(CASE01_DIR / "firmware.s19")
+            await _flush(pilot)
+            await _wait_for(
+                pilot,
+                lambda: _file_status_text(app).startswith("Loaded "),
+                "the durable file-state line",
+            )
+            await _wait_for_focus_on_target(pilot, app, "files_list")
+            await _assert_p_opens_the_project_dialog(app, pilot)
+
+    asyncio.run(_drive())
+
+
 def test_tc_b100_12_rehome_lands_on_the_active_windows_target(
     tmp_path: Path,
 ) -> None:

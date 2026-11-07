@@ -68,10 +68,13 @@ RLO = "\u202e"  # right-to-left override (Cf)
 ZWSP = "\u200b"  # zero-width space (Cf)
 
 #: The CTX-SHELL focus target of each rail window, written here from the
-#: requirement (not read from the product): key, window, target id.
+#: requirement (not read from the product): key, window, target id. The A2L
+#: entry is the window's switch landing of E4-R4 (graph I-4): the ``?`` chip,
+#: because the tag table's own PgDn would shadow R-TUI-020.1's paging
+#: (changed at E4, E4-R4).
 RAIL_TARGETS = (
     ("1", "workspace", "files_list"),
-    ("2", "a2l", "a2l_tags_list"),
+    ("2", "a2l", "window_help_a2l"),
     ("3", "mac", "mac_records_list"),
     ("4", "map", "memory_map_panel"),
     ("5", "issues", "validation_issues_groups"),
@@ -909,16 +912,22 @@ def test_r_shell_status_7_2_project_load_line_scrubs_the_mac_name(
 # ---------------------------------------------------------------------------
 # R-SHELL-FOCUS.2 - the focus after a rail key
 # ---------------------------------------------------------------------------
-def test_r_shell_focus_2_1_key_2_puts_focus_on_the_tag_table(tmp_path: Path, case08: Path) -> None:
-    """R-SHELL-FOCUS.2 case /1: with the image and A2L loaded and ``files_list``
-    focused, ``2`` focuses ``a2l_tags_list`` (base: ``ws_load_project_button``,
-    in the hidden Workspace, area 0)."""
+def test_r_shell_focus_2_1_key_2_lands_on_the_a2l_window_help_chip(tmp_path: Path, case08: Path) -> None:
+    """R-SHELL-FOCUS.2 case /1 (changed at E4, E4-R4): with the image and A2L
+    loaded and ``files_list`` focused, ``2`` lands the focus on the A2L
+    window's switch landing ``window_help_a2l`` (graph I-4), inside the shown
+    window and not on the tag table, whose own PgDn would scroll it instead of
+    paging the explorer (R-TUI-020.1; base: ``ws_load_project_button``, in the
+    hidden Workspace, area 0; the Inc 10a tree before E4-R4: ``a2l_tags_list``)."""
 
     async def scenario(app, pilot, log):
         await case_session(pilot, app, case08, mac=False, a2l=True)
         await pilot.press("2")
         await wait_screen(pilot, app, "a2l")
-        await wait_focus(pilot, app, "a2l_tags_list")
+        await wait_focus(pilot, app, "window_help_a2l")
+        assert inside(focus_of(app), "screen_a2l"), focus_report(app)
+        await settle(pilot, 6)
+        assert focus_of(app) is not None and focus_of(app).id == "window_help_a2l", focus_report(app)
 
     run(tmp_path, scenario)
 
@@ -1148,19 +1157,23 @@ def test_r_shell_focus_3_2_unload_with_nothing_focused_lands_on_the_target(tmp_p
     run(tmp_path, scenario)
 
 
-def test_r_shell_focus_4_1_unload_all_keeps_a_healthy_list_focus(tmp_path: Path) -> None:
-    """R-SHELL-FOCUS.4 case /1: ``files_list`` focused, ``U`` keeps it (base:
-    ``sje_table``)."""
-    image = write_three_ranges(tmp_path / "src" / "three.s19")
+def test_r_shell_focus_4_1_mac_unload_keeps_a_healthy_list_focus(tmp_path: Path, case08: Path) -> None:
+    """R-SHELL-FOCUS.4 case /1 (changed at E4, E4-R2): case 08 S19 + MAC,
+    ``files_list`` focused, ``[u]`` on the MAC slot keeps the focus on
+    ``files_list`` — the image stays, so ``files_list`` stays shown. The arm
+    was ``U``, whose empty state hides ``files_list`` (LLR-002.3; I-D7). Base:
+    ``sje_table`` (the unload's ``refresh_window`` focused the hidden table)."""
 
     async def scenario(app, pilot, log):
-        await load_image(pilot, app, image)
-        await put_focus(pilot, app, "files_list")
+        await case_session(pilot, app, case08)
         mark = len(log.messages)
-        await pilot.press("U")
-        await wait_message(pilot, log, mark, "Unloaded all artifacts.")
+        await press_unload(pilot, app, "mac")
+        await wait_message(pilot, log, mark, "Unloaded MAC.")
         await settle(pilot, 10)
         await wait_focus(pilot, app, "files_list")
+        await settle(pilot, 6)
+        assert focus_of(app) is not None and focus_of(app).id == "files_list", focus_report(app)
+        assert not inside(focus_of(app), "screen_split_join"), focus_report(app)
 
     run(tmp_path, scenario)
 

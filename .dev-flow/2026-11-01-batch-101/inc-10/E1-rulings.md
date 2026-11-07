@@ -109,3 +109,10 @@ Backlog:
 
 - **BL-I10-1** (AR2-5, I-D2; with D4-14 / R-TUI-007.9): the main hex view's stored window index survives a load and a MAC load or unload. Measured (`../evidence/inc-10/int-06.txt`): after a go-to to row 949 of a 1 000-row image, loading fixture three shows only `0x00008020` under `... showing from 0x00008020 (context preserved) ...` (the index clamped to the last view row, 2); on base `2f54c7d` the page floor gave start 0 and all three rows. The operator notices it: a load after a deep jump into a smaller file shows its last rows only. A MAC load or unload with records outside the image also shifts the window by the MAC-only rows before it (the index counts view rows, I-5). The fix hooks the load tail (`_step_hex`) and the MAC-load install (`_apply_prepared_load`), outside Inc 10a's slice.
 - **BL-I10-2** (tester H F-1): at 80 × 24 the Workspace `#hex_scroll` is 1 line high (A2L pane 5 lines, MAC 7, measured at E4), so no jump target can be the second row inside the main pane at the floor size; case R-TUI-018.1/13 runs its main arm at 100 × 30. A layout row of S4 / S6, not Inc 10a's.
+
+## 10. E4 rulings applied (2026-11-07)
+
+Rulings `E4-rulings.md` E4-R1 … R5, applied by the second E4 integrator (`E4-integration-notes.md` §6). What changes for the records here:
+
+- **BL-I10-1 narrowed.** Its load half is fixed in Inc 10a (E4-R1): a load that installs a new image sets `_hex_window_start = 0`, so after a deep jump a smaller file is shown from its first row (R-TUI-007.9, brought in unchanged; case R-TUI-007.9/1). What stays in the backlog: a MAC load or unload with records outside the image shifts the window by the MAC-only rows before it (the index counts view rows, I-5) — AR2-5's re-anchor half, with D4-14.
+- **STOPPED for the orchestrator (I-D18):** R-TUI-020.1's MAC arm — PgDn right after `3` scrolls `mac_records_list` instead of paging the MAC View (base pages it); the same mechanism as I-D16, outside E4-R4's A2L-only ruling. The MAC window has no `?` chip, so its switch landing is a new design choice.

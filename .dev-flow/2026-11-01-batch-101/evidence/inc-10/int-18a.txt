@@ -1,0 +1,124 @@
+=== Inc 10a E4 rulings run: int-18a
+date: 2026-11-07T02:16:31Z
+checkout HEAD (base): 2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+main ref in this checkout: 2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+index tree with the increment staged: c9513e1c1f2e2a0d8a67e561218bf3a6f1cf2383
+staged files vs base: 10
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10fix_mut_M-R1/s19_app/__init__.py
+CMD: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -n 1 -m not serial_timing -rfs tests/test_b101_hex_jump.py::test_r_tui_007_9_1_a_load_after_a_deep_jump_shows_the_new_file_from_its_first_row
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_r_tui_007_9_1_a_load_after_a_deep_jump_shows_the_new_file_from_its_first_row _
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-359/popen-gw0/test_r_tui_007_9_1_a_load_afte0')
+
+    def test_r_tui_007_9_1_a_load_after_a_deep_jump_shows_the_new_file_from_its_first_row(tmp_path):
+        """R-TUI-007.9/1 (added at E4, E4-R1): after a go-to to row 949 of a 1 000-row
+        image (window from row 948), loading fixture three shows the new file from its
+        first view row: rows 0x00008000, 0x00008010, 0x00008020 and no ``... showing
+        from`` notice (the Inc 10a tree before E4-R1: 0x00008020 alone under
+        ``... showing from 0x00008020 (context preserved) ...``, int-06; base: the
+        whole file, from the page floor)."""
+    
+        async def scenario(app, pilot, log):
+            image = write_rows(tmp_path / "rows.s19", 1000)
+            app.load_selected_file(image)
+            await wait_until(pilot, lambda: app.current_file is not None and app.current_file.path.name == image.name, "load")
+            await settle_workers(pilot)
+            await wait_until(pilot, lambda: bool(hex_rows(app, "#hex_view")), "no rows painted")
+            await goto(pilot, app, log, MAIN, f"0x{row_at(949):08X}", hit(row_at(949)))
+            await wait_rows(pilot, app, MAIN, [row_at(948), row_at(949)], "go-to row 949")
+            three = write_three(tmp_path / "three.s19")
+            app.load_selected_file(three)
+            await wait_until(
+                pilot,
+                lambda: app.current_file is not None and app.current_file.path.name == three.name,
+                "the load of fixture three",
+            )
+            await settle_workers(pilot)
+            await wait_rows(pilot, app, MAIN, [0x8000, 0x8010, 0x8020], "the load after the deep jump")
+            assert len(hex_rows(app, "#hex_view")) == 3, hex_rows(app, "#hex_view")
+            showing = [line for line in notices(app, "#hex_view") if "showing from" in line]
+            assert showing == [], showing
+    
+>       drive(tmp_path, scenario)
+
+tests/test_b101_hex_jump.py:1167: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_hex_jump.py:137: in drive
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_hex_jump.py:1162: in scenario
+    await wait_rows(pilot, app, MAIN, [0x8000, 0x8010, 0x8020], "the load after the deep jump")
+tests/test_b101_hex_jump.py:207: in wait_rows
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function wait_rows.<locals>.<lambda> at 0x7fbddbefdc60>
+failure = <function wait_rows.<locals>.<lambda> at 0x7fbde041c900>
+timeout = 10.0, pause_first = False
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: the load after the deep jump: first rows [0x00008020], expected [0x00008000, 0x00008010, 0x00008020]
+
+tests/support/timing.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_hex_jump.py::test_r_tui_007_9_1_a_load_after_a_deep_jump_shows_the_new_file_from_its_first_row
+1 failed in 19.02s
+=== exit code: 1
+=== mutation M-R1 (working tree of the copy vs its staged index):
+diff --git a/s19_app/tui/app.py b/s19_app/tui/app.py
+index c168f64a..462b504a 100644
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -18880,8 +18880,6 @@ class S19TuiApp(App):
+         # view row — the window a jump placed in the previous image is not
+         # carried over. A MAC / A2L attach keeps the live image and its
+         # window (the MAC re-anchor stays BL-I10-1).
+-        if loaded.mem_map is not previous_map:
+-            self._hex_window_start = 0
+         self._validation_issues_window_start = 0
+         self._a2l_tag_hex_highlight = None
+         # A new file invalidates every per-view goto focus address (LLR-003.6 file-load).

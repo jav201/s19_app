@@ -1133,3 +1133,35 @@ def test_r_tui_007_8_1_pages_count_the_row_added_for_a_mac_record(tmp_path):
         assert [addr_of(r) for r in hex_rows(app, "#hex_view")] == [0x8020], fmt(addrs(app, "#hex_view", 5))
 
     drive(tmp_path, scenario)
+
+
+def test_r_tui_007_9_1_a_load_after_a_deep_jump_shows_the_new_file_from_its_first_row(tmp_path):
+    """R-TUI-007.9/1 (added at E4, E4-R1): after a go-to to row 949 of a 1 000-row
+    image (window from row 948), loading fixture three shows the new file from its
+    first view row: rows 0x00008000, 0x00008010, 0x00008020 and no ``... showing
+    from`` notice (the Inc 10a tree before E4-R1: 0x00008020 alone under
+    ``... showing from 0x00008020 (context preserved) ...``, int-06; base: the
+    whole file, from the page floor)."""
+
+    async def scenario(app, pilot, log):
+        image = write_rows(tmp_path / "rows.s19", 1000)
+        app.load_selected_file(image)
+        await wait_until(pilot, lambda: app.current_file is not None and app.current_file.path.name == image.name, "load")
+        await settle_workers(pilot)
+        await wait_until(pilot, lambda: bool(hex_rows(app, "#hex_view")), "no rows painted")
+        await goto(pilot, app, log, MAIN, f"0x{row_at(949):08X}", hit(row_at(949)))
+        await wait_rows(pilot, app, MAIN, [row_at(948), row_at(949)], "go-to row 949")
+        three = write_three(tmp_path / "three.s19")
+        app.load_selected_file(three)
+        await wait_until(
+            pilot,
+            lambda: app.current_file is not None and app.current_file.path.name == three.name,
+            "the load of fixture three",
+        )
+        await settle_workers(pilot)
+        await wait_rows(pilot, app, MAIN, [0x8000, 0x8010, 0x8020], "the load after the deep jump")
+        assert len(hex_rows(app, "#hex_view")) == 3, hex_rows(app, "#hex_view")
+        showing = [line for line in notices(app, "#hex_view") if "showing from" in line]
+        assert showing == [], showing
+
+    drive(tmp_path, scenario)

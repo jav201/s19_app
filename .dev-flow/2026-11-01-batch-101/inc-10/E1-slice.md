@@ -1,12 +1,12 @@
 # Inc 10a — E1 slice (E3 correction)
 
-Base `98d94d7`. Lines are base lines. E3: #16, #17 and #19 moved to `../inc-10b/E1-slice.md` (split); #20–#27 added. 3 source files of the 4 allowed; 24 functions (20 changed, 4 new). E3 addendum (Inc 12 D-2): #11 withdrawn, no product route (before: 25 functions, 21 changed). No module-level import changes (`painted_names` is already imported, `app.py:224`; `hex_row_bases` joins the existing `..render.hexview` import, `app.py:48`).
+Base `98d94d7`. Lines are base lines. E3: #16, #17 and #19 moved to `../inc-10b/E1-slice.md` (split); #20–#27 added. 3 source files of the 4 allowed; 24 functions (20 changed, 4 new). E3 addendum (Inc 12 D-2): #11 withdrawn, no product route (before: 25 functions, 21 changed). E4 rulings (`E4-rulings.md`, §6 of `E4-integration-notes.md`): #29–#34 added, all in `app.py` (still 3 source files): 30 functions (23 changed, 7 new). No module-level import changes (`painted_names` is already imported, `app.py:224`; `hex_row_bases` joins the existing `..render.hexview` import, `app.py:48`).
 
 ## 1. Files
 
 | File | Functions | Rows |
 |---|---|---|
-| `s19_app/tui/app.py` | 17 changed, 2 new (below; #11 withdrawn, Inc 12 D-2) | S4, S5, S6 rows |
+| `s19_app/tui/app.py` | 17 changed, 2 new (below; #11 withdrawn, Inc 12 D-2); E4 rulings: 3 more changed (#29, #30, #31), 3 more new (#32–#34), and #24 changed (E4-R4) | S4, S5, S6 rows; R-TUI-007.9 (E4-R1) |
 | `s19_app/tui/segment_split_view.py` | `SplitJoinWindow.refresh_window` changed; `SplitJoinWindow.check_action` new; `SplitJoinWindow.action_export` changed | R-SEG-OPEN.1, .6, .7 |
 | `s19_app/render/hexview.py` | `_collect_hex_rows` changed; `hex_row_bases` new | R-TUI-018.1, .3, R-TUI-007.8 |
 
@@ -42,7 +42,15 @@ Base `98d94d7`. Lines are base lines. E3: #16, #17 and #19 moved to `../inc-10b/
 | 27 | `_collect_hex_rows` (module) | `render/hexview.py:148-247` | its row list from #26; output unchanged | R-TUI-007.8 |
 | 28 | `SplitJoinWindow.action_export` (changed) | `segment_split_view.py:2053-2081` | E3 SR2-1: returns at once while the window has `hidden`, before the export body, so Enter on the hidden `#sje_export` button exports nothing; `check_action` (I-6) does not reach this path | R-SEG-OPEN.7 |
 
-Not changed: `_jump_to_section`, `on_memory_map_panel_open_in_hex_requested`, `_handle_search` (their jumps go through #1); `_jump_to_mac_address` (`:16295-16317`; Enter on a `#mac_records_list` row, `on_data_table_row_selected` `:15886-15888` → `update_mac_hex_view(address, near_top=True, reset_scroll=True)`, so through #4 and #20; the route of case R-TUI-018.3/3, Inc 12 D-2) and `_jump_to_tag_by_data` (through #3); `_jump_to_validation_issue_object` (#11, withdrawn); `_apply_goto`; `SplitJoinWindow.action_cycle_tab` (F-18 not reproduced, D-3) and `action_close_window` (its `action_show_screen` call gets the focus from #15); `_rehome_focus_after_load` (the load tails keep it; the unload now uses #24); `_resolve_focus_target`, `_fallback_focus_target`, `_focus_needs_rehome`; `_plan_project_save` and `_load_question_text` (they read the spine #12 builds).
+| 24 (E4-R4, E4-R3) | `S19TuiApp._land_focus` | `app.py:10769-10870` (final tree) | a window switch (`on_switch`) to a window of `_SWITCH_LANDING_TARGETS` (`app.py:9957`, `{"a2l": "window_help_a2l"}`) lands on that widget while it is focusable and shown, else on `_resolve_focus_target()` (`:10852-10864`); every landing ends with `_note_focus_landing(target)` (`:10870`) | R-SHELL-FOCUS.2 (its `2` arm, changed at E4), R-TUI-020.1 (kept) |
+| 29 (E4-R1, E4-R3, E4-R5) | `S19TuiApp._apply_prepared_load` | `app.py:18722-19035` (final tree) | E4-R1: a new image dict (`loaded.mem_map is not previous_map`) sets `_hex_window_start = 0` (`:18883-18884`); E4-R5: `_step_sections`, `_step_hex`, `_step_a2l`, `_step_finalize` start with `if self._load_tree_gone(): return` (`:18966`, `:18981`, `:18995`, `:19010`); E4-R3: `_step_finalize` calls #33 after `_rehome_focus_after_load()` (`:19022`) | R-TUI-007.9, R-SHELL-FOCUS.3, .4 (b100 HLR-166, HLR-177c) |
+| 30 (E4-R3) | `S19TuiApp._install_attached_a2l` | `app.py:16454-16499` (final tree) | the A2L load tail calls #33 after `_rehome_focus_after_load()` (`:16488`) | R-SHELL-FOCUS.3, .4 (b100 HLR-166) |
+| 31 (E4-R3) | `S19TuiApp._rehome_focus_after_load` | `app.py:10607-10680` (final tree) | unchanged re-home, then `_note_focus_landing(target)` (`:10680`); was "not changed" above | R-SHELL-FOCUS.3, .4 |
+| 32 (E4-R3, new) | `S19TuiApp._note_focus_landing` | `app.py:10682-10687` (final tree) | `_focus_landing_fallback` = the landing widget when it is not `_FOCUS_TARGETS[_active_screen_key]`, else `None`; the attribute starts `None` in `__init__` (`:2846`) | R-SHELL-FOCUS.5 |
+| 33 (E4-R3, new) | `S19TuiApp._rehome_placeholder_focus_after_load` | `app.py:10689-10755` (final tree) | a focus on a `RailItem` or on `_focus_landing_fallback` moves to `_FOCUS_TARGETS[window]` once it is focusable and shown (`call_after_refresh` re-check, at most 3); a focus the operator put elsewhere is kept | R-SHELL-FOCUS.3, .4, .5 (b100 HLR-166) |
+| 34 (E4-R5, new) | `S19TuiApp._load_tree_gone` | `app.py:10757-10767` (final tree) | `not default_screen.is_attached` (Textual: False after `App.exit`); `False` for a tree that never mounted | b100 HLR-177c |
+
+Not changed: `_jump_to_section`, `on_memory_map_panel_open_in_hex_requested`, `_handle_search` (their jumps go through #1); `_jump_to_mac_address` (`:16295-16317`; Enter on a `#mac_records_list` row, `on_data_table_row_selected` `:15886-15888` → `update_mac_hex_view(address, near_top=True, reset_scroll=True)`, so through #4 and #20; the route of case R-TUI-018.3/3, Inc 12 D-2) and `_jump_to_tag_by_data` (through #3); `_jump_to_validation_issue_object` (#11, withdrawn); `_apply_goto`; `SplitJoinWindow.action_cycle_tab` (F-18 not reproduced, D-3) and `action_close_window` (its `action_show_screen` call gets the focus from #15); `_rehome_focus_after_load` (the load tails keep it; the unload now uses #24; changed at E4, #31); `_resolve_focus_target`, `_fallback_focus_target`, `_focus_needs_rehome`; `_plan_project_save` and `_load_question_text` (they read the spine #12 builds).
 
 ## 3. Callers read
 

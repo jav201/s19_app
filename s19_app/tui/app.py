@@ -2838,6 +2838,12 @@ class S19TuiApp(App):
         #: Inc 12b (S-c): quit confirmed while a session action runs; UI
         #: control state, not session state (TC-B100-09).
         self._quit_pending: bool = False
+        #: Inc 10a E4-R3: the widget a focus landing last put the focus on
+        #: because the shown window's declared target was not shown (or, on
+        #: A2L, the switch landing of E4-R4); a completed load moves a focus
+        #: still sitting there to the target once it is shown. UI focus
+        #: state, not session state (TC-B100-09).
+        self._focus_landing_fallback: Optional[Widget] = None
         # N1: the active rail screen, so the Legend modal can scope its rows to
         # what THIS screen paints (updated by ``action_show_screen``).
         self._active_screen_key: str = "workspace"
@@ -9942,6 +9948,14 @@ class S19TuiApp(App):
         "split_join": "sje_table",
     }
 
+    #: Inc 10a E4-R4 (I-D16): where a window switch lands instead of the
+    #: declared target when that target's own bindings shadow the window's
+    #: paging keys. The A2L tag table handles PgDn / PgUp itself (LLR-042.1),
+    #: so a landing there would stop PgDn paging the A2L Explorer right
+    #: after ``2`` (R-TUI-020.1); the window's ``?`` chip leads its header
+    #: and binds Enter only. Load tails still land on ``_FOCUS_TARGETS``.
+    _SWITCH_LANDING_TARGETS: "dict[str, str]" = {"a2l": "window_help_a2l"}
+
     #: Every window container a focused widget can sit in: the registry's
     #: containers plus the Split / Join / Export window. Derived from
     #: ``SCREEN_CONTAINER_IDS`` rather than re-listed, so the two sets can
@@ -10663,6 +10677,94 @@ class S19TuiApp(App):
             # Before mount there is no tree to focus into (TC-B78-41's
             # no-op shape, matching `_focus_local_input`).
             return
+        self._note_focus_landing(target)
+
+    def _note_focus_landing(self, target: Widget) -> None:
+        """Inc 10a E4-R3: remember a landing that did not reach the shown
+        window's declared target (a fallback, or E4-R4's A2L switch landing),
+        so a completed load can still move it there once it is shown."""
+        declared = self._FOCUS_TARGETS.get(self._active_screen_key)
+        self._focus_landing_fallback = None if target.id == declared else target
+
+    def _rehome_placeholder_focus_after_load(
+        self, switch: Optional[str] = None, *, layout_waits: int = 3
+    ) -> None:
+        """
+        Summary:
+            Inc 10a E4-R3 (HLR-166): at the end of a completed load, move a
+            focus that sits on a rail item, or on the widget a focus landing
+            chose because the shown window's target was not shown, to that
+            target once the loaded view shows it. A focus the operator put
+            on a real control is kept (R-SHELL-FOCUS.4).
+
+        Args:
+            switch (Optional[str]): The window the first call saw; a later
+                call for another window does nothing.
+            layout_waits (int): How many more refreshes the call may wait
+                for the target to get its region.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Reads ``default_screen.focused`` (a dialog keeps its own
+              focus); an unmounted tree is a no-op.
+            - The target is ``_FOCUS_TARGETS`` of the shown window — never
+              its fallback: a target that stays hidden keeps the focus where
+              it is.
+            - While the target has no region the call re-schedules itself
+              after a refresh, at most ``layout_waits`` times, and only while
+              the focus has not moved (E4-R5 guard included).
+
+        Dependencies:
+            Uses:
+                - ``_FOCUS_TARGETS`` / ``_focus_landing_fallback`` /
+                  ``_note_focus_landing`` / ``_load_tree_gone``
+            Used by:
+                - ``_step_finalize`` and the A2L load tail
+        """
+        if self._load_tree_gone():
+            return
+        if switch is None:
+            switch = self._active_screen_key
+        elif switch != self._active_screen_key:
+            return
+        try:
+            focused = self.default_screen.focused
+        except Exception:
+            return
+        if focused is None:
+            return
+        if not isinstance(focused, RailItem) and focused is not self._focus_landing_fallback:
+            return
+        try:
+            target = self.query_one(f"#{self._FOCUS_TARGETS[switch]}")
+        except Exception:
+            return
+        if target is focused:
+            return
+        if target.focusable and target.region.area > 0:
+            target.screen.set_focus(target)
+            self._note_focus_landing(target)
+            return
+        if layout_waits > 0:
+            self.call_after_refresh(
+                self._rehome_placeholder_focus_after_load,
+                switch,
+                layout_waits=layout_waits - 1,
+            )
+
+    def _load_tree_gone(self) -> bool:
+        """Inc 10a E4-R5 (I-D17): ``True`` once the default screen a deferred
+        load step renders into is no longer attached — Textual reports every
+        node detached once ``App.exit`` has run, and a pruned screen has no
+        parent. A tree that never mounted (the headless chain test) is not
+        gone: its steps still run."""
+        try:
+            screen = self.default_screen
+        except Exception:
+            return False
+        return not screen.is_attached
 
     def _land_focus(
         self,
@@ -10703,7 +10805,11 @@ class S19TuiApp(App):
               so a dialog's own focus is never judged or moved.
             - Resolves the target through ``_resolve_focus_target`` (which
               reads ``_active_screen_key``) and lands via
-              ``Screen.set_focus``; otherwise the focus stays.
+              ``Screen.set_focus``; otherwise the focus stays. A window
+              switch to a window of ``_SWITCH_LANDING_TARGETS`` lands on
+              that widget while it is shown (E4-R4: A2L, the ``?`` chip).
+            - Records a landing that missed the declared target
+              (``_note_focus_landing``, E4-R3).
 
         Dependencies:
             Uses:
@@ -10744,13 +10850,24 @@ class S19TuiApp(App):
         )
         if not move:
             return
-        target = self._resolve_focus_target()
+        target = None
+        landing_id = self._SWITCH_LANDING_TARGETS.get(self._active_screen_key)
+        if on_switch and landing_id is not None:
+            try:
+                landing = self.query_one(f"#{landing_id}")
+            except Exception:
+                landing = None
+            if landing is not None and landing.focusable and landing.region.area > 0:
+                target = landing
+        if target is None:
+            target = self._resolve_focus_target()
         if target is None:
             return
         try:
             target.screen.set_focus(target)
         except Exception:
             return
+        self._note_focus_landing(target)
 
     def action_open_settings_menu(self) -> None:
         """Open the viewer page-size settings menu (resurfaced via the palette)."""
@@ -16368,6 +16485,7 @@ class S19TuiApp(App):
             self.update_project_labels()
             self._refresh_loaded_panel()
             self._rehome_focus_after_load()
+            self._rehome_placeholder_focus_after_load()
             self.logger.info("A2L loaded: %s", copied)
             if self.current_project:
                 self._sync_loaded_a2l_to_project()
@@ -18758,6 +18876,12 @@ class S19TuiApp(App):
         self._apply_empty_state()
         self._invalidate_mac_view_cache()
         self._mac_window_start = 0
+        # Inc 10a E4-R1 (R-TUI-007.9): a NEW image is shown from its first
+        # view row — the window a jump placed in the previous image is not
+        # carried over. A MAC / A2L attach keeps the live image and its
+        # window (the MAC re-anchor stays BL-I10-1).
+        if loaded.mem_map is not previous_map:
+            self._hex_window_start = 0
         self._validation_issues_window_start = 0
         self._a2l_tag_hex_highlight = None
         # A new file invalidates every per-view goto focus address (LLR-003.6 file-load).
@@ -18835,7 +18959,12 @@ class S19TuiApp(App):
 
         precomputed_oor = prepared.mac_out_of_range if prepared.precomputed else None
 
+        # Inc 10a E4-R5 (I-D17): each deferred step returns without acting —
+        # and ends the chain — once the tree it renders into is gone (a quit
+        # confirmed while the load was held: the app is exiting).
         def _step_sections() -> None:
+            if self._load_tree_gone():
+                return
             try:
                 if precomputed_oor is not None:
                     self.update_sections(precomputed_out_of_range=precomputed_oor)
@@ -18849,6 +18978,8 @@ class S19TuiApp(App):
                 self.call_later(_step_hex)
 
         def _step_hex() -> None:
+            if self._load_tree_gone():
+                return
             try:
                 self.update_hex_view()
                 self.update_alt_hex_view()
@@ -18861,6 +18992,8 @@ class S19TuiApp(App):
                 self.call_later(_step_a2l)
 
         def _step_a2l() -> None:
+            if self._load_tree_gone():
+                return
             try:
                 # ``update_a2l_view`` invokes ``update_mac_view`` internally in both
                 # A2L present/absent branches, which in turn installs the precomputed
@@ -18874,6 +19007,8 @@ class S19TuiApp(App):
                 self.call_later(_step_finalize)
 
         def _step_finalize() -> None:
+            if self._load_tree_gone():
+                return
             try:
                 self.update_project_labels()
                 self.update_memory_map()
@@ -18882,6 +19017,9 @@ class S19TuiApp(App):
                 # through ``watch_current_file``; land the focus on the
                 # displayed window's target.
                 self._rehome_focus_after_load()
+                # Inc 10a E4-R3 (HLR-166): a rail-item or fallback focus
+                # moves to the target once the loaded view shows it.
+                self._rehome_placeholder_focus_after_load()
             finally:
                 total_elapsed = time.perf_counter() - load_started
                 self.logger.info(
