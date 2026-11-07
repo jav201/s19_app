@@ -6,7 +6,7 @@ Base `9ae92c3` (product tree `e07fb00`). Line numbers are as of `e07fb00`. Rows:
 
 | File | Functions | Rows |
 |---|---|---|
-| `s19_app/tui/a2l_definition.py` (Inc 2's new module; the one source file of this increment) | 19 new functions, 3 new frozen dataclasses, `Definition` gains 6 fields with defaults; 4 of Inc 2's functions changed (§2) | R-A2L-DEF.64 … .132, .140 … .143; cited R-A2L-DEF.5 … .7, .26, .58, .137, R-A2L-010, 011, 019, 024 … 027 |
+| `s19_app/tui/a2l_definition.py` (Inc 2's new module; the one source file of this increment) | 19 new functions, 3 new frozen dataclasses, `Definition` gains 6 fields with defaults; 4 of Inc 2's functions changed (§2) | R-A2L-DEF.64 … .132, .140 … .146 (.116, .117 split into .1 and .2 at E3); cited R-A2L-DEF.5 … .7, .26, .58, .137, R-A2L-010, 011, 019, 024 … 027 |
 | `tools/synth/make_release_case.py` (test-data tooling, not counted toward the source cap: PLAN D6) | 1 new function; 2 of Inc 2's new functions changed (§4) | R-A2L-DEF.133 … .135; cited .59, .63 |
 | `s19_app/tui/a2l.py` and every other source file | **unchanged** (`a2l.py` frozen; private helpers reused, §3) | — |
 
@@ -94,16 +94,22 @@ Amendment A2 (`../PLAN.md`) splits the increment as it splits Inc 2. **3a**, the
 - E2's **`_conversion_fields`** reads Inc 2's `compu_methods_by_name` / `compu_tables_by_name` and returns the method record's `coeffs_linear`, `coeffs`, `compu_tab_ref` (E3A-03); **#14 `_element_definition`** is a `dataclasses.replace` of the object's definition (E3A-22).
 - **#20 `_decode_stored`** converts from the definition's method fields, never from `sections` (E3A-03).
 - The coverage pass before 3a's E3 (`E2-rulings.md`, orchestrator rulings on the rebase and split) changed one more: **#13 `_fixed_points`** gains `point_count` and gives, beside the points and `None` (.98), `"unreadable"` (.141) and the count it gives when that is not the point count (.99), so it never builds more than 1,048,576 points (.142). #11 `_read_axis` gains .141 … .143. No function is added; the counts below do not change.
+- The E3 round-1 correction (`E3-rulings.md`) changes four more and adds one:
+  - **#13 `_fixed_points`** now builds the stored points of a FIX_AXIS at decode only, from `AxisDefinition.fixed_rule` (the FIX parameters), called by #19 `_decode_axis` after #15 has found the record's bytes in the image (E3A-01 = E3S3-02). #11 `_read_axis` reads and checks those parameters (.98, .99, .141) and builds no point.
+  - **#18 `_current_count`** reads only a NO_AXIS_PTS count from the image, in a count datatype (E3A-22, E3S3-01). It tests the count positively: equal to the point count, else PARTIAL from 1 up, else CURRENT (E3A-13, E3S3-05).
+  - **#10 `_check_module_alignment`** reports an unreadable MOD_COMMON ALIGNMENT line (R-A2L-DEF.144, E3A-09).
+  - **#8 `_read_record_layout`** refuses a float NO_AXIS_PTS datatype (.86) and a component line with extra words (.84/7).
+  - **`_describe_one`**, Inc 2a's per-name function (`a2l_definition.py:324-572` at `82f5f8e5`), joins the changed 3a functions (E3A-04). It holds the kind branch to #5, the VALUE's R-A2L-DEF.145 check and the element count `None` of a kind `""` definition. `_conversion_fields` takes its `:406-430` and `:496-530`, with Inc 2a's tests as the guard and no 2a test edited for it.
 
 | Side | Functions (§2 number, or added at E2) | Count |
 |---|---|---|
-| 3a | #1 `describe_definitions` (changed), #2 `_object_kind` (changed), #3 `decode_definition` (changed), #5 `_describe_array`, #6 `_read_matrix_dim`, #7 `_array_shape`, #8 `_read_record_layout`, #9 `_place_components`, #10 `_check_module_alignment`, #11 `_read_axis`, #12 `_find_axis_object`, #13 `_fixed_points`, #14 `_element_definition`, #15 `decode_values`, #16 `_element_offset`, #17 `_point_offset`, #18 `_current_count`, #19 `_decode_axis`, #20 `_decode_stored`, #23 `element_name`, `_conversion_fields` (E2), `_module_common` (E2) | 22 |
+| 3a | #1 `describe_definitions` (changed), #2 `_object_kind` (changed), #3 `decode_definition` (changed), #5 `_describe_array`, #6 `_read_matrix_dim`, #7 `_array_shape`, #8 `_read_record_layout`, #9 `_place_components`, #10 `_check_module_alignment`, #11 `_read_axis`, #12 `_find_axis_object`, #13 `_fixed_points`, #14 `_element_definition`, #15 `decode_values`, #16 `_element_offset`, #17 `_point_offset`, #18 `_current_count`, #19 `_decode_axis`, #20 `_decode_stored`, #23 `element_name`, `_conversion_fields` (E2), `_module_common` (E2), `_describe_one` (changed; Inc 2a's, E3A-04) | 23 |
 | 3a, synth (§4) | S1 `build_definition_objects`, S2 `emit_definitions_a2l` (changed), S5 `_definition_array_objects` | 3 |
 | 3b | #4 `encode_definition` (changed; Inc 2b's function), #21 `encode_values`, #22 `_breaking_point` | 3 |
 | 3b, added inside a 3a function | `describe_definitions`: the AXIS_PTS entries of R-A2L-DEF.138's span index (Inc 2 E3 census ruling; R-A2L-DEF.140, counted, `01-requirements.md` S2.7h) | — |
 
 What each side reuses from §3:
-- **3a** imports, beyond Inc 2a's list, `_walk_record_layout_components`, `_strip_a2l_comments`, `_split_line_respecting_quotes` (back in D-9's list, graph baseline), `_byte_order_from_section_lines`, `_DATATYPE_ALIGNMENT_DIRECTIVE`, `_ALIGNMENT_DIRECTIVES`, `MAX_A2L_DECODE_BYTES`.
+- **3a** imports, beyond Inc 2a's list, `_walk_record_layout_components`, `_strip_a2l_comments`, `_split_line_respecting_quotes` (back in D-9's list, graph baseline), `_byte_order_from_section_lines`, `_DATATYPE_ALIGNMENT_DIRECTIVE`, `_ALIGNMENT_DIRECTIVES`, `MAX_A2L_DECODE_BYTES`. It reuses Inc 2a's own helpers (E3A-04): `_clean` (U+FFFD, R-A2L-DEF.137), `_finite_number` (the FIX words, .141), `_read_limits` (the axis limits), `_parse_bit_mask`, `_read_count` (the rule of CTX *whole number*), `_with_refusal` and `_fmt_address` (`<address>`).
 - **3b** reuses Inc 2b's encode functions per element; `_encode_curve_record_bytes` stays unused (it is the oracle of the negative controls of R-A2L-DEF.123/4 and .132).
 
 Source files and consumers:
