@@ -1,0 +1,15 @@
+=== Inc 10a E4 round-2 run: int-20e
+date: 2026-11-07T04:34:22Z
+checkout HEAD (base): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+main ref in this checkout: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+index tree with the increment staged: ba8da17556ca3b4f6f5d42dd0a6e9b9b9ed00ce8
+staged files vs base: 10
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10r6/s19_app/__init__.py
+CMD: env -u NO_COLOR /data/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -n 6 --dist load -m not serial_timing -rfs tests/test_b101_unload_focus.py::test_r_tui_020_1_mac_arm_key_3_then_pagedown_pages_the_mac_view tests/test_b101_unload_focus.py::test_r_shell_focus_2_3_rail_key_in_split_join_focuses_that_window tests/test_b101_unload_focus.py::test_r_shell_focus_2_5_every_rail_key_lands_on_its_target[mac] tests/test_b101_unload_focus.py::test_r_shell_focus_2_7_the_later_of_two_rail_keys_wins
+bringing up nodes...
+bringing up nodes...
+
+....                                                                     [100%]
+4 passed in 22.03s
+=== exit code: 0

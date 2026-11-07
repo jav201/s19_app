@@ -9953,8 +9953,14 @@ class S19TuiApp(App):
     #: paging keys. The A2L tag table handles PgDn / PgUp itself (LLR-042.1),
     #: so a landing there would stop PgDn paging the A2L Explorer right
     #: after ``2`` (R-TUI-020.1); the window's ``?`` chip leads its header
-    #: and binds Enter only. Load tails still land on ``_FOCUS_TARGETS``.
-    _SWITCH_LANDING_TARGETS: "dict[str, str]" = {"a2l": "window_help_a2l"}
+    #: and binds Enter only. The MAC record table does the same after ``3``
+    #: (E4-R6, I-D18); that window has no chip, so the switch lands on its
+    #: first focusable control, the Page Prev button (Enter only). Load
+    #: tails still land on ``_FOCUS_TARGETS``.
+    _SWITCH_LANDING_TARGETS: "dict[str, str]" = {
+        "a2l": "window_help_a2l",
+        "mac": "mac_page_prev_button",
+    }
 
     #: Every window container a focused widget can sit in: the registry's
     #: containers plus the Split / Join / Export window. Derived from
@@ -10807,7 +10813,8 @@ class S19TuiApp(App):
               reads ``_active_screen_key``) and lands via
               ``Screen.set_focus``; otherwise the focus stays. A window
               switch to a window of ``_SWITCH_LANDING_TARGETS`` lands on
-              that widget while it is shown (E4-R4: A2L, the ``?`` chip).
+              that widget while it is shown (E4-R4: A2L, the ``?`` chip;
+              E4-R6: MAC, the Page Prev button).
             - Records a landing that missed the declared target
               (``_note_focus_landing``, E4-R3).
 

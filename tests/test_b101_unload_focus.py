@@ -17,6 +17,8 @@ Requirements observed (the case id is in each node's docstring):
   carry no character of category Cc, Cf, Zl or Zp;
 - R-SHELL-FOCUS.2 / .3 / .4 / .5 - the focus after a rail key, an unload and an
   empty-state window;
+- R-TUI-020.1's MAC arm - PgDn right after ``3`` pages the MAC View (added at
+  E4, E4-R6: the MAC switch landing must not shadow the paging keys);
 - R-SEG-OPEN.6 and R-SEG-OPEN.7 - the hidden Split / Join window holds no focus
   and runs no key action or button.
 
@@ -71,11 +73,13 @@ ZWSP = "\u200b"  # zero-width space (Cf)
 #: requirement (not read from the product): key, window, target id. The A2L
 #: entry is the window's switch landing of E4-R4 (graph I-4): the ``?`` chip,
 #: because the tag table's own PgDn would shadow R-TUI-020.1's paging
-#: (changed at E4, E4-R4).
+#: (changed at E4, E4-R4). The MAC entry is the MAC window's switch landing of
+#: E4-R6 (graph I-4): the Page Prev button, for the same reason with the record
+#: table (changed at E4, E4-R6).
 RAIL_TARGETS = (
     ("1", "workspace", "files_list"),
     ("2", "a2l", "window_help_a2l"),
-    ("3", "mac", "mac_records_list"),
+    ("3", "mac", "mac_page_prev_button"),
     ("4", "map", "memory_map_panel"),
     ("5", "issues", "validation_issues_groups"),
     ("6", "patch", "patch_editor_panel"),
@@ -962,15 +966,19 @@ def test_r_shell_focus_2_2_esc_in_split_join_focuses_the_workspace_target(
 def test_r_shell_focus_2_3_rail_key_in_split_join_focuses_that_window(
     tmp_path: Path, case08: Path
 ) -> None:
-    """R-SHELL-FOCUS.2 case /3: ``3`` in Split / Join shows the MAC View with
-    ``mac_records_list`` focused (base: nothing focused)."""
+    """R-SHELL-FOCUS.2 case /3 (changed at E4, E4-R6): ``3`` in Split / Join
+    shows the MAC View with the MAC window's switch landing
+    ``mac_page_prev_button`` focused (graph I-4; the record table's own PgDn
+    would shadow R-TUI-020.1's paging; base: nothing focused; the Inc 10a tree
+    before E4-R6: ``mac_records_list``)."""
 
     async def scenario(app, pilot, log):
         await case_session(pilot, app, case08)
         await open_split_join(pilot, app)
         await pilot.press("3")
         await wait_screen(pilot, app, "mac")
-        await wait_focus(pilot, app, "mac_records_list")
+        await wait_focus(pilot, app, "mac_page_prev_button")
+        assert inside(focus_of(app), "screen_mac"), focus_report(app)
 
     run(tmp_path, scenario)
 
@@ -1025,7 +1033,8 @@ def test_r_shell_focus_2_5_every_rail_key_lands_on_its_target(
     """R-SHELL-FOCUS.2 case /5: with the image, A2L and MAC loaded, each rail key
     lands the focus on its window's CTX-SHELL target, or (target not shown) on
     the first shown focusable non-text widget of the window, else its rail item
-    (base: the focus stays in the window just left)."""
+    (base: the focus stays in the window just left); ``2`` and ``3`` land on
+    their windows' switch landings (changed at E4, E4-R4 / E4-R6)."""
 
     async def scenario(app, pilot, log):
         await case_session(pilot, app, case08, mac=True, a2l=True)
@@ -1090,18 +1099,70 @@ def test_r_shell_focus_2_6_synchronous_clear_decides_and_enter_runs_nothing(
 
 
 def test_r_shell_focus_2_7_the_later_of_two_rail_keys_wins(tmp_path: Path, case08: Path) -> None:
-    """R-SHELL-FOCUS.2 case /7: two rail actions (``2``, then ``3``) with no await
-    between them land the focus on ``mac_records_list`` once laid out; the
-    stale ``2`` landing does not move it (base: nothing lands)."""
+    """R-SHELL-FOCUS.2 case /7 (changed at E4, E4-R6): two rail actions
+    (``2``, then ``3``) with no await between them land the focus on the MAC
+    window's switch landing ``mac_page_prev_button`` once laid out; the stale
+    ``2`` landing does not move it to ``window_help_a2l`` (base: nothing lands;
+    the Inc 10a tree before E4-R6: ``mac_records_list``)."""
 
     async def scenario(app, pilot, log):
         await case_session(pilot, app, case08, mac=True, a2l=True)
         app.action_show_screen("a2l")
         app.action_show_screen("mac")
         await wait_screen(pilot, app, "mac")
-        await wait_focus(pilot, app, "mac_records_list")
+        await wait_focus(pilot, app, "mac_page_prev_button")
         await settle(pilot, 8)
-        assert focus_of(app) is not None and focus_of(app).id == "mac_records_list", focus_report(app)
+        assert focus_of(app) is not None and focus_of(app).id == "mac_page_prev_button", focus_report(app)
+
+    run(tmp_path, scenario)
+
+
+def mac_summary(app) -> str:
+    """The painted MAC records summary (its first line holds the page)."""
+    return plain_of(app.query_one("#mac_records_summary", Label))
+
+
+def test_r_tui_020_1_mac_arm_key_3_then_pagedown_pages_the_mac_view(
+    tmp_path: Path, case08: Path
+) -> None:
+    """R-TUI-020.1's MAC arm (added at E4, E4-R6; graph I-4): with case 08's
+    image and its 200-record MAC loaded (page size 100), ``3`` then PgDn shows
+    the next page of the MAC records table: the summary goes from
+    ``Page 1/2 | rows 1-100 / 200`` to ``Page 2/2 | rows 101-200 / 200``. PgDn
+    is pressed only once the switch has landed inside the MAC window, so the
+    landing widget is what receives it (the Inc 10a tree before E4-R6: the
+    landing on ``mac_records_list``, whose own PgDn scrolls the table, keeps
+    page 1, I-D18; base pages, with the focus left in the hidden Workspace)."""
+
+    async def scenario(app, pilot, log):
+        await case_session(pilot, app, case08, mac=True)
+        await pilot.press("3")
+        await wait_screen(pilot, app, "mac")
+        await wait_until(
+            pilot,
+            lambda: focus_of(app) is not None
+            and focus_of(app).region.area > 0
+            and inside(focus_of(app), "screen_mac"),
+            lambda: f"setup: the switch never landed inside the MAC window: {focus_report(app)}",
+            timeout=FOCUS_WAIT_S,
+        )
+        await wait_until(
+            pilot,
+            lambda: mac_summary(app).startswith("Page 1/2 | rows 1-100 / 200"),
+            lambda: f"setup: the MAC View is not on its first page: {mac_summary(app)!r}",
+            timeout=FOCUS_WAIT_S,
+        )
+        landed = focus_report(app)
+        await pilot.press("pagedown")
+        await wait_until(
+            pilot,
+            lambda: mac_summary(app).startswith("Page 2/2 | rows 101-200 / 200"),
+            lambda: (
+                f"PgDn after 3 did not page the MAC View: {(mac_summary(app).splitlines() or [''])[0]!r}; "
+                f"the focus at the press was {landed}"
+            ),
+            timeout=FOCUS_WAIT_S,
+        )
 
     run(tmp_path, scenario)
 

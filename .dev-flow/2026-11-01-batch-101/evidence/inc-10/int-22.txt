@@ -1,0 +1,18 @@
+=== Inc 10a E4 round-2 run: int-22
+date: 2026-11-07T05:00:57Z
+checkout HEAD (base): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+main ref in this checkout: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+index tree with the increment staged: ba8da17556ca3b4f6f5d42dd0a6e9b9b9ed00ce8
+staged files vs base: 10
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10r6/s19_app/__init__.py
+CMD: env -u NO_COLOR /data/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -n 6 --dist loadfile -m not serial_timing -rfs tests/test_address_census.py tests/test_suite_hygiene.py tests/test_id_registry.py tests/test_engine_unchanged.py tests/test_docs_canon.py tests/test_b101_doc_hygiene.py tests/test_b101_help_legend_docs.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 33%]
+........................................................................ [ 66%]
+........................................................................ [ 99%]
+..                                                                       [100%]
+218 passed in 211.34s (0:03:31)
+=== exit code: 0
