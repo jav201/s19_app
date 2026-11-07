@@ -18,3 +18,16 @@ Round 1: `E3-architect.md` **FAIL** (3 MAJOR, 5 MEDIUM, 3 MINOR, 1 LOW, 2 INFO);
 | all other findings (E3A-04, -06 … -12; E3S-06, -07) | accept with their fix columns. INFO noted. |
 
 **Next:** one correction pass (rows and cases; graph), then a round-2 re-check of the blocking findings by both reviewers.
+
+## Round 2 rulings (2026-11-06T19:46:20-06:00, orchestrator Opus 5.5)
+
+Round 2: architect **FAIL** (round-1 MAJORs closed; new MAJOR E3A-15, E3A-16 introduced by the correction pass); security **FAIL** (E3S-02/-03/-04 closed; E3S-01 open through new MAJORs E3S-13 … E3S-16; E3S-05 open as E3S-19). All accepted with their fix columns:
+
+- **E3A-15 = E3S-13 (strip before the first-line split):** order of the paste step is fixed: a single-line box first takes the first line, then strips; a multi-line box keeps TAB, LF and CR and strips the rest of the set. R-PASTE.1, R-TUI-043.4, R-TUI-044.3, R-PASTE.29, .30 hold as written.
+- **E3A-16 = E3S-14 (`restrict` boxes):** a box with its own `restrict` filter is not stripped; its restrict check runs on the raw pasted text and keeps refusing (R-LOADDLG.20 holds). A case pastes `a\x00.s19` into `#load_path` → refused.
+- **E3S-15:** the strip set is the CTX term's (C0 and C1 controls, ESC, lone surrogates, bidi controls); the graph uses the same set. A lone surrogate is removed (it would kill Textual's Windows writer thread).
+- **E3S-16:** case oracles assert the widget's value (no ESC, no surrogate in the value), never the painted line (the renderer adds its own style codes).
+- **E3S-19 (E3S-05):** a row and a case in this increment: the redaction gate (`tests/test_suite_hygiene.py`) scans the batch-103 folder.
+- All other round-2 findings: accept with their fix columns.
+
+**Model change (skill: "when a model's work costs an extra pass, move that task up a class"):** the round-1 DeepSeek pass introduced E3A-15/16. This round's correction is done by **Opus**, one agent, targeted edits. Then round 3 by both reviewers, blocking findings only.

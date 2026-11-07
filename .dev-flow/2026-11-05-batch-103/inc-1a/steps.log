@@ -11,3 +11,7 @@
 2026-11-07T01:13:03Z E3 inc-1a architect end claude-opus-5-5 — E3-architect.md: FAIL, 3 MAJOR (E3A-01 I-1 vs Inc 1b seam/file budget, E3A-02 no-text clipboard pays PowerShell vs R-TUI-043.10.1/R-PASTE.31, E3A-03 timing negative controls), 5 MEDIUM, 3 MINOR, 1 LOW, 2 INFO; E2-1 confirmed with a pin, E2-2 = design fix + cases, E2-5 = keep (never tags-ignore alone)
 2026-11-07T01:25:51Z E3 correction unit G (graph) — deepseek-v4-pro via pi — 19 findings applied
 2026-11-07T01:26:57Z E3 correction unit R (rows, cases) — deepseek-v4-pro via pi — 13 findings applied
+2026-11-07T01:28:34Z E3 round 2 security inc-1a start claude-opus-5-5
+2026-11-07T01:35:51Z E3 round 2 inc-1a architect start claude-opus-5-5
+2026-11-07T01:40:04Z E3 round 2 inc-1a architect end claude-opus-5-5 — E3-architect.md Round 2: FAIL; round-1 MAJORs E3A-01/02/03 closed (all 14 closed or closed with notes); new 2 MAJOR (E3A-15 strip before the first-line split, multi-line table holds TAB/LF/CR; E3A-16 strip before restrict breaks R-LOADDLG.20), 3 MEDIUM, 3 MINOR, 2 LOW
+2026-11-07T01:45:39Z E3 round 2 security inc-1a end claude-opus-5-5 — E3-security.md Round 2: FAIL; E3S-01 open via new MAJOR E3S-13 (strip before first-line split; = E3A-15), E3S-14 (restrict / R-LOADDLG.20; = E3A-16), E3S-15 (graph set != CTX/cases; lone surrogate kills the Windows writer thread), E3S-16 (case oracles); E3S-02/-03/-04 closed; E3S-05 open (E3S-19: ruled test in no record); +3 MEDIUM, 2 MINOR, 2 LOW; evidence-e3/sec-r2-1a-probe{,2}.py + transcripts (cachyos-rtx, no clipboard)
