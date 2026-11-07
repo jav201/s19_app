@@ -182,3 +182,14 @@ Rulings:
   - After this correction, which is records-only and applies a fix the reviewer already executed on the model, **Inc 3a's E3 closes: PASS-WITH-NOTES by orchestrator ruling.**
   - The census and range equality are taken from Inc 2a's E5 security review: 0 differences over the full corpus and 8,000 hostile tables (`../inc-2/E5-security.md` in the 2a worktree).
   - Inc 3a's E4 waits for Inc 2a to merge into `batch-103`.
+- **Round-8 correction done** (Opus).
+  - The reads keys are namespaced.
+  - .136/arr-4 gains K1–K3.
+  - The measure is restated. The agent read the decode side as follows, and the ruling accepts it, because decode stores nothing per walk (Inc 2a E5-3): `.150/arr-*` build the walk with the generator, then time the decodes of `names[1:]` as one interval; /arr-10 has one name and times its decode alone.
+- **Inc 3a E3 CLOSED: PASS-WITH-NOTES by orchestrator ruling.**
+  - The class is closed for every node, stated by the reviewer in round 8.
+  - E3S3-38's fix was executed on the model and is now in the records.
+  - The census and range equality are taken from Inc 2a's E5 security review.
+  - Round 9 is not run.
+  - E4 waits for Inc 2a's merge into `batch-103`.
+  - Carried to E5: E3S3-03, -04, -06 and -21 (backlog: the frozen file), plus the 3b notes (E3S3-37).

@@ -1,0 +1,8 @@
+s19_app.__file__ = ~/work/b103-int2a/s19_app/__init__.py | python 3.11.18 | a2l_definition md5 f7fa38a5 | a2l md5 d6879216
+[B] files 203, errors 0 []; COMPU_TAB / COMPU_VTAB tables with entries 1668 in 70 files; named by a TAB_INTP / TAB_NOINTP method 81 (a COMPU_VTAB among them 0); tables with a duplicate x 0, a non-numeric y 1585, a NaN x 0, an infinite x 0
+[B] the case's values (each x, quarter points, first x - 1, last x + 1): pairs 39164 (both TAB_INTP and TAB_NOINTP on every table); differences from the frozen _table_lookup: v1 0, v2 0
+[B] extended finite (midpoints, x +/- 1 ulp, +/-0, +/-1e300, 2^53+1, +/-2^63, 2^64-1): pairs 70512 (both TAB_INTP and TAB_NOINTP on every table); differences from the frozen _table_lookup: v1 4818, v2 0
+[B] non-finite (NaN, +inf, -inf): pairs 10008 (both TAB_INTP and TAB_NOINTP on every table); differences from the frozen _table_lookup: v1 3283, v2 0
+[B] first differences [('v1', 'ext', False, '9.223372036854776e+18', "(98.0, '')", "(111.0, '')"), ('v1', 'ext', False, '1.8446744073709552e+19', "(98.0, '')", "(111.0, '')"), ('v1', 'ext', False, '1e+300', "(98.0, '')", "(111.0, '')"), ('v1', 'nonfinite', True, 'nan', "(None, 'value outside interpolation rang", "(nan, '')"), ('v1', 'ext', False, '9.223372036854776e+18', "(98.0, '')", "(111.0, '')"), ('v1', 'ext', False, '1.8446744073709552e+19', "(98.0, '')", "(111.0, '')"), ('v1', 'ext', False, '1e+300', "(98.0, '')", "(111.0, '')"), ('v1', 'nonfinite', True, 'nan', "(None, 'value outside interpolation rang", "(nan, '')")]
+[B] enum index (2a, as ruled: dict / segment bisect) vs Inc 2a's _enum_entry_text: pairs 20823, differences 0; COMPU_VTAB_RANGE tables with overlapping ranges 30
+exit=0

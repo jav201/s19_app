@@ -1,0 +1,24 @@
+s19_app.__file__ = ~/work/b103-int2a/s19_app/__init__.py | python 3.11.18 | a2l_definition md5 f7fa38a5 | a2l md5 d6879216
+[I] RL-7: forms {'layout-refusal': 1}; mutable or mutated: none; forms unchanged by two decodes: True; a2l_data unchanged: True; long element texts (distinct objects, elements): None
+[I] RL-8: forms {'layout-refusal': 1}; mutable or mutated: none; forms unchanged by two decodes: True; a2l_data unchanged: True; long element texts (distinct objects, elements): None
+[I] RL-9: forms {'layout-refusal': 1}; mutable or mutated: none; forms unchanged by two decodes: True; a2l_data unchanged: True; long element texts (distinct objects, elements): None
+[I] RL-15: forms {'layout': 1, 'layout-refusal': 1, 'method': 1}; mutable or mutated: none; forms unchanged by two decodes: True; a2l_data unchanged: True; long element texts (distinct objects, elements): None
+[I] RL-16: forms {'layout': 1, 'layout-refusal': 1, 'method': 1}; mutable or mutated: ['stored refusal 65594 chars']; forms unchanged by two decodes: True; a2l_data unchanged: True; long element texts (distinct objects, elements): None
+[I] MC-7: forms {'layout': 1, 'mod_common': 1}; mutable or mutated: none; forms unchanged by two decodes: True; a2l_data unchanged: True; long element texts (distinct objects, elements): None
+[I] MC-8: forms {'layout': 2, 'mod_common': 1, 'method': 1}; mutable or mutated: none; forms unchanged by two decodes: True; a2l_data unchanged: True; long element texts (distinct objects, elements): None
+[I] CM-4: forms {'layout': 1, 'method': 1, 'mod_common': 1}; mutable or mutated: none; forms unchanged by two decodes: True; a2l_data unchanged: True; long element texts (distinct objects, elements): None
+[I] CM-6: forms {'layout': 1, 'method': 1, 'mod_common': 1}; mutable or mutated: none; forms unchanged by two decodes: True; a2l_data unchanged: True; long element texts (distinct objects, elements): None
+[I] CM-8: forms {'layout': 1, 'method': 1, 'mod_common': 1}; mutable or mutated: none; forms unchanged by two decodes: True; a2l_data unchanged: True; long element texts (distinct objects, elements): None
+[I] VT-1: forms {'layout': 1, 'method': 1, 'enum-table': 1, 'mod_common': 1, 'enum-form': 1}; mutable or mutated: none; forms unchanged by two decodes: True; a2l_data unchanged: True; long element texts (distinct objects, elements): None
+[I] VT-5: forms {'layout': 1, 'mod_common': 1, 'method': 1, 'enum-table': 1, 'enum-form': 1}; mutable or mutated: none; forms unchanged by two decodes: True; a2l_data unchanged: True; long element texts (distinct objects, elements): (1, 800)
+[I] VT-6: forms {'layout': 1, 'mod_common': 1, 'method': 1, 'enum-table': 1, 'enum-form': 1}; mutable or mutated: none; forms unchanged by two decodes: True; a2l_data unchanged: True; long element texts (distinct objects, elements): (1, 800)
+[I] VT-8: forms {'layout': 1, 'method': 1, 'enum-table': 1, 'mod_common': 1}; mutable or mutated: none; forms unchanged by two decodes: True; a2l_data unchanged: True; long element texts (distinct objects, elements): None
+[I] VR-1: forms {'layout': 1, 'method': 1, 'enum-table': 1, 'mod_common': 1, 'enum-form': 1}; mutable or mutated: none; forms unchanged by two decodes: True; a2l_data unchanged: True; long element texts (distinct objects, elements): None
+[I] VR-2: forms {'layout': 1, 'mod_common': 1, 'method': 1, 'enum-table': 1, 'enum-form': 1}; mutable or mutated: none; forms unchanged by two decodes: True; a2l_data unchanged: True; long element texts (distinct objects, elements): (1, 800)
+[I] CT-1: forms {'layout': 1, 'mod_common': 1, 'method': 1}; mutable or mutated: none; forms unchanged by two decodes: True; a2l_data unchanged: True; long element texts (distinct objects, elements): None
+[I] CT-2: forms {'layout': 1, 'mod_common': 1, 'method': 1}; mutable or mutated: none; forms unchanged by two decodes: True; a2l_data unchanged: True; long element texts (distinct objects, elements): None
+[I] CM-5: forms {'method': 1}; mutable or mutated: none; forms unchanged by two decodes: True; a2l_data unchanged: True; long element texts (distinct objects, elements): None
+[I] CM-7: forms {'method': 1}; mutable or mutated: none; forms unchanged by two decodes: True; a2l_data unchanged: True; long element texts (distinct objects, elements): None
+[I] CM-9: forms {'method': 1}; mutable or mutated: none; forms unchanged by two decodes: True; a2l_data unchanged: True; long element texts (distinct objects, elements): None
+[I] VT-3: forms {'method': 1, 'enum-table': 1, 'enum-form': 1}; mutable or mutated: none; forms unchanged by two decodes: True; a2l_data unchanged: True; long element texts (distinct objects, elements): None
+[I] total forms by kind {'layout-refusal': 5, 'layout': 16, 'method': 18, 'mod_common': 13, 'enum-table': 7, 'enum-form': 6}
