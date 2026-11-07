@@ -1,0 +1,11 @@
+s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+python = 3.11.18  PYTHONHASHSEED = None
+host = cachyos-rtx  load = (2.2451171875, 2.802734375, 3.8671875)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e3r2-4-security/home  LOCALAPPDATA = /tmp/b103-e3r2-4-security/home/localappdata  PILOT_DIR = /tmp/b103-e3r2-4-security/pilot
+  25 names of a 1000-char token; query 256 chars: no band   1468.5 ms | band   31.9 ms | same list True | listed 20 fuzzy e1
+  25 names of a 1000-char token; query 256 chars: no band   1454.3 ms | band   31.3 ms | same list True | listed 20 fuzzy e2
+  25 names of a 1000-char token; query 129 chars: no band    742.9 ms | band   21.8 ms | same list True | listed 20 fuzzy e1
+  100 names of a 1020-char token; query 256 chars: no band   1483.2 ms | band   31.9 ms | same list True | listed 20 fuzzy e1
+  100 names of a 1020-char token; query 256 chars: no band   1446.6 ms | band   32.2 ms | same list True | listed 20 fuzzy e2
+  100 names of a 1020-char token; query 129 chars: no band    759.9 ms | band   22.3 ms | same list True | listed 20 fuzzy e1
+load after = (2.1240234375, 2.7001953125, 3.78662109375)

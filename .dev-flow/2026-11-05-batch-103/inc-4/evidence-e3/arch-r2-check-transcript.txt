@@ -1,0 +1,172 @@
+mode = check
+s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+python = 3.11.18  host = cachyos-rtx  cpus = 16
+HOME = /tmp/b103-e3r2-4-architect/home  LOCALAPPDATA = /tmp/b103-e3r2-4-architect/home/localappdata  PILOT_DIR = /tmp/b103-e3r2-4-architect/pilot  OUT = /tmp/b103-e3r2-4-architect/out
+  sha256 i4e2-pilot4.py = b58035398d50b71170b5c88ff5c97c36be2583e01438b8a5ed45de190b8077a5
+  sha256 i4e1-pilot3.py = b99beab32b0e6896db513e000bd3aebd26d212493ee32b46228ceb889e94f1b4
+  sha256 i4e1-pilot2.py = 633c1bfa9f95a60e6e415e6f8cd5414cd7edb325e02347043f0b4f9406e066cf
+  sha256 i4e1-pilot.py = 09ab1d2a5621194e70bce7488dc350bd03573871d944e90452b099f10f2da6b5
+load before = (3.35205078125, 3.51123046875, 4.46728515625)
+names: case08 462  issues 470  software_a 13990  REF 50000  case06[:50000] 50000 (lengths [13])
+pd_capped == min(osa_prefix, cap + 1): 20,000 random pairs x caps 0-2 + 5 fixed: OK
+
+=== 1. every example of 02-test-cases.md (pilot4 section 1 list + the round-1 corrections' new cases)
+[C08] query='  VALUE_0001  ' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08] query='\tVALUE_0001\n' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08] query=' value_000 ' limit=5  R2 == oracle(ruled): True  == v3: True
+[C08] query='' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08] query='   ' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08] query='\t\n' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08] query='_' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08] query='._[]' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08] query='value_0001' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08] query='Value_0001' limit=20  R2 == oracle(ruled): True  == v3: True
+[TW] query='rpm' limit=20  R2 == oracle(ruled): True  == v3: True
+[NA] query='drück' limit=20  R2 == oracle(ruled): True  == v3: False  == 02-test-cases literal: True
+      'Drück_Max'                                  prefix      key=0 spans=[(0, 5)]
+      'DRÜCK_MAX'                                  fuzzy       key=1 spans=[(0, 5)]
+      'druck_max'                                  fuzzy       key=1 spans=[(0, 5)]
+      v3 gives:       [('Drück_Max', 'prefix'), ('druck_max', 'fuzzy'), ('DRÜCK_MAX', 'fuzzy')]
+[NA] query='DRÜCK' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08] query='VALUE-0001' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08] query='VALUE_0001' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08] query='map_0020' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08] query='value_000' limit=5  R2 == oracle(ruled): True  == v3: True
+[C08i] query='span' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08i] query='LIMIT' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08] query='0001' limit=20  R2 == oracle(ruled): True  == v3: True
+[SRC] query='knife[1]' limit=20  R2 == oracle(ruled): True  == v3: True
+[SRC] query='[0].Spoon' limit=20  R2 == oracle(ruled): True  == v3: True
+[BAL] query='ledRing[1]' limit=4  R2 == oracle(ruled): True  == v3: True
+[C08] query='blk val 00' limit=3  R2 == oracle(ruled): True  == v3: True
+[BAL] query='stop watch' limit=20  R2 == oracle(ruled): True  == v3: True
+[SWB] query='oks ahw' limit=20  R2 == oracle(ruled): True  == v3: True
+[SRC] query='knife 1 x' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08i] query='out range' limit=20  R2 == oracle(ruled): True  == v3: True
+[SRC] query='knife.*' limit=4  R2 == oracle(ruled): True  == v3: True
+[CUR] query='a value' limit=20  R2 == oracle(ruled): True  == v3: True
+[CUR] query='map 3 d' limit=20  R2 == oracle(ruled): True  == v3: True
+[CUR] query='abs value' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08] query='VALUE_0001_VALUE_0001' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08] query='mp' limit=3  R2 == oracle(ruled): True  == v3: True
+[C08] query='ascii 1' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08] query='map 2' limit=20  R2 == oracle(ruled): True  == v3: True
+[BAL] query='gamecontroller timer' limit=3  R2 == oracle(ruled): True  == v3: True
+[C08] query='map 20' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08] query='cuvre' limit=3  R2 == oracle(ruled): True  == v3: True
+[C08] query='maesurement_0001' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08] query='vlaue_0001' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08] query='mpa' limit=3  R2 == oracle(ruled): True  == v3: True
+[C08] query='xmap' limit=3  R2 == oracle(ruled): True  == v3: True
+[C08] query='maq' limit=3  R2 == oracle(ruled): True  == v3: True
+[C08] query='measurementss_0001' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08] query='vblk' limit=2  R2 == oracle(ruled): True  == v3: True
+[C08] query='VALUE_0300' limit=20  R2 == oracle(ruled): True  == v3: True
+[cur1] query='ab' limit=20  R2 == oracle(ruled): True  == v3: True
+[cur1b] query='ca' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08] query='cvure' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08] query='valuexx_0001' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08] query='valuexxx_0001' limit=20  R2 == oracle(ruled): True  == v3: True
+[cur2] query='curvee' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08] query='value_000' limit=100  R2 == oracle(ruled): True  == v3: True
+[C08] query='0001' limit=100  R2 == oracle(ruled): True  == v3: True
+[C08] query='temp_sensor_max' limit=20  R2 == oracle(ruled): True  == v3: True
+[blank] query='v' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08] query='value_000' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08] query='valu_0001' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08] query='vale_0001' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08i] query='VALUE_0001' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08i] query='value_000' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08] query='value_000' limit=1  R2 == oracle(ruled): True  == v3: True
+[C08] query='VALUE' limit=0  R2 == oracle(ruled): True  == v3: True
+[C08] query='VALUE' limit=-1  R2 == oracle(ruled): True  == v3: True
+[BAL] query='gamecontroller.timer' limit=20  R2 == oracle(ruled): True  == v3: True
+[cur3] query='counter' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08] query='_0001' limit=20  R2 == oracle(ruled): True  == v3: True
+[BAL] query='ounter' limit=4  R2 == oracle(ruled): True  == v3: True
+[cur4] query='rpm' limit=20  R2 == oracle(ruled): True  == v3: True
+[TW] query='RPM' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08r] query='0001' limit=20  R2 == oracle(ruled): True  == v3: True
+[TW2] query='rpm' limit=20  R2 == oracle(ruled): True  == v3: True
+[cur5] query='count' limit=20  R2 == oracle(ruled): True  == v3: True
+[SWB] query='sahw' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08] query='maesu' limit=3  R2 == oracle(ruled): True  == v3: True
+[cur6] query='cuvre maq' limit=20  R2 == oracle(ruled): True  == v3: True
+[C08] query='\x1cVALUE_0001' limit=20  R2 == oracle(ruled): True  == v3: True  == 02-test-cases literal: True
+      'VALUE_0001'                                 token       key=0 spans=[(0, 5), (6, 10)]
+[U0663] query='٣٣٤' limit=20  R2 == oracle(ruled): True  == v3: True  == 02-test-cases literal: True
+      '٣٣٣_X'                                      fuzzy       key=1 spans=[(0, 3)]
+[C08] query='crxuve' limit=20  R2 == oracle(ruled): True  == v3: True  == 02-test-cases literal: True
+[C08] query='VALUE_0001_VALUE_0001_VA...(256 chars)' limit=20  R2 == oracle(ruled): True  == v3: True  == 02-test-cases literal: True
+      'VALUE_0001'                                 token       key=0 spans=[(0, 5), (6, 10)]
+[C08] query='VALUE_0001_VALUE_0001_VA...(257 chars)' limit=20  R2 == oracle(ruled): True  == v3: False  == 02-test-cases literal: True
+      v3 gives:       [('VALUE_0001', 'token')]
+[X1024] query='x' limit=20  R2 == oracle(ruled): True  == v3: True  == 02-test-cases literal: True
+      'xxxxxxxxxxxx...(1024 chars)'                prefix      key=0 spans=[(0, 1)]
+[X1025] query='x' limit=20  R2 == oracle(ruled): True  == v3: False  == 02-test-cases literal: True
+      v3 gives:       [('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', 'prefix')]
+[CE-sub] query='count' limit=20  R2 == oracle(ruled): True  == v3: True  ce=graph DIFFERS
+      'DiscountCount'                              substring   key=0 spans=[(8, 13)]
+      'DiscouNTCount'                              substring   key=0 spans=[(8, 13)]
+      ce=graph gives: ['DiscouNTCount', 'DiscountCount']
+AT-B103-I4-1 (C08, limit 5) and AT-B103-I4-2 (SWA, limit 5)
+  [C08] 'm': R2 == oracle(ruled): True
+  [C08] 'ma': R2 == oracle(ruled): True
+  [C08] 'map': R2 == oracle(ruled): True
+  [C08] 'map_': R2 == oracle(ruled): True
+  [C08] 'map_00': R2 == oracle(ruled): True
+  [C08] 'map_002': R2 == oracle(ruled): True
+  [C08] 'map_0020': R2 == oracle(ruled): True
+  [SWA] 'JotafVod_msrqlLzL_kh2C_rWl_pfue._0_': R2 == oracle(ruled): True  target position 0
+  [SWA] 'jotafvod': R2 == oracle(ruled): True  target position 0
+  [SWA] 'msrqlLzL': R2 == oracle(ruled): True  target position 0
+  [SWA] 'pfue._0_': R2 == oracle(ruled): True  target position 0
+  [SWA] 'jotaf vod': R2 == oracle(ruled): True  target position 0
+  [SWA] 'vod jotaf': R2 == oracle(ruled): True  target position 0
+  [SWA] 'jotfa vod': R2 == oracle(ruled): True  target position 0
+  [SWA] 'jotaf_vdo': R2 == oracle(ruled): True  target position 0
+  section 1: R2 vs oracle(ruled) mismatches = 0; vs the literal expected values = 0; tier rule/key disagreements = 0; differences from v3 = 3: [('NA', 'drück'), ('C08', 'VALUE_0001_VALUE_0001_VALUE_00'), ('X1025', 'x')]
+
+=== 2. v3's pool and queries (pilot4 section 2, seed 20261106), 4 limits
+  differs from v3: query='siv i' limit=50: R2 [('SivI_Xeidtcgcvks', 'token'), ('IogGikorVgd.WxkPljSvip', 'fuzzy'), ('Pxvfi_RpqRwa_jgzhIva_mlmqDq_tfe4._6_', 'fuzzy'), ('XlavlxYpefc.IvqgLxube1BakrqByjaiJfsf', 'fuzzy'), ('TlrnuiwrCgypgecfnw.JnesndokbIvtmuVtpwwe', 'fuzzy'), ('JBM_CF_IVRNPM1_RMQ_OVRRT_YP_GVTAL.Huqgkoxddf', 'fuzzy')] | v3 [('SivI_Xeidtcgcvks', 'token'), ('IogGikorVgd.WxkPljSvip', 'fuzzy'), ('Pxvfi_RpqRwa_jgzhIva_mlmqDq_tfe4._6_', 'fuzzy'), ('XlavlxYpefc.IvqgLxube1BakrqByjaiJfsf', 'fuzzy'), ('TlrnuiwrCgypgecfnw.JnesndokbIvtmuVtpwwe', 'fuzzy'), ('KuQ_KjxsfPdllpRivq_qk._5_.OfLuuXmfbihenbe_i8', 'fuzzy')]
+  differs from v3: query='siv i' limit=100000: R2 [('SivI_Xeidtcgcvks', 'token'), ('IogGikorVgd.WxkPljSvip', 'fuzzy'), ('Pxvfi_RpqRwa_jgzhIva_mlmqDq_tfe4._6_', 'fuzzy'), ('XlavlxYpefc.IvqgLxube1BakrqByjaiJfsf', 'fuzzy'), ('TlrnuiwrCgypgecfnw.JnesndokbIvtmuVtpwwe', 'fuzzy'), ('JBM_CF_IVRNPM1_RMQ_OVRRT_YP_GVTAL.Huqgkoxddf', 'fuzzy')] | v3 [('SivI_Xeidtcgcvks', 'token'), ('IogGikorVgd.WxkPljSvip', 'fuzzy'), ('Pxvfi_RpqRwa_jgzhIva_mlmqDq_tfe4._6_', 'fuzzy'), ('XlavlxYpefc.IvqgLxube1BakrqByjaiJfsf', 'fuzzy'), ('TlrnuiwrCgypgecfnw.JnesndokbIvtmuVtpwwe', 'fuzzy'), ('KuQ_KjxsfPdllpRivq_qk._5_.OfLuuXmfbihenbe_i8', 'fuzzy')]
+  differs from v3: query='ln' limit=50: R2 [('Lnqjb_LwrGfi_itgxNym_dgZwt_lkr6._7_', 'prefix'), ('Lns_QazCbu19YrdTpnfBcvmOnkzekhVqzgo', 'prefix'), ('WSOKsacZrliw_ln_vyj_ut32', 'substring'), ('JHH_LN1_FDOOYM_QBGEV_N_HKABR.JocjeokmncWzto', 'substring'), ('JMQ_YH_RRQIMU_QTV2_CUEU_RJ_LNUQN.Xudzowqkcf', 'substring'), ('VDC_LJXPH_FOPDZN_KJUKEZU_O_KBBIJ.LnhOwmooGq', 'substring')] | v3 [('Lnqjb_LwrGfi_itgxNym_dgZwt_lkr6._7_', 'prefix'), ('Lns_QazCbu19YrdTpnfBcvmOnkzekhVqzgo', 'prefix'), ('WSOKsacZrliw_ln_vyj_ut32', 'substring'), ('JHH_LN1_FDOOYM_QBGEV_N_HKABR.JocjeokmncWzto', 'substring'), ('JMQ_YH_RRQIMU_QTV2_CUEU_RJ_LNUQN.Xudzowqkcf', 'substring'), ('VDC_LJXPH_FOPDZN_KJUKEZU_O_KBBIJ.LnhOwmooGq', 'substring')]
+  differs from v3: query='ln' limit=100000: R2 [('Lnqjb_LwrGfi_itgxNym_dgZwt_lkr6._7_', 'prefix'), ('Lns_QazCbu19YrdTpnfBcvmOnkzekhVqzgo', 'prefix'), ('WSOKsacZrliw_ln_vyj_ut32', 'substring'), ('JHH_LN1_FDOOYM_QBGEV_N_HKABR.JocjeokmncWzto', 'substring'), ('JMQ_YH_RRQIMU_QTV2_CUEU_RJ_LNUQN.Xudzowqkcf', 'substring'), ('VDC_LJXPH_FOPDZN_KJUKEZU_O_KBBIJ.LnhOwmooGq', 'substring')] | v3 [('Lnqjb_LwrGfi_itgxNym_dgZwt_lkr6._7_', 'prefix'), ('Lns_QazCbu19YrdTpnfBcvmOnkzekhVqzgo', 'prefix'), ('WSOKsacZrliw_ln_vyj_ut32', 'substring'), ('JHH_LN1_FDOOYM_QBGEV_N_HKABR.JocjeokmncWzto', 'substring'), ('JMQ_YH_RRQIMU_QTV2_CUEU_RJ_LNUQN.Xudzowqkcf', 'substring'), ('VDC_LJXPH_FOPDZN_KJUKEZU_O_KBBIJ.LnhOwmooGq', 'substring')]
+  differs from v3: query='led' limit=100000: R2 [('model.Signals.ledRing[0].red', 'substring'), ('model.Signals.ledRing[2].red', 'substring'), ('model.Signals.ledRing[4].red', 'substring'), ('model.Signals.ledRing[5].red', 'substring'), ('model.Signals.ledRing[7].red', 'substring'), ('model.Signals.ledRing[0].blue', 'substring')] | v3 [('model.Signals.ledRing[0].red', 'substring'), ('model.Signals.ledRing[2].red', 'substring'), ('model.Signals.ledRing[4].red', 'substring'), ('model.Signals.ledRing[5].red', 'substring'), ('model.Signals.ledRing[7].red', 'substring'), ('model.Signals.ledRing[0].blue', 'substring')]
+  differs from v3: query='XAS' limit=50: R2 [('YtU_NvdpmJvtwwWptjw_hw._9_.NurrsbOthsummrjj_ht._2_.Kdqxaso_m', 'substring'), ('Wzr_Mas_HykodmWmjnsNv._6_', 'fuzzy'), ('Ftv_WivdnXls.EuqXzvitZmpuc', 'fuzzy'), ('UasufCobpClC.IzfNfyzhaZdjktn', 'fuzzy'), ('Ehn_ePbdJlngg0.Xws_NhiEuxwv._1_', 'fuzzy'), ('EewehQvj_rblJh_tyyVusprw_oasq._2_', 'fuzzy')] | v3 [('YtU_NvdpmJvtwwWptjw_hw._9_.NurrsbOthsummrjj_ht._2_.Kdqxaso_m', 'substring'), ('Wzr_Mas_HykodmWmjnsNv._6_', 'fuzzy'), ('Ftv_WivdnXls.EuqXzvitZmpuc', 'fuzzy'), ('UasufCobpClC.IzfNfyzhaZdjktn', 'fuzzy'), ('Ehn_ePbdJlngg0.Xws_NhiEuxwv._1_', 'fuzzy'), ('EewehQvj_rblJh_tyyVusprw_oasq._2_', 'fuzzy')]
+  pool 944 names, 409 queries x 4 limits: R2 vs oracle(ruled) mismatches = 0; differences from v3 = 188; ce=graph differs from ce=ctx = 56; tier disagreements = 0
+
+=== 3. REF and REF6 (case_06's first 50,000): R2 vs BN (v3 index, ruled .24) and vs IndexB (v3)
+  differs from v3 [REF] query='e e e'
+  differs from v3 [REF] query='x y z w v u'
+  differs from v3 [REF] query='e e e e e e e e e e e e e e e e e e e e e e e e e e e e e e '
+  differs from v3 [REF] query='Lsxe'
+  differs from v3 [REF] query='bjgo'
+  differs from v3 [REF] query='eekAko'
+  differs from v3 [REF] query='LhSq'
+  differs from v3 [REF] query='zlme'
+  differs from v3 [REF] query='bbgd._'
+  differs from v3 [REF] query='axn4'
+  differs from v3 [REF] query='Gzhw'
+  differs from v3 [REF] query='p v'
+  differs from v3 [REF] query='X.Fn'
+  differs from v3 [REF] query='UK2T'
+  differs from v3 [REF] query='MRF_WS_GK'
+  differs from v3 [REF] query='jlg_1'
+  differs from v3 [REF] query='MqbU'
+  differs from v3 [REF] query='qgrkkq'
+  differs from v3 [REF] query='JZ_N1_'
+  differs from v3 [REF] query='QnuvZ'
+  differs from v3 [REF] query='mausj'
+  differs from v3 [REF] query='HRBX'
+  differs from v3 [REF] query='zcmea'
+  differs from v3 [REF] query='vNfyth'
+  differs from v3 [REF] query='cx_su'
+  differs from v3 [REF] query='Imqa'
+  differs from v3 [REF] query='yowgv'
+  differs from v3 [REF] query='PQIO'
+  REF: 50000 names, 345 queries, limit 20: R2 vs BN mismatches = 0; differences from v3 = 28; ce=graph differs = 1; brk=False and dedupe give the same lists (asserted); tier disagreements = 0
+  REF6: 50000 names, 319 queries, limit 20: R2 vs BN mismatches = 0; differences from v3 = 0; ce=graph differs = 0; brk=False and dedupe give the same lists (asserted); tier disagreements = 0
+
+load after = (2.29345703125, 2.90771484375, 4.03173828125)
+exit 0

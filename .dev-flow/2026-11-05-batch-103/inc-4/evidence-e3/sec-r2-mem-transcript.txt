@@ -1,0 +1,26 @@
+s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+python = 3.11.18  PYTHONHASHSEED = None
+host = cachyos-rtx  load = (2.5400390625, 4.83984375, 5.1787109375)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e3r2-4-security/home  LOCALAPPDATA = /tmp/b103-e3r2-4-security/home/localappdata  PILOT_DIR = /tmp/b103-e3r2-4-security/pilot
+
+=== REF: 58 shapes; tracemalloc peak of one ranking, top 8
+        29.90 MiB [ok] "'e ' x 120 + 'rat'"
+        29.90 MiB [ok] "'e ' x 120 + 'jmz'"
+         3.65 MiB [ok] 'pposbxiifkdgfiajnbbpvb_dyan_xvz1'
+         3.18 MiB [ok] "SWA names joined by ',' (draw 1)"
+         2.80 MiB [ok] "'cnt ' x 64"
+         2.66 MiB [ok] "'rat ' cut at 256 (typo, 2611 fuzzy names)"
+         2.52 MiB [ok] "'jmz ' cut at 256 (typo, 2260 fuzzy names)"
+         2.34 MiB [ok] "'a b c ... z ' cut at 256"
+
+=== REF6: 45 shapes; tracemalloc peak of one ranking, top 8
+        17.41 MiB [ok] "'0 ' x 125 + 'chax'"
+         8.96 MiB [ok] "'0 ' x 128"
+         8.56 MiB [ok] 'chr 0'
+         7.89 MiB [ok] "'c ' x 125 + 'chax'"
+         7.86 MiB [ok] "'chax ' cut at 256 (fuzzy, 1 edit each)"
+         7.86 MiB [ok] "'mesa ' cut at 256"
+         5.85 MiB [ok] 'ch00'
+         5.80 MiB [ok] "'1 ' x 128"
+
+load after = (3.35205078125, 3.51123046875, 4.46728515625)

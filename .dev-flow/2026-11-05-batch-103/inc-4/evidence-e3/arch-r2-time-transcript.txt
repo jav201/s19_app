@@ -1,0 +1,95 @@
+mode = time
+s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+python = 3.11.18  host = cachyos-rtx  cpus = 16
+HOME = /tmp/b103-e3r2-4-architect/home  LOCALAPPDATA = /tmp/b103-e3r2-4-architect/home/localappdata  PILOT_DIR = /tmp/b103-e3r2-4-architect/pilot  OUT = /tmp/b103-e3r2-4-architect/out
+  sha256 i4e2-pilot4.py = b58035398d50b71170b5c88ff5c97c36be2583e01438b8a5ed45de190b8077a5
+  sha256 i4e1-pilot3.py = b99beab32b0e6896db513e000bd3aebd26d212493ee32b46228ceb889e94f1b4
+  sha256 i4e1-pilot2.py = 633c1bfa9f95a60e6e415e6f8cd5414cd7edb325e02347043f0b4f9406e066cf
+  sha256 i4e1-pilot.py = 09ab1d2a5621194e70bce7488dc350bd03573871d944e90452b099f10f2da6b5
+load before = (2.29345703125, 2.90771484375, 4.03173828125)
+
+=== 4a. R-A2L-MATCH.37: tracemalloc peak during one build (nothing else alive)
+  REF: peak 19,385,133 bytes = 18.5 MiB (<= 64 MiB); held 17,497,189 bytes
+  REF6: peak 6,971,027 bytes = 6.6 MiB (<= 64 MiB); held 5,945,757 bytes
+
+=== 4b. R-A2L-MATCH.35: build median of 3; load (2.0927734375, 2.8037109375, 3.9599609375)
+  REF: builds [1.81, 1.788, 1.788] s  median 1.788 s
+  REF6: builds [0.493, 0.504, 0.512] s  median 0.504 s
+  _tokens derived from _at_boundary == the scan on 100,000 names (REF + REF6): OK
+  REF with _tokens from _at_boundary: builds [2.525, 2.547, 2.58] s  median 2.547 s
+  REF6 with _tokens from _at_boundary: builds [0.885, 0.876, 0.879] s  median 0.879 s
+
+=== 4c. R-A2L-MATCH.36: median of 7 per query, limit 20 (R2 = the corrected graph; nb = no early break)
+  -- REF; load (2.9189453125, 2.94677734375, 3.9833984375)
+     [QSET    ] 'a'                                                  R2     5.7 ms (max     5.9)  nb     5.8 ms  walks   0 pd     0  {'prefix': 20}
+     [QSET    ] 'e'                                                  R2     5.9 ms (max     6.0)  nb     5.8 ms  walks   0 pd     0  {'prefix': 20}
+     [QSET    ] '0'                                                  R2    12.3 ms (max    12.7)  nb    12.0 ms  walks   0 pd     0  {'substring': 20}
+     [QSET    ] 'zz'                                                 R2     3.5 ms (max     3.6)  nb     3.5 ms  walks   0 pd     0  {'prefix': 20}
+     [QSET    ] 'ab'                                                 R2     3.9 ms (max     3.9)  nb     3.7 ms  walks   0 pd     0  {'prefix': 20}
+     [QSET    ] 'JotafVod_msrqlLzL_kh2C_rWl_pfue._0_'                R2     9.7 ms (max     9.8)  nb     9.7 ms  walks   3 pd     0  {'exact': 1, 'prefix': 3}
+     [QSET    ] 'JotafVod_msr'                                       R2    13.6 ms (max    14.1)  nb    13.5 ms  walks   1 pd    10  {'prefix': 4}
+     [QSET    ] 'srqlLzL_'                                           R2    21.7 ms (max    22.8)  nb    21.2 ms  walks   3 pd     0  {'substring': 4, 'subsequence': 16}
+     [QSET    ] '0 jotaf'                                            R2    15.4 ms (max    15.6)  nb    15.0 ms  walks   2 pd     0  {'token': 4, 'subsequence': 16}
+     [QSET    ] 'JVmL'                                               R2     4.6 ms (max     5.0)  nb     4.5 ms  walks   0 pd     0  {'substring': 7, 'token': 13}
+     [QSET    ] 'xqzjvkw'                                            R2    57.0 ms (max    57.6)  nb    56.9 ms  walks   1 pd     0  {'subsequence': 20}
+     [QSET    ] 'qqqq zzzz'                                          R2    25.6 ms (max    26.1)  nb    24.3 ms  walks   1 pd    88  {'subsequence': 13}
+     [QSET    ] 'aaaa'                                               R2     7.7 ms (max     8.2)  nb     7.2 ms  walks   1 pd     0  {'fuzzy': 20}
+     [QSET    ] 'e e e'                                              R2    11.7 ms (max    12.1)  nb    11.3 ms  walks   0 pd     0  {'token': 20}
+     [QSET    ] 'Nzukij'                                             R2    58.6 ms (max    58.9)  nb    57.9 ms  walks   1 pd     0  {'substring': 4, 'fuzzy': 15, 'subsequence': 1}
+     [QSET    ] 'Ierxjr_Eud'                                         R2    60.2 ms (max    60.9)  nb    59.5 ms  walks   2 pd     0  {'substring': 4}
+     [QSET    ] 'ledRing'                                            R2    21.6 ms (max    22.0)  nb    22.0 ms  walks   2 pd     0  {'fuzzy': 15, 'subsequence': 5}
+     [QSET    ] 'pposbxiif'                                          R2    52.1 ms (max    52.5)  nb    52.8 ms  walks   1 pd     0  {'substring': 4}
+     [QSET    ] 'cnt'                                                R2     4.4 ms (max     4.4)  nb     4.2 ms  walks   0 pd     0  {'prefix': 4, 'substring': 16}
+     [QSET    ] 'temp_sensor_max'                                    R2    15.5 ms (max    15.8)  nb    16.2 ms  walks   1 pd   311  {}
+     [QSET    ] 'x y z w v u'                                        R2    25.7 ms (max    27.7)  nb    25.7 ms  walks   4 pd  1158  {'token': 10, 'subsequence': 10}
+     [QSET    ] 'pposbxiifkdgfiajnbbpvb_dyan_xvz1'                   R2    16.9 ms (max    17.3)  nb    17.7 ms  walks   2 pd   233  {'subsequence': 4}
+     [QSET    ] 'njraipjtbtu lsuakcoj hsxgibymj...(57)'              R2    57.9 ms (max    58.5)  nb    57.7 ms  walks   1 pd    65  {'fuzzy': 4}
+     [QSET    ] 'votklbi fjblnabj qghque pdjxmq...(51)'              R2    55.5 ms (max    56.0)  nb    54.7 ms  walks   1 pd    65  {'fuzzy': 4}
+     [QSET    ] 'lmmwngodou jadkvqy khbnukc qom...(45)'              R2    53.6 ms (max    54.6)  nb    53.4 ms  walks   1 pd    44  {'fuzzy': 3}
+     [QSET    ] 'e e e e e e e e e e e e e e e ...(256)'             R2   110.0 ms (max   128.7)  nb   112.5 ms  walks   0 pd     0  {'token': 20}
+     [QSET    ] 'a b c d e f g h i j k l m n o ...(256)'             R2    28.5 ms (max    31.8)  nb    91.2 ms  walks   4 pd  1058  {}
+     [QSET    ] '0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ...(256)'             R2    45.5 ms (max    45.7)  nb    46.4 ms  walks   0 pd     0  {'token': 20}
+     [QSET    ] 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...(256)'             R2    68.5 ms (max    69.8)  nb    67.6 ms  walks   1 pd     0  {}
+     [QSET    ] 'FCA_NPUK_SMM.RWG_TjsPHIoim_SNX...(256)'             R2    17.3 ms (max    17.8)  nb   322.6 ms  walks   2 pd  1832  {}
+     [QSET    ] 'RUX_ARV_LFS_QM_GJWTDMS_WDGTH.F...(256)'             R2     7.0 ms (max     7.5)  nb    17.1 ms  walks   2 pd    77  {}
+     [QSET    ] 'HRR_WOL.TNY_U_ZmyrXSZTPeyoMsdp...(103)'             R2    15.0 ms (max    15.5)  nb    47.3 ms  walks   3 pd  1011  {'exact': 1}
+     [QSET    ] 'RHR_WOL.TNY_U_ZmyrXSZTPeyoMsdp...(103)'             R2    16.7 ms (max    16.9)  nb    49.3 ms  walks   3 pd  1032  {'fuzzy': 1}
+     [r1-multi] 'xwzlhjf hoxbplop slurwp oydfiw'                     R2    51.2 ms (max    51.3)  nb    51.1 ms  walks   1 pd    39  {'fuzzy': 4}
+     [r1-multi] 'xwzlhjf hoxbplop slurwp oydfiw zhcefugpt'           R2    50.8 ms (max    51.1)  nb    51.1 ms  walks   1 pd    52  {'fuzzy': 4}
+     [r1-multi] 'xwzlhjf hoxbplop slurwp oydfiw...(47)'              R2    51.5 ms (max    51.9)  nb    51.3 ms  walks   1 pd    65  {'fuzzy': 4}
+     [r1-multi] 'lmmwngodou jadkvqy khbnukc qomfrybiza'              R2    51.3 ms (max    51.8)  nb    51.2 ms  walks   1 pd    33  {'fuzzy': 3}
+     [r1-multi] 'lmmwngodou jadkvqy khbnukc qom...(45)'              R2    50.9 ms (max    51.3)  nb    50.7 ms  walks   1 pd    44  {'fuzzy': 3}
+     [r1-multi] 'lmmwngodou jadkvqy khbnukc qom...(53)'              R2    51.1 ms (max    52.7)  nb    51.9 ms  walks   1 pd    55  {'fuzzy': 3}
+     [r1-multi] 'njraipjtbtu lsuakcoj hsxgibymjxu orfltalc'          R2    56.7 ms (max    57.4)  nb    55.0 ms  walks   1 pd    39  {'fuzzy': 4}
+     [r1-multi] 'njraipjtbtu lsuakcoj hsxgibymj...(50)'              R2    55.3 ms (max    55.3)  nb    55.3 ms  walks   1 pd    52  {'fuzzy': 4}
+     [r1-multi] 'njraipjtbtu lsuakcoj hsxgibymj...(57)'              R2    55.7 ms (max    56.3)  nb    55.4 ms  walks   1 pd    65  {'fuzzy': 4}
+     [r1-multi] 'votklbi fjblnabj qghque pdjxmq'                     R2    52.5 ms (max    52.7)  nb    52.7 ms  walks   1 pd    39  {'fuzzy': 4}
+     [r1-multi] 'votklbi fjblnabj qghque pdjxmq tiprdynotu'          R2    53.0 ms (max    53.4)  nb    52.9 ms  walks   1 pd    52  {'fuzzy': 4}
+     [r1-multi] 'votklbi fjblnabj qghque pdjxmq...(51)'              R2    53.1 ms (max    53.3)  nb    52.9 ms  walks   1 pd    65  {'fuzzy': 4}
+     worst REF: R2 110.0 ms ('e e e e e e e e e e e e e e e e e e e e e e e e e '); fixture only (.36/1) 110.0 ms ('e e e e e e e e e e e e e e e e e e e e e e e e e '); nb 322.6 ms ('FCA_NPUK_SMM.RWG_TjsPHIoim_SNX_TVC_2_ewhpkdtjc_3v9')
+     paste-modal workload (100 labels, limit 3): total 1.15 s  median 11.6 ms  max 22.0 ms
+  -- REF6; load (2.95361328125, 2.97802734375, 3.95751953125)
+     [REF6Q   ] 'm'                                                  R2    17.5 ms (max    18.4)  nb    17.7 ms  walks   0 pd     0  {'prefix': 20}
+     [REF6Q   ] 'meas_'                                              R2    17.9 ms (max    18.4)  nb    17.9 ms  walks   0 pd     0  {'prefix': 20}
+     [REF6Q   ] 'chr'                                                R2    32.0 ms (max    32.5)  nb    31.4 ms  walks   1 pd     0  {'fuzzy': 20}
+     [REF6Q   ] 'mesa'                                               R2    31.6 ms (max    32.3)  nb    31.8 ms  walks   1 pd     0  {'fuzzy': 20}
+     [REF6Q   ] 'cahr'                                               R2    31.8 ms (max    32.3)  nb    31.8 ms  walks   1 pd     0  {'fuzzy': 20}
+     [REF6Q   ] 'cr0'                                                R2    32.2 ms (max    33.3)  nb    32.2 ms  walks   1 pd     0  {'subsequence': 20}
+     [REF6Q   ] 'char 1'                                             R2    11.6 ms (max    11.6)  nb    11.5 ms  walks   0 pd     0  {'token': 20}
+     [REF6Q   ] '0'                                                  R2    78.5 ms (max    79.8)  nb    77.9 ms  walks   0 pd     0  {'substring': 20}
+     [REF6Q   ] 'chr 0'                                              R2    42.1 ms (max    42.7)  nb    41.9 ms  walks   2 pd     0  {'fuzzy': 20}
+     [REF6Q   ] 'ch00'                                               R2    15.6 ms (max    15.9)  nb    15.8 ms  walks   0 pd     0  {'token': 20}
+     [REF6Q   ] 'meas 1'                                             R2    11.6 ms (max    11.8)  nb    12.6 ms  walks   0 pd     0  {'token': 20}
+     [REF6Q   ] 'c 0 1'                                              R2    13.2 ms (max    15.0)  nb    12.9 ms  walks   0 pd     0  {'token': 20}
+     [r1-c6q  ] 'me'                                                 R2    17.7 ms (max    18.1)  nb    17.6 ms  walks   0 pd     0  {'prefix': 20}
+     [r1-c6q  ] 'meas'                                               R2    17.6 ms (max    18.1)  nb    17.9 ms  walks   0 pd     0  {'prefix': 20}
+     [r1-c6q  ] 'c'                                                  R2    17.1 ms (max    17.6)  nb    17.0 ms  walks   0 pd     0  {'prefix': 20}
+     [r1-c6q  ] 'meas 12'                                            R2     4.9 ms (max     6.2)  nb     5.0 ms  walks   0 pd     0  {'token': 20}
+     [r1-c6q  ] '00'                                                 R2    67.7 ms (max    80.5)  nb    64.8 ms  walks   0 pd     0  {'substring': 20}
+     [r1-c6q  ] 'char_'                                              R2    17.4 ms (max    18.0)  nb    17.3 ms  walks   0 pd     0  {'prefix': 20}
+     [r1-c6q  ] 'c 1 2'                                              R2    14.9 ms (max    15.0)  nb    14.9 ms  walks   3 pd     0  {'subsequence': 20}
+     worst REF6: R2 78.5 ms ('0'); fixture only (.36/1) 78.5 ms ('0'); nb 77.9 ms ('0')
+
+SUMMARY [('REF', 110.0, 'e e e e e e e e e e e e e e e ', 110.0), ('REF6', 78.5, '0', 78.5)]
+load after = (2.796875, 2.94482421875, 3.94140625)
+exit 0

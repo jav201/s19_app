@@ -12,3 +12,14 @@ Round 1: `E3-architect.md` **FAIL** (2 MAJOR, 2 MEDIUM, 3 MINOR, 2 LOW, 2 INFO);
 | all other findings | accept with their fix columns; INFO noted. |
 
 **Next:** one correction pass (rows and cases; graph), then a round-2 re-check of the blocking findings by both reviewers, each re-running its probe on the corrected design's pilot.
+
+## Round 2 rulings (2026-11-06T20:00:09-06:00, orchestrator Opus 5.5) — E3 done
+
+Round 2: architect **PASS-WITH-NOTES** (E3A-01, -02 closed and measured: worst 110.0 ms REF, 78.5 ms REF6, build 1.788 s, peak 18.5 MiB, 0 oracle mismatches); security **PASS-WITH-NOTES** (E3S-01, -02 closed: 64 KiB paste → empty in 45–70 ms; 0 exceptions, 0 bad spans, 4 hash seeds identical). **E3 is done for Inc 4.** The notes are applied before E4 as addenda (records and graph, one Opus pass, no further round):
+
+| Addendum | Findings | Ruling |
+|---|---|---|
+| A-1 | E3A-12 = E3S-10 | Delete "at a boundary offset" from step 6: substring case-exactness is "anywhere", as the CTX term says; add case .24/4 that tells the two apart. |
+| A-2 | E3A-13 = E3S-09 | Duplicate query tokens are collapsed before ranking (same lists; ≤ 55 ms measured). **The open question is ruled:** R-A2L-MATCH.36 keeps its 200 ms bound for the fixture query sets (the realistic typed-name shapes of both reference lists); a new row **R-A2L-MATCH.40** bounds every query the system ranks: `When the system ranks a prepared name list of 50,000 names for any query of at most 256 characters, the system shall return the ranked list within 1.0 s.` (pathological shapes of both reviews — repeated, distinct near-tokens, 256-character — as its cases; measured worst after A-2 about 461 ms; negative control: no duplicate collapse → `'0 ' × 128` over REF6 > 1.0 s → RED). The UI never freezes past 1 s; the typed-name experience keeps 200 ms. |
+| A-3 | E3S-11 | `_prefix_distance` is banded (1.47 s → 32 ms on the crafted A2L); the crafted shape joins R-A2L-MATCH.40's cases. |
+| A-4 | all other round-2 MINOR / LOW | apply their fix columns. |

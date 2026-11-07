@@ -132,3 +132,94 @@ Re-run confirmation: 0 mismatches against the oracle (944 names, 409 queries × 
 | Real callers | ✓ No product caller changes. `parse_a2l_file` has 5 real call sites (`extract-e2/diff-report.md`) and is context only. | ibid. |
 | `trace_check.py` at E5 | SLICE passes only with `--req 01-requirements.md E1-slice.md`, the batch-101 practice: `01-requirements.md` alone does not name `label_match.py`. US, CASE and TEST are as designed. | `trace_check.py:87-97`; batch-101 `inc-13/04-validation.md:65` |
 | E2-7 (`build_label_index("VALUE")`) | No guard, as E2 proposed. Inc 7 passes the list of tag names, and a guard would add an error path with no row. | — |
+
+
+## Round 2 (2026-11-06T19:56:56-06:00)
+
+This round re-checks the blocking findings after the correction pass `15129b64`: DeepSeek, units R (rows and cases) and G (graph), diff `08ad2ae8..15129b64 -- inc-4/` over `01-requirements.md`, `02-test-cases.md`, `E1-slice.md` and `codewire/graph-inc4.md`. Rulings: `E3-rulings.md`. Reviewer: Opus 5.5, architect lens, read-only on the records.
+
+### Verdict: PASS-WITH-NOTES
+
+**The four MAJORs are closed.** Both of mine (E3A-01, E3A-02) are closed, and so is the design side of security's two (E3S-01: the 256-character cap and the fuzzy stop; E3S-02, which is the same defect as E3A-01). The corrected procedure was measured on cachyos-rtx at host load 2–3:
+- **R-A2L-MATCH.36:** the worst fixture median is 110.0 ms on REF (QSET's `e ` × 128) and 78.5 ms on REF6 (`0`).
+- **R-A2L-MATCH.35:** the REF build takes 1.788 s.
+- **R-A2L-MATCH.37:** the peak is 18.5 MiB.
+- **Equality:** 0 mismatches against the rows' oracle with the ruled case-exactness.
+
+**The pass introduced no MAJOR.** New findings: 2 MEDIUM, 2 MINOR, 3 LOW, 2 INFO.
+- **E3A-12 (MEDIUM):** apply it before E4. Step 6 of the graph pins a case-exactness test for `substring` that contradicts the CTX definition the same pass wrote, and no case would catch it.
+- **E3A-13 (MEDIUM):** carries one question to the orchestrator (§R2.4).
+
+### R2.1 Round-1 findings, one line each
+
+| Id (R1 severity) | Status | Evidence |
+|---|---|---|
+| E3A-01 (MAJOR) | **closed** | CTX *case-exact* is narrowed to exact / prefix / substring (`01-requirements.md:64-67`). .24/3 and .4/1 are changed (`02-test-cases.md:100`, `:32`). .36 gains REF6 with both reviews' slow queries (`:15`, `:129`; `01-requirements.md:143`) and the raw re-classification control. The graph drops `fold`, `_Query.folded`, `_classify`'s raw mode and `_prefix_distance`'s raw clause (`graph-inc4.md:182`, `:292-312`, `:389-391`). Measured on REF6: worst 78.5 ms (`0`); `mesa`, `cahr` and `chr` take 32–34 ms, against 554–717 ms in round 1 (`arch-r2-time-transcript.txt:72-91`). E3A-12 is a defect in the wording of step 6, not in this fix. |
+| E3A-02 (MAJOR) | **closed** | Step 4 is rewritten: lazy maps in ascending allowed edits, stop when no candidate is left, at most 300 candidates, then the per-candidate check (`graph-inc4.md:180`). QSET gains the three multi-word queries, and .36 gains the "map for every query token" control. Measured: the multi-word queries take 50.7–60.1 ms, against 194.9–296.8 ms in round 1. The paste workload takes 1.15 s for 100 labels, at most 22.0 ms each (`arch-r2-time-transcript.txt:46-48`, `:57-70`). E3A-14 is a gap in the step text. |
+| E3A-03 (MEDIUM) | closed | .37's control is now the product mutant (75.7 MiB), and the Base column records that a one-structure regression is not caught (`01-requirements.md:144`; `graph-inc4.md:76`). |
+| E3A-04 (MEDIUM) | closed, one leftover | (a) The .37 test carries no `serial_timing`, and E2-4's reason is corrected (`graph-inc4.md:17`, `:413`). (b) The E4 notes use `report_margin` / `timing_bound` (`:480`). (c) Rows .35 and .36 carry the "× 2 when `CI` is set" clause (`01-requirements.md:142-143`). The leftover is `graph-inc4.md:478` (E3A-17). |
+| E3A-05 (MINOR) | closed | The code points are in the definitions (`01-requirements.md:25`, `:30`), and cases .1/4 and .12/4 are added. Both equal the literal expected values (`arch-r2-check-transcript.txt:95-98`). |
+| E3A-06 (MINOR) | partly applied | .13/4 (`crxuve` → `[]`) is added and verified. D-5's wrong sentence ("never decisive at ≤ 2 edits on words") still stands at `E1-rulings.md:51`. LOW, open. |
+| E3A-07 (MINOR) | closed | The slice maps 17 functions and 4 types, and its design note points to E2-1 (`E1-slice.md:9-11`, `:20-31`). |
+| E3A-08 (LOW) | applied | `_tokens` now derives from `_at_boundary` (`graph-inc4.md:217`). It gives the same spans on all 100,000 REF and REF6 names, but it costs build time (E3A-19). |
+| E3A-09 (LOW) | closed | .29 is in the `When` form, and its cases are normal (`01-requirements.md:131`; `02-test-cases.md:111-112`). |
+| E3A-10 (INFO) | open, INFO | The consumer note now carries security's E3S-01, -04 and -05 (`graph-inc4.md:60`). My items (a)–(e) are not in PLAN's Inc 7 row (`PLAN.md:62`): carry them at Inc 7's E1 (see E3A-20). |
+| E3A-11 (INFO) | not applied, INFO | The graph has no `type(m.rule) is MatchRule` interface check. |
+| E3S-01 (security MAJOR; design side) | **closed** | **Row .38:** `01-requirements.md:86`. Cases .38/1 (256 characters) and .38/2 (257) give exactly the literal values (`arch-r2-check-transcript.txt:100-103`). **Fuzzy stop:** `graph-inc4.md:180`. **The E3S-01 shapes in QSET:** each takes at most 110.0 ms; the two 256-character pasted lists take 17.3 and 7.6 ms, against 523–672 ms in round 1. The worst rank peak is 9.0 MiB, with no `MemoryError` (`arch-r2-adv-transcript.txt`). **Residual:** E3A-13. The verdict on E3S-01 itself belongs to security's round 2. |
+| E3S-02 (security MAJOR) | **closed** | Same evidence as E3A-01. |
+
+### R2.2 New findings
+
+| Id | Severity | Row / node / case | Finding | Proposed fix |
+|---|---|---|---|---|
+| E3A-12 | MEDIUM | `rank` step 6 (`graph-inc4.md:182`) · CTX *case-exact* (`01-requirements.md:64-67`) · R-A2L-MATCH.24 | **Step 6 tests substring case-exactness "`in` at a boundary offset". CTX says "whose rule still holds", and the `substring` rule holds for an occurrence at any offset (R-A2L-MATCH.7).** Round 1 had already noted that case-exactness compares the rule, not the key (§2.5: `count` on `DiscountCount` is case-exact). The literal step diverges from the rows' oracle on 56 of the 1,636 rankings of v3's pool and on 1 of 345 REF queries. The ctx reading diverges on 0 of each (`arch-r2-check-transcript.txt:137`, `:168`). **Counterexample:** [`DiscouNTCount`, `DiscountCount`] with `count` gives `DiscountCount` first under CTX, the oracle and v3, and `DiscouNTCount` first under step 6 as written (`:108-111`). No case of `02-test-cases.md` separates the two readings, so an implementer who follows the graph passes every case. | **Fix the step:** delete "at a boundary offset", so step 6 reads "(`==`, `startswith`, or `in`)". **Add case R-A2L-MATCH.24/4:** [`DiscouNTCount`, `DiscountCount`], `count` → exactly [DiscountCount · substring · (8,13); DiscouNTCount · substring · (8,13)]. **Negative control:** case-exact only at a boundary offset → `DiscouNTCount` first → RED. |
+| E3A-13 | MEDIUM (MAJOR if .36 is read as a bound on every query within the cap, §R2.4) | R-A2L-MATCH.36 (`01-requirements.md:143`) · `rank` steps 3–4 (`graph-inc4.md:179-180`) · REF6 queries (`02-test-cases.md:15`) | **The token and fuzzy tiers still grow with the number of query tokens when a short query token is repeated or nearly repeated.** In that case the candidate set never shrinks under 300, so step 4 walks every token and step 3 intersects every range. Within the 256-character cap, measured on cachyos-rtx: REF6 `chr ` × 64 442.3 ms; `cahr ` × 51 361.6 ms; `0 ` × 128 310.6 ms (token tier); REF `qzx ` × 64 291.2 ms (`arch-r2-adv-transcript.txt:12`, `:22-28`). **Collapsing duplicate query tokens fixes the repeated class with the same lists.** Each distinct token gets one range or map, and the key is multiplied by the token's count. Equality is asserted on every shape, on 348 REF queries and on 8 repeated-word C08 queries against the oracle (`arch-r2-adv2-transcript.txt:30-31`). The collapsed times: `chr ` × 64 → 47.8 ms, `0 ` × 128 → 41.8 ms, `qzx ` × 64 → 30.7 ms, and QSET's `e ` × 128 drops from 110.0 to 10.6 ms (`:12-22`). **A residual remains: distinct near tokens.** On REF6, `cha` … `chz` (26 tokens, 103 characters) takes 203.2 ms. 64 distinct tokens at 1 edit from `char` take 461.3 ms, or 449.1 ms collapsed (`:25-27`), about 7 ms per token while 25,000 candidates remain. **The realistic shapes are cheap:** 40 REF6 names pasted as one line take 6.2–6.9 ms, and 61-token REF pastes 17.1 ms. | **Change step 3 and step 4:** "the query tokens as a multiset: one range or map per distinct token; a FUZZY key adds each distinct token's smallest distance times its count". **Add to REF6's queries** `0 ` × 128 and `chr ` × 64. **Negative control:** a range or map per token occurrence → 310.6 / 442.3 ms → RED. **For the residual,** see §R2.4. |
+| E3A-14 | MINOR | `rank` step 4 (`graph-inc4.md:180`) | **The step does not say that a candidate's check stops at the first query token the candidate fails.** Without that stop, the fixture's own first seeded 256-character paste takes 322.6 ms instead of 17.3 ms (`arch-r2-time-transcript.txt:53`), so .36/1 would go RED. E4 would catch it, but the procedure is pinned to meet the row. | Add: "a candidate's check stops at the first query token it fails". |
+| E3A-15 | MINOR | QSET (`02-test-cases.md:16`) | **Six of the E3S-01 shapes cannot be rebuilt from the text.** "Two seeded 256-character `,`-joined SWA name lists" names no seed and no draw. "The longest REF name" is in fact the REF name with the most tokens (27 tokens, 103 characters), and "with a transposition" does not say which characters are swapped. | State each shape as `i4e3s-probe.py` `cap()` builds it, which is also how `arch-r2-probe.py` `qset33()` builds it: `random.Random(20261108).sample(SWA, 400)` joined by `,`, the first 256 characters, then the same from the 201st name on; the REF name with the most tokens (ties in code-point order), whole and with its first two characters swapped. Or list the literal strings in an evidence file. |
+| E3A-16 | LOW | `rank` step 1 (`graph-inc4.md:177`) | **Step 1 parses the whole query before the 256-character check.** For a 64 KiB query (R-TUI-044.2's paste cut), parsing takes 43–51 ms, and the strip and length check alone take 0.003 ms (`arch-r2-adv-transcript.txt:33-37`). | Order step 1 as: strip, then the length check (.38), then `_parse_query`. |
+| E3A-17 | LOW | `graph-inc4.md:16-17`, `:478` · `02-test-cases.md:3`, `:138` | **The records disagree on .37/1's owner.** The graph puts .37/1 in G-T2 (G-T1 114 cases, G-T2 3), while `02-test-cases.md` counts G-T1 115 and G-T2 2. The graph's E4 note at `:478` still reads "G-T2 marks all three tests", against `:17` and `:480`. | Pick one owner for .37/1, align both counts, and reword `:478` to "the .35/.36 tests carry `serial_timing`; .37/1 none". |
+| E3A-18 | LOW | `graph-inc4.md:169`, `:468` | **The .36/1 example cites my round-1 probe-2 numbers (71.2 / 85.5 ms) for a query set they were not measured on.** That set includes the E3S-01 shapes and four REF6 queries probe 2 did not run. | Cite this round: worst 110.0 ms on REF (`e ` × 128), 78.5 ms on REF6 (`0`), `arch-r2-time-transcript.txt:69`, `:91`; or the post-E3A-13 numbers once that fix is applied. |
+| E3A-19 | INFO | `_tokens` (`graph-inc4.md:217`) · R-A2L-MATCH.35 | **E3A-08 as applied costs build time.** Deriving `_tokens` from `_at_boundary` raises the REF build from 1.788 s to 2.547 s, so the margin to 5.0 s falls from 2.8× to 2.0×. REF6 goes from 0.504 s to 0.879 s (`arch-r2-time-transcript.txt:16-20`). The spans are identical. This was my own LOW. | **Either keep it:** 2.0× is enough, and CI doubles the bound. **Or keep the scan** in `_tokens`, with a G-T1 property test that every token start is an `_at_boundary` offset. |
+| E3A-20 | INFO | R-A2L-MATCH.39 · I-3 consumer note (`graph-inc4.md:60`) | **Two side effects of .39.** (a) A build that copies the names into a filtered list adds about 0.4 MiB to the REF peak: 19,385,133 bytes against E2's 18,940,597 (`arch-r2-time-transcript.txt:12`). (b) A name longer than 1,024 characters is not in `index.names`. If Inc 7 derives found/missing from `index.names` (E3A-10 (a)), such a name would show as missing. | Inc 7's E1: take found/missing from the A2L tag names, not from `index.names`, or state that names longer than 1,024 characters show as missing. |
+
+### R2.3 What was measured, and against what
+
+**Setup.**
+- **Probe:** `evidence-e3/arch-r2-probe.py` (sha256 `dd537c1f…2d63`), run on cachyos-rtx, Python 3.11.18.
+- **Scratch:** `/tmp/b103-e3r2-4-architect/`, with its own HOME, XDG and LOCALAPPDATA; `s19_app.__file__` is the read-only clone at `e07fb00`, printed first in every transcript.
+- **Pilot files:** copied from the records; their sha256 equals the records' and round 1's.
+- **Isolation:** no clipboard was touched.
+
+**What the probe implements.** `R2` is the pinned procedure of `graph-inc4.md:177-182` over the E2 pilot's `IndexC` buffers:
+- **step 1:** the .38 cap; the build applies .39;
+- **step 4:** lazy maps, the 300 limit and the stop when no candidate is left, with `_prefix_distance` capped and memoised (equal to `min(osa_prefix, cap + 1)` on 20,000 random pairs);
+- **step 6:** string comparisons, in two readings (E3A-12).
+
+**The references it is checked against.**
+- **The ruled oracle:** `naive_rank_r2`, which is E1's `naive_rank_b` with case-exactness only for rules 0–2, plus .38 and .39.
+- **BN:** v3's `IndexB` with the same narrowing.
+- **v3 itself:** `naive_rank_b` and `IndexB`.
+
+Transcripts: `arch-r2-{check,time,adv,adv2}-transcript.txt`, all from this script version, run in sequence at host load 2.1–3.4.
+
+| Check | Result | Transcript |
+|---|---|---|
+| Every example of `02-test-cases.md`, with AT-B103-I4-1/-2 and the 8 changed or new cases (.4/1 = .24/3, .1/4, .12/4, .13/4, .38/1–/2, .39/1–/2) | 0 mismatches against the ruled oracle; 0 against the literal expected values; 0 tier/`_classify` disagreements; AT-I4-2's target is first in all 8 | check `:13-128` |
+| v3's pool (944 names, 409 queries × 4 limits) | 0 mismatches against the ruled oracle | check `:137` |
+| REF: QSET (33) + round-1 multi-word (12) + 300 generated queries | 0 mismatches against BN | check `:168` |
+| REF6: its 12 queries + round 1's (7 more) + 300 generated queries | 0 mismatches against BN | check `:169` |
+| No early stop / duplicates collapsed | the same lists on REF and REF6 (asserted) | check `:168-169`; adv2 `:30-31` |
+| **Where the ranking rules did not change** | **0 differences from v3 on REF6 (319 queries)** | check `:169` |
+| **Where they changed** (.24, the ruled narrowing; the new rows .38 and .39) | Every difference from v3 is a tie that case-exactness used to decide for a token, fuzzy or subsequence name: 1 of pilot4's 76 example rankings (`drück`, .4/1 = .24/3), 188 of the 1,636 pool rankings and 28 of the 345 REF rankings. 2 more example rankings differ by the new rows (.38/2, .39/2). R2 equals the ruled oracle and BN in every one of these. | check `:25-29`, `:102-107`, `:128`, `:137-168` |
+| R-A2L-MATCH.35 (build, median of 3) | REF 1.788 s, REF6 0.504 s (`_tokens` from `_at_boundary`: 2.547 s, 0.879 s) | time `:16-20` |
+| R-A2L-MATCH.36 (median of 7, limit 20) | **worst REF 110.0 ms** (`e ` × 128), **worst REF6 78.5 ms** (`0`), both on the fixture's own queries; paste workload 1.15 s / 100 labels, max 22.0 ms | time `:22-91` |
+| R-A2L-MATCH.37 (tracemalloc peak, one build) | REF 19,385,133 bytes = 18.5 MiB; REF6 6.6 MiB | time `:12-13` |
+| Within-cap shapes outside the fixture | see E3A-13; the worst is 461.3 ms (REF6, 64 distinct near tokens); rank peak ≤ 9.0 MiB | adv, adv2 |
+
+### R2.4 Question for the orchestrator (E3A-13)
+
+**Is R-A2L-MATCH.36 a bound on every query within the 256-character cap, or on the operator's query shapes the fixtures stand for?** The row's statement reads universally ("for a query"); its threshold names the fixtures.
+
+**My recommendation:** apply the multiset collapse, which is measured and changes no list, and record the residual in .36's Base column: "distinct near tokens, at most about 0.5 s at the cap, measured 461.3 ms on REF6". This follows the precedent of E3S-03 (c)'s residual. A row that bounds the number of distinct query tokens would remove the residual, but it would change the rows' semantics for long pasted names (27 tokens), so I do not recommend it.
+
+**If the orchestrator rules the universal reading,** E3A-13 is MAJOR, and the design needs a bound per query token that does not depend on how many candidates remain. That is an E2 change, to be escalated as D-12 says.

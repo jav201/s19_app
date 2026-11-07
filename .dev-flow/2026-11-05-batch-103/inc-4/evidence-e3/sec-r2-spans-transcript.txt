@@ -1,0 +1,5 @@
+s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+python = 3.11.18  PYTHONHASHSEED = None
+host = cachyos-rtx  load = (3.73583984375, 7.65478515625, 5.8984375)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e3r2-4-security/home  LOCALAPPDATA = /tmp/b103-e3r2-4-security/home/localappdata  PILOT_DIR = /tmp/b103-e3r2-4-security/pilot
+hostile names 32 (indexed 31: the 1,025-character name left out); queries 3087 x 3 limits; listed entries 21082; exceptions 0; bad spans 0; R2 != oracle 0; tier disagreements 0

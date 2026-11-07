@@ -60,3 +60,72 @@ Both are cheap to fix in the records, and both need an E2 change to the procedur
 - [x] No secret values appear here: none were read.
 - [x] The verdict is explicit: **FAIL**. No HIGH is present. E3S-01 and E3S-02 block until their row and procedure changes are applied and re-checked; both are `planned`.
 - [x] New tool or integration: none. The module has no external action surface. Its one outbound effect, suggestions that feed Check and Patch specs, is routed to Inc 7 (E3S-04 (4)).
+
+## Round 2 (2026-11-06T19:56:49-06:00)
+
+Re-check of the round-1 blocking findings on the records at `15129b64` (correction units R and G, deepseek-v4-pro), and whether those edits introduced a HIGH or MAJOR. Read: `E3-rulings.md`, `E3-architect.md`, `git diff 08ad2ae8 HEAD -- inc-4/`, and the current `01-requirements.md`, `02-test-cases.md`, `E1-slice.md` and `codewire/graph-inc4.md`. This section and two lines in `steps.log` are the only writes.
+
+**Probe (state `executed`).** The probe is `evidence-e3/sec-r2-probe.py` (sha256 `81f5c22d…e422`). Its class `R2` follows the corrected procedure (`graph-inc4.md:176-182`) over the E2 pilot's build, with the names over 1,024 characters left out:
+- **Step 1:** parse, then refuse more than 256 characters.
+- **Step 4:** lazy walks in ascending allowed edits; it stops on an empty set, and at 300 candidates or fewer it switches to a per-candidate check, memoised per (query-token position, token id).
+- **Step 6:** case-exactness only for `exact`, `prefix` and `substring`, by string comparison.
+- **Entries:** `_classify` with the capped `_prefix_distance` (one-row early exit, no band, as pinned).
+- **Oracle:** `evaluate_b` per name, with the same order key.
+
+The pilot files' sha256 equal round 1's. The runs used cachyos-rtx, Python 3.11.18 and `s19_app.__file__` = the read-only clone at `e07fb00`. Scratch was `/tmp/b103-e3r2-4-security/`, with its own HOME, XDG and LOCALAPPDATA, under an 8 GiB address-space cap and a per-case alarm. No clipboard was touched. Host load was 2.2–3.8 during the timed runs; the architect's round-2 probe shared the host at the start, at 11.6. The transcripts are `sec-r2-{check,spans,perf,paste,mem,dedupe,det-0,det-1,det-4242,det-random,band}-transcript.txt`, with `sec-r2-band.py` and `sec-r2-run.sh`. The check, spans, perf, paste and mem runs used the probe before the `R2D`/`dedupe` mode and the `hash('abc')` print were appended. `R2`'s path did not change, because its `dedup_tok` is unset.
+
+### Verdict
+
+**PASS-WITH-NOTES.** Both round-1 MAJORs were applied in the records and verified by measurement (`executed`). The edits introduced no HIGH and no MAJOR. New findings: 0 HIGH, 0 MAJOR, 3 MEDIUM, 1 MINOR, 1 LOW and 1 INFO. None blocks the security gate, but E3S-09 needs a ruling on how .36 reads. This verdict covers the E3 design gate only and authorizes nothing beyond it.
+
+### Round-1 findings
+
+| Id | Round 1 | Round 2 |
+|---|---|---|
+| E3S-01 | MAJOR | **Closed.** R-A2L-MATCH.38 (`01-requirements.md:86`): .38/1 and .38/2 PASS on R2. QSET gains the shapes (`02-test-cases.md:16`). Step 4 stops on an empty set and at 300 candidates or fewer (`graph-inc4.md:180`). The paste note is at `:60`. **Measured:** every 64 KiB paste returns `[]` in 45–70 ms, with a peak of 6.6 MiB or less (round 1: 3.0–73.7 s and about 7.5 GiB, a `MemoryError`). QSET's shapes over REF take at most 108.1 ms (`'e ' x 128`); at the cap, a pasted list takes 7.6–13.7 ms (round 1: 523–672 ms). The worst ranking under the cap anywhere is 1,350 ms and 29.9 MiB (E3S-09). 0 exceptions. |
+| E3S-02 (+ E3A-01) | MAJOR | **Closed.** Case-exactness now covers only `exact`, `prefix` and `substring` (`01-requirements.md:64-67`). .24/3 and .4/1 are re-derived, and both PASS. REF6 and its 12 queries are in .36 (`:143`; `02-test-cases.md:15`, `:129`). Step 6 compares strings (`graph-inc4.md:182`). **Measured:** REF6's worst query is 85.7 ms (`0`). Against round 1: `cahr` 32.8 ms (was 680), `chr 0` 44.5 (647), `ch00` 18.0 (430), `meas 1` 13.7 (348), `c 0 1` 15.9 (243). R2 equals the oracle on 2,000 REF6 names × 12 queries. A substring defect remains (E3S-10). |
+| E3S-03 | MEDIUM | **Applied in part.** R-A2L-MATCH.39 (`:145`): .39/1 and .39/2 PASS. The 258-character trie bound is written as a property, not an obligation (`graph-inc4.md:70`, `:345`). Residual (c) stands. A new aspect is E3S-11. |
+| E3S-04 | MEDIUM | **Applied** as Inc 7 obligations (1)–(5) (`graph-inc4.md:60`). Not re-measured. |
+| E3S-05 | MINOR | **Applied** (`graph-inc4.md:60`). |
+| E3S-06 | LOW | **Applied:** the `TypeError` for a `str` or `bytes` argument (`graph-inc4.md:56`), with its example. |
+| E3S-07 | LOW | **Applied:** `_tokens` is a tuple, and no function writes a buffer after the build. The purity example over the private buffers was not checked. |
+| E3S-08 | INFO | — |
+
+### New findings
+
+| Id | Severity | Row / node / case | Defect | Fix |
+|---|---|---|---|---|
+| E3S-09 | MEDIUM | R-A2L-MATCH.36 (`01-requirements.md:143`) · QSET (`02-test-cases.md:16`) × REF6 (`:15`) · `rank` steps 3–4 (`graph-inc4.md:179-180`) | **Repeated query tokens defeat both stop rules.**<br>• **Mechanism:** each copy of an identical query token is intersected (token tier) or walked and scored (fuzzy tier) again. The candidate set never shrinks, so neither "stop when empty" nor the 300-candidate stop fires.<br>• **Under the cap, .36's statement fails on REF6,** including for QSET's own `'0 ' x 128`: 316–387 ms over REF6, against 41 ms over REF. The threshold pairs QSET with REF only.<br>• **Measured** (median of 7, limit 20, load about 3):<br>  – REF6 `'0 ' x 125 + 'chax'`: **1,141–1,350 ms**<br>  – REF6 `'c ' x 125 + 'chax'`: 833–875 ms<br>  – REF6 `'chax '` and `'mesa '` cut at 256: 365–378 ms<br>  – REF `'e ' x 120 + 'jmz'`: 329 ms<br>  – REF `'cnt ' x 64`: 286–316 ms<br>  – REF `'1a' x 128`: 198–207 ms<br>• **Bounded:** at most 29.9 MiB, 0 exceptions.<br>• **Severity:** from the security lens this is a bounded slowdown with no freeze and no memory growth, so MEDIUM. If the orchestrator reads .36 as holding for every query of 256 characters or fewer, it is a .36 miss, and that is a ruling to make. | **(a)** De-duplicate identical query tokens.<br>• Token tier: intersect each distinct range once.<br>• Fuzzy tier: walk and check each distinct token once, and count its edits once per occurrence in the key.<br>• **Measured** (`R2D`, `sec-r2-dedupe-transcript.txt`): the 8 repeated-token shapes measured with it each take 55.4 ms or less. REF6 `'0 ' x 125 + 'chax'` goes from 1,141 to 53.5 ms, and `'0 ' x 128` from 320 to 41.6. REF `'1a' x 128` goes from 198 to 9.6, and `'cnt ' x 64` from 286 to 10.4. The lists are the same in every comparison.<br>**(b)** .36's threshold: rank QSET's E3S-01 shapes over REF6 too, and add `'0 ' x 125 + 'chax'` and `'chax '` cut at 256 to REF6's queries. Negative control: no de-duplication → `'0 ' x 125 + 'chax'` takes about 1.2 s → RED.<br>**Residual after (a):** distinct typos of one token that all hit one large set still grow with their count. On REF6, 16 typos take 128 ms, 32 take 228–230 ms and 51 take 353 ms (a crafted query). A token cap that brings this under 200 ms would refuse real 27-token names whole. Do not loosen .36. Record the residual, or escalate per D-12. The REF generator found no typo of `rat` that starts no token, so the residual is measured on REF6 only. |
+| E3S-10 | MEDIUM | CTX *case-exact* (`01-requirements.md:64-67`) vs `rank` step 6 (`graph-inc4.md:182`) | **The definition and step 6 disagree on substring case-exactness, and no case notices.**<br>• **Definition:** a substring name is case-exact when its rule still holds raw. .7's rule is "contains the query text", so the check is raw `in` anywhere. The architect's measured `text3` does this.<br>• **Step 6:** says "`in` at a boundary offset".<br>• **They order differently:** [`abcdefg_count`, `DiscountCount`] with `count` puts `DiscountCount` first under the definition, because raw `count` occurs at 3. Step 6 puts `abcdefg_count` first, because `DiscountCount` has no raw boundary occurrence. The two variants also differ on 1 of 200 REF-sample rankings.<br>• **No case pins it:** .24/1–/3 are `exact` and `fuzzy` cases, so either implementation passes every test.<br>This is a contract contradiction the edits introduced, not a security risk. | Step 6: write "`in`" (anywhere), as the definition and the measured fix do.<br>New case .24/4: [`abcdefg_count`, `DiscountCount`], `count` → exactly [DiscountCount · substring · (8,13); abcdefg_count · substring · (8,13)].<br>Negative control: a boundary-only raw check → `abcdefg_count` first → RED. |
+| E3S-11 | MEDIUM | `_prefix_distance` (`graph-inc4.md:240-244`), used by `_classify` and step 4's per-candidate check | **The pinned distance has no band, so its early exit never fires along a matching diagonal.**<br>• **Cost:** one call costs (query-token length × name-token length) cells, up to 256 × 1,024 under the two caps.<br>• **Measured on a crafted A2L:** 25 or 100 names of one 1,000–1,020-character token (each within .39), with a 256-character query 1–2 edits away. It takes **1.45–1.48 s per keystroke**, almost all in `_classify` for the 20 listed entries. A 129-character query takes 0.74–0.76 s. | Compute only the band \|i − j\| ≤ cap, as `_fuzzy_token_distances` already does.<br>• **Measured** (`sec-r2-band.py`): 21.8–32.2 ms, with the same lists (6 of 6).<br>• Add an example: `'a' * 255 + 'b'` against `'a' * 1000`, cap 2 → 1. |
+| E3S-12 | MINOR | QSET shapes (`02-test-cases.md:16`) · Counts (`:138`) | **Three QSET entries cannot be reproduced as written:**<br>• "two seeded … lists" names no seed and no draw;<br>• "the longest REF name" does not say whether by characters (104) or by tokens (27 tokens, 103 characters);<br>• "with a transposition" does not say where.<br>A tester can draw an easy list: round 1's two draws took 523 and 672 ms on the old procedure.<br>**Counts:** the line splits the 117 cases as G-T1 115 and G-T2 2. The graph (`:16-17`) has G-T1 114 and G-T2 3 (.35/1, .36/1, .37/1). | Write the strings out, or the generator: `random.Random(20261108).sample(SWA, 400)`, then `','.join(pool)[:256]` and `','.join(pool[200:])[:256]`, as this probe does.<br>Pin "the REF name with the most tokens, ties by code point, and a transposition of its first two characters".<br>Counts → G-T1 114, G-T2 3. |
+| E3S-13 | LOW | `rank` step 1 (`graph-inc4.md:177`) | **A 64 KiB paste is fully tokenised before it is refused.** The 256-character check runs after `_parse_query` folds and tokenises the whole stripped query.<br>• **Measured:** 45–70 ms and up to 6.6 MiB per keystroke, with the pilot's tokenizer. The product's `_tokens` derives each cut from `_at_boundary` per offset, so it may be slower.<br>• **Check first:** 0.01 ms and 0 MiB, with the same results. | Step 1 order: strip the six whitespace characters; refuse a query over 256 characters; then fold and tokenise. |
+| E3S-14 | INFO | `rank` step 4 (`graph-inc4.md:180`) | **Step 4 says to drop each map while the key still needs it.** It says "drop each map once its candidates are taken", but the key (total edits) is summed from the maps after the walks. Taken literally, the maps are needed until the candidates are scored.<br>With the maps kept until scoring, the worst one-ranking peak is 29.9 MiB (`'e ' x 120 + 'rat'`, 121 maps; `sec-r2-mem-transcript.txt`). | Write "keep the maps until the candidates are scored", or recompute with `_prefix_distance`. No bound changes. |
+
+### Checked and clear (round 2)
+
+- **Correctness:** all 13 cases of the new and changed rows PASS on R2: .38/1–/2, .39/1–/2, .4/1 (= .24/3), .4/2, .3/3, .24/2, .25/3, .23/2, .1/4, .12/4 and .13/4. R2 equals the oracle in every comparison, with 0 tier/`_classify` disagreements:
+  - 200 rankings over a 1,500-name REF sample;
+  - a 2,000-name REF6 sample × 12 queries;
+  - 3,087 hostile queries × 3 limits over 32 hostile names (31 indexed; the 1,025-character name is left out).
+
+  The lazy fuzzy tier gives the all-maps lists in 406, 36 and 26 rankings (REF sample, REF, REF6).
+- **No exception and no bad span:** over 21,082 hostile entries and every perf, paste and mem ranking there are 0 exceptions and 0 spans that are empty, out of order, touching, or outside `[0, len(name))`.
+- **The ranking does not depend on the hash seed.** With PYTHONHASHSEED 0, 1, 4242 and `random`, `hash('abc')` differs every time, yet the sha256 over 1,167 rankings is identical (`f7f29046…e9e5`). The rankings covered REF (QSET, the shapes and 300 generated queries), REF6 (its queries and the shapes) and the hostile set.
+- **Shapes at the cap:**
+  - many short tokens (`'1a' x 128`: 256 tokens; `'aB' x 128`; `'aBcd' x 64`);
+  - 255 repeated letters;
+  - digits only (`'0' x 256`, a digit run of 256);
+  - non-ASCII (`é`, `Ä` and `İ` × 256; `漢字 `; U+1F600 × 128; `drück `).
+
+  None raises. Outside E3S-09, every shape takes 108.1 ms or less over REF (`'e ' x 128`) and 85.7 ms or less over REF6. E3S-09's class also covers `'c '`, `'m '` and `'1 '` × 128 over REF6, at 143–181 ms. `İ` keeps its length, because only A–Z fold.
+- **Padded pastes:** 65,000 spaces + `VALUE` ranks normally (17.7 ms). 32,000 spaces + 300 `a` + 32,000 spaces returns `[]` (0.4 ms).
+- **No new external action surface:** the module still does no file, clipboard or network I/O.
+
+### Evidence checklist (round 2)
+
+- [x] Each finding has what, where, why and fix: the table's columns, with `file:line` at `15129b64`.
+- [x] Each finding has a severity: 3 MEDIUM, 1 MINOR, 1 LOW, 1 INFO; 0 HIGH, 0 MAJOR.
+- [x] No secret values appear here: none were read.
+- [x] The verdict is explicit: **PASS-WITH-NOTES**. No HIGH is present. The E3S-01 and E3S-02 mitigations are `executed` in the records and measured by this probe. The new findings' fixes are `planned`.
+- [x] New tool or integration: none.

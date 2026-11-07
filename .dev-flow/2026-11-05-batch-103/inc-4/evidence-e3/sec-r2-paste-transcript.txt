@@ -1,0 +1,30 @@
+s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+python = 3.11.18  PYTHONHASHSEED = None
+host = cachyos-rtx  load = (2.46875, 4.986328125, 5.23291015625)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e3r2-4-security/home  LOCALAPPDATA = /tmp/b103-e3r2-4-security/home/localappdata  PILOT_DIR = /tmp/b103-e3r2-4-security/pilot
+
+=== REF prepared; graph order (parse, then the 256 check); limit 20; load (2.55126953125, 4.92041015625, 5.20849609375)
+        50.09 ms median of 5 [ok] peak    2.32 MiB  result=0 len=65483 "1604 SWA names joined by ','"
+        51.05 ms median of 5 [ok] peak    4.40 MiB  result=0 len=65536 "'e ' x 32768"
+        45.99 ms median of 5 [ok] peak    0.66 MiB  result=0 len=65536 "'a' x 65536"
+        70.43 ms median of 5 [ok] peak    6.63 MiB  result=0 len=65536 "'1a' x 32768"
+        45.46 ms median of 5 [ok] peak    0.66 MiB  result=0 len=65536 "'é' x 65536"
+        52.33 ms median of 5 [ok] peak    4.40 MiB  result=0 len=65520 "'a b c ... z ' x 1260"
+        55.29 ms median of 5 [ok] peak    6.04 MiB  result=0 len=65536 "'😀' x 65536"
+        17.68 ms median of 5 [ok] peak    0.06 MiB  result=20 len=65005 "65,000 spaces + 'VALUE' (stripped 5 chars: ranked)"
+         0.39 ms median of 5 [ok] peak    0.00 MiB  result=0 len=64300 "32,000 spaces + 'a' x 300 + 32,000 spaces"
+         0.19 ms median of 5 [ok] peak    0.00 MiB  result=0 len=257 "'a' x 257 (just over)"
+
+=== REF prepared; length check first (CAP_FIRST); limit 20; load (2.58740234375, 4.88818359375, 5.1962890625)
+         0.01 ms median of 5 [ok] peak    0.00 MiB  result=0 len=65483 "1604 SWA names joined by ','"
+         0.01 ms median of 5 [ok] peak    0.06 MiB  result=0 len=65536 "'e ' x 32768"
+         0.01 ms median of 5 [ok] peak    0.00 MiB  result=0 len=65536 "'a' x 65536"
+         0.01 ms median of 5 [ok] peak    0.00 MiB  result=0 len=65536 "'1a' x 32768"
+         0.01 ms median of 5 [ok] peak    0.00 MiB  result=0 len=65536 "'é' x 65536"
+         0.02 ms median of 5 [ok] peak    0.06 MiB  result=0 len=65520 "'a b c ... z ' x 1260"
+         0.01 ms median of 5 [ok] peak    0.00 MiB  result=0 len=65536 "'😀' x 65536"
+        17.68 ms median of 5 [ok] peak    0.06 MiB  result=20 len=65005 "65,000 spaces + 'VALUE' (stripped 5 chars: ranked)"
+         0.18 ms median of 5 [ok] peak    0.00 MiB  result=0 len=64300 "32,000 spaces + 'a' x 300 + 32,000 spaces"
+         0.01 ms median of 5 [ok] peak    0.00 MiB  result=0 len=257 "'a' x 257 (just over)"
+
+load after = (2.5400390625, 4.83984375, 5.1787109375)
