@@ -17,3 +17,9 @@ Worktree `C:\Users\jjgh8\Github\s19_app-b103-inc11-code`, branch `b103-inc11-cod
 5. **Cleanup.** Delete `/tmp/b103-int11` and keep `~/work/b103-int11` for E5. Kill processes by PID only. On this PC, run only git and ssh, and no Python.
 
 **Report** (≤ 120 words): pass/fail counts per run, each failure with its cause, and the READ.52 ratio.
+
+## Run 2 (the first run timed out at 90 min: the ssh link was cut during (a), and (d) was left running)
+
+- **Never hold a long run on one ssh link.** On the runner, start each run with `nohup … > /tmp/b103-int11/<run>.log 2>&1 &`, record its PID, poll with a short ssh every few minutes, and fetch the log when it ends. Use `-n 8` (xdist) for (a), (b) and (c).
+- **Order:** run (a) first. The partial transcript of run 1 shows many failures, so classify every failure (implementation or test, with the line) before you run (d). Run (d) only if time remains, and only for READ.52 plus the tester's perf file.
+- Save every transcript as `int-green2-*.txt`. In the report, list each failing test id with its one-line cause.
