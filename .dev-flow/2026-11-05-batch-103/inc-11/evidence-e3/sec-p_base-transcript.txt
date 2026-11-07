@@ -1,0 +1,48 @@
+A2L section tree has structural errors: path=/tmp/b103-e3-11-security/work/x.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/tmp/b103-e3-11-security/work/H2.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/tmp/b103-e3-11-security/work/H3.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/tmp/b103-e3-11-security/work/H5.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=/tmp/b103-e3-11-security/work/H10.a2l sample=Line 13: /end without /begin; Line 14: /end without /begin; Line 15: /end without /begin
+A2L section tree has structural errors: path=/tmp/b103-e3-11-security/work/H13.a2l sample=Unclosed /begin sections detected.
+s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+python 3.11.18 recursionlimit 1000
+[B1] comment glue in CHARACTERISTIC header (TC-097 class) | tags=[('XG', [{'address': '0x1c2d3e004026', 'length': 2, 'bit_org': None, 'effective_byte_order': 'little', 'matrix_dim': None, 'char_type': 'VALUE', 'deposit': 'RL_U16'}])] | errors=[] n_err=0 | 0.000s
+[B2] underscore glue in header address (int(x,0)) | tags=[('XU', [{'address': '0x1c2d3e004026', 'length': 2, 'bit_org': None, 'effective_byte_order': 'little', 'matrix_dim': None, 'char_type': 'VALUE', 'deposit': 'RL_U16'}])] | errors=[] n_err=0 | 0.000s
+[B3] header address 0x2000 and body ECU_ADDRESS 0x3000 disagree (CHARACTERISTIC) | tags=[('XD', [{'address': '0x3000', 'length': 2, 'bit_org': None, 'effective_byte_order': 'little', 'matrix_dim': None, 'char_type': 'VALUE', 'deposit': 'RL_U16'}])] | errors=[] n_err=0 | 0.000s
+[B3b] header address 0x2000 and body ECU_ADDRESS non-number 0x30_00 | tags=[('XD2', [{'address': None, 'length': 2, 'bit_org': None, 'effective_byte_order': 'little', 'matrix_dim': None, 'char_type': 'VALUE', 'deposit': 'RL_U16'}])] | errors=[] n_err=0 | 0.000s
+[B4] ECU_ADDRESS twice (MEASUREMENT), different values | tags=[('XE', [{'address': '0x20', 'length': 2, 'bit_org': None, 'effective_byte_order': 'little', 'matrix_dim': None, 'char_type': None, 'deposit': None}])] | errors=[] n_err=0 | 0.000s
+[B5] LENGTH twice / DATA_SIZE 2 + LENGTH 8 (MEASUREMENT) | tags=[('XL', [{'address': '0x10', 'length': 8, 'bit_org': None, 'effective_byte_order': 'little', 'matrix_dim': None, 'char_type': None, 'deposit': None}]), ('XL2', [{'address': '0x20', 'length': 8, 'bit_org': None, 'effective_byte_order': 'little', 'matrix_dim': None, 'char_type': None, 'deposit': None}])] | errors=[] n_err=0 | 0.000s
+[B6] VALUE on RL_U16 with LENGTH 4 (LENGTH vs datatype size disagree) | tags=[('XV', [{'address': '0x40', 'length': 4, 'bit_org': None, 'effective_byte_order': 'little', 'matrix_dim': None, 'char_type': 'VALUE', 'deposit': 'RL_U16'}])] | errors=[] n_err=0 | 0.000s
+[B7] BIT_MASK twice, different masks | tags=[('XB', [{'address': '0x50', 'length': 2, 'bit_org': '0xF0', 'effective_byte_order': 'little', 'matrix_dim': None, 'char_type': None, 'deposit': None}])] | errors=[] n_err=0 | 0.000s
+[B8] BYTE_ORDER missing its argument on its own line, then BIT_MASK 0x0FF0 (base: line-based) | tags=[('XA1', [{'address': '0x60', 'length': 2, 'bit_org': '0x0FF0', 'effective_byte_order': 'little', 'matrix_dim': None, 'char_type': None, 'deposit': None}])] | errors=[] n_err=0 | 0.000s
+[B9] ECU_ADDRESS_EXTENSION missing its argument, then ECU_ADDRESS 0x1234 | tags=[('XA2', [{'address': '0x1234', 'length': 2, 'bit_org': None, 'effective_byte_order': 'little', 'matrix_dim': None, 'char_type': None, 'deposit': None}])] | errors=[] n_err=0 | 0.000s
+[B10] MATRIX_DIM with a non-number word (base: matrix=1 silently) | tags=[('XM1', [{'address': '0x70', 'length': 2, 'bit_org': None, 'effective_byte_order': 'little', 'matrix_dim': None, 'char_type': None, 'deposit': None}])] | errors=[] n_err=0 | 0.000s
+[B11] MATRIX_DIM three 20-digit numbers (product overflow, base takes first) | tags=[('XM2', [{'address': '0x80', 'length': 199999999999999999998, 'bit_org': None, 'effective_byte_order': 'little', 'matrix_dim': 99999999999999999999, 'char_type': None, 'deposit': None}])] | errors=[] n_err=0 | 0.000s
+[B12] LENGTH 99999999999 MEASUREMENT (base keeps it; enrich byte_size; picker/PE size) | tags=[('XH', [{'address': '0x90', 'length': 99999999999, 'bit_org': None, 'effective_byte_order': 'little', 'matrix_dim': None, 'char_type': None, 'deposit': None}])] | errors=[] n_err=0 | 0.000s
+[B12-pe] base enriched byte_size=[99999999999] -> picker size int(byte_size or 1)=99999999999 -> PE: over cap, Bytes not prefilled; after Inc 11 (length None, READ.38) -> int(None or 1)=1 -> PE prefills 1 byte, Fmt 'u8'
+[B13] unclosed object at EOF, last word truncated (ECU_ADDRESS 0x12 of 0x1234) | tags=[] | errors=[] n_err=0 | 0.000s
+[B13] truncated file: tags=[{'address': '0x12', 'length': 2, 'bit_org': None, 'effective_byte_order': 'little', 'matrix_dim': None, 'char_type': None, 'deposit': None}] errors=['Unclosed /begin sections detected.'] exc=None
+[B14] nested-looking comment: object meant to be commented out stays live; base gives no error | tags=[('XN', [{'address': '0xdead', 'length': 2, 'bit_org': None, 'effective_byte_order': 'little', 'matrix_dim': None, 'char_type': None, 'deposit': None}])] | errors=[] n_err=0 | 0.000s
+[H1] nesting depth 1100 (/begin A per line) | exc=RecursionError: maximum recursion depth exceeded tags=None n_err=None first_err=[None] | parse 0.002s | None
+[H1-900] nesting depth 900 | exc=None tags=0 n_err=0 first_err=[] | parse 0.003s | render ok 834238 chars 0.002s
+[H1-990] nesting depth 990 | exc=None tags=0 n_err=0 first_err=[] | parse 0.003s | render ok 1006858 chars 0.002s
+[H1-where] parse exc=RecursionError: maximum recursion depth exceeded
+[H1-where] build_section_tree ok, errors=[]
+[H1-where] extract_record_layouts raises RecursionError
+[H1-where] extract_a2l_tags raises RecursionError
+[H1-where] extract_memory_segments raises RecursionError
+[H1-where] iter_section_lines raises RecursionError
+[H2] unterminated block comment at EOF inside a CHARACTERISTIC | exc=None tags=1 n_err=1 first_err=['Unclosed /begin sections detected.'] | parse 0.000s | render ok 54 chars 0.000s
+[H3] unterminated string at EOF | exc=None tags=1 n_err=1 first_err=['Unclosed /begin sections detected.'] | parse 0.000s | render ok 54 chars 0.000s
+[H4] // at EOF without newline | exc=None tags=1 n_err=0 first_err=[] | parse 0.000s | render ok 318 chars 0.000s
+[H5] escape at EOF inside a string | exc=None tags=1 n_err=1 first_err=['Unclosed /begin sections detected.'] | parse 0.000s | render ok 54 chars 0.000s
+[H6] NUL bytes | exc=None tags=1 n_err=0 first_err=[] | parse 0.000s | render ok 311 chars 0.000s
+[H7] UTF-16 LE BOM | exc=None tags=0 n_err=0 first_err=[] | parse 0.000s | render ok 22 chars 0.000s
+[H8] Latin-1 byte in a name word | exc=None tags=1 n_err=0 first_err=[] | parse 0.000s | render ok 320 chars 0.000s
+[H9] CR-only line ends | exc=None tags=1 n_err=0 first_err=[] | parse 0.000s | render ok 320 chars 0.000s
+[H10] 200000 stray /end lines (error flood on base) | exc=None tags=0 n_err=200000 first_err=['Line 13: /end without /begin'] | parse 0.085s | render ok 6888969 chars 0.027s
+[H11] 300000 tiny sections, one per line pair | exc=None tags=0 n_err=0 first_err=[] | parse 1.062s | render ok 8889174 chars 0.161s
+[H12] 20 MB single body line | exc=None tags=1 n_err=0 first_err=[] | parse 0.672s | render ok 318 chars 0.000s
+[H13] /begin without /end x 50000 (every line) | exc=RecursionError: maximum recursion depth exceeded tags=None n_err=None first_err=[None] | parse 0.079s | None
+[H14] huge quoted long identifier over one line (5 MB) | exc=None tags=1 n_err=0 first_err=[] | parse 0.318s | render ok 5000320 chars 0.004s
+[peak] ru_maxrss_MB 1098
