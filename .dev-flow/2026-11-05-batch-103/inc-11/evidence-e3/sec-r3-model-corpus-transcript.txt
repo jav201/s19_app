@@ -1,0 +1,10 @@
+# scripts/sec-r3-p_r3_model.py corpus 2026-11-07T01:35:59-06:00 host cachyos-rtx clone e07fb00f status 0 changed; corpus files 168 (read-only); load 0.94 0.81 1.24
+[CORP3] files=158 utf16_bom=0 tags=255734 with_address=255460 with_length=241205 own_words_max=61 refused={} exceptions=0 s=90
+[CORP3] 1221 x ('byte_order_arg', 'ok')
+[CORP3] 85 x ('byte_order_arg_in_MOD_COMMON', 'ok')
+[CORP3] 71 x ('byte_order_arg_in_other_section', 'ok')
+[CORP3] 9 x ('surplus_word', 'ECU_ADDRESS', 'identifier')
+[CORP3-rule digit] tags that lose an address: 0; lose a length: 0 (against the records' rule 'number')
+[CORP3-rule hexlike] tags that lose an address: 0; lose a length: 0 (against the records' rule 'number')
+[CORP3-rule any] tags that lose an address: 7; lose a length: 0 (against the records' rule 'number')
+# exit 0 ; clone status after: 0 changed

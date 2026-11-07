@@ -88,3 +88,4 @@
 2026-11-07T01:16:25-06:00 Inc 11 round-2 correction done (Opus, 27 min); split: tag-table view rows → new Inc 12 (app.py, visible, operator approves captures); Inc 11 = reader only; round 3 next
 2026-11-07T01:26:53-06:00 E3 round 4 — Inc 3a security FAIL (E3S3-17 ALIGNMENT walk; E3S3-18 2a datatype re-scan); ruled: shared sections reduced once to fixed-size forms + a scaling row (×2 shared size ≤ 1.3× time), also for 2a's E5
 2026-11-07T01:30:38-06:00 E1 done — Inc 12 (split from Inc 11; Opus, 13 min): 4 rows (R-TUI-042a.2–.5), 16 cases + 2 AT; D-1..D-3 A; Inc 11 now 78 rows / 256 cases + 2 AT / 3 files
+2026-11-07T01:45:35-06:00 E3 done — Inc 11: security round 3 PASS-WITH-NOTES; E3A-17 moved to Inc 12; addenda (E3S-24 surplus rule, -27, -28) before E4

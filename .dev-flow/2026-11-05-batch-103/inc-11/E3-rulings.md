@@ -38,3 +38,11 @@ Correction applied (Opus, 27 min): 80 rows, 262 cases + 3 AT, 39 nodes; E3S-18 (
 - **Split accepted:** the tag-table view rows (R-TUI-042a.2 padding, .3 Tag cap, .4 Address/Length first and fixed — E3A-17 = E3S-20) leave Inc 11 for a **new Inc 12 — A2L tag table: no glued or cut values** (`app.py` only; visible change; the operator approves its before/after captures). Inc 11 is the reader only: `a2l.py`, `a2l_extract.py`, `a2l_definition.py`. Inc 12 also owns the open item "at 80–118 columns the capped Tag is cut unmarked — size the cap from the width left".
 - **Open in Inc 11:** `3E00` (no number word) still slips past E3S-24 — round 3 checks it.
 **Next:** round 3 on Inc 11 (reader items only), and Inc 12's E1 from the moved rows.
+
+## Round 3 rulings (2026-11-07T01:45:35-06:00, orchestrator Opus 5.5) — Inc 11 E3 done
+
+Round 3 (security): **PASS-WITH-NOTES** — E3S-18, -19, -21, -22, -23, -25 closed; E3S-24 open (`ECU_ADDRESS 0x1C2D 3E00` gives 0x1C2D with no error — the symbol entry and "Use parameter" use it); new MEDIUM E3S-27 (BYTE_ORDER fallback), E3S-28 (peak memory 6.7× the base reader's against READ.52's 2×), 1 MINOR, 1 INFO. The architect's only open MAJOR (E3A-17) moved to Inc 12 with its rows; its other findings are closed. **E3 is done for Inc 11**, with addenda applied before E4 (one Opus pass):
+- **E3S-24 (address integrity, treated as blocking for the write consumers):** the hex-like surplus rule — a word after an address argument that a number or hex continuation could be (`3E00`, `_4026`, …) is an error and the tag gets no address; cases with each shape.
+- **E3S-27:** the fix column (BYTE_ORDER fallback).
+- **E3S-28:** READ.52's memory clause holds as 2×: the design reaches it (the fix column's streaming change) or, if measured impossible, the orchestrator rules a restated bound with the measurement — no silent loosening.
+- MINOR / INFO: fix columns.
