@@ -1,0 +1,69 @@
+/home/javiergr/work/b103-int1a/s19_app/__init__.py
+====RUN-WINCI====
+ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 93%]
+sssss                                                                    [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_b103_clipboard_windows.py:129: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:148: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:175: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:246: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:307: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:342: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:416: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:435: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:454: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:478: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:496: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:527: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:565: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:583: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:642: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:666: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:692: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:716: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:739: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:767: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:785: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:813: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:831: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:860: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:893: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:910: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:1033: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:1048: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:1063: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:1078: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:1098: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:1121: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:1146: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:1171: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:1204: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:1241: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:1270: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:1297: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:1334: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:1372: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:1401: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:1417: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:1448: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:1480: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:1496: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:1513: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:1545: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:1567: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:1590: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:1610: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:1651: Windows only
+77 skipped in 0.25s
+====RUN-LAWS====
+........................................................................ [ 91%]
+.F.....                                                                  [100%]
+=================================== FAILURES ===================================
+/home/javiergr/work/b103-int1a/tests/test_suite_hygiene.py:2053: AssertionError: unredacted batch records or evidence:
+============================= QC-TM timing margins =============================
+49.8%  0.201 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+66.4%  0.503 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 2 bounds, 0 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_suite_hygiene.py::test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses
+1 failed, 78 passed in 211.38s (0:03:31)
