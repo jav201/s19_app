@@ -54,8 +54,8 @@
       "reason": "batch 2026-11-01-batch-101 opened by rollover from 2026-10-26-batch-100 (closed at P6, synced, tag v1.0.0-rc1); mode full by the operator's standing rule and the release decision of 2026-11-01"
     }
   ],
-  "current_station": "P5",
-  "phase_status": "not-started",
+  "current_station": "P6",
+  "phase_status": "awaiting-sync",
   "stations_active": [
     "P0",
     "ARQ",
@@ -257,6 +257,11 @@
       "station": "P4",
       "date": "2026-11-07",
       "decision": "P5 close: batch-101 closed. 16 increments (with splits 10a/10b, 12/12b) merged; close record 05-close.md (backlog reconciled into BACKLOG-CODE.md; the canon fold of the batch's user stories into REQUIREMENTS.md; the requirement rows handed to the requirements session in close/FORWARD-requirements-session.md, 273 rows); review page close/review-b101.html; version 1.0.0; the operator approved the v1.0.0 tag in advance on 2026-11-07 without reading the review page (05-close.md, Operator decision)."
+    },
+    {
+      "station": "P5",
+      "date": "2026-11-07",
+      "decision": "P6 docs: 06-docs/ written (traceability matrix, executive summary, functionality, diagrams); the batch is ready for /dev-flow-sync."
     }
   ],
   "obsidian_synced": false,
