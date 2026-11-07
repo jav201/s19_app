@@ -1,0 +1,7 @@
+s19_app.__file__ = /home/javiergr/work/b103-int2a/s19_app/__init__.py
+[G1] NO_AXIS_PTS_X UBYTE = 08: ('count', 8); _decode_axis read 8 points
+[G1] NO_AXIS_PTS_X FLOAT16_IEEE = an IEEE half 8.0 (48 00 big): RAISE TypeError: '>' not supported between instances of 'NoneType' and 'int'
+[G1] NO_AXIS_PTS_X FLOAT32_IEEE = 8.0 (41 00 00 00 big): ('count', 8.0); _decode_axis range() -> TypeError: 'float' object cannot be interpreted as an integer
+[G1] NO_AXIS_PTS_X FLOAT32_IEEE = NaN (7F C0 00 00 big): ('count', nan); _decode_axis range() -> TypeError: 'float' object cannot be interpreted as an integer
+[G1] NO_AXIS_PTS_X FLOAT64_IEEE = +inf (7F F0.. big): ('refusal', 'A2L-DEF-AXIS-CURRENT', inf)
+[G2] the graph's component datatype whitelist includes the float types: True True (a NO_AXIS_PTS_X FLOAT16_IEEE / FLOAT32_IEEE passes the R-A2L-DEF.86 datatype check)

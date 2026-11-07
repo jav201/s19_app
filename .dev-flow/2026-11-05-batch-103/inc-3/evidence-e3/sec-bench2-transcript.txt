@@ -1,0 +1,3 @@
+A2L section tree has structural errors: path=/home/javiergr/work/b103-int2a/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+s19_app.__file__ = /home/javiergr/work/b103-int2a/s19_app/__init__.py
+[B7] per element: replace of the 30-field Definition 8.98 us; Inc 2a read + conversion + display 3.67 us
