@@ -1,10 +1,10 @@
 # Code-Wire graph — Inc 11 (A2L reader: comments, quoted strings, line ends, one-line IF_DATA, INSTANCE/BLOB; the tag-table padding), batch-103
 
-Stage E2 of `dev-flow-v3-beta`. Graph only: no stub, mark or declaration in any tree. Base `05e43d8a` on `batch-103` (product tree `main` `e07fb00`). Requirements `../01-requirements.md` (60 rows), cases `../02-test-cases.md`, rulings `../E1-rulings.md` (all of D-1 … D-12 accepted, its "Orchestrator rulings" section), slice `../E1-slice.md`, E1 evidence `../evidence-e1/`. Notation: Code-Wire v3.1.0 (`C:\Users\jjgh8\Github\code-wire`, tag `v3.1.0` = `e436a08`), `docs/Notation-Grammar.md`; layout as `b101-inc12:.dev-flow/2026-11-01-batch-101/inc-12/codewire/graph-inc12.md`. Corpus evidence (the orchestrator, 2026-11-06): `../../design/a2l-corpus/` (158 public files; only derived counts are cited, no file content).
+Stage E2 of `dev-flow-v3-beta`. Graph only: no stub, mark or declaration in any tree. Base `05e43d8a` on `batch-103` (product tree `main` `e07fb00`). Requirements `../01-requirements.md` (60 rows at E2; 62 after the E1 addendum), cases `../02-test-cases.md`, rulings `../E1-rulings.md` (all of D-1 … D-12 accepted, its "Orchestrator rulings" section), slice `../E1-slice.md`, E1 evidence `../evidence-e1/`. Notation: Code-Wire v3.1.0 (`C:\Users\jjgh8\Github\code-wire`, tag `v3.1.0` = `e436a08`), `docs/Notation-Grammar.md`; layout as `b101-inc12:.dev-flow/2026-11-01-batch-101/inc-12/codewire/graph-inc12.md`. Corpus evidence (the orchestrator, 2026-11-06): `../../design/a2l-corpus/` (158 public files; only derived counts are cited, no file content).
 
 How to read it:
 - One file holds the baseline and the prototype. Every node's `func:` starts with **unchanged**, **changed** (then "was: … / now: …"), **new** or **removed**. Context nodes (unchanged) are here because a changed node calls them, a consumer reads what they return, or they keep a canon row.
-- Example sources: the case ids of `02-test-cases.md` (`R-A2L-READ.7/1`, `AT-B103-I11-1`); `C` = the E1 census (`../evidence-e1/e1-repro-transcript.txt` tags `[RP-…]`, `e1-fixtures-transcript.txt` `[FX…]`, `e1-glue-transcript.txt` `[H…]`, `e1-widths-transcript.txt` `[W…]`); `K` = the E2 corpus reductions on the base reader (`evidence-e2/i11e2-corpus-shapes-transcript.txt`, tags `[K1]` … `[L1]`); `LS` = the E2 lexer model's outputs (`evidence-e2/i11e2-lexer-shapes-transcript.txt`; a throwaway feasibility model of `_lex_a2l_lines`, not product code); `P1`, `P2` = the E2 timing pilots (`evidence-e2/i11e2-pilot-time-transcript.txt`, `i11e2-pilot-time2-transcript.txt`); `X` = the extractor run (`evidence-e2/i11e2-extract-transcript.txt`); `R` = read in the code at `e07fb00`. Every example states the Inc 11 target unless it says "the base" or "holds on base".
+- Example sources: the case ids of `02-test-cases.md` (`R-A2L-READ.7/1`, `AT-B103-I11-1`); `C` = the E1 census (`../evidence-e1/e1-repro-transcript.txt` tags `[RP-…]`, `e1-fixtures-transcript.txt` `[FX…]`, `e1-glue-transcript.txt` `[H…]`, `e1-widths-transcript.txt` `[W…]`); `K` = the E2 corpus reductions on the base reader (`evidence-e2/i11e2-corpus-shapes-transcript.txt`, tags `[K1]` … `[L1]`); `LS` = the E2 lexer model's outputs (`evidence-e2/i11e2-lexer-shapes-transcript.txt`; a throwaway feasibility model of `_lex_a2l_lines`, not product code); `P1`, `P2` = the E2 timing pilots (`evidence-e2/i11e2-pilot-time-transcript.txt`, `i11e2-pilot-time2-transcript.txt`); `X` = the extractor run (`evidence-e2/i11e2-extract-transcript.txt`); `A` = the E1-addendum census (`../01-requirements.md` source A); `R` = read in the code at `e07fb00`. Every example states the Inc 11 target unless it says "the base" or "holds on base".
 - `HDR`, `MEAS(X, …)` and `SYNMAP` are the common fixtures of `02-test-cases.md`; `↵` is a line end. Every A2L text is synthetic.
 - **Canonical text**: a run of words joined by one space; a quoted word keeps its quotes and its escape pairs as in the file (`"a\"b"`), so `_split_line_respecting_quotes` reads it back as the same word. A **run** is the words of one source line that stand between two child sections, or between a child section and the line's start or end.
 
@@ -79,7 +79,7 @@ Extractor: Code-Wire v3.1.0 over a throwaway `git archive e07fb00 s19_app` copy,
 
 | Consumer | Reads | Change |
 |---|---|---|
-| A2L Explorer table (`app.py:20286-20473`) | the 16 cells | a blank column between cells (R-TUI-042a.2); the 122 listed tags; names, kinds and addresses of objects whose header stands on the `/begin` line (corpus classes 3–5); each of the 16 columns 2 cells wider, so fewer columns fit at 118 (PLAN backlog 5, Inc 7) |
+| A2L Explorer table (`app.py:20286-20473`) | the 16 cells | a blank column between cells (R-TUI-042a.2); the 226 listed tags (122 at E1, 226 after the E1 addendum); names, kinds and addresses of objects whose header stands on the `/begin` line (corpus classes 3–5); each of the 16 columns 2 cells wider, so fewer columns fit at 118 (PLAN backlog 5, Inc 7) |
 | A2L snapshot baselines (6 `a2l-*` SVGs, `tests/test_tui_snapshot.py:391-395`) | the painted A2L screen | drift from the padding; regenerated in the canonical CI env (G-T2) |
 | DOSSIER F-09 (`docs/user-guide/DOSSIER.md:718`) | the live defect "columns run together" | closed by R-TUI-042a.2 (the integrator marks it) |
 | Workspace A2L summary (`app.py:20147-20178`) | `render_a2l_view` | errors, then sections, then tags (R-A2L-076, .077); no comment text in section lines (.50); U+FFFD for control characters (.51); V171 lists its sections |
@@ -99,14 +99,14 @@ Extractor: Code-Wire v3.1.0 over a throwaway `git archive e07fb00 s19_app` copy,
 
 | Class (corpus count) | Reduction (K, base reading) | Fixed by | Row |
 |---|---|---|---|
-| 1 name `UNKNOWN` — `/begin` alone on its line, one word per line (137,243) | [K1] two such MEASUREMENTs → both `UNKNOWN`, no address, datatype None, one `A2L_DUPLICATE_SYMBOL`; [K1c] CHARACTERISTIC → `UNKNOWN`, address right | `_section_words` + `_tag_header` (the name is the first own word, any line) | READ.23 (covers it; threshold addendum PROPOSED, CG-1) |
-| 2 MEASUREMENT datatype None (121,299) | [K2] header one word per line → datatype None, length None | `_tag_header` (header words across line ends) + `parse_measurement_header` | READ.25 (covers it; CG-1) |
-| 3 CHARACTERISTIC kind misread, header on the `/begin` line (657) | [K3] → kind `ECU_ADDRESS_EXTENSION`, deposit `BYTE_ORDER` (the B6 salvage anchors on a body keyword) | `_tag_header` reads the header from `meta`; it stops at a keyword, so `_extended_kind_anchor` never sees a body keyword | READ.26, .27 |
-| 4 wrong address, header on the `/begin` line (805) | [K3] → `0x0`; [K4] `CUBE_5 0x123` → kind `NUMBER`, address `0x2710` | as class 3 | READ.26, .27 |
-| 5 address None, ECU_ADDRESS mid-line or after a comment (729) | [K5] one-line MEASUREMENT with a nested IF_DATA → address None, `Unclosed /begin sections detected.`; [K5b] `/* moved */ ECU_ADDRESS 0x1234` → None | `build_section_tree` (one-line sections close) + `_tag_keyword_lines` (a keyword anywhere among own words) + `_lex_a2l_lines` (no comment word) | R-A2L-001.1, READ.17, .30, R-A2L-001.2 |
-| 6 CHARACTERISTIC length None with its layout in the file (17,000) | [K6d] VALUE one word per line → 4 (holds on base); [K6] VAL_BLK on `RL_U16` with `MATRIX_DIM 4` → None; [K6b] VAL_BLK `NUMBER 4` → None; [K6c] ASCII `MATRIX_DIM 8` → None | partly: the header rule fixes the objects whose deposit word is lost (classes 1, 3); a VAL_BLK or ASCII on a layout whose name carries no size stays None — **no row** | CG-2, CG-3 (PROPOSED); CURVE/MAP/CUBE → CG-4 |
-| 7 short headers (19), `/begin` after code (1) | [K7] 4-word header → datatype None, no error; [K7b] two one-line INSTANCEs on one line → `Unclosed /begin sections detected.` | `extract_a2l_tags` (.28's error); `build_section_tree` | READ.28, R-A2L-001.1 |
-| Latin-1 input (11 files) | [L1] `0xB0` → U+FFFD in the long identifier and in the name word, 0 errors | `_lex_a2l_lines`: U+FFFD in a word gives .4's error; in a string or comment none | R-A2L-001.7 + READ.4; CG-5 (PROPOSED) |
+| 1 name `UNKNOWN` — `/begin` alone on its line, one word per line (137,243) | [K1] two such MEASUREMENTs → both `UNKNOWN`, no address, datatype None, one `A2L_DUPLICATE_SYMBOL`; [K1c] CHARACTERISTIC → `UNKNOWN`, address right | `_section_words` + `_tag_header` (the name is the first own word, any line) | READ.23/5, /6 (CG-1, applied) |
+| 2 MEASUREMENT datatype None (121,299) | [K2] header one word per line → datatype None, length None | `_tag_header` (header words across line ends) + `parse_measurement_header` | READ.25/5 (CG-1) |
+| 3 CHARACTERISTIC kind misread, header on the `/begin` line (657) | [K3] → kind `ECU_ADDRESS_EXTENSION`, deposit `BYTE_ORDER` (the B6 salvage anchors on a body keyword) | `_tag_header` reads the header from `meta`; it stops at a keyword, so `_extended_kind_anchor` never sees a body keyword | READ.26/4, .27/4 |
+| 4 wrong address, header on the `/begin` line (805) | [K3] → `0x0`; [K4] `CUBE_5 0x123` → kind `NUMBER`, address `0x2710` | as class 3 | READ.26/4, /5, .27/4, /5 |
+| 5 address None, ECU_ADDRESS mid-line or after a comment (729) | [K5] one-line MEASUREMENT with a nested IF_DATA → address None, `Unclosed /begin sections detected.`; [K5b] `/* moved */ ECU_ADDRESS 0x1234` → None | `build_section_tree` (one-line sections close) + `_tag_keyword_lines` (a keyword anywhere among own words) + `_lex_a2l_lines` (no comment word) | R-A2L-001.1, READ.17, .25/6, .30/3, R-A2L-001.2/9 |
+| 6 CHARACTERISTIC length None with its layout in the file (17,000) | [K6d] VALUE one word per line → 4 (holds on base); [K6] VAL_BLK on `RL_U16` with `MATRIX_DIM 4` → None; [K6b] VAL_BLK `NUMBER 4` → None; [K6c] ASCII `MATRIX_DIM 8` → None | partly: the header rule fixes the objects whose deposit word is lost (classes 1, 3); a VAL_BLK or ASCII on a layout whose name carries no size stays None — since the E1 addendum `_infer_length_characteristic` sizes such a VAL_BLK (CG-2, CG-3) | R-A2L-016/1 (CG-2), R-A2L-READ.53/1 (CG-3); [K6c] not applied (R-A2L-017 reads NUMBER); CURVE/MAP/CUBE → CG-4 (Inc 3a) |
+| 7 short headers (19), `/begin` after code (1) | [K7] 4-word header → datatype None, no error; [K7b] two one-line INSTANCEs on one line → `Unclosed /begin sections detected.` | `extract_a2l_tags` (.28's error); `build_section_tree` | READ.28/4, R-A2L-001.1/4 |
+| Latin-1 input (11 files) | [L1] `0xB0` → U+FFFD in the long identifier and in the name word, 0 errors | `_lex_a2l_lines`: U+FFFD in a word gives .4's error; in a string or comment none | R-A2L-001.7 + READ.4/4 (CG-5 A) |
 
 ### Corpus gaps — PROPOSED rows for the orchestrator (E1 addendum follows)
 
@@ -119,6 +119,8 @@ Extractor: Code-Wire v3.1.0 over a throwaway `git archive e07fb00 s19_app` copy,
 | CG-5 | Latin-1: (A, recommended) no new row — R-A2L-001.7 reads each non-UTF-8 byte as U+FFFD; inside a word R-A2L-READ.4 records `Line <n>: unexpected character U+FFFD`, inside a string or a comment nothing; the E5 corpus run counts these errors on the 11 files. (B) a second decode (cp1252) when UTF-8 fails — a second encoding path, refused for UTF-16 at D-3 | (A): [L1] → 1 error for `XL1_<U+FFFD>`, 0 for the comment and the long identifier | [L1] |
 | CG-6 | E5 evidence run (not a row, not a CI test): `run_corpus_differential` on the 158 files of `../../design/a2l-corpus/manifest.tsv` (sha256 checked first), on the runner only, next to the 35-file no-regression set | node `run_corpus_differential` | — |
 
+Ruled at E2 (`../E2-rulings.md`) and applied by the E1 addendum (2026-11-06): CG-1 (the 9 reductions K1 … K7b in the hostile corpus, now 153 shapes, and each as a case); CG-2 for R-A2L-016 only (R-A2L-017 reads its NUMBER line and is met on base, so its part and [K6c] were not applied: `../01-requirements.md` § G notes); CG-3 (R-A2L-READ.53); CG-4 to Inc 3a; CG-5 A (READ.4/4); CG-6 (`../02-test-cases.md` § E5 evidence). CG-2's census (`../01-requirements.md`, source A): 12 tracked VAL_BLKs on a layout whose name carries no size (9 already defect tags, 3 added), 101 tracked VAL_BLKs with a NUMBER and no MATRIX_DIM (added, READ.53), 0 such ASCII; R-A2L-READ.49's exceptions 122 → 226.
+
 ### Coverage — every requirement → node(s) and example(s)
 
 | Requirement | Node(s) | Example(s) |
@@ -126,10 +128,10 @@ Extractor: Code-Wire v3.1.0 over a throwaway `git archive e07fb00 s19_app` copy,
 | R-A2L-READ.1 | `_lex_a2l_lines`, `build_section_tree` | READ.1/1–/4 |
 | R-A2L-READ.2 | `_lex_a2l_lines`, `_split_line_respecting_quotes` | READ.2/1, /2 |
 | R-A2L-READ.3 | `_lex_a2l_lines`, `_number_word` | READ.3/1, /2 |
-| R-A2L-READ.4 | `_lex_a2l_lines` | READ.4/1–/3, [L1] |
+| R-A2L-READ.4 | `_lex_a2l_lines` | READ.4/1–/4 (/4 = [L1]) |
 | R-A2L-READ.5 | `build_section_tree` | READ.5/1, /2 |
 | R-A2L-READ.6 | `build_section_tree`, `parse_a2l_file` | READ.6/1, /2 |
-| R-A2L-001.2 | `_lex_a2l_lines`, `extract_a2l_tags` | 001.2/1–/8 |
+| R-A2L-001.2 | `_lex_a2l_lines`, `extract_a2l_tags` | 001.2/1–/9 (/9 = [K5b]) |
 | R-A2L-READ.7 | `_lex_a2l_lines`, `_strip_a2l_comments`, `extract_a2l_tags` | READ.7/1–/6 |
 | R-A2L-READ.8 | `_lex_a2l_lines` | READ.8/1, /2 |
 | R-A2L-READ.9 | `_lex_a2l_lines` | READ.9/1–/3 |
@@ -142,7 +144,7 @@ Extractor: Code-Wire v3.1.0 over a throwaway `git archive e07fb00 s19_app` copy,
 | R-A2L-READ.14 | `_lex_a2l_lines` | READ.14/1 |
 | R-A2L-READ.15 | `_lex_a2l_lines` | READ.15/1 |
 | R-A2L-READ.16 | `_lex_a2l_lines`, `_split_line_respecting_quotes`, `_line_words` | READ.16/1–/3 |
-| R-A2L-001.1 | `build_section_tree` | 001.1/1–/3, [K7b] |
+| R-A2L-001.1 | `build_section_tree` | 001.1/1–/4 (/4 = [K7b]) |
 | R-A2L-READ.17 | `build_section_tree` | READ.17/1–/3, [K5] |
 | R-A2L-READ.18 | `build_section_tree` | READ.18/1, /2 |
 | R-A2L-READ.19 | `build_section_tree` | READ.19/1, /2 |
@@ -151,14 +153,14 @@ Extractor: Code-Wire v3.1.0 over a throwaway `git archive e07fb00 s19_app` copy,
 | R-A2L-001.5 | `build_section_tree` | 001.5/1, /2 |
 | R-A2L-READ.21 | `build_section_tree` | READ.21/1 |
 | R-A2L-READ.22 | `build_section_tree` | READ.22/1, /2 |
-| R-A2L-READ.23 | `_section_words`, `_tag_header`, `extract_a2l_tags` | READ.23/1–/4, [K1], [K1c] |
+| R-A2L-READ.23 | `_section_words`, `_tag_header`, `extract_a2l_tags` | READ.23/1–/6 (/5 = [K1], /6 = [K1c]) |
 | R-A2L-READ.24 | `_tag_header` | READ.24/1, /2 |
-| R-A2L-READ.25 | `_tag_header`, `parse_measurement_header` | READ.25/1–/4, [K2], [K5] |
-| R-A2L-READ.26 | `_tag_header`, `_characteristic_from_tokens` | READ.26/1–/3, [K3], [K4] |
-| R-A2L-READ.27 | `_tag_header`, `parse_measurement_header` | READ.27/1–/3, [K3] |
-| R-A2L-READ.28 | `extract_a2l_tags` | READ.28/1–/3, [K7] |
+| R-A2L-READ.25 | `_tag_header`, `parse_measurement_header` | READ.25/1–/6 (/5 = [K2], /6 = [K5]) |
+| R-A2L-READ.26 | `_tag_header`, `_characteristic_from_tokens` | READ.26/1–/5 (/4 = [K3], /5 = [K4]) |
+| R-A2L-READ.27 | `_tag_header`, `parse_measurement_header` | READ.27/1–/5 (/4 = [K3], /5 = [K4]) |
+| R-A2L-READ.28 | `extract_a2l_tags` | READ.28/1–/4 (/4 = [K7]) |
 | R-A2L-READ.29 | `_tag_keyword_lines` | READ.29/1–/4 |
-| R-A2L-READ.30 | `_tag_keyword_lines` | READ.30/1, /2, [K5] |
+| R-A2L-READ.30 | `_tag_keyword_lines` | READ.30/1–/3 (/3 = [K5]) |
 | R-A2L-READ.31 | `_section_words`, `build_section_tree` | READ.31/1–/3 |
 | R-A2L-READ.32 | `extract_a2l_tags` | READ.32/1–/4 |
 | R-A2L-READ.33 | `_tag_keyword_lines`, `extract_a2l_tags` | READ.33/1, /2 |
@@ -167,11 +169,13 @@ Extractor: Code-Wire v3.1.0 over a throwaway `git archive e07fb00 s19_app` copy,
 | R-A2L-READ.36 | `_number_word`, `_characteristic_from_tokens`, `_extended_kind_anchor` | READ.36/1–/3, READ.7/1 |
 | R-A2L-READ.37 | `_tag_keyword_lines`, `_infer_length_measurement`, `_infer_length_characteristic` | READ.37/1, /2, READ.29/4 |
 | R-A2L-READ.38 | `_bounded_length`, `extract_a2l_tags` | READ.38/1–/3 |
-| R-A2L-READ.39 | `extract_a2l_tags` | READ.39/1 (4 of its 5 inputs; F-E2-3) |
+| R-A2L-READ.39 | `extract_a2l_tags` | READ.39/1 (4/4; F-E2-3 ruled at E2) |
+| R-A2L-016 | `_infer_length_characteristic`, `extract_declared_spans` | 016/1, /2; READ.43/2 |
+| R-A2L-READ.53 | `_infer_length_characteristic` | READ.53/1 |
 | R-A2L-READ.40 | `extract_declared_spans` | READ.40/1–/3 |
 | R-A2L-READ.41 | `extract_declared_spans` | READ.41/1 |
 | R-A2L-READ.42 | `extract_declared_spans` | READ.42/1, /2 |
-| R-A2L-READ.43 | `extract_declared_spans` | READ.43/1, /3; /2 with a fixture fix (F-E2-5) |
+| R-A2L-READ.43 | `extract_declared_spans` | READ.43/1–/3 (/2's fixture fixed at the E1 addendum, F-E2-5) |
 | R-A2L-READ.44 | `extract_declared_spans` | READ.44/1, /2 |
 | R-A2L-READ.45 | `extract_declared_spans` | READ.45/1–/3 |
 | R-A2L-READ.46 | `extract_declared_spans`, `_bounded_length` | READ.46/1, /2 |
@@ -184,7 +188,7 @@ Extractor: Code-Wire v3.1.0 over a throwaway `git archive e07fb00 s19_app` copy,
 | R-A2L-077 | `render_a2l_view` | 077/1 |
 | R-A2L-READ.52 | `build_section_tree`, `_lex_a2l_lines`, `parse_a2l_file` | READ.52/1 (base medians measured: P1, P2) |
 
-Requirements without an example: **none**. Two examples depend on a ruling: READ.39/1's `-5` input (F-E2-3) and READ.43/2's fixture (F-E2-5).
+Requirements without an example: **none**. READ.39/1 (F-E2-3) and READ.43/2 (F-E2-5) were ruled at E2 and applied by the E1 addendum.
 
 ### Node count
 
@@ -207,7 +211,7 @@ examples: (R-A2L-READ.2/1, /2, LS) `ECU_ADDRESS` then HT, VT or FF, then `0x1234
 examples: (R-A2L-READ.3/1, R-A2L-READ.4/1, LS) `["ECU_ADDRESS 0x1234<U+00A0>", "ECU_ADDRESS 0x1234<U+2028>"]` → the words `0x1234<U+00A0>` and `0x1234<U+2028>` kept whole; errors `Line 1: unexpected character U+00A0`, `Line 2: unexpected character U+2028` (the 9 characters of .3/1 the same, `U+0000` included)
 examples: (R-A2L-READ.3/2) `ECU_ADDRESS<U+00A0>0x1234` → one word `ECU_ADDRESS<U+00A0>0x1234` and its error (base: NBSP splits it, C [RP-A14])
 examples: (R-A2L-READ.4/2) `/* ° µ */` and `PHYS_UNIT "°C"` → errors `[]`
-examples: (R-A2L-READ.4/3, CG-5 [L1]) a Latin-1 `0xB0` read as U+FFFD (R-A2L-001.7): in `/* 20 <U+FFFD>C */` and `"Temp <U+FFFD>C"` → no error; in the word `XL1_<U+FFFD>` → `Line <n>: unexpected character U+FFFD` (base: 0 errors, K [L1])
+examples: (R-A2L-READ.4/4, CG-5 [L1]) a Latin-1 `0xB0` read as U+FFFD (R-A2L-001.7): in `/* 20 <U+FFFD>C */` and `"Temp <U+FFFD>C"` → no error; in the word `XL1_<U+FFFD>` → `Line <n>: unexpected character U+FFFD` (base: 0 errors, K [L1])
 examples: (R-A2L-READ.1/4, LS) `["A\r\r\nB\r\nC\rD"]` → `(1, "A")`, `(3, "B")`, `(4, "C")`, `(5, "D")`
 examples: (R-A2L-READ.8/1) `/* a /* b */ ECU_ADDRESS 0x1234` → `(1, "ECU_ADDRESS 0x1234")`
 examples: (R-A2L-READ.8/2, R-A2L-READ.11/2, LS) `/* a /* b */ c */ ECU_ADDRESS 0x1234` → `(1, "c */ ECU_ADDRESS 0x1234")`; errors `Line 1: */ without /*`
@@ -243,7 +247,7 @@ module: s19_app/tui/a2l.py
 examples: (R-A2L-001.1/1, Inc 2 J4) `MEAS(SX, " ECU_ADDRESS 0x10 /begin IF_DATA XCP", "  KP_BLOB 0x10", " /end IF_DATA", " BIT_MASK 0x0FF0")` → SX `meta` `SX ""`, `lines` `["UWORD CM_ID 0 0 0 65535", "ECU_ADDRESS 0x10", "", "BIT_MASK 0x0FF0"]`; its child IF_DATA `meta` `XCP`, `lines` `["KP_BLOB 0x10"]`; errors `[]` (base: IF_DATA never opened, C [RP-C-J4])
 examples: (R-A2L-001.1/2) `/* c */ /begin MEASUREMENT X ""` … → a MEASUREMENT section, `meta` `X ""`
 examples: (R-A2L-001.1/3) `MEAS(X, " ECU_ADDRESS 0x1234 /end MEASUREMENT")` with no `/end` line of its own → X closed on that line, `lines` end with `ECU_ADDRESS 0x1234`; errors `[]`
-examples: (R-A2L-001.1, [K7b]) `/begin INSTANCE IK7 "" T_U16 0x20 /end INSTANCE /begin INSTANCE IK7B "" T_U16 0x40 /end INSTANCE` on one line → two INSTANCE sections, `meta` `IK7 "" T_U16 0x20` and `IK7B "" T_U16 0x40`, both with `start_line` = `end_line`; errors `[]` (base: `Unclosed /begin sections detected.`, K)
+examples: (R-A2L-001.1/4, [K7b]) `/begin INSTANCE IK7 "" T_U16 0x20 /end INSTANCE /begin INSTANCE IK7B "" T_U16 0x40 /end INSTANCE` on one line → two INSTANCE sections, `meta` `IK7 "" T_U16 0x20` and `IK7B "" T_U16 0x40`, both with `start_line` = `end_line`; errors `[]` (base: `Unclosed /begin sections detected.`, K)
 examples: (R-A2L-READ.17/1) `ASAP2_Demo_V171.a2l` → errors `[]`; the 30 one-line IF_DATA closed on their line; every MEASUREMENT at depth `3` (base: `Unclosed /begin sections detected.`, MEASUREMENTs nested, C [CH])
 examples: (R-A2L-READ.17/2) RP-B13 → X's `lines` `["UWORD CM_ID 0 0 0 65535", "", "ECU_ADDRESS 0x1234"]`, its IF_DATA `meta` `ETK KP_BLOB 0x10 INTERN 1 RASTER 2`
 examples: (R-A2L-READ.17, [K5]) `/begin MEASUREMENT XK5 "d" FLOAT64_IEEE NO_COMPU_METHOD 0 0 -100 100  ECU_ADDRESS 0x18 ECU_ADDRESS_EXTENSION 3 READ_WRITE /begin IF_DATA XCP /begin DAQ_EVENT FIXED_EVENT_LIST EVENT 0x0 /end DAQ_EVENT /end IF_DATA /end MEASUREMENT` → XK5 `meta` `XK5 "d" FLOAT64_IEEE NO_COMPU_METHOD 0 0 -100 100 ECU_ADDRESS 0x18 ECU_ADDRESS_EXTENSION 3 READ_WRITE`, `lines` `[""]`, child IF_DATA › DAQ_EVENT; errors `[]` (base: `Unclosed /begin sections detected.`, K)
@@ -340,20 +344,20 @@ out: tuple(str name, Optional[str] long_identifier, list[str] header, int rest)
 func: new (DE-4). `name` = the first word (a quoted word without its quotes; `UNKNOWN` when there is none); `long_identifier` = the second word without its quotes when it is quoted (`None` when it is not quoted or is `""`; a `""` is still consumed); `header` = the next words, at most `_HEADER_WORDS[section_name]` (MEASUREMENT `6`, CHARACTERISTIC `7`, BLOB `2`, INSTANCE `2`, TYPEDEF_MEASUREMENT `6`, TYPEDEF_CHARACTERISTIC `6`, TYPEDEF_BLOB `1`, TYPEDEF_STRUCTURE `1`), ending before the first unquoted keyword of `_TAG_KEYWORD_ARITY` or the first place mark; `rest` = the index of the first word after the header.
 module: s19_app/tui/a2l.py
 examples: (R-A2L-READ.23/1) MEASUREMENT, the words of RP-B16 → (`X`, `None`, `["UWORD", "CM_ID", "0", "0", "0", "65535"]`, `8`)
-examples: (R-A2L-READ.23, [K1]) `/begin MEASUREMENT` ↵ `XK1` ↵ `"long id"` ↵ `UWORD` ↵ `CM_ID` ↵ `0` ↵ `0` ↵ `0` ↵ `65535` ↵ `ECU_ADDRESS` ↵ `0x1234` → (`XK1`, `long id`, `["UWORD", "CM_ID", "0", "0", "0", "65535"]`, `8`) (base: `UNKNOWN`, datatype None, no address, K)
-examples: (R-A2L-READ.23, [K1c]) CHARACTERISTIC `CK1` one word per line → (`CK1`, `long id`, `["VALUE", "0x2000", "RL_U16", "0", "CM_ID", "0", "65535"]`, `9`) (base: name `UNKNOWN`, K)
+examples: (R-A2L-READ.23/5, [K1]) `/begin MEASUREMENT` ↵ `XK1` ↵ `"long id"` ↵ `UWORD` ↵ `CM_ID` ↵ `0` ↵ `0` ↵ `0` ↵ `65535` ↵ `ECU_ADDRESS` ↵ `0x1234` → (`XK1`, `long id`, `["UWORD", "CM_ID", "0", "0", "0", "65535"]`, `8`) (base: `UNKNOWN`, datatype None, no address, K)
+examples: (R-A2L-READ.23/6, [K1c]) CHARACTERISTIC `CK1` one word per line → (`CK1`, `long id`, `["VALUE", "0x2000", "RL_U16", "0", "CM_ID", "0", "65535"]`, `9`) (base: name `UNKNOWN`, K)
 examples: (R-A2L-READ.23/2, /3) RP-B19 `/begin MEASUREMENT /* c */ X ""` and RP-B18 `X/*c*/ ""` → name `X`
 examples: (R-A2L-READ.24/1) V171 `ASAM.M.SCALAR.UBYTE.IDENTICAL` (long identifier on the next line) → long identifier `Scalar measurement` (base: `None`, C [FX-other])
 examples: (R-A2L-READ.24/2) `case_07_stress_smoke/firmware.a2l` → `long_identifier` `None` for 12/12 tags, `header` `[]`
 examples: (R-A2L-001.3.1/1, /3) `X "a b"` → long identifier `a b`; `X "x/*y*/z"` → `x/*y*/z`
 examples: (R-A2L-001.3.1/2) `X ""` → long identifier `None`, rest after the `""`
 examples: (R-A2L-READ.25/1) BalanceTube `model.MainClass.gameController.sm` (header over 6 commented lines) → header `["UBYTE", "esdl_model_GameControllerStatemachineStates", "1", "100.0", "0", "3"]` (Inc 2 B2 P1b)
-examples: (R-A2L-READ.25, [K2]) `/begin MEASUREMENT XK2 ""` ↵ `UWORD` ↵ `CM_ID` ↵ `0` ↵ `0` ↵ `0` ↵ `65535` ↵ `ECU_ADDRESS 0x1234` → header `["UWORD", "CM_ID", "0", "0", "0", "65535"]` (base: datatype None, length None, K)
+examples: (R-A2L-READ.25/5, [K2]) `/begin MEASUREMENT XK2 ""` ↵ `UWORD` ↵ `CM_ID` ↵ `0` ↵ `0` ↵ `0` ↵ `65535` ↵ `ECU_ADDRESS 0x1234` → header `["UWORD", "CM_ID", "0", "0", "0", "65535"]` (base: datatype None, length None, K)
 examples: (R-A2L-READ.25/3, RP-B14) `/begin MEASUREMENT X "" UWORD CM_ID 0 0 0 65535` → header from `meta`: `["UWORD", "CM_ID", "0", "0", "0", "65535"]`
 examples: (R-A2L-READ.26/1, RP-B23) `/begin CHARACTERISTIC X "d" VALUE 0x2000 RL_U16 0 CM_ID 0 65535` → (`X`, `d`, `["VALUE", "0x2000", "RL_U16", "0", "CM_ID", "0", "65535"]`, `9`)
 examples: (R-A2L-READ.26/3, RP-B21) `VALUE 0x2000/*c*/RL_U16 0 CM_ID 0 65535` → header `["VALUE", "0x2000", "RL_U16", "0", "CM_ID", "0", "65535"]`
-examples: (R-A2L-READ.26, R-A2L-READ.27, [K3]) `/begin CHARACTERISTIC CK3 "d" VALUE 0x1000 RL_U16 0 CM_ID 100 10000` ↵ `ECU_ADDRESS_EXTENSION 0` ↵ `BYTE_ORDER MSB_LAST` … → header `["VALUE", "0x1000", "RL_U16", "0", "CM_ID", "100", "10000"]`; `ECU_ADDRESS_EXTENSION` never a header word (base: kind `ECU_ADDRESS_EXTENSION`, address `0x0`, deposit `BYTE_ORDER`, K)
-examples: (R-A2L-READ.26, [K4]) `/begin CHARACTERISTIC CK4 "d" CUBE_5 0x123 RL_U16 1 CM_ID 0 10` ↵ `NUMBER 10000` … → header `["CUBE_5", "0x123", "RL_U16", "1", "CM_ID", "0", "10"]` (base: kind `NUMBER`, address `0x2710`, K)
+examples: (R-A2L-READ.26/4, R-A2L-READ.27/4, [K3]) `/begin CHARACTERISTIC CK3 "d" VALUE 0x1000 RL_U16 0 CM_ID 100 10000` ↵ `ECU_ADDRESS_EXTENSION 0` ↵ `BYTE_ORDER MSB_LAST` … → header `["VALUE", "0x1000", "RL_U16", "0", "CM_ID", "100", "10000"]`; `ECU_ADDRESS_EXTENSION` never a header word (base: kind `ECU_ADDRESS_EXTENSION`, address `0x0`, deposit `BYTE_ORDER`, K)
+examples: (R-A2L-READ.26/5, R-A2L-READ.27/5, [K4]) `/begin CHARACTERISTIC CK4 "d" CUBE_5 0x123 RL_U16 1 CM_ID 0 10` ↵ `NUMBER 10000` … → header `["CUBE_5", "0x123", "RL_U16", "1", "CM_ID", "0", "10"]` (base: kind `NUMBER`, address `0x2710`, K)
 examples: (R-A2L-READ.27/2, Inc 2 C) `UWORD CM_ID 0 0 0 BIT_MASK 0x0FF0` after `SX ""` → header `["UWORD", "CM_ID", "0", "0", "0"]` (5 words; BIT_MASK is the first keyword)
 examples: (R-A2L-READ.27/3) `/begin CHARACTERISTIC Q` ↵ `ECU_ADDRESS 0x10` ↵ `LENGTH 2` → (`Q`, `None`, `[]`, `1`)
 examples: (R-A2L-READ.27/1) case_07's MEASUREMENTs (no long identifier, no header) → header `[]` for 12/12
@@ -370,7 +374,7 @@ examples: (R-A2L-READ.29/3, Inc 2 N) `BIT_MASK` ↵ `0x0FF0` ↵ `ECU_ADDRESS 0x
 examples: (R-A2L-READ.29/4) `ECU_ADDRESS 0x10` ↵ `MATRIX_DIM 2` ↵ `3` → `[("ECU_ADDRESS 0x10", …), ("MATRIX_DIM 2 3", …)]`
 examples: (R-A2L-READ.30/1, RP-B12) `ECU_ADDRESS 0x1234 BYTE_ORDER MSB_LAST` → `[("ECU_ADDRESS 0x1234", 23), ("BYTE_ORDER MSB_LAST", 23)]` (base: byte order big, C [RP-B12])
 examples: (R-A2L-READ.30/2, Inc 2 J3) `/begin IF_DATA ETK KP_BLOB 0x10 /end IF_DATA BIT_MASK 0x0FF0` → `[…, ("BIT_MASK 0x0FF0", …)]`
-examples: (R-A2L-READ.30, [K5]) XK5's words after its header → `[("ECU_ADDRESS 0x18", 1), ("ECU_ADDRESS_EXTENSION 3", 1), ("READ_WRITE", 1)]`
+examples: (R-A2L-READ.30/3, [K5]) XK5's words after its header → `[("ECU_ADDRESS 0x18", 1), ("ECU_ADDRESS_EXTENSION 3", 1), ("READ_WRITE", 1)]`
 examples: (R-A2L-READ.33/2, RP-A29) `DISPLAY_IDENTIFIER XM_disp /* shown name */` → `("DISPLAY_IDENTIFIER XM_disp", …)`
 examples: (R-A2L-READ.37/2, RP-B26) `MATRIX_DIM 2 2` → `("MATRIX_DIM 2 2", …)`
 examples: (R-A2L-READ.31/3) a CURVE whose AXIS_DESCR holds `BYTE_ORDER MSB_LAST` → no `BYTE_ORDER` item (the axis words are the child's)
@@ -424,7 +428,7 @@ in: list[str] tokens
 out: Optional[int] anchor
 func: changed. was: the first token that is not a kind, not in `MEASUREMENT_BODY_KEYWORDS` and not an `int(x, 0)` number, followed by an `int(x, 0)` number and 6 more tokens. / now: `_number_word` in place of `int(x, 0)`; on header words only (via `_characteristic_from_tokens` from `extract_a2l_tags`).
 module: s19_app/tui/a2l.py
-examples: (R-A2L-READ.26, [K4]) `["CUBE_5", "0x123", "RL_U16", "1", "CM_ID", "0", "10"]` → `0` (kind `CUBE_5`, address `0x123`)
+examples: (R-A2L-READ.26/5, [K4]) `["CUBE_5", "0x123", "RL_U16", "1", "CM_ID", "0", "10"]` → `0` (kind `CUBE_5`, address `0x123`)
 examples: (the base, [K3]) on the body tokens `["ECU_ADDRESS_EXTENSION", "0", "BYTE_ORDER", "MSB_LAST", "PHYS_UNIT", "ms", "STEP_SIZE", "1"]` → `0`, which is the base defect (K); after Inc 11 these tokens never reach it
 
 _memory_segment_record_words
@@ -448,15 +452,17 @@ examples: (R-A2L-READ.29/4) `["MATRIX_DIM 2 3"]`, UWORD → `12`
 examples: (holds on base) `[]`, datatype `SWORD` → `2`
 
 _infer_length_characteristic
-req: R-A2L-READ.37, R-A2L-READ.36, R-A2L-READ.38, R-A2L-015, R-A2L-016, R-A2L-017
+req: R-A2L-READ.37, R-A2L-READ.36, R-A2L-READ.38, R-A2L-015, R-A2L-016, R-A2L-017, R-A2L-READ.53
 in: list[str] lines; Optional[dict] header; Optional[dict[str, dict]] record_layouts_by_name = None
 out: Optional[int] length
-func: changed. was: `LENGTH`, `MATRIX_DIM`, `NUMBER` by `int(parts[1], 0)`; the first MATRIX_DIM number. / now: `_tag_keyword_lines` texts; numbers by `_number_word`; MATRIX_DIM = the product; an unreadable LENGTH or NUMBER word → `None` (DE-6). The VALUE-only layout resolution stays (CG-2 would widen it).
+func: changed. was: `LENGTH`, `MATRIX_DIM`, `NUMBER` by `int(parts[1], 0)`; the first MATRIX_DIM number. / now: `_tag_keyword_lines` texts; numbers by `_number_word`; MATRIX_DIM = the product; an unreadable LENGTH or NUMBER word → `None` (DE-6). E1 addendum: the layout's datatype (CTX *datatype (CHARACTERISTIC)*) is resolved for VAL_BLK as for VALUE (CG-2, R-A2L-016); a VAL_BLK with a NUMBER and no MATRIX_DIM → the datatype's size × NUMBER (CG-3, R-A2L-READ.53); an ASCII as base (its NUMBER; [K6c] not ruled).
 module: s19_app/tui/a2l.py
-examples: (R-A2L-READ.37/1) V161 `ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR` (`MATRIX_DIM 3 4 1`) → `24` (base `6`)
+examples: (R-A2L-READ.37/1) V161 `ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR` (`MATRIX_DIM 3 4 1`, layout `RL.FNC.SWORD.ROW_DIR`) → `24` with R-A2L-016 (base `None`: the layout's name carries no size, `../01-requirements.md` source A)
 examples: (R-A2L-READ.38/2, H1) ASCII with `["NUMBER 1000000000000"]` → `1000000000000` (the caller caps it)
 examples: (holds on base, `tests/test_a2l_record_layout_length.py:53`) `[]`, VALUE on `_RL_U16` → `2`
-examples: (CG-2, [K6]) `["MATRIX_DIM 4"]`, VAL_BLK on `RL_U16` → `None` today and after Inc 11 unless CG-2 is accepted (then `8`)
+examples: (R-A2L-016/1, [K6]) `["MATRIX_DIM 4"]`, VAL_BLK on `RL_U16` (FNC_VALUES UWORD) → `8` (base `None`, K)
+examples: (R-A2L-016/2) V161 `ASAM.C.ARRAY.SWORD.MATRIX_DIM_6.ROW_DIR` (`MATRIX_DIM 6 1 1`, layout `RL.FNC.SWORD.ROW_DIR`) → `12` (base `None`, source A)
+examples: (R-A2L-READ.53/1, [K6b]) `["NUMBER 4"]`, VAL_BLK on `RL_U16`, no MATRIX_DIM → `8` (base `None`, K)
 
 extract_a2l_tags
 req: R-A2L-005.1, R-A2L-005.2, R-A2L-001.2, R-A2L-READ.7, R-A2L-READ.12, R-A2L-READ.23, R-A2L-READ.28, R-A2L-READ.30, R-A2L-READ.32, R-A2L-READ.33, R-A2L-READ.36, R-A2L-READ.38, R-A2L-READ.39
@@ -475,18 +481,18 @@ examples: (R-A2L-READ.7/1, H2a) SYNMAP-like CHARACTERISTIC `MAP 0x1C2D3E00/*c*/4
 examples: (R-A2L-READ.7/3 … /6, RP-B1, RP-B4, Inc 2 G, F) → address `4660`, `4660`; `bit_org` `0x0FF0`; upper limit `65535` and `bit_org` `0x0FF0`
 examples: (R-A2L-READ.12/1, AT-B103-I11-2) RP-B28 → exactly `1` tag `X`, address `4660` (base: 2 tags, the first `0x9999`, C [RP-B28])
 examples: (R-A2L-READ.23/4) V161 and V171 → a CHARACTERISTIC `ASAM.C.ASCII.UBYTE.NUMBER_42` at `0x810200` each; `0` tags `UNKNOWN`
-examples: (R-A2L-READ.23, [K1]) the two one-word-per-line MEASUREMENTs → `XK1` at `0x1234` and `XK1B` at `0x1236`, datatype `UWORD`, length `2`, description `long id`; no `A2L_DUPLICATE_SYMBOL` (base: both `UNKNOWN`, one duplicate issue, K)
-examples: (R-A2L-READ.26, [K3]) → `CK3` kind `VALUE`, address `0x1000`, deposit `RL_U16`, length `2`, byte order `little` (base: kind `ECU_ADDRESS_EXTENSION`, address `0x0`, K)
-examples: (R-A2L-READ.26, [K4]) → `CK4` kind `CUBE_5`, address `0x123`, deposit `RL_U16` (base: kind `NUMBER`, address `0x2710`, K)
-examples: (R-A2L-READ.30, [K5]) → `XK5` address `0x18`, datatype `FLOAT64_IEEE`, length `8`; errors `[]` (base: address None, `Unclosed …`, K)
-examples: (R-A2L-001.2/7, [K5b]) `/* moved */ ECU_ADDRESS 0x1234` → address `0x1234` (base: None, K)
+examples: (R-A2L-READ.23/5, [K1]) the two one-word-per-line MEASUREMENTs → `XK1` at `0x1234` and `XK1B` at `0x1236`, datatype `UWORD`, length `2`, description `long id`; no `A2L_DUPLICATE_SYMBOL` (base: both `UNKNOWN`, one duplicate issue, K)
+examples: (R-A2L-READ.26/4, [K3]) → `CK3` kind `VALUE`, address `0x1000`, deposit `RL_U16`, length `2`, byte order `little` (base: kind `ECU_ADDRESS_EXTENSION`, address `0x0`, K)
+examples: (R-A2L-READ.26/5, [K4]) → `CK4` kind `CUBE_5`, address `0x123`, deposit `RL_U16` (base: kind `NUMBER`, address `0x2710`, K)
+examples: (R-A2L-READ.30/3, R-A2L-READ.25/6, [K5]) → `XK5` address `0x18`, datatype `FLOAT64_IEEE`, length `8`; errors `[]` (base: address None, `Unclosed …`, K)
+examples: (R-A2L-001.2/9, [K5b]) `/* moved */ ECU_ADDRESS 0x1234` → address `0x1234` (base: None, K)
 examples: (R-A2L-READ.25/1) BalanceTube → 104/104 MEASUREMENTs with datatype and length (`model.MainClass.gameController.sm` `UBYTE`, `1`)
 examples: (R-A2L-READ.25/2) V161 and V171 `ASAM.M.VIRTUAL.SCALAR.SWORD.PHYSICAL` → datatype `SWORD`, length `2`, conversion `CM.VIRTUAL.EXTERNAL_VALUE`
 examples: (R-A2L-READ.26/1, RP-B23) → address `0x2000`, kind `VALUE`, deposit `RL_U16`
 examples: (R-A2L-READ.27/1) case_07 → 12/12 tags with their e07fb00 address, length, limits and unit
 examples: (R-A2L-READ.27/3) `/begin CHARACTERISTIC Q` ↵ `ECU_ADDRESS 0x10` ↵ `LENGTH 2` → address `16`, length `2`, no error
 examples: (R-A2L-READ.28/1, Inc 2 C, `/begin` on line 20) → `Line 20: MEASUREMENT SX has 5 of its 6 header words`; datatype `UWORD`, `bit_org` `0x0FF0`, upper limit `None`
-examples: (R-A2L-READ.28, [K7]) `/begin MEASUREMENT XK7 "" UWORD CM_ID 0 0` on line 20 → `Line 20: MEASUREMENT XK7 has 4 of its 6 header words`; datatype `UWORD`, length `2` (base: datatype None, no error, K)
+examples: (R-A2L-READ.28/4, [K7]) `/begin MEASUREMENT XK7 "" UWORD CM_ID 0 0` on line 20 → `Line 20: MEASUREMENT XK7 has 4 of its 6 header words`; datatype `UWORD`, length `2` (base: datatype None, no error, K)
 examples: (R-A2L-READ.28/2, H3c, `/begin` on line 20) → `Line 20: CHARACTERISTIC Synthetic map has 6 of its 7 header words`; address `None` (DE-7)
 examples: (R-A2L-READ.28/3, R-A2L-READ.32/4) the 35 tracked files → `0` such errors
 examples: (R-A2L-READ.32/1) `ECU_ADDRESS 0x10` line 22, `ECU_ADDRESS 0x20` line 23 → `Line 23: ECU_ADDRESS is declared twice in MEASUREMENT X`; address `32`
@@ -512,12 +518,12 @@ examples: (R-A2L-READ.40/3, RP-D4) a commented-out BLOB → `[]`
 examples: (R-A2L-READ.41/1) the 35 tracked files → `82` INSTANCE spans with their address words
 examples: (R-A2L-READ.42/1, /2, RP-D2, RP-D3) `I1 "" T_U16 0x10` → (`I1`, `INSTANCE`, `16`, `2`); `I2 "" T_U16 0x20` with `MATRIX_DIM 5` → length `10`
 examples: (R-A2L-READ.43/1) V171 `ASAM_I_SCALAR_VALUE_UWORD_SINGLE` → address `0x810000`, length `2`
-examples: (R-A2L-READ.43/2, F-E2-5) a VAL_BLK typedef on `RL_U16` with `MATRIX_DIM 3`, INSTANCE `MATRIX_DIM 2` → `12` only with CG-2 (the layout `RL_U16` names no size); with the case's `NUMBER 3` → `12` only with CG-3
+examples: (R-A2L-READ.43/2, F-E2-5 applied) a VAL_BLK typedef on `RL_U16` with `MATRIX_DIM 3`, INSTANCE `MATRIX_DIM 2` → `12` (R-A2L-016 with the layout's datatype, CG-2)
 examples: (R-A2L-READ.43/3) an ASCII typedef `NUMBER 8` → `8`
 examples: (R-A2L-READ.44/1, /2) `TYPEDEF_BLOB TB "" 6` → `6`; `TYPEDEF_STRUCTURE TS "" 12`, INSTANCE `MATRIX_DIM 3` → `36`
 examples: (R-A2L-READ.45/1 … /3) an INSTANCE of a TYPEDEF_AXIS, of a CURVE TYPEDEF_CHARACTERISTIC, of `T_NONE` → `length` `None` each (tracked: 1 TYPEDEF_AXIS, 2 unknown, C [FX-total])
 examples: (R-A2L-READ.46/1, /2) BLOB sizes `0` and `1048577` → `length` `None`; INSTANCE of T_U16 with `MATRIX_DIM 4294967296` → `None`
-examples: (R-A2L-READ.41, [K7b]) the two one-line INSTANCEs → `IK7` at `0x20`, `IK7B` at `0x40`, length `2` each
+examples: (R-A2L-READ.41, R-A2L-001.1/4, [K7b]) the two one-line INSTANCEs → `IK7` at `0x20`, `IK7B` at `0x40`, length `2` each
 
 parse_a2l_file
 req: R-A2L-READ.6, R-A2L-READ.39, R-A2L-READ.40, R-A2L-READ.48, R-A2L-READ.49, R-A2L-READ.52
@@ -528,7 +534,7 @@ module: s19_app/tui/a2l.py
 examples: (R-A2L-READ.6/1) a UTF-16 LE file → `errors` `["File is UTF-16 encoded; save it as UTF-8 and load it again."]`, `tags` `[]`, `declared_spans` `[]`
 examples: (R-A2L-READ.40/1) RP-D1 → `declared_spans` `[{"name": "B1", "kind": "BLOB", "address": 16, "length": 2}]`, `tags` without B1
 examples: (R-A2L-READ.48/1) the 35 tracked files → tags, spans and errors equal to `ref_read_a2l` on the compared fields, `0` differences, within `120` s on cachyos-rtx
-examples: (R-A2L-READ.49/1) the 35 tracked files → 234,532 tags identical to `[I/O: e07fb00 tag fixture]` on the six fields; the tag count per file equal (35/35); the 122 listed tags with REF's values
+examples: (R-A2L-READ.49/1) the 35 tracked files → 234,428 tags identical to `[I/O: e07fb00 tag fixture]` on the six fields; the tag count per file equal (35/35); the 226 listed tags with REF's values
 examples: (R-A2L-READ.17/1) V171 → `errors` `[]` (base `["Unclosed /begin sections detected."]`)
 examples: (R-A2L-READ.52/1) case_06 and software_a, median of 3 → at most `1.5` × the e07fb00 median measured in the same session (P2: base `5.898` s and `0.653` s)
 
@@ -572,7 +578,7 @@ out: list[ValidationIssue] issues
 func: unchanged (`validation/rules.py:463`, frozen). Errors → `A2L_STRUCTURE_ERROR`; a name on more than one tag → `A2L_DUPLICATE_SYMBOL`; GROUP/FUNCTION `lines` → `A2L_BROKEN_REFERENCE`. It sees Inc 11 only through the payload.
 module: s19_app/validation/rules.py
 examples: (R-A2L-READ.12/1) RP-B28 → `0` `A2L_DUPLICATE_SYMBOL` (base: `1`)
-examples: (R-A2L-READ.23, [K1]) → `0` `A2L_DUPLICATE_SYMBOL` (base: `A2L symbol 'unknown' is defined multiple times.`, K)
+examples: (R-A2L-READ.23/5, [K1]) → `0` `A2L_DUPLICATE_SYMBOL` (base: `A2L symbol 'unknown' is defined multiple times.`, K)
 
 iter_section_lines
 req: R-A2L-READ.50, R-A2L-READ.51, R-A2L-076
@@ -613,7 +619,7 @@ in: str text
 out: dict reading
 func: new, test side (G-T1; `tests/support/b103_a2l_ref.py`). The reference reading: imports nothing from `s19_app`; written from `../01-requirements.md` § Definitions and rows S2.1/S2.2 only, never from the reader's code. Its own lexer (a single regex pass over the whole text after the BOM and line-end normalisation: ASCII blanks; `/* … */` and `//` as word breaks; strings with escape pairs over line ends; stray `*/`; unexpected characters), its own tree (whole-word `/begin`/`/end` in any case, the keyword the next token, innermost close with the name check), its own header split (name; long identifier when quoted; 6 or 7 words to the first keyword or child; short MEASUREMENT headers by position, short CHARACTERISTIC headers giving no field, DE-7) and keyword reader (the arity list, MATRIX_DIM 1–3 numbers, last wins, duplicates), its own number words, cap and spans. Returns `{"tags": [{name, long_identifier, address, datatype, byte_order, bit_mask, matrix_dim, kind, deposit, conversion, length, axis_counts, record_layout}], "spans": [{name, kind, address, length}], "errors": [(text, line)]}`. The comparison is field by field on R-A2L-READ.48's list, errors as a sorted multiset. Shape model: `../evidence-e1/e1-census.py` (`ref_lex`, `ref_tree`, `split_header`, `ref_fields`); E4 writes its own, and its mutant check (`.2`, `.7`, `.12`, `.17` or `.25` reverted in the reader → ≥ 1 difference) proves it can fail.
 module: tests/support/b103_a2l_ref.py
-examples: (R-A2L-READ.48/2) the hostile corpus (144 shapes of `02-test-cases.md` + the 11 reductions K1 … L1, CG-1) → `0` differences, 155/155
+examples: (R-A2L-READ.48/2) the hostile corpus (the 153 shapes of `02-test-cases.md`: 144 + the 9 CG-1 reductions K1 … K7b) → `0` differences, 153/153
 examples: (R-A2L-READ.48/2) RP-B40 → errors `[("*/ without /*", <line>)]`, X's address `4660`
 examples: (R-A2L-READ.48 neg) the reader with `_tag_header` reading the name from `meta` only → [K1] differs (`UNKNOWN`) → RED
 
@@ -656,7 +662,7 @@ desc: I-11.7. Gains `extract_declared_spans`.
 desc: the file `build_section_tree` reads: UTF-8 (a BOM dropped), UTF-16 refused, LF/CRLF/CR line ends.
 
 [I/O: e07fb00 tag fixture]
-desc: `tests/fixtures/b103_i11/e07fb00_tags.jsonl`: for each of the 35 tracked files, its tag count and each tag's six fields (name, address, length, datatype, byte order, BIT_MASK word), taken on a clean checkout of `e07fb00` with the transcript kept (02-test-cases R-A2L-READ.49/1). The oracle of R-A2L-READ.49: 234,654 tags, of which 234,532 must stay identical; the exceptions are the 122 tags of `../01-requirements.md` "Defect tags at e07fb00" (BalanceTube 104, V161 6, V171 10, update_test1 1, update_test2 1), each taking REF's values. If CG-2 is accepted, every tracked VAL_BLK or ASCII on a layout whose name carries no size joins the exceptions (count owed by the E1 addendum).
+desc: `tests/fixtures/b103_i11/e07fb00_tags.jsonl`: for each of the 35 tracked files, its tag count and each tag's six fields (name, address, length, datatype, byte order, BIT_MASK word), taken on a clean checkout of `e07fb00` with the transcript kept (02-test-cases R-A2L-READ.49/1). The oracle of R-A2L-READ.49: 234,654 tags, of which 234,428 must stay identical; the exceptions are the 226 tags of `../01-requirements.md` "Defect tags at e07fb00" (BalanceTube 104, V161 7, V171 11, update_test1 2, update_test2 1, software_a 101), each taking REF's values. The E1 addendum's census (source A) added 3 VAL_BLKs (R-A2L-016) and 101 (R-A2L-READ.53); 0 tracked ASCII on a layout whose name carries no size.
 
 [I/O: public A2L corpus]
 desc: `~/a2l-corpus/files/` on cachyos-rtx only (licenses mixed: never copied into the repo); identity by `../../design/a2l-corpus/manifest.tsv` sha256.
@@ -710,7 +716,7 @@ anchor: extract_a2l_tags
 seen: R-A2L-READ.38/1 and .39/1 list `LENGTH -5` among the lengths below 1; R-A2L-READ.36/2 makes `-0x10` and `+16` no number word, so `-5` is no number either
 cause: a length that is not a number has no value to print in `<length>`
 effect: .39/1 cannot reach 5/5
-decision: PROPOSED — `LENGTH -5` gives no length (DE-6, meets .38/1) and no length error; .39/1 becomes 4/4 (0, 1048577, 99999999999, `NUMBER 1000000000000`)
+decision: PROPOSED — `LENGTH -5` gives no length (DE-6, meets .38/1) and no length error; .39/1 becomes 4/4 (0, 1048577, 99999999999, `NUMBER 1000000000000`). Ruled at E2; applied at the E1 addendum (R-A2L-READ.39's threshold 4/4, with the reason)
 
 finding F-E2-4 E1's REF model reads a short CHARACTERISTIC header by position
 anchor: ref_read_a2l
@@ -724,7 +730,7 @@ anchor: extract_declared_spans
 seen: the case's typedef is a VAL_BLK on `RL_U16` with `NUMBER 3`; R-A2L-016 sizes a VAL_BLK by MATRIX_DIM, and the base resolves a layout's datatype for VALUE only ([K6]: VAL_BLK on `RL_U16` → None)
 cause: two gaps, CG-2 and CG-3
 effect: the expected `12` is unreachable without CG-2 (and CG-3 for the NUMBER form)
-decision: PROPOSED — accept CG-2 (and CG-3), or change the case to a VAL_BLK on a layout whose name carries its size (e.g. `RL.FNC.UWORD.ROW_DIR` style with `__UWORD_Z`) with `MATRIX_DIM 3`
+decision: PROPOSED — accept CG-2 (and CG-3), or change the case to a VAL_BLK on a layout whose name carries its size (e.g. `RL.FNC.UWORD.ROW_DIR` style with `__UWORD_Z`) with `MATRIX_DIM 3`. Ruled at E2 (CG-2, CG-3 accepted); applied at the E1 addendum: the case's typedef is a VAL_BLK on `RL_U16` with `MATRIX_DIM 3`, sized by R-A2L-016 as R-A2L-READ.43 cites it
 
 finding F-E2-6 `_strip_a2l_comments` is pinned by Inc 3's graph
 anchor: _strip_a2l_comments
@@ -738,7 +744,7 @@ anchor: _infer_length_characteristic
 seen: [K6] VAL_BLK on `RL_U16` with `MATRIX_DIM 4` → length None; [K6c] ASCII `RL_U8` `MATRIX_DIM 8` → None (K); corpus `LEN_NONE_CHAR_VAL_BLK` 14,317
 cause: the layout's datatype is resolved for VALUE only (`a2l.py:1218-1229`); `sizeof_from_deposit` reads only names like `__UWORD_Z`
 effect: R-A2L-016/.017's "size of its datatype" is unmet for project-named layouts
-decision: CG-2 (PROPOSED, E1 addendum)
+decision: CG-2 (PROPOSED, E1 addendum). Ruled at E2; applied at the E1 addendum for R-A2L-016 (cited, code to meet). R-A2L-017 takes an ASCII's length from its NUMBER line, which the base meets, so its part and [K6c] (an ASCII sized by MATRIX_DIM) were not applied: a ruling is owed
 
 finding F-E2-8 two number-word rules in one module
 anchor: _number_word

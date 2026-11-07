@@ -8,7 +8,7 @@ Real callers come from `evidence-e1/e1-callers-transcript.txt`. That run used th
 
 | File | Functions | Rows |
 |---|---|---|
-| `s19_app/tui/a2l.py` (unfrozen, A2) | 19 changed; 4 new (below) | every R-A2L-READ row, R-A2L-001.1 … .5, R-A2L-076, .077 |
+| `s19_app/tui/a2l.py` (unfrozen, A2) | 19 changed; 4 new (below) | every R-A2L-READ row, R-A2L-001.1 … .5, R-A2L-016 (E1 addendum), R-A2L-076, .077 |
 | `s19_app/tui/app.py` | 1 changed: `S19TuiApp._compose_screen_a2l` (`:8456`; its argument at `:8520`) | R-TUI-042a.2 (D-1 A; with D-1 B this file leaves the slice) |
 | `s19_app/tui/a2l_extract.py` | its re-export list gains `extract_declared_spans` (`CLAUDE.md`: new public symbols in `a2l.py`, re-exported by the matching facade) | R-A2L-READ.40 … .46 (with D-8 B this file leaves the slice) |
 
@@ -33,7 +33,7 @@ Real callers come from `evidence-e1/e1-callers-transcript.txt`. That run used th
 | 13 | `_memory_segment_record_words` | `a2l.py:982` | Its own scanner removes a comment without a word break (`:1003-1040`) and uses `isspace`; it follows #20 | `extract_memory_segments.<locals>.walk` `:1091` | READ.2, .7; R-A2L-036.1 … .6 (cited) |
 | 14 | `extract_a2l_tags` (and its `walk`) | `a2l.py:2572` | Reads every keyword among the tag's own words, wherever it stands on its line, with its arguments across lines (arity list). Keywords inside comments or child sections are not read. A keyword declared twice gives the .32 error (D-6 A: the last wins). The display identifier is the word after DISPLAY_IDENTIFIER. Numbers via #21. | `parse_a2l_file` `:2834` | R-A2L-001.2; READ.12, .29 … .33, .36 |
 | 15 | `_infer_length_measurement` | `a2l.py:1164` | The MATRIX_DIM product; the length cap via #23 | `walk` `:2721` | READ.37, .38 |
-| 16 | `_infer_length_characteristic` | `a2l.py:1187` | The MATRIX_DIM product; NUMBER via #21; the cap | `walk` `:2723` | READ.37, .38 |
+| 16 | `_infer_length_characteristic` | `a2l.py:1187` | The MATRIX_DIM product; NUMBER via #21; the cap. E1 addendum: the layout's datatype (CTX *datatype (CHARACTERISTIC)*) resolved for VAL_BLK as for VALUE (`:1218-1229`, CG-2); a VAL_BLK with a NUMBER and no MATRIX_DIM sized by datatype × NUMBER (CG-3) | `walk` `:2723` | READ.37, .38, .53; R-A2L-016 |
 | 17 | `parse_a2l_file` | `a2l.py:2797` | The payload gains the key `declared_spans` (#22); the length errors join `errors` | `parse_a2l_cached` (`app.py:948`, `:950`); `run_flow` (`flow_execution_service.py:381`, `:500`); `execute_variant_plan` (`variant_execution_service.py:2665`) | READ.39, .40, .52 |
 | 18 | `iter_section_lines` | `a2l.py:3627` | Shows a section's header as its words joined by single spaces; control characters as U+FFFD | `render_a2l_view` `:3657` | READ.50, .51 |
 | 19 | `render_a2l_view` | `a2l.py:3644` | Lists the errors, then the sections, then the tags; no early return; U+FFFD in file words | `enrich_tags_and_render` (`services/a2l_service.py:26`) ← 5 callers (`app.py:20136`, `:18844`; `compare_service.py:305`; `variant_execution_service.py:2553`; `flow_execution_service.py:399`) | R-A2L-076, .077 (cited); READ.51 |

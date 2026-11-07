@@ -19,3 +19,9 @@ Graph: 32 nodes (8 new, 16 changed — 15 in `a2l.py`, 1 in `app.py` —, 1 remo
 | F-E2-2 | **to E3** (how READ.50's "header" is read). |
 
 **Next:** a short Opus E1 addendum (CG-1/2/3, F-E2-3/5 in the records), then E3 (architect + security) on Inc 11.
+
+## Rulings on the E1 addendum (2026-11-06T23:03:29-06:00, orchestrator Opus 5.5)
+
+Addendum applied (Opus, 15 min): 62 rows (new R-A2L-READ.53; R-A2L-016 cited, code to meet; term *datatype (CHARACTERISTIC)* with R-A2L-023's deposit-name fallback), 166 cases + 3 AT; READ.49's no-regression exceptions 122 → 226 (+3 VAL_BLK under 016, +101 under .53).
+- **R-A2L-017 / K6c:** R-A2L-017 changes in place: an ASCII CHARACTERISTIC's length is the number after NUMBER, else the product of its MATRIX_DIM numbers (ASAP2 1.7 form) — K6c traces to it.
+- **READ.53 vs R-A2L-013 (a VAL_BLK with both LENGTH and NUMBER):** fail closed — when an object's size keywords (MATRIX_DIM, NUMBER, LENGTH) give different sizes, the reader records a diagnostic and gives the object no length (downstream refusals follow); when they agree, that size. The E3 correction writes the row (next free READ id) and its cases.
