@@ -1,0 +1,5 @@
+# E3 round-3 correction unit G — Inc 2 graph (`inc-2/codewire/graph-inc2.md` only)
+
+Rules: `design/E3-corr-common.md` (N = `2`; no new row id). Authority: "## Round 3 rulings" at the end of `inc-2/E3-rulings.md`, then the "## Round 3" section of `inc-2/E3-security.md` (fix columns of E3S-24 … E3S-28).
+
+Apply to the graph only: `describe_definitions` / `_read_object_lines` compute *the text of the object* (as the CTX term defines it) and count the letters `BIT_MASK` in any letter case; more than one, or one with no mask read → `A2L-DEF-MASK` at the mask's place in the refusal order; a record that ends inside an open comment or quote → `A2L-DEF-MASK`. Remove the keyword clause and the `bit_org` cross-check nodes/steps the letters rule replaces. Examples for every round-3 shape (F, G, J1, L, L2, H, P) with the ids unit R gives (.19/10 … .19/14 or the fix column's numbering), .19/6 (E3S-25), .19/7 (E3S-27); the DEFC block's headers on their own body line if E3S-25 says so; the span wording (E3S-28). Update coverage rows and the node count. Append to `inc-2/steps.log`: `<ISO timestamp> E3 round-3 correction unit G — deepseek-v4-pro via pi — <n> findings applied`.

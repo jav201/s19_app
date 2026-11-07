@@ -45,3 +45,14 @@ Round 2: architect **PASS-WITH-NOTES** (round-1 MAJORs closed; new 2 MEDIUM, 7 M
 | all other round-2 findings (E3A-21, -23, -24, -28 … -31; E3S-16, -17, -18, -20, -21) | accept with their fix columns. |
 
 **Next:** one correction pass (records and graph), then a round-3 security re-check of E3S-14 and the parts the pass touched. The architect does not re-review (PASS-WITH-NOTES; its notes are applied in the same pass).
+
+## Round 3 rulings (2026-11-06T19:38:34-06:00, orchestrator Opus 5.5)
+
+Round 3 (security only): **FAIL** — E3S-14 narrowed, not closed; new MAJOR **E3S-24** (five shapes still lose the mask: a comment glued to the keyword, a one-line IF_DATA before the BIT_MASK line, `/begin` or `/end` inside a comment); MEDIUM E3S-25, E3S-26; MINOR E3S-27; LOW E3S-28. All **accepted with their fix columns**:
+
+- **E3S-24 (the rule that replaces the keyword clause and the `bit_org` cross-check):** R-A2L-DEF.19 gets one clause — "…or the text of the object holds the letters BIT_MASK, in any letter case, more than once, or once while the system read no bit mask" — with *the text of the object* defined in CTX-A2L-DEF exactly as the fix column defines it (its /begin line after the name and long identifier, its own lines, the lines of each child section that is not itself an object; comments and quoted strings included). Plus a refusal `A2L-DEF-MASK` when an object's record ends inside an open comment or an open quote. The reviewer's census: 0 objects refused that the graph accepts, over 234,654 objects in the 35 fixture files. Rationale: one guard on the raw letters fails closed for every tokenizer mistake, instead of guarding each shape (the skill's "prefer removing a feature over guarding it": two guards go, one stays).
+- **E3S-25:** .19/6's text as the fix column gives (header on its own body line); its negative control as written there.
+- **E3S-26:** covered by "more than once"; case .19/14 (shape P).
+- **E3S-27, E3S-28:** as their fix columns.
+
+**Next:** one correction pass (rows/cases; graph), then a round-4 security check that runs the reviewer's reference rule against the graph's text.
