@@ -91,3 +91,7 @@ Every fix column is accepted:
 - **E3A-23:** E5 writes the painted-tag-name exception into CTX-TEXT's views list (canon text at batch end).
 
 **Next:** a narrow correction, then round 4 only if a MAJOR remains open in what it changes. The reviewers confirm each fix by reading.
+- **Round-3 correction done** (Opus, 8 min). The orchestrator added "and no `is not a number` error" to READ.69/1 and /3 in `inc-11/02-test-cases.md`; the correction's scope excluded that file.
+  - **E3A-24 (INFO), recorded for E5:** `_card_value_text` is the product's first R-TUI-103.1 helper. When D-6 is fixed for the other safe-text views, move it to `utils.py` beside `safe_text` and reuse it; do not add a second helper.
+  - **Gate:** no MAJOR remains open in what the correction changed. Each round-3 fix applies its finding's own fix column, and the remaining items are records-only. **Inc 12's E3 is closed: PASS-WITH-NOTES by orchestrator ruling.** Round 4 is not run.
+  - **E4 waits for:** batch-101 Inc 10b on `main`, then `batch-103` rebased onto it (E3A-01 (3)); and Inc 11's reader, for the after-Inc-11 captures.
