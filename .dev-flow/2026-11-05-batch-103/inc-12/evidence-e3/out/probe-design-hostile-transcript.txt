@@ -1,0 +1,49 @@
+# probe design hostile transcript 2026-11-07T02:53:50-06:00 host cachyos-rtx
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e3-12-S/zq_iso_user; no DISPLAY; no clipboard; stdin closed; load: 20.52 17.00 14.68
+s19_app.__file__ = /tmp/b103-e3-12-S/design/s19_app/__init__.py | textual 8.2.8 | rich 15.0.0 | variant design | scenario hostile
+[design hostile 118x54] visible=60 scroll_x=0/96 scroll_y=0 cols: Address=12, Length=8, Tag=38, Source=9 | w=36 | rows=5 cursor_row=0 | builds=2 fits=2 fit_rebuilds=0
+[design hostile 118x54] row0|  0x1C2D3E00  2266    ✓ SYN_MAP_W                           f
+[design hostile 118x54] row0: Address=0x1C2D3E00:whole; Length=2266:whole; Tag ends at 32 (inside)
+[design hostile 118x54] row1|  0x00002000  2       · SYN_RLO_<U+202E>ABCDEFGH…XYZ0123456789<U+202C>_END  f
+[design hostile 118x54] row1: Address=0x00002000:whole; Length=2:whole; Tag ends at 57 (inside)
+[design hostile 118x54] row2|  0x00002010  2       · SYN_HEB_<U+05E9><U+05DD><U+05E9><U+05DD><U+05E9><U+05DD>_END                  f
+[design hostile 118x54] row2: Address=0x00002010:whole; Length=2:whole; Tag ends at 41 (inside)
+[design hostile 118x54] row3|  0x00002020  2       · SYN_ESC_]0;PWNED\_END               f
+[design hostile 118x54] row3: Address=0x00002020:whole; Length=2:whole; Tag ends at 44 (inside)
+[design hostile 118x54] row4|  0x00002030  2       · SYN_ZW_<U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B>ABCDEFGHI…XYZ0123456789<U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B>_END  f
+[design hostile 118x54] row4: Address=0x00002030:whole; Length=2:whole; Tag ends at 57 (inside)
+[design hostile 118x54] ROWS OK 5/5
+[design hostile 118] row0 name 'SYN_MAP_W': Address at x 1, first bidi opener at x -1; painted line opens 0 closes 0
+[design hostile 118] row0 cursor: card lines ['✓ SYN_MAP_W  0x1C2D3E00', 'desc synthetic map', 'unit <U+2014> · conv CM_SYN']; card line on the same screen row: '(no card line)'; terminal output holds ESC ]0;PWNED: no; RLO 1 PDF 1; U+200B 20
+[design hostile 118] row1 name 'SYN_RLO_<U+202E>ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<U+202C>_END': Address at x 1, first bidi opener at x 31; painted line opens 1 closes 1
+[design hostile 118] row1 cursor: card lines ['·', 'SYN_RLO_<U+202E>ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567', '89<U+202C>_END  0x00002000']; card line on the same screen row: '(no card line)'; terminal output holds ESC ]0;PWNED: no; RLO 2 PDF 2; U+200B 20
+[design hostile 118] row2 name 'SYN_HEB_<U+05E9><U+05DD><U+05E9><U+05DD><U+05E9><U+05DD>_END': Address at x 1, first bidi opener at x -1; painted line opens 0 closes 0
+[design hostile 118] row2 cursor: card lines ['· SYN_HEB_<U+05E9><U+05DD><U+05E9><U+05DD><U+05E9><U+05DD>_END  0x00002010', 'desc synthetic', 'unit <U+2014> · conv CM_SYN']; card line on the same screen row: '(no card line)'; terminal output holds ESC ]0;PWNED: no; RLO 1 PDF 1; U+200B 20
+[design hostile 118] row3 name 'SYN_ESC_<U+001B>]0;PWNED<U+001B>\\_END': Address at x 1, first bidi opener at x -1; painted line opens 0 closes 0
+[design hostile 118] row3 cursor: card lines ['· SYN_ESC_<U+001B>]0;PWNED<U+001B>\\_END  0x00002020', 'desc synthetic', 'unit <U+2014> · conv CM_SYN']; card line on the same screen row: '(no card line)'; terminal output holds ESC ]0;PWNED: YES; RLO 1 PDF 1; U+200B 20
+[design hostile 118] row4 name 'SYN_ZW_<U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B>ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B>_END': Address at x 1, first bidi opener at x -1; painted line opens 0 closes 0
+[design hostile 118] row4 cursor: card lines ['·', 'SYN_ZW_<U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B>ABCDEFGHIJKLMNOPQRSTUVWXYZ012345678', '9<U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B>_END  0x00002030']; card line on the same screen row: '(no card line)'; terminal output holds ESC ]0;PWNED: no; RLO 1 PDF 1; U+200B 40
+[design hostile 80x54] visible=38 scroll_x=0/118 scroll_y=0 cols: Address=12, Length=8, Tag=38, Source=9 | w=14 | rows=5 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[design hostile 80x54] row0|  0x1C2D3E00  2266    ✓ SYN_MAP_W
+[design hostile 80x54] row0: Address=0x1C2D3E00:whole; Length=2266:whole; Tag ends at 32 (inside)
+[design hostile 80x54] row1|  0x00002000  2       · SYN_RL…789<U+202C>_END
+[design hostile 80x54] row1: Address=0x00002000:whole; Length=2:whole; Tag ends at 37 (inside)
+[design hostile 80x54] row2|  0x00002010  2       · SYN_HE…<U+05DD><U+05E9><U+05DD>_END
+[design hostile 80x54] row2: Address=0x00002010:whole; Length=2:whole; Tag ends at 37 (inside)
+[design hostile 80x54] row3|  0x00002020  2       · SYN_ES…ED\_END
+[design hostile 80x54] row3: Address=0x00002020:whole; Length=2:whole; Tag ends at 37 (inside)
+[design hostile 80x54] row4|  0x00002030  2       · SYN_ZW…789<U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B>_END
+[design hostile 80x54] row4: Address=0x00002030:whole; Length=2:whole; Tag ends at 37 (inside)
+[design hostile 80x54] ROWS OK 5/5
+[design hostile 80] row0 name 'SYN_MAP_W': Address at x 1, first bidi opener at x -1; painted line opens 0 closes 0
+[design hostile 80] row0 cursor: card lines ['✓ SYN_MAP_W  0x1C2D3E00', 'desc synthetic map', 'unit <U+2014> · conv CM_SYN']; card line on the same screen row: '(no card line)'; terminal output holds ESC ]0;PWNED: no; RLO 0 PDF 1; U+200B 10
+[design hostile 80] row1 name 'SYN_RLO_<U+202E>ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<U+202C>_END': Address at x 1, first bidi opener at x -1; painted line opens 0 closes 1
+[design hostile 80] row1 cursor: card lines ['·', 'SYN_RLO_<U+202E>ABCDEFGHIJKLMNOPQR', 'STUVWXYZ0123456789<U+202C>_END']; card line on the same screen row: '(no card line)'; terminal output holds ESC ]0;PWNED: no; RLO 1 PDF 2; U+200B 10
+[design hostile 80] row2 name 'SYN_HEB_<U+05E9><U+05DD><U+05E9><U+05DD><U+05E9><U+05DD>_END': Address at x 1, first bidi opener at x -1; painted line opens 0 closes 0
+[design hostile 80] row2 cursor: card lines ['· SYN_HEB_<U+05E9><U+05DD><U+05E9><U+05DD><U+05E9><U+05DD>_END', '0x00002010', 'desc synthetic']; card line on the same screen row: '(no card line)'; terminal output holds ESC ]0;PWNED: no; RLO 0 PDF 1; U+200B 10
+[design hostile 80] row3 name 'SYN_ESC_<U+001B>]0;PWNED<U+001B>\\_END': Address at x 1, first bidi opener at x -1; painted line opens 0 closes 0
+[design hostile 80] row3 cursor: card lines ['· SYN_ESC_<U+001B>]0;PWNED<U+001B>\\_END', '0x00002020', 'desc synthetic']; card line on the same screen row: '(no card line)'; terminal output holds ESC ]0;PWNED: YES; RLO 0 PDF 1; U+200B 10
+[design hostile 80] row4 name 'SYN_ZW_<U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B>ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B>_END': Address at x 1, first bidi opener at x -1; painted line opens 0 closes 0
+[design hostile 80] row4 cursor: card lines ['·', 'SYN_ZW_<U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B>ABCDEFGHIJKLMNOPQRS', 'TUVWXYZ0123456789<U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B><U+200B>_END']; card line on the same screen row: '(no card line)'; terminal output holds ESC ]0;PWNED: no; RLO 0 PDF 1; U+200B 30
+# exit 0 ; clone status after: 0 changed; load: 22.00 18.23 15.29

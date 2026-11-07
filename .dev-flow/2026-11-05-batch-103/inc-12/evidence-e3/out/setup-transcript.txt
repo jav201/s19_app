@@ -1,0 +1,17 @@
+# setup transcript 2026-11-07T02:49:30-06:00 host cachyos-rtx
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e3-12-S/zq_iso_user; no DISPLAY; no clipboard; stdin closed; load: 13.83 13.89 13.31
+patched compose: cell_padding=1, fixed_columns=2
+patched columns: Address, Length, Tag, ...
+patched helper: _shorten_tag_name
+patched cells: signature
+patched cells: order and the cut
+patched page: name width
+patched page: fit scheduled; new methods _a2l_tag_name_width, _fit_a2l_tag_cells
+patched import Message
+patched class A2LTagTable
+patched compose: A2LTagTable
+variant design: wrote /tmp/b103-e3-12-S/design/s19_app/tui/app.py
+py_compile design: ok
+diff design vs e07fb00: 88 changed lines
+# clone status after: 0 changed

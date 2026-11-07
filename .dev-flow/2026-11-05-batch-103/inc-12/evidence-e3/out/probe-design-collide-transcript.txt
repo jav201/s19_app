@@ -1,0 +1,35 @@
+# probe design collide transcript 2026-11-07T02:52:02-06:00 host cachyos-rtx
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e3-12-S/zq_iso_user; no DISPLAY; no clipboard; stdin closed; load: 17.74 15.26 13.90
+s19_app.__file__ = /tmp/b103-e3-12-S/design/s19_app/__init__.py | textual 8.2.8 | rich 15.0.0 | variant design | scenario collide
+[collide tracked] files with tags 26, distinct names 234654
+[collide tracked] w=34: names shortened 9969; names whose shortened Tag cell equals another name's on the SAME 200-row page 46 (in 4 files); file-wide 46
+[collide tracked] w=31: names shortened 10959; names whose shortened Tag cell equals another name's on the SAME 200-row page 61 (in 4 files); file-wide 61
+[collide tracked] w=29: names shortened 11741; names whose shortened Tag cell equals another name's on the SAME 200-row page 77 (in 4 files); file-wide 77
+[collide tracked] w=23: names shortened 13182; names whose shortened Tag cell equals another name's on the SAME 200-row page 155 (in 4 files); file-wide 155
+[collide tracked] w=20: names shortened 13758; names whose shortened Tag cell equals another name's on the SAME 200-row page 171 (in 4 files); file-wide 171
+[collide tracked] w=14: names shortened 14356; names whose shortened Tag cell equals another name's on the SAME 200-row page 293 (in 5 files); file-wide 293
+[collide tracked] w=12: names shortened 234480; names whose shortened Tag cell equals another name's on the SAME 200-row page 319 (in 5 files); file-wide 220359
+[collide tracked] w=9: names shortened 234527; names whose shortened Tag cell equals another name's on the SAME 200-row page 337 (in 7 files); file-wide 220377
+[collide tracked] w=7: names shortened 234639; names whose shortened Tag cell equals another name's on the SAME 200-row page 220357 (in 8 files); file-wide 220421
+[collide tracked] w=5: names shortened 234650; names whose shortened Tag cell equals another name's on the SAME 200-row page 221187 (in 8 files); file-wide 221765
+[collide tracked file] examples/case_00_public/ASAP2_Demo_V161.a2l: 75 names; same-page collisions at w=34,31,29,23,20,14,12,9,7,5: [14, 17, 21, 35, 37, 51, 59, 64, 66, 68]
+[collide tracked file] examples/case_00_public/ASAP2_Demo_V171.a2l: 118 names; same-page collisions at w=34,31,29,23,20,14,12,9,7,5: [18, 22, 30, 48, 52, 72, 88, 92, 95, 112]
+[collide tracked file] examples/case_00_public/BalanceTube_STMicro.a2l: 111 names; same-page collisions at w=34,31,29,23,20,14,12,9,7,5: [10, 10, 10, 18, 18, 96, 98, 100, 101, 103]
+[collide tracked file] examples/case_00_public/from_source.a2l: 72 names; same-page collisions at w=34,31,29,23,20,14,12,9,7,5: [4, 12, 16, 54, 64, 72, 72, 72, 72, 72]
+[collide tracked file] examples/case_00_public/software_a.a2l: 13990 names; same-page collisions at w=34,31,29,23,20,14,12,9,7,5: [0, 0, 0, 0, 0, 0, 0, 2, 16, 825]
+[collide tracked file] examples/case_00_public/update_test1.a2l: 12 names; same-page collisions at w=34,31,29,23,20,14,12,9,7,5: [0, 0, 0, 0, 0, 2, 2, 4, 4, 4]
+[collide tracked file] examples/case_06_large_nested_a2l/firmware.a2l: 220040 names; same-page collisions at w=34,31,29,23,20,14,12,9,7,5: [0, 0, 0, 0, 0, 0, 0, 0, 220000, 220000]
+[collide tracked file] tests/fixtures/synth/synth_a2l.a2l: 6 names; same-page collisions at w=34,31,29,23,20,14,12,9,7,5: [0, 0, 0, 0, 0, 0, 0, 3, 3, 3]
+[collide corpus] files with tags 126, distinct names 256212
+[collide corpus] w=34: names shortened 20634; names whose shortened Tag cell equals another name's on the SAME 200-row page 3730 (in 26 files); file-wide 4769
+[collide corpus] w=31: names shortened 31833; names whose shortened Tag cell equals another name's on the SAME 200-row page 6970 (in 27 files); file-wide 7534
+[collide corpus] w=29: names shortened 47220; names whose shortened Tag cell equals another name's on the SAME 200-row page 9305 (in 30 files); file-wide 10265
+[collide corpus] w=23: names shortened 117762; names whose shortened Tag cell equals another name's on the SAME 200-row page 26990 (in 38 files); file-wide 30509
+[collide corpus] w=20: names shortened 160964; names whose shortened Tag cell equals another name's on the SAME 200-row page 40984 (in 43 files); file-wide 47703
+[collide corpus] w=14: names shortened 228091; names whose shortened Tag cell equals another name's on the SAME 200-row page 93814 (in 50 files); file-wide 116751
+[collide corpus] w=12: names shortened 237550; names whose shortened Tag cell equals another name's on the SAME 200-row page 117867 (in 53 files); file-wide 150758
+[collide corpus] w=9: names shortened 245305; names whose shortened Tag cell equals another name's on the SAME 200-row page 168189 (in 67 files); file-wide 196620
+[collide corpus] w=7: names shortened 251242; names whose shortened Tag cell equals another name's on the SAME 200-row page 207928 (in 70 files); file-wide 224088
+[collide corpus] w=5: names shortened 255033; names whose shortened Tag cell equals another name's on the SAME 200-row page 228425 (in 77 files); file-wide 239307
+# exit 0 ; clone status after: 0 changed; load: 19.86 16.27 14.33

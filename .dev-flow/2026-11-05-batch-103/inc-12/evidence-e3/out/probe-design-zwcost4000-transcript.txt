@@ -1,0 +1,11 @@
+# probe design zwcost:4000 transcript 2026-11-07T02:57:30-06:00 host cachyos-rtx
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e3-12-S/zq_iso_user; no DISPLAY; no clipboard; stdin closed; load: 19.35 18.97 16.02
+s19_app.__file__ = /tmp/b103-e3-12-S/design/s19_app/__init__.py | textual 8.2.8 | rich 15.0.0 | variant design | scenario zwcost:4000
+[design zwcost 4000 ZWSP at the end of the name] load+build 7.28 s; key 2 (show, fit) 6.99 s; builds 2 fits 2 fit_rebuilds 0
+[design zwcost 4000 ZWSP at the end of the name] resize to 80x54: 9.97 s; builds 3 fits 4 fit_rebuilds 1; Tag cell 16 cells
+[design zwcost 4000 ZWSP at the end of the name] resize to 118x54: 10.08 s; builds 4 fits 6 fit_rebuilds 2; Tag cell 36 cells
+[design zwcost 4000 ZWSP at the end of the name] resize to 100x54: 8.90 s; builds 5 fits 8 fit_rebuilds 3; Tag cell 27 cells
+[design zwcost 4000 ZWSP at the end of the name] visible=49 scroll_x=0/107 scroll_y=0 cols: Address=12, Length=8, Tag=38, Source=9 | w=25 | rows=2 cursor_row=0 | builds=5 fits=8 fit_rebuilds=3
+[design zwcost 4000 ZWSP at the end of the name] ROWS OK 2/2
+# exit 0 ; clone status after: 0 changed; load: 18.07 18.68 16.08
