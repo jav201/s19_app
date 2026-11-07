@@ -1,0 +1,3 @@
+s19_app.__file__ = /tmp/b103-e5-2a-sec/tree/s19_app/__init__.py | python 3.11.18
+[fixeq] 4000 hostile COMPU_TABs (duplicate x dense), TAB_NOINTP pairs 152294: the fix differs from the frozen _table_lookup on 0, the real code on 0
+exit=0
