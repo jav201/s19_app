@@ -1,0 +1,82 @@
+base commit (origin/main): 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+base worktree: <HOME>/work/s19_i10bmut (main == origin/main == 6f1743c, + the Inc 10b product and test diff applied)
+mutant: M3 - remove the Split / Join notice from the write notice
+
+=== MUTANT M3 ===
+edit: 1 edit
+grep output:
+0
+
+mutation diff:
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -18811,7 +18811,7 @@
+         except Exception:
+             split_window = None
+         if split_window is not None:
+-            split_window.note_image_bytes_written()
++            pass
+ 
+     def _refresh_hex_views_after_write(self) -> None:
+         """
+
+s19_app.__file__ = <HOME>/work/s19_i10bmut_m3/s19_app/__init__.py
+pytest output:
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+E   AssertionError: the band is [('data', 8), ('fill', 11), ('conflict', 1), ('fill', 12), ('data', 8)], expected [('data', 8), ('fill', 13), ('conflict', 2), ('fill', 9), ('data', 8)]
+<HOME>/work/s19_i10bmut_m3/tests/support/timing.py:66: AssertionError: the band is [('data', 8), ('fill', 11), ('conflict', 1), ('fill', 12), ('data', 8)], expected [('data', 8), ('fill', 13), ('conflict', 2), ('fill', 9), ('data', 8)]
+E   AssertionError: the commit did not disarm: ['packed 16 B  ·  span 1.00 MiB  ·  fill 100.00%', '⚠ GUARD  1.00 MiB span — e again to confirm']
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3015 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-464/test_r_seg_exp_15_1_save_proje0/app workarea=/tmp/pytest-of-<user>/pytest-464/test_r_seg_exp_15_1_save_proje0/app/.s19tool/workarea
+INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:18694 Loading file: path=/tmp/pytest-of-<user>/pytest-464/test_r_seg_exp_15_1_save_proje0/img/guard.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:15001 Load phase boundary: parse_branch_entry path=guard.s19 suffix=.s19
+INFO     s19tui:app.py:19737 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-464/test_r_seg_exp_15_1_save_proje0/img/guard.s19 addresses=16 range_count=2 range_bytes=16 errors=0
+INFO     s19tui:app.py:15018 Load phase boundary: parse_branch_done path=guard.s19 branch=s19
+INFO     s19tui:app.py:19182 Load phase boundary: apply_install_state path=guard.s19 precomputed=False
+INFO     s19tui:app.py:19865 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19203 Load phase boundary: apply_sections_done path=guard.s19
+INFO     s19tui:app.py:19217 Load phase boundary: apply_hex_done path=guard.s19
+INFO     s19tui:app.py:20960 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:18547 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18602 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:20474 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:19232 Load phase boundary: apply_a2l_done path=guard.s19
+INFO     s19tui:app.py:20092 Memory Map updated. ranges=2
+INFO     s19tui:app.py:19255 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-464/test_r_seg_exp_15_1_save_proje0/img/guard.s19 file_type=s19 elapsed_seconds=0.307 has_mac=False precomputed=False
+INFO     s19tui:app.py:8912 Save project action triggered for /tmp/pytest-of-<user>/pytest-464/test_r_seg_exp_15_1_save_proje0/img/guard.s19
+INFO     s19tui:app.py:12948 Project saved image. name=P file=/tmp/pytest-of-<user>/pytest-464/test_r_seg_exp_15_1_save_proje0/app/.s19tool/workarea/P/guard.s19
+INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+<HOME>/work/s19_i10bmut_m3/tests/support/timing.py:66: AssertionError: the commit did not disarm: ['packed 16 B  ·  span 1.00 MiB  ·  fill 100.00%', '⚠ GUARD  1.00 MiB span — e again to confirm']
+E   AssertionError: the reopen shows an armed confirm: ['packed 16 B  ·  span 1.00 MiB  ·  fill 100.00%', '⚠ GUARD  1.00 MiB span — e again to confirm']
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3015 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-464/test_r_seg_exp_15_2_hidden_wri0/app workarea=/tmp/pytest-of-<user>/pytest-464/test_r_seg_exp_15_2_hidden_wri0/app/.s19tool/workarea
+INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.007
+INFO     s19tui:app.py:18694 Loading file: path=/tmp/pytest-of-<user>/pytest-464/test_r_seg_exp_15_2_hidden_wri0/img/guard.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:15001 Load phase boundary: parse_branch_entry path=guard.s19 suffix=.s19
+INFO     s19tui:app.py:19737 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-464/test_r_seg_exp_15_2_hidden_wri0/img/guard.s19 addresses=16 range_count=2 range_bytes=16 errors=0
+INFO     s19tui:app.py:15018 Load phase boundary: parse_branch_done path=guard.s19 branch=s19
+INFO     s19tui:app.py:19182 Load phase boundary: apply_install_state path=guard.s19 precomputed=False
+INFO     s19tui:app.py:19865 Sections updated. count=2 rendered_ranges=2 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19203 Load phase boundary: apply_sections_done path=guard.s19
+INFO     s19tui:app.py:19217 Load phase boundary: apply_hex_done path=guard.s19
+INFO     s19tui:app.py:20960 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:18547 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18602 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:20474 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:19232 Load phase boundary: apply_a2l_done path=guard.s19
+INFO     s19tui:app.py:20092 Memory Map updated. ranges=2
+INFO     s19tui:app.py:19255 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-464/test_r_seg_exp_15_2_hidden_wri0/img/guard.s19 file_type=s19 elapsed_seconds=0.211 has_mac=False precomputed=False
+<HOME>/work/s19_i10bmut_m3/tests/support/timing.py:66: AssertionError: the reopen shows an armed confirm: ['packed 16 B  ·  span 1.00 MiB  ·  fill 100.00%', '⚠ GUARD  1.00 MiB span — e again to confirm']
+=========================== short test summary info ============================
+FAILED tests/test_b101_inplace_views.py::test_r_seg_prev_21_1_preview_follows_a_save_project_commit
+FAILED tests/test_b101_inplace_views.py::test_r_seg_exp_15_1_save_project_commit_disarms_the_confirm
+FAILED tests/test_b101_inplace_views.py::test_r_seg_exp_15_2_hidden_write_disarms_the_confirm
+3 failed, 17 deselected in 85.97s (0:01:25)
+
+pytest exit code: 1

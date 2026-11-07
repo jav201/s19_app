@@ -1,0 +1,60 @@
+# Inc 10b E4 tester W (hex panels, A2L values column, Split/Join after an in-place write) - notes
+
+Node file: `tests/test_b101_inplace_views.py`, 18 test functions = 20 collected nodes (`test_r_tui_004_8_shown_window_is_kept` is parametrised over `main`, `a2l`, `mac`). 19 are the cases of `02-test-cases.md` marked `W planned`; the 20th is the QC-TM-10b-1 measurement node. No product file touched.
+
+RED run: base `09b4808a0344de05d9d64cd55362ac7058a8c17f` (origin/main) **+ Inc 10a diff (569e446)** (`git diff --binary 09b4808 569e4468 -- s19_app tests docs`, taken from the local main, applied with `git apply`), LAN Linux host, detached worktree `s19_i10bw` (removed), `s19_app.__file__` resolved inside the worktree. Transcript (redacted, two complete runs, each read from its own output): `.dev-flow/2026-11-01-batch-101/evidence/inc-10b/red-01-tester-w-base.txt`.
+- Run 1, `env -u NO_COLOR PYTHONPATH=<worktree> python -m pytest -q -p no:cacheprovider -rfs --tb=short --show-capture=no tests/test_b101_inplace_views.py -n 6 --dist load -m 'not serial_timing'`: **18 failed, 1 passed in 132.13s**.
+- Run 2, the same file with `-p no:xdist -m serial_timing`: **1 failed in 52.06s** (QC-TM node).
+- State: `executed` on base. GREEN on the integrated tree: `not-run` (implementers still editing). Mutants of the "Negative control" columns: `not-run` (no implementation to mutate yet; each node's docstring names its control).
+
+Guards run with the file in place (same worktree, `-p no:xdist`): `tests/test_address_census.py` and `tests/test_suite_hygiene.py` pass (including R-TST-002 and R-TST-040/041, the serial_timing and report_margin shape of the QC node). `tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound` fails 273 vs 272 only because of this file (expected; the integrator bumps `EXPECTED_SCANNED_TEST_FILES`, with the 10a files already counted in 272).
+
+## How the nodes read and drive
+- Writers are driven through the shipped controls: key `6`; the document path typed and the Load button; Apply; the entry Edit button; *Write file* (`#patch_saveback_confirm_button`); `ctrl+s` through `tests/support/b100_save_dialog.py::save_through_dialog`. Windows by rail keys (`1`, `2`, `3`, `6`); Split / Join by the palette (`ctrl+k`, the name, Enter), ticks by `down` / `space`, `p` `m` `g`, `e`, Esc. The A2L Raw filter through the filter-field button, the menu list and the filter box. Go-to by `g`, the text, Tab, Enter.
+- Oracles = what is painted: the plain text of `#hex_view`, `#alt_hex_view`, `#mac_hex_view` (a row's byte cells, parsed from the line), the scroll offsets of `#hex_scroll`, `#alt_hex_scroll`, `#mac_hex_scroll`; the cells of `#a2l_tags_list` (Raw = column 4, Physical = 5), `#a2l_tags_summary` (`tags a-b / T`), `#a2l_detail_card`; `#sje_stats` lines (state line = line 2); `#sje_band` blocks (`_blocks`, the `(class, size)` list the window handed the band, because the band itself paints proportional glyphs); the files on disk (`*_joined*` anywhere under the test folder, since a Save project may move the export destination).
+- Waits: all through `wait_until`; fix-only signs use `FIX_WAIT` = 15 s so a missing behaviour fails with the painted state in the message; every negative assertion (window kept, marker kept, 0 files) follows a positive wait in the same node.
+- Round-trip control (new, W's own): every node that compares a window, cursor or marker across a write first goes Patch Editor -> view with no write and asserts that the round trip alone changes nothing (R-A2L-049/1, /2, R-A2L-105/1, R-TUI-004.8, R-TUI-004.9), so the post-write comparison tests the write and not the window switch.
+- Preconditions asserted (Inc 9 RR-3): `VALUE_0001` Raw `108` and byte `6C` before the apply; the apply / edit / commit really wrote (or, for an edit, did not write: `mem_map[0x0]` still `93`) via `app.current_file.mem_map`; the document of R-TUI-004.7/3 and R-SEG-EXP.15 not applied (`0xFF`, `0x04` at the address); >41 rows listed and the scroll / cursor reached (`scroll_y` 30, `cursor_row` 40); the detail card names the row-40 tag; the go-to window `[0x950, 0x960]` and the old byte at `0x965` equal to the painted row; the band `BAND_ONE` and `⚠ 1 B would clobber source` before the commit; `e` armed (`— e again to confirm`) and 0 export files before the commit; Esc hid the window; the Raw filter field and the listed rows.
+
+## Cases -> nodes, RED on base
+| Case | Node | Base result and the reason |
+|---|---|---|
+| R-A2L-048/1 | `test_r_a2l_048_1_apply_shows_in_the_tag_table` | RED: `VALUE_0001` paints `('108', '108')`, expected `('147', '147')` (cache kept) |
+| R-A2L-048/2 | `test_r_a2l_048_2_save_project_commit_shows_in_the_tag_table` | RED: `('108', '108')`, expected `('85', '85')` |
+| R-A2L-048/3 | `test_r_a2l_048_3_save_back_shows_in_the_tag_table` | RED: `('108', '108')`, expected `('85', '85')` |
+| R-A2L-049/1 | `test_r_a2l_049_1_first_shown_row_is_kept` | RED at the repaint sign: `the repaint did not happen: VALUE_0001 paints ('108', '108')` (W-4) |
+| R-A2L-049/2 | `test_r_a2l_049_2_first_shown_row_is_kept_with_a_value_filter` | RED, same reason, with the Raw filter `1` |
+| R-A2L-105/1 | `test_r_a2l_105_1_highlighted_row_is_kept` | RED, same reason (cursor 40 and the card name reached before it) |
+| R-A2L-106/1 | `test_r_a2l_106_1_value_filter_rows_stay_listed` | RED: `('108', '108')`, expected `('147', '147')` |
+| R-TUI-004.7/1 | `test_r_tui_004_7_1_apply_shows_in_the_main_hex_view` | RED: `#hex_view` row `0x8010` paints `FF FF FF FF FF FF FF FF` (P1) |
+| R-TUI-004.7/2 | `test_r_tui_004_7_2_save_back_shows_in_the_a2l_hex_view` | RED: `#alt_hex_view` row `0x8010` `FF FF FF FF ...` (W-1) |
+| R-TUI-004.7/3 | `test_r_tui_004_7_3_save_project_commit_shows_in_the_mac_hex_view` | RED: `#mac_hex_view` row `0x8010` `FF FF FF FF ...` |
+| R-TUI-004.8/1, /2, /3 | `test_r_tui_004_8_shown_window_is_kept[main]`, `[a2l]`, `[mac]` | RED at the re-render sign: row `0x960` still paints the old byte (`00 ... 00`, expected `FF` at offset 5) (W-4) |
+| R-TUI-004.9/1 | `test_r_tui_004_9_1_markers_survive_a_write` | RED at the re-render sign (`#hex_view` row `0x960` unchanged); the marker clause is reached only with the fix (W-4) |
+| R-SEG-PREV.21/1 | `test_r_seg_prev_21_1_preview_follows_a_save_project_commit` | RED: band stays `data 8, fill 11, conflict 1, fill 12, data 8`, expected `... fill 13, conflict 2, fill 9 ...` |
+| R-SEG-PREV.21/2 | `test_r_seg_prev_21_2_hidden_write_shows_on_the_next_open` | PASSES (standing guard, below) |
+| R-SEG-PREV.22/1 | `test_r_seg_prev_22_1_preview_refresh_keeps_the_focus` | RED at the band wait (the refresh itself); the focus clause is reached only with the fix (W-4) |
+| R-SEG-EXP.15/1 | `test_r_seg_exp_15_1_save_project_commit_disarms_the_confirm` | RED: state line still `⚠ GUARD  1.00 MiB span — e again to confirm` after the commit |
+| R-SEG-EXP.15/2 | `test_r_seg_exp_15_2_hidden_write_disarms_the_confirm` | RED: the reopen shows `... — e again to confirm` |
+| (QC-TM-10b-1) | `test_qc_tm_10b_1_a2l_refresh_cost_on_the_largest_a2l` (`serial_timing`) | RED: `hasattr(app, '_refresh_a2l_values_after_write')` is False; the measured value is `not-run` until the method exists (W-6) |
+
+## Standing guards (pass on base) and why each still has a failure mode
+- `test_r_seg_prev_21_2_hidden_write_shows_on_the_next_open` (regression, as the case says): on base the window re-syncs on open, so the band shows `conflict 1` at offset 19 and `⚠ 1 B would clobber source`. It would fail if the hidden-window notice cleared the two ticks (asserted `{0, 2}`), skipped the open's re-sync, left a cached plan, or made the open show the pre-write plan. Its precondition (`ready — e exports` before the Esc) proves the write is what creates the conflict.
+- Every other node is RED on base. Nodes whose own clause is invisible on base (W-4) carry the repaint / re-render sign first, so they cannot pass vacuously.
+
+## Findings for the integrator
+1. **W-1 (case precondition, R-TUI-004.7/2).** "The document of /1 loaded, not applied; *Save patched image as* confirmed" is not reachable through the shipped controls: the save-back row shows only after an Apply. The node applies `0x8013` = `11`, edits the entry to `AA` with no new apply (asserts the image still holds `11`), and confirms *Write file*; the `AA` can only come from the save-back, which is the writer under test. R-TUI-004.7/3 and R-SEG-EXP.15/1 keep "loaded, not applied" literally (Save project re-derives from the loaded document).
+2. **W-2 (case wording, R-TUI-004.8/2, /3).** The scroll (10, 40) arm: the A2L and MAC panes have no horizontal range (Inc 10a finding F-2). The nodes scroll to x 10, y 40 "as far as the pane allows", assert the pane left the origin, and compare the achieved offset after the write. Only the main pane reaches x 10.
+3. **W-3 (case wording, R-SEG-PREV.21/2).** "As /1 before the commit" would already hold the `AA` apply; the node follows the E1 pilot (D4B b1): window opened and ticked on the unwritten fixture (join fill, pad `FF`: `ready - e exports`), Esc, key `6`, `0x8013` = `AA` applied, palette reopen. Expected values are the case's.
+4. **W-4 (RED-reason mixing, as 10a F-8).** R-A2L-049/1, /2, R-A2L-105/1, R-TUI-004.8, R-TUI-004.9 and R-SEG-PREV.22/1 have Base "n/a" or "Yes" in the requirements (no refresh exists on base), so their own clause (place kept, window kept, marker kept, focus kept) is true on base and cannot be RED there. Each node first waits for the repaint / re-render itself (Raw `147`, the written byte at row `0x960`, the re-planned band) and asserts its clause after it. Base is RED at that sign; the clauses are first observable on the fixed tree. A mutant that repaints by clear-and-refill, re-renders with a focus address, or moves the focus is caught only at E5 (mutation) or at GREEN.
+5. **W-5.** `EXPECTED_SCANNED_TEST_FILES` (`tests/test_id_registry.py`) 272 -> 273 for this file.
+6. **W-6 (measurement).** QC-TM-10b-1 is authored as a node (the cases list does not give it a row): a release case at the generator's default 10 MB (the largest synth A2L; the tag count is in the QC-TM label), `_refresh_a2l_values_after_write` wrapped on the app instance and timed across one real Patch Editor apply, `elapsed < report_margin(label, elapsed, timing_bound(1.0))`, marked `serial_timing`. It names a private method (design graph node 3). On the fixed tree it needs a run on the LAN host (serial lane) for the figure; the orchestrator rules the fallback if the bound fails. `not-run`.
+7. **W-7 (private reads).** The nodes read `app._active_screen_key` (window switched), `SplitJoinWindow._sel`, `_pad_int`, `_mode`, `_gap` (as `test_b101_split_join_band.py` does) and `#sje_band._blocks` (the painted band is glyphs only; the case quotes the block sizes). A product rename of those breaks the node loudly at its wait, not silently.
+8. **W-8 (case wording, R-SEG-EXP.15).** The "0 files under the export destination" check scans `*_joined*` under the whole test folder: after a Save project the export destination can be the project's. The node's first `e` arms (asserted before the write) and the final `e` must only arm again.
+9. **W-9 (a precondition that holds).** The Save project commit re-derives the image from the loaded document and the source (the `AA` of the earlier apply is gone: `... BB CC` only), as the E1 pilot D4C measured; R-SEG-PREV.21/1's expected band depends on it.
+
+## Deviations from the brief
+1. A second run for the `serial_timing` node (`-m 'not serial_timing'` in run 1, `-p no:xdist -m serial_timing` in run 2), as the brief allows.
+2. `--tb=short --show-capture=no` added to the command so the painted state is in the transcript; `--dist load` as the group brief instructs.
+
+Remote worktree `s19_i10bw` removed; patch, run files and script deleted from the host. No stray `pgrep` wait loop was used and none of the earlier agents' processes was touched. Uncovered by this file: none of group W's cases; the QC-TM figure and the GREEN run are `not-run`.

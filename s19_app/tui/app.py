@@ -18659,9 +18659,11 @@ class S19TuiApp(App):
             write (an apply, a save-back or a Save project commit), so this
             helper is the in-place twin of :meth:`watch_current_file`. It
             also clears the Check Editor's validation results, whose verdict
-            rows judged the bytes before the write (R-CHKED-057). A
-            not-yet-mounted panel (headless unit path) is tolerated as a
-            no-op, matching ``watch_current_file``.
+            rows judged the bytes before the write (R-CHKED-057), and it
+            disarms a Split / Join export confirm, re-plans a displayed
+            Split / Join preview and refreshes the three hex views and the
+            A2L tag table's values, so every view over the image follows the
+            written bytes (Inc 10b).
 
         Args:
             None
@@ -18670,23 +18672,39 @@ class S19TuiApp(App):
             None
 
         Data Flow:
-            - Query each panel separately and delegate to its public method
-              (``note_image_bytes_written``, ``clear_check_results``); a
-              missing panel skips only its own notice. A fault inside a
-              panel is NOT swallowed — each delegation sits outside its
-              ``try``. Inc 6 (E3A-03) prepends: end the current check run,
-              repaint the Patch Editor ledger/Checks tab through the load
-              tail, and repaint the Checks screen.
+            - First the Split / Join window (queried in its own ``try``;
+              missing -> skipped): ``note_image_bytes_written`` disarms the
+              confirm, so a fault later in this hook cannot leave a confirm
+              given for other bytes armed (E5 R-2).
+            - Inc 6 (E3A-03): end the current check run, repaint the Patch
+              Editor ledger/Checks tab through the load tail (panel queried
+              in a ``try``), repaint the Checks screen, then the CRC Designer
+              and the Check Editor notices (each panel queried in its own
+              ``try``; a missing panel skips only its own notice).
+            - Inc 10b: refresh the three hex views, then the A2L tag table's
+              values; each guards its panes the same way (a pane not mounted
+              skips that notice).
+            - A fault inside a panel or a notice is NOT swallowed: each
+              delegation sits outside its ``try``.
 
         Dependencies:
             Uses:
                 - ``CrcDesignerPanel``
                 - ``CheckEditorPanel``
+                - ``_refresh_hex_views_after_write``
+                - ``_refresh_a2l_values_after_write``
+                - ``SplitJoinWindow``
             Used by:
                 - ``on_patch_editor_panel_action_requested``
                 - ``on_patch_editor_panel_save_back_decision``
                 - ``_on_project_saved``
         """
+        try:
+            split_window = self.query_one("#screen_split_join", SplitJoinWindow)
+        except Exception:
+            split_window = None
+        if split_window is not None:
+            split_window.note_image_bytes_written()
         # Inc 6 (E3A-03, I-7/I-8): an in-place write of the loaded image's
         # bytes ends the current run, then the Patch Editor ledger glyphs and
         # the Checks tab repaint with ``no run yet``, and a displayed Checks
@@ -18708,8 +18726,171 @@ class S19TuiApp(App):
         try:
             checks = self.query_one("#check_editor_panel", CheckEditorPanel)
         except Exception:
+            checks = None
+        if checks is not None:
+            checks.clear_check_results()
+        self._refresh_hex_views_after_write()
+        self._refresh_a2l_values_after_write()
+
+    def _refresh_hex_views_after_write(self) -> None:
+        """
+        Summary:
+            Repaint the main, A2L and MAC hex views after an in-place write
+            so each pane shows the written bytes while its window, scroll
+            and ``> `` marker stay put (R-TUI-004.7, .8, .9).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - No file -> return (the views already read "No file loaded.").
+            - A hex pane not mounted -> return (the hook's guard idiom, E5
+              R-6).
+            - ``update_hex_view()`` with no focus: 10a's single clamp keeps
+              ``_hex_window_start``, the marker and the scroll (I-3).
+            - Bisect the A2L view's first visible address in
+              ``_hex_view_rows()`` and re-render with that ``start_row``
+              (``None`` while the address is unset, as a load does); the same
+              for the MAC view. No ``reset_scroll`` and no focus address, so
+              no marker change.
+
+        Dependencies:
+            Uses:
+                - ``update_hex_view`` / ``update_alt_hex_view`` /
+                  ``update_mac_hex_view``
+                - ``_hex_view_rows``
+            Used by:
+                - ``_note_image_bytes_written``
+        """
+        if not self.current_file:
             return
-        checks.clear_check_results()
+        try:
+            self.query_one("#hex_view", Static)
+            self.query_one("#alt_hex_view", Static)
+            self.query_one("#mac_hex_view", Static)
+        except Exception:
+            return
+        self.update_hex_view()
+        rows = self._hex_view_rows()
+        from bisect import bisect_left
+
+        start = (
+            bisect_left(rows, self._alt_first_visible_address)
+            if self._alt_first_visible_address is not None
+            else None
+        )
+        self.update_alt_hex_view(start_row=start)
+        start = (
+            bisect_left(rows, self._mac_first_visible_address)
+            if self._mac_first_visible_address is not None
+            else None
+        )
+        self.update_mac_hex_view(start_row=start)
+
+    def _refresh_a2l_values_after_write(self) -> None:
+        """
+        Summary:
+            Recompute the A2L tags whose bytes the write changed and repaint
+            the shown tag-table page in place, so the Raw and Physical cells
+            read the written bytes while the listed tags, the first shown
+            row, the cursor and the scroll stay (R-A2L-048, -049, -105,
+            -106). Only the changed tags are recomputed, so a write costs
+            far less than a full enrichment on a large A2L (E5 R-1: 3.95 s
+            for 220,040 tags on case_06).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - No image or no A2L -> return (nothing was written that a tag
+              reads). The tag-table panes not mounted -> the cache and the
+              filtered list still refresh; only the paints are skipped
+              (E5 RR-3).
+            - ``old = _a2l_enriched_tags``. When ``_compute_a2l_enriched_tags``
+              returns ``old`` itself, the cache describes this image's
+              layout, and a write keeps that layout (it writes only addresses
+              already in ``mem_map``): a tag is recomputed when the bytes its
+              row was computed from (``raw_bytes``) differ from the image's
+              bytes at its range now. Those tags go through
+              ``enrich_tags_and_render`` as a sub-list (a duplicated
+              ``(section, name)`` group is flagged as a whole, since every
+              row of the group carries the group's last tag's range, so the
+              merge picks the same check row as a full run); every other
+              dict is kept. No changed tag -> return. The summary lines read
+              no byte value (D-10b-3), so they are kept.
+            - Otherwise the cache did not describe this image: the full
+              recompute runs and ``#a2l_view`` is repainted (S-8).
+            - Re-point ``_a2l_filtered_tags`` to the new dict at each listed
+              tag's position in ``old`` (same tags, same order, no
+              ``_filter_a2l_tags`` call). A listed tag not in ``old`` (the
+              listing was stale) re-runs the filter instead
+              (``_refresh_a2l_filtered_tags``, anchor kept), never a
+              ``KeyError`` (E5 R-2).
+            - ``_repaint_a2l_tag_cells()`` writes the shown page's changed
+              cells in place; not ``update_a2l_view()`` /
+              ``_refresh_a2l_filtered_tags`` on the normal path (their
+              ``clear()`` resets the cursor and scroll).
+
+        Dependencies:
+            Uses:
+                - ``_compute_a2l_enriched_tags`` / ``enrich_tags_and_render``
+                - ``_update_a2l_summary_buffer``
+                - ``_refresh_a2l_filtered_tags``
+                - ``_repaint_a2l_tag_cells``
+            Used by:
+                - ``_note_image_bytes_written``
+        """
+        if not self.current_file or not self.current_a2l_data:
+            return
+        try:
+            self.query_one("#a2l_view", Static)
+            self.query_one("#a2l_tags_list", DataTable)
+            self.query_one("#a2l_tags_summary", Label)
+            mounted = True
+        except Exception:
+            mounted = False
+        old = self._a2l_enriched_tags
+        if self._compute_a2l_enriched_tags() is old:
+            mem_map = self.current_file.mem_map
+            changed = []
+            for index, tag in enumerate(old):
+                raw = tag.get("raw_bytes")
+                if raw is None:
+                    continue
+                start = tag["address"]
+                now = [mem_map.get(address) for address in range(start, start + len(raw) // 2)]
+                if now != list(bytes.fromhex(raw)):
+                    changed.append(index)
+            if not changed:
+                return
+            source = self.current_a2l_data.get("tags", [])
+            fresh, _lines = enrich_tags_and_render(
+                {**self.current_a2l_data, "tags": [source[index] for index in changed]},
+                mem_map,
+            )
+            new = list(old)
+            for index, tag in zip(changed, fresh):
+                new[index] = tag
+            self._a2l_enriched_tags = new
+        else:
+            new = self._a2l_enriched_tags
+            if mounted:
+                self._update_a2l_summary_buffer()
+        position_by_tag = {id(tag): i for i, tag in enumerate(old)}
+        positions = [position_by_tag.get(id(tag)) for tag in self._a2l_filtered_tags]
+        if None in positions:
+            if mounted:
+                self._refresh_a2l_filtered_tags(preserve_anchor=True)
+            return
+        self._a2l_filtered_tags = [new[i] for i in positions]
+        if mounted:
+            self._repaint_a2l_tag_cells()
 
     def watch_current_file(self) -> None:
         """
@@ -20804,6 +20985,88 @@ class S19TuiApp(App):
             time.perf_counter() - populate_started,
         )
         self._flush_logger()
+
+    def _repaint_a2l_tag_cells(self) -> None:
+        """
+        Summary:
+            Write the shown A2L tag-table page's cells in place after a value
+            recompute, so the Raw/Physical cells read the written bytes while
+            the first shown row, the cursor, the scroll and the detail card
+            stay (R-A2L-048, -049, -105, R2-7).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Read ``_a2l_filtered_tags`` and ``_a2l_window_start``; compute
+              the page bounds ``update_a2l_tags_view`` uses.
+            - For each shown row, rebuild its 16 cells with the row's
+              severity style and write only the cells whose plain text or
+              style differs (``update_cell_at`` with ``update_width=True``
+              so a widened Raw/Physical value is not clipped).
+            - Re-point ``_a2l_row_key_to_tag`` for each shown row and
+              recompute the summary label with ``update_a2l_tags_view``'s
+              text. No ``clear()``, no ``move_cursor``, no ``scroll_to`` and
+              no ``RowHighlighted`` is posted, so the detail card keeps its
+              tag.
+
+        Dependencies:
+            Uses:
+                - ``_build_a2l_table_cells``
+                - ``_a2l_tag_row_severity`` / ``_severity_style``
+                - ``_a2l_issue_severity_map``
+                - ``_get_window_bounds`` / ``_clamp_viewer_page_size``
+            Used by:
+                - ``_refresh_a2l_values_after_write``
+        """
+        table = self.query_one("#a2l_tags_list", DataTable)
+        summary_label = self.query_one("#a2l_tags_summary", Label)
+        tags = self._a2l_filtered_tags
+        total_tags = len(tags)
+        if not total_tags:
+            return
+        page_size = self._clamp_viewer_page_size(self.a2l_tags_page_size)
+        start, end = self._get_window_bounds(
+            total_tags, self._a2l_window_start, page_size
+        )
+        from textual.coordinate import Coordinate
+
+        issue_severity_map = _a2l_issue_severity_map(self._validation_issues)
+        for i in range(end - start):
+            absolute_index = start + i
+            tag = tags[absolute_index]
+            cells = self._build_a2l_table_cells(tag)
+            severity = _a2l_tag_row_severity(tag, issue_severity_map)
+            style = _severity_style(severity)
+            if style:
+                for cell in cells:
+                    cell.style = style
+            for column, cell in enumerate(cells):
+                existing = table.get_cell_at(Coordinate(i, column))
+                if isinstance(existing, Text):
+                    text_changed = existing.plain != cell.plain
+                    style_changed = existing.style != cell.style
+                else:
+                    text_changed = str(existing) != cell.plain
+                    style_changed = True
+                if text_changed or style_changed:
+                    table.update_cell_at(
+                        Coordinate(i, column), cell, update_width=True
+                    )
+            self._a2l_row_key_to_tag[f"a2l:{absolute_index}"] = tag
+        page_num = start // page_size + 1
+        total_pages = max(1, (total_tags + page_size - 1) // page_size)
+        in_image = sum(1 for tag in tags if tag.get("in_memory"))
+        summary_text = Text(
+            f"Page {page_num}/{total_pages} | tags {start + 1}-{end} / {total_tags} "
+            f"(page size {page_size}; +/- to change page)"
+        )
+        summary_text.append("  ·  ")
+        summary_text.append(f"{in_image} in image", style=GREEN)
+        summary_label.update(summary_text)
 
     def _build_a2l_table_cells(self, tag: dict) -> tuple[Text, ...]:
         """

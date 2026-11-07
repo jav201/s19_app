@@ -1,0 +1,36 @@
+base commit (origin/main): 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+base worktree: <HOME>/work/s19_i10bmut (main == origin/main == 6f1743c, + the Inc 10b product and test diff applied)
+mutant: M5 - displayed branch re-syncs but keeps the arm
+
+=== MUTANT M5 ===
+edit: 1 edit
+grep output:
+1746:        if not self.has_class("hidden"):
+1747-            try:
+--
+1761:        if not self.has_class("hidden"):
+
+mutation diff:
+--- a/s19_app/tui/segment_split_view.py
++++ b/s19_app/tui/segment_split_view.py
+@@ -1759,7 +1759,7 @@
+         focuses, never resets a selection and never calls ``refresh_window``.
+         """
+         if not self.has_class("hidden"):
+-            self._bump()
++            self._sync()
+         else:
+             self._armed = False
+ 
+
+s19_app.__file__ = <HOME>/work/s19_i10bmut_m5/s19_app/__init__.py
+pytest output:
+F                                                                        [100%]
+=================================== FAILURES ===================================
+E   AssertionError: the commit did not disarm: ['packed 16 B  ·  span 1.00 MiB  ·  fill 100.00%', '⚠ GUARD  1.00 MiB span — e again to confirm']
+<HOME>/work/s19_i10bmut_m5/tests/support/timing.py:66: AssertionError: the commit did not disarm: ['packed 16 B  ·  span 1.00 MiB  ·  fill 100.00%', '⚠ GUARD  1.00 MiB span — e again to confirm']
+=========================== short test summary info ============================
+FAILED tests/test_b101_inplace_views.py::test_r_seg_exp_15_1_save_project_commit_disarms_the_confirm
+1 failed, 19 deselected in 27.33s
+
+pytest exit code: 1

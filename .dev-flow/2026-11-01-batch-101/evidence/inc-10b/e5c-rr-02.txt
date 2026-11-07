@@ -1,0 +1,184 @@
+== e5c-rr-02  2026-11-07T12:08:35Z  host: LAN Linux laptop
+base commit (HEAD): 6f1743c1ad54ff7db89e8fcd4e96266414950f42  main: 6f1743c1ad54ff7db89e8fcd4e96266414950f42  origin/main: 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+staged tree (index): 3e43288889bc1d9f0c42848531081e532b187c92
+--- working-tree edits over the index (mutant):
+diff --git a/s19_app/tui/app.py b/s19_app/tui/app.py
+index 3b3d9fd9..a8e2c881 100644
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -21140,7 +21140,7 @@ class S19TuiApp(App):
+                     table.update_cell_at(
+                         Coordinate(i, column), cell, update_width=True
+                     )
+-            self._a2l_row_key_to_tag[f"a2l:{absolute_index}"] = tag
++            self._a2l_row_key_to_tag[f"a2l:{i}"] = tag
+         page_num = start // page_size + 1
+         total_pages = max(1, (total_tags + page_size - 1) // page_size)
+         in_image = sum(1 for tag in tags if tag.get("in_memory"))
+--- end of edits
+python: Python 3.11.18
+s19_app.__file__: <HOME>/work/s19_i10brr/s19_app/__init__.py
+CMD: cd <HOME>/work/s19_i10brr && env -u NO_COLOR timeout 1800 <CONDA>/envs/s19ci/bin/python -m pytest -p no:cacheprovider -m not serial_timing tests/test_b101_inplace_views.py -k 048_5
+--- pytest output
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0
+rootdir: <HOME>/work/s19_i10brr
+configfile: pyproject.toml
+plugins: platformdirs-4.14.3, xdist-3.8.0
+collected 22 items / 21 deselected / 1 selected
+
+tests/test_b101_inplace_views.py F                                       [100%]
+
+=================================== FAILURES ===================================
+___________ test_r_a2l_048_5_a_write_on_the_second_page_shows_there ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-511/test_r_a2l_048_5_a_write_on_th0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-511/b101_i10bw_case080')
+
+    def test_r_a2l_048_5_a_write_on_the_second_page_shows_there(tmp_path: Path, case08: Path) -> None:
+        """R-A2L-048 case /5 (robustness, E5 R-4): case 08 and its A2L, key ``2``,
+        ``+`` (page 2: ``tags 201-400 / 462``); the cursor on page row 45
+        (``VAL_BLK_0002``: a 2-byte little-endian tag at ``0x00800108``, bytes
+        ``0D BA``, Raw ``47629``); key ``6``, ``0x00800109`` = ``45`` (the tag's
+        second byte) applied; key ``2`` -> the row reads Raw ``17677``, Physical
+        ``17677``; the summary still reads ``tags 201-400 / 462``; the page's row
+        names are unchanged and the cursor stays on row 45.
+    
+        Why: the repaint writes page row ``i`` from the listed tag ``start + i``;
+        one that reads tag ``i`` paints page 1's tags over page 2 (every other A2L
+        node stays on page 1), and a changed-byte test that reads only a tag's
+        first byte misses a write into its second (E5 R-1). Base: Raw ``47629`` ->
+        RED. Negative controls: ``tags[i]`` -> ``VAL_BLK_0002`` is no longer painted
+        and the row names change -> RED; the first byte only -> Raw ``47629`` ->
+        RED."""
+    
+        async def scenario(app, pilot, log):
+            await load_case(pilot, app, case08, a2l=True)
+            await show_a2l(pilot, app)
+            await pilot.press("plus")
+            await wait_until(
+                pilot,
+                lambda: summary_span(app) == "tags 201-400 / 462",
+                lambda: f"+ did not page: the summary reads {summary_span(app)!r}",
+            )
+            await settle(pilot)
+            table = tag_table(app)
+            assert row_name(app, 45) == "VAL_BLK_0002", row_name(app, 45)
+            assert raw_phys(app, "VAL_BLK_0002") == ("47629", "47629"), raw_phys(app, "VAL_BLK_0002")
+            assert (mem_at(app, 0x800108), mem_at(app, 0x800109)) == (0x0D, 0xBA)
+            table.move_cursor(row=45, animate=False)
+            await wait_until(
+                pilot, lambda: table.cursor_row == 45, lambda: f"cursor row {table.cursor_row}"
+            )
+            names = [row_name(app, i) for i in range(table.row_count)]
+            await patch_apply(pilot, app, log, tmp_path / "docs", "d.json", [(0x800109, b"\x45")])
+            assert mem_at(app, 0x800109) == 0x45, "the apply did not write"
+            await show_a2l(pilot, app)
+            await wait_until(
+                pilot,
+                lambda: raw_phys(app, "VAL_BLK_0002") == ("17677", "17677"),
+                lambda: f"VAL_BLK_0002 paints {raw_phys(app, 'VAL_BLK_0002')!r}, expected 17677",
+                timeout=FIX_WAIT,
+            )
+            assert summary_span(app) == "tags 201-400 / 462", summary_span(app)
+            assert [row_name(app, i) for i in range(table.row_count)] == names, "the row names changed"
+            assert table.cursor_row == 45 and row_name(app, 45) == "VAL_BLK_0002", table.cursor_row
+            # E5 RR-4: the row key of page row 45 (``a2l:245``) maps to the new dict;
+            # the card for that row is the one the highlight resolves through it.
+            row_key = table.coordinate_to_cell_key(Coordinate(45, 0)).row_key.value
+            assert row_key == "a2l:245", row_key
+            assert str(app._a2l_row_key_to_tag[row_key]["raw_value"]) == "17677", (
+                app._a2l_row_key_to_tag[row_key]["raw_value"]
+            )
+            table.move_cursor(row=44, animate=False)
+            await wait_until(
+                pilot, lambda: "VAL_BLK_0001" in card_text(app), lambda: card_text(app)
+            )
+            table.move_cursor(row=45, animate=False)
+            await wait_until(
+                pilot,
+                lambda: "VAL_BLK_0002" in card_text(app),
+                lambda: f"the card for row 45 reads {card_text(app)!r}",
+            )
+            # E5 RR-1: the recomputed list is the one installed - a filter on the new
+            # Raw value lists the written tag, built from ``_a2l_enriched_tags``.
+            await filter_raw(pilot, app, "17677")
+            assert raw_phys(app, "VAL_BLK_0002") == ("17677", "17677"), raw_phys(app, "VAL_BLK_0002")
+    
+>       drive(tmp_path, scenario)
+
+tests/test_b101_inplace_views.py:933: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_inplace_views.py:177: in drive
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+<CONDA>/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<CONDA>/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<CONDA>/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7ff2869ee8d0>
+
+    async def scenario(app, pilot, log):
+        await load_case(pilot, app, case08, a2l=True)
+        await show_a2l(pilot, app)
+        await pilot.press("plus")
+        await wait_until(
+            pilot,
+            lambda: summary_span(app) == "tags 201-400 / 462",
+            lambda: f"+ did not page: the summary reads {summary_span(app)!r}",
+        )
+        await settle(pilot)
+        table = tag_table(app)
+        assert row_name(app, 45) == "VAL_BLK_0002", row_name(app, 45)
+        assert raw_phys(app, "VAL_BLK_0002") == ("47629", "47629"), raw_phys(app, "VAL_BLK_0002")
+        assert (mem_at(app, 0x800108), mem_at(app, 0x800109)) == (0x0D, 0xBA)
+        table.move_cursor(row=45, animate=False)
+        await wait_until(
+            pilot, lambda: table.cursor_row == 45, lambda: f"cursor row {table.cursor_row}"
+        )
+        names = [row_name(app, i) for i in range(table.row_count)]
+        await patch_apply(pilot, app, log, tmp_path / "docs", "d.json", [(0x800109, b"\x45")])
+        assert mem_at(app, 0x800109) == 0x45, "the apply did not write"
+        await show_a2l(pilot, app)
+        await wait_until(
+            pilot,
+            lambda: raw_phys(app, "VAL_BLK_0002") == ("17677", "17677"),
+            lambda: f"VAL_BLK_0002 paints {raw_phys(app, 'VAL_BLK_0002')!r}, expected 17677",
+            timeout=FIX_WAIT,
+        )
+        assert summary_span(app) == "tags 201-400 / 462", summary_span(app)
+        assert [row_name(app, i) for i in range(table.row_count)] == names, "the row names changed"
+        assert table.cursor_row == 45 and row_name(app, 45) == "VAL_BLK_0002", table.cursor_row
+        # E5 RR-4: the row key of page row 45 (``a2l:245``) maps to the new dict;
+        # the card for that row is the one the highlight resolves through it.
+        row_key = table.coordinate_to_cell_key(Coordinate(45, 0)).row_key.value
+        assert row_key == "a2l:245", row_key
+>       assert str(app._a2l_row_key_to_tag[row_key]["raw_value"]) == "17677", (
+            app._a2l_row_key_to_tag[row_key]["raw_value"]
+        )
+E       AssertionError: 47629
+E       assert '47629' == '17677'
+E         
+E         - 17677
+E         + 47629
+
+tests/test_b101_inplace_views.py:915: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_inplace_views.py::test_r_a2l_048_5_a_write_on_the_second_page_shows_there
+====================== 1 failed, 21 deselected in 18.10s =======================
+exit: 1  end 2026-11-07T12:08:54Z
