@@ -1,0 +1,4 @@
+== fixture generation (e07fb00 base reader + REF expected values) ==
+examples/professional_validation/case_08_heavy_fragmentation/firmware.a2l: tags=100
+tests/fixtures/synth/synth_a2l.a2l: tags=6
+TOTAL tags=234654 defects=227

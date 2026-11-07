@@ -122,23 +122,10 @@ _ENGINE_PATHS: list[str] = [
     "s19_app/hexfile.py",
     "s19_app/range_index.py",
     "s19_app/validation",
-    # ``s19_app/tui/a2l.py`` was UNFROZEN for batch-56 (operator-approved
-    # alignment-aware summer, PR #114) and is now RE-FROZEN (PR-B): it is a
-    # read-only oracle again. Any further edit needs an explicit unfreeze.
-    # UNFROZEN for batch-95 (2026-10-13, the batch's Phase-1 contract
-    # 2026-10-13-batch-95 HLR-137 / LLR-137.4): the extract_memory_segments
-    # hardening (quoted MEMORY_SEGMENT names + the offset field) is an
-    # explicit, contract-pinned edit to this module. Re-freeze after the
-    # batch lands; the parsing layer beyond that function stays read-only.
-    # UNFROZEN for batch-100 Inc 12b (the parser's byte callback, LLR-176.4);
-    # re-frozen by the same increment (LLR-176.4b). On the increment branch
-    # TC-027 compares against ``main``, where a2l.py differs until the merge,
-    # so its full run is owed after the merge.
-    # UNFROZEN for batch-101 Inc 11 (ruling OR-3, planned at P0): `validation/rules.py`
-    # (ASAM block names, IF_DATA exemption) and `tui/a2l.py` (MEMORY_SEGMENT reader,
-    # CURVE index note) change by plan. This test is RED on the Inc 11 branch and GREEN
-    # again once the merge puts the new bytes on ``main`` (re-freeze by merge).
-    "s19_app/tui/a2l.py",
+    # ``s19_app/tui/a2l.py`` is UNFROZEN for batch-103 Inc 11 (the A2L reader
+    # rewrite: comments, quoted strings, line ends, one-line IF_DATA,
+    # INSTANCE/BLOB). It leaves this guard set for the increment and is
+    # RE-FROZEN by a separate post-merge PR (CLAUDE.md, Engine-frozen guard).
     "s19_app/tui/mac.py",
 ]
 

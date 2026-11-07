@@ -266,7 +266,7 @@ def test_tc_b94_18_curated_set_and_engine_freeze(tmp_path: Path) -> None:
     # the arm skips instead of dying with exit 128 — exactly how
     # tests/test_engine_unchanged.py stays green on CI. Where ``main`` exists
     # (local runs, the post-merge gate) both assertions still bite, same run.
-    frozen_paths = ["s19_app/validation/rules.py", "s19_app/tui/a2l.py"]
+    frozen_paths = ["s19_app/validation/rules.py"]
     try:
         completed = subprocess.run(
             ["git", "diff", "--name-only", "main", "--", *frozen_paths],

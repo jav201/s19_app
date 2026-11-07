@@ -385,8 +385,8 @@ def test_at103_deposit_with_markup_metachars_renders_verbatim() -> None:
 def test_tc097_strip_removes_block_and_line_comments() -> None:
     # Spanning block comment (across the newline sentinel) removed as one unit.
     assert _strip_a2l_comments("A /* c\n more c */ B") == "A  B"
-    # Adjacent (no-space) block comment fuses the surrounding tokens.
-    assert _strip_a2l_comments("CURVE/*c*/0x1") == "CURVE0x1"
+    # Adjacent (no-space) block comment is a word break (R-A2L-READ.7).
+    assert _strip_a2l_comments("CURVE/*c*/0x1") == "CURVE 0x1"
 
 
 def test_tc097_line_comment_truncates_to_next_newline_only() -> None:
