@@ -72,3 +72,22 @@ Both lenses FAIL, with no redesign asked and round-1 findings closed as ruled.
 - **E3A-16:** done by the orchestrator. PLAN row 12 holds the E4 sequencing, and the two `.pyc` files are out of the index.
 
 **Next:** a narrow Opus correction, then round 3 on the changed rows only, both lenses.
+
+## Round 3 rulings (2026-11-07, orchestrator claude-opus-5-5)
+
+Both lenses FAIL, with no redesign asked.
+- Security: E3S-14 MAJOR, E3S-15 MEDIUM, E3S-16 MINOR, E3S-17 LOW.
+- Architect: E3A-18 MAJOR, E3A-19 MEDIUM (= E3S-15), E3A-20/-21 MINOR (E3A-21 = E3S-16), E3A-22 MINOR, E3A-23 INFO.
+- Closed in this round: E3S-08 … -13, and E3A-11 … -17 except E3A-14's pinned input, which reopens as E3A-18.
+
+Every fix column is accepted:
+- **E3S-14:** add case .7.1/7, a hostile name with a clean display identifier, so the Name line gets a hostile value. The threshold becomes 8/8, plus one E5 mutant: the Name line built without `_card_value_text`.
+- **E3S-15 = E3A-19:** .7.1's check runs per card line, so the card's own LF line ends are not counted.
+- **E3S-16 = E3A-21:** READ.69's bound lives in the node that gives a tag its address (`extract_a2l_tags` / the address-word step). Trace READ.69 there, not to `_number_word`.
+- **E3S-17:** add DEL (U+007F) to the hostile inputs of .7.1.
+- **E3A-18:** .5/7's input becomes R-A2L-048/2's Save project commit with the table shown, not `patch_apply` (key 6 hides the Explorer, so the control stays GREEN). E4 records the negative control RED.
+- **E3A-20:** .3, .5 and .6 speak of the painted tag name where they mean it.
+- **E3A-22:** record it in "What else the operator sees": with a display identifier, the Name line moves the description and unit down one row of the card's 4 visible rows. Add one capture of it to AT-B103-I12-2, labelled so, for the operator's verdict.
+- **E3A-23:** E5 writes the painted-tag-name exception into CTX-TEXT's views list (canon text at batch end).
+
+**Next:** a narrow correction, then round 4 only if a MAJOR remains open in what it changes. The reviewers confirm each fix by reading.

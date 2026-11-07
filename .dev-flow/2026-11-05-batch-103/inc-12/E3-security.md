@@ -136,3 +136,58 @@ Records at `a102c160` (the E3 correction; authority `E3-rulings.md`). Product tr
 - [x] No secret values in this section, and no operator data. The payloads are synthetic and described, and home paths in the transcripts are masked.
 - [x] The verdict is explicit: **FAIL — BLOCK-UNTIL: E3S-08**. The HIGH (E3S-02) has no applied-and-verified evidence and stays `planned`.
 - [x] New tool or integration: none. No new outbound action, dependency or persisted state.
+
+## Round 3
+
+Records at `7ceb9671` (the round-2 correction; authority `E3-rulings.md` "Round 2 rulings"). Product tree unchanged (`e07fb00`; the card code is byte-identical on `b101-inc10` `aedeaddf` and `origin/main` `6f1743c1`, R). Reviewer: security-reviewer (Opus 5.5). Scope: only what `git diff 42348d10 7ceb9671 -- inc-12/ inc-11/` changed. Only this section and two `steps.log` lines were written.
+
+**Verdict: FAIL — BLOCK-UNTIL: E3S-14.** 1 MAJOR, 1 MEDIUM, 1 MINOR and 1 LOW findings.
+- **The helper closes E3S-08 for the five base sites.** `_card_value_text` (`graph-inc12.md:225-234`) maps each TAB/LF/CR run to one space and then calls `safe_text`, whose `_CONTROL_SCRUB` (`utils.py:41`) is the full C0, DEL and C1 class. It returns a literal `Text`, so there is no markup path. One mutant per site is listed.
+- **R-TUI-042a.8 adds a sixth site that no hostile case reaches** (E3S-14). This is the E3S-08 pattern again, one site this time.
+- **E3S-02 (HIGH) stays `planned`.** This clearance covers the E3 design gate only and authorizes nothing.
+
+**Evidence states.** All **R** this round: read in the records, at `e07fb00` and with `git show` on `b101-inc10` and `origin/main`. Nothing was run, so no runner copy or `/tmp/b103-e3-12-*` folder was made. The leak mechanism E3S-14 relies on, a raw `Text.append` reaching `render_full_update().render_segments`, was measured for the header in round 2 ([H2], [H row3]).
+
+### Findings
+
+| Id | Severity | Row / node / case | Defect | Fix |
+|---|---|---|---|---|
+| E3S-14 | MAJOR | R-TUI-042a.7.1 threshold (`01-requirements.md:57`); cases .7.1/1, /2 (`02-test-cases.md:42-43`); `_a2l_detail_card_text` example (`graph-inc12.md:206`); E5 mutants (`02-test-cases.md:64`) | **The Name line is a new append site for file text, and no case puts a hostile value on it.** When a display identifier is shown, the name moves from the header to the Name line (`graph-inc12.md:201`).<br>- .7.1/1 puts the sequences in the name with **no** display identifier, so there is no Name line.<br>- .7.1/2 puts them in the display identifier, and its example says "the Name line holds the clean name".<br>- .8/1 uses LONGMAP's plain name.<br>- AT-069b injects hostile text into the description and the unit only (`tests/test_tui_a2l_detail.py:279-283`).<br><br>So a Name line written as `text.append(tag["name"])` instead of `_card_field` passes all 7 items and every listed mutant. It then writes the name's ESC, U+009B, U+009D and U+0090 to the terminal on the card's visible second line (the same mechanism as round 2 [H2]). The node is right; the verification is not. The input is a hostile file (READ.4 records an error and keeps the tag). | Add **.7.1/7**: a tag with a clean `DISPLAY_IDENTIFIER` whose name holds the four sequences → the Name line holds no control character and the name's other characters in order, and the screen output holds none of the sequences. Threshold 7/7 → 8/8.<br><br>Add an E5 mutant: the Name line by raw `Text.append` → .7.1/7 RED.<br><br>Make the graph example at `:206` hostile in the name too. |
+| E3S-15 | MEDIUM | R-TUI-042a.7.1 threshold (`01-requirements.md:57`); expected results of .7.1/1 … /5 (`02-test-cases.md:42-46`) | **The card-text oracle cannot pass on the correct design.** It says `_a2l_detail_card_text(tag).plain` "holds no control character (U+0000 … U+001F, …)". But the card's own line ends are LF (`app.py:1273`, `:1324`, `:1335`), and every case tag has more than one line: a header, plus a `unit … · conv` line and a `limits` line from the MEASUREMENT header. So the assertion is RED on `_card_value_text` too. Round 2's text ("painted lines, joined without their line ends") did not have this problem.<br><br>A tester who has to reinterpret it may weaken the oracle of the HIGH's mitigation, for example by stripping every C0. The screen-output half ("none of the four sequences with its introducer") is unaffected. .7.1/6 is already per line. | State the oracle per line: "each line of the card's text, split at its LF line ends, holds no control character", or "no control character other than the card's own line ends". An LF from the value is still caught, by .7.2/1's one-line form. |
+| E3S-16 | MINOR | R-A2L-READ.69 coverage row and `_number_word` (`../inc-11/codewire/graph-inc11.md:191`, `:450`, `:461`); `extract_a2l_tags` (`:580-583`) | **READ.69 is traced to a node whose own examples show that it does not apply the bound.**<br>- `_number_word` returns `18446744073709551616` and `99999999999999999999` as values (`:461`).<br>- The address is decided in `extract_a2l_tags` (DE-8: both address words, agreement, `None`), and that node holds neither READ.69 nor the 2^64 − 1 bound.<br><br>Where the bound goes is therefore not designed. If an implementer puts it inside `_number_word`, READ.69/1 … /3 still pass ("no address"). The node would then also append READ.63's `address <word> is not a number` for a valid 20-digit number word, which is a false error text and contradicts round 2's accepted "no address, no parse error". READ.69/3 itself is right: its negative control kills a check that sits only on the ECU_ADDRESS path. | Put READ.69 in `extract_a2l_tags`: add it to `req:`, and add to `func:` "an agreed address above 0xFFFFFFFFFFFFFFFF → `None`, no error", with the /1 … /3 examples. Leave `_number_word`'s example as "holds: returns the value".<br><br>Add "and no `is not a number` error" to the expected results of READ.69/1 and /3. |
+| E3S-17 | LOW | R-TUI-042a.7.1's four sequences (`01-requirements.md:57`; `02-test-cases.md:42`) | **DEL (U+007F) is in the class but in no input.** A home-grown filter over `range(0x00, 0x20)` and `range(0x80, 0xA0)` passes all items. The design uses `safe_text`, which deletes DEL, so this is a guard on the oracle only. Terminals ignore DEL. | Put one U+007F inside one of the four sequences, for example in the DCS payload. |
+
+### Round-2 findings: status
+
+| Id | Status | Evidence |
+|---|---|---|
+| E3S-08 MAJOR | **closed in the design for the five base sites** (`approved` at E3; the mitigation stays `planned` until E4 and E5). The sixth site is E3S-14. | One helper builds every base file value: the header, `_card_field` (desc, layout, byte order), the unit, the conversion and the limits (`graph-inc12.md:201`, `:217`). `—`, the labels and `0x{addr:08X}` are developer text.<br>The class is C0, DEL and C1 (`utils.py:41`). The break runs are mapped before the scrub, so they are not deleted. The output is literal `Text`, and `Static.update(Text)` parses no markup.<br>The cases reach all five sites with ESC, U+009B, U+009D and U+0090, and E5 lists one mutant per site (`02-test-cases.md:42-47`, `:64`). The oracle wording is E3S-15. |
+| E3S-09 MEDIUM | **closed** | R-TUI-042a.8 shows the full name whenever the header shows the display identifier. The label of AT-B103-I12-2, "What else" and E2-7 are reworded. For the 88 V171 rows the decision page now asks about, every row has its full name in the card. |
+| E3S-10 MINOR | **rejected by the ruling; the residual is accepted** | Note for the record (R, not run): the ruling's premise "only on names that are already parse errors" does not reach a display identifier written as a quoted word. READ.4 exempts quoted strings that are not names, so a bidirectional control in it is kept with no error. It sits on the card's address line. R-TUI-042a.8 moves the name itself to its own line. Display only, and bidirectional reordering on Windows Terminal was not measured. No new finding. |
+| E3S-11 LOW | **closed in the design** | Only the two slices are projected (`graph-inc12.md:107`), so the cost is O(*w*). `name[len(name) - t:]` avoids the `name[-0:]` trap at *t* = 0. Residual: the caller's `.replace("\n", " ").strip()` (`app.py:20432`, unchanged) stays linear, but at C speed: a substring search, and when nothing changes the same string comes back (R, CPython semantics, not measured). It is not the per-character Python loop of round 2. No action. |
+| E3S-12 LOW | **closed** | (a) the oracle and (b) the call shape are in the E2-6 note (`graph-inc12.md:304`) and in `E2-rulings.md:13`, as proposed. |
+| E3S-13 MINOR | **closed for the case** | READ.69/3 (`../inc-11/02-test-cases.md:238`): the 7 words are kind, address, deposit, max diff, conversion and the two limits, so the 20-digit word is in the address position. Its negative control kills a check that sits only on the ECU_ADDRESS path. The node gap is E3S-16. |
+
+### Routed questions — answers
+
+- **The *painted tag name* term and the proposed CTX-TEXT note.** Sound from this lens.
+  - The Tag cell meets R-TUI-103 (no control character: they are shown as U+FFFD) and R-TUI-103b (`safe_text` around the cut).
+  - Canon's break characters are TAB, LF and CR only (`REQUIREMENTS.md:451`), so the helper's mapping set matches.
+  - The note exists only in `01-requirements.md:44` until batch end. The canon pass must carry it, or canon R-TUI-103a contradicts the Tag cell. That is a records item, not a finding.
+- **R-TUI-042a.7.1 / .7.2 and `_card_value_text`.**
+  - Every base append site routes through it: yes.
+  - C0, DEL and C1 are covered in the helper: yes. In the inputs, DEL is missing (E3S-17).
+  - Each break run becomes one space: yes, and before the scrub. Interleaved controls (LF ESC LF) give two spaces, which follows the letter of R-TUI-103.1.
+  - There is no markup path.
+  - .7.2 also stops an LF in a value from forging a card line such as `name …`.
+- **R-TUI-042a.8.** The file text goes through the same helper (`_card_field`) in the node, but not in the cases (E3S-14).
+- **`_shorten_tag_name`.** O(*w*): yes (E3S-11).
+- **READ.69/3.** Right as a case (E3S-13). The node is E3S-16.
+
+### Evidence checklist (round 3)
+
+- [x] Each finding has what, where, why and fix: the table columns, with `file:line` in the records and at `e07fb00`.
+- [x] Each finding has a severity: 1 MAJOR, 1 MEDIUM, 1 MINOR and 1 LOW.
+- [x] No secret values and no operator data in this section. The payloads are described, not reproduced.
+- [x] The verdict is explicit: **FAIL — BLOCK-UNTIL: E3S-14**. The HIGH (E3S-02) has no applied-and-verified evidence and stays `planned`.
+- [x] New tool or integration: none. No new outbound action, dependency or persisted state.

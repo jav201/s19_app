@@ -197,3 +197,93 @@ Batch 2026-11-05-batch-103, increment 12 (A2L tag table: no glued or cut values)
 - **`not-run`:** no probe on cachyos-rtx. Every claim rests on reading, the extractor or Grep, so no runner folder was made.
 
 **What would make this PASS-WITH-NOTES:** the ruling of E3A-11. E3A-12 … E3A-17 do not block.
+
+## Round 3 (2026-11-07): the round-2 correction `7ceb9671` against `42348d10`
+
+**Scope:** only what `git diff 42348d10 7ceb9671 -- inc-12/ inc-11/` changed, judged against `E3-rulings.md` "Round 2 rulings".
+
+**Read:**
+- the diff (word level) of `inc-12/01-requirements.md`, `02-test-cases.md`, `codewire/graph-inc12.md`, `E1-slice.md`, `E2-rulings.md`, `steps.log`, and of `inc-11/01-requirements.md`, `02-test-cases.md`, `codewire/graph-inc11.md` (`_number_word`, `_characteristic_from_tokens`, `extract_a2l_tags`, coverage rows `:186-194`);
+- canon `REQUIREMENTS.md:445-486`, `PLAN.md:67`;
+- at `e07fb00`: `s19_app/tui/app.py:1245-1377` (the card and its CSS), `s19_app/utils.py:41-99`, `tests/test_tui_a2l_detail.py:130-300`, `tests/test_a2l_multiline_headers.py:355-376`;
+- on `b101-inc10` (`aedeaddf`): `app.py:18737-18915` (`_note_image_bytes_written`, `_refresh_a2l_values_after_write`), `tests/test_b101_inplace_views.py:288-392`, `:480-530`, `:681-910`;
+- round 1's probe `e3a12-order.py:430-495` (session scratchpad);
+- `E3-security.md` "Round 3", read after these findings were drafted, for cross-references only.
+
+### Verdict: FAIL
+
+1 MAJOR, 1 MEDIUM, 3 MINOR, 1 LOW, 1 INFO. No redesign is asked.
+
+**What blocks: E3A-18.** Round 2 pinned an input for R-TUI-042a.5/7, on my E3A-14 fix, and that input makes the case's negative control vacuous.
+- `patch_apply` presses key `6`, so the A2L Explorer is hidden when the write repaints the table.
+- To read the Tag cell, the test presses key `2`. The fit that runs then repaints every Tag cell with *w*, with or without the one-line change.
+
+The fix is one case input. No design change.
+
+**The question asked of the CTX term and the note:** yes, the Tag cell is now a scoped exception, with two wording gaps.
+- The *painted tag name* meets R-TUI-103: every control character is shown as U+FFFD.
+- It meets R-TUI-103b: the cell is a literal `Text`, and AT-069c's `Text.from_markup` mutant guards it.
+- It departs from 103a and 103.1 only in the way the note states.
+- The card meets all four rows through `_card_value_text` (R-TUI-042a.7.1, .7.2).
+- No other row of CTX-TEXT is contradicted.
+
+The two gaps:
+- Rows .3, .5 and .6 still measure, and promise, by the raw name rather than the *painted tag name* that the term defines (E3A-20).
+- The note carries the exception beside the normative text, not in it (E3A-23).
+
+| Id | Severity | Row / node / case | Finding | Proposed fix |
+|---|---|---|---|---|
+| E3A-18 | MAJOR | R-TUI-042a.5/7 (`02-test-cases.md:36`); .5's threshold item (`01-requirements.md:55`); `_repaint_a2l_tag_cells` example (`graph-inc12.md:151`) | **The pinned input hides the table, so the case cannot fail. My round-2 fix (E3A-14) was wrong.**<br><br>**The write happens on a hidden table.**<br>- `patch_apply` is `open_patch` (key `6`; it waits for `_active_screen_key == "patch"`), then the document load and Apply (`b101-inc10` `tests/test_b101_inplace_views.py:288-299`, `:364-369`).<br>- So the A2L Explorer is hidden during the write, and its table's size is (0, 0) (E2 [P design rehide]).<br>- The chain `_note_image_bytes_written` → `_refresh_a2l_values_after_write` → `_repaint_a2l_tag_cells` (`app.py:18808`, `:18866-18913`) runs on that hidden table. With the one-line change, *w* is `None` and the repaint paints the 34-cell form. Without the change, it paints the same form.<br><br>**Showing the table again repairs both.**<br>- The test must press `2` to read the Tag cell.<br>- Showing the table gives it a Resize, then `Measured`, then a fit that repaints in place with *w* (E2-2; [P design rehide] 1/1).<br>- Both variants therefore end at 6 + `…` + 7, and the negative control "the repaint without the name width → RED" stays GREEN.<br><br>**Why the round-1 evidence does not carry over.** [O repaint10b] called `_repaint_a2l_tag_cells()` directly, with the table shown (`e3a12-order.py:469-495`). `patch_apply` never reaches that state. | **Pin the input to the one 10b route whose write lands while the tag table is shown:** the Save project commit of R-A2L-048/2 (10b's `save_project`, `:372-382`; its test, `:708-734`). The steps:<br>1. `patch_apply` of one byte;<br>2. `edit_entry` with no new apply;<br>3. key `2`;<br>4. `ctrl+s`, with the Save project dialog confirmed.<br><br>Read the Tag cell after the `Saved project to` line, before any other key:<br>- with the width: 6 + `…` + 7;<br>- without it: the 34-cell form, cut at the pane edge → RED.<br><br>The dialog leaves the table's size unchanged, so neither a Resize nor a fit follows (R). E4 confirms the RED before the case counts.<br><br>Use the same input in the graph example (`:151`) and in .5's threshold item. |
+| E3A-19 | MEDIUM (= E3S-15) | R-TUI-042a.7.1 threshold (`01-requirements.md:57`); cases .7.1/1 … /6 (`02-test-cases.md:42-47`); graph example `:205` | **The card-text oracle is RED on the correct design.**<br>- It asks that `_a2l_detail_card_text(tag).plain` hold no character of U+0000 … U+001F.<br>- But the card's own line ends are LF (`app.py:1273`, `:1324`, `:1335`), and every case tag has several lines.<br>- Round 2's wording, "the painted lines, joined without their line ends", did not have this defect. The correction dropped it. | **Scope the oracle to the value.** Either:<br>- "each line of the card's text (`.plain` split at its line ends) holds no control character", or<br>- "no control character other than the card's own line ends".<br><br>Make the same change in the graph example (`:205`). .7.2's "no TAB, LF or CR from the value" is already scoped, so it stays. |
+| E3A-20 | MINOR | CTX *painted tag name* (`01-requirements.md:42`) against R-TUI-042a.3, .5 and .6 (`:53`, `:55`, `:56`); `_shorten_tag_name` (`graph-inc12.md:107`, `:111`) | **The term says "project, then cut", but the rows still speak of the raw name.**<br><br>**.3 and .5 count cells; the node counts characters.**<br>- The rows cut "a tag name wider than 34 (or *w*) cells" into its first and last *cells*.<br>- The node cuts by characters of the projection: `len(name) <= width` (`:107`).<br>- The two differ for every name that holds a character not one cell wide.<br>- Example `:111`: `ＡＢＣＤＥＦＧＨＩＪ` is 20 cells, wider than 14, so .5 asks for a cut. The node shows its 10 × U+FFFD whole.<br>- A 30-character name followed by 10 × U+200B is 30 cells, so .3 asks for no cut. The node cuts it, since it has 40 characters.<br><br>**.6's text contradicts its own case.** .6 says the system "shall show that character as U+FFFD in the Tag cell", but the cut drops most such characters. .6/1's own expected result keeps 7 of the 4,000 (`:56`).<br><br>**Impact.** No tracked or corpus name is affected, so no test of the shipped files moves. The gap is in what E4 reads as the rule. | **Let the rows use the term.**<br>- .3 and .5: "… shall show a tag's *painted tag name* longer than 34 (*w*) characters as its first … characters, `…` and its last … characters". Each of its characters is one cell, since `len(p(s)) == len(s)`.<br>- .6: "… shall show each such character that the Tag cell keeps as U+FFFD".<br><br>The thresholds stay unchanged. |
+| E3A-21 | MINOR (= E3S-16) | R-A2L-READ.69 coverage row and `_number_word` (`../inc-11/codewire/graph-inc11.md:191`, `:450`, `:461`); `_characteristic_from_tokens` (`:522-526`); `extract_a2l_tags` (`:580-583`) | **READ.69 is traced to a node that, by its own example, does not apply the bound.**<br>- `_number_word` returns `18446744073709551616` and `99999999999999999999` as values (`:461`).<br>- Two nodes turn an address word into the tag's address: `_characteristic_from_tokens` (the header address, `_number_word(params[1])`) and `extract_a2l_tags` (ECU_ADDRESS, DE-8). Neither lists READ.69 or the bound, so the check has no home.<br><br>**The risk of the obvious placement.** Put inside `_number_word`, the bound passes /1 … /3. But it also turns every 20-digit length or count word above 2^64 − 1 into "gives no number". That changes READ.38's and READ.39's path, and no case would see it.<br><br>My round-2 fix ("the node that takes a tag's address words, beside `_number_word`") was ambiguous. | **Mirror READ.38's row** (`:193`):<br>- READ.69 goes on `_characteristic_from_tokens` (/3) and `extract_a2l_tags` (/1, /2), each with its example and the negative control "only on the ECU_ADDRESS path".<br>- `_number_word` keeps its example in READ.38's H3 pattern (`:460`): "returns the value; its callers apply the bound". |
+| E3A-22 | MINOR (UX) | R-TUI-042a.8 (`01-requirements.md:59`); "What else the operator sees" (`:68`); AT-B103-I12-2 (`02-test-cases.md:58`) | **The Name line uses the card's few visible rows, and no record shows the operator that.**<br><br>**The space.** The card has `max-height: 5` and a bottom border (`app.py:1370-1377`), so it has 4 content rows (R: textual's border-box sizing). On base, a tag with a display identifier shows its header and the next three lines: desc, unit · conv, layout.<br><br>**The cost** (R, from round 1's measured card widths; not run):<br>- With .8 the Name line comes second.<br>- Rich wraps after the label `name` and folds a long word.<br>- At 118 columns (40 content cells), a name of 36 or more characters takes 2–3 rows.<br>- At 80 columns (24 cells), a name of 20 or more characters takes 2–3 rows.<br>- The description and the unit then fall below the visible rows, and the operator has to scroll to them.<br>- For LONGMAP(48) with `SYN_DISP_W` at 118×54, the 4 rows hold only the header and the Name line.<br><br>That is the state long names without a display identifier already have on base (R-TUI-042a.3/4's 3-row header).<br><br>**The placement is right.** Both alternatives are worse:<br>- the Name line last: it would be hidden;<br>- the name in the header: READ.33's first line would no longer show the identifier alone. | **No design change.**<br>- Record it in "What else the operator sees": "for a tag with a display identifier, the Name line can push the description and unit below the card's visible rows".<br>- Add one capture to AT-B103-I12-2 with that label: V171, the cursor on a row with a display identifier, at 80×50 and 118×54, before and after. |
+| E3A-23 | LOW | Proposed canon note (`01-requirements.md:44`); canon `REQUIREMENTS.md:455-486` | **The exception sits beside the normative text, not in it.**<br>- R-TUI-103a and 103.1 carve out "a painted name" in their own text.<br>- The proposed note is a paragraph beside *painted-name views*. Written as it stands, the rows still say "every other character unchanged" for the whole A2L Explorer, so a reader has to find the note.<br>- The house has an in-text precedent: "the Reports dialog's report view with its Markdown structure kept (S12)" sits in the safe-text views list itself.<br><br>**Two tracked totals.** The note counts 234,654 tracked names (E3S [N2]); the same file counts 234,648 tracked tags (`:68`, E3A [C], 34 tracked A2L files). They are two instruments, and both give 0 here. | **When E5 writes the canon:**<br>- define *painted tag name* in CTX-TEXT (from `:42`);<br>- write the exception into the views list: "the A2L Explorer (detail card; table, its Tag cell showing a tag name as its *painted tag name*, R-TUI-042a.3, .5, .6)".<br><br>No canon row changes.<br><br>Name the file set of each count. |
+| E3A-24 | INFO | `_card_value_text` (`graph-inc12.md:225-234`); D-6 (`docs/requirements/review/CODE-CHANGES.md:28`) | **The product's first R-TUI-103.1 implementation.**<br>- A Grep at `e07fb00` finds no break-run helper. `diff_report_service.py:244` maps each break character, not each run.<br>- D-6 stays open for the other safe-text views. | Record beside D-6: when D-6 is fixed, move this helper to `utils.py` beside `safe_text` and reuse it, rather than adding a second one. |
+
+### Status of the round-2 findings
+
+| Id | Status | Evidence |
+|---|---|---|
+| E3A-11 | **closed as ruled**; two wording gaps remain (E3A-20, E3A-23) | **The CTX term** is in `01-requirements.md:42`.<br>**The note** is at `:44`. It names the scoped exception to 103a and 103.1, and keeps the card as a full safe-text view.<br>**.6's status** now cites READ.66's character range, with DEF.137 dropped (`:56`).<br>**"Cited and unchanged"** cites R-TUI-103, 103.1, 103a and 103b (`:61`).<br>**The graph's `_shorten_tag_name`** returns the *painted tag name* and cites the note (`graph-inc12.md:107`).<br>**The older middle-cut gap** is covered by the same note. |
+| E3A-12 | **closed in the design**; its oracle regressed (E3A-19) | **(i) The class.** .7.1 is CTX-TEXT's whole control class, and a filter of ESC and U+009B only is a negative control (`:57`).<br>**(ii) The sites.** All five append sites are cases, /1 … /6 (`02-test-cases.md:42-47`), and E5 has one mutant per site (`:64`).<br>**(iii) Break runs.** .7.2 maps each break run to one space, with three negative controls (`:58`). Its third control, one space for every whitespace run → R-TUI-103a, is a good addition.<br>**The helper.** `_card_value_text` maps break runs, then calls `safe_text`. My example check: `SYN` + ESC `[31m` + U+009B `31m` + U+009D `0;x` + U+0090 `q` + `_END` → `SYN[31m31m0;xq_END` is right for `_CONTROL_SCRUB` (`utils.py:41`).<br>**`utils.py` holds no 103.1 helper** (Grep). |
+| E3A-13 | **closed for the case**; the node is E3A-21 | READ.69/3 has the header address in the address position, and no ECU_ADDRESS, so DE-8's disagreement rule does not apply (`../inc-11/02-test-cases.md:238`).<br>Threshold 4/4 = 2 + 1 + 1.<br>`0x56BC75E2D630FFFFF` = 10^20 − 1 ✓. |
+| E3A-14 | **red list closed**; **the pin reopened as E3A-18** | The 7 tests and their helpers are as I listed them (`E2-rulings.md:13`; graph E2-6 note):<br>- `row_name` and `find_row` read `get_row_at(index)[0]`;<br>- `filter_raw` reads `[4]` (`:566`) and `raw_phys` reads `[4]` and `[5]`, which keep their indices;<br>- `card_text` asserts `tag in …` (`:859-880`), which holds with a Name line.<br><br>QC-TM-10b-1 (`:1367-1402`) reads no column. |
+| E3A-15 | **closed** | Both places are reworded (`graph-inc12.md:122`, `:251`). The entity `[Outside: image write]` (`:265`) and both edges (`:293-295`) are added.<br>No helper call edge is drawn anywhere in this graph, so `_card_value_text` having no edge follows the graph's own convention. |
+| E3A-16 | **closed** | PLAN row 12 holds the E4 sequencing (`PLAN.md:67`).<br>0 `.pyc` files are under `.dev-flow/` at `7ceb9671` (`git ls-tree`). |
+| E3A-17 | **closed** | `E1-slice.md:3`. |
+
+### The checks this round named
+
+- **Strict EARS ✓ for .7.1 (If), .7.2 (If) and .8 (When):**
+  - each has one *shall* and the subject "the system", and is observable;
+  - .8's "When the system shows …" matches canon R-TUI-103's form.
+- **Every N/N threshold equals its case count ✓:**
+
+  | Row | Threshold | Cases |
+  |---|---|---|
+  | .7.1 | 7/7 | 1 + 1 + 1 + 1 + 1 + 2 |
+  | .7.2 | 2/2 | 1 + 1 |
+  | .8 | 2/2 | 1 + 1 |
+  | READ.69 | 4/4 | 2 + 1 + 1 |
+
+- **Negative controls:**
+  - .7.1, .7.2 and .8 each have a real mutant that goes RED, except that .7.1's oracle is RED on every variant (E3A-19).
+  - .5/7's is vacuous (E3A-18).
+- **`_card_value_text` and its callers ✓:**
+  - The callers are `_a2l_detail_card_text` (header, unit, conversion, limits) and `_card_field` (desc, layout, byte order and the Name line). Both are in the card, and the node is new, so no base caller exists.
+  - Its input `str(value)` covers the non-string limits.
+  - The card's developer text (the labels, `—`, `0x{addr:08X}`) stays outside it.
+- **Tests that read the card (Grep of `tests/` at `e07fb00`, `main` `3c196d16` and `b101-inc10`):** AT-069, AT-069b, AT-103 (`test_a2l_multiline_headers.py:362-376`) and 10b's `card_text` all assert by substring or `.plain`. No test reads card lines by position, so the Name line adds nothing to E2-6. AT-069b's re-point already covers the break mapping.
+- **The Name line against READ.33 ✓:**
+  - READ.33's threshold ("only the identifier in the detail card's first line") holds, since the Name line is second.
+  - The UX cost is E3A-22.
+
+### Run
+
+- **`not-run`:** no runner run. Every claim rests on reading and Grep, and on measurements already on record: E2 [P design rehide] and round 1's [O repaint10b].
+  - E3A-18's proposed route (the Save project commit with the table shown) is **R**. E4 confirms its RED.
+  - No runner folder was made.
+- **Executed on this PC:** read-only `git show`, `git grep`, `git ls-tree` and Grep. Nothing imports `s19_app`.
+
+**What would make this PASS-WITH-NOTES:** E3A-18's fix (one case input, in three places). E3A-19 … E3A-24 do not block. E3A-19 is a one-phrase fix that is best made in the same pass.
