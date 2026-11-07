@@ -71,3 +71,16 @@ Round 4 (security): **FAIL** — E3S-24 … -28 closed, census still 0 extra ref
 | E3S-31, -32, -33 | accept with their fix columns. |
 
 **Correction by Opus** (design work; one agent, targeted edits), then **round 5 security**, asked specifically to break R-A2L-DEF.138.
+
+## Round 4 census ruling (2026-11-06T20:44:40-06:00, orchestrator Opus 5.5)
+
+The round-4 correction (Opus, 25 min) applied E3S-30 … -35 and R-A2L-DEF.138 / .139; the overlap census (`evidence-e3/corr4-overlap-census*`) refuses **223,524 encodes**: case_06 (220,040 — a synthetic stress file whose 220,040 tags all overlap), software_a (3,189, all at 0x0), from_source (68), small update/validation fixtures; 8 refusals only because two read masks share bits (correct: those objects would clobber each other). Release case 08: 0 (its issues variant: 6, by design). Duplicate names: 0 outside case 08's issues file.
+
+| Item | Ruling |
+|---|---|
+| I-2 field `shared_with` | **accepted.** |
+| R-A2L-DEF.138's index | **refined:** the span index holds only objects whose address the A2L **declares** (a CHARACTERISTIC's header address word, or an ECU_ADDRESS line of a MEASUREMENT / AXIS_PTS) — an object with no declared address cannot be encoded anyway (its own refusal). The value 0x0 is a valid declared address (flash at 0) and is not special. Refusals that remain are declared overlaps; they stay refused (a file whose objects overlap is inconsistent; the refusal names both). |
+| Census | re-run with the refinement; report per file. Expected: software_a and from_source's 0x0 refusals disappear if those objects declare no address; case_06 stays refused if its addresses are declared (correct). |
+| The 8 V171 cases that contradict .138 (`02-test-cases.md:318`) | the cases follow the row: two masked objects whose read masks share bits are refused. |
+
+**Next:** a narrow Opus pass (the index refinement in the row, CTX and graph; census re-run; the 8 cases), then round 5 security on E3S-30, E3S-35 and .138.

@@ -1,0 +1,54 @@
+# E3 correction pass 4 (Inc 2, batch-103) - R-A2L-DEF.138 overlap census
+# host cachyos-rtx; run 2026-11-06T20:24:06-06:00 .. 20:24:24-06:00; Python 3.11.18 (conda env s19ci), python -I
+# base parser imported from the read-only clone ~/work/s19_app at e07fb00f (0 changed files before and after the run)
+# HOME, XDG_CACHE/CONFIG/DATA_HOME and LOCALAPPDATA under /tmp/b103-e3c4-2/home; DISPLAY/WAYLAND_DISPLAY unset; stdin </dev/null; no clipboard
+# command: python -I corr4-overlap-census.py ~/work/s19_app /tmp/b103-e3c4-2/scratch /tmp/b103-e3c4-2/corr4-overlap-census-list.txt
+# list file: corr4-overlap-census-list.txt (one line per refused object for files with <= 400 refusals; one line per start address otherwise)
+# the 'A2L section tree has structural errors' lines are the base parser's own log output (kept)
+
+A2L section tree has structural errors: path=/home/javiergr/work/s19_app/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+tracked .a2l files: 35
+[FX] examples/case_00_public/ASAP2_Demo_V161.a2l: tags=75 spans=67 addr-no-len=8 masks-read=6 overlapping-pairs=153 exempt-pairs=3 | refused=41 (A=37, B-only=4) describe-clean-refused=38 | duplicate-names=0
+[FX] examples/case_00_public/ASAP2_Demo_V171.a2l: tags=118 spans=98 addr-no-len=20 masks-read=6 overlapping-pairs=199 exempt-pairs=3 | refused=51 (A=47, B-only=4) describe-clean-refused=43 | duplicate-names=0
+[FX] examples/case_00_public/BalanceTube_STMicro.a2l: tags=111 spans=111 addr-no-len=0 masks-read=9 overlapping-pairs=6105 exempt-pairs=0 | refused=111 (A=111, B-only=0) describe-clean-refused=111 | duplicate-names=0
+[FX] examples/case_00_public/check_test.a2l: tags=1 spans=0 addr-no-len=1 masks-read=0 overlapping-pairs=0 exempt-pairs=0 | refused=0 (A=0, B-only=0) describe-clean-refused=0 | duplicate-names=0
+[FX] examples/case_00_public/cleanup_test.a2l: tags=0 spans=0 addr-no-len=0 masks-read=0 overlapping-pairs=0 exempt-pairs=0 | refused=0 (A=0, B-only=0) describe-clean-refused=0 | duplicate-names=0
+[FX] examples/case_00_public/from_source.a2l: tags=72 spans=68 addr-no-len=4 masks-read=0 overlapping-pairs=2278 exempt-pairs=0 | refused=68 (A=68, B-only=0) describe-clean-refused=36 | duplicate-names=0
+[FX] examples/case_00_public/from_source_structs.a2l: tags=0 spans=0 addr-no-len=0 masks-read=0 overlapping-pairs=0 exempt-pairs=0 | refused=0 (A=0, B-only=0) describe-clean-refused=0 | duplicate-names=0
+[FX] examples/case_00_public/included.a2l: tags=1 spans=1 addr-no-len=0 masks-read=0 overlapping-pairs=0 exempt-pairs=0 | refused=0 (A=0, B-only=0) describe-clean-refused=0 | duplicate-names=0
+[FX] examples/case_00_public/memorysegment.a2l: tags=0 spans=0 addr-no-len=0 masks-read=0 overlapping-pairs=0 exempt-pairs=0 | refused=0 (A=0, B-only=0) describe-clean-refused=0 | duplicate-names=0
+[FX] examples/case_00_public/merge_inc_test.a2l: tags=0 spans=0 addr-no-len=0 masks-read=0 overlapping-pairs=0 exempt-pairs=0 | refused=0 (A=0, B-only=0) describe-clean-refused=0 | duplicate-names=0
+[FX] examples/case_00_public/remove_test.a2l: tags=2 spans=2 addr-no-len=0 masks-read=0 overlapping-pairs=0 exempt-pairs=0 | refused=0 (A=0, B-only=0) describe-clean-refused=0 | duplicate-names=0
+[FX] examples/case_00_public/software_a.a2l: tags=13990 spans=3189 addr-no-len=263 masks-read=0 overlapping-pairs=5083266 exempt-pairs=0 | refused=3189 (A=3189, B-only=0) describe-clean-refused=3182 | duplicate-names=0
+[FX] examples/case_00_public/software_b.a2l: tags=67 spans=0 addr-no-len=0 masks-read=0 overlapping-pairs=0 exempt-pairs=0 | refused=0 (A=0, B-only=0) describe-clean-refused=0 | duplicate-names=0
+[FX] examples/case_00_public/update_test1.a2l: tags=12 spans=7 addr-no-len=5 masks-read=3 overlapping-pairs=21 exempt-pairs=3 | refused=7 (A=7, B-only=0) describe-clean-refused=6 | duplicate-names=0
+[FX] examples/case_00_public/update_test2.a2l: tags=14 spans=9 addr-no-len=5 masks-read=3 overlapping-pairs=36 exempt-pairs=1 | refused=9 (A=9, B-only=0) describe-clean-refused=9 | duplicate-names=0
+[FX] examples/case_00_public/update_typedef_test1.a2l: tags=0 spans=0 addr-no-len=0 masks-read=0 overlapping-pairs=0 exempt-pairs=0 | refused=0 (A=0, B-only=0) describe-clean-refused=0 | duplicate-names=0
+[FX] examples/case_00_public/update_typedef_test2.a2l: tags=0 spans=0 addr-no-len=0 masks-read=0 overlapping-pairs=0 exempt-pairs=0 | refused=0 (A=0, B-only=0) describe-clean-refused=0 | duplicate-names=0
+[FX] examples/case_00_public/update_typedef_test3.a2l: tags=0 spans=0 addr-no-len=0 masks-read=0 overlapping-pairs=0 exempt-pairs=0 | refused=0 (A=0, B-only=0) describe-clean-refused=0 | duplicate-names=0
+[FX] examples/case_00_public/update_typedef_test4.a2l: tags=0 spans=0 addr-no-len=0 masks-read=0 overlapping-pairs=0 exempt-pairs=0 | refused=0 (A=0, B-only=0) describe-clean-refused=0 | duplicate-names=0
+[FX] examples/case_00_public/xcp_test.a2l: tags=0 spans=0 addr-no-len=0 masks-read=0 overlapping-pairs=0 exempt-pairs=0 | refused=0 (A=0, B-only=0) describe-clean-refused=0 | duplicate-names=0
+[FX] examples/case_01_basic_valid/firmware.a2l: tags=3 spans=3 addr-no-len=0 masks-read=0 overlapping-pairs=0 exempt-pairs=0 | refused=0 (A=0, B-only=0) describe-clean-refused=0 | duplicate-names=0
+[FX] examples/case_02_gaps_and_patch_targets/firmware.a2l: tags=3 spans=3 addr-no-len=0 masks-read=0 overlapping-pairs=0 exempt-pairs=0 | refused=0 (A=0, B-only=0) describe-clean-refused=0 | duplicate-names=0
+[FX] examples/case_03_overlapping_records/firmware.a2l: tags=2 spans=2 addr-no-len=0 masks-read=0 overlapping-pairs=0 exempt-pairs=0 | refused=0 (A=0, B-only=0) describe-clean-refused=0 | duplicate-names=0
+[FX] examples/case_04_bad_checksums/firmware.a2l: tags=1 spans=1 addr-no-len=0 masks-read=0 overlapping-pairs=0 exempt-pairs=0 | refused=0 (A=0, B-only=0) describe-clean-refused=0 | duplicate-names=0
+[FX] examples/case_05_dense_mixed_content/firmware.a2l: tags=4 spans=4 addr-no-len=0 masks-read=0 overlapping-pairs=0 exempt-pairs=0 | refused=0 (A=0, B-only=0) describe-clean-refused=0 | duplicate-names=0
+[FX] examples/case_06_large_nested_a2l/firmware.a2l: tags=220040 spans=220040 addr-no-len=0 masks-read=0 overlapping-pairs=12499540 exempt-pairs=0 | refused=220040 (A=220040, B-only=0) describe-clean-refused=220040 | duplicate-names=0
+[FX] examples/case_07_stress_smoke/firmware.a2l: tags=12 spans=12 addr-no-len=0 masks-read=0 overlapping-pairs=1 exempt-pairs=0 | refused=2 (A=2, B-only=0) describe-clean-refused=0 | duplicate-names=0
+[FX] examples/professional_validation/case_01_baseline_valid/firmware.a2l: tags=3 spans=3 addr-no-len=0 masks-read=0 overlapping-pairs=0 exempt-pairs=0 | refused=0 (A=0, B-only=0) describe-clean-refused=0 | duplicate-names=0
+[FX] examples/professional_validation/case_02_patch_targets_and_gaps/firmware.a2l: tags=6 spans=6 addr-no-len=0 masks-read=0 overlapping-pairs=3 exempt-pairs=0 | refused=6 (A=6, B-only=0) describe-clean-refused=6 | duplicate-names=0
+[FX] examples/professional_validation/case_03_overlapping_records/firmware.a2l: tags=3 spans=3 addr-no-len=0 masks-read=0 overlapping-pairs=0 exempt-pairs=0 | refused=0 (A=0, B-only=0) describe-clean-refused=0 | duplicate-names=0
+[FX] examples/professional_validation/case_04_bad_checksums/firmware.a2l: tags=1 spans=1 addr-no-len=0 masks-read=0 overlapping-pairs=0 exempt-pairs=0 | refused=0 (A=0, B-only=0) describe-clean-refused=0 | duplicate-names=0
+[FX] examples/professional_validation/case_05_out_of_order_and_mixed/firmware.a2l: tags=3 spans=3 addr-no-len=0 masks-read=0 overlapping-pairs=0 exempt-pairs=0 | refused=0 (A=0, B-only=0) describe-clean-refused=0 | duplicate-names=0
+[FX] examples/professional_validation/case_07_cross_reference_inconsistencies/firmware.a2l: tags=4 spans=4 addr-no-len=0 masks-read=0 overlapping-pairs=0 exempt-pairs=0 | refused=0 (A=0, B-only=0) describe-clean-refused=0 | duplicate-names=0
+[FX] examples/professional_validation/case_08_heavy_fragmentation/firmware.a2l: tags=100 spans=100 addr-no-len=0 masks-read=0 overlapping-pairs=0 exempt-pairs=0 | refused=0 (A=0, B-only=0) describe-clean-refused=0 | duplicate-names=0
+[FX] tests/fixtures/synth/synth_a2l.a2l: tags=6 spans=6 addr-no-len=0 masks-read=0 overlapping-pairs=0 exempt-pairs=0 | refused=0 (A=0, B-only=0) describe-clean-refused=0 | duplicate-names=0
+[FX-total] files=35 tags=234654 spans=223743 addr-no-len=306 masks-read=27 overlapping-pairs=17591602 exempt-pairs=10 | refused=223524 (A=223516, B-only=8) describe-clean-refused=223471 | duplicate-names=0 | 17.2 s
+files with refusals: 10
+
+== extra: release case 08 (generator of the clone, seed 20260001, 1 MiB) ==
+generator exit 0 
+[FX] case08/firmware.a2l: tags=462 spans=462 addr-no-len=0 masks-read=0 overlapping-pairs=0 exempt-pairs=0 | refused=0 (A=0, B-only=0) describe-clean-refused=0 | duplicate-names=0
+[FX] case08/firmware_issues.a2l: tags=470 spans=470 addr-no-len=0 masks-read=0 overlapping-pairs=3 exempt-pairs=0 | refused=6 (A=6, B-only=0) describe-clean-refused=6 | duplicate-names=1
+list written: corr4-overlap-census-list.txt, 2233 lines
