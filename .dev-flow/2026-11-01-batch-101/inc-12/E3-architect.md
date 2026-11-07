@@ -23,7 +23,7 @@ Batch 2026-11-01-batch-101, increment 12 (every dialog, action and widget reacha
 - `reach_audit.py` classifies the source of each action's reach.
 - `opener_audit.py` finds the function that holds each dialog construction and counts its references.
 
-Both scripts are in the session scratchpad (`C:\Users\jjgh8\AppData\Local\Temp\claude\107abb51e32da120\e5f4854c-ff03-4b96-961e-71e14eb1ee40\scratchpad\`). They are not evidence. Their results below are `executed` on this PC as source reads only. Every base count they imply must be re-measured on the LAN host at E4.
+Both scripts are in the session scratchpad (`<HOME>\AppData\Local\Temp\claude\107abb51e32da120\e5f4854c-ff03-4b96-961e-71e14eb1ee40\scratchpad\`). They are not evidence. Their results below are `executed` on this PC as source reads only. Every base count they imply must be re-measured on the LAN host at E4.
 
 ## Verdict: FAIL
 
