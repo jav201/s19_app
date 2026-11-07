@@ -1,0 +1,164 @@
+# M-.58.2e
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.58.2e/s19_app/__init__.py
+# note: recursive walk restored
+#   EDIT-OK: '    stack = list(reversed(a2l_data.get("sections") or []))\n    while s'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..7353ab23 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -375,18 +375,19 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
+     compu_methods_by_name: dict[str, dict] = {}
+     compu_tables_by_name: dict[str, dict] = {}
+ 
+-    stack = list(reversed(a2l_data.get("sections") or []))
+-    while stack:
+-        node = stack.pop()
+-        node_name = node.get("name")
+-        parsed = parse_begin_meta(node.get("meta", "") or "")
+-        if node_name in ("MEASUREMENT", "CHARACTERISTIC"):
+-            object_sections_by_name.setdefault(parsed[0], []).append(node)
+-        elif node_name == "COMPU_METHOD":
+-            compu_methods_by_name.setdefault(parsed[0], node)
+-        elif node_name in ("COMPU_VTAB", "COMPU_VTAB_RANGE"):
+-            compu_tables_by_name.setdefault(parsed[0], node)
+-        stack.extend(reversed(node.get("children") or []))
++    def _walk(nodes):
++        for node in nodes:
++            node_name = node.get("name")
++            parsed = parse_begin_meta(node.get("meta", "") or "")
++            if node_name in ("MEASUREMENT", "CHARACTERISTIC"):
++                object_sections_by_name.setdefault(parsed[0], []).append(node)
++            elif node_name == "COMPU_METHOD":
++                compu_methods_by_name.setdefault(parsed[0], node)
++            elif node_name in ("COMPU_VTAB", "COMPU_VTAB_RANGE"):
++                compu_tables_by_name.setdefault(parsed[0], node)
++            _walk(node.get("children") or [])
++
++    _walk(a2l_data.get("sections") or [])
+ 
+     result: dict[str, Definition] = {}
+     reads: dict[int, object] = {}
+
+# --- pytest (rc=1) ---
+or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:388: in _walk
+    _walk(node.get("children") or [])
+s19_app/tui/a2l_definition.py:381: in _walk
+    parsed = parse_begin_meta(node.get("meta", "") or "")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/a2l.py:260: in parse_begin_meta
+    name, rest = _parse_first_field(meta)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+meta = 'G939 ""'
+
+    def _parse_first_field(meta: str) -> tuple[str, str]:
+        """Return first identifier or quoted string, and remainder."""
+        meta = meta.strip()
+        if not meta:
+            return "", ""
+        if meta[0] == '"':
+            end = 1
+            while end < len(meta):
+                if meta[end] == '"' and meta[end - 1] != "\\":
+                    return meta[1:end], meta[end + 1 :].lstrip()
+                end += 1
+            return meta[1:], ""
+>       parts = meta.split(maxsplit=1)
+                ^^^^^^^^^^^^^^^^^^^^^^
+E       RecursionError: maximum recursion depth exceeded while calling a Python object
+
+s19_app/tui/a2l.py:281: RecursionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_24_deep_nesting_does_not_raise_and_the_walk_keeps_file_order
+1 failed, 190 deselected in 10.51s

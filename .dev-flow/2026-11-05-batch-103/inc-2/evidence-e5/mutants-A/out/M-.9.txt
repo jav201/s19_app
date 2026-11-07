@@ -1,0 +1,53 @@
+# M-.9
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.9/s19_app/__init__.py
+# note: declared length ignored
+#   EDIT-OK: '        elif byte_length != DATATYPE_SIZES[datatype]:\n            refu'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..fd44c9a4 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -594,12 +594,6 @@ def _describe_one(
+                 "A2L-DEF-DATATYPE",
+                 f"{name_echo}: the object declares no datatype the system can read",
+             )
+-        elif byte_length != DATATYPE_SIZES[datatype]:
+-            refusal = Refusal(
+-                "A2L-DEF-LENGTH",
+-                f"{name_echo}: its length {_number_text(byte_length)} differs from the "
+-                f"{DATATYPE_SIZES[datatype]} bytes of {datatype}",
+-            )
+ 
+     if refusal is None and method_name is not None and method_name != "NO_COMPU_METHOD":
+         if record is None:
+
+# --- pytest (rc=1) ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________ test_r_a2l_def_9_1_length_not_the_datatypes_is_refused ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-949/test_r_a2l_def_9_1_length_not_0')
+
+    def test_r_a2l_def_9_1_length_not_the_datatypes_is_refused(tmp_path):
+        """R-A2L-DEF.9/1 - UWORD with LENGTH 4."""
+        a2l = _inline(tmp_path, _val("LX", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535", "LENGTH 4"))
+>       _is_refused(describe_definition("LX", a2l), "A2L-DEF-LENGTH", "LX: its length 4 differs from the 2 bytes of UWORD")
+
+../base/tests/test_b103_a2l_definition.py:507: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='LX', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=4, datatype=...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None)
+code = 'A2L-DEF-LENGTH'
+message = 'LX: its length 4 differs from the 2 bytes of UWORD'
+
+    def _is_refused(d: Definition, code: str, message: str) -> None:
+>       assert d.refusal == Refusal(code, message), d.refusal
+E       AssertionError: None
+E       assert None == Refusal(code='A2L-DEF-LENGTH', message='LX: its length 4 differs from the 2 bytes of UWORD')
+E        +  where None = Definition(name='LX', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=4, datatype=...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None).refusal
+E        +  and   Refusal(code='A2L-DEF-LENGTH', message='LX: its length 4 differs from the 2 bytes of UWORD') = Refusal('A2L-DEF-LENGTH', 'LX: its length 4 differs from the 2 bytes of UWORD')
+
+../base/tests/test_b103_a2l_definition.py:165: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_9_1_length_not_the_datatypes_is_refused
+1 failed, 190 deselected in 1.01s

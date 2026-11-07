@@ -1,0 +1,56 @@
+# M-.1
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.1/s19_app/__init__.py
+# note: kind chosen by the section (every MEASUREMENT -> enum)
+#   EDIT-OK: '        if matrix_dim is None or matrix_dim == 1:\n            kind = "'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..4a1b33bb 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -731,7 +731,7 @@ def _object_kind(tag: dict, conversion_type: Optional[str]) -> tuple[str | None,
+     if section == "MEASUREMENT":
+         matrix_dim = tag.get("matrix_dim")
+         if matrix_dim is None or matrix_dim == 1:
+-            kind = "enum" if conversion_type == "TAB_VERB" else "number"
++            kind = "enum"
+             return kind, "MEASUREMENT"
+         return None, f"MATRIX_DIM {_number_text(matrix_dim)} MEASUREMENT"
+     return None, "(none)"
+
+# --- pytest (rc=1) ---
+.FF.                                                                     [100%]
+=================================== FAILURES ===================================
+______________ test_r_a2l_def_1_2_scalar_measurement_is_a_number _______________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...losed /begin sections detected.'], 'path': '/tmp/b103-e5-2-mutA/M-.1/examples/case_00_public/ASAP2_Demo_V171.a2l', ...}
+
+    def test_r_a2l_def_1_2_scalar_measurement_is_a_number(v171):
+        """R-A2L-DEF.1/2 - a scalar MEASUREMENT is a number."""
+        d = describe_definition("ASAM.M.SCALAR.UBYTE.IDENTICAL", v171)
+>       assert d.kind == "number" and d.section == "MEASUREMENT"
+E       AssertionError: assert ('enum' == 'number'
+E         
+E         - number
+E         + enum)
+
+../base/tests/test_b103_a2l_definition.py:263: AssertionError
+______________ test_r_a2l_def_1_3_no_compu_method_gives_a_number _______________
+
+softa = {'compu_methods_by_name': {'AFI_TU_FXBD_XMC_KKWP_MMV.DQXN_O_IJX_MSK_UimufsteUejnmysraz': {'coeffs': None, 'coeffs_line...HjjVfzjGyvl', ...}, ...}, 'errors': [], 'path': '/tmp/b103-e5-2-mutA/M-.1/examples/case_00_public/software_a.a2l', ...}
+
+    def test_r_a2l_def_1_3_no_compu_method_gives_a_number(softa):
+        """R-A2L-DEF.1/3 - NO_COMPU_METHOD gives a number (software_a)."""
+        name = next(t["name"] for t in softa["tags"]
+                    if t["section"] == "MEASUREMENT" and t.get("conversion") == "NO_COMPU_METHOD")
+        d = describe_definition(name, softa)
+>       assert d.kind == "number"
+E       AssertionError: assert 'enum' == 'number'
+E         
+E         - number
+E         + enum
+
+../base/tests/test_b103_a2l_definition.py:271: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_1_2_scalar_measurement_is_a_number
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_1_3_no_compu_method_gives_a_number
+2 failed, 2 passed, 187 deselected in 4.46s

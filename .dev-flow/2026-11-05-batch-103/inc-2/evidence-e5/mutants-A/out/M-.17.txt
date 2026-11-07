@@ -1,0 +1,75 @@
+# M-.17
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.17/s19_app/__init__.py
+# note: empty table accepted (TABLE-EMPTY removed)
+#   EDIT-OK: '        elif not enum_entries:\n            refusal = Refusal(\n        '
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..63c1ecb4 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -628,11 +628,6 @@ def _describe_one(
+                 f"{name_echo}: the table {table_echo} of "
+                 f"{method_echo} is not declared in the A2L",
+             )
+-        elif not enum_entries:
+-            refusal = Refusal(
+-                "A2L-DEF-TABLE-EMPTY",
+-                f"{name_echo}: the table {table_echo} has no entries",
+-            )
+ 
+     if refusal is None and mask_word is not None:
+         if kind == "text":
+
+# --- pytest (rc=1) ---
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+__________________ test_r_a2l_def_17_1_count_zero_is_refused ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-959/test_r_a2l_def_17_1_count_zero0')
+
+    def test_r_a2l_def_17_1_count_zero_is_refused(tmp_path):
+        """R-A2L-DEF.17/1 - ``TAB_VERB 0``."""
+        a2l = _inline(tmp_path, *_enum_blocks("CM_0", "VT_0", "0"), _val("E0", "0x10", "RL_U8", "CM_0"))
+>       _is_refused(describe_definition("E0", a2l), "A2L-DEF-TABLE-EMPTY", "E0: the table VT_0 has no entries")
+
+../base/tests/test_b103_a2l_definition.py:669: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='E0', section='CHARACTERISTIC', char_type='VALUE', kind='enum', address=16, byte_length=1, datatype='U..._table='VT_0', enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref='VT_0', refusal=None)
+code = 'A2L-DEF-TABLE-EMPTY', message = 'E0: the table VT_0 has no entries'
+
+    def _is_refused(d: Definition, code: str, message: str) -> None:
+>       assert d.refusal == Refusal(code, message), d.refusal
+E       AssertionError: None
+E       assert None == Refusal(code='A2L-DEF-TABLE-EMPTY', message='E0: the table VT_0 has no entries')
+E        +  where None = Definition(name='E0', section='CHARACTERISTIC', char_type='VALUE', kind='enum', address=16, byte_length=1, datatype='U..._table='VT_0', enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref='VT_0', refusal=None).refusal
+E        +  and   Refusal(code='A2L-DEF-TABLE-EMPTY', message='E0: the table VT_0 has no entries') = Refusal('A2L-DEF-TABLE-EMPTY', 'E0: the table VT_0 has no entries')
+
+../base/tests/test_b103_a2l_definition.py:165: AssertionError
+______________ test_r_a2l_def_17_2_count_not_a_number_is_refused _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-959/test_r_a2l_def_17_2_count_not_0')
+
+    def test_r_a2l_def_17_2_count_not_a_number_is_refused(tmp_path):
+        """R-A2L-DEF.17/2 - ``TAB_VERB X`` then ``0 "A"``."""
+        a2l = _inline(tmp_path, *_enum_blocks("CM_N", "VT_N", "X", '0 "A"'), _val("EN2", "0x10", "RL_U8", "CM_N"))
+>       _is_refused(describe_definition("EN2", a2l), "A2L-DEF-TABLE-EMPTY", "EN2: the table VT_N has no entries")
+
+../base/tests/test_b103_a2l_definition.py:675: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='EN2', section='CHARACTERISTIC', char_type='VALUE', kind='enum', address=16, byte_length=1, datatype='..._table='VT_N', enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref='VT_N', refusal=None)
+code = 'A2L-DEF-TABLE-EMPTY', message = 'EN2: the table VT_N has no entries'
+
+    def _is_refused(d: Definition, code: str, message: str) -> None:
+>       assert d.refusal == Refusal(code, message), d.refusal
+E       AssertionError: None
+E       assert None == Refusal(code='A2L-DEF-TABLE-EMPTY', message='EN2: the table VT_N has no entries')
+E        +  where None = Definition(name='EN2', section='CHARACTERISTIC', char_type='VALUE', kind='enum', address=16, byte_length=1, datatype='..._table='VT_N', enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref='VT_N', refusal=None).refusal
+E        +  and   Refusal(code='A2L-DEF-TABLE-EMPTY', message='EN2: the table VT_N has no entries') = Refusal('A2L-DEF-TABLE-EMPTY', 'EN2: the table VT_N has no entries')
+
+../base/tests/test_b103_a2l_definition.py:165: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_17_1_count_zero_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_17_2_count_not_a_number_is_refused
+2 failed, 189 deselected in 0.58s

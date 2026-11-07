@@ -1,0 +1,45 @@
+# M-.35
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.35/s19_app/__init__.py
+# note: format's length applied as padding
+#   EDIT-OK: '        return f"{value:.{d}f}"'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..9ff6fc11 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -1442,5 +1442,13 @@ def display_text(definition: Definition, value: int | float) -> str:
+             # Round to 15 significant digits, then write exactly d decimals of that
+             # decimal value (E3A-06); a float round-trip would bring back binary digits.
+             return format(Decimal(f"{value:.15g}"), f".{d}f")
+-        return f"{value:.{d}f}"
++        width = ""
++        fmt_text = definition.display_format or ""
++        if fmt_text.startswith("%"):
++            for ch in fmt_text[1:]:
++                if ch.isdigit():
++                    width += ch
++                else:
++                    break
++        return f"{value:{width}.{d}f}"
+     return f"{value:.15g}"
+
+# --- pytest (rc=1) ---
+..F...                                                                   [100%]
+=================================== FAILURES ===================================
+______________________ test_r_a2l_def_35_3_four_decimals _______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-980/test_r_a2l_def_35_3_four_decim0')
+
+    def test_r_a2l_def_35_3_four_decimals(tmp_path):
+        """R-A2L-DEF.35/3 - 3.14159 with %8.4 -> ``3.1416``."""
+>       assert _num(tmp_path, "D3", "FLOAT64_IEEE", "%8.4", struct.pack(">d", 3.14159)).text == "3.1416"
+E       AssertionError: assert '  3.1416' == '3.1416'
+E         
+E         - 3.1416
+E         +   3.1416
+E         ? ++
+
+../base/tests/test_b103_a2l_definition.py:1015: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_35_3_four_decimals
+1 failed, 5 passed, 185 deselected in 0.52s

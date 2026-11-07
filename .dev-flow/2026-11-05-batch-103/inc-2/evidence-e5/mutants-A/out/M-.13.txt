@@ -1,0 +1,101 @@
+# M-.13
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.13/s19_app/__init__.py
+# note: missing table read as an empty enum (no refusal)
+#   EDIT-OK: '    if refusal is None and kind == "enum":\n        if enum_table is No'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..fee5f4e5 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -616,19 +616,7 @@ def _describe_one(
+             )
+ 
+     if refusal is None and kind == "enum":
+-        if enum_table is None:
+-            refusal = Refusal(
+-                "A2L-DEF-TABLE",
+-                f"{name_echo}: the table (none) of {method_echo} "
+-                "is not declared in the A2L",
+-            )
+-        elif table_form is None:
+-            refusal = Refusal(
+-                "A2L-DEF-TABLE",
+-                f"{name_echo}: the table {table_echo} of "
+-                f"{method_echo} is not declared in the A2L",
+-            )
+-        elif not enum_entries:
++        if not enum_entries:
+             refusal = Refusal(
+                 "A2L-DEF-TABLE-EMPTY",
+                 f"{name_echo}: the table {table_echo} has no entries",
+
+# --- pytest (rc=1) ---
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+______________ test_r_a2l_def_13_1_enum_with_no_table_is_refused _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-954/test_r_a2l_def_13_1_enum_with_0')
+
+    def test_r_a2l_def_13_1_enum_with_no_table_is_refused(tmp_path):
+        """R-A2L-DEF.13/1 - TAB_VERB with no COMPU_TAB_REF."""
+        a2l = _inline(tmp_path, _cm("CM_V", "TAB_VERB", fmt='"%.0"'), _val("EN", "0x10", "RL_U8", "CM_V"))
+>       _is_refused(describe_definition("EN", a2l), "A2L-DEF-TABLE", "EN: the table (none) of CM_V is not declared in the A2L")
+
+../base/tests/test_b103_a2l_definition.py:587: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='EN', section='CHARACTERISTIC', char_type='VALUE', kind='enum', address=16, byte_length=1, datatype='U...s=None, compu_tab_ref=None, refusal=Refusal(code='A2L-DEF-TABLE-EMPTY', message='EN: the table (none) has no entries'))
+code = 'A2L-DEF-TABLE'
+message = 'EN: the table (none) of CM_V is not declared in the A2L'
+
+    def _is_refused(d: Definition, code: str, message: str) -> None:
+>       assert d.refusal == Refusal(code, message), d.refusal
+E       AssertionError: Refusal(code='A2L-DEF-TABLE-EMPTY', message='EN: the table (none) has no entries')
+E       assert Refusal(code=...s no entries') == Refusal(code=...d in the A2L')
+E         
+E         Differing attributes:
+E         ['code', 'message']
+E         
+E         Drill down into differing attribute code:
+E           code: 'A2L-DEF-TABLE-EMPTY' != 'A2L-DEF-TABLE'
+E           - A2L-DEF-TABLE...
+E         
+E         ...Full output truncated (7 lines hidden), use '-vv' to show
+
+../base/tests/test_b103_a2l_definition.py:165: AssertionError
+________________ test_r_a2l_def_13_2_dangling_table_is_refused _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-954/test_r_a2l_def_13_2_dangling_t0')
+
+    def test_r_a2l_def_13_2_dangling_table_is_refused(tmp_path):
+        """R-A2L-DEF.13/2 - COMPU_TAB_REF VT_GONE."""
+        a2l = _inline(tmp_path, _cm("CM_V", "TAB_VERB", fmt='"%.0"', ref="VT_GONE"), _val("EN", "0x10", "RL_U8", "CM_V"))
+>       _is_refused(describe_definition("EN", a2l), "A2L-DEF-TABLE",
+                    "EN: the table VT_GONE of CM_V is not declared in the A2L")
+
+../base/tests/test_b103_a2l_definition.py:593: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='EN', section='CHARACTERISTIC', char_type='VALUE', kind='enum', address=16, byte_length=1, datatype='U..., compu_tab_ref='VT_GONE', refusal=Refusal(code='A2L-DEF-TABLE-EMPTY', message='EN: the table VT_GONE has no entries'))
+code = 'A2L-DEF-TABLE'
+message = 'EN: the table VT_GONE of CM_V is not declared in the A2L'
+
+    def _is_refused(d: Definition, code: str, message: str) -> None:
+>       assert d.refusal == Refusal(code, message), d.refusal
+E       AssertionError: Refusal(code='A2L-DEF-TABLE-EMPTY', message='EN: the table VT_GONE has no entries')
+E       assert Refusal(code=...s no entries') == Refusal(code=...d in the A2L')
+E         
+E         Differing attributes:
+E         ['code', 'message']
+E         
+E         Drill down into differing attribute code:
+E           code: 'A2L-DEF-TABLE-EMPTY' != 'A2L-DEF-TABLE'
+E           - A2L-DEF-TABLE...
+E         
+E         ...Full output truncated (7 lines hidden), use '-vv' to show
+
+../base/tests/test_b103_a2l_definition.py:165: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_13_1_enum_with_no_table_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_13_2_dangling_table_is_refused
+2 failed, 189 deselected in 0.74s

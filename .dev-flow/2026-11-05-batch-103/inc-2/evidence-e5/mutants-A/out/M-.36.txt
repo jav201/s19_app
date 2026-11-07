@@ -1,0 +1,38 @@
+# M-.36
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.36/s19_app/__init__.py
+# note: 40 decimals (no cap at 17)
+#   EDIT-OK: '    return min(int(digits), 17)'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..a81cfe4e 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -1148,7 +1148,7 @@ def _display_decimals(display_format: Optional[str]) -> Optional[int]:
+         return None
+     if len(digits) > 2:
+         return 17
+-    return min(int(digits), 17)
++    return int(digits)
+ 
+ 
+ def decode_definition(
+
+# --- pytest (rc=1) ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________________ test_r_a2l_def_36_1_decimals_are_capped_at_17 _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-982/test_r_a2l_def_36_1_decimals_a0')
+
+    def test_r_a2l_def_36_1_decimals_are_capped_at_17(tmp_path):
+        """R-A2L-DEF.36/1 - %.40 on 0.1 -> 17 decimals."""
+>       assert _num(tmp_path, "D5", "FLOAT64_IEEE", "%.40", struct.pack(">d", 0.1)).text == "0.10000000000000000"
+E       AssertionError: assert '0.1000000000...0000000000000' == '0.10000000000000000'
+E         
+E         - 0.10000000000000000
+E         + 0.1000000000000000000000000000000000000000
+
+../base/tests/test_b103_a2l_definition.py:1037: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_36_1_decimals_are_capped_at_17
+1 failed, 190 deselected in 0.33s

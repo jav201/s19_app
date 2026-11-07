@@ -1,0 +1,62 @@
+# M-.11
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.11/s19_app/__init__.py
+# note: identity fallback of the tag table (no METHOD refusal)
+#   EDIT-OK: '        if record is None:\n            refusal = Refusal(\n            '
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..ae2043dc 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -602,13 +602,7 @@ def _describe_one(
+             )
+ 
+     if refusal is None and method_name is not None and method_name != "NO_COMPU_METHOD":
+-        if record is None:
+-            refusal = Refusal(
+-                "A2L-DEF-METHOD",
+-                f"{name_echo}: the conversion method {method_echo} "
+-                "is not declared in the A2L",
+-            )
+-        elif type_verdict is None:
++        if type_verdict is None:
+             refusal = Refusal(
+                 "A2L-DEF-CONVERSION",
+                 f"{name_echo}: the conversion type {type_echo} of "
+
+# --- pytest (rc=1) ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______________ test_r_a2l_def_11_1_undeclared_method_is_refused _______________
+
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp...BL_NOINTP', ...}}, 'errors': [], 'path': '/tmp/pytest-of-javiergr/pytest-951/b103_c080/firmware_issues.a2l', ...}, ...}
+
+    def test_r_a2l_def_11_1_undeclared_method_is_refused(c08):
+        """R-A2L-DEF.11/1 - MISSING_CM names CM_MISSING (base: identity)."""
+        d = describe_definition("MISSING_CM", c08["issues"])
+>       _is_refused(d, "A2L-DEF-METHOD", "MISSING_CM: the conversion method CM_MISSING is not declared in the A2L")
+
+../base/tests/test_b103_a2l_definition.py:543: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='MISSING_CM', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=12582912, byte_lengt...al=Refusal(code='A2L-DEF-CONVERSION', message='MISSING_CM: the conversion type (none) of CM_MISSING is not supported'))
+code = 'A2L-DEF-METHOD'
+message = 'MISSING_CM: the conversion method CM_MISSING is not declared in the A2L'
+
+    def _is_refused(d: Definition, code: str, message: str) -> None:
+>       assert d.refusal == Refusal(code, message), d.refusal
+E       AssertionError: Refusal(code='A2L-DEF-CONVERSION', message='MISSING_CM: the conversion type (none) of CM_MISSING is not supported')
+E       assert Refusal(code=...ot supported') == Refusal(code=...d in the A2L')
+E         
+E         Differing attributes:
+E         ['code', 'message']
+E         
+E         Drill down into differing attribute code:
+E           code: 'A2L-DEF-CONVERSION' != 'A2L-DEF-METHOD'
+E           - A2L-DEF-METHOD...
+E         
+E         ...Full output truncated (6 lines hidden), use '-vv' to show
+
+../base/tests/test_b103_a2l_definition.py:165: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_11_1_undeclared_method_is_refused
+1 failed, 190 deselected in 1.97s

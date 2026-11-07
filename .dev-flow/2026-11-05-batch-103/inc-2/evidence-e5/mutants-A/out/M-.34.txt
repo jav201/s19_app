@@ -1,0 +1,60 @@
+# M-.34
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.34/s19_app/__init__.py
+# note: byte decoded as Latin-1
+#   EDIT-OK: '            out.append("\\uFFFD")'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..31b3da17 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -1396,7 +1396,7 @@ def _ascii_text(raw: bytes) -> str:
+         if 0x20 <= byte <= 0x7E:
+             out.append(chr(byte))
+         else:
+-            out.append("\uFFFD")
++            out.append(chr(byte))
+     return "".join(out)
+ 
+ 
+
+# --- pytest (rc=1) ---
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_______________ test_r_a2l_def_34_1_control_byte_shows_as_u_fffd _______________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...osed /begin sections detected.'], 'path': '/tmp/b103-e5-2-mutA/M-.34/examples/case_00_public/ASAP2_Demo_V171.a2l', ...}
+
+    def test_r_a2l_def_34_1_control_byte_shows_as_u_fffd(v171):
+        """R-A2L-DEF.34/1."""
+        d = describe_definition(V171_ASCII, v171)
+        data = b"AB\x07C" + bytes(38)
+>       assert _decoded(d, v171, _img(0x810200, data)).text == "AB" + FFFD + "C"
+E       AssertionError: assert 'AB\x07C' == 'AB�C'
+E         
+E         - AB�C
+E         ?   ^
+E         + ABC
+E         ?   ^
+
+../base/tests/test_b103_a2l_definition.py:978: AssertionError
+------------------------------ Captured log setup ------------------------------
+WARNING  s19_app.tui.a2l:a2l.py:250 A2L section tree has structural errors: path=/tmp/b103-e5-2-mutA/M-.34/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+_____________ test_r_a2l_def_34_2_bytes_above_0x7e_show_as_u_fffd ______________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...osed /begin sections detected.'], 'path': '/tmp/b103-e5-2-mutA/M-.34/examples/case_00_public/ASAP2_Demo_V171.a2l', ...}
+
+    def test_r_a2l_def_34_2_bytes_above_0x7e_show_as_u_fffd(v171):
+        """R-A2L-DEF.34/2 - C3 A9 (UTF-8 for e-acute) -> two U+FFFD (Latin-1 would give two letters)."""
+        d = describe_definition(V171_ASCII, v171)
+        data = b"\xc3\xa9" + bytes(40)
+>       assert _decoded(d, v171, _img(0x810200, data)).text == FFFD + FFFD
+E       AssertionError: assert 'Ã©' == '��'
+E         
+E         - ��
+E         + Ã©
+
+../base/tests/test_b103_a2l_definition.py:985: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_34_1_control_byte_shows_as_u_fffd
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_34_2_bytes_above_0x7e_show_as_u_fffd
+2 failed, 189 deselected in 0.43s

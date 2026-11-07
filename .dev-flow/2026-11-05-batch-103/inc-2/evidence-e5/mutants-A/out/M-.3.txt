@@ -1,0 +1,56 @@
+# M-.3
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.3/s19_app/__init__.py
+# note: ASCII built as a number
+#   EDIT-OK: '        if char_type == "ASCII":\n            return "text", "ASCII"'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..736e76b4 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -721,7 +721,7 @@ def _object_kind(tag: dict, conversion_type: Optional[str]) -> tuple[str | None,
+     char_type = tag.get("char_type")
+     if section == "CHARACTERISTIC":
+         if char_type == "ASCII":
+-            return "text", "ASCII"
++            return "number", "ASCII"
+         if char_type == "VALUE":
+             kind = "enum" if conversion_type == "TAB_VERB" else "number"
+             return kind, "VALUE"
+
+# --- pytest (rc=1) ---
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+______________ test_r_a2l_def_3_1_ascii_characteristic_is_a_text _______________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...losed /begin sections detected.'], 'path': '/tmp/b103-e5-2-mutA/M-.3/examples/case_00_public/ASAP2_Demo_V171.a2l', ...}
+
+    def test_r_a2l_def_3_1_ascii_characteristic_is_a_text(v171):
+        """R-A2L-DEF.3/1 - V171 ASCII object (the parser names it UNKNOWN)."""
+        d = describe_definition(V171_ASCII, v171)
+>       assert d.kind == "text" and d.byte_length == 42 and d.address == 0x810200
+E       AssertionError: assert ('number' == 'text'
+E         
+E         - text
+E         + number)
+
+../base/tests/test_b103_a2l_definition.py:302: AssertionError
+------------------------------ Captured log setup ------------------------------
+WARNING  s19_app.tui.a2l:a2l.py:250 A2L section tree has structural errors: path=/tmp/b103-e5-2-mutA/M-.3/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+__________________ test_r_a2l_def_3_2_case08_ascii_is_a_text ___________________
+
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp...BL_NOINTP', ...}}, 'errors': [], 'path': '/tmp/pytest-of-javiergr/pytest-942/b103_c080/firmware_issues.a2l', ...}, ...}
+
+    def test_r_a2l_def_3_2_case08_ascii_is_a_text(c08):
+        """R-A2L-DEF.3/2 - case 08 ASCII_0001, byte length 32."""
+        d = describe_definition("ASCII_0001", c08["a2l"])
+>       assert d.kind == "text" and d.byte_length == 32
+E       AssertionError: assert ('number' == 'text'
+E         
+E         - text
+E         + number)
+
+../base/tests/test_b103_a2l_definition.py:308: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_3_1_ascii_characteristic_is_a_text
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_3_2_case08_ascii_is_a_text
+2 failed, 189 deselected in 2.74s
