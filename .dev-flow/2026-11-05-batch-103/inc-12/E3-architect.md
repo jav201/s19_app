@@ -106,3 +106,94 @@ Batch 2026-11-05-batch-103, increment 12 (A2L tag table: no glued or cut values)
   - I-12.2 gains Inc 1b's base class (E3A-03).
   - I-12.3 holds: the fit keeps no state, and neither does the in-place alternative.
 - **What would change this verdict to PASS-WITH-NOTES:** E3A-01's interface line and case (fixes (1) and (2)), and E3A-02's two cases. The rest is non-blocking. E3A-04 and E3A-05 go to the operator through AT-B103-I12-2.
+
+## Round 2 (2026-11-07): the E3 correction `a102c160` against `7e6d4496`
+
+**Scope:** only what the correction changed, judged against `E3-rulings.md`:
+- in Inc 12: the changed rows, nodes and cases, and R-TUI-042a.6 and .7;
+- Inc 11's R-A2L-READ.69;
+- the Inc 1b note.
+
+**Read:**
+- the correction diff of `inc-12/`, `inc-11/` and `inc-1b/E1-rulings.md`, plus `PLAN.md`'s line;
+- the current `codewire/graph-inc12.md`;
+- `REQUIREMENTS.md:445-486` (CTX-TEXT, R-TUI-103 family) and `docs/requirements/review/CODE-CHANGES.md:28-30`;
+- `s19_app/utils.py:30-99` at `e07fb00`;
+- on `b101-inc10` (`aedeaddf`, unchanged since round 1):
+  - `app.py:1250-1345`, `:18760-18913` and `:20906-21090`;
+  - `tests/test_b101_inplace_views.py:69`, `:364-369`, `:480-510`, `:681-910` and `:1367-1402`.
+
+### Verdict: FAIL
+
+1 MAJOR, 1 MEDIUM, 2 MINOR, 2 LOW, 1 INFO. Every round-1 finding is closed as ruled (status table below).
+
+**No redesign is needed.** The in-place repaint, the class chain and the page-change cases hold against the code. 10b's `_repaint_a2l_tag_cells` has no image guard, writes only the cells that differ, and calls no `clear()`, `move_cursor` or `scroll_to`. So the fit can use it as drawn, with or without an image.
+
+**What blocks:** the new R-TUI-042a.6 contradicts the canon row R-TUI-103a for a view on CTX-TEXT's safe-text list, and no ruling records it (E3A-11). The fix is one ruling and one scope note in the records. No code or design change is needed.
+
+| Id | Severity | Row / node / case | Finding | Proposed fix |
+|---|---|---|---|---|
+| E3A-11 | MAJOR | R-TUI-042a.6 (`01-requirements.md:53`); `_shorten_tag_name` (`graph-inc12.md:103-116`); canon `REQUIREMENTS.md:445-486` | **.6 contradicts a canon row, and no ruling records it.**<br><br>**The canon.** CTX-TEXT lists "the A2L Explorer (table and detail card)" as a safe-text view (`REQUIREMENTS.md:455-457`). For file-derived text there, two rows apply:<br>- R-TUI-103a (`:485`): every non-control character is displayed "unchanged and in the same order".<br>- R-TUI-103.1 (`:483`): a run of break characters is shown as one space.<br><br>**What .6 does.** It shows every character outside U+0021 … U+007E as U+FFFD in the Tag cell. That includes `é`, fullwidth letters, U+200B (Cf), U+0301 (Mn), and a space or a line end in a quoted name.<br><br>**The cited precedent does not cover it.** .6's status column cites R-A2L-DEF.137 as "the rule", but DEF.137 replaces only control characters (`../inc-2/01-requirements.md:183`), which R-TUI-103 removes anyway. Only READ.66 (error texts) uses .6's wider range. No Inc 12 record cites the R-TUI-103 family, and E3S-01 did not either.<br><br>**An older gap of the same kind.** The middle cut of .3 and .5 drops characters, which 103a's literal "every other character" does not allow either. It dates from Inc 11's .3.<br><br>**Impact.** 0 tracked tag names hold a character above U+007E (Grep over the 35 tracked `.a2l`). After Inc 11, READ.4 records a parse error for every such name. As written, the canon would hold two contradicting rows at batch close. | **(a) Recommended: a ruling plus a scope note, no design change.** The Tag cell is R-TUI-103a's and .103.1's exception, under R-TUI-042a.3, .5 and .6 (security reason: E3S-01). The detail card keeps the R-TUI-103 family, so the true name stays readable there. Write the exception in three places:<br>- .6's status column, with "DEF.137" replaced by "READ.66's character range";<br>- Inc 12's "Cited and unchanged" paragraph, which cites R-TUI-103, 103.1, 103a and 103b;<br>- the CTX-TEXT note that E5 carries into the canon: "the A2L Explorer's Tag cell shows a tag name per R-TUI-042a.3, .5 and .6".<br><br>**(b) Alternative:** project only the characters whose cell width is not 1, or whose category is Cc, Cf, Mn, Zl or Zp. `é` then stays, and the cut stays plain slicing; only the exception shrinks. A ruling is needed either way. |
+| E3A-12 | MEDIUM | R-TUI-042a.7 (`01-requirements.md:54`) and its cases (`02-test-cases.md:42-44`); `_a2l_detail_card_text`, `_card_field` (`graph-inc12.md:197-216`); canon R-TUI-103 family; `CODE-CHANGES.md:28-30` | **.7 restates a canon row for one view, more narrowly, and the design misses a second canon row.**<br><br>**(i) A narrower duplicate.** The card is already a safe-text view, so canon R-TUI-103 ("no other control character") applies to it. E3S-02 is a base defect against that row, open as D-7+ (`CODE-CHANGES.md:30`). .7 names only ESC and U+009B. A filter that deletes just those two characters meets .7's text and its 3/3, and leaves open U+009D (single-byte OSC) and U+0090 (DCS). `safe_text`'s own docstring names this trap: naming the class is "normative and load-bearing" (`utils.py:30-38`, LLR-116.7).<br><br>**(ii) A field left out.** The threshold covers the name, the display identifier and the description, but not `unit` (a quoted string) or `conversion`. Besides the name, those are the two values the card appends outside `_card_field` (`b101-inc10` `app.py:1326-1333`). The mutant "`unit` or `conversion` left raw" survives.<br><br>**(iii) Break characters.** The pinned design is bare `safe_text`, which deletes break characters. Canon R-TUI-103.1 asks for one space (D-6, open, `CODE-CHANGES.md:28`). After Inc 11's READ.14, a long identifier may span line ends:<br>- after the correction, the card joins those lines with no space;<br>- on base, it breaks the line.<br>Neither meets 103.1. 0 tracked long identifiers span a line end or hold a TAB (Grep). | **Prefer citing R-TUI-103 (and 103b) as rows the card must now meet, as Inc 11 cites R-A2L-077, rather than keeping a new row.** Move .7's 3 cases under R-TUI-103 and add 2: a U+009D-introduced sequence, and the two sequences in `unit` and in `conversion` (6/6). If .7 stays, word it on CTX-TEXT's *control character* class, with the same 6 cases.<br><br>For R-TUI-103.1, choose one:<br>- map each run of TAB, LF or CR to one space before `safe_text` in the two functions, with one case: a description holding LF and TAB;<br>- or record D-6 as still open for the card in "What else the operator sees". |
+| E3A-13 | MINOR | R-A2L-READ.69 (`../inc-11/01-requirements.md:220`), cases (`../inc-11/02-test-cases.md:236-237`); `../inc-11/codewire/graph-inc11.md:218`; I-12.4 (`graph-inc12.md:26`) | **The bound is tested on one of the two address-word paths, and the Inc 11 graph has no example for it.**<br><br>CTX *address words* (`../inc-11/01-requirements.md:124`) covers two words: the ECU_ADDRESS argument word and a CHARACTERISTIC's header address. All 3 items are ECU_ADDRESS words. A check placed only on the ECU_ADDRESS path therefore passes 3/3. Meanwhile a CHARACTERISTIC with header address `99999999999999999999` keeps `0x56BC75E2D630FFFFF` (19 characters), so I-12.4's "Address cell at most 18 characters" breaks. R-TUI-042a.4's rows still hold at 17 digits (round 1, [O dec20]).<br><br>The addendum left the Inc 11 graph untouched (`../inc-11/steps.log`, last line). Its line "Requirements without an example: **none** (80 rows …)" is now false for READ.69. | Add READ.69/3: a CHARACTERISTIC whose header address word is `99999999999999999999` gives no address (threshold 3/3 → 4/4). Negative control: the check only on the ECU_ADDRESS path → RED.<br><br>In `graph-inc11.md`, put READ.69 and its examples on the node that takes a tag's address words (beside `_number_word`, `:448`), and add its coverage row. |
+| E3A-14 | MINOR | E2-6 E3 note (`E2-rulings.md:12`; graph E2-6); R-TUI-042a.5/7 (`02-test-cases.md:36`); round-1 §4 | **Correction of round 1: b101 Inc 10b's tests are committed.** Round 1 said they "are not committed on `b101-inc10` yet". In fact `tests/test_b101_inplace_views.py` is on `aedeaddf` (1,402 lines).<br><br>**They break under the new order.** The helpers `row_name` and `find_row` read the Tag as `get_row_at(index)[0]` (`:492-501`). `raw_phys` goes through `find_row`; its own `[4]` and `[5]` stay right, since Raw and Physical keep their indices. In Inc 12's order, index 0 is the Address, so `find_row` returns `None` and 7 tests go RED: R-A2L-048/1 … /3, 049/1 and /2 (through `first_shown_scenario`), 105/1 and 106/1. They run at 120×56 (`:69`).<br><br>**.5/7's input is not pinned.** It reads "a write through the product route". 10b's own cases use three routes: apply, save project and save back (`:681-760`). | In the E2-6 red list, name the file, the helpers and the 7 tests. The re-point:<br>- finds the Tag column by its `Tag` label (the house idiom);<br>- finds rows by the row key's tag, never by the painted name.<br><br>Pin .5/7's input as one Patch Editor apply of one byte inside the image (10b's `patch_apply`, `:364-369`). |
+| E3A-15 | LOW | `[Data: A2L tag table columns]` (`graph-inc12.md:233`); `_a2l_tag_name_width` (`:122`); edges (`:253-271`) | **A stale premise and two missing edges.**<br><br>Both places above still say a column width "only grows while the app runs" (E2-4). The new repaint node says the opposite for the Tag column (`update_width=True`, 38 → 16 at 80). 10b's repaint can shrink any column it rewrites, because a shrinking cell recomputes its column (textual 8.2.8, round 1). E3A-09's termination sentence still holds, because it needs only Address and Length: a repaint never rewrites those cells, since their text and style equal the build's.<br><br>Unlike the resize and key-2 triggers, the image-write trigger has no edge. The card nodes have no edge to `[Interface: A2L detail card]` either. | Reword both places: "Address and Length only grow (no repaint rewrites them); the other columns follow their cells after a repaint".<br><br>Add two edges:<br>- `[Outside: image write]` (`_note_image_bytes_written` → `_refresh_a2l_values_after_write`, 10b) `──▶ S19TuiApp._repaint_a2l_tag_cells`;<br>- `_a2l_detail_card_text ──▶ [Interface: A2L detail card]`. |
+| E3A-16 | LOW | PLAN row 12 (`PLAN.md:67`); commit `a102c160` | **The sequencing ruling is missing from the PLAN.** E3A-01 (3) is recorded only in the graph's Order line (`graph-inc12.md:29`). PLAN row 12's dependency column still reads "Inc 11 (the reader's lengths)", and the E4 dispatch reads the PLAN.<br><br>**Two binary files in the records.** The commit adds `inc-1b/evidence-e1/__pycache__/i1b-e1a-button3-probe.cpython-312.pyc`, as `717f8780` added `inc-12/evidence-e3/__pycache__/i12e3s-probe.cpython-312.pyc`, although `.gitignore:4-5` ignores both. | Add to row 12: "E4 after batch-101 Inc 10b is on `main` (E3A-01 (3))". Remove the two `.pyc` files from the index at the next records commit. |
+| E3A-17 | INFO | `E1-slice.md` §1–§2 | The slice still lists 5 functions, `on_resize` among them, and says the card keeps the full name, unchanged. The graph has superseded it since E2: 12 changed and new nodes, all owned by G1 (`graph-inc12.md:16`). No product consumer or caller is missing (checks below). | Add one line at the slice's top: "superseded by `codewire/graph-inc12.md` (E2, E3 correction)". |
+
+### Status of the round-1 findings
+
+| Id | Status | Evidence |
+|---|---|---|
+| E3A-01 | **closed** | (1) I-12.1 names the 10b consumer and the width it passes (`graph-inc12.md:23`).<br>(2) .5/7 is written, with its measured negative control (`02-test-cases.md:36`).<br>(3) The sequencing is in the Order line (`:29`); the PLAN lacks it (E3A-16).<br>(4) The fit repaints in place (`:130-142`); the node is added (`:144-152`).<br><br>The extractor (executed) confirms the callers:<br>- on `b101-inc10`: `_repaint_a2l_tag_cells` ← `_refresh_a2l_values_after_write` (`:18913`) ← `_note_image_bytes_written` (`:18808`);<br>- `_build_a2l_table_cells` has 2 callers on `b101-inc10` (`:21061`, `:20977`) and 1 on `e07fb00`.<br><br>Fix (5) was not ruled. |
+| E3A-02 | **closed** | .5/8 and /9 are written (`02-test-cases.md:37-38`). MANY(230, 48) and MANY(219, 48) equal the E2 probe's `page_many(230, 48, wide_at=215)` and `page_many(219, 48)` (`evidence-e2/i12e2-probe.py:129-136`, `:321`, `:352`). Page 2 holds 31 rows, so its scrollbar exists and *w* is 8 (`i12e2-probe-design-flip-transcript.txt:12`). 15/15 = 3+1+4+2+1+1+1+1+1. The AT wording is as written. |
+| E3A-03 | **closed** | I-12.2 pins one class chain (`graph-inc12.md:24`). The note sits beside D-3 (`../inc-1b/E1-rulings.md:277`). Inc 1b is at E1 (it has no graph yet), so the note applies at its E2. |
+| E3A-04 | **closed** | D-1 A's reason is restated as measured (`E1-rulings.md:50`). AT-I12-2 has the V171 capture, the label and the counts, which match round 1's census (V171: *w* 34 → 18, *w* 12 → 88). Routed to PLAN backlog 5 (`PLAN.md:178`). |
+| E3A-05 | **closed** | PLAN backlog 5 (`PLAN.md:178`), E1 "Not decisions" (`E1-rulings.md:54`), and the labelled mid-scroll capture. |
+| E3A-06 | **closed** | The fit node no longer saves or restores the cursor or the scroll, and calls no `move_cursor` (`graph-inc12.md:134`). `on_data_table_row_highlighted` is updated. |
+| E3A-07 | **closed in Inc 12** | CTX *Address* cites READ.69, PAGE64W is corrected, and I-12.4 pins both bounds. READ.69 has no error row, mirroring READ.38 as ruled. Its coverage gap is E3A-13. |
+| E3A-08 | **closed** | The clause is dropped. The threshold keeps "the column labels read …" as the cases' column locator. |
+| E3A-09 | **closed** | The termination sentence is added. Its premise is stale in two other places (E3A-15). |
+| E3A-10 | INFO | — |
+
+### The checks this round named
+
+- **Every N/N threshold equals its row's case count ✓.**
+
+  | Row | Threshold | Cases |
+  |---|---|---|
+  | .2 | 5/5 | 3 + 2 |
+  | .3 | 8/8 | 4 + 1 + 2 + 1 |
+  | .4 | 82/82 | 40 + 40 + 2 (/4 is the order check, outside the count, as recorded) |
+  | .5 | 15/15 | 3+1+4+2+1+1+1+1+1 |
+  | .6 | 5/5 | 2 + 2 + 1 |
+  | .7 | 3/3 | 1 + 1 + 1 |
+  | READ.69 | 3/3 | 2 + 1 |
+
+- **R-TUI-042a.6, architect side.**
+  - Strict EARS (If form, one *shall*, subject "the system", observable) ✓.
+  - A numeric threshold with a 1 s bound per call ✓.
+  - The negative control goes RED by content (no U+FFFD) and by time ✓.
+  - Node and caller: `_shorten_tag_name`, whose only caller is `_build_a2l_table_cells` ✓.
+  - The canon conflict is E3A-11.
+- **R-TUI-042a.7, architect side.**
+  - Strict EARS ✓.
+  - Negative control "raw `Text.append`" ✓.
+  - Nodes `_a2l_detail_card_text` and `_card_field` ✓.
+  - The class, the coverage and the duplication are E3A-12.
+- **Does .7's card change add a consumer or caller the slice does not list? No product one.** By the extractor (executed on `e07fb00` and `b101-inc10`):
+  - `_card_field` ← `_a2l_detail_card_text` only (3 sites); no other card uses it.
+  - `_a2l_detail_card_text` ← `A2LDetailCard.show_tag` and `_compose_screen_a2l`, which passes `None` (the hint, no file text).
+  - One test caller is not in the records: `tests/test_a2l_multiline_headers.py:362-376` (AT-103: markup metacharacters, no control character). It holds.
+- **E2-4 … E2-7:** recorded as ruled (`E2-rulings.md:10-13`). E2-6's list needs E3A-14's precise entries.
+
+### Run
+
+- **Executed:** the caller census `i12e2-callers.py`, with three targets added (`_card_field`, `_repaint_a2l_tag_cells`, `_refresh_a2l_values_after_write`).
+  - Tool: Code-Wire `v3.1.0`.
+  - Input: throwaway `git archive` copies of `e07fb00` and `b101-inc10`, in the session scratchpad. Each run: 86 files, 0 parse failures.
+  - Transcripts: `C:\Users\jjgh8\AppData\Local\Temp\claude\107abb51e32da120\c57f44a4-8a42-42ee-9fb3-80f699575124\scratchpad\e3a12r2\census-{e07fb00,b101-inc10}-transcript.txt`. The copies are deleted.
+- **Executed:** Grep over the 35 tracked `.a2l`: 0 long identifiers spanning a line end, 0 TABs in quoted strings, 0 tag names with a non-ASCII character.
+- **`not-run`:** no probe on cachyos-rtx. Every claim rests on reading, the extractor or Grep, so no runner folder was made.
+
+**What would make this PASS-WITH-NOTES:** the ruling of E3A-11. E3A-12 … E3A-17 do not block.

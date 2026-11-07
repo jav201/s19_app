@@ -39,3 +39,36 @@ Authority for the E3 correction pass. Sources: `E3-architect.md` (FAIL: 1 MAJOR,
 ## After the correction
 
 E3 round 2, both lenses, on the corrected records only (the changed rows, nodes and cases, plus R-A2L-READ.69 in Inc 11). Inc 12's E4 waits for the rebase in E3A-01 (3).
+
+## Round 2 rulings (2026-11-07, orchestrator claude-opus-5-5)
+
+Both lenses FAIL, with no redesign asked and round-1 findings closed as ruled.
+- Architect: E3A-11 MAJOR, E3A-12 MEDIUM, E3A-13/-14 MINOR, E3A-15/-16 LOW, E3A-17 INFO.
+- Security: E3S-08 MAJOR, E3S-09 MEDIUM, E3S-10/-13 MINOR, E3S-11/-12 LOW.
+
+**One rule for file text on this screen**, which settles E3A-11 against E3S-10:
+- **The Tag cell shows a *painted tag name*.** A new CTX term, like canon's *painted name*: each character outside U+0021 … U+007E shown as U+FFFD, then the middle cut of .3 / .5. The Tag cell of the tag table becomes a scoped exception to R-TUI-103a and R-TUI-103.1, recorded as a canon note beside CTX-TEXT's *painted-name views*.
+  - **Why:** the cell is a fixed-width cell for A2L identifiers, and the projection keeps the cut O(*w*). A name holding such a character is already a parse error after Inc 11 (READ.4), and 0 of 234,654 tracked and 0 of 256,568 corpus names change.
+  - The older gap E3A-11 names, the middle cut against 103a's "every other character", is covered by the same note.
+- **The detail card stays a full safe-text view.** It follows canon R-TUI-103, R-TUI-103.1 and R-TUI-103a for every file-derived value: controls removed, each run of break characters shown as one space, every other character unchanged. **E3S-10 is rejected:** the card is the faithful view, and the card and the cell differ only on names that are already parse errors.
+- **E3A-12 + E3S-08:** every file value of the card goes through **one helper** that meets R-TUI-103, R-TUI-103.1 and R-TUI-103b. That covers the header, `_card_field`, unit, conversion and limits. Use the house helper if `utils.py` has one for 103.1; otherwise `safe_text` after mapping each break run to one space.
+  - R-TUI-042a.7 becomes the whole control class for the card: C0, DEL, C1 per CTX-TEXT, not ESC and U+009B only.
+  - Split it to **R-TUI-042a.7.1** (no control character) and **R-TUI-042a.7.2** (each break run as one space).
+  - Cases cover every site: name, display identifier, description, unit, conversion and the two limit words, with ESC, U+009B, U+009D and U+0090.
+  - E5's table gets one mutant per append site.
+
+**E3S-09: add a Name line.** When the card's header shows the display identifier, the card also shows the tag's name on a line of its own.
+- The Tag cell now cuts names, and on V171 the card shows the display identifier for 64 of the 88 look-alike rows, so without this the full name would be visible nowhere for them.
+- New row **R-TUI-042a.8** (When), cases with and without a display identifier, negative control "no Name line → V171's 64 rows show no full name". This is inside the slice (`_a2l_detail_card_text`).
+- The operator sees it in AT-B103-I12-2's captures; reword its label to "the Address tells them apart; the card shows the full name".
+
+**Accepted as written:**
+- **E3S-11:** project only the two slices, so the cost is O(*w*).
+- **E3S-12:** AT-069c's oracle and call shape go in the E2-6 note.
+- **E3A-13 = E3S-13:** READ.69 gets a CHARACTERISTIC header-address case. In Inc 11, threshold 3/3 → 4/4, and the node `_number_word` takes its example and coverage row.
+- **E3A-14:** Inc 10b's 7 tests are named in the E2-6 red list and re-pointed: Tag column by its label, rows by the row key's tag. Pin .5/7's input as one Patch Editor apply of one byte, through `patch_apply`.
+- **E3A-15:** reword the "only grows" premise and add the two edges.
+- **E3A-17:** add the superseded line to `E1-slice.md`.
+- **E3A-16:** done by the orchestrator. PLAN row 12 holds the E4 sequencing, and the two `.pyc` files are out of the index.
+
+**Next:** a narrow Opus correction, then round 3 on the changed rows only, both lenses.

@@ -61,3 +61,78 @@ Read: `01-requirements.md`, `02-test-cases.md`, `E1-rulings.md` (with its orches
 - [x] No secret values in this report: none were read. Payloads are described, not reproduced.
 - [x] The verdict is explicit: **FAIL**, owed E3S-01 (design) and E3S-02 (base; routing for the orchestrator). The HIGH has no applied-and-verified evidence, so it blocks. All mitigations are `planned`.
 - [x] New tool or integration: none.
+
+## Round 2
+
+Records at `a102c160` (the E3 correction; authority `E3-rulings.md`). Product tree unchanged (`e07fb00`). Reviewer: security-reviewer (Opus 5.5). Scope: only what the correction changed: R-TUI-042a.6 and .7, the AT-069c redesign, E3S-03's counts and AT-B103-I12-2's wording, Inc 11's R-A2L-READ.69, and the `_repaint_a2l_tag_cells` consumer. Only this section and two `steps.log` lines were written.
+
+**Verdict: FAIL — BLOCK-UNTIL: E3S-08.** 1 MAJOR, 1 MEDIUM, 2 MINOR and 2 LOW findings.
+- **R-TUI-042a.6 holds.** The cut is no longer quadratic, and no valid name paints differently.
+- **R-TUI-042a.7's node is complete, but its cases are not.** A partial fix passes all three cases, and the card still writes ESC and U+009B to the terminal through two of its five append sites.
+- **E3S-02 (HIGH) stays `planned`** until E3S-08 lands. This clearance covers the E3 design gate only and authorizes nothing.
+
+**Evidence states.**
+- **C** = run on cachyos-rtx: Python 3.11.18, textual 8.2.8, rich 15.0.0, load 1–2, so the timings are clean this round.
+  - The variants are throwaway `git archive e07fb00 s19_app` copies:
+    - `design` is E2's `i12e2-mkproto.py design`, 88 changed lines, as in round 1.
+    - `corr` is `design` plus the corrected nodes, written by `i12e3s2-mkcorr.py` (95 lines). The cut projects to U+FFFD and then slices, as in `graph-inc12.md:107`. Every file-derived card value goes through `safe_text`, as in `:197`. The fit keeps E2's rebuild form, because `_repaint_a2l_tag_cells` is not on `e07fb00`.
+    - `corrpart` is `corr` with only the card header and `_card_field` through `safe_text`.
+    - `base` is the read-only clone, with 0 changed files after every run.
+  - HOME, XDG and LOCALAPPDATA were isolated. There was no DISPLAY and no clipboard. All names are synthetic, and the census prints counts only.
+  - Scripts: `C:\Users\jjgh8\AppData\Local\Temp\claude\107abb51e32da120\c57f44a4-8a42-42ee-9fb3-80f699575124\scratchpad\i12e3s2\` (`i12e3s2-run.sh`, `i12e3s2-mkcorr.py`, `i12e3s2-probe.py`). Transcripts are in its `out\`, with home paths masked. They are not committed, because this brief allows one output file. The orchestrator may commit them under `evidence-e3/`.
+  - The runner scratch `/tmp/b103-e3-12-S2/` is deleted. Tags: [U2] units2, [N2] census2, [H2] hostile2, [Z2] zwcost / zwcard, [T2] at069c.
+- **R** = read in the records or the code, not run. `b101-inc10` was read with `git show` only.
+
+### Findings
+
+| Id | Severity | Row / node / case | Defect | Fix |
+|---|---|---|---|---|
+| E3S-08 | MAJOR | R-TUI-042a.7 threshold (`01-requirements.md:54`); cases /1 … /3 (`02-test-cases.md:42-44`); coverage row (`graph-inc12.md:293`); E5 mutant (`02-test-cases.md:57`) | **The cases reach two of the card's five append sites, so the HIGH they close can stay half open with every test green.** The card writes file text at five sites (`app.py:1311-1340` at `e07fb00`):<br>- the header (name or display identifier);<br>- `_card_field` (description, layout, byte order);<br>- unit;<br>- conversion;<br>- limits.<br><br>The node (`graph-inc12.md:197`) covers all five. The cases test the header twice and `_card_field` once.<br><br>Measured with one field per row: the name, the display identifier, the description, the `UNIT` word, the header conversion word and the header limit words [H2]:<br>- **`base`:** 5 of 6 rows put the ESC sequence and U+009B into the screen output (`render_full_update().render_segments`).<br>- **`corr`:** 0 of 6.<br>- **`corrpart`:** 0 leaks for the three case fields, so it passes /1 … /3. The unit and conversion rows still put both sequences into the screen output (2 of 6). The limit words keep ESC and U+009B in the card's text, below the 4 visible card lines here; they are painted when the card scrolls (`max-height: 5`, `app.py:1373`).<br><br>E5's mutant "raw `Text.append`" reverts every site at once. A revert of one site survives it.<br><br>The tracked files hold 0 C0 or C1 characters in description, unit, conversion and limits [N2], so this is reached only from a hostile file. | **Remove the duplicate paths.** Build the unit, conversion and limits lines through `_card_field`, or one value helper, so that one function builds every file value.<br><br>Extend the threshold to every file-derived field, each case as /1:<br>- /4 unit;<br>- /5 conversion;<br>- /6 the two limit words (assert on the card's `Text`, or scroll the card).<br><br>In E5's table, list one mutant per append site. |
+| E3S-09 | MEDIUM | AT-B103-I12-2 label and decision text (`02-test-cases.md:51`); "What else the operator sees" (`01-requirements.md:63`); E2-7 (`graph-inc12.md`, the E3 note) | **"The card shows the full name" is false for most of the rows the operator is shown.** The card's first line is `display_identifier or name` (`app.py:1312`), and Inc 11's READ.33 keeps it so.<br><br>On ASAP2_Demo_V171, base reader, of the 88 names that read alike at *w* = 12 [N2]:<br>- 64 show their display identifier in the card, not their name.<br>- 8 show a card header that another tag of the file also shows (4 headers are used by 2 or more tags).<br>- 88 of 88 have an Address.<br><br>Tracked files: 1,100 tags have a display identifier, every one different from the name, and 23 share it with a tag of another name.<br><br>The Address tells the rows apart (whole, in the first column and in the card). For these rows the card does not. My round-1 E3S-03 said "the card shows the cursor row's full name"; that was wrong for these tags. The decision page would ask for a verdict on a premise that is false for 64 of the 88 rows it shows. No wrong address is painted. | Reword the label and the decision text, for example: "shortened names can read alike; the Address tells them apart; the card shows the display identifier when the file has one (64 of these 88), else the name; the copy takes the full name". Make the same change in "What else" and E2-7.<br><br>If the card should be the full-name check that the E3S-02 ruling calls it, add a `name` line when a display identifier is shown. That is a product change inside the slice (READ.33's first line kept) and an orchestrator ruling; it is not asked for here. |
+| E3S-10 | MINOR | R-TUI-042a.6 against .7: one name, two sinks (`01-requirements.md:53-54`; `graph-inc12.md:197`) | **The Tag cell and the card show the same name with different characters, and the card keeps bidirectional controls on the line that holds the Address.**<br><br>The name `SYN_N1_<ESC>]0;PWNED<ESC>\_<U+009B>31mRED_END` paints [H2 corr]:<br>- in the Tag cell: `SYN_N1_<U+FFFD>]0;PWNED<U+FFFD>\_<U+FFFD>31mRED_END`;<br>- in the card: `SYN_N1_]0;PWNED\_31mRED_END`.<br><br>So the card does not show the text that the Tag cell cuts, and it merges `A<ESC>B` with `AB`.<br><br>An RLO in a name stays in the card header, after which the Address follows on the same line. A terminal that applies the Unicode bidirectional algorithm reorders the rest of that line, including the address (R). Windows Terminal was not measured. READ.4 records an error for such a name. | Build the header's name or display identifier with R-TUI-042a.6's projection, without the cut. This changes 0 of 234,654 tracked names and 0 of 256,568 corpus names [N2]. Keep `safe_text` for the description and the unit: 4 tracked descriptions hold non-ASCII text [N2]. |
+| E3S-11 | LOW | node `_shorten_tag_name` (`graph-inc12.md:107`) | **The node projects the whole name and then slices, so it is linear in the name, not O(*w*) as the ruling says.** Per call [U2]:<br>- tails of 16,000 characters: 0.8–1.4 ms;<br>- 100,000: 5–9 ms;<br>- a 1,000,000-character ASCII name: 79 ms;<br>- 10,000,000: 750 ms.<br><br>The build, the fit's comparison and the repaint each run it once per row. No superlinear term remains. | Project only the two slices: `p(name[:h]) + "…" + p(name[len(name) - t:])`. The projection maps one character to one, so the output is the same, and the cost is O(*w*). |
+| E3S-12 | LOW | the AT-069c redesign (`E2-rulings.md:12`; `graph-inc12.md`, the E2-6 E3 note) | **The guard works, but two things the tester needs are not written down.**<br><br>The guard: on `corr` at the test's sizes, *w* is 12 at 80×24 and 26 at 120×30. The mutant `Text.from_markup` changes the text and adds a `red` span at both sizes, so the test goes RED [T2].<br><br>(a) **The oracle.** The Tag cell's expected text is R-TUI-042a.6's projection: `_P_ANSI`'s ESC becomes U+FFFD. `_scrub(payload) in cell` is False for all 4 payloads at both sizes [T2]. `_scrub` stays the card's oracle (AT-069b).<br><br>(b) **The call shape.** The test injects with `update_a2l_tags_view([tag])`, but the fit's repaint reads `_a2l_filtered_tags`, which the test leaves empty. The injected row therefore keeps its build-time form: `✓ [red]PW…nclosed` (*w* 15, before the fit) against the fitted `✓ [red]…closed` (*w* 12) [T2]. | Write (a) and (b) into the E2-6 note:<br>- assert R-TUI-042a.6's projection;<br>- set `app._a2l_filtered_tags = [tag]` and pass it, which is the call shape of all 6 product callers.<br><br>"Payloads placed where they fit": at 80×24 only `_P_ANSI` (10 characters) fits whole. At 120×30 each of the four fits whole as its own name. The across-the-cut case covers the rest. |
+| E3S-13 | MINOR | R-A2L-READ.69 (`../inc-11/01-requirements.md:220`); cases READ.69/1, /2 (`../inc-11/02-test-cases.md:236-237`) | **The cases test only the ECU_ADDRESS word.** CTX *address words* (`../inc-11/01-requirements.md:124`) also holds a CHARACTERISTIC's header address. An implementation that checks only the ECU_ADDRESS path passes, and then the header address `99999999999999999999` keeps 0x56BC75E2D630FFFFF. That breaks I-12.4's "at most 18 characters". The painted cell is still whole: 21 + 9 cells fit in the 36 visible at 80 columns (R). | Add READ.69/3: a CHARACTERISTIC with header address `99999999999999999999` gives no address. |
+
+### Round-1 findings: status
+
+| Id | Status | Evidence |
+|---|---|---|
+| E3S-01 MAJOR | **closed in the design** (`approved` at E3; the mitigation stays `planned` until E4 and E5) | **The cut** [U2]: a 16,000-character tail of U+200B, U+0301, ESC, U+009B, U+3164, fullwidth, RLO or VS16 costs 0.8–1.4 ms per call (round 1: 24–34 s). Cases .6/1 … /3 give the forms the threshold states, in 0.02–1.4 ms.<br>**End to end** [Z2], a page with 16,000 × U+200B:<br>- resize 1.48–1.65 s on `corr` and 1.47–1.64 s on `base`;<br>- 1.45–1.56 s with no U+200B, which is the probe's settle floor;<br>- the same with the cursor on that row (the card).<br>So the design adds nothing measurable.<br>**Valid names** [U2, N2]: 0 differences from the E2 form over 234,654 tracked names × 8 widths and over 200,000 random identifier names × 10 widths. 0 tracked names and 0 corpus names hold a projected character. |
+| E3S-02 HIGH | **open, `planned`** | The node is complete: `corr` 0/6 [H2]. The verification is not: E3S-08. |
+| E3S-03 MEDIUM | **counts closed**; wording → E3S-09 | The counts in `01-requirements.md:63`, E2-7 and AT-B103-I12-2 match the round-1 transcript: 46 names in 4 files at *w* = 34; 319 in 5 at *w* = 12; V171 88 and 18; corpus 3,730 in 26 files and 117,867 in 53. They hold under the correction, because ASCII names cut the same. |
+| E3S-04 MINOR | **closed** | RLO…PDF and RLI…PDI leave 0 bidirectional openers in the Tag cell at *w* 34, 14 and 9 [U2]. The card residue is E3S-10. |
+| E3S-05 MINOR | **closed by removal** (READ.69) | The case gap is E3S-13. |
+| E3S-06 MINOR | **closed** | The test goes RED under the mutant at both sizes [T2]. The tester's notes are E3S-12. |
+| E3S-07 INFO | **closed** | The pin is cited in the fit node (`graph-inc12.md:134`). |
+
+### Routed questions — answers
+
+- **R-TUI-042a.6.**
+  - **Is the cut O(*w*) on every hostile tail of round 1?** The slicing is O(*w*), and the projection is linear in the name. The worst tail costs 1.4 ms at 16,000 characters and 9 ms at 100,000 (E3S-11).
+  - **Does any valid tracked name paint differently?** No: 0 of 234,654.
+- **R-TUI-042a.7.**
+  - **Is every file-derived field covered?** In the node, yes. In the cases, no (E3S-08).
+  - **Are ESC and U+009B gone from the driver output?** On `corr`, 0/6. On a partial fix, 2/6.
+- **AT-069c:** E3S-06 closed, notes in E3S-12.
+- **E3S-03 and AT-B103-I12-2:** the counts are right; the "card shows the full name" premise is not (E3S-09).
+- **R-A2L-READ.69, reader side: is "no address, no parse error" acceptable? Yes, from this lens.**
+  - It is fail-safe: the Address paints `n/a`, no bytes are read, there is no address to write to, and no R-VAL-036 issue is raised.
+  - It is the same rule as READ.38 and READ.60.
+  - Hexadecimal words cannot reach it: READ.34 allows at most 16 digits.
+  - The corpus holds 0 decimal ECU_ADDRESS words of 20 or more digits [N2].
+  - Detection would call for a parse error. That would be one uniform row for READ.38, .60 and .69 in the backlog, not a change here. The case gap is E3S-13.
+- **The `_repaint_a2l_tag_cells` consumer** (`b101-inc10` `app.py:21009-21090`, read with `git show`): **clear** (R).
+  - It rebuilds all 16 cells with `_build_a2l_table_cells` and writes column *i* from cell *i*. In the new order, every value still lands in its own column, and the Tag cell gets R-TUI-042a.6's projection from the same builder.
+  - The cells and `_a2l_row_key_to_tag` come from the same `_a2l_filtered_tags[start:end]`.
+  - Every write of that list or of `_a2l_window_start`, on base and on 10b (`:18909`), is followed in the same call by a page build or this repaint. `_replace_current_a2l` empties the key map, so the fit's row-count guard returns. No fit can run between the two.
+  - A write while the A2L Explorer is hidden gets *w* `None`, so the 34-cell form. It is refitted on the show Resize (E2-2).
+  - One note, not a finding: compute *w* once before the row loop, as `update_a2l_tags_view` does.
+
+### Evidence checklist (round 2)
+
+- [x] Each finding has what, where, why and fix: the table columns, with `file:line` in the records, at `e07fb00` and on `b101-inc10`.
+- [x] Each finding has a severity: 1 MAJOR, 1 MEDIUM, 2 MINOR and 2 LOW.
+- [x] No secret values in this section, and no operator data. The payloads are synthetic and described, and home paths in the transcripts are masked.
+- [x] The verdict is explicit: **FAIL — BLOCK-UNTIL: E3S-08**. The HIGH (E3S-02) has no applied-and-verified evidence and stays `planned`.
+- [x] New tool or integration: none. No new outbound action, dependency or persisted state.
