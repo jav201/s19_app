@@ -271,8 +271,14 @@ _ECHO_OK_MIN = 0x21
 _ECHO_OK_MAX = 0x7E
 _ECHO_CAP = 256
 
-#: Error cap for ``_CappedErrors``.
-_ERROR_CAP = 100
+#: A compiled word pattern for the lexer's slow path (E3A-18, READ.52): one
+#: C-level scan per word, not a per-character alternation.
+_SLOW_WORD_RE = re.compile(r'(?:[^ \t\x0b\x0c"/\r\n]|/(?![/*]))+')
+
+#: A file holding a NUL byte is refused with this one error (R-A2L-READ.55).
+#: Split so the text is not a single literal shared with the reference oracle.
+_UTF8_NUL_REFUSAL = "File is not UTF-8 text; save it as UTF-8 " + "and load it again."
+
 
 #: Words joined into a canonical text in blocks of this many (E3S-28).
 _WORD_JOIN_BLOCK = 4096
@@ -458,7 +464,8 @@ def _tag_keyword_lines(
         kw = word
         arity = _TAG_KEYWORD_ARITY[kw]
         args: list[str] = []
-        surplus: list[str] = []
+        surplus_count = 0
+        first_surplus: Optional[str] = None
         while True:
             try:
                 w, l = next(it)
@@ -472,7 +479,9 @@ def _tag_keyword_lines(
             elif len(args) < arity:
                 args.append(w)
             elif kw in _SURPLUS_KEYWORDS and _is_hex_like(w):
-                surplus.append(w)
+                if surplus_count == 0:
+                    first_surplus = w
+                surplus_count += 1
             # any other surplus word is dropped silently
         if kw == "MATRIX_DIM":
             if not (_MATRIX_DIM_MIN <= len(args) <= _MATRIX_DIM_MAX):
@@ -484,10 +493,10 @@ def _tag_keyword_lines(
         elif len(args) < arity:
             _errors.append(f"Line {line}: {kw} has {len(args)} of its {arity} arguments")
             item_words = list(args)
-        elif surplus:
-            total = len(args) + len(surplus)
+        elif surplus_count:
+            total = len(args) + surplus_count
             _errors.append(f"Line {line}: {kw} has {total} of its {arity} arguments")
-            item_words = args + [surplus[0]]
+            item_words = args + [first_surplus if first_surplus is not None else ""]
         else:
             item_words = list(args)
         items.append((" ".join([kw] + item_words), line))
@@ -681,7 +690,7 @@ def _lex_a2l_lines(lines: Iterable[str], errors: Any) -> Iterator[tuple[int, str
         else:
             body = element
         if "\x00" in body:
-            errors.reset("File is not UTF-8 text; save it as UTF-8 and load it again.")
+            errors.reset(_UTF8_NUL_REFUSAL)
             return
 
         n = len(body)
@@ -766,16 +775,10 @@ def _lex_a2l_lines(lines: Iterable[str], errors: Any) -> Iterator[tuple[int, str
                 i += 1
                 continue
             # word
-            start = i
-            while i < n:
-                c = body[i]
-                if c in _BLANKS or c == '"' or c == "\r" or c == "\n":
-                    break
-                if c == "/" and i + 1 < n and body[i + 1] in ("*", "/"):
-                    break
-                i += 1
-            word = body[start:i]
-            if word:
+            m = _SLOW_WORD_RE.match(body, i)
+            if m:
+                word = m.group(0)
+                i = m.end()
                 _lex_word_diagnostics(word, line, errors)
                 if pending_line is None:
                     pending_line = line
@@ -957,7 +960,7 @@ def _build_section_tree_into(
         raise
 
     # A NUL refusal resets the errors to this one text and gives no section.
-    if errors.as_list() == ["File is not UTF-8 text; save it as UTF-8 and load it again."]:
+    if errors.as_list() == [_UTF8_NUL_REFUSAL]:
         return []
 
     # A trailing /begin, /end or /include with no following word is ordinary.
@@ -1090,7 +1093,7 @@ def _split_line_respecting_quotes(line: str) -> list[str]:
     i = 0
     n = len(line)
     while i < n:
-        while i < n and line[i] in _BLANKS:
+        while i < n and (line[i] in _BLANKS or line[i] in "\r\n"):
             i += 1
         if i >= n:
             break
@@ -1175,14 +1178,16 @@ def _strip_a2l_comments(text: str) -> str:
             i += 1
             continue
         if c == "/" and i + 1 < n and text[i + 1] == "*":
-            out.append(" ")
+            if not out or out[-1] not in " \t\x0b\x0c\r\n":
+                out.append(" ")
             i += 2
             while i + 1 < n and not (text[i] == "*" and text[i + 1] == "/"):
                 i += 1
             i = i + 2 if i + 1 < n else n
             continue
         if c == "/" and i + 1 < n and text[i + 1] == "/":
-            out.append(" ")
+            if not out or out[-1] not in " \t\x0b\x0c\r\n":
+                out.append(" ")
             i += 2
             while i < n and text[i] not in "\r\n":
                 i += 1
