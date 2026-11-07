@@ -1,0 +1,52 @@
+=== Inc 10a E4 integration run: int-07 (probe: where the focus goes after U, a load and a two-key burst; _land_focus and Screen.set_focus instrumented)
+date: 2026-11-07T00:00:54Z
+worktree HEAD (base): 2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+index tree with the increment staged: 7d9218d3e1249b8d805c6f448256af5167b48092
+CMD: env -u NO_COLOR HOME=<tmp> XDG_*=<tmp> LOCALAPPDATA=<tmp> python - <scenario> < probe_focus.py (stdin, the clone on sys.path)
+
+##### scenario U
+s19_app.__file__ = <HOME>/work/s19_i10int_eng/s19_app/__init__.py
+start: files_list ListView#files_list(area 0) items 0 workarea /tmp/i10int-focus-29u435kp/.s19tool/workarea
+after load: files_list ListView#files_list(area 216) items 0 focused RailItem#rail_item_workspace(area 21)
+before U: focused ListView#files_list(area 216)
+  set_focus(Button#ws_load_project_button(area 0)) via _reset_focus < blur < _on_hide < _invoke < invoke < _on_message < on_event < _dispatch_message
+  _land_focus(trigger=ListView#files_list(area 0), switch=None, on_switch=False): focused=Button#ws_load_project_button(area 0) active=workspace resolve='WindowHelpChip#window_help_workspace(area 3)' files_list=ListView#files_list(area 0) needs_rehome(focused)=True
+  set_focus(WindowHelpChip#window_help_workspace(area 3)) via _land_focus < land < _invoke < invoke < _invoke_and_clear_callbacks < _invoke < invoke < _flush_next_callbacks
+    -> focused=WindowHelpChip#window_help_workspace(area 3)
+pause 0: focused=WindowHelpChip#window_help_workspace(area 3) files_list=ListView#files_list(area 0) mac_records_list=DataTable#mac_records_list(area 0)
+pause 1: focused=WindowHelpChip#window_help_workspace(area 3) files_list=ListView#files_list(area 0) mac_records_list=DataTable#mac_records_list(area 0)
+pause 2: focused=WindowHelpChip#window_help_workspace(area 3) files_list=ListView#files_list(area 0) mac_records_list=DataTable#mac_records_list(area 0)
+pause 5: focused=WindowHelpChip#window_help_workspace(area 3) files_list=ListView#files_list(area 0) mac_records_list=DataTable#mac_records_list(area 0)
+pause 10: focused=WindowHelpChip#window_help_workspace(area 3) files_list=ListView#files_list(area 0) mac_records_list=DataTable#mac_records_list(area 0)
+pause 29: focused=WindowHelpChip#window_help_workspace(area 3) files_list=ListView#files_list(area 0) mac_records_list=DataTable#mac_records_list(area 0)
+=== exit code: 0
+
+##### scenario load
+s19_app.__file__ = <HOME>/work/s19_i10int_eng/s19_app/__init__.py
+start: files_list ListView#files_list(area 0) items 0 workarea /tmp/i10int-focus-f023d7sn/.s19tool/workarea
+before load: focused ListView#files_list(area 0)
+pause 0: focused=ListView#files_list(area 216) files_list=ListView#files_list(area 216) mac_records_list=DataTable#mac_records_list(area 0)
+pause 1: focused=ListView#files_list(area 216) files_list=ListView#files_list(area 216) mac_records_list=DataTable#mac_records_list(area 0)
+pause 2: focused=ListView#files_list(area 216) files_list=ListView#files_list(area 216) mac_records_list=DataTable#mac_records_list(area 0)
+pause 5: focused=ListView#files_list(area 216) files_list=ListView#files_list(area 216) mac_records_list=DataTable#mac_records_list(area 0)
+pause 10: focused=ListView#files_list(area 216) files_list=ListView#files_list(area 216) mac_records_list=DataTable#mac_records_list(area 0)
+pause 29: focused=ListView#files_list(area 216) files_list=ListView#files_list(area 216) mac_records_list=DataTable#mac_records_list(area 0)
+=== exit code: 0
+
+##### scenario burst08
+s19_app.__file__ = <HOME>/work/s19_i10int_eng/s19_app/__init__.py
+start: files_list ListView#files_list(area 0) items 0 workarea /tmp/i10int-focus-gzv0m1xz/.s19tool/workarea
+before burst: focused ListView#files_list(area 216)
+  set_focus(None) via action_show_screen < main < _run < _run_once < run_forever < run_until_complete < run < run
+  _land_focus(trigger=None, switch=a2l, on_switch=True): focused=None active=mac resolve='DataTable#mac_records_list(area 370)' files_list=ListView#files_list(area 0) needs_rehome(focused)=-
+    -> focused=None
+  _land_focus(trigger=None, switch=mac, on_switch=True): focused=None active=mac resolve='DataTable#mac_records_list(area 370)' files_list=ListView#files_list(area 0) needs_rehome(focused)=-
+  set_focus(DataTable#mac_records_list(area 370)) via _land_focus < land < _invoke < invoke < _invoke_and_clear_callbacks < _invoke < invoke < _flush_next_callbacks
+    -> focused=DataTable#mac_records_list(area 370)
+pause 0: focused=DataTable#mac_records_list(area 360) files_list=ListView#files_list(area 0) mac_records_list=DataTable#mac_records_list(area 360)
+pause 1: focused=DataTable#mac_records_list(area 360) files_list=ListView#files_list(area 0) mac_records_list=DataTable#mac_records_list(area 360)
+pause 2: focused=DataTable#mac_records_list(area 360) files_list=ListView#files_list(area 0) mac_records_list=DataTable#mac_records_list(area 360)
+pause 5: focused=DataTable#mac_records_list(area 360) files_list=ListView#files_list(area 0) mac_records_list=DataTable#mac_records_list(area 360)
+pause 10: focused=DataTable#mac_records_list(area 360) files_list=ListView#files_list(area 0) mac_records_list=DataTable#mac_records_list(area 360)
+pause 29: focused=DataTable#mac_records_list(area 360) files_list=ListView#files_list(area 0) mac_records_list=DataTable#mac_records_list(area 360)
+=== exit code: 0

@@ -1,0 +1,539 @@
+# Inc 10 E1 pilot - LAN Linux host, detached worktree at 98d94d7 (origin/main), python 3.11 env s19ci, textual 8.2.8, NO_COLOR unset, LOCALAPPDATA/XDG isolated, no clipboard
+# command: cd <worktree> && python i10e1-pilot.py <run> <scenarios>  (4 runs, each exit 0; D4A/D4B run 2 is the corrected probe, D4B run 3 adds the band oracle; F07/M06/F18/SE5 run 2 submits go-to by Tab+Enter)
+# paths redacted: <run> = the run folder
+s19_app.__file__ = <worktree>/s19_app/__init__.py
+{
+  "scenario": "D4A",
+  "tag": {
+    "name": "VALUE_0001",
+    "address": "0x00000000",
+    "length": 1,
+    "datatype": null
+  },
+  "row_before": {
+    "Tag": "\u2713 VALUE_0001",
+    "Address": "0x00000000",
+    "Length": "1",
+    "Source": "formula",
+    "Raw": "108",
+    "Physical": "108",
+    "InMem": "yes",
+    "Region": "flash",
+    "Limits": "0..255",
+    "Unit": "counts",
+    "Bits": "",
+    "Endian": "MSB_FIRST",
+    "Virt": "no",
+    "Func": "",
+    "Access": "",
+    "Dtype": ""
+  },
+  "byte_before": "0x6C",
+  "apply_status": [
+    "Loaded change: 1 entry, 0 error(s)",
+    "Apply: 1 applied, 0 skipped, 0 blocked"
+  ],
+  "byte_after": "0x93",
+  "same_mem_map_object": true,
+  "row_after_reshow": {
+    "Tag": "\u2713 VALUE_0001",
+    "Address": "0x00000000",
+    "Length": "1",
+    "Source": "formula",
+    "Raw": "108",
+    "Physical": "108",
+    "InMem": "yes",
+    "Region": "flash",
+    "Limits": "0..255",
+    "Unit": "counts",
+    "Bits": "",
+    "Endian": "MSB_FIRST",
+    "Virt": "no",
+    "Func": "",
+    "Access": "",
+    "Dtype": ""
+  },
+  "enriched_key_unchanged": true,
+  "cached_tag_raw_value_after": 108,
+  "oracle_raw_value_after": 147,
+  "oracle_physical_value_after": 147,
+  "painted_matches_post_apply_bytes": false
+}
+{
+  "scenario": "D4B",
+  "tab": "ranges",
+  "default_pad": "0x00",
+  "mode_gap_sel": [
+    "join",
+    "fill",
+    [
+      0,
+      2
+    ]
+  ],
+  "stats_before": "packed 16 B  \u00b7  span 40 B  \u00b7  fill 60.00%\nready \u2014 e exports",
+  "oracle_conflicts_before": 0,
+  "b1_apply": [
+    "Loaded change: 1 entry, 0 error(s)",
+    "Apply: 1 applied, 0 skipped, 0 blocked"
+  ],
+  "b1_sel_after_reopen": [
+    0,
+    2
+  ],
+  "b1_stats_after_reopen": "packed 16 B  \u00b7  span 40 B  \u00b7  fill 57.50%\n\u26a0 1 B would clobber source \u2014 abort on export",
+  "b1_oracle_conflicts": 1,
+  "b2_apply": [
+    "Loaded change: 1 entry, 0 error(s)",
+    "Apply: 1 applied, 0 skipped, 0 blocked"
+  ],
+  "b2_stats_while_shown": "packed 16 B  \u00b7  span 40 B  \u00b7  fill 57.50%\n\u26a0 1 B would clobber source \u2014 abort on export",
+  "b2_oracle_conflicts": 1
+}
+
+s19_app.__file__ = <worktree>/s19_app/__init__.py
+{
+  "scenario": "D4C",
+  "apply_1": [
+    "Loaded change: 1 entry, 0 error(s)",
+    "Apply: 1 applied, 0 skipped, 0 blocked"
+  ],
+  "bytes_before_save": "FF FF FF AA FF FF FF FF",
+  "painted_band_before_save": [
+    [
+      "data",
+      8
+    ],
+    [
+      "fill",
+      11
+    ],
+    [
+      "conflict",
+      1
+    ],
+    [
+      "fill",
+      12
+    ],
+    [
+      "data",
+      8
+    ]
+  ],
+  "save_status": [
+    "Project saved + manifest verified",
+    "Saved + verified: three.s19 \u2014 0 entries applied before this save; includes 2 entries not applied before this save (0x00008015, 0x00008016)",
+    "Saved project to <run>/d4c/.s19tool/workarea/P10 (variant 'three') \u2014 three.s19 + 2 change entries, 2 applied by this save"
+  ],
+  "split_join_displayed_after_save": true,
+  "same_mem_map_object": true,
+  "bytes_after_save": "FF FF FF FF FF BB CC FF",
+  "painted_band_after_save": [
+    [
+      "data",
+      8
+    ],
+    [
+      "fill",
+      11
+    ],
+    [
+      "conflict",
+      1
+    ],
+    [
+      "fill",
+      12
+    ],
+    [
+      "data",
+      8
+    ]
+  ],
+  "oracle_band_after_save": [
+    [
+      "data",
+      8
+    ],
+    [
+      "fill",
+      13
+    ],
+    [
+      "conflict",
+      2
+    ],
+    [
+      "fill",
+      9
+    ],
+    [
+      "data",
+      8
+    ]
+  ],
+  "painted_state_after_save": "packed 16 B  \u00b7  span 40 B  \u00b7  fill 57.50%\n\u26a0 1 B would clobber source \u2014 abort on export"
+}
+
+s19_app.__file__ = <worktree>/s19_app/__init__.py
+{
+  "scenario": "F07",
+  "row_count": 26546,
+  "page_size": 200,
+  "target": "0x00000960 (row index 150)",
+  "main_goto": {
+    "notice_lines": [
+      "... window limited to 200 rows ..."
+    ],
+    "first_row": "  0x00000000  ",
+    "rows": 200,
+    "marker_line": null,
+    "marker_row_index": null,
+    "scroll_y": 0.0,
+    "scroll_x": 0.0,
+    "viewport_rows": 28
+  },
+  "main_goto_after_scroll": {
+    "notice_lines": [
+      "... window limited to 200 rows ..."
+    ],
+    "first_row": "  0x00000000  ",
+    "rows": 200,
+    "marker_line": null,
+    "marker_row_index": null,
+    "scroll_y": 40,
+    "scroll_x": 10,
+    "viewport_rows": 28
+  },
+  "search_text_printable": false,
+  "sections": 4,
+  "section_jump": {
+    "start": "0x00040000",
+    "start_line": 98,
+    "first_row": "  0x0000FA00  ",
+    "marker_line": null,
+    "scroll_y": 40,
+    "viewport_rows": 28
+  },
+  "mac_goto": {
+    "notice_lines": [
+      "... window limited to 200 rows ..."
+    ],
+    "first_row": "  0x00000000  ",
+    "rows": 200,
+    "marker_line": null,
+    "marker_row_index": null,
+    "scroll_y": 0.0,
+    "scroll_x": 0.0,
+    "viewport_rows": 0
+  },
+  "a2l_goto": {
+    "notice_lines": [
+      "... window limited to 200 rows ..."
+    ],
+    "first_row": "  0x00000000  ",
+    "rows": 200,
+    "marker_line": null,
+    "marker_row_index": null,
+    "scroll_y": 0.0,
+    "scroll_x": 0.0,
+    "viewport_rows": 0
+  },
+  "status_tail": [
+    "A2L loaded: firmware.a2l"
+  ]
+}
+{
+  "scenario": "M06",
+  "error": "IndexError: list index out of range"
+}
+{
+  "scenario": "F13",
+  "U_nothing_loaded_message": "Unloaded all artifacts.",
+  "status_after_loads": "Loaded firmware.mac (S19+MAC)",
+  "after_u_mac": {
+    "status_text": "Loaded firmware.mac (S19+MAC)",
+    "message": "Unloaded MAC."
+  },
+  "after_U": {
+    "status_text": "Loaded firmware.mac (S19+MAC)",
+    "message": "Unloaded all artifacts."
+  }
+}
+{
+  "scenario": "D519",
+  "errors_before": 1,
+  "path_before": "bad.s19",
+  "after_primary_unload": {
+    "file_type": "mac",
+    "errors": 1,
+    "path": "bad.s19",
+    "status_text": "Loaded firmware.mac (S19+MAC)"
+  }
+}
+{
+  "scenario": "F14",
+  "after_load": {
+    "id": "files_list",
+    "type": "ListView",
+    "area": 216,
+    "window_hidden": false
+  },
+  "after_key_2": {
+    "id": "ws_load_project_button",
+    "type": "Button",
+    "area": 0,
+    "window_hidden": true
+  },
+  "after_key_1": {
+    "id": "ws_load_project_button",
+    "type": "Button",
+    "area": 18,
+    "window_hidden": false
+  },
+  "before_U": {
+    "id": "files_list",
+    "type": "ListView",
+    "area": 216,
+    "window_hidden": false
+  },
+  "after_U": {
+    "id": "sje_table",
+    "type": "_SegTable",
+    "area": 0,
+    "window_hidden": true
+  },
+  "after_open_split_join": {
+    "id": "sje_table",
+    "type": "_SegTable",
+    "area": 1295,
+    "window_hidden": false
+  },
+  "after_esc_close": {
+    "id": null,
+    "active": "workspace"
+  },
+  "after_rail_key_close": {
+    "id": null,
+    "active": "mac"
+  }
+}
+{
+  "scenario": "F18",
+  "tabs_seen": [
+    "ranges",
+    "manual"
+  ],
+  "manual_text_after_t": "",
+  "focus": {
+    "id": "sje_manual",
+    "type": "CappedTextArea",
+    "area": 111,
+    "window_hidden": false
+  }
+}
+{
+  "scenario": "SE5",
+  "error": "IndexError: list index out of range"
+}
+
+s19_app.__file__ = <worktree>/s19_app/__init__.py
+{
+  "scenario": "F07",
+  "row_count": 26546,
+  "page_size": 200,
+  "target": "0x00000960 (row index 150)",
+  "main_goto": {
+    "notice_lines": [
+      "... window limited to 200 rows ..."
+    ],
+    "first_row": "  0x00000000  ",
+    "rows": 200,
+    "marker_line": 151,
+    "marker_row_index": 150,
+    "scroll_y": 0.0,
+    "scroll_x": 0.0,
+    "viewport_rows": 28,
+    "marker_visible": false
+  },
+  "main_goto_after_scroll": {
+    "notice_lines": [
+      "... window limited to 200 rows ..."
+    ],
+    "first_row": "  0x00000000  ",
+    "rows": 200,
+    "marker_line": 21,
+    "marker_row_index": 20,
+    "scroll_y": 40,
+    "scroll_x": 10,
+    "viewport_rows": 28,
+    "marker_visible": false
+  },
+  "search_hit": "0x00C00050",
+  "main_find_next": {
+    "status": "Found at 0x00C00050",
+    "hit_line": 97,
+    "notice_lines": [
+      "... showing from 0x0081FA60 (context preserved) ...",
+      "... window limited to 200 rows ..."
+    ],
+    "first_row": "  0x0081FA60  ",
+    "scroll_y": 0,
+    "viewport_rows": 28
+  },
+  "sections": 4,
+  "section_jump": {
+    "start": "0x00040000",
+    "start_line": 98,
+    "first_row": "  0x0000FA00  ",
+    "marker_line": null,
+    "scroll_y": 0,
+    "viewport_rows": 28
+  },
+  "mac_goto": {
+    "notice_lines": [
+      "... window limited to 200 rows ..."
+    ],
+    "first_row": "  0x00000000  ",
+    "rows": 200,
+    "marker_line": null,
+    "marker_row_index": null,
+    "scroll_y": 0.0,
+    "scroll_x": 0.0,
+    "viewport_rows": 39
+  },
+  "a2l_goto": {
+    "notice_lines": [
+      "... showing from 0x00000560 (context preserved) ...",
+      "... window limited to 200 rows ..."
+    ],
+    "first_row": "  0x00000560  ",
+    "rows": 200,
+    "marker_line": 66,
+    "marker_row_index": 64,
+    "scroll_y": 0.0,
+    "scroll_x": 0.0,
+    "viewport_rows": 37,
+    "marker_visible": false
+  },
+  "status_tail": [
+    "Goto 0x00000960",
+    "Goto 0x00000140",
+    "Found at 0x00C00050",
+    "Goto 0x00000960"
+  ]
+}
+{
+  "scenario": "M06",
+  "after_goto_hit_marker_line": 6,
+  "after_goto_miss_status": "Address 0xFFFFFFF0 not in loaded file.",
+  "after_goto_miss_marker_line": 6,
+  "after_goto_invalid_status": "Invalid address format.",
+  "after_goto_invalid_marker_line": 6,
+  "after_section_jump_marker_line": null,
+  "after_section_jump_marker_field": 80
+}
+{
+  "scenario": "F18",
+  "tabs_seen": [
+    "ranges",
+    "manual"
+  ],
+  "manual_text_after_t": "",
+  "focus": {
+    "id": "sje_manual",
+    "type": "CappedTextArea",
+    "area": 111,
+    "window_hidden": false
+  },
+  "after_second_t": {
+    "tab": "manual",
+    "manual_text": "t"
+  }
+}
+{
+  "scenario": "SE5",
+  "status_text_codepoints_cf": [
+    "U+202E"
+  ],
+  "status_text_ascii": "Loaded fw\\u202egpj.s19 (S19 only)",
+  "last_message_ascii": "None"
+}
+s19_app.__file__ = <worktree>/s19_app/__init__.py
+{
+  "scenario": "D4B",
+  "tab": "ranges",
+  "default_pad": "0x00",
+  "mode_gap_sel": [
+    "join",
+    "fill",
+    [
+      0,
+      2
+    ]
+  ],
+  "stats_before": "packed 16 B  \u00b7  span 40 B  \u00b7  fill 60.00%\nready \u2014 e exports",
+  "oracle_conflicts_before": 0,
+  "b1_apply": [
+    "Loaded change: 1 entry, 0 error(s)",
+    "Apply: 1 applied, 0 skipped, 0 blocked"
+  ],
+  "b1_sel_after_reopen": [
+    0,
+    2
+  ],
+  "b1_stats_after_reopen": "packed 16 B  \u00b7  span 40 B  \u00b7  fill 57.50%\n\u26a0 1 B would clobber source \u2014 abort on export",
+  "b1_oracle_conflicts": 1,
+  "b2_apply": [
+    "Loaded change: 2 entries, 0 error(s)",
+    "Apply: 2 applied, 0 skipped, 0 blocked"
+  ],
+  "b2_bytes_8010_8017": "FF FF FF FF FF BB CC FF",
+  "b2_painted_band": [
+    [
+      "data",
+      8
+    ],
+    [
+      "fill",
+      11
+    ],
+    [
+      "conflict",
+      1
+    ],
+    [
+      "fill",
+      12
+    ],
+    [
+      "data",
+      8
+    ]
+  ],
+  "b2_oracle_band": [
+    [
+      "data",
+      8
+    ],
+    [
+      "fill",
+      13
+    ],
+    [
+      "conflict",
+      2
+    ],
+    [
+      "fill",
+      9
+    ],
+    [
+      "data",
+      8
+    ]
+  ],
+  "b2_stats_while_shown": "packed 16 B  \u00b7  span 40 B  \u00b7  fill 57.50%\n\u26a0 1 B would clobber source \u2014 abort on export",
+  "b2_oracle_conflicts": 2
+}

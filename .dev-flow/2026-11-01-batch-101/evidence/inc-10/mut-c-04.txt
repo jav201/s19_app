@@ -1,0 +1,37 @@
+=== Inc 10a E5 corrective run: mut-c-04
+date: 2026-11-07T06:00:04Z
+tree dir: <HOME>/work/s19_i10c_mut_mut-c-04
+checkout HEAD (base): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+main ref: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+index tree: 6cb142f114dea93b83e526ca5c29303554283466
+mutation: <HOME>/work/s19_i10c-helpers/mutation-mut-c-04.diff (printed at the end)
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10c_mut_mut-c-04/s19_app/__init__.py
+CMD: env -u NO_COLOR timeout 900 /data/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -q -n 6 --dist load -rfs --tb=line tests/test_b101_unload_focus.py -k seg_open_7_
+bringing up nodes...
+bringing up nodes...
+
+..F.                                                                     [100%]
+=================================== FAILURES ===================================
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: the hidden window's 'a' ticked rows: '4 files · 414.8 KiB data\nready — e exports'
+    assert 'nothing selected' in '4 files · 414.8 KiB data\nready — e exports'
+<HOME>/work/s19_i10c_mut_mut-c-04/tests/test_b101_unload_focus.py:1695: AssertionError: the hidden window's 'a' ticked rows: '4 files · 414.8 KiB data\nready — e exports'
+=========================== short test summary info ============================
+FAILED tests/test_b101_unload_focus.py::test_r_seg_open_7_3_keys_stay_inert_while_hidden_even_with_focus_inside
+1 failed, 3 passed in 22.19s
+exit code: 1
+--- mutation diff (vs the staged clone) ---
+diff --git a/s19_app/tui/segment_split_view.py b/s19_app/tui/segment_split_view.py
+index d1f2c15b..7ba063d0 100644
+--- a/s19_app/tui/segment_split_view.py
++++ b/s19_app/tui/segment_split_view.py
+@@ -1749,7 +1749,7 @@ class SplitJoinWindow(WindowSection):
+             except Exception:
+                 pass
+ 
+-    def check_action(self, action: str, parameters: tuple) -> Optional[bool]:
++    def _check_action_removed(self, action: str, parameters: tuple) -> Optional[bool]:
+         """Refuse the window's own keys while it is hidden (E3 S-3, D-11, I-6).
+ 
+         Textual asks this for every binding of the window (``␣``, ``a``, ``n``,

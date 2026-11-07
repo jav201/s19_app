@@ -1,0 +1,91 @@
+=== Inc 10a E4 round-2: int-20c — probe of the MAC switch landing under 6 parallel workers (no product file changed; a run-time spy wraps S19TuiApp._land_focus)
+
+===== checkout ~/work/s19_i10r6_red
+=== Inc 10a E4 round-2 run: int-20c-s19_i10r6_red
+date: 2026-11-07T04:31:17Z
+checkout HEAD (base): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+main ref in this checkout: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+index tree with the increment staged: f716da44f3c3aec6b868cfd57feec122a5fdf8ff
+staged files vs base: 10
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10r6_red/s19_app/__init__.py
+CMD: env -u NO_COLOR /data/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -n 6 --dist load -rfs <HOME>/work/s19_i10r6-helpers/probe_burst_test.py
+
+......                                                                   [100%]
+6 passed in 34.29s
+=== exit code: 0
+--- probe lines (PROBE_OUT)
+[probe 3] landing calls (stamp, shown, layout_waits, area screen_mac, mac_records_list, mac_page_prev_button)=[('a2l', 'mac', 3, 4128, 370, 48), ('mac', 'mac', 3, 4128, 370, 48)] | final focus=DataTable#mac_records_list (region area 360)
+[probe 0] landing calls (stamp, shown, layout_waits, area screen_mac, mac_records_list, mac_page_prev_button)=[('a2l', 'mac', 3, 4128, 370, 48), ('mac', 'mac', 3, 4128, 370, 48)] | final focus=DataTable#mac_records_list (region area 360)
+[probe 5] landing calls (stamp, shown, layout_waits, area screen_mac, mac_records_list, mac_page_prev_button)=[('a2l', 'mac', 3, 4128, 370, 48), ('mac', 'mac', 3, 4128, 370, 48)] | final focus=DataTable#mac_records_list (region area 360)
+[probe 4] landing calls (stamp, shown, layout_waits, area screen_mac, mac_records_list, mac_page_prev_button)=[('a2l', 'mac', 3, 4128, 370, 48), ('mac', 'mac', 3, 4128, 370, 48)] | final focus=DataTable#mac_records_list (region area 360)
+[probe 1] landing calls (stamp, shown, layout_waits, area screen_mac, mac_records_list, mac_page_prev_button)=[('a2l', 'mac', 3, 4128, 370, 48), ('mac', 'mac', 3, 4128, 370, 48)] | final focus=DataTable#mac_records_list (region area 360)
+[probe 2] landing calls (stamp, shown, layout_waits, area screen_mac, mac_records_list, mac_page_prev_button)=[('a2l', 'mac', 3, 4128, 370, 48), ('mac', 'mac', 3, 4128, 370, 48)] | final focus=DataTable#mac_records_list (region area 360)
+
+===== checkout ~/work/s19_i10r6
+=== Inc 10a E4 round-2 run: int-20c-s19_i10r6
+date: 2026-11-07T04:31:52Z
+checkout HEAD (base): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+main ref in this checkout: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+index tree with the increment staged: 7b1c023b5bfff937e71ea86490a4b2cab3dfa0a6
+staged files vs base: 10
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10r6/s19_app/__init__.py
+CMD: env -u NO_COLOR /data/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -n 6 --dist load -rfs <HOME>/work/s19_i10r6-helpers/probe_burst_test.py
+
+......                                                                   [100%]
+6 passed in 33.51s
+=== exit code: 0
+--- probe lines (PROBE_OUT)
+[probe 5] landing calls (stamp, shown, layout_waits, area screen_mac, mac_records_list, mac_page_prev_button)=[('a2l', 'mac', 3, 4128, 370, 48), ('mac', 'mac', 3, 4128, 370, 48)] | final focus=Button#mac_page_prev_button (region area 48)
+[probe 2] landing calls (stamp, shown, layout_waits, area screen_mac, mac_records_list, mac_page_prev_button)=[('a2l', 'mac', 3, 4128, 370, 48), ('mac', 'mac', 3, 4128, 370, 48)] | final focus=Button#mac_page_prev_button (region area 48)
+[probe 3] landing calls (stamp, shown, layout_waits, area screen_mac, mac_records_list, mac_page_prev_button)=[('a2l', 'mac', 3, 4128, 370, 48), ('mac', 'mac', 3, 4128, 370, 48)] | final focus=Button#mac_page_prev_button (region area 48)
+[probe 0] landing calls (stamp, shown, layout_waits, area screen_mac, mac_records_list, mac_page_prev_button)=[('a2l', 'mac', 3, 4128, 370, 48), ('mac', 'mac', 3, 4128, 370, 48)] | final focus=Button#mac_page_prev_button (region area 48)
+[probe 1] landing calls (stamp, shown, layout_waits, area screen_mac, mac_records_list, mac_page_prev_button)=[('a2l', 'mac', 3, 4128, 370, 48), ('mac', 'mac', 3, 4128, 370, 48)] | final focus=Button#mac_page_prev_button (region area 48)
+[probe 4] landing calls (stamp, shown, layout_waits, area screen_mac, mac_records_list, mac_page_prev_button)=[('a2l', 'mac', 3, 4128, 370, 48), ('mac', 'mac', 3, 4128, 370, 48)] | final focus=Button#mac_page_prev_button (region area 48)
+
+=== probe script:
+"""Probe (Inc 10a E4 round 2, int-20b): the regions the MAC switch landing of
+R-SHELL-FOCUS.2 case /7 sees (``2`` then ``3`` in one burst). A spy wraps
+``S19TuiApp._land_focus`` at run time (no product file is changed) and records,
+per call, the stamped window, the shown window, ``layout_waits`` and the areas
+of ``#screen_mac``, ``#mac_records_list`` and ``#mac_page_prev_button``."""
+import os
+import pytest
+
+import tests.test_b101_unload_focus as F
+from tests.test_b101_unload_focus import case08  # noqa: F401  (module fixture)
+from s19_app.tui.app import S19TuiApp
+
+
+@pytest.mark.parametrize("i", range(6))
+def test_probe_burst(tmp_path, case08, i, monkeypatch):  # noqa: F811
+    seen = []
+    orig = S19TuiApp._land_focus
+
+    def spy(self, trigger, switch, *, on_switch, layout_waits=3):
+        areas = tuple(
+            self.query_one(f"#{wid}").region.area
+            for wid in ("screen_mac", "mac_records_list", "mac_page_prev_button")
+        )
+        seen.append((switch, self._active_screen_key, layout_waits) + areas)
+        return orig(self, trigger, switch, on_switch=on_switch, layout_waits=layout_waits)
+
+    monkeypatch.setattr(S19TuiApp, "_land_focus", spy)
+
+    async def scenario(app, pilot, log):
+        await F.case_session(pilot, app, case08, mac=True, a2l=True)
+        seen.clear()
+        app.action_show_screen("a2l")
+        app.action_show_screen("mac")
+        await F.wait_screen(pilot, app, "mac")
+        await F.settle(pilot, 20)
+        line = (
+            f"[probe {i}] landing calls (stamp, shown, layout_waits, area screen_mac, "
+            f"mac_records_list, mac_page_prev_button)={seen} | final focus={F.focus_report(app)}"
+        )
+        print(line)
+        with open(os.environ["PROBE_OUT"], "a", encoding="utf-8") as out:
+            out.write(line + chr(10))
+
+    F.run(tmp_path, scenario)

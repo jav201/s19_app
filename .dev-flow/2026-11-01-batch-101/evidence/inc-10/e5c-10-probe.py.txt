@@ -1,0 +1,33 @@
+"""Probe (E5 corrective, M-L): do the rail keys reach the app while a dialog is current?"""
+from __future__ import annotations
+
+from pathlib import Path
+
+import pytest
+
+from tests.test_b101_unload_focus import case08, case_session, run, settle  # noqa: F401
+from tests.support.timing import wait_until
+
+
+@pytest.mark.parametrize("dialog", ["show_legend", "operations_view"])
+def test_probe_rail_key_under_a_dialog(tmp_path: Path, case08: Path, dialog: str) -> None:
+    async def scenario(app, pilot, log):
+        await case_session(pilot, app, case08)
+        calls = []
+        original = app._land_focus
+
+        def spy(*args, **kwargs):
+            calls.append(args)
+            original(*args, **kwargs)
+
+        app._land_focus = spy
+        await app.run_action(dialog)
+        await wait_until(pilot, lambda: app.screen is not app.default_screen, "dialog", timeout=10)
+        await settle(pilot, 6)
+        name = type(app.screen).__name__
+        for key in ("3", "4", "2"):
+            await pilot.press(key)
+            await settle(pilot, 6)
+            print(f"PROBE {dialog}: dialog {name}, key {key} -> shown window {app._active_screen_key}, landings {len(calls)}, screen {type(app.screen).__name__}", flush=True)
+
+    run(tmp_path, scenario)

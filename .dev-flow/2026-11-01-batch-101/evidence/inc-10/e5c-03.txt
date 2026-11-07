@@ -1,0 +1,221 @@
+=== Inc 10a E5 corrective run: e5c-03
+date: 2026-11-07T05:50:31Z
+tree dir: <HOME>/work/s19_i10c
+checkout HEAD (base): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+main ref: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+index tree: 802d3d42acadbd08d0e7648fd556446b5fceecfd
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10c/s19_app/__init__.py
+CMD: env -u NO_COLOR timeout 1800 /data/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -q -n 6 --dist load -rfs tests/test_b101_unload_focus.py
+bringing up nodes...
+bringing up nodes...
+
+.....................F...................................                [100%]
+=================================== FAILURES ===================================
+_____ test_r_ws_loaded_19_3_save_as_after_primary_unload_carries_no_image ______
+[gw4] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-385/popen-gw4/test_r_ws_loaded_19_3_save_as_0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-385/popen-gw4/b101_i10f_case080')
+
+    def test_r_ws_loaded_19_3_save_as_after_primary_unload_carries_no_image(
+        tmp_path: Path, case08: Path
+    ) -> None:
+        """R-WS-LOADED.19 case /3 (added at E5, SE5-1): project ``PS`` (fixture three
+        as ``unloaded_primary.s19`` plus the case 08 MAC) loaded, ``[u]`` on the
+        primary, then Save project ``P9`` (a save as: ``P9`` does not exist and
+        ``PS`` is open). ``P9`` holds the MAC and no ``.s19`` / ``.hex`` file and no
+        file with the image's SHA-256, and loading ``P9`` installs no S19 / HEX
+        image (the tree before E5: the save as carried ``unloaded_primary.s19``
+        from ``PS``, so loading ``P9`` installed it as the primary)."""
+        image = write_three_ranges(tmp_path / "src" / "unloaded_primary.s19")
+        mac = copy_to(case08 / "firmware.mac", tmp_path / "src" / "firmware.mac")
+        image_digest = sha256(image)
+    
+        async def scenario(app, pilot, log):
+            await open_project_ps(pilot, app, log, image, mac)
+            mark = len(log.messages)
+            await press_unload(pilot, app, "primary")
+            await wait_message(pilot, log, mark, "Unloaded primary image.")
+            await settle(pilot, 4)
+            assert app.current_file is not None and app.current_file.file_type == "mac"
+            messages = await save_and_wait(pilot, app, log, "P9")
+            assert any(m.startswith("Saved project to") for m in messages), messages
+            files = project_files(app, "P9")
+            assert "firmware.mac" in files, f"the MAC is not in P9: {sorted(files)}"
+            images = [n for n in files if n.lower().endswith((".s19", ".hex"))]
+            assert images == [], f"P9 holds image files: {images}"
+            assert image_digest not in files.values(), f"P9 holds the image's bytes: {sorted(files)}"
+            assert not any("unloaded_primary" in m for m in messages), messages
+            text = await unload_and_open(pilot, app, log, "P9")
+            installed = app.current_file
+            assert installed is None or installed.file_type == "mac", (
+                f"loading P9 installed {installed.file_type} {installed.path.name!r}; status {text!r}"
+            )
+    
+>       run(tmp_path, scenario)
+
+tests/test_b101_unload_focus.py:746: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_unload_focus.py:374: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_unload_focus.py:740: in scenario
+    text = await unload_and_open(pilot, app, log, "P9")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_unload_focus.py:950: in unload_and_open
+    await wait_message(pilot, log, mark, "Unloaded all artifacts.")
+tests/test_b101_unload_focus.py:256: in wait_message
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function wait_message.<locals>.<lambda> at 0x7f138d71db20>
+failure = <function wait_message.<locals>.<lambda> at 0x7f138d71ed40>
+timeout = 20.0, pause_first = False
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: timed out waiting for the message 'Unloaded all artifacts.'; got []
+
+tests/support/timing.py:66: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3015 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-385/popen-gw4/test_r_ws_loaded_19_3_save_as_0 workarea=/tmp/pytest-of-<user>/pytest-385/popen-gw4/test_r_ws_loaded_19_3_save_as_0/.s19tool/workarea
+INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+INFO     s19tui:app.py:17380 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:18630 Loading file: path=/tmp/pytest-of-<user>/pytest-385/popen-gw4/test_r_ws_loaded_19_3_save_as_0/src/unloaded_primary.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14943 Load phase boundary: parse_branch_entry path=unloaded_primary.s19 suffix=.s19
+INFO     s19tui:app.py:19555 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-385/popen-gw4/test_r_ws_loaded_19_3_save_as_0/src/unloaded_primary.s19 addresses=24 range_count=3 range_bytes=24 errors=0
+INFO     s19tui:app.py:14960 Load phase boundary: parse_branch_done path=unloaded_primary.s19 branch=s19
+INFO     s19tui:app.py:19001 Load phase boundary: apply_install_state path=unloaded_primary.s19 precomputed=False
+INFO     s19tui:app.py:19683 Sections updated. count=3 rendered_ranges=3 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19022 Load phase boundary: apply_sections_done path=unloaded_primary.s19
+INFO     s19tui:app.py:19036 Load phase boundary: apply_hex_done path=unloaded_primary.s19
+INFO     s19tui:app.py:20778 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18483 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18538 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17380 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.015
+INFO     s19tui:app.py:20292 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.017
+INFO     s19tui:app.py:19051 Load phase boundary: apply_a2l_done path=unloaded_primary.s19
+INFO     s19tui:app.py:19910 Memory Map updated. ranges=3
+INFO     s19tui:app.py:19073 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-385/popen-gw4/test_r_ws_loaded_19_3_save_as_0/src/unloaded_primary.s19 file_type=s19 elapsed_seconds=0.269 has_mac=False precomputed=False
+INFO     s19tui:app.py:18630 Loading file: path=/tmp/pytest-of-<user>/pytest-385/popen-gw4/test_r_ws_loaded_19_3_save_as_0/src/firmware.mac suffix=.mac project=None
+INFO     s19tui:app.py:14943 Load phase boundary: parse_branch_entry path=firmware.mac suffix=.mac
+INFO     s19tui:app.py:17633 Load phase boundary: mac_parse_entry path=firmware.mac
+INFO     s19tui:app.py:17639 Load phase boundary: mac_parse_done path=firmware.mac rows=200 diagnostics=0 elapsed=0.001s
+INFO     s19tui:app.py:17653 MAC parse summary (mirrored): path=/tmp/pytest-of-<user>/pytest-385/popen-gw4/test_r_ws_loaded_19_3_save_as_0/src/firmware.mac rows=200 parse_ok=200 diagnostics=0 valid_addresses=200
+INFO     s19tui:app.py:17674 Load phase boundary: mac_a2l_resolve_entry path=firmware.mac a2l_path=None
+INFO     s19tui:app.py:17680 Load phase boundary: mac_a2l_resolve_done path=firmware.mac has_a2l_data=False
+INFO     s19tui:app.py:17686 MAC parse summary: path=/tmp/pytest-of-<user>/pytest-385/popen-gw4/test_r_ws_loaded_19_3_save_as_0/src/firmware.mac total_records=200 parse_ok=200 diagnostics=0 valid_addresses=200 a2l_path=None elapsed_seconds=0.001
+INFO     s19tui:app.py:14985 Load phase boundary: mac_merge_entry path=firmware.mac has_primary=True
+INFO     s19tui:app.py:14992 Load phase boundary: mac_merge_done path=firmware.mac file_type=s19
+INFO     s19tui:app.py:19555 Load summary: file_type=s19+mac path=/tmp/pytest-of-<user>/pytest-385/popen-gw4/test_r_ws_loaded_19_3_save_as_0/src/firmware.mac addresses=24 range_count=3 range_bytes=24 errors=0
+INFO     s19tui:app.py:15014 Load phase boundary: parse_branch_done path=firmware.mac branch=mac
+INFO     s19tui:app.py:19001 Load phase boundary: apply_install_state path=firmware.mac precomputed=False
+INFO     s19tui:app.py:19683 Sections updated. count=3 rendered_ranges=3 mac_out_of_range_total=200 rendered_oor=50
+INFO     s19tui:app.py:19022 Load phase boundary: apply_sections_done path=firmware.mac
+INFO     s19tui:app.py:19036 Load phase boundary: apply_hex_done path=firmware.mac
+INFO     s19tui:app.py:20778 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18483 MAC validation computed: records=200 issues=400 elapsed_seconds=0.002
+INFO     s19tui:app.py:18538 MAC row cache built: records=200 elapsed_seconds=0.003
+INFO     s19tui:app.py:17412 Load phase boundary: populate_issues_table_done rows=40 total=400 elapsed=0.022
+INFO     s19tui:app.py:20343 Load phase boundary: populate_mac_table_done rows=100 total=200 elapsed=0.032
+INFO     s19tui:app.py:19051 Load phase boundary: apply_a2l_done path=firmware.mac
+INFO     s19tui:app.py:19910 Memory Map updated. ranges=3
+INFO     s19tui:app.py:19073 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-385/popen-gw4/test_r_ws_loaded_19_3_save_as_0/src/firmware.mac file_type=s19 elapsed_seconds=0.913 has_mac=True precomputed=False
+INFO     s19tui:app.py:8912 Save project action triggered for /tmp/pytest-of-<user>/pytest-385/popen-gw4/test_r_ws_loaded_19_3_save_as_0/src/unloaded_primary.s19
+INFO     s19tui:app.py:12895 Project saved image. name=PS file=/tmp/pytest-of-<user>/pytest-385/popen-gw4/test_r_ws_loaded_19_3_save_as_0/.s19tool/workarea/PS/unloaded_primary.s19
+INFO     s19tui:app.py:12895 Project saved mac. name=PS file=/tmp/pytest-of-<user>/pytest-385/popen-gw4/test_r_ws_loaded_19_3_save_as_0/.s19tool/workarea/PS/firmware.mac
+INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+INFO     s19tui:app.py:20778 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17380 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.024
+INFO     s19tui:app.py:20292 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.026
+INFO     s19tui:app.py:17380 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.024
+INFO     s19tui:app.py:8977 Load project action triggered.
+INFO     s19tui:app.py:16238 Load phase boundary: modal_dismiss_scheduled kind=project value='PS'
+INFO     s19tui:app.py:14943 Load phase boundary: parse_branch_entry path=unloaded_primary.s19 suffix=.s19
+INFO     s19tui:app.py:19555 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-385/popen-gw4/test_r_ws_loaded_19_3_save_as_0/.s19tool/workarea/PS/unloaded_primary.s19 addresses=24 range_count=3 range_bytes=24 errors=0
+INFO     s19tui:app.py:14960 Load phase boundary: parse_branch_done path=unloaded_primary.s19 branch=s19
+INFO     s19tui:app.py:14943 Load phase boundary: parse_branch_entry path=firmware.mac suffix=.mac
+INFO     s19tui:app.py:17633 Load phase boundary: mac_parse_entry path=firmware.mac
+INFO     s19tui:app.py:17639 Load phase boundary: mac_parse_done path=firmware.mac rows=200 diagnostics=0 elapsed=0.001s
+INFO     s19tui:app.py:17653 MAC parse summary (mirrored): path=/tmp/pytest-of-<user>/pytest-385/popen-gw4/test_r_ws_loaded_19_3_save_as_0/.s19tool/workarea/PS/firmware.mac rows=200 parse_ok=200 diagnostics=0 valid_addresses=200
+INFO     s19tui:app.py:17674 Load phase boundary: mac_a2l_resolve_entry path=firmware.mac a2l_path=None
+INFO     s19tui:app.py:17680 Load phase boundary: mac_a2l_resolve_done path=firmware.mac has_a2l_data=False
+INFO     s19tui:app.py:17686 MAC parse summary: path=/tmp/pytest-of-<user>/pytest-385/popen-gw4/test_r_ws_loaded_19_3_save_as_0/.s19tool/workarea/PS/firmware.mac total_records=200 parse_ok=200 diagnostics=0 valid_addresses=200 a2l_path=None elapsed_seconds=0.002
+INFO     s19tui:app.py:14985 Load phase boundary: mac_merge_entry path=firmware.mac has_primary=True
+INFO     s19tui:app.py:14992 Load phase boundary: mac_merge_done path=firmware.mac file_type=s19
+INFO     s19tui:app.py:19555 Load summary: file_type=s19+mac path=/tmp/pytest-of-<user>/pytest-385/popen-gw4/test_r_ws_loaded_19_3_save_as_0/.s19tool/workarea/PS/firmware.mac addresses=24 range_count=3 range_bytes=24 errors=0
+INFO     s19tui:app.py:15014 Load phase boundary: parse_branch_done path=firmware.mac branch=mac
+INFO     s19tui:app.py:19001 Load phase boundary: apply_install_state path=unloaded_primary.s19 precomputed=False
+INFO     s19tui:app.py:19001 Load phase boundary: apply_install_state path=firmware.mac precomputed=False
+INFO     s19tui:app.py:14896 Project loaded. name=PS file=/tmp/pytest-of-<user>/pytest-385/popen-gw4/test_r_ws_loaded_19_3_save_as_0/.s19tool/workarea/PS/unloaded_primary.s19 mac=/tmp/pytest-of-<user>/pytest-385/popen-gw4/test_r_ws_loaded_19_3_save_as_0/.s19tool/workarea/PS/firmware.mac
+INFO     s19tui:app.py:19683 Sections updated. count=3 rendered_ranges=3 mac_out_of_range_total=200 rendered_oor=50
+INFO     s19tui:app.py:19022 Load phase boundary: apply_sections_done path=unloaded_primary.s19
+INFO     s19tui:app.py:19683 Sections updated. count=3 rendered_ranges=3 mac_out_of_range_total=200 rendered_oor=50
+INFO     s19tui:app.py:19022 Load phase boundary: apply_sections_done path=firmware.mac
+INFO     s19tui:app.py:19036 Load phase boundary: apply_hex_done path=unloaded_primary.s19
+INFO     s19tui:app.py:19036 Load phase boundary: apply_hex_done path=firmware.mac
+INFO     s19tui:app.py:20778 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18483 MAC validation computed: records=200 issues=400 elapsed_seconds=0.007
+INFO     s19tui:app.py:18538 MAC row cache built: records=200 elapsed_seconds=0.009
+INFO     s19tui:app.py:17412 Load phase boundary: populate_issues_table_done rows=40 total=400 elapsed=0.036
+INFO     s19tui:app.py:20343 Load phase boundary: populate_mac_table_done rows=100 total=200 elapsed=0.054
+INFO     s19tui:app.py:19051 Load phase boundary: apply_a2l_done path=unloaded_primary.s19
+INFO     s19tui:app.py:20778 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17412 Load phase boundary: populate_issues_table_done rows=40 total=400 elapsed=0.041
+INFO     s19tui:app.py:20343 Load phase boundary: populate_mac_table_done rows=100 total=200 elapsed=0.047
+INFO     s19tui:app.py:19051 Load phase boundary: apply_a2l_done path=firmware.mac
+INFO     s19tui:app.py:19910 Memory Map updated. ranges=3
+INFO     s19tui:app.py:19073 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-385/popen-gw4/test_r_ws_loaded_19_3_save_as_0/.s19tool/workarea/PS/unloaded_primary.s19 file_type=s19 elapsed_seconds=2.320 has_mac=False precomputed=False
+INFO     s19tui:app.py:19910 Memory Map updated. ranges=3
+INFO     s19tui:app.py:19073 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-385/popen-gw4/test_r_ws_loaded_19_3_save_as_0/.s19tool/workarea/PS/firmware.mac file_type=s19 elapsed_seconds=2.467 has_mac=True precomputed=False
+INFO     s19tui:app.py:19683 Sections updated. count=0 rendered_ranges=0 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:20778 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18483 MAC validation computed: records=200 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18538 MAC row cache built: records=200 elapsed_seconds=0.002
+INFO     s19tui:app.py:17380 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.023
+INFO     s19tui:app.py:20343 Load phase boundary: populate_mac_table_done rows=100 total=200 elapsed=0.354
+INFO     s19tui:app.py:19910 Memory Map updated. ranges=0
+INFO     s19tui:app.py:8912 Save project action triggered for /tmp/pytest-of-<user>/pytest-385/popen-gw4/test_r_ws_loaded_19_3_save_as_0/.s19tool/workarea/PS/firmware.mac
+INFO     s19tui:app.py:12895 Project saved image. name=P9 file=/tmp/pytest-of-<user>/pytest-385/popen-gw4/test_r_ws_loaded_19_3_save_as_0/.s19tool/workarea/P9/firmware.mac
+INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+=========================== short test summary info ============================
+FAILED tests/test_b101_unload_focus.py::test_r_ws_loaded_19_3_save_as_after_primary_unload_carries_no_image
+1 failed, 56 passed in 188.08s (0:03:08)
+exit code: 1

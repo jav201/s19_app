@@ -1,0 +1,86 @@
+"""Inc 10a E5 security probe: the save-as copy list after a primary unload.
+
+Extracts by AST the source text of ``_plan_copies`` and the dataclasses it
+reads from ``s19_app/tui/services/project_gather_service.py`` and the two
+extension sets from ``s19_app/tui/workspace.py``, execs that text in one
+namespace and calls ``_plan_copies``. Nothing from ``s19_app`` is imported.
+
+Usage: python -I e5s_plan_copies_probe.py <repo root>
+"""
+from __future__ import annotations
+
+import ast
+import os
+import sys
+from dataclasses import dataclass, field
+from pathlib import Path, PurePosixPath
+from typing import Optional, Sequence
+
+repo = Path(sys.argv[1])
+gather = repo / "s19_app" / "tui" / "services" / "project_gather_service.py"
+work = repo / "s19_app" / "tui" / "workspace.py"
+
+WANT_GATHER = {
+    "InventoryFile", "PlannedFolder", "ProjectInventory", "PlannedFile",
+    "_source_key", "_plan_copies", "PLAN_ROLE_DOCUMENT",
+}
+WANT_WORK = {"MAC_EXTENSIONS", "A2L_EXTENSIONS"}
+
+
+def extract(path: Path, names: set) -> str:
+    src = path.read_text(encoding="utf-8")
+    tree = ast.parse(src)
+    parts, found = [], set()
+    for node in tree.body:
+        name = None
+        if isinstance(node, (ast.FunctionDef, ast.ClassDef)):
+            name = node.name
+        elif isinstance(node, ast.Assign) and len(node.targets) == 1 and isinstance(node.targets[0], ast.Name):
+            name = node.targets[0].id
+        if name in names:
+            parts.append(ast.get_source_segment(src, node, padded=False))
+            if isinstance(node, ast.ClassDef):
+                # keep the decorators (``@dataclass(frozen=True)``)
+                deco = "".join("@" + ast.get_source_segment(src, d) + "\n" for d in node.decorator_list)
+                parts[-1] = deco + parts[-1]
+            found.add(name)
+    missing = names - found
+    if missing:
+        raise SystemExit(f"not found in {path.name}: {sorted(missing)}")
+    return "\n\n".join(parts)
+
+
+ns = {
+    "__name__": "__main__", "os": os, "Path": Path, "PurePosixPath": PurePosixPath,
+    "dataclass": dataclass, "field": field, "Optional": Optional, "Sequence": Sequence,
+}
+code = "from __future__ import annotations\n" + extract(work, WANT_WORK) + "\n\n" + extract(gather, WANT_GATHER)
+exec(compile(code, "<extracted>", "exec"), ns)
+print("s19_app imported:", any(m == "s19_app" or m.startswith("s19_app.") for m in sys.modules))
+
+IF, PF, PI = ns["InventoryFile"], ns["PlannedFile"], ns["ProjectInventory"]
+plan_copies = ns["_plan_copies"]
+
+# The open project P as a save as walks it: the variant saved earlier and the MAC.
+root = Path("P")
+inventory = PI(
+    root=root,
+    folders=(),
+    top_level=(IF("firmware.mac", 2048), IF("unloaded_primary.s19", 4096)),
+    skipped_links=(),
+    unreadable=(),
+)
+
+# Before the unload: the image row is the S19, the MAC row is the MAC (app.py
+# _plan_project_save: mac_path != path).
+before = [
+    PF("image", root / "unloaded_primary.s19", "unloaded_primary.s19", "d1", 4096),
+    PF("mac", root / "firmware.mac", "firmware.mac", "d2", 2048),
+]
+# After [u] on the primary (D-7): path == mac_path, so the image row IS the MAC
+# and no "mac" row is planned (app.py: `if loaded.mac_path and loaded.mac_path != loaded.path`).
+after = [PF("image", root / "firmware.mac", "firmware.mac", "d2", 2048)]
+
+for label, files in (("before unload", before), ("after primary unload", after)):
+    _folders, copies, _owned = plan_copies(inventory, files)
+    print(f"{label}: planned rows {[f.role + ':' + f.name for f in files]} -> carried {[c.relative for c in copies]}")

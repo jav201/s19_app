@@ -1,0 +1,40 @@
+=== Inc 10a E5 corrective run: mut-c-02
+date: 2026-11-07T05:59:09Z
+tree dir: <HOME>/work/s19_i10c_mut_mut-c-02
+checkout HEAD (base): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+main ref: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+index tree: 6cb142f114dea93b83e526ca5c29303554283466
+mutation: <HOME>/work/s19_i10c-helpers/mutation-mut-c-02.diff (printed at the end)
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10c_mut_mut-c-02/s19_app/__init__.py
+CMD: env -u NO_COLOR timeout 900 /data/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -q -n 6 --dist load -rfs --tb=line tests/test_b101_unload_focus.py -k shell_focus_2_8 or shell_focus_2_7 or shell_focus_3_1 or shell_focus_3_2 or shell_focus_4_1 or shell_focus_4_2
+bringing up nodes...
+bringing up nodes...
+
+.....FF                                                                  [100%]
+=================================== FAILURES ===================================
+[gw1] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: the focus never landed on #mac_page_prev_button; it is DataTable#mac_records_list (region area 360)
+<HOME>/work/s19_i10c_mut_mut-c-02/tests/support/timing.py:66: AssertionError: the focus never landed on #mac_page_prev_button; it is DataTable#mac_records_list (region area 360)
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: the focus never landed on #window_help_a2l; it is DataTable#a2l_tags_list (region area 1600)
+<HOME>/work/s19_i10c_mut_mut-c-02/tests/support/timing.py:66: AssertionError: the focus never landed on #window_help_a2l; it is DataTable#a2l_tags_list (region area 1600)
+=========================== short test summary info ============================
+FAILED tests/test_b101_unload_focus.py::test_r_shell_focus_2_8_a_rail_key_in_an_unload_burst_lands_on_the_switch_landing[mac]
+FAILED tests/test_b101_unload_focus.py::test_r_shell_focus_2_8_a_rail_key_in_an_unload_burst_lands_on_the_switch_landing[a2l]
+2 failed, 5 passed in 35.53s
+exit code: 1
+--- mutation diff (vs the staged clone) ---
+diff --git a/s19_app/tui/app.py b/s19_app/tui/app.py
+index cab4ee01..2049ddfd 100644
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -18064,7 +18064,7 @@ class S19TuiApp(App):
+         # Inc 10a (E5, CR-3): stamped with the window shown now, so a rail
+         # key in the same burst makes this landing stale and its own wins.
+         self.call_after_refresh(
+-            self._land_focus, trigger, self._active_screen_key, on_switch=False
++            self._land_focus, trigger, None, on_switch=False
+         )
+ 
+     def _refresh_loaded_panel(self, project: Optional[str] = None) -> None:

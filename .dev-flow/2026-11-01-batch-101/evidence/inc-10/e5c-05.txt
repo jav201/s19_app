@@ -1,0 +1,15 @@
+=== Inc 10a E5 corrective run: e5c-05
+date: 2026-11-07T05:56:41Z
+tree dir: <HOME>/work/s19_i10c
+checkout HEAD (base): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+main ref: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+index tree: 6cb142f114dea93b83e526ca5c29303554283466
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10c/s19_app/__init__.py
+CMD: env -u NO_COLOR timeout 900 /data/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -q -n 2 --dist load -rfs tests/test_b101_unload_focus.py::test_r_ws_loaded_19_3_save_as_after_primary_unload_carries_no_image tests/test_b101_unload_focus.py::test_r_ws_loaded_19_4_save_as_with_the_image_loaded_carries_it
+bringing up nodes...
+bringing up nodes...
+
+..                                                                       [100%]
+2 passed in 18.59s
+exit code: 0

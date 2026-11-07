@@ -1,0 +1,174 @@
+"""Probe (E5 corrective, M-L ruling): where does a focus landing meet a shown window with no region?
+
+Spies on S19TuiApp._land_focus and records, at every call, the shown window, the stamp, on_switch,
+layout_waits and the region area of the shown window's container. A call with area 0 is a route
+where I-D3's layout wait decides the landing. Not a test of the product: it asserts nothing.
+"""
+from __future__ import annotations
+
+from pathlib import Path
+
+import pytest
+
+from tests.test_b101_unload_focus import (  # noqa: F401
+    RAIL_TARGETS,
+    case08,
+    case_session,
+    focus_report,
+    open_split_join,
+    run,
+    settle,
+    wait_screen,
+)
+from tests.support import b100_projects as projects
+
+LOG: list = []
+
+
+def spy_on(app, label: str) -> None:
+    original = app._land_focus
+
+    def spy(trigger, switch, *, on_switch, layout_waits=3):
+        key = app._active_screen_key
+        cid = "screen_split_join" if key == "split_join" else app.SCREEN_CONTAINER_IDS.get(key)
+        try:
+            area = app.query_one(f"#{cid}").region.area
+        except Exception as exc:  # noqa: BLE001
+            area = f"err {type(exc).__name__}"
+        try:
+            current = type(app.screen).__name__
+        except Exception:  # noqa: BLE001
+            current = "?"
+        LOG.append((label, key, switch, on_switch, layout_waits, area, current))
+        print(f"PROBE call {label}: shown={key} stamp={switch} on_switch={on_switch} waits={layout_waits} area={area} screen={current}", flush=True)
+        original(trigger, switch, on_switch=on_switch, layout_waits=layout_waits)
+
+    app._land_focus = spy
+
+
+async def landed(pilot, app, label: str) -> None:
+    await settle(pilot, 12)
+    print(f"PROBE end  {label}: {focus_report(app)}", flush=True)
+
+
+def test_probe_fresh_keys(tmp_path: Path) -> None:
+    async def scenario(app, pilot, log):
+        spy_on(app, "fresh")
+        for key, window, _target in RAIL_TARGETS[1:] + RAIL_TARGETS[:1]:
+            await pilot.press(key)
+            await landed(pilot, app, f"fresh {key}->{window}")
+
+    run(tmp_path, scenario)
+
+
+def test_probe_fresh_first_action_before_any_pause(tmp_path: Path) -> None:
+    async def _drive():
+        from s19_app.tui.app import S19TuiApp
+
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 56)) as pilot:
+            spy_on(app, "first")
+            app.action_show_screen("mac")
+            await landed(pilot, app, "first mac")
+
+    import asyncio
+
+    asyncio.run(_drive())
+
+
+def test_probe_fresh_keys_80x24(tmp_path: Path) -> None:
+    async def scenario(app, pilot, log):
+        spy_on(app, "fresh80")
+        for key, window, _target in RAIL_TARGETS[1:4]:
+            await pilot.press(key)
+            await landed(pilot, app, f"fresh80 {key}->{window}")
+
+    projects.run_app(tmp_path, scenario, size=(80, 24))
+
+
+def test_probe_loaded_keys(tmp_path: Path, case08: Path) -> None:
+    async def scenario(app, pilot, log):
+        await case_session(pilot, app, case08, mac=True, a2l=True)
+        spy_on(app, "loaded")
+        for key, window, _target in RAIL_TARGETS[1:] + RAIL_TARGETS[:1]:
+            await pilot.press(key)
+            await landed(pilot, app, f"loaded {key}->{window}")
+
+    run(tmp_path, scenario)
+
+
+@pytest.mark.parametrize("pair", [("a2l", "mac"), ("map", "issues"), ("patch", "flow"), ("checks", "crc_designer"), ("mac", "map"), ("diff", "a2l")])
+def test_probe_action_bursts(tmp_path: Path, case08: Path, pair) -> None:
+    async def scenario(app, pilot, log):
+        await case_session(pilot, app, case08, mac=True, a2l=True)
+        spy_on(app, f"burst {pair}")
+        app.action_show_screen(pair[0])
+        app.action_show_screen(pair[1])
+        await landed(pilot, app, f"burst {pair}")
+
+    run(tmp_path, scenario)
+
+
+def test_probe_key_bursts(tmp_path: Path, case08: Path) -> None:
+    async def scenario(app, pilot, log):
+        await case_session(pilot, app, case08, mac=True, a2l=True)
+        spy_on(app, "keys")
+        for keys in (("2", "3"), ("4", "5"), ("6", "8"), ("1", "4")):
+            await pilot.press(*keys)
+            await landed(pilot, app, f"keys {keys}")
+
+    run(tmp_path, scenario)
+
+
+def test_probe_split_join_then_key(tmp_path: Path, case08: Path) -> None:
+    async def scenario(app, pilot, log):
+        await case_session(pilot, app, case08, mac=True, a2l=True)
+        spy_on(app, "sje")
+        for key in ("3", "4", "2"):
+            await open_split_join(pilot, app)
+            await pilot.press(key)
+            await landed(pilot, app, f"sje {key}")
+
+    run(tmp_path, scenario)
+
+
+def test_probe_palette(tmp_path: Path, case08: Path) -> None:
+    async def scenario(app, pilot, log):
+        await case_session(pilot, app, case08, mac=True, a2l=True)
+        spy_on(app, "palette")
+        for text in ("MAC View", "Memory Map", "A2L Explorer"):
+            await pilot.press("ctrl+k")
+            await settle(pilot, 4)
+            await pilot.press(*list(text))
+            await settle(pilot, 4)
+            await pilot.press("enter")
+            await landed(pilot, app, f"palette {text}")
+
+    run(tmp_path, scenario)
+
+
+def test_probe_load_then_switch(tmp_path: Path, case08: Path) -> None:
+    async def scenario(app, pilot, log):
+        spy_on(app, "loadswitch")
+        app.load_selected_file(case08 / "firmware.s19")
+        app.action_show_screen("map")
+        await landed(pilot, app, "loadswitch map")
+        await settle(pilot, 40)
+        print(f"PROBE end  loadswitch after load: {focus_report(app)}", flush=True)
+
+    run(tmp_path, scenario)
+
+
+def test_probe_switch_under_a_modal(tmp_path: Path, case08: Path) -> None:
+    async def scenario(app, pilot, log):
+        await case_session(pilot, app, case08, mac=True, a2l=True)
+        spy_on(app, "modal")
+        await pilot.press("question_mark")
+        await settle(pilot, 6)
+        print(f"PROBE modal open: screen={type(app.screen).__name__}", flush=True)
+        app.action_show_screen("mac")
+        await landed(pilot, app, "modal mac (under the modal)")
+        await pilot.press("escape")
+        await landed(pilot, app, "modal closed")
+
+    run(tmp_path, scenario)

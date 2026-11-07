@@ -1,0 +1,105 @@
+=== base commit: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+=== python: Python 3.11.18
+=== mutation applied: M25 (file s19_app/tui/app.py)
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -10849,14 +10849,6 @@
+             focused = self.default_screen.focused
+         except Exception:
+             return
+-        move = (
+-            focused is None
+-            or self._focus_needs_rehome(focused)
+-            or (on_switch and focused is trigger)
+-            or (not on_switch and focused is not trigger)
+-        )
+-        if not move:
+-            return
+         target = None
+         landing_id = self._SWITCH_LANDING_TARGETS.get(self._active_screen_key)
+         if on_switch and landing_id is not None:
+LANDED M25: 'if not move:' x0
+=== s19_app.__file__ ===
+<HOME>/work/s19_i10mut_m28/s19_app/__init__.py
+=== CMD ===
+env -u NO_COLOR <HOME>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -rf  tests/test_b101_unload_focus.py::test_r_shell_focus_4_2_unload_all_keeps_a_rail_items_focus
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________ test_r_shell_focus_4_2_unload_all_keeps_a_rail_items_focus __________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-666/test_r_shell_focus_4_2_unload_0')
+
+    def test_r_shell_focus_4_2_unload_all_keeps_a_rail_items_focus(tmp_path: Path) -> None:
+        """R-SHELL-FOCUS.4 case /2: ``rail_item_workspace`` focused, ``U`` keeps it
+        (base: the unload refresh moves the focus to ``sje_table``)."""
+        image = write_three_ranges(tmp_path / "src" / "three.s19")
+    
+        async def scenario(app, pilot, log):
+            await load_image(pilot, app, image)
+            await put_focus(pilot, app, "rail_item_workspace")
+            mark = len(log.messages)
+            await pilot.press("U")
+            await wait_message(pilot, log, mark, "Unloaded all artifacts.")
+            await settle(pilot, 10)
+            await wait_focus(pilot, app, "rail_item_workspace")
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:1256: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_unload_focus.py:1254: in scenario
+    await wait_focus(pilot, app, "rail_item_workspace")
+../s19_i10mut/tests/test_b101_unload_focus.py:269: in wait_focus
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function wait_focus.<locals>.landed at 0x7f6b38b82020>
+failure = <function wait_focus.<locals>.<lambda> at 0x7f6b38b814e0>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: the focus never landed on #rail_item_workspace; it is WindowHelpChip#window_help_workspace (region area 3)
+
+tests/support/timing.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_unload_focus.py::test_r_shell_focus_4_2_unload_all_keeps_a_rail_items_focus
+1 failed in 14.21s

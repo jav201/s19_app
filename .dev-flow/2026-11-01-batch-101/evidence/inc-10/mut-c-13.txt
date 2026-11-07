@@ -1,0 +1,40 @@
+=== Inc 10a E5 corrective run: mut-c-13
+date: 2026-11-07T06:05:37Z
+tree dir: <HOME>/work/s19_i10c_mut_mut-c-13
+checkout HEAD (base): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+main ref: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+index tree: 6cb142f114dea93b83e526ca5c29303554283466
+mutation: <HOME>/work/s19_i10c-helpers/mutation-mut-c-13.diff (printed at the end)
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10c_mut_mut-c-13/s19_app/__init__.py
+CMD: env -u NO_COLOR timeout 900 /data/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -q -n 6 --dist load -rfs --tb=line tests/test_b101_unload_focus.py -k shell_focus_2_7 or shell_focus_2_8
+bringing up nodes...
+bringing up nodes...
+
+.FF                                                                      [100%]
+=================================== FAILURES ===================================
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: the focus never landed on #window_help_a2l; it is DataTable#a2l_tags_list (region area 1600)
+<HOME>/work/s19_i10c_mut_mut-c-13/tests/support/timing.py:66: AssertionError: the focus never landed on #window_help_a2l; it is DataTable#a2l_tags_list (region area 1600)
+[gw1] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: the focus never landed on #mac_page_prev_button; it is DataTable#mac_records_list (region area 360)
+<HOME>/work/s19_i10c_mut_mut-c-13/tests/support/timing.py:66: AssertionError: the focus never landed on #mac_page_prev_button; it is DataTable#mac_records_list (region area 360)
+=========================== short test summary info ============================
+FAILED tests/test_b101_unload_focus.py::test_r_shell_focus_2_8_a_rail_key_in_an_unload_burst_lands_on_the_switch_landing[a2l]
+FAILED tests/test_b101_unload_focus.py::test_r_shell_focus_2_8_a_rail_key_in_an_unload_burst_lands_on_the_switch_landing[mac]
+2 failed, 1 passed in 30.02s
+exit code: 1
+--- mutation diff (vs the staged clone) ---
+diff --git a/s19_app/tui/app.py b/s19_app/tui/app.py
+index cab4ee01..a6154ee4 100644
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -10840,8 +10840,6 @@ class S19TuiApp(App):
+         """
+         if self._load_tree_gone():
+             return
+-        if switch is not None and switch != self._active_screen_key:
+-            return
+         container_id = (
+             "screen_split_join"
+             if self._active_screen_key == "split_join"

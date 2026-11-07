@@ -1,0 +1,19 @@
+=== Inc 10a E4 integration run: int-11 (probe: the focus after a fresh session first load, and after a rail key then a load)
+date: 2026-11-07T00:49:10Z
+CMD: env -u NO_COLOR HOME=<tmp> XDG_*=<tmp> LOCALAPPDATA=<tmp> python - < probe_firstload.py (stdin, the tree on sys.path)
+
+##### s19_i10int: HEAD 2f54c7dea27d826483e5c5e596421b8b3a68bb2f, index tree f9a78d96271784a56e999813541f869f4f8d2137
+s19_app.__file__ = <HOME>/work/s19_i10int/s19_app/__init__.py
+[fresh] before the load: focused RailItem#rail_item_workspace(area 21)
+[fresh] after the load: focused RailItem#rail_item_workspace(area 21); files_list ListView#files_list(area 216)
+[rail-then-load] before the load: focused WindowHelpChip#window_help_workspace(area 3)
+[rail-then-load] after the load: focused WindowHelpChip#window_help_workspace(area 3); files_list ListView#files_list(area 216)
+=== exit code: 0
+
+##### s19_i10int_base: HEAD 2f54c7dea27d826483e5c5e596421b8b3a68bb2f, index tree 337d9f8a43a966a21065a1ff6f52840beae805a5
+s19_app.__file__ = <HOME>/work/s19_i10int_base/s19_app/__init__.py
+[fresh] before the load: focused RailItem#rail_item_workspace(area 21)
+[fresh] after the load: focused ListView#files_list(area 216); files_list ListView#files_list(area 216)
+[rail-then-load] before the load: focused RailItem#rail_item_workspace(area 21)
+[rail-then-load] after the load: focused ListView#files_list(area 216); files_list ListView#files_list(area 216)
+=== exit code: 0

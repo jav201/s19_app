@@ -1,0 +1,18 @@
+# LAN Linux laptop run
+=== Inc 10a E5 RR run: final-files
+date: 2026-11-07T07:38:42Z
+tree dir: <HOME>/work/s19_i10rr
+base HEAD: 09b4808a0344de05d9d64cd55362ac7058a8c17f  main: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+staged tree: d5beaa3e4f07a1be90300618b308106d2874e812
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10rr/s19_app/__init__.py
+CMD: env -u NO_COLOR timeout 1500 /data/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -q -n 6 --dist load -m not serial_timing -rfs --tb=line tests/test_b101_unload_focus.py tests/test_b101_hex_jump.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 69%]
+.s..............................                                         [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_b101_hex_jump.py:608: the main pane is 1 line(s) high at 80 x 24: no second row can lie inside it
+103 passed, 1 skipped in 306.32s (0:05:06)
+exit code: 0

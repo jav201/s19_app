@@ -1,0 +1,116 @@
+"""Inc 10a E5 corrective mutants: label -> (file, old text, new text). Each old text occurs once.
+
+Usage: python mutants.py check <root>          -> verify every anchor occurs exactly once
+       python mutants.py apply <root> <label>  -> apply one mutation in place
+"""
+import sys
+from pathlib import Path
+
+APP = "s19_app/tui/app.py"
+SJV = "s19_app/tui/segment_split_view.py"
+
+M = {
+    # SE5-1: the save-as filter removed (= the tree before E5)
+    "mut-c-01": (APP,
+        '        if walked is not None and loaded is not None and loaded.file_type == "mac":\n',
+        '        if False and walked is not None and loaded is not None and loaded.file_type == "mac":\n'),
+    # CR-3: the unload landing unstamped (= the tree before E5)
+    "mut-c-02": (APP,
+        "            self._land_focus, trigger, self._active_screen_key, on_switch=False\n",
+        "            self._land_focus, trigger, None, on_switch=False\n"),
+    # SE5-5: _land_focus without its exit guard (= the tree before E5)
+    "mut-c-03": (APP,
+        "        if self._load_tree_gone():\n            return\n        if switch is not None and switch != self._active_screen_key:\n",
+        "        if switch is not None and switch != self._active_screen_key:\n"),
+    # M28 (SE5-2): SplitJoinWindow.check_action removed
+    "mut-c-04": (SJV,
+        "    def check_action(self, action: str, parameters: tuple) -> Optional[bool]:\n        \"\"\"Refuse the window's own keys while it is hidden",
+        "    def _check_action_removed(self, action: str, parameters: tuple) -> Optional[bool]:\n        \"\"\"Refuse the window's own keys while it is hidden"),
+    # M8 split (QA-3): one failure branch keeps the marker clear but does not re-render
+    "mut-c-05": (APP,
+        '            self.set_status("Goto address is empty.")\n            self._clear_goto_marker_keeping_window("alt")\n',
+        '            self.set_status("Goto address is empty.")\n            self._alt_goto_focus_address = None\n'),
+    "mut-c-06": (APP,
+        '            self.set_status("Invalid address format.")\n            self._clear_goto_marker_keeping_window("alt")\n',
+        '            self.set_status("Invalid address format.")\n            self._alt_goto_focus_address = None\n'),
+    "mut-c-07": (APP,
+        '        if not self._apply_goto("alt", addr):\n            self._clear_goto_marker_keeping_window("alt")\n',
+        '        if not self._apply_goto("alt", addr):\n            self._alt_goto_focus_address = None\n'),
+    "mut-c-08": (APP,
+        '            self.set_status("Goto address is empty.")\n            self._clear_goto_marker_keeping_window("mac")\n',
+        '            self.set_status("Goto address is empty.")\n            self._mac_goto_focus_address = None\n'),
+    "mut-c-09": (APP,
+        '            self.set_status("Invalid address format.")\n            self._clear_goto_marker_keeping_window("mac")\n',
+        '            self.set_status("Invalid address format.")\n            self._mac_goto_focus_address = None\n'),
+    "mut-c-10": (APP,
+        '        if not self._apply_goto("mac", addr):\n            self._clear_goto_marker_keeping_window("mac")\n',
+        '        if not self._apply_goto("mac", addr):\n            self._mac_goto_focus_address = None\n'),
+    # M9b (QA-9): the A2L / MAC failure re-render from row 0
+    "mut-c-11": (APP,
+        "        start = bisect_left(self._hex_view_rows(), first) if first is not None else 0\n",
+        "        start = 0\n"),
+    # M6 on the rewritten _hex_view_rows: no MAC rows
+    "mut-c-12": (APP,
+        '        rows = hex_row_bases(\n            file.row_bases or [],\n            getattr(file, "bases_set", None),\n            mac_set,\n        )\n        self._hex_view_rows_cache = (key, rows)\n',
+        '        rows = file.row_bases or []\n        self._hex_view_rows_cache = (key, rows)\n'),
+    # M23: the stale-switch return removed
+    "mut-c-13": (APP,
+        "            return\n        if switch is not None and switch != self._active_screen_key:\n            return\n        container_id = (\n",
+        "            return\n        container_id = (\n"),
+    # M-L: layout_waits default 0
+    "mut-c-14": (APP,
+        "        on_switch: bool,\n        layout_waits: int = 3,\n    ) -> None:\n        \"\"\"\n        Summary:\n            Land the keyboard focus",
+        "        on_switch: bool,\n        layout_waits: int = 0,\n    ) -> None:\n        \"\"\"\n        Summary:\n            Land the keyboard focus"),
+    # M25: move unconditionally
+    "mut-c-15": (APP,
+        "        if not move:\n            return\n        target = None\n        landing_id = self._SWITCH_LANDING_TARGETS",
+        "        target = None\n        landing_id = self._SWITCH_LANDING_TARGETS"),
+    # M24 on the rewritten call: no unload landing scheduled
+    "mut-c-16": (APP,
+        "        self.call_after_refresh(\n            self._land_focus, trigger, self._active_screen_key, on_switch=False\n        )\n",
+        "        pass\n"),
+    # CR-7 (R-TUI-007.5/1): a hit leaves the go-to box focused
+    "mut-c-17": (APP,
+        '        self.update_hex_view(addr)\n        self.set_status(f"Goto 0x{addr:08X}")\n',
+        '        self.update_hex_view(addr)\n        self.set_status(f"Goto 0x{addr:08X}")\n        self.query_one("#goto_input", Input).focus()\n'),
+    # CR-6 (R-WS-LOADED.16/1): the loader-facts line not painted on a MAC-only spine
+    "mut-c-18": (APP,
+        '        text = build_workspace_stats_text(stats, error_count, warning_count)\n        text.append("\\n")\n',
+        '        text = build_workspace_stats_text(stats, error_count, warning_count)\n        if self.current_file.file_type == "mac":\n            body.update(text)\n            return\n        text.append("\\n")\n'),
+    # M19 (QA-4, R-TUI-012L.8/2): the MAC name raw
+    "mut-c-19": (APP,
+        '                    f"{painted_names([loaded.mac_path.name])})"\n',
+        '                    f"{loaded.mac_path.name})"\n'),
+    # M18 (QA-4, R-TUI-012L.8/3): path.name raw
+    "mut-c-20": (APP,
+        "        name = painted_names([path.name])\n        if codes:\n",
+        "        name = path.name\n        if codes:\n"),
+}
+
+M["mut-c-14b"] = M["mut-c-14"]
+M["mut-c-14c"] = M["mut-c-14"]
+M["mut-c-21"] = M["mut-c-14"]  # M-L on the tree with R-SHELL-FOCUS.2/9
+
+
+def main(argv):
+    action, root = argv[1], Path(argv[2])
+    if action == "check":
+        bad = 0
+        for label, (rel, old, new) in M.items():
+            text = (root / rel).read_text(encoding="utf-8").replace("\r\n", "\n")
+            count = text.count(old)
+            print(f"{label}: {rel} anchor x{count}")
+            bad += count != 1
+        return 1 if bad else 0
+    label = argv[3]
+    rel, old, new = M[label]
+    path = root / rel
+    text = path.read_text(encoding="utf-8")
+    assert text.count(old) == 1, (label, text.count(old))
+    path.write_text(text.replace(old, new), encoding="utf-8")
+    print(f"{label}: applied to {rel}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

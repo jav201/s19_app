@@ -1,0 +1,694 @@
+=== base commit: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+=== python: Python 3.11.18
+=== mutation applied: M-R5 (file s19_app/tui/app.py)
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -10766,11 +10766,7 @@
+         node detached once ``App.exit`` has run, and a pruned screen has no
+         parent. A tree that never mounted (the headless chain test) is not
+         gone: its steps still run."""
+-        try:
+-            screen = self.default_screen
+-        except Exception:
+-            return False
+-        return not screen.is_attached
++        return False
+ 
+     def _land_focus(
+         self,
+LANDED M-R5: 'return not screen.is_attached' x0
+=== s19_app.__file__ ===
+<HOME>/work/s19_i10mut_m37/s19_app/__init__.py
+=== CMD ===
+env -u NO_COLOR <HOME>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -rf -p no:xdist tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_waits_for_the_end[project] tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_during_a_routed_project_load_exits_cleanly
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+__________ test_tc_b100_53_confirmed_quit_waits_for_the_end[project] ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-685/test_tc_b100_53_confirmed_quit0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7faa69109fd0>
+arm = 'project'
+
+    @pytest.mark.parametrize("arm", ["save", "save_fails", "project", "a2l"])
+    def test_tc_b100_53_confirmed_quit_waits_for_the_end(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch, arm: str
+    ) -> None:
+        """LLR-177.4c, HLR-177c, E3 S12b-01 (C12b-22, C12b-23, C12b-24,
+        C12b-25, P1-33, P1-73, P1-85): ``q`` then ``y`` while an action is held
+        → the app keeps running while held; released:
+        - ``save``: the app exits, and ``W/P1/project.json`` records exactly
+          the files on disk (hashlib, never the app's reader);
+        - ``save_fails`` (the held placement raises ``OSError(28)``): the app
+          KEEPS running, the failure line is the last log line, the failure
+          toast is shown, ``W/P1`` is absent, the entries are kept and the quit
+          is no longer pending;
+        - ``project``: the app exits after the install (at exit
+          ``current_project == "P2"`` and the announcement is composed);
+        - ``a2l``: the app exits after the tag-table build ran once.
+    
+        Why: exiting at once runs the worker's end handler on a stopped app
+        (P12b-3) and can leave a half-written project; a failed save must stay
+        on screen so the engineer sees it failed.
+        Negative control: an exit on ``y`` → the app stops while held → RED;
+        base: ``q`` exits at once with no question → RED."""
+        base = tmp_path / "app"
+        trio(W(base) / "P2")
+        at_exit: list = []
+        views = Spy(monkeypatch, S19TuiApp, "update_a2l_view")
+        real_exit = S19TuiApp.exit
+    
+        def _exit(self, *args, **kwargs):
+            at_exit.append(SimpleNamespace(project=self.current_project,
+                                           announcement=getattr(self, "_last_load_announcement", None),
+                                           views=len(views.calls),
+                                           a2l=self.current_a2l_path))
+            return real_exit(self, *args, **kwargs)
+    
+        monkeypatch.setattr(S19TuiApp, "exit", _exit)
+        # E4 integration re-pin: the toast is read from a ``notify`` spy; the
+        # ``save_fails`` arm first waits 60 s for an exit that must not come, and
+        # the 10 s toast has expired from ``_notifications`` by then.
+        toasts = Spy(monkeypatch, S19TuiApp, "notify")
+        if arm in ("save", "save_fails"):
+            hold = Hold(monkeypatch, app_module, "place_into_workarea",
+                        raise_on_release=OSError(28, "synthetic no space") if arm == "save_fails" else None)
+        elif arm == "project":
+            hold = Hold(monkeypatch, app_module, "read_project_manifest")
+        else:
+            hold = Hold(monkeypatch, app_module, "parse_a2l_file")
+    
+        async def scenario(app, pilot, log):
+            if arm in ("save", "save_fails"):
+                await open_trio_project(app, pilot, "P2")
+                await patch_one_byte(app, pilot)
+                n_entries = len(entries(app))
+                save(app, "P1")
+                await reached(pilot, hold, "Save project P1")
+            elif arm == "project":
+                n_entries = 0
+                app._handle_load_project("P2")
+                await reached(pilot, hold, "the project load of P2")
+            else:
+                n_entries = 0
+                app.load_a2l_from_path(CASE01 / "firmware.a2l")
+                await reached(pilot, hold, "the A2L attach")
+            try:
+                neutral_focus(app)
+                await pilot.press("q")
+                await wait(pilot, lambda: is_quit_question(app.screen) or not running(app), "the quit question", 10)
+                asked = is_quit_question(app.screen)
+                await pilot.press("y")
+                for _ in range(6):
+                    await pilot.pause()
+                held_alive = running(app)
+            finally:
+                hold.release.set()
+            exited = await wait_exit(app, 60)
+            if exited:
+                return SimpleNamespace(asked=asked, held_alive=held_alive, exited=True)
+            await settle_workers(pilot)
+            notes = [(c.kwargs.get("title"), c.args[1] if len(c.args) > 1 else c.kwargs.get("message"))
+                     for c in toasts.calls]
+            return SimpleNamespace(asked=asked, held_alive=held_alive, exited=False, last=log_tail(app)[0],
+                                   notes=notes, entries=len(entries(app)) == n_entries,
+                                   pending=getattr(app, "_quit_pending", None))
+    
+>       got = run(base, scenario, notifications=True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+../s19_i10mut/tests/test_b100_workers.py:2656: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b100_workers.py:337: in run
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b100_workers.py:333: in _drive
+    async with app.run_test(size=size, notifications=notifications) as pilot:
+../../miniconda3/envs/s19ci/lib/python3.11/contextlib.py:217: in __aexit__
+    await anext(self.gen)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:2218: in run_test
+    raise self._exception
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:663: in _process_messages_loop
+    await self._dispatch_message(message)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:727: in _dispatch_message
+    await self.on_event(message)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:4148: in on_event
+    await super().on_event(event)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:808: in on_event
+    await self._on_message(event)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:829: in _on_message
+    await invoke(method, message)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:58: in _invoke
+    result = await result
+             ^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:900: in on_callback
+    await invoke(event.callback)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:56: in _invoke
+    result = callback(*params[:parameter_count])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/app.py:18975: in _step_sections
+    self.update_sections()
+s19_app/tui/app.py:19572: in update_sections
+    self.update_memory_strip()
+s19_app/tui/app.py:19820: in update_memory_strip
+    band.mount(*cells)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Container(id='ws_memstrip'), before = None, after = None
+widgets = (Static(classes='strip-cell band-low'), Static(classes='strip-cell band-low'), Static(classes='strip-cell band-low'), Static(classes='strip-cell band-low'), Static(classes='strip-cell band-low'), Static(classes='strip-cell band-low'), ...)
+
+    def mount(
+        self,
+        *widgets: Widget,
+        before: int | str | Widget | None = None,
+        after: int | str | Widget | None = None,
+    ) -> AwaitMount:
+        """Mount widgets below this widget (making this widget a container).
+    
+        Args:
+            *widgets: The widget(s) to mount.
+            before: Optional location to mount before. An `int` is the index
+                of the child to mount before, a `str` is a `query_one` query to
+                find the widget to mount before.
+            after: Optional location to mount after. An `int` is the index
+                of the child to mount after, a `str` is a `query_one` query to
+                find the widget to mount after.
+    
+        Returns:
+            An awaitable object that waits for widgets to be mounted.
+    
+        Raises:
+            MountError: If there is a problem with the mount request.
+    
+        Note:
+            Only one of ``before`` or ``after`` can be provided. If both are
+            provided a ``MountError`` will be raised.
+        """
+        if self._closing or self._pruning:
+            return AwaitMount(self, [])
+        if not self.is_attached:
+>           raise MountError(f"Can't mount widget(s) before {self!r} is mounted")
+E           textual.widget.MountError: Can't mount widget(s) before Container(id='ws_memstrip') is mounted
+
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/widget.py:1454: MountError
+----------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ <HOME>/work/s19_i10mut_m37/s19_app/tui/app.py:18975 in               │
+│ _step_sections                                                               │
+│                                                                              │
+│   18972 │   │   │   │   if precomputed_oor is not None:                      │
+│   18973 │   │   │   │   │   self.update_sections(precomputed_out_of_range=pr │
+│   18974 │   │   │   │   else:                                                │
+│ ❱ 18975 │   │   │   │   │   self.update_sections()                           │
+│   18976 │   │   │   finally:                                                 │
+│   18977 │   │   │   │   self.logger.info(                                    │
+│   18978 │   │   │   │   │   "Load phase boundary: apply_sections_done path=% │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │            path = PosixPath('/tmp/pytest-of-<user>/pytest-685/test_tc… │ │
+│ │ precomputed_oor = None                                                   │ │
+│ │            self = S19TuiApp(                                             │ │
+│ │                   │   title='Hex Edit Tool',                             │ │
+│ │                   │   classes={'-dark-mode'},                            │ │
+│ │                   │   pseudo_classes={'dark', 'focus'}                   │ │
+│ │                   )                                                      │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ <HOME>/work/s19_i10mut_m37/s19_app/tui/app.py:19572 in               │
+│ update_sections                                                              │
+│                                                                              │
+│   19569 │   │   sections = self.query_one("#sections_list", ListView)        │
+│   19570 │   │   sections.clear()                                             │
+│   19571 │   │   self.update_workspace_stats()                                │
+│ ❱ 19572 │   │   self.update_memory_strip()                                   │
+│   19573 │   │   if not self.current_file:                                    │
+│   19574 │   │   │   return                                                   │
+│   19575 │   │   ranges = self.current_file.ranges                            │
+│                                                                              │
+│ ╭──────────────────────────── locals ─────────────────────────────╮          │
+│ │ precomputed_out_of_range = None                                 │          │
+│ │                 sections = ListView(id='sections_list')         │          │
+│ │                     self = S19TuiApp(                           │          │
+│ │                            │   title='Hex Edit Tool',           │          │
+│ │                            │   classes={'-dark-mode'},          │          │
+│ │                            │   pseudo_classes={                 │          │
+│ │                            │   │   'dark',                      │          │
+│ │                            │   │   'focus'                      │          │
+│ │                            │   }                                │          │
+│ │                            )                                    │          │
+│ ╰─────────────────────────────────────────────────────────────────╯          │
+│                                                                              │
+│ <HOME>/work/s19_i10mut_m37/s19_app/tui/app.py:19820 in               │
+│ update_memory_strip                                                          │
+│                                                                              │
+│   19817 │   │   │   │   )                                                    │
+│   19818 │   │   │   )                                                        │
+│   19819 │   │   if cells:                                                    │
+│ ❱ 19820 │   │   │   band.mount(*cells)                                       │
+│   19821 │                                                                    │
+│   19822 │   def update_memory_map(self) -> None:                             │
+│   19823 │   │   """                                                          │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │        _meaning = 'calibration / data'                                   │ │
+│ │            band = Container(id='ws_memstrip')                            │ │
+│ │      band_class = 'band-medium'                                          │ │
+│ │      band_label = 'medium'                                               │ │
+│ │        cell_end = 2147483776                                             │ │
+│ │      cell_start = 2147483870                                             │ │
+│ │           cells = [                                                      │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   ... +102                                           │ │
+│ │                   ]                                                      │ │
+│ │            cols = 112                                                    │ │
+│ │           count = 112                                                    │ │
+│ │             end = 2147483776                                             │ │
+│ │ entropy_windows = [                                                      │ │
+│ │                   │   EntropyWindow(                                     │ │
+│ │                   │   │   start=2147483648,                              │ │
+│ │                   │   │   end=2147483681,                                │ │
+│ │                   │   │   sample_count=33,                               │ │
+│ │                   │   │   entropy=4.68075775572209,                      │ │
+│ │                   │   │   band='low',                                    │ │
+│ │                   │   │   low_confidence=True                            │ │
+│ │                   │   ),                                                 │ │
+│ │                   │   EntropyWindow(                                     │ │
+│ │                   │   │   start=2147483712,                              │ │
+│ │                   │   │   end=2147483776,                                │ │
+│ │                   │   │   sample_count=64,                               │ │
+│ │                   │   │   entropy=6.0,                                   │ │
+│ │                   │   │   band='medium',                                 │ │
+│ │                   │   │   low_confidence=False                           │ │
+│ │                   │   )                                                  │ │
+│ │                   ]                                                      │ │
+│ │           glyph = '▒'                                                    │ │
+│ │           index = 111                                                    │ │
+│ │        is_valid = True                                                   │ │
+│ │         ordered = [                                                      │ │
+│ │                   │   (2147483648, 2147483681, True),                    │ │
+│ │                   │   (2147483712, 2147483776, True)                     │ │
+│ │                   ]                                                      │ │
+│ │        per_cell = 2                                                      │ │
+│ │          ranges = [(2147483648, 2147483681), (2147483712, 2147483776)]   │ │
+│ │            self = S19TuiApp(                                             │ │
+│ │                   │   title='Hex Edit Tool',                             │ │
+│ │                   │   classes={'-dark-mode'},                            │ │
+│ │                   │   pseudo_classes={'dark', 'focus'}                   │ │
+│ │                   )                                                      │ │
+│ │            size = Size(width=112, height=1)                              │ │
+│ │            span = 128                                                    │ │
+│ │        span_end = 2147483776                                             │ │
+│ │      span_start = 2147483648                                             │ │
+│ │           start = 2147483712                                             │ │
+│ │          status = 'gap'                                                  │ │
+│ │        validity = [True, True]                                           │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ <HOME>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/wi │
+│ dget.py:1454 in mount                                                        │
+│                                                                              │
+│   1451 │   │   if self._closing or self._pruning:                            │
+│   1452 │   │   │   return AwaitMount(self, [])                               │
+│   1453 │   │   if not self.is_attached:                                      │
+│ ❱ 1454 │   │   │   raise MountError(f"Can't mount widget(s) before {self!r}  │
+│   1455 │   │   # Check for duplicate IDs in the incoming widgets             │
+│   1456 │   │   ids_to_mount = [                                              │
+│   1457 │   │   │   widget_id for widget in widgets if (widget_id := widget.i │
+│                                                                              │
+│ ╭─────────────────────── locals ───────────────────────╮                     │
+│ │   after = None                                       │                     │
+│ │  before = None                                       │                     │
+│ │    self = Container(id='ws_memstrip')                │                     │
+│ │ widgets = (                                          │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   ... +102                               │                     │
+│ │           )                                          │                     │
+│ ╰──────────────────────────────────────────────────────╯                     │
+╰──────────────────────────────────────────────────────────────────────────────╯
+MountError: Can't mount widget(s) before Container(id='ws_memstrip') is mounted
+__ test_tc_b100_53_confirmed_quit_during_a_routed_project_load_exits_cleanly ___
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-685/test_tc_b100_53_confirmed_quit1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7faa671e2150>
+
+    def test_tc_b100_53_confirmed_quit_during_a_routed_project_load_exits_cleanly(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """LLR-177.4c, HLR-177c (E5 round 2; found while writing the arm for
+        mutant 046): ``q`` then ``y`` while a ROUTED load of ``P2`` (the Load
+        dialog's route, ``routed=True``, which opens the Load result panel at
+        the end of the install) is held at its worker step; released → the app
+        exits after the install (``current_project == "P2"`` at exit) and the
+        exit is clean: nothing is raised out of the app.
+    
+        Why: "quit after it finishes" must end the program, not crash it while
+        the result panel mounts on an app that is shutting down. Observed on
+        d4d9c1a: the install pushes ``LoadResultScreen`` and then ``end_busy``
+        exits; the screen's ``on_mount`` then raises
+        ``NoMatches('#result_body')`` and ``run_test`` re-raises it. The mutant
+        that ends before the push (046) fails the same way, so 046 cannot be
+        told apart from the code until this is fixed. Fixed in the E5
+        round 2 follow-up: the routed install skips the result panel when a
+        quit is confirmed (it exits in ``end_busy``)."""
+        base = tmp_path / "app"
+        trio(W(base) / "P2")
+        at_exit: list = []
+        real_exit = S19TuiApp.exit
+    
+        def _exit(self, *args, **kwargs):
+            at_exit.append(self.current_project)
+            return real_exit(self, *args, **kwargs)
+    
+        monkeypatch.setattr(S19TuiApp, "exit", _exit)
+        hold = Hold(monkeypatch, app_module, "read_project_manifest")
+    
+        async def scenario(app, pilot, log):
+            app._handle_load_project("P2", routed=True)
+            try:
+                await reached(pilot, hold, "the routed project load of P2")
+                asked = await confirm_quit(app, pilot)
+            finally:
+                hold.release.set()
+            return asked, await wait_exit(app, 60)
+    
+>       asked, exited = run(base, scenario)
+                        ^^^^^^^^^^^^^^^^^^^
+
+../s19_i10mut/tests/test_b100_workers.py:3816: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b100_workers.py:337: in run
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b100_workers.py:333: in _drive
+    async with app.run_test(size=size, notifications=notifications) as pilot:
+../../miniconda3/envs/s19ci/lib/python3.11/contextlib.py:217: in __aexit__
+    await anext(self.gen)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:2218: in run_test
+    raise self._exception
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:663: in _process_messages_loop
+    await self._dispatch_message(message)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:727: in _dispatch_message
+    await self.on_event(message)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:4148: in on_event
+    await super().on_event(event)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:808: in on_event
+    await self._on_message(event)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:829: in _on_message
+    await invoke(method, message)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:58: in _invoke
+    result = await result
+             ^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:900: in on_callback
+    await invoke(event.callback)
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:56: in _invoke
+    result = callback(*params[:parameter_count])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/app.py:18975: in _step_sections
+    self.update_sections()
+s19_app/tui/app.py:19572: in update_sections
+    self.update_memory_strip()
+s19_app/tui/app.py:19820: in update_memory_strip
+    band.mount(*cells)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Container(id='ws_memstrip'), before = None, after = None
+widgets = (Static(classes='strip-cell band-low'), Static(classes='strip-cell band-low'), Static(classes='strip-cell band-low'), Static(classes='strip-cell band-low'), Static(classes='strip-cell band-low'), Static(classes='strip-cell band-low'), ...)
+
+    def mount(
+        self,
+        *widgets: Widget,
+        before: int | str | Widget | None = None,
+        after: int | str | Widget | None = None,
+    ) -> AwaitMount:
+        """Mount widgets below this widget (making this widget a container).
+    
+        Args:
+            *widgets: The widget(s) to mount.
+            before: Optional location to mount before. An `int` is the index
+                of the child to mount before, a `str` is a `query_one` query to
+                find the widget to mount before.
+            after: Optional location to mount after. An `int` is the index
+                of the child to mount after, a `str` is a `query_one` query to
+                find the widget to mount after.
+    
+        Returns:
+            An awaitable object that waits for widgets to be mounted.
+    
+        Raises:
+            MountError: If there is a problem with the mount request.
+    
+        Note:
+            Only one of ``before`` or ``after`` can be provided. If both are
+            provided a ``MountError`` will be raised.
+        """
+        if self._closing or self._pruning:
+            return AwaitMount(self, [])
+        if not self.is_attached:
+>           raise MountError(f"Can't mount widget(s) before {self!r} is mounted")
+E           textual.widget.MountError: Can't mount widget(s) before Container(id='ws_memstrip') is mounted
+
+../../miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/widget.py:1454: MountError
+----------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ <HOME>/work/s19_i10mut_m37/s19_app/tui/app.py:18975 in               │
+│ _step_sections                                                               │
+│                                                                              │
+│   18972 │   │   │   │   if precomputed_oor is not None:                      │
+│   18973 │   │   │   │   │   self.update_sections(precomputed_out_of_range=pr │
+│   18974 │   │   │   │   else:                                                │
+│ ❱ 18975 │   │   │   │   │   self.update_sections()                           │
+│   18976 │   │   │   finally:                                                 │
+│   18977 │   │   │   │   self.logger.info(                                    │
+│   18978 │   │   │   │   │   "Load phase boundary: apply_sections_done path=% │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │            path = PosixPath('/tmp/pytest-of-<user>/pytest-685/test_tc… │ │
+│ │ precomputed_oor = None                                                   │ │
+│ │            self = S19TuiApp(                                             │ │
+│ │                   │   title='Hex Edit Tool',                             │ │
+│ │                   │   classes={'-dark-mode'},                            │ │
+│ │                   │   pseudo_classes={'dark', 'focus'}                   │ │
+│ │                   )                                                      │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ <HOME>/work/s19_i10mut_m37/s19_app/tui/app.py:19572 in               │
+│ update_sections                                                              │
+│                                                                              │
+│   19569 │   │   sections = self.query_one("#sections_list", ListView)        │
+│   19570 │   │   sections.clear()                                             │
+│   19571 │   │   self.update_workspace_stats()                                │
+│ ❱ 19572 │   │   self.update_memory_strip()                                   │
+│   19573 │   │   if not self.current_file:                                    │
+│   19574 │   │   │   return                                                   │
+│   19575 │   │   ranges = self.current_file.ranges                            │
+│                                                                              │
+│ ╭──────────────────────────── locals ─────────────────────────────╮          │
+│ │ precomputed_out_of_range = None                                 │          │
+│ │                 sections = ListView(id='sections_list')         │          │
+│ │                     self = S19TuiApp(                           │          │
+│ │                            │   title='Hex Edit Tool',           │          │
+│ │                            │   classes={'-dark-mode'},          │          │
+│ │                            │   pseudo_classes={                 │          │
+│ │                            │   │   'dark',                      │          │
+│ │                            │   │   'focus'                      │          │
+│ │                            │   }                                │          │
+│ │                            )                                    │          │
+│ ╰─────────────────────────────────────────────────────────────────╯          │
+│                                                                              │
+│ <HOME>/work/s19_i10mut_m37/s19_app/tui/app.py:19820 in               │
+│ update_memory_strip                                                          │
+│                                                                              │
+│   19817 │   │   │   │   )                                                    │
+│   19818 │   │   │   )                                                        │
+│   19819 │   │   if cells:                                                    │
+│ ❱ 19820 │   │   │   band.mount(*cells)                                       │
+│   19821 │                                                                    │
+│   19822 │   def update_memory_map(self) -> None:                             │
+│   19823 │   │   """                                                          │
+│                                                                              │
+│ ╭───────────────────────────────── locals ─────────────────────────────────╮ │
+│ │        _meaning = 'calibration / data'                                   │ │
+│ │            band = Container(id='ws_memstrip')                            │ │
+│ │      band_class = 'band-medium'                                          │ │
+│ │      band_label = 'medium'                                               │ │
+│ │        cell_end = 2147483776                                             │ │
+│ │      cell_start = 2147483870                                             │ │
+│ │           cells = [                                                      │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   Static(classes='strip-cell band-low'),             │ │
+│ │                   │   ... +102                                           │ │
+│ │                   ]                                                      │ │
+│ │            cols = 112                                                    │ │
+│ │           count = 112                                                    │ │
+│ │             end = 2147483776                                             │ │
+│ │ entropy_windows = [                                                      │ │
+│ │                   │   EntropyWindow(                                     │ │
+│ │                   │   │   start=2147483648,                              │ │
+│ │                   │   │   end=2147483681,                                │ │
+│ │                   │   │   sample_count=33,                               │ │
+│ │                   │   │   entropy=4.68075775572209,                      │ │
+│ │                   │   │   band='low',                                    │ │
+│ │                   │   │   low_confidence=True                            │ │
+│ │                   │   ),                                                 │ │
+│ │                   │   EntropyWindow(                                     │ │
+│ │                   │   │   start=2147483712,                              │ │
+│ │                   │   │   end=2147483776,                                │ │
+│ │                   │   │   sample_count=64,                               │ │
+│ │                   │   │   entropy=6.0,                                   │ │
+│ │                   │   │   band='medium',                                 │ │
+│ │                   │   │   low_confidence=False                           │ │
+│ │                   │   )                                                  │ │
+│ │                   ]                                                      │ │
+│ │           glyph = '▒'                                                    │ │
+│ │           index = 111                                                    │ │
+│ │        is_valid = True                                                   │ │
+│ │         ordered = [                                                      │ │
+│ │                   │   (2147483648, 2147483681, True),                    │ │
+│ │                   │   (2147483712, 2147483776, True)                     │ │
+│ │                   ]                                                      │ │
+│ │        per_cell = 2                                                      │ │
+│ │          ranges = [(2147483648, 2147483681), (2147483712, 2147483776)]   │ │
+│ │            self = S19TuiApp(                                             │ │
+│ │                   │   title='Hex Edit Tool',                             │ │
+│ │                   │   classes={'-dark-mode'},                            │ │
+│ │                   │   pseudo_classes={'dark', 'focus'}                   │ │
+│ │                   )                                                      │ │
+│ │            size = Size(width=112, height=1)                              │ │
+│ │            span = 128                                                    │ │
+│ │        span_end = 2147483776                                             │ │
+│ │      span_start = 2147483648                                             │ │
+│ │           start = 2147483712                                             │ │
+│ │          status = 'gap'                                                  │ │
+│ │        validity = [True, True]                                           │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ <HOME>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/wi │
+│ dget.py:1454 in mount                                                        │
+│                                                                              │
+│   1451 │   │   if self._closing or self._pruning:                            │
+│   1452 │   │   │   return AwaitMount(self, [])                               │
+│   1453 │   │   if not self.is_attached:                                      │
+│ ❱ 1454 │   │   │   raise MountError(f"Can't mount widget(s) before {self!r}  │
+│   1455 │   │   # Check for duplicate IDs in the incoming widgets             │
+│   1456 │   │   ids_to_mount = [                                              │
+│   1457 │   │   │   widget_id for widget in widgets if (widget_id := widget.i │
+│                                                                              │
+│ ╭─────────────────────── locals ───────────────────────╮                     │
+│ │   after = None                                       │                     │
+│ │  before = None                                       │                     │
+│ │    self = Container(id='ws_memstrip')                │                     │
+│ │ widgets = (                                          │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   Static(                                │                     │
+│ │           │   │   classes='strip-cell band-low'      │                     │
+│ │           │   ),                                     │                     │
+│ │           │   ... +102                               │                     │
+│ │           )                                          │                     │
+│ ╰──────────────────────────────────────────────────────╯                     │
+╰──────────────────────────────────────────────────────────────────────────────╯
+MountError: Can't mount widget(s) before Container(id='ws_memstrip') is mounted
+=========================== short test summary info ============================
+FAILED tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_waits_for_the_end[project]
+FAILED tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_during_a_routed_project_load_exits_cleanly
+2 failed in 13.82s
