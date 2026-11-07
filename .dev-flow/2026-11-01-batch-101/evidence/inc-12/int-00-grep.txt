@@ -1,0 +1,32 @@
+=== Inc 12 E4 integration run: int-00-grep
+date: 2026-11-07T10:19:26Z
+worktree HEAD (base): 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+index tree with the increment staged: d171353393e0d3a7abeac10d1980600d239d056d
+staged files vs base: 18
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i12int/s19_app/__init__.py
+CMD: git grep -n -w -e VariantHelpScreen -e VARIANT_HELP_TEXT -e action_view_main -e action_view_alt -e action_view_mac -e action_a2l_tag_find_next -e _jump_to_validation_issue -e _jump_to_validation_issue_object -e _format_validation_issue_line -e check_preview_toggle_button -- s19_app tests
+s19_app/tui/window_help.py:12:The modal is the shipped :class:`~s19_app.tui.screens.VariantHelpScreen`
+s19_app/tui/window_help.py:627:    sequence. Joined with blank paragraphs, the VariantHelpScreen voice.
+s19_app/tui/window_help.py:661:        Generalizes the shipped :class:`VariantHelpScreen` pattern from
+=== exit code: 0
+
+=== appendix (run on the staged tree 860ccb8d..., the same tree before the EXPECTED_SCANNED_TEST_FILES edit; that edit touches no line the patterns match)
+CMD: git grep -n -w <the same patterns> 6f1743c -- s19_app tests | wc -l ; git grep --cached -n <the same patterns, no -w> -- s19_app tests ; git grep --cached -n -w -e view_main -e view_alt -e view_mac -e a2l_tag_find_next -- s19_app tests
+== base 6f1743c, same -w command: 39 lines
+== S-3 substring form (no -w) on the staged tree, index:
+s19_app/tui/window_help.py:12:The modal is the shipped :class:`~s19_app.tui.screens.VariantHelpScreen`
+s19_app/tui/window_help.py:627:    sequence. Joined with blank paragraphs, the VariantHelpScreen voice.
+s19_app/tui/window_help.py:661:        Generalizes the shipped :class:`VariantHelpScreen` pattern from
+== bare action strings (not in the pattern, informational):
+s19_app/tui/app.py:8556:                Button("Find next", id="a2l_tag_find_next"),
+s19_app/tui/app.py:17040:                - ``on_button_pressed`` for ``a2l_tag_find_next``
+s19_app/tui/app.py:21429:        elif event.button.id == "a2l_tag_find_next":
+tests/test_b101_hex_jump.py:331:        lambda: getattr(app.default_screen.focused, "id", None) == "a2l_tag_find_next",
+tests/test_tui_directionb.py:6543:    ("1", "view_main"),
+tests/test_tui_directionb.py:6544:    ("2", "view_alt"),
+tests/test_tui_directionb.py:6545:    ("3", "view_mac"),
+tests/test_tui_directionb.py:6617:    palette entry. The ``view_main`` / ``view_alt`` / ``view_mac`` actions
+tests/test_tui_directionb.py:6649:        "view_main": ("show_screen('workspace')", "view_main"),
+tests/test_tui_directionb.py:6650:        "view_alt": ("show_screen('a2l')", "view_alt"),
+tests/test_tui_directionb.py:6651:        "view_mac": ("show_screen('mac')", "view_mac"),

@@ -1,0 +1,60 @@
+=== Inc 12 E4 integration run: int-01
+date: 2026-11-07T10:19:32Z
+worktree HEAD (base): 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+index tree with the increment staged: d171353393e0d3a7abeac10d1980600d239d056d
+staged files vs base: 18
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i12int/s19_app/__init__.py
+CMD: python -m pytest -q -p no:cacheprovider -rfs -n 12 --dist loadfile -m not serial_timing tests/test_b101_reach_and_reports_escape.py tests/test_b101_shown_widgets.py tests/test_b101_help_legend_docs.py tests/test_tui_variants.py tests/test_tui_app.py tests/test_tui_goto_marker.py tests/test_window_usage_help.py tests/test_b97_check_editor.py tests/test_tui_directionb.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 16%]
+..........x............................................................. [ 33%]
+........................................................................ [ 49%]
+........................................................................ [ 66%]
+........................................................................ [ 83%]
+........................................................................ [ 99%]
+.                                                                        [100%]
+432 passed, 1 xfailed in 473.39s (0:07:53)
+=== exit code: 0
+
+=== appendix: the node ids of the two new files and the passage / _FIXED nodes, collected on the same staged tree
+CMD: env -u NO_COLOR python -m pytest --co -q -p no:cacheprovider -p no:xdist tests/test_b101_reach_and_reports_escape.py tests/test_b101_shown_widgets.py tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0 tests/test_b101_help_legend_docs.py::test_r_doc_guide_2_1_fixed_rows_marked tests/test_b101_help_legend_docs.py::test_r_doc_guide_2_2_no_other_row_marked
+tests/test_b101_reach_and_reports_escape.py::test_r_dlg_14_1_every_dialog_has_an_opener
+tests/test_b101_reach_and_reports_escape.py::test_r_shell_keys_3_1_every_action_has_a_reach
+tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_1_escape_on_the_report_list_closes_reports
+tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_2_escape_on_the_report_view_closes_reports
+tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_3_escape_in_the_regions_box_closes_and_keeps_nothing
+tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_4_escape_on_the_closed_dropdown_closes_reports
+tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_5_escape_in_the_filter_path_box_applies_nothing
+tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_6_escape_in_the_context_box_closes_reports
+tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_7_escape_on_generate_writes_no_report
+tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_8_escape_on_close_closes_reports
+tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_9_escape_on_the_folder_chip_opens_no_folder
+tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_10_escape_on_the_help_chip_opens_no_help
+tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_11_escape_closes_the_empty_reports_dialog
+tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_12_escape_in_its_help_window_keeps_reports_open
+tests/test_b101_reach_and_reports_escape.py::test_r_dlg_15_1_escape_with_the_dropdown_open_closes_only_the_list
+tests/test_b101_reach_and_reports_escape.py::test_r_dlg_15_2_escape_with_the_gating_dropdown_open_closes_only_the_list
+tests/test_b101_reach_and_reports_escape.py::test_at_i12_1_escape_closes_reports_from_list_box_and_dropdown
+tests/test_b101_reach_and_reports_escape.py::test_at_i12_2_rail_keys_and_issue_peek_after_the_aliases_go
+tests/test_b101_shown_widgets.py::test_r_chked_058_1_every_check_editor_widget_is_shown_in_a_state
+tests/test_b101_shown_widgets.py::test_at_i12_3_addendum_tab_by_keys
+tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-1]
+tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-2]
+tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-3]
+tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-4]
+tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-5]
+tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-6]
+tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-7]
+tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-8]
+tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-9]
+tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-10]
+tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-11]
+tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-12]
+tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-13]
+tests/test_b101_help_legend_docs.py::test_r_doc_guide_2_1_fixed_rows_marked
+tests/test_b101_help_legend_docs.py::test_r_doc_guide_2_2_no_other_row_marked
+
+35 tests collected in 0.40s

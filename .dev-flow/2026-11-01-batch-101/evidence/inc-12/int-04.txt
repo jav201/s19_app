@@ -1,0 +1,17 @@
+=== Inc 12 E4 integration run: int-04
+date: 2026-11-07T10:27:26Z
+worktree HEAD (base): 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+index tree with the increment staged: d171353393e0d3a7abeac10d1980600d239d056d
+staged files vs base: 18
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i12int/s19_app/__init__.py
+CMD: python -m pytest -q -p no:cacheprovider -rfs -n 12 --dist loadfile -m not serial_timing tests/test_address_census.py tests/test_suite_hygiene.py tests/test_id_registry.py tests/test_engine_unchanged.py tests/test_docs_canon.py tests/test_b101_doc_hygiene.py tests/test_b101_help_legend_docs.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 32%]
+........................................................................ [ 65%]
+........................................................................ [ 98%]
+....                                                                     [100%]
+220 passed in 203.21s (0:03:23)
+=== exit code: 0

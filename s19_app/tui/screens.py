@@ -3079,7 +3079,9 @@ class ReportViewerScreen(ModalScreen[None]):
     #: is focused, `?` opens ITS usage-help section instead of the app-wide
     #: stock HelpPanel; the binding is `show=False` and lives on the modal,
     #: so the global `question_mark` binding is untouched and still opens
-    #: the panel everywhere else.
+    #: the panel everywhere else. Escape closes the dialog as Close does (batch-101
+    #: Inc 12, R-DLG.2); not `priority`, so an open dropdown list's own Escape
+    #: closes only that list first (R-DLG.15).
     BINDINGS = [
         Binding("question_mark", "show_window_usage_help", "Window help", show=False),
         Binding("escape", "close_reports", "Close", show=False),

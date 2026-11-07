@@ -17133,8 +17133,8 @@ class S19TuiApp(App):
             Used by:
                 - ``on_issue_row_selected``
         """
-        # No mounted screen (e.g. a call with no mounted screen) ->
-        # there is no DOM to query; skip the best-effort pane update.
+        # A call with no mounted screen has no DOM to query; skip the
+        # best-effort pane update.
         if not self.screen_stack:
             return
         matches = self.query("#issues_hex_pane")

@@ -221,7 +221,7 @@ in:
 out: ComposeResult widgets
 func: changed (D-3 A). was: the second action row `#check_actions_row2` holds `#check_fields_count` and the button `Addendum preview` (`#check_preview_toggle_button`) with `display = False` (`:7827-7834`); the docstring says it "stays mounted and hidden". / now: the row holds `#check_fields_count` alone; the docstring sentence goes; every other widget and the layout are unchanged.
 module: s19_app/tui/screens_directionb.py
-examples: (R-CHKED-058/1) walk [opened with the demo A2L; Fields; JSON; Addendum] → 0 ids never shown; `47` ids in the population (the union of the ids mounted over the four states, E3A-03)
+examples: (R-CHKED-058/1) walk [opened with the demo A2L; Fields; JSON; Addendum] → 0 ids never shown; `51` ids in the population (the union of the ids mounted in the window over the four states, E3A-03; measured at E4, int-06: the window, its two title chips and the panel with its 47 ids; base `52`)
 examples: (R-CHKED-058/1 neg, the base) the same walk → never shown: `check_preview_toggle_button` (B line 19)
 examples: (test edit TC-B97-08) every id of `CE_IDS_9C7BEAF` (now `35`) is mounted
 
