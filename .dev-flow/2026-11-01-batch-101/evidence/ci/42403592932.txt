@@ -1,0 +1,8 @@
+gh run 42403592932 (main b3b2c45: batch close + version 1.0.0) — attempt 1 and the failed-jobs re-run (attempt 2)
+attempt 1 failure | FAILED: the 4 known + tests/test_b97_key_bar.py::test_tc_b97_69_page_keys_do_nothing_where_disabled
+attempt 2 (gh run rerun --failed) failure | FAILED:
+FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-120x30]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-80x24]
+Classification: test_tc_b97_69_page_keys_do_nothing_where_disabled passed on the re-run (and alone 3/3 at the Inc 12b merge): a known load flake, not a regression. The product tree tagged v1.0.0 is CI-clean apart from the batch's 4 known failures.
