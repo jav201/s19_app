@@ -208,3 +208,14 @@ Applied (Opus, 50 min): one `reads` map per walk keyed by section identity, ever
   2. code (DeepSeek; Sonnet if its API fails) ∥ tests (an independent Sonnet tester);
   3. GREEN on cachyos-rtx;
   4. Inc 2a's E5 reviews (code, security), mutants and the coverage audit.
+
+### Gap pass 2 — addendum from Inc 3a's E3 security round 6 (2026-11-07, orchestrator Opus 5.5)
+
+Authority: `../inc-3/E3-rulings.md` "Round 6 rulings" (main worktree `s19_app-b103`); the findings are in `../inc-3/E3-security.md` "## Round 6". The Inc 2a items join gap pass 2:
+- **.151's reach is every file word a refusal message echoes**, `<name>` and `<layout>` included (E3S3-25). This replaces the ".137 for `<name>`/`<layout>`" line above. A shared word's echo is computed at reduction; the object's own name echo is computed once at describe and carried.
+- **TABLE-EMPTY** (`a2l_definition.py:529`) echoes the stored COMPU_TAB_REF echo, like CONVERSION and TABLE (E3S3-26).
+- **Decode fails closed** in `decode_definition` (E3S3-28): a conversion result that is not an `int` or a `float` → `A2L-DEF-DECODE` `<name>: the table <ref> gives a value that is not a number`. Case: a VALUE whose TAB_NOINTP / TAB_INTP method names a COMPU_VTAB → the refusal, 0 exceptions. Negative control: `82f5f8e5` → `TypeError` → RED.
+- **The scalar TAB_INTP / TAB_NOINTP lookup** (E3S3-29, -30 (b)) moves to Inc 2a's reduced form: O(log n), with v2's two rules pinned (see the round-6 fix column of E3S3-29). The equality case against the frozen `a2l._table_lookup` runs over every corpus table at the extended values: NaN, ±inf, 2^63, 2^64 − 1, midpoints and ±1 ulp. A table whose x holds a NaN is refused at decode, with the verdict computed once per walk.
+- **The range index** (E3S3-30 (a)) is the segment index of the rulings above. The equality case runs over every corpus COMPU_VTAB / _RANGE table at each raw value, min, max, midpoint, ±1, NaN and ±inf, against `_enum_entry_text` at `82f5f8e5`, and gives 0 differences. Negative control: a plain bisect → 780 differences in 30 tables → RED.
+- **References resolved at reduction** (E3S3-31): the method record keeps the section its COMPU_TAB_REF names, or none. No per-call name lookup of a shared word remains.
+- **The message bound** is "1,024 characters" (E3S3-32).
