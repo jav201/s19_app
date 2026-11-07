@@ -156,3 +156,8 @@ Rulings:
 - **E3S3-37:** recorded for 3b's re-review.
 
 **Next:** a narrow Opus correction, then round 8: the census and equality runs that did not happen, plus CT-5 and CT-6, with the fresh-walk measure. Every round-8 kill is by PID, never `pkill -f`.
+- **Round-7 correction done** (Opus). .148 is 19/19, with CT-5 and CT-6 as .148/19; it reuses Inc 2a's `_TabForm`, `_build_tab_form` and `_EnumForm`. Orchestrator rulings on what it reported:
+  1. **E3S3-35's count is scoped to lookups keyed by a word of a shared section.** That covers the COMPU_TAB_REF word of a shared method, the axis object's layout reached through a shared AXIS_PTS, and the table of a shared method. An object's lookup of its own layout by its own header word is one lookup per object, costs only its own text, and is not counted. Accepted as the agent's reading (`01-requirements.md:341`).
+  2. CT-5 and CT-6 as one case, .148/19: accepted.
+  3. `_conversion_fields` takes `compu_tabs_by_name`, and the method-record example shows Inc 2a's 11 keys: accepted (both follow Inc 2a's code at `6071a385`).
+- **Round 8 is narrow.** The v2 lookup census and the range-index equality run on Inc 2a's **real** code in Inc 2a's E5 security review (in progress); round 8 cites that result and does not repeat it. Round 8 runs only the paths specific to Inc 3a, on the model with Inc 2a's real forms imported from `~/work/b103-int2a`: CT-5, CT-6, the counting-mapping cases, RL-16/17, EN-1/2, and one flat pass of the 54-path table with the fresh-walk measure.
