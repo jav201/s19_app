@@ -1,0 +1,82 @@
+# M-PASTE.34
+# row: R-PASTE.34
+# s19_app.__file__ = /tmp/b103-e5-1a-mut/work/s19_app/__init__.py
+# note: the strip step removed -> ESC / surrogate stay in the value
+# --- git diff ---
+diff --git a/s19_app/tui/os_clipboard_input.py b/s19_app/tui/os_clipboard_input.py
+index ad2f7240..8cb6e62a 100644
+--- a/s19_app/tui/os_clipboard_input.py
++++ b/s19_app/tui/os_clipboard_input.py
+@@ -851,7 +851,7 @@ class OsClipboardInput(Input):
+                     event.stop()
+                     return
+             else:
+-                event.text = _strip_paste_controls(first_line, multiline=False)
++                event.text = first_line  # mutant: strip removed
+ 
+     async def _on_mouse_down(self, event: events.MouseDown) -> None:
+         """Copy or paste on a button-3 press, before the stock handler.
+@@ -1005,7 +1005,7 @@ class OsClipboardInput(Input):
+                 self.restricted()
+                 return
+         else:
+-            first_line = _strip_paste_controls(first_line, multiline=False)
++            first_line = first_line  # mutant: strip removed
+         start, end = self.selection
+         self.replace(first_line, start, end)
+         logger.debug(
+
+# --- pytest (rc=1) ---
+                 │
+│   20818 │   │   │   │   self._a2l_filtered_tags,                             │
+│   20819 │   │   │   │   empty_message=f"No A2L tags match '{filter_text}'.", │
+│   20820 │   │   │   )                                                        │
+│                                                                              │
+│ ╭──────────────────────── locals ────────────────────────╮                   │
+│ │     filter_text = 'L1\x1b[2J'                          │                   │
+│ │ preserve_anchor = False                                │                   │
+│ │            self = S19TuiApp(                           │                   │
+│ │                   │   title='Hex Edit Tool',           │                   │
+│ │                   │   classes={'-dark-mode'},          │                   │
+│ │                   │   pseudo_classes={                 │                   │
+│ │                   │   │   'focus',                     │                   │
+│ │                   │   │   'dark'                       │                   │
+│ │                   │   }                                │                   │
+│ │                   )                                    │                   │
+│ ╰────────────────────────────────────────────────────────╯                   │
+│                                                                              │
+│ /tmp/b103-e5-1a-mut/work/s19_app/tui/app.py:20930 in update_a2l_tags_view    │
+│                                                                              │
+│   20927 │   │   │   │   - A2L tag paging and find actions                    │
+│   20928 │   │   """                                                          │
+│   20929 │   │   populate_started = time.perf_counter()                       │
+│ ❱ 20930 │   │   a2l_table = self.query_one("#a2l_tags_list", DataTable)      │
+│   20931 │   │   summary_label = self.query_one("#a2l_tags_summary", Label)   │
+│   20932 │   │   self._a2l_row_key_to_tag = {}                                │
+│   20933 │   │   a2l_table.clear(columns=False)                               │
+│                                                                              │
+│ ╭──────────────────────── locals ─────────────────────────╮                  │
+│ │    empty_message = "No A2L tags match 'L1\x1b[2J'."     │                  │
+│ │ populate_started = 170810.202883463                     │                  │
+│ │             self = S19TuiApp(                           │                  │
+│ │                    │   title='Hex Edit Tool',           │                  │
+│ │                    │   classes={'-dark-mode'},          │                  │
+│ │                    │   pseudo_classes={                 │                  │
+│ │                    │   │   'focus',                     │                  │
+│ │                    │   │   'dark'                       │                  │
+│ │                    │   }                                │                  │
+│ │                    )                                    │                  │
+│ │             tags = []                                   │                  │
+│ ╰─────────────────────────────────────────────────────────╯                  │
+╰──────────────────────────────────────────────────────────────────────────────╯
+NoMatches: No nodes match '#a2l_tags_list' on Screen(id='_default')
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+=========================== short test summary info ============================
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_34_1_terminal_paste_single_line_strips_unsafe
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_34_3_app_clipboard_fallback_single_line_strips
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_34_4_right_click_paste_single_line_strips
+3 failed, 84 deselected in 12.25s
+
+===== stderr =====

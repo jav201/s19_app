@@ -1,0 +1,63 @@
+# M-PASTE.7
+# row: R-PASTE.7
+# s19_app.__file__ = /tmp/b103-e5-1a-mut/work/s19_app/__init__.py
+# note: the cut leaves the text (acts as copy)
+# --- git diff ---
+diff --git a/s19_app/tui/os_clipboard_input.py b/s19_app/tui/os_clipboard_input.py
+index ad2f7240..78f65970 100644
+--- a/s19_app/tui/os_clipboard_input.py
++++ b/s19_app/tui/os_clipboard_input.py
+@@ -935,7 +935,6 @@ class OsClipboardInput(Input):
+         selected_text = self.selected_text
+         if not selected_text:
+             raise SkipAction()
+-        self.delete_selection()
+         await _mirror_and_write_os_clipboard(self.app, selected_text)
+ 
+     async def action_paste(self) -> None:
+
+# --- pytest (rc=1) ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________________ test_r_paste_7_cut_removes_selection _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10026/test_r_paste_7_cut_removes_sel0')
+
+    def test_r_paste_7_cut_removes_selection(tmp_path: Path) -> None:
+        """R-PASTE.7/1-2 (LinuxH): ``DE AD BE EF`` with ``DE AD`` selected → `` BE EF``."""
+        _assert_linuxh_headless()
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(160, 48)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("a2l")
+                for _ in range(4):
+                    await pilot.pause()
+                box = app.query_one("#a2l_tags_filter_input", Input)
+                box.focus()
+                await pilot.pause()
+                box.value = "DE AD BE EF"
+                box.selection = (0, 5)
+                await pilot.pause()
+                await pilot.press("ctrl+x")
+                await pilot.pause()
+                return box.value, app.clipboard
+    
+        value, clip = asyncio.run(_drive())
+>       assert value == " BE EF", value
+E       AssertionError: DE AD BE EF
+E       assert 'DE AD BE EF' == ' BE EF'
+E         
+E         -  BE EF
+E         + DE AD BE EF
+
+tests/test_b103_clipboard_core.py:890: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:686 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:747 OS clipboard write failed; retained Textual internal clipboard only
+=========================== short test summary info ============================
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_7_cut_removes_selection
+1 failed, 86 deselected in 2.63s
+
+===== stderr =====

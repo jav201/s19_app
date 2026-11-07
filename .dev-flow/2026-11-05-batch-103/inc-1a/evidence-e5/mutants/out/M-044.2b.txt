@@ -1,0 +1,104 @@
+# M-044.2b
+# row: R-TUI-044.2
+# s19_app.__file__ = /tmp/b103-e5-1a-mut/work/s19_app/__init__.py
+# note: the wstring_at size argument dropped -> /8 RED
+# --- git diff ---
+diff --git a/s19_app/tui/os_clipboard_input.py b/s19_app/tui/os_clipboard_input.py
+index ad2f7240..51064e56 100644
+--- a/s19_app/tui/os_clipboard_input.py
++++ b/s19_app/tui/os_clipboard_input.py
+@@ -257,9 +257,7 @@ def _read_via_ctypes() -> Optional[str]:
+             logger.debug("_read_via_ctypes: GlobalLock returned null")
+             return None
+         try:
+-            text = ctypes.wstring_at(
+-                pointer, min(size // 2, _CLIPBOARD_CAP_CHARS + 1)
+-            )
++            text = ctypes.wstring_at(pointer)  # mutant: size argument dropped
+             return text.split("\x00", 1)[0]
+         finally:
+             kernel32.GlobalUnlock(handle)
+
+# --- pytest (rc=1) ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________ test_r_tui_044_2_8_win32_read_bounded_by_global_size _____________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f49543e5190>
+
+    def test_r_tui_044_2_8_win32_read_bounded_by_global_size(monkeypatch) -> None:
+        """R-TUI-044.2/8 (LinuxH unit, partial): ``wstring_at(pointer, 1000)`` once."""
+        import sys as _sys
+    
+        from s19_app.tui import os_clipboard_input as mod
+    
+        recorded = {}
+    
+        class _FakeWintypes:
+            HWND = 1
+            UINT = 2
+            BOOL = 3
+            HANDLE = 4
+            HGLOBAL = 5
+    
+        def _open_clipboard(hwnd):
+            recorded["open"] = True
+            return 1
+    
+        def _close_clipboard():
+            return 1
+    
+        def _get_clipboard_data(fmt):
+            return 0x1234
+    
+        def _global_lock(handle):
+            return 0xABCD
+    
+        def _global_unlock(handle):
+            return 1
+    
+        def _global_size(handle):
+            return 2000
+    
+        # Plain functions (not bound methods), so the product's
+        # ``OpenClipboard.argtypes = ...`` assignments land (bound methods
+        # reject attribute assignment).
+        fake_ctypes = type(sys)("fake_ctypes")
+        fake_ctypes.windll = type(sys)("windll")
+        fake_ctypes.windll.user32 = type(sys)("user32")
+        fake_ctypes.windll.user32.OpenClipboard = _open_clipboard
+        fake_ctypes.windll.user32.CloseClipboard = _close_clipboard
+        fake_ctypes.windll.user32.GetClipboardData = _get_clipboard_data
+        fake_ctypes.windll.kernel32 = type(sys)("kernel32")
+        fake_ctypes.windll.kernel32.GlobalLock = _global_lock
+        fake_ctypes.windll.kernel32.GlobalUnlock = _global_unlock
+        fake_ctypes.windll.kernel32.GlobalSize = _global_size
+        fake_ctypes.wintypes = _FakeWintypes()
+        fake_ctypes.c_size_t = int
+        fake_ctypes.c_void_p = int
+        fake_ctypes.memmove = lambda *a: None
+        fake_ctypes.HGLOBAL = 5
+    
+        def _wstring_at(pointer, size=None):
+            recorded["wstring_at"] = (pointer, size)
+            return "x" * (size if size is not None else 1)
+    
+        fake_ctypes.wstring_at = _wstring_at
+    
+        monkeypatch.setitem(_sys.modules, "ctypes", fake_ctypes)
+        monkeypatch.setattr(_sys, "platform", "win32")
+    
+        text = mod._read_via_ctypes()
+>       assert recorded["wstring_at"] == (0xABCD, 1000), recorded
+E       AssertionError: {'open': True, 'wstring_at': (43981, None)}
+E       assert (43981, None) == (43981, 1000)
+E         
+E         At index 1 diff: None != 1000
+E         Use -v to get more diff
+
+tests/test_b103_clipboard_core.py:2284: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_clipboard_core.py::test_r_tui_044_2_8_win32_read_bounded_by_global_size
+1 failed, 86 deselected in 0.10s
+
+===== stderr =====

@@ -1,0 +1,82 @@
+# M-PASTE.35
+# row: R-PASTE.35
+# s19_app.__file__ = /tmp/b103-e5-1a-mut/work/s19_app/__init__.py
+# note: the strip step removed (multi-line) -> ESC / surrogate stay
+# --- git diff ---
+diff --git a/s19_app/tui/capped_text_area.py b/s19_app/tui/capped_text_area.py
+index 42582b4d..c446627f 100644
+--- a/s19_app/tui/capped_text_area.py
++++ b/s19_app/tui/capped_text_area.py
+@@ -166,7 +166,7 @@ class CappedTextArea(TextArea):
+         """
+         if len(event.text) > _CLIPBOARD_CAP_CHARS:
+             event.text = event.text[:_CLIPBOARD_CAP_CHARS]
+-        event.text = _strip_paste_controls(event.text, multiline=True)
++        event.text = event.text  # mutant: strip removed
+ 
+     async def action_paste(self) -> None:
+         """Paste the OS clipboard text at the selection, capped and stripped.
+@@ -235,7 +235,6 @@ class CappedTextArea(TextArea):
+             return
+         if len(text) > _CLIPBOARD_CAP_CHARS:
+             text = text[:_CLIPBOARD_CAP_CHARS]
+-        text = _strip_paste_controls(text, multiline=True)
+         if result := self._replace_via_keyboard(text, *self.selection):
+             self.move_cursor(result.end_location)
+ 
+
+# --- pytest (rc=1) ---
+= 0                                                     │ │
+│ │           result = EditResult(end_location=(1, 3), replaced_text='')     │ │
+│ │             self = JsonHighlightTextArea(id='patch_paste_text')          │ │
+│ ╰──────────────────────────────────────────────────────────────────────────╯ │
+│                                                                              │
+│ /tmp/b103-e5-1a-mut/work/s19_app/tui/json_highlight.py:355 in                │
+│ _build_highlight_map                                                         │
+│                                                                              │
+│   352 │   │   if not highlights_supported(self):                             │
+│   353 │   │   │   return                                                     │
+│   354 │   │   for index, line in enumerate(self.document.lines):             │
+│ ❱ 355 │   │   │   spans = tokenize_json_line(line)                           │
+│   356 │   │   │   if spans:                                                  │
+│   357 │   │   │   │   self._highlights[index] = spans                        │
+│   358                                                                        │
+│                                                                              │
+│ ╭─────────────────────── locals ───────────────────────╮                     │
+│ │ index = 1                                            │                     │
+│ │  line = 'E\u202e\ud800'                              │                     │
+│ │  self = JsonHighlightTextArea(id='patch_paste_text') │                     │
+│ │ spans = [(3, 5, 'json.number')]                      │                     │
+│ ╰──────────────────────────────────────────────────────╯                     │
+│                                                                              │
+│ /tmp/b103-e5-1a-mut/work/s19_app/tui/json_highlight.py:174 in                │
+│ tokenize_json_line                                                           │
+│                                                                              │
+│   171 │   prefix_bytes = [0] * (len(line) + 1)                               │
+│   172 │   total = 0                                                          │
+│   173 │   for index, char in enumerate(line):                                │
+│ ❱ 174 │   │   total += len(char.encode("utf-8"))                             │
+│   175 │   │   prefix_bytes[index + 1] = total                                │
+│   176 │                                                                      │
+│   177 │   for match in _TOKEN_RE.finditer(line):                             │
+│                                                                              │
+│ ╭──────────── locals ────────────╮                                           │
+│ │         char = '\ud800'        │                                           │
+│ │        index = 2               │                                           │
+│ │         line = 'E\u202e\ud800' │                                           │
+│ │ prefix_bytes = [0, 1, 4, 0]    │                                           │
+│ │        spans = []              │                                           │
+│ │        total = 4               │                                           │
+│ ╰────────────────────────────────╯                                           │
+╰──────────────────────────────────────────────────────────────────────────────╯
+UnicodeEncodeError: 'utf-8' codec can't encode character '\ud800' in position 0:
+surrogates not allowed
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+=========================== short test summary info ============================
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_35_1_terminal_paste_multi_line_strips
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_35_3_app_clipboard_fallback_multi_line_strips
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_35_4_right_click_paste_multi_line_strips
+3 failed, 84 deselected in 12.48s
+
+===== stderr =====

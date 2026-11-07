@@ -1,0 +1,65 @@
+# M-PASTE.11
+# row: R-PASTE.11
+# s19_app.__file__ = /tmp/b103-e5-1a-mut/work/s19_app/__init__.py
+# note: delay mutant: the write layer sleeps ~1 s
+# --- git diff ---
+diff --git a/s19_app/tui/os_clipboard_input.py b/s19_app/tui/os_clipboard_input.py
+index ad2f7240..f90c4bcb 100644
+--- a/s19_app/tui/os_clipboard_input.py
++++ b/s19_app/tui/os_clipboard_input.py
+@@ -672,6 +672,7 @@ def write_os_clipboard(
+             - :func:`_mirror_and_write_os_clipboard`
+     """
+     text = text[:_CLIPBOARD_CAP_CHARS]
++    time.sleep(1.0)  # mutant: answering layer delay (R-PASTE.11 / R-PASTE.27)
+     cascade = strategies if strategies is not None else _WRITE_STRATEGIES
+     for name, writer in cascade:
+         try:
+
+# --- pytest (rc=1) ---
+                  while time.monotonic() < deadline:
+                        await asyncio.sleep(0.005)
+                        await pilot.pause()
+                        if len(notices) > before:
+                            break
+                    samples.append(time.monotonic() - start)
+                samples.sort()
+                return key_time, samples[len(samples) // 2]
+    
+        key_time, median = asyncio.run(_drive())
+>       assert median <= report_margin("r_paste_11_3", median, key_time + timing_bound(0.1)), (key_time, median)
+E       AssertionError: (0.21799509899574332, 1.1301700930052903)
+E       assert 1.1301700930052903 <= 0.3179950989957433
+E        +  where 0.3179950989957433 = report_margin('r_paste_11_3', 1.1301700930052903, (0.21799509899574332 + 0.1))
+E        +    where 0.1 = timing_bound(0.1)
+
+tests/test_b103_clipboard_core.py:1553: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:687 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:748 OS clipboard write failed; retained Textual internal clipboard only
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:687 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:748 OS clipboard write failed; retained Textual internal clipboard only
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:687 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:748 OS clipboard write failed; retained Textual internal clipboard only
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:687 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:748 OS clipboard write failed; retained Textual internal clipboard only
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:687 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:748 OS clipboard write failed; retained Textual internal clipboard only
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:687 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:748 OS clipboard write failed; retained Textual internal clipboard only
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:687 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:748 OS clipboard write failed; retained Textual internal clipboard only
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:687 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:748 OS clipboard write failed; retained Textual internal clipboard only
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:687 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:748 OS clipboard write failed; retained Textual internal clipboard only
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:687 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:748 OS clipboard write failed; retained Textual internal clipboard only
+============================= QC-TM timing margins =============================
+LOW -255.4%  1.130 s / 0.318 s  r_paste_11_3  tests/test_b103_clipboard_core.py::test_r_paste_11_3_linux_copy_ends_within_typed_key_time
+QC-TM: 1 bounds, 1 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_11_3_linux_copy_ends_within_typed_key_time
+1 failed, 86 deselected in 17.51s
+
+===== stderr =====

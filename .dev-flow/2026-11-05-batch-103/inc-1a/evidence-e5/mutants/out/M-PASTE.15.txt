@@ -1,0 +1,101 @@
+# M-PASTE.15
+# row: R-PASTE.15
+# s19_app.__file__ = /tmp/b103-e5-1a-mut/work/s19_app/__init__.py
+# note: the mirror written to App._clipboard without the driver write -> 0 OSC 52 requests
+# --- git diff ---
+diff --git a/s19_app/tui/os_clipboard_input.py b/s19_app/tui/os_clipboard_input.py
+index ad2f7240..133a9818 100644
+--- a/s19_app/tui/os_clipboard_input.py
++++ b/s19_app/tui/os_clipboard_input.py
+@@ -729,7 +729,7 @@ async def _mirror_and_write_os_clipboard(app: App, text: str) -> None:
+     """
+     text = text[:_CLIPBOARD_CAP_CHARS]
+     try:
+-        App.copy_to_clipboard(app, text)
++        app._clipboard = text  # mutant: no OSC 52 driver write
+     except Exception:  # pragma: no cover — mirror is best-effort.
+         logger.debug("internal clipboard mirror failed", exc_info=True)
+     loop = asyncio.get_event_loop()
+
+# --- pytest (rc=1) ---
+ion_show_screen("a2l")
+                    for _ in range(4):
+                        await pilot.pause()
+                    widget = app.query_one("#a2l_tags_filter_input", Input)
+                    widget.value = P1
+                    widget.selection = (0, len(P1))
+                else:
+                    await show_patch_paste(app, pilot)
+                    widget = app.query_one("#patch_paste_text", TextArea)
+                    widget.text = P2
+                    widget.select_all()
+                widget.focus()
+                await pilot.pause()
+                await right_click_app_route(app, pilot, widget)
+                await pilot.pause()
+                return len(osc), osc[0] if osc else None
+    
+        count, payload = asyncio.run(_drive())
+>       assert count == 1, (count, payload)
+E       AssertionError: (0, None)
+E       assert 0 == 1
+
+tests/test_b103_clipboard_core.py:1302: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:686 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:747 OS clipboard write failed; retained Textual internal clipboard only
+______ test_r_paste_15_6_7_one_osc52_request_for_right_click_copy[multi] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-10032/test_r_paste_15_6_7_one_osc52_1')
+box_kind = 'textarea'
+
+    @pytest.mark.parametrize("box_kind", ["input", "textarea"], ids=["single", "multi"])
+    def test_r_paste_15_6_7_one_osc52_request_for_right_click_copy(
+        tmp_path: Path, box_kind: str
+    ) -> None:
+        """R-PASTE.15/6-7 (LinuxH): one OSC 52 request for a right-click copy."""
+        _assert_linuxh_headless()
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(160, 48)) as pilot:
+                await pilot.pause()
+                osc = install_osc52_spy(app)
+                if box_kind == "input":
+                    app.action_show_screen("a2l")
+                    for _ in range(4):
+                        await pilot.pause()
+                    widget = app.query_one("#a2l_tags_filter_input", Input)
+                    widget.value = P1
+                    widget.selection = (0, len(P1))
+                else:
+                    await show_patch_paste(app, pilot)
+                    widget = app.query_one("#patch_paste_text", TextArea)
+                    widget.text = P2
+                    widget.select_all()
+                widget.focus()
+                await pilot.pause()
+                await right_click_app_route(app, pilot, widget)
+                await pilot.pause()
+                return len(osc), osc[0] if osc else None
+    
+        count, payload = asyncio.run(_drive())
+>       assert count == 1, (count, payload)
+E       AssertionError: (0, None)
+E       assert 0 == 1
+
+tests/test_b103_clipboard_core.py:1302: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:686 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:747 OS clipboard write failed; retained Textual internal clipboard only
+=========================== short test summary info ============================
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_15_one_osc52_request_per_copy[copy_a]
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_15_one_osc52_request_per_copy[cut_a]
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_15_one_osc52_request_per_copy[copy_m]
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_15_one_osc52_request_per_copy[cut_m]
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_15_one_osc52_request_per_copy[line_cut_m]
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_15_6_7_one_osc52_request_for_right_click_copy[single]
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_15_6_7_one_osc52_request_for_right_click_copy[multi]
+7 failed, 80 deselected in 23.15s
+
+===== stderr =====
