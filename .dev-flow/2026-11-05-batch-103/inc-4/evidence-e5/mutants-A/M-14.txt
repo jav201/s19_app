@@ -1,0 +1,22 @@
+=== DIFF base -> M-14 (s19_app/tui/services/label_match.py) ===
+diff --git a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py b/M-14/s19_app/tui/services/label_match.py
+index d274de0..0b13786 100644
+--- a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py
++++ b/M-14/s19_app/tui/services/label_match.py
+@@ -347,7 +347,7 @@ def rank(query: str, index: LabelIndex, limit: int) -> list[LabelMatch]:
+             taken.add(name_id)
+             found += 1
+ 
+-    if found < limit and parsed.keys:
++    if False:
+         key_mask = _char_mask(parsed.keys)
+         for i in range(count):
+             if i in taken:
+
+=== PYTEST (tail) ===
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+/tmp/b103-e5-4-mutA/M-14/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.14/1: query 'value_000' limit 100
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.14/1]
+1 failed, 1 passed, 127 deselected in 5.32s

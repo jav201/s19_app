@@ -1,0 +1,35 @@
+=== DIFF base -> M-01 (s19_app/tui/services/label_match.py) ===
+diff --git a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py b/M-01/s19_app/tui/services/label_match.py
+index d274de0..23850b2 100644
+--- a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py
++++ b/M-01/s19_app/tui/services/label_match.py
+@@ -264,7 +264,7 @@ def rank(query: str, index: LabelIndex, limit: int) -> list[LabelMatch]:
+         raise TypeError(f"limit must be int, got {type(limit).__name__}")
+     if limit < 1:
+         return []
+-    raw = query.strip(_WHITESPACE)
++    raw = query
+     if len(raw) > 256:
+         return []
+     parsed = _parse_query(raw)
+@@ -739,7 +739,7 @@ def _parse_query(query: str) -> _Query | None:
+             the stripped query, ``keys`` the letters and digits of ``text`` in
+             order; ``None`` when the stripped query holds no letter or digit.
+     """
+-    stripped = query.strip(_WHITESPACE)
++    stripped = query
+     has_alnum = False
+     for ch in stripped:
+         if (
+
+=== PYTEST (tail) ===
+FFF.                                                                     [100%]
+=================================== FAILURES ===================================
+/tmp/b103-e5-4-mutA/M-01/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.1/1: query '  VALUE_0001  ' limit 20
+/tmp/b103-e5-4-mutA/M-01/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.1/2: query '\tVALUE_0001\n' limit 20
+/tmp/b103-e5-4-mutA/M-01/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.1/3: query ' value_000 ' limit 5
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.1/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.1/2]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.1/3]
+3 failed, 1 passed, 125 deselected in 5.13s

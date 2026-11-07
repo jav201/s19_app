@@ -1,0 +1,26 @@
+=== DIFF base -> M-06 (s19_app/tui/services/label_match.py) ===
+diff --git a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py b/M-06/s19_app/tui/services/label_match.py
+index d274de0..3e0f97f 100644
+--- a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py
++++ b/M-06/s19_app/tui/services/label_match.py
+@@ -783,8 +783,6 @@ def _classify(query: _Query, name: str) -> tuple[MatchRule, int, tuple[tuple[int
+     text_len = len(text)
+     if folded == text:
+         return (MatchRule.EXACT, 0, ((0, len(name)),))
+-    if folded.startswith(text):
+-        return (MatchRule.PREFIX, 0, ((0, text_len),))
+     p = folded.find(text)
+     if p >= 0:
+         key = 1
+
+=== PYTEST (tail) ===
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+/tmp/b103-e5-4-mutA/M-06/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.6/1: query 'value_000' limit 5
+/tmp/b103-e5-4-mutA/M-06/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.6/2: query 'span' limit 20
+/tmp/b103-e5-4-mutA/M-06/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.6/3: query 'LIMIT' limit 20
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.6/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.6/2]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.6/3]
+3 failed, 126 deselected in 5.39s

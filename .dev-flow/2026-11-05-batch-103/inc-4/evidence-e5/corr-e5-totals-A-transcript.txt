@@ -1,0 +1,20 @@
+s19_app.__file__ = /tmp/b103-e5-4-corr/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5-4-corr/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 24564b32d53f142b85fb33825aed3c30a116fbaaf4808be45e4378b2d8bedb9b
+sec-e5-probe.py sha256 = 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+this probe sha256 = 5fd0b981d2b03082636db885b71632c8ebd7a3f5dfc6bee25018dde89dc8aeb4
+variant = A (A: walk every distinct token; C: A + switch at <= 512 candidate token occurrences, step 6 by the tier's rule)
+mode = totals  python = 3.11.18  host = cachyos-rtx  load = (0.33, 0.52, 0.62)  cpus = 16
+HOME = /tmp/b103-e5-4-corr/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5-4-corr/zq_iso_user/localappdata
+
+E5S-02: the lists the performance rows bound, by count and total characters
+  REF                                          names 50,000  distinct 50,000  total characters  2,062,041  mean   41.24  longest   104
+  REF6                                         names 50,000  distinct 50,000  total characters    650,000  mean   13.00  longest    13
+  LONG                                         names 50,000  distinct 50,000  total characters  2,160,180  mean   43.20  longest 1,023
+  CRAFT (300 crafted + 49,700 REF)             names 50,000  distinct 50,000  total characters  2,356,624  mean   47.13  longest 1,024
+  2,000 crafted + 48,000 REF (map-path shape)  names 50,000  distinct 50,000  total characters  4,026,644  mean   80.53  longest 1,024
+  crafted names: 300 x 1024 characters, 268 tokens each, head '987654'
+  CRAFT sha256 of '\n'.join(names) = 70a89ba19130fbc699f374ef59419d272ad501776a9f1bdd26be7f4d0a6632db
+  CRAFT query  4 tokens, 21 characters: '987654 kemq vbcq sdlq'  sha256 eedc9c40e393a9ae
+  CRAFT query 51 tokens, 256 characters: '987654 kemq vbcq sdlq tbrq gbcq nncq nbtq dhvq vtbq sejq nes'...  sha256 3427d3ae34d6e40a
+  CRAFT subsequence shape, 139 characters: '987654 kemv sdlt gbcn nbtd vtbs nesd swfd vgld ctbu zkot jhf'...

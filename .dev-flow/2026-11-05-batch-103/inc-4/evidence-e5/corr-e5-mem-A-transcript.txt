@@ -1,0 +1,12 @@
+s19_app.__file__ = /tmp/b103-e5-4-corr/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5-4-corr/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 24564b32d53f142b85fb33825aed3c30a116fbaaf4808be45e4378b2d8bedb9b
+sec-e5-probe.py sha256 = 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+this probe sha256 = 5fd0b981d2b03082636db885b71632c8ebd7a3f5dfc6bee25018dde89dc8aeb4
+variant = A (A: walk every distinct token; C: A + switch at <= 512 candidate token occurrences, step 6 by the tier's rule)
+mode = mem  python = 3.11.18  host = cachyos-rtx  load = (1.04, 1.02, 0.87)  cpus = 16
+HOME = /tmp/b103-e5-4-corr/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5-4-corr/zq_iso_user/localappdata
+  CRAFT 51 tokens            pinned: one ranking under tracemalloc, peak     0.2 MiB
+  CRAFT 4 tokens             pinned: one ranking under tracemalloc, peak     0.1 MiB
+  CRAFT subsequence shape    pinned: one ranking under tracemalloc, peak     0.2 MiB
+  REF6 near tokens           pinned: one ranking under tracemalloc, peak    12.9 MiB

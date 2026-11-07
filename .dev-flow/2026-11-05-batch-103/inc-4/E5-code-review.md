@@ -1,0 +1,36 @@
+# E5 code review — Inc 4, label similarity matcher (claude-opus-5-5, role `code`)
+
+## Verdict: PASS-WITH-NOTES
+
+No CRITICAL, HIGH or MAJOR finding. The code follows the approved graph: rule order, ties, edit bands, banded OSA, case-exactness, duplicate collapse, both caps and spans all match it. An independent rows-oracle (written from `01-requirements.md`, sharing no helper with the module) agrees with `rank` on 9,624 checks, with 0 mismatches. The banded `_prefix_distance` agrees with a full OSA on 20,000 pairs. **There is one open drift:** the Code-Wire extractor exits **1** on an `_order_key` return annotation (F1). That is a one-line fix, and the corrective pass must re-run the extractor to exit 0. E4 integration never ran the extractor that the graph's E4 notes require (`graph-inc4.md:492`; `steps.log` has no extractor line), so this drift was never caught there.
+
+Scope: `s19_app/tui/services/label_match.py` (1,050 lines, `git diff a2043cfd HEAD`, read in full: lines 1–1050). I read the tests only where a finding needed them. The test-case audit belongs to another E5 role.
+
+## Findings
+
+| Id | Sev | Tag | Where | Requirement / node | Finding | Fix |
+|---|---|---|---|---|---|---|
+| F1 | MEDIUM | impl | `label_match.py:848` | node `_order_key` (graph out `tuple[int, int, int, int, str]`) | The code returns a bare `tuple`. The extractor reports "Output type mismatch" and exits 1 (`evidence-e5/code-review-extract.txt`, the only finding of 18 marks / 25 calls). | Annotate `-> tuple[int, int, int, int, str]` and match the docstring's Returns. Re-run the extractor on a marked throwaway copy; expect exit 0. |
+| F2 | MINOR | impl | `label_match.py:609-611` | node `_prefix_distance` ("costs at most (2 × cap + 1) cells per query character, never query-token length × name-token length", A-3); R-A2L-MATCH.40 | The column loop runs over every character of the name token. Each pass allocates `[limit] * (m + 1)`, even past column `m + cap`, where the band is empty and `best` can no longer change. The cells are banded, but the cost per call grows with the name-token length: 0.233 ms against 0.004 ms bounded for `('aab', 'a'*1000, 1)`, and 1.035 against 0.474 ms for `('a'*255+'b', 'a'*1020, 2)`. No row is breached on the shapes measured: 300 distinct 701–1,000-letter tokens with 64 distinct near query tokens took 267.4 ms, and LONG with the same query 243.3 ms. Bounding the loop leaves every list equal (`evidence-e5/code-review-probe.txt` Part C). | `for j in range(1, min(n, m + cap) + 1):`. This equals the current result on 20,000 pairs (probe Part C). |
+| F3 | LOW | impl | `label_match.py:378-382` | `rank` step 6 ("a mismatch is a defect of the tiers") | `if classified is None: continue` drops a listed name silently. Because the emitted rule comes from `_classify`, a tier that disagrees would also be hidden: the entry would be ordered by the tier's group but show `_classify`'s rule. The branch is dead while the tiers are correct (0 disagreements in the probe), but it hides the defect class the graph names. | Remove the guard and unpack `_classify(...)` directly, so a tier defect raises instead of shortening the list (rule 12, fail loud). |
+| F4 | MINOR | impl | `label_match.py:261-393` | `CLAUDE.md` "Function granularity" (split at ~40–60 logical lines) | `rank` holds about 130 logical lines over five stages: text tiers, token tier, fuzzy call, subsequence tier, order and cut. Only the fuzzy tier is extracted. | Extract `_text_tiers`, `_token_tier`, `_subsequence_tier` and `_cut` as private tier helpers. The graph allows these unmarked (`graph-inc4.md:190`). |
+| F5 | LOW | impl | `:200` and `:206`; `:541`; `:883-884`; `:33`; `:535-540`, `:548-553`, `:683-690`, `:745-750` | simplicity | (a) `tuple(tokens_sorted)` is built twice. (b) The outer `not _at_boundary(text, i)` branch in `_tokens` can never fire (every non-separator the outer loop reaches is a boundary), yet it costs one `_at_boundary` call per token at build. (c) The empty-prefix branch of `_token_range` is unreachable, because tokens are never empty. (d) `ord(chr(c))` is just `c`. (e) The CTX letter-or-digit test is written inline five times. | (a) `tokens = tuple(sorted(token_map))` once. (b) Drop the `or not _at_boundary(...)` from the outer test. (c) Drop the branch. (d) `{c: c + 32 ...}`. (e) Optional: one `_is_word_char(ch)` used by every site, if the build stays within its 5.0 s bound. |
+| F6 | LOW | impl | `label_match.py:177`, `:186`, `:192` | R-A2L-MATCH.35/.37 build | `array("I", bytes(4 * n))` assumes `array('I').itemsize == 4`. That holds on both target platforms (E2-9), but on an ABI where it differs the build would raise or size wrongly. | Use `array("I", [0]) * n`. |
+| F7 | LOW | impl | `label_match.py:399-407` | `PROJECT_RULES.md` "Private Helper Policy" | `_fuzzy_tier` is 75 lines and encodes the A-2 / E3A-14 invariants. Its docstring is one paragraph, with no Args or Returns, while every other helper in the module has Summary / Args / Returns. The helper itself is allowed (tier helper called only by `rank`, `graph-inc4.md:190`), so it is not a deviation. | Add Summary / Args / Returns in the module's form. |
+
+## Checks (evidence states)
+
+| Check | State | Evidence |
+|---|---|---|
+| Diff read in full | executed | `label_match.py:1-1050`; diff stat: 1 source file, 3 test files |
+| Graph conformance, 17 nodes + 4 entities (signatures, contracts, I-3 error texts, procedure steps 1–6) | executed | read against `graph-inc4.md:26-60`, `:64-400`; only F1 drifts |
+| Extractor, 0 drift | **failed** (1 drift, F1) | `evidence-e5/code-review-extract.txt` (throwaway copy in scratch, 18 marks, `_fuzzy_tier` unmarked; extract rc=1) |
+| Correctness: rows-oracle differential (random pools of SWA names, synthetic names, case twins, duplicates, non-ASCII, U+00A0, U+001C, 1,024/1,025-character names; queries ± whitespace, edits, swaps, token subsets; limits 1, 3, 20, 10^6) | executed | `evidence-e5/code-review-probe.txt` Part A: 9,600 checks, 0 mismatches; tokens over 258 characters sharing a 258 prefix (trie truncation) with 256-character queries: 24 checks, 0 mismatches |
+| `_prefix_distance` (band, transposition, cap) vs full OSA | executed | Part B: 20,000 pairs, cap 0–2, 0 mismatches |
+| Rule order, ties, case-exactness only for exact/prefix/substring (A-1, anywhere), duplicate collapse in the token and fuzzy tiers (A-2), 256 cap before parse, 1,024 cap at build, spans | executed | read (`:265-393`, `:408-470`, `:763-845`) + Part A |
+| Determinism | executed | sets hold ints only; str-keyed dicts are insertion-ordered and used for order only after `sorted`; output order comes from the total `_order_key` |
+| Purity (stdlib only, no Textual, no I/O, no writes after build) | executed | imports `:19-25`; no module state written; `LabelIndex` frozen, arrays written only inside `build_label_index` |
+| Style and docstrings | executed | public functions carry all sections; private helpers exceed the services' precedent (the other services: 180 private defs, 41 `Data Flow:` sections in all, public ones included; grep); F4, F7 |
+| Cost of the unbounded column loop | executed | Part C (host load 0.59–0.70; mutant runs active on the host) |
+
+Not run: the behaviour and perf suites (E4 evidence covers GREEN; mutants are other roles); Windows; CPython 3.12.

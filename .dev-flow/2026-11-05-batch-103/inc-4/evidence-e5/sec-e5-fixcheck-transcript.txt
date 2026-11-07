@@ -1,0 +1,12 @@
+s19_app.__file__ = /tmp/b103-e5-4-sec/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5-4-sec/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 24564b32d53f142b85fb33825aed3c30a116fbaaf4808be45e4378b2d8bedb9b
+tests module = /tmp/b103-e5-4-sec/tree/tests/test_b103_label_match_perf.py
+mode = fixcheck  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = -2154381008979028911
+host = cachyos-rtx  load = (0.34, 1.18, 1.34)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5-4-sec/zq_iso_user  LOCALAPPDATA = /tmp/b103-e5-4-sec/zq_iso_user/localappdata  PILOT_DIR = /tmp/b103-e5-4-sec/pilot
+   4 tokens: rank    966.4 ms | one walk per distinct token, all tokens    11.5 ms | candidate check from the maps   12.0 ms (300 candidates, all fuzzy True) | _classify of the 20 listed    81.7 ms
+  16 tokens: rank   4622.6 ms | one walk per distinct token, all tokens    57.3 ms | candidate check from the maps   49.9 ms (300 candidates, all fuzzy True) | _classify of the 20 listed   347.3 ms
+  51 tokens: rank  15517.7 ms | one walk per distinct token, all tokens   177.9 ms | candidate check from the maps  158.9 ms (300 candidates, all fuzzy True) | _classify of the 20 listed  1128.5 ms
+
+load after = (0.74, 1.15, 1.32)

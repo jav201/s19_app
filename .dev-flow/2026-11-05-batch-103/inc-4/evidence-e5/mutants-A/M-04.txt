@@ -1,0 +1,24 @@
+=== DIFF base -> M-04 (s19_app/tui/services/label_match.py) ===
+diff --git a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py b/M-04/s19_app/tui/services/label_match.py
+index d274de0..3802fbb 100644
+--- a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py
++++ b/M-04/s19_app/tui/services/label_match.py
+@@ -483,7 +483,7 @@ def _fold(text: str) -> str:
+     Returns:
+         str: The folded text.
+     """
+-    return text.translate(_FOLD_TABLE)
++    return text.lower()
+ 
+ 
+ def _char_mask(text: str) -> int:
+
+=== PYTEST (tail) ===
+FF.                                                                      [100%]
+=================================== FAILURES ===================================
+/tmp/b103-e5-4-mutA/M-04/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.4/1: query 'drück' limit 20
+/tmp/b103-e5-4-mutA/M-04/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.4/2: query 'DRÜCK' limit 20
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.4/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.4/2]
+2 failed, 1 passed, 126 deselected in 5.43s

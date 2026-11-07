@@ -22,7 +22,7 @@ from array import array
 from bisect import bisect_left
 from dataclasses import dataclass
 from enum import Enum
-from typing import Iterable, NamedTuple
+from typing import Callable, Iterable, Mapping, NamedTuple, Sequence
 
 # The six CTX-A2L-MATCH whitespace characters. Never a bare ``str.strip``,
 # which also strips U+001C … U+001F, U+0085 and U+00A0 (E2-5).
@@ -30,11 +30,17 @@ _WHITESPACE = " \t\n\r\v\f"
 
 # A-Z -> a-z translation table for _fold; every other character is kept, so a
 # folded string is exactly as long as its source and spans index the source.
-_FOLD_TABLE = str.maketrans({ord(chr(c)): chr(c + 32) for c in range(65, 91)})
+_FOLD_TABLE = str.maketrans({c: c + 32 for c in range(65, 91)})
 
 # The trie needs each token's first 258 characters only: a prefix test needs
 # at most 256 and a prefix distance of at most 2 needs at most 258 (E3S-03).
 _TRIE_PREFIX = 258
+
+# The fuzzy tier's switch (E5S-01, variant C): once at most this many
+# candidates remain and they hold at most this many name-token occurrences in
+# all, each remaining distinct query token is computed with _prefix_distance
+# on those candidates' token ids only (one call per (query token, token id)).
+_FUZZY_SWITCH_CAP = 512
 
 
 class MatchRule(str, Enum):
@@ -173,23 +179,23 @@ def build_label_index(names: Iterable[str]) -> LabelIndex:
             name_token_ids.append(token_id)
         name_token_starts.append(len(name_token_ids))
 
-    tokens_sorted = sorted(token_map)
-    remap = array("I", bytes(4 * len(tokens_sorted)))
-    for sorted_id, token in enumerate(tokens_sorted):
+    tokens = tuple(sorted(token_map))
+    remap = array("I", [0]) * len(tokens)
+    for sorted_id, token in enumerate(tokens):
         remap[token_map[token]] = sorted_id
     del token_map
     for j in range(len(name_token_ids)):
         name_token_ids[j] = remap[name_token_ids[j]]
     del remap
 
-    ntok = len(tokens_sorted)
-    posting_starts = array("I", bytes(4 * (ntok + 1)))
+    ntok = len(tokens)
+    posting_starts = array("I", [0]) * (ntok + 1)
     for i in range(count):
         for token_id in set(name_token_ids[name_token_starts[i]:name_token_starts[i + 1]]):
             posting_starts[token_id + 1] += 1
     for token_id in range(ntok):
         posting_starts[token_id + 1] += posting_starts[token_id]
-    postings = array("I", bytes(4 * posting_starts[ntok]))
+    postings = array("I", [0]) * posting_starts[ntok]
     cursor = array("I", posting_starts)
     for i in range(count):
         for token_id in set(name_token_ids[name_token_starts[i]:name_token_starts[i + 1]]):
@@ -197,13 +203,13 @@ def build_label_index(names: Iterable[str]) -> LabelIndex:
             cursor[token_id] += 1
     del cursor
 
-    trie_chars, trie_depth, trie_first, trie_end = _build_trie(tuple(tokens_sorted))
+    trie_chars, trie_depth, trie_first, trie_end = _build_trie(tokens)
 
     return LabelIndex(
         names=names_tuple,
         _folded=folded,
         _masks=masks,
-        _tokens=tuple(tokens_sorted),
+        _tokens=tokens,
         _name_token_ids=name_token_ids,
         _name_token_starts=name_token_starts,
         _postings=postings,
@@ -240,21 +246,20 @@ def rank(query: str, index: LabelIndex, limit: int) -> list[LabelMatch]:
 
     Data Flow:
         - Type checks; strip; length cap; parse the query (fold, tokens, keys).
-        - Collect exact / prefix / substring names in one pass over the folded
-          names; then token, fuzzy and subsequence tiers while fewer than
-          ``limit`` names are found.
-        - Order the found names by rule, key, length, case-exactness and name;
-          emit ``LabelMatch`` entries from ``_classify`` until ``limit``.
+        - Run the rule tiers in rank order — text (exact / prefix / substring),
+          token, fuzzy and subsequence — stopping after the tier at which
+          ``limit`` names are found, each name grouped by rule, key and length.
+        - Order each group by case-exactness and name, then emit ``LabelMatch``
+          entries with ``_classify`` spans until ``limit``.
 
     Dependencies:
         Uses:
             - _parse_query
-            - _at_boundary
-            - _token_range
+            - _text_tiers
+            - _token_tier
             - _fuzzy_tier
-            - _subsequence
-            - _order_key
-            - _classify
+            - _subsequence_tier
+            - _cut
         Used by:
             - (Inc 7) the A2L Viewer autocomplete and paste modal
     """
@@ -271,16 +276,58 @@ def rank(query: str, index: LabelIndex, limit: int) -> list[LabelMatch]:
     if parsed is None:
         return []
 
+    groups: dict[tuple, list[int]] = {}
+    taken: set[int] = set()
+
+    def add_group(rule: MatchRule, key: int, name_id: int) -> None:
+        groups.setdefault(
+            _order_key(rule, key, index.names[name_id], False)[:3], []
+        ).append(name_id)
+
+    found = _text_tiers(parsed, index, taken, add_group)
+    if found < limit and parsed.tokens:
+        found += _token_tier(parsed, index, taken, add_group)
+    tables: dict[str, dict[int, int]] = {}
+    if found < limit and parsed.tokens:
+        fuzzy, tables = _fuzzy_tier(parsed, index, taken)
+        for name_id, total in fuzzy.items():
+            add_group(MatchRule.FUZZY, total, name_id)
+            taken.add(name_id)
+            found += 1
+    if found < limit and parsed.keys:
+        found += _subsequence_tier(parsed, index, taken, add_group)
+    return _cut(parsed, raw, index, groups, tables, limit)
+
+
+def _text_tiers(
+    parsed: _Query,
+    index: LabelIndex,
+    taken: set[int],
+    add_group: Callable[[MatchRule, int, int], None],
+) -> int:
+    """
+    Summary:
+        Run the exact, prefix and substring tiers and return the number of
+        names listed (R-A2L-MATCH.5–.7, .21). One pass over the folded names:
+        a name that contains the query text is EXACT (equal), PREFIX (starts
+        with it) or SUBSTRING, whose key is 0 when an occurrence sits at a
+        boundary offset, else 1.
+
+    Args:
+        parsed (_Query): The parsed query.
+        index (LabelIndex): The prepared name list.
+        taken (set[int]): Name ids already listed.
+        add_group (Callable[[MatchRule, int, int], None]): Records a listed
+            name under its (rule, key, length) group.
+
+    Returns:
+        int: The number of names listed by these tiers.
+    """
     names = index.names
     folded = index._folded
     count = len(names)
     text = parsed.text
     text_len = len(text)
-    groups: dict[tuple, list[int]] = {}
-
-    def add_group(rule: MatchRule, key: int, name_id: int) -> None:
-        groups.setdefault(_order_key(rule, key, names[name_id], False)[:3], []).append(name_id)
-
     exact: list[int] = []
     prefix: list[int] = []
     subs: list[int] = []
@@ -293,8 +340,10 @@ def rank(query: str, index: LabelIndex, limit: int) -> list[LabelMatch]:
                 subs.append(i)
     for i in exact:
         add_group(MatchRule.EXACT, 0, i)
+        taken.add(i)
     for i in prefix:
         add_group(MatchRule.PREFIX, 0, i)
+        taken.add(i)
     for i in subs:
         key = 1
         name_folded = folded[i]
@@ -305,64 +354,133 @@ def rank(query: str, index: LabelIndex, limit: int) -> list[LabelMatch]:
                 break
             p = name_folded.find(text, p + 1)
         add_group(MatchRule.SUBSTRING, key, i)
+        taken.add(i)
+    return len(exact) + len(prefix) + len(subs)
 
-    found = len(exact) + len(prefix) + len(subs)
-    taken = set(exact)
-    taken.update(prefix)
-    taken.update(subs)
 
-    if found < limit and parsed.tokens:
-        distinct: dict[str, int] = {}
-        for token in parsed.tokens:
-            distinct[token] = distinct.get(token, 0) + 1
-        ranges = [_token_range(index._tokens, token) for token in distinct]
-        if ranges and all(lo < hi for lo, hi in ranges):
-            order = sorted(
-                range(len(ranges)),
-                key=lambda j: index._posting_starts[ranges[j][1]]
-                - index._posting_starts[ranges[j][0]],
-            )
-            lo, hi = ranges[order[0]]
-            candidates = set(
-                index._postings[index._posting_starts[lo]:index._posting_starts[hi]]
-            )
-            candidates.difference_update(taken)
-            for j in order[1:]:
-                if not candidates:
-                    break
-                lo, hi = ranges[j]
-                candidates.intersection_update(
-                    index._postings[index._posting_starts[lo]:index._posting_starts[hi]]
-                )
-            for name_id in candidates:
-                add_group(MatchRule.TOKEN, 0, name_id)
-                taken.add(name_id)
-                found += 1
+def _token_tier(
+    parsed: _Query,
+    index: LabelIndex,
+    taken: set[int],
+    add_group: Callable[[MatchRule, int, int], None],
+) -> int:
+    """
+    Summary:
+        Run the token tier and return the number of names listed
+        (R-A2L-MATCH.8, .30): a name whose tokens start with each distinct
+        query token, one range per distinct token, intersected by postings
+        (A-2).
 
-    if found < limit and parsed.tokens:
-        for name_id, total in _fuzzy_tier(parsed, index, taken).items():
-            if name_id in taken:
-                continue
-            add_group(MatchRule.FUZZY, total, name_id)
-            taken.add(name_id)
-            found += 1
+    Args:
+        parsed (_Query): The parsed query.
+        index (LabelIndex): The prepared name list.
+        taken (set[int]): Name ids already listed.
+        add_group (Callable[[MatchRule, int, int], None]): Records a listed
+            name under its (rule, key, length) group.
 
-    if found < limit and parsed.keys:
-        key_mask = _char_mask(parsed.keys)
-        for i in range(count):
-            if i in taken:
-                continue
-            if key_mask & ~index._masks[i]:
-                continue
-            if _subsequence(parsed.keys, folded[i]) is not None:
-                add_group(MatchRule.SUBSEQUENCE, 0, i)
+    Returns:
+        int: The number of names listed by this tier.
+    """
+    distinct = list(dict.fromkeys(parsed.tokens))
+    ranges = [_token_range(index._tokens, token) for token in distinct]
+    if not ranges or not all(lo < hi for lo, hi in ranges):
+        return 0
+    posting_starts = index._posting_starts
+    postings = index._postings
+    order = sorted(
+        range(len(ranges)),
+        key=lambda j: posting_starts[ranges[j][1]] - posting_starts[ranges[j][0]],
+    )
+    lo, hi = ranges[order[0]]
+    candidates = set(postings[posting_starts[lo]:posting_starts[hi]])
+    candidates.difference_update(taken)
+    for j in order[1:]:
+        if not candidates:
+            break
+        lo, hi = ranges[j]
+        candidates.intersection_update(
+            postings[posting_starts[lo]:posting_starts[hi]]
+        )
+    added = 0
+    for name_id in candidates:
+        add_group(MatchRule.TOKEN, 0, name_id)
+        taken.add(name_id)
+        added += 1
+    return added
 
+
+def _subsequence_tier(
+    parsed: _Query,
+    index: LabelIndex,
+    taken: set[int],
+    add_group: Callable[[MatchRule, int, int], None],
+) -> int:
+    """
+    Summary:
+        Run the subsequence tier and return the number of names listed
+        (R-A2L-MATCH.9, .31): each name not yet listed whose mask holds every
+        key-character bit and whose folded text holds the keys in order.
+
+    Args:
+        parsed (_Query): The parsed query.
+        index (LabelIndex): The prepared name list.
+        taken (set[int]): Name ids already listed.
+        add_group (Callable[[MatchRule, int, int], None]): Records a listed
+            name under its (rule, key, length) group.
+
+    Returns:
+        int: The number of names listed by this tier.
+    """
+    key_mask = _char_mask(parsed.keys)
+    folded = index._folded
+    count = len(index.names)
+    added = 0
+    for i in range(count):
+        if i in taken or key_mask & ~index._masks[i]:
+            continue
+        if _subsequence(parsed.keys, folded[i]) is not None:
+            add_group(MatchRule.SUBSEQUENCE, 0, i)
+            taken.add(i)
+            added += 1
+    return added
+
+
+def _cut(
+    parsed: _Query,
+    raw: str,
+    index: LabelIndex,
+    groups: dict[tuple, list[int]],
+    tables: dict[str, dict[int, int]],
+    limit: int,
+) -> list[LabelMatch]:
+    """
+    Summary:
+        Order the found names and emit the ranked list (``rank`` step 6,
+        R-A2L-MATCH.18–.25): groups by rule, key and length; within a group
+        case-exactness (computed only for exact / prefix / substring) and then
+        the name; each entry's rule and edits are its group's, and its spans
+        come from ``_classify`` (no listed name is classified again, E5S-01).
+
+    Args:
+        parsed (_Query): The parsed query.
+        raw (str): The stripped-but-unfolded query, for case-exactness.
+        index (LabelIndex): The prepared name list.
+        groups (dict[tuple, list[int]]): Name ids grouped by (rule, key, length).
+        tables (dict[str, dict[int, int]]): The fuzzy tier's per-token distance
+            tables (step 4); empty for the other rules.
+        limit (int): The largest number of names to return.
+
+    Returns:
+        list[LabelMatch]: The first ``limit`` entries in rank order.
+    """
+    names = index.names
+    starts = index._name_token_starts
+    ids_all = index._name_token_ids
     result: list[LabelMatch] = []
     for group_key in sorted(groups):
         rule = _RULE_BY_POS[group_key[0]]
-        members = groups[group_key]
         keyed: list[tuple[tuple, int]] = []
-        for name_id in members:
+        for name_id in groups[group_key]:
             name = names[name_id]
             if rule is MatchRule.EXACT:
                 case_exact = name == raw
@@ -375,16 +493,13 @@ def rank(query: str, index: LabelIndex, limit: int) -> list[LabelMatch]:
             keyed.append((_order_key(rule, group_key[1], name, case_exact)[3:], name_id))
         keyed.sort(key=lambda item: item[0])
         for _, name_id in keyed:
-            classified = _classify(parsed, names[name_id])
-            if classified is None:
-                continue
-            classified_rule, classified_key, spans = classified
-            edits = classified_key if classified_rule is MatchRule.FUZZY else 0
+            token_ids = ids_all[starts[name_id]:starts[name_id + 1]]
+            spans = _classify(parsed, names[name_id], rule, token_ids, tables)
             result.append(
                 LabelMatch(
                     name=names[name_id],
-                    rule=classified_rule,
-                    edits=edits,
+                    rule=rule,
+                    edits=group_key[1] if rule is MatchRule.FUZZY else 0,
                     spans=spans,
                 )
             )
@@ -395,79 +510,100 @@ def rank(query: str, index: LabelIndex, limit: int) -> list[LabelMatch]:
 
 def _fuzzy_tier(
     query: _Query, index: LabelIndex, taken: set[int]
-) -> dict[int, int]:
-    """Return ``{name id: total edits}`` for the fuzzy tier, or an empty dict.
+) -> tuple[dict[int, int], dict[str, dict[int, int]]]:
+    """
+    Summary:
+        Run the fuzzy tier (R-A2L-MATCH.10–.13, .33, .40; E5S-01 variant C):
+        walk each distinct query token in ascending allowed edits, intersect
+        the candidates by postings, and return each candidate's total edits
+        plus the per-token distance tables ``rank`` step 6 reads the spans
+        from. Once at most ``_FUZZY_SWITCH_CAP`` candidates remain holding at
+        most that many name-token occurrences in all, each remaining token's
+        table is computed with ``_prefix_distance`` on those candidates' token
+        ids only (one call per (query token, token id)).
 
-    Collapses duplicate query tokens (A-2), walks one distinct token at a time
-    in ascending allowed edits, intersects the candidate postings after each
-    walk and stops when the set is empty or at most 300 candidates remain; the
-    remaining distinct tokens are then checked per candidate with the banded
-    ``_prefix_distance`` (memoised per token id), stopping a candidate at the
-    first query token it fails (E3A-14).
+    Args:
+        query (_Query): The parsed query.
+        index (LabelIndex): The prepared name list.
+        taken (set[int]): Name ids already listed by an earlier tier.
+
+    Returns:
+        tuple[dict[int, int], dict[str, dict[int, int]]]: ``(name id ->
+        total edits, distinct query token -> token id -> prefix distance)``.
+        The tables keep every token id within its token's allowed edits, for
+        step 6; both are empty when the tier finds nothing.
     """
     counts: dict[str, int] = {}
     for token in query.tokens:
         counts[token] = counts.get(token, 0) + 1
     distinct = sorted(counts, key=_allowed_edits)
 
-    maps: dict[str, dict[int, int]] = {}
+    posting_starts = index._posting_starts
+    postings = index._postings
+    starts = index._name_token_starts
+    ids_all = index._name_token_ids
+    tokens = index._tokens
+
+    tables: dict[str, dict[int, int]] = {}
     candidates: set[int] | None = None
+    totals: dict[int, int] = {}
+    switched = False
+
     for token in distinct:
         allowed = _allowed_edits(token)
-        distances = _fuzzy_token_distances(index, token, allowed)
-        maps[token] = distances
-        if not distances:
-            return {}
-        postings: set[int] = set()
-        for token_id in distances:
-            lo = index._posting_starts[token_id]
-            hi = index._posting_starts[token_id + 1]
-            postings.update(index._postings[lo:hi])
-        if candidates is None:
-            candidates = postings
-        else:
-            candidates &= postings
-        candidates.difference_update(taken)
-        if not candidates:
-            return {}
-        if len(candidates) <= 300:
-            break
-
-    result: dict[int, int] = {}
-    memo: dict[tuple[str, int], int] = {}
-    for name_id in candidates:
-        start = index._name_token_starts[name_id]
-        end = index._name_token_starts[name_id + 1]
-        ids = index._name_token_ids[start:end]
-        total = 0
-        ok = True
-        for token in distinct:
-            count = counts[token]
-            allowed = _allowed_edits(token)
-            distances = maps.get(token)
-            best: int | None = None
-            if distances is not None:
-                for token_id in ids:
-                    value = distances.get(token_id)
-                    if value is not None and (best is None or value < best):
-                        best = value
-            else:
-                for token_id in ids:
-                    memo_key = (token, token_id)
-                    if memo_key not in memo:
-                        memo[memo_key] = _prefix_distance(
-                            token, index._tokens[token_id], allowed
-                        )
-                    value = memo[memo_key]
+        count = counts[token]
+        if (
+            not switched
+            and candidates is not None
+            and len(candidates) <= _FUZZY_SWITCH_CAP
+            and sum(starts[n + 1] - starts[n] for n in candidates)
+            <= _FUZZY_SWITCH_CAP
+        ):
+            switched = True
+        if switched:
+            seen: dict[int, int] = {}
+            kept: set[int] = set()
+            for name_id in candidates:
+                best: int | None = None
+                for token_id in ids_all[starts[name_id]:starts[name_id + 1]]:
+                    value = seen.get(token_id)
+                    if value is None:
+                        value = _prefix_distance(token, tokens[token_id], allowed)
+                        seen[token_id] = value
                     if value <= allowed and (best is None or value < best):
                         best = value
-            if best is None:
-                ok = False
-                break
-            total += best * count
-        if ok:
-            result[name_id] = total
-    return result
+                if best is not None:
+                    kept.add(name_id)
+                    totals[name_id] = totals.get(name_id, 0) + best * count
+            tables[token] = {t: v for t, v in seen.items() if v <= allowed}
+            candidates = kept
+            if not candidates:
+                return {}, tables
+            continue
+        distances = _fuzzy_token_distances(index, token, allowed)
+        tables[token] = distances
+        if not distances:
+            return {}, tables
+        layers = [set() for _ in range(allowed + 1)]
+        for token_id, d in distances.items():
+            layers[d].update(
+                postings[posting_starts[token_id]:posting_starts[token_id + 1]]
+            )
+        reached = layers[0].union(*layers[1:])
+        if candidates is None:
+            candidates = reached
+            candidates.difference_update(taken)
+        else:
+            candidates &= reached
+        if not candidates:
+            return {}, tables
+        lower = layers[0]
+        for d in range(1, allowed + 1):
+            for name_id in (layers[d] & candidates) - lower:
+                totals[name_id] = totals.get(name_id, 0) + d * count
+            if d < allowed:
+                lower = lower | layers[d]
+    return {name_id: totals.get(name_id, 0) for name_id in candidates}, tables
 
 
 def _fold(text: str) -> str:
@@ -513,6 +649,16 @@ def _char_mask(text: str) -> int:
     return mask
 
 
+def _is_word_char(ch: str) -> bool:
+    """Whether ``ch`` is a CTX-A2L-MATCH letter or digit (by code point, E2-5)."""
+    return (
+        ("a" <= ch <= "z")
+        or ("A" <= ch <= "Z")
+        or ("0" <= ch <= "9")
+        or ord(ch) > 0x7F
+    )
+
+
 def _tokens(text: str) -> tuple[tuple[int, int], ...]:
     """
     Summary:
@@ -532,26 +678,14 @@ def _tokens(text: str) -> tuple[tuple[int, int], ...]:
     i = 0
     while i < n:
         ch = text[i]
-        is_sep = not (
-            ("a" <= ch <= "z")
-            or ("A" <= ch <= "Z")
-            or ("0" <= ch <= "9")
-            or ord(ch) > 0x7F
-        )
-        if is_sep or not _at_boundary(text, i):
+        if not _is_word_char(ch):
             i += 1
             continue
         start = i
         i += 1
         while i < n:
             ch = text[i]
-            is_sep = not (
-                ("a" <= ch <= "z")
-                or ("A" <= ch <= "Z")
-                or ("0" <= ch <= "9")
-                or ord(ch) > 0x7F
-            )
-            if is_sep or _at_boundary(text, i):
+            if not _is_word_char(ch) or _at_boundary(text, i):
                 break
             i += 1
         spans.append((start, i))
@@ -606,7 +740,7 @@ def _prefix_distance(query_token: str, name_token: str, cap: int) -> int:
     prev = [i if i < limit else limit for i in range(m + 1)]
     prev2: list[int] | None = None
     best = m if m < limit else limit
-    for j in range(1, n + 1):
+    for j in range(1, min(n, m + cap) + 1):
         c = name_token[j - 1]
         new = [limit] * (m + 1)
         new[0] = j if j < limit else limit
@@ -680,13 +814,9 @@ def _at_boundary(name: str, offset: int) -> bool:
         return True
     c = name[offset]
     b = name[offset - 1]
-    if not (
-        ("a" <= c <= "z") or ("A" <= c <= "Z") or ("0" <= c <= "9") or ord(c) > 0x7F
-    ):
+    if not _is_word_char(c):
         return True
-    if not (
-        ("a" <= b <= "z") or ("A" <= b <= "Z") or ("0" <= b <= "9") or ord(b) > 0x7F
-    ):
+    if not _is_word_char(b):
         return True
     if ("0" <= c <= "9") != ("0" <= b <= "9"):
         return True
@@ -742,12 +872,7 @@ def _parse_query(query: str) -> _Query | None:
     stripped = query.strip(_WHITESPACE)
     has_alnum = False
     for ch in stripped:
-        if (
-            ("a" <= ch <= "z")
-            or ("A" <= ch <= "Z")
-            or ("0" <= ch <= "9")
-            or ord(ch) > 0x7F
-        ):
+        if _is_word_char(ch):
             has_alnum = True
             break
     if not has_alnum:
@@ -760,92 +885,101 @@ def _parse_query(query: str) -> _Query | None:
     return _Query(text=text, tokens=tokens, keys=keys)
 
 
-def _classify(query: _Query, name: str) -> tuple[MatchRule, int, tuple[tuple[int, int], ...]] | None:
+def _classify(
+    query: _Query,
+    name: str,
+    rule: MatchRule,
+    token_ids: Sequence[int],
+    tables: Mapping[str, Mapping[int, int]],
+) -> tuple[tuple[int, int], ...]:
     """
     Summary:
-        The first rule in rank order that ``name`` (folded internally;
-        ``query.text`` and ``query.tokens`` are already folded) meets for
-        ``query``, with its rule key and its match spans, or ``None``
-        (R-A2L-MATCH.5–.10, .15, .16, .21, .26–.33). Case-exactness is decided
-        in :func:`rank`, not here.
+        The match spans of one listed name for the ``rule`` its tier found
+        (``rank`` step 6, R-A2L-MATCH.26–.32): it tests no other rule, never
+        decides the rule or the key (the tiers do), and calls no
+        ``_prefix_distance``. ``name`` is folded here; ``query.text`` and
+        ``query.tokens`` are already folded. Case-exactness is decided in
+        ``rank`` step 6 by string comparison on the raw texts, not here.
 
     Args:
         query (_Query): The parsed query.
         name (str): The unfolded name.
+        rule (MatchRule): The rule the name's tier found.
+        token_ids (Sequence[int]): The name's token ids, in name order.
+        tables (Mapping[str, Mapping[int, int]]): The fuzzy tier's per-token
+            distance tables (step 4); empty for the other rules.
 
     Returns:
-        tuple[MatchRule, int, tuple[tuple[int, int], ...]] | None: The rule,
-            its key (fuzzy: total edits; substring: 0/1 boundary) and the
-            joined match spans; ``None`` when the name meets no rule.
+        tuple[tuple[int, int], ...]: The joined match spans.
+
+    Raises:
+        ValueError: When ``name`` does not meet ``rule`` — a defect of the
+            tiers, never a skipped entry.
     """
     folded = _fold(name)
     text = query.text
-    text_len = len(text)
-    if folded == text:
-        return (MatchRule.EXACT, 0, ((0, len(name)),))
-    if folded.startswith(text):
-        return (MatchRule.PREFIX, 0, ((0, text_len),))
-    p = folded.find(text)
-    if p >= 0:
-        key = 1
-        span = (p, p + text_len)
+    if rule is MatchRule.EXACT:
+        return ((0, len(name)),)
+    if rule is MatchRule.PREFIX:
+        return ((0, len(text)),)
+    if rule is MatchRule.SUBSTRING:
+        p = folded.find(text)
+        if p < 0:
+            raise ValueError(f"substring: {name!r} does not meet its tier")
+        span = (p, p + len(text))
         cursor = p
         while cursor >= 0:
             if _at_boundary(name, cursor):
-                key = 0
-                span = (cursor, cursor + text_len)
+                span = (cursor, cursor + len(text))
                 break
             cursor = folded.find(text, cursor + 1)
-        return (MatchRule.SUBSTRING, key, (span,))
+        return (span,)
 
     name_spans = _tokens(name)
-    if name_spans and query.tokens:
+    counts: dict[str, int] = {}
+    for token in query.tokens:
+        counts[token] = counts.get(token, 0) + 1
+
+    if rule is MatchRule.TOKEN:
         token_spans: list[tuple[int, int]] = []
-        token_ok = True
-        for query_token in query.tokens:
+        for query_token in counts:
             match_span: tuple[int, int] | None = None
             for start, end in name_spans:
                 if folded[start:end].startswith(query_token):
                     match_span = (start, start + len(query_token))
                     break
             if match_span is None:
-                token_ok = False
-                break
+                raise ValueError(f"token: {name!r} does not meet its tier")
             token_spans.append(match_span)
-        if token_ok:
-            return (MatchRule.TOKEN, 0, _join_spans(token_spans))
+        return _join_spans(token_spans)
 
-        total = 0
+    if rule is MatchRule.FUZZY:
         fuzzy_spans: list[tuple[int, int]] = []
-        for query_token in query.tokens:
-            allowed = _allowed_edits(query_token)
+        for query_token in counts:
+            table = tables.get(query_token)
+            if table is None:
+                raise ValueError(f"fuzzy: {name!r} does not meet its tier")
             best: int | None = None
             best_span: tuple[int, int] | None = None
-            for start, end in name_spans:
-                distance = _prefix_distance(query_token, folded[start:end], allowed)
-                if distance <= allowed and (best is None or distance < best):
-                    best = distance
+            for (start, end), token_id in zip(name_spans, token_ids):
+                value = table.get(token_id)
+                if value is not None and (best is None or value < best):
+                    best = value
                     best_span = (start, end)
             if best is None:
-                total = -1
-                break
-            total += best
+                raise ValueError(f"fuzzy: {name!r} does not meet its tier")
             fuzzy_spans.append(best_span)
-        if total >= 0:
-            return (MatchRule.FUZZY, total, _join_spans(fuzzy_spans))
+        return _join_spans(fuzzy_spans)
 
-    if query.keys:
-        offsets = _subsequence(query.keys, folded)
-        if offsets is not None:
-            return (
-                MatchRule.SUBSEQUENCE,
-                0,
-                _join_spans([(o, o + 1) for o in offsets]),
-            )
-    return None
+    offsets = _subsequence(query.keys, folded)
+    if offsets is None:
+        raise ValueError(f"subsequence: {name!r} does not meet its tier")
+    return _join_spans([(o, o + 1) for o in offsets])
 
 
-def _order_key(rule: MatchRule, key: int, name: str, case_exact: bool) -> tuple:
+def _order_key(
+    rule: MatchRule, key: int, name: str, case_exact: bool
+) -> tuple[int, int, int, int, str]:
     """
     Summary:
         The total rank-order key of one listed name (R-A2L-MATCH.20–.25):
@@ -860,7 +994,7 @@ def _order_key(rule: MatchRule, key: int, name: str, case_exact: bool) -> tuple:
         case_exact (bool): Whether the name is case-exact.
 
     Returns:
-        tuple: The five-part order key.
+        tuple[int, int, int, int, str]: The five-part order key.
     """
     return (_RULE_RANK[rule], key, len(name), 0 if case_exact else 1, name)
 
@@ -880,8 +1014,6 @@ def _token_range(tokens: tuple[str, ...], prefix: str) -> tuple[int, int]:
     Returns:
         tuple[int, int]: The inclusive-exclusive id range (possibly empty).
     """
-    if not prefix:
-        return (0, len(tokens))
     lo = bisect_left(tokens, prefix)
     last = ord(prefix[-1])
     if last < 0x10FFFF:

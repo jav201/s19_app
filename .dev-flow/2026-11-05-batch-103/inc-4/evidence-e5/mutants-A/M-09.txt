@@ -1,0 +1,28 @@
+=== DIFF base -> M-09 (s19_app/tui/services/label_match.py) ===
+diff --git a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py b/M-09/s19_app/tui/services/label_match.py
+index d274de0..0b13786 100644
+--- a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py
++++ b/M-09/s19_app/tui/services/label_match.py
+@@ -347,7 +347,7 @@ def rank(query: str, index: LabelIndex, limit: int) -> list[LabelMatch]:
+             taken.add(name_id)
+             found += 1
+ 
+-    if found < limit and parsed.keys:
++    if False:
+         key_mask = _char_mask(parsed.keys)
+         for i in range(count):
+             if i in taken:
+
+=== PYTEST (tail) ===
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+/tmp/b103-e5-4-mutA/M-09/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.9/1: query 'mp' limit 3
+/tmp/b103-e5-4-mutA/M-09/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.9/2: query 'ascii 1' limit 20
+/tmp/b103-e5-4-mutA/M-09/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.9/3: query 'map 20' limit 20
+/tmp/b103-e5-4-mutA/M-09/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.9/4: query 'gamecontroller timer' limit 3
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.9/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.9/2]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.9/3]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.9/4]
+4 failed, 125 deselected in 5.38s

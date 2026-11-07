@@ -1,0 +1,64 @@
+===== diff -u (base vs mutant) s19_app/tui/services/label_match.py =====
+--- /tmp/b103-e5-4-mutB/base/s19_app/tui/services/label_match.py	2026-11-06 20:36:19.839317227 -0600
++++ /tmp/b103-e5-4-mutB/M-40/s19_app/tui/services/label_match.py	2026-11-06 21:21:22.907868212 -0600
+@@ -610,8 +610,8 @@
+         c = name_token[j - 1]
+         new = [limit] * (m + 1)
+         new[0] = j if j < limit else limit
+-        lo = j - cap if j - cap > 1 else 1
+-        hi = j + cap if j + cap < m else m
++        lo = 1
++        hi = m
+         for i in range(lo, hi + 1):
+             qi = query_token[i - 1]
+             value = prev[i - 1] + (0 if qi == c else 1)
+===== pytest tail =====
+--- uptime before ---
+ 21:21:22 up 1 day, 12:53,  3 users,  load average: 1.34, 1.84, 1.53
+E            +  where 1.0 = report_margin('R-A2L-MATCH.40 LONG a x255 + b', 1.1549409860017477, 1.0)
+E            +    where 1.0 = timing_bound(1.0)
+
+/home/javiergr/work/b103-int4/tests/test_b103_label_match_perf.py:334: AssertionError
+----------------------------- Captured stdout call -----------------------------
+host load before: 1.26 1.77 1.52
+host load after: 1.19 1.72 1.51
+    1154.94 ms  R-A2L-MATCH.40 LONG a x255 + b
+    1156.12 ms  R-A2L-MATCH.40 LONG a x254 + bb
+     615.51 ms  R-A2L-MATCH.40 LONG a x128 + b
+============================= QC-TM timing margins =============================
+LOW -15.5%  1.155 s / 1.000 s  R-A2L-MATCH.40 LONG a x255 + b  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_2_long_queries_against_1020_character_tokens
+29.8%  0.702 s / 1.000 s  R-A2L-MATCH.40 REF6 near tokens  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+45.2%  0.548 s / 1.000 s  R-A2L-MATCH.40 REF6 51 typos of char  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+68.0%  0.320 s / 1.000 s  R-A2L-MATCH.40 REF6 cha..chz x3  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+86.9%  0.131 s / 1.000 s  R-A2L-MATCH.40 REF qza..qzz x3  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+91.7%  0.083 s / 1.000 s  R-A2L-MATCH.40 REF6 0 x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+91.7%  0.083 s / 1.000 s  R-A2L-MATCH.40 REF6 E3S-01 0 x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+92.0%  0.080 s / 1.000 s  R-A2L-MATCH.40 REF6 mesa x52  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+92.2%  0.078 s / 1.000 s  R-A2L-MATCH.40 REF6 chax x52  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+93.1%  0.069 s / 1.000 s  R-A2L-MATCH.40 REF6 chr x64  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+93.2%  0.068 s / 1.000 s  R-A2L-MATCH.40 REF6 cahr x51  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+93.2%  0.068 s / 1.000 s  R-A2L-MATCH.40 REF6 0 x125 + chax  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+93.4%  0.066 s / 1.000 s  R-A2L-MATCH.40 REF6 c x125 + chax  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+93.5%  0.065 s / 1.000 s  R-A2L-MATCH.40 REF6 00 x85  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+95.8%  0.042 s / 1.000 s  R-A2L-MATCH.40 REF6 1 x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+96.3%  0.037 s / 1.000 s  R-A2L-MATCH.40 REF6 c 0 x64  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+96.4%  0.036 s / 1.000 s  R-A2L-MATCH.40 REF6 m x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+96.5%  0.035 s / 1.000 s  R-A2L-MATCH.40 REF6 c x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+96.9%  0.031 s / 1.000 s  R-A2L-MATCH.40 REF rat x64  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+97.0%  0.030 s / 1.000 s  R-A2L-MATCH.40 REF qzx x64  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+97.9%  0.021 s / 1.000 s  R-A2L-MATCH.40 REF6 E3S-01 a x256  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+98.5%  0.015 s / 1.000 s  R-A2L-MATCH.40 REF6 E3S-01 e x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+98.7%  0.013 s / 1.000 s  R-A2L-MATCH.40 REF e x120 + rat  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+98.9%  0.011 s / 1.000 s  R-A2L-MATCH.40 REF cnt x64  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+99.1%  0.009 s / 1.000 s  R-A2L-MATCH.40 REF 1a x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+99.2%  0.008 s / 1.000 s  R-A2L-MATCH.40 REF6 E3S-01 a..z  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+99.3%  0.007 s / 1.000 s  R-A2L-MATCH.40 REF6 E3S-01 pool join  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+99.3%  0.007 s / 1.000 s  R-A2L-MATCH.40 REF6 E3S-01 pool[200:] join  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+99.3%  0.007 s / 1.000 s  R-A2L-MATCH.40 REF6 E3S-01 longest REF name  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+99.3%  0.007 s / 1.000 s  R-A2L-MATCH.40 REF6 E3S-01 longest swapped  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+QC-TM: 30 bounds, 1 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match_perf.py::test_r_a2l_match_40_2_long_queries_against_1020_character_tokens
+1 failed, 2 passed, 4 deselected in 50.87s
+--- uptime after ---
+ 21:22:14 up 1 day, 12:53,  3 users,  load average: 1.19, 1.72, 1.51

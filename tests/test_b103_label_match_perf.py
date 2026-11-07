@@ -8,6 +8,9 @@ Independent tester file (E4). Cases (``02-test-cases.md``):
 - R-A2L-MATCH.37/1 - the tracemalloc peak of preparing REF <= 64 MiB.
 - R-A2L-MATCH.40/1 - every pathological PSET query over its list: median of 7 <= 1.0 s.
 - R-A2L-MATCH.40/2 - the three LONG queries over LONG: median of 7 <= 1.0 s.
+- R-A2L-MATCH.40/3 - the 4-token and the 51-token CRAFT queries over CRAFT (E5S-01).
+- R-A2L-MATCH.40/4 - a query that still reaches ``_prefix_distance`` after the posting
+  switch (BAND list): the banded distance keeps it fast, the no-band mutant does not.
 
 The timing arms carry ``serial_timing`` (run apart and serially); the memory
 bound R-A2L-MATCH.37/1 is a byte bound and carries none. The bounds are stated
@@ -20,6 +23,7 @@ measures the preparation itself.
 from __future__ import annotations
 
 import gc
+import hashlib
 import os
 import random
 import statistics
@@ -216,6 +220,16 @@ def _median_of(n, call):
     return statistics.median(times)
 
 
+def _check_all(medians, bound_s):
+    """Print EVERY margin line (no truncation, whatever the reporter or a ``tail`` keeps), then assert each
+    median against ``report_margin(..., timing_bound(bound_s))``; the failure names its label."""
+    bound = timing_bound(bound_s)
+    for label_, median in medians:
+        print(f"  {median * 1000:9.2f} ms  {(bound - median) / bound * 100:6.1f} % margin  {label_}")
+    for label_, median in medians:
+        assert median <= report_margin(label_, median, bound), f"{label_}: median {median:.4f} s"
+
+
 # ---------------------------------------------------------------------------
 # Query tables, built once at import from fixtures that need no matcher call
 # ---------------------------------------------------------------------------
@@ -245,7 +259,7 @@ def test_r_a2l_match_35_1_preparing_50000_names(ref_names):
         del index
     print(_load("after"), "prep times", [round(t, 3) for t in times])
     median = statistics.median(times)
-    assert median <= report_margin("R-A2L-MATCH.35 prepare REF", median, timing_bound(PREP_BOUND_S))
+    _check_all([("R-A2L-MATCH.35 prepare REF", median)], PREP_BOUND_S)
 
 
 @pytest.mark.serial_timing
@@ -256,10 +270,7 @@ def test_r_a2l_match_36_1_ranking_per_keystroke_over_ref(ref_index, qset_ref):
     for query in qset_ref:
         medians.append((f"R-A2L-MATCH.36 REF {query[:40]!r}", _median_of(7, lambda q=query: rank(q, ref_index, 20))))
     print(_load("after"))
-    for label_, median in medians:
-        print(f"  {median * 1000:9.2f} ms  {label_}")
-    for label_, median in medians:
-        assert median <= report_margin(label_, median, timing_bound(KEYSTROKE_BOUND_S)), f"{label_}: median {median:.4f} s"
+    _check_all(medians, KEYSTROKE_BOUND_S)
 
 
 @pytest.mark.serial_timing
@@ -270,10 +281,7 @@ def test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6(ref6_index):
     for query in REF6_QUERIES:
         medians.append((f"R-A2L-MATCH.36 REF6 {query!r}", _median_of(7, lambda q=query: rank(q, ref6_index, 20))))
     print(_load("after"))
-    for label_, median in medians:
-        print(f"  {median * 1000:9.2f} ms  {label_}")
-    for label_, median in medians:
-        assert median <= report_margin(label_, median, timing_bound(KEYSTROKE_BOUND_S)), f"{label_}: median {median:.4f} s"
+    _check_all(medians, KEYSTROKE_BOUND_S)
 
 
 def test_r_a2l_match_37_1_prepared_list_stays_within_64_mib(ref_names):
@@ -299,10 +307,7 @@ def test_r_a2l_match_40_1_pathological_queries_over_ref(ref_index):
         assert len(query) <= 256, label
         medians.append((f"R-A2L-MATCH.40 REF {label}", _median_of(7, lambda q=query: rank(q, ref_index, 20))))
     print(_load("after"))
-    for label_, median in medians:
-        print(f"  {median * 1000:9.2f} ms  {label_}")
-    for label_, median in medians:
-        assert median <= report_margin(label_, median, timing_bound(ANY_QUERY_BOUND_S)), f"{label_}: median {median:.4f} s"
+    _check_all(medians, ANY_QUERY_BOUND_S)
 
 
 @pytest.mark.serial_timing
@@ -314,10 +319,7 @@ def test_r_a2l_match_40_1_pathological_queries_over_ref6(ref6_index, swa):
         assert len(query) <= 256, label
         medians.append((f"R-A2L-MATCH.40 REF6 {label}", _median_of(7, lambda q=query: rank(q, ref6_index, 20))))
     print(_load("after"))
-    for label_, median in medians:
-        print(f"  {median * 1000:9.2f} ms  {label_}")
-    for label_, median in medians:
-        assert median <= report_margin(label_, median, timing_bound(ANY_QUERY_BOUND_S)), f"{label_}: median {median:.4f} s"
+    _check_all(medians, ANY_QUERY_BOUND_S)
 
 
 @pytest.mark.serial_timing
@@ -328,7 +330,113 @@ def test_r_a2l_match_40_2_long_queries_against_1020_character_tokens(long_index)
     for label, query in LONG_QUERIES:
         medians.append((f"R-A2L-MATCH.40 LONG {label}", _median_of(7, lambda q=query: rank(q, long_index, 20))))
     print(_load("after"))
-    for label_, median in medians:
-        print(f"  {median * 1000:9.2f} ms  {label_}")
-    for label_, median in medians:
-        assert median <= report_margin(label_, median, timing_bound(ANY_QUERY_BOUND_S)), f"{label_}: median {median:.4f} s"
+    _check_all(medians, ANY_QUERY_BOUND_S)
+
+
+# ---------------------------------------------------------------------------
+# R-A2L-MATCH.40/3 and .40/4 (E5 corrective pass)
+# ---------------------------------------------------------------------------
+
+CRAFT_NCAP = 1024
+CRAFT_HEAD = "987654"  # starts no REF token (0 allowed edits: walked first, it yields only the crafted names)
+# 50 three-letter hits (Random(7) over 'a'..'z' minus 'q', kept when hit + 'q' has an empty token range in REF),
+# fixed here as literals found once on the reference host with the E5 probe's builder.
+CRAFT_HITS = (
+    "kem vbc sdl tbr gbc nnc nbt dhv vtb sej nes dtj swf dtt vgl dsx ctb ugp zko tol jhf xzh ctj rpk ucd "
+    "rnf zke pnb wcz stk kxl upt occ ipx wcb yxj vtw ojx aol fud pbg zje yhm mpc fom sie nsi xnl wmh ecf"
+).split()
+CRAFT_SEED = 20261413
+CRAFT_TOTAL_CHARS = 2356624  # R-A2L-MATCH.40 row: CRAFT holds this many characters in all
+CRAFT_SHA256 = "70a89ba19130fbc699f374ef59419d272ad501776a9f1bdd26be7f4d0a6632db"
+
+
+def _base25(value, width, alphabet):
+    out = []
+    for _ in range(width):
+        value, rem = divmod(value, len(alphabet))
+        out.append(alphabet[rem])
+    return "".join(out)
+
+
+def craft_names(n_crafted=300):
+    """300 names of 1,024 characters: ``CRAFT_HEAD``, the 50 hits capitalised (same order in every name), then 217
+    four-letter capitalised junk tokens distinct across the names (268 tokens each)."""
+    assert len(CRAFT_HITS) == 50
+    letters = [c for c in _LOWER if c != "q"]
+    k_junk = (CRAFT_NCAP - len(CRAFT_HEAD) - 3 * len(CRAFT_HITS)) // 4
+    pool = random.Random(CRAFT_SEED).sample(range(len(letters) ** 4), n_crafted * k_junk)
+    names = []
+    for i in range(n_crafted):
+        junk = "".join(_base25(v, 4, letters).capitalize() for v in pool[i * k_junk:(i + 1) * k_junk])
+        names.append(CRAFT_HEAD + "".join(h.capitalize() for h in CRAFT_HITS) + junk)
+    assert len(set(names)) == n_crafted and {len(n) for n in names} == {CRAFT_NCAP}
+    return names
+
+
+def craft_query(n_tokens):
+    """The head, then n_tokens - 1 tokens, each a hit followed by ``q`` (1 edit from the hit, starting no token)."""
+    return " ".join([CRAFT_HEAD] + [h + "q" for h in CRAFT_HITS[: n_tokens - 1]])
+
+
+@pytest.fixture(scope="module")
+def craft_index(ref_names):
+    names = craft_names() + ref_names[:49700]
+    assert len(names) == 50000
+    assert sum(len(n) for n in names) == CRAFT_TOTAL_CHARS  # fixture sanity: the row's list
+    assert hashlib.sha256("\n".join(names).encode("utf-8")).hexdigest() == CRAFT_SHA256
+    return build_label_index(names)
+
+
+@pytest.mark.serial_timing
+def test_r_a2l_match_40_3_crafted_stress_list(craft_index):
+    """R-A2L-MATCH.40/3: the 4-token and the 51-token CRAFT queries (300 names of 1,024 characters, 268 tokens
+    each, every query token matching within its allowed edits) over the prepared list CRAFT, limit 20, median of 7
+    <= 1.0 s; the list holds 20 entries, each fuzzy (the 51-token list: 50 edits each)."""
+    print(_load("before"))
+    medians = []
+    for n_tokens in (4, 51):
+        query = craft_query(n_tokens)
+        assert len(query) <= 256 and len(query.split()) == n_tokens
+        got = rank(query, craft_index, 20)
+        assert len(got) == 20
+        assert {m.rule.value for m in got} == {"fuzzy"}
+        assert {m.edits for m in got} == {n_tokens - 1}  # one edit per hit-and-q token, none for the head
+        medians.append((f"R-A2L-MATCH.40/3 CRAFT {n_tokens} tokens", _median_of(7, lambda q=query: rank(q, craft_index, 20))))
+    print(_load("after"))
+    _check_all(medians, ANY_QUERY_BOUND_S)
+
+
+BAND_HEAD = "987654"
+BAND_LETTERS = "cdefghijklmnopr"  # 15 letters, no 'b': the query's last letter appears in no name, so no subsequence tier fires
+
+
+def band_names():
+    """225 names ``987654_`` + 1,000 ``a`` + two letters of BAND_LETTERS: one 1,002-character token each (within .39)."""
+    return [f"{BAND_HEAD}_{'a' * 1000}{x}{y}" for x in BAND_LETTERS for y in BAND_LETTERS]
+
+
+@pytest.fixture(scope="module")
+def band_index(ref_names):
+    names = band_names() + ref_names[:50000 - len(band_names())]
+    assert len(names) == 50000 and len(set(names)) == 50000
+    return build_label_index(names)
+
+
+@pytest.mark.serial_timing
+def test_r_a2l_match_40_4_prefix_distance_band_after_the_switch(band_index):
+    """R-A2L-MATCH.40/4: a two-token query whose first token (``987654``, 0 edits) leaves 225 candidates holding
+    450 token occurrences (<= 512: the posting switch) and whose second token (248 ``a`` and a ``b``) is then
+    scored against each 1,002-character candidate token by ``_prefix_distance``; ranked 7 times, limit 20,
+    median <= 1.0 s. Without the band the 225 alignments cost about 249 x 250 cells each (seconds)."""
+    query = BAND_HEAD + " " + "a" * 248 + "b"
+    assert len(query) == 256
+    got = rank(query, band_index, 20)
+    expected = set(band_names())
+    assert len(got) == 20
+    assert {m.name in expected for m in got} == {True}
+    assert {m.rule.value for m in got} == {"fuzzy"}
+    assert {m.edits for m in got} == {1}  # the final 'b' replaces one 'a' of the name's token
+    print(_load("before"))
+    medians = [("R-A2L-MATCH.40/4 BAND head + 249-character token", _median_of(7, lambda: rank(query, band_index, 20)))]
+    print(_load("after"))
+    _check_all(medians, ANY_QUERY_BOUND_S)

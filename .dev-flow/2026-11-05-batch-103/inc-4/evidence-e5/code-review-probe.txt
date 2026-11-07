@@ -1,0 +1,42 @@
+# E5 code review probe transcript (inc-4 label_match) - generated, not typed
+# runner: cachyos-rtx; tree: cp -a ~/work/b103-int4 /tmp/b103-e5-4-code/tree (read-only original untouched)
+# command: cd /tmp/b103-e5-4-code/tree && env PYTHONPATH=/tmp/b103-e5-4-code/tree HOME=/tmp/b103-e5-4-code/zq_iso_user XDG_{CONFIG,CACHE,DATA}_HOME=<under zq_iso_user> LOCALAPPDATA=<under zq_iso_user> PYTHONDONTWRITEBYTECODE=1 PYTHONHASHSEED=0 timeout 1500 ~/miniconda3/envs/s19ci/bin/python -u /tmp/b103-e5-4-code/e5_code_probe.py
+# script: evidence-e5/code-review-probe.py
+# sha256 on runner:
+1a70871d172ddb649281668e2d6a252f95394364515fc8ebdbb503eb494583e2  /tmp/b103-e5-4-code/e5_code_probe.py
+24564b32d53f142b85fb33825aed3c30a116fbaaf4808be45e4378b2d8bedb9b  /tmp/b103-e5-4-code/tree/s19_app/tui/services/label_match.py
+24564b32d53f142b85fb33825aed3c30a116fbaaf4808be45e4378b2d8bedb9b  /home/javiergr/work/b103-int4/s19_app/tui/services/label_match.py
+# ===== probe.log =====
+s19_app.__file__ = /tmp/b103-e5-4-code/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5-4-code/tree/s19_app/tui/services/label_match.py
+python 3.11.18
+SWA names: 13990
+
+== Part A: rank() vs the rows oracle == load 0.12 0.23 0.34
+checks 9600 mismatches 0
+long-token checks 24 mismatches 0
+
+== Part B: _prefix_distance vs full OSA == load 0.55 0.33 0.37
+pairs 20000 mismatches 0
+
+== Part C: cost ==
+bounded-variant equivalence: 20000 pairs, mismatches 0
+_prefix_distance(len 3, len 5, cap 1): current 0.004 ms, bounded 0.004 ms
+_prefix_distance(len 3, len 1000, cap 1): current 0.233 ms, bounded 0.004 ms
+_prefix_distance(len 256, len 1020, cap 2): current 1.035 ms, bounded 0.474 ms
+_prefix_distance(len 129, len 1020, cap 2): current 0.638 ms, bounded 0.214 ms
+Q64 len 255 Q16 len 63 QDUP len 255
+build DIST 2.01 s
+build LONG 1.83 s
+DIST Q16 before: load 0.59 0.34 0.38
+  DIST Q16: 20 entries (['fuzzy']), current median 61.9 ms, bounded median 61.9 ms, same list: True; after: load 0.59 0.34 0.38
+DIST Q64 before: load 0.59 0.34 0.38
+  DIST Q64: 20 entries (['fuzzy']), current median 267.4 ms, bounded median 265.6 ms, same list: True; after: load 0.70 0.37 0.39
+LONG QDUP before: load 0.70 0.37 0.39
+  LONG QDUP: 20 entries (['fuzzy', 'token']), current median 10.7 ms, bounded median 10.8 ms, same list: True; after: load 0.70 0.37 0.39
+LONG Q64 before: load 0.70 0.37 0.39
+  LONG Q64: 20 entries (['fuzzy']), current median 243.3 ms, bounded median 239.9 ms, same list: True; after: load 0.70 0.37 0.39
+done
+# ===== end =====
+# sha256 local copy of script:
+1a70871d172ddb649281668e2d6a252f95394364515fc8ebdbb503eb494583e2 */c/Users/jjgh8/Github/s19_app-b103-inc4-code/.dev-flow/2026-11-05-batch-103/inc-4/evidence-e5/code-review-probe.py

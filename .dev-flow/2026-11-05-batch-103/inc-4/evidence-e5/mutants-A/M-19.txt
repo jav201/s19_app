@@ -1,0 +1,33 @@
+=== DIFF base -> M-19 (s19_app/tui/services/label_match.py) ===
+diff --git a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py b/M-19/s19_app/tui/services/label_match.py
+index d274de0..4c79c7d 100644
+--- a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py
++++ b/M-19/s19_app/tui/services/label_match.py
+@@ -262,8 +262,6 @@ def rank(query: str, index: LabelIndex, limit: int) -> list[LabelMatch]:
+         raise TypeError(f"query must be str, got {type(query).__name__}")
+     if not isinstance(limit, int) or isinstance(limit, bool):
+         raise TypeError(f"limit must be int, got {type(limit).__name__}")
+-    if limit < 1:
+-        return []
+     raw = query.strip(_WHITESPACE)
+     if len(raw) > 256:
+         return []
+@@ -388,9 +386,7 @@ def rank(query: str, index: LabelIndex, limit: int) -> list[LabelMatch]:
+                     spans=spans,
+                 )
+             )
+-            if len(result) >= limit:
+-                return result
+-    return result
++    return result[:limit]
+ 
+ 
+ def _fuzzy_tier(
+
+=== PYTEST (tail) ===
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+/tmp/b103-e5-4-mutA/M-19/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.19/2: query 'VALUE' limit -1
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.19/2]
+1 failed, 1 passed, 127 deselected in 5.21s
