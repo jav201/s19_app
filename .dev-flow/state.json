@@ -262,9 +262,15 @@
       "station": "P5",
       "date": "2026-11-07",
       "decision": "P6 docs: 06-docs/ written (traceability matrix, executive summary, functionality, diagrams); the batch is ready for /dev-flow-sync."
+    },
+    {
+      "station": "P6",
+      "date": "2026-11-07",
+      "decision": "synced-to-obsidian",
+      "notes": "vault:s19_app/dev-flow-batches/2026-11-01-batch-101/ (449 files + 2026-11-01-batch-101-README.md; repo-home artifacts not copied)"
     }
   ],
-  "obsidian_synced": false,
+  "obsidian_synced": true,
   "created_at": "2026-11-01T22:48:29.039153",
   "owner": "C:/Users/jjgh8/Github/s19_app",
   "base_ref": "7717394b5828fff345ac53fe2455a30417b6f102"
