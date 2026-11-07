@@ -1,0 +1,83 @@
+# Mutant M18 — batch-end re-run on the final tree (b982846)
+BASE_COMMIT=b982846ce33ccc20b1774f91b1091af4b42dff73
+BASE_TREE=detached worktree at 7d641d9 + git diff --binary 7d641d9 b982846 -- s19_app tests docs README.md AT-TC-REGISTRY.jsonl applied
+s19_app.__file__=<HOME>/work/s19_i5rm_m18/s19_app/__init__.py
+mutation: R-CHKED-041.3/6 symbol range mismatch falls back to the address rule (A-6)
+mutation diff:
+diff --git a<HOME>/work/s19_i5rm/s19_app/tui/screens_directionb.py b<HOME>/work/s19_i5rm_m18/s19_app/tui/screens_directionb.py
+index b05226d..96e72b3 100644
+--- a<HOME>/work/s19_i5rm/s19_app/tui/screens_directionb.py
++++ b<HOME>/work/s19_i5rm_m18/s19_app/tui/screens_directionb.py
+@@ -7407,7 +7407,6 @@ class CheckEditorPanel(ScrollableContainer):
+         if isinstance(symbol, str) and symbol and symbol in self._param_rows:
+             if self._param_rows[symbol][:2] == (address, size) and symbol not in taken:
+                 return symbol
+-            return None
+         names = by_key.get((address, size), [])
+         if len(names) == 1 and names[0] not in taken:
+             return names[0]
+verify:
+grep s19_app/tui/screens_directionb.py: replaced -> 'names = by_key.get((address, size), [])' FOUND
+guard nodes (1):
+  tests/test_b101_check_spec_keep.py::test_r_chked_041_3_6_symbol_range_mismatch_memory_row
+
+--- pytest ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________ test_r_chked_041_3_6_symbol_range_mismatch_memory_row _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-537/test_r_chked_041_3_6_symbol_ra0')
+facts = Facts(case=PosixPath('/tmp/pytest-of-<user>/pytest-537/b101_inc5_case080'), image={0: 108, 1: 49, 2: 57, 3: 84, 4: 79...ram(name='VALUE_0002', address=20, size=2), v3=Param(name='VALUE_0003', address=40, size=4), serial=12587004, moved=32)
+
+    def test_r_chked_041_3_6_symbol_range_mismatch_memory_row(tmp_path: Path, facts: Facts) -> None:
+        """Case R-CHKED-041.3/6 (partial: Inc 4's reader drops such an entry when
+        the tag carries a length, so the item goes through the panel seam): a
+        ledger of ``ALPHA`` (``0x14``, 2 bytes) and ``GAMMA`` (``0x14``, 1 byte)
+        set through ``set_a2l_parameters``; one spec-load item ``{address 0x14,
+        size 1, expected (0xA0,), symbol "ALPHA"}`` handed to ``load_spec`` -> 0
+        included (neither ``ALPHA`` nor ``GAMMA``), 1 memory row ``0x00000014``,
+        Label ``—``, Fmt ``u8``. Control in the same session: an item of size 2
+        with symbol ``ALPHA`` includes ``ALPHA``.
+    
+        Negative control: a symbol naming a listed parameter at another range
+        falling back to the address rule -> ``GAMMA`` included -> RED; no
+        resolution at all (the base) -> the control item includes nothing -> RED."""
+        rows_in = [
+            {"name": "ALPHA", "address": 0x14, "byte_size": 2},
+            {"name": "GAMMA", "address": 0x14, "byte_size": 1},
+        ]
+    
+        async def scenario(app, pilot, log):
+            await open_session(pilot, app, facts, image=False, a2l=False)
+            panel = editor(app)
+            panel.set_a2l_parameters(rows_in)
+            await wait_until(
+                pilot, lambda: len(panel._visible_params) == 2, "timed out waiting for the ledger"
+            )
+            panel.load_spec(
+                [{"address": 0x14, "size": 1, "expected": (0xA0,), "symbol": "ALPHA"}],
+                "mismatch.chk.json",
+            )
+            await wait_until(
+                pilot, lambda: head(app).startswith("1 field:"), "timed out waiting for the seam load"
+            )
+            first = (included(app), mem_rows(app))
+            panel.load_spec(
+                [{"address": 0x14, "size": 2, "expected": (0xA0, 0xBE), "symbol": "ALPHA"}],
+                "exact.chk.json",
+            )
+            await settle(pilot, 4)  # load_spec is synchronous; let the repaint flush
+            return first, included(app)
+    
+        (picks, rows), control = run(tmp_path, scenario)
+>       assert picks == [], picks
+E       AssertionError: ['GAMMA']
+E       assert ['GAMMA'] == []
+E         
+E         Left contains one more item: 'GAMMA'
+E         Use -v to get more diff
+
+tests/test_b101_check_spec_keep.py:953: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_041_3_6_symbol_range_mismatch_memory_row
+1 failed in 4.03s

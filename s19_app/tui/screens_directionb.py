@@ -7710,8 +7710,8 @@ class CheckEditorPanel(ScrollableContainer):
 
         Every row below the two columns is one terminal row; the ledger is
         the panel's growing region (design §3, Check Editor tree). The shipped
-        ids are all kept (LLR-145.1); ``#check_preview_toggle_button`` stays
-        mounted and hidden, its function carried by the Addendum tab chip.
+        ids are kept (LLR-145.1), except the hidden addendum toggle, which
+        batch-101 Inc 12 removed (R-CHKED-058).
         """
         with Horizontal(id="check_columns"):
             with Vertical(id="check_left_column") as left:
@@ -7825,13 +7825,6 @@ class CheckEditorPanel(ScrollableContainer):
                 )
             with Horizontal(id="check_actions_row2", classes="patch-docked-row"):
                 yield Static("", id="check_fields_count", markup=False)
-                toggle = Button(
-                    "Addendum preview",
-                    id="check_preview_toggle_button",
-                    classes="patch-chip",
-                )
-                toggle.display = False
-                yield toggle
             yield Static(
                 Text(self._APPLY_HINT, style=DGRAY),
                 id="check_apply_hint",
@@ -7936,10 +7929,6 @@ class CheckEditorPanel(ScrollableContainer):
             self._memory_rows.pop(cursor)
             self._rebuild_memory_table()
             self._refresh_preview()
-            return
-        if button_id == "check_preview_toggle_button":
-            event.stop()
-            self._show_tab("check_tab_addendum")
             return
         actions = {
             "check_write_button": "write_doc",

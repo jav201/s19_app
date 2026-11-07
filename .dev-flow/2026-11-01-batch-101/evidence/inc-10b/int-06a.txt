@@ -1,0 +1,20 @@
+=== Inc 10b E4 integration: int-06a — M-D (the notice calls refresh_window) on the tester node as delivered
+
+=== mutant M-D (2026-11-07T09:07:32Z)
+copy: <HOME>/work/s19_i10bint_mut (cp -a of the clone); base (HEAD = main): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+index tree (the integrated tree before the mutant): 5a4fdd38bec27eda2213ae4b7cafc07402bd4e14
+test file blob: f08184ad4b359ecc4507642c1f780ae075337c68
+M-D: 1 edit(s) applied to s19_app/tui/segment_split_view.py
+mutated files vs index:
+   s19_app/tui/segment_split_view.py | 2 +-
+   1 file changed, 1 insertion(+), 1 deletion(-)
+  -            self._bump()
+  +            self.refresh_window()  # MUTANT M-D
+s19_app.__file__ = <HOME>/work/s19_i10bint_mut/s19_app/__init__.py
+CMD: env -u NO_COLOR PYTHONPATH=<copy> timeout 1200 python -m pytest -q -p no:cacheprovider -n 6 --dist load -m 'not serial_timing' -rfs --tb=line tests/test_b101_inplace_views.py -k 'prev_22'
+bringing up nodes...
+bringing up nodes...
+
+.                                                                        [100%]
+1 passed in 15.21s
+exit: 0

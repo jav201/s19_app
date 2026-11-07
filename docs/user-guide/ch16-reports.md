@@ -57,4 +57,5 @@ list here.
 | Filter dropdown / path | select / type | 16.1 |
 | Context bytes | type | 16.1 |
 | Generate new report | button | 16.2 |
-| Open reports/, `?`, Close | chips, button | 16.1 |
+| Open reports/, `?` | chips | 16.1 |
+| Close | button / `esc` | 16.1 |

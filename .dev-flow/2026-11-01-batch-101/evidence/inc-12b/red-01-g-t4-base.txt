@@ -1,0 +1,439 @@
+$ git status --short   (only the test file copied in)
+?? tests/test_b101_flow_shown_widgets.py
+$ git rev-parse HEAD   (LAN Linux host, detached worktree at origin/main)
+2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+$ python -c "import s19_app; print(s19_app.__file__)"
+<HOME>/work/s19_i12t4/s19_app/__init__.py
+
+$ env -u NO_COLOR python -m pytest -q -p no:cacheprovider -rfs tests/test_b101_flow_shown_widgets.py -n 4 --dist loadfile
+bringing up nodes...
+bringing up nodes...
+
+FFF.                                                                     [100%]
+=================================== FAILURES ===================================
+______ test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state _______
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user><USER>/pytest-403/popen-gw0/test_r_tui_059_25_1_every_flow0')
+
+    def test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state(tmp_path: Path) -> None:
+        """R-TUI-059.25 (case /1): walk [opened; each of the 7 kind chips pressed;
+        Variables opened and closed; the Add notice (LOAD, empty image file, Add);
+        3 x (prg.s19, Add)] -> 0 ids never shown, at least 45 ids in the
+        population.
+    
+        RED on base: five widgets (the help sentence, the grid canvas, the
+        numbered list, the kind dropdown and the session line) are mounted and
+        never shown; the failure message lists their ids.
+        """
+    
+        async def body(app, pilot, project_dir):
+            panel = await open_flow_builder(app, pilot)
+            walk = _Walk(panel)
+            await settled(pilot, lambda: _tag(app, panel) != "", "the kind tag is painted")
+            walk.collect("opened")
+    
+            for kind, tag in KIND_TAGS:
+                await _press_kind_chip(app, pilot, panel, kind, tag)
+                walk.collect(f"chip {kind}")
+    
+            toggle = panel.query_one("#flow_funnel_toggle", Button)
+            toggle.press()
+            await settled(pilot, lambda: is_displayed(panel.query_one("#flow_funnel_editor")), "Variables open")
+            walk.collect("variables open")
+            toggle.press()
+            await settled(pilot, lambda: not is_displayed(panel.query_one("#flow_funnel_editor")), "Variables closed")
+            walk.collect("variables closed")
+    
+            await _press_kind_chip(app, pilot, panel, BLOCK_SOURCE, "◉ LOAD")
+            assert panel.query_one("#flow_ref", Input).value == ""
+            panel.query_one("#flow_add", Button).press()
+            notice = panel.query_one("#flow_wiring_notice")
+            await settled(
+                pilot,
+                lambda: is_displayed(notice) and "Add needs" in _painted(app, notice),
+                "the Add notice is shown",
+            )
+            walk.collect("add notice")
+    
+            for count in (1, 2, 3):
+                panel.query_one("#flow_ref", Input).value = "prg.s19"
+                panel.query_one("#flow_add", Button).press()
+                title = f"chain · {count} block" + ("" if count == 1 else "s")
+                await settled(pilot, lambda: _chain_title(panel) == title, f"the chain reads {title}")
+                walk.collect(f"{count} LOAD block(s)")
+            assert _painted(app, panel.query_one("#flow_pipeline")).count("◉ LOAD") == 3
+    
+            return len(walk.population), walk.never_shown(), walk.states
+    
+        size, never, states = _drive(tmp_path, body)
+        assert size >= 45, (size, states)
+>       assert never == [], f"mounted and never shown: {never}"
+E       AssertionError: mounted and never shown: ['flow_blocks', 'flow_canvas', 'flow_ext_session', 'flow_help', 'flow_kind']
+E       assert ['flow_blocks..., 'flow_kind'] == []
+E         
+E         Left contains 5 more items, first extra item: 'flow_blocks'
+E         Use -v to get more diff
+
+tests/test_b101_flow_shown_widgets.py:191: AssertionError
+______ test_r_fx_scr_4_1_every_flow_execution_widget_is_shown_in_a_state _______
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user><USER>/pytest-403/popen-gw0/test_r_fx_scr_4_1_every_flow_e0')
+
+    def test_r_fx_scr_4_1_every_flow_execution_widget_is_shown_in_a_state(tmp_path: Path) -> None:
+        """R-FX-SCR.4 (case /1): walk [Flow Execution shown, no lane;
+        ``flash_chain`` imported; Run, until ``#fx_required`` is shown; set name
+        ``s``, Save Set, until ``#fx_notice`` is shown] -> 0 ids never shown, at
+        least 30 ids in the population (the lane widgets mount on the import).
+    
+        RED on base: the help sentence is mounted and never shown; the failure
+        message lists its id.
+        """
+    
+        async def body(app, pilot, project_dir):
+            panel = await open_flow_execution(app, pilot)
+            walk = _Walk(panel)
+            await settled(pilot, lambda: panel.lane_count() == 0, "no lane yet")
+            walk.collect("no lane")
+    
+            await import_flow(app, pilot, "flash_chain")
+            await settled(pilot, lambda: panel.lane_count() == 1, "flash_chain is imported as a lane")
+            await settled(
+                pilot,
+                lambda: app.query_one("#fx_lane_0").region.width > 0,
+                "the lane is laid out",
+            )
+            walk.collect("flash_chain imported")
+    
+            panel.query_one("#fx_run", Button).press()
+            await settled(
+                pilot,
+                lambda: is_displayed(panel.query_one("#fx_required")),
+                "the run waits at the external step: required line shown",
+            )
+            walk.collect("run waiting")
+    
+            panel.query_one("#fx_set_name", Input).value = "s"
+            set_file = project_dir / "flowsets" / "s.json"
+            panel.query_one("#fx_save", Button).press()
+            await settled(pilot, set_file.exists, "the set file s.json is on disk")
+            await settled(
+                pilot,
+                lambda: is_displayed(panel.query_one("#fx_notice")),
+                "the set notice is shown",
+            )
+            walk.collect("set saved")
+    
+            return len(walk.population), walk.never_shown(), walk.states
+    
+        size, never, states = _drive(tmp_path, body)
+        assert size >= 30, (size, states)
+>       assert never == [], f"mounted and never shown: {never}"
+E       AssertionError: mounted and never shown: ['fx_help']
+E       assert ['fx_help'] == []
+E         
+E         Left contains one more item: 'fx_help'
+E         Use -v to get more diff
+
+tests/test_b101_flow_shown_widgets.py:247: AssertionError
+___________ test_r_fb_add_1_2_a_press_naming_no_kind_changes_nothing ___________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+    async def _run():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=SIZE) as pilot:
+            await settle(pilot)
+            project_dir = await fx_project(app)
+>           return await body(app, pilot, project_dir)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b101_flow_shown_widgets.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_flow_shown_widgets.py:293: in body
+    "tag": _tag(app, panel),
+           ^^^^^^^^^^^^^^^^
+tests/test_b101_flow_shown_widgets.py:118: in _tag
+    return _painted(app, panel.query_one(".flow-kind-tag")).strip()
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = FlowBuilderPanel(id='flow_panel'), selector = '.flow-kind-tag'
+expect_type = None
+
+    def query_one(
+        self,
+        selector: str | type[QueryType],
+        expect_type: type[QueryType] | None = None,
+    ) -> QueryType | Widget:
+        """Get a widget from this widget's children that matches a selector or widget type.
+    
+        Args:
+            selector: A selector or widget type.
+            expect_type: Require the object be of the supplied type, or None for any type.
+    
+        Raises:
+            WrongType: If the wrong type was found.
+            NoMatches: If no node matches the query.
+    
+        Returns:
+            A widget matching the selector.
+        """
+        _rich_traceback_omit = True
+    
+        base_node = self._get_dom_base()
+    
+        if isinstance(selector, str):
+            query_selector = selector
+        else:
+            query_selector = selector.__name__
+    
+        if is_id_selector(query_selector):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+            if (
+                node := walk_breadth_search_id(
+                    base_node, query_selector[1:], with_root=False
+                )
+            ) is not None:
+                if expect_type is not None and not isinstance(node, expect_type):
+                    raise WrongType(
+                        f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                    )
+                base_node._query_one_cache[cache_key] = node
+                return node
+            raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+    
+        try:
+            selector_set = parse_selectors(query_selector)
+        except TokenError:
+            raise InvalidQueryFormat(
+                f"Unable to parse {query_selector!r} as a query; check for syntax errors"
+            ) from None
+    
+        if all(selectors.is_simple for selectors in selector_set):
+            cache_key = (base_node._nodes._updates, query_selector, expect_type)
+            cached_result = base_node._query_one_cache.get(cache_key)
+            if cached_result is not None:
+                return cached_result
+        else:
+            cache_key = None
+    
+        for node in walk_breadth_first(base_node, with_root=False):
+            if not match(selector_set, node):
+                continue
+            if expect_type is not None and not isinstance(node, expect_type):
+                raise WrongType(
+                    f"Node matching {query_selector!r} is the wrong type; expected type {expect_type.__name__!r}, found {node}"
+                )
+            if cache_key is not None:
+                base_node._query_one_cache[cache_key] = node
+            return node
+    
+>       raise NoMatches(f"No nodes match {query_selector!r} on {base_node!r}")
+E       textual.css.query.NoMatches: No nodes match '.flow-kind-tag' on FlowBuilderPanel(id='flow_panel')
+
+<HOME>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/dom.py:1533: NoMatches
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-<user><USER>/pytest-403/popen-gw0/test_r_fb_add_1_2_a_press_nami0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fdd73dacd50>
+
+    def test_r_fb_add_1_2_a_press_naming_no_kind_changes_nothing(tmp_path: Path, monkeypatch) -> None:
+        """R-FB-ADD.1 (case /2, E3 S-1): with the CHECK chip chosen, a button
+        whose id is ``flow_palette_bogus`` mounted into the palette row and pressed
+        leaves the kind tag at ``CHECK``, the CHECK chip marked (and it alone), the
+        inputs shown unchanged (the gating control among them) and raises nothing;
+        then ``baseline.chk.json`` and Add paint one CHECK card and no notice.
+    
+        RED on base: the hidden kind select refuses the value with
+        ``InvalidSelectValueError`` at the stray press. A mutant that stores the
+        suffix unchecked also fails: the later Add gives ``Add needs ...`` and
+        adds nothing.
+        """
+        seen: list = []
+        original = fs.FlowBuilderPanel.on_button_pressed
+    
+        def spying(self, event):
+            seen.append(event.button.id)
+            return original(self, event)
+    
+        monkeypatch.setattr(fs.FlowBuilderPanel, "on_button_pressed", spying)
+    
+        async def body(app, pilot, project_dir):
+            panel = await open_flow_builder(app, pilot)
+            await _press_kind_chip(app, pilot, panel, BLOCK_CHECK, CHECK_TAG)
+            gating = panel.query_one("#flow_gating")
+            assert is_displayed(gating)
+            before_shown = _shown(panel)
+            before_marked = sorted(c.id for c in panel.query(".chip-selected"))
+            assert before_marked == [f"flow_palette_{BLOCK_CHECK}"], before_marked
+    
+            stray = Button("bogus", id="flow_palette_bogus")
+            await panel.query_one("#flow_palette").mount(stray)
+            await settled(pilot, lambda: stray.region.width > 0, "the stray button is laid out")
+            stray.press()
+            await settled(pilot, lambda: "flow_palette_bogus" in seen, "the stray press reached the panel")
+            await settle(pilot, 4)
+    
+            after = {
+                "tag": _tag(app, panel),
+                "marked": sorted(c.id for c in panel.query(".chip-selected")),
+                "shown": _shown(panel) - {"flow_palette_bogus"},
+                "gating": is_displayed(gating),
+                "notice": is_displayed(panel.query_one("#flow_wiring_notice")),
+            }
+    
+            panel.query_one("#flow_ref", Input).value = "baseline.chk.json"
+            panel.query_one("#flow_add", Button).press()
+            await settled(
+                pilot,
+                lambda: _chain_title(panel) == "chain · 1 block"
+                or is_displayed(panel.query_one("#flow_wiring_notice")),
+                "Add added a block or refused",
+            )
+            await settle(pilot, 2)
+            return (
+                before_shown,
+                before_marked,
+                after,
+                _painted(app, panel.query_one("#flow_pipeline")),
+                _chain_title(panel),
+                _painted(app, panel.query_one("#flow_wiring_notice")) if is_displayed(panel.query_one("#flow_wiring_notice")) else "",
+            )
+    
+>       before_shown, before_marked, after, pipeline, title, notice = _drive(tmp_path, body)
+                                                                      ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b101_flow_shown_widgets.py:318: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_flow_shown_widgets.py:82: in _drive
+    return asyncio.run(_run())
+           ^^^^^^^^^^^^^^^^^^^
+<HOME>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+<HOME>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<HOME>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/test_b101_flow_shown_widgets.py:77: in _run
+    async with app.run_test(size=SIZE) as pilot:
+<HOME>/miniconda3/envs/s19ci/lib/python3.11/contextlib.py:231: in __aexit__
+    await self.gen.athrow(typ, value, traceback)
+<HOME>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py:2218: in run_test
+    raise self._exception
+<HOME>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:663: in _process_messages_loop
+    await self._dispatch_message(message)
+<HOME>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:739: in _dispatch_message
+    await self._on_message(message)
+<HOME>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/message_pump.py:829: in _on_message
+    await invoke(method, message)
+<HOME>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:96: in invoke
+    return await _invoke(callback, *params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<HOME>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/_callback.py:56: in _invoke
+    result = callback(*params[:parameter_count])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_flow_shown_widgets.py:272: in spying
+    return original(self, event)
+           ^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/flow_screens.py:2512: in on_button_pressed
+    self.query_one("#flow_kind", Select).value = kind
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<HOME>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/reactive.py:374: in __set__
+    self._set(obj, value)
+<HOME>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/reactive.py:340: in _set
+    value = private_validate_function(value)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Select(id='flow_kind'), value = 'bogus'
+
+    def _validate_value(
+        self, value: SelectType | NoSelection
+    ) -> SelectType | NoSelection:
+        """Ensure the new value is a valid option.
+    
+        If `allow_blank` is `True`, `None` is also a valid value and corresponds to no
+            selection.
+    
+        Raises:
+            InvalidSelectValueError: If the new value does not correspond to any known
+                value.
+        """
+        if value not in self._legal_values:
+            # It would make sense to use `None` to flag that the Select has no selection,
+            # so we provide a helpful message to catch this mistake in case people didn't
+            # realise we use a special value to flag "no selection".
+            help_text = " Did you mean to use Select.clear()?" if value is None else ""
+>           raise InvalidSelectValueError(
+                f"Illegal select value {value!r}." + help_text
+            )
+E           textual.widgets._select.InvalidSelectValueError: Illegal select value 'bogus'.
+
+<HOME>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/widgets/_select.py:594: InvalidSelectValueError
+----------------------------- Captured stderr call -----------------------------
+╭───────────────────── Traceback (most recent call last) ──────────────────────╮
+│ <HOME>/work/s19_i12t4/tests/test_b101_flow_shown_widgets.py:272 in   │
+│ spying                                                                       │
+│                                                                              │
+│   269 │                                                                      │
+│   270 │   def spying(self, event):                                           │
+│   271 │   │   seen.append(event.button.id)                                   │
+│ ❱ 272 │   │   return original(self, event)                                   │
+│   273 │                                                                      │
+│   274 │   monkeypatch.setattr(fs.FlowBuilderPanel, "on_button_pressed", spyi │
+│   275                                                                        │
+│                                                                              │
+│ ╭─────────────────────── locals ───────────────────────╮                     │
+│ │ event = Pressed()                                    │                     │
+│ │  seen = ['flow_palette_check', 'flow_palette_bogus'] │                     │
+│ │  self = FlowBuilderPanel(id='flow_panel')            │                     │
+│ ╰──────────────────────────────────────────────────────╯                     │
+│                                                                              │
+│ <HOME>/work/s19_i12t4/s19_app/tui/flow_screens.py:2512 in            │
+│ on_button_pressed                                                            │
+│                                                                              │
+│   2509 │   │   │   "flow_palette_"                                           │
+│   2510 │   │   ):                                                            │
+│   2511 │   │   │   kind = event.button.id.removeprefix("flow_palette_")      │
+│ ❱ 2512 │   │   │   self.query_one("#flow_kind", Select).value = kind         │
+│   2513 │   │   │   self._sync_kind_dependent_visibility(kind)                │
+│   2514 │   │   │   # A notice about the previous kind no longer applies (ux  │
+│   2515 │   │   │   self._show_wiring_notice("")                              │
+│                                                                              │
+│ ╭───────────────── locals ──────────────────╮                                │
+│ │ event = Pressed()                         │                                │
+│ │  kind = 'bogus'                           │                                │
+│ │  self = FlowBuilderPanel(id='flow_panel') │                                │
+│ ╰───────────────────────────────────────────╯                                │
+│                                                                              │
+│ <HOME>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/wi │
+│ dgets/_select.py:594 in _validate_value                                      │
+│                                                                              │
+│   591 │   │   │   # so we provide a helpful message to catch this mistake in │
+│   592 │   │   │   # realise we use a special value to flag "no selection".   │
+│   593 │   │   │   help_text = " Did you mean to use Select.clear()?" if valu │
+│ ❱ 594 │   │   │   raise InvalidSelectValueError(                             │
+│   595 │   │   │   │   f"Illegal select value {value!r}." + help_text         │
+│   596 │   │   │   )                                                          │
+│   597                                                                        │
+│                                                                              │
+│ ╭────────────── locals ──────────────╮                                       │
+│ │ help_text = ''                     │                                       │
+│ │      self = Select(id='flow_kind') │                                       │
+│ │     value = 'bogus'                │                                       │
+│ ╰────────────────────────────────────╯                                       │
+╰──────────────────────────────────────────────────────────────────────────────╯
+InvalidSelectValueError: Illegal select value 'bogus'.
+=========================== short test summary info ============================
+FAILED tests/test_b101_flow_shown_widgets.py::test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state
+FAILED tests/test_b101_flow_shown_widgets.py::test_r_fx_scr_4_1_every_flow_execution_widget_is_shown_in_a_state
+FAILED tests/test_b101_flow_shown_widgets.py::test_r_fb_add_1_2_a_press_naming_no_kind_changes_nothing
+3 failed, 1 passed in 32.13s

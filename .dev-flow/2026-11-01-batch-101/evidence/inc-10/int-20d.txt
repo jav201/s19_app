@@ -1,0 +1,13 @@
+=== Note (int-20d): the first edit of the F module dropped the run(tmp_path, scenario) line of test_r_shell_focus_2_7 (it moved below the new node), so /2/7 ran no scenario and passed in 0.86 s on the RED tree f716da44 (the pre-fix test file). Found by the first RED run; fixed before int-20 was re-run (§7.3 I-D27). Kept as the record of the vacuous node.
+=== Inc 10a E4 round-2 run: int-20d-1
+date: 2026-11-07T04:32:37Z
+checkout HEAD (base): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+main ref in this checkout: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+index tree with the increment staged: f716da44f3c3aec6b868cfd57feec122a5fdf8ff
+staged files vs base: 10
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10r6_red/s19_app/__init__.py
+CMD: env -u NO_COLOR /data/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -p no:xdist -rfs tests/test_b101_unload_focus.py::test_r_shell_focus_2_7_the_later_of_two_rail_keys_wins
+.                                                                        [100%]
+1 passed in 0.86s
+=== exit code: 0

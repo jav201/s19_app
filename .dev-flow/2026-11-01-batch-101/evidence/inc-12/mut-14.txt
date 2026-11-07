@@ -1,0 +1,803 @@
+base commit: 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+mutant: M14
+
+mutation:
+==== diff -u s19_app/tui/screens.py ====
+--- <HOME>/work/s19_i12mut/s19_app/tui/screens.py	2026-11-07 05:38:44.571238593 -0600
++++ <HOME>/work/s19_i12mut_m14/s19_app/tui/screens.py	2026-11-07 06:04:13.796940666 -0600
+@@ -3092,6 +3092,7 @@
+ 
+     def action_close_reports(self) -> None:
+         logger.info("ReportViewerScreen dismissed by Esc.")
++        self.app.screen_stack[0].set_focus(None)
+         self.dismiss(None)
+ 
+     class GenerateRequested(Message):
+
+
+s19_app.__file__: <HOME>/work/s19_i12mut_m14/s19_app/__init__.py
+
+--- landed grep M14: 's19_app/tui/screens.py' marker='set_focus(None)' expected=present found=present OK=True ---
+3095:        self.app.screen_stack[0].set_focus(None)
+
+
+nodes (12):
+  tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_1_escape_on_the_report_list_closes_reports
+  tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_2_escape_on_the_report_view_closes_reports
+  tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_3_escape_in_the_regions_box_closes_and_keeps_nothing
+  tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_4_escape_on_the_closed_dropdown_closes_reports
+  tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_5_escape_in_the_filter_path_box_applies_nothing
+  tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_6_escape_in_the_context_box_closes_reports
+  tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_7_escape_on_generate_writes_no_report
+  tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_8_escape_on_close_closes_reports
+  tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_9_escape_on_the_folder_chip_opens_no_folder
+  tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_10_escape_on_the_help_chip_opens_no_help
+  tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_11_escape_closes_the_empty_reports_dialog
+  tests/test_b101_reach_and_reports_escape.py::test_at_i12_1_escape_closes_reports_from_list_box_and_dropdown
+
+
+--- pytest ---
+FFFFFFFFFFFF                                                             [100%]
+=================================== FAILURES ===================================
+___________ test_r_dlg_2_1_escape_on_the_report_list_closes_reports ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-892/test_r_dlg_2_1_escape_on_the_r0')
+
+    def test_r_dlg_2_1_escape_on_the_report_list_closes_reports(tmp_path: Path) -> None:
+        """R-DLG.2/1: Escape on the report list closes the dialog, writes nothing, leaves
+        the status line and gives the focus and the window back as before ``t``; one
+        Close press in place of Escape gives the same (the reference)."""
+    
+        async def scenario(app, pilot) -> None:
+            project = await _reports_project(app, pilot)
+            known = _known(app)
+            await _open_reports(app, pilot)
+            status = list(app.log_lines)
+            assert app.focused is app.screen.query_one("#report_list")
+            await _escape_closes(app, pilot, known, project, status, "escape on the list")
+            # the reference: one Close press from the same place
+            await _open_reports(app, pilot)
+            app.screen.query_one("#report_close").press()
+            await _await_closed(app, pilot, "the Close button")
+            assert (app.focused, app._active_screen_key) == known
+    
+>       _run(tmp_path, scenario)
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:701: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:680: in _run
+    asyncio.run(_go())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:678: in _go
+    await scenario(app, pilot)
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:694: in scenario
+    await _escape_closes(app, pilot, known, project, status, "escape on the list")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+known = (ListView(id='files_list'), 'workspace')
+project = PosixPath('/tmp/pytest-of-<user>/pytest-892/test_r_dlg_2_1_escape_on_the_r0/.s19tool/workarea/proj1')
+before_status = ['Loaded prg.s19 (S19 only)', "Loaded project 'proj1' -> prg.s19 - variant 1 of 1, 1 problem - details: p"]
+what = 'escape on the list'
+
+    async def _escape_closes(app, pilot, known: tuple, project: Path, before_status: List[str], what: str) -> None:
+        await pilot.press("escape")
+        await _await_closed(app, pilot, what)
+        assert _report_files(project) == [
+            "20261106T100000Z-report.md", "20261106T110000Z-report.md",
+        ], _report_files(project)
+        assert list(app.log_lines) == before_status, list(app.log_lines)
+>       assert (app.focused, app._active_screen_key) == known
+E       AssertionError: assert (OsClipboardI..., 'workspace') == (ListView(id=..., 'workspace')
+E         
+E         At index 0 diff: OsClipboardInput(id='palette_input') != ListView(id='files_list')
+E         Use -v to get more diff
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:670: AssertionError
+___________ test_r_dlg_2_2_escape_on_the_report_view_closes_reports ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-892/test_r_dlg_2_2_escape_on_the_r0')
+
+    def test_r_dlg_2_2_escape_on_the_report_view_closes_reports(tmp_path: Path) -> None:
+        """R-DLG.2/2: Escape on the rendered report view closes the dialog; 2 files."""
+    
+        async def scenario(app, pilot) -> None:
+            project = await _reports_project(app, pilot)
+            known = _known(app)
+            screen = await _open_reports(app, pilot)
+            await pilot.press("enter")
+            await settled(pilot, lambda: screen.selected_path is not None, "a report rendered", timeout=CLOSE_WAIT_S)
+            await _focus(app, pilot, "report_markdown_scroll")
+            await _escape_closes(app, pilot, known, project, list(app.log_lines), "escape on the report view")
+    
+>       _run(tmp_path, scenario)
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:716: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:680: in _run
+    asyncio.run(_go())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:678: in _go
+    await scenario(app, pilot)
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:714: in scenario
+    await _escape_closes(app, pilot, known, project, list(app.log_lines), "escape on the report view")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+known = (ListView(id='files_list'), 'workspace')
+project = PosixPath('/tmp/pytest-of-<user>/pytest-892/test_r_dlg_2_2_escape_on_the_r0/.s19tool/workarea/proj1')
+before_status = ['Loaded prg.s19 (S19 only)', "Loaded project 'proj1' -> prg.s19 - variant 1 of 1, 1 problem - details: p"]
+what = 'escape on the report view'
+
+    async def _escape_closes(app, pilot, known: tuple, project: Path, before_status: List[str], what: str) -> None:
+        await pilot.press("escape")
+        await _await_closed(app, pilot, what)
+        assert _report_files(project) == [
+            "20261106T100000Z-report.md", "20261106T110000Z-report.md",
+        ], _report_files(project)
+        assert list(app.log_lines) == before_status, list(app.log_lines)
+>       assert (app.focused, app._active_screen_key) == known
+E       AssertionError: assert (OsClipboardI..., 'workspace') == (ListView(id=..., 'workspace')
+E         
+E         At index 0 diff: OsClipboardInput(id='palette_input') != ListView(id='files_list')
+E         Use -v to get more diff
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:670: AssertionError
+______ test_r_dlg_2_3_escape_in_the_regions_box_closes_and_keeps_nothing _______
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-892/test_r_dlg_2_3_escape_in_the_r0')
+
+    def test_r_dlg_2_3_escape_in_the_regions_box_closes_and_keeps_nothing(tmp_path: Path) -> None:
+        """R-DLG.2/3: Escape in the declared-regions box with typed text closes the
+        dialog; reopened, the box holds the project's regions (none: empty), not ``x``."""
+    
+        async def scenario(app, pilot) -> None:
+            project = await _reports_project(app, pilot)
+            known = _known(app)
+            await _open_reports(app, pilot)
+            box = await _focus(app, pilot, "report_declared_regions")
+            await pilot.press("x")
+            await settle(pilot)
+            assert box.text == "x", box.text
+            await _escape_closes(app, pilot, known, project, list(app.log_lines), "escape in the regions box")
+            screen = await _open_reports(app, pilot)
+            assert screen.query_one("#report_declared_regions").text == ""
+    
+>       _run(tmp_path, scenario)
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:735: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:680: in _run
+    asyncio.run(_go())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:678: in _go
+    await scenario(app, pilot)
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:731: in scenario
+    await _escape_closes(app, pilot, known, project, list(app.log_lines), "escape in the regions box")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+known = (ListView(id='files_list'), 'workspace')
+project = PosixPath('/tmp/pytest-of-<user>/pytest-892/test_r_dlg_2_3_escape_in_the_r0/.s19tool/workarea/proj1')
+before_status = ['Loaded prg.s19 (S19 only)', "Loaded project 'proj1' -> prg.s19 - variant 1 of 1, 1 problem - details: p"]
+what = 'escape in the regions box'
+
+    async def _escape_closes(app, pilot, known: tuple, project: Path, before_status: List[str], what: str) -> None:
+        await pilot.press("escape")
+        await _await_closed(app, pilot, what)
+        assert _report_files(project) == [
+            "20261106T100000Z-report.md", "20261106T110000Z-report.md",
+        ], _report_files(project)
+        assert list(app.log_lines) == before_status, list(app.log_lines)
+>       assert (app.focused, app._active_screen_key) == known
+E       AssertionError: assert (OsClipboardI..., 'workspace') == (ListView(id=..., 'workspace')
+E         
+E         At index 0 diff: OsClipboardInput(id='palette_input') != ListView(id='files_list')
+E         Use -v to get more diff
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:670: AssertionError
+_________ test_r_dlg_2_4_escape_on_the_closed_dropdown_closes_reports __________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-892/test_r_dlg_2_4_escape_on_the_c0')
+
+    def test_r_dlg_2_4_escape_on_the_closed_dropdown_closes_reports(tmp_path: Path) -> None:
+        """R-DLG.2/4: Escape on the closed filter dropdown closes the dialog."""
+    
+        async def scenario(app, pilot) -> None:
+            project = await _reports_project(app, pilot)
+            known = _known(app)
+            await _open_reports(app, pilot)
+            select = await _focus(app, pilot, "report_filter_select")
+            assert select.expanded is False
+            await _escape_closes(app, pilot, known, project, list(app.log_lines), "escape on the closed dropdown")
+    
+>       _run(tmp_path, scenario)
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:749: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:680: in _run
+    asyncio.run(_go())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:678: in _go
+    await scenario(app, pilot)
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:747: in scenario
+    await _escape_closes(app, pilot, known, project, list(app.log_lines), "escape on the closed dropdown")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+known = (ListView(id='files_list'), 'workspace')
+project = PosixPath('/tmp/pytest-of-<user>/pytest-892/test_r_dlg_2_4_escape_on_the_c0/.s19tool/workarea/proj1')
+before_status = ['Loaded prg.s19 (S19 only)', "Loaded project 'proj1' -> prg.s19 - variant 1 of 1, 1 problem - details: p"]
+what = 'escape on the closed dropdown'
+
+    async def _escape_closes(app, pilot, known: tuple, project: Path, before_status: List[str], what: str) -> None:
+        await pilot.press("escape")
+        await _await_closed(app, pilot, what)
+        assert _report_files(project) == [
+            "20261106T100000Z-report.md", "20261106T110000Z-report.md",
+        ], _report_files(project)
+        assert list(app.log_lines) == before_status, list(app.log_lines)
+>       assert (app.focused, app._active_screen_key) == known
+E       AssertionError: assert (OsClipboardI..., 'workspace') == (ListView(id=..., 'workspace')
+E         
+E         At index 0 diff: OsClipboardInput(id='palette_input') != ListView(id='files_list')
+E         Use -v to get more diff
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:670: AssertionError
+_________ test_r_dlg_2_5_escape_in_the_filter_path_box_applies_nothing _________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-892/test_r_dlg_2_5_escape_in_the_f0')
+
+    def test_r_dlg_2_5_escape_in_the_filter_path_box_applies_nothing(tmp_path: Path) -> None:
+        """R-DLG.2/5: Escape in the filter path box with ``abc`` typed and not submitted
+        closes the dialog; reopened, the path box is empty and the dropdown blank."""
+    
+        async def scenario(app, pilot) -> None:
+            project = await _reports_project(app, pilot)
+            known = _known(app)
+            await _open_reports(app, pilot)
+            box = await _focus(app, pilot, "report_filter_path")
+            await pilot.press("a", "b", "c")
+            await settle(pilot)
+            assert box.value == "abc", box.value
+            await _escape_closes(app, pilot, known, project, list(app.log_lines), "escape in the path box")
+            screen = await _open_reports(app, pilot)
+            assert screen.query_one("#report_filter_path").value == ""
+            assert screen.query_one("#report_filter_select", Select).value is Select.NULL
+    
+>       _run(tmp_path, scenario)
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:769: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:680: in _run
+    asyncio.run(_go())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:678: in _go
+    await scenario(app, pilot)
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:764: in scenario
+    await _escape_closes(app, pilot, known, project, list(app.log_lines), "escape in the path box")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+known = (ListView(id='files_list'), 'workspace')
+project = PosixPath('/tmp/pytest-of-<user>/pytest-892/test_r_dlg_2_5_escape_in_the_f0/.s19tool/workarea/proj1')
+before_status = ['Loaded prg.s19 (S19 only)', "Loaded project 'proj1' -> prg.s19 - variant 1 of 1, 1 problem - details: p"]
+what = 'escape in the path box'
+
+    async def _escape_closes(app, pilot, known: tuple, project: Path, before_status: List[str], what: str) -> None:
+        await pilot.press("escape")
+        await _await_closed(app, pilot, what)
+        assert _report_files(project) == [
+            "20261106T100000Z-report.md", "20261106T110000Z-report.md",
+        ], _report_files(project)
+        assert list(app.log_lines) == before_status, list(app.log_lines)
+>       assert (app.focused, app._active_screen_key) == known
+E       AssertionError: assert (OsClipboardI..., 'workspace') == (ListView(id=..., 'workspace')
+E         
+E         At index 0 diff: OsClipboardInput(id='palette_input') != ListView(id='files_list')
+E         Use -v to get more diff
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:670: AssertionError
+___________ test_r_dlg_2_6_escape_in_the_context_box_closes_reports ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-892/test_r_dlg_2_6_escape_in_the_c0')
+
+    def test_r_dlg_2_6_escape_in_the_context_box_closes_reports(tmp_path: Path) -> None:
+        """R-DLG.2/6: Escape in the context-bytes box with ``9`` typed closes the dialog;
+        2 files in ``reports/``."""
+    
+        async def scenario(app, pilot) -> None:
+            project = await _reports_project(app, pilot)
+            known = _known(app)
+            await _open_reports(app, pilot)
+            box = await _focus(app, pilot, "report_context_bytes")
+            shipped = box.value
+            await pilot.press("9")
+            await settle(pilot)
+            assert box.value != shipped and "9" in box.value, (shipped, box.value)
+            await _escape_closes(app, pilot, known, project, list(app.log_lines), "escape in the context box")
+    
+>       _run(tmp_path, scenario)
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:787: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:680: in _run
+    asyncio.run(_go())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:678: in _go
+    await scenario(app, pilot)
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:785: in scenario
+    await _escape_closes(app, pilot, known, project, list(app.log_lines), "escape in the context box")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+known = (ListView(id='files_list'), 'workspace')
+project = PosixPath('/tmp/pytest-of-<user>/pytest-892/test_r_dlg_2_6_escape_in_the_c0/.s19tool/workarea/proj1')
+before_status = ['Loaded prg.s19 (S19 only)', "Loaded project 'proj1' -> prg.s19 - variant 1 of 1, 1 problem - details: p"]
+what = 'escape in the context box'
+
+    async def _escape_closes(app, pilot, known: tuple, project: Path, before_status: List[str], what: str) -> None:
+        await pilot.press("escape")
+        await _await_closed(app, pilot, what)
+        assert _report_files(project) == [
+            "20261106T100000Z-report.md", "20261106T110000Z-report.md",
+        ], _report_files(project)
+        assert list(app.log_lines) == before_status, list(app.log_lines)
+>       assert (app.focused, app._active_screen_key) == known
+E       AssertionError: assert (OsClipboardI..., 'workspace') == (ListView(id=..., 'workspace')
+E         
+E         At index 0 diff: OsClipboardInput(id='palette_input') != ListView(id='files_list')
+E         Use -v to get more diff
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:670: AssertionError
+______________ test_r_dlg_2_7_escape_on_generate_writes_no_report ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-892/test_r_dlg_2_7_escape_on_gener0')
+
+    def test_r_dlg_2_7_escape_on_generate_writes_no_report(tmp_path: Path) -> None:
+        """R-DLG.2/7: Escape on Generate closes the dialog and generates nothing (a third
+        file would be Escape bound to Generate's path)."""
+    
+        async def scenario(app, pilot) -> None:
+            project = await _reports_project(app, pilot)
+            known = _known(app)
+            await _open_reports(app, pilot)
+            await _focus(app, pilot, "report_generate")
+            await _escape_closes(app, pilot, known, project, list(app.log_lines), "escape on Generate")
+            await settle_workers(pilot)
+            await settle(pilot, 12)
+            assert len(_report_files(project)) == 2, _report_files(project)
+    
+>       _run(tmp_path, scenario)
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:804: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:680: in _run
+    asyncio.run(_go())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:678: in _go
+    await scenario(app, pilot)
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:799: in scenario
+    await _escape_closes(app, pilot, known, project, list(app.log_lines), "escape on Generate")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+known = (ListView(id='files_list'), 'workspace')
+project = PosixPath('/tmp/pytest-of-<user>/pytest-892/test_r_dlg_2_7_escape_on_gener0/.s19tool/workarea/proj1')
+before_status = ['Loaded prg.s19 (S19 only)', "Loaded project 'proj1' -> prg.s19 - variant 1 of 1, 1 problem - details: p"]
+what = 'escape on Generate'
+
+    async def _escape_closes(app, pilot, known: tuple, project: Path, before_status: List[str], what: str) -> None:
+        await pilot.press("escape")
+        await _await_closed(app, pilot, what)
+        assert _report_files(project) == [
+            "20261106T100000Z-report.md", "20261106T110000Z-report.md",
+        ], _report_files(project)
+        assert list(app.log_lines) == before_status, list(app.log_lines)
+>       assert (app.focused, app._active_screen_key) == known
+E       AssertionError: assert (OsClipboardI..., 'workspace') == (ListView(id=..., 'workspace')
+E         
+E         At index 0 diff: OsClipboardInput(id='palette_input') != ListView(id='files_list')
+E         Use -v to get more diff
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:670: AssertionError
+________________ test_r_dlg_2_8_escape_on_close_closes_reports _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-892/test_r_dlg_2_8_escape_on_close0')
+
+    def test_r_dlg_2_8_escape_on_close_closes_reports(tmp_path: Path) -> None:
+        """R-DLG.2/8: Escape on the Close button closes the dialog."""
+    
+        async def scenario(app, pilot) -> None:
+            project = await _reports_project(app, pilot)
+            known = _known(app)
+            await _open_reports(app, pilot)
+            await _focus(app, pilot, "report_close")
+            await _escape_closes(app, pilot, known, project, list(app.log_lines), "escape on Close")
+    
+>       _run(tmp_path, scenario)
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:817: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:680: in _run
+    asyncio.run(_go())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:678: in _go
+    await scenario(app, pilot)
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:815: in scenario
+    await _escape_closes(app, pilot, known, project, list(app.log_lines), "escape on Close")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+known = (ListView(id='files_list'), 'workspace')
+project = PosixPath('/tmp/pytest-of-<user>/pytest-892/test_r_dlg_2_8_escape_on_close0/.s19tool/workarea/proj1')
+before_status = ['Loaded prg.s19 (S19 only)', "Loaded project 'proj1' -> prg.s19 - variant 1 of 1, 1 problem - details: p"]
+what = 'escape on Close'
+
+    async def _escape_closes(app, pilot, known: tuple, project: Path, before_status: List[str], what: str) -> None:
+        await pilot.press("escape")
+        await _await_closed(app, pilot, what)
+        assert _report_files(project) == [
+            "20261106T100000Z-report.md", "20261106T110000Z-report.md",
+        ], _report_files(project)
+        assert list(app.log_lines) == before_status, list(app.log_lines)
+>       assert (app.focused, app._active_screen_key) == known
+E       AssertionError: assert (OsClipboardI..., 'workspace') == (ListView(id=..., 'workspace')
+E         
+E         At index 0 diff: OsClipboardInput(id='palette_input') != ListView(id='files_list')
+E         Use -v to get more diff
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:670: AssertionError
+___________ test_r_dlg_2_9_escape_on_the_folder_chip_opens_no_folder ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-892/test_r_dlg_2_9_escape_on_the_f0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fab30c32b90>
+
+    def test_r_dlg_2_9_escape_on_the_folder_chip_opens_no_folder(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """R-DLG.2/9: Escape on the ``Open reports/`` chip closes the dialog and the
+        folder spy counts 0 calls (the spy is live: a press of the chip counts 1)."""
+        calls: List[Path] = []
+    
+        def spy(path, *, set_status=None, label="folder") -> bool:
+            calls.append(Path(path))
+            return True
+    
+        monkeypatch.setattr(fos, "open_folder_in_file_manager", spy)
+    
+        async def scenario(app, pilot) -> None:
+            project = await _reports_project(app, pilot)
+            known = _known(app)
+            await _open_reports(app, pilot)
+            await _focus(app, pilot, "open_folder_reports")
+            await _escape_closes(app, pilot, known, project, list(app.log_lines), "escape on the folder chip")
+            await settle(pilot, 8)
+            assert calls == [], calls
+            # the spy is live: a press of the chip reaches it
+            await _open_reports(app, pilot)
+            app.screen.query_one("#open_folder_reports").press()
+            await settled(pilot, lambda: len(calls) == 1, "the chip press reached the folder spy", timeout=CLOSE_WAIT_S)
+    
+>       _run(tmp_path, scenario)
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:846: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:680: in _run
+    asyncio.run(_go())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:678: in _go
+    await scenario(app, pilot)
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:838: in scenario
+    await _escape_closes(app, pilot, known, project, list(app.log_lines), "escape on the folder chip")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+known = (ListView(id='files_list'), 'workspace')
+project = PosixPath('/tmp/pytest-of-<user>/pytest-892/test_r_dlg_2_9_escape_on_the_f0/.s19tool/workarea/proj1')
+before_status = ['Loaded prg.s19 (S19 only)', "Loaded project 'proj1' -> prg.s19 - variant 1 of 1, 1 problem - details: p"]
+what = 'escape on the folder chip'
+
+    async def _escape_closes(app, pilot, known: tuple, project: Path, before_status: List[str], what: str) -> None:
+        await pilot.press("escape")
+        await _await_closed(app, pilot, what)
+        assert _report_files(project) == [
+            "20261106T100000Z-report.md", "20261106T110000Z-report.md",
+        ], _report_files(project)
+        assert list(app.log_lines) == before_status, list(app.log_lines)
+>       assert (app.focused, app._active_screen_key) == known
+E       AssertionError: assert (OsClipboardI..., 'workspace') == (ListView(id=..., 'workspace')
+E         
+E         At index 0 diff: OsClipboardInput(id='palette_input') != ListView(id='files_list')
+E         Use -v to get more diff
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:670: AssertionError
+____________ test_r_dlg_2_10_escape_on_the_help_chip_opens_no_help _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-892/test_r_dlg_2_10_escape_on_the_0')
+
+    def test_r_dlg_2_10_escape_on_the_help_chip_opens_no_help(tmp_path: Path) -> None:
+        """R-DLG.2/10: Escape on the ``?`` chip closes the dialog; no help window opens."""
+    
+        async def scenario(app, pilot) -> None:
+            project = await _reports_project(app, pilot)
+            known = _known(app)
+            await _open_reports(app, pilot)
+            await _focus(app, pilot, "window_help_reports")
+            await _escape_closes(app, pilot, known, project, list(app.log_lines), "escape on the ? chip")
+            assert not any(isinstance(s, WindowHelpScreen) for s in app.screen_stack), _stack(app)
+    
+>       _run(tmp_path, scenario)
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:860: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:680: in _run
+    asyncio.run(_go())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:678: in _go
+    await scenario(app, pilot)
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:857: in scenario
+    await _escape_closes(app, pilot, known, project, list(app.log_lines), "escape on the ? chip")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+known = (ListView(id='files_list'), 'workspace')
+project = PosixPath('/tmp/pytest-of-<user>/pytest-892/test_r_dlg_2_10_escape_on_the_0/.s19tool/workarea/proj1')
+before_status = ['Loaded prg.s19 (S19 only)', "Loaded project 'proj1' -> prg.s19 - variant 1 of 1, 1 problem - details: p"]
+what = 'escape on the ? chip'
+
+    async def _escape_closes(app, pilot, known: tuple, project: Path, before_status: List[str], what: str) -> None:
+        await pilot.press("escape")
+        await _await_closed(app, pilot, what)
+        assert _report_files(project) == [
+            "20261106T100000Z-report.md", "20261106T110000Z-report.md",
+        ], _report_files(project)
+        assert list(app.log_lines) == before_status, list(app.log_lines)
+>       assert (app.focused, app._active_screen_key) == known
+E       AssertionError: assert (OsClipboardI..., 'workspace') == (ListView(id=..., 'workspace')
+E         
+E         At index 0 diff: OsClipboardInput(id='palette_input') != ListView(id='files_list')
+E         Use -v to get more diff
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:670: AssertionError
+____________ test_r_dlg_2_11_escape_closes_the_empty_reports_dialog ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-892/test_r_dlg_2_11_escape_closes_0')
+
+    def test_r_dlg_2_11_escape_closes_the_empty_reports_dialog(tmp_path: Path) -> None:
+        """R-DLG.2/11: Escape closes the Reports dialog of a project with no report."""
+    
+        async def scenario(app, pilot) -> None:
+            await _reports_project(app, pilot, name="proj2", with_reports=False)
+            known = _known(app)
+            screen = await _open_reports(app, pilot)
+            assert screen.query("#report_empty_state"), "the dialog does not show the empty text"
+            assert app.focused is screen.query_one("#window_help_reports")
+            await pilot.press("escape")
+            await _await_closed(app, pilot, "escape on the empty dialog")
+            assert (app.focused, app._active_screen_key) == known
+    
+>       _run(tmp_path, scenario)
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:876: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:680: in _run
+    asyncio.run(_go())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:678: in _go
+    await scenario(app, pilot)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+
+    async def scenario(app, pilot) -> None:
+        await _reports_project(app, pilot, name="proj2", with_reports=False)
+        known = _known(app)
+        screen = await _open_reports(app, pilot)
+        assert screen.query("#report_empty_state"), "the dialog does not show the empty text"
+        assert app.focused is screen.query_one("#window_help_reports")
+        await pilot.press("escape")
+        await _await_closed(app, pilot, "escape on the empty dialog")
+>       assert (app.focused, app._active_screen_key) == known
+E       AssertionError: assert (OsClipboardI..., 'workspace') == (ListView(id=..., 'workspace')
+E         
+E         At index 0 diff: OsClipboardInput(id='palette_input') != ListView(id='files_list')
+E         Use -v to get more diff
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:874: AssertionError
+________ test_at_i12_1_escape_closes_reports_from_list_box_and_dropdown ________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-892/test_at_i12_1_escape_closes_re0')
+
+    def test_at_i12_1_escape_closes_reports_from_list_box_and_dropdown(tmp_path: Path) -> None:
+        """AT-I12-1 (US-I12-3; rows R-DLG.2, R-DLG.15): through the keys, Escape closes
+        the dialog from the rendered list and from the path box with ``abc`` typed (the
+        focus and window as before ``t``, nothing applied), and with the filter list
+        open Escape closes the list alone and the next one the dialog."""
+    
+        async def scenario(app, pilot) -> None:
+            project = await _reports_project(app, pilot)
+            known = _known(app)
+            two = ["20261106T100000Z-report.md", "20261106T110000Z-report.md"]
+            screen = await _open_reports(app, pilot)
+            await pilot.press("enter")
+            await settled(pilot, lambda: screen.selected_path is not None, "a report rendered", timeout=CLOSE_WAIT_S)
+            await pilot.press("escape")
+            await _await_closed(app, pilot, "first escape")
+            assert (app.focused, app._active_screen_key) == known
+            screen = await _open_reports(app, pilot)
+            await _tab_to(app, pilot, "report_filter_path")
+            await pilot.press("a", "b", "c")
+            await settle(pilot)
+            assert screen.query_one("#report_filter_path").value == "abc"
+            await pilot.press("escape")
+            await _await_closed(app, pilot, "second escape")
+            assert (app.focused, app._active_screen_key) == known
+            screen = await _open_reports(app, pilot)
+            assert screen.query_one("#report_filter_path").value == ""
+            select = screen.query_one("#report_filter_select", Select)
+            assert select.value is Select.NULL
+            await _tab_to(app, pilot, "report_filter_select")
+            await pilot.press("enter")
+            await settled(pilot, lambda: select.expanded, "the filter list opens", timeout=CLOSE_WAIT_S)
+            await pilot.press("down")
+            await settle(pilot)
+            await pilot.press("escape")
+            await settled(pilot, lambda: not select.expanded, "the filter list closed", timeout=CLOSE_WAIT_S)
+            await settle(pilot)
+            assert app.screen is screen and select.value is Select.NULL
+            await pilot.press("escape")
+            await _await_closed(app, pilot, "last escape")
+            assert _report_files(project) == two
+    
+>       _run(tmp_path, scenario)
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:1041: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:680: in _run
+    asyncio.run(_go())
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:678: in _go
+    await scenario(app, pilot)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+
+    async def scenario(app, pilot) -> None:
+        project = await _reports_project(app, pilot)
+        known = _known(app)
+        two = ["20261106T100000Z-report.md", "20261106T110000Z-report.md"]
+        screen = await _open_reports(app, pilot)
+        await pilot.press("enter")
+        await settled(pilot, lambda: screen.selected_path is not None, "a report rendered", timeout=CLOSE_WAIT_S)
+        await pilot.press("escape")
+        await _await_closed(app, pilot, "first escape")
+>       assert (app.focused, app._active_screen_key) == known
+E       AssertionError: assert (OsClipboardI..., 'workspace') == (ListView(id=..., 'workspace')
+E         
+E         At index 0 diff: OsClipboardInput(id='palette_input') != ListView(id='files_list')
+E         Use -v to get more diff
+
+../s19_i12mut/tests/test_b101_reach_and_reports_escape.py:1015: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_1_escape_on_the_report_list_closes_reports
+FAILED tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_2_escape_on_the_report_view_closes_reports
+FAILED tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_3_escape_in_the_regions_box_closes_and_keeps_nothing
+FAILED tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_4_escape_on_the_closed_dropdown_closes_reports
+FAILED tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_5_escape_in_the_filter_path_box_applies_nothing
+FAILED tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_6_escape_in_the_context_box_closes_reports
+FAILED tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_7_escape_on_generate_writes_no_report
+FAILED tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_8_escape_on_close_closes_reports
+FAILED tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_9_escape_on_the_folder_chip_opens_no_folder
+FAILED tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_10_escape_on_the_help_chip_opens_no_help
+FAILED tests/test_b101_reach_and_reports_escape.py::test_r_dlg_2_11_escape_closes_the_empty_reports_dialog
+FAILED tests/test_b101_reach_and_reports_escape.py::test_at_i12_1_escape_closes_reports_from_list_box_and_dropdown
+12 failed in 62.47s (0:01:02)

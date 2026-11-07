@@ -1,0 +1,48 @@
+=== Inc 10a E5 corrective run: mut-c-11
+date: 2026-11-07T06:04:39Z
+tree dir: <HOME>/work/s19_i10c_mut_mut-c-11
+checkout HEAD (base): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+main ref: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+index tree: 6cb142f114dea93b83e526ca5c29303554283466
+mutation: <HOME>/work/s19_i10c-helpers/mutation-mut-c-11.diff (printed at the end)
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10c_mut_mut-c-11/s19_app/__init__.py
+CMD: env -u NO_COLOR timeout 900 /data/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -q -n 6 --dist load -rfs --tb=line tests/test_b101_hex_jump.py -k tui_040_11_4 or tui_040_11_5 or tui_040_8_2 or tui_040_8_3
+bringing up nodes...
+bringing up nodes...
+
+...F.F..                                                                 [100%]
+=================================== FAILURES ===================================
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: a2l: the miss changed the rows (200 before, 200 after)
+    assert ['0x00000000 .........|', ...] == ['0x00000040 .........|', ...]
+      
+      At index 0 diff: '0x00000000  6C 31 39 54 4F 4F 4C 20 42 4F 4F 54 20 76 31 2E  |l19TOOL BOOT v1.|' != '0x00000040  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|'
+      Use -v to get more diff
+<HOME>/work/s19_i10c_mut_mut-c-11/tests/test_b101_hex_jump.py:831: AssertionError: a2l: the miss changed the rows (200 before, 200 after)
+[gw1] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: mac: the miss changed the rows (200 before, 200 after)
+    assert ['0x00000000 .........|', ...] == ['0x00000040 .........|', ...]
+      
+      At index 0 diff: '0x00000000  6C 31 39 54 4F 4F 4C 20 42 4F 4F 54 20 76 31 2E  |l19TOOL BOOT v1.|' != '0x00000040  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |................|'
+      Use -v to get more diff
+<HOME>/work/s19_i10c_mut_mut-c-11/tests/test_b101_hex_jump.py:831: AssertionError: mac: the miss changed the rows (200 before, 200 after)
+=========================== short test summary info ============================
+FAILED tests/test_b101_hex_jump.py::test_r_tui_040_8_2_a2l_miss_leaves_rows
+FAILED tests/test_b101_hex_jump.py::test_r_tui_040_8_3_mac_miss_leaves_rows
+2 failed, 6 passed in 35.25s
+exit code: 1
+--- mutation diff (vs the staged clone) ---
+diff --git a/s19_app/tui/app.py b/s19_app/tui/app.py
+index cab4ee01..6166ff30 100644
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -21741,7 +21741,7 @@ class S19TuiApp(App):
+                 return
+             self._mac_goto_focus_address = None
+             first, render = self._mac_first_visible_address, self.update_mac_hex_view
+-        start = bisect_left(self._hex_view_rows(), first) if first is not None else 0
++        start = 0
+         render(start_row=start)
+ 
+     def set_status(self, message: str) -> None:

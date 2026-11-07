@@ -1,0 +1,131 @@
+base commit (origin/main): e07fb00f9fc13afd314d0334fac683fe33b29b6c
+applied-tree head: d6f1801d98e36f3e9b88414d29b78e53f1fd66e5
+mutant: M11 — R-FLOW-FILE.14/4, R-FLOW-SET.8/4 (E3 S-2 b)
+
+--- mutation (diff) ---
+diff --git a/s19_app/tui/services/flow_persistence_service.py b/s19_app/tui/services/flow_persistence_service.py
+index 7f9ab2f2..053846cd 100644
+--- a/s19_app/tui/services/flow_persistence_service.py
++++ b/s19_app/tui/services/flow_persistence_service.py
+@@ -1156,41 +1156,6 @@ def _create_new_json(
+                 continue
+             raise
+ 
+-        # (d) The post-claim check (E3 S-1, E4-R1, E5 SE5-1): before any
+-        # byte is written, the new entry must be the regular file this call
+-        # created, with one link (no hard link to a followed target), not a
+-        # link or special file swapped in after the name check, and its real
+-        # parent must be the home the guard approved. Every read sits inside
+-        # the try, so a failure to read is a failed check (E5 CR-07).
+-        claim: Optional[os.stat_result] = None
+-        failure: Optional[OSError] = None
+-        verified = False
+-        try:
+-            claim = os.fstat(fd)
+-            st = os.lstat(candidate)
+-            verified = (
+-                stat.S_ISREG(st.st_mode)
+-                and st.st_nlink == 1
+-                and os.path.samestat(claim, st)
+-                and not _is_reparse_point(candidate)
+-                and Path(os.path.realpath(candidate)).parent == resolved_home
+-            )
+-        except OSError as exc:
+-            failure = exc
+-        if not verified:
+-            os.close(fd)
+-            _unlink_own_claim(candidate, claim, resolved_home)
+-            if failure is not None:
+-                raise WorkareaContainmentError(
+-                    f"Not saved: {candidate.name} in {home} could not be "
+-                    f"verified after the claim: {failure}. Nothing written."
+-                ) from failure
+-            raise WorkareaContainmentError(
+-                f"Not saved: {candidate.name} in {home} was replaced by a "
+-                "link, a hard link or another file between the claim and the "
+-                "write, or resolves outside the approved home. Nothing written."
+-            )
+-
+         # (e) Write through the claim's descriptor. The ``with`` block owns
+         # the close (a flush error surfaces here); a write failure removes
+         # the claim when it is provably ours and re-raises, never leaving a
+@@ -1199,7 +1164,10 @@ def _create_new_json(
+             with os.fdopen(fd, "w", encoding="utf-8") as handle:
+                 handle.write(text)
+         except OSError:
+-            _unlink_own_claim(candidate, claim, resolved_home)
++            try:
++                os.unlink(candidate)
++            except OSError:
++                pass
+             raise
+ 
+         return candidate
+
+--- s19_app.__file__ (from inside the copy) ---
+<HOME>/work/s19_i9rm_m11/s19_app/__init__.py
+
+--- pytest ---
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+______________ test_r_flow_file_14_4_followed_create_gets_no_byte ______________
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-389/test_r_flow_file_14_4_followed0/.s19tool/workarea'), PosixPath('/tmp/py...llowed0/.s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-389/test_r_flow_file_14_4_followed0/outside'))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fe9388e9110>
+
+    def test_r_flow_file_14_4_followed_create_gets_no_byte(area, monkeypatch):
+        """R-FLOW-FILE.14/4: a link put in at the free name gets no byte (E3 S-2 b)."""
+        _root, project, outside = area
+        home = project / "flows"
+        home.mkdir()
+        _windows_follow(monkeypatch, home, outside)
+>       with pytest.raises(WorkareaContainmentError):
+E       Failed: DID NOT RAISE <class 's19_app.tui.workspace.WorkareaContainmentError'>
+
+../s19_i9rm/tests/test_b101_flow_saves.py:413: Failed
+_______________ test_r_flow_set_8_4_followed_create_gets_no_byte _______________
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-389/test_r_flow_set_8_4_followed_c0/.s19tool/workarea'), PosixPath('/tmp/py...owed_c0/.s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-389/test_r_flow_set_8_4_followed_c0/outside'))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fe9388f5c10>
+
+    def test_r_flow_set_8_4_followed_create_gets_no_byte(area, monkeypatch):
+        """R-FLOW-SET.8/4: a link put in at the free set name gets no byte (E3 S-2 b)."""
+        _root, project, outside = area
+        home = project / "flowsets"
+        home.mkdir()
+        _windows_follow(monkeypatch, home, outside)
+>       with pytest.raises(WorkareaContainmentError):
+E       Failed: DID NOT RAISE <class 's19_app.tui.workspace.WorkareaContainmentError'>
+
+../s19_i9rm/tests/test_b101_flow_saves.py:486: Failed
+_______________ test_r_flow_file_14_5_swapped_home_gets_no_byte ________________
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-389/test_r_flow_file_14_5_swapped_0/.s19tool/workarea'), PosixPath('/tmp/py...apped_0/.s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-389/test_r_flow_file_14_5_swapped_0/outside'))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fe937ee5510>
+
+    def test_r_flow_file_14_5_swapped_home_gets_no_byte(area, monkeypatch):
+        """R-FLOW-FILE.14/5 (E3 R2-1; E5 SE5-2, CR-09): a home swapped for a link after the name
+        check gets no byte, and the empty claim at the link's target is left where it is.
+    
+        Under the swap the created file is regular and the same file as the
+        descriptor, so only the real-path clause of the check after the claim
+        refuses it. Its name now resolves outside the approved home, so the
+        cleanup does not unlink through it (E5 SE5-2): Folder O holds exactly the
+        empty claim (BL-I9-4; mutant M25, the cleanup's real-parent clause
+        dropped, removes it → RED). The swap puts in a directory symbolic link
+        (``os.symlink``): it runs on Linux, and on Windows only where that link is
+        permitted (a named skip otherwise).
+        """
+        _root, project, outside = area
+        home = project / "flows"
+        home.mkdir()
+        _swap_home_for_link(monkeypatch, home, project / "flows_aside", outside)
+>       with pytest.raises(WorkareaContainmentError):
+E       Failed: DID NOT RAISE <class 's19_app.tui.workspace.WorkareaContainmentError'>
+
+../s19_i9rm/tests/test_b101_flow_saves.py:437: Failed
+=========================== short test summary info ============================
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_4_followed_create_gets_no_byte
+FAILED tests/test_b101_flow_saves.py::test_r_flow_set_8_4_followed_create_gets_no_byte
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_5_swapped_home_gets_no_byte
+3 failed in 0.23s

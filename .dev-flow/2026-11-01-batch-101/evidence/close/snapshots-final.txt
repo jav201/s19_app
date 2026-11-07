@@ -1,0 +1,13 @@
+Snapshot suite on the final batch tree (LAN Linux laptop, CI-recipe venv py3.11 + pytest-textual-snapshot 1.1.0): origin/main 7d641d9 + git diff 7d641d9 b982846c.
+ok
+applied
+HEAD 7d641d98 + diff 7d641d9..b982846c
+<HOME>/work/s19_snapfull/s19_app/__init__.py
+--- SNAPSHOT SUITE (CI recipe venv py3.11 + pytest-textual-snapshot 1.1.0): python -m pytest -q -p no:cacheprovider -rfs tests/test_tui_snapshot.py
+2 snapshots failed. 27 snapshots passed.
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-120x30]
+2 failed, 31 passed in 137.39s (0:02:17)
+removed
+
+[exited with code 0]

@@ -1,0 +1,233 @@
+=== base commit: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+=== python: Python 3.11.18
+=== mutation applied: M18 (file s19_app/tui/app.py)
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -19068,7 +19068,7 @@
+                 - ``_apply_loaded_file``
+         """
+         codes = _integrity_notice_codes(getattr(loaded, "errors", None))
+-        name = painted_names([path.name])
++        name = path.name
+         if codes:
+             return (
+                 f"Loaded {name} with integrity notices: "
+LANDED M18: 'name = path.name' x1
+=== s19_app.__file__ ===
+<HOME>/work/s19_i10mut_m20/s19_app/__init__.py
+=== CMD ===
+env -u NO_COLOR <HOME>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -rf -n 4 --dist load tests/test_b101_unload_focus.py::test_r_tui_012l_8_1_load_status_drops_a_cf_character tests/test_b101_unload_focus.py::test_r_tui_012l_8_3_integrity_notice_arm_paints_the_name tests/test_b101_unload_focus.py::test_r_tui_012l_8_5_a_long_name_is_clipped_to_120 tests/test_b101_unload_focus.py::test_r_tui_012l_8_4_plain_name_is_unchanged
+bringing up nodes...
+bringing up nodes...
+
+FFF.                                                                     [100%]
+=================================== FAILURES ===================================
+_____________ test_r_tui_012l_8_1_load_status_drops_a_cf_character _____________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-658/popen-gw0/test_r_tui_012l_8_1_load_statu0')
+
+    def test_r_tui_012l_8_1_load_status_drops_a_cf_character(tmp_path: Path) -> None:
+        """R-TUI-012L.8 case /1: ``fw`` U+202E ``gpj.s19`` loads as ``Loaded
+        fwgpj.s19 (S19 only)`` in ``#status_text`` and in the newest message, with
+        0 characters of Cc, Cf, Zl, Zp (base: U+202E kept)."""
+        image = write_three_ranges(tmp_path / "src" / f"fw{RLO}gpj.s19")
+    
+        async def scenario(app, pilot, log):
+            await load_image(pilot, app, image)
+            # The load line reaches the message lines directly (not through
+            # ``set_status``), so the wait reads every painted line, never the
+            # newest alone (R-TST-050 / QC-OR; fixed at E4 integration, I-D8).
+            await wait_until(
+                pilot,
+                lambda: any(line.startswith("Loaded ") for line in app.log_lines),
+                lambda: f"no load message; painted lines {ascii(list(app.log_lines)[-4:])}",
+                timeout=MESSAGE_WAIT_S,
+            )
+            await settle(pilot, 4)
+            expected = "Loaded fwgpj.s19 (S19 only)"
+            assert status_text(app) == expected, ascii(status_text(app))
+            assert newest_message(app) == expected, ascii(newest_message(app))
+            assert bad_chars(status_text(app) + newest_message(app)) == []
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:771: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7fef7804a810>
+
+    async def scenario(app, pilot, log):
+        await load_image(pilot, app, image)
+        # The load line reaches the message lines directly (not through
+        # ``set_status``), so the wait reads every painted line, never the
+        # newest alone (R-TST-050 / QC-OR; fixed at E4 integration, I-D8).
+        await wait_until(
+            pilot,
+            lambda: any(line.startswith("Loaded ") for line in app.log_lines),
+            lambda: f"no load message; painted lines {ascii(list(app.log_lines)[-4:])}",
+            timeout=MESSAGE_WAIT_S,
+        )
+        await settle(pilot, 4)
+        expected = "Loaded fwgpj.s19 (S19 only)"
+        assert status_text(app) == expected, ascii(status_text(app))
+>       assert newest_message(app) == expected, ascii(newest_message(app))
+E       AssertionError: 'Loaded fw\u202egpj.s19 (S19 only)'
+E       assert 'Loaded fw\u2...19 (S19 only)' == 'Loaded fwgpj.s19 (S19 only)'
+E         
+E         - Loaded fwgpj.s19 (S19 only)
+E         + Loaded fw‮gpj.s19 (S19 only)
+E         ?          +
+
+../s19_i10mut/tests/test_b101_unload_focus.py:768: AssertionError
+______________ test_r_tui_012l_8_5_a_long_name_is_clipped_to_120 _______________
+[gw2] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-658/popen-gw2/test_r_tui_012l_8_5_a_long_nam0')
+
+    def test_r_tui_012l_8_5_a_long_name_is_clipped_to_120(tmp_path: Path) -> None:
+        """R-TUI-012L.8 case /5 (added at E4 integration: the threshold's E3 A10-06
+        arm had no case): a 130-character file name loads as ``Loaded`` + its
+        first 119 characters + ``...`` (U+2026) + `` (S19 only)`` in
+        ``#status_text`` (base: the whole name)."""
+        raw = "n" * 126 + ".s19"
+        image = write_three_ranges(tmp_path / "src" / raw)
+    
+        async def scenario(app, pilot, log):
+            await load_image(pilot, app, image)
+            await settle(pilot, 4)
+            expected = f"Loaded {raw[:119]}… (S19 only)"
+            assert status_text(app) == expected, status_text(app)
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:852: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f30d3715e90>
+
+    async def scenario(app, pilot, log):
+        await load_image(pilot, app, image)
+        await settle(pilot, 4)
+        expected = f"Loaded {raw[:119]}… (S19 only)"
+>       assert status_text(app) == expected, status_text(app)
+E       AssertionError: Loaded nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn.s19 (S19 only)
+E       assert 'Loaded nnnnn...19 (S19 only)' == 'Loaded nnnnn...n… (S19 only)'
+E         
+E         Skipping 116 identical leading characters in diff, use -v to show
+E         - nnnnnnnnnn… (S19 only)
+E         ?           ^
+E         + nnnnnnnnnnnnnnnnn.s19 (S19 only)
+E         ?           ^^^^^^^^^^^
+
+../s19_i10mut/tests/test_b101_unload_focus.py:850: AssertionError
+___________ test_r_tui_012l_8_3_integrity_notice_arm_paints_the_name ___________
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-658/popen-gw1/test_r_tui_012l_8_3_integrity_0')
+
+    def test_r_tui_012l_8_3_integrity_notice_arm_paints_the_name(tmp_path: Path) -> None:
+        """R-TUI-012L.8 case /3: an S19 with a notice code (no terminator) and U+202E
+        in its name loads as ``Loaded <painted name> with integrity notices: `` and
+        carries no Cc, Cf, Zl, Zp character (base: U+202E kept)."""
+        raw = f"fw{RLO}gpj.s19"
+        image = write_three_ranges(tmp_path / "src" / raw, terminator=False)
+    
+        async def scenario(app, pilot, log):
+            await load_image(pilot, app, image)
+            await settle(pilot, 4)
+            prefix = f"Loaded {painted_name(raw)} with integrity notices: "
+            text = status_text(app)
+            assert "integrity notices" in text, f"setup: no notice arm: {ascii(text)}"
+            assert text.startswith(prefix), ascii(text)
+            assert bad_chars(text + newest_message(app)) == []
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:818: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f0ae6271150>
+
+    async def scenario(app, pilot, log):
+        await load_image(pilot, app, image)
+        await settle(pilot, 4)
+        prefix = f"Loaded {painted_name(raw)} with integrity notices: "
+        text = status_text(app)
+        assert "integrity notices" in text, f"setup: no notice arm: {ascii(text)}"
+        assert text.startswith(prefix), ascii(text)
+>       assert bad_chars(text + newest_message(app)) == []
+E       AssertionError: assert ['U+202E'] == []
+E         
+E         Left contains one more item: 'U+202E'
+E         Use -v to get more diff
+
+../s19_i10mut/tests/test_b101_unload_focus.py:816: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_unload_focus.py::test_r_tui_012l_8_1_load_status_drops_a_cf_character
+FAILED tests/test_b101_unload_focus.py::test_r_tui_012l_8_5_a_long_name_is_clipped_to_120
+FAILED tests/test_b101_unload_focus.py::test_r_tui_012l_8_3_integrity_notice_arm_paints_the_name
+3 failed, 1 passed in 8.23s

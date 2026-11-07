@@ -1,0 +1,38 @@
+commit: 98d94d72
+platform: Linux x86_64, python 3.11.18
+command: PYTHONPATH=<worktree> python i9e1-pilot.py (cwd = worktree, HOME/XDG/LOCALAPPDATA isolated under the run folder, NO_COLOR unset)
+s19_app.__file__ = s19_app/__init__.py
+
+== F-45: a confirm re-run in a parallel set
+lanes: ['patch_chain', 'flash_chain', 'patch_chain_b']
+run mode on record: parallel
+lane statuses after Run: ['completed-with-issues', 'paused', 'completed-with-issues']
+chain-set reports written by Run: 1
+lane statuses after confirm: ['completed-with-issues', 'ok', 'completed-with-issues']
+chain-set reports written by the confirm re-run: 1
+  reports/20261106T130531Z-01-chain-set-report.md ['- **Mode:** sequential', '- **Chains:** 1'] ledger rows: 1
+  reports/20261106T130531Z-chain-set-report.md ['- **Mode:** parallel', '- **Chains:** 3'] ledger rows: 3
+
+== F-46: Save after Clear
+ribbon after load: Flow: patch_chain
+ribbon after Clear: Flow: patch_chain
+blocks after Add: ['source']
+Save dialog prefill: 'patch_chain'
+flows/tune_b.json name field: 'patch_chain'
+ribbon after Save: Flow: tune_b
+-- consequence in Flow Execution: a lane of a file whose name is stale
+load findings: [] loaded.name: 'tune_a'
+flow report header: # Flow report — tune\_a
+-- a clash: second save of the same typed name
+second save: tune_b_2.json name field: 'tune_a'
+a 70-character embedded name loads with: ['FLOW-BAD-FIELD']
+
+== D15-18: a linked flows/ or flowsets/ home
+save_flow_json returned: flows/x.json | file outside the work area: True
+save_chain_set returned: flowsets/s.json | file outside the work area: True
+_guarded_destination(flows): refuses - Refusing to place
+_guarded_destination(flowsets): refuses - Refusing to place
+import_flow_file through the linked flows/: refused - Refusing to place
+-- a plain flows/ holding a dangling link named like the saved file
+save_flow_json returned: flows/z.json | file created outside through the link: True
+_guarded_destination(flows) on the plain home: passes

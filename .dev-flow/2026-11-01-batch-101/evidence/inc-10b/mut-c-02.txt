@@ -1,0 +1,44 @@
+== mut-c-02  2026-11-07T11:35:52Z  host: LAN Linux laptop
+base commit (HEAD): 6f1743c1ad54ff7db89e8fcd4e96266414950f42  main: 6f1743c1ad54ff7db89e8fcd4e96266414950f42  origin/main: 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+staged tree (index): 43e7fcaf7991de4398ef944d3153451b242b7dfb
+--- working-tree edits over the index (mutant):
+diff --git a/s19_app/tui/app.py b/s19_app/tui/app.py
+index e21dc3ea..cff502c5 100644
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -18938,6 +18938,7 @@ class S19TuiApp(App):
+         except Exception:
+             return
+         old = self._a2l_enriched_tags
++        self._a2l_enriched_key = None
+         if self._compute_a2l_enriched_tags() is old:
+             mem_map = self.current_file.mem_map
+             changed = []
+--- end of edits
+python: 3.11.18
+s19_app.__file__: <HOME>/work/s19_i10bc_mut/s19_app/__init__.py
+CMD: cd <HOME>/work/s19_i10bc_mut && env -u NO_COLOR timeout 900 <CONDA>/envs/s19ci/bin/python -m pytest -p no:xdist -p no:cacheprovider tests/test_b101_inplace_views.py -k qc_tm_10b_1 -rfs --tb=line
+--- pytest output
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0
+rootdir: <HOME>/work/s19_i10bc_mut
+configfile: pyproject.toml
+plugins: platformdirs-4.14.3, xdist-3.8.0
+collected 22 items / 21 deselected / 1 selected
+
+tests/test_b101_inplace_views.py QC-TM-10b-1 case_06: 220040 tags, 3.926 s
+F                                       [100%]
+
+=================================== FAILURES ===================================
+E   AssertionError: 220040 tags: 3.926 s
+    assert 3.9262818220304325 < 1.0
+     +  where 1.0 = report_margin('QC-TM-10b-1 A2L refresh 220040 tags', 3.9262818220304325, 1.0)
+     +    where 1.0 = timing_bound(1.0)
+<HOME>/work/s19_i10bc_mut/tests/test_b101_inplace_views.py:1592: AssertionError: 220040 tags: 3.926 s
+============================= QC-TM timing margins =============================
+LOW -292.6%  3.926 s / 1.000 s  QC-TM-10b-1 A2L refresh 220040 tags  tests/test_b101_inplace_views.py::test_qc_tm_10b_1_a2l_refresh_cost_on_the_largest_a2l
+QC-TM: 1 bounds, 1 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b101_inplace_views.py::test_qc_tm_10b_1_a2l_refresh_cost_on_the_largest_a2l
+====================== 1 failed, 21 deselected in 29.70s =======================
+exit: 1  end 2026-11-07T11:36:29Z

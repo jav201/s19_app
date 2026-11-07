@@ -1,0 +1,35 @@
+base commit (origin/main): 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+base worktree: <HOME>/work/s19_i10bmut (main == origin/main == 6f1743c, + the Inc 10b product and test diff applied)
+mutant: M6 - hidden branch keeps the arm (no disarm)
+
+=== MUTANT M6 ===
+edit: 1 edit
+grep output:
+--
+1762-            self._bump()
+1763-        else:
+
+mutation diff:
+--- a/s19_app/tui/segment_split_view.py
++++ b/s19_app/tui/segment_split_view.py
+@@ -1761,7 +1761,7 @@
+         if not self.has_class("hidden"):
+             self._bump()
+         else:
+-            self._armed = False
++            pass
+ 
+     def check_action(self, action: str, parameters: tuple) -> Optional[bool]:
+         """Refuse the window's own keys while it is hidden (E3 S-3, D-11, I-6).
+
+s19_app.__file__ = <HOME>/work/s19_i10bmut_m6/s19_app/__init__.py
+pytest output:
+F                                                                        [100%]
+=================================== FAILURES ===================================
+E   AssertionError: the reopen shows an armed confirm: ['packed 16 B  ·  span 1.00 MiB  ·  fill 100.00%', '⚠ GUARD  1.00 MiB span — e again to confirm']
+<HOME>/work/s19_i10bmut_m6/tests/support/timing.py:66: AssertionError: the reopen shows an armed confirm: ['packed 16 B  ·  span 1.00 MiB  ·  fill 100.00%', '⚠ GUARD  1.00 MiB span — e again to confirm']
+=========================== short test summary info ============================
+FAILED tests/test_b101_inplace_views.py::test_r_seg_exp_15_2_hidden_write_disarms_the_confirm
+1 failed, 19 deselected in 30.66s
+
+pytest exit code: 1

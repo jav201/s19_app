@@ -1,0 +1,229 @@
+=== Inc 12 E4 integration run: int-03
+date: 2026-11-07T11:00:50Z
+worktree HEAD (base): 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+index tree with the increment staged: d171353393e0d3a7abeac10d1980600d239d056d
+staged files vs base: 18
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i12int/s19_app/__init__.py
+CMD: python -m pytest -q -p no:cacheprovider -rfs -n 12 --dist loadfile -m not serial_timing tests/test_b100_active_variant.py tests/test_b100_announce.py tests/test_b100_document.py tests/test_b100_load_question.py tests/test_b100_project_check.py tests/test_b100_project_homes.py tests/test_b100_recents.py tests/test_b100_save_dialog.py tests/test_b100_save_image.py tests/test_b101_crc_model_and_reasons.py tests/test_b101_patch_lifecycle.py tests/test_b102_patch_picker.py tests/test_b99_staging.py tests/test_b99_truncation.py tests/test_before_after_report.py tests/test_capped_text_area.py tests/test_flow_builder_render.py tests/test_flow_report_wire.py tests/test_help_toggle_and_a2l_panel.py tests/test_import_census.py tests/test_legend_map_sheet.py tests/test_legend_n8.py tests/test_legend_scope_and_logwidth.py tests/test_legend_two_pane.py tests/test_map_click_chain.py tests/test_memmap_entropy_merge.py tests/test_render_hexview.py tests/test_tui_crc_surface.py tests/test_tui_flow_persistence_ui.py tests/test_tui_hostile_map.py tests/test_tui_insight_style.py tests/test_tui_legend.py tests/test_tui_manifest_save.py tests/test_tui_map_big.py tests/test_tui_map_wrap.py tests/test_tui_memory_patch.py tests/test_tui_operations_view.py tests/test_tui_patch_big.py tests/test_tui_patch_card.py tests/test_tui_patch_editor_b94.py tests/test_tui_patch_editor_v2.py tests/test_tui_patch_glyphs.py tests/test_tui_patch_history_strip.py tests/test_tui_patch_json.py tests/test_tui_patch_layout.py tests/test_tui_patch_variant.py tests/test_tui_snapshot.py tests/test_undo_redo_ux.py tests/test_universal_paste.py tests/test_unload_feature.py tests/test_variant_execution.py
+bringing up nodes...
+bringing up nodes...
+
+s....................................................................... [  4%]
+..............................s..s...................................... [  8%]
+........................................................................ [ 12%]
+.....................s.............sssssssssssssssssssssssssss.......... [ 16%]
+....s..........sss....ss..............................s........s........ [ 20%]
+.sss.ss..s...........................ss.......s......................... [ 24%]
+....................s.......sss......................................... [ 29%]
+..............sss.........s...ss.....s..s...............s...s........... [ 33%]
+..........s.s................ssssss....s.s..............ss.............. [ 37%]
+........ss......................................ss...ss................. [ 41%]
+ss...........................................................s......ss.. [ 45%]
+.sss.............s......sss..................ss..............sss........ [ 49%]
+...........................s............................................ [ 53%]
+..........................................................s..s.......sss [ 58%]
+sssss........................................s.......................... [ 62%]
+...................................................s............ss...... [ 66%]
+...................................................s...................s [ 70%]
+..........................F............F.....................s.......... [ 74%]
+.............................................................s.......... [ 78%]
+.......................................sss.ss........................... [ 82%]
+...........................s.s.......................................... [ 87%]
+...s........................s........................................... [ 91%]
+............ssss........................................................ [ 95%]
+.............................................ss......................... [ 99%]
+........                                                                 [100%]
+=================================== FAILURES ===================================
+_________ test_tc016s_density_layout_snapshot[patch-comfortable-80x24] _________
+[gw2] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+snap_compare = <function snap_compare.<locals>.compare at 0x7fbf68d2d4e0>
+public_triple = {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-861/popen-gw2/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/py...napshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-861/popen-gw2/snapshot_public0/snap.s19')}
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-861/popen-gw2/test_tc016s_density_layout_sna26')
+screen = 'patch', density = 'comfortable', size_key = '80x24'
+
+    @pytest.mark.skipif(
+        not snapshot_plugin_available,
+        reason="pytest-textual-snapshot not installed (dev-only optional extra)",
+    )
+    @pytest.mark.snapshot
+    @pytest.mark.parametrize("screen, density, size_key", _ALL_SNAPSHOT_CELLS)
+    def test_tc016s_density_layout_snapshot(
+        snap_compare,
+        public_triple: dict[str, Path],
+        tmp_path: Path,
+        screen: str,
+        density: str,
+        size_key: str,
+    ) -> None:
+        """Each Direction B screen matches its approved layout baseline (TC-016-S).
+    
+        Intent: LLR-007.1 — the SVG baseline is the primary verdict that every
+        Direction B screen lays out without overlapping or clipped panes in
+        both density modes across the fixed {80x24, 120x30, 160x40} matrix. A
+        layout-drift regression (a pane resized, a regime mis-toggled, a token
+        re-themed) changes the rendered SVG and fails the cell. LLR-007.2 — the
+        app renders only the public synthetic ``conftest.py`` generators; no
+        client artifact is opened.
+    
+        The 29-cell matrix: the 4 restyled screens carry the full
+        {density x size} grid (24 cells); the diff scaffold is pinned at 120x30
+        comfortable (1 cell); the patch and map scaffolds each carry 80x24 + 120x30
+        to lock, respectively, the batch-22 2x2 four-pane layout and the batch-27
+        minimap redesign + narrow-regime reflow at both regimes (4 cells).
+    
+        # AT-034a
+        # AT-034b
+        # TC-16s
+        """
+        width, height = _SIZES[size_key]
+        app = S19TuiApp(base_dir=tmp_path)
+>       assert snap_compare(
+            app,
+            terminal_size=(width, height),
+            run_before=_snapshot_run_before(screen, density, public_triple),
+        )
+E       AssertionError: assert False
+E        +  where False = <function snap_compare.<locals>.compare at 0x7fbf68d2d4e0>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}), terminal_size=(80, 24), run_before=<function _snapshot_run_before.<locals>.run_before at 0x7fbf68ea1260>)
+E        +    where <function _snapshot_run_before.<locals>.run_before at 0x7fbf68ea1260> = _snapshot_run_before('patch', 'comfortable', {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-861/popen-gw2/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/py...napshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-861/popen-gw2/snapshot_public0/snap.s19')})
+
+tests/test_tui_snapshot.py:1220: AssertionError
+________ test_tc016s_density_layout_snapshot[patch-comfortable-120x30] _________
+[gw2] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+snap_compare = <function snap_compare.<locals>.compare at 0x7fbf69319e40>
+public_triple = {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-861/popen-gw2/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/py...napshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-861/popen-gw2/snapshot_public0/snap.s19')}
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-861/popen-gw2/test_tc016s_density_layout_sna27')
+screen = 'patch', density = 'comfortable', size_key = '120x30'
+
+    @pytest.mark.skipif(
+        not snapshot_plugin_available,
+        reason="pytest-textual-snapshot not installed (dev-only optional extra)",
+    )
+    @pytest.mark.snapshot
+    @pytest.mark.parametrize("screen, density, size_key", _ALL_SNAPSHOT_CELLS)
+    def test_tc016s_density_layout_snapshot(
+        snap_compare,
+        public_triple: dict[str, Path],
+        tmp_path: Path,
+        screen: str,
+        density: str,
+        size_key: str,
+    ) -> None:
+        """Each Direction B screen matches its approved layout baseline (TC-016-S).
+    
+        Intent: LLR-007.1 — the SVG baseline is the primary verdict that every
+        Direction B screen lays out without overlapping or clipped panes in
+        both density modes across the fixed {80x24, 120x30, 160x40} matrix. A
+        layout-drift regression (a pane resized, a regime mis-toggled, a token
+        re-themed) changes the rendered SVG and fails the cell. LLR-007.2 — the
+        app renders only the public synthetic ``conftest.py`` generators; no
+        client artifact is opened.
+    
+        The 29-cell matrix: the 4 restyled screens carry the full
+        {density x size} grid (24 cells); the diff scaffold is pinned at 120x30
+        comfortable (1 cell); the patch and map scaffolds each carry 80x24 + 120x30
+        to lock, respectively, the batch-22 2x2 four-pane layout and the batch-27
+        minimap redesign + narrow-regime reflow at both regimes (4 cells).
+    
+        # AT-034a
+        # AT-034b
+        # TC-16s
+        """
+        width, height = _SIZES[size_key]
+        app = S19TuiApp(base_dir=tmp_path)
+>       assert snap_compare(
+            app,
+            terminal_size=(width, height),
+            run_before=_snapshot_run_before(screen, density, public_triple),
+        )
+E       AssertionError: assert False
+E        +  where False = <function snap_compare.<locals>.compare at 0x7fbf69319e40>(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}), terminal_size=(120, 30), run_before=<function _snapshot_run_before.<locals>.run_before at 0x7fbf6931b420>)
+E        +    where <function _snapshot_run_before.<locals>.run_before at 0x7fbf6931b420> = _snapshot_run_before('patch', 'comfortable', {'a2l': PosixPath('/tmp/pytest-of-<user>/pytest-861/popen-gw2/snapshot_public0/snap.a2l'), 'mac': PosixPath('/tmp/py...napshot_public0/snap.mac'), 's19': PosixPath('/tmp/pytest-of-<user>/pytest-861/popen-gw2/snapshot_public0/snap.s19')})
+
+tests/test_tui_snapshot.py:1220: AssertionError
+[1;31mTextual Snapshot Report[0m
+
+[1;30;41m2[0m[30;41m mismatched snapshots[0m
+
+[1mView the [0m]8;id=1307798;file://<HOME>/work/s19_i12int/snapshot_report.html\[1mfailure report[0m]8;;\[1m.[0m
+
+[2;35m<HOME>/work/s19_i12int/[0m[2;95msnapshot_report.html[0m
+
+=========================== short test summary info ============================
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-80x24]
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-120x30]
+SKIPPED [1] tests/test_b100_recents.py:477: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [38] tests/support/b100_links.py:30: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_recents.py:545: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:643: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:669: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:686: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_recents.py:706: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:733: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:755: case-insensitive file system arm; Windows only (E3 R12)
+SKIPPED [1] tests/test_b100_recents.py:774: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:801: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:867: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:908: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:968: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_recents.py:1002: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [3] tests/test_b100_recents.py:1035: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [4] tests/test_b100_recents.py:1071: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:1145: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [2] tests/test_b100_recents.py:1181: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:1209: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:1250: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:1281: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:1320: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:1339: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:1466: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_recents.py:1704: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:1772: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:1804: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [2] tests/test_b100_recents.py:1980: Win32 name rule arm (stream / 8.3 / trailing dot or space); Windows only (E3 R12)
+SKIPPED [1] tests/test_b100_save_dialog.py:517: Windows-only test arm (junction / case-insensitive volume); not run here
+SKIPPED [1] tests/test_b100_recents.py:2093: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_recents.py:2134: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [2] tests/test_b100_recents.py:2186: case-insensitive file system arm; Windows only (E3 R12)
+SKIPPED [1] tests/test_b100_recents.py:2224: case-insensitive file system arm; Windows only (E3 R12)
+SKIPPED [1] tests/test_b100_recents.py:2300: case-insensitive file system arm; Windows only (E3 R12)
+SKIPPED [3] tests/test_b100_recents.py:2300: Win32 name rule arm (stream / 8.3 / trailing dot or space); Windows only (E3 R12)
+SKIPPED [3] tests/test_b100_recents.py:2379: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_document.py:1027: share-mode locks are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [2] tests/test_b100_save_dialog.py:805: Windows-only arm; not run here
+SKIPPED [1] tests/test_b100_project_check.py:471: NUL is a device only on Windows (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_recents.py:2409: Win32 name rule arm (stream / 8.3 / trailing dot or space); Windows only (E3 R12)
+SKIPPED [1] tests/test_b100_save_image.py:960: msvcrt byte-range lock
+SKIPPED [1] tests/test_b100_recents.py:2456: case-insensitive file system arm; Windows only (E3 R12)
+SKIPPED [3] tests/test_b100_recents.py:2456: Win32 name rule arm (stream / 8.3 / trailing dot or space); Windows only (E3 R12)
+SKIPPED [1] tests/test_b100_recents.py:2493: case-insensitive file system arm; Windows only (E3 R12)
+SKIPPED [2] tests/test_b100_recents.py:2511: Win32 name rule arm (stream / 8.3 / trailing dot or space); Windows only (E3 R12)
+SKIPPED [1] tests/test_b100_document.py:1222: share-mode locks are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_recents.py:2608: case-insensitive file system arm; Windows only (E3 R12)
+SKIPPED [2] tests/test_b100_recents.py:2608: Win32 name rule arm (stream / 8.3 / trailing dot or space); Windows only (E3 R12)
+SKIPPED [2] tests/test_b100_project_homes.py:790: trailing-dot names are a Windows-only arm
+SKIPPED [1] tests/test_b100_active_variant.py:766: a read-only file blocks a replace only on Windows (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_document.py:1401: a case-folding filesystem is the Windows arm of this case
+SKIPPED [1] tests/test_b100_recents.py:2719: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_recents.py:2719: Win32 root-relative path arm; Windows only (E3 R12)
+SKIPPED [1] tests/test_b100_document.py:1651: share-mode locks are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_document.py:1698: share-mode locks are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/support/b100_links.py:40: case-sensitive folders are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_document.py:1836: share-mode locks are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [2] tests/test_b100_recents.py:2872: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:2993: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_recents.py:3029: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_recents.py:3060: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only (E3 R12, P9a-G1-6)
+SKIPPED [1] tests/test_b100_project_homes.py:1269: not run: the upper-case spelling needs a case-insensitive file system (Windows)
+SKIPPED [1] tests/test_b100_save_dialog.py:1023: Windows-only test arm (junction / case-insensitive volume); not run here
+SKIPPED [1] tests/test_b100_load_question.py:2017: an exclusively held file is a Windows-only arm (reported not run elsewhere)
+SKIPPED [1] tests/test_b100_save_dialog.py:1291: Windows-only test arm (junction / case-insensitive volume); not run here
+SKIPPED [3] tests/test_b100_project_homes.py:2170: reserved device names are a Windows-only arm
+SKIPPED [1] tests/test_b100_project_homes.py:2200: trailing-dot names are a Windows-only arm
+SKIPPED [2] tests/test_b100_save_dialog.py:1423: Windows-only arm; not run here
+SKIPPED [1] tests/test_b100_project_homes.py:2346: not run: a con.json file needs the Windows extended spelling
+SKIPPED [2] tests/test_b100_save_dialog.py:2992: Windows-only test arm (junction / case-insensitive volume); not run here
+2 failed, 1603 passed, 131 skipped in 1643.64s (0:27:23)
+=== exit code: 1

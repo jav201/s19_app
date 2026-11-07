@@ -1,0 +1,90 @@
+# LAN Linux laptop run
+=== Inc 10a E5 RR run: mut-rr1
+date: 2026-11-07T07:38:02Z
+tree dir: <HOME>/work/s19_i10rr_mut
+base HEAD: 09b4808a0344de05d9d64cd55362ac7058a8c17f  main: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+staged tree: d5beaa3e4f07a1be90300618b308106d2874e812
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10rr_mut/s19_app/__init__.py
+CMD: env -u NO_COLOR timeout 1500 /data/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -q -n 3 --dist load -rfs --tb=line tests/test_b101_unload_focus.py -k ws_loaded_19_
+bringing up nodes...
+bringing up nodes...
+
+...F.                                                                    [100%]
+=================================== FAILURES ===================================
+[gw2] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+E   AssertionError: P9 holds top-level image files: ['unloaded_primary.s19']
+    assert ['unloaded_primary.s19'] == []
+      
+      Left contains one more item: 'unloaded_primary.s19'
+      Use -v to get more diff
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3015 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-435/popen-gw2/test_r_ws_loaded_19_5_save_as_0 workarea=/tmp/pytest-of-<user>/pytest-435/popen-gw2/test_r_ws_loaded_19_5_save_as_0/.s19tool/workarea
+INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+INFO     s19tui:app.py:17436 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.015
+INFO     s19tui:app.py:18692 Loading file: path=/tmp/pytest-of-<user>/pytest-435/popen-gw2/test_r_ws_loaded_19_5_save_as_0/src/unloaded_primary.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14999 Load phase boundary: parse_branch_entry path=unloaded_primary.s19 suffix=.s19
+INFO     s19tui:app.py:19618 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-435/popen-gw2/test_r_ws_loaded_19_5_save_as_0/src/unloaded_primary.s19 addresses=24 range_count=3 range_bytes=24 errors=0
+INFO     s19tui:app.py:15016 Load phase boundary: parse_branch_done path=unloaded_primary.s19 branch=s19
+INFO     s19tui:app.py:19063 Load phase boundary: apply_install_state path=unloaded_primary.s19 precomputed=False
+INFO     s19tui:app.py:19746 Sections updated. count=3 rendered_ranges=3 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19084 Load phase boundary: apply_sections_done path=unloaded_primary.s19
+INFO     s19tui:app.py:19098 Load phase boundary: apply_hex_done path=unloaded_primary.s19
+INFO     s19tui:app.py:20841 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:18545 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18600 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17436 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.014
+INFO     s19tui:app.py:20355 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.015
+INFO     s19tui:app.py:19113 Load phase boundary: apply_a2l_done path=unloaded_primary.s19
+INFO     s19tui:app.py:19973 Memory Map updated. ranges=3
+INFO     s19tui:app.py:19136 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-435/popen-gw2/test_r_ws_loaded_19_5_save_as_0/src/unloaded_primary.s19 file_type=s19 elapsed_seconds=0.458 has_mac=False precomputed=False
+INFO     s19tui:app.py:16523 A2L copy complete: path=/tmp/pytest-of-<user>/pytest-435/popen-gw2/test_r_ws_loaded_19_5_save_as_0/.s19tool/workarea/temp/firmware.a2l size_bytes=97347 copy_seconds=0.010
+INFO     s19tui:app.py:951 A2L cache miss: path=/tmp/pytest-of-<user>/pytest-435/popen-gw2/test_r_ws_loaded_19_5_save_as_0/.s19tool/workarea/temp/firmware.a2l size_bytes=97347
+WARNING  s19tui:app.py:16561 Recent sources not updated: '/tmp/pytest-of-<user>/pytest-435/popen-gw2/test_r_ws_loaded_19_5_save_as_0/src/firmware.a2l'
+INFO     s19tui:app.py:8830 Workarea refreshed. files=1
+INFO     s19tui:app.py:19565 A2L parse summary: path=/tmp/pytest-of-<user>/pytest-435/popen-gw2/test_r_ws_loaded_19_5_save_as_0/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.040 sections=1 tags=462 errors=0
+INFO     s19tui:app.py:18545 MAC validation computed: records=0 issues=924 elapsed_seconds=0.009
+INFO     s19tui:app.py:18600 MAC row cache built: records=0 elapsed_seconds=0.009
+INFO     s19tui:app.py:17468 Load phase boundary: populate_issues_table_done rows=40 total=924 elapsed=0.021
+INFO     s19tui:app.py:20355 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.032
+INFO     s19tui:app.py:20882 Load phase boundary: populate_a2l_table_done rows=200 total=462 elapsed=0.014
+INFO     s19tui:app.py:16580 A2L view refresh complete: path=/tmp/pytest-of-<user>/pytest-435/popen-gw2/test_r_ws_loaded_19_5_save_as_0/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.055
+INFO     s19tui:app.py:16589 A2L loaded: /tmp/pytest-of-<user>/pytest-435/popen-gw2/test_r_ws_loaded_19_5_save_as_0/.s19tool/workarea/temp/firmware.a2l
+INFO     s19tui:app.py:8912 Save project action triggered for /tmp/pytest-of-<user>/pytest-435/popen-gw2/test_r_ws_loaded_19_5_save_as_0/src/unloaded_primary.s19
+INFO     s19tui:app.py:12948 Project saved image. name=PS file=/tmp/pytest-of-<user>/pytest-435/popen-gw2/test_r_ws_loaded_19_5_save_as_0/.s19tool/workarea/PS/unloaded_primary.s19
+INFO     s19tui:app.py:12948 Project saved a2l. name=PS file=/tmp/pytest-of-<user>/pytest-435/popen-gw2/test_r_ws_loaded_19_5_save_as_0/.s19tool/workarea/PS/firmware.a2l
+INFO     s19tui:app.py:8830 Workarea refreshed. files=1
+INFO     s19tui:app.py:20841 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17436 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.011
+INFO     s19tui:app.py:20355 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.012
+INFO     s19tui:app.py:17436 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.012
+INFO     s19tui:app.py:8977 Load project action triggered.
+INFO     s19tui:app.py:16294 Load phase boundary: modal_dismiss_scheduled kind=project value='PS'
+INFO     s19tui:app.py:951 A2L cache miss: path=/tmp/pytest-of-<user>/pytest-435/popen-gw2/test_r_ws_loaded_19_5_save_as_0/.s19tool/workarea/PS/firmware.a2l size_bytes=97347
+INFO     s19tui:app.py:14999 Load phase boundary: parse_branch_entry path=unloaded_primary.s19 suffix=.s19
+INFO     s19tui:app.py:19618 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-435/popen-gw2/test_r_ws_loaded_19_5_save_as_0/.s19tool/workarea/PS/unloaded_primary.s19 addresses=24 range_count=3 range_bytes=24 errors=0
+INFO     s19tui:app.py:15016 Load phase boundary: parse_branch_done path=unloaded_primary.s19 branch=s19
+INFO     s19tui:app.py:19063 Load phase boundary: apply_install_state path=unloaded_primary.s19 precomputed=False
+INFO     s19tui:app.py:14952 Project loaded. name=PS file=/tmp/pytest-of-<user>/pytest-435/popen-gw2/test_r_ws_loaded_19_5_save_as_0/.s19tool/workarea/PS/unloaded_primary.s19 mac=None
+INFO     s19tui:app.py:19746 Sections updated. count=3 rendered_ranges=3 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19084 Load phase boundary: apply_sections_done path=unloaded_primary.s19
+INFO     s19tui:app.py:19098 Load phase boundary: apply_hex_done path=unloaded_primary.s19
+INFO     s19tui:app.py:18545 MAC validation computed: records=0 issues=924 elapsed_seconds=0.007
+INFO     s19tui:app.py:18600 MAC row cache built: records=0 elapsed_seconds=0.008
+INFO     s19tui:app.py:17468 Load phase boundary: populate_issues_table_done rows=40 total=924 elapsed=0.032
+INFO     s19tui:app.py:20355 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.041
+INFO     s19tui:app.py:20882 Load phase boundary: populate_a2l_table_done rows=200 total=462 elapsed=0.016
+INFO     s19tui:app.py:19113 Load phase boundary: apply_a2l_done path=unloaded_primary.s19
+INFO     s19tui:app.py:19973 Memory Map updated. ranges=3
+INFO     s19tui:app.py:19136 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-435/popen-gw2/test_r_ws_loaded_19_5_save_as_0/.s19tool/workarea/PS/unloaded_primary.s19 file_type=s19 elapsed_seconds=0.689 has_mac=False precomputed=False
+INFO     s19tui:app.py:17436 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.011
+INFO     s19tui:app.py:20355 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.012
+INFO     s19tui:app.py:20882 Load phase boundary: populate_a2l_table_done rows=200 total=462 elapsed=0.017
+INFO     s19tui:app.py:8914 Save project action triggered with A2L only.
+INFO     s19tui:app.py:12948 Project saved a2l. name=P9 file=/tmp/pytest-of-<user>/pytest-435/popen-gw2/test_r_ws_loaded_19_5_save_as_0/.s19tool/workarea/P9/firmware.a2l
+INFO     s19tui:app.py:8830 Workarea refreshed. files=1
+<HOME>/work/s19_i10rr_mut/tests/test_b101_unload_focus.py:821: AssertionError: P9 holds top-level image files: ['unloaded_primary.s19']
+=========================== short test summary info ============================
+FAILED tests/test_b101_unload_focus.py::test_r_ws_loaded_19_5_save_as_after_primary_unload_without_mac_carries_no_image
+1 failed, 4 passed in 30.79s
+exit code: 1

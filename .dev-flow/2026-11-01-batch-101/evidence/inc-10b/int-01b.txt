@@ -1,0 +1,18 @@
+=== Inc 10b E4 integration run: int-01b
+date: 2026-11-07T09:08:33Z
+host: LAN Linux laptop, 8 cores
+clone: git clone --shared, own branch main checked out
+base (HEAD = main): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+refs/remotes/origin/main in this clone: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+index tree with the increment staged: 9cf01b0259cf241f968e9b38159988af7171accf
+staged files vs base: 11
+unstaged changes vs index: 0
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10bint/s19_app/__init__.py
+CMD: env -u NO_COLOR PYTHONPATH=<clone> timeout 900 python -m pytest -q -p no:cacheprovider -n 6 --dist load -m not serial_timing -rfs --tb=short tests/test_b101_inplace_views.py -k prev_22 or prev_21
+bringing up nodes...
+bringing up nodes...
+
+...                                                                      [100%]
+3 passed in 14.85s
+exit: 0

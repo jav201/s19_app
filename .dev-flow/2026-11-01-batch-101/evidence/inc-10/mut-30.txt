@@ -1,0 +1,129 @@
+=== base commit: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+=== python: Python 3.11.18
+=== mutation applied: M27 (file s19_app/tui/segment_split_view.py)
+--- a/s19_app/tui/segment_split_view.py
++++ b/s19_app/tui/segment_split_view.py
+@@ -1743,11 +1743,10 @@
+         # R-SEG-OPEN.6 / I-2: focus the table only while the window is shown;
+         # a hidden window (a load or unload while it is closed) must not
+         # steal the focus.
+-        if not self.has_class("hidden"):
+-            try:
+-                self.query_one("#sje_table", _SegTable).focus()
+-            except Exception:
+-                pass
++        try:
++            self.query_one("#sje_table", _SegTable).focus()
++        except Exception:
++            pass
+ 
+     def check_action(self, action: str, parameters: tuple) -> Optional[bool]:
+         """Refuse the window's own keys while it is hidden (E3 S-3, D-11, I-6).
+LANDED M27: 'if not self.has_class("hidden"):' x0
+=== s19_app.__file__ ===
+<HOME>/work/s19_i10mut_m30/s19_app/__init__.py
+=== CMD ===
+env -u NO_COLOR <HOME>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -rf  tests/test_b101_unload_focus.py::test_r_seg_open_6_1_unload_keeps_the_focus_out_of_the_hidden_window tests/test_b101_unload_focus.py::test_r_seg_open_6_2_load_keeps_the_focus_out_of_the_hidden_window
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+______ test_r_seg_open_6_2_load_keeps_the_focus_out_of_the_hidden_window _______
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-668/test_r_seg_open_6_2_load_keeps0')
+
+    def test_r_seg_open_6_2_load_keeps_the_focus_out_of_the_hidden_window(tmp_path: Path) -> None:
+        """R-SEG-OPEN.6 case /2 (written at E4 integration): fixture three loaded
+        (so the Workspace panes are shown), ``files_list`` focused and Split / Join
+        hidden; a second load of fixture three puts the focus inside
+        ``#screen_split_join`` at no point: every focus the screen takes during the
+        load is recorded, none sits in the window, and the focus ends on
+        ``files_list``. Base: the load's ``refresh_window`` focuses the hidden
+        ``#sje_table`` and the load tail's re-home moves it back, so the end state
+        alone could not fail. (With nothing loaded the empty state hides the
+        panes, LLR-002.3, so ``files_list`` is focused after a first load.)"""
+        image = write_three_ranges(tmp_path / "src" / "three.s19")
+        again = write_three_ranges(tmp_path / "src" / "three_again.s19")
+    
+        async def scenario(app, pilot, log):
+            await load_image(pilot, app, image)
+            await put_focus(pilot, app, "files_list")
+            await wait_focus(pilot, app, "files_list")
+            assert split_join_hidden(app)
+            screen = app.default_screen
+            taken = []
+            original = screen.set_focus
+    
+            def record(widget, *args, **kwargs):
+                taken.append(widget)
+                return original(widget, *args, **kwargs)
+    
+            screen.set_focus = record
+            try:
+                await load_image(pilot, app, again)
+                await wait_focus(pilot, app, "files_list")
+                await settle(pilot, 6)
+            finally:
+                del screen.set_focus
+            leaked = [widget.id for widget in taken if inside(widget, "screen_split_join")]
+            assert leaked == [], f"the load focused {leaked} inside the hidden window"
+            assert not inside(focus_of(app), "screen_split_join"), focus_report(app)
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:1350: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f0a952381d0>
+
+    async def scenario(app, pilot, log):
+        await load_image(pilot, app, image)
+        await put_focus(pilot, app, "files_list")
+        await wait_focus(pilot, app, "files_list")
+        assert split_join_hidden(app)
+        screen = app.default_screen
+        taken = []
+        original = screen.set_focus
+    
+        def record(widget, *args, **kwargs):
+            taken.append(widget)
+            return original(widget, *args, **kwargs)
+    
+        screen.set_focus = record
+        try:
+            await load_image(pilot, app, again)
+            await wait_focus(pilot, app, "files_list")
+            await settle(pilot, 6)
+        finally:
+            del screen.set_focus
+        leaked = [widget.id for widget in taken if inside(widget, "screen_split_join")]
+>       assert leaked == [], f"the load focused {leaked} inside the hidden window"
+E       AssertionError: the load focused ['sje_table'] inside the hidden window
+E       assert ['sje_table'] == []
+E         
+E         Left contains one more item: 'sje_table'
+E         Use -v to get more diff
+
+../s19_i10mut/tests/test_b101_unload_focus.py:1347: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_unload_focus.py::test_r_seg_open_6_2_load_keeps_the_focus_out_of_the_hidden_window
+1 failed, 1 passed in 8.28s

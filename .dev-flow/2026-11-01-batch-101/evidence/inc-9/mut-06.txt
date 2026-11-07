@@ -1,0 +1,172 @@
+base commit (origin/main): e07fb00f9fc13afd314d0334fac683fe33b29b6c
+applied-tree head: b204c7d44a42383f2a7c63295280b0a4b7f3ad58
+mutant: M6 — R-FLOW-SET.9
+
+--- mutation (diff) ---
+--- a/s19_app/tui/services/flow_persistence_service.py
++++ b/s19_app/tui/services/flow_persistence_service.py
+@@ -1710,9 +1710,7 @@
+ 
+     def render(stem: str) -> str:
+         return json.dumps(
+-            chain_set_to_dict(
+-                replace(chain_set, name=stem[:CHAIN_SET_MAX_NAME_LEN])
+-            ),
++            chain_set_to_dict(chain_set),
+             indent=2,
+         )
+
+--- s19_app.__file__ (from inside the copy) ---
+<HOME>/work/s19_i9mut_m6/s19_app/__init__.py
+
+--- pytest ---
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+_________________ test_r_flow_set_9_1_cleaned_name_is_written __________________
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-371/test_r_flow_set_9_1_cleaned_na0/.s19tool/workarea'), PosixPath('/tmp/py...ned_na0/.s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-371/test_r_flow_set_9_1_cleaned_na0/outside'))
+
+    def test_r_flow_set_9_1_cleaned_name_is_written(area):
+        """R-FLOW-SET.9/1: a saved set holds its cleaned file stem as its name."""
+        _root, project, _out = area
+        saved = save_chain_set(replace(C1, name="Nightly Set!"), "Nightly Set!  ", project)
+        assert saved == project / "flowsets" / "NightlySet.json"
+>       assert _name_in(saved) == "NightlySet"
+E       AssertionError: assert 'Nightly Set!' == 'NightlySet'
+E         
+E         - NightlySet
+E         + Nightly Set!
+E         ?        +   +
+
+../s19_i9mut/tests/test_b101_flow_saves.py:198: AssertionError
+________________ test_r_flow_set_9_2_clash_file_holds_its_stem _________________
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-371/test_r_flow_set_9_2_clash_file0/.s19tool/workarea'), PosixPath('/tmp/py...h_file0/.s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-371/test_r_flow_set_9_2_clash_file0/outside'))
+
+    def test_r_flow_set_9_2_clash_file_holds_its_stem(area):
+        """R-FLOW-SET.9/2: a clash set file holds its own stem as its name."""
+        _root, project, _out = area
+        (project / "flowsets").mkdir()
+        (project / "flowsets" / "s.json").write_text("{}", encoding="utf-8")
+        saved = save_chain_set(C1, "s", project)
+        assert saved.stem != "s"
+>       assert _name_in(saved) == saved.stem
+E       AssertionError: assert 's' == 's_2'
+E         
+E         - s_2
+E         + s
+
+../s19_i9mut/tests/test_b101_flow_saves.py:211: AssertionError
+_________________ test_r_flow_set_10_1_long_stem_is_cut_to_64 __________________
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-371/test_r_flow_set_10_1_long_stem0/.s19tool/workarea'), PosixPath('/tmp/py...g_stem0/.s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-371/test_r_flow_set_10_1_long_stem0/outside'))
+
+    def test_r_flow_set_10_1_long_stem_is_cut_to_64(area):
+        """R-FLOW-SET.10/1: a 65-character set stem names the file whole, the name is cut to 64."""
+        _root, project, _out = area
+        saved = save_chain_set(replace(C1, name="D" * 65), "D" * 65, project)
+        assert saved == project / "flowsets" / ("D" * 65 + ".json")
+>       assert _name_in(saved) == "D" * 64
+E       AssertionError: assert 'DDDDDDDDDDDD...DDDDDDDDDDDDD' == 'DDDDDDDDDDDD...DDDDDDDDDDDDD'
+E         
+E         Skipping 53 identical leading characters in diff, use -v to show
+E         - DDDDDDDDDDD
+E         + DDDDDDDDDDDD
+E         ?            +
+
+../s19_i9mut/tests/test_b101_flow_saves.py:219: AssertionError
+____________ test_at_i9_2_resaved_flow_and_long_set_keep_own_names _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-371/test_at_i9_2_resaved_flow_and_0')
+
+    def test_at_i9_2_resaved_flow_and_long_set_keep_own_names(tmp_path: Path) -> None:
+        """AT-I9-2 (US-I9-2, rows R-FLOW-FILE.12, R-FLOW-SET.9 and .10, output then
+        consume; E3 addendum N-1): ``rep_a`` loaded and saved as ``rep_b``,
+        imported and run as a lane, a 70-character set name saved through Save Set
+        and reloaded through Load Set: ``flows/rep_b.json`` holds ``"name":
+        "rep_b"``, the lane's flow report starts ``# Flow report - rep\\_b``,
+        ``flowsets/<70 S>.json`` holds a 64-character name, and Load Set paints
+        ``1 chain(s) restored`` with the one lane ``rep_b`` and no ``Chain set load
+        refused`` status.
+    
+        RED on base: the flow keeps ``rep_a``, the report reads ``rep\\_a``, and Load
+        Set paints a refusal (``chain-set name exceeds 64 characters``).
+        """
+        set_name = "S" * 70
+    
+        async def body(app, pilot, project_dir, log):
+            write_flow(project_dir, "rep_a", [SourceBlock("prg.s19"), ReportBlock()])
+            panel = await open_flow_builder(app, pilot)
+            await load_flow(app, pilot, "rep_a")
+            flow_file = project_dir / "flows" / "rep_b.json"
+            await _builder_save(app, pilot, panel, "rep_b", flow_file.exists)
+            flow_saved = _read_json(flow_file)
+            before = _flow_reports(project_dir)
+            fx_panel = await import_lanes(app, pilot, "rep_b")
+            await run_lanes(app, pilot, fx_panel)
+            await settled(
+                pilot,
+                lambda: len([p for p in _flow_reports(project_dir) if p not in before]) >= 1,
+                "the lane's flow report is on disk",
+            )
+            reports = [
+                p.read_text(encoding="utf-8") for p in _flow_reports(project_dir) if p not in before
+            ]
+            set_file = project_dir / "flowsets" / f"{set_name}.json"
+            fx_panel.query_one("#fx_set_name", Input).value = set_name
+            fx_panel.query_one("#fx_save", Button).press()
+            await settled(pilot, set_file.exists, "the set file is on disk")
+            select = fx_panel.query_one("#fx_set_select", Select)
+            await settled(pilot, lambda: select.value == set_name, "the set picker offers the saved set")
+            set_saved = _read_json(set_file)
+            notice = fx_panel.query_one("#fx_notice")
+            mark = len(log.messages)
+            fx_panel.query_one("#fx_load", Button).press()
+            await settled(
+                pilot,
+                lambda: "chain(s) restored" in _painted(app, notice)
+                or any(m.startswith("Chain set load refused") for m in log.since(mark)),
+                "Load Set restored the lanes or was refused",
+            )
+            await settle(pilot, 2)
+            return (
+                flow_saved,
+                reports,
+                set_saved,
+                _painted(app, notice),
+                _painted_status(app),
+                fx_panel.lane_names(),
+            )
+    
+        flow_saved, reports, set_saved, notice, status, lanes = _drive(tmp_path, body, builder=True)
+        # every clause is checked before the verdict, so a RED names each failing one
+        problems = []
+        if flow_saved["name"] != "rep_b":
+            problems.append(f"flows/rep_b.json name = {flow_saved['name']!r}")
+        if len(reports) != 1:
+            problems.append(f"{len(reports)} new flow reports, expected 1")
+        elif reports[0].splitlines()[0] != REP_B_TITLE:
+            problems.append(f"flow report title = {reports[0].splitlines()[0]!r}")
+        if set_saved["name"] != "S" * 64:
+            problems.append(f"set name has {len(set_saved['name'])} characters, expected 64")
+        if "1 chain(s) restored" not in notice:
+            problems.append(f"Load Set notice = {notice!r}")
+        if status.startswith("Chain set load refused"):
+            problems.append(f"status line = {status!r}")
+        if lanes != ["rep_b"]:
+            problems.append(f"lanes after Load Set = {lanes!r}")
+>       assert problems == [], problems
+E       AssertionError: ['set name has 70 characters, expected 64', "Load Set notice = 'load refused: flowsets/SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS...SSSSSSSSSSSSSSSSSSS.json — [CHAIN-S…'", "status line = 'Chain set load refused: chain-set name exceeds 64 characters'"]
+E       assert ['set name ha... characters'"] == []
+E         
+E         Left contains 3 more items, first extra item: 'set name has 70 characters, expected 64'
+E         Use -v to get more diff
+
+../s19_i9mut/tests/test_b101_flow_names_ui.py:606: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_flow_saves.py::test_r_flow_set_9_1_cleaned_name_is_written
+FAILED tests/test_b101_flow_saves.py::test_r_flow_set_9_2_clash_file_holds_its_stem
+FAILED tests/test_b101_flow_saves.py::test_r_flow_set_10_1_long_stem_is_cut_to_64
+FAILED tests/test_b101_flow_names_ui.py::test_at_i9_2_resaved_flow_and_long_set_keep_own_names
+4 failed in 6.61s
+

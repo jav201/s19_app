@@ -1,0 +1,16 @@
+=== Inc 12 E5 corrective: e5c-12-files-n8
+date: 2026-11-07T12:26:47Z  host: LAN Linux host 2  python: Python 3.11.18
+base: 6f1743c1ad54ff7db89e8fcd4e96266414950f42  main: 6f1743c1ad54ff7db89e8fcd4e96266414950f42  staged tree: de2521d3285fdc05eb7ea84b03caa4f68bf5d285
+s19_app.__file__ = <HOME>/work/s19_i12c/s19_app/__init__.py
+CMD: env -u NO_COLOR PYTHONPATH=<HOME>/work/s19_i12c python -m pytest -q -p no:cacheprovider -n 8 -m not serial_timing -rf tests/test_b101_reach_and_reports_escape.py tests/test_b101_shown_widgets.py tests/test_b101_help_legend_docs.py tests/test_b97_check_editor.py tests/test_id_registry.py tests/test_tui_app.py tests/test_tui_directionb.py tests/test_tui_goto_marker.py tests/test_tui_variants.py tests/test_window_usage_help.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 16%]
+.......................................................x................ [ 32%]
+........................................................................ [ 48%]
+........................................................................ [ 64%]
+........................................................................ [ 80%]
+........................................................................ [ 97%]
+.............                                                            [100%]
+444 passed, 1 xfailed in 209.80s (0:03:29)

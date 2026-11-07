@@ -1,0 +1,143 @@
+# G-T3 base run: 39 re-pointed nodes (13 test files) on origin/main
+# host: LAN Linux host 2; worktree prefix s19_i12t3
+$ git rev-parse HEAD
+2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+$ git status --short (only the 13 copied test files differ from base)
+ M tests/test_b100_project_homes.py
+ M tests/test_b101_flow_names_ui.py
+ M tests/test_b102_flow_file_chooser.py
+ M tests/test_b97_chips_help.py
+ M tests/test_b97_flow_builder.py
+ M tests/test_flow_builder_render.py
+ M tests/test_flow_crc_ribbon.py
+ M tests/test_flow_crc_ui.py
+ M tests/test_flow_external_step_b96.py
+ M tests/test_flow_funnel_b96.py
+ M tests/test_tui_directionb.py
+ M tests/test_tui_flow_builder_b94.py
+ M tests/test_tui_flow_persistence_ui.py
+?? s19_i12t3_probe.py
+$ python -c 'import s19_app; print(s19_app.__file__)'
+<HOME>/work/s19_i12t3/s19_app/__init__.py
+$ env -u NO_COLOR python -m pytest -q -p no:cacheprovider -rfs -v <39 node ids> -n 8 --dist loadfile
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0 -- <HOME>/miniconda3/envs/s19ci/bin/python
+rootdir: <HOME>/work/s19_i12t3
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+created: 8/8 workers
+8 workers [54 items]
+
+scheduling tests via LoadFileScheduling
+
+tests/test_b97_flow_builder.py::test_tc_b97_13_pipeline_cards_and_cables_replace_list_and_canvas 
+tests/test_b101_flow_names_ui.py::test_r_flow_file_12_1_save_after_clear_holds_own_name 
+tests/test_b97_chips_help.py::test_tc_b97_32_flow_help_names_every_label 
+tests/test_flow_crc_ribbon.py::test_tc358_empty_flow_renders_without_crash 
+tests/test_tui_flow_persistence_ui.py::test_at006_report_bearing_flow_shows_report_row 
+tests/test_flow_crc_ui.py::test_at128_crc_node_renders_and_shows_status 
+tests/test_flow_builder_render.py::test_at088b_check_ref_label_renders_literally 
+tests/test_tui_flow_builder_b94.py::test_at_b94_15_fb_a_surface_and_wired_patch_run 
+[gw6] [  1%] PASSED tests/test_flow_crc_ribbon.py::test_tc358_empty_flow_renders_without_crash 
+tests/test_flow_crc_ribbon.py::test_tc361_gating_control_hidden_for_non_check 
+[gw7] [  3%] PASSED tests/test_flow_crc_ui.py::test_at128_crc_node_renders_and_shows_status 
+tests/test_flow_crc_ui.py::test_tc356_crc_in_dropdown_and_builder 
+[gw7] [  5%] PASSED tests/test_flow_crc_ui.py::test_tc356_crc_in_dropdown_and_builder 
+tests/test_b100_project_homes.py::test_tc_b100_31_flow_session_folder_follows_q 
+[gw3] [  7%] PASSED tests/test_flow_builder_render.py::test_at088b_check_ref_label_renders_literally 
+tests/test_flow_builder_render.py::test_at088_gating_selector_appends_block_own_op_check 
+[gw4] [  9%] PASSED tests/test_tui_flow_persistence_ui.py::test_at006_report_bearing_flow_shows_report_row 
+tests/test_tui_flow_persistence_ui.py::test_at006_quarantine_card_painted_and_flow_unchanged 
+[gw0] [ 11%] PASSED tests/test_b97_flow_builder.py::test_tc_b97_13_pipeline_cards_and_cables_replace_list_and_canvas 
+tests/test_b97_flow_builder.py::test_tc_b97_14_palette_offers_every_kind_in_order 
+[gw1] [ 12%] PASSED tests/test_tui_flow_builder_b94.py::test_at_b94_15_fb_a_surface_and_wired_patch_run 
+tests/test_tui_flow_builder_b94.py::test_at_b94_16_a2b_wiring_rule_and_report_provenance 
+[gw5] [ 14%] PASSED tests/test_b101_flow_names_ui.py::test_r_flow_file_12_1_save_after_clear_holds_own_name 
+tests/test_b101_flow_names_ui.py::test_r_fb_save_8_1_refused_home_status 
+[gw3] [ 16%] PASSED tests/test_flow_builder_render.py::test_at088_gating_selector_appends_block_own_op_check 
+tests/test_flow_builder_render.py::test_flow_block_label_covers_check 
+[gw3] [ 18%] PASSED tests/test_flow_builder_render.py::test_flow_block_label_covers_check 
+tests/test_flow_funnel_b96.py::test_tc1817_builder_funnel_table_edits 
+[gw6] [ 20%] PASSED tests/test_flow_crc_ribbon.py::test_tc361_gating_control_hidden_for_non_check 
+tests/test_tui_directionb.py::test_at_flow_add_blocks_and_run_renders_result 
+[gw4] [ 22%] PASSED tests/test_tui_flow_persistence_ui.py::test_at006_quarantine_card_painted_and_flow_unchanged 
+tests/test_tui_flow_persistence_ui.py::test_at005_dirty_guard_cancel_keeps_blocks_confirm_replaces 
+[gw2] [ 24%] PASSED tests/test_b97_chips_help.py::test_tc_b97_32_flow_help_names_every_label 
+tests/test_b97_chips_help.py::test_at_b97_14_help_chip_opens_a_body_covering_the_screen[patch] 
+[gw3] [ 25%] PASSED tests/test_flow_funnel_b96.py::test_tc1817_builder_funnel_table_edits 
+[gw6] [ 27%] PASSED tests/test_tui_directionb.py::test_at_flow_add_blocks_and_run_renders_result 
+tests/test_tui_directionb.py::test_at_flow_block_label_markup_safe 
+[gw7] [ 29%] PASSED tests/test_b100_project_homes.py::test_tc_b100_31_flow_session_folder_follows_q 
+tests/test_b102_flow_file_chooser.py::test_tc_b102_file_02_browse_beside_every_ref_field 
+[gw1] [ 31%] PASSED tests/test_tui_flow_builder_b94.py::test_at_b94_16_a2b_wiring_rule_and_report_provenance 
+tests/test_tui_flow_builder_b94.py::test_at_b94_17_template_save_listing_import_and_dedup 
+[gw5] [ 33%] PASSED tests/test_b101_flow_names_ui.py::test_r_fb_save_8_1_refused_home_status 
+tests/test_b101_flow_names_ui.py::test_at_i9_3_linked_homes_refuse_saves 
+[gw4] [ 35%] PASSED tests/test_tui_flow_persistence_ui.py::test_at005_dirty_guard_cancel_keeps_blocks_confirm_replaces 
+[gw0] [ 37%] PASSED tests/test_b97_flow_builder.py::test_tc_b97_14_palette_offers_every_kind_in_order 
+tests/test_b97_flow_builder.py::test_tc_b97_15_add_form_shows_exactly_the_kind_inputs 
+[gw6] [ 38%] PASSED tests/test_tui_directionb.py::test_at_flow_block_label_markup_safe 
+[gw1] [ 40%] PASSED tests/test_tui_flow_builder_b94.py::test_at_b94_17_template_save_listing_import_and_dedup 
+tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally 
+[gw7] [ 42%] PASSED tests/test_b102_flow_file_chooser.py::test_tc_b102_file_02_browse_beside_every_ref_field 
+tests/test_flow_external_step_b96.py::test_tc1804_builder_palette_select_and_config_row_gate 
+[gw5] [ 44%] PASSED tests/test_b101_flow_names_ui.py::test_at_i9_3_linked_homes_refuse_saves 
+[gw7] [ 46%] PASSED tests/test_flow_external_step_b96.py::test_tc1804_builder_palette_select_and_config_row_gate 
+[gw2] [ 48%] PASSED tests/test_b97_chips_help.py::test_at_b97_14_help_chip_opens_a_body_covering_the_screen[patch] 
+tests/test_b97_chips_help.py::test_at_b97_14_help_chip_opens_a_body_covering_the_screen[check_editor] 
+[gw0] [ 50%] PASSED tests/test_b97_flow_builder.py::test_tc_b97_15_add_form_shows_exactly_the_kind_inputs 
+tests/test_b97_flow_builder.py::test_tc_b97_17_run_is_the_one_filled_action_on_one_foot_row 
+[gw1] [ 51%] PASSED tests/test_tui_flow_builder_b94.py::test_at_b94_18_hostile_names_render_literally 
+tests/test_tui_flow_builder_b94.py::test_tc_b94_20_fb_a_composition_census 
+[gw2] [ 53%] PASSED tests/test_b97_chips_help.py::test_at_b97_14_help_chip_opens_a_body_covering_the_screen[check_editor] 
+tests/test_b97_chips_help.py::test_at_b97_14_help_chip_opens_a_body_covering_the_screen[flow] 
+[gw1] [ 55%] PASSED tests/test_tui_flow_builder_b94.py::test_tc_b94_20_fb_a_composition_census 
+[gw0] [ 57%] PASSED tests/test_b97_flow_builder.py::test_tc_b97_17_run_is_the_one_filled_action_on_one_foot_row 
+tests/test_b97_flow_builder.py::test_tc_b97_49_ribbon_paints_saved_then_unsaved 
+[gw2] [ 59%] PASSED tests/test_b97_chips_help.py::test_at_b97_14_help_chip_opens_a_body_covering_the_screen[flow] 
+tests/test_b97_chips_help.py::test_at_b97_14_help_chip_opens_a_body_covering_the_screen[flow_execution] 
+[gw0] [ 61%] PASSED tests/test_b97_flow_builder.py::test_tc_b97_49_ribbon_paints_saved_then_unsaved 
+tests/test_b97_flow_builder.py::test_tc_b97_49_session_on_the_ribbon[project] 
+[gw0] [ 62%] PASSED tests/test_b97_flow_builder.py::test_tc_b97_49_session_on_the_ribbon[project] 
+tests/test_b97_flow_builder.py::test_tc_b97_49_session_on_the_ribbon[no_project] 
+[gw2] [ 64%] PASSED tests/test_b97_chips_help.py::test_at_b97_14_help_chip_opens_a_body_covering_the_screen[flow_execution] 
+[gw0] [ 66%] PASSED tests/test_b97_flow_builder.py::test_tc_b97_49_session_on_the_ribbon[no_project] 
+tests/test_b97_flow_builder.py::test_tc_b97_51_keyboard_order_keys_and_chip_states 
+[gw0] [ 68%] PASSED tests/test_b97_flow_builder.py::test_tc_b97_51_keyboard_order_keys_and_chip_states 
+tests/test_b97_flow_builder.py::test_tc_b97_51_space_presses_every_builder_button_group 
+[gw0] [ 70%] PASSED tests/test_b97_flow_builder.py::test_tc_b97_51_space_presses_every_builder_button_group 
+tests/test_b97_flow_builder.py::test_tc_b97_58_add_with_an_empty_field_says_what_it_needs[source-image file] 
+[gw0] [ 72%] PASSED tests/test_b97_flow_builder.py::test_tc_b97_58_add_with_an_empty_field_says_what_it_needs[source-image file] 
+tests/test_b97_flow_builder.py::test_tc_b97_58_add_with_an_empty_field_says_what_it_needs[check-check doc] 
+[gw0] [ 74%] PASSED tests/test_b97_flow_builder.py::test_tc_b97_58_add_with_an_empty_field_says_what_it_needs[check-check doc] 
+tests/test_b97_flow_builder.py::test_tc_b97_58_add_with_an_empty_field_says_what_it_needs[write_out-output file] 
+[gw0] [ 75%] PASSED tests/test_b97_flow_builder.py::test_tc_b97_58_add_with_an_empty_field_says_what_it_needs[write_out-output file] 
+tests/test_b97_flow_builder.py::test_tc_b97_58_add_notice_clears_on_kind_change_and_run[kind change] 
+[gw0] [ 77%] PASSED tests/test_b97_flow_builder.py::test_tc_b97_58_add_notice_clears_on_kind_change_and_run[kind change] 
+tests/test_b97_flow_builder.py::test_tc_b97_58_add_notice_clears_on_kind_change_and_run[Run] 
+[gw0] [ 79%] PASSED tests/test_b97_flow_builder.py::test_tc_b97_58_add_notice_clears_on_kind_change_and_run[Run] 
+tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[source.image_ref] 
+[gw0] [ 81%] PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[source.image_ref] 
+tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[patch.change_doc_ref] 
+[gw0] [ 83%] PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[patch.change_doc_ref] 
+tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[check.check_doc_ref] 
+[gw0] [ 85%] PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[check.check_doc_ref] 
+tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[crc.config_ref] 
+[gw0] [ 87%] PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[crc.config_ref] 
+tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[write_out.output_name] 
+[gw0] [ 88%] PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[write_out.output_name] 
+tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[a2b.image_a.ref] 
+[gw0] [ 90%] PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[a2b.image_a.ref] 
+tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[a2b.image_b.ref] 
+[gw0] [ 92%] PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[a2b.image_b.ref] 
+tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[external_step.log_ref] 
+[gw0] [ 94%] PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[external_step.log_ref] 
+tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[external_step.output_path] 
+[gw0] [ 96%] PASSED tests/test_b97_flow_builder.py::test_tc_b97_62_nul_pasted_into_the_add_form_is_refused[external_step.output_path] 
+tests/test_b97_flow_builder.py::test_at_b97_07_each_kind_its_inputs_and_an_ext_step_card 
+[gw0] [ 98%] PASSED tests/test_b97_flow_builder.py::test_at_b97_07_each_kind_its_inputs_and_an_ext_step_card 
+tests/test_b97_flow_builder.py::test_at_b97_08_hostile_and_nul_refs_never_crash_or_inject 
+[gw0] [100%] PASSED tests/test_b97_flow_builder.py::test_at_b97_08_hostile_and_nul_refs_never_crash_or_inject 
+
+======================== 54 passed in 206.93s (0:03:26) ========================
+exit status: 0

@@ -1,0 +1,26 @@
+== e5c-01 setup  2026-11-07T10:56:59Z  host: LAN Linux laptop
+laptop clone origin/main after fetch: 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+Note: switching to 'e2663953ef06da6f05468da282c71019af04c1ee'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+isolated clone main: 6f1743c1ad54ff7db89e8fcd4e96266414950f42  origin/main: 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+base: 6f1743c1ad54ff7db89e8fcd4e96266414950f42  staged tree: e02ea3925c35ad3acda08e160a25911afdd868c7
+ tests/test_b101_inplace_views.py  | 1440 +++++++++++++++++++++++++++++++++++++
+ tests/test_id_registry.py         |    3 +-
+ 4 files changed, 1660 insertions(+), 6 deletions(-)
+mutant copy refreshed: e02ea3925c35ad3acda08e160a25911afdd868c7
+--- note added when the transcript was copied: the clone is <HOME>/work/s19_i10bc (git clone --shared of the laptop's clone, then git checkout -B main 6f1743c and git update-ref refs/remotes/origin/main 6f1743c); the same diff applied to 6f1743c in a scratch index on the Windows PC (git plumbing only) gives tree e02ea3925c35ad3acda08e160a25911afdd868c7. Later trees of this pass: 0d9e780f27b9189f5ffdb7c859857df4e07ee1bd (e5c-03, e5c-04), f60e3b2df551b8ca5ed438916a0ff14c8f4571b3 (final; e5c-05 on, every mut-c run), each equal to the local scratch-index tree.

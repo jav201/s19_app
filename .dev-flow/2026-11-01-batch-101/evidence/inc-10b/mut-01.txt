@@ -1,0 +1,118 @@
+base commit (origin/main): 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+base worktree: <HOME>/work/s19_i10bmut (main == origin/main == 6f1743c, + the Inc 10b product and test diff applied)
+mutant: M1 - remove the hex refresh from the write notice
+
+=== MUTANT M1 ===
+edit: 1 edit
+grep output:
+0
+
+mutation diff:
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -18804,7 +18804,6 @@
+             checks = None
+         if checks is not None:
+             checks.clear_check_results()
+-        self._refresh_hex_views_after_write()
+         self._refresh_a2l_values_after_write()
+         try:
+             split_window = self.query_one("#screen_split_join", SplitJoinWindow)
+
+s19_app.__file__ = <HOME>/work/s19_i10bmut_m1/s19_app/__init__.py
+pytest output:
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+E   AssertionError: #hex_view row 0x8010 paints 'FF FF FF FF FF FF FF FF', expected 'FF FF FF AA FF FF FF FF'
+<HOME>/work/s19_i10bmut_m1/tests/support/timing.py:66: AssertionError: #hex_view row 0x8010 paints 'FF FF FF FF FF FF FF FF', expected 'FF FF FF AA FF FF FF FF'
+E   AssertionError: #alt_hex_view row 0x8010 paints 'FF FF FF FF FF FF FF FF', expected 'FF FF FF AA FF FF FF FF'
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3015 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-462/test_r_tui_004_7_2_save_back_s0/app workarea=/tmp/pytest-of-<user>/pytest-462/test_r_tui_004_7_2_save_back_s0/app/.s19tool/workarea
+INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.007
+INFO     s19tui:app.py:18694 Loading file: path=/tmp/pytest-of-<user>/pytest-462/test_r_tui_004_7_2_save_back_s0/img/three.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:15001 Load phase boundary: parse_branch_entry path=three.s19 suffix=.s19
+INFO     s19tui:app.py:19736 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-462/test_r_tui_004_7_2_save_back_s0/img/three.s19 addresses=24 range_count=3 range_bytes=24 errors=0
+INFO     s19tui:app.py:15018 Load phase boundary: parse_branch_done path=three.s19 branch=s19
+INFO     s19tui:app.py:19181 Load phase boundary: apply_install_state path=three.s19 precomputed=False
+INFO     s19tui:app.py:19864 Sections updated. count=3 rendered_ranges=3 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19202 Load phase boundary: apply_sections_done path=three.s19
+INFO     s19tui:app.py:19216 Load phase boundary: apply_hex_done path=three.s19
+INFO     s19tui:app.py:20959 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:18547 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18602 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:20473 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:19231 Load phase boundary: apply_a2l_done path=three.s19
+INFO     s19tui:app.py:20091 Memory Map updated. ranges=3
+INFO     s19tui:app.py:19254 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-462/test_r_tui_004_7_2_save_back_s0/img/three.s19 file_type=s19 elapsed_seconds=0.291 has_mac=False precomputed=False
+INFO     s19tui:app.py:16525 A2L copy complete: path=/tmp/pytest-of-<user>/pytest-462/test_r_tui_004_7_2_save_back_s0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347 copy_seconds=0.005
+INFO     s19tui:app.py:951 A2L cache miss: path=/tmp/pytest-of-<user>/pytest-462/test_r_tui_004_7_2_save_back_s0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347
+WARNING  s19tui:app.py:16563 Recent sources not updated: '/tmp/pytest-of-<user>/pytest-462/b101_i10bw_case080/firmware.a2l'
+INFO     s19tui:app.py:8830 Workarea refreshed. files=1
+INFO     s19tui:app.py:19683 A2L parse summary: path=/tmp/pytest-of-<user>/pytest-462/test_r_tui_004_7_2_save_back_s0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.022 sections=1 tags=462 errors=0
+INFO     s19tui:app.py:18547 MAC validation computed: records=0 issues=924 elapsed_seconds=0.004
+INFO     s19tui:app.py:18602 MAC row cache built: records=0 elapsed_seconds=0.005
+INFO     s19tui:app.py:17470 Load phase boundary: populate_issues_table_done rows=40 total=924 elapsed=0.113
+INFO     s19tui:app.py:20473 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.118
+INFO     s19tui:app.py:21000 Load phase boundary: populate_a2l_table_done rows=200 total=462 elapsed=0.013
+INFO     s19tui:app.py:16582 A2L view refresh complete: path=/tmp/pytest-of-<user>/pytest-462/test_r_tui_004_7_2_save_back_s0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.138
+INFO     s19tui:app.py:16591 A2L loaded: /tmp/pytest-of-<user>/pytest-462/test_r_tui_004_7_2_save_back_s0/app/.s19tool/workarea/temp/firmware.a2l
+<HOME>/work/s19_i10bmut_m1/tests/support/timing.py:66: AssertionError: #alt_hex_view row 0x8010 paints 'FF FF FF FF FF FF FF FF', expected 'FF FF FF AA FF FF FF FF'
+E   AssertionError: #mac_hex_view row 0x8010 paints 'FF FF FF FF FF FF FF FF', expected 'FF FF FF AA FF FF FF FF'
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3015 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-462/test_r_tui_004_7_3_save_projec0/app workarea=/tmp/pytest-of-<user>/pytest-462/test_r_tui_004_7_3_save_projec0/app/.s19tool/workarea
+INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.007
+INFO     s19tui:app.py:18694 Loading file: path=/tmp/pytest-of-<user>/pytest-462/test_r_tui_004_7_3_save_projec0/img/three.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:15001 Load phase boundary: parse_branch_entry path=three.s19 suffix=.s19
+INFO     s19tui:app.py:19736 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-462/test_r_tui_004_7_3_save_projec0/img/three.s19 addresses=24 range_count=3 range_bytes=24 errors=0
+INFO     s19tui:app.py:15018 Load phase boundary: parse_branch_done path=three.s19 branch=s19
+INFO     s19tui:app.py:19181 Load phase boundary: apply_install_state path=three.s19 precomputed=False
+INFO     s19tui:app.py:19864 Sections updated. count=3 rendered_ranges=3 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19202 Load phase boundary: apply_sections_done path=three.s19
+INFO     s19tui:app.py:19216 Load phase boundary: apply_hex_done path=three.s19
+INFO     s19tui:app.py:20959 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:18547 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18602 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:20473 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:19231 Load phase boundary: apply_a2l_done path=three.s19
+INFO     s19tui:app.py:20091 Memory Map updated. ranges=3
+INFO     s19tui:app.py:19254 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-462/test_r_tui_004_7_3_save_projec0/img/three.s19 file_type=s19 elapsed_seconds=0.345 has_mac=False precomputed=False
+INFO     s19tui:app.py:18694 Loading file: path=/tmp/pytest-of-<user>/pytest-462/test_r_tui_004_7_3_save_projec0/img/below.mac suffix=.mac project=None
+INFO     s19tui:app.py:15001 Load phase boundary: parse_branch_entry path=below.mac suffix=.mac
+INFO     s19tui:app.py:17691 Load phase boundary: mac_parse_entry path=below.mac
+INFO     s19tui:app.py:17697 Load phase boundary: mac_parse_done path=below.mac rows=1 diagnostics=0 elapsed=0.000s
+INFO     s19tui:app.py:17711 MAC parse summary (mirrored): path=/tmp/pytest-of-<user>/pytest-462/test_r_tui_004_7_3_save_projec0/img/below.mac rows=1 parse_ok=1 diagnostics=0 valid_addresses=1
+INFO     s19tui:app.py:17732 Load phase boundary: mac_a2l_resolve_entry path=below.mac a2l_path=None
+INFO     s19tui:app.py:17738 Load phase boundary: mac_a2l_resolve_done path=below.mac has_a2l_data=False
+INFO     s19tui:app.py:17744 MAC parse summary: path=/tmp/pytest-of-<user>/pytest-462/test_r_tui_004_7_3_save_projec0/img/below.mac total_records=1 parse_ok=1 diagnostics=0 valid_addresses=1 a2l_path=None elapsed_seconds=0.000
+INFO     s19tui:app.py:15043 Load phase boundary: mac_merge_entry path=below.mac has_primary=True
+INFO     s19tui:app.py:15050 Load phase boundary: mac_merge_done path=below.mac file_type=s19
+INFO     s19tui:app.py:19736 Load summary: file_type=s19+mac path=/tmp/pytest-of-<user>/pytest-462/test_r_tui_004_7_3_save_projec0/img/below.mac addresses=24 range_count=3 range_bytes=24 errors=0
+INFO     s19tui:app.py:15072 Load phase boundary: parse_branch_done path=below.mac branch=mac
+INFO     s19tui:app.py:19181 Load phase boundary: apply_install_state path=below.mac precomputed=False
+INFO     s19tui:app.py:19864 Sections updated. count=3 rendered_ranges=3 mac_out_of_range_total=1 rendered_oor=1
+INFO     s19tui:app.py:19202 Load phase boundary: apply_sections_done path=below.mac
+INFO     s19tui:app.py:19216 Load phase boundary: apply_hex_done path=below.mac
+INFO     s19tui:app.py:20959 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:18547 MAC validation computed: records=1 issues=2 elapsed_seconds=0.000
+INFO     s19tui:app.py:18602 MAC row cache built: records=1 elapsed_seconds=0.000
+INFO     s19tui:app.py:17470 Load phase boundary: populate_issues_table_done rows=2 total=2 elapsed=0.009
+INFO     s19tui:app.py:20524 Load phase boundary: populate_mac_table_done rows=1 total=1 elapsed=0.010
+INFO     s19tui:app.py:19231 Load phase boundary: apply_a2l_done path=below.mac
+INFO     s19tui:app.py:20091 Memory Map updated. ranges=3
+INFO     s19tui:app.py:19254 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-462/test_r_tui_004_7_3_save_projec0/img/below.mac file_type=s19 elapsed_seconds=0.335 has_mac=True precomputed=False
+INFO     s19tui:app.py:8912 Save project action triggered for /tmp/pytest-of-<user>/pytest-462/test_r_tui_004_7_3_save_projec0/img/three.s19
+INFO     s19tui:app.py:12948 Project saved image. name=P file=/tmp/pytest-of-<user>/pytest-462/test_r_tui_004_7_3_save_projec0/app/.s19tool/workarea/P/three.s19
+INFO     s19tui:app.py:12948 Project saved mac. name=P file=/tmp/pytest-of-<user>/pytest-462/test_r_tui_004_7_3_save_projec0/app/.s19tool/workarea/P/below.mac
+INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+<HOME>/work/s19_i10bmut_m1/tests/support/timing.py:66: AssertionError: #mac_hex_view row 0x8010 paints 'FF FF FF FF FF FF FF FF', expected 'FF FF FF AA FF FF FF FF'
+=========================== short test summary info ============================
+FAILED tests/test_b101_inplace_views.py::test_r_tui_004_7_1_apply_shows_in_the_main_hex_view
+FAILED tests/test_b101_inplace_views.py::test_r_tui_004_7_2_save_back_shows_in_the_a2l_hex_view
+FAILED tests/test_b101_inplace_views.py::test_r_tui_004_7_3_save_project_commit_shows_in_the_mac_hex_view
+3 failed, 17 deselected in 69.68s (0:01:09)
+
+pytest exit code: 1

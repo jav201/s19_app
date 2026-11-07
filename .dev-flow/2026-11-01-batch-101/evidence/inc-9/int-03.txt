@@ -1,0 +1,34 @@
+=== Inc 9 E4 integration run: int-03
+date: 2026-11-06T19:56:29Z
+worktree HEAD (base): e07fb00f9fc13afd314d0334fac683fe33b29b6c
+index tree with the increment staged: e222dd2700c0a2d27bda3625b5ed6f910f0c788c
+staged files vs base: 11
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i9int/s19_app/__init__.py
+CMD: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -n 12 --dist loadfile -m not serial_timing -rfs tests/test_b101_crc_model_and_reasons.py tests/test_b102_flow_block_edit.py tests/test_b102_flow_file_chooser.py tests/test_b97_width.py tests/test_b99_truncation.py tests/test_changes_symbol_entries.py tests/test_flow_builder_render.py tests/test_flow_crc_block.py tests/test_flow_crc_ribbon.py tests/test_flow_crc_ui.py tests/test_flow_execution.py tests/test_flow_execution_service.py tests/test_flow_multi_image.py tests/test_flow_multi_image_ui.py tests/test_flow_report_ac6_golden.py tests/test_flow_report_ui.py tests/test_flow_report_wire.py tests/test_patch_dual_entry.py tests/test_tui_directionb.py tests/test_b100_load_dialog.py tests/test_import_census.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  9%]
+........................................................................ [ 18%]
+........................................................................ [ 28%]
+..............................................s......................... [ 37%]
+........................................................................ [ 46%]
+........................................................................ [ 56%]
+........................................................................ [ 65%]
+................................................s....................... [ 74%]
+.......................s......................s..........s.............. [ 84%]
+........ss...................s.......................................... [ 93%]
+................s...s..............................                      [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_b100_load_dialog.py:774: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only
+SKIPPED [1] tests/test_b100_load_dialog.py:1956: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_load_dialog.py:2450: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only
+SKIPPED [1] tests/test_b100_load_dialog.py:2576: Windows strips a trailing dot from a file name, so fw.s19. opens fw.s19; on posix fw.s19. is a distinct, missing name (fix round 1, CI9b-4)
+SKIPPED [1] tests/test_b100_load_dialog.py:2599: case-insensitive file system arm; Windows only
+SKIPPED [2] tests/test_b100_load_dialog.py:2642: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_load_dialog.py:2766: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_load_dialog.py:3666: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only
+SKIPPED [1] tests/test_b100_load_dialog.py:3811: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only
+761 passed, 10 skipped in 1118.82s (0:18:38)
+=== exit code: 0

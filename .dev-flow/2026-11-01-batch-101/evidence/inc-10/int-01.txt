@@ -1,0 +1,123 @@
+=== Inc 10a E4 integration run: int-01
+date: 2026-11-06T23:09:55Z
+worktree HEAD (base): 2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+main ref in this checkout: f9f3cb09738c30d0c73be2523590a5286a55c72f
+index tree with the increment staged: 7324ef328fc9d80ef4907ca78f5472f7d3c696f1
+staged files vs base: 8
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10int/s19_app/__init__.py
+CMD: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -n 6 --dist load -m not serial_timing -rfs tests/test_b101_hex_jump.py tests/test_b101_unload_focus.py tests/test_b100_session_reset.py tests/test_tui_hexview.py tests/test_id_registry.py tests/test_b97_flow_execution.py
+bringing up nodes...
+bringing up nodes...
+
+.............s...............................................F.......... [ 32%]
+........................................................................ [ 64%]
+........................................................................ [ 96%]
+........                                                                 [100%]
+=================================== FAILURES ===================================
+_________ test_r_shell_focus_4_1_unload_all_keeps_a_healthy_list_focus _________
+[gw0] linux -- Python 3.11.18 /data/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-330/popen-gw0/test_r_shell_focus_4_1_unload_0')
+
+    def test_r_shell_focus_4_1_unload_all_keeps_a_healthy_list_focus(tmp_path: Path) -> None:
+        """R-SHELL-FOCUS.4 case /1: ``files_list`` focused, ``U`` keeps it (base:
+        ``sje_table``)."""
+        image = write_three_ranges(tmp_path / "src" / "three.s19")
+    
+        async def scenario(app, pilot, log):
+            await load_image(pilot, app, image)
+            await put_focus(pilot, app, "files_list")
+            mark = len(log.messages)
+            await pilot.press("U")
+            await wait_message(pilot, log, mark, "Unloaded all artifacts.")
+            await settle(pilot, 10)
+            await wait_focus(pilot, app, "files_list")
+    
+>       run(tmp_path, scenario)
+
+tests/test_b101_unload_focus.py:1158: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_unload_focus.py:365: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_unload_focus.py:1156: in scenario
+    await wait_focus(pilot, app, "files_list")
+tests/test_b101_unload_focus.py:262: in wait_focus
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function wait_focus.<locals>.landed at 0x7fd0e61c04a0>
+failure = <function wait_focus.<locals>.<lambda> at 0x7fd0e61c13a0>
+timeout = 10.0, pause_first = False
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: the focus never landed on #files_list; it is WindowHelpChip#window_help_workspace (region area 3)
+
+tests/support/timing.py:66: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3004 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-330/popen-gw0/test_r_shell_focus_4_1_unload_0 workarea=/tmp/pytest-of-<user>/pytest-330/popen-gw0/test_r_shell_focus_4_1_unload_0/.s19tool/workarea
+INFO     s19tui:app.py:8819 Workarea refreshed. files=0
+INFO     s19tui:app.py:17218 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.015
+INFO     s19tui:app.py:18464 Loading file: path=/tmp/pytest-of-<user>/pytest-330/popen-gw0/test_r_shell_focus_4_1_unload_0/src/three.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14782 Load phase boundary: parse_branch_entry path=three.s19 suffix=.s19
+INFO     s19tui:app.py:19369 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-330/popen-gw0/test_r_shell_focus_4_1_unload_0/src/three.s19 addresses=24 range_count=3 range_bytes=24 errors=0
+INFO     s19tui:app.py:14799 Load phase boundary: parse_branch_done path=three.s19 branch=s19
+INFO     s19tui:app.py:18829 Load phase boundary: apply_install_state path=three.s19 precomputed=False
+INFO     s19tui:app.py:19497 Sections updated. count=3 rendered_ranges=3 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18845 Load phase boundary: apply_sections_done path=three.s19
+INFO     s19tui:app.py:18857 Load phase boundary: apply_hex_done path=three.s19
+INFO     s19tui:app.py:20557 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18317 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18372 MAC row cache built: records=0 elapsed_seconds=0.001
+INFO     s19tui:app.py:17218 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.014
+INFO     s19tui:app.py:20071 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.017
+INFO     s19tui:app.py:18870 Load phase boundary: apply_a2l_done path=three.s19
+INFO     s19tui:app.py:19724 Memory Map updated. ranges=3
+INFO     s19tui:app.py:18887 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-330/popen-gw0/test_r_shell_focus_4_1_unload_0/src/three.s19 file_type=s19 elapsed_seconds=0.624 has_mac=False precomputed=False
+INFO     s19tui:app.py:20557 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17218 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.012
+INFO     s19tui:app.py:20071 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.014
+INFO     s19tui:app.py:17218 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.017
+=========================== short test summary info ============================
+FAILED tests/test_b101_unload_focus.py::test_r_shell_focus_4_1_unload_all_keeps_a_healthy_list_focus
+SKIPPED [1] tests/test_b101_hex_jump.py:606: the main pane is 1 line(s) high at 80 x 24: no second row can lie inside it
+1 failed, 222 passed, 1 skipped in 432.90s (0:07:12)
+=== exit code: 1

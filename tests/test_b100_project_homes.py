@@ -866,8 +866,10 @@ def test_tc_b100_31_failed_copy_rolls_back_in_user_terms(
 
 
 def test_tc_b100_31_flow_session_folder_follows_q(tmp_path: Path) -> None:
-    """LLR-171.1l (R9): after a save as, the Flow panels' painted session
-    strip names ``W/Q`` (and no longer ``W/P``).
+    """LLR-171.1l (R9): after a save as, the Flow Builder's painted ribbon
+    ends its session part with the tail of ``W/Q`` (and no longer ``W/P``).
+    Inc 12b re-pointed this node from the removed session line to the ribbon,
+    which clips the session path to its tail.
 
     RED (base, F-5): the strip still names P. Negative control: no
     republish → the strip names P."""
@@ -878,13 +880,14 @@ def test_tc_b100_31_flow_session_folder_follows_q(tmp_path: Path) -> None:
     async def _scenario(app, pilot, log):
         await _open_p(pilot, app)
         messages = await _save(pilot, app, log, "Q")
-        strip = str(app.query_one("#flow_ext_session").render())
+        strip = str(app.query_one("#flow_name_strip").render()).rstrip()
         return messages, strip
 
     messages, strip = projects.run_app(base, _scenario)
     assert _saved(messages), messages
-    assert str(workarea / "Q") in strip, strip
-    assert str(workarea / "P") not in strip.replace(str(workarea / "Q"), ""), strip
+    assert "session" in strip, strip
+    assert strip.endswith(str(Path(workarea.name) / "Q")), strip
+    assert not strip.endswith(str(Path(workarea.name) / "P")), strip
 
 
 # ---------------------------------------------------------------------------

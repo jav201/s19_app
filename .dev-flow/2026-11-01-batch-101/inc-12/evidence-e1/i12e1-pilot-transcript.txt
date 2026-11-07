@@ -1,0 +1,54 @@
+commit: e07fb00f (origin/main; s19_app/ and tests/ equal to main 2d1e2b17)
+platform: Linux x86_64, Python 3.11.18 (LAN Linux host)
+command: PYTHONPATH=<worktree> python i12e1-pilot.py (cwd = the detached worktree; HOME, XDG and LOCALAPPDATA isolated under the run folder; NO_COLOR unset)
+
+s19_app.__file__ = s19_app/__init__.py
+textual 8.2.8
+
+== F-34: the three view aliases and the keys 1, 2, 3
+view_main: in BINDINGS False | in the palette False | method on the app True
+view_alt: in BINDINGS False | in the palette False | method on the app True
+view_mac: in BINDINGS False | in the palette False | method on the app True
+palette commands: 42
+key 2 -> shown window a2l
+key 3 -> shown window mac
+key 1 -> shown window workspace
+
+== F-35: widgets mounted in the window that no driven state displays
+Check Editor: 48 ids mounted; display off when the window opens: ['check_pane_addendum', 'check_pane_json', 'check_preview_toggle_button']
+  never displayed over the states [open with the demo A2L, Fields tab, JSON tab, Addendum tab]: ['check_preview_toggle_button']
+  the Addendum tab shows the addendum preview: True
+Flow Builder: 53 ids mounted; display off when the window opens: ['flow_blocks', 'flow_canvas', 'flow_ext_instruction', 'flow_ext_mode', 'flow_ext_row', 'flow_ext_session', 'flow_funnel_editor', 'flow_funnel_list', 'flow_gating', 'flow_help', 'flow_kind', 'flow_ref_a', 'flow_ref_a_browse', 'flow_ref_b', 'flow_ref_b_browse', 'flow_wiring_notice']
+  kind chip pressed -> value of the hidden kind select: [('source', 'source'), ('patch', 'patch'), ('check', 'check'), ('crc', 'crc'), ('write_out', 'write_out'), ('a2b', 'a2b'), ('external_step', 'external_step')]
+  3 blocks added with Add: the hidden canvas painted 3 times, the hidden list 3 times
+  one paint of the hidden canvas with 3 blocks: 0.33 ms (LAN host)
+  never displayed over the states [open, 7 kind chips, Variables open, Add notice, 3 blocks]: ['flow_blocks', 'flow_canvas', 'flow_ext_session', 'flow_help', 'flow_kind']
+Flow Execution: 35 ids mounted after one import
+  never displayed over the states [no lane, one lane, the lane waits, set saved]: ['fx_help']
+
+== F-51: escape on the Reports dialog
+ReportViewerScreen.BINDINGS: [('question_mark', 'show_window_usage_help', False)]
+escape among the open dialog's active bindings: False
+focus when the dialog opens: report_list
+declared-regions box tab_behavior: focus
+enter on the list shows: 20261106T110000Z-report.md
+focus report_list                         escape -> top screen ReportViewerScreen; focus after report_list
+focus report_markdown_scroll              escape -> top screen ReportViewerScreen; focus after report_markdown_scroll
+focus report_declared_regions  + typed x  escape -> top screen ReportViewerScreen; focus after report_declared_regions
+focus report_filter_select                escape -> top screen ReportViewerScreen; focus after report_filter_select
+focus report_filter_path       + typed x  escape -> top screen ReportViewerScreen; focus after report_filter_path
+focus report_context_bytes     + typed x  escape -> top screen ReportViewerScreen; focus after report_context_bytes
+focus report_generate                     escape -> top screen ReportViewerScreen; focus after report_generate
+focus report_close                        escape -> top screen ReportViewerScreen; focus after report_close
+focus open_folder_reports                 escape -> top screen ReportViewerScreen; focus after open_folder_reports
+focus window_help_reports                 escape -> top screen ReportViewerScreen; focus after window_help_reports
+dropdown: enter on the filter dropdown opens it: True
+dropdown: escape -> open False | top screen ReportViewerScreen
+dropdown: second escape -> top screen ReportViewerScreen
+? on the list opens: WindowHelpScreen | stack ['Screen', 'ReportViewerScreen', 'WindowHelpScreen']
+escape in the help window -> top screen ReportViewerScreen
+Close button -> top screen Screen
+reports on disk after all of the above: 2
+-- a project with no report
+focus when the empty dialog opens: window_help_reports
+escape -> top screen ReportViewerScreen

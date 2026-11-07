@@ -1067,92 +1067,6 @@ class BulkParameterAddScreen(ModalScreen[Optional[dict]]):
         return width if width > 0 else 76
 
 
-#: Static help copy for the variant-selector info modal (US-067 / LLR-067.3).
-#: One paragraph per idea, joined with blank lines. Authored free of Rich /
-#: console-markup metacharacters (``[`` / ``]`` / ``link=``) and rendered
-#: through a ``markup=False`` ``Static`` — the text is a fixed constant with NO
-#: untrusted interpolation, so it can never carry a markup or style leak
-#: (C-17). The required content tokens (``picks which firmware image loads`` /
-#: ``at least two firmware images`` / ``project directory``) are asserted by
-#: AT-067a + TC-337, so a copy edit that drops the explanation trips the tests.
-VARIANT_HELP_TEXT: str = "\n\n".join(
-    (
-        "The variant selector picks which firmware image loads.",
-        "Each option is one firmware image found in the current project "
-        "directory. Choosing an option reloads that image, so you can inspect "
-        "or patch a different build without leaving the project.",
-        "The selector appears only when the project directory holds at least "
-        "two firmware images. With a single image there is nothing to switch "
-        "between, so the control stays empty and disabled.",
-    )
-)
-
-
-class VariantHelpScreen(ModalScreen[None]):
-    """Read-only help modal explaining the variant selector (HLR-067).
-
-    Summary:
-        Static discovery help for the Patch Editor's ``#patch_variant_select``
-        dropdown (LLR-067.3), opened by the always-rendered
-        ``#patch_variant_info_button`` beside it. The body renders the fixed
-        :data:`VARIANT_HELP_TEXT` — what the selector does (picks which
-        firmware image loads) and when it appears (>=2 images in the project
-        directory) — through a ``markup=False`` ``Static`` so a stray
-        metacharacter could never be interpreted (C-17); the copy is a constant
-        with no interpolation. Reuses the shared ``.modal-dialog`` box model
-        (``height: auto`` fits the short help text at both 80x24 and 120x30 —
-        pilot-measured, C-23), so no new CSS rule is added. Dismissed by Close
-        (self-handled, no app-side dispatch) — the same idiom as
-        :class:`LegendScreen`.
-
-    Data Flow:
-        - ``compose`` builds a ``.modal-dialog`` with a title, the
-          ``#variant_help_body`` ``Static`` seeded from ``VARIANT_HELP_TEXT``,
-          and a Close button.
-        - ``on_button_pressed`` dismisses with ``None`` on Close.
-
-    Dependencies:
-        Uses:
-            - ``Static`` / ``Button`` / the shared ``.modal-dialog`` classes
-            - :data:`VARIANT_HELP_TEXT`
-        Used by:
-            - ``S19TuiApp.on_patch_editor_panel_variant_help_requested``
-            - tests/test_tui_variants.py
-
-    Example:
-        >>> screen = VariantHelpScreen()  # doctest: +SKIP
-    """
-
-    def compose(self) -> ComposeResult:
-        yield Container(
-            Label("About the variant selector", classes="modal-title"),
-            Static(
-                VARIANT_HELP_TEXT,
-                id="variant_help_body",
-                markup=False,
-            ),
-            Container(
-                Button(
-                    "Close",
-                    id="variant_help_close",
-                    classes="modal-confirm",
-                ),
-                id="variant_help_buttons",
-                classes="modal-buttons",
-            ),
-            id="variant_help_dialog",
-            classes="modal-dialog",
-        )
-
-    def on_mount(self) -> None:
-        self.query_one("#variant_help_close", Button).focus()
-
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == "variant_help_close":
-            logger.info("VariantHelpScreen dismissed by close.")
-            self.dismiss(None)
-
-
 #: Debounce window for the save-plan recompute: one run 150 ms after the
 #: last keystroke (LLR-175.5a).
 SAVE_RECOMPUTE_S = 0.150
@@ -3165,13 +3079,20 @@ class ReportViewerScreen(ModalScreen[None]):
     #: is focused, `?` opens ITS usage-help section instead of the app-wide
     #: stock HelpPanel; the binding is `show=False` and lives on the modal,
     #: so the global `question_mark` binding is untouched and still opens
-    #: the panel everywhere else.
+    #: the panel everywhere else. Escape closes the dialog as Close does (batch-101
+    #: Inc 12, R-DLG.2); not `priority`, so an open dropdown list's own Escape
+    #: closes only that list first (R-DLG.15).
     BINDINGS = [
         Binding("question_mark", "show_window_usage_help", "Window help", show=False),
+        Binding("escape", "close_reports", "Close", show=False),
     ]
 
     def action_show_window_usage_help(self) -> None:
         open_window_help(self.app, "reports")
+
+    def action_close_reports(self) -> None:
+        logger.info("ReportViewerScreen dismissed by Esc.")
+        self.dismiss(None)
 
     class GenerateRequested(Message):
         """Operator asked for a new report with the given context size.

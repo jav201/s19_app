@@ -1,0 +1,85 @@
+"""Inc 12 E4 integration diagnostic: census sizes and the Check Editor walk population.
+
+Run with the tree under test as the working directory (it is put first on sys.path).
+Argument: "tree" (census of the working tree) or a commit (census of that commit's
+s19_app/ read with git show), then "walk" to also measure the walk population.
+"""
+import os
+import subprocess
+import sys
+import tempfile
+
+os.environ["LOCALAPPDATA"] = tempfile.mkdtemp(prefix="s19_i12int-lad-")  # never the operator's store
+sys.path.insert(0, os.getcwd())
+
+import s19_app  # noqa: E402
+
+print("s19_app.__file__ =", s19_app.__file__)
+
+from tests import test_b101_reach_and_reports_escape as reach  # noqa: E402
+
+source = sys.argv[1]
+if source == "tree":
+    sources = reach._read_tree()
+else:
+    paths = subprocess.run(
+        ["git", "ls-tree", "-r", "--name-only", source, "--", "s19_app"],
+        check=True, capture_output=True, text=True,
+    ).stdout.split()
+    sources = {
+        p: subprocess.run(["git", "show", f"{source}:{p}"], check=True,
+                          capture_output=True, text=True).stdout
+        for p in paths if p.endswith(".py") and "__pycache__" not in p
+    }
+census = reach.census_sources(sources)
+print(f"census of {source}: {len(sources)} modules")
+print(f"  dialogs: {len(census.dialogs)}; without an opener: {census.dialogs_without_opener}")
+print(f"  actions: {len(census.actions)}; without a reach: {census.actions_without_reach}")
+print("  ReportViewerScreen.action_close_reports reasons:",
+      sorted(census.actions.get("ReportViewerScreen.action_close_reports", {"<absent>"})))
+by_name = {}
+for label in census.actions:
+    cls, name = label.split(".", 1)
+    by_name.setdefault(name, []).append(cls)
+import ast  # noqa: E402
+
+own_bound = {}
+for text in sources.values():
+    for node in ast.walk(ast.parse(text)):
+        if isinstance(node, ast.ClassDef):
+            for stmt in node.body:
+                if reach._assigned_name(stmt) == "BINDINGS":
+                    own_bound.setdefault(node.name, set()).update(reach._action_strings(stmt))
+print("  action names defined on more than one class (the E3A-R2-3 limit):")
+for name, classes in sorted(by_name.items()):
+    if len(classes) > 1:
+        action = name[len("action_"):]
+        marks = [f"{c}{'' if action in own_bound.get(c, set()) else ' (no own binding)'}" for c in sorted(classes)]
+        print(f"    {name}: {marks}")
+
+if "walk" in sys.argv[2:]:
+    from tests import test_b101_shown_widgets as shown
+    from tests.b97_probes import settled
+
+    async def body(app, pilot, panel):
+        walk = shown._Walk(app.query_one("#screen_check_editor"))
+        await settled(pilot, lambda: shown._shown_panes(panel) == ["check_pane_fields"], "fields")
+        walk.collect("opened")
+        panel_ids = {w.id for w in panel.query("*") if w.id} | {panel.id}
+        for chip_id, pane in shown.TABS:
+            panel.query_one(f"#{chip_id}").press()
+            await settled(pilot, lambda: shown._shown_panes(panel) == [pane], chip_id)
+            walk.collect(chip_id)
+            panel_ids |= {w.id for w in panel.query("*") if w.id}
+        ids = sorted(w.id for w in walk.population.values())
+        return len(walk.population), walk.never_shown(), ids, sorted(panel_ids)
+
+    import tempfile
+    from pathlib import Path
+
+    with tempfile.TemporaryDirectory() as tmp:
+        size, never, ids, panel_ids = shown._drive(Path(tmp), body)
+    print(f"walk population (window #screen_check_editor, widgets with an id): {size}")
+    print(f"  distinct ids: {len(set(ids))}; never shown: {never}")
+    print(f"  ids inside the panel (panel included): {len(panel_ids)}")
+    print(f"  ids outside the panel: {sorted(set(ids) - set(panel_ids))}")

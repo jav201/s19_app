@@ -1,0 +1,61 @@
+=== Inc 10a E4 round-2: int-20-setup — the run clone (LAN Linux laptop): laptop repo fetched; git clone --shared at <HOME>/work/s19_i10r6, detached at 09b4808, its own main = 09b4808; the increment's diff from its product base (git diff --binary 2f54c7d -- s19_app tests docs README.md of the local tree, E4-R6 included) applied with git apply --3way --index; the one conflict resolved in the clone only; staged blobs compared one by one with git hash-object of the local working tree; the RED copy (cp -a, E4-R6's app.py hunk reverse-applied: e8af53c's app.py + the new and changed nodes)
+laptop repo origin/main: 09b4808a0344de05d9d64cd55362ac7058a8c17f; local main (untouched): f9f3cb09738c30d0c73be2523590a5286a55c72f
+Turn off this advice by setting config variable advice.detachedHead to false
+
+clone HEAD: 09b4808a0344de05d9d64cd55362ac7058a8c17f; clone main: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+Applied patch to 's19_app/render/hexview.py' cleanly.
+Applied patch to 's19_app/tui/app.py' cleanly.
+Applied patch to 's19_app/tui/segment_split_view.py' cleanly.
+Applied patch to 'tests/test_b100_focus.py' cleanly.
+Applied patch to 'tests/test_b100_session_reset.py' cleanly.
+Falling back to direct application...
+Falling back to direct application...
+Applied patch to 'tests/test_b97_flow_execution.py' cleanly.
+Applied patch to 'tests/test_id_registry.py' with conflicts.
+Applied patch to 'tests/test_tui_commandbar.py' cleanly.
+U tests/test_id_registry.py
+git apply --3way --index rc=1
+tests/test_id_registry.py
+--- conflict resolution (tests/test_id_registry.py, staged vs base 09b4808):
+diff --git a/tests/test_id_registry.py b/tests/test_id_registry.py
+index d33860e5..4729d88e 100644
+--- a/tests/test_id_registry.py
++++ b/tests/test_id_registry.py
+@@ -184,7 +184,9 @@ from tools.id_registry import (
+ # batch-101 Inc 9: 267 -> 269, measured at E4 integration (tests/test_b101_flow_saves.py,
+ # tests/test_b101_flow_names_ui.py).
+ # batch-101 Inc 12b: 269 -> 270, measured at E4 integration (tests/test_b101_flow_shown_widgets.py).
+-EXPECTED_SCANNED_TEST_FILES = 270
++# batch-101 Inc 10a: 269 -> 271, measured at E4 integration (tests/test_b101_hex_jump.py,
++# tests/test_b101_unload_focus.py).
++EXPECTED_SCANNED_TEST_FILES = 272
+ """Test modules scanned, including this one.
+ 
+ batch-101 Inc 11: 250 -> 253. ``tests/test_b101_a2l_blocks_and_segments.py``,
+--- staged blobs vs the local working tree (git hash-object, one by one):
+equal   s19_app/render/hexview.py
+equal   s19_app/tui/app.py
+equal   s19_app/tui/segment_split_view.py
+equal   tests/test_b100_focus.py
+equal   tests/test_b100_session_reset.py
+equal   tests/test_b101_hex_jump.py
+equal   tests/test_b101_unload_focus.py
+equal   tests/test_b97_flow_execution.py
+DIFFER  tests/test_id_registry.py (local 9887443a11c1fa3b66d51e7c94fb68c73f55e4e0, staged 4729d88ef2aff332f08b252a1681a1b1c0525ca4)
+equal   tests/test_tui_commandbar.py
+--- staged files vs base: 10
+M	s19_app/render/hexview.py
+M	s19_app/tui/app.py
+M	s19_app/tui/segment_split_view.py
+M	tests/test_b100_focus.py
+M	tests/test_b100_session_reset.py
+A	tests/test_b101_hex_jump.py
+A	tests/test_b101_unload_focus.py
+M	tests/test_b97_flow_execution.py
+M	tests/test_id_registry.py
+M	tests/test_tui_commandbar.py
+final staged tree: ba8da17556ca3b4f6f5d42dd0a6e9b9b9ed00ce8
+RED copy: E4-R6 app.py hunk reverse-applied (e8af53c product + new tests)
+RED staged tree: ea2a9c3c054a85336db7c4f6cab4a08df8caaf4a
+ s19_app/tui/segment_split_view.py |  38 ++-
+ 3 files changed, 548 insertions(+), 96 deletions(-)

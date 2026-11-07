@@ -1,0 +1,223 @@
+base commit: 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+mutant: M16
+
+mutation:
+==== diff -u s19_app/tui/screens_directionb.py ====
+--- <HOME>/work/s19_i12mut/s19_app/tui/screens_directionb.py	2026-11-07 05:38:44.571302663 -0600
++++ <HOME>/work/s19_i12mut_m16/s19_app/tui/screens_directionb.py	2026-11-07 06:05:43.253564151 -0600
+@@ -7909,10 +7909,6 @@
+         above refreshes the previews.
+         """
+         button_id = event.button.id or ""
+-        if any(button_id == tab_id for tab_id, _l, _p in self._CARD_TABS):
+-            event.stop()
+-            self._show_tab(button_id)
+-            return
+         if button_id == "check_mem_add_button":
+             event.stop()
+             self._add_memory_row()
+
+
+s19_app.__file__: <HOME>/work/s19_i12mut_m16/s19_app/__init__.py
+
+--- landed grep M16: 's19_app/tui/screens_directionb.py' marker='tab_id for tab_id, _l, _p in self._CARD_TABS' expected=absent found=absent OK=True ---
+
+
+nodes (2):
+  tests/test_b101_shown_widgets.py::test_at_i12_3_addendum_tab_by_keys
+  tests/test_b101_shown_widgets.py::test_r_chked_058_1_every_check_editor_widget_is_shown_in_a_state
+
+
+--- pytest ---
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+______________________ test_at_i12_3_addendum_tab_by_keys ______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-894/test_at_i12_3_addendum_tab_by_0')
+
+    def test_at_i12_3_addendum_tab_by_keys(tmp_path: Path) -> None:
+        """AT-I12-3 (US-I12-2; R-CHKED-058 with the cited R-CHKED-021): the demo
+        A2L loaded; rail key ``=`` shows the Check Editor; ``tab`` until
+        ``#check_tab_addendum`` has the focus (bounded); ``enter``. The Addendum
+        pane is the one shown and ``#check_addendum_preview`` paints the addendum
+        text starting ``## Checks``.
+    
+        Holds on base (R): the Addendum tab chip already carries the function; the
+        walk node carries the removed button.
+        """
+    
+        async def body(app, pilot, panel):
+            await pilot.press("1")
+            await settled(pilot, lambda: not is_displayed(panel), "the Check Editor is left for the Workspace")
+            await pilot.press("=")
+            await settled(pilot, lambda: is_displayed(panel), "rail key = shows the Check Editor")
+            chip = panel.query_one("#check_tab_addendum", Button)
+            before = _shown_panes(panel)
+    
+            focused = False
+            for _ in range(150):
+                if app.focused is chip:
+                    focused = True
+                    break
+                await pilot.press("tab")
+                await settle(pilot, 1)
+            assert focused, f"tab did not reach #check_tab_addendum in 150 presses; focus is {app.focused!r}"
+    
+            await pilot.press("enter")
+            await settled(
+                pilot,
+                lambda: _shown_panes(panel) == ["check_pane_addendum"],
+                "enter on the Addendum chip shows the Addendum pane alone",
+            )
+            preview = panel.query_one("#check_addendum_preview")
+            await settled(pilot, lambda: _painted(app, preview).startswith("## Checks"), "the addendum text is painted")
+            return before, is_displayed(preview), _painted(app, preview), chip.has_class("chip-selected")
+    
+>       before, preview_shown, text, marked = _drive(tmp_path, body)
+                                              ^^^^^^^^^^^^^^^^^^^^^^
+
+../s19_i12mut/tests/test_b101_shown_widgets.py:175: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i12mut/tests/test_b101_shown_widgets.py:56: in _drive
+    return asyncio.run(_run())
+           ^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i12mut/tests/test_b101_shown_widgets.py:54: in _run
+    return await body(app, pilot, panel)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i12mut/tests/test_b101_shown_widgets.py:166: in body
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_at_i12_3_addendum_tab_by_keys.<locals>.body.<locals>.<lambda> at 0x7feb1e15f4c0>
+failure = 'did not settle: enter on the Addendum chip shows the Addendum pane alone'
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: did not settle: enter on the Addendum chip shows the Addendum pane alone
+
+tests/support/timing.py:66: AssertionError
+_______ test_r_chked_058_1_every_check_editor_widget_is_shown_in_a_state _______
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-894/test_r_chked_058_1_every_check0')
+
+    def test_r_chked_058_1_every_check_editor_widget_is_shown_in_a_state(tmp_path: Path) -> None:
+        """R-CHKED-058 (case /1): walk the window ``#screen_check_editor`` over
+        [opened with the demo A2L; ``#check_tab_fields``, ``#check_tab_json``,
+        ``#check_tab_addendum`` pressed in turn] -> 0 widgets with an id never
+        shown, at least 45 in the population, and the Addendum state shows
+        ``#check_addendum_preview``.
+    
+        RED on base: the hidden ``Addendum preview`` button is mounted and never
+        shown in any of the four states; the failure message lists its id.
+        """
+    
+        async def body(app, pilot, panel):
+            walk = _Walk(app.query_one("#screen_check_editor"))
+            await settled(pilot, lambda: _shown_panes(panel) == ["check_pane_fields"], "opened on the Fields tab")
+            walk.collect("opened")
+            addendum_state = None
+    
+            for chip_id, pane in TABS:
+                panel.query_one(f"#{chip_id}", Button).press()
+                await settled(
+                    pilot,
+                    lambda: _shown_panes(panel) == [pane] and panel.query_one(f"#{chip_id}").has_class("chip-selected"),
+                    f"the {chip_id} tab is shown alone and its chip marked",
+                )
+                walk.collect(chip_id)
+                if chip_id == "check_tab_addendum":
+                    addendum_state = is_displayed(panel.query_one("#check_addendum_preview"))
+    
+            return len(walk.population), walk.never_shown(), walk.states, addendum_state
+    
+>       size, never, states, addendum_state = _drive(tmp_path, body)
+                                              ^^^^^^^^^^^^^^^^^^^^^^
+
+../s19_i12mut/tests/test_b101_shown_widgets.py:125: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i12mut/tests/test_b101_shown_widgets.py:56: in _drive
+    return asyncio.run(_run())
+           ^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i12mut/tests/test_b101_shown_widgets.py:54: in _run
+    return await body(app, pilot, panel)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i12mut/tests/test_b101_shown_widgets.py:114: in body
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_r_chked_058_1_every_check_editor_widget_is_shown_in_a_state.<locals>.body.<locals>.<lambda> at 0x7feb1e029080>
+failure = 'did not settle: the check_tab_json tab is shown alone and its chip marked'
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: did not settle: the check_tab_json tab is shown alone and its chip marked
+
+tests/support/timing.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_shown_widgets.py::test_at_i12_3_addendum_tab_by_keys
+FAILED tests/test_b101_shown_widgets.py::test_r_chked_058_1_every_check_editor_widget_is_shown_in_a_state
+2 failed in 130.43s (0:02:10)

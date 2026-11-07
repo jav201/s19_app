@@ -1,0 +1,22 @@
+# LAN Linux laptop run
+=== Inc 10a E5 RR run: final-laws
+date: 2026-11-07T07:43:56Z
+tree dir: <HOME>/work/s19_i10rr
+base HEAD: 09b4808a0344de05d9d64cd55362ac7058a8c17f  main: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+staged tree: d5beaa3e4f07a1be90300618b308106d2874e812
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10rr/s19_app/__init__.py
+CMD: env -u NO_COLOR timeout 1500 /data/miniconda3/envs/s19ci/bin/python -m pytest -p no:cacheprovider -q -n 6 --dist load -rf --tb=line tests/test_address_census.py tests/test_suite_hygiene.py tests/test_id_registry.py tests/test_engine_unchanged.py tests/test_docs_canon.py tests/test_b101_doc_hygiene.py tests/test_b101_help_legend_docs.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 32%]
+........................................................................ [ 65%]
+........................................................................ [ 98%]
+...                                                                      [100%]
+============================= QC-TM timing margins =============================
+49.8%  0.201 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+66.5%  0.502 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 2 bounds, 0 under 20 % margin
+219 passed in 121.52s (0:02:01)
+exit code: 0

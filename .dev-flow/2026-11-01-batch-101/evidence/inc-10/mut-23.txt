@@ -1,0 +1,1655 @@
+=== base commit: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+=== python: Python 3.11.18
+=== mutation applied: M21 (file s19_app/tui/app.py)
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -10135,9 +10135,7 @@
+         except Exception:
+             focused = None
+         if changed:
+-            self.call_after_refresh(
+-                self._land_focus, focused, self._active_screen_key, on_switch=True
+-            )
++            pass
+         # batch-97 Inc-8 (D29): the key bar's row 2 follows the window.
+         self.refresh_bindings()
+ 
+LANDED M21: 'self._land_focus, focused, self._active_screen_key, on_switch=True' x0
+=== s19_app.__file__ ===
+<HOME>/work/s19_i10mut_m23/s19_app/__init__.py
+=== CMD ===
+env -u NO_COLOR <HOME>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -rf -n 6 --dist load tests/test_b101_unload_focus.py::test_r_shell_focus_2_1_key_2_lands_on_the_a2l_window_help_chip tests/test_b101_unload_focus.py::test_r_shell_focus_2_2_esc_in_split_join_focuses_the_workspace_target tests/test_b101_unload_focus.py::test_r_shell_focus_2_3_rail_key_in_split_join_focuses_that_window tests/test_b101_unload_focus.py::test_r_shell_focus_2_5_every_rail_key_lands_on_its_target tests/test_b101_unload_focus.py::test_r_shell_focus_2_7_the_later_of_two_rail_keys_wins tests/test_b97_flow_execution.py::test_tc_b97_64_arriving_with_bracket_c_confirms
+bringing up nodes...
+bringing up nodes...
+
+FFFFFFFFFFFFFFFFFF                                                       [100%]
+=================================== FAILURES ===================================
+________ test_r_shell_focus_2_1_key_2_lands_on_the_a2l_window_help_chip ________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw0/test_r_shell_focus_2_1_key_2_l0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw0/b101_i10f_case080')
+
+    def test_r_shell_focus_2_1_key_2_lands_on_the_a2l_window_help_chip(tmp_path: Path, case08: Path) -> None:
+        """R-SHELL-FOCUS.2 case /1 (changed at E4, E4-R4): with the image and A2L
+        loaded and ``files_list`` focused, ``2`` lands the focus on the A2L
+        window's switch landing ``window_help_a2l`` (graph I-4), inside the shown
+        window and not on the tag table, whose own PgDn would scroll it instead of
+        paging the explorer (R-TUI-020.1; base: ``ws_load_project_button``, in the
+        hidden Workspace, area 0; the Inc 10a tree before E4-R4: ``a2l_tags_list``)."""
+    
+        async def scenario(app, pilot, log):
+            await case_session(pilot, app, case08, mac=False, a2l=True)
+            await pilot.press("2")
+            await wait_screen(pilot, app, "a2l")
+            await wait_focus(pilot, app, "window_help_a2l")
+            assert inside(focus_of(app), "screen_a2l"), focus_report(app)
+            await settle(pilot, 6)
+            assert focus_of(app) is not None and focus_of(app).id == "window_help_a2l", focus_report(app)
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:936: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_unload_focus.py:931: in scenario
+    await wait_focus(pilot, app, "window_help_a2l")
+../s19_i10mut/tests/test_b101_unload_focus.py:269: in wait_focus
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function wait_focus.<locals>.landed at 0x7f9e32ce71a0>
+failure = <function wait_focus.<locals>.<lambda> at 0x7f9e2e76aac0>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: the focus never landed on #window_help_a2l; it is no widget focused
+
+tests/support/timing.py:66: AssertionError
+______ test_r_shell_focus_2_3_rail_key_in_split_join_focuses_that_window _______
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw1/test_r_shell_focus_2_3_rail_ke0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw1/b101_i10f_case080')
+
+    def test_r_shell_focus_2_3_rail_key_in_split_join_focuses_that_window(
+        tmp_path: Path, case08: Path
+    ) -> None:
+        """R-SHELL-FOCUS.2 case /3 (changed at E4, E4-R6): ``3`` in Split / Join
+        shows the MAC View with the MAC window's switch landing
+        ``mac_page_prev_button`` focused (graph I-4; the record table's own PgDn
+        would shadow R-TUI-020.1's paging; base: nothing focused; the Inc 10a tree
+        before E4-R6: ``mac_records_list``)."""
+    
+        async def scenario(app, pilot, log):
+            await case_session(pilot, app, case08)
+            await open_split_join(pilot, app)
+            await pilot.press("3")
+            await wait_screen(pilot, app, "mac")
+            await wait_focus(pilot, app, "mac_page_prev_button")
+            assert inside(focus_of(app), "screen_mac"), focus_report(app)
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:983: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_unload_focus.py:980: in scenario
+    await wait_focus(pilot, app, "mac_page_prev_button")
+../s19_i10mut/tests/test_b101_unload_focus.py:269: in wait_focus
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function wait_focus.<locals>.landed at 0x7f38d513dbc0>
+failure = <function wait_focus.<locals>.<lambda> at 0x7f38db941c60>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: the focus never landed on #mac_page_prev_button; it is no widget focused
+
+tests/support/timing.py:66: AssertionError
+_______ test_r_shell_focus_2_5_every_rail_key_lands_on_its_target[diff] ________
+[gw5] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw5/test_r_shell_focus_2_5_every_r0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw5/b101_i10f_case080')
+key = '7', window = 'diff', target_id = 'diff_compare_button'
+
+    @pytest.mark.parametrize(
+        "key,window,target_id", RAIL_TARGETS, ids=[row[1] for row in RAIL_TARGETS]
+    )
+    def test_r_shell_focus_2_5_every_rail_key_lands_on_its_target(
+        tmp_path: Path, case08: Path, key: str, window: str, target_id: str
+    ) -> None:
+        """R-SHELL-FOCUS.2 case /5: with the image, A2L and MAC loaded, each rail key
+        lands the focus on its window's CTX-SHELL target, or (target not shown) on
+        the first shown focusable non-text widget of the window, else its rail item
+        (base: the focus stays in the window just left); ``2`` and ``3`` land on
+        their windows' switch landings (changed at E4, E4-R4 / E4-R6)."""
+    
+        async def scenario(app, pilot, log):
+            await case_session(pilot, app, case08, mac=True, a2l=True)
+            if window == "workspace":
+                await pilot.press("3")
+                await wait_screen(pilot, app, "mac")
+                await settle(pilot, 8)
+            await pilot.press(key)
+            await wait_screen(pilot, app, window)
+            await wait_until(
+                pilot,
+                lambda: focus_matches_target(app, target_id),
+                lambda: f"after {key!r} the focus is {focus_report(app)}, not #{target_id}",
+                timeout=FOCUS_WAIT_S,
+            )
+            assert target_is_shown(app, target_id), f"#{target_id} paints no region"
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:1055: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_unload_focus.py:1047: in scenario
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_r_shell_focus_2_5_every_rail_key_lands_on_its_target.<locals>.scenario.<locals>.<lambda> at 0x7faae7b7ade0>
+failure = <function test_r_shell_focus_2_5_every_rail_key_lands_on_its_target.<locals>.scenario.<locals>.<lambda> at 0x7faae7b78540>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: after '7' the focus is no widget focused, not #diff_compare_button
+
+tests/support/timing.py:66: AssertionError
+_______ test_r_shell_focus_2_5_every_rail_key_lands_on_its_target[patch] _______
+[gw4] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw4/test_r_shell_focus_2_5_every_r0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw4/b101_i10f_case080')
+key = '6', window = 'patch', target_id = 'patch_editor_panel'
+
+    @pytest.mark.parametrize(
+        "key,window,target_id", RAIL_TARGETS, ids=[row[1] for row in RAIL_TARGETS]
+    )
+    def test_r_shell_focus_2_5_every_rail_key_lands_on_its_target(
+        tmp_path: Path, case08: Path, key: str, window: str, target_id: str
+    ) -> None:
+        """R-SHELL-FOCUS.2 case /5: with the image, A2L and MAC loaded, each rail key
+        lands the focus on its window's CTX-SHELL target, or (target not shown) on
+        the first shown focusable non-text widget of the window, else its rail item
+        (base: the focus stays in the window just left); ``2`` and ``3`` land on
+        their windows' switch landings (changed at E4, E4-R4 / E4-R6)."""
+    
+        async def scenario(app, pilot, log):
+            await case_session(pilot, app, case08, mac=True, a2l=True)
+            if window == "workspace":
+                await pilot.press("3")
+                await wait_screen(pilot, app, "mac")
+                await settle(pilot, 8)
+            await pilot.press(key)
+            await wait_screen(pilot, app, window)
+            await wait_until(
+                pilot,
+                lambda: focus_matches_target(app, target_id),
+                lambda: f"after {key!r} the focus is {focus_report(app)}, not #{target_id}",
+                timeout=FOCUS_WAIT_S,
+            )
+            assert target_is_shown(app, target_id), f"#{target_id} paints no region"
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:1055: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_unload_focus.py:1047: in scenario
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_r_shell_focus_2_5_every_rail_key_lands_on_its_target.<locals>.scenario.<locals>.<lambda> at 0x7fb62d525260>
+failure = <function test_r_shell_focus_2_5_every_rail_key_lands_on_its_target.<locals>.scenario.<locals>.<lambda> at 0x7fb62ad69120>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: after '6' the focus is no widget focused, not #patch_editor_panel
+
+tests/support/timing.py:66: AssertionError
+________ test_r_shell_focus_2_5_every_rail_key_lands_on_its_target[a2l] ________
+[gw2] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw2/test_r_shell_focus_2_5_every_r0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw2/b101_i10f_case080')
+key = '2', window = 'a2l', target_id = 'window_help_a2l'
+
+    @pytest.mark.parametrize(
+        "key,window,target_id", RAIL_TARGETS, ids=[row[1] for row in RAIL_TARGETS]
+    )
+    def test_r_shell_focus_2_5_every_rail_key_lands_on_its_target(
+        tmp_path: Path, case08: Path, key: str, window: str, target_id: str
+    ) -> None:
+        """R-SHELL-FOCUS.2 case /5: with the image, A2L and MAC loaded, each rail key
+        lands the focus on its window's CTX-SHELL target, or (target not shown) on
+        the first shown focusable non-text widget of the window, else its rail item
+        (base: the focus stays in the window just left); ``2`` and ``3`` land on
+        their windows' switch landings (changed at E4, E4-R4 / E4-R6)."""
+    
+        async def scenario(app, pilot, log):
+            await case_session(pilot, app, case08, mac=True, a2l=True)
+            if window == "workspace":
+                await pilot.press("3")
+                await wait_screen(pilot, app, "mac")
+                await settle(pilot, 8)
+            await pilot.press(key)
+            await wait_screen(pilot, app, window)
+            await wait_until(
+                pilot,
+                lambda: focus_matches_target(app, target_id),
+                lambda: f"after {key!r} the focus is {focus_report(app)}, not #{target_id}",
+                timeout=FOCUS_WAIT_S,
+            )
+            assert target_is_shown(app, target_id), f"#{target_id} paints no region"
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:1055: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_unload_focus.py:1047: in scenario
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_r_shell_focus_2_5_every_rail_key_lands_on_its_target.<locals>.scenario.<locals>.<lambda> at 0x7ff5f576ae80>
+failure = <function test_r_shell_focus_2_5_every_rail_key_lands_on_its_target.<locals>.scenario.<locals>.<lambda> at 0x7ff5f576b100>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: after '2' the focus is no widget focused, not #window_help_a2l
+
+tests/support/timing.py:66: AssertionError
+________ test_r_shell_focus_2_5_every_rail_key_lands_on_its_target[map] ________
+[gw3] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw3/test_r_shell_focus_2_5_every_r0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw3/b101_i10f_case080')
+key = '4', window = 'map', target_id = 'memory_map_panel'
+
+    @pytest.mark.parametrize(
+        "key,window,target_id", RAIL_TARGETS, ids=[row[1] for row in RAIL_TARGETS]
+    )
+    def test_r_shell_focus_2_5_every_rail_key_lands_on_its_target(
+        tmp_path: Path, case08: Path, key: str, window: str, target_id: str
+    ) -> None:
+        """R-SHELL-FOCUS.2 case /5: with the image, A2L and MAC loaded, each rail key
+        lands the focus on its window's CTX-SHELL target, or (target not shown) on
+        the first shown focusable non-text widget of the window, else its rail item
+        (base: the focus stays in the window just left); ``2`` and ``3`` land on
+        their windows' switch landings (changed at E4, E4-R4 / E4-R6)."""
+    
+        async def scenario(app, pilot, log):
+            await case_session(pilot, app, case08, mac=True, a2l=True)
+            if window == "workspace":
+                await pilot.press("3")
+                await wait_screen(pilot, app, "mac")
+                await settle(pilot, 8)
+            await pilot.press(key)
+            await wait_screen(pilot, app, window)
+            await wait_until(
+                pilot,
+                lambda: focus_matches_target(app, target_id),
+                lambda: f"after {key!r} the focus is {focus_report(app)}, not #{target_id}",
+                timeout=FOCUS_WAIT_S,
+            )
+            assert target_is_shown(app, target_id), f"#{target_id} paints no region"
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:1055: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_unload_focus.py:1047: in scenario
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_r_shell_focus_2_5_every_rail_key_lands_on_its_target.<locals>.scenario.<locals>.<lambda> at 0x7f9bcfcbb740>
+failure = <function test_r_shell_focus_2_5_every_rail_key_lands_on_its_target.<locals>.scenario.<locals>.<lambda> at 0x7f9bcfcbb7e0>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: after '4' the focus is no widget focused, not #memory_map_panel
+
+tests/support/timing.py:66: AssertionError
+____ test_r_shell_focus_2_2_esc_in_split_join_focuses_the_workspace_target _____
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw0/test_r_shell_focus_2_2_esc_in_0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw0/b101_i10f_case080')
+
+    def test_r_shell_focus_2_2_esc_in_split_join_focuses_the_workspace_target(
+        tmp_path: Path, case08: Path
+    ) -> None:
+        """R-SHELL-FOCUS.2 case /2: Esc in Split / Join shows the Workspace with
+        ``files_list`` focused (base: nothing focused)."""
+    
+        async def scenario(app, pilot, log):
+            await case_session(pilot, app, case08)
+            await open_split_join(pilot, app)
+            await pilot.press("escape")
+            await wait_screen(pilot, app, "workspace")
+            await wait_focus(pilot, app, "files_list")
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:963: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_unload_focus.py:961: in scenario
+    await wait_focus(pilot, app, "files_list")
+../s19_i10mut/tests/test_b101_unload_focus.py:269: in wait_focus
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function wait_focus.<locals>.landed at 0x7f9e2e7e7ec0>
+failure = <function wait_focus.<locals>.<lambda> at 0x7f9e2e7e7880>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: the focus never landed on #files_list; it is no widget focused
+
+tests/support/timing.py:66: AssertionError
+_______ test_r_shell_focus_2_5_every_rail_key_lands_on_its_target[flow] ________
+[gw5] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw5/test_r_shell_focus_2_5_every_r1')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw5/b101_i10f_case080')
+key = '8', window = 'flow', target_id = 'flow_panel'
+
+    @pytest.mark.parametrize(
+        "key,window,target_id", RAIL_TARGETS, ids=[row[1] for row in RAIL_TARGETS]
+    )
+    def test_r_shell_focus_2_5_every_rail_key_lands_on_its_target(
+        tmp_path: Path, case08: Path, key: str, window: str, target_id: str
+    ) -> None:
+        """R-SHELL-FOCUS.2 case /5: with the image, A2L and MAC loaded, each rail key
+        lands the focus on its window's CTX-SHELL target, or (target not shown) on
+        the first shown focusable non-text widget of the window, else its rail item
+        (base: the focus stays in the window just left); ``2`` and ``3`` land on
+        their windows' switch landings (changed at E4, E4-R4 / E4-R6)."""
+    
+        async def scenario(app, pilot, log):
+            await case_session(pilot, app, case08, mac=True, a2l=True)
+            if window == "workspace":
+                await pilot.press("3")
+                await wait_screen(pilot, app, "mac")
+                await settle(pilot, 8)
+            await pilot.press(key)
+            await wait_screen(pilot, app, window)
+            await wait_until(
+                pilot,
+                lambda: focus_matches_target(app, target_id),
+                lambda: f"after {key!r} the focus is {focus_report(app)}, not #{target_id}",
+                timeout=FOCUS_WAIT_S,
+            )
+            assert target_is_shown(app, target_id), f"#{target_id} paints no region"
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:1055: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_unload_focus.py:1047: in scenario
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_r_shell_focus_2_5_every_rail_key_lands_on_its_target.<locals>.scenario.<locals>.<lambda> at 0x7faae7aa0860>
+failure = <function test_r_shell_focus_2_5_every_rail_key_lands_on_its_target.<locals>.scenario.<locals>.<lambda> at 0x7faaec74ab60>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: after '8' the focus is no widget focused, not #flow_panel
+
+tests/support/timing.py:66: AssertionError
+___ test_r_shell_focus_2_5_every_rail_key_lands_on_its_target[check_editor] ____
+[gw4] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw4/test_r_shell_focus_2_5_every_r1')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw4/b101_i10f_case080')
+key = 'equals_sign', window = 'check_editor', target_id = 'check_editor_panel'
+
+    @pytest.mark.parametrize(
+        "key,window,target_id", RAIL_TARGETS, ids=[row[1] for row in RAIL_TARGETS]
+    )
+    def test_r_shell_focus_2_5_every_rail_key_lands_on_its_target(
+        tmp_path: Path, case08: Path, key: str, window: str, target_id: str
+    ) -> None:
+        """R-SHELL-FOCUS.2 case /5: with the image, A2L and MAC loaded, each rail key
+        lands the focus on its window's CTX-SHELL target, or (target not shown) on
+        the first shown focusable non-text widget of the window, else its rail item
+        (base: the focus stays in the window just left); ``2`` and ``3`` land on
+        their windows' switch landings (changed at E4, E4-R4 / E4-R6)."""
+    
+        async def scenario(app, pilot, log):
+            await case_session(pilot, app, case08, mac=True, a2l=True)
+            if window == "workspace":
+                await pilot.press("3")
+                await wait_screen(pilot, app, "mac")
+                await settle(pilot, 8)
+            await pilot.press(key)
+            await wait_screen(pilot, app, window)
+            await wait_until(
+                pilot,
+                lambda: focus_matches_target(app, target_id),
+                lambda: f"after {key!r} the focus is {focus_report(app)}, not #{target_id}",
+                timeout=FOCUS_WAIT_S,
+            )
+            assert target_is_shown(app, target_id), f"#{target_id} paints no region"
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:1055: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_unload_focus.py:1047: in scenario
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_r_shell_focus_2_5_every_rail_key_lands_on_its_target.<locals>.scenario.<locals>.<lambda> at 0x7fb62c69ae80>
+failure = <function test_r_shell_focus_2_5_every_rail_key_lands_on_its_target.<locals>.scenario.<locals>.<lambda> at 0x7fb62c69afc0>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: after 'equals_sign' the focus is no widget focused, not #check_editor_panel
+
+tests/support/timing.py:66: AssertionError
+_____ test_r_shell_focus_2_5_every_rail_key_lands_on_its_target[workspace] _____
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw1/test_r_shell_focus_2_5_every_r0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw1/b101_i10f_case080')
+key = '1', window = 'workspace', target_id = 'files_list'
+
+    @pytest.mark.parametrize(
+        "key,window,target_id", RAIL_TARGETS, ids=[row[1] for row in RAIL_TARGETS]
+    )
+    def test_r_shell_focus_2_5_every_rail_key_lands_on_its_target(
+        tmp_path: Path, case08: Path, key: str, window: str, target_id: str
+    ) -> None:
+        """R-SHELL-FOCUS.2 case /5: with the image, A2L and MAC loaded, each rail key
+        lands the focus on its window's CTX-SHELL target, or (target not shown) on
+        the first shown focusable non-text widget of the window, else its rail item
+        (base: the focus stays in the window just left); ``2`` and ``3`` land on
+        their windows' switch landings (changed at E4, E4-R4 / E4-R6)."""
+    
+        async def scenario(app, pilot, log):
+            await case_session(pilot, app, case08, mac=True, a2l=True)
+            if window == "workspace":
+                await pilot.press("3")
+                await wait_screen(pilot, app, "mac")
+                await settle(pilot, 8)
+            await pilot.press(key)
+            await wait_screen(pilot, app, window)
+            await wait_until(
+                pilot,
+                lambda: focus_matches_target(app, target_id),
+                lambda: f"after {key!r} the focus is {focus_report(app)}, not #{target_id}",
+                timeout=FOCUS_WAIT_S,
+            )
+            assert target_is_shown(app, target_id), f"#{target_id} paints no region"
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:1055: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_unload_focus.py:1047: in scenario
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_r_shell_focus_2_5_every_rail_key_lands_on_its_target.<locals>.scenario.<locals>.<lambda> at 0x7f38d48d39c0>
+failure = <function test_r_shell_focus_2_5_every_rail_key_lands_on_its_target.<locals>.scenario.<locals>.<lambda> at 0x7f38d8c99580>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: after '1' the focus is no widget focused, not #files_list
+
+tests/support/timing.py:66: AssertionError
+________ test_r_shell_focus_2_5_every_rail_key_lands_on_its_target[mac] ________
+[gw2] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw2/test_r_shell_focus_2_5_every_r1')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw2/b101_i10f_case080')
+key = '3', window = 'mac', target_id = 'mac_page_prev_button'
+
+    @pytest.mark.parametrize(
+        "key,window,target_id", RAIL_TARGETS, ids=[row[1] for row in RAIL_TARGETS]
+    )
+    def test_r_shell_focus_2_5_every_rail_key_lands_on_its_target(
+        tmp_path: Path, case08: Path, key: str, window: str, target_id: str
+    ) -> None:
+        """R-SHELL-FOCUS.2 case /5: with the image, A2L and MAC loaded, each rail key
+        lands the focus on its window's CTX-SHELL target, or (target not shown) on
+        the first shown focusable non-text widget of the window, else its rail item
+        (base: the focus stays in the window just left); ``2`` and ``3`` land on
+        their windows' switch landings (changed at E4, E4-R4 / E4-R6)."""
+    
+        async def scenario(app, pilot, log):
+            await case_session(pilot, app, case08, mac=True, a2l=True)
+            if window == "workspace":
+                await pilot.press("3")
+                await wait_screen(pilot, app, "mac")
+                await settle(pilot, 8)
+            await pilot.press(key)
+            await wait_screen(pilot, app, window)
+            await wait_until(
+                pilot,
+                lambda: focus_matches_target(app, target_id),
+                lambda: f"after {key!r} the focus is {focus_report(app)}, not #{target_id}",
+                timeout=FOCUS_WAIT_S,
+            )
+            assert target_is_shown(app, target_id), f"#{target_id} paints no region"
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:1055: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_unload_focus.py:1047: in scenario
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_r_shell_focus_2_5_every_rail_key_lands_on_its_target.<locals>.scenario.<locals>.<lambda> at 0x7ff5f33a0220>
+failure = <function test_r_shell_focus_2_5_every_rail_key_lands_on_its_target.<locals>.scenario.<locals>.<lambda> at 0x7ff5ee61f4c0>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: after '3' the focus is no widget focused, not #mac_page_prev_button
+
+tests/support/timing.py:66: AssertionError
+______ test_r_shell_focus_2_5_every_rail_key_lands_on_its_target[issues] _______
+[gw3] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw3/test_r_shell_focus_2_5_every_r1')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw3/b101_i10f_case080')
+key = '5', window = 'issues', target_id = 'validation_issues_groups'
+
+    @pytest.mark.parametrize(
+        "key,window,target_id", RAIL_TARGETS, ids=[row[1] for row in RAIL_TARGETS]
+    )
+    def test_r_shell_focus_2_5_every_rail_key_lands_on_its_target(
+        tmp_path: Path, case08: Path, key: str, window: str, target_id: str
+    ) -> None:
+        """R-SHELL-FOCUS.2 case /5: with the image, A2L and MAC loaded, each rail key
+        lands the focus on its window's CTX-SHELL target, or (target not shown) on
+        the first shown focusable non-text widget of the window, else its rail item
+        (base: the focus stays in the window just left); ``2`` and ``3`` land on
+        their windows' switch landings (changed at E4, E4-R4 / E4-R6)."""
+    
+        async def scenario(app, pilot, log):
+            await case_session(pilot, app, case08, mac=True, a2l=True)
+            if window == "workspace":
+                await pilot.press("3")
+                await wait_screen(pilot, app, "mac")
+                await settle(pilot, 8)
+            await pilot.press(key)
+            await wait_screen(pilot, app, window)
+            await wait_until(
+                pilot,
+                lambda: focus_matches_target(app, target_id),
+                lambda: f"after {key!r} the focus is {focus_report(app)}, not #{target_id}",
+                timeout=FOCUS_WAIT_S,
+            )
+            assert target_is_shown(app, target_id), f"#{target_id} paints no region"
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:1055: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_unload_focus.py:1047: in scenario
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_r_shell_focus_2_5_every_rail_key_lands_on_its_target.<locals>.scenario.<locals>.<lambda> at 0x7f9bd0553740>
+failure = <function test_r_shell_focus_2_5_every_rail_key_lands_on_its_target.<locals>.scenario.<locals>.<lambda> at 0x7f9bd1b66d40>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: after '5' the focus is no widget focused, not #validation_issues_groups
+
+tests/support/timing.py:66: AssertionError
+__ test_r_shell_focus_2_5_every_rail_key_lands_on_its_target[flow_execution] ___
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw0/test_r_shell_focus_2_5_every_r0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw0/b101_i10f_case080')
+key = 'right_square_bracket', window = 'flow_execution', target_id = 'fx_panel'
+
+    @pytest.mark.parametrize(
+        "key,window,target_id", RAIL_TARGETS, ids=[row[1] for row in RAIL_TARGETS]
+    )
+    def test_r_shell_focus_2_5_every_rail_key_lands_on_its_target(
+        tmp_path: Path, case08: Path, key: str, window: str, target_id: str
+    ) -> None:
+        """R-SHELL-FOCUS.2 case /5: with the image, A2L and MAC loaded, each rail key
+        lands the focus on its window's CTX-SHELL target, or (target not shown) on
+        the first shown focusable non-text widget of the window, else its rail item
+        (base: the focus stays in the window just left); ``2`` and ``3`` land on
+        their windows' switch landings (changed at E4, E4-R4 / E4-R6)."""
+    
+        async def scenario(app, pilot, log):
+            await case_session(pilot, app, case08, mac=True, a2l=True)
+            if window == "workspace":
+                await pilot.press("3")
+                await wait_screen(pilot, app, "mac")
+                await settle(pilot, 8)
+            await pilot.press(key)
+            await wait_screen(pilot, app, window)
+            await wait_until(
+                pilot,
+                lambda: focus_matches_target(app, target_id),
+                lambda: f"after {key!r} the focus is {focus_report(app)}, not #{target_id}",
+                timeout=FOCUS_WAIT_S,
+            )
+            assert target_is_shown(app, target_id), f"#{target_id} paints no region"
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:1055: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_unload_focus.py:1047: in scenario
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_r_shell_focus_2_5_every_rail_key_lands_on_its_target.<locals>.scenario.<locals>.<lambda> at 0x7f9e2f379120>
+failure = <function test_r_shell_focus_2_5_every_rail_key_lands_on_its_target.<locals>.scenario.<locals>.<lambda> at 0x7f9e2ff807c0>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: after 'right_square_bracket' the focus is no widget focused, not #fx_panel
+
+tests/support/timing.py:66: AssertionError
+____________ test_tc_b97_64_arriving_with_bracket_c_confirms[rail] _____________
+[gw2] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw2/test_tc_b97_64_arriving_with_b0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ff5f5fe38d0>
+arrival = 'rail'
+
+    @pytest.mark.parametrize("arrival", ["rail", "none"])
+    def test_tc_b97_64_arriving_with_bracket_c_confirms(tmp_path: Path, monkeypatch, arrival) -> None:
+        """TC-B97-64 (LLR-147.13, PC-13 arrival arms): with lane 1 waiting, show
+        the Workspace, then arrive with ``]`` — the focus left on the rail, or
+        with no focus at all — and ``c`` after the dwell confirms 1.
+    
+        Why: the arrival must not leave ``c`` dead while the REQUIRED line says
+        ``press c``. RED by mutation: ``c`` bound on the section (the sealed D10)
+        → 0.
+    
+        Named supersession (batch-101 Inc 10a, ruling D-2, R-SHELL-FOCUS.2/4):
+        ``]`` now lands the focus on the window's target ``fx_panel`` once the
+        window is laid out (it was "``]`` moves no focus"); the focus is polled
+        until it lands (E3 A10-10), and ``c`` still confirms 1.
+        """
+        from tests.support.timing import wait_until
+    
+        confirms = ConfirmSpy(monkeypatch)
+    
+        async def body(app, pilot, panel, project_dir):
+            assert _c_bound(app), "c is bound on the app"
+            app.action_show_screen("workspace")
+            await settle(pilot, 2)
+            if arrival == "rail":
+                rail = app.query_one("#rail_item_workspace")
+                rail.focus()
+                await poll(pilot, lambda: app.focused is rail)
+            else:
+                app.set_focus(None)
+                await poll(pilot, lambda: app.focused is None)
+            await pilot.press("right_square_bracket")
+            await poll(pilot, lambda: not app.query_one("#screen_flow_execution").has_class("hidden"))
+            await wait_until(
+                pilot,
+                lambda: app.focused is not None and app.focused.id == "fx_panel",
+                lambda: f"the focus never landed on #fx_panel; it is {app.focused!r}",
+                timeout=10.0,
+            )
+            focused = app.focused.id if app.focused else None
+            # F3 (gate fold): the dwell base is stamped after the attention paint;
+            # wait for it, so the 0.6 s step measures the dwell, not the paint.
+            await poll(pilot, lambda: panel._attention is None or panel._attention_since is not None, 200)
+            await pilot.pause(0.6)
+            await pilot.press("c")
+            await poll(pilot, lambda: len(confirms.posts) == 1, 200)
+            return focused, list(confirms.posts)
+    
+>       focused, posts = run_fx(tmp_path, (118, 54), body, stems=THREE, run=True, evidence=True)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+../s19_i10mut/tests/test_b97_flow_execution.py:1645: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b97_flow_execution.py:335: in run_fx
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b97_flow_execution.py:333: in _drive
+    return await body(app, pilot, panel, project_dir)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b97_flow_execution.py:1630: in body
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_tc_b97_64_arriving_with_bracket_c_confirms.<locals>.body.<locals>.<lambda> at 0x7ff5f0b1f9c0>
+failure = <function test_tc_b97_64_arriving_with_bracket_c_confirms.<locals>.body.<locals>.<lambda> at 0x7ff5f0b1d300>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: the focus never landed on #fx_panel; it is RailItem(id='rail_item_workspace', classes='rail-item')
+
+tests/support/timing.py:66: AssertionError
+____________ test_tc_b97_64_arriving_with_bracket_c_confirms[none] _____________
+[gw3] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw3/test_tc_b97_64_arriving_with_b0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f9bc7ed2e10>
+arrival = 'none'
+
+    @pytest.mark.parametrize("arrival", ["rail", "none"])
+    def test_tc_b97_64_arriving_with_bracket_c_confirms(tmp_path: Path, monkeypatch, arrival) -> None:
+        """TC-B97-64 (LLR-147.13, PC-13 arrival arms): with lane 1 waiting, show
+        the Workspace, then arrive with ``]`` — the focus left on the rail, or
+        with no focus at all — and ``c`` after the dwell confirms 1.
+    
+        Why: the arrival must not leave ``c`` dead while the REQUIRED line says
+        ``press c``. RED by mutation: ``c`` bound on the section (the sealed D10)
+        → 0.
+    
+        Named supersession (batch-101 Inc 10a, ruling D-2, R-SHELL-FOCUS.2/4):
+        ``]`` now lands the focus on the window's target ``fx_panel`` once the
+        window is laid out (it was "``]`` moves no focus"); the focus is polled
+        until it lands (E3 A10-10), and ``c`` still confirms 1.
+        """
+        from tests.support.timing import wait_until
+    
+        confirms = ConfirmSpy(monkeypatch)
+    
+        async def body(app, pilot, panel, project_dir):
+            assert _c_bound(app), "c is bound on the app"
+            app.action_show_screen("workspace")
+            await settle(pilot, 2)
+            if arrival == "rail":
+                rail = app.query_one("#rail_item_workspace")
+                rail.focus()
+                await poll(pilot, lambda: app.focused is rail)
+            else:
+                app.set_focus(None)
+                await poll(pilot, lambda: app.focused is None)
+            await pilot.press("right_square_bracket")
+            await poll(pilot, lambda: not app.query_one("#screen_flow_execution").has_class("hidden"))
+            await wait_until(
+                pilot,
+                lambda: app.focused is not None and app.focused.id == "fx_panel",
+                lambda: f"the focus never landed on #fx_panel; it is {app.focused!r}",
+                timeout=10.0,
+            )
+            focused = app.focused.id if app.focused else None
+            # F3 (gate fold): the dwell base is stamped after the attention paint;
+            # wait for it, so the 0.6 s step measures the dwell, not the paint.
+            await poll(pilot, lambda: panel._attention is None or panel._attention_since is not None, 200)
+            await pilot.pause(0.6)
+            await pilot.press("c")
+            await poll(pilot, lambda: len(confirms.posts) == 1, 200)
+            return focused, list(confirms.posts)
+    
+>       focused, posts = run_fx(tmp_path, (118, 54), body, stems=THREE, run=True, evidence=True)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+../s19_i10mut/tests/test_b97_flow_execution.py:1645: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b97_flow_execution.py:335: in run_fx
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b97_flow_execution.py:333: in _drive
+    return await body(app, pilot, panel, project_dir)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b97_flow_execution.py:1630: in body
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_tc_b97_64_arriving_with_bracket_c_confirms.<locals>.body.<locals>.<lambda> at 0x7f9bd2bd5760>
+failure = <function test_tc_b97_64_arriving_with_bracket_c_confirms.<locals>.body.<locals>.<lambda> at 0x7f9bd2ab1e40>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: the focus never landed on #fx_panel; it is None
+
+tests/support/timing.py:66: AssertionError
+___ test_r_shell_focus_2_5_every_rail_key_lands_on_its_target[crc_designer] ____
+[gw5] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw5/test_r_shell_focus_2_5_every_r2')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw5/b101_i10f_case080')
+key = '0', window = 'crc_designer', target_id = 'crc_designer_panel'
+
+    @pytest.mark.parametrize(
+        "key,window,target_id", RAIL_TARGETS, ids=[row[1] for row in RAIL_TARGETS]
+    )
+    def test_r_shell_focus_2_5_every_rail_key_lands_on_its_target(
+        tmp_path: Path, case08: Path, key: str, window: str, target_id: str
+    ) -> None:
+        """R-SHELL-FOCUS.2 case /5: with the image, A2L and MAC loaded, each rail key
+        lands the focus on its window's CTX-SHELL target, or (target not shown) on
+        the first shown focusable non-text widget of the window, else its rail item
+        (base: the focus stays in the window just left); ``2`` and ``3`` land on
+        their windows' switch landings (changed at E4, E4-R4 / E4-R6)."""
+    
+        async def scenario(app, pilot, log):
+            await case_session(pilot, app, case08, mac=True, a2l=True)
+            if window == "workspace":
+                await pilot.press("3")
+                await wait_screen(pilot, app, "mac")
+                await settle(pilot, 8)
+            await pilot.press(key)
+            await wait_screen(pilot, app, window)
+            await wait_until(
+                pilot,
+                lambda: focus_matches_target(app, target_id),
+                lambda: f"after {key!r} the focus is {focus_report(app)}, not #{target_id}",
+                timeout=FOCUS_WAIT_S,
+            )
+            assert target_is_shown(app, target_id), f"#{target_id} paints no region"
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:1055: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_unload_focus.py:1047: in scenario
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_r_shell_focus_2_5_every_rail_key_lands_on_its_target.<locals>.scenario.<locals>.<lambda> at 0x7faae168cf40>
+failure = <function test_r_shell_focus_2_5_every_rail_key_lands_on_its_target.<locals>.scenario.<locals>.<lambda> at 0x7faae1712de0>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: after '0' the focus is no widget focused, not #crc_designer_panel
+
+tests/support/timing.py:66: AssertionError
+____________ test_r_shell_focus_2_7_the_later_of_two_rail_keys_wins ____________
+[gw4] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw4/test_r_shell_focus_2_7_the_lat0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw4/b101_i10f_case080')
+
+    def test_r_shell_focus_2_7_the_later_of_two_rail_keys_wins(tmp_path: Path, case08: Path) -> None:
+        """R-SHELL-FOCUS.2 case /7 (changed at E4, E4-R6): two rail actions
+        (``2``, then ``3``) with no await between them land the focus on the MAC
+        window's switch landing ``mac_page_prev_button`` once laid out; the stale
+        ``2`` landing does not move it to ``window_help_a2l`` (base: nothing lands;
+        the Inc 10a tree before E4-R6: ``mac_records_list``)."""
+    
+        async def scenario(app, pilot, log):
+            await case_session(pilot, app, case08, mac=True, a2l=True)
+            app.action_show_screen("a2l")
+            app.action_show_screen("mac")
+            await wait_screen(pilot, app, "mac")
+            await wait_focus(pilot, app, "mac_page_prev_button")
+            await settle(pilot, 8)
+            assert focus_of(app) is not None and focus_of(app).id == "mac_page_prev_button", focus_report(app)
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:1117: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_unload_focus.py:1113: in scenario
+    await wait_focus(pilot, app, "mac_page_prev_button")
+../s19_i10mut/tests/test_b101_unload_focus.py:269: in wait_focus
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function wait_focus.<locals>.landed at 0x7fb628928a40>
+failure = <function wait_focus.<locals>.<lambda> at 0x7fb62c88d940>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: the focus never landed on #mac_page_prev_button; it is no widget focused
+
+tests/support/timing.py:66: AssertionError
+______ test_r_shell_focus_2_5_every_rail_key_lands_on_its_target[checks] _______
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw1/test_r_shell_focus_2_5_every_r1')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-661/popen-gw1/b101_i10f_case080')
+key = '9', window = 'checks', target_id = 'checks_grouped'
+
+    @pytest.mark.parametrize(
+        "key,window,target_id", RAIL_TARGETS, ids=[row[1] for row in RAIL_TARGETS]
+    )
+    def test_r_shell_focus_2_5_every_rail_key_lands_on_its_target(
+        tmp_path: Path, case08: Path, key: str, window: str, target_id: str
+    ) -> None:
+        """R-SHELL-FOCUS.2 case /5: with the image, A2L and MAC loaded, each rail key
+        lands the focus on its window's CTX-SHELL target, or (target not shown) on
+        the first shown focusable non-text widget of the window, else its rail item
+        (base: the focus stays in the window just left); ``2`` and ``3`` land on
+        their windows' switch landings (changed at E4, E4-R4 / E4-R6)."""
+    
+        async def scenario(app, pilot, log):
+            await case_session(pilot, app, case08, mac=True, a2l=True)
+            if window == "workspace":
+                await pilot.press("3")
+                await wait_screen(pilot, app, "mac")
+                await settle(pilot, 8)
+            await pilot.press(key)
+            await wait_screen(pilot, app, window)
+            await wait_until(
+                pilot,
+                lambda: focus_matches_target(app, target_id),
+                lambda: f"after {key!r} the focus is {focus_report(app)}, not #{target_id}",
+                timeout=FOCUS_WAIT_S,
+            )
+            assert target_is_shown(app, target_id), f"#{target_id} paints no region"
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:1055: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_unload_focus.py:1047: in scenario
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_r_shell_focus_2_5_every_rail_key_lands_on_its_target.<locals>.scenario.<locals>.<lambda> at 0x7f38db9b1580>
+failure = <function test_r_shell_focus_2_5_every_rail_key_lands_on_its_target.<locals>.scenario.<locals>.<lambda> at 0x7f38d9296340>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: after '9' the focus is no widget focused, not #checks_grouped
+
+tests/support/timing.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_unload_focus.py::test_r_shell_focus_2_1_key_2_lands_on_the_a2l_window_help_chip
+FAILED tests/test_b101_unload_focus.py::test_r_shell_focus_2_3_rail_key_in_split_join_focuses_that_window
+FAILED tests/test_b101_unload_focus.py::test_r_shell_focus_2_5_every_rail_key_lands_on_its_target[diff]
+FAILED tests/test_b101_unload_focus.py::test_r_shell_focus_2_5_every_rail_key_lands_on_its_target[patch]
+FAILED tests/test_b101_unload_focus.py::test_r_shell_focus_2_5_every_rail_key_lands_on_its_target[a2l]
+FAILED tests/test_b101_unload_focus.py::test_r_shell_focus_2_5_every_rail_key_lands_on_its_target[map]
+FAILED tests/test_b101_unload_focus.py::test_r_shell_focus_2_2_esc_in_split_join_focuses_the_workspace_target
+FAILED tests/test_b101_unload_focus.py::test_r_shell_focus_2_5_every_rail_key_lands_on_its_target[flow]
+FAILED tests/test_b101_unload_focus.py::test_r_shell_focus_2_5_every_rail_key_lands_on_its_target[check_editor]
+FAILED tests/test_b101_unload_focus.py::test_r_shell_focus_2_5_every_rail_key_lands_on_its_target[workspace]
+FAILED tests/test_b101_unload_focus.py::test_r_shell_focus_2_5_every_rail_key_lands_on_its_target[mac]
+FAILED tests/test_b101_unload_focus.py::test_r_shell_focus_2_5_every_rail_key_lands_on_its_target[issues]
+FAILED tests/test_b101_unload_focus.py::test_r_shell_focus_2_5_every_rail_key_lands_on_its_target[flow_execution]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_64_arriving_with_bracket_c_confirms[rail]
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_64_arriving_with_bracket_c_confirms[none]
+FAILED tests/test_b101_unload_focus.py::test_r_shell_focus_2_5_every_rail_key_lands_on_its_target[crc_designer]
+FAILED tests/test_b101_unload_focus.py::test_r_shell_focus_2_7_the_later_of_two_rail_keys_wins
+FAILED tests/test_b101_unload_focus.py::test_r_shell_focus_2_5_every_rail_key_lands_on_its_target[checks]
+18 failed in 85.30s (0:01:25)

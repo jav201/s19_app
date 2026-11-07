@@ -1,0 +1,198 @@
+=== base commit: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+=== python: Python 3.11.18
+=== mutation applied: M16 (file s19_app/tui/app.py)
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -1888,7 +1888,6 @@
+             row_bases=[],
+             ranges=[],
+             range_validity=[],
+-            errors=[{"line": None, "message": d} for d in loaded.mac_diagnostics],
+             entropy_windows=[],
+             source_s0_header=None,
+             out_of_order_count=0,
+LANDED M16: 'for d in loaded.mac_diagnostics' x0
+=== s19_app.__file__ ===
+<HOME>/work/s19_i10mut_m18/s19_app/__init__.py
+=== CMD ===
+env -u NO_COLOR <HOME>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -rf  tests/test_b101_unload_focus.py::test_r_ws_loaded_16_1_primary_diagnostics_go_with_it tests/test_b101_unload_focus.py::test_r_ws_loaded_16_3_mac_diagnostics_stay_after_a_primary_unload
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_____________ test_r_ws_loaded_16_1_primary_diagnostics_go_with_it _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-656/test_r_ws_loaded_16_1_primary_0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-656/b101_i10f_case080')
+
+    def test_r_ws_loaded_16_1_primary_diagnostics_go_with_it(tmp_path: Path, case08: Path) -> None:
+        """R-WS-LOADED.16 case /1: a bad-checksum S19 plus the case 08 MAC; after
+        ``[u]`` on the primary the loader-facts line reads 0 errors and no
+        ``integrity notices`` text is painted (base: ``Loader 1 err``)."""
+        bad = write_bad_checksum(tmp_path / "src" / "bad.s19")
+    
+        async def scenario(app, pilot, log):
+            await load_image(pilot, app, bad)
+            await load_mac(pilot, app, case08 / "firmware.mac")
+            await wait_until(
+                pilot,
+                lambda: loader_error_count(app) == 1,
+                lambda: f"setup: the loader facts read {ws_stats(app)!r}",
+                timeout=FOCUS_WAIT_S,
+            )
+            mark = len(log.messages)
+            await press_unload(pilot, app, "primary")
+            await wait_message(pilot, log, mark, "Unloaded primary image.")
+            await settle(pilot, 4)
+            assert loader_error_count(app) in (0, -1), ws_stats(app)
+            assert "bad.s19" not in " ".join(slot_texts(app)), slot_texts(app)
+            assert "integrity notices" not in status_text(app)
+            assert "integrity notices" not in newest_message(app)
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:548: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f049bf0d590>
+
+    async def scenario(app, pilot, log):
+        await load_image(pilot, app, bad)
+        await load_mac(pilot, app, case08 / "firmware.mac")
+        await wait_until(
+            pilot,
+            lambda: loader_error_count(app) == 1,
+            lambda: f"setup: the loader facts read {ws_stats(app)!r}",
+            timeout=FOCUS_WAIT_S,
+        )
+        mark = len(log.messages)
+        await press_unload(pilot, app, "primary")
+        await wait_message(pilot, log, mark, "Unloaded primary image.")
+        await settle(pilot, 4)
+>       assert loader_error_count(app) in (0, -1), ws_stats(app)
+E       AssertionError: Coverage: —
+E         Ranges: 0
+E         Errors: 0
+E         Warnings: 400
+E         Loader 1 err · ⚠0 OOO · Entry —
+E       assert 1 in (0, -1)
+E        +  where 1 = loader_error_count(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}))
+
+../s19_i10mut/tests/test_b101_unload_focus.py:543: AssertionError
+______ test_r_ws_loaded_16_3_mac_diagnostics_stay_after_a_primary_unload _______
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-656/test_r_ws_loaded_16_3_mac_diag0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-656/b101_i10f_case080')
+
+    def test_r_ws_loaded_16_3_mac_diagnostics_stay_after_a_primary_unload(
+        tmp_path: Path, case08: Path
+    ) -> None:
+        """R-WS-LOADED.16 case /3: with ``firmware_issues.mac`` (2 parse
+        diagnostics) the loader facts after ``[u]`` on the primary equal those of a
+        MAC-only load of the same file: 2 errors, none of the primary's (base: 1,
+        the primary's)."""
+        bad = write_bad_checksum(tmp_path / "src" / "bad.s19")
+        mac = case08 / "firmware_issues.mac"
+    
+        async def reference(app, pilot, log):
+            await load_mac(pilot, app, mac)
+            await wait_until(
+                pilot,
+                lambda: loader_error_count(app) >= 0,
+                lambda: f"reference: the loader facts read {ws_stats(app)!r}",
+                timeout=FOCUS_WAIT_S,
+            )
+            return loader_error_count(app)
+    
+        expected = run(tmp_path / "reference", reference)
+        assert expected == 2, f"the MAC-only reference shows {expected} errors, not 2"
+    
+        async def scenario(app, pilot, log):
+            await load_image(pilot, app, bad)
+            await load_mac(pilot, app, mac)
+            await wait_until(
+                pilot,
+                lambda: loader_error_count(app) >= 1,
+                lambda: f"setup: the loader facts read {ws_stats(app)!r}",
+                timeout=FOCUS_WAIT_S,
+            )
+            mark = len(log.messages)
+            await press_unload(pilot, app, "primary")
+            await wait_message(pilot, log, mark, "Unloaded primary image.")
+            await settle(pilot, 4)
+            assert loader_error_count(app) == expected, ws_stats(app)
+    
+>       run(tmp_path / "session", scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:612: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f049a507a90>
+
+    async def scenario(app, pilot, log):
+        await load_image(pilot, app, bad)
+        await load_mac(pilot, app, mac)
+        await wait_until(
+            pilot,
+            lambda: loader_error_count(app) >= 1,
+            lambda: f"setup: the loader facts read {ws_stats(app)!r}",
+            timeout=FOCUS_WAIT_S,
+        )
+        mark = len(log.messages)
+        await press_unload(pilot, app, "primary")
+        await wait_message(pilot, log, mark, "Unloaded primary image.")
+        await settle(pilot, 4)
+>       assert loader_error_count(app) == expected, ws_stats(app)
+E       AssertionError: Coverage: —
+E         Ranges: 0
+E         Errors: 4
+E         Warnings: 412
+E         Loader 1 err · ⚠0 OOO · Entry —
+E       assert 1 == 2
+E        +  where 1 = loader_error_count(S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}))
+
+../s19_i10mut/tests/test_b101_unload_focus.py:610: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_unload_focus.py::test_r_ws_loaded_16_1_primary_diagnostics_go_with_it
+FAILED tests/test_b101_unload_focus.py::test_r_ws_loaded_16_3_mac_diagnostics_stay_after_a_primary_unload
+2 failed in 13.51s
