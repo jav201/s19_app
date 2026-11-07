@@ -19,3 +19,13 @@ Inputs: `E5-code-review.md` **PASS-WITH-NOTES** (CR-1, CR-2 MEDIUM; CR-3 … CR-
 | QA-3 | Accept: R-TUI-040.11/4 and /5 parametrised over the A2L empty/invalid and MAC empty/miss branches; split mutant M8 per branch; add M9b (A2L/MAC miss re-renders from row 0) for 040.8/2, /3. | Each branch needs a node and a mutant. |
 | QA-1, QA-2 | The corrective's final runs, on the final tree: the H and F files and TC-B97-64 **three times**; R-TUI-040.12/7, R-TUI-007.3/2, the HLR-177c nodes ×3, `test_b100_focus.py`, the 7 law guards, serial_timing. (QC-BC and the other importers run at the merge verification.) | Thresholds say 3/3 on the final tree. |
 | QA-5 … QA-10 | Record-level: mark partial where the audit says; executors and trees in the Result cells; fix the stale header and the empty tree lines; R-SEG-OPEN.7/3, /4: load a MAC if the threshold names one, else fix the case text. | Record hygiene. |
+
+## Re-review rulings (2026-11-07)
+
+Re-review of the corrective `d317138` (`E5-code-review.md`, section "Re-review of the corrective"): **FAIL** on RR-1 MEDIUM; RR-2, RR-3 LOW. Rulings:
+
+| Finding | Ruling | Why |
+|---|---|---|
+| RR-1 | **Fix:** the save-as filter in `_plan_project_save` drops the open project's top-level S19/HEX whenever no S19/HEX image is loaded (`walked is not None and (loaded is None or loaded.file_type not in {"s19", "hex"})`), covering the A2L-only session after `[u]` on the primary and `[u]` primary then `[u]` MAC. **R-WS-LOADED.19 text widened** to "when no S19 or HEX image is loaded" (was: a MAC file is loaded), marked "(changed at E5, RR-1)"; new case R-WS-LOADED.19/5 (S19 + A2L project, `[u]` primary, save as → the new project holds no top-level image file; reloading installs no primary), RED under the old condition, GREEN. Forward the text change to the requirements session. | The row's intent is that an unloaded image is never written back; the MAC wording was one instance. |
+| RR-2 | Narrow R-WS-LOADED.19's and /19/3's text to **top-level** image files (Split/Join exports in `splits/` are not images the load installs). | Text must match the behaviour and the oracle. |
+| RR-3 | Fix the nine CR-9 doc items the re-review lists (file:line) — comments and docstrings only. | The ruling was "fix", not "accept". |

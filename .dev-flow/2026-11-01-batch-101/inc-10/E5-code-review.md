@@ -144,3 +144,212 @@ Severity is this reviewer's rubric (HIGH = correctness bug or a test that gives 
 ## §4b Independent review cell
 
 `code-reviewer · PASS-WITH-NOTES · no HIGH (none to resolve); I-2…I-6 and E4-R1…R6 honoured (reset on image install only, one [0,len−1] clamp, view-row paging, landing waits/stale/switch targets, fallback record + load re-home, all four deferred steps guarded by _load_tree_gone, hidden Split/Join keys and EXPORT refused, unload texts); no leaks; open as recommendations: CR-1 MEDIUM _hex_view_rows memo contract/declaration/reset/render-sharing, CR-2 MEDIUM six duplicated failed-go-to blocks with double linear scans, CR-3 LOW unstamped unload landing loses the switch landing in a [u]+2/3 burst, CR-4 LOW I-D23 Enter after 3 pages back silently (acceptable; Legend alternative), CR-5 LOW _SegTable cursor keys bypass the hidden check, CR-6 LOW 16/1 accepts a missing loader line, CR-7 LOW 7.5/1 and 4/2 rest on settle counts, CR-8 LOW image-less MAC jump still centres, CR-9 LOW stale comments`
+
+## Re-review of the corrective (code + security)
+
+Reviewer: code-reviewer, with the security lens on the changed items; independent of the corrective's author (Opus).
+
+**Scope:** `git diff 10deda9 d317138 -- s19_app tests` (head `d317138`, branch `b101-inc10`, worktree `<HOME>/Github/s19_app-b101-inc10`) and the records it changed. Read against `E5-rulings.md` and its addendum (`E5-corrective-notes.md` §1–§4, E-1 … E-16), `E5-security.md`, `E5-coverage-audit.md` and `E5-mutants.md`.
+
+**Read in full:**
+- the product hunks (`app.py`, `segment_split_view.py`), the test hunks (`test_b101_hex_jump.py`, `test_b101_unload_focus.py`) and the graph hunks;
+- the callers and callees the changes rely on: `_save_as_source_for`, `_prepare_project_save`, the copy and variant steps of `_commit_project_save`, `_plan_copies`, `inventory_project_tree`, `_unload_primary`, `_unload_mac`, `_apply_unload`, `_reset_project_session`, `update_alt_hex_view`, `update_mac_hex_view`, `_land_focus`, `_fallback_focus_target`, `_load_tree_gone` and every `action_show_screen` caller;
+- Textual 8.2.8's binding dispatch (source only).
+
+**Transcripts read:** `e5c-05`, `-06`, `-08` … `-16`, `mut-c-01` … `-14`, `-22`, `-23`, `mut-c-mutations.py.txt`.
+
+**Tree tie-in** (git plumbing on a scratch index; the working tree is untouched):
+- `09b4808` + `git diff 09b4808 d317138 -- s19_app tests docs README.md` gives tree `6cb142f1…`. That is the tree of `e5c-11` … `e5c-16` and of every `mut-c-NN` copy.
+- The worktree's tracked `s19_app/` and `tests/` are clean.
+- Nothing that imports `s19_app` ran on this PC. The one probe below execs extracted source text only.
+
+### Verdict
+
+**FAIL**, on one MEDIUM finding (RR-1). No HIGH is open, so this is not `BLOCK-UNTIL`. HIGH 0 · MEDIUM 1 · LOW 2.
+
+- **SE5-1 is met for the MAC remainder only.** After a primary unload, the file left loaded is either a MAC spine (`file_type == "mac"`, covered) or nothing, because `_unload_primary` returns `None` when there is no MAC. In the second case an A2L can stay loaded, and a save as still carries the unloaded image; loading the new project installs it (RR-1).
+- **Every other item is met as ruled:** SE5-2, SE5-5, CR-1, CR-2 (same behaviour on every reachable state), CR-3, CR-6, CR-7, QA-3, QA-4. M23 and M28 now die. My own reading supports the M-L judgement.
+- **CR-9 is not done:** the pass read the ruling as "accept" (E-1). RR-3 lists what remains, for the close step.
+- **No new defect** in the changed code, on the exit paths or between Windows and POSIX.
+- **How it closes:** RR-1's fix plus case R-WS-LOADED.19/5, RED then GREEN. Or a ruling narrows SE5-1 to R-WS-LOADED.19's MAC state and moves the A2L-only route to the backlog; this lens is then PASS-WITH-NOTES.
+
+### Rulings, as ruled
+
+Line numbers are those of `d317138`.
+
+- **SE5-1: partly met (RR-1).**
+  - **Where the filter runs.** The filter (`app.py:13758-13771`) applies to a save as only: `walked` is set only when `_save_as_source_for` returns a source (`:13749-13756`).
+  - **Every save route reaches it.** `action_save_project` → the Save dialog → `_prepare_project_save` → the single `_plan_project_save` call (`:12185`). The preview, the confirm and the dismiss all go through that call.
+  - **Same suffix rule as `_plan_copies`.** `splitext(...)[1].lower()` (`project_gather_service.py:1493`) over `PROJECT_PRIMARY_DATA_EXTENSIONS` = `.s19 .srec .hex .ihex` (`workspace.py:126-132`).
+  - **Only the filtered copy reaches the planner** (`:13918`). The session's cached inventory is not mutated: `replace` builds a new object.
+  - **Preview, copy and manifest agree.** The commit copies `plan.copies` (`:12679`, `:12737-12739`) and rebuilds the variants from what is on disk (`:12932-12936`).
+  - **A loaded S19 / HEX is never filtered** (`file_type` `s19` or `hex`). /19/4 is GREEN, and stays GREEN under `mut-c-01`; /19/3 is RED under `mut-c-01`.
+  - **The /19/3 reload clause can fail.** It waits for `Loaded project 'P9'` (`unload_and_open`), so a P9 that fails to load cannot pass.
+  - **File types left after a primary unload:** `mac` is covered; nothing, with or without an A2L, is not (RR-1).
+- **SE5-2: met.**
+  - /7/3 reopens the window and reads `#sje_stats` (F:1695).
+  - `mut-c-04` (= M28) is RED with `4 files · 414.8 KiB data …`. This also proves that reopening keeps the selection, so the clause can fail.
+- **SE5-5: met.**
+  - `_land_focus` returns at its first line (`:10841-10842`); a re-scheduled wait hits the same guard.
+  - In `_fallback_focus_target`, `query_one(Rail)` sits in a `try` (`:10575-10580`). `except Exception` matches the module's other teardown guards.
+  - /3/3 is RED under `mut-c-03` (`the landing after exit focused ['files_list']`).
+  - Both deferred focus callbacks are now guarded: this one and `_rehome_placeholder_focus_after_load` (`:10742`).
+- **CR-1: met.**
+  - Declared in `__init__` (`:2847-2851`); the invalidation rule is written in the docstring (`:19999-20005`).
+  - Reset in `_reset_project_session` (`:14236`). The ruling's `_reset_session_state` was my naming error at E5: `_reset_project_session` is the one reset seam, and `_handle_load_project` is its only caller.
+  - The unload reset is kept (`:18005`).
+  - `current_file` has three writers: the reset, the unload and the install (`:14233`, `:18004`, `:18837`; grep). Nothing mutates `row_bases` or `mac_records` in place (grep).
+  - The docstring's Used-by list matches the six call sites.
+  - The graph text is corrected, and E-2 (not shared with the renderer) gives its reasons.
+  - `mut-c-12` is RED on both nodes.
+- **CR-2: met; behaviour is the same on every reachable state.**
+  - The helper is `:21706-21745`. The six call sites (`:21642`, `:21648`, `:21651`, `:21692`, `:21698`, `:21701`) each call it after the same status line.
+  - **Present** first visible row: the same index. The view rows are sorted and unique, because `hex_row_bases` returns `row_bases` or a sorted union.
+  - **`None`**, and **no rows** (`bisect_left([], x)`): 0 in both versions.
+  - **Empty box**, **invalid** and **miss** (a miss below or above the image): the same call after the same status.
+  - **Absent** first visible row: the result differs (the next row instead of 0), but no path reaches this state:
+    - each render sets the field to `rows[effective_start]` (`:20171`, `:20225`);
+    - the view rows change only on an install, which bumps the generation and clears both markers (`:18937-18938`), or on an unload, which re-renders the three views (`:18055-18057`);
+    - `_collect_mac_highlight_addresses` reads only the file.
+  - **M8 split:** `mut-c-05` … `-10` each give `1 failed, 7 passed`, each on its own arm. **M9b:** `mut-c-11` is RED on 040.8/2 and /3.
+  - The local `from bisect import bisect_left` follows the form already used at `:19974` and `:20083`.
+- **CR-3: met.**
+  - The stamp is at `:18064-18068`.
+  - `[u]` exists only on the Workspace's Loaded panel (the `_apply_unload` callers are `:18161` and `:18188`), so a single-artifact unload is always stamped `workspace`.
+  - `U` pressed from another window leaves nothing to page, so no switch landing is lost there.
+  - `mut-c-02` and `mut-c-13` are RED on both /2/8 ids.
+  - The /2/8 entry point (direct calls with no await between them) is named in the case (E-6).
+- **CR-6, CR-7, QA-3, QA-4: met.**
+  - **/16/1:** asserts `== 0` (F:546); `mut-c-18` RED.
+  - **/7.5/1:** focus precondition (H:1120-1125); `mut-c-17` RED.
+  - **/4/2:** `_land_focus` spy (F:1418-1436); `mut-c-15` RED. The spy records a call, not a decision. That is enough here, because the Workspace has its region at the first call (e5c-06: area 4128 on every Workspace landing).
+  - **040.11/4 and /5:** each is parametrised over three failures (H:937, H:950).
+  - **/8/2 and /8/3:** assert the full line on both sinks (F:886-888, F:906-910); `mut-c-19` and `mut-c-20` are RED at the new clauses.
+- **M23 and M-L (the addendum): met.**
+  - **M23** is killed by /2/8 (`mut-c-13`).
+  - **M-L** survives (`mut-c-14` ×3, `-21`) and is equivalent on every reachable route. My reading confirms E-15:
+    - Non-priority keys go through `screen._modal_binding_chain` (Textual 8.2.8 `app.py:3978-3982`), which stops at the topmost modal (`screen.py:449-455`). All 20 dialog classes under `s19_app/tui` are `ModalScreen`s.
+    - The four priority keys (`app.py:2701-2704`) switch no window.
+    - Every `action_show_screen` caller runs while the default screen is current: the 12 rail bindings (`:2732-2748`), the rail click (`:10404`), `action_view_*` (`:11054-11062`), the map open-in-hex (`:19940`), the Split / Join close (`segment_split_view.py:2233`) and the inline palette.
+    - A dismiss callback runs after its screen is popped.
+    - Probes e5c-09 and `mut-c-23` show that the one state where M-L changes anything is reached only by a direct call.
+  - The layout wait stays as a bounded defence. As with E-9, no reachable state needs it today.
+- **CR-9: not met.** E-1 read the ruling as "accept"; the ruling meant "fix". The list is in RR-3.
+
+### Findings
+
+#### RR-1 — the save-as filter misses the A2L-only remainder of a primary unload  [MEDIUM · impl / security (S-2 class)]
+
+**Where:**
+- The condition, `app.py:13758`: `loaded is not None and loaded.file_type == "mac"`.
+- The chain that creates the state:
+  - `app.py:1882-1900`: with no MAC, `_unload_primary` returns `None`.
+  - `:18023`: only `all` and `a2l` clear `current_a2l_path`, so the A2L stays.
+  - `:11797` and `:8907`: Save project accepts an A2L-only session.
+  - `project_gather_service.py:1492-1500`: the top-level copy drops only the planned rows' names, plus the MAC / A2L suffixes when such a row is planned.
+
+**Scenario (route 1):**
+1. Project `PA` holds fixture three as `unloaded_primary.s19`, plus an A2L. The operator loads it.
+2. The operator presses `[u]` on the primary. `current_file` becomes `None`, the Loaded panel shows only the A2L slot, and `PA` stays open.
+3. The operator saves the project as `P9`, which is a save as. `loaded is None`, so the filter is skipped. The plan has one `a2l` row, and `_plan_copies` carries `unloaded_primary.s19`.
+4. Loading `P9` installs the unloaded image as the primary.
+
+This is SE5-1's harm, on a state the ruling names: "after the primary was unloaded … when no S19/HEX is loaded".
+
+**Scenario (route 2):** S19 + MAC + A2L; `[u]` on the primary, then `[u]` on the MAC. On a MAC spine `_unload_mac` returns `None` (`:1832-1834`), so the same state follows.
+
+**Evidence:**
+- **Probe (executed on this PC).** Run with `python -I` from a scratch folder; not committed. It uses the AST extraction of `e5s-probe.py.txt` and imports nothing from `s19_app` (it prints `s19_app imported: False`). Inputs: an inventory of `cal.a2l` + `unloaded_primary.s19`, and one planned row, `a2l:cal.a2l`. Results:
+  - with the corrective's condition, the copy list is `['unloaded_primary.s19']`;
+  - with the widened condition below, it is `[]`.
+- **The rest is read, not run.** The state chain and the reload come from reading the code.
+- **Why the pass missed it.** E-4 took R-WS-LOADED.19's own state ("a MAC file is loaded"). Its MAC-only states ("a primary unload or a MAC-only load") never reach the remainder with no spine.
+
+**Fix:**
+```python
+if walked is not None and (loaded is None or loaded.file_type not in {"s19", "hex"}):
+```
+- Add case **R-WS-LOADED.19/5**:
+  - Steps: route 1, then Save project `P9`.
+  - Expected: `P9` holds the A2L, no `.s19` or `.hex` file and no file with the image's SHA-256; after `P9` is loaded, no S19 / HEX image is installed.
+  - It is RED on `6cb142f1` and GREEN with the fix.
+- **The case needs a one-line ruling.** R-WS-LOADED.19's state reads "While a MAC file is loaded and no S19 or HEX image is". One of:
+  - widen the state to "While no S19 or HEX image is loaded";
+  - or rule that the A2L does not outlive a primary unload that leaves no spine. That is what `_unload_primary`'s own docstring says (`:1848-1853`: "a companion A2L cannot outlive it"). `_apply_unload` then clears the A2L in that case, and the save says "Nothing to save".
+- **Alternative:** narrow SE5-1 to the MAC state and record this route in the backlog.
+
+**State:** `executed` (the helper rule, by probe) · `not-run` (the chain, read) · fix `planned`.
+
+#### RR-2 — R-WS-LOADED.19 and its case say "no .s19 or .hex file"; the fix filters the top level only  [LOW · records / requirement precision]
+
+**Where:**
+- `app.py:13762-13770` filters only `walked.top_level`.
+- `project_gather_service.py:1510-1517` still copies every file in a sub-folder.
+- `segment_split_view.py:1661-1670`: the Split / Join `project` destination writes S19 / HEX parts into `<project>/splits/`.
+
+**Scenario:**
+- Suppose `PS` holds a Split / Join export of its image under `splits/`. The /19/3 steps then put that `.s19` part into `P9`.
+- /19/3's oracle is recursive (`project_files`, `rglob`), so it would go RED. Yet the fix does exactly what the ruling says ("top-level").
+- The part is not installed on load (variants are top-level only), so S-2's harm does not follow.
+
+**Fix (a ruling, and the records):** narrow the requirement and case text to "no S19 or HEX image file at the project's top level". Do not filter the exports: they are the operator's own files.
+
+#### RR-3 — CR-9's stale comments and thin docstrings remain  [LOW · doc]
+
+The list for the close step.
+
+**From CR-9, still present:**
+1. `app.py:10630-10632`, the `_rehome_focus_after_load` Summary: "``watch_current_file`` re-focuses the Split / Join table on every install…". Stale since I-2: `refresh_window` focuses `#sje_table` only while the window is shown.
+2. `app.py:19064-19066`, the `_step_finalize` comment: "the install re-focused the Split / Join table through ``watch_current_file``". Stale for the same reason.
+3. `app.py:10732-10733`, the `_rehome_placeholder_focus_after_load` Data Flow: it says the call re-schedules "only while the focus has not moved". The code (`:10754`) checks something else: that the focus is still a `RailItem` or the recorded fallback.
+4. `s19_app/render/hexview.py:188`: the example output reads `[0x1000, 0x8000, 0x8010, 0x8020]`, but the interpreter prints `[4096, 32768, 32784, 32800]`.
+5. `app.py:10698-10701`, `_note_focus_landing`: one paragraph, with no Args, Data Flow or Dependencies. It has three callers (`:10696`, `:10764`, `:10893`) and holds the declared-vs-fallback rule.
+6. `app.py:10773-10778`, `_load_tree_gone`: one paragraph, with no Returns or Dependencies. It has six callers (`:10742`, `:10841`, `:19014`, `:19029`, `:19043`, `:19058`).
+
+**Exposed by the corrective's own edits:**
+
+7. `app.py:17951-17962`, the `_apply_unload` Data Flow names none of:
+   - the view-row memo reset (`:18005`);
+   - the file-status write (`:18062`);
+   - the stamped focus landing (`:18064-18068`, CR-3).
+8. `app.py:10539-10551`, the `_fallback_focus_target` Returns and Data Flow do not describe the teardown branch (`:10575-10580`). With no rail, it returns the given target, the one that failed the visibility check.
+9. `app.py:14171-14228`, the `_reset_project_session` Summary and Data Flow list every reset except the view-row memo (`:14234-14236`). The new comment also uses single backticks where the module's comments use double ones.
+
+**Fix:** update the texts, and give `_note_focus_landing` and `_load_tree_gone` the house sections. Docs only; no node changes.
+
+### Checked, no finding
+
+- **Exit paths:**
+  - A landing scheduled before `App.exit` returns at the first line of `_land_focus`, and so does any re-scheduled wait.
+  - The rail lookup cannot raise.
+  - The four load steps and the E4-R3 re-check were already guarded.
+  - /3/3 drives the landing by a direct call, named in its case: no driven route runs a landing after exit (E-6).
+- **Windows vs POSIX:**
+  - The save-as filter reads the POSIX `relative` text of a bare top-level name with `splitext(...)[1].lower()`. That is the rule `_plan_copies` and the project load use, so case and separators behave the same on both systems.
+  - No changed line branches on the OS.
+  - The new nodes use no OS-specific facility: /19/3 and /19/4 write and read files under `tmp_path` only.
+- **Session cache:** the filter builds a new `ProjectInventory`. The Save session's cached inventory (`:12174-12184`) and its later re-use are unchanged.
+
+### Evidence states
+
+| Item | State | Basis |
+|---|---|---|
+| Rulings | `executed` | Read and grep, with the runs cited by id. The runs are the corrective's (`e5c-*`, `mut-c-*`), not mine; the scratch-index tree ties them to `d317138`. |
+| Tree tie-in | `executed` | Git plumbing, scratch index. |
+| RR-1 | `executed` · `not-run` · fix `planned` | The helper rule ran in a probe; the chain is read. |
+| RR-2 | `not-run` · ruling `planned` | Read. |
+| RR-3 | `executed` · fix `planned` | Read. |
+| Mutants and suites | `not-run` by me | — |
+
+### Evidence checklist
+
+- [x] **Diff read in full:** `git diff 10deda9 d317138 -- s19_app tests` (`app.py`, 10 hunks; `segment_split_view.py:1755-1765`; H, 4 hunks; F, 11 hunks), plus the graph hunks.
+- [x] **Correctness pass:** every file type left after a primary unload (RR-1); every CR-2 arm; stale and burst landings for an unload; the exit paths.
+- [x] **Simplicity pass:** one helper replaces six blocks; no speculative parameter.
+- [x] **Reuse:** the filter reuses `PROJECT_PRIMARY_DATA_EXTENSIONS` and `_plan_copies`' suffix rule; `bisect` follows the file's local-import form.
+- [x] **Tests reviewed for intent:** each new or strengthened clause has a mutant that turns it RED (`mut-c-01` … `-20`); the attempted M-L node was dropped for the right reason (`mut-c-21`).
+- [x] **Verdict explicit:** FAIL on RR-1 (MEDIUM). No HIGH is open.
+
+### §4b Independent review cell (re-review)
+
+`code-reviewer (re-review of the E5 corrective, code + security) · FAIL · no HIGH (none to resolve); SE5-2, SE5-5, CR-1, CR-2 (identical on every reachable arm), CR-3, CR-6/7, QA-3/4 met, M23/M28 killed, M-L equivalent on every reachable route (confirmed by reading Textual's modal binding chain and every action_show_screen caller); open: RR-1 MEDIUM the SE5-1 filter covers the MAC remainder only — a primary unload with no MAC leaves an A2L-only session whose save as still carries the unloaded image (probe executed; fix + R-WS-LOADED.19/5 or a narrowing ruling), RR-2 LOW requirement says "no .s19/.hex file" but the ruled fix is top-level only (splits/ exports), RR-3 LOW nine CR-9 doc items still to fix (listed with file:line)`
