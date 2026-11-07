@@ -1,0 +1,49 @@
+# E5 gap pass 2 extractor transcript — Inc 2a (batch-103), the enum/tab forms and _table_value
+# code-wire: v3.1.0 e436a08; python: 3.12.7 (Windows host, this PC)
+# repo: b103-inc2a-code @ 1c90cf9b (worktree; read-only) — marks written only into a THROWAWAY copy under <scratch>
+# scratch: C:/Users/jjgh8/AppData/Local/Temp/b103-e5g-gap2 (copy of s19_app/ + marks + subset graph + extractor out)
+# subset graph: graph-inc2.md filtered to the 3 nodes gap pass 2 touches (_read_method_record, _read_enum_table, _table_value)
+# command: python -I <scratch>/make_extract.py <scratch>  (runs codewire_extract.py --repo <copy> --graph graph-subset.md --path s19_app/tui/a2l_definition.py --out out)
+
+marking: {780: '_read_method_record', 958: '_read_enum_table', 1321: '_table_value'} | missing: []
+subset nodes: ['_read_method_record', '_read_enum_table', '_table_value']
+extractor stdout: marks=3 graph_nodes=3 calls=1 findings=6 parse_failures=0
+exit 0
+# Code-Wire extractor report
+
+- Marks found: 3
+- Graph nodes parsed: 3
+- Real calls between marked nodes: 1
+- Findings: 6 (0 drift, 6 info)
+- Ambiguous call resolutions (a name matched several defs): 3
+- Files that failed to parse: 0
+
+Type normalisation: spaces and quotes dropped; `List/Dict/Tuple/Set` -> builtins; `X | None` and graph `X?` -> `Optional[X]`; graph `(Callable) A->B` -> `Callable[[A], B]`; graph `tuple(A a, B b)` -> `tuple[A, B]`. A bare graph container (`dict`) against a parameterised code type (`dict[str, Any]`) is info (loose match), not drift.
+
+Call resolution is name-based (`f()`, `Class()` -> `__init__`, `self.m()`, `x.m()` -> top-level `m` or a marked method `m`); dynamic calls and callables passed as values are not seen. Tests excluded.
+
+## Counts
+
+| Kind | Count |
+|---|---|
+| Info: graph names the bare container only (loose match) | 6 |
+
+## Real calls between marked nodes
+
+| Caller | Callee | Sites |
+|---|---|---|
+| `_read_method_record` | `_read_enum_table` | s19_app/tui/a2l_definition.py:850 |
+
+Top-level sites (no marked node above them):
+
+- `_read_method_record`: s19_app/tui/a2l_definition.py:470
+- `_table_value`: s19_app/tui/a2l_definition.py:1180
+
+## Info: graph names the bare container only (loose match)
+
+- `s19_app/tui/a2l_definition.py:780` — `compu_methods_by_name`: graph `dict` vs code `dict[str, dict]`
+- `s19_app/tui/a2l_definition.py:780` — `compu_tables_by_name`: graph `dict` vs code `dict[str, dict]`
+- `s19_app/tui/a2l_definition.py:780` — `compu_tabs_by_name`: graph `dict` vs code `dict[str, dict]`
+- `s19_app/tui/a2l_definition.py:780` — `reads`: graph `dict` vs code `dict[int, object]`
+- `s19_app/tui/a2l_definition.py:959` — `compu_tables_by_name`: graph `dict` vs code `dict[str, dict]`
+- `s19_app/tui/a2l_definition.py:959` — `reads`: graph `dict` vs code `dict[int, object]`

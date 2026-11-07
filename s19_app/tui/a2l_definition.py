@@ -16,9 +16,11 @@ value.  It reads ``a2l_data`` and the image and writes neither.
 
 from __future__ import annotations
 
+import heapq
 import math
 import struct
-from dataclasses import dataclass, replace
+from bisect import bisect_left
+from dataclasses import dataclass, field, replace
 from decimal import Decimal
 from types import MappingProxyType
 from typing import Iterable, Mapping, Optional
@@ -74,6 +76,36 @@ class EnumEntry:
 
 
 @dataclass(frozen=True)
+class _EnumForm:
+    """The enum table's reduced form (R-A2L-DEF.150): the public entries, the
+    once-cleaned display texts and the private one-lookup index, built once per
+    walk and shared by reference.  COMPU_VTAB holds ``first_of``; a
+    COMPU_VTAB_RANGE holds ``ends`` / ``at_end`` / ``between``."""
+
+    section_kind: str
+    entries: tuple[EnumEntry, ...]
+    default_text: Optional[str]
+    texts: tuple[str, ...]
+    default_display: Optional[str]
+    first_of: Mapping
+    ends: tuple[float, ...]
+    at_end: tuple[Optional[int], ...]
+    between: tuple[Optional[int], ...]
+
+
+@dataclass(frozen=True)
+class _TabForm:
+    """A COMPU_TAB's reduced form for a TAB_INTP / TAB_NOINTP method
+    (R-A2L-DEF.150): the frozen parse's sorted x / y, a NaN-x verdict and the
+    echoed COMPU_TAB_REF word.  Read by :func:`_table_value`."""
+
+    xs: tuple[float, ...]
+    ys: tuple[object, ...]
+    x_nan: bool
+    ref_echo: str
+
+
+@dataclass(frozen=True)
 class Definition:
     """What the system knows about how one defined object stores, converts and
     shows its value.  A definition that cannot be edited carries a
@@ -105,6 +137,8 @@ class Definition:
     coeffs: Optional[tuple[Optional[float], ...]]
     compu_tab_ref: Optional[str]
     refusal: Optional[Refusal]
+    _name_echo: Optional[str] = field(default=None, compare=False, repr=False)
+    _table_form: Optional[_EnumForm | _TabForm] = field(default=None, compare=False, repr=False)
 
 
 @dataclass(frozen=True)
@@ -147,6 +181,23 @@ def _clean(text: Optional[str]) -> Optional[str]:
         else ch
         for ch in text
     )
+
+
+#: The cap on a file word echoed into a message (R-A2L-DEF.151): its first 256
+#: characters, then ``…`` when it is longer.
+_ECHO_LIMIT = 256
+_ELLIPSIS = "\u2026"
+
+
+def _echo(word: str) -> str:
+    """Write a file word into a message: its first 256 characters, each
+    character outside U+0021-U+007E written as U+FFFD, and ``…`` after them
+    when the word is longer (R-A2L-DEF.151)."""
+    cut = len(word) > _ECHO_LIMIT
+    body = word[:_ECHO_LIMIT]
+    return "".join(
+        ch if 0x21 <= ord(ch) <= 0x7E else "\uFFFD" for ch in body
+    ) + (_ELLIPSIS if cut else "")
 
 
 def _finite_number(word: object) -> Optional[float]:
@@ -338,6 +389,7 @@ def _describe_one(
 ) -> Definition:
     """Read every field and the refusal for one name (the body of
     :func:`describe_definitions`)."""
+    name_echo = _echo(name)
     empty = Definition(
         name=name,
         section="",
@@ -363,18 +415,19 @@ def _describe_one(
         coeffs=None,
         compu_tab_ref=None,
         refusal=None,
+        _name_echo=name_echo,
+        _table_form=None,
     )
 
     found = _find_tag(name, tags_by_name, object_sections_by_name)
     if found is None:
         return _with_refusal(
-            empty, Refusal("A2L-DEF-NAME", f"{_clean(name)}: no tag of that name in the A2L")
+            empty, Refusal("A2L-DEF-NAME", f"{name_echo}: no tag of that name in the A2L")
         )
     if isinstance(found, Refusal):
         return _with_refusal(empty, found)
 
     tag, section = found
-    clean_name = _clean(name) or ""
 
     # Copy the tag so the MEASUREMENT fill never mutates the parse payload
     # (R-A2L-DEF.58.1).
@@ -411,9 +464,16 @@ def _describe_one(
     section_name = tag.get("section") or ""
 
     method_name = tag.get("conversion")
+    method_echo = _echo(method_name) if method_name is not None else "(none)"
     record: Optional[Mapping] = None
     if method_name is not None and method_name != "NO_COMPU_METHOD":
-        record = _read_method_record(method_name, compu_methods_by_name, reads)
+        record = _read_method_record(
+            method_name,
+            compu_methods_by_name,
+            compu_tables_by_name,
+            a2l_data.get("compu_tabs_by_name") or {},
+            reads,
+        )
 
     if record is not None:
         conversion_type = record.get("conversion_type")
@@ -428,6 +488,9 @@ def _describe_one(
         compu_tab_ref = record.get("compu_tab_ref")
         record_format = record.get("format")
         record_unit = record.get("unit")
+        type_verdict = record.get("type_verdict")
+        type_echo = record.get("type_echo")
+        table_echo = record.get("table_echo")
     else:
         conversion_type = None
         coeffs_linear = None
@@ -435,12 +498,18 @@ def _describe_one(
         compu_tab_ref = None
         record_format = None
         record_unit = None
+        type_verdict = None
+        type_echo = "(none)"
+        table_echo = "(none)"
 
     kind, kind_text = _object_kind(tag, conversion_type)
 
     object_format = object_lines.get("format")
     display_format = object_format if object_format is not None else record_format
-    decimals = _display_decimals(display_format)
+    if object_format is not None:
+        decimals = _display_decimals(object_format)
+    else:
+        decimals = record.get("decimals") if record is not None else None
     unit = object_lines.get("unit")
     if unit is None:
         unit = record_unit or ""
@@ -457,24 +526,32 @@ def _describe_one(
     enum_table: Optional[str] = None
     enum_entries: tuple[EnumEntry, ...] = ()
     default_text: Optional[str] = None
-    table_read: Optional[tuple[str, tuple[EnumEntry, ...], Optional[str]]] = None
+    table_form: Optional[_EnumForm | _TabForm] = None
     if kind == "enum":
         enum_table = compu_tab_ref
-        if compu_tab_ref is not None:
-            table_read = _read_enum_table(compu_tab_ref, compu_tables_by_name, reads)
-            if table_read is not None:
-                _section_kind, enum_entries, default_text = table_read
+        enum_form = record.get("table_form") if record is not None else None
+        if isinstance(enum_form, _EnumForm):
+            table_form = enum_form
+            enum_entries = enum_form.entries
+            default_text = enum_form.default_text
+    elif kind == "number" and type_verdict in ("TAB_INTP", "TAB_NOINTP"):
+        tab_form = record.get("table_form") if record is not None else None
+        if isinstance(tab_form, _TabForm):
+            table_form = tab_form
 
     # ---- the refusal order -------------------------------------------------
     refusal: Optional[Refusal] = None
     if kind is None:
+        kind_echo = kind_text
+        if kind_text != "(none)" and not kind_text.startswith("MATRIX_DIM "):
+            kind_echo = _echo(kind_text)
         refusal = Refusal(
             "A2L-DEF-KIND",
-            f"{clean_name}: the system has no definition for a {_clean(kind_text)} object",
+            f"{name_echo}: the system has no definition for a {kind_echo} object",
         )
     elif address is None or byte_length is None:
         refusal = Refusal(
-            "A2L-DEF-ADDRESS", f"{clean_name}: the object has no address or no length"
+            "A2L-DEF-ADDRESS", f"{name_echo}: the object has no address or no length"
         )
     elif (
         byte_length < 1
@@ -484,71 +561,68 @@ def _describe_one(
     ):
         refusal = Refusal(
             "A2L-DEF-ADDRESS",
-            f"{clean_name}: its span of {byte_length} bytes at "
+            f"{name_echo}: its span of {byte_length} bytes at "
             f"{_fmt_address(address)} cannot be read",
         )
     elif kind in ("number", "enum"):
         if datatype is None:
             refusal = Refusal(
                 "A2L-DEF-DATATYPE",
-                f"{clean_name}: the object declares no datatype the system can read",
+                f"{name_echo}: the object declares no datatype the system can read",
             )
         elif byte_length != DATATYPE_SIZES[datatype]:
             refusal = Refusal(
                 "A2L-DEF-LENGTH",
-                f"{clean_name}: its length {byte_length} differs from the "
-                f"{DATATYPE_SIZES[datatype]} bytes of {_clean(datatype)}",
+                f"{name_echo}: its length {byte_length} differs from the "
+                f"{DATATYPE_SIZES[datatype]} bytes of {datatype}",
             )
 
     if refusal is None and method_name is not None and method_name != "NO_COMPU_METHOD":
         if record is None:
             refusal = Refusal(
                 "A2L-DEF-METHOD",
-                f"{clean_name}: the conversion method {_clean(method_name)} "
+                f"{name_echo}: the conversion method {method_echo} "
                 "is not declared in the A2L",
             )
-        else:
-            type_word = record.get("conversion_type")
-            if type_word is None or str(type_word).upper() not in _SUPPORTED_CONVERSION_TYPES:
-                type_text = _clean(str(type_word)) if type_word else "(none)"
-                refusal = Refusal(
-                    "A2L-DEF-CONVERSION",
-                    f"{clean_name}: the conversion type {type_text} of "
-                    f"{_clean(method_name)} is not supported",
-                )
+        elif type_verdict is None:
+            refusal = Refusal(
+                "A2L-DEF-CONVERSION",
+                f"{name_echo}: the conversion type {type_echo} of "
+                f"{method_echo} is not supported",
+            )
 
     if refusal is None and kind == "enum":
         if enum_table is None:
             refusal = Refusal(
                 "A2L-DEF-TABLE",
-                f"{clean_name}: the table (none) of {_clean(method_name)} "
+                f"{name_echo}: the table (none) of {method_echo} "
                 "is not declared in the A2L",
             )
-        elif table_read is None:
+        elif table_form is None:
             refusal = Refusal(
                 "A2L-DEF-TABLE",
-                f"{clean_name}: the table {_clean(enum_table)} of "
-                f"{_clean(method_name)} is not declared in the A2L",
+                f"{name_echo}: the table {table_echo} of "
+                f"{method_echo} is not declared in the A2L",
             )
         elif not enum_entries:
             refusal = Refusal(
                 "A2L-DEF-TABLE-EMPTY",
-                f"{clean_name}: the table {_clean(enum_table)} has no entries",
+                f"{name_echo}: the table {table_echo} has no entries",
             )
 
     if refusal is None and mask_word is not None:
         if kind == "text":
             refusal = Refusal(
                 "A2L-DEF-MASK",
-                f"{clean_name}: the bit mask {_clean(mask_word)} cannot be "
-                f"applied to {_clean(char_type)}",
+                f"{name_echo}: the bit mask {_echo(mask_word)} cannot be "
+                f"applied to {_echo(char_type)}",
             )
         elif kind in ("number", "enum"):
             if mask_number is None or not _check_bit_mask(mask_number, datatype):
                 refusal = Refusal(
                     "A2L-DEF-MASK",
-                    f"{clean_name}: the bit mask {_clean(mask_word)} cannot be "
-                    f"applied to {_clean(datatype)}",
+                    f"{name_echo}: the bit mask {_echo(mask_word)} cannot be "
+                    f"applied to {datatype}",
                 )
 
     return Definition(
@@ -576,6 +650,8 @@ def _describe_one(
         coeffs=coeffs,
         compu_tab_ref=compu_tab_ref,
         refusal=refusal,
+        _name_echo=name_echo,
+        _table_form=table_form,
     )
 
 
@@ -602,7 +678,7 @@ def _find_tag(
         return None
     if len(tags) > 1 or len(sections) > 1:
         return Refusal(
-            "A2L-DEF-NAME", f"{_clean(name)}: the A2L declares that name more than once"
+            "A2L-DEF-NAME", f"{_echo(name)}: the A2L declares that name more than once"
         )
     return tags[0], sections[0] if sections else None
 
@@ -681,8 +757,32 @@ def _resolve_datatype(
     return None
 
 
+def _build_tab_form(
+    ref: str, compu_tabs_by_name: dict[str, dict], reads: dict[int, object]
+) -> Optional[_TabForm]:
+    """The reduced COMPU_TAB form of the frozen parse's ``ref`` (R-A2L-DEF.150),
+    built once per walk and stored in ``reads`` under ``id()`` of that entry."""
+    entry = compu_tabs_by_name.get(ref)
+    if entry is None:
+        return None
+    key = id(entry)
+    if key in reads:
+        return reads[key]
+    tab_entries = entry.get("entries") or []
+    xs = tuple(e[0] for e in tab_entries)
+    ys = tuple(e[1] for e in tab_entries)
+    x_nan = any(isinstance(xv, float) and math.isnan(xv) for xv in xs)
+    form = _TabForm(xs=xs, ys=ys, x_nan=x_nan, ref_echo=_echo(ref))
+    reads[key] = form
+    return form
+
+
 def _read_method_record(
-    method_name: str, compu_methods_by_name: dict[str, dict], reads: dict[int, object]
+    method_name: str,
+    compu_methods_by_name: dict[str, dict],
+    compu_tables_by_name: dict[str, dict],
+    compu_tabs_by_name: dict[str, dict],
+    reads: dict[int, object],
 ) -> Optional[Mapping]:
     """Read the first COMPU_METHOD of ``method_name`` as the conversion method
     record (the words of ``_flatten_body_tokens([meta] + lines)``, comments
@@ -692,12 +792,14 @@ def _read_method_record(
     Read once per walk (R-A2L-DEF.149): the record is ``reads[id(section)]``,
     computed at the first call that names the section and returned as stored at
     every later call.  The stored form is a read-only
-    :class:`types.MappingProxyType` of the 6 fields an object reads
+    :class:`types.MappingProxyType` of 11 fields: the 6 an object reads
     (``conversion_type``, ``format``, ``unit``, ``coeffs_linear`` and ``coeffs``
-    as tuples or ``None``, ``compu_tab_ref``); it holds no ``name``,
-    ``long_identifier``, ``formula`` or ``lines``.  A missing positional word is
-    ``None``; a coefficient word that is not a finite number is ``None``
-    (E3S-10).  ``None`` when no map entry has the name.
+    as tuples or ``None``, ``compu_tab_ref``) and the 5 derived at reduction
+    (``decimals``, ``type_verdict``, ``type_echo``, ``table_echo``,
+    ``table_form``); it holds no ``name``, ``long_identifier``, ``formula`` or
+    ``lines``.  A missing positional word is ``None``; a coefficient word that
+    is not a finite number is ``None`` (E3S-10).  ``None`` when no map entry
+    has the name.
     """
     section = compu_methods_by_name.get(method_name)
     if section is None:
@@ -733,6 +835,21 @@ def _read_method_record(
             i += 2
             continue
         i += 1
+    decimals = _display_decimals(fmt)
+    if conversion_type:
+        upper = str(conversion_type).upper()
+        type_verdict = upper if upper in _SUPPORTED_CONVERSION_TYPES else None
+    else:
+        type_verdict = None
+    type_echo = _echo(conversion_type) if conversion_type else "(none)"
+    table_echo = _echo(compu_tab_ref) if compu_tab_ref else "(none)"
+    table_form = None
+    if type_verdict == "TAB_VERB":
+        if compu_tab_ref is not None:
+            table_form = _read_enum_table(compu_tab_ref, compu_tables_by_name, reads)
+    elif type_verdict in ("TAB_INTP", "TAB_NOINTP"):
+        if compu_tab_ref is not None:
+            table_form = _build_tab_form(compu_tab_ref, compu_tabs_by_name, reads)
     form: Mapping = MappingProxyType(
         {
             "conversion_type": conversion_type,
@@ -741,22 +858,112 @@ def _read_method_record(
             "coeffs_linear": None if coeffs_linear is None else tuple(coeffs_linear),
             "coeffs": None if coeffs is None else tuple(coeffs),
             "compu_tab_ref": compu_tab_ref,
+            "decimals": decimals,
+            "type_verdict": type_verdict,
+            "type_echo": type_echo,
+            "table_echo": table_echo,
+            "table_form": table_form,
         }
     )
     reads[key] = form
     return form
 
 
+def _build_enum_form(
+    section_kind: str,
+    entries: tuple[EnumEntry, ...],
+    default_text: Optional[str],
+) -> _EnumForm:
+    """Reduce the parsed enum table to its immutable form: the public entries,
+    the once-cleaned display texts and the private index (a dict from raw to the
+    first entry for COMPU_VTAB; a segmentation over the sorted ends for
+    COMPU_VTAB_RANGE), each of one lookup per element."""
+    texts = tuple(_clean(entry.text) for entry in entries)
+    default_display = _clean(default_text)
+    empty: Mapping = MappingProxyType({})
+    if section_kind == "COMPU_VTAB":
+        first_of: dict[float, int] = {}
+        for pos, entry in enumerate(entries):
+            raw = entry.raw
+            if isinstance(raw, float) and math.isnan(raw):
+                continue
+            if raw not in first_of:
+                first_of[raw] = pos
+        return _EnumForm(
+            section_kind=section_kind,
+            entries=entries,
+            default_text=default_text,
+            texts=texts,
+            default_display=default_display,
+            first_of=MappingProxyType(first_of),
+            ends=(),
+            at_end=(),
+            between=(),
+        )
+    # COMPU_VTAB_RANGE: the sorted distinct ends of the ranges that can match
+    # (min <= max, neither NaN; +-inf kept) and, per end and per open gap, the
+    # position of the first range in file order that covers it.
+    valid: list[tuple[int, float, float]] = []
+    end_values: list[float] = []
+    for pos, entry in enumerate(entries):
+        lo = entry.raw
+        hi = entry.raw_max
+        if hi is None:
+            continue
+        if (isinstance(lo, float) and math.isnan(lo)) or (
+            isinstance(hi, float) and math.isnan(hi)
+        ):
+            continue
+        if lo <= hi:
+            valid.append((pos, lo, hi))
+            end_values.append(lo)
+            end_values.append(hi)
+    ends = tuple(sorted(set(end_values)))
+    by_min = sorted(valid, key=lambda item: item[1])
+    at_end: list[Optional[int]] = []
+    heap: list[tuple[int, float, float]] = []
+    ri = 0
+    for end in ends:
+        while ri < len(by_min) and by_min[ri][1] <= end:
+            heapq.heappush(heap, by_min[ri])
+            ri += 1
+        while heap and heap[0][2] < end:
+            heapq.heappop(heap)
+        at_end.append(heap[0][0] if heap else None)
+    between: list[Optional[int]] = []
+    heap = []
+    ri = 0
+    for idx in range(len(ends) - 1):
+        end = ends[idx]
+        next_end = ends[idx + 1]
+        while ri < len(by_min) and by_min[ri][1] <= end:
+            heapq.heappush(heap, by_min[ri])
+            ri += 1
+        while heap and heap[0][2] < next_end:
+            heapq.heappop(heap)
+        between.append(heap[0][0] if heap else None)
+    return _EnumForm(
+        section_kind=section_kind,
+        entries=entries,
+        default_text=default_text,
+        texts=texts,
+        default_display=default_display,
+        first_of=empty,
+        ends=ends,
+        at_end=tuple(at_end),
+        between=tuple(between),
+    )
+
+
 def _read_enum_table(
     table_name: str, compu_tables_by_name: dict[str, dict], reads: dict[int, object]
-) -> Optional[tuple[str, tuple[EnumEntry, ...], str | None]]:
+) -> Optional[_EnumForm]:
     """Read the first COMPU_VTAB / COMPU_VTAB_RANGE of ``table_name`` as the
-    enum table: ``(section kind, entries, default text)``, or ``None`` when no
-    map entry has the name.
+    enum form (:class:`_EnumForm`), or ``None`` when no map entry has the name.
 
-    Read once per walk (R-A2L-DEF.149): the table is ``reads[id(section)]``,
-    read at the first call that names the section and returned as stored (the
-    same tuple, held by reference) at every later call.
+    Read once per walk (R-A2L-DEF.149): the form is ``reads[id(section)]``,
+    built at the first call that names the section and returned as stored (the
+    same form, held by reference) at every later call.
 
     The count is a run of ASCII digits of at most 9 digits, else there are no
     entries.  Entries are read in file order, count-driven, at most ``n``; an
@@ -814,7 +1021,7 @@ def _read_enum_table(
     if i < n and tokens[i] == "DEFAULT_VALUE":
         if i + 1 < n:
             default_text = tokens[i + 1]
-    form = (section_kind, tuple(entries), default_text)
+    form = _build_enum_form(section_kind, tuple(entries), default_text)
     reads[key] = form
     return form
 
@@ -945,6 +1152,11 @@ def decode_definition(
     """
     if definition.refusal is not None:
         return definition.refusal
+    name_echo = (
+        definition._name_echo
+        if definition._name_echo is not None
+        else _echo(definition.name)
+    )
     stored = _read_stored_value(definition, image)
     if isinstance(stored, Refusal):
         return stored
@@ -954,8 +1166,20 @@ def decode_definition(
     if definition.kind == "enum":
         entry_text = _enum_entry_text(definition, stored)
         return Decoded(stored, entry_text, _enum_text(definition, stored))
+    table_form = definition._table_form
     if definition.method_name == "NO_COMPU_METHOD":
-        value: int | float = stored
+        value: object = stored
+    elif isinstance(table_form, _TabForm):
+        if table_form.x_nan:
+            return Refusal(
+                "A2L-DEF-DECODE",
+                f"{name_echo}: the table {table_form.ref_echo} has an x that is not a number",
+            )
+        value, table_error = _table_value(
+            table_form, stored, definition.conversion_type == "TAB_INTP"
+        )
+        if table_error:
+            return Refusal("A2L-DEF-DECODE", f"{name_echo}: {table_error}")
     else:
         method = {
             "conversion_type": definition.conversion_type,
@@ -970,9 +1194,18 @@ def decode_definition(
             (definition.limits.lower, definition.limits.upper),
         )
         if status == "error":
-            return Refusal(
-                "A2L-DEF-DECODE", f"{_clean(definition.name)}: {_clean(error)}"
-            )
+            return Refusal("A2L-DEF-DECODE", f"{name_echo}: {error}")
+    if not isinstance(value, (int, float)):
+        if isinstance(table_form, _TabForm):
+            ref_echo = table_form.ref_echo
+        elif definition.compu_tab_ref is not None:
+            ref_echo = _echo(definition.compu_tab_ref)
+        else:
+            ref_echo = "(none)"
+        return Refusal(
+            "A2L-DEF-DECODE",
+            f"{name_echo}: the table {ref_echo} gives a value that is not a number",
+        )
     return Decoded(stored, value, display_text(definition, value))
 
 
@@ -996,9 +1229,14 @@ def _read_stored_value(
         else:
             values.append(image[current] & 0xFF)
     if missing:
+        name_echo = (
+            definition._name_echo
+            if definition._name_echo is not None
+            else _echo(definition.name)
+        )
         return Refusal(
             "A2L-DEF-BYTES",
-            f"{_clean(definition.name)}: {missing} of its {length} bytes "
+            f"{name_echo}: {missing} of its {length} bytes "
             "are not in the image",
         )
     raw = bytes(values)
@@ -1012,11 +1250,30 @@ def _read_stored_value(
     return _decode_scalar(raw, definition.datatype, definition.byte_order)
 
 
+def _enum_position(form: _EnumForm, stored: int | float) -> Optional[int]:
+    """The position in ``form.entries`` of the first entry that holds ``stored``
+    (one lookup in the form's index), else ``None``."""
+    if form.section_kind == "COMPU_VTAB":
+        return form.first_of.get(stored)
+    if isinstance(stored, float) and math.isnan(stored):
+        return None
+    ends = form.ends
+    i = bisect_left(ends, stored)
+    if i < len(ends) and ends[i] == stored:
+        return form.at_end[i]
+    if 0 < i < len(ends):
+        return form.between[i - 1]
+    return None
+
+
 def _enum_entry_text(definition: Definition, stored: int | float) -> Optional[str]:
-    """The raw text of the first entry in file order that holds ``stored``
-    (a pair whose raw equals it, or a range with min ≤ stored ≤ max), else
-    ``None``.  The text is raw (not control-replaced), so matching is
-    unchanged (R-A2L-DEF.137)."""
+    """The raw text of the first entry in file order that holds ``stored``: one
+    lookup in the enum form (the text by reference), else the linear first match
+    of a hand-built definition (``_table_form`` ``None``)."""
+    form = definition._table_form
+    if isinstance(form, _EnumForm):
+        pos = _enum_position(form, stored)
+        return form.entries[pos].text if pos is not None else None
     for entry in definition.enum_entries:
         if entry.raw_max is None:
             if entry.raw == stored:
@@ -1028,14 +1285,87 @@ def _enum_entry_text(definition: Definition, stored: int | float) -> Optional[st
 
 def _enum_text(definition: Definition, stored: int | float) -> str:
     """The display text for an enum stored value: the first matching entry's
-    text, else the default text, else ``<raw> (no text)``.  The returned text
-    gives U+FFFD for control characters (R-A2L-DEF.137)."""
+    cleaned text, else the default's, else ``<raw> (no text)``.  With the enum
+    form the text is its stored string (cleaned once, by reference); without it
+    the linear match is ``_clean``ed per call (R-A2L-DEF.137)."""
+    form = definition._table_form
+    if isinstance(form, _EnumForm):
+        pos = _enum_position(form, stored)
+        if pos is not None:
+            return form.texts[pos]
+        if form.default_display is not None:
+            return form.default_display
+        return f"{_raw_text(stored)} (no text)"
     entry = _enum_entry_text(definition, stored)
     if entry is not None:
         return _clean(entry)
     if definition.default_text is not None:
         return _clean(definition.default_text)
     return f"{_raw_text(stored)} (no text)"
+
+
+def _first_equal_below(xs: tuple[float, ...], x: float, lo: int, d: float) -> int:
+    """The first index ``j`` in ``[0, lo]`` whose distance ``x - xs[j]`` equals
+    ``d`` (the rounded least distance below ``x``): the frozen ``min`` takes the
+    first such entry.  Below ``x`` the distance does not increase with ``j``."""
+    low, high = 0, lo
+    while low < high:
+        mid = (low + high) // 2
+        if x - xs[mid] <= d:
+            high = mid
+        else:
+            low = mid + 1
+    return low
+
+
+def _table_value(form: _TabForm, stored: int | float, interpolate: bool) -> tuple[object, str]:
+    """The TAB_INTP / TAB_NOINTP value of ``stored`` on the reduced COMPU_TAB in
+    O(log n), giving the (value, error) the frozen ``_table_lookup`` gives."""
+    xs = form.xs
+    ys = form.ys
+    n = len(xs)
+    if n == 0:
+        return None, "lookup table is empty"
+    x = float(stored)
+    if not interpolate:
+        i = bisect_left(xs, x)
+        if i < n and xs[i] == x:
+            return ys[i], ""
+        lo: Optional[int] = None
+        hi: Optional[int] = None
+        if i > 0:
+            lo = i - 1
+            while lo > 0 and xs[lo - 1] == xs[lo]:
+                lo -= 1
+        if i < n:
+            hi = i
+        if lo is None:
+            return ys[hi], ""
+        if hi is None:
+            d = x - xs[lo]
+            return ys[_first_equal_below(xs, x, lo, d)], ""
+        d_lo = x - xs[lo]
+        d_hi = xs[hi] - x
+        if d_lo <= d_hi:
+            return ys[_first_equal_below(xs, x, lo, d_lo)], ""
+        return ys[hi], ""
+    if x <= xs[0]:
+        return ys[0], ""
+    if x >= xs[-1]:
+        return ys[-1], ""
+    i = bisect_left(xs, x)
+    if not (0 < i < n and xs[i - 1] <= x <= xs[i]):
+        return None, "value outside interpolation range"
+    lx, ly = xs[i - 1], ys[i - 1]
+    rx, ry = xs[i], ys[i]
+    lyf = _to_float(ly)
+    ryf = _to_float(ry)
+    if lyf is None or ryf is None:
+        return ly, ""
+    if rx == lx:
+        return lyf, ""
+    ratio = (x - lx) / (rx - lx)
+    return lyf + ratio * (ryf - lyf), ""
 
 
 def _ascii_text(raw: bytes) -> str:
