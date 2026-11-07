@@ -56,3 +56,18 @@ Round 3 (security only): **FAIL** — E3S-14 narrowed, not closed; new MAJOR **E
 - **E3S-27, E3S-28:** as their fix columns.
 
 **Next:** one correction pass (rows/cases; graph), then a round-4 security check that runs the reviewer's reference rule against the graph's text.
+
+## Round 4 rulings (2026-11-06T20:13:11-06:00, orchestrator Opus 5.5)
+
+Round 4 (security): **FAIL** — E3S-24 … -28 closed, census still 0 extra refusals over 234,654 objects; but six more shapes lose the mask (**E3S-30**, MAJOR: a comment or quote opened in a child section; a `/begin` that does not start its line; the literal reading of "lines of each child section"), and **E3S-35** (MAJOR: a commented-out copy of an object is a live tag and the first of its name, so an edit goes to the old address).
+
+**Why the rounds do not converge:** every guard so far defines "the text of the object" through the frozen reader's section tree, and that reader mis-handles comments (a `/begin` inside a comment opens a section; BL-I2-12, BL-I3-11). Each round closes the shapes found and the next finds more. The hazard is the *consequence* — an encode that writes bytes a neighbouring object owns — so this round adds one guard on the consequence, which does not depend on reading the mask at all.
+
+| Finding | Ruling |
+|---|---|
+| E3S-30 | accept the fix column (the text of the object pinned to reading W; each section of it checked for an open comment or quote; `/begin` not at a line start covered) **and** add the structural guard below. |
+| **New guard (orchestrator, E3S-30 + E3S-35)** | New row **R-A2L-DEF.138**: `If the bytes an encode would write overlap the span of another object of the A2L file, then the system shall refuse the encode with the refusal A2L-DEF-OVERLAP and the message `<name>: its bytes at <address> are shared with <other>`, unless both objects' bit masks were read and do not overlap.` The spans come from the tag table's address and byte length of every MEASUREMENT and CHARACTERISTIC (built once in `describe_definitions`'s walk). A mask the system failed to read can then never overwrite a neighbour: the neighbour's span overlaps, the refusal fires. Census the fixtures for false refusals (objects that overlap without masks) and report the count; if it is not 0, list them and the orchestrator rules. |
+| E3S-35 | accept the fix column: R-A2L-DEF.5 refuses a name that has more than one tag or object section — new row **R-A2L-DEF.139** if .5's response differs: `A2L-DEF-NAME` `<name>: the A2L declares that name more than once`; cases .5/1, .5/2 and AT-B103-I2-3 change (case 08's issues file declares `VALUE_0001` twice). The reader fix (no `/begin` inside a comment) goes to the backlog as a proposed increment for the operator (it also makes commented-out objects show as live tags in the A2L views today). |
+| E3S-31, -32, -33 | accept with their fix columns. |
+
+**Correction by Opus** (design work; one agent, targeted edits), then **round 5 security**, asked specifically to break R-A2L-DEF.138.

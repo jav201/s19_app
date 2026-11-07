@@ -1,0 +1,122 @@
+s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+python = 3.11.18  PYTHONHASHSEED = None
+host = cachyos-rtx  load = (0.60302734375, 0.47216796875, 1.7763671875)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e3a-4/home  LOCALAPPDATA = /tmp/b103-e3a-4/home/localappdata  PILOT_DIR = /tmp/b103-e3a-4/pilot
+  PSET: 6 REF queries, 23 REF6 queries -> out/addenda-pset.txt
+
+=== R-A2L-MATCH.36: QSET over REF (A); limit 20, median of 7; load (0.66455078125, 0.48974609375, 1.767578125)
+       4.9 ms  ok  chars   1  a  {'prefix': 20}
+       5.0 ms  ok  chars   1  e  {'prefix': 20}
+      11.2 ms  ok  chars   1  0  {'substring': 20}
+       3.0 ms  ok  chars   2  zz  {'prefix': 20}
+       3.4 ms  ok  chars   2  ab  {'prefix': 20}
+       9.2 ms  ok  chars  35  JotafVod_msrqlLzL_kh2C_rWl_pfue._0_  {'exact': 1, 'prefix': 3}
+      12.6 ms  ok  chars  12  JotafVod_msr  {'prefix': 4}
+      19.1 ms  ok  chars   8  srqlLzL_  {'substring': 4, 'subsequence': 16}
+      13.7 ms  ok  chars   7  0 jotaf  {'token': 4, 'subsequence': 16}
+       4.0 ms  ok  chars   4  JVmL  {'substring': 7, 'token': 13}
+      55.4 ms  ok  chars   7  xqzjvkw  {'subsequence': 20}
+      21.4 ms  ok  chars   9  qqqq zzzz  {'subsequence': 13}
+       6.5 ms  ok  chars   4  aaaa  {'fuzzy': 20}
+       5.8 ms  ok  chars   5  e e e  {'token': 20}
+      56.9 ms  ok  chars   6  Nzukij  {'substring': 4, 'fuzzy': 15, 'subsequence': 1}
+      61.5 ms  ok  chars  10  Ierxjr_Eud  {'substring': 4}
+      19.6 ms  ok  chars   7  ledRing  {'fuzzy': 15, 'subsequence': 5}
+      49.3 ms  ok  chars   9  pposbxiif  {'substring': 4}
+       3.2 ms  ok  chars   3  cnt  {'prefix': 4, 'substring': 16}
+      14.4 ms  ok  chars  15  temp_sensor_max  {}
+      23.4 ms  ok  chars  11  x y z w v u  {'token': 10, 'subsequence': 10}
+      14.5 ms  ok  chars  32  pposbxiifkdgfiajnbbpvb_dyan_xvz1  {'subsequence': 4}
+      53.1 ms  ok  chars  57  njraipjtbtu lsuakcoj hsxgibymjxu orfltal...  {'fuzzy': 4}
+      54.2 ms  ok  chars  51  votklbi fjblnabj qghque pdjxmq tiprdynot...  {'fuzzy': 4}
+      48.8 ms  ok  chars  45  lmmwngodou jadkvqy khbnukc qomfrybiza ev...  {'fuzzy': 3}
+       7.0 ms  ok  chars 255  e e e e e e e e e e e e e e e e e e e e ...  {'token': 20}
+      18.4 ms  ok  chars 255  a b c d e f g h i j k l m n o p q r s t ...  {}
+       5.7 ms  ok  chars 255  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ...  {'token': 20}
+      66.4 ms  ok  chars 256  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...  {}
+      14.0 ms  ok  chars 256  FCA_NPUK_SMM.RWG_TjsPHIoim_SNX_TVC_2_ewh...  {}
+       7.3 ms  ok  chars 256  RUX_ARV_LFS_QM_GJWTDMS_WDGTH.Fgathduhjd,...  {}
+      14.0 ms  ok  chars 103  HRR_WOL.TNY_U_ZmyrXSZTPeyoMsdpWwbcUtd_Dw...  {'exact': 1}
+      15.7 ms  ok  chars 103  RHR_WOL.TNY_U_ZmyrXSZTPeyoMsdpWwbcUtd_Dw...  {'fuzzy': 1}
+  worst 66.4 ms (aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...)
+
+=== R-A2L-MATCH.36: REF6 queries over REF6 (A); limit 20, median of 7; load (0.716796875, 0.50732421875, 1.7587890625)
+      16.5 ms  ok  chars   1  m  {'prefix': 20}
+      16.5 ms  ok  chars   5  meas_  {'prefix': 20}
+      29.8 ms  ok  chars   3  chr  {'fuzzy': 20}
+      30.0 ms  ok  chars   4  mesa  {'fuzzy': 20}
+      29.3 ms  ok  chars   4  cahr  {'fuzzy': 20}
+      30.4 ms  ok  chars   3  cr0  {'subsequence': 20}
+      10.7 ms  ok  chars   6  char 1  {'token': 20}
+      78.4 ms  ok  chars   1  0  {'substring': 20}
+      41.0 ms  ok  chars   5  chr 0  {'fuzzy': 20}
+      15.3 ms  ok  chars   4  ch00  {'token': 20}
+      11.2 ms  ok  chars   6  meas 1  {'token': 20}
+      12.5 ms  ok  chars   5  c 0 1  {'token': 20}
+  worst 78.4 ms (0)
+
+=== R-A2L-MATCH.40/1: PSET over REF (A); limit 20, median of 7; load (0.716796875, 0.50732421875, 1.7587890625)
+      28.3 ms  ok  chars 255  'qzx ' x 64  {'token': 3, 'fuzzy': 17}
+     121.5 ms  ok  chars 255  'qza' .. 'qzz' 3x, cut at 256  {'fuzzy': 20}
+      10.9 ms  ok  chars 255  'cnt ' x 64  {'token': 19, 'fuzzy': 1}
+       9.5 ms  ok  chars 256  '1a' x 128  {'token': 20}
+      30.5 ms  ok  chars 255  'rat ' x 64, cut at 256  {'fuzzy': 20}
+      34.6 ms  ok  chars 243  'e ' x 120 + 'rat'  {'fuzzy': 20}
+  worst 121.5 ms ('qza' .. 'qzz' 3x, cut at 256)
+
+=== R-A2L-MATCH.40/1: PSET over REF6 (A); limit 20, median of 7; load (0.73974609375, 0.515625, 1.75439453125)
+      45.6 ms  ok  chars 255  'chr ' x 64  {'fuzzy': 20}
+      43.6 ms  ok  chars 254  'cahr ' x 51  {'fuzzy': 20}
+      41.2 ms  ok  chars 255  '0 ' x 128  {'token': 20}
+      32.7 ms  ok  chars 254  '00 ' x 85  {'token': 20}
+      19.8 ms  ok  chars 255  'c 0 ' x 64  {'token': 20}
+      17.6 ms  ok  chars 255  'c ' x 128  {'token': 20}
+      18.1 ms  ok  chars 255  'm ' x 128  {'token': 20}
+      22.7 ms  ok  chars 255  '1 ' x 128  {'token': 20}
+      54.7 ms  ok  chars 254  'c ' x 125 + 'chax'  {'fuzzy': 20}
+      56.4 ms  ok  chars 254  '0 ' x 125 + 'chax'  {'fuzzy': 20}
+      52.0 ms  ok  chars 256  'chax ' x 52, cut at 256  {'fuzzy': 20}
+      52.4 ms  ok  chars 256  'mesa ' x 52, cut at 256  {'fuzzy': 20}
+     461.7 ms  ok  chars 255  NEAR (64 distinct near tokens), cut at 256  {'fuzzy': 20}
+     216.9 ms  ok  chars 255  'cha' .. 'chz' 3x, cut at 256  {'fuzzy': 20}
+     367.9 ms  ok  chars 254  51 distinct 1-edit typos of 'char'  {'fuzzy': 20}
+      12.9 ms  ok  chars 255  QSET E3S-01 shape 1 over REF6  {}
+       6.2 ms  ok  chars 255  QSET E3S-01 shape 2 over REF6  {}
+      41.3 ms  ok  chars 255  QSET E3S-01 shape 3 over REF6  {'token': 20}
+      21.6 ms  ok  chars 256  QSET E3S-01 shape 4 over REF6  {}
+       6.8 ms  ok  chars 256  QSET E3S-01 shape 5 over REF6  {}
+       6.9 ms  ok  chars 256  QSET E3S-01 shape 6 over REF6  {}
+       6.7 ms  ok  chars 103  QSET E3S-01 shape 7 over REF6  {}
+       6.6 ms  ok  chars 103  QSET E3S-01 shape 8 over REF6  {}
+  worst 461.7 ms (NEAR (64 distinct near tokens), cut at 256)
+
+=== R-A2L-MATCH.40 negative control 1: no collapse (R2), REF6; limit 20, median of 7; load (0.79833984375, 0.5400390625, 1.7412109375)
+    1136.9 ms  ok  chars 254  '0 ' x 125 + 'chax'  {'fuzzy': 20}
+     813.4 ms  ok  chars 254  'c ' x 125 + 'chax'  {'fuzzy': 20}
+     309.4 ms  ok  chars 255  '0 ' x 128  {'token': 20}
+     455.6 ms  ok  chars 255  'chr ' x 64  {'fuzzy': 20}
+  worst 1136.9 ms ('0 ' x 125 + 'chax')
+  LONG: 50000 names (49,900 REF + 100 of 'a' x 1020 + '_' + i)
+
+=== R-A2L-MATCH.40/2: LONG, banded _prefix_distance (A); limit 20, median of 7; load (0.8564453125, 0.57080078125, 1.7236328125)
+      76.5 ms  ok  chars 256  'a' x 255 + 'b'  {'fuzzy': 20}
+      77.5 ms  ok  chars 256  'a' x 254 + 'bb'  {'fuzzy': 20}
+      63.9 ms  ok  chars 129  'a' x 128 + 'b'  {'fuzzy': 20}
+  worst 77.5 ms ('a' x 254 + 'bb')
+
+=== R-A2L-MATCH.40 negative control 2: unbanded _prefix_distance, LONG; limit 20, median of 7; load (0.8564453125, 0.57080078125, 1.7236328125)
+    1534.6 ms  ok  chars 256  'a' x 255 + 'b'  {'fuzzy': 20}
+    1520.5 ms  ok  chars 256  'a' x 254 + 'bb'  {'fuzzy': 20}
+     800.4 ms  ok  chars 129  'a' x 128 + 'b'  {'fuzzy': 20}
+  worst 1534.6 ms ('a' x 255 + 'b')
+
+=== summary (worst median per set)
+  36 REF               66.4 ms  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...
+  36 REF6              78.4 ms  0
+  40 REF              121.5 ms  'qza' .. 'qzz' 3x, cut at 256
+  40 REF6             461.7 ms  NEAR (64 distinct near tokens), cut at 256
+  40 neg collapse    1136.9 ms  '0 ' x 125 + 'chax'
+  40/2 LONG            77.5 ms  'a' x 254 + 'bb'
+  40 neg band        1534.6 ms  'a' x 255 + 'b'
+
+load after = (0.9140625, 0.61328125, 1.7001953125)

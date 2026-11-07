@@ -6,7 +6,7 @@ Base `e07fb00`. Line numbers are "as of `e07fb00`". Rows: `01-requirements.md`; 
 
 | File | Functions | Rows |
 |---|---|---|
-| `s19_app/tui/services/label_match.py` (**new**, D-11 A) | 4 types, 2 public functions, 15 private helpers | R-A2L-MATCH.1 … .39 |
+| `s19_app/tui/services/label_match.py` (**new**, D-11 A) | 4 types, 2 public functions, 15 private helpers | R-A2L-MATCH.1 … .40 |
 
 **Totals:** **1 source file of the 4 allowed** (new). 17 functions, 4 types, 18 graph nodes (PLAN estimate ~8). 0 changed, 0 removed functions: nothing in `e07fb00` changes. Not source: none (the user guide gains the autocomplete with Inc 7). Tests (not capped): 2 new files (§4).
 
@@ -19,11 +19,11 @@ Base `e07fb00`. Line numbers are "as of `e07fb00`". Rows: `01-requirements.md`; 
 | `LabelIndex` | immutable class (opaque) | the prepared name list: distinct names in first-occurrence order, their folded forms, their tokens, their boundary offsets, and a structure of the distinct folded tokens for the token and fuzzy steps | .17, .35, .37 |
 | `_Query` | NamedTuple | the parsed query: `text: str` (folded), `tokens: tuple[str, ...]` (folded token strings), `keys: str` (folded) | — |
 | `build_label_index(names: Iterable[str]) -> LabelIndex` | public | de-duplicates, folds, tokenises, indexes; leaves out a name longer than 1,024 characters (.39); `TypeError` for a non-`str` name or a `str`/`bytes` argument (I-3) | .17, .35, .37, .39 |
-| `rank(query: str, index: LabelIndex, limit: int) -> list[LabelMatch]` | public | strips the query (.1); `[]` for no letter or digit (.2), a limit below 1 (.19) or a stripped query longer than 256 characters (.38); finds each name's first rule (.14–.16), orders (.20–.25), cuts at the limit (.18); `TypeError` for a non-`str` query or a non-`int` limit (I-3) | .1, .2, .14–.16, .18–.25, .36, .38 |
+| `rank(query: str, index: LabelIndex, limit: int) -> list[LabelMatch]` | public | strips the query (.1); `[]` for a limit below 1 (.19), a stripped query longer than 256 characters (.38, checked before the parse) or no letter or digit (.2); takes the query tokens as a multiset, one range or map per distinct token (.40); finds each name's first rule (.14–.16), orders (.20–.25), cuts at the limit (.18); `TypeError` for a non-`str` query or a non-`int` limit (I-3) | .1, .2, .14–.16, .18–.25, .36, .38, .40 |
 | `_fold(text: str) -> str` | private | `A`–`Z` → `a`–`z`, every other character kept (same length) | .3, .4 |
 | `_tokens(text: str) -> tuple[tuple[int, int], ...]` | private | the token spans of CTX-A2L-MATCH *token*, read on the unfolded text (the case cuts need the case) | .8, .10, .21, .28–.30, .32 |
 | `_allowed_edits(token: str) -> int` | private | 0 for digits or 1–2 letters, 1 for 3–5 letters, 2 for 6 or more | .11–.13 |
-| `_prefix_distance(query_token: str, name_token: str, cap: int) -> int` | private | the optimal string alignment distance to the nearest prefix, with an early exit above `cap` | .10, .13, .22, .33 |
+| `_prefix_distance(query_token: str, name_token: str, cap: int) -> int` | private | the optimal string alignment distance to the nearest prefix, computed on the band \|i − j\| ≤ `cap` (A-3), with an early exit above `cap` | .10, .13, .22, .33, .40 |
 | `_classify(query: _Query, name: str) -> tuple[MatchRule, int, tuple] \| None` | private | the first rule in rank order the name meets, its rule key and its spans (case-exactness is decided in `rank` by string comparison, not here) | .5–.10, .15, .16, .21, .26–.33 |
 | `_join_spans(spans) -> tuple[tuple[int, int], ...]` | private | the fewest spans in offset order covering the same offsets | .34 |
 | `_order_key(match, case_exact: bool) -> tuple` | private | (rank of the rule, rule key, length, 0 if case-exact else 1, name) | .20–.25 |
@@ -34,7 +34,7 @@ Base `e07fb00`. Line numbers are "as of `e07fb00`". Rows: `01-requirements.md`; 
 | `_parse_query(query: str) -> _Query \| None` | private | strips exactly the six CTX whitespace characters (never `str.strip`); `None` when no letter or digit; else text folded, tokens folded, keys folded | .1–.3, .8 |
 | `_token_range(tokens: tuple[str, ...], prefix: str) -> tuple[int, int]` | private | the contiguous id range of the sorted distinct tokens that start with `prefix` | .8, .11, .30 |
 | `_build_trie(tokens: tuple[str, ...]) -> tuple[str, array, array, array]` | private | the pre-order array trie of the sorted distinct tokens (chars, depth, first, end) | .35–.37 |
-| `_fuzzy_token_distances(index: LabelIndex, query_token: str, allowed: int) -> dict[int, int]` | private | `{token id: prefix distance}` for every distinct token within `allowed` edits, one trie walk | .10–.13, .36 |
+| `_fuzzy_token_distances(index: LabelIndex, query_token: str, allowed: int) -> dict[int, int]` | private | `{token id: prefix distance}` for every distinct token within `allowed` edits, one trie walk per distinct query token | .10–.13, .36, .40 |
 
 Design note: superseded by the graph's compact index (`codewire/graph-inc4.md`, finding E2-1) — flat `array` buffers, a pre-order array trie and a sorted tuple of distinct tokens in place of the pilot's dict trie and bitmasks; the definitional oracle (`evaluate_b`, `naive_rank_b`) is the reference the testers' expected values were checked against, not code to copy.
 
@@ -48,8 +48,8 @@ Design note: superseded by the graph's compact index (`codewire/graph-inc4.md`, 
 
 ## 4. Tests (proposed for E4; testers own them)
 
-- **G-T1 `tests/test_b103_label_match.py`** — the 107 non-timing cases and the 2 black-box cases of `02-test-cases.md`. Pure: no Textual, no app. Case 08 is generated into `tmp_path` by `tools/synth/make_release_case.py` (seed 20260001; subprocess or its `generate()`), never into the repository; the fixture A2Ls are read with `parse_a2l_file`. Module-scoped fixtures for the prepared lists.
-- **G-T2 `tests/test_b103_label_match_timing.py`** — `@pytest.mark.serial_timing`: R-A2L-MATCH.35/1 and .36/1, printing the host load before and after, `time.perf_counter()` around each call (the style of `tests/test_a2l_alignment_sizing.py:248-253`).
+- **G-T1 `tests/test_b103_label_match.py`** — the 113 coverage items outside G-T2 and the 2 black-box cases of `02-test-cases.md` (115 cases). Pure: no Textual, no app. Case 08 is generated into `tmp_path` by `tools/synth/make_release_case.py` (seed 20260001; subprocess or its `generate()`), never into the repository; the fixture A2Ls are read with `parse_a2l_file`. Module-scoped fixtures for the prepared lists.
+- **G-T2 `tests/test_b103_label_match_timing.py`** — `@pytest.mark.serial_timing`: R-A2L-MATCH.35/1, .36/1, .40/1 and .40/2, printing the host load before and after, `time.perf_counter()` around each call (the style of `tests/test_a2l_alignment_sizing.py:248-253`); and R-A2L-MATCH.37/1, a byte bound with no mark (5 cases in all).
 - **Law guards at E5** (CLAUDE.md), with what they ask of this increment:
   - `tests/test_engine_unchanged.py` — the frozen set is untouched (the module is new, outside it).
   - `tests/test_id_registry.py` — the AT ids are outside its authority; **`EXPECTED_SCANNED_TEST_FILES = 267` (`:184`) grows by the 2 new test files**, re-measured at integration because other increments add files too (an E4 edit of a test file, not source).

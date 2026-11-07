@@ -1,11 +1,11 @@
 # Code-Wire graph — Inc 4 (label similarity matcher, a pure module), batch-103
 
-Stage E2 of the design-first flow (`dev-flow-v3-beta`). Graph only: no stub, mark or declaration in any tree; the one extractor mark (`parse_a2l_file`) sat in a throwaway copy in the session's scratch directory. Base `e07fb00` (worktree branch `batch-103` at `cbe56e6`; `git diff --stat e07fb00 HEAD -- s19_app tests tools` is empty). Requirements `../01-requirements.md` (39 rows, R-A2L-MATCH.1 … .39), cases `../02-test-cases.md`, slice `../E1-slice.md`, rulings `../E1-rulings.md` (its section "Orchestrator rulings" overrides the rows above it: D-1 the two calls, D-2 … D-9, D-11, D-13 as recommended, D-10 S2.8, D-12 A + D). Notation: Code-Wire v3.1.0 (`e436a08`), `docs/Notation-Grammar.md`; layout as batch-101 Inc 12 (`b101-inc12:.dev-flow/2026-11-01-batch-101/inc-12/codewire/graph-inc12.md`).
+Stage E2 of the design-first flow (`dev-flow-v3-beta`). Graph only: no stub, mark or declaration in any tree; the one extractor mark (`parse_a2l_file`) sat in a throwaway copy in the session's scratch directory. Base `e07fb00` (worktree branch `batch-103` at `cbe56e6`; `git diff --stat e07fb00 HEAD -- s19_app tests tools` is empty). Requirements `../01-requirements.md` (40 rows, R-A2L-MATCH.1 … .40), cases `../02-test-cases.md`, slice `../E1-slice.md`, rulings `../E1-rulings.md` (its section "Orchestrator rulings" overrides the rows above it: D-1 the two calls, D-2 … D-9, D-11, D-13 as recommended, D-10 S2.8, D-12 A + D). Notation: Code-Wire v3.1.0 (`e436a08`), `docs/Notation-Grammar.md`; layout as batch-101 Inc 12 (`b101-inc12:.dev-flow/2026-11-01-batch-101/inc-12/codewire/graph-inc12.md`).
 
 How to read it:
 - Every node's `func:` starts with **new** or **unchanged**. The increment adds one file and changes nothing in `e07fb00`; the only unchanged node is `parse_a2l_file`, the reader the tests take their names from.
 - Example sources: the case ids of `02-test-cases.md`; `B4` = this stage's pilot (`i4e2-pilot4.py`, `i4e2-pilot4-transcript.txt`: the compact index pinned here, checked against the E1 oracle and the E1 v3 index); `B4a` = its first variant (`i4e2-pilot4-variantA-transcript.txt`: the same index with the fuzzy walk over the bare sorted token list; that walk's code is `walk_sorted` in `i4e2-walk-variants.py`); `X` = `i4e2-examples-transcript.txt` (each private helper against the oracle's definition); `O` = `i4e2-order-examples-transcript.txt` (`_classify` and `_order_key` values); `W` = `i4e2-walk-variants-transcript.txt` (one fuzzy walk, four ways); `B3` = the E1 pilot v3 (`../evidence-e1/i4e1-pilot3-transcript.txt`); `R` = read. **derived** = a value that follows from a row and its definitions but is no case of `02-test-cases.md` (E2-6).
-- Results use the notation of `02-test-cases.md`: a ranked list `[entry; entry; …]`, an entry `NAME · rule · (s,e),…`, a fuzzy entry adds `· e<k>`. It stands for `list[LabelMatch]`, each `LabelMatch(name=NAME, rule=MatchRule.<RULE>, edits=k or 0, spans=((s, e), …))`. `rank(q, F)` is `rank(q, build_label_index(F), 20)`; "limit n" replaces the 20. Fixtures C08, C08i, C08r, BAL, SRC, SWB, SWA, TW, TW2, NA, CUR, REF and QSET are those of `02-test-cases.md`.
+- Results use the notation of `02-test-cases.md`: a ranked list `[entry; entry; …]`, an entry `NAME · rule · (s,e),…`, a fuzzy entry adds `· e<k>`. It stands for `list[LabelMatch]`, each `LabelMatch(name=NAME, rule=MatchRule.<RULE>, edits=k or 0, spans=((s, e), …))`. `rank(q, F)` is `rank(q, build_label_index(F), 20)`; "limit n" replaces the 20. Fixtures C08, C08i, C08r, BAL, SRC, SWB, SWA, TW, TW2, NA, CUR, REF, REF6, QSET, PSET and LONG are those of `02-test-cases.md`. `A` = the E3 addenda probe (`../evidence-e3/addenda-probe.py`, `addenda-{check,time}-transcript.txt`: this procedure with steps 1, 3, 4 and 6 as the addenda rule and the banded `_prefix_distance`, on cachyos-rtx at host load 0.3–0.9).
 - Every run: cachyos-rtx, Python 3.11.18, `s19_app.__file__` = the read-only clone at `e07fb00`, scratch `/tmp/b103-e2-4/` with its own HOME, XDG and LOCALAPPDATA, case 08 generated there (seed 20260001); no clipboard; host load printed in each transcript (0.95 to 1.15 during B4). The scripts on the host and in this folder are byte-identical (sha256 checked).
 
 ### Groups for E4 (file ownership) and interfaces — pinned here, changed only by an orchestrator ruling
@@ -13,8 +13,8 @@ How to read it:
 | Group | Files | Owns |
 |---|---|---|
 | G1 matcher (implementer) | `s19_app/tui/services/label_match.py` (new; the increment's only source file, 1 of 4) | every node of `## Nodes` but `parse_a2l_file`; the entities `[Data: MatchRule]`, `[Data: LabelMatch]`, `[Data: LabelIndex]`, `[Data: _Query]` |
-| G-T1 (tester) | `tests/test_b103_label_match.py` (new) | the 112 non-timing coverage items and AT-B103-I4-1, -2 of `02-test-cases.md` (114 cases); the I-3 interface checks |
-| G-T2 (tester) | `tests/test_b103_label_match_timing.py` (new; the .35/.36 timing tests `@pytest.mark.serial_timing`; the .37 memory test carries none) | R-A2L-MATCH.35/1, .36/1, .37/1 (E2-4) |
+| G-T1 (tester) | `tests/test_b103_label_match.py` (new) | the 113 coverage items outside G-T2 and AT-B103-I4-1, -2 of `02-test-cases.md` (115 cases); the I-3 interface checks |
+| G-T2 (tester) | `tests/test_b103_label_match_timing.py` (new; the .35/.36/.40 timing tests `@pytest.mark.serial_timing`; the .37 memory test carries none) | R-A2L-MATCH.35/1, .36/1, .37/1, .40/1, .40/2 (5 cases; E2-4) |
 
 | Interface | Pinned form | Producer → consumers |
 |---|---|---|
@@ -83,10 +83,10 @@ examples: (R-A2L-MATCH.39/2 neg) the cap removed → the 1,025-character name is
 examples: (I-3, derived) `[]` → an index of `len` `0`; any ranking over it → `[]` (X §H)
 
 rank
-req: R-A2L-MATCH.1, R-A2L-MATCH.2, R-A2L-MATCH.3, R-A2L-MATCH.4, R-A2L-MATCH.5, R-A2L-MATCH.6, R-A2L-MATCH.7, R-A2L-MATCH.8, R-A2L-MATCH.9, R-A2L-MATCH.10, R-A2L-MATCH.11, R-A2L-MATCH.12, R-A2L-MATCH.13, R-A2L-MATCH.14, R-A2L-MATCH.15, R-A2L-MATCH.16, R-A2L-MATCH.17, R-A2L-MATCH.18, R-A2L-MATCH.19, R-A2L-MATCH.20, R-A2L-MATCH.21, R-A2L-MATCH.22, R-A2L-MATCH.23, R-A2L-MATCH.24, R-A2L-MATCH.25, R-A2L-MATCH.26, R-A2L-MATCH.27, R-A2L-MATCH.28, R-A2L-MATCH.29, R-A2L-MATCH.30, R-A2L-MATCH.31, R-A2L-MATCH.32, R-A2L-MATCH.33, R-A2L-MATCH.34, R-A2L-MATCH.36, R-A2L-MATCH.38
+req: R-A2L-MATCH.1, R-A2L-MATCH.2, R-A2L-MATCH.3, R-A2L-MATCH.4, R-A2L-MATCH.5, R-A2L-MATCH.6, R-A2L-MATCH.7, R-A2L-MATCH.8, R-A2L-MATCH.9, R-A2L-MATCH.10, R-A2L-MATCH.11, R-A2L-MATCH.12, R-A2L-MATCH.13, R-A2L-MATCH.14, R-A2L-MATCH.15, R-A2L-MATCH.16, R-A2L-MATCH.17, R-A2L-MATCH.18, R-A2L-MATCH.19, R-A2L-MATCH.20, R-A2L-MATCH.21, R-A2L-MATCH.22, R-A2L-MATCH.23, R-A2L-MATCH.24, R-A2L-MATCH.25, R-A2L-MATCH.26, R-A2L-MATCH.27, R-A2L-MATCH.28, R-A2L-MATCH.29, R-A2L-MATCH.30, R-A2L-MATCH.31, R-A2L-MATCH.32, R-A2L-MATCH.33, R-A2L-MATCH.34, R-A2L-MATCH.36, R-A2L-MATCH.38, R-A2L-MATCH.40
 in: str query; LabelIndex index; int limit
 out: list[LabelMatch] matches
-func: new (I-3). Ranks the prepared names for one query: type checks, then `[]` for a limit below 1, a query with no letter or digit, or a stripped query longer than 256 characters (R-A2L-MATCH.38); then the rule tiers in rank order over the index, stopping after the tier at which `limit` names are found; then the order of `_order_key` with case-exactness computed only for the `exact`, `prefix` and `substring` groups it reaches, and each entry from `_classify`. The procedure is pinned in the note under this node (R-A2L-MATCH.36).
+func: new (I-3). Ranks the prepared names for one query: type checks, then `[]` for a limit below 1, a stripped query longer than 256 characters (R-A2L-MATCH.38, checked before the parse), or a query with no letter or digit; then the rule tiers in rank order over the index, with the query tokens taken as a multiset (one range or map per distinct token, R-A2L-MATCH.40), stopping after the tier at which `limit` names are found; then the order of `_order_key` with case-exactness computed only for the `exact`, `prefix` and `substring` groups it reaches, and each entry from `_classify`. The procedure is pinned in the note under this node (R-A2L-MATCH.36, .40).
 module: s19_app/tui/services/label_match.py
 examples: (R-A2L-MATCH.1/1) C08, `  VALUE_0001  ` → `[VALUE_0001 · exact · (0,10)]` (B4 §1)
 examples: (R-A2L-MATCH.1/2) C08, `\tVALUE_0001\n` → `[VALUE_0001 · exact · (0,10)]`
@@ -153,6 +153,8 @@ examples: (R-A2L-MATCH.21/3, .29/1) BAL, `ounter`, limit 4 → `[model.MainClass
 examples: (R-A2L-MATCH.23/2) [`rpm_x`, `RPMX`], `rpm` → `[RPMX · prefix · (0,3); rpm_x · prefix · (0,3)]`
 examples: (R-A2L-MATCH.24/1) TW, `rpm` → entry 1 `rpm`
 examples: (R-A2L-MATCH.24/2) TW, `RPM` → `[RPM · exact · (0,3); Rpm · exact · (0,3); rpm · exact · (0,3)]`
+examples: (R-A2L-MATCH.24/4) [`DiscouNTCount`, `DiscountCount`], `count` → `[DiscountCount · substring · (8,13); DiscouNTCount · substring · (8,13)]` (the raw `count` occurs in `DiscountCount` at offset 3, inside a token, so it is case-exact; A check)
+examples: (R-A2L-MATCH.24/4 neg) `substring` case-exact only for a raw occurrence at a boundary offset → `[DiscouNTCount …; DiscountCount …]` → RED (A check; E3A-12, E3S-10)
 examples: (R-A2L-MATCH.25/2) C08r, `0001` → the 6 entries of R-A2L-MATCH.7/1, in the same order
 examples: (R-A2L-MATCH.25/3) TW2, `rpm` → `[rpm · exact · (0,3); RPM · exact · (0,3); Rpm · exact · (0,3)]`
 examples: (R-A2L-MATCH.28/1) [`DiscountCount`], `count` → `[DiscountCount · substring · (8,13)]`
@@ -166,20 +168,25 @@ examples: (R-A2L-MATCH.34/1) CUR, `abs value` → `[ABSValue · token · (0,8)]`
 examples: (R-A2L-MATCH.38/1) C08, `'VALUE_0001_' * 23 + 'VAL'` (256 characters) → `[VALUE_0001 · token · (0,5),(6,10)]`
 examples: (R-A2L-MATCH.38/2) C08, `'VALUE_0001_' * 23 + 'VALU'` (257 characters) → `[]`
 examples: (R-A2L-MATCH.38/2 neg) the cap removed → the 257-character query lists `VALUE_0001` → RED
-examples: (R-A2L-MATCH.36/1) REF prepared once; every QSET query, the three multi-word queries, the worst pasted-list shapes and every REF6 query, limit 20, ranked 7 times → worst median `71.2` ms on REF (the multi-word queries; `temp_sensor_max` drops to 16.9 ms) and `85.5` ms on REF6 (the first 50,000 names of `examples/case_06_large_nested_a2l/firmware.a2l`) ≤ 200 ms (E3A-01/E3A-02 probe 2; the v3 index: 122.6 ms, B3 §4; the sorted-list variant: 158.3 ms, B4a §5)
+examples: (R-A2L-MATCH.36/1) REF and REF6 prepared once; each of QSET's 33 queries over REF and each of REF6's 12 queries over REF6, limit 20, ranked 7 times → worst median `66.4` ms on REF (`a` × 256) and `78.4` ms on REF6 (`0`) ≤ 200 ms (A, host load 0.7; `addenda-time-transcript.txt`). Before the collapse, round 2 measured `110.0` ms on REF (`e ` × 128, now 7.0 ms) and `78.5` ms on REF6 (`arch-r2-time-transcript.txt:69`, `:91`; the v3 index: 122.6 ms, B3 §4; the sorted-list variant: 158.3 ms, B4a §5)
 examples: (R-A2L-MATCH.36/1 neg) no preparation (every ranking reads the 50,000 names with the oracle) → 9.15 s for one query (E1 v1) → RED; a map for every query token before the candidate check (the E2 tier) → 296.8 ms → RED; case-exactness by a raw re-classification of every member of the group at the cut → `mesa` ≈ 700 ms → RED
+examples: (R-A2L-MATCH.40/1) REF and REF6 prepared once; each PSET query over its list, limit 20, ranked 7 times → worst median `121.5` ms on REF (`qza` … `qzz` 3×, cut at 256) and `461.7` ms on REF6 (64 near tokens of `char`, 62 distinct: the collapse does not shorten them) ≤ 1.0 s; `0 ` × 125 + `chax` `56.4` ms, `chr ` × 64 `45.6` ms (A, host load 0.7–0.8)
+examples: (R-A2L-MATCH.40/1 neg) a range or map per query token occurrence (no collapse) → REF6 `0 ` × 125 + `chax` `1,136.9` ms > 1.0 s → RED (A; round 2: 1,141–1,350 ms, `sec-r2-dedupe-transcript.txt`); `0 ` × 128 takes only `309.4` ms without the collapse, so it is no control for 1.0 s
+examples: (R-A2L-MATCH.40/2) LONG prepared once; `'a' * 255 + 'b'`, `'a' * 254 + 'bb'`, `'a' * 128 + 'b'`, limit 20, ranked 7 times → 20 entries `fuzzy` e1, e2, e1; worst median `77.5` ms ≤ 1.0 s (A, banded `_prefix_distance`)
+examples: (R-A2L-MATCH.40/2 neg) `_prefix_distance` without the band → `1,534.6` ms for `'a' * 255 + 'b'` → RED (A; round 2: 1.45–1.48 s on 125–200 names, `sec-r2-band-transcript.txt`)
+examples: (R-A2L-MATCH.33, .40, derived) C08, `cuvre cuvre`, limit 2 → `[CURVE_0001 · fuzzy · (0,5) · e2; CURVE_0002 · fuzzy · (0,5) · e2]`: a repeated query token adds its edits once per occurrence, so the collapse keeps every list (`arch-r2-adv2-transcript.txt:30-31`; A check: 0 differences from the round-2 procedure on 77 REF, REF6 and LONG queries, 0 mismatches against the oracle on 3 fixtures × 35 queries × 3 limits)
 examples: (AT-B103-I4-1) C08, limit 5, `m`, `ma`, `map`, `map_`, `map_00` in turn on one index → `MAP_0001` … `MAP_0005`, each `· prefix · (0,k)`, k = 1, 2, 3, 4, 6; `map_002` → `[MAP_0020 · prefix · (0,7); MAP_0002 · subsequence · (0,3),(4,6),(7,8); MAP_0012 · subsequence · (0,3),(4,6),(7,8)]`; `map_0020` → `[MAP_0020 · exact · (0,8)]` (B4 §1)
 examples: (AT-B103-I4-2) SWA, limit 5, target `JotafVod_msrqlLzL_kh2C_rWl_pfue._0_` → entry 1 is the target for each query: the target `exact (0,35)`, `jotafvod` `prefix (0,8)`, `msrqlLzL` `substring (9,17)`, `pfue._0_` `substring (27,35)`, `jotaf vod` and `vod jotaf` `token (0,8)`, `jotfa vod` and `jotaf_vdo` `fuzzy (0,8) e1` (B4 §1, target position 0 for all 8)
 examples: (purity, derived) the same query, index and limit twice → equal lists; the list passed to `build_label_index` unchanged (X §G)
 examples: (I-3) `rank(None, index, 20)` → TypeError `query must be str, got NoneType`; `rank("VALUE", index, True)` → TypeError `limit must be int, got bool`; `rank("VALUE", index, 2.0)` → TypeError `limit must be int, got float`
 
-### rank — the procedure pinned for R-A2L-MATCH.36 (0 mismatches against the E1 oracle and the v3 index; step 4 and step 6 as E3A-01/E3A-02/E3S-01 ruled)
-1. Type checks (I-3); `limit < 1` → `[]`; `q = _parse_query(query)`; `None` → `[]`; the stripped query longer than 256 characters → `[]` (R-A2L-MATCH.38); keep the raw stripped query for step 6.
+### rank — the procedure pinned for R-A2L-MATCH.36 and .40 (0 mismatches against the E1 oracle and the v3 index; step 4 and step 6 as E3A-01/E3A-02/E3S-01 ruled; steps 1, 3, 4 and 6 as the E3 addenda A-1, A-2 and A-4 rule)
+1. Type checks (I-3); `limit < 1` → `[]`; strip the six whitespace characters; the stripped query longer than 256 characters → `[]` (R-A2L-MATCH.38), before any fold or tokenising (E3A-16, E3S-13); then `q = _parse_query(query)`; `None` → `[]`; keep the raw stripped query for step 6.
 2. Text tiers, one pass over `_folded`: a name that contains `q.text` is EXACT (equal), PREFIX (starts with it) or SUBSTRING; a SUBSTRING name's key is 0 when `_at_boundary(name, p)` holds for an occurrence `p` (`str.find` on the folded name, from left to right), else 1.
-3. Fewer than `limit` so far → TOKEN: each query token's `_token_range(_tokens, qt)`; an empty range → no TOKEN name; else the names = the postings of the range with the fewest postings, intersected (as sets) with the postings of each other range, minus the names already found.
-4. Still fewer → FUZZY, one query token at a time in ascending `_allowed_edits` (0, then 1, then 2): compute `_fuzzy_token_distances(index, qt, allowed)` lazily and drop each map once its candidates are taken; intersect the candidate postings after each walk and stop when the set is empty; once at most 300 candidates remain, stop walking and check the remaining query tokens per candidate with `_prefix_distance`, memoised per token id. An empty map → no FUZZY name; a candidate (minus the names already found) is FUZZY when, for each query token, one of its token ids is in that token's map or passes the per-candidate check; its key (total edits) = the sum over the query tokens of the smallest distance among its token ids.
+3. Fewer than `limit` so far → TOKEN, with the query tokens as a multiset (A-2): one `_token_range(_tokens, qt)` per distinct query token; an empty range → no TOKEN name; else the names = the postings of the range with the fewest postings, intersected (as sets) with the postings of each other range, minus the names already found.
+4. Still fewer → FUZZY, with the query tokens as a multiset (A-2): one distinct query token at a time in ascending `_allowed_edits` (0, then 1, then 2): compute `_fuzzy_token_distances(index, qt, allowed)` lazily, one map per distinct token, and drop each map once its candidates are taken; intersect the candidate postings after each walk and stop when the set is empty; once at most 300 candidates remain, stop walking and check the remaining distinct query tokens per candidate with `_prefix_distance`, memoised per token id; a candidate's check stops at the first query token it fails (E3A-14). An empty map → no FUZZY name; a candidate (minus the names already found) is FUZZY when, for each distinct query token, one of its token ids is in that token's map or passes the per-candidate check; its key (total edits) = the sum over the distinct query tokens of the smallest distance among its token ids times the token's count in the query (so a repeated token counts its edits once per occurrence, as R-A2L-MATCH.33's sum over the query tokens says).
 5. Still fewer → SUBSEQUENCE: each name not yet found whose `_masks` entry holds every bit of `_char_mask(q.keys)` and for which `_subsequence(q.keys, folded name)` is not `None`.
-6. Order and cut: group the names found by the first three parts of `_order_key` (rule, key, length) and take the groups in order; in a group whose rule is `exact`, `prefix` or `substring`, a name is case-exact when its rule still holds on the raw stripped query (`==`, `startswith`, or `in` at a boundary offset), and a name listed with any other rule is not case-exact (CTX case-exact, as ruled); sort the group by the last two parts; emit `LabelMatch(name, rule, edits, spans)` from `_classify(q, name)` (edits = its key for FUZZY, else 0) until `limit` entries. For every listed name the tier's rule and key equal `_classify`'s (0 disagreements); a mismatch is a defect of the tiers.
+6. Order and cut: group the names found by the first three parts of `_order_key` (rule, key, length) and take the groups in order; in a group whose rule is `exact`, `prefix` or `substring`, a name is case-exact when its rule still holds on the raw stripped query (`==`, `startswith`, or `in`; for `substring` an occurrence at any offset, A-1), and a name listed with any other rule is not case-exact (CTX case-exact, as ruled); sort the group by the last two parts; emit `LabelMatch(name, rule, edits, spans)` from `_classify(q, name)` (edits = its key for FUZZY, else 0) until `limit` entries. For every listed name the tier's rule and key equal `_classify`'s (0 disagreements); a mismatch is a defect of the tiers.
 Helpers called only by `rank` for one tier may stay unmarked (the extractor lifts calls through them); any other new function is a deviation to record.
 
 LabelIndex.__len__
@@ -238,10 +245,10 @@ examples: (R-A2L-MATCH.12/4) `٣٣٤` → `1` (three letters by CTX-A2L-MATCH; `
 examples: (R-A2L-MATCH.11/1 neg) 1 edit for a digit token → `VALUE_0300` lists `VALUE_0200` → RED
 
 _prefix_distance
-req: R-A2L-MATCH.10, R-A2L-MATCH.12, R-A2L-MATCH.13, R-A2L-MATCH.32, R-A2L-MATCH.33
+req: R-A2L-MATCH.10, R-A2L-MATCH.12, R-A2L-MATCH.13, R-A2L-MATCH.32, R-A2L-MATCH.33, R-A2L-MATCH.40
 in: str query_token; str name_token; int cap
 out: int distance
-func: new (D-5 A). The smallest optimal-string-alignment distance between `query_token` and a prefix of `name_token` (the empty prefix included) when it is at most `cap`, else `cap + 1`; it may stop as soon as a whole column of the alignment is above `cap`. Characters compare as given, both folded. Used by `_classify`; `_fuzzy_token_distances` gives the same values for many tokens at once.
+func: new (D-5 A). The smallest optimal-string-alignment distance between `query_token` and a prefix of `name_token` (the empty prefix included) when it is at most `cap`, else `cap + 1`; computed only on the band |i − j| ≤ `cap` of the alignment (as `_fuzzy_token_distances` does), so one call costs at most (2 × `cap` + 1) cells per query character, never query-token length × name-token length (A-3, E3S-11); it may stop as soon as a whole column of the alignment is above `cap`. Characters compare as given, both folded. Used by `_classify`; `_fuzzy_token_distances` gives the same values for many tokens at once.
 module: s19_app/tui/services/label_match.py
 examples: (CTX-A2L-MATCH *prefix distance*, X §C) `cuvre`, `curve` → `1`; `valuee`, `value` → `1`; `value`, `val` → `2` (cap 2)
 examples: (R-A2L-MATCH.10/4 … /6, X §C) `mpa`, `map` → `1`; `xmap`, `map` → `1`; `maq`, `map` → `1` (cap 1)
@@ -251,6 +258,8 @@ examples: (R-A2L-MATCH.32/1, X §C) `maesu`, `measurement`, cap 1 → `1`
 examples: (R-A2L-MATCH.13/1, /2, X §C, §H) `valuexx`, `value`, cap 2 → `2`; `valuexxx`, `value`, cap 2 → `3`
 examples: (R-A2L-MATCH.11/3, X §C) `ca`, `abc` → `1` (the prefix `a`)
 examples: (R-A2L-MATCH.10/1 neg) plain Levenshtein → `cuvre`, `curve` → `2` → RED
+examples: (R-A2L-MATCH.40/2, A-3) `'a' * 255 + 'b'`, `'a' * 1000`, cap 2 → `1` (the band visits at most 5 cells per row; A check: the banded and the full alignment agree on 20,000 random pairs, cap 0–2)
+examples: (R-A2L-MATCH.40/2 neg) the full alignment (no band) → about 256 × 1,020 cells per listed LONG name → `1,534.6` ms for one ranking → RED
 
 _join_spans
 req: R-A2L-MATCH.34
@@ -348,10 +357,10 @@ examples: (X §H) [`0001`, `curve`, `cuve`] → chars `0001curveve`, depth `[1, 
 examples: (R-A2L-MATCH.37, B4 §4, W) REF's 77,256 tokens → `177148` nodes; chars 177,197 bytes and each array 749,076 bytes, 2.3 MiB in all
 
 _fuzzy_token_distances
-req: R-A2L-MATCH.10, R-A2L-MATCH.11, R-A2L-MATCH.12, R-A2L-MATCH.13, R-A2L-MATCH.36
+req: R-A2L-MATCH.10, R-A2L-MATCH.11, R-A2L-MATCH.12, R-A2L-MATCH.13, R-A2L-MATCH.36, R-A2L-MATCH.40
 in: LabelIndex index; str query_token; int allowed
 out: dict[int, int] distances
-func: new (E2-1). `{token id: prefix distance}` for every distinct token of `index` at a prefix distance of at most `allowed` from `query_token`. For `allowed` 0: every id of `_token_range(index._tokens, query_token)`, with 0. Otherwise one walk of the trie arrays in pre-order: each node's alignment column from its parent's (and its grandparent's, for a transposition), capped at `allowed + 1` and computed only on the band |row − depth| ≤ `allowed`; the best prefix distance so far carried down the path; when the column minimum is above `allowed` or not below the best, every token under the node gets the best (when it is at most `allowed`) and the walk jumps to `end[j]`. The same values as `_prefix_distance` token by token. `rank` calls it once per query token per allowed-edit level, lazily in ascending edits, and drops each map once its candidates are taken (step 4; E3A-02/E3S-01).
+func: new (E2-1). `{token id: prefix distance}` for every distinct token of `index` at a prefix distance of at most `allowed` from `query_token`. For `allowed` 0: every id of `_token_range(index._tokens, query_token)`, with 0. Otherwise one walk of the trie arrays in pre-order: each node's alignment column from its parent's (and its grandparent's, for a transposition), capped at `allowed + 1` and computed only on the band |row − depth| ≤ `allowed`; the best prefix distance so far carried down the path; when the column minimum is above `allowed` or not below the best, every token under the node gets the best (when it is at most `allowed`) and the walk jumps to `end[j]`. The same values as `_prefix_distance` token by token. `rank` calls it once per distinct query token (A-2), lazily in ascending edits, and drops each map once its candidates are taken (step 4; E3A-02/E3S-01).
 module: s19_app/tui/services/label_match.py
 examples: (R-A2L-MATCH.10/1, X §F) C08, `cuvre`, `1` → {`curve`: 1} (ids written as their tokens)
 examples: (R-A2L-MATCH.10/4, X §F) C08, `mpa`, `1` → {`map`: 1, `measurement`: 1}
@@ -453,7 +462,7 @@ Reason for the 8 added functions: the memory row (.37) removed the trie and the 
 | .21 | rank, _order_key, _at_boundary, _classify | .21/1–/3 |
 | .22 | rank, _order_key | .22/1 |
 | .23 | rank, _order_key | .23/1–/2 |
-| .24 | rank, _order_key | .24/1–/3 |
+| .24 | rank, _order_key | .24/1–/4, neg |
 | .25 | rank, _order_key | .25/1–/3, neg |
 | .26 | rank, _classify | .26/1–/2 |
 | .27 | rank, _classify | .27/1–/3 |
@@ -465,18 +474,19 @@ Reason for the 8 added functions: the memory row (.37) removed the trie and the 
 | .33 | rank, _classify | .33/1–/3 |
 | .34 | rank, _join_spans | .34/1–/3, neg |
 | .35 | build_label_index, _build_trie | .35/1 (B4: 1.798 s), neg |
-| .36 | rank, _fuzzy_token_distances, _build_trie, _char_mask | .36/1 (E3A-01/E3A-02: 71.2 ms REF, 85.5 ms REF6), neg; W |
+| .36 | rank, _fuzzy_token_distances, _build_trie, _char_mask | .36/1 (A: 66.4 ms REF, 78.4 ms REF6), neg; W |
 | .37 | build_label_index, _build_trie | .37/1 (B4: 18.1 MiB), neg (75.7 MiB) |
 | .38 | rank | .38/1–/2, neg |
 | .39 | build_label_index | .39/1–/2, neg |
+| .40 | rank, _prefix_distance, _fuzzy_token_distances | .40/1 (A: 461.7 ms REF6, 121.5 ms REF), .40/2 (A: 77.5 ms LONG), neg (no collapse 1,136.9 ms; no band 1,534.6 ms); derived `cuvre cuvre` |
 | AT-B103-I4-1 | rank | typing `m` … `map_0020` |
 | AT-B103-I4-2 | rank | 8 queries, target first in each |
 
 ### E4 notes (for G1, G-T1, G-T2 and the integration step)
 - The module imports `array`, `bisect`, `dataclasses`, `enum`, `typing` only: `tests/test_engine_unchanged.py` (frozen set untouched) and `tests/test_import_census.py` TC-654 (no `tui/services/*` import of `insight_style`) hold by construction; E5 runs them.
 - `tests/test_id_registry.py`: `EXPECTED_SCANNED_TEST_FILES = 267` (`:184`) grows by 2 for `test_b103_label_match.py` and `test_b103_label_match_timing.py`; re-measured at integration, since other increments add files too (an E4 edit of a test file, not source).
-- `tests/test_suite_hygiene.py` R-TST-002 (`:392`): every timing arm carries `serial_timing` (`pyproject.toml:115`); G-T2 marks all three tests, G-T1 times nothing.
+- `tests/test_suite_hygiene.py` R-TST-002 (`:392`): every timing arm carries `serial_timing` (`pyproject.toml:115`); the .35/.36/.40 tests carry `serial_timing`, .37/1 none; G-T1 times nothing.
 - G-T1 fixtures: case 08 generated into `tmp_path` by `tools/synth/make_release_case.py --seed 20260001` (never into the repository; Amendment A1 keeps it byte-stable), names read with `parse_a2l_file`; module-scoped prepared indexes. Expected values come from `../02-test-cases.md` and this graph, never from the pilots' code.
-- G-T2: REF built before the clock or `tracemalloc.start()` (after `gc.collect()` for .37); `time.perf_counter()` around each call; host load printed before and after (`os.getloadavg()`, POSIX only: skip the print on Windows). The .35/.36 tests assert `median <= report_margin("R-A2L-MATCH.36 <query>", median, timing_bound(0.200))` (5.0 for .35) — not a bare `<= 0.2`, which trips R-TST-040/041 — and the .37 test carries no `serial_timing` mark and asserts a plain byte bound.
+- G-T2: REF built before the clock or `tracemalloc.start()` (after `gc.collect()` for .37); `time.perf_counter()` around each call; host load printed before and after (`os.getloadavg()`, POSIX only: skip the print on Windows). The .35/.36/.40 tests assert `median <= report_margin("R-A2L-MATCH.36 <query>", median, timing_bound(0.200))` (5.0 for .35, 1.0 for .40; LONG and PSET built before the clock) — not a bare `<= 0.2`, which trips R-TST-040/041 — and the .37 test carries no `serial_timing` mark and asserts a plain byte bound.
 - G1 may keep tier helpers private to `rank` unmarked; every other function not in this graph is a deviation to write down. The pilots (`i4e2-pilot4.py`, the E1 pilots) are evidence, not code to copy; the graph's contracts and examples are the source.
 - Extractor at integration: copy the merged tree to a scratch directory (never the worktree), put `# node: <name>` above each of the 17 new defs and above `parse_a2l_file`, run `codewire_extract.py --repo <copy> --graph graph-inc4.md --out <dir>` (no `--path`, as at E2); expected: exit 0, no drift, and calls from `rank` and `build_label_index` to the private nodes.
