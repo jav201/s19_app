@@ -739,9 +739,9 @@ app during the captures; "code" = read in the code.
 | F-30 | help mismatch, live · fixed in 1.0.0 | Reports "Declared regions" stays empty with the A2L loaded; the help says it pre-fills from the A2L. | ch16-01 |
 | F-31 | placeholder, live + code | Operations `extract` and `split_by_segment` are listed but return "placeholder — not yet implemented". | ch13-06; `operations/placeholders.py` |
 | F-32 | layout, live | CRC Designer bench is taller than 54 rows; Store placement, Custom vector, Template and Load / Save are below the fold. | ch12-04, ch12-05 |
-| F-33 | unreachable, code | `screens.py:VariantHelpScreen` is never opened. | no call site |
-| F-34 | unreachable, code | `app.py:action_view_main`, `action_view_mac` have no key and no palette entry (`action_view_alt` only internal). | `app.py` |
-| F-35 | dead widget, code | Hidden widgets kept mounted: Check Editor "Addendum preview" button, Flow Builder kind dropdown `#flow_kind`. | `CheckEditorPanel.compose`, `FlowBuilderPanel.on_mount` |
+| F-33 | unreachable, code · fixed in 1.0.0 | `screens.py:VariantHelpScreen` is never opened. | no call site |
+| F-34 | unreachable, code · fixed in 1.0.0 | `app.py:action_view_main`, `action_view_mac` have no key and no palette entry (`action_view_alt` only internal). | `app.py` |
+| F-35 | dead widget, code · fixed in 1.0.0 | Hidden widgets kept mounted: Check Editor "Addendum preview" button, Flow Builder kind dropdown `#flow_kind`. | `CheckEditorPanel.compose`, `FlowBuilderPanel.on_mount` |
 | F-36 | limitation, code | Flow "report" block cannot be added from the builder; it appears only if a loaded flow file carries one. | `FlowBuilderPanel._KIND_OPTIONS` |
 | F-37 | help mismatch, code + live · fixed in 1.0.0 | In-app help text that the app does not do: Split / Join "pick the source image … or browse" and an editable naming pattern; A2L "section tree" and "`/` jumps to a name"; Checks "table" and "grouped by reason"; CRC Designer "coverage over the image's real ranges"; Workspace "folders.html board"; Reports pre-filled regions (F-30); Map keys (F-16). | `window_help.py:WINDOW_HELP_SECTIONS`; ch19-01 |
 | F-38 | doc mismatch, code · fixed in 1.0.0 | README says 10 screens on keys 1–0 and a one-row footer; the app has 12 rail windows (`=` Check Editor, `]` Flow Execution), the palette-only Split / Join / Export and a two-row key bar. | `README.md` |
@@ -757,7 +757,7 @@ app during the captures; "code" = read in the code.
 | F-48 | gap, code + live | A later block cannot reference an external step's output: there is no `#n` reference, binding or `${NAME}` for it. The only way is to type the copy's file name as an ordinary project-relative ref (17.11). The block's docstring says "downstream blocks reference THAT copy". | `flow_model.ExternalStepBlock`, `flow_execution_service.run_flow` (`ExternalStepBlock` branch); ch18-17 |
 | F-49 | defect, live · fixed in 1.0.0 | When a later run's external output differs, the copy is stored as `<name>_1.<ext>` (no overwrite) but a later block that names the copy still reads the first file: `terminal_out.s19` kept `BENCH=OK` after the step produced `BENCH=V2`. | driver log of the 18.9 run (`step_patch.changes_1.json` written, `terminal_out.s19` unchanged) |
 | F-50 | limitation, live + code | The Flow Builder pauses at an external step (*PAUSED – WAITING FOR A HUMAN*) but offers no Confirm; the run can only continue from Flow Execution. In Terminal mode the app never runs the command and does not see its exit code — only the existence of the log and output files is checked. | `app.py:on_flow_builder_panel_run_requested` (`FlowContext` without confirmations); ch17-18, ch18-16 |
-| F-51 | usability, live | `esc` does not close the Reports viewer; only **Close** does (its bindings hold `?` only). | `screens.py:ReportViewerScreen.BINDINGS`; driver log of the 18.9 run |
+| F-51 | usability, live · fixed in 1.0.0 | `esc` does not close the Reports viewer; only **Close** does (its bindings hold `?` only). | `screens.py:ReportViewerScreen.BINDINGS`; driver log of the 18.9 run |
 
 ## 6. Live checks requested
 

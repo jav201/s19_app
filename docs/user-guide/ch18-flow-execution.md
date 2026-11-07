@@ -170,7 +170,7 @@ mode → PATCH `step_patch.changes.json` → WRITE-OUT `terminal_out.s19`).
 5. **The record.** `t` opens the Reports viewer; the newest chain-set report lists,
    under *Written files*, the copy in the project
    (`…\workarea\demo\step_patch.changes.json`) and `terminal_out.s19`. Close it with
-   **Close** — `esc` does not close this viewer (finding F-51).
+   **Close** or `esc`.
 
    ![Chain-set report](img/ch18-18-terminal-chain-set-report.png)
 

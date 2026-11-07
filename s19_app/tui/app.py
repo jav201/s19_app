@@ -11102,18 +11102,6 @@ class S19TuiApp(App):
         event.stop()
         event.prevent_default()
 
-    def action_view_main(self) -> None:
-        """Legacy alias: activate the Workspace rail screen (superseded by key ``1``)."""
-        self.action_show_screen("workspace")
-
-    def action_view_alt(self) -> None:
-        """Legacy alias: activate the A2L Explorer rail screen (superseded by key ``2``)."""
-        self.action_show_screen("a2l")
-
-    def action_view_mac(self) -> None:
-        """Legacy alias: activate the MAC View rail screen (superseded by key ``3``)."""
-        self.action_show_screen("mac")
-
     def action_cycle_density(self) -> None:
         """
         Summary:
@@ -11538,10 +11526,6 @@ class S19TuiApp(App):
         self._mac_window_start = max(0, self._mac_window_start - page_size)
         self._mac_goto_focus_address = None
         self.update_mac_view()
-
-    def action_a2l_tag_find_next(self) -> None:
-        """Invoke the A2L tag find-next scan (same as the Find-next button)."""
-        self._handle_a2l_tag_find_next()
 
     def _abort_save(
         self,
@@ -17054,7 +17038,6 @@ class S19TuiApp(App):
                 - ``set_status``
             Used by:
                 - ``on_button_pressed`` for ``a2l_tag_find_next``
-                - ``action_a2l_tag_find_next``
         """
         query = self.query_one("#a2l_tag_find_input", Input).value.strip()
         if not query:
@@ -17121,22 +17104,6 @@ class S19TuiApp(App):
         self.update_mac_hex_view(address, near_top=True, reset_scroll=True)
         self.set_status(f"MAC tag at 0x{address:08X}")
 
-    def _jump_to_validation_issue(self, item: ListItem) -> None:
-        """Legacy ListView adapter that forwards to ``_jump_to_validation_issue_object``."""
-        info = getattr(item, "data", None)
-        if not isinstance(info, dict):
-            return
-        issue_stub = ValidationIssue(
-            code=str(info.get("code") or ""),
-            severity=ValidationSeverity.INFO,
-            artifact="",
-            message="",
-            symbol=str(info.get("symbol") or "") or None,
-            address=info.get("address") if isinstance(info.get("address"), int) else None,
-            line_number=info.get("line_number") if isinstance(info.get("line_number"), int) else None,
-        )
-        self._jump_to_validation_issue_object(issue_stub)
-
     def _update_issues_hex_pane(self, address: Optional[int]) -> None:
         """Render the selected issue's address bytes in ``#issues_hex_pane`` (US-020a).
 
@@ -17164,9 +17131,9 @@ class S19TuiApp(App):
             Uses:
                 - ``render_hex_view_text``
             Used by:
-                - ``_jump_to_validation_issue_object``
+                - ``on_issue_row_selected``
         """
-        # No mounted screen (e.g. a headless unit-test call to the jump path) ->
+        # No mounted screen (e.g. a call with no mounted screen) ->
         # there is no DOM to query; skip the best-effort pane update.
         if not self.screen_stack:
             return
@@ -17184,48 +17151,6 @@ class S19TuiApp(App):
         pane.update(
             render_hex_view_text(self.current_file.mem_map, address, row_bases, None)
         )
-
-    def _jump_to_validation_issue_object(self, issue: ValidationIssue) -> None:
-        """
-        Summary:
-            Focus related hex/tag context for a selected validation issue.
-
-        Args:
-            issue (ValidationIssue): Issue whose address (if any) or symbol drives the jump.
-
-        Returns:
-            None
-
-        Data Flow:
-            - Prefer the integer address field when present: refresh all three hex views.
-            - Otherwise fall back to the symbol and look it up in the filtered A2L tags.
-
-        Dependencies:
-            Uses:
-                - ``update_hex_view`` / ``update_alt_hex_view`` / ``update_mac_hex_view``
-                - ``_focus_a2l_tag_absolute_index``
-                - ``set_status``
-            Used by:
-                - ``_jump_to_validation_issue`` (legacy ListView adapter)
-        """
-        address = issue.address
-        # US-020a: every issue selection refreshes the on-screen Issues hex pane
-        # (bytes at the address, or a placeholder when the issue carries none).
-        self._update_issues_hex_pane(address)
-        if isinstance(address, int) and self.current_file:
-            self.update_hex_view(address)
-            self.update_alt_hex_view(address)
-            self.update_mac_hex_view(address)
-            self.set_status(f"Issue at 0x{address:08X}: {issue.code or 'validation'}")
-            return
-        symbol = (issue.symbol or "").strip()
-        if symbol and self._a2l_filtered_tags:
-            for index, tag in enumerate(self._a2l_filtered_tags):
-                if str(tag.get("name") or "").strip().lower() == symbol.lower():
-                    if self._focus_a2l_tag_absolute_index(index):
-                        self.action_view_alt()
-                        self.set_status(f"Issue symbol focused: {symbol}")
-                    return
 
     def _deduplicate_issues(self, issues: list[ValidationIssue]) -> list[ValidationIssue]:
         """Drop duplicate issues by stable identity tuple while preserving order."""
@@ -17260,15 +17185,6 @@ class S19TuiApp(App):
             key=lambda issue: _ISSUE_DISPLAY_RANK.get(
                 issue.severity, len(SEVERITY_ORDER)
             ),
-        )
-
-    def _format_validation_issue_line(self, issue: ValidationIssue) -> str:
-        symbol = issue.symbol or "-"
-        addr = f"0x{issue.address:08X}" if isinstance(issue.address, int) else "-"
-        line_no = str(issue.line_number) if isinstance(issue.line_number, int) else "-"
-        return (
-            f"[{issue.severity.value.upper()}] {issue.code} | {issue.artifact} | "
-            f"sym={symbol} addr={addr} line={line_no} | {issue.message}"
         )
 
     def _update_issues_severity_strip(
