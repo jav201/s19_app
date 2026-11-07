@@ -49,3 +49,11 @@ Design pass (Opus, 50 min): **N = 20** distinct query tokens (range tables + C-l
 | R-A2L-MATCH.41's negative control | **behavioural**, not timing: with the cap removed, a query of more than 20 distinct tokens lists a name only the fuzzy rule finds → RED (the 1.22× timing margin was too thin to be a control). |
 | .37 scope narrowed to ASCII names | **accepted**: ASAP2 identifiers are ASCII; a non-ASCII name is not a valid identifier (the reader records it, Inc 11). The row states the scope. |
 | Next | code (DeepSeek: range tables, C-level totals, the N = 20 cap, the compact build), tests (Sonnet: .40/3–5 with W40 and SUBO, .41's cases, .37's scope), GREEN, mutant table, security round 3 on E5S-07 / -08 only. |
+
+## E5 round-3 rulings (2026-11-07T00:56:17-06:00, orchestrator Opus 5.5)
+
+Security round 3: **FAIL** — E5S-07 closed (76 tokens 6.4–8.1 ms; 20 tokens ≤ 384 ms; peaks ≤ 20 MiB); E5S-08 closed within .37's ASCII scope (B4MIX 59.5 MiB); new **E5S-10 MAJOR design-gap**: the cap bounds how many walks run, not how many trie nodes one walk visits — W40 2 tokens 2.24 s, 6 tokens 5.6–6.6 s; DEEP40 1 token 2.30 s, 6 tokens 12.05 s; W12 at exactly 20 tokens 4.68 s; E5S-11 MINOR (non-ASCII lists accepted, 208 MiB); E5S-12 LOW (records still say 1.0 s); E5S-13 INFO. Mutant round 3 stopped (the code changes again).
+- **E5S-10:** accept the piloted fix — a **per-ranking budget of trie nodes** (400,000, measured: the attacks take 0.55–0.76 s, no fixture list changes). When the budget is spent the fuzzy rule lists what it found so far; the result stays deterministic (a count, not a clock). New row (next free R-A2L-MATCH id): the budget, threshold, negative control (budget removed → W40 6 tokens > 2.0 s → RED), cases W40, DEEP40, W12.
+- **E5S-11:** a name holding a non-ASCII character is left out of the prepared list (as .39 does for names over 1,024 characters): A2L identifiers are ASCII, and the reader reports such names (Inc 11). New row; .37's scope note becomes a consequence.
+- **E5S-12:** the records' stale 1.0 s texts are corrected to 2.0 s.
+- Then: design pass (Opus, records/graph), code (DeepSeek), tests (Sonnet), GREEN, mutant table, security round 4 on E5S-10/-11 only.
