@@ -1,0 +1,29 @@
+s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+python = 3.11.18  host = cachyos-rtx  load = (1.1064453125, 0.89697265625, 1.88232421875)
+REF distinct tokens 77256, trie nodes 177148, longest token 42
+  'nzukij'                   k=2 within k    5  trie   46.3 ms  sorted   81.9 ms  sorted+band   71.4 ms  nodes   45.0 ms  all equal True
+  'ierxjr'                   k=2 within k    7  trie   48.5 ms  sorted   83.4 ms  sorted+band   72.9 ms  nodes   46.4 ms  all equal True
+  'eud'                      k=1 within k  602  trie    3.1 ms  sorted    7.0 ms  sorted+band    6.3 ms  nodes    2.9 ms  all equal True
+  'pposbxiif'                k=2 within k    0  trie   54.2 ms  sorted   85.7 ms  sorted+band   64.4 ms  nodes   38.7 ms  all equal True
+  'temp'                     k=1 within k   31  trie    3.6 ms  sorted    8.1 ms  sorted+band    6.6 ms  nodes    3.5 ms  all equal True
+  'sensor'                   k=2 within k    5  trie   48.0 ms  sorted   83.4 ms  sorted+band   71.6 ms  nodes   45.6 ms  all equal True
+  'max'                      k=1 within k  529  trie    3.1 ms  sorted    7.0 ms  sorted+band    5.9 ms  nodes    2.8 ms  all equal True
+  'xqzjvkw'                  k=2 within k    0  trie   51.2 ms  sorted   85.2 ms  sorted+band   70.8 ms  nodes   45.4 ms  all equal True
+  'pposbxiifkdgfiajnbbpvb'   k=2 within k    0  trie  102.0 ms  sorted  136.7 ms  sorted+band   64.4 ms  nodes   40.3 ms  all equal True
+  'dyan'                     k=1 within k   26  trie    3.6 ms  sorted    7.9 ms  sorted+band    6.5 ms  nodes    3.5 ms  all equal True
+  'xvz'                      k=1 within k  523  trie    3.1 ms  sorted    7.0 ms  sorted+band    5.9 ms  nodes    2.7 ms  all equal True
+  'led'                      k=1 within k  581  trie    2.9 ms  sorted    6.9 ms  sorted+band    5.9 ms  nodes    2.8 ms  all equal True
+  'ring'                     k=1 within k   32  trie    3.5 ms  sorted    8.1 ms  sorted+band    6.6 ms  nodes    3.4 ms  all equal True
+  'jotaf'                    k=1 within k    2  trie    4.0 ms  sorted    8.6 ms  sorted+band    6.6 ms  nodes    3.6 ms  all equal True
+  'vod'                      k=1 within k  590  trie    3.0 ms  sorted    7.0 ms  sorted+band    5.8 ms  nodes    2.8 ms  all equal True
+  'msr'                      k=1 within k  555  trie    3.0 ms  sorted    7.0 ms  sorted+band    5.7 ms  nodes    2.7 ms  all equal True
+  'aaaa'                     k=1 within k    9  trie    2.6 ms  sorted    5.9 ms  sorted+band    4.9 ms  nodes    2.6 ms  all equal True
+  'qqqq'                     k=1 within k   10  trie    2.7 ms  sorted    6.1 ms  sorted+band    5.0 ms  nodes    2.7 ms  all equal True
+  'zzzz'                     k=1 within k   11  trie    2.7 ms  sorted    5.7 ms  sorted+band    4.8 ms  nodes    2.6 ms  all equal True
+  'cnt'                      k=1 within k  566  trie    3.0 ms  sorted    7.0 ms  sorted+band    5.9 ms  nodes    2.8 ms  all equal True
+  'srql'                     k=1 within k   37  trie    3.6 ms  sorted    7.9 ms  sorted+band    6.6 ms  nodes    3.4 ms  all equal True
+  'jotafvod'                 k=2 within k    0  trie   56.0 ms  sorted   92.9 ms  sorted+band   71.3 ms  nodes   44.7 ms  all equal True
+  'cuvre'                    k=1 within k    0  trie    4.0 ms  sorted    8.7 ms  sorted+band    6.6 ms  nodes    3.6 ms  all equal True
+  'maesu'                    k=1 within k    0  trie    4.0 ms  sorted    8.5 ms  sorted+band    6.6 ms  nodes    3.6 ms  all equal True
+  total ms: trie 461.7, sorted 773.4, sorted+band 588.8, nodes 358.0; query tokens 24, maps not equal = 0
+load at end = (1.08203125, 0.90283203125, 1.86767578125)

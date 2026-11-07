@@ -1,0 +1,29 @@
+# i2e3a-probe transcript 2026-11-06T18:13:46-06:00 host cachyos-rtx
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e3-2-architect/home; no DISPLAY; no clipboard; stdin closed
+A2L section tree has structural errors: path=/home/javiergr/work/s19_app/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+[P0 tracked a2l files] 35
+[P1a SOFTA parse ms / tags / tags with address and length] (624.5, 13990, 3189)
+[P1b SOFTA one index walk ms (objects / methods / tables mapped)] (40.37, 13990, 438, 163)
+[P1c SOFTA tokenize every object + its method + its table, ms total / objects] (483.8, 13990)
+[P1d SOFTA graph per-call lookups (enum path), ms per describe] 21.11
+[P1e SOFTA one method-record walk (each decode; each encode does two), ms] 3.75
+[P2a BIT_MASK words not 0x-hex or decimal digits (count, first 3)] (0, [])
+[P2b BIT_MASK words decimal with a leading 0 (count, first 3)] (0, [])
+[P2c masks on a signed datatype holding bit 0 and the sign bit (count, first 5)] (0, [])
+[P2d CHARACTERISTIC tags with char_type None (count, first 3)] (2, [('examples/case_07_stress_smoke/firmware.a2l', 'CHAR_000000'), ('examples/case_07_stress_smoke/firmware.a2l', 'CHAR_000001')])
+[P2e ASCII CHARACTERISTICs with a BIT_MASK (count, first 3)] (0, [])
+[P2f TAB_VERB objects on a float datatype (count, first 3)] (677, [('examples/case_00_public/software_a.a2l', 'ABF_XT_TPIBWK1_UWG_JBAGF_HZ_SUDMW.EzqdqAnwapm', 'FLOAT32_IEEE'), ('examples/case_00_public/software_a.a2l', 'ABT_DNU_BBKHQEOXY_NUOEA.RdglmjhpgcSbzguv', 'FLOAT32_IEEE'), ('examples/case_00_public/software_a.a2l', 'ACL_NOK_2gs_GG_H_YHKQE.KjndobctzxMqfnfm', 'FLOAT32_IEEE')])
+[P2g of them on a COMPU_VTAB_RANGE (count, first 3)] (0, [])
+[P2h addressed integer LINEAR/RAT_FUNC objects with >= 13 decimals (all files / software_a)] (7, 7)
+[P2i addressed FLOAT32 objects (IDENTICAL/none/LINEAR) with >= 13 decimals (all / software_a)] (0, 0)
+[P3 LINEAR a=0.1, k=0..20000: per d (refused by |p-x|<=0.5e-d, still refused if %.15g also agrees, display text != exact decimal)] {6: (0, 0, 0), 12: (0, 0, 0), 15: (7171, 0, 15932), 17: (7186, 0, 16000)}
+[P3 LINEAR a=0.01, k=0..20000: per d (refused by |p-x|<=0.5e-d, still refused if %.15g also agrees, display text != exact decimal)] {6: (0, 0, 0), 12: (0, 0, 0), 15: (2610, 0, 17368), 17: (2661, 0, 19178)}
+[P3 LINEAR a=0.05, k=0..20000: per d (refused by |p-x|<=0.5e-d, still refused if %.15g also agrees, display text != exact decimal)] {6: (0, 0, 0), 12: (0, 0, 0), 15: (7156, 0, 15863), 17: (7186, 0, 15999)}
+[P3 LINEAR a=0.2, k=0..20000: per d (refused by |p-x|<=0.5e-d, still refused if %.15g also agrees, display text != exact decimal)] {6: (0, 0, 0), 12: (0, 0, 0), 15: (7179, 0, 15967), 17: (7186, 0, 16000)}
+[P3 LINEAR a=0.3, k=0..20000: per d (refused by |p-x|<=0.5e-d, still refused if %.15g also agrees, display text != exact decimal)] {6: (0, 0, 0), 12: (1269, 0, 1269), 15: (4545, 0, 15972), 17: (4549, 0, 16000)}
+[P3 LINEAR a=0.125, k=0..20000: per d (refused by |p-x|<=0.5e-d, still refused if %.15g also agrees, display text != exact decimal)] {6: (0, 0, 0), 12: (0, 0, 0), 15: (0, 0, 0), 17: (0, 0, 0)}
+[P3x stored 123, a=0.1: repr(p), p == 12.3, |p-12.3|, f'{p:.15f}'] ('12.3', True, 0.0, '12.300000000000001')
+[P3y FLOAT32 0.1 stored: repr, '%.15g', f'{:.15f}', '%.9g'] ('0.10000000149011612', '0.100000001490116', '0.100000001490116', '0.100000001')
+# exit 0

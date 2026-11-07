@@ -1,0 +1,125 @@
+A2L section tree has structural errors: path=/tmp/b103-e1-1b/e1a/run/tmpsf6n9p27/.s19tool/workarea/temp/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+textual 8.2.8 | python 3.11.18
+DISPLAY in env: False | WAYLAND_DISPLAY in env: False
+HOME = /tmp/b103-e1-1b/e1a/home
+XDG_CONFIG_HOME = /tmp/b103-e1-1b/e1a/xdgc
+XDG_DATA_HOME = /tmp/b103-e1-1b/e1a/xdgd
+XDG_CACHE_HOME = /tmp/b103-e1-1b/e1a/xdgk
+LOCALAPPDATA = /tmp/b103-e1-1b/e1a/lad
+
+== A toolkit source facts
+  Screen._forward_event -> textual/screen.py:1820-1951
+    textual/screen.py:1866:             if isinstance(event, events.MouseUp):
+    textual/screen.py:1879:                         self.clear_selection()
+    textual/screen.py:1885:             elif isinstance(event, events.MouseDown) and not self.app.mouse_captured:
+    textual/screen.py:1933:                 if isinstance(event, events.MouseDown):
+    textual/screen.py:1939:                         self.set_focus(focusable_widget, scroll_visible=False)
+  DataTable._on_click -> textual/widgets/_data_table.py:2669-2702
+    textual/widgets/_data_table.py:2698:             self.cursor_coordinate = new_coordinate
+    textual/widgets/_data_table.py:2700:                 self._post_selected_message()
+    textual/widgets/_data_table.py:2702:             event.stop()
+  TextArea._on_mouse_down -> textual/widgets/_text_area.py:1948-1957
+    textual/widgets/_text_area.py:1951:         self.selection = Selection.cursor(target)
+  TextArea.action_copy -> textual/widgets/_text_area.py:2653-2659
+    textual/widgets/_text_area.py:2657:             self.app.copy_to_clipboard(selected_text)
+    textual/widgets/_text_area.py:2659:             raise SkipAction()
+  Screen.action_copy_text -> textual/screen.py:985-991
+    textual/screen.py:990:             raise SkipAction()
+    textual/screen.py:991:         self.app.copy_to_clipboard(selection)
+  App.action_help_quit -> textual/app.py:3990-4002
+    textual/app.py:3999:                 self.notify(
+  App.on_event -> textual/app.py:4060-4148
+    textual/app.py:4066:         elif isinstance(event, events.InputEvent) and not event.is_forwarded:
+    textual/app.py:4082:                 self.screen._forward_event(event)
+    textual/app.py:4110:                             click_event = events.Click.from_event(
+    textual/app.py:4117:                             self.screen._forward_event(click_event)
+    textual/app.py:4138:                     forward_target._forward_event(event)
+    textual/app.py:4140:                 self.screen._forward_event(event)
+    textual/app.py:4142:         elif isinstance(event, events.Paste) and not event.is_forwarded:
+    textual/app.py:4144:                 self.focused._forward_event(event)
+    textual/app.py:4146:                 self.screen._forward_event(event)
+  Screen._modal_binding_chain -> textual/screen.py:448-455
+    textual/screen.py:453:             if node.is_modal:
+    textual/screen.py:454:                 return binding_chain[:index]
+    textual/screen.py:455:         return binding_chain
+  Pilot._post_mouse_events -> textual/pilot.py:383-471
+    textual/pilot.py:463:                 # Bypass event processing in App.on_event. Because App.on_event
+    textual/pilot.py:468:                 screen._forward_event(event)
+  Pilot.click signature: (self, widget: 'Widget | type[Widget] | str | None' = None, offset: 'tuple[int, int]' = (0, 0), shift: 'bool' = False, meta: 'bool' = False, control: 'bool' = False, times: 'int' = 1, button: 'int' = 1) -> 'bool'
+  Pilot.mouse_down signature: (self, widget: 'Widget | type[Widget] | str | None' = None, offset: 'tuple[int, int]' = (0, 0), shift: 'bool' = False, meta: 'bool' = False, control: 'bool' = False, button: 'int' = 1) -> 'bool'
+  Pilot.mouse_up signature: (self, widget: 'Widget | type[Widget] | str | None' = None, offset: 'tuple[int, int]' = (0, 0), shift: 'bool' = False, meta: 'bool' = False, control: 'bool' = False) -> 'bool'
+  MouseDown signature: (self, widget: 'Widget | None', x: 'float', y: 'float', delta_x: 'int', delta_y: 'int', button: 'int', shift: 'bool', meta: 'bool', ctrl: 'bool', screen_x: 'float | None' = None, screen_y: 'float | None' = None, style: 'Style | None' = None) -> 'None'
+  XTermParser.parse_mouse_code -> textual/_xterm_parser.py:84-143
+    textual/_xterm_parser.py:121:                 button = (buttons + 1) & 3
+    textual/_xterm_parser.py:127:                     event_class = events.MouseDown if state == "M" else events.MouseUp
+  App binding 'ctrl+q' -> 'quit' priority=True system=False
+  App binding 'ctrl+c' -> 'help_quit' priority=False system=True
+  Screen binding 'ctrl+c,super+c' -> 'screen.copy_text' priority=False
+    textual/drivers/windows_driver.py:61:         write("\x1b[?1000h")  # SET_VT200_MOUSE
+    textual/drivers/windows_driver.py:62:         write("\x1b[?1003h")  # SET_ANY_EVENT_MOUSE
+    textual/drivers/windows_driver.py:64:         write("\x1b[?1006h")  # SET_SGR_EXT_MODE_MOUSE
+    textual/drivers/windows_driver.py:72:         write("\x1b[?1000l")
+    textual/drivers/windows_driver.py:73:         write("\x1b[?1003l")
+    textual/drivers/windows_driver.py:75:         write("\x1b[?1006l")
+    textual/drivers/win32.py:173:         set_console_mode(terminal_in, current_console_mode_in)
+    textual/drivers/win32.py:179:     set_console_mode(terminal_in, ENABLE_VIRTUAL_TERMINAL_INPUT)
+
+== B minimal app (textual 8.2.8, headless)
+B1 selection after a left drag over #s1: 'alpha line\nbeta line'
+  -- B1 Pilot.click(button=3) on #s1 (Pilot posts to Screen._forward_event, bypassing App.on_event)
+    s1.on_mouse_down button=3 screen_sel='alpha line\nbeta line'
+    App.on_mouse_down (bubbled) button=3 screen_sel='alpha line\nbeta line'
+    s1.on_mouse_up button=3 screen_sel=None
+    s1.on_click button=3 screen_sel=None
+B1 selection after the button-3 click: None
+  -- B2 driver route: MouseDown+MouseUp button 3 posted back to back to the App
+    App.on_event MouseDown button=3 (not forwarded) screen_sel='alpha line\nbeta line' ta_sel=''
+    App.on_event MouseUp button=3 (not forwarded) screen_sel='alpha line\nbeta line' ta_sel=''
+    s1.on_mouse_down button=3 screen_sel=None
+    s1.on_mouse_up button=3 screen_sel=None
+    s1.on_click button=3 screen_sel=None
+    App.on_mouse_down (bubbled) button=3 screen_sel=None
+B2 selection after: None
+  -- B3 Pilot.click(button=3) on #s2 while #s1 holds the selection
+    App.on_mouse_down (bubbled) button=3 screen_sel='alpha line\nbeta line'
+B3 selection after: None
+B4 selection after a button-3 press then a move (right-drag): 'alpha line\nbeta line\ngamma '
+B5 table cursor_row before: 0 | focused: b1
+B5 after Pilot.click(button=3) on table row 3: cursor_row 3 | msgs ['RowHighlighted row=3'] | focused: t1
+B5 a second button-3 click on the same row: cursor_row 3 | msgs ['RowSelected row=3']
+B6 TextArea selected_text before: 'one\ntwo\n'
+  -- B6 driver route: button 3 on the read-only TextArea
+    App.on_event MouseDown button=3 (not forwarded) screen_sel=None ta_sel='one\ntwo\n'
+    App.on_event MouseUp button=3 (not forwarded) screen_sel=None ta_sel='one\ntwo\n'
+    App.on_mouse_down (bubbled) button=3 screen_sel=None
+B6 TextArea selected_text after: '' | selection Selection(start=(0, 0), end=(0, 0))
+B7 ctrl+c, focus on a Button, nothing selected: help_quit + 1 | copies + 0
+B7 ctrl+c, focus on the DataTable (a row highlighted), nothing selected: help_quit + 1 | copies + 0
+B7 ctrl+c, focus on the read-only TextArea, no selection: help_quit + 1 | copies + 0
+B8 ctrl+c inside a ModalScreen, nothing selected: help_quit + 0 | copies + 0 | top screen Modal
+B8 ctrl+c inside the ModalScreen with 'modal line one\nmodal lin' selected: help_quit + 0 | copies + 1 | copied ['modal line one\nmodal lin']
+  -- B9 driver route: button 3 on a selection inside the ModalScreen
+    App.on_event MouseDown button=3 (not forwarded) screen_sel='modal line one\nmodal lin' ta_sel='-'
+    App.on_event MouseUp button=3 (not forwarded) screen_sel='modal line one\nmodal lin' ta_sel='-'
+    m1.on_mouse_down button=3 screen_sel=None
+    m1.on_mouse_up button=3 screen_sel=None
+    m1.on_click button=3 screen_sel=None
+    App.on_mouse_down (bubbled) button=3 screen_sel=None
+B9 selection after: None
+
+== C product app S19TuiApp (e07fb00), headless 118x54
+loaded: image True | a2l True
+C1 hex-view drag: selected 203 chars, 3 lines
+  -- C1 driver route: button 3 on the hex-view selection
+    App.on_event MouseDown button=3 screen_sel_len=203
+    App.on_event MouseUp button=3 screen_sel_len=203
+C1 after: selection None | copies 0 | notices [] | focused hex_scroll | screens ['Screen']
+C2 A2L tag table: cursor_row 0 | rows 118 | header_height 1
+C2 after Pilot.click(button=3) on the third row: cursor_row 2 | Tag cell '· ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING' | jumps [] | copies 0 | screens ['Screen']
+C2 a second button-3 click on the same row: cursor_row 2 | jumps ['ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING']
+C3 ctrl+c on the tag table, a row highlighted, nothing selected: notices [('Press [b]ctrl+q[/b] to quit the app', 'Do you want to quit?')] | copies 0
+C4 top screen after ?: WindowHelpScreen | modal True
+C4 ctrl+c in the help window, nothing selected: notices [] | copies 0 | top WindowHelpScreen
+C4 after escape: top Screen
+total os writes recorded: 0 | copy_to_clipboard calls recorded: 0

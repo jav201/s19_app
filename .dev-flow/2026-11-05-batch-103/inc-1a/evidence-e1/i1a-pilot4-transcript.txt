@@ -1,0 +1,32 @@
+s19_app.__file__ = /home/javiergr/work/s19_app/s19_app/__init__.py
+python = 3.11.18; platform = linux; DISPLAY=None
+textual = 8.2.8
+P10/P11 right-click (pilot.click button=3) on a box holding a selection
+  OsClipboardInput: before sel=(0, 4) text='AAAA' | after right-click sel=(3, 3) text='' value='AAAA-BBBB' app_clipboard='APP-BEFORE' focused=OsClipboardInput
+  CappedTextArea  : before sel=((0, 0), (0, 4)) text='AAAA' | after right-click sel=((0, 4), (0, 4)) text='' value='AAAA-BBBB' app_clipboard='APP-BEFORE' focused=CappedTextArea
+P12 events the box receives, two routes
+  OsClipboardInput [pilot.click]: events=['down b=3 sel@entry=(0, 4)', 'up b=3 sel@entry=(3, 3)', 'click b=3 chain=1 sel@entry=(3, 3)'] | sel after=(3, 3)
+  OsClipboardInput [App route]: events=['down b=3 sel@entry=(0, 4)', 'up b=3 sel@entry=(3, 3)', 'click b=3 chain=1 sel@entry=(3, 3)'] | sel after=(3, 3)
+  CappedTextArea   [pilot.click]: events=['down b=3 sel@entry=((0, 0), (0, 4))', 'up b=3 sel@entry=((0, 4), (0, 4))', 'click b=3 chain=1 sel@entry=((0, 4), (0, 4))'] | sel after=((0, 4), (0, 4))
+  CappedTextArea   [App route]: events=['down b=3 sel@entry=((0, 0), (0, 4))', 'up b=3 sel@entry=((0, 4), (0, 4))', 'click b=3 chain=1 sel@entry=((0, 4), (0, 4))'] | sel after=((0, 4), (0, 4))
+P13 right-click on a box without the focus
+  OsClipboardInput: unfocused sel=(9, 9) focused=Button
+  OsClipboardInput: events=['down b=3 sel@entry=(0, 9)', 'up b=3 sel@entry=(3, 3)', 'click b=3 chain=1 sel@entry=(3, 3)'] | sel after=(3, 3) focused=RecIn
+  CappedTextArea  : unfocused sel=((0, 0), (0, 4)) focused=Button
+  CappedTextArea  : events=['down b=3 sel@entry=((0, 0), (0, 4))', 'up b=3 sel@entry=((0, 4), (0, 4))', 'click b=3 chain=1 sel@entry=((0, 4), (0, 4))'] | sel after=((0, 4), (0, 4)) focused=RecTA
+P14 feasibility: prevent_default on button-3 mouse-down
+  KeepIn (OsClipboardInput subclass) times=1: before=(0, 4) after=(0, 4) text='AAAA' screen selection=None
+  KeepIn (OsClipboardInput subclass) times=2: before=(0, 4) after=(0, 4) text='AAAA' screen selection=''
+  KeepTA (CappedTextArea subclass)   times=1: before=((0, 0), (0, 4)) after=((0, 0), (0, 4)) text='AAAA' screen selection=None
+  KeepTA (CappedTextArea subclass)   times=2: before=((0, 0), (0, 4)) after=((0, 0), (0, 4)) text='AAAA' screen selection=''
+P15 xterm parser, SGR mouse
+  right press        '\x1b[<2;10;5M'    -> MouseDown(button=3, shift=False)
+  right release      '\x1b[<2;10;5m'    -> MouseUp(button=3, shift=False)
+  left press         '\x1b[<0;10;5M'    -> MouseDown(button=1, shift=False)
+  shift+right press  '\x1b[<6;10;5M'    -> MouseDown(button=3, shift=True)
+P16 real app
+  real app: box region=Region(x=25, y=7, width=6, height=3) content_region=Region(x=28, y=8, width=0, height=1) left-click hit=True focused='a2l_tags_filter_input'
+  real app: widget at box offset (2, 1) = OsClipboardInput id='a2l_tags_filter_input'
+  real app: right-click hit=True
+  real app #a2l_tags_filter_input: before sel=(0, 4) text='AAAA' | after sel=(3, 3) text='' value='AAAA-BBBB' app_clipboard='APP-BEFORE' new notices=[] focused='a2l_tags_filter_input'
+  real app, second right-click (no selection): value='AAAA-BBBB' app_clipboard='APP-BEFORE'
