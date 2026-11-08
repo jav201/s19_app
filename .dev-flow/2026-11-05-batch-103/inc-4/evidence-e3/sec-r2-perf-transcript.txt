@@ -1,0 +1,135 @@
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+python = 3.11.18  PYTHONHASHSEED = None
+host = <runner>  load = (3.56787109375, 6.396484375, 5.64501953125)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e3r2-4-security/home  LOCALAPPDATA = /tmp/b103-e3r2-4-security/home/<localappdata>  PILOT_DIR = /tmp/b103-e3r2-4-security/pilot
+
+=== REF (50000 names) built in 1.74 s [ok]; limit 20, median of 7; load (3.55419921875, 6.30029296875, 5.62158203125)
+  -- QSET (22)
+          5.3 ms [ok] n=20  chars=1    qtok=1    stats={'sorted_members': 23} 'a'
+          5.3 ms [ok] n=20  chars=1    qtok=1    stats={'sorted_members': 29} 'e'
+         11.3 ms [ok] n=20  chars=1    qtok=1    stats={'sorted_members': 21} '0'
+          3.1 ms [ok] n=20  chars=2    qtok=1    stats={'sorted_members': 24} 'zz'
+          3.5 ms [ok] n=20  chars=2    qtok=1    stats={'sorted_members': 20} 'ab'
+          9.4 ms [ok] n=4   chars=35   qtok=12   stats={'token_intersections': 0, 'walks': 3, 'cand': 0, 'sorted_members': 4} 'JotafVod_msrqlLzL_kh2C_rWl_pfue._0_'
+         13.1 ms [ok] n=4   chars=12   qtok=3    stats={'token_intersections': 0, 'walks': 1, 'cand': 4, 'checks': 10, 'sorted_members': 4} 'JotafVod_msr'
+         19.8 ms [ok] n=20  chars=8    qtok=3    stats={'walks': 3, 'cand': 0, 'sorted_members': 22} 'srqlLzL_'
+         14.2 ms [ok] n=20  chars=7    qtok=2    stats={'token_intersections': 1, 'walks': 2, 'cand': 0, 'sorted_members': 20} '0 jotaf'
+          4.2 ms [ok] n=20  chars=4    qtok=3    stats={'token_intersections': 2, 'sorted_members': 20} 'JVmL'
+         58.0 ms [ok] n=20  chars=7    qtok=1    stats={'walks': 1, 'cand': 0, 'sorted_members': 22} 'xqzjvkw'
+         21.7 ms [ok] n=13  chars=9    qtok=2    stats={'walks': 1, 'cand': 34, 'checks': 88, 'sorted_members': 13} 'qqqq zzzz'
+          6.6 ms [ok] n=20  chars=4    qtok=1    stats={'walks': 1, 'cand': 31, 'checks': 0, 'sorted_members': 20} 'aaaa'
+          7.7 ms [ok] n=20  chars=5    qtok=3    stats={'token_intersections': 2, 'sorted_members': 22} 'e e e'
+         57.2 ms [ok] n=20  chars=6    qtok=1    stats={'token_intersections': 0, 'walks': 1, 'cand': 15, 'checks': 0, 'sorted_members': 20} 'Nzukij'
+         58.9 ms [ok] n=4   chars=10   qtok=2    stats={'token_intersections': 0, 'walks': 2, 'cand': 0, 'sorted_members': 4} 'Ierxjr_Eud'
+         20.0 ms [ok] n=20  chars=7    qtok=2    stats={'walks': 2, 'cand': 15, 'checks': 0, 'sorted_members': 20} 'ledRing'
+         50.0 ms [ok] n=4   chars=9    qtok=1    stats={'walks': 1, 'cand': 0, 'sorted_members': 4} 'pposbxiif'
+          3.3 ms [ok] n=20  chars=3    qtok=1    stats={'sorted_members': 20} 'cnt'
+         15.0 ms [ok] n=0   chars=15   qtok=3    stats={'walks': 1, 'cand': 118, 'checks': 311, 'sorted_members': 0} 'temp_sensor_max'
+         24.6 ms [ok] n=20  chars=11   qtok=6    stats={'token_intersections': 5, 'walks': 4, 'cand': 269, 'checks': 1158, 'sorted_members': 21} 'x y z w v u'
+         15.2 ms [ok] n=4   chars=32   qtok=4    stats={'walks': 2, 'cand': 55, 'checks': 233, 'sorted_members': 4} 'pposbxiifkdgfiajnbbpvb_dyan_xvz1'
+  -- QSET multi-word (3)
+         55.3 ms [ok] n=4   chars=57   qtok=6    stats={'walks': 1, 'cand': 4, 'checks': 65, 'sorted_members': 4} 'njraipjtbtu lsuakcoj hsxgibymjxu orfltalc uadvdygb zobnkw'
+         54.7 ms [ok] n=4   chars=51   qtok=6    stats={'walks': 1, 'cand': 4, 'checks': 65, 'sorted_members': 4} 'votklbi fjblnabj qghque pdjxmq tiprdynotu djchlitjt'
+         51.4 ms [ok] n=3   chars=45   qtok=5    stats={'walks': 1, 'cand': 3, 'checks': 44, 'sorted_members': 3} 'lmmwngodou jadkvqy khbnukc qomfrybiza evfwbqj'
+  -- QSET shapes (E3S-01)
+        108.1 ms [ok] n=20  chars=255  qtok=128  stats={'token_intersections': 127, 'sorted_members': 22} "'e ' x 128"
+         27.7 ms [ok] n=0   chars=255  qtok=128  stats={'token_intersections': 28, 'walks': 4, 'cand': 244, 'checks': 1058, 'sorted_members': 0} "'a b c ... z ' cut at 256"
+         41.4 ms [ok] n=20  chars=255  qtok=128  stats={'token_intersections': 127, 'sorted_members': 21} "'0 ' x 128"
+         67.7 ms [ok] n=0   chars=256  qtok=1    stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'a' x 256"
+         13.7 ms [ok] n=0   chars=256  qtok=61   stats={'token_intersections': 6, 'walks': 2, 'cand': 246, 'checks': 1832, 'sorted_members': 0} "SWA names joined by ',' (draw 1)"
+          7.6 ms [ok] n=0   chars=256  qtok=51   stats={'token_intersections': 3, 'walks': 2, 'cand': 15, 'checks': 77, 'sorted_members': 0} "SWA names joined by ',' (draw 2)"
+         14.0 ms [ok] n=1   chars=103  qtok=27   stats={'token_intersections': 26, 'walks': 3, 'cand': 140, 'checks': 1011, 'sorted_members': 1} 'longest REF name by tokens (27 tok, 103 ch)'
+         14.8 ms [ok] n=1   chars=103  qtok=27   stats={'token_intersections': 1, 'walks': 3, 'cand': 141, 'checks': 1032, 'sorted_members': 1} '  the same with a transposition'
+         13.0 ms [ok] n=4   chars=104  qtok=27   stats={'token_intersections': 26, 'walks': 3, 'cand': 132, 'checks': 430, 'sorted_members': 4} 'longest REF name by characters (104 ch)'
+  -- extra shapes (beyond QSET)
+        206.9 ms [ok] n=20  chars=256  qtok=256  stats={'token_intersections': 255, 'sorted_members': 26} "'1a' x 128 (256 one-char tokens, no separator)"  > 200 ms
+          7.8 ms [ok] n=20  chars=256  qtok=129  stats={'token_intersections': 128, 'sorted_members': 20} "'aB' x 128 (camel cuts: 128 tokens)"
+         77.6 ms [ok] n=20  chars=256  qtok=65   stats={'walks': 2, 'cand': 60, 'checks': 10332, 'sorted_members': 22} "'aBcd' x 64 (64 fuzzy tokens, no separator)"
+         74.4 ms [ok] n=10  chars=255  qtok=128  stats={'token_intersections': 127, 'walks': 4, 'cand': 269, 'checks': 1158, 'sorted_members': 10} "'x y z w v u ' cut at 256"
+         69.8 ms [ok] n=0   chars=255  qtok=1    stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'a' x 255"
+         69.2 ms [ok] n=0   chars=255  qtok=1    stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'e' x 255"
+         68.4 ms [ok] n=0   chars=255  qtok=1    stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'z' x 255"
+         74.5 ms [ok] n=0   chars=255  qtok=1    stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'ab' x 127 + 'a' (255)"
+          6.7 ms [ok] n=0   chars=256  qtok=1    stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "digits '0123456789' cut at 256 (one token)"
+          9.4 ms [ok] n=0   chars=256  qtok=1    stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'0' x 256"
+         77.5 ms [ok] n=20  chars=255  qtok=128  stats={'token_intersections': 127, 'sorted_members': 25} "'1 2 3 ' cut at 256"
+         43.9 ms [ok] n=0   chars=256  qtok=1    stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'é' x 256"
+          7.0 ms [ok] n=0   chars=255  qtok=128  stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'é ' x 128"
+          7.0 ms [ok] n=0   chars=256  qtok=86   stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'漢字 ' cut at 256"
+         42.8 ms [ok] n=0   chars=256  qtok=1    stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'Ä' x 256"
+         44.5 ms [ok] n=0   chars=256  qtok=1    stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'İ' x 256"
+         17.3 ms [ok] n=0   chars=255  qtok=128  stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'U+1F600 ' x 128"
+         10.5 ms [ok] n=0   chars=256  qtok=43   stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'drück ' cut at 256"
+        316.1 ms [ok] n=20  chars=255  qtok=64   stats={'token_intersections': 63, 'walks': 64, 'cand': 2550, 'checks': 0, 'sorted_members': 20} "'cnt ' x 64"  > 200 ms
+  -- adversarial typo shapes (beyond QSET)
+        311.8 ms [ok] n=20  chars=239  qtok=60   stats={'walks': 60, 'cand': 2611, 'checks': 0, 'sorted_members': 24} "'rat ' cut at 256 (typo, 2611 fuzzy names)"  > 200 ms
+        323.4 ms [ok] n=20  chars=243  qtok=121  stats={'walks': 121, 'cand': 576, 'checks': 0, 'sorted_members': 25} "'e ' x 120 + 'rat'"  > 200 ms
+        296.4 ms [ok] n=20  chars=239  qtok=60   stats={'walks': 60, 'cand': 2260, 'checks': 0, 'sorted_members': 35} "'jmz ' cut at 256 (typo, 2260 fuzzy names)"  > 200 ms
+        328.6 ms [ok] n=20  chars=243  qtok=121  stats={'walks': 121, 'cand': 581, 'checks': 0, 'sorted_members': 20} "'e ' x 120 + 'jmz'"  > 200 ms
+         85.0 ms [ok] n=20  chars=256  qtok=52   stats={'walks': 2, 'cand': 150, 'checks': 16850, 'sorted_members': 22} "'cxwu ' cut at 256 (typo, <= 300 fuzzy names: the per-candidate check)"
+  worst per group: QSET (22): 58.9 ms (Ierxjr_Eud); QSET multi-word (3): 55.3 ms (njraipjtbtu lsuakcoj hsxgibymjxu orfltalc uadvdygb zobnkw); QSET shapes (E3S-01): 108.1 ms ('e ' x 128); extra shapes (beyond QSET): 316.1 ms ('cnt ' x 64); adversarial typo shapes (beyond QSET): 328.6 ms ('e ' x 120 + 'jmz')
+  non-ok calls 0; out-of-range/unsorted/touching/empty spans 0; tier/_classify disagreements 0
+
+=== REF6 (50000 names) built in 0.50 s [ok]; limit 20, median of 7; load (3.74560546875, 6.07958984375, 5.56884765625)
+  -- REF6 query set (12)
+         19.1 ms [ok] n=20  chars=1    qtok=1    stats={'sorted_members': 25000} 'm'
+         19.2 ms [ok] n=20  chars=5    qtok=1    stats={'sorted_members': 25000} 'meas_'
+         32.0 ms [ok] n=20  chars=3    qtok=1    stats={'walks': 1, 'cand': 25000, 'checks': 0, 'sorted_members': 25000} 'chr'
+         34.0 ms [ok] n=20  chars=4    qtok=1    stats={'walks': 1, 'cand': 25000, 'checks': 0, 'sorted_members': 25000} 'mesa'
+         32.8 ms [ok] n=20  chars=4    qtok=1    stats={'walks': 1, 'cand': 25000, 'checks': 0, 'sorted_members': 25000} 'cahr'
+         34.5 ms [ok] n=20  chars=3    qtok=2    stats={'walks': 1, 'cand': 0, 'sorted_members': 25000} 'cr0'
+         12.9 ms [ok] n=20  chars=6    qtok=2    stats={'token_intersections': 1, 'sorted_members': 12500} 'char 1'
+         85.7 ms [ok] n=20  chars=1    qtok=1    stats={'sorted_members': 50000} '0'
+         44.5 ms [ok] n=20  chars=5    qtok=2    stats={'walks': 2, 'cand': 25000, 'checks': 0, 'sorted_members': 25000} 'chr 0'
+         18.0 ms [ok] n=20  chars=4    qtok=2    stats={'token_intersections': 1, 'sorted_members': 20250} 'ch00'
+         13.7 ms [ok] n=20  chars=6    qtok=2    stats={'token_intersections': 1, 'sorted_members': 12500} 'meas 1'
+         15.9 ms [ok] n=20  chars=5    qtok=3    stats={'token_intersections': 2, 'sorted_members': 12500} 'c 0 1'
+  -- QSET shapes over REF6 (beyond the row)
+         16.4 ms [ok] n=0   chars=255  qtok=128  stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'e ' x 128"
+          8.3 ms [ok] n=0   chars=255  qtok=128  stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'a b c ... z ' cut at 256"
+        375.2 ms [ok] n=20  chars=255  qtok=128  stats={'token_intersections': 127, 'sorted_members': 50000} "'0 ' x 128"  > 200 ms
+         22.2 ms [ok] n=0   chars=256  qtok=1    stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'a' x 256"
+          7.5 ms [ok] n=0   chars=256  qtok=61   stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "SWA names joined by ',' (draw 1)"
+          7.7 ms [ok] n=0   chars=256  qtok=51   stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "SWA names joined by ',' (draw 2)"
+          7.4 ms [ok] n=0   chars=103  qtok=27   stats={'walks': 1, 'cand': 0, 'sorted_members': 0} 'longest REF name by tokens (27 tok, 103 ch)'
+          7.4 ms [ok] n=0   chars=103  qtok=27   stats={'walks': 1, 'cand': 0, 'sorted_members': 0} '  the same with a transposition'
+          7.8 ms [ok] n=0   chars=104  qtok=27   stats={'walks': 1, 'cand': 0, 'sorted_members': 0} 'longest REF name by characters (104 ch)'
+  -- repeated-token shapes over REF6 (beyond the row)
+        142.6 ms [ok] n=20  chars=255  qtok=128  stats={'token_intersections': 127, 'sorted_members': 25000} "'c ' x 128"
+        165.8 ms [ok] n=20  chars=255  qtok=128  stats={'token_intersections': 127, 'sorted_members': 25000} "'m ' x 128"
+        387.2 ms [ok] n=20  chars=255  qtok=128  stats={'token_intersections': 127, 'sorted_members': 50000} "'0 ' x 128"  > 200 ms
+        180.8 ms [ok] n=20  chars=255  qtok=128  stats={'token_intersections': 127, 'sorted_members': 25000} "'1 ' x 128"
+         68.9 ms [ok] n=20  chars=256  qtok=52   stats={'token_intersections': 51, 'sorted_members': 25000} "'char ' cut at 256"
+        377.6 ms [ok] n=20  chars=256  qtok=52   stats={'walks': 52, 'cand': 25000, 'checks': 0, 'sorted_members': 25000} "'chax ' cut at 256 (fuzzy, 1 edit each)"  > 200 ms
+        375.3 ms [ok] n=20  chars=256  qtok=52   stats={'walks': 52, 'cand': 25000, 'checks': 0, 'sorted_members': 25000} "'mesa ' cut at 256"  > 200 ms
+        874.7 ms [ok] n=20  chars=254  qtok=126  stats={'walks': 126, 'cand': 25000, 'checks': 0, 'sorted_members': 25000} "'c ' x 125 + 'chax'"  > 200 ms
+       1350.2 ms [ok] n=20  chars=254  qtok=126  stats={'walks': 126, 'cand': 25000, 'checks': 0, 'sorted_members': 25000} "'0 ' x 125 + 'chax'"  > 200 ms
+         23.3 ms [ok] n=0   chars=256  qtok=256  stats={'walks': 2, 'cand': 0, 'sorted_members': 0} "'1a' x 128"
+          8.3 ms [ok] n=0   chars=256  qtok=55   stats={'token_intersections': 20, 'walks': 1, 'cand': 40, 'checks': 67, 'sorted_members': 0} "REF6 names joined by ','"
+          8.8 ms [ok] n=0   chars=255  qtok=128  stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'a b c ... z ' cut at 256"
+         17.6 ms [ok] n=0   chars=255  qtok=128  stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'e ' x 128"
+         26.2 ms [ok] n=0   chars=256  qtok=1    stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'a' x 256"
+  -- extra shapes over REF6
+         23.4 ms [ok] n=0   chars=256  qtok=256  stats={'walks': 2, 'cand': 0, 'sorted_members': 0} "'1a' x 128 (256 one-char tokens, no separator)"
+          8.2 ms [ok] n=0   chars=256  qtok=129  stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'aB' x 128 (camel cuts: 128 tokens)"
+          8.1 ms [ok] n=0   chars=256  qtok=65   stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'aBcd' x 64 (64 fuzzy tokens, no separator)"
+          8.3 ms [ok] n=0   chars=255  qtok=128  stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'x y z w v u ' cut at 256"
+         24.3 ms [ok] n=0   chars=255  qtok=1    stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'a' x 255"
+         15.5 ms [ok] n=0   chars=255  qtok=1    stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'e' x 255"
+          7.7 ms [ok] n=0   chars=255  qtok=1    stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'z' x 255"
+          8.1 ms [ok] n=0   chars=255  qtok=1    stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'ab' x 127 + 'a' (255)"
+          7.9 ms [ok] n=0   chars=256  qtok=1    stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "digits '0123456789' cut at 256 (one token)"
+         33.0 ms [ok] n=0   chars=256  qtok=1    stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'0' x 256"
+         11.5 ms [ok] n=0   chars=255  qtok=128  stats={'walks': 2, 'cand': 0, 'sorted_members': 0} "'1 2 3 ' cut at 256"
+          8.2 ms [ok] n=0   chars=256  qtok=1    stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'é' x 256"
+          8.2 ms [ok] n=0   chars=255  qtok=128  stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'é ' x 128"
+          7.7 ms [ok] n=0   chars=256  qtok=86   stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'漢字 ' cut at 256"
+          8.2 ms [ok] n=0   chars=256  qtok=1    stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'Ä' x 256"
+          8.1 ms [ok] n=0   chars=256  qtok=1    stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'İ' x 256"
+          8.3 ms [ok] n=0   chars=255  qtok=128  stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'U+1F600 ' x 128"
+          7.7 ms [ok] n=0   chars=256  qtok=43   stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'drück ' cut at 256"
+          8.1 ms [ok] n=0   chars=255  qtok=64   stats={'walks': 1, 'cand': 0, 'sorted_members': 0} "'cnt ' x 64"
+  worst per group: REF6 query set (12): 85.7 ms (0); QSET shapes over REF6 (beyond the row): 375.2 ms ('0 ' x 128); repeated-token shapes over REF6 (beyond the row): 1350.2 ms ('0 ' x 125 + 'chax'); extra shapes over REF6: 33.0 ms ('0' x 256)
+  non-ok calls 0; out-of-range/unsorted/touching/empty spans 0; tier/_classify disagreements 0
+
+load after = (3.79931640625, 5.75732421875, 5.48193359375)

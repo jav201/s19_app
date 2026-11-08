@@ -1,0 +1,7 @@
+# E5 corrective — Inc 4 code (DeepSeek v4 Pro)
+
+You fix the implementation of `s19_app/tui/services/label_match.py` in the worktree `C:\Users\<user>\Github\s19_app-b103-inc4-code` (branch `b103-inc4-code`). Read first `.dev-flow/2026-11-05-batch-103/inc-4/E4-handoff-impl.md` sections 1, 4 and 5 (its rules apply unchanged: one file, no tests, **no Python that imports or loads the module on this PC** — only `python -m py_compile` and `codewire_extract.py`), then the last section of `inc-4/E3-rulings.md` ("## E5 rulings"), `inc-4/E5-code-review.md` (F1 … F7), `inc-4/E5-security-review.md` (E5S-01, E5S-02, minors), and the corrected design: `inc-4/codewire/graph-inc4.md` (steps 4 and 6, `_classify`, the posting variant C and its switch at ≤ 512 name-token occurrences), `inc-4/01-requirements.md` (.35, .37, .40 as corrected), `inc-4/evidence-e5/corr-e5-*` (the probe that measured variant C).
+
+Fix: E5S-01 as the graph now says (variant C); F1 (`_order_key` returns the pinned `tuple[int, int, int, int, str]` — then run the extractor on a throwaway copy with marks outside the worktree and get exit 0; save its transcript to `inc-4/evidence-e5/corrective-extract.txt`); F2 / the security minor (`_prefix_distance` stops early when the band is exceeded); `_classify` merges repeated query tokens; every other code fix column of F3–F7. Do not commit (a tester edits tests in the same worktree); the orchestrator commits.
+
+Report (≤ 200 words): each finding → change (function, line), line count, commands with exit codes, deviations.

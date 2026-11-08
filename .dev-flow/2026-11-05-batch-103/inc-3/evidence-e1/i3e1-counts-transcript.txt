@@ -1,0 +1,44 @@
+# i3e1-counts.py transcript 2026-11-06T16:45:12-06:00 host <runner>
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed
+# python Python 3.11.18; HOME=/tmp/b103-e1-3/home LOCALAPPDATA=/tmp/b103-e1-3/home/<local> DISPLAY=unset
+A2L section tree has structural errors: path=/home/<user>/work/s19_app/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+
+== examples/case_00_public/ASAP2_Demo_V161.a2l
+       2  COM: AXIS_DESCR max == AXIS_PTS max
+      10  CURVE element count readable
+       2  MAP element count readable
+
+== examples/case_00_public/ASAP2_Demo_V171.a2l
+       6  COM: AXIS_DESCR max == AXIS_PTS max
+      16  CURVE element count readable
+       8  MAP element count readable
+
+== examples/case_00_public/check_test.a2l
+       1  CURVE element count NOT readable
+
+== examples/case_00_public/from_source.a2l
+       4  COM: AXIS_DESCR max == AXIS_PTS max
+       4  CURVE element count readable
+
+== examples/case_00_public/software_a.a2l
+     161  COM: AXIS_DESCR max == AXIS_PTS max
+     158  CURVE element count readable
+      12  FIX_NO == point count
+      11  MAP element count readable
+
+== examples/case_00_public/update_test1.a2l
+       3  COM: AXIS_DESCR max == AXIS_PTS max
+       2  CURVE element count readable
+       3  FIX_NO == point count
+       2  MAP element count readable
+
+== examples/case_00_public/update_test2.a2l
+       1  COM: AXIS_DESCR max == AXIS_PTS max
+       1  CURVE element count NOT readable
+       1  CURVE element count readable
+       1  FIX_NO != point count
+       2  FIX_NO == point count
+       1  MAP element count NOT readable
+       1  MAP element count readable
+   sample: examples/case_00_public/update_test2.a2l: Curve_InternalAxis_bad_axis_size axis 1: FIX_NO_AXIS_PTS_X 4, point count 8

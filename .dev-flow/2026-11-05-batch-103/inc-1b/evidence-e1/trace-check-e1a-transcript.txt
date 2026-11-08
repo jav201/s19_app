@@ -1,0 +1,6 @@
+rows: 22 cells per row: [8]
+active 20 withdrawn ['R-COPY.3', 'R-COPY.5']
+ids 1..22 complete: True
+active rows without a case: []
+cases naming a non-active row: []
+case rows with cell count != 9: []

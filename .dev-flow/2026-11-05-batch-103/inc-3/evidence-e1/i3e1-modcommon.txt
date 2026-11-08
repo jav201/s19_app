@@ -1,0 +1,54 @@
+# i3e1 MOD_COMMON alignment and mixed-size layouts — 2026-11-06T16:56:56-06:00; worktree HEAD 9ae92c35 (product tree e07fb00)
+## MOD_COMMON BYTE_ORDER / ALIGNMENT lines per file (files with curves or maps)
+== examples/case_00_public/ASAP2_Demo_V161.a2l
+   BYTE_ORDER MSB_LAST
+   ALIGNMENT_BYTE 1
+   ALIGNMENT_WORD 2
+   ALIGNMENT_LONG 4
+   ALIGNMENT_FLOAT32_IEEE 4
+   ALIGNMENT_FLOAT64_IEEE 4
+== examples/case_00_public/ASAP2_Demo_V171.a2l
+   BYTE_ORDER MSB_LAST
+   ALIGNMENT_BYTE 1
+   ALIGNMENT_WORD 2
+   ALIGNMENT_LONG 4
+   ALIGNMENT_FLOAT32_IEEE 4
+   ALIGNMENT_FLOAT64_IEEE 4
+== examples/case_00_public/software_a.a2l
+   BYTE_ORDER MSB_LAST
+   ALIGNMENT_BYTE 1
+== examples/case_00_public/software_b.a2l
+   BYTE_ORDER MSB_LAST
+   ALIGNMENT_BYTE 1
+   ALIGNMENT_WORD 2
+   ALIGNMENT_LONG 4
+   ALIGNMENT_FLOAT16_IEEE 1
+   ALIGNMENT_FLOAT32_IEEE 4
+   ALIGNMENT_FLOAT64_IEEE 8
+   ALIGNMENT_INT64 8
+== examples/case_00_public/from_source.a2l
+== examples/case_00_public/update_test1.a2l
+== examples/case_00_public/update_test2.a2l
+== examples/case_00_public/check_test.a2l
+== tools/synth/make_release_case.py
+   out.append("      BYTE_ORDER MSB_FIRST")
+   out.append("      ALIGNMENT_BYTE 1")
+   out.append("      ALIGNMENT_WORD 2")
+   out.append("      ALIGNMENT_LONG 4")
+   out.append("      ALIGNMENT_FLOAT32_IEEE 4")
+== tools/synth/make_release_case.py emit_a2l MOD_COMMON lines
+    out.append('    /begin MOD_COMMON ""')
+    out.append("      BYTE_ORDER MSB_FIRST")
+    out.append("      ALIGNMENT_BYTE 1")
+    out.append("      ALIGNMENT_WORD 2")
+    out.append("      ALIGNMENT_LONG 4")
+    out.append("      ALIGNMENT_FLOAT32_IEEE 4")
+    out.append("    /end MOD_COMMON")
+## software_a RECORD_LAYOUTs with 2+ components: (count, component datatypes all the same or mixed, layout-local ALIGNMENT or not)
+      6 same no-local-align
+## AXIS_PTS_REF names with no '/begin AXIS_PTS <name>' on the same line in the same file (rough text check; the shapes census gives 3 dangling)
+   examples/case_00_public/ASAP2_Demo_V171.a2l: ASAM_I_AXIS_PTS_UBYTE_8
+   examples/case_00_public/check_test.a2l: Axis_0
+   examples/case_00_public/from_source_structs.a2l: THIS.x
+   examples/case_00_public/update_test2.a2l: Axis_0
+   examples/case_00_public/update_test2.a2l: Axis_1

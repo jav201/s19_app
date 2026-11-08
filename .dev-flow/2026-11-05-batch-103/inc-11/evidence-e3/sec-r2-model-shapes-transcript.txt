@@ -1,0 +1,72 @@
+== [S-ARG] missing argument shapes (E3S-02; READ.29, .58, .60, .61) ==
+[S-ARG B8] address=0x10 length=2 bit_mask=0x0FF0 byte_order(own)=None flags=['byteorder_missing_arg'] | errors=['Line 23: BYTE_ORDER has 0 of its 1 arguments']
+[S-ARG B9] address=0x1234 length=2 bit_mask=None byte_order(own)=None flags=[] | errors=['Line 22: ECU_ADDRESS_EXTENSION has 0 of its 1 arguments']
+[S-ARG ecu->bitmask] address=None length=2 bit_mask=0x0FF0 byte_order(own)=None flags=[] | errors=['Line 22: ECU_ADDRESS has 0 of its 1 arguments']
+[S-ARG maxrefresh] address=0x10 length=2 bit_mask=None byte_order(own)=None flags=[] | errors=['Line 22: MAX_REFRESH has 1 of its 2 arguments']
+[S-ARG ecu-last] address=None length=2 bit_mask=0x0FF0 byte_order(own)=None flags=[] | errors=['Line 23: ECU_ADDRESS has 0 of its 1 arguments']
+[S-ARG mdim->ecu] address=0x10 length=None bit_mask=None byte_order(own)=None flags=[] | errors=['Line 22: MATRIX_DIM has 0 of its 1 to 3 arguments']
+[S-ARG mdim-4] address=0x10 length=None bit_mask=None byte_order(own)=None flags=[] | errors=['Line 23: MATRIX_DIM has 4 of its 1 to 3 arguments']
+[S-ARG length->ecu] address=0x10 length=None bit_mask=None byte_order(own)=None flags=[] | errors=['Line 22: LENGTH has 0 of its 1 arguments']
+[S-ARG datasize->ecu] address=0x10 length=None bit_mask=None byte_order(own)=None flags=[] | errors=['Line 22: DATA_SIZE has 0 of its 1 arguments']
+[S-ARG extlimits] address=0x10 length=2 bit_mask=None byte_order(own)=None flags=[] | errors=['Line 22: EXTENDED_LIMITS has 1 of its 2 arguments']
+[S-ARG symlink] address=0x10 length=2 bit_mask=None byte_order(own)=None flags=[] | errors=['Line 22: SYMBOL_LINK has 1 of its 2 arguments']
+[S-ARG ecu-child-ecu] address=None length=2 bit_mask=None byte_order(own)=None flags=[] | errors=['Line 22: ECU_ADDRESS has 0 of its 1 arguments']
+[S-ARG bitmask-missing] address=0x10 length=2 bit_mask=None byte_order(own)=MSB_FIRST flags=['bitmask_missing_arg'] | errors=['Line 23: BIT_MASK has 0 of its 1 arguments']
+[S-ARG byteorder-missing] address=0x10 length=2 bit_mask=None byte_order(own)=None flags=['byteorder_missing_arg'] | errors=['Line 23: BYTE_ORDER has 0 of its 1 arguments']
+[S-ARG quoted-arg] address=None length=2 bit_mask=None byte_order(own)=None flags=[] | errors=['Line 22: ECU_ADDRESS "0x10" is not a number']
+[S-ARG unknown-kw-arg] address=None length=2 bit_mask=None byte_order(own)=None flags=[] | errors=['Line 22: ECU_ADDRESS MY_VENDOR_KW is not a number']
+== [S-PAIR] disagreeing and agreeing pairs (E3S-03; D-6 revised; READ.59-.61) ==
+[S-PAIR ecu x2 diff] address=None length=2 bit_mask=None byte_order(own)=None flags=[] | errors=['Line 23: ECU_ADDRESS is declared twice in MEASUREMENT X', 'Line 20: MEASUREMENT X declares the addresses 0x00000010 and 0x00000020']
+[S-PAIR ecu x2 same] address=0x10 length=2 bit_mask=None byte_order(own)=None flags=[] | errors=['Line 23: ECU_ADDRESS is declared twice in MEASUREMENT X']
+[S-PAIR ecu ok + ecu nonnum] address=None length=2 bit_mask=None byte_order(own)=None flags=[] | errors=['Line 23: ECU_ADDRESS is declared twice in MEASUREMENT X', 'Line 23: ECU_ADDRESS 0x10_00 is not a number']
+[S-PAIR B5 datasize2 length8] address=0x10 length=None bit_mask=None byte_order(own)=None flags=[] | errors=['Line 20: MEASUREMENT X declares the sizes 2 and 8']
+[S-PAIR no-datatype datasize2 length8] address=0x10 length=2 bit_mask=None byte_order(own)=None flags=[] | errors=[]
+[S-PAIR no-datatype length4 length8] address=0x10 length=4 bit_mask=None byte_order(own)=None flags=[] | errors=['Line 23: LENGTH is declared twice in MEASUREMENT X']
+[S-PAIR no-datatype length8 datasize2] address=0x10 length=2 bit_mask=None byte_order(own)=None flags=[] | errors=[]
+[S-PAIR undeclared-layout VALUE length4 length8] address=0x2000 length=4 bit_mask=None byte_order(own)=None flags=[] | errors=['Line 22: LENGTH is declared twice in CHARACTERISTIC C']
+[S-PAIR length4 length8] address=0x10 length=None bit_mask=None byte_order(own)=None flags=[] | errors=['Line 24: LENGTH is declared twice in MEASUREMENT X', 'Line 20: MEASUREMENT X declares the sizes 2 and 8']
+[S-PAIR B3 hdr 2000 ecu 3000] address=None length=2 bit_mask=None byte_order(own)=None flags=[] | errors=['Line 20: CHARACTERISTIC C declares the addresses 0x00002000 and 0x00003000']
+[S-PAIR hdr 2000 ecu 2000] address=0x2000 length=2 bit_mask=None byte_order(own)=None flags=[] | errors=[]
+[S-PAIR B3b hdr 2000 ecu 30_00] address=None length=2 bit_mask=None byte_order(own)=None flags=[] | errors=['Line 21: ECU_ADDRESS 0x30_00 is not a number']
+[S-PAIR hdr 20_00 ecu 3000] address=0x3000 length=2 bit_mask=None byte_order(own)=None flags=['hdr_addr_nonnum', 'hdr_nonnum_but_ecu'] | errors=['Line 20: address 0x20_00 is not a number']
+[S-PAIR B7 bitmask x2 diff] address=None length=2 bit_mask=0x000F byte_order(own)=None flags=['dup_BIT_MASK'] | errors=['Line 24: BIT_MASK is declared twice in MEASUREMENT X']
+[S-PAIR bitmask x2 same] address=0x10 length=2 bit_mask=0x0FF0 byte_order(own)=None flags=[] | errors=['Line 24: BIT_MASK is declared twice in MEASUREMENT X']
+[S-PAIR byteorder x2 diff] address=None length=2 bit_mask=None byte_order(own)=MSB_FIRST flags=['dup_BYTE_ORDER'] | errors=['Line 24: BYTE_ORDER is declared twice in MEASUREMENT X']
+[S-PAIR byteorder x2 same] address=0x10 length=2 bit_mask=None byte_order(own)=MSB_FIRST flags=[] | errors=['Line 24: BYTE_ORDER is declared twice in MEASUREMENT X']
+[S-PAIR B6 VALUE RL_U16 LENGTH 4] address=0x2000 length=None bit_mask=None byte_order(own)=None flags=[] | errors=['Line 20: CHARACTERISTIC C declares the sizes 2 and 4']
+[S-PAIR VALBLK mdim4 number5] address=0x2000 length=None bit_mask=None byte_order(own)=None flags=[] | errors=['Line 20: CHARACTERISTIC C declares the sizes 8 and 10']
+[S-PAIR VALBLK mdim4 number4] address=0x2000 length=8 bit_mask=None byte_order(own)=None flags=[] | errors=[]
+[S-PAIR arraysize4 mdim3] address=0x10 length=None bit_mask=None byte_order(own)=None flags=[] | errors=['Line 20: MEASUREMENT X declares the sizes 6 and 8']
+[S-PAIR MAP LENGTH = span] address=0x2000 length=None bit_mask=None byte_order(own)=None flags=['refused_but_span_pass_as_base'] | errors=['Line 20: CHARACTERISTIC M declares the sizes 2 and 2266']
+[S-PAIR MAP LENGTH x4] address=0x2000 length=None bit_mask=None byte_order(own)=None flags=['refused_but_span_pass_as_base'] | errors=['Line 21: LENGTH x4 is not a number']
+[S-PAIR ecu surplus word] address=0x1C2D length=2 bit_mask=None byte_order(own)=None flags=[] | errors=[]
+[S-PAIR length surplus word] address=0x10 length=2 bit_mask=None byte_order(own)=None flags=[] | errors=[]
+== [S-DEPTH] nesting cap (E3S-04; READ.64, .65) ==
+[S-DEPTH 31 one per line] sections=31 refusal=None errors=[]
+[S-DEPTH 31 one line] sections=31 refusal=None errors=[]
+[S-DEPTH 32 one per line] sections=32 refusal=None errors=[]
+[S-DEPTH 32 one line] sections=32 refusal=None errors=[]
+[S-DEPTH 33 one per line] sections=0 refusal=depth errors=['Line 33: sections nested deeper than 32']
+[S-DEPTH 33 one line] sections=0 refusal=depth errors=['Line 1: sections nested deeper than 32']
+[S-DEPTH 5000 nested] sections=0 refusal=depth errors=['Line 33: sections nested deeper than 32'] s=0.002
+[S-DEPTH 50000 /begin unclosed] sections=0 refusal=depth errors=['Line 33: sections nested deeper than 32'] s=0.013
+== [S-ENC] NUL and UTF-16 without a BOM (READ.55, .6) ==
+[S-ENC utf-16-le no BOM] bytes=344 sections=0 tags=0 errors=['File is not UTF-8 text; save it as UTF-8 and load it again.']
+[S-ENC utf-16-be no BOM] bytes=344 sections=0 tags=0 errors=['File is not UTF-8 text; save it as UTF-8 and load it again.']
+[S-ENC utf-32-le no BOM] bytes=688 sections=0 tags=0 errors=['File is not UTF-8 text; save it as UTF-8 and load it again.']
+[S-ENC NUL after addr] sections=0 tags=0 errors=['File is not UTF-8 text; save it as UTF-8 and load it again.']
+[S-ENC NUL in comment] sections=0 tags=0 errors=['File is not UTF-8 text; save it as UTF-8 and load it again.']
+[S-ENC NUL in string] sections=0 tags=0 errors=['File is not UTF-8 text; save it as UTF-8 and load it again.']
+[S-ENC NUL last byte] sections=0 tags=0 errors=['File is not UTF-8 text; save it as UTF-8 and load it again.']
+[S-ENC NUL after 300 errors] sections=0 tags=0 errors=['File is not UTF-8 text; save it as UTF-8 and load it again.']
+[S-ENC 5 MiB random] nul_in=20498 sections=0 errors=['File is not UTF-8 text; save it as UTF-8 and load it again.'] s=0.09
+== [S-CAP] error cap (READ.56; E3A-02, E3S-11) ==
+[S-CAP 100 stray /end] entries=100 last='Line 100: /end without /begin' raw_total=100
+[S-CAP 101 stray /end] entries=101 last='… 1 more parse errors' raw_total=101
+[S-CAP 200000 stray /end] entries=101 last='… 199900 more parse errors' raw_total=200000
+[S-CAP 400000 U+00E9 words] entries=101 last='… 399900 more parse errors'
+[S-CAP disagreement past the cap] address=None entries=101 last='… 52 more parse errors'
+== [S-ECHO] echoed words (READ.66) ==
+[S-ECHO 1 MB include word] lens=[94] has_LF=False has_ESC=False
+== [S-LINE] a word after a string that closes on a later line (line attribution) ==
+[S-LINE] MEASUREMENT /end on line 5 -> end_line=4 (the string opened on line 4)

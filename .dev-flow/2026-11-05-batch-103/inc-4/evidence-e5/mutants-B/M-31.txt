@@ -1,0 +1,39 @@
+===== diff -u (base vs mutant) s19_app/tui/services/label_match.py =====
+--- /tmp/b103-e5-4-mutB/base/s19_app/tui/services/label_match.py	2026-11-06 20:36:19.839317227 -0600
++++ /tmp/b103-e5-4-mutB/M-31/s19_app/tui/services/label_match.py	2026-11-06 21:03:35.792577369 -0600
+@@ -713,13 +713,11 @@
+         tuple[int, ...] | None: The offsets, or ``None``.
+     """
+     offsets: list[int] = []
+-    pos = 0
+     for ch in keys:
+-        found = text.find(ch, pos)
++        found = text.rfind(ch)
+         if found < 0:
+             return None
+         offsets.append(found)
+-        pos = found + 1
+     return tuple(offsets)
+ 
+ 
+===== pytest tail =====
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________________________ test_rows_31_subsequence_spans ________________________
+
+prep = <function prep.<locals>.get at 0x7f843149cf40>
+
+    def test_rows_31_subsequence_spans(prep):
+        """R-A2L-MATCH.31/1, .31/2 (across a separator) and .31/3 (leftmost-after-previous on a long name)."""
+        assert [m.spans for m in run(prep, "C08", "mp", 3)] == [((0, 1), (2, 3))] * 3
+>       assert spans_of(run(prep, "C08", "value_000"), "VALUE_0010") == ((0, 5), (6, 8), (9, 10))
+E       assert ((0, 5), (9, 10)) == ((0, 5), (6, 8), (9, 10))
+E         
+E         At index 1 diff: (9, 10) != (6, 8)
+E         Right contains one more item: (9, 10)
+E         Use -v to get more diff
+
+/home/<user>/work/b103-int4/tests/test_b103_label_match.py:510: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_rows_31_subsequence_spans - asser...
+1 failed, 128 deselected in 4.89s

@@ -1,0 +1,33 @@
+=== DIFF base -> M-08 (s19_app/tui/services/label_match.py) ===
+diff --git a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py b/M-08/s19_app/tui/services/label_match.py
+index d274de0..c15eed4 100644
+--- a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py
++++ b/M-08/s19_app/tui/services/label_match.py
+@@ -688,13 +688,6 @@ def _at_boundary(name: str, offset: int) -> bool:
+         ("a" <= b <= "z") or ("A" <= b <= "Z") or ("0" <= b <= "9") or ord(b) > 0x7F
+     ):
+         return True
+-    if ("0" <= c <= "9") != ("0" <= b <= "9"):
+-        return True
+-    if "A" <= c <= "Z":
+-        if "a" <= b <= "z":
+-            return True
+-        if "A" <= b <= "Z" and offset + 1 < len(name) and "a" <= name[offset + 1] <= "z":
+-            return True
+     return False
+ 
+ 
+
+=== PYTEST (tail) ===
+.FF...FF.                                                                [100%]
+=================================== FAILURES ===================================
+/tmp/b103-e5-4-mutA/M-08/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.8/2: query 'stop watch' limit 20
+/tmp/b103-e5-4-mutA/M-08/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.8/3: query 'oks ahw' limit 20
+/tmp/b103-e5-4-mutA/M-08/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.8/7: query 'a value' limit 20
+/tmp/b103-e5-4-mutA/M-08/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.8/8: query 'map 3 d' limit 20
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.8/2]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.8/3]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.8/7]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.8/8]
+4 failed, 5 passed, 120 deselected in 5.52s

@@ -1,0 +1,38 @@
+=== s19_app.__file__ ===
+/home/<user>/mutr4B-work/s19_app/__init__.py
+
+=== DIFF base -> M-34 (s19_app/tui/services/label_match.py) ===
+--- /tmp/b103-e5-4-mutr4B/base/s19_app/tui/services/label_match.py	2026-11-07 01:32:51.000000000 -0600
++++ /home/<user>/mutr4B-work/s19_app/tui/services/label_match.py	2026-11-07 02:11:27.378566407 -0600
+@@ -844,7 +844,7 @@
+     """
+     if not spans:
+         return ()
+-    ordered = sorted(spans)
++    ordered = list(spans)
+     result: list[tuple[int, int]] = [ordered[0]]
+     for start, end in ordered[1:]:
+         prev_start, prev_end = result[-1]
+
+=== PYTEST (tail, rc=1) ===
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+________________ test_rows_34_spans_in_offset_order_and_joined _________________
+
+prep = <function prep.<locals>.get at 0x7f77006a3ba0>
+
+    def test_rows_34_spans_in_offset_order_and_joined(prep):
+        """R-A2L-MATCH.34/2 (offset order whatever the query order) and .34/3 (touching spans joined)."""
+        got = run(prep, "C08", "blk val 00", 1)
+        assert [m.name for m in got] == ["VAL_BLK_0001"]
+>       assert got[0].spans == ((0, 3), (4, 7), (8, 10))
+E       assert ((4, 7), (8, 10)) == ((0, 3), (4, 7), (8, 10))
+E         
+E         At index 0 diff: (4, 7) != (0, 3)
+E         Right contains one more item: (8, 10)
+E         Use -v to get more diff
+
+tests/test_b103_label_match.py:586: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_rows_34_spans_in_offset_order_and_joined
+1 failed, 1 passed, 143 deselected in 5.04s

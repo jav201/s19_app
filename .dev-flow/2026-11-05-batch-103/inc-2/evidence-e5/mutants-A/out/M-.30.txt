@@ -1,0 +1,76 @@
+# M-.30
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.30/s19_app/__init__.py
+# note: max excluded
+#   EDIT-OK: '        while heap and heap[0][2] < end:'
+#   EDIT-OK: '        while heap and heap[0][2] < next_end:'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..c882fbf6 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -951,7 +951,7 @@ def _build_enum_form(
+         while ri < len(by_min) and by_min[ri][1] <= end:
+             heapq.heappush(heap, by_min[ri])
+             ri += 1
+-        while heap and heap[0][2] < end:
++        while heap and heap[0][2] <= end:
+             heapq.heappop(heap)
+         at_end.append(heap[0][0] if heap else None)
+     between: list[Optional[int]] = []
+@@ -963,7 +963,7 @@ def _build_enum_form(
+         while ri < len(by_min) and by_min[ri][1] <= end:
+             heapq.heappush(heap, by_min[ri])
+             ri += 1
+-        while heap and heap[0][2] < next_end:
++        while heap and heap[0][2] <= next_end:
+             heapq.heappop(heap)
+         between.append(heap[0][0] if heap else None)
+     return _EnumForm(
+
+# --- pytest (rc=1) ---
+.FFF                                                                     [100%]
+=================================== FAILURES ===================================
+________________________ test_r_a2l_def_30_2_range_max _________________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...osed /begin sections detected.'], 'path': '/tmp/b103-e5-2-mutA/M-.30/examples/case_00_public/ASAP2_Demo_V171.a2l', ...}
+
+    def test_r_a2l_def_30_2_range_max(v171):
+        """R-A2L-DEF.30/2 - stored 1 (the max end is included)."""
+>       assert _v171_text(v171, V171_RANGE, b"\x01\x00") == "Zero_to_one"
+E       AssertionError: assert 'out of range value' == 'Zero_to_one'
+E         
+E         - Zero_to_one
+E         + out of range value
+
+../base/tests/test_b103_a2l_definition.py:921: AssertionError
+______________________ test_r_a2l_def_30_3_inside_a_range ______________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...osed /begin sections detected.'], 'path': '/tmp/b103-e5-2-mutA/M-.30/examples/case_00_public/ASAP2_Demo_V171.a2l', ...}
+
+    def test_r_a2l_def_30_3_inside_a_range(v171):
+        """R-A2L-DEF.30/3 - stored 5."""
+>       assert _v171_text(v171, V171_RANGE, b"\x05\x00") == "four_to_seven"
+E       AssertionError: assert 'out of range value' == 'four_to_seven'
+E         
+E         - four_to_seven
+E         + out of range value
+
+../base/tests/test_b103_a2l_definition.py:926: AssertionError
+_____________________ test_r_a2l_def_30_4_one_value_range ______________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...osed /begin sections detected.'], 'path': '/tmp/b103-e5-2-mutA/M-.30/examples/case_00_public/ASAP2_Demo_V171.a2l', ...}
+
+    def test_r_a2l_def_30_4_one_value_range(v171):
+        """R-A2L-DEF.30/4 - stored 100."""
+>       assert _v171_text(v171, V171_RANGE, b"\x64\x00") == "hundred"
+E       AssertionError: assert 'out of range value' == 'hundred'
+E         
+E         - hundred
+E         + out of range value
+
+../base/tests/test_b103_a2l_definition.py:931: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_30_2_range_max - Ass...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_30_3_inside_a_range
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_30_4_one_value_range
+3 failed, 1 passed, 187 deselected in 0.53s

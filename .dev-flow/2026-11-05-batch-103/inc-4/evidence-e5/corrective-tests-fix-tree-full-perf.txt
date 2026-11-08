@@ -1,0 +1,189 @@
+/tmp/b103-e5c-4-tests/tree-fix/s19_app/__init__.py
+394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0  s19_app/tui/services/label_match.py
+CMD: pytest -q tests/test_b103_label_match_perf.py
+host load: 7.67 4.27 2.24 9/642 218921
+host load before: 7.67 4.27 2.24
+host load after: 7.61 4.32 2.26 prep times [1.988, 1.982, 1.984]
+    1984.28 ms    60.3 % margin  R-A2L-MATCH.35 prepare REF
+.host load before: 7.80 4.41 2.30
+host load after: 7.90 4.49 2.34
+      57.43 ms    71.3 % margin  R-A2L-MATCH.36 REF 'a'
+      56.83 ms    71.6 % margin  R-A2L-MATCH.36 REF 'e'
+      12.56 ms    93.7 % margin  R-A2L-MATCH.36 REF '0'
+       5.66 ms    97.2 % margin  R-A2L-MATCH.36 REF 'zz'
+       6.54 ms    96.7 % margin  R-A2L-MATCH.36 REF 'ab'
+      12.09 ms    94.0 % margin  R-A2L-MATCH.36 REF 'JotafVod_msrqlLzL_kh2C_rWl_pfue._0_'
+      15.19 ms    92.4 % margin  R-A2L-MATCH.36 REF 'JotafVod_msr'
+      21.95 ms    89.0 % margin  R-A2L-MATCH.36 REF 'srqlLzL_'
+      14.83 ms    92.6 % margin  R-A2L-MATCH.36 REF '0 jotaf'
+       4.24 ms    97.9 % margin  R-A2L-MATCH.36 REF 'JVmL'
+      58.30 ms    70.9 % margin  R-A2L-MATCH.36 REF 'xqzjvkw'
+      24.73 ms    87.6 % margin  R-A2L-MATCH.36 REF 'qqqq zzzz'
+       6.20 ms    96.9 % margin  R-A2L-MATCH.36 REF 'aaaa'
+      10.74 ms    94.6 % margin  R-A2L-MATCH.36 REF 'e e e'
+      60.62 ms    69.7 % margin  R-A2L-MATCH.36 REF 'Nzukij'
+      62.99 ms    68.5 % margin  R-A2L-MATCH.36 REF 'Ierxjr_Eud'
+      21.74 ms    89.1 % margin  R-A2L-MATCH.36 REF 'ledRing'
+      53.93 ms    73.0 % margin  R-A2L-MATCH.36 REF 'pposbxiif'
+       3.39 ms    98.3 % margin  R-A2L-MATCH.36 REF 'cnt'
+      17.62 ms    91.2 % margin  R-A2L-MATCH.36 REF 'temp_sensor_max'
+      27.83 ms    86.1 % margin  R-A2L-MATCH.36 REF 'x y z w v u'
+      18.25 ms    90.9 % margin  R-A2L-MATCH.36 REF 'pposbxiifkdgfiajnbbpvb_dyan_xvz1'
+      55.88 ms    72.1 % margin  R-A2L-MATCH.36 REF 'njraipjtbtu lsuakcoj hsxgibymjxu orfltal'
+      55.53 ms    72.2 % margin  R-A2L-MATCH.36 REF 'votklbi fjblnabj qghque pdjxmq tiprdynot'
+      53.28 ms    73.4 % margin  R-A2L-MATCH.36 REF 'lmmwngodou jadkvqy khbnukc qomfrybiza ev'
+       9.48 ms    95.3 % margin  R-A2L-MATCH.36 REF 'e e e e e e e e e e e e e e e e e e e e '
+      22.21 ms    88.9 % margin  R-A2L-MATCH.36 REF 'a b c d e f g h i j k l m n o p q r s t '
+       5.76 ms    97.1 % margin  R-A2L-MATCH.36 REF '0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 '
+      72.50 ms    63.7 % margin  R-A2L-MATCH.36 REF 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+      11.74 ms    94.1 % margin  R-A2L-MATCH.36 REF 'FCA_NPUK_SMM.RWG_TjsPHIoim_SNX_TVC_2_ewh'
+       8.81 ms    95.6 % margin  R-A2L-MATCH.36 REF 'RUX_ARV_LFS_QM_GJWTDMS_WDGTH.Fgathduhjd,'
+      12.90 ms    93.6 % margin  R-A2L-MATCH.36 REF 'HRR_WOL.TNY_U_ZmyrXSZTPeyoMsdpWwbcUtd_Dw'
+      14.20 ms    92.9 % margin  R-A2L-MATCH.36 REF 'RHR_WOL.TNY_U_ZmyrXSZTPeyoMsdpWwbcUtd_Dw'
+.host load before: 7.91 4.55 2.37
+host load after: 8.16 4.71 2.45
+      39.32 ms    80.3 % margin  R-A2L-MATCH.36 REF6 'm'
+      38.75 ms    80.6 % margin  R-A2L-MATCH.36 REF6 'meas_'
+      72.96 ms    63.5 % margin  R-A2L-MATCH.36 REF6 'chr'
+     119.76 ms    40.1 % margin  R-A2L-MATCH.36 REF6 'mesa'
+      69.64 ms    65.2 % margin  R-A2L-MATCH.36 REF6 'cahr'
+      82.32 ms    58.8 % margin  R-A2L-MATCH.36 REF6 'cr0'
+      26.17 ms    86.9 % margin  R-A2L-MATCH.36 REF6 'char 1'
+     118.30 ms    40.9 % margin  R-A2L-MATCH.36 REF6 '0'
+      58.74 ms    70.6 % margin  R-A2L-MATCH.36 REF6 'chr 0'
+      62.06 ms    69.0 % margin  R-A2L-MATCH.36 REF6 'ch00'
+      29.86 ms    85.1 % margin  R-A2L-MATCH.36 REF6 'meas 1'
+      29.87 ms    85.1 % margin  R-A2L-MATCH.36 REF6 'c 0 1'
+.tracemalloc peak 21306125 bytes (20.3 MiB)
+.host load before: 7.74 4.79 2.51
+host load after: 7.28 4.75 2.51
+       7.35 ms    99.3 % margin  R-A2L-MATCH.40 REF qzx x64
+      86.42 ms    91.4 % margin  R-A2L-MATCH.40 REF qza..qzz x3
+       8.17 ms    99.2 % margin  R-A2L-MATCH.40 REF cnt x64
+       7.81 ms    99.2 % margin  R-A2L-MATCH.40 REF 1a x128
+       7.58 ms    99.2 % margin  R-A2L-MATCH.40 REF rat x64
+       8.00 ms    99.2 % margin  R-A2L-MATCH.40 REF e x120 + rat
+.host load before: 7.28 4.75 2.51
+host load after: 6.93 4.75 2.54
+      47.28 ms    95.3 % margin  R-A2L-MATCH.40 REF6 chr x64
+      44.40 ms    95.6 % margin  R-A2L-MATCH.40 REF6 cahr x51
+      95.54 ms    90.4 % margin  R-A2L-MATCH.40 REF6 0 x128
+      70.31 ms    93.0 % margin  R-A2L-MATCH.40 REF6 00 x85
+      40.55 ms    95.9 % margin  R-A2L-MATCH.40 REF6 c 0 x64
+      42.13 ms    95.8 % margin  R-A2L-MATCH.40 REF6 c x128
+      38.03 ms    96.2 % margin  R-A2L-MATCH.40 REF6 m x128
+      43.86 ms    95.6 % margin  R-A2L-MATCH.40 REF6 1 x128
+      45.69 ms    95.4 % margin  R-A2L-MATCH.40 REF6 c x125 + chax
+      46.27 ms    95.4 % margin  R-A2L-MATCH.40 REF6 0 x125 + chax
+      42.87 ms    95.7 % margin  R-A2L-MATCH.40 REF6 chax x52
+      43.41 ms    95.7 % margin  R-A2L-MATCH.40 REF6 mesa x52
+     334.57 ms    66.5 % margin  R-A2L-MATCH.40 REF6 near tokens
+     149.82 ms    85.0 % margin  R-A2L-MATCH.40 REF6 cha..chz x3
+     270.07 ms    73.0 % margin  R-A2L-MATCH.40 REF6 51 typos of char
+      14.77 ms    98.5 % margin  R-A2L-MATCH.40 REF6 E3S-01 e x128
+       6.69 ms    99.3 % margin  R-A2L-MATCH.40 REF6 E3S-01 a..z
+      86.85 ms    91.3 % margin  R-A2L-MATCH.40 REF6 E3S-01 0 x128
+      21.79 ms    97.8 % margin  R-A2L-MATCH.40 REF6 E3S-01 a x256
+       6.76 ms    99.3 % margin  R-A2L-MATCH.40 REF6 E3S-01 pool join
+       6.80 ms    99.3 % margin  R-A2L-MATCH.40 REF6 E3S-01 pool[200:] join
+       6.61 ms    99.3 % margin  R-A2L-MATCH.40 REF6 E3S-01 longest REF name
+       6.80 ms    99.3 % margin  R-A2L-MATCH.40 REF6 E3S-01 longest swapped
+.host load before: 6.93 4.75 2.54
+host load after: 6.93 4.75 2.54
+      59.14 ms    94.1 % margin  R-A2L-MATCH.40 LONG a x255 + b
+      59.61 ms    94.0 % margin  R-A2L-MATCH.40 LONG a x254 + bb
+      52.70 ms    94.7 % margin  R-A2L-MATCH.40 LONG a x128 + b
+.host load before: 6.61 4.72 2.54
+host load after: 6.61 4.72 2.54
+      28.34 ms    97.2 % margin  R-A2L-MATCH.40/3 CRAFT 4 tokens
+     225.28 ms    77.5 % margin  R-A2L-MATCH.40/3 CRAFT 51 tokens
+.host load before: 6.32 4.70 2.54
+host load after: 6.32 4.70 2.54
+     117.04 ms    88.3 % margin  R-A2L-MATCH.40/4 BAND head + 249-character token
+.
+============================= QC-TM timing margins =============================
+40.1%  0.120 s / 0.200 s  R-A2L-MATCH.36 REF6 'mesa'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+40.9%  0.118 s / 0.200 s  R-A2L-MATCH.36 REF6 '0'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+58.8%  0.082 s / 0.200 s  R-A2L-MATCH.36 REF6 'cr0'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+60.3%  1.984 s / 5.000 s  R-A2L-MATCH.35 prepare REF  tests/test_b103_label_match_perf.py::test_r_a2l_match_35_1_preparing_50000_names
+63.5%  0.073 s / 0.200 s  R-A2L-MATCH.36 REF6 'chr'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+63.7%  0.073 s / 0.200 s  R-A2L-MATCH.36 REF 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+65.2%  0.070 s / 0.200 s  R-A2L-MATCH.36 REF6 'cahr'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+66.5%  0.335 s / 1.000 s  R-A2L-MATCH.40 REF6 near tokens  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+68.5%  0.063 s / 0.200 s  R-A2L-MATCH.36 REF 'Ierxjr_Eud'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+69.0%  0.062 s / 0.200 s  R-A2L-MATCH.36 REF6 'ch00'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+69.7%  0.061 s / 0.200 s  R-A2L-MATCH.36 REF 'Nzukij'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+70.6%  0.059 s / 0.200 s  R-A2L-MATCH.36 REF6 'chr 0'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+70.9%  0.058 s / 0.200 s  R-A2L-MATCH.36 REF 'xqzjvkw'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+71.3%  0.057 s / 0.200 s  R-A2L-MATCH.36 REF 'a'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+71.6%  0.057 s / 0.200 s  R-A2L-MATCH.36 REF 'e'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+72.1%  0.056 s / 0.200 s  R-A2L-MATCH.36 REF 'njraipjtbtu lsuakcoj hsxgibymjxu orfltal'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+72.2%  0.056 s / 0.200 s  R-A2L-MATCH.36 REF 'votklbi fjblnabj qghque pdjxmq tiprdynot'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+73.0%  0.054 s / 0.200 s  R-A2L-MATCH.36 REF 'pposbxiif'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+73.0%  0.270 s / 1.000 s  R-A2L-MATCH.40 REF6 51 typos of char  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+73.4%  0.053 s / 0.200 s  R-A2L-MATCH.36 REF 'lmmwngodou jadkvqy khbnukc qomfrybiza ev'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+77.5%  0.225 s / 1.000 s  R-A2L-MATCH.40/3 CRAFT 51 tokens  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_3_crafted_stress_list
+80.3%  0.039 s / 0.200 s  R-A2L-MATCH.36 REF6 'm'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+80.6%  0.039 s / 0.200 s  R-A2L-MATCH.36 REF6 'meas_'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+85.0%  0.150 s / 1.000 s  R-A2L-MATCH.40 REF6 cha..chz x3  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+85.1%  0.030 s / 0.200 s  R-A2L-MATCH.36 REF6 'meas 1'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+85.1%  0.030 s / 0.200 s  R-A2L-MATCH.36 REF6 'c 0 1'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+86.1%  0.028 s / 0.200 s  R-A2L-MATCH.36 REF 'x y z w v u'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+86.9%  0.026 s / 0.200 s  R-A2L-MATCH.36 REF6 'char 1'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+87.6%  0.025 s / 0.200 s  R-A2L-MATCH.36 REF 'qqqq zzzz'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+88.3%  0.117 s / 1.000 s  R-A2L-MATCH.40/4 BAND head + 249-character token  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_4_prefix_distance_band_after_the_switch
+88.9%  0.022 s / 0.200 s  R-A2L-MATCH.36 REF 'a b c d e f g h i j k l m n o p q r s t '  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+89.0%  0.022 s / 0.200 s  R-A2L-MATCH.36 REF 'srqlLzL_'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+89.1%  0.022 s / 0.200 s  R-A2L-MATCH.36 REF 'ledRing'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+90.4%  0.096 s / 1.000 s  R-A2L-MATCH.40 REF6 0 x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+90.9%  0.018 s / 0.200 s  R-A2L-MATCH.36 REF 'pposbxiifkdgfiajnbbpvb_dyan_xvz1'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+91.2%  0.018 s / 0.200 s  R-A2L-MATCH.36 REF 'temp_sensor_max'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+91.3%  0.087 s / 1.000 s  R-A2L-MATCH.40 REF6 E3S-01 0 x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+91.4%  0.086 s / 1.000 s  R-A2L-MATCH.40 REF qza..qzz x3  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+92.4%  0.015 s / 0.200 s  R-A2L-MATCH.36 REF 'JotafVod_msr'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+92.6%  0.015 s / 0.200 s  R-A2L-MATCH.36 REF '0 jotaf'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+92.9%  0.014 s / 0.200 s  R-A2L-MATCH.36 REF 'RHR_WOL.TNY_U_ZmyrXSZTPeyoMsdpWwbcUtd_Dw'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+93.0%  0.070 s / 1.000 s  R-A2L-MATCH.40 REF6 00 x85  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+93.6%  0.013 s / 0.200 s  R-A2L-MATCH.36 REF 'HRR_WOL.TNY_U_ZmyrXSZTPeyoMsdpWwbcUtd_Dw'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+93.7%  0.013 s / 0.200 s  R-A2L-MATCH.36 REF '0'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+94.0%  0.012 s / 0.200 s  R-A2L-MATCH.36 REF 'JotafVod_msrqlLzL_kh2C_rWl_pfue._0_'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+94.0%  0.060 s / 1.000 s  R-A2L-MATCH.40 LONG a x254 + bb  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_2_long_queries_against_1020_character_tokens
+94.1%  0.012 s / 0.200 s  R-A2L-MATCH.36 REF 'FCA_NPUK_SMM.RWG_TjsPHIoim_SNX_TVC_2_ewh'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+94.1%  0.059 s / 1.000 s  R-A2L-MATCH.40 LONG a x255 + b  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_2_long_queries_against_1020_character_tokens
+94.6%  0.011 s / 0.200 s  R-A2L-MATCH.36 REF 'e e e'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+94.7%  0.053 s / 1.000 s  R-A2L-MATCH.40 LONG a x128 + b  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_2_long_queries_against_1020_character_tokens
+95.3%  0.009 s / 0.200 s  R-A2L-MATCH.36 REF 'e e e e e e e e e e e e e e e e e e e e '  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+95.3%  0.047 s / 1.000 s  R-A2L-MATCH.40 REF6 chr x64  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+95.4%  0.046 s / 1.000 s  R-A2L-MATCH.40 REF6 c x125 + chax  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+95.4%  0.046 s / 1.000 s  R-A2L-MATCH.40 REF6 0 x125 + chax  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+95.6%  0.009 s / 0.200 s  R-A2L-MATCH.36 REF 'RUX_ARV_LFS_QM_GJWTDMS_WDGTH.Fgathduhjd,'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+95.6%  0.044 s / 1.000 s  R-A2L-MATCH.40 REF6 cahr x51  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+95.6%  0.044 s / 1.000 s  R-A2L-MATCH.40 REF6 1 x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+95.7%  0.043 s / 1.000 s  R-A2L-MATCH.40 REF6 chax x52  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+95.7%  0.043 s / 1.000 s  R-A2L-MATCH.40 REF6 mesa x52  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+95.8%  0.042 s / 1.000 s  R-A2L-MATCH.40 REF6 c x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+95.9%  0.041 s / 1.000 s  R-A2L-MATCH.40 REF6 c 0 x64  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+96.2%  0.038 s / 1.000 s  R-A2L-MATCH.40 REF6 m x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+96.7%  0.007 s / 0.200 s  R-A2L-MATCH.36 REF 'ab'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+96.9%  0.006 s / 0.200 s  R-A2L-MATCH.36 REF 'aaaa'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+97.1%  0.006 s / 0.200 s  R-A2L-MATCH.36 REF '0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 '  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+97.2%  0.006 s / 0.200 s  R-A2L-MATCH.36 REF 'zz'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+97.2%  0.028 s / 1.000 s  R-A2L-MATCH.40/3 CRAFT 4 tokens  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_3_crafted_stress_list
+97.8%  0.022 s / 1.000 s  R-A2L-MATCH.40 REF6 E3S-01 a x256  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+97.9%  0.004 s / 0.200 s  R-A2L-MATCH.36 REF 'JVmL'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+98.3%  0.003 s / 0.200 s  R-A2L-MATCH.36 REF 'cnt'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+98.5%  0.015 s / 1.000 s  R-A2L-MATCH.40 REF6 E3S-01 e x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+99.2%  0.008 s / 1.000 s  R-A2L-MATCH.40 REF cnt x64  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+99.2%  0.008 s / 1.000 s  R-A2L-MATCH.40 REF 1a x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+99.2%  0.008 s / 1.000 s  R-A2L-MATCH.40 REF rat x64  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+99.2%  0.008 s / 1.000 s  R-A2L-MATCH.40 REF e x120 + rat  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+99.3%  0.007 s / 1.000 s  R-A2L-MATCH.40 REF qzx x64  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+99.3%  0.007 s / 1.000 s  R-A2L-MATCH.40 REF6 E3S-01 a..z  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+99.3%  0.007 s / 1.000 s  R-A2L-MATCH.40 REF6 E3S-01 pool join  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+99.3%  0.007 s / 1.000 s  R-A2L-MATCH.40 REF6 E3S-01 pool[200:] join  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+99.3%  0.007 s / 1.000 s  R-A2L-MATCH.40 REF6 E3S-01 longest REF name  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+99.3%  0.007 s / 1.000 s  R-A2L-MATCH.40 REF6 E3S-01 longest swapped  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+QC-TM: 81 bounds, 0 under 20 % margin
+9 passed in 70.66s (0:01:10)
+pytest exit 0
+host load: 6.32 4.70 2.54 3/632 219373

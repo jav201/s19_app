@@ -1,0 +1,37 @@
+# M-.23
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.23/s19_app/__init__.py
+# note: method format read as a2l.py's (None for the commented TAB_VERB header)
+#   EDIT-OK: '    fmt = tokens[3] if len(tokens) > 3 else None'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..9d453687 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -837,7 +837,7 @@ def _read_method_record(
+         [section.get("meta", "") or ""] + (section.get("lines") or [])
+     )
+     conversion_type = tokens[2] if len(tokens) > 2 else None
+-    fmt = tokens[3] if len(tokens) > 3 else None
++    fmt = tokens[3] if len(tokens) > 3 and conversion_type in {"IDENTICAL", "LINEAR", "RAT_FUNC", "TAB_INTP", "TAB_NOINTP", "FORM"} else None
+     unit = tokens[4] if len(tokens) > 4 else None
+     coeffs_linear: Optional[list[Optional[float]]] = None
+     coeffs: Optional[list[Optional[float]]] = None
+
+# --- pytest (rc=1) ---
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+_______________ test_r_a2l_def_23_2_format_of_a_commented_header _______________
+
+tube = {'compu_methods_by_name': {'esdl_f0_00392156862745098': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None,...s_vtab', ...}}, 'errors': [], 'path': '/tmp/b103-e5-2-mutA/M-.23/examples/case_00_public/BalanceTube_STMicro.a2l', ...}
+
+    def test_r_a2l_def_23_2_format_of_a_commented_header(tube):
+        """R-A2L-DEF.23/2 - TUBE: %12.4 (base: None)."""
+>       assert describe_definition("model.MainClass.gameController.sm", tube).display_format == "%12.4"
+E       AssertionError: assert None == '%12.4'
+E        +  where None = Definition(name='model.MainClass.gameController.sm', section='MEASUREMENT', char_type=None, kind='enum', address=0, by...rror', coeffs_linear=None, coeffs=None, compu_tab_ref='esdl_model_GameControllerStatemachineStates_vtab', refusal=None).display_format
+E        +    where Definition(name='model.MainClass.gameController.sm', section='MEASUREMENT', char_type=None, kind='enum', address=0, by...rror', coeffs_linear=None, coeffs=None, compu_tab_ref='esdl_model_GameControllerStatemachineStates_vtab', refusal=None) = describe_definition('model.MainClass.gameController.sm', {'compu_methods_by_name': {'esdl_f0_00392156862745098': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None,...s_vtab', ...}}, 'errors': [], 'path': '/tmp/b103-e5-2-mutA/M-.23/examples/case_00_public/BalanceTube_STMicro.a2l', ...})
+
+../base/tests/test_b103_a2l_definition.py:805: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_23_2_format_of_a_commented_header
+1 failed, 1 passed, 189 deselected in 0.53s

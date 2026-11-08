@@ -1,4 +1,4 @@
-"""Input widget that pastes from — and copies/cuts to — the OS clipboard.
+"""Input widget that pastes from — and copies/cuts to — the Windows OS clipboard.
 
 Textual's stock ``Input`` binds ``ctrl+v`` to an ``action_paste`` that
 reads from ``self.app.clipboard`` — an in-process string buffer only
@@ -10,8 +10,8 @@ actions only write that same in-process buffer (plus an OSC52 escape the
 Windows driver does not reliably deliver), so text copied inside the TUI
 never reaches other Windows applications.
 
-Bracketed paste (the terminal sending ``\\x1b[200~...\\x1b[201~``) does route
-through ``Input._on_paste`` and does use the OS clipboard, but in a
+Bracketed paste (the terminal sending a bracketed-paste sequence) does
+route through ``Input._on_paste`` and does use the OS clipboard, but in a
 terminal that has negotiated the Kitty keyboard protocol (Windows Terminal
 with Textual's Windows driver, which enables it via ``CSI > 1 u`` before
 enabling bracketed paste) the terminal forwards Ctrl+V as a plain key
@@ -25,80 +25,73 @@ converts to a bracketed paste sequence), but that is not how users expect
 Ctrl+V to behave.
 
 This module supplies :class:`OsClipboardInput`, a drop-in replacement for
-``Input`` whose ``action_paste`` reads the OS clipboard through a
+``Input`` whose ``action_paste`` reads the Windows clipboard through a
 **layered read cascade**:
 
-    1. ``tkinter`` ``clipboard_get()`` through a **process-wide singleton
-       root** — Python stdlib, no extra runtime dep. The ``tk.Tk()`` root
-       is created exactly once, in the main thread (Tk pins its interpreter
-       to the creating thread, and on Windows repeated create/destroy
-       cycles in one process can fail persistently after the first — the
-       BUG B7 residual root cause), reused for every read, and destroyed
-       once at process exit. Works in the vast majority of cases.
-    2. ``ctypes`` against the Win32 clipboard API — no window, no event
-       loop, immune to the transient states where Tk's implicit Tcl
-       interpreter would raise ``TclError``.
-    3. ``subprocess`` shelling out to PowerShell's ``Get-Clipboard -Raw``
-       — a fresh process, completely isolated from any in-process
-       clipboard grab state. Available on every Windows install (no
-       Windows Terminal dependency).
+    1. ``ctypes`` against the Win32 clipboard API — no window, no event
+       loop, immune to the transient states that used to hang the removed
+       Tk read layer.
+    2. ``subprocess`` shelling out to the **system** PowerShell's
+       ``Get-Clipboard -Raw`` — a fresh process, completely isolated from
+       any in-process clipboard grab state, resolved by its absolute path
+       under the system folder (never a bare name that a planted
+       ``powershell.exe`` could hijack).
 
 and whose ``action_copy`` / ``action_cut`` write the OS clipboard through
-a **layered write cascade** (E3 ruling, finding F-B102-3):
+a **layered write cascade**:
 
     1. ``ctypes`` against the Win32 ``SetClipboardData`` API — the buffer
        ownership passes to the system on success, so the write is
        delivered immediately and survives app exit.
-    2. ``tkinter`` ``clipboard_clear()`` + ``clipboard_append()`` on the
-       existing process-wide singleton root — rescue layer only: Tk owns
-       the clipboard content it writes, and that content can vanish when
-       the singleton root is destroyed at process exit.
-    3. ``subprocess`` shelling out to PowerShell's ``Set-Clipboard`` with
-       the payload passed through stdin as UTF-8 — a fresh isolated
-       process, and the copied text is never interpolated into the
-       command line.
+    2. ``subprocess`` shelling out to the system PowerShell's
+       ``Set-Clipboard`` with the payload passed through stdin as UTF-8 —
+       a fresh isolated process, and the copied text is never interpolated
+       into the command line.
 
-Each layer carries its own short retry loop; the worst-case budget is
-dominated by the PowerShell rescue, capped at 2.0 s per subprocess so a
-cold Windows PowerShell start can still succeed (finding F-B102-1), and
-every OS access runs in an executor off the UI event loop so that budget
-never freezes the interface. All clipboard payloads — read or written, OS
-or the Textual internal mirror — are capped at ``_CLIPBOARD_CAP_CHARS``
-(65,536 chars). When every OS write strategy fails we retain Textual's
-internal clipboard and paint a warning; when every read layer fails we
-fall back to the internal clipboard and, when it is also empty, select
-the current field text and paint a read warning.
+Every OS access runs in an executor off the UI event loop, and every
+clipboard payload — read or written, OS or the Textual internal mirror —
+is capped at ``_CLIPBOARD_CAP_CHARS`` (65,536 chars). Off Windows there is
+no OS clipboard: a read returns ``None`` and a write ``False`` at once, no
+process is started, and the app-clipboard / OSC 52 paths carry the text.
+Both paste ingresses (the ``ctrl+v`` action and the terminal paste) strip
+the *unsafe paste characters* — C0 controls except NUL, C1 controls, lone
+surrogates and bidi controls — before insertion; a box with its own
+``restrict`` filter is never stripped and refuses a paste that would put
+an unsafe character into it. A right-click in the box copies the shown
+selection, or pastes at the cursor when there is none. When every OS write
+strategy fails we retain Textual's internal clipboard and paint a warning;
+when every read layer fails we fall back to the internal clipboard and,
+when it is also empty, select the current field text and paint a read
+warning.
 """
 
 from __future__ import annotations
 
 import asyncio
-import atexit
 import logging
+import os
 import subprocess
 import sys
 import threading
 import time
-from typing import TYPE_CHECKING, Callable, Optional
+from typing import Callable, Optional
 
+from textual import events
 from textual.actions import SkipAction
+from textual.app import App
 from textual.widgets import Input
 
-if TYPE_CHECKING:  # pragma: no cover — typing only.
-    from textual.app import App
+from s19_app.utils import _CONTROL_SCRUB
 
 logger = logging.getLogger(__name__)
 
-# Layer retry budgets. The Tk/ctypes retry loops stay short; the
+# Layer retry budgets. The Win32 read/write retry loops stay short; the
 # PowerShell rescue gets 2.0 s per subprocess (E3 ruling, finding
 # F-B102-1: a cold Windows PowerShell start can exceed the old 500 ms cap
 # before Get-Clipboard / Set-Clipboard even runs). Every OS access runs in
 # an executor, so the 2.0 s worst case never blocks the UI event loop.
-#   tkinter    : 3 retries × 50 ms = 150 ms
 #   ctypes     : 5 retries × 20 ms = 100 ms
 #   powershell : one attempt, 2.0 s subprocess wall-clock
-_TK_RETRIES = 3
-_TK_RETRY_DELAY_S = 0.05
 _CTYPES_RETRIES = 5
 _CTYPES_RETRY_DELAY_S = 0.02
 _POWERSHELL_TIMEOUT_S = 2.0
@@ -126,158 +119,93 @@ _POWERSHELL_SUBPROCESS_LOCK = threading.Lock()
 
 # Static PowerShell write command (E3 ruling): the payload travels through
 # stdin (``$input | Set-Clipboard``), never interpolated into ``-Command``,
-# so copied text cannot break out of the command line.
+# so copied text cannot break out of the command line. The program itself
+# is resolved at call time by :func:`_system_powershell` (R-PASTE.16), so
+# this tuple holds the arguments only.
 _POWERSHELL_WRITE_COMMAND = (
-    "powershell",
     "-NoProfile",
     "-Command",
     "[Console]::InputEncoding=[System.Text.Encoding]::UTF8;"
     "$input | Set-Clipboard",
 )
 
+# The one definition of the CTX-PASTE term *unsafe paste character*: every
+# C0 and C1 control of the repository's ``_CONTROL_SCRUB`` (utils.py:41)
+# except NUL (U+0000), plus the lone surrogates (U+D800–U+DFFF) and the
+# bidi controls (U+202A–U+202E, U+2066–U+2069). NUL is left out (E3A-25):
+# it starts no terminal sequence and every path consumer refuses it
+# loudly, so stripping it would only turn a refused path into another
+# path.
+_UNSAFE_PASTE = dict.fromkeys(
+    (
+        *(c for c in _CONTROL_SCRUB if c != 0x00),
+        *range(0xD800, 0xE000),
+        *range(0x202A, 0x202F),
+        *range(0x2066, 0x206A),
+    )
+)
+# Translate tables derived once: the keep-set differs by box shape. A
+# single-line box keeps TAB; a multi-line box keeps TAB, LF and CR.
+_UNSAFE_PASTE_SINGLE = _UNSAFE_PASTE.copy()
+_UNSAFE_PASTE_SINGLE.pop(0x09, None)
+_UNSAFE_PASTE_MULTI = _UNSAFE_PASTE.copy()
+for _KEPT_CONTROL in (0x09, 0x0A, 0x0D):
+    _UNSAFE_PASTE_MULTI.pop(_KEPT_CONTROL, None)
 
-def _create_tk_root() -> Optional[object]:
-    """Create a single withdrawn ``tkinter.Tk`` root.
 
-    Must be called from the MAIN thread only: Tk binds its interpreter to
-    the creating thread, and on Windows repeated create/destroy cycles of
-    ``tk.Tk()`` in the same process can fail persistently after the first
-    one (BUG B7 residual root cause, 2026-10-18). Returns ``None`` when
-    tkinter is unavailable or the root cannot be created (headless / no
-    display), in which case the cascade falls through to the ctypes /
-    PowerShell layers unchanged.
+def _system_directory() -> Optional[str]:
+    """Return the Windows system directory, or ``None`` off Windows.
+
+    Calls ``GetSystemDirectoryW`` (kernel32, through ``ctypes``) into a
+    260-character buffer. Reads no environment variable (``SystemRoot``,
+    ``PATH``), which a caller could set to redirect the PowerShell layer.
+    This is the seam R-PASTE.17 points at an empty folder.
     """
-    try:
-        import tkinter as tk
-    except Exception as exc:  # pragma: no cover — Tk is stdlib on CPython.
-        logger.debug("_create_tk_root: tkinter unavailable: %s", exc)
+    if sys.platform != "win32":
         return None
     try:
-        root = tk.Tk()
-        root.withdraw()
-    except Exception as exc:
-        logger.debug("_create_tk_root: tk.Tk() failed: %s", exc)
+        import ctypes
+    except Exception as exc:  # pragma: no cover — ctypes ships with CPython.
+        logger.debug("_system_directory: ctypes unavailable: %s", exc)
         return None
-    return root
+    buffer = ctypes.create_unicode_buffer(260)
+    try:
+        length = ctypes.windll.kernel32.GetSystemDirectoryW(buffer, 260)
+    except Exception as exc:  # pragma: no cover — defensive.
+        logger.debug("_system_directory: GetSystemDirectoryW failed: %s", exc)
+        return None
+    if not length or length >= 260:
+        logger.debug("_system_directory: GetSystemDirectoryW returned %r", length)
+        return None
+    return buffer.value
 
 
-class _TkRootSingleton:
-    """Process-wide lazy singleton for the layer-1 Tk clipboard root.
+def _system_powershell() -> Optional[str]:
+    """Return the system PowerShell's absolute path, or ``None``.
 
-    Exactly one ``tk.Tk()`` is created per process, in the main thread, and
-    it is destroyed exactly once at process exit (``atexit``). Reads via
-    ``clipboard_get`` and rescue writes via ``clipboard_clear`` /
-    ``clipboard_append`` may run on an executor thread once the root
-    exists — the stateful create/destroy lifecycle is what Tk pins to the
-    main thread, and that lifecycle lives entirely in this class.
+    Joins ``WindowsPowerShell\\v1.0\\powershell.exe`` onto the folder
+    :func:`_system_directory` reports, and returns it only when that is an
+    existing file. No cache: called at each PowerShell start, so a test can
+    point it elsewhere; the cost is one API call and one file check.
     """
-
-    def __init__(self) -> None:
-        self._lock = threading.Lock()
-        self._root: Optional[object] = None
-        # Sticky negative: once creation failed (no tkinter / headless) do
-        # not pay the import + failure cost on every paste.
-        self._unavailable = False
-        # Seam for tests / diagnostics: name of the thread that created
-        # the root (creation is only ever attempted on the main thread).
-        self.creator_thread: Optional[str] = None
-
-    def get_or_create(self) -> Optional[object]:
-        """Return the shared root, creating it when called on the main thread.
-
-        Returns ``None`` when tk is unavailable, when creation previously
-        failed, or when called off the main thread before the root exists
-        (creation is main-thread-only; the executor reader then yields to
-        the next cascade layer — ``action_paste`` primes the root from the
-        main thread before entering the executor).
-        """
-        with self._lock:
-            if self._root is not None:
-                return self._root
-            if self._unavailable:
-                return None
-            if threading.current_thread() is not threading.main_thread():
-                return None
-            root = _create_tk_root()
-            if root is None:
-                self._unavailable = True
-                return None
-            self._root = root
-            self.creator_thread = threading.current_thread().name
-            atexit.register(_destroy_tk_root_singleton)
-            return self._root
-
-    def get_existing(self) -> Optional[object]:
-        """Return the shared root if it already exists, else ``None``."""
-        with self._lock:
-            return self._root
-
-
-def _destroy_tk_root_singleton() -> None:
-    """Destroy the shared root exactly once, at process exit."""
-    with _TK_ROOT._lock:
-        root = _TK_ROOT._root
-        _TK_ROOT._root = None
-    if root is not None:
-        try:
-            root.destroy()
-        except Exception:  # pragma: no cover — best-effort at exit.
-            pass
-
-
-_TK_ROOT = _TkRootSingleton()
-
-
-def _prime_tk_root() -> None:
-    """Create the shared Tk root NOW when running on the main thread.
-
-    The clipboard actions prime the root from the app's event loop (the
-    main thread, where Tk demands creation) before dispatching the cascade
-    to the executor, so the executor thread never attempts a Tk creation.
-    Off-main-thread calls are a no-op: the reader/writer will then fall
-    through to the next cascade layer.
-    """
-    if threading.current_thread() is threading.main_thread():
-        _TK_ROOT.get_or_create()
-
-
-def _read_via_tk() -> Optional[str]:
-    """Layer 1 — read via the process-wide Tk root with short retries.
-
-    The root is a lazy singleton (see :class:`_TkRootSingleton`): created
-    once in the main thread, reused for every read, destroyed once at
-    process exit. This function never creates the root off the main thread
-    — the pre-fix create/destroy-per-paste cycle killed layer 1 permanently
-    mid-session on Windows (BUG B7, 2026-10-18).
-
-    Thread-safety note: ``clipboard_get`` on the already-created root from
-    an executor thread is accepted here — the call is a single synchronous
-    Win32 clipboard read through the Tcl interpreter and does not touch the
-    root's event loop; only root creation/destruction is main-thread-pinned.
-    """
-    for attempt in range(_TK_RETRIES):
-        root = _TK_ROOT.get_or_create()
-        if root is None:
-            # tk unavailable, creation previously failed, or we are off the
-            # main thread before the root exists — let the cascade move on.
-            return None
-        try:
-            text = root.clipboard_get()
-        except Exception as exc:
-            logger.debug("_read_via_tk attempt %d failed: %s", attempt, exc)
-            text = None
-        if isinstance(text, str):
-            return text
-        time.sleep(_TK_RETRY_DELAY_S)
-    return None
+    folder = _system_directory()
+    if folder is None:
+        return None
+    path = os.path.join(folder, "WindowsPowerShell", "v1.0", "powershell.exe")
+    return path if os.path.isfile(path) else None
 
 
 def _read_via_ctypes() -> Optional[str]:
-    """Layer 2 — Win32 clipboard API through ``ctypes`` with short retries.
+    """Layer 1 — Win32 clipboard API through ``ctypes`` with short retries.
 
     Uses ``OpenClipboard(NULL)`` so no window handle is needed. Bypasses
-    the Tcl interpreter and any of its window-manager expectations.
-    Returns ``None`` on any non-Windows platform.
+    the Tcl interpreter and any of its window-manager expectations. The
+    read is bounded by ``GlobalSize`` so an unterminated UTF-16 block
+    cannot read past the clipboard block. Returns ``None`` on any
+    non-Windows platform or when it could not answer (the clipboard is
+    held, ``GlobalLock`` fails, or the size is 0); returns ``''`` when the
+    clipboard opened but holds no ``CF_UNICODETEXT`` (a file-drop list or
+    an image) or an empty text — answered, no text.
     """
     if sys.platform != "win32":
         return None
@@ -295,6 +223,8 @@ def _read_via_ctypes() -> Optional[str]:
     user32.CloseClipboard.restype = wintypes.BOOL
     user32.GetClipboardData.argtypes = [wintypes.UINT]
     user32.GetClipboardData.restype = wintypes.HANDLE
+    kernel32.GlobalSize.argtypes = [wintypes.HGLOBAL]
+    kernel32.GlobalSize.restype = ctypes.c_size_t
     kernel32.GlobalLock.argtypes = [wintypes.HGLOBAL]
     kernel32.GlobalLock.restype = ctypes.c_void_p
     kernel32.GlobalUnlock.argtypes = [wintypes.HGLOBAL]
@@ -314,14 +244,23 @@ def _read_via_ctypes() -> Optional[str]:
     try:
         handle = user32.GetClipboardData(CF_UNICODETEXT)
         if not handle:
+            # The clipboard opened but holds no text format: answered, no
+            # text — the cascade ends without starting a rescue process.
             logger.debug("_read_via_ctypes: no CF_UNICODETEXT on clipboard")
+            return ""
+        size = kernel32.GlobalSize(handle)
+        if not size:
+            logger.debug("_read_via_ctypes: GlobalSize returned 0")
             return None
         pointer = kernel32.GlobalLock(handle)
         if not pointer:
             logger.debug("_read_via_ctypes: GlobalLock returned null")
             return None
         try:
-            return ctypes.wstring_at(pointer)
+            text = ctypes.wstring_at(
+                pointer, min(size // 2, _CLIPBOARD_CAP_CHARS + 1)
+            )
+            return text.split("\x00", 1)[0]
         finally:
             kernel32.GlobalUnlock(handle)
     finally:
@@ -329,13 +268,16 @@ def _read_via_ctypes() -> Optional[str]:
 
 
 def _read_via_powershell() -> Optional[str]:
-    """Layer 3 — subprocess ``powershell.exe Get-Clipboard -Raw`` fallback.
+    """Layer 2 — subprocess ``Get-Clipboard -Raw`` rescue, system path only.
 
     A fresh process reads the clipboard, isolating us from any in-process
-    lock state. Ships with every Windows install (does not depend on
-    Windows Terminal). Serialized with the write layer through
-    ``_POWERSHELL_SUBPROCESS_LOCK`` so key spam cannot spawn concurrent
-    PowerShell processes. Returns ``None`` on any non-Windows platform.
+    lock state. The program is the system PowerShell's absolute path
+    (:func:`_system_powershell`), never a bare name a planted
+    ``powershell.exe`` could hijack (R-PASTE.16). Serialized with the write
+    layer through ``_POWERSHELL_SUBPROCESS_LOCK`` so key spam cannot spawn
+    concurrent PowerShell processes. Returns ``None`` on any non-Windows
+    platform, when the system PowerShell is missing, or when the child
+    fails, times out or exits non-zero.
 
     Encoding: ``utf-8`` explicit with ``errors='replace'`` so unicode
     paths (``Ñoño``, cyrillic, CJK, emoji) survive the round-trip
@@ -344,6 +286,10 @@ def _read_via_powershell() -> Optional[str]:
     UTF-8 via ``[Console]::OutputEncoding``.
     """
     if sys.platform != "win32":
+        return None
+    program = _system_powershell()
+    if program is None:
+        logger.debug("_read_via_powershell: system PowerShell not found")
         return None
     try:
         kwargs: dict = {
@@ -358,28 +304,27 @@ def _read_via_powershell() -> Optional[str]:
         with _POWERSHELL_SUBPROCESS_LOCK:
             result = subprocess.run(
                 [
-                    "powershell",
+                    program,
                     "-NoProfile",
+                    "-NonInteractive",
                     "-Command",
                     "[Console]::OutputEncoding=[System.Text.Encoding]::UTF8;"
                     "Get-Clipboard -Raw",
                 ],
+                cwd=_system_directory(),
                 **kwargs,
             )
     except subprocess.TimeoutExpired as exc:
         logger.debug("_read_via_powershell timed out after %ss", exc.timeout)
-        return None
-    except FileNotFoundError as exc:
-        logger.debug("_read_via_powershell: powershell.exe not on PATH: %s", exc)
         return None
     except OSError as exc:
         logger.debug("_read_via_powershell subprocess OSError: %s", exc)
         return None
     if result.returncode != 0:
         logger.debug(
-            "_read_via_powershell exit=%d stderr=%s",
+            "_read_via_powershell exit=%d stderr_len=%d",
             result.returncode,
-            result.stderr[:120],
+            len(result.stderr),
         )
         return None
     text = result.stdout.rstrip("\r\n")
@@ -466,35 +411,12 @@ def _write_via_ctypes(text: str) -> bool:
     return True
 
 
-def _write_via_tk(text: str) -> bool:
-    """Write layer 2 — Tk ``clipboard_clear`` + ``clipboard_append`` rescue.
-
-    Runs on the existing process-wide singleton root and deliberately does
-    NOT create it: creation is main-thread-pinned (see
-    :class:`_TkRootSingleton`) and the copy/cut actions prime the root on
-    the UI thread before the cascade enters the executor. Tk owns the
-    clipboard content it writes until another application takes ownership
-    — and the content can vanish when the singleton root is destroyed at
-    process exit — so this layer runs AFTER the Win32 layer. Returns
-    ``False`` when Tk is unavailable or the write raises.
-    """
-    root = _TK_ROOT.get_existing()
-    if root is None:
-        return False
-    try:
-        root.clipboard_clear()
-        root.clipboard_append(text)
-    except Exception as exc:
-        logger.debug("_write_via_tk failed: %s", exc)
-        return False
-    return True
-
-
 def _write_via_powershell(text: str) -> bool:
-    """Write layer 3 — subprocess ``powershell.exe Set-Clipboard`` fallback.
+    """Write layer 2 — subprocess ``Set-Clipboard`` rescue, system path only.
 
     A fresh, isolated process writes the clipboard — impervious to any
-    in-process clipboard grab state. The command is STATIC
+    in-process clipboard grab state. The program is the system PowerShell's
+    absolute path (:func:`_system_powershell`). The command is STATIC
     (``_POWERSHELL_WRITE_COMMAND``): the payload travels through stdin as
     UTF-8 (``$input | Set-Clipboard``), never interpolated into
     ``-Command``, so copied text cannot break out of the command line.
@@ -506,6 +428,10 @@ def _write_via_powershell(text: str) -> bool:
     PowerShell or on any non-zero exit.
     """
     if sys.platform != "win32":
+        return False
+    program = _system_powershell()
+    if program is None:
+        logger.debug("_write_via_powershell: system PowerShell not found")
         return False
     kwargs: dict = {
         "input": text,
@@ -519,23 +445,24 @@ def _write_via_powershell(text: str) -> bool:
     kwargs["creationflags"] = getattr(subprocess, "CREATE_NO_WINDOW", 0)
     try:
         with _POWERSHELL_SUBPROCESS_LOCK:
-            result = subprocess.run(list(_POWERSHELL_WRITE_COMMAND), **kwargs)
+            result = subprocess.run(
+                [program, "-NonInteractive", *_POWERSHELL_WRITE_COMMAND],
+                cwd=_system_directory(),
+                **kwargs,
+            )
     except subprocess.TimeoutExpired:
         logger.debug(
             "_write_via_powershell timed out after %ss", _POWERSHELL_TIMEOUT_S
         )
-        return False
-    except FileNotFoundError as exc:
-        logger.debug("_write_via_powershell: powershell.exe not on PATH: %s", exc)
         return False
     except OSError as exc:
         logger.debug("_write_via_powershell subprocess OSError: %s", exc)
         return False
     if result.returncode != 0:
         logger.debug(
-            "_write_via_powershell exit=%d stderr=%s",
+            "_write_via_powershell exit=%d stderr_len=%d",
             result.returncode,
-            result.stderr[:120],
+            len(result.stderr),
         )
         return False
     return True
@@ -545,21 +472,57 @@ def _write_via_powershell(text: str) -> bool:
 # (see ``read_os_clipboard(strategies=...)``) so tests can substitute
 # fakes without monkeypatching module attributes.
 _STRATEGIES: tuple[tuple[str, Callable[[], Optional[str]]], ...] = (
-    ("tkinter", _read_via_tk),
     ("ctypes-win32", _read_via_ctypes),
     ("powershell", _read_via_powershell),
 )
 
 # Ordered cascade of clipboard-writing strategies. Win32 runs first so a
-# successful write survives app exit; Tk is the in-process rescue; the
-# static-command PowerShell layer is the isolated-process last resort.
-# Overridable per-call (see ``write_os_clipboard(strategies=...)``) so
-# tests can substitute fakes without monkeypatching module attributes.
+# successful write survives app exit; the static-command system PowerShell
+# layer is the isolated-process last resort. Overridable per-call (see
+# ``write_os_clipboard(strategies=...)``) so tests can substitute fakes
+# without monkeypatching module attributes.
 _WRITE_STRATEGIES: tuple[tuple[str, Callable[[str], bool]], ...] = (
     ("win32", _write_via_ctypes),
-    ("tkinter", _write_via_tk),
     ("powershell", _write_via_powershell),
 )
+
+
+def _strip_paste_controls(text: str, multiline: bool) -> str:
+    """
+    Summary:
+        Remove every unsafe paste character from ``text``. This is the one
+        strip step shared by the four paste entry points (terminal paste
+        and ``action_paste`` in each box class).
+
+    Args:
+        text (str): The pasted text to strip.
+        multiline (bool): ``True`` for a multi-line box (keeps TAB, LF and
+            CR); ``False`` for a single-line box (keeps TAB).
+
+    Returns:
+        str: ``text`` without its unsafe paste characters — C0 except NUL
+        and C1 (``_CONTROL_SCRUB`` without U+0000), the lone surrogates and
+        the bidi controls — minus the box's keep-set.
+
+    Data Flow:
+        - Uses the table ``_UNSAFE_PASTE_MULTI`` when ``multiline`` is set,
+          else ``_UNSAFE_PASTE_SINGLE``. Code points are removed, not whole
+          sequences, so an introducer disappears but its payload remains.
+        - It never splits lines: a single-line caller takes the first line
+          *before* calling this, so the line end that ends the first line
+          is still there to split on.
+
+    Dependencies:
+        Uses:
+            - ``_UNSAFE_PASTE_SINGLE`` / ``_UNSAFE_PASTE_MULTI``
+        Used by:
+            - :meth:`OsClipboardInput._on_paste`
+            - :meth:`OsClipboardInput.action_paste`
+            - :meth:`s19_app.tui.capped_text_area.CappedTextArea._on_paste`
+            - :meth:`s19_app.tui.capped_text_area.CappedTextArea.action_paste`
+    """
+    table = _UNSAFE_PASTE_MULTI if multiline else _UNSAFE_PASTE_SINGLE
+    return text.translate(table)
 
 
 def _bound_clipboard_text(text: Optional[str]) -> Optional[str]:
@@ -603,38 +566,37 @@ def read_os_clipboard(
 ) -> Optional[str]:
     """
     Summary:
-        Return the current OS clipboard text, or ``None`` when every
-        layer of the cascade fails.
+        Return the current Windows clipboard text, or ``None`` when no
+        layer of the cascade answers.
 
     Args:
         strategies (Optional[tuple[tuple[str, Callable[[], Optional[str]]], ...]]):
             Ordered cascade to attempt. When ``None`` (default) the
             module-level ``_STRATEGIES`` cascade is used
-            (tkinter → ctypes → PowerShell). Tests inject fake cascades
+            (ctypes-win32 → powershell). Tests inject fake cascades
             here to exercise failure and fallback ordering.
 
     Returns:
         Optional[str]: Clipboard text from the first strategy that
-        returns a non-``None`` value, bounded to
-        ``_CLIPBOARD_CAP_CHARS``; ``None`` when every strategy fails.
+        returns a non-empty string, bounded to ``_CLIPBOARD_CAP_CHARS``;
+        ``None`` when a strategy answered "no text" (``''``) or when no
+        strategy answered.
 
     Data Flow:
-        - Iterates ``strategies`` in order, calling each callable and
-          returning its result the first time it is not ``None``, after
-          bounding it through :func:`_bound_clipboard_text` so an
-          oversized clipboard cannot flow unbounded downstream.
-        - The default cascade prioritises the cheapest / most reliable
-          layer first (``tkinter``); each fallback layer costs more
-          latency but is impervious to the failure mode that could kill
-          the previous one. The worst-case wall-clock budget is dominated
-          by the PowerShell rescue (150 ms + 100 ms + 2,000 ms); the
-          cascade runs in an executor, off the UI event loop.
-        - Each strategy's own exceptions are swallowed inside the
-          strategy; this function does not raise.
+        - Iterates ``strategies`` in order. A ``None`` (could not answer)
+          or a raised exception counts as no answer and the next layer
+          runs. The first ``str`` ends the cascade: an empty ``''``
+          (answered, no text) returns ``None`` with its own WARNING, so
+          no rescue process starts and the caller falls back to the app
+          clipboard; a non-empty text is bounded through
+          :func:`_bound_clipboard_text` and returned with a DEBUG line.
+        - The default cascade runs the cheap Win32 read first, then the
+          system PowerShell rescue. The worst-case wall-clock budget is
+          the Win32 retries (0.1 s) plus one PowerShell subprocess
+          (2.0 s); the cascade runs in an executor, off the UI event loop.
 
     Dependencies:
         Uses:
-            - :func:`_read_via_tk`
             - :func:`_read_via_ctypes`
             - :func:`_read_via_powershell`
             - :func:`_bound_clipboard_text`
@@ -649,12 +611,18 @@ def read_os_clipboard(
         except Exception as exc:  # pragma: no cover — defensive.
             logger.debug("read_os_clipboard: %s raised %s", name, exc)
             continue
-        if text is not None:
-            text = _bound_clipboard_text(text)
-            logger.debug(
-                "read_os_clipboard succeeded via %s (len=%d)", name, len(text)
+        if text is None:
+            continue
+        if text == "":
+            logger.warning(
+                "read_os_clipboard: no text on the OS clipboard (via %s)", name
             )
-            return text
+            return None
+        text = _bound_clipboard_text(text)
+        logger.debug(
+            "read_os_clipboard succeeded via %s (len=%d)", name, len(text)
+        )
+        return text
     logger.warning(
         "read_os_clipboard: every strategy failed (cascade=%s)",
         [name for name, _ in cascade],
@@ -669,7 +637,7 @@ def write_os_clipboard(
     """
     Summary:
         Write ``text`` to the OS clipboard through the ordered
-        Win32 → Tk → PowerShell write cascade, returning ``True`` on the
+        Win32 → system PowerShell write cascade, returning ``True`` on the
         first successful strategy. The payload is capped at
         ``_CLIPBOARD_CAP_CHARS`` before any strategy runs.
 
@@ -679,8 +647,8 @@ def write_os_clipboard(
         strategies (Optional[tuple[tuple[str, Callable[[str], bool]], ...]]):
             Ordered cascade to attempt. When ``None`` (default) the
             module-level ``_WRITE_STRATEGIES`` cascade is used
-            (win32 → tkinter → powershell). Tests inject fake cascades
-            here to exercise failure and fallback ordering.
+            (win32 → powershell). Tests inject fake cascades here to
+            exercise failure and fallback ordering.
 
     Returns:
         bool: ``True`` when a strategy wrote the OS clipboard; ``False``
@@ -691,15 +659,13 @@ def write_os_clipboard(
         - Truncates ``text`` to ``_CLIPBOARD_CAP_CHARS`` once, then
           iterates ``strategies`` in order, returning ``True`` the first
           time a writer returns ``True``.
-        - Win32 runs first so a successful write survives app exit;
-          Tk rescue writes can vanish when the singleton root is
-          destroyed at exit; PowerShell is the isolated-process last
-          resort with a 2.0 s budget.
+        - Win32 runs first so a successful write survives app exit; the
+          system PowerShell layer is the isolated-process last resort with
+          a 2.0 s budget.
 
     Dependencies:
         Uses:
             - :func:`_write_via_ctypes`
-            - :func:`_write_via_tk`
             - :func:`_write_via_powershell`
             - ``_CLIPBOARD_CAP_CHARS``
         Used by:
@@ -724,16 +690,16 @@ def write_os_clipboard(
     return False
 
 
-async def _mirror_and_write_os_clipboard(app: "App", text: str) -> None:
+async def _mirror_and_write_os_clipboard(app: App, text: str) -> None:
     """
     Summary:
         Shared copy/cut tail for :class:`OsClipboardInput` and
         ``CappedTextArea``: truncate ``text`` to the cap, mirror it to
-        Textual's internal clipboard (cheap, synchronous, and retained
-        even if every OS layer fails), prime the Tk root on the UI thread,
-        then run the write cascade in the executor. On total OS failure
-        the internal mirror is kept and the exact write warning
-        ``_WRITE_FAIL_NOTIFICATION`` is painted.
+        Textual's internal clipboard through the toolkit base
+        ``App.copy_to_clipboard`` (cheap, synchronous, and retained even
+        if every OS layer fails), then run the write cascade in the
+        executor. On total OS failure the internal mirror is kept and the
+        exact write warning ``_WRITE_FAIL_NOTIFICATION`` is painted.
 
     Args:
         app: The running app — mirror target and notification surface.
@@ -743,16 +709,18 @@ async def _mirror_and_write_os_clipboard(app: "App", text: str) -> None:
         None.
 
     Data Flow:
-        - ``text[:_CLIPBOARD_CAP_CHARS]`` → ``app.copy_to_clipboard``
-          (internal mirror) → :func:`_prime_tk_root` on the UI thread →
+        - ``text[:_CLIPBOARD_CAP_CHARS]`` →
+          ``App.copy_to_clipboard(app, text)`` (the toolkit base, never an
+          app override, so the app clipboard and one OSC 52 request are
+          written exactly once per copy) →
           :func:`write_os_clipboard` in the executor →
           ``app.notify(_WRITE_FAIL_NOTIFICATION, severity="warning")``
           when the cascade returns ``False``.
 
     Dependencies:
         Uses:
-            - ``_CLIPBOARD_CAP_CHARS``, :func:`_prime_tk_root`,
-              :func:`write_os_clipboard`, ``_WRITE_FAIL_NOTIFICATION``
+            - ``_CLIPBOARD_CAP_CHARS``, :func:`write_os_clipboard`,
+              ``_WRITE_FAIL_NOTIFICATION``, ``textual.app.App``
         Used by:
             - :meth:`OsClipboardInput.action_copy`
             - :meth:`OsClipboardInput.action_cut`
@@ -761,10 +729,9 @@ async def _mirror_and_write_os_clipboard(app: "App", text: str) -> None:
     """
     text = text[:_CLIPBOARD_CAP_CHARS]
     try:
-        app.copy_to_clipboard(text)
+        App.copy_to_clipboard(app, text)
     except Exception:  # pragma: no cover — mirror is best-effort.
         logger.debug("internal clipboard mirror failed", exc_info=True)
-    _prime_tk_root()
     loop = asyncio.get_event_loop()
     written = await loop.run_in_executor(None, write_os_clipboard, text)
     if written:
@@ -786,28 +753,27 @@ class OsClipboardInput(Input):
     """
     Summary:
         Drop-in ``Input`` replacement whose ``action_paste`` reads from
-        the OS clipboard through a layered cascade
-        (tkinter → ctypes Win32 API → PowerShell ``Get-Clipboard``),
+        the Windows clipboard through a layered cascade
+        (ctypes Win32 API → the system PowerShell ``Get-Clipboard``),
         falling back to Textual's in-process buffer (``App._clipboard``)
         when every OS layer fails, and whose ``action_copy`` /
         ``action_cut`` write the selection to the OS clipboard through the
-        Win32 → Tk → PowerShell write cascade, keeping Textual's internal
+        Win32 → system PowerShell write cascade, keeping Textual's internal
         clipboard as a mirror/fallback. Surfaces ``notify`` warnings on
         total failure so the user knows the paste/copy did nothing and
         can reach for the OS-level workaround (Ctrl+Shift+V on Windows
-        Terminal).
+        Terminal). A right-click copies the shown selection, or pastes at
+        the cursor when there is none.
 
     Data Flow:
         - ``action_paste`` (bound to Ctrl+V by ``Input.BINDINGS``) is
           async so the cascade runs off the UI event loop via
           ``loop.run_in_executor`` — otherwise the worst-case PowerShell
-          subprocess (up to 2.0 s) would freeze the terminal. Before
-          entering the executor it primes the process-wide Tk root on the
-          main thread (see :func:`_prime_tk_root`), so the Tk layer is
-          only ever *read* from the executor thread.
+          subprocess (up to 2.0 s) would freeze the terminal.
         - The executor call yields to :func:`read_os_clipboard`; on
-          ``None`` we fall back to ``self.app.clipboard``. On non-empty
-          text, only the first line of the payload is inserted, matching
+          ``None`` we fall back to ``self.app.clipboard``, cut to the cap.
+          On non-empty text, only the first line of the payload is
+          inserted, stripped of its unsafe paste characters, matching
           Textual's stock ``Input._on_paste`` policy for single-line
           ``Input`` widgets.
         - The insertion goes through ``self.replace(text, start, end)``
@@ -830,11 +796,92 @@ class OsClipboardInput(Input):
         Uses:
             - :func:`read_os_clipboard`
             - :func:`_mirror_and_write_os_clipboard`
+            - :func:`_strip_paste_controls`
             - ``self.app.clipboard`` (fallback)
             - ``self.app.notify`` (UX signal on total failure)
         Used by:
             - :class:`s19_app.tui.screens.LoadDialog` (``#load_path``)
     """
+
+    # The cursor at a press that gave this box the focus (written by
+    # ``focus_on_click``, read and cleared by ``_on_mouse_down``): ``None``
+    # when the box already had the focus at the press. A class-level
+    # default that each instance overrides; no ``__init__`` is added.
+    _press_cursor: Optional[int] = None
+
+    def focus_on_click(self) -> bool:
+        """Record the cursor at a press that changes the focus.
+
+        The screen calls this synchronously for every mouse press on the
+        box, before it sets the focus and forwards the press. Writes
+        ``_press_cursor`` (the cursor position) only when
+        ``self.screen.focused is not self`` — this press changes the focus,
+        so the cursor must be read before the stock ``Input._on_focus``
+        selects the whole text. Returns ``super().focus_on_click()``, so
+        which widget gets the focus is unchanged.
+        """
+        if self.screen.focused is not self:
+            self._press_cursor = self.cursor_position
+        else:
+            self._press_cursor = None
+        return super().focus_on_click()
+
+    def _on_paste(self, event: events.Paste) -> None:
+        """Cut and strip a terminal paste into a single-line box in place.
+
+        Caps ``event.text`` to the limit, then takes its first line first
+        and strips the unsafe paste characters from it. A box with its own
+        ``restrict`` filter is never stripped: a first line that holds an
+        unsafe paste character is refused whole (``restricted()``,
+        ``prevent_default()``, ``stop()``) so the box is unchanged; any
+        other line keeps its raw text, so the stock ``Input._on_paste``
+        (which runs after this handler through the MRO) inserts the first
+        line and its own ``restrict`` check refuses a C0, DEL or NUL line.
+        This handler must not call ``super()._on_paste`` or the stock
+        handler would insert twice.
+        """
+        if len(event.text) > _CLIPBOARD_CAP_CHARS:
+            event.text = event.text[:_CLIPBOARD_CAP_CHARS]
+        if event.text:
+            first_line = event.text.splitlines()[0]
+            if self.restrict:
+                if _strip_paste_controls(first_line, multiline=False) != first_line:
+                    self.restricted()
+                    event.prevent_default()
+                    event.stop()
+                    return
+            else:
+                event.text = _strip_paste_controls(first_line, multiline=False)
+
+    async def _on_mouse_down(self, event: events.MouseDown) -> None:
+        """Copy or paste on a button-3 press, before the stock handler.
+
+        Button 3 (Ctrl or Alt held or not) is handled here: the press is
+        prevented (no stock ``Input._on_mouse_down`` cursor move) and
+        stopped (no ancestor or app handler). With a shown selection and
+        ``_press_cursor`` ``None`` (the box had the focus) it copies;
+        otherwise it drops the whole-text selection a press-made focus
+        made (the cursor goes back to the cursor at the press) and pastes.
+        Any other button returns, so the stock press handler runs as today.
+        """
+        press = self._press_cursor
+        self._press_cursor = None
+        if event.button != 3:
+            return
+        event.prevent_default()
+        event.stop()
+        if press is None and self.selected_text:
+            await self.action_copy()
+        else:
+            if press is not None:
+                self.cursor_position = press
+            await self.action_paste()
+
+    def _on_click(self, event: events.Click) -> None:
+        """Stop a button-3 click before the widget's text select runs."""
+        if event.button == 3:
+            event.prevent_default()
+            event.stop()
 
     async def action_copy(self) -> None:
         """Copy the current selection to the OS and internal clipboards.
@@ -892,21 +939,41 @@ class OsClipboardInput(Input):
         await _mirror_and_write_os_clipboard(self.app, selected_text)
 
     async def action_paste(self) -> None:
-        # Prime the process-wide Tk root on the UI thread (the main thread,
-        # where Tk demands creation) BEFORE the cascade runs in the executor
-        # — creating/destroying tk.Tk() from the executor thread is what
-        # used to kill layer 1 permanently mid-session (BUG B7 residual,
-        # 2026-10-18). Priming is a no-op once the root exists.
-        _prime_tk_root()
-        # Run the cascade off the UI event loop. Even the fast tk layer
-        # blocks synchronously (~89 ms measured), and the PowerShell
-        # rescue can spend up to 2.0 s in a blocking subprocess. Both
+        """Paste the OS clipboard text at the selection, stripped and capped.
+
+        Summary:
+            Async override of ``Input.action_paste``. Runs the read
+            cascade in the executor; falls back to the app clipboard
+            (cut to ``_CLIPBOARD_CAP_CHARS``) when no OS layer answers;
+            inserts the first line — stripped of its unsafe paste
+            characters, or refused whole when a ``restrict`` box would
+            admit one — at the selection. When the total result is empty
+            the field text is selected and the paste failure warning
+            painted.
+
+        Returns:
+            None.
+
+        Data Flow:
+            ``read_os_clipboard`` in the executor → internal fallback →
+            empty? → ``select_all()`` + notify; else first line → strip
+            (or refuse in a ``restrict`` box) → ``self.replace``.
+
+        Dependencies:
+            Uses: ``read_os_clipboard``, ``self.app.clipboard``,
+            ``_CLIPBOARD_CAP_CHARS``, ``_strip_paste_controls``,
+            ``_PASTE_FAIL_NOTIFICATION``.
+            Used by: the widget's ctrl+v key binding.
+        """
+        # Run the cascade off the UI event loop. The Win32 read blocks
+        # synchronously for its short retry window and the PowerShell
+        # rescue can spend up to 2.0 s in a blocking subprocess — both
         # would freeze the UI if invoked directly from the loop.
         loop = asyncio.get_event_loop()
         text = await loop.run_in_executor(None, read_os_clipboard)
         source = "os"
         if text is None:
-            text = self.app.clipboard
+            text = self.app.clipboard[:_CLIPBOARD_CAP_CHARS]
             source = "internal"
         if not text:
             # Every source empty — surface a warning so the user knows
@@ -927,7 +994,18 @@ class OsClipboardInput(Input):
                 "action_paste: no clipboard text available (source=%s)", source
             )
             return
-        first_line = text.splitlines()[0] if text else ""
+        first_line = text.splitlines()[0]
+        if self.restrict:
+            # A box with its own ``restrict`` filter (the Load path box)
+            # is never stripped: a first line holding an unsafe paste
+            # character is refused whole (R-LOADDLG.20), and any other
+            # line goes on raw so ``Input.replace`` refuses a C0, DEL or
+            # NUL line itself.
+            if _strip_paste_controls(first_line, multiline=False) != first_line:
+                self.restricted()
+                return
+        else:
+            first_line = _strip_paste_controls(first_line, multiline=False)
         start, end = self.selection
         self.replace(first_line, start, end)
         logger.debug(

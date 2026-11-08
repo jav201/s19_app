@@ -1,0 +1,48 @@
+# M-.7.1
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.7.1/s19_app/__init__.py
+# note: missing length taken as the datatype size
+#   EDIT-OK: '    address = tag.get("address")\n    byte_length = tag.get("length")\n '
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..0e18076d 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -486,6 +486,8 @@ def _describe_one(
+     address = tag.get("address")
+     byte_length = tag.get("length")
+     datatype = _resolve_datatype(tag, a2l_data, reads)
++    if byte_length is None and datatype in DATATYPE_SIZES:
++        byte_length = DATATYPE_SIZES[datatype]
+     byte_order = tag.get("effective_byte_order") or "little"
+     char_type = tag.get("char_type")
+     section_name = tag.get("section") or ""
+
+# --- pytest (rc=1) ---
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+__________________ test_r_a2l_def_7_1_2_no_length_is_refused ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-946/test_r_a2l_def_7_1_2_no_length0')
+
+    def test_r_a2l_def_7_1_2_no_length_is_refused(tmp_path):
+        """R-A2L-DEF.7.1/2 - ASCII CHARACTERISTIC with no NUMBER, MATRIX_DIM or LENGTH."""
+        a2l = _inline(tmp_path, _char("NL", "ASCII", "0x10", "RL_U8", "NO_COMPU_METHOD", "0", "255"))
+>       _is_refused(describe_definition("NL", a2l), "A2L-DEF-ADDRESS", "NL: the object has no address or no length")
+
+../base/tests/test_b103_a2l_definition.py:440: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='NL', section='CHARACTERISTIC', char_type='ASCII', kind='text', address=16, byte_length=1, datatype='U...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None)
+code = 'A2L-DEF-ADDRESS', message = 'NL: the object has no address or no length'
+
+    def _is_refused(d: Definition, code: str, message: str) -> None:
+>       assert d.refusal == Refusal(code, message), d.refusal
+E       AssertionError: None
+E       assert None == Refusal(code='A2L-DEF-ADDRESS', message='NL: the object has no address or no length')
+E        +  where None = Definition(name='NL', section='CHARACTERISTIC', char_type='ASCII', kind='text', address=16, byte_length=1, datatype='U...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None).refusal
+E        +  and   Refusal(code='A2L-DEF-ADDRESS', message='NL: the object has no address or no length') = Refusal('A2L-DEF-ADDRESS', 'NL: the object has no address or no length')
+
+../base/tests/test_b103_a2l_definition.py:165: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_7_1_2_no_length_is_refused
+1 failed, 1 passed, 189 deselected in 0.37s

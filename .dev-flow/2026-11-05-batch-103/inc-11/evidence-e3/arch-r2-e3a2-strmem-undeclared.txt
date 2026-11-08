@@ -1,0 +1,13 @@
+[base] e3s14_string_200k.a2l: 0.495 s, result 1, peak RSS 71.0 MB
+[alt] e3s14_string_200k.a2l: 0.008 s, result 2, peak RSS 29.1 MB
+[unrolled] e3s14_string_200k.a2l: 0.006 s, result 2, peak RSS 29.1 MB
+[perline] e3s14_string_200k.a2l: 0.062 s, result 8488894, peak RSS 41.0 MB
+[base] e3s14_string_200k.a2l: 0.367 s, result 1, peak RSS 70.9 MB
+[alt] e3s14_string_200k.a2l: 0.007 s, result 2, peak RSS 29.1 MB
+[unrolled] e3s14_string_200k.a2l: 0.006 s, result 2, peak RSS 29.1 MB
+[perline] e3s14_string_200k.a2l: 0.063 s, result 8488894, peak RSS 40.9 MB
+[base] e3s14_string_200k.a2l: 0.363 s, result 1, peak RSS 70.8 MB
+[alt] e3s14_string_200k.a2l: 0.006 s, result 2, peak RSS 29.1 MB
+[unrolled] e3s14_string_200k.a2l: 0.006 s, result 2, peak RSS 29.0 MB
+[perline] e3s14_string_200k.a2l: 0.060 s, result 8488894, peak RSS 40.9 MB
+[corpus] files 158; tags with a conversion method 240533; naming a COMPU_METHOD the file does not declare 878

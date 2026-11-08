@@ -1,0 +1,95 @@
+# E5 corrective - Code-Wire extractor re-run (inc-4, label_match.py, corrected)
+# date: 2026-11-07T04:13:15Z  host: Windows PC (extractor only; no s19_app import)
+# worktree HEAD: 885634bf078146f4abd5e04f343134334a4efa39
+# worktree status (s19_app, tests, tools):
+ M s19_app/tui/services/label_match.py
+ M tests/test_b103_label_match_perf.py
+# (end status)
+# code-wire: v3.1.0 e436a0812325e85a78ca2bdeaaf0fbfe39e8b4c5
+# copy: cp -r s19_app tests tools <scratch>/tree from the WORKTREE (the corrective
+# edits are uncommitted; the orchestrator commits). __pycache__ removed from the copy.
+# scratch: /tmp/tmp.AlE7793PqB
+# sha256 worktree s19_app/tui/services/label_match.py (corrected):
+394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0 *<worktree>/s19_app/tui/services/label_match.py
+# marks: one '# node: <name>' line above each of the 17 new defs (copy only) and above
+# parse_a2l_file; _fuzzy_tier, _text_tiers, _token_tier, _subsequence_tier, _cut and
+# _is_word_char left unmarked (tier/site helpers, allowed by the graph)
+$ grep -rn '# node:' <copy>/s19_app
+s19_app/tui/a2l.py:2797:# node: parse_a2l_file
+s19_app/tui/services/label_match.py:97:    # node: LabelIndex.__len__
+s19_app/tui/services/label_match.py:111:# node: build_label_index
+s19_app/tui/services/label_match.py:226:# node: rank
+s19_app/tui/services/label_match.py:612:# node: _fold
+s19_app/tui/services/label_match.py:629:# node: _char_mask
+s19_app/tui/services/label_match.py:667:# node: _tokens
+s19_app/tui/services/label_match.py:701:# node: _allowed_edits
+s19_app/tui/services/label_match.py:724:# node: _prefix_distance
+s19_app/tui/services/label_match.py:779:# node: _join_spans
+s19_app/tui/services/label_match.py:807:# node: _at_boundary
+s19_app/tui/services/label_match.py:841:# node: _subsequence
+s19_app/tui/services/label_match.py:867:# node: _parse_query
+s19_app/tui/services/label_match.py:900:# node: _classify
+s19_app/tui/services/label_match.py:993:# node: _order_key
+s19_app/tui/services/label_match.py:1016:# node: _token_range
+s19_app/tui/services/label_match.py:1043:# node: _build_trie
+s19_app/tui/services/label_match.py:1092:# node: _fuzzy_token_distances
+# mark count: 18
+$ python -m py_compile <copy>/s19_app/tui/services/label_match.py <copy>/s19_app/tui/a2l.py
+rc=0
+$ python C:/Users/<user>/Github/code-wire/tools/codewire_extract.py --repo <copy> --graph <inc-4>/codewire/graph-inc4.md --out <scratch>/out
+marks=18 graph_nodes=18 calls=23 findings=0 parse_failures=0
+extract rc=0
+$ ls <out>
+diff-report.md
+extract.json
+===== <out>/diff-report.md =====
+# Code-Wire extractor report
+
+- Marks found: 18
+- Graph nodes parsed: 18
+- Real calls between marked nodes: 23
+- Findings: 0 (0 drift, 0 info)
+- Ambiguous call resolutions (a name matched several defs): 3
+- Files that failed to parse: 0
+
+Type normalisation: spaces and quotes dropped; `List/Dict/Tuple/Set` -> builtins; `X | None` and graph `X?` -> `Optional[X]`; graph `(Callable) A->B` -> `Callable[[A], B]`; graph `tuple(A a, B b)` -> `tuple[A, B]`. A bare graph container (`dict`) against a parameterised code type (`dict[str, Any]`) is info (loose match), not drift.
+
+Call resolution is name-based (`f()`, `Class()` -> `__init__`, `self.m()`, `x.m()` -> top-level `m` or a marked method `m`); dynamic calls and callables passed as values are not seen. Tests excluded.
+
+## Counts
+
+| Kind | Count |
+|---|---|
+
+## Real calls between marked nodes
+
+| Caller | Callee | Sites |
+|---|---|---|
+| `_classify` | `_at_boundary` | s19_app/tui/services/label_match.py:945 |
+| `_classify` | `_fold` | s19_app/tui/services/label_match.py:932 |
+| `_classify` | `_join_spans` | s19_app/tui/services/label_match.py:967, s19_app/tui/services/label_match.py:985, s19_app/tui/services/label_match.py:990 |
+| `_classify` | `_subsequence` | s19_app/tui/services/label_match.py:987 |
+| `_classify` | `_tokens` | s19_app/tui/services/label_match.py:951 |
+| `_fuzzy_token_distances` | `_token_range` | s19_app/tui/services/label_match.py:1116 |
+| `_parse_query` | `_fold` | s19_app/tui/services/label_match.py:892 |
+| `_parse_query` | `_tokens` | s19_app/tui/services/label_match.py:893 |
+| `_tokens` | `_at_boundary` | s19_app/tui/services/label_match.py:694 |
+| `build_label_index` | `_build_trie` | s19_app/tui/services/label_match.py:208 |
+| `build_label_index` | `_char_mask` | s19_app/tui/services/label_match.py:169 |
+| `build_label_index` | `_fold` | s19_app/tui/services/label_match.py:168 |
+| `build_label_index` | `_tokens` | s19_app/tui/services/label_match.py:175 |
+| `rank` | `_allowed_edits` | s19_app/tui/services/label_match.py:542 (ref), s19_app/tui/services/label_match.py:556 |
+| `rank` | `_at_boundary` | s19_app/tui/services/label_match.py:355 |
+| `rank` | `_char_mask` | s19_app/tui/services/label_match.py:437 |
+| `rank` | `_classify` | s19_app/tui/services/label_match.py:500 |
+| `rank` | `_fuzzy_token_distances` | s19_app/tui/services/label_match.py:586 |
+| `rank` | `_order_key` | s19_app/tui/services/label_match.py:287, s19_app/tui/services/label_match.py:496 |
+| `rank` | `_parse_query` | s19_app/tui/services/label_match.py:278 |
+| `rank` | `_prefix_distance` | s19_app/tui/services/label_match.py:574 |
+| `rank` | `_subsequence` | s19_app/tui/services/label_match.py:444 |
+| `rank` | `_token_range` | s19_app/tui/services/label_match.py:388 |
+
+Top-level sites (no marked node above them):
+
+- `parse_a2l_file`: s19_app/tui/app.py:948, s19_app/tui/app.py:950, s19_app/tui/services/flow_execution_service.py:381, s19_app/tui/services/flow_execution_service.py:500, s19_app/tui/services/variant_execution_service.py:2665
+===== end diff-report.md =====

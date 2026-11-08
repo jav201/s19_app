@@ -1,0 +1,20 @@
+codewire_extract.py exit=1; stdout: marks=6 graph_nodes=6 calls=2 findings=6 parse_failures=0
+
+Line numbers below are mapped back to e07fb00 (the marks shift the copy).
+
+## Real calls between marked nodes (caller -> callee: sites)
+- S19TuiApp._answer_quit -> S19TuiApp._running_session_action: s19_app/tui/app.py:21620
+- S19TuiApp.action_quit -> S19TuiApp._running_session_action: s19_app/tui/app.py:21595
+
+## Callers outside the marked set (top-level sites)
+- S19TuiApp._compose_screen_a2l: s19_app/tui/app.py:3385
+- S19TuiApp._compose_screen_mac: s19_app/tui/app.py:3386
+- S19TuiApp._running_session_action: s19_app/tui/app.py:21586, s19_app/tui/app.py:6502
+
+## Findings (drift lines, expected only if a contract above is wrong)
+- graph_examples_missing:  
+- graph_examples_missing:  
+- graph_examples_missing:  
+- graph_examples_missing:  
+- graph_examples_missing:  
+- graph_examples_missing:  

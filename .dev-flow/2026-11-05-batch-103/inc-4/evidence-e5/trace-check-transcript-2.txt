@@ -1,0 +1,9 @@
+SLICE  s19_app/tui/services/label_match.py changed since e07fb00 and no requirement file names it
+EVID   .dev-flow/2026-11-05-batch-103/inc-4/04-validation.md cites evidence/..., which is not committed
+EVID   .dev-flow/2026-11-05-batch-103/inc-4/04-validation.md cites evidence/inc-4/green-after-corrective3.txt, which is not committed
+EVID   .dev-flow/2026-11-05-batch-103/inc-4/04-validation.md cites evidence/inc-4/int-green-behaviour.txt, which is not committed
+EVID   .dev-flow/2026-11-05-batch-103/inc-4/04-validation.md cites evidence/inc-4/mutant-table-r4-A.md, which is not committed
+EVID   .dev-flow/2026-11-05-batch-103/inc-4/04-validation.md cites evidence/inc-4/mutant-table-r4-B.md, which is not committed
+EVID   .dev-flow/2026-11-05-batch-103/inc-4/04-validation.md cites evidence/…, which is not committed
+trace_check: 2 US, 43 active requirements (0 withdrawn), 7 gap(s)
+EXIT=1

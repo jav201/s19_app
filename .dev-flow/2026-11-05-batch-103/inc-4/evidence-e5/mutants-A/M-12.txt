@@ -1,0 +1,22 @@
+=== DIFF base -> M-12 (s19_app/tui/services/label_match.py) ===
+diff --git a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py b/M-12/s19_app/tui/services/label_match.py
+index d274de0..cdbb3c7 100644
+--- a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py
++++ b/M-12/s19_app/tui/services/label_match.py
+@@ -576,7 +576,7 @@ def _allowed_edits(token: str) -> int:
+     if n <= 2:
+         return 0
+     if n <= 5:
+-        return 1
++        return 2
+     return 2
+ 
+ 
+
+=== PYTEST (tail) ===
+F...                                                                     [100%]
+=================================== FAILURES ===================================
+/tmp/b103-e5-4-mutA/M-12/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.12/3: query 'cvure' limit 20
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.12/3]
+1 failed, 3 passed, 125 deselected in 5.15s

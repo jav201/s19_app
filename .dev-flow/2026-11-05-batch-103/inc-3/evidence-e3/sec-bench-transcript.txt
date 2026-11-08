@@ -1,0 +1,23 @@
+A2L section tree has structural errors: path=/home/<user>/work/b103-int2a/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+s19_app.__file__ = /home/<user>/work/b103-int2a/s19_app/__init__.py
+python 3.11.18
+[B0] Definition fields: Inc 2a 24, with Inc 3a's 30
+[B1] ASAM.C.SCALAR.UBYTE.IDENTICAL: 10.44 us per element (median of 3 x 50,000); result kept 156 B per element (peak 165 B); non-Decoded 0; extrapolated to 1,048,576 elements: 10.9 s, 156 MiB kept
+[B1] ASAM.C.SCALAR.SWORD.IDENTICAL: 10.80 us per element (median of 3 x 50,000); result kept 190 B per element (peak 199 B); non-Decoded 0; extrapolated to 1,048,576 elements: 11.3 s, 190 MiB kept
+[B1] ASAM.C.SCALAR.SWORD.LINEAR_MUL_2: 11.48 us per element (median of 3 x 50,000); result kept 216 B per element (peak 225 B); non-Decoded 0; extrapolated to 1,048,576 elements: 12.0 s, 216 MiB kept
+[B2] IEEE checks used by _fixed_points:
+   2.0 ** 1023.9999999999999 -> 1.7976931348621742e+308 finite=True
+   2.0 ** 1023 -> 8.98846567431158e+307 finite=True
+   2.0 ** -1e9 -> 0.0 finite=True
+   2.0 ** -1075 -> 0.0 finite=True
+   1e308 + 1e308 -> inf finite=False
+   (4 - 1) * 2.0 ** 1023 -> inf finite=False
+   2.0 ** 1024 -> OverflowError: (34, 'Numerical result out of range')
+[B3] sizes: {'float': 24, 'int 1000': 28, 'int 2**62': 36, 'int(1e300)': 160, 'tuple slot': 8}
+[B4] _decode_scalar on a FLOAT16_IEEE count word: None
+   the count rule '0 or above point_count' -> TypeError: '>' not supported between instances of 'NoneType' and 'int'
+[B5] FLOAT32 count word 7F C0 00 00 -> nan: '0 or above 8' False, 'below 8' False (so the rule gives neither refusal)
+[B6] model digest over V171 + software_a, PYTHONHASHSEED=0: a5514f9a8adbf5a0
+[B6] model digest over V171 + software_a, PYTHONHASHSEED=1: a5514f9a8adbf5a0
+[B6] model digest over V171 + software_a, PYTHONHASHSEED=4242: a5514f9a8adbf5a0
+[B6] distinct digests: 1

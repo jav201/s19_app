@@ -1,0 +1,12 @@
+host=<runner> date=2026-11-06T21:53:02-06:00 clone=e07fb00f9fc13afd314d0334fac683fe33b29b6c changed=0 HOME=/tmp/b103-e1-11/<user>
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py | textual 8.2.8
+[P0] reader: name='Synthetic map' address=472727040 (= 0x1c2d3e00) length=4026 errors=[]
+[P1] product cells: ['· Synthetic map', '0x1C2D3E00', '4026', 'formula', '', '', 'n/a', 'unknown', '0..4095', '%.0', '', '', 'no', '', '', '']
+[P2] summary tag line: - CHARACTERISTIC Synthetic map: 0x1C2D3E00 len=4026 mem=unknown
+[P3 cell_padding=0] header: Tag            Address   LengthSource RawPhysicalInMemRegion Limits UnitBitsEndianVirtFuncAccessDtype
+[P3 cell_padding=0] row:    · Synthetic map0x1C2D3E004026  formula           n/a  unknown0..4095%.0           no
+[P3 cell_padding=0] '0x1C2D3E004026' painted: True | 'unknown0..4095' painted: True
+[P3 cell_padding=1] header:  Tag              Address     Length  Source   Raw  Physical  InMem  Region   Limits   Unit  Bits  Endian  Virt  Func  Access  Dtype
+[P3 cell_padding=1] row:     · Synthetic map  0x1C2D3E00  4026    formula                 n/a    unknown  0..4095  %.0                 no
+[P3 cell_padding=1] '0x1C2D3E004026' painted: False | 'unknown0..4095' painted: False
+exit=0 clone_changed_after=0

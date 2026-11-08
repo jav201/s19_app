@@ -1,0 +1,396 @@
+# red-stub-all transcript 2026-11-06T22:08:04-06:00 host <runner> tree /tmp/b103-e4-stub
+# command: python -m pytest -q -p no:cacheprovider -rA --tb=line tests/test_b103_a2l_definition.py tests/test_b103_a2l_definition_perf.py tests/test_b103_synth_definitions.py
+# cwd: /tmp/b103-e4-stub; python Python 3.11.18; HOME=/tmp/b103-e4-2a-tests/<user>
+/tmp/b103-e4-stub/s19_app/__init__.py
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF [ 39%]
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF [ 78%]
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF...EEEFE                                  [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of test_r_a2l_def_60_1_the_definitions_case_has_an_enum_with_a_default _
+E   AssertionError: usage: make_release_case.py [-h] --out OUT [--seed SEED] [--size-mb SIZE_MB]
+      make_release_case.py: error: unrecognized arguments: --case definitions
+      
+    assert 2 == 0
+     +  where 2 = CompletedProcess(args=['/home/<user>/miniconda3/envs/s19ci/bin/python', '/tmp/b103-e4-stub/tools/synth/make_release_...-out OUT [--seed SEED] [--size-mb SIZE_MB]\nmake_release_case.py: error: unrecognized arguments: --case definitions\n').returncode
+___ ERROR at setup of test_r_a2l_def_61_1_two_disjoint_masks_at_one_address ____
+E   AssertionError: usage: make_release_case.py [-h] --out OUT [--seed SEED] [--size-mb SIZE_MB]
+      make_release_case.py: error: unrecognized arguments: --case definitions
+      
+    assert 2 == 0
+     +  where 2 = CompletedProcess(args=['/home/<user>/miniconda3/envs/s19ci/bin/python', '/tmp/b103-e4-stub/tools/synth/make_release_...-out OUT [--seed SEED] [--size-mb SIZE_MB]\nmake_release_case.py: error: unrecognized arguments: --case definitions\n').returncode
+_ ERROR at setup of test_r_a2l_def_62_1_the_display_object_has_format_unit_and_wider_extended_limits _
+E   AssertionError: usage: make_release_case.py [-h] --out OUT [--seed SEED] [--size-mb SIZE_MB]
+      make_release_case.py: error: unrecognized arguments: --case definitions
+      
+    assert 2 == 0
+     +  where 2 = CompletedProcess(args=['/home/<user>/miniconda3/envs/s19ci/bin/python', '/tmp/b103-e4-stub/tools/synth/make_release_...-out OUT [--seed SEED] [--size-mb SIZE_MB]\nmake_release_case.py: error: unrecognized arguments: --case definitions\n').returncode
+_ ERROR at setup of test_at_b103_i2_2_the_definitions_case_decodes_to_its_planned_values_through_the_loaders _
+E   AssertionError: usage: make_release_case.py [-h] --out OUT [--seed SEED] [--size-mb SIZE_MB]
+      make_release_case.py: error: unrecognized arguments: --case definitions
+      
+    assert 2 == 0
+     +  where 2 = CompletedProcess(args=['/home/<user>/miniconda3/envs/s19ci/bin/python', '/tmp/b103-e4-stub/tools/synth/make_release_...-out OUT [--seed SEED] [--size-mb SIZE_MB]\nmake_release_case.py: error: unrecognized arguments: --case definitions\n').returncode
+=================================== FAILURES ===================================
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:257: AssertionError: assert ('' == 'number'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:263: AssertionError: assert ('' == 'number'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:271: AssertionError: assert '' == 'number'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:278: AssertionError: assert ('' == 'number'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:284: AssertionError: assert ('' == 'enum'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:290: AssertionError: assert ('' == 'enum'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:296: AssertionError: assert ('' == 'enum'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:302: AssertionError: assert ('' == 'text'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:308: AssertionError: assert ('' == 'text'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:384: AssertionError: assert (None == 32)
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:390: AssertionError: assert (None == 0)
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:481: AssertionError: assert (Refusal(code='A2L-DEF-NAME', message='stub: refuses everything') is None)
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:518: AssertionError: assert (None == 'CM.TAB_VERB.DEFAULT_VALUE')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:524: AssertionError: assert (None == 'CM.IDENTICAL')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:530: AssertionError: assert (None == 'RKR_KC_VVOYJDA')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:536: AssertionError: assert None == 'esdl_model_GameControllerStatemachineStates'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:590: AssertionError: assert [] == [(1.0, None, ...one, 'Sinus')]
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:596: AssertionError: assert '' == 'enum'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:604: AssertionError: assert [] == [(2.0, None, ..., None, '10')]
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:611: AssertionError: assert 0 == 11
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:618: StopIteration
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:628: AssertionError: assert None == 'unknown signal type'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:633: AssertionError: assert None == 'out of range value'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:656: AssertionError: assert (None == 4080)
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:663: AssertionError: assert (None == 16)
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:669: AssertionError: assert (None == 16777215)
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:719: AttributeError: 'NoneType' object has no attribute 'lower'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:726: AttributeError: 'NoneType' object has no attribute 'lower'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:734: AssertionError: assert (None is None and None == '%5.0')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:745: AssertionError: assert None is not None
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:754: assert ((None, None) == (0, 100)
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:759: AssertionError: assert None == '%6.1'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:764: AssertionError: assert None == '%5.0'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:770: AssertionError: assert (None == '%3.0')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:775: AssertionError: assert None == '%12.4'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:781: AssertionError: assert 'A2L-DEF-NAME' == 'A2L-DEF-KIND'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:787: AssertionError: assert 'A2L-DEF-NAME' == 'A2L-DEF-ADDRESS'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:794: AssertionError: assert 'A2L-DEF-NAME' == 'A2L-DEF-TABLE'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:812: AssertionError: assert (True and Refusal(code=...s everything') == Refusal(code=...s everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:820: AssertionError: assert Refusal(code=...s everything') == Refusal(code=...in the image')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:857: AssertionError: assert Refusal(code=...s everything') == Refusal(code=...r this value')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:863: AssertionError: assert Refusal(code=...s everything') == Refusal(code=...r this value')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:869: AssertionError: assert Refusal(code=...s everything') == Refusal(code=... denominator')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:156: AssertionError: assert None is not None
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:156: AssertionError: assert None is not None
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:156: AssertionError: assert None is not None
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:156: AssertionError: assert None is not None
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:156: AssertionError: assert None is not None
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:156: AssertionError: assert None is not None
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:156: AssertionError: assert None is not None
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:156: AssertionError: assert None is not None
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:156: AssertionError: assert None is not None
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1093: AssertionError: assert (Refusal(code='A2L-DEF-NAME', message='stub: refuses everything') is None)
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1105: assert (0 == 322)
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1111: AssertionError: assert (Refusal(code='A2L-DEF-NAME', message='stub: refuses everything') is not None and 'A2L-DEF-NAME' == 'A2L-DEF-TABLE-EMPTY'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1111: AssertionError: assert (Refusal(code='A2L-DEF-NAME', message='stub: refuses everything') is not None and 'A2L-DEF-NAME' == 'A2L-DEF-TABLE-EMPTY'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1111: AssertionError: assert (Refusal(code='A2L-DEF-NAME', message='stub: refuses everything') is not None and 'A2L-DEF-NAME' == 'A2L-DEF-TABLE-EMPTY'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1111: AssertionError: assert (Refusal(code='A2L-DEF-NAME', message='stub: refuses everything') is not None and 'A2L-DEF-NAME' == 'A2L-DEF-TABLE-EMPTY'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1141: AssertionError: assert (Refusal(code='A2L-DEF-NAME', message='stub: refuses everything') is not None and 'A2L-DEF-NAME' == 'A2L-DEF-MASK'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1155: AssertionError: assert (Refusal(code='A2L-DEF-NAME', message='stub: refuses everything') is not None and 'A2L-DEF-NAME' == 'A2L-DEF-MASK'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1163: AssertionError: assert (Refusal(code='A2L-DEF-NAME', message='stub: refuses everything') is not None and 'A2L-DEF-NAME' == 'A2L-DEF-ADDRESS'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1171: AssertionError: assert (Refusal(code='A2L-DEF-NAME', message='stub: refuses everything') is not None and 'A2L-DEF-NAME' == 'A2L-DEF-ADDRESS'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1179: AssertionError: assert (Refusal(code='A2L-DEF-NAME', message='stub: refuses everything') is not None and 'A2L-DEF-NAME' == 'A2L-DEF-ADDRESS'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1187: AssertionError: assert (None is None and (None, None) == (0, 100)
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1195: AssertionError: assert (None is not None)
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1204: AssertionError: assert (None == (0.0, 0.0, 0.0, 0.0, 0.0, 0.0))
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1213: AssertionError: assert ('' == 'enum'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1227: AssertionError: assert (Refusal(code='A2L-DEF-NAME', message='stub: refuses everything') is None)
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:165: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1288: AssertionError: assert '' == 'number'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1299: AssertionError: assert None == 8454148
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1304: AssertionError: assert None == 80384
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1310: AssertionError: assert (None == 1)
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1315: AssertionError: assert None == 'SWORD'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1323: AssertionError: assert None == 'SWORD'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1329: AssertionError: assert 'little' == 'big'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1337: AssertionError: assert 'little' == 'big'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1344: AssertionError: assert 'little' == 'big'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1352: AssertionError: assert 'little' == 'big'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1357: AssertionError: assert '' == 'V'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1363: AssertionError: assert '' == 'deg C'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1368: AssertionError: assert '' == 'hours'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1376: AssertionError: assert ('' == 'km/h'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1439: AssertionError: assert None == (2.0, None)
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1460: AssertionError: assert (True and 'stub: refuses everything' == 'R1: RAT_FUNC...or this value'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1466: AssertionError: assert (True and 'stub: refuses everything' == 'R2: RAT_FUNC...or this value'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1472: AssertionError: assert (True and 'stub: refuses everything' == 'R3: RAT_FUNC...o denominator'
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:170: AssertionError: Refusal(code='A2L-DEF-NAME', message='stub: refuses everything')
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1525: AssertionError: assert ['', '', ''] == ['nan', 'inf', '-inf']
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1558: AssertionError: ('ASAM.C.SCALAR.SWORD.TAB_VERB_DEFAULT_VALUE', Refusal(code='A2L-DEF-NAME', message='stub: refuses everything'))
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition.py:1578: AssertionError: ('VALUE_0001', Refusal(code='A2L-DEF-NAME', message='stub: refuses everything'))
+/tmp/b103-e4-stub/tests/test_b103_a2l_definition_perf.py:46: assert (False)
+/tmp/b103-e4-stub/tests/test_b103_synth_definitions.py:226: AssertionError: usage: make_release_case.py [-h] --out OUT [--seed SEED] [--size-mb SIZE_MB]
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_b103_synth_definitions.py::test_r_a2l_def_59_1_case08_at_1_mib_equals_its_pin
+PASSED tests/test_b103_synth_definitions.py::test_r_a2l_def_59_2_case08_at_10_mib_equals_its_pin
+PASSED tests/test_b103_synth_definitions.py::test_r_a2l_def_59_3_object_list_digest_equals_the_e4_pin
+ERROR tests/test_b103_synth_definitions.py::test_r_a2l_def_60_1_the_definitions_case_has_an_enum_with_a_default
+ERROR tests/test_b103_synth_definitions.py::test_r_a2l_def_61_1_two_disjoint_masks_at_one_address
+ERROR tests/test_b103_synth_definitions.py::test_r_a2l_def_62_1_the_display_object_has_format_unit_and_wider_extended_limits
+ERROR tests/test_b103_synth_definitions.py::test_at_b103_i2_2_the_definitions_case_decodes_to_its_planned_values_through_the_loaders
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_1_1_value_with_plain_method_is_a_number
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_1_2_scalar_measurement_is_a_number
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_1_3_no_compu_method_gives_a_number
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_1_4_case08_value_is_a_number
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_2_1_tab_verb_with_long_identifier_on_its_own_line_is_an_enum
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_2_2_a2ltool_tab_verb_is_an_enum
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_2_3_commented_tab_verb_header_is_an_enum
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_3_1_ascii_characteristic_is_a_text
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_3_2_case08_ascii_is_a_text
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_4_1_val_blk_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_4_2_curve_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_4_3_map_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_4_4_cuboid_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_4_5_map_block_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_4_6_vendor_kind_is_refused_and_keeps_its_address
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_4_7_array_measurement_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_4_8_header_with_no_kind_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_5_1_the_one_tag_of_a_name_is_used_case_included
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_5_2_case08_name_declared_once
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_6_1_unknown_name_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_6_2_name_is_matched_with_its_case
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_139_1_name_declared_twice_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_139_2_case08_issues_duplicate
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_139_3_commented_out_old_copy_counts_as_a_second_declaration
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_7_1_1_no_address_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_7_1_2_no_length_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_7_2_1_length_zero_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_7_2_2_negative_length_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_7_2_3_length_above_one_mib_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_7_2_4_negative_address_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_7_2_5_span_ending_above_32_bits_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_7_2_6_span_whose_last_byte_is_0xffffffff_is_readable
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_8_1_unreadable_layout_datatype_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_8_2_unknown_measurement_datatype_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_9_1_length_not_the_datatypes_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_10_1_type_of_a_multi_line_v171_method
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_10_2_type_of_an_identical_method
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_10_3_type_of_an_a2ltool_method
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_10_4_type_of_a_commented_header
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_11_1_undeclared_method_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_12_1_form_is_not_supported
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_12_2_an_unlisted_type_is_not_supported
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_12_3_a_record_with_no_type_is_not_supported
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_13_1_enum_with_no_table_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_13_2_dangling_table_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_14_1_pairs_of_a_v171_compu_vtab
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_14_2_negative_raw_first
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_14_3_file_order_and_numeric_text_stay_as_written
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_15_1_triples_of_a_v171_compu_vtab_range
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_15_2_a2ltool_range_table
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_16_1_default_text_of_a_compu_vtab
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_16_2_default_text_of_a_range_table
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_17_1_count_zero_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_17_2_count_not_a_number_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_18_1_hexadecimal_mask
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_18_2_decimal_mask - ...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_18_3_a_24_bit_mask_on_a_ulong
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_19_1_mask_zero_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_19_2_mask_wider_than_the_datatype_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_19_3_mask_on_a_float_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_19_4_unreadable_mask_word_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_19_5_mask_on_a_text_object_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_19_9_signed_mask_with_bit_0_and_the_sign_bit_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_20_1_integer_extended_limits
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_20_2_decimal_extended_limits
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_21_1_one_number_gives_no_extended_limits
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_21_2_words_give_no_extended_limits
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_21_3_non_finite_words_give_no_extended_limits
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_22_1_format_overrides_the_method_format
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_22_2_format_with_a_trailing_comment
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_23_1_method_format_is_the_fallback
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_23_2_format_of_a_commented_header
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_24_1_kind_comes_before_address
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_24_2_address_comes_before_method
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_24_3_table_comes_before_mask
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_24_4_address_comes_before_the_mask
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_25_1_decode_gives_the_definitions_refusal
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_26_1_a_missing_byte_is_refused_at_decode
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_27_1_multi_bit_field
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_27_2_single_bit_field
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_27_3_field_of_a_signed_datatype_is_unsigned
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_28_1_rat_func_no_solution
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_28_2_rat_func_no_real_root
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_28_3_rat_func_zero_denominator
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_29_1_first_of_two_entries_with_one_raw
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_30_1_range_min - Ass...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_30_2_range_max - Ass...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_30_3_inside_a_range
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_30_4_one_value_range
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_31_1_default_text_of_a_compu_vtab
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_31_2_default_text_of_a_range_table
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_32_1_unmatched_value_with_no_default_pairs
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_32_2_unmatched_value_with_no_default_ranges
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_33_1_text_ended_by_a_nul
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_33_2_case08_text - A...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_33_3_text_with_no_nul
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_34_1_control_byte_shows_as_u_fffd
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_34_2_bytes_above_0x7e_show_as_u_fffd
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_35_1_two_decimals - ...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_35_2_zero_decimals_a_tie
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_35_3_four_decimals
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_35_4_exact_binary_tie
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_35_5_fifteen_or_more_decimals_round_to_15_significant_digits
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_35_6_float32_at_15_decimals
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_36_1_decimals_are_capped_at_17
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_37_1_no_format_gives_the_15_digit_text
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_37_2_percent_alone_gives_no_decimals
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_37_3_a_length_with_no_decimals
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_37_4_an_unreadable_format
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_38_1_integer_text_under_many_decimals
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_38_2_integer_text_of_an_identical_field
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_39_1_nan - Assertion...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_39_2_positive_infinity
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_39_3_negative_infinity
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_1_1_v171_and_its_image_are_unchanged
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_1_2_case08_is_unchanged
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_1_count_1e400
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_2_count_nan - A...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_3_count_minus_3
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_4_count_2_5 - A...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_5_a_5000_digit_decimal_mask_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_6_a_5000_digit_decimals_run_is_capped
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_7_bit_mask_0xzz_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_8_number_minus_5
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_9_number_above_one_mib
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_10_negative_ecu_address
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_11_non_finite_extended_limits
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_12_non_finite_coefficients_read_as_missing
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_13_all_zero_rat_func
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_14_esc_and_unterminated_quote_in_an_entry_text
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_15_v171_unclosed_begin
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_16_float_enum_with_a_non_finite_stored_value
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_17_masked_object_with_no_datatype
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_137_1_nul_in_an_enum_text
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_137_2_esc_in_an_enum_text
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_137_3_nul_in_a_name
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_137_4_esc_in_a_name
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_136_1_batch_describe_equals_per_name_describe
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_010_def_1_address_from_a_characteristic_header
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_011_def_1_address_from_ecu_address
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_014_def_1_length_from_the_datatype_when_the_tag_lacks_it
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_022_def_1_datatype_from_the_record_layout
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_023_def_1_datatype_the_deposit_name_spells
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_024_def_1_byte_order_of_the_tag
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_025_def_1_byte_order_of_the_record_layout
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_026_def_1_byte_order_of_mod_common
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_027_def_1_default_byte_order
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_030_def_1_phys_unit - As...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_030_def_2_a_unit_with_a_space
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_031_def_1_the_methods_unit
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_033_def_1_unit_on_the_begin_line
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_040_def_1_raw_bytes_are_read_from_the_image
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_043_def_1_byte_order_of_the_read
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_044_def_1_twos_complement
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_045_def_1_float16 - Asse...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_045_def_2_float32 - Asse...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_045_def_3_float64 - Asse...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_051_def_1_no_compu_method
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_053_def_1_identical - As...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_054_def_1_linear - Asser...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_055_def_1_linear_with_b_missing
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_056_def_1_rat_func - Ass...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_057_def_1_root_inside_the_limits
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_058_1_def_1_no_solution_message
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_058_2_def_1_no_real_root_message
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_058_3_def_1_zero_denominator_message
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_059_def_1_compu_vtab_text
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_059_def_2_text_of_a_masked_enum
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_061_def_1_tab_intp - Ass...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_062_def_1_tab_intp_outside_the_table
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_063_def_1_tab_nointp_nearest
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_39_4_display_text_of_non_finite_values_direct
+FAILED tests/test_b103_a2l_definition.py::test_at_b103_i2_1_asam_demo_scalar_kinds_decode_to_the_text_the_a2l_gives
+FAILED tests/test_b103_a2l_definition.py::test_at_b103_i2_3_case08_builds_and_decodes_with_the_model
+FAILED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_136_1_describing_every_object_is_fast
+FAILED tests/test_b103_synth_definitions.py::test_r_a2l_def_63_1_the_definitions_case_is_deterministic
+176 failed, 3 passed, 4 errors in 8.13s
+# exit 1

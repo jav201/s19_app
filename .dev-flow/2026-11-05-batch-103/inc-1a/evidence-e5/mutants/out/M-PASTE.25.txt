@@ -1,0 +1,118 @@
+# M-PASTE.25
+# row: R-PASTE.25
+# s19_app.__file__ = /tmp/b103-e5-1a-mut/work/s19_app/__init__.py
+# note: the right-click copy skipped (app-clipboard mirror never runs)
+# --- git diff ---
+diff --git a/s19_app/tui/capped_text_area.py b/s19_app/tui/capped_text_area.py
+index 42582b4d..83ffaa73 100644
+--- a/s19_app/tui/capped_text_area.py
++++ b/s19_app/tui/capped_text_area.py
+@@ -324,7 +324,7 @@ class CappedTextArea(TextArea):
+         event.prevent_default()
+         event.stop()
+         if self.selected_text:
+-            await self.action_copy()
++            pass  # mutant: right-click copy skipped
+         else:
+             await self.action_paste()
+ 
+diff --git a/s19_app/tui/os_clipboard_input.py b/s19_app/tui/os_clipboard_input.py
+index ad2f7240..0076b1d6 100644
+--- a/s19_app/tui/os_clipboard_input.py
++++ b/s19_app/tui/os_clipboard_input.py
+@@ -871,7 +871,7 @@ class OsClipboardInput(Input):
+         event.prevent_default()
+         event.stop()
+         if press is None and self.selected_text:
+-            await self.action_copy()
++            pass  # mutant: right-click copy skipped
+         else:
+             if press is not None:
+                 self.cursor_position = press
+
+# --- pytest (rc=1) ---
+160, 48)) as pilot:
+                await pilot.pause()
+                app._clipboard = "BEFORE"
+                app.action_show_screen("a2l")
+                for _ in range(4):
+                    await pilot.pause()
+                box = app.query_one("#a2l_tags_filter_input", Input)
+                box.focus()
+                await pilot.pause()
+                box.value = "AAAA-BBBB"
+                box.selection = (0, 4)
+                await pilot.pause()
+                await right_click_app_route(app, pilot, box)
+                await pilot.pause()
+                return app.clipboard
+    
+>       assert asyncio.run(_drive()) == "AAAA"
+E       AssertionError: assert 'BEFORE' == 'AAAA'
+E         
+E         - AAAA
+E         + BEFORE
+
+tests/test_b103_clipboard_core.py:1104: AssertionError
+______ test_r_paste_25_3_and_26_3_multi_line_unfocused_right_click_copies ______
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10033/test_r_paste_25_3_and_26_3_mul0')
+
+    def test_r_paste_25_3_and_26_3_multi_line_unfocused_right_click_copies(
+        tmp_path: Path,
+    ) -> None:
+        """R-PASTE.25/3 + .26/3 (LinuxH): an unfocused Box 2 copies the selection it shows."""
+        _assert_linuxh_headless()
+    
+        async def _drive() -> tuple:
+            async for app, pilot, widget in _one_box_app("textarea"):
+                app._clipboard = "BEFORE"
+                widget.text = "AAAA-BBBB"
+                widget.selection = ((0, 0), (0, 4))
+                widget.focus()
+                await pilot.pause()
+                await _unfocus(app, pilot)
+                await right_click_app_route(app, pilot, widget)
+                await pilot.pause()
+                return app.clipboard, widget.text, widget.selection, widget.has_focus
+    
+        clip, value, selection, focused = asyncio.run(_drive())
+>       assert clip == "AAAA", clip
+E       AssertionError: BEFORE
+E       assert 'BEFORE' == 'AAAA'
+E         
+E         - AAAA
+E         + BEFORE
+
+tests/test_b103_clipboard_core.py:2059: AssertionError
+------------------------------ Captured log call -------------------------------
+ERROR    asyncio:base_events.py:1785 unhandled exception during asyncio.run() shutdown
+task: <Task finished name='Task-5211' coro=<<async_generator_athrow without __name__>()> exception=ValueError("<Token var=<ContextVar name='active_message_pump' at 0x7f274e1fe7f0> at 0x7f274cd6ba00> was created in a different Context")>
+Traceback (most recent call last):
+  File "/home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 2210, in run_test
+    yield pilot
+  File "/tmp/b103-e5-1a-mut/work/tests/test_b103_clipboard_core.py", line 1077, in _one_box_app
+    yield app, pilot, widget
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/tmp/b103-e5-1a-mut/work/tests/test_b103_clipboard_core.py", line 1072, in _one_box_app
+    async with app.run_test(size=(80, 30)) as pilot:
+  File "/home/<user>/miniconda3/envs/s19ci/lib/python3.11/contextlib.py", line 231, in __aexit__
+    await self.gen.athrow(typ, value, traceback)
+  File "/home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 2205, in run_test
+    with app._context():
+  File "/home/<user>/miniconda3/envs/s19ci/lib/python3.11/contextlib.py", line 158, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/home/<user>/miniconda3/envs/s19ci/lib/python3.11/site-packages/textual/app.py", line 1107, in _context
+    active_message_pump.reset(message_pump_reset_token)
+ValueError: <Token var=<ContextVar name='active_message_pump' at 0x7f274e1fe7f0> at 0x7f274cd6ba00> was created in a different Context
+=========================== short test summary info ============================
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_25_right_click_puts_selection_on_app_clipboard[single]
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_25_right_click_puts_selection_on_app_clipboard[multi]
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_25_3_and_26_3_multi_line_unfocused_right_click_copies
+3 failed, 84 deselected in 5.64s
+
+===== stderr =====

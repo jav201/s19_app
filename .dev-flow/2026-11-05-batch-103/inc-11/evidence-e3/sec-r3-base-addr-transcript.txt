@@ -1,0 +1,12 @@
+# scripts/sec-r3-p_r3_base.py addr 2026-11-07T01:36:51-06:00 host <runner> clone e07fb00f status 0 changed; corpus files 168 (read-only); load 2.82 1.37 1.41
+s19_app imported from the read-only clone: True
+[B3-ADDR ecu 0x1C2D 3E00] base tag: address=0x1c2d length=2 effective_byte_order=big errors=[]
+[B3-ADDR ecu 0x1C2D 3E00] symbol entry (Patch Editor, value 4660): address=0x1C2D bytes=1234 issues=[]
+[B3-ADDR ecu 0x1C2D 3E00] picker row ('Use parameter'): address=0x1C2D size=2 fmt='u16 %.0'
+[B3-ADDR ecu 0x1C2D / 3E00 (next line)] base tag: address=0x1c2d length=2 effective_byte_order=big errors=[]
+[B3-ADDR ecu 0x1C2D / 3E00 (next line)] symbol entry (Patch Editor, value 4660): address=0x1C2D bytes=1234 issues=[]
+[B3-ADDR ecu 0x1C2D / 3E00 (next line)] picker row ('Use parameter'): address=0x1C2D size=2 fmt='u16 %.0'
+[B3-ADDR ecu 0x1C2D3E00 (whole, control)] base tag: address=0x1c2d3e00 length=2 effective_byte_order=big errors=[]
+[B3-ADDR ecu 0x1C2D3E00 (whole, control)] symbol entry (Patch Editor, value 4660): address=0x1C2D3E00 bytes=1234 issues=[]
+[B3-ADDR ecu 0x1C2D3E00 (whole, control)] picker row ('Use parameter'): address=0x1C2D3E00 size=2 fmt='u16 %.0'
+# exit 0 ; clone status after: 0 changed

@@ -1,0 +1,31 @@
+===== diff -u (base vs mutant) s19_app/tui/services/label_match.py =====
+--- /tmp/b103-e5-4-mutB/base/s19_app/tui/services/label_match.py	2026-11-06 20:36:19.839317227 -0600
++++ /tmp/b103-e5-4-mutB/M-30/s19_app/tui/services/label_match.py	2026-11-06 21:03:30.163492618 -0600
+@@ -806,7 +806,7 @@
+             match_span: tuple[int, int] | None = None
+             for start, end in name_spans:
+                 if folded[start:end].startswith(query_token):
+-                    match_span = (start, start + len(query_token))
++                    match_span = (start, end)
+                     break
+             if match_span is None:
+                 token_ok = False
+===== pytest tail =====
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________________________ test_rows_30_token_spans ___________________________
+
+prep = <function prep.<locals>.get at 0x7fbb0daf8f40>
+
+    def test_rows_30_token_spans(prep):
+        """R-A2L-MATCH.30/1, .30/2 (leftmost name token a query token starts) and .30/3 (one-letter token)."""
+>       assert [m.spans for m in run(prep, "C08", "blk val 00", 3)] == [((0, 3), (4, 7), (8, 10))] * 3
+E       assert [((0, 3), (4,... 7), (8, 12))] == [((0, 3), (4,... 7), (8, 10))]
+E         
+E         At index 0 diff: ((0, 3), (4, 7), (8, 12)) != ((0, 3), (4, 7), (8, 10))
+E         Use -v to get more diff
+
+/home/<user>/work/b103-int4/tests/test_b103_label_match.py:501: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_rows_30_token_spans - assert [((0...
+1 failed, 128 deselected in 4.86s

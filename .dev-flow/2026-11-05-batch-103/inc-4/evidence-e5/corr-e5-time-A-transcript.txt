@@ -1,0 +1,27 @@
+s19_app.__file__ = /tmp/b103-e5-4-corr/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5-4-corr/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 24564b32d53f142b85fb33825aed3c30a116fbaaf4808be45e4378b2d8bedb9b
+sec-e5-probe.py sha256 = 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+this probe sha256 = 5fd0b981d2b03082636db885b71632c8ebd7a3f5dfc6bee25018dde89dc8aeb4
+variant = A (A: walk every distinct token; C: A + switch at <= 512 candidate token occurrences, step 6 by the tier's rule)
+mode = time  python = 3.11.18  host = <runner>  load = (1.08, 0.86, 0.74)  cpus = 16
+HOME = /tmp/b103-e5-4-corr/<user>  LOCALAPPDATA = /tmp/b103-e5-4-corr/<user>/localappdata
+
+A. CRAFT (50,000 names; 300 crafted of 1,024 characters + 49,700 REF), limit 20; load (1.07, 0.86, 0.75)
+   4 tokens ( 21 ch): pinned median of 7     29.8 ms, _prefix_distance 0/ranking, listed 20 ['fuzzy'] | current (per-candidate check) median of 3     970.5 ms, _prefix_distance 216,893/ranking
+   8 tokens ( 41 ch): pinned median of 7     44.5 ms, _prefix_distance 0/ranking, listed 20 ['fuzzy']
+  16 tokens ( 81 ch): pinned median of 7     76.7 ms, _prefix_distance 0/ranking, listed 20 ['fuzzy']
+  32 tokens (161 ch): pinned median of 7    140.2 ms, _prefix_distance 0/ranking, listed 20 ['fuzzy']
+  51 tokens (256 ch): pinned median of 7    218.6 ms, _prefix_distance 0/ranking, listed 20 ['fuzzy'] | current (per-candidate check) median of 3   15959.2 ms, _prefix_distance 3,530,910/ranking
+  subsequence shape (139 ch): pinned median of 7    168.2 ms, _prefix_distance 0/ranking, listed 20 ['subsequence'] | current median of 3    8374.7 ms, _prefix_distance 1,838,646/ranking
+  2,000 crafted + 48,000 REF, 51 tokens: pinned median of 7    286.4 ms | current (map path) median of 3   2418.7 ms; load (1.25, 0.97, 0.79)
+  1 crafted (268 token occurrences) + 49,999 REF, 51 tokens: pinned median of 7    172.8 ms, _prefix_distance 0/ranking, listed 1 ['fuzzy']
+
+B. fixture query sets, pinned vs current, median of 7 each, limit 20 (worst per set); load (1.23, 0.97, 0.8)
+  QSET over REF (.36/1, 200 ms)    pinned worst   264.0 ms ('njraipjtbtu lsuakcoj hsxgibymj') | current worst    66.2 ms ('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+  REF6 queries (.36/1, 200 ms)     pinned worst   102.1 ms ('0') | current worst    99.6 ms ('0')
+  PSET over REF (.40/1, 1.0 s)     pinned worst    82.6 ms ('qza qzb qzc qzd qze qzf qzg qz') | current worst   122.0 ms ('qza qzb qzc qzd qze qzf qzg qz')
+  PSET over REF6 (.40/1, 1.0 s)    pinned worst   310.1 ms ('cha chb chc chd che chf chg ch') | current worst   650.0 ms ('cha chb chc chd che chf chg ch')
+  LONG (.40/2, 1.0 s)              pinned worst    55.1 ms ('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa') | current worst    77.8 ms ('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+
+load after = (1.09, 0.99, 0.82)

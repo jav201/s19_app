@@ -1,0 +1,53 @@
+# M-06  row R-A2L-MATCH.6
+
+control: no prefix rule -> those names fall to `substring`
+edit: `_text_tiers`: route startswith (non-exact) names to `subs`
+
+s19_app.__file__: /tmp/b103-e5-4-mutr2A/M-06/s19_app/__init__.py
+
+== diff ==
+--- /tmp/b103-e5-4-mutr2A/base/s19_app/tui/services/label_match.py	2026-11-06 22:11:34.000000000 -0600
++++ /tmp/b103-e5-4-mutr2A/M-06/s19_app/tui/services/label_match.py	2026-11-06 22:42:43.294362357 -0600
+@@ -335,7 +335,7 @@
+         name_folded = folded[i]
+         if text in name_folded:
+             if name_folded.startswith(text):
+-                (exact if len(name_folded) == text_len else prefix).append(i)
++                (exact if len(name_folded) == text_len else subs).append(i)
+             else:
+                 subs.append(i)
+     for i in exact:
+
+== pytest (returncode 1, KILLED) ==
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_________________ test_ranked_list_is_exactly[R-A2L-MATCH.6/1] _________________
+tests/test_b103_label_match.py:391: in test_ranked_list_is_exactly
+    assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E   AssertionError: R-A2L-MATCH.6/1: query 'value_000' limit 5
+E   assert [('VALUE_0001...0, ((0, 9),))] == [('VALUE_0001...0, ((0, 9),))]
+E     
+E     At index 0 diff: ('VALUE_0001', 'substring', 0, ((0, 9),)) != ('VALUE_0001', 'prefix', 0, ((0, 9),))
+E     Use -v to get more diff
+_________________ test_ranked_list_is_exactly[R-A2L-MATCH.6/2] _________________
+tests/test_b103_label_match.py:391: in test_ranked_list_is_exactly
+    assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E   AssertionError: R-A2L-MATCH.6/2: query 'span' limit 20
+E   assert [('SPAN_OVER_...0, ((0, 4),))] == [('SPAN_OVER_...0, ((0, 4),))]
+E     
+E     At index 0 diff: ('SPAN_OVER_1', 'substring', 0, ((0, 4),)) != ('SPAN_OVER_1', 'prefix', 0, ((0, 4),))
+E     Use -v to get more diff
+_________________ test_ranked_list_is_exactly[R-A2L-MATCH.6/3] _________________
+tests/test_b103_label_match.py:391: in test_ranked_list_is_exactly
+    assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E   AssertionError: R-A2L-MATCH.6/3: query 'LIMIT' limit 20
+E   assert [('LIMIT_BREA...0, ((0, 5),))] == [('LIMIT_BREA...0, ((0, 5),))]
+E     
+E     At index 0 diff: ('LIMIT_BREAKER', 'substring', 0, ((0, 5),)) != ('LIMIT_BREAKER', 'prefix', 0, ((0, 5),))
+E     Use -v to get more diff
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.6/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.6/2]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.6/3]
+3 failed, 126 deselected in 4.95s
+

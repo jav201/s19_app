@@ -1,0 +1,61 @@
+# M-PASTE.8
+# row: R-PASTE.8
+# s19_app.__file__ = /tmp/b103-e5-1a-mut/work/s19_app/__init__.py
+# note: the no-selection cut made a no-op
+# --- git diff ---
+diff --git a/s19_app/tui/capped_text_area.py b/s19_app/tui/capped_text_area.py
+index 42582b4d..35222d41 100644
+--- a/s19_app/tui/capped_text_area.py
++++ b/s19_app/tui/capped_text_area.py
+@@ -300,7 +300,7 @@ class CappedTextArea(TextArea):
+             return
+         start, end = self.selection
+         if start == end:
+-            edit_result = self._delete_cursor_line()
++            return  # mutant: no-selection cut is a no-op
+         else:
+             edit_result = self._delete_via_keyboard(start, end)
+         if edit_result is None:
+
+# --- pytest (rc=1) ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______________ test_r_paste_8_no_selection_cut_cuts_cursor_line _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10027/test_r_paste_8_no_selection_cu0')
+
+    def test_r_paste_8_no_selection_cut_cuts_cursor_line(tmp_path: Path) -> None:
+        """R-PASTE.8/1 (LinuxH): a no-selection cut removes the cursor line."""
+        _assert_linuxh_headless()
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(160, 48)) as pilot:
+                await pilot.pause()
+                await show_patch_paste(app, pilot)
+                ta = app.query_one("#patch_paste_text", TextArea)
+                ta.text = "first\nline_to_cut\nthird"
+                ta.selection = ((1, 2), (1, 2))
+                ta.focus()
+                await pilot.pause()
+                await pilot.press("ctrl+x")
+                await pilot.pause()
+                return ta.text, app.clipboard
+    
+        text, clip = asyncio.run(_drive())
+>       assert text == "first\nthird", text
+E       AssertionError: first
+E         line_to_cut
+E         third
+E       assert 'first\nline_to_cut\nthird' == 'first\nthird'
+E         
+E           first
+E         + line_to_cut
+E           third
+
+tests/test_b103_clipboard_core.py:913: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_8_no_selection_cut_cuts_cursor_line
+1 failed, 86 deselected in 3.65s
+
+===== stderr =====

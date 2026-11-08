@@ -1,0 +1,68 @@
+# M-.39b
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.39b/s19_app/__init__.py
+# note: NaN / Infinity spellings
+#   EDIT-OK: '        if math.isnan(value):\n            return "nan"\n        return '
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..df5c1527 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -1423,8 +1423,8 @@ def display_text(definition: Definition, value: int | float) -> str:
+     """
+     if not math.isfinite(value):
+         if math.isnan(value):
+-            return "nan"
+-        return "inf" if value > 0 else "-inf"
++            return "NaN"
++        return "Infinity" if value > 0 else "-Infinity"
+     datatype = definition.datatype
+     conversion = definition.conversion_type
+     if (
+
+# --- pytest (rc=1) ---
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+___________________________ test_r_a2l_def_39_1_nan ____________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-986/test_r_a2l_def_39_1_nan0')
+
+    def test_r_a2l_def_39_1_nan(tmp_path):
+        """R-A2L-DEF.39/1."""
+>       assert _f1(tmp_path, "7FC00000").text == "nan"
+E       AssertionError: assert 'NaN' == 'nan'
+E         
+E         - nan
+E         + NaN
+
+../base/tests/test_b103_a2l_definition.py:1079: AssertionError
+____________________ test_r_a2l_def_39_2_positive_infinity _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-986/test_r_a2l_def_39_2_positive_i0')
+
+    def test_r_a2l_def_39_2_positive_infinity(tmp_path):
+        """R-A2L-DEF.39/2."""
+>       assert _f1(tmp_path, "7F800000").text == "inf"
+E       AssertionError: assert 'Infinity' == 'inf'
+E         
+E         - inf
+E         + Infinity
+
+../base/tests/test_b103_a2l_definition.py:1084: AssertionError
+____________________ test_r_a2l_def_39_3_negative_infinity _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-986/test_r_a2l_def_39_3_negative_i0')
+
+    def test_r_a2l_def_39_3_negative_infinity(tmp_path):
+        """R-A2L-DEF.39/3."""
+>       assert _f1(tmp_path, "FF800000").text == "-inf"
+E       AssertionError: assert '-Infinity' == '-inf'
+E         
+E         - -inf
+E         + -Infinity
+
+../base/tests/test_b103_a2l_definition.py:1089: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_39_1_nan - Assertion...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_39_2_positive_infinity
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_39_3_negative_infinity
+3 failed, 188 deselected in 0.47s

@@ -1,0 +1,13 @@
+s19_app.__file__ = ~/work/s19_app/s19_app/__init__.py
+[P1] P1 old copy commented out, live copy below
+     parse errors=[]
+     sections named X: [(10, 13, 'old'), (15, 18, 'new')]
+     tags named X (file order): [(16, 'UWORD', 2), (32, 'UWORD', 2)]
+     first tag (R-A2L-DEF.5 / _find_tag): address=16; first section long id='old'
+     REF (comments removed first): live X at [32]
+[P2] P2 only a commented-out copy
+     parse errors=[]
+     sections named X: [(10, 13, 'old')]
+     tags named X (file order): [(16, 'UWORD', 2)]
+     first tag (R-A2L-DEF.5 / _find_tag): address=16; first section long id='old'
+     REF (comments removed first): live X at []

@@ -1,0 +1,2 @@
+[C] files 203, errors 0; COMPU_TABs named by a TAB_INTP / TAB_NOINTP method 81, with a non-numeric y 1; case points 1977, at which the frozen lookup returns text 2
+[C] COMPU_VTAB_RANGE tables 219; a plain bisect on the ranges sorted by min differs from the first-in-file-order lookup on 780 of 7752 points, in 30 tables

@@ -1,0 +1,76 @@
+=== s19_app.__file__ ===
+/home/<user>/mutr4B-work/s19_app/__init__.py
+
+=== DIFF base -> M-35 (s19_app/tui/services/label_match.py) ===
+--- /tmp/b103-e5-4-mutr4B/base/s19_app/tui/services/label_match.py	2026-11-07 01:32:51.000000000 -0600
++++ /home/<user>/mutr4B-work/s19_app/tui/services/label_match.py	2026-11-07 02:12:08.590884110 -0600
+@@ -205,6 +205,10 @@
+     del add
+     tokens = tuple(sorted(distinct))
+     del distinct
++    _sub = tokens[:6000]
++    for _a in _sub:
++        for _b in _sub:
++            _prefix_distance(_a, _b, 2)
+     find = bisect_left
+     name_token_ids = array("I", [0]) * len(span_start)
+     for i in range(count):
+
+=== uptime before ===
+02:12:08 up 1 day, 17:43,  6 users,  load average: 3.46, 3.05, 2.64
+
+=== uptime after ===
+02:29:25 up 1 day, 18:01,  6 users,  load average: 15.27, 15.31, 11.25
+
+=== PYTEST (tail, rc=1) ===
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________________ test_r_a2l_match_35_1_preparing_50000_names __________________
+
+ref_names = ['AAD_UTRQ.HWV_VIUF_C_PposBXIIFfkdGfiaJnbbPvb_DYAN_XVZ1_Ierxjr_Eud_Y', 'ACN_ULWY.FVH_MUGP_O_SBW_RTD_NJZ_MKE_WODEYLMQXZ...w_kg_HH', 'AHS_KNAH.AGA_PYKM_C_DuxKndZquv_CRR_Foopqx_Ofx_D', 'AJI_MXOW.IPC_KYJU_B_HdfuojQfdbgqctwjsbpdQekwvvn_21', ...]
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_match_35_1_preparing_50000_names(ref_names):
+        """R-A2L-MATCH.35/1: the median of 3 preparations of REF (50,000 names) <= 5.0 s."""
+        gc.collect()
+        print(_load("before"))
+        times = []
+        for _ in range(3):
+            t0 = time.perf_counter()
+            index = build_label_index(ref_names)
+            times.append(time.perf_counter() - t0)
+            assert len(index) == 50000
+            del index
+        print(_load("after"), "prep times", [round(t, 3) for t in times])
+        median = statistics.median(times)
+>       _check_all([("R-A2L-MATCH.35 prepare REF", median)], PREP_BOUND_S)
+
+tests/test_b103_label_match_perf.py:293: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+medians = [('R-A2L-MATCH.35 prepare REF', 368.95273919499596)], bound_s = 5.0
+
+    def _check_all(medians, bound_s):
+        """Print EVERY margin line (no truncation, whatever the reporter or a ``tail`` keeps), then assert each
+        median against ``report_margin(..., timing_bound(bound_s))``; the failure names its label."""
+        bound = timing_bound(bound_s)
+        for label_, median in medians:
+            print(f"  {median * 1000:9.2f} ms  {(bound - median) / bound * 100:6.1f} % margin  {label_}")
+        for label_, median in medians:
+>           assert median <= report_margin(label_, median, timing_bound(bound_s)), f"{label_}: median {median:.4f} s"
+E           AssertionError: R-A2L-MATCH.35 prepare REF: median 368.9527 s
+E           assert 368.95273919499596 <= 5.0
+E            +  where 5.0 = report_margin('R-A2L-MATCH.35 prepare REF', 368.95273919499596, 5.0)
+E            +    where 5.0 = timing_bound(5.0)
+
+tests/test_b103_label_match_perf.py:261: AssertionError
+----------------------------- Captured stdout call -----------------------------
+host load before: 3.46 3.05 2.64
+host load after: 15.27 15.31 11.25 prep times [255.043, 411.067, 368.953]
+  368952.74 ms  -7279.1 % margin  R-A2L-MATCH.35 prepare REF
+============================= QC-TM timing margins =============================
+LOW -7279.1%  368.953 s / 5.000 s  R-A2L-MATCH.35 prepare REF  tests/test_b103_label_match_perf.py::test_r_a2l_match_35_1_preparing_50000_names
+QC-TM: 1 bounds, 1 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match_perf.py::test_r_a2l_match_35_1_preparing_50000_names
+1 failed, 19 deselected in 1036.12s (0:17:16)

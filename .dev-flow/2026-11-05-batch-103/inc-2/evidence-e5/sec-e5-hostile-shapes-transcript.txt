@@ -1,0 +1,72 @@
+s19_app.__file__ = /tmp/b103-e5-2a-sec/tree/s19_app/__init__.py | python 3.11.18 | a2l_definition md5 820a4c3a | load 2.15 1.74 2.52 | mode shapes
+  LEN-hex3700            definitions 0, refused 0, decodes 0, exceptions 1 {'describe ValueError at a2l_definition.py:_describe_one:564': 1}; msg max 0, longest word 0, msg>1024 0, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 0, msgs [ 0
+  DATASIZE-hex3700       definitions 0, refused 0, decodes 0, exceptions 1 {'describe ValueError at a2l_definition.py:_describe_one:564': 1}; msg max 0, longest word 0, msg>1024 0, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 0, msgs [ 0
+  NUMBER-hex3700         definitions 0, refused 0, decodes 0, exceptions 1 {'describe ValueError at a2l_definition.py:_describe_one:564': 1}; msg max 0, longest word 0, msg>1024 0, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 0, msgs [ 0
+  MATRIXDIM-hex3700      definitions 0, refused 0, decodes 0, exceptions 1 {'describe ValueError at a2l_definition.py:_object_kind:710': 1}; msg max 0, longest word 0, msg>1024 0, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 0, msgs [ 0
+  MATRIXDIM-hex1000      definitions 1, refused 1, decodes 4, exceptions 0 ; msg max 1273, longest word 1205, msg>1024 5, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 0, msgs [ 0
+      X: A2L-DEF-KIND msg 1273 chars; decode 0x00 / 0xFF: A2L-DEF-KIND | A2L-DEF-KIND
+  ADDR-hex1500           definitions 1, refused 1, decodes 4, exceptions 0 ; msg max 1543, longest word 1502, msg>1024 5, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 0, msgs [ 0
+      X: A2L-DEF-ADDRESS msg 1543 chars; decode 0x00 / 0xFF: A2L-DEF-ADDRESS | A2L-DEF-ADDRESS
+  ADDR-neg-hex1500       definitions 1, refused 1, decodes 4, exceptions 0 ; msg max 1544, longest word 1503, msg>1024 5, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 0, msgs [ 0
+      X: A2L-DEF-ADDRESS msg 1544 chars; decode 0x00 / 0xFF: A2L-DEF-ADDRESS | A2L-DEF-ADDRESS
+  CHARADDR-hex1500       definitions 1, refused 1, decodes 4, exceptions 0 ; msg max 1543, longest word 1502, msg>1024 5, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 0, msgs [ 0
+      V: A2L-DEF-ADDRESS msg 1543 chars; decode 0x00 / 0xFF: A2L-DEF-ADDRESS | A2L-DEF-ADDRESS
+  CASE-tab_intp          definitions 1, refused 0, decodes 4, exceptions 0 ; msg max 40, longest word 5, msg>1024 0, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 0, msgs [ 0
+      V: - msg 0 chars; decode 0x00 / 0xFF: value 0.0 text-len 5 | value 100.0 text-len 7
+  CASE-TAB_INTP          definitions 1, refused 0, decodes 4, exceptions 0 ; msg max 40, longest word 5, msg>1024 0, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 0, msgs [ 0
+      V: - msg 0 chars; decode 0x00 / 0xFF: value 0.0 text-len 5 | value 100.0 text-len 7
+  CASE-tab_verb          definitions 1, refused 0, decodes 4, exceptions 0 ; msg max 40, longest word 5, msg>1024 0, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 0, msgs [ 0
+      V: - msg 0 chars; decode 0x00 / 0xFF: value 0 text-len 5 | value 255 text-len 7
+  TEXT-bidi-sep          definitions 1, refused 0, decodes 4, exceptions 0 ; msg max 40, longest word 5, msg>1024 0, foreign 0; texts control 0 Cf 2 Zl 1 Zp 0 [ 0, msgs [ 0
+      V: - msg 0 chars; decode 0x00 / 0xFF: value 'a\u202ebc' text-len 4 | value 'l1\u2028l2' text-len 5
+  TEXT-markup            definitions 2, refused 1, decodes 8, exceptions 0 ; msg max 75, longest word 15, msg>1024 0, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 2, msgs [ 5
+      V: - msg 0 chars; decode 0x00 / 0xFF: value '[bold red]x[/]' text-len 14 | value '[link=file:///x]y[/link text-len 24
+      [bold]N[/bold]: A2L-DEF-METHOD msg 75 chars; decode 0x00 / 0xFF: A2L-DEF-METHOD | A2L-DEF-METHOD
+  TEXT-control           definitions 2, refused 1, decodes 8, exceptions 0 ; msg max 67, longest word 10, msg>1024 0, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 1, msgs [ 5
+      V: - msg 0 chars; decode 0x00 / 0xFF: value 'a\x1b[31mb' text-len 7 | value 'n\x00l\x7f' text-len 4
+      N\x1b[2Jx: A2L-DEF-METHOD msg 67 chars; decode 0x00 / 0xFF: A2L-DEF-METHOD | A2L-DEF-METHOD
+  count-1e400            definitions 1, refused 1, decodes 4, exceptions 0 ; msg max 30, longest word 7, msg>1024 0, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 0, msgs [ 0
+      V: A2L-DEF-TABLE-EMPTY msg 30 chars; decode 0x00 / 0xFF: A2L-DEF-TABLE-EMPTY | A2L-DEF-TABLE-EMPTY
+  count-nan              definitions 1, refused 1, decodes 4, exceptions 0 ; msg max 30, longest word 7, msg>1024 0, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 0, msgs [ 0
+      V: A2L-DEF-TABLE-EMPTY msg 30 chars; decode 0x00 / 0xFF: A2L-DEF-TABLE-EMPTY | A2L-DEF-TABLE-EMPTY
+  count-minus3           definitions 1, refused 1, decodes 4, exceptions 0 ; msg max 30, longest word 7, msg>1024 0, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 0, msgs [ 0
+      V: A2L-DEF-TABLE-EMPTY msg 30 chars; decode 0x00 / 0xFF: A2L-DEF-TABLE-EMPTY | A2L-DEF-TABLE-EMPTY
+  count-2.5              definitions 1, refused 1, decodes 4, exceptions 0 ; msg max 30, longest word 7, msg>1024 0, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 0, msgs [ 0
+      V: A2L-DEF-TABLE-EMPTY msg 30 chars; decode 0x00 / 0xFF: A2L-DEF-TABLE-EMPTY | A2L-DEF-TABLE-EMPTY
+  mask-5000digits        definitions 1, refused 1, decodes 4, exceptions 0 ; msg max 300, longest word 257, msg>1024 0, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 0, msgs [ 0
+      V: A2L-DEF-MASK msg 300 chars; decode 0x00 / 0xFF: A2L-DEF-MASK | A2L-DEF-MASK
+  format-5000digits      definitions 1, refused 0, decodes 4, exceptions 0 ; msg max 40, longest word 5, msg>1024 0, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 0, msgs [ 0
+      V: - msg 0 chars; decode 0x00 / 0xFF: value 0.0 text-len 19 | value 255.0 text-len 21
+  mask-0xZZ              definitions 1, refused 1, decodes 4, exceptions 0 ; msg max 47, longest word 7, msg>1024 0, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 0, msgs [ 0
+      V: A2L-DEF-MASK msg 47 chars; decode 0x00 / 0xFF: A2L-DEF-MASK | A2L-DEF-MASK
+  number-minus5          definitions 1, refused 1, decodes 4, exceptions 0 ; msg max 48, longest word 6, msg>1024 0, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 0, msgs [ 0
+      T: A2L-DEF-ADDRESS msg 48 chars; decode 0x00 / 0xFF: A2L-DEF-ADDRESS | A2L-DEF-ADDRESS
+  number-1048577         definitions 1, refused 1, decodes 4, exceptions 0 ; msg max 53, longest word 7, msg>1024 0, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 0, msgs [ 0
+      T: A2L-DEF-ADDRESS msg 53 chars; decode 0x00 / 0xFF: A2L-DEF-ADDRESS | A2L-DEF-ADDRESS
+  ecuaddr-minus0x10      definitions 1, refused 1, decodes 4, exceptions 0 ; msg max 46, longest word 6, msg>1024 0, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 0, msgs [ 0
+      X: A2L-DEF-ADDRESS msg 46 chars; decode 0x00 / 0xFF: A2L-DEF-ADDRESS | A2L-DEF-ADDRESS
+  extlimits-nan          definitions 1, refused 0, decodes 4, exceptions 0 ; msg max 40, longest word 5, msg>1024 0, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 0, msgs [ 0
+      V: - msg 0 chars; decode 0x00 / 0xFF: value 0 text-len 1 | value 255 text-len 3
+  coeffs-nan-inf         definitions 1, refused 0, decodes 4, exceptions 0 ; msg max 42, longest word 8, msg>1024 0, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 0, msgs [ 0
+      V: - msg 0 chars; decode 0x00 / 0xFF: A2L-DEF-DECODE | A2L-DEF-DECODE
+  ratfunc-zero           definitions 1, refused 0, decodes 4, exceptions 0 ; msg max 42, longest word 8, msg>1024 0, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 0, msgs [ 0
+      V: - msg 0 chars; decode 0x00 / 0xFF: A2L-DEF-DECODE | A2L-DEF-DECODE
+  vtab-esc-unterminated  definitions 1, refused 0, decodes 4, exceptions 0 ; msg max 40, longest word 5, msg>1024 0, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 0, msgs [ 0
+      V: - msg 0 chars; decode 0x00 / 0xFF: value 'a\x1bb' text-len 3 | value None text-len 13
+  float-enum-nonfinite   definitions 1, refused 0, decodes 4, exceptions 0 ; msg max 40, longest word 5, msg>1024 0, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 0, msgs [ 0
+      F: - msg 0 chars; decode 0x00 / 0xFF: value 'z' text-len 1 | value None text-len 13
+  mask-no-datatype       definitions 1, refused 1, decodes 4, exceptions 0 ; msg max 41, longest word 7, msg>1024 0, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 0, msgs [ 0
+      V: A2L-DEF-ADDRESS msg 41 chars; decode 0x00 / 0xFF: A2L-DEF-ADDRESS | A2L-DEF-ADDRESS
+  nointp-names-vtab      definitions 1, refused 0, decodes 4, exceptions 0 ; msg max 50, longest word 6, msg>1024 0, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 0, msgs [ 0
+      V: - msg 0 chars; decode 0x00 / 0xFF: A2L-DEF-DECODE | A2L-DEF-DECODE
+  intp-names-vtab        definitions 1, refused 0, decodes 4, exceptions 0 ; msg max 50, longest word 6, msg>1024 0, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 0, msgs [ 0
+      V: - msg 0 chars; decode 0x00 / 0xFF: A2L-DEF-DECODE | A2L-DEF-DECODE
+  nan-x                  definitions 1, refused 0, decodes 4, exceptions 0 ; msg max 45, longest word 6, msg>1024 0, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 0, msgs [ 0
+      V: - msg 0 chars; decode 0x00 / 0xFF: A2L-DEF-DECODE | A2L-DEF-DECODE
+A2L section tree has structural errors: path=/tmp/b103-e5-2a-sec/tree/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+  V171                   definitions 118, refused 43, decodes 472, exceptions 0 ; msg max 107, longest word 69, msg>1024 0, foreign 0; texts control 0 Cf 0 Zl 0 Zp 0 [ 0, msgs [ 0
+  [case] CASE-tab_intp: 2a decode of stored 50 -> 0.0 (type_verdict path _TabForm, conversion_type 'tab_intp'); frozen _apply_compu_method -> 50 (unknown_method)
+  [case] CASE-TAB_INTP: 2a decode of stored 50 -> 50.0 (type_verdict path _TabForm, conversion_type 'TAB_INTP'); frozen _apply_compu_method -> 50.0 (ok)
+[shapes] 34 shapes; describe exceptions 4, decode exceptions 0; messages > 1,024 chars 20; words > 260 20; exceptions by place {'EXC describe ValueError at a2l_definition.py:_describe_one:564': 3, 'EXC describe ValueError at a2l_definition.py:_object_kind:710': 1}
+end | load 2.15 1.74 2.52
+exit=0

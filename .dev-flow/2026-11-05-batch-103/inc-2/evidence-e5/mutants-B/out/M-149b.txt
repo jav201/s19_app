@@ -1,0 +1,91 @@
+===== mutant M-149b (2026-11-07T13:23:48Z) =====
+--- unified diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..71b2b587 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -137,8 +137,8 @@ class Definition:
+     coeffs: Optional[tuple[Optional[float], ...]]
+     compu_tab_ref: Optional[str]
+     refusal: Optional[Refusal]
+-    _name_echo: Optional[str] = field(default=None, compare=False, repr=False)
+-    _table_form: Optional[_EnumForm | _TabForm] = field(default=None, compare=False, repr=False)
++    _name_echo: Optional[str] = field(default=None, compare=True, repr=False)
++    _table_form: Optional[_EnumForm | _TabForm] = field(default=None, compare=True, repr=False)
+ 
+ 
+ @dataclass(frozen=True)
+--- pytest ---
+s19_app.__file__ = /tmp/b103-e5-2-mutB/M-M-149b/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______________ test_r_a2l_def_149_5_cached_read_form_is_immutable ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-937/test_r_a2l_def_149_5_cached_re0')
+
+    def test_r_a2l_def_149_5_cached_read_form_is_immutable(tmp_path):
+        """R-A2L-DEF.149/5 (E5 gap pass 2) - every stored form is immutable, the enum / table forms and their indexes included.
+    
+        Eight objects share four methods and three tables.  Writes into the method record, the enum forms, the table form,
+        their tuples and index and a Definition all raise; the objects described together equal those described alone, in
+        either order; each decodes as it decodes alone; the two objects of a table hold the same form object.
+        """
+        names = ["OBJ_A", "OBJ_B", "LIN_A", "LIN_B", "TAB_A", "TAB_B", "RNG_A", "RNG_B"]
+        a2l = _inline(
+            tmp_path,
+            *_enum_blocks("CM_E", "VT_E", "2", '0 "off"', '1 "on"', default="none"),
+            _cm("CM_R", "TAB_VERB", fmt='"%.0"', ref="VR_E"),
+            _vrange("VR_E", "2", '0 1 "lo"', '2 3 "hi"'),
+            _cm("CM_LIN", "LINEAR", "0.5", "2"),
+            _cm("CM_T", "TAB_NOINTP", fmt='"%.0"', ref="CT_T"),
+            _ctab("CT_T", "TAB_NOINTP", "0 10", "1 20"),
+            _val("OBJ_A", "0x2000", LAYOUT["UBYTE"], "CM_E", "0", "1"),
+            _val("OBJ_B", "0x2001", LAYOUT["UBYTE"], "CM_E", "0", "1"),
+            _val("LIN_A", "0x2002", LAYOUT["UBYTE"], "CM_LIN", "0", "255"),
+            _val("LIN_B", "0x2003", LAYOUT["UBYTE"], "CM_LIN", "0", "255"),
+            _val("RNG_A", "0x2004", LAYOUT["UBYTE"], "CM_R", "0", "3"),
+            _val("RNG_B", "0x2005", LAYOUT["UBYTE"], "CM_R", "0", "3"),
+            _val("TAB_A", "0x2006", LAYOUT["UBYTE"], "CM_T", "0", "255"),
+            _val("TAB_B", "0x2007", LAYOUT["UBYTE"], "CM_T", "0", "255"),
+        )
+        image = {0x2000 + i: 1 for i in range(8)}
+        expect = {"OBJ": "on", "RNG": "lo", "LIN": "2.500", "TAB": "20"}
+    
+        fresh = {n: describe_definition(n, a2l) for n in names}
+        for order in (names, list(reversed(names))):
+            together = describe_definitions(order, a2l)
+            assert {n: together[n] for n in names} == fresh
+        together = describe_definitions(names, a2l)
+        assert describe_definitions(names, a2l) == together                        # a second walk
+        for n in names:                                                            # decodes as it decodes alone
+            assert decode_definition(together[n], a2l, image) == decode_definition(fresh[n], a2l, image)
+            assert _decoded(together[n], a2l, image).text == expect[n[:3]], n
+    
+        # the two objects of a table hold the same form
+        for a, b in (("OBJ_A", "OBJ_B"), ("RNG_A", "RNG_B"), ("TAB_A", "TAB_B")):
+            assert together[a]._table_form is not None and together[a]._table_form is together[b]._table_form
+        assert together["LIN_A"]._table_form is None
+    
+        # CR-7 / P-2: the two private fields change neither equality nor repr nor the decode (I-2's public surface)
+        for n in ("OBJ_A", "RNG_A", "TAB_A", "LIN_A"):
+            full = together[n]
+            bare = dataclasses.replace(full, _name_echo=None, _table_form=None)
+>           assert full == bare, n                                                 # compare=False
+            ^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError: OBJ_A
+E           assert Definition(na... refusal=None) == Definition(na... refusal=None)
+E             
+E             Omitting 24 identical items, use -vv to show
+E             Differing attributes:
+E             ['_name_echo', '_table_form']
+E             
+E             Drill down into differing attribute _name_echo:
+E               _name_echo: 'OBJ_A' != None...
+E             
+E             ...Full output truncated (3 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:1798: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_149_5_cached_read_form_is_immutable
+1 failed, 190 deselected in 1.37s
+pytest exit code: 1

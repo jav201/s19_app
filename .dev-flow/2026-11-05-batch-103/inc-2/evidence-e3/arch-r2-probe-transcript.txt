@@ -1,0 +1,21 @@
+# i2e3ar2-probe transcript 2026-11-06T19:00:39-06:00 host <runner>
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; load 4.12 5.13 3.32
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+[R0 software_a tags / distinct names] (13990, 13990)
+[R1 describe_definitions prototype over every name: runs s / median s] ([0.817, 0.757, 0.823], 0.817)
+[R1 kinds of the prototype's definitions] [('', 270), ('enum', 2124), ('number', 11570), ('text', 26)]
+[R1 refusals of the prototype (rough)] [('A2L-DEF-ADDRESS', 10538), ('A2L-DEF-CONVERSION', 1), ('A2L-DEF-KIND', 270)]
+[R2 the one walk + tags pass alone, median ms] 36.24
+[R3 describe_definition via the full walk, ms per call] 39.83
+[R4 one cheap first-word walk (objects only), ms per call] 5.19
+[R5 software_a CHARACTERISTIC kinds] [('VALUE', 3156), ('CURVE', 158), ('VAL_BLK', 101), ('ASCII', 26), ('MAP', 11)]
+[R5 AXIS_DESCR by kind / MODULE count] ([('(none)', 180)], 1)
+[R5 one AXIS_PTS walk (_collect_sections_by_name), ms] 3.96
+[R6 inline methods / tables] (['CM_BIG', 'CM_L01', 'CM_T4'], ['TAB_T4'])
+[R6 .45/3 TAB_INTP 0.55 -> encode result / raw / decode] (((0, 6), None, ['the value 0.55 is not a table value - the write proceeds as 0.6']), 6, (0.6, 'ok', ''))
+[R6 .45/3 p, %.1f text, |p-0.55| <= 0.05] (0.6, '0.6', True)
+[R6 E3A-02 LINEAR 0.1 4.1 -> raw / p / %.15g / |p-x|<=0.5e-15] (41, 4.1000000000000005, '4.1', False)
+[R6 .54/3 FLOAT64 LINEAR 1 1e10 1.0000001 -> raw / p / %.15g / %.6g] (-9999999999.0, 1.0, '1', '1')
+[R6 .54/4 A_UINT64 9007199254740993 -> encode result] ((0, 32, 0, 0, 0, 0, 0, 0), None, [])
+[R6 .37 vs .38: '%.15g' of 9007199254740992 / int text] ('9.00719925474099e+15', '9007199254740992')
+# exit 0

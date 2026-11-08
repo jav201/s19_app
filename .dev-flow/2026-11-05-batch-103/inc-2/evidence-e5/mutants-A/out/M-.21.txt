@@ -1,0 +1,52 @@
+# M-.21
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.21/s19_app/__init__.py
+# note: one number taken as both limits
+#   EDIT-OK: '        elif word == "EXTENDED_LIMITS" and result["extended_limits"] i'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..f78926b7 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -1081,14 +1081,14 @@ def _read_object_lines(section: Optional[dict]) -> dict:
+         if word == "FORMAT" and result["format"] is None and i + 1 < n:
+             result["format"] = body[i + 1]
+             i += 1
+-        elif word == "EXTENDED_LIMITS" and result["extended_limits"] is None and i + 2 < n:
++        elif word == "EXTENDED_LIMITS" and result["extended_limits"] is None and i + 1 < n:
+             lo = _finite_number(body[i + 1])
+-            hi = _finite_number(body[i + 2])
+-            if lo is not None and hi is not None:
+-                result["extended_limits"] = Limits(lo, hi, body[i + 1], body[i + 2])
+-                i += 2
+-            # A line that does not hold two numbers consumes only its keyword, so the
+-            # next keyword (e.g. FORMAT) is still read (R-A2L-DEF.21/1, .22).
++            hi = _finite_number(body[i + 2]) if i + 2 < n else None
++            if lo is not None:
++                if hi is None:
++                    hi = lo
++                result["extended_limits"] = Limits(lo, hi, body[i + 1], body[i + 1])
++                i += 1
+         elif word in ("PHYS_UNIT", "UNIT") and result["unit"] is None and i + 1 < n:
+             result["unit"] = body[i + 1]
+             i += 1
+
+# --- pytest (rc=1) ---
+F..                                                                      [100%]
+=================================== FAILURES ===================================
+___________ test_r_a2l_def_21_1_one_number_gives_no_extended_limits ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-992/test_r_a2l_def_21_1_one_number0')
+
+    def test_r_a2l_def_21_1_one_number_gives_no_extended_limits(tmp_path):
+        """R-A2L-DEF.21/1 - ``EXTENDED_LIMITS 0`` (next word is a keyword)."""
+        a2l = _inline(tmp_path, _val("XL1", "0x10", "RL_U16", "NO_COMPU_METHOD", "0", "65535",
+                                     "EXTENDED_LIMITS 0", 'FORMAT "%5.0"'))
+        d = describe_definition("XL1", a2l)
+>       assert d.extended_limits is None and d.display_format == "%5.0"
+E       AssertionError: assert (Limits(lower=0.0, upper=0.0, lower_text='0', upper_text='0') is None)
+E        +  where Limits(lower=0.0, upper=0.0, lower_text='0', upper_text='0') = Definition(name='XL1', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None).extended_limits
+
+../base/tests/test_b103_a2l_definition.py:764: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_21_1_one_number_gives_no_extended_limits
+1 failed, 2 passed, 188 deselected in 0.42s

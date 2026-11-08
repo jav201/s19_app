@@ -1,0 +1,44 @@
+# M-04  row R-A2L-MATCH.4
+
+control: Unicode case folding (str.lower/casefold) -> `DRUECK_MAX` becomes `prefix` for `drueck` (first clause)
+edit: `_fold`: return `text.lower()` (Unicode fold)
+
+s19_app.__file__: /tmp/b103-e5-4-mutr2A/M-04/s19_app/__init__.py
+
+== diff ==
+--- /tmp/b103-e5-4-mutr2A/base/s19_app/tui/services/label_match.py	2026-11-06 22:11:34.000000000 -0600
++++ /tmp/b103-e5-4-mutr2A/M-04/s19_app/tui/services/label_match.py	2026-11-06 22:42:31.522563190 -0600
+@@ -619,7 +619,7 @@
+     Returns:
+         str: The folded text.
+     """
+-    return text.translate(_FOLD_TABLE)
++    return text.lower()
+ 
+ 
+ def _char_mask(text: str) -> int:
+
+== pytest (returncode 1, KILLED) ==
+FF.                                                                      [100%]
+=================================== FAILURES ===================================
+_________________ test_ranked_list_is_exactly[R-A2L-MATCH.4/1] _________________
+tests/test_b103_label_match.py:391: in test_ranked_list_is_exactly
+    assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E   AssertionError: R-A2L-MATCH.4/1: query 'drück' limit 20
+E   assert [('DRÜCK_MAX'...1, ((0, 5),))] == [('Drück_Max'...1, ((0, 5),))]
+E     
+E     At index 0 diff: ('DRÜCK_MAX', 'prefix', 0, ((0, 5),)) != ('Drück_Max', 'prefix', 0, ((0, 5),))
+E     Use -v to get more diff
+_________________ test_ranked_list_is_exactly[R-A2L-MATCH.4/2] _________________
+tests/test_b103_label_match.py:391: in test_ranked_list_is_exactly
+    assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E   AssertionError: R-A2L-MATCH.4/2: query 'DRÜCK' limit 20
+E   assert [('DRÜCK_MAX'...1, ((0, 5),))] == [('DRÜCK_MAX'...1, ((0, 5),))]
+E     
+E     At index 1 diff: ('Drück_Max', 'prefix', 0, ((0, 5),)) != ('Drück_Max', 'fuzzy', 1, ((0, 5),))
+E     Use -v to get more diff
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.4/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.4/2]
+2 failed, 1 passed, 126 deselected in 4.98s
+

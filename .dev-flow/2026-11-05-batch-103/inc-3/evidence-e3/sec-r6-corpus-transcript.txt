@@ -1,0 +1,3 @@
+s19_app.__file__ = ~/work/b103-int2a/s19_app/__init__.py | python 3.11.18 | a2l_definition md5 f7fa38a5 | a2l md5 d6879216
+[E] files 203, errors 0 []; objects 353626 (arrays 6379); verdict/public diffs r6 vs r5 0; message diffs 0 {}; scalar fields diffs vs Inc 2a's real describe 0; longest message r6 283 chars (r5 283); definitions over 1,024 chars 0
+exit=0

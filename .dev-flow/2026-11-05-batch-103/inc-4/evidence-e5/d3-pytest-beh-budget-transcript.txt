@@ -1,0 +1,6 @@
+runner d3-run.sh sha256 3165c8cf50aa697565dfeaf500a9f4f54cdc5d65aa829b8301ce81a15a9da873; plugin d3_plugin.py sha256 bc7c49282dfbb680d7f987ebee684d7262c5168f3cfbba26b4477ba59a45e07e; D3_BUDGET=400000 D3_ASCII=0; load 2.48 1.78 2.03
+d3_plugin: s19_app.__file__ = /tmp/b103-e5d3-4/tree/s19_app/__init__.py; label_match sha256 8f396c15d3c848ceb2c98ab74c112150bf9c09759abb662ea0f2162d1ca7c94d; budget=400000 ascii_only=False
+........................................................................ [ 51%]
+....................................................................     [100%]
+140 passed in 5.82s
+pytest exit 0; load 2.56 1.82 2.04

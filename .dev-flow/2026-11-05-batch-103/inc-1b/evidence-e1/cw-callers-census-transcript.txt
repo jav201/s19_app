@@ -1,0 +1,33 @@
+codewire_extract.py exit=1; stdout: marks=13 graph_nodes=13 calls=3 findings=13 parse_failures=0
+
+Line numbers below are mapped back to e07fb00 (the marks shift the copy).
+
+## Real calls between marked nodes (caller -> callee: sites)
+- CappedTextArea.action_copy -> _mirror_and_write_os_clipboard: s19_app/tui/capped_text_area.py:268
+- OsClipboardInput.action_copy -> _mirror_and_write_os_clipboard: s19_app/tui/os_clipboard_input.py:864
+- _mirror_and_write_os_clipboard -> write_os_clipboard: s19_app/tui/os_clipboard_input.py:769 (ref)
+
+## Callers outside the marked set (top-level sites)
+- PatchEditorPanel._show_document: s19_app/tui/screens_directionb.py:6320
+- S19TuiApp._update_a2l_summary_buffer: s19_app/tui/app.py:20268, s19_app/tui/app.py:20284
+- S19TuiApp.update_a2l_tags_view: s19_app/tui/app.py:11102, s19_app/tui/app.py:11128, s19_app/tui/app.py:16603, s19_app/tui/app.py:20217, s19_app/tui/app.py:20222, s19_app/tui/app.py:20269, s19_app/tui/app.py:20605
+- S19TuiApp.update_alt_hex_view: s19_app/tui/app.py:16572, s19_app/tui/app.py:16697, s19_app/tui/app.py:16699, s19_app/tui/app.py:16831, s19_app/tui/app.py:17720, s19_app/tui/app.py:18678, s19_app/tui/app.py:20600, s19_app/tui/app.py:21190, s19_app/tui/app.py:21211
+- S19TuiApp.update_hex_view: s19_app/tui/app.py:11043, s19_app/tui/app.py:11074, s19_app/tui/app.py:16489, s19_app/tui/app.py:16830, s19_app/tui/app.py:17719, s19_app/tui/app.py:18677, s19_app/tui/app.py:19578, s19_app/tui/app.py:20599, s19_app/tui/app.py:21099, s19_app/tui/app.py:21160
+- S19TuiApp.update_mac_hex_view: s19_app/tui/app.py:16735, s19_app/tui/app.py:16832, s19_app/tui/app.py:17721, s19_app/tui/app.py:18679, s19_app/tui/app.py:20601, s19_app/tui/app.py:21240, s19_app/tui/app.py:21260
+- S19TuiApp.update_workspace_stats: s19_app/tui/app.py:19253
+- _mirror_and_write_os_clipboard: s19_app/tui/capped_text_area.py:306, s19_app/tui/os_clipboard_input.py:892
+
+## Findings (drift lines, expected only if a contract above is wrong)
+- graph_examples_missing:  
+- graph_examples_missing:  
+- graph_examples_missing:  
+- graph_examples_missing:  
+- graph_examples_missing:  
+- graph_examples_missing:  
+- graph_examples_missing:  
+- graph_examples_missing:  
+- graph_examples_missing:  
+- graph_examples_missing:  
+- graph_examples_missing:  
+- graph_examples_missing:  
+- graph_examples_missing:  

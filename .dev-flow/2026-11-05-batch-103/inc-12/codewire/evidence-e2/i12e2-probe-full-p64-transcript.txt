@@ -1,0 +1,306 @@
+# probe full p64 transcript 2026-11-07T01:46:42-06:00 host <runner>
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e2-12/<user>; no DISPLAY; no clipboard; stdin closed; load: 2.12 2.51 1.97
+s19_app.__file__ = /tmp/b103-e2-12/full/s19_app/__init__.py | textual 8.2.8 | variant full | scenario p64
+[full PAGE64(20) 80x54 unscrolled] visible=38 vbar=False scroll_x=0/109 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=24, Source=9 | w=9 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(20) 80x54 unscrolled] header|  Address         Length   Tag
+[full PAGE64(20) 80x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(20) 80x54 scrolled-right] visible=38 vbar=False scroll_x=109/109 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=24, Source=9 | w=9 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(20) 80x54 scrolled-right] header|  Address         Length  ccess  Dtype
+[full PAGE64(20) 80x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(20) 85x54 unscrolled] visible=41 vbar=False scroll_x=0/106 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=24, Source=9 | w=12 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(20) 85x54 unscrolled] header|  Address         Length   Tag
+[full PAGE64(20) 85x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(20) 85x54 scrolled-right] visible=41 vbar=False scroll_x=106/106 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=24, Source=9 | w=12 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(20) 85x54 scrolled-right] header|  Address         Length    Access  Dtype
+[full PAGE64(20) 85x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(20) 90x54 unscrolled] visible=44 vbar=False scroll_x=0/103 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=24, Source=9 | w=15 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(20) 90x54 unscrolled] header|  Address         Length   Tag
+[full PAGE64(20) 90x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(20) 90x54 scrolled-right] visible=44 vbar=False scroll_x=103/103 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=24, Source=9 | w=15 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(20) 90x54 scrolled-right] header|  Address         Length  unc  Access  Dtype
+[full PAGE64(20) 90x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(20) 95x54 unscrolled] visible=46 vbar=False scroll_x=0/101 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=24, Source=9 | w=17 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(20) 95x54 unscrolled] header|  Address         Length   Tag
+[full PAGE64(20) 95x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(20) 95x54 scrolled-right] visible=46 vbar=False scroll_x=101/101 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=24, Source=9 | w=17 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(20) 95x54 scrolled-right] header|  Address         Length   Func  Access  Dtype
+[full PAGE64(20) 95x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(20) 100x54 unscrolled] visible=49 vbar=False scroll_x=0/98 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=24, Source=9 | w=20 | rows=3 cursor_row=0 | builds=2 fits=2 fit_rebuilds=0
+[full PAGE64(20) 100x54 unscrolled] header|  Address         Length   Tag
+[full PAGE64(20) 100x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(20) 100x54 scrolled-right] visible=49 vbar=False scroll_x=98/98 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=24, Source=9 | w=20 | rows=3 cursor_row=0 | builds=2 fits=2 fit_rebuilds=0
+[full PAGE64(20) 100x54 scrolled-right] header|  Address         Length  rt  Func  Access  Dtype
+[full PAGE64(20) 100x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(20) 118x54 unscrolled] visible=60 vbar=False scroll_x=0/87 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=24, Source=9 | w=31 | rows=3 cursor_row=0 | builds=2 fits=2 fit_rebuilds=0
+[full PAGE64(20) 118x54 unscrolled] header|  Address         Length   Tag                     Source   R
+[full PAGE64(20) 118x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(20) 118x54 scrolled-right] visible=60 vbar=False scroll_x=87/87 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=24, Source=9 | w=31 | rows=3 cursor_row=0 | builds=2 fits=2 fit_rebuilds=0
+[full PAGE64(20) 118x54 scrolled-right] header|  Address         Length   Endian  Virt  Func  Access  Dtype
+[full PAGE64(20) 118x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(20) 160x54 unscrolled] visible=73 vbar=False scroll_x=0/74 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=24, Source=9 | w=44 | rows=3 cursor_row=0 | builds=2 fits=2 fit_rebuilds=0
+[full PAGE64(20) 160x54 unscrolled] header|  Address         Length   Tag                     Source   Raw   Physical
+[full PAGE64(20) 160x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(20) 160x54 scrolled-right] visible=73 vbar=False scroll_x=74/74 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=24, Source=9 | w=44 | rows=3 cursor_row=0 | builds=2 fits=2 fit_rebuilds=0
+[full PAGE64(20) 160x54 scrolled-right] header|  Address         Length    Unit  Bits  Endian  Virt  Func  Access  Dtype
+[full PAGE64(20) 160x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(20) 220x54 unscrolled] visible=108 vbar=False scroll_x=0/39 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=24, Source=9 | w=79 | rows=3 cursor_row=0 | builds=2 fits=2 fit_rebuilds=0
+[full PAGE64(20) 220x54 unscrolled] header|  Address         Length   Tag                     Source   Raw   Physical  InMem  Region   Limits    Unit  B
+[full PAGE64(20) 220x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(20) 220x54 scrolled-right] visible=108 vbar=False scroll_x=39/39 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=24, Source=9 | w=79 | rows=3 cursor_row=0 | builds=2 fits=2 fit_rebuilds=0
+[full PAGE64(20) 220x54 scrolled-right] header|  Address         Length   Physical  InMem  Region   Limits    Unit  Bits  Endian  Virt  Func  Access  Dtype
+[full PAGE64(20) 220x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(28) 80x54 unscrolled] visible=38 vbar=False scroll_x=0/117 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=32, Source=9 | w=9 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(28) 80x54 unscrolled] header|  Address         Length   Tag
+[full PAGE64(28) 80x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(28) 80x54 scrolled-right] visible=38 vbar=False scroll_x=117/117 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=32, Source=9 | w=9 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(28) 80x54 scrolled-right] header|  Address         Length  ccess  Dtype
+[full PAGE64(28) 80x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(28) 85x54 unscrolled] visible=41 vbar=False scroll_x=0/114 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=32, Source=9 | w=12 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(28) 85x54 unscrolled] header|  Address         Length   Tag
+[full PAGE64(28) 85x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(28) 85x54 scrolled-right] visible=41 vbar=False scroll_x=114/114 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=32, Source=9 | w=12 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(28) 85x54 scrolled-right] header|  Address         Length    Access  Dtype
+[full PAGE64(28) 85x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(28) 90x54 unscrolled] visible=44 vbar=False scroll_x=0/111 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=32, Source=9 | w=15 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(28) 90x54 unscrolled] header|  Address         Length   Tag
+[full PAGE64(28) 90x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(28) 90x54 scrolled-right] visible=44 vbar=False scroll_x=111/111 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=32, Source=9 | w=15 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(28) 90x54 scrolled-right] header|  Address         Length  unc  Access  Dtype
+[full PAGE64(28) 90x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(28) 95x54 unscrolled] visible=46 vbar=False scroll_x=0/109 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=32, Source=9 | w=17 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(28) 95x54 unscrolled] header|  Address         Length   Tag
+[full PAGE64(28) 95x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(28) 95x54 scrolled-right] visible=46 vbar=False scroll_x=109/109 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=32, Source=9 | w=17 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(28) 95x54 scrolled-right] header|  Address         Length   Func  Access  Dtype
+[full PAGE64(28) 95x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(28) 100x54 unscrolled] visible=49 vbar=False scroll_x=0/106 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=32, Source=9 | w=20 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(28) 100x54 unscrolled] header|  Address         Length   Tag
+[full PAGE64(28) 100x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(28) 100x54 scrolled-right] visible=49 vbar=False scroll_x=106/106 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=32, Source=9 | w=20 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(28) 100x54 scrolled-right] header|  Address         Length  rt  Func  Access  Dtype
+[full PAGE64(28) 100x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(28) 118x54 unscrolled] visible=60 vbar=False scroll_x=0/95 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=32, Source=9 | w=31 | rows=3 cursor_row=0 | builds=2 fits=2 fit_rebuilds=0
+[full PAGE64(28) 118x54 unscrolled] header|  Address         Length   Tag                             So
+[full PAGE64(28) 118x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(28) 118x54 scrolled-right] visible=60 vbar=False scroll_x=95/95 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=32, Source=9 | w=31 | rows=3 cursor_row=0 | builds=2 fits=2 fit_rebuilds=0
+[full PAGE64(28) 118x54 scrolled-right] header|  Address         Length   Endian  Virt  Func  Access  Dtype
+[full PAGE64(28) 118x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(28) 160x54 unscrolled] visible=73 vbar=False scroll_x=0/82 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=32, Source=9 | w=44 | rows=3 cursor_row=0 | builds=2 fits=2 fit_rebuilds=0
+[full PAGE64(28) 160x54 unscrolled] header|  Address         Length   Tag                             Source   Raw
+[full PAGE64(28) 160x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(28) 160x54 scrolled-right] visible=73 vbar=False scroll_x=82/82 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=32, Source=9 | w=44 | rows=3 cursor_row=0 | builds=2 fits=2 fit_rebuilds=0
+[full PAGE64(28) 160x54 scrolled-right] header|  Address         Length    Unit  Bits  Endian  Virt  Func  Access  Dtype
+[full PAGE64(28) 160x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(28) 220x54 unscrolled] visible=108 vbar=False scroll_x=0/47 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=32, Source=9 | w=79 | rows=3 cursor_row=0 | builds=2 fits=2 fit_rebuilds=0
+[full PAGE64(28) 220x54 unscrolled] header|  Address         Length   Tag                             Source   Raw   Physical  InMem  Region   Limits
+[full PAGE64(28) 220x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(28) 220x54 scrolled-right] visible=108 vbar=False scroll_x=47/47 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=32, Source=9 | w=79 | rows=3 cursor_row=0 | builds=2 fits=2 fit_rebuilds=0
+[full PAGE64(28) 220x54 scrolled-right] header|  Address         Length   Physical  InMem  Region   Limits    Unit  Bits  Endian  Virt  Func  Access  Dtype
+[full PAGE64(28) 220x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(34) 80x54 unscrolled] visible=38 vbar=False scroll_x=0/123 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=9 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(34) 80x54 unscrolled] header|  Address         Length   Tag
+[full PAGE64(34) 80x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(34) 80x54 scrolled-right] visible=38 vbar=False scroll_x=123/123 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=9 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(34) 80x54 scrolled-right] header|  Address         Length  ccess  Dtype
+[full PAGE64(34) 80x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(34) 85x54 unscrolled] visible=41 vbar=False scroll_x=0/120 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=12 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(34) 85x54 unscrolled] header|  Address         Length   Tag
+[full PAGE64(34) 85x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(34) 85x54 scrolled-right] visible=41 vbar=False scroll_x=120/120 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=12 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(34) 85x54 scrolled-right] header|  Address         Length    Access  Dtype
+[full PAGE64(34) 85x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(34) 90x54 unscrolled] visible=44 vbar=False scroll_x=0/117 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=15 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(34) 90x54 unscrolled] header|  Address         Length   Tag
+[full PAGE64(34) 90x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(34) 90x54 scrolled-right] visible=44 vbar=False scroll_x=117/117 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=15 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(34) 90x54 scrolled-right] header|  Address         Length  unc  Access  Dtype
+[full PAGE64(34) 90x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(34) 95x54 unscrolled] visible=46 vbar=False scroll_x=0/115 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=17 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(34) 95x54 unscrolled] header|  Address         Length   Tag
+[full PAGE64(34) 95x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(34) 95x54 scrolled-right] visible=46 vbar=False scroll_x=115/115 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=17 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(34) 95x54 scrolled-right] header|  Address         Length   Func  Access  Dtype
+[full PAGE64(34) 95x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(34) 100x54 unscrolled] visible=49 vbar=False scroll_x=0/112 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=20 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(34) 100x54 unscrolled] header|  Address         Length   Tag
+[full PAGE64(34) 100x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(34) 100x54 scrolled-right] visible=49 vbar=False scroll_x=112/112 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=20 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(34) 100x54 scrolled-right] header|  Address         Length  rt  Func  Access  Dtype
+[full PAGE64(34) 100x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(34) 118x54 unscrolled] visible=60 vbar=False scroll_x=0/101 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=31 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(34) 118x54 unscrolled] header|  Address         Length   Tag
+[full PAGE64(34) 118x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(34) 118x54 scrolled-right] visible=60 vbar=False scroll_x=101/101 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=31 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(34) 118x54 scrolled-right] header|  Address         Length   Endian  Virt  Func  Access  Dtype
+[full PAGE64(34) 118x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(34) 160x54 unscrolled] visible=73 vbar=False scroll_x=0/88 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=44 | rows=3 cursor_row=0 | builds=2 fits=2 fit_rebuilds=0
+[full PAGE64(34) 160x54 unscrolled] header|  Address         Length   Tag                                   Source
+[full PAGE64(34) 160x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(34) 160x54 scrolled-right] visible=73 vbar=False scroll_x=88/88 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=44 | rows=3 cursor_row=0 | builds=2 fits=2 fit_rebuilds=0
+[full PAGE64(34) 160x54 scrolled-right] header|  Address         Length    Unit  Bits  Endian  Virt  Func  Access  Dtype
+[full PAGE64(34) 160x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(34) 220x54 unscrolled] visible=108 vbar=False scroll_x=0/53 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=79 | rows=3 cursor_row=0 | builds=2 fits=2 fit_rebuilds=0
+[full PAGE64(34) 220x54 unscrolled] header|  Address         Length   Tag                                   Source   Raw   Physical  InMem  Region   Lim
+[full PAGE64(34) 220x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(34) 220x54 scrolled-right] visible=108 vbar=False scroll_x=53/53 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=79 | rows=3 cursor_row=0 | builds=2 fits=2 fit_rebuilds=0
+[full PAGE64(34) 220x54 scrolled-right] header|  Address         Length   Physical  InMem  Region   Limits    Unit  Bits  Endian  Virt  Func  Access  Dtype
+[full PAGE64(34) 220x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(48) 80x54 unscrolled] visible=38 vbar=False scroll_x=0/123 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=9 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(48) 80x54 unscrolled] header|  Address         Length   Tag
+[full PAGE64(48) 80x54 unscrolled] row0|  0x1C2D3E00      2266     ✓ SYN_…ABCD
+[full PAGE64(48) 80x54 unscrolled] row0: Address=0x1C2D3E00:whole; Length=2266:whole; Tag='✓ SYN_…ABCD' (11 cells, ends at 37, inside, form=ok)
+[full PAGE64(48) 80x54 unscrolled] row1|  0x1C2D3E004026  2        · SYN_…ABCD
+[full PAGE64(48) 80x54 unscrolled] row1: Address=0x1C2D3E004026:whole; Length=2:whole; Tag='· SYN_…ABCD' (11 cells, ends at 37, inside, form=ok)
+[full PAGE64(48) 80x54 unscrolled] row2|  0x00001000      1048576  · SYN_…ABCD
+[full PAGE64(48) 80x54 unscrolled] row2: Address=0x00001000:whole; Length=1048576:whole; Tag='· SYN_…ABCD' (11 cells, ends at 37, inside, form=ok)
+[full PAGE64(48) 80x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(48) 80x54 scrolled-right] visible=38 vbar=False scroll_x=123/123 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=9 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(48) 80x54 scrolled-right] header|  Address         Length  ccess  Dtype
+[full PAGE64(48) 80x54 scrolled-right] row0|  0x1C2D3E00      2266
+[full PAGE64(48) 80x54 scrolled-right] row0: Address=0x1C2D3E00:whole; Length=2266:whole; Tag='✓ SYN_…ABCD' (11 cells, ends at -86, inside, -)
+[full PAGE64(48) 80x54 scrolled-right] row1|  0x1C2D3E004026  2              UWORD
+[full PAGE64(48) 80x54 scrolled-right] row1: Address=0x1C2D3E004026:whole; Length=2:whole; Tag='· SYN_…ABCD' (11 cells, ends at -86, inside, -)
+[full PAGE64(48) 80x54 scrolled-right] row2|  0x00001000      1048576        UBYTE
+[full PAGE64(48) 80x54 scrolled-right] row2: Address=0x00001000:whole; Length=1048576:whole; Tag='· SYN_…ABCD' (11 cells, ends at -86, inside, -)
+[full PAGE64(48) 80x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(48) 85x54 unscrolled] visible=41 vbar=False scroll_x=0/120 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=12 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(48) 85x54 unscrolled] header|  Address         Length   Tag
+[full PAGE64(48) 85x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(48) 85x54 scrolled-right] visible=41 vbar=False scroll_x=120/120 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=12 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(48) 85x54 scrolled-right] header|  Address         Length    Access  Dtype
+[full PAGE64(48) 85x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(48) 90x54 unscrolled] visible=44 vbar=False scroll_x=0/117 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=15 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(48) 90x54 unscrolled] header|  Address         Length   Tag
+[full PAGE64(48) 90x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(48) 90x54 scrolled-right] visible=44 vbar=False scroll_x=117/117 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=15 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(48) 90x54 scrolled-right] header|  Address         Length  unc  Access  Dtype
+[full PAGE64(48) 90x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(48) 95x54 unscrolled] visible=46 vbar=False scroll_x=0/115 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=17 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(48) 95x54 unscrolled] header|  Address         Length   Tag
+[full PAGE64(48) 95x54 unscrolled] row0|  0x1C2D3E00      2266     ✓ SYN_MAP_…6789ABCD
+[full PAGE64(48) 95x54 unscrolled] row0: Address=0x1C2D3E00:whole; Length=2266:whole; Tag='✓ SYN_MAP_…6789ABCD' (19 cells, ends at 45, inside, form=ok)
+[full PAGE64(48) 95x54 unscrolled] row1|  0x1C2D3E004026  2        · SYN_V64_…6789ABCD
+[full PAGE64(48) 95x54 unscrolled] row1: Address=0x1C2D3E004026:whole; Length=2:whole; Tag='· SYN_V64_…6789ABCD' (19 cells, ends at 45, inside, form=ok)
+[full PAGE64(48) 95x54 unscrolled] row2|  0x00001000      1048576  · SYN_BIG_…6789ABCD
+[full PAGE64(48) 95x54 unscrolled] row2: Address=0x00001000:whole; Length=1048576:whole; Tag='· SYN_BIG_…6789ABCD' (19 cells, ends at 45, inside, form=ok)
+[full PAGE64(48) 95x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(48) 95x54 scrolled-right] visible=46 vbar=False scroll_x=115/115 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=17 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(48) 95x54 scrolled-right] header|  Address         Length   Func  Access  Dtype
+[full PAGE64(48) 95x54 scrolled-right] row0|  0x1C2D3E00      2266
+[full PAGE64(48) 95x54 scrolled-right] row0: Address=0x1C2D3E00:whole; Length=2266:whole; Tag='✓ SYN_MAP_…6789ABCD' (19 cells, ends at -70, inside, -)
+[full PAGE64(48) 95x54 scrolled-right] row1|  0x1C2D3E004026  2                      UWORD
+[full PAGE64(48) 95x54 scrolled-right] row1: Address=0x1C2D3E004026:whole; Length=2:whole; Tag='· SYN_V64_…6789ABCD' (19 cells, ends at -70, inside, -)
+[full PAGE64(48) 95x54 scrolled-right] row2|  0x00001000      1048576                UBYTE
+[full PAGE64(48) 95x54 scrolled-right] row2: Address=0x00001000:whole; Length=1048576:whole; Tag='· SYN_BIG_…6789ABCD' (19 cells, ends at -70, inside, -)
+[full PAGE64(48) 95x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(48) 100x54 unscrolled] visible=49 vbar=False scroll_x=0/112 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=20 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(48) 100x54 unscrolled] header|  Address         Length   Tag
+[full PAGE64(48) 100x54 unscrolled] row0|  0x1C2D3E00      2266     ✓ SYN_MAP_A…456789ABCD
+[full PAGE64(48) 100x54 unscrolled] row0: Address=0x1C2D3E00:whole; Length=2266:whole; Tag='✓ SYN_MAP_A…456789ABCD' (22 cells, ends at 48, inside, form=ok)
+[full PAGE64(48) 100x54 unscrolled] row1|  0x1C2D3E004026  2        · SYN_V64_A…456789ABCD
+[full PAGE64(48) 100x54 unscrolled] row1: Address=0x1C2D3E004026:whole; Length=2:whole; Tag='· SYN_V64_A…456789ABCD' (22 cells, ends at 48, inside, form=ok)
+[full PAGE64(48) 100x54 unscrolled] row2|  0x00001000      1048576  · SYN_BIG_A…456789ABCD
+[full PAGE64(48) 100x54 unscrolled] row2: Address=0x00001000:whole; Length=1048576:whole; Tag='· SYN_BIG_A…456789ABCD' (22 cells, ends at 48, inside, form=ok)
+[full PAGE64(48) 100x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(48) 100x54 scrolled-right] visible=49 vbar=False scroll_x=112/112 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=20 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(48) 100x54 scrolled-right] header|  Address         Length  rt  Func  Access  Dtype
+[full PAGE64(48) 100x54 scrolled-right] row0|  0x1C2D3E00      2266
+[full PAGE64(48) 100x54 scrolled-right] row0: Address=0x1C2D3E00:whole; Length=2266:whole; Tag='✓ SYN_MAP_A…456789ABCD' (22 cells, ends at -64, inside, -)
+[full PAGE64(48) 100x54 scrolled-right] row1|  0x1C2D3E004026  2                         UWORD
+[full PAGE64(48) 100x54 scrolled-right] row1: Address=0x1C2D3E004026:whole; Length=2:whole; Tag='· SYN_V64_A…456789ABCD' (22 cells, ends at -64, inside, -)
+[full PAGE64(48) 100x54 scrolled-right] row2|  0x00001000      1048576                   UBYTE
+[full PAGE64(48) 100x54 scrolled-right] row2: Address=0x00001000:whole; Length=1048576:whole; Tag='· SYN_BIG_A…456789ABCD' (22 cells, ends at -64, inside, -)
+[full PAGE64(48) 100x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(48) 118x54 unscrolled] visible=60 vbar=False scroll_x=0/101 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=31 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(48) 118x54 unscrolled] header|  Address         Length   Tag
+[full PAGE64(48) 118x54 unscrolled] row0|  0x1C2D3E00      2266     ✓ SYN_MAP_ABCDEFG…Z0123456789ABCD
+[full PAGE64(48) 118x54 unscrolled] row0: Address=0x1C2D3E00:whole; Length=2266:whole; Tag='✓ SYN_MAP_ABCDEFG…Z0123456789ABCD' (33 cells, ends at 59, inside, form=ok)
+[full PAGE64(48) 118x54 unscrolled] row1|  0x1C2D3E004026  2        · SYN_V64_ABCDEFG…Z0123456789ABCD
+[full PAGE64(48) 118x54 unscrolled] row1: Address=0x1C2D3E004026:whole; Length=2:whole; Tag='· SYN_V64_ABCDEFG…Z0123456789ABCD' (33 cells, ends at 59, inside, form=ok)
+[full PAGE64(48) 118x54 unscrolled] row2|  0x00001000      1048576  · SYN_BIG_ABCDEFG…Z0123456789ABCD
+[full PAGE64(48) 118x54 unscrolled] row2: Address=0x00001000:whole; Length=1048576:whole; Tag='· SYN_BIG_ABCDEFG…Z0123456789ABCD' (33 cells, ends at 59, inside, form=ok)
+[full PAGE64(48) 118x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(48) 118x54 scrolled-right] visible=60 vbar=False scroll_x=101/101 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=31 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(48) 118x54 scrolled-right] header|  Address         Length   Endian  Virt  Func  Access  Dtype
+[full PAGE64(48) 118x54 scrolled-right] row0|  0x1C2D3E00      2266             no
+[full PAGE64(48) 118x54 scrolled-right] row0: Address=0x1C2D3E00:whole; Length=2266:whole; Tag='✓ SYN_MAP_ABCDEFG…Z0123456789ABCD' (33 cells, ends at -42, inside, -)
+[full PAGE64(48) 118x54 scrolled-right] row1|  0x1C2D3E004026  2                no                  UWORD
+[full PAGE64(48) 118x54 scrolled-right] row1: Address=0x1C2D3E004026:whole; Length=2:whole; Tag='· SYN_V64_ABCDEFG…Z0123456789ABCD' (33 cells, ends at -42, inside, -)
+[full PAGE64(48) 118x54 scrolled-right] row2|  0x00001000      1048576          no                  UBYTE
+[full PAGE64(48) 118x54 scrolled-right] row2: Address=0x00001000:whole; Length=1048576:whole; Tag='· SYN_BIG_ABCDEFG…Z0123456789ABCD' (33 cells, ends at -42, inside, -)
+[full PAGE64(48) 118x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(48) 160x54 unscrolled] visible=73 vbar=False scroll_x=0/88 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=44 | rows=3 cursor_row=0 | builds=2 fits=2 fit_rebuilds=0
+[full PAGE64(48) 160x54 unscrolled] header|  Address         Length   Tag                                   Source
+[full PAGE64(48) 160x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(48) 160x54 scrolled-right] visible=73 vbar=False scroll_x=88/88 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=44 | rows=3 cursor_row=0 | builds=2 fits=2 fit_rebuilds=0
+[full PAGE64(48) 160x54 scrolled-right] header|  Address         Length    Unit  Bits  Endian  Virt  Func  Access  Dtype
+[full PAGE64(48) 160x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(48) 220x54 unscrolled] visible=108 vbar=False scroll_x=0/53 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=79 | rows=3 cursor_row=0 | builds=2 fits=2 fit_rebuilds=0
+[full PAGE64(48) 220x54 unscrolled] header|  Address         Length   Tag                                   Source   Raw   Physical  InMem  Region   Lim
+[full PAGE64(48) 220x54 unscrolled] row0|  0x1C2D3E00      2266     ✓ SYN_MAP_ABCDEFGH…XYZ0123456789ABCD  formula  1792  1792      yes    unknown  0..
+[full PAGE64(48) 220x54 unscrolled] row0: Address=0x1C2D3E00:whole; Length=2266:whole; Tag='✓ SYN_MAP_ABCDEFGH…XYZ0123456789ABCD' (36 cells, ends at 62, inside, form=ok)
+[full PAGE64(48) 220x54 unscrolled] row1|  0x1C2D3E004026  2        · SYN_V64_ABCDEFGH…XYZ0123456789ABCD  formula                  no     unknown  0..
+[full PAGE64(48) 220x54 unscrolled] row1: Address=0x1C2D3E004026:whole; Length=2:whole; Tag='· SYN_V64_ABCDEFGH…XYZ0123456789ABCD' (36 cells, ends at 62, inside, form=ok)
+[full PAGE64(48) 220x54 unscrolled] row2|  0x00001000      1048576  · SYN_BIG_ABCDEFGH…XYZ0123456789ABCD  formula                  no     unknown  0..
+[full PAGE64(48) 220x54 unscrolled] row2: Address=0x00001000:whole; Length=1048576:whole; Tag='· SYN_BIG_ABCDEFGH…XYZ0123456789ABCD' (36 cells, ends at 62, inside, form=ok)
+[full PAGE64(48) 220x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(48) 220x54 scrolled-right] visible=108 vbar=False scroll_x=53/53 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=79 | rows=3 cursor_row=0 | builds=2 fits=2 fit_rebuilds=0
+[full PAGE64(48) 220x54 scrolled-right] header|  Address         Length   Physical  InMem  Region   Limits    Unit  Bits  Endian  Virt  Func  Access  Dtype
+[full PAGE64(48) 220x54 scrolled-right] row0|  0x1C2D3E00      2266     1792      yes    unknown  0..4095   %.0                 no
+[full PAGE64(48) 220x54 scrolled-right] row0: Address=0x1C2D3E00:whole; Length=2266:whole; Tag='✓ SYN_MAP_ABCDEFGH…XYZ0123456789ABCD' (36 cells, ends at 9, inside, -)
+[full PAGE64(48) 220x54 scrolled-right] row1|  0x1C2D3E004026  2                  no     unknown  0..65535  %.0                 no                  UWORD
+[full PAGE64(48) 220x54 scrolled-right] row1: Address=0x1C2D3E004026:whole; Length=2:whole; Tag='· SYN_V64_ABCDEFGH…XYZ0123456789ABCD' (36 cells, ends at 9, inside, -)
+[full PAGE64(48) 220x54 scrolled-right] row2|  0x00001000      1048576            no     unknown  0..65535  %.0                 no                  UBYTE
+[full PAGE64(48) 220x54 scrolled-right] row2: Address=0x00001000:whole; Length=1048576:whole; Tag='· SYN_BIG_ABCDEFGH…XYZ0123456789ABCD' (36 cells, ends at 9, inside, -)
+[full PAGE64(48) 220x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(100) 80x54 unscrolled] visible=38 vbar=False scroll_x=0/123 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=9 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(100) 80x54 unscrolled] header|  Address         Length   Tag
+[full PAGE64(100) 80x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(100) 80x54 scrolled-right] visible=38 vbar=False scroll_x=123/123 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=9 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(100) 80x54 scrolled-right] header|  Address         Length  ccess  Dtype
+[full PAGE64(100) 80x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(100) 85x54 unscrolled] visible=41 vbar=False scroll_x=0/120 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=12 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(100) 85x54 unscrolled] header|  Address         Length   Tag
+[full PAGE64(100) 85x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(100) 85x54 scrolled-right] visible=41 vbar=False scroll_x=120/120 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=12 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(100) 85x54 scrolled-right] header|  Address         Length    Access  Dtype
+[full PAGE64(100) 85x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(100) 90x54 unscrolled] visible=44 vbar=False scroll_x=0/117 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=15 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(100) 90x54 unscrolled] header|  Address         Length   Tag
+[full PAGE64(100) 90x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(100) 90x54 scrolled-right] visible=44 vbar=False scroll_x=117/117 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=15 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(100) 90x54 scrolled-right] header|  Address         Length  unc  Access  Dtype
+[full PAGE64(100) 90x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(100) 95x54 unscrolled] visible=46 vbar=False scroll_x=0/115 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=17 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(100) 95x54 unscrolled] header|  Address         Length   Tag
+[full PAGE64(100) 95x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(100) 95x54 scrolled-right] visible=46 vbar=False scroll_x=115/115 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=17 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(100) 95x54 scrolled-right] header|  Address         Length   Func  Access  Dtype
+[full PAGE64(100) 95x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(100) 100x54 unscrolled] visible=49 vbar=False scroll_x=0/112 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=20 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(100) 100x54 unscrolled] header|  Address         Length   Tag
+[full PAGE64(100) 100x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(100) 100x54 scrolled-right] visible=49 vbar=False scroll_x=112/112 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=20 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(100) 100x54 scrolled-right] header|  Address         Length  rt  Func  Access  Dtype
+[full PAGE64(100) 100x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(100) 118x54 unscrolled] visible=60 vbar=False scroll_x=0/101 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=31 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(100) 118x54 unscrolled] header|  Address         Length   Tag
+[full PAGE64(100) 118x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(100) 118x54 scrolled-right] visible=60 vbar=False scroll_x=101/101 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=31 | rows=3 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[full PAGE64(100) 118x54 scrolled-right] header|  Address         Length   Endian  Virt  Func  Access  Dtype
+[full PAGE64(100) 118x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(100) 160x54 unscrolled] visible=73 vbar=False scroll_x=0/88 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=44 | rows=3 cursor_row=0 | builds=2 fits=2 fit_rebuilds=0
+[full PAGE64(100) 160x54 unscrolled] header|  Address         Length   Tag                                   Source
+[full PAGE64(100) 160x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(100) 160x54 scrolled-right] visible=73 vbar=False scroll_x=88/88 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=44 | rows=3 cursor_row=0 | builds=2 fits=2 fit_rebuilds=0
+[full PAGE64(100) 160x54 scrolled-right] header|  Address         Length    Unit  Bits  Endian  Virt  Func  Access  Dtype
+[full PAGE64(100) 160x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(100) 220x54 unscrolled] visible=108 vbar=False scroll_x=0/53 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=79 | rows=3 cursor_row=0 | builds=2 fits=2 fit_rebuilds=0
+[full PAGE64(100) 220x54 unscrolled] header|  Address         Length   Tag                                   Source   Raw   Physical  InMem  Region   Lim
+[full PAGE64(100) 220x54 unscrolled] ROWS OK 3/3 | painted 0x runs not declared: none
+[full PAGE64(100) 220x54 scrolled-right] visible=108 vbar=False scroll_x=53/53 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=9, Tag=38, Source=9 | w=79 | rows=3 cursor_row=0 | builds=2 fits=2 fit_rebuilds=0
+[full PAGE64(100) 220x54 scrolled-right] header|  Address         Length   Physical  InMem  Region   Limits    Unit  Bits  Endian  Virt  Func  Access  Dtype
+[full PAGE64(100) 220x54 scrolled-right] ROWS OK 3/3 | painted 0x runs not declared: none
+[full p64 SUMMARY] cases=40 rows all OK unscrolled=40/40 Address+Length whole after scroll-right=40/40
+# exit 0 ; clone status after: 0 changed; load: 1.85 2.43 2.22

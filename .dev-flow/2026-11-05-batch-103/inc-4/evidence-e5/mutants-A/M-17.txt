@@ -1,0 +1,26 @@
+=== DIFF base -> M-17 (s19_app/tui/services/label_match.py) ===
+diff --git a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py b/M-17/s19_app/tui/services/label_match.py
+index d274de0..47ab58f 100644
+--- a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py
++++ b/M-17/s19_app/tui/services/label_match.py
+@@ -151,9 +151,7 @@ def build_label_index(names: Iterable[str]) -> LabelIndex:
+             raise TypeError(f"label names must be str, got {type(name).__name__}")
+         if len(name) > 1024:
+             continue
+-        if name not in seen:
+-            seen.add(name)
+-            uniq.append(name)
++        uniq.append(name)
+ 
+     names_tuple = tuple(uniq)
+     count = len(uniq)
+
+=== PYTEST (tail) ===
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+/tmp/b103-e5-4-mutA/M-17/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.17/1: query 'VALUE_0001' limit 20
+/tmp/b103-e5-4-mutA/M-17/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.17/2: query 'value_000' limit 20
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.17/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.17/2]
+2 failed, 127 deselected in 5.20s

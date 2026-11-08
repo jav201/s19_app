@@ -1,0 +1,65 @@
+===== diff -u (base vs mutant) s19_app/tui/services/label_match.py =====
+--- /tmp/b103-e5-4-mutB/base/s19_app/tui/services/label_match.py	2026-11-06 20:36:19.839317227 -0600
++++ /tmp/b103-e5-4-mutB/M-24/s19_app/tui/services/label_match.py	2026-11-06 21:02:50.664081119 -0600
+@@ -364,14 +364,7 @@
+         keyed: list[tuple[tuple, int]] = []
+         for name_id in members:
+             name = names[name_id]
+-            if rule is MatchRule.EXACT:
+-                case_exact = name == raw
+-            elif rule is MatchRule.PREFIX:
+-                case_exact = name.startswith(raw)
+-            elif rule is MatchRule.SUBSTRING:
+-                case_exact = raw in name
+-            else:
+-                case_exact = False
++            case_exact = False
+             keyed.append((_order_key(rule, group_key[1], name, case_exact)[3:], name_id))
+         keyed.sort(key=lambda item: item[0])
+         for _, name_id in keyed:
+===== pytest tail =====
+case_id = 'R-A2L-MATCH.24/4', key = ('DiscouNTCount', 'DiscountCount')
+query = 'count', limit = 20
+expected = [('DiscountCount', 'substring', 0, ((8, 13),)), ('DiscouNTCount', 'substring', 0, ((8, 13),))]
+
+    @pytest.mark.parametrize(
+        "case_id,key,query,limit,expected",
+        EXACT_CASES,
+        ids=[c[0] for c in EXACT_CASES],
+    )
+    def test_ranked_list_is_exactly(prep, case_id, key, query, limit, expected):
+        """The ranked list is exactly the case's expected list (names, rules, edits, spans, order).
+    
+        Covers (the case id is the pytest id) R-A2L-MATCH.1/1 .1/2 .1/3 .1/4 .2/1 .2/2 .2/3 .2/4
+        .2/5 .3/1 .3/2 .3/3 .4/1 .4/2 .4/3 .5/1 .5/2 .6/1 .6/2 .6/3 .7/1 .7/2 .7/3 .7/4 .8/1 .8/2
+        .8/3 .8/4 .8/5 .8/6 .8/7 .8/8 .8/9 .9/1 .9/2 .9/3 .9/4 .10/1 .10/2 .10/3 .10/4 .10/5
+        .10/6 .11/1 .11/2 .11/3 .12/3 .12/4 .13/1 .13/2 .13/3 .13/4 .14/1 .14/2 .15/1 .15/2
+        .16/1 .16/2 .16/3 .17/1 .17/2 .18/3 .19/1 .19/2 .20/2 .21/1 .21/2 .21/3 .22/1 .23/2
+        .24/2 .24/4 .25/3 .28/1 .32/1 .32/3 .33/2 .33/3 .34/1 .38/1 .38/2 .39/1 .39/2.
+        """
+        got = proj(run(prep, key, query, limit))
+>       assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E       AssertionError: R-A2L-MATCH.24/4: query 'count' limit 20
+E       assert [('DiscouNTCo..., ((8, 13),))] == [('DiscountCo..., ((8, 13),))]
+E         
+E         At index 0 diff: ('DiscouNTCount', 'substring', 0, ((8, 13),)) != ('DiscountCount', 'substring', 0, ((8, 13),))
+E         Use -v to get more diff
+
+/home/<user>/work/b103-int4/tests/test_b103_label_match.py:391: AssertionError
+___________ test_rows_24_1_case_exact_name_first_for_lowercase_query ___________
+
+prep = <function prep.<locals>.get at 0x7ff5f349cf40>
+
+    def test_rows_24_1_case_exact_name_first_for_lowercase_query(prep):
+        """R-A2L-MATCH.24/1: for ``rpm`` over RPM, rpm, Rpm entry 1 is ``rpm``."""
+>       assert run(prep, "TW", "rpm")[0].name == "rpm"
+E       AssertionError: assert 'RPM' == 'rpm'
+E         
+E         - rpm
+E         + RPM
+
+/home/<user>/work/b103-int4/tests/test_b103_label_match.py:452: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.24/4]
+FAILED tests/test_b103_label_match.py::test_rows_24_1_case_exact_name_first_for_lowercase_query
+2 failed, 2 passed, 125 deselected in 4.87s

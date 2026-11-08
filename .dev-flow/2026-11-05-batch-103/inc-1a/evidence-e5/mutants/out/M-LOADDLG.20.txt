@@ -1,0 +1,108 @@
+# M-LOADDLG.20
+# row: R-LOADDLG.20
+# s19_app.__file__ = /tmp/b103-e5-1a-mut/work/s19_app/__init__.py
+# note: the restrict branch without the unsafe-character check -> inserted
+# --- git diff ---
+diff --git a/s19_app/tui/os_clipboard_input.py b/s19_app/tui/os_clipboard_input.py
+index ad2f7240..dcd6c7da 100644
+--- a/s19_app/tui/os_clipboard_input.py
++++ b/s19_app/tui/os_clipboard_input.py
+@@ -845,11 +845,7 @@ class OsClipboardInput(Input):
+         if event.text:
+             first_line = event.text.splitlines()[0]
+             if self.restrict:
+-                if _strip_paste_controls(first_line, multiline=False) != first_line:
+-                    self.restricted()
+-                    event.prevent_default()
+-                    event.stop()
+-                    return
++                pass  # mutant: unsafe-character refusal removed
+             else:
+                 event.text = _strip_paste_controls(first_line, multiline=False)
+ 
+@@ -1001,9 +997,7 @@ class OsClipboardInput(Input):
+             # character is refused whole (R-LOADDLG.20), and any other
+             # line goes on raw so ``Input.replace`` refuses a C0, DEL or
+             # NUL line itself.
+-            if _strip_paste_controls(first_line, multiline=False) != first_line:
+-                self.restricted()
+-                return
++            pass  # mutant: unsafe-character refusal removed
+         else:
+             first_line = _strip_paste_controls(first_line, multiline=False)
+         start, end = self.selection
+
+# --- pytest (rc=1) ---
+9", "a\u202e.s19", "a.s19"):
+                    widget.value = ""
+                    widget.focus()
+                    app._clipboard = payload
+                    await pilot.pause()
+                    await pilot.press("ctrl+v")
+                    await pilot.pause()
+                    values.append(widget.value)
+                return values
+    
+        values = asyncio.run(_drive())
+>       assert values == ["", "", "", "a.s19"], values
+E       AssertionError: ['a\x9b31m.s19', 'a\ud800.s19', 'a\u202e.s19', 'a.s19']
+E       assert ['a\x9b31m.s1...s19', 'a.s19'] == ['', '', '', 'a.s19']
+E         
+E         At index 0 diff: 'a\x9b31m.s19' != ''
+E         Use -v to get more diff
+
+tests/test_b103_clipboard_core.py:678: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+___________ test_r_loaddlg_20_3_right_click_path_box_refuses_unsafe ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10020/test_r_loaddlg_20_3_right_clic0')
+
+    def test_r_loaddlg_20_3_right_click_path_box_refuses_unsafe(tmp_path: Path) -> None:
+        """R-LOADDLG.20/3 (LinuxH): a right-click paste with no selection refuses as /1."""
+        _assert_linuxh_headless()
+        from tests.support.b100_load_dialog import bare_path_dialog
+    
+        async def _drive() -> list:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(160, 48)) as pilot:
+                await pilot.pause()
+                app.push_screen(bare_path_dialog())
+                for _ in range(6):
+                    await pilot.pause()
+                widget = app.screen.query_one("#load_path", Input)
+                values = []
+                for payload in ("a\x9b31m.s19", "a\ud800.s19", "a\u202e.s19", "a.s19"):
+                    widget.value = ""
+                    widget.focus()
+                    app._clipboard = payload
+                    await pilot.pause()
+                    await right_click_app_route(app, pilot, widget)
+                    await pilot.pause()
+                    values.append(widget.value)
+                return values
+    
+        values = asyncio.run(_drive())
+>       assert values == ["", "", "", "a.s19"], values
+E       AssertionError: ['a\x9b31m.s19', 'a\ud800.s19', 'a\u202e.s19', 'a.s19']
+E       assert ['a\x9b31m.s1...s19', 'a.s19'] == ['', '', '', 'a.s19']
+E         
+E         At index 0 diff: 'a\x9b31m.s19' != ''
+E         Use -v to get more diff
+
+tests/test_b103_clipboard_core.py:706: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:626 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+=========================== short test summary info ============================
+FAILED tests/test_b103_clipboard_core.py::test_r_loaddlg_20_1_terminal_paste_path_box_refuses_unsafe
+FAILED tests/test_b103_clipboard_core.py::test_r_loaddlg_20_2_ctrl_v_path_box_refuses_unsafe
+FAILED tests/test_b103_clipboard_core.py::test_r_loaddlg_20_3_right_click_path_box_refuses_unsafe
+3 failed, 84 deselected in 7.37s
+
+===== stderr =====

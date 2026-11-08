@@ -1,0 +1,46 @@
+# M-20  row R-A2L-MATCH.20
+
+control: order by name alone -> rules interleave (first clause)
+edit: `_cut`: collect all entries, sort by name (code point), slice to limit
+
+s19_app.__file__: /tmp/b103-e5-4-mutr2A/M-20/s19_app/__init__.py
+
+== diff ==
+--- /tmp/b103-e5-4-mutr2A/base/s19_app/tui/services/label_match.py	2026-11-06 22:11:34.000000000 -0600
++++ /tmp/b103-e5-4-mutr2A/M-20/s19_app/tui/services/label_match.py	2026-11-06 22:44:08.600469612 -0600
+@@ -503,9 +503,8 @@
+                     spans=spans,
+                 )
+             )
+-            if len(result) >= limit:
+-                return result
+-    return result
++    result.sort(key=lambda m: m.name)
++    return result[:limit]
+ 
+ 
+ def _fuzzy_tier(
+
+== pytest (returncode 1, KILLED) ==
+F.F                                                                      [100%]
+=================================== FAILURES ===================================
+________________ test_ranked_list_is_exactly[R-A2L-MATCH.20/2] _________________
+tests/test_b103_label_match.py:391: in test_ranked_list_is_exactly
+    assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E   AssertionError: R-A2L-MATCH.20/2: query 'gamecontroller.timer' limit 20
+E   assert [('model.Main... ((16, 36),))] == [('model.Main...), (51, 52)))]
+E     
+E     At index 0 diff: ('model.MainClass.gameController.stopWatch.timeCounter', 'subsequence', 0, ((16, 30), (32, 33), (42, 45), (51, 52))) != ('model.MainClass.gameController.timer.timeCounter', 'substring', 0, ((16, 36),))
+E     Use -v to get more diff
+_______________ test_rows_20_3_token_then_fuzzy_then_subsequence _______________
+tests/test_b103_label_match.py:436: in test_rows_20_3_token_then_fuzzy_then_subsequence
+    assert got == R_OKS_AHW
+E   AssertionError: assert [('AwsQdc.VXA...), (56, 57)))] == [('LukPvq.JXM...), (56, 57)))]
+E     
+E     At index 0 diff: ('AwsQdc.VXAO_CSP_KH.NkshfehlTcyfkjea_IPNR', 'fuzzy', 2, ((0, 3), (19, 27))) != ('LukPvq.JXML_UPQ_BI.OKSAhwvcueaniy', 'token', 0, ((19, 25),))
+E     Use -v to get more diff
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.20/2]
+FAILED tests/test_b103_label_match.py::test_rows_20_3_token_then_fuzzy_then_subsequence
+2 failed, 1 passed, 126 deselected in 5.09s
+

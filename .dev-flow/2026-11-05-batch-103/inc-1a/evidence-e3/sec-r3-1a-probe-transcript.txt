@@ -1,0 +1,122 @@
+s19_app.__file__ = <home>/work/s19_app/s19_app/__init__.py
+textual = 8.2.8 python = 3.11.18
+cascade = ['ctypes-win32', 'powershell']
+
+== U1  [Data: _UNSAFE_PASTE] keys (graph example)
+  U+D800 single=True  multi=True 
+  U+DFFF single=True  multi=True 
+  U+202E single=True  multi=True 
+  U+2069 single=True  multi=True 
+  U+001B single=True  multi=True 
+  U+009B single=True  multi=True 
+  U+0000 single=True  multi=True 
+  U+007F single=True  multi=True 
+  U+0009 single=False multi=False
+  U+000A single=True  multi=False
+  U+000D single=True  multi=False
+  U+00A0 single=False multi=False
+  U+200F single=False multi=False
+  key types: ['int'] size 2122
+  strip(P-CTRL, single) = 'A[13DBC'
+  strip(P-CTRL-M, multi) = 'A[13DBC\tD\r\nE'
+  strip(P1 unicode) unchanged: True
+
+== S1  E3S-13/-16: single-line, design C, value oracles (R-PASTE.34/1-/4, R-PASTE.1, R-TUI-043.4)
+  ok  P-CTRL               terminal value='A[13DBC' unsafe-left=[]
+  ok  P-CTRL               ctrlv    value='A[13DBC' unsafe-left=[]
+  ok  P-CTRL               right    value='A[13DBC' unsafe-left=[]
+  ok  P-CTRL-L             terminal value='L1[2J' unsafe-left=[]
+  ok  P-CTRL-L             ctrlv    value='L1[2J' unsafe-left=[]
+  ok  P-CTRL-L             right    value='L1[2J' unsafe-left=[]
+  ok  L1\nL2               terminal value='L1' unsafe-left=[]
+  ok  unicode\nsecond      terminal value='Ñoño Ж 漢字 😀' unsafe-left=[]
+  ok  unicode\nsecond      ctrlv    value='Ñoño Ж 漢字 😀' unsafe-left=[]
+  ok  unicode\nsecond      right    value='Ñoño Ж 漢字 😀' unsafe-left=[]
+  ok  ab|P1 line\nsecond   terminal value='aP1 lineb' unsafe-left=[]
+  ok  ab|P1 line\nsecond   ctrlv    value='aP1 lineb' unsafe-left=[]
+  ok  ab|P1 line\nsecond   right    value='aP1 lineb' unsafe-left=[]
+
+== S2  E3S-13/-15 negative controls, single-line (each must differ from the row)
+  RED strip before split   terminal value='L1[2JL2'
+  RED strip before split   ctrlv    value='L1[2JL2'
+  RED strip before split   ctrlv    value='P1 linesecond'
+  RED C0/C1-only table     terminal value='A[13DBC\u202e\ud800'
+  RED no strip (base)      terminal value='A\x1b[13DB\x00C\u202e\ud800'
+
+== M1  E3S-13/-16: multi-line, design C, document-line oracles (R-PASTE.35/1-/4, R-TUI-044.3)
+  ok  P-CTRL-M             terminal lines=['A[13DBC\tD', 'E'] unsafe-left=[]
+  ok  P-CTRL-M             ctrlv    lines=['A[13DBC\tD', 'E'] unsafe-left=[]
+  ok  P-CTRL-M             right    lines=['A[13DBC\tD', 'E'] unsafe-left=[]
+  ok  P2-ESC               terminal lines=['L1 Ñ€[2J', 'L2 漢'] unsafe-left=[]
+  ok  P2-ESC               ctrlv    lines=['L1 Ñ€[2J', 'L2 漢'] unsafe-left=[]
+  ok  P2-ESC               right    lines=['L1 Ñ€[2J', 'L2 漢'] unsafe-left=[]
+  ok  ab|P1 line\nsecond   terminal lines=['aP1 line', 'secondb'] unsafe-left=[]
+  ok  ab|P1 line\nsecond   ctrlv    lines=['aP1 line', 'secondb'] unsafe-left=[]
+  ok  ab|P1 line\nsecond   right    lines=['aP1 line', 'secondb'] unsafe-left=[]
+
+== M2  negative controls, multi-line
+  bare _CONTROL_SCRUB  terminal lines=['A[13DBCDE\u202e\ud800'] unsafe-left=['U+202E', 'U+D800']
+  bare _CONTROL_SCRUB  ctrlv    lines=['P1 linesecond'] unsafe-left=[]
+  C0/C1-only table     terminal lines=['A[13DBC\tD', 'E\u202e\ud800'] unsafe-left=['U+202E', 'U+D800']
+  no strip (base)      terminal lines=['A\x1b[13DB\x00C\tD', 'E\u202e\ud800'] unsafe-left=['U+0000', 'U+001B', 'U+202E', 'U+D800']
+
+== L1  E3S-14: #load_path shape (restrict, max_length=4096), design C -> '' (R-PASTE.34/5, R-LOADDLG.20)
+  ok  'a\x00.s19'      terminal value=''
+  ok  'a\x00.s19'      ctrlv    value=''
+  ok  'a\x00.s19'      right    value=''
+  ok  'a\x1b[2K.s19'   terminal value=''
+  ok  'a\x1b[2K.s19'   ctrlv    value=''
+  ok  'a\x1b[2K.s19'   right    value=''
+  negative control: StripRestrictInput (the strip before `restrict`)
+  RED 'a\x00.s19'      terminal value='a.s19'
+  RED 'a\x00.s19'      ctrlv    value='a.s19'
+  RED 'a\x1b[2K.s19'   terminal value='a[2K.s19'
+  RED 'a\x1b[2K.s19'   ctrlv    value='a[2K.s19'
+  clean path still lands: C:/fw/a.s19
+
+== L2  the path box's own filter, design C: what it lets through (base gap; R-PASTE.34 'Base' names C1 only)
+  C1 CSI          terminal inserted=True  unsafe-left=['U+009B'] in-drawn=True
+  C1 CSI          ctrlv    inserted=True  unsafe-left=['U+009B'] in-drawn=True
+  lone surrogate  terminal inserted=True  unsafe-left=['U+D800'] in-drawn=True
+  lone surrogate  ctrlv    inserted=True  unsafe-left=['U+D800'] in-drawn=True
+  RLO bidi        terminal inserted=True  unsafe-left=['U+202E'] in-drawn=True
+  RLO bidi        ctrlv    inserted=True  unsafe-left=['U+202E'] in-drawn=True
+  LRI bidi        terminal inserted=True  unsafe-left=['U+2066'] in-drawn=True
+  LRI bidi        ctrlv    inserted=True  unsafe-left=['U+2066'] in-drawn=True
+
+== D1  round 1's P1/P2 shapes, design C: the drawn line after removing SGR (the security property)
+  CInput  R1-P1 terminal ESC-left=False unsafe-in-drawn=[] unsafe-in-value=[]
+  CInput  R1-P1 ctrlv    ESC-left=False unsafe-in-drawn=[] unsafe-in-value=[]
+  CInput  R1-P1 right    ESC-left=False unsafe-in-drawn=[] unsafe-in-value=[]
+  CInput  R1-P2 terminal ESC-left=False unsafe-in-drawn=[] unsafe-in-value=[]
+  CInput  R1-P2 ctrlv    ESC-left=False unsafe-in-drawn=[] unsafe-in-value=[]
+  CInput  R1-P2 right    ESC-left=False unsafe-in-drawn=[] unsafe-in-value=[]
+  CArea   R1-P1 terminal ESC-left=False unsafe-in-drawn=[] unsafe-in-value=[]
+  CArea   R1-P1 ctrlv    ESC-left=False unsafe-in-drawn=[] unsafe-in-value=[]
+  CArea   R1-P1 right    ESC-left=False unsafe-in-drawn=[] unsafe-in-value=[]
+  CArea   R1-P2 terminal ESC-left=False unsafe-in-drawn=[] unsafe-in-value=[]
+  CArea   R1-P2 ctrlv    ESC-left=False unsafe-in-drawn=[] unsafe-in-value=[]
+  CArea   R1-P2 right    ESC-left=False unsafe-in-drawn=[] unsafe-in-value=[]
+
+== W1  a lone surrogate drawn in the path box (design C) -> textual's WriterThread
+  #load_path value: 'ok\ud800ok' | lone surrogate in the drawn line: True
+  errors=strict           thread exception=['UnicodeEncodeError'] frame-3 written=False
+  errors=surrogateescape  thread exception=['UnicodeEncodeError'] frame-3 written=False
+  a box without restrict, same payload: value 'okok' | surrogate drawn: False
+
+== E1  edges of the corrected nodes
+  only unsafe, terminal, over 'ab' selected  -> 'ab'
+  only unsafe, ctrl+v, over 'ab' selected    -> ''
+  '\n' alone, terminal                       -> ''
+  '\n' alone, ctrl+v                         -> ''
+  C1 NEL line break                          -> 'A'
+  U+2028 line break                          -> 'A'
+  only unsafe, multi, terminal               -> ['']
+
+== SUMMARY
+  S1: 13/13 as the records say
+  S2: 5/5 as the records say
+  M1: 9/9 as the records say
+  L1: 6/6 as the records say
+  D1: 12/12 as the records say
+exit=0

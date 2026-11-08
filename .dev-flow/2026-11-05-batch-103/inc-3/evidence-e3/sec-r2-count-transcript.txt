@@ -1,0 +1,47 @@
+s19_app.__file__ = ~/work/b103-int2a/s19_app/__init__.py
+python 3.11.18
+[K1] NO_AXIS_PTS_X datatype UBYTE        : STD curve CQ -> None; COM curve CR (axis object AXO) -> None
+[K2] UBYTE: 1,024 count values (range 0..255, exhaustive x 2 byte orders x STD/COM) -> {'A2L-DEF-AXIS-CURRENT': 1008, 'A2L-DEF-AXIS-PARTIAL': 12, 'count 4': 4}; exceptions 0
+     UBYTE count 255 (largest): ('REFUSAL', 'A2L-DEF-AXIS-CURRENT', 255)
+[K1] NO_AXIS_PTS_X datatype SBYTE        : STD curve CQ -> None; COM curve CR (axis object AXO) -> None
+[K2] SBYTE: 1,024 count values (range -128..127, exhaustive x 2 byte orders x STD/COM) -> {'A2L-DEF-AXIS-CURRENT': 1008, 'A2L-DEF-AXIS-PARTIAL': 12, 'count 4': 4}; exceptions 0
+     SBYTE count -1: ('REFUSAL', 'A2L-DEF-AXIS-CURRENT', -1)  (E3S3-05: CURRENT, not PARTIAL)
+     SBYTE count -128: ('REFUSAL', 'A2L-DEF-AXIS-CURRENT', -128)  (E3S3-05: CURRENT, not PARTIAL)
+     SBYTE count 127 (largest): ('REFUSAL', 'A2L-DEF-AXIS-CURRENT', 127)
+[K1] NO_AXIS_PTS_X datatype UWORD        : STD curve CQ -> None; COM curve CR (axis object AXO) -> None
+[K2] UWORD: 262,144 count values (range 0..65535, exhaustive x 2 byte orders x STD/COM) -> {'A2L-DEF-AXIS-CURRENT': 262128, 'A2L-DEF-AXIS-PARTIAL': 12, 'count 4': 4}; exceptions 0
+     UWORD count 65535 (largest): ('REFUSAL', 'A2L-DEF-AXIS-CURRENT', 65535)
+[K1] NO_AXIS_PTS_X datatype SWORD        : STD curve CQ -> None; COM curve CR (axis object AXO) -> None
+[K2] SWORD: 262,144 count values (range -32768..32767, exhaustive x 2 byte orders x STD/COM) -> {'A2L-DEF-AXIS-CURRENT': 262128, 'A2L-DEF-AXIS-PARTIAL': 12, 'count 4': 4}; exceptions 0
+     SWORD count -1: ('REFUSAL', 'A2L-DEF-AXIS-CURRENT', -1)  (E3S3-05: CURRENT, not PARTIAL)
+     SWORD count -32768: ('REFUSAL', 'A2L-DEF-AXIS-CURRENT', -32768)  (E3S3-05: CURRENT, not PARTIAL)
+     SWORD count 32767 (largest): ('REFUSAL', 'A2L-DEF-AXIS-CURRENT', 32767)
+[K1] NO_AXIS_PTS_X datatype ULONG        : STD curve CQ -> None; COM curve CR (axis object AXO) -> None
+[K2] ULONG: 800,056 count values (range 0..4294967295, edges + 200,000 seeded x 2 byte orders x STD/COM) -> {'A2L-DEF-AXIS-CURRENT': 800036, 'A2L-DEF-AXIS-PARTIAL': 16, 'count 4': 4}; exceptions 0
+     ULONG count 4294967295 (largest): ('REFUSAL', 'A2L-DEF-AXIS-CURRENT', 4294967295)
+[K1] NO_AXIS_PTS_X datatype SLONG        : STD curve CQ -> None; COM curve CR (axis object AXO) -> None
+[K2] SLONG: 800,064 count values (range -2147483648..2147483647, edges + 200,000 seeded x 2 byte orders x STD/COM) -> {'A2L-DEF-AXIS-CURRENT': 800048, 'A2L-DEF-AXIS-PARTIAL': 12, 'count 4': 4}; exceptions 0
+     SLONG count -1: ('REFUSAL', 'A2L-DEF-AXIS-CURRENT', -1)  (E3S3-05: CURRENT, not PARTIAL)
+     SLONG count -2147483648: ('REFUSAL', 'A2L-DEF-AXIS-CURRENT', -2147483648)  (E3S3-05: CURRENT, not PARTIAL)
+     SLONG count 2147483647 (largest): ('REFUSAL', 'A2L-DEF-AXIS-CURRENT', 2147483647)
+[K1] NO_AXIS_PTS_X datatype A_UINT64     : STD curve CQ -> None; COM curve CR (axis object AXO) -> None
+[K2] A_UINT64: 800,056 count values (range 0..18446744073709551615, edges + 200,000 seeded x 2 byte orders x STD/COM) -> {'A2L-DEF-AXIS-CURRENT': 800036, 'A2L-DEF-AXIS-PARTIAL': 16, 'count 4': 4}; exceptions 0
+     A_UINT64 count 18446744073709551615 (largest): ('REFUSAL', 'A2L-DEF-AXIS-CURRENT', 18446744073709551615)
+[K1] NO_AXIS_PTS_X datatype A_INT64      : STD curve CQ -> None; COM curve CR (axis object AXO) -> None
+[K2] A_INT64: 800,064 count values (range -9223372036854775808..9223372036854775807, edges + 200,000 seeded x 2 byte orders x STD/COM) -> {'A2L-DEF-AXIS-CURRENT': 800048, 'A2L-DEF-AXIS-PARTIAL': 12, 'count 4': 4}; exceptions 0
+     A_INT64 count -1: ('REFUSAL', 'A2L-DEF-AXIS-CURRENT', -1)  (E3S3-05: CURRENT, not PARTIAL)
+     A_INT64 count -9223372036854775808: ('REFUSAL', 'A2L-DEF-AXIS-CURRENT', -9223372036854775808)  (E3S3-05: CURRENT, not PARTIAL)
+     A_INT64 count 9223372036854775807 (largest): ('REFUSAL', 'A2L-DEF-AXIS-CURRENT', 9223372036854775807)
+[K1] NO_AXIS_PTS_X datatype FLOAT16_IEEE : STD curve CQ -> A2L-DEF-LAYOUT-DATATYPE; COM curve CR (axis object AXO) -> A2L-DEF-LAYOUT-DATATYPE
+[K1] NO_AXIS_PTS_X datatype FLOAT32_IEEE : STD curve CQ -> A2L-DEF-LAYOUT-DATATYPE; COM curve CR (axis object AXO) -> A2L-DEF-LAYOUT-DATATYPE
+[K1] NO_AXIS_PTS_X datatype FLOAT64_IEEE : STD curve CQ -> A2L-DEF-LAYOUT-DATATYPE; COM curve CR (axis object AXO) -> A2L-DEF-LAYOUT-DATATYPE
+[K1] NO_AXIS_PTS_X datatype BYTE         : STD curve CQ -> A2L-DEF-LAYOUT-DATATYPE; COM curve CR (axis object AXO) -> A2L-DEF-LAYOUT-DATATYPE
+[K1] NO_AXIS_PTS_X datatype WORD         : STD curve CQ -> A2L-DEF-LAYOUT-DATATYPE; COM curve CR (axis object AXO) -> A2L-DEF-LAYOUT-DATATYPE
+[K1] NO_AXIS_PTS_X datatype LONG         : STD curve CQ -> A2L-DEF-LAYOUT-DATATYPE; COM curve CR (axis object AXO) -> A2L-DEF-LAYOUT-DATATYPE
+[K1] NO_AXIS_PTS_X datatype FOO          : STD curve CQ -> A2L-DEF-LAYOUT-DATATYPE; COM curve CR (axis object AXO) -> A2L-DEF-LAYOUT-DATATYPE
+[K1] NO_AXIS_PTS_X datatype (missing word): STD curve CQ -> A2L-DEF-LAYOUT-DATATYPE; COM curve CR (axis object AXO) -> A2L-DEF-LAYOUT-DATATYPE
+[K3] exceptions over every shape: 0; open branches met: [('_read_record_layout: datatype word missing, <word> unpinned', ('RL_CQ', ('NO_AXIS_PTS_X', '1'))), ('_read_record_layout: datatype word missing, <word> unpinned', ('RL_AXO', ('NO_AXIS_PTS_X', '1')))]
+[K4] negative control FLOAT16_IEEE 48 00 (decodes None): round-1 rule -> RAISE TypeError: '>' not supported between instances of 'NoneType' and 'int'; corrected rule -> ('REFUSAL', 'A2L-DEF-AXIS-CURRENT', None)
+[K4] negative control FLOAT32_IEEE 41 00 00 00 (decodes 8.0): round-1 rule -> 'CURRENT'; corrected rule -> ('REFUSAL', 'A2L-DEF-AXIS-CURRENT', 8.0)
+[K4] negative control FLOAT32_IEEE 7f c0 00 00 (decodes nan): round-1 rule -> RAISE TypeError: 'float' object cannot be interpreted as an integer; corrected rule -> ('REFUSAL', 'A2L-DEF-AXIS-CURRENT', nan)
+[K4] negative control FLOAT64_IEEE 40 10 00 00 00 00 00 00 (decodes 4.0): round-1 rule -> RAISE TypeError: 'float' object cannot be interpreted as an integer; corrected rule -> ('REFUSAL', 'A2L-DEF-AXIS-CURRENT', 4.0)

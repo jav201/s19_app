@@ -1,0 +1,58 @@
+# M-.20
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.20/s19_app/__init__.py
+# note: EXTENDED_LIMITS ignored
+#   EDIT-OK: '        elif word == "EXTENDED_LIMITS" and result["extended_limits"] i'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..d4462237 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -1081,14 +1081,6 @@ def _read_object_lines(section: Optional[dict]) -> dict:
+         if word == "FORMAT" and result["format"] is None and i + 1 < n:
+             result["format"] = body[i + 1]
+             i += 1
+-        elif word == "EXTENDED_LIMITS" and result["extended_limits"] is None and i + 2 < n:
+-            lo = _finite_number(body[i + 1])
+-            hi = _finite_number(body[i + 2])
+-            if lo is not None and hi is not None:
+-                result["extended_limits"] = Limits(lo, hi, body[i + 1], body[i + 2])
+-                i += 2
+-            # A line that does not hold two numbers consumes only its keyword, so the
+-            # next keyword (e.g. FORMAT) is still read (R-A2L-DEF.21/1, .22).
+         elif word in ("PHYS_UNIT", "UNIT") and result["unit"] is None and i + 1 < n:
+             result["unit"] = body[i + 1]
+             i += 1
+
+# --- pytest (rc=1) ---
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_________________ test_r_a2l_def_20_1_integer_extended_limits __________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...osed /begin sections detected.'], 'path': '/tmp/b103-e5-2-mutA/M-.20/examples/case_00_public/ASAP2_Demo_V171.a2l', ...}
+
+    def test_r_a2l_def_20_1_integer_extended_limits(v171):
+        """R-A2L-DEF.20/1 - extended -128..127, limits -100..100."""
+        d = describe_definition(V171_SBYTE, v171)
+>       assert (d.extended_limits.lower, d.extended_limits.upper) == (-128, 127)
+                ^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'NoneType' object has no attribute 'lower'
+
+../base/tests/test_b103_a2l_definition.py:749: AttributeError
+------------------------------ Captured log setup ------------------------------
+WARNING  s19_app.tui.a2l:a2l.py:250 A2L section tree has structural errors: path=/tmp/b103-e5-2-mutA/M-.20/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+_________________ test_r_a2l_def_20_2_decimal_extended_limits __________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...osed /begin sections detected.'], 'path': '/tmp/b103-e5-2-mutA/M-.20/examples/case_00_public/ASAP2_Demo_V171.a2l', ...}
+
+    def test_r_a2l_def_20_2_decimal_extended_limits(v171):
+        """R-A2L-DEF.20/2 - EXTENDED_LIMITS -10000.0 20000.0."""
+        d = describe_definition("ASAM.C.SCALAR.FLOAT64_IEEE.IDENTICAL", v171)
+>       assert (d.extended_limits.lower, d.extended_limits.upper) == (-10000.0, 20000.0)
+                ^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'NoneType' object has no attribute 'lower'
+
+../base/tests/test_b103_a2l_definition.py:756: AttributeError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_20_1_integer_extended_limits
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_20_2_decimal_extended_limits
+2 failed, 189 deselected in 0.54s

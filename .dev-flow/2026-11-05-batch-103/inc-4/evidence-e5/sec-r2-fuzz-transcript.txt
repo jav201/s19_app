@@ -1,0 +1,12 @@
+runner sec-r2-run.sh sha256 01a6306bb691ca8ba9909f4f35ba0d442c21ea334e625d9331e6e9241c6bce63; probe sec-r2-probe.py sha256 86ef259a778cc3797e5e6312772d1edb6945d2d4732d4e94238565249ad2c47b
+s19_app.__file__ = /tmp/b103-e5-4-sec-r2/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5-4-sec-r2/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0
+tests module = /tmp/b103-e5-4-sec-r2/tree/tests/test_b103_label_match_perf.py
+mode = r2 fuzz  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = -988058495436741314
+host = <runner>  load = (1.73, 0.82, 1.43)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5-4-sec-r2/<user>  LOCALAPPDATA = /tmp/b103-e5-4-sec-r2/<user>/localappdata  PILOT_DIR = /tmp/b103-e5-4-sec-r2/pilot
+probe = sec-r2-probe.py sha256 86ef259a778cc3797e5e6312772d1edb6945d2d4732d4e94238565249ad2c47b; round-1 helpers = sec-e5-probe.py sha256 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+_FUZZY_SWITCH_CAP = 512
+queries x limits 1400 (27 s); listed entries 2624; exceptions 0; bad spans 0; rank != oracle 0; shipped vs forced paths (cap 0, cap 10**9) differing 0
+probe exit 0

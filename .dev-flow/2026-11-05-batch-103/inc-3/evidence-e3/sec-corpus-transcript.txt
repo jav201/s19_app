@@ -1,0 +1,10 @@
+[C0] files 168, parsed 168, worker errors 0, wall 37.8 s
+[C1] array/curve/map objects built by the model: 7331; exceptions: 0
+[C2] first refusal per object: {'none': 7128, 'A2L-DEF-ALIGNMENT': 136, 'A2L-DEF-AXIS-KIND': 50, 'A2L-DEF-LAYOUT': 6, 'A2L-DEF-AXIS-FIX-COUNT': 5, 'A2L-DEF-LAYOUT-MODE': 2, 'A2L-DEF-AXIS-MAX': 2, 'A2L-DEF-LAYOUT-PART': 1, 'A2L-DEF-LAYOUT-POSITION': 1}
+[C3] open branches reached (graph gives no result): {}
+[C4] largest real shapes: {'element_count': 524280, 'byte_length_ok': 524280, 'point_count': 1000} | FIX axes built: 376 largest FIX point count: 1000 | non-integral FIX points: 0
+[C5] VAL_BLK record layout components (readable layouts): {'FNC_VALUES': 2712}
+[C6] NO_AXIS_PTS_X datatypes of COM axis objects: {'UWORD': 51, 'UBYTE': 74}
+[C7] MOD_COMMON ALIGNMENT lines: {'ALIGNMENT_BYTE 1': 76, 'ALIGNMENT_WORD 2': 41, 'ALIGNMENT_LONG 4': 40, 'ALIGNMENT_FLOAT32_IEEE 4': 40, 'ALIGNMENT_FLOAT32_IEEE 1': 33, 'ALIGNMENT_LONG 1': 33, 'ALIGNMENT_WORD 1': 33, 'ALIGNMENT_FLOAT64_IEEE 1': 31, 'ALIGNMENT_FLOAT64_IEEE 4': 23, 'ALIGNMENT_INT64 1': 14, 'ALIGNMENT_FLOAT16_IEEE 1': 14, 'ALIGNMENT_INT64 8': 12, 'ALIGNMENT_FLOAT64_IEEE 8': 12, 'ALIGNMENT_FLOAT16_IEEE 2': 6, 'ALIGNMENT_INT64 4': 2, 'ALIGNMENT_WORDa 2': 1}
+[C8] slowest model runs (model s, parse s, file, objects): [(2.99, 30.914, '154.a2l', 3997), (0.849, 0.825, '159.a2l', 1463), (0.62, 0.906, '160.a2l', 1094), (0.486, 7.538, '155.a2l', 0), (0.269, 4.956, '157.a2l', 0), (0.253, 2.445, '158.a2l', 0)]
+[C9] model seconds total 6.40, parse seconds total 57.1

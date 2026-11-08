@@ -1,0 +1,19 @@
+# i3e3a-arch-probe 2026-11-06T22:45:41-06:00 host <runner>; load 3.14 1.91 1.76
+s19_app.__file__ = /tmp/b103-e3-3-architect/clone/s19_app/__init__.py
+a2l_definition.__file__ = /tmp/b103-e3-3-architect/clone/s19_app/tui/a2l_definition.py
+[Q0 software_a tags] 13990
+[Q1 Inc 2a real describe_definitions, every name: runs s / median s] ([0.962, 0.922, 0.932], 0.932)
+[Q2 walk alone / walk with Inc 3's two maps, median ms] (39.37, 47.79)
+[Q3 Inc 3 per-object reads: shapes] {'VAL_BLK': 101, 'CURVE': 158, 'MAP': 11, 'MEASUREMENT array': 196, 'COM axes': 161, 'AXIS_DESCR': 180}
+[Q3 Inc 3 per-object reads: runs s / median s] ([0.2607, 0.2611, 0.2627], 0.2611)
+[Q4 estimate: Inc 2a real + maps' extra + Inc 3 reads, s (bound 2.0 s)] 1.201
+[Q4 same with Inc 3 reads scaled x1.35 (2a real / 2a prototype = 1.0/0.74)] 1.293
+[Q5 1 FIX curve(s) of 1048576 points built at describe: s / peak MB] (0.663, 42.2)
+[Q5 4 FIX curve(s) of 1048576 points built at describe: s / peak MB] (2.612, 168.0)
+A2L section tree has structural errors: path=/tmp/b103-e3-3-architect/clone/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+[Q6 V171 AXIS_DESCR sections / with words on the /begin line] (51, 0)
+[Q6 SOFTA AXIS_DESCR sections / with words on the /begin line] (180, 0)
+[Q7 MD161: tag matrix_dim / 2a kind / 2a byte_length / refusal] (1, 'number', 1, None)
+[Q7 MDMID: tag matrix_dim / 2a kind / 2a byte_length / refusal] (None, 'number', 1, None)
+[Q8 walk on 'NO_AXIS_PTS_X 1 UBYTE AXIS_PTS_X 2 UBYTE …' + FNC_VALUES, 4 points: (component, offset)] [('NO_AXIS_PTS_X', 0), ('FNC_VALUES', 1)]
+# exit 0

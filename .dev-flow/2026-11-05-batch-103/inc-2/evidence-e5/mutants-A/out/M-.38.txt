@@ -1,0 +1,49 @@
+# M-.38
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.38/s19_app/__init__.py
+# note: the 15 decimals applied to an integer
+#   EDIT-OK: '    if (\n        datatype is not None\n        and datatype not in _FLO'
+#   EDIT-OK: '    if definition.decimals is not None and (\n        (datatype is not '
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..bfecfb04 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -1427,16 +1427,7 @@ def display_text(definition: Definition, value: int | float) -> str:
+         return "inf" if value > 0 else "-inf"
+     datatype = definition.datatype
+     conversion = definition.conversion_type
+-    if (
+-        datatype is not None
+-        and datatype not in _FLOAT_DATATYPES
+-        and conversion in (None, "IDENTICAL")
+-    ):
+-        return str(int(value))
+-    if definition.decimals is not None and (
+-        (datatype is not None and datatype in _FLOAT_DATATYPES)
+-        or conversion not in (None, "IDENTICAL")
+-    ):
++    if definition.decimals is not None:
+         d = definition.decimals
+         if d >= 15:
+             # Round to 15 significant digits, then write exactly d decimals of that
+
+# --- pytest (rc=1) ---
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+_____________ test_r_a2l_def_38_1_integer_text_under_many_decimals _____________
+
+softa = {'compu_methods_by_name': {'AFI_TU_FXBD_XMC_KKWP_MMV.DQXN_O_IJX_MSK_UimufsteUejnmysraz': {'coeffs': None, 'coeffs_line...jjVfzjGyvl', ...}, ...}, 'errors': [], 'path': '/tmp/b103-e5-2-mutA/M-.38/examples/case_00_public/software_a.a2l', ...}
+
+    def test_r_a2l_def_38_1_integer_text_under_many_decimals(softa):
+        """R-A2L-DEF.38/1 - software_a SWORD, NO_COMPU_METHOD, ``%.15``, FB FF -> ``-5``."""
+        d = describe_definition("AlyjmQyfk.GrsaEjbkyQmicdevPjq_GpqJraTjkq._1_", softa)
+>       assert _decoded(d, softa, _word(d, bytes([0xFB, 0xFF]))).text == "-5"
+E       AssertionError: assert '-5.000000000000000' == '-5'
+E         
+E         - -5
+E         + -5.000000000000000
+
+../base/tests/test_b103_a2l_definition.py:1064: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_38_1_integer_text_under_many_decimals
+1 failed, 1 passed, 189 deselected in 1.60s

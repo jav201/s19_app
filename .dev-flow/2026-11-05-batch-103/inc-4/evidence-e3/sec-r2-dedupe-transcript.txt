@@ -1,0 +1,28 @@
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+python = 3.11.18  PYTHONHASHSEED = None
+host = <runner>  load = (2.19970703125, 2.98583984375, 4.11279296875)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e3r2-4-security/home  LOCALAPPDATA = /tmp/b103-e3r2-4-security/home/<localappdata>  PILOT_DIR = /tmp/b103-e3r2-4-security/pilot
+
+=== REF6; limit 20, median of 7; R2 (graph) vs R2D (identical query tokens de-duplicated in the fuzzy tier); load (2.24267578125, 2.9697265625, 4.0947265625)
+   graph    319.9 ms | dedupe     41.6 ms | same list True | qtok 128 distinct 1 | walks None->None cand None tokint 127 | "'0 ' x 128"
+   graph    367.9 ms | dedupe     50.4 ms | same list True | qtok 52 distinct 2 | walks 52->2 cand 25000 tokint None | "'chax ' cut at 256"
+   graph    844.5 ms | dedupe     55.4 ms | same list True | qtok 126 distinct 2 | walks 126->2 cand 25000 tokint None | "'c ' x 125 + 'chax'"
+   graph   1141.0 ms | dedupe     53.5 ms | same list True | qtok 126 distinct 2 | walks 126->2 cand 25000 tokint None | "'0 ' x 125 + 'chax'"
+   graph     49.5 ms | dedupe     49.6 ms | same list True | qtok 4 distinct 4 | walks 4->4 cand 25000 tokint None | "4 DISTINCT 1-edit typos of 'char'"
+   graph     75.3 ms | dedupe     75.5 ms | same list True | qtok 8 distinct 8 | walks 8->8 cand 25000 tokint None | "8 DISTINCT 1-edit typos of 'char'"
+   graph    128.3 ms | dedupe    127.0 ms | same list True | qtok 16 distinct 16 | walks 16->16 cand 25000 tokint None | "16 DISTINCT 1-edit typos of 'char'"
+   graph    229.8 ms | dedupe    227.7 ms | same list True | qtok 32 distinct 32 | walks 32->32 cand 25000 tokint None | "32 DISTINCT 1-edit typos of 'char'"
+   graph    352.7 ms | dedupe    353.6 ms | same list True | qtok 51 distinct 51 | walks 51->51 cand 25000 tokint None | "51 DISTINCT 1-edit typos of 'char'"
+   graph      8.0 ms | dedupe      8.1 ms | same list True | qtok 52 distinct 52 | walks 2->2 cand 0 tokint None | "51 distinct typos of 'char' and 'meas' alternating"
+
+=== REF; limit 20, median of 7; R2 (graph) vs R2D (identical query tokens de-duplicated in the fuzzy tier); load (2.26953125, 2.892578125, 4.0205078125)
+   graph    198.3 ms | dedupe      9.6 ms | same list True | qtok 256 distinct 2 | walks None->None cand None tokint 255 | "'1a' x 128"
+   graph    286.2 ms | dedupe     10.4 ms | same list True | qtok 64 distinct 1 | walks 64->1 cand 2550 tokint 63 | "'cnt ' x 64"
+   graph    307.9 ms | dedupe     24.7 ms | same list True | qtok 64 distinct 1 | walks 64->1 cand 2611 tokint None | "'rat ' cut at 256"
+   graph    308.4 ms | dedupe     31.2 ms | same list True | qtok 121 distinct 2 | walks 121->2 cand 576 tokint None | "'e ' x 120 + 'rat'"
+   graph      0.0 ms | dedupe      0.0 ms | same list True | qtok 0 distinct 0 | walks None->None cand None tokint None | "8 DISTINCT 1-edit typos of 'rat'"
+   graph      0.0 ms | dedupe      0.0 ms | same list True | qtok 0 distinct 0 | walks None->None cand None tokint None | "16 DISTINCT 1-edit typos of 'rat'"
+   graph      0.0 ms | dedupe      0.0 ms | same list True | qtok 0 distinct 0 | walks None->None cand None tokint None | "32 DISTINCT 1-edit typos of 'rat'"
+   graph      0.0 ms | dedupe      0.0 ms | same list True | qtok 0 distinct 0 | walks None->None cand None tokint None | "64 DISTINCT 1-edit typos of 'rat'"
+
+load after = (2.3017578125, 2.87939453125, 4.00341796875)

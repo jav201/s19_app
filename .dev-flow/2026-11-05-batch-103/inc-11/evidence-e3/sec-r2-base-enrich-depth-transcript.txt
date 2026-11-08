@@ -1,0 +1,14 @@
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+[EN] base reader: C_B6 length=4; C_VB length=None; C_L0 length=0; C_X4 length=2; M_L0 length=0
+[EN] C_B6: reader length=None -> enriched byte_size=2 raw_bytes=1111 raw_value=4369 physical=4369
+[EN] C_VB: reader length=None -> enriched byte_size=2 raw_bytes=1111 raw_value=4369 physical=4369
+[EN] C_L0: reader length=None -> enriched byte_size=2 raw_bytes=1111 raw_value=4369 physical=4369
+[EN] C_X4: reader length=None -> enriched byte_size=2 raw_bytes=1111 raw_value=4369 physical=4369
+[EN] M_L0: reader length=None -> enriched byte_size=None raw_bytes=None raw_value=None physical=None
+[EN-picker] C_B6: address=0x2000 size=2 fmt='u16 %.0'  (the 'Use parameter' prefill size)
+[EN-picker] C_VB: address=0x2100 size=2 fmt='u16 %.0'  (the 'Use parameter' prefill size)
+[EN-picker] C_L0: address=0x2200 size=2 fmt='u16 %.0'  (the 'Use parameter' prefill size)
+[EN-picker] C_X4: address=0x2300 size=2 fmt='u16 %.0'  (the 'Use parameter' prefill size)
+[EN-picker] M_L0: address=0x3000 size=1 fmt='u8 %.0'  (the 'Use parameter' prefill size)
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+[DP 32 levels] base walkers + render: no exception; tags=1 errors=[]

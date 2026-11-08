@@ -1,0 +1,3 @@
+s19_app.__file__ = ~/work/b103-int2a/s19_app/__init__.py | python 3.11.18 | part list
+A2L section tree has structural errors: path=~/work/b103-int2a/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+[X8] FIX_AXIS_PAR_LIST of 1,048,576 numbers: file 7.28 MB, parse 0.01 s; describe 21.03 s, peak 95 MiB, kept 40 MiB; refusal None; fixed_rule numbers 1048576 (the file's own numbers; describe/parse = 1615.00)

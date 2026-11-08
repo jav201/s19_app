@@ -1,0 +1,46 @@
+=== s19_app.__file__ ===
+/tmp/b103-e5-4-mutr4B/M-31/s19_app/__init__.py
+
+=== DIFF base -> M-31 (s19_app/tui/services/label_match.py) ===
+--- /tmp/b103-e5-4-mutr4B/base/s19_app/tui/services/label_match.py	2026-11-07 01:32:51.000000000 -0600
++++ /tmp/b103-e5-4-mutr4B/M-31/s19_app/tui/services/label_match.py	2026-11-07 02:08:38.821655426 -0600
+@@ -906,7 +906,7 @@
+     offsets: list[int] = []
+     pos = 0
+     for ch in keys:
+-        found = text.find(ch, pos)
++        found = text.rfind(ch, pos)
+         if found < 0:
+             return None
+         offsets.append(found)
+
+=== PYTEST (tail, rc=1) ===
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________________________ test_rows_31_subsequence_spans ________________________
+
+prep = <function prep.<locals>.get at 0x7f78e77efc40>
+
+    def test_rows_31_subsequence_spans(prep):
+        """R-A2L-MATCH.31/1, .31/2 (across a separator) and .31/3 (leftmost-after-previous on a long name)."""
+        assert [m.spans for m in run(prep, "C08", "mp", 3)] == [((0, 1), (2, 3))] * 3
+>       assert spans_of(run(prep, "C08", "value_000"), "VALUE_0010") == ((0, 5), (6, 8), (9, 10))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_label_match.py:565: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = [LabelMatch(name='VALUE_0001', rule=<MatchRule.PREFIX: 'prefix'>, edits=0, spans=((0, 9),)), LabelMatch(name='VALUE_00...s=0, spans=((0, 9),)), LabelMatch(name='VALUE_0006', rule=<MatchRule.PREFIX: 'prefix'>, edits=0, spans=((0, 9),)), ...]
+name = 'VALUE_0010'
+
+    def spans_of(result, name):
+        hits = [m for m in result if m.name == name]
+>       assert len(hits) == 1, f"{name!r} listed {len(hits)} times in {[m.name for m in result]}"
+E       AssertionError: 'VALUE_0010' listed 0 times in ['VALUE_0001', 'VALUE_0002', 'VALUE_0003', 'VALUE_0004', 'VALUE_0005', 'VALUE_0006', 'VALUE_0007', 'VALUE_0008', 'VALUE_0009']
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/test_b103_label_match.py:83: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_rows_31_subsequence_spans - Asser...
+1 failed, 144 deselected in 5.04s

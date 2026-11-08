@@ -1,0 +1,29 @@
+grep -rnE 'R-A2L-MATCH\.4[23]([^0-9]|$)' --exclude-dir=.git (before this pass's record edits; the d3 pilot files already name them)
+== s19_app-b103-inc4-code @ 1c5314ec
+s19_app-b103-inc4-code/.dev-flow/2026-11-05-batch-103/inc-4/E5-security-review.md:217:| E5S-10 | **MAJOR** | design-gap | `label_match.py:584-631` (step 4 walks each distinct token, `:620`), `:1194-12
+s19_app-b103-inc4-code/.dev-flow/2026-11-05-batch-103/inc-4/evidence-e5/d3-pilot.py:4:- R-A2L-MATCH.42 (E5S-10): a per-ranking budget of trie node visits shared by the fuzzy walks of one ranking, in t
+s19_app-b103-inc4-code/.dev-flow/2026-11-05-batch-103/inc-4/evidence-e5/d3-pilot.py:10:- R-A2L-MATCH.43 (E5S-11): a name holding a character above U+007F (not str.isascii()) is left out of the prepare
+s19_app-b103-inc4-code/.dev-flow/2026-11-05-batch-103/inc-4/evidence-e5/d3-probe.py:8:R-A2L-MATCH.42 (a per-ranking budget of 400,000 trie node visits; when spent, the fuzzy rule lists what it found s
+s19_app-b103-inc4-code/.dev-flow/2026-11-05-batch-103/inc-4/evidence-e5/d3-probe.py:9:far) and R-A2L-MATCH.43 (a non-ASCII name is left out of the prepared list).
+s19_app-b103-inc4-code/.dev-flow/2026-11-05-batch-103/inc-4/evidence-e5/d3-probe.py:14:  cases  the cases of R-A2L-MATCH.42 (W40 2 and 6 tokens, DEEP40 1 and 6, W12 T20): budgeted median of 7, the
+s19_app-b103-inc4-code/.dev-flow/2026-11-05-batch-103/inc-4/evidence-e5/d3-probe.py:20:  ascii  the cases of R-A2L-MATCH.43 and the cases it changes (.4/1, .4/2, .12/4, .24/3, new .4/4), each shipped 
+s19_app-b103-inc4-code/.dev-flow/2026-11-05-batch-103/inc-4/evidence-e5/d3-probe.py:145:            ("R-A2L-MATCH.42/1", "'a' * 40 + ' ' + 'a' * 39 (2 distinct tokens, 80 chars)", R.runs_query((40, 39
+s19_app-b103-inc4-code/.dev-flow/2026-11-05-batch-103/inc-4/evidence-e5/d3-probe.py:146:            ("R-A2L-MATCH.42/2", "'a' * 40 ... 'a' * 35 (6 distinct tokens, 230 chars)", R.runs_query(range(40, 
+s19_app-b103-inc4-code/.dev-flow/2026-11-05-batch-103/inc-4/evidence-e5/d3-probe.py:150:            ("R-A2L-MATCH.42/3", "'a' * 40 (1 token)", "a" * 40),
+s19_app-b103-inc4-code/.dev-flow/2026-11-05-batch-103/inc-4/evidence-e5/d3-probe.py:151:            ("R-A2L-MATCH.42/4", "'a' * 40 ... 'a' * 35 (6 distinct tokens, 230 chars)", R.runs_query(range(40, 
+s19_app-b103-inc4-code/.dev-flow/2026-11-05-batch-103/inc-4/evidence-e5/d3-probe.py:153:            ("R-A2L-MATCH.42/5", "T20: 'a' * 10 + b ... u (20 distinct tokens, 239 chars)", R.t_query(20))]),
+s19_app-b103-inc4-code/.dev-flow/2026-11-05-batch-103/inc-4/evidence-e5/d3-probe.py:178:            if cid == "R-A2L-MATCH.42/2":
+s19_app-b103-inc4-code/.dev-flow/2026-11-05-batch-103/inc-4/evidence-e5/d3-probe.py:250:        ("R-A2L-MATCH.43/1", "['VALUE' + U+007F]", ["VALUE\x7f"], "value", 20),
+s19_app-b103-inc4-code/.dev-flow/2026-11-05-batch-103/inc-4/evidence-e5/d3-probe.py:251:        ("R-A2L-MATCH.43/2", "['VALUE' + U+0080]", ["VALUE\x80"], "value", 20),
+s19_app-b103-inc4-code/.dev-flow/2026-11-05-batch-103/inc-4/evidence-e5/d3-probe.py:252:        ("R-A2L-MATCH.43/3", "NA", NA, "max", 20),
+matches: 16
+== s19_app-b103-inc4-tests @ 889ab444
+matches: 0
+== s19_app-b103 @ dc1ba751
+matches: 0
+== s19_app-b103-inc2a-code @ 82f5f8e5
+matches: 0
+== s19_app-b103-inc2a-tests @ 707c9b92
+matches: 0
+== s19_app @ d0697582
+matches: 0

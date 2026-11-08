@@ -1,0 +1,76 @@
+=== s19_app.__file__ ===
+/home/<user>/mutr4B-work/s19_app/__init__.py
+
+=== DIFF base -> M-43 (s19_app/tui/services/label_match.py) ===
+--- /tmp/b103-e5-4-mutr4B/base/s19_app/tui/services/label_match.py	2026-11-07 01:32:51.000000000 -0600
++++ /home/<user>/mutr4B-work/s19_app/tui/services/label_match.py	2026-11-07 02:12:02.935999439 -0600
+@@ -170,7 +170,7 @@
+     for name in names:
+         if not isinstance(name, str):
+             raise TypeError(f"label names must be str, got {type(name).__name__}")
+-        if len(name) > 1024 or not name.isascii():
++        if len(name) > 1024:
+             continue
+         if name not in seen:
+             seen.add(name)
+
+=== PYTEST (tail, rc=1) ===
+.FFF                                                                     [100%]
+=================================== FAILURES ===================================
+________________ test_ranked_list_is_exactly[R-A2L-MATCH.43/3] _________________
+
+prep = <function prep.<locals>.get at 0x7f52fd9e3c40>
+case_id = 'R-A2L-MATCH.43/3', key = 'NA', query = 'max', limit = 20
+expected = [('druck_max', 'substring', 0, ((6, 9),))]
+
+    @pytest.mark.parametrize(
+        "case_id,key,query,limit,expected",
+        EXACT_CASES,
+        ids=[c[0] for c in EXACT_CASES],
+    )
+    def test_ranked_list_is_exactly(prep, case_id, key, query, limit, expected):
+        """The ranked list is exactly the case's expected list (names, rules, edits, spans, order).
+    
+        Covers (the case id is the pytest id) R-A2L-MATCH.1/1 .1/2 .1/3 .1/4 .2/1 .2/2 .2/3 .2/4
+        .2/5 .3/1 .3/2 .3/3 .4/1 .4/2 .4/3 .4/4 .5/1 .5/2 .6/1 .6/2 .6/3 .7/1 .7/2 .7/3 .7/4 .8/1 .8/2
+        .8/3 .8/4 .8/5 .8/6 .8/7 .8/8 .8/9 .9/1 .9/2 .9/3 .9/4 .10/1 .10/2 .10/3 .10/4 .10/5
+        .10/6 .11/1 .11/2 .11/3 .12/3 .12/4 .13/1 .13/2 .13/3 .13/4 .14/1 .14/2 .15/1 .15/2
+        .16/1 .16/2 .16/3 .17/1 .17/2 .18/3 .19/1 .19/2 .20/2 .21/1 .21/2 .21/3 .22/1 .23/2
+        .24/2 .24/4 .25/3 .28/1 .32/1 .32/3 .33/2 .33/3 .34/1 .38/1 .38/2 .39/1 .39/2 .41/1 .41/2 .41/3 .41/4 .41/5 .43/1 .43/3.
+        """
+        got = proj(run(prep, key, query, limit))
+>       assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E       AssertionError: R-A2L-MATCH.43/3: query 'max' limit 20
+E       assert [('druck_max'...0, ((6, 9),))] == [('druck_max'...0, ((6, 9),))]
+E         
+E         Left contains 2 more items, first extra item: ('DRÜCK_MAX', 'substring', 0, ((6, 9),))
+E         Use -v to get more diff
+
+tests/test_b103_label_match.py:413: AssertionError
+______ test_rows_43_2_a_name_above_u007f_is_left_out_of_the_prepared_list ______
+
+    def test_rows_43_2_a_name_above_u007f_is_left_out_of_the_prepared_list():
+        """R-A2L-MATCH.43/2: ``VALUE`` + U+0080 (the first character above U+007F) is not prepared: ``len(index)`` 0, ``value`` lists nothing."""
+        index = build_label_index(["VALUE\x80"])
+>       assert len(index) == 0
+E       assert 1 == 0
+E        +  where 1 = len(<s19_app.tui.services.label_match.LabelIndex object at 0x7f52fb92c0c0>)
+
+tests/test_b103_label_match.py:419: AssertionError
+_______ test_rows_43_3_only_the_ascii_names_of_a_mixed_list_are_prepared _______
+
+prep = <function prep.<locals>.get at 0x7f52fd9e3c40>
+
+    def test_rows_43_3_only_the_ascii_names_of_a_mixed_list_are_prepared(prep):
+        """R-A2L-MATCH.43/3: of [Drück_Max, DRÜCK_MAX, druck_max] only ``druck_max`` is prepared (``len(index)`` 1)."""
+>       assert len(prep("NA")) == 1
+E       AssertionError: assert 3 == 1
+E        +  where 3 = len(<s19_app.tui.services.label_match.LabelIndex object at 0x7f52fb92c140>)
+E        +    where <s19_app.tui.services.label_match.LabelIndex object at 0x7f52fb92c140> = <function prep.<locals>.get at 0x7f52fd9e3c40>('NA')
+
+tests/test_b103_label_match.py:425: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.43/3]
+FAILED tests/test_b103_label_match.py::test_rows_43_2_a_name_above_u007f_is_left_out_of_the_prepared_list
+FAILED tests/test_b103_label_match.py::test_rows_43_3_only_the_ascii_names_of_a_mixed_list_are_prepared
+3 failed, 1 passed, 141 deselected in 5.09s

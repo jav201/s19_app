@@ -1,0 +1,54 @@
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+=== SOURCE s19_sample.s19 kind s19 bytes 242 ranges 1 highest 0x80F1 s0 b'Debug\\stm8s003.sm8' entry_point 0xFFFF src_types {'S0': 1, 'S1': 9, 'S9': 1}
+  -> s19 w32 file s19_sample-patched.s19 lines 10 types {'S0': 1, 'S1': 8, 'S9': 1} max_data 32 first S015000044656275675C7374 last S9030000FC s0 b'Debug\\stm8s003.sm8' verify verified reread_equal True reread_entry 0x0
+  -> s19 w16 file s19_sample-patched.s19 lines 18 types {'S0': 1, 'S1': 16, 'S9': 1} max_data 16 first S0030000FC last S9030000FC s0 b'' verify verified reread_equal True reread_entry 0x0
+  -> hex w32 file s19_sample-patched.hex lines 18 types {'HEX00': 16, 'HEX01': 1, 'HEX04': 1} max_data 16 first :020000040000FA last :00000001FF s0 None verify verified reread_equal True reread_entry None
+  -> hex w16 file s19_sample-patched.hex lines 18 types {'HEX00': 16, 'HEX01': 1, 'HEX04': 1} max_data 16 first :020000040000FA last :00000001FF s0 None verify verified reread_equal True reread_entry None
+  NEG verify written=hex read-as=s19 -> mismatch runs=1
+=== SOURCE s19_sample.hex kind hex bytes 242 ranges 1 highest 0x80F1 s0 None entry_point None src_types {'HEX00': 16, 'HEX01': 1, 'HEX04': 1}
+  -> s19 w32 file s19_sample-patched.s19 lines 10 types {'S0': 1, 'S1': 8, 'S9': 1} max_data 32 first S01900007331395F73616D70 last S9030000FC s0 b's19_sample-patched.s19' verify verified reread_equal True reread_entry 0x0
+  -> s19 w16 file s19_sample-patched.s19 lines 18 types {'S0': 1, 'S1': 16, 'S9': 1} max_data 16 first S0030000FC last S9030000FC s0 b'' verify verified reread_equal True reread_entry 0x0
+  -> hex w32 file s19_sample-patched.hex lines 18 types {'HEX00': 16, 'HEX01': 1, 'HEX04': 1} max_data 16 first :020000040000FA last :00000001FF s0 None verify verified reread_equal True reread_entry None
+  -> hex w16 file s19_sample-patched.hex lines 18 types {'HEX00': 16, 'HEX01': 1, 'HEX04': 1} max_data 16 first :020000040000FA last :00000001FF s0 None verify verified reread_equal True reread_entry None
+  NEG verify written=s19 read-as=hex -> mismatch runs=1
+=== SOURCE s2_source.s19 kind s19 bytes 57 ranges 2 highest 0x20010 s0 b'S2SRC' entry_point 0x0 src_types {'S0': 1, 'S2': 5, 'S8': 1}
+  -> s19 w32 file s2_source-patched.s19 lines 5 types {'S0': 1, 'S2': 3, 'S8': 1} max_data 32 first S008000053325352438A last S804000000FB s0 b'S2SRC' verify verified reread_equal True reread_entry 0x0
+  -> s19 w16 file s2_source-patched.s19 lines 7 types {'S0': 1, 'S2': 5, 'S8': 1} max_data 16 first S0030000FC last S804000000FB s0 b'' verify verified reread_equal True reread_entry 0x0
+  -> hex w32 file s2_source-patched.hex lines 8 types {'HEX00': 5, 'HEX01': 1, 'HEX04': 2} max_data 16 first :020000040001F9 last :00000001FF s0 None verify verified reread_equal True reread_entry None
+  -> hex w16 file s2_source-patched.hex lines 8 types {'HEX00': 5, 'HEX01': 1, 'HEX04': 2} max_data 16 first :020000040001F9 last :00000001FF s0 None verify verified reread_equal True reread_entry None
+  NEG verify written=hex read-as=s19 -> mismatch runs=2
+=== SOURCE s2_source.hex kind hex bytes 57 ranges 2 highest 0x20010 s0 None entry_point None src_types {'HEX00': 5, 'HEX01': 1, 'HEX04': 2}
+  -> s19 w32 file s2_source-patched.s19 lines 5 types {'S0': 1, 'S2': 3, 'S8': 1} max_data 32 first S018000073325F736F757263 last S804000000FB s0 b's2_source-patched.s19' verify verified reread_equal True reread_entry 0x0
+  -> s19 w16 file s2_source-patched.s19 lines 7 types {'S0': 1, 'S2': 5, 'S8': 1} max_data 16 first S0030000FC last S804000000FB s0 b'' verify verified reread_equal True reread_entry 0x0
+  -> hex w32 file s2_source-patched.hex lines 8 types {'HEX00': 5, 'HEX01': 1, 'HEX04': 2} max_data 16 first :020000040001F9 last :00000001FF s0 None verify verified reread_equal True reread_entry None
+  -> hex w16 file s2_source-patched.hex lines 8 types {'HEX00': 5, 'HEX01': 1, 'HEX04': 2} max_data 16 first :020000040001F9 last :00000001FF s0 None verify verified reread_equal True reread_entry None
+  NEG verify written=s19 read-as=hex -> mismatch runs=2
+=== SOURCE firmware.s19 kind s19 bytes 97 ranges 2 highest 0x8000007F s0 b'CASE01_BASIC' entry_point 0x80000000 src_types {'S0': 1, 'S3': 7, 'S7': 1}
+  -> s19 w32 file firmware-patched.s19 lines 6 types {'S0': 1, 'S3': 4, 'S7': 1} max_data 32 first S00F00004341534530315F42 last S70500000000FA s0 b'CASE01_BASIC' verify verified reread_equal True reread_entry 0x0
+  -> s19 w16 file firmware-patched.s19 lines 9 types {'S0': 1, 'S3': 7, 'S7': 1} max_data 16 first S0030000FC last S70500000000FA s0 b'' verify verified reread_equal True reread_entry 0x0
+  -> hex w32 file firmware-patched.hex lines 9 types {'HEX00': 7, 'HEX01': 1, 'HEX04': 1} max_data 16 first :0200000480007A last :00000001FF s0 None verify verified reread_equal True reread_entry None
+  -> hex w16 file firmware-patched.hex lines 9 types {'HEX00': 7, 'HEX01': 1, 'HEX04': 1} max_data 16 first :0200000480007A last :00000001FF s0 None verify verified reread_equal True reread_entry None
+  NEG verify written=hex read-as=s19 -> mismatch runs=2
+=== SOURCE firmware.hex kind hex bytes 97 ranges 2 highest 0x8000007F s0 None entry_point None src_types {'HEX00': 7, 'HEX01': 1, 'HEX04': 1}
+  -> s19 w32 file firmware-patched.s19 lines 6 types {'S0': 1, 'S3': 4, 'S7': 1} max_data 32 first S01700006669726D77617265 last S70500000000FA s0 b'firmware-patched.s19' verify verified reread_equal True reread_entry 0x0
+  -> s19 w16 file firmware-patched.s19 lines 9 types {'S0': 1, 'S3': 7, 'S7': 1} max_data 16 first S0030000FC last S70500000000FA s0 b'' verify verified reread_equal True reread_entry 0x0
+  -> hex w32 file firmware-patched.hex lines 9 types {'HEX00': 7, 'HEX01': 1, 'HEX04': 1} max_data 16 first :0200000480007A last :00000001FF s0 None verify verified reread_equal True reread_entry None
+  -> hex w16 file firmware-patched.hex lines 9 types {'HEX00': 7, 'HEX01': 1, 'HEX04': 1} max_data 16 first :0200000480007A last :00000001FF s0 None verify verified reread_equal True reread_entry None
+  NEG verify written=s19 read-as=hex -> mismatch runs=2
+=== SOURCE cross64k.s19 kind s19 bytes 36 ranges 1 highest 0x10013 s0 b'X64' entry_point 0x0 src_types {'S0': 1, 'S2': 2, 'S8': 1}
+  -> s19 w32 file cross64k-patched.s19 lines 4 types {'S0': 1, 'S2': 2, 'S8': 1} max_data 32 first S006000058363437 last S804000000FB s0 b'X64' verify verified reread_equal True reread_entry 0x0
+  -> s19 w16 file cross64k-patched.s19 lines 5 types {'S0': 1, 'S2': 3, 'S8': 1} max_data 16 first S0030000FC last S804000000FB s0 b'' verify verified reread_equal True reread_entry 0x0
+  -> hex w32 file cross64k-patched.hex lines 6 types {'HEX00': 3, 'HEX01': 1, 'HEX04': 2} max_data 16 first :020000040000FA last :00000001FF s0 None verify verified reread_equal True reread_entry None
+  -> hex w16 file cross64k-patched.hex lines 6 types {'HEX00': 3, 'HEX01': 1, 'HEX04': 2} max_data 16 first :020000040000FA last :00000001FF s0 None verify verified reread_equal True reread_entry None
+  NEG verify written=hex read-as=s19 -> mismatch runs=1
+=== SOURCE cross64k.hex kind hex bytes 36 ranges 1 highest 0x10013 s0 None entry_point None src_types {'HEX00': 3, 'HEX01': 1, 'HEX04': 2}
+  -> s19 w32 file cross64k-patched.s19 lines 4 types {'S0': 1, 'S2': 2, 'S8': 1} max_data 32 first S017000063726F737336346B last S804000000FB s0 b'cross64k-patched.s19' verify verified reread_equal True reread_entry 0x0
+  -> s19 w16 file cross64k-patched.s19 lines 5 types {'S0': 1, 'S2': 3, 'S8': 1} max_data 16 first S0030000FC last S804000000FB s0 b'' verify verified reread_equal True reread_entry 0x0
+  -> hex w32 file cross64k-patched.hex lines 6 types {'HEX00': 3, 'HEX01': 1, 'HEX04': 2} max_data 16 first :020000040000FA last :00000001FF s0 None verify verified reread_equal True reread_entry None
+  -> hex w16 file cross64k-patched.hex lines 6 types {'HEX00': 3, 'HEX01': 1, 'HEX04': 2} max_data 16 first :020000040000FA last :00000001FF s0 None verify verified reread_equal True reread_entry None
+  NEG verify written=s19 read-as=hex -> mismatch runs=1
+NAME typed='firmware-patched.s19' out=hex -> firmware-patched.s19.hex
+NAME typed='firmware-patched.HEX' out=hex -> firmware-patched.HEX
+NAME typed='firmware-patched' out=hex -> firmware-patched.hex
+NAME typed='firmware-patched.hex' out=s19 -> firmware-patched.hex.s19
+END

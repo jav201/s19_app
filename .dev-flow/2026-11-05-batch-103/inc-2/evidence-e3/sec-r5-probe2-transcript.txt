@@ -1,0 +1,20 @@
+A2L section tree has structural errors: path=~/work/s19_app/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+s19_app.__file__ = ~/work/s19_app/s19_app/__init__.py
+[FX2] examples/case_00_public/ASAP2_Demo_V161.a2l: unindexed-or-undersized spans=Counter({'no-length': 8, 'AXIS_PTS': 2, 'MATRIX_DIM': 2})
+[FX2] examples/case_00_public/ASAP2_Demo_V171.a2l: unindexed-or-undersized spans=Counter({'no-length': 20, 'INSTANCE': 5, 'AXIS_PTS': 2, 'MATRIX_DIM': 2, 'BLOB': 1})
+[FX2] examples/case_00_public/check_test.a2l: unindexed-or-undersized spans=Counter({'no-length': 1})
+[FX2] examples/case_00_public/from_source.a2l: unindexed-or-undersized spans=Counter({'AXIS_PTS': 4, 'no-length': 4})
+[FX2] examples/case_00_public/from_source_structs.a2l: unindexed-or-undersized spans=Counter({'INSTANCE': 2})
+[FX2] examples/case_00_public/remove_test.a2l: unindexed-or-undersized spans=Counter({'AXIS_PTS': 1, 'INSTANCE': 1, 'BLOB': 1})
+[FX2] examples/case_00_public/software_a.a2l: unindexed-or-undersized spans=Counter({'no-length': 263, 'AXIS_PTS': 66})
+[FX2] examples/case_00_public/update_test1.a2l: unindexed-or-undersized spans=Counter({'no-length': 5, 'AXIS_PTS': 3, 'BLOB': 2, 'INSTANCE': 1, 'MATRIX_DIM': 1})
+[FX2] examples/case_00_public/update_test2.a2l: unindexed-or-undersized spans=Counter({'no-length': 5, 'AXIS_PTS': 4, 'BLOB': 3, 'INSTANCE': 3})
+[FX2] examples/case_00_public/update_typedef_test1.a2l: unindexed-or-undersized spans=Counter({'INSTANCE': 11})
+[FX2] examples/case_00_public/update_typedef_test2.a2l: unindexed-or-undersized spans=Counter({'INSTANCE': 11})
+[FX2] examples/case_00_public/update_typedef_test3.a2l: unindexed-or-undersized spans=Counter({'INSTANCE': 24})
+[FX2] examples/case_00_public/update_typedef_test4.a2l: unindexed-or-undersized spans=Counter({'INSTANCE': 24})
+[FX2-total] undeclared-spans=482 defined-objects-over-an-unindexed-span=3257 ...of which-.138-lets-encode=4
+[FX2-hit] ('examples/case_00_public/ASAP2_Demo_V171.a2l', 'ASAM.C.SCALAR.UBYTE.IDENTICAL', '0x810000', 1, [('INSTANCE', 'ASAM_I_SCALAR_VALUE_UWORD_SINGLE', '0x810000', 2, 'exact')])
+[FX2-hit] ('examples/case_00_public/ASAP2_Demo_V171.a2l', 'ASAM.C.SCALAR.SBYTE.IDENTICAL', '0x810001', 1, [('INSTANCE', 'ASAM_I_SCALAR_VALUE_UWORD_SINGLE', '0x810000', 2, 'exact')])
+[FX2-hit] ('examples/case_00_public/ASAP2_Demo_V171.a2l', 'ASAM.C.SCALAR.ULONG.IDENTICAL', '0x810008', 4, [('INSTANCE', 'ASAM_I_SCALAR_VALUE_UWORD_ARRAY_5', '0x810002', 10, 'exact')])
+[FX2-hit] ('examples/case_00_public/ASAP2_Demo_V171.a2l', 'ASAM.C.DEPENDENT.REF_1.SWORD', '0x811000', 2, [('INSTANCE', 'ASAM_S_EXAMPLE', '0x811000', 1, 'lower bound')])

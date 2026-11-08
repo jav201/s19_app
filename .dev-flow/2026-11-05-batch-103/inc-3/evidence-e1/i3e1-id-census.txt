@@ -1,0 +1,31 @@
+# i3e1 id census — 2026-11-06T16:38:04-06:00; worktree HEAD 9ae92c35; pattern: R-A2L-DEF\.(6[4-9]|[7-9][0-9]|1[0-4][0-9])\b (R-A2L-DEF.64 … .149)
+## REQUIREMENTS.md + docs/requirements/review/*.md
+(no file holds an id of the range)
+## C:/Users/<user>/Github/s19w/review/
+(none)
+## every .dev-flow/*/ folder (this increment's folder excluded)
+.dev-flow/2026-11-05-batch-103/inc-2/01-requirements.md:6:Row status: every row is **new** (ids `R-A2L-DEF.1` … `.63`, unused everywhere the brief names: `evidence-e1/i2e1-id-census.txt`). No existing canon row is changed (`E1-rulings.md` §2). Inc 3 continues at `R-A2L-DEF.64`; a row ruled out is marked `— Withdrawn` and keeps its id, so no gap opens.
+.dev-flow/2026-11-05-batch-103/inc-2/E1-rulings.md:176:All recommendations accepted: D-1 A (I-2 as written, `Refusal` value), D-2 A, D-3 A, D-4 A (E3 checks the COMPU_VTAB_RANGE upper-end rule; if unsure, the row states the rule the system applies), D-5 A (`--case definitions`, case 08 untouched and hash-pinned), D-6 A, D-7 A, D-8 A, D-9 A (rename guard test), D-10 A, D-11 A (S2.7 "A value by its A2L definition"), D-12 A (E3 reviews the texts), D-13 no split. The 16 defects of §5 go to the batch backlog; the BIT_MASK whole-word write is ranked first (no product caller today; Inc 8 must not use that encode for masks). Inc 3 continues at R-A2L-DEF.64.
+.dev-flow/2026-11-05-batch-103/inc-2/E1-slice.md:81:| `s19_app/tui/a2l_definition.py` | **Inc 3** (same file, after Inc 2) | Inc 3 adds functions and `Definition` fields with defaults; it changes none of §2's signatures (I-2 §4); its rows continue at R-A2L-DEF.64 |
+.dev-flow/2026-11-05-batch-103/steps.log:15:2026-11-06T16:21:28-06:00 E1 start — Inc 3 (arrays and axes, R-A2L-DEF.64+); model Opus 5.5
+## git grep on the open batch-101 branches and every other local b101-* branch
+b101-canon: 0 files
+b101-inc10: 0 files
+b101-inc11: 0 files
+b101-inc12: 0 files
+b101-inc12b: 0 files
+b101-inc13: 0 files
+b101-inc14: 0 files
+b101-inc15: 0 files
+b101-inc16: 0 files
+b101-inc2: 0 files
+b101-inc3: 0 files
+b101-inc4: 0 files
+b101-inc5: 0 files
+b101-inc6: 0 files
+b101-inc7: 0 files
+b101-inc8: 0 files
+b101-inc9: 0 files
+b101-p0: 0 files
+## the family's last id in use (Inc 2)
+R-A2L-DEF.64

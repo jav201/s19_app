@@ -1,0 +1,10 @@
+s19_app.__file__ = <home>/work/s19_app/s19_app/__init__.py
+textual = 8.2.8 python = 3.11.18
+  OsClipboardInput payload='abc'                        value='abc'                  ESC in drawn=True  ESC after removing SGR=False CSI-13D in drawn=False
+  OsClipboardInput payload='A\x1b[13DB\x00C\u202e\ud800' value='A\x1b[13DB\x00C\u202e\ud800' ESC in drawn=True  ESC after removing SGR=True  CSI-13D in drawn=True
+  RInput           payload='abc'                        value='abc'                  ESC in drawn=True  ESC after removing SGR=False CSI-13D in drawn=False
+  RInput           payload='A\x1b[13DB\x00C\u202e\ud800' value='A[13DBC'              ESC in drawn=True  ESC after removing SGR=False CSI-13D in drawn=False
+  CappedTextArea   payload='abc'                        value='abc'                  ESC in drawn=True  ESC after removing SGR=False CSI-13D in drawn=False
+  CappedTextArea   payload='A\x1b[13DB\x00C\u202e\ud800' value='A\x1b[13DB\x00C\u202e\ud800' ESC in drawn=True  ESC after removing SGR=True  CSI-13D in drawn=True
+  RArea            payload='abc'                        value='abc'                  ESC in drawn=True  ESC after removing SGR=False CSI-13D in drawn=False
+  RArea            payload='A\x1b[13DB\x00C\u202e\ud800' value='A[13DBC'              ESC in drawn=True  ESC after removing SGR=False CSI-13D in drawn=False

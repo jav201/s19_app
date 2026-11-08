@@ -1,0 +1,34 @@
+s19_app.__file__ = /tmp/b103-e5-4-sec/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5-4-sec/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 24564b32d53f142b85fb33825aed3c30a116fbaaf4808be45e4378b2d8bedb9b
+tests module = /tmp/b103-e5-4-sec/tree/tests/test_b103_label_match_perf.py
+mode = mem  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = -2824115120960826228
+host = <runner>  load = (0.8, 1.21, 0.86)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5-4-sec/<user>  LOCALAPPDATA = /tmp/b103-e5-4-sec/<user>/localappdata  PILOT_DIR = /tmp/b103-e5-4-sec/pilot
+REF build: tracemalloc peak 22,059,981 B (21.0 MiB; .37 bound 67,108,864) 16.48 s under tracemalloc [ok]
+
+=== REF: 58 shapes; tracemalloc peak of one ranking, top 6
+         4.19 MiB [ok] 'e'
+         4.17 MiB [ok] 'a'
+         3.18 MiB [ok] 'FCA_NPUK_SMM.RWG_TjsPHIoim_SNX_TVC_2_ewh'
+         3.11 MiB [ok] 'pposbxiifkdgfiajnbbpvb_dyan_xvz1'
+         2.32 MiB [ok] 'a b c d e f g h i j k l m n o p q r s t '
+         2.32 MiB [ok] 'HRR_WOL.TNY_U_ZmyrXSZTPeyoMsdpWwbcUtd_Dw'
+
+=== REF6: 49 shapes; tracemalloc peak of one ranking, top 6
+        12.09 MiB [ok] 'E3S-01 0 x128'
+        12.09 MiB [ok] '0 x128'
+        12.09 MiB [ok] "'0 ' x 128"
+        10.70 MiB [ok] '0'
+        10.54 MiB [ok] '00 x85'
+         8.57 MiB [ok] '0 x125 + chax'
+
+=== LONG: 9 shapes; tracemalloc peak of one ranking, top 6
+         1.09 MiB [ok] "'aab' .. 'aaz' x 2, cut 256 (distinct 1-edit tokens)"
+         0.53 MiB [ok] 'a x255 + b'
+         0.53 MiB [ok] 'a x254 + bb'
+         0.33 MiB [ok] "'aaq ' x 64 (one 1-edit token, repeated)"
+         0.14 MiB [ok] 'a x128 + b'
+         0.04 MiB [ok] "'aaaaaq ' x 36 (2-edit token, repeated)"
+
+load after = (1.96, 1.59, 1.08)

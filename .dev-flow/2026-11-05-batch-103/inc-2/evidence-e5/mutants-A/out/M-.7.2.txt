@@ -1,0 +1,48 @@
+# M-.7.2
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.7.2/s19_app/__init__.py
+# note: the upper length bound removed
+#   EDIT-OK: '        byte_length < 1\n        or byte_length > MAX_A2L_DECODE_BYTES\n'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..b3419b76 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -579,7 +579,6 @@ def _describe_one(
+         )
+     elif (
+         byte_length < 1
+-        or byte_length > MAX_A2L_DECODE_BYTES
+         or address < 0
+         or address + byte_length - 1 > 0xFFFFFFFF
+     ):
+
+# --- pytest (rc=1) ---
+..F...                                                                   [100%]
+=================================== FAILURES ===================================
+_____________ test_r_a2l_def_7_2_3_length_above_one_mib_is_refused _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-947/test_r_a2l_def_7_2_3_length_ab0')
+
+    def test_r_a2l_def_7_2_3_length_above_one_mib_is_refused(tmp_path):
+        """R-A2L-DEF.7.2/3 - NUMBER 1048577 (one past the bound)."""
+        a2l = _inline(tmp_path, _ascii("ZH", "0x10", "1048577"))
+>       _is_refused(describe_definition("ZH", a2l), "A2L-DEF-ADDRESS", "ZH: its span of 1048577 bytes at 0x10 cannot be read")
+
+../base/tests/test_b103_a2l_definition.py:462: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='ZH', section='CHARACTERISTIC', char_type='ASCII', kind='text', address=16, byte_length=1048577, datat...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None)
+code = 'A2L-DEF-ADDRESS'
+message = 'ZH: its span of 1048577 bytes at 0x10 cannot be read'
+
+    def _is_refused(d: Definition, code: str, message: str) -> None:
+>       assert d.refusal == Refusal(code, message), d.refusal
+E       AssertionError: None
+E       assert None == Refusal(code='A2L-DEF-ADDRESS', message='ZH: its span of 1048577 bytes at 0x10 cannot be read')
+E        +  where None = Definition(name='ZH', section='CHARACTERISTIC', char_type='ASCII', kind='text', address=16, byte_length=1048577, datat...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None).refusal
+E        +  and   Refusal(code='A2L-DEF-ADDRESS', message='ZH: its span of 1048577 bytes at 0x10 cannot be read') = Refusal('A2L-DEF-ADDRESS', 'ZH: its span of 1048577 bytes at 0x10 cannot be read')
+
+../base/tests/test_b103_a2l_definition.py:165: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_7_2_3_length_above_one_mib_is_refused
+1 failed, 5 passed, 185 deselected in 0.57s

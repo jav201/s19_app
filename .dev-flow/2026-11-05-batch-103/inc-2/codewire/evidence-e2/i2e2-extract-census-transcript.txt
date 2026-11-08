@@ -1,0 +1,81 @@
+# i2e2-extract census transcript 2026-11-06T16:40:04-06:00 host <runner>
+# copy: git archive e07fb00 s19_app tools/synth -> /tmp/b103-e2-2/copy-census (clone e07fb00f9fc13afd314d0334fac683fe33b29b6c, status 0 changed)
+# code-wire: code-wire v3.1.0 e436a08; codewire_extract.py sha256 78d54439f2c95b6e35f31f02b1ed9564b160774622c253624f78e155f23a8599; python Python 3.11.18
+marks written: 2044
+extractor: marks=2044 graph_nodes=0 calls=3839 findings=2058 parse_failures=0 exit 1 (drift expected: no graph)
+note: duplicate qualname across files: `main` also marked at s19_app/cli.py:226
+
+== s19_app/tui/a2l.py :: encode_physical_to_raw_bytes: 1 marked caller(s)
+   resolve_symbol_entry  <-  s19_app/tui/services/change_service.py:649
+
+== s19_app/tui/a2l.py :: describe_curve_tag: 1 marked caller(s)
+   S19TuiApp.action_a2l_describe_tag  <-  s19_app/tui/app.py:9776
+
+== s19_app/tui/a2l.py :: parse_begin_meta: 4 marked caller(s)
+   extract_a2l_tags.<locals>.walk  <-  s19_app/tui/a2l.py:2601, s19_app/tui/a2l.py:2732
+   extract_compu_methods  <-  s19_app/tui/a2l.py:859
+   extract_compu_tables  <-  s19_app/tui/a2l.py:903
+   extract_record_layouts  <-  s19_app/tui/a2l.py:715
+
+== s19_app/tui/a2l.py :: _flatten_body_tokens: 2 marked caller(s)
+   assemble_characteristic_header  <-  s19_app/tui/a2l.py:653
+   extract_a2l_tags.<locals>.walk  <-  s19_app/tui/a2l.py:2729
+
+== s19_app/tui/a2l.py :: _split_line_respecting_quotes: 10 marked caller(s)
+   _byte_order_from_section_lines  <-  s19_app/tui/a2l.py:313
+   _flatten_body_tokens  <-  s19_app/tui/a2l.py:456
+   _parse_compu_method_conversion_from_body  <-  s19_app/tui/a2l.py:795
+   _parse_link_map_line  <-  s19_app/tui/a2l.py:674
+   extract_a2l_tags.<locals>.walk  <-  s19_app/tui/a2l.py:2712
+   extract_compu_methods  <-  s19_app/tui/a2l.py:848, s19_app/tui/a2l.py:873
+   extract_compu_tables  <-  s19_app/tui/a2l.py:909, s19_app/tui/a2l.py:913
+   extract_record_layouts  <-  s19_app/tui/a2l.py:718
+   parse_characteristic_header  <-  s19_app/tui/a2l.py:613
+   parse_measurement_header  <-  s19_app/tui/a2l.py:482
+
+== s19_app/tui/a2l.py :: _collect_sections_by_name: 3 marked caller(s)
+   extract_compu_methods  <-  s19_app/tui/a2l.py:846
+   extract_compu_tables  <-  s19_app/tui/a2l.py:902
+   extract_record_layouts  <-  s19_app/tui/a2l.py:714
+
+== s19_app/tui/a2l.py :: _apply_compu_method: 3 marked caller(s)
+   _decode_external_axis_points  <-  s19_app/tui/a2l.py:3304
+   describe_curve_tag  <-  s19_app/tui/a2l.py:3155, s19_app/tui/a2l.py:3202
+   enrich_a2l_tags_with_values  <-  s19_app/tui/a2l.py:2909
+
+== s19_app/tui/a2l.py :: _decode_scalar: 2 marked caller(s)
+   _decode_component_run  <-  s19_app/tui/a2l.py:2975
+   _decode_raw_value  <-  s19_app/tui/a2l.py:1830, s19_app/tui/a2l.py:1834
+
+== s19_app/tui/a2l.py :: _resolve_record_layout: 3 marked caller(s)
+   _infer_length_characteristic  <-  s19_app/tui/a2l.py:1227
+   encode_physical_to_raw_bytes  <-  s19_app/tui/a2l.py:2490
+   enrich_a2l_tags_with_values  <-  s19_app/tui/a2l.py:2887
+
+== s19_app/tui/a2l.py :: _to_float: 10 marked caller(s)
+   _encode_curve_record_bytes  <-  s19_app/tui/a2l.py:2311, s19_app/tui/a2l.py:2312
+   _format_point_number  <-  s19_app/tui/a2l.py:3311
+   _reverse_table_lookup  <-  s19_app/tui/a2l.py:2047, s19_app/tui/a2l.py:2095
+   _table_lookup  <-  s19_app/tui/a2l.py:1880, s19_app/tui/a2l.py:1881
+   describe_curve_tag  <-  s19_app/tui/a2l.py:3039, s19_app/tui/a2l.py:3040, s19_app/tui/a2l.py:3228
+   encode_physical_to_raw_bytes  <-  s19_app/tui/a2l.py:2560, s19_app/tui/a2l.py:2561
+   enrich_a2l_tags_with_values  <-  s19_app/tui/a2l.py:2914, s19_app/tui/a2l.py:2915, s19_app/tui/a2l.py:2918, s19_app/tui/a2l.py:2919, s19_app/tui/a2l.py:2920
+   extract_compu_methods  <-  s19_app/tui/a2l.py:887, s19_app/tui/a2l.py:889
+   extract_compu_tables  <-  s19_app/tui/a2l.py:916, s19_app/tui/a2l.py:919
+   render_curve_description  <-  s19_app/tui/a2l.py:3430
+
+== s19_app/tui/a2l_parameter_picker.py :: parse_parameter_list: 1 marked caller(s)
+   BulkParameterAddScreen._apply_list  <-  s19_app/tui/screens.py:1019
+
+== tools/synth/make_release_case.py :: generate: 1 marked caller(s)
+   main  <-  tools/synth/make_release_case.py:1055
+
+== tools/synth/make_release_case.py :: emit_s19: 1 marked caller(s)
+   generate  <-  tools/synth/make_release_case.py:1034, tools/synth/make_release_case.py:1036
+
+== tools/synth/make_release_case.py :: _pack_scalar: 2 marked caller(s)
+   _changed_scalar_bytes  <-  tools/synth/make_release_case.py:732
+   _scalar_value  <-  tools/synth/make_release_case.py:321, tools/synth/make_release_case.py:355
+
+== tools/synth/make_release_case.py :: main: 0 marked caller(s)
+# exit 0

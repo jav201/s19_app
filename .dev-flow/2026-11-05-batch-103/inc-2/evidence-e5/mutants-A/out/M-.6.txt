@@ -1,0 +1,58 @@
+# M-.6
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.6/s19_app/__init__.py
+# note: name matched ignoring case
+#   EDIT-OK: '        tags_by_name.setdefault(tag.get("name"), []).append(tag)'
+#   EDIT-OK: '    tags = tags_by_name.get(name) or []'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..8407a098 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -369,7 +369,7 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
+     """
+     tags_by_name: dict[str, list[dict]] = {}
+     for tag in a2l_data.get("tags") or []:
+-        tags_by_name.setdefault(tag.get("name"), []).append(tag)
++        tags_by_name.setdefault((tag.get("name") or "").lower(), []).append(tag)
+ 
+     object_sections_by_name: dict[str, list[dict]] = {}
+     compu_methods_by_name: dict[str, dict] = {}
+@@ -696,7 +696,7 @@ def _find_tag(
+     section → ``Refusal("A2L-DEF-NAME", "<name>: the A2L declares that name
+     more than once")`` (R-A2L-DEF.139); ``None`` when no tag has the name.
+     """
+-    tags = tags_by_name.get(name) or []
++    tags = tags_by_name.get(name.lower()) or []
+     sections = object_sections_by_name.get(name) or []
+     if not tags:
+         return None
+
+# --- pytest (rc=1) ---
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+_______________ test_r_a2l_def_6_2_name_is_matched_with_its_case _______________
+
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp...BL_NOINTP', ...}}, 'errors': [], 'path': '/tmp/pytest-of-<user>/pytest-945/b103_c080/firmware_issues.a2l', ...}, ...}
+
+    def test_r_a2l_def_6_2_name_is_matched_with_its_case(c08):
+        """R-A2L-DEF.6/2 - value_0001 is not VALUE_0001."""
+        d = describe_definition("value_0001", c08["a2l"])
+>       _is_refused(d, "A2L-DEF-NAME", "value_0001: no tag of that name in the A2L")
+
+../base/tests/test_b103_a2l_definition.py:403: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='value_0001', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=0, byte_length=1, da...ies=(), default_text=None, coeffs_linear=None, coeffs=(0.0, 1.0, 0.0, 0.0, 0.0, 1.0), compu_tab_ref=None, refusal=None)
+code = 'A2L-DEF-NAME', message = 'value_0001: no tag of that name in the A2L'
+
+    def _is_refused(d: Definition, code: str, message: str) -> None:
+>       assert d.refusal == Refusal(code, message), d.refusal
+E       AssertionError: None
+E       assert None == Refusal(code='A2L-DEF-NAME', message='value_0001: no tag of that name in the A2L')
+E        +  where None = Definition(name='value_0001', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=0, byte_length=1, da...ies=(), default_text=None, coeffs_linear=None, coeffs=(0.0, 1.0, 0.0, 0.0, 0.0, 1.0), compu_tab_ref=None, refusal=None).refusal
+E        +  and   Refusal(code='A2L-DEF-NAME', message='value_0001: no tag of that name in the A2L') = Refusal('A2L-DEF-NAME', 'value_0001: no tag of that name in the A2L')
+
+../base/tests/test_b103_a2l_definition.py:165: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_6_2_name_is_matched_with_its_case
+1 failed, 1 passed, 189 deselected in 2.05s

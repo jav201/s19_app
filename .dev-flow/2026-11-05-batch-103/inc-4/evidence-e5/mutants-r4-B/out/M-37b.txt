@@ -1,0 +1,56 @@
+=== s19_app.__file__ ===
+/home/<user>/mutr4B-work/s19_app/__init__.py
+
+=== DIFF base -> M-37b (s19_app/tui/services/label_match.py) ===
+--- /tmp/b103-e5-4-mutr4B/base/s19_app/tui/services/label_match.py	2026-11-07 01:32:51.000000000 -0600
++++ /home/<user>/mutr4B-work/s19_app/tui/services/label_match.py	2026-11-07 02:53:48.551472272 -0600
+@@ -205,12 +205,12 @@
+     del add
+     tokens = tuple(sorted(distinct))
+     del distinct
+-    find = bisect_left
++    token_to_id = {tok: tid for tid, tok in enumerate(tokens)}
+     name_token_ids = array("I", [0]) * len(span_start)
+     for i in range(count):
+         text = folded[i]
+         for j in range(name_token_starts[i], name_token_starts[i + 1]):
+-            name_token_ids[j] = find(tokens, text[span_start[j]:span_end[j]])
++            name_token_ids[j] = token_to_id[text[span_start[j]:span_end[j]]]
+     del span_start, span_end
+ 
+     ntok = len(tokens)
+
+=== uptime before ===
+02:53:48 up 1 day, 18:25,  8 users,  load average: 20.52, 17.00, 14.68
+
+=== uptime after ===
+02:55:54 up 1 day, 18:27,  7 users,  load average: 22.62, 18.95, 15.69
+
+=== PYTEST (tail, rc=1) ===
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+_________ test_r_a2l_match_37_2_densest_ascii_list_stays_within_64_mib _________
+
+    def test_r_a2l_match_37_2_densest_ascii_list_stays_within_64_mib():
+        """R-A2L-MATCH.37/2: the tracemalloc peak while preparing B4MAX (50,000 ASCII names of 10 camel tokens,
+        500,000 distinct tokens, 2,043,024 characters) is <= 67,108,864 bytes; the memory follows the distinct tokens."""
+        names = b4max_names()  # built before tracemalloc starts
+        gc.collect()
+        tracemalloc.start()
+        try:
+            index = build_label_index(names)
+            _, peak = tracemalloc.get_traced_memory()
+        finally:
+            tracemalloc.stop()
+        assert len(index) == 50000
+        print(f"B4MAX tracemalloc peak {peak} bytes ({peak / 1048576:.1f} MiB)")
+>       assert peak <= MEMORY_BOUND_BYTES, f"peak {peak} > {MEMORY_BOUND_BYTES}"
+E       AssertionError: peak 82824471 > 67108864
+E       assert 82824471 <= 67108864
+
+tests/test_b103_label_match_perf.py:345: AssertionError
+----------------------------- Captured stdout call -----------------------------
+B4MAX tracemalloc peak 82824471 bytes (79.0 MiB)
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match_perf.py::test_r_a2l_match_37_2_densest_ascii_list_stays_within_64_mib
+1 failed, 1 passed, 18 deselected in 124.77s (0:02:04)

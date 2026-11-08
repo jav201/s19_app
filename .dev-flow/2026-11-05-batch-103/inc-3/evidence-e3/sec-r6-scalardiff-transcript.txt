@@ -1,0 +1,2 @@
+s19_app.__file__ = ~/work/b103-int2a/s19_app/__init__.py | python 3.11.18 | a2l_definition md5 f7fa38a5 | a2l md5 d6879216
+[E2] scalar definitions whose fields differ (fields, (2a code, model code), type, length): {}

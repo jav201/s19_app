@@ -1,0 +1,35 @@
+=== s19_app.__file__ ===
+/tmp/b103-e5-4-mutr4B/M-26/s19_app/__init__.py
+
+=== DIFF base -> M-26 (s19_app/tui/services/label_match.py) ===
+--- /tmp/b103-e5-4-mutr4B/base/s19_app/tui/services/label_match.py	2026-11-07 01:32:51.000000000 -0600
++++ /tmp/b103-e5-4-mutr4B/M-26/s19_app/tui/services/label_match.py	2026-11-07 02:08:08.418056399 -0600
+@@ -981,7 +981,7 @@
+     folded = _fold(name)
+     text = query.text
+     if rule is MatchRule.EXACT:
+-        return ((0, len(name)),)
++        return ()
+     if rule is MatchRule.PREFIX:
+         return ((0, len(text)),)
+     if rule is MatchRule.SUBSTRING:
+
+=== PYTEST (tail, rc=1) ===
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________________________ test_rows_26_exact_span ____________________________
+
+prep = <function prep.<locals>.get at 0x7f8beccefc40>
+
+    def test_rows_26_exact_span(prep):
+        """R-A2L-MATCH.26/1 and .26/2: an exact entry's spans are exactly the whole name."""
+>       assert spans_of(run(prep, "C08", "VALUE_0001"), "VALUE_0001") == ((0, 10),)
+E       assert () == ((0, 10),)
+E         
+E         Right contains one more item: (0, 10)
+E         Use -v to get more diff
+
+tests/test_b103_label_match.py:530: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_rows_26_exact_span - assert () ==...
+1 failed, 144 deselected in 5.00s

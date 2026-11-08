@@ -1,0 +1,79 @@
+# M-PASTE.31
+# row: R-PASTE.31
+# s19_app.__file__ = /tmp/b103-e5-1a-mut/work/s19_app/__init__.py
+# note: delay mutant: the read layer sleeps ~1 s
+# --- git diff ---
+diff --git a/s19_app/tui/os_clipboard_input.py b/s19_app/tui/os_clipboard_input.py
+index ad2f7240..72e2cb59 100644
+--- a/s19_app/tui/os_clipboard_input.py
++++ b/s19_app/tui/os_clipboard_input.py
+@@ -604,6 +604,7 @@ def read_os_clipboard(
+             - :meth:`OsClipboardInput.action_paste`
+             - :meth:`s19_app.tui.capped_text_area.CappedTextArea.action_paste`
+     """
++    time.sleep(1.0)  # mutant: answering layer delay (R-TUI-043.10.1 / R-PASTE.31)
+     cascade = strategies if strategies is not None else _STRATEGIES
+     for name, reader in cascade:
+         try:
+
+# --- pytest (rc=1) ---
+p.run_test(size=(160, 48)) as pilot:
+                await pilot.pause()
+                if box_kind == "a":
+                    app.action_show_screen("a2l")
+                    for _ in range(4):
+                        await pilot.pause()
+                    widget = app.query_one("#a2l_tags_filter_input", Input)
+                else:
+                    await show_patch_paste(app, pilot)
+                    widget = app.query_one("#patch_paste_text", TextArea)
+                widget.focus()
+                await pilot.pause()
+                key_time = await typed_key_time(pilot, widget, app)
+                samples = []
+                for _ in range(10):
+                    _set_box(widget, "")
+                    await pilot.pause()
+                    start = time.monotonic()
+                    await right_click_app_route(app, pilot, widget)
+                    deadline = time.monotonic() + 10.0
+                    while time.monotonic() < deadline:
+                        await asyncio.sleep(0.005)
+                        await pilot.pause()
+                        if P1000[:10] in _box(widget):
+                            break
+                    samples.append(time.monotonic() - start)
+                samples.sort()
+                return key_time, samples[len(samples) // 2]
+    
+        key_time, median = asyncio.run(_drive())
+>       assert median <= report_margin(
+            f"r_paste_31_{box_kind}", median, key_time + timing_bound(0.1)
+        ), (key_time, median)
+E       AssertionError: (0.2020177879894618, 1.1257552090100944)
+E       assert 1.1257552090100944 <= 0.3020177879894618
+E        +  where 0.3020177879894618 = report_margin('r_paste_31_m', 1.1257552090100944, (0.2020177879894618 + 0.1))
+E        +    where 0.1 = timing_bound(0.1)
+
+tests/test_b103_clipboard_core.py:1638: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:627 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:627 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:627 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:627 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:627 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:627 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:627 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:627 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:627 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:627 read_os_clipboard: every strategy failed (cascade=['ctypes-win32', 'powershell'])
+============================= QC-TM timing margins =============================
+LOW -272.7%  1.126 s / 0.302 s  r_paste_31_m  tests/test_b103_clipboard_core.py::test_r_paste_31_3_4_linux_right_click_paste_ends_within_typed_key_time[multi]
+LOW -265.0%  1.090 s / 0.299 s  r_paste_31_a  tests/test_b103_clipboard_core.py::test_r_paste_31_3_4_linux_right_click_paste_ends_within_typed_key_time[single]
+QC-TM: 2 bounds, 2 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_31_3_4_linux_right_click_paste_ends_within_typed_key_time[single]
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_31_3_4_linux_right_click_paste_ends_within_typed_key_time[multi]
+2 failed, 85 deselected in 36.43s
+
+===== stderr =====
