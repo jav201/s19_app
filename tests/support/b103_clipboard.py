@@ -502,14 +502,17 @@ async def _poll_until(pilot, predicate: Callable[[], bool], timeout: float = 10.
     raise AssertionError("poll predicate not satisfied within timeout")
 
 
-async def arm_tick_lateness(app: App, screen, marker: dict, interval: float = 0.05) -> list:
-    """Arm a 50 ms interval timer on ``screen``; record lateness per tick.
+async def arm_tick_lateness(app: App, marker: dict, interval: float = 0.05) -> list:
+    """Arm a 50 ms interval timer owned by the running app; record lateness per tick.
 
     Summary:
-        ``marker`` is a dict the pass-through read/write entry flips to
-        ``True`` once the clipboard layer started; a vacuous run (the
-        marker never set before the end) fails in the test. Returns the
-        list of lateness values (actual − due)."""
+        The tick oracle is a repeating ``app.set_interval`` armed on the
+        running app (not the screen), so each tick fires and is counted on the
+        event loop; ``screen.set_interval`` never fires under ``run_test`` + the
+        Pilot poll loop (run-4 triage), leaving ``lateness`` empty. ``marker`` is
+        a dict the pass-through read/write entry flips to ``True`` once the
+        clipboard layer started; a vacuous run (the marker never set before the
+        end) fails in the test. Returns the list of lateness values (actual − due)."""
     lateness: list = []
     due = time.monotonic() + interval
 
@@ -519,8 +522,8 @@ async def arm_tick_lateness(app: App, screen, marker: dict, interval: float = 0.
         lateness.append(now - due)
         due = now + interval
 
-    # Re-arm a repeating timer via the screen's ``set_interval``.
-    timer = screen.set_interval(interval, _tick)
+    # A repeating timer owned by the running app (fires on the event loop).
+    timer = app.set_interval(interval, _tick)
     try:
         yield lateness
     finally:

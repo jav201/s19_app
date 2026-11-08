@@ -628,7 +628,14 @@ def test_r_tui_043_12_2_held_clipboard_logs_warning(tmp_path: Path, os_clipboard
             await pilot.pause()
             await pilot.press("ctrl+v")
             await pilot.pause()
-            n = sum(1 for r in records if r[0] == "s19_app.tui.os_clipboard_input" and r[1] == "WARNING")
+            deadline = time.monotonic() + 5.0
+            n = 0
+            while time.monotonic() < deadline:
+                n = sum(1 for r in records if r[0] == "s19_app.tui.os_clipboard_input" and r[1] == "WARNING")
+                if n >= 1:
+                    break
+                await asyncio.sleep(0.005)
+                await pilot.pause()
             remove_log_capture(records)
             return n
 
@@ -1097,7 +1104,7 @@ async def _held_clipboard_tick_lateness(
 
         mod.write_os_clipboard = _wrap
     try:
-        async for lateness in arm_tick_lateness(app, app.screen, marker):
+        async for lateness in arm_tick_lateness(app, marker):
             if right_click:
                 await right_click_app_route(app, pilot, widget)
             else:
@@ -1546,8 +1553,15 @@ def test_r_tui_043_12_3_win_right_click_held_logs_warning(tmp_path: Path, os_cli
             box.focus()
             await pilot.pause()
             await right_click_app_route(app, pilot, box)
-            await pilot.pause(0.2)
-            n = sum(1 for r in records if r[0] == "s19_app.tui.os_clipboard_input" and r[1] == "WARNING")
+            await pilot.pause()
+            deadline = time.monotonic() + 5.0
+            n = 0
+            while time.monotonic() < deadline:
+                n = sum(1 for r in records if r[0] == "s19_app.tui.os_clipboard_input" and r[1] == "WARNING")
+                if n >= 1:
+                    break
+                await asyncio.sleep(0.005)
+                await pilot.pause()
             remove_log_capture(records)
             return n
 
