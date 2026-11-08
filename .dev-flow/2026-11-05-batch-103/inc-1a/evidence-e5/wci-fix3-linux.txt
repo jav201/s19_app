@@ -1,0 +1,87 @@
+s19_app: /tmp/b103-fix3/s19_app/__init__.py
+
+====COLLECT-WINCI====
+tests/test_b103_clipboard_windows.py::test_r_paste_21_5_direct_win32_call_opens_nothing_and_fails
+
+77 tests collected in 0.04s
+
+====COLLECT-CORE====
+tests/test_b103_clipboard_core.py::test_r_tui_044_2_8_win32_read_bounded_by_global_size
+
+87 tests collected in 0.04s
+
+====RUN-A====
+........................................................................ [ 82%]
+............ss.                                                          [100%]
+============================= QC-TM timing margins =============================
+21.9%  0.246 s / 0.314 s  r_tui_043_10_1_m  tests/test_b103_clipboard_core.py::test_r_tui_043_10_1_3_4_linux_ctrl_v_ends_within_typed_key_time[multi]
+29.9%  0.211 s / 0.301 s  r_paste_31_m  tests/test_b103_clipboard_core.py::test_r_paste_31_3_4_linux_right_click_paste_ends_within_typed_key_time[multi]
+31.5%  0.220 s / 0.321 s  r_tui_043_10_1_a  tests/test_b103_clipboard_core.py::test_r_tui_043_10_1_3_4_linux_ctrl_v_ends_within_typed_key_time[single]
+34.4%  0.210 s / 0.321 s  r_paste_11_3  tests/test_b103_clipboard_core.py::test_r_paste_11_3_linux_copy_ends_within_typed_key_time
+39.3%  0.196 s / 0.322 s  r_paste_27_3  tests/test_b103_clipboard_core.py::test_r_paste_27_3_linux_right_click_copy_ends_within_typed_key_time
+45.1%  0.177 s / 0.322 s  r_paste_31_a  tests/test_b103_clipboard_core.py::test_r_paste_31_3_4_linux_right_click_paste_ends_within_typed_key_time[single]
+QC-TM: 6 bounds, 0 under 20 % margin
+=========================== short test summary info ============================
+SKIPPED [2] tests/test_b103_clipboard_core.py:2153: LinuxX needs a private Xvfb DISPLAY
+85 passed, 2 skipped in 263.74s (0:04:23)
+
+====RUN-A-XVFB====
+..                                                                       [100%]
+2 passed, 85 deselected in 5.11s
+
+====RUN-WINCI====
+ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 93%]
+sssss                                                                    [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_b103_clipboard_windows.py:134: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:153: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:180: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:252: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:338: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:374: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:449: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:468: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:487: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:513: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:531: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:562: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:600: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:618: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:677: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:701: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:727: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:751: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:774: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:802: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:820: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:848: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:866: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:895: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:928: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:945: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:1068: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:1083: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:1098: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:1113: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:1133: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:1156: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:1181: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:1206: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:1239: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:1276: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:1307: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:1334: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:1370: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:1406: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:1434: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:1450: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:1481: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:1513: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:1529: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:1546: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:1578: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:1604: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:1627: Windows only
+SKIPPED [2] tests/test_b103_clipboard_windows.py:1647: Windows only
+SKIPPED [1] tests/test_b103_clipboard_windows.py:1690: Windows only
+77 skipped in 0.09s

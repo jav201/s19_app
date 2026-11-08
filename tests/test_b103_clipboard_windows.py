@@ -26,6 +26,9 @@ Dependencies:
 from __future__ import annotations
 
 import asyncio
+import subprocess
+import sys
+import textwrap
 import threading
 import time
 from pathlib import Path
@@ -57,6 +60,7 @@ from tests.support.b103_clipboard import (
     other_program_write,
     own_read,
     right_click_app_route,
+    show_patch_paste,
     terminal_paste,
     typed_key_time,
 )
@@ -92,6 +96,7 @@ async def _box_a(tmp_path: Path):
 
 async def _box_m(tmp_path: Path):
     async for app, pilot in _drive_real_app(tmp_path, "patch"):
+        await show_patch_paste(app, pilot)
         widget = app.query_one("#patch_paste_text", TextArea)
         widget.text = ""
         widget.focus()
@@ -198,6 +203,7 @@ def test_r_tui_043_10_1_5_6_no_text_no_powershell(
                     for _ in range(4):
                         await pilot.pause()
                     widget = app.query_one("#patch_paste_text", TextArea)
+                    widget.text = ""
                 widget.focus()
                 await pilot.pause()
                 await pilot.press("ctrl+v")
@@ -282,25 +288,50 @@ def test_r_tui_043_10_2_1_2_held_clipboard_paste_ends_within_2_5(
 
 
 def _hold_clipboard(seconds: float) -> dict:
-    """A helper thread that opens the clipboard and keeps it open for
-    ``seconds`` or until ``release`` is set; confirmed holding before return."""
-    import ctypes
+    """Hold the clipboard from a separate process (never a thread of the
+    test process): a child interpreter opens the clipboard with
+    ``OpenClipboard`` and sleeps until killed. The ready handshake is one
+    ``HOLDING`` line on stdout; ``release.set()`` (or the ``seconds``
+    fallback) kills the child, which makes Windows drop the hold."""
+    script = textwrap.dedent(
+        """
+        import ctypes
+        import sys
+        import time
+        from ctypes import wintypes
 
-    state = {"holding": threading.Event(), "release": threading.Event()}
-
-    def _holder():
         user32 = ctypes.windll.user32
-        user32.OpenClipboard.argtypes = [ctypes.c_void_p]
-        user32.OpenClipboard.restype = ctypes.c_int
-        if user32.OpenClipboard(None):
-            state["holding"].set()
-            state["release"].wait(timeout=seconds)
-            user32.CloseClipboard()
-        state["holding"].set()
+        user32.OpenClipboard.argtypes = [wintypes.HWND]
+        user32.OpenClipboard.restype = wintypes.BOOL
+        user32.CloseClipboard.restype = wintypes.BOOL
+        if not user32.OpenClipboard(None):
+            print("OPEN-FAILED", flush=True)
+            sys.exit(1)
+        print("HOLDING", flush=True)
+        while True:
+            time.sleep(0.05)
+        """
+    )
+    proc = subprocess.Popen(
+        [sys.executable, "-c", script],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+    )
+    ready = proc.stdout.readline().strip()
+    if ready != "HOLDING":
+        proc.wait()
+        raise RuntimeError(f"clipboard hold child failed to hold: {ready!r}")
+    state = {"proc": proc, "release": threading.Event()}
 
-    thread = threading.Thread(target=_holder, daemon=True)
-    thread.start()
-    state["holding"].wait(timeout=10.0)
+    def _supervisor() -> None:
+        state["release"].wait(timeout=seconds)
+        if proc.poll() is None:
+            proc.kill()
+        proc.wait()
+
+    threading.Thread(target=_supervisor, daemon=True).start()
     return state
 
 
@@ -326,6 +357,7 @@ def test_r_tui_043_6_2_held_clipboard_pastes_app_clipboard(
                 for _ in range(4):
                     await pilot.pause()
                 widget = app.query_one("#patch_paste_text", TextArea)
+                widget.text = ""
             widget.focus()
             await pilot.pause()
             await pilot.press("ctrl+v")
@@ -365,6 +397,7 @@ def test_r_tui_043_6_3_empty_unicode_text_pastes_app_clipboard_no_powershell(
                 for _ in range(4):
                     await pilot.pause()
                 widget = app.query_one("#patch_paste_text", TextArea)
+                widget.text = ""
             widget.focus()
             await pilot.pause()
             await pilot.press("ctrl+v")
@@ -422,9 +455,9 @@ def test_r_tui_043_4_1_single_line_inserts_first_line_at_cursor(
     async def _drive() -> str:
         async for app, pilot, widget in _box_a(tmp_path):
             widget.value = "ab"
-            widget.selection = (1, 1)
             widget.focus()
             await pilot.pause()
+            widget.selection = (1, 1)
             await pilot.press("ctrl+v")
             await pilot.pause()
             return widget.value
@@ -462,12 +495,14 @@ def test_r_tui_043_5_1_2_ctrl_v_replaces_selection(
         async for app, pilot, widget in (_box_a(tmp_path) if box_kind == "a" else _box_m(tmp_path)):
             if box_kind == "a":
                 widget.value = "AAAA-BBBB"
-                widget.selection = (0, 4)
             else:
                 widget.text = "AAAA-BBBB"
-                widget.selection = ((0, 0), (0, 4))
             widget.focus()
             await pilot.pause()
+            if box_kind == "a":
+                widget.selection = (0, 4)
+            else:
+                widget.selection = ((0, 0), (0, 4))
             await pilot.press("ctrl+v")
             await pilot.pause()
             return _box(widget)
@@ -798,9 +833,9 @@ def test_r_paste_5_win_no_selection_keeps_os_clipboard(
                 await pilot.pause()
             box = app.query_one("#a2l_tags_filter_input", Input)
             box.value = "KEEP"
-            box.selection = (4, 4)
             box.focus()
             await pilot.pause()
+            box.selection = (4, 4)
             await pilot.press("ctrl+c")
             await pilot.pause()
             return app.clipboard
@@ -1152,12 +1187,12 @@ def test_r_paste_25_26_win_right_click_copy_app_clipboard(
         async for app, pilot, widget in (_box_a(tmp_path) if box_kind == "a" else _box_m(tmp_path)):
             app._clipboard = "BEFORE"
             _set_box(widget, "AAAA-BBBB")
+            widget.focus()
+            await pilot.pause()
             if box_kind == "a":
                 widget.selection = (0, 4)
             else:
                 widget.selection = ((0, 0), (0, 4))
-            widget.focus()
-            await pilot.pause()
             await right_click_app_route(app, pilot, widget)
             await pilot.pause()
             return app.clipboard, _box(widget), widget.selection
@@ -1253,12 +1288,14 @@ def test_r_paste_29_30_win_right_click_paste_placement(
             widget = app.query_one("#box")
             if box_kind == "a":
                 widget.value = "ab"
-                widget.selection = (1, 1)
             else:
                 widget.text = "ab"
-                widget.selection = ((0, 1), (0, 1))
             widget.focus()
             await pilot.pause()
+            if box_kind == "a":
+                widget.selection = (1, 1)
+            else:
+                widget.selection = ((0, 1), (0, 1))
             await right_click_app_route(app, pilot, widget)
             await pilot.pause()
             return _box(widget)
@@ -1316,14 +1353,13 @@ def test_r_paste_31_5_6_right_click_no_text_no_powershell(
                         await pilot.pause()
                     widget = app.query_one("#a2l_tags_filter_input", Input)
                 else:
-                    app.action_show_screen("patch")
-                    for _ in range(4):
-                        await pilot.pause()
+                    await show_patch_paste(app, pilot)
                     widget = app.query_one("#patch_paste_text", TextArea)
+                    widget.text = ""
                 widget.focus()
                 await pilot.pause()
                 await right_click_app_route(app, pilot, widget)
-                await pilot.pause()
+                await pilot.pause(0.2)
                 return _box(widget)
 
         value = asyncio.run(_drive())
@@ -1350,9 +1386,7 @@ def test_r_paste_32_1_2_held_right_click_paste_ends_within_2_5(
                     await pilot.pause()
                 widget = app.query_one("#a2l_tags_filter_input", Input)
             else:
-                app.action_show_screen("patch")
-                for _ in range(4):
-                    await pilot.pause()
+                await show_patch_paste(app, pilot)
                 widget = app.query_one("#patch_paste_text", TextArea)
             widget.focus()
             await pilot.pause()
@@ -1385,14 +1419,13 @@ def test_r_tui_043_6_5_win_right_click_pastes_app_clipboard(
                     await pilot.pause()
                 widget = app.query_one("#a2l_tags_filter_input", Input)
             else:
-                app.action_show_screen("patch")
-                for _ in range(4):
-                    await pilot.pause()
+                await show_patch_paste(app, pilot)
                 widget = app.query_one("#patch_paste_text", TextArea)
+                widget.text = ""
             widget.focus()
             await pilot.pause()
             await right_click_app_route(app, pilot, widget)
-            await pilot.pause()
+            await pilot.pause(0.2)
             return _box(widget)
 
     assert asyncio.run(_drive()) == "APP-TEXT"
@@ -1433,7 +1466,7 @@ def test_r_tui_043_12_3_win_right_click_held_logs_warning(tmp_path: Path, os_cli
             box.focus()
             await pilot.pause()
             await right_click_app_route(app, pilot, box)
-            await pilot.pause()
+            await pilot.pause(0.2)
             n = sum(1 for r in records if r[0] == "s19_app.tui.os_clipboard_input" and r[1] == "WARNING")
             remove_log_capture(records)
             return n
@@ -1550,16 +1583,20 @@ def test_r_paste_16_1_read_rescue_starts_system_powershell(
 
     other_program_write("PS-READ")
     started = install_process_spy(mod)
+    original = mod._STRATEGIES
+    mod._STRATEGIES = (("ctypes-win32", lambda: None),) + original[1:]
+    try:
+        async def _drive() -> str:
+            async for app, pilot, widget in _box_a(tmp_path):
+                widget.focus()
+                await pilot.pause()
+                await pilot.press("ctrl+v")
+                await pilot.pause()
+                return widget.value
 
-    async def _drive() -> str:
-        async for app, pilot, widget in _box_a(tmp_path):
-            widget.focus()
-            await pilot.pause()
-            await pilot.press("ctrl+v")
-            await pilot.pause()
-            return widget.value
-
-    value = asyncio.run(_drive())
+        value = asyncio.run(_drive())
+    finally:
+        mod._STRATEGIES = original
     assert value == "PS-READ", value
     assert started and started[0].lower() == mod._system_powershell().lower(), started
 
@@ -1613,6 +1650,7 @@ def test_r_paste_17_no_powershell_starts_nothing(
 ) -> None:
     """R-PASTE.17/1-2 (WinCI): a missing system PowerShell starts nothing."""
     from s19_app.tui import os_clipboard_input as mod
+    from tests.support.b103_clipboard import _own_write
 
     started = install_process_spy(mod)
 
@@ -1628,6 +1666,7 @@ def test_r_paste_17_no_powershell_starts_nothing(
             box.focus()
             await pilot.pause()
             if mode == "read":
+                _own_write("")
                 await pilot.press("ctrl+v")
             else:
                 box.value = "PS-WRITE"
