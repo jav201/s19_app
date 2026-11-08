@@ -574,6 +574,7 @@ def _ref_record_layouts(sections: List[dict]) -> dict:
             "tokens": tokens,
             "decode_type": decode_token,
             "byte_order": _byte_order_of_lines(lines),
+            "lines": lines,
         }
     return out
 
@@ -1203,8 +1204,10 @@ def _read_tag(section, layouts, module_byte_order, errors) -> dict:
     if agree and not no_number_sizes:
         if sname == "MEASUREMENT":
             length, _ = _infer_measurement_length(items, datatype)
-        elif kind in ("CURVE", "MAP") and span is not None:
+        elif kind in _KIND_FAMILY:
             length = span
+            if length is None:
+                length = _standing_length(items)
         else:
             length, _ = _infer_characteristic_length(
                 items, kind, deposit, layouts
@@ -1237,21 +1240,132 @@ def _read_tag(section, layouts, module_byte_order, errors) -> dict:
     }
 
 
+def _standing_length(items: List[Tuple[str, List[str], List[str], int]]) -> Optional[int]:
+    """A standing LENGTH keyword of a CURVE/MAP-family tag, else None."""
+    for kw, args, surplus, ln in items:
+        if kw == "LENGTH" and len(args) == 1 and not surplus:
+            value = _number_word(args[0])
+            if value is not None:
+                return value
+    return None
+
+
+# A RECORD_LAYOUT component whose on-disk element count is one, whatever the
+# axes (R-A2L-READ.48: the full byte span; CTX *layout span*).
+_FIXED_SPAN_COMPONENTS = frozenset(
+    ("NO_AXIS_PTS_X", "NO_AXIS_PTS_Y", "NO_AXIS_PTS_Z", "NO_RESCALE_X")
+)
+
+# The ALIGNMENT_* directive each datatype class reads its start padding from.
+_DATATYPE_ALIGN = {
+    "UBYTE": "ALIGNMENT_BYTE",
+    "SBYTE": "ALIGNMENT_BYTE",
+    "BYTE": "ALIGNMENT_BYTE",
+    "UWORD": "ALIGNMENT_WORD",
+    "SWORD": "ALIGNMENT_WORD",
+    "WORD": "ALIGNMENT_WORD",
+    "ULONG": "ALIGNMENT_LONG",
+    "SLONG": "ALIGNMENT_LONG",
+    "LONG": "ALIGNMENT_LONG",
+    "A_UINT64": "ALIGNMENT_INT64",
+    "A_INT64": "ALIGNMENT_INT64",
+    "FLOAT16_IEEE": "ALIGNMENT_FLOAT16_IEEE",
+    "FLOAT32_IEEE": "ALIGNMENT_FLOAT32_IEEE",
+    "FLOAT64_IEEE": "ALIGNMENT_FLOAT64_IEEE",
+}
+
+_ALIGN_TOKENS = frozenset(_DATATYPE_ALIGN.values())
+
+
+def _pad_up(offset: int, align: int) -> int:
+    """Round ``offset`` up to a multiple of ``align`` (no pad when <= 1)."""
+    if align <= 1:
+        return offset
+    rem = offset % align
+    return offset if rem == 0 else offset + (align - rem)
+
+
+def _declared_alignments(lines: List[str]) -> Optional[dict]:
+    """Collect ``ALIGNMENT_* N`` directives, or None on a bad value."""
+    declared: dict = {}
+    for text in lines or []:
+        tokens = text.split()
+        if not tokens or tokens[0] not in _ALIGN_TOKENS:
+            continue
+        if len(tokens) < 2:
+            continue
+        try:
+            value = int(tokens[1])
+        except (ValueError, TypeError):
+            return None
+        if value < 1:
+            return None
+        declared[tokens[0]] = value
+    return declared
+
+
 def _layout_span(layout: dict, axis_counts: Optional[List[int]]) -> Optional[int]:
-    """A CURVE/MAP layout span: the FNC_VALUES datatype size x the axis-count
-    product. Best-effort for the differential (the reader computes the full
-    multi-component span; the corpus/tracked shapes this oracle is compared on
-    use the simple product form)."""
-    decode = layout.get("decode_type")
-    if decode is None or axis_counts is None:
+    """R-A2L-READ.48: the on-disk byte span of a CURVE/MAP record layout —
+    the sum over EVERY component line of (datatype size x element count), each
+    component padded up to its datatype's declared alignment; None when any
+    component, datatype or needed axis count is unclassifiable. The reader's
+    full multi-component span, not the FNC_VALUES-size x axis product."""
+    lines = layout.get("lines") or []
+    declared = _declared_alignments(lines)
+    if declared is None or axis_counts is None:
         return None
-    size = _DATATYPE_SIZES.get(decode)
-    if size is None:
-        return None
-    product = 1
-    for c in axis_counts:
-        product *= c
-    return size * product
+    total = 0
+    any_component = False
+    for text in lines:
+        tokens = text.split()
+        if not tokens:
+            continue
+        component = tokens[0]
+        if component in _ALIGN_TOKENS:
+            continue
+        if component == "DIRECT" and len(tokens) == 1:
+            continue
+        if component in _FIXED_SPAN_COMPONENTS:
+            count = 1
+        elif component == "AXIS_PTS_X":
+            if len(axis_counts) < 1:
+                return None
+            count = axis_counts[0]
+        elif component == "AXIS_PTS_Y":
+            if len(axis_counts) < 2:
+                return None
+            count = axis_counts[1]
+        elif component == "AXIS_PTS_Z":
+            if len(axis_counts) < 3:
+                return None
+            count = axis_counts[2]
+        elif component == "FNC_VALUES":
+            product = 1
+            for c in axis_counts:
+                product *= c
+            count = product
+        elif component == "RESERVED":
+            if len(tokens) < 4:
+                return None
+            try:
+                count = int(tokens[3])
+            except (ValueError, TypeError):
+                return None
+            if count < 1:
+                return None
+        else:
+            return None
+        if len(tokens) < 3:
+            return None
+        size = _DATATYPE_SIZES.get(tokens[2])
+        if size is None:
+            return None
+        align = declared.get(_DATATYPE_ALIGN.get(tokens[2]), 1)
+        total = _pad_up(total, align) + size * count
+        any_component = True
+        if total > _MAX_BYTES:
+            return None
+    return total if any_component else None
 
 
 def _axis_counts(section: dict) -> Optional[List[int]]:

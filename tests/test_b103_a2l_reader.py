@@ -513,9 +513,9 @@ def test_r_a2l_001_2_comment_before_live_address(tmp_path: Path) -> None:
 
 
 def test_r_a2l_read_7_comment_between_digits_splits(tmp_path: Path) -> None:
-    """R-A2L-READ.7/1: MAP 0x1C2D3E00/*c*/4026 -> address 0x1C2D3E00."""
+    """R-A2L-READ.7/1 (name = first word, R-A2L-READ.23): MAP 0x1C2D3E00/*c*/4026 -> address 0x1C2D3E00."""
     text = _body(
-        '/begin CHARACTERISTIC Synthetic map ""\n MAP 0x1C2D3E00/*c*/4026 RL_SYN_U16 0 CM_ID 0 65535\n/end CHARACTERISTIC\n'
+        '/begin CHARACTERISTIC Synthetic ""\n MAP 0x1C2D3E00/*c*/4026 RL_SYN_U16 0 CM_ID 0 65535\n/end CHARACTERISTIC\n'
         "/begin RECORD_LAYOUT RL_SYN_U16\nFNC_VALUES 1 UWORD ROW_DIR DIRECT\n/end RECORD_LAYOUT\n"
     )
     data = _parse(tmp_path, text)
@@ -1011,11 +1011,11 @@ def test_r_a2l_read_27_case_07_keeps_reading() -> None:
 
 
 def test_r_a2l_read_28_short_header_error(tmp_path: Path) -> None:
-    """R-A2L-READ.28/1, /2, /4: short header errors."""
+    """R-A2L-READ.28/1, /2, /4 (/2 name = first word, R-A2L-READ.23): short header errors."""
     text = _body(meas("SX", " ECU_ADDRESS 0x10", hdr=" UWORD CM_ID 0 0 0"))
     data = _parse(tmp_path, text)
     assert any("MEASUREMENT SX has 5 of its 6 header words" in e for e in data["errors"])
-    text2 = _body('/begin CHARACTERISTIC Synthetic map ""\n MAP 0x1C2D3E00 RL 0 CM 0 1\n/end CHARACTERISTIC')
+    text2 = _body('/begin CHARACTERISTIC Synthetic ""\n MAP 0x1C2D3E00 RL 0 CM 1\n/end CHARACTERISTIC')
     data2 = _parse(tmp_path, text2)
     assert any("CHARACTERISTIC Synthetic has 6 of its 7 header words" in e for e in data2["errors"])
     assert _tag(data2, "Synthetic", "CHARACTERISTIC")["address"] is None
