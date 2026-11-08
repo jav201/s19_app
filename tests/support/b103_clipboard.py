@@ -549,13 +549,14 @@ def _system_powershell_path() -> str:
 
 def other_program_write(text: str) -> None:
     """A separate system PowerShell ``Set-Clipboard`` with the text on stdin
-    (stands for "another Windows program")."""
+    as UTF-16LE (matching ``[Console]::InputEncoding``; stands for "another
+    Windows program")."""
     _require_windows()
     path = _system_powershell_path()
     subprocess.run(
         [path, "-NoProfile", "-NonInteractive", "-Command",
-         "[Console]::InputEncoding=[System.Text.Encoding]::UTF8;$input | Set-Clipboard"],
-        input=text, capture_output=True, text=True, encoding="utf-8",
+         "[Console]::InputEncoding=[System.Text.Encoding]::Unicode;$input | Set-Clipboard"],
+        input=text, capture_output=True, text=True, encoding="utf-16-le",
         errors="replace", timeout=10.0, shell=False,
         creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
     )
