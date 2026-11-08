@@ -361,11 +361,13 @@ def test_r_a2l_036_2_leading_zero_decimal(tmp_path: Path) -> None:
 
 
 def test_r_a2l_036_2_open_quote_ends_at_line(tmp_path: Path) -> None:
-    """Why: an unterminated quote ends at its line; it must not swallow the next line's
-    comment/words (carried quote state would give base 0x10, size 0x20)."""
+    """Why: a closed quote ends at its line; it must not swallow the next line's
+    comment/words (carried quote state would give base 0x10, size 0x20). An
+    unterminated quote now spans to EOF (R-A2L-READ.14/.15), so this pins the
+    closed-quote shape."""
     seg = _one_segment(
         tmp_path,
-        '/begin MEMORY_SEGMENT S7 "oops',
+        '/begin MEMORY_SEGMENT S7 "oops"',
         "/* 0x10 0x20 */ DATA FLASH INTERN 0x1000 0x200 -1",
     )
     assert (seg["base"], seg["size"], seg["offset"]) == (0x1000, 0x200, -1)

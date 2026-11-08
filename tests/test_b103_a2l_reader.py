@@ -211,7 +211,8 @@ def test_r_a2l_read_1_cr_cr_lf_counts_two_ends(tmp_path: Path) -> None:
     tag = _tag(data, "X")
     assert tag["address"] == 0x1234
     sec = data["sections"][0]
-    assert sec["start_line"] * 2 - 1 == sec["end_line"]  # line k -> 2k-1
+    assert sec["start_line"] == 3  # PROJECT's LF line 2 -> 2*2 - 1
+    assert sec["end_line"] == 49  # PROJECT's LF line 25 -> 2*25 - 1
 
 
 @pytest.mark.parametrize("sep", ["\n", "\r", " "])
@@ -452,8 +453,8 @@ def test_r_a2l_read_66_name_cut_256(tmp_path: Path) -> None:
     n256 = "N" * 256
     n257 = "N" * 257
     text = _body(
-        f'/begin MEASUREMENT {n256} ""\n ECU_ADDRESS 0x10\n/end MEASUREMENT\n'
-        f'/begin MEASUREMENT {n257} ""\n ECU_ADDRESS 0x20\n/end MEASUREMENT'
+        f'/begin MEASUREMENT {n256} ""\n UWORD\n ECU_ADDRESS 0x10\n/end MEASUREMENT\n'
+        f'/begin MEASUREMENT {n257} ""\n UWORD\n ECU_ADDRESS 0x20\n/end MEASUREMENT'
     )
     data = _parse(tmp_path, text)
     errs = [e for e in data["errors"] if "header words" in e]
@@ -481,7 +482,7 @@ def test_r_a2l_001_2_comment_not_read(tmp_path: Path) -> None:
         ("BYTE_ORDER", meas("X", " ECU_ADDRESS 0x1234", " BYTE_ORDER MSB_LAST", " /*", " BYTE_ORDER MSB_FIRST", " */"), "effective_byte_order", "little"),
         ("MATRIX_DIM", meas("X", " ECU_ADDRESS 0x1234", " MATRIX_DIM 4", " /*", " MATRIX_DIM 1", " */"), "length", 8),
         ("BIT_MASK", meas("X", " ECU_ADDRESS 0x1234", " /* BIT_MASK 0x0FF0 */"), "bit_org", None),
-        ("LENGTH", meas("X", " ECU_ADDRESS 0x10", " LENGTH 4", " /*", " LENGTH 2", " */"), "length", 4),
+        ("LENGTH", meas("X", " ECU_ADDRESS 0x10", " MATRIX_DIM 2", " LENGTH 4", " /*", " LENGTH 2", " */"), "length", 4),
         ("//", meas("X", " ECU_ADDRESS 0x1234", " // ECU_ADDRESS 0x9999"), "address", 0x1234),
         ("before", meas("X", " /* ECU_ADDRESS 0x9999 */ ECU_ADDRESS 0x1234"), "address", 0x1234),
     ]
@@ -492,15 +493,15 @@ def test_r_a2l_001_2_comment_not_read(tmp_path: Path) -> None:
 
 def test_r_a2l_001_2_mod_common_comment_not_read(tmp_path: Path) -> None:
     """R-A2L-001.2/8: a commented MOD_COMMON BYTE_ORDER is not read."""
-    hdr = (
+    text = (
         "ASAP2_VERSION 1 71\n/project P\n"
         "/begin MODULE M \"\"\n"
         "/begin MOD_COMMON \"\"\n/*\nBYTE_ORDER MSB_LAST\n*/\nBYTE_ORDER MSB_FIRST\n/end MOD_COMMON\n"
         "/begin COMPU_METHOD CM_ID \"\" IDENTICAL \"%.0\" \"\"\n/end COMPU_METHOD\n"
-        + "".join(f"/begin RECORD_LAYOUT RL_{k}\nFNC_VALUES 1 {v} ROW_DIR DIRECT\n/end RECORD_LAYOUT\n" for k, v in (("U16", "UWORD"),))
+        "/begin RECORD_LAYOUT RL_U16\nFNC_VALUES 1 UWORD ROW_DIR DIRECT\n/end RECORD_LAYOUT\n"
+        + meas("X", " ECU_ADDRESS 0x10") + "\n"
         + "/end MODULE\n/end PROJECT\n"
     )
-    text = hdr + meas("X", " ECU_ADDRESS 0x10") + "\n"
     data = _parse(tmp_path, text)
     assert _tag(data, "X")["effective_byte_order"] == "big"
 
@@ -518,7 +519,7 @@ def test_r_a2l_read_7_comment_between_digits_splits(tmp_path: Path) -> None:
         "/begin RECORD_LAYOUT RL_SYN_U16\nFNC_VALUES 1 UWORD ROW_DIR DIRECT\n/end RECORD_LAYOUT\n"
     )
     data = _parse(tmp_path, text)
-    tag = _tag(data, "Synthetic map", "CHARACTERISTIC")
+    tag = _tag(data, "Synthetic", "CHARACTERISTIC")
     assert tag["address"] == 0x1C2D3E00
 
 
@@ -597,7 +598,7 @@ def test_r_a2l_read_12_commented_object_alone_no_tag(tmp_path: Path) -> None:
 
 def test_r_a2l_read_12_cut_section_no_tag(tmp_path: Path) -> None:
     """R-A2L-READ.12/4 ([B13]): a file cut inside a MEASUREMENT gives 0 tags."""
-    text = _body('/begin MEASUREMENT X ""\n UWORD CM_ID 0 0 0 65535\n ECU_ADDRESS 0x12')
+    text = HDR + '/begin MEASUREMENT X ""\n UWORD CM_ID 0 0 0 65535\n ECU_ADDRESS 0x12'
     data = _parse(tmp_path, text)
     assert _tags_named(data, "X") == []
 
@@ -670,7 +671,7 @@ def test_r_a2l_read_14_words_after_close_carry_closing_line(tmp_path: Path) -> N
     """R-A2L-READ.14/2: words after a closing quote carry the closing line."""
     text = _body(meas("X", ' FORMAT "a', 'b" \u00e9 /end MEASUREMENT'))
     data = _parse(tmp_path, text)
-    assert any("unexpected character U+00E9" in e and "Line 5" in e for e in data["errors"])
+    assert any("unexpected character U+00E9" in e and "Line 23" in e for e in data["errors"])
 
 
 def test_r_a2l_read_15_quoted_string_not_closed(tmp_path: Path) -> None:
@@ -800,9 +801,18 @@ def test_r_a2l_read_54_axis_pts_named_later(tmp_path: Path) -> None:
     """R-A2L-READ.54/5: an AXIS_PTS named on a later line parses its name."""
     text = _body("/begin AXIS_PTS\nAP_K1 \"\" 0x3000 NO_INPUT_QUANTITY RL_U16 0 CM_ID 4 0 100\n/end AXIS_PTS")
     data = _parse(tmp_path, text)
-    names = [s["name"] for s in data["sections"] if s["name"] == "AXIS_PTS"]
-    assert names
-    assert any(parse_begin_meta(s["meta"])[0] == "AP_K1" for s in data["sections"] if s["name"] == "AXIS_PTS")
+
+    def _walk(nodes: List[dict]) -> List[dict]:
+        out: List[dict] = []
+        for s in nodes:
+            if s.get("name") == "AXIS_PTS":
+                out.append(s)
+            out.extend(_walk(s.get("children") or []))
+        return out
+
+    axis = _walk(data["sections"])
+    assert axis
+    assert any(parse_begin_meta(s["meta"])[0] == "AP_K1" for s in axis)
 
 
 def test_r_a2l_001_4_stray_end(tmp_path: Path) -> None:
@@ -1007,8 +1017,8 @@ def test_r_a2l_read_28_short_header_error(tmp_path: Path) -> None:
     assert any("MEASUREMENT SX has 5 of its 6 header words" in e for e in data["errors"])
     text2 = _body('/begin CHARACTERISTIC Synthetic map ""\n MAP 0x1C2D3E00 RL 0 CM 0 1\n/end CHARACTERISTIC')
     data2 = _parse(tmp_path, text2)
-    assert any("CHARACTERISTIC Synthetic map has 6 of its 7 header words" in e for e in data2["errors"])
-    assert _tag(data2, "Synthetic map", "CHARACTERISTIC")["address"] is None
+    assert any("CHARACTERISTIC Synthetic has 6 of its 7 header words" in e for e in data2["errors"])
+    assert _tag(data2, "Synthetic", "CHARACTERISTIC")["address"] is None
     text3 = _body('/begin MEASUREMENT XK7 "" UWORD CM_ID 0 0\n ECU_ADDRESS 0x10\n/end MEASUREMENT')
     data3 = _parse(tmp_path, text3)
     assert any("MEASUREMENT XK7 has 4 of its 6 header words" in e for e in data3["errors"])
@@ -1177,7 +1187,7 @@ def test_r_a2l_read_60_no_address_header_not_number(tmp_path: Path) -> None:
 def test_r_a2l_read_62_short_characteristic_no_field(tmp_path: Path) -> None:
     """R-A2L-READ.62/1, /2: a short CHARACTERISTIC header gives no field."""
     text = _body('/begin CHARACTERISTIC Synthetic map ""\n MAP 0x1C2D3E00 RL 0 CM 0 1\n/end CHARACTERISTIC')
-    t = _tag(_parse(tmp_path, text), "Synthetic map", "CHARACTERISTIC")
+    t = _tag(_parse(tmp_path, text), "Synthetic", "CHARACTERISTIC")
     assert t["address"] is None and t["char_type"] is None and t["deposit"] is None
     text2 = _body('/begin CHARACTERISTIC CQ "" VALUE\n/end CHARACTERISTIC')
     t2 = _tag(_parse(tmp_path, text2), "CQ", "CHARACTERISTIC")
@@ -1208,7 +1218,7 @@ def test_r_a2l_read_63_no_such_error_on_tracked() -> None:
 
 def test_r_a2l_read_67_not_closed(tmp_path: Path) -> None:
     """R-A2L-READ.67/1, /2: the not-closed error."""
-    text = _body('/begin MEASUREMENT X ""\n UWORD CM_ID 0 0 0 65535\n ECU_ADDRESS 0x12')
+    text = HDR + '/begin MEASUREMENT X ""\n UWORD CM_ID 0 0 0 65535\n ECU_ADDRESS 0x12'
     data = _parse(tmp_path, text)
     assert any("MEASUREMENT X is not closed" in e for e in data["errors"])
     assert any("Unclosed /begin sections detected." in e for e in data["errors"])
@@ -1330,14 +1340,14 @@ def _section_of(data: dict, name: str) -> str:
 def test_r_a2l_read_38_length_bounds(tmp_path: Path) -> None:
     """R-A2L-READ.38/1..3: lengths below 1 or above 1 MiB give no length."""
     for w, want in (("0", None), ("-5", None), ("1048577", None), ("99999999999", None), ("1048576", 1048576)):
-        data = _parse(tmp_path, _body(meas("X", " ECU_ADDRESS 0x10", f" LENGTH {w}")))
+        data = _parse(tmp_path, _body(meas("X", " ECU_ADDRESS 0x10", f" LENGTH {w}", hdr="")))
         assert _tag(data, "X")["length"] == want, w
 
 
 def test_r_a2l_read_39_length_error(tmp_path: Path) -> None:
     """R-A2L-READ.39/1: the length-out-of-bounds error."""
     for w in ("0", "1048577", "99999999999"):
-        data = _parse(tmp_path, _body(meas("X", " ECU_ADDRESS 0x10", f" LENGTH {w}")))
+        data = _parse(tmp_path, _body(meas("X", " ECU_ADDRESS 0x10", f" LENGTH {w}", hdr="")))
         assert any(f"has the length {w}, outside 1 to 1048576 bytes" in e for e in data["errors"]), w
 
 
@@ -1415,7 +1425,8 @@ def test_r_a2l_read_38_definition_stays_refused(tmp_path: Path) -> None:
         data = _parse(tmp_path, text)
         definition = describe_definition("X", data)
         assert definition.byte_length is None
-        assert any("A2L-DEF-ADDRESS" in (r.code or "") for r in (definition.refusals or []))
+        assert definition.refusal is not None
+        assert "A2L-DEF-ADDRESS" in (definition.refusal.code or "")
 
 
 def test_r_a2l_read_61_no_enriched_byte_size(tmp_path: Path) -> None:

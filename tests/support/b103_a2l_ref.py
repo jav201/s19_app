@@ -1177,10 +1177,16 @@ def _read_tag(section, layouts, module_byte_order, errors) -> dict:
         element_size = _DATATYPE_SIZES.get(datatype or "")
     else:
         element_size = _characteristic_element_size(kind, deposit, layouts)
+
+    # Inline axis counts for a CURVE/MAP (the span and the length both need it).
+    axis_counts = None
+    if kind in ("CURVE", "MAP"):
+        axis_counts = _axis_counts(section)
+
     span = None
     if kind_for_sizes is not None and record_layout_name in layouts:
         layout = layouts[record_layout_name]
-        span = _layout_span(layout, None)
+        span = _layout_span(layout, axis_counts)
     agree, smallest, largest, no_number_sizes = _tag_sizes(
         items, element_size, kind_for_sizes, span
     )
@@ -1197,6 +1203,8 @@ def _read_tag(section, layouts, module_byte_order, errors) -> dict:
     if agree and not no_number_sizes:
         if sname == "MEASUREMENT":
             length, _ = _infer_measurement_length(items, datatype)
+        elif kind in ("CURVE", "MAP") and span is not None:
+            length = span
         else:
             length, _ = _infer_characteristic_length(
                 items, kind, deposit, layouts
@@ -1210,12 +1218,6 @@ def _read_tag(section, layouts, module_byte_order, errors) -> dict:
                 start_line,
             )
         )
-
-    # Axis counts for a CURVE/MAP (inline axes only, for READ.48 comparison).
-    axis_counts = None
-    if kind in ("CURVE", "MAP"):
-        counts = _axis_counts(section)
-        axis_counts = counts
 
     return {
         "section": sname,
@@ -1341,7 +1343,10 @@ def _read_span(section: dict, layouts: dict, typedefs: dict) -> dict:
                     length = _bounded_length(size * tmatrix * matrix_product)
             elif tkind == "TYPEDEF_CHARACTERISTIC":
                 tkind2 = theader[0] if theader else None
-                tdeposit = theader[2] if len(theader) > 2 else None
+                tdeposit = theader[1] if len(theader) > 1 else None
+                if tdeposit is not None and _number_word(tdeposit) is not None:
+                    # ASAP2 1.6 with-address form: theader[1] is the address.
+                    tdeposit = theader[2] if len(theader) > 2 else None
                 titems = _keyword_items(_section_words(tsection), len(theader), [])
                 tlen, _ = _infer_characteristic_length(
                     titems, tkind2, tdeposit, layouts

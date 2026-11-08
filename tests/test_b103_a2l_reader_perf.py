@@ -2,7 +2,8 @@
 
 Run ALONE on cachyos-rtx (``-m serial_timing``, never under ``-n``), GC off,
 the least of >= 15 in-process runs for time, and a fresh process per memory run
-(``resource.getrusage(RUSAGE_SELF).ru_maxrss``) so the peak is the true peak.
+(the ``/proc/self/status`` ``VmHWM`` high-water mark) so the peak is the true
+peak (``ru_maxrss`` is inherited across ``fork``/``exec`` from the timing runs).
 The bounds are the requirement's numbers: time <= 1.5 x the e07fb00 median and
 peak RSS <= 2 x e07fb00's peak, both measured on the same host (base medians
 recorded in the RED transcript).
@@ -17,7 +18,6 @@ per-character alternation (1,005 MB) both trip the 2 x memory bound.
 from __future__ import annotations
 
 import gc
-import resource
 import subprocess
 import sys
 import time
@@ -129,11 +129,17 @@ def _min_time(path: Path) -> float:
 def _peak_mb(path: Path) -> float:
     """Peak RSS of one parse in a fresh process (best of 3)."""
     script = (
-        "import resource,sys\n"
+        "import sys\n"
         "from s19_app.tui.a2l import parse_a2l_file\n"
         "from pathlib import Path\n"
         "parse_a2l_file(Path(sys.argv[1]))\n"
-        "print(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)\n"
+        "peak_kb = 0\n"
+        "with open('/proc/self/status') as fh:\n"
+        "    for line in fh:\n"
+        "        if line.startswith('VmHWM:'):\n"
+        "            peak_kb = int(line.split()[1])\n"
+        "            break\n"
+        "print(peak_kb)\n"
     )
     best = None
     for _ in range(3):
@@ -200,7 +206,6 @@ def test_r_a2l_read_52_words_memory(big_files: dict) -> None:
     assert peak < report_margin("R-A2L-READ.52/3 words peak RSS", peak, timing_bound(bound)), peak
 
 
-@pytest.mark.serial_timing
 def test_r_a2l_read_52_words_no_exception_and_one_error(big_files: dict) -> None:
     """R-A2L-READ.52/3 / .65/6: the 19.8 MB file parses with one surplus-word
     error and the tag ``BIG`` has no address."""
