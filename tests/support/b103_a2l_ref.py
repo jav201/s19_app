@@ -500,7 +500,7 @@ def _ref_tree(
             flush_run()
             file_word = flat[k + 1][0] if k + 1 < n else ""
             errors.append(
-                ("/include " + _echo_word(_unquote(file_word)) + " is not read", ln)
+                (f"Line {ln}: /include " + _echo_word(_unquote(file_word)) + " is not read", ln)
             )
             own_word(w, ln)
             k += 2 if k + 1 < n else 1
@@ -582,15 +582,15 @@ def _ref_record_layouts(sections: List[dict]) -> dict:
 def _deposit_size(deposit: str) -> Optional[int]:
     u = (deposit or "").upper()
     markers = (
-        ("FLOAT64", 8),
-        ("FLOAT32", 4),
-        ("FLOAT16", 2),
-        ("UBYTE", 1),
-        ("SBYTE", 1),
-        ("UWORD", 2),
-        ("SWORD", 2),
-        ("ULONG", 4),
-        ("SLONG", 4),
+        ("__FLOAT64_IEEE_Z", 8),
+        ("__FLOAT32_IEEE_Z", 4),
+        ("__FLOAT16_IEEE_Z", 2),
+        ("__UBYTE_Z", 1),
+        ("__SBYTE_Z", 1),
+        ("__UWORD_Z", 2),
+        ("__SWORD_Z", 2),
+        ("__ULONG_Z", 4),
+        ("__SLONG_Z", 4),
     )
     for marker, size in markers:
         if marker in u:
@@ -637,7 +637,7 @@ def _tag_header(
     max_hdr = _HEADER_WORDS[section_name]
     while i < n and len(header) < max_hdr:
         w, ln, ph = words[i]
-        if ph or _is_quoted(w) or w.upper() in _ARITY:
+        if ph or _is_quoted(w) or w in _ARITY:
             break
         header.append(w)
         i += 1
@@ -660,7 +660,7 @@ def _keyword_items(
     n = len(words)
     while i < n:
         w, ln, ph = words[i]
-        if ph or _is_quoted(w) or w.upper() not in _ARITY:
+        if ph or _is_quoted(w) or w not in _ARITY:
             i += 1
             continue
         kw = w.upper()
@@ -671,7 +671,7 @@ def _keyword_items(
         if arity == -1:  # MATRIX_DIM: all words up to the next keyword/place
             while j < n:
                 w2, _, ph2 = words[j]
-                if ph2 or (not _is_quoted(w2) and w2.upper() in _ARITY):
+                if ph2 or (not _is_quoted(w2) and w2 in _ARITY):
                     break
                 args.append(w2)
                 j += 1
@@ -682,14 +682,14 @@ def _keyword_items(
         else:
             while j < n and len(args) < arity:
                 w2, _, ph2 = words[j]
-                if ph2 or (not _is_quoted(w2) and w2.upper() in _ARITY):
+                if ph2 or (not _is_quoted(w2) and w2 in _ARITY):
                     break
                 args.append(w2)
                 j += 1
             if kw in _SURPLUS_KINDS:
                 while j < n:
                     w2, _, ph2 = words[j]
-                    if ph2 or (not _is_quoted(w2) and w2.upper() in _ARITY):
+                    if ph2 or (not _is_quoted(w2) and w2 in _ARITY):
                         break
                     if _is_hex_like(w2):
                         surplus.append(w2)
@@ -1400,16 +1400,21 @@ def _read_spans(sections: List[dict], layouts: dict) -> List[dict]:
     spans: List[dict] = []
     typedefs: dict = {}
 
-    def _walk(secs: List[dict]) -> None:
+    def _collect_typedefs(secs: List[dict]) -> None:
         for sec in secs:
             if sec["name"].startswith("TYPEDEF_"):
                 words = _section_words(sec)
                 name, _, header, _ = _tag_header(sec["name"], words)
                 typedefs[name] = (sec["name"], header, sec)
+            _collect_typedefs(sec.get("children", []))
+
+    def _walk(secs: List[dict]) -> None:
+        for sec in secs:
             if sec["name"] in ("INSTANCE", "BLOB"):
                 spans.append(_read_span(sec, layouts, typedefs))
             _walk(sec.get("children", []))
 
+    _collect_typedefs(sections)
     _walk(sections)
     return spans
 
@@ -1461,12 +1466,13 @@ def _read_span(section: dict, layouts: dict, typedefs: dict) -> dict:
                 if tdeposit is not None and _number_word(tdeposit) is not None:
                     # ASAP2 1.6 with-address form: theader[1] is the address.
                     tdeposit = theader[2] if len(theader) > 2 else None
-                titems = _keyword_items(_section_words(tsection), len(theader), [])
-                tlen, _ = _infer_characteristic_length(
-                    titems, tkind2, tdeposit, layouts
-                )
-                if tlen is not None:
-                    length = _bounded_length(tlen * matrix_product)
+                if tkind2 in ("VALUE", "VAL_BLK", "ASCII"):
+                    titems = _keyword_items(_section_words(tsection), len(theader), [])
+                    tlen, _ = _infer_characteristic_length(
+                        titems, tkind2, tdeposit, layouts
+                    )
+                    if tlen is not None:
+                        length = _bounded_length(tlen * matrix_product)
             elif tkind in ("TYPEDEF_BLOB", "TYPEDEF_STRUCTURE"):
                 size_word = theader[0] if theader else None
                 size = _number_word(size_word or "")

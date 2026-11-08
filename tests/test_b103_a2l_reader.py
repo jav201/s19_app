@@ -841,6 +841,18 @@ def test_r_a2l_read_22_include_error(tmp_path: Path) -> None:
     assert [e for e in _parse(tmp_path, text)["errors"] if "is not read" in e] == []
 
 
+def test_r_a2l_read_22_include_error_ref(ref: Callable[[str], dict]) -> None:
+    """R-A2L-READ.22 (oracle): the /include error keeps its exact `Line n:` text."""
+    path = REPO_ROOT / "examples" / "case_00_public" / "merge_inc_test.a2l"
+    text = path.read_text(encoding="utf-8", errors="replace")
+    data = parse_a2l_file(path)
+    reading = ref(text)
+    assert any(
+        t == "Line 5: /include included.a2l is not read" for t, _ in reading["errors"]
+    )
+    _assert_errors_equal(data["errors"], reading["errors"])
+
+
 def test_r_a2l_read_64_nesting_cap(tmp_path: Path) -> None:
     """R-A2L-READ.64/1..3: 33 levels error, 32 levels read."""
     def nested(n: int, one_line: bool = False) -> str:
@@ -1056,6 +1068,15 @@ def test_r_a2l_read_29_keyword_never_argument(tmp_path: Path) -> None:
     data2 = _parse(tmp_path, text2)
     assert _tag(data2, "XA2")["address"] == 0x1234
     assert any("ECU_ADDRESS_EXTENSION has 0 of its 1 arguments" in e for e in data2["errors"])
+
+
+def test_r_a2l_read_29_unit_body_keyword_ref(tmp_path: Path, ref: Callable[[str], dict]) -> None:
+    """R-A2L-READ.29 (oracle): `UNIT unit` is a one-argument keyword, no error."""
+    text = _body(meas("X", " UNIT unit", " READ_ONLY"))
+    data = _parse(tmp_path, text)
+    assert _tag(data, "X")["unit"] == "unit"
+    assert data["errors"] == []
+    _assert_errors_equal(data["errors"], ref(text)["errors"])
 
 
 def test_r_a2l_read_30_keyword_wherever(tmp_path: Path) -> None:
@@ -1528,6 +1549,42 @@ def test_r_a2l_read_45_instance_unknown_typedef(tmp_path: Path) -> None:
         text = _body(body + f"/begin INSTANCE I1 \"\" {typedef} 0x10\n/end INSTANCE")
         spans = _spans(_parse(tmp_path, text))
         assert any(s["name"] == "I1" and s["length"] is None for s in spans), typedef
+
+
+def test_r_a2l_read_45_instance_curve_typedef_ref(tmp_path: Path, ref: Callable[[str], dict]) -> None:
+    """R-A2L-READ.43/.45 (oracle): a CURVE typedef is unsizeable, a VALUE sized."""
+    text = _body(
+        '/begin TYPEDEF_CHARACTERISTIC TCURVE "" CURVE 0x0 UWORD 0 CM_ID 0 65535\n/end TYPEDEF_CHARACTERISTIC\n'
+        '/begin TYPEDEF_CHARACTERISTIC TVALUE "" VALUE 0x0 UWORD 0 CM_ID 0 65535\n/end TYPEDEF_CHARACTERISTIC\n'
+        '/begin INSTANCE IC "" TCURVE 0x10\n/end INSTANCE\n'
+        '/begin INSTANCE IV "" TVALUE 0x20\n/end INSTANCE'
+    )
+    spans = _spans(_parse(tmp_path, text))
+    assert any(s["name"] == "IC" and s["length"] is None for s in spans)
+    assert any(s["name"] == "IV" and s["length"] == 2 for s in spans)
+    _assert_spans_equal(spans, ref(text)["spans"])
+
+
+def test_r_a2l_read_42_instance_forward_typedef_ref(tmp_path: Path, ref: Callable[[str], dict]) -> None:
+    """R-A2L-READ.42 (oracle): an INSTANCE declared before its typedef is sized."""
+    text = _body(
+        '/begin INSTANCE I1 "" T_FWD 0x10\n/end INSTANCE\n'
+        '/begin TYPEDEF_MEASUREMENT T_FWD "" UWORD CM_ID 0 0 0 65535\n/end TYPEDEF_MEASUREMENT'
+    )
+    spans = _spans(_parse(tmp_path, text))
+    assert any(s["name"] == "I1" and s["length"] == 2 for s in spans)
+    _assert_spans_equal(spans, ref(text)["spans"])
+
+
+def test_r_a2l_read_45_instance_unresolvable_value_deposit_ref(tmp_path: Path, ref: Callable[[str], dict]) -> None:
+    """R-A2L-READ.43/.45 (oracle): a VALUE typedef with an undeclared deposit gives no length."""
+    text = _body(
+        '/begin TYPEDEF_CHARACTERISTIC TVAL "" VALUE __ULong_Value 0 AccessType 0 4294967295\n/end TYPEDEF_CHARACTERISTIC\n'
+        '/begin INSTANCE I1 "" TVAL 0x10\n/end INSTANCE'
+    )
+    spans = _spans(_parse(tmp_path, text))
+    assert any(s["name"] == "I1" and s["length"] is None for s in spans)
+    _assert_spans_equal(spans, ref(text)["spans"])
 
 
 def test_r_a2l_read_46_span_length_bounds(tmp_path: Path) -> None:

@@ -1,0 +1,42 @@
+All done. Here's the report.
+
+## Report — Inc 11 E4 oracle-fix2 (DeepSeek)
+
+### Result
+The full reader file is **green**: `183 passed, 0 failed`. The three listed defects are fixed, and one further reference defect that surfaced after the two-pass fix was also fixed (all reference-only, no product changes). No commit was made.
+
+### Exact diff summary (vs HEAD `1075fe48`, uncommitted)
+```
+ tests/support/b103_a2l_ref.py | 28 insertions, 22 deletions
+ tests/test_b103_a2l_reader.py | 57 insertions,  0 deletions
+ 2 files changed, 85 insertions(+), 22 deletions(-)
+```
+The pre-existing CURVE/VALUE correction (`_read_span` `if tkind2 in ("VALUE","VAL_BLK","ASCII")` guard + `test_r_a2l_read_45_instance_curve_typedef_ref`) is preserved untouched; everything below is added on top of it.
+
+### Root causes and fixes (`tests/support/b103_a2l_ref.py`)
+
+1. **Forward-reference typedef (R-A2L-READ.42–.45).** `_read_spans` collected typedefs and read spans in one walk, so an `INSTANCE` whose `TYPEDEF_*` is declared later got no length. Fixed by a two-pass `_collect_typedefs(sections)` then `_walk(sections)`; span order unchanged.
+
+2. **`/include` diagnostic (R-A2L-READ.22).** The reference emitted `/include <file> is not read` without the required prefix. Fixed to `f"Line {ln}: /include <file> is not read"` (matches the product's `pending_include_line` text exactly — `Line 5: /include included.a2l is not read` on the tracked file).
+
+3. **Spurious `UNIT unit` errors (R-A2L-READ.29).** The reference detected keywords case-insensitively (`w.upper() in _ARITY`), so the argument `unit` was re-parsed as the `UNIT` keyword, producing 30 false "has 0 of its 1 arguments" / "declared twice" errors on `case_07_stress_smoke/firmware.a2l`. The product detects keywords case-sensitively (`word in _TAG_KEYWORD_ARITY`). Fixed by making all five `_ARITY` membership checks in `_tag_header` and `_keyword_items` case-sensitive — no special-casing of UNIT or the file.
+
+4. **Unresolvable-deposit VALUE typedef over-sizing (R-A2L-READ.43/.45) — surfaced after fix #1.** `_deposit_size` matched broad datatype substrings (`"ULONG"`, `"UWORD"`, …), so `dummy`'s deposit `__ULong_Value` in `update_typedef_test3.a2l` was sized to 4 while the product (correctly) gives no length. Fixed by narrowing the markers to the product's `sizeof_from_deposit` record-layout suffixes (`"__ULONG_Z"`, `"__UWORD_Z"`, `"__FLOAT64_IEEE_Z"`, …), keeping the `_DATATYPE_SIZES.get(u)` fallback.
+
+### Pinned synthetic differential coverage (`tests/test_b103_a2l_reader.py`)
+- `test_r_a2l_read_22_include_error_ref` — exact `Line 5: /include included.a2l is not read`.
+- `test_r_a2l_read_29_unit_body_keyword_ref` — `UNIT unit` = one-argument keyword, zero errors.
+- `test_r_a2l_read_42_instance_forward_typedef_ref` — INSTANCE declared before its typedef is sized.
+- `test_r_a2l_read_45_instance_unresolvable_value_deposit_ref` — VALUE typedef with an undeclared deposit → no length.
+
+### Test counts and exit codes (runner, fresh clone `/tmp/b103-e4-11-oracle-kimi/tree`, s19ci Python 3.11.18, `PYTHONDONTWRITEBYTECODE=1`, isolated `zq_iso_user`, closed stdin)
+```
+s19_app.__file__ = /tmp/b103-e4-11-oracle-kimi/tree/s19_app/__init__.py   exit=0
+TEST 1  focused synthetic differential cases (5)        5 passed in 0.63s   exit=0
+TEST 2  test_r_a2l_read_48_tracked_files_equal_ref      1 passed in 35.29s  exit=0
+TEST 3  whole test_b103_a2l_reader.py -m "not serial_timing"  183 passed in 223.97s  exit=0
+```
+Transcript saved to `inc-11/evidence-e4/int-oracle-followup-reader.txt` (also at `/tmp/b103-e4-11-oracle-kimi/followup-reader.log`).
+
+### Remaining failure
+None in `tests/test_b103_a2l_reader.py`. **I do not claim E4 green from these reader tests alone** — this covers only the reader arm; the broader Inc 11 integration battery is a separate judgment.

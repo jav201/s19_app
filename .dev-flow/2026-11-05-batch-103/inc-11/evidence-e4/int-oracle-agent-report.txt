@@ -1,0 +1,54 @@
+I have completed the task and gathered full evidence. Here is the report.
+
+## Report — Inc 11 E4 oracle fix (CURVE INSTANCE reference fault)
+
+### Exact diff summary
+```
+ tests/support/b103_a2l_ref.py | 13 +++++++------
+ tests/test_b103_a2l_reader.py | 14 ++++++++++++++
+ 2 files changed, 21 insertions(+), 6 deletions(-)
+```
+
+**`tests/support/b103_a2l_ref.py`** — in `_read_span`, the `TYPEDEF_CHARACTERISTIC` branch now guards the length inference with `if tkind2 in ("VALUE", "VAL_BLK", "ASCII"):`, so a CURVE/MAP typedef is no longer sized (matching the product's `_instance_length` and R-A2L-READ.43/.45).
+
+**`tests/test_b103_a2l_reader.py`** — one focused synthetic differential case `test_r_a2l_read_45_instance_curve_typedef_ref` pinning CURVE→no length vs VALUE→2, asserting reader == reference.
+
+### Local check (this PC)
+- `python -m py_compile tests/support/b103_a2l_ref.py tests/test_b103_a2l_reader.py` → **OK** (no other Python run here).
+
+### Runner transcript (fresh clone `1075fe48` at `/tmp/b103-e4-11-oracle-kimi/tree`)
+```
+s19_app.__file__ = /tmp/b103-e4-11-oracle-kimi/tree/s19_app/__init__.py   exit=0
+TEST 1  test_r_a2l_read_45_instance_curve_typedef_ref      1 passed in 0.61s    exit=0
+TEST 2  test_r_a2l_read_48_tracked_files_equal_ref         1 failed in 0.87s    exit=1
+TEST 3  whole file, -m "not serial_timing"                 1 failed, 178 passed  exit=1
+```
+The CURVE fault is **fixed and verified**: the synthetic case is green, and `ASAP2_Demo_V171.a2l` now passes spans (the only remaining failure in the tracked test is a *different*, previously-masked assertion).
+
+### Remaining failure (and why it was hidden)
+`test_r_a2l_read_48_tracked_files_equal_ref` still fails, but **no longer on the CURVE span**. The original span failure at `ASAP2_Demo_V171.a2l` (file #2 of 35 in `git ls-files` order) aborted the loop before files #3–35 were ever compared. Once the span is fixed, three more pre-existing **reference** defects surface (all outside my scoped CURVE fix; I did not edit them):
+
+1. **Forward-reference typedef resolution** — the reference `_read_spans` is single-pass (collects typedefs and reads spans in one walk), so an `INSTANCE` whose `TYPEDEF_*` is declared *later* in the file gets no length; the product is two-pass and sizes it correctly. Affects `update_test1/2.a2l` and `update_typedef_test1..4.a2l` (~40 spans; e.g. `INSTANCE.Map_InternalAxis` reader=64 vs ref=None, `TEST_struct` reader=4 vs ref=None, …).
+2. **`/include` error text** — `merge_inc_test.a2l`: product emits `Line 5: /include included.a2l is not read`, reference emits `/include included.a2l is not read` (missing the `Line N:` prefix).
+3. **`UNIT` false-positive arity errors** — `case_07_stress_smoke/firmware.a2l`: product reports `[]`, reference reports 30 spurious `UNIT has 0 of its 1 arguments` / `UNIT is declared twice …` errors.
+
+Full 35-file differential diagnostic (supplementary, on the runner):
+
+```
+OK   ASAP2_Demo_V161.a2l          OK   ASAP2_Demo_V171.a2l
+OK   BalanceTube_STMicro.a2l      OK   check_test.a2l
+OK   cleanup_test.a2l             OK   from_source.a2l
+OK   from_source_structs.a2l      OK   included.a2l
+OK   memorysegment.a2l            DIFF merge_inc_test.a2l      -> errors
+OK   remove_test.a2l              OK   software_a.a2l
+OK   software_b.a2l               DIFF update_test1.a2l        -> spans
+DIFF update_test2.a2l             DIFF update_typedef_test1.a2l -> spans
+DIFF update_typedef_test2.a2l     DIFF update_typedef_test3.a2l -> spans
+DIFF update_typedef_test4.a2l     OK   xcp_test.a2l
+OK   case_01..case_06 firmware     DIFF case_07_stress_smoke    -> errors
+OK   professional_validation (7)  OK   synth_a2l.a2l
+```
+
+### Bottom line
+- My scoped change (CURVE-vs-VALUE) is correct, minimal, and regression-free (no new failures introduced).
+- The reader battery is **not green**: `test_b103_a2l_reader.py` = **1 failed, 178 passed**, and the failure is now driven by the three pre-existing reference defects above, not by the CURVE fault. I did **not** claim green, and I did not fix the out-of-scope defects — flagging them for the orchestrator, since they will also fail integration run 6 (reader arm A).

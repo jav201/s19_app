@@ -1,0 +1,4 @@
+/tmp/b103-e4-11-oracle-kimi/tree/s19_app/__init__.py
+.....                                                                    [100%]
+5 passed in 0.63s
+exit=0

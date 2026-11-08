@@ -1,0 +1,175 @@
+/tmp/b103-e4-11-oracle-base/tree/s19_app/__init__.py
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+_____________________ test_r_a2l_read_22_include_error_ref _____________________
+
+ref = <function ref_read_a2l at 0x7f2a4e7f5f80>
+
+    def test_r_a2l_read_22_include_error_ref(ref: Callable[[str], dict]) -> None:
+        """R-A2L-READ.22 (oracle): the /include error keeps its exact `Line n:` text."""
+        path = REPO_ROOT / "examples" / "case_00_public" / "merge_inc_test.a2l"
+        text = path.read_text(encoding="utf-8", errors="replace")
+        data = parse_a2l_file(path)
+        reading = ref(text)
+>       assert any(
+            t == "Line 5: /include included.a2l is not read" for t, _ in reading["errors"]
+        )
+E       assert False
+E        +  where False = any(<generator object test_r_a2l_read_22_include_error_ref.<locals>.<genexpr> at 0x7f2a4e64af80>)
+
+tests/test_b103_a2l_reader.py:850: AssertionError
+___________________ test_r_a2l_read_29_unit_body_keyword_ref ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-26/test_r_a2l_read_29_unit_body_k0')
+ref = <function ref_read_a2l at 0x7f2a4e7f5f80>
+
+    def test_r_a2l_read_29_unit_body_keyword_ref(tmp_path: Path, ref: Callable[[str], dict]) -> None:
+        """R-A2L-READ.29 (oracle): `UNIT unit` is a one-argument keyword, no error."""
+        text = _body(meas("X", " UNIT unit", " READ_ONLY"))
+        data = _parse(tmp_path, text)
+        assert _tag(data, "X")["unit"] == "unit"
+        assert data["errors"] == []
+>       _assert_errors_equal(data["errors"], ref(text)["errors"])
+
+tests/test_b103_a2l_reader.py:1079: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+reader_errors = []
+ref_errors = [('UNIT has 0 of its 1 arguments', 22), ('UNIT has 0 of its 1 arguments', 22), ('UNIT is declared twice in MEASUREMENT X', 22)]
+
+    def _assert_errors_equal(reader_errors: list, ref_errors: list) -> None:
+        def norm(errs):
+            return sorted(str(e) for e in errs)
+    
+>       assert norm(reader_errors) == norm([t for t, _ in ref_errors])
+E       AssertionError: assert [] == ['UNIT has 0 ...EASUREMENT X']
+E         
+E         Right contains 3 more items, first extra item: 'UNIT has 0 of its 1 arguments'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_reader.py:1698: AssertionError
+________________ test_r_a2l_read_45_instance_curve_typedef_ref _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-26/test_r_a2l_read_45_instance_cu0')
+ref = <function ref_read_a2l at 0x7f2a4e7f5f80>
+
+    def test_r_a2l_read_45_instance_curve_typedef_ref(tmp_path: Path, ref: Callable[[str], dict]) -> None:
+        """R-A2L-READ.43/.45 (oracle): a CURVE typedef is unsizeable, a VALUE sized."""
+        text = _body(
+            '/begin TYPEDEF_CHARACTERISTIC TCURVE "" CURVE 0x0 UWORD 0 CM_ID 0 65535\n/end TYPEDEF_CHARACTERISTIC\n'
+            '/begin TYPEDEF_CHARACTERISTIC TVALUE "" VALUE 0x0 UWORD 0 CM_ID 0 65535\n/end TYPEDEF_CHARACTERISTIC\n'
+            '/begin INSTANCE IC "" TCURVE 0x10\n/end INSTANCE\n'
+            '/begin INSTANCE IV "" TVALUE 0x20\n/end INSTANCE'
+        )
+        spans = _spans(_parse(tmp_path, text))
+        assert any(s["name"] == "IC" and s["length"] is None for s in spans)
+        assert any(s["name"] == "IV" and s["length"] == 2 for s in spans)
+>       _assert_spans_equal(spans, ref(text)["spans"])
+
+tests/test_b103_a2l_reader.py:1565: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+reader_spans = [{'address': 16, 'kind': 'INSTANCE', 'length': None, 'name': 'IC'}, {'address': 32, 'kind': 'INSTANCE', 'length': 2, 'name': 'IV'}]
+ref_spans = [{'address': 16, 'kind': 'INSTANCE', 'length': 2, 'name': 'IC'}, {'address': 32, 'kind': 'INSTANCE', 'length': 2, 'name': 'IV'}]
+
+    def _assert_spans_equal(reader_spans: list, ref_spans: list) -> None:
+        rkey = sorted((s.get("name"), s.get("kind")) for s in reader_spans)
+        fkey = sorted((s.get("name"), s.get("kind")) for s in ref_spans)
+        assert rkey == fkey
+        reader = {(s.get("name"), s.get("kind")): s for s in reader_spans}
+        ref = {(s.get("name"), s.get("kind")): s for s in ref_spans}
+        for k in reader:
+            assert reader[k].get("address") == ref[k].get("address"), k
+>           assert reader[k].get("length") == ref[k].get("length"), k
+E           AssertionError: ('IC', 'INSTANCE')
+E           assert None == 2
+E            +  where None = <built-in method get of dict object at 0x7f2a4e9f3e00>('length')
+E            +    where <built-in method get of dict object at 0x7f2a4e9f3e00> = {'address': 16, 'kind': 'INSTANCE', 'length': None, 'name': 'IC'}.get
+E            +  and   2 = <built-in method get of dict object at 0x7f2a4e9f3400>('length')
+E            +    where <built-in method get of dict object at 0x7f2a4e9f3400> = {'address': 16, 'kind': 'INSTANCE', 'length': 2, 'name': 'IC'}.get
+
+tests/test_b103_a2l_reader.py:1691: AssertionError
+_______________ test_r_a2l_read_42_instance_forward_typedef_ref ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-26/test_r_a2l_read_42_instance_fo0')
+ref = <function ref_read_a2l at 0x7f2a4e7f5f80>
+
+    def test_r_a2l_read_42_instance_forward_typedef_ref(tmp_path: Path, ref: Callable[[str], dict]) -> None:
+        """R-A2L-READ.42 (oracle): an INSTANCE declared before its typedef is sized."""
+        text = _body(
+            '/begin INSTANCE I1 "" T_FWD 0x10\n/end INSTANCE\n'
+            '/begin TYPEDEF_MEASUREMENT T_FWD "" UWORD CM_ID 0 0 0 65535\n/end TYPEDEF_MEASUREMENT'
+        )
+        spans = _spans(_parse(tmp_path, text))
+        assert any(s["name"] == "I1" and s["length"] == 2 for s in spans)
+>       _assert_spans_equal(spans, ref(text)["spans"])
+
+tests/test_b103_a2l_reader.py:1576: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+reader_spans = [{'address': 16, 'kind': 'INSTANCE', 'length': 2, 'name': 'I1'}]
+ref_spans = [{'address': 16, 'kind': 'INSTANCE', 'length': None, 'name': 'I1'}]
+
+    def _assert_spans_equal(reader_spans: list, ref_spans: list) -> None:
+        rkey = sorted((s.get("name"), s.get("kind")) for s in reader_spans)
+        fkey = sorted((s.get("name"), s.get("kind")) for s in ref_spans)
+        assert rkey == fkey
+        reader = {(s.get("name"), s.get("kind")): s for s in reader_spans}
+        ref = {(s.get("name"), s.get("kind")): s for s in ref_spans}
+        for k in reader:
+            assert reader[k].get("address") == ref[k].get("address"), k
+>           assert reader[k].get("length") == ref[k].get("length"), k
+E           AssertionError: ('I1', 'INSTANCE')
+E           assert 2 == None
+E            +  where 2 = <built-in method get of dict object at 0x7f2a4e088300>('length')
+E            +    where <built-in method get of dict object at 0x7f2a4e088300> = {'address': 16, 'kind': 'INSTANCE', 'length': 2, 'name': 'I1'}.get
+E            +  and   None = <built-in method get of dict object at 0x7f2a4e75c4c0>('length')
+E            +    where <built-in method get of dict object at 0x7f2a4e75c4c0> = {'address': 16, 'kind': 'INSTANCE', 'length': None, 'name': 'I1'}.get
+
+tests/test_b103_a2l_reader.py:1691: AssertionError
+__________ test_r_a2l_read_45_instance_unresolvable_value_deposit_ref __________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-26/test_r_a2l_read_45_instance_un0')
+ref = <function ref_read_a2l at 0x7f2a4e7f5f80>
+
+    def test_r_a2l_read_45_instance_unresolvable_value_deposit_ref(tmp_path: Path, ref: Callable[[str], dict]) -> None:
+        """R-A2L-READ.43/.45 (oracle): a VALUE typedef with an undeclared deposit gives no length."""
+        text = _body(
+            '/begin TYPEDEF_CHARACTERISTIC TVAL "" VALUE __ULong_Value 0 AccessType 0 4294967295\n/end TYPEDEF_CHARACTERISTIC\n'
+            '/begin INSTANCE I1 "" TVAL 0x10\n/end INSTANCE'
+        )
+        spans = _spans(_parse(tmp_path, text))
+        assert any(s["name"] == "I1" and s["length"] is None for s in spans)
+>       _assert_spans_equal(spans, ref(text)["spans"])
+
+tests/test_b103_a2l_reader.py:1587: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+reader_spans = [{'address': 16, 'kind': 'INSTANCE', 'length': None, 'name': 'I1'}]
+ref_spans = [{'address': 16, 'kind': 'INSTANCE', 'length': 4, 'name': 'I1'}]
+
+    def _assert_spans_equal(reader_spans: list, ref_spans: list) -> None:
+        rkey = sorted((s.get("name"), s.get("kind")) for s in reader_spans)
+        fkey = sorted((s.get("name"), s.get("kind")) for s in ref_spans)
+        assert rkey == fkey
+        reader = {(s.get("name"), s.get("kind")): s for s in reader_spans}
+        ref = {(s.get("name"), s.get("kind")): s for s in ref_spans}
+        for k in reader:
+            assert reader[k].get("address") == ref[k].get("address"), k
+>           assert reader[k].get("length") == ref[k].get("length"), k
+E           AssertionError: ('I1', 'INSTANCE')
+E           assert None == 4
+E            +  where None = <built-in method get of dict object at 0x7f2a4ecf6580>('length')
+E            +    where <built-in method get of dict object at 0x7f2a4ecf6580> = {'address': 16, 'kind': 'INSTANCE', 'length': None, 'name': 'I1'}.get
+E            +  and   4 = <built-in method get of dict object at 0x7f2a4ece7400>('length')
+E            +    where <built-in method get of dict object at 0x7f2a4ece7400> = {'address': 16, 'kind': 'INSTANCE', 'length': 4, 'name': 'I1'}.get
+
+tests/test_b103_a2l_reader.py:1691: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_22_include_error_ref - ...
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_29_unit_body_keyword_ref
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_45_instance_curve_typedef_ref
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_42_instance_forward_typedef_ref
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_45_instance_unresolvable_value_deposit_ref
+5 failed in 0.85s
+exit=1
