@@ -1,0 +1,75 @@
+# Inc 11 E4 perf pass — cProfile (top 25 by cumulative time), cachyos-rtx
+# R-A2L-READ.52 time (least of 15, GC off, fresh measure):
+#   case_06  8.466 s vs base 5.898 s = 1.435x (bound <= 1.5x)
+#   software_a 0.843 s vs base 0.653 s = 1.291x (bound <= 1.5x)
+
+===== case_06 =====
+         59937060 function calls (57505026 primitive calls) in 26.182 seconds
+
+   Ordered by: cumulative time
+   List reduced from 125 to 25 due to restriction <25>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.005    0.005   26.182   26.182 s19_app/tui/a2l.py:3860(parse_a2l_file)
+        1    0.147    0.147   14.348   14.348 s19_app/tui/a2l.py:3321(extract_a2l_tags)
+  11005/1    0.381    0.000   13.690   13.690 s19_app/tui/a2l.py:3713(walk)
+   220040    4.575    0.000   13.264    0.000 s19_app/tui/a2l.py:3363(_process_tag)
+        1    0.494    0.494   10.408   10.408 s19_app/tui/a2l.py:838(_build_section_tree_into)
+  1034369    3.882    0.000    6.558    0.000 s19_app/tui/a2l.py:682(_lex_a2l_lines)
+  1034368    2.164    0.000    3.137    0.000 s19_app/tui/a2l.py:884(_process_text)
+   220040    1.435    0.000    2.150    0.000 s19_app/tui/a2l.py:420(_tag_header)
+  2310445    0.766    0.000    1.333    0.000 s19_app/tui/a2l.py:400(_section_words)
+ 13478939    1.109    0.000    1.109    0.000 {method 'get' of 'dict' objects}
+  1034314    0.375    0.000    0.982    0.000 s19_app/tui/a2l.py:384(_line_words)
+   220040    0.596    0.000    0.856    0.000 s19_app/tui/a2l.py:456(_tag_keyword_lines)
+   110020    0.423    0.000    0.801    0.000 s19_app/tui/a2l.py:1280(parse_measurement_header)
+        4    0.000    0.000    0.679    0.170 s19_app/tui/a2l.py:1482(_collect_sections_by_name)
+ 968416/4    0.524    0.000    0.679    0.170 s19_app/tui/a2l.py:1485(walk)
+   110020    0.223    0.000    0.657    0.000 s19_app/tui/a2l.py:1922(_infer_length_characteristic)
+   110020    0.136    0.000    0.608    0.000 s19_app/tui/a2l.py:582(_characteristic_element_size)
+   220040    0.407    0.000    0.554    0.000 s19_app/tui/a2l.py:1982(_resolve_record_layout)
+   451138    0.494    0.000    0.494    0.000 {method 'findall' of 're.Pattern' objects}
+   693342    0.491    0.000    0.491    0.000 {method 'match' of 're.Pattern' objects}
+  7014656    0.472    0.000    0.472    0.000 {built-in method builtins.len}
+   330060    0.294    0.000    0.455    0.000 s19_app/tui/a2l.py:341(_number_word)
+  6206492    0.453    0.000    0.453    0.000 {method 'append' of 'list' objects}
+   693342    0.322    0.000    0.443    0.000 s19_app/tui/a2l.py:671(_lex_word_diagnostics)
+        1    0.000    0.000    0.418    0.418 s19_app/tui/a2l.py:3768(extract_declared_spans)
+
+
+
+===== software_a =====
+         5706916 function calls (5464463 primitive calls) in 2.511 seconds
+
+   Ordered by: cumulative time
+   List reduced from 141 to 25 due to restriction <25>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    2.511    2.511 s19_app/tui/a2l.py:3860(parse_a2l_file)
+        1    0.048    0.048    1.244    1.244 s19_app/tui/a2l.py:838(_build_section_tree_into)
+        1    0.011    0.011    1.099    1.099 s19_app/tui/a2l.py:3321(extract_a2l_tags)
+   7216/1    0.032    0.000    1.044    1.044 s19_app/tui/a2l.py:3713(walk)
+    13990    0.261    0.000    1.008    0.000 s19_app/tui/a2l.py:3363(_process_tag)
+    99527    0.557    0.000    0.930    0.000 s19_app/tui/a2l.py:682(_lex_a2l_lines)
+    98980    0.163    0.000    0.245    0.000 s19_app/tui/a2l.py:884(_process_text)
+    13990    0.008    0.000    0.145    0.000 s19_app/tui/a2l.py:1464(collect_link_maps)
+20568/13990    0.024    0.000    0.137    0.000 s19_app/tui/a2l.py:1468(walk)
+    13990    0.091    0.000    0.136    0.000 s19_app/tui/a2l.py:420(_tag_header)
+    19795    0.096    0.000    0.131    0.000 s19_app/tui/a2l.py:1102(_split_line_respecting_quotes)
+    13990    0.068    0.000    0.117    0.000 s19_app/tui/a2l.py:456(_tag_keyword_lines)
+    18315    0.013    0.000    0.108    0.000 s19_app/tui/a2l.py:1454(_parse_link_map_line)
+   172387    0.058    0.000    0.107    0.000 s19_app/tui/a2l.py:400(_section_words)
+  1035299    0.088    0.000    0.088    0.000 {method 'get' of 'dict' objects}
+    88505    0.033    0.000    0.083    0.000 s19_app/tui/a2l.py:384(_line_words)
+    10538    0.040    0.000    0.077    0.000 s19_app/tui/a2l.py:1280(parse_measurement_header)
+   118763    0.056    0.000    0.077    0.000 s19_app/tui/a2l.py:671(_lex_word_diagnostics)
+   118763    0.075    0.000    0.075    0.000 {method 'match' of 're.Pattern' objects}
+        4    0.000    0.000    0.068    0.017 s19_app/tui/a2l.py:1482(_collect_sections_by_name)
+  91468/4    0.054    0.000    0.068    0.017 s19_app/tui/a2l.py:1485(walk)
+   701972    0.050    0.000    0.050    0.000 {method 'append' of 'list' objects}
+    46694    0.037    0.000    0.048    0.000 s19_app/tui/a2l.py:651(_find_string_end)
+   608366    0.044    0.000    0.044    0.000 {built-in method builtins.len}
+   114470    0.042    0.000    0.043    0.000 s19_app/tui/a2l.py:959(_elements)
+
+
+

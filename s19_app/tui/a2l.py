@@ -376,19 +376,25 @@ def _unquote(word: str) -> str:
 #: unquoted word is a run of non-space characters.
 _WORD_SPLIT_RE = re.compile(r'"[^"\\]*(?:\\.[^"\\]*)*"|[^ ]+')
 
+#: A compiled ASCII-blank run split for the no-quote fast path of
+#: ``_split_line_respecting_quotes`` (space, HT, VT, FF and line ends).
+_BLANK_SPLIT_RE = re.compile(r"[ \t\x0b\x0c\r\n]+")
 
-def _line_words(text: str) -> Iterator[str]:
-    """Yield the words of one canonical text in order."""
-    for match in _WORD_SPLIT_RE.finditer(text):
-        yield match.group(0)
+
+def _line_words(text: str) -> list[str]:
+    """Return the words of one canonical text in order.
+
+    Canonical texts hold their words single-space separated, so a text with
+    no quote needs no quoted-span regex: one ``str.split`` per line (READ.52).
+    """
+    if '"' not in text:
+        return text.split(" ") if text else []
+    return _WORD_SPLIT_RE.findall(text)
 
 
 def _is_single_word(text: str) -> bool:
     """True when ``text`` holds exactly one word."""
-    it = _line_words(text)
-    if next(it, None) is None:
-        return False
-    return next(it, None) is None
+    return len(_line_words(text)) == 1
 
 
 def _section_words(section: dict) -> Iterator[tuple[str, int]]:
@@ -421,7 +427,8 @@ def _tag_header(
     i = 0
     n = len(words)
     if n > 0:
-        name = _unquote(words[0][0])
+        first = words[0][0]
+        name = _unquote(first) if first.startswith('"') else first
         i = 1
         if n > 1 and words[1][0].startswith('"'):
             long_identifier = _unquote(words[1][0]) or None
@@ -432,9 +439,10 @@ def _tag_header(
         word = words[i][0]
         if word == "":
             break
-        if not word.startswith('"') and word in _TAG_KEYWORD_ARITY:
+        quoted = word.startswith('"')
+        if not quoted and word in _TAG_KEYWORD_ARITY:
             break
-        header.append(_unquote(word))
+        header.append(_unquote(word) if quoted else word)
         i += 1
     return name, long_identifier, header, i
 
@@ -623,6 +631,8 @@ def _byte_order_from_words(words_iter: Iterable[tuple[str, int]]) -> tuple[Optio
 
 def _count_line_ends(text: str) -> int:
     """Count the line ends in ``text`` (CRLF counts one, a lone CR one, LF one)."""
+    if "\r" not in text and "\n" not in text:
+        return 0
     count = 0
     i = 0
     n = len(text)
@@ -662,10 +672,11 @@ def _lex_word_diagnostics(word: str, line: int, errors: Any) -> None:
     """Append the stray-``*/`` and unexpected-character errors of one word."""
     if "*/" in word:
         errors.append(f"Line {line}: */ without /*")
-    m = _NONPRINTABLE_RE.search(word)
-    if m:
-        code = ord(m.group(0))
-        errors.append(f"Line {line}: unexpected character U+{code:04X}")
+    if not (word.isascii() and word.isprintable()):
+        m = _NONPRINTABLE_RE.search(word)
+        if m:
+            code = ord(m.group(0))
+            errors.append(f"Line {line}: unexpected character U+{code:04X}")
 
 
 def _lex_a2l_lines(lines: Iterable[str], errors: Any) -> Iterator[tuple[int, str]]:
@@ -698,15 +709,17 @@ def _lex_a2l_lines(lines: Iterable[str], errors: Any) -> Iterator[tuple[int, str
 
         n = len(body)
         i = 0
-        # Tier 1 fast path: a plain ASCII line (no quote, no slash) is its own
-        # canonical text.
+        # Tier 1 fast path: a plain line (no quote, no comment marker, no line
+        # end, no non-blank non-printable character) is its own canonical
+        # text. A slash that is not part of /*, // or */ (a /begin word, say)
+        # needs no slow path either.
         if (
             not in_comment
             and not in_string
+            and '"' not in body
             and body.isascii()
             and body.isprintable()
-            and '"' not in body
-            and "/" not in body
+            and ("/" not in body or ("/*" not in body and "//" not in body and "*/" not in body))
         ):
             text = " ".join(body.split())
             if text:
@@ -1006,7 +1019,7 @@ def _apply_named_kind_meta(sections: list[dict]) -> None:
                         while j < len(lines) and lines[j] == "":
                             j += 1
                         if j < len(lines):
-                            second_words = list(_line_words(lines[j]))
+                            second_words = _line_words(lines[j])
                             if second_words and second_words[0].startswith('"'):
                                 meta = meta + " " + lines.pop(j)
                                 if line_numbers and j < len(line_numbers):
@@ -1092,6 +1105,8 @@ def _split_line_respecting_quotes(line: str) -> list[str]:
     line = (line or "").strip(" \t\x0b\x0c\r\n")
     if not line:
         return []
+    if '"' not in line:
+        return _BLANK_SPLIT_RE.split(line)
     tokens: list[str] = []
     i = 0
     n = len(line)
@@ -2071,7 +2086,9 @@ def _positive_decimal_count(value: Any) -> Optional[int]:
     return count if count > 0 else None
 
 
-def _axis_counts_resolving_external(axis_meta: list[dict], tags: list[dict]) -> Optional[list[int]]:
+def _axis_counts_resolving_external(
+    axis_meta: list[dict], tags: list[dict], tags_by_name: Optional[dict[str, dict]] = None
+) -> Optional[list[int]]:
     """
     Summary:
         R5 extension of :func:`_inline_axis_counts`: resolve the ordered axis
@@ -2089,6 +2106,9 @@ def _axis_counts_resolving_external(axis_meta: list[dict], tags: list[dict]) -> 
         tags (list[dict]): The COMPLETED tag list of the parse payload — the
             referenced AXIS_PTS CHARACTERISTIC may be declared after the
             referencing CURVE/MAP, which is why this runs as a post-pass.
+        tags_by_name (Optional[dict[str, dict]]): An optional name → first-tag
+            index over ``tags`` (built once by the caller); when given, the
+            external-axis reference lookup is O(1) instead of a linear scan.
 
     Returns:
         Optional[list[int]]: One positive int per axis in AXIS_DESCR order when
@@ -2147,7 +2167,10 @@ def _axis_counts_resolving_external(axis_meta: list[dict], tags: list[dict]) -> 
         if ref_index + 1 >= len(header_tokens):
             return None
         ref_name = header_tokens[ref_index + 1]
-        ref_tag = next((t for t in tags if t.get("name") == ref_name), None)
+        if tags_by_name is not None:
+            ref_tag = tags_by_name.get(ref_name)
+        else:
+            ref_tag = next((t for t in tags if t.get("name") == ref_name), None)
         if ref_tag is None:
             return None
         ref_meta = ref_tag.get("axis_meta") or []
@@ -3711,13 +3734,16 @@ def extract_a2l_tags(
     walk(sections, None, (None, None, None))
 
     # External-axis post-pass (base) + the standing-size span comparison (E3S-29).
+    tags_by_name: dict[str, dict] = {}
+    for _t in tags:
+        tags_by_name.setdefault(_t.get("name"), _t)
     for tag in tags:
         tid = id(tag)
         if tid in refused_length_ids:
             continue
         if not (tag.get("section") == "CHARACTERISTIC" and tag.get("char_type") in ("CURVE", "MAP")):
             continue
-        counts = _axis_counts_resolving_external(tag.get("axis_meta") or [], tags)
+        counts = _axis_counts_resolving_external(tag.get("axis_meta") or [], tags, tags_by_name)
         if counts is None:
             continue
         layout = record_layouts_by_name.get(str(tag.get("record_layout_name") or ""))
