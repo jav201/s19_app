@@ -1,0 +1,894 @@
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	﻿2026-11-08T19:32:43.9700606Z ##[group]Run pytest -v -rs --durations=20 tests/test_b103_clipboard_windows.py tests/test_b103_clipboard_matrix.py
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:32:43.9701513Z [36;1mpytest -v -rs --durations=20 tests/test_b103_clipboard_windows.py tests/test_b103_clipboard_matrix.py[0m
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:32:43.9775379Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:32:43.9775748Z env:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:32:43.9776008Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.11.9\x64
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:32:43.9776480Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.11.9\x64/lib/pkgconfig
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:32:43.9776913Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:32:43.9777317Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:32:43.9777703Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.11.9\x64
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:32:43.9778026Z ##[endgroup]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:32:45.6274362Z ============================= test session starts =============================
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:32:45.6276110Z platform win32 -- Python 3.11.9, pytest-9.2.0, pluggy-1.7.0 -- C:\hostedtoolcache\windows\Python\3.11.9\x64\python.exe
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:32:45.6277056Z cachedir: .pytest_cache
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:32:45.6277416Z rootdir: D:\a\s19_app\s19_app
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:32:45.6277785Z configfile: pyproject.toml
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:32:45.6278487Z plugins: platformdirs-4.14.5
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:32:45.9128921Z collecting ... collected 114 items
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:32:45.9129470Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:32:48.9867820Z tests/test_b103_clipboard_windows.py::test_runner_clipboard_probe PASSED [  0%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:32:57.1247247Z tests/test_b103_clipboard_windows.py::test_r_tui_043_10_1_1_2_ctrl_v_ends_within_typed_key_time[single] PASSED [  1%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:33:07.8319234Z tests/test_b103_clipboard_windows.py::test_r_tui_043_10_1_1_2_ctrl_v_ends_within_typed_key_time[multi] PASSED [  2%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:33:14.3530907Z tests/test_b103_clipboard_windows.py::test_r_tui_043_10_1_5_6_no_text_no_powershell[single] PASSED [  3%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:33:21.8882201Z tests/test_b103_clipboard_windows.py::test_r_tui_043_10_1_5_6_no_text_no_powershell[multi] PASSED [  4%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:33:25.7545385Z tests/test_b103_clipboard_windows.py::test_r_tui_043_10_2_1_2_held_clipboard_paste_ends_within_2_5[single] PASSED [  5%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:33:29.5559280Z tests/test_b103_clipboard_windows.py::test_r_tui_043_10_2_1_2_held_clipboard_paste_ends_within_2_5[multi] PASSED [  6%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:33:33.0571440Z tests/test_b103_clipboard_windows.py::test_r_tui_043_6_2_held_clipboard_pastes_app_clipboard[single] PASSED [  7%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:33:36.9689067Z tests/test_b103_clipboard_windows.py::test_r_tui_043_6_2_held_clipboard_pastes_app_clipboard[multi] PASSED [  7%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:33:40.5140363Z tests/test_b103_clipboard_windows.py::test_r_tui_043_6_3_empty_unicode_text_pastes_app_clipboard_no_powershell[single] PASSED [  8%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:33:44.4590119Z tests/test_b103_clipboard_windows.py::test_r_tui_043_6_3_empty_unicode_text_pastes_app_clipboard_no_powershell[multi] PASSED [  9%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:33:48.0216538Z tests/test_b103_clipboard_windows.py::test_r_tui_043_4_1_single_line_inserts_first_line_at_cursor PASSED [ 10%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:33:53.3220345Z tests/test_b103_clipboard_windows.py::test_r_tui_044_3_1_multi_line_inserts_all_at_cursor PASSED [ 11%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:33:56.7676445Z tests/test_b103_clipboard_windows.py::test_r_tui_043_5_1_2_ctrl_v_replaces_selection[single] PASSED [ 12%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:34:02.3526710Z tests/test_b103_clipboard_windows.py::test_r_tui_043_5_1_2_ctrl_v_replaces_selection[multi] PASSED [ 13%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:34:10.2989424Z tests/test_b103_clipboard_windows.py::test_r_tui_043_11_1_code_page_characters_arrive_unchanged[single] PASSED [ 14%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:34:15.7828744Z tests/test_b103_clipboard_windows.py::test_r_tui_043_11_1_code_page_characters_arrive_unchanged[multi] PASSED [ 14%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:34:19.5343193Z tests/test_b103_clipboard_windows.py::test_r_tui_043_12_2_held_clipboard_logs_warning FAILED [ 15%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:34:23.6072509Z tests/test_b103_clipboard_windows.py::test_r_tui_043_13_1_no_clipboard_text_in_log_win PASSED [ 16%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:34:27.0824823Z tests/test_b103_clipboard_windows.py::test_r_tui_044_2_4_ctrl_v_of_os_text_capped[single] PASSED [ 17%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:34:32.7027717Z tests/test_b103_clipboard_windows.py::test_r_tui_044_2_4_ctrl_v_of_os_text_capped[multi] PASSED [ 18%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:34:36.3223821Z tests/test_b103_clipboard_windows.py::test_r_tui_044_2_7_win32_read_bounded_on_no_terminator PASSED [ 19%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:34:40.2733958Z tests/test_b103_clipboard_windows.py::test_r_paste_34_2_own_write_strips_single_line PASSED [ 20%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:34:44.1574736Z tests/test_b103_clipboard_windows.py::test_r_paste_34_4_win_right_click_strips_single_line PASSED [ 21%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:34:49.4311437Z tests/test_b103_clipboard_windows.py::test_r_paste_35_2_own_write_strips_multi_line PASSED [ 21%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:34:54.9309763Z tests/test_b103_clipboard_windows.py::test_r_paste_35_4_win_right_click_strips_multi_line PASSED [ 22%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:35:01.2957032Z tests/test_b103_clipboard_windows.py::test_r_paste_2_five_consecutive_copies_reach_other_program[single] PASSED [ 23%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:35:09.8200403Z tests/test_b103_clipboard_windows.py::test_r_paste_2_five_consecutive_copies_reach_other_program[multi] PASSED [ 24%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:35:13.6721610Z tests/test_b103_clipboard_windows.py::test_r_paste_3_win_copy_puts_selection_on_app_clipboard PASSED [ 25%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:35:18.3113232Z tests/test_b103_clipboard_windows.py::test_r_paste_5_win_no_selection_keeps_os_clipboard PASSED [ 26%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:35:22.0824988Z tests/test_b103_clipboard_windows.py::test_r_paste_6_win_cut_copies_selection PASSED [ 27%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:35:25.8251770Z tests/test_b103_clipboard_windows.py::test_r_paste_9_2_held_clipboard_write_warning[single] FAILED [ 28%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:35:31.3103068Z tests/test_b103_clipboard_windows.py::test_r_paste_9_2_held_clipboard_write_warning[multi] FAILED [ 28%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:35:40.8652287Z tests/test_b103_clipboard_windows.py::test_r_paste_11_1_2_copy_ends_within_typed_key_time[single] PASSED [ 29%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:35:53.3150632Z tests/test_b103_clipboard_windows.py::test_r_paste_11_1_2_copy_ends_within_typed_key_time[multi] PASSED [ 30%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:35:57.4004256Z tests/test_b103_clipboard_windows.py::test_r_paste_12_2_copy_over_limit_os[single] PASSED [ 31%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:36:03.3138426Z tests/test_b103_clipboard_windows.py::test_r_paste_12_2_copy_over_limit_os[multi] PASSED [ 32%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:36:16.7779882Z tests/test_b103_clipboard_windows.py::test_r_paste_13_1_2_held_clipboard_copy_ends_within_2_5[single] FAILED [ 33%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:36:32.1577652Z tests/test_b103_clipboard_windows.py::test_r_paste_13_1_2_held_clipboard_copy_ends_within_2_5[multi] FAILED [ 34%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:36:32.3546077Z tests/test_b103_clipboard_windows.py::test_r_tui_043_9_1_held_read_ctrl_v_stays_responsive FAILED [ 35%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:36:32.5821535Z tests/test_b103_clipboard_windows.py::test_r_paste_14_1_held_write_ctrl_c_stays_responsive FAILED [ 35%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:36:32.7564192Z tests/test_b103_clipboard_windows.py::test_r_paste_14_2_held_write_right_click_stays_responsive FAILED [ 36%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:36:33.2779289Z tests/test_b103_clipboard_windows.py::test_r_tui_043_9_2_held_read_right_click_stays_responsive FAILED [ 37%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:36:39.4913451Z tests/test_b103_clipboard_windows.py::test_r_paste_24_1_2_five_right_click_copies[single] PASSED [ 38%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:36:48.3454705Z tests/test_b103_clipboard_windows.py::test_r_paste_24_1_2_five_right_click_copies[multi] PASSED [ 39%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:36:48.8828212Z tests/test_b103_clipboard_windows.py::test_r_paste_24_3_unfocused_multi_line_right_click_copies PASSED [ 40%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:36:52.3031924Z tests/test_b103_clipboard_windows.py::test_r_paste_25_26_win_right_click_copy_app_clipboard[single] PASSED [ 41%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:36:57.8327709Z tests/test_b103_clipboard_windows.py::test_r_paste_25_26_win_right_click_copy_app_clipboard[multi] PASSED [ 42%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:37:12.1545404Z tests/test_b103_clipboard_windows.py::test_r_paste_27_1_2_right_click_copy_ends_within_typed_key_time[single] PASSED [ 42%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:37:23.9807861Z tests/test_b103_clipboard_windows.py::test_r_paste_27_1_2_right_click_copy_ends_within_typed_key_time[multi] PASSED [ 43%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:37:37.5830248Z tests/test_b103_clipboard_windows.py::test_r_paste_28_1_2_held_right_click_copy_ends_within_2_5[single] FAILED [ 44%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:37:52.8364089Z tests/test_b103_clipboard_windows.py::test_r_paste_28_1_2_held_right_click_copy_ends_within_2_5[multi] FAILED [ 45%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:37:52.9726995Z tests/test_b103_clipboard_windows.py::test_r_paste_29_30_win_right_click_paste_placement[single] PASSED [ 46%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:37:53.0836358Z tests/test_b103_clipboard_windows.py::test_r_paste_29_30_win_right_click_paste_placement[multi] PASSED [ 47%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:38:01.9638920Z tests/test_b103_clipboard_windows.py::test_r_paste_31_1_2_right_click_paste_ends_within_typed_key_time[single] PASSED [ 48%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:38:13.2993223Z tests/test_b103_clipboard_windows.py::test_r_paste_31_1_2_right_click_paste_ends_within_typed_key_time[multi] PASSED [ 49%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:38:20.2814521Z tests/test_b103_clipboard_windows.py::test_r_paste_31_5_6_right_click_no_text_no_powershell[single] PASSED [ 50%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:38:30.1256321Z tests/test_b103_clipboard_windows.py::test_r_paste_31_5_6_right_click_no_text_no_powershell[multi] PASSED [ 50%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:38:33.5077668Z tests/test_b103_clipboard_windows.py::test_r_paste_32_1_2_held_right_click_paste_ends_within_2_5[single] PASSED [ 51%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:38:38.0870681Z tests/test_b103_clipboard_windows.py::test_r_paste_32_1_2_held_right_click_paste_ends_within_2_5[multi] PASSED [ 52%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:38:41.6853748Z tests/test_b103_clipboard_windows.py::test_r_tui_043_6_5_win_right_click_pastes_app_clipboard[single] PASSED [ 53%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:38:46.5867071Z tests/test_b103_clipboard_windows.py::test_r_tui_043_6_5_win_right_click_pastes_app_clipboard[multi] PASSED [ 54%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:38:49.9381505Z tests/test_b103_clipboard_windows.py::test_r_tui_043_11_2_right_click_keeps_code_page[single] PASSED [ 55%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:38:55.0266712Z tests/test_b103_clipboard_windows.py::test_r_tui_043_11_2_right_click_keeps_code_page[multi] PASSED [ 56%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:38:58.7993226Z tests/test_b103_clipboard_windows.py::test_r_tui_043_12_3_win_right_click_held_logs_warning FAILED [ 57%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:02.4519538Z tests/test_b103_clipboard_windows.py::test_r_tui_043_13_2_win_right_click_no_log_leak PASSED [ 57%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:05.8204693Z tests/test_b103_clipboard_windows.py::test_r_tui_044_2_6_win_right_click_paste_capped[single] PASSED [ 58%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:11.3609619Z tests/test_b103_clipboard_windows.py::test_r_tui_044_2_6_win_right_click_paste_capped[multi] PASSED [ 59%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:15.3650206Z tests/test_b103_clipboard_windows.py::test_r_paste_12_3_win_right_click_copy_over_limit[single] PASSED [ 60%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:22.0074662Z tests/test_b103_clipboard_windows.py::test_r_paste_12_3_win_right_click_copy_over_limit[multi] PASSED [ 61%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:25.7600745Z tests/test_b103_clipboard_windows.py::test_r_paste_10_2_win_right_click_copy_logs_warning FAILED [ 62%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:29.3954308Z tests/test_b103_clipboard_windows.py::test_r_paste_16_1_read_rescue_starts_system_powershell PASSED [ 63%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:33.0387469Z tests/test_b103_clipboard_windows.py::test_r_paste_16_2_write_rescue_starts_system_powershell PASSED [ 64%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:36.5901363Z tests/test_b103_clipboard_windows.py::test_r_paste_16_3_decoy_powershell_never_runs PASSED [ 64%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:39.9148345Z tests/test_b103_clipboard_windows.py::test_r_paste_17_no_powershell_starts_nothing[read] PASSED [ 65%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:43.5987601Z tests/test_b103_clipboard_windows.py::test_r_paste_17_no_powershell_starts_nothing[write] PASSED [ 66%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:46.8972690Z tests/test_b103_clipboard_windows.py::test_r_paste_21_5_direct_win32_call_opens_nothing_and_fails PASSED [ 67%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:47.3097217Z tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[A->A_ctrl_c_ctrl_v] SKIPPED [ 68%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:47.9408475Z tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[A->A_right_click_ctrl_v] SKIPPED [ 69%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:48.2284039Z tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[A->A_ctrl_c_terminal] SKIPPED [ 70%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:48.4338454Z tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[A->A_right_click_terminal] SKIPPED [ 71%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:48.8294414Z tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[A->A_ctrl_c_right_click] SKIPPED [ 71%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:49.0678343Z tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[A->A_right_click_right_click] SKIPPED [ 72%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:49.2086351Z tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[A->M_ctrl_c_ctrl_v] SKIPPED [ 73%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:49.3513527Z tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[A->M_right_click_ctrl_v] SKIPPED [ 74%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:49.3783352Z tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[A->M_ctrl_c_terminal] SKIPPED [ 75%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:49.3827304Z tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[A->M_right_click_terminal] SKIPPED [ 76%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:49.3870723Z tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[A->M_ctrl_c_right_click] SKIPPED [ 77%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:49.4089173Z tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[A->M_right_click_right_click] SKIPPED [ 78%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:49.5085645Z tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[M->A_ctrl_c_ctrl_v] SKIPPED [ 78%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:49.7178614Z tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[M->A_right_click_ctrl_v] SKIPPED [ 79%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:49.9058385Z tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[M->A_ctrl_c_terminal] SKIPPED [ 80%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:50.0003639Z tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[M->A_right_click_terminal] SKIPPED [ 81%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:50.1616999Z tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[M->A_ctrl_c_right_click] SKIPPED [ 82%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:50.2537709Z tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[M->A_right_click_right_click] SKIPPED [ 83%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:50.3030248Z tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[M->M_ctrl_c_ctrl_v] SKIPPED [ 84%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:50.3375249Z tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[M->M_right_click_ctrl_v] SKIPPED [ 85%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:50.3421935Z tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[M->M_ctrl_c_terminal] SKIPPED [ 85%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:50.3460303Z tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[M->M_right_click_terminal] SKIPPED [ 86%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:50.3506326Z tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[M->M_ctrl_c_right_click] SKIPPED [ 87%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:50.3544301Z tests/test_b103_clipboard_matrix.py::test_at_i1a_matrix_copy_then_paste[M->M_right_click_right_click] SKIPPED [ 88%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:50.4591231Z tests/test_b103_clipboard_matrix.py::test_r_tui_044_1_walk_single_line_round_trip[workspace] SKIPPED [ 89%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:50.4720857Z tests/test_b103_clipboard_matrix.py::test_r_tui_044_1_walk_single_line_round_trip[a2l] SKIPPED [ 90%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:50.5850640Z tests/test_b103_clipboard_matrix.py::test_r_tui_044_1_walk_single_line_round_trip[mac] SKIPPED [ 91%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:50.5893796Z tests/test_b103_clipboard_matrix.py::test_r_tui_044_1_walk_single_line_round_trip[patch] SKIPPED [ 92%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:50.6158523Z tests/test_b103_clipboard_matrix.py::test_r_tui_044_1_walk_single_line_round_trip[diff] SKIPPED [ 92%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:50.6203579Z tests/test_b103_clipboard_matrix.py::test_r_tui_044_1_walk_single_line_round_trip[crc_designer] SKIPPED [ 93%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:50.6904002Z tests/test_b103_clipboard_matrix.py::test_r_tui_044_1_10_command_palette_box_round_trip SKIPPED [ 94%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:50.7141192Z tests/test_b103_clipboard_matrix.py::test_r_tui_044_1_11_load_dialog_path_box_round_trip SKIPPED [ 95%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:50.7360578Z tests/test_b103_clipboard_matrix.py::test_r_paste_18_walk_multi_line_round_trip[patch] SKIPPED [ 96%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:50.8739828Z tests/test_b103_clipboard_matrix.py::test_r_paste_18_walk_multi_line_round_trip[sje] SKIPPED [ 97%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:51.5552873Z tests/test_b103_clipboard_matrix.py::test_r_tui_044_1_7_flow_ref_box_round_trip SKIPPED [ 98%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:51.9172875Z tests/test_b103_clipboard_matrix.py::test_r_tui_044_1_8_fx_set_name_box_round_trip SKIPPED [ 99%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2523461Z tests/test_b103_clipboard_matrix.py::test_r_tui_044_1_5_check_mem_address_box_round_trip SKIPPED [100%]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2524439Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2524751Z ================================== FAILURES ===================================
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2525657Z _______________ test_r_tui_043_12_2_held_clipboard_logs_warning _______________
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2526247Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2527065Z tmp_path = WindowsPath('C:/Users/runneradmin/AppData/Local/Temp/pytest-of-runneradmin/pytest-0/test_r_tui_043_12_2_held_clipb0')
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2528013Z os_clipboard_ready = None
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2528207Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2528618Z     def test_r_tui_043_12_2_held_clipboard_logs_warning(tmp_path: Path, os_clipboard_ready) -> None:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2529379Z         """R-TUI-043.12/2 (WinCI): a held clipboard read logs \u2265 1 WARNING."""
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2530067Z         from tests.support.b103_clipboard import install_log_capture, remove_log_capture
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2530611Z     
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2530879Z         _held = _hold_clipboard(8.0)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2531240Z     
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2531513Z         async def _drive() -> int:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2531885Z             app = S19TuiApp(base_dir=tmp_path)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2532277Z             app._clipboard = "APP-TEXT"
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2532911Z             async with app.run_test(size=(160, 48)) as pilot:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2533357Z                 await pilot.pause()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2533737Z                 records = install_log_capture()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2534340Z                 app.action_show_screen("a2l")
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2534695Z                 for _ in range(4):
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2534996Z                     await pilot.pause()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2535387Z                 box = app.query_one("#a2l_tags_filter_input", Input)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2535757Z                 box.focus()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2536033Z                 await pilot.pause()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2536385Z                 await pilot.press("ctrl+v")
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2536708Z                 await pilot.pause()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2537343Z                 n = sum(1 for r in records if r[0] == "s19_app.tui.os_clipboard_input" and r[1] == "WARNING")
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2538828Z                 remove_log_capture(records)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2539431Z                 return n
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2539893Z     
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2540290Z         try:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2541021Z             n = asyncio.run(_drive())
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2541586Z         finally:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2542036Z             _held["release"].set()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2542577Z >       assert n >= 1
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2543073Z E       assert 0 >= 1
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2543361Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2543644Z tests\test_b103_clipboard_windows.py:639: AssertionError
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2544483Z ------------------------------ Captured log call ------------------------------
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2546793Z INFO     s19tui:app.py:3015 App initialized. base_dir=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_tui_043_12_2_held_clipb0 workarea=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_tui_043_12_2_held_clipb0\.s19tool\workarea
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2550422Z INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2551389Z INFO     s19tui:app.py:17354 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2552584Z INFO     s19tui:app.py:20940 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2553668Z ____________ test_r_paste_9_2_held_clipboard_write_warning[single] ____________
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2554276Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2555444Z tmp_path = WindowsPath('C:/Users/runneradmin/AppData/Local/Temp/pytest-of-runneradmin/pytest-0/test_r_paste_9_2_held_clipboar0')
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2556649Z os_clipboard_ready = None, box_kind = 'a'
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2557019Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2557467Z     @pytest.mark.parametrize("box_kind", ["a", "m"], ids=["single", "multi"])
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2558353Z     def test_r_paste_9_2_held_clipboard_write_warning(
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2559085Z         tmp_path: Path, os_clipboard_ready, box_kind: str
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2559689Z     ) -> None:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2560342Z         """R-PASTE.9/2 (WinCI): a held clipboard copy shows the write failure warning."""
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2561121Z         _held = _hold_clipboard(8.0)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2561611Z     
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2561933Z         async def _drive() -> list:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2562768Z             async for app, pilot, widget in (_box_a(tmp_path) if box_kind == "a" else _box_m(tmp_path)):
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2563738Z                 notices = install_notice_capture(app)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2564417Z                 _set_box(widget, "AAAA-BBBB")
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2564967Z                 if box_kind == "a":
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2565435Z                     widget.selection = (0, 4)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2565897Z                 else:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2566309Z                     widget.selection = ((0, 0), (0, 4))
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2566850Z                 widget.focus()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2567342Z                 await pilot.pause()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2567891Z                 await pilot.press("ctrl+c")
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2568445Z                 await pilot.pause()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2568960Z                 await pilot.pause()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2569536Z                 return [n for n in notices if n[0] == "warning"]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2570098Z     
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2570441Z         try:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2570864Z             warnings = asyncio.run(_drive())
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2571396Z         finally:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2571825Z             _held["release"].set()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2572573Z >       assert warnings and warnings[-1][1] == WRITE_FAIL_WARNING, warnings
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2573329Z E       AssertionError: []
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2573788Z E       assert ([])
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2574020Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2574337Z tests\test_b103_clipboard_windows.py:972: AssertionError
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2575639Z ------------------------------ Captured log call ------------------------------
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2578374Z INFO     s19tui:app.py:3015 App initialized. base_dir=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_paste_9_2_held_clipboar0 workarea=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_paste_9_2_held_clipboar0\.s19tool\workarea
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2580671Z INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2581696Z INFO     s19tui:app.py:17354 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2582917Z INFO     s19tui:app.py:20940 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2583981Z ERROR    asyncio:base_events.py:1785 Task exception was never retrieved
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2586041Z future: <Task finished name='Task-86826' coro=<<async_generator_athrow without __name__>()> exception=ValueError("<Token var=<ContextVar name='active_message_pump' at 0x000001D95288C130> at 0x000001D9570EB340> was created in a different Context")>
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2588133Z Traceback (most recent call last):
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2600050Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\site-packages\textual\app.py", line 1105, in _context
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2601178Z     yield
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2602042Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\site-packages\textual\app.py", line 2210, in run_test
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2602868Z     yield pilot
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2603507Z   File "D:\a\s19_app\s19_app\tests\test_b103_clipboard_windows.py", line 89, in _drive_real_app
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2604238Z     yield app, pilot
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2604581Z GeneratorExit
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2604786Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2605099Z During handling of the above exception, another exception occurred:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2605533Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2605711Z Traceback (most recent call last):
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2606428Z   File "D:\a\s19_app\s19_app\tests\test_b103_clipboard_windows.py", line 84, in _drive_real_app
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2607197Z     async with app.run_test(size=(160, 48)) as pilot:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2607973Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\contextlib.py", line 231, in __aexit__
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2608725Z     await self.gen.athrow(typ, value, traceback)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2609601Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\site-packages\textual\app.py", line 2205, in run_test
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2610404Z     with app._context():
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2611069Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\contextlib.py", line 158, in __exit__
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2611808Z     self.gen.throw(typ, value, traceback)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2612642Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\site-packages\textual\app.py", line 1107, in _context
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2613938Z     active_message_pump.reset(message_pump_reset_token)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2614962Z ValueError: <Token var=<ContextVar name='active_message_pump' at 0x000001D95288C130> at 0x000001D9570EB340> was created in a different Context
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2616106Z ____________ test_r_paste_9_2_held_clipboard_write_warning[multi] _____________
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2616599Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2617244Z tmp_path = WindowsPath('C:/Users/runneradmin/AppData/Local/Temp/pytest-of-runneradmin/pytest-0/test_r_paste_9_2_held_clipboar1')
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2618270Z os_clipboard_ready = None, box_kind = 'm'
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2618562Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2618902Z     @pytest.mark.parametrize("box_kind", ["a", "m"], ids=["single", "multi"])
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2619579Z     def test_r_paste_9_2_held_clipboard_write_warning(
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2620139Z         tmp_path: Path, os_clipboard_ready, box_kind: str
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2620627Z     ) -> None:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2621143Z         """R-PASTE.9/2 (WinCI): a held clipboard copy shows the write failure warning."""
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2621836Z         _held = _hold_clipboard(8.0)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2622503Z     
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2622816Z         async def _drive() -> list:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2623488Z             async for app, pilot, widget in (_box_a(tmp_path) if box_kind == "a" else _box_m(tmp_path)):
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2624222Z                 notices = install_notice_capture(app)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2624710Z                 _set_box(widget, "AAAA-BBBB")
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2625137Z                 if box_kind == "a":
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2625560Z                     widget.selection = (0, 4)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2625997Z                 else:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2626390Z                     widget.selection = ((0, 0), (0, 4))
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2626900Z                 widget.focus()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2627306Z                 await pilot.pause()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2627740Z                 await pilot.press("ctrl+c")
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2628182Z                 await pilot.pause()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2628786Z                 await pilot.pause()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2629274Z                 return [n for n in notices if n[0] == "warning"]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2629745Z     
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2630027Z         try:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2630358Z             warnings = asyncio.run(_drive())
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2630782Z         finally:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2631151Z             _held["release"].set()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2631696Z >       assert warnings and warnings[-1][1] == WRITE_FAIL_WARNING, warnings
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2632286Z E       AssertionError: []
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2632654Z E       assert ([])
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2632836Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2633098Z tests\test_b103_clipboard_windows.py:972: AssertionError
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2634062Z ------------------------------ Captured log call ------------------------------
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2636046Z INFO     s19tui:app.py:3015 App initialized. base_dir=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_paste_9_2_held_clipboar1 workarea=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_paste_9_2_held_clipboar1\.s19tool\workarea
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2637888Z INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2638642Z INFO     s19tui:app.py:17354 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2639504Z ERROR    asyncio:base_events.py:1785 Task exception was never retrieved
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2641122Z future: <Task finished name='Task-89465' coro=<<async_generator_athrow without __name__>()> exception=ValueError("<Token var=<ContextVar name='active_message_pump' at 0x000001D95288C130> at 0x000001D957F82480> was created in a different Context")>
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2642599Z Traceback (most recent call last):
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2643526Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\site-packages\textual\app.py", line 1105, in _context
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2644317Z     yield
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2644981Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\site-packages\textual\app.py", line 2210, in run_test
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2645735Z     yield pilot
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2646356Z   File "D:\a\s19_app\s19_app\tests\test_b103_clipboard_windows.py", line 89, in _drive_real_app
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2647035Z     yield app, pilot
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2647369Z GeneratorExit
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2647569Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2647841Z During handling of the above exception, another exception occurred:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2648289Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2648462Z Traceback (most recent call last):
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2649115Z   File "D:\a\s19_app\s19_app\tests\test_b103_clipboard_windows.py", line 84, in _drive_real_app
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2649875Z     async with app.run_test(size=(160, 48)) as pilot:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2650672Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\contextlib.py", line 231, in __aexit__
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2651404Z     await self.gen.athrow(typ, value, traceback)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2652269Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\site-packages\textual\app.py", line 2205, in run_test
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2653287Z     with app._context():
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2654236Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\contextlib.py", line 158, in __exit__
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2654974Z     self.gen.throw(typ, value, traceback)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2655758Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\site-packages\textual\app.py", line 1107, in _context
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2656597Z     active_message_pump.reset(message_pump_reset_token)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2657562Z ValueError: <Token var=<ContextVar name='active_message_pump' at 0x000001D95288C130> at 0x000001D957F82480> was created in a different Context
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2658685Z _______ test_r_paste_13_1_2_held_clipboard_copy_ends_within_2_5[single] _______
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2659115Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2659744Z tmp_path = WindowsPath('C:/Users/runneradmin/AppData/Local/Temp/pytest-of-runneradmin/pytest-0/test_r_paste_13_1_2_held_clipb0')
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2660827Z os_clipboard_ready = None, box_kind = 'a'
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2661135Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2661271Z     @pytest.mark.serial_timing
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2661815Z     @pytest.mark.parametrize("box_kind", ["a", "m"], ids=["single", "multi"])
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2662586Z     def test_r_paste_13_1_2_held_clipboard_copy_ends_within_2_5(
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2663191Z         tmp_path: Path, os_clipboard_ready, box_kind: str
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2663649Z     ) -> None:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2664089Z         """R-PASTE.13/1-2 (WinCI): a held clipboard copy warns \u2264 2.5 s."""
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2664650Z         _held = _hold_clipboard(8.0)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2665019Z     
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2665318Z         async def _drive() -> float:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2665964Z             async for app, pilot, widget in (_box_a(tmp_path) if box_kind == "a" else _box_m(tmp_path)):
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2666674Z                 notices = install_notice_capture(app)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2667157Z                 _set_box(widget, "AAAA-BBBB")
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2667579Z                 if box_kind == "a":
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2668004Z                     widget.selection = (0, 4)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2668406Z                 else:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2668768Z                     widget.selection = ((0, 0), (0, 4))
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2669210Z                 widget.focus()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2669588Z                 await pilot.pause()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2669984Z                 before = len(notices)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2670389Z                 start = time.monotonic()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2670819Z                 await pilot.press("ctrl+c")
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2671269Z                 deadline = time.monotonic() + 10.0
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2671746Z                 while time.monotonic() < deadline:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2672233Z                     await asyncio.sleep(0.005)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2672666Z                     await pilot.pause()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2673099Z                     if len(notices) > before:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2673566Z                         return time.monotonic() - start
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2674289Z                 return 999.0
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2674633Z     
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2674913Z         try:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2675240Z             elapsed = asyncio.run(_drive())
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2675651Z         finally:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2675979Z             _held["release"].set()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2676411Z         bound = timing_bound(2.5)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2677025Z >       assert elapsed <= report_margin(f"r_paste_13_{box_kind}", elapsed, bound), elapsed
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2677677Z E       AssertionError: 999.0
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2678055Z E       assert 999.0 <= 5.0
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2678488Z E        +  where 5.0 = report_margin('r_paste_13_a', 999.0, 5.0)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2678861Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2679073Z tests\test_b103_clipboard_windows.py:1059: AssertionError
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2679715Z ------------------------------ Captured log call ------------------------------
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2681703Z INFO     s19tui:app.py:3015 App initialized. base_dir=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_paste_13_1_2_held_clipb0 workarea=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_paste_13_1_2_held_clipb0\.s19tool\workarea
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2683477Z INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2684229Z INFO     s19tui:app.py:17354 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2685148Z INFO     s19tui:app.py:20940 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2685970Z ERROR    asyncio:base_events.py:1785 Task exception was never retrieved
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2687543Z future: <Task finished name='Task-103290' coro=<<async_generator_athrow without __name__>()> exception=ValueError("<Token var=<ContextVar name='active_message_pump' at 0x000001D95288C130> at 0x000001D958635D80> was created in a different Context")>
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2689953Z Traceback (most recent call last):
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2690800Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\site-packages\textual\app.py", line 1105, in _context
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2691578Z     yield
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2692225Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\site-packages\textual\app.py", line 2210, in run_test
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2692970Z     yield pilot
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2693556Z   File "D:\a\s19_app\s19_app\tests\test_b103_clipboard_windows.py", line 89, in _drive_real_app
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2694608Z     yield app, pilot
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2694944Z GeneratorExit
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2695113Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2695400Z During handling of the above exception, another exception occurred:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2695805Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2695974Z Traceback (most recent call last):
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2696644Z   File "D:\a\s19_app\s19_app\tests\test_b103_clipboard_windows.py", line 84, in _drive_real_app
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2697362Z     async with app.run_test(size=(160, 48)) as pilot:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2698093Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\contextlib.py", line 231, in __aexit__
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2698847Z     await self.gen.athrow(typ, value, traceback)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2699650Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\site-packages\textual\app.py", line 2205, in run_test
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2700403Z     with app._context():
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2701061Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\contextlib.py", line 158, in __exit__
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2701768Z     self.gen.throw(typ, value, traceback)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2702541Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\site-packages\textual\app.py", line 1107, in _context
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2703370Z     active_message_pump.reset(message_pump_reset_token)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2704353Z ValueError: <Token var=<ContextVar name='active_message_pump' at 0x000001D95288C130> at 0x000001D958635D80> was created in a different Context
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2705439Z _______ test_r_paste_13_1_2_held_clipboard_copy_ends_within_2_5[multi] ________
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2705906Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2706528Z tmp_path = WindowsPath('C:/Users/runneradmin/AppData/Local/Temp/pytest-of-runneradmin/pytest-0/test_r_paste_13_1_2_held_clipb1')
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2707447Z os_clipboard_ready = None, box_kind = 'm'
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2707720Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2707887Z     @pytest.mark.serial_timing
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2708435Z     @pytest.mark.parametrize("box_kind", ["a", "m"], ids=["single", "multi"])
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2709120Z     def test_r_paste_13_1_2_held_clipboard_copy_ends_within_2_5(
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2709695Z         tmp_path: Path, os_clipboard_ready, box_kind: str
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2710165Z     ) -> None:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2710636Z         """R-PASTE.13/1-2 (WinCI): a held clipboard copy warns \u2264 2.5 s."""
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2711391Z         _held = _hold_clipboard(8.0)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2711777Z     
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2712072Z         async def _drive() -> float:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2712713Z             async for app, pilot, widget in (_box_a(tmp_path) if box_kind == "a" else _box_m(tmp_path)):
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2728987Z                 notices = install_notice_capture(app)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2729642Z                 _set_box(widget, "AAAA-BBBB")
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2730198Z                 if box_kind == "a":
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2730717Z                     widget.selection = (0, 4)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2731276Z                 else:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2731740Z                     widget.selection = ((0, 0), (0, 4))
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2732333Z                 widget.focus()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2732848Z                 await pilot.pause()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2733662Z                 before = len(notices)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2734180Z                 start = time.monotonic()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2734998Z                 await pilot.press("ctrl+c")
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2735583Z                 deadline = time.monotonic() + 10.0
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2736192Z                 while time.monotonic() < deadline:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2736768Z                     await asyncio.sleep(0.005)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2737316Z                     await pilot.pause()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2737839Z                     if len(notices) > before:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2738411Z                         return time.monotonic() - start
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2738974Z                 return 999.0
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2739398Z     
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2739708Z         try:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2740083Z             elapsed = asyncio.run(_drive())
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2740566Z         finally:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2740957Z             _held["release"].set()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2741477Z         bound = timing_bound(2.5)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2742209Z >       assert elapsed <= report_margin(f"r_paste_13_{box_kind}", elapsed, bound), elapsed
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2743028Z E       AssertionError: 999.0
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2743482Z E       assert 999.0 <= 5.0
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2743986Z E        +  where 5.0 = report_margin('r_paste_13_m', 999.0, 5.0)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2744418Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2744672Z tests\test_b103_clipboard_windows.py:1059: AssertionError
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2745412Z ------------------------------ Captured log call ------------------------------
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2747587Z INFO     s19tui:app.py:3015 App initialized. base_dir=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_paste_13_1_2_held_clipb1 workarea=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_paste_13_1_2_held_clipb1\.s19tool\workarea
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2749811Z INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2751389Z INFO     s19tui:app.py:17354 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2752407Z ERROR    asyncio:base_events.py:1785 Task exception was never retrieved
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2754340Z future: <Task finished name='Task-106185' coro=<<async_generator_athrow without __name__>()> exception=ValueError("<Token var=<ContextVar name='active_message_pump' at 0x000001D95288C130> at 0x000001D95A749D40> was created in a different Context")>
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2756087Z Traceback (most recent call last):
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2757062Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\site-packages\textual\app.py", line 1105, in _context
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2757934Z     yield
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2758631Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\site-packages\textual\app.py", line 2210, in run_test
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2759493Z     yield pilot
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2760196Z   File "D:\a\s19_app\s19_app\tests\test_b103_clipboard_windows.py", line 89, in _drive_real_app
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2760984Z     yield app, pilot
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2761381Z GeneratorExit
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2761611Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2763157Z During handling of the above exception, another exception occurred:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2763661Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2763865Z Traceback (most recent call last):
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2764666Z   File "D:\a\s19_app\s19_app\tests\test_b103_clipboard_windows.py", line 84, in _drive_real_app
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2765516Z     async with app.run_test(size=(160, 48)) as pilot:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2766398Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\contextlib.py", line 231, in __aexit__
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2767251Z     await self.gen.athrow(typ, value, traceback)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2768228Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\site-packages\textual\app.py", line 2205, in run_test
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2769123Z     with app._context():
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2769902Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\contextlib.py", line 158, in __exit__
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2770948Z     self.gen.throw(typ, value, traceback)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2772070Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\site-packages\textual\app.py", line 1107, in _context
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2773084Z     active_message_pump.reset(message_pump_reset_token)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2774243Z ValueError: <Token var=<ContextVar name='active_message_pump' at 0x000001D95288C130> at 0x000001D95A749D40> was created in a different Context
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2776447Z ____________ test_r_tui_043_9_1_held_read_ctrl_v_stays_responsive _____________
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2777026Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2777787Z tmp_path = WindowsPath('C:/Users/runneradmin/AppData/Local/Temp/pytest-of-runneradmin/pytest-0/test_r_tui_043_9_1_held_read_c0')
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2802203Z os_clipboard_ready = None
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2802526Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2802685Z     @pytest.mark.serial_timing
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2803227Z     def test_r_tui_043_9_1_held_read_ctrl_v_stays_responsive(
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2803880Z         tmp_path: Path, os_clipboard_ready
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2804384Z     ) -> None:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2805089Z         """R-TUI-043.9/1 (WinCI): the screen stays responsive while a read waits on a held clipboard."""
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2805905Z         _held = _hold_clipboard(8.0)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2806423Z         try:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2806812Z             marker, lateness = asyncio.run(
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2807465Z                 _drive_box1_held_lateness("", mode="read", right_click=False)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2808128Z             )
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2808472Z         finally:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2808850Z             _held["release"].set()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2809412Z >       _assert_ticks_on_time("r_tui_043_9_1", marker, lateness)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2809864Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2810125Z tests\test_b103_clipboard_windows.py:1160: 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2810745Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2811364Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2811668Z label = 'r_tui_043_9_1', marker = {'started': True, 'ended': True}
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2812283Z lateness = []
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2812513Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2812868Z     def _assert_ticks_on_time(label: str, marker: dict, lateness: list) -> None:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2813816Z         """R-PASTE.14 / R-TUI-043.9 oracle: \u2265 10 ticks fired, every tick \u2264 bound."""
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2814795Z         assert marker["started"] is True, "clipboard read/write never started (vacuous)"
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2815701Z >       assert len(lateness) >= 10, f"only {len(lateness)} ticks fired"
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2816372Z E       AssertionError: only 0 ticks fired
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2816902Z E       assert 0 >= 10
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2817286Z E        +  where 0 = len([])
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2817542Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2817829Z tests\test_b103_clipboard_windows.py:1143: AssertionError
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2818608Z ____________ test_r_paste_14_1_held_write_ctrl_c_stays_responsive _____________
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2819123Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2819834Z tmp_path = WindowsPath('C:/Users/runneradmin/AppData/Local/Temp/pytest-of-runneradmin/pytest-0/test_r_paste_14_1_held_write_c0')
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2821116Z os_clipboard_ready = None
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2821394Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2821557Z     @pytest.mark.serial_timing
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2822090Z     def test_r_paste_14_1_held_write_ctrl_c_stays_responsive(
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2822670Z         tmp_path: Path, os_clipboard_ready
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2823152Z     ) -> None:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2823834Z         """R-PASTE.14/1 (WinCI): the screen stays responsive while a write waits on a held clipboard."""
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2824669Z         _held = _hold_clipboard(8.0)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2825115Z         try:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2825496Z             marker, lateness = asyncio.run(
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2826183Z                 _drive_box1_held_lateness("AAAA-BBBB", mode="write", right_click=False)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2826859Z             )
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2827334Z         finally:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2827717Z             _held["release"].set()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2828304Z >       _assert_ticks_on_time("r_paste_14_1", marker, lateness)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2828717Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2828910Z tests\test_b103_clipboard_windows.py:1175: 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2829505Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2829923Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2830317Z label = 'r_paste_14_1', marker = {'started': True, 'ended': True}, lateness = []
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2830877Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2831418Z     def _assert_ticks_on_time(label: str, marker: dict, lateness: list) -> None:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2832364Z         """R-PASTE.14 / R-TUI-043.9 oracle: \u2265 10 ticks fired, every tick \u2264 bound."""
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2833335Z         assert marker["started"] is True, "clipboard read/write never started (vacuous)"
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2834247Z >       assert len(lateness) >= 10, f"only {len(lateness)} ticks fired"
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2834915Z E       AssertionError: only 0 ticks fired
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2835412Z E       assert 0 >= 10
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2835806Z E        +  where 0 = len([])
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2836092Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2836341Z tests\test_b103_clipboard_windows.py:1143: AssertionError
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2837121Z __________ test_r_paste_14_2_held_write_right_click_stays_responsive __________
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2837665Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2838374Z tmp_path = WindowsPath('C:/Users/runneradmin/AppData/Local/Temp/pytest-of-runneradmin/pytest-0/test_r_paste_14_2_held_write_r0')
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2839458Z os_clipboard_ready = None
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2839683Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2839866Z     @pytest.mark.serial_timing
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2840436Z     def test_r_paste_14_2_held_write_right_click_stays_responsive(
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2841059Z         tmp_path: Path, os_clipboard_ready
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2841528Z     ) -> None:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2842289Z         """R-PASTE.14/2 (WinCI): the screen stays responsive while a right-click write waits on a held clipboard."""
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2843210Z         _held = _hold_clipboard(8.0)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2843661Z         try:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2844034Z             marker, lateness = asyncio.run(
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2844757Z                 _drive_box1_held_lateness("AAAA-BBBB", mode="write", right_click=True)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2845429Z             )
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2845755Z         finally:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2846131Z             _held["release"].set()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2846681Z >       _assert_ticks_on_time("r_paste_14_2", marker, lateness)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2847124Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2847308Z tests\test_b103_clipboard_windows.py:1190: 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2847905Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2848353Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2848685Z label = 'r_paste_14_2', marker = {'started': True, 'ended': True}, lateness = []
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2849252Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2864356Z     def _assert_ticks_on_time(label: str, marker: dict, lateness: list) -> None:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2866053Z         """R-PASTE.14 / R-TUI-043.9 oracle: \u2265 10 ticks fired, every tick \u2264 bound."""
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2867117Z         assert marker["started"] is True, "clipboard read/write never started (vacuous)"
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2868008Z >       assert len(lateness) >= 10, f"only {len(lateness)} ticks fired"
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2868680Z E       AssertionError: only 0 ticks fired
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2869176Z E       assert 0 >= 10
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2869560Z E        +  where 0 = len([])
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2869850Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2870104Z tests\test_b103_clipboard_windows.py:1143: AssertionError
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2870932Z __________ test_r_tui_043_9_2_held_read_right_click_stays_responsive __________
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2871663Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2872417Z tmp_path = WindowsPath('C:/Users/runneradmin/AppData/Local/Temp/pytest-of-runneradmin/pytest-0/test_r_tui_043_9_2_held_read_r0')
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2873706Z os_clipboard_ready = None
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2873970Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2874170Z     @pytest.mark.serial_timing
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2874750Z     def test_r_tui_043_9_2_held_read_right_click_stays_responsive(
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2875402Z         tmp_path: Path, os_clipboard_ready
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2875889Z     ) -> None:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2876657Z         """R-TUI-043.9/2 (WinCI): the screen stays responsive while a right-click read waits on a held clipboard."""
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2877602Z         _held = _hold_clipboard(8.0)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2878023Z         try:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2878403Z             marker, lateness = asyncio.run(
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2879042Z                 _drive_box1_held_lateness("", mode="read", right_click=True)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2879655Z             )
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2879998Z         finally:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2880374Z             _held["release"].set()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2880935Z >       _assert_ticks_on_time("r_tui_043_9_2", marker, lateness)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2881390Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2881577Z tests\test_b103_clipboard_windows.py:1205: 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2882207Z _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2882622Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2882914Z label = 'r_tui_043_9_2', marker = {'started': True, 'ended': True}
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2883504Z lateness = []
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2883693Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2884076Z     def _assert_ticks_on_time(label: str, marker: dict, lateness: list) -> None:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2885016Z         """R-PASTE.14 / R-TUI-043.9 oracle: \u2265 10 ticks fired, every tick \u2264 bound."""
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2885993Z         assert marker["started"] is True, "clipboard read/write never started (vacuous)"
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2886885Z >       assert len(lateness) >= 10, f"only {len(lateness)} ticks fired"
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2887553Z E       AssertionError: only 0 ticks fired
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2888089Z E       assert 0 >= 10
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2888504Z E        +  where 0 = len([])
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2888764Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2889049Z tests\test_b103_clipboard_windows.py:1143: AssertionError
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2889826Z ______ test_r_paste_28_1_2_held_right_click_copy_ends_within_2_5[single] ______
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2890375Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2891109Z tmp_path = WindowsPath('C:/Users/runneradmin/AppData/Local/Temp/pytest-of-runneradmin/pytest-0/test_r_paste_28_1_2_held_right0')
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2892470Z os_clipboard_ready = None, box_kind = 'a'
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2892839Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2893002Z     @pytest.mark.serial_timing
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2893680Z     @pytest.mark.parametrize("box_kind", ["a", "m"], ids=["single", "multi"])
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2894503Z     def test_r_paste_28_1_2_held_right_click_copy_ends_within_2_5(
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2895181Z         tmp_path: Path, os_clipboard_ready, box_kind: str
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2895700Z     ) -> None:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2896188Z         """R-PASTE.28/1-2 (WinCI): a held right-click copy warns \u2264 2.5 s."""
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2896987Z         _held = _hold_clipboard(8.0)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2897361Z     
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2897633Z         async def _drive() -> float:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2898322Z             async for app, pilot, widget in (_box_a(tmp_path) if box_kind == "a" else _box_m(tmp_path)):
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2899093Z                 notices = install_notice_capture(app)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2899571Z                 _set_box(widget, "AAAA-BBBB")
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2900003Z                 if box_kind == "a":
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2900410Z                     widget.selection = (0, 4)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2900817Z                 else:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2901159Z                     widget.selection = ((0, 0), (0, 4))
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2901604Z                 widget.focus()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2901966Z                 await pilot.pause()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2902529Z                 before = len(notices)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2902942Z                 start = time.monotonic()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2903448Z                 await right_click_app_route(app, pilot, widget)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2903992Z                 deadline = time.monotonic() + 10.0
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2904471Z                 while time.monotonic() < deadline:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2904934Z                     await asyncio.sleep(0.005)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2905377Z                     await pilot.pause()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2905792Z                     if len(notices) > before:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2906253Z                         return time.monotonic() - start
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2906697Z                 return 999.0
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2907023Z     
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2907266Z         try:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2907579Z             elapsed = asyncio.run(_drive())
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2907985Z         finally:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2908287Z             _held["release"].set()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2912836Z         bound = timing_bound(2.5)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2913484Z >       assert elapsed <= report_margin(f"r_paste_28_{box_kind}", elapsed, bound), elapsed
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2914075Z E       AssertionError: 999.0
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2914388Z E       assert 999.0 <= 5.0
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2914762Z E        +  where 5.0 = report_margin('r_paste_28_a', 999.0, 5.0)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2915094Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2915300Z tests\test_b103_clipboard_windows.py:1353: AssertionError
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2915872Z ------------------------------ Captured log call ------------------------------
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2917614Z INFO     s19tui:app.py:3015 App initialized. base_dir=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_paste_28_1_2_held_right0 workarea=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_paste_28_1_2_held_right0\.s19tool\workarea
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2919295Z INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2919968Z INFO     s19tui:app.py:17354 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2920816Z INFO     s19tui:app.py:20940 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2921541Z ERROR    asyncio:base_events.py:1785 Task exception was never retrieved
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2923061Z future: <Task finished name='Task-125533' coro=<<async_generator_athrow without __name__>()> exception=ValueError("<Token var=<ContextVar name='active_message_pump' at 0x000001D95288C130> at 0x000001D9575A0C80> was created in a different Context")>
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2924435Z Traceback (most recent call last):
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2925210Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\site-packages\textual\app.py", line 1105, in _context
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2925887Z     yield
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2926465Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\site-packages\textual\app.py", line 2210, in run_test
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2927139Z     yield pilot
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2927924Z   File "D:\a\s19_app\s19_app\tests\test_b103_clipboard_windows.py", line 89, in _drive_real_app
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2928516Z     yield app, pilot
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2928773Z GeneratorExit
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2928916Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2929169Z During handling of the above exception, another exception occurred:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2929553Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2929669Z Traceback (most recent call last):
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2930246Z   File "D:\a\s19_app\s19_app\tests\test_b103_clipboard_windows.py", line 84, in _drive_real_app
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2930886Z     async with app.run_test(size=(160, 48)) as pilot:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2931923Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\contextlib.py", line 231, in __aexit__
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2932581Z     await self.gen.athrow(typ, value, traceback)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2933332Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\site-packages\textual\app.py", line 2205, in run_test
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2934183Z     with app._context():
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2934751Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\contextlib.py", line 158, in __exit__
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2935394Z     self.gen.throw(typ, value, traceback)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2936096Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\site-packages\textual\app.py", line 1107, in _context
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2936838Z     active_message_pump.reset(message_pump_reset_token)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2937739Z ValueError: <Token var=<ContextVar name='active_message_pump' at 0x000001D95288C130> at 0x000001D9575A0C80> was created in a different Context
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2938785Z ______ test_r_paste_28_1_2_held_right_click_copy_ends_within_2_5[multi] _______
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2939204Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2939774Z tmp_path = WindowsPath('C:/Users/runneradmin/AppData/Local/Temp/pytest-of-runneradmin/pytest-0/test_r_paste_28_1_2_held_right1')
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2940615Z os_clipboard_ready = None, box_kind = 'm'
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2940872Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2940997Z     @pytest.mark.serial_timing
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2941483Z     @pytest.mark.parametrize("box_kind", ["a", "m"], ids=["single", "multi"])
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2942094Z     def test_r_paste_28_1_2_held_right_click_copy_ends_within_2_5(
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2942829Z         tmp_path: Path, os_clipboard_ready, box_kind: str
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2943304Z     ) -> None:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2943780Z         """R-PASTE.28/1-2 (WinCI): a held right-click copy warns \u2264 2.5 s."""
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2944375Z         _held = _hold_clipboard(8.0)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2944752Z     
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2945067Z         async def _drive() -> float:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2945714Z             async for app, pilot, widget in (_box_a(tmp_path) if box_kind == "a" else _box_m(tmp_path)):
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2946414Z                 notices = install_notice_capture(app)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2946943Z                 _set_box(widget, "AAAA-BBBB")
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2947380Z                 if box_kind == "a":
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2947810Z                     widget.selection = (0, 4)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2948220Z                 else:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2967295Z                     widget.selection = ((0, 0), (0, 4))
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2967921Z                 widget.focus()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2968329Z                 await pilot.pause()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2968706Z                 before = len(notices)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2969170Z                 start = time.monotonic()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2969662Z                 await right_click_app_route(app, pilot, widget)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2970181Z                 deadline = time.monotonic() + 10.0
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2970624Z                 while time.monotonic() < deadline:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2971049Z                     await asyncio.sleep(0.005)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2971469Z                     await pilot.pause()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2971894Z                     if len(notices) > before:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2972360Z                         return time.monotonic() - start
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2973096Z                 return 999.0
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2973474Z     
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2973753Z         try:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2974081Z             elapsed = asyncio.run(_drive())
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2974487Z         finally:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2974810Z             _held["release"].set()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2975217Z         bound = timing_bound(2.5)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2975809Z >       assert elapsed <= report_margin(f"r_paste_28_{box_kind}", elapsed, bound), elapsed
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2976797Z E       AssertionError: 999.0
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2977178Z E       assert 999.0 <= 5.0
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2977598Z E        +  where 5.0 = report_margin('r_paste_28_m', 999.0, 5.0)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2977962Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2978220Z tests\test_b103_clipboard_windows.py:1353: AssertionError
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.2978841Z ------------------------------ Captured log call ------------------------------
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7638722Z INFO     s19tui:app.py:3015 App initialized. base_dir=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_paste_28_1_2_held_right1 workarea=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_paste_28_1_2_held_right1\.s19tool\workarea
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7640932Z INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7641711Z INFO     s19tui:app.py:17354 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7642536Z ERROR    asyncio:base_events.py:1785 Task exception was never retrieved
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7644146Z future: <Task finished name='Task-128418' coro=<<async_generator_athrow without __name__>()> exception=ValueError("<Token var=<ContextVar name='active_message_pump' at 0x000001D95288C130> at 0x000001D9568D9DC0> was created in a different Context")>
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7645629Z Traceback (most recent call last):
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7646447Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\site-packages\textual\app.py", line 1105, in _context
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7647189Z     yield
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7648087Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\site-packages\textual\app.py", line 2210, in run_test
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7648951Z     yield pilot
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7649489Z   File "D:\a\s19_app\s19_app\tests\test_b103_clipboard_windows.py", line 89, in _drive_real_app
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7650096Z     yield app, pilot
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7650357Z GeneratorExit
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7650510Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7650771Z During handling of the above exception, another exception occurred:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7651176Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7651309Z Traceback (most recent call last):
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7652433Z   File "D:\a\s19_app\s19_app\tests\test_b103_clipboard_windows.py", line 84, in _drive_real_app
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7653112Z     async with app.run_test(size=(160, 48)) as pilot:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7653980Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\contextlib.py", line 231, in __aexit__
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7654688Z     await self.gen.athrow(typ, value, traceback)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7655459Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\site-packages\textual\app.py", line 2205, in run_test
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7656171Z     with app._context():
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7656751Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\contextlib.py", line 158, in __exit__
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7657403Z     self.gen.throw(typ, value, traceback)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7658140Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\site-packages\textual\app.py", line 1107, in _context
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7658898Z     active_message_pump.reset(message_pump_reset_token)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7659830Z ValueError: <Token var=<ContextVar name='active_message_pump' at 0x000001D95288C130> at 0x000001D9568D9DC0> was created in a different Context
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7660854Z ____________ test_r_tui_043_12_3_win_right_click_held_logs_warning ____________
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7661664Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7662271Z tmp_path = WindowsPath('C:/Users/runneradmin/AppData/Local/Temp/pytest-of-runneradmin/pytest-0/test_r_tui_043_12_3_win_right_0')
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7663123Z os_clipboard_ready = None
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7663325Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7663749Z     def test_r_tui_043_12_3_win_right_click_held_logs_warning(tmp_path: Path, os_clipboard_ready) -> None:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7664587Z         """R-TUI-043.12/3 (WinCI arm): a held right-click read logs \u2265 1 WARNING."""
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7665340Z         from tests.support.b103_clipboard import install_log_capture, remove_log_capture
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7665895Z     
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7666124Z         _held = _hold_clipboard(8.0)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7666442Z     
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7666678Z         async def _drive() -> int:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7667016Z             app = S19TuiApp(base_dir=tmp_path)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7667399Z             app._clipboard = "APP-TEXT"
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7669659Z             async with app.run_test(size=(160, 48)) as pilot:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7670108Z                 await pilot.pause()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7670462Z                 records = install_log_capture()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7670857Z                 app.action_show_screen("a2l")
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7671214Z                 for _ in range(4):
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7671541Z                     await pilot.pause()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7671963Z                 box = app.query_one("#a2l_tags_filter_input", Input)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7672406Z                 box.focus()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7672706Z                 await pilot.pause()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7673096Z                 await right_click_app_route(app, pilot, box)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7673516Z                 await pilot.pause(0.2)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7674094Z                 n = sum(1 for r in records if r[0] == "s19_app.tui.os_clipboard_input" and r[1] == "WARNING")
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7674716Z                 remove_log_capture(records)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7675066Z                 return n
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7675318Z     
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7675520Z         try:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7675768Z             n = asyncio.run(_drive())
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7676088Z         finally:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7676333Z             _held["release"].set()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7676637Z >       assert n >= 1
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7676893Z E       assert 0 >= 1
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7677060Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7677265Z tests\test_b103_clipboard_windows.py:1558: AssertionError
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7677822Z ------------------------------ Captured log call ------------------------------
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7679640Z INFO     s19tui:app.py:3015 App initialized. base_dir=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_tui_043_12_3_win_right_0 workarea=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_tui_043_12_3_win_right_0\.s19tool\workarea
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7681318Z INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7681987Z INFO     s19tui:app.py:17354 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7682819Z INFO     s19tui:app.py:20940 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7683555Z _____________ test_r_paste_10_2_win_right_click_copy_logs_warning _____________
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7683962Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7684539Z tmp_path = WindowsPath('C:/Users/runneradmin/AppData/Local/Temp/pytest-of-runneradmin/pytest-0/test_r_paste_10_2_win_right_cl0')
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7685375Z os_clipboard_ready = None
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7685561Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7685958Z     def test_r_paste_10_2_win_right_click_copy_logs_warning(tmp_path: Path, os_clipboard_ready) -> None:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7686768Z         """R-PASTE.10/2 (WinCI arm): a failed right-click copy logs \u2265 1 WARNING."""
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7687492Z         from tests.support.b103_clipboard import install_log_capture, remove_log_capture
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7688276Z     
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7688502Z         _held = _hold_clipboard(8.0)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7688819Z     
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7689040Z         async def _drive() -> int:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7689700Z             async for app, pilot, widget in _box_a(tmp_path):
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7690142Z                 records = install_log_capture()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7690558Z                 widget.value = "SECRET-RC-44"
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7690954Z                 widget.selection = (0, len(widget.value))
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7691330Z                 widget.focus()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7691637Z                 await pilot.pause()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7692028Z                 await right_click_app_route(app, pilot, widget)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7692449Z                 await pilot.pause()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7692777Z                 await pilot.pause()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7693154Z                 n = sum(1 for r in records if r[1] == "WARNING")
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7693779Z                 remove_log_capture(records)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7694123Z                 return n
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7694371Z     
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7694567Z         try:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7694847Z             n = asyncio.run(_drive())
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7695154Z         finally:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7695394Z             _held["release"].set()
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7695695Z >       assert n >= 1
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7695947Z E       assert 0 >= 1
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7696103Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7696297Z tests\test_b103_clipboard_windows.py:1650: AssertionError
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7696835Z ------------------------------ Captured log call ------------------------------
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7698557Z INFO     s19tui:app.py:3015 App initialized. base_dir=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_paste_10_2_win_right_cl0 workarea=C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_r_paste_10_2_win_right_cl0\.s19tool\workarea
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7700208Z INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7700845Z INFO     s19tui:app.py:17354 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7701678Z INFO     s19tui:app.py:20940 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7702407Z ERROR    asyncio:base_events.py:1785 Task exception was never retrieved
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7703891Z future: <Task finished name='Task-178591' coro=<<async_generator_athrow without __name__>()> exception=ValueError("<Token var=<ContextVar name='active_message_pump' at 0x000001D95288C130> at 0x000001D959216B00> was created in a different Context")>
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7705262Z Traceback (most recent call last):
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7705947Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\site-packages\textual\app.py", line 1105, in _context
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7706595Z     yield
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7707165Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\site-packages\textual\app.py", line 2210, in run_test
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7707830Z     yield pilot
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7708532Z   File "D:\a\s19_app\s19_app\tests\test_b103_clipboard_windows.py", line 89, in _drive_real_app
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7709122Z     yield app, pilot
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7709387Z GeneratorExit
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7709801Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7710058Z During handling of the above exception, another exception occurred:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7710443Z 
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7710554Z Traceback (most recent call last):
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7711125Z   File "D:\a\s19_app\s19_app\tests\test_b103_clipboard_windows.py", line 84, in _drive_real_app
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7711754Z     async with app.run_test(size=(160, 48)) as pilot:
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7712417Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\contextlib.py", line 231, in __aexit__
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7713059Z     await self.gen.athrow(typ, value, traceback)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7713783Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\site-packages\textual\app.py", line 2205, in run_test
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7714649Z     with app._context():
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7715400Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\contextlib.py", line 158, in __exit__
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7716024Z     self.gen.throw(typ, value, traceback)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7716709Z   File "C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\site-packages\textual\app.py", line 1107, in _context
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7717442Z     active_message_pump.reset(message_pump_reset_token)
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7718338Z ValueError: <Token var=<ContextVar name='active_message_pump' at 0x000001D95288C130> at 0x000001D959216B00> was created in a different Context
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7719250Z ============================ QC-TM timing margins =============================
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7720228Z LOW -19880.0%  999.000 s / 5.000 s  r_paste_13_a  tests/test_b103_clipboard_windows.py::test_r_paste_13_1_2_held_clipboard_copy_ends_within_2_5[single]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7721759Z LOW -19880.0%  999.000 s / 5.000 s  r_paste_13_m  tests/test_b103_clipboard_windows.py::test_r_paste_13_1_2_held_clipboard_copy_ends_within_2_5[multi]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7723066Z LOW -19880.0%  999.000 s / 5.000 s  r_paste_28_a  tests/test_b103_clipboard_windows.py::test_r_paste_28_1_2_held_right_click_copy_ends_within_2_5[single]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7724363Z LOW -19880.0%  999.000 s / 5.000 s  r_paste_28_m  tests/test_b103_clipboard_windows.py::test_r_paste_28_1_2_held_right_click_copy_ends_within_2_5[multi]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7725642Z 47.5%  0.203 s / 0.387 s  r_paste_27_m  tests/test_b103_clipboard_windows.py::test_r_paste_27_1_2_right_click_copy_ends_within_typed_key_time[multi]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7726854Z 47.7%  0.203 s / 0.388 s  r_paste_11_a  tests/test_b103_clipboard_windows.py::test_r_paste_11_1_2_copy_ends_within_typed_key_time[single]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7728021Z 49.6%  0.203 s / 0.403 s  r_paste_11_m  tests/test_b103_clipboard_windows.py::test_r_paste_11_1_2_copy_ends_within_typed_key_time[multi]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7729240Z 49.6%  0.203 s / 0.403 s  r_paste_27_a  tests/test_b103_clipboard_windows.py::test_r_paste_27_1_2_right_click_copy_ends_within_typed_key_time[single]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7730785Z 100.0%  0.000 s / 0.403 s  r_tui_043_10_1_a  tests/test_b103_clipboard_windows.py::test_r_tui_043_10_1_1_2_ctrl_v_ends_within_typed_key_time[single]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7732022Z 100.0%  0.000 s / 0.403 s  r_tui_043_10_1_m  tests/test_b103_clipboard_windows.py::test_r_tui_043_10_1_1_2_ctrl_v_ends_within_typed_key_time[multi]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7733256Z 100.0%  0.000 s / 5.000 s  r_tui_043_10_2_a  tests/test_b103_clipboard_windows.py::test_r_tui_043_10_2_1_2_held_clipboard_paste_ends_within_2_5[single]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7734545Z 100.0%  0.000 s / 5.000 s  r_tui_043_10_2_m  tests/test_b103_clipboard_windows.py::test_r_tui_043_10_2_1_2_held_clipboard_paste_ends_within_2_5[multi]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7735825Z 100.0%  0.000 s / 0.403 s  r_paste_31_a  tests/test_b103_clipboard_windows.py::test_r_paste_31_1_2_right_click_paste_ends_within_typed_key_time[single]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7737121Z 100.0%  0.000 s / 0.403 s  r_paste_31_m  tests/test_b103_clipboard_windows.py::test_r_paste_31_1_2_right_click_paste_ends_within_typed_key_time[multi]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7738373Z 100.0%  0.000 s / 5.000 s  r_paste_32_a  tests/test_b103_clipboard_windows.py::test_r_paste_32_1_2_held_right_click_paste_ends_within_2_5[single]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7739598Z 100.0%  0.000 s / 5.000 s  r_paste_32_m  tests/test_b103_clipboard_windows.py::test_r_paste_32_1_2_held_right_click_paste_ends_within_2_5[multi]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7740397Z QC-TM: 16 bounds, 4 under 20 % margin
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7740824Z ============================ slowest 20 durations =============================
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7741583Z 15.34s call     tests/test_b103_clipboard_windows.py::test_r_paste_13_1_2_held_clipboard_copy_ends_within_2_5[multi]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7742610Z 15.22s call     tests/test_b103_clipboard_windows.py::test_r_paste_28_1_2_held_right_click_copy_ends_within_2_5[multi]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7743910Z 14.32s call     tests/test_b103_clipboard_windows.py::test_r_paste_27_1_2_right_click_copy_ends_within_typed_key_time[single]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7744995Z 13.57s call     tests/test_b103_clipboard_windows.py::test_r_paste_28_1_2_held_right_click_copy_ends_within_2_5[single]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7746028Z 13.43s call     tests/test_b103_clipboard_windows.py::test_r_paste_13_1_2_held_clipboard_copy_ends_within_2_5[single]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7747043Z 12.45s call     tests/test_b103_clipboard_windows.py::test_r_paste_11_1_2_copy_ends_within_typed_key_time[multi]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7748153Z 11.82s call     tests/test_b103_clipboard_windows.py::test_r_paste_27_1_2_right_click_copy_ends_within_typed_key_time[multi]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7749257Z 11.33s call     tests/test_b103_clipboard_windows.py::test_r_paste_31_1_2_right_click_paste_ends_within_typed_key_time[multi]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7750829Z 10.70s call     tests/test_b103_clipboard_windows.py::test_r_tui_043_10_1_1_2_ctrl_v_ends_within_typed_key_time[multi]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7751873Z 9.84s call     tests/test_b103_clipboard_windows.py::test_r_paste_31_5_6_right_click_no_text_no_powershell[multi]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7752875Z 9.55s call     tests/test_b103_clipboard_windows.py::test_r_paste_11_1_2_copy_ends_within_typed_key_time[single]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7753927Z 8.88s call     tests/test_b103_clipboard_windows.py::test_r_paste_31_1_2_right_click_paste_ends_within_typed_key_time[single]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7754950Z 8.85s call     tests/test_b103_clipboard_windows.py::test_r_paste_24_1_2_five_right_click_copies[multi]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7755960Z 8.52s call     tests/test_b103_clipboard_windows.py::test_r_paste_2_five_consecutive_copies_reach_other_program[multi]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7757010Z 8.13s call     tests/test_b103_clipboard_windows.py::test_r_tui_043_10_1_1_2_ctrl_v_ends_within_typed_key_time[single]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7758047Z 7.94s call     tests/test_b103_clipboard_windows.py::test_r_tui_043_11_1_code_page_characters_arrive_unchanged[single]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7759022Z 7.53s call     tests/test_b103_clipboard_windows.py::test_r_tui_043_10_1_5_6_no_text_no_powershell[multi]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7759997Z 6.98s call     tests/test_b103_clipboard_windows.py::test_r_paste_31_5_6_right_click_no_text_no_powershell[single]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7761006Z 6.64s call     tests/test_b103_clipboard_windows.py::test_r_paste_12_3_win_right_click_copy_over_limit[multi]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7761951Z 6.52s call     tests/test_b103_clipboard_windows.py::test_r_tui_043_10_1_5_6_no_text_no_powershell[single]
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7762667Z =========================== short test summary info ===========================
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7763222Z SKIPPED [24] tests\test_b103_clipboard_matrix.py:159: Windows only
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7763786Z SKIPPED [6] tests\test_b103_clipboard_matrix.py:224: Windows only
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7764352Z SKIPPED [1] tests\test_b103_clipboard_matrix.py:272: Windows only
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7764912Z SKIPPED [1] tests\test_b103_clipboard_matrix.py:300: Windows only
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7765470Z SKIPPED [2] tests\test_b103_clipboard_matrix.py:340: Windows only
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7766025Z SKIPPED [1] tests\test_b103_clipboard_matrix.py:387: Windows only
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7766576Z SKIPPED [1] tests\test_b103_clipboard_matrix.py:416: Windows only
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7767132Z SKIPPED [1] tests\test_b103_clipboard_matrix.py:447: Windows only
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:52.7767695Z ============ 13 failed, 64 passed, 37 skipped in 426.64s (0:07:06) ============
+clipboard-windows	Run the OS clipboard tests (serial, every outcome listed)	2026-11-08T19:39:53.8642482Z ##[error]Process completed with exit code 1.
