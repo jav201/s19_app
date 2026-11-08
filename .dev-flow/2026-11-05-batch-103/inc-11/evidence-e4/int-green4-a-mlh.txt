@@ -1,0 +1,7 @@
+/home/javiergr/work/b103-int11/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+.............................                                            [100%]
+29 passed in 1.61s
+A_MLH_EXIT=0

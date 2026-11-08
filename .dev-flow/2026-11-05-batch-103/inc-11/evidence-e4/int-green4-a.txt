@@ -1,0 +1,34 @@
+/home/javiergr/work/b103-int11/s19_app/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 40%]
+....F..........F........................................................ [ 80%]
+........F.........................                                       [100%]
+=================================== FAILURES ===================================
+_______________ test_r_a2l_read_7_comment_between_digits_splits ________________
+[gw4] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+tests/test_b103_a2l_reader.py:523: in test_r_a2l_read_7_comment_between_digits_splits
+    assert tag["address"] == 0x1C2D3E00
+E   assert None == 472727040
+____________________ test_r_a2l_read_28_short_header_error _____________________
+[gw4] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+tests/test_b103_a2l_reader.py:1020: in test_r_a2l_read_28_short_header_error
+    assert any("CHARACTERISTIC Synthetic has 6 of its 7 header words" in e for e in data2["errors"])
+E   assert False
+E    +  where False = any(<generator object test_r_a2l_read_28_short_header_error.<locals>.<genexpr> at 0x7fe2b497acf0>)
+__________________ test_r_a2l_read_48_tracked_files_equal_ref __________________
+[gw3] linux -- Python 3.11.18 /home/javiergr/miniconda3/envs/s19ci/bin/python
+tests/test_b103_a2l_reader.py:1584: in test_r_a2l_read_48_tracked_files_equal_ref
+    _assert_tags_equal(data["tags"], reading["tags"])
+tests/test_b103_a2l_reader.py:1623: in _assert_tags_equal
+    assert _reader_to_ref(reader[k]) == _ref_native(ref[k]), (k, _reader_to_ref(reader[k]), _ref_native(ref[k]))
+E   AssertionError: (('CHARACTERISTIC', 'ASAM.C.CURVE.STD_AXIS'), {'address': 8454912, 'bit_mask': None, 'byte_order': 'little', 'conversi...CM.IDENTICAL', ...}, {'address': 8454912, 'bit_mask': None, 'byte_order': 'little', 'conversion': 'CM.IDENTICAL', ...})
+E   assert {'address': 8...ENTICAL', ...} == {'address': 8...ENTICAL', ...}
+E     
+E     Omitting 11 identical items, use -vv to show
+E     Differing items:
+E     {'length': 25} != {'length': 8}
+E     Use -v to get more diff
+3 failed, 175 passed in 52.60s
+A_READER_EXIT=1
