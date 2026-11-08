@@ -1,0 +1,195 @@
+s19_app: /tmp/b103-fix4/s19_app/__init__.py
+
+====COLLECT-WINCI====
+tests/test_b103_clipboard_windows.py::test_runner_clipboard_probe
+tests/test_b103_clipboard_windows.py::test_r_tui_043_10_1_1_2_ctrl_v_ends_within_typed_key_time[single]
+tests/test_b103_clipboard_windows.py::test_r_tui_043_10_1_1_2_ctrl_v_ends_within_typed_key_time[multi]
+tests/test_b103_clipboard_windows.py::test_r_tui_043_10_1_5_6_no_text_no_powershell[single]
+tests/test_b103_clipboard_windows.py::test_r_tui_043_10_1_5_6_no_text_no_powershell[multi]
+tests/test_b103_clipboard_windows.py::test_r_tui_043_10_2_1_2_held_clipboard_paste_ends_within_2_5[single]
+tests/test_b103_clipboard_windows.py::test_r_tui_043_10_2_1_2_held_clipboard_paste_ends_within_2_5[multi]
+tests/test_b103_clipboard_windows.py::test_r_tui_043_6_2_held_clipboard_pastes_app_clipboard[single]
+tests/test_b103_clipboard_windows.py::test_r_tui_043_6_2_held_clipboard_pastes_app_clipboard[multi]
+tests/test_b103_clipboard_windows.py::test_r_tui_043_6_3_empty_unicode_text_pastes_app_clipboard_no_powershell[single]
+tests/test_b103_clipboard_windows.py::test_r_tui_043_6_3_empty_unicode_text_pastes_app_clipboard_no_powershell[multi]
+tests/test_b103_clipboard_windows.py::test_r_tui_043_4_1_single_line_inserts_first_line_at_cursor
+tests/test_b103_clipboard_windows.py::test_r_tui_044_3_1_multi_line_inserts_all_at_cursor
+tests/test_b103_clipboard_windows.py::test_r_tui_043_5_1_2_ctrl_v_replaces_selection[single]
+tests/test_b103_clipboard_windows.py::test_r_tui_043_5_1_2_ctrl_v_replaces_selection[multi]
+tests/test_b103_clipboard_windows.py::test_r_tui_043_11_1_code_page_characters_arrive_unchanged[single]
+tests/test_b103_clipboard_windows.py::test_r_tui_043_11_1_code_page_characters_arrive_unchanged[multi]
+tests/test_b103_clipboard_windows.py::test_r_tui_043_12_2_held_clipboard_logs_warning
+tests/test_b103_clipboard_windows.py::test_r_tui_043_13_1_no_clipboard_text_in_log_win
+tests/test_b103_clipboard_windows.py::test_r_tui_044_2_4_ctrl_v_of_os_text_capped[single]
+tests/test_b103_clipboard_windows.py::test_r_tui_044_2_4_ctrl_v_of_os_text_capped[multi]
+tests/test_b103_clipboard_windows.py::test_r_tui_044_2_7_win32_read_bounded_on_no_terminator
+tests/test_b103_clipboard_windows.py::test_r_paste_34_2_own_write_strips_single_line
+tests/test_b103_clipboard_windows.py::test_r_paste_34_4_win_right_click_strips_single_line
+tests/test_b103_clipboard_windows.py::test_r_paste_35_2_own_write_strips_multi_line
+tests/test_b103_clipboard_windows.py::test_r_paste_35_4_win_right_click_strips_multi_line
+tests/test_b103_clipboard_windows.py::test_r_paste_2_five_consecutive_copies_reach_other_program[single]
+tests/test_b103_clipboard_windows.py::test_r_paste_2_five_consecutive_copies_reach_other_program[multi]
+tests/test_b103_clipboard_windows.py::test_r_paste_3_win_copy_puts_selection_on_app_clipboard
+tests/test_b103_clipboard_windows.py::test_r_paste_5_win_no_selection_keeps_os_clipboard
+tests/test_b103_clipboard_windows.py::test_r_paste_6_win_cut_copies_selection
+tests/test_b103_clipboard_windows.py::test_r_paste_9_2_held_clipboard_write_warning[single]
+tests/test_b103_clipboard_windows.py::test_r_paste_9_2_held_clipboard_write_warning[multi]
+tests/test_b103_clipboard_windows.py::test_r_paste_11_1_2_copy_ends_within_typed_key_time[single]
+tests/test_b103_clipboard_windows.py::test_r_paste_11_1_2_copy_ends_within_typed_key_time[multi]
+tests/test_b103_clipboard_windows.py::test_r_paste_12_2_copy_over_limit_os[single]
+tests/test_b103_clipboard_windows.py::test_r_paste_12_2_copy_over_limit_os[multi]
+tests/test_b103_clipboard_windows.py::test_r_paste_13_1_2_held_clipboard_copy_ends_within_2_5[single]
+tests/test_b103_clipboard_windows.py::test_r_paste_13_1_2_held_clipboard_copy_ends_within_2_5[multi]
+tests/test_b103_clipboard_windows.py::test_r_tui_043_9_1_held_read_ctrl_v_stays_responsive
+tests/test_b103_clipboard_windows.py::test_r_paste_14_1_held_write_ctrl_c_stays_responsive
+tests/test_b103_clipboard_windows.py::test_r_paste_14_2_held_write_right_click_stays_responsive
+tests/test_b103_clipboard_windows.py::test_r_tui_043_9_2_held_read_right_click_stays_responsive
+tests/test_b103_clipboard_windows.py::test_r_paste_24_1_2_five_right_click_copies[single]
+tests/test_b103_clipboard_windows.py::test_r_paste_24_1_2_five_right_click_copies[multi]
+tests/test_b103_clipboard_windows.py::test_r_paste_24_3_unfocused_multi_line_right_click_copies
+tests/test_b103_clipboard_windows.py::test_r_paste_25_26_win_right_click_copy_app_clipboard[single]
+tests/test_b103_clipboard_windows.py::test_r_paste_25_26_win_right_click_copy_app_clipboard[multi]
+tests/test_b103_clipboard_windows.py::test_r_paste_27_1_2_right_click_copy_ends_within_typed_key_time[single]
+tests/test_b103_clipboard_windows.py::test_r_paste_27_1_2_right_click_copy_ends_within_typed_key_time[multi]
+tests/test_b103_clipboard_windows.py::test_r_paste_28_1_2_held_right_click_copy_ends_within_2_5[single]
+tests/test_b103_clipboard_windows.py::test_r_paste_28_1_2_held_right_click_copy_ends_within_2_5[multi]
+tests/test_b103_clipboard_windows.py::test_r_paste_29_30_win_right_click_paste_placement[single]
+tests/test_b103_clipboard_windows.py::test_r_paste_29_30_win_right_click_paste_placement[multi]
+tests/test_b103_clipboard_windows.py::test_r_paste_31_1_2_right_click_paste_ends_within_typed_key_time[single]
+tests/test_b103_clipboard_windows.py::test_r_paste_31_1_2_right_click_paste_ends_within_typed_key_time[multi]
+tests/test_b103_clipboard_windows.py::test_r_paste_31_5_6_right_click_no_text_no_powershell[single]
+tests/test_b103_clipboard_windows.py::test_r_paste_31_5_6_right_click_no_text_no_powershell[multi]
+tests/test_b103_clipboard_windows.py::test_r_paste_32_1_2_held_right_click_paste_ends_within_2_5[single]
+tests/test_b103_clipboard_windows.py::test_r_paste_32_1_2_held_right_click_paste_ends_within_2_5[multi]
+tests/test_b103_clipboard_windows.py::test_r_tui_043_6_5_win_right_click_pastes_app_clipboard[single]
+tests/test_b103_clipboard_windows.py::test_r_tui_043_6_5_win_right_click_pastes_app_clipboard[multi]
+tests/test_b103_clipboard_windows.py::test_r_tui_043_11_2_right_click_keeps_code_page[single]
+tests/test_b103_clipboard_windows.py::test_r_tui_043_11_2_right_click_keeps_code_page[multi]
+tests/test_b103_clipboard_windows.py::test_r_tui_043_12_3_win_right_click_held_logs_warning
+tests/test_b103_clipboard_windows.py::test_r_tui_043_13_2_win_right_click_no_log_leak
+tests/test_b103_clipboard_windows.py::test_r_tui_044_2_6_win_right_click_paste_capped[single]
+tests/test_b103_clipboard_windows.py::test_r_tui_044_2_6_win_right_click_paste_capped[multi]
+tests/test_b103_clipboard_windows.py::test_r_paste_12_3_win_right_click_copy_over_limit[single]
+tests/test_b103_clipboard_windows.py::test_r_paste_12_3_win_right_click_copy_over_limit[multi]
+tests/test_b103_clipboard_windows.py::test_r_paste_10_2_win_right_click_copy_logs_warning
+tests/test_b103_clipboard_windows.py::test_r_paste_16_1_read_rescue_starts_system_powershell
+tests/test_b103_clipboard_windows.py::test_r_paste_16_2_write_rescue_starts_system_powershell
+tests/test_b103_clipboard_windows.py::test_r_paste_16_3_decoy_powershell_never_runs
+tests/test_b103_clipboard_windows.py::test_r_paste_17_no_powershell_starts_nothing[read]
+tests/test_b103_clipboard_windows.py::test_r_paste_17_no_powershell_starts_nothing[write]
+tests/test_b103_clipboard_windows.py::test_r_paste_21_5_direct_win32_call_opens_nothing_and_fails
+
+77 tests collected in 0.12s
+
+====COLLECT-CORE====
+tests/test_b103_clipboard_core.py::test_r_tui_043_6_1_linux_ctrl_v_pastes_app_clipboard
+tests/test_b103_clipboard_core.py::test_r_tui_043_7_1_and_043_8_1_neither_clipboard_warns_and_selects[single]
+tests/test_b103_clipboard_core.py::test_r_tui_043_7_1_and_043_8_1_neither_clipboard_warns_and_selects[multi]
+tests/test_b103_clipboard_core.py::test_r_tui_043_12_1_warning_line_when_no_text_read_on_linux[single]
+tests/test_b103_clipboard_core.py::test_r_tui_043_12_1_warning_line_when_no_text_read_on_linux[multi]
+tests/test_b103_clipboard_core.py::test_r_tui_043_13_1_no_clipboard_text_reaches_the_log
+tests/test_b103_clipboard_core.py::test_r_paste_1_1_terminal_paste_single_line_takes_first_line
+tests/test_b103_clipboard_core.py::test_r_paste_1_2_terminal_paste_first_line_non_codepage
+tests/test_b103_clipboard_core.py::test_r_tui_044_4_1_terminal_paste_multi_line_inserts_every_line_once
+tests/test_b103_clipboard_core.py::test_r_tui_044_2_1_terminal_paste_single_line_capped
+tests/test_b103_clipboard_core.py::test_r_tui_044_2_2_app_clipboard_fallback_single_line_capped
+tests/test_b103_clipboard_core.py::test_r_tui_044_2_3_terminal_paste_multi_line_capped
+tests/test_b103_clipboard_core.py::test_r_tui_044_2_5_load_path_box_keeps_its_own_limit
+tests/test_b103_clipboard_core.py::test_r_paste_34_1_terminal_paste_single_line_strips_unsafe
+tests/test_b103_clipboard_core.py::test_r_paste_34_3_app_clipboard_fallback_single_line_strips
+tests/test_b103_clipboard_core.py::test_r_paste_34_4_right_click_paste_single_line_strips
+tests/test_b103_clipboard_core.py::test_r_paste_34_5_load_path_not_stripped_refuses_control_whole
+tests/test_b103_clipboard_core.py::test_r_paste_35_1_terminal_paste_multi_line_strips
+tests/test_b103_clipboard_core.py::test_r_paste_35_3_app_clipboard_fallback_multi_line_strips
+tests/test_b103_clipboard_core.py::test_r_paste_35_4_right_click_paste_multi_line_strips
+tests/test_b103_clipboard_core.py::test_r_loaddlg_20_1_terminal_paste_path_box_refuses_unsafe
+tests/test_b103_clipboard_core.py::test_r_loaddlg_20_2_ctrl_v_path_box_refuses_unsafe
+tests/test_b103_clipboard_core.py::test_r_loaddlg_20_3_right_click_path_box_refuses_unsafe
+tests/test_b103_clipboard_core.py::test_r_loaddlg_20_4_path_box_refuses_del_payload
+tests/test_b103_clipboard_core.py::test_r_paste_3_copy_puts_selection_on_app_clipboard
+tests/test_b103_clipboard_core.py::test_r_paste_4_copy_leaves_box_unchanged
+tests/test_b103_clipboard_core.py::test_r_paste_5_no_selection_changes_no_clipboard[c]
+tests/test_b103_clipboard_core.py::test_r_paste_5_no_selection_changes_no_clipboard[x]
+tests/test_b103_clipboard_core.py::test_r_paste_5_no_selection_changes_no_clipboard[x_multi]
+tests/test_b103_clipboard_core.py::test_r_paste_6_cut_copies_selection
+tests/test_b103_clipboard_core.py::test_r_paste_7_cut_removes_selection
+tests/test_b103_clipboard_core.py::test_r_paste_8_no_selection_cut_cuts_cursor_line
+tests/test_b103_clipboard_core.py::test_r_paste_9_1_write_failure_warning_on_linux[single]
+tests/test_b103_clipboard_core.py::test_r_paste_9_1_write_failure_warning_on_linux[multi]
+tests/test_b103_clipboard_core.py::test_r_paste_10_1_warning_line_per_failed_copy_without_text
+tests/test_b103_clipboard_core.py::test_r_paste_12_1_copy_over_limit_keeps_first_65536
+tests/test_b103_clipboard_core.py::test_r_paste_15_one_osc52_request_per_copy[copy_a]
+tests/test_b103_clipboard_core.py::test_r_paste_15_one_osc52_request_per_copy[cut_a]
+tests/test_b103_clipboard_core.py::test_r_paste_15_one_osc52_request_per_copy[copy_m]
+tests/test_b103_clipboard_core.py::test_r_paste_15_one_osc52_request_per_copy[cut_m]
+tests/test_b103_clipboard_core.py::test_r_paste_15_one_osc52_request_per_copy[line_cut_m]
+tests/test_b103_clipboard_core.py::test_r_paste_25_right_click_puts_selection_on_app_clipboard[single]
+tests/test_b103_clipboard_core.py::test_r_paste_25_right_click_puts_selection_on_app_clipboard[multi]
+tests/test_b103_clipboard_core.py::test_r_paste_26_right_click_copy_leaves_text_and_selection[single]
+tests/test_b103_clipboard_core.py::test_r_paste_26_right_click_copy_leaves_text_and_selection[multi]
+tests/test_b103_clipboard_core.py::test_r_paste_29_1_right_click_no_selection_pastes_at_cursor
+tests/test_b103_clipboard_core.py::test_r_paste_29_3_right_click_empty_box_pastes
+tests/test_b103_clipboard_core.py::test_r_paste_30_1_right_click_multi_line_pastes_all
+tests/test_b103_clipboard_core.py::test_r_paste_9_4_write_failure_warning_after_right_click_copy
+tests/test_b103_clipboard_core.py::test_r_paste_10_2_warning_line_per_failed_right_click_copy
+tests/test_b103_clipboard_core.py::test_r_paste_12_3_right_click_copy_over_limit
+tests/test_b103_clipboard_core.py::test_r_paste_15_6_7_one_osc52_request_for_right_click_copy[single]
+tests/test_b103_clipboard_core.py::test_r_paste_15_6_7_one_osc52_request_for_right_click_copy[multi]
+tests/test_b103_clipboard_core.py::test_r_tui_043_6_5_right_click_no_selection_pastes_app_clipboard
+tests/test_b103_clipboard_core.py::test_r_tui_043_7_2_and_043_8_2_right_click_warns_and_selects[single]
+tests/test_b103_clipboard_core.py::test_r_tui_043_7_2_and_043_8_2_right_click_warns_and_selects[multi]
+tests/test_b103_clipboard_core.py::test_r_tui_043_12_3_warning_line_on_right_click_no_text
+tests/test_b103_clipboard_core.py::test_r_tui_043_13_2_no_clipboard_text_in_log_on_right_click
+tests/test_b103_clipboard_core.py::test_r_tui_044_2_6_right_click_paste_capped
+tests/test_b103_clipboard_core.py::test_r_tui_043_10_1_3_4_linux_ctrl_v_ends_within_typed_key_time[single]
+tests/test_b103_clipboard_core.py::test_r_tui_043_10_1_3_4_linux_ctrl_v_ends_within_typed_key_time[multi]
+tests/test_b103_clipboard_core.py::test_r_paste_11_3_linux_copy_ends_within_typed_key_time
+tests/test_b103_clipboard_core.py::test_r_paste_27_3_linux_right_click_copy_ends_within_typed_key_time
+tests/test_b103_clipboard_core.py::test_r_paste_31_3_4_linux_right_click_paste_ends_within_typed_key_time[single]
+tests/test_b103_clipboard_core.py::test_r_paste_31_3_4_linux_right_click_paste_ends_within_typed_key_time[multi]
+tests/test_b103_clipboard_core.py::test_r_tui_044_1_18_every_single_line_box_is_os_clipboard_input
+tests/test_b103_clipboard_core.py::test_r_paste_18_8_every_multi_line_box_is_capped_text_area
+tests/test_b103_clipboard_core.py::test_r_paste_19_1_and_33_1_every_text_box_is_the_two_classes
+tests/test_b103_clipboard_core.py::test_r_paste_20_1_windows_workflow_runs_os_clipboard_tests
+tests/test_b103_clipboard_core.py::test_r_paste_21_1_windows_not_github_hosted_stops_before_open
+tests/test_b103_clipboard_core.py::test_r_paste_21_2_x_display_session_did_not_start_stops
+tests/test_b103_clipboard_core.py::test_r_paste_21_3_isolated_clipboard_lets_the_test_go_on
+tests/test_b103_clipboard_core.py::test_r_paste_21_4_outside_clipboard_files_fails_before_open
+tests/test_b103_clipboard_core.py::test_r_paste_22_1_failed_probe_skips_os_clipboard_tests
+tests/test_b103_clipboard_core.py::test_r_paste_23_1_failed_probe_fails_the_probe_test
+tests/test_b103_clipboard_core.py::test_r_paste_23_2_passing_probe_passes_the_probe_test
+tests/test_b103_clipboard_core.py::test_r_paste_36_1_redaction_gate_scans_batch_103_and_names_planted_leaks
+tests/test_b103_clipboard_core.py::test_r_tui_043_5_3_terminal_paste_replaces_selection[single]
+tests/test_b103_clipboard_core.py::test_r_tui_043_5_3_terminal_paste_replaces_selection[multi]
+tests/test_b103_clipboard_core.py::test_r_paste_34_6_pasted_nul_kept_consumer_refuses
+tests/test_b103_clipboard_core.py::test_r_paste_25_3_and_26_3_multi_line_unfocused_right_click_copies
+tests/test_b103_clipboard_core.py::test_r_paste_29_2_unfocused_single_line_pastes_at_cursor
+tests/test_b103_clipboard_core.py::test_r_paste_29_4_blur_back_to_back_pastes_and_copies_nothing
+tests/test_b103_clipboard_core.py::test_r_paste_30_2_unfocused_multi_line_pastes_at_cursor
+tests/test_b103_clipboard_core.py::test_r_tui_043_6_4_linux_x_clipboard_is_not_read
+tests/test_b103_clipboard_core.py::test_r_paste_9_3_linux_copy_leaves_x_clipboard
+tests/test_b103_clipboard_core.py::test_r_tui_044_2_8_win32_read_bounded_by_global_size
+
+87 tests collected in 0.17s
+
+====RUN-A====
+........................................................................ [ 82%]
+............ss.                                                          [100%]
+============================= QC-TM timing margins =============================
+22.5%  0.267 s / 0.344 s  r_paste_31_a  tests/test_b103_clipboard_core.py::test_r_paste_31_3_4_linux_right_click_paste_ends_within_typed_key_time[single]
+27.5%  0.254 s / 0.350 s  r_tui_043_10_1_a  tests/test_b103_clipboard_core.py::test_r_tui_043_10_1_3_4_linux_ctrl_v_ends_within_typed_key_time[single]
+28.3%  0.235 s / 0.328 s  r_tui_043_10_1_m  tests/test_b103_clipboard_core.py::test_r_tui_043_10_1_3_4_linux_ctrl_v_ends_within_typed_key_time[multi]
+32.0%  0.240 s / 0.353 s  r_paste_11_3  tests/test_b103_clipboard_core.py::test_r_paste_11_3_linux_copy_ends_within_typed_key_time
+32.5%  0.218 s / 0.323 s  r_paste_31_m  tests/test_b103_clipboard_core.py::test_r_paste_31_3_4_linux_right_click_paste_ends_within_typed_key_time[multi]
+38.8%  0.216 s / 0.353 s  r_paste_27_3  tests/test_b103_clipboard_core.py::test_r_paste_27_3_linux_right_click_copy_ends_within_typed_key_time
+QC-TM: 6 bounds, 0 under 20 % margin
+85 passed, 2 skipped in 287.62s (0:04:47)
+
+====RUN-A-XVFB====
+..                                                                       [100%]
+2 passed in 5.50s
+
+====RUN-WINCI====
+ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss [ 93%]
+sssss                                                                    [100%]
+77 skipped in 0.16s

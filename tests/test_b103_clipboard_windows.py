@@ -277,6 +277,13 @@ def test_r_tui_043_10_2_1_2_held_clipboard_paste_ends_within_2_5(
             start = time.monotonic()
             await pilot.press("ctrl+v")
             elapsed = await _wait_for_box(pilot, widget, "APP-TEXT")
+            if box_kind == "a":
+                # C5: settle the _apply_filter debounce (0.15 s) while the a2l
+                # screen is still mounted, so its timer callback cannot fire
+                # during teardown against the unmounted #a2l_tags_list
+                # (NoMatches on Screen('_default')).
+                await asyncio.sleep(0.25)
+                await pilot.pause()
             return elapsed
 
     try:
@@ -289,27 +296,68 @@ def test_r_tui_043_10_2_1_2_held_clipboard_paste_ends_within_2_5(
 
 def _hold_clipboard(seconds: float) -> dict:
     """Hold the clipboard from a separate process (never a thread of the
-    test process): a child interpreter opens the clipboard with
-    ``OpenClipboard`` and sleeps until killed. The ready handshake is one
-    ``HOLDING`` line on stdout; ``release.set()`` (or the ``seconds``
-    fallback) kills the child, which makes Windows drop the hold."""
+    test process) so a held read/write really fails cross-process.
+
+    The child creates a message-only window (``CreateWindowExW`` with parent
+    ``HWND_MESSAGE``) so the clipboard is owned by a real window, opens the
+    clipboard with that ``hwnd`` and keeps it open while pumping messages
+    until killed; ``release.set()`` (or the ``seconds`` fallback) kills the
+    child, which makes Windows drop the hold. The parent then VERIFIES the
+    hold with its own ``OpenClipboard(None)``: it must return 0 (the child
+    holds the clipboard), otherwise the hold is not effective and this raises
+    ``clipboard hold not effective`` (run-3 triage C4).
+    """
     script = textwrap.dedent(
         """
         import ctypes
         import sys
-        import time
         from ctypes import wintypes
 
         user32 = ctypes.windll.user32
+        kernel32 = ctypes.windll.kernel32
+
+        kernel32.GetModuleHandleW.restype = wintypes.HMODULE
+        kernel32.GetModuleHandleW.argtypes = [wintypes.LPCWSTR]
+
+        user32.CreateWindowExW.argtypes = [
+            wintypes.DWORD, wintypes.LPCWSTR, wintypes.LPCWSTR, wintypes.DWORD,
+            ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int,
+            wintypes.HWND, wintypes.HANDLE, wintypes.HMODULE, ctypes.c_void_p,
+        ]
+        user32.CreateWindowExW.restype = wintypes.HWND
+
+        hinstance = kernel32.GetModuleHandleW(None)
+        hwnd = user32.CreateWindowExW(
+            0, "STATIC", "b103-holder", 0,
+            0, 0, 0, 0, -3, None, hinstance, None,  # HWND_MESSAGE = -3
+        )
+        if not hwnd:
+            print("WINDOW-FAILED", flush=True)
+            sys.exit(1)
+
         user32.OpenClipboard.argtypes = [wintypes.HWND]
         user32.OpenClipboard.restype = wintypes.BOOL
-        user32.CloseClipboard.restype = wintypes.BOOL
-        if not user32.OpenClipboard(None):
+        if not user32.OpenClipboard(hwnd):
             print("OPEN-FAILED", flush=True)
             sys.exit(1)
         print("HOLDING", flush=True)
+
+        user32.PeekMessageW.argtypes = [
+            ctypes.POINTER(wintypes.MSG), wintypes.HWND, wintypes.UINT,
+            wintypes.UINT, wintypes.UINT,
+        ]
+        user32.PeekMessageW.restype = wintypes.BOOL
+        user32.TranslateMessage.argtypes = [ctypes.POINTER(wintypes.MSG)]
+        user32.TranslateMessage.restype = wintypes.BOOL
+        user32.DispatchMessageW.argtypes = [ctypes.POINTER(wintypes.MSG)]
+        user32.DispatchMessageW.restype = ctypes.c_ssize_t
+
+        msg = wintypes.MSG()
         while True:
-            time.sleep(0.05)
+            while user32.PeekMessageW(ctypes.byref(msg), None, 0, 0, 1):
+                user32.TranslateMessage(ctypes.byref(msg))
+                user32.DispatchMessageW(ctypes.byref(msg))
+            user32.Sleep(10)
         """
     )
     proc = subprocess.Popen(
@@ -323,6 +371,18 @@ def _hold_clipboard(seconds: float) -> dict:
     if ready != "HOLDING":
         proc.wait()
         raise RuntimeError(f"clipboard hold child failed to hold: {ready!r}")
+
+    # Verify the hold cross-process before any test proceeds: this process's
+    # own OpenClipboard must fail (return 0) because the child holds it. A
+    # nonzero return means the hold is not effective (run-3 triage C4).
+    if _open_clipboard_probe() != 0:
+        proc.kill()
+        proc.wait()
+        raise RuntimeError(
+            "clipboard hold not effective: parent OpenClipboard returned "
+            "nonzero (expected 0) while the child reports HOLDING"
+        )
+
     state = {"proc": proc, "release": threading.Event()}
 
     def _supervisor() -> None:
@@ -333,6 +393,26 @@ def _hold_clipboard(seconds: float) -> dict:
 
     threading.Thread(target=_supervisor, daemon=True).start()
     return state
+
+
+def _open_clipboard_probe() -> int:
+    """This process's ``OpenClipboard(None)`` BOOL (0 = held by another task).
+
+    Used by :func:`_hold_clipboard` to verify the child really holds the
+    clipboard: a nonzero return (this process could open it) closes the
+    clipboard again and signals the hold is ineffective.
+    """
+    import ctypes
+    from ctypes import wintypes
+
+    user32 = ctypes.windll.user32
+    user32.OpenClipboard.argtypes = [wintypes.HWND]
+    user32.OpenClipboard.restype = wintypes.BOOL
+    user32.CloseClipboard.restype = wintypes.BOOL
+    result = int(user32.OpenClipboard(None))
+    if result:
+        user32.CloseClipboard()
+    return result
 
 
 @pytest.mark.parametrize("box_kind", ["a", "m"], ids=["single", "multi"])
