@@ -125,6 +125,7 @@ _POWERSHELL_SUBPROCESS_LOCK = threading.Lock()
 _POWERSHELL_WRITE_COMMAND = (
     "-NoProfile",
     "-Command",
+    "$ErrorActionPreference='Stop';"
     "[Console]::InputEncoding=[System.Text.Encoding]::UTF8;"
     "$input | Set-Clipboard",
 )
@@ -425,7 +426,11 @@ def _write_via_powershell(text: str) -> bool:
     ``_POWERSHELL_SUBPROCESS_LOCK`` so key spam cannot spawn concurrent
     PowerShell processes. Returns ``True`` only for exit code 0; ``False``
     off Windows, on timeout (``_POWERSHELL_TIMEOUT_S``), on missing
-    PowerShell or on any non-zero exit.
+    PowerShell, on any non-zero exit or on any stderr output (a held
+    clipboard makes PowerShell 5.1 ``Set-Clipboard`` emit a non-terminating
+    error and still exit 0, so ``$ErrorActionPreference='Stop'`` promotes
+    it to a terminating error and any remaining stderr is treated as
+    failure).
     """
     if sys.platform != "win32":
         return False
@@ -458,7 +463,7 @@ def _write_via_powershell(text: str) -> bool:
     except OSError as exc:
         logger.debug("_write_via_powershell subprocess OSError: %s", exc)
         return False
-    if result.returncode != 0:
+    if result.returncode != 0 or result.stderr:
         logger.debug(
             "_write_via_powershell exit=%d stderr_len=%d",
             result.returncode,
