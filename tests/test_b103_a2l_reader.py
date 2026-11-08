@@ -1843,20 +1843,140 @@ def test_r_a2l_read_51_control_chars_as_fffd(tmp_path: Path) -> None:
 
 
 def test_at_b103_i11_2_commented_old_copy_changes_nothing(tmp_path: Path) -> None:
-    """AT-B103-I11-2 (RP-B28): 1 row X at 0x1234; no duplicate issue."""
-    from s19_app.validation.rules import validate_a2l_structure
+    """AT-B103-I11-2 (RP-B28) through the app: exactly one A2L Explorer row X
+    at 0x1234, no ``A2L_DUPLICATE_SYMBOL`` issue on the Issues screen, and a
+    Workspace A2L summary that names one tag X at 0x1234 (never 0x9999)."""
+    from textual.widgets import DataTable, Static
 
-    body = _body("/*\n" + meas("X", " ECU_ADDRESS 0x9999") + "\n*/\n" + meas("X", " ECU_ADDRESS 0x1234"))
-    data = _parse(tmp_path, body)
-    xs = _tags_named(data, "X")
-    assert len(xs) == 1 and xs[0]["address"] == 0x1234
-    issues = validate_a2l_structure(data)
-    assert not [i for i in issues if i.code == "A2L_DUPLICATE_SYMBOL"]
+    from s19_app.tui.app import S19TuiApp
+    from s19_app.tui.changes.io import emit_s19_from_mem_map
+    from s19_app.tui.issues_view import GroupedIssuesPanel, IssueRow
+
+    from tests.support import b100_projects as projects
+    from tests.support.b100_workers import settle_workers
+    from tests.support.timing import wait_until
+
+    image = tmp_path / "img.s19"
+    image.write_text(
+        emit_s19_from_mem_map({0x1234: 0xAA}, [(0x1234, 0x1235)]),
+        encoding="ascii",
+    )
+    a2l = tmp_path / "rp_b28.a2l"
+    a2l.write_text(
+        _body(
+            "/*\n" + meas("X", " ECU_ADDRESS 0x9999") + "\n*/\n"
+            + meas("X", " ECU_ADDRESS 0x1234")
+        ),
+        encoding="utf-8",
+    )
+
+    def _strip_glyph(cell: str) -> str:
+        for glyph in ("✓ ", "· "):
+            if cell.startswith(glyph):
+                return cell[len(glyph):]
+        return cell
+
+    def _painted(widget) -> str:
+        rendered = widget.render()
+        return getattr(rendered, "plain", str(rendered))
+
+    async def scenario(app: S19TuiApp, pilot, log) -> None:
+        # Load the image first, so the later A2L attach runs the real
+        # cross-artifact validation engine (the duplicate-symbol source).
+        app.load_selected_file(image)
+        await wait_until(
+            pilot,
+            lambda: app.current_file is not None
+            and app.current_file.path.name == image.name,
+            f"the image load of {image.name}",
+        )
+        await settle_workers(pilot)
+
+        # Drive the app's actual A2L attach action.
+        app.load_a2l_from_path(a2l)
+        await settle_workers(pilot)
+        await wait_until(
+            pilot,
+            lambda: app.current_a2l_path is not None,
+            "the A2L attach did not land",
+        )
+
+        # A2L Explorer: exactly one row X, at 0x1234.
+        app.action_show_screen("a2l")
+        for _ in range(6):
+            await pilot.pause()
+        table = app.query_one("#a2l_tags_list", DataTable)
+        rows = [table.get_row_at(i) for i in range(table.row_count)]
+        names = [_strip_glyph(str(row[0])) for row in rows]
+        assert names == ["X"], f"expected exactly one X row, got {names!r}"
+        assert str(rows[0][1]) == "0x00001234", (
+            f"expected X at 0x00001234, got {str(rows[0][1])!r}"
+        )
+
+        # Issues screen: no A2L_DUPLICATE_SYMBOL issue for X.
+        app.action_show_screen("issues")
+        for _ in range(6):
+            await pilot.pause()
+        panel = app.query_one("#validation_issues_groups", GroupedIssuesPanel)
+        duplicates = [
+            row.issue.code
+            for row in panel.query(IssueRow)
+            if row.issue.code == "A2L_DUPLICATE_SYMBOL"
+        ]
+        assert duplicates == [], f"unexpected duplicate-symbol issues: {duplicates!r}"
+
+        # Workspace A2L summary reports one tag X at 0x1234, never 0x9999.
+        app.action_show_screen("workspace")
+        for _ in range(6):
+            await pilot.pause()
+        summary = _painted(app.query_one("#a2l_view", Static))
+        assert "A2L Tags:" in summary
+        assert "- MEASUREMENT X: 0x00001234" in summary
+        assert "0x00009999" not in summary
+
+    projects.run_app(tmp_path / "app", scenario, size=(160, 50))
 
 
 def test_at_b103_i11_3_v171_loads_clean(tmp_path: Path) -> None:
-    """AT-B103-I11-3: V171 loads clean and the summary shows sections and tags."""
-    data = parse_a2l_file(REPO_ROOT / "examples" / "case_00_public" / "ASAP2_Demo_V171.a2l")
-    assert data["errors"] == []
-    view = render_a2l_view(data)
-    assert "A2L Sections:" in view and "A2L Tags:" in view
+    """AT-B103-I11-3 through the app: the real A2L attach action loads
+    ``ASAP2_Demo_V171.a2l``, the application status names the file, and the
+    Workspace A2L summary shows ``A2L Sections:`` and ``A2L Tags:`` with no
+    ``A2L parse errors:`` block."""
+    from textual.widgets import Static
+
+    from s19_app.tui.app import S19TuiApp
+
+    from tests.support import b100_projects as projects
+    from tests.support.b100_workers import settle_workers
+    from tests.support.timing import wait_until
+
+    v171 = REPO_ROOT / "examples" / "case_00_public" / "ASAP2_Demo_V171.a2l"
+
+    def _painted(widget) -> str:
+        rendered = widget.render()
+        return getattr(rendered, "plain", str(rendered))
+
+    async def scenario(app: S19TuiApp, pilot, log) -> None:
+        app.load_a2l_from_path(v171)
+        await settle_workers(pilot)
+        await wait_until(
+            pilot,
+            lambda: app.current_a2l_path is not None,
+            "the V171 A2L attach did not land",
+        )
+
+        # The application status names the loaded file.
+        assert any(
+            "A2L loaded: ASAP2_Demo_V171.a2l" in message for message in log.messages
+        ), log.messages
+
+        # The Workspace A2L summary shows sections and tags, no parse errors.
+        app.action_show_screen("workspace")
+        for _ in range(6):
+            await pilot.pause()
+        summary = _painted(app.query_one("#a2l_view", Static))
+        assert "A2L Sections:" in summary, summary
+        assert "A2L Tags:" in summary, summary
+        assert "A2L parse errors:" not in summary, summary
+
+    projects.run_app(tmp_path / "app", scenario, size=(160, 50))

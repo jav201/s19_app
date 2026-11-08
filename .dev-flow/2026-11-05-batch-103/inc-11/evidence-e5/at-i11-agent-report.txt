@@ -1,0 +1,46 @@
+Done. All four evidence transcripts are landed in `inc-11/evidence-e5/`, the runner scratch is removed, and nothing is committed.
+
+## Summary
+
+Replaced the two partial acceptance tests in `tests/test_b103_a2l_reader.py` with full application-level tests that drive the real `S19TuiApp` through `run_test`/Pilot. Diff: **+133 / −13** in that one file only (plus the evidence transcripts).
+
+### App routes and observable assertions
+
+**AT-B103-I11-2** (`test_at_b103_i11_2_commented_old_copy_changes_nothing`)
+- Loads a real S19 (byte at `0x1234`, via `emit_s19_from_mem_map`) through `app.load_selected_file`, then the A2L through `app.load_a2l_from_path`.
+- A2L Explorer (`#a2l_tags_list` DataTable, shown via `action_show_screen("a2l")`): asserts `get_row_at` yields exactly one row whose name is `X` and whose address cell is `0x00001234`.
+- Issues screen (`#validation_issues_groups` `GroupedIssuesPanel`, shown via `action_show_screen("issues")`): asserts no mounted `IssueRow` carries `issue.code == "A2L_DUPLICATE_SYMBOL"`.
+- Workspace A2L summary (`#a2l_view` Static, shown via `action_show_screen("workspace")`): asserts `A2L Tags:`, the line `- MEASUREMENT X: 0x00001234`, and that `0x00009999` is absent.
+
+**AT-B103-I11-3** (`test_at_b103_i11_3_v171_loads_clean`)
+- Loads `examples/case_00_public/ASAP2_Demo_V171.a2l` through the real `app.load_a2l_from_path`.
+- Status log: asserts `A2L loaded: ASAP2_Demo_V171.a2l`.
+- Workspace `#a2l_view`: asserts `A2L Sections:` and `A2L Tags:` present and `A2L parse errors:` absent.
+
+No `parse_a2l_file`, `render_a2l_view`, `validate_a2l_structure`, or parser dicts are used as evidence — all assertions read painted widgets.
+
+### RED / GREEN counts and exit codes
+
+| Run | Result | Exit |
+|---|---|---|
+| RED (old reader) | `2 failed` — both behavioral | `1` |
+| GREEN (`c351ed7b`) | `2 passed` | `0` |
+| Regression: `test_b103_a2l_reader.py` (`-m "not serial_timing" -n 8`) | `183 passed` | `0` |
+| Laws: `test_id_registry.py` + `test_suite_hygiene.py` | `79 passed` | `0` |
+
+RED failures are the required behavioral ones: AT-2 got `['X', 'X']` (the commented-out copy became live), and AT-3's summary showed `A2L parse errors:\n- Unclosed /begin sections detected.` — not import/fixture failures.
+
+### One deviation you should know about (RED base commit)
+
+The brief names `e07fb00` for the RED checkout, but that commit predates the Inc 2a `s19_app/tui/a2l_definition.py` module, which the test file imports **unguarded** at module scope (`describe_definition`). Collection on `e07fb00` would therefore fail on that import — a non-behavioral failure the brief explicitly rules out.
+
+I used **`10d01dc1`** ("batch-103 Inc 11: E4 handoffs") instead, verified as:
+- `tui/a2l.py` **byte-identical** to `e07fb00` (`git diff e07fb00 10d01dc1 -- s19_app/tui/a2l.py` = 0 lines) → same old-reader behavior;
+- has `a2l_definition.describe_definition` (so collection works);
+- lacks `extract_declared_spans` (the one guarded import).
+
+So the behavioral RED is exactly the old reader's, without an import-level collection break.
+
+### Remaining limitation
+
+None within the acceptance scope. Both ATs are independent, deterministic, and use the repository's settled/wait helpers (`settle_workers`, `wait_until`), not fixed sleeps. Product code and other tests/records were not touched.

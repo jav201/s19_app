@@ -1,0 +1,265 @@
+/tmp/b103-e5-11-at/red/s19_app/__init__.py
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+____________ test_at_b103_i11_2_commented_old_copy_changes_nothing _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-39/test_at_b103_i11_2_commented_o0')
+
+    def test_at_b103_i11_2_commented_old_copy_changes_nothing(tmp_path: Path) -> None:
+        """AT-B103-I11-2 (RP-B28) through the app: exactly one A2L Explorer row X
+        at 0x1234, no ``A2L_DUPLICATE_SYMBOL`` issue on the Issues screen, and a
+        Workspace A2L summary that names one tag X at 0x1234 (never 0x9999)."""
+        from textual.widgets import DataTable, Static
+    
+        from s19_app.tui.app import S19TuiApp
+        from s19_app.tui.changes.io import emit_s19_from_mem_map
+        from s19_app.tui.issues_view import GroupedIssuesPanel, IssueRow
+    
+        from tests.support import b100_projects as projects
+        from tests.support.b100_workers import settle_workers
+        from tests.support.timing import wait_until
+    
+        image = tmp_path / "img.s19"
+        image.write_text(
+            emit_s19_from_mem_map({0x1234: 0xAA}, [(0x1234, 0x1235)]),
+            encoding="ascii",
+        )
+        a2l = tmp_path / "rp_b28.a2l"
+        a2l.write_text(
+            _body(
+                "/*\n" + meas("X", " ECU_ADDRESS 0x9999") + "\n*/\n"
+                + meas("X", " ECU_ADDRESS 0x1234")
+            ),
+            encoding="utf-8",
+        )
+    
+        def _strip_glyph(cell: str) -> str:
+            for glyph in ("✓ ", "· "):
+                if cell.startswith(glyph):
+                    return cell[len(glyph):]
+            return cell
+    
+        def _painted(widget) -> str:
+            rendered = widget.render()
+            return getattr(rendered, "plain", str(rendered))
+    
+        async def scenario(app: S19TuiApp, pilot, log) -> None:
+            # Load the image first, so the later A2L attach runs the real
+            # cross-artifact validation engine (the duplicate-symbol source).
+            app.load_selected_file(image)
+            await wait_until(
+                pilot,
+                lambda: app.current_file is not None
+                and app.current_file.path.name == image.name,
+                f"the image load of {image.name}",
+            )
+            await settle_workers(pilot)
+    
+            # Drive the app's actual A2L attach action.
+            app.load_a2l_from_path(a2l)
+            await settle_workers(pilot)
+            await wait_until(
+                pilot,
+                lambda: app.current_a2l_path is not None,
+                "the A2L attach did not land",
+            )
+    
+            # A2L Explorer: exactly one row X, at 0x1234.
+            app.action_show_screen("a2l")
+            for _ in range(6):
+                await pilot.pause()
+            table = app.query_one("#a2l_tags_list", DataTable)
+            rows = [table.get_row_at(i) for i in range(table.row_count)]
+            names = [_strip_glyph(str(row[0])) for row in rows]
+            assert names == ["X"], f"expected exactly one X row, got {names!r}"
+            assert str(rows[0][1]) == "0x00001234", (
+                f"expected X at 0x00001234, got {str(rows[0][1])!r}"
+            )
+    
+            # Issues screen: no A2L_DUPLICATE_SYMBOL issue for X.
+            app.action_show_screen("issues")
+            for _ in range(6):
+                await pilot.pause()
+            panel = app.query_one("#validation_issues_groups", GroupedIssuesPanel)
+            duplicates = [
+                row.issue.code
+                for row in panel.query(IssueRow)
+                if row.issue.code == "A2L_DUPLICATE_SYMBOL"
+            ]
+            assert duplicates == [], f"unexpected duplicate-symbol issues: {duplicates!r}"
+    
+            # Workspace A2L summary reports one tag X at 0x1234, never 0x9999.
+            app.action_show_screen("workspace")
+            for _ in range(6):
+                await pilot.pause()
+            summary = _painted(app.query_one("#a2l_view", Static))
+            assert "A2L Tags:" in summary
+            assert "- MEASUREMENT X: 0x00001234" in summary
+            assert "0x00009999" not in summary
+    
+>       projects.run_app(tmp_path / "app", scenario, size=(160, 50))
+
+tests/test_b103_a2l_reader.py:1937: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7fa04d61ac90>
+
+    async def scenario(app: S19TuiApp, pilot, log) -> None:
+        # Load the image first, so the later A2L attach runs the real
+        # cross-artifact validation engine (the duplicate-symbol source).
+        app.load_selected_file(image)
+        await wait_until(
+            pilot,
+            lambda: app.current_file is not None
+            and app.current_file.path.name == image.name,
+            f"the image load of {image.name}",
+        )
+        await settle_workers(pilot)
+    
+        # Drive the app's actual A2L attach action.
+        app.load_a2l_from_path(a2l)
+        await settle_workers(pilot)
+        await wait_until(
+            pilot,
+            lambda: app.current_a2l_path is not None,
+            "the A2L attach did not land",
+        )
+    
+        # A2L Explorer: exactly one row X, at 0x1234.
+        app.action_show_screen("a2l")
+        for _ in range(6):
+            await pilot.pause()
+        table = app.query_one("#a2l_tags_list", DataTable)
+        rows = [table.get_row_at(i) for i in range(table.row_count)]
+        names = [_strip_glyph(str(row[0])) for row in rows]
+>       assert names == ["X"], f"expected exactly one X row, got {names!r}"
+E       AssertionError: expected exactly one X row, got ['X', 'X']
+E       assert ['X', 'X'] == ['X']
+E         
+E         Left contains one more item: 'X'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_reader.py:1911: AssertionError
+_____________________ test_at_b103_i11_3_v171_loads_clean ______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-39/test_at_b103_i11_3_v171_loads_0')
+
+    def test_at_b103_i11_3_v171_loads_clean(tmp_path: Path) -> None:
+        """AT-B103-I11-3 through the app: the real A2L attach action loads
+        ``ASAP2_Demo_V171.a2l``, the application status names the file, and the
+        Workspace A2L summary shows ``A2L Sections:`` and ``A2L Tags:`` with no
+        ``A2L parse errors:`` block."""
+        from textual.widgets import Static
+    
+        from s19_app.tui.app import S19TuiApp
+    
+        from tests.support import b100_projects as projects
+        from tests.support.b100_workers import settle_workers
+        from tests.support.timing import wait_until
+    
+        v171 = REPO_ROOT / "examples" / "case_00_public" / "ASAP2_Demo_V171.a2l"
+    
+        def _painted(widget) -> str:
+            rendered = widget.render()
+            return getattr(rendered, "plain", str(rendered))
+    
+        async def scenario(app: S19TuiApp, pilot, log) -> None:
+            app.load_a2l_from_path(v171)
+            await settle_workers(pilot)
+            await wait_until(
+                pilot,
+                lambda: app.current_a2l_path is not None,
+                "the V171 A2L attach did not land",
+            )
+    
+            # The application status names the loaded file.
+            assert any(
+                "A2L loaded: ASAP2_Demo_V171.a2l" in message for message in log.messages
+            ), log.messages
+    
+            # The Workspace A2L summary shows sections and tags, no parse errors.
+            app.action_show_screen("workspace")
+            for _ in range(6):
+                await pilot.pause()
+            summary = _painted(app.query_one("#a2l_view", Static))
+            assert "A2L Sections:" in summary, summary
+            assert "A2L Tags:" in summary, summary
+            assert "A2L parse errors:" not in summary, summary
+    
+>       projects.run_app(tmp_path / "app", scenario, size=(160, 50))
+
+tests/test_b103_a2l_reader.py:1982: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/javiergr/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7fa04d10ae50>
+
+    async def scenario(app: S19TuiApp, pilot, log) -> None:
+        app.load_a2l_from_path(v171)
+        await settle_workers(pilot)
+        await wait_until(
+            pilot,
+            lambda: app.current_a2l_path is not None,
+            "the V171 A2L attach did not land",
+        )
+    
+        # The application status names the loaded file.
+        assert any(
+            "A2L loaded: ASAP2_Demo_V171.a2l" in message for message in log.messages
+        ), log.messages
+    
+        # The Workspace A2L summary shows sections and tags, no parse errors.
+        app.action_show_screen("workspace")
+        for _ in range(6):
+            await pilot.pause()
+        summary = _painted(app.query_one("#a2l_view", Static))
+>       assert "A2L Sections:" in summary, summary
+E       AssertionError: A2L summary lines 1-2 / 2
+E         -------------------------
+E         A2L parse errors:
+E         - Unclosed /begin sections detected.
+E       assert 'A2L Sections:' in 'A2L summary lines 1-2 / 2\n-------------------------\nA2L parse errors:\n- Unclosed /begin sections detected.'
+
+tests/test_b103_a2l_reader.py:1978: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.a2l:a2l.py:250 A2L section tree has structural errors: path=/tmp/pytest-of-javiergr/pytest-39/test_at_b103_i11_3_v171_loads_0/app/.s19tool/workarea/temp/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader.py::test_at_b103_i11_2_commented_old_copy_changes_nothing
+FAILED tests/test_b103_a2l_reader.py::test_at_b103_i11_3_v171_loads_clean - A...
+2 failed in 6.46s
+PYTEST_EXIT=1
