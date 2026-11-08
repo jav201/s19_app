@@ -1,0 +1,48 @@
+# M-.5
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.5/s19_app/__init__.py
+# note: tag matched ignoring case
+#   EDIT-OK: '        tags_by_name.setdefault(tag.get("name"), []).append(tag)'
+#   EDIT-OK: '    tags = tags_by_name.get(name) or []'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..8407a098 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -369,7 +369,7 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
+     """
+     tags_by_name: dict[str, list[dict]] = {}
+     for tag in a2l_data.get("tags") or []:
+-        tags_by_name.setdefault(tag.get("name"), []).append(tag)
++        tags_by_name.setdefault((tag.get("name") or "").lower(), []).append(tag)
+ 
+     object_sections_by_name: dict[str, list[dict]] = {}
+     compu_methods_by_name: dict[str, dict] = {}
+@@ -696,7 +696,7 @@ def _find_tag(
+     section → ``Refusal("A2L-DEF-NAME", "<name>: the A2L declares that name
+     more than once")`` (R-A2L-DEF.139); ``None`` when no tag has the name.
+     """
+-    tags = tags_by_name.get(name) or []
++    tags = tags_by_name.get(name.lower()) or []
+     sections = object_sections_by_name.get(name) or []
+     if not tags:
+         return None
+
+# --- pytest (rc=1) ---
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+________ test_r_a2l_def_5_1_the_one_tag_of_a_name_is_used_case_included ________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-944/test_r_a2l_def_5_1_the_one_tag0')
+
+    def test_r_a2l_def_5_1_the_one_tag_of_a_name_is_used_case_included(tmp_path):
+        """R-A2L-DEF.5/1 - DUP at 0x20, dup at 0x10: DUP is the 0x20 object."""
+        a2l = _inline(tmp_path, _val("DUP", "0x20", "RL_U16"), _val("dup", "0x10", "RL_U16"))
+        d = describe_definition("DUP", a2l)
+>       assert d.address == 0x20 and d.refusal is None
+E       AssertionError: assert (None == 32)
+E        +  where None = Definition(name='DUP', section='', char_type=None, kind='', address=None, byte_length=None, datatype=None, byte_order=...ne, compu_tab_ref=None, refusal=Refusal(code='A2L-DEF-NAME', message='DUP: the A2L declares that name more than once')).address
+
+../base/tests/test_b103_a2l_definition.py:384: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_5_1_the_one_tag_of_a_name_is_used_case_included
+1 failed, 1 passed, 189 deselected in 2.41s

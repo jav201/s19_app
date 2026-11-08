@@ -1,0 +1,177 @@
+# i2e2-probe transcript 2026-11-06T16:37:49-06:00 host <runner>
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e2-2/home; no DISPLAY; no clipboard; stdin closed
+A2L section tree has structural errors: path=/home/<user>/work/s19_app/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+make_release_case.__file__ = /home/<user>/work/s19_app/tools/synth/make_release_case.py
+[P0 V171 tags / object sections / same name at same position / parse ms] (118, 118, 118, 16)
+[P0 SOFTA tags / object sections / same name at same position / parse ms] (13990, 13990, 13990, 690)
+[P0 TUBE tags / object sections / same name at same position / parse ms] (111, 111, 111, 6)
+[P1a TUBE first object naming the enum method: tag fields] {'section': 'MEASUREMENT', 'name': 'model.MainClass.gameController.sm', 'char_type': None, 'address': '0x0', 'length': None, 'datatype': None, 'deposit': None, 'compu_method_name': None, 'conversion': None, 'effective_byte_order': 'little', 'lower_limit': None, 'upper_limit': None, 'bit_org': None, 'matrix_dim': None, 'unit': None}
+[P1b its record words (comments left out), first 10] ['model.MainClass.gameController.sm', '', 'UBYTE', 'esdl_model_GameControllerStatemachineStates', '1', '100.0', '0', '3', 'ECU_ADDRESS', '0x0']
+[P1c TUBE method record words] ['esdl_model_GameControllerStatemachineStates', '', 'TAB_VERB', '%12.4', '', 'COMPU_TAB_REF', 'esdl_model_GameControllerStatemachineStates_vtab']
+[P1d TUBE side-table method (a2l.py)] {'conversion_type': None, 'format': None, 'unit': None, 'compu_tab_ref': None}
+[P1e TUBE table record words] ['esdl_model_GameControllerStatemachineStates_vtab', '', 'TAB_VERB', '4', '0', 'Idle', '3', 'GameRunning', '2', 'NotInScoringZone', '1', 'IncreaseScore', 'DEFAULT_VALUE', 'Error']
+[P2 V171 ASAM.C.SCALAR.SWORD.IDENTICAL] {'section': 'CHARACTERISTIC', 'name': 'ASAM.C.SCALAR.SWORD.IDENTICAL', 'char_type': 'VALUE', 'address': '0x810004', 'length': 2, 'datatype': None, 'deposit': 'RL.FNC.SWORD.ROW_DIR', 'compu_method_name': 'CM.IDENTICAL', 'conversion': 'CM.IDENTICAL', 'effective_byte_order': 'little', 'lower_limit': '-10000', 'upper_limit': '20000', 'bit_org': None, 'matrix_dim': None, 'unit': None}
+[P2 V171 ASAM.C.SCALAR.SWORD.IDENTICAL words after the header] ['EXTENDED_LIMITS', '-32268', '32267', 'DISPLAY_IDENTIFIER', 'DI.ASAM.C.SCALAR.SWORD.IDENTICAL']
+[P2 V171 ASAM.C.SCALAR.SWORD.IDENTICAL record layout] {'decode_type': 'SWORD', 'element_count': 1, 'byte_size': 2, 'decode_endian': None}
+[P2 V171 ASAM.M.SCALAR.UBYTE.IDENTICAL] {'section': 'MEASUREMENT', 'name': 'ASAM.M.SCALAR.UBYTE.IDENTICAL', 'char_type': None, 'address': '0x13a00', 'length': 1, 'datatype': 'UBYTE', 'deposit': None, 'compu_method_name': 'CM.IDENTICAL', 'conversion': 'CM.IDENTICAL', 'effective_byte_order': 'little', 'lower_limit': '0', 'upper_limit': '255', 'bit_org': None, 'matrix_dim': None, 'unit': None}
+[P2 V171 ASAM.M.SCALAR.UBYTE.IDENTICAL words after the header] ['ECU_ADDRESS', '0x13A00', 'FORMAT', '%5.0', 'DISPLAY_IDENTIFIER', 'DI.ASAM.M.SCALAR.UBYTE.IDENTICAL']
+[P2 V171 ASAM.M.SCALAR.UBYTE.IDENTICAL record layout] None
+[P2 V171 ASAM.C.SCALAR.UBYTE.IDENTICAL] {'section': 'CHARACTERISTIC', 'name': 'ASAM.C.SCALAR.UBYTE.IDENTICAL', 'char_type': 'VALUE', 'address': '0x810000', 'length': 1, 'datatype': None, 'deposit': 'RL.FNC.UBYTE.ROW_DIR', 'compu_method_name': 'CM.IDENTICAL', 'conversion': 'CM.IDENTICAL', 'effective_byte_order': 'little', 'lower_limit': '10', 'upper_limit': '200', 'bit_org': None, 'matrix_dim': None, 'unit': None}
+[P2 V171 ASAM.C.SCALAR.UBYTE.IDENTICAL words after the header] ['EXTENDED_LIMITS', '0', '256', 'DISPLAY_IDENTIFIER', 'DI.ASAM.C.SCALAR.UBYTE']
+[P2 V171 ASAM.C.SCALAR.UBYTE.IDENTICAL record layout] {'decode_type': 'UBYTE', 'element_count': 1, 'byte_size': 1, 'decode_endian': None}
+[P2 V171 ASAM.C.SCALAR.SBYTE.IDENTICAL] {'section': 'CHARACTERISTIC', 'name': 'ASAM.C.SCALAR.SBYTE.IDENTICAL', 'char_type': 'VALUE', 'address': '0x810001', 'length': 1, 'datatype': None, 'deposit': 'RL.FNC.SBYTE.ROW_DIR', 'compu_method_name': 'CM.IDENTICAL', 'conversion': 'CM.IDENTICAL', 'effective_byte_order': 'little', 'lower_limit': '-100', 'upper_limit': '100', 'bit_org': None, 'matrix_dim': None, 'unit': None}
+[P2 V171 ASAM.C.SCALAR.SBYTE.IDENTICAL words after the header] ['EXTENDED_LIMITS', '-128', '127', 'FORMAT', '%6.1', 'DISPLAY_IDENTIFIER', 'DI.ASAM.C.SCALAR.SBYTE.IDENTICAL']
+[P2 V171 ASAM.C.SCALAR.SBYTE.IDENTICAL record layout] {'decode_type': 'SBYTE', 'element_count': 1, 'byte_size': 1, 'decode_endian': None}
+[P2 V171 ASAM.C.SCALAR.SWORD.TAB_VERB_DEFAULT_VALUE] {'section': 'CHARACTERISTIC', 'name': 'ASAM.C.SCALAR.SWORD.TAB_VERB_DEFAULT_VALUE', 'char_type': 'VALUE', 'address': '0x810004', 'length': 2, 'datatype': None, 'deposit': 'RL.FNC.SWORD.ROW_DIR', 'compu_method_name': 'CM.TAB_VERB.DEFAULT_VALUE', 'conversion': 'CM.TAB_VERB.DEFAULT_VALUE', 'effective_byte_order': 'little', 'lower_limit': '-10000', 'upper_limit': '20000', 'bit_org': None, 'matrix_dim': None, 'unit': None}
+[P2 V171 ASAM.C.SCALAR.SWORD.TAB_VERB_DEFAULT_VALUE words after the header] ['EXTENDED_LIMITS', '-32268', '32267', 'DISPLAY_IDENTIFIER', 'DI.ASAM.C.SCALAR.SWORD.TAB_VERB_DEFAULT_VALUE']
+[P2 V171 ASAM.C.SCALAR.SWORD.TAB_VERB_DEFAULT_VALUE record layout] {'decode_type': 'SWORD', 'element_count': 1, 'byte_size': 2, 'decode_endian': None}
+[P2 V171 ASAM.C.SCALAR.SWORD.TAB_VERB_NO_DEFAULT_VALUE] {'section': 'CHARACTERISTIC', 'name': 'ASAM.C.SCALAR.SWORD.TAB_VERB_NO_DEFAULT_VALUE', 'char_type': 'VALUE', 'address': '0x810004', 'length': 2, 'datatype': None, 'deposit': 'RL.FNC.SWORD.ROW_DIR', 'compu_method_name': 'CM.TAB_VERB.NO_DEFAULT_VALUE', 'conversion': 'CM.TAB_VERB.NO_DEFAULT_VALUE', 'effective_byte_order': 'little', 'lower_limit': '-10000', 'upper_limit': '20000', 'bit_org': None, 'matrix_dim': None, 'unit': None}
+[P2 V171 ASAM.C.SCALAR.SWORD.TAB_VERB_NO_DEFAULT_VALUE words after the header] ['EXTENDED_LIMITS', '-32268', '32267', 'DISPLAY_IDENTIFIER', 'DI.ASAM.C.SCALAR.SWORD.TAB_VERB_NO_DEFAULT_VALUE']
+[P2 V171 ASAM.C.SCALAR.SWORD.TAB_VERB_NO_DEFAULT_VALUE record layout] {'decode_type': 'SWORD', 'element_count': 1, 'byte_size': 2, 'decode_endian': None}
+[P2 V171 ASAM.C.SCALAR.SWORD.VTAB_RANGE_DEFAULT_VALUE] {'section': 'CHARACTERISTIC', 'name': 'ASAM.C.SCALAR.SWORD.VTAB_RANGE_DEFAULT_VALUE', 'char_type': 'VALUE', 'address': '0x810004', 'length': 2, 'datatype': None, 'deposit': 'RL.FNC.SWORD.ROW_DIR', 'compu_method_name': 'CM.VTAB_RANGE.DEFAULT_VALUE', 'conversion': 'CM.VTAB_RANGE.DEFAULT_VALUE', 'effective_byte_order': 'little', 'lower_limit': '-10000', 'upper_limit': '20000', 'bit_org': None, 'matrix_dim': None, 'unit': None}
+[P2 V171 ASAM.C.SCALAR.SWORD.VTAB_RANGE_DEFAULT_VALUE words after the header] ['EXTENDED_LIMITS', '-32268', '32267', 'DISPLAY_IDENTIFIER', 'DI.ASAM.C.SCALAR.SWORD.VTAB_RANGE_DEFAULT_VALUE']
+[P2 V171 ASAM.C.SCALAR.SWORD.VTAB_RANGE_DEFAULT_VALUE record layout] {'decode_type': 'SWORD', 'element_count': 1, 'byte_size': 2, 'decode_endian': None}
+[P2 V171 ASAM.C.SCALAR.SWORD.VTAB_RANGE_NO_DEFAULT_VALUE] {'section': 'CHARACTERISTIC', 'name': 'ASAM.C.SCALAR.SWORD.VTAB_RANGE_NO_DEFAULT_VALUE', 'char_type': 'VALUE', 'address': '0x810004', 'length': 2, 'datatype': None, 'deposit': 'RL.FNC.SWORD.ROW_DIR', 'compu_method_name': 'CM.VTAB_RANGE.NO_DEFAULT_VALUE', 'conversion': 'CM.VTAB_RANGE.NO_DEFAULT_VALUE', 'effective_byte_order': 'little', 'lower_limit': '-10000', 'upper_limit': '20000', 'bit_org': None, 'matrix_dim': None, 'unit': None}
+[P2 V171 ASAM.C.SCALAR.SWORD.VTAB_RANGE_NO_DEFAULT_VALUE words after the header] ['EXTENDED_LIMITS', '-32268', '32267', 'DISPLAY_IDENTIFIER', 'DI.ASAM.C.SCALAR.SWORD.VTAB_RANGE_NO_DEFAULT_VALUE']
+[P2 V171 ASAM.C.SCALAR.SWORD.VTAB_RANGE_NO_DEFAULT_VALUE record layout] {'decode_type': 'SWORD', 'element_count': 1, 'byte_size': 2, 'decode_endian': None}
+[P2 V171 ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE] {'section': 'MEASUREMENT', 'name': 'ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE', 'char_type': None, 'address': '0x13a00', 'length': 1, 'datatype': 'UBYTE', 'deposit': None, 'compu_method_name': 'CM.VTAB_RANGE.NO_DEFAULT_VALUE', 'conversion': 'CM.VTAB_RANGE.NO_DEFAULT_VALUE', 'effective_byte_order': 'little', 'lower_limit': '0', 'upper_limit': '101', 'bit_org': None, 'matrix_dim': None, 'unit': None}
+[P2 V171 ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE words after the header] ['ECU_ADDRESS', '0x13A00']
+[P2 V171 ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE record layout] None
+[P2 V171 ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0] {'section': 'CHARACTERISTIC', 'name': 'ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0', 'char_type': 'VALUE', 'address': '0x810002', 'length': 2, 'datatype': None, 'deposit': 'RL.FNC.UWORD.ROW_DIR', 'compu_method_name': 'CM.IDENTICAL', 'conversion': 'CM.IDENTICAL', 'effective_byte_order': 'little', 'lower_limit': '0', 'upper_limit': '255', 'bit_org': '0x0FF0', 'matrix_dim': None, 'unit': None}
+[P2 V171 ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0 words after the header] ['EXTENDED_LIMITS', '0', '65535', 'BIT_MASK', '0x0FF0', 'FORMAT', '%5.0', 'DISPLAY_IDENTIFIER', 'DI.ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0']
+[P2 V171 ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0 record layout] {'decode_type': 'UWORD', 'element_count': 1, 'byte_size': 2, 'decode_endian': None}
+[P2 V171 ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0001] {'section': 'CHARACTERISTIC', 'name': 'ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0001', 'char_type': 'VALUE', 'address': '0x810002', 'length': 2, 'datatype': None, 'deposit': 'RL.FNC.UWORD.ROW_DIR', 'compu_method_name': 'CM.IDENTICAL', 'conversion': 'CM.IDENTICAL', 'effective_byte_order': 'little', 'lower_limit': '0', 'upper_limit': '1', 'bit_org': '0x0001', 'matrix_dim': None, 'unit': None}
+[P2 V171 ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0001 words after the header] ['EXTENDED_LIMITS', '0', '65535', 'BIT_MASK', '0x0001', 'PHYS_UNIT', '', 'FORMAT', '%5.0', 'DISPLAY_IDENTIFIER', 'DI.ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0001']
+[P2 V171 ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0001 record layout] {'decode_type': 'UWORD', 'element_count': 1, 'byte_size': 2, 'decode_endian': None}
+[P2 V171 ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0010] {'section': 'CHARACTERISTIC', 'name': 'ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0010', 'char_type': 'VALUE', 'address': '0x810002', 'length': 2, 'datatype': None, 'deposit': 'RL.FNC.UWORD.ROW_DIR', 'compu_method_name': 'CM.IDENTICAL', 'conversion': 'CM.IDENTICAL', 'effective_byte_order': 'little', 'lower_limit': '0', 'upper_limit': '1', 'bit_org': '0x0010', 'matrix_dim': None, 'unit': None}
+[P2 V171 ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0010 words after the header] ['EXTENDED_LIMITS', '0', '65535', 'BIT_MASK', '0x0010', 'PHYS_UNIT', '', 'FORMAT', '%5.0', 'DISPLAY_IDENTIFIER', 'DI.ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0010']
+[P2 V171 ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0010 record layout] {'decode_type': 'UWORD', 'element_count': 1, 'byte_size': 2, 'decode_endian': None}
+[P2 V171 UNKNOWN] {'section': 'CHARACTERISTIC', 'name': 'UNKNOWN', 'char_type': 'ASCII', 'address': '0x810200', 'length': 42, 'datatype': None, 'deposit': 'RL.FNC.UBYTE.ROW_DIR', 'compu_method_name': 'CM.IDENTICAL', 'conversion': 'CM.IDENTICAL', 'effective_byte_order': 'little', 'lower_limit': '0', 'upper_limit': '255', 'bit_org': None, 'matrix_dim': None, 'unit': None}
+[P2 V171 UNKNOWN words after the header] ['NUMBER', '42', 'DISPLAY_IDENTIFIER', 'DI.ASAM.C.ASCII.UBYTE.NUMBER_42']
+[P2 V171 UNKNOWN record layout] {'decode_type': 'UBYTE', 'element_count': 1, 'byte_size': 1, 'decode_endian': None}
+[P2 V171 ASAM.M.MATRIX_DIM_16_1.UBYTE.IDENTICAL] {'section': 'MEASUREMENT', 'name': 'ASAM.M.MATRIX_DIM_16_1.UBYTE.IDENTICAL', 'char_type': None, 'address': '0x13a30', 'length': 16, 'datatype': 'UBYTE', 'deposit': None, 'compu_method_name': 'CM.IDENTICAL', 'conversion': 'CM.IDENTICAL', 'effective_byte_order': 'little', 'lower_limit': '0', 'upper_limit': '255', 'bit_org': None, 'matrix_dim': 16, 'unit': None}
+[P2 V171 ASAM.M.MATRIX_DIM_16_1.UBYTE.IDENTICAL words after the header] ['ECU_ADDRESS', '0x13A30', 'FORMAT', '%5.0', 'MATRIX_DIM', '16', '1']
+[P2 V171 ASAM.M.MATRIX_DIM_16_1.UBYTE.IDENTICAL record layout] None
+[P2 V171 ASAM.C.SCALAR.FLOAT64_IEEE.IDENTICAL] {'section': 'CHARACTERISTIC', 'name': 'ASAM.C.SCALAR.FLOAT64_IEEE.IDENTICAL', 'char_type': 'VALUE', 'address': '0x810010', 'length': 8, 'datatype': None, 'deposit': 'RL.FNC.FLOAT64_IEEE.ROW_DIR', 'compu_method_name': 'CM.IDENTICAL', 'conversion': 'CM.IDENTICAL', 'effective_byte_order': 'little', 'lower_limit': '-100', 'upper_limit': '200', 'bit_org': None, 'matrix_dim': None, 'unit': None}
+[P2 V171 ASAM.C.SCALAR.FLOAT64_IEEE.IDENTICAL words after the header] ['EXTENDED_LIMITS', '-10000.0', '20000.0', 'DISPLAY_IDENTIFIER', 'DI.ASAM.C.SCALAR.FLOAT64_IEEE.IDENTICAL']
+[P2 V171 ASAM.C.SCALAR.FLOAT64_IEEE.IDENTICAL record layout] {'decode_type': 'FLOAT64_IEEE', 'element_count': 1, 'byte_size': 8, 'decode_endian': None}
+[P2x V171 tags named UNKNOWN] 1
+[P2y V171 first CUBOID] ASAM.C.CUBOID.COM_AXIS.FIX_AXIS.STD_AXIS
+[P2z V171 first object with EXTENDED_LIMITS -10000.0 20000.0] ASAM.C.SCALAR.FLOAT64_IEEE.IDENTICAL
+[P3 V171 method record CM.TAB_VERB.DEFAULT_VALUE] ['CM.TAB_VERB.DEFAULT_VALUE', 'Verbal conversion with default value', 'TAB_VERB', '%12.0', '', 'COMPU_TAB_REF', 'CM.TAB_VERB.DEFAULT_VALUE.REF']
+[P3 V171 method record CM.IDENTICAL] ['CM.IDENTICAL', 'conversion that delivers always phys = int', 'IDENTICAL', '%3.0', 'hours']
+[P3 V171 method record CM.VTAB_RANGE.DEFAULT_VALUE] ['CM.VTAB_RANGE.DEFAULT_VALUE', 'verbal range with default value', 'TAB_VERB', '%4.2', '', 'COMPU_TAB_REF', 'CM.VTAB_RANGE.DEFAULT_VALUE.REF']
+[P3 V171 table record CM.TAB_VERB.DEFAULT_VALUE.REF] ['CM.TAB_VERB.DEFAULT_VALUE.REF', 'List of text strings and relation to impl value', 'TAB_VERB', '3', '1', 'SawTooth', '2', 'Square', '3', 'Sinus', 'DEFAULT_VALUE', 'unknown signal type']
+[P3 V171 table record CM.VTAB_RANGE.DEFAULT_VALUE.REF] ['CM.VTAB_RANGE.DEFAULT_VALUE.REF', '', '11', '0', '1', 'Zero_to_one', '2', '3', 'two_to_three', '4', '7', 'four_to_seven', '14', '17', 'fourteen_to_seventeen', '18', '99', 'eigteen_to_ninetynine', '100', '100', 'hundred', '101', '101', 'hundredone', '102', '102', 'hundredtwo', '103', '103', 'hundredthree', '104', '104', 'hundredfour', '105', '105', 'hundredfive', 'DEFAULT_VALUE', 'out of range value']
+[P4a SOFTA first NO_COMPU_METHOD MEASUREMENT] {'section': 'MEASUREMENT', 'name': 'AAB_CHYEAQ1_DXZTD_NLPMJIM_2_IGTLL_AWV_CHZTO.SwaxfqdawbZkcwtx', 'char_type': None, 'address': None, 'length': 2, 'datatype': 'UWORD', 'deposit': None, 'compu_method_name': None, 'conversion': 'NO_COMPU_METHOD', 'effective_byte_order': 'little', 'lower_limit': '-1000000', 'upper_limit': '1000000', 'bit_org': None, 'matrix_dim': None, 'unit': None, 'FORMAT': None}
+[P4b SOFTA first object whose method record type is TAB_VERB] {'section': 'CHARACTERISTIC', 'name': 'ACN_ULWY.FVH_MUGP_O_SBW_RTD_NJZ_MKE_WODEYLMQXZ46_OXATIRMZ_YOQJZI', 'char_type': 'VALUE', 'address': '0x0', 'length': 1, 'datatype': None, 'deposit': 'CJG_GW_PYLDRAF', 'compu_method_name': 'RKR_KC_VVOYJDA', 'conversion': 'RKR_KC_VVOYJDA', 'effective_byte_order': 'little', 'lower_limit': '0', 'upper_limit': '1', 'bit_org': None, 'matrix_dim': None, 'unit': None, 'method': 'RKR_KC_VVOYJDA', 'table': 'CXP_GM_YQTODIW', 'table words': []}
+[P4c SOFTA first COMPU_VTAB whose first pair raw is -1: name / words / first object using it] ('zIzbovMkwaNungk_ZHDJ', ['zIzbovMkwaNungk_ZHDJ', 'Lmhzedfmtt Gaara rpw hjzyxjhkaa rblj ChokcqdcidBot::NnbneGpPbjyVlsesTzn::XajbxKgZipeReexe::ZIUD_Guhtpcbbdj::yCwhqvCzylPhkph', 'TAB_VERB', '5', '-1', 'NMUF_MSWGZ_SPTKAGRI', '0', 'YAPJ_HRPJFQX_SHTX'], 'QUUU_Ywjznkkjwj.AuooouPgqj')
+[P4d SOFTA first COMPU_VTAB_RANGE: words / first object using it] (['AET_ES_RLBM_AjzY.Ruffte_MG_WIN_JljHYWzox_RBR_2_Lolzhsf_RdzyhoEgzz.UQA_SscVOMjkb', '', '5', '0', '0', 'BPQ_UQKPL_XLDM_EM_SPFMDDQDOEMCT', '1', '1', 'QXF_WSTOP_SIBU_CVJDMQ_WYKSTOMXRYSZL', '2', '2', 'DYT_QYOEQ_LGTR_OOAV_YPZTXIUTBFCYJ', '3', '3', 'CLT_DTJDE_TAKJ_IKM_HDK', '4', '4', 'GFB_ZUTJS_SERO_AQLLCU_JVAGEZDW'], 'MhiH.Szymzt_WN_MDB_PifFJDjfo_ZHE_2_Kvypjld_EgdrylBxtq.RPI_BfgPPFcmu')
+[P4e SOFTA first MEASUREMENT with BIT_MASK 0xFFFFFF] {'section': 'MEASUREMENT', 'name': 'Adt_UhsihQwbpns._9_.NfwzbMcockRrbkj', 'char_type': None, 'address': None, 'length': 4, 'datatype': 'ULONG', 'deposit': None, 'compu_method_name': None, 'conversion': 'NO_COMPU_METHOD', 'effective_byte_order': 'little', 'lower_limit': '0', 'upper_limit': '16777215', 'bit_org': '0xFFFFFF', 'matrix_dim': None, 'unit': None}
+[P4f SOFTA first object with PHYS_UNIT V] {'section': 'CHARACTERISTIC', 'name': 'BcpGxvlbvneyoAudnMhl.DRCDJ_XNIFM_DSURLVD_VSJMQJBMW', 'char_type': 'VALUE', 'address': '0x0', 'length': 2, 'datatype': None, 'deposit': 'SkcqPrebycvuEyxcs.XPDJR_XR', 'compu_method_name': 'oDnjbscc_FRXZSVJBUF', 'conversion': 'oDnjbscc_FRXZSVJBUF', 'effective_byte_order': 'little', 'lower_limit': '-127', 'upper_limit': '127', 'bit_org': None, 'matrix_dim': None, 'unit': None}
+[P4h SOFTA MEASUREMENTs with an address / all MEASUREMENTs] (0, 10538)
+[P4i SOFTA first SWORD VALUE, NO_COMPU_METHOD, FORMAT %.15, with an address] {'section': 'CHARACTERISTIC', 'name': 'AlyjmQyfk.GrsaEjbkyQmicdevPjq_GpqJraTjkq._1_', 'char_type': 'VALUE', 'address': '0x0', 'length': 2, 'datatype': None, 'deposit': '__VBFES_C', 'compu_method_name': 'NO_COMPU_METHOD', 'conversion': 'NO_COMPU_METHOD', 'effective_byte_order': 'little', 'lower_limit': '-32768', 'upper_limit': '32767', 'bit_org': None, 'matrix_dim': None, 'unit': None, 'layout': {'decode_type': 'SWORD', 'element_count': 1, 'byte_size': 2, 'decode_endian': None}}
+[P4j SOFTA first object with BIT_MASK 0xFFFFFF and an address] none
+[P4k SOFTA P4b user] {'section': 'CHARACTERISTIC', 'name': 'ACN_ULWY.FVH_MUGP_O_SBW_RTD_NJZ_MKE_WODEYLMQXZ46_OXATIRMZ_YOQJZI', 'char_type': 'VALUE', 'address': '0x0', 'length': 1, 'datatype': None, 'deposit': 'CJG_GW_PYLDRAF', 'compu_method_name': 'RKR_KC_VVOYJDA', 'conversion': 'RKR_KC_VVOYJDA', 'effective_byte_order': 'little', 'lower_limit': '0', 'upper_limit': '1', 'bit_org': None, 'matrix_dim': None, 'unit': None, 'layout': {'decode_type': 'UBYTE', 'element_count': 1, 'byte_size': 1, 'decode_endian': None}}
+[P4k SOFTA P4c user] {'section': 'MEASUREMENT', 'name': 'QUUU_Ywjznkkjwj.AuooouPgqj', 'char_type': None, 'address': None, 'length': 2, 'datatype': 'SWORD', 'deposit': None, 'compu_method_name': 'bObysxNmrbOgpxq_UPTOQFOEJQ', 'conversion': 'bObysxNmrbOgpxq_UPTOQFOEJQ', 'effective_byte_order': 'little', 'lower_limit': '-1', 'upper_limit': '3', 'bit_org': None, 'matrix_dim': None, 'unit': None, 'layout': None}
+[P4k SOFTA P4d user] {'section': 'MEASUREMENT', 'name': 'MhiH.Szymzt_WN_MDB_PifFJDjfo_ZHE_2_Kvypjld_EgdrylBxtq.RPI_BfgPPFcmu', 'char_type': None, 'address': None, 'length': 1, 'datatype': 'UBYTE', 'deposit': None, 'compu_method_name': 'RPY_WQ_YIKG_OcgZ.Vxdqti_JC_TXJ_YvlYAUrcx_ORW_2_Hndybrk_AtqftbLxpi.QIY_ZxbXNRpud', 'conversion': 'RPY_WQ_YIKG_OcgZ.Vxdqti_JC_TXJ_YvlYAUrcx_ORW_2_Hndybrk_AtqftbLxpi.QIY_ZxbXNRpud', 'effective_byte_order': 'little', 'lower_limit': '0', 'upper_limit': '5', 'bit_org': None, 'matrix_dim': None, 'unit': None, 'layout': None}
+[P4k SOFTA P4f user] {'section': 'CHARACTERISTIC', 'name': 'BcpGxvlbvneyoAudnMhl.DRCDJ_XNIFM_DSURLVD_VSJMQJBMW', 'char_type': 'VALUE', 'address': '0x0', 'length': 2, 'datatype': None, 'deposit': 'SkcqPrebycvuEyxcs.XPDJR_XR', 'compu_method_name': 'oDnjbscc_FRXZSVJBUF', 'conversion': 'oDnjbscc_FRXZSVJBUF', 'effective_byte_order': 'little', 'lower_limit': '-127', 'upper_limit': '127', 'bit_org': None, 'matrix_dim': None, 'unit': None, 'layout': {'decode_type': 'SWORD', 'element_count': 1, 'byte_size': 2, 'decode_endian': None}}
+[P4l SOFTA table CXP_GM_YQTODIW record] ['CXP_GM_YQTODIW', '', '2', '0', '0', 'xrbci', '1', '1', 'buyz']
+[P4g SOFTA ms per call: object-section walk+sort / one _collect_sections_by_name] (9.13, 3.91)
+[P5a C08 object counts by kind] {'VALUE': 208, 'MEASUREMENT': 104, 'VAL_BLK': 60, 'CURVE': 60, 'MAP': 20, 'ASCII': 10}
+[P5b C08 image bytes] 424736
+[P5c C08 VALUE_0001] {'name': 'VALUE_0001', 'section': 'CHARACTERISTIC', 'kind': 'VALUE', 'datatype': 'UBYTE', 'conversion': 'CM_IDENT', 'address': '0x0', 'length': 1, 'big_endian': True, 'low': '0', 'high': '255', 'physical': 108, 'raw_bytes': '6c', 'tag byte order': 'big', 'tag length': 1, 'bytes on image': True}
+[P5c C08 ASCII_0001] {'name': 'ASCII_0001', 'section': 'CHARACTERISTIC', 'kind': 'ASCII', 'datatype': 'UBYTE', 'conversion': 'CM_IDENT', 'address': '0xc00000', 'length': 32, 'big_endian': True, 'low': '0', 'high': '255', 'physical': 72, 'raw_bytes': '48 57 5f 52 45 56 3d 30', 'tag byte order': 'big', 'tag length': 32, 'bytes on image': True}
+[P5c C08 VAL_BLK_0001] {'name': 'VAL_BLK_0001', 'section': 'CHARACTERISTIC', 'kind': 'VAL_BLK', 'datatype': 'UWORD', 'conversion': 'CM_IDENT', 'address': '0x800000', 'length': 256, 'big_endian': True, 'low': '0', 'high': '65535', 'physical': 39054, 'raw_bytes': '98 8e 98 93 98 98 98 9d', 'tag byte order': 'big', 'tag length': 256, 'bytes on image': True}
+[P5c C08 CURVE_0001] {'name': 'CURVE_0001', 'section': 'CHARACTERISTIC', 'kind': 'CURVE', 'datatype': 'UWORD', 'conversion': 'CM_IDENT', 'address': '0x803de0', 'length': 64, 'big_endian': True, 'low': '0', 'high': '65535', 'physical': 57199, 'raw_bytes': 'df 6f df 76 df 7d df 84', 'tag byte order': 'big', 'tag length': 64, 'bytes on image': True}
+[P5c C08 MAP_0001] {'name': 'MAP_0001', 'section': 'CHARACTERISTIC', 'kind': 'MAP', 'datatype': 'UWORD', 'conversion': 'CM_IDENT', 'address': '0x804ec0', 'length': 128, 'big_endian': True, 'low': '0', 'high': '65535', 'physical': 15412, 'raw_bytes': '3c 34 3c 3f 3c 4a 3c 55', 'tag byte order': 'big', 'tag length': 128, 'bytes on image': True}
+[P5c C08 LIN_OFF_UWORD] {'name': 'VALUE_0019', 'section': 'CHARACTERISTIC', 'kind': 'VALUE', 'datatype': 'UWORD', 'conversion': 'CM_LIN_OFF', 'address': '0x40118', 'length': 2, 'big_endian': True, 'low': '100', 'high': '65635', 'physical': 12930, 'raw_bytes': '32 1e', 'tag byte order': 'big', 'tag length': 2, 'bytes on image': True}
+[P5c C08 RAT_FIRST] {'name': 'VALUE_0004', 'section': 'CHARACTERISTIC', 'kind': 'VALUE', 'datatype': 'SLONG', 'conversion': 'CM_RAT', 'address': '0x3c', 'length': 4, 'big_endian': False, 'low': '0', 'high': '2000', 'physical': 970, 'raw_bytes': 'fe 01 00 00', 'tag byte order': 'little', 'tag length': 4, 'bytes on image': True}
+[P5c C08 TAB_NOINTP] {'name': 'MEASUREMENT_0002', 'section': 'MEASUREMENT', 'kind': 'MEASUREMENT', 'datatype': 'UWORD', 'conversion': 'CM_TAB_NOINTP', 'address': '0x64', 'length': 2, 'big_endian': False, 'low': '0', 'high': '30', 'physical': 0.0, 'raw_bytes': '00 00', 'tag byte order': 'little', 'tag length': 2, 'bytes on image': True}
+[P5c C08 TAB_INTP] {'name': 'MEASUREMENT_0001', 'section': 'MEASUREMENT', 'kind': 'MEASUREMENT', 'datatype': 'UWORD', 'conversion': 'CM_TAB_INTP', 'address': '0x50', 'length': 2, 'big_endian': True, 'low': '0', 'high': '50', 'physical': 20.0, 'raw_bytes': '00 c8', 'tag byte order': 'big', 'tag length': 2, 'bytes on image': True}
+[P5c C08 LIN_10_FLOAT32] {'name': 'VALUE_0012', 'section': 'CHARACTERISTIC', 'kind': 'VALUE', 'datatype': 'FLOAT32_IEEE', 'conversion': 'CM_LIN_10', 'address': '0x4008c', 'length': 4, 'big_endian': False, 'low': '143.098', 'high': '429.294', 'physical': 286.19590827378426, 'raw_bytes': 'ec f4 e4 41', 'tag byte order': 'little', 'tag length': 4, 'bytes on image': True}
+[P5c C08 LIN_10_UBYTE] {'name': 'VALUE_0018', 'section': 'CHARACTERISTIC', 'kind': 'VALUE', 'datatype': 'UBYTE', 'conversion': 'CM_LIN_10', 'address': '0x40104', 'length': 1, 'big_endian': False, 'low': '0', 'high': '2550', 'physical': 1700, 'raw_bytes': 'aa', 'tag byte order': 'little', 'tag length': 1, 'bytes on image': True}
+[P5c C08 LIN_10_UWORD] {'name': 'VALUE_0002', 'section': 'CHARACTERISTIC', 'kind': 'VALUE', 'datatype': 'UWORD', 'conversion': 'CM_LIN_10', 'address': '0x14', 'length': 2, 'big_endian': False, 'low': '0', 'high': '655350', 'physical': 488000, 'raw_bytes': 'a0 be', 'tag byte order': 'little', 'tag length': 2, 'bytes on image': True}
+[P5c C08 LIN_10_ULONG] {'name': 'MEASUREMENT_0004', 'section': 'MEASUREMENT', 'kind': 'MEASUREMENT', 'datatype': 'ULONG', 'conversion': 'CM_LIN_10', 'address': '0x8c', 'length': 4, 'big_endian': False, 'low': '0', 'high': '42949672950', 'physical': 7072213680, 'raw_bytes': '78 57 27 2a', 'tag byte order': 'little', 'tag length': 4, 'bytes on image': True}
+[P5c C08 LIN_10_SWORD] {'name': 'VALUE_0006', 'section': 'CHARACTERISTIC', 'kind': 'VALUE', 'datatype': 'SWORD', 'conversion': 'CM_LIN_10', 'address': '0x40014', 'length': 2, 'big_endian': False, 'low': '-327680', 'high': '327670', 'physical': -274270, 'raw_bytes': 'dd 94', 'tag byte order': 'little', 'tag length': 2, 'bytes on image': True}
+[P5d C08 ASCII_0001 planned string] b'HW_REV=00.01.00.00'
+[P5e C08 the 10 planned ASCII strings] ['HW_REV=00.01.00.00', 'CFG_CKSUM=00000000', 'BUILD_ID=SYNTH_0001', 'S19TOOL_RELEASE_DEMO', 'SERIAL=00000000', 'END_OF_ID_BLOCK', 'SERIAL=00000000', 'FW_VERSION=01.02.03.04', 'FW_VERSION=01.02.03.04', 'HW_REV=00.01.00.00']
+[P5f C08 clean: defined objects (VALUE, ASCII, scalar MEASUREMENT) / all tags] (322, 462)
+[P5g C08 issues MISSING_CM] {'section': 'CHARACTERISTIC', 'name': 'MISSING_CM', 'char_type': 'VALUE', 'address': '0xc00000', 'length': 1, 'datatype': None, 'deposit': 'RL_U8', 'compu_method_name': 'CM_MISSING', 'conversion': 'CM_MISSING', 'effective_byte_order': 'big', 'lower_limit': '0', 'upper_limit': '255', 'bit_org': None, 'matrix_dim': None, 'unit': None, 'bytes missing in the image': 0}
+[P5g C08 issues OUT_OF_RANGE_1] {'section': 'MEASUREMENT', 'name': 'OUT_OF_RANGE_1', 'char_type': None, 'address': '0xd00000', 'length': 1, 'datatype': 'UBYTE', 'deposit': None, 'compu_method_name': 'CM_IDENT', 'conversion': 'CM_IDENT', 'effective_byte_order': 'big', 'lower_limit': '0', 'upper_limit': '255', 'bit_org': None, 'matrix_dim': None, 'unit': '"units"', 'bytes missing in the image': 1}
+[P5g C08 issues OUT_OF_RANGE_2] {'section': 'MEASUREMENT', 'name': 'OUT_OF_RANGE_2', 'char_type': None, 'address': '0xd00010', 'length': 1, 'datatype': 'UBYTE', 'deposit': None, 'compu_method_name': 'CM_IDENT', 'conversion': 'CM_IDENT', 'effective_byte_order': 'big', 'lower_limit': '0', 'upper_limit': '255', 'bit_org': None, 'matrix_dim': None, 'unit': '"units"', 'bytes missing in the image': 1}
+[P5g C08 issues OUT_OF_RANGE_3] {'section': 'MEASUREMENT', 'name': 'OUT_OF_RANGE_3', 'char_type': None, 'address': '0xd00020', 'length': 1, 'datatype': 'UBYTE', 'deposit': None, 'compu_method_name': 'CM_IDENT', 'conversion': 'CM_IDENT', 'effective_byte_order': 'big', 'lower_limit': '0', 'upper_limit': '255', 'bit_org': None, 'matrix_dim': None, 'unit': '"units"', 'bytes missing in the image': 1}
+[P5g C08 issues SPAN_OVER_1] {'section': 'MEASUREMENT', 'name': 'SPAN_OVER_1', 'char_type': None, 'address': '0xc00ffe', 'length': 4, 'datatype': 'ULONG', 'deposit': None, 'compu_method_name': 'CM_IDENT', 'conversion': 'CM_IDENT', 'effective_byte_order': 'big', 'lower_limit': '0', 'upper_limit': '4294967295', 'bit_org': None, 'matrix_dim': None, 'unit': '"units"', 'bytes missing in the image': 2}
+[P5g C08 issues SPAN_OVER_2] {'section': 'MEASUREMENT', 'name': 'SPAN_OVER_2', 'char_type': None, 'address': '0xc00fff', 'length': 4, 'datatype': 'ULONG', 'deposit': None, 'compu_method_name': 'CM_IDENT', 'conversion': 'CM_IDENT', 'effective_byte_order': 'big', 'lower_limit': '0', 'upper_limit': '4294967295', 'bit_org': None, 'matrix_dim': None, 'unit': '"units"', 'bytes missing in the image': 3}
+[P5g C08 issues LIMIT_BREAKER] {'section': 'MEASUREMENT', 'name': 'LIMIT_BREAKER', 'char_type': None, 'address': '0xc00200', 'length': 1, 'datatype': 'UBYTE', 'deposit': None, 'compu_method_name': 'CM_IDENT', 'conversion': 'CM_IDENT', 'effective_byte_order': 'big', 'lower_limit': '100', 'upper_limit': '120', 'bit_org': None, 'matrix_dim': None, 'unit': '"units"', 'bytes missing in the image': 0}
+[P5h C08 issues VALUE_0001 addresses in file order] ['0x0', '0x0']
+[P5i C08 issues tags named value_0001 (lower case)] 0
+[P5j C08 encode 150.0 on LIN_OFF_UWORD VALUE_0019] ((0, 50), None, [])
+[P5j C08 encode 100.0 on RAT_FIRST VALUE_0004] ((75, 0, 0, 0), None, [])
+[P5j C08 encode 15.0 on TAB_NOINTP MEASUREMENT_0002] ((3, 0), None, [])
+[P5j C08 encode 12.0 on TAB_NOINTP MEASUREMENT_0002] (None, 'the value 12.0 is not a table value - the nearest table values are 10.0 and 15.0', [])
+[P5j C08 encode 20.0 on TAB_INTP MEASUREMENT_0001] ((0, 200), None, [])
+[P5j C08 encode 45.0 on TAB_INTP MEASUREMENT_0001] (None, 'the value 45.0 is outside the table range [0.0, 40.0]', [])
+[P5j C08 encode 5.07 on TAB_INTP MEASUREMENT_0001] ((0, 51), None, ['the value 5.07 is not a table value - the write proceeds as 5.1'])
+[P5j C08 encode 0.5 on LIN_10_FLOAT32 VALUE_0012] ((205, 204, 76, 61), None, [])
+[P5j C08 encode 1.0 on LIN_10_FLOAT32 VALUE_0012] ((205, 204, 204, 61), None, [])
+[P5j C08 encode 0.5 on LIN_10_UWORD VALUE_0002] (None, 'the converted raw value 0.05 is not integral', [])
+[P5j C08 encode 1.0 on LIN_10_UWORD VALUE_0002] (None, 'the converted raw value 0.1 is not integral', [])
+[P5j C08 encode 10.0 on LIN_10_UWORD VALUE_0002] ((1, 0), None, [])
+[P5k C08 decode TAB_INTP stored 500 / stored 51] ((40.0, 'ok', ''), (5.1, 'ok', ''))
+[P5l C08 decode TAB_NOINTP stored 6] (20.0, 'ok', '')
+[P5m C08 TBL_NOINTP side table / TBL_INTP side table] ([(0.0, 0.0), (1.0, 5.0), (2.0, 10.0), (3.0, 15.0), (4.0, 20.0)], [(0.0, 0.0), (100.0, 10.0), (200.0, 20.0), (300.0, 30.0), (400.0, 40.0)])
+[P5n C08 decode LIN_OFF_UWORD stored / physical / planned] (12830, (12930.0, 'ok', ''), 12930)
+[P5n C08 decode RAT_FIRST stored / physical / planned] (510, (970.0, 'ok', ''), 970)
+[P5n C08 decode TAB_INTP stored / physical / planned] (200, (20.0, 'ok', ''), 20.0)
+[P6 encode 42/1 LINEAR 0 5, 5] (None, 'LINEAR conversion coefficient a is zero', [])
+[P6 encode 42/2 RAT 0 1 0 0 0 0, 3] (None, 'RAT_FUNC denominator is zero', [])
+[P6 encode 42/3 TAB_NOINTP TB_GONE, 1] (None, 'lookup table missing or empty', [])
+[P6 encode 42/4 TAB_INTP non-numeric, 1] (None, 'lookup table has no numeric entries', [])
+[P6 encode 42/7 FLOAT64 LINEAR 1e-300, 1e300] (None, 'the converted raw value is not finite', [])
+[P6 encode 42/8 SWORD LINEAR 2, 3] (None, 'the converted raw value 1.5 is not integral', [])
+[P6 encode 42/9 SWORD LINEAR 2, 1e9] (None, 'the converted raw value 500000000 is outside the SWORD range', [])
+[P6 encode 42/10 FLOAT16 none, 1] (None, 'datatype FLOAT16_IEEE is not supported', [])
+[P6 encode 42/11 FLOAT32 none, 1e39] (None, 'the raw value does not pack as FLOAT32_IEEE: float too large to pack with f format', [])
+[P6 encode 41/1 UBYTE none, 7] ((7,), None, [])
+[P6 encode 53/1 UWORD big none, 4660] ((18, 52), None, [])
+[P6 encode 53/2 UWORD little none, 4660] ((52, 18), None, [])
+[P6 encode 41/2 SWORD little IDENTICAL, -5] ((251, 255), None, [])
+[P6 encode 47/2 SWORD none, -1 (the encode's bytes)] ((255, 255), None, [])
+[P6 encode 46/1 UWORD little IDENTICAL, 35 (base: whole word)] ((35, 0), None, [])
+[P6 encode 44/1 SBYTE IDENTICAL, 120] ((120,), None, [])
+[P6 encode 44/2 SBYTE IDENTICAL, -128] ((128,), None, [])
+[P6 decode RAT_FUNC 28/1 stored 7] (None, 'error', 'RAT_FUNC has no solution for this value')
+[P6 decode RAT_FUNC 28/2 stored 0] (None, 'error', 'RAT_FUNC has no real root for this value')
+[P6 decode RAT_FUNC 28/3 stored 1] (None, 'error', 'RAT_FUNC has no solution for this value')
+[P6 decode R-A2L-057 RAT 1 0 0 0 0 1 stored 9 limits 0..10] (3.0, 'ok', '')
+[P6 decode R-A2L-055 LINEAR [2, None] stored 3] (6.0, 'ok', '')
+[P6 decode LINEAR 0.1 stored 123 / stored 3] ((12.3, 'ok', ''), (0.30000000000000004, 'ok', ''))
+[P6 _decode_scalar SWORD little FB FF / UWORD big 12 34 / FLOAT16 3C 00] (-5, 4660, None)
+[P7 f'{0.1*123:.2f}'] 12.30
+[P7 repr(0.1*123)] 12.3
+[P7 f'{2.5:.0f}'] 2
+[P7 f'{3.14159:.4f}'] 3.1416
+[P7 f'{0.125:.2f}'] 0.12
+[P7 f'{0.1:.17f}'] 0.10000000000000001
+[P7 '%.15g' % (0.1*3)] 0.3
+[P7 '%.15g' % 1234567.0] 1234567
+[P7 '%.15g' % 1e-07] 1e-07
+[P7 '%.15g' % 12.5] 12.5
+[P7 f'{5.1:.3f}'] 5.100
+[P7 f'{12.5:.1f}'] 12.5
+[P7 unpack >e 3C00] 1.0
+[P7 unpack >f 7FC00000 / 7F800000 / FF800000] [nan, inf, -inf]
+[P7 str(nan), str(inf), str(-inf)] ('nan', 'inf', '-inf')
+[P7 float32(0.1) %.6g / %.15g] ('0.1', '0.100000001490116')
+[P7 (0x1234 & 0x0FF0) >> 4] 35
+[P7 (0xF0F0 & 0xFF00) >> 8] 240
+[P7 (0xF00F & ~0x0FF0) | (35 << 4)] 0xf23f
+[P7 (0x1234 & ~0x0001) | 1] 0x1235
+[P7 abs(5.1-5.07) vs 0.5e-3 / 0.5e-1] (0.02999999999999936, 0.0005, 0.05)
+[P8 DEFC planned: enum raw / bit / field / display raw / display physical] (1, 1, 174, 287, 143.5)
+[P8 DEFC fill word at +0x10 / planned word / bytes +0x00, +0x10..+0x11, +0x20..+0x21] ('0x1787', '0x1ae7', '01', '1a e7', '01 1f')
+# exit 0
+# exit 0

@@ -1,0 +1,134 @@
+date 2026-11-07T00:00:27-06:00 host <runner> load 0.15 0.87 1.71
+label pre-perf; label_match sha256 394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0
+/tmp/c2-pre/s19_app/__init__.py
+cmd: /home/<user>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -s tests/test_b103_label_match_perf.py -k 37_2 or 40_5 or d3 or fam6 or w40 or subo --durations=0
+B4MAX tracemalloc peak 74479560 bytes (71.0 MiB)
+Fhost load before: 0.48 0.88 1.68
+Fhost load before: 0.66 0.89 1.66
+Fhost load before: 0.69 0.90 1.66
+Fhost load before: 1.35 1.03 1.70
+host load after: 2.01 1.19 1.74
+    1136.88 ms    43.2 % margin  R-A2L-MATCH.40 W40 40 a
+    1165.58 ms    41.7 % margin  R-A2L-MATCH.40 W40 64 a
+.host load before: 2.01 1.21 1.74
+host load after: 2.32 1.33 1.77
+     922.31 ms    53.9 % margin  R-A2L-MATCH.40 SUBO 'aa'
+     930.51 ms    53.5 % margin  R-A2L-MATCH.40 SUBO 'aaa'
+     938.36 ms    53.1 % margin  R-A2L-MATCH.40 SUBO 'aaaaaaaa'
+.
+=================================== FAILURES ===================================
+_________ test_r_a2l_match_37_2_densest_ascii_list_stays_within_64_mib _________
+
+    def test_r_a2l_match_37_2_densest_ascii_list_stays_within_64_mib():
+        """R-A2L-MATCH.37/2: the tracemalloc peak while preparing B4MAX (50,000 ASCII names of 10 camel tokens,
+        500,000 distinct tokens, 2,043,024 characters) is <= 67,108,864 bytes; the memory follows the distinct tokens."""
+        names = b4max_names()  # built before tracemalloc starts
+        gc.collect()
+        tracemalloc.start()
+        try:
+            index = build_label_index(names)
+            _, peak = tracemalloc.get_traced_memory()
+        finally:
+            tracemalloc.stop()
+        assert len(index) == 50000
+        print(f"B4MAX tracemalloc peak {peak} bytes ({peak / 1048576:.1f} MiB)")
+>       assert peak <= MEMORY_BOUND_BYTES, f"peak {peak} > {MEMORY_BOUND_BYTES}"
+E       AssertionError: peak 74479560 > 67108864
+E       assert 74479560 <= 67108864
+
+tests/test_b103_label_match_perf.py:341: AssertionError
+________________ test_r_a2l_match_40_5_famq_over_u6_dense_list _________________
+
+u6_index = <s19_app.tui.services.label_match.LabelIndex object at 0x7f4a4d7c8440>
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_match_40_5_famq_over_u6_dense_list(u6_index):
+        """R-A2L-MATCH.40/5: FAMQ(20) (60 characters) and FAMQ(76) (228 characters) over U6 (300,000 postings every FAMQ
+        token reaches within 1 edit), limit 20, median of 7 <= 2.0 s. FAMQ(20): 20 fuzzy entries of 14 edits each;
+        FAMQ(76): [] (more than 20 distinct query tokens, R-A2L-MATCH.41)."""
+        print(_load("before"))
+        medians = []
+        for n_tokens in (20, 76):
+            query = fam_query(FAMQ, n_tokens)
+            assert len(query) == 3 * n_tokens
+            got = rank(query, u6_index, 20)
+            if n_tokens == 20:
+                assert len(got) == 20
+                assert {m.rule.value for m in got} == {"fuzzy"}
+                assert {m.edits for m in got} == {14}
+            else:
+>               assert got == []
+E               AssertionError: assert [LabelMatch(n...5, 41))), ...] == []
+E                 
+E                 Left contains 20 more items, first extra item: LabelMatch(name='abaaaa_abbaaa_abcaaa_abdaaa_abeaaa_abfaaa', rule=<MatchRule.FUZZY: 'fuzzy'>, edits=70, spans=((0, 6), (7, 13), (14, 20), (21, 27), (28, 34), (35, 41)))
+E                 Use -v to get more diff
+
+tests/test_b103_label_match_perf.py:603: AssertionError
+____________ test_r_a2l_match_40_famq_over_d3_densest_postings_list ____________
+
+d3_index = <s19_app.tui.services.label_match.LabelIndex object at 0x7f4a4901b140>
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_match_40_famq_over_d3_densest_postings_list(d3_index):
+        """R-A2L-MATCH.40 (adversarial list D3, E5 round-2 design pass): FAMQ(n) over the densest postings shape found for
+        one 1-edit 3-letter query token, n = 4, 12, 20, 76, limit 20, median of 7 <= 2.0 s; past 20 distinct tokens no
+        fuzzy entry is listed."""
+        print(_load("before"))
+        medians = []
+        for n_tokens in (4, 12, 20, 76):
+            query = fam_query(FAMQ, n_tokens)
+            got = rank(query, d3_index, 20)
+            assert len(got) <= 20
+            if n_tokens > 20:
+>               assert "fuzzy" not in {m.rule.value for m in got}
+E               AssertionError: assert 'fuzzy' not in {'fuzzy'}
+
+tests/test_b103_label_match_perf.py:621: AssertionError
+________________ test_r_a2l_match_40_fam6_over_e2_two_edit_list ________________
+
+e2_index = <s19_app.tui.services.label_match.LabelIndex object at 0x7f4a4d7c3dc0>
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_match_40_fam6_over_e2_two_edit_list(e2_index):
+        """R-A2L-MATCH.40 (adversarial list E2, E5 round-2 design pass): FAM6(n) (6-letter tokens, 2 allowed edits) over
+        E2, n = 4, 12, 24, 36, limit 20, median of 7 <= 2.0 s; past 20 distinct tokens no fuzzy entry is listed."""
+        print(_load("before"))
+        medians = []
+        for n_tokens in (4, 12, 24, 36):
+            query = fam_query(FAM6, n_tokens)
+            assert len(query) <= 256
+            got = rank(query, e2_index, 20)
+            assert len(got) <= 20
+            if n_tokens > 20:
+>               assert "fuzzy" not in {m.rule.value for m in got}
+E               AssertionError: assert 'fuzzy' not in {'fuzzy'}
+
+tests/test_b103_label_match_perf.py:639: AssertionError
+============================= QC-TM timing margins =============================
+41.7%  1.166 s / 2.000 s  R-A2L-MATCH.40 W40 64 a  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_one_token_walk_over_w40
+43.2%  1.137 s / 2.000 s  R-A2L-MATCH.40 W40 40 a  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_one_token_walk_over_w40
+53.1%  0.938 s / 2.000 s  R-A2L-MATCH.40 SUBO 'aaaaaaaa'  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_substring_key_over_subo
+53.5%  0.931 s / 2.000 s  R-A2L-MATCH.40 SUBO 'aaa'  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_substring_key_over_subo
+53.9%  0.922 s / 2.000 s  R-A2L-MATCH.40 SUBO 'aa'  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_substring_key_over_subo
+QC-TM: 5 bounds, 0 under 20 % margin
+============================== slowest durations ===============================
+25.95s call     tests/test_b103_label_match_perf.py::test_r_a2l_match_37_2_densest_ascii_list_stays_within_64_mib
+23.03s call     tests/test_b103_label_match_perf.py::test_r_a2l_match_40_5_famq_over_u6_dense_list
+22.38s call     tests/test_b103_label_match_perf.py::test_r_a2l_match_40_substring_key_over_subo
+18.55s call     tests/test_b103_label_match_perf.py::test_r_a2l_match_40_one_token_walk_over_w40
+6.01s call     tests/test_b103_label_match_perf.py::test_r_a2l_match_40_famq_over_d3_densest_postings_list
+5.37s call     tests/test_b103_label_match_perf.py::test_r_a2l_match_40_fam6_over_e2_two_edit_list
+2.19s setup    tests/test_b103_label_match_perf.py::test_r_a2l_match_40_one_token_walk_over_w40
+2.04s setup    tests/test_b103_label_match_perf.py::test_r_a2l_match_40_5_famq_over_u6_dense_list
+2.01s setup    tests/test_b103_label_match_perf.py::test_r_a2l_match_40_famq_over_d3_densest_postings_list
+1.51s setup    tests/test_b103_label_match_perf.py::test_r_a2l_match_40_substring_key_over_subo
+0.42s setup    tests/test_b103_label_match_perf.py::test_r_a2l_match_40_fam6_over_e2_two_edit_list
+
+(7 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match_perf.py::test_r_a2l_match_37_2_densest_ascii_list_stays_within_64_mib
+FAILED tests/test_b103_label_match_perf.py::test_r_a2l_match_40_5_famq_over_u6_dense_list
+FAILED tests/test_b103_label_match_perf.py::test_r_a2l_match_40_famq_over_d3_densest_postings_list
+FAILED tests/test_b103_label_match_perf.py::test_r_a2l_match_40_fam6_over_e2_two_edit_list
+4 failed, 2 passed, 9 deselected in 109.77s (0:01:49)
+pytest exit 1

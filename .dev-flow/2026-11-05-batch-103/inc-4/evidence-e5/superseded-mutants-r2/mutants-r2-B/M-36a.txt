@@ -1,0 +1,96 @@
+===== diff -u (base vs mutant) s19_app/tui/services/label_match.py =====
+--- /tmp/b103-e5-4-mutr2B/base/s19_app/tui/services/label_match.py	2026-11-06 22:11:34.000000000 -0600
++++ /tmp/b103-e5-4-mutr2B/M-36a/s19_app/tui/services/label_match.py	2026-11-06 22:48:27.310894459 -0600
+@@ -267,6 +267,7 @@
+         raise TypeError(f"query must be str, got {type(query).__name__}")
+     if not isinstance(limit, int) or isinstance(limit, bool):
+         raise TypeError(f"limit must be int, got {type(limit).__name__}")
++    index = build_label_index(index.names)
+     if limit < 1:
+         return []
+     raw = query.strip(_WHITESPACE)
+===== pytest tail =====
+--- uptime before ---
+ 22:48:27 up 1 day, 14:20,  5 users,  load average: 4.17, 2.69, 2.08
+    1822.53 ms  -811.3 % margin  R-A2L-MATCH.36 REF 'JVmL'
+    1899.01 ms  -849.5 % margin  R-A2L-MATCH.36 REF 'xqzjvkw'
+    1882.21 ms  -841.1 % margin  R-A2L-MATCH.36 REF 'qqqq zzzz'
+    1815.22 ms  -807.6 % margin  R-A2L-MATCH.36 REF 'aaaa'
+    1830.09 ms  -815.0 % margin  R-A2L-MATCH.36 REF 'e e e'
+    1893.16 ms  -846.6 % margin  R-A2L-MATCH.36 REF 'Nzukij'
+    3274.72 ms  -1537.4 % margin  R-A2L-MATCH.36 REF 'Ierxjr_Eud'
+    1982.87 ms  -891.4 % margin  R-A2L-MATCH.36 REF 'ledRing'
+    1939.58 ms  -869.8 % margin  R-A2L-MATCH.36 REF 'pposbxiif'
+    1847.00 ms  -823.5 % margin  R-A2L-MATCH.36 REF 'cnt'
+    1860.18 ms  -830.1 % margin  R-A2L-MATCH.36 REF 'temp_sensor_max'
+    1895.41 ms  -847.7 % margin  R-A2L-MATCH.36 REF 'x y z w v u'
+    1914.59 ms  -857.3 % margin  R-A2L-MATCH.36 REF 'pposbxiifkdgfiajnbbpvb_dyan_xvz1'
+    1957.71 ms  -878.9 % margin  R-A2L-MATCH.36 REF 'njraipjtbtu lsuakcoj hsxgibymjxu orfltal'
+    1942.60 ms  -871.3 % margin  R-A2L-MATCH.36 REF 'votklbi fjblnabj qghque pdjxmq tiprdynot'
+    1848.85 ms  -824.4 % margin  R-A2L-MATCH.36 REF 'lmmwngodou jadkvqy khbnukc qomfrybiza ev'
+    1825.81 ms  -812.9 % margin  R-A2L-MATCH.36 REF 'e e e e e e e e e e e e e e e e e e e e '
+    1834.63 ms  -817.3 % margin  R-A2L-MATCH.36 REF 'a b c d e f g h i j k l m n o p q r s t '
+    1811.05 ms  -805.5 % margin  R-A2L-MATCH.36 REF '0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 '
+    1884.53 ms  -842.3 % margin  R-A2L-MATCH.36 REF 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+    1823.34 ms  -811.7 % margin  R-A2L-MATCH.36 REF 'FCA_NPUK_SMM.RWG_TjsPHIoim_SNX_TVC_2_ewh'
+    1842.16 ms  -821.1 % margin  R-A2L-MATCH.36 REF 'RUX_ARV_LFS_QM_GJWTDMS_WDGTH.Fgathduhjd,'
+    1805.72 ms  -802.9 % margin  R-A2L-MATCH.36 REF 'HRR_WOL.TNY_U_ZmyrXSZTPeyoMsdpWwbcUtd_Dw'
+    1865.66 ms  -832.8 % margin  R-A2L-MATCH.36 REF 'RHR_WOL.TNY_U_ZmyrXSZTPeyoMsdpWwbcUtd_Dw'
+____________ test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6 _____________
+
+ref6_index = <s19_app.tui.services.label_match.LabelIndex object at 0x7efd5b918a40>
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6(ref6_index):
+        """R-A2L-MATCH.36/1: each query of the REF6 query set over REF6, limit 20, median of 7 <= 200 ms."""
+        print(_load("before"))
+        medians = []
+        for query in REF6_QUERIES:
+            medians.append((f"R-A2L-MATCH.36 REF6 {query!r}", _median_of(7, lambda q=query: rank(q, ref6_index, 20))))
+        print(_load("after"))
+>       _check_all(medians, KEYSTROKE_BOUND_S)
+
+tests/test_b103_label_match_perf.py:284: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+medians = [("R-A2L-MATCH.36 REF6 'm'", 0.6401293099916074), ("R-A2L-MATCH.36 REF6 'meas_'", 0.6423969409952406), ("R-A2L-MATCH.3...399919474), ("R-A2L-MATCH.36 REF6 'cahr'", 0.6472797979949974), ("R-A2L-MATCH.36 REF6 'cr0'", 0.6632294059963897), ...]
+bound_s = 0.2
+
+    def _check_all(medians, bound_s):
+        """Print EVERY margin line (no truncation, whatever the reporter or a ``tail`` keeps), then assert each
+        median against ``report_margin(..., timing_bound(bound_s))``; the failure names its label."""
+        bound = timing_bound(bound_s)
+        for label_, median in medians:
+            print(f"  {median * 1000:9.2f} ms  {(bound - median) / bound * 100:6.1f} % margin  {label_}")
+        for label_, median in medians:
+>           assert median <= report_margin(label_, median, bound), f"{label_}: median {median:.4f} s"
+E           AssertionError: R-A2L-MATCH.36 REF6 'm': median 0.6401 s
+E           assert 0.6401293099916074 <= 0.2
+E            +  where 0.2 = report_margin("R-A2L-MATCH.36 REF6 'm'", 0.6401293099916074, 0.2)
+
+tests/test_b103_label_match_perf.py:230: AssertionError
+----------------------------- Captured stdout call -----------------------------
+host load before: 2.74 3.26 2.71
+host load after: 3.16 3.30 2.76
+     640.13 ms  -220.1 % margin  R-A2L-MATCH.36 REF6 'm'
+     642.40 ms  -221.2 % margin  R-A2L-MATCH.36 REF6 'meas_'
+     649.23 ms  -224.6 % margin  R-A2L-MATCH.36 REF6 'chr'
+     652.57 ms  -226.3 % margin  R-A2L-MATCH.36 REF6 'mesa'
+     647.28 ms  -223.6 % margin  R-A2L-MATCH.36 REF6 'cahr'
+     663.23 ms  -231.6 % margin  R-A2L-MATCH.36 REF6 'cr0'
+     627.74 ms  -213.9 % margin  R-A2L-MATCH.36 REF6 'char 1'
+     713.68 ms  -256.8 % margin  R-A2L-MATCH.36 REF6 '0'
+     651.13 ms  -225.6 % margin  R-A2L-MATCH.36 REF6 'chr 0'
+     634.96 ms  -217.5 % margin  R-A2L-MATCH.36 REF6 'ch00'
+     630.65 ms  -215.3 % margin  R-A2L-MATCH.36 REF6 'meas 1'
+     625.72 ms  -212.9 % margin  R-A2L-MATCH.36 REF6 'c 0 1'
+============================= QC-TM timing margins =============================
+LOW -875.5%  1.951 s / 0.200 s  R-A2L-MATCH.36 REF 'a'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+LOW -220.1%  0.640 s / 0.200 s  R-A2L-MATCH.36 REF6 'm'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+QC-TM: 2 bounds, 2 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+FAILED tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+2 failed, 7 deselected in 512.55s (0:08:32)
+--- uptime after ---
+ 22:57:00 up 1 day, 14:28,  4 users,  load average: 3.16, 3.30, 2.76

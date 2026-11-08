@@ -1,0 +1,987 @@
+{
+  "marks": [
+    {
+      "name": "parse_a2l_file",
+      "reqs": null,
+      "file": "s19_app/tui/a2l.py",
+      "line": 2797,
+      "def": {
+        "qualname": "parse_a2l_file",
+        "line": 2798,
+        "params": [
+          {
+            "name": "path",
+            "type": "Path",
+            "default": null
+          },
+          {
+            "name": "progress",
+            "type": "Optional[A2LProgress]",
+            "default": "None"
+          }
+        ],
+        "returns": "dict"
+      }
+    }
+  ],
+  "graph_nodes": [
+    {
+      "name": "build_label_index",
+      "reqs": [
+        "R-A2L-MATCH.17",
+        "R-A2L-MATCH.35",
+        "R-A2L-MATCH.37"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Iterable[str]",
+          "name": "names",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "LabelIndex",
+        "names": [
+          "index"
+        ],
+        "raw": "LabelIndex index"
+      },
+      "module": "s19_app/tui/services/label_match.py",
+      "examples": [
+        "(R-A2L-MATCH.17/1, derived) C08i (470 names, `VALUE_0001` twice) → `len(index)` `469`, `index.names` in first-occurrence order (X §G)",
+        "(R-A2L-MATCH.35/1) REF (50,000 names) prepared 3 times → median `1.798` s ≤ 5.0 s (1.809, 1.798, 1.735 s; host load 1.09 before, 1.15 after, 16 cores; B4 §5)",
+        "(R-A2L-MATCH.35/1 neg) a preparation that computes the fuzzy distance of every pair of name tokens (quadratic) → minutes → RED (the row's control; not run)",
+        "(R-A2L-MATCH.37/1) REF prepared once under tracemalloc, nothing else alive → peak `18,940,597` bytes (18.1 MiB) ≤ 67,108,864; `17,496,901` bytes held after the build (B4 §4)",
+        "(R-A2L-MATCH.37/1 neg) the E1 v3 index (dict trie, per-name token tuples, dict of lists) on REF → peak `81,652,763` bytes (77.9 MiB) > 67,108,864 → RED (B4 §4)",
+        "(B4 §3, W) REF → 50,000 names, `77256` distinct tokens (the same sorted token list as v3's), `177148` trie nodes",
+        "(I-3) [`VALUE_0001`, `None`] → TypeError `label names must be str, got NoneType`",
+        "(I-3, derived) `[]` → an index of `len` `0`; any ranking over it → `[]` (X §H)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new (D-1 as ruled; I-3). Prepares a name list once: refuses an element that is not a `str`; keeps each distinct name once, at its first occurrence; folds each (`_fold`) and sets its character mask (`_char_mask`); cuts each into tokens (`_tokens`), gives every distinct folded token an id in code-point order, and stores each name's token ids; builds the postings (token id → the names holding it) and the pre-order array trie of the tokens (`_build_trie`). The fields are `[Data: LabelIndex]`: strings, one tuple and flat `array` buffers — no dict trie, no per-name tuple of token strings, no dict of Python lists (the 77.9 MiB of v3; E2-1).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "rank",
+      "reqs": [
+        "R-A2L-MATCH.1",
+        "R-A2L-MATCH.2",
+        "R-A2L-MATCH.3",
+        "R-A2L-MATCH.4",
+        "R-A2L-MATCH.5",
+        "R-A2L-MATCH.6",
+        "R-A2L-MATCH.7",
+        "R-A2L-MATCH.8",
+        "R-A2L-MATCH.9",
+        "R-A2L-MATCH.10",
+        "R-A2L-MATCH.11",
+        "R-A2L-MATCH.12",
+        "R-A2L-MATCH.13",
+        "R-A2L-MATCH.14",
+        "R-A2L-MATCH.15",
+        "R-A2L-MATCH.16",
+        "R-A2L-MATCH.17",
+        "R-A2L-MATCH.18",
+        "R-A2L-MATCH.19",
+        "R-A2L-MATCH.20",
+        "R-A2L-MATCH.21",
+        "R-A2L-MATCH.22",
+        "R-A2L-MATCH.23",
+        "R-A2L-MATCH.24",
+        "R-A2L-MATCH.25",
+        "R-A2L-MATCH.26",
+        "R-A2L-MATCH.27",
+        "R-A2L-MATCH.28",
+        "R-A2L-MATCH.29",
+        "R-A2L-MATCH.30",
+        "R-A2L-MATCH.31",
+        "R-A2L-MATCH.32",
+        "R-A2L-MATCH.33",
+        "R-A2L-MATCH.34",
+        "R-A2L-MATCH.36"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "query",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "LabelIndex",
+          "name": "index",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "limit",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "list[LabelMatch]",
+        "names": [
+          "matches"
+        ],
+        "raw": "list[LabelMatch] matches"
+      },
+      "module": "s19_app/tui/services/label_match.py",
+      "examples": [
+        "(R-A2L-MATCH.1/1) C08, `  VALUE_0001  ` → `[VALUE_0001 · exact · (0,10)]` (B4 §1)",
+        "(R-A2L-MATCH.1/2) C08, `\\tVALUE_0001\\n` → `[VALUE_0001 · exact · (0,10)]`",
+        "(R-A2L-MATCH.1/3, .27/3) C08, ` value_000 `, limit 5 → `VALUE_0001` … `VALUE_0005`, each `· prefix · (0,9)`",
+        "(R-A2L-MATCH.1, derived) C08, U+001C then `VALUE_0001` (U+001C is not one of the six whitespace characters: it stays, a separator) → `[VALUE_0001 · token · (0,5),(6,10)]`; a bare `str.strip()` would make it `exact` (X §G, §H; E2-5)",
+        "(R-A2L-MATCH.1, derived) C08, U+00A0 then `VALUE_0001` (above U+007F, so a letter: the query token `\\xa0value`) → `[VALUE_0001 · fuzzy · (0,5),(6,10) · e1]` (X §G)",
+        "(R-A2L-MATCH.2/1 … /5) C08, ``, `   `, `\\t\\n`, `_`, `._[]` → `[]` each",
+        "(R-A2L-MATCH.2/1 neg) guard removed → `` is a prefix of all 462 names → 462 `prefix` entries → RED",
+        "(R-A2L-MATCH.3/1, /2) C08, `value_0001` and `Value_0001` → `[VALUE_0001 · exact · (0,10)]` each",
+        "(R-A2L-MATCH.3/3) TW, `rpm` → `[rpm · exact · (0,3); RPM · exact · (0,3); Rpm · exact · (0,3)]`",
+        "(R-A2L-MATCH.4/1, .24/3) NA, `drück` → `[Drück_Max · prefix · (0,5); druck_max · fuzzy · (0,5) · e1; DRÜCK_MAX · fuzzy · (0,5) · e1]`",
+        "(R-A2L-MATCH.4/2) NA, `DRÜCK` → `[DRÜCK_MAX · prefix · (0,5); Drück_Max · fuzzy · (0,5) · e1; druck_max · fuzzy · (0,5) · e1]`",
+        "(R-A2L-MATCH.4/3) C08, `VALUE-0001` → `[VALUE_0001 · token · (0,5),(6,10)]`",
+        "(R-A2L-MATCH.5/1, .26/1) C08, `VALUE_0001` → `[VALUE_0001 · exact · (0,10)]`",
+        "(R-A2L-MATCH.5/2, .26/2) C08, `map_0020` → `[MAP_0020 · exact · (0,8)]`",
+        "(R-A2L-MATCH.5/3) TW, `rpm` → 3 entries, each `exact`",
+        "(R-A2L-MATCH.6/1, .18/1, .27/1) C08, `value_000`, limit 5 → `VALUE_0001` … `VALUE_0005`, each `· prefix · (0,9)`",
+        "(R-A2L-MATCH.6/2, .27/2) C08i, `span` → `[SPAN_OVER_1 · prefix · (0,4); SPAN_OVER_2 · prefix · (0,4)]`",
+        "(R-A2L-MATCH.6/3) C08i, `LIMIT` → `[LIMIT_BREAKER · prefix · (0,5)]`",
+        "(R-A2L-MATCH.7/1, .14/2, .18/2, .23/1, .25/1, .28/2) C08, `0001` (limit 20 or 100) → `[MAP_0001 · substring · (4,8); ASCII_0001 · substring · (6,10); CURVE_0001 · substring · (6,10); VALUE_0001 · substring · (6,10); VAL_BLK_0001 · substring · (8,12); MEASUREMENT_0001 · substring · (12,16)]`",
+        "(R-A2L-MATCH.7/2) SRC, `knife[1]` → `[parameter_instance[0].Knife[1].x · substring · (22,30); parameter_instance[1].Knife[1].x · substring · (22,30); parameter_instance[2].Knife[1].x · substring · (22,30); parameter_instance[3].Knife[1].x · substring · (22,30); parameter_instance[1].Knife[0].x · token · (19,20),(22,27)]`",
+        "(R-A2L-MATCH.7/3) SRC, `[0].Spoon` → `[parameter_instance[0].Spoon.x · substring · (18,27)]`",
+        "(R-A2L-MATCH.7/4) BAL, `ledRing[1]`, limit 4 → `[model.Signals.ledRing[1].red · substring · (14,24); model.Signals.ledRing[1].blue · substring · (14,24); model.Signals.ledRing[1].green · substring · (14,24); model.MainClass.ledController.ledRing[1].red · substring · (30,40)]`",
+        "(R-A2L-MATCH.8/1, .30/1, .34/2) C08, `blk val 00`, limit 3 → `VAL_BLK_0001`, `VAL_BLK_0002`, `VAL_BLK_0003`, each `· token · (0,3),(4,7),(8,10)`",
+        "(R-A2L-MATCH.8/2) BAL, `stop watch` → `[model.MainClass.gameController.stopWatch.timeCounter · token · (31,40)]`",
+        "(R-A2L-MATCH.8/3, .20/3) SWB, `oks ahw` → `[LukPvq.JXML_UPQ_BI.OKSAhwvcueaniy · token · (19,25); AwsQdc.VXAO_CSP_KH.NkshfehlTcyfkjea_IPNR · fuzzy · (0,3),(19,27) · e2; OotGyt.FmcP_UGL_SgvHhu_MME_GEH_kdfba.VsvL_BILR_GtnWga_HGW_RKK_eroog · subsequence · (0,1),(31,32),(38,39),(52,53),(54,55),(56,57)]`",
+        "(R-A2L-MATCH.8/4, .30/2) SRC, `knife 1 x` → `[parameter_instance[0].Knife[1].x · token · (22,27),(28,29),(31,32); parameter_instance[1].Knife[0].x · token · (19,20),(22,27),(31,32); parameter_instance[1].Knife[1].x · token · (19,20),(22,27),(31,32); parameter_instance[2].Knife[1].x · token · (22,27),(28,29),(31,32); parameter_instance[3].Knife[1].x · token · (22,27),(28,29),(31,32)]`",
+        "(R-A2L-MATCH.8/5) C08i, `out range` → `OUT_OF_RANGE_1`, `OUT_OF_RANGE_2`, `OUT_OF_RANGE_3`, each `· token · (0,3),(7,12)`",
+        "(R-A2L-MATCH.8/6) SRC, `knife.*`, limit 4 → `parameter_instance[0].Knife[0].x`, `parameter_instance[0].Knife[1].x`, `parameter_instance[1].Knife[0].x`, `parameter_instance[1].Knife[1].x`, each `· token · (22,27)`",
+        "(R-A2L-MATCH.8/7, .30/3, .34/3) CUR, `a value` → `[AValue · token · (0,6); ABSValue · token · (0,1),(3,8)]`",
+        "(R-A2L-MATCH.8/8) CUR, `map 3 d` → `[Map3D · token · (0,5)]`",
+        "(R-A2L-MATCH.8/9) C08, `VALUE_0001_VALUE_0001` (21 characters, longer than every name) → `[VALUE_0001 · token · (0,5),(6,10)]`",
+        "(R-A2L-MATCH.9/1, .31/1) C08, `mp`, limit 3 → `MAP_0001`, `MAP_0002`, `MAP_0003`, each `· subsequence · (0,1),(2,3)`",
+        "(R-A2L-MATCH.9/2) C08, `ascii 1` → `[ASCII_0001 · subsequence · (0,5),(9,10); ASCII_0010 · subsequence · (0,5),(8,9)]`",
+        "(R-A2L-MATCH.9/3) C08, `map 20` → `[MAP_0020 · subsequence · (0,3),(6,8)]`",
+        "(R-A2L-MATCH.9/4, .31/3) BAL, `gamecontroller timer`, limit 3 → `[model.MainClass.gameController.timer.timeCounter · subsequence · (16,30),(31,36); model.MainClass.gameController.stopWatch.timeCounter · subsequence · (16,30),(32,33),(42,45),(51,52)]`",
+        "(R-A2L-MATCH.10/1, .12/2) C08, `cuvre`, limit 3 → `CURVE_0001`, `CURVE_0002`, `CURVE_0003`, each `· fuzzy · (0,5) · e1`",
+        "(R-A2L-MATCH.10/2, .33/1) C08, `maesurement_0001` → `[MEASUREMENT_0001 · fuzzy · (0,11),(12,16) · e1]`",
+        "(R-A2L-MATCH.10/3) C08, `vlaue_0001` → `[VALUE_0001 · fuzzy · (0,5),(6,10) · e1]`",
+        "(R-A2L-MATCH.10/4, /5, /6, .12/1) C08, `mpa`, `xmap`, `maq`, limit 3 each → `MAP_0001`, `MAP_0002`, `MAP_0003`, each `· fuzzy · (0,3) · e1`",
+        "(R-A2L-MATCH.11/1) C08, `VALUE_0300` → `[]`",
+        "(R-A2L-MATCH.11/2, /3) [`BA_X`], `ab`; [`abc`], `ca` → `[]` each",
+        "(R-A2L-MATCH.12/3) C08, `cvure` → `[]`",
+        "(R-A2L-MATCH.13/1) C08, `valuexx_0001` → `[VALUE_0001 · fuzzy · (0,5),(6,10) · e2]`",
+        "(R-A2L-MATCH.13/2) C08, `valuexxx_0001` → `[]`",
+        "(R-A2L-MATCH.13/3, .22/1) [`CUVE`, `CURVE_0001`], `curvee` → `[CURVE_0001 · fuzzy · (0,5) · e1; CUVE · fuzzy · (0,4) · e2]`",
+        "(R-A2L-MATCH.14/1, .20/1) C08, `value_000`, limit 100 → exactly 20 entries: `VALUE_0001` … `VALUE_0009` `· prefix · (0,9)`; then `VALUE_0010`, `VALUE_0020` … `VALUE_0090` `· subsequence · (0,5),(6,8),(9,10)`; then `VALUE_0100`, `VALUE_0200` `· subsequence · (0,5),(6,7),(8,10)`",
+        "(R-A2L-MATCH.14/1 neg) the subsequence tier left out → `9` entries → RED",
+        "(R-A2L-MATCH.15/1) C08, `temp_sensor_max` → `[]`",
+        "(R-A2L-MATCH.15/2) [``, `   `, `VALUE_0001`], `v` → `[VALUE_0001 · prefix · (0,1)]`",
+        "(R-A2L-MATCH.16/1, .18/3) C08, `value_000`, limit 1 → `[VALUE_0001 · prefix · (0,9)]`",
+        "(R-A2L-MATCH.16/2, .32/2) C08, `valu_0001` → `[VALUE_0001 · token · (0,4),(6,10); VAL_BLK_0001 · fuzzy · (0,3),(8,12) · e1]`",
+        "(R-A2L-MATCH.16/3) C08, `vale_0001` → `[VALUE_0001 · fuzzy · (0,5),(6,10) · e1; VAL_BLK_0001 · fuzzy · (0,3),(8,12) · e1]`",
+        "(R-A2L-MATCH.17/1) C08i, `VALUE_0001` → `[VALUE_0001 · exact · (0,10)]`",
+        "(R-A2L-MATCH.17/2) C08i, `value_000` → the 20 entries of R-A2L-MATCH.14/1, `VALUE_0001` once",
+        "(R-A2L-MATCH.18/1 neg) limit ignored → 20 entries for limit 5 → RED",
+        "(R-A2L-MATCH.19/1, /2) C08, `VALUE`, limit `0` and limit `-1` → `[]` each",
+        "(R-A2L-MATCH.19/2 neg) a slice `[:limit]` → limit -1 returns all but the last listed name → RED",
+        "(R-A2L-MATCH.20/2) BAL, `gamecontroller.timer` → `[model.MainClass.gameController.timer.timeCounter · substring · (16,36); model.MainClass.gameController.stopWatch.timeCounter · subsequence · (16,30),(32,33),(42,45),(51,52)]`",
+        "(R-A2L-MATCH.21/1) [`timeCounter`, `Encounter`], `counter` → `[timeCounter · substring · (4,11); Encounter · substring · (2,9)]`",
+        "(R-A2L-MATCH.21/2) C08, `_0001` → `[MAP_0001 · substring · (3,8); ASCII_0001 · substring · (5,10); CURVE_0001 · substring · (5,10); VALUE_0001 · substring · (5,10); VAL_BLK_0001 · substring · (7,12); MEASUREMENT_0001 · substring · (11,16)]`",
+        "(R-A2L-MATCH.21/3, .29/1) BAL, `ounter`, limit 4 → `[model.MainClass.ledController.sw.timeCounter · substring · (38,44); model.MainClass.gameController.timer.timeCounter · substring · (42,48); model.MainClass.gameController.stopWatch.timeCounter · substring · (46,52)]`",
+        "(R-A2L-MATCH.23/2) [`rpm_x`, `RPMX`], `rpm` → `[RPMX · prefix · (0,3); rpm_x · prefix · (0,3)]`",
+        "(R-A2L-MATCH.24/1) TW, `rpm` → entry 1 `rpm`",
+        "(R-A2L-MATCH.24/2) TW, `RPM` → `[RPM · exact · (0,3); Rpm · exact · (0,3); rpm · exact · (0,3)]`",
+        "(R-A2L-MATCH.25/2) C08r, `0001` → the 6 entries of R-A2L-MATCH.7/1, in the same order",
+        "(R-A2L-MATCH.25/3) TW2, `rpm` → `[rpm · exact · (0,3); RPM · exact · (0,3); Rpm · exact · (0,3)]`",
+        "(R-A2L-MATCH.28/1) [`DiscountCount`], `count` → `[DiscountCount · substring · (8,13)]`",
+        "(R-A2L-MATCH.29/2) SWB, `sahw` → entry 1 `LukPvq.JXML_UPQ_BI.OKSAhwvcueaniy · substring · (21,25)`",
+        "(R-A2L-MATCH.31/2) C08, `value_000` → `VALUE_0010`'s spans `(0,5),(6,8),(9,10)`",
+        "(R-A2L-MATCH.32/1) C08, `maesu`, limit 3 → `MEASUREMENT_0001`, `MEASUREMENT_0002`, `MEASUREMENT_0003`, each `· fuzzy · (0,11) · e1`",
+        "(R-A2L-MATCH.32/3) C08, `vblk`, limit 2 → `[VAL_BLK_0001 · fuzzy · (4,7) · e1; VAL_BLK_0002 · fuzzy · (4,7) · e1]`",
+        "(R-A2L-MATCH.33/2) C08, `measurementss_0001` (18 characters, longer than every name) → `[MEASUREMENT_0001 · fuzzy · (0,11),(12,16) · e2]`",
+        "(R-A2L-MATCH.33/3) [`Curve_Map_X`], `cuvre maq` → `[Curve_Map_X · fuzzy · (0,5),(6,9) · e2]`",
+        "(R-A2L-MATCH.34/1) CUR, `abs value` → `[ABSValue · token · (0,8)]`",
+        "(R-A2L-MATCH.36/1) REF prepared once; each of the 22 QSET queries, limit 20, ranked 7 times → worst median `62.6` ms (`Nzukij`) ≤ 200 ms, 20 of 22 medians ≤ 53.3 ms (B4 §5; the v3 index: 122.6 ms, B3 §4; the sorted-list variant: 158.3 ms, B4a §5)",
+        "(R-A2L-MATCH.36/1 neg) no preparation (every ranking reads the 50,000 names with the oracle) → 9.15 s for one query (E1 v1) → RED; a fuzzy tier that computes the prefix distance of every distinct token per query token → about 1.2 s (E1 v1, `qqqq zzzz`) → RED",
+        "(AT-B103-I4-1) C08, limit 5, `m`, `ma`, `map`, `map_`, `map_00` in turn on one index → `MAP_0001` … `MAP_0005`, each `· prefix · (0,k)`, k = 1, 2, 3, 4, 6; `map_002` → `[MAP_0020 · prefix · (0,7); MAP_0002 · subsequence · (0,3),(4,6),(7,8); MAP_0012 · subsequence · (0,3),(4,6),(7,8)]`; `map_0020` → `[MAP_0020 · exact · (0,8)]` (B4 §1)",
+        "(AT-B103-I4-2) SWA, limit 5, target `JotafVod_msrqlLzL_kh2C_rWl_pfue._0_` → entry 1 is the target for each query: the target `exact (0,35)`, `jotafvod` `prefix (0,8)`, `msrqlLzL` `substring (9,17)`, `pfue._0_` `substring (27,35)`, `jotaf vod` and `vod jotaf` `token (0,8)`, `jotfa vod` and `jotaf_vdo` `fuzzy (0,8) e1` (B4 §1, target position 0 for all 8)",
+        "(purity, derived) the same query, index and limit twice → equal lists; the list passed to `build_label_index` unchanged (X §G)",
+        "(I-3) `rank(None, index, 20)` → TypeError `query must be str, got NoneType`; `rank(\"VALUE\", index, True)` → TypeError `limit must be int, got bool`; `rank(\"VALUE\", index, 2.0)` → TypeError `limit must be int, got float`"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new (I-3). Ranks the prepared names for one query: type checks, then `[]` for a limit below 1 or a query with no letter or digit; then the rule tiers in rank order over the index, stopping after the tier at which `limit` names are found; then the order of `_order_key` with case-exactness computed only for the groups it reaches, and each entry from `_classify`. The procedure is pinned in the note under this node (R-A2L-MATCH.36).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "LabelIndex.__len__",
+      "reqs": [
+        "R-A2L-MATCH.17"
+      ],
+      "in": [],
+      "out": {
+        "type": "int",
+        "names": [
+          "count"
+        ],
+        "raw": "int count"
+      },
+      "module": "s19_app/tui/services/label_match.py",
+      "examples": [
+        "(R-A2L-MATCH.17/1, derived) `build_label_index(C08i)` → `469` (X §G)",
+        "(derived) `build_label_index([])` → `0` (X §H); `build_label_index(REF)` → `50000` (B4 §3)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new (I-3). The number of distinct names the index holds: `len(self.names)`.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "_fold",
+      "reqs": [
+        "R-A2L-MATCH.3",
+        "R-A2L-MATCH.4"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "text",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "str",
+        "names": [
+          "folded"
+        ],
+        "raw": "str folded"
+      },
+      "module": "s19_app/tui/services/label_match.py",
+      "examples": [
+        "(R-A2L-MATCH.3/1) `VALUE_0001` → `value_0001`",
+        "(R-A2L-MATCH.4/1) `DRÜCK_MAX` → `drÜck_max` (`Ü` kept; `drück` is 1 edit from the token `drÜck`, X §C), so `DRÜCK_MAX` is `fuzzy` for `drück`, not `prefix` (B4 §1)",
+        "(R-A2L-MATCH.4/1 neg) `str.lower` → `drück_max` → `DRÜCK_MAX` becomes `prefix` for `drück` → RED"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new (D-2 A). `A`–`Z` (U+0041 … U+005A) → `a`–`z`; every other character kept, so the result is as long as `text` and spans index the name directly. `str.translate` with a 26-entry table; never `str.lower` or `str.casefold` (Unicode tables, version-dependent).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "_char_mask",
+      "reqs": [
+        "R-A2L-MATCH.9",
+        "R-A2L-MATCH.36"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "text",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "int",
+        "names": [
+          "mask"
+        ],
+        "raw": "int mask"
+      },
+      "module": "s19_app/tui/services/label_match.py",
+      "examples": [
+        "(X §H) `map_0001` → `1125900108206081` (bits of `a`, `m`, `p`, `0`, `1`, and `_` → bit 50)",
+        "(R-A2L-MATCH.9/1, X §H) keys `mp` → `36864`; `36864 & ~1125900108206081` → `0`, so `MAP_0001` goes on to `_subsequence`; keys `mpz` → `33591296`, `& ~` → `33554432` (no `z`), so it is skipped"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new. The OR of one bit per character of an already folded `text`: `a`–`z` → bits 0–25, `0`–`9` → bits 26–35, any other character `c` → bit `36 + ord(c) % 27` (at most 62, so a mask fits `array('Q')`). A name holds the key characters in order only if its mask holds every bit of the keys' mask; a shared bit lets more names through to `_subsequence`, never fewer.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "_tokens",
+      "reqs": [
+        "R-A2L-MATCH.8",
+        "R-A2L-MATCH.10",
+        "R-A2L-MATCH.21",
+        "R-A2L-MATCH.28",
+        "R-A2L-MATCH.29",
+        "R-A2L-MATCH.30",
+        "R-A2L-MATCH.32"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "text",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "tuple[tuple[int, int], ...]",
+        "names": [
+          "spans"
+        ],
+        "raw": "tuple[tuple[int, int], ...] spans"
+      },
+      "module": "s19_app/tui/services/label_match.py",
+      "examples": [
+        "(CTX-A2L-MATCH *token*, X §A) `VAL_BLK_0001` → `((0, 3), (4, 7), (8, 12))`",
+        "(X §A) `model.MainClass.ledRing[0].red` → `((0, 5), (6, 10), (10, 15), (16, 19), (19, 23), (24, 25), (27, 30))` (model · Main · Class · led · Ring · 0 · red)",
+        "(X §A) `ABSValue` → `((0, 3), (3, 8))`; `AValue` → `((0, 1), (1, 6))`; `Map3D` → `((0, 3), (3, 4), (4, 5))`",
+        "(X §A) `LukPvq.JXML_UPQ_BI.OKSAhwvcueaniy` → `((0, 3), (3, 6), (7, 11), (12, 15), (16, 18), (19, 22), (22, 33))`",
+        "(X §A) `Drück_Max` → `((0, 5), (6, 9))`; `JVmL` → `((0, 1), (1, 3), (3, 4))` (J · Vm · L)",
+        "(X §A) `___` → `()`; `` → `()`",
+        "(derived, X §A, §H) U+00A0 then `VALUE_0001` → `((0, 6), (7, 11))` (U+00A0 is a letter); U+001C then `VALUE_0001` → `((1, 6), (7, 11))` (U+001C is a separator); three U+0663 → `((0, 3),)` (one letter token)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new. The [start, end) spans of the CTX-A2L-MATCH *tokens* of `text`, read on the unfolded text (the case cuts need the case): maximal runs of `0`–`9`; maximal runs of letters (A–Z, a–z, or any character above U+007F), cut before an uppercase letter that follows a lowercase one and before the last uppercase letter of a run of two or more that a lowercase letter follows. Every other character is a separator and in no token. Classes by code point, never `str.isalpha`, `isdigit` or `isalnum` (E2-5).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "_allowed_edits",
+      "reqs": [
+        "R-A2L-MATCH.11",
+        "R-A2L-MATCH.12",
+        "R-A2L-MATCH.13"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "token",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "int",
+        "names": [
+          "allowed"
+        ],
+        "raw": "int allowed"
+      },
+      "module": "s19_app/tui/services/label_match.py",
+      "examples": [
+        "(R-A2L-MATCH.11, X §B) `0300` → `0`; `1` → `0`; `ab` → `0`; `x` → `0`",
+        "(R-A2L-MATCH.12, X §B) `maq` → `1`; `cuvre` → `1`; `drück` → `1`",
+        "(R-A2L-MATCH.13, X §B) `valuexx` → `2`; `curvee` → `2`; `measurementss` → `2`",
+        "(derived, X §H) three U+0663 → `1` (three letters by CTX-A2L-MATCH; `str.isdigit()` says `True`, which would give 0: E2-5)",
+        "(R-A2L-MATCH.11/1 neg) 1 edit for a digit token → `VALUE_0300` lists `VALUE_0200` → RED"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new (D-4 A). 0 for a token of digits (its first character is `0`–`9`: tokens are pure runs) or of 1 or 2 letters; 1 for 3 to 5 letters; 2 for 6 or more.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "_prefix_distance",
+      "reqs": [
+        "R-A2L-MATCH.10",
+        "R-A2L-MATCH.12",
+        "R-A2L-MATCH.13",
+        "R-A2L-MATCH.32",
+        "R-A2L-MATCH.33"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "query_token",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "name_token",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "cap",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "int",
+        "names": [
+          "distance"
+        ],
+        "raw": "int distance"
+      },
+      "module": "s19_app/tui/services/label_match.py",
+      "examples": [
+        "(CTX-A2L-MATCH *prefix distance*, X §C) `cuvre`, `curve` → `1`; `valuee`, `value` → `1`; `value`, `val` → `2` (cap 2)",
+        "(R-A2L-MATCH.10/4 … /6, X §C) `mpa`, `map` → `1`; `xmap`, `map` → `1`; `maq`, `map` → `1` (cap 1)",
+        "(R-A2L-MATCH.12/3, X §C, §H) `cvure`, `curve`, cap 1 → `2` (= cap + 1; the distance is 2)",
+        "(R-A2L-MATCH.32/1, X §C) `maesu`, `measurement`, cap 1 → `1`",
+        "(R-A2L-MATCH.13/1, /2, X §C, §H) `valuexx`, `value`, cap 2 → `2`; `valuexxx`, `value`, cap 2 → `3`",
+        "(R-A2L-MATCH.11/3, X §C) `ca`, `abc` → `1` (the prefix `a`)",
+        "(R-A2L-MATCH.10/1 neg) plain Levenshtein → `cuvre`, `curve` → `2` → RED"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new (D-5 A). The smallest optimal-string-alignment distance between `query_token` and a prefix of `name_token` (the empty prefix included) when it is at most `cap`, else `cap + 1`; it may stop as soon as a whole column of the alignment is above `cap`. Characters compare as given: both folded, or both raw for the case-exact check. Used by `_classify`; `_fuzzy_token_distances` gives the same values for many tokens at once.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "_join_spans",
+      "reqs": [
+        "R-A2L-MATCH.34"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "list[tuple[int, int]]",
+          "name": "spans",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "tuple[tuple[int, int], ...]",
+        "names": [
+          "joined"
+        ],
+        "raw": "tuple[tuple[int, int], ...] joined"
+      },
+      "module": "s19_app/tui/services/label_match.py",
+      "examples": [
+        "(R-A2L-MATCH.34/2, X §D) `[(4, 7), (0, 3), (8, 10)]` → `((0, 3), (4, 7), (8, 10))`",
+        "(R-A2L-MATCH.34/1, X §D) `[(0, 3), (3, 8)]` → `((0, 8),)`",
+        "(R-A2L-MATCH.34/3, X §D) `[(0, 1), (1, 6)]` → `((0, 6),)`; `[(0, 1), (3, 8)]` → `((0, 1), (3, 8))`",
+        "(R-A2L-MATCH.31/2, X §D) the eight one-character spans of `value_000` on `VALUE_0010` → `((0, 5), (6, 8), (9, 10))`",
+        "(R-A2L-MATCH.34/1 neg) touching spans kept apart → `((0, 3), (3, 8))` → RED"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new. The fewest spans in offset order that cover the same offsets: sort, then join each span that starts at or before the end of the one before it.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "_at_boundary",
+      "reqs": [
+        "R-A2L-MATCH.21",
+        "R-A2L-MATCH.28",
+        "R-A2L-MATCH.29"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "name",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "offset",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "bool",
+        "names": [
+          "boundary"
+        ],
+        "raw": "bool boundary"
+      },
+      "module": "s19_app/tui/services/label_match.py",
+      "examples": [
+        "(R-A2L-MATCH.28/1, X §E) `DiscountCount`, `3` → `False`; `DiscountCount`, `8` → `True`",
+        "(R-A2L-MATCH.21/2, X §E) `MAP_0001`, `3` (the `_`) → `True`; `4` → `True`; `5` → `False`",
+        "(R-A2L-MATCH.21/1, X §E) `timeCounter`, `4` → `True`; `Encounter`, `2` → `False`",
+        "(X §E) `ABSValue`, `2` → `False`; `ABSValue`, `3` → `True`; `Map3D`, `3` and `4` → `True`",
+        "(R-A2L-MATCH.29/1, /2, X §E) `model.MainClass.ledController.sw.timeCounter`, `38` → `False`; `LukPvq.JXML_UPQ_BI.OKSAhwvcueaniy`, `21` → `False`, `22` → `True`",
+        "(X §E) every offset of every name of C08, C08i, SRC, BAL, SWB, SWA and six more (`572,421` offsets) → equal to the oracle's boundary set (from `_tokens` and the separators): `0` disagreements"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new (in place of v3's per-name boundary bitmask; E2-1). Whether `offset` of `name` is a CTX-A2L-MATCH *boundary offset*: offset 0; a separator; or the first offset of a token, read on the unfolded name from its neighbours — the character before is a separator; one of the two is a digit and the other a letter; a lowercase letter then an uppercase one; or an uppercase letter before an uppercase letter that a lowercase letter follows.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "_subsequence",
+      "reqs": [
+        "R-A2L-MATCH.9",
+        "R-A2L-MATCH.31"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "keys",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "text",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Optional[tuple[int, ...]]",
+        "names": [
+          "offsets"
+        ],
+        "raw": "tuple[int, ...]? offsets"
+      },
+      "module": "s19_app/tui/services/label_match.py",
+      "examples": [
+        "(R-A2L-MATCH.9/1, .31/1, derived from the spans of B4 §1) `mp`, `map_0001` → `(0, 2)`, spans `(0,1),(2,3)`",
+        "(R-A2L-MATCH.9/3, derived from O) `map20`, `map_0020` → `(0, 1, 2, 6, 7)`, spans `(0,3),(6,8)`",
+        "(R-A2L-MATCH.31/2, derived from X §D) `value000`, `value_0010` → `(0, 1, 2, 3, 4, 6, 7, 9)`",
+        "(derived) `mpz`, `map_0001` → `None`",
+        "(R-A2L-MATCH.31/3 neg) each key at its rightmost possible offset → other spans on the BalanceTube name → RED"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new. The leftmost offsets of the key characters in `text`, each after the one before (`str.find` from the previous offset + 1), or `None` when one is missing.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "_parse_query",
+      "reqs": [
+        "R-A2L-MATCH.1",
+        "R-A2L-MATCH.2",
+        "R-A2L-MATCH.3",
+        "R-A2L-MATCH.8",
+        "R-A2L-MATCH.24"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "query",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "bool",
+          "name": "fold",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Optional[_Query]",
+        "names": [
+          "parsed"
+        ],
+        "raw": "_Query? parsed"
+      },
+      "module": "s19_app/tui/services/label_match.py",
+      "examples": [
+        "(R-A2L-MATCH.1/1) `  VALUE_0001  `, `True` → text `value_0001`, tokens (`value`, `0001`), keys `value0001`",
+        "(R-A2L-MATCH.2/1, /2, /4, /5) ``, `   `, `_`, `._[]` → `None`",
+        "(R-A2L-MATCH.8, X §A) `JVmL`, `True` → tokens (`j`, `vm`, `l`)",
+        "(R-A2L-MATCH.24) `Value_0001`, `False` → text `Value_0001`, tokens (`Value`, `0001`): the case-exact check compares these with the raw name",
+        "(R-A2L-MATCH.1, derived, X §A, §H) U+001C then `VALUE_0001`, `True` → text U+001C + `value_0001` (U+001C kept), tokens (`value`, `0001`); U+00A0 then `VALUE_0001` → tokens (U+00A0 + `value`, `0001`)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new. Strips exactly the six CTX-A2L-MATCH whitespace characters (space, tab, line feed, carriage return, vertical tab, form feed) from both ends — never a bare `str.strip()`, which also strips U+001C … U+001F, U+0085, U+00A0 and others (E2-5); `None` when what is left holds no letter or digit; else `[Data: _Query]`: `text` = the stripped query, folded when `fold`; `tokens` = the `_tokens` spans of the stripped (unfolded) query, taken from `text`; `keys` = the letters and digits of `text`, in order; `folded` = `fold`.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "_classify",
+      "reqs": [
+        "R-A2L-MATCH.5",
+        "R-A2L-MATCH.6",
+        "R-A2L-MATCH.7",
+        "R-A2L-MATCH.8",
+        "R-A2L-MATCH.9",
+        "R-A2L-MATCH.10",
+        "R-A2L-MATCH.15",
+        "R-A2L-MATCH.16",
+        "R-A2L-MATCH.21",
+        "R-A2L-MATCH.24",
+        "R-A2L-MATCH.26",
+        "R-A2L-MATCH.27",
+        "R-A2L-MATCH.28",
+        "R-A2L-MATCH.29",
+        "R-A2L-MATCH.30",
+        "R-A2L-MATCH.31",
+        "R-A2L-MATCH.32",
+        "R-A2L-MATCH.33"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "_Query",
+          "name": "query",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "name",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "Optional[tuple[MatchRule, int, tuple[tuple[int, int], ...]]]",
+        "names": [
+          "classified"
+        ],
+        "raw": "tuple[MatchRule, int, tuple[tuple[int, int], ...]]? classified"
+      },
+      "module": "s19_app/tui/services/label_match.py",
+      "examples": [
+        "(R-A2L-MATCH.16/1, O) `value_000` (folded), `VALUE_0001` → `(PREFIX, 0, ((0, 9),))` (also a substring and a fuzzy match); raw → `None`",
+        "(R-A2L-MATCH.16/3, O) `vale_0001`, `VALUE_0001` → `(FUZZY, 1, ((0, 5), (6, 10)))` (also a subsequence match)",
+        "(R-A2L-MATCH.32/2, O) `valu_0001`, `VAL_BLK_0001` → `(FUZZY, 1, ((0, 3), (8, 12)))`",
+        "(R-A2L-MATCH.28/1, O) `count`, `DiscountCount` → `(SUBSTRING, 0, ((8, 13),))`; raw → `(SUBSTRING, 1, ((3, 8),))`, the same rule, so case-exact",
+        "(R-A2L-MATCH.29/1, O) `ounter`, `model.MainClass.ledController.sw.timeCounter` → `(SUBSTRING, 1, ((38, 44),))`",
+        "(R-A2L-MATCH.24/3, O) raw `drück`: `druck_max` → `(FUZZY, 1, ((0, 5),))` (case-exact); `DRÜCK_MAX` → `None` (not case-exact); `Drück_Max` → `FUZZY` while its folded rule is `PREFIX` (not case-exact)",
+        "(R-A2L-MATCH.30/2, O) `knife 1 x`, `parameter_instance[1].Knife[0].x` → `(TOKEN, 0, ((19, 20), (22, 27), (31, 32)))`",
+        "(R-A2L-MATCH.9/3, O) `map 20`, `MAP_0020` → `(SUBSEQUENCE, 0, ((0, 3), (6, 8)))`",
+        "(R-A2L-MATCH.15/1, O) `temp_sensor_max`, `VALUE_0001` → `None`",
+        "(R-A2L-MATCH.16/1 neg) the last rule met instead of the first → `VALUE_0001` is `FUZZY` for `value_000` → RED"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new (the rows' definitional check for one name; the E1 oracle `evaluate_b`). The first rule in rank order that `name` (folded when `query.folded`) meets for `query`, with its rule key and its match spans, or `None`. EXACT: `((0, len(name)),)`. PREFIX: `((0, len(query.text)),)`. SUBSTRING: key 0 and the leftmost occurrence at a boundary offset (`_at_boundary`), else key 1 and the leftmost occurrence. TOKEN: for each query token, from the start of the leftmost name token that starts with it, as long as it. FUZZY (the name has a token): for each query token the leftmost name token at the smallest `_prefix_distance(qt, nt, _allowed_edits(qt))`, which must be at most `_allowed_edits(qt)`; key = the sum; span = that name token. SUBSEQUENCE: one span per offset of `_subsequence`. Spans pass through `_join_spans`. `rank` calls it for each listed name, and with the raw query for case-exactness (the same rule).",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "_order_key",
+      "reqs": [
+        "R-A2L-MATCH.20",
+        "R-A2L-MATCH.21",
+        "R-A2L-MATCH.22",
+        "R-A2L-MATCH.23",
+        "R-A2L-MATCH.24",
+        "R-A2L-MATCH.25"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "MatchRule",
+          "name": "rule",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "key",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "name",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "bool",
+          "name": "case_exact",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "tuple[int, int, int, int, str]",
+        "names": [
+          "order"
+        ],
+        "raw": "tuple[int, int, int, int, str] order"
+      },
+      "module": "s19_app/tui/services/label_match.py",
+      "examples": [
+        "(R-A2L-MATCH.23/2, O) query `rpm`: `RPMX` → `(1, 0, 4, 1, 'RPMX')` < `rpm_x` → `(1, 0, 5, 0, 'rpm_x')`",
+        "(R-A2L-MATCH.24/2, O) query `RPM`: `(0, 0, 3, 0, 'RPM')` < `(0, 0, 3, 1, 'Rpm')` < `(0, 0, 3, 1, 'rpm')`",
+        "(R-A2L-MATCH.22/1, O) query `curvee`: `(4, 1, 10, 1, 'CURVE_0001')` < `(4, 2, 4, 1, 'CUVE')`",
+        "(R-A2L-MATCH.21/1, O) query `counter`: `(2, 0, 11, 1, 'timeCounter')` < `(2, 1, 9, 0, 'Encounter')`",
+        "(R-A2L-MATCH.20/1, O, B4 §1) query `value_000`: `VALUE_0001` → `(1, 0, 10, 1, 'VALUE_0001')`; every `prefix` key `(1, …)` sorts before every `subsequence` key `(5, …)`",
+        "(R-A2L-MATCH.25/2 neg) a stable sort with no name part → C08r gives `VALUE_0001` first for `0001` → RED"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new (D-3 B, D-6 A). `(position of rule in MatchRule, key, len(name), 0 if case_exact else 1, name)`; tuple and `str` comparison give the rank order, code-point order last, so the order is total over distinct names and the input order decides nothing.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "_token_range",
+      "reqs": [
+        "R-A2L-MATCH.8",
+        "R-A2L-MATCH.11",
+        "R-A2L-MATCH.30"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "list[str]",
+          "name": "tokens",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "prefix",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "tuple[int, int]",
+        "names": [
+          "lo",
+          "hi"
+        ],
+        "raw": "tuple(int lo, int hi)"
+      },
+      "module": "s19_app/tui/services/label_match.py",
+      "examples": [
+        "(X §H) C08's 215 tokens, `va` → `(213, 215)` (`val`, `value`); `valu` → `(214, 215)`; `m` → `(211, 213)` (`map`, `measurement`); `0` → `(0, 208)`; `zz` → `(215, 215)`, empty",
+        "(R-A2L-MATCH.11/2) [`BA_X`] (tokens `ba`, `x`), `ab` → an empty range: no token and no fuzzy match, so `rank` gives `[]`"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new. The ids `lo` … `hi - 1` of the sorted distinct tokens that start with `prefix` (contiguous in code-point order): `bisect_left(tokens, prefix)`, then `bisect_left` of `prefix[:-1] + chr(ord(prefix[-1]) + 1)` from `lo`; a prefix that ends in U+10FFFF scans forward instead.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "_build_trie",
+      "reqs": [
+        "R-A2L-MATCH.35",
+        "R-A2L-MATCH.36",
+        "R-A2L-MATCH.37"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "list[str]",
+          "name": "tokens",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "tuple[str, array, array, array]",
+        "names": [
+          "chars",
+          "depth",
+          "first",
+          "end"
+        ],
+        "raw": "tuple(str chars, array depth, array first, array end)"
+      },
+      "module": "s19_app/tui/services/label_match.py",
+      "examples": [
+        "(X §H) [`0001`, `curve`, `cuve`] → chars `0001curveve`, depth `[1, 2, 3, 4, 1, 2, 3, 4, 5, 3, 4]`, first `[0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 3]`, end `[4, 4, 4, 4, 11, 11, 9, 9, 9, 11, 11]`",
+        "(R-A2L-MATCH.37, B4 §4, W) REF's 77,256 tokens → `177148` nodes; chars 177,197 bytes and each array 749,076 bytes, 2.3 MiB in all"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new (E2-1). The pre-order array trie of the sorted distinct tokens: one node per distinct non-empty prefix, in pre-order (= the tokens' code-point order); `chars[j]` is its last character, `depth[j]` its length, `first[j]` the id of the first token under it, `end[j]` the index after its subtree; `first` ends with one sentinel, `len(tokens)`; the arrays are `array('I')`. The tokens under node `j` are the ids `first[j]` … `first[end[j]] - 1`. One pass over the tokens with the common prefix of each and the one before, and a stack of open nodes.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "_fuzzy_token_distances",
+      "reqs": [
+        "R-A2L-MATCH.10",
+        "R-A2L-MATCH.11",
+        "R-A2L-MATCH.12",
+        "R-A2L-MATCH.13",
+        "R-A2L-MATCH.36"
+      ],
+      "in": [
+        {
+          "kind": "value",
+          "type": "LabelIndex",
+          "name": "index",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "str",
+          "name": "query_token",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "int",
+          "name": "allowed",
+          "default": null
+        }
+      ],
+      "out": {
+        "type": "dict[int, int]",
+        "names": [
+          "distances"
+        ],
+        "raw": "dict[int, int] distances"
+      },
+      "module": "s19_app/tui/services/label_match.py",
+      "examples": [
+        "(R-A2L-MATCH.10/1, X §F) C08, `cuvre`, `1` → {`curve`: 1} (ids written as their tokens)",
+        "(R-A2L-MATCH.10/4, X §F) C08, `mpa`, `1` → {`map`: 1, `measurement`: 1}",
+        "(R-A2L-MATCH.32, X §F) C08, `maesu`, `1` → {`measurement`: 1}; `vblk` → {`blk`: 1}; `valu` → {`val`: 1, `value`: 0}",
+        "(R-A2L-MATCH.12/3, X §F) C08, `cvure`, `1` → `{}`",
+        "(R-A2L-MATCH.13/3, X §F) [`CUVE`, `CURVE_0001`], `curvee`, `2` → {`curve`: 1, `cuve`: 2}",
+        "(R-A2L-MATCH.11/1) C08, `0300`, `0` → `{}` (no token starts with `0300`)",
+        "(X §F) REF, 33 query tokens with 1 or 2 allowed edits (from `nzukij` to `pposbxiifkdgfiajnbbpvb`) → equal to brute force (the prefix distance to each of the 77,256 tokens): `0` mismatches",
+        "(R-A2L-MATCH.36, W) REF, median of 5 per query token: `nzukij` `45.0` ms (v3 dict trie 46.3, bare sorted list 81.9); `pposbxiifkdgfiajnbbpvb` `40.3` ms (v3 102.0, sorted list 136.7); all 24 tokens `358.0` ms (v3 461.7, sorted list 773.4)"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "new (E2-1). `{token id: prefix distance}` for every distinct token of `index` at a prefix distance of at most `allowed` from `query_token`. For `allowed` 0: every id of `_token_range(index._tokens, query_token)`, with 0. Otherwise one walk of the trie arrays in pre-order: each node's alignment column from its parent's (and its grandparent's, for a transposition), capped at `allowed + 1` and computed only on the band |row − depth| ≤ `allowed`; the best prefix distance so far carried down the path; when the column minimum is above `allowed` or not below the best, every token under the node gets the best (when it is at most `allowed`) and the walk jumps to `end[j]`. The same values as `_prefix_distance` token by token.",
+      "volatile": [],
+      "oracle": []
+    },
+    {
+      "name": "parse_a2l_file",
+      "reqs": [],
+      "in": [
+        {
+          "kind": "value",
+          "type": "Path",
+          "name": "path",
+          "default": null
+        },
+        {
+          "kind": "value",
+          "type": "Optional[A2LProgress]",
+          "name": "progress",
+          "default": "None"
+        }
+      ],
+      "out": {
+        "type": "dict",
+        "names": [
+          "parsed"
+        ],
+        "raw": "dict parsed"
+      },
+      "module": "s19_app/tui/a2l.py",
+      "examples": [
+        "(fixture C08, B4 header) case 08 `firmware.a2l` (seed 20260001) → `462` names, `VALUE_0001` … `VAL_BLK_0060` (`../evidence-e1/case08-names.txt`)",
+        "(fixture C08i, B4 header) `firmware_issues.a2l` → `470` names, `VALUE_0001` twice",
+        "(fixtures, B4 header) `software_a.a2l` → `13990`, `software_b.a2l` → `67`, `BalanceTube_STMicro.a2l` → `111`, `from_source.a2l` → `72` names"
+      ],
+      "modify": [],
+      "assign": [],
+      "func": "unchanged (frozen module `tui/a2l.py`; context only). The reader G-T1 takes the fixture names from: `parse_a2l_file(path)[\"tags\"][i][\"name\"]`, in file order (the tag dict at `a2l.py:2610-2612`; the A2L views list these names, S2.2). The matcher never calls it: the new module imports no `s19_app` code, and no product caller changes. Real callers (the extractor on a throwaway copy, tests excluded; `extract-e2/diff-report.md`, \"Top-level sites\"): `s19_app/tui/app.py:948`, `:950` (both in `parse_a2l_cached`, `:906`, R), `s19_app/tui/services/flow_execution_service.py:381`, `:500` (in `run_flow`, `:187`, R), `s19_app/tui/services/variant_execution_service.py:2665` (in `execute_variant_plan`, `:2609`, R). Its contract in this node matches the code (no drift on it).",
+      "volatile": [],
+      "oracle": []
+    }
+  ],
+  "calls": [],
+  "top_level_sites": {
+    "parse_a2l_file": [
+      "s19_app/tui/app.py:948",
+      "s19_app/tui/app.py:950",
+      "s19_app/tui/services/flow_execution_service.py:381",
+      "s19_app/tui/services/flow_execution_service.py:500",
+      "s19_app/tui/services/variant_execution_service.py:2665"
+    ]
+  },
+  "findings": [
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/services/label_match.py",
+      "msg": "`build_label_index`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/services/label_match.py",
+      "msg": "`rank`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/services/label_match.py",
+      "msg": "`LabelIndex.__len__`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/services/label_match.py",
+      "msg": "`_fold`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/services/label_match.py",
+      "msg": "`_char_mask`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/services/label_match.py",
+      "msg": "`_tokens`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/services/label_match.py",
+      "msg": "`_allowed_edits`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/services/label_match.py",
+      "msg": "`_prefix_distance`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/services/label_match.py",
+      "msg": "`_join_spans`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/services/label_match.py",
+      "msg": "`_at_boundary`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/services/label_match.py",
+      "msg": "`_subsequence`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/services/label_match.py",
+      "msg": "`_parse_query`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/services/label_match.py",
+      "msg": "`_classify`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/services/label_match.py",
+      "msg": "`_order_key`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/services/label_match.py",
+      "msg": "`_token_range`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/services/label_match.py",
+      "msg": "`_build_trie`"
+    },
+    {
+      "kind": "graph_node_without_mark",
+      "where": "s19_app/tui/services/label_match.py",
+      "msg": "`_fuzzy_token_distances`"
+    }
+  ],
+  "parse_failures": []
+}

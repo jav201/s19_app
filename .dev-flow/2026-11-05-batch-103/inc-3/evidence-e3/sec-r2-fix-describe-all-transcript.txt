@@ -1,0 +1,9 @@
+s19_app.__file__ = ~/work/b103-int2a/s19_app/__init__.py | python 3.11.18 | part describe-all
+A2L section tree has structural errors: path=~/work/b103-int2a/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+[X5] file: 5,000 FIX curves at max 1,048,576 + 1,000 FIX maps of two such axes; 1.38 MB; parse (frozen a2l.py) 0.30 s; tags 6,000
+[X6] model describe-all (Inc 3a reads, corrected), run 1: 1.789 s, peak 8.0 MiB, kept 6.6 MiB; objects 6,000; refusals {None: 5000, 'A2L-DEF-ADDRESS': 1000}; axes with a fixed_rule 7,000; axes holding built points 0
+[X6] model describe-all (Inc 3a reads, corrected), run 2: 1.775 s, peak 8.0 MiB, kept 6.6 MiB; objects 6,000; refusals {None: 5000, 'A2L-DEF-ADDRESS': 1000}; axes with a fixed_rule 7,000; axes holding built points 0
+[X6] model describe-all (Inc 3a reads, corrected), run 3: 1.772 s, peak 8.0 MiB, kept 6.6 MiB; objects 6,000; refusals {None: 5000, 'A2L-DEF-ADDRESS': 1000}; axes with a fixed_rule 7,000; axes holding built points 0
+[X7] Inc 2a real describe_definitions over the 6,000 names, run 1: 1.160 s, peak 6.2 MiB
+[X7] Inc 2a real describe_definitions over the 6,000 names, run 2: 1.158 s, peak 6.2 MiB
+[X7] Inc 2a real describe_definitions over the 6,000 names, run 3: 1.159 s, peak 6.2 MiB

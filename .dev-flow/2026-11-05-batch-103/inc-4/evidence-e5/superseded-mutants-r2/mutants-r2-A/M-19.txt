@@ -1,0 +1,44 @@
+# M-19  row R-A2L-MATCH.19
+
+control: a slice `[:limit]` -> limit -1 returns all but the last listed name
+edit: `rank`: drop the `limit < 1` guard and return `_cut(...)[:limit]` (slice)
+
+s19_app.__file__: /tmp/b103-e5-4-mutr2A/M-19/s19_app/__init__.py
+
+== diff ==
+--- /tmp/b103-e5-4-mutr2A/base/s19_app/tui/services/label_match.py	2026-11-06 22:11:34.000000000 -0600
++++ /tmp/b103-e5-4-mutr2A/M-19/s19_app/tui/services/label_match.py	2026-11-06 22:44:02.697878312 -0600
+@@ -267,8 +267,6 @@
+         raise TypeError(f"query must be str, got {type(query).__name__}")
+     if not isinstance(limit, int) or isinstance(limit, bool):
+         raise TypeError(f"limit must be int, got {type(limit).__name__}")
+-    if limit < 1:
+-        return []
+     raw = query.strip(_WHITESPACE)
+     if len(raw) > 256:
+         return []
+@@ -296,7 +294,7 @@
+             found += 1
+     if found < limit and parsed.keys:
+         found += _subsequence_tier(parsed, index, taken, add_group)
+-    return _cut(parsed, raw, index, groups, tables, limit)
++    return _cut(parsed, raw, index, groups, tables, 10**9)[:limit]
+ 
+ 
+ def _text_tiers(
+
+== pytest (returncode 1, KILLED) ==
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+________________ test_ranked_list_is_exactly[R-A2L-MATCH.19/2] _________________
+tests/test_b103_label_match.py:391: in test_ranked_list_is_exactly
+    assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E   AssertionError: R-A2L-MATCH.19/2: query 'VALUE' limit -1
+E   assert [('VALUE_0001...0, 5),)), ...] == []
+E     
+E     Left contains 207 more items, first extra item: ('VALUE_0001', 'prefix', 0, ((0, 5),))
+E     Use -v to get more diff
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.19/2]
+1 failed, 1 passed, 127 deselected in 4.97s
+

@@ -1,0 +1,27 @@
+# probe nopostfit flip transcript 2026-11-07T01:57:00-06:00 host <runner>
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e2-12/<user>; no DISPLAY; no clipboard; stdin closed; load: 1.03 1.56 1.89
+s19_app.__file__ = /tmp/b103-e2-12/nopostfit/s19_app/__init__.py | textual 8.2.8 | variant nopostfit | scenario flip
+[nopostfit flip page1 (200 rows) 80x54] visible=36 vbar=True scroll_x=0/120 scroll_y=0 fixed_columns=2 padding=1 cols: Address=12, Length=8, Tag=38, Source=9 | w=12 | rows=200 cursor_row=0 | builds=3 fits=1 fit_rebuilds=1
+[nopostfit flip page1 (200 rows) 80x54] header|  Address     Length  Tag
+[nopostfit flip page1 (200 rows) 80x54] row0|  0x1C2D3E00  2266    ✓ SYN_M…LL_END
+[nopostfit flip page1 (200 rows) 80x54] row0: Address=0x1C2D3E00:whole; Length=2266:whole; Tag='✓ SYN_M…LL_END' (14 cells, ends at 35, inside, form=ok)
+[nopostfit flip page1 (200 rows) 80x54] row1|  0x00002000  2       · SYN_M…789ABC
+[nopostfit flip page1 (200 rows) 80x54] row1: Address=0x00002000:whole; Length=2:whole; Tag='· SYN_M…789ABC' (14 cells, ends at 35, inside, form=ok)
+[nopostfit flip page1 (200 rows) 80x54] ROWS OK 28/28 | painted 0x runs not declared: none
+[nopostfit flip page2 (31 rows, one 64-bit address) 80x54] visible=36 vbar=True scroll_x=0/124 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=8, Tag=38, Source=9 | w=8 | rows=31 cursor_row=0 | builds=4 fits=1 fit_rebuilds=1
+[nopostfit flip page2 (31 rows, one 64-bit address) 80x54] header|  Address         Length  Tag
+[nopostfit flip page2 (31 rows, one 64-bit address) 80x54] row0|  0x0000218E      2       · SYN_M…789AB
+[nopostfit flip page2 (31 rows, one 64-bit address) 80x54] row0: Address=0x0000218E:whole; Length=2:whole; Tag='· SYN_M…789ABC' (14 cells, ends at 39, PAST the visible width, form=DIFF(want '· SYN…9ABC'))
+[nopostfit flip page2 (31 rows, one 64-bit address) 80x54] row1|  0x00002190      2       · SYN_M…789AB
+[nopostfit flip page2 (31 rows, one 64-bit address) 80x54] row1: Address=0x00002190:whole; Length=2:whole; Tag='· SYN_M…789ABC' (14 cells, ends at 39, PAST the visible width, form=DIFF(want '· SYN…9ABC'))
+[nopostfit flip page2 (31 rows, one 64-bit address) 80x54] ROWS OK 0/28 | painted 0x runs not declared: none
+[nopostfit flip back to page1 80x54] visible=36 vbar=True scroll_x=0/124 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=8, Tag=38, Source=9 | w=8 | rows=200 cursor_row=0 | builds=5 fits=1 fit_rebuilds=1
+[nopostfit flip back to page1 80x54] header|  Address         Length  Tag
+[nopostfit flip back to page1 80x54] row0|  0x1C2D3E00      2266    ✓ SYN…_END
+[nopostfit flip back to page1 80x54] row0: Address=0x1C2D3E00:whole; Length=2266:whole; Tag='✓ SYN…_END' (10 cells, ends at 35, inside, form=ok)
+[nopostfit flip back to page1 80x54] row1|  0x00002000      2       · SYN…9ABC
+[nopostfit flip back to page1 80x54] row1: Address=0x00002000:whole; Length=2:whole; Tag='· SYN…9ABC' (10 cells, ends at 35, inside, form=ok)
+[nopostfit flip back to page1 80x54] ROWS OK 28/28 | painted 0x runs not declared: none
+[nopostfit flip timing] 200-row page build median 19.7 ms (5 runs: 17.9, 19.5, 19.7, 33.1, 188.2); no-op fit median 6.5 ms
+# exit 0 ; clone status after: 0 changed; load: 5.48 2.63 2.24

@@ -1,0 +1,3 @@
+# scripts/sec-r3-p_r3_base.py mem words /tmp/b103-e3r3-11-S/work/bigbody.a2l 2026-11-07T01:36:53-06:00 host <runner> clone e07fb00f status 0 changed; corpus files 168 (read-only); load 2.82 1.37 1.41
+[MEM words] file_bytes=19800291 held_items=4800008 peak_rss_MB=755.5 import_baseline_MB=51.0 peak_per_file_byte=40.0
+# exit 0 ; clone status after: 0 changed

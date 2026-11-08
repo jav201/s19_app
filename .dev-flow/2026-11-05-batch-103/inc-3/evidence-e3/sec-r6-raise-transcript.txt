@@ -1,0 +1,31 @@
+s19_app.__file__ = ~/work/b103-int2a/s19_app/__init__.py | python 3.11.18 | a2l_definition md5 f7fa38a5 | a2l md5 d6879216
+[X] TAB_NOINTP / TAB_INTP naming a COMPU_VTAB (text y) SV1 (Inc 2a real decode): RAISES TypeError: must be real number, not str
+[X] TAB_NOINTP / TAB_INTP naming a COMPU_VTAB (text y) SV2 (Inc 2a real decode): RAISES TypeError: must be real number, not str
+[X] TAB_NOINTP / TAB_INTP naming a COMPU_VTAB (text y) SV1 (r6 model, 3a _decode_stored): RAISES TypeError: must be real number, not str
+[X] TAB_NOINTP / TAB_INTP naming a COMPU_VTAB (text y) SV2 (r6 model, 3a _decode_stored): RAISES TypeError: must be real number, not str
+[X] TAB_NOINTP / TAB_INTP naming a COMPU_VTAB (text y) BV1 (r6 model, 3a _decode_stored): RAISES TypeError: must be real number, not str
+[X] TAB_NOINTP / TAB_INTP naming a COMPU_VTAB (text y) BV2 (r6 model, 3a _decode_stored): RAISES TypeError: must be real number, not str
+[X] stored nan TAB_INTP on 0 0 / 10 100 / 20 50: frozen (None, 'value outside interpolation range'), v1 (nan, ''), v2 (None, 'value outside interpolation range')
+[X] stored nan TAB_NOINTP on 0 0 / 10 100 / 20 50: frozen (0.0, ''), v1 (0.0, ''), v2 (0.0, '')
+[X] stored inf TAB_INTP on 0 0 / 10 100 / 20 50: frozen (50.0, ''), v1 (50.0, ''), v2 (50.0, '')
+[X] stored inf TAB_NOINTP on 0 0 / 10 100 / 20 50: frozen (0.0, ''), v1 (50.0, ''), v2 (0.0, '')
+[X] stored -inf TAB_INTP on 0 0 / 10 100 / 20 50: frozen (0.0, ''), v1 (0.0, ''), v2 (0.0, '')
+[X] stored -inf TAB_NOINTP on 0 0 / 10 100 / 20 50: frozen (0.0, ''), v1 (0.0, ''), v2 (0.0, '')
+[X] stored 2.5 TAB_INTP on 0 0 / 10 100 / 20 50: frozen (25.0, ''), v1 (25.0, ''), v2 (25.0, '')
+[X] stored 2.5 TAB_NOINTP on 0 0 / 10 100 / 20 50: frozen (0.0, ''), v1 (0.0, ''), v2 (0.0, '')
+[X] stored 15.0 TAB_INTP on 0 0 / 10 100 / 20 50: frozen (75.0, ''), v1 (75.0, ''), v2 (75.0, '')
+[X] stored 15.0 TAB_NOINTP on 0 0 / 10 100 / 20 50: frozen (100.0, ''), v1 (100.0, ''), v2 (100.0, '')
+[X] FLOAT32 VAL_BLK stored NaN FB1 (r6 model, 3a _decode_stored): (Decoded(stored=nan, value=nan, text='nan'), Decoded(stored=nan, value=nan, text='nan'))
+[X] FLOAT32 VAL_BLK stored NaN FB2 (r6 model, 3a _decode_stored): (Decoded(stored=nan, value=0.0, text='0.000'), Decoded(stored=nan, value=0.0, text='0.000'))
+[X] FLOAT32 VAL_BLK stored +inf FB1 (r6 model, 3a _decode_stored): (Decoded(stored=inf, value=50.0, text='50.000'), Decoded(stored=inf, value=50.0, text='50.000'))
+[X] FLOAT32 VAL_BLK stored +inf FB2 (r6 model, 3a _decode_stored): (Decoded(stored=inf, value=50.0, text='50.000'), Decoded(stored=inf, value=50.0, text='50.000'))
+[X] COMPU_TAB with a 'nan' x: entries as parsed [(0.0, 0.0), (nan, 7.0), (10.0, 100.0), (20.0, 50.0)]
+[X]   stored 5.0 TAB_INTP: frozen (None, 'value outside interpolation range'), v1 (nan, ''), v2 (None, 'value outside interpolation range')
+[X]   stored 5.0 TAB_NOINTP: frozen (0.0, ''), v1 (7.0, ''), v2 (7.0, '')
+[X]   stored 15.0 TAB_INTP: frozen (75.0, ''), v1 (75.0, ''), v2 (75.0, '')
+[X]   stored 15.0 TAB_NOINTP: frozen (100.0, ''), v1 (50.0, ''), v2 (50.0, '')
+[X]   stored 10.0 TAB_INTP: frozen (100.0, ''), v1 (nan, ''), v2 (None, 'value outside interpolation range')
+[X]   stored 10.0 TAB_NOINTP: frozen (100.0, ''), v1 (7.0, ''), v2 (7.0, '')
+[X] TAB_NOINTP stored 1.84467e+19 on x 0 / 50 / 100: frozen (1.0, ''), v1 (3.0, ''), v2 (1.0, '')
+[X] TAB_NOINTP stored 9.22337e+18 on x 0 / 50 / 100: frozen (1.0, ''), v1 (3.0, ''), v2 (1.0, '')
+exit=0

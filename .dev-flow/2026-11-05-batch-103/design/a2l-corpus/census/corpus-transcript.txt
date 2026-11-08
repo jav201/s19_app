@@ -1,0 +1,212 @@
+reader module: /home/<user>/work/s19_app/s19_app/tui/a2l.py python 3.11.18
+1	243	ascii	LF	vnone	objs=0	parse=0.0s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/2.a2l sample=Unclosed /begin sections detected.
+2	520	ascii	LF	vnone	objs=1	parse=0.0s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/3.a2l sample=Line 936: /end without /begin
+3	29356	ascii	LF	v1.71	objs=1	parse=0.001s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/4.a2l sample=Unclosed /begin sections detected.
+4	12869	ascii	LF	v1.61	objs=5	parse=0.001s
+5	1427	ascii	LF	v1.30	objs=1	parse=0.0s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/6.a2l sample=Line 20: /end without /begin
+6	592	ascii	LF	vnone	objs=0	parse=0.0s
+7	239	ascii	LF	vnone	objs=0	parse=0.0s
+8	303	ascii	LF	vnone	objs=0	parse=0.0s
+9	2685	ascii	LF	v1.71	objs=0	parse=0.0s
+10	6678	ascii	LF	v1.71	objs=0	parse=0.0s
+11	8942	ascii	LF	v1.71	objs=12	parse=0.001s
+12	6544	ascii	LF	v1.71	objs=0	parse=0.0s
+13	1573	ascii	LF	v1.60	objs=6	parse=0.0s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/14.a2l sample=Unclosed /begin sections detected.
+14	14920	utf-8	LF	v1.71	objs=10	parse=0.001s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/15.a2l sample=Unclosed /begin sections detected.
+15	8874	ascii	LF	v1.71	objs=6	parse=0.0s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/16.a2l sample=Unclosed /begin sections detected.
+16	18133	utf-8	LF	v1.71	objs=22	parse=0.001s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/17.a2l sample=Unclosed /begin sections detected.
+17	13981	ascii	LF	v1.71	objs=9	parse=0.001s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/18.a2l sample=Unclosed /begin sections detected.
+18	30325	utf-8	LF	vnone	objs=20	parse=0.002s
+19	157610	ascii	LF	v1.61	objs=75	parse=0.008s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/20.a2l sample=Unclosed /begin sections detected.
+20	32367	utf-8	LF	v1.60	objs=20	parse=0.002s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/21.a2l sample=Unclosed /begin sections detected.
+21	30327	utf-8	LF	vnone	objs=20	parse=0.002s
+22	4127	utf-8	LF	v1.71	objs=7	parse=0.0s
+23	247107	ascii	CRLF	v1.70	objs=530	parse=0.021s
+24	36871	ascii	CRLF	v1.70	objs=0	parse=0.001s
+25	195	ascii	LF	v1.71	objs=0	parse=0.0s
+26	2536	ascii	LF	vnone	objs=6	parse=0.0s
+27	34688	ascii	LF	v1.51	objs=12	parse=0.002s
+28	212003	ascii	LF	vnone	objs=1358	parse=0.045s
+29	1449	ascii	LF	vnone	objs=4	parse=0.0s
+30	1051	ascii	LF	v1.60	objs=5	parse=0.0s
+31	488	utf-8	CRLF	v1.71	objs=2	parse=0.0s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/32.a2l sample=Unclosed /begin sections detected.
+32	3620	ascii	LF	vnone	objs=3	parse=0.0s
+33	157606	ascii	LF	v1.61	objs=75	parse=0.007s
+34	6236	ascii	LF	vnone	objs=3	parse=0.001s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/35.a2l sample=Unclosed /begin sections detected.
+35	241699	utf-8	LF	v1.71	objs=118	parse=0.016s
+36	5969	ascii	LF	v1.61	objs=12	parse=0.001s
+37	231	ascii	LF	v1.61	objs=0	parse=0.0s
+38	481	ascii	LF	vnone	objs=1	parse=0.0s
+39	8766	ascii	LF	v1.61	objs=23	parse=0.001s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/41.a2l sample=Unclosed /begin sections detected.
+41	250837	utf-8	LF	v1.71	objs=122	parse=0.017s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/43.a2l sample=Unclosed /begin sections detected.
+43	250696	utf-8	LF	v1.71	objs=122	parse=0.017s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/44.a2l sample=Unclosed /begin sections detected.
+44	10309	ascii	LF	v1.71	objs=6	parse=0.001s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/45.a2l sample=Unclosed /begin sections detected.
+45	12166	ascii	LF	v1.71	objs=11	parse=0.001s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/46.a2l sample=Unclosed /begin sections detected.
+46	10467	utf-8	LF	v1.71	objs=2	parse=0.001s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/47.a2l sample=Unclosed /begin sections detected.
+47	11339	ascii	LF	v1.71	objs=1	parse=0.001s
+48	1078	ascii	LF	vnone	objs=3	parse=0.0s
+49	31174	ascii	LF	v1.71	objs=1	parse=0.001s
+50	31174	ascii	LF	v1.71	objs=1	parse=0.001s
+51	109592	ascii	LF	v1.51	objs=220	parse=0.008s
+52	33411	ascii	LF	v1.51	objs=8	parse=0.001s
+53	597	ascii	LF	vnone	objs=3	parse=0.0s
+54	150420	ascii	LF	v1.60	objs=62	parse=0.004s
+55	93198	ascii	LF	v1.51	objs=110	parse=0.009s
+56	82	ascii	LF	vnone	objs=0	parse=0.0s
+57	249	ascii	LF	vnone	objs=1	parse=0.0s
+58	245	ascii	LF	vnone	objs=0	parse=0.0s
+59	220	ascii	LF	vnone	objs=1	parse=0.0s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/60.a2l sample=Unclosed /begin sections detected.
+60	768	ascii	LF	v1.31	objs=2	parse=0.0s
+61	158	utf-8	LF	v1.31	objs=1	parse=0.0s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/62.a2l sample=Unclosed /begin sections detected.
+62	883	ascii	LF	v1.31	objs=3	parse=0.0s
+63	1787	ascii	LF	v1.61	objs=7	parse=0.0s
+64	379	ascii	LF	vnone	objs=3	parse=0.0s
+65	379	ascii	LF	vnone	objs=3	parse=0.0s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/66.a2l sample=Unclosed /begin sections detected.
+66	755	utf-8	LF	vnone	objs=3	parse=0.0s
+67	1520	ascii	LF	v1.71	objs=4	parse=0.0s
+68	670	ascii	LF	v1.71	objs=4	parse=0.0s
+69	4873	ascii	LF	v1.71	objs=7	parse=0.0s
+70	59828	utf-8	LF	v1.71	objs=13	parse=0.002s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/71.a2l sample=Unclosed /begin sections detected.
+71	2990	ascii	LF	v1.61	objs=13	parse=0.0s
+72	1437	ascii	LF	v1.71	objs=2	parse=0.0s
+73	173617	utf-8	LF	v1.71	objs=252	parse=0.014s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/75.a2l sample=Unclosed /begin sections detected.
+75	5963	ascii	LF	v1.71	objs=5	parse=0.0s
+76	80700	ascii	LF	v1.61	objs=0	parse=0.001s
+77	157607	ascii	LF	v1.61	objs=75	parse=0.008s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/79.a2l sample=Unclosed /begin sections detected.
+79	247664	ascii	CRLF	v1.71	objs=118	parse=0.016s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/80.a2l sample=Unclosed /begin sections detected.
+80	12833	ascii	LF	v1.71	objs=29	parse=0.001s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/81.a2l sample=Unclosed /begin sections detected.
+81	2437	ascii	LF	v1.61	objs=0	parse=0.0s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/82.a2l sample=Unclosed /begin sections detected.
+82	13390	ascii	LF	v1.71	objs=9	parse=0.001s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/83.a2l sample=Unclosed /begin sections detected.
+83	15054	utf-8	LF	v1.71	objs=10	parse=0.001s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/84.a2l sample=Unclosed /begin sections detected.
+84	1008	ascii	LF	v1.71	objs=1	parse=0.0s
+85	86279	ascii	LF	v1.61	objs=11	parse=0.002s
+86	82657	ascii	LF	v1.61	objs=0	parse=0.001s
+87	84173	ascii	LF	v1.61	objs=1	parse=0.001s
+92	161691	ascii	CRLF	v1.61	objs=75	parse=0.008s
+93	5408	ascii	LF	v1.71	objs=14	parse=0.001s
+94	41014	ascii	LF	v1.71	objs=69	parse=0.004s
+95	12454	ascii	LF	v1.71	objs=12	parse=0.001s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/96.a2l sample=Unclosed /begin sections detected.
+96	104897	ascii	LF	v1.71	objs=391	parse=0.053s
+97	11149	ascii	LF	v1.71	objs=8	parse=0.001s
+98	8276	ascii	LF	v1.71	objs=14	parse=0.001s
+99	17411	ascii	LF	v1.71	objs=76	parse=0.003s
+100	4642	ascii	LF	v1.71	objs=23	parse=0.001s
+101	4327	ascii	LF	v1.71	objs=21	parse=0.001s
+102	3048	ascii	LF	v1.71	objs=13	parse=0.001s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/103.a2l sample=Unclosed /begin sections detected.
+103	11583	utf-8	LF	v1.71	objs=14	parse=0.001s
+104	116280	ascii	LF	v1.51	objs=108	parse=0.012s
+105	102628	ascii	LF	v1.51	objs=92	parse=0.009s
+106	106689	ascii	LF	v1.51	objs=98	parse=0.01s
+107	175498	ascii	LF	v1.51	objs=199	parse=0.018s
+108	328636	ascii	LF	v1.51	objs=522	parse=0.036s
+109	10884	ascii	LF	v1.51	objs=0	parse=0.0s
+110	82175	ascii	CRLF	v1.50	objs=100	parse=0.006s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/111.a2l sample=Line 4279: /end without /begin
+111	158012	utf-8	CRLF	vnone	objs=241	parse=0.015s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/112.a2l sample=Line 1546: /end without /begin
+112	63930	utf-8	CRLF	vnone	objs=184	parse=0.007s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/113.a2l sample=Line 3177: /end without /begin
+113	133755	utf-8	CRLF	vnone	objs=101	parse=0.013s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/114.a2l sample=Line 574: /end without /begin
+114	21866	utf-8	CRLF	vnone	objs=21	parse=0.002s
+115	248626	utf-8	LF	v1.31	objs=341	parse=0.018s
+116	92669	utf-8	LF	v1.31	objs=69	parse=0.005s
+117	92669	utf-8	LF	v1.31	objs=69	parse=0.006s
+118	92669	utf-8	LF	v1.31	objs=69	parse=0.006s
+119	89095	utf-8	CRLF	v1.31	objs=57	parse=0.005s
+120	109563	utf-8	CRLF	v1.31	objs=88	parse=0.007s
+121	106271	utf-8	LF	v1.31	objs=88	parse=0.007s
+122	82914	utf-8	CRLF	v1.31	objs=49	parse=0.005s
+123	80128	utf-8	LF	v1.31	objs=49	parse=0.004s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/124.a2l sample=Unclosed /begin sections detected.
+124	9298	utf-8	LF	v1.71	objs=2	parse=0.001s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/125.a2l sample=Unclosed /begin sections detected.
+125	8638	utf-8	LF	vnone	objs=2	parse=0.001s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/126.a2l sample=Unclosed /begin sections detected.
+126	10022	utf-8	LF	v1.71	objs=5	parse=0.001s
+127	12243	ascii	LF	vnone	objs=14	parse=0.001s
+128	2683	ascii	LF	vnone	objs=0	parse=0.0s
+129	8259	ascii	LF	vnone	objs=0	parse=0.0s
+130	2684	ascii	LF	vnone	objs=0	parse=0.0s
+131	8258	ascii	LF	vnone	objs=0	parse=0.0s
+132	299	ascii	LF	vnone	objs=0	parse=0.0s
+133	8956	ascii	LF	vnone	objs=0	parse=0.0s
+134	8305	ascii	LF	vnone	objs=0	parse=0.0s
+135	8302	ascii	LF	vnone	objs=0	parse=0.0s
+136	2684	ascii	LF	vnone	objs=0	parse=0.0s
+137	3445	ascii	LF	vnone	objs=0	parse=0.0s
+138	4342	ascii	LF	vnone	objs=0	parse=0.0s
+139	2669	ascii	LF	vnone	objs=0	parse=0.0s
+140	3287	ascii	LF	vnone	objs=0	parse=0.0s
+141	2968	ascii	LF	vnone	objs=0	parse=0.0s
+142	4634	ascii	LF	vnone	objs=0	parse=0.0s
+143	35674	ascii	LF	v1.60	objs=0	parse=0.001s
+144	11121	ascii	LF	vnone	objs=0	parse=0.0s
+146	415	ascii	LF	vnone	objs=0	parse=0.0s
+147	415	ascii	LF	vnone	objs=0	parse=0.0s
+148	415	ascii	LF	vnone	objs=0	parse=0.0s
+149	415	ascii	LF	vnone	objs=0	parse=0.0s
+150	415	ascii	LF	vnone	objs=0	parse=0.0s
+152	415	ascii	LF	vnone	objs=0	parse=0.0s
+153	5613	ascii	LF	vnone	objs=0	parse=0.0s
+154	25274051	not-utf8(latin-1?)	CRLF+LF	v1.51	objs=93539	parse=33.837s
+155	17381120	not-utf8(latin-1?)	CRLF	v1.4	objs=44676	parse=4.285s
+156	15720453	not-utf8(latin-1?)	CRLF	v1.4	objs=41856	parse=4.254s
+157	10057240	not-utf8(latin-1?)	CRLF	v1.4	objs=30486	parse=3.022s
+158	8608043	not-utf8(latin-1?)	LF	v1.3	objs=12457	parse=1.662s
+159	5456718	ascii	LF	vnone	objs=7048	parse=0.893s
+160	4882759	ascii	LF	vnone	objs=6458	parse=0.698s
+161	1700282	not-utf8(latin-1?)	LF	v1.40	objs=5084	parse=0.187s
+162	1120723	not-utf8(latin-1?)	CRLF	vnone	objs=1771	parse=0.12s
+163	956169	ascii	LF	vnone	objs=1745	parse=0.145s
+164	809812	not-utf8(latin-1?)	CRLF	vnone	objs=1039	parse=0.091s
+165	684796	not-utf8(latin-1?)	LF	v1.61	objs=1258	parse=0.079s
+A2L section tree has structural errors: path=/home/<user>/a2l-corpus/files/166.a2l sample=Line 11012: /end without /begin
+166	390734	utf-8	CRLF	vnone	objs=494	parse=0.038s
+167	344705	not-utf8(latin-1?)	CRLF	vnone	objs=411	parse=0.031s
+168	336384	not-utf8(latin-1?)	CRLF	vnone	objs=497	parse=0.035s
+identical-content duplicates skipped (n, same as n): [('40', '35'), ('42', '35'), ('74', '73'), ('78', '77'), ('88', '34'), ('89', '35'), ('90', '33'), ('91', '33'), ('145', '144'), ('151', '150')]
+# census summary: 158 files, 255734 MEASUREMENT/CHARACTERISTIC objects
+encoding: ascii=113, utf-8=34, not-utf8(latin-1?)=11
+bom: none=144, utf8=14
+eol: LF=136, CRLF=21, CRLF+LF=1
+asap2_version: none=59, 1.71=46, 1.61=16, 1.31=12, 1.51=11, 1.60=5, 1.4=3, 1.70=2, 1.30=1, 1.50=1, 1.3=1, 1.40=1
+files with: mixed_eol=1 tabs=44 formfeeds=0 nbsp=3 nul=0 other_separators=0 non-spec-python-whitespace=2 replacement_chars=12 no_final_newline=12
+size bytes: min=82 median=11149 max=25274051 total=99952414
+parse seconds max=33.837 ; largest-5 (name, bytes, seconds, tracemalloc peak bytes): [('154.a2l', 25274051, 57.55, 246412131), ('155.a2l', 17381120, 19.7, 139083856), ('156.a2l', 15720453, 18.28, 129310298), ('157.a2l', 10057240, 15.73, 88164121), ('158.a2l', 8608043, 8.81, 79479733)]
+
+## reader/oracle comparison totals (counts of objects)
+ADDR_DIFFERENT	255
+ADDR_READER_NONE_ORACLE_HAS	729

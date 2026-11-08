@@ -1,0 +1,117 @@
+# M-PASTE.5
+# row: R-PASTE.5
+# s19_app.__file__ = /tmp/b103-e5-1a-mut/work/s19_app/__init__.py
+# note: an empty selection copied as ''
+# --- git diff ---
+diff --git a/s19_app/tui/os_clipboard_input.py b/s19_app/tui/os_clipboard_input.py
+index ad2f7240..61202b05 100644
+--- a/s19_app/tui/os_clipboard_input.py
++++ b/s19_app/tui/os_clipboard_input.py
+@@ -906,8 +906,6 @@ class OsClipboardInput(Input):
+             Used by: the widget's ctrl+c key binding.
+         """
+         selected_text = self.selected_text
+-        if not selected_text:
+-            raise SkipAction()
+         await _mirror_and_write_os_clipboard(self.app, selected_text)
+ 
+     async def action_cut(self) -> None:
+@@ -933,8 +931,6 @@ class OsClipboardInput(Input):
+             Used by: the widget's ctrl+x key binding.
+         """
+         selected_text = self.selected_text
+-        if not selected_text:
+-            raise SkipAction()
+         self.delete_selection()
+         await _mirror_and_write_os_clipboard(self.app, selected_text)
+ 
+
+# --- pytest (rc=1) ---
+ard = "BEFORE"
+            async with app.run_test(size=(160, 48)) as pilot:
+                await pilot.pause()
+                if action == "x_multi":
+                    await show_patch_paste(app, pilot)
+                    widget = app.query_one("#patch_paste_text", TextArea)
+                    widget.text = "KEEP"
+                    widget.selection = ((0, 4), (0, 4))
+                    widget.focus()
+                    await pilot.pause()
+                    await pilot.press("ctrl+x")
+                else:
+                    app.action_show_screen("a2l")
+                    for _ in range(4):
+                        await pilot.pause()
+                    widget = app.query_one("#a2l_tags_filter_input", Input)
+                    widget.focus()
+                    await pilot.pause()
+                    widget.value = "KEEP"
+                    widget.selection = (4, 4)
+                    await pilot.pause()
+                    await pilot.press(action)
+                await pilot.pause()
+                await pilot.pause()
+                return app.clipboard
+    
+>       assert asyncio.run(_drive()) == "BEFORE"
+E       AssertionError: assert '' == 'BEFORE'
+E         
+E         - BEFORE
+
+tests/test_b103_clipboard_core.py:841: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:686 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:747 OS clipboard write failed; retained Textual internal clipboard only
+_____________ test_r_paste_5_no_selection_changes_no_clipboard[x] ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10024/test_r_paste_5_no_selection_ch1')
+action = 'ctrl+x'
+
+    @pytest.mark.parametrize("action", ["ctrl+c", "ctrl+x", "ctrl+x_multi"], ids=["c", "x", "x_multi"])
+    def test_r_paste_5_no_selection_changes_no_clipboard(tmp_path: Path, action: str) -> None:
+        """R-PASTE.5/1-3 (LinuxH): no selection → the app clipboard keeps BEFORE."""
+        _assert_linuxh_headless()
+    
+        async def _drive() -> str:
+            app = S19TuiApp(base_dir=tmp_path)
+            app._clipboard = "BEFORE"
+            async with app.run_test(size=(160, 48)) as pilot:
+                await pilot.pause()
+                if action == "x_multi":
+                    await show_patch_paste(app, pilot)
+                    widget = app.query_one("#patch_paste_text", TextArea)
+                    widget.text = "KEEP"
+                    widget.selection = ((0, 4), (0, 4))
+                    widget.focus()
+                    await pilot.pause()
+                    await pilot.press("ctrl+x")
+                else:
+                    app.action_show_screen("a2l")
+                    for _ in range(4):
+                        await pilot.pause()
+                    widget = app.query_one("#a2l_tags_filter_input", Input)
+                    widget.focus()
+                    await pilot.pause()
+                    widget.value = "KEEP"
+                    widget.selection = (4, 4)
+                    await pilot.pause()
+                    await pilot.press(action)
+                await pilot.pause()
+                await pilot.pause()
+                return app.clipboard
+    
+>       assert asyncio.run(_drive()) == "BEFORE"
+E       AssertionError: assert '' == 'BEFORE'
+E         
+E         - BEFORE
+
+tests/test_b103_clipboard_core.py:841: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:686 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:747 OS clipboard write failed; retained Textual internal clipboard only
+=========================== short test summary info ============================
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_5_no_selection_changes_no_clipboard[c]
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_5_no_selection_changes_no_clipboard[x]
+2 failed, 1 passed, 84 deselected in 8.17s
+
+===== stderr =====

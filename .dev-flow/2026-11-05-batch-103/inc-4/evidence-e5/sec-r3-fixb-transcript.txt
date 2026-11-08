@@ -1,0 +1,40 @@
+runner sec-r3-run.sh sha256 8f70dd916038119faecd2d3ae51bc8e4ea5e6cc1ea06100f087bce044c077f84; probe sec-r3-probe.py sha256 9cf292424ce8f1a335da4da39354d86b2b99bb480f5b41f0d387f608e52ceefa
+s19_app.__file__ = /tmp/b103-e5r3-4-sec/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5r3-4-sec/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 8f396c15d3c848ceb2c98ab74c112150bf9c09759abb662ea0f2162d1ca7c94d
+tests module = /tmp/b103-e5r3-4-sec/tree/tests/test_b103_label_match_perf.py
+mode = r3 fixb  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = 6526531248096795698
+host = <runner>  load = (2.91, 4.45, 3.7)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5r3-4-sec/<user>  LOCALAPPDATA = /tmp/b103-e5r3-4-sec/<user>/localappdata  PILOT_DIR = /tmp/b103-e5r3-4-sec/pilot
+probe = sec-r3-probe.py sha256 9cf292424ce8f1a335da4da39354d86b2b99bb480f5b41f0d387f608e52ceefa; round-1 helpers = sec-e5-probe.py sha256 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+_FUZZY_TOKEN_CAP = 20; _FUZZY_SWITCH_CAP = 512; T.ANY_QUERY_BOUND_S = 2.0; T.KEYSTROKE_BOUND_S = 0.2
+=== A. lists the budget must leave unchanged (fixtures, the row's cases): shipped == budgeted, per budget
+  REF    58 queries; most nodes in one ranking    35,247; lists changed per budget {200000: 0, 400000: 0, 800000: 0}; load (2.93, 4.38, 3.68)
+  REF6   49 queries; most nodes in one ranking        43; lists changed per budget {200000: 0, 400000: 0, 800000: 0}; load (2.94, 4.33, 3.68)
+  LONG    9 queries; most nodes in one ranking    25,698; lists changed per budget {200000: 0, 400000: 0, 800000: 0}; load (2.95, 4.31, 3.67)
+  CRAFT   4 queries; most nodes in one ranking    68,901; lists changed per budget {200000: 0, 400000: 0, 800000: 0}; load (2.95, 4.29, 3.67)
+  U6      3 queries; most nodes in one ranking       540; lists changed per budget {200000: 0, 400000: 0, 800000: 0}; load (2.95, 4.27, 3.66)
+  D3      3 queries; most nodes in one ranking     2,760; lists changed per budget {200000: 0, 400000: 0, 800000: 0}; load (2.96, 4.24, 3.66)
+  E2      3 queries; most nodes in one ranking    24,080; lists changed per budget {200000: 0, 400000: 0, 800000: 0}; load (2.96, 4.22, 3.66)
+  BAND    1 queries; most nodes in one ranking         0; lists changed per budget {200000: 0, 400000: 0, 800000: 0}; load (2.96, 4.2, 3.65)
+  W40     2 queries; most nodes in one ranking   700,568; lists changed per budget {200000: 1, 400000: 1, 800000: 0}; load (2.97, 4.16, 3.64)
+
+=== B. the adversarial rankings under each budget (median of 3, limit 20)
+  W40     budget   200,000:     410.2 ms [ok] listed 20 ['subsequence']  'aaaaaaaaaaaaaaaaaaaaaaaa' (230 chars)
+  W40     budget   400,000:     759.5 ms [ok] listed 20 ['subsequence']  'aaaaaaaaaaaaaaaaaaaaaaaa' (230 chars)
+  W40     budget   800,000:    1455.2 ms [ok] listed 20 ['subsequence']  'aaaaaaaaaaaaaaaaaaaaaaaa' (230 chars)
+  DEEP40  budget   200,000:     377.0 ms [ok] listed 20 ['subsequence']  'aaaaaaaaaaaaaaaaaaaaaaaa' (40 chars)
+  DEEP40  budget   400,000:     719.6 ms [ok] listed 20 ['subsequence']  'aaaaaaaaaaaaaaaaaaaaaaaa' (40 chars)
+  DEEP40  budget   800,000:    1414.3 ms [ok] listed 20 ['subsequence']  'aaaaaaaaaaaaaaaaaaaaaaaa' (40 chars)
+  DEEP40  budget   200,000:     404.1 ms [ok] listed 20 ['subsequence']  'aaaaaaaaaaaaaaaaaaaaaaaa' (230 chars)
+  DEEP40  budget   400,000:     749.5 ms [ok] listed 20 ['subsequence']  'aaaaaaaaaaaaaaaaaaaaaaaa' (230 chars)
+  DEEP40  budget   800,000:    1415.9 ms [ok] listed 20 ['subsequence']  'aaaaaaaaaaaaaaaaaaaaaaaa' (230 chars)
+  DEEP258 budget   200,000:       5.6 ms [ok] listed 20 ['substring']  'aaaaaaaaaaaaaaaaaaaaaaaa' (256 chars)
+  DEEP258 budget   400,000:       5.9 ms [ok] listed 20 ['substring']  'aaaaaaaaaaaaaaaaaaaaaaaa' (256 chars)
+  DEEP258 budget   800,000:       5.8 ms [ok] listed 20 ['substring']  'aaaaaaaaaaaaaaaaaaaaaaaa' (256 chars)
+  W12     budget   200,000:     295.1 ms [ok] listed 0 -  'aaaaaaaaaab aaaaaaaaaac ' (239 chars)
+  W12     budget   400,000:     551.0 ms [ok] listed 0 -  'aaaaaaaaaab aaaaaaaaaac ' (239 chars)
+  W12     budget   800,000:    1114.5 ms [ok] listed 0 -  'aaaaaaaaaab aaaaaaaaaac ' (239 chars)
+
+load after = (2.98, 4.03, 3.62)
+probe exit 0

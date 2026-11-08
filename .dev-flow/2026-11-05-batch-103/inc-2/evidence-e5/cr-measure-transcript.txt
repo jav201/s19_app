@@ -1,0 +1,30 @@
+ 05:43:56 up 1 day, 21:15,  3 users,  load average: 1.66, 1.32, 2.62
+[M0] s19_app.__file__ = /tmp/b103-e5-2-code/tree/s19_app/__init__.py
+[M0] python 3.11.18 cpus 16
+[M0] quiet start, load average (1.6640625, 1.3203125, 2.61767578125)
+[M1] fmt   quiet  A trial 1: part ms   10.35    7.54    2.79  x2S  0.73  x8S  0.27  GREEN
+[M1] fmt   quiet  B trial 1: part ms   10.19   10.22   10.11  x2S  1.00  x8S  0.99  GREEN
+[M1] fmt   quiet  A trial 2: part ms   10.20    8.25    4.08  x2S  0.81  x8S  0.40  GREEN
+[M1] fmt   quiet  B trial 2: part ms   10.18   10.22   10.22  x2S  1.00  x8S  1.00  GREEN
+[M1] fmt   quiet  A trial 3: part ms   10.25    8.43    2.02  x2S  0.82  x8S  0.20  GREEN
+[M1] fmt   quiet  B trial 3: part ms   10.03   10.25   10.10  x2S  1.02  x8S  1.01  GREEN
+[M1] type  quiet  A trial 1: part ms   10.97    9.06    7.33  x2S  0.83  x8S  0.67  GREEN
+[M1] type  quiet  B trial 1: part ms   10.44   10.37   10.34  x2S  0.99  x8S  0.99  GREEN
+[M1] type  quiet  A trial 2: part ms   10.30   10.69    5.02  x2S  1.04  x8S  0.49  GREEN
+[M1] type  quiet  B trial 2: part ms   10.35   10.30   10.37  x2S  1.00  x8S  1.00  GREEN
+[M1] type  quiet  A trial 3: part ms   10.27    8.04    6.02  x2S  0.78  x8S  0.59  GREEN
+[M1] type  quiet  B trial 3: part ms   10.41   10.34   10.37  x2S  0.99  x8S  1.00  GREEN
+[M0] loaded block skipped (no --load: another session's timing probe shares the host)
+[M0] mutant 'reduction per object' active; load average (2.49609375, 1.9150390625, 2.51220703125)
+[M3] fmt   mutant B trial 1: part ms 15110.43 29921.39 118506.49  x2S  1.98  x8S  7.84  RED
+[M3] type  mutant B trial 1: part ms 15878.72 31672.61 123022.93  x2S  1.99  x8S  7.75  RED
+
+[M9] summary (GREEN count / trials):
+[M9] quiet  fmt   A: 3/3 GREEN
+[M9] quiet  fmt   B: 3/3 GREEN
+[M9] quiet  type  A: 3/3 GREEN
+[M9] quiet  type  B: 3/3 GREEN
+[M9] mutant fmt   B: 0/1 GREEN
+[M9] mutant type  B: 0/1 GREEN
+[END] measure probe done
+exit=0

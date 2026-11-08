@@ -1,0 +1,14 @@
+E3 round-3 security, batch-103 Inc 1a: what the redaction gate's forms see in the batch-103 records (counts only; no value printed).
+Run on the operator's PC with ripgrep (read-only), 2026-11-07, from .dev-flow/2026-11-05-batch-103/ (rg honours .gitignore, as the gate skips git-ignored files).
+Patterns: the gate's own (`tests/test_suite_hygiene.py:1920-1953`); <login> = the LAN host's login (not written here).
+
+  L=<login>
+  rg -l -i -w "$L" .                                   -> 71 files hold the host login
+  rg -l -P "/home/(?!runner/)$L" .                     -> 67 files hold its posix home path   (form: posix home path outside the runner image)
+  rg -l -P '<the gate's lan address pattern>' .        -> 4 files hold a LAN address          (form: lan address)
+  rg -l -P '<the gate's two user-profile patterns>' .  -> 4 files hold a user-profile path    (forms: user-profile path, unix-style user-profile path)
+  rg -i -w "$L" . | rg -v -P "/home/$L|192\.168\.|10\.\d+\.\d+\.\d+|$L@[A-Za-z0-9._-]+:[~/]" | wc -l
+                                                       -> 0 lines hold the login with no CI-visible form on the same line
+
+Reading: every login occurrence today carries a form the gate names on any host (CI included), so R-PASTE.36/2's "0 hits" is a sound oracle for the current records.
+The counts in R-PASTE.36's threshold and case /2 (57 / 23 / 4) are round 2's and have moved (the records grow); the oracle is "0 hits", not the counts.

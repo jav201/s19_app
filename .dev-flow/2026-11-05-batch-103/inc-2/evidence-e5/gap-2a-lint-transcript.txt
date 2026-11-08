@@ -1,0 +1,2 @@
+# Inc 2a E5 gap pass: Code-Wire v3.1.0 lint (code-wire e436a08, tools/codewire_lint.py) on codewire/graph-inc2.md after the pass (before: nodes=43 entities=10 edges=21, A2 split)
+nodes=43 entities=11 edges=25 findings=18 not read=0

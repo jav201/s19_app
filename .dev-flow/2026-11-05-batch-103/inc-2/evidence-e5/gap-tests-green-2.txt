@@ -1,0 +1,42 @@
+# host: <runner> | 2026-11-07T03:48:24-06:00 | load: 1.63 1.58 2.73
+# a2l_definition.py md5: eb750c6ff5f2eb23117e1f9a04212364  s19_app/tui/a2l_definition.py
+/tmp/b103-e5gt/tree/s19_app/__init__.py
+# python Python 3.11.18
+........                                                                 [100%]
+==================================== PASSES ====================================
+============================= QC-TM timing margins =============================
+LOW 16.6%  1.251 s / 1.500 s  R-A2L-DEF.149 /2 COMPU_VTAB per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_2_scaling_enum_table
+LOW 17.3%  1.241 s / 1.500 s  R-A2L-DEF.149 /3 COMPU_VTAB_RANGE per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_3_scaling_range_table
+32.5%  1.013 s / 1.500 s  R-A2L-DEF.149 /4 RECORD_LAYOUT per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_4_scaling_layout
+32.8%  1.008 s / 1.500 s  R-A2L-DEF.149 /1 COMPU_METHOD per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_1_scaling_method
+41.9%  1.161 s / 2.000 s  R-A2L-DEF.149 /2 COMPU_VTAB per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_2_scaling_enum_table
+48.8%  1.025 s / 2.000 s  R-A2L-DEF.149 /4 RECORD_LAYOUT per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_4_scaling_layout
+55.3%  0.894 s / 2.000 s  R-A2L-DEF.149 /1 COMPU_METHOD per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_1_scaling_method
+66.5%  0.670 s / 2.000 s  R-A2L-DEF.149 /3 COMPU_VTAB_RANGE per-object part 8S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_3_scaling_range_table
+87.5%  0.063 s / 0.500 s  R-A2L-DEF.149 /3 COMPU_VTAB_RANGE 400 names at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_3_shared_range_table_size_costs_nothing_per_object
+87.6%  0.062 s / 0.500 s  R-A2L-DEF.149 /2 COMPU_VTAB 400 names at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_2_shared_enum_table_size_costs_nothing_per_object
+88.9%  0.055 s / 0.500 s  R-A2L-DEF.149 /1 COMPU_METHOD 400 names at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_1_shared_method_size_costs_nothing_per_object
+96.8%  0.016 s / 0.500 s  R-A2L-DEF.149 /4 RECORD_LAYOUT 400 names at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_4_shared_layout_first_line_costs_nothing_per_object
+QC-TM: 12 bounds, 2 under 20 % margin
+============================== slowest durations ===============================
+55.68s call     tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_2_scaling_enum_table
+52.73s call     tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_3_scaling_range_table
+38.64s call     tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_1_scaling_method
+20.40s call     tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_4_scaling_layout
+1.21s call     tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_4_shared_layout_first_line_costs_nothing_per_object
+0.78s call     tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_2_shared_enum_table_size_costs_nothing_per_object
+0.75s call     tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_3_shared_range_table_size_costs_nothing_per_object
+0.69s call     tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_1_shared_method_size_costs_nothing_per_object
+
+(16 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+PASSED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_1_shared_method_size_costs_nothing_per_object
+PASSED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_2_shared_enum_table_size_costs_nothing_per_object
+PASSED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_3_shared_range_table_size_costs_nothing_per_object
+PASSED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_4_shared_layout_first_line_costs_nothing_per_object
+PASSED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_1_scaling_method
+PASSED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_2_scaling_enum_table
+PASSED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_3_scaling_range_table
+PASSED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_4_scaling_layout
+8 passed, 1 deselected in 171.08s (0:02:51)
+exit=0

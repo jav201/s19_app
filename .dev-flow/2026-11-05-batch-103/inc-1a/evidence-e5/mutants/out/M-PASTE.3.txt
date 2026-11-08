@@ -1,0 +1,75 @@
+# M-PASTE.3
+# row: R-PASTE.3
+# s19_app.__file__ = /tmp/b103-e5-1a-mut/work/s19_app/__init__.py
+# note: the app-clipboard mirror removed
+# --- git diff ---
+diff --git a/s19_app/tui/os_clipboard_input.py b/s19_app/tui/os_clipboard_input.py
+index ad2f7240..cd373d1e 100644
+--- a/s19_app/tui/os_clipboard_input.py
++++ b/s19_app/tui/os_clipboard_input.py
+@@ -729,7 +729,7 @@ async def _mirror_and_write_os_clipboard(app: App, text: str) -> None:
+     """
+     text = text[:_CLIPBOARD_CAP_CHARS]
+     try:
+-        App.copy_to_clipboard(app, text)
++        pass  # mutant: app-clipboard mirror removed
+     except Exception:  # pragma: no cover — mirror is best-effort.
+         logger.debug("internal clipboard mirror failed", exc_info=True)
+     loop = asyncio.get_event_loop()
+
+# --- pytest (rc=1) ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________ test_r_paste_3_copy_puts_selection_on_app_clipboard ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10022/test_r_paste_3_copy_puts_selec0')
+
+    def test_r_paste_3_copy_puts_selection_on_app_clipboard(tmp_path: Path) -> None:
+        """R-PASTE.3/1-2 (LinuxH): Ctrl+C puts the selection on the app clipboard."""
+        _assert_linuxh_headless()
+    
+        async def _drive() -> tuple:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(160, 48)) as pilot:
+                await pilot.pause()
+                app.action_show_screen("a2l")
+                for _ in range(4):
+                    await pilot.pause()
+                box = app.query_one("#a2l_tags_filter_input", Input)
+                box.value = "COPYME-1"
+                box.selection = (0, len(box.value))
+                box.focus()
+                await pilot.pause()
+                await pilot.press("ctrl+c")
+                await pilot.pause()
+                await pilot.pause()
+                single = app.clipboard
+                await show_patch_paste(app, pilot)
+                ta = app.query_one("#patch_paste_text", TextArea)
+                ta.text = "COPYME-2"
+                ta.select_all()
+                ta.focus()
+                await pilot.pause()
+                await pilot.press("ctrl+c")
+                await pilot.pause()
+                await pilot.pause()
+                return single, app.clipboard
+    
+        single, multi = asyncio.run(_drive())
+>       assert single == "COPYME-1", single
+E       AssertionError: 
+E       assert '' == 'COPYME-1'
+E         
+E         - COPYME-1
+
+tests/test_b103_clipboard_core.py:781: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:686 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:747 OS clipboard write failed; retained Textual internal clipboard only
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:686 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:747 OS clipboard write failed; retained Textual internal clipboard only
+=========================== short test summary info ============================
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_3_copy_puts_selection_on_app_clipboard
+1 failed, 86 deselected in 4.51s
+
+===== stderr =====

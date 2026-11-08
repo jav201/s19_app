@@ -1,0 +1,66 @@
+# transcript: codewire_extract.py v3.1.0 on a marked scratch copy of s19_app/ at e07fb00 (marks: i1a-codewire-marks.sh); run 2026-11-06T21:55:56Z
+# extractor stdout: marks=22 graph_nodes=0 calls=15 findings=22 parse_failures=0
+
+# Code-Wire extractor report
+
+- Marks found: 22
+- Graph nodes parsed: 0
+- Real calls between marked nodes: 15
+- Findings: 22 (22 drift, 0 info)
+- Ambiguous call resolutions (a name matched several defs): 3
+- Files that failed to parse: 0
+
+Type normalisation: spaces and quotes dropped; `List/Dict/Tuple/Set` -> builtins; `X | None` and graph `X?` -> `Optional[X]`; graph `(Callable) A->B` -> `Callable[[A], B]`; graph `tuple(A a, B b)` -> `tuple[A, B]`. A bare graph container (`dict`) against a parameterised code type (`dict[str, Any]`) is info (loose match), not drift.
+
+Call resolution is name-based (`f()`, `Class()` -> `__init__`, `self.m()`, `x.m()` -> top-level `m` or a marked method `m`); dynamic calls and callables passed as values are not seen. Tests excluded.
+
+## Counts
+
+| Kind | Count |
+|---|---|
+| Mark without graph node | 22 |
+
+## Real calls between marked nodes
+
+| Caller | Callee | Sites |
+|---|---|---|
+| `CappedTextArea.action_copy` | `_mirror_and_write_os_clipboard` | s19_app/tui/capped_text_area.py:271 |
+| `CappedTextArea.action_cut` | `_mirror_and_write_os_clipboard` | s19_app/tui/capped_text_area.py:310 |
+| `CappedTextArea.action_paste` | `_prime_tk_root` | s19_app/tui/capped_text_area.py:213 |
+| `OsClipboardInput.action_copy` | `_mirror_and_write_os_clipboard` | s19_app/tui/os_clipboard_input.py:880 |
+| `OsClipboardInput.action_cut` | `_mirror_and_write_os_clipboard` | s19_app/tui/os_clipboard_input.py:909 |
+| `OsClipboardInput.action_paste` | `_prime_tk_root` | s19_app/tui/os_clipboard_input.py:918 |
+| `OsClipboardInput.action_paste` | `read_os_clipboard` | s19_app/tui/os_clipboard_input.py:924 (ref) |
+| `_TkRootSingleton.get_or_create` | `_create_tk_root` | s19_app/tui/os_clipboard_input.py:203 |
+| `_TkRootSingleton.get_or_create` | `_destroy_tk_root_singleton` | s19_app/tui/os_clipboard_input.py:209 (ref) |
+| `_mirror_and_write_os_clipboard` | `_prime_tk_root` | s19_app/tui/os_clipboard_input.py:782 |
+| `_mirror_and_write_os_clipboard` | `write_os_clipboard` | s19_app/tui/os_clipboard_input.py:784 (ref) |
+| `_prime_tk_root` | `_TkRootSingleton.get_or_create` | s19_app/tui/os_clipboard_input.py:246 |
+| `_read_via_tk` | `_TkRootSingleton.get_or_create` | s19_app/tui/os_clipboard_input.py:265 |
+| `_write_via_tk` | `_TkRootSingleton.get_existing` | s19_app/tui/os_clipboard_input.py:491 |
+| `read_os_clipboard` | `_bound_clipboard_text` | s19_app/tui/os_clipboard_input.py:666 |
+
+## Mark without graph node
+
+- `s19_app/tui/capped_text_area.py:131` — `CappedTextArea._on_paste`
+- `s19_app/tui/capped_text_area.py:168` — `CappedTextArea.action_paste`
+- `s19_app/tui/capped_text_area.py:241` — `CappedTextArea.action_copy`
+- `s19_app/tui/capped_text_area.py:273` — `CappedTextArea.action_cut`
+- `s19_app/tui/os_clipboard_input.py:139` — `_create_tk_root`
+- `s19_app/tui/os_clipboard_input.py:186` — `_TkRootSingleton.get_or_create`
+- `s19_app/tui/os_clipboard_input.py:212` — `_TkRootSingleton.get_existing`
+- `s19_app/tui/os_clipboard_input.py:219` — `_destroy_tk_root_singleton`
+- `s19_app/tui/os_clipboard_input.py:235` — `_prime_tk_root`
+- `s19_app/tui/os_clipboard_input.py:249` — `_read_via_tk`
+- `s19_app/tui/os_clipboard_input.py:281` — `_read_via_ctypes`
+- `s19_app/tui/os_clipboard_input.py:338` — `_read_via_powershell`
+- `s19_app/tui/os_clipboard_input.py:397` — `_write_via_ctypes`
+- `s19_app/tui/os_clipboard_input.py:478` — `_write_via_tk`
+- `s19_app/tui/os_clipboard_input.py:503` — `_write_via_powershell`
+- `s19_app/tui/os_clipboard_input.py:576` — `_bound_clipboard_text`
+- `s19_app/tui/os_clipboard_input.py:613` — `read_os_clipboard`
+- `s19_app/tui/os_clipboard_input.py:678` — `write_os_clipboard`
+- `s19_app/tui/os_clipboard_input.py:741` — `_mirror_and_write_os_clipboard`
+- `s19_app/tui/os_clipboard_input.py:854` — `OsClipboardInput.action_copy`
+- `s19_app/tui/os_clipboard_input.py:882` — `OsClipboardInput.action_cut`
+- `s19_app/tui/os_clipboard_input.py:911` — `OsClipboardInput.action_paste`

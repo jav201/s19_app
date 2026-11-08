@@ -1,0 +1,27 @@
+# probe design flip transcript 2026-11-07T02:08:08-06:00 host <runner>
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e2-12/<user>; no DISPLAY; no clipboard; stdin closed; load: 3.51 2.97 2.50
+s19_app.__file__ = /tmp/b103-e2-12/design/s19_app/__init__.py | textual 8.2.8 | variant design | scenario flip
+[design flip page1 (200 rows) 80x54] visible=36 vbar=True scroll_x=0/120 scroll_y=0 fixed_columns=2 padding=1 cols: Address=12, Length=8, Tag=38, Source=9 | w=12 | rows=200 cursor_row=0 | builds=3 fits=3 fit_rebuilds=1
+[design flip page1 (200 rows) 80x54] header|  Address     Length  Tag
+[design flip page1 (200 rows) 80x54] row0|  0x1C2D3E00  2266    ✓ SYN_M…LL_END
+[design flip page1 (200 rows) 80x54] row0: Address=0x1C2D3E00:whole; Length=2266:whole; Tag='✓ SYN_M…LL_END' (14 cells, ends at 35, inside, form=ok)
+[design flip page1 (200 rows) 80x54] row1|  0x00002000  2       · SYN_M…789ABC
+[design flip page1 (200 rows) 80x54] row1: Address=0x00002000:whole; Length=2:whole; Tag='· SYN_M…789ABC' (14 cells, ends at 35, inside, form=ok)
+[design flip page1 (200 rows) 80x54] ROWS OK 28/28 | painted 0x runs not declared: none
+[design flip page2 (31 rows, one 64-bit address) 80x54] visible=36 vbar=True scroll_x=0/124 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=8, Tag=38, Source=9 | w=8 | rows=31 cursor_row=0 | builds=5 fits=5 fit_rebuilds=2
+[design flip page2 (31 rows, one 64-bit address) 80x54] header|  Address         Length  Tag
+[design flip page2 (31 rows, one 64-bit address) 80x54] row0|  0x0000218E      2       · SYN…9ABC
+[design flip page2 (31 rows, one 64-bit address) 80x54] row0: Address=0x0000218E:whole; Length=2:whole; Tag='· SYN…9ABC' (10 cells, ends at 35, inside, form=ok)
+[design flip page2 (31 rows, one 64-bit address) 80x54] row1|  0x00002190      2       · SYN…9ABC
+[design flip page2 (31 rows, one 64-bit address) 80x54] row1: Address=0x00002190:whole; Length=2:whole; Tag='· SYN…9ABC' (10 cells, ends at 35, inside, form=ok)
+[design flip page2 (31 rows, one 64-bit address) 80x54] ROWS OK 28/28 | painted 0x runs not declared: none
+[design flip back to page1 80x54] visible=36 vbar=True scroll_x=0/124 scroll_y=0 fixed_columns=2 padding=1 cols: Address=16, Length=8, Tag=38, Source=9 | w=8 | rows=200 cursor_row=0 | builds=6 fits=6 fit_rebuilds=2
+[design flip back to page1 80x54] header|  Address         Length  Tag
+[design flip back to page1 80x54] row0|  0x1C2D3E00      2266    ✓ SYN…_END
+[design flip back to page1 80x54] row0: Address=0x1C2D3E00:whole; Length=2266:whole; Tag='✓ SYN…_END' (10 cells, ends at 35, inside, form=ok)
+[design flip back to page1 80x54] row1|  0x00002000      2       · SYN…9ABC
+[design flip back to page1 80x54] row1: Address=0x00002000:whole; Length=2:whole; Tag='· SYN…9ABC' (10 cells, ends at 35, inside, form=ok)
+[design flip back to page1 80x54] ROWS OK 28/28 | painted 0x runs not declared: none
+[design flip timing] 200-row page build median 15.2 ms (5 runs: 14.4, 15.1, 15.2, 15.6, 125.5); no-op fit median 5.9 ms
+# exit 0 ; clone status after: 0 changed; load: 3.57 3.02 2.53

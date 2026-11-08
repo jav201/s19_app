@@ -1,0 +1,50 @@
+# batch-103 Inc 4 E1 — base-tree reads (git grep at e07fb00; run 2026-11-06T22:01:52Z on the Windows PC, read-only)
+
+$ git grep -nE "difflib|levenshtein|Levenshtein|get_close_matches|damerau|subsequence|fuzzy" e07fb00 -- s19_app/
+e07fb00:s19_app/tui/operations/registry.py:50:        fallback, no fuzzy match, no default operation.
+e07fb00:s19_app/tui/services/flow_report_service.py:34:protocol-relative (``//x``) and **fuzzy** (``www.evil.com``, ``evil.com``,
+e07fb00:s19_app/tui/services/markdown_safety.py:63:#: protocol-relative (``//x``) and **fuzzy** (``www.evil.com``, ``evil.com``,
+e07fb00:s19_app/tui/services/operation_service.py:67:            registry error, propagated unchanged (no fallback, no fuzzy
+
+$ git grep -nE "label_match|LabelIndex|LabelMatch|MatchRule|build_label_index" e07fb00 -- s19_app tests  (expect none)
+(exit 1)
+
+# the existing name/text filters the matcher sits beside (unchanged by Inc 4)
+$ git grep -nE "needle in name.lower|return text in haystack|query.lower\(\) in self._a2l_tag_find_haystack|def _filter_a2l_tags|def _tag_matches_filter|def _a2l_tag_matches_find_query|def parse_parameter_list" e07fb00 -- s19_app/
+e07fb00:s19_app/tui/a2l_parameter_picker.py:75:def parse_parameter_list(text: str) -> list:
+e07fb00:s19_app/tui/a2l_parameter_picker.py:700:            1 for name in self._param_rows if not needle or needle in name.lower()
+e07fb00:s19_app/tui/a2l_parameter_picker.py:808:            name for name in self._param_rows if not needle or needle in name.lower()
+e07fb00:s19_app/tui/app.py:16641:    def _a2l_tag_matches_find_query(self, tag: dict, query: str) -> bool:
+e07fb00:s19_app/tui/app.py:16644:        return query.lower() in self._a2l_tag_find_haystack(tag)
+e07fb00:s19_app/tui/app.py:20475:    def _filter_a2l_tags(self, tags: list[dict]) -> list[dict]:
+e07fb00:s19_app/tui/app.py:20494:    def _tag_matches_filter(self, tag: dict, text: str) -> bool:
+e07fb00:s19_app/tui/app.py:20519:            return text in haystack
+
+$ git grep -n "difflib.get_close_matches" -- prototypes/ (prototype only, not product)
+
+$ id check: R-A2L-MATCH in REQUIREMENTS.md, docs/requirements/review/, .dev-flow/ (this folder excluded), s19w/review/, b101 branches
+.dev-flow/2026-11-05-batch-103/inc-2/evidence-e1/i2e1-id-census.txt:9:11:2026-11-06T15:34:56-06:00 E1 start — Inc 1a, 1b, 2, 4 in parallel; model Opus 5.5 (architect agents, one per folder); common rules design/E1-brief-common.md; ids R-PASTE (1a), R-COPY (1b), R-A2L-DEF (2, Inc 3 continues), R-A2L-MATCH (4)
+.dev-flow/2026-11-05-batch-103/steps.log:11:2026-11-06T15:34:56-06:00 E1 start — Inc 1a, 1b, 2, 4 in parallel; model Opus 5.5 (architect agents, one per folder); common rules design/E1-brief-common.md; ids R-PASTE (1a), R-COPY (1b), R-A2L-DEF (2, Inc 3 continues), R-A2L-MATCH (4)
+branch b101-canon: 0 files
+branch b101-inc10: 0 files
+branch b101-inc11: 0 files
+branch b101-inc12: 0 files
+branch b101-inc13: 0 files
+branch b101-inc14: 0 files
+branch b101-inc15: 0 files
+branch b101-inc16: 0 files
+branch b101-inc2: 0 files
+branch b101-inc3: 0 files
+branch b101-inc4: 0 files
+branch b101-inc5: 0 files
+branch b101-inc6: 0 files
+branch b101-inc7: 0 files
+branch b101-inc8: 0 files
+branch b101-inc9: 0 files
+branch b101-p0: 0 files
+
+$ AT id check: AT-B103-I4 anywhere
+(none above = unused)
+
+$ grep -n "get_close_matches" prototypes/b103_ux/variants/_av_common.py   (main clone; prototype files are not tracked in the batch worktree)
+134:    return difflib.get_close_matches(name, names, n=n, cutoff=0.6)

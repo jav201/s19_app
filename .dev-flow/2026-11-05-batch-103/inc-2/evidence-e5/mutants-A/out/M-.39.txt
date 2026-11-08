@@ -1,0 +1,101 @@
+# M-.39
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.39/s19_app/__init__.py
+# note: a non-finite value refused as a decode error
+#   EDIT-OK: '    return Decoded(stored, value, display_text(definition, value))'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..fc8007ac 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -1231,6 +1231,8 @@ def decode_definition(
+             "A2L-DEF-DECODE",
+             f"{name_echo}: the table {ref_echo} gives a value that is not a number",
+         )
++    if isinstance(value, float) and not math.isfinite(value):
++        return Refusal("A2L-DEF-DECODE", f"{name_echo}: {value} is not finite")
+     return Decoded(stored, value, display_text(definition, value))
+ 
+ 
+
+# --- pytest (rc=1) ---
+ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='F1', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=4, datatype=...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None)
+a2l = {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-<user>/pytest-985/test_r_a2l_def_39_1_nan0/inline_1.a2l', ...}
+image = {16: 127, 17: 192, 18: 0, 19: 0}
+
+    def _decoded(d: Definition, a2l: dict, image: Mapping[int, int]) -> Decoded:
+        res = decode_definition(d, a2l, image)
+>       assert isinstance(res, Decoded), res
+E       AssertionError: Refusal(code='A2L-DEF-DECODE', message='F1: nan is not finite')
+E       assert False
+E        +  where False = isinstance(Refusal(code='A2L-DEF-DECODE', message='F1: nan is not finite'), Decoded)
+
+../base/tests/test_b103_a2l_definition.py:170: AssertionError
+____________________ test_r_a2l_def_39_2_positive_infinity _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-985/test_r_a2l_def_39_2_positive_i0')
+
+    def test_r_a2l_def_39_2_positive_infinity(tmp_path):
+        """R-A2L-DEF.39/2."""
+>       assert _f1(tmp_path, "7F800000").text == "inf"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+../base/tests/test_b103_a2l_definition.py:1084: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../base/tests/test_b103_a2l_definition.py:1074: in _f1
+    return _num(tmp_path, "F1", "FLOAT32_IEEE", "%.2", bytes.fromhex(raw_hex))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../base/tests/test_b103_a2l_definition.py:1000: in _num
+    return _decoded(d, a2l, _img(0x10, raw))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='F1', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=4, datatype=...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None)
+a2l = {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-<user>/pytest-985/test_r_a2l_def_39_2_positive_i0/inline_2.a2l', ...}
+image = {16: 127, 17: 128, 18: 0, 19: 0}
+
+    def _decoded(d: Definition, a2l: dict, image: Mapping[int, int]) -> Decoded:
+        res = decode_definition(d, a2l, image)
+>       assert isinstance(res, Decoded), res
+E       AssertionError: Refusal(code='A2L-DEF-DECODE', message='F1: inf is not finite')
+E       assert False
+E        +  where False = isinstance(Refusal(code='A2L-DEF-DECODE', message='F1: inf is not finite'), Decoded)
+
+../base/tests/test_b103_a2l_definition.py:170: AssertionError
+____________________ test_r_a2l_def_39_3_negative_infinity _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-985/test_r_a2l_def_39_3_negative_i0')
+
+    def test_r_a2l_def_39_3_negative_infinity(tmp_path):
+        """R-A2L-DEF.39/3."""
+>       assert _f1(tmp_path, "FF800000").text == "-inf"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+../base/tests/test_b103_a2l_definition.py:1089: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../base/tests/test_b103_a2l_definition.py:1074: in _f1
+    return _num(tmp_path, "F1", "FLOAT32_IEEE", "%.2", bytes.fromhex(raw_hex))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../base/tests/test_b103_a2l_definition.py:1000: in _num
+    return _decoded(d, a2l, _img(0x10, raw))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='F1', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=4, datatype=...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None)
+a2l = {'compu_methods_by_name': {}, 'compu_tabs_by_name': {}, 'errors': [], 'path': '/tmp/pytest-of-<user>/pytest-985/test_r_a2l_def_39_3_negative_i0/inline_3.a2l', ...}
+image = {16: 255, 17: 128, 18: 0, 19: 0}
+
+    def _decoded(d: Definition, a2l: dict, image: Mapping[int, int]) -> Decoded:
+        res = decode_definition(d, a2l, image)
+>       assert isinstance(res, Decoded), res
+E       AssertionError: Refusal(code='A2L-DEF-DECODE', message='F1: -inf is not finite')
+E       assert False
+E        +  where False = isinstance(Refusal(code='A2L-DEF-DECODE', message='F1: -inf is not finite'), Decoded)
+
+../base/tests/test_b103_a2l_definition.py:170: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_39_1_nan - Assertion...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_39_2_positive_infinity
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_39_3_negative_infinity
+3 failed, 188 deselected in 1.32s

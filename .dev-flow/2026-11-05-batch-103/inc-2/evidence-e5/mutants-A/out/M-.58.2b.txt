@@ -1,0 +1,91 @@
+# M-.58.2b
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.58.2b/s19_app/__init__.py
+# note: fail-closed check removed (a text value reaches display_text)
+#   EDIT-OK: '    if not isinstance(value, (int, float)):\n        if isinstance(tabl'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..da69a732 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -1220,17 +1220,6 @@ def decode_definition(
+         )
+         if status == "error":
+             return Refusal("A2L-DEF-DECODE", f"{name_echo}: {error}")
+-    if not isinstance(value, (int, float)):
+-        if isinstance(table_form, _TabForm):
+-            ref_echo = table_form.ref_echo
+-        elif definition.compu_tab_ref is not None:
+-            ref_echo = _echo(definition.compu_tab_ref)
+-        else:
+-            ref_echo = "(none)"
+-        return Refusal(
+-            "A2L-DEF-DECODE",
+-            f"{name_echo}: the table {ref_echo} gives a value that is not a number",
+-        )
+     return Decoded(stored, value, display_text(definition, value))
+ 
+ 
+
+# --- pytest (rc=1) ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____ test_r_a2l_def_58_2_18_a_table_conversion_that_gives_a_text_is_refused ____
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-988/test_r_a2l_def_58_2_18_a_table0')
+
+    def test_r_a2l_def_58_2_18_a_table_conversion_that_gives_a_text_is_refused(tmp_path):
+        """R-A2L-DEF.58.2/18 (E3S3-28) - a VALUE whose TAB_NOINTP / TAB_INTP method names a COMPU_VTAB decodes to a refusal, not an exception."""
+        a2l = _inline(
+            tmp_path,
+            _vtab("VT_X", "2", '0 "OFF"', '1 "ON"'),
+            _cm("CM_XN", "TAB_NOINTP", fmt='"%.0"', ref="VT_X"),
+            _cm("CM_XI", "TAB_INTP", fmt='"%.0"', ref="VT_X"),
+            _val("XN", "0x10", LAYOUT["UBYTE"], "CM_XN", "0", "255"),
+            _val("XI", "0x11", LAYOUT["UBYTE"], "CM_XI", "0", "255"),
+        )
+        image = {0x10: 0x01, 0x11: 0x00}
+        for name in ("XN", "XI"):
+            d = describe_definition(name, a2l)
+            assert d.kind == "number" and d.refusal is None, (name, d.refusal)
+>           result = decode_definition(d, a2l, image)                     # 0 exceptions
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+../base/tests/test_b103_a2l_definition.py:1861: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+s19_app/tui/a2l_definition.py:1223: in decode_definition
+    return Decoded(stored, value, display_text(definition, value))
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+definition = Definition(name='XN', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=1, datatype=...um_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref='VT_X', refusal=None)
+value = 'ON'
+
+    def display_text(definition: Definition, value: int | float) -> str:
+        """The display text of a decoded number (I-2; Inc 3 reuses it per element).
+    
+        In order (E3A-04): non-finite → ``nan``/``inf``/``-inf``; an integer
+        datatype whose conversion is ``NO_COMPU_METHOD`` or IDENTICAL → the integer
+        text; ``decimals`` with a float datatype or a conversion other than none /
+        IDENTICAL → exactly ``d`` digits after the point (d ≥ 15 first rounds to 15
+        significant digits); else the 15-significant-digit text (``%.15g``).  No
+        unit.
+    
+        Args:
+            definition (Definition): The definition (datatype, conversion type,
+                decimals).
+            value (int | float): The physical value to show.
+    
+        Returns:
+            str: the display text.
+    
+        Raises:
+            None.
+        """
+>       if not math.isfinite(value):
+               ^^^^^^^^^^^^^^^^^^^^
+E       TypeError: must be real number, not str
+
+s19_app/tui/a2l_definition.py:1413: TypeError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_18_a_table_conversion_that_gives_a_text_is_refused
+1 failed, 190 deselected in 0.61s

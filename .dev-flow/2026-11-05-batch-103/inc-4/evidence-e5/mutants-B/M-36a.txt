@@ -1,0 +1,61 @@
+===== diff -u (base vs mutant) s19_app/tui/services/label_match.py =====
+--- /tmp/b103-e5-4-mutB/base/s19_app/tui/services/label_match.py	2026-11-06 20:36:19.839317227 -0600
++++ /tmp/b103-e5-4-mutB/M-36a/s19_app/tui/services/label_match.py	2026-11-06 21:11:03.524288466 -0600
+@@ -262,6 +262,7 @@
+         raise TypeError(f"query must be str, got {type(query).__name__}")
+     if not isinstance(limit, int) or isinstance(limit, bool):
+         raise TypeError(f"limit must be int, got {type(limit).__name__}")
++    index = build_label_index(index.names)
+     if limit < 1:
+         return []
+     raw = query.strip(_WHITESPACE)
+===== pytest tail =====
+--- uptime before ---
+ 21:11:03 up 1 day, 12:42,  2 users,  load average: 1.20, 1.44, 1.08
+____________ test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6 _____________
+
+ref6_index = <s19_app.tui.services.label_match.LabelIndex object at 0x7faf6a5f17c0>
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6(ref6_index):
+        """R-A2L-MATCH.36/1: each query of the REF6 query set over REF6, limit 20, median of 7 <= 200 ms."""
+        print(_load("before"))
+        medians = []
+        for query in REF6_QUERIES:
+            medians.append((f"R-A2L-MATCH.36 REF6 {query!r}", _median_of(7, lambda q=query: rank(q, ref6_index, 20))))
+        print(_load("after"))
+        for label_, median in medians:
+            print(f"  {median * 1000:9.2f} ms  {label_}")
+        for label_, median in medians:
+>           assert median <= report_margin(label_, median, timing_bound(KEYSTROKE_BOUND_S)), f"{label_}: median {median:.4f} s"
+E           AssertionError: R-A2L-MATCH.36 REF6 'm': median 0.6349 s
+E           assert 0.6348626890103333 <= 0.2
+E            +  where 0.2 = report_margin("R-A2L-MATCH.36 REF6 'm'", 0.6348626890103333, 0.2)
+E            +    where 0.2 = timing_bound(0.2)
+
+/home/<user>/work/b103-int4/tests/test_b103_label_match_perf.py:276: AssertionError
+----------------------------- Captured stdout call -----------------------------
+host load before: 2.26 2.05 1.50
+host load after: 2.10 2.04 1.54
+     634.86 ms  R-A2L-MATCH.36 REF6 'm'
+     633.26 ms  R-A2L-MATCH.36 REF6 'meas_'
+     641.14 ms  R-A2L-MATCH.36 REF6 'chr'
+     641.54 ms  R-A2L-MATCH.36 REF6 'mesa'
+     640.91 ms  R-A2L-MATCH.36 REF6 'cahr'
+     645.69 ms  R-A2L-MATCH.36 REF6 'cr0'
+     616.23 ms  R-A2L-MATCH.36 REF6 'char 1'
+     696.58 ms  R-A2L-MATCH.36 REF6 '0'
+     665.10 ms  R-A2L-MATCH.36 REF6 'chr 0'
+     629.15 ms  R-A2L-MATCH.36 REF6 'ch00'
+     618.61 ms  R-A2L-MATCH.36 REF6 'meas 1'
+     619.85 ms  R-A2L-MATCH.36 REF6 'c 0 1'
+============================= QC-TM timing margins =============================
+LOW -822.8%  1.846 s / 0.200 s  R-A2L-MATCH.36 REF 'a'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+LOW -217.4%  0.635 s / 0.200 s  R-A2L-MATCH.36 REF6 'm'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+QC-TM: 2 bounds, 2 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+FAILED tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref6
+2 failed, 5 deselected in 490.30s (0:08:10)
+--- uptime after ---
+ 21:19:14 up 1 day, 12:50,  4 users,  load average: 2.10, 2.04, 1.54

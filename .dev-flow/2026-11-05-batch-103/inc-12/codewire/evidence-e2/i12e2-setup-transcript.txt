@@ -1,0 +1,117 @@
+# setup transcript 2026-11-07T02:01:18-06:00 host <runner>
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e2-12/<user>; no DISPLAY; no clipboard; stdin closed; load: 1.22 2.07 2.11
+patched compose: cell_padding=1, fixed_columns=2
+patched columns: Address, Length, Tag, ...
+patched helper: _shorten_tag_name
+patched cells: signature
+patched cells: order and the cut
+patched page: name width
+patched page: fit scheduled; new methods _a2l_tag_name_width, _fit_a2l_tag_cells
+patched on_resize: fit while the A2L Explorer is shown
+patched action_show_screen: fit when the A2L Explorer is shown
+variant full: wrote /tmp/b103-e2-12/full/s19_app/tui/app.py
+py_compile full: ok
+diff full vs e07fb00: 73 changed lines
+patched compose: cell_padding=1, fixed_columns=2
+patched columns: Address, Length, Tag, ...
+patched helper: _shorten_tag_name
+patched cells: signature
+patched cells: order and the cut
+patched page: name width
+patched page: fit scheduled; new methods _a2l_tag_name_width, _fit_a2l_tag_cells
+patched on_resize: fit while the A2L Explorer is shown
+variant noshow: wrote /tmp/b103-e2-12/noshow/s19_app/tui/app.py
+py_compile noshow: ok
+diff noshow vs e07fb00: 71 changed lines
+patched compose: cell_padding=1, fixed_columns=2
+patched columns: Address, Length, Tag, ...
+patched helper: _shorten_tag_name
+patched cells: signature
+patched cells: order and the cut
+patched page: name width
+patched page: fit scheduled; new methods _a2l_tag_name_width, _fit_a2l_tag_cells
+patched on_resize: fit while the A2L Explorer is shown
+patched action_show_screen: fit when the A2L Explorer is shown
+variant nopostfit: wrote /tmp/b103-e2-12/nopostfit/s19_app/tui/app.py
+py_compile nopostfit: ok
+diff nopostfit vs e07fb00: 72 changed lines
+patched compose: cell_padding=1, fixed_columns=2
+patched columns: Address, Length, Tag, ...
+patched helper: _shorten_tag_name
+patched cells: signature
+patched cells: order and the cut
+patched page: name width
+patched page: fit scheduled; new methods _a2l_tag_name_width, _fit_a2l_tag_cells
+patched action_show_screen: fit when the A2L Explorer is shown
+variant noresize: wrote /tmp/b103-e2-12/noresize/s19_app/tui/app.py
+py_compile noresize: ok
+diff noresize vs e07fb00: 71 changed lines
+patched compose: cell_padding=1, fixed_columns=2
+patched columns: Address, Length, Tag, ...
+patched helper: _shorten_tag_name
+patched cells: signature
+patched cells: order and the cut
+patched page: name width
+patched page: fit scheduled; new methods _a2l_tag_name_width, _fit_a2l_tag_cells
+patched action_show_screen: fit when the A2L Explorer is shown
+patched import Message
+patched class A2LTagTable
+patched compose: A2LTagTable
+variant widget: wrote /tmp/b103-e2-12/widget/s19_app/tui/app.py
+py_compile widget: ok
+diff widget vs e07fb00: 90 changed lines
+patched compose: cell_padding=1, fixed_columns=2
+patched columns: Address, Length, Tag, ...
+patched helper: _shorten_tag_name
+patched cells: signature
+patched cells: order and the cut
+patched page: name width
+patched page: fit scheduled; new methods _a2l_tag_name_width, _fit_a2l_tag_cells
+patched import Message
+patched class A2LTagTable
+patched compose: A2LTagTable
+variant widgetonly: wrote /tmp/b103-e2-12/widgetonly/s19_app/tui/app.py
+py_compile widgetonly: ok
+diff widgetonly vs e07fb00: 87 changed lines
+patched compose: cell_padding=1, fixed_columns=2
+patched columns: Address, Length, Tag, ...
+patched helper: _shorten_tag_name
+patched cells: signature
+patched cells: order and the cut
+patched page: name width
+patched page: fit scheduled; new methods _a2l_tag_name_width, _fit_a2l_tag_cells
+patched import Message
+patched class A2LTagTable
+patched compose: A2LTagTable
+variant widgetnoshow: wrote /tmp/b103-e2-12/widgetnoshow/s19_app/tui/app.py
+py_compile widgetnoshow: ok
+diff widgetnoshow vs e07fb00: 88 changed lines
+patched compose: cell_padding=1, fixed_columns=2
+patched columns: Address, Length, Tag, ...
+patched helper: _shorten_tag_name
+patched cells: signature
+patched cells: order and the cut
+patched page: name width
+patched page: fit scheduled; new methods _a2l_tag_name_width, _fit_a2l_tag_cells
+patched action_show_screen: fit when the A2L Explorer is shown
+patched import Message
+patched class A2LTagTable
+patched compose: A2LTagTable
+variant widgetnopost: wrote /tmp/b103-e2-12/widgetnopost/s19_app/tui/app.py
+py_compile widgetnopost: ok
+diff widgetnopost vs e07fb00: 89 changed lines
+patched compose: cell_padding=1, fixed_columns=2
+patched columns: Address, Length, Tag, ...
+patched helper: _shorten_tag_name
+patched cells: signature
+patched cells: order and the cut
+patched page: name width
+patched page: fit scheduled; new methods _a2l_tag_name_width, _fit_a2l_tag_cells
+patched import Message
+patched class A2LTagTable
+patched compose: A2LTagTable
+variant design: wrote /tmp/b103-e2-12/design/s19_app/tui/app.py
+py_compile design: ok
+diff design vs e07fb00: 88 changed lines
+# clone status after: 0 changed

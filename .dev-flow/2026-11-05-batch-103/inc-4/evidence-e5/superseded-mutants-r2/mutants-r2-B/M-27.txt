@@ -1,0 +1,31 @@
+===== diff -u (base vs mutant) s19_app/tui/services/label_match.py =====
+--- /tmp/b103-e5-4-mutr2B/base/s19_app/tui/services/label_match.py	2026-11-06 22:11:34.000000000 -0600
++++ /tmp/b103-e5-4-mutr2B/M-27/s19_app/tui/services/label_match.py	2026-11-06 22:42:28.485690441 -0600
+@@ -921,7 +921,7 @@
+     if rule is MatchRule.EXACT:
+         return ((0, len(name)),)
+     if rule is MatchRule.PREFIX:
+-        return ((0, len(text)),)
++        return ((0, len(name)),)
+     if rule is MatchRule.SUBSTRING:
+         p = folded.find(text)
+         if p < 0:
+===== pytest tail =====
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_rows_27_prefix_span_counts_the_query_text_not_whitespace _________
+
+prep = <function prep.<locals>.get at 0x7f5fba73ba60>
+
+    def test_rows_27_prefix_span_counts_the_query_text_not_whitespace(prep):
+        """R-A2L-MATCH.27/1, .27/2, .27/3: every prefix entry's spans are exactly (0,k); stripped whitespace counts in no span."""
+>       assert [m.spans for m in run(prep, "C08", "value_000", 5)] == [((0, 9),)] * 5
+E       assert [((0, 10),), ...), ((0, 10),)] == [((0, 9),), (...,), ((0, 9),)]
+E         
+E         At index 0 diff: ((0, 10),) != ((0, 9),)
+E         Use -v to get more diff
+
+tests/test_b103_label_match.py:481: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_rows_27_prefix_span_counts_the_query_text_not_whitespace
+1 failed, 128 deselected in 4.92s

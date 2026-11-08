@@ -1,0 +1,37 @@
+# M-PASTE.18
+# row: R-PASTE.18
+# s19_app.__file__ = /tmp/b103-e5-1a-mut/work/s19_app/__init__.py
+# note: one place's box built as a stock TextArea (the census names it)
+# --- git diff ---
+diff --git a/s19_app/tui/screens.py b/s19_app/tui/screens.py
+index 63a48d28..fec42e3c 100644
+--- a/s19_app/tui/screens.py
++++ b/s19_app/tui/screens.py
+@@ -972,7 +972,7 @@ class BulkParameterAddScreen(ModalScreen[Optional[dict]]):
+         yield Container(
+             Label("Add A2L parameters", classes="modal-title"),
+             Label(Text(self._INSTRUCTION), id="bulk_param_instruction"),
+-            CappedTextArea("", id="bulk_param_text"),
++            TextArea("", id="bulk_param_text"),
+             Static("", id="bulk_param_summary", markup=False),
+             Container(
+                 Button(
+
+# --- pytest (rc=1) ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________ test_r_paste_18_8_every_multi_line_box_is_capped_text_area __________
+
+    def test_r_paste_18_8_every_multi_line_box_is_capped_text_area() -> None:
+        """R-PASTE.18/8: 0 editable stock ``TextArea``; 7 multi-line boxes capped."""
+        counts = _census_text_box_constructions()
+>       assert counts["CappedTextArea"] + counts["JsonHighlightTextArea"] == 7, counts
+E       AssertionError: {'CappedTextArea': 5, 'Input': 0, 'JsonHighlightTextArea': 1, 'OsClipboardInput': 40, ...}
+E       assert (5 + 1) == 7
+
+tests/test_b103_clipboard_core.py:1699: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_18_8_every_multi_line_box_is_capped_text_area
+1 failed, 86 deselected in 0.72s
+
+===== stderr =====

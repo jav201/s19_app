@@ -1,0 +1,54 @@
+# M-.31
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.31/s19_app/__init__.py
+# note: stored value shown instead of the default text
+#   EDIT-OK: '            return form.default_display'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..46de71d2 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -1314,7 +1314,7 @@ def _enum_text(definition: Definition, stored: int | float) -> str:
+         if pos is not None:
+             return form.texts[pos]
+         if form.default_display is not None:
+-            return form.default_display
++            return _raw_text(stored)
+         return f"{_raw_text(stored)} (no text)"
+     entry = _enum_entry_text(definition, stored)
+     if entry is not None:
+
+# --- pytest (rc=1) ---
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_______________ test_r_a2l_def_31_1_default_text_of_a_compu_vtab _______________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...osed /begin sections detected.'], 'path': '/tmp/b103-e5-2-mutA/M-.31/examples/case_00_public/ASAP2_Demo_V171.a2l', ...}
+
+    def test_r_a2l_def_31_1_default_text_of_a_compu_vtab(v171):
+        """R-A2L-DEF.31/1 - stored 9."""
+>       assert _v171_text(v171, V171_ENUM, b"\x09\x00") == "unknown signal type"
+E       AssertionError: assert '9' == 'unknown signal type'
+E         
+E         - unknown signal type
+E         + 9
+
+../base/tests/test_b103_a2l_definition.py:936: AssertionError
+------------------------------ Captured log setup ------------------------------
+WARNING  s19_app.tui.a2l:a2l.py:250 A2L section tree has structural errors: path=/tmp/b103-e5-2-mutA/M-.31/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+______________ test_r_a2l_def_31_2_default_text_of_a_range_table _______________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...osed /begin sections detected.'], 'path': '/tmp/b103-e5-2-mutA/M-.31/examples/case_00_public/ASAP2_Demo_V171.a2l', ...}
+
+    def test_r_a2l_def_31_2_default_text_of_a_range_table(v171):
+        """R-A2L-DEF.31/2 - stored 10."""
+>       assert _v171_text(v171, V171_RANGE, b"\x0a\x00") == "out of range value"
+E       AssertionError: assert '10' == 'out of range value'
+E         
+E         - out of range value
+E         + 10
+
+../base/tests/test_b103_a2l_definition.py:941: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_31_1_default_text_of_a_compu_vtab
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_31_2_default_text_of_a_range_table
+2 failed, 189 deselected in 0.54s

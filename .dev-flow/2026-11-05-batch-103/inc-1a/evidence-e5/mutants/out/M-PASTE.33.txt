@@ -1,0 +1,38 @@
+# M-PASTE.33
+# row: R-PASTE.33
+# s19_app.__file__ = /tmp/b103-e5-1a-mut/work/s19_app/__init__.py
+# note: one place built from a class without the right-click (census 33/1)
+# --- git diff ---
+diff --git a/s19_app/tui/screens.py b/s19_app/tui/screens.py
+index 63a48d28..055a9aaf 100644
+--- a/s19_app/tui/screens.py
++++ b/s19_app/tui/screens.py
+@@ -855,7 +855,7 @@ class EntryJsonScreen(ModalScreen[Optional[str]]):
+     def compose(self) -> ComposeResult:
+         yield Container(
+             Label("Edit entry JSON:", classes="modal-title"),
+-            CappedTextArea(self._seed_text, id="entry_json_text"),
++            TextArea(self._seed_text, id="entry_json_text"),
+             Container(
+                 Button("Confirm", id="entry_json_confirm", classes="modal-confirm"),
+                 Button("Cancel", id="entry_json_cancel"),
+
+# --- pytest (rc=1) ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________ test_r_paste_19_1_and_33_1_every_text_box_is_the_two_classes _________
+
+    def test_r_paste_19_1_and_33_1_every_text_box_is_the_two_classes() -> None:
+        """R-PASTE.19/1 + .33/1: 47/47 text boxes are the two clipboard classes."""
+        counts = _census_text_box_constructions()
+        assert counts["OsClipboardInput"] == 40, counts
+>       assert counts["CappedTextArea"] + counts["JsonHighlightTextArea"] == 7, counts
+E       AssertionError: {'CappedTextArea': 5, 'Input': 0, 'JsonHighlightTextArea': 1, 'OsClipboardInput': 40, ...}
+E       assert (5 + 1) == 7
+
+tests/test_b103_clipboard_core.py:1707: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_19_1_and_33_1_every_text_box_is_the_two_classes
+1 failed, 86 deselected in 0.72s
+
+===== stderr =====

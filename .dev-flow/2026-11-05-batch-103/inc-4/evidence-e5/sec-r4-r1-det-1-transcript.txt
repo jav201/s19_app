@@ -1,0 +1,10 @@
+runner sec-r4-run.sh sha256 7225a0c07c03fcc70fc7b999ce05a020dd89112bd40d37d6b63c27d49d485517; probe sec-e5-probe.py sha256 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+s19_app.__file__ = /tmp/b103-e5r4-4-sec/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5r4-4-sec/tree/s19_app/tui/services/label_match.py
+label_match sha256 = b97d19ebfe11dd47f096ded2ae6d7dd5f12f6fa02c42d8b9d5f782056bd79ecc
+tests module = /tmp/b103-e5r4-4-sec/tree/tests/test_b103_label_match_perf.py
+mode = det  python = 3.11.18  PYTHONHASHSEED = 1  hash('abc') = -4667308735975688587
+host = <runner>  load = (4.44, 3.45, 2.81)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5r4-4-sec/<user>  LOCALAPPDATA = /tmp/b103-e5r4-4-sec/<user>/localappdata  PILOT_DIR = /tmp/b103-e5r4-4-sec/pilot
+PYTHONHASHSEED=1 hash('abc')=-4667308735975688587 rankings=1287 sha256=e658b97987c7dfe94cef40e7336201cee094f99927f6ccc669244b6a6f6b2d53 (30 s)
+probe exit 0

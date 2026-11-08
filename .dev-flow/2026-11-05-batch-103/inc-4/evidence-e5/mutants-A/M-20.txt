@@ -1,0 +1,24 @@
+=== DIFF base -> M-20 (s19_app/tui/services/label_match.py) ===
+diff --git a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py b/M-20/s19_app/tui/services/label_match.py
+index d274de0..9eee8fb 100644
+--- a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py
++++ b/M-20/s19_app/tui/services/label_match.py
+@@ -358,7 +358,7 @@ def rank(query: str, index: LabelIndex, limit: int) -> list[LabelMatch]:
+                 add_group(MatchRule.SUBSEQUENCE, 0, i)
+ 
+     result: list[LabelMatch] = []
+-    for group_key in sorted(groups):
++    for group_key in sorted(groups, key=lambda gk: names[groups[gk][0]]):
+         rule = _RULE_BY_POS[group_key[0]]
+         members = groups[group_key]
+         keyed: list[tuple[tuple, int]] = []
+
+=== PYTEST (tail) ===
+F.F                                                                      [100%]
+=================================== FAILURES ===================================
+/tmp/b103-e5-4-mutA/M-20/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.20/2: query 'gamecontroller.timer' limit 20
+/tmp/b103-e5-4-mutA/M-20/tests/test_b103_label_match.py:436: AssertionError: assert [('AwsQdc.VXA...), (56, 57)))] == [('LukPvq.JXM...), (56, 57)))]
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.20/2]
+FAILED tests/test_b103_label_match.py::test_rows_20_3_token_then_fuzzy_then_subsequence
+2 failed, 1 passed, 126 deselected in 5.12s

@@ -1,0 +1,101 @@
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+s19_app.__file__ = <home>/work/s19_app/s19_app/__init__.py
+textual = 8.2.8 python = 3.11.18
+
+== T1  round-1 P1 shape (+ C1 CSI, + lone surrogate): marker in value / in drawn line
+  OsClipboardInput terminal ESC=True /True   NUL=True /True   C1-CSI=True /True   RLO=True /True   LRI=True /True   U+D800=True /True 
+  OsClipboardInput fallback ESC=True /True   NUL=True /True   C1-CSI=True /True   RLO=True /True   LRI=True /True   U+D800=True /True 
+  GInput          terminal ESC=False/True   NUL=False/False  C1-CSI=False/False  RLO=True /True   LRI=True /True   U+D800=True /True 
+  GInput          fallback ESC=False/True   NUL=False/False  C1-CSI=False/False  RLO=True /True   LRI=True /True   U+D800=True /True 
+  RInput          terminal ESC=False/True   NUL=False/False  C1-CSI=False/False  RLO=False/False  LRI=False/False  U+D800=False/False
+  RInput          fallback ESC=False/True   NUL=False/False  C1-CSI=False/False  RLO=False/False  LRI=False/False  U+D800=False/False
+  CappedTextArea  terminal ESC=True /True   NUL=True /True   C1-CSI=True /True   RLO=True /True   LRI=True /True   U+D800=True /True 
+  CappedTextArea  fallback ESC=True /True   NUL=True /True   C1-CSI=True /True   RLO=True /True   LRI=True /True   U+D800=True /True 
+  GArea           terminal ESC=False/True   NUL=False/False  C1-CSI=False/False  RLO=True /True   LRI=True /True   U+D800=True /True 
+  GArea           fallback ESC=False/True   NUL=False/False  C1-CSI=False/False  RLO=True /True   LRI=True /True   U+D800=True /True 
+  RArea           terminal ESC=False/True   NUL=False/False  C1-CSI=False/False  RLO=False/False  LRI=False/False  U+D800=False/False
+  RArea           fallback ESC=False/True   NUL=False/False  C1-CSI=False/False  RLO=False/False  LRI=False/False  U+D800=False/False
+
+== T2  round-1 P2 shape (cursor-left, erase, ST-terminated OSC 52) in the drawn line
+  OsClipboardInput terminal CSI-13D=True  OSC52-ST=True  value='C:/fw/good.s19\x1b[13D\x1b[0Kevil.s19\x1b]52;c;SElKQUNL\x1b\\X'
+  OsClipboardInput fallback CSI-13D=True  OSC52-ST=True  value='C:/fw/good.s19\x1b[13D\x1b[0Kevil.s19\x1b]52;c;SElKQUNL\x1b\\X'
+  GInput          terminal CSI-13D=False OSC52-ST=False value='C:/fw/good.s19[13D[0Kevil.s19]52;c;SElKQUNL\\X'
+  GInput          fallback CSI-13D=False OSC52-ST=False value='C:/fw/good.s19[13D[0Kevil.s19]52;c;SElKQUNL\\X'
+  RInput          terminal CSI-13D=False OSC52-ST=False value='C:/fw/good.s19[13D[0Kevil.s19]52;c;SElKQUNL\\X'
+  RInput          fallback CSI-13D=False OSC52-ST=False value='C:/fw/good.s19[13D[0Kevil.s19]52;c;SElKQUNL\\X'
+
+== T3  R-PASTE.1: terminal paste 'L1\nL2' into a single-line box (row: 'L1')
+  OsClipboardInput value='L1'
+  GInput          value='L1L2'
+  RInput          value='L1'
+
+== T4  R-TUI-043.4 / R-PASTE.29 shape: ctrl+v of 'P1 line\nsecond' (fallback), single-line (row: 'P1 line')
+  OsClipboardInput value='P1 line'
+  GInput          value='P1 linesecond'
+  GInputT1        value='P1 linesecond'
+  RInput          value='P1 line'
+
+== T5  R-TUI-044.3 / R-PASTE.30 shape: ctrl+v of 'P1 line\nsecond', multi-line (row: the line end kept)
+  CappedTextArea  value='P1 line\nsecond'
+  GArea           value='P1 linesecond'
+  GAreaT2         value='P1 line\nsecond'
+  RArea           value='P1 line\nsecond'
+
+== T6  #load_path shape (restrict=[^\x00-\x1f\x7f]*, max_length=4096); R-LOADDLG.20: 'leave the path box text unchanged'
+  'a\x00.s19'      OsClipboardInput terminal value=''             unchanged=True  C1-CSI-in-drawn=False
+  'a\x00.s19'      OsClipboardInput fallback value=''             unchanged=True  C1-CSI-in-drawn=False
+  'a\x00.s19'      GInput          terminal value='a.s19'        unchanged=False C1-CSI-in-drawn=False
+  'a\x00.s19'      GInput          fallback value='a.s19'        unchanged=False C1-CSI-in-drawn=False
+  'a\x00.s19'      RInput          terminal value=''             unchanged=True  C1-CSI-in-drawn=False
+  'a\x00.s19'      RInput          fallback value=''             unchanged=True  C1-CSI-in-drawn=False
+  'a\x1b[2K.s19'   OsClipboardInput terminal value=''             unchanged=True  C1-CSI-in-drawn=False
+  'a\x1b[2K.s19'   OsClipboardInput fallback value=''             unchanged=True  C1-CSI-in-drawn=False
+  'a\x1b[2K.s19'   GInput          terminal value='a[2K.s19'     unchanged=False C1-CSI-in-drawn=False
+  'a\x1b[2K.s19'   GInput          fallback value='a[2K.s19'     unchanged=False C1-CSI-in-drawn=False
+  'a\x1b[2K.s19'   RInput          terminal value=''             unchanged=True  C1-CSI-in-drawn=False
+  'a\x1b[2K.s19'   RInput          fallback value=''             unchanged=True  C1-CSI-in-drawn=False
+  'a\x9b31m.s19'   OsClipboardInput terminal value='a\x9b31m.s19' unchanged=False C1-CSI-in-drawn=True
+  'a\x9b31m.s19'   OsClipboardInput fallback value='a\x9b31m.s19' unchanged=False C1-CSI-in-drawn=True
+  'a\x9b31m.s19'   GInput          terminal value='a31m.s19'     unchanged=False C1-CSI-in-drawn=False
+  'a\x9b31m.s19'   GInput          fallback value='a31m.s19'     unchanged=False C1-CSI-in-drawn=False
+  'a\x9b31m.s19'   RInput          terminal value=''             unchanged=True  C1-CSI-in-drawn=False
+  'a\x9b31m.s19'   RInput          fallback value=''             unchanged=True  C1-CSI-in-drawn=False
+
+== T7  P-CTRL of 02-test-cases.md ('scrubbed to ABC')
+  graph single-line set : 'A[13DBC\u202e\ud800'
+  CTX-PASTE set         : 'A[13DBC'
+  via the OS clipboard  : 'A\x1b[13DB' -> 'A[13DB'
+  UTF-8 stdin encode    : UnicodeEncodeError: surrogates not allowed at 10
+
+== T8  a lone surrogate left on screen -> textual's WriterThread (the driver's only writer)
+  design G value: 'ok\ud800ok' | lone surrogate in the drawn line: True
+  errors=strict           thread exception=['UnicodeEncodeError']  thread alive=False  frame-3 written=False
+  errors=surrogateescape  thread exception=['UnicodeEncodeError']  thread alive=False  frame-3 written=False
+  errors=backslashreplace thread exception=None  thread alive=False  frame-3 written=True
+
+== T9  App.copy_to_clipboard of a lone surrogate (the copy tail's first call)
+  UnicodeEncodeError: surrogates not allowed
+
+== T10 the cascade tuples are read at call time (the E3S-02 conftest stand-ins can replace them)
+  read_os_clipboard names _STRATEGIES: True | write_os_clipboard names _WRITE_STRATEGIES: True

@@ -1,0 +1,52 @@
+===== mutant M-63 (2026-11-07T13:23:18Z) =====
+--- unified diff ---
+diff --git a/tools/synth/make_release_case.py b/tools/synth/make_release_case.py
+index 7b843b64..af67018f 100644
+--- a/tools/synth/make_release_case.py
++++ b/tools/synth/make_release_case.py
+@@ -30,6 +30,7 @@ import math
+ import random
+ import struct
+ import sys
++import time
+ from pathlib import Path
+ 
+ # ---------------------------------------------------------------------------
+@@ -1241,7 +1242,7 @@ def generate_definitions_case(out_dir: Path, seed: int) -> dict[str, Path]:
+         "a2l": out_dir / "definitions.a2l",
+     }
+     paths["s19"].write_text(emit_s19(regions, BOOT_BASE), encoding="utf-8")
+-    paths["a2l"].write_text(emit_definitions_a2l(regions, objects), encoding="utf-8")
++    paths["a2l"].write_text(emit_definitions_a2l(regions, objects) + f"/* {time.time()} */\n", encoding="utf-8")
+     return paths
+ 
+ 
+--- pytest ---
+s19_app.__file__ = /tmp/b103-e5-2-mutB/M-M-63/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________ test_r_a2l_def_63_1_the_definitions_case_is_deterministic ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-934/test_r_a2l_def_63_1_the_defini0')
+
+    def test_r_a2l_def_63_1_the_definitions_case_is_deterministic(tmp_path):
+        """R-A2L-DEF.63/1 - two runs, same seed, two folders: every file byte-identical."""
+        a, b = tmp_path / "run_a", tmp_path / "run_b"
+        for folder in (a, b):
+            result = _run_cli(folder, "--seed", str(SEED), "--case", "definitions")
+            assert result.returncode == 0, result.stderr
+        names = sorted(p.name for p in a.iterdir())
+        assert names == sorted(p.name for p in b.iterdir()) == ["definitions.a2l", "definitions.s19"]
+        for name in names:
+>           assert (a / name).read_bytes() == (b / name).read_bytes(), name
+E           AssertionError: definitions.a2l
+E           assert b'ASAP2_VERSI....6932874 */\n' == b'ASAP2_VERSI....7786775 */\n'
+E             
+E             At index 1966 diff: b'6' != b'7'
+E             Use -v to get more diff
+
+tests/test_b103_synth_definitions.py:256: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_synth_definitions.py::test_r_a2l_def_63_1_the_definitions_case_is_deterministic
+1 failed, 8 deselected in 0.80s
+pytest exit code: 1

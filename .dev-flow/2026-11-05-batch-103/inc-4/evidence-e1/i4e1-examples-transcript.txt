@@ -1,0 +1,131 @@
+rc=0
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+case08 462 names; case08_issues 470 (VALUE_0001 x2)
+[case08] query='\tVALUE_0001\n' limit=20
+    'VALUE_0001'                                         exact       key=0 spans=[(0, 10)]
+[case08] query=' value_000 ' limit=5
+    'VALUE_0001'                                         prefix      key=0 spans=[(0, 9)]
+    'VALUE_0002'                                         prefix      key=0 spans=[(0, 9)]
+    'VALUE_0003'                                         prefix      key=0 spans=[(0, 9)]
+    'VALUE_0004'                                         prefix      key=0 spans=[(0, 9)]
+    'VALUE_0005'                                         prefix      key=0 spans=[(0, 9)]
+[case08] query='\t\n' limit=20
+    (empty)
+[case08] query='map_0020' limit=20
+    'MAP_0020'                                           exact       key=0 spans=[(0, 8)]
+[case08] query='VALUE-0001' limit=20
+    'VALUE_0001'                                         token       key=0 spans=[(0, 5), (6, 10)]
+[case08] query='_0001' limit=20
+    'MAP_0001'                                           substring   key=0 spans=[(3, 8)]
+    'ASCII_0001'                                         substring   key=0 spans=[(5, 10)]
+    'CURVE_0001'                                         substring   key=0 spans=[(5, 10)]
+    'VALUE_0001'                                         substring   key=0 spans=[(5, 10)]
+    'VAL_BLK_0001'                                       substring   key=0 spans=[(7, 12)]
+    'MEASUREMENT_0001'                                   substring   key=0 spans=[(11, 16)]
+[case08] query='cvure' limit=20
+    (empty)
+[case08] query='valuexx_0001' limit=20
+    'VALUE_0001'                                         fuzzy       key=2 spans=[(0, 5), (6, 10)]
+[case08] query='valuexxx_0001' limit=20
+    (empty)
+[case08] query='VALUE_0001_VALUE_0001' limit=20
+    'VALUE_0001'                                         token       key=0 spans=[(0, 5), (6, 10)]
+[case08] query='maesu' limit=3
+    'MEASUREMENT_0001'                                   fuzzy       key=1 spans=[(0, 11)]
+    'MEASUREMENT_0002'                                   fuzzy       key=1 spans=[(0, 11)]
+    'MEASUREMENT_0003'                                   fuzzy       key=1 spans=[(0, 11)]
+[case08] query='temp_sensor_max' limit=20
+    (empty)
+[case08] query='0001' limit=20
+    'MAP_0001'                                           substring   key=0 spans=[(4, 8)]
+    'ASCII_0001'                                         substring   key=0 spans=[(6, 10)]
+    'CURVE_0001'                                         substring   key=0 spans=[(6, 10)]
+    'VALUE_0001'                                         substring   key=0 spans=[(6, 10)]
+    'VAL_BLK_0001'                                       substring   key=0 spans=[(8, 12)]
+    'MEASUREMENT_0001'                                   substring   key=0 spans=[(12, 16)]
+[case08_rev] query='0001' limit=20
+    'MAP_0001'                                           substring   key=0 spans=[(4, 8)]
+    'ASCII_0001'                                         substring   key=0 spans=[(6, 10)]
+    'CURVE_0001'                                         substring   key=0 spans=[(6, 10)]
+    'VALUE_0001'                                         substring   key=0 spans=[(6, 10)]
+    'VAL_BLK_0001'                                       substring   key=0 spans=[(8, 12)]
+    'MEASUREMENT_0001'                                   substring   key=0 spans=[(12, 16)]
+[case08_issues] query='value_000' limit=20
+    'VALUE_0001'                                         prefix      key=0 spans=[(0, 9)]
+    'VALUE_0002'                                         prefix      key=0 spans=[(0, 9)]
+    'VALUE_0003'                                         prefix      key=0 spans=[(0, 9)]
+    'VALUE_0004'                                         prefix      key=0 spans=[(0, 9)]
+    'VALUE_0005'                                         prefix      key=0 spans=[(0, 9)]
+    'VALUE_0006'                                         prefix      key=0 spans=[(0, 9)]
+    'VALUE_0007'                                         prefix      key=0 spans=[(0, 9)]
+    'VALUE_0008'                                         prefix      key=0 spans=[(0, 9)]
+    'VALUE_0009'                                         prefix      key=0 spans=[(0, 9)]
+    'VALUE_0010'                                         subsequence key=0 spans=[(0, 5), (6, 8), (9, 10)]
+    'VALUE_0020'                                         subsequence key=0 spans=[(0, 5), (6, 8), (9, 10)]
+    'VALUE_0030'                                         subsequence key=0 spans=[(0, 5), (6, 8), (9, 10)]
+    'VALUE_0040'                                         subsequence key=0 spans=[(0, 5), (6, 8), (9, 10)]
+    'VALUE_0050'                                         subsequence key=0 spans=[(0, 5), (6, 8), (9, 10)]
+    'VALUE_0060'                                         subsequence key=0 spans=[(0, 5), (6, 8), (9, 10)]
+    'VALUE_0070'                                         subsequence key=0 spans=[(0, 5), (6, 8), (9, 10)]
+    'VALUE_0080'                                         subsequence key=0 spans=[(0, 5), (6, 8), (9, 10)]
+    'VALUE_0090'                                         subsequence key=0 spans=[(0, 5), (6, 8), (9, 10)]
+    'VALUE_0100'                                         subsequence key=0 spans=[(0, 5), (6, 7), (8, 10)]
+    'VALUE_0200'                                         subsequence key=0 spans=[(0, 5), (6, 7), (8, 10)]
+[curated] query='ab' limit=20
+    (empty)
+[curated] query='ca' limit=20
+    (empty)
+[curated] query='counter' limit=20
+    'timeCounter'                                        substring   key=0 spans=[(4, 11)]
+    'Encounter'                                          substring   key=1 spans=[(2, 9)]
+[curated] query='count' limit=20
+    'DiscountCount'                                      substring   key=0 spans=[(8, 13)]
+[curated] query='curvee' limit=20
+    'CURVE_0001'                                         fuzzy       key=1 spans=[(0, 5)]
+    'CUVE'                                               fuzzy       key=2 spans=[(0, 4)]
+[curated] query='cuvre maq' limit=20
+    'Curve_Map_X'                                        fuzzy       key=2 spans=[(0, 5), (6, 9)]
+[curated] query='rpm' limit=20
+    'RPMX'                                               prefix      key=0 spans=[(0, 3)]
+    'rpm_x'                                              prefix      key=0 spans=[(0, 3)]
+[curated] query='rpm' limit=20
+    'rpm'                                                exact       key=0 spans=[(0, 3)]
+    'RPM'                                                exact       key=0 spans=[(0, 3)]
+    'Rpm'                                                exact       key=0 spans=[(0, 3)]
+[curated] query='v' limit=20
+    'VALUE_0001'                                         prefix      key=0 spans=[(0, 1)]
+[curated] query='abs value' limit=20
+    'ABSValue'                                           token       key=0 spans=[(0, 8)]
+[curated] query='a value' limit=20
+    'AValue'                                             token       key=0 spans=[(0, 6)]
+    'ABSValue'                                           token       key=0 spans=[(0, 1), (3, 8)]
+[curated] query='engine speed' limit=20
+    'engineSpeed'                                        token       key=0 spans=[(0, 11)]
+[curated] query='map 3 d' limit=20
+    'Map3D'                                              token       key=0 spans=[(0, 5)]
+[BalanceTube] query='gamecontroller timer' limit=3
+    'model.MainClass.gameController.timer.timeCounter'   subsequence key=0 spans=[(16, 30), (31, 36)]
+    'model.MainClass.gameController.stopWatch.timeCounter' subsequence key=0 spans=[(16, 30), (32, 33), (42, 45), (51, 52)]
+[from_source] query='Fork.y' limit=20
+    'parameter_instance[0].Fork.y'                       substring   key=0 spans=[(22, 28)]
+    'parameter_instance[1].Fork.y'                       substring   key=0 spans=[(22, 28)]
+    'parameter_instance[2].Fork.y'                       substring   key=0 spans=[(22, 28)]
+    'parameter_instance[3].Fork.y'                       substring   key=0 spans=[(22, 28)]
+[from_source] query='knife 1 x' limit=20
+    'parameter_instance[0].Knife[1].x'                   token       key=0 spans=[(22, 27), (28, 29), (31, 32)]
+    'parameter_instance[1].Knife[0].x'                   token       key=0 spans=[(19, 20), (22, 27), (31, 32)]
+    'parameter_instance[1].Knife[1].x'                   token       key=0 spans=[(19, 20), (22, 27), (31, 32)]
+    'parameter_instance[2].Knife[1].x'                   token       key=0 spans=[(22, 27), (28, 29), (31, 32)]
+    'parameter_instance[3].Knife[1].x'                   token       key=0 spans=[(22, 27), (28, 29), (31, 32)]
+
+OSA prefix distances used by the cases
+  d('cvure', 'curve') = 2
+  d('valuexx', 'value') = 2
+  d('valuexxx', 'value') = 3
+  d('curvee', 'curve') = 1
+  d('curvee', 'cuve') = 2
+  d('maesu', 'measurement') = 1
+  d('cuvre', 'curve') = 1
+  d('maq', 'map') = 1
+  d('ab', 'ba') = 1
+  d('ca', 'abc') = 1

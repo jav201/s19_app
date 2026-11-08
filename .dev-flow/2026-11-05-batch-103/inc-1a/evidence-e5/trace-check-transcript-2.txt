@@ -1,0 +1,2 @@
+trace_check: 1 US, 43 active requirements (0 withdrawn), 0 gap(s)
+EXIT=0

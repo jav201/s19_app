@@ -1,0 +1,54 @@
+name: clipboard-windows
+
+# The OS clipboard tests of batch-103 Inc 1a (R-PASTE.20): Windows only, on a
+# GitHub-hosted runner, whose clipboard belongs to no person (R-PASTE.21).
+# Separate from tui-ci.yml (D-6 B), which stays unchanged.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "s19_app/tui/os_clipboard_input.py"
+      - "s19_app/tui/capped_text_area.py"
+      - "tests/support/b103_clipboard.py"
+      - "tests/test_b103_clipboard_windows.py"
+      - "tests/test_b103_clipboard_matrix.py"
+      - ".github/workflows/clipboard-windows.yml"
+  pull_request:
+    paths:
+      - "s19_app/tui/os_clipboard_input.py"
+      - "s19_app/tui/capped_text_area.py"
+      - "tests/support/b103_clipboard.py"
+      - "tests/test_b103_clipboard_windows.py"
+      - "tests/test_b103_clipboard_matrix.py"
+      - ".github/workflows/clipboard-windows.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  clipboard-windows:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install pytest
+          python -m pip install -e .
+
+      - name: Print the toolkit version the design rests on (E3A-10 a)
+        run: python -c "import sys, textual; print(sys.version, textual.__version__)"
+
+      - name: Run the OS clipboard tests (serial, every outcome listed)
+        run: pytest -v -rs --durations=20 tests/test_b103_clipboard_windows.py tests/test_b103_clipboard_matrix.py

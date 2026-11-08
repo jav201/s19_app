@@ -1,0 +1,26 @@
+# E5 code review round 2 probe transcript (inc-4 label_match) - generated, not typed
+# runner code-review-r2-run.sh sha256 81ee47c78fa30819e0188f4f2ceffd9af2c0f799cb48dcaba1470d0457dddc9f; probe code-review-r2-probe.py sha256 0f468545b35852c9e50c7b293219ac892f0a12828da3b82ff867b724a29353b7
+# host <runner>; HOME=/tmp/b103-e5r2-4-code/<user>; load before 15.82 14.66 13.67; nproc 16
+s19_app.__file__ = /tmp/b103-e5r2-4-code/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5r2-4-code/tree/s19_app/tui/services/label_match.py
+python 3.11.18 mode all PYTHONHASHSEED 0
+label_match sha256 b97d19ebfe11dd47f096ded2ae6d7dd5f12f6fa02c42d8b9d5f782056bd79ecc
+constants: switch 512 token cap 20 node budget 400000
+SWA names: 13990
+
+== Part A: rank() vs the rows oracle (43 rows) == load 15.82 14.66 13.67
+checks 9600 mismatches 0 | expected lists holding a fuzzy entry 1367 | queries by distinct tokens {'<=20': 2178, '>20': 145} | most node visits in one ranking 1669 (budget 400000 )
+Part A results sha256 9e6f5ea9167864cf8f5b8a9bd36dd7e13a4bfcb1c7c927a3ee100e24d73f64b7
+
+== Part B: the switch (cap 0 / 512 / 10**9) gives one list == load 19.86 16.27 14.33
+REF-like list: 50000 names, 77256 tokens
+checks 1540 mismatches 0 | lists holding a fuzzy entry 215 | load 20.31 16.73 14.54
+
+== Part C: _fuzzy_token_distances under every budget == load 20.31 16.73 14.54
+BRUTE MISMATCH qt='aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaay'
+query tokens 274 unbudgeted vs brute force mismatches 1 | budgets checked 261173 property failures 0
+
+== Part D: rank() under small node budgets == load 17.11 18.01 16.21
+rankings 2400 invariant failures 0 exceptions 0 | rankings where the budget turned an oracle fuzzy name into another rule 66 | load 16.94 17.92 16.21
+done
+# probe exit 0; load after 16.94 17.92 16.21

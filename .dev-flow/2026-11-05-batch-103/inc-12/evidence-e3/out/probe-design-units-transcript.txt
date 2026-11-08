@@ -1,0 +1,76 @@
+# probe design units transcript 2026-11-07T02:49:39-06:00 host <runner>
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e3-12-S/<user>; no DISPLAY; no clipboard; stdin closed; load: 14.09 13.95 13.33
+s19_app.__file__ = /tmp/b103-e3-12-S/design/s19_app/__init__.py | textual 8.2.8 | rich 15.0.0 | variant design | scenario units
+[units char] ESC U+001B: category Cc, bidi class BN, rich cell_len 0, safe_text deletes it
+[units char] BEL U+0007: category Cc, bidi class BN, rich cell_len 0, safe_text deletes it
+[units char] C1 CSI U+009B: category Cc, bidi class BN, rich cell_len 0, safe_text deletes it
+[units char] RLO U+202E: category Cf, bidi class RLO, rich cell_len 0, safe_text keeps it
+[units char] PDF U+202C: category Cf, bidi class PDF, rich cell_len 0, safe_text keeps it
+[units char] RLI U+2067: category Cf, bidi class RLI, rich cell_len 0, safe_text keeps it
+[units char] PDI U+2069: category Cf, bidi class PDI, rich cell_len 0, safe_text keeps it
+[units char] LRM U+200E: category Cf, bidi class L, rich cell_len 0, safe_text keeps it
+[units char] ALM U+061C: category Cf, bidi class AL, rich cell_len 0, safe_text keeps it
+[units char] ZWSP U+200B: category Cf, bidi class BN, rich cell_len 0, safe_text keeps it
+[units char] ZWJ U+200D: category Cf, bidi class BN, rich cell_len 0, safe_text keeps it
+[units char] WJ U+2060: category Cf, bidi class BN, rich cell_len 0, safe_text keeps it
+[units char] BOM U+FEFF: category Cf, bidi class BN, rich cell_len 0, safe_text keeps it
+[units char] LS U+2028: category Zl, bidi class WS, rich cell_len 0, safe_text keeps it
+[units char] PS U+2029: category Zp, bidi class B, rich cell_len 0, safe_text keeps it
+[units char] SHY U+00AD: category Cf, bidi class BN, rich cell_len 1, safe_text keeps it
+[units char] COMBINING ACUTE U+0301: category Mn, bidi class NSM, rich cell_len 0, safe_text keeps it
+[units char] REPLACEMENT U+FFFD: category So, bidi class ON, rich cell_len 1, safe_text keeps it
+[units char] HANGUL FILLER U+3164: category Lo, bidi class L, rich cell_len 0, safe_text keeps it
+[units char] HANGUL CHOSEONG FILLER U+115F: category Lo, bidi class L, rich cell_len 2, safe_text keeps it
+[units char] FULLWIDTH A U+FF21: category Lu, bidi class L, rich cell_len 2, safe_text keeps it
+[units char] EMOJI U+1F600: category So, bidi class ON, rich cell_len 2, safe_text keeps it
+[units char] VS16 U+FE0F: category Mn, bidi class NSM, rich cell_len 0, safe_text keeps it
+[units char] TAG LATIN A U+E0041: category Cf, bidi class BN, rich cell_len 0, safe_text keeps it
+[units char] HEBREW SHIN U+05E9: category Lo, bidi class R, rich cell_len 1, safe_text keeps it
+[units char] ELLIPSIS U+2026: category Po, bidi class ON, rich cell_len 1, safe_text keeps it
+[units bidi] RLO ... PDF (50 code points, 48 cells; opens 1, closes 1) w=34 -> 'SYN_RLO_<U+202E>ABCDEFGH…XYZ0123456789<U+202C>_END': opens 1, closes 1 -> balanced
+[units bidi] RLO ... PDF (50 code points, 48 cells; opens 1, closes 1) w=14 -> 'SYN_RL…789<U+202C>_END': opens 0, closes 1 -> balanced
+[units bidi] RLO ... PDF (50 code points, 48 cells; opens 1, closes 1) w=9 -> 'SYN_…<U+202C>_END': opens 0, closes 1 -> balanced
+[units bidi] RLI ... PDI (50 code points, 48 cells; opens 1, closes 1) w=34 -> 'SYN_RLI_<U+2067>ABCDEFGH…XYZ0123456789<U+2069>_END': opens 1, closes 1 -> balanced
+[units bidi] RLI ... PDI (50 code points, 48 cells; opens 1, closes 1) w=14 -> 'SYN_RL…789<U+2069>_END': opens 0, closes 1 -> balanced
+[units bidi] RLI ... PDI (50 code points, 48 cells; opens 1, closes 1) w=9 -> 'SYN_…<U+2069>_END': opens 0, closes 1 -> balanced
+[units cost tail] 500 x ZWSP at the END of a 47-cell name: _shorten_tag_name(name, 34) 36.5 ms; painted 34 cells
+[units cost tail] 1000 x ZWSP at the END of a 47-cell name: _shorten_tag_name(name, 34) 87.1 ms; painted 34 cells
+[units cost tail] 2000 x ZWSP at the END of a 47-cell name: _shorten_tag_name(name, 34) 382.0 ms; painted 34 cells
+[units cost tail] 4000 x ZWSP at the END of a 47-cell name: _shorten_tag_name(name, 34) 1811.0 ms; painted 34 cells
+[units cost tail] 8000 x ZWSP at the END of a 47-cell name: _shorten_tag_name(name, 34) 7074.1 ms; painted 34 cells
+[units cost tail] 16000 x ZWSP at the END of a 47-cell name: _shorten_tag_name(name, 34) 33553.2 ms; painted 34 cells
+[units cost head] 16000 x ZWSP at the START: 15.4 ms
+[units cost tail] 500 x COMBINING ACUTE at the END of a 47-cell name: _shorten_tag_name(name, 34) 32.2 ms; painted 34 cells
+[units cost tail] 1000 x COMBINING ACUTE at the END of a 47-cell name: _shorten_tag_name(name, 34) 89.3 ms; painted 34 cells
+[units cost tail] 2000 x COMBINING ACUTE at the END of a 47-cell name: _shorten_tag_name(name, 34) 469.7 ms; painted 34 cells
+[units cost tail] 4000 x COMBINING ACUTE at the END of a 47-cell name: _shorten_tag_name(name, 34) 2287.5 ms; painted 34 cells
+[units cost tail] 8000 x COMBINING ACUTE at the END of a 47-cell name: _shorten_tag_name(name, 34) 7861.0 ms; painted 34 cells
+[units cost tail] 16000 x COMBINING ACUTE at the END of a 47-cell name: _shorten_tag_name(name, 34) 33655.2 ms; painted 34 cells
+[units cost head] 16000 x COMBINING ACUTE at the START: 14.2 ms
+[units cost tail] 500 x ESC at the END of a 47-cell name: _shorten_tag_name(name, 34) 23.1 ms; painted 34 cells
+[units cost tail] 1000 x ESC at the END of a 47-cell name: _shorten_tag_name(name, 34) 62.5 ms; painted 34 cells
+[units cost tail] 2000 x ESC at the END of a 47-cell name: _shorten_tag_name(name, 34) 304.2 ms; painted 34 cells
+[units cost tail] 4000 x ESC at the END of a 47-cell name: _shorten_tag_name(name, 34) 1555.0 ms; painted 34 cells
+[units cost tail] 8000 x ESC at the END of a 47-cell name: _shorten_tag_name(name, 34) 5725.9 ms; painted 34 cells
+[units cost tail] 16000 x ESC at the END of a 47-cell name: _shorten_tag_name(name, 34) 24099.2 ms; painted 34 cells
+[units cost head] 16000 x ESC at the START: 26.0 ms
+[units cost ascii] 10000-character ASCII name: 0.27 ms
+[units cost ascii] 100000-character ASCII name: 3.95 ms
+[units cost ascii] 1000000-character ASCII name: 38.26 ms
+[units fix model] 16000 ZWSP tail: 0.026 ms -> 'SYN_ZW_LLLLLLLLL…<U+FFFD><U+FFFD><U+FFFD><U+FFFD><U+FFFD><U+FFFD><U+FFFD><U+FFFD><U+FFFD><U+FFFD><U+FFFD><U+FFFD><U+FFFD><U+FFFD><U+FFFD><U+FFFD><U+FFFD>' (34 cells)
+[units fix model] 1,000,000 ASCII: 0.009 ms -> 'SYN_LLLLLLLLLLLL…LLLLLLLLLLLLLLLLL' (34 cells)
+[units fix model] RLO ... PDF: 0.010 ms -> 'SYN_RLO_<U+FFFD>ABCDEFG…YZ0123456789<U+FFFD>_END' (34 cells)
+[units collide] 43/43-char pair, w=34: 'SYN_TORQUE_LIMIT…ECTION_FACTOR_END' vs 'SYN_TORQUE_LIMIT…ECTION_FACTOR_END' -> SAME
+[units collide] 43/43-char pair, w=31: 'SYN_TORQUE_LIMI…TION_FACTOR_END' vs 'SYN_TORQUE_LIMI…TION_FACTOR_END' -> SAME
+[units collide] 43/43-char pair, w=22: 'SYN_TORQUE…_FACTOR_END' vs 'SYN_TORQUE…_FACTOR_END' -> SAME
+[units collide] 43/43-char pair, w=14: 'SYN_TO…TOR_END' vs 'SYN_TO…TOR_END' -> SAME
+[units collide] 43/43-char pair, w=9: 'SYN_…_END' vs 'SYN_…_END' -> SAME
+[units collide] 43/43-char pair, w=5: 'SY…ND' vs 'SY…ND' -> SAME
+[units collide] 35/38-char pair, w=34: 'SYN_KL_A_LONG_SH…ED_PREFIX_ROW_DIR' vs 'SYN_KL_A_LONG_SH…PREFIX_COLUMN_DIR' -> distinct
+[units collide] 35/38-char pair, w=31: 'SYN_KL_A_LONG_S…_PREFIX_ROW_DIR' vs 'SYN_KL_A_LONG_S…EFIX_COLUMN_DIR' -> distinct
+[units collide] 35/38-char pair, w=22: 'SYN_KL_A_L…FIX_ROW_DIR' vs 'SYN_KL_A_L…_COLUMN_DIR' -> distinct
+[units collide] 35/38-char pair, w=14: 'SYN_KL…ROW_DIR' vs 'SYN_KL…UMN_DIR' -> distinct
+[units collide] 35/38-char pair, w=9: 'SYN_…_DIR' vs 'SYN_…_DIR' -> SAME
+[units collide] 35/38-char pair, w=5: 'SY…IR' vs 'SY…IR' -> SAME
+# exit 0 ; clone status after: 0 changed; load: 16.17 14.77 13.71

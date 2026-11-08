@@ -1,0 +1,98 @@
+runner sec-r3-run.sh sha256 8f70dd916038119faecd2d3ae51bc8e4ea5e6cc1ea06100f087bce044c077f84; probe sec-r3-probe.py sha256 eb161db9dae675bf29146e1ee26edf0a0fd0344791761bd264485f2c879403da
+s19_app.__file__ = /tmp/b103-e5r3-4-sec/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5r3-4-sec/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 8f396c15d3c848ceb2c98ab74c112150bf9c09759abb662ea0f2162d1ca7c94d
+tests module = /tmp/b103-e5r3-4-sec/tree/tests/test_b103_label_match_perf.py
+mode = r3 walk  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = -656743355882881216
+host = <runner>  load = (1.77, 1.22, 1.19)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5r3-4-sec/<user>  LOCALAPPDATA = /tmp/b103-e5r3-4-sec/<user>/localappdata  PILOT_DIR = /tmp/b103-e5r3-4-sec/pilot
+probe = sec-r3-probe.py sha256 eb161db9dae675bf29146e1ee26edf0a0fd0344791761bd264485f2c879403da; round-1 helpers = sec-e5-probe.py sha256 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+_FUZZY_TOKEN_CAP = 20; _FUZZY_SWITCH_CAP = 512; T.ANY_QUERY_BOUND_S = 2.0; T.KEYSTROKE_BOUND_S = 0.2
+.40 as ruled: 50,000 names, <= 2,356,624 characters, any query of <= 256 characters, limit <= 20, within 2.0 s
+
+=== W40 (the test module's own list, w40_names())
+    50,000 names, 2,336,068 characters in all (.40 scope: 50,000 names, <= 2,356,624; .35/.37 scope: <= 2,062,041); all ASCII True; longest name 983
+    build 1.97 s [ok]; 97,933 distinct tokens; 753,276 trie nodes; load (1.95, 1.26, 1.2)
+      1098.2 ms [ok] median of 3; chars  40, tokens   1 (distinct   1); listed 20 ['fuzzy'] edits [2]; bad spans 0  'a' * 40 (the test's one-token query)
+        walks 1, nodes visited 700,568 (1.65 us/node, walks 1154 ms instrumented); _prefix_distance 0; instrumented list == shipped True
+        per walk: 40ch k2: 700,568 nodes 1154 ms
+        one ranking under tracemalloc: peak 0.61 MiB (9.5 s [ok])
+      1158.9 ms [ok] median of 3; chars  64, tokens   1 (distinct   1); listed 20 ['subsequence'] edits [0]; bad spans 0  'a' * 64 (the test's one-token query)
+        walks 1, nodes visited 700,568 (1.66 us/node, walks 1165 ms instrumented); _prefix_distance 0; instrumented list == shipped True
+        per walk: 64ch k2: 700,568 nodes 1165 ms
+        one ranking under tracemalloc: peak 0.47 MiB (8.9 s [ok])
+      2241.3 ms [ok] median of 3; chars  80, tokens   2 (distinct   2); listed 20 ['fuzzy'] edits [3]; bad spans 0  > 2.0 s (.40)  x1.12  'a' * 40, 'a' * 39 (2 distinct tokens)
+        walks 2, nodes visited 1,351,120 (1.64 us/node, walks 2217 ms instrumented); _prefix_distance 0; instrumented list == shipped True
+        per walk: 40ch k2: 700,568 nodes 1142 ms, 39ch k2: 650,552 nodes 1075 ms
+        one ranking under tracemalloc: peak 1.32 MiB (18.0 s [ok])
+      3111.1 ms [ok] median of 3; chars 119, tokens   3 (distinct   3); listed 20 ['fuzzy'] edits [3]; bad spans 0  > 2.0 s (.40)  x1.56  'a' * 40 .. 'a' * 38 (3 distinct tokens)
+        walks 3, nodes visited 1,953,330 (1.57 us/node, walks 3067 ms instrumented); _prefix_distance 0; instrumented list == shipped True
+        per walk: 40ch k2: 700,568 nodes 1112 ms, 39ch k2: 650,552 nodes 1007 ms, 38ch k2: 602,210 nodes 948 ms
+        one ranking under tracemalloc: peak 1.62 MiB (26.0 s [ok])
+      5644.3 ms [ok] median of 3; chars 230, tokens   6 (distinct   6); listed 20 ['fuzzy'] edits [3]; bad spans 0  > 2.0 s (.40)  x2.82  'a' * 40 .. 'a' * 35 (6 distinct tokens, 230 chars)
+        walks 6, nodes visited 3,494,116 (1.53 us/node, walks 5338 ms instrumented); _prefix_distance 0; instrumented list == shipped True
+        per walk: 40ch k2: 700,568 nodes 1067 ms, 39ch k2: 650,552 nodes 990 ms, 38ch k2: 602,210 nodes 927 ms, 37ch k2: 556,333 nodes 848 ms, 36ch k2: 512,837 nodes 787 ms, 35ch k2: 471,616 nodes 718 ms
+        one ranking under tracemalloc: peak 2.18 MiB (47.3 s [ok])
+      6579.8 ms [ok] median of 3; chars 245, tokens   6 (distinct   6); listed 20 ['fuzzy'] edits [9, 10]; bad spans 0  > 2.0 s (.40)  x3.29  'a' * 39 + b .. g (6 distinct tokens, 245 chars)
+        walks 6, nodes visited 4,202,729 (1.57 us/node, walks 6582 ms instrumented); _prefix_distance 0; instrumented list == shipped True
+        per walk: 40ch k2: 700,461 nodes 1143 ms, 40ch k2: 700,471 nodes 1132 ms, 40ch k2: 700,441 nodes 1081 ms, 40ch k2: 700,470 nodes 1083 ms, 40ch k2: 700,434 nodes 1068 ms, 40ch k2: 700,452 nodes 1074 ms
+        one ranking under tracemalloc: peak 1.37 MiB (52.7 s [ok])
+
+=== DEEP40
+    50,000 names, 1,979,217 characters in all (.40 scope: 50,000 names, <= 2,356,624; .35/.37 scope: <= 2,062,041); all ASCII True; longest name 983
+    build 1.97 s [ok]; 89,532 distinct tokens; 1,389,057 trie nodes; load (5.26, 3.22, 2.0)
+      2295.4 ms [ok] median of 3; chars  40, tokens   1 (distinct   1); listed 20 ['fuzzy'] edits [2]; bad spans 0  > 2.0 s (.40)  x1.15  'a' * 40 (1 token)
+        walks 1, nodes visited 1,335,947 (1.63 us/node, walks 2171 ms instrumented); _prefix_distance 0; instrumented list == shipped True
+        per walk: 40ch k2: 1,335,947 nodes 2171 ms
+        one ranking under tracemalloc: peak 0.48 MiB (17.5 s [ok])
+      4409.2 ms [ok] median of 3; chars  80, tokens   2 (distinct   2); listed 20 ['fuzzy'] edits [4]; bad spans 0  > 2.0 s (.40)  x2.20  'a' * 40, 'a' * 39 (2 distinct tokens)
+        walks 2, nodes visited 2,630,644 (1.68 us/node, walks 4427 ms instrumented); _prefix_distance 0; instrumented list == shipped True
+        per walk: 40ch k2: 1,335,947 nodes 2224 ms, 39ch k2: 1,294,697 nodes 2204 ms
+        one ranking under tracemalloc: peak 0.66 MiB (33.9 s [ok])
+     12050.7 ms [ok] median of 3; chars 230, tokens   6 (distinct   6); listed 20 ['fuzzy'] edits [12]; bad spans 0  > 2.0 s (.40)  x6.03  'a' * 40 .. 'a' * 35 (6 distinct tokens, 230 chars)
+        walks 6, nodes visited 7,396,932 (1.64 us/node, walks 12159 ms instrumented); _prefix_distance 0; instrumented list == shipped True
+        per walk: 40ch k2: 1,335,947 nodes 2255 ms, 39ch k2: 1,294,697 nodes 2154 ms, 38ch k2: 1,253,447 nodes 2070 ms, 37ch k2: 1,212,197 nodes 2002 ms, 36ch k2: 1,170,947 nodes 1880 ms, 35ch k2: 1,129,697 nodes 1798 ms
+        one ranking under tracemalloc: peak 0.74 MiB (101.9 s [ok])
+
+=== DEEP258
+    50,000 names, 1,904,162 characters in all (.40 scope: 50,000 names, <= 2,356,624; .35/.37 scope: <= 2,062,041); all ASCII True; longest name 776
+    build 3.85 s [ok]; 54,167 distinct tokens; 1,647,244 trie nodes; load (7.57, 4.81, 2.9)
+         8.0 ms [ok] median of 3; chars 256, tokens   1 (distinct   1); listed 20 ['substring'] edits [0]; bad spans 0  'a' * 256 (1 token)
+        walks 0, nodes visited 0 (-, walks 0 ms instrumented); _prefix_distance 0; instrumented list == shipped True
+        one ranking under tracemalloc: peak 0.13 MiB (0.1 s [ok])
+      2901.8 ms [ok] median of 3; chars 256, tokens   2 (distinct   2); listed 20 ['fuzzy'] edits [4]; bad spans 0  > 2.0 s (.40)  x1.45  'a' * 128, 'a' * 127 (2 distinct tokens)
+        walks 2, nodes visited 1,557,822 (1.84 us/node, walks 2861 ms instrumented); _prefix_distance 0; instrumented list == shipped True
+        per walk: 128ch k2: 782,036 nodes 1451 ms, 127ch k2: 775,786 nodes 1410 ms
+        one ranking under tracemalloc: peak 0.83 MiB (29.2 s [ok])
+      1269.4 ms [ok] median of 3; chars  40, tokens   1 (distinct   1); listed 20 ['substring'] edits [0]; bad spans 0  'a' * 40 (1 token)
+        walks 0, nodes visited 0 (-, walks 0 ms instrumented); _prefix_distance 0; instrumented list == shipped True
+        one ranking under tracemalloc: peak 0.47 MiB (3.9 s [ok])
+
+=== W12
+    50,000 names, 850,992 characters in all (.40 scope: 50,000 names, <= 2,356,624; .35/.37 scope: <= 2,062,041); all ASCII True; longest name 311
+    build 0.95 s [ok]; 89,745 distinct tokens; 234,261 trie nodes; load (9.85, 5.81, 3.34)
+         2.7 ms [ok] median of 3; chars  11, tokens   1 (distinct   1); listed 20 ['substring'] edits [0]; bad spans 0  T1: 1 distinct tokens 'a' * 10 + c
+        walks 0, nodes visited 0 (-, walks 0 ms instrumented); _prefix_distance 0; instrumented list == shipped True
+        one ranking under tracemalloc: peak 0.01 MiB (0.0 s [ok])
+       931.0 ms [ok] median of 3; chars  47, tokens   4 (distinct   4); listed 20 ['fuzzy'] edits [3]; bad spans 0  T4: 4 distinct tokens 'a' * 10 + c
+        walks 4, nodes visited 695,088 (1.43 us/node, walks 995 ms instrumented); _prefix_distance 0; instrumented list == shipped True
+        per walk: 11ch k2: 173,772 nodes 247 ms, 11ch k2: 173,772 nodes 250 ms, 11ch k2: 173,772 nodes 250 ms, 11ch k2: 173,772 nodes 248 ms
+        one ranking under tracemalloc: peak 1.62 MiB (9.3 s [ok])
+      1938.5 ms [ok] median of 3; chars  95, tokens   8 (distinct   8); listed 20 ['fuzzy'] edits [6, 7]; bad spans 0  T8: 8 distinct tokens 'a' * 10 + c
+        walks 8, nodes visited 1,390,176 (1.40 us/node, walks 1947 ms instrumented); _prefix_distance 0; instrumented list == shipped True
+        per walk: 11ch k2: 173,772 nodes 249 ms, 11ch k2: 173,772 nodes 253 ms, 11ch k2: 173,772 nodes 249 ms, 11ch k2: 173,772 nodes 248 ms, 11ch k2: 173,772 nodes 249 ms, 11ch k2: 173,772 nodes 235 ms, 11ch k2: 173,772 nodes 230 ms, 11ch k2: 173,772 nodes 234 ms
+        one ranking under tracemalloc: peak 2.07 MiB (18.6 s [ok])
+      3754.3 ms [ok] median of 3; chars 191, tokens  16 (distinct  16); listed 20 ['fuzzy'] edits [13, 14]; bad spans 0  > 2.0 s (.40)  x1.88  T16: 16 distinct tokens 'a' * 10 + c
+        walks 16, nodes visited 2,780,352 (1.40 us/node, walks 3902 ms instrumented); _prefix_distance 0; instrumented list == shipped True
+        per walk: 11ch k2: 173,772 nodes 248 ms, 11ch k2: 173,772 nodes 251 ms, 11ch k2: 173,772 nodes 250 ms, 11ch k2: 173,772 nodes 251 ms, 11ch k2: 173,772 nodes 250 ms, 11ch k2: 173,772 nodes 248 ms, 11ch k2: 173,772 nodes 249 ms, 11ch k2: 173,772 nodes 245 ms, ... (+8)
+        one ranking under tracemalloc: peak 2.99 MiB (36.4 s [ok])
+      4675.8 ms [ok] median of 3; chars 239, tokens  20 (distinct  20); listed 20 ['fuzzy'] edits [17, 18]; bad spans 0  > 2.0 s (.40)  x2.34  T20: 20 distinct tokens 'a' * 10 + c
+        walks 20, nodes visited 3,475,440 (1.42 us/node, walks 4920 ms instrumented); _prefix_distance 0; instrumented list == shipped True
+        per walk: 11ch k2: 173,772 nodes 247 ms, 11ch k2: 173,772 nodes 246 ms, 11ch k2: 173,772 nodes 247 ms, 11ch k2: 173,772 nodes 249 ms, 11ch k2: 173,772 nodes 249 ms, 11ch k2: 173,772 nodes 246 ms, 11ch k2: 173,772 nodes 245 ms, 11ch k2: 173,772 nodes 242 ms, ... (+12)
+        one ranking under tracemalloc: peak 3.44 MiB (46.2 s [ok])
+        10.3 ms [ok] median of 3; chars 251, tokens  21 (distinct  21); listed 0 - edits -; bad spans 0  T21: 21 distinct tokens 'a' * 10 + c
+        walks 0, nodes visited 0 (-, walks 0 ms instrumented); _prefix_distance 0; instrumented list == shipped True
+        one ranking under tracemalloc: peak 0.01 MiB (0.1 s [ok])
+
+load after = (5.35, 5.41, 3.58)
+probe exit 0

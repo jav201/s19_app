@@ -1,0 +1,21 @@
+[X1p] 50 COM curves on an AXO of max 1048575: describe_all 0.004 s (0.08 ms/object); top by tottime:
+    39041 function calls in 0.014 seconds
+    206    0.003    0.000    0.004    0.000 ~/work/b103-int2a/s19_app/tui/a2l.py:353(_strip_a2l_comments)
+    208    0.003    0.000    0.004    0.000 ~/work/b103-int2a/s19_app/tui/a2l.py:319(_split_line_respecting_quotes)
+    13232    0.001    0.000    0.001    0.000 {method 'append' of 'list' objects}
+    50    0.001    0.000    0.009    0.000 /tmp/b103-e3r4-3-S/sec-r3-m3a.py:301(describe_array)
+    13706    0.001    0.000    0.001    0.000 {method 'isspace' of 'str' objects}
+[X1p] 200 COM curves on an AXO of max 1048575: describe_all 0.016 s (0.08 ms/object); top by tottime:
+    153491 function calls in 0.051 seconds
+    806    0.013    0.000    0.016    0.000 ~/work/b103-int2a/s19_app/tui/a2l.py:353(_strip_a2l_comments)
+    808    0.013    0.000    0.016    0.000 ~/work/b103-int2a/s19_app/tui/a2l.py:319(_split_line_respecting_quotes)
+    52082    0.003    0.000    0.003    0.000 {method 'append' of 'list' objects}
+    200    0.002    0.000    0.036    0.000 /tmp/b103-e3r4-3-S/sec-r3-m3a.py:301(describe_array)
+    53906    0.002    0.000    0.002    0.000 {method 'isspace' of 'str' objects}
+[X1p] 200 COM curves on an AXO of max 4: describe_all 0.014 s (0.07 ms/object); top by tottime:
+    147467 function calls in 0.050 seconds
+    806    0.013    0.000    0.015    0.000 ~/work/b103-int2a/s19_app/tui/a2l.py:353(_strip_a2l_comments)
+    808    0.013    0.000    0.016    0.000 ~/work/b103-int2a/s19_app/tui/a2l.py:319(_split_line_respecting_quotes)
+    49670    0.003    0.000    0.003    0.000 {method 'append' of 'list' objects}
+    200    0.002    0.000    0.036    0.000 /tmp/b103-e3r4-3-S/sec-r3-m3a.py:301(describe_array)
+    51494    0.002    0.000    0.002    0.000 {method 'isspace' of 'str' objects}

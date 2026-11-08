@@ -1,0 +1,63 @@
+# M-PASTE.36
+# row: R-PASTE.36
+# s19_app.__file__ = /tmp/b103-e5-1a-mut/work/s19_app/__init__.py
+# note: the gate left on batch-101's folder only
+# --- git diff ---
+diff --git a/tests/test_suite_hygiene.py b/tests/test_suite_hygiene.py
+index 739d4bea..a2f87b89 100644
+--- a/tests/test_suite_hygiene.py
++++ b/tests/test_suite_hygiene.py
+@@ -2027,8 +2027,7 @@ def _redaction_roots(repo_root: Path) -> list:
+     """
+     return [
+         repo_root / ".dev-flow" / "2026-11-01-batch-101",
+-        repo_root / ".dev-flow" / "2026-11-05-batch-103",
+-    ]
++    ]  # mutant: batch-103 root removed
+ 
+ 
+ def test_r_tst_070_2_committed_evidence_has_no_home_paths_or_lan_addresses() -> None:
+
+# --- pytest (rc=1) ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ test_r_paste_36_1_redaction_gate_scans_batch_103_and_names_planted_leaks ___
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10046/test_r_paste_36_1_redaction_ga0')
+
+    def test_r_paste_36_1_redaction_gate_scans_batch_103_and_names_planted_leaks(
+        tmp_path: Path,
+    ) -> None:
+        """R-PASTE.36/1 (LinuxH): ``_redaction_roots`` covers both batch folders and
+        names the planted batch-103 leaks."""
+        from tests.test_suite_hygiene import (
+            _PLANTED_LEAKS,
+            _local_identity_names,
+            _redaction_hits,
+            _redaction_roots,
+        )
+    
+        shape = tmp_path / "shape"
+        batch103 = shape / ".dev-flow" / "2026-11-05-batch-103" / "inc-1a"
+        batch103.mkdir(parents=True)
+        (batch103 / "x.md").write_text(
+            _PLANTED_LEAKS["lan address"] + "\n" + _PLANTED_LEAKS["posix home path outside the runner image"] + "\n",
+            encoding="utf-8",
+        )
+        roots = _redaction_roots(shape)
+>       assert roots == [
+            shape / ".dev-flow" / "2026-11-01-batch-101",
+            shape / ".dev-flow" / "2026-11-05-batch-103",
+        ], roots
+E       AssertionError: [PosixPath('/tmp/pytest-of-<user>/pytest-10046/test_r_paste_36_1_redaction_ga0/shape/.dev-flow/2026-11-01-batch-101')]
+E       assert [PosixPath('/...1-batch-101')] == [PosixPath('/...5-batch-103')]
+E         
+E         Right contains one more item: PosixPath('/tmp/pytest-of-<user>/pytest-10046/test_r_paste_36_1_redaction_ga0/shape/.dev-flow/2026-11-05-batch-103')
+E         Use -v to get more diff
+
+tests/test_b103_clipboard_core.py:1956: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_36_1_redaction_gate_scans_batch_103_and_names_planted_leaks
+1 failed, 86 deselected in 0.21s
+
+===== stderr =====

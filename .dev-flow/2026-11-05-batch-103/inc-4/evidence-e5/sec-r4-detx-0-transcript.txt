@@ -1,0 +1,52 @@
+runner sec-r4-run.sh sha256 7225a0c07c03fcc70fc7b999ce05a020dd89112bd40d37d6b63c27d49d485517; probe sec-r4-probe.py sha256 21c822974d2904d84f66f2b61c965aee71d0c76fac3767facb6bd54baca32233
+s19_app.__file__ = /tmp/b103-e5r4-4-sec/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5r4-4-sec/tree/s19_app/tui/services/label_match.py
+label_match sha256 = b97d19ebfe11dd47f096ded2ae6d7dd5f12f6fa02c42d8b9d5f782056bd79ecc
+tests module = /tmp/b103-e5r4-4-sec/tree/tests/test_b103_label_match_perf.py
+mode = r4 detx  python = 3.11.18  PYTHONHASHSEED = 0  hash('abc') = -4594863902769663758
+host = <runner>  load = (15.65, 15.32, 10.68)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5r4-4-sec/<user>  LOCALAPPDATA = /tmp/b103-e5r4-4-sec/<user>/localappdata  PILOT_DIR = /tmp/b103-e5r4-4-sec/pilot
+probe = sec-r4-probe.py sha256 21c822974d2904d84f66f2b61c965aee71d0c76fac3767facb6bd54baca32233; sec-r3-probe.py sha256 9cf292424ce8f1a335da4da39354d86b2b99bb480f5b41f0d387f608e52ceefa; sec-e5-probe.py sha256 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+_FUZZY_NODE_BUDGET = 400,000; _FUZZY_TOKEN_CAP = 20; _FUZZY_SWITCH_CAP = 512; _TRIE_PREFIX = 258; T.ANY_QUERY_BOUND_S = 2.0; T.KEYSTROKE_BOUND_S = 0.2
+round-3 module lm_r3.py sha256 8f396c15d3c848ceb2c98ab74c112150bf9c09759abb662ea0f2162d1ca7c94d; has _FUZZY_NODE_BUDGET False
+
+--- b97d19eb (this code), HOSTILE as is (P.det with s19_app.tui.services.label_match.build_label_index / rank; 57 HOSTILE names)
+s19_app.__file__ = /tmp/b103-e5r4-4-sec/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5r4-4-sec/tree/s19_app/tui/services/label_match.py
+label_match sha256 = b97d19ebfe11dd47f096ded2ae6d7dd5f12f6fa02c42d8b9d5f782056bd79ecc
+tests module = /tmp/b103-e5r4-4-sec/tree/tests/test_b103_label_match_perf.py
+mode = det  python = 3.11.18  PYTHONHASHSEED = 0  hash('abc') = -4594863902769663758
+host = <runner>  load = (15.65, 15.32, 10.68)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5r4-4-sec/<user>  LOCALAPPDATA = /tmp/b103-e5r4-4-sec/<user>/localappdata  PILOT_DIR = /tmp/b103-e5r4-4-sec/pilot
+PYTHONHASHSEED=0 hash('abc')=-4594863902769663758 rankings=1287 sha256=e658b97987c7dfe94cef40e7336201cee094f99927f6ccc669244b6a6f6b2d53 (62 s)
+
+--- b97d19eb (this code), HOSTILE ASCII names only (P.det with s19_app.tui.services.label_match.build_label_index / rank; 31 HOSTILE names)
+s19_app.__file__ = /tmp/b103-e5r4-4-sec/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5r4-4-sec/tree/s19_app/tui/services/label_match.py
+label_match sha256 = b97d19ebfe11dd47f096ded2ae6d7dd5f12f6fa02c42d8b9d5f782056bd79ecc
+tests module = /tmp/b103-e5r4-4-sec/tree/tests/test_b103_label_match_perf.py
+mode = det  python = 3.11.18  PYTHONHASHSEED = 0  hash('abc') = -4594863902769663758
+host = <runner>  load = (15.68, 15.38, 11.06)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5r4-4-sec/<user>  LOCALAPPDATA = /tmp/b103-e5r4-4-sec/<user>/localappdata  PILOT_DIR = /tmp/b103-e5r4-4-sec/pilot
+PYTHONHASHSEED=0 hash('abc')=-4594863902769663758 rankings=1287 sha256=e658b97987c7dfe94cef40e7336201cee094f99927f6ccc669244b6a6f6b2d53 (57 s)
+
+--- 8f396c15 (round 3), HOSTILE ASCII names only (P.det with lm_r3.build_label_index / rank; 31 HOSTILE names)
+s19_app.__file__ = /tmp/b103-e5r4-4-sec/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5r4-4-sec/tree/s19_app/tui/services/label_match.py
+label_match sha256 = b97d19ebfe11dd47f096ded2ae6d7dd5f12f6fa02c42d8b9d5f782056bd79ecc
+tests module = /tmp/b103-e5r4-4-sec/tree/tests/test_b103_label_match_perf.py
+mode = det  python = 3.11.18  PYTHONHASHSEED = 0  hash('abc') = -4594863902769663758
+host = <runner>  load = (15.36, 15.33, 11.32)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5r4-4-sec/<user>  LOCALAPPDATA = /tmp/b103-e5r4-4-sec/<user>/localappdata  PILOT_DIR = /tmp/b103-e5r4-4-sec/pilot
+PYTHONHASHSEED=0 hash('abc')=-4594863902769663758 rankings=1287 sha256=e658b97987c7dfe94cef40e7336201cee094f99927f6ccc669244b6a6f6b2d53 (57 s)
+
+--- 8f396c15 (round 3), HOSTILE as is (P.det with lm_r3.build_label_index / rank; 57 HOSTILE names)
+s19_app.__file__ = /tmp/b103-e5r4-4-sec/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5r4-4-sec/tree/s19_app/tui/services/label_match.py
+label_match sha256 = b97d19ebfe11dd47f096ded2ae6d7dd5f12f6fa02c42d8b9d5f782056bd79ecc
+tests module = /tmp/b103-e5r4-4-sec/tree/tests/test_b103_label_match_perf.py
+mode = det  python = 3.11.18  PYTHONHASHSEED = 0  hash('abc') = -4594863902769663758
+host = <runner>  load = (14.96, 15.23, 11.52)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5r4-4-sec/<user>  LOCALAPPDATA = /tmp/b103-e5r4-4-sec/<user>/localappdata  PILOT_DIR = /tmp/b103-e5r4-4-sec/pilot
+PYTHONHASHSEED=0 hash('abc')=-4594863902769663758 rankings=1287 sha256=132f1e9efb1809cb927ec045764f2c136d0e777a0cd5c9b1c7b08c975333712e (59 s)
+probe exit 0

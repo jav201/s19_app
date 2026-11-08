@@ -1,0 +1,18 @@
+# batch-103 pre-push redaction sweep — verification transcript (runner)
+
+python: /home/<user>/miniconda3/envs/s19ci/bin/python  (Python 3.11.18)
+s19_app: /tmp/b103-sweep/clone/s19_app/__init__.py
+isolated HOME: /tmp/b103-sweep/<user>  (XDG_* and LOCALAPPDATA under it)
+
+$ /home/<user>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider \
+    tests/test_suite_hygiene.py tests/test_id_registry.py
+
+........................................................................ [ 91%]
+.......                                                                  [100%]
+============================= QC-TM timing margins =============================
+49.5%  0.202 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+66.3%  0.505 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 2 bounds, 0 under 20 % margin
+79 passed in 212.93s (0:03:32)
+
+exit 0 — 0 leak files (test_r_tst_070_2 green; test_id_registry green)

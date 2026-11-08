@@ -1,0 +1,69 @@
+runner sec-r2-run.sh sha256 01a6306bb691ca8ba9909f4f35ba0d442c21ea334e625d9331e6e9241c6bce63; probe sec-r2-probe.py sha256 97ba09572a2544759f9fe28d09e982244c15680c81b825065d58855a7e85cda9
+s19_app.__file__ = /tmp/b103-e5-4-sec-r2/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5-4-sec-r2/tree/s19_app/tui/services/label_match.py
+label_match sha256 = 394bf2f94d15559c68edc99d2f5f897f68f0dde2b2e1816f3bf9f247028783a0
+tests module = /tmp/b103-e5-4-sec-r2/tree/tests/test_b103_label_match_perf.py
+mode = r2 craft  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = -5882620464869133874
+host = <runner>  load = (3.1, 3.21, 2.42)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5-4-sec-r2/<user>  LOCALAPPDATA = /tmp/b103-e5-4-sec-r2/<user>/localappdata  PILOT_DIR = /tmp/b103-e5-4-sec-r2/pilot
+probe = sec-r2-probe.py sha256 97ba09572a2544759f9fe28d09e982244c15680c81b825065d58855a7e85cda9; round-1 helpers = sec-e5-probe.py sha256 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+_FUZZY_SWITCH_CAP = 512
+CRAFT: 50,000 names, 2,356,624 characters in all (.40 scope: 50,000 names, <= 2,356,624); sha256 70a89ba19130fbc6 == test's CRAFT_SHA256: True
+  built in 2.30 s [ok]; the 300 crafted names hold 80,400 token occurrences (> 512: the switch never fires); load (2.93, 3.17, 2.42)
+       29.1 ms [ok] median of 7; chars  21, tokens   4 (distinct   4); listed 20 ['fuzzy'] edits [3]; bad spans 0  CRAFT 4-token query
+      walks 4, _prefix_distance 0, _classify 20; same list on {'map-only': True, 'per-id after walk 1': True}
+       45.2 ms [ok] median of 7; chars  41, tokens   8 (distinct   8); listed 20 ['fuzzy'] edits [7]; bad spans 0  CRAFT 8-token query
+      walks 8, _prefix_distance 0, _classify 20; same list on {'map-only': True, 'per-id after walk 1': True}
+       77.6 ms [ok] median of 7; chars  81, tokens  16 (distinct  16); listed 20 ['fuzzy'] edits [15]; bad spans 0  CRAFT 16-token query
+      walks 16, _prefix_distance 0, _classify 20; same list on {'map-only': True, 'per-id after walk 1': True}
+      146.2 ms [ok] median of 7; chars 161, tokens  32 (distinct  32); listed 20 ['fuzzy'] edits [31]; bad spans 0  CRAFT 32-token query
+      walks 32, _prefix_distance 0, _classify 20; same list on {'map-only': True}
+      226.0 ms [ok] median of 7; chars 256, tokens  51 (distinct  51); listed 20 ['fuzzy'] edits [50]; bad spans 0  CRAFT 51-token query
+      walks 51, _prefix_distance 0, _classify 20; same list on {'map-only': True}
+  16 tokens, one ranking under tracemalloc: peak 0.13 MiB (0.80 s [ok]) (round 1: 118.3 / 464.0 MiB)
+  51 tokens, one ranking under tracemalloc: peak 0.21 MiB (2.53 s [ok]) (round 1: 118.3 / 464.0 MiB)
+  cProfile (51 tokens), top by own time:
+       ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+           51    0.617    0.012    0.628    0.012 <tree>/s19_app/tui/services/label_match.py:1076(_fuzzy_token_distances)
+           20    0.072    0.004    0.135    0.007 <tree>/s19_app/tui/services/label_match.py:888(_classify)
+       290751    0.021    0.000    0.021    0.000 {method 'get' of 'dict' objects}
+        20615    0.018    0.000    0.025    0.000 <tree>/s19_app/tui/services/label_match.py:798(_at_boundary)
+        67357    0.013    0.000    0.013    0.000 <tree>/s19_app/tui/services/label_match.py:652(_is_word_char)
+           21    0.012    0.001    0.042    0.002 <tree>/s19_app/tui/services/label_match.py:662(_tokens)
+
+=== round-1 A1 variants (P.crafted, P.memo_query): 1 / 2 / 300 / 2,000 crafted names + REF padding to 50,000
+
+  1 crafted (junk distinct True; 268 occurrences; switch fires); 50,000 names, 2,063,027 characters in all (.40 scope: 50,000 names, <= 2,356,624)
+       12.0 ms [ok] median of 5; chars  21, tokens   4 (distinct   4); listed 1 ['fuzzy'] edits [3]; bad spans 0  1 crafted, 4-token query
+      walks 1, _prefix_distance 804, _classify 1; same list on {'map-only': True, 'per-id after walk 1': True}
+       25.0 ms [ok] median of 5; chars  81, tokens  16 (distinct  16); listed 1 ['fuzzy'] edits [15]; bad spans 0  1 crafted, 16-token query
+      walks 1, _prefix_distance 4,020, _classify 1; same list on {'map-only': True, 'per-id after walk 1': True}
+       68.9 ms [ok] median of 5; chars 256, tokens  51 (distinct  51); listed 1 ['fuzzy'] edits [50]; bad spans 0  1 crafted, 51-token query
+      walks 1, _prefix_distance 13,400, _classify 1; same list on {'map-only': True}
+
+  2 crafted (junk distinct True; 536 occurrences; switch never fires); 50,000 names, 2,064,009 characters in all (.40 scope: 50,000 names, <= 2,356,624)
+       33.0 ms [ok] median of 5; chars  21, tokens   4 (distinct   4); listed 2 ['fuzzy'] edits [3]; bad spans 0  2 crafted, 4-token query
+      walks 4, _prefix_distance 0, _classify 2; same list on {'map-only': True, 'per-id after walk 1': True}
+       96.0 ms [ok] median of 5; chars  81, tokens  16 (distinct  16); listed 2 ['fuzzy'] edits [15]; bad spans 0  2 crafted, 16-token query
+      walks 16, _prefix_distance 0, _classify 2; same list on {'map-only': True, 'per-id after walk 1': True}
+      220.1 ms [ok] median of 5; chars 256, tokens  51 (distinct  51); listed 2 ['fuzzy'] edits [50]; bad spans 0  2 crafted, 51-token query
+      walks 51, _prefix_distance 0, _classify 2; same list on {'map-only': True}
+
+  300 crafted (junk distinct True; 80,400 occurrences; switch never fires); 50,000 names, 2,356,624 characters in all (.40 scope: 50,000 names, <= 2,356,624)
+       46.5 ms [ok] median of 5; chars  21, tokens   4 (distinct   4); listed 20 ['fuzzy'] edits [3]; bad spans 0  300 crafted, 4-token query
+      walks 4, _prefix_distance 0, _classify 20; same list on {'map-only': True, 'per-id after walk 1': True}
+      135.9 ms [ok] median of 5; chars  81, tokens  16 (distinct  16); listed 20 ['fuzzy'] edits [15]; bad spans 0  300 crafted, 16-token query
+      walks 16, _prefix_distance 0, _classify 20; same list on {'map-only': True, 'per-id after walk 1': True}
+      236.9 ms [ok] median of 5; chars 256, tokens  51 (distinct  51); listed 20 ['fuzzy'] edits [50]; bad spans 0  300 crafted, 51-token query
+      walks 51, _prefix_distance 0, _classify 20; same list on {'map-only': True}
+
+  2000 crafted (junk distinct False; 536,000 occurrences; switch never fires); 50,000 names, 4,026,644 characters in all (.40 scope: 50,000 names, <= 2,356,624)
+       36.9 ms [ok] median of 5; chars  21, tokens   4 (distinct   4); listed 20 ['fuzzy'] edits [3]; bad spans 0  2000 crafted, 4-token query
+      walks 4, _prefix_distance 0, _classify 20; same list on {'map-only': True}
+      101.8 ms [ok] median of 5; chars  81, tokens  16 (distinct  16); listed 20 ['fuzzy'] edits [15]; bad spans 0  2000 crafted, 16-token query
+      walks 16, _prefix_distance 0, _classify 20; same list on {'map-only': True}
+      303.4 ms [ok] median of 5; chars 256, tokens  51 (distinct  51); listed 20 ['fuzzy'] edits [50]; bad spans 0  2000 crafted, 51-token query
+      walks 51, _prefix_distance 0, _classify 20; same list on {'map-only': True}
+
+load after = (5.99, 3.9, 2.71)
+probe exit 0

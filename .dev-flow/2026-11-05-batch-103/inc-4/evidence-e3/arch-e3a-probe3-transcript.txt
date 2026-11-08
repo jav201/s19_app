@@ -1,0 +1,13 @@
+rc=0
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+python = 3.11.18  host = <runner>
+=== R-A2L-MATCH.37 two-structure mutants on REF (bound 67,108,864; 32 MiB = 33,554,432)
+  M2+M3 dict trie + token tuples     peak   79,390,164 =  75.7 MiB -> RED at 64 MiB
+  M1+M3 lists + token tuples         peak   91,418,020 =  87.2 MiB -> RED at 64 MiB
+=== oracle (naive_rank_b, E1 v3) values for proposed cases
+  [C08] query='crxuve': []
+  [C08] query='\x1cVALUE_0001': [('VALUE_0001', 'token', 0, [(0, 5), (6, 10)])]
+  [C08] query='\xa0VALUE_0001': [('VALUE_0001', 'fuzzy', 1, [(0, 5), (6, 10)])]
+  [[٣٣٣_X]] query='٣٣٤': [('٣٣٣_X', 'fuzzy', 1, [(0, 3)])]
+  [TW] query='rpm': [('rpm', 'exact', 0, [(0, 3)]), ('RPM', 'exact', 0, [(0, 3)]), ('Rpm', 'exact', 0, [(0, 3)])]
+  [NA] query='drück': [('Drück_Max', 'prefix', 0, [(0, 5)]), ('druck_max', 'fuzzy', 1, [(0, 5)]), ('DRÜCK_MAX', 'fuzzy', 1, [(0, 5)])]

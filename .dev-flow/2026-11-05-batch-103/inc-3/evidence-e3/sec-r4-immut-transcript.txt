@@ -1,0 +1,21 @@
+s19_app.__file__ = ~/work/b103-int2a/s19_app/__init__.py | python 3.11.18
+A2L section tree has structural errors: path=~/work/s19_app/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+[I1] AXIS_PTS header: 3 stored forms; mutations that succeed: none
+[I1] axis object byte order: 2 stored forms; mutations that succeed: none
+[I1] enum table: 5 stored forms; mutations that succeed: none
+[I1] layout: 12 stored forms; mutations that succeed: none
+[I1] method record: 15 stored forms; mutations that succeed: {"form['lines'].append": 15}
+[I1] mod_common: 7 stored forms; mutations that succeed: none
+[I1] refusal (layout): 1 stored forms; mutations that succeed: none
+[I1] the stored CM_V record: keys ['coeffs', 'coeffs_linear', 'compu_tab_ref', 'conversion_type', 'format', 'formula', 'lines', 'long_identifier', 'name', 'unit']; type(rec['lines']) list; rec['lines'] is the parse payload's own list: True
+[I1] after rec['lines'].append(...) through the stored record: the payload's section lines grew 1 -> 2; a fresh read of CM_V now gives compu_tab_ref 'VT_GONE' (was 'VT'); the cached record still says 'VT'
+A2L section tree has structural errors: path=~/work/s19_app/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+[I2] ASAP2_Demo_V171.a2l: 118 definitions; mutable containers reachable from a field: none; unhashable 0; deepcopy and pickle ok; enum tables shared by >1 object 4, of which with more than one tuple 0 (read once: one tuple per table)
+[I2] software_a.a2l: 13990 definitions; mutable containers reachable from a field: none; unhashable 0; deepcopy and pickle ok; enum tables shared by >1 object 161, of which with more than one tuple 0 (read once: one tuple per table)
+[I3] V171: 118 decode_definition (+ display_text / _enum_text), 8 TAB objects x 3 _apply_compu_method, 6 _fixed_points; digests a2l_data / definitions / read forms / headers unchanged: [True, True, True, True]; unexpected results 0
+[I3] TAB_VERB curves: 4 decode_definition (+ display_text / _enum_text), 0 TAB objects x 3 _apply_compu_method, 0 _fixed_points; digests a2l_data / definitions / read forms / headers unchanged: [True, True, True, True]; unexpected results 0
+[I3] P2: 2 decode_definition (+ display_text / _enum_text), 0 TAB objects x 3 _apply_compu_method, 0 _fixed_points; digests a2l_data / definitions / read forms / headers unchanged: [True, True, True, True]; unexpected results 0
+[I3] P5: 2 decode_definition (+ display_text / _enum_text), 0 TAB objects x 3 _apply_compu_method, 0 _fixed_points; digests a2l_data / definitions / read forms / headers unchanged: [True, True, True, True]; unexpected results 0
+[D] table of 1000 entries: _enum_text (no entry matches) 37 us per element, _table_lookup TAB_INTP (last interval) 49 us, TAB_NOINTP (no exact entry) 77 us; a 1,048,576-element array therefore ~0.01 h / 0.01 h / 0.02 h
+[D] table of 10000 entries: _enum_text (no entry matches) 381 us per element, _table_lookup TAB_INTP (last interval) 495 us, TAB_NOINTP (no exact entry) 773 us; a 1,048,576-element array therefore ~0.11 h / 0.14 h / 0.23 h
+[D] table of 100000 entries: _enum_text (no entry matches) 5003 us per element, _table_lookup TAB_INTP (last interval) 6422 us, TAB_NOINTP (no exact entry) 10714 us; a 1,048,576-element array therefore ~1.46 h / 1.87 h / 3.12 h

@@ -1,0 +1,615 @@
+A2L section tree has structural errors: path=/home/<user>/work/s19_app/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+python = 3.11.18  executable = /home/<user>/miniconda3/envs/s19ci/bin/python
+repo HEAD = e07fb00f
+HOME = /tmp/b103-e1-4/home  LOCALAPPDATA = /tmp/b103-e1-4/home/<localappdata>
+
+--- make_release_case.py --out /tmp/b103-e1-4/out --seed 20260001  rc = 0
+a2l           97340  firmware.a2l
+a2l_issues      98921  firmware_issues.a2l
+change          872  demo_patch.changes.json
+check           447  demo_check.chk.json
+check_fails        454  demo_check_fails.chk.json
+hex        10088640  firmware.hex
+mac            4553  firmware.mac
+mac_issues       4781  firmware_issues.mac
+readme         2005  README.txt
+s19        10485815  firmware.s19
+v2         10495927  firmware_v2.s19
+
+=== case08 firmware.a2l (parser): 462 names
+unique = 462  duplicates (exact, >1 occurrence) = 0  case-twins (equal after ASCII folding) = 0
+length: min 8  median 10.0  max 16
+tokens/name: min 2  median 2.0  max 3
+  underscore                    462  VALUE_0001, VALUE_0002, VALUE_0003, VALUE_0004, MEASUREMENT_0001, MEASUREMENT_0002
+  underscore_run_ge2              0  
+  lead_or_trail_underscore        0  
+  camel_lower_upper               0  
+  acronym_then_lower              0  
+  letter_digit_boundary           0  
+  dot                             0  
+  bracket                         0  
+  other_char                      0  
+  non_ascii                       0  
+  all_upper_letters             462  VALUE_0001, VALUE_0002, VALUE_0003, VALUE_0004, MEASUREMENT_0001, MEASUREMENT_0002
+  all_lower_letters               0  
+  mixed_case                      0  
+  starts_with_digit               0  
+
+=== case08 firmware_issues.a2l (parser): 470 names
+unique = 469  duplicates (exact, >1 occurrence) = 1  case-twins (equal after ASCII folding) = 0
+length: min 8  median 10.0  max 16
+tokens/name: min 2  median 2.0  max 4
+  underscore                    469  VALUE_0001, VALUE_0002, VALUE_0003, VALUE_0004, MEASUREMENT_0001, MEASUREMENT_0002
+  underscore_run_ge2              0  
+  lead_or_trail_underscore        0  
+  camel_lower_upper               0  
+  acronym_then_lower              0  
+  letter_digit_boundary           0  
+  dot                             0  
+  bracket                         0  
+  other_char                      0  
+  non_ascii                       0  
+  all_upper_letters             469  VALUE_0001, VALUE_0002, VALUE_0003, VALUE_0004, MEASUREMENT_0001, MEASUREMENT_0002
+  all_lower_letters               0  
+  mixed_case                      0  
+  starts_with_digit               0  
+  duplicates sample: [('VALUE_0001', 2)]
+
+case08 name families (name without its trailing number): {'ASCII': 20, 'CURVE': 120, 'LIMIT_BREAKER': 1, 'MAP': 40, 'MEASUREMENT': 208, 'MISSING_CM': 1, 'OUT_OF_RANGE': 3, 'SPAN_OVER': 2, 'VALUE': 417, 'VAL_BLK': 120}
+
+=== examples/case_00_public/ASAP2_Demo_V161.a2l: 75 names
+unique = 75  duplicates (exact, >1 occurrence) = 0  case-twins (equal after ASCII folding) = 0
+length: min 7  median 35  max 47
+tokens/name: min 1  median 7  max 10
+  underscore                     58  ASAM.M.SCALAR.UBYTE.TAB_VERB_DEFAULT_VALUE, ASAM.M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_VALUE, ASAM.M.SCALAR.UBYTE.VTAB_RANGE_DEFAULT_VALUE, ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE, ASAM.M.SCALAR.UBYTE.TAB_INTP_DEFAULT_VALUE, ASAM.M.SCALAR.UBYTE.TAB_INTP_NO_DEFAULT_VALUE
+  underscore_run_ge2              0  
+  lead_or_trail_underscore        0  
+  camel_lower_upper               0  
+  acronym_then_lower              0  
+  letter_digit_boundary           8  ASAM.M.SCALAR.FLOAT32.IDENTICAL, ASAM.M.SCALAR.FLOAT64.IDENTICAL, ASAM.M.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0, ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0, ASAM.C.SCALAR.FLOAT32_IEEE.IDENTICAL, ASAM.C.SCALAR.FLOAT64_IEEE.IDENTICAL
+  dot                            74  ASAM.M.SCALAR.UBYTE.IDENTICAL, ASAM.M.SCALAR.UBYTE.TAB_VERB_DEFAULT_VALUE, ASAM.M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_VALUE, ASAM.M.SCALAR.UBYTE.VTAB_RANGE_DEFAULT_VALUE, ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE, ASAM.M.SCALAR.UBYTE.TAB_INTP_DEFAULT_VALUE
+  bracket                         0  
+  other_char                      0  
+  non_ascii                       0  
+  all_upper_letters              75  ASAM.M.SCALAR.UBYTE.IDENTICAL, ASAM.M.SCALAR.UBYTE.TAB_VERB_DEFAULT_VALUE, ASAM.M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_VALUE, ASAM.M.SCALAR.UBYTE.VTAB_RANGE_DEFAULT_VALUE, ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE, ASAM.M.SCALAR.UBYTE.TAB_INTP_DEFAULT_VALUE
+  all_lower_letters               0  
+  mixed_case                      0  
+  starts_with_digit               0  
+
+=== examples/case_00_public/ASAP2_Demo_V171.a2l: 118 names
+unique = 118  duplicates (exact, >1 occurrence) = 0  case-twins (equal after ASCII folding) = 0
+length: min 7  median 35.0  max 68
+tokens/name: min 1  median 7.0  max 11
+  underscore                     99  ASAM.M.SCALAR.UBYTE.IDENTICAL.STATUS_STRING, ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING, ASAM.M.SCALAR.UBYTE.RAT_FUNC.DIV_10, ASAM.M.SCALAR.UBYTE.TAB_VERB_DEFAULT_VALUE, ASAM.M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_VALUE, ASAM.M.SCALAR.UBYTE.VTAB_RANGE_DEFAULT_VALUE
+  underscore_run_ge2              0  
+  lead_or_trail_underscore        0  
+  camel_lower_upper               0  
+  acronym_then_lower              0  
+  letter_digit_boundary          27  ASAM.M.SCALAR.FLOAT32.IDENTICAL, ASAM.M.SCALAR.FLOAT32.IDENTICAL.DISCRETE, ASAM.M.SCALAR.FLOAT64.IDENTICAL, ASAM.M.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0, ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0, ASAM.C.SCALAR.FLOAT32_IEEE.IDENTICAL
+  dot                           117  ASAM.M.SCALAR.UBYTE.IDENTICAL, ASAM.M.SCALAR.UBYTE.IDENTICAL.STATUS_STRING, ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING, ASAM.M.SCALAR.UBYTE.RAT_FUNC.DIV_10, ASAM.M.SCALAR.UBYTE.HYPERBOLIC, ASAM.M.SCALAR.UBYTE.TAB_VERB_DEFAULT_VALUE
+  bracket                         0  
+  other_char                      0  
+  non_ascii                       0  
+  all_upper_letters             118  ASAM.M.SCALAR.UBYTE.IDENTICAL, ASAM.M.SCALAR.UBYTE.IDENTICAL.STATUS_STRING, ASAM.M.SCALAR.UBYTE.RAT_FUNC.IDENT.STATUS_STRING, ASAM.M.SCALAR.UBYTE.RAT_FUNC.DIV_10, ASAM.M.SCALAR.UBYTE.HYPERBOLIC, ASAM.M.SCALAR.UBYTE.TAB_VERB_DEFAULT_VALUE
+  all_lower_letters               0  
+  mixed_case                      0  
+  starts_with_digit               0  
+
+=== examples/case_00_public/BalanceTube_STMicro.a2l: 111 names
+unique = 111  duplicates (exact, >1 occurrence) = 0  case-twins (equal after ASCII folding) = 0
+length: min 19  median 39  max 52
+tokens/name: min 3  median 7  max 9
+  underscore                      0  
+  underscore_run_ge2              0  
+  lead_or_trail_underscore        0  
+  camel_lower_upper             110  model.MainClass.gameController.sm, model.MainClass.gameController.timer.timeCounter, model.MainClass.gameController.stopWatch.timeCounter, model.MainClass.gameController.edgeDetect.buffer, model.MainClass.gameController.edgeDetect.oldSignal, model.MainClass.gameController.gameTime
+  acronym_then_lower              0  
+  letter_digit_boundary           0  
+  dot                           111  model.MainClass.gameController.sm, model.MainClass.gameController.timer.timeCounter, model.MainClass.gameController.stopWatch.timeCounter, model.MainClass.gameController.edgeDetect.buffer, model.MainClass.gameController.edgeDetect.oldSignal, model.MainClass.gameController.gameTime
+  bracket                        72  model.MainClass.ledController.ledRing[0].red, model.MainClass.ledController.ledRing[0].green, model.MainClass.ledController.ledRing[0].blue, model.MainClass.ledController.ledRing[1].red, model.MainClass.ledController.ledRing[1].green, model.MainClass.ledController.ledRing[1].blue
+  other_char                      0  
+  non_ascii                       0  
+  all_upper_letters               0  
+  all_lower_letters               0  
+  mixed_case                    111  model.MainClass.gameController.sm, model.MainClass.gameController.timer.timeCounter, model.MainClass.gameController.stopWatch.timeCounter, model.MainClass.gameController.edgeDetect.buffer, model.MainClass.gameController.edgeDetect.oldSignal, model.MainClass.gameController.gameTime
+  starts_with_digit               0  
+
+=== examples/case_00_public/check_test.a2l: 1 names
+unique = 1  duplicates (exact, >1 occurrence) = 0  case-twins (equal after ASCII folding) = 0
+length: min 18  median 18  max 18
+tokens/name: min 3  median 3  max 3
+  underscore                      1  Curve_ExternalAxis
+  underscore_run_ge2              0  
+  lead_or_trail_underscore        0  
+  camel_lower_upper               1  Curve_ExternalAxis
+  acronym_then_lower              0  
+  letter_digit_boundary           0  
+  dot                             0  
+  bracket                         0  
+  other_char                      0  
+  non_ascii                       0  
+  all_upper_letters               0  
+  all_lower_letters               0  
+  mixed_case                      1  Curve_ExternalAxis
+  starts_with_digit               0  
+
+=== examples/case_00_public/cleanup_test.a2l: 0 names
+
+=== examples/case_00_public/from_source.a2l: 72 names
+unique = 72  duplicates (exact, >1 occurrence) = 0  case-twins (equal after ASCII folding) = 0
+length: min 23  median 33.0  max 40
+tokens/name: min 5  median 7.0  max 14
+  underscore                     72  parameter_instance[0].Fork.y, parameter_instance[0].Knife[0].x, parameter_instance[0].Knife[1].x, parameter_instance[0].Spoon.x, parameter_instance[0].other_thing.it, parameter_instance[0].other_thing.part
+  underscore_run_ge2              0  
+  lead_or_trail_underscore        0  
+  camel_lower_upper               0  
+  acronym_then_lower              0  
+  letter_digit_boundary          40  shapes_a2l[0].Square.it, shapes_a2l[0].Triangle[0].subelem, shapes_a2l[0].Triangle[1].subelem, shapes_a2l[0].alternative_a2l_name.x_a2l, shapes_a2l[1].Square.it, shapes_a2l[1].Triangle[0].subelem
+  dot                            72  parameter_instance[0].Fork.y, parameter_instance[0].Knife[0].x, parameter_instance[0].Knife[1].x, parameter_instance[0].Spoon.x, parameter_instance[0].other_thing.it, parameter_instance[0].other_thing.part
+  bracket                        72  parameter_instance[0].Fork.y, parameter_instance[0].Knife[0].x, parameter_instance[0].Knife[1].x, parameter_instance[0].Spoon.x, parameter_instance[0].other_thing.it, parameter_instance[0].other_thing.part
+  other_char                      0  
+  non_ascii                       0  
+  all_upper_letters               0  
+  all_lower_letters              26  parameter_instance[0].other_thing.it, parameter_instance[0].other_thing.part, parameter_instance[0].something.it, parameter_instance[0].something.part, parameter_instance[1].other_thing.it, parameter_instance[1].other_thing.part
+  mixed_case                     46  parameter_instance[0].Fork.y, parameter_instance[0].Knife[0].x, parameter_instance[0].Knife[1].x, parameter_instance[0].Spoon.x, parameter_instance[1].Fork.y, parameter_instance[1].Knife[0].x
+  starts_with_digit               0  
+
+=== examples/case_00_public/from_source_structs.a2l: 0 names
+
+=== examples/case_00_public/included.a2l: 1 names
+unique = 1  duplicates (exact, >1 occurrence) = 0  case-twins (equal after ASCII folding) = 0
+length: min 17  median 17  max 17
+tokens/name: min 2  median 2  max 2
+  underscore                      1  Measurement_Value
+  underscore_run_ge2              0  
+  lead_or_trail_underscore        0  
+  camel_lower_upper               0  
+  acronym_then_lower              0  
+  letter_digit_boundary           0  
+  dot                             0  
+  bracket                         0  
+  other_char                      0  
+  non_ascii                       0  
+  all_upper_letters               0  
+  all_lower_letters               0  
+  mixed_case                      1  Measurement_Value
+  starts_with_digit               0  
+
+=== examples/case_00_public/memorysegment.a2l: 0 names
+
+=== examples/case_00_public/merge_inc_test.a2l: 0 names
+
+=== examples/case_00_public/remove_test.a2l: 2 names
+unique = 2  duplicates (exact, >1 occurrence) = 0  case-twins (equal after ASCII folding) = 0
+length: min 17  median 18.5  max 20
+tokens/name: min 2  median 2.0  max 2
+  underscore                      2  Characteristic_Value, Measurement_Value
+  underscore_run_ge2              0  
+  lead_or_trail_underscore        0  
+  camel_lower_upper               0  
+  acronym_then_lower              0  
+  letter_digit_boundary           0  
+  dot                             0  
+  bracket                         0  
+  other_char                      0  
+  non_ascii                       0  
+  all_upper_letters               0  
+  all_lower_letters               0  
+  mixed_case                      2  Characteristic_Value, Measurement_Value
+  starts_with_digit               0  
+
+=== examples/case_00_public/software_a.a2l: 13990 names
+unique = 13990  duplicates (exact, >1 occurrence) = 0  case-twins (equal after ASCII folding) = 0
+length: min 4  median 39.0  max 102
+tokens/name: min 1  median 8.0  max 26
+  underscore                  12820  AAD_UTRQ.HWV_VIUF_C_PposBXIIFfkdGfiaJnbbPvb_DYAN_XVZ1_Ierxjr_Eud_Y, ACN_ULWY.FVH_MUGP_O_SBW_RTD_NJZ_MKE_WODEYLMQXZ46_OXATIRMZ_YOQJZI, AGY_AVKB.REV_TMMM_K_VcvtTovXizg_QYWC_Nzukij_Iie_R, AHB_Zjrrw_kg_HH, AHS_KNAH.AGA_PYKM_C_DuxKndZquv_CRR_Foopqx_Ofx_D, AJI_MXOW.IPC_KYJU_B_HdfuojQfdbgqctwjsbpdQekwvvn_21
+  underscore_run_ge2            561  AehduMbpv__Miotc1.BvhVofqLubhoanQopechsNbeu, AejcpMzcl__Svpsr3.ChamzejKcratnsQbdmgqtMuj, AevniXxbj__Kwgys2.EumTkbcImtezfwZqvmhhqHtax, AfqojPfqs__Yktzq1.YcgllbzAhiarheRqbalniXaa, AhtpgRwfz__Lvntj1.HWFXWU_PWFWOTR_ZOKUR_ISDKBWXXIF, AljxdUybv__Mylof2.XqtqovICCYa_UatfexuoUgpWibdew
+  lead_or_trail_underscore     3441  Aabcx_GgrDwx_kaudIvm_ydmuH_uoz3._5_, Acdlg_LreIim_iwpnVzp_igZju_gzcb._7_, Afeqr_qutgE_eEqpljk_wftp1._0_, Affhs_NuqHfc_TQhjsl_tgjs_aguf_yls4._4_, Aghz_qHdto_xlWkioo_pzuf._1_, Ahdhy_OedGwl_lnfyKvx_wnblZm_nfsi._5_
+  camel_lower_upper           12593  AAD_UTRQ.HWV_VIUF_C_PposBXIIFfkdGfiaJnbbPvb_DYAN_XVZ1_Ierxjr_Eud_Y, AGY_AVKB.REV_TMMM_K_VcvtTovXizg_QYWC_Nzukij_Iie_R, AHS_KNAH.AGA_PYKM_C_DuxKndZquv_CRR_Foopqx_Ofx_D, AJI_MXOW.IPC_KYJU_B_HdfuojQfdbgqctwjsbpdQekwvvn_21, AJY_PFE.NHW_U_NcbVdz16_Kzstew_YLV_65o9l075_Zw_NnGwdcihjbHigo_NVZ_QMFU_ZW_YveadfnzbQLL, AMYEegfHxwht_XmiimrumkbZthzbOjb_in32
+  acronym_then_lower           1442  AAD_UTRQ.HWV_VIUF_C_PposBXIIFfkdGfiaJnbbPvb_DYAN_XVZ1_Ierxjr_Eud_Y, AMYEegfHxwht_XmiimrumkbZthzbOjb_in32, AOSGkbgIcruc_DOhp_on32, AVA_Ajrxdqck_PXeinih, AclhyNyza.QVHXimdXfmxtMjqc.HwtZzcCvb.lscSbijczFxrljDnrgmjee, Affhs_NuqHfc_TQhjsl_tgjs_aguf_yls4._4_
+  letter_digit_boundary        5187  AAD_UTRQ.HWV_VIUF_C_PposBXIIFfkdGfiaJnbbPvb_DYAN_XVZ1_Ierxjr_Eud_Y, ACN_ULWY.FVH_MUGP_O_SBW_RTD_NJZ_MKE_WODEYLMQXZ46_OXATIRMZ_YOQJZI, AJY_PFE.NHW_U_NcbVdz16_Kzstew_YLV_65o9l075_Zw_NnGwdcihjbHigo_NVZ_QMFU_ZW_YveadfnzbQLL, AMYEegfHxwht_XmiimrumkbZthzbOjb_in32, AOSGkbgIcruc_DOhp_on32, ART_UQDI.WJG_XSYX_T_YhaNze16_Liyzrh_Stn_Z
+  dot                         13237  AAD_UTRQ.HWV_VIUF_C_PposBXIIFfkdGfiaJnbbPvb_DYAN_XVZ1_Ierxjr_Eud_Y, ACN_ULWY.FVH_MUGP_O_SBW_RTD_NJZ_MKE_WODEYLMQXZ46_OXATIRMZ_YOQJZI, AGY_AVKB.REV_TMMM_K_VcvtTovXizg_QYWC_Nzukij_Iie_R, AHS_KNAH.AGA_PYKM_C_DuxKndZquv_CRR_Foopqx_Ofx_D, AJI_MXOW.IPC_KYJU_B_HdfuojQfdbgqctwjsbpdQekwvvn_21, AJY_PFE.NHW_U_NcbVdz16_Kzstew_YLV_65o9l075_Zw_NnGwdcihjbHigo_NVZ_QMFU_ZW_YveadfnzbQLL
+  bracket                         8  eZbuccvIbnowx_Szlff.[0].OrqswuTtitcdRxe, kOfyieqOxfauo.[0].YkjQsohjtgQcm, kPghmyuIqasjd.[0].LubdzqCqgaajOqv, nThowcsLwxcos_Bxzpm.[1].KssmwyDbodogLyn, qQpovxrDbeurh.[1].XfqRshPdk, qTdpkjqLxhgpy.[0].PqhIleWae
+  other_char                      0  
+  non_ascii                       0  
+  all_upper_letters             143  ACN_ULWY.FVH_MUGP_O_SBW_RTD_NJZ_MKE_WODEYLMQXZ46_OXATIRMZ_YOQJZI, AKT_YOD.CZF_100000516, AUU_VZIH.IAQ_KQNS_Q_FLO_CGX_DQY_LYR_OWIBAEWRSS22_GASPQMJD_PTBYXF, AVC_LNT.KUS_PPZ_TYI_UFF, BCQ_VBZO.NUP_IEBC_E_WOZ_WMG_HFF_ZQQ_QD_QIEWVVOGZNTDPQUCW, BEBN_FFWGGMC_GVV_ERLJQPJ_AZU
+  all_lower_letters              45  cdx_zb_cjcb_fncn_znyrs_izrpf, dii_p_oak_nvh, dzq_ew_uikwrcg_vjsrp, jxk_ic_wwrrfhve_jbzqs, kjq_v_cmhd_zeg, kxy_bpk_pyix_vcip_azvsn_rsuu
+  mixed_case                  13802  AAD_UTRQ.HWV_VIUF_C_PposBXIIFfkdGfiaJnbbPvb_DYAN_XVZ1_Ierxjr_Eud_Y, AGY_AVKB.REV_TMMM_K_VcvtTovXizg_QYWC_Nzukij_Iie_R, AHB_Zjrrw_kg_HH, AHS_KNAH.AGA_PYKM_C_DuxKndZquv_CRR_Foopqx_Ofx_D, AJI_MXOW.IPC_KYJU_B_HdfuojQfdbgqctwjsbpdQekwvvn_21, AJY_PFE.NHW_U_NcbVdz16_Kzstew_YLV_65o9l075_Zw_NnGwdcihjbHigo_NVZ_QMFU_ZW_YveadfnzbQLL
+  starts_with_digit               0  
+
+=== examples/case_00_public/software_b.a2l: 67 names
+unique = 67  duplicates (exact, >1 occurrence) = 0  case-twins (equal after ASCII folding) = 0
+length: min 23  median 41  max 136
+tokens/name: min 6  median 8  max 36
+  underscore                     59  AgkCpj.FXPZ_OBT_ZW.Blx_IBFO, Asp.Xqi_SmcurbgeqkbyacHabbvQtbuBzqmhzSbmtrofuw_PB_0hM234_nLRCD_iCEFTM3_OR_k0962218.LejLtdhjqfyrrizfkOixot, AwsQdc.VXAO_CSP_KH.NkshfehlTcyfkjea_IPNR, BbqArc.UYZV_DKF_HH.Gmugbkf_Peque, Bdc_MfdwJpy_XmvxkpzyyqkJrccDe_GufxhteozkjRiidpqjqrui.Vsafdfavj_b64, BwePdr.SCGH_NYZ_QR.Zctdjlyz_WGCP
+  underscore_run_ge2              0  
+  lead_or_trail_underscore        0  
+  camel_lower_upper              67  AgkCpj.FXPZ_OBT_ZW.Blx_IBFO, Asp.Xqi_SmcurbgeqkbyacHabbvQtbuBzqmhzSbmtrofuw_PB_0hM234_nLRCD_iCEFTM3_OR_k0962218.LejLtdhjqfyrrizfkOixot, AwsQdc.VXAO_CSP_KH.NkshfehlTcyfkjea_IPNR, BbqArc.UYZV_DKF_HH.Gmugbkf_Peque, Bdc_MfdwJpy_XmvxkpzyyqkJrccDe_GufxhteozkjRiidpqjqrui.Vsafdfavj_b64, BwePdr.SCGH_NYZ_QR.Zctdjlyz_WGCP
+  acronym_then_lower              5  CizRmf.PKYQjkdLupft.UxwqpyyvFQCQmyf, Csa.MnpJyftyyqhfjgjxLhfafug_CrgSBokl_HdzLOmgiurh_FS_EOXTU3_d7714392.PxbPtnpwjlvtanaaOapview_OskABypk_PccYMelbhvk_ZB_DJXAX3_s7714392, LnkHzu.VZBNqlxOjfhu.ZRX, LukPvq.JXML_UPQ_BI.OKSAhwvcueaniy, WtuHvb.RUMD_BQB_HE.ZhhoZofyueppsROke_EUHI
+  letter_digit_boundary          15  Asp.Xqi_SmcurbgeqkbyacHabbvQtbuBzqmhzSbmtrofuw_PB_0hM234_nLRCD_iCEFTM3_OR_k0962218.LejLtdhjqfyrrizfkOixot, Bdc_MfdwJpy_XmvxkpzyyqkJrccDe_GufxhteozkjRiidpqjqrui.Vsafdfavj_b64, Chr.Nne_ZodgqqdrktwubiVtcoeKkiiViprbbCafzmabfc_EQ_0pA234_wUQTJ_lRSOWK3_bg1l9316.PozQtpenpfeipdtczQeqns, Csa.MnpJyftyyqhfjgjxLhfafug_CrgSBokl_HdzLOmgiurh_FS_EOXTU3_d7714392.PxbPtnpwjlvtanaaOapview_OskABypk_PccYMelbhvk_ZB_DJXAX3_s7714392, Dic_OveaQya_KidywqzjbquCfhuTz_CdyvogjsmjaDvnboqyvdql.KqyqddrsvKbjoeyktkoXffyu_u32, Egn_OyvgNrp_OduxrzocmyePurzLo_BgyanvbqzbkJwrdriepppq.ErubyemZjtgdqolXhaxosdmfnMpofj_j32
+  dot                            67  AgkCpj.FXPZ_OBT_ZW.Blx_IBFO, Asp.Xqi_SmcurbgeqkbyacHabbvQtbuBzqmhzSbmtrofuw_PB_0hM234_nLRCD_iCEFTM3_OR_k0962218.LejLtdhjqfyrrizfkOixot, AwsQdc.VXAO_CSP_KH.NkshfehlTcyfkjea_IPNR, BbqArc.UYZV_DKF_HH.Gmugbkf_Peque, Bdc_MfdwJpy_XmvxkpzyyqkJrccDe_GufxhteozkjRiidpqjqrui.Vsafdfavj_b64, BwePdr.SCGH_NYZ_QR.Zctdjlyz_WGCP
+  bracket                         0  
+  other_char                      0  
+  non_ascii                       0  
+  all_upper_letters               0  
+  all_lower_letters               0  
+  mixed_case                     67  AgkCpj.FXPZ_OBT_ZW.Blx_IBFO, Asp.Xqi_SmcurbgeqkbyacHabbvQtbuBzqmhzSbmtrofuw_PB_0hM234_nLRCD_iCEFTM3_OR_k0962218.LejLtdhjqfyrrizfkOixot, AwsQdc.VXAO_CSP_KH.NkshfehlTcyfkjea_IPNR, BbqArc.UYZV_DKF_HH.Gmugbkf_Peque, Bdc_MfdwJpy_XmvxkpzyyqkJrccDe_GufxhteozkjRiidpqjqrui.Vsafdfavj_b64, BwePdr.SCGH_NYZ_QR.Zctdjlyz_WGCP
+  starts_with_digit               0  
+
+=== examples/case_00_public/update_test1.a2l: 12 names
+unique = 12  duplicates (exact, >1 occurrence) = 0  case-twins (equal after ASCII folding) = 0
+length: min 16  median 18.0  max 26
+tokens/name: min 2  median 3.0  max 4
+  underscore                     12  Curve_ExternalAxis, Curve_InternalAxis, Map_ExternalAxis, Map_InternalAxis, Characteristic_ValBlk, Characteristic_Value
+  underscore_run_ge2              0  
+  lead_or_trail_underscore        0  
+  camel_lower_upper               5  Curve_ExternalAxis, Curve_InternalAxis, Map_ExternalAxis, Map_InternalAxis, Characteristic_ValBlk
+  acronym_then_lower              0  
+  letter_digit_boundary           3  Measurement_Bitfield_bits1, Measurement_Bitfield_bits2, Measurement_Bitfield_bits3
+  dot                             0  
+  bracket                         0  
+  other_char                      0  
+  non_ascii                       0  
+  all_upper_letters               0  
+  all_lower_letters               0  
+  mixed_case                     12  Curve_ExternalAxis, Curve_InternalAxis, Map_ExternalAxis, Map_InternalAxis, Characteristic_ValBlk, Characteristic_Value
+  starts_with_digit               0  
+
+=== examples/case_00_public/update_test2.a2l: 14 names
+unique = 14  duplicates (exact, >1 occurrence) = 0  case-twins (equal after ASCII folding) = 0
+length: min 16  median 30.0  max 40
+tokens/name: min 2  median 4.0  max 6
+  underscore                     14  Curve_ExternalAxis_Bad_Recordlayout, Curve_InternalAxis_bad_axis_size, Map_ExternalAxis_bad_datatype, Map_InternalAxis, Characteristic_ValBlk_matrix_dim, Characteristic_Value_bad_limit
+  underscore_run_ge2              0  
+  lead_or_trail_underscore        0  
+  camel_lower_upper               5  Curve_ExternalAxis_Bad_Recordlayout, Curve_InternalAxis_bad_axis_size, Map_ExternalAxis_bad_datatype, Map_InternalAxis, Characteristic_ValBlk_matrix_dim
+  acronym_then_lower              0  
+  letter_digit_boundary           3  Measurement_Bitfield_bits1_wrong_bitmask, Measurement_Bitfield_bits2, Measurement_Bitfield_bits3
+  dot                             0  
+  bracket                         0  
+  other_char                      0  
+  non_ascii                       0  
+  all_upper_letters               0  
+  all_lower_letters               0  
+  mixed_case                     14  Curve_ExternalAxis_Bad_Recordlayout, Curve_InternalAxis_bad_axis_size, Map_ExternalAxis_bad_datatype, Map_InternalAxis, Characteristic_ValBlk_matrix_dim, Characteristic_Value_bad_limit
+  starts_with_digit               0  
+
+=== examples/case_00_public/update_typedef_test1.a2l: 0 names
+
+=== examples/case_00_public/update_typedef_test2.a2l: 0 names
+
+=== examples/case_00_public/update_typedef_test3.a2l: 0 names
+
+=== examples/case_00_public/update_typedef_test4.a2l: 0 names
+
+=== examples/case_00_public/xcp_test.a2l: 0 names
+
+=== examples/case_01_basic_valid/firmware.a2l: 3 names
+unique = 3  duplicates (exact, >1 occurrence) = 0  case-twins (equal after ASCII folding) = 0
+length: min 11  median 11  max 11
+tokens/name: min 2  median 3  max 3
+  underscore                      3  CAL_BLOCK_A, CAL_BLOCK_B, MEAS_STATUS
+  underscore_run_ge2              0  
+  lead_or_trail_underscore        0  
+  camel_lower_upper               0  
+  acronym_then_lower              0  
+  letter_digit_boundary           0  
+  dot                             0  
+  bracket                         0  
+  other_char                      0  
+  non_ascii                       0  
+  all_upper_letters               3  CAL_BLOCK_A, CAL_BLOCK_B, MEAS_STATUS
+  all_lower_letters               0  
+  mixed_case                      0  
+  starts_with_digit               0  
+
+=== examples/case_02_gaps_and_patch_targets/firmware.a2l: 3 names
+unique = 3  duplicates (exact, >1 occurrence) = 0  case-twins (equal after ASCII folding) = 0
+length: min 7  median 10  max 11
+tokens/name: min 2  median 2  max 2
+  underscore                      3  DATE_FIELD, PATCH_BYTES, TABLE_1
+  underscore_run_ge2              0  
+  lead_or_trail_underscore        0  
+  camel_lower_upper               0  
+  acronym_then_lower              0  
+  letter_digit_boundary           0  
+  dot                             0  
+  bracket                         0  
+  other_char                      0  
+  non_ascii                       0  
+  all_upper_letters               3  DATE_FIELD, PATCH_BYTES, TABLE_1
+  all_lower_letters               0  
+  mixed_case                      0  
+  starts_with_digit               0  
+
+=== examples/case_03_overlapping_records/firmware.a2l: 2 names
+unique = 2  duplicates (exact, >1 occurrence) = 0  case-twins (equal after ASCII folding) = 0
+length: min 6  median 6.0  max 6
+tokens/name: min 2  median 2.0  max 2
+  underscore                      2  OVER_A, OVER_B
+  underscore_run_ge2              0  
+  lead_or_trail_underscore        0  
+  camel_lower_upper               0  
+  acronym_then_lower              0  
+  letter_digit_boundary           0  
+  dot                             0  
+  bracket                         0  
+  other_char                      0  
+  non_ascii                       0  
+  all_upper_letters               2  OVER_A, OVER_B
+  all_lower_letters               0  
+  mixed_case                      0  
+  starts_with_digit               0  
+
+=== examples/case_04_bad_checksums/firmware.a2l: 1 names
+unique = 1  duplicates (exact, >1 occurrence) = 0  case-twins (equal after ASCII folding) = 0
+length: min 9  median 9  max 9
+tokens/name: min 2  median 2  max 2
+  underscore                      1  CHK_BLOCK
+  underscore_run_ge2              0  
+  lead_or_trail_underscore        0  
+  camel_lower_upper               0  
+  acronym_then_lower              0  
+  letter_digit_boundary           0  
+  dot                             0  
+  bracket                         0  
+  other_char                      0  
+  non_ascii                       0  
+  all_upper_letters               1  CHK_BLOCK
+  all_lower_letters               0  
+  mixed_case                      0  
+  starts_with_digit               0  
+
+=== examples/case_05_dense_mixed_content/firmware.a2l: 4 names
+unique = 4  duplicates (exact, >1 occurrence) = 0  case-twins (equal after ASCII folding) = 0
+length: min 11  median 14.5  max 21
+tokens/name: min 2  median 2.0  max 4
+  underscore                      4  VECTOR_LIKE_HEADER_01, DATE_PLACEHOLDER, RAW_PATTERN, ASCII_TRAILER
+  underscore_run_ge2              0  
+  lead_or_trail_underscore        0  
+  camel_lower_upper               0  
+  acronym_then_lower              0  
+  letter_digit_boundary           0  
+  dot                             0  
+  bracket                         0  
+  other_char                      0  
+  non_ascii                       0  
+  all_upper_letters               4  VECTOR_LIKE_HEADER_01, DATE_PLACEHOLDER, RAW_PATTERN, ASCII_TRAILER
+  all_lower_letters               0  
+  mixed_case                      0  
+  starts_with_digit               0  
+
+=== examples/case_06_large_nested_a2l/firmware.a2l: 220040 names
+unique = 220040  duplicates (exact, >1 occurrence) = 0  case-twins (equal after ASCII folding) = 0
+length: min 13  median 13.0  max 13
+tokens/name: min 3  median 3.0  max 3
+  underscore                 220040  CHAR_00000_00, MEAS_00000_00, CHAR_00000_01, MEAS_00000_01, CHAR_00000_02, MEAS_00000_02
+  underscore_run_ge2              0  
+  lead_or_trail_underscore        0  
+  camel_lower_upper               0  
+  acronym_then_lower              0  
+  letter_digit_boundary           0  
+  dot                             0  
+  bracket                         0  
+  other_char                      0  
+  non_ascii                       0  
+  all_upper_letters          220040  CHAR_00000_00, MEAS_00000_00, CHAR_00000_01, MEAS_00000_01, CHAR_00000_02, MEAS_00000_02
+  all_lower_letters               0  
+  mixed_case                      0  
+  starts_with_digit               0  
+
+=== examples/case_07_stress_smoke/firmware.a2l: 12 names
+unique = 12  duplicates (exact, >1 occurrence) = 0  case-twins (equal after ASCII folding) = 0
+length: min 11  median 11.0  max 11
+tokens/name: min 2  median 2.0  max 2
+  underscore                     12  MEAS_000000, MEAS_000001, MEAS_000002, MEAS_000003, MEAS_000004, MEAS_000005
+  underscore_run_ge2              0  
+  lead_or_trail_underscore        0  
+  camel_lower_upper               0  
+  acronym_then_lower              0  
+  letter_digit_boundary           0  
+  dot                             0  
+  bracket                         0  
+  other_char                      0  
+  non_ascii                       0  
+  all_upper_letters              12  MEAS_000000, MEAS_000001, MEAS_000002, MEAS_000003, MEAS_000004, MEAS_000005
+  all_lower_letters               0  
+  mixed_case                      0  
+  starts_with_digit               0  
+
+=== examples/professional_validation/case_01_baseline_valid/firmware.a2l: 3 names
+unique = 3  duplicates (exact, >1 occurrence) = 0  case-twins (equal after ASCII folding) = 0
+length: min 5  median 5  max 9
+tokens/name: min 2  median 2  max 2
+  underscore                      3  HEADER_OK, CAL_A, CAL_B
+  underscore_run_ge2              0  
+  lead_or_trail_underscore        0  
+  camel_lower_upper               0  
+  acronym_then_lower              0  
+  letter_digit_boundary           0  
+  dot                             0  
+  bracket                         0  
+  other_char                      0  
+  non_ascii                       0  
+  all_upper_letters               3  HEADER_OK, CAL_A, CAL_B
+  all_lower_letters               0  
+  mixed_case                      0  
+  starts_with_digit               0  
+
+=== examples/professional_validation/case_02_patch_targets_and_gaps/firmware.a2l: 6 names
+unique = 6  duplicates (exact, >1 occurrence) = 0  case-twins (equal after ASCII folding) = 0
+length: min 7  median 11.5  max 16
+tokens/name: min 2  median 2.5  max 3
+  underscore                      6  DATE_FIELD, MEAS_DATE_FIELD, PATCH_BYTES, MEAS_PATCH_BYTES, TABLE_1, MEAS_TABLE_1
+  underscore_run_ge2              0  
+  lead_or_trail_underscore        0  
+  camel_lower_upper               0  
+  acronym_then_lower              0  
+  letter_digit_boundary           0  
+  dot                             0  
+  bracket                         0  
+  other_char                      0  
+  non_ascii                       0  
+  all_upper_letters               6  DATE_FIELD, MEAS_DATE_FIELD, PATCH_BYTES, MEAS_PATCH_BYTES, TABLE_1, MEAS_TABLE_1
+  all_lower_letters               0  
+  mixed_case                      0  
+  starts_with_digit               0  
+
+=== examples/professional_validation/case_03_overlapping_records/firmware.a2l: 3 names
+unique = 3  duplicates (exact, >1 occurrence) = 0  case-twins (equal after ASCII folding) = 0
+length: min 6  median 6  max 10
+tokens/name: min 2  median 2  max 2
+  underscore                      3  OVER_A, OVER_B, SAFE_BLOCK
+  underscore_run_ge2              0  
+  lead_or_trail_underscore        0  
+  camel_lower_upper               0  
+  acronym_then_lower              0  
+  letter_digit_boundary           0  
+  dot                             0  
+  bracket                         0  
+  other_char                      0  
+  non_ascii                       0  
+  all_upper_letters               3  OVER_A, OVER_B, SAFE_BLOCK
+  all_lower_letters               0  
+  mixed_case                      0  
+  starts_with_digit               0  
+
+=== examples/professional_validation/case_04_bad_checksums/firmware.a2l: 1 names
+unique = 1  duplicates (exact, >1 occurrence) = 0  case-twins (equal after ASCII folding) = 0
+length: min 9  median 9  max 9
+tokens/name: min 2  median 2  max 2
+  underscore                      1  CHK_BLOCK
+  underscore_run_ge2              0  
+  lead_or_trail_underscore        0  
+  camel_lower_upper               0  
+  acronym_then_lower              0  
+  letter_digit_boundary           0  
+  dot                             0  
+  bracket                         0  
+  other_char                      0  
+  non_ascii                       0  
+  all_upper_letters               1  CHK_BLOCK
+  all_lower_letters               0  
+  mixed_case                      0  
+  starts_with_digit               0  
+
+=== examples/professional_validation/case_05_out_of_order_and_mixed/firmware.a2l: 3 names
+unique = 3  duplicates (exact, >1 occurrence) = 0  case-twins (equal after ASCII folding) = 0
+length: min 11  median 16  max 21
+tokens/name: min 2  median 2  max 4
+  underscore                      3  VECTOR_LIKE_HEADER_01, RAW_PATTERN, DATE_PLACEHOLDER
+  underscore_run_ge2              0  
+  lead_or_trail_underscore        0  
+  camel_lower_upper               0  
+  acronym_then_lower              0  
+  letter_digit_boundary           0  
+  dot                             0  
+  bracket                         0  
+  other_char                      0  
+  non_ascii                       0  
+  all_upper_letters               3  VECTOR_LIKE_HEADER_01, RAW_PATTERN, DATE_PLACEHOLDER
+  all_lower_letters               0  
+  mixed_case                      0  
+  starts_with_digit               0  
+
+=== examples/professional_validation/case_07_cross_reference_inconsistencies/firmware.a2l: 4 names
+unique = 4  duplicates (exact, >1 occurrence) = 0  case-twins (equal after ASCII folding) = 0
+length: min 7  median 11.5  max 15
+tokens/name: min 2  median 2.0  max 5
+  underscore                      4  VALID_BLOCK, VALID_TARGET, A2L_ONLY_SYMBOL, ALIAS_1
+  underscore_run_ge2              0  
+  lead_or_trail_underscore        0  
+  camel_lower_upper               0  
+  acronym_then_lower              0  
+  letter_digit_boundary           1  A2L_ONLY_SYMBOL
+  dot                             0  
+  bracket                         0  
+  other_char                      0  
+  non_ascii                       0  
+  all_upper_letters               4  VALID_BLOCK, VALID_TARGET, A2L_ONLY_SYMBOL, ALIAS_1
+  all_lower_letters               0  
+  mixed_case                      0  
+  starts_with_digit               0  
+
+=== examples/professional_validation/case_08_heavy_fragmentation/firmware.a2l: 100 names
+unique = 100  duplicates (exact, >1 occurrence) = 0  case-twins (equal after ASCII folding) = 0
+length: min 9  median 9.0  max 9
+tokens/name: min 2  median 2.0  max 2
+  underscore                    100  FRAG_0000, FRAG_0001, FRAG_0002, FRAG_0003, FRAG_0004, FRAG_0005
+  underscore_run_ge2              0  
+  lead_or_trail_underscore        0  
+  camel_lower_upper               0  
+  acronym_then_lower              0  
+  letter_digit_boundary           0  
+  dot                             0  
+  bracket                         0  
+  other_char                      0  
+  non_ascii                       0  
+  all_upper_letters             100  FRAG_0000, FRAG_0001, FRAG_0002, FRAG_0003, FRAG_0004, FRAG_0005
+  all_lower_letters               0  
+  mixed_case                      0  
+  starts_with_digit               0  
+
+=== tests/fixtures/synth/synth_a2l.a2l: 6 names
+unique = 6  duplicates (exact, >1 occurrence) = 0  case-twins (equal after ASCII folding) = 0
+length: min 11  median 12.0  max 19
+tokens/name: min 3  median 3.0  max 4
+  underscore                      6  SYM_U16_MSB, RAT_FUNC_SYM, TAB_INTP_SYM, TAB_NOINTP_SYM, LINEAR_MUL_2, TAB_INTP_SPARSE_SYM
+  underscore_run_ge2              0  
+  lead_or_trail_underscore        0  
+  camel_lower_upper               0  
+  acronym_then_lower              0  
+  letter_digit_boundary           1  SYM_U16_MSB
+  dot                             0  
+  bracket                         0  
+  other_char                      0  
+  non_ascii                       0  
+  all_upper_letters               6  SYM_U16_MSB, RAT_FUNC_SYM, TAB_INTP_SYM, TAB_NOINTP_SYM, LINEAR_MUL_2, TAB_INTP_SPARSE_SYM
+  all_lower_letters               0  
+  mixed_case                      0  
+  starts_with_digit               0  
+
+=== inline A2L names in tests/*.py (regex, templates marked): 84 names
+unique = 59  duplicates (exact, >1 occurrence) = 14  case-twins (equal after ASCII folding) = 1
+length: min 1  median 7.0  max 14
+tokens/name: min 1  median 2.0  max 3
+  underscore                     24  BAD_CHAR\n, AXIS_SRC, CURVE_EXT, C_UNK, C_DANGLING, MAP_DIR_LBL
+  underscore_run_ge2              0  
+  lead_or_trail_underscore        0  
+  camel_lower_upper               8  InFlash\n, InRam\n, RawByte\n, IdentVal\n, FormVal\n, TabVal\n
+  acronym_then_lower              0  
+  letter_digit_boundary           3  C1, C3, C1\n
+  dot                             2  T.sub, Cal.K\n
+  bracket                         0  
+  other_char                     34  BAD_CHAR\n, Cal.K\n, X\n, InFlash\n, InRam\n, C1\n
+  non_ascii                       0  
+  all_upper_letters              25  C1, C3, AXIS_SRC, CURVE_EXT, CT, CX
+  all_lower_letters               1  rpm\n
+  mixed_case                     33  BAD_CHAR\n, T.sub, Cal.K\n, X\n, InFlash\n, InRam\n
+  starts_with_digit               0  
+  duplicates sample: [('AXIS_SRC', 2), ('Alpha\\n', 2), ('C1', 2), ('C3', 2), ('CURVE_EXT', 2), ('C_UNK', 2)]
+  case-twins sample: [['RPM\\n', 'rpm\\n']]
+
+inline templates: ['<template>P{i:03d}', '<template>{_HOSTILE_ANSI_NAME}\\n', '<template>{_HOSTILE_BRACKET_NAME}\\n', '<template>{_HOSTILE_LINK_NAME}\\n', '<template>{cname}', '<template>{name}', '<template>{name}\\n']
+
+=== UNION of every tracked .a2l (parser): 234654 names
+unique = 234567  duplicates (exact, >1 occurrence) = 86  case-twins (equal after ASCII folding) = 0
+length: min 4  median 13.0  max 136
+tokens/name: min 1  median 3.0  max 36
+  underscore                 233258  ASAM.M.SCALAR.UBYTE.TAB_VERB_DEFAULT_VALUE, ASAM.M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_VALUE, ASAM.M.SCALAR.UBYTE.VTAB_RANGE_DEFAULT_VALUE, ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE, ASAM.M.SCALAR.UBYTE.TAB_INTP_DEFAULT_VALUE, ASAM.M.SCALAR.UBYTE.TAB_INTP_NO_DEFAULT_VALUE
+  underscore_run_ge2            561  AehduMbpv__Miotc1.BvhVofqLubhoanQopechsNbeu, AejcpMzcl__Svpsr3.ChamzejKcratnsQbdmgqtMuj, AevniXxbj__Kwgys2.EumTkbcImtezfwZqvmhhqHtax, AfqojPfqs__Yktzq1.YcgllbzAhiarheRqbalniXaa, AhtpgRwfz__Lvntj1.HWFXWU_PWFWOTR_ZOKUR_ISDKBWXXIF, AljxdUybv__Mylof2.XqtqovICCYa_UatfexuoUgpWibdew
+  lead_or_trail_underscore     3441  Aabcx_GgrDwx_kaudIvm_ydmuH_uoz3._5_, Acdlg_LreIim_iwpnVzp_igZju_gzcb._7_, Afeqr_qutgE_eEqpljk_wftp1._0_, Affhs_NuqHfc_TQhjsl_tgjs_aguf_yls4._4_, Aghz_qHdto_xlWkioo_pzuf._1_, Ahdhy_OedGwl_lnfyKvx_wnblZm_nfsi._5_
+  camel_lower_upper           12779  model.MainClass.gameController.sm, model.MainClass.gameController.timer.timeCounter, model.MainClass.gameController.stopWatch.timeCounter, model.MainClass.gameController.edgeDetect.buffer, model.MainClass.gameController.edgeDetect.oldSignal, model.MainClass.gameController.gameTime
+  acronym_then_lower           1447  AAD_UTRQ.HWV_VIUF_C_PposBXIIFfkdGfiaJnbbPvb_DYAN_XVZ1_Ierxjr_Eud_Y, AMYEegfHxwht_XmiimrumkbZthzbOjb_in32, AOSGkbgIcruc_DOhp_on32, AVA_Ajrxdqck_PXeinih, AclhyNyza.QVHXimdXfmxtMjqc.HwtZzcCvb.lscSbijczFxrljDnrgmjee, Affhs_NuqHfc_TQhjsl_tgjs_aguf_yls4._4_
+  letter_digit_boundary        5275  ASAM.M.SCALAR.FLOAT32.IDENTICAL, ASAM.M.SCALAR.FLOAT64.IDENTICAL, ASAM.M.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0, ASAM.C.SCALAR.UWORD.IDENTICAL.BITMASK_0FF0, ASAM.C.SCALAR.FLOAT32_IEEE.IDENTICAL, ASAM.C.SCALAR.FLOAT64_IEEE.IDENTICAL
+  dot                         13608  ASAM.M.SCALAR.UBYTE.IDENTICAL, ASAM.M.SCALAR.UBYTE.TAB_VERB_DEFAULT_VALUE, ASAM.M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_VALUE, ASAM.M.SCALAR.UBYTE.VTAB_RANGE_DEFAULT_VALUE, ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE, ASAM.M.SCALAR.UBYTE.TAB_INTP_DEFAULT_VALUE
+  bracket                       152  model.MainClass.ledController.ledRing[0].red, model.MainClass.ledController.ledRing[0].green, model.MainClass.ledController.ledRing[0].blue, model.MainClass.ledController.ledRing[1].red, model.MainClass.ledController.ledRing[1].green, model.MainClass.ledController.ledRing[1].blue
+  other_char                      0  
+  non_ascii                       0  
+  all_upper_letters          220447  ASAM.M.SCALAR.UBYTE.IDENTICAL, ASAM.M.SCALAR.UBYTE.TAB_VERB_DEFAULT_VALUE, ASAM.M.SCALAR.UBYTE.TAB_VERB_NO_DEFAULT_VALUE, ASAM.M.SCALAR.UBYTE.VTAB_RANGE_DEFAULT_VALUE, ASAM.M.SCALAR.UBYTE.VTAB_RANGE_NO_DEFAULT_VALUE, ASAM.M.SCALAR.UBYTE.TAB_INTP_DEFAULT_VALUE
+  all_lower_letters              71  parameter_instance[0].other_thing.it, parameter_instance[0].other_thing.part, parameter_instance[0].something.it, parameter_instance[0].something.part, parameter_instance[1].other_thing.it, parameter_instance[1].other_thing.part
+  mixed_case                  14049  model.MainClass.gameController.sm, model.MainClass.gameController.timer.timeCounter, model.MainClass.gameController.stopWatch.timeCounter, model.MainClass.gameController.edgeDetect.buffer, model.MainClass.gameController.edgeDetect.oldSignal, model.MainClass.gameController.gameTime
+  starts_with_digit               0  
+  duplicates sample: [('ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.COLUMN_DIR', 2), ('ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR', 2), ('ASAM.C.ARRAY.SWORD.MATRIX_DIM_6.ROW_DIR', 2), ('ASAM.C.CUBOID.COM_AXIS.FIX_AXIS.STD_AXIS', 2), ('ASAM.C.CURVE.COM_AXIS', 2), ('ASAM.C.CURVE.CURVE_AXIS', 2)]
+

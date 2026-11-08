@@ -1,0 +1,26 @@
+=== DIFF base -> M-03 (s19_app/tui/services/label_match.py) ===
+diff --git a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py b/M-03/s19_app/tui/services/label_match.py
+index d274de0..ac8a70f 100644
+--- a/tmp/b103-e5-4-mutA/base/s19_app/tui/services/label_match.py
++++ b/M-03/s19_app/tui/services/label_match.py
+@@ -483,7 +483,7 @@ def _fold(text: str) -> str:
+     Returns:
+         str: The folded text.
+     """
+-    return text.translate(_FOLD_TABLE)
++    return text
+ 
+ 
+ def _char_mask(text: str) -> int:
+
+=== PYTEST (tail) ===
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+/tmp/b103-e5-4-mutA/M-03/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.3/1: query 'value_0001' limit 20
+/tmp/b103-e5-4-mutA/M-03/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.3/2: query 'Value_0001' limit 20
+/tmp/b103-e5-4-mutA/M-03/tests/test_b103_label_match.py:391: AssertionError: R-A2L-MATCH.3/3: query 'rpm' limit 20
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.3/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.3/2]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.3/3]
+3 failed, 126 deselected in 5.42s

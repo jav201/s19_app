@@ -1,0 +1,22 @@
+M-01|KILLED|tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.1/1]; tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.1/2]; tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.1/3]
+M-02|KILLED|tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.2/1]; tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.2/2]; tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.2/3]; tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.2/4]
+M-03|KILLED|tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.3/1]; tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.3/2]; tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.3/3]
+M-04|KILLED|tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.4/1]; tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.4/2]
+M-05|KILLED|tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.5/1]; tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.5/2]; tests/test_b103_label_match.py::test_rows_5_3_three_exact_matches_are_all_listed
+M-06|KILLED|tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.6/1]; tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.6/2]; tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.6/3]
+M-07|KILLED|tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.7/2]; tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.7/3]; tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.7/4]
+M-08|KILLED|tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.8/2]; tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.8/3]; tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.8/7]; tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.8/8]
+M-09|KILLED|tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.9/1]; tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.9/2]; tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.9/3]; tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.9/4]
+M-10|KILLED|tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.10/1]; tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.10/2]; tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.10/3]
+M-11|KILLED|tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.11/1]; tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.11/2]; tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.11/3]
+M-12|KILLED|tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.12/3]
+M-13|KILLED|tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.13/1]; tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.13/3]
+M-14|KILLED|tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.14/1]
+M-15|KILLED|tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.15/1]; tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.15/2]
+M-16|KILLED|tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.16/1]; tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.16/2]
+M-17|KILLED|tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.17/1]; tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.17/2]
+M-18|KILLED|tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.18/3]; tests/test_b103_label_match.py::test_rows_18_1_limit_cut_is_the_head_of_the_full_list
+M-19|KILLED|tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.19/2]
+M-20|KILLED|tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.20/2]; tests/test_b103_label_match.py::test_rows_20_3_token_then_fuzzy_then_subsequence
+M-20b|KILLED|tests/test_b103_label_match.py::test_rows_20_3_token_then_fuzzy_then_subsequence
+ELAPSED|127.1s

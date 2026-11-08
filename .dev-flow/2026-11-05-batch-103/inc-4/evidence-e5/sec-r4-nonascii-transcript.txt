@@ -1,0 +1,88 @@
+runner sec-r4-run.sh sha256 7225a0c07c03fcc70fc7b999ce05a020dd89112bd40d37d6b63c27d49d485517; probe sec-r4-probe.py sha256 3cbaf0fb141a1399f27057356ea7a022104e0dac6b150483dce2590696af7bbf
+s19_app.__file__ = /tmp/b103-e5r4-4-sec/tree/s19_app/__init__.py
+label_match.__file__ = /tmp/b103-e5r4-4-sec/tree/s19_app/tui/services/label_match.py
+label_match sha256 = b97d19ebfe11dd47f096ded2ae6d7dd5f12f6fa02c42d8b9d5f782056bd79ecc
+tests module = /tmp/b103-e5r4-4-sec/tree/tests/test_b103_label_match_perf.py
+mode = r4 nonascii  python = 3.11.18  PYTHONHASHSEED = None  hash('abc') = -6985003777908929726
+host = <runner>  load = (1.75, 2.14, 2.14)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e5r4-4-sec/<user>  LOCALAPPDATA = /tmp/b103-e5r4-4-sec/<user>/localappdata  PILOT_DIR = /tmp/b103-e5r4-4-sec/pilot
+probe = sec-r4-probe.py sha256 3cbaf0fb141a1399f27057356ea7a022104e0dac6b150483dce2590696af7bbf; sec-r3-probe.py sha256 9cf292424ce8f1a335da4da39354d86b2b99bb480f5b41f0d387f608e52ceefa; sec-e5-probe.py sha256 8700b63bebae2c4af6847986a710946f67de255c8ac3e162365ae9891f7484bc
+_FUZZY_NODE_BUDGET = 400,000; _FUZZY_TOKEN_CAP = 20; _FUZZY_SWITCH_CAP = 512; _TRIE_PREFIX = 258; T.ANY_QUERY_BOUND_S = 2.0; T.KEYSTROKE_BOUND_S = 0.2
+=== A. one character in an otherwise matching name (start / middle / end), beside 'VALUE_0001'
+  U+007F       prepared ["'VALUE_0001'", "'\\x7fVALUE_X'", "'VALUE\\x7f_X'", "'VALUE_X\\x7f'", "'value_\\x7f'"]; rank('value') [("'value_\\x7f'", 'prefix'), ("'VALUE_X\\x7f'", 'prefix'), ("'VALUE\\x7f_X'", 'prefix'), ("'VALUE_0001'", 'prefix'), ("'\\x7fVALUE_X'", 'substring')]
+  U+0080       prepared ["'VALUE_0001'"]; rank('value') [("'VALUE_0001'", 'prefix')]
+  U+00E9       prepared ["'VALUE_0001'"]; rank('value') [("'VALUE_0001'", 'prefix')]
+  U+00FF       prepared ["'VALUE_0001'"]; rank('value') [("'VALUE_0001'", 'prefix')]
+  U+0100       prepared ["'VALUE_0001'"]; rank('value') [("'VALUE_0001'", 'prefix')]
+  U+0130       prepared ["'VALUE_0001'"]; rank('value') [("'VALUE_0001'", 'prefix')]
+  U+2028       prepared ["'VALUE_0001'"]; rank('value') [("'VALUE_0001'", 'prefix')]
+  U+FEFF       prepared ["'VALUE_0001'"]; rank('value') [("'VALUE_0001'", 'prefix')]
+  U+FFFF       prepared ["'VALUE_0001'"]; rank('value') [("'VALUE_0001'", 'prefix')]
+  U+10000      prepared ["'VALUE_0001'"]; rank('value') [("'VALUE_0001'", 'prefix')]
+  U+10FFFF     prepared ["'VALUE_0001'"]; rank('value') [("'VALUE_0001'", 'prefix')]
+  lone U+D800  prepared ["'VALUE_0001'"]; rank('value') [("'VALUE_0001'", 'prefix')]
+  U+212A       prepared ["'VALUE_0001'"]; rank('value') [("'VALUE_0001'", 'prefix')]
+
+=== B. lists that are all or half non-ASCII (50,000 names)
+  AST1 (20 astral 1-character tokens per name)
+    50,000 names, 1,950,000 characters; build 0.00 s [ok]; prepared 0 names == the ASCII names in first-occurrence order True; tracemalloc peak 2,000 B (0.00 MiB) [ok]
+      rank 'sig': 0 in 0.1 ms, bad spans 0, non-ASCII listed 0
+      rank 'a': 0 in 0.0 ms, bad spans 0, non-ASCII listed 0
+      rank '\xe9': 0 in 0.1 ms, bad spans 0, non-ASCII listed 0
+      rank '\U00010000': 0 in 0.1 ms, bad spans 0, non-ASCII listed 0
+      rank 'sig_0000': 0 in 0.1 ms, bad spans 0, non-ASCII listed 0
+      rank '\U0001003c_\U0001003d_\U0001003e_': 0 in 0.1 ms, bad spans 0, non-ASCII listed 0
+      rank 'xxxxxxxx': 0 in 0.3 ms, bad spans 0, non-ASCII listed 0
+  LAT1 (8 Latin-1 tokens per name)
+    50,000 names, 1,950,000 characters; build 0.00 s [ok]; prepared 0 names == the ASCII names in first-occurrence order True; tracemalloc peak 2,000 B (0.00 MiB) [ok]
+      rank 'sig': 0 in 0.1 ms, bad spans 0, non-ASCII listed 0
+      rank 'a': 0 in 0.0 ms, bad spans 0, non-ASCII listed 0
+      rank '\xe9': 0 in 0.1 ms, bad spans 0, non-ASCII listed 0
+      rank '\U00010000': 0 in 0.1 ms, bad spans 0, non-ASCII listed 0
+      rank 'sig_0000': 0 in 0.1 ms, bad spans 0, non-ASCII listed 0
+      rank '\xf9\xe0\xe0\xe0_\xfa': 0 in 0.1 ms, bad spans 0, non-ASCII listed 0
+      rank 'xxxxxxxx': 0 in 0.3 ms, bad spans 0, non-ASCII listed 0
+  ONE (ASCII name + one trailing U+00E9)
+    50,000 names, 500,000 characters; build 0.00 s [ok]; prepared 0 names == the ASCII names in first-occurrence order True; tracemalloc peak 2,000 B (0.00 MiB) [ok]
+      rank 'sig': 0 in 0.1 ms, bad spans 0, non-ASCII listed 0
+      rank 'a': 0 in 0.0 ms, bad spans 0, non-ASCII listed 0
+      rank '\xe9': 0 in 0.0 ms, bad spans 0, non-ASCII listed 0
+      rank '\U00010000': 0 in 0.0 ms, bad spans 0, non-ASCII listed 0
+      rank 'sig_0000': 0 in 0.1 ms, bad spans 0, non-ASCII listed 0
+      rank 'Sig_00': 0 in 0.1 ms, bad spans 0, non-ASCII listed 0
+      rank 'xxxxxxxx': 0 in 0.2 ms, bad spans 0, non-ASCII listed 0
+  HALF (ASCII / ONE alternating)
+    50,000 names, 475,000 characters; build 0.26 s [ok]; prepared 25000 names == the ASCII names in first-occurrence order True; tracemalloc peak 6,419,688 B (6.12 MiB) [ok]
+      rank 'sig': 20 in 24.9 ms, bad spans 0, non-ASCII listed 0
+      rank 'a': 0 in 3.9 ms, bad spans 0, non-ASCII listed 0
+      rank '\xe9': 0 in 3.5 ms, bad spans 0, non-ASCII listed 0
+      rank '\U00010000': 0 in 3.3 ms, bad spans 0, non-ASCII listed 0
+      rank 'sig_0000': 1 in 8.7 ms, bad spans 0, non-ASCII listed 0
+      rank 'Sig_00': 20 in 1.9 ms, bad spans 0, non-ASCII listed 0
+      rank 'xxxxxxxx': 0 in 4.1 ms, bad spans 0, non-ASCII listed 0
+  REF with every 7th name given a trailing U+00E9
+    50,000 names, 2,069,184 characters; build 1.81 s [ok]; prepared 42857 names == the ASCII names in first-occurrence order True; tracemalloc peak 17,278,447 B (16.48 MiB) [ok]
+      rank 'sig': 20 in 2.6 ms, bad spans 0, non-ASCII listed 0
+      rank 'a': 20 in 45.2 ms, bad spans 0, non-ASCII listed 0
+      rank '\xe9': 0 in 6.9 ms, bad spans 0, non-ASCII listed 0
+      rank '\U00010000': 0 in 6.6 ms, bad spans 0, non-ASCII listed 0
+      rank 'sig_0000': 0 in 8.1 ms, bad spans 0, non-ASCII listed 0
+      rank 'AHB_Zj': 20 in 6.4 ms, bad spans 0, non-ASCII listed 0
+      rank 'xxxxxxxx': 0 in 65.3 ms, bad spans 0, non-ASCII listed 0
+  duplicates around non-ASCII twins
+    7 names, 19 characters; build 0.00 s [ok]; prepared 3 names == the ASCII names in first-occurrence order True; tracemalloc peak 2,561 B (0.00 MiB) [ok]
+      rank 'sig': 0 in 0.1 ms, bad spans 0, non-ASCII listed 0
+      rank 'a': 1 in 0.1 ms, bad spans 0, non-ASCII listed 0
+      rank '\xe9': 0 in 0.1 ms, bad spans 0, non-ASCII listed 0
+      rank '\U00010000': 0 in 0.1 ms, bad spans 0, non-ASCII listed 0
+      rank 'sig_0000': 0 in 0.1 ms, bad spans 0, non-ASCII listed 0
+      rank 'C_2': 2 in 0.1 ms, bad spans 0, non-ASCII listed 0
+      rank 'xxxxxxxx': 0 in 0.3 ms, bad spans 0, non-ASCII listed 0
+
+=== C. a str subclass, an iterator, and a generator
+  [S('Sub_é'), S('Sub_x')]     -> prepared ["'Sub_x'"]; rank('x') ["'Sub_x'"]
+  iter([...])                  -> prepared ["'a_b'"]; rank('x') []
+  generator                    -> prepared ["'x_y'"]; rank('x') ["'x_y'"]
+
+load after = (2.7, 2.33, 2.2)
+probe exit 0

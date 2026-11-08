@@ -1,0 +1,42 @@
+host=<runner> date=2026-11-06T21:45:22-06:00 clone=e07fb00f9fc13afd314d0334fac683fe33b29b6c changed=0 HOME=/tmp/b103-e1-11/<user>
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+python = 3.11.18 | mode = chars
+files = 35
+== [CH] character and structure census of the 35 tracked .a2l files (counted outside comments and strings unless said) ==
+[CH] examples/case_00_public/ASAP2_Demo_V161.a2l: bytes=157606 lf=4085 object_name_not_on_begin_line=1 sec:AXIS_PTS=2 sec:CHARACTERISTIC=50 sec:IF_DATA=2 sec:MEASUREMENT=25
+[CH] examples/case_00_public/ASAP2_Demo_V171.a2l: begin_in_block_comment=3 bom_utf8=1 bytes=241699 end_in_block_comment=3 end_not_line_start=30 lf=5968 line_comments=83 lines_begin_and_end=30 object_name_not_on_begin_line=1 sec:AXIS_PTS=2 sec:BLOB=1 sec:CHARACTERISTIC=87 sec:IF_DATA=33 sec:INSTANCE=5 sec:MEASUREMENT=31 sec:STRUCTURE_COMPONENT=4 sec:TYPEDEF_AXIS=1 sec:TYPEDEF_CHARACTERISTIC=5 sec:TYPEDEF_STRUCTURE=1
+[CH] examples/case_00_public/BalanceTube_STMicro.a2l: bom_utf8=1 bytes=64103 lf=1988 sec:CHARACTERISTIC=7 sec:MEASUREMENT=104 tab=5474
+[CH] examples/case_00_public/check_test.a2l: bytes=542 lf=17 sec:CHARACTERISTIC=1 sec:IF_DATA=1
+[CH] examples/case_00_public/cleanup_test.a2l: bytes=2685 lf=99 sec:STRUCTURE_COMPONENT=3 sec:TYPEDEF_MEASUREMENT=2 sec:TYPEDEF_STRUCTURE=1
+[CH] examples/case_00_public/from_source.a2l: bytes=21100 lf=528 sec:AXIS_PTS=4 sec:CHARACTERISTIC=32 sec:MEASUREMENT=40
+[CH] examples/case_00_public/from_source_structs.a2l: bytes=5346 lf=200 sec:INSTANCE=2 sec:STRUCTURE_COMPONENT=17 sec:TYPEDEF_AXIS=1 sec:TYPEDEF_CHARACTERISTIC=5 sec:TYPEDEF_MEASUREMENT=3 sec:TYPEDEF_STRUCTURE=9
+[CH] examples/case_00_public/included.a2l: bytes=142 lf=4 sec:MEASUREMENT=1
+[CH] examples/case_00_public/memorysegment.a2l: bytes=1601 lf=56 sec:IF_DATA=2 tab=307
+[CH] examples/case_00_public/merge_inc_test.a2l: bytes=147 include=1 lf=7
+[CH] examples/case_00_public/remove_test.a2l: bytes=1654 lf=55 sec:AXIS_PTS=1 sec:BLOB=1 sec:CHARACTERISTIC=1 sec:IF_DATA=5 sec:INSTANCE=1 sec:MEASUREMENT=1
+[CH] examples/case_00_public/software_a.a2l: bytes=5078623 escaped_backslash_in_string=23 lf=114468 multiline_block_comments=22 sec:AXIS_PTS=66 sec:CHARACTERISTIC=3452 sec:IF_DATA=6468 sec:MEASUREMENT=10538
+[CH] examples/case_00_public/software_b.a2l: bytes=114539 lf=2706 multiline_block_comments=22 sec:IF_DATA=69 sec:MEASUREMENT=67
+[CH] examples/case_00_public/update_test1.a2l: bytes=8942 lf=287 sec:AXIS_PTS=3 sec:BLOB=2 sec:CHARACTERISTIC=6 sec:IF_DATA=18 sec:INSTANCE=1 sec:MEASUREMENT=6 sec:STRUCTURE_COMPONENT=3 sec:TYPEDEF_MEASUREMENT=2 sec:TYPEDEF_STRUCTURE=1
+[CH] examples/case_00_public/update_test2.a2l: bytes=10452 lf=320 sec:AXIS_PTS=4 sec:BLOB=3 sec:CHARACTERISTIC=7 sec:IF_DATA=24 sec:INSTANCE=3 sec:MEASUREMENT=7 sec:STRUCTURE_COMPONENT=3 sec:TYPEDEF_MEASUREMENT=2 sec:TYPEDEF_STRUCTURE=1
+[CH] examples/case_00_public/update_typedef_test1.a2l: bytes=6678 lf=254 sec:INSTANCE=11 sec:STRUCTURE_COMPONENT=18 sec:TYPEDEF_MEASUREMENT=8 sec:TYPEDEF_STRUCTURE=9
+[CH] examples/case_00_public/update_typedef_test2.a2l: bytes=6544 lf=242 sec:INSTANCE=11 sec:STRUCTURE_COMPONENT=18 sec:TYPEDEF_MEASUREMENT=8 sec:TYPEDEF_STRUCTURE=6
+[CH] examples/case_00_public/update_typedef_test3.a2l: bytes=8074 lf=323 sec:INSTANCE=24 sec:STRUCTURE_COMPONENT=18 sec:TYPEDEF_CHARACTERISTIC=1 sec:TYPEDEF_MEASUREMENT=8 sec:TYPEDEF_STRUCTURE=9
+[CH] examples/case_00_public/update_typedef_test4.a2l: bytes=10468 lf=391 sec:INSTANCE=24 sec:STRUCTURE_COMPONENT=16 sec:TYPEDEF_BLOB=1 sec:TYPEDEF_CHARACTERISTIC=11 sec:TYPEDEF_MEASUREMENT=8 sec:TYPEDEF_STRUCTURE=7
+[CH] examples/case_00_public/xcp_test.a2l: bytes=70878 lf=2550 sec:IF_DATA=2
+[CH] examples/case_01_basic_valid/firmware.a2l: bytes=1391 lf=53 sec:CHARACTERISTIC=2 sec:MEASUREMENT=1
+[CH] examples/case_02_gaps_and_patch_targets/firmware.a2l: bytes=1396 lf=53 sec:CHARACTERISTIC=3
+[CH] examples/case_03_overlapping_records/firmware.a2l: bytes=1231 lf=49 sec:CHARACTERISTIC=2
+[CH] examples/case_04_bad_checksums/firmware.a2l: bytes=983 lf=40 sec:CHARACTERISTIC=1
+[CH] examples/case_05_dense_mixed_content/firmware.a2l: bytes=1604 lf=57 sec:CHARACTERISTIC=4
+[CH] examples/case_06_large_nested_a2l/firmware.a2l: bytes=36702962 lf=1039926 sec:CHARACTERISTIC=110020 sec:MEASUREMENT=110020
+[CH] examples/case_07_stress_smoke/firmware.a2l: bytes=2446 lf=105 sec:CHARACTERISTIC=2 sec:MEASUREMENT=10
+[CH] examples/professional_validation/case_01_baseline_valid/firmware.a2l: bytes=1382 lf=53 sec:CHARACTERISTIC=3
+[CH] examples/professional_validation/case_02_patch_targets_and_gaps/firmware.a2l: bytes=1828 lf=65 sec:CHARACTERISTIC=3 sec:MEASUREMENT=3
+[CH] examples/professional_validation/case_03_overlapping_records/firmware.a2l: bytes=1388 lf=53 sec:CHARACTERISTIC=3
+[CH] examples/professional_validation/case_04_bad_checksums/firmware.a2l: bytes=984 lf=40 sec:CHARACTERISTIC=1
+[CH] examples/professional_validation/case_05_out_of_order_and_mixed/firmware.a2l: bytes=1461 lf=53 sec:CHARACTERISTIC=3
+[CH] examples/professional_validation/case_07_cross_reference_inconsistencies/firmware.a2l: bytes=1564 lf=57 sec:CHARACTERISTIC=4
+[CH] examples/professional_validation/case_08_heavy_fragmentation/firmware.a2l: bytes=15265 lf=441 sec:CHARACTERISTIC=100
+[CH] tests/fixtures/synth/synth_a2l.a2l: bytes=3401 lf=132 sec:CHARACTERISTIC=6
+[CH-total] begin_in_block_comment=3 bom_utf8=2 bytes=42551109 end_in_block_comment=3 end_not_line_start=30 escaped_backslash_in_string=23 include=1 lf=1175725 line_comments=83 lines_begin_and_end=30 multiline_block_comments=44 object_name_not_on_begin_line=2 sec:AXIS_PTS=82 sec:BLOB=7 sec:CHARACTERISTIC=113800 sec:IF_DATA=6624 sec:INSTANCE=82 sec:MEASUREMENT=120854 sec:STRUCTURE_COMPONENT=100 sec:TYPEDEF_AXIS=2 sec:TYPEDEF_BLOB=1 sec:TYPEDEF_CHARACTERISTIC=22 sec:TYPEDEF_MEASUREMENT=41 sec:TYPEDEF_STRUCTURE=44 tab=5781
+exit=0 clone_changed_after=0

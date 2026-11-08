@@ -1,0 +1,44 @@
+/home/<user>/work/b103-int4/s19_app/__init__.py
+ 20:36:46 up 1 day, 12:08,  2 users,  load average: 0.08, 0.05, 0.33
+92.5%  0.075 s / 1.000 s  R-A2L-MATCH.40 REF6 mesa x52  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+92.6%  0.015 s / 0.200 s  R-A2L-MATCH.36 REF 'JotafVod_msr'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+92.6%  0.074 s / 1.000 s  R-A2L-MATCH.40 REF6 chax x52  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+93.1%  0.014 s / 0.200 s  R-A2L-MATCH.36 REF 'HRR_WOL.TNY_U_ZmyrXSZTPeyoMsdpWwbcUtd_Dw'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+93.3%  0.067 s / 1.000 s  R-A2L-MATCH.40 REF6 0 x125 + chax  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+93.4%  0.066 s / 1.000 s  R-A2L-MATCH.40 LONG a x128 + b  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_2_long_queries_against_1020_character_tokens
+93.5%  0.065 s / 1.000 s  R-A2L-MATCH.40 REF6 chr x64  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+93.6%  0.064 s / 1.000 s  R-A2L-MATCH.40 REF6 00 x85  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+93.6%  0.064 s / 1.000 s  R-A2L-MATCH.40 REF6 c x125 + chax  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+93.7%  0.063 s / 1.000 s  R-A2L-MATCH.40 REF6 cahr x51  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+94.2%  0.012 s / 0.200 s  R-A2L-MATCH.36 REF 'FCA_NPUK_SMM.RWG_TjsPHIoim_SNX_TVC_2_ewh'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+94.3%  0.011 s / 0.200 s  R-A2L-MATCH.36 REF 'JotafVod_msrqlLzL_kh2C_rWl_pfue._0_'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+95.0%  0.010 s / 0.200 s  R-A2L-MATCH.36 REF '0'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+95.4%  0.009 s / 0.200 s  R-A2L-MATCH.36 REF 'RUX_ARV_LFS_QM_GJWTDMS_WDGTH.Fgathduhjd,'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+95.5%  0.009 s / 0.200 s  R-A2L-MATCH.36 REF 'e e e'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+95.5%  0.009 s / 0.200 s  R-A2L-MATCH.36 REF 'e e e e e e e e e e e e e e e e e e e e '  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+95.9%  0.041 s / 1.000 s  R-A2L-MATCH.40 REF6 1 x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+96.4%  0.036 s / 1.000 s  R-A2L-MATCH.40 REF6 c 0 x64  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+96.5%  0.035 s / 1.000 s  R-A2L-MATCH.40 REF6 c x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+96.5%  0.035 s / 1.000 s  R-A2L-MATCH.40 REF6 m x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+96.8%  0.006 s / 0.200 s  R-A2L-MATCH.36 REF 'aaaa'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+96.9%  0.006 s / 0.200 s  R-A2L-MATCH.36 REF '0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 '  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+97.1%  0.029 s / 1.000 s  R-A2L-MATCH.40 REF rat x64  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+97.2%  0.028 s / 1.000 s  R-A2L-MATCH.40 REF qzx x64  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+97.3%  0.005 s / 0.200 s  R-A2L-MATCH.36 REF 'ab'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+97.7%  0.005 s / 0.200 s  R-A2L-MATCH.36 REF 'zz'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+97.7%  0.023 s / 1.000 s  R-A2L-MATCH.40 REF6 E3S-01 a x256  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+98.2%  0.004 s / 0.200 s  R-A2L-MATCH.36 REF 'JVmL'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+98.4%  0.016 s / 1.000 s  R-A2L-MATCH.40 REF6 E3S-01 e x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+98.6%  0.003 s / 0.200 s  R-A2L-MATCH.36 REF 'cnt'  tests/test_b103_label_match_perf.py::test_r_a2l_match_36_1_ranking_per_keystroke_over_ref
+98.6%  0.014 s / 1.000 s  R-A2L-MATCH.40 REF e x120 + rat  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+98.9%  0.011 s / 1.000 s  R-A2L-MATCH.40 REF cnt x64  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+99.1%  0.009 s / 1.000 s  R-A2L-MATCH.40 REF 1a x128  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref
+99.2%  0.008 s / 1.000 s  R-A2L-MATCH.40 REF6 E3S-01 a..z  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+99.2%  0.008 s / 1.000 s  R-A2L-MATCH.40 REF6 E3S-01 pool join  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+99.2%  0.008 s / 1.000 s  R-A2L-MATCH.40 REF6 E3S-01 pool[200:] join  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+99.2%  0.008 s / 1.000 s  R-A2L-MATCH.40 REF6 E3S-01 longest REF name  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+99.2%  0.008 s / 1.000 s  R-A2L-MATCH.40 REF6 E3S-01 longest swapped  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_1_pathological_queries_over_ref6
+QC-TM: 78 bounds, 0 under 20 % margin
+7 passed in 64.11s (0:01:04)
+EXIT=0
+ 20:37:50 up 1 day, 12:09,  2 users,  load average: 0.77, 0.26, 0.39

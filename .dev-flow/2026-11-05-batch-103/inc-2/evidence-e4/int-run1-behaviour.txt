@@ -1,0 +1,43 @@
+/home/<user>/work/b103-int2a/s19_app/__init__.py
+ 22:09:19 up 1 day, 13:41,  3 users,  load average: 1.07, 0.85, 0.83
+E        +  and   None = Definition(name='XL1', section='CHARACTERISTIC', char_type='VALUE', kind='number', address=16, byte_length=2, datatype...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None).display_format
+
+tests/test_b103_a2l_definition.py:734: AssertionError
+________________ test_r_a2l_def_36_1_decimals_are_capped_at_17 _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-565/test_r_a2l_def_36_1_decimals_a0')
+
+    def test_r_a2l_def_36_1_decimals_are_capped_at_17(tmp_path):
+        """R-A2L-DEF.36/1 - %.40 on 0.1 -> 17 decimals."""
+>       assert _num(tmp_path, "D5", "FLOAT64_IEEE", "%.40", struct.pack(">d", 0.1)).text == "0.10000000000000000"
+E       AssertionError: assert '0.10000000000000001' == '0.10000000000000000'
+E         
+E         - 0.10000000000000000
+E         ?                   ^
+E         + 0.10000000000000001
+E         ?                   ^
+
+tests/test_b103_a2l_definition.py:1007: AssertionError
+__________ test_r_a2l_def_58_2_6_a_5000_digit_decimals_run_is_capped ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-565/test_r_a2l_def_58_2_6_a_5000_d0')
+
+    def test_r_a2l_def_58_2_6_a_5000_digit_decimals_run_is_capped(tmp_path):
+        """R-A2L-DEF.58.2/6 - %.<5000 digits> on 0.1 -> 17 decimals."""
+        res = _num(tmp_path, "FD", "FLOAT64_IEEE", "%." + "1" * 5000, struct.pack(">d", 0.1))
+>       assert res.text == "0.10000000000000000"
+E       AssertionError: assert '0.10000000000000001' == '0.10000000000000000'
+E         
+E         - 0.10000000000000000
+E         ?                   ^
+E         + 0.10000000000000001
+E         ?                   ^
+
+tests/test_b103_a2l_definition.py:1148: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_15_2_a2ltool_range_table
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_21_1_one_number_gives_no_extended_limits
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_36_1_decimals_are_capped_at_17
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_6_a_5000_digit_decimals_run_is_capped
+4 failed, 178 passed in 9.78s
+EXIT=1

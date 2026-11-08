@@ -1,0 +1,82 @@
+# M-.35b
+# s19_app.__file__ = /tmp/b103-e5-2-mutA/M-.35b/s19_app/__init__.py
+# note: %g used
+#   EDIT-OK: '        return f"{value:.{d}f}"'
+# --- git diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..49f4f3ce 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -1442,5 +1442,5 @@ def display_text(definition: Definition, value: int | float) -> str:
+             # Round to 15 significant digits, then write exactly d decimals of that
+             # decimal value (E3A-06); a float round-trip would bring back binary digits.
+             return format(Decimal(f"{value:.15g}"), f".{d}f")
+-        return f"{value:.{d}f}"
++        return f"{value:g}"
+     return f"{value:.15g}"
+
+# --- pytest (rc=1) ---
+FFFF..                                                                   [100%]
+=================================== FAILURES ===================================
+_______________________ test_r_a2l_def_35_1_two_decimals _______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-981/test_r_a2l_def_35_1_two_decima0')
+
+    def test_r_a2l_def_35_1_two_decimals(tmp_path):
+        """R-A2L-DEF.35/1 - LINEAR 0.1, %4.2, stored 123 -> ``12.30``."""
+>       assert _num(tmp_path, "D1", "UWORD", "%4.2", bytes([0, 0x7B]), method="LINEAR", coeffs=("0.1", "0")).text == "12.30"
+E       AssertionError: assert '12.3' == '12.30'
+E         
+E         - 12.30
+E         ?     -
+E         + 12.3
+
+../base/tests/test_b103_a2l_definition.py:1005: AssertionError
+___________________ test_r_a2l_def_35_2_zero_decimals_a_tie ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-981/test_r_a2l_def_35_2_zero_decim0')
+
+    def test_r_a2l_def_35_2_zero_decimals_a_tie(tmp_path):
+        """R-A2L-DEF.35/2 - FLOAT64 2.5 with %.0 -> ``2``."""
+>       assert _num(tmp_path, "D2", "FLOAT64_IEEE", "%.0", struct.pack(">d", 2.5)).text == "2"
+E       AssertionError: assert '2.5' == '2'
+E         
+E         - 2
+E         + 2.5
+
+../base/tests/test_b103_a2l_definition.py:1010: AssertionError
+______________________ test_r_a2l_def_35_3_four_decimals _______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-981/test_r_a2l_def_35_3_four_decim0')
+
+    def test_r_a2l_def_35_3_four_decimals(tmp_path):
+        """R-A2L-DEF.35/3 - 3.14159 with %8.4 -> ``3.1416``."""
+>       assert _num(tmp_path, "D3", "FLOAT64_IEEE", "%8.4", struct.pack(">d", 3.14159)).text == "3.1416"
+E       AssertionError: assert '3.14159' == '3.1416'
+E         
+E         - 3.1416
+E         ?      ^
+E         + 3.14159
+E         ?      ^^
+
+../base/tests/test_b103_a2l_definition.py:1015: AssertionError
+_____________________ test_r_a2l_def_35_4_exact_binary_tie _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-981/test_r_a2l_def_35_4_exact_bina0')
+
+    def test_r_a2l_def_35_4_exact_binary_tie(tmp_path):
+        """R-A2L-DEF.35/4 - 0.125 with %.2 -> ``0.12``."""
+>       assert _num(tmp_path, "D4", "FLOAT64_IEEE", "%.2", struct.pack(">d", 0.125)).text == "0.12"
+E       AssertionError: assert '0.125' == '0.12'
+E         
+E         - 0.12
+E         + 0.125
+E         ?     +
+
+../base/tests/test_b103_a2l_definition.py:1020: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_35_1_two_decimals - ...
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_35_2_zero_decimals_a_tie
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_35_3_four_decimals
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_35_4_exact_binary_tie
+4 failed, 2 passed, 185 deselected in 1.00s

@@ -1,0 +1,56 @@
+ 05:36:28 up 1 day, 21:08,  2 users,  load average: 0.11, 0.82, 3.45
+A2L section tree has structural errors: path=/tmp/b103-e5-2-code/tree/examples/case_00_public/ASAP2_Demo_V171.a2l sample=Unclosed /begin sections detected.
+[P0] s19_app.__file__ = /tmp/b103-e5-2-code/tree/s19_app/__init__.py
+[P0] a2l_definition.__file__ = /tmp/b103-e5-2-code/tree/s19_app/tui/a2l_definition.py
+[P0] python 3.11.18
+
+[P1] type-word letter case (verdict upper-cased; kind / display / interpolate read the raw word)
+[P1] LI: kind='number' conversion_type='tab_intp' refusal=None -> Decoded(stored=5, value=0.0, text='0.0')
+[P1] UI: kind='number' conversion_type='TAB_INTP' refusal=None -> Decoded(stored=5, value=50.0, text='50.0')
+[P1] LV: kind='number' conversion_type='tab_verb' refusal=None -> Decoded(stored=5, value=5, text='5')
+[P1] LD: kind='number' conversion_type='identical' refusal=None -> Decoded(stored=5, value=5, text='5.00')
+[P1] UD: kind='number' conversion_type='IDENTICAL' refusal=None -> Decoded(stored=5, value=5, text='5')
+[P1] frozen _apply_compu_method(5, 'tab_intp', CT) = (50.0, 'ok', '')   (82f5f8e5 decoded TAB_* through it)
+[P1] corpus: 35 tracked .a2l files, 560 COMPU_METHOD sections, 0 type words not in upper case: []; skipped > 20 MiB: ['examples/case_06_large_nested_a2l/firmware.a2l']
+
+[P2] TAB_NOINTP decode on a COMPU_TAB whose x repeats below the stored value (400 UBYTE VALUEs, stored 250)
+[P2] dup-x   256 KiB, 52429 entries: 400 decodes    948.6 ms CPU (least of 7); value 0.0, frozen (0.0, ''), equal=True
+[P2] dup-x   512 KiB, 104858 entries: 400 decodes   1919.9 ms CPU (least of 7); value 0.0, frozen (0.0, ''), equal=True
+[P2] dup-x  2048 KiB, 419431 entries: 400 decodes   7871.8 ms CPU (least of 7); value 0.0, frozen (0.0, ''), equal=True
+[P2] dup-x ratios: 2S/S = 2.02, 8S/S = 8.30   (.150 bounds 1.5 / 2.0; absolute 0.5 s at S)
+[P2] distinct-x   256 KiB, 21846 entries: 400 decodes      1.8 ms CPU (least of 7); value 21844.0, frozen (21844.0, ''), equal=True
+[P2] distinct-x   512 KiB, 43691 entries: 400 decodes      1.8 ms CPU (least of 7); value 43689.0, frozen (43689.0, ''), equal=True
+[P2] distinct-x  2048 KiB, 174763 entries: 400 decodes      1.9 ms CPU (least of 7); value 174761.0, frozen (174761.0, ''), equal=True
+[P2] distinct-x ratios: 2S/S = 1.03, 8S/S = 1.07   (.150 bounds 1.5 / 2.0; absolute 0.5 s at S)
+[P2] one TAB_NOINTP lookup on 1000 repeated x below 250: 1000 x comparisons (the `while lo > 0 and xs[lo - 1] == xs[lo]` walk; a bisect would make ~10)
+
+[P3] MATRIX_DIM words the frozen parser reads as large ints
+[P3] hex 5000 digits: parsed; tag matrix_dim is an int of 20000 bits
+[P3] hex 5000 digits: describe_definition RAISED ValueError: Exceeds the limit (4300 digits) for integer string conversion; use sys.set_int_max_str_digits() to increase th
+[P3] decimal 4000 digits: parsed; tag matrix_dim is an int of 13285 bits
+[P3] decimal 4000 digits: describe -> refusal code A2L-DEF-KIND, message length 4069 (R-A2L-DEF.151 bound 1,024)
+
+[P4] a quoted CHARACTERISTIC kind word that starts with 'MATRIX_DIM '
+[P4] tags of KQ: 1; char_type starts 'MATRIX_DIM xxxxxxxxxxxxx' (length 2011)
+[P4] describe -> A2L-DEF-KIND, message length 2057 (bound 1,024), ellipsis in message: False
+
+[P5] P-2: the two private fields stay out of == and repr
+[P5] fields: ['compu_tab_ref', 'refusal', '_name_echo', '_table_form']; compare/repr of the last two: [(False, False), (False, False)]
+[P5] described == hand-stripped: True; '_table_form' in repr: False; '_name_echo' in repr: False
+[P5] hand-stripped decodes the same: True
+
+[P6] read-once by counting (400 objects naming one method / table / layout; one walk)
+[P6] enum        describe of 400 names: {'flatten': 402, 'resolve_layout': 1, 'enum_form': 1, 'tab_form_build': 0, 'display_decimals': 1}; decode of 400: 0 compu_tabs_by_name lookups; results ['Decoded']
+[P6] tab         describe of 400 names: {'flatten': 401, 'resolve_layout': 1, 'enum_form': 0, 'tab_form_build': 1, 'display_decimals': 1}; decode of 400: 0 compu_tabs_by_name lookups; results ['Decoded']
+[P6] tab_missing describe of 400 names: {'flatten': 401, 'resolve_layout': 1, 'enum_form': 0, 'tab_form_build': 0, 'display_decimals': 1}; decode of 400: 400 compu_tabs_by_name lookups; results ['Refusal:A2L-DEF-DECODE']
+
+[P7] definitions case: planned_text against the model's decode, by seed
+[P7] seed 20260001: enum raw 1, planned_text 'IDLE', model text 'IDLE', agree=True
+[P7] seed 1: enum raw 1, planned_text 'IDLE', model text 'IDLE', agree=True
+[P7] seed 2: enum raw 0, planned_text 'IDLE', model text 'OFF', agree=False
+[P7] seed 3: enum raw 0, planned_text 'IDLE', model text 'OFF', agree=False
+[P7] seed 4: enum raw 0, planned_text 'IDLE', model text 'OFF', agree=False
+[P7] seed 5: enum raw 3, planned_text 'IDLE', model text 'FAULT', agree=False
+
+[END] probe done
+exit=0

@@ -1,0 +1,35 @@
+# M-14  row R-A2L-MATCH.14
+
+control: a rule left out of the listing (subsequence not listed) -> `value_000` gives 9
+edit: `rank`: disable the subsequence tier (`if False:`)
+
+s19_app.__file__: /tmp/b103-e5-4-mutr2A/M-14/s19_app/__init__.py
+
+== diff ==
+--- /tmp/b103-e5-4-mutr2A/base/s19_app/tui/services/label_match.py	2026-11-06 22:11:34.000000000 -0600
++++ /tmp/b103-e5-4-mutr2A/M-14/s19_app/tui/services/label_match.py	2026-11-06 22:43:31.927399163 -0600
+@@ -294,7 +294,7 @@
+             add_group(MatchRule.FUZZY, total, name_id)
+             taken.add(name_id)
+             found += 1
+-    if found < limit and parsed.keys:
++    if False:
+         found += _subsequence_tier(parsed, index, taken, add_group)
+     return _cut(parsed, raw, index, groups, tables, limit)
+ 
+
+== pytest (returncode 1, KILLED) ==
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+________________ test_ranked_list_is_exactly[R-A2L-MATCH.14/1] _________________
+tests/test_b103_label_match.py:391: in test_ranked_list_is_exactly
+    assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E   AssertionError: R-A2L-MATCH.14/1: query 'value_000' limit 100
+E   assert [('VALUE_0001...0, 9),)), ...] == [('VALUE_0001...0, 9),)), ...]
+E     
+E     Right contains 11 more items, first extra item: ('VALUE_0010', 'subsequence', 0, ((0, 5), (6, 8), (9, 10)))
+E     Use -v to get more diff
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.14/1]
+1 failed, 1 passed, 127 deselected in 5.10s
+

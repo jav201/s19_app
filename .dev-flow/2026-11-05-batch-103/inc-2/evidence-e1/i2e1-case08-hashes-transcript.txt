@@ -1,0 +1,84 @@
+# i2e1-case08-hashes transcript 2026-11-06T15:54:18-06:00 host <runner>
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
+# (the generator is stdlib only and imports no s19_app; no s19_app.__file__ applies)
+tool: /home/<user>/work/s19_app/tools/synth/make_release_case.py
+tool sha256: 0d594a28c37707f065673e72fdd1d2dd0174cfeda4f52b14b9a3a69ee28923f2
+
+# --size-mb 10 run a: exit 0
+a2l           97340  firmware.a2l
+a2l_issues      98921  firmware_issues.a2l
+change          872  demo_patch.changes.json
+check           447  demo_check.chk.json
+check_fails        454  demo_check_fails.chk.json
+hex        10088640  firmware.hex
+mac            4553  firmware.mac
+mac_issues       4781  firmware_issues.mac
+readme         2005  README.txt
+s19        10485815  firmware.s19
+v2         10495927  firmware_v2.s19
+
+# --size-mb 10 run b: exit 0
+a2l           97340  firmware.a2l
+a2l_issues      98921  firmware_issues.a2l
+change          872  demo_patch.changes.json
+check           447  demo_check.chk.json
+check_fails        454  demo_check_fails.chk.json
+hex        10088640  firmware.hex
+mac            4553  firmware.mac
+mac_issues       4781  firmware_issues.mac
+readme         2005  README.txt
+s19        10485815  firmware.s19
+v2         10495927  firmware_v2.s19
+
+# --size-mb 1 run a: exit 0
+a2l           97347  firmware.a2l
+a2l_issues      98928  firmware_issues.a2l
+change          872  demo_patch.changes.json
+check           447  demo_check.chk.json
+check_fails        454  demo_check_fails.chk.json
+hex         1008888  firmware.hex
+mac            4553  firmware.mac
+mac_issues       4781  firmware_issues.mac
+readme         2003  README.txt
+s19         1048633  firmware.s19
+v2          1058745  firmware_v2.s19
+
+# --size-mb 1 run b: exit 0
+a2l           97347  firmware.a2l
+a2l_issues      98928  firmware_issues.a2l
+change          872  demo_patch.changes.json
+check           447  demo_check.chk.json
+check_fails        454  demo_check_fails.chk.json
+hex         1008888  firmware.hex
+mac            4553  firmware.mac
+mac_issues       4781  firmware_issues.mac
+readme         2003  README.txt
+s19         1048633  firmware.s19
+v2          1058745  firmware_v2.s19
+
+# pin: size | file | bytes | sha256 | run b equal
+10 | firmware.s19 | 10485815 | cb0cd7f1a07488aecbcb0928d75b4ae57bb5373f2ff4c097147aac41e2a7c2d9 | yes
+10 | firmware.hex | 10088640 | 2bd129e0ce59d30b70b93ad4660a45f3ff91525fc39fc14c907a587d0766184d | yes
+10 | firmware_v2.s19 | 10495927 | 7a41b8c7c291b389fe588cc32615176f809cc9267fe547cb0800bd02c42ca906 | yes
+10 | firmware.a2l | 97340 | 42ca7d40a8c3a1a4ee15abd6fb36ed9953554156c0bb1865e64b17615ba2d961 | yes
+10 | firmware.mac | 4553 | 6f28961a896a253829b6188813192f0a43f05025a6662a038093fbda5ce19212 | yes
+10 | demo_patch.changes.json | 872 | e5ca0550cafef62222ab65f68126b6cf4b1bee76d389da7862052ff398153980 | yes
+10 | demo_check.chk.json | 447 | 8ebd23b0e5afe12e14bffb72212c6202aa23eba7b8f7965a0329b62a0348594f | yes
+10 | demo_check_fails.chk.json | 454 | a2151fae2f1be301662a18b16ae390eb2042f5fe045c058c9915fbd465b1f7fc | yes
+10 | firmware_issues.a2l | 98921 | 6f9362939936a01683756239b2b884bf9b69ece2d9dac62d3d0ef71651f71f36 | yes
+10 | firmware_issues.mac | 4781 | f52799cca08d72c461647a992723915fadd02c6dd90ddd5c33f2cd1449c443c0 | yes
+10 | README.txt | 2005 | b01212e5cdde95a2975a92f64212a988d6f3dec6c35d5cf9e4cf11167d09bc62 | yes
+1 | firmware.s19 | 1048633 | f5592b511a561c463bf89679b784aea9d9fa552d5aa9b06a17f8e91cd87ea49b | yes
+1 | firmware.hex | 1008888 | f0eb7556d01b31a54009608af0dd0b1c73f5faa4b077941e55e757540bd2e8f2 | yes
+1 | firmware_v2.s19 | 1058745 | 855cdd8434dc639e91732fb0b3ffc2d2f2977804546c8e7cbfae6dc25cf6ec21 | yes
+1 | firmware.a2l | 97347 | 34900db01fee2d2f67252b675f1536a0a2213fa178496e1140019bf05b7f3e8f | yes
+1 | firmware.mac | 4553 | 6f28961a896a253829b6188813192f0a43f05025a6662a038093fbda5ce19212 | yes
+1 | demo_patch.changes.json | 872 | 46cfc7b200ecd0dea85c7e80fdf1b6bd3c8af3f756109a650831796393d2ac79 | yes
+1 | demo_check.chk.json | 447 | 819bd4a0fa1290fc725ea368f541d2d909ac95936ecbeab82cae2bb6b8878451 | yes
+1 | demo_check_fails.chk.json | 454 | 8bcefc106cb80cab4f7e381d421b72c881c71fec76b6cfbfd6c7a2633704ec92 | yes
+1 | firmware_issues.a2l | 98928 | bb1522da3e47c083a6705c69cb73da3c3179a760a01e65cac275a6f50498bb91 | yes
+1 | firmware_issues.mac | 4781 | f52799cca08d72c461647a992723915fadd02c6dd90ddd5c33f2cd1449c443c0 | yes
+1 | README.txt | 2003 | 1ac1b52e1ddb13ffc0fcf45113ec01ce759992bde87730bfae63c647924506ed | yes
+
+files pinned: 22; run-to-run mismatches: 0
+# exit 0

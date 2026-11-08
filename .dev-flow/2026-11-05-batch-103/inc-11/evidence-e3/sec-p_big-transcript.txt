@@ -1,0 +1,29 @@
+== [M] lexer model: tier-1 'after stripping its blanks' read with str.strip() (Unicode) vs ASCII ==
+[M1 U+00A0] as-written (Unicode strip, no char check): [(1, 'ECU_ADDRESS 0x1234')] errors=[] | fixed: [(1, 'ECU_ADDRESS 0x1234\\xa0')] errors=['Line 1: unexpected character U+00A0']
+[M1 U+0085] as-written (Unicode strip, no char check): [(1, 'ECU_ADDRESS 0x1234')] errors=[] | fixed: [(1, 'ECU_ADDRESS 0x1234\\x85')] errors=['Line 1: unexpected character U+0085']
+[M1 U+2028] as-written (Unicode strip, no char check): [(1, 'ECU_ADDRESS 0x1234')] errors=[] | fixed: [(1, 'ECU_ADDRESS 0x1234\\u2028')] errors=['Line 1: unexpected character U+2028']
+[M1 U+2029] as-written (Unicode strip, no char check): [(1, 'ECU_ADDRESS 0x1234')] errors=[] | fixed: [(1, 'ECU_ADDRESS 0x1234\\u2029')] errors=['Line 1: unexpected character U+2029']
+[M1 U+001C] as-written (Unicode strip, no char check): [(1, 'ECU_ADDRESS 0x1234')] errors=[] | fixed: [(1, 'ECU_ADDRESS 0x1234\\x1c')] errors=['Line 1: unexpected character U+001C']
+[M1 U+001E] as-written (Unicode strip, no char check): [(1, 'ECU_ADDRESS 0x1234')] errors=[] | fixed: [(1, 'ECU_ADDRESS 0x1234\\x1e')] errors=['Line 1: unexpected character U+001E']
+[M1 U+FEFF] as-written (Unicode strip, no char check): [(1, 'ECU_ADDRESS 0x1234\ufeff')] errors=[] | fixed: [(1, 'ECU_ADDRESS 0x1234\\ufeff')] errors=['Line 1: unexpected character U+FEFF']
+[M1 U+200B] as-written (Unicode strip, no char check): [(1, 'ECU_ADDRESS 0x1234\u200b')] errors=[] | fixed: [(1, 'ECU_ADDRESS 0x1234\\u200b')] errors=['Line 1: unexpected character U+200B']
+[M1 U+0000] as-written (Unicode strip, no char check): [(1, 'ECU_ADDRESS 0x1234\x00')] errors=[] | fixed: [(1, 'ECU_ADDRESS 0x1234\\x00')] errors=['Line 1: unexpected character U+0000']
+== [M2] Python primitives that re-open Unicode-whitespace or non-ASCII-digit semantics ==
+[M2] '0x1234<NBSP>'.strip() -> '0x1234' | .split() -> ['0x1234'] | re \S+ -> ['0x1234'] | int(w,0) -> 4660
+[M2] int('0x12_34',0) -> 0x1234 | int('12_34',16) -> 0x1234 | re \d{1,20} fullmatch '١٢' -> True int -> 12 | '²'.isdigit() -> True
+[M2] 'A\x1cB\x85C\u2028D'.splitlines() -> ['A', 'B', 'C', 'D']
+== [M3] linearity on hostile shapes (model; seconds) ==
+[M3] all-tier-3 lines (a comment on each): (n, s, errors) [(100000, 0.521, 0), (200000, 1.023, 0), (400000, 2.052, 0)] step ratios [1.96, 2.01] (2.0 = linear)
+[M3] one huge tier-3 line (words + comments): (n, s, errors) [(200000, 0.216, 0), (400000, 0.427, 0), (800000, 0.838, 0)] step ratios [1.98, 1.96] (2.0 = linear)
+[M3] string over n lines (incremental): (n, s, errors) [(50000, 0.072, 0), (100000, 0.145, 0), (200000, 0.297, 0)] step ratios [2.01, 2.05] (2.0 = linear)
+[M3] string over n lines, re-joined from its start on each line (naive): [(5000, 0.013), (10000, 0.035), (20000, 0.113)] (4.0 per step = quadratic)
+[M3] block comment never closed over n lines: (n, s, errors) [(100000, 0.048, 1), (200000, 0.097, 1), (400000, 0.193, 1)] step ratios [2.02, 1.99] (2.0 = linear)
+[M3] non-ASCII word on every line (error flood): (n, s, errors) [(100000, 0.378, 100000), (200000, 0.768, 200000), (400000, 1.528, 400000)] step ratios [2.03, 1.99] (2.0 = linear)
+== [M4] error-text size: words the graph echoes into messages ==
+[M4] /include "<1 MB string>" -> error text 1000029 chars; /end "<1 MB string>" -> 1000047 chars; a quoted word may hold LF, ESC and '[link=...]' and is exempt from READ.4
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+[BIG n=154] 25274051 B lines=1234717 tags=93539 ext_axis_tags=2705 | base tree 0.88s parse 95.45s (profiled) | top tottime ['seconds function', '/home/<user>/work/s19_app/s19_app/tui/a2l.py:1424(<genexpr>) 38.984', '/home/<user>/work/s19_app/s19_app/tui/a2l.py:319(_split_line_respecting_quotes) 2.885', '/home/<user>/work/s19_app/s19_app/tui/a2l.py:2592(walk) 2.799'] | model lex 3.22s tier1=3 tier3=1234714 lines_with_tab=1234608
+[BIG n=155] 17381120 B lines=989674 tags=44676 ext_axis_tags=202 | base tree 1.09s parse 16.33s (profiled) | top tottime ['seconds function', '/home/<user>/work/s19_app/s19_app/tui/a2l.py:319(_split_line_respecting_quotes) 2.305', '/home/<user>/work/s19_app/s19_app/tui/a2l.py:353(_strip_a2l_comments) 2.202', '/home/<user>/work/s19_app/s19_app/tui/a2l.py:2592(walk) 2.034'] | model lex 1.62s tier1=733304 tier3=256370 lines_with_tab=1182
+[BIG n=156] 15720453 B lines=931917 tags=41856 ext_axis_tags=214 | base tree 0.48s parse 15.24s (profiled) | top tottime ['seconds function', '/home/<user>/work/s19_app/s19_app/tui/a2l.py:319(_split_line_respecting_quotes) 2.096', '/home/<user>/work/s19_app/s19_app/tui/a2l.py:353(_strip_a2l_comments) 1.934', '/home/<user>/work/s19_app/s19_app/tui/a2l.py:2592(walk) 1.890'] | model lex 1.47s tier1=688985 tier3=242932 lines_with_tab=16
+[BIG n=157] 10057240 B lines=665207 tags=30486 ext_axis_tags=366 | base tree 0.34s parse 11.22s (profiled) | top tottime ['seconds function', '/home/<user>/work/s19_app/s19_app/tui/a2l.py:1424(<genexpr>) 1.531', '/home/<user>/work/s19_app/s19_app/tui/a2l.py:2592(walk) 1.446', 'objects} 1.413'] | model lex 0.98s tier1=482898 tier3=182309 lines_with_tab=14
+[BIG n=158] 8608043 B lines=543079 tags=12457 ext_axis_tags=29 | base tree 0.71s parse 4.97s (profiled) | top tottime ['seconds function', '/home/<user>/work/s19_app/s19_app/tui/a2l.py:154(build_section_tree) 1.083', '/home/<user>/work/s19_app/s19_app/tui/a2l.py:353(_strip_a2l_comments) 0.648', '/home/<user>/work/s19_app/s19_app/tui/a2l.py:2592(walk) 0.616'] | model lex 1.11s tier1=211388 tier3=331691 lines_with_tab=166542

@@ -1,0 +1,40 @@
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+names 13990; queries per class: [60, 60, 60, 60]
+
+=== typo-words
+  order A: target listed 60/60  top-1 52/60  top-5 60/60  MRR 0.923  median position 0.0
+  order B: target listed 60/60  top-1 60/60  top-5 60/60  MRR 1.000  median position 0.0
+  queries whose target position differs between A and B: 8
+    query='unib swqc'                  A=2 B=0  target='wqy_XNW_UinbSwqcAdgteGsmn.gqqyjfPnmqiEifijheVpbdc'
+    query='lqeay juol'                 A=1 B=0  target='CON_LQEYA_LDM2_JUOL_AWDOH.KfgqCmvlpgt'
+    query='qdpr ejfe'                  A=1 B=0  target='DQPREjfeKsscBxmbf.UtrugGnpvIrqmjBhacsdlvtsby'
+    query='vflk wjby'                  A=1 B=0  target='VFKL.WJBYScuckiy._3_.xqfybuYvigfLsac.Rdqy'
+    query='uqbi evivp'                 A=2 B=0  target='Yqa_EjvTlaXgmVjaUqbiMhEvzvp._13_'
+    query='wouae eyah'                 A=1 B=0  target='Wouce_IehSur_eyahZus_mpybJ_flm1._7_'
+
+=== typo-word
+  order A: target listed 60/60  top-1 9/60  top-5 18/60  MRR 0.220  median position 56.0
+  order B: target listed 60/60  top-1 46/60  top-5 56/60  MRR 0.854  median position 0.0
+  queries whose target position differs between A and B: 50
+    query='weaivjk'                    A=11 B=0  target='TNG4998R_Weavjk.DTROOK'
+    query='maay'                       A=117 B=5  target='TNM_OJJL_MAKAY_EUEYTLPP.SilkeuabknLybj'
+    query='gojbr'                      A=72 B=2  target='Fgh_Dlz_GojbkVkeej._11_.BkuRkhcdDapVhGaelyHlagv'
+    query='mtfbhk'                     A=59 B=0  target='Zwy_Vue19YjsUyxKcmEksvRyXfrvhsqaIeuuMtfbkhJlIUD._1_'
+    query='vwdzgaz'                    A=16 B=0  target='XFC_VDZGAZ2_SUSTD_CXKTPSN_2_QAGOS_WGRX_NEWDX.Icjfudlao'
+    query='ibbvi'                      A=223 B=0  target='JmuKxaFjtpo.bvIlbviGfj'
+
+=== abbrev
+  order A: target listed 60/60  top-1 1/60  top-5 4/60  MRR 0.044  median position 185.0
+  order B: target listed 60/60  top-1 1/60  top-5 1/60  MRR 0.025  median position 300.0
+  queries whose target position differs between A and B: 52
+    query='tom'                        A=508 B=285  target='TNM_OJJL_MAKAY_EUEYTLPP.SilkeuabknLybj'
+    query='fdgv'                       A=291 B=312  target='Fgh_Dlz_GojbkVkeej._11_.BkuRkhcdDapVhGaelyHlagv'
+    query='jkfb'                       A=4 B=36  target='JmuKxaFjtpo.bvIlbviGfj'
+    query='vryx'                       A=23 B=50  target='Vun_RxvutYsb.XmjJdyynIjct._14_'
+    query='dzj'                        A=1513 B=2003  target='DVP_ZZEY_JRKCU_RYSEUHN_XYGGV_XAHGZU_SCW.NfxphmySjnfmdg'
+    query='wxus'                       A=335 B=359  target='wqy_XNW_UinbSwqcAdgteGsmn.gqqyjfPnmqiEifijheVpbdc'
+
+=== partial
+  order A: target listed 60/60  top-1 60/60  top-5 60/60  MRR 1.000  median position 0.0
+  order B: target listed 60/60  top-1 60/60  top-5 60/60  MRR 1.000  median position 0.0
+  queries whose target position differs between A and B: 0

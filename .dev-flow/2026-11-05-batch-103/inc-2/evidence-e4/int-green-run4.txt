@@ -1,0 +1,9 @@
+/home/<user>/work/b103-int2a/s19_app/__init__.py
+ 22:24:42 up 1 day, 13:56,  4 users,  load average: 2.78, 3.22, 2.66
+============================= QC-TM timing margins =============================
+49.8%  0.201 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+53.6%  0.929 s / 2.000 s  R-A2L-DEF.136 describe 13990  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_136_1_describing_every_object_is_fast
+66.5%  0.502 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 3 bounds, 0 under 20 % margin
+80 passed in 190.52s (0:03:10)
+EXIT=0

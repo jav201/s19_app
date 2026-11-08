@@ -1,0 +1,61 @@
+# M-07  row R-A2L-MATCH.7
+
+control: query used as a regular expression -> `knife[1]` is a character class and matches no `[1]`
+edit: substring matching via `re.search` (add `import re`)
+
+s19_app.__file__: /tmp/b103-e5-4-mutr2A/M-07/s19_app/__init__.py
+
+== diff ==
+--- /tmp/b103-e5-4-mutr2A/base/s19_app/tui/services/label_match.py	2026-11-06 22:11:34.000000000 -0600
++++ /tmp/b103-e5-4-mutr2A/M-07/s19_app/tui/services/label_match.py	2026-11-06 22:42:49.159807818 -0600
+@@ -23,6 +23,7 @@
+ from dataclasses import dataclass
+ from enum import Enum
+ from typing import Callable, Iterable, Mapping, NamedTuple, Sequence
++import re
+ 
+ # The six CTX-A2L-MATCH whitespace characters. Never a bare ``str.strip``,
+ # which also strips U+001C … U+001F, U+0085 and U+00A0 (E2-5).
+@@ -333,7 +334,7 @@
+     subs: list[int] = []
+     for i in range(count):
+         name_folded = folded[i]
+-        if text in name_folded:
++        if re.search(text, name_folded):
+             if name_folded.startswith(text):
+                 (exact if len(name_folded) == text_len else prefix).append(i)
+             else:
+
+== pytest (returncode 1, KILLED) ==
+.FFF                                                                     [100%]
+=================================== FAILURES ===================================
+_________________ test_ranked_list_is_exactly[R-A2L-MATCH.7/2] _________________
+tests/test_b103_label_match.py:391: in test_ranked_list_is_exactly
+    assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E   AssertionError: R-A2L-MATCH.7/2: query 'knife[1]' limit 20
+E   assert [('parameter_...), (28, 29)))] == [('parameter_...), (22, 27)))]
+E     
+E     At index 0 diff: ('parameter_instance[0].Knife[1].x', 'token', 0, ((22, 27), (28, 29))) != ('parameter_instance[0].Knife[1].x', 'substring', 0, ((22, 30),))
+E     Use -v to get more diff
+_________________ test_ranked_list_is_exactly[R-A2L-MATCH.7/3] _________________
+tests/test_b103_label_match.py:391: in test_ranked_list_is_exactly
+    assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E   AssertionError: R-A2L-MATCH.7/3: query '[0].Spoon' limit 20
+E   assert [('parameter_...), (22, 27)))] == [('parameter_... ((18, 27),))]
+E     
+E     At index 0 diff: ('parameter_instance[0].Spoon.x', 'token', 0, ((19, 20), (22, 27))) != ('parameter_instance[0].Spoon.x', 'substring', 0, ((18, 27),))
+E     Use -v to get more diff
+_________________ test_ranked_list_is_exactly[R-A2L-MATCH.7/4] _________________
+tests/test_b103_label_match.py:391: in test_ranked_list_is_exactly
+    assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E   AssertionError: R-A2L-MATCH.7/4: query 'ledRing[1]' limit 4
+E   assert [('model.Sign...), (22, 23)))] == [('model.Sign... ((30, 40),))]
+E     
+E     At index 0 diff: ('model.Signals.ledRing[1].red', 'token', 0, ((14, 21), (22, 23))) != ('model.Signals.ledRing[1].red', 'substring', 0, ((14, 24),))
+E     Use -v to get more diff
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.7/2]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.7/3]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.7/4]
+3 failed, 1 passed, 125 deselected in 5.08s
+

@@ -1,0 +1,11 @@
+s19_app.__file__ = /tmp/b103-e5r2-2a-sec/tree/s19_app/__init__.py | python 3.11.18 | a2l_definition md5 f661674b | control 0691 md5 820a4c3a | mutation lists md5 030c3f2f | load 12.12 6.31 5.29 | mode nest
+  recursion limit 1000
+  depth 900: parse thread ok, describe +0 ok/decode ok, describe +10 ok/decode ok, describe +25 ok/decode ok, describe +50 ok/decode ok, describe +100 ok/decode ok, describe +500 ok/decode ok, describe +900 ok/decode ok
+  depth 950: parse thread ok, describe +0 ok/decode ok, describe +10 ok/decode ok, describe +25 ok/decode ok, describe +50 ok/decode ok, describe +100 ok/decode ok, describe +500 ok/decode ok, describe +900 ok/decode ok
+  depth 970: parse thread ok, describe +0 ok/decode ok, describe +10 ok/decode ok, describe +25 ok/decode ok, describe +50 ok/decode ok, describe +100 ok/decode ok, describe +500 ok/decode ok, describe +900 ok/decode ok
+  depth 980: parse thread ok, describe +0 ok/decode ok, describe +10 ok/decode ok, describe +25 ok/decode ok, describe +50 ok/decode ok, describe +100 ok/decode ok, describe +500 ok/decode ok, describe +900 ok/decode ok
+  depth 985: parse thread ok, describe +0 ok/decode ok, describe +10 ok/decode ok, describe +25 ok/decode ok, describe +50 ok/decode ok, describe +100 ok/decode ok, describe +500 ok/decode ok, describe +900 ok/decode ok
+  depth 990: parse thread RecursionError
+  depth 5000: parse (limit 60000, 512 MiB stack) ok, describe at limit 1000 +0 equal to the flat file, describe at limit 1000 +900 equal to the flat file
+end | load 12.12 6.31 5.29
+exit=0 seconds=2

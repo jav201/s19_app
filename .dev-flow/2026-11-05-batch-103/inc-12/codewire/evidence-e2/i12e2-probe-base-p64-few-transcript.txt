@@ -1,0 +1,41 @@
+# probe base p64-few transcript 2026-11-07T02:31:11-06:00 host <runner>
+# clone e07fb00f9fc13afd314d0334fac683fe33b29b6c status: 0 changed; python Python 3.11.18
+# HOME/XDG/LOCALAPPDATA under /tmp/b103-e2-12/<user>; no DISPLAY; no clipboard; stdin closed; load: 14.92 15.19 11.66
+s19_app.__file__ = ~/work/s19_app/s19_app/__init__.py | textual 8.2.8 | variant base | scenario p64-few
+[base PAGE64(48) 80x54 unscrolled] visible=38 vbar=False scroll_x=0/105 scroll_y=0 fixed_columns=0 padding=0 cols: Tag=50, Address=14, Length=7, Source=7 | w=-28 | rows=3 cursor_row=0 | builds=2 fits=0 fit_rebuilds=0
+[base PAGE64(48) 80x54 unscrolled] header| Tag
+[base PAGE64(48) 80x54 unscrolled] row0| ✓ SYN_MAP_ABCDEFGHIJKLMNOPQRSTUVWXYZ01
+[base PAGE64(48) 80x54 unscrolled] row0: Address=0x1C2D3E00:CUT(''); Length=2266:CUT(''); Tag='✓ SYN_MAP_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCD' (50 cells, ends at 51, PAST the visible width, form=DIFF(want '✓ SYN_MAP_ABCDEFGHIJKLMNOPQRSTUVWXY…'))
+[base PAGE64(48) 80x54 unscrolled] row1| · SYN_V64_ABCDEFGHIJKLMNOPQRSTUVWXYZ01
+[base PAGE64(48) 80x54 unscrolled] row1: Address=0x1C2D3E004026:CUT(''); Length=2:CUT(''); Tag='· SYN_V64_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCD' (50 cells, ends at 51, PAST the visible width, form=DIFF(want '· SYN_V64_ABCDEFGHIJKLMNOPQRSTUVWXY…'))
+[base PAGE64(48) 80x54 unscrolled] row2| · SYN_BIG_ABCDEFGHIJKLMNOPQRSTUVWXYZ01
+[base PAGE64(48) 80x54 unscrolled] row2: Address=0x00001000:CUT(''); Length=1048576:CUT(''); Tag='· SYN_BIG_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCD' (50 cells, ends at 51, PAST the visible width, form=DIFF(want '· SYN_BIG_ABCDEFGHIJKLMNOPQRSTUVWXY…'))
+[base PAGE64(48) 80x54 unscrolled] ROWS OK 0/3 | painted 0x runs not declared: none
+[base PAGE64(48) 80x54 scrolled-right] visible=38 vbar=False scroll_x=105/105 scroll_y=0 fixed_columns=0 padding=0 cols: Tag=50, Address=14, Length=7, Source=7 | w=-28 | rows=3 cursor_row=0 | builds=2 fits=0 fit_rebuilds=0
+[base PAGE64(48) 80x54 scrolled-right] header| its  UnitBitsEndianVirtFuncAccessDtype
+[base PAGE64(48) 80x54 scrolled-right] row0| 4095 %.0           no
+[base PAGE64(48) 80x54 scrolled-right] row0: Address=0x1C2D3E00:CUT(''); Length=2266:CUT(''); Tag='✓ SYN_MAP_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCD' (50 cells, ends at -54, inside, -)
+[base PAGE64(48) 80x54 scrolled-right] row1| 65535%.0           no            UWORD
+[base PAGE64(48) 80x54 scrolled-right] row1: Address=0x1C2D3E004026:CUT(''); Length=2:CUT(''); Tag='· SYN_V64_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCD' (50 cells, ends at -54, inside, -)
+[base PAGE64(48) 80x54 scrolled-right] row2| 65535%.0           no            UBYTE
+[base PAGE64(48) 80x54 scrolled-right] row2: Address=0x00001000:CUT(''); Length=1048576:CUT(''); Tag='· SYN_BIG_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCD' (50 cells, ends at -54, inside, -)
+[base PAGE64(48) 80x54 scrolled-right] ROWS OK 0/3 | painted 0x runs not declared: none
+[base PAGE64(48) 118x54 unscrolled] visible=60 vbar=False scroll_x=0/83 scroll_y=0 fixed_columns=0 padding=0 cols: Tag=50, Address=14, Length=7, Source=7 | w=-6 | rows=3 cursor_row=0 | builds=2 fits=0 fit_rebuilds=0
+[base PAGE64(48) 118x54 unscrolled] header| Tag                                               Address
+[base PAGE64(48) 118x54 unscrolled] row0| ✓ SYN_MAP_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCD0x1C2D3E00
+[base PAGE64(48) 118x54 unscrolled] row0: Address=0x1C2D3E00:CUT('0x1C2D3E00'); Length=2266:CUT(''); Tag='✓ SYN_MAP_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCD' (50 cells, ends at 51, inside, form=DIFF(want '✓ SYN_MAP_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789…'))
+[base PAGE64(48) 118x54 unscrolled] row1| · SYN_V64_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCD0x1C2D3E00
+[base PAGE64(48) 118x54 unscrolled] row1: Address=0x1C2D3E004026:CUT('0x1C2D3E00'); Length=2:CUT(''); Tag='· SYN_V64_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCD' (50 cells, ends at 51, inside, form=DIFF(want '· SYN_V64_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789…'))
+[base PAGE64(48) 118x54 unscrolled] row2| · SYN_BIG_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCD0x00001000
+[base PAGE64(48) 118x54 unscrolled] row2: Address=0x00001000:CUT('0x00001000'); Length=1048576:CUT(''); Tag='· SYN_BIG_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCD' (50 cells, ends at 51, inside, form=DIFF(want '· SYN_BIG_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789…'))
+[base PAGE64(48) 118x54 unscrolled] ROWS OK 0/3 | painted 0x runs not declared: none
+[base PAGE64(48) 118x54 scrolled-right] visible=60 vbar=False scroll_x=83/83 scroll_y=0 fixed_columns=0 padding=0 cols: Tag=50, Address=14, Length=7, Source=7 | w=-6 | rows=3 cursor_row=0 | builds=2 fits=0 fit_rebuilds=0
+[base PAGE64(48) 118x54 scrolled-right] header| hysicalInMemRegion Limits  UnitBitsEndianVirtFuncAccessDtype
+[base PAGE64(48) 118x54 scrolled-right] row0| 792    yes  unknown0..4095 %.0           no
+[base PAGE64(48) 118x54 scrolled-right] row0: Address=0x1C2D3E00:CUT(''); Length=2266:CUT(''); Tag='✓ SYN_MAP_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCD' (50 cells, ends at -32, inside, -)
+[base PAGE64(48) 118x54 scrolled-right] row1|        no   unknown0..65535%.0           no            UWORD
+[base PAGE64(48) 118x54 scrolled-right] row1: Address=0x1C2D3E004026:CUT(''); Length=2:CUT(''); Tag='· SYN_V64_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCD' (50 cells, ends at -32, inside, -)
+[base PAGE64(48) 118x54 scrolled-right] row2|        no   unknown0..65535%.0           no            UBYTE
+[base PAGE64(48) 118x54 scrolled-right] row2: Address=0x00001000:CUT(''); Length=1048576:CUT(''); Tag='· SYN_BIG_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCD' (50 cells, ends at -32, inside, -)
+[base PAGE64(48) 118x54 scrolled-right] ROWS OK 0/3 | painted 0x runs not declared: none
+# exit 0 ; clone status after: 0 changed; load: 16.20 15.50 11.92

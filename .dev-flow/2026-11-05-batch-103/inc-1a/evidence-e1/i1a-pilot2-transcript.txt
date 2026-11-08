@@ -1,0 +1,45 @@
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+read_os_clipboard: every strategy failed (cascade=['tkinter', 'ctypes-win32', 'powershell'])
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+python = 3.11.18; platform = linux; DISPLAY=None
+cpu count = 16
+
+== host as is (no Tk root possible) ==
+  real app, L1 typed key 'a'            : n=10 median=175.4 ms max=376.7 ms min=149.0 ms
+  real app, L2 ctrl+v (no OS reader)    : n=10 median=173.5 ms max=228.3 ms min=145.5 ms
+  real app, L3 terminal paste           : n=10 median=118.2 ms max=243.7 ms min=96.8 ms
+  one-box app, L1 typed key 'a'         : n=10 median=62.4 ms max=64.4 ms min=61.4 ms
+  one-box app, L2 ctrl+v (no OS reader) : n=10 median=61.7 ms max=62.7 ms min=61.5 ms
+  one-box app, L3 terminal paste        : n=10 median=8.2 ms max=9.8 ms min=7.8 ms
+
+== Tcl stand-in root ==
+  real app, L4 ctrl+v with Tcl stand-in : n=3 median=3178.6 ms max=3195.0 ms min=3176.5 ms
+
+pilot2 done

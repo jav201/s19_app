@@ -1,0 +1,7 @@
+s19_app.__file__ = ~/work/b103-int2a/s19_app/__init__.py | python 3.11.18
+[S1] shared layout: 256 KiB kept in the section's lines by the parser; file 262 KiB, parse 0.01 s; one read 0.015 s; describe of 50 objects sharing it 0.67 s (13 ms per object; first result None); memoised 0.027 s; Inc 2a describe_definitions of the same names 0.002 s
+[S1] shared layout: 256 KiB kept in the section's lines by the parser; file 299 KiB, parse 0.02 s; one read 0.016 s; describe of 400 objects sharing it 5.34 s (13 ms per object; first result None); memoised 0.026 s; Inc 2a describe_definitions of the same names 0.012 s
+[S2] layout: per object per MiB of shared section 0.05 s; a file of a 1 MiB shared layout + 20,000 objects (~3.5 MB) -> about 0.3 h of describe-all (memoised: one read)
+[S1] shared modcommon: 256 KiB kept in the section's lines by the parser; file 262 KiB, parse 0.01 s; one read 0.047 s; describe of 50 objects sharing it 2.29 s (46 ms per object; first result None); memoised 0.044 s; Inc 2a describe_definitions of the same names 0.002 s
+[S1] shared modcommon: 256 KiB kept in the section's lines by the parser; file 299 KiB, parse 0.01 s; one read 0.051 s; describe of 400 objects sharing it 19.13 s (48 ms per object; first result None); memoised 0.044 s; Inc 2a describe_definitions of the same names 0.012 s
+[S2] modcommon: per object per MiB of shared section 0.19 s; a file of a 1 MiB shared modcommon + 20,000 objects (~3.5 MB) -> about 1.1 h of describe-all (memoised: one read)

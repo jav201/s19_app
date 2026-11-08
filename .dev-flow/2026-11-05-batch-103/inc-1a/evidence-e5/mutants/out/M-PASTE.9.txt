@@ -1,0 +1,93 @@
+# M-PASTE.9
+# row: R-PASTE.9
+# s19_app.__file__ = /tmp/b103-e5-1a-mut/work/s19_app/__init__.py
+# note: the write failure warning removed
+# --- git diff ---
+diff --git a/s19_app/tui/os_clipboard_input.py b/s19_app/tui/os_clipboard_input.py
+index ad2f7240..48f943d1 100644
+--- a/s19_app/tui/os_clipboard_input.py
++++ b/s19_app/tui/os_clipboard_input.py
+@@ -736,14 +736,7 @@ async def _mirror_and_write_os_clipboard(app: App, text: str) -> None:
+     written = await loop.run_in_executor(None, write_os_clipboard, text)
+     if written:
+         return
+-    try:
+-        app.notify(
+-            _WRITE_FAIL_NOTIFICATION,
+-            severity="warning",
+-            timeout=6.0,
+-        )
+-    except Exception:  # pragma: no cover — notify is best-effort.
+-        pass
++    pass  # mutant: write-failure warning removed
+     logger.warning(
+         "OS clipboard write failed; retained Textual internal clipboard only"
+     )
+
+# --- pytest (rc=1) ---
+['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:740 OS clipboard write failed; retained Textual internal clipboard only
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:686 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:740 OS clipboard write failed; retained Textual internal clipboard only
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:686 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:740 OS clipboard write failed; retained Textual internal clipboard only
+____________ test_r_paste_9_1_write_failure_warning_on_linux[multi] ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-10028/test_r_paste_9_1_write_failure1')
+kind = 'm'
+
+    @pytest.mark.parametrize("kind", ["a", "m"], ids=["single", "multi"])
+    def test_r_paste_9_1_write_failure_warning_on_linux(tmp_path: Path, kind: str) -> None:
+        """R-PASTE.9/1 (LinuxH): the write failure warning after every copy and cut."""
+        _assert_linuxh_headless()
+    
+        async def _drive() -> list:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(160, 48)) as pilot:
+                await pilot.pause()
+                notices = install_notice_capture(app)
+                for _ in range(2):
+                    if kind == "a":
+                        app.action_show_screen("a2l")
+                        for _ in range(4):
+                            await pilot.pause()
+                        widget = app.query_one("#a2l_tags_filter_input", Input)
+                    else:
+                        app.action_show_screen("patch")
+                        for _ in range(4):
+                            await pilot.pause()
+                        widget = app.query_one("#patch_paste_text", TextArea)
+                    _set_box(widget, "KEEP")
+                    widget.selection = (0, 4) if kind == "a" else ((0, 0), (0, 4))
+                    widget.focus()
+                    await pilot.pause()
+                    await pilot.press("ctrl+c")
+                    await pilot.pause()
+                    await pilot.press("ctrl+x")
+                    await pilot.pause()
+                    await pilot.pause()
+                return notices
+    
+        notices = asyncio.run(_drive())
+        warnings = [n for n in notices if n[0] == "warning"]
+>       assert len(warnings) == 4, notices
+E       AssertionError: []
+E       assert 0 == 4
+E        +  where 0 = len([])
+
+tests/test_b103_clipboard_core.py:951: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:686 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:740 OS clipboard write failed; retained Textual internal clipboard only
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:686 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:740 OS clipboard write failed; retained Textual internal clipboard only
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:686 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:740 OS clipboard write failed; retained Textual internal clipboard only
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:686 write_os_clipboard: every strategy failed (cascade=['win32', 'powershell'])
+WARNING  s19_app.tui.os_clipboard_input:os_clipboard_input.py:740 OS clipboard write failed; retained Textual internal clipboard only
+=========================== short test summary info ============================
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_9_1_write_failure_warning_on_linux[single]
+FAILED tests/test_b103_clipboard_core.py::test_r_paste_9_1_write_failure_warning_on_linux[multi]
+2 failed, 85 deselected in 7.67s
+
+===== stderr =====

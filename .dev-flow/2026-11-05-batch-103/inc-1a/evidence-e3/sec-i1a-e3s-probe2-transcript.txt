@@ -1,0 +1,6 @@
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py textual = 8.2.8
+value repr : 'C:/fw/good.s19\x1b[13D\x1b[0Kevil.s19\x1b]52;c;SElKQUNL\x1b\\X'
+render repr: '/fw/good.s19\x1b[13D\x1b[0Kevil.s19\x1b]52;c;SElKQUNL\x1b\\X\x1b[0m\x1b[30;107m \x1b[0m\x1b[97;40m           '
+ST-terminated OSC 52 intact in render: True
+CSI cursor-left 13 intact in render: True
+exit=0

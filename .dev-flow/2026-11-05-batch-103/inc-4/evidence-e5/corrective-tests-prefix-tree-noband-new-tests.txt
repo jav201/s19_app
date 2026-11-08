@@ -1,0 +1,106 @@
+/tmp/b103-e5c-4-tests/tree-noband/s19_app/__init__.py
+7086506fc52be0dff11adbe42aac2bcac575c86d09abd7f2dac1325fa8f0d47f  s19_app/tui/services/label_match.py
+CMD: pytest -q tests/test_b103_label_match_perf.py::test_r_a2l_match_40_3_crafted_stress_list tests/test_b103_label_match_perf.py::test_r_a2l_match_40_4_prefix_distance_band_after_the_switch
+host load: 3.60 4.11 2.66 3/642 220289
+host load before: 3.56 4.09 2.66
+host load after: 2.30 3.37 2.61
+    1103.60 ms   -10.4 % margin  R-A2L-MATCH.40/3 CRAFT 4 tokens
+   17579.29 ms  -1657.9 % margin  R-A2L-MATCH.40/3 CRAFT 51 tokens
+Fhost load before: 2.25 3.33 2.60
+host load after: 3.03 3.32 2.66
+   11560.19 ms  -1056.0 % margin  R-A2L-MATCH.40/4 BAND head + 249-character token
+F
+=================================== FAILURES ===================================
+__________________ test_r_a2l_match_40_3_crafted_stress_list ___________________
+
+craft_index = <s19_app.tui.services.label_match.LabelIndex object at 0x7f5ea4d6fac0>
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_match_40_3_crafted_stress_list(craft_index):
+        """R-A2L-MATCH.40/3: the 4-token and the 51-token CRAFT queries (300 names of 1,024 characters, 268 tokens
+        each, every query token matching within its allowed edits) over the prepared list CRAFT, limit 20, median of 7
+        <= 1.0 s; the list holds 20 entries, each fuzzy (the 51-token list: 50 edits each)."""
+        print(_load("before"))
+        medians = []
+        for n_tokens in (4, 51):
+            query = craft_query(n_tokens)
+            assert len(query) <= 256 and len(query.split()) == n_tokens
+            got = rank(query, craft_index, 20)
+            assert len(got) == 20
+            assert {m.rule.value for m in got} == {"fuzzy"}
+            assert {m.edits for m in got} == {n_tokens - 1}  # one edit per hit-and-q token, none for the head
+            medians.append((f"R-A2L-MATCH.40/3 CRAFT {n_tokens} tokens", _median_of(7, lambda q=query: rank(q, craft_index, 20))))
+        print(_load("after"))
+>       _check_all(medians, ANY_QUERY_BOUND_S)
+
+tests/test_b103_label_match_perf.py:406: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+medians = [('R-A2L-MATCH.40/3 CRAFT 4 tokens', 1.103602190996753), ('R-A2L-MATCH.40/3 CRAFT 51 tokens', 17.579291047994047)]
+bound_s = 1.0
+
+    def _check_all(medians, bound_s):
+        """Print EVERY margin line (no truncation, whatever the reporter or a ``tail`` keeps), then assert each
+        median against ``report_margin(..., timing_bound(bound_s))``; the failure names its label."""
+        bound = timing_bound(bound_s)
+        for label_, median in medians:
+            print(f"  {median * 1000:9.2f} ms  {(bound - median) / bound * 100:6.1f} % margin  {label_}")
+        for label_, median in medians:
+>           assert median <= report_margin(label_, median, bound), f"{label_}: median {median:.4f} s"
+E           AssertionError: R-A2L-MATCH.40/3 CRAFT 4 tokens: median 1.1036 s
+E           assert 1.103602190996753 <= 1.0
+E            +  where 1.0 = report_margin('R-A2L-MATCH.40/3 CRAFT 4 tokens', 1.103602190996753, 1.0)
+
+tests/test_b103_label_match_perf.py:230: AssertionError
+_________ test_r_a2l_match_40_4_prefix_distance_band_after_the_switch __________
+
+band_index = <s19_app.tui.services.label_match.LabelIndex object at 0x7f5ea4270bc0>
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_match_40_4_prefix_distance_band_after_the_switch(band_index):
+        """R-A2L-MATCH.40/4: a two-token query whose first token (``987654``, 0 edits) leaves 225 candidates holding
+        450 token occurrences (<= 512: the posting switch) and whose second token (248 ``a`` and a ``b``) is then
+        scored against each 1,002-character candidate token by ``_prefix_distance``; ranked 7 times, limit 20,
+        median <= 1.0 s. Without the band the 225 alignments cost about 249 x 250 cells each (seconds)."""
+        query = BAND_HEAD + " " + "a" * 248 + "b"
+        assert len(query) == 256
+        got = rank(query, band_index, 20)
+        expected = set(band_names())
+        assert len(got) == 20
+        assert {m.name in expected for m in got} == {True}
+        assert {m.rule.value for m in got} == {"fuzzy"}
+        assert {m.edits for m in got} == {1}  # the final 'b' replaces one 'a' of the name's token
+        print(_load("before"))
+        medians = [("R-A2L-MATCH.40/4 BAND head + 249-character token", _median_of(7, lambda: rank(query, band_index, 20)))]
+        print(_load("after"))
+>       _check_all(medians, ANY_QUERY_BOUND_S)
+
+tests/test_b103_label_match_perf.py:442: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+medians = [('R-A2L-MATCH.40/4 BAND head + 249-character token', 11.560187562005012)]
+bound_s = 1.0
+
+    def _check_all(medians, bound_s):
+        """Print EVERY margin line (no truncation, whatever the reporter or a ``tail`` keeps), then assert each
+        median against ``report_margin(..., timing_bound(bound_s))``; the failure names its label."""
+        bound = timing_bound(bound_s)
+        for label_, median in medians:
+            print(f"  {median * 1000:9.2f} ms  {(bound - median) / bound * 100:6.1f} % margin  {label_}")
+        for label_, median in medians:
+>           assert median <= report_margin(label_, median, bound), f"{label_}: median {median:.4f} s"
+E           AssertionError: R-A2L-MATCH.40/4 BAND head + 249-character token: median 11.5602 s
+E           assert 11.560187562005012 <= 1.0
+E            +  where 1.0 = report_margin('R-A2L-MATCH.40/4 BAND head + 249-character token', 11.560187562005012, 1.0)
+
+tests/test_b103_label_match_perf.py:230: AssertionError
+============================= QC-TM timing margins =============================
+LOW -1056.0%  11.560 s / 1.000 s  R-A2L-MATCH.40/4 BAND head + 249-character token  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_4_prefix_distance_band_after_the_switch
+LOW -10.4%  1.104 s / 1.000 s  R-A2L-MATCH.40/3 CRAFT 4 tokens  tests/test_b103_label_match_perf.py::test_r_a2l_match_40_3_crafted_stress_list
+QC-TM: 2 bounds, 2 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match_perf.py::test_r_a2l_match_40_3_crafted_stress_list
+FAILED tests/test_b103_label_match_perf.py::test_r_a2l_match_40_4_prefix_distance_band_after_the_switch
+2 failed in 248.75s (0:04:08)
+pytest exit 1
+host load: 3.03 3.32 2.66 3/611 221636

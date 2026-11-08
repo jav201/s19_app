@@ -1,0 +1,15 @@
+s19_app.__file__ = /tmp/b103-e5g-2a/tree/s19_app/__init__.py | python 3.11.18
+[gc vtab 256 KiB, collector on] 400 names 0.1192 s (in collections 0.0033 s, gen0/1/2 [25, 2, 0]); first name 0.0900 s (in collections 0.0026 s, [24, 2, 0]); beyond 0.0293 s; beyond less collections 0.0285 s
+[gc vtab 256 KiB, collector paused] 400 names 0.1097 s (in collections 0.0000 s, gen0/1/2 [0, 0, 0]); first name 0.1023 s (in collections 0.0000 s, [0, 0, 0]); beyond 0.0074 s; beyond less collections 0.0074 s
+[gc vtab 512 KiB, collector on] 400 names 0.2438 s (in collections 0.0119 s, gen0/1/2 [47, 4, 0]); first name 0.2088 s (in collections 0.0090 s, [45, 4, 0]); beyond 0.0350 s; beyond less collections 0.0322 s
+[gc vtab 512 KiB, collector paused] 400 names 0.2096 s (in collections 0.0000 s, gen0/1/2 [0, 0, 0]); first name 0.1786 s (in collections 0.0000 s, [0, 0, 0]); beyond 0.0310 s; beyond less collections 0.0310 s
+[gc vtab] collector on: beyond 0.0293 -> 0.0350 s, x1.20; total 256 KiB 0.119 s
+[gc vtab] collector paused: beyond 0.0074 -> 0.0310 s, x4.19; total 256 KiB 0.110 s
+[gc method 256 KiB, collector on] 400 names 0.1043 s (in collections 0.0002 s, gen0/1/2 [2, 0, 0]); first name 0.0690 s (in collections 0.0000 s, [1, 0, 0]); beyond 0.0353 s; beyond less collections 0.0352 s
+[gc method 256 KiB, collector paused] 400 names 0.1017 s (in collections 0.0000 s, gen0/1/2 [0, 0, 0]); first name 0.0702 s (in collections 0.0000 s, [0, 0, 0]); beyond 0.0315 s; beyond less collections 0.0315 s
+[gc method 512 KiB, collector on] 400 names 0.1703 s (in collections 0.0002 s, gen0/1/2 [2, 0, 0]); first name 0.1552 s (in collections 0.0000 s, [1, 0, 0]); beyond 0.0150 s; beyond less collections 0.0148 s
+[gc method 512 KiB, collector paused] 400 names 0.1144 s (in collections 0.0000 s, gen0/1/2 [0, 0, 0]); first name 0.1561 s (in collections 0.0000 s, [0, 0, 0]); beyond -0.0417 s; beyond less collections -0.0417 s
+[gc method] collector on: beyond 0.0353 -> 0.0150 s, x0.42; total 256 KiB 0.104 s
+[gc method] collector paused: beyond 0.0315 -> -0.0417 s, x-1.32; total 256 KiB 0.102 s
+[gc range 256 KiB, collector on] 400 names 0.1106 s (in collections 0.0060 s, gen0/1/2 [19, 1, 0]); first name 0.1081 s (in collections 0.0038 s, [18, 1, 0]); beyond 0.0025 s; beyond less collections 0.0003 s
+[gc range 256 KiB, collector paused] 400 names 0.1214 s (in collections 0.0000 s, gen0/1/2 [0, 0, 0]); first name 0.1019 s (in collections 0.0000 s, [0, 0, 0]); beyond 0.0196 s; beyond less collections 0.0196 s

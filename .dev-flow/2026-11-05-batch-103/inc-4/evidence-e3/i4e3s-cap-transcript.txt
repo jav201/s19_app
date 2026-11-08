@@ -1,0 +1,32 @@
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+python = 3.11.18  PYTHONHASHSEED = None
+host = <runner>  load = (5.58642578125, 3.533203125, 2.02197265625)  cpus = 16  RLIMIT_AS = 8 GiB
+HOME = /tmp/b103-e3-4-security/home  LOCALAPPDATA = /tmp/b103-e3-4-security/home/<localappdata>  PILOT_DIR = /tmp/b103-e3-4-security/pilot
+  -- cap 64 characters
+     'e ' repeated                                chars=64   tokens=32   median     37.4 ms [ok] results=20
+     'a b c ... z ' repeated                      chars=64   tokens=32   median     38.3 ms [ok] results=0
+     '0 ' repeated                                chars=64   tokens=32   median     16.5 ms [ok] results=20
+     'a' repeated                                 chars=64   tokens=1    median     60.8 ms [ok] results=0
+     real names joined by ','                     chars=64   tokens=18   median    126.1 ms [ok] results=4
+     real names joined by ',' (other draw)        chars=64   tokens=13   median    133.0 ms [ok] results=0
+     longest REF name (27 tokens)                 chars=64   tokens=19   median     86.3 ms [ok] results=4
+     the same name with a transposition           chars=64   tokens=19   median    105.4 ms [ok] results=4
+  -- cap 128 characters
+     'e ' repeated                                chars=128  tokens=64   median     66.0 ms [ok] results=20
+     'a b c ... z ' repeated                      chars=128  tokens=64   median     53.3 ms [ok] results=0
+     '0 ' repeated                                chars=128  tokens=64   median     28.4 ms [ok] results=20
+     'a' repeated                                 chars=128  tokens=1    median     63.7 ms [ok] results=0
+     real names joined by ','                     chars=128  tokens=33   median    205.8 ms [ok] results=0
+     real names joined by ',' (other draw)        chars=128  tokens=26   median    292.8 ms [ok] results=0
+     longest REF name (27 tokens)                 chars=103  tokens=27   median    197.0 ms [ok] results=1
+     the same name with a transposition           chars=103  tokens=27   median    212.7 ms [ok] results=1
+  -- cap 256 characters
+     'e ' repeated                                chars=256  tokens=128  median    133.6 ms [ok] results=20
+     'a b c ... z ' repeated                      chars=256  tokens=128  median     84.4 ms [ok] results=0
+     '0 ' repeated                                chars=256  tokens=128  median     53.0 ms [ok] results=20
+     'a' repeated                                 chars=256  tokens=1    median     72.3 ms [ok] results=0
+     real names joined by ','                     chars=256  tokens=61   median    522.8 ms [ok] results=0
+     real names joined by ',' (other draw)        chars=256  tokens=51   median    671.7 ms [ok] results=0
+     longest REF name (27 tokens)                 chars=103  tokens=27   median    194.3 ms [ok] results=1
+     the same name with a transposition           chars=103  tokens=27   median    208.6 ms [ok] results=1
+load after = (6.06396484375, 3.84912109375, 2.17626953125)

@@ -1,0 +1,806 @@
+===== mutant M-149 (2026-11-07T13:40:46Z) =====
+--- unified diff ---
+diff --git a/s19_app/tui/a2l_definition.py b/s19_app/tui/a2l_definition.py
+index 7b4d1416..ce616617 100644
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -400,7 +400,7 @@ def describe_definitions(names: Iterable[str], a2l_data: dict) -> dict[str, Defi
+             compu_methods_by_name,
+             compu_tables_by_name,
+             a2l_data,
+-            reads,
++            {},
+         )
+     return result
+ 
+--- pytest ---
+s19_app.__file__ = /tmp/b103-e5-2-mutB/M-M-149/s19_app/__init__.py
+FFFFFFFFFFFFFF                                                           [100%]
+=================================== FAILURES ===================================
+______________ test_r_a2l_def_149_5_cached_read_form_is_immutable ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_5_cached_re0')
+
+    def test_r_a2l_def_149_5_cached_read_form_is_immutable(tmp_path):
+        """R-A2L-DEF.149/5 (E5 gap pass 2) - every stored form is immutable, the enum / table forms and their indexes included.
+    
+        Eight objects share four methods and three tables.  Writes into the method record, the enum forms, the table form,
+        their tuples and index and a Definition all raise; the objects described together equal those described alone, in
+        either order; each decodes as it decodes alone; the two objects of a table hold the same form object.
+        """
+        names = ["OBJ_A", "OBJ_B", "LIN_A", "LIN_B", "TAB_A", "TAB_B", "RNG_A", "RNG_B"]
+        a2l = _inline(
+            tmp_path,
+            *_enum_blocks("CM_E", "VT_E", "2", '0 "off"', '1 "on"', default="none"),
+            _cm("CM_R", "TAB_VERB", fmt='"%.0"', ref="VR_E"),
+            _vrange("VR_E", "2", '0 1 "lo"', '2 3 "hi"'),
+            _cm("CM_LIN", "LINEAR", "0.5", "2"),
+            _cm("CM_T", "TAB_NOINTP", fmt='"%.0"', ref="CT_T"),
+            _ctab("CT_T", "TAB_NOINTP", "0 10", "1 20"),
+            _val("OBJ_A", "0x2000", LAYOUT["UBYTE"], "CM_E", "0", "1"),
+            _val("OBJ_B", "0x2001", LAYOUT["UBYTE"], "CM_E", "0", "1"),
+            _val("LIN_A", "0x2002", LAYOUT["UBYTE"], "CM_LIN", "0", "255"),
+            _val("LIN_B", "0x2003", LAYOUT["UBYTE"], "CM_LIN", "0", "255"),
+            _val("RNG_A", "0x2004", LAYOUT["UBYTE"], "CM_R", "0", "3"),
+            _val("RNG_B", "0x2005", LAYOUT["UBYTE"], "CM_R", "0", "3"),
+            _val("TAB_A", "0x2006", LAYOUT["UBYTE"], "CM_T", "0", "255"),
+            _val("TAB_B", "0x2007", LAYOUT["UBYTE"], "CM_T", "0", "255"),
+        )
+        image = {0x2000 + i: 1 for i in range(8)}
+        expect = {"OBJ": "on", "RNG": "lo", "LIN": "2.500", "TAB": "20"}
+    
+        fresh = {n: describe_definition(n, a2l) for n in names}
+        for order in (names, list(reversed(names))):
+            together = describe_definitions(order, a2l)
+            assert {n: together[n] for n in names} == fresh
+        together = describe_definitions(names, a2l)
+        assert describe_definitions(names, a2l) == together                        # a second walk
+        for n in names:                                                            # decodes as it decodes alone
+            assert decode_definition(together[n], a2l, image) == decode_definition(fresh[n], a2l, image)
+            assert _decoded(together[n], a2l, image).text == expect[n[:3]], n
+    
+        # the two objects of a table hold the same form
+        for a, b in (("OBJ_A", "OBJ_B"), ("RNG_A", "RNG_B"), ("TAB_A", "TAB_B")):
+>           assert together[a]._table_form is not None and together[a]._table_form is together[b]._table_form
+E           AssertionError: assert (_EnumForm(section_kind='COMPU_VTAB', entries=(EnumEntry(raw=0.0, raw_max=None, text='off'), EnumEntry(raw=1.0, raw_max..., texts=('off', 'on'), default_display='none', first_of=mappingproxy({0.0: 0, 1.0: 1}), ends=(), at_end=(), between=()) is not None and _EnumForm(section_kind='COMPU_VTAB', entries=(EnumEntry(raw=0.0, raw_max=None, text='off'), EnumEntry(raw=1.0, raw_max..., texts=('off', 'on'), default_display='none', first_of=mappingproxy({0.0: 0, 1.0: 1}), ends=(), at_end=(), between=()) is _EnumForm(section_kind='COMPU_VTAB', entries=(EnumEntry(raw=0.0, raw_max=None, text='off'), EnumEntry(raw=1.0, raw_max..., texts=('off', 'on'), default_display='none', first_of=mappingproxy({0.0: 0, 1.0: 1}), ends=(), at_end=(), between=()))
+E            +  where _EnumForm(section_kind='COMPU_VTAB', entries=(EnumEntry(raw=0.0, raw_max=None, text='off'), EnumEntry(raw=1.0, raw_max..., texts=('off', 'on'), default_display='none', first_of=mappingproxy({0.0: 0, 1.0: 1}), ends=(), at_end=(), between=()) = Definition(name='OBJ_A', section='CHARACTERISTIC', char_type='VALUE', kind='enum', address=8192, byte_length=1, dataty...0, raw_max=None, text='on')), default_text='none', coeffs_linear=None, coeffs=None, compu_tab_ref='VT_E', refusal=None)._table_form
+E            +  and   _EnumForm(section_kind='COMPU_VTAB', entries=(EnumEntry(raw=0.0, raw_max=None, text='off'), EnumEntry(raw=1.0, raw_max..., texts=('off', 'on'), default_display='none', first_of=mappingproxy({0.0: 0, 1.0: 1}), ends=(), at_end=(), between=()) = Definition(name='OBJ_A', section='CHARACTERISTIC', char_type='VALUE', kind='enum', address=8192, byte_length=1, dataty...0, raw_max=None, text='on')), default_text='none', coeffs_linear=None, coeffs=None, compu_tab_ref='VT_E', refusal=None)._table_form
+E            +  and   _EnumForm(section_kind='COMPU_VTAB', entries=(EnumEntry(raw=0.0, raw_max=None, text='off'), EnumEntry(raw=1.0, raw_max..., texts=('off', 'on'), default_display='none', first_of=mappingproxy({0.0: 0, 1.0: 1}), ends=(), at_end=(), between=()) = Definition(name='OBJ_B', section='CHARACTERISTIC', char_type='VALUE', kind='enum', address=8193, byte_length=1, dataty...0, raw_max=None, text='on')), default_text='none', coeffs_linear=None, coeffs=None, compu_tab_ref='VT_E', refusal=None)._table_form
+
+tests/test_b103_a2l_definition.py:1791: AssertionError
+_______ test_r_a2l_def_149_1_shared_method_size_costs_nothing_per_object _______
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_1_shared_me0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_149_1_shared_method_size_costs_nothing_per_object(tmp_path):
+        """R-A2L-DEF.149/1 - 400 objects naming one COMPU_METHOD of 256 KiB: within 0.5 s (least of 7)."""
+>       _absolute(tmp_path, "method", "/1 COMPU_METHOD")
+
+tests/test_b103_a2l_definition_perf.py:247: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_1_shared_me0')
+case = 'method', label = '/1 COMPU_METHOD'
+
+    def _absolute(tmp_path: Path, case: str, label: str) -> None:
+        a2l, names = _load(tmp_path, case, SIZE_S_KIB)
+        runs, result = [], {}
+        for _ in range(LEAST_OF):
+            seconds, result = _timed(lambda: describe_definitions(names, a2l))
+            runs.append(seconds)
+            if seconds > HOPELESS_S:
+                break
+        least = min(runs)
+>       assert least <= report_margin(f"R-A2L-DEF.149 {label} 400 names at 256 KiB", least,
+                                      timing_bound(ABS_BOUND_S)), runs
+E       AssertionError: [29.609764074004488]
+E       assert 29.609764074004488 <= 0.5
+E        +  where 0.5 = report_margin('R-A2L-DEF.149 /1 COMPU_METHOD 400 names at 256 KiB', 29.609764074004488, 0.5)
+E        +    where 0.5 = timing_bound(0.5)
+
+tests/test_b103_a2l_definition_perf.py:210: AssertionError
+_____ test_r_a2l_def_149_2_shared_enum_table_size_costs_nothing_per_object _____
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_2_shared_en0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_149_2_shared_enum_table_size_costs_nothing_per_object(tmp_path):
+        """R-A2L-DEF.149/2 - 400 objects sharing one COMPU_VTAB of 256 KiB: within 0.5 s; one shared enum tuple."""
+>       _absolute(tmp_path, "vtab", "/2 COMPU_VTAB")
+
+tests/test_b103_a2l_definition_perf.py:253: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_2_shared_en0')
+case = 'vtab', label = '/2 COMPU_VTAB'
+
+    def _absolute(tmp_path: Path, case: str, label: str) -> None:
+        a2l, names = _load(tmp_path, case, SIZE_S_KIB)
+        runs, result = [], {}
+        for _ in range(LEAST_OF):
+            seconds, result = _timed(lambda: describe_definitions(names, a2l))
+            runs.append(seconds)
+            if seconds > HOPELESS_S:
+                break
+        least = min(runs)
+>       assert least <= report_margin(f"R-A2L-DEF.149 {label} 400 names at 256 KiB", least,
+                                      timing_bound(ABS_BOUND_S)), runs
+E       AssertionError: [53.133300246001454]
+E       assert 53.133300246001454 <= 0.5
+E        +  where 0.5 = report_margin('R-A2L-DEF.149 /2 COMPU_VTAB 400 names at 256 KiB', 53.133300246001454, 0.5)
+E        +    where 0.5 = timing_bound(0.5)
+
+tests/test_b103_a2l_definition_perf.py:210: AssertionError
+____ test_r_a2l_def_149_3_shared_range_table_size_costs_nothing_per_object _____
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_3_shared_ra0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_149_3_shared_range_table_size_costs_nothing_per_object(tmp_path):
+        """R-A2L-DEF.149/3 - 400 objects sharing one COMPU_VTAB_RANGE of 256 KiB: within 0.5 s; one shared enum tuple."""
+>       _absolute(tmp_path, "range", "/3 COMPU_VTAB_RANGE")
+
+tests/test_b103_a2l_definition_perf.py:259: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_3_shared_ra0')
+case = 'range', label = '/3 COMPU_VTAB_RANGE'
+
+    def _absolute(tmp_path: Path, case: str, label: str) -> None:
+        a2l, names = _load(tmp_path, case, SIZE_S_KIB)
+        runs, result = [], {}
+        for _ in range(LEAST_OF):
+            seconds, result = _timed(lambda: describe_definitions(names, a2l))
+            runs.append(seconds)
+            if seconds > HOPELESS_S:
+                break
+        least = min(runs)
+>       assert least <= report_margin(f"R-A2L-DEF.149 {label} 400 names at 256 KiB", least,
+                                      timing_bound(ABS_BOUND_S)), runs
+E       AssertionError: [51.83521183801349]
+E       assert 51.83521183801349 <= 0.5
+E        +  where 0.5 = report_margin('R-A2L-DEF.149 /3 COMPU_VTAB_RANGE 400 names at 256 KiB', 51.83521183801349, 0.5)
+E        +    where 0.5 = timing_bound(0.5)
+
+tests/test_b103_a2l_definition_perf.py:210: AssertionError
+____ test_r_a2l_def_149_4_shared_layout_first_line_costs_nothing_per_object ____
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_4_shared_la0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_149_4_shared_layout_first_line_costs_nothing_per_object(tmp_path):
+        """R-A2L-DEF.149/4 - 400 VALUEs sharing one RECORD_LAYOUT of 256 KiB: within 0.5 s."""
+>       _absolute(tmp_path, "layout", "/4 RECORD_LAYOUT")
+
+tests/test_b103_a2l_definition_perf.py:265: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_4_shared_la0')
+case = 'layout', label = '/4 RECORD_LAYOUT'
+
+    def _absolute(tmp_path: Path, case: str, label: str) -> None:
+        a2l, names = _load(tmp_path, case, SIZE_S_KIB)
+        runs, result = [], {}
+        for _ in range(LEAST_OF):
+            seconds, result = _timed(lambda: describe_definitions(names, a2l))
+            runs.append(seconds)
+            if seconds > HOPELESS_S:
+                break
+        least = min(runs)
+>       assert least <= report_margin(f"R-A2L-DEF.149 {label} 400 names at 256 KiB", least,
+                                      timing_bound(ABS_BOUND_S)), runs
+E       AssertionError: [4.103402848995756, 4.486838940996677, 3.902155244984897, 4.466102917009266, 6.011977023998043, 2.8028267540212255, ...]
+E       assert 2.8028267540212255 <= 0.5
+E        +  where 0.5 = report_margin('R-A2L-DEF.149 /4 RECORD_LAYOUT 400 names at 256 KiB', 2.8028267540212255, 0.5)
+E        +    where 0.5 = timing_bound(0.5)
+
+tests/test_b103_a2l_definition_perf.py:210: AssertionError
+_____________________ test_r_a2l_def_149_1_scaling_method ______________________
+
+fn = <function _scaling.<locals>.<lambda> at 0x7f3fd38fae80>
+clock = <built-in function process_time>
+
+    def _timed(fn, clock=time.perf_counter):
+        """Seconds ``fn()`` takes and its result; a call past 60 s is a timeout and fails the test."""
+        if not hasattr(signal, "SIGALRM"):          # non-POSIX: no cap, the bound assertion still applies
+            started = clock()
+            result = fn()
+            return clock() - started, result
+    
+        def _raise(*_):
+            raise _Timeout()
+    
+        old = signal.signal(signal.SIGALRM, _raise)
+        signal.setitimer(signal.ITIMER_REAL, CALL_TIMEOUT_S)
+        gc.collect()
+        gc.disable()          # a full collection over a 2 MiB table's objects is not the code under test
+        try:
+            started = clock()
+>           result = fn()
+                     ^^^^
+
+tests/test_b103_a2l_definition_perf.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_definition_perf.py:226: in <lambda>
+    t_outer, (interval, results[kib]) = _timed(lambda: _steady_describe(names, a2l), time.process_time)
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_perf.py:126: in _steady_describe
+    result = describe_definitions(gen(), a2l)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/a2l_definition.py:396: in describe_definitions
+    result[name] = _describe_one(
+s19_app/tui/a2l_definition.py:497: in _describe_one
+    record = _read_method_record(
+s19_app/tui/a2l_definition.py:836: in _read_method_record
+    tokens = _flatten_body_tokens(
+s19_app/tui/a2l.py:456: in _flatten_body_tokens
+    return _split_line_respecting_quotes(_strip_a2l_comments(body))
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/a2l.py:393: in _strip_a2l_comments
+    while i < n:
+          ^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+_ = (14, <frame at 0x7f3fd2a4a9b0, file '/tmp/b103-e5-2-mutB/M-M-149/s19_app/tui/a2l.py', line 393, code _strip_a2l_comments>)
+
+    def _raise(*_):
+>       raise _Timeout()
+E       tests.test_b103_a2l_definition_perf._Timeout
+
+tests/test_b103_a2l_definition_perf.py:90: _Timeout
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_1_scaling_m0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_149_1_scaling_method(tmp_path):
+        """R-A2L-DEF.149/1 scaling - per-object part at 512 KiB at most 1.3x and at 2048 KiB at most 2.0x that at 256 KiB (E3S3-24 measure)."""
+>       _scaling(tmp_path, "method", "/1 COMPU_METHOD")
+
+tests/test_b103_a2l_definition_perf.py:271: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_definition_perf.py:226: in _scaling
+    t_outer, (interval, results[kib]) = _timed(lambda: _steady_describe(names, a2l), time.process_time)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+fn = <function _scaling.<locals>.<lambda> at 0x7f3fd38fae80>
+clock = <built-in function process_time>
+
+    def _timed(fn, clock=time.perf_counter):
+        """Seconds ``fn()`` takes and its result; a call past 60 s is a timeout and fails the test."""
+        if not hasattr(signal, "SIGALRM"):          # non-POSIX: no cap, the bound assertion still applies
+            started = clock()
+            result = fn()
+            return clock() - started, result
+    
+        def _raise(*_):
+            raise _Timeout()
+    
+        old = signal.signal(signal.SIGALRM, _raise)
+        signal.setitimer(signal.ITIMER_REAL, CALL_TIMEOUT_S)
+        gc.collect()
+        gc.disable()          # a full collection over a 2 MiB table's objects is not the code under test
+        try:
+            started = clock()
+            result = fn()
+            return clock() - started, result
+        except _Timeout:
+>           pytest.fail(f"R-A2L-DEF.149: a describe call timed out at {CALL_TIMEOUT_S:.0f} s "
+                        "(the shared section is read per object)")
+E           Failed: R-A2L-DEF.149: a describe call timed out at 60 s (the shared section is read per object)
+
+tests/test_b103_a2l_definition_perf.py:101: Failed
+___________________ test_r_a2l_def_149_2_scaling_enum_table ____________________
+
+fn = <function _scaling.<locals>.<lambda> at 0x7f3f6fc432e0>
+clock = <built-in function process_time>
+
+    def _timed(fn, clock=time.perf_counter):
+        """Seconds ``fn()`` takes and its result; a call past 60 s is a timeout and fails the test."""
+        if not hasattr(signal, "SIGALRM"):          # non-POSIX: no cap, the bound assertion still applies
+            started = clock()
+            result = fn()
+            return clock() - started, result
+    
+        def _raise(*_):
+            raise _Timeout()
+    
+        old = signal.signal(signal.SIGALRM, _raise)
+        signal.setitimer(signal.ITIMER_REAL, CALL_TIMEOUT_S)
+        gc.collect()
+        gc.disable()          # a full collection over a 2 MiB table's objects is not the code under test
+        try:
+            started = clock()
+>           result = fn()
+                     ^^^^
+
+tests/test_b103_a2l_definition_perf.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_definition_perf.py:226: in <lambda>
+    t_outer, (interval, results[kib]) = _timed(lambda: _steady_describe(names, a2l), time.process_time)
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_perf.py:126: in _steady_describe
+    result = describe_definitions(gen(), a2l)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/a2l_definition.py:396: in describe_definitions
+    result[name] = _describe_one(
+s19_app/tui/a2l_definition.py:497: in _describe_one
+    record = _read_method_record(
+s19_app/tui/a2l_definition.py:873: in _read_method_record
+    table_form = _read_enum_table(compu_tab_ref, compu_tables_by_name, reads)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/a2l_definition.py:1034: in _read_enum_table
+    entries.append(EnumEntry(raw, None, text))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+<string>:4: in __init__
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+_ = (14, <frame at 0x7f3fd3ac5380, file '<string>', line 4, code __init__>)
+
+    def _raise(*_):
+>       raise _Timeout()
+E       tests.test_b103_a2l_definition_perf._Timeout
+
+tests/test_b103_a2l_definition_perf.py:90: _Timeout
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_2_scaling_e0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_149_2_scaling_enum_table(tmp_path):
+        """R-A2L-DEF.149/2 scaling - as /1 for a COMPU_VTAB."""
+>       _scaling(tmp_path, "vtab", "/2 COMPU_VTAB")
+
+tests/test_b103_a2l_definition_perf.py:277: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_definition_perf.py:226: in _scaling
+    t_outer, (interval, results[kib]) = _timed(lambda: _steady_describe(names, a2l), time.process_time)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+fn = <function _scaling.<locals>.<lambda> at 0x7f3f6fc432e0>
+clock = <built-in function process_time>
+
+    def _timed(fn, clock=time.perf_counter):
+        """Seconds ``fn()`` takes and its result; a call past 60 s is a timeout and fails the test."""
+        if not hasattr(signal, "SIGALRM"):          # non-POSIX: no cap, the bound assertion still applies
+            started = clock()
+            result = fn()
+            return clock() - started, result
+    
+        def _raise(*_):
+            raise _Timeout()
+    
+        old = signal.signal(signal.SIGALRM, _raise)
+        signal.setitimer(signal.ITIMER_REAL, CALL_TIMEOUT_S)
+        gc.collect()
+        gc.disable()          # a full collection over a 2 MiB table's objects is not the code under test
+        try:
+            started = clock()
+            result = fn()
+            return clock() - started, result
+        except _Timeout:
+>           pytest.fail(f"R-A2L-DEF.149: a describe call timed out at {CALL_TIMEOUT_S:.0f} s "
+                        "(the shared section is read per object)")
+E           Failed: R-A2L-DEF.149: a describe call timed out at 60 s (the shared section is read per object)
+
+tests/test_b103_a2l_definition_perf.py:101: Failed
+___________________ test_r_a2l_def_149_3_scaling_range_table ___________________
+
+fn = <function _scaling.<locals>.<lambda> at 0x7f3fd38fae80>
+clock = <built-in function process_time>
+
+    def _timed(fn, clock=time.perf_counter):
+        """Seconds ``fn()`` takes and its result; a call past 60 s is a timeout and fails the test."""
+        if not hasattr(signal, "SIGALRM"):          # non-POSIX: no cap, the bound assertion still applies
+            started = clock()
+            result = fn()
+            return clock() - started, result
+    
+        def _raise(*_):
+            raise _Timeout()
+    
+        old = signal.signal(signal.SIGALRM, _raise)
+        signal.setitimer(signal.ITIMER_REAL, CALL_TIMEOUT_S)
+        gc.collect()
+        gc.disable()          # a full collection over a 2 MiB table's objects is not the code under test
+        try:
+            started = clock()
+>           result = fn()
+                     ^^^^
+
+tests/test_b103_a2l_definition_perf.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_definition_perf.py:226: in <lambda>
+    t_outer, (interval, results[kib]) = _timed(lambda: _steady_describe(names, a2l), time.process_time)
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_a2l_definition_perf.py:126: in _steady_describe
+    result = describe_definitions(gen(), a2l)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/a2l_definition.py:396: in describe_definitions
+    result[name] = _describe_one(
+s19_app/tui/a2l_definition.py:497: in _describe_one
+    record = _read_method_record(
+s19_app/tui/a2l_definition.py:873: in _read_method_record
+    table_form = _read_enum_table(compu_tab_ref, compu_tables_by_name, reads)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/a2l_definition.py:1005: in _read_enum_table
+    tokens = _flatten_body_tokens(
+s19_app/tui/a2l.py:456: in _flatten_body_tokens
+    return _split_line_respecting_quotes(_strip_a2l_comments(body))
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/a2l.py:400: in _strip_a2l_comments
+    continue
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+_ = (14, <frame at 0x7f3fd2f88380, file '/tmp/b103-e5-2-mutB/M-M-149/s19_app/tui/a2l.py', line 400, code _strip_a2l_comments>)
+
+    def _raise(*_):
+>       raise _Timeout()
+E       tests.test_b103_a2l_definition_perf._Timeout
+
+tests/test_b103_a2l_definition_perf.py:90: _Timeout
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_3_scaling_r0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_149_3_scaling_range_table(tmp_path):
+        """R-A2L-DEF.149/3 scaling - as /1 for a COMPU_VTAB_RANGE."""
+>       _scaling(tmp_path, "range", "/3 COMPU_VTAB_RANGE")
+
+tests/test_b103_a2l_definition_perf.py:283: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_definition_perf.py:226: in _scaling
+    t_outer, (interval, results[kib]) = _timed(lambda: _steady_describe(names, a2l), time.process_time)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+fn = <function _scaling.<locals>.<lambda> at 0x7f3fd38fae80>
+clock = <built-in function process_time>
+
+    def _timed(fn, clock=time.perf_counter):
+        """Seconds ``fn()`` takes and its result; a call past 60 s is a timeout and fails the test."""
+        if not hasattr(signal, "SIGALRM"):          # non-POSIX: no cap, the bound assertion still applies
+            started = clock()
+            result = fn()
+            return clock() - started, result
+    
+        def _raise(*_):
+            raise _Timeout()
+    
+        old = signal.signal(signal.SIGALRM, _raise)
+        signal.setitimer(signal.ITIMER_REAL, CALL_TIMEOUT_S)
+        gc.collect()
+        gc.disable()          # a full collection over a 2 MiB table's objects is not the code under test
+        try:
+            started = clock()
+            result = fn()
+            return clock() - started, result
+        except _Timeout:
+>           pytest.fail(f"R-A2L-DEF.149: a describe call timed out at {CALL_TIMEOUT_S:.0f} s "
+                        "(the shared section is read per object)")
+E           Failed: R-A2L-DEF.149: a describe call timed out at 60 s (the shared section is read per object)
+
+tests/test_b103_a2l_definition_perf.py:101: Failed
+_____________________ test_r_a2l_def_149_4_scaling_layout ______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_4_scaling_l0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_149_4_scaling_layout(tmp_path):
+        """R-A2L-DEF.149/4 scaling - as /1 for a RECORD_LAYOUT whose first line is long."""
+>       _scaling(tmp_path, "layout", "/4 RECORD_LAYOUT")
+
+tests/test_b103_a2l_definition_perf.py:289: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_4_scaling_l0')
+case = 'layout', label = '/4 RECORD_LAYOUT'
+
+    def _scaling(tmp_path: Path, case: str, label: str) -> None:
+        """E5-3 measure (inc-2/E5-code-review.md): the per-object part is the process CPU time of the 399 names after the
+        first, read inside one fresh walk (``_steady_describe``); S, 2S and 8S are interleaved round by round; each time
+        is the least of 31 rounds (one round once a run exceeds 2 s)."""
+        loaded = {kib: _load(tmp_path, case, kib) for kib in SIZES_KIB}
+        part = {kib: float("inf") for kib in SIZES_KIB}
+        results = {}
+        for _ in range(SCALE_ROUNDS):
+            slow = False
+            for kib in SIZES_KIB:                    # interleaved: S, 2S, 8S in turn within every round
+                a2l, names = loaded[kib]
+                t_outer, (interval, results[kib]) = _timed(lambda: _steady_describe(names, a2l), time.process_time)
+                part[kib] = min(part[kib], interval)
+                slow = slow or t_outer > SLOW_RUN_S
+            if slow:
+                break
+        assert part[SIZE_S_KIB] >= NON_VACUITY_S, part
+        ratio_2s = part[2 * SIZE_S_KIB] / part[SIZE_S_KIB]
+        ratio_8s = part[SIZE_8S_KIB] / part[SIZE_S_KIB]
+>       assert ratio_2s <= report_margin(f"R-A2L-DEF.149 {label} per-object part 2S/S", ratio_2s,
+                                         timing_bound(RATIO_BOUND_2S)), part
+E       AssertionError: {256: 5.036763060999988, 512: 9.152921984000045, 2048: 31.53002076100006}
+E       assert 1.8172230603563162 <= 1.5
+E        +  where 1.5 = report_margin('R-A2L-DEF.149 /4 RECORD_LAYOUT per-object part 2S/S', 1.8172230603563162, 1.5)
+E        +    where 1.5 = timing_bound(1.5)
+
+tests/test_b103_a2l_definition_perf.py:234: AssertionError
+_ test_r_a2l_def_149_6_long_format_word_of_a_shared_method_costs_nothing_per_object _
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_6_long_form0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_149_6_long_format_word_of_a_shared_method_costs_nothing_per_object(tmp_path):
+        """R-A2L-DEF.149/6 - a FORMAT word of S / 2S / 8S nines is scanned once per walk; decimals 2; one display_format object."""
+        def check(kib, c, result):
+            _first_last_alone(c, result)
+            for d in result.values():
+                assert (d.kind, d.datatype, d.conversion_type, d.decimals, d.refusal) == ("number", "UBYTE", "LINEAR", 2, None)
+            assert _same_object(d.display_format for d in result.values())
+            assert result[c.names[0]].display_format == "%" + "9" * (kib * 1024) + ".2"
+    
+>       _gp2_run(tmp_path, "fmt", "149/6 FORMAT word", _describe_all, check, steady=_describe_steady)
+
+tests/test_b103_a2l_definition_perf.py:509: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_6_long_form0')
+case = 'fmt', label = '149/6 FORMAT word'
+work = <function _describe_all at 0x7f3fd2e9e520>
+check = <function test_r_a2l_def_149_6_long_format_word_of_a_shared_method_costs_nothing_per_object.<locals>.check at 0x7f3f6fc41c60>
+image_byte = None, steady = <function _describe_steady at 0x7f3fd2e9e660>
+
+    def _gp2_run(tmp_path: Path, case: str, label: str, work: Callable[[_Loaded], Any],
+                 check: Callable[[int, _Loaded, Any], None], image_byte: Optional[int] = None,
+                 steady: Optional[Callable[[_Loaded], tuple]] = None) -> None:
+        """Absolute bound at S (400 calls within 0.5 s, wall clock, the least of 7 runs) then the scaling bound.
+    
+        A describe case passes ``steady`` (E5-3): it returns (the CPU interval of the 399 names after the first, read
+        inside one fresh walk, that walk's result) and the per-object part is the least of >= 15 interleaved rounds of
+        that interval.  A decode case keeps one interval: the process CPU time of ``work`` itself."""
+        loaded = {kib: _gp2_load(tmp_path, case, kib, image_byte) for kib in SIZES_KIB}
+        runs, result = [], None
+        for _ in range(LEAST_OF):
+            seconds, result = _timed(lambda: work(loaded[SIZE_S_KIB]))
+            runs.append(seconds)
+            if seconds > HOPELESS_S:
+                break
+        least = min(runs)
+>       assert least <= report_margin(f"R-A2L-DEF.{label} 400 calls at 256 KiB", least, timing_bound(ABS_BOUND_S)), runs
+E       AssertionError: [26.875169338978594]
+E       assert 26.875169338978594 <= 0.5
+E        +  where 0.5 = report_margin('R-A2L-DEF.149/6 FORMAT word 400 calls at 256 KiB', 26.875169338978594, 0.5)
+E        +    where 0.5 = timing_bound(0.5)
+
+tests/test_b103_a2l_definition_perf.py:440: AssertionError
+___ test_r_a2l_def_149_7_long_conversion_type_word_costs_nothing_per_object ____
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_7_long_conv0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_149_7_long_conversion_type_word_costs_nothing_per_object(tmp_path):
+        """R-A2L-DEF.149/7 - a type word of S ... 8S of Z is echoed once at reduction: 256 characters and an ellipsis, message <= 1,024."""
+        def check(kib, c, result):
+            _first_last_alone(c, result)
+            _messages_bounded(result)
+            for name, d in result.items():
+                assert (d.kind, d.datatype) == ("number", "UBYTE")
+                assert d.refusal == Refusal("A2L-DEF-CONVERSION",
+                                            f"{name}: the conversion type {'Z' * 256}… of CM_T is not supported")
+            assert _same_object(d.conversion_type for d in result.values())
+    
+>       _gp2_run(tmp_path, "type", "149/7 conversion type word", _describe_all, check, steady=_describe_steady)
+
+tests/test_b103_a2l_definition_perf.py:524: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_7_long_conv0')
+case = 'type', label = '149/7 conversion type word'
+work = <function _describe_all at 0x7f3fd2e9e520>
+check = <function test_r_a2l_def_149_7_long_conversion_type_word_costs_nothing_per_object.<locals>.check at 0x7f3f6fc437e0>
+image_byte = None, steady = <function _describe_steady at 0x7f3fd2e9e660>
+
+    def _gp2_run(tmp_path: Path, case: str, label: str, work: Callable[[_Loaded], Any],
+                 check: Callable[[int, _Loaded, Any], None], image_byte: Optional[int] = None,
+                 steady: Optional[Callable[[_Loaded], tuple]] = None) -> None:
+        """Absolute bound at S (400 calls within 0.5 s, wall clock, the least of 7 runs) then the scaling bound.
+    
+        A describe case passes ``steady`` (E5-3): it returns (the CPU interval of the 399 names after the first, read
+        inside one fresh walk, that walk's result) and the per-object part is the least of >= 15 interleaved rounds of
+        that interval.  A decode case keeps one interval: the process CPU time of ``work`` itself."""
+        loaded = {kib: _gp2_load(tmp_path, case, kib, image_byte) for kib in SIZES_KIB}
+        runs, result = [], None
+        for _ in range(LEAST_OF):
+            seconds, result = _timed(lambda: work(loaded[SIZE_S_KIB]))
+            runs.append(seconds)
+            if seconds > HOPELESS_S:
+                break
+        least = min(runs)
+>       assert least <= report_margin(f"R-A2L-DEF.{label} 400 calls at 256 KiB", least, timing_bound(ABS_BOUND_S)), runs
+E       AssertionError: [22.060595493006986]
+E       assert 22.060595493006986 <= 0.5
+E        +  where 0.5 = report_margin('R-A2L-DEF.149/7 conversion type word 400 calls at 256 KiB', 22.060595493006986, 0.5)
+E        +    where 0.5 = timing_bound(0.5)
+
+tests/test_b103_a2l_definition_perf.py:440: AssertionError
+______ test_r_a2l_def_149_8_long_table_ref_word_costs_nothing_per_object _______
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_8_long_tabl0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_149_8_long_table_ref_word_costs_nothing_per_object(tmp_path):
+        """R-A2L-DEF.149/8 - a COMPU_TAB_REF word of S ... 8S of G, declared nowhere: echoed once, found once per walk."""
+        def check(kib, c, result):
+            _first_last_alone(c, result)
+            _messages_bounded(result)
+            for name, d in result.items():
+                assert (d.kind, d.datatype) == ("enum", "UBYTE")
+                assert d.refusal == Refusal("A2L-DEF-TABLE",
+                                            f"{name}: the table {'G' * 256}… of CM_V is not declared in the A2L")
+            assert _same_object(d.enum_table for d in result.values())
+    
+>       _gp2_run(tmp_path, "tabref", "149/8 COMPU_TAB_REF word", _describe_all, check, steady=_describe_steady)
+
+tests/test_b103_a2l_definition_perf.py:539: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_8_long_tabl0')
+case = 'tabref', label = '149/8 COMPU_TAB_REF word'
+work = <function _describe_all at 0x7f3fd2e9e520>
+check = <function test_r_a2l_def_149_8_long_table_ref_word_costs_nothing_per_object.<locals>.check at 0x7f3f6fc41760>
+image_byte = None, steady = <function _describe_steady at 0x7f3fd2e9e660>
+
+    def _gp2_run(tmp_path: Path, case: str, label: str, work: Callable[[_Loaded], Any],
+                 check: Callable[[int, _Loaded, Any], None], image_byte: Optional[int] = None,
+                 steady: Optional[Callable[[_Loaded], tuple]] = None) -> None:
+        """Absolute bound at S (400 calls within 0.5 s, wall clock, the least of 7 runs) then the scaling bound.
+    
+        A describe case passes ``steady`` (E5-3): it returns (the CPU interval of the 399 names after the first, read
+        inside one fresh walk, that walk's result) and the per-object part is the least of >= 15 interleaved rounds of
+        that interval.  A decode case keeps one interval: the process CPU time of ``work`` itself."""
+        loaded = {kib: _gp2_load(tmp_path, case, kib, image_byte) for kib in SIZES_KIB}
+        runs, result = [], None
+        for _ in range(LEAST_OF):
+            seconds, result = _timed(lambda: work(loaded[SIZE_S_KIB]))
+            runs.append(seconds)
+            if seconds > HOPELESS_S:
+                break
+        least = min(runs)
+>       assert least <= report_margin(f"R-A2L-DEF.{label} 400 calls at 256 KiB", least, timing_bound(ABS_BOUND_S)), runs
+E       AssertionError: [18.806083269009832]
+E       assert 18.806083269009832 <= 0.5
+E        +  where 0.5 = report_margin('R-A2L-DEF.149/8 COMPU_TAB_REF word 400 calls at 256 KiB', 18.806083269009832, 0.5)
+E        +    where 0.5 = timing_bound(0.5)
+
+tests/test_b103_a2l_definition_perf.py:440: AssertionError
+____ test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid ____
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_9_shared_la0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid(tmp_path):
+        """R-A2L-DEF.149/9 - 400 CUBOIDs sharing a layout whose first line is S ... 8S: the layout step runs once per walk."""
+        def check(kib, c, result):
+            _first_last_alone(c, result)
+            _messages_bounded(result)
+            for name, d in result.items():
+                assert d.datatype == "UBYTE"
+                assert d.refusal == Refusal("A2L-DEF-KIND", f"{name}: the system has no definition for a CUBOID object")
+    
+>       _gp2_run(tmp_path, "cuboid", "149/9 CUBOID layout", _describe_all, check, steady=_describe_steady)
+
+tests/test_b103_a2l_definition_perf.py:552: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_9_shared_la0')
+case = 'cuboid', label = '149/9 CUBOID layout'
+work = <function _describe_all at 0x7f3fd2e9e520>
+check = <function test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid.<locals>.check at 0x7f3f6fc42340>
+image_byte = None, steady = <function _describe_steady at 0x7f3fd2e9e660>
+
+    def _gp2_run(tmp_path: Path, case: str, label: str, work: Callable[[_Loaded], Any],
+                 check: Callable[[int, _Loaded, Any], None], image_byte: Optional[int] = None,
+                 steady: Optional[Callable[[_Loaded], tuple]] = None) -> None:
+        """Absolute bound at S (400 calls within 0.5 s, wall clock, the least of 7 runs) then the scaling bound.
+    
+        A describe case passes ``steady`` (E5-3): it returns (the CPU interval of the 399 names after the first, read
+        inside one fresh walk, that walk's result) and the per-object part is the least of >= 15 interleaved rounds of
+        that interval.  A decode case keeps one interval: the process CPU time of ``work`` itself."""
+        loaded = {kib: _gp2_load(tmp_path, case, kib, image_byte) for kib in SIZES_KIB}
+        runs, result = [], None
+        for _ in range(LEAST_OF):
+            seconds, result = _timed(lambda: work(loaded[SIZE_S_KIB]))
+            runs.append(seconds)
+            if seconds > HOPELESS_S:
+                break
+        least = min(runs)
+>       assert least <= report_margin(f"R-A2L-DEF.{label} 400 calls at 256 KiB", least, timing_bound(ABS_BOUND_S)), runs
+E       AssertionError: [3.7680830610042904, 3.0657950550084934, 2.960045788990101, 3.207900809997227, 2.7685673699888866, 2.654812165972544, ...]
+E       assert 2.654812165972544 <= 0.5
+E        +  where 0.5 = report_margin('R-A2L-DEF.149/9 CUBOID layout 400 calls at 256 KiB', 2.654812165972544, 0.5)
+E        +    where 0.5 = timing_bound(0.5)
+
+tests/test_b103_a2l_definition_perf.py:440: AssertionError
+_ test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object _
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_10_long_nam0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object(tmp_path):
+        """R-A2L-DEF.149/10 - a table named by a word of S ... 8S of E and holding no entries: echoed and found once per walk."""
+        def check(kib, c, result):
+            _first_last_alone(c, result)
+            _messages_bounded(result)
+            for name, d in result.items():
+                assert d.kind == "enum" and d.datatype == "UBYTE"
+                assert d.refusal == Refusal("A2L-DEF-TABLE-EMPTY", f"{name}: the table {'E' * 256}… has no entries")
+    
+>       _gp2_run(tmp_path, "emptyname", "149/10 empty table name", _describe_all, check, steady=_describe_steady)
+
+tests/test_b103_a2l_definition_perf.py:565: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-995/test_r_a2l_def_149_10_long_nam0')
+case = 'emptyname', label = '149/10 empty table name'
+work = <function _describe_all at 0x7f3fd2e9e520>
+check = <function test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object.<locals>.check at 0x7f3f6fc43f60>
+image_byte = None, steady = <function _describe_steady at 0x7f3fd2e9e660>
+
+    def _gp2_run(tmp_path: Path, case: str, label: str, work: Callable[[_Loaded], Any],
+                 check: Callable[[int, _Loaded, Any], None], image_byte: Optional[int] = None,
+                 steady: Optional[Callable[[_Loaded], tuple]] = None) -> None:
+        """Absolute bound at S (400 calls within 0.5 s, wall clock, the least of 7 runs) then the scaling bound.
+    
+        A describe case passes ``steady`` (E5-3): it returns (the CPU interval of the 399 names after the first, read
+        inside one fresh walk, that walk's result) and the per-object part is the least of >= 15 interleaved rounds of
+        that interval.  A decode case keeps one interval: the process CPU time of ``work`` itself."""
+        loaded = {kib: _gp2_load(tmp_path, case, kib, image_byte) for kib in SIZES_KIB}
+        runs, result = [], None
+        for _ in range(LEAST_OF):
+            seconds, result = _timed(lambda: work(loaded[SIZE_S_KIB]))
+            runs.append(seconds)
+            if seconds > HOPELESS_S:
+                break
+        least = min(runs)
+>       assert least <= report_margin(f"R-A2L-DEF.{label} 400 calls at 256 KiB", least, timing_bound(ABS_BOUND_S)), runs
+E       AssertionError: [48.32213330199011]
+E       assert 48.32213330199011 <= 0.5
+E        +  where 0.5 = report_margin('R-A2L-DEF.149/10 empty table name 400 calls at 256 KiB', 48.32213330199011, 0.5)
+E        +    where 0.5 = timing_bound(0.5)
+
+tests/test_b103_a2l_definition_perf.py:440: AssertionError
+============================= QC-TM timing margins =============================
+LOW -10526.7%  53.133 s / 0.500 s  R-A2L-DEF.149 /2 COMPU_VTAB 400 names at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_2_shared_enum_table_size_costs_nothing_per_object
+LOW -10267.0%  51.835 s / 0.500 s  R-A2L-DEF.149 /3 COMPU_VTAB_RANGE 400 names at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_3_shared_range_table_size_costs_nothing_per_object
+LOW -9564.4%  48.322 s / 0.500 s  R-A2L-DEF.149/10 empty table name 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object
+LOW -5822.0%  29.610 s / 0.500 s  R-A2L-DEF.149 /1 COMPU_METHOD 400 names at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_1_shared_method_size_costs_nothing_per_object
+LOW -5275.0%  26.875 s / 0.500 s  R-A2L-DEF.149/6 FORMAT word 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_6_long_format_word_of_a_shared_method_costs_nothing_per_object
+LOW -4312.1%  22.061 s / 0.500 s  R-A2L-DEF.149/7 conversion type word 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_7_long_conversion_type_word_costs_nothing_per_object
+LOW -3661.2%  18.806 s / 0.500 s  R-A2L-DEF.149/8 COMPU_TAB_REF word 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_8_long_table_ref_word_costs_nothing_per_object
+LOW -460.6%  2.803 s / 0.500 s  R-A2L-DEF.149 /4 RECORD_LAYOUT 400 names at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_4_shared_layout_first_line_costs_nothing_per_object
+LOW -431.0%  2.655 s / 0.500 s  R-A2L-DEF.149/9 CUBOID layout 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid
+LOW -21.1%  1.817 s / 1.500 s  R-A2L-DEF.149 /4 RECORD_LAYOUT per-object part 2S/S  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_4_scaling_layout
+QC-TM: 10 bounds, 10 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_149_5_cached_read_form_is_immutable
+FAILED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_1_shared_method_size_costs_nothing_per_object
+FAILED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_2_shared_enum_table_size_costs_nothing_per_object
+FAILED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_3_shared_range_table_size_costs_nothing_per_object
+FAILED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_4_shared_layout_first_line_costs_nothing_per_object
+FAILED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_1_scaling_method
+FAILED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_2_scaling_enum_table
+FAILED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_3_scaling_range_table
+FAILED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_4_scaling_layout
+FAILED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_6_long_format_word_of_a_shared_method_costs_nothing_per_object
+FAILED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_7_long_conversion_type_word_costs_nothing_per_object
+FAILED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_8_long_table_ref_word_costs_nothing_per_object
+FAILED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_9_shared_layout_first_line_costs_nothing_per_cuboid
+FAILED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_149_10_long_name_of_a_shared_empty_table_costs_nothing_per_object
+14 failed, 199 deselected in 757.69s (0:12:37)
+pytest exit code: 1

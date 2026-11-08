@@ -1,0 +1,66 @@
+# host: <runner> | 2026-11-07T07:01:29-06:00 | load: 4.94 7.13 7.08
+# a2l_definition.py md5: 427e262ac47c6bd0a1b8aa0370969d4e  make_release_case.py md5: 82fba4c34fb9cad1888a30d06025a725
+# cmd: python -m pytest -q -p no:cacheprovider tests/test_b103_a2l_definition_perf.py -m serial_timing -k 150_10
+/tmp/b103-e5fix/mut/s19_app/__init__.py
+Python 3.11.18
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_r_a2l_def_150_10_a_run_of_repeated_x_below_the_stored_value_costs_nothing_per_element _
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-924/test_r_a2l_def_150_10_a_run_of0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_150_10_a_run_of_repeated_x_below_the_stored_value_costs_nothing_per_element(tmp_path):
+        """R-A2L-DEF.150/10 (CR-1 = E5S-02) - TAB_NOINTP over a COMPU_TAB that is one run of equal x (0) then 1000:
+        250 is nearer the run, whose FIRST entry (y 0) is taken, as the frozen lookup takes it; one bisect, not a walk back."""
+        def check(kib, c, result):
+            table = c.a2l["compu_tabs_by_name"]["CT"]
+            assert len(table["entries"]) > 1000 and sum(1 for x, _y in table["entries"] if x == 0) == len(table["entries"]) - 1
+            frozen_value, _status, _msg = _frozen_apply(c.a2l["compu_methods_by_name"]["CM_N"], 250, c.a2l)
+            assert frozen_value == 0.0                              # the oracle itself: the first entry of the run
+            for r in result:
+                assert isinstance(r, Decoded) and r.stored == 250
+                assert r.value == frozen_value == 0.0 and r.text == "0.000", r
+    
+>       _gp2_run(tmp_path, "tab_run", "150/10 TAB_NOINTP run of repeated x decode", _decode_all, check, image_byte=250)
+
+tests/test_b103_a2l_definition_perf.py:662: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-924/test_r_a2l_def_150_10_a_run_of0')
+case = 'tab_run', label = '150/10 TAB_NOINTP run of repeated x decode'
+work = <function _decode_all at 0x7f6503bedf80>
+check = <function test_r_a2l_def_150_10_a_run_of_repeated_x_below_the_stored_value_costs_nothing_per_element.<locals>.check at 0x7f6503bef100>
+image_byte = 250, steady = None
+
+    def _gp2_run(tmp_path: Path, case: str, label: str, work: Callable[[_Loaded], Any],
+                 check: Callable[[int, _Loaded, Any], None], image_byte: Optional[int] = None,
+                 steady: Optional[Callable[[_Loaded], tuple]] = None) -> None:
+        """Absolute bound at S (400 calls within 0.5 s, wall clock, the least of 7 runs) then the scaling bound.
+    
+        A describe case passes ``steady`` (E5-3): it returns (the CPU interval of the 399 names after the first, read
+        inside one fresh walk, that walk's result) and the per-object part is the least of >= 15 interleaved rounds of
+        that interval.  A decode case keeps one interval: the process CPU time of ``work`` itself."""
+        loaded = {kib: _gp2_load(tmp_path, case, kib, image_byte) for kib in SIZES_KIB}
+        runs, result = [], None
+        for _ in range(LEAST_OF):
+            seconds, result = _timed(lambda: work(loaded[SIZE_S_KIB]))
+            runs.append(seconds)
+            if seconds > HOPELESS_S:
+                break
+        least = min(runs)
+>       assert least <= report_margin(f"R-A2L-DEF.{label} 400 calls at 256 KiB", least, timing_bound(ABS_BOUND_S)), runs
+E       AssertionError: [0.5707528649945743, 0.5606728999991901, 0.5564296670199838, 0.5552055269945413, 0.5537732579978183, 0.559126132982783, ...]
+E       assert 0.5537732579978183 <= 0.5
+E        +  where 0.5 = report_margin('R-A2L-DEF.150/10 TAB_NOINTP run of repeated x decode 400 calls at 256 KiB', 0.5537732579978183, 0.5)
+E        +    where 0.5 = timing_bound(0.5)
+
+tests/test_b103_a2l_definition_perf.py:440: AssertionError
+============================= QC-TM timing margins =============================
+LOW -10.8%  0.554 s / 0.500 s  R-A2L-DEF.150/10 TAB_NOINTP run of repeated x decode 400 calls at 256 KiB  tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_10_a_run_of_repeated_x_below_the_stored_value_costs_nothing_per_element
+QC-TM: 1 bounds, 1 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_150_10_a_run_of_repeated_x_below_the_stored_value_costs_nothing_per_element
+1 failed, 21 deselected in 5.34s
+# exit: 1
+# load after: 4.64 6.99 7.04

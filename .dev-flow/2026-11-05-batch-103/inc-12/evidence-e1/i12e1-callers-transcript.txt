@@ -1,0 +1,30 @@
+# i12e1-callers transcript — 2026-11-07T01:21:55-06:00
+# base tree: git archive e07fb00 s19_app (throwaway copy in the scratchpad); code-wire v3.1.0 (e436a08); python Python 3.12.7
+files parsed: 86; parse failures: 0
+marks written: 1996
+extractor: marks=1996 graph_nodes=0 calls=3771 findings=2009 parse_failures=0
+
+== S19TuiApp._compose_screen_a2l: 1 marked caller(s)
+   S19TuiApp.compose  <-  s19_app/tui/app.py:3385
+
+== S19TuiApp._setup_datatable_columns: 1 marked caller(s)
+   S19TuiApp.on_mount  <-  s19_app/tui/app.py:8644
+
+== S19TuiApp._build_a2l_table_cells: 1 marked caller(s)
+   S19TuiApp.update_a2l_tags_view  <-  s19_app/tui/app.py:20357
+
+== S19TuiApp.update_a2l_tags_view: 6 marked caller(s)
+   S19TuiApp._apply_viewer_setting  <-  s19_app/tui/app.py:20605
+   S19TuiApp._focus_a2l_tag_absolute_index  <-  s19_app/tui/app.py:16603
+   S19TuiApp._refresh_a2l_filtered_tags  <-  s19_app/tui/app.py:20217, s19_app/tui/app.py:20222
+   S19TuiApp.action_a2l_tags_page_next  <-  s19_app/tui/app.py:11102
+   S19TuiApp.action_a2l_tags_page_prev  <-  s19_app/tui/app.py:11128
+   S19TuiApp.update_a2l_view  <-  s19_app/tui/app.py:20269
+
+== S19TuiApp.on_resize: 0 marked caller(s)
+
+== S19TuiApp._refresh_a2l_filtered_tags: 4 marked caller(s)
+   S19TuiApp._schedule_a2l_filter_refresh.<locals>._apply_filter  <-  s19_app/tui/app.py:20665
+   S19TuiApp._set_a2l_filter_field  <-  s19_app/tui/app.py:20634
+   S19TuiApp.on_button_pressed  <-  s19_app/tui/app.py:21001, s19_app/tui/app.py:21004, s19_app/tui/app.py:21007
+   S19TuiApp.update_a2l_view  <-  s19_app/tui/app.py:20283

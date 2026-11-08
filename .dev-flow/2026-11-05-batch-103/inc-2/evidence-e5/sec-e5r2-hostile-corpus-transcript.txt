@@ -1,0 +1,77 @@
+s19_app.__file__ = /tmp/b103-e5r2-2a-sec/tree/s19_app/__init__.py | python 3.11.18 | a2l_definition md5 f661674b | control 0691 md5 820a4c3a | mutation lists md5 030c3f2f | load 13.62 11.35 7.99 | mode corpus
+  files 203
+A2L section tree has structural errors: path=~/a2l-corpus/fixtures/2.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/103.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/111.a2l sample=Line 4279: /end without /begin
+A2L section tree has structural errors: path=~/a2l-corpus/files/112.a2l sample=Line 1546: /end without /begin
+A2L section tree has structural errors: path=~/a2l-corpus/files/113.a2l sample=Line 3177: /end without /begin
+A2L section tree has structural errors: path=~/a2l-corpus/files/114.a2l sample=Line 574: /end without /begin
+A2L section tree has structural errors: path=~/a2l-corpus/files/124.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/125.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/126.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/14.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/15.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/166.a2l sample=Line 11012: /end without /begin
+A2L section tree has structural errors: path=~/a2l-corpus/files/16.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/17.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/18.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/20.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/21.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/2.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/32.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/35.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/3.a2l sample=Line 936: /end without /begin
+A2L section tree has structural errors: path=~/a2l-corpus/files/40.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/41.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/42.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/43.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/44.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/45.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/46.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/47.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/4.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/60.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/62.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/66.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/6.a2l sample=Line 20: /end without /begin
+A2L section tree has structural errors: path=~/a2l-corpus/files/71.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/75.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/79.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/80.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/81.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/82.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/83.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/84.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/89.a2l sample=Unclosed /begin sections detected.
+A2L section tree has structural errors: path=~/a2l-corpus/files/96.a2l sample=Unclosed /begin sections detected.
+  B compared: 353669
+  B decodes compared: 1414676
+  I a2l_data changed (end): 0
+  I a2l_data changed by decode: 0
+  I a2l_data changed by describe: 0
+  I digest nodes: 42971440
+  I stored NoneType: 10
+  I stored _EnumForm: 1728
+  I stored _TabForm: 67
+  I stored mappingproxy: 5830
+  I stored str: 1135
+  I writes refused: 930889
+  O alone compared: 2115
+  O alone differs: 0
+  O decode order differs: 0
+  O definitions changed by decoding: 0
+  O form shared across walks: 0
+  O fresh walk differs: 0
+  O names: 353669
+  O reversed walk differs: 0
+  c decodes: 1414676
+  c definitions: 353669
+  c longest word max: 137
+  c message max: 176
+  c message with [: 21985
+  c messages: 435641
+  c refused: 20473
+  c texts: 999508
+  files: 203
+end | load 14.42 13.41 9.67
+exit=0 seconds=247

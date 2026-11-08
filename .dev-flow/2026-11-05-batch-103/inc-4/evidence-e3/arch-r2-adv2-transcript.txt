@@ -1,0 +1,34 @@
+mode = adv2
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+python = 3.11.18  host = <runner>  cpus = 16
+HOME = /tmp/b103-e3r2-4-architect/home  LOCALAPPDATA = /tmp/b103-e3r2-4-architect/home/<localappdata>  PILOT_DIR = /tmp/b103-e3r2-4-architect/pilot  OUT = /tmp/b103-e3r2-4-architect/out
+  sha256 i4e2-pilot4.py = b58035398d50b71170b5c88ff5c97c36be2583e01438b8a5ed45de190b8077a5
+  sha256 i4e1-pilot3.py = b99beab32b0e6896db513e000bd3aebd26d212493ee32b46228ceb889e94f1b4
+  sha256 i4e1-pilot2.py = 633c1bfa9f95a60e6e415e6f8cd5414cd7edb325e02347043f0b4f9406e066cf
+  sha256 i4e1-pilot.py = 09ab1d2a5621194e70bce7488dc350bd03573871d944e90452b099f10f2da6b5
+load before = (2.083984375, 3.46435546875, 4.533203125)
+
+=== 7. REF: R2 (graph) vs R2 with collapsed duplicate query tokens, limit 20, median of 7; load (2.2255859375, 3.44873046875, 4.5166015625)
+  'qzx ' x 64                                      chars 255 tokens  64 distinct   1: R2   306.8 ms (walks  64)  collapsed    30.7 ms (walks   1)  same lists: True  {'token': 3, 'fuzzy': 17}
+  'e ' x 128 (QSET)                                chars 255 tokens 128 distinct   1: R2   110.0 ms (walks   0)  collapsed    10.6 ms (walks   0)  same lists: True  {'token': 20}
+  '0 ' x 128 (QSET)                                chars 255 tokens 128 distinct   1: R2    43.9 ms (walks   0)  collapsed     9.3 ms (walks   0)  same lists: True  {'token': 20}
+  'qz?' 26 distinct (103 chars)                    chars 103 tokens  26 distinct  26: R2   101.4 ms (walks  26)  collapsed   101.6 ms (walks  26)  same lists: True  {'fuzzy': 20}
+  'qz?' 26 distinct, twice, cut at 256             chars 255 tokens  64 distinct  26: R2   250.9 ms (walks  64)  collapsed   126.5 ms (walks  26)  same lists: True  {'fuzzy': 20}
+  REF: collapsed lists differ from R2 in 0 shapes
+
+=== 7. REF6: R2 (graph) vs R2 with collapsed duplicate query tokens, limit 20, median of 7; load (2.2646484375, 3.4169921875, 4.49462890625)
+  'chr ' x 64                                      chars 255 tokens  64 distinct   1: R2   453.8 ms (walks  64)  collapsed    47.8 ms (walks   1)  same lists: True  {'fuzzy': 20}
+  'cahr ' x 51                                     chars 254 tokens  51 distinct   1: R2   372.7 ms (walks  51)  collapsed    47.1 ms (walks   1)  same lists: True  {'fuzzy': 20}
+  '0 ' x 128                                       chars 255 tokens 128 distinct   1: R2   301.4 ms (walks   0)  collapsed    41.8 ms (walks   0)  same lists: True  {'token': 20}
+  '00 ' x 85                                       chars 254 tokens  85 distinct   1: R2   168.9 ms (walks   0)  collapsed    33.8 ms (walks   0)  same lists: True  {'token': 20}
+  'c 0 ' x 64                                      chars 255 tokens 128 distinct   2: R2   180.9 ms (walks   0)  collapsed    23.6 ms (walks   0)  same lists: True  {'token': 20}
+  'ch?' 26 distinct (103 chars)                    chars 103 tokens  26 distinct  26: R2   203.2 ms (walks  26)  collapsed   201.7 ms (walks  26)  same lists: True  {'fuzzy': 20}
+  'ch?' + '?ha' + 'c?a', 64 distinct (255 chars)   chars 255 tokens  64 distinct  62: R2   461.3 ms (walks  64)  collapsed   449.1 ms (walks  62)  same lists: True  {'fuzzy': 20}
+  'cha' .. 'chz' 3x, cut at 256                    chars 255 tokens  64 distinct  26: R2   460.5 ms (walks  64)  collapsed   213.3 ms (walks  26)  same lists: True  {'fuzzy': 20}
+  REF6: collapsed lists differ from R2 in 0 shapes
+
+  REF, 348 queries (QSET, round-1 multi-word, 300 generated, 3 with repeated words): collapsed != R2 in 0
+  C08, 8 repeated-word queries: R2 == collapsed == oracle(ruled) (asserted; e.g. 'cuvre cuvre' -> [('CURVE_0001', 'fuzzy', 2, [(0, 5)]), ('CURVE_0002', 'fuzzy', 2, [(0, 5)])])
+
+load after = (3.35205078125, 3.51123046875, 4.46728515625)
+exit 0

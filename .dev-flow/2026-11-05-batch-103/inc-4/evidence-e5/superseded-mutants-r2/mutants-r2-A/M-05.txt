@@ -1,0 +1,50 @@
+# M-05  row R-A2L-MATCH.5
+
+control: no exact rule (an equal name counted as `prefix`) -> rule `prefix`
+edit: `_text_tiers`: always append to `prefix` (equal names stop being exact)
+
+s19_app.__file__: /tmp/b103-e5-4-mutr2A/M-05/s19_app/__init__.py
+
+== diff ==
+--- /tmp/b103-e5-4-mutr2A/base/s19_app/tui/services/label_match.py	2026-11-06 22:11:34.000000000 -0600
++++ /tmp/b103-e5-4-mutr2A/M-05/s19_app/tui/services/label_match.py	2026-11-06 22:42:37.461188013 -0600
+@@ -335,7 +335,7 @@
+         name_folded = folded[i]
+         if text in name_folded:
+             if name_folded.startswith(text):
+-                (exact if len(name_folded) == text_len else prefix).append(i)
++                prefix.append(i)
+             else:
+                 subs.append(i)
+     for i in exact:
+
+== pytest (returncode 1, KILLED) ==
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_________________ test_ranked_list_is_exactly[R-A2L-MATCH.5/1] _________________
+tests/test_b103_label_match.py:391: in test_ranked_list_is_exactly
+    assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E   AssertionError: R-A2L-MATCH.5/1: query 'VALUE_0001' limit 20
+E   assert [('VALUE_0001..., ((0, 10),))] == [('VALUE_0001..., ((0, 10),))]
+E     
+E     At index 0 diff: ('VALUE_0001', 'prefix', 0, ((0, 10),)) != ('VALUE_0001', 'exact', 0, ((0, 10),))
+E     Use -v to get more diff
+_________________ test_ranked_list_is_exactly[R-A2L-MATCH.5/2] _________________
+tests/test_b103_label_match.py:391: in test_ranked_list_is_exactly
+    assert got == expected, f"{case_id}: query {query!r} limit {limit}"
+E   AssertionError: R-A2L-MATCH.5/2: query 'map_0020' limit 20
+E   assert [('MAP_0020',...0, ((0, 8),))] == [('MAP_0020',...0, ((0, 8),))]
+E     
+E     At index 0 diff: ('MAP_0020', 'prefix', 0, ((0, 8),)) != ('MAP_0020', 'exact', 0, ((0, 8),))
+E     Use -v to get more diff
+_______________ test_rows_5_3_three_exact_matches_are_all_listed _______________
+tests/test_b103_label_match.py:403: in test_rows_5_3_three_exact_matches_are_all_listed
+    assert all(m.rule.value == "exact" for m in got)
+E   assert False
+E    +  where False = all(<generator object test_rows_5_3_three_exact_matches_are_all_listed.<locals>.<genexpr> at 0x7f15b873f370>)
+=========================== short test summary info ============================
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.5/1]
+FAILED tests/test_b103_label_match.py::test_ranked_list_is_exactly[R-A2L-MATCH.5/2]
+FAILED tests/test_b103_label_match.py::test_rows_5_3_three_exact_matches_are_all_listed
+3 failed, 126 deselected in 4.94s
+

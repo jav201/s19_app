@@ -1,0 +1,12 @@
+s19_app.__file__ = /home/<user>/work/s19_app/s19_app/__init__.py
+[Q1-A] A full header, BIT_MASK own line: tag bit_org='0x0FF0' datatype='UWORD' addr=16 len=2 upper='65535' | header=['MA', '', 'UWORD', 'CM_ID', '0', '0', '0', '65535'] | model mask='0x0FF0' | BOTH MISS=False
+[Q1-B] B short header (no upper), BIT_MASK own line: tag bit_org='0x0FF0' datatype=None addr=16 len=None upper=None | header=['MB', '', 'UWORD', 'CM_ID', '0', '0', '0', 'BIT_MASK'] | model mask=None | BOTH MISS=False
+[Q1-C] C short header (no upper), BIT_MASK same line: tag bit_org=None datatype='UWORD' addr=16 len=2 upper='BIT_MASK' | header=['MC', '', 'UWORD', 'CM_ID', '0', '0', '0', 'BIT_MASK'] | model mask=None | BOTH MISS=True
+[Q1-D] D short header, BIT_MASK after a comment: tag bit_org=None datatype=None addr=16 len=None upper=None | header=['MD', '', 'UWORD', 'CM_ID', '0', '0', '0', 'BIT_MASK'] | model mask=None | BOTH MISS=True
+[Q1-E] E full header on /begin line + BIT_MASK same line: tag bit_org=None datatype=None addr=16 len=None upper=None | header=['ME', '', 'UWORD', 'CM_ID', '0', '0', '0', '65535'] | model mask='0x0FF0' | BOTH MISS=False
+[Q2-span] addr=0xFFFFFF00 len=256: last byte=0xFFFFFFFF (above 0xFFFFFFFF: False); exclusive end=0x100000000 (above: True)
+[Q2-span] addr=0xFFFFFFFF len=3: last byte=0x100000001 (above 0xFFFFFFFF: True); exclusive end=0x100000002 (above: True)
+[Q2-span] addr=0xFFFFFFFF len=1: last byte=0xFFFFFFFF (above 0xFFFFFFFF: False); exclusive end=0x100000000 (above: True)
+[Q2-raw] inf: is_integer=False ; ('int-compare raises', 'OverflowError')
+[Q2-raw] nan: is_integer=False ; ('int-compare raises', 'ValueError')
+hex(-16) = -0x10 ; hex(0xFFFFFFFF) = 0xffffffff
