@@ -548,18 +548,34 @@ def _system_powershell_path() -> str:
 
 
 def other_program_write(text: str) -> None:
-    """A separate system PowerShell ``Set-Clipboard`` with the text on stdin
-    as UTF-16LE (matching ``[Console]::InputEncoding``; stands for "another
-    Windows program")."""
+    """Write the clipboard for the "other program" role via :func:`_own_write`.
+
+    Summary:
+        Run-3 triage C6: the previous PowerShell UTF-16LE stdin pipe decoded
+        to a one-character payload (an embedded NUL after every char). This
+        now delegates to :func:`_own_write` (ctypes ``CF_UNICODETEXT``,
+        UTF-16LE, no PowerShell encoding trick) — the path the probe already
+        proves round-trips through :func:`other_program_read` and the
+        product's readers — and then self-checks the round-trip so a future
+        encoding regression fails here instead of in 21 downstream tests.
+
+    Args:
+        text (str): The payload to write to the clipboard.
+
+    Raises:
+        AssertionError: When the Win32 write fails, or the value reads back
+            different from ``text``.
+    """
     _require_windows()
-    path = _system_powershell_path()
-    subprocess.run(
-        [path, "-NoProfile", "-NonInteractive", "-Command",
-         "[Console]::InputEncoding=[System.Text.Encoding]::Unicode;$input | Set-Clipboard"],
-        input=text, capture_output=True, text=True, encoding="utf-16-le",
-        errors="replace", timeout=10.0, shell=False,
-        creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
-    )
+    if not _own_write(text):
+        raise AssertionError("other_program_write: CF_UNICODETEXT write failed")
+    read_back = own_read()
+    if read_back != text:
+        shown = read_back[:20] if read_back is not None else None
+        raise AssertionError(
+            "other_program_write round-trip failed: "
+            f"wrote {text[:20]!r}, read back {shown!r}"
+        )
 
 
 def other_program_read() -> str:
