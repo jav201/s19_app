@@ -195,7 +195,7 @@ def _probe_once() -> tuple:
     if not written:
         return False, "win32 write failed"
     try:
-        read_back = _other_program_read()
+        read_back = other_program_read()
     except Exception as exc:  # pragma: no cover - the layers report themselves
         return False, f"PowerShell read raised {exc!r}"
     if read_back == nonce:

@@ -1658,6 +1658,7 @@ def test_r_paste_21_5_direct_win32_call_opens_nothing_and_fails(pytester) -> Non
         "import os\n"
         "os.environ['GITHUB_ACTIONS'] = 'false'\n"
         "os.environ.pop('RUNNER_ENVIRONMENT', None)\n"
+        "pytest_plugins = ['tests.conftest']\n"
     )
     (pytester.path / "test_direct.py").write_text(
         "import sys\n"
