@@ -697,15 +697,44 @@ def _lex_a2l_lines(lines: Iterable[str], errors: Any) -> Iterator[tuple[int, str
     comment_line = 0
 
     for element in lines:
-        if element.endswith("\r\n"):
-            body = element[:-2]
-        elif element.endswith(("\n", "\r")):
+        # Tier 0a fast path: a string continuation whose element is content +
+        # exactly one trailing ``\n`` (no quote, no CR, no NUL, no embedded
+        # line end) is appended verbatim — one append, no slice, no endswith.
+        # This is the hot line of READ.52/2's 200,000-line string.
+        if (
+            in_string
+            and '"' not in element
+            and "\r" not in element
+            and "\x00" not in element
+            and element.count("\n") == 1
+            and element.endswith("\n")
+        ):
+            string_buf.append(element)
+            line += 1
+            continue
+
+        if element.endswith("\n"):
+            body = element[:-1]
+            if body.endswith("\r"):
+                body = body[:-1]
+        elif element.endswith("\r"):
             body = element[:-1]
         else:
             body = element
         if "\x00" in body:
             errors.reset(_UTF8_NUL_REFUSAL)
             return
+
+        # Tier 0 fast path: a multi-line quoted string's continuation line with
+        # no quote and no embedded line end is appended verbatim (the stripped
+        # terminator is the one line end). This keeps the 200,000-line string
+        # of READ.52/2 on C-level scans only — no ``_find_string_end``, no
+        # ``_count_line_ends``, no slices.
+        if in_string and '"' not in body and "\r" not in body and "\n" not in body:
+            string_buf.append(body)
+            string_buf.append("\n")
+            line += 1
+            continue
 
         n = len(body)
         i = 0
@@ -958,6 +987,13 @@ def _build_section_tree_into(
 
             def _elements() -> Iterator[str]:
                 nonlocal line_count
+                # Fast path (no progress, no BOM): a bare per-line yield so the
+                # 200,000-line string of READ.52/2 pays no enumerate/if cost.
+                if progress is None and not utf8_bom:
+                    for element in handle:
+                        line_count += 1
+                        yield element
+                    return
                 for index, element in enumerate(handle, 1):
                     line_count += 1
                     if progress is not None and line_count % _PROGRESS_LINES == 0:
