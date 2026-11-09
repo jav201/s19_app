@@ -892,10 +892,15 @@ def test_r_tui_042a_6_2_combining_and_esc_tails(tmp_path: Path) -> None:
 
 def test_r_tui_042a_6_3_plain_ascii_unchanged(tmp_path: Path) -> None:
     """R-TUI-042a.6 case /3: LONGMAP(48)'s ASCII name — ``✓ SYN_MA…LLL_END``,
-    no U+FFFD."""
+    no U+FFFD; a raw name ``"A "`` at width 2 — ``✓ A�`` (the trailing space
+    projected to U+FFFD, not stripped)."""
     plain, _elapsed = _build_cell(tmp_path, longname(48), 14)
     assert plain == "✓ SYN_MA…LLL_END", plain
     assert "\ufffd" not in plain, repr(plain)
+    # Discriminating arm: a trailing space (U+0020, outside U+0021..U+007E)
+    # must project to U+FFFD, not be stripped — a strip would leave ``✓ A``.
+    projected, _elapsed = _build_cell(tmp_path, "A ", 2)
+    assert projected == "✓ A\ufffd", projected
 
 
 # ---------------------------------------------------------------------------
