@@ -20,6 +20,17 @@ The audit rejects the initial all-full claim. Every correction below is accepted
 
 The tester owns all corrections and the ledger. Linux RED/GREEN runs decide execution status only after these corrections land.
 
+## Re-audit of `0b34546f`
+
+The real-file card routes, hard timing bound, painted Name line and positive visibility controls are closed. Two findings remain accepted for a second tester correction:
+
+1. `_painted_tag_cell` must skip only vertically off-screen rows. An on-screen blank or completely clipped Tag cell is a failure, not a skip. R-TUI-042a.5/6 must assert the exact painted Tag at both 220-column states as well as at 80.
+2. `_assert_adjacent_cell_gaps` must clip partially visible right-hand cells to the viewport and check their painted gap; skipping partial cells leaves the 80-column Source example outside the oracle.
+
+The first RED/GREEN pair running on `549ef3f1` is diagnostic only. Final GREEN and Result updates wait for these corrections and a clean re-audit.
+
 ## Capture-driver review
 
 Tracked-file scenarios must load `prg.s19` before the A2L; otherwise the CURVE before/after Raw/Physical comparison is vacuous. Sidecar reports must not contain checkout/account paths. Accepted and routed to the mechanical capture lane.
+
+The independent capture review's six findings are also accepted: explicit launched-process environment, the same pinned CURVE file in both roots, hard scenario postconditions, redacted error sidecars, verified window/scratch cleanup, and a nonzero/incomplete batch result. The executed `e07fb00` selection pins `examples/case_00_public/software_a.a2l` (151 CURVE tags).
