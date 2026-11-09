@@ -45,7 +45,7 @@ from s19_app.tui.screens_directionb import PatchEditorPanel
 from tests.support import b100_projects as projects
 from tests.support import b100_save_dialog as sd
 from tests.support.b100_workers import settle_workers
-from tests.support.timing import wait_until
+from tests.support.timing import report_margin, wait_until
 
 
 # ---------------------------------------------------------------------------
@@ -954,21 +954,25 @@ def _build_cell(tmp_path: Path, name: str, width: int):
     return cells[2].plain, time.perf_counter() - start
 
 
+@pytest.mark.serial_timing
 def test_r_tui_042a_6_1_zero_width_tail(tmp_path: Path) -> None:
     """R-TUI-042a.6 case /1: a 47-char ASCII name + 4,000 then 16,000 × U+200B —
     one ``_build_a2l_table_cells(tag, 14)`` call each, under 1 s, 6 + ``…`` + 7 × U+FFFD."""
     for tail_len in (4_000, 16_000):
         plain, elapsed = _build_cell(tmp_path, "A" * 47 + "\u200b" * tail_len, 14)
         assert elapsed < 1.0, elapsed
+        report_margin("R-TUI-042a.6/1 cell build", elapsed, 1.0)
         assert plain == "✓ " + "A" * 6 + "…" + "\ufffd" * 7, plain
 
 
+@pytest.mark.serial_timing
 def test_r_tui_042a_6_2_combining_and_esc_tails(tmp_path: Path) -> None:
     """R-TUI-042a.6 case /2: the same name + 16,000 × U+0301, then + 16,000 × ESC —
     the /1 form, no U+0301 and no ESC in the cell."""
     for tail_char in ("\u0301", "\x1b"):
         plain, elapsed = _build_cell(tmp_path, "A" * 47 + tail_char * 16_000, 14)
         assert elapsed < 1.0, elapsed
+        report_margin("R-TUI-042a.6/2 cell build", elapsed, 1.0)
         assert plain == "✓ " + "A" * 6 + "…" + "\ufffd" * 7, plain
         assert "\u0301" not in plain and "\x1b" not in plain, repr(plain)
 
