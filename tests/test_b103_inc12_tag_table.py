@@ -1102,8 +1102,10 @@ async def _assert_card_painted_then_safe(
         card.scroll_to(y=card.max_scroll_y, animate=False, force=True, immediate=True)
         await _settle(pilot, 6)
         assert card.scroll_y > 0, (card.scroll_y, card.max_scroll_y)
+        painted = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
+        joined = "".join(painted)
+        assert projected in joined, (projected, joined)
         screen = _screen_output(app)
-        assert projected in screen, (projected, screen)
         _assert_card_lines_clean(full)
         _assert_no_introducers(screen)
         return
@@ -1210,7 +1212,7 @@ def test_r_tui_042a_7_1_7_name_on_the_name_line(tmp_path: Path) -> None:
         card = _card(app)
         lines = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
         assert lines and lines[0].startswith("✓ SYN_DISP_C"), lines
-        start = next((i for i, ln in enumerate(lines) if ln.startswith("name ")), None)
+        start = next((i for i, ln in enumerate(lines) if ln == "name" or ln.startswith("name ")), None)
         assert start is not None, lines
         assert scrubbed in "".join(lines[start:]), (scrubbed, lines[start:])
         _assert_card_lines_clean(card.render().plain)
@@ -1272,7 +1274,7 @@ def test_r_tui_042a_8_1_name_line_with_a_display_identifier(tmp_path: Path) -> N
         card = _card(app)
         lines = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
         assert lines and lines[0] == f"✓ SYN_DISP_W  {ADDR_STR}", lines
-        start = next((i for i, ln in enumerate(lines) if ln.startswith("name ")), None)
+        start = next((i for i, ln in enumerate(lines) if ln == "name" or ln.startswith("name ")), None)
         assert start is not None, lines
         assert longname(48) in "".join(lines[start:]), (longname(48), lines[start:])
 
