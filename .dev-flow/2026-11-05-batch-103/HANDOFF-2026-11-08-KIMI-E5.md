@@ -168,3 +168,9 @@ The next session continues the corrective E5 of Inc 11. Reply to the operator in
 - `inc-11/04-validation.md` is written: **PASS-WITH-NOTES**, with all LOW items declared. `inc-11/REVIEW-PACKET.md` contains the mandatory seven sections.
 - Final `trace_check`: **3 US, 81 active requirements, 2 withdrawn, 0 gaps** (`evidence/inc-11/trace-check-transcript.txt`).
 - Remaining work is integration, not more Inc 11 product changes: merge current `origin/main` and `batch-103` into this branch, re-measure the scanned test count, rerun combined-tree gates, integrate into `batch-103`, then start Inc 3a.
+
+## Combined-tree redaction closed — 2026-11-09 10:16 (Kimi)
+
+- Final combined commit: **`c8c3ab45`**. The redaction sweep preserves line counts and replaces only local identity strings with `<user>`, `<runner>` and `<runner-ip>`.
+- The initial application normalized line endings and new sweep artifacts reintroduced leaks; both were corrected before the final commit. The unneeded diff file was removed.
+- On the committed clone: **R-TST-070_2 = 1 passed** and **trace_check = 0 gaps**. Group D is rerunning. After it passes, Inc 11 can merge into `batch-103` and Inc 3a starts.
