@@ -1,0 +1,75 @@
+== mut-c-10  2026-11-07T11:19:32Z  host: LAN Linux laptop
+base commit (HEAD): 6f1743c1ad54ff7db89e8fcd4e96266414950f42  main: 6f1743c1ad54ff7db89e8fcd4e96266414950f42  origin/main: 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+staged tree (index): f60e3b2df551b8ca5ed438916a0ff14c8f4571b3
+--- working-tree edits over the index (mutant):
+diff --git a/s19_app/tui/app.py b/s19_app/tui/app.py
+index e21dc3ea..2738e0af 100644
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -5102,7 +5102,7 @@ class S19TuiApp(App):
+         # in place — ``save_patched`` adopts the re-derived bytes before it
+         # possibly refuses a blocked save — so tell the CRC Designer whatever
+         # ``result.ok`` (R-CRC-PREVIEW-002.5/7).
+-        self._note_image_bytes_written()
++        pass
+         self._report_change_result(result)
+         if result.ok:
+             # LLR-167.5: a successful save-back records the saved image.
+--- end of edits
+python: 3.11.18
+s19_app.__file__: <HOME>/work/s19_i10bc_mut/s19_app/__init__.py
+CMD: cd <HOME>/work/s19_i10bc_mut && env -u NO_COLOR timeout 1500 <CONDA>/envs/s19ci/bin/python -m pytest -n 4 -m not serial_timing -p no:cacheprovider tests/test_b101_inplace_views.py -rfs --tb=line
+--- pytest output
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0
+rootdir: <HOME>/work/s19_i10bc_mut
+configfile: pyproject.toml
+plugins: platformdirs-4.14.3, xdist-3.8.0
+created: 4/4 workers
+4 workers [21 items]
+
+...F........F........                                                    [100%]
+=================================== FAILURES ===================================
+[gw1] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+E   AssertionError: VALUE_0001 paints ('147', '147'), expected ('85', '85')
+<HOME>/work/s19_i10bc_mut/tests/support/timing.py:66: AssertionError: VALUE_0001 paints ('147', '147'), expected ('85', '85')
+[gw3] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+E   AssertionError: #alt_hex_view row 0x8010 paints 'FF FF FF 11 FF FF FF FF', expected 'FF FF FF AA FF FF FF FF'
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3015 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-486/popen-gw3/test_r_tui_004_7_2_save_back_s0/app workarea=/tmp/pytest-of-<user>/pytest-486/popen-gw3/test_r_tui_004_7_2_save_back_s0/app/.s19tool/workarea
+INFO     s19tui:app.py:8830 Workarea refreshed. files=0
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.017
+INFO     s19tui:app.py:18694 Loading file: path=/tmp/pytest-of-<user>/pytest-486/popen-gw3/test_r_tui_004_7_2_save_back_s0/img/three.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:15001 Load phase boundary: parse_branch_entry path=three.s19 suffix=.s19
+INFO     s19tui:app.py:19796 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-486/popen-gw3/test_r_tui_004_7_2_save_back_s0/img/three.s19 addresses=24 range_count=3 range_bytes=24 errors=0
+INFO     s19tui:app.py:15018 Load phase boundary: parse_branch_done path=three.s19 branch=s19
+INFO     s19tui:app.py:19241 Load phase boundary: apply_install_state path=three.s19 precomputed=False
+INFO     s19tui:app.py:19924 Sections updated. count=3 rendered_ranges=3 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19262 Load phase boundary: apply_sections_done path=three.s19
+INFO     s19tui:app.py:19276 Load phase boundary: apply_hex_done path=three.s19
+INFO     s19tui:app.py:21019 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18547 MAC validation computed: records=0 issues=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:18602 MAC row cache built: records=0 elapsed_seconds=0.000
+INFO     s19tui:app.py:17438 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.016
+INFO     s19tui:app.py:20533 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.019
+INFO     s19tui:app.py:19291 Load phase boundary: apply_a2l_done path=three.s19
+INFO     s19tui:app.py:20151 Memory Map updated. ranges=3
+INFO     s19tui:app.py:19314 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-486/popen-gw3/test_r_tui_004_7_2_save_back_s0/img/three.s19 file_type=s19 elapsed_seconds=0.308 has_mac=False precomputed=False
+INFO     s19tui:app.py:16525 A2L copy complete: path=/tmp/pytest-of-<user>/pytest-486/popen-gw3/test_r_tui_004_7_2_save_back_s0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347 copy_seconds=0.006
+INFO     s19tui:app.py:951 A2L cache miss: path=/tmp/pytest-of-<user>/pytest-486/popen-gw3/test_r_tui_004_7_2_save_back_s0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347
+WARNING  s19tui:app.py:16563 Recent sources not updated: '/tmp/pytest-of-<user>/pytest-486/popen-gw3/b101_i10bw_case080/firmware.a2l'
+INFO     s19tui:app.py:8830 Workarea refreshed. files=1
+INFO     s19tui:app.py:19743 A2L parse summary: path=/tmp/pytest-of-<user>/pytest-486/popen-gw3/test_r_tui_004_7_2_save_back_s0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.029 sections=1 tags=462 errors=0
+INFO     s19tui:app.py:18547 MAC validation computed: records=0 issues=924 elapsed_seconds=0.006
+INFO     s19tui:app.py:18602 MAC row cache built: records=0 elapsed_seconds=0.006
+INFO     s19tui:app.py:17470 Load phase boundary: populate_issues_table_done rows=40 total=924 elapsed=0.020
+INFO     s19tui:app.py:20533 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.027
+INFO     s19tui:app.py:21060 Load phase boundary: populate_a2l_table_done rows=200 total=462 elapsed=0.013
+INFO     s19tui:app.py:16582 A2L view refresh complete: path=/tmp/pytest-of-<user>/pytest-486/popen-gw3/test_r_tui_004_7_2_save_back_s0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.047
+INFO     s19tui:app.py:16591 A2L loaded: /tmp/pytest-of-<user>/pytest-486/popen-gw3/test_r_tui_004_7_2_save_back_s0/app/.s19tool/workarea/temp/firmware.a2l
+<HOME>/work/s19_i10bc_mut/tests/support/timing.py:66: AssertionError: #alt_hex_view row 0x8010 paints 'FF FF FF 11 FF FF FF FF', expected 'FF FF FF AA FF FF FF FF'
+=========================== short test summary info ============================
+FAILED tests/test_b101_inplace_views.py::test_r_a2l_048_3_save_back_shows_in_the_tag_table
+FAILED tests/test_b101_inplace_views.py::test_r_tui_004_7_2_save_back_shows_in_the_a2l_hex_view
+=================== 2 failed, 19 passed in 117.10s (0:01:57) ===================
+exit: 1  end 2026-11-07T11:21:30Z

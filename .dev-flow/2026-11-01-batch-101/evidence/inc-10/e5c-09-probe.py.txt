@@ -1,0 +1,35 @@
+"""Probe (E5 corrective, M-L): a switch made while a dialog is current (no product route makes one)."""
+from __future__ import annotations
+
+from pathlib import Path
+
+from tests.test_b101_unload_focus import case08, case_session, focus_report, run, settle  # noqa: F401
+from tests.support.timing import wait_until
+
+
+def test_probe_switch_while_a_dialog_is_current(tmp_path: Path, case08: Path) -> None:
+    async def scenario(app, pilot, log):
+        await case_session(pilot, app, case08)
+        original = app._land_focus
+
+        def spy(*args, **kwargs):
+            area = app.query_one("#screen_mac").region.area
+            waits = kwargs.get("layout_waits", "default")
+            print(f"PROBE call: waits={waits} area={area} screen={type(app.screen).__name__} before={focus_report(app)}", flush=True)
+            original(*args, **kwargs)
+            print(f"PROBE after call: {focus_report(app)}", flush=True)
+
+        app._land_focus = spy
+        app.action_show_legend()
+        await wait_until(pilot, lambda: type(app.screen).__name__ == "LegendScreen", "legend", timeout=10)
+        await settle(pilot, 8)
+        print(f"PROBE dialog current: {type(app.screen).__name__}; rail key 3 under it reaches no app binding, so the switch is a direct call", flush=True)
+        app.action_show_screen("mac")
+        await settle(pilot, 12)
+        print(f"PROBE under the dialog: {focus_report(app)}", flush=True)
+        await pilot.press("escape")
+        await wait_until(pilot, lambda: app.screen is app.default_screen, "closed", timeout=10)
+        await settle(pilot, 8)
+        print(f"PROBE after close: {focus_report(app)}", flush=True)
+
+    run(tmp_path, scenario)

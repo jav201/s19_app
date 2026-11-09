@@ -1744,6 +1744,12 @@ CHAIN_RUN_SEQUENTIAL = "sequential"
 CHAIN_RUN_PARALLEL = "parallel"
 CHAIN_RUN_MODES = (CHAIN_RUN_SEQUENTIAL, CHAIN_RUN_PARALLEL)
 
+#: The mode of a confirm re-run (CTX-CHAIN): the re-run of ONE waiting lane
+#: that a confirm starts. It runs the lanes in order like ``sequential`` and
+#: stays in ``record.mode`` so the chain-set report records it — but it is
+#: not a mode of the switch, so it is NOT a member of ``CHAIN_RUN_MODES``.
+CHAIN_RUN_CONFIRM_RERUN = "confirm re-run"
+
 #: The chain-set report filename stem (M-5 idiom: ``<ts>-chain-set-report.md``).
 CHAIN_SET_REPORT_STEM = "chain-set-report"
 
@@ -1837,10 +1843,10 @@ class ChainSetRunRecord:
     """The whole-set run record — the fx_a run-log's data source.
 
     Args:
-        mode (str): The dispatched mode — ``sequential`` (default) or
-            ``parallel`` (LLR-019.2's captured-value assertion arm: the field
-            MUST differ between the untouched default arm and the driven
-            non-default arm, C-10).
+        mode (str): The dispatched mode — ``sequential`` (default),
+            ``parallel``, or ``confirm re-run`` (LLR-019.2's captured-value
+            assertion arm: the field MUST differ between the untouched
+            default arm and the driven non-default arm, C-10).
         outcomes (List[ChainRunOutcome]): One per chain, in lane order —
             a chain that failed never drops its sibling (A5 / LLR-019.2's
             error arm), and the order never depends on which thread finished
@@ -1963,7 +1969,9 @@ def run_chain_set(
     Args:
         chains (Sequence[ChainSpec]): The lanes to run, in lane order.
         ctx (FlowContext): The project directory + optional MAC/A2L context.
-        mode (str): ``CHAIN_RUN_SEQUENTIAL`` (default) or ``CHAIN_RUN_PARALLEL``.
+        mode (str): ``CHAIN_RUN_SEQUENTIAL`` (default),
+            ``CHAIN_RUN_PARALLEL``, or ``CHAIN_RUN_CONFIRM_RERUN`` (a confirm
+            re-run of one lane — runs the lanes in order like ``sequential``).
         set_name (str): The set's display name for the report header
             (operator text — rendered through ``md_safe`` at emission).
         run_one (Optional[Callable]): The per-chain executor; defaults to
@@ -1979,8 +1987,10 @@ def run_chain_set(
         one refusal line per colliding name in ``diagnostics``.
 
     Raises:
-        ValueError: When ``mode`` is not one of ``CHAIN_RUN_MODES``
-            (trusted-side caller — the panel's select only offers the two).
+        ValueError: When ``mode`` is not one of ``CHAIN_RUN_MODES`` nor
+            ``CHAIN_RUN_CONFIRM_RERUN`` (trusted-side caller — the panel's
+            select only offers the two switch modes; the confirm re-run
+            arrives through the confirm handler).
 
     Data Flow:
         - ``chains`` → per-chain bound copy → ``run_flow`` → outcomes.
@@ -1993,8 +2003,10 @@ def run_chain_set(
             - compose_chain_set_report / write_chain_set_report
         Used by:
             - s19_app.tui.app.on_flow_execution_panel_run_requested
+            - s19_app.tui.app.on_flow_execution_panel_external_step_confirmed
+              (the confirm re-run, ``CHAIN_RUN_CONFIRM_RERUN``)
     """
-    if mode not in CHAIN_RUN_MODES:
+    if mode not in CHAIN_RUN_MODES and mode != CHAIN_RUN_CONFIRM_RERUN:
         raise ValueError(f"unknown chain-run mode {mode!r}")
     execute = run_one if run_one is not None else run_flow
     tick = clock if clock is not None else time.perf_counter

@@ -1,0 +1,8 @@
+Inc 10a E5 security probe (Windows PC, Python 3.11.15, run with -I from a folder outside the repository)
+worktree HEAD: 54a0eb2; product blobs equal HEAD (git hash-object): app.py aba486d4, segment_split_view.py 108cf014, project_gather_service.py 78981ac8
+command: python -I e5s-probe.py <worktree>
+---
+s19_app imported: False
+before unload: planned rows ['image:unloaded_primary.s19', 'mac:firmware.mac'] -> carried []
+after primary unload: planned rows ['image:firmware.mac'] -> carried ['unloaded_primary.s19']
+exit=0

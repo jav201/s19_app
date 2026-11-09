@@ -1,0 +1,174 @@
+=== base commit: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+=== python: Python 3.11.18
+=== mutation applied: M11 (file s19_app/tui/app.py)
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -20088,8 +20088,6 @@
+             )
+         else:
+             start_row_index = None
+-        if focus_address is not None and focus_address != self._alt_goto_focus_address:
+-            self._alt_goto_focus_address = None
+         if rows:
+             effective_start = start_row_index if isinstance(start_row_index, int) else 0
+             self._alt_first_visible_address = rows[effective_start]
+@@ -20142,8 +20140,6 @@
+             )
+         else:
+             start_row_index = None
+-        if focus_address is not None and focus_address != self._mac_goto_focus_address:
+-            self._mac_goto_focus_address = None
+         if rows:
+             effective_start = start_row_index if isinstance(start_row_index, int) else 0
+             self._mac_first_visible_address = rows[effective_start]
+LANDED M11: 'focus_address != self._alt_goto_focus_address' x0; 'focus_address != self._mac_goto_focus_address' x0
+=== s19_app.__file__ ===
+<HOME>/work/s19_i10mut_m11/s19_app/__init__.py
+=== CMD ===
+env -u NO_COLOR <HOME>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -rf  tests/test_b101_hex_jump.py::test_r_tui_040_12_5_continued_a2l_search_removes_marker tests/test_b101_hex_jump.py::test_r_tui_040_12_6_continued_mac_search_removes_marker
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+___________ test_r_tui_040_12_5_continued_a2l_search_removes_marker ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-649/test_r_tui_040_12_5_continued_0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-649/case080')
+
+    def test_r_tui_040_12_5_continued_a2l_search_removes_marker(tmp_path, case08):
+        """R-TUI-040.12/5: a continued A2L search removes the marker."""
+    
+        async def scenario(app, pilot, log):
+            await _continued_search_clears(pilot, app, log, case08, "a2l")
+    
+>       drive(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_hex_jump.py:1052: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_hex_jump.py:137: in drive
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_hex_jump.py:1050: in scenario
+    await _continued_search_clears(pilot, app, log, case08, "a2l")
+../s19_i10mut/tests/test_b101_hex_jump.py:1033: in _continued_search_clears
+    await _marker_gone(pilot, app, view, f"{view_name} after the continued search")
+../s19_i10mut/tests/test_b101_hex_jump.py:960: in _marker_gone
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function _marker_gone.<locals>.<lambda> at 0x7f4631f26b60>
+failure = <function _marker_gone.<locals>.<lambda> at 0x7f4632de3f60>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: a2l after the continued search: the marker address field still holds 80
+
+tests/support/timing.py:66: AssertionError
+___________ test_r_tui_040_12_6_continued_mac_search_removes_marker ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-649/test_r_tui_040_12_6_continued_0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-649/case080')
+
+    def test_r_tui_040_12_6_continued_mac_search_removes_marker(tmp_path, case08):
+        """R-TUI-040.12/6: a continued MAC search removes the marker."""
+    
+        async def scenario(app, pilot, log):
+            await _continued_search_clears(pilot, app, log, case08, "mac")
+    
+>       drive(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_hex_jump.py:1061: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_hex_jump.py:137: in drive
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_hex_jump.py:1059: in scenario
+    await _continued_search_clears(pilot, app, log, case08, "mac")
+../s19_i10mut/tests/test_b101_hex_jump.py:1033: in _continued_search_clears
+    await _marker_gone(pilot, app, view, f"{view_name} after the continued search")
+../s19_i10mut/tests/test_b101_hex_jump.py:960: in _marker_gone
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function _marker_gone.<locals>.<lambda> at 0x7f4633ee49a0>
+failure = <function _marker_gone.<locals>.<lambda> at 0x7f4632311800>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: mac after the continued search: the marker address field still holds 80
+
+tests/support/timing.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_hex_jump.py::test_r_tui_040_12_5_continued_a2l_search_removes_marker
+FAILED tests/test_b101_hex_jump.py::test_r_tui_040_12_6_continued_mac_search_removes_marker
+2 failed in 44.74s

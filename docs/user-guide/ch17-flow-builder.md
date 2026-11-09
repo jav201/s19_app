@@ -118,7 +118,8 @@ applies the document. The document file on disk is never changed.
 The demo document `guide_patch_funnel.changes.json` was derived (in scratch, for the
 guide) from the case change-set `demo_patch.changes.json`: the first entry's bytes at
 `0x00800000` became `${BOOST}` and the string at `0x00C00192` became
-`CAL_MODE=${MODE}`; the symbol entries were left out (finding F-01). It sits in the
+`CAL_MODE=${MODE}`; the symbol entries were left out in the captured run (before
+1.0.0 the Patch Editor refused symbol entries, finding F-01). It sits in the
 project's `patches\` folder.
 
 ![One variable](img/ch17-13-funnel-one-variable.png)

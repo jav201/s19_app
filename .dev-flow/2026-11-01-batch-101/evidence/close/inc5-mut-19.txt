@@ -1,0 +1,70 @@
+# Mutant M19 — batch-end re-run on the final tree (b982846)
+BASE_COMMIT=b982846ce33ccc20b1774f91b1091af4b42dff73
+BASE_TREE=detached worktree at 7d641d9 + git diff --binary 7d641d9 b982846 -- s19_app tests docs README.md AT-TC-REGISTRY.jsonl applied
+s19_app.__file__=<HOME>/work/s19_i5rm_m19/s19_app/__init__.py
+mutation: R-CHKED-025/2 spec bytes never pruned on a toggle
+mutation diff:
+diff --git a<HOME>/work/s19_i5rm/s19_app/tui/screens_directionb.py b<HOME>/work/s19_i5rm_m19/s19_app/tui/screens_directionb.py
+index b05226d..686df2b 100644
+--- a<HOME>/work/s19_i5rm/s19_app/tui/screens_directionb.py
++++ b<HOME>/work/s19_i5rm_m19/s19_app/tui/screens_directionb.py
+@@ -7869,7 +7869,6 @@ class CheckEditorPanel(ScrollableContainer):
+         document controls keep collecting ``items`` from the picker at
+         write/validate time."""
+         event.stop()
+-        self._prune_spec_bytes()
+         self._refresh_preview()
+ 
+     def _on_a2l_parameter_picker_bulk_add_requested(
+verify:
+grep s19_app/tui/screens_directionb.py: replaced -> 'event.stop()' FOUND
+guard nodes (1):
+  tests/test_b101_check_spec_keep.py::test_r_chked_025_2_exclude_include_rebaselines
+
+--- pytest ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________________ test_r_chked_025_2_exclude_include_rebaselines ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-538/test_r_chked_025_2_exclude_inc0')
+facts = Facts(case=PosixPath('/tmp/pytest-of-<user>/pytest-538/b101_inc5_case080'), image={0: 108, 1: 49, 2: 57, 3: 84, 4: 79...ram(name='VALUE_0002', address=20, size=2), v3=Param(name='VALUE_0003', address=40, size=4), serial=12587004, moved=32)
+
+    def test_r_chked_025_2_exclude_include_rebaselines(tmp_path: Path, facts: Facts) -> None:
+        """Case R-CHKED-025/2: case 08 and its A2L loaded; a Patch Editor apply set
+        the image byte at ``0x0`` to ``93``; the pilot spec picked; ``space`` on
+        ``VALUE_0001`` (excluded), the toggle awaited, ``space`` again (included);
+        Write as ``rebased.chk.json`` -> included ``[VALUE_0002, VALUE_0001]``, the
+        entries ``0x14`` ``A0 BE``, ``0x0`` ``93`` (re-baselined from the image),
+        ``0xC00FFC`` ``FF FF FF FF``.
+    
+        Negative control: every field taking the spec's bytes when a spec was
+        loaded -> ``0x0`` ``6C`` -> RED; the base clears the picks on the pick, so
+        the toggles end with ``VALUE_0001`` excluded -> RED."""
+        assert facts.image[facts.v1.address] != PATCH_BYTE
+    
+        async def scenario(app, pilot, log):
+            await open_session(pilot, app, facts, specs={PILOT: spec_doc(pilot_entries(facts))})
+            await apply_bytes(pilot, app, log, tmp_path, facts.v1.address, bytes([PATCH_BYTE]))
+            await pick_spec(pilot, app, log, PILOT)
+            await include_by_space(pilot, app, facts.v1.name)  # excluded
+            await include_by_space(pilot, app, facts.v1.name)  # included again
+            _lines, entries = await write_spec(pilot, app, log, "rebased.chk.json")
+            return included(app), entries
+    
+        picks, entries = run(tmp_path, scenario)
+        assert picks == [facts.v2.name, facts.v1.name], picks
+>       assert entries == [
+            (facts.v2.address, facts.image_bytes(facts.v2.address, facts.v2.size)),
+            (facts.v1.address, bytes([PATCH_BYTE])),
+            (facts.serial, facts.image_bytes(facts.serial, 4)),
+        ], entries
+E       AssertionError: [(20, b'\xa0\xbe'), (0, b'l'), (12587004, b'\xff\xff\xff\xff')]
+E       assert [(20, b'\xa0\...xff\xff\xff')] == [(20, b'\xa0\...xff\xff\xff')]
+E         
+E         At index 1 diff: (0, b'l') != (0, b'\x93')
+E         Use -v to get more diff
+
+tests/test_b101_check_spec_keep.py:1010: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_025_2_exclude_include_rebaselines
+1 failed in 26.20s

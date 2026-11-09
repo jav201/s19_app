@@ -1,0 +1,96 @@
+=== base commit: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+=== python: Python 3.11.18
+=== mutation applied: M-P (file s19_app/tui/app.py)
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -11319,8 +11319,8 @@
+             return
+         page_size = self._clamp_viewer_page_size(self.hex_rows_page_size)
+         total = len(self._hex_view_rows())
+-        start = self._hex_window_start
+-        self._hex_window_start = start + page_size if start + page_size < total else start
++        max_start = max(0, ((total - 1) // page_size) * page_size)
++        self._hex_window_start = min(max_start, self._hex_window_start + page_size)
+         self.last_search_address = None
+         self._goto_focus_address = None
+         self.update_hex_view()
+LANDED M-P: 'min(max_start, self._hex_window_start + page_size)' x1
+=== s19_app.__file__ ===
+<HOME>/work/s19_i10mut_m12/s19_app/__init__.py
+=== CMD ===
+env -u NO_COLOR <HOME>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -rf  tests/test_b101_hex_jump.py::test_r_tui_007_5_1_next_page_keeps_a_window_holding_the_last_row
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_r_tui_007_5_1_next_page_keeps_a_window_holding_the_last_row _______
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-650/test_r_tui_007_5_1_next_page_k0')
+
+    def test_r_tui_007_5_1_next_page_keeps_a_window_holding_the_last_row(tmp_path):
+        """R-TUI-007.5/1: after a jump to row 949 (window from row 948, holding the
+        last row) '.' three times keeps the window at row 948 (base: 800)."""
+    
+        async def scenario(app, pilot, log):
+            image = write_rows(tmp_path / "rows.s19", 1000)
+            app.load_selected_file(image)
+            await wait_until(pilot, lambda: app.current_file is not None and app.current_file.path.name == image.name, "load")
+            await settle_workers(pilot)
+            await wait_until(pilot, lambda: bool(hex_rows(app, "#hex_view")), "no rows painted")
+            await goto(pilot, app, log, MAIN, f"0x{row_at(949):08X}", hit(row_at(949)))
+            await wait_rows(pilot, app, MAIN, [row_at(948), row_at(949)], "go-to row 949")
+            for press in (1, 2, 3):
+                await pilot.press("period")
+                assert addrs(app, "#hex_view", 1) == [row_at(948)], (
+                    f"'.' press {press}: first row {fmt(addrs(app, '#hex_view', 1))}, expected {fmt([row_at(948)])}"
+                )
+    
+>       drive(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_hex_jump.py:1106: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_hex_jump.py:137: in drive
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f9039141f10>
+
+    async def scenario(app, pilot, log):
+        image = write_rows(tmp_path / "rows.s19", 1000)
+        app.load_selected_file(image)
+        await wait_until(pilot, lambda: app.current_file is not None and app.current_file.path.name == image.name, "load")
+        await settle_workers(pilot)
+        await wait_until(pilot, lambda: bool(hex_rows(app, "#hex_view")), "no rows painted")
+        await goto(pilot, app, log, MAIN, f"0x{row_at(949):08X}", hit(row_at(949)))
+        await wait_rows(pilot, app, MAIN, [row_at(948), row_at(949)], "go-to row 949")
+        for press in (1, 2, 3):
+            await pilot.press("period")
+>           assert addrs(app, "#hex_view", 1) == [row_at(948)], (
+                f"'.' press {press}: first row {fmt(addrs(app, '#hex_view', 1))}, expected {fmt([row_at(948)])}"
+            )
+E           AssertionError: '.' press 1: first row [0x0000B200], expected [0x0000BB40]
+E           assert [45568] == [47936]
+E             
+E             At index 0 diff: 45568 != 47936
+E             Use -v to get more diff
+
+../s19_i10mut/tests/test_b101_hex_jump.py:1102: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_hex_jump.py::test_r_tui_007_5_1_next_page_keeps_a_window_holding_the_last_row
+1 failed in 4.33s

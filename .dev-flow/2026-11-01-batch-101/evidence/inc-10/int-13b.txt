@@ -1,0 +1,12 @@
+=== Inc 10a E4 rulings run: int-13b
+date: 2026-11-07T02:45:44Z
+checkout HEAD (base): 2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+main ref in this checkout: 2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+index tree with the increment staged: c9513e1c1f2e2a0d8a67e561218bf3a6f1cf2383
+staged files vs base: 10
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10fix/s19_app/__init__.py
+CMD: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -p no:xdist -m not serial_timing -rfs tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_waits_for_the_end[project] tests/test_b100_workers.py::test_tc_b100_53_confirmed_quit_during_a_routed_project_load_exits_cleanly
+..                                                                       [100%]
+2 passed in 9.86s
+=== exit code: 0

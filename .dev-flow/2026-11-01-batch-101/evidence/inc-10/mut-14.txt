@@ -1,0 +1,109 @@
+=== base commit: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+=== python: Python 3.11.18
+=== mutation applied: M12 (file s19_app/tui/app.py)
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -11318,7 +11318,7 @@
+         if not self.current_file or not self.current_file.row_bases:
+             return
+         page_size = self._clamp_viewer_page_size(self.hex_rows_page_size)
+-        total = len(self._hex_view_rows())
++        total = len(self.current_file.row_bases)
+         start = self._hex_window_start
+         self._hex_window_start = start + page_size if start + page_size < total else start
+         self.last_search_address = None
+LANDED M12: 'total = len(self.current_file.row_bases)' x1
+=== s19_app.__file__ ===
+<HOME>/work/s19_i10mut_m14/s19_app/__init__.py
+=== CMD ===
+env -u NO_COLOR <HOME>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -rf  tests/test_b101_hex_jump.py::test_r_tui_007_8_1_pages_count_the_row_added_for_a_mac_record
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_r_tui_007_8_1_pages_count_the_row_added_for_a_mac_record _________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-652/test_r_tui_007_8_1_pages_count0')
+
+    def test_r_tui_007_8_1_pages_count_the_row_added_for_a_mac_record(tmp_path):
+        """R-TUI-007.8/1: with a MAC record below the image and a page of 3 rows,
+        '.' shows 0x00008020 alone and a second '.' keeps it (base: the first page)."""
+    
+        async def scenario(app, pilot, log):
+            await load_three(pilot, app, tmp_path, mac=True)
+            await show(pilot, app, MAIN)
+            mark = len(log.messages)
+            app._apply_viewer_setting("hex_rows_page_size", 3)
+            await wait_status(pilot, log, mark, "Updated hex_rows_page_size to 3.")
+            assert app.hex_rows_page_size == 3
+            await wait_until(
+                pilot,
+                lambda: [addr_of(r) for r in hex_rows(app, "#hex_view")] == [0x1000, 0x8000, 0x8010],
+                lambda: f"first page: {fmt(addrs(app, '#hex_view', 5))}",
+            )
+            await pilot.press("period")
+            await wait_until(
+                pilot,
+                lambda: [addr_of(r) for r in hex_rows(app, "#hex_view")] == [0x8020],
+                lambda: f"after the first '.': {fmt(addrs(app, '#hex_view', 5))}, expected [0x00008020]",
+                timeout=FIX_WAIT,
+            )
+            await pilot.press("period")
+            assert [addr_of(r) for r in hex_rows(app, "#hex_view")] == [0x8020], fmt(addrs(app, "#hex_view", 5))
+    
+>       drive(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_hex_jump.py:1135: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_hex_jump.py:137: in drive
+    return projects.run_app(base, scenario, size=size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_hex_jump.py:1126: in scenario
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_r_tui_007_8_1_pages_count_the_row_added_for_a_mac_record.<locals>.scenario.<locals>.<lambda> at 0x7fdcb180e840>
+failure = <function test_r_tui_007_8_1_pages_count_the_row_added_for_a_mac_record.<locals>.scenario.<locals>.<lambda> at 0x7fdcb0de9b20>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: after the first '.': [0x00001000, 0x00008000, 0x00008010], expected [0x00008020]
+
+tests/support/timing.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_hex_jump.py::test_r_tui_007_8_1_pages_count_the_row_added_for_a_mac_record
+1 failed in 13.38s

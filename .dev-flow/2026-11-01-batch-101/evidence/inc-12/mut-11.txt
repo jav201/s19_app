@@ -1,0 +1,52 @@
+base commit: 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+mutant: M11
+
+mutation:
+==== diff -u docs/user-guide/ch16-reports.md ====
+--- <HOME>/work/s19_i12mut/docs/user-guide/ch16-reports.md	2026-11-07 05:38:44.570943176 -0600
++++ <HOME>/work/s19_i12mut_m11/docs/user-guide/ch16-reports.md	2026-11-07 06:04:09.977351674 -0600
+@@ -57,5 +57,4 @@
+ | Filter dropdown / path | select / type | 16.1 |
+ | Context bytes | type | 16.1 |
+ | Generate new report | button | 16.2 |
+-| Open reports/, `?` | chips | 16.1 |
+-| Close | button / `esc` | 16.1 |
++| Open reports/, `?`, Close | chips, button | 16.1 |
+
+
+s19_app.__file__: <HOME>/work/s19_i12mut_m11/s19_app/__init__.py
+
+--- landed grep M11: 'docs/user-guide/ch16-reports.md' marker='chips, button' expected=present found=present OK=True ---
+60:| Open reports/, `?`, Close | chips, button | 16.1 |
+
+
+nodes (1):
+  tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-12]
+
+
+--- pytest ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________ test_r_doc_guide_1_passages_describe_1_0_0[passage-12] ____________
+
+number = 12
+
+    @pytest.mark.parametrize(
+        "number", range(1, len(_GUIDE_PASSAGES) + 1), ids=lambda n: f"passage-{n}"
+    )
+    def test_r_doc_guide_1_passages_describe_1_0_0(number: int) -> None:
+        name, absent, present = _GUIDE_PASSAGES[number - 1]
+        text = _flat(_doc(f"docs/user-guide/{name}"))
+        stale = [p for p in absent if _flat(p) in text]
+        missing = [p for p in present if _flat(p) not in text]
+>       assert stale == [], f"{name}: stale text still present: {stale}"
+E       AssertionError: ch16-reports.md: stale text still present: ['Open reports/, `?`, Close']
+E       assert ['Open reports/, `?`, Close'] == []
+E         
+E         Left contains one more item: 'Open reports/, `?`, Close'
+E         Use -v to get more diff
+
+../s19_i12mut/tests/test_b101_help_legend_docs.py:1853: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_help_legend_docs.py::test_r_doc_guide_1_passages_describe_1_0_0[passage-12]
+1 failed in 0.24s

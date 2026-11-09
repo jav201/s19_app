@@ -499,11 +499,11 @@ def test_goto_focus_not_cleared_on_tab_switch(tmp_path: Path) -> None:
             app._goto_focus_address = 0x1040
             # Switch the active view (workspace -> a2l -> mac -> workspace); the main
             # focus address must persist per view across these tab switches.
-            app.action_view_alt()
+            app.action_show_screen("a2l")
             await pilot.pause()
-            app.action_view_mac()
+            app.action_show_screen("mac")
             await pilot.pause()
-            app.action_view_main()
+            app.action_show_screen("workspace")
             await pilot.pause()
             return app._goto_focus_address
 

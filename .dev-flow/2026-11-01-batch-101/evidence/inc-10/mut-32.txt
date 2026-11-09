@@ -1,0 +1,122 @@
+=== base commit: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+=== python: Python 3.11.18
+=== mutation applied: M29 (file s19_app/tui/segment_split_view.py)
+--- a/s19_app/tui/segment_split_view.py
++++ b/s19_app/tui/segment_split_view.py
+@@ -2083,8 +2083,6 @@
+         # directly and bypasses ``check_action``, so the hidden-window guard
+         # lives here too — Enter, a click or ``e`` on a hidden window writes
+         # nothing.
+-        if self.has_class("hidden"):
+-            return
+         app = self._app()
+         rows = self._rows()
+         plan = self._plan(rows)
+LANDED M29: 'if self.has_class("hidden"):' x1
+=== s19_app.__file__ ===
+<HOME>/work/s19_i10mut_m32/s19_app/__init__.py
+=== CMD ===
+env -u NO_COLOR <HOME>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -rf  tests/test_b101_unload_focus.py::test_r_seg_open_7_4_export_button_writes_nothing_while_hidden
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_r_seg_open_7_4_export_button_writes_nothing_while_hidden _________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-670/test_r_seg_open_7_4_export_but0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-670/b101_i10f_case080')
+
+    def test_r_seg_open_7_4_export_button_writes_nothing_while_hidden(tmp_path: Path, case08: Path) -> None:
+        """R-SEG-OPEN.7 case /4: Split / Join opened and every row ticked with ``a``
+        (asserted before the trigger), closed with Esc, the focus put on
+        ``#sje_export``; Enter writes 0 files, paints no ``Exported`` and no
+        ``nothing selected`` (base: the button runs the export)."""
+    
+        async def scenario(app, pilot, log):
+            await case_session(pilot, app, case08, mac=False)
+            await open_split_join(pilot, app)
+            await pilot.press("a")
+            await wait_until(
+                pilot,
+                lambda: "nothing selected" not in plain_of(app.query_one("#sje_stats", Static)),
+                lambda: f"setup: no row ticked: {plain_of(app.query_one('#sje_stats', Static))!r}",
+                timeout=FOCUS_WAIT_S,
+            )
+            await pilot.press("escape")
+            await wait_screen(pilot, app, "workspace")
+            await wait_until(
+                pilot, lambda: split_join_hidden(app), "Split / Join was not hidden", timeout=FOCUS_WAIT_S
+            )
+            await settle(pilot, 10)
+            await put_focus(pilot, app, "sje_export")
+            assert split_join_hidden(app)
+            assert export_files(app) == []
+            mark = len(log.messages)
+            await pilot.press("enter")
+            await pilot.press("2")
+            await wait_screen(pilot, app, "a2l")
+            await settle(pilot, 4)
+            assert export_files(app) == [], export_files(app)
+            assert exported_messages(log, mark) == [], exported_messages(log, mark)
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:1543: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f6463fc9710>
+
+    async def scenario(app, pilot, log):
+        await case_session(pilot, app, case08, mac=False)
+        await open_split_join(pilot, app)
+        await pilot.press("a")
+        await wait_until(
+            pilot,
+            lambda: "nothing selected" not in plain_of(app.query_one("#sje_stats", Static)),
+            lambda: f"setup: no row ticked: {plain_of(app.query_one('#sje_stats', Static))!r}",
+            timeout=FOCUS_WAIT_S,
+        )
+        await pilot.press("escape")
+        await wait_screen(pilot, app, "workspace")
+        await wait_until(
+            pilot, lambda: split_join_hidden(app), "Split / Join was not hidden", timeout=FOCUS_WAIT_S
+        )
+        await settle(pilot, 10)
+        await put_focus(pilot, app, "sje_export")
+        assert split_join_hidden(app)
+        assert export_files(app) == []
+        mark = len(log.messages)
+        await pilot.press("enter")
+        await pilot.press("2")
+        await wait_screen(pilot, app, "a2l")
+        await settle(pilot, 4)
+>       assert export_files(app) == [], export_files(app)
+E       AssertionError: ['firmware_range_00.s19', 'firmware_range_01.s19', 'firmware_range_02.s19', 'firmware_range_03.s19']
+E       assert ['firmware_ra...range_03.s19'] == []
+E         
+E         Left contains 4 more items, first extra item: 'firmware_range_00.s19'
+E         Use -v to get more diff
+
+../s19_i10mut/tests/test_b101_unload_focus.py:1540: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_unload_focus.py::test_r_seg_open_7_4_export_button_writes_nothing_while_hidden
+1 failed in 11.70s

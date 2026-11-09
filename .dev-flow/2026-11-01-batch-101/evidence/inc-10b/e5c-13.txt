@@ -1,0 +1,30 @@
+== e5c-13  2026-11-07T11:46:14Z  host: LAN Linux laptop
+base commit (HEAD): 6f1743c1ad54ff7db89e8fcd4e96266414950f42  main: 6f1743c1ad54ff7db89e8fcd4e96266414950f42  origin/main: 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+staged tree (index): 43e7fcaf7991de4398ef944d3153451b242b7dfb
+working tree = index (no mutant edit)
+python: 3.11.18
+s19_app.__file__: <HOME>/work/s19_i10bc/s19_app/__init__.py
+CMD: cd <HOME>/work/s19_i10bc && env -u NO_COLOR timeout 1800 <CONDA>/envs/s19ci/bin/python -m pytest -m serial_timing -p no:xdist -p no:cacheprovider tests/test_b101_inplace_views.py tests/test_b101_unload_focus.py tests/test_address_census.py tests/test_suite_hygiene.py tests/test_id_registry.py tests/test_engine_unchanged.py tests/test_docs_canon.py tests/test_b101_doc_hygiene.py tests/test_b101_help_legend_docs.py -rA --tb=short
+--- pytest output
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0
+rootdir: <HOME>/work/s19_i10bc
+configfile: pyproject.toml
+plugins: platformdirs-4.14.3, xdist-3.8.0
+collected 299 items / 297 deselected / 2 selected
+
+tests/test_b101_inplace_views.py QC-TM-10b-1 case_06: 220040 tags, 0.350 s
+.                                       [ 50%]
+tests/test_suite_hygiene.py .                                            [100%]
+
+==================================== PASSES ====================================
+============================= QC-TM timing margins =============================
+49.6%  0.202 s / 0.400 s  R-TST-020 fast return  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+65.0%  0.350 s / 1.000 s  QC-TM-10b-1 A2L refresh 220040 tags  tests/test_b101_inplace_views.py::test_qc_tm_10b_1_a2l_refresh_cost_on_the_largest_a2l
+66.4%  0.504 s / 1.500 s  R-TST-020 wall-clock bound  tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+QC-TM: 3 bounds, 0 under 20 % margin
+=========================== short test summary info ============================
+PASSED tests/test_b101_inplace_views.py::test_qc_tm_10b_1_a2l_refresh_cost_on_the_largest_a2l
+PASSED tests/test_suite_hygiene.py::test_r_tst_020_shared_wait_is_bounded_by_the_wall_clock
+====================== 2 passed, 297 deselected in 31.01s ======================
+exit: 0  end 2026-11-07T11:46:47Z

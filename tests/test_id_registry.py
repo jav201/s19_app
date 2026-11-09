@@ -181,18 +181,23 @@ from tools.id_registry import (
 # tests/test_b101_check_spec_keep.py); re-measured by the merge verification.
 # batch-101 Inc 6: 265 -> 267, measured at E4 integration (tests/test_b101_patch_lifecycle.py,
 # tests/test_b101_document_homes.py).
-# batch-103 Inc 4 E4: 267 -> 269 (tests/test_b103_label_match.py,
+# batch-101 Inc 9: 267 -> 269, measured at E4 integration (tests/test_b101_flow_saves.py,
+# tests/test_b101_flow_names_ui.py).
+# batch-101 Inc 12b: 269 -> 270, measured at E4 integration (tests/test_b101_flow_shown_widgets.py).
+# batch-101 Inc 10a: 270 -> 272, measured at E4 (round-2 run int-21 on 09b4808 + Inc 10a)
+# (tests/test_b101_hex_jump.py, tests/test_b101_unload_focus.py).
+# batch-101 Inc 10b: 272 -> 273, measured at E4 integration (tests/test_b101_inplace_views.py).
+# batch-101 Inc 12: 273 -> 275 at the merge (measured 272 -> 274 at E4 integration on 6f1743c + Inc 12)
+# (tests/test_b101_reach_and_reports_escape.py, tests/test_b101_shown_widgets.py).
+# batch-103 Inc 4 E4: 275 -> 277 (tests/test_b103_label_match.py,
 # tests/test_b103_label_match_perf.py); re-measured at integration.
 # batch-103 Inc 2a: +3 (tests/test_b103_a2l_definition.py, tests/test_b103_a2l_definition_perf.py,
-# tests/test_b103_synth_definitions.py; no support module); merged count 272, to be
-# re-measured by the guard on the LAN Linux host at the next integrated run.
+# tests/test_b103_synth_definitions.py; no support module); 277 -> 280.
 # batch-103 Inc 11 E4 (tester): +3 (tests/test_b103_a2l_reader.py,
-# tests/test_b103_a2l_reader_perf.py, tests/support/b103_a2l_ref.py); 272 -> 275,
-# to be re-measured by the guard on the LAN Linux host.
-# batch-103 Inc 11 E5 (tester): +1 (tests/test_b103_a2l_reader_e5.py); 275 -> 276,
-# measured with ``scanned_test_files()``.
-# batch-103 Inc 11 E5 coverage: +1 (tests/test_b103_a2l_reader_coverage.py); 276 -> 277.
-EXPECTED_SCANNED_TEST_FILES = 277
+# tests/test_b103_a2l_reader_perf.py, tests/support/b103_a2l_ref.py); 280 -> 283.
+# batch-103 Inc 11 E5 (tester): +1 (tests/test_b103_a2l_reader_e5.py); 283 -> 284.
+# batch-103 Inc 11 E5 coverage: +1 (tests/test_b103_a2l_reader_coverage.py); 284 -> 285.
+EXPECTED_SCANNED_TEST_FILES = 285
 """Test modules scanned, including this one.
 
 batch-101 Inc 11: 250 -> 253. ``tests/test_b101_a2l_blocks_and_segments.py``,

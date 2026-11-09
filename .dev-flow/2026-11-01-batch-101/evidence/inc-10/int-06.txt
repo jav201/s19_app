@@ -1,0 +1,21 @@
+=== Inc 10a E4 integration run: int-06 (probe, AR2-5 consequence)
+date: 2026-11-06T22:47:21Z
+worktree HEAD (base): 2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+index tree with the increment staged: 6bbd677d690ed691e2b7f5af098214d40317e1e8
+CMD: env -u NO_COLOR HOME=<tmp> XDG_*=<tmp> LOCALAPPDATA=<tmp> python - < probe_ar25.py (stdin, worktree on sys.path)
+s19_app.__file__ = <HOME>/work/s19_i10int/s19_app/__init__.py
+after go-to row 949 of big.s19: _hex_window_start = 948 rows ['  0x00003B40  B4 B4 B4 B4 B4 B4 B4 B4 B4 B4 B4 B4 B4 B4 B4 B4  |................|', '  0x00003B50  B5 B5 B5 B5 B5 B5 B5 B5 B5 B5 B5 B5 B5 B5 B5 B5  |................|']
+after loading three.s19: _hex_window_start = 2
+  painted hex rows: ['  0x00008020  20 21 22 23 24 25 26 27                          | !"#$%&\'        |']
+  notice lines: ['... showing from 0x00008020 (context preserved) ...']
+=== exit code: 0
+
+=== int-06b: the same probe on base (detached worktree s19_i10int_base, nothing staged)
+worktree HEAD (base): 2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+index tree: 337d9f8a43a966a21065a1ff6f52840beae805a5
+s19_app.__file__ = <HOME>/work/s19_i10int_base/s19_app/__init__.py
+after go-to row 949 of big.s19: _hex_window_start = 800 rows ['  0x00003200  20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20  |                |', '  0x00003210  21 21 21 21 21 21 21 21 21 21 21 21 21 21 21 21  |!!!!!!!!!!!!!!!!|']
+after loading three.s19: _hex_window_start = 0
+  painted hex rows: ['  0x00008000  00 01 02 03 04 05 06 07                          |........        |', '  0x00008010  FF FF FF FF FF FF FF FF                          |........        |', '  0x00008020  20 21 22 23 24 25 26 27                          | !"#$%&\'        |']
+  notice lines: []
+=== exit code: 0

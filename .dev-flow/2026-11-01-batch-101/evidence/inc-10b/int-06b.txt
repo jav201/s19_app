@@ -1,0 +1,30 @@
+=== Inc 10b E4 integration: int-06b — M-D (the notice calls refresh_window) on the corrected node (I-D5)
+
+=== mutant M-D (2026-11-07T09:08:49Z)
+copy: <HOME>/work/s19_i10bint_mut (cp -a of the clone); base (HEAD = main): 09b4808a0344de05d9d64cd55362ac7058a8c17f
+index tree (the integrated tree before the mutant): 9cf01b0259cf241f968e9b38159988af7171accf
+test file blob: fc9a09a2e8f6a1c40c9f38d9fef5ff695b203c94
+M-D: 1 edit(s) applied to s19_app/tui/segment_split_view.py
+mutated files vs index:
+   s19_app/tui/segment_split_view.py | 2 +-
+   1 file changed, 1 insertion(+), 1 deletion(-)
+  -            self._bump()
+  +            self.refresh_window()  # MUTANT M-D
+s19_app.__file__ = <HOME>/work/s19_i10bint_mut/s19_app/__init__.py
+CMD: env -u NO_COLOR PYTHONPATH=<copy> timeout 1200 python -m pytest -q -p no:cacheprovider -n 6 --dist load -m 'not serial_timing' -rfs --tb=line tests/test_b101_inplace_views.py -k 'prev_22'
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+[gw0] linux -- Python 3.11.18 <CONDA>/envs/s19ci/bin/python
+E   AssertionError: the focus moved from #sje_export to #sje_table
+    assert 'sje_table' == 'sje_export'
+      
+      - sje_export
+      + sje_table
+<HOME>/work/s19_i10bint_mut/tests/test_b101_inplace_views.py:1250: AssertionError: the focus moved from #sje_export to #sje_table
+=========================== short test summary info ============================
+FAILED tests/test_b101_inplace_views.py::test_r_seg_prev_22_1_preview_refresh_keeps_the_focus
+1 failed in 15.16s
+exit: 1

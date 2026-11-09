@@ -1,0 +1,381 @@
+=== base commit: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+=== python: Python 3.11.18
+=== mutation applied: M-R6 (file s19_app/tui/app.py)
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -9959,7 +9959,6 @@
+     #: tails still land on ``_FOCUS_TARGETS``.
+     _SWITCH_LANDING_TARGETS: "dict[str, str]" = {
+         "a2l": "window_help_a2l",
+-        "mac": "mac_page_prev_button",
+     }
+ 
+     #: Every window container a focused widget can sit in: the registry's
+LANDED M-R6: '"mac": "mac_page_prev_button"' x0; '"a2l": "window_help_a2l"' x1
+=== s19_app.__file__ ===
+<HOME>/work/s19_i10mut_m38/s19_app/__init__.py
+=== CMD ===
+env -u NO_COLOR <HOME>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -rf -n 4 --dist load tests/test_b101_unload_focus.py::test_r_tui_020_1_mac_arm_key_3_then_pagedown_pages_the_mac_view tests/test_b101_unload_focus.py::test_r_shell_focus_2_3_rail_key_in_split_join_focuses_that_window tests/test_b101_unload_focus.py::test_r_shell_focus_2_5_every_rail_key_lands_on_its_target[mac] tests/test_b101_unload_focus.py::test_r_shell_focus_2_7_the_later_of_two_rail_keys_wins
+bringing up nodes...
+bringing up nodes...
+
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+______ test_r_shell_focus_2_3_rail_key_in_split_join_focuses_that_window _______
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-686/popen-gw1/test_r_shell_focus_2_3_rail_ke0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-686/popen-gw1/b101_i10f_case080')
+
+    def test_r_shell_focus_2_3_rail_key_in_split_join_focuses_that_window(
+        tmp_path: Path, case08: Path
+    ) -> None:
+        """R-SHELL-FOCUS.2 case /3 (changed at E4, E4-R6): ``3`` in Split / Join
+        shows the MAC View with the MAC window's switch landing
+        ``mac_page_prev_button`` focused (graph I-4; the record table's own PgDn
+        would shadow R-TUI-020.1's paging; base: nothing focused; the Inc 10a tree
+        before E4-R6: ``mac_records_list``)."""
+    
+        async def scenario(app, pilot, log):
+            await case_session(pilot, app, case08)
+            await open_split_join(pilot, app)
+            await pilot.press("3")
+            await wait_screen(pilot, app, "mac")
+            await wait_focus(pilot, app, "mac_page_prev_button")
+            assert inside(focus_of(app), "screen_mac"), focus_report(app)
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:983: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_unload_focus.py:980: in scenario
+    await wait_focus(pilot, app, "mac_page_prev_button")
+../s19_i10mut/tests/test_b101_unload_focus.py:269: in wait_focus
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function wait_focus.<locals>.landed at 0x7ff4f4bac2c0>
+failure = <function wait_focus.<locals>.<lambda> at 0x7ff4f0d6c0e0>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: the focus never landed on #mac_page_prev_button; it is DataTable#mac_records_list (region area 360)
+
+tests/support/timing.py:66: AssertionError
+_______ test_r_tui_020_1_mac_arm_key_3_then_pagedown_pages_the_mac_view ________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-686/popen-gw0/test_r_tui_020_1_mac_arm_key_30')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-686/popen-gw0/b101_i10f_case080')
+
+    def test_r_tui_020_1_mac_arm_key_3_then_pagedown_pages_the_mac_view(
+        tmp_path: Path, case08: Path
+    ) -> None:
+        """R-TUI-020.1's MAC arm (added at E4, E4-R6; graph I-4): with case 08's
+        image and its 200-record MAC loaded (page size 100), ``3`` then PgDn shows
+        the next page of the MAC records table: the summary goes from
+        ``Page 1/2 | rows 1-100 / 200`` to ``Page 2/2 | rows 101-200 / 200``. PgDn
+        is pressed only once the switch has landed inside the MAC window, so the
+        landing widget is what receives it (the Inc 10a tree before E4-R6: the
+        landing on ``mac_records_list``, whose own PgDn scrolls the table, keeps
+        page 1, I-D18; base pages, with the focus left in the hidden Workspace)."""
+    
+        async def scenario(app, pilot, log):
+            await case_session(pilot, app, case08, mac=True)
+            await pilot.press("3")
+            await wait_screen(pilot, app, "mac")
+            await wait_until(
+                pilot,
+                lambda: focus_of(app) is not None
+                and focus_of(app).region.area > 0
+                and inside(focus_of(app), "screen_mac"),
+                lambda: f"setup: the switch never landed inside the MAC window: {focus_report(app)}",
+                timeout=FOCUS_WAIT_S,
+            )
+            await wait_until(
+                pilot,
+                lambda: mac_summary(app).startswith("Page 1/2 | rows 1-100 / 200"),
+                lambda: f"setup: the MAC View is not on its first page: {mac_summary(app)!r}",
+                timeout=FOCUS_WAIT_S,
+            )
+            landed = focus_report(app)
+            await pilot.press("pagedown")
+            await wait_until(
+                pilot,
+                lambda: mac_summary(app).startswith("Page 2/2 | rows 101-200 / 200"),
+                lambda: (
+                    f"PgDn after 3 did not page the MAC View: {(mac_summary(app).splitlines() or [''])[0]!r}; "
+                    f"the focus at the press was {landed}"
+                ),
+                timeout=FOCUS_WAIT_S,
+            )
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:1167: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_unload_focus.py:1157: in scenario
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_r_tui_020_1_mac_arm_key_3_then_pagedown_pages_the_mac_view.<locals>.scenario.<locals>.<lambda> at 0x7f9320383e20>
+failure = <function test_r_tui_020_1_mac_arm_key_3_then_pagedown_pages_the_mac_view.<locals>.scenario.<locals>.<lambda> at 0x7f9320383ce0>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: PgDn after 3 did not page the MAC View: 'Page 1/2 | rows 1-100 / 200 (page size 100; +/- for MAC page)  Total=200  Verified=0  Invalid=0  Neutral=200  NameInA2L=0  OutOfMem=0  ParseErrs=0'; the focus at the press was DataTable#mac_records_list (region area 360)
+
+tests/support/timing.py:66: AssertionError
+____________ test_r_shell_focus_2_7_the_later_of_two_rail_keys_wins ____________
+[gw3] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-686/popen-gw3/test_r_shell_focus_2_7_the_lat0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-686/popen-gw3/b101_i10f_case080')
+
+    def test_r_shell_focus_2_7_the_later_of_two_rail_keys_wins(tmp_path: Path, case08: Path) -> None:
+        """R-SHELL-FOCUS.2 case /7 (changed at E4, E4-R6): two rail actions
+        (``2``, then ``3``) with no await between them land the focus on the MAC
+        window's switch landing ``mac_page_prev_button`` once laid out; the stale
+        ``2`` landing does not move it to ``window_help_a2l`` (base: nothing lands;
+        the Inc 10a tree before E4-R6: ``mac_records_list``)."""
+    
+        async def scenario(app, pilot, log):
+            await case_session(pilot, app, case08, mac=True, a2l=True)
+            app.action_show_screen("a2l")
+            app.action_show_screen("mac")
+            await wait_screen(pilot, app, "mac")
+            await wait_focus(pilot, app, "mac_page_prev_button")
+            await settle(pilot, 8)
+            assert focus_of(app) is not None and focus_of(app).id == "mac_page_prev_button", focus_report(app)
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:1117: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_unload_focus.py:1113: in scenario
+    await wait_focus(pilot, app, "mac_page_prev_button")
+../s19_i10mut/tests/test_b101_unload_focus.py:269: in wait_focus
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function wait_focus.<locals>.landed at 0x7f7897d2c360>
+failure = <function wait_focus.<locals>.<lambda> at 0x7f7897d2c400>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: the focus never landed on #mac_page_prev_button; it is DataTable#mac_records_list (region area 360)
+
+tests/support/timing.py:66: AssertionError
+________ test_r_shell_focus_2_5_every_rail_key_lands_on_its_target[mac] ________
+[gw2] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-686/popen-gw2/test_r_shell_focus_2_5_every_r0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-686/popen-gw2/b101_i10f_case080')
+key = '3', window = 'mac', target_id = 'mac_page_prev_button'
+
+    @pytest.mark.parametrize(
+        "key,window,target_id", RAIL_TARGETS, ids=[row[1] for row in RAIL_TARGETS]
+    )
+    def test_r_shell_focus_2_5_every_rail_key_lands_on_its_target(
+        tmp_path: Path, case08: Path, key: str, window: str, target_id: str
+    ) -> None:
+        """R-SHELL-FOCUS.2 case /5: with the image, A2L and MAC loaded, each rail key
+        lands the focus on its window's CTX-SHELL target, or (target not shown) on
+        the first shown focusable non-text widget of the window, else its rail item
+        (base: the focus stays in the window just left); ``2`` and ``3`` land on
+        their windows' switch landings (changed at E4, E4-R4 / E4-R6)."""
+    
+        async def scenario(app, pilot, log):
+            await case_session(pilot, app, case08, mac=True, a2l=True)
+            if window == "workspace":
+                await pilot.press("3")
+                await wait_screen(pilot, app, "mac")
+                await settle(pilot, 8)
+            await pilot.press(key)
+            await wait_screen(pilot, app, window)
+            await wait_until(
+                pilot,
+                lambda: focus_matches_target(app, target_id),
+                lambda: f"after {key!r} the focus is {focus_report(app)}, not #{target_id}",
+                timeout=FOCUS_WAIT_S,
+            )
+            assert target_is_shown(app, target_id), f"#{target_id} paints no region"
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:1055: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_unload_focus.py:1047: in scenario
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_r_shell_focus_2_5_every_rail_key_lands_on_its_target.<locals>.scenario.<locals>.<lambda> at 0x7f424920e3e0>
+failure = <function test_r_shell_focus_2_5_every_rail_key_lands_on_its_target.<locals>.scenario.<locals>.<lambda> at 0x7f42516b00e0>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: after '3' the focus is DataTable#mac_records_list (region area 360), not #mac_page_prev_button
+
+tests/support/timing.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_unload_focus.py::test_r_shell_focus_2_3_rail_key_in_split_join_focuses_that_window
+FAILED tests/test_b101_unload_focus.py::test_r_tui_020_1_mac_arm_key_3_then_pagedown_pages_the_mac_view
+FAILED tests/test_b101_unload_focus.py::test_r_shell_focus_2_7_the_later_of_two_rail_keys_wins
+FAILED tests/test_b101_unload_focus.py::test_r_shell_focus_2_5_every_rail_key_lands_on_its_target[mac]
+4 failed in 27.66s

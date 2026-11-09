@@ -167,11 +167,19 @@ def test_tc008_slash_focuses_find_from_every_screen(tmp_path: Path) -> None:
     `AT-B78-04` (3 owning screens) and `AT-B78-05` (7 notice screens) cover only
     when read together, and it would have touched the AT/TC registry, which is
     Inc-11's declared work.
-    """
 
-    async def _drive() -> list[tuple[str, str]]:
+    Batch-101 Inc 10a (R-SHELL-FOCUS.2, ruling D-2): a window switch now
+    lands the focus on the window's target (or its fallback) once laid out,
+    so the sweep no longer starts each screen from no focus: it waits for
+    the landing, then ``/`` on a screen owning no find input must leave the
+    focus where it was (it took no focus), and on the three owning screens
+    must move it to their own input.
+    """
+    from tests.support.timing import wait_until
+
+    async def _drive() -> list[tuple[str, str, str]]:
         app = S19TuiApp(base_dir=tmp_path)
-        seen: list[tuple[str, str]] = []
+        seen: list[tuple[str, str, str]] = []
         async with app.run_test() as pilot:
             await pilot.pause()
             for key in (
@@ -185,11 +193,26 @@ def test_tc008_slash_focuses_find_from_every_screen(tmp_path: Path) -> None:
                 "flow",
             ):
                 app.action_show_screen(key)
-                app.set_focus(None)
-                await pilot.pause()
+
+                def landed() -> bool:
+                    widget = app.focused
+                    if widget is None or widget.region.area <= 0:
+                        return False
+                    container = S19TuiApp.SCREEN_CONTAINER_IDS[key]
+                    return widget.id == f"rail_item_{key}" or any(
+                        node.id == container for node in widget.ancestors
+                    )
+
+                await wait_until(
+                    pilot,
+                    landed,
+                    lambda: f"no focus landed in {key!r}: {app.focused!r}",
+                    timeout=10.0,
+                )
+                before = app.focused.id or ""
                 await pilot.press("slash")
                 await pilot.pause()
-                seen.append((key, app.focused.id if app.focused else ""))
+                seen.append((key, before, app.focused.id if app.focused else ""))
         return seen
 
     seen = asyncio.run(_drive())
@@ -198,16 +221,16 @@ def test_tc008_slash_focuses_find_from_every_screen(tmp_path: Path) -> None:
         "a2l": "alt_search_input",
         "mac": "mac_search_input",
     }
-    for key, focused_id in seen:
+    for key, before, focused_id in seen:
         if key in expected:
             assert focused_id == expected[key], (
                 f"'/' must focus {key!r}'s OWN find input {expected[key]!r}, "
                 f"focused {focused_id!r}"
             )
         else:
-            assert focused_id == "", (
+            assert focused_id == before, (
                 f"on {key!r}, which owns no find input, '/' must take no focus "
-                f"at all (the notice path); focused {focused_id!r}"
+                f"(the notice path); the focus moved from {before!r} to {focused_id!r}"
             )
 
 

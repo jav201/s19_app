@@ -6991,4 +6991,60 @@ The palette entry and closing by a rail key are S6's (R-TUI-021.10, R-TUI-021.11
 | R-SEG-EXP.13 | When | When every file of an export is written or reused, the system shall show the notification `Exported <n> file(s): <written list>`. |
 | R-SEG-EXP.14 | If | If an export fails for a reason that no other row of S17.7 or S17.8 names, then the system shall show the notice `Export failed: <error>`. |
 
-
+| Id | Statement | Owning batch | Status |
+|---|---|---|---|
+| US-101.1 | As the engineer who changes s19_app, I read and change one requirements file in which every requirement is a single strict EARS sentence with a stable id, so that each requirement can be tested on its own and traced to its tests. | 2026-11-01-batch-101 | active |
+| US-BAR-1 | the before/after report names itself and its inputs | 2026-11-01-batch-101 | active |
+| US-CHK-KEEP-1 | my included parameters survive a Write and a return to the Check Editor | 2026-11-01-batch-101 | active |
+| US-CHK-SPEC-1 | a spec I load back is the spec I wrote | 2026-11-01-batch-101 | active |
+| US-CRC-FRESH-1 | the CRC Designer's coverage follows the loaded image | 2026-11-01-batch-101 | active |
+| US-CRC-FRESH-2 | the CRC Designer's coverage follows bytes written into the image | 2026-11-01-batch-101 | active |
+| US-CRC-RESP-1 | the CRC Designer stays usable with the 10 MB demo image | 2026-11-01-batch-101 | active |
+| US-DOC-HYG-1 | a contributor finds only paths, links and commands that exist | 2026-11-01-batch-101 | active |
+| US-DOC-HYG-2 | the developer documents describe the shipped app | 2026-11-01-batch-101 | active |
+| US-DOC-HYG-3 | finished notes leave the living documents, with their history kept | 2026-11-01-batch-101 | active |
+| US-FOCUS-2 | the keys reach the window I see | 2026-11-01-batch-101 | active |
+| US-FRESH-3 | views over the image follow bytes written into it | 2026-11-01-batch-101 | active |
+| US-GUIDE-1 | the user guide describes 1.0.0 | 2026-11-01-batch-101 | active |
+| US-HELP-1 | each help window describes what its window does | 2026-11-01-batch-101 | active |
+| US-HEXNAV-1 | a jump shows me its target | 2026-11-01-batch-101 | active |
+| US-HEXWIN-1 | a written report carries every hex window whole | 2026-11-01-batch-101 | active |
+| US-I11-1 | a valid A2L raises no "unrecognized block" (F-02, D3-12) | 2026-11-01-batch-101 | active |
+| US-I11-2 | the Issues screen shows each issue under its own severity, errors first (F-03, F-39) | 2026-11-01-batch-101 | active |
+| US-I11-3 | a CURVE without axis points says so once (F-21) | 2026-11-01-batch-101 | active |
+| US-I11-4 | every MEMORY_SEGMENT that states a base and a size is read (F-29) | 2026-11-01-batch-101 | active |
+| US-I12-1 | every dialog opens and every action runs from somewhere (F-33, F-34) | 2026-11-01-batch-101 | active |
+| US-I12-2 | every widget of the Check Editor is shown in some state (F-35, the Check Editor half) | 2026-11-01-batch-101 | active |
+| US-I12-3 | Escape closes the Reports dialog (F-51) | 2026-11-01-batch-101 | active |
+| US-I12b-1 | every widget of the Flow Builder and Flow Execution is shown in some state (F-35, the #flow_kind half; D16-6) | 2026-11-01-batch-101 | active |
+| US-I8-1 | a Designer template given to a Flow CRC block is named as such (F-28) | 2026-11-01-batch-101 | active |
+| US-I8-2 | a CRC config error names its field (D13-23) | 2026-11-01-batch-101 | active |
+| US-I8-3 | one CRC for one set of parameters (D13-20) | 2026-11-01-batch-101 | active |
+| US-I8-4 | a later block reads this run's external output (F-49, D15-17) | 2026-11-01-batch-101 | active |
+| US-I9-1 | a confirm re-run's report says what ran (F-45) | 2026-11-01-batch-101 | active |
+| US-I9-2 | a saved flow keeps its own name (F-46) | 2026-11-01-batch-101 | active |
+| US-I9-3 | flow and chain-set saves stay in the work area (D15-18) | 2026-11-01-batch-101 | active |
+| US-LEGEND-1 | the Memory Map legend names the keys the map handles | 2026-11-01-batch-101 | active |
+| US-MDESC-1 | names and paths stay plain text in the Markdown report | 2026-11-01-batch-101 | active |
+| US-PE-LIFE-1 | no report offer I cannot use | 2026-11-01-batch-101 | active |
+| US-PE-LIFE-2 | what I save in a project is in the lists | 2026-11-01-batch-101 | active |
+| US-PE-LIFE-3 | the Checks views show the run I have now | 2026-11-01-batch-101 | active |
+| US-PE-LIFE-4 | a new document starts clean | 2026-11-01-batch-101 | active |
+| US-PROJ-SAVE-1 | Save project keeps its time bound with room to spare | 2026-11-01-batch-101 | active |
+| US-PROJ-SYNC-1 | a deleted project folder is not silently brought back | 2026-11-01-batch-101 | active |
+| US-README-1 | the README describes the shipped app | 2026-11-01-batch-101 | active |
+| US-REL-1 | the 1.0.0 release notes state what changed in written results | 2026-11-01-batch-101 | active |
+| US-SEC-1 | a security policy says how to report a vulnerability | 2026-11-01-batch-101 | active |
+| US-SEG-RESP-1 | the Split/Join preview stays usable with the 10 MB demo image | 2026-11-01-batch-101 | active |
+| US-SYM-1 | documents I open resolve their symbols through the A2L I loaded | 2026-11-01-batch-101 | active |
+| US-SYM-2 | a variant run uses the project's A2L and nothing implicit | 2026-11-01-batch-101 | active |
+| US-SYM-3 | the per-entry JSON edit works on a symbol entry and says plainly when it cannot | 2026-11-01-batch-101 | active |
+| US-TST-1 | a release gate without false timing failures | 2026-11-01-batch-101 | active |
+| US-TST-15 | a Windows run reports the product, not the host's clock | 2026-11-01-batch-101 | active |
+| US-TST-16 | a no-op arm proves the press was handled | 2026-11-01-batch-101 | active |
+| US-TST-2 | CI runs what the local gate runs | 2026-11-01-batch-101 | active |
+| US-TST-3 | wait and timing rules that a guard enforces | 2026-11-01-batch-101 | active |
+| US-TST-4 | no unread CI result in the v1.0.0 baseline | 2026-11-01-batch-101 | active |
+| US-TST-5 | a version bump keeps the report goldens | 2026-11-01-batch-101 | active |
+| US-TST-PAINT-1 | the panel and append timing arms measure what the app paints | 2026-11-01-batch-101 | active |
+| US-UNLOAD-1 | the status line describes what is loaded | 2026-11-01-batch-101 | active |

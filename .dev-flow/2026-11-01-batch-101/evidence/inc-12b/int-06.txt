@@ -1,0 +1,64 @@
+=== Inc 12b E4 integration run: int-06
+date: 2026-11-06T23:56:42Z
+worktree: <HOME>/work/s19_i12bint
+worktree HEAD (base): 2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+main ref in this clone: 2f54c7dea27d826483e5c5e596421b8b3a68bb2f (= origin/main 2f54c7dea27d826483e5c5e596421b8b3a68bb2f)
+index tree with the increment staged: e7f05497140dc23dedae1aa68925390fe08f5671
+staged files vs base: 17
+unstaged changes vs index: 0
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i12bint/s19_app/__init__.py
+CMD: PYTHONPATH=<HOME>/work/s19_i12bint-probe env -u NO_COLOR python -m pytest -q -p no:cacheprovider -p no:xdist -p s19_i12bint_probe -s -rfs tests/test_b101_flow_shown_widgets.py
+
+PROBE test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state: population 49 ids: ['flow_add', 'flow_add_row', 'flow_browse', 'flow_clear', 'flow_clip_row', 'flow_clip_status', 'flow_copy', 'flow_edit', 'flow_ext_instruction', 'flow_ext_log', 'flow_ext_mode', 'flow_ext_output', 'flow_ext_row', 'flow_funnel_add', 'flow_funnel_editor', 'flow_funnel_list', 'flow_funnel_name', 'flow_funnel_toggle', 'flow_funnel_value', 'flow_gating', 'flow_legend', 'flow_load', 'flow_name_strip', 'flow_palette', 'flow_palette_a2b', 'flow_palette_check', 'flow_palette_crc', 'flow_palette_external_step', 'flow_palette_patch', 'flow_palette_source', 'flow_palette_write_out', 'flow_panel', 'flow_paste', 'flow_pick', 'flow_pipeline', 'flow_pipeline_scroll', 'flow_ref', 'flow_ref_a', 'flow_ref_a_browse', 'flow_ref_b', 'flow_ref_b_browse', 'flow_remove', 'flow_result', 'flow_ribbon', 'flow_run', 'flow_run_row', 'flow_save', 'flow_wiring_notice', 'label']
+PROBE test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state: states ['opened', 'chip source', 'chip patch', 'chip check', 'chip crc', 'chip write_out', 'chip a2b', 'chip external_step', 'variables open', 'variables closed', 'add notice', '1 LOAD block(s)', '2 LOAD block(s)', '3 LOAD block(s)']
+PROBE test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state: never shown []
+.
+PROBE test_r_fx_scr_4_1_every_flow_execution_widget_is_shown_in_a_state: population 35 ids: ['fx_bind_0_0', 'fx_cable_0_0', 'fx_cable_0_1', 'fx_cable_0_2', 'fx_card_0_0', 'fx_card_0_1', 'fx_card_0_2', 'fx_card_0_3', 'fx_confirm_0', 'fx_empty', 'fx_import', 'fx_in_0_0', 'fx_lane_0', 'fx_lane_0_edit_0', 'fx_lane_0_head', 'fx_lane_0_pending', 'fx_lane_0_row', 'fx_lanes', 'fx_lanes_scroll', 'fx_legend', 'fx_load', 'fx_log', 'fx_mode', 'fx_name_strip', 'fx_notice', 'fx_panel', 'fx_required', 'fx_ribbon', 'fx_run', 'fx_run_row', 'fx_save', 'fx_set_name', 'fx_set_row', 'fx_set_select', 'label']
+PROBE test_r_fx_scr_4_1_every_flow_execution_widget_is_shown_in_a_state: states ['no lane', 'flash_chain imported', 'run waiting', 'set saved']
+PROBE test_r_fx_scr_4_1_every_flow_execution_widget_is_shown_in_a_state: never shown []
+..
+PROBE test_at_i12b_1_kind_chip_add_and_ribbon_by_keys: tag '✓ CHECK' gating_shown True
+PROBE test_at_i12b_1_kind_chip_add_and_ribbon_by_keys: ribbon ' Flow: flow  · unsaved  CHECK                                      session …chip_add_a0/.s19tool/workarea/proj1'
+PROBE test_at_i12b_1_kind_chip_add_and_ribbon_by_keys: project '/tmp/pytest-of-<user>/pytest-425/test_at_i12b_1_kind_chip_add_a0/.s19tool/workarea/proj1' (folder name 'proj1')
+.
+4 passed in 34.93s
+=== exit code: 0
+
+--- the probe plugin (<HOME>/work/s19_i12bint-probe/s19_i12bint_probe.py, on PYTHONPATH; read-only, removed after the run):
+"""Read-only probe for Inc 12b E4 integration (int-06): prints what the G-T4
+nodes measure on the integrated tree. It wraps the module's ``_Walk`` and
+``_drive`` (no assertion changed, nothing written)."""
+import pytest
+
+
+@pytest.fixture(autouse=True)
+def _i12b_probe(request, monkeypatch):
+    mod = request.module
+    if not mod.__name__.endswith("test_b101_flow_shown_widgets"):
+        yield
+        return
+    base_walk = mod._Walk
+
+    class ProbeWalk(base_walk):
+        def never_shown(self):
+            print(f"\nPROBE {request.node.name}: population {len(self.population)} ids: {sorted(self.population)}")
+            print(f"PROBE {request.node.name}: states {self.states}")
+            result = super().never_shown()
+            print(f"PROBE {request.node.name}: never shown {result}")
+            return result
+
+    original_drive = mod._drive
+
+    def drive(tmp_path, body):
+        result = original_drive(tmp_path, body)
+        if request.node.name.startswith("test_at_i12b_1"):
+            tag, gating, pipeline, ribbon, project = result
+            print(f"\nPROBE {request.node.name}: tag {tag!r} gating_shown {gating}")
+            print(f"PROBE {request.node.name}: ribbon {ribbon!r}")
+            print(f"PROBE {request.node.name}: project {project!r} (folder name {project.rsplit('/', 1)[-1]!r})")
+        return result
+
+    monkeypatch.setattr(mod, "_Walk", ProbeWalk)
+    monkeypatch.setattr(mod, "_drive", drive)
+    yield

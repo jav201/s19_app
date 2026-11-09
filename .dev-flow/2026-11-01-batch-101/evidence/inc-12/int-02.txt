@@ -1,0 +1,209 @@
+=== Inc 12 E4 integration run: int-02
+date: 2026-11-07T10:31:02Z
+worktree HEAD (base): 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+index tree with the increment staged: d171353393e0d3a7abeac10d1980600d239d056d
+staged files vs base: 18
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i12int/s19_app/__init__.py
+CMD: python -m pytest -q -p no:cacheprovider -rfs -n 12 --dist loadfile -m not serial_timing tests/test_b100_busy.py tests/test_b100_focus.py tests/test_b100_load_dialog.py tests/test_b100_save_guards.py tests/test_b100_session_reset.py tests/test_b100_workers.py tests/test_b101_check_spec_keep.py tests/test_b101_document_homes.py tests/test_b101_hex_jump.py tests/test_b101_inc11_acceptance.py tests/test_b101_issues_severity_view.py tests/test_b101_symbol_reads.py tests/test_b101_unload_focus.py tests/test_b102_bulk_add.py tests/test_b102_parameter_picker.py tests/test_b97_chips_help.py tests/test_b97_flow_builder.py tests/test_b97_flow_execution.py tests/test_b97_key_bar.py tests/test_b97_patch_editor.py tests/test_b97_width.py tests/test_b99_bytes_field.py tests/test_b99_crc_region.py tests/test_b99_export.py tests/test_b99_patch_truth.py tests/test_changes_file_notation_help.py tests/test_command_bar_interlock.py tests/test_flow_report_ui.py tests/test_loadfilescreen_input.py tests/test_open_folder_chips.py tests/test_report_progress.py tests/test_segment_split_window.py tests/test_tui_a2l_issue_recolor.py tests/test_tui_check_editor.py tests/test_tui_commandbar.py tests/test_tui_diff_screen.py tests/test_tui_issues_triage_b94.py tests/test_tui_issues_view.py tests/test_tui_patch_checks_strip.py tests/test_tui_report_filter_surface.py tests/test_tui_report_seam.py tests/test_tui_report_view.py tests/test_validation_service_supplemental.py
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  4%]
+....................................................................s... [  9%]
+........................................................................ [ 13%]
+.......................................s.............................s.. [ 18%]
+........................................................................ [ 23%]
+..................................................................s..... [ 27%]
+......................sssssss...................s..........s...........s [ 32%]
+ss...................................................s.................. [ 37%]
+........................................................................ [ 41%]
+....................................................s................... [ 46%]
+................s....................................................... [ 51%]
+..........s.......................................s...................s. [ 55%]
+.............................................................ss......... [ 60%]
+........................................................................ [ 65%]
+........s....................x.......................................... [ 69%]
+........................................................................ [ 74%]
+........................................................................ [ 79%]
+..................................................s.............F....s.. [ 83%]
+........................................................................ [ 88%]
+........................................................................ [ 93%]
+........................................................................ [ 97%]
+....................F..............                                      [100%]
+=================================== FAILURES ===================================
+________ test_at_056e_a2b_diff_report_byte_identical_despite_selection _________
+[gw9] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-857/popen-gw9/test_at_056e_a2b_diff_report_b0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fe6e0eb3990>
+
+    def test_at_056e_a2b_diff_report_byte_identical_despite_selection(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """AT-056e / LLR-054.5 (HLR-054 scope guard, Q-5 black-box arm).
+    
+        Intent: with a filter SELECTED on the report selector, the A2B diff
+        report driven through ITS shipped surface (Compare then Report on the
+        diff screen) is byte-identical (canonical form) to a no-filter A2B
+        run under the same environment pin — the sticky selection observably
+        does NOT leak into the always-complete diff report.
+        """
+        _pin_report_clocks(monkeypatch)
+    
+        def _session(root: Path, select_filter: bool) -> Dict[str, bytes]:
+            project_dir = _make_project(
+                root, "proj", filters={"f.json": _valid_filter_body()}
+            )
+    
+            async def _drive() -> Dict[str, bytes]:
+                app = S19TuiApp(base_dir=root)
+                async with app.run_test(size=(120, 40)) as pilot:
+                    await pilot.pause()
+                    await _load_project(app, pilot, "proj")
+                    if select_filter:
+                        await _select_filter_via_dropdown(app, pilot, "f.json")
+                    app.action_show_screen("diff")
+                    await pilot.pause()
+                    app.query_one("#diff_path_a", Input).value = str(
+                        project_dir / "a.s19"
+                    )
+                    app.query_one("#diff_path_b", Input).value = str(
+                        project_dir / "b.s19"
+                    )
+                    app.query_one("#diff_compare_button", Button).press()
+                    await _flush(pilot)
+                    app.query_one("#diff_report_button", Button).press()
+                    await _flush(pilot)
+                return _reports(project_dir)
+    
+            return asyncio.run(_drive())
+    
+        base_root = tmp_path / "base"
+        sel_root = tmp_path / "sel"
+        base_root.mkdir()
+        sel_root.mkdir()
+        baseline = _session(base_root, select_filter=False)
+        selected = _session(sel_root, select_filter=True)
+    
+        expected = {_DIFF_MD_NAME, _DIFF_HTML_NAME}
+>       assert set(baseline) == expected, f"baseline wrote {sorted(baseline)}"
+E       AssertionError: baseline wrote []
+E       assert set() == {'20260710T12...ff-report.md'}
+E         
+E         Extra items in the right set:
+E         '20260710T120000Z-diff-report.md'
+E         '20260710T120000Z-diff-report.html'
+E         Use -v to get more diff
+
+tests/test_tui_report_filter_surface.py:775: AssertionError
+______ test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact _______
+[gw8] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-857/popen-gw8/test_at_b78_03_the_palette_act0')
+
+    def test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact(
+        tmp_path: Path,
+    ) -> None:
+        """AT-B78-03 (GATE) -- the action set equals the Inc-0 ARTIFACT, not the producer.
+    
+        ⚠️ **This node was provably INERT before Inc-0 froze the artifact, and the
+        reason is worth carrying.** `CommandBar` is constructed as
+        `CommandBar(self._build_palette_entries())`, so an implementation comparing
+        the rendered palette against `_build_palette_entries()` compares a producer
+        with ITSELF: executed, the predicate stayed GREEN at `36 == 36` with a whole
+        `Binding` removed from `S19TuiApp.BINDINGS`.
+    
+        What breaks the circularity is the TEMPORAL FREEZE -- a set captured before
+        the change and read back from disk. So this reads
+        `tests/goldens/batch78/at-b78-03-palette-actions.json` and **never
+        regenerates it**; a run that rebuilds it has restored the tautology.
+        """
+        import json
+    
+        from s19_app.tui.command_bar import CommandBar
+    
+        frozen = json.loads(
+            Path("tests/goldens/batch78/at-b78-03-palette-actions.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        expected = frozen if isinstance(frozen, list) else frozen.get("actions", frozen)
+    
+        async def _drive():
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 30)) as pilot:
+                await pilot.pause()
+                bar = app.query_one(CommandBar)
+                await pilot.press("ctrl+k")
+                await pilot.pause()
+                rows = list(bar.query_one("#palette_list").children)
+                return [item.data for item in rows]
+    
+        observed = asyncio.run(_drive())
+    
+        # Union of both lanes' amendments to the frozen artifact (RC-1 rebase #4):
+        # batch-95 change 4 (LLR-135.6, ruling Q6/7a) hand-appended ONE action —
+        # "open_split_join_export", the palette-first Split / Join / Export screen
+        # entry — so the freeze now carries the 37 Inc-0 rows plus that one
+        # reviewed amendment (a REGENERATION would restore the tautology this
+        # node exists to break). batch-94's two non-digit rail bindings are NOT
+        # in the freeze — each is pinned as a named live-only delta below
+        # (Inc-001's Check Editor `=`; Inc-003's Flow Execution `]`, US-007).
+        assert len(expected) == 38, (
+            f"the frozen artifact must still carry the 37 Inc-0 actions plus the "
+            f"one batch-95 amendment; it has {len(expected)} -- if this fails "
+            f"the artifact was REGENERATED, which restores the tautology"
+        )
+        live_deltas = ["show_screen('check_editor')", "show_screen('flow_execution')"]
+        for added in live_deltas:
+            assert added in observed, (
+                f"a non-digit rail binding must add exactly one palette action "
+                f"({added!r}); observed={observed!r}"
+            )
+        observed_pre_change = [
+            a for a in observed if a not in live_deltas
+        ]
+        assert len(observed_pre_change) == len(observed) - len(live_deltas), (
+            "each live-only delta must appear exactly once (no duplicates)"
+        )
+>       assert observed_pre_change == list(expected), (
+            f"the pre-change palette action set must equal the Inc-0 freeze.\n"
+            f"missing: {sorted(set(expected) - set(observed_pre_change))}\n"
+            f"unexpected: {sorted(set(observed_pre_change) - set(expected))}"
+        )
+E       AssertionError: the pre-change palette action set must equal the Inc-0 freeze.
+E         missing: []
+E         unexpected: ['a2l_describe_tag', 'confirm_attention']
+E       assert ['focus_palet...us_goto', ...] == ['focus_palet...us_goto', ...]
+E         
+E         At index 13 diff: 'a2l_describe_tag' != 'view_reports'
+E         Left contains 2 more items, first extra item: 'open_settings_menu'
+E         Use -v to get more diff
+
+tests/test_tui_commandbar.py:2727: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_tui_report_filter_surface.py::test_at_056e_a2b_diff_report_byte_identical_despite_selection
+FAILED tests/test_tui_commandbar.py::test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact
+SKIPPED [1] tests/test_b100_load_dialog.py:774: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only
+SKIPPED [6] tests/support/b100_links.py:30: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b101_hex_jump.py:608: the main pane is 1 line(s) high at 80 x 24: no second row can lie inside it
+SKIPPED [1] tests/test_b100_save_guards.py:1080: icacls deny-read is a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_save_guards.py:1226: icacls deny-read is a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_save_guards.py:1451: case-insensitive names are a Windows-only arm (PDR C-QA-6)
+SKIPPED [2] tests/test_b100_save_guards.py:1505: case-insensitive names are a Windows-only arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_save_guards.py:1709: an open handle blocks a replace only on Windows (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_save_guards.py:1732: an open handle blocks a replace only on Windows (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_save_guards.py:1791: an open handle blocks a replace only on Windows (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_save_guards.py:1991: an open handle blocks a replace only on Windows (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_load_dialog.py:1956: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_save_guards.py:2539: share-mode locks are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_load_dialog.py:2450: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only
+SKIPPED [1] tests/test_b100_load_dialog.py:2576: Windows strips a trailing dot from a file name, so fw.s19. opens fw.s19; on posix fw.s19. is a distinct, missing name (fix round 1, CI9b-4)
+SKIPPED [1] tests/test_b100_load_dialog.py:2599: case-insensitive file system arm; Windows only
+SKIPPED [2] tests/test_b100_load_dialog.py:2642: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_load_dialog.py:2766: directory junctions are a Windows-only test arm (PDR C-QA-6)
+SKIPPED [1] tests/test_b100_load_dialog.py:3666: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only
+SKIPPED [1] tests/test_b100_load_dialog.py:3811: store write arm: LLR-172.1f needs a drive-rooted LOCALAPPDATA; Windows only
+2 failed, 1517 passed, 27 skipped, 1 xfailed in 1787.85s (0:29:47)
+=== exit code: 1

@@ -1,0 +1,4 @@
+Version bump check: LAN host 2, origin/main 15e90c4 + the close diff (version 1.0.0); the version-reading tests and the law guards.
+1.0.0
+334 passed in 205.26s (0:03:25)
+cleaned

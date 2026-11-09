@@ -54,8 +54,8 @@
       "reason": "batch 2026-11-01-batch-101 opened by rollover from 2026-10-26-batch-100 (closed at P6, synced, tag v1.0.0-rc1); mode full by the operator's standing rule and the release decision of 2026-11-01"
     }
   ],
-  "current_station": "P3",
-  "phase_status": "not-started",
+  "current_station": "P6",
+  "phase_status": "awaiting-sync",
   "stations_active": [
     "P0",
     "ARQ",
@@ -217,9 +217,60 @@
       "station": "P3",
       "date": "2026-11-06",
       "decision": "P3 increment 006 (Inc 6, Patch Editor document lifecycle: the before/after offer only with a project; with a project the Patch Editor, Check Editor and A2B Diff lists show patches/<n> and checks/<n> then the common library as library/<n>, every Write lands in the project home with a free-name claim and its status names the home; the before/after control and the save-back prompt hide when a document or an image is replaced, not on Save project; the Checks tab resets after loads and in-place writes and repaints when displayed; linked folders refused for picks and writes; lists refill after a project change; F-47 not reproduced, backlog) approved and merged under the standing authorization: E1 reproduced F-05, F-06, D10-30, F-40; E3 architect FAIL (4 MAJOR) and security PASS-WITH-NOTES (2 MAJOR) then both PASS-WITH-NOTES in round 2 (D-3 revised); mutants 39/41 (DeepSeek; M10, M35 equivalent, M27 expected) + M43, M44; E5 code-reviewer and security PASS-WITH-NOTES; coverage audit 21 % then corrective then re-audit (85 cases covered; the 10 Windows junction arms ran but their transcript lacks node ids, re-run at batch end); trace_check 0 gaps. Full-suite merge verification on LAN host 2 found one merged-tree failure (pytest temp folders in a tester transcript), fixed in e0cb491; the rest are the known failures and tc_b100_53[load_dialog], a ~230 s node that timed out once under load and passed 3/3 alone (backlog) (evidence/merge/lan-merge-inc6.txt)."
+    },
+    {
+      "station": "P3",
+      "date": "2026-11-06",
+      "decision": "P3 increment 009 (Inc 9, confirm re-run and saved flow names: a confirm re-run writes one report of that lane whose Mode line reads confirm re-run; a saved flow or chain set holds its own file stem as its name, cut to 64 characters; flow and chain-set saves go through the work-area guard and an exclusive create with a post-claim check (regular file, one link, same file as the descriptor, real parent equals the approved home) and clean up only their own claim; refused saves paint one status line) approved and merged under the standing authorization: E1 reproduced F-45, F-46, D15-18; E3 architect FAIL (1 HIGH) and security FAIL (2 MAJOR) then both PASS-WITH-NOTES in round 2; E4 rulings E4-R1 (post-claim check re-resolved the home) and E4-R3 (claim mode 0o666); E5 code-review, security and coverage audit PASS-WITH-NOTES, corrective (10 rulings) and re-review PASS-WITH-NOTES; mutants 32/32 killed (DeepSeek + orchestrator); Windows arms win-02 46 passed; trace_check 0 gaps. Partial merge verification on LAN host 2 by operator order 2026-11-06 (55 files: 2312 passed, 0 failed; serial_timing 46 passed); the full suite runs once at batch end."
+    },
+    {
+      "station": "P3",
+      "date": "2026-11-06",
+      "decision": "P3 increment 012b (Inc 12b, Flow Builder and Flow Execution hidden widgets: the hidden help sentences, grid canvas, numbered list, session line and kind dropdown are removed with their painter family (F-35 Flow half, D16-6); the block kind is panel state written only with a kind-options value (S-1); 39 existing test nodes re-pointed to the visible pipeline, ribbon and chips with their hostile inputs kept) approved and merged under the standing authorization: split from Inc 12 at E3 (D-5 B); E3 architect FAIL then PASS-WITH-NOTES, security PASS-WITH-NOTES; E5 code+security review and coverage audit PASS-WITH-NOTES, corrective applied (R-1 width bound measured before the first card; BL-I12b-1 pre-existing 2-cell overflow); mutants 7/7 killed (DeepSeek); Windows arms win-01 95 passed, win-02 4 passed; trace_check 0 gaps. Partial merge verification on LAN host 2 by operator order 2026-11-06 (37 files: 1401 passed; failures = 2 known tc016s snapshots + test_tc_b97_69_page_keys_do_nothing_where_disabled, a load flake that passes alone 3/3 merged and 2/2 on base; serial_timing 4 passed); the full suite runs once at batch end."
+    },
+    {
+      "station": "P3",
+      "date": "2026-11-07",
+      "decision": "P3 increment 010 (Inc 10a, hex navigation, unload state and focus: a jump shows its target as the view's second row in the main, A2L and MAC views and an image load resets the window; the go-to marker clears on paging, a new search, a jump or a load; an unload clears the stale load facts and question; the focus never lands in a hidden window (landing per window, switch targets that keep the paging keys, a rail or fallback focus re-homed after a load per HLR-166); Split/Join refuses keys while hidden; deferred load steps stop when the app exits; a save as never carries an unloaded image) approved and merged under the standing authorization: Inc 10 split at E3 into 10a and 10b; Inc 12 D-2 removed the dead issue-jump cases; E4 rulings E4-R1 … R6; E5 code review PASS-WITH-NOTES, security FAIL (SE5-1 save as) then fixed, coverage audit PASS-WITH-NOTES; corrective and re-review (RR-1 widened R-WS-LOADED.19 to any session with no S19/HEX); mutants 35/38 pre-corrective, the survivors and every changed branch killed by the corrective's mutants (M-L equivalent on every reachable route); trace_check 0 gaps. Partial merge verification on LAN host 2 by operator order 2026-11-06 (136 files: 3918 passed; failures = the 4 known + test_tc_b100_53 x2, a load flake that passes alone 3/3 merged and 2/2 on base; serial_timing 62 passed); the full suite runs once at batch end."
+    },
+    {
+      "station": "P3",
+      "date": "2026-11-07",
+      "decision": "P3 increment 010b (Inc 10b, views after an in-place write: after an apply, a save-back or a Save project commit the main, A2L and MAC hex panes, the A2L value column and the Split/Join window show the new bytes without moving the filter, page or cursor; the A2L refresh recomputes only the tags whose bytes changed (220,040-tag A2L: 3.95 s -> 0.31 s, bound 1 s); Split/Join while hidden only disarms) approved and merged under the standing authorization: split from Inc 10 at E3; E4 integration GREEN with no product change; E5 review FAIL on R-1 (refresh cost on the large A2L) then fixed, coverage audit PASS-WITH-NOTES, corrective and re-review PASS-WITH-NOTES; mutants 15/15 (DeepSeek) + corrective mutants all RED; BL-I10b-1 (stale Hex Peek panes in Issues and Checks) flagged for the review page; trace_check 0 gaps. Partial merge verification on LAN host 2 by operator order 2026-11-06 (65 files: 2200 passed; failures = the 4 known; serial_timing 20 passed, QC-TM 0.314 s / 1 s); the full suite runs once at batch end."
+    },
+    {
+      "station": "P3",
+      "date": "2026-11-07",
+      "decision": "P3 increment 012 (Inc 12, unreachable code and the Reports viewer: VariantHelpScreen, the three view aliases, the dead issue-jump trio, action_a2l_tag_find_next and the hidden Check Editor toggle removed; censuses guard that every dialog has an opener and every action a reach; Escape closes the Reports viewer as Close does while an open dropdown keeps its own Escape; DOSSIER F-33, F-34, F-35, F-51 fixed in 1.0.0) approved and merged under the standing authorization: split at E3 into Inc 12 and 12b (12b merged earlier); D-2 removed the dead issue jump and ruled Inc 10a; E3 architect FAIL twice (reach rule, a fourth dead action) then closed; E5 review, coverage audit PASS-WITH-NOTES, mutants 17/17, corrective (records, oracles); trace_check 0 gaps. Merge verification = the batch-end FULL SUITE on the final tree (6113 passed; failures = the 4 known + test_tc_b100_53 x2, a load flake that passes alone 2/2; serial_timing 69 passed, 95 QC-TM bounds, 0 under 20 % margin); snapshot suite 31 passed + the 2 known; Inc 6's Windows arms re-run with node ids on the final tree, 82 passed."
+    },
+    {
+      "station": "P3",
+      "date": "2026-11-07",
+      "decision": "DDR: the design reviews of batch-101 ran per increment at E3 (design-first flow): architect, security and, where fired, UX reviewers on each increment's requirements and Code-Wire graph before any code, with orchestrator rulings in each inc-N/E3-rulings.md; no separate batch-level DDR."
+    },
+    {
+      "station": "DDR",
+      "date": "2026-11-07",
+      "decision": "P4 validation: batch-end battery on the final tree b982846 (operator order 2026-11-06: the full suite once, after the last increment) — full suite 6113 passed, failures = the 4 known + test_tc_b100_53 load flake (passes alone 2/2), serial_timing 69 passed with 95 QC-TM bounds and 0 under 20 % margin; snapshot suite 31 passed + the 2 known; Inc 6 Windows arms 82 passed with node ids; Inc 5 mutant re-run 24/24 killed; doc-pass guards 196 passed; final CI 42391147566 = the 4 known. Record: 04-validation.md, evidence/close/."
+    },
+    {
+      "station": "P4",
+      "date": "2026-11-07",
+      "decision": "P5 close: batch-101 closed. 16 increments (with splits 10a/10b, 12/12b) merged; close record 05-close.md (backlog reconciled into BACKLOG-CODE.md; the canon fold of the batch's user stories into REQUIREMENTS.md; the requirement rows handed to the requirements session in close/FORWARD-requirements-session.md, 273 rows); review page close/review-b101.html; version 1.0.0; the operator approved the v1.0.0 tag in advance on 2026-11-07 without reading the review page (05-close.md, Operator decision)."
+    },
+    {
+      "station": "P5",
+      "date": "2026-11-07",
+      "decision": "P6 docs: 06-docs/ written (traceability matrix, executive summary, functionality, diagrams); the batch is ready for /dev-flow-sync."
+    },
+    {
+      "station": "P6",
+      "date": "2026-11-07",
+      "decision": "synced-to-obsidian",
+      "notes": "vault:s19_app/dev-flow-batches/2026-11-01-batch-101/ (449 files + 2026-11-01-batch-101-README.md; repo-home artifacts not copied)"
     }
   ],
-  "obsidian_synced": false,
+  "obsidian_synced": true,
   "created_at": "2026-11-01T22:48:29.039153",
   "owner": "C:/Users/jjgh8/Github/s19_app",
   "base_ref": "7717394b5828fff345ac53fe2455a30417b6f102"

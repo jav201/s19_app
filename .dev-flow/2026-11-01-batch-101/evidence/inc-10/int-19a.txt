@@ -1,0 +1,25 @@
+=== Inc 10a E4 rulings probe: int-19a (before the E4-ruling edits)
+date: 2026-11-07 (the first run of this round, before the ruling edits were staged)
+checkout HEAD (base): 2f54c7dea27d826483e5c5e596421b8b3a68bb2f (both clones)
+index tree with the increment staged: b3b7935e38e8774d8d67d46ce90002b30602a7d7 (s19_i10fix: the previous integration's final tree, apply step output); base clone s19_i10fix_base: nothing staged (base tree)
+python: Python 3.11.18
+CMD (each clone, in parallel): env -u NO_COLOR HOME=<tmp> XDG_CONFIG_HOME=<tmp>/.config XDG_DATA_HOME=<tmp>/.local/share XDG_CACHE_HOME=<tmp>/.cache LOCALAPPDATA=<tmp> timeout 900 python probe_focus.py (the script is printed in int-19b.txt); INFO / DEBUG / WARNING log lines filtered
+### s19_i10fix
+s19_app.__file__ = <HOME>/work/s19_i10fix/s19_app/__init__.py
+[fresh] startup=RailItem#rail_item_workspace area=3 | after load=RailItem#rail_item_workspace area=3
+[workspace] startup=RailItem#rail_item_workspace area=3 | switch landing=WindowHelpChip#window_help_workspace area=3 | after load=WindowHelpChip#window_help_workspace area=3
+[issues] startup=RailItem#rail_item_workspace area=3 | switch landing=RailItem#rail_item_issues area=3 | after load=RailItem#rail_item_issues area=3
+[checks] startup=RailItem#rail_item_workspace area=3 | switch landing=WindowHelpChip#window_help_checks area=3 | after load=WindowHelpChip#window_help_checks area=3
+[a2l] startup=RailItem#rail_item_workspace area=3 | switch landing=DataTable#a2l_tags_list area=1800 | after load=DataTable#a2l_tags_list area=1800
+[mac] startup=RailItem#rail_item_workspace area=3 | switch landing=DataTable#mac_records_list area=936 | after load=DataTable#mac_records_list area=936
+[mac PgDn] focus after 3=DataTable#mac_records_list area=884 | _mac_window_start 0 -> 0
+### s19_i10fix_base
+s19_app.__file__ = <HOME>/work/s19_i10fix_base/s19_app/__init__.py
+[fresh] startup=RailItem#rail_item_workspace area=3 | after load=ListView#files_list area=286
+[workspace] startup=RailItem#rail_item_workspace area=3 | switch landing=None | after load=ListView#files_list area=286
+[issues] startup=RailItem#rail_item_workspace area=3 | switch landing=None | after load=GroupedIssuesPanel#validation_issues_groups area=2232
+[checks] startup=RailItem#rail_item_workspace area=3 | switch landing=None | after load=GroupedChecksPanel#checks_grouped area=2812
+[a2l] startup=RailItem#rail_item_workspace area=3 | switch landing=None | after load=DataTable#a2l_tags_list area=1800
+[mac] startup=RailItem#rail_item_workspace area=3 | switch landing=None | after load=DataTable#mac_records_list area=936
+[mac PgDn] focus after 3=Button#ws_load_project_button area=0 | _mac_window_start 0 -> 1
+=== exit code: 0 (both)

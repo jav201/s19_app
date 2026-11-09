@@ -1,0 +1,303 @@
+=== base commit: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+=== python: Python 3.11.18
+=== mutation applied: M-R4 (file s19_app/tui/app.py)
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -9957,10 +9957,7 @@
+     #: (E4-R6, I-D18); that window has no chip, so the switch lands on its
+     #: first focusable control, the Page Prev button (Enter only). Load
+     #: tails still land on ``_FOCUS_TARGETS``.
+-    _SWITCH_LANDING_TARGETS: "dict[str, str]" = {
+-        "a2l": "window_help_a2l",
+-        "mac": "mac_page_prev_button",
+-    }
++    _SWITCH_LANDING_TARGETS: "dict[str, str]" = {}
+ 
+     #: Every window container a focused widget can sit in: the registry's
+     #: containers plus the Split / Join / Export window. Derived from
+LANDED M-R4: '"a2l": "window_help_a2l"' x0
+=== s19_app.__file__ ===
+<HOME>/work/s19_i10mut_m36/s19_app/__init__.py
+=== CMD ===
+env -u NO_COLOR <HOME>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -rf -n 3 --dist load tests/test_b101_inc11_acceptance.py::test_at_i11_5_curve_description_index_note_once tests/test_b101_unload_focus.py::test_r_shell_focus_2_1_key_2_lands_on_the_a2l_window_help_chip tests/test_b101_unload_focus.py::test_r_shell_focus_2_5_every_rail_key_lands_on_its_target[a2l]
+bringing up nodes...
+bringing up nodes...
+
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+________ test_r_shell_focus_2_1_key_2_lands_on_the_a2l_window_help_chip ________
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-683/popen-gw1/test_r_shell_focus_2_1_key_2_l0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-683/popen-gw1/b101_i10f_case080')
+
+    def test_r_shell_focus_2_1_key_2_lands_on_the_a2l_window_help_chip(tmp_path: Path, case08: Path) -> None:
+        """R-SHELL-FOCUS.2 case /1 (changed at E4, E4-R4): with the image and A2L
+        loaded and ``files_list`` focused, ``2`` lands the focus on the A2L
+        window's switch landing ``window_help_a2l`` (graph I-4), inside the shown
+        window and not on the tag table, whose own PgDn would scroll it instead of
+        paging the explorer (R-TUI-020.1; base: ``ws_load_project_button``, in the
+        hidden Workspace, area 0; the Inc 10a tree before E4-R4: ``a2l_tags_list``)."""
+    
+        async def scenario(app, pilot, log):
+            await case_session(pilot, app, case08, mac=False, a2l=True)
+            await pilot.press("2")
+            await wait_screen(pilot, app, "a2l")
+            await wait_focus(pilot, app, "window_help_a2l")
+            assert inside(focus_of(app), "screen_a2l"), focus_report(app)
+            await settle(pilot, 6)
+            assert focus_of(app) is not None and focus_of(app).id == "window_help_a2l", focus_report(app)
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:936: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_unload_focus.py:931: in scenario
+    await wait_focus(pilot, app, "window_help_a2l")
+../s19_i10mut/tests/test_b101_unload_focus.py:269: in wait_focus
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function wait_focus.<locals>.landed at 0x7fbc52726340>
+failure = <function wait_focus.<locals>.<lambda> at 0x7fbc567fc400>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: the focus never landed on #window_help_a2l; it is DataTable#a2l_tags_list (region area 1600)
+
+tests/support/timing.py:66: AssertionError
+________ test_r_shell_focus_2_5_every_rail_key_lands_on_its_target[a2l] ________
+[gw2] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-683/popen-gw2/test_r_shell_focus_2_5_every_r0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-683/popen-gw2/b101_i10f_case080')
+key = '2', window = 'a2l', target_id = 'window_help_a2l'
+
+    @pytest.mark.parametrize(
+        "key,window,target_id", RAIL_TARGETS, ids=[row[1] for row in RAIL_TARGETS]
+    )
+    def test_r_shell_focus_2_5_every_rail_key_lands_on_its_target(
+        tmp_path: Path, case08: Path, key: str, window: str, target_id: str
+    ) -> None:
+        """R-SHELL-FOCUS.2 case /5: with the image, A2L and MAC loaded, each rail key
+        lands the focus on its window's CTX-SHELL target, or (target not shown) on
+        the first shown focusable non-text widget of the window, else its rail item
+        (base: the focus stays in the window just left); ``2`` and ``3`` land on
+        their windows' switch landings (changed at E4, E4-R4 / E4-R6)."""
+    
+        async def scenario(app, pilot, log):
+            await case_session(pilot, app, case08, mac=True, a2l=True)
+            if window == "workspace":
+                await pilot.press("3")
+                await wait_screen(pilot, app, "mac")
+                await settle(pilot, 8)
+            await pilot.press(key)
+            await wait_screen(pilot, app, window)
+            await wait_until(
+                pilot,
+                lambda: focus_matches_target(app, target_id),
+                lambda: f"after {key!r} the focus is {focus_report(app)}, not #{target_id}",
+                timeout=FOCUS_WAIT_S,
+            )
+            assert target_is_shown(app, target_id), f"#{target_id} paints no region"
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:1055: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_unload_focus.py:1047: in scenario
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_r_shell_focus_2_5_every_rail_key_lands_on_its_target.<locals>.scenario.<locals>.<lambda> at 0x7f9c6c7bf880>
+failure = <function test_r_shell_focus_2_5_every_rail_key_lands_on_its_target.<locals>.scenario.<locals>.<lambda> at 0x7f9c6ade8ae0>
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: after '2' the focus is DataTable#a2l_tags_list (region area 1600), not #window_help_a2l
+
+tests/support/timing.py:66: AssertionError
+_______________ test_at_i11_5_curve_description_index_note_once ________________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-683/popen-gw0/test_at_i11_5_curve_descriptio0')
+demo_dir = PosixPath('/tmp/pytest-of-<user>/pytest-683/popen-gw0/b101_inc11_acceptance_demo0')
+
+    def test_at_i11_5_curve_description_index_note_once(tmp_path: Path, demo_dir: Path) -> None:
+        """The first CURVE's description states the index note once, above the table, and the
+        rows carry none (base: the note on every row)."""
+    
+        async def _go() -> None:
+            app = S19TuiApp(base_dir=tmp_path)
+            async with app.run_test(size=(120, 36)) as pilot:
+                await _load_demo(pilot, app, demo_dir, CLEAN, "demo_clean")
+                await _press(pilot, "2")
+                await wait_until(
+                    pilot,
+                    lambda: app.query_one("#a2l_tags_list", DataTable).row_count > 0,
+                    "the A2L Explorer rows",
+                )
+                # the table is paged and the demo lists its 208 VALUE tags first:
+                # PgDn until a page holds a CURVE row.
+                for _ in range(20):
+                    if _first_row_of_type(app, "CURVE") is not None:
+                        break
+                    first = app.query_one("#a2l_tags_list", DataTable).coordinate_to_cell_key((0, 0))
+                    await _press(pilot, "pagedown")
+                    await wait_until(
+                        pilot,
+                        lambda: app.query_one("#a2l_tags_list", DataTable).coordinate_to_cell_key((0, 0)) != first,
+                        "the next A2L Explorer page",
+                        timeout=15,
+                    )
+                assert _first_row_of_type(app, "CURVE") is not None, "no CURVE row on any page"
+                table = app.query_one("#a2l_tags_list", DataTable)
+                target = _first_row_of_type(app, "CURVE")
+                # The cursor reaches the CURVE row by keys (C-7, E5), not by move_cursor:
+                # Tab moves the focus to the tag table, then Down / Up walk the cursor.
+                for _ in range(40):
+                    if app.focused is table:
+                        break
+                    await _press(pilot, "tab")
+                assert app.focused is table, f"Tab never reached the tag table: {app.focused!r}"
+                for _ in range(table.row_count + 1):
+                    if table.cursor_row == target:
+                        break
+                    before = table.cursor_row
+                    await _press(pilot, "down" if before < target else "up")
+                    await wait_until(
+                        pilot,
+                        lambda: table.cursor_row != before,
+                        lambda: f"cursor stuck at {table.cursor_row} (target {target})",
+                        timeout=15,
+                    )
+                assert table.cursor_row == target, (table.cursor_row, target)
+                await settle_workers(pilot)
+                await _press(pilot, "d")
+                await wait_until(
+                    pilot,
+                    lambda: isinstance(app.screen, CurveDescriptionScreen),
+                    "the description window",
+                )
+                text = _plain(app.screen.query_one("#a2l_curve_desc_body", Static))
+                assert text.count(NOTE_TEXT) == 1, text
+                assert text.count(ROW_SUFFIX) == 0, text
+    
+>       asyncio.run(_go())
+
+../s19_i10mut/tests/test_b101_inc11_acceptance.py:493: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i10mut/tests/test_b101_inc11_acceptance.py:454: in _go
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_at_i11_5_curve_description_index_note_once.<locals>._go.<locals>.<lambda> at 0x7f6ae8b18f40>
+failure = 'the next A2L Explorer page'
+
+    async def wait_until(pilot, predicate, failure, *, timeout: float = 300.0) -> None:
+        """Poll ``predicate`` like ``tests/support/timing.py::wait_until`` but ride out a
+        ``WaitForScreenTimeout``: loading the 10 MB demo keeps the app busy for longer
+        than Textual's 30 s pause limit on a loaded shared host. The deadline still
+        bounds the wait."""
+        deadline = time.monotonic() + timeout
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: the next A2L Explorer page
+
+../s19_i10mut/tests/test_b101_inc11_acceptance.py:75: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_unload_focus.py::test_r_shell_focus_2_1_key_2_lands_on_the_a2l_window_help_chip
+FAILED tests/test_b101_unload_focus.py::test_r_shell_focus_2_5_every_rail_key_lands_on_its_target[a2l]
+FAILED tests/test_b101_inc11_acceptance.py::test_at_i11_5_curve_description_index_note_once
+3 failed in 63.76s (0:01:03)

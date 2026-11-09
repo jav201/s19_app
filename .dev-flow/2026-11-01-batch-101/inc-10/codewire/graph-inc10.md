@@ -1,0 +1,446 @@
+# Code-Wire graph — Inc 10a (hex navigation, unload state, focus), batch-101
+
+Stage E2 of the design-first flow (`dev-flow-v3-beta`), corrected at E3 (`../E3-rulings.md`; split: the in-place-write nodes moved to `../../inc-10b/codewire/graph-inc10b.md`). Graph only: no stub, mark or declaration in any tree. Base `98d94d7`. Requirements `../01-requirements.md`, slice `../E1-slice.md`, rulings `../E1-rulings.md` (E3 decisions: §7), cases `../02-test-cases.md`. `P1` … `P7` in an example = the E3 architect probe of that number unless it says "security".
+
+How to read it:
+- One file holds the baseline and the prototype. Every node's `func:` starts with **unchanged**, **changed** ("was: … / now: …") or **new**. Context nodes are unchanged nodes a changed node calls or relies on.
+- Example sources are case ids of `02-test-cases.md`; `P` = the E1 pilot on `98d94d7` (`../evidence-e1/i10e1-pilot-transcript.txt`). An example states the Inc 10 target unless it says "base".
+- Values: case 08 (26 546 present rows, page 200; row 150 = `0x00000960`; `BUILD_ID` at `0x00C00050`; `VALUE_0001` @ `0x00000000` = `6C`), fixture three (`0x8000`, `0x8010` all `FF`, `0x8020`).
+
+## Groups and interfaces
+
+34 slice nodes in 3 files and 9 context nodes (E5 corrective, `../E5-rulings.md`: `_clear_goto_marker_keeping_window` (CR-2) and `_reset_project_session` (CR-1) added, `_plan_project_save` (SE5-1) and `_fallback_focus_target` (SE5-5) moved from the context list; before E5: 30 slice nodes and 11 context nodes. E4 rulings E4-R1 … R5: 6 slice nodes added — `_apply_prepared_load`, `_install_attached_a2l`, `_rehome_focus_after_load` (was a context node), `_note_focus_landing`, `_rehome_placeholder_focus_after_load`, `_load_tree_gone`; before: 24 slice nodes and 12 context nodes. E3 addendum, Inc 12 D-2: #11 `_jump_to_validation_issue_object` withdrawn, no product route; before it: 25 slice nodes, the header said 24 since round 2 added `SplitJoinWindow.action_export`), grouped by file ownership (one E4 implementer per group; G1's nodes are one file, so one agent; G3's two nodes may go to the same agent, built first, since G1 calls them). Interfaces are pinned here; an E4 agent proposes a change and never changes one alone.
+
+| Group | File | Owns nodes |
+|---|---|---|
+| G1 app | `s19_app/tui/app.py` | the 29 `S19TuiApp` / module nodes below (25 before E5; 19 before the E4 rulings) |
+| G2 split-join | `s19_app/tui/segment_split_view.py` | `SplitJoinWindow.refresh_window`, `SplitJoinWindow.check_action`, `SplitJoinWindow.action_export` |
+| G3 render | `s19_app/render/hexview.py` | `hex_row_bases`, `_collect_hex_rows` |
+
+| Interface | Pinned form | Producer → consumers |
+|---|---|---|
+| I-1 | moved to 10b (`SplitJoinWindow.note_image_bytes_written`) | — |
+| I-2 open/reload seam | `SplitJoinWindow.refresh_window(self) -> None`: parameters and selection reset unchanged; the `#sje_table` focus only while the window has no `hidden` class | G2 → G1 (`watch_current_file`, `action_open_split_join_export`) |
+| I-3 hex view render | `update_alt_hex_view(self, focus_address=None, near_top=False, reset_scroll=False, *, start_row: Optional[int] = None)`, same for `update_mac_hex_view`; `start_row` is an index into the view rows (I-5) and wins over `near_top`; a focus address that is not `None` and differs from the view's marker address clears the marker, `None` keeps it; `_alt_first_visible_address` / `_mac_first_visible_address` = the painted first view row. `update_hex_view(focus_address=None)`: without a focus, `_hex_window_start` kept (clamped to `[0, len(view rows) − 1]`), marker kept, scroll untouched | G1 internal; 10b `_refresh_hex_views_after_write` |
+| I-4 focus landing | `_land_focus(self, trigger: Optional[Widget], switch: Optional[str], *, on_switch: bool, layout_waits: int = 3) -> None` (`layout_waits` added at E4 integration, I-D3: callers never pass it; while the shown window has no region the landing re-schedules itself with `layout_waits − 1`; E5: on the final tree the wait decides only a landing that runs while a dialog is current, a state no product route reaches — probes `e5c-06`, `e5c-09`, `e5c-10`, `../E5-corrective-notes.md` E-15), scheduled with `call_after_refresh` by `action_show_screen` (`on_switch=True`, `switch = self._active_screen_key`) and `_apply_unload` (`False`, `switch = self._active_screen_key` **(changed at E5, CR-3: was `None`; an unstamped unload landing ran before the switch landing of a rail key pressed in the same burst and put the focus on the new window's table, which the switch landing then kept)**); a landing whose `switch` is no longer `_active_screen_key` returns without moving (AR2-2); a landing that runs once `_load_tree_gone()` is True does nothing **(E5, SE5-5)**; it lands through `screen.set_focus` on `_resolve_focus_target()`; `_resolve_focus_target()` / `_fallback_focus_target()` / `_focus_needs_rehome()` unchanged; `_rehome_focus_after_load()` stays the load tails'. **Chosen A2L target (E4-R4, I-D16):** a window switch (`on_switch=True`) to a window named in `S19TuiApp._SWITCH_LANDING_TARGETS` lands on that widget while it is focusable and shown, else on `_resolve_focus_target()`; the entries are `{"a2l": "window_help_a2l", "mac": "mac_page_prev_button"}` — the A2L window's `?` chip, which leads its header and binds Enter only, so PgDn / PgUp / `+` / `-` right after `2` reach the app's paging (R-TUI-020.1) instead of the tag table's own PgDn (LLR-042.1). **Chosen MAC target (E4-R6, I-D18):** the MAC window has no `?` chip; its switch landing is the `Page Prev` button `mac_page_prev_button`, the window's first focusable control (the widget R-SHELL-FOCUS.5 would choose there, as the chip is on A2L), a `Button` that binds Enter only, so PgDn / PgUp / `+` / `-` right after `3` reach the app's paging instead of the record table's own PgDn (`mac_records_list`, a `DataTable`). An unload landing and every load tail still land on `_FOCUS_TARGETS` (the tag table on A2L, the record table on MAC). **E4-R3:** every landing that misses the shown window's declared target (a R-SHELL-FOCUS.5 fallback, or the A2L switch landing) is recorded by `_note_focus_landing` in `_focus_landing_fallback`; a completed load moves a focus still sitting there, or on a rail item, to `_FOCUS_TARGETS[window]` once that target is shown (`_rehome_placeholder_focus_after_load`) | G1 internal |
+| I-5 view rows | `hex_row_bases(row_bases: List[int], row_bases_set: Optional[set[int]] = None, extra_addresses: Optional[set[int]] = None) -> List[int]`: the row list `_collect_hex_rows` paints (present rows plus the rows of extra addresses, ascending; the given list itself when nothing is added). `S19TuiApp._hex_view_rows(self) -> list[int]`: `hex_row_bases(current_file.row_bases, bases_set, _collect_mac_highlight_addresses(current_file))`, `[]` without a file | G3 → G1; 10b |
+| I-6 hidden-window keys | `SplitJoinWindow.check_action(self, action: str, parameters: tuple) -> Optional[bool]`: `False` while the window has `hidden`, else `super().check_action(action, parameters)` | G2 (Textual calls it) |
+
+Interfaces with Inc 10b (10a merges first; both edit `app.py` and `segment_split_view.py`; no function in common): I-3 (10b's hex refresh renders the main view without a focus and the A2L / MAC views with `start_row`, relying on the kept window, marker and scroll); I-5 (10b bisects the first visible address in `_hex_view_rows()`); I-2 (10b never calls `refresh_window`); I-4 (an in-place write schedules no landing); case R-SEG-OPEN.6/3 stays here and is re-run at 10b's E5.
+
+Interfaces with other increments:
+
+| With | What is shared | Rule |
+|---|---|---|
+| Inc 6 (in flight, merges first) | none after the split (`_note_image_bytes_written` is 10b's) | — |
+| Inc 9 (in flight) | none (`app.py:3988-4572` flow save handlers) | — |
+| Inc 5 (merged) | the in-place-write hook and its three callers; the term *in-place write* | reused; scope of the term widened (`../E1-rulings.md` §4); no `refresh_window` from the hook (Inc 5 E3 A-4) |
+| Inc 13 (merged) | `segment_split_view.py` `_conflict_marks`, `build_plan`, `_state_text` (conflict first), `_sync` | reused unchanged; D-1 … D-4 of Inc 13 untouched |
+| Inc 12 (next in the `app.py` chain) | Inc 12's E1 found one: `_jump_to_validation_issue_object` (10a #11). Inc 12 removes it, with `_jump_to_validation_issue`, `_format_validation_issue_line` and `action_view_main` / `_alt` / `_mac` (its D-2 A). 10a also changes `action_show_screen`, which Inc 12 only calls | E3 addendum (Inc 12 D-2): #11 withdrawn (no product route); 10a changes none of the removed functions, and no 10a test drives them (`../02-test-cases.md`, window-switch rule) |
+
+## Nodes — G1 app
+
+S19TuiApp.update_hex_view
+req: R-TUI-018.1, R-TUI-018.2, R-TUI-018.3, R-TUI-018.4, R-TUI-040.4, R-TUI-040.8, R-TUI-040.12, R-TUI-007.3, R-TUI-007.5
+in: focus_address: Optional[int]
+out: None
+func: changed. was: with a focus, `_hex_window_start = (snapped_index // page) * page`, then, with or without a focus, clamped to `max_start` (the last page floor, `app.py:19191-19192`); the scroll untouched; the marker kept. / now (E3 A10-02, A10-03): `rows = _hex_view_rows()`; with a focus, `_hex_window_start = _row_start_for_near_top_focus(focus_address, row_bases, rows)`; then, with or without a focus, one clamp `max(0, min(_hex_window_start, len(rows) − 1))` and no page floor; when a focus address that is not `None` and differs from `_goto_focus_address` the marker is cleared before the render; after a focused render `_reset_scroll_to_top("#hex_scroll")` (both axes). Without a focus: window kept (clamped), marker kept, scroll untouched. (E4 integration, I-D2: the AR2-5 clause — a load resets `_hex_window_start` and a MAC load/unload re-anchors it by the first shown address — is removed: no coverage item of an Inc 10a row requires it, and read literally it contradicts R-TUI-007.8/1's first page; backlog BL-I10-1, with D4-14. E4-R1: its first half is back, in `_apply_prepared_load` — a load that installs a new image sets `_hex_window_start = 0` (R-TUI-007.9); the MAC re-anchor stays BL-I10-1.)
+module: s19_app/tui/app.py
+calls: S19TuiApp._hex_view_rows, S19TuiApp._row_start_for_near_top_focus, render_hex_view_text, S19TuiApp._reset_scroll_to_top
+examples: (R-TUI-018.1/1) go-to `0x00000960` → start 149; rows `0x00000950`, `0x00000960` (`> `), …; notice `... showing from 0x00000950 ...` (base P: start 0, target on line 151, viewport 28)
+examples: (R-TUI-018.1/3) section `0x00040000` → second row `0x00040000`; marker cleared (base P: line 98; marker address `0x50` kept)
+examples: (R-TUI-018.1/11) last present row → start = last − 1; 2 rows; no `window limited` notice
+examples: (R-TUI-018.2/1) scroll (10, 40), go-to `0x00000140` → (0, 0) (base P: (10, 40))
+examples: (no focus, after `.`) → rows from `_hex_window_start`, marker as set
+examples: (R-TUI-040.8/4) after a jump to the last present row (start 26 544 of 26 546), a render without a focus → start 26 544 kept (base P7: 26 400, the last page floor)
+examples: (R-TUI-018.1/12) MAC below, go-to `0x00008020` → view rows `0x1000`, `0x8000`, `0x8010`, `0x8020`; start 2; rows `0x00008010`, `0x00008020` (base P5: start 1 counted in `row_bases`, target third)
+examples: (R-TUI-018.1/13) 80 × 24, go-to `0x00000960` → the `0x00000960` row is the second hex row, below at most 2 notice lines, inside `#hex_scroll`'s region
+examples: (unit shape, no product route — Inc 12 D-2; R-TUI-018.3/1 withdrawn) a focus address with no present row → start = (index of the snapped present row in the view rows) − 1; second row = the snapped row. Every shipped main-view jump targets a present row, so no case drives this arm
+examples: (R-TUI-018.4/1) go-to `0x00000000` → start 0; first hex row `0x00000000`, no `... showing from` line; the miss after it (#5) re-renders from start 0
+
+S19TuiApp.action_hex_page_next
+req: R-TUI-007.3, R-TUI-007.5, R-TUI-007.8
+in: —
+out: None
+func: changed. was: `start = min(max_start, start + page)`, `max_start` from `len(row_bases)`. / now: `total = len(_hex_view_rows())`; `start = start + page if start + page < total else start`; the rest unchanged (search hit and marker cleared, `update_hex_view()`).
+module: s19_app/tui/app.py
+calls: S19TuiApp._hex_view_rows, S19TuiApp.update_hex_view
+examples: (R-TUI-007.3/1) 1 000 rows, start 150 → 350
+examples: (R-TUI-007.5/1) start 948 → 948 (base: 800)
+examples: (R-TUI-007.3/2) 12 rows, page 5: 0 → 5
+examples: (R-TUI-007.8/1) MAC below, page 3: 4 view rows; 0 → 3 (`0x00008020` alone); 3 → 3 (base: `max_start` 0 from 3 present rows, 0 → 0)
+
+S19TuiApp.update_alt_hex_view
+req: R-TUI-018.1, R-TUI-018.3, R-TUI-018.4, R-TUI-040.8, R-TUI-040.11, R-TUI-040.12
+in: focus_address, near_top, reset_scroll, *, start_row: Optional[int] = None
+out: None
+func: changed. was: `start_row_index` = near-top index by exact match or None (then the renderer centres with 64 context rows, while `_alt_first_visible_address` records row 0, `app.py:19295-19298`). / now: `rows = _hex_view_rows()`; `start_row` given → `start_row_index = start_row` (clamped to `[0, len(rows) − 1]`); else `near_top` with a focus → `_row_start_for_near_top_focus(focus_address, row_bases, rows)` (snapped, never `None` while rows exist); a focus address that is not `None` and differs from `_alt_goto_focus_address` clears it before the render; `_alt_first_visible_address = rows[effective start]` (the painted first view row).
+module: s19_app/tui/app.py
+calls: S19TuiApp._hex_view_rows, S19TuiApp._row_start_for_near_top_focus, render_hex_view_text, S19TuiApp._reset_scroll_to_top
+examples: (R-TUI-040.11/4) marker on `0x00000050`, window from `0x00000040`; failed go-to → `start_row` = index of `0x00000040` in the view rows → same rows, 0 marked lines
+examples: (R-TUI-040.12/5) continued search hit ≠ marker → marker cleared
+examples: (R-TUI-018.1/12) MAC below, go-to `0x00008020` → start 2; first rows `0x00008010`, `0x00008020`
+examples: (R-TUI-018.3/2) tag find of a tag outside the image → start = snapped row's view index − 1; second row = snapped row (base: no start index, 64 context rows, E1 N-2)
+examples: (R-TUI-018.4/1) go-to `0x00000000` → start 0, `_alt_first_visible_address` `0x00000000`; the miss re-renders from index 0
+
+S19TuiApp.update_mac_hex_view
+req: R-TUI-018.1, R-TUI-018.3, R-TUI-018.4, R-TUI-040.8, R-TUI-040.11, R-TUI-040.12
+in: as update_alt_hex_view
+out: None
+func: changed. As `update_alt_hex_view` for `#mac_hex_view`, `_mac_goto_focus_address`, `_mac_first_visible_address`, `#mac_hex_scroll`.
+module: s19_app/tui/app.py
+calls: S19TuiApp._row_start_for_near_top_focus, render_hex_view_text, S19TuiApp._reset_scroll_to_top
+examples: (R-TUI-040.11/5) marker set, `zz` → 0 marked lines, rows unchanged
+examples: (R-TUI-018.3/3) case 08 + `firmware_issues.mac`; Enter on the `#mac_records_list` row of `0x00FF0000` (In mem `no`) → `_jump_to_mac_address` (unchanged) → `update_mac_hex_view(0x00FF0000, near_top=True, reset_scroll=True)` → snapped to the last present row `0x00C00FF0`; start = its view index − 1; rows `0x00C00FE0`, `0x00C00FF0`, then the MAC-added rows of the valid records outside the image (base: no start index → centred on the `0x00FF0000` row with 64 context rows)
+
+S19TuiApp._handle_goto
+req: R-TUI-040.8, R-TUI-040.11, R-TUI-018.4
+in: — (reads `#goto_input`)
+out: None
+func: changed. was: empty / invalid → marker field cleared, no render; miss → `_apply_goto` status, nothing cleared. / now: on each failure, after its status: if a marker was set, clear it and `update_hex_view()`; if none was set, no render (TC-007 keeps 0 calls).
+module: s19_app/tui/app.py
+calls: S19TuiApp._apply_goto, S19TuiApp.update_hex_view, S19TuiApp.set_status
+examples: (R-TUI-040.11/1) hit `0x00000050` then `0xFFFFFFF0` → `Address 0xFFFFFFF0 not in loaded file.`; 0 marked lines; rows unchanged (base P: marker on line 6)
+examples: (R-TUI-040.11/3) `zz` → `Invalid address format.`; 0 marked lines (base P: line 6)
+examples: (R-TUI-040.8/1) no marker set, miss → 0 `update_hex_view` calls
+
+S19TuiApp._handle_goto_alt
+req: R-TUI-018.1, R-TUI-018.2, R-TUI-040.4, R-TUI-040.8, R-TUI-040.11
+in: — (reads `#alt_goto_input`)
+out: None
+func: changed. was: hit → `update_alt_hex_view(addr)`; failures as `_handle_goto` on base. / now: hit → `update_alt_hex_view(addr, near_top=True, reset_scroll=True)`; each of the three failures (empty, invalid, miss), after its status → `_clear_goto_marker_keeping_window("alt")` (E5, CR-2: the three copied blocks — clear, `rows.index` of `_alt_first_visible_address`, re-render — became the one helper).
+module: s19_app/tui/app.py
+calls: S19TuiApp._apply_goto, S19TuiApp.update_alt_hex_view, S19TuiApp._clear_goto_marker_keeping_window
+examples: (R-TUI-018.1/6) `0x00000960` → second row `0x00000960` (base P: row 65, 64 context rows, viewport 37)
+examples: (R-TUI-040.11/4, /6, /7; E5 QA-3) marker on `0x50`, then a miss / an empty box / `zz` → 0 marked lines (each branch its own mutant, M8a–M8c = mut-c-05 … 07)
+
+S19TuiApp._handle_goto_mac
+req: R-TUI-018.1, R-TUI-018.2, R-TUI-040.4, R-TUI-040.8, R-TUI-040.11
+in: — (reads `#mac_goto_input`)
+out: None
+func: changed. As `_handle_goto_alt`, for `#mac_goto_input` and the MAC view (failures → `_clear_goto_marker_keeping_window("mac")`, E5 CR-2).
+module: s19_app/tui/app.py
+calls: S19TuiApp._apply_goto, S19TuiApp.update_mac_hex_view, S19TuiApp._clear_goto_marker_keeping_window
+examples: (R-TUI-018.1/9) `0x00000960` → second row `0x00000960` (base: 64 context rows, guide ch05-04)
+examples: (R-TUI-040.11/5, /8, /9; E5 QA-3) marker on `0x50`, then `zz` / an empty box / a miss → 0 marked lines (M8d–M8f = mut-c-08 … 10)
+
+S19TuiApp._clear_goto_marker_keeping_window
+req: R-TUI-040.8, R-TUI-040.11
+in: view: str (`"alt"` or `"mac"`)
+out: None
+func: new (E5, CR-2). The view's marker field is `None` → return (no render, as on base). Else set it to `None`; `start = bisect_left(_hex_view_rows(), first)` with `first` = `_alt_first_visible_address` / `_mac_first_visible_address` (`0` when it is `None`); `update_alt_hex_view(start_row=start)` / `update_mac_hex_view(start_row=start)`. One `bisect` replaces the two linear scans (`in`, `index`) of each copied block; for an address present in the view rows the index is the same, for one no longer present it is the next row (bounded by the render's clamp) where the copies gave `0`.
+module: s19_app/tui/app.py
+calls: S19TuiApp._hex_view_rows, S19TuiApp.update_alt_hex_view, S19TuiApp.update_mac_hex_view, bisect.bisect_left
+examples: (R-TUI-040.8/2) A2L, go-to `0x50` (window from `0x40`, index 4), then a miss → `start_row=4`, rows unchanged; M9b (`start = 0`, mut-c-11) → the window jumps to `0x00000000`
+examples: (R-TUI-040.11/6) A2L, marker on `0x50`, empty box → field `None`, re-render, 0 marked lines
+
+S19TuiApp._handle_search_alt
+req: R-TUI-018.1, R-TUI-018.2, R-TUI-040.12
+in: — (reads `#alt_search_input`)
+out: None
+func: changed. was: `update_alt_hex_view(addr)`. / now: `update_alt_hex_view(addr, near_top=True, reset_scroll=True)`; the marker clear comes from I-3.
+module: s19_app/tui/app.py
+calls: find_string_in_mem, S19TuiApp.update_alt_hex_view
+examples: (R-TUI-018.1/7) `BUILD_ID` → `Found at 0x00C00050`; second row `0x00C00050`
+
+S19TuiApp._handle_search_mac
+req: R-TUI-018.1, R-TUI-018.2, R-TUI-040.12
+in: — (reads `#mac_search_input`)
+out: None
+func: changed. As `_handle_search_alt` for the MAC view.
+module: s19_app/tui/app.py
+calls: find_string_in_mem, S19TuiApp.update_mac_hex_view
+examples: (R-TUI-018.1/10) `BUILD_ID` → second row `0x00C00050`; (R-TUI-040.12/6) a continued hit clears the marker
+
+S19TuiApp._handle_a2l_tag_find_next
+req: R-TUI-018.1, R-TUI-018.3
+in: —
+out: None
+func: changed. was: `update_alt_hex_view(addr)` for a tag with an address. / now: `update_alt_hex_view(addr, near_top=True, reset_scroll=True)`; the rest unchanged.
+module: s19_app/tui/app.py
+calls: S19TuiApp.update_alt_hex_view
+examples: (R-TUI-018.1/8) `VALUE_0200` → its address row is the second row
+
+S19TuiApp._jump_to_validation_issue_object — withdrawn (no product route — Inc 12 D-2)
+func: unchanged; not a slice node and not counted. Its only caller, `_jump_to_validation_issue` (the legacy ListView adapter), has no caller on `98d94d7` or on main `2d1e2b1`. Enter on an issue row runs `on_issue_row_selected` → `_update_issues_hex_pane` (the Issues peek). Its A2L and MAC renders keep the 64-row centring, which no product route reaches. Inc 12 removes it (its D-2 A). Cases R-TUI-018.1/5, R-TUI-018.3/1 and R-TUI-040.12/2 are withdrawn with it; R-TUI-018.3's MAC arm is re-pointed to R-TUI-018.3/3 (`update_mac_hex_view` above).
+
+_unload_primary
+req: R-WS-LOADED.16, R-WS-LOADED.19, R-WS-LOADED.20
+in: loaded: LoadedFile
+out: Optional[LoadedFile]
+func: changed. was: when `_has_mac`, the MAC-only `replace(...)` keeps `path` (the unloaded image's) and `errors` (the primary's). / now (E3 S-2, A10-07; D-5 withdrawn, D-7): when `loaded.mac_path is not None`, the same `replace(...)` also sets `path=loaded.mac_path` and `errors=[{"line": None, "message": d} for d in loaded.mac_diagnostics]` (the shape a MAC-only load builds, `app.py:16924`, `:16948-16960`); `mem_map`, rows, ranges stay empty; MAC records with no MAC file, or no MAC → None.
+module: s19_app/tui/app.py
+calls: dataclasses.replace
+examples: (R-WS-LOADED.16/1) 1 bad-checksum diagnostic + case 08 MAC (no MAC diagnostic) → `errors` `[]`; Issues 0 loader diagnostics (base P: 1)
+examples: (R-WS-LOADED.16/2) no MAC → None
+examples: (R-WS-LOADED.16/3) bad S19 + `firmware_issues.mac` (2 diagnostics) → `errors` = those 2, as a MAC-only load of it (E1 shape `errors=[]`: 0)
+examples: (R-WS-LOADED.19/1) `unloaded_primary.s19` + `firmware.mac`, `[u]` primary → `path` = `firmware.mac`; Save project `P6` plans the MAC as its only data file → no `.s19` in `P6` (base security P6: `P6/unloaded_primary.s19`)
+examples: (R-WS-LOADED.19/2) no unload → the S19 is planned and placed (the control)
+examples: (R-WS-LOADED.20/1) after the unload, a project load with an unsaved entry → `_load_question_text` reads `current_file.path.name` = `firmware.mac` → `Replace firmware.mac?` (base: `Replace unloaded_primary.s19?`)
+examples: (unit shape, no product route) `mac_records` set, `mac_path` None → None
+
+S19TuiApp._apply_unload
+req: R-WS-LOADED.13, R-WS-LOADED.14, R-WS-LOADED.18, R-SHELL-FOCUS.3, R-SHELL-FOCUS.4
+in: kind: str
+out: None
+func: changed. was: `all` always proceeds (`Unloaded all artifacts.` with nothing loaded); ends with `set_status(f"Unloaded {label}.")`; no file-status write; no focus step. / now: (a) `kind == "all"` with `current_file is None` and `current_a2l_path is None` → `set_status("Nothing to unload.")`, return; (b) after `_refresh_loaded_panel()`: `set_file_status(f"Unloaded {label}.")` and the unchanged `set_status(...)` (one message line; `set_file_status` writes no message); (c) E3 A10-01, AR2-1: `trigger = default_screen.focused` read before (a)'s changes, and as the last step `call_after_refresh(self._land_focus, trigger, self._active_screen_key, on_switch=False)` (changed at E5, CR-3: `switch` was `None`; no synchronous re-home; the focus has already moved — `_refresh_loaded_panel()` removes the button and Textual's prune reset moves the focus to `window_help_workspace` synchronously inside `_apply_unload`, P3).
+module: s19_app/tui/app.py
+calls: _unload_primary, _unload_mac, _unload_a2l, S19TuiApp._replace_current_a2l, S19TuiApp.set_file_status, S19TuiApp.set_status, App.call_after_refresh, S19TuiApp._land_focus
+examples: (R-WS-LOADED.18/1) S19+MAC, `[u]` MAC → `#status_text` `Unloaded MAC.`, newest message `Unloaded MAC.` (base P: `Loaded firmware.mac (S19+MAC)`)
+examples: (R-WS-LOADED.14/1) nothing loaded, `U` → `Nothing to unload.`; `#status_text` `Ready.` (base P: `Unloaded all artifacts.`)
+examples: (R-WS-LOADED.14/2) A2L-only, `U` → `Unloaded all artifacts.`
+examples: (R-SHELL-FOCUS.4/1, changed at E4, E4-R2) S19 + MAC, `files_list` focused, `[u]` on the MAC slot → `files_list` (the image stays, so `files_list` stays shown; the arm was `U`, whose empty state hides `files_list`, LLR-002.3; with I-2; base: `sje_table`, area 0)
+examples: (R-SHELL-FOCUS.3/1) the MAC `[u]` focused and pressed → `_refresh_loaded_panel()` removes the button and Textual's prune reset moves the focus to `window_help_workspace` synchronously inside `_apply_unload`; the landing sees `focused is not trigger` → `files_list` (P3: a synchronous re-home gives `window_help_workspace`)
+examples: (R-SHELL-FOCUS.3/2) nothing focused, `U` → the landing sees `None` → `files_list`
+examples: (R-SHELL-FOCUS.4/2) `rail_item_workspace` focused, `U` → healthy and attached → kept
+examples: (R-SHELL-FOCUS.2/8, E5 CR-3) S19 + A2L + MAC, `files_list` focused, `[u]` on the MAC slot and `2` in one burst → the unload landing is stamped `workspace`, stale once `_active_screen_key` is `a2l` → the switch landing → `window_help_a2l` (before E5: `a2l_tags_list`); `[u]` on the A2L slot and `3` → `mac_page_prev_button` (before E5: `mac_records_list`)
+
+S19TuiApp._format_coexistence_status
+req: R-TUI-012L.8
+in: loaded: LoadedFile, path: Path
+out: str
+func: changed. was: `path.name` and `loaded.mac_path.name` formatted raw in the 5 returns. / now: `painted_names([path.name])` and `painted_names([loaded.mac_path.name])`; texts otherwise identical.
+module: s19_app/tui/app.py
+calls: _integrity_notice_codes, painted_names
+examples: (R-TUI-012L.8/1) `fw` U+202E `gpj.s19` → `Loaded fwgpj.s19 (S19 only)` (base P: U+202E kept)
+examples: (R-TUI-012L.8/4) `firmware.s19` → `Loaded firmware.s19 (S19 only)`
+examples: (R-TUI-012L.8/2) MAC `m` U+200B `x.mac` → `… (S19+MAC: mx.mac)`; the message line (`_append_log_line`, `:18206`) gets the same text, so the composer's scrub is what keeps the log clean
+examples: (A10-06) a 130-character name → its first 119 characters + `…` (the `painted_names` clip)
+
+S19TuiApp.action_show_screen
+req: R-SHELL-FOCUS.2, R-SHELL-FOCUS.5, R-SEG-OPEN.6
+in: screen_key: str
+out: None
+func: changed. was: swaps the `hidden` classes, hides Split / Join, moves the rail marker, runs the entry prefills; no focus move. / now (E3 A10-01 = S-4, D-8): identical, then, before `refresh_bindings()`: (1) when `default_screen.focused` has an ancestor in `_WINDOW_CONTAINER_IDS` that now has `hidden`, `default_screen.set_focus(None)` at once (a class test, valid before any layout); (2) when the call changed what is shown (the shown window's container had `hidden` before the swap, or Split / Join was displayed), `call_after_refresh(self._land_focus, default_screen.focused, self._active_screen_key, on_switch=True)`; a call that shows the window already shown (`1` on the Workspace, a click on the active rail item; on the base also `action_view_main`, which Inc 12 removes and no 10a test drives) schedules no landing and a healthy focus there stays (AR2-4). No synchronous landing: the window un-hidden in this call has no region until the next layout (Textual `widget.py:2285-2294`, P1/P2). Unknown key → return as on base. Every caller gets it (A10-11: rail keys and clicks, palette, Memory Map open-in-hex, window help, `action_view_*` (removed by Inc 12; tests switch with the keys or `action_show_screen`), the Split / Join close).
+module: s19_app/tui/app.py
+calls: Rail.set_active, S19TuiApp._apply_empty_state, Screen.set_focus, App.call_after_refresh, S19TuiApp._land_focus
+examples: (R-SHELL-FOCUS.2/1, changed at E4, E4-R4) `files_list` focused, `2` → `window_help_a2l`, the A2L switch landing of I-4 (the Inc 10a tree before E4-R4: `a2l_tags_list`, whose own PgDn scrolled the table, I-D16; base P: `ws_load_project_button`, hidden, area 0)
+examples: (R-SHELL-FOCUS.2/2) Split / Join open from the Workspace, Esc → `files_list` (base P: none)
+examples: (R-SHELL-FOCUS.2/4) `rail_item_workspace` focused, `]` → `fx_panel`; `c` still confirms
+examples: (R-SHELL-FOCUS.5/1) target paints no region → first shown focusable non-text widget, else the rail item
+examples: (R-SHELL-FOCUS.2/6) a Patch Editor button focused, `1`: the button's window is hidden → focus cleared at once; an Enter before the landing reaches no Patch Editor control (no `Validate:`; base security P5: `Validate: 1 entry, 0 error(s), 0 warning(s)`); the landing → `files_list`
+examples: (R-SHELL-FOCUS.2/3, changed at E4, E4-R6) Split / Join open, `3` → `sje_table` sits in the window just hidden → cleared; landing → `mac_page_prev_button`, the MAC switch landing of I-4 (the Inc 10a tree before E4-R6: `mac_records_list`, whose own PgDn scrolled the table, I-D18; base P: none)
+
+Moved to 10b at E3: `_note_image_bytes_written`, `_refresh_a2l_values_after_write` (`../../inc-10b/codewire/graph-inc10b.md`). R-SEG-OPEN.6/3 (a write while Split / Join is hidden: no focus inside `#screen_split_join`) stays a 10a case; 10b re-runs it.
+
+S19TuiApp._land_focus
+req: R-SHELL-FOCUS.2, R-SHELL-FOCUS.3, R-SHELL-FOCUS.4, R-SHELL-FOCUS.5, R-SEG-OPEN.6
+in: trigger: Optional[Widget], switch: Optional[str], *, on_switch: bool
+out: None
+func: new (E3 A10-01, AR2-1, AR2-2). E5 SE5-5: `_load_tree_gone()` → return (a landing that runs once `App.exit` has run moves nothing; the crash-at-exit class of E4-R5). `switch` is not `None` and is not the latest `self._active_screen_key` → return (a stale landing does nothing, AR2-2; since E5 CR-3 the unload landing is stamped too). E4 integration (I-D3): the shown window's container (`SCREEN_CONTAINER_IDS[_active_screen_key]`, or `#screen_split_join`) has no region yet and `layout_waits > 0` → `call_after_refresh(self._land_focus, trigger, switch, on_switch=on_switch, layout_waits=layout_waits − 1)` and return (an after-refresh callback can run before the layout that gives the window just shown its region: `#screen_mac` area 0 at the landing of the two-key burst, int-07). `focused = default_screen.focused` (never `self.focused`: a dialog keeps its own focus, R-SHELL-FOCUS.7); an unmounted tree → return. Move when `focused is None`, or `_focus_needs_rehome(focused)`, or (`on_switch` and `focused is trigger`), or (not `on_switch` and `focused is not trigger`) (AR2-1: `not trigger.is_attached` is dropped — the prune reset moves the focus synchronously inside `_apply_unload`, and the removed button's own task exit is not ordered against the landing). Then `target = _resolve_focus_target()` (it reads `_active_screen_key` now) — E4-R4 / E4-R6: on a switch (`on_switch`) to a window of `_SWITCH_LANDING_TARGETS` (`a2l` → `window_help_a2l`, `mac` → `mac_page_prev_button`), that widget instead while it is focusable and shown; not `None` → `target.screen.set_focus(target)`, then `_note_focus_landing(target)` (E4-R3). Otherwise the focus stays (a caller or the operator moved it since the trigger).
+module: s19_app/tui/app.py
+calls: S19TuiApp._focus_needs_rehome, S19TuiApp._resolve_focus_target, Screen.set_focus
+examples: (R-SHELL-FOCUS.2/1, changed at E4, E4-R4) `2` from `files_list`: trigger `None` (cleared), focused `None` → `window_help_a2l` (recorded as the landing's fallback); PgDn then pages the A2L Explorer (`test_at_i11_5_curve_description_index_note_once`; before E4-R4: `a2l_tags_list`, PgDn scrolled the table; base P: `ws_load_project_button`)
+examples: (R-SHELL-FOCUS.2/4) `]` from `rail_item_workspace` (frame widget, not cleared): focused is the trigger → `fx_panel`; `c` still confirms
+examples: (R-SHELL-FOCUS.2/7, changed at E4, E4-R6) `2` then `3` in one burst: the `2` landing is stamped `a2l` and is stale once `_active_screen_key` is `mac` → it does nothing; the `3` landing (stamped `mac`) → `mac_page_prev_button` (before E4-R6: `mac_records_list`)
+examples: (R-TUI-020.1 MAC arm, E4-R6) case 08 S19 + MAC (200 records, page 100), `3` from `files_list` → `mac_page_prev_button`; PgDn reaches the app's `page_down_context` → `Page 2/2 | rows 101-200 / 200` (`test_r_tui_020_1_mac_arm_key_3_then_pagedown_pages_the_mac_view`; before E4-R6: the landing on `mac_records_list`, whose own PgDn scrolled the table, kept `Page 1/2`, I-D18; base P: `_mac_window_start` 0 → 1 with case 01 at page size 1, the focus in the hidden Workspace)
+examples: (a caller's own focus) `action_show_screen("workspace")` then the caller focuses `#goto_input` before the refresh → focused is not the trigger and healthy → `#goto_input` kept
+examples: (R-SHELL-FOCUS.3/1) unload: trigger the removed `[u]`, focused `window_help_workspace` (moved by the prune reset inside `_apply_unload`) → `focused is not trigger` → `files_list`
+examples: (R-SHELL-FOCUS.4/1, changed at E4, E4-R2) `[u]` on the MAC slot: trigger `files_list`, focused `files_list`, attached, healthy → kept
+examples: (R-SHELL-FOCUS.2/8, E5 CR-3) unload stamped `workspace`, then `2` → the unload landing is stale and returns; the switch landing → `window_help_a2l`
+examples: (R-SHELL-FOCUS.3/3, E5 SE5-5) `App.exit()` called, then the unload's landing runs → `_load_tree_gone()` → no `set_focus` (before E5: `files_list` set on the tree being torn down)
+
+S19TuiApp._row_start_for_near_top_focus
+req: R-TUI-018.1, R-TUI-018.3, R-TUI-018.4
+in: focus_address: Optional[int], row_bases: list[int], view_rows: list[int], context_rows: int = 1
+out: Optional[int]
+func: changed (E3 A10-03). was: `row_bases.index(focus_base)` (exact; `None` when the row is absent) minus `context_rows`, in `row_bases`. / now: no focus or no rows → `None`; `i = _snapped_focus_row_index(focus_address, row_bases)` (the CTX-HEX target row: next present row, else the last); `j = bisect_left(view_rows, row_bases[i])` (its index in the view rows); return `max(0, j − context_rows)`.
+module: s19_app/tui/app.py
+calls: S19TuiApp._snapped_focus_row_index, bisect.bisect_left
+examples: (R-TUI-018.1/12) MAC below, `0x8020` → `i` 2, `j` 3 → 2
+examples: (R-TUI-018.3/2) a tag at an absent address `A` → `i` = the first present row at or after `A`'s row base → `j − 1` (base: `None`)
+examples: (R-TUI-018.4/1) `0x00000000` → `j` 0 → 0
+examples: (R-TUI-018.1/6) case 08, `0x00000960` → 149
+
+S19TuiApp._hex_view_rows
+req: R-TUI-018.1, R-TUI-007.8
+in: —
+out: list[int]
+func: new (E3 A10-03, I-5; AR2-6 (b)). No `current_file` → `[]`; else `hex_row_bases(current_file.row_bases or [], getattr(current_file, "bases_set", None), _collect_mac_highlight_addresses(current_file))`, memoised in `_hex_view_rows_cache` under the key `(_image_generation, frozenset(MAC record addresses))`, so one sorted list is built per image and MAC set and shared by the paging, the clamp, the start indices and the first-visible reads. **Cache rule (changed at E5, CR-1):** the attribute is declared `None` in `__init__`; every image install bumps `_image_generation`; a writer of `current_file` that does not bump it must reset the cache to `None` itself — today `_apply_unload` and `_reset_project_session` (S1). **Not shared with the render (E5, CR-1; the graph said "and the render"):** `render_hex_view_text` rebuilds the same list from the same three inputs through `hex_row_bases`, so the indices agree by construction. I-5 pins no renderer parameter, and the renderer's present parameters cannot take the view rows as they are: passed as `row_bases`, `hex_row_bases(view rows, the image's bases_set, MAC set)` re-sorts whenever a MAC row lies outside the image, and without `bases_set` it builds `set(view rows)` per render; a `view_rows=` parameter is an interface change this graph has not ruled.
+module: s19_app/tui/app.py
+calls: hex_row_bases, S19TuiApp._collect_mac_highlight_addresses
+examples: (R-TUI-007.8/1) MAC below → `[0x1000, 0x8000, 0x8010, 0x8020]`
+examples: (R-TUI-018.1/1) case 08 with no MAC → `row_bases` itself (no copy)
+
+S19TuiApp._first_visible_hex_address
+req: R-TUI-018.1, R-TUI-040.12
+in: view: str
+out: Optional[int]
+func: changed (E3 A10-03). was: main → `row_bases[_hex_window_start]`. / now: main → `_hex_view_rows()[_hex_window_start]` (the painted first row); A2L, MAC unchanged (their fields hold the painted first view row, I-3).
+module: s19_app/tui/app.py
+calls: S19TuiApp._hex_view_rows
+examples: (R-TUI-018.1/12) MAC below, window start 0 → `0x00001000` (base: `row_bases[0]` = `0x00008000`, a row below the painted first row)
+
+S19TuiApp.set_file_status
+req: R-SHELL-STATUS.7, R-WS-LOADED.18
+in: message: str
+out: None
+func: changed (E3 S-5, D-12). was: `_busy.file_state = safe_text(str(message)).plain` (C0 / C1 removed). / now: `text = str(message)`; every character of category Cc, Cf, Zl or Zp removed (`painted_names([text], limit=1, clip=max(1, len(text)))`: its filter, no clip); then `safe_text(...).plain`; the paint rule unchanged.
+module: s19_app/tui/app.py
+calls: painted_names, safe_text, S19TuiApp._paint_status_text
+examples: (R-SHELL-STATUS.7/1) `Loaded project 'PB' -> fw` U+202E `gpj.s19` → `Loaded project 'PB' -> fwgpj.s19` (base security P7: U+202E kept)
+examples: (R-SHELL-STATUS.7/2) `… -> fwgpj.s19 + m` U+200B `x.mac` → `… -> fwgpj.s19 + mx.mac`
+examples: (R-WS-LOADED.18/1) `Unloaded MAC.` → unchanged
+
+Nodes added by the E4 rulings (`../E4-rulings.md`; `../E4-integration-notes.md` §6):
+
+S19TuiApp._apply_prepared_load
+req: R-TUI-007.9, R-SHELL-FOCUS.3, R-SHELL-FOCUS.4 (and b100 HLR-166, HLR-177c)
+in: prepared: PreparedLoad, path: Path, load_started: float
+out: None
+func: changed at E4 (E4-R1, E4-R3, E4-R5). was: the install kept `_hex_window_start`, so a load showed the new image from the old window index, clamped (after a deep jump a smaller file showed its last row only, int-06); the deferred chain `_step_sections` → `_step_hex` → `_step_a2l` → `_step_finalize` ran whatever the app's state; `_step_finalize` re-homed only a stale focus. / now: (E4-R1) when `loaded.mem_map is not previous_map` — a new image dict: an image, project or MAC-only load, a variant activation — `_hex_window_start = 0`, beside the existing `_mac_window_start = 0`; a MAC or A2L attach keeps the live dict and the window (the MAC re-anchor stays BL-I10-1). (E4-R5) each of the four deferred steps starts with `if self._load_tree_gone(): return`: it acts on nothing and schedules no next step. (E4-R3) `_step_finalize` calls `_rehome_placeholder_focus_after_load()` after `_rehome_focus_after_load()`.
+module: s19_app/tui/app.py
+calls: S19TuiApp._load_tree_gone, S19TuiApp._rehome_focus_after_load, S19TuiApp._rehome_placeholder_focus_after_load, App.call_later
+examples: (R-TUI-007.9/1) 1 000-row image, go-to row 949 (window from 948), load fixture three → start 0; rows `0x00008000`, `0x00008010`, `0x00008020`, no `... showing from` line (before E4-R1: start clamped to 2, `0x00008020` alone, int-06)
+examples: (R-TUI-007.8/1) fixture three, then the MAC below: the attach keeps the dict, so the window is not reset (start 0 either way in that case)
+examples: (HLR-177c, E4-R5) a quit confirmed during a held project load: `App.exit` has run, `default_screen.is_attached` is False → `_step_sections` returns; no `MountError` (before E4-R5: `MountError: Can't mount widget(s) before Container(id='ws_memstrip') is mounted` from `update_memory_strip`, I-D17)
+examples: (headless) an app that never mounted (`test_apply_prepared_load_chains_updates_via_call_later`): `_load_tree_gone()` is False → the four steps run in order
+
+S19TuiApp._install_attached_a2l
+req: R-SHELL-FOCUS.3, R-SHELL-FOCUS.4 (and b100 HLR-166)
+in: result: A2LAttachResult
+out: None
+func: changed at E4 (E4-R3). was: the A2L load tail ended its focus step with `_rehome_focus_after_load()`. / now: then `_rehome_placeholder_focus_after_load()`; nothing else changed.
+module: s19_app/tui/app.py
+calls: S19TuiApp._rehome_focus_after_load, S19TuiApp._rehome_placeholder_focus_after_load
+examples: (TC-B100-13 a2l_only_load_with_no_image) `2`, Split / Join opened and closed with `2` → the A2L switch landing `window_help_a2l` (recorded); an A2L-only load → the tag table is shown → `a2l_tags_list`
+examples: (TC-B100-12 empty_state_target_falls_back) the Workspace fallback `window_help_workspace` (recorded); an A2L-only load leaves `files_list` hidden → after 3 waits the focus stays on the chip
+
+S19TuiApp._rehome_focus_after_load
+req: R-SHELL-FOCUS.3, R-SHELL-FOCUS.4
+in: —
+out: None
+func: changed at E4 (E4-R3; a context node before). was: the load tails' synchronous re-home of a `None` or stale focus onto `_resolve_focus_target()`; the unload uses `_land_focus` (E3). / now: identical, then `_note_focus_landing(target)` after `set_focus` (a fallback landing is recorded).
+module: s19_app/tui/app.py
+calls: S19TuiApp._focus_needs_rehome, S19TuiApp._resolve_focus_target, Screen.set_focus, S19TuiApp._note_focus_landing
+examples: (TC-B100-12 rehome_lands_synchronously) hidden `sje_table` focused → `files_list` at once; the record is cleared (the declared target)
+
+S19TuiApp._note_focus_landing
+req: R-SHELL-FOCUS.5 (E4-R3)
+in: target: Widget
+out: None
+func: new (E4-R3). `_focus_landing_fallback = None if target.id == _FOCUS_TARGETS.get(_active_screen_key) else target`. The attribute starts `None` in `__init__` and is UI focus state, not session state (`tests/test_b100_session_reset.py`: `SNAPSHOT_EXCLUSIONS` entry, `_CENSUS_AT_12B_BASE` re-frozen with it).
+module: s19_app/tui/app.py
+calls: —
+examples: nothing loaded, `1` from Split / Join → `window_help_workspace` → recorded; `2` → `window_help_a2l` (E4-R4) → recorded; `3` → `mac_page_prev_button` (E4-R6) → recorded, so a later load moves it to `mac_records_list` (`test_tc_b100_12_every_window_load_lands_on_its_target[mac]`); a landing on `files_list` → cleared
+
+S19TuiApp._rehome_placeholder_focus_after_load
+req: R-SHELL-FOCUS.3, R-SHELL-FOCUS.4, R-SHELL-FOCUS.5 (and b100 HLR-166)
+in: switch: Optional[str] = None, *, layout_waits: int = 3
+out: None
+func: new (E4-R3, option A). `_load_tree_gone()` → return. The first call takes `switch = _active_screen_key`; a later call for another window returns. `focused = default_screen.focused` (a dialog keeps its own focus); unmounted → return; `None` → return (`_rehome_focus_after_load` owns it). It acts only when `focused` is a `RailItem` or `focused is _focus_landing_fallback`: a focus the operator put on a real control is kept. `target` = the widget `#_FOCUS_TARGETS[switch]` (the declared target, never its fallback); `target is focused` → return; focusable with a region → `target.screen.set_focus(target)`, `_note_focus_landing(target)`; else, while `layout_waits > 0`, `call_after_refresh(self._rehome_placeholder_focus_after_load, switch, layout_waits=layout_waits − 1)`; a target that is never shown keeps the focus where it is.
+module: s19_app/tui/app.py
+calls: S19TuiApp._load_tree_gone, S19TuiApp._note_focus_landing, Screen.set_focus, App.call_after_refresh
+examples: (TC-B100-12 first_load_from_the_startup_rail_focus) fresh session, focus `rail_item_workspace`, load case 01 → `files_list` (before E4-R3: `rail_item_workspace`, int-11)
+examples: (TC-B100-12 load_file_tail / load_project_tail / workarea_files_pick / every_window[workspace], AT-B100-04, panel_close) Split / Join opened and closed with `1` with nothing loaded → `window_help_workspace` (recorded); the load → `files_list` (before E4-R3: the chip, I-D14)
+examples: (every_window[issues]) the Issues empty state has no `?` chip; the landing is `rail_item_issues` (measured, probe int-19a) → load → `validation_issues_groups`
+examples: (every_window[checks]) `window_help_checks` → load → `checks_grouped`
+examples: (TC-B100-12 healthy_focus_is_not_moved, visible_find_input_keeps_its_focus) `#hex_scroll` / `#search_input` put by the operator → an A2L load keeps it
+
+S19TuiApp._load_tree_gone
+req: — (E4-R5; b100 HLR-177c)
+in: —
+out: bool
+func: new (E4-R5). `default_screen` raises (the tree never mounted) → `False`; else `not default_screen.is_attached`. Textual 8.2.8's `MessagePump.is_attached` is False once `App.exit` has run (`app._exit`) and for a node whose parent chain no longer reaches the app (a pruned screen) — the condition under which `Widget.mount` raises `MountError` (`textual/widget.py:1452-1454`).
+module: s19_app/tui/app.py
+calls: MessagePump.is_attached
+examples: a running app → False; after `App.exit` → True; `S19TuiApp()` never run → False
+
+S19TuiApp._fallback_focus_target
+req: R-SHELL-FOCUS.5
+in: target: Widget
+out: Widget
+func: changed (E5, SE5-5; was a context node). was: the window's first shown focusable non-text widget, else the active rail item, with `query_one(Rail)` outside any `try` — a landing that ran during teardown could raise there at exit (I-D17's class). / now: identical, with `query_one(Rail)` inside `try`; no rail → the given target.
+module: s19_app/tui/app.py
+calls: Widget.query, App.query_one
+examples: (R-SHELL-FOCUS.5/1) `5` with nothing loaded → the first shown non-text widget of `#screen_issues`, else `rail_item_issues`
+examples: (no product route reached by a test) the rail gone → the target itself, no exception
+
+S19TuiApp._plan_project_save
+req: R-WS-LOADED.19
+in: as on base
+out: SavePlan
+func: changed (E5, SE5-1; was a context node). was: plans `loaded.path` as the project's data file (after `_unload_primary` that is the MAC file) and, for a save as, passes the open project's whole inventory, so `_plan_copies` carried every top-level S19 / HEX file of the open project — the unloaded image among them. / now: identical, but when the save is a save as (`walked` set) and no S19 / HEX image is loaded (`current_file` is `None` or its `file_type` is not `s19` / `hex`: a primary unload, with or without an A2L left, or a MAC-only load; widened at the re-review, RR-1), the inventory passed on has its top-level `PROJECT_PRIMARY_DATA_EXTENSIONS` files removed (`dataclasses.replace(walked, top_level=…)`); `project_gather_service.py` is unchanged (the ruling's condition). Cost, as the security review states: every S19 / HEX variant of the open project is dropped, not only the unloaded one (after D-7 the session no longer knows which file was unloaded).
+module: s19_app/tui/app.py
+calls: project_gather_service.inventory_project_tree, project_gather_service.plan_project_save, dataclasses.replace
+examples: (R-WS-LOADED.19/3, E5) project `PS` = `unloaded_primary.s19` + `firmware.mac` loaded, `[u]` on the primary, Save project `P9` → `P9` holds `firmware.mac` and no `.s19` / `.hex`; loading `P9` installs a MAC-only spine (before E5, probe `e5s-probe.txt`: carried `['unloaded_primary.s19']`)
+examples: (R-WS-LOADED.19/4, E5 control) the same without the unload → `P9/unloaded_primary.s19` with the image's SHA-256
+examples: (R-WS-LOADED.19/1) no project open → no inventory; the MAC is the only data file (unchanged)
+
+S19TuiApp._reset_project_session
+req: R-TUI-018.1, R-TUI-007.8 (the view-row memo)
+in: —
+out: None
+func: changed (E5, CR-1). was: S1 sets `current_file = None` and keeps `_hex_view_rows_cache`, so after a project load-over whose install fails the old image's row list stays referenced. / now: `_hex_view_rows_cache = None` beside S1; the rest unchanged.
+module: s19_app/tui/app.py
+calls: —
+examples: (no case: the next install bumps `_image_generation`, so the stale entry is never returned; the reset frees the old list only)
+
+## Nodes — G2 split-join
+
+SplitJoinWindow.refresh_window
+req: R-SEG-OPEN.1, R-SEG-OPEN.6
+in: —
+out: None
+func: changed. was: selection reset on a new image, `_sync()`, `call_after_refresh(_sync)`, then `#sje_table` focused always. / now: identical, but the focus only `if not self.has_class("hidden")`.
+module: s19_app/tui/segment_split_view.py
+calls: SplitJoinWindow._sync, Widget.focus
+examples: (R-SEG-OPEN.1/1) palette open → `sje_table` focused
+examples: (R-SEG-OPEN.6/1) window hidden, `U` (via `watch_current_file`) → focus not moved (base P: `sje_table`, area 0)
+
+SplitJoinWindow.check_action
+req: R-SEG-OPEN.7
+in: action: str, parameters: tuple
+out: Optional[bool]
+func: new (E3 S-3, D-11, I-6). `if self.has_class("hidden"): return False`; else `return super().check_action(action, parameters)`. Textual asks it for every binding of the window (`␣`, `a`, `n`, `t`, `m`, `g`, `f`, `p`, `d`, `e`, Esc, arrows); a refused key goes on to the app's bindings. Not refused (E5, SE5-3 / CR-5; docstring says so): `_SegTable`'s own up / down / `k` / `j` (Textual asks the table, whose `action_cursor_move` moves the window's cursor) and text typed into `#sje_manual`; neither writes, and both need a focus inside the hidden window (backlog BL-I10-3).
+module: s19_app/tui/segment_split_view.py
+calls: WindowSection.check_action
+examples: (R-SEG-OPEN.7/3) window hidden, focus put on `#sje_table`, `a`, `e` → both refused; 0 files, no `Exported` (base security P3: 4 files, `Exported 4 files: wrote firmware_range_00.s19; …`); reopened → `nothing selected` (E5 SE5-2: the one observable only I-6 holds; M28 = mut-c-04 → rows ticked)
+examples: (R-SEG-OPEN.7/1) `[u]` MAC from `files_list`, then `a`, `e` → the focus never enters the window (I-2, the landing); `a`, `e` reach the app → 0 files
+examples: (R-SEG-OPEN.7/2) `U` from `files_list`, then `a`, `e` → as /1 (base security P3 shape: `refresh_window` focused the hidden `sje_table`, 4 files)
+examples: (R-SEG-OPEN.1/1) window shown → `super()`'s answer, `e` exports as before
+
+SplitJoinWindow.action_export
+req: R-SEG-OPEN.7
+in: —
+out: None
+func: changed (E3 SR2-1). was: `on_button_pressed` (`#sje_export`) → `action_export()` directly; nothing on that path asks `check_action` (`textual/widgets/_button.py:297,429`). / now: `if self.has_class("hidden"): return` at the top, before the export body; `check_action` (I-6) stays for the other keys.
+module: s19_app/tui/segment_split_view.py
+calls: —
+examples: (R-SEG-OPEN.7/4) window opened and closed (Esc), the focus put on `#sje_export`, Enter → `action_export` returns at once: 0 files, no `Exported` (with I-6 alone the button's own binding runs the export, E3 security R2-1)
+examples: (R-SEG-OPEN.1/1) window shown → export proceeds as before
+
+Moved to 10b at E3: `SplitJoinWindow.note_image_bytes_written` (I-1).
+
+## Nodes — G3 render
+
+hex_row_bases
+req: R-TUI-018.1, R-TUI-007.8
+in: row_bases: List[int], row_bases_set: Optional[set[int]] = None, extra_addresses: Optional[set[int]] = None
+out: List[int]
+func: new (E3 A10-03, I-5). The row list `_collect_hex_rows` builds today (`render/hexview.py:192-207`), moved out unchanged: no extra address, or every extra row already present → `row_bases` itself (no copy, the multi-million-row hot path); else `sorted(existing | extra_rows)` with `existing = row_bases_set or set(row_bases)`.
+module: s19_app/render/hexview.py
+calls: —
+examples: (R-TUI-007.8/1) `[0x8000, 0x8010, 0x8020]`, extra `{0x1000}` → `[0x1000, 0x8000, 0x8010, 0x8020]`
+examples: (R-TUI-018.1/1) case 08, extra `{}` → the same list object
+
+_collect_hex_rows
+req: R-TUI-007.8
+in: as on base
+out: as on base
+func: changed. was: builds `bases` inline. / now: `bases = hex_row_bases(base_row_bases, row_bases_set, extra)`; everything after unchanged (output identical for every input).
+module: s19_app/render/hexview.py
+calls: hex_row_bases
+examples: (R-TUI-018.1/12) MAC below, `start_row_index` 2 → rows `0x8010`, `0x8020`; notice `... showing from 0x00008010 ...`
+
+## Context nodes (unchanged; `_rehome_focus_after_load` moved to the slice at E4, E4-R3; `_fallback_focus_target` and `_plan_project_save` at E5)
+
+S19TuiApp._focus_needs_rehome — req: R-SHELL-FOCUS.3 — zero area, or an ancestor window with `hidden` (`app.py:9967-10020`).
+S19TuiApp._snapped_focus_row_index — req: R-TUI-018.3 — next present row at or after the target's row base, else the last (`app.py:19134-19171`).
+S19TuiApp._collect_mac_highlight_addresses — req: R-TUI-007.8 — the valid MAC record addresses (`app.py:17073-17082`).
+S19TuiApp._load_question_text — req: R-WS-LOADED.20 — `<current>` = project, else `current_file.path.name`, else `the current session` (`app.py:8703-8709`).
+S19TuiApp._resolve_focus_target — req: R-SHELL-FOCUS.2, R-SHELL-FOCUS.5 — `_FOCUS_TARGETS[_active_screen_key]`, fallback `_fallback_focus_target` (R-SHELL-FOCUS.6).
+render_hex_view_text — req: R-TUI-018.1 — `start_row_index` wins over the focus centring; notice lines above the rows.
+S19TuiApp._reset_scroll_to_top — req: R-TUI-018.2 — `scroll_home(animate=False)` (Textual 8.2.8: both axes).
+painted_names — req: R-TUI-012L.8 — `project_gather_service.py:978`, Cc/Cf/Zl/Zp removed, 120-character clip.
+SplitJoinWindow._sync — req: R-SEG-OPEN.1 — called by `refresh_window`; reads `current_file.mem_map` live; `build_plan` → `_conflict_marks` (Inc 13).

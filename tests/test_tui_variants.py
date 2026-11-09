@@ -43,7 +43,7 @@ import ast
 import asyncio
 from pathlib import Path
 
-from textual.widgets import Button, ListView, Select, Static
+from textual.widgets import Button, ListView, Select
 
 import s19_app.tui.app as app_module
 from s19_app.tui.app import S19TuiApp
@@ -460,8 +460,9 @@ def test_duplicate_stem_ids_are_filenames(tmp_path: Path) -> None:
 # batch-94 Inc-001 (HLR-006, US-002 annotation 4) RETIRED the variant selector
 # and its help affordance: ``#patch_variant_select``,
 # ``#patch_variant_info_button`` and the ``PatchEditorPanel.
-# VariantHelpRequested`` message are gone from the shipped surface. The three
-# tests below observed that retired machinery THROUGH this file — the P1/R-6
+# VariantHelpRequested`` message are gone from the shipped surface. The tests
+# below (three until batch-101 Inc 12 removed the orphan-modal geometry node)
+# observed that retired machinery THROUGH this file — the P1/R-6
 # census assigned this file to the DO-NOT-TOUCH group on its app-level
 # patterns (``action_select_variant`` / ``SelectVariantScreen``), and the
 # retired-pattern re-run at the Inc-001 cut (V43) found these three nodes
@@ -472,17 +473,6 @@ def test_duplicate_stem_ids_are_filenames(tmp_path: Path) -> None:
 # retirement; the file's other eight app-level machinery tests are untouched
 # (11 total - 3 rewritten). Recorded as a deviation in the increment packet —
 # the P1 group assignment under-counted this file.
-#
-# The help TEXT tokens are kept as the retirement census reference: the
-# modal's subject (the selector) no longer exists, so the shipped surface
-# must not render. The tokens are asserted in the orphan-modal geometry
-# node's direct-push arm — the only surviving reach — restoring the content
-# assertion the retired surface owed (fold round, F6).
-_VARIANT_HELP_TOKENS = (
-    "picks which firmware image loads",
-    "at least two firmware images",
-    "project directory",
-)
 
 
 async def _open_patch_with_two_variants(pilot, app: S19TuiApp) -> None:
@@ -582,67 +572,3 @@ def test_tc336_tc337_help_message_pushes_modal_with_content(
     assert outcomes["stack_unchanged"] is True, (
         "a stale VariantHelpRequested-shaped message must be a no-op"
     )
-
-
-def test_variant_help_modal_fits_at_both_sizes(tmp_path: Path) -> None:
-    """Geometry node (batch-94 form) — the retired modal is unreachable.
-
-    Intent: WAS the C-23 pilot-measure of the help modal at 80x24/120x30.
-    batch-94 retires the surface's only reach path; the modal class still
-    composes (orphaned), but the shipped surface must not open it. This node
-    now guards the retirement geometry: the orphan is recorded by direct
-    push (the only surviving reach), the dialog still fits at both sizes,
-    and the pushed orphan still paints the help-text census tokens (the
-    content assertion the retired surface owed — fold round F6). (This node
-    was RED at the batch-93 base census; the rewrite resolves it as a side
-    effect of the retirement census, recorded in the increment packet — not
-    chased as a baseline failure.)
-    """
-
-    async def _measure(width: int, height: int) -> dict[str, object]:
-        app = S19TuiApp(base_dir=tmp_path)
-        _make_project(app, "proj", {"a.s19": S19_A, "b.s19": S19_B})
-        async with app.run_test(size=(width, height)) as pilot:
-            await _open_patch_with_two_variants(pilot, app)
-            from s19_app.tui.screens import VariantHelpScreen
-
-            # The ONLY surviving reach is a direct push (the orphan record).
-            app.push_screen(VariantHelpScreen())
-            await pilot.pause()
-            dialog = app.screen.query_one("#variant_help_dialog")
-            region = dialog.region
-            # F6: the orphan still carries its content — the retired
-            # surface's owed content assertion, kept via the census tokens.
-            body_text = str(
-                app.screen.query_one("#variant_help_body", Static).content
-            )
-            tokens_painted = all(
-                token in body_text for token in _VARIANT_HELP_TOKENS
-            )
-            return {
-                "region": (
-                    region.x,
-                    region.y,
-                    region.right,
-                    region.bottom,
-                ),
-                "tokens_painted": tokens_painted,
-                "body_text": body_text,
-            }
-
-    for width, height in ((80, 24), (120, 30)):
-        m = asyncio.run(_measure(width, height))
-        x, y, right, bottom = m["region"]  # type: ignore[misc]
-        assert x >= 0 and y >= 0, (
-            f"dialog origin off-screen at {width}x{height}: ({x},{y})"
-        )
-        assert right <= width, (
-            f"dialog overflows width at {width}x{height}: right={right}"
-        )
-        assert bottom <= height, (
-            f"dialog overflows height at {width}x{height}: bottom={bottom}"
-        )
-        assert m["tokens_painted"] is True, (
-            "the orphan modal must still paint the census tokens; "
-            f"body={m['body_text']!r}"
-        )

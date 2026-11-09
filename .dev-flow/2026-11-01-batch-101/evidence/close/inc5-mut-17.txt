@@ -1,0 +1,115 @@
+# Mutant M17 — batch-end re-run on the final tree (b982846)
+BASE_COMMIT=b982846ce33ccc20b1774f91b1091af4b42dff73
+BASE_TREE=detached worktree at 7d641d9 + git diff --binary 7d641d9 b982846 -- s19_app tests docs README.md AT-TC-REGISTRY.jsonl applied
+s19_app.__file__=<HOME>/work/s19_i5rm_m17/s19_app/__init__.py
+mutation: R-CHKED-041.3/5 duplicate included twice / dropped
+mutation diff:
+diff --git a<HOME>/work/s19_i5rm/s19_app/tui/screens_directionb.py b<HOME>/work/s19_i5rm_m17/s19_app/tui/screens_directionb.py
+index b05226d..3829cd9 100644
+--- a<HOME>/work/s19_i5rm/s19_app/tui/screens_directionb.py
++++ b<HOME>/work/s19_i5rm_m17/s19_app/tui/screens_directionb.py
+@@ -7409,7 +7409,7 @@ class CheckEditorPanel(ScrollableContainer):
+                 return symbol
+             return None
+         names = by_key.get((address, size), [])
+-        if len(names) == 1 and names[0] not in taken:
++        if len(names) == 1:
+             return names[0]
+         return None
+ 
+verify:
+grep s19_app/tui/screens_directionb.py: replaced -> 'if len(names) == 1:' FOUND
+guard nodes (1):
+  tests/test_b101_check_spec_keep.py::test_r_chked_041_3_5_duplicate_memory_row
+
+--- pytest ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________________ test_r_chked_041_3_5_duplicate_memory_row ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-536/test_r_chked_041_3_5_duplicate0')
+facts = Facts(case=PosixPath('/tmp/pytest-of-<user>/pytest-536/b101_inc5_case080'), image={0: 108, 1: 49, 2: 57, 3: 84, 4: 79...ram(name='VALUE_0002', address=20, size=2), v3=Param(name='VALUE_0003', address=40, size=4), serial=12587004, moved=32)
+
+    def test_r_chked_041_3_5_duplicate_memory_row(tmp_path: Path, facts: Facts) -> None:
+        """Case R-CHKED-041.3/5 (partial: a pick cannot reach it - E3 round 2 NOTE -
+        so the two items go through the panel seam ``CheckEditorPanel.load_spec``):
+        case 08 and its A2L loaded; a spec of two entries at ``VALUE_0001``'s
+        address and size -> ``VALUE_0001`` included once and one memory row
+        ``0x00000000``; head line ``2 fields: 1 param · 1 memory row``.
+    
+        Negative control: a duplicate included twice or dropped -> not 2 fields ->
+        RED; no resolution at all (the base) -> 2 memory rows, 0 included -> RED."""
+        v1 = facts.v1
+        data = tuple(facts.image_bytes(v1.address, v1.size))
+        item = {"address": v1.address, "size": v1.size, "expected": data, "symbol": None}
+    
+        async def scenario(app, pilot, log):
+            await open_session(pilot, app, facts)
+            editor(app).load_spec([dict(item), dict(item)], "dup.chk.json")
+            await wait_until(
+                pilot,
+                lambda: head(app).startswith("2 fields"),
+                lambda: f"timed out waiting for the seam load: {head(app)!r}",
+            )
+            return included(app), mem_rows(app), head(app)
+    
+>       picks, rows, line = run(tmp_path, scenario)
+                            ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b101_check_spec_keep.py:906: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b101_check_spec_keep.py:255: in run
+    return projects.run_app(base, scenario)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b101_check_spec_keep.py:899: in scenario
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+predicate = <function test_r_chked_041_3_5_duplicate_memory_row.<locals>.scenario.<locals>.<lambda> at 0x7f1dd71060c0>
+failure = <function test_r_chked_041_3_5_duplicate_memory_row.<locals>.scenario.<locals>.<lambda> at 0x7f1dd7104400>
+timeout = 60.0, pause_first = False
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: timed out waiting for the seam load: '1 field: 1 param · 0 memory rows'
+
+tests/support/timing.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_041_3_5_duplicate_memory_row
+1 failed in 78.58s (0:01:18)

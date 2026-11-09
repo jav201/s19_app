@@ -10,7 +10,120 @@ Flow: dev-flow-v3-beta (operator ruling 2026-11-01). Records live in `.dev-flow/
 - Docs that described the old format corrected; G4 marked retired in the registry spec and tools.
 
 ## 2. Files modified
-See `git diff --stat e273181..b101-canon`. Source (non-test, non-doc): `tools/counterfactual_id_registry.py`, `tools/id_registry.py` (comment), `tools/seed_id_registry.py` (comment). No product file under `s19_app/`.
+
+Committed: `git diff --stat e273181..HEAD` plus the operator/batch-102 commits that landed on `main` after `base_ref` (charged to this batch's diff by the un-re-stamped `base_ref`). **SOURCE files: 0 / 4** under `s19_app/`.
+
+| File | Kind | Traces to | Change |
+|---|---|---|---|
+| `.gitattributes` | config | US-101.1 | `docs/requirements/history/** -text` (ruling R-6) |
+| `docs/requirements/history/REQUIREMENTS-legacy-e273181.md` | doc |  | the earlier canon moved here byte-for-byte (git rename, `-text`) |
+| `docs/requirements/review/README.md` | doc |  | the strict-EARS review published as rationale (its "Code today" column is a snapshot as of e273181) |
+| `docs/requirements/review/RECONCILE-570b4b5.md` | doc |  | the strict-EARS review published as rationale (its "Code today" column is a snapshot as of e273181) |
+| `docs/requirements/review/S0-ears-strict.md` | doc |  | the strict-EARS review published as rationale (its "Code today" column is a snapshot as of e273181) |
+| `docs/requirements/review/S1-ears-strict.md` | doc |  | the strict-EARS review published as rationale (its "Code today" column is a snapshot as of e273181) |
+| `docs/requirements/review/S2-ears-strict.md` | doc |  | the strict-EARS review published as rationale (its "Code today" column is a snapshot as of e273181) |
+| `docs/requirements/review/S3-ears-strict.md` | doc |  | the strict-EARS review published as rationale (its "Code today" column is a snapshot as of e273181) |
+| `docs/requirements/review/S4-ears-strict.md` | doc |  | the strict-EARS review published as rationale (its "Code today" column is a snapshot as of e273181) |
+| `docs/requirements/review/S5-ears-strict.md` | doc |  | the strict-EARS review published as rationale (its "Code today" column is a snapshot as of e273181) |
+| `docs/requirements/review/S6-ears-strict.md` | doc |  | the strict-EARS review published as rationale (its "Code today" column is a snapshot as of e273181) |
+| `docs/requirements/review/S7-ears-strict.md` | doc |  | the strict-EARS review published as rationale (its "Code today" column is a snapshot as of e273181) |
+| `docs/requirements/review/S8-ears-strict.md` | doc |  | the strict-EARS review published as rationale (its "Code today" column is a snapshot as of e273181) |
+| `docs/requirements/review/S10-ears-strict.md` | doc |  | the strict-EARS review published as rationale (its "Code today" column is a snapshot as of e273181) |
+| `docs/requirements/review/S11-ears-strict.md` | doc |  | the strict-EARS review published as rationale (its "Code today" column is a snapshot as of e273181) |
+| `docs/requirements/review/S12-ears-strict.md` | doc |  | the strict-EARS review published as rationale (its "Code today" column is a snapshot as of e273181) |
+| `docs/requirements/review/S13-ears-strict.md` | doc |  | the strict-EARS review published as rationale (its "Code today" column is a snapshot as of e273181) |
+| `docs/requirements/review/S14-ears-strict.md` | doc |  | the strict-EARS review published as rationale (its "Code today" column is a snapshot as of e273181) |
+| `docs/requirements/review/S15-ears-strict.md` | doc |  | the strict-EARS review published as rationale (its "Code today" column is a snapshot as of e273181) |
+| `docs/requirements/review/S16-ears-strict.md` | doc |  | the strict-EARS review published as rationale (its "Code today" column is a snapshot as of e273181) |
+| `docs/requirements/review/S17-ears-strict.md` | doc |  | the strict-EARS review published as rationale (its "Code today" column is a snapshot as of e273181) |
+| `tests/test_requirements_canon.py` | test | US-101.1 | new guard: one test per R-DOC-CANON.1 … .11 row + a shared row parser |
+| `tests/test_batch91_registry_hygiene.py` | test | US-101.1 | `test_at286_no_declared_id_is_absent_from_the_registry` removed (ruling R-3) |
+| `tests/test_tui_patch_json.py` | test | US-101.1 | one failure-message string re-pointed to the new canon (ruling R-4) |
+| `tools/counterfactual_id_registry.py` | source | US-101.1 | G4 retired, TC-603/TC-497 retired, AT-281 G4 arm and TC-609 anchor check removed, `g4_exempt_anchors` and AT-286 census removed, `EXPECTED_SCANNED_TEST_FILES` measured (rulings R-2, R-3, R-7) |
+| `tools/id_registry.py` | source | US-101.1 | comment only — G4 retired and the registry spec reworded (ruling R-3) |
+| `tools/seed_id_registry.py` | source | US-101.1 | comment only — G4 retired (ruling R-3) |
+| `.gitignore` | config | US-101.1 | `/prototypes/` ignore rule (operator 2026-11-05) |
+| `prototypes/NOTES.md` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/abdiff_baseline.132w.svg` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/abdiff_variant_A.132w.svg` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/abdiff_variant_B.132w.svg` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/abdiff_variant_C.132w.svg` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/cmdbar_a2bdiff.HANDOFF.md` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/cmdbar_a2bdiff.NOTES.md` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/cmdbar_a2bdiff.prototype.html` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/cmdbar_a2bdiff.tui_prototype.py` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/cmdbar_baseline.120w.svg` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/cmdbar_variant_A.120w.svg` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/cmdbar_variant_B.120w.svg` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/cmdbar_variant_C.120w.svg` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/crc_designer.b59.inapp_prototype.py` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/crc_designer.blocks.excalidraw` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/crc_designer.blocks.png` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/crc_designer.flow.excalidraw` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/crc_designer.flow.png` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/crc_designer.prototype.py` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/crc_designer.screen.prototype.html` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/fb_p1_flow_persistence.DECISIONS.md` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/fb_p1_flow_persistence.NOTES.md` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/fb_p1_flow_persistence.artifact.html` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/fb_p1_flow_persistence.mockup.py` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/fb_p1_flow_persistence.prototype.py` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/fb_p1_flow_persistence.viz.html` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/fb_p1b_report.NOTES.md` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/fb_p1b_report.example.md` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/fb_p1b_report.prototype.py` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/flow_builder.NOTES.md` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/flow_builder.prototype.py` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/flow_builder.screen.prototype.html` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/legend_n8.INVENTORY.md` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/legend_n8.NOTES.md` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/legend_n8.kimi.NOTES.md` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/legend_n8.kimi.prototype.py` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/legend_n8.kimi_prompt.txt` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/legend_n8.prototype.py` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/legend_n8.variant_A.120w.svg` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/legend_n8.variant_A.80w.svg` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/legend_n8.variant_B.120w.svg` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/legend_n8.variant_B.80w.svg` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/legend_n8.variant_C.120w.svg` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/legend_n8.variant_C.80w.svg` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/legend_n8.variant_kimi.a2l.svg` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/legend_n8.variant_kimi.issues.svg` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/legend_n8.variant_kimi.mac.svg` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/legend_n8.variant_kimi.memory_map.svg` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/legend_n8.variant_kimi.workspace.svg` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/memmap_redesign.proposals.html` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/memmap_variant_a.HANDOFF.md` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/memmap_variant_a.prototype.py` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/memmap_variant_a.variant_A.120w.svg` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/memmap_variant_a.variant_B.120w.svg` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/memmap_variant_a.variant_C.120w.svg` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/screen_upgrades.HANDOFF-PLAN.md` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/screen_upgrades.NOTES.md` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/screen_upgrades.prototype.py` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/unload_state.NOTES.md` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/unload_state.prototype.py` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `prototypes/view-enhancements.prototype.html` | doc |  | `git rm` — archived to the operator's drive backup (2026-11-05); prototypes/ is ignored |
+| `tests/test_loadfilescreen_input.py` | test | US-101.1 | redaction (operator decision 2026-11-02): the local account folder redacted |
+| `tools/e13/capture.ps1` | source | US-101.1 | redaction (operator decision 2026-11-02): the local account folder redacted |
+| `s19_app/tui/a2l_parameter_picker.py` | source | US-101.1 | added by batch-102; rebase-brought (batch-102 hot-fixes merged to main after base_ref) — charged to this batch's diff by the un-re-stamped base_ref |
+| `s19_app/tui/capped_text_area.py` | source | US-101.1 | changed by batch-102; rebase-brought (batch-102 hot-fixes merged to main after base_ref) — charged to this batch's diff by the un-re-stamped base_ref |
+| `s19_app/tui/os_clipboard_input.py` | source | US-101.1 | changed by batch-102; rebase-brought (batch-102 hot-fixes merged to main after base_ref) — charged to this batch's diff by the un-re-stamped base_ref |
+| `s19_app/tui/styles.tcss` | config | US-101.1 | changed by batch-102; rebase-brought (batch-102 hot-fixes merged to main after base_ref) — charged to this batch's diff by the un-re-stamped base_ref |
+| `s19_app/tui/workspace.py` | source | US-101.1 | changed by batch-102; rebase-brought (batch-102 hot-fixes merged to main after base_ref) — charged to this batch's diff by the un-re-stamped base_ref |
+| `tests/test_b100_load_dialog.py` | test | US-101.1 | changed by batch-102; rebase-brought (batch-102 hot-fixes merged to main after base_ref) — charged to this batch's diff by the un-re-stamped base_ref |
+| `tests/test_b102_a2l_refresh.py` | test | US-101.1 | added by batch-102; rebase-brought (batch-102 hot-fixes merged to main after base_ref) — charged to this batch's diff by the un-re-stamped base_ref |
+| `tests/test_b102_bulk_add.py` | test | US-101.1 | added by batch-102; rebase-brought (batch-102 hot-fixes merged to main after base_ref) — charged to this batch's diff by the un-re-stamped base_ref |
+| `tests/test_b102_clipboard.py` | test | US-101.1 | added by batch-102; rebase-brought (batch-102 hot-fixes merged to main after base_ref) — charged to this batch's diff by the un-re-stamped base_ref |
+| `tests/test_b102_flow_block_edit.py` | test | US-101.1 | added by batch-102; rebase-brought (batch-102 hot-fixes merged to main after base_ref) — charged to this batch's diff by the un-re-stamped base_ref |
+| `tests/test_b102_parameter_picker.py` | test | US-101.1 | added by batch-102; rebase-brought (batch-102 hot-fixes merged to main after base_ref) — charged to this batch's diff by the un-re-stamped base_ref |
+| `tests/test_b102_patch_picker.py` | test | US-101.1 | added by batch-102; rebase-brought (batch-102 hot-fixes merged to main after base_ref) — charged to this batch's diff by the un-re-stamped base_ref |
+| `tests/test_b97_width.py` | test | US-101.1 | changed by batch-102; rebase-brought (batch-102 hot-fixes merged to main after base_ref) — charged to this batch's diff by the un-re-stamped base_ref |
+| `tests/test_capped_text_area.py` | test | US-101.1 | changed by batch-102; rebase-brought (batch-102 hot-fixes merged to main after base_ref) — charged to this batch's diff by the un-re-stamped base_ref |
+| `tests/test_import_census.py` | test | US-101.1 | changed by batch-102; rebase-brought (batch-102 hot-fixes merged to main after base_ref) — charged to this batch's diff by the un-re-stamped base_ref |
+| `tests/test_tui_patch_card.py` | test | US-101.1 | changed by batch-102; rebase-brought (batch-102 hot-fixes merged to main after base_ref) — charged to this batch's diff by the un-re-stamped base_ref |
+| `tests/test_tui_patch_chips.py` | test | US-101.1 | changed by batch-102; rebase-brought (batch-102 hot-fixes merged to main after base_ref) — charged to this batch's diff by the un-re-stamped base_ref |
+
 
 ## 3. How to test
 From the repo root: `env -u NO_COLOR PYTHONPATH=. python -m pytest -q tests/test_requirements_canon.py tests/test_id_registry.py tests/test_batch91_registry_hygiene.py tests/test_report_addendum_bound.py tests/test_tui_patch_json.py tests/test_engine_unchanged.py`.

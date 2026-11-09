@@ -1,0 +1,281 @@
+=== base commit: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+=== python: Python 3.11.18
+=== mutation applied: M13 (file s19_app/tui/app.py)
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -18022,7 +18022,6 @@
+         self.update_project_labels()
+         self.update_memory_map()
+         self._refresh_loaded_panel()
+-        self.set_file_status(f"Unloaded {label}.")
+         self.set_status(f"Unloaded {label}.")
+         self.call_after_refresh(self._land_focus, trigger, None, on_switch=False)
+ 
+LANDED M13: 'set_file_status(f"Unloaded {label}.")' x0
+=== s19_app.__file__ ===
+<HOME>/work/s19_i10mut_m15/s19_app/__init__.py
+=== CMD ===
+env -u NO_COLOR <HOME>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -rf -n 4 --dist load tests/test_b101_unload_focus.py::test_r_ws_loaded_18_1_unload_mac_slot_sets_file_status tests/test_b101_unload_focus.py::test_r_ws_loaded_18_2_unload_all_sets_file_status tests/test_b101_unload_focus.py::test_r_ws_loaded_18_3_unload_primary_slot_sets_file_status tests/test_b101_unload_focus.py::test_r_ws_loaded_18_4_unload_a2l_slot_sets_file_status
+bringing up nodes...
+bringing up nodes...
+
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+______________ test_r_ws_loaded_18_2_unload_all_sets_file_status _______________
+[gw1] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-653/popen-gw1/test_r_ws_loaded_18_2_unload_a0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-653/popen-gw1/b101_i10f_case080')
+
+    def test_r_ws_loaded_18_2_unload_all_sets_file_status(tmp_path: Path, case08: Path) -> None:
+        """R-WS-LOADED.18 case /2: ``U`` makes ``#status_text`` ``Unloaded all
+        artifacts.``"""
+    
+        async def scenario(app, pilot, log):
+            await case_session(pilot, app, case08)
+            assert status_text(app) == "Loaded firmware.mac (S19+MAC)", status_text(app)
+            mark = len(log.messages)
+            await pilot.press("U")
+            await wait_message(pilot, log, mark, "Unloaded all artifacts.")
+            await settle(pilot, 4)
+            assert newest_message(app) == "Unloaded all artifacts."
+            assert status_text(app) == "Unloaded all artifacts."
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:409: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f9d756fc990>
+
+    async def scenario(app, pilot, log):
+        await case_session(pilot, app, case08)
+        assert status_text(app) == "Loaded firmware.mac (S19+MAC)", status_text(app)
+        mark = len(log.messages)
+        await pilot.press("U")
+        await wait_message(pilot, log, mark, "Unloaded all artifacts.")
+        await settle(pilot, 4)
+        assert newest_message(app) == "Unloaded all artifacts."
+>       assert status_text(app) == "Unloaded all artifacts."
+E       AssertionError: assert 'Loaded firmw...mac (S19+MAC)' == 'Unloaded all artifacts.'
+E         
+E         - Unloaded all artifacts.
+E         + Loaded firmware.mac (S19+MAC)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:407: AssertionError
+__________ test_r_ws_loaded_18_3_unload_primary_slot_sets_file_status __________
+[gw2] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-653/popen-gw2/test_r_ws_loaded_18_3_unload_p0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-653/popen-gw2/b101_i10f_case080')
+
+    def test_r_ws_loaded_18_3_unload_primary_slot_sets_file_status(tmp_path: Path, case08: Path) -> None:
+        """R-WS-LOADED.18 case /3: ``[u]`` on the primary slot makes ``#status_text``
+        ``Unloaded primary image.``"""
+    
+        async def scenario(app, pilot, log):
+            await case_session(pilot, app, case08)
+            assert status_text(app) == "Loaded firmware.mac (S19+MAC)", status_text(app)
+            mark = len(log.messages)
+            await press_unload(pilot, app, "primary")
+            await wait_message(pilot, log, mark, "Unloaded primary image.")
+            await settle(pilot, 4)
+            assert newest_message(app) == "Unloaded primary image."
+            assert status_text(app) == "Unloaded primary image."
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:426: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f308dd64090>
+
+    async def scenario(app, pilot, log):
+        await case_session(pilot, app, case08)
+        assert status_text(app) == "Loaded firmware.mac (S19+MAC)", status_text(app)
+        mark = len(log.messages)
+        await press_unload(pilot, app, "primary")
+        await wait_message(pilot, log, mark, "Unloaded primary image.")
+        await settle(pilot, 4)
+        assert newest_message(app) == "Unloaded primary image."
+>       assert status_text(app) == "Unloaded primary image."
+E       AssertionError: assert 'Loaded firmw...mac (S19+MAC)' == 'Unloaded primary image.'
+E         
+E         - Unloaded primary image.
+E         + Loaded firmware.mac (S19+MAC)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:424: AssertionError
+____________ test_r_ws_loaded_18_4_unload_a2l_slot_sets_file_status ____________
+[gw3] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-653/popen-gw3/test_r_ws_loaded_18_4_unload_a0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-653/popen-gw3/b101_i10f_case080')
+
+    def test_r_ws_loaded_18_4_unload_a2l_slot_sets_file_status(tmp_path: Path, case08: Path) -> None:
+        """R-WS-LOADED.18 case /4: ``[u]`` on the A2L slot makes ``#status_text``
+        ``Unloaded A2L.``"""
+    
+        async def scenario(app, pilot, log):
+            await case_session(pilot, app, case08, mac=False, a2l=True)
+            assert status_text(app).startswith("Loaded "), status_text(app)
+            mark = len(log.messages)
+            await press_unload(pilot, app, "a2l")
+            await wait_message(pilot, log, mark, "Unloaded A2L.")
+            await settle(pilot, 4)
+            assert newest_message(app) == "Unloaded A2L."
+            assert status_text(app) == "Unloaded A2L."
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:443: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7fbef0ac33d0>
+
+    async def scenario(app, pilot, log):
+        await case_session(pilot, app, case08, mac=False, a2l=True)
+        assert status_text(app).startswith("Loaded "), status_text(app)
+        mark = len(log.messages)
+        await press_unload(pilot, app, "a2l")
+        await wait_message(pilot, log, mark, "Unloaded A2L.")
+        await settle(pilot, 4)
+        assert newest_message(app) == "Unloaded A2L."
+>       assert status_text(app) == "Unloaded A2L."
+E       AssertionError: assert 'Loaded firmw...19 (S19 only)' == 'Unloaded A2L.'
+E         
+E         - Unloaded A2L.
+E         + Loaded firmware.s19 (S19 only)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:441: AssertionError
+____________ test_r_ws_loaded_18_1_unload_mac_slot_sets_file_status ____________
+[gw0] linux -- Python 3.11.18 <HOME>/miniconda3/envs/s19ci/bin/python
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-653/popen-gw0/test_r_ws_loaded_18_1_unload_m0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-653/popen-gw0/b101_i10f_case080')
+
+    def test_r_ws_loaded_18_1_unload_mac_slot_sets_file_status(tmp_path: Path, case08: Path) -> None:
+        """R-WS-LOADED.18 case /1: ``[u]`` on the MAC slot makes ``#status_text``
+        ``Unloaded MAC.`` (base: ``Loaded firmware.mac (S19+MAC)`` stays)."""
+    
+        async def scenario(app, pilot, log):
+            await case_session(pilot, app, case08)
+            assert status_text(app) == "Loaded firmware.mac (S19+MAC)", status_text(app)
+            mark = len(log.messages)
+            await press_unload(pilot, app, "mac")
+            await wait_message(pilot, log, mark, "Unloaded MAC.")
+            await settle(pilot, 4)
+            assert newest_message(app) == "Unloaded MAC."
+            assert status_text(app) == "Unloaded MAC."
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:392: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f9522382c50>
+
+    async def scenario(app, pilot, log):
+        await case_session(pilot, app, case08)
+        assert status_text(app) == "Loaded firmware.mac (S19+MAC)", status_text(app)
+        mark = len(log.messages)
+        await press_unload(pilot, app, "mac")
+        await wait_message(pilot, log, mark, "Unloaded MAC.")
+        await settle(pilot, 4)
+        assert newest_message(app) == "Unloaded MAC."
+>       assert status_text(app) == "Unloaded MAC."
+E       AssertionError: assert 'Loaded firmw...mac (S19+MAC)' == 'Unloaded MAC.'
+E         
+E         - Unloaded MAC.
+E         + Loaded firmware.mac (S19+MAC)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:390: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_unload_focus.py::test_r_ws_loaded_18_2_unload_all_sets_file_status
+FAILED tests/test_b101_unload_focus.py::test_r_ws_loaded_18_3_unload_primary_slot_sets_file_status
+FAILED tests/test_b101_unload_focus.py::test_r_ws_loaded_18_4_unload_a2l_slot_sets_file_status
+FAILED tests/test_b101_unload_focus.py::test_r_ws_loaded_18_1_unload_mac_slot_sets_file_status
+4 failed in 16.55s

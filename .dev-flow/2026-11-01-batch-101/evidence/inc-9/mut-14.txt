@@ -1,0 +1,68 @@
+base commit (origin/main): e07fb00f9fc13afd314d0334fac683fe33b29b6c
+applied-tree head: b204c7d44a42383f2a7c63295280b0a4b7f3ad58
+mutant: M14 — (d) regular-file / same-stat test
+
+--- mutation (diff) ---
+--- a/s19_app/tui/services/flow_persistence_service.py
++++ b/s19_app/tui/services/flow_persistence_service.py
+@@ -1107,7 +1107,7 @@
+                 f"Not saved: {candidate.name} in {home} could not be "
+                 f"verified after the claim: {exc}. Nothing written."
+             ) from exc
+-        owned = stat.S_ISREG(st.st_mode) and os.path.samestat(os.fstat(fd), st)
++        owned = True
+         if not (
+             owned
+             and not _is_reparse_point(candidate)
+
+--- s19_app.__file__ (from inside the copy) ---
+<HOME>/work/s19_i9mut_m14/s19_app/__init__.py
+
+--- pytest ---
+FF.                                                                      [100%]
+=================================== FAILURES ===================================
+______________ test_r_flow_file_14_4_followed_create_gets_no_byte ______________
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-379/test_r_flow_file_14_4_followed0/.s19tool/workarea'), PosixPath('/tmp/py...llowed0/.s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-379/test_r_flow_file_14_4_followed0/outside'))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fe8f5ff3750>
+
+    def test_r_flow_file_14_4_followed_create_gets_no_byte(area, monkeypatch):
+        """R-FLOW-FILE.14/4: a link put in at the free name gets no byte (E3 S-2 b)."""
+        _root, project, outside = area
+        home = project / "flows"
+        home.mkdir()
+        _windows_follow(monkeypatch, home, outside)
+        with pytest.raises(WorkareaContainmentError):
+            save_flow_json(F1, "z", project)
+        assert (outside / "followed.json").read_bytes() == b""
+>       assert (home / "z.json").is_symlink()
+E       AssertionError: assert False
+E        +  where False = is_symlink()
+E        +    where is_symlink = (PosixPath('/tmp/pytest-of-<user>/pytest-379/test_r_flow_file_14_4_followed0/.s19tool/workarea/p/flows') / 'z.json').is_symlink
+
+../s19_i9mut/tests/test_b101_flow_saves.py:343: AssertionError
+_______________ test_r_flow_set_8_4_followed_create_gets_no_byte _______________
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-379/test_r_flow_set_8_4_followed_c0/.s19tool/workarea'), PosixPath('/tmp/py...owed_c0/.s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-379/test_r_flow_set_8_4_followed_c0/outside'))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fe8f5ff12d0>
+
+    def test_r_flow_set_8_4_followed_create_gets_no_byte(area, monkeypatch):
+        """R-FLOW-SET.8/4: a link put in at the free set name gets no byte (E3 S-2 b)."""
+        _root, project, outside = area
+        home = project / "flowsets"
+        home.mkdir()
+        _windows_follow(monkeypatch, home, outside)
+        with pytest.raises(WorkareaContainmentError):
+            save_chain_set(C1, "s", project)
+        assert (outside / "followed.json").read_bytes() == b""
+>       assert (home / "s.json").is_symlink()
+E       AssertionError: assert False
+E        +  where False = is_symlink()
+E        +    where is_symlink = (PosixPath('/tmp/pytest-of-<user>/pytest-379/test_r_flow_set_8_4_followed_c0/.s19tool/workarea/p/flowsets') / 's.json').is_symlink
+
+../s19_i9mut/tests/test_b101_flow_saves.py:409: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_14_4_followed_create_gets_no_byte
+FAILED tests/test_b101_flow_saves.py::test_r_flow_set_8_4_followed_create_gets_no_byte
+2 failed, 1 passed in 0.23s
+

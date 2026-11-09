@@ -1,0 +1,12 @@
+=== Inc 10a E4 integration run: int-02b-freeze
+date: 2026-11-07T00:44:05Z
+worktree HEAD (base): 2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+main ref in this checkout: 2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+index tree with the increment staged: 7d9218d3e1249b8d805c6f448256af5167b48092
+staged files vs base: 8
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10int_eng/s19_app/__init__.py
+CMD: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -p no:xdist -rfs tests/test_tui_directionb.py::test_tc031_engine_modules_have_no_diff_vs_main tests/test_tui_directionb.py::test_tc031_engine_modules_have_no_name_only_diff_vs_main tests/test_tui_issues_triage_b94.py::test_tc_b94_18_curated_set_and_engine_freeze
+...                                                                      [100%]
+3 passed in 1.24s
+=== exit code: 0

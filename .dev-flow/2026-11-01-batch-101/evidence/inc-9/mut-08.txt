@@ -1,0 +1,175 @@
+base commit (origin/main): e07fb00f9fc13afd314d0334fac683fe33b29b6c
+applied-tree head: b204c7d44a42383f2a7c63295280b0a4b7f3ad58
+mutant: M8 — R-FLOW-FILE.11
+
+--- mutation (diff) ---
+--- a/s19_app/tui/services/flow_persistence_service.py
++++ b/s19_app/tui/services/flow_persistence_service.py
+@@ -1214,7 +1214,7 @@
+     if clean is None:
+         return None
+     flows_dir = project_dir / FLOWS_SUBDIR
+-    resolved_home, _ = _guarded_destination(flows_dir, workarea_root)
++    resolved_home = flows_dir.resolve()
+     flows_dir.mkdir(parents=True, exist_ok=True)
+ 
+     def render(stem: str) -> str:
+
+--- s19_app.__file__ (from inside the copy) ---
+<HOME>/work/s19_i9mut_m8/s19_app/__init__.py
+
+--- pytest ---
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+___________ test_r_flow_file_11_1_home_linked_outside_saves_nothing ____________
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-373/test_r_flow_file_11_1_home_lin0/.s19tool/workarea'), PosixPath('/tmp/py...me_lin0/.s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-373/test_r_flow_file_11_1_home_lin0/outside'))
+
+    def test_r_flow_file_11_1_home_linked_outside_saves_nothing(area):
+        """R-FLOW-FILE.11/1: a flows home linked outside the work area saves nothing."""
+        root, project, outside = area
+        make_junction(project / "flows", outside / "flows")
+>       with pytest.raises(WorkareaContainmentError):
+E       Failed: DID NOT RAISE <class 's19_app.tui.workspace.WorkareaContainmentError'>
+
+../s19_i9mut/tests/test_b101_flow_saves.py:243: Failed
+____________ test_r_flow_file_11_2_home_linked_inside_saves_nothing ____________
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-373/test_r_flow_file_11_2_home_lin0/.s19tool/workarea'), PosixPath('/tmp/py...me_lin0/.s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-373/test_r_flow_file_11_2_home_lin0/outside'))
+
+    def test_r_flow_file_11_2_home_linked_inside_saves_nothing(area):
+        """R-FLOW-FILE.11/2: a flows home linked inside the project saves nothing."""
+        root, project, _out = area
+        (project / "patches").mkdir()
+        make_junction(project / "flows", project / "patches")
+>       with pytest.raises(WorkareaContainmentError):
+E       Failed: DID NOT RAISE <class 's19_app.tui.workspace.WorkareaContainmentError'>
+
+../s19_i9mut/tests/test_b101_flow_saves.py:253: Failed
+__________ test_r_flow_file_11_3_linked_project_folder_saves_nothing ___________
+
+area = (PosixPath('/tmp/pytest-of-<user>/pytest-373/test_r_flow_file_11_3_linked_p0/.s19tool/workarea'), PosixPath('/tmp/py...nked_p0/.s19tool/workarea/p'), PosixPath('/tmp/pytest-of-<user>/pytest-373/test_r_flow_file_11_3_linked_p0/outside'))
+
+    def test_r_flow_file_11_3_linked_project_folder_saves_nothing(area):
+        """R-FLOW-FILE.11/3: a flows home under a linked project folder saves nothing (E3A-06)."""
+        root, _project, _out = area
+        real = root / "q"
+        real.mkdir()
+        (real / "prg.s19").write_text("S9030000FC\n", encoding="utf-8")
+        make_junction(root / "pl", real)
+        before = _entries(real)
+>       with pytest.raises(WorkareaContainmentError):
+E       Failed: DID NOT RAISE <class 's19_app.tui.workspace.WorkareaContainmentError'>
+
+../s19_i9mut/tests/test_b101_flow_saves.py:266: Failed
+____________________ test_r_fb_save_8_1_refused_home_status ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-373/test_r_fb_save_8_1_refused_hom0')
+
+    def test_r_fb_save_8_1_refused_home_status(tmp_path: Path) -> None:
+        """R-FB-SAVE.8 (case /1): with ``flows/`` replaced by a link to a folder
+        outside the work area, Save... under ``x`` paints exactly
+        ``Flow not saved - the project's flows folder is a link or is outside the
+        work area.`` on the status line, writes nothing outside, and the result
+        area shows no ``saved`` line.
+    
+        RED on base: the file lands in the outside folder and the result shows
+        ``saved flows/x.json``.
+        """
+    
+        async def body(app, pilot, project_dir, log):
+            panel = await open_flow_builder(app, pilot)
+            outside = _link_home(tmp_path, project_dir, "flows")
+            await _add_load_block(app, pilot, panel)
+            mark = len(log.messages)
+            await _open_save_dialog(app, pilot, panel, "x")
+            await settled(
+                pilot,
+                lambda: FLOW_REFUSED in log.since(mark)
+                or bool(_entries(outside))
+                or "saved flows/" in _painted(app, panel.query_one("#flow_result")),
+                "the refusal status is painted, or the file landed (base)",
+            )
+            await settle(pilot, 2)
+            return (
+                _painted_status(app),
+                _entries(outside),
+                _painted(app, panel.query_one("#flow_result")),
+            )
+    
+        status, outside_files, result = _drive(tmp_path, body, builder=True)
+>       assert status == FLOW_REFUSED, status
+E       AssertionError: Loaded project 'proj1' -> prg.s19 - variant 1 of 1, 1 problem - details: p
+E       assert 'Loaded proje... - details: p' == 'Flow not sav...he work area.'
+E         
+E         - Flow not saved - the project's flows folder is a link or is outside the work area.
+E         + Loaded project 'proj1' -> prg.s19 - variant 1 of 1, 1 problem - details: p
+
+../s19_i9mut/tests/test_b101_flow_names_ui.py:440: AssertionError
+____________________ test_at_i9_3_linked_homes_refuse_saves ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-373/test_at_i9_3_linked_homes_refu0')
+
+    def test_at_i9_3_linked_homes_refuse_saves(tmp_path: Path) -> None:
+        """AT-I9-3 (US-I9-3, rows R-FLOW-FILE.11, R-FLOW-SET.7, R-FB-SAVE.8 and
+        R-FX-SET.15): with ``patch_chain`` imported as a lane and then ``flows/``
+        and ``flowsets/`` replaced by links to folders outside the work area, the
+        Builder Save... under ``x`` and Flow Execution Save Set under ``s`` each
+        paint their exact refusal line and leave both outside folders empty.
+    
+        RED on base: one file lands in each outside folder.
+        """
+    
+        async def body(app, pilot, project_dir, log):
+            fx_panel = await import_lanes(app, pilot, "patch_chain")
+            outside_flows = _link_home(tmp_path, project_dir, "flows")
+            outside_sets = _link_home(tmp_path, project_dir, "flowsets")
+            builder = await open_flow_builder(app, pilot)
+            await _add_load_block(app, pilot, builder)
+            mark = len(log.messages)
+            await _open_save_dialog(app, pilot, builder, "x")
+            await settled(
+                pilot,
+                lambda: FLOW_REFUSED in log.since(mark) or bool(_entries(outside_flows)),
+                "the Builder refusal is painted, or the file landed (base)",
+            )
+            await settle(pilot, 2)
+            flow_status = _painted_status(app)
+            await open_flow_execution(app, pilot)
+            mark = len(log.messages)
+            fx_panel.query_one("#fx_set_name", Input).value = "s"
+            fx_panel.query_one("#fx_save", Button).press()
+            await settled(
+                pilot,
+                lambda: SET_REFUSED in log.since(mark) or bool(_entries(outside_sets)),
+                "the Save Set refusal is painted, or the file landed (base)",
+            )
+            await settle(pilot, 2)
+            return flow_status, _painted_status(app), _entries(outside_flows), _entries(outside_sets)
+    
+        flow_status, set_status, flows_files, sets_files = _drive(tmp_path, body)
+        problems = []
+        if flow_status != FLOW_REFUSED:
+            problems.append(f"Builder status line = {flow_status!r}")
+        if set_status != SET_REFUSED:
+            problems.append(f"Save Set status line = {set_status!r}")
+        if flows_files != []:
+            problems.append(f"outside flows folder holds {flows_files!r}")
+        if sets_files != []:
+            problems.append(f"outside flowsets folder holds {sets_files!r}")
+>       assert problems == [], problems
+E       AssertionError: ['Builder status line = "Loaded project \'proj1\' -> prg.s19 - variant 1 of 1, 1 problem - details: p"', "outside flows folder holds ['x.json']"]
+E       assert ['Builder sta...s ['x.json']"] == []
+E         
+E         Left contains 2 more items, first extra item: 'Builder status line = "Loaded project \'proj1\' -> prg.s19 - variant 1 of 1, 1 problem - details: p"'
+E         Use -v to get more diff
+
+../s19_i9mut/tests/test_b101_flow_names_ui.py:656: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_11_1_home_linked_outside_saves_nothing
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_11_2_home_linked_inside_saves_nothing
+FAILED tests/test_b101_flow_saves.py::test_r_flow_file_11_3_linked_project_folder_saves_nothing
+FAILED tests/test_b101_flow_names_ui.py::test_r_fb_save_8_1_refused_home_status
+FAILED tests/test_b101_flow_names_ui.py::test_at_i9_3_linked_homes_refuse_saves
+5 failed in 11.46s
+

@@ -1,0 +1,133 @@
+=== Inc 10a E4 integration run: int-08 (mutants, in a cp -a copy of the integrated worktree)
+date: 2026-11-06T23:22:27Z
+copied from: worktree at base 2f54c7dea27d826483e5c5e596421b8b3a68bb2f, staged tree 7324ef328fc9d80ef4907ca78f5472f7d3c696f1
+python: Python 3.11.18
+s19_app.__file__ = <HOME>/work/s19_i10int_mut/s19_app/__init__.py
+
+--- mutant M-L applied to <HOME>/work/s19_i10int_mut/s19_app/tui/app.py: 'layout_waits: int = 3,' -> 'layout_waits: int = 0,'
+CMD: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -p no:xdist -rfs --tb=line -s tests/test_zz_probe_i10.py tests/test_b101_unload_focus.py::test_r_shell_focus_2_7_the_later_of_two_rail_keys_wins
+before: focused=ListView#files_list(area 216) active=workspace
+land(trigger=None, switch=a2l, on_switch=True, {}) focused=None active=mac screen_mac=Container#screen_mac(area 0) hidden=False mac_records_list=DataTable#mac_records_list(area 0) resolve=RailItem#rail_item_mac(area 21)
+  -> None
+land(trigger=None, switch=mac, on_switch=True, {}) focused=None active=mac screen_mac=Container#screen_mac(area 0) hidden=False mac_records_list=DataTable#mac_records_list(area 0) resolve=RailItem#rail_item_mac(area 21)
+  -> RailItem#rail_item_mac(area 21)
+pause 0: focused=RailItem#rail_item_mac(area 21) mac_records_list=DataTable#mac_records_list(area 288)
+pause 1: focused=RailItem#rail_item_mac(area 21) mac_records_list=DataTable#mac_records_list(area 360)
+pause 3: focused=RailItem#rail_item_mac(area 21) mac_records_list=DataTable#mac_records_list(area 360)
+pause 10: focused=RailItem#rail_item_mac(area 21) mac_records_list=DataTable#mac_records_list(area 360)
+pause 39: focused=RailItem#rail_item_mac(area 21) mac_records_list=DataTable#mac_records_list(area 360)
+.F
+=================================== FAILURES ===================================
+E   AssertionError: the focus never landed on #mac_records_list; it is RailItem#rail_item_mac (region area 21)
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3004 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-332/test_r_shell_focus_2_7_the_lat0 workarea=/tmp/pytest-of-<user>/pytest-332/test_r_shell_focus_2_7_the_lat0/.s19tool/workarea
+INFO     s19tui:app.py:8819 Workarea refreshed. files=0
+INFO     s19tui:app.py:17218 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.011
+INFO     s19tui:app.py:18464 Loading file: path=/tmp/pytest-of-<user>/pytest-332/b101_i10f_case081/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14782 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:19369 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-332/b101_i10f_case081/firmware.s19 addresses=424736 range_count=4 range_bytes=424736 errors=0
+INFO     s19tui:app.py:14799 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:18829 Load phase boundary: apply_install_state path=firmware.s19 precomputed=False
+INFO     s19tui:app.py:19497 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18845 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:18857 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:20557 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:18317 MAC validation computed: records=0 issues=0 elapsed_seconds=1.143
+INFO     s19tui:app.py:18372 MAC row cache built: records=0 elapsed_seconds=1.143
+INFO     s19tui:app.py:17218 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.015
+INFO     s19tui:app.py:20071 Load phase boundary: populate_mac_table_done rows=0 elapsed=1.159
+INFO     s19tui:app.py:18870 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:19724 Memory Map updated. ranges=4
+INFO     s19tui:app.py:18887 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-332/b101_i10f_case081/firmware.s19 file_type=s19 elapsed_seconds=3.197 has_mac=False precomputed=False
+INFO     s19tui:app.py:16306 A2L copy complete: path=/tmp/pytest-of-<user>/pytest-332/test_r_shell_focus_2_7_the_lat0/.s19tool/workarea/temp/firmware.a2l size_bytes=97347 copy_seconds=0.018
+INFO     s19tui:app.py:951 A2L cache miss: path=/tmp/pytest-of-<user>/pytest-332/test_r_shell_focus_2_7_the_lat0/.s19tool/workarea/temp/firmware.a2l size_bytes=97347
+WARNING  s19tui:app.py:16344 Recent sources not updated: '/tmp/pytest-of-<user>/pytest-332/b101_i10f_case081/firmware.a2l'
+INFO     s19tui:app.py:8819 Workarea refreshed. files=1
+INFO     s19tui:app.py:19316 A2L parse summary: path=/tmp/pytest-of-<user>/pytest-332/test_r_shell_focus_2_7_the_lat0/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.042 sections=1 tags=462 errors=0
+INFO     s19tui:app.py:18317 MAC validation computed: records=0 issues=462 elapsed_seconds=1.548
+INFO     s19tui:app.py:18372 MAC row cache built: records=0 elapsed_seconds=1.549
+INFO     s19tui:app.py:17250 Load phase boundary: populate_issues_table_done rows=40 total=462 elapsed=0.075
+INFO     s19tui:app.py:20071 Load phase boundary: populate_mac_table_done rows=0 elapsed=1.626
+INFO     s19tui:app.py:20598 Load phase boundary: populate_a2l_table_done rows=200 total=462 elapsed=0.025
+INFO     s19tui:app.py:16363 A2L view refresh complete: path=/tmp/pytest-of-<user>/pytest-332/test_r_shell_focus_2_7_the_lat0/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=1.674
+INFO     s19tui:app.py:16371 A2L loaded: /tmp/pytest-of-<user>/pytest-332/test_r_shell_focus_2_7_the_lat0/.s19tool/workarea/temp/firmware.a2l
+INFO     s19tui:app.py:18464 Loading file: path=/tmp/pytest-of-<user>/pytest-332/b101_i10f_case081/firmware.mac suffix=.mac project=None
+INFO     s19tui:app.py:949 A2L cache hit: path=/tmp/pytest-of-<user>/pytest-332/test_r_shell_focus_2_7_the_lat0/.s19tool/workarea/temp/firmware.a2l size_bytes=97347
+INFO     s19tui:app.py:14782 Load phase boundary: parse_branch_entry path=firmware.mac suffix=.mac
+INFO     s19tui:app.py:17471 Load phase boundary: mac_parse_entry path=firmware.mac
+INFO     s19tui:app.py:17477 Load phase boundary: mac_parse_done path=firmware.mac rows=200 diagnostics=0 elapsed=0.000s
+INFO     s19tui:app.py:17491 MAC parse summary (mirrored): path=/tmp/pytest-of-<user>/pytest-332/b101_i10f_case081/firmware.mac rows=200 parse_ok=200 diagnostics=0 valid_addresses=200
+INFO     s19tui:app.py:17512 Load phase boundary: mac_a2l_resolve_entry path=firmware.mac a2l_path=/tmp/pytest-of-<user>/pytest-332/test_r_shell_focus_2_7_the_lat0/.s19tool/workarea/temp/firmware.a2l
+INFO     s19tui:app.py:17518 Load phase boundary: mac_a2l_resolve_done path=firmware.mac has_a2l_data=True
+INFO     s19tui:app.py:17524 MAC parse summary: path=/tmp/pytest-of-<user>/pytest-332/b101_i10f_case081/firmware.mac total_records=200 parse_ok=200 diagnostics=0 valid_addresses=200 a2l_path=/tmp/pytest-of-<user>/pytest-332/test_r_shell_focus_2_7_the_lat0/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.001
+INFO     s19tui:app.py:14824 Load phase boundary: mac_merge_entry path=firmware.mac has_primary=True
+INFO     s19tui:app.py:14831 Load phase boundary: mac_merge_done path=firmware.mac file_type=s19
+INFO     s19tui:app.py:19369 Load summary: file_type=s19+mac path=/tmp/pytest-of-<user>/pytest-332/b101_i10f_case081/firmware.mac addresses=424736 range_count=4 range_bytes=424736 errors=0
+INFO     s19tui:app.py:14853 Load phase boundary: parse_branch_done path=firmware.mac branch=mac
+INFO     s19tui:app.py:18829 Load phase boundary: apply_install_state path=firmware.mac precomputed=False
+INFO     s19tui:app.py:19497 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:18845 Load phase boundary: apply_sections_done path=firmware.mac
+INFO     s19tui:app.py:18857 Load phase boundary: apply_hex_done path=firmware.mac
+INFO     s19tui:app.py:18317 MAC validation computed: records=200 issues=262 elapsed_seconds=1.007
+INFO     s19tui:app.py:18372 MAC row cache built: records=200 elapsed_seconds=1.010
+INFO     s19tui:app.py:17250 Load phase boundary: populate_issues_table_done rows=40 total=262 elapsed=0.042
+INFO     s19tui:app.py:20122 Load phase boundary: populate_mac_table_done rows=100 total=200 elapsed=1.058
+INFO     s19tui:app.py:20598 Load phase boundary: populate_a2l_table_done rows=200 total=462 elapsed=0.016
+INFO     s19tui:app.py:18870 Load phase boundary: apply_a2l_done path=firmware.mac
+INFO     s19tui:app.py:19724 Memory Map updated. ranges=4
+INFO     s19tui:app.py:18887 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-332/b101_i10f_case081/firmware.mac file_type=s19 elapsed_seconds=2.623 has_mac=True precomputed=False
+<HOME>/work/s19_i10int_mut/tests/support/timing.py:66: AssertionError: the focus never landed on #mac_records_list; it is RailItem#rail_item_mac (region area 21)
+=========================== short test summary info ============================
+FAILED tests/test_b101_unload_focus.py::test_r_shell_focus_2_7_the_later_of_two_rail_keys_wins
+1 failed, 1 passed in 79.29s (0:01:19)
+=== exit code: 1
+
+--- no mutant (app.py as integrated)
+CMD: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -p no:xdist -rfs --tb=line -s tests/test_zz_probe_i10.py tests/test_b101_unload_focus.py::test_r_shell_focus_2_7_the_later_of_two_rail_keys_wins
+before: focused=ListView#files_list(area 216) active=workspace
+land(trigger=None, switch=a2l, on_switch=True, {}) focused=None active=mac screen_mac=Container#screen_mac(area 0) hidden=False mac_records_list=DataTable#mac_records_list(area 0) resolve=RailItem#rail_item_mac(area 21)
+  -> None
+land(trigger=None, switch=mac, on_switch=True, {}) focused=None active=mac screen_mac=Container#screen_mac(area 0) hidden=False mac_records_list=DataTable#mac_records_list(area 0) resolve=RailItem#rail_item_mac(area 21)
+  -> None
+land(trigger=None, switch=mac, on_switch=True, {'layout_waits': 2}) focused=None active=mac screen_mac=Container#screen_mac(area 4128) hidden=False mac_records_list=DataTable#mac_records_list(area 370) resolve=DataTable#mac_records_list(area 370)
+  -> DataTable#mac_records_list(area 370)
+pause 0: focused=DataTable#mac_records_list(area 288) mac_records_list=DataTable#mac_records_list(area 288)
+pause 1: focused=DataTable#mac_records_list(area 360) mac_records_list=DataTable#mac_records_list(area 360)
+pause 3: focused=DataTable#mac_records_list(area 360) mac_records_list=DataTable#mac_records_list(area 360)
+pause 10: focused=DataTable#mac_records_list(area 360) mac_records_list=DataTable#mac_records_list(area 360)
+pause 39: focused=DataTable#mac_records_list(area 360) mac_records_list=DataTable#mac_records_list(area 360)
+..
+2 passed in 74.73s (0:01:14)
+=== exit code: 0
+
+--- mutant M-P applied to <HOME>/work/s19_i10int_mut/s19_app/tui/app.py: 'self._hex_window_start = start + page_size if start + page_size < total else start' -> 'self._hex_window_start = min(max(0, ((total - 1) // page_size) * page_size), start + page_size)'
+CMD: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -p no:xdist -rfs --tb=line tests/test_b101_hex_jump.py::test_r_tui_007_5_1_next_page_keeps_a_window_holding_the_last_row tests/test_b101_hex_jump.py::test_r_tui_007_3_1_next_page_follows_the_shown_window
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+E   AssertionError: '.' press 1: first row [0x0000B200], expected [0x0000BB40]
+    assert [45568] == [47936]
+      
+      At index 0 diff: 45568 != 47936
+      Use -v to get more diff
+<HOME>/work/s19_i10int_mut/tests/test_b101_hex_jump.py:1102: AssertionError: '.' press 1: first row [0x0000B200], expected [0x0000BB40]
+=========================== short test summary info ============================
+FAILED tests/test_b101_hex_jump.py::test_r_tui_007_5_1_next_page_keeps_a_window_holding_the_last_row
+1 failed, 1 passed in 15.44s
+=== exit code: 1
+
+--- mutant M-W applied to <HOME>/work/s19_i10int_mut/s19_app/tui/app.py: 'self._hex_window_start = max(0, min(self._hex_window_start, len(rows) - 1))' -> 'self._hex_window_start = max(0, min(self._hex_window_start, len(rows) - 1 if isinstance(focus_address, int) else max(0, ((len(rows) - 1) // page_size) * page_size)))'
+CMD: env -u NO_COLOR python -m pytest -q -p no:cacheprovider -p no:xdist -rfs --tb=line tests/test_b101_hex_jump.py::test_r_tui_040_8_4_miss_after_jump_to_last_row_keeps_window tests/test_b101_hex_jump.py::test_r_tui_018_1_11_jump_to_last_present_row_still_second
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+E   AssertionError: the miss moved the window: 2 rows before, 146 after
+    assert ['0x00C006E0 .........|', ...] == ['0x00C00FE0 ..............|']
+      
+      At index 0 diff: '0x00C006E0  FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF  |................|' != '0x00C00FE0  FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF  |................|'
+      Left contains 144 more items, first extra item: '0x00C00700  FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF  |................|'
+      Use -v to get more diff
+<HOME>/work/s19_i10int_mut/tests/test_b101_hex_jump.py:873: AssertionError: the miss moved the window: 2 rows before, 146 after
+=========================== short test summary info ============================
+FAILED tests/test_b101_hex_jump.py::test_r_tui_040_8_4_miss_after_jump_to_last_row_keeps_window
+1 failed, 1 passed in 25.58s
+=== exit code: 1
+=== done

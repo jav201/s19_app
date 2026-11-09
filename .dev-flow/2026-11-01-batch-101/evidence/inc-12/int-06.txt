@@ -1,0 +1,79 @@
+=== Inc 12 E4 integration diagnostic: int-06 census
+date: 2026-11-07T10:21:56Z
+worktree HEAD (base): 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+index tree with the increment staged: d171353393e0d3a7abeac10d1980600d239d056d
+CMD: env -u NO_COLOR python -I s19_i12int-measure.py tree ; ... 6f1743c
+s19_app.__file__ = <HOME>/work/s19_i12int/s19_app/__init__.py
+census of tree: 86 modules
+  dialogs: 21; without an opener: []
+  actions: 80; without a reach: []
+  ReportViewerScreen.action_close_reports reasons: ['string']
+  action names defined on more than one class (the E3A-R2-3 limit):
+    action_cancel: ['BulkParameterAddScreen', 'ChangeSetJsonScreen', 'FileRefChooserScreen', 'FlowBlockEditScreen', 'LoadDialog', 'LoadGuardScreen', 'SaveProjectScreen']
+    action_copy: ['CappedTextArea (no own binding)', 'OsClipboardInput (no own binding)']
+    action_cut: ['CappedTextArea (no own binding)', 'OsClipboardInput (no own binding)']
+    action_paste: ['CappedTextArea (no own binding)', 'OsClipboardInput (no own binding)']
+    action_select_variant: ['LoadResultScreen', 'S19TuiApp']
+    action_show_window_usage_help: ['ReportViewerScreen', 'WindowSection']
+s19_app.__file__ = <HOME>/work/s19_i12int/s19_app/__init__.py
+census of 6f1743c1ad54ff7db89e8fcd4e96266414950f42: 86 modules
+  dialogs: 22; without an opener: ['VariantHelpScreen']
+  actions: 83; without a reach: ['S19TuiApp.action_a2l_tag_find_next', 'S19TuiApp.action_view_alt', 'S19TuiApp.action_view_mac', 'S19TuiApp.action_view_main']
+  ReportViewerScreen.action_close_reports reasons: ['<absent>']
+  action names defined on more than one class (the E3A-R2-3 limit):
+    action_cancel: ['BulkParameterAddScreen', 'ChangeSetJsonScreen', 'FileRefChooserScreen', 'FlowBlockEditScreen', 'LoadDialog', 'LoadGuardScreen', 'SaveProjectScreen']
+    action_copy: ['CappedTextArea (no own binding)', 'OsClipboardInput (no own binding)']
+    action_cut: ['CappedTextArea (no own binding)', 'OsClipboardInput (no own binding)']
+    action_paste: ['CappedTextArea (no own binding)', 'OsClipboardInput (no own binding)']
+    action_select_variant: ['LoadResultScreen', 'S19TuiApp']
+    action_show_window_usage_help: ['ReportViewerScreen', 'WindowSection']
+=== exit code: 0
+
+=== Inc 12 E4 integration diagnostic: int-06 walk population
+date: 2026-11-07T10:28:50Z
+
+--- worktree <HOME>/work/s19_i12int
+worktree HEAD (base): 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+index tree: d171353393e0d3a7abeac10d1980600d239d056d
+staged files vs base: 18; untracked: 0
+CMD: env -u NO_COLOR python -I s19_i12int-measure.py tree walk
+s19_app.__file__ = <HOME>/work/s19_i12int/s19_app/__init__.py
+census of tree: 86 modules
+  dialogs: 21; without an opener: []
+  actions: 80; without a reach: []
+  ReportViewerScreen.action_close_reports reasons: ['string']
+  action names defined on more than one class (the E3A-R2-3 limit):
+    action_cancel: ['BulkParameterAddScreen', 'ChangeSetJsonScreen', 'FileRefChooserScreen', 'FlowBlockEditScreen', 'LoadDialog', 'LoadGuardScreen', 'SaveProjectScreen']
+    action_copy: ['CappedTextArea (no own binding)', 'OsClipboardInput (no own binding)']
+    action_cut: ['CappedTextArea (no own binding)', 'OsClipboardInput (no own binding)']
+    action_paste: ['CappedTextArea (no own binding)', 'OsClipboardInput (no own binding)']
+    action_select_variant: ['LoadResultScreen', 'S19TuiApp']
+    action_show_window_usage_help: ['ReportViewerScreen', 'WindowSection']
+walk population (window #screen_check_editor, widgets with an id): 51
+  distinct ids: 51; never shown: []
+  ids inside the panel (panel included): 48
+  ids outside the panel: ['open_folder_checks_editor', 'screen_check_editor', 'window_help_check_editor']
+=== exit code: 0
+
+--- worktree <HOME>/work/s19_i12int_base
+worktree HEAD (base): 6f1743c1ad54ff7db89e8fcd4e96266414950f42
+index tree: 2766bbba190da2e4a9acf8446bd945942a19960c
+staged files vs base: 0; untracked: 2
+CMD: env -u NO_COLOR python -I s19_i12int-measure.py tree walk
+s19_app.__file__ = <HOME>/work/s19_i12int_base/s19_app/__init__.py
+census of tree: 86 modules
+  dialogs: 22; without an opener: ['VariantHelpScreen']
+  actions: 83; without a reach: ['S19TuiApp.action_a2l_tag_find_next', 'S19TuiApp.action_view_alt', 'S19TuiApp.action_view_mac', 'S19TuiApp.action_view_main']
+  ReportViewerScreen.action_close_reports reasons: ['<absent>']
+  action names defined on more than one class (the E3A-R2-3 limit):
+    action_cancel: ['BulkParameterAddScreen', 'ChangeSetJsonScreen', 'FileRefChooserScreen', 'FlowBlockEditScreen', 'LoadDialog', 'LoadGuardScreen', 'SaveProjectScreen']
+    action_copy: ['CappedTextArea (no own binding)', 'OsClipboardInput (no own binding)']
+    action_cut: ['CappedTextArea (no own binding)', 'OsClipboardInput (no own binding)']
+    action_paste: ['CappedTextArea (no own binding)', 'OsClipboardInput (no own binding)']
+    action_select_variant: ['LoadResultScreen', 'S19TuiApp']
+    action_show_window_usage_help: ['ReportViewerScreen', 'WindowSection']
+walk population (window #screen_check_editor, widgets with an id): 52
+  distinct ids: 52; never shown: ['check_preview_toggle_button']
+  ids inside the panel (panel included): 49
+  ids outside the panel: ['open_folder_checks_editor', 'screen_check_editor', 'window_help_check_editor']
+=== exit code: 0

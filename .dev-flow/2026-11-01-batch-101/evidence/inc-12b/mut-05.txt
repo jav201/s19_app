@@ -1,0 +1,47 @@
+=== base commit ===
+2f54c7dea27d826483e5c5e596421b8b3a68bb2f
+applied M5a OK
+=== mutation diff ===
+--- <HOME>/work/s19_i12bmut/s19_app/tui/flow_screens.py	2026-11-06 18:16:04.301575372 -0600
++++ s19_app/tui/flow_screens.py	2026-11-06 18:35:11.644970185 -0600
+@@ -1408,6 +1408,12 @@
+                 markup=False,
+                 classes=self._name_strip_class(),
+             )
++        yield Label(
++            "Flow Builder: pick a block kind, enter its refs, Add; wire A2B "
++            "inputs as a file name or #<n> (a flow output).",
++            id="flow_help",
++            markup=False,
++        )  # MUTANT M5a: restored #flow_help
+         with ScrollableContainer(id="flow_pipeline_scroll"):
+             yield Static(
+                 pipeline_text(self._blocks, self._card_w),
+@@ -2129,6 +2135,7 @@
+         # for SOURCE (default), PATCH, WRITE-OUT, CRC and A2B; the A2B binding
+         # inputs show only for A2B, the single ref for every other kind.
+         self._sync_kind_dependent_visibility(self._kind)
++        self.query_one("#flow_help").display = False  # MUTANT M5a
+         # batch-96 B1: the funnel editor starts COLLAPSED (a declaration
+         # table, not a canvas element) — the toggle opens it.
+         self.query_one("#flow_funnel_editor").display = False
+=== grep landed ===
+1416:        )  # MUTANT M5a: restored #flow_help
+2138:        self.query_one("#flow_help").display = False  # MUTANT M5a
+=== s19_app.__file__ ===
+<HOME>/work/s19_i12bmut_m05/s19_app/__init__.py
+=== pytest ===
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______ test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state _______
+../s19_i12bmut/tests/test_b101_flow_shown_widgets.py:191: in test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state
+    assert never == [], f"mounted and never shown: {never}"
+E   AssertionError: mounted and never shown: ['flow_help']
+E   assert ['flow_help'] == []
+E     
+E     Left contains one more item: 'flow_help'
+E     Use -v to get more diff
+=========================== short test summary info ============================
+FAILED tests/test_b101_flow_shown_widgets.py::test_r_tui_059_25_1_every_flow_builder_widget_is_shown_in_a_state
+1 failed in 5.87s
+=== exit code: 1 ===

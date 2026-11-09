@@ -1,0 +1,224 @@
+=== base commit: 09b4808a0344de05d9d64cd55362ac7058a8c17f
+=== python: Python 3.11.18
+=== mutation applied: M17 (file s19_app/tui/app.py)
+--- a/s19_app/tui/app.py
++++ b/s19_app/tui/app.py
+@@ -1883,7 +1883,6 @@
+         return replace(
+             loaded,
+             file_type="mac",
+-            path=loaded.mac_path,
+             mem_map={},
+             row_bases=[],
+             ranges=[],
+LANDED M17: 'path=loaded.mac_path,' x0
+=== s19_app.__file__ ===
+<HOME>/work/s19_i10mut_m19/s19_app/__init__.py
+=== CMD ===
+env -u NO_COLOR <HOME>/miniconda3/envs/s19ci/bin/python -m pytest -q -p no:cacheprovider -rf  tests/test_b101_unload_focus.py::test_r_ws_loaded_19_1_save_after_primary_unload_writes_no_image tests/test_b101_unload_focus.py::test_r_ws_loaded_20_1_load_question_names_the_mac_after_a_primary_unload
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_______ test_r_ws_loaded_19_1_save_after_primary_unload_writes_no_image ________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-657/test_r_ws_loaded_19_1_save_aft0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-657/b101_i10f_case080')
+
+    def test_r_ws_loaded_19_1_save_after_primary_unload_writes_no_image(
+        tmp_path: Path, case08: Path
+    ) -> None:
+        """R-WS-LOADED.19 case /1: fixture three as ``unloaded_primary.s19`` plus the
+        case 08 MAC; ``[u]`` on the primary; Save project ``P6`` writes no ``.s19`` or
+        ``.hex`` file, no file with the image's SHA-256, and names no
+        ``unloaded_primary`` in its status (base: ``P6/unloaded_primary.s19``)."""
+        image = write_three_ranges(tmp_path / "src" / "unloaded_primary.s19")
+        mac = copy_to(case08 / "firmware.mac", tmp_path / "src" / "firmware.mac")
+        image_digest = sha256(image)
+    
+        async def scenario(app, pilot, log):
+            await load_image(pilot, app, image)
+            await load_mac(pilot, app, mac)
+            mark = len(log.messages)
+            await press_unload(pilot, app, "primary")
+            await wait_message(pilot, log, mark, "Unloaded primary image.")
+            await settle(pilot, 4)
+            messages = await save_and_wait(pilot, app, log, "P6")
+            assert any(m.startswith("Saved project to") for m in messages), messages
+            files = project_files(app, "P6")
+            assert "firmware.mac" in files, f"the MAC is not in P6: {sorted(files)}"
+            images = [n for n in files if n.lower().endswith((".s19", ".hex"))]
+            assert images == [], f"P6 holds image files: {images}"
+            assert image_digest not in files.values(), f"P6 holds the image's bytes: {sorted(files)}"
+            assert not any("unloaded_primary" in m for m in messages), messages
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:672: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f1d27c1f150>
+
+    async def scenario(app, pilot, log):
+        await load_image(pilot, app, image)
+        await load_mac(pilot, app, mac)
+        mark = len(log.messages)
+        await press_unload(pilot, app, "primary")
+        await wait_message(pilot, log, mark, "Unloaded primary image.")
+        await settle(pilot, 4)
+        messages = await save_and_wait(pilot, app, log, "P6")
+        assert any(m.startswith("Saved project to") for m in messages), messages
+        files = project_files(app, "P6")
+        assert "firmware.mac" in files, f"the MAC is not in P6: {sorted(files)}"
+        images = [n for n in files if n.lower().endswith((".s19", ".hex"))]
+>       assert images == [], f"P6 holds image files: {images}"
+E       AssertionError: P6 holds image files: ['unloaded_primary.s19']
+E       assert ['unloaded_primary.s19'] == []
+E         
+E         Left contains one more item: 'unloaded_primary.s19'
+E         Use -v to get more diff
+
+../s19_i10mut/tests/test_b101_unload_focus.py:668: AssertionError
+___ test_r_ws_loaded_20_1_load_question_names_the_mac_after_a_primary_unload ___
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-657/test_r_ws_loaded_20_1_load_que0')
+case08 = PosixPath('/tmp/pytest-of-<user>/pytest-657/b101_i10f_case080')
+
+    def test_r_ws_loaded_20_1_load_question_names_the_mac_after_a_primary_unload(
+        tmp_path: Path, case08: Path
+    ) -> None:
+        """R-WS-LOADED.20 case /1: after the primary unload, with no project open and
+        one Patch Editor entry unsaved, a project load asks ``Replace
+        firmware.mac?`` and names no ``unloaded_primary`` (base: ``Replace
+        unloaded_primary.s19?``)."""
+        image = write_three_ranges(tmp_path / "src" / "unloaded_primary.s19")
+        mac = copy_to(case08 / "firmware.mac", tmp_path / "src" / "firmware.mac")
+    
+        async def scenario(app, pilot, log):
+            folder = Path(app.workarea) / "PQ"
+            copy_to(image, folder / "firmware.s19")
+            await load_image(pilot, app, image)
+            await load_mac(pilot, app, mac)
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            panel.request_action("add_entry")
+            await wait_until(
+                pilot,
+                lambda: panel.is_dirty,
+                "setup: the Patch Editor entry did not make the panel unsaved",
+                timeout=FOCUS_WAIT_S,
+            )
+            mark = len(log.messages)
+            await press_unload(pilot, app, "primary")
+            await wait_message(pilot, log, mark, "Unloaded primary image.")
+            await settle(pilot, 4)
+            assert panel.is_dirty, "setup: the unload dropped the unsaved entry"
+            assert app.current_project is None
+            # The `p` key must reach the app: put the focus on the Workspace target
+            # (on base the unload leaves it on the hidden window's table).
+            await put_focus(pilot, app, "files_list")
+            await ld.open_project_through_dialog(pilot, app, "PQ", confirm="enter")
+            await wait_until(
+                pilot,
+                lambda: isinstance(app.screen, ConfirmQuestionScreen),
+                lambda: f"no load question; screen {type(app.screen).__name__}",
+                timeout=FOCUS_WAIT_S,
+            )
+            await settle(pilot, 4)
+            title = plain_of(app.screen.query_one("#confirm_title"))
+            body = plain_of(app.screen.query_one("#confirm_body"))
+            await pilot.press("n")
+            assert title == "Replace firmware.mac?", title
+            assert "unloaded_primary" not in title + body, (title, body)
+    
+>       run(tmp_path, scenario)
+
+../s19_i10mut/tests/test_b101_unload_focus.py:742: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i10mut/tests/test_b101_unload_focus.py:372: in run
+    return projects.run_app(base, scenario, size=SIZE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f1d26359510>
+
+    async def scenario(app, pilot, log):
+        folder = Path(app.workarea) / "PQ"
+        copy_to(image, folder / "firmware.s19")
+        await load_image(pilot, app, image)
+        await load_mac(pilot, app, mac)
+        panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+        panel.request_action("add_entry")
+        await wait_until(
+            pilot,
+            lambda: panel.is_dirty,
+            "setup: the Patch Editor entry did not make the panel unsaved",
+            timeout=FOCUS_WAIT_S,
+        )
+        mark = len(log.messages)
+        await press_unload(pilot, app, "primary")
+        await wait_message(pilot, log, mark, "Unloaded primary image.")
+        await settle(pilot, 4)
+        assert panel.is_dirty, "setup: the unload dropped the unsaved entry"
+        assert app.current_project is None
+        # The `p` key must reach the app: put the focus on the Workspace target
+        # (on base the unload leaves it on the hidden window's table).
+        await put_focus(pilot, app, "files_list")
+        await ld.open_project_through_dialog(pilot, app, "PQ", confirm="enter")
+        await wait_until(
+            pilot,
+            lambda: isinstance(app.screen, ConfirmQuestionScreen),
+            lambda: f"no load question; screen {type(app.screen).__name__}",
+            timeout=FOCUS_WAIT_S,
+        )
+        await settle(pilot, 4)
+        title = plain_of(app.screen.query_one("#confirm_title"))
+        body = plain_of(app.screen.query_one("#confirm_body"))
+        await pilot.press("n")
+>       assert title == "Replace firmware.mac?", title
+E       AssertionError: Replace unloaded_primary.s19?
+E       assert 'Replace unlo..._primary.s19?' == 'Replace firmware.mac?'
+E         
+E         - Replace firmware.mac?
+E         + Replace unloaded_primary.s19?
+
+../s19_i10mut/tests/test_b101_unload_focus.py:739: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_unload_focus.py::test_r_ws_loaded_19_1_save_after_primary_unload_writes_no_image
+FAILED tests/test_b101_unload_focus.py::test_r_ws_loaded_20_1_load_question_names_the_mac_after_a_primary_unload
+2 failed in 13.96s

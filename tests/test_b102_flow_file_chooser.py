@@ -85,7 +85,6 @@ from textual.widgets import (
     Label,
     ListItem,
     ListView,
-    Select,
     Static,
 )
 
@@ -612,8 +611,7 @@ def test_tc_b102_file_02_browse_beside_every_ref_field(tmp_path: Path) -> None:
         results = {}
         single = need(panel, "#flow_browse", Button)
         results["single_label"] = str(single.label).strip()
-        kind = need(panel, "#flow_kind", Select)
-        kind.value = BLOCK_A2B
+        need(panel, f"#flow_palette_{BLOCK_A2B}", Button).press()
         for _ in range(60):
             await pilot.pause()
             if need(panel, "#flow_ref_a", Input).display:

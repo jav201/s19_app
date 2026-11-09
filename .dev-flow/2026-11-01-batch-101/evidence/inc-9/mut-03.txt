@@ -1,0 +1,402 @@
+base commit (origin/main): e07fb00f9fc13afd314d0334fac683fe33b29b6c
+applied-tree head: b204c7d44a42383f2a7c63295280b0a4b7f3ad58
+mutant: M3 — R-FLOW-CHAIN.19 (D-1 option A)
+
+--- mutation (diff) ---
+--- a/s19_app/tui/services/flow_execution_service.py
++++ b/s19_app/tui/services/flow_execution_service.py
+@@ -2096,6 +2096,8 @@
+         for spec in chains:
+             record.outcomes.append(_run_one(spec))
+ 
++    if mode == CHAIN_RUN_CONFIRM_RERUN:
++        return record
+     try:
+         record.report_path = write_chain_set_report(record, set_name, ctx.project_dir)
+     except Exception as exc:  # noqa: BLE001 - degrade, never lose the run
+
+--- s19_app.__file__ (from inside the copy) ---
+<HOME>/work/s19_i9mut_m3/s19_app/__init__.py
+
+--- pytest ---
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+____________ test_r_flow_chain_19_1_confirm_writes_one_lane_report _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-368/test_r_flow_chain_19_1_confirm0')
+
+    def test_r_flow_chain_19_1_confirm_writes_one_lane_report(tmp_path: Path) -> None:
+        """R-FLOW-CHAIN.19 (case /1): after a parallel Run of three lanes, Confirm
+        on the waiting lane 1 writes exactly one new chain-set report of that lane
+        alone: ``- **Chains:** 1`` and one Chain ledger row, ``flash_chain``.
+    
+        Standing guard on base (the re-run already reports its one lane); it fails
+        if the re-run ever reports the whole set or none.
+        """
+    
+        async def body(app, pilot, project_dir, log):
+            panel = await import_lanes(app, pilot, *SET_P)
+            await _set_mode_parallel(app, pilot, panel)
+            return await _run_set_then_confirm(app, pilot, project_dir, panel)
+    
+>       _, new = _drive(tmp_path, body)
+                 ^^^^^^^^^^^^^^^^^^^^^^
+
+../s19_i9mut/tests/test_b101_flow_names_ui.py:297: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i9mut/tests/test_b101_flow_names_ui.py:77: in _drive
+    return asyncio.run(_run())
+           ^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i9mut/tests/test_b101_flow_names_ui.py:75: in _run
+    return await body(app, pilot, project_dir, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i9mut/tests/test_b101_flow_names_ui.py:295: in body
+    return await _run_set_then_confirm(app, pilot, project_dir, panel)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i9mut/tests/test_b101_flow_names_ui.py:265: in _run_set_then_confirm
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function _run_set_then_confirm.<locals>.<lambda> at 0x7f1b3b23b600>
+failure = 'did not settle: the confirm re-run wrote its report and Run is enabled again'
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: did not settle: the confirm re-run wrote its report and Run is enabled again
+
+tests/support/timing.py:66: AssertionError
+______________ test_r_flow_chain_20_1_parallel_confirm_mode_line _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-368/test_r_flow_chain_20_1_paralle0')
+
+    def test_r_flow_chain_20_1_parallel_confirm_mode_line(tmp_path: Path) -> None:
+        """R-FLOW-CHAIN.20 (case /1): after a parallel Run, the confirm re-run's
+        report holds the line ``- **Mode:** confirm re-run`` and no line
+        ``- **Mode:** sequential``; the Run's report holds ``- **Mode:** parallel``.
+    
+        RED on base: the re-run's report reads ``- **Mode:** sequential``.
+        """
+    
+        async def body(app, pilot, project_dir, log):
+            panel = await import_lanes(app, pilot, *SET_P)
+            await _set_mode_parallel(app, pilot, panel)
+            return await _run_set_then_confirm(app, pilot, project_dir, panel)
+    
+>       run_text, new = _drive(tmp_path, body)
+                        ^^^^^^^^^^^^^^^^^^^^^^
+
+../s19_i9mut/tests/test_b101_flow_names_ui.py:316: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i9mut/tests/test_b101_flow_names_ui.py:77: in _drive
+    return asyncio.run(_run())
+           ^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i9mut/tests/test_b101_flow_names_ui.py:75: in _run
+    return await body(app, pilot, project_dir, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i9mut/tests/test_b101_flow_names_ui.py:314: in body
+    return await _run_set_then_confirm(app, pilot, project_dir, panel)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i9mut/tests/test_b101_flow_names_ui.py:265: in _run_set_then_confirm
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function _run_set_then_confirm.<locals>.<lambda> at 0x7f1b3b016660>
+failure = 'did not settle: the confirm re-run wrote its report and Run is enabled again'
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: did not settle: the confirm re-run wrote its report and Run is enabled again
+
+tests/support/timing.py:66: AssertionError
+_____________ test_r_flow_chain_20_2_sequential_confirm_mode_line ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-368/test_r_flow_chain_20_2_sequent0')
+
+    def test_r_flow_chain_20_2_sequential_confirm_mode_line(tmp_path: Path) -> None:
+        """R-FLOW-CHAIN.20 (case /2): after a sequential Run, the Run's report
+        holds ``- **Mode:** sequential`` and the confirm re-run's report holds
+        ``- **Mode:** confirm re-run``.
+    
+        RED on base: both reports read ``- **Mode:** sequential``.
+        """
+    
+        async def body(app, pilot, project_dir, log):
+            panel = await import_lanes(app, pilot, *SET_S)
+            assert panel.query_one("#fx_mode").mode == "sequential"
+            return await _run_set_then_confirm(app, pilot, project_dir, panel)
+    
+>       run_text, new = _drive(tmp_path, body)
+                        ^^^^^^^^^^^^^^^^^^^^^^
+
+../s19_i9mut/tests/test_b101_flow_names_ui.py:337: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i9mut/tests/test_b101_flow_names_ui.py:77: in _drive
+    return asyncio.run(_run())
+           ^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i9mut/tests/test_b101_flow_names_ui.py:75: in _run
+    return await body(app, pilot, project_dir, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i9mut/tests/test_b101_flow_names_ui.py:335: in body
+    return await _run_set_then_confirm(app, pilot, project_dir, panel)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i9mut/tests/test_b101_flow_names_ui.py:265: in _run_set_then_confirm
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function _run_set_then_confirm.<locals>.<lambda> at 0x7f1b3a39dee0>
+failure = 'did not settle: the confirm re-run wrote its report and Run is enabled again'
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: did not settle: the confirm re-run wrote its report and Run is enabled again
+
+tests/support/timing.py:66: AssertionError
+________________ test_at_i9_1_confirm_report_says_confirm_rerun ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-368/test_at_i9_1_confirm_report_sa0')
+
+    def test_at_i9_1_confirm_report_says_confirm_rerun(tmp_path: Path) -> None:
+        """AT-I9-1 (US-I9-1, rows R-FLOW-CHAIN.19 and .20, black-box, keys only):
+        three lanes imported through Import... and the picker, the mode switch on
+        ``parallel`` by ``enter``, Run by ``enter`` with the focus on it, Evidence
+        written, the dwell waited, ``c``: ``reports/`` holds two new chain-set
+        reports - one ``- **Mode:** parallel`` with ``- **Chains:** 3``, one
+        ``- **Mode:** confirm re-run`` with ``- **Chains:** 1`` and the ledger row
+        ``flash_chain`` - and none says ``- **Mode:** sequential``.
+    
+        RED on base: the second report reads ``- **Mode:** sequential``.
+        """
+    
+        async def body(app, pilot, project_dir, log):
+            panel = await open_flow_execution(app, pilot)
+            for stem in SET_P:
+                await _import_by_keys(app, pilot, panel, stem)
+            await _set_mode_parallel(app, pilot, panel)
+            before = _chain_set_reports(project_dir)
+            await run_lanes(app, pilot, panel, key=True)
+            run_reports = [p for p in _chain_set_reports(project_dir) if p not in before]
+            assert len(run_reports) == 1, run_reports
+            flash_evidence(project_dir)
+            await _dwell(pilot, panel)
+            await pilot.press("c")
+            await settled(
+                pilot,
+                lambda: len(_chain_set_reports(project_dir)) == len(before) + 2
+                and "re-run" in panel.run_log_plain()
+                and not panel.query_one("#fx_run").disabled,
+                "the confirm re-run wrote its report and Run is enabled again",
+            )
+            await settle(pilot, 2)
+            return [p.read_text(encoding="utf-8") for p in _chain_set_reports(project_dir) if p not in before]
+    
+>       texts = _drive(tmp_path, body)
+                ^^^^^^^^^^^^^^^^^^^^^^
+
+../s19_i9mut/tests/test_b101_flow_names_ui.py:518: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../s19_i9mut/tests/test_b101_flow_names_ui.py:77: in _drive
+    return asyncio.run(_run())
+           ^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+../s19_i9mut/tests/test_b101_flow_names_ui.py:75: in _run
+    return await body(app, pilot, project_dir, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../s19_i9mut/tests/test_b101_flow_names_ui.py:508: in body
+    await settled(
+tests/b97_probes.py:326: in settled
+    await wait_until(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+predicate = <function test_at_i9_1_confirm_report_says_confirm_rerun.<locals>.body.<locals>.<lambda> at 0x7f1b394674c0>
+failure = 'did not settle: the confirm re-run wrote its report and Run is enabled again'
+
+    async def wait_until(
+        pilot,
+        predicate: Callable[[], bool],
+        failure: Union[str, Callable[[], str]],
+        *,
+        timeout: float = WAIT_TIMEOUT_S,
+        pause_first: bool = False,
+    ) -> None:
+        """Poll ``predicate`` until it is truthy, yielding to the app between
+        checks; raise ``AssertionError`` with ``failure`` at the deadline.
+    
+        A callable ``failure`` is called only when this raises, so its text can
+        show state accumulated up to the timeout.
+        """
+        deadline = time.monotonic() + timeout
+        if pause_first:
+            await pilot.pause()
+        while True:
+            if predicate():
+                return
+            if time.monotonic() > deadline:
+>               raise AssertionError(failure() if callable(failure) else failure)
+E               AssertionError: did not settle: the confirm re-run wrote its report and Run is enabled again
+
+tests/support/timing.py:66: AssertionError
+______________ test_tc_b97_55_confirm_rerun_is_one_run_at_a_time _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-368/test_tc_b97_55_confirm_rerun_i0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f1b3bb361d0>
+
+    def test_tc_b97_55_confirm_rerun_is_one_run_at_a_time(tmp_path: Path, monkeypatch) -> None:
+        """TC-B97-55 (LLR-147.10 confirm arm, LED-…97.29): during the confirm
+        re-run of ``flash_chain``, one more press of ``#fx_confirm_1`` and one of
+        ``#fx_run`` → 1 ``ExternalStepConfirmed``, 1 ``run_chain_set`` call, 1 new
+        report; ``#fx_run`` and the Confirm are disabled inside the re-run; after
+        it Run is enabled and the Confirm hidden (the lane finished).
+    
+        Why: a second Confirm queued during its own re-run would confirm the
+        lane's NEXT waiting entry with no human. RED on main: 2 confirms.
+        Mutation: the Confirm left enabled during the re-run.
+        """
+        holder = {"armed": False}
+    
+        def during():
+            if not holder["armed"]:
+                return
+            panel = holder["panel"]
+            holder["inside"] = (panel.query_one("#fx_run").disabled, panel.query_one("#fx_confirm_1").disabled)
+            panel.query_one("#fx_confirm_1").press()
+            panel.query_one("#fx_run").press()
+    
+        spy = RunSpy(monkeypatch, during=during)
+        confirms = ConfirmSpy(monkeypatch)
+    
+        async def body(app, pilot, panel, project_dir):
+            holder["panel"] = panel
+            calls_before = len(spy.calls)
+            before = reports_of(project_dir)
+            holder["armed"] = True
+            panel.query_one("#fx_confirm_1").press()
+            await poll(pilot, lambda: len(spy.calls) > calls_before and not panel.query_one("#fx_run").disabled, 200)
+            await settle(pilot, 10)
+            new = [p for p in reports_of(project_dir) if p not in before]
+            return (
+                len(confirms.posts), len(spy.calls) - calls_before, len(new), holder.get("inside"),
+                panel.query_one("#fx_run").disabled, panel.query_one("#fx_confirm_1").display,
+            )
+    
+        posts, calls, new, inside, run_disabled, confirm_shown = run_fx(
+            tmp_path, (118, 54), body, stems=THREE, run=True, evidence=True
+        )
+        assert posts == 1 and calls == 1, (posts, calls)
+>       assert new == 1, new
+E       AssertionError: 0
+E       assert 0 == 1
+
+../s19_i9mut/tests/test_b97_flow_execution.py:1238: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b101_flow_names_ui.py::test_r_flow_chain_19_1_confirm_writes_one_lane_report
+FAILED tests/test_b101_flow_names_ui.py::test_r_flow_chain_20_1_parallel_confirm_mode_line
+FAILED tests/test_b101_flow_names_ui.py::test_r_flow_chain_20_2_sequential_confirm_mode_line
+FAILED tests/test_b101_flow_names_ui.py::test_at_i9_1_confirm_report_says_confirm_rerun
+FAILED tests/test_b97_flow_execution.py::test_tc_b97_55_confirm_rerun_is_one_run_at_a_time
+5 failed in 279.58s (0:04:39)
+

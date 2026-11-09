@@ -73,7 +73,7 @@ Totals (counted by script, one per id; a row with several ids counts each): 317 
 |---|---|---|---|
 | D3-4 | Remove unreachable codes and the xfail `CROSS_S19_HEX_OVERLAP` test | — | open |
 | D3-5 | Remove `alias_policy`; bit-field sharing is INFO | R-VAL-022 … 024 | open |
-| D3-7 | Remove the dead jump-to-source code and `_format_validation_issue_line` | — | open |
+| D3-7 | Remove the dead jump-to-source code and `_format_validation_issue_line` | — | done (batch-101 Inc 12) |
 | D3-8 | Remove the unused issue page-size setting and capped branch | — | open |
 | D3-9 | "Only in A2L / MAC" warnings only when the other file is loaded | R-VAL-045, 046 | open |
 | D3-10 | A2L structure checks in every session with an A2L | R-VAL-030 … 033 | open |
@@ -157,7 +157,7 @@ Totals (counted by script, one per id; a row with several ids counts each): 317 
 | D6-46 | Typed file load: paint step 1 `Copy into the work area` before the copy on the screen's thread (`load_from_path`, `app.py:15117-15124`), with the `call_after_refresh` idiom of the A2L tag-table build and the project install; read from the code, reproduce first | R-PROGRESS-LINE.5 | open |
 |---|---|---|---|
 | D6-11 | Remove the rail's ASCII glyph fallback (`ascii_mode`) and its test | — | open |
-| D6-12 | Remove `action_view_main`, `action_view_mac`; reuse or remove `_toggle_settings_menu` | — | open |
+| D6-12 | Remove `action_view_main`, `action_view_mac`; reuse or remove `_toggle_settings_menu` | — | partly done (batch-101 Inc 12): action_view_main, action_view_mac (and action_view_alt) removed; _toggle_settings_menu still open |
 | D6-13 | Switch off Textual's own palette (Ctrl+P: Theme, Keys, Quit, Screenshot); drop `^p palette` from key-bar row 1 | R-TUI-022.11, R-TUI-024.3, R-KEYBAR.2 | open |
 | D6-20 | Hex+ key bound as `period`, which a keyboard never sends (`full_stop`); rebind, test by character; reproduce first | R-SHELL-KEYS.1 | open (re-verified at 570b4b5) |
 | D6-21 | A window switch by key moves the focus to the new window's focus target | R-SHELL-FOCUS.2 | open |
@@ -178,9 +178,9 @@ Totals (counted by script, one per id; a row with several ids counts each): 317 
 | D7-33 | Ignore every load request after Escape in the Load dialog (an Alt+L queued behind Escape loads; batch-100 risk A9b-R2-5); reproduce first | R-LOADDLG.59 | open |
 | D7-35 | Show the open project's last load result (load reason and problem rows) in the Load dialog's preview of its row (batch-100 LLR-178.3, last sentence; the summary line's `details: p` points there; stored at `app.py:13708`, read by nothing) | R-LOADDLG.83 | open |
 |---|---|---|---|
-| D7-10 | Remove `VariantHelpScreen`, its text and its test (opener gone since batch 94) | — | open (re-verified at 570b4b5) |
+| D7-10 | Remove `VariantHelpScreen`, its text and its test (opener gone since batch 94) | — | done (batch-101 Inc 12) |
 | D7-11 | Show the `Changes file notation` steps in the Patch Editor's help window | R-WHELP.15 | open |
-| D7-20 | Escape does what Cancel / Close does on every dialog (11 of 16 lack it) | R-DLG.2 | partly done: Escape added on the Load dialog (Inc 9b, 12d0f81), Save project (Inc 11, 53d08d5), the load question (Inc 10, 4eef8a3), the quit question (Inc 12b, dabcd41) and the Load-result panel (Inc 6, 948e65c); still missing on Select variant, Save flow, Load flow, Discard unsaved flow edits?, Edit entry JSON, the CRC write confirmation, Operations and Reports (8 of 18 dialogs) |
+| D7-20 | Escape does what Cancel / Close does on every dialog (11 of 16 lack it) | R-DLG.2 | partly done: Escape added on the Load dialog (Inc 9b, 12d0f81), Save project (Inc 11, 53d08d5), the load question (Inc 10, 4eef8a3), the quit question (Inc 12b, dabcd41), the Load-result panel (Inc 6, 948e65c) and Reports (Inc 12); still missing on Select variant, Save flow, Load flow, Discard unsaved flow edits?, Edit entry JSON, the CRC write confirmation and Operations (7 of 18 dialogs) |
 | D7-21 | Enter in a confirm box, or on a dialog list item, presses the confirm button | R-DLG.3, R-DLG.4 | partly done: the Load dialog (Inc 9b, 12d0f81) and Save project (Inc 11, 53d08d5) handle Enter; Enter in the Save flow name box, and on a Select variant or Load flow list item, still does nothing |
 | D7-22 | Confirmation dialogs open on Cancel (`Discard unsaved flow edits?`, CRC write confirmation) | R-DLG.6 | open (re-verified at 570b4b5) |
 | D7-23 | Ctrl+K / Ctrl+D / Ctrl+L / Ctrl+S do not act behind an open dialog; reproduce first | R-DLG.1 | partly done: inert while the Load dialog, Save project or a question is on the screen stack (Inc 9b 12d0f81, Inc 10 4eef8a3, Inc 11 53d08d5); still act behind the other 14 dialogs (reproduce first) |
@@ -220,7 +220,7 @@ Totals (counted by script, one per id; a row with several ids counts each): 317 
 | Id | Change | Rows | Status |
 |---|---|---|---|
 | D9-7 | Remove `run_checks_for_project` and its test-only caller (the headless project-run test) | — | done (batch-101 Inc 4) |
-| D9-8 | Remove the hidden `#check_preview_toggle_button` and its handler | — | open |
+| D9-8 | Remove the hidden `#check_preview_toggle_button` and its handler | — | done (batch-101 Inc 12) |
 | D9-10 | One "current run" rule: the Checks tab (rows, status, strip, subtitle) and the Checks screen show the no-run state when the document or the image differs from the run's (the stamp the ledger glyphs already use); a 0-entry run shows `0 checked` | R-CHK-PE-008 … 012, R-CHKS-001, R-CHKS-004, R-CHKS-009 | open |
 | D9-11 | Check Editor: a field loaded from a spec keeps the spec's expected bytes; only new fields take the image's bytes (Write and Validate) | R-CHKED-025, R-CHKED-026 | open |
 | D9-12 | Check Editor: keep the included parameters the new A2L list still holds on screen entry and after Write | R-CHKED-010 | open |
@@ -364,7 +364,7 @@ Totals (counted by script, one per id; a row with several ids counts each): 317 
 
 | Id | Change | Rows | Status |
 |---|---|---|---|
-| D16-6 | Remove the hidden `#flow_help`, `#flow_canvas`, `#flow_blocks`, `#flow_ext_session`, `#fx_help` and their painters (`_canvas_text`, `_blocks_text`, `_flow_block_label`) | — | open |
+| D16-6 | Remove the hidden `#flow_help`, `#flow_canvas`, `#flow_blocks`, `#flow_ext_session`, `#fx_help` and their painters (`_canvas_text`, `_blocks_text`, `_flow_block_label`) | — | done (batch-101 Inc 12b) |
 | D16-10 | Builder: check each Add and + Add var with the flow loader's rules (refs, output names, funnel limits, block cap), as Paste does | R-FB-ADD.11, R-FB-VAR.6 | open |
 | D16-11 | Builder: declare Intel HEX for LOAD / WRITE-OUT names ending in `.hex` / `.ihex` | R-FB-ADD.12 | open |
 | D16-12 | Builder: refuse Run on an empty chain (`No blocks to run — add a block first.`) | R-FB-RUN.1 | open |

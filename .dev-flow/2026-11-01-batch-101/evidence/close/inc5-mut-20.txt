@@ -1,0 +1,418 @@
+# Mutant M20 — batch-end re-run on the final tree (b982846)
+BASE_COMMIT=b982846ce33ccc20b1774f91b1091af4b42dff73
+BASE_TREE=detached worktree at 7d641d9 + git diff --binary 7d641d9 b982846 -- s19_app tests docs README.md AT-TC-REGISTRY.jsonl applied
+s19_app.__file__=<HOME>/work/s19_i5rm_m20/s19_app/__init__.py
+mutation: R-CHKED-026 expected bytes re-read from the image (base)
+mutation diff:
+diff --git a<HOME>/work/s19_i5rm/s19_app/tui/app.py b<HOME>/work/s19_i5rm_m20/s19_app/tui/app.py
+index 18795c7..679f5fd 100644
+--- a<HOME>/work/s19_i5rm/s19_app/tui/app.py
++++ b<HOME>/work/s19_i5rm_m20/s19_app/tui/app.py
+@@ -7773,15 +7773,6 @@ class S19TuiApp(App):
+             if not isinstance(address, int) or address < 0 or size <= 0:
+                 skipped += 1
+                 continue
+-            spec_expected = item.get("expected")
+-            if isinstance(spec_expected, tuple) and len(spec_expected) == size:
+-                # A field loaded from a spec declares the spec's bytes at its
+-                # own entry's range; the image is not read (amended "declared
+-                # field", Inc 5 D9-11 / R-CHKED-026).
+-                entries.append(
+-                    ChangeEntry("bytes", address, spec_expected, value=None)
+-                )
+-                continue
+             expected: list[int] = []
+             if mem_map is not None:
+                 for offset in range(size):
+verify:
+grep s19_app/tui/app.py: replaced -> 'expected: list[int] = []' FOUND
+guard nodes (5):
+  tests/test_b101_check_spec_keep.py::test_r_chked_026_1_write_keeps_spec_bytes
+  tests/test_b101_check_spec_keep.py::test_r_chked_026_2_validate_reports_the_drift
+  tests/test_b101_check_spec_keep.py::test_r_chked_026_3_memory_row_keeps_spec_bytes
+  tests/test_b101_check_spec_keep.py::test_r_chked_026_4_spec_bytes_survive_same_range_reload
+  tests/test_b101_check_spec_keep.py::test_r_chked_027_2_loaded_fields_kept_without_image
+
+--- pytest ---
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+__________________ test_r_chked_026_1_write_keeps_spec_bytes ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_1_write_keeps0')
+facts = Facts(case=PosixPath('/tmp/pytest-of-<user>/pytest-539/b101_inc5_case080'), image={0: 108, 1: 49, 2: 57, 3: 84, 4: 79...ram(name='VALUE_0002', address=20, size=2), v3=Param(name='VALUE_0003', address=40, size=4), serial=12587004, moved=32)
+
+    def test_r_chked_026_1_write_keeps_spec_bytes(tmp_path: Path, facts: Facts) -> None:
+        """Case R-CHKED-026/1 (D9-11): case 08 and its A2L loaded; a Patch Editor
+        apply set ``0x0`` to ``93``; the pilot spec picked; Write as
+        ``rewritten.chk.json`` -> entries ``0x0`` ``6C``, ``0x14`` ``A0 BE``,
+        ``0xC00FFC`` ``FF FF FF FF`` (the spec's bytes, not the image's).
+    
+        Negative control: the expected bytes re-read from the image (the base) ->
+        ``0x0`` ``93`` -> RED."""
+    
+        async def scenario(app, pilot, log):
+            await patched_pick(pilot, app, log, facts, tmp_path, facts.v1.address, bytes([PATCH_BYTE]))
+            _lines, entries = await write_spec(pilot, app, log, "rewritten.chk.json")
+            return entries
+    
+        entries = run(tmp_path, scenario)
+>       assert entries == pilot_entries(facts), entries
+E       AssertionError: [(0, b'\x93'), (20, b'\xa0\xbe'), (12587004, b'\xff\xff\xff\xff')]
+E       assert [(0, b'\x93')...xff\xff\xff')] == [(0, b'l'), (...xff\xff\xff')]
+E         
+E         At index 0 diff: (0, b'\x93') != (0, b'l')
+E         Use -v to get more diff
+
+tests/test_b101_check_spec_keep.py:1080: AssertionError
+________________ test_r_chked_026_2_validate_reports_the_drift _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_2_validate_re0')
+facts = Facts(case=PosixPath('/tmp/pytest-of-<user>/pytest-539/b101_inc5_case080'), image={0: 108, 1: 49, 2: 57, 3: 84, 4: 79...ram(name='VALUE_0002', address=20, size=2), v3=Param(name='VALUE_0003', address=40, size=4), serial=12587004, moved=32)
+
+    def test_r_chked_026_2_validate_reports_the_drift(tmp_path: Path, facts: Facts) -> None:
+        """Case R-CHKED-026/2: as /1; Validate pressed -> status ``Checks: 2
+        passed, 1 failed, 0 uncheckable`` and the result row ``0x0-0x0 expected
+        [6C] actual [93] -> fail``.
+    
+        Negative control: the expected bytes re-read from the image (the base) ->
+        ``Checks: 3 passed, 0 failed, 0 uncheckable`` -> RED."""
+        original = facts.image[facts.v1.address]
+    
+        async def scenario(app, pilot, log):
+            await patched_pick(pilot, app, log, facts, tmp_path, facts.v1.address, bytes([PATCH_BYTE]))
+            return await validate(pilot, app, log)
+    
+        lines, rows = run(tmp_path, scenario)
+>       assert "Checks: 2 passed, 1 failed, 0 uncheckable" in lines, lines
+E       AssertionError: ['Checks: 3 passed, 0 failed, 0 uncheckable']
+E       assert 'Checks: 2 passed, 1 failed, 0 uncheckable' in ['Checks: 3 passed, 0 failed, 0 uncheckable']
+
+tests/test_b101_check_spec_keep.py:1097: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3015 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_2_validate_re0/app workarea=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_2_validate_re0/app/.s19tool/workarea
+INFO     s19tui:app.py:8821 Workarea refreshed. files=0
+INFO     s19tui:app.py:17345 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:8830 Load file action triggered.
+INFO     s19tui:app.py:16271 Load phase boundary: modal_dismiss_scheduled kind=path value='/tmp/pytest-of-<user>/pytest-539/b101_inc5_case080/firmware.s19'
+INFO     s19tui:app.py:16316 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<user>/pytest-539/b101_inc5_case080/firmware.s19
+INFO     s19tui:app.py:16337 Load phase boundary: copy_started path=/tmp/pytest-of-<user>/pytest-539/b101_inc5_case080/firmware.s19
+INFO     s19tui:app.py:16350 Load phase boundary: copy_done path=firmware.s19 elapsed=0.005s
+WARNING  s19tui:app.py:16369 Recent sources not updated: '/tmp/pytest-of-<user>/pytest-539/b101_inc5_case080/firmware.s19'
+INFO     s19tui:app.py:8821 Workarea refreshed. files=1
+INFO     s19tui:app.py:16387 File copied to temp: path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_2_validate_re0/app/.s19tool/workarea/temp/firmware.s19 size_bytes=1048633 copy_seconds=0.005
+INFO     s19tui:app.py:16393 Load phase boundary: worker_spawned path=firmware.s19
+INFO     s19tui:app.py:19492 Load phase boundary: worker_parse_start path=firmware.s19
+INFO     s19tui:app.py:18601 Loading file: path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_2_validate_re0/app/.s19tool/workarea/temp/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14976 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:19708 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_2_validate_re0/app/.s19tool/workarea/temp/firmware.s19 addresses=424736 range_count=4 range_bytes=424736 errors=0
+INFO     s19tui:app.py:14993 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:19511 Load phase boundary: worker_parse_done path=firmware.s19 elapsed=0.635s
+INFO     s19tui:app.py:19335 Load phase boundary: prepare_entry path=firmware.s19 file_type=s19
+INFO     s19tui:app.py:19370 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:18454 MAC validation computed: records=0 issues=0 elapsed_seconds=0.941
+INFO     s19tui:app.py:19379 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:19399 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:19406 Load phase boundary: prepare_bases_done row_bases=26546
+INFO     s19tui:app.py:19416 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:19422 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:19544 Load phase boundary: worker_compute_done path=firmware.s19 precomputed=True elapsed=0.943s
+INFO     s19tui:app.py:19551 Load phase boundary: call_from_thread_apply_dispatched path=firmware.s19
+INFO     s19tui:app.py:19153 Load phase boundary: apply_install_state path=firmware.s19 precomputed=True
+INFO     s19tui:app.py:19836 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19174 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:19188 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:20931 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.000
+INFO     s19tui:app.py:17345 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:20445 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.011
+INFO     s19tui:app.py:19203 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:20063 Memory Map updated. ranges=4
+INFO     s19tui:app.py:19226 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_2_validate_re0/app/.s19tool/workarea/temp/firmware.s19 file_type=s19 elapsed_seconds=2.152 has_mac=False precomputed=True
+INFO     s19tui:app.py:8830 Load file action triggered.
+INFO     s19tui:app.py:16271 Load phase boundary: modal_dismiss_scheduled kind=path value='/tmp/pytest-of-<user>/pytest-539/b101_inc5_case080/firmware.a2l'
+INFO     s19tui:app.py:16500 A2L copy complete: path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_2_validate_re0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347 copy_seconds=0.001
+INFO     s19tui:app.py:951 A2L cache miss: path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_2_validate_re0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347
+WARNING  s19tui:app.py:16538 Recent sources not updated: '/tmp/pytest-of-<user>/pytest-539/b101_inc5_case080/firmware.a2l'
+INFO     s19tui:app.py:8821 Workarea refreshed. files=2
+INFO     s19tui:app.py:19655 A2L parse summary: path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_2_validate_re0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.019 sections=1 tags=462 errors=0
+INFO     s19tui:app.py:18454 MAC validation computed: records=0 issues=462 elapsed_seconds=0.673
+INFO     s19tui:app.py:18509 MAC row cache built: records=0 elapsed_seconds=0.673
+INFO     s19tui:app.py:17377 Load phase boundary: populate_issues_table_done rows=40 total=462 elapsed=0.038
+INFO     s19tui:app.py:20445 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.713
+INFO     s19tui:app.py:20972 Load phase boundary: populate_a2l_table_done rows=200 total=462 elapsed=0.013
+INFO     s19tui:app.py:16557 A2L view refresh complete: path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_2_validate_re0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.735
+INFO     s19tui:app.py:16566 A2L loaded: /tmp/pytest-of-<user>/pytest-539/test_r_chked_026_2_validate_re0/app/.s19tool/workarea/temp/firmware.a2l
+________________ test_r_chked_026_3_memory_row_keeps_spec_bytes ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_3_memory_row_0')
+facts = Facts(case=PosixPath('/tmp/pytest-of-<user>/pytest-539/b101_inc5_case080'), image={0: 108, 1: 49, 2: 57, 3: 84, 4: 79...ram(name='VALUE_0002', address=20, size=2), v3=Param(name='VALUE_0003', address=40, size=4), serial=12587004, moved=32)
+
+    def test_r_chked_026_3_memory_row_keeps_spec_bytes(tmp_path: Path, facts: Facts) -> None:
+        """Case R-CHKED-026/3: case 08 and its A2L loaded; a Patch Editor apply set
+        the image bytes at ``0xC00FFC``-``0xC00FFF`` to ``00 00 00 00``; the pilot
+        spec picked; Write as ``mem.chk.json`` -> entry ``0xC00FFC`` ``FF FF FF
+        FF``.
+    
+        Negative control: the memory row's bytes re-read from the image (the base)
+        -> ``00 00 00 00`` -> RED."""
+    
+        async def scenario(app, pilot, log):
+            await patched_pick(pilot, app, log, facts, tmp_path, facts.serial, bytes(4))
+            _lines, entries = await write_spec(pilot, app, log, "mem.chk.json")
+            return entries
+    
+        entries = run(tmp_path, scenario)
+        assert facts.image_bytes(facts.serial, 4) != bytes(4), "the spec's bytes must differ from the patch"
+>       assert [e for e in entries if e[0] == facts.serial] == [
+            (facts.serial, facts.image_bytes(facts.serial, 4))
+        ], entries
+E       AssertionError: [(0, b'l'), (20, b'\xa0\xbe'), (12587004, b'\x00\x00\x00\x00')]
+E       assert [(12587004, b...x00\x00\x00')] == [(12587004, b...xff\xff\xff')]
+E         
+E         At index 0 diff: (12587004, b'\x00\x00\x00\x00') != (12587004, b'\xff\xff\xff\xff')
+E         Use -v to get more diff
+
+tests/test_b101_check_spec_keep.py:1121: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3015 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_3_memory_row_0/app workarea=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_3_memory_row_0/app/.s19tool/workarea
+INFO     s19tui:app.py:8821 Workarea refreshed. files=0
+INFO     s19tui:app.py:17345 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:8830 Load file action triggered.
+INFO     s19tui:app.py:16271 Load phase boundary: modal_dismiss_scheduled kind=path value='/tmp/pytest-of-<user>/pytest-539/b101_inc5_case080/firmware.s19'
+INFO     s19tui:app.py:16316 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<user>/pytest-539/b101_inc5_case080/firmware.s19
+INFO     s19tui:app.py:16337 Load phase boundary: copy_started path=/tmp/pytest-of-<user>/pytest-539/b101_inc5_case080/firmware.s19
+INFO     s19tui:app.py:16350 Load phase boundary: copy_done path=firmware.s19 elapsed=0.005s
+WARNING  s19tui:app.py:16369 Recent sources not updated: '/tmp/pytest-of-<user>/pytest-539/b101_inc5_case080/firmware.s19'
+INFO     s19tui:app.py:8821 Workarea refreshed. files=1
+INFO     s19tui:app.py:16387 File copied to temp: path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_3_memory_row_0/app/.s19tool/workarea/temp/firmware.s19 size_bytes=1048633 copy_seconds=0.005
+INFO     s19tui:app.py:16393 Load phase boundary: worker_spawned path=firmware.s19
+INFO     s19tui:app.py:19492 Load phase boundary: worker_parse_start path=firmware.s19
+INFO     s19tui:app.py:18601 Loading file: path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_3_memory_row_0/app/.s19tool/workarea/temp/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14976 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:19708 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_3_memory_row_0/app/.s19tool/workarea/temp/firmware.s19 addresses=424736 range_count=4 range_bytes=424736 errors=0
+INFO     s19tui:app.py:14993 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:19511 Load phase boundary: worker_parse_done path=firmware.s19 elapsed=0.500s
+INFO     s19tui:app.py:19335 Load phase boundary: prepare_entry path=firmware.s19 file_type=s19
+INFO     s19tui:app.py:19370 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:18454 MAC validation computed: records=0 issues=0 elapsed_seconds=0.873
+INFO     s19tui:app.py:19379 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:19399 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:19406 Load phase boundary: prepare_bases_done row_bases=26546
+INFO     s19tui:app.py:19416 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:19422 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:19544 Load phase boundary: worker_compute_done path=firmware.s19 precomputed=True elapsed=0.877s
+INFO     s19tui:app.py:19551 Load phase boundary: call_from_thread_apply_dispatched path=firmware.s19
+INFO     s19tui:app.py:19153 Load phase boundary: apply_install_state path=firmware.s19 precomputed=True
+INFO     s19tui:app.py:19836 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19174 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:19188 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:20931 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17345 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:20445 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.011
+INFO     s19tui:app.py:19203 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:20063 Memory Map updated. ranges=4
+INFO     s19tui:app.py:19226 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_3_memory_row_0/app/.s19tool/workarea/temp/firmware.s19 file_type=s19 elapsed_seconds=2.133 has_mac=False precomputed=True
+INFO     s19tui:app.py:8830 Load file action triggered.
+INFO     s19tui:app.py:16271 Load phase boundary: modal_dismiss_scheduled kind=path value='/tmp/pytest-of-<user>/pytest-539/b101_inc5_case080/firmware.a2l'
+INFO     s19tui:app.py:16500 A2L copy complete: path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_3_memory_row_0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347 copy_seconds=0.002
+INFO     s19tui:app.py:951 A2L cache miss: path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_3_memory_row_0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347
+WARNING  s19tui:app.py:16538 Recent sources not updated: '/tmp/pytest-of-<user>/pytest-539/b101_inc5_case080/firmware.a2l'
+INFO     s19tui:app.py:8821 Workarea refreshed. files=2
+INFO     s19tui:app.py:19655 A2L parse summary: path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_3_memory_row_0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.021 sections=1 tags=462 errors=0
+INFO     s19tui:app.py:18454 MAC validation computed: records=0 issues=462 elapsed_seconds=0.942
+INFO     s19tui:app.py:18509 MAC row cache built: records=0 elapsed_seconds=0.942
+INFO     s19tui:app.py:17377 Load phase boundary: populate_issues_table_done rows=40 total=462 elapsed=0.039
+INFO     s19tui:app.py:20445 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.982
+INFO     s19tui:app.py:20972 Load phase boundary: populate_a2l_table_done rows=200 total=462 elapsed=0.013
+INFO     s19tui:app.py:16557 A2L view refresh complete: path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_3_memory_row_0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=1.006
+INFO     s19tui:app.py:16566 A2L loaded: /tmp/pytest-of-<user>/pytest-539/test_r_chked_026_3_memory_row_0/app/.s19tool/workarea/temp/firmware.a2l
+___________ test_r_chked_026_4_spec_bytes_survive_same_range_reload ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_4_spec_bytes_0')
+facts = Facts(case=PosixPath('/tmp/pytest-of-<user>/pytest-539/b101_inc5_case080'), image={0: 108, 1: 49, 2: 57, 3: 84, 4: 79...ram(name='VALUE_0002', address=20, size=2), v3=Param(name='VALUE_0003', address=40, size=4), serial=12587004, moved=32)
+
+    def test_r_chked_026_4_spec_bytes_survive_same_range_reload(
+        tmp_path: Path, facts: Facts
+    ) -> None:
+        """Case R-CHKED-026/4 (E3 SEC5-1: the key is name, address and size): as
+        /1 (``0x0`` set to ``93``, the pilot spec picked); key ``1``;
+        ``firmware.a2l`` loaded again through the Load dialog; key ``=``; Write as
+        ``reloaded.chk.json`` -> included ``[VALUE_0001, VALUE_0002]``; entries
+        ``0x0`` ``6C``, ``0x14`` ``A0 BE``, ``0xC00FFC`` ``FF FF FF FF``.
+    
+        Negative control: the spec's bytes dropped on every repopulation -> ``0x0``
+        ``93`` -> RED."""
+    
+        async def scenario(app, pilot, log):
+            await patched_pick(pilot, app, log, facts, tmp_path, facts.v1.address, bytes([PATCH_BYTE]))
+            await go_workspace(pilot, app)
+            await load_a2l_file(pilot, app, facts.case / "firmware.a2l")
+            await enter_check_editor(pilot, app)
+            picks = included(app)
+            _lines, entries = await write_spec(pilot, app, log, "reloaded.chk.json")
+            return picks, entries
+    
+        picks, entries = run(tmp_path, scenario)
+        assert picks == [facts.v1.name, facts.v2.name], picks
+>       assert entries == pilot_entries(facts), entries
+E       AssertionError: [(0, b'\x93'), (20, b'\xa0\xbe'), (12587004, b'\xff\xff\xff\xff')]
+E       assert [(0, b'\x93')...xff\xff\xff')] == [(0, b'l'), (...xff\xff\xff')]
+E         
+E         At index 0 diff: (0, b'\x93') != (0, b'l')
+E         Use -v to get more diff
+
+tests/test_b101_check_spec_keep.py:1149: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3015 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_4_spec_bytes_0/app workarea=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_4_spec_bytes_0/app/.s19tool/workarea
+INFO     s19tui:app.py:8821 Workarea refreshed. files=0
+INFO     s19tui:app.py:17345 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:8830 Load file action triggered.
+INFO     s19tui:app.py:16271 Load phase boundary: modal_dismiss_scheduled kind=path value='/tmp/pytest-of-<user>/pytest-539/b101_inc5_case080/firmware.s19'
+INFO     s19tui:app.py:16316 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<user>/pytest-539/b101_inc5_case080/firmware.s19
+INFO     s19tui:app.py:16337 Load phase boundary: copy_started path=/tmp/pytest-of-<user>/pytest-539/b101_inc5_case080/firmware.s19
+INFO     s19tui:app.py:16350 Load phase boundary: copy_done path=firmware.s19 elapsed=0.005s
+WARNING  s19tui:app.py:16369 Recent sources not updated: '/tmp/pytest-of-<user>/pytest-539/b101_inc5_case080/firmware.s19'
+INFO     s19tui:app.py:8821 Workarea refreshed. files=1
+INFO     s19tui:app.py:16387 File copied to temp: path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_4_spec_bytes_0/app/.s19tool/workarea/temp/firmware.s19 size_bytes=1048633 copy_seconds=0.005
+INFO     s19tui:app.py:16393 Load phase boundary: worker_spawned path=firmware.s19
+INFO     s19tui:app.py:19492 Load phase boundary: worker_parse_start path=firmware.s19
+INFO     s19tui:app.py:18601 Loading file: path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_4_spec_bytes_0/app/.s19tool/workarea/temp/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14976 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:19708 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_4_spec_bytes_0/app/.s19tool/workarea/temp/firmware.s19 addresses=424736 range_count=4 range_bytes=424736 errors=0
+INFO     s19tui:app.py:14993 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:19511 Load phase boundary: worker_parse_done path=firmware.s19 elapsed=0.500s
+INFO     s19tui:app.py:19335 Load phase boundary: prepare_entry path=firmware.s19 file_type=s19
+INFO     s19tui:app.py:19370 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:18454 MAC validation computed: records=0 issues=0 elapsed_seconds=1.005
+INFO     s19tui:app.py:19379 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:19399 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:19406 Load phase boundary: prepare_bases_done row_bases=26546
+INFO     s19tui:app.py:19416 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:19422 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:19544 Load phase boundary: worker_compute_done path=firmware.s19 precomputed=True elapsed=1.009s
+INFO     s19tui:app.py:19551 Load phase boundary: call_from_thread_apply_dispatched path=firmware.s19
+INFO     s19tui:app.py:19153 Load phase boundary: apply_install_state path=firmware.s19 precomputed=True
+INFO     s19tui:app.py:19836 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19174 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:19188 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:20931 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17345 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:20445 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.011
+INFO     s19tui:app.py:19203 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:20063 Memory Map updated. ranges=4
+INFO     s19tui:app.py:19226 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_4_spec_bytes_0/app/.s19tool/workarea/temp/firmware.s19 file_type=s19 elapsed_seconds=2.127 has_mac=False precomputed=True
+INFO     s19tui:app.py:8830 Load file action triggered.
+INFO     s19tui:app.py:16271 Load phase boundary: modal_dismiss_scheduled kind=path value='/tmp/pytest-of-<user>/pytest-539/b101_inc5_case080/firmware.a2l'
+INFO     s19tui:app.py:16500 A2L copy complete: path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_4_spec_bytes_0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347 copy_seconds=0.001
+INFO     s19tui:app.py:951 A2L cache miss: path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_4_spec_bytes_0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347
+WARNING  s19tui:app.py:16538 Recent sources not updated: '/tmp/pytest-of-<user>/pytest-539/b101_inc5_case080/firmware.a2l'
+INFO     s19tui:app.py:8821 Workarea refreshed. files=2
+INFO     s19tui:app.py:19655 A2L parse summary: path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_4_spec_bytes_0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.019 sections=1 tags=462 errors=0
+INFO     s19tui:app.py:18454 MAC validation computed: records=0 issues=462 elapsed_seconds=0.720
+INFO     s19tui:app.py:18509 MAC row cache built: records=0 elapsed_seconds=0.720
+INFO     s19tui:app.py:17377 Load phase boundary: populate_issues_table_done rows=40 total=462 elapsed=0.039
+INFO     s19tui:app.py:20445 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.761
+INFO     s19tui:app.py:20972 Load phase boundary: populate_a2l_table_done rows=200 total=462 elapsed=0.013
+INFO     s19tui:app.py:16557 A2L view refresh complete: path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_4_spec_bytes_0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.784
+INFO     s19tui:app.py:16566 A2L loaded: /tmp/pytest-of-<user>/pytest-539/test_r_chked_026_4_spec_bytes_0/app/.s19tool/workarea/temp/firmware.a2l
+INFO     s19tui:app.py:8830 Load file action triggered.
+INFO     s19tui:app.py:16271 Load phase boundary: modal_dismiss_scheduled kind=path value='/tmp/pytest-of-<user>/pytest-539/b101_inc5_case080/firmware.a2l'
+INFO     s19tui:app.py:16500 A2L copy complete: path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_4_spec_bytes_0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347 copy_seconds=0.001
+INFO     s19tui:app.py:949 A2L cache hit: path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_4_spec_bytes_0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347
+WARNING  s19tui:app.py:16538 Recent sources not updated: '/tmp/pytest-of-<user>/pytest-539/b101_inc5_case080/firmware.a2l'
+INFO     s19tui:app.py:8821 Workarea refreshed. files=2
+INFO     s19tui:app.py:19655 A2L parse summary: path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_4_spec_bytes_0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.000 sections=1 tags=462 errors=0
+INFO     s19tui:app.py:17377 Load phase boundary: populate_issues_table_done rows=40 total=462 elapsed=0.043
+INFO     s19tui:app.py:20445 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.044
+INFO     s19tui:app.py:20972 Load phase boundary: populate_a2l_table_done rows=200 total=462 elapsed=0.013
+INFO     s19tui:app.py:16557 A2L view refresh complete: path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_026_4_spec_bytes_0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.068
+INFO     s19tui:app.py:16566 A2L loaded: /tmp/pytest-of-<user>/pytest-539/test_r_chked_026_4_spec_bytes_0/app/.s19tool/workarea/temp/firmware.a2l
+_____________ test_r_chked_027_2_loaded_fields_kept_without_image ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-539/test_r_chked_027_2_loaded_fiel0')
+facts = Facts(case=PosixPath('/tmp/pytest-of-<user>/pytest-539/b101_inc5_case080'), image={0: 108, 1: 49, 2: 57, 3: 84, 4: 79...ram(name='VALUE_0002', address=20, size=2), v3=Param(name='VALUE_0003', address=40, size=4), serial=12587004, moved=32)
+
+    def test_r_chked_027_2_loaded_fields_kept_without_image(tmp_path: Path, facts: Facts) -> None:
+        """Case R-CHKED-027/2: case 08's A2L loaded, the image unloaded (Workspace
+        ``[u]``); the pilot spec picked; Write as ``noimage.chk.json`` -> the file
+        holds the 3 pilot-spec entries with the spec's bytes and no status mentions
+        ``outside the loaded image``.
+    
+        Negative control: a field loaded from a spec left out when the image lacks
+        its range (the base) -> an empty spec and ``Check Editor: 3 field(s)
+        outside the loaded image — not declared.`` -> RED."""
+    
+        async def scenario(app, pilot, log):
+            await open_session(pilot, app, facts, specs={PILOT: spec_doc(pilot_entries(facts))})
+            await unload_image(pilot, app)
+            await pick_spec(pilot, app, log, PILOT)
+            return await write_spec(pilot, app, log, "noimage.chk.json")
+    
+        lines, entries = run(tmp_path, scenario)
+>       assert not [ln for ln in lines if "outside the loaded image" in ln], lines
+E       AssertionError: ['Check Editor: 3 field(s) outside the loaded image — not declared.', 'Check Editor: wrote noimage.chk.json (0 fields, kind=check).']
+E       assert not ['Check Editor: 3 field(s) outside the loaded image — not declared.']
+
+tests/test_b101_check_spec_keep.py:1190: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:3015 App initialized. base_dir=/tmp/pytest-of-<user>/pytest-539/test_r_chked_027_2_loaded_fiel0/app workarea=/tmp/pytest-of-<user>/pytest-539/test_r_chked_027_2_loaded_fiel0/app/.s19tool/workarea
+INFO     s19tui:app.py:8821 Workarea refreshed. files=0
+INFO     s19tui:app.py:17345 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:8830 Load file action triggered.
+INFO     s19tui:app.py:16271 Load phase boundary: modal_dismiss_scheduled kind=path value='/tmp/pytest-of-<user>/pytest-539/b101_inc5_case080/firmware.s19'
+INFO     s19tui:app.py:16316 Load phase boundary: dialog_callback_entry path=/tmp/pytest-of-<user>/pytest-539/b101_inc5_case080/firmware.s19
+INFO     s19tui:app.py:16337 Load phase boundary: copy_started path=/tmp/pytest-of-<user>/pytest-539/b101_inc5_case080/firmware.s19
+INFO     s19tui:app.py:16350 Load phase boundary: copy_done path=firmware.s19 elapsed=0.004s
+WARNING  s19tui:app.py:16369 Recent sources not updated: '/tmp/pytest-of-<user>/pytest-539/b101_inc5_case080/firmware.s19'
+INFO     s19tui:app.py:8821 Workarea refreshed. files=1
+INFO     s19tui:app.py:16387 File copied to temp: path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_027_2_loaded_fiel0/app/.s19tool/workarea/temp/firmware.s19 size_bytes=1048633 copy_seconds=0.004
+INFO     s19tui:app.py:16393 Load phase boundary: worker_spawned path=firmware.s19
+INFO     s19tui:app.py:19492 Load phase boundary: worker_parse_start path=firmware.s19
+INFO     s19tui:app.py:18601 Loading file: path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_027_2_loaded_fiel0/app/.s19tool/workarea/temp/firmware.s19 suffix=.s19 project=None
+INFO     s19tui:app.py:14976 Load phase boundary: parse_branch_entry path=firmware.s19 suffix=.s19
+INFO     s19tui:app.py:19708 Load summary: file_type=s19 path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_027_2_loaded_fiel0/app/.s19tool/workarea/temp/firmware.s19 addresses=424736 range_count=4 range_bytes=424736 errors=0
+INFO     s19tui:app.py:14993 Load phase boundary: parse_branch_done path=firmware.s19 branch=s19
+INFO     s19tui:app.py:19511 Load phase boundary: worker_parse_done path=firmware.s19 elapsed=0.745s
+INFO     s19tui:app.py:19335 Load phase boundary: prepare_entry path=firmware.s19 file_type=s19
+INFO     s19tui:app.py:19370 Load phase boundary: prepare_a2l_done has_a2l=False enriched_tags=0
+INFO     s19tui:app.py:18454 MAC validation computed: records=0 issues=0 elapsed_seconds=0.953
+INFO     s19tui:app.py:19379 Load phase boundary: prepare_mac_payload_done rows=0 issues=0
+INFO     s19tui:app.py:19399 Load phase boundary: prepare_highlights_done highlights=0 out_of_range=0
+INFO     s19tui:app.py:19406 Load phase boundary: prepare_bases_done row_bases=26546
+INFO     s19tui:app.py:19416 Load phase boundary: prepare_datatable_done mac_rows=0 widths=(3, 7, 5, 5, 6, 10, 8, 8)
+INFO     s19tui:app.py:19422 Load phase boundary: prepare_done records=0
+INFO     s19tui:app.py:19544 Load phase boundary: worker_compute_done path=firmware.s19 precomputed=True elapsed=0.954s
+INFO     s19tui:app.py:19551 Load phase boundary: call_from_thread_apply_dispatched path=firmware.s19
+INFO     s19tui:app.py:19153 Load phase boundary: apply_install_state path=firmware.s19 precomputed=True
+INFO     s19tui:app.py:19836 Sections updated. count=4 rendered_ranges=4 mac_out_of_range_total=0 rendered_oor=0
+INFO     s19tui:app.py:19174 Load phase boundary: apply_sections_done path=firmware.s19
+INFO     s19tui:app.py:19188 Load phase boundary: apply_hex_done path=firmware.s19
+INFO     s19tui:app.py:20931 Load phase boundary: populate_a2l_table_done rows=0 elapsed=0.001
+INFO     s19tui:app.py:17345 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.009
+INFO     s19tui:app.py:20445 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.010
+INFO     s19tui:app.py:19203 Load phase boundary: apply_a2l_done path=firmware.s19
+INFO     s19tui:app.py:20063 Memory Map updated. ranges=4
+INFO     s19tui:app.py:19226 Loaded file successfully: path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_027_2_loaded_fiel0/app/.s19tool/workarea/temp/firmware.s19 file_type=s19 elapsed_seconds=2.328 has_mac=False precomputed=True
+INFO     s19tui:app.py:8830 Load file action triggered.
+INFO     s19tui:app.py:16271 Load phase boundary: modal_dismiss_scheduled kind=path value='/tmp/pytest-of-<user>/pytest-539/b101_inc5_case080/firmware.a2l'
+INFO     s19tui:app.py:16500 A2L copy complete: path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_027_2_loaded_fiel0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347 copy_seconds=0.001
+INFO     s19tui:app.py:951 A2L cache miss: path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_027_2_loaded_fiel0/app/.s19tool/workarea/temp/firmware.a2l size_bytes=97347
+WARNING  s19tui:app.py:16538 Recent sources not updated: '/tmp/pytest-of-<user>/pytest-539/b101_inc5_case080/firmware.a2l'
+INFO     s19tui:app.py:8821 Workarea refreshed. files=2
+INFO     s19tui:app.py:19655 A2L parse summary: path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_027_2_loaded_fiel0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.026 sections=1 tags=462 errors=0
+INFO     s19tui:app.py:18454 MAC validation computed: records=0 issues=462 elapsed_seconds=0.790
+INFO     s19tui:app.py:18509 MAC row cache built: records=0 elapsed_seconds=0.790
+INFO     s19tui:app.py:17377 Load phase boundary: populate_issues_table_done rows=40 total=462 elapsed=0.039
+INFO     s19tui:app.py:20445 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.830
+INFO     s19tui:app.py:20972 Load phase boundary: populate_a2l_table_done rows=200 total=462 elapsed=0.013
+INFO     s19tui:app.py:16557 A2L view refresh complete: path=/tmp/pytest-of-<user>/pytest-539/test_r_chked_027_2_loaded_fiel0/app/.s19tool/workarea/temp/firmware.a2l elapsed_seconds=0.853
+INFO     s19tui:app.py:16566 A2L loaded: /tmp/pytest-of-<user>/pytest-539/test_r_chked_027_2_loaded_fiel0/app/.s19tool/workarea/temp/firmware.a2l
+INFO     s19tui:app.py:17345 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.030
+INFO     s19tui:app.py:20445 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.031
+INFO     s19tui:app.py:20972 Load phase boundary: populate_a2l_table_done rows=200 total=462 elapsed=0.021
+=========================== short test summary info ============================
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_026_1_write_keeps_spec_bytes
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_026_2_validate_reports_the_drift
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_026_3_memory_row_keeps_spec_bytes
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_026_4_spec_bytes_survive_same_range_reload
+FAILED tests/test_b101_check_spec_keep.py::test_r_chked_027_2_loaded_fields_kept_without_image
+5 failed in 132.22s (0:02:12)
