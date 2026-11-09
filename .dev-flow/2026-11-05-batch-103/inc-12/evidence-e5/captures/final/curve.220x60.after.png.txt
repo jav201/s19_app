@@ -1,0 +1,8 @@
+scenario=curve
+selected_file=examples/case_00_public/software_a.a2l
+curve_without_length_selected=151
+tags=13990
+table_rows=200
+curve_without_length_row=60 (page 1, in-page row 60)
+expect_raw=blank observed_raw=blank
+surface=ready
