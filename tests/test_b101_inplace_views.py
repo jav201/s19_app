@@ -789,11 +789,17 @@ def test_r_a2l_048_3_save_back_shows_in_the_tag_table(tmp_path: Path, case08: Pa
 
 def painted_cell(app, index: int, column: int) -> str:
     """The text the tag table paints in its row ``index`` and ``column`` (the
-    rendered line cut at the column's painted width; the header is line 0)."""
+    rendered line cut at the column's painted width; the header is line 0).
+
+    A fixed column paints at its left edge regardless of the horizontal
+    scroll, so its start is the plain prefix of render widths; every later
+    column starts that prefix minus ``scroll_x`` (R-A2L-048/4)."""
     table = tag_table(app)
     line = table.render_line(1 + index - int(table.scroll_y)).text
     columns = table.ordered_columns
-    start = sum(c.get_render_width(table) for c in columns[:column]) - int(table.scroll_x)
+    start = sum(c.get_render_width(table) for c in columns[:column])
+    if column >= int(table.fixed_columns):
+        start -= int(table.scroll_x)
     return line[start:start + columns[column].get_render_width(table)].strip()
 
 
@@ -879,20 +885,23 @@ def test_r_a2l_048_4_a_wider_value_is_painted_whole(tmp_path: Path, case08: Path
 
 def test_r_a2l_048_5_a_write_on_the_second_page_shows_there(tmp_path: Path, case08: Path) -> None:
     """R-A2L-048 case /5 (robustness, E5 R-4): case 08 and its A2L, key ``2``,
-    ``+`` (page 2: ``tags 201-400 / 462``); the cursor on page row 45
-    (``VAL_BLK_0002``: a 2-byte little-endian tag at ``0x00800108``, bytes
-    ``0D BA``, Raw ``47629``); key ``6``, ``0x00800109`` = ``45`` (the tag's
-    second byte) applied; key ``2`` -> the row reads Raw ``17677``, Physical
-    ``17677``; the summary still reads ``tags 201-400 / 462``; the page's row
-    names are unchanged and the cursor stays on row 45.
+    ``+`` (page 2: ``tags 201-400 / 462``); the cursor on page row 4
+    (``MEASUREMENT_0021``: a 1-byte tag at ``0x00040F00``, Raw ``226``); key
+    ``6``, ``0x00040F00`` = ``E1`` applied; key ``2`` -> the row reads Raw
+    ``225``, Physical ``225``; the summary still reads ``tags 201-400 / 462``;
+    the page's row names are unchanged and the cursor stays on row 4.
 
     Why: the repaint writes page row ``i`` from the listed tag ``start + i``;
     one that reads tag ``i`` paints page 1's tags over page 2 (every other A2L
-    node stays on page 1), and a changed-byte test that reads only a tag's
-    first byte misses a write into its second (E5 R-1). Base: Raw ``47629`` ->
-    RED. Negative controls: ``tags[i]`` -> ``VAL_BLK_0002`` is no longer painted
-    and the row names change -> RED; the first byte only -> Raw ``47629`` ->
-    RED."""
+    node stays on page 1). Base: Raw ``226`` -> RED. Negative control:
+    ``tags[i]`` -> ``MEASUREMENT_0021`` is no longer painted and the row names
+    change -> RED.
+
+    The fixture moved off ``VAL_BLK_0002``: Inc 11 renders that tag's
+    Raw/Physical cells intentionally blank, so a decoded-value oracle there
+    can no longer assert anything. ``MEASUREMENT_0021`` (page row 4) keeps its
+    decoded values under Inc 11 and sits on page 2, so the case's second-page
+    purpose is preserved."""
 
     async def scenario(app, pilot, log):
         await load_case(pilot, app, case08, a2l=True)
@@ -905,47 +914,47 @@ def test_r_a2l_048_5_a_write_on_the_second_page_shows_there(tmp_path: Path, case
         )
         await settle(pilot)
         table = tag_table(app)
-        assert row_name(app, 45) == "VAL_BLK_0002", row_name(app, 45)
-        assert raw_phys(app, "VAL_BLK_0002") == ("47629", "47629"), raw_phys(app, "VAL_BLK_0002")
-        assert (mem_at(app, 0x800108), mem_at(app, 0x800109)) == (0x0D, 0xBA)
-        table.move_cursor(row=45, animate=False)
+        assert row_name(app, 4) == "MEASUREMENT_0021", row_name(app, 4)
+        assert raw_phys(app, "MEASUREMENT_0021") == ("226", "226"), raw_phys(app, "MEASUREMENT_0021")
+        assert mem_at(app, 0x40F00) == 0xE2
+        table.move_cursor(row=4, animate=False)
         await wait_until(
-            pilot, lambda: table.cursor_row == 45, lambda: f"cursor row {table.cursor_row}"
+            pilot, lambda: table.cursor_row == 4, lambda: f"cursor row {table.cursor_row}"
         )
         names = [row_name(app, i) for i in range(table.row_count)]
-        await patch_apply(pilot, app, log, tmp_path / "docs", "d.json", [(0x800109, b"\x45")])
-        assert mem_at(app, 0x800109) == 0x45, "the apply did not write"
+        await patch_apply(pilot, app, log, tmp_path / "docs", "d.json", [(0x40F00, b"\xE1")])
+        assert mem_at(app, 0x40F00) == 0xE1, "the apply did not write"
         await show_a2l(pilot, app)
         await wait_until(
             pilot,
-            lambda: raw_phys(app, "VAL_BLK_0002") == ("17677", "17677"),
-            lambda: f"VAL_BLK_0002 paints {raw_phys(app, 'VAL_BLK_0002')!r}, expected 17677",
+            lambda: raw_phys(app, "MEASUREMENT_0021") == ("225", "225"),
+            lambda: f"MEASUREMENT_0021 paints {raw_phys(app, 'MEASUREMENT_0021')!r}, expected 225",
             timeout=FIX_WAIT,
         )
         assert summary_span(app) == "tags 201-400 / 462", summary_span(app)
         assert [row_name(app, i) for i in range(table.row_count)] == names, "the row names changed"
-        assert table.cursor_row == 45 and row_name(app, 45) == "VAL_BLK_0002", table.cursor_row
-        # E5 RR-4: the row key of page row 45 (``a2l:245``) maps to the new dict;
+        assert table.cursor_row == 4 and row_name(app, 4) == "MEASUREMENT_0021", table.cursor_row
+        # E5 RR-4: the row key of page row 4 (``a2l:204``) maps to the new dict;
         # the card for that row is the one the highlight resolves through it.
-        row_key = table.coordinate_to_cell_key(Coordinate(45, 0)).row_key.value
-        assert row_key == "a2l:245", row_key
-        assert str(app._a2l_row_key_to_tag[row_key]["raw_value"]) == "17677", (
+        row_key = table.coordinate_to_cell_key(Coordinate(4, 0)).row_key.value
+        assert row_key == "a2l:204", row_key
+        assert str(app._a2l_row_key_to_tag[row_key]["raw_value"]) == "225", (
             app._a2l_row_key_to_tag[row_key]["raw_value"]
         )
-        table.move_cursor(row=44, animate=False)
+        table.move_cursor(row=3, animate=False)
         await wait_until(
-            pilot, lambda: "VAL_BLK_0001" in card_text(app), lambda: card_text(app)
+            pilot, lambda: "MEASUREMENT_0020" in card_text(app), lambda: card_text(app)
         )
-        table.move_cursor(row=45, animate=False)
+        table.move_cursor(row=4, animate=False)
         await wait_until(
             pilot,
-            lambda: "VAL_BLK_0002" in card_text(app),
-            lambda: f"the card for row 45 reads {card_text(app)!r}",
+            lambda: "MEASUREMENT_0021" in card_text(app),
+            lambda: f"the card for row 4 reads {card_text(app)!r}",
         )
         # E5 RR-1: the recomputed list is the one installed - a filter on the new
         # Raw value lists the written tag, built from ``_a2l_enriched_tags``.
-        await filter_raw(pilot, app, "17677")
-        assert raw_phys(app, "VAL_BLK_0002") == ("17677", "17677"), raw_phys(app, "VAL_BLK_0002")
+        await filter_raw(pilot, app, "225")
+        assert raw_phys(app, "MEASUREMENT_0021") == ("225", "225"), raw_phys(app, "MEASUREMENT_0021")
 
     drive(tmp_path, scenario)
 
