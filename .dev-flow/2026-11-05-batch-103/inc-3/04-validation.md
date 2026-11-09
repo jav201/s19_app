@@ -45,7 +45,9 @@ Total practical mutants: **103 KILLED, 0 open survivors**. Timing-only and non-d
 
 ## Trace check
 
-Pending on the final committed Linux clone. Command: `trace_check.py --req .dev-flow/2026-11-05-batch-103/inc-3/01-requirements.md --base e07fb00 --src s19_app/tui/a2l_definition.py tools/synth/make_release_case.py`.
+Final command on committed Linux clone `1452c838afe6`: `trace_check.py --req .dev-flow/2026-11-05-batch-103/inc-3/01-requirements.md --base e07fb00 --src s19_app/tui/a2l_definition.py tools/synth/make_release_case.py`.
+
+**Result: 1 US, 85 active requirements, 12 gaps.** All 12 are TEST gaps on the Inc 3b rows R-A2L-DEF.122 … .132 and .140. **0 EVID gaps and 0 gaps on any Inc 3a row.** Transcript: `../evidence/inc-3/evidence-e5-trace-check-final.txt`. The earlier path-convention failure is retained as history in `../evidence/inc-3/evidence-e5-trace-check.txt`.
 
 ## Models
 

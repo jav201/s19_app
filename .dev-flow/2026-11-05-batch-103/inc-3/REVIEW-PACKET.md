@@ -65,7 +65,7 @@ Print `s19_app.__file__` before each transcript and isolate HOME/XDG/LOCALAPPDAT
 ### 6. Pending items
 
 - Inc 3b: 42 write-side cases and the five mixed edit arms.
-- Final committed-clone `trace_check.py`, then integration into `batch-103`.
+- Integration into `batch-103`. Final committed-clone trace is accepted: 12 TEST gaps, all Inc 3b, and no Inc 3a/EVID gaps (`../evidence/inc-3/evidence-e5-trace-check-final.txt`).
 - Full repository suite and requirements-canon fold at batch end.
 - Inc 12 real Windows Terminal captures at 80, 118 and 220 columns with operator approval.
 - `origin/main` remains unchanged until the whole batch is green.
