@@ -1,0 +1,75 @@
+/tmp/b103-e4-12-27fb/run/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________________________ test_r_tui_042a_7_1_6_limits _________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-213/test_r_tui_042a_7_1_6_limits0')
+
+    def test_r_tui_042a_7_1_6_limits(tmp_path: Path) -> None:
+        """R-TUI-042a.7.1 case /6: a hostile lower-limit word, then a hostile
+        upper-limit word — each loaded from a real A2L file; the limits line sits
+        below the card's 5 visible rows and is scrolled into view, proven painted,
+        before the hostile introducers are asserted absent."""
+        for field in ("lower_limit", "upper_limit"):
+            hostile, scrubbed = _hostile("LIM", "_END")
+            if field == "lower_limit":
+                a2l = _card_characteristic_limits(lower_limit=hostile, upper_limit="100")
+            else:
+                a2l = _card_characteristic_limits(lower_limit="0", upper_limit=hostile)
+    
+            async def _observe(app, pilot, table, scrubbed=scrubbed):
+                await _assert_card_painted_then_safe(app, pilot, scrubbed, scroll=True)
+    
+>           _explore_card(tmp_path, a2l, (118, 54), _observe)
+
+tests/test_b103_inc12_tag_table.py:1200: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:1081: in _explore_card
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:1079: in _run
+    await scenario(app, pilot, table)
+tests/test_b103_inc12_tag_table.py:1198: in _observe
+    await _assert_card_painted_then_safe(app, pilot, scrubbed, scroll=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'dark', 'focus'})>
+projected = 'LIM]0;PWN31m0;xq_END'
+
+    async def _assert_card_painted_then_safe(
+        app, pilot, projected: str, *, scroll: bool = False
+    ) -> None:
+        """Positive-first (R-TUI-042a.7.1): prove ``projected`` — the value's
+        control-free projection — is actually painted (scrolling to the end with an
+        asserted nonzero effective scroll first when it lives below the card's
+        visible rows), then every card text line holds no control character and the
+        screen output holds none of the four hostile introducers."""
+        card = _card(app)
+        if scroll:
+            full = card.render().plain
+            assert "byteorder " in full, full
+            assert "limits " in full, full
+>           assert card.max_scroll_y > 0, card.max_scroll_y
+E           AssertionError: 0
+E           assert 0 > 0
+E            +  where 0 = A2LDetailCard(id='a2l_detail_card').max_scroll_y
+
+tests/test_b103_inc12_tag_table.py:1102: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_6_limits - Ass...
+1 failed in 4.59s

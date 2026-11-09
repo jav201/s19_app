@@ -1,0 +1,6 @@
+/tmp/b103-e4-12-27fb/run/s19_app/__init__.py
+expected_len=48 joined_len=77
+expected='SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END'
+joined='✓SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END  0x1C2D3E00desc synthetic map'
+first_difference=0 expected='S' actual='✓'
+scroll=0.0/5 wrap=True min_width=1
