@@ -1,0 +1,209 @@
+/tmp/b103-e5-11-p18-laptop/tree/s19_app/__init__.py
+..........................F............................................. [ 48%]
+........................................................................ [ 97%]
+...F                                                                     [100%]
+=================================== FAILURES ===================================
+__________________ test_cov_read_1_line_end_variants_equal_lf __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-javierg/pytest-546/test_cov_read_1_line_end_varia0')
+
+    def test_cov_read_1_line_end_variants_equal_lf(tmp_path: Path) -> None:
+        """R-A2L-READ.1/1..3: tags, sections (line numbers included) and errors
+        equal the LF reading, not just the six tag fields."""
+>       for path in _tracked_a2l():
+                    ^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_reader_coverage.py:139: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_reader.py:124: in _tracked_a2l
+    out = subprocess.run(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (['git', 'ls-files', '*.a2l'],)
+kwargs = {'cwd': PosixPath('/tmp/b103-e5-11-p18-laptop/tree'), 'text': True, 'stdout': -1, 'stderr': -1}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout is given, and the process takes too long, a TimeoutExpired
+        exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '['git', 'ls-files', '*.a2l']' returned non-zero exit status 128.
+
+/data/miniconda3/envs/s19ci/lib/python3.11/subprocess.py:571: CalledProcessError
+____________ test_cov_read_61_09_picker_and_check_editor_never_u16 _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-javierg/pytest-546/test_cov_read_61_09_picker_and0')
+
+    def test_cov_read_61_09_picker_and_check_editor_never_u16(tmp_path: Path) -> None:
+        """R-A2L-READ.61/9 real routes: the Patch picker and Check Editor list each
+        no-length tag as u8 (never u16)."""
+        from textual.widgets import DataTable
+    
+        from s19_app.tui.app import S19TuiApp
+    
+        from tests.support import b100_projects as projects
+        from tests.support.b100_workers import settle_workers
+        from tests.support.timing import wait_until
+    
+        shapes = [
+            '/begin CHARACTERISTIC X0 ""\n VALUE 0x10 RL_U16 0 CM_ID 0 65535\n LENGTH 4\n/end CHARACTERISTIC',
+            '/begin CHARACTERISTIC X1 ""\n VAL_BLK 0x10 RL_U16 0 CM_ID 0 65535\n MATRIX_DIM 4\n NUMBER 5\n/end CHARACTERISTIC',
+            '/begin CHARACTERISTIC X2 ""\n VALUE 0x10 RL_U16 0 CM_ID 0 65535\n LENGTH 0\n/end CHARACTERISTIC',
+            '/begin CHARACTERISTIC X3 ""\n VAL_BLK 0x10 RL_U16 0 CM_ID 0 65535\n MATRIX_DIM x4\n/end CHARACTERISTIC',
+        ]
+        a2l = tmp_path / "no_length.a2l"
+        a2l.write_text(_body("\n".join(shapes)), encoding="utf-8")
+    
+        def _fmt(table) -> dict:
+            return {
+                str(table.get_row_at(i)[1]): str(table.get_row_at(i)[3])
+                for i in range(table.row_count)
+            }
+    
+        expected = {f"X{index}": "u8" for index in range(4)}
+    
+        async def scenario(app: S19TuiApp, pilot, log) -> None:
+            app.load_a2l_from_path(a2l)
+            await settle_workers(pilot)
+            await wait_until(pilot, lambda: app.current_a2l_path is not None, "the A2L attach")
+    
+            app.action_show_screen("patch")
+            for _ in range(6):
+                await pilot.pause()
+            patch_fmt = _fmt(app.query_one("#patch_param_table", DataTable))
+            assert patch_fmt == expected, patch_fmt
+    
+            app.action_show_screen("check_editor")
+            for _ in range(6):
+                await pilot.pause()
+            check_fmt = _fmt(app.query_one("#check_param_table", DataTable))
+            assert check_fmt == expected, check_fmt
+    
+>       projects.run_app(tmp_path / "app", scenario, size=(160, 50))
+
+tests/test_b103_a2l_reader_coverage.py:2186: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/data/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+log = <tests.support.b100_projects.StatusLog object at 0x7f8dfa1b9c90>
+
+    async def scenario(app: S19TuiApp, pilot, log) -> None:
+        app.load_a2l_from_path(a2l)
+        await settle_workers(pilot)
+        await wait_until(pilot, lambda: app.current_a2l_path is not None, "the A2L attach")
+    
+        app.action_show_screen("patch")
+        for _ in range(6):
+            await pilot.pause()
+        patch_fmt = _fmt(app.query_one("#patch_param_table", DataTable))
+>       assert patch_fmt == expected, patch_fmt
+E       AssertionError: {'X0': 'u8 …', 'X1': 'u8 …', 'X2': 'u8 …', 'X3': 'u8 …'}
+E       assert {'X0': 'u8 …'... 'X3': 'u8 …'} == {'X0': 'u8', ...', 'X3': 'u8'}
+E         
+E         Differing items:
+E         {'X1': 'u8 …'} != {'X1': 'u8'}
+E         {'X3': 'u8 …'} != {'X3': 'u8'}
+E         {'X0': 'u8 …'} != {'X0': 'u8'}
+E         {'X2': 'u8 …'} != {'X2': 'u8'}
+E         Use -v to get more diff
+
+tests/test_b103_a2l_reader_coverage.py:2178: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     s19tui:app.py:2993 App initialized. base_dir=/tmp/pytest-of-javierg/pytest-546/test_cov_read_61_09_picker_and0/app workarea=/tmp/pytest-of-javierg/pytest-546/test_cov_read_61_09_picker_and0/app/.s19tool/workarea
+INFO     s19tui:app.py:8780 Workarea refreshed. files=0
+INFO     s19tui:app.py:17052 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.007
+INFO     s19tui:app.py:16140 A2L copy complete: path=/tmp/pytest-of-javierg/pytest-546/test_cov_read_61_09_picker_and0/app/.s19tool/workarea/temp/no_length.a2l size_bytes=929 copy_seconds=0.008
+INFO     s19tui:app.py:946 A2L cache miss: path=/tmp/pytest-of-javierg/pytest-546/test_cov_read_61_09_picker_and0/app/.s19tool/workarea/temp/no_length.a2l size_bytes=929
+WARNING  s19tui:app.py:16178 Recent sources not updated: '/tmp/pytest-of-javierg/pytest-546/test_cov_read_61_09_picker_and0/no_length.a2l'
+INFO     s19tui:app.py:8780 Workarea refreshed. files=1
+INFO     s19tui:app.py:19139 A2L parse summary: path=/tmp/pytest-of-javierg/pytest-546/test_cov_read_61_09_picker_and0/app/.s19tool/workarea/temp/no_length.a2l elapsed_seconds=0.002 sections=1 tags=4 errors=4
+WARNING  s19tui:app.py:19156 A2L parse reported structural errors: path=/tmp/pytest-of-javierg/pytest-546/test_cov_read_61_09_picker_and0/app/.s19tool/workarea/temp/no_length.a2l sample=Line 20: CHARACTERISTIC X0 declares the sizes 2 and 4; Line 24: CHARACTERISTIC X1 declares the sizes 8 and 10; Line 29: CHARACTERISTIC X2 declares the sizes 0 and 2
+INFO     s19tui:app.py:17052 Load phase boundary: populate_issues_table_done rows=0 elapsed=0.007
+INFO     s19tui:app.py:19854 Load phase boundary: populate_mac_table_done rows=0 elapsed=0.008
+INFO     s19tui:app.py:20381 Load phase boundary: populate_a2l_table_done rows=4 total=4 elapsed=0.002
+INFO     s19tui:app.py:16197 A2L view refresh complete: path=/tmp/pytest-of-javierg/pytest-546/test_cov_read_61_09_picker_and0/app/.s19tool/workarea/temp/no_length.a2l elapsed_seconds=0.011
+INFO     s19tui:app.py:16205 A2L loaded: /tmp/pytest-of-javierg/pytest-546/test_cov_read_61_09_picker_and0/app/.s19tool/workarea/temp/no_length.a2l
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader_coverage.py::test_cov_read_1_line_end_variants_equal_lf
+FAILED tests/test_b103_a2l_reader_coverage.py::test_cov_read_61_09_picker_and_check_editor_never_u16
+2 failed, 146 passed in 84.54s (0:01:24)

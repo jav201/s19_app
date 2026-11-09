@@ -1,0 +1,44 @@
+/tmp/b103-e5-11-int9-laptop/tree/s19_app/__init__.py
+         62137724 function calls (59705690 primitive calls) in 31.901 seconds
+
+   Ordered by: cumulative time
+   List reduced from 128 to 35 due to restriction <35>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.009    0.009   31.901   31.901 /tmp/b103-e5-11-int9-laptop/tree/s19_app/tui/a2l.py:3959(parse_a2l_file)
+        1    0.168    0.168   18.128   18.128 /tmp/b103-e5-11-int9-laptop/tree/s19_app/tui/a2l.py:3386(extract_a2l_tags)
+  11005/1    0.555    0.000   17.441   17.441 /tmp/b103-e5-11-int9-laptop/tree/s19_app/tui/a2l.py:3779(walk)
+   220040    5.227    0.000   16.837    0.000 /tmp/b103-e5-11-int9-laptop/tree/s19_app/tui/a2l.py:3428(_process_tag)
+        1    0.556    0.556   12.255   12.255 /tmp/b103-e5-11-int9-laptop/tree/s19_app/tui/a2l.py:885(_build_section_tree_into)
+  1034369    4.471    0.000    7.698    0.000 /tmp/b103-e5-11-int9-laptop/tree/s19_app/tui/a2l.py:686(_lex_a2l_lines)
+  1034368    2.564    0.000    3.759    0.000 /tmp/b103-e5-11-int9-laptop/tree/s19_app/tui/a2l.py:931(_process_text)
+   220040    1.682    0.000    2.573    0.000 /tmp/b103-e5-11-int9-laptop/tree/s19_app/tui/a2l.py:421(_tag_header)
+  2310445    0.899    0.000    1.645    0.000 /tmp/b103-e5-11-int9-laptop/tree/s19_app/tui/a2l.py:401(_section_words)
+  1144334    0.512    0.000    1.332    0.000 /tmp/b103-e5-11-int9-laptop/tree/s19_app/tui/a2l.py:385(_line_words)
+   220040    0.850    0.000    1.225    0.000 /tmp/b103-e5-11-int9-laptop/tree/s19_app/tui/a2l.py:457(_tag_keyword_lines)
+ 13478939    1.195    0.000    1.195    0.000 {method 'get' of 'dict' objects}
+   110020    0.401    0.000    1.091    0.000 /tmp/b103-e5-11-int9-laptop/tree/s19_app/tui/a2l.py:1362(_characteristic_from_tokens)
+   110020    0.556    0.000    1.051    0.000 /tmp/b103-e5-11-int9-laptop/tree/s19_app/tui/a2l.py:1338(parse_measurement_header)
+   220040    0.754    0.000    0.932    0.000 /tmp/b103-e5-11-int9-laptop/tree/s19_app/tui/a2l.py:520(_tag_sizes)
+   220040    0.228    0.000    0.905    0.000 /tmp/b103-e5-11-int9-laptop/tree/s19_app/tui/a2l.py:583(_characteristic_element_size)
+   990180    0.523    0.000    0.757    0.000 /tmp/b103-e5-11-int9-laptop/tree/s19_app/tui/a2l.py:369(_unquote)
+        4    0.000    0.000    0.734    0.184 /tmp/b103-e5-11-int9-laptop/tree/s19_app/tui/a2l.py:1540(_collect_sections_by_name)
+ 968416/4    0.601    0.000    0.734    0.184 /tmp/b103-e5-11-int9-laptop/tree/s19_app/tui/a2l.py:1543(walk)
+   220040    0.465    0.000    0.634    0.000 /tmp/b103-e5-11-int9-laptop/tree/s19_app/tui/a2l.py:2039(_resolve_record_layout)
+   693342    0.617    0.000    0.617    0.000 {method 'match' of 're.Pattern' objects}
+   451138    0.615    0.000    0.615    0.000 {method 'findall' of 're.Pattern' objects}
+  6206496    0.608    0.000    0.608    0.000 {method 'append' of 'list' objects}
+   110020    0.173    0.000    0.595    0.000 /tmp/b103-e5-11-int9-laptop/tree/s19_app/tui/a2l.py:1980(_infer_length_characteristic)
+  7784798    0.590    0.000    0.590    0.000 {built-in method builtins.len}
+   330060    0.369    0.000    0.584    0.000 /tmp/b103-e5-11-int9-laptop/tree/s19_app/tui/a2l.py:342(_number_word)
+   693342    0.378    0.000    0.538    0.000 /tmp/b103-e5-11-int9-laptop/tree/s19_app/tui/a2l.py:675(_lex_word_diagnostics)
+  3322663    0.490    0.000    0.490    0.000 {method 'startswith' of 'str' objects}
+        1    0.000    0.000    0.447    0.447 /tmp/b103-e5-11-int9-laptop/tree/s19_app/tui/a2l.py:3841(extract_declared_spans)
+  1502024    0.405    0.000    0.405    0.000 {method 'split' of 'str' objects}
+  2299892    0.375    0.000    0.375    0.000 {method 'endswith' of 'str' objects}
+        2    0.000    0.000    0.368    0.184 /tmp/b103-e5-11-int9-laptop/tree/s19_app/tui/a2l.py:1841(extract_memory_segments)
+ 484208/2    0.302    0.000    0.368    0.184 /tmp/b103-e5-11-int9-laptop/tree/s19_app/tui/a2l.py:1856(walk)
+        1    0.000    0.000    0.363    0.363 /tmp/b103-e5-11-int9-laptop/tree/s19_app/tui/a2l.py:1740(extract_compu_tables)
+   110179    0.091    0.000    0.350    0.000 /tmp/b103-e5-11-int9-laptop/tree/s19_app/tui/a2l.py:1160(_split_line_respecting_quotes)
+
+

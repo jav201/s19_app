@@ -16,6 +16,7 @@ from __future__ import annotations
 import ast
 import json
 import subprocess
+import time
 from pathlib import Path
 from typing import Callable, List, Optional, Tuple
 
@@ -33,6 +34,7 @@ from s19_app.tui.a2l import (
     render_a2l_view,
 )
 from s19_app.tui.a2l_definition import describe_definition
+from tests.support.timing import report_margin, timing_bound
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
@@ -1631,8 +1633,10 @@ def _ref_native(tag: dict) -> dict:
     )}
 
 
+@pytest.mark.serial_timing
 def test_r_a2l_read_48_tracked_files_equal_ref(ref: Callable[[str], dict]) -> None:
     """R-A2L-READ.48/1: the 35 tracked files equal the reference reading."""
+    started = time.monotonic()
     for path in _tracked_a2l():
         text = path.read_text(encoding="utf-8", errors="replace")
         data = parse_a2l_file(path)
@@ -1642,6 +1646,10 @@ def test_r_a2l_read_48_tracked_files_equal_ref(ref: Callable[[str], dict]) -> No
         _assert_spans_equal(_spans(data), reading["spans"])
         _assert_errors_equal(data["errors"], reading["errors"])
         del data, reading
+    elapsed = time.monotonic() - started
+    assert elapsed <= report_margin("R-A2L-READ.48/1 tracked files", elapsed, timing_bound(120.0)), (
+        f"tracked-file differential took {elapsed:.1f}s, exceeding 120s"
+    )
 
 
 def _assert_sections_equal(reader_sections: list, ref_sections: list) -> None:
@@ -1776,8 +1784,8 @@ def test_r_a2l_read_49_2_defect_classes_hand_written(tmp_path: Path) -> None:
     d5b = _parse(
         tmp_path,
         _body(
-            "/begin RECORD_LAYOUT RL_SWORD\nFNC_VALUES 1 SWORD ROW_DIR DIRECT\n/end RECORD_LAYOUT\n"
-            '/begin CHARACTERISTIC CK6B ""\n VAL_BLK 0x3000 RL_SWORD 0 CM_ID 0 65535\n MATRIX_DIM 3 4 1\n/end CHARACTERISTIC'
+            "/begin RECORD_LAYOUT RL.FNC.SWORD.ROW_DIR\nFNC_VALUES 1 SWORD ROW_DIR DIRECT\n/end RECORD_LAYOUT\n"
+            '/begin CHARACTERISTIC CK6B ""\n VAL_BLK 0x3000 RL.FNC.SWORD.ROW_DIR 0 CM_ID 0 65535\n MATRIX_DIM 3 4 1\n/end CHARACTERISTIC'
         ),
     )
     assert _tag(d5b, "CK6B", "CHARACTERISTIC")["length"] == 24

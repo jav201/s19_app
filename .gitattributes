@@ -58,3 +58,6 @@ tests/fixtures/synth/** -text
 # R-DOC-CANON.7 pins its sha256). Evidence bytes, so -text in BOTH directions:
 # a CRLF checkout on Windows would change the hash the guard compares.
 docs/requirements/history/** -text
+# Batch-103 transcripts are evidence bytes; preserve mixed line endings verbatim.
+.dev-flow/2026-11-05-batch-103/evidence/** -text
+.dev-flow/2026-11-05-batch-103/inc-*/evidence-*/** -text

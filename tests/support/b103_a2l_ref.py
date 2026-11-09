@@ -637,7 +637,7 @@ def _tag_header(
     max_hdr = _HEADER_WORDS[section_name]
     while i < n and len(header) < max_hdr:
         w, ln, ph = words[i]
-        if ph or _is_quoted(w) or w in _ARITY:
+        if ph or w in _ARITY:
             break
         header.append(w)
         i += 1
@@ -1005,11 +1005,11 @@ def _read_tag(section, layouts, module_byte_order, errors) -> dict:
         conversion = header[1] if len(header) >= 2 else None
     else:
         if len(header) == 7:
-            kind = header[0]
+            kind = _unquote(header[0])
             header_address = _number_word(header[1])
-            deposit = header[2]
-            record_layout_name = header[2]
-            conversion = header[4]
+            deposit = _unquote(header[2])
+            record_layout_name = deposit
+            conversion = _unquote(header[4])
         else:
             kind = None
             header_address = None
@@ -1024,7 +1024,10 @@ def _read_tag(section, layouts, module_byte_order, errors) -> dict:
         and _number_word(header[1]) is None
     ):
         errors.append(
-            (f"address {_echo_word(header[1])} is not a number", start_line)
+            (
+                f"address {_echo_word(header[1])} is not a number",
+                words[rest - len(header) + 1][1],
+            )
         )
 
     # Duplicate keywords (R-A2L-READ.32).
@@ -1041,7 +1044,7 @@ def _read_tag(section, layouts, module_byte_order, errors) -> dict:
 
     # Field values.
     address_words: List[Tuple[Optional[int], int]] = []
-    header_address_valid = header_address is not None
+    address_invalid = sname == "CHARACTERISTIC" and len(header) == 7 and header_address is None
     if sname == "CHARACTERISTIC" and header_address is not None:
         address_words.append((header_address, start_line))
 
@@ -1057,12 +1060,14 @@ def _read_tag(section, layouts, module_byte_order, errors) -> dict:
             if len(args) == 1 and not surplus:
                 value = _number_word(args[0])
                 if value is None:
+                    address_invalid = True
                     errors.append(
                         (f"ECU_ADDRESS {_echo_word(args[0])} is not a number", ln)
                     )
                 else:
                     address_words.append((value, ln))
-            # a missing argument or surplus gives no address (no explicit error here)
+            else:
+                address_invalid = True
         elif kw in ("DATA_SIZE", "LENGTH"):
             if len(args) == 1 and not surplus and _number_word(args[0]) is None:
                 errors.append(
@@ -1070,7 +1075,7 @@ def _read_tag(section, layouts, module_byte_order, errors) -> dict:
                 )
         elif kw == "BYTE_ORDER":
             if len(args) == 1 and not surplus:
-                byte_order_arg = _unquote(args[0])
+                byte_order_arg = args[0]
                 byte_order_line = ln
                 if _normalize_byte_order(byte_order_arg) is None:
                     byte_order_invalid = True
@@ -1137,8 +1142,8 @@ def _read_tag(section, layouts, module_byte_order, errors) -> dict:
         else:
             effective = "little"
 
-    # No address when a byte-order source is no byte-order word (R-A2L-READ.60/9).
-    no_address = byte_order_invalid
+    # No address for an invalid address word or byte-order source (READ.60).
+    no_address = byte_order_invalid or address_invalid
 
     # BIT_MASK / BYTE_ORDER with fewer args or surplus (R-A2L-READ.60/6).
     for kw in ("BIT_MASK", "BYTE_ORDER"):
@@ -1147,9 +1152,13 @@ def _read_tag(section, layouts, module_byte_order, errors) -> dict:
             distinct = {_unquote(a[0]) for a, s, l in occ if a}
             if len(distinct) > 1 or any(s for a, s, l in occ):
                 no_address = True
+                if kw == "BIT_MASK":
+                    bit_mask = None
         for args, surplus, ln in occ:
             if len(args) != 1 or surplus:
                 no_address = True
+                if kw == "BIT_MASK":
+                    bit_mask = None
 
     # Address words: disagreement -> no address + .59 (R-A2L-READ.60/1).
     values = [v for v, ln in address_words]
@@ -1242,9 +1251,9 @@ def _read_tag(section, layouts, module_byte_order, errors) -> dict:
 
 
 def _standing_length(items: List[Tuple[str, List[str], List[str], int]]) -> Optional[int]:
-    """A standing LENGTH keyword of a CURVE/MAP-family tag, else None."""
+    """A standing DATA_SIZE/LENGTH keyword of a CURVE/MAP-family tag, else None."""
     for kw, args, surplus, ln in items:
-        if kw == "LENGTH" and len(args) == 1 and not surplus:
+        if kw in ("DATA_SIZE", "LENGTH") and len(args) == 1 and not surplus:
             value = _number_word(args[0])
             if value is not None:
                 return value

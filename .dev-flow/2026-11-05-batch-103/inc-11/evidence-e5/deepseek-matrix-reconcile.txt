@@ -1,0 +1,80 @@
+## 1. Per-ID dispositions (all 37, re-audit table order)
+
+| # | ID | Disposition |
+|---|---|---|
+| 1 | R-A2L-READ.55/2 | verified-now |
+| 2 | R-A2L-READ.55/3 | verified-now |
+| 3 | R-A2L-READ.55/4 | verified-now |
+| 4 | R-A2L-READ.56/1 | verified-now |
+| 5 | R-A2L-READ.56/2 | verified-now |
+| 6 | R-A2L-READ.56/3 | verified-now |
+| 7 | R-A2L-READ.66/3 | verified-now |
+| 8 | R-A2L-READ.9/2 | verified-now |
+| 9 | R-A2L-001.3.2/4 | verified-now |
+| 10 | R-A2L-READ.14/1 | verified-now |
+| 11 | R-A2L-001.1/3 | verified-now |
+| 12 | R-A2L-READ.19/2 | verified-now |
+| 13 | R-A2L-001.4/1 | verified-now |
+| 14 | R-A2L-001.4/2 | verified-now |
+| 15 | R-A2L-001.5/1 | verified-now |
+| 16 | R-A2L-001.5/2 | verified-now |
+| 17 | R-A2L-READ.64/1 | verified-now |
+| 18 | R-A2L-READ.64/2 | verified-now |
+| 19 | R-A2L-READ.65/5 | verified-now |
+| 20 | R-A2L-READ.65/6 | **pending-perf** |
+| 21 | R-A2L-READ.27/1 | verified-now |
+| 22 | R-A2L-READ.32/2 | verified-now |
+| 23 | R-A2L-READ.58/3 | verified-now |
+| 24 | R-A2L-READ.58/5 | verified-now |
+| 25 | R-A2L-READ.59/6 | verified-now |
+| 26 | R-A2L-READ.60/2 | verified-now |
+| 27 | R-A2L-READ.60/4 | verified-now |
+| 28 | R-A2L-READ.60/6 | verified-now |
+| 29 | R-A2L-READ.39/1 | verified-now |
+| 30 | R-A2L-READ.61/1 | verified-now |
+| 31 | R-A2L-READ.50/1 | verified-now |
+| 32 | R-A2L-READ.65/4 | verified-now |
+| 33 | R-A2L-READ.48/1 | **pending-reader** |
+| 34 | R-A2L-READ.49/2 | **pending-reader** |
+| 35 | R-A2L-READ.60/8 | verified-now |
+| 36 | R-A2L-READ.60/9 | verified-now |
+| 37 | R-A2L-READ.61/9 | verified-now |
+
+**Totals (37/37):** verified-now **34**, pending-reader **2**, pending-perf **1**.
+
+## 2. Verified matrix rows still naming only `test_b103_a2l_reader.py` (coverage module now supplies the full assertion)
+
+Excluded from this list: READ.48/1 and READ.49/2 (legacy reader supplies the assertion, not the coverage module) and READ.65/6 (performance module supplies it). The 34 flagged rows:
+
+- R-A2L-READ.55/2, /3, /4 → `tests/test_b103_a2l_reader_coverage.py::test_cov_read_55_zero_sections_and_tags`
+- R-A2L-READ.56/1, /2 → `tests/test_b103_a2l_reader_coverage.py::test_cov_read_56_cap_and_views`
+- R-A2L-READ.56/3 → `::test_cov_read_56_cap_and_views` + `::test_cov_read_56_views_show_capped_errors`
+- R-A2L-READ.66/3 → `::test_cov_read_66_esc_in_echoed_word_exact`
+- R-A2L-READ.9/2 → `::test_cov_read_9_lone_line_end_terminator`
+- R-A2L-001.3.2/4 → `::test_cov_001_3_2_backslash_line_end_exact`
+- R-A2L-READ.14/1 → `::test_cov_read_14_multiline_string_one_word`
+- R-A2L-001.1/3 → `::test_cov_001_1_end_after_words_closed_zero_errors`
+- R-A2L-READ.19/2 → `::test_cov_read_19_endx_closes_at_own_end`
+- R-A2L-001.4/1, /2 → `::test_cov_001_4_stray_end_exact_line_30`
+- R-A2L-001.5/1, /2 → `::test_cov_001_5_end_name_mismatch_exact`
+- R-A2L-READ.64/1, /2 → `::test_cov_read_64_32_levels_exact`
+- R-A2L-READ.65/5 → `::test_cov_read_65_one_line_string_one_word`
+- R-A2L-READ.27/1 → `::test_cov_read_27_case07_full`
+- R-A2L-READ.32/2 → `::test_cov_read_32_duplicate_exact_lines`
+- R-A2L-READ.58/3 → `::test_cov_read_58_matrix_dim_exact_lines`
+- R-A2L-READ.58/5 → `::test_cov_read_58_round2_surplus_exact` + `::test_cov_read_58_hex_like_surplus_exact`
+- R-A2L-READ.59/6 → `::test_cov_read_59_no_datatype_size_shapes`
+- R-A2L-READ.60/2, /4, /6 → `::test_cov_read_60_no_address_all_shapes`
+- R-A2L-READ.39/1 → `::test_cov_read_39_ascii_number_error`
+- R-A2L-READ.61/1 → `::test_cov_read_61_no_length_missing_invalid` + `::test_cov_read_59_undeclared_layout_val_blk`
+- R-A2L-READ.50/1 → `::test_cov_read_50_summary_exact`
+- R-A2L-READ.65/4 → `::test_cov_read_65_hostile_corpus_mutations`
+- R-A2L-READ.60/8 → `::test_cov_read_60_08_patch_editor_refuses_hex_surplus` + `::test_cov_read_60_08_picker_lists_only_usable_address`
+- R-A2L-READ.60/9 → `::test_cov_read_60_byte_order_source_not_byte_order`
+- R-A2L-READ.61/9 → `::test_cov_read_61_no_enriched_byte_size_all_shapes` + `::test_cov_read_61_09_patch_editor_refuses` + `::test_cov_read_61_09_picker_and_check_editor_never_u16`
+
+That is 34 IDs; all prefixed by `tests/test_b103_a2l_reader_coverage.py`.
+
+## 3. READ.61/9 oracle flag
+
+Confirmed: the real-route oracle in `test_cov_read_61_09_picker_and_check_editor_never_u16` (coverage `:2161-2184`) compares only the width token before the first space — `_fmt` returns `str(get_row_at(i)[3]).partition(" ")[0]` and asserts equality to `{X0: "u8", X1: "u8", X2: "u8", X3: "u8"}`. It does not compare the unit suffix, matching the requirement's u8-vs-u16 constraint.

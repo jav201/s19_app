@@ -420,3 +420,75 @@ def test_e5_p15_length_zero_inline_axis_refusal_final(tmp_path: Path) -> None:
     data = _parse(tmp_path, text)
     assert _tag(data, "C", "CHARACTERISTIC")["length"] is None
     assert any("CHARACTERISTIC C declares the sizes 0 and 13" in e for e in data["errors"])
+
+
+# ---------------------------------------------------------------------------
+# P16 — a CURVE on a declared UWORD layout with two inline axis points takes
+# the full layout span 4, not the scalar deposit length 2 (R-A2L-018).
+# ---------------------------------------------------------------------------
+
+
+def test_e5_p16_curve_declared_uword_two_axis_points_full_span(tmp_path: Path) -> None:
+    """R-A2L-018: a CURVE with a declared UWORD record layout and two inline
+    axis points sizes to its whole record (2 × UWORD = 4), not the scalar
+    deposit length 2."""
+    text = _body(
+        "/begin RECORD_LAYOUT __UWORD_Z\nFNC_VALUES 1 UWORD ROW_DIR DIRECT\n/end RECORD_LAYOUT\n"
+        + char(
+            "C",
+            "CURVE",
+            "0x2000",
+            "__UWORD_Z",
+            " /begin AXIS_DESCR",
+            " STD_AXIS NO_INPUT_QUANTITY CM_ID 2 0 255",
+            " /end AXIS_DESCR",
+        )
+    )
+    data = _parse(tmp_path, text)
+    assert _tag(data, "C", "CHARACTERISTIC")["length"] == 4
+
+
+
+# ---------------------------------------------------------------------------
+# P18 — standing DATA_SIZE and a later full span take precedence over scalar
+# inference (R-A2L-READ.48, CTX sizes).
+# ---------------------------------------------------------------------------
+
+
+def test_e5_p18_data_size_only_unresolved_span_uses_standing_size(tmp_path: Path) -> None:
+    """A CURVE with DATA_SIZE 4 and no resolvable span keeps 4, never the
+    generic UWORD scalar length 2."""
+    text = _body(
+        char("C", "CURVE", "0x2000", "RL_U16", " DATA_SIZE 4")
+    )
+    data = _parse(tmp_path, text)
+    assert _tag(data, "C", "CHARACTERISTIC")["length"] == 4
+
+
+def test_e5_p18_external_full_span_agrees_with_standing_data_size(tmp_path: Path) -> None:
+    """A later-resolved full span 4 agrees with standing DATA_SIZE 4 and is
+    exported as the characteristic length."""
+    text = _body(
+        char(
+            "C",
+            "CURVE",
+            "0x2000",
+            "RL_U16",
+            " DATA_SIZE 4",
+            " /begin AXIS_DESCR",
+            " COM_AXIS NO_INPUT_QUANTITY CM_ID 2 0 1 AXIS_PTS_REF AP",
+            " /end AXIS_DESCR",
+        )
+        + "\n"
+        + char(
+            "AP",
+            "VALUE",
+            "0x3000",
+            "RL_U16",
+            " /begin AXIS_DESCR",
+            " STD_AXIS NO_INPUT_QUANTITY CM_ID 2 0 1",
+            " /end AXIS_DESCR",
+        )
+    )
+    data = _parse(tmp_path, text)
+    assert _tag(data, "C", "CHARACTERISTIC")["length"] == 4

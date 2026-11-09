@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import itertools
+from functools import lru_cache
 import logging
 import math
 import os
@@ -88,6 +89,7 @@ COMPU_CONVERSION_KEYWORDS = frozenset(
         "RAT_FUNC",
         "TAB_INTP",
         "TAB_NOINTP",
+        "TAB_VERB",
         "FORM",
     }
 )
@@ -338,6 +340,7 @@ def _echo_word(word: str) -> str:
     return "".join(out)
 
 
+@lru_cache(maxsize=4096)
 def _number_word(word: str) -> Optional[int]:
     """Parse a number word (``0x``/``0X`` + 1..16 hex digits, or 1..20 decimal
     digits), else ``None`` (R-A2L-READ.34 … .36)."""
@@ -428,10 +431,17 @@ def _tag_header(
     n = len(words)
     if n > 0:
         first = words[0][0]
-        name = _unquote(first) if first.startswith('"') else first
+        if len(first) >= 2 and first.startswith('"') and first.endswith('"'):
+            name = first[1:-1]
+        else:
+            name = first
         i = 1
         if n > 1 and words[1][0].startswith('"'):
-            long_identifier = _unquote(words[1][0]) or None
+            long_word = words[1][0]
+            if len(long_word) >= 2 and long_word.endswith('"'):
+                long_identifier = long_word[1:-1] or None
+            else:
+                long_identifier = long_word or None
             i = 2
     max_header = _HEADER_WORDS.get(section_name, 0)
     header: list[str] = []
@@ -531,25 +541,30 @@ def _tag_sizes(
     has_count = False
     for text, _line, arg_words in keyword_lines:
         kw = text.partition(" ")[0]
+        if kw not in ("DATA_SIZE", "LENGTH", "NUMBER", "ARRAY_SIZE", "MATRIX_DIM"):
+            continue
         args = [word for word, _arg_line in arg_words]
         if kw in ("DATA_SIZE", "LENGTH"):
             has_data_or_length = True
-            if len(args) == 1 and _number_word(args[0]) is not None:
-                byte_sizes.append(_number_word(args[0]))
+            value = _number_word(args[0]) if len(args) == 1 else None
+            if value is not None:
+                byte_sizes.append(value)
             else:
                 no_number = True
         elif kw in ("NUMBER", "ARRAY_SIZE"):
             has_count = True
-            if len(args) == 1 and _number_word(args[0]) is not None:
-                counts.append(_number_word(args[0]))
+            value = _number_word(args[0]) if len(args) == 1 else None
+            if value is not None:
+                counts.append(value)
             else:
                 no_number = True
         elif kw == "MATRIX_DIM":
             has_count = True
-            if 1 <= len(args) <= _MATRIX_DIM_MAX and all(_number_word(a) is not None for a in args):
+            values = [_number_word(a) for a in args]
+            if 1 <= len(args) <= _MATRIX_DIM_MAX and all(value is not None for value in values):
                 prod = 1
-                for a in args:
-                    prod *= _number_word(a)
+                for value in values:
+                    prod *= value
                 counts.append(prod)
             else:
                 no_number = True
@@ -1980,6 +1995,7 @@ def _infer_length_characteristic(
     lines: list[str],
     header: Optional[dict],
     record_layouts_by_name: Optional[dict[str, dict]] = None,
+    element_size: Optional[int] = None,
 ) -> Optional[int]:
     """Infer a CHARACTERISTIC's length from its ``_tag_keyword_lines`` texts."""
     explicit: Optional[int] = None
@@ -1987,7 +2003,7 @@ def _infer_length_characteristic(
     number: Optional[int] = None
     for text in lines:
         parts = _line_words(text)
-        if parts[0] == "LENGTH" and len(parts) == 2:
+        if parts[0] in ("DATA_SIZE", "LENGTH") and len(parts) == 2:
             value = _number_word(parts[1])
             if value is not None:
                 explicit = value
@@ -2013,7 +2029,9 @@ def _infer_length_characteristic(
     deposit = str(h.get("deposit") or "")
     char_type = h.get("char_type")
     if char_type in ("VALUE", "VAL_BLK"):
-        el = _characteristic_element_size(deposit, record_layouts_by_name)
+        el = element_size
+        if el is None:
+            el = _characteristic_element_size(deposit, record_layouts_by_name)
     else:
         el = sizeof_from_deposit(deposit)
     if char_type == "ASCII":
@@ -2725,6 +2743,14 @@ def _apply_compu_method(
         if physical is None:
             return None, "error", rat_error or "RAT_FUNC inversion failed"
         return physical, "ok", ""
+    if conversion_type == "TAB_VERB":
+        table = compu_tables_by_name.get(str(method.get("compu_tab_ref") or ""))
+        if table is None:
+            return None, "error", "lookup table missing"
+        for table_raw, table_text in table.get("entries") or []:
+            if table_raw == raw_value:
+                return table_text, "ok", ""
+        return None, "error", "raw value not in verbal table"
     if conversion_type in {"TAB_NOINTP", "TAB_INTP"}:
         table_name = method.get("compu_tab_ref")
         table = compu_tables_by_name.get(table_name or "")
@@ -3481,10 +3507,33 @@ def extract_a2l_tags(
         header_address_word: Optional[str] = None
         header_address_line: Optional[int] = None
         if section_name == "MEASUREMENT":
-            header_meas = parse_measurement_header(" ".join(header))
+            if header and not any('"' in word for word in header):
+                header_meas = {
+                    "datatype": header[0],
+                    "conversion": header[1] if len(header) > 1 else None,
+                    "resolution": header[2] if len(header) > 2 else None,
+                    "accuracy": header[3] if len(header) > 3 else None,
+                    "lower_limit": header[4] if len(header) > 4 else None,
+                    "upper_limit": header[5] if len(header) > 5 else None,
+                    "address_inline": None,
+                }
+            else:
+                header_meas = parse_measurement_header(" ".join(header))
         else:
             if len(header) == 7:
-                header_char = _characteristic_from_tokens(header)
+                if not any('"' in word for word in header) and header[0] in CHARACTERISTIC_KINDS:
+                    header_char = {
+                        "char_type": header[0],
+                        "address_inline": _number_word(header[1]),
+                        "deposit": header[2],
+                        "max_diff": header[3],
+                        "conversion": header[4],
+                        "lower_limit": header[5],
+                        "upper_limit": header[6],
+                        "datatype": None,
+                    }
+                else:
+                    header_char = _characteristic_from_tokens(header)
                 header_address_word = header[1]
                 header_address_line = head[name_count + 1][1] if name_count + 1 < len(head) else start_line
 
@@ -3724,11 +3773,26 @@ def extract_a2l_tags(
             tag["length"] = None
         else:
             if section_name == "MEASUREMENT":
-                tag["length"] = _infer_length_measurement(keyword_texts, header_meas)
+                if seen.isdisjoint(("DATA_SIZE", "LENGTH", "ARRAY_SIZE", "MATRIX_DIM")):
+                    tag["length"] = DATATYPE_SIZES.get(tag.get("datatype"))
+                else:
+                    tag["length"] = _infer_length_measurement(keyword_texts, header_meas)
+            elif section_name == "CHARACTERISTIC" and kind in _CURVE_MAP_FAMILY:
+                if span is not None:
+                    tag["length"] = span
+                elif has_standing_size:
+                    tag["length"] = _infer_length_characteristic(
+                        keyword_texts, header_char, record_layouts_by_name, element_size
+                    )
+                else:
+                    tag["length"] = None
             else:
-                tag["length"] = _infer_length_characteristic(
-                    keyword_texts, header_char, record_layouts_by_name
-                )
+                if kind == "VALUE" and seen.isdisjoint(("DATA_SIZE", "LENGTH", "MATRIX_DIM", "NUMBER")):
+                    tag["length"] = element_size
+                else:
+                    tag["length"] = _infer_length_characteristic(
+                        keyword_texts, header_char, record_layouts_by_name, element_size
+                    )
             if tag["length"] is not None:
                 bounded = _bounded_length(tag["length"])
                 if bounded is None:
@@ -3738,16 +3802,6 @@ def extract_a2l_tags(
                     )
                     refused_length_ids.add(id(tag))
                 tag["length"] = bounded
-
-        # Inline-axis span (base behavior; a refusal is final).
-        if (
-            section_name == "CHARACTERISTIC"
-            and kind in _CURVE_MAP_FAMILY
-            and tag.get("length") is None
-            and id(tag) not in refused_length_ids
-            and span is not None
-        ):
-            tag["length"] = span
 
         # Remember a standing DATA_SIZE/LENGTH whose span is external (E3S-29).
         if (
@@ -3811,6 +3865,8 @@ def extract_a2l_tags(
         if not layout:
             continue
         span = _record_layout_full_span(layout, counts)
+        if span is None:
+            continue
         if tag.get("length") is None:
             tag["length"] = span
         elif tid in standing_size_ids:
@@ -3823,6 +3879,8 @@ def extract_a2l_tags(
                 )
                 tag["length"] = None
                 refused_length_ids.add(tid)
+            else:
+                tag["length"] = span
     return tags
 
 

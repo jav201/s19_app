@@ -1,0 +1,16 @@
+/tmp/b103-e5-11-int9-laptop/tree/s19_app/__init__.py
+...R-A2L-READ.52/1 case_06 peak RSS: peak=581.3 MB pre-parse=62.2 MB peak-minus-before=519.2 MB
+.R-A2L-READ.52/1 software_a peak RSS: peak=98.2 MB pre-parse=61.1 MB peak-minus-before=37.2 MB
+.R-A2L-READ.52/2 string peak RSS: peak=88.4 MB pre-parse=61.1 MB peak-minus-before=27.3 MB
+.R-A2L-READ.52/3 words peak RSS: peak=135.3 MB pre-parse=62.2 MB peak-minus-before=73.1 MB
+.
+============================= QC-TM timing margins =============================
+LOW 0.2%  9.296 s / 9.313 s  R-A2L-READ.52/1 case_06 time  tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_case06_time
+LOW 10.3%  0.955 s / 1.065 s  R-A2L-READ.52/1 software_a time  tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_software_a_time
+35.1%  0.096 s / 0.148 s  R-A2L-READ.52/2 string time  tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_string_time
+45.2%  135.281 s / 246.969 s  R-A2L-READ.52/3 words peak RSS  tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_words_memory
+45.5%  581.332 s / 1067.375 s  R-A2L-READ.52/1 case_06 peak RSS  tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_case06_memory
+45.8%  88.375 s / 162.961 s  R-A2L-READ.52/2 string peak RSS  tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_string_memory
+47.6%  98.223 s / 187.578 s  R-A2L-READ.52/1 software_a peak RSS  tests/test_b103_a2l_reader_perf.py::test_r_a2l_read_52_software_a_memory
+QC-TM: 7 bounds, 2 under 20 % margin
+7 passed, 1 deselected in 163.60s (0:02:43)

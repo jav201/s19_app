@@ -1,0 +1,32 @@
+/tmp/b103-e5-11-p16/tree/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________ test_e5_p16_curve_declared_uword_two_axis_points_full_span __________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-57/test_e5_p16_curve_declared_uwo0')
+
+    def test_e5_p16_curve_declared_uword_two_axis_points_full_span(tmp_path: Path) -> None:
+        """R-A2L-018: a CURVE with a declared UWORD record layout and two inline
+        axis points sizes to its whole record (2 × UWORD = 4), not the scalar
+        deposit length 2."""
+        text = _body(
+            "/begin RECORD_LAYOUT __UWORD_Z\nFNC_VALUES 1 UWORD ROW_DIR DIRECT\n/end RECORD_LAYOUT\n"
+            + char(
+                "C",
+                "CURVE",
+                "0x2000",
+                "__UWORD_Z",
+                " /begin AXIS_DESCR",
+                " STD_AXIS NO_INPUT_QUANTITY CM_ID 2 0 255",
+                " /end AXIS_DESCR",
+            )
+        )
+        data = _parse(tmp_path, text)
+>       assert _tag(data, "C", "CHARACTERISTIC")["length"] == 4
+E       assert 2 == 4
+
+tests/test_b103_a2l_reader_e5.py:448: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader_e5.py::test_e5_p16_curve_declared_uword_two_axis_points_full_span
+1 failed in 0.21s
+PYTEST_EXIT=1

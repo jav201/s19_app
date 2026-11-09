@@ -1,0 +1,370 @@
+/tmp/b103-e5-11-p16/tree/s19_app/__init__.py
+F...........FFFFFFFF..................F................................. [ 64%]
+.........................F..........F...                                 [100%]
+=================================== FAILURES ===================================
+__________________ test_cov_read_1_line_end_variants_equal_lf __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-62/test_cov_read_1_line_end_varia0')
+
+    def test_cov_read_1_line_end_variants_equal_lf(tmp_path: Path) -> None:
+        """R-A2L-READ.1/1..3: tags, sections (line numbers included) and errors
+        equal the LF reading, not just the six tag fields."""
+        for path in _tracked_a2l():
+            text = path.read_text(encoding="utf-8", errors="replace")
+            base = parse_a2l_file(path)
+            for variant in ("crlf", "cr", "mixed"):
+                if variant == "crlf":
+                    body = text.replace("\n", "\r\n")
+                elif variant == "cr":
+                    body = text.replace("\n", "\r")
+                else:
+                    body = "".join(
+                        ln + ("\r\n" if i % 3 == 0 else "\r" if i % 3 == 1 else "\n")
+                        for i, ln in enumerate(text.split("\n"))
+                    )
+                data = _parse(tmp_path, body, name="line.a2l")
+>               assert data["sections"] == base["sections"], (path, variant)
+E               AssertionError: (PosixPath('/tmp/b103-e5-11-p16/tree/examples/case_00_public/ASAP2_Demo_V161.a2l'), 'mixed')
+E               assert [{'children':...'', ''], ...}] == [{'children':...'', ''], ...}]
+E                 
+E                 At index 0 diff: {'name': 'PROJECT', 'meta': 'ASAP2_Example ""', 'meta_line': 2, 'start_line': 2, 'end_line': 4032, 'lines': ['', ''], 'line_numbers': [3, 8], 'children': [{'name': 'HEADER', 'meta': '"ASAP2 Example File"', 'meta_line': 3, 'start_line': 3, 'end_line': 6, 'lines': ['VERSION "V1.61"', 'PROJECT_NO MCD_P12_08'], 'line_numbers': [4, 5], 'children': []}, {'name': 'MODULE', 'meta': 'Example ""', 'meta_line': 8, 'start_line': 8, 'end_line': 4031, 'lines': ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '',...
+E                 
+E                 ...Full output truncated (2 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_reader_coverage.py:139: AssertionError
+_________ test_cov_read_4_after_address_length_matrix_exact[\xa0-00A0] _________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-62/test_cov_read_4_after_address_0')
+ch = '\xa0', code = '00A0'
+
+    @pytest.mark.parametrize(
+        ("ch", "code"),
+        [
+            ("\u00a0", "00A0"), ("\u0085", "0085"), ("\u2028", "2028"), ("\u2029", "2029"),
+            ("\u001c", "001C"), ("\u001e", "001E"), ("\ufeff", "FEFF"), ("\u200b", "200B"),
+        ],
+    )
+    def test_cov_read_4_after_address_length_matrix_exact(tmp_path: Path, ch: str, code: str) -> None:
+        """R-A2L-READ.4/5: exactly one ``Line 20: unexpected character U+<code>``
+        per object (header address, LENGTH, MATRIX_DIM — 3 total)."""
+        shapes = (
+            f'/begin CHARACTERISTIC CX "" VALUE 0x2000{ch} RL_U16 0 CM_ID 0 65535\n/end CHARACTERISTIC',
+            meas("X", " ECU_ADDRESS 0x10", f" LENGTH 4{ch}"),
+            meas("Y", " ECU_ADDRESS 0x10", f" MATRIX_DIM 4{ch}"),
+        )
+        for shape in shapes:
+            data = _parse(tmp_path, _body(shape))
+            errs = [e for e in data["errors"] if "unexpected character" in e]
+>           assert errs == [f"Line 20: unexpected character U+{code}"], data["errors"]
+E           AssertionError: ['Line 23: unexpected character U+00A0', 'Line 23: LENGTH 4� is not a number']
+E           assert ['Line 23: un...acter U+00A0'] == ['Line 20: un...acter U+00A0']
+E             
+E             At index 0 diff: 'Line 23: unexpected character U+00A0' != 'Line 20: unexpected character U+00A0'
+E             Use -v to get more diff
+
+tests/test_b103_a2l_reader_coverage.py:222: AssertionError
+_________ test_cov_read_4_after_address_length_matrix_exact[\x85-0085] _________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-62/test_cov_read_4_after_address_1')
+ch = '\x85', code = '0085'
+
+    @pytest.mark.parametrize(
+        ("ch", "code"),
+        [
+            ("\u00a0", "00A0"), ("\u0085", "0085"), ("\u2028", "2028"), ("\u2029", "2029"),
+            ("\u001c", "001C"), ("\u001e", "001E"), ("\ufeff", "FEFF"), ("\u200b", "200B"),
+        ],
+    )
+    def test_cov_read_4_after_address_length_matrix_exact(tmp_path: Path, ch: str, code: str) -> None:
+        """R-A2L-READ.4/5: exactly one ``Line 20: unexpected character U+<code>``
+        per object (header address, LENGTH, MATRIX_DIM — 3 total)."""
+        shapes = (
+            f'/begin CHARACTERISTIC CX "" VALUE 0x2000{ch} RL_U16 0 CM_ID 0 65535\n/end CHARACTERISTIC',
+            meas("X", " ECU_ADDRESS 0x10", f" LENGTH 4{ch}"),
+            meas("Y", " ECU_ADDRESS 0x10", f" MATRIX_DIM 4{ch}"),
+        )
+        for shape in shapes:
+            data = _parse(tmp_path, _body(shape))
+            errs = [e for e in data["errors"] if "unexpected character" in e]
+>           assert errs == [f"Line 20: unexpected character U+{code}"], data["errors"]
+E           AssertionError: ['Line 23: unexpected character U+0085', 'Line 23: LENGTH 4� is not a number']
+E           assert ['Line 23: un...acter U+0085'] == ['Line 20: un...acter U+0085']
+E             
+E             At index 0 diff: 'Line 23: unexpected character U+0085' != 'Line 20: unexpected character U+0085'
+E             Use -v to get more diff
+
+tests/test_b103_a2l_reader_coverage.py:222: AssertionError
+________ test_cov_read_4_after_address_length_matrix_exact[\u2028-2028] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-62/test_cov_read_4_after_address_2')
+ch = '\u2028', code = '2028'
+
+    @pytest.mark.parametrize(
+        ("ch", "code"),
+        [
+            ("\u00a0", "00A0"), ("\u0085", "0085"), ("\u2028", "2028"), ("\u2029", "2029"),
+            ("\u001c", "001C"), ("\u001e", "001E"), ("\ufeff", "FEFF"), ("\u200b", "200B"),
+        ],
+    )
+    def test_cov_read_4_after_address_length_matrix_exact(tmp_path: Path, ch: str, code: str) -> None:
+        """R-A2L-READ.4/5: exactly one ``Line 20: unexpected character U+<code>``
+        per object (header address, LENGTH, MATRIX_DIM — 3 total)."""
+        shapes = (
+            f'/begin CHARACTERISTIC CX "" VALUE 0x2000{ch} RL_U16 0 CM_ID 0 65535\n/end CHARACTERISTIC',
+            meas("X", " ECU_ADDRESS 0x10", f" LENGTH 4{ch}"),
+            meas("Y", " ECU_ADDRESS 0x10", f" MATRIX_DIM 4{ch}"),
+        )
+        for shape in shapes:
+            data = _parse(tmp_path, _body(shape))
+            errs = [e for e in data["errors"] if "unexpected character" in e]
+>           assert errs == [f"Line 20: unexpected character U+{code}"], data["errors"]
+E           AssertionError: ['Line 23: unexpected character U+2028', 'Line 23: LENGTH 4� is not a number']
+E           assert ['Line 23: un...acter U+2028'] == ['Line 20: un...acter U+2028']
+E             
+E             At index 0 diff: 'Line 23: unexpected character U+2028' != 'Line 20: unexpected character U+2028'
+E             Use -v to get more diff
+
+tests/test_b103_a2l_reader_coverage.py:222: AssertionError
+________ test_cov_read_4_after_address_length_matrix_exact[\u2029-2029] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-62/test_cov_read_4_after_address_3')
+ch = '\u2029', code = '2029'
+
+    @pytest.mark.parametrize(
+        ("ch", "code"),
+        [
+            ("\u00a0", "00A0"), ("\u0085", "0085"), ("\u2028", "2028"), ("\u2029", "2029"),
+            ("\u001c", "001C"), ("\u001e", "001E"), ("\ufeff", "FEFF"), ("\u200b", "200B"),
+        ],
+    )
+    def test_cov_read_4_after_address_length_matrix_exact(tmp_path: Path, ch: str, code: str) -> None:
+        """R-A2L-READ.4/5: exactly one ``Line 20: unexpected character U+<code>``
+        per object (header address, LENGTH, MATRIX_DIM — 3 total)."""
+        shapes = (
+            f'/begin CHARACTERISTIC CX "" VALUE 0x2000{ch} RL_U16 0 CM_ID 0 65535\n/end CHARACTERISTIC',
+            meas("X", " ECU_ADDRESS 0x10", f" LENGTH 4{ch}"),
+            meas("Y", " ECU_ADDRESS 0x10", f" MATRIX_DIM 4{ch}"),
+        )
+        for shape in shapes:
+            data = _parse(tmp_path, _body(shape))
+            errs = [e for e in data["errors"] if "unexpected character" in e]
+>           assert errs == [f"Line 20: unexpected character U+{code}"], data["errors"]
+E           AssertionError: ['Line 23: unexpected character U+2029', 'Line 23: LENGTH 4� is not a number']
+E           assert ['Line 23: un...acter U+2029'] == ['Line 20: un...acter U+2029']
+E             
+E             At index 0 diff: 'Line 23: unexpected character U+2029' != 'Line 20: unexpected character U+2029'
+E             Use -v to get more diff
+
+tests/test_b103_a2l_reader_coverage.py:222: AssertionError
+_________ test_cov_read_4_after_address_length_matrix_exact[\x1c-001C] _________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-62/test_cov_read_4_after_address_4')
+ch = '\x1c', code = '001C'
+
+    @pytest.mark.parametrize(
+        ("ch", "code"),
+        [
+            ("\u00a0", "00A0"), ("\u0085", "0085"), ("\u2028", "2028"), ("\u2029", "2029"),
+            ("\u001c", "001C"), ("\u001e", "001E"), ("\ufeff", "FEFF"), ("\u200b", "200B"),
+        ],
+    )
+    def test_cov_read_4_after_address_length_matrix_exact(tmp_path: Path, ch: str, code: str) -> None:
+        """R-A2L-READ.4/5: exactly one ``Line 20: unexpected character U+<code>``
+        per object (header address, LENGTH, MATRIX_DIM — 3 total)."""
+        shapes = (
+            f'/begin CHARACTERISTIC CX "" VALUE 0x2000{ch} RL_U16 0 CM_ID 0 65535\n/end CHARACTERISTIC',
+            meas("X", " ECU_ADDRESS 0x10", f" LENGTH 4{ch}"),
+            meas("Y", " ECU_ADDRESS 0x10", f" MATRIX_DIM 4{ch}"),
+        )
+        for shape in shapes:
+            data = _parse(tmp_path, _body(shape))
+            errs = [e for e in data["errors"] if "unexpected character" in e]
+>           assert errs == [f"Line 20: unexpected character U+{code}"], data["errors"]
+E           AssertionError: ['Line 23: unexpected character U+001C', 'Line 23: LENGTH 4� is not a number']
+E           assert ['Line 23: un...acter U+001C'] == ['Line 20: un...acter U+001C']
+E             
+E             At index 0 diff: 'Line 23: unexpected character U+001C' != 'Line 20: unexpected character U+001C'
+E             Use -v to get more diff
+
+tests/test_b103_a2l_reader_coverage.py:222: AssertionError
+_________ test_cov_read_4_after_address_length_matrix_exact[\x1e-001E] _________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-62/test_cov_read_4_after_address_5')
+ch = '\x1e', code = '001E'
+
+    @pytest.mark.parametrize(
+        ("ch", "code"),
+        [
+            ("\u00a0", "00A0"), ("\u0085", "0085"), ("\u2028", "2028"), ("\u2029", "2029"),
+            ("\u001c", "001C"), ("\u001e", "001E"), ("\ufeff", "FEFF"), ("\u200b", "200B"),
+        ],
+    )
+    def test_cov_read_4_after_address_length_matrix_exact(tmp_path: Path, ch: str, code: str) -> None:
+        """R-A2L-READ.4/5: exactly one ``Line 20: unexpected character U+<code>``
+        per object (header address, LENGTH, MATRIX_DIM — 3 total)."""
+        shapes = (
+            f'/begin CHARACTERISTIC CX "" VALUE 0x2000{ch} RL_U16 0 CM_ID 0 65535\n/end CHARACTERISTIC',
+            meas("X", " ECU_ADDRESS 0x10", f" LENGTH 4{ch}"),
+            meas("Y", " ECU_ADDRESS 0x10", f" MATRIX_DIM 4{ch}"),
+        )
+        for shape in shapes:
+            data = _parse(tmp_path, _body(shape))
+            errs = [e for e in data["errors"] if "unexpected character" in e]
+>           assert errs == [f"Line 20: unexpected character U+{code}"], data["errors"]
+E           AssertionError: ['Line 23: unexpected character U+001E', 'Line 23: LENGTH 4� is not a number']
+E           assert ['Line 23: un...acter U+001E'] == ['Line 20: un...acter U+001E']
+E             
+E             At index 0 diff: 'Line 23: unexpected character U+001E' != 'Line 20: unexpected character U+001E'
+E             Use -v to get more diff
+
+tests/test_b103_a2l_reader_coverage.py:222: AssertionError
+________ test_cov_read_4_after_address_length_matrix_exact[\ufeff-FEFF] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-62/test_cov_read_4_after_address_6')
+ch = '\ufeff', code = 'FEFF'
+
+    @pytest.mark.parametrize(
+        ("ch", "code"),
+        [
+            ("\u00a0", "00A0"), ("\u0085", "0085"), ("\u2028", "2028"), ("\u2029", "2029"),
+            ("\u001c", "001C"), ("\u001e", "001E"), ("\ufeff", "FEFF"), ("\u200b", "200B"),
+        ],
+    )
+    def test_cov_read_4_after_address_length_matrix_exact(tmp_path: Path, ch: str, code: str) -> None:
+        """R-A2L-READ.4/5: exactly one ``Line 20: unexpected character U+<code>``
+        per object (header address, LENGTH, MATRIX_DIM — 3 total)."""
+        shapes = (
+            f'/begin CHARACTERISTIC CX "" VALUE 0x2000{ch} RL_U16 0 CM_ID 0 65535\n/end CHARACTERISTIC',
+            meas("X", " ECU_ADDRESS 0x10", f" LENGTH 4{ch}"),
+            meas("Y", " ECU_ADDRESS 0x10", f" MATRIX_DIM 4{ch}"),
+        )
+        for shape in shapes:
+            data = _parse(tmp_path, _body(shape))
+            errs = [e for e in data["errors"] if "unexpected character" in e]
+>           assert errs == [f"Line 20: unexpected character U+{code}"], data["errors"]
+E           AssertionError: ['Line 23: unexpected character U+FEFF', 'Line 23: LENGTH 4� is not a number']
+E           assert ['Line 23: un...acter U+FEFF'] == ['Line 20: un...acter U+FEFF']
+E             
+E             At index 0 diff: 'Line 23: unexpected character U+FEFF' != 'Line 20: unexpected character U+FEFF'
+E             Use -v to get more diff
+
+tests/test_b103_a2l_reader_coverage.py:222: AssertionError
+________ test_cov_read_4_after_address_length_matrix_exact[\u200b-200B] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-62/test_cov_read_4_after_address_7')
+ch = '\u200b', code = '200B'
+
+    @pytest.mark.parametrize(
+        ("ch", "code"),
+        [
+            ("\u00a0", "00A0"), ("\u0085", "0085"), ("\u2028", "2028"), ("\u2029", "2029"),
+            ("\u001c", "001C"), ("\u001e", "001E"), ("\ufeff", "FEFF"), ("\u200b", "200B"),
+        ],
+    )
+    def test_cov_read_4_after_address_length_matrix_exact(tmp_path: Path, ch: str, code: str) -> None:
+        """R-A2L-READ.4/5: exactly one ``Line 20: unexpected character U+<code>``
+        per object (header address, LENGTH, MATRIX_DIM — 3 total)."""
+        shapes = (
+            f'/begin CHARACTERISTIC CX "" VALUE 0x2000{ch} RL_U16 0 CM_ID 0 65535\n/end CHARACTERISTIC',
+            meas("X", " ECU_ADDRESS 0x10", f" LENGTH 4{ch}"),
+            meas("Y", " ECU_ADDRESS 0x10", f" MATRIX_DIM 4{ch}"),
+        )
+        for shape in shapes:
+            data = _parse(tmp_path, _body(shape))
+            errs = [e for e in data["errors"] if "unexpected character" in e]
+>           assert errs == [f"Line 20: unexpected character U+{code}"], data["errors"]
+E           AssertionError: ['Line 23: unexpected character U+200B', 'Line 23: LENGTH 4� is not a number']
+E           assert ['Line 23: un...acter U+200B'] == ['Line 20: un...acter U+200B']
+E             
+E             At index 0 diff: 'Line 23: unexpected character U+200B' != 'Line 20: unexpected character U+200B'
+E             Use -v to get more diff
+
+tests/test_b103_a2l_reader_coverage.py:222: AssertionError
+______________ test_cov_read_14_words_after_close_carry_end_line _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-62/test_cov_read_14_words_after_c0')
+
+    def test_cov_read_14_words_after_close_carry_end_line(tmp_path: Path) -> None:
+        """R-A2L-READ.14/2: X's end_line is 5; the U+00E9 error names Line 5."""
+        text = _body(meas("X", ' FORMAT "a', 'b" \u00e9 /end MEASUREMENT'))
+        data = _parse(tmp_path, text)
+        sec = _sections(data, "MEASUREMENT")[0]
+>       assert sec["end_line"] == 5
+E       assert 23 == 5
+
+tests/test_b103_a2l_reader_coverage.py:429: AssertionError
+__________________ test_cov_read_48_hostile_corpus_equal_ref ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-62/test_cov_read_48_hostile_corpu0')
+
+    def test_cov_read_48_hostile_corpus_equal_ref(tmp_path: Path) -> None:
+        """R-A2L-READ.48/2: the hostile corpus equals the reference reading."""
+        ref = _ref_read()
+        corpus = _corpus()
+        assert len(corpus) == 160, f"hostile corpus has {len(corpus)} shapes, expected 160"
+        checked = 0
+        for entry in corpus:
+            raw = _corpus_bytes(entry)
+            path = tmp_path / f"{entry['key']}.a2l"
+            path.write_bytes(raw)
+            data = parse_a2l_file(path)
+            if data["errors"] == ["File is UTF-16 encoded; save it as UTF-8 and load it again."]:
+                # REF is a text oracle; the byte-level UTF-16 refusal is asserted
+                # directly (R-A2L-READ.6/1, /2).
+                assert data["tags"] == [] and data["sections"] == []
+                continue
+            text_for_ref = raw.decode("utf-8", errors="replace")
+            reading = ref(text_for_ref)
+            _assert_sections_equal(data["sections"], reading["sections"])
+            _assert_tags_equal(data["tags"], reading["tags"])
+            _assert_spans_equal(_spans(data), reading["spans"])
+>           assert _cov_errors_equal(data["errors"], reading["errors"]), (
+                entry["key"], data["errors"], reading["errors"]
+            )
+E           AssertionError: ('H1b', ['Line 10: unexpected character U+200B', 'Line 9: unexpected character U+0020', 'Line 10: address 0x1C2D3E00�4...unexpected character U+200B', 10), ('unexpected character U+0020', 9), ('address 0x1C2D3E00�4026 is not a number', 9)])
+E           assert False
+E            +  where False = _cov_errors_equal(['Line 10: unexpected character U+200B', 'Line 9: unexpected character U+0020', 'Line 10: address 0x1C2D3E00�4026 is not a number'], [('unexpected character U+200B', 10), ('unexpected character U+0020', 9), ('address 0x1C2D3E00�4026 is not a number', 9)])
+
+tests/test_b103_a2l_reader_coverage.py:1535: AssertionError
+___________________ test_cov_read_54_compu_vtab_named_later ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-62/test_cov_read_54_compu_vtab_na0')
+
+    def test_cov_read_54_compu_vtab_named_later(tmp_path: Path) -> None:
+        """R-A2L-READ.54/4: a later-named COMPU_VTAB resolves its entries."""
+        hdr = (
+            "ASAP2_VERSION 1 71\n/project P\n/begin MODULE M \"\"\n/begin MOD_COMMON \"\"\nBYTE_ORDER MSB_FIRST\n/end MOD_COMMON\n"
+            "/begin COMPU_VTAB\nVT_K1 \"\"\nTAB_VERB 2\n0 \"off\"\n1 \"on\"\n/end COMPU_VTAB\n"
+            "/begin COMPU_METHOD CM_VT \"\" TAB_VERB \"%.0\" \"\"\nCOMPU_TAB_REF VT_K1\n/end COMPU_METHOD\n"
+            "/begin RECORD_LAYOUT RL_U16\nFNC_VALUES 1 UWORD ROW_DIR DIRECT\n/end RECORD_LAYOUT\n"
+            "/begin TYPEDEF_MEASUREMENT T_U16 \"\" UWORD CM_ID 0 0 0 65535\n/end TYPEDEF_MEASUREMENT\n"
+            '/begin MEASUREMENT XVT ""\nUWORD\nCM_VT\n0\n0\n0\n65535\nECU_ADDRESS\n0x1238\n/end MEASUREMENT\n'
+            "/end MODULE\n/end PROJECT\n"
+        )
+        data = _parse(tmp_path, hdr)
+        table = data["compu_tabs_by_name"].get("VT_K1")
+        assert table is not None
+        assert table["section"] == "COMPU_VTAB" and table["kind"] == "TAB_VERB"
+        assert table["entries"] == [(0.0, "off"), (1.0, "on")]
+        enriched = enrich_a2l_tags_with_values(data, {0x1238: 0x00, 0x1239: 0x01})
+        row = [entry for entry in enriched if entry.get("name") == "XVT"][0]
+        assert row["raw_value"] == 1
+>       assert row["physical_value"] == "on"
+E       AssertionError: assert 1 == 'on'
+
+tests/test_b103_a2l_reader_coverage.py:1789: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader_coverage.py::test_cov_read_1_line_end_variants_equal_lf
+FAILED tests/test_b103_a2l_reader_coverage.py::test_cov_read_4_after_address_length_matrix_exact[\xa0-00A0]
+FAILED tests/test_b103_a2l_reader_coverage.py::test_cov_read_4_after_address_length_matrix_exact[\x85-0085]
+FAILED tests/test_b103_a2l_reader_coverage.py::test_cov_read_4_after_address_length_matrix_exact[\u2028-2028]
+FAILED tests/test_b103_a2l_reader_coverage.py::test_cov_read_4_after_address_length_matrix_exact[\u2029-2029]
+FAILED tests/test_b103_a2l_reader_coverage.py::test_cov_read_4_after_address_length_matrix_exact[\x1c-001C]
+FAILED tests/test_b103_a2l_reader_coverage.py::test_cov_read_4_after_address_length_matrix_exact[\x1e-001E]
+FAILED tests/test_b103_a2l_reader_coverage.py::test_cov_read_4_after_address_length_matrix_exact[\ufeff-FEFF]
+FAILED tests/test_b103_a2l_reader_coverage.py::test_cov_read_4_after_address_length_matrix_exact[\u200b-200B]
+FAILED tests/test_b103_a2l_reader_coverage.py::test_cov_read_14_words_after_close_carry_end_line
+FAILED tests/test_b103_a2l_reader_coverage.py::test_cov_read_48_hostile_corpus_equal_ref
+FAILED tests/test_b103_a2l_reader_coverage.py::test_cov_read_54_compu_vtab_named_later
+12 failed, 100 passed in 77.76s (0:01:17)
+PYTEST_EXIT=1

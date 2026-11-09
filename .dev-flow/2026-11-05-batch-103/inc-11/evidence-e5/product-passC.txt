@@ -1,0 +1,4 @@
+/tmp/b103-e5-11-p16/tree/s19_app/__init__.py
+........................                                                 [100%]
+24 passed in 0.21s
+PYTEST_EXIT=0

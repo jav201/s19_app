@@ -1,0 +1,52 @@
+/tmp/b103-e5-11-p16/tree/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________________ test_cov_read_1_line_end_variants_equal_lf __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-63/test_cov_read_1_line_end_varia0')
+
+    def test_cov_read_1_line_end_variants_equal_lf(tmp_path: Path) -> None:
+        """R-A2L-READ.1/1..3: tags, sections (line numbers included) and errors
+        equal the LF reading, not just the six tag fields."""
+        for path in _tracked_a2l():
+            text = path.read_text(encoding="utf-8", errors="replace")
+            base = parse_a2l_file(path)
+            for variant in ("crlf", "cr", "mixed"):
+                if variant == "crlf":
+                    body = text.replace("\n", "\r\n")
+                elif variant == "cr":
+                    body = text.replace("\n", "\r")
+                else:
+                    body = "".join(
+                        ln + ("\r\n" if i % 3 == 0 else "\r" if i % 3 == 1 else "\n")
+                        for i, ln in enumerate(text.split("\n"))
+                    )
+                data = _parse(tmp_path, body, name="line.a2l")
+>               _assert_same_section_tree(data["sections"], base["sections"], (str(path), variant))
+
+tests/test_b103_a2l_reader_coverage.py:153: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+left = [{'children': [{'children': [], 'end_line': 6, 'line_numbers': [4, 5], 'lines': ['VERSION "V1.61"', 'PROJECT_NO MCD_P1......], 'lines': ['', '', '', '', '', '', ...], ...}], 'end_line': 4032, 'line_numbers': [3, 8], 'lines': ['', ''], ...}]
+right = [{'children': [{'children': [], 'end_line': 7, 'line_numbers': [5, 6], 'lines': ['VERSION "V1.61"', 'PROJECT_NO MCD_P1......], 'lines': ['', '', '', '', '', '', ...], ...}], 'end_line': 4085, 'line_numbers': [4, 9], 'lines': ['', ''], ...}]
+context = ('/tmp/b103-e5-11-p16/tree/examples/case_00_public/ASAP2_Demo_V161.a2l', 'mixed')
+
+    def _assert_same_section_tree(left: List[dict], right: List[dict], context: tuple) -> None:
+        """Assert equal section trees and identify any differing scalar field."""
+        assert len(left) == len(right), context
+        for index, (sec, bsec) in enumerate(zip(left, right)):
+            route = context + (index,)
+            differing = {
+                key: (value, bsec.get(key))
+                for key, value in sec.items()
+                if key != "children" and value != bsec.get(key)
+            }
+>           assert not differing, (route, differing)
+E           AssertionError: (('/tmp/b103-e5-11-p16/tree/examples/case_00_public/ASAP2_Demo_V161.a2l', 'mixed', 0), {'end_line': (4032, 4085), 'line_numbers': ([3, 8], [4, 9])})
+E           assert not {'end_line': (4032, 4085), 'line_numbers': ([3, 8], [4, 9])}
+
+tests/test_b103_a2l_reader_coverage.py:127: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader_coverage.py::test_cov_read_1_line_end_variants_equal_lf
+1 failed in 0.70s
+PYTEST_EXIT=1
