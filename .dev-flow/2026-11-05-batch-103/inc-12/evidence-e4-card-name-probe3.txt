@@ -1,0 +1,18 @@
+/tmp/b103-e4-12-27fb/run/s19_app/__init__.py
+expected_len=48 joined_len=77
+expected='SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END'
+joined='✓SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END  0x1C2D3E00desc synthetic map'
+expected_at_1=False index=-1
+actual_name='SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END  ' actual_name_len=48
+first_difference=42 expected='L' actual='_'
+scroll=0.0/5 wrap=True min_width=1
+raw_len=152 raw='✓ SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL_END  0x1C2D3E00\ndesc synthetic map\nunit — · conv CM_SYN\nlayout RL_SYN_MAP\nbyteorder little\nlimits 0..4095'
+expected_in_raw=True
+strip_0_len=2 text='✓ '
+strip_1_len=42 text='SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL'
+strip_2_len=18 text='LL_END  0x1C2D3E00'
+strip_3_len=18 text='desc synthetic map'
+strip_4_len=20 text='unit — · conv CM_SYN'
+strip_5_len=17 text='layout RL_SYN_MAP'
+strip_6_len=16 text='byteorder little'
+strip_7_len=14 text='limits 0..4095'

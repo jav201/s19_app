@@ -1,0 +1,138 @@
+/tmp/b103-e4-12-27fb/run/s19_app/__init__.py
+........................................................................ [ 64%]
+.................................F...F..                                 [100%]
+=================================== FAILURES ===================================
+_________________________ test_r_tui_042a_7_1_6_limits _________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-209/test_r_tui_042a_7_1_6_limits0')
+
+    def test_r_tui_042a_7_1_6_limits(tmp_path: Path) -> None:
+        """R-TUI-042a.7.1 case /6: a hostile lower-limit word, then a hostile
+        upper-limit word — each loaded from a real A2L file; the limits line sits
+        below the card's 5 visible rows and is scrolled into view, proven painted,
+        before the hostile introducers are asserted absent."""
+        for field in ("lower_limit", "upper_limit"):
+            hostile, scrubbed = _hostile("LIM", "_END")
+            if field == "lower_limit":
+                a2l = _card_characteristic_limits(lower_limit=hostile, upper_limit="100")
+            else:
+                a2l = _card_characteristic_limits(lower_limit="0", upper_limit=hostile)
+    
+            async def _observe(app, pilot, table, scrubbed=scrubbed):
+                await _assert_card_painted_then_safe(app, pilot, scrubbed, scroll=True)
+    
+>           _explore_card(tmp_path, a2l, (118, 54), _observe)
+
+tests/test_b103_inc12_tag_table.py:1198: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:1080: in _explore_card
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:1078: in _run
+    await scenario(app, pilot, table)
+tests/test_b103_inc12_tag_table.py:1196: in _observe
+    await _assert_card_painted_then_safe(app, pilot, scrubbed, scroll=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+projected = 'LIM]0;PWN31m0;xq_END'
+
+    async def _assert_card_painted_then_safe(
+        app, pilot, projected: str, *, scroll: bool = False
+    ) -> None:
+        """Positive-first (R-TUI-042a.7.1): prove ``projected`` — the value's
+        control-free projection — is actually painted (scrolling to the end with an
+        asserted nonzero effective scroll first when it lives below the card's
+        visible rows), then every card text line holds no control character and the
+        screen output holds none of the four hostile introducers."""
+        card = _card(app)
+        if scroll:
+            full = card.render().plain
+            assert "byteorder " in full, full
+            assert "limits " in full, full
+            assert card.max_scroll_y > 0, card.max_scroll_y
+            card.scroll_to(y=card.max_scroll_y, animate=False, force=True, immediate=True)
+            await _settle(pilot, 6)
+            assert card.scroll_y > 0, (card.scroll_y, card.max_scroll_y)
+            screen = _screen_output(app)
+>           assert projected in screen, (projected, screen)
+E           AssertionError: ('LIM]0;PWN31m0;xq_END', '\x1b[1;1H\x1b[40m                                                                           ...                                                                                                              \x1b[0m')
+E           assert 'LIM]0;PWN31m0;xq_END' in '\x1b[1;1H\x1b[40m                                                                                                    ...                                                                                                               \x1b[0m'
+
+tests/test_b103_inc12_tag_table.py:1106: AssertionError
+___________ test_r_tui_042a_8_1_name_line_with_a_display_identifier ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-<user>/pytest-209/test_r_tui_042a_8_1_name_line_0')
+
+    def test_r_tui_042a_8_1_name_line_with_a_display_identifier(tmp_path: Path) -> None:
+        """R-TUI-042a.8 case /1: LONGMAP(48) with ``DISPLAY_IDENTIFIER SYN_DISP_W`` —
+        first line ``✓ SYN_DISP_W  0x1C2D3E00``; the painted Name line and its
+        painted continuations hold the full 48-character name (never read from
+        ``card.render().plain``)."""
+        async def _check(app, pilot, table):
+            card = _card(app)
+            lines = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
+            assert lines and lines[0] == f"✓ SYN_DISP_W  {ADDR_STR}", lines
+            start = next((i for i, ln in enumerate(lines) if ln.startswith("name ")), None)
+            assert start is not None, lines
+            assert longname(48) in "".join(lines[start:]), (longname(48), lines[start:])
+    
+>       _explore(tmp_path, HEAD + map_block(longname(48), display_identifier="SYN_DISP_W") + TAIL,
+                 (118, 54), _check)
+
+tests/test_b103_inc12_tag_table.py:1279: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_inc12_tag_table.py:278: in _explore
+    projects.run_app(base, _run, size=size)
+tests/support/b100_projects.py:615: in run_app
+    return asyncio.run(_drive())
+           ^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:190: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/<user>/miniconda3/envs/s19ci/lib/python3.11/asyncio/base_events.py:654: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests/support/b100_projects.py:613: in _drive
+    return await scenario(app, pilot, log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_b103_inc12_tag_table.py:276: in _run
+    await result
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+app = S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})
+pilot = <Pilot app=S19TuiApp(title='Hex Edit Tool', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'})>
+table = A2LTagTable(id='a2l_tags_list')
+
+    async def _check(app, pilot, table):
+        card = _card(app)
+        lines = [ln.rstrip() for ln in _painted_lines(card) if ln.strip()]
+        assert lines and lines[0] == f"✓ SYN_DISP_W  {ADDR_STR}", lines
+        start = next((i for i, ln in enumerate(lines) if ln.startswith("name ")), None)
+>       assert start is not None, lines
+E       AssertionError: ['✓ SYN_DISP_W  0x1C2D3E00', 'name', 'SYN_MAP_LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL', 'LL_END']
+E       assert None is not None
+
+tests/test_b103_inc12_tag_table.py:1276: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_7_1_6_limits - Ass...
+FAILED tests/test_b103_inc12_tag_table.py::test_r_tui_042a_8_1_name_line_with_a_display_identifier
+2 failed, 110 passed in 812.80s (0:13:32)
