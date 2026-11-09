@@ -16,7 +16,7 @@
 # fails loudly if either could not be cleaned up.
 #
 #   powershell -NoProfile -File capture_windows.ps1 -Root . -Scenario synmap -OutPng out/synmap.80x50.png -Cols 80 -Rows 50
-#   powershell -NoProfile -File capture_windows.ps1 -Root . -Scenario curve -Cols 118 -Rows 54 -OutPng out/curve.118x54.png
+#   powershell -NoProfile -File capture_windows.ps1 -Root . -Scenario curve -Cols 118 -Rows 54 -ExpectRaw present -OutPng out/curve.118x54.png
 
 param(
   [Parameter(Mandatory = $true)][string]$Root,
@@ -25,6 +25,7 @@ param(
   [int]$Cols = 118,
   [int]$Rows = 54,
   [int]$SettleSeconds = 15,
+  [ValidateSet("present", "blank")][string]$ExpectRaw = "present",
   [string]$Python = "$env:USERPROFILE\anaconda3\envs\s19env\python.exe"
 )
 
@@ -155,7 +156,7 @@ $env:XDG_CACHE_HOME = '__ISO_CACHE__'
 $env:XDG_DATA_HOME = '__ISO_DATA__'
 $env:XDG_STATE_HOME = '__ISO_STATE__'
 $env:LOCALAPPDATA = '__ISO_LOCAL__'
-& '__PYTHON__' -I -B '__DRIVER__' --root '__ROOT__' --scenario __SCENARIO__ --base '__BASE__' --report '__REPORT__'
+& '__PYTHON__' -I -B '__DRIVER__' --root '__ROOT__' --scenario __SCENARIO__ --base '__BASE__' --expect-raw __EXPECT_RAW__ --report '__REPORT__'
 exit $LASTEXITCODE
 '@
 $launcherText = $launcherTemplate
@@ -170,6 +171,7 @@ $launcherText = $launcherText.Replace('__DRIVER__', $driver)
 $launcherText = $launcherText.Replace('__ROOT__', $Root)
 $launcherText = $launcherText.Replace('__SCENARIO__', $Scenario)
 $launcherText = $launcherText.Replace('__BASE__', $base)
+$launcherText = $launcherText.Replace('__EXPECT_RAW__', $ExpectRaw)
 $launcherText = $launcherText.Replace('__REPORT__', $report)
 Set-Content -LiteralPath $launcherPs1 -Value $launcherText -Encoding ASCII
 

@@ -32,9 +32,9 @@ $extras = @(@("synmap-midscroll", 80, 54), @("v171-nameline", 118, 54))
 
 $script:fail = 0
 
-function Invoke-Capture([string]$CaptureRoot, [string]$Scenario, [string]$OutPng, [int]$Cols, [int]$Rows) {
+function Invoke-Capture([string]$CaptureRoot, [string]$Scenario, [string]$OutPng, [int]$Cols, [int]$Rows, [string]$ExpectRaw) {
   try {
-    & $cap -Root $CaptureRoot -Scenario $Scenario -OutPng $OutPng -Cols $Cols -Rows $Rows
+    & $cap -Root $CaptureRoot -Scenario $Scenario -OutPng $OutPng -Cols $Cols -Rows $Rows -ExpectRaw $ExpectRaw
   } catch {
     $script:fail++
     Write-Output ("FAILED {0}: {1}" -f $OutPng, $_)
@@ -52,10 +52,10 @@ foreach ($scn in $scenarios) {
     $cols, $rows = $size
     if (-not $SkipBefore) {
       $out = Join-Path $OutDir ("{0}.{1}x{2}.before.png" -f $scn, $cols, $rows)
-      Invoke-Capture -CaptureRoot $BeforeRoot -Scenario $scn -OutPng $out -Cols $cols -Rows $rows
+      Invoke-Capture -CaptureRoot $BeforeRoot -Scenario $scn -OutPng $out -Cols $cols -Rows $rows -ExpectRaw present
     }
     $out = Join-Path $OutDir ("{0}.{1}x{2}.after.png" -f $scn, $cols, $rows)
-    Invoke-Capture -CaptureRoot $Root -Scenario $scn -OutPng $out -Cols $cols -Rows $rows
+    Invoke-Capture -CaptureRoot $Root -Scenario $scn -OutPng $out -Cols $cols -Rows $rows -ExpectRaw blank
   }
 }
 foreach ($ex in $extras) {
@@ -63,10 +63,10 @@ foreach ($ex in $extras) {
   if ($Only -ne "" -and $scn -ne $Only) { continue }
   if (-not $SkipBefore) {
     $out = Join-Path $OutDir ("{0}.{1}x{2}.before.png" -f $scn, $cols, $rows)
-    Invoke-Capture -CaptureRoot $BeforeRoot -Scenario $scn -OutPng $out -Cols $cols -Rows $rows
+    Invoke-Capture -CaptureRoot $BeforeRoot -Scenario $scn -OutPng $out -Cols $cols -Rows $rows -ExpectRaw present
   }
   $out = Join-Path $OutDir ("{0}.{1}x{2}.after.png" -f $scn, $cols, $rows)
-  Invoke-Capture -CaptureRoot $Root -Scenario $scn -OutPng $out -Cols $cols -Rows $rows
+  Invoke-Capture -CaptureRoot $Root -Scenario $scn -OutPng $out -Cols $cols -Rows $rows -ExpectRaw blank
 }
 
 Write-Output "DONE failures=$script:fail"

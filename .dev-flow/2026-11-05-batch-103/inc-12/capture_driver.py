@@ -23,9 +23,11 @@ Scenarios (see ``02-test-cases.md`` AT-B103-I12-2):
   v171-nameline    V171 with the cursor on the first row whose card shows a
                    DISPLAY_IDENTIFIER (the Name-line capture, R-TUI-042a.8).
   curve            The tracked ``examples/case_00_public/software_a.a2l``
-                   (pinned), whose 151 CURVE-without-length tags (the executed
-                   e07 selection evidence) lead the page to a blank
-                   Raw/Physical cell.
+                   (pinned) with a deterministic 64-byte synthetic image at
+                   the first length-less CURVE's address (parsed from the A2L,
+                   never recorded). Its 151 CURVE-without-length tags lead the
+                   page; ``--expect-raw`` asserts the selected CURVE's
+                   Raw/Physical cells are present or blank.
 
 Synthetic text only is written for the SYNMAP / PAGE64 fixtures. Tracked files
 are read from the checkout and their names/counts go into the sidecar report;
@@ -35,7 +37,7 @@ focused). The recent-files store and HOME/XDG/LOCALAPPDATA are isolated by the
 wrapper, not here.
 
     python -I -B capture_driver.py --root <checkout> --scenario <name> \
-        --base <scratch-dir> [--report <sidecar.txt>]
+        --base <scratch-dir> --expect-raw present|blank [--report <sidecar.txt>]
 """
 from __future__ import annotations
 
@@ -66,6 +68,10 @@ _SCENARIOS = (
 # selection evidence counts exactly 151 CURVE tags with no length in it.
 _CURVE_FILE_REL = ("examples", "case_00_public", "software_a.a2l")
 _REQUIRED_CURVE_COUNT = 151
+#: Deterministic synthetic image size (bytes) placed at the first length-less
+#: CURVE's address for the curve scenario. The address is parsed from the
+#: tracked A2L and never recorded in the sidecar.
+_CURVE_SYNTHETIC_BYTES = 64
 
 # A safety-net matcher for any absolute path a redacted message may still hold
 # (Windows drive letter or a leading slash). Anchors are replaced exactly first.
@@ -123,6 +129,12 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--root", required=True, type=Path, help="checkout under test")
     parser.add_argument("--scenario", required=True, choices=_SCENARIOS)
     parser.add_argument("--base", required=True, type=Path, help="scratch work area")
+    parser.add_argument(
+        "--expect-raw",
+        required=True,
+        choices=("present", "blank"),
+        help="expected Raw/Physical state of the selected CURVE (curve scenario)",
+    )
     parser.add_argument("--report", type=Path, default=None, help="sidecar summary path")
     return parser.parse_args(argv)
 
@@ -136,6 +148,7 @@ def main() -> int:
     # syntax-only ``python -m py_compile`` never needs the checkout present).
     from textual.widgets import DataTable
 
+    from s19_app.tui.a2l import parse_a2l_file
     from s19_app.tui.app import S19TuiApp
     from s19_app.tui.changes.io import emit_s19_from_mem_map
 
@@ -214,6 +227,28 @@ def main() -> int:
     # -Root and -BeforeRoot, whose 151 CURVE-without-length tags the executed
     # e07 selection evidence requires.
     curve_path = root.joinpath(*_CURVE_FILE_REL)
+
+    def curve_synthetic_image() -> str:
+        """Deterministic 64-byte S19 image at the first length-less CURVE's
+        address, parsed from the tracked A2L. The CURVE name and address are
+        consumed here and never reach the report."""
+        parsed = parse_a2l_file(curve_path)
+        address: int | None = None
+        for tag in parsed.get("tags", []):
+            if tag.get("char_type") == "CURVE" and tag.get("length") is None:
+                address = tag.get("address")
+                break
+        if not isinstance(address, int) or address < 0:
+            raise AssertionError(
+                "software_a.a2l has no CURVE tag with no length and an address"
+            )
+        mem_map = {
+            address + offset: (offset * 7) & 0xFF
+            for offset in range(_CURVE_SYNTHETIC_BYTES)
+        }
+        return emit_s19_from_mem_map(
+            mem_map, [(address, address + _CURVE_SYNTHETIC_BYTES)]
+        )
 
     fixture_a2l = base / "fixture.a2l"
     fixture_s19 = base / "fixture.s19"
@@ -310,9 +345,10 @@ def main() -> int:
                     self.load_a2l_from_path(fixture_a2l)
                     report_lines.append(f"synthetic_fixture={args.scenario}")
                 elif args.scenario == "curve":
-                    self.load_selected_file(image_path)
+                    fixture_s19.write_text(curve_synthetic_image(), encoding="ascii")
+                    self.load_selected_file(fixture_s19)
                     if not await self._wait_for(
-                        lambda: self._image_loaded(image_path.name)
+                        lambda: self._image_loaded(fixture_s19.name)
                     ):
                         raise TimeoutError("image load did not finish before A2L attach")
                     await self._settle(0.4)
@@ -404,6 +440,30 @@ def main() -> int:
                         f"(page {idx // page_size + 1}, in-page row {in_page})"
                     )
                     await self._settle(0.4)
+                    # Raw/Physical discrimination: assert the selected enriched
+                    # CURVE matches the expected state without ever recording a
+                    # value. Both cells must agree (both present, or both blank);
+                    # a half-populated row is a failure, not a pass.
+                    selected = self._a2l_filtered_tags[idx]
+                    raw_present = selected.get("raw_value") is not None
+                    physical_present = selected.get("physical_value") is not None
+                    if args.expect_raw == "present":
+                        if not raw_present or not physical_present:
+                            raise AssertionError(
+                                "expected present Raw/Physical for the selected "
+                                "CURVE but observed blank"
+                            )
+                        observed = "present"
+                    else:
+                        if raw_present or physical_present:
+                            raise AssertionError(
+                                "expected blank Raw/Physical for the selected "
+                                "CURVE but observed present"
+                            )
+                        observed = "blank"
+                    report_lines.append(
+                        f"expect_raw={args.expect_raw} observed_raw={observed}"
+                    )
                 report_lines.append("surface=ready")
             except BaseException as exc:  # noqa: BLE001 - keep the app alive, report it
                 error = _redact_message(f"{type(exc).__name__}: {exc}", root, base)
