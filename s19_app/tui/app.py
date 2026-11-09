@@ -1529,9 +1529,9 @@ class A2LDetailCard(RichLog):
         Used by:
             - _compose_screen_a2l (mount) ; on_data_table_row_highlighted (update)
 
-    Note (Textual internal-name shadowing): the only instance member added is
-    the public ``show_tag`` method — no ``_nodes``/``_context`` (or any other
-    ``Widget`` private) name is introduced, so mounting cannot silently deadlock.
+    Note (Textual internal-name shadowing): the subclass adds only ``on_mount``,
+    ``render``, ``show_tag`` and its current ``_card_text`` — no ``_nodes`` or
+    ``_context`` (or any other ``Widget`` private) name is introduced.
     """
 
     DEFAULT_CSS = """
@@ -8754,6 +8754,9 @@ class S19TuiApp(App):
             A2LDetailCard(
                 id="a2l_detail_card",
                 markup=False,
+                wrap=True,
+                min_width=1,
+                auto_scroll=False,
             ),
             Label("Hex Viewer", id="alt_hex_title"),
             Container(
