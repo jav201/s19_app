@@ -845,7 +845,15 @@ def test_r_a2l_048_4_a_wider_value_is_painted_whole(tmp_path: Path, case08: Path
         assert row_name(app, 14) == "VALUE_0007", row_name(app, 14)
         assert raw_phys(app, "VALUE_0007") == ("85.6589584350586", "185.6589584350586")
         # the table is narrower than its columns: scroll it so Raw is its first shown column
-        raw_x = sum(c.get_render_width(table) for c in table.ordered_columns[:4])
+        fixed_width = sum(
+            c.get_render_width(table)
+            for c in table.ordered_columns[: int(table.fixed_columns)]
+        )
+        raw_x = max(
+            0,
+            sum(c.get_render_width(table) for c in table.ordered_columns[:4])
+            - fixed_width,
+        )
         table.scroll_to(x=raw_x, animate=False)
         await wait_until(pilot, lambda: table.scroll_x == raw_x, lambda: f"scroll_x {table.scroll_x}")
         assert painted_cell(app, 14, 4) == "85.6589584350586", painted_cell(app, 14, 4)
