@@ -1,0 +1,48 @@
+Done. `py_compile` passes (exit 0).
+
+## Verification
+
+```
+/home/<runner>/miniconda3/envs/s19ci/bin/python -I -B -m py_compile s19_app/tui/a2l_definition.py < /dev/null
+exit=0
+```
+
+Note on the requested isolation: `zq_iso_user` does not exist on this host and `sudo` requires a password (NOPASSWD was removed), so I could not switch to that account. I ran the compile with the exact interpreter and flags (`-I -B`), closed stdin (`< /dev/null`), as the current user. `-B` means no `__pycache__`/bytecode was written.
+
+## Exact diff
+
+```diff
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@ -1628,11 +1628,11 @@
+-    elif list_numbers is not None:
+-        numbers = [_finite_number(word) for word in list_numbers]
+-        if any(number is None for number in numbers):
+-            return Refusal(
+-                "A2L-DEF-AXIS-FIX",
+-                f"{axis_name}: the fixed axis gives a point the system cannot read",
+-            )
+-        n = len(numbers)
+-        rule = ("PAR_LIST", tuple(_to_int_or_float(number) for number in numbers))
++    elif list_numbers is not None:
++        for i, word in enumerate(list_numbers):
++            number = _finite_number(word)
++            if number is None:
++                return Refusal(
++                    "A2L-DEF-AXIS-FIX",
++                    f"{axis_name}: the fixed axis gives a point the system cannot read",
++                )
++            list_numbers[i] = _to_int_or_float(number)
++        n = len(list_numbers)
++        rule = ("PAR_LIST", tuple(list_numbers))
+```
+
+The only change is the `FIX_AXIS_PAR_LIST` branch of `_read_fixed_rule`. The `PAR` and `PAR_DIST` branches, the `fixed_rule` shape (`("PAR_LIST", tuple)`), the `Refusal` codes/messages, and the count check are all untouched.
+
+## Why token strings and the float list are no longer all retained
+
+- **No second float list.** The old code built `numbers = [_finite_number(word) for word in list_numbers]`, holding a whole list of `float`s alongside the token strings. The new loop parses each word via `_finite_number(word)` and immediately converts it with `_to_int_or_float` before the loop variable is reused, so the float list never exists.
+- **Token strings are replaced in place, not kept alongside.** `list_numbers` *is* the `tokens` list returned by `_flatten_body_tokens` — a freshly built list with no other owners. Writing `list_numbers[i] = _to_int_or_float(number)` overwrites each `str` slot; once a slot is overwritten, the old string has no remaining reference and is collectable immediately (there is no alias to the original token list inside `_read_fixed_rule`). So the strings are released progressively during the loop instead of surviving until the branch ends.
+- **`tuple(list_numbers)` shares the numeric objects.** The final tuple holds references to the same `int`/`float` objects already stored in the mutated list — no second copy of the values is materialised. After `return rule`, the local list is dropped and only the tuple (and its `int`/`float` objects) survives.
+
+Peak simultaneous retention drops from three collections (token strings + float list + int/float tuple) to two (the single in-place list + the shared tuple), and the list no longer holds any strings by the time the tuple is built.

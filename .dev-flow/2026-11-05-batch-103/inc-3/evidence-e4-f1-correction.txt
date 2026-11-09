@@ -1,0 +1,50 @@
+Done. I corrected the one reviewed Inc 3a implementation defect (plus the requested docstring wording), made no other changes, and ran only `py_compile`.
+
+## Changes (`s19_app/tui/a2l_definition.py`)
+
+**1. `_describe_one` return, line 831 — `element_count` for the empty-kind (`kind is None` → `A2L-DEF-KIND`) path**
+
+```diff
+@@ -828,7 +828,7 @@
+         compu_tab_ref=fields["compu_tab_ref"],
+         refusal=refusal,
+-        element_count=None if value_145 else 1,
++        element_count=None if value_145 or kind is None else 1,
+         _name_echo=name_echo,
+         _table_form=fields["table_form"],
+```
+
+Now: `kind is None` → `element_count` `None`; scalar kinds (`number`/`enum`/`text`) keep `1`; the VALUE `.145` multi-value-MATRIX_DIM path keeps `None`.
+
+**2. `describe_definitions` docstring — `reads` key wording**
+
+```diff
+@@ -552,7 +552,13 @@
+-    mask).  A ``reads`` map (one per call, keyed by the ``id()`` of a section
+-    an object names) holds the method record, enum table and layout datatype
+-    each read once, so a name's time does not grow with the size of a section
+-    it shares (R-A2L-DEF.149); the map is dropped when the call returns.
++    mask).  A ``reads`` map (one per call) holds each shared section's read
++    form once, so a name's time does not grow with the size of a section it
++    shares (R-A2L-DEF.148): Inc 2a's forms under the bare ``id()`` of the
++    section (the method record, enum table, table form and resolved layout
++    datatype) and Inc 3a's under a ``(kind, id(section))`` tuple key
++    (``("layout", id(entry))``, ``("mod_common", id(section))``,
++    ``("axis_byte_order", id(section))``); the map is dropped when the call
++    returns.
+```
+
+## Compile result
+
+```
+PY_COMPILE_OK
+```
+
+Command used (isolated env, closed stdin, no pytest):
+
+```bash
+env -i HOME=/tmp/zq_iso_user PATH=/home/<runner>/miniconda3/envs/s19ci/bin:/usr/bin:/bin \
+  /home/<runner>/miniconda3/envs/s19ci/bin/python -I -B -m py_compile s19_app/tui/a2l_definition.py < /dev/null
+```
+
+Note: the working tree already contained the uncommitted Inc 3a batch changes (the file differs from `HEAD` by ~1869 insertions), so the full `git diff` is large; the diff above shows only my two edits on top of that pre-existing state. The other modified/untracked files (`tools/synth/make_release_case.py`, `.dev-flow/.../E4-brief-common.md`) were not touched.

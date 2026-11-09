@@ -1,0 +1,25 @@
+/tmp/b103-e4-3a-int/tree/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________________ test_timed_runs_function_between_clock_reads _________________
+
+    def test_timed_runs_function_between_clock_reads():
+        events = []
+    
+        def clock():
+            events.append("clock")
+            return float(len(events))
+    
+        def work():
+            events.append("work")
+            return "done"
+    
+        seconds, result = _timed(work, clock)
+        assert events == ["clock", "work", "clock"]
+>       assert seconds == 1.0 and result == "done"
+E       assert (2.0 == 1.0)
+
+tests/test_b103_a2l_definition_arrays_scale.py:117: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_arrays_scale.py::test_timed_runs_function_between_clock_reads
+1 failed in 0.24s

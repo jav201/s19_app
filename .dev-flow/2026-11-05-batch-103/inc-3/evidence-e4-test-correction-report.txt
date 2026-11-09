@@ -1,0 +1,36 @@
+The correction pass is complete. Here's the final state.
+
+## Result
+
+- **Main non-serial functional selection** (4 files, 427 tests): `1 failed, 426 passed` (was `114 failed, 313 passed`).
+- **Synth file** (`tests/test_b103_synth_definitions.py`, `-m "not slow"`): `8 passed, 1 deselected`.
+- GREEN transcript saved to `/tmp/b103-e4-3a-tests/green-functional-transcript.txt` (package path printed first line; isolated `zq_iso_user`, closed stdin, `-I -B`, explicit sys.path).
+
+## Fixture/test defects fixed (all now green)
+
+**`tests/support/b103_a2l_arrays.py`**
+- `extras=` now accepted on `axis_pts`, `characteristic`, `valblk`, `curve`, `meas` (and `mapchar` normalized), merging positional + keyword extras; a bare string `extras=rl(...)` counts as one line. All prior positional call forms preserved.
+- `inline` now declares `CM_IDENT` (IDENTICAL, `%.3`) per the INLINE3 fixture spec, so `STD(n)` / `C(<axis>;…)` axes resolve without per-case `cm()`.
+
+**`tests/test_b103_a2l_definition.py`** — `.58.2/23` and `.151/4` reconciled to the Inc 3a I-D contract: a MEASUREMENT with an oversized/malformed `MATRIX_DIM` is an array, so a non-whole-number word → `A2L-DEF-MATRIX`, echoed per R-A2L-DEF.151 (256 chars + `…`), not `A2L-DEF-ADDRESS`.
+
+**`tests/test_b103_synth_definitions.py`** — the two failures (`59/4` and `AT-B103-I2-2`) now dispatch via `_defc_decode`/`_defc_plan`: AXIS_PTS skipped (axis record), arrays use `decode_values`, scalars keep `decode_definition`; both compare against the generator's plan.
+
+**Additional test defects found and fixed (not product behavior):**
+- arrays: import `characteristic`; `.145/2` builds a VALUE (was VAL_BLK); `.92/5` expects `len(d.axes) == 1` ("axes holding X"); `.147` asserts `rule[0] == par.split()[0].replace("FIX_AXIS_", "")` (PAR vs PAR_DIST).
+- decode: `.105/5` image extended to 12 bytes + Y-point assertions corrected (`[0]`="ON", `[1]`="7 (no text)"); `.107/1` indices corrected to element order (`values[1]==5`, `values[3]==2`); `.114/1`/`.114/2` add the curve's 5 UWORD value bytes at 0x100; `.26/arr-1` image `[:-1]` (23 of 24 bytes); `.58.2/arr-1` expected message uses the 256-char echo.
+- scale: `.148/6` moved `DEPOSIT ABSOLUTE` lines from the record layout into the AXIS_PTS body (per `.148/6` / `.136/arr-3`).
+
+## Remaining product failure (reported, not a test defect)
+
+**`tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_7_2_arr_1_span_bound_on_computed_length`**
+
+The product returns `Refusal("A2L-DEF-ADDRESS", "VH: the object has no address or no length")` with `byte_length=None`, but the contract (`.7.2/arr-1`; graph-inc3.md line 142 "an array's product as computed") requires `byte_length = element_count × size = 1048577` and the refusal `VH: its span of 1048577 bytes at 0x10 cannot be read`.
+
+Root cause in `s19_app/tui/a2l_definition.py::_describe_array`: the array's `byte_length` is computed only inside the `else` branch after `_place_components(...)`, which returns `None` past `MAX_A2L_DECODE_BYTES`; so the array byte_length collapses to `None` and step (7) fires the wrong "no length" message. An array's byte_length is just `element_count × size` and should not be gated behind component placement (that gate is for curves/maps whose byte_length is the walk's end).
+
+The test assertion was kept unchanged (not weakened).
+
+## Scope note
+
+I edited only test files and the fixture support module — no product files, no commits. The 6 changed test/support files are copied into `/tmp/b103-e4-3a-int/tree` and match the working tree.

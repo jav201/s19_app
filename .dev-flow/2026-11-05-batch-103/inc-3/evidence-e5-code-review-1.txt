@@ -1,0 +1,60 @@
+I've completed a full read-only review of the Inc 3a product changes. Here are my findings.
+
+## Verdict: PASS-WITH-NOTES
+
+The two prior corrections are correctly implemented and I close them. The code tracks the approved graph (`graph-inc3.md`) and requirements closely; no API or refusal-order regression found. The only substantive note is the FIX-form selection design-gap (LOW, below), plus two cosmetic LOW items.
+
+---
+
+## 1. Prior corrections — re-checked
+
+### F1 — empty-kind `element_count` correction: **CLOSED (correct)**
+
+The E3A-03 / E3A-24 rulings require an unknown count to be `None`, never `0` or `1`, including on kind `""` and on the R-A2L-DEF.145 VALUE refusal. Verified:
+
+- `_empty_definition` — `s19_app/tui/a2l_definition.py:868` → `element_count=None` (kind `""`, serves `A2L-DEF-NAME`).
+- Scalar return path in `_describe_one` — `:835` → `element_count=None if value_145 or kind is None else 1` (covers `A2L-DEF-KIND` and `.145`-on-VALUE), with `byte_length=None if value_145` at `:833`.
+- Axis-object record definition — `:1852` → `element_count=None` (kind `""`).
+
+All three empty/unknown-kind paths now yield `None`. Matches graph examples R-A2L-DEF.4/9 (CUBE_4 → `None`) and `.145/2` (VALUE `VMD` → `None` + `byte_length None`).
+
+### Array span `byte_length` correction: **CLOSED (correct)**
+
+- Array: `byte_length = element_count * size` (R-A2L-DEF.74 product) — `:2012` (CHARACTERISTIC/VAL_BLK) and `:2040` (MEASUREMENT).
+- Curve/map: `byte_length = end` of `_place_components` (R-A2L-DEF.75) — `:2021`.
+- The `.7.1`/`.7.2` span check (`:2075-2078`) uses this computed `byte_length`, not the tag's raw `length`/`base.byte_length`.
+
+Confirmed against the graph's arithmetic: 3×4 SWORD → 24; 8×4×2 UBYTE → 64; 6 SWORD → 12; `MATRIX_DIM 1048577` UBYTE → `its span of 1048577 bytes … cannot be read`.
+
+---
+
+## 2. Design-gap assessment (tasked item)
+
+### FIX forms selected by fixed priority rather than file order — **design-gap, LOW**
+
+- `s19_app/tui/a2l_definition.py:1511-1601` (`_read_fixed_rule`): records the first `FIX_AXIS_PAR` and first `FIX_AXIS_PAR_DIST` in the header, then the `FIX_AXIS_PAR_LIST` child, and selects `par → par_dist → list_numbers` by **fixed priority** (`if par is not None … elif par_dist … elif list_numbers …`).
+- The graph `_read_axis` node writes "the first of `FIX_AXIS_PAR o s n`, `FIX_AXIS_PAR_DIST o d n` (header words) and the numbers of the FIX_AXIS_PAR_LIST child **in file order**" — `graph-inc3.md:594`. That wording is ambiguous, but a literal "first … in file order" reading differs from the implementation when two forms co-occur.
+- Requirement R-A2L-DEF.98 (`01-requirements.md:190`) pins only the **none** case ("has no FIX_AXIS_PAR, … or FIX_AXIS_PAR_LIST"). The "more than one form" case is **unpinned by any row or case**.
+
+Assessment: LOW. A well-formed AXIS_DESCR has exactly one FIX form (E1 census: 12 tracked PAR_DIST lines, 2 tracked PAR_LISTs, no object with two forms), so no real fixture is affected. The implementation is deterministic and cannot raise or overflow — but it is *not* fail-closed, which diverges from the design doctrine the E3 pass itself applied to the analogous multi-value-MATRIX_DIM case (E3A-10 → R-A2L-DEF.145 refused rather than ignored). This is a spec gap surfacing in the code, not an implementation bug against a pinned contract. **Recommendation (not blocking):** pin the selection rule in CTX/`_read_axis` ("first form in file order", or fixed priority as chosen), or — consistent with fail-closed — refuse a FIX_AXIS carrying more than one form. No code change required to merge.
+
+---
+
+## 3. Other findings
+
+| # | Tag / severity | Location | Finding |
+|---|---|---|---|
+| 3a | impl / LOW | `s19_app/tui/a2l_definition.py:1-16` | Module docstring still says "read side (Inc 2a) … one scalar A2L object"; does not mention arrays/curves/maps or Inc 3a. Documentation staleness only. |
+| 3b | impl / LOW | `tools/synth/make_release_case.py:975-978` | `DEFC_CURVE1_ADDR`, `DEFC_CURVE2_ADDR`, `DEFC_MAP_ADDR`, `DEFC_VALBLK_ADDR` are defined but unused (only `DEFC_AXIS_ADDR:1058` is consumed; the object dicts compute `cursor + 0x10…` internally). Dead constants. |
+| 3c | impl / LOW (informational) | `s19_app/tui/a2l_definition.py:1526-1530` | A `FIX_AXIS_PAR` with fewer than 3 following header words is silently skipped (`len(header) - i > 3` guard); if no other form is present the axis falls through to `.98` "no points" instead of `.141` "cannot read". Edge case, no case covers it, no crash. |
+
+---
+
+## 4. API / refusal-order regression checks — PASS
+
+- **Public API unchanged:** `describe_definition` (`:520`) is still `describe_definitions([name], a2l_data)[name]`; `Definition`'s six new fields (`shape`, `element_count`, `index_mode`, `values_offset`, `record_layout`, `axes`) are all defaulted after `refusal`, so Inc 2a keyword construction is untouched; `_name_echo`/`_table_form` (compare=False, repr=False) pre-existed. Existing importer `tests/test_b103_a2l_definition.py:48-56` (`Decoded, Definition, Refusal, decode_definition, describe_definition, describe_definitions, display_text`) is unaffected.
+- **Scalar refusal order preserved:** kind → address/length → datatype/length → METHOD/CONVERSION/TABLE/TABLE-EMPTY (`conv_refusal` applied only when `refusal is None`, `:779`) → mask. The early `_conversion_fields` call is benign (its refusal is gated) and mirrors Inc 2a reading the method before `_object_kind`.
+- **Array refusal order** in `_describe_array` matches CTX *array refusal order*: MATRIX_DIM(.71/.145) → MEASUREMENT datatype → layout(.82) → positions(.87)/parts(.84)/modes(.85)/datatypes(.86) → FNC_VALUES(.83) → axes(.91 + axis-major checks) → 3-D COLUMN_DIR(.80) → alignment(.144/.89) → shape(.70)/length(.76) → span(.7.1/.7.2) → values(.81) → axis-point refusals(.103). Verified `decode_definition` puts `.25` (refusal) before `A2L-DEF-ELEMENTS`, and `decode_values` puts the refusal before the scalar branch.
+- **`_build_record_layout_form` refusal order** (POSITION → PART → MODE → DATATYPE) matches the graph node; extra-word component lines produce the E3A-08 first-extra-word part; NO_AXIS_PTS restricted to `_COUNT_DATATYPES` (E3S3-01); MOD_COMMON reduced to one entry per class (E3S3-17). `_element_offset`/`_element_indexes`/`_point_offset`/`_fixed_points`/`_current_count` arithmetic all match the graph examples (incl. COLUMN_DIR `j + n2·i`, INDEX_DECR, PAR/PAR_DIST exact-integer ratios, count below 1 → CURRENT).
+
+No blocking findings. The two prior corrections are closed on the strength of the code; the FIX-form selection gap is a pre-approved-graph ambiguity, not an implementation defect, and is LOW.

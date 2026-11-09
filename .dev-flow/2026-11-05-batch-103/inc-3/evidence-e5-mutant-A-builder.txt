@@ -1,0 +1,29 @@
+Done. I prepared the Inc 3a mutant-A driver without running any tests or mutants (only read-only syntax/anchoring checks).
+
+## Files written (only these two)
+- `/tmp/b103-e4-3a-mutA/run_mutants.py` — the driver (743 lines)
+- `/tmp/b103-e4-3a-mutA/README.txt` — coverage + invocation + not-realisable controls
+
+The mutant plan `evidence-e5-mutant-plan.txt` was **not present**, so I derived every arm directly from each row's *Negative control* cell in `01-requirements.md` and the integrated tests (`tests/test_b103_a2l_definition_arrays*.py`).
+
+## Driver behaviour
+- Clones the integrated tree once into `work/base` (skips `.git`, `.dev-flow`, `.pytest_cache`, `zq_iso_user`, `__pycache__`, egg-info, `.pyc`); never writes the real tree.
+- Per mutant: unique isolated `work/<id>/tree` copy → exact guarded `anchor → mutation` replacement on `s19_app/tui/a2l_definition.py` (asserts anchor occurs **exactly once** and bytes change) → runs only that mutant's discriminating test nodes with `/data/miniconda3/envs/s19ci/bin/python -I -B -m pytest -p no:cacheprovider -q`.
+- Isolated `zq_iso_user` HOME/XDG/LOCALAPPDATA/TMPDIR, `PYTHONDONTWRITEBYTECODE=1`, `PYTHONPATH`/`PYTHONHOME`/`DISPLAY`/`WAYLAND_DISPLAY`/`CI` unset.
+- Classifies **KILLED / SURVIVED / CRASH / BAD** from the pytest summary, and emits `transcript.txt` + `diff.txt` per mutant plus `runner-summary.txt`.
+
+## Exact coverage — 61 arms, 47 of 48 S2.7e/S2.7f rows
+- **S2.7e (19/19)**: `.64`–`.81`, `.145` — all covered (`.64`, `.71`, `.73`, `.81`, `.145` have two arms each).
+- **S2.7f (28/29)**: `.82`–`.104`, `.141`–`.144`, `.147` — all covered; `.148` excluded (timing-only).
+- **Cited span** `.7.2` (array byte-length bound) → `M-span`.
+- Named priorities: **F1/exact FIX bounds** (M-98, M-99, M-141/141b/141c, M-147/147b), **span** (M-span, M-143), **H3e** (M-92b), **count datatype** (M-86/86b/86c), **axis guards** (M-96/96b, M-97, M-141–M-144).
+
+I verified all 61 anchors occur exactly once in the source, all 61 mutations are non-no-op and syntactically valid, and every referenced test function exists.
+
+## Not realisable / excluded controls
+1. `R-A2L-DEF.148` (all 19 cases) — timing/scaling only → excluded.
+2. `R-A2L-DEF.142/5`, `.142/6` — timing arms → excluded; behavioural `/1…/4` covered by M-142.
+3. `R-A2L-DEF.96/2` "dangling ref read as index points" — the literal clean realisation needs restructuring the COM_AXIS block; realised as guard-removal M-96 → **CRASH**.
+4. `R-A2L-DEF.141/3–/4` "points computed unchecked → inf points (a definition)" — not realisable as a clean definition (the design stores exact integer ratios); realised as `_finite_number→_to_float` M-141b → **CRASH**.
+
+No timing-only mutants, no assertion/test edits — only `a2l_definition.py` is mutated. The driver was **not executed** (only `--list` and read-only AST/anchor validation ran).

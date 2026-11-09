@@ -1,0 +1,29 @@
+All work is complete. Here is the summary.
+
+## Result: 240 passed, 34 deselected (serial), exit 0
+
+Saved to `/tmp/b103-e4-3a-int/coverage-fix-green.txt`.
+
+## Changed cases (all in the three allowed test files)
+
+**`tests/test_b103_a2l_definition_arrays.py`** (describe side)
+- **`.66/3` (DEFC kind map)** — added `test_r_a2l_def_66_3_definitions_case_map` (`MAP_DEF_0001` → kind `map`). Added a `defc` fixture (generate-definitions-case A2L) to this file.
+- **`.93/3` (DEFC X point_count)** — added `test_r_a2l_def_93_3_definitions_case_map_axis_count` (`MAP_DEF_0001`.axes[0].point_count == 4, the planned X count).
+- **`.147/3/6/11`** — `test_r_a2l_def_147_fix_point_bound` now asserts the **exact full `fixed_rule` tuple** (`("PAR_DIST",(0,4503599627370496,3))`, `("PAR",(0,62,1))`, `("PAR",(9007199254740992,0,1))`) and the **decoded stored points** (`0/4503599627370496/9007199254740992`, `0`, `9007199254740992` as `int`s) — no longer just `rule[0]` keyword self-echo.
+- **`.147/9` (serial <1s refusal)** — added `test_r_a2l_def_147_9_huge_shift_computes_no_power` (`@pytest.mark.serial_timing`, `FIX_AXIS_PAR 0 1000000000 4` refused within `timing_bound(1.0)`).
+
+**`tests/test_b103_a2l_definition_arrays_decode.py`** (decode side)
+- **`.108/2` (DEFC INDEX_INCR)** — added `test_r_a2l_def_108_2_definitions_case_map_axis_index_incr` (MAP X = planned points `[224,577,648,909]`).
+- **`.113/2` (explicit shared COM axis)** — added `test_r_a2l_def_113_2_definitions_case_shared_axis` (both COM curves → `[485,635,696,828,901]`).
+- **`R-A2L-024/arr-1` (case08 byte_order)** — added `test_r_a2l_024_arr_1_case08_array_byte_order` (byte order from the generator plan's `big_endian`, decode = plan).
+- **`AT-B103-I3-1`** — now decodes the 3×4 twins (ROW_DIR `1..12`, COLUMN_DIR exact column-major permutation), the COM/FIX map (X `0..70`, FIX Y `1..3`), and the three MATRIX_DIM MEASUREMENTs (`8×4×2`=0..63, `8×2`=0..15, `16`=0..15).
+- **`AT-B103-I3-3`** — added `a2l_issues` to the `c08` fixture and loops the decode over **both** `firmware.a2l` and `firmware_issues.a2l` (60/60/20 each, 0 refusals, decodes = plan).
+
+**`tests/test_b103_a2l_definition_arrays_scale.py`**
+- **`.148` absolute measure** — the 400-name absolute bound in `_measure` now uses `time.process_time` (`_timed(..., time.process_time)`), matching E3S3-24 / the existing per-object part.
+- **Fixed a pre-existing broken helper self-test** `test_timed_runs_function_between_clock_reads`: its `clock()` returned `len(events)`, so the two reads were `1.0`→`3.0` (delta 2.0) against the asserted `1.0`. Changed to count only clock events (`float(events.count("clock") - 1)`), preserving the `seconds == 1.0` assertion (not a weakening).
+
+## Still partial (by design)
+- **`.147/9`** and the **`.148` absolute-measure change** live in `serial_timing` tests. They are added/edited and collected (verified via `--collect-only`) but **not executed**, per "Do not run serial timing". They can only be confirmed green when the serial lane is run.
+
+No product/ledger/registry files were edited and no commits were made.

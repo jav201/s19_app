@@ -1,0 +1,21 @@
+Inc 3a coverage-fix green run (non-serial only; serial_timing deselected)
+python: /home/<runner>/miniconda3/envs/s19ci/bin/python -I -B
+sys.path: package root /tmp/b103-e4-3a-int/tree inserted first
+isolated: HOME/XDG/LOCALAPPDATA under zq_iso_user, stdin closed
+Mon Nov  9 06:29:22 PM UTC 2026
+
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-8.4.2, pluggy-1.7.0
+rootdir: /tmp/b103-e4-3a-int/tree
+configfile: pyproject.toml
+plugins: syrupy-4.8.0, xdist-3.8.0, platformdirs-4.14.5, textual-snapshot-1.1.0
+collected 274 items / 34 deselected / 240 selected
+
+tests/test_b103_a2l_definition_arrays.py ............................... [ 12%]
+........................................................................ [ 42%]
+........................................................                 [ 66%]
+tests/test_b103_a2l_definition_arrays_decode.py ........................ [ 76%]
+........................................................                 [ 99%]
+tests/test_b103_a2l_definition_arrays_scale.py .                         [100%]
+
+====================== 240 passed, 34 deselected in 6.29s ======================

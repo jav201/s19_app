@@ -1,0 +1,43 @@
+I've completed the read-only review. Here are my findings.
+
+## Review scope verified
+
+Read in full: `E4-brief-common.md`, `graph-inc3.md` (split 3a, interfaces, all 34 nodes + findings), `01-requirements.md` (rows 64–148), `s19_app/tui/a2l_definition.py` (3114 lines), `tools/synth/make_release_case.py` (1691 lines), plus `a2l.py` section-tree/lexer context for H3e and `_flatten_body_tokens`. I also ran a **read-only** `python -I -B` check (no files written, no tests) to reproduce the synth draws.
+
+## Confirmed findings
+
+**F1 — impl, HIGH — `s19_app/tui/a2l_definition.py:831`**
+A definition refused with `A2L-DEF-KIND` (kind `""`: CUBOID, CUBE_4, vendor kinds) gets `element_count=1`, not `None`.
+```python
+return Definition(
+    ...
+    kind=kind or "",                                   # :810
+    byte_length=None if value_145 else tag_length,     # :812
+    ...
+    element_count=None if value_145 else 1,            # :831
+)
+```
+`value_145` is only set for a VALUE with a multi-value MATRIX_DIM, so the KIND-refusal path (`kind is None`) falls through to `1`. This violates the pinned E3A-03 ruling and the graph `_describe_one` node — *"Every definition of kind `""` (`A2L-DEF-NAME`, `A2L-DEF-KIND`) gets `element_count` `None`"* — and the case expectations `R-A2L-DEF.4/9` (`ASAM.C.CUBE_4.ROW_DIR → kind "", element count None (not the default 1)`) and the D-14 `R-A2L-DEF.24/1` changed case. The `.4/9` negative control is literally "element count 1 → RED", so this case will go RED. The `A2L-DEF-NAME` path is correct (it uses `_empty_definition`, element_count `None`); only the KIND-refusal path is wrong. Fix: `element_count=None if (value_145 or kind is None) else 1`.
+
+**F2 — design-gap, LOW — `s19_app/tui/a2l_definition.py:1528,1557,1581`**
+`_read_fixed_rule` selects the FIX form by fixed priority `FIX_AXIS_PAR` → `FIX_AXIS_PAR_DIST` → `FIX_AXIS_PAR_LIST`, whereas the graph `_read_axis` node pins *"the first of `FIX_AXIS_PAR o s n`, `FIX_AXIS_PAR_DIST o d n` (header words) and the numbers of the `FIX_AXIS_PAR_LIST` child **in file order**"*. A FIX_AXIS carrying both PAR and PAR_DIST would prefer PAR regardless of which appears first. No fixture or case exercises two FIX forms on one axis, so nothing goes RED — but it is a silent contract deviation.
+
+## Notes (not findings, no case impact)
+
+- **`a2l_definition.py:552-555`** — `describe_definitions` docstring still says `reads` is "keyed by the `id()` of a section" and cites `R-A2L-DEF.149`; it omits 3a's tuple keys (`("layout", id)`, `("mod_common", id)`, `("axis_byte_order", id)`) and the `.148` scaling row. Doc-only staleness.
+
+## Checks that passed
+
+- **Public Inc 2a API compatibility** — `Definition` (6 defaulted fields after `refusal` + `_name_echo`/`_table_form` as `field(default=None, compare=False, repr=False)`), `AxisDefinition` (field order incl. `count_datatype` last, `fixed_rule` replacing `fixed_points`), `DecodedAxis`, `DecodedValues`, `decode_values`, `decode_definition`, `element_name` all match the pinned I-2 exactly. `kind` gains `"array"`/`"curve"`/`"map"`.
+- **H3e** — `_read_axis` reads `_flatten_body_tokens([meta] + lines)`; `meta` holds the `/begin`-line words after `/begin AXIS_DESCR` (AXIS_DESCR is not in `_NAMED_KINDS`), so the axis kind/header words on the `/begin` line come first. Verified against `a2l.py` section-tree building (`.92/4` holds).
+- **Exact FIX arithmetic** — `_read_fixed_rule` and `_fixed_points` use exact `float.as_integer_ratio()` / int-as-itself ratios over one power-of-two denominator; checks `abs(A) > 2**53·D` and `abs(A+(n−1)·B) > 2**53·D` in integers, shift bounded to ≤62 before any power, `2^s` as `1<<s`. I spot-checked `.147/1..11`, `.110/.111/.112`, `.99`, `.141/3..6` — all reproduce the pinned expected values (incl. `9007199254740993 → 9007199254740992` via `_to_float`-first).
+- **Fail-closed handling** — count datatypes restricted to integer `_COUNT_DATATYPES` (.86/3,/4), `_current_count` tests positively (.116.2/4 `-1` → CURRENT), NaN-x verdict stored once in `_TabForm` (.150/arr-9 NaN table), non-number value check before `display_text` (.150/arr-11), no `int()` on >9-digit whole-number words.
+- **Read-form keying & immutability** — 3a forms under tuple keys (`("layout", id)`, `("mod_common", id)`, `("axis_byte_order", id)`), Inc 2a forms under bare `id()`; all forms are `MappingProxyType`/frozen dataclasses/tuples, no list/dict/`a2l_data` alias (E3S3-14, -36, -38 hold).
+- **Per-object / per-element scaling** — shared sections reduced once (layout ≤5 components + ≤7 alignments, MOD_COMMON ≤7 alignments, method record 11 fields, `_TabForm`/`_EnumForm`), echoes computed once at reduction, `_decode_stored` bisects `_TabForm.xs` (one lookup per element). `.148` and `.150` paths are structurally O(1).
+- **Refusal order / messages** — the array refusal order (.71/.145 → MEASUREMENT datatype → .82/.87/.84/.85/.86/.83 → axes → .80 → .144/.89 → .70/.76 → .7.1/.7.2 → .81 → .103) matches the pinned CTX order; `.89/.144/.84/.85/.86/.103/.141/.147` messages match the pinned texts verbatim.
+- **Synth pinned values** — reproduced seed `20260001` draws 6–11 exactly: axis points `[485,635,696,828,901]`, curves `[37818,52215,28375,58106,11719]` / `[33014,24541,24691,2267,39540]`, map X `[224,577,648,909]`, map values `[472,132,610,330,709,-890,-383,-636,843,-485,730,-556]`, VAL_BLK `[737,219,636,-413,-395,-214]`; `axis_raw = 00 05 01 e5 02 7b 02 b8 03 3c 03 85`, `valblk_raw = 02 e1 00 db 02 7c fe 63 fe 75 ff 2a` — all match the DEFC table. `_definition_array_a2l` emits the pinned AXIS_PTS/AXIS_DESCR/MAP/VAL_BLK lines (CM_DEF_LIN axis method, `MONOTONY STRICT_INCREASE`, `FIX_AXIS_PAR_DIST 10 5 3`, COLUMN_DIR offset `8+2·(y+3x)`).
+- **3b exclusions** — no `encode_values`, `_breaking_point`, `encode_definition` changes, or codes `-INDEX/-AXIS-FIXED/-AXIS-SHARED/-AXIS-NONE/-MONOTONY` present; `shared_with` appears only in a comment.
+
+## Verdict
+
+**FAIL** — one confirmed HIGH implementation defect (F1: `element_count` on KIND-refused definitions) that will turn the pinned `R-A2L-DEF.4/9` (and D-14 `.24/1`) case RED. F2 is a minor design-gap to record or correct; no other confirmed defects found.

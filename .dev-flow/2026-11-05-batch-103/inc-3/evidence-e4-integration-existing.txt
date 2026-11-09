@@ -1,0 +1,227 @@
+/tmp/b103-e4-3a-int/tree/s19_app/__init__.py
+.........FFF...F........................................................ [ 36%]
+.F...................................................................... [ 72%]
+..........................................F.F.....F....F                 [100%]
+=================================== FAILURES ===================================
+____________________ test_r_a2l_def_4_1_val_blk_is_refused _____________________
+
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp... declares the sizes 2 and 256', 'Line 1260: CHARACTERISTIC VAL_BLK_0006 declares the sizes 2 and 256', ...], ...}, ...}
+
+    def test_r_a2l_def_4_1_val_blk_is_refused(c08):
+        """R-A2L-DEF.4/1 - VAL_BLK refused; address still given, byte length None (R-A2L-READ.61)."""
+        d = describe_definition("VAL_BLK_0001", c08["a2l"])
+>       _is_refused(d, *_kind_msg("VAL_BLK_0001", "VAL_BLK"))
+
+tests/test_b103_a2l_definition.py:323: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='VAL_BLK_0001', section='CHARACTERISTIC', char_type='VAL_BLK', kind='array', address=8388608, byte_len...fusal=None, shape=(128,), element_count=128, index_mode='COLUMN_DIR', values_offset=0, record_layout='RL_U16', axes=())
+code = 'A2L-DEF-KIND'
+message = 'VAL_BLK_0001: the system has no definition for a VAL_BLK object'
+
+    def _is_refused(d: Definition, code: str, message: str) -> None:
+>       assert d.refusal == Refusal(code, message), d.refusal
+E       AssertionError: None
+E       assert None == Refusal(code='A2L-DEF-KIND', message='VAL_BLK_0001: the system has no definition for a VAL_BLK object')
+E        +  where None = Definition(name='VAL_BLK_0001', section='CHARACTERISTIC', char_type='VAL_BLK', kind='array', address=8388608, byte_len...fusal=None, shape=(128,), element_count=128, index_mode='COLUMN_DIR', values_offset=0, record_layout='RL_U16', axes=()).refusal
+E        +  and   Refusal(code='A2L-DEF-KIND', message='VAL_BLK_0001: the system has no definition for a VAL_BLK object') = Refusal('A2L-DEF-KIND', 'VAL_BLK_0001: the system has no definition for a VAL_BLK object')
+
+tests/test_b103_a2l_definition.py:165: AssertionError
+_____________________ test_r_a2l_def_4_2_curve_is_refused ______________________
+
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp... declares the sizes 2 and 256', 'Line 1260: CHARACTERISTIC VAL_BLK_0006 declares the sizes 2 and 256', ...], ...}, ...}
+
+    def test_r_a2l_def_4_2_curve_is_refused(c08):
+        """R-A2L-DEF.4/2 - CURVE."""
+        d = describe_definition("CURVE_0001", c08["a2l"])
+>       _is_refused(d, *_kind_msg("CURVE_0001", "CURVE"))
+
+tests/test_b103_a2l_definition.py:331: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='CURVE_0001', section='CHARACTERISTIC', char_type='CURVE', kind='curve', address=8404448, byte_length=...ne, axis_object_address=None, axis_object_record=None, monotony='STRICT_MON', has_points=False, count_datatype=None),))
+code = 'A2L-DEF-KIND'
+message = 'CURVE_0001: the system has no definition for a CURVE object'
+
+    def _is_refused(d: Definition, code: str, message: str) -> None:
+>       assert d.refusal == Refusal(code, message), d.refusal
+E       AssertionError: None
+E       assert None == Refusal(code='A2L-DEF-KIND', message='CURVE_0001: the system has no definition for a CURVE object')
+E        +  where None = Definition(name='CURVE_0001', section='CHARACTERISTIC', char_type='CURVE', kind='curve', address=8404448, byte_length=...ne, axis_object_address=None, axis_object_record=None, monotony='STRICT_MON', has_points=False, count_datatype=None),)).refusal
+E        +  and   Refusal(code='A2L-DEF-KIND', message='CURVE_0001: the system has no definition for a CURVE object') = Refusal('A2L-DEF-KIND', 'CURVE_0001: the system has no definition for a CURVE object')
+
+tests/test_b103_a2l_definition.py:165: AssertionError
+______________________ test_r_a2l_def_4_3_map_is_refused _______________________
+
+c08 = {'a2l': {'compu_methods_by_name': {'CM_IDENT': {'coeffs': [0.0, 1.0, 0.0, 0.0, 0.0, 1.0], 'coeffs_linear': None, 'comp... declares the sizes 2 and 256', 'Line 1260: CHARACTERISTIC VAL_BLK_0006 declares the sizes 2 and 256', ...], ...}, ...}
+
+    def test_r_a2l_def_4_3_map_is_refused(c08):
+        """R-A2L-DEF.4/3 - MAP."""
+        d = describe_definition("MAP_0001", c08["a2l"])
+>       _is_refused(d, *_kind_msg("MAP_0001", "MAP"))
+
+tests/test_b103_a2l_definition.py:337: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='MAP_0001', section='CHARACTERISTIC', char_type='MAP', kind='map', address=8408768, byte_length=128, d...one, axis_object_address=None, axis_object_record=None, monotony='STRICT_MON', has_points=False, count_datatype=None)))
+code = 'A2L-DEF-KIND'
+message = 'MAP_0001: the system has no definition for a MAP object'
+
+    def _is_refused(d: Definition, code: str, message: str) -> None:
+>       assert d.refusal == Refusal(code, message), d.refusal
+E       AssertionError: None
+E       assert None == Refusal(code='A2L-DEF-KIND', message='MAP_0001: the system has no definition for a MAP object')
+E        +  where None = Definition(name='MAP_0001', section='CHARACTERISTIC', char_type='MAP', kind='map', address=8408768, byte_length=128, d...one, axis_object_address=None, axis_object_record=None, monotony='STRICT_MON', has_points=False, count_datatype=None))).refusal
+E        +  and   Refusal(code='A2L-DEF-KIND', message='MAP_0001: the system has no definition for a MAP object') = Refusal('A2L-DEF-KIND', 'MAP_0001: the system has no definition for a MAP object')
+
+tests/test_b103_a2l_definition.py:165: AssertionError
+_______________ test_r_a2l_def_4_7_array_measurement_is_refused ________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_4_7_array_measurement_is_refused(v171):
+        """R-A2L-DEF.4/7 - MATRIX_DIM 16 MEASUREMENT."""
+        n = "ASAM.M.MATRIX_DIM_16_1.UBYTE.IDENTICAL"
+        d = describe_definition(n, v171)
+>       _is_refused(d, *_kind_msg(n, "MATRIX_DIM 16 MEASUREMENT"))
+
+tests/test_b103_a2l_definition.py:365: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='ASAM.M.MATRIX_DIM_16_1.UBYTE.IDENTICAL', section='MEASUREMENT', char_type=None, kind='array', address...=None, refusal=None, shape=(16,), element_count=16, index_mode='ROW_DIR', values_offset=0, record_layout=None, axes=())
+code = 'A2L-DEF-KIND'
+message = 'ASAM.M.MATRIX_DIM_16_1.UBYTE.IDENTICAL: the system has no definition for a MATRIX_DIM 16 MEASUREMENT object'
+
+    def _is_refused(d: Definition, code: str, message: str) -> None:
+>       assert d.refusal == Refusal(code, message), d.refusal
+E       AssertionError: None
+E       assert None == Refusal(code='A2L-DEF-KIND', message='ASAM.M.MATRIX_DIM_16_1.UBYTE.IDENTICAL: the system has no definition for a MATRIX_DIM 16 MEASUREMENT object')
+E        +  where None = Definition(name='ASAM.M.MATRIX_DIM_16_1.UBYTE.IDENTICAL', section='MEASUREMENT', char_type=None, kind='array', address...=None, refusal=None, shape=(16,), element_count=16, index_mode='ROW_DIR', values_offset=0, record_layout=None, axes=()).refusal
+E        +  and   Refusal(code='A2L-DEF-KIND', message='ASAM.M.MATRIX_DIM_16_1.UBYTE.IDENTICAL: the system has no definition for a MATRIX_DIM 16 MEASUREMENT object') = Refusal('A2L-DEF-KIND', 'ASAM.M.MATRIX_DIM_16_1.UBYTE.IDENTICAL: the system has no definition for a MATRIX_DIM 16 MEASUREMENT object')
+
+tests/test_b103_a2l_definition.py:165: AssertionError
+________________ test_r_a2l_def_24_1_kind_comes_before_address _________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-existing/test_r_a2l_def_24_1_kind_comes0')
+
+    def test_r_a2l_def_24_1_kind_comes_before_address(tmp_path):
+        """R-A2L-DEF.24/1."""
+        a2l = _inline(tmp_path, _meas("MA", "UBYTE", "NO_COMPU_METHOD", "0", "255", "MATRIX_DIM 4"))
+>       assert describe_definition("MA", a2l).refusal.code == "A2L-DEF-KIND"
+E       AssertionError: assert 'A2L-DEF-ADDRESS' == 'A2L-DEF-KIND'
+E         
+E         - A2L-DEF-KIND
+E         + A2L-DEF-ADDRESS
+
+tests/test_b103_a2l_definition.py:812: AssertionError
+_ test_r_a2l_def_58_2_23_a_matrix_dim_of_5000_hex_digits_is_a_refusal_not_an_exception _
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-existing/test_r_a2l_def_58_2_23_a_matri0')
+
+    def test_r_a2l_def_58_2_23_a_matrix_dim_of_5000_hex_digits_is_a_refusal_not_an_exception(tmp_path):
+        """R-A2L-DEF.58.2/23 (E5S-01, CR-2) - MATRIX_DIM 0x + 5,000 F on a UBYTE MEASUREMENT: A2L-DEF-KIND, bounded."""
+        a2l = _inline(tmp_path, _meas("MD", "UBYTE", "NO_COMPU_METHOD", "0", "255", "MATRIX_DIM 0x" + "F" * 5000,
+                                      addr="0x10"))
+        d = describe_definition("MD", a2l)                                         # 0 exceptions
+        want = Refusal("A2L-DEF-ADDRESS", "MD: the object has no address or no length")  # R-A2L-READ.34/.63
+>       assert d.refusal == want, d.refusal
+E       AssertionError: Refusal(code='A2L-DEF-MATRIX', message='MD: MATRIX_DIM 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF...FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF… is not 1 to 3 whole numbers of at least 1')
+E       assert Refusal(code=...f at least 1') == Refusal(code=...or no length')
+E         
+E         Differing attributes:
+E         ['code', 'message']
+E         
+E         Drill down into differing attribute code:
+E           code: 'A2L-DEF-MATRIX' != 'A2L-DEF-ADDRESS'
+E           - A2L-DEF-ADDRESS...
+E         
+E         ...Full output truncated (6 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2316: AssertionError
+____ test_r_a2l_def_151_4_a_matrix_dim_number_is_written_by_the_number_rule ____
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-existing/test_r_a2l_def_151_4_a_matrix_0')
+
+    def test_r_a2l_def_151_4_a_matrix_dim_number_is_written_by_the_number_rule(tmp_path):
+        """R-A2L-DEF.151/4 - an oversized MATRIX_DIM number gives no length (R-A2L-READ.34/.63)."""
+        a2l = _inline(
+            tmp_path,
+            _meas("MD4", "UBYTE", "NO_COMPU_METHOD", "0", "255", "MATRIX_DIM " + "9" * 4000, addr="0x10"),
+            _meas("MD5", "UBYTE", "NO_COMPU_METHOD", "0", "255", "MATRIX_DIM 0x" + "F" * 1000, addr="0x11"),
+        )
+        got = describe_definitions(["MD4", "MD5"], a2l)
+        for name in ("MD4", "MD5"):
+>           assert got[name].refusal == Refusal("A2L-DEF-ADDRESS", f"{name}: the object has no address or no length"), got[name].refusal
+E           AssertionError: Refusal(code='A2L-DEF-MATRIX', message='MD4: MATRIX_DIM 99999999999999999999999999999999999999999999999999999999999999...99999999999999999999999999999999999999999999999999999999999999999999999999… is not 1 to 3 whole numbers of at least 1')
+E           assert Refusal(code=...f at least 1') == Refusal(code=...or no length')
+E             
+E             Differing attributes:
+E             ['code', 'message']
+E             
+E             Drill down into differing attribute code:
+E               code: 'A2L-DEF-MATRIX' != 'A2L-DEF-ADDRESS'
+E               - A2L-DEF-ADDRESS...
+E             
+E             ...Full output truncated (6 lines hidden), use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2375: AssertionError
+_ test_r_a2l_def_59_4_every_seed_of_the_definitions_case_builds_and_decodes_to_its_plan _
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-existing/test_r_a2l_def_59_4_every_seed0')
+
+    def test_r_a2l_def_59_4_every_seed_of_the_definitions_case_builds_and_decodes_to_its_plan(tmp_path):
+        """R-A2L-DEF.59/4 (CR-6; E5 fix pass) - seeds 1 ... 5: the enum's planned text is the text the model decodes.
+    
+        The enum raw is drawn from the seed; its planned text must follow the draw.  Non-vacuity: the five seeds do not
+        all draw one raw (a fixed planned text would pass for the seeds that draw it).
+        """
+        m = _model()
+        seen_texts = set()
+        for seed in range(1, 6):
+            folder = tmp_path / f"seed_{seed}"
+            result = _run_cli(folder, "--seed", str(seed), "--case", "definitions")
+            assert result.returncode == 0, (seed, result.stderr)
+            a2l = parse_a2l_file(folder / "definitions.a2l")
+            image = S19File(str(folder / "definitions.s19")).get_memory_map()
+            _regions, objects = gen.build_definition_objects(random.Random(seed))
+            for obj in objects:
+                d = m.describe_definition(obj["name"], a2l)
+>               assert d.refusal is None, (seed, obj["name"], d.refusal)
+E               AssertionError: (1, 'AXIS_DEF_0001', Refusal(code='A2L-DEF-NAME', message='AXIS_DEF_0001: no tag of that name in the A2L'))
+E               assert Refusal(code='A2L-DEF-NAME', message='AXIS_DEF_0001: no tag of that name in the A2L') is None
+E                +  where Refusal(code='A2L-DEF-NAME', message='AXIS_DEF_0001: no tag of that name in the A2L') = Definition(name='AXIS_DEF_0001', section='', char_type=None, kind='', address=None, byte_length=None, datatype=None, b...of that name in the A2L'), shape=(), element_count=None, index_mode=None, values_offset=0, record_layout=None, axes=()).refusal
+
+tests/test_b103_synth_definitions.py:161: AssertionError
+_ test_at_b103_i2_2_the_definitions_case_decodes_to_its_planned_values_through_the_loaders _
+
+defc = {'a2l': {'compu_methods_by_name': {'CM_DEF_ENUM': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT_DEF_STA.../end MODULE\n/end PROJECT\n', 'dir': PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-existing/b103_defc0'), ...}
+
+    def test_at_b103_i2_2_the_definitions_case_decodes_to_its_planned_values_through_the_loaders(defc):
+        """AT-B103-I2-2 (2a arm) - build and decode each DEFC object to its planned value.
+    
+        Rows .60, .61, .62. The write arm (encode the planned text and a second
+        value, apply, decode again; rows .46, .48, .55, .56) waits for 2b.
+        """
+        m = _model()
+        Decoded, decode_definition, describe_definition = m.Decoded, m.decode_definition, m.describe_definition
+        image = defc["mem"]
+        assert sorted(image) == list(range(0x800000, 0x800100))
+        for name, obj in defc["objs"].items():
+            d = describe_definition(name, defc["a2l"])
+>           assert d.refusal is None, (name, d.refusal)
+E           AssertionError: ('AXIS_DEF_0001', Refusal(code='A2L-DEF-NAME', message='AXIS_DEF_0001: no tag of that name in the A2L'))
+E           assert Refusal(code='A2L-DEF-NAME', message='AXIS_DEF_0001: no tag of that name in the A2L') is None
+E            +  where Refusal(code='A2L-DEF-NAME', message='AXIS_DEF_0001: no tag of that name in the A2L') = Definition(name='AXIS_DEF_0001', section='', char_type=None, kind='', address=None, byte_length=None, datatype=None, b...of that name in the A2L'), shape=(), element_count=None, index_mode=None, values_offset=0, record_layout=None, axes=()).refusal
+
+tests/test_b103_synth_definitions.py:271: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_4_1_val_blk_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_4_2_curve_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_4_3_map_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_4_7_array_measurement_is_refused
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_24_1_kind_comes_before_address
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_23_a_matrix_dim_of_5000_hex_digits_is_a_refusal_not_an_exception
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_151_4_a_matrix_dim_number_is_written_by_the_number_rule
+FAILED tests/test_b103_synth_definitions.py::test_r_a2l_def_59_4_every_seed_of_the_definitions_case_builds_and_decodes_to_its_plan
+FAILED tests/test_b103_synth_definitions.py::test_at_b103_i2_2_the_definitions_case_decodes_to_its_planned_values_through_the_loaders
+9 failed, 191 passed in 13.57s

@@ -1,0 +1,32 @@
+Prepared `/tmp/b103-e4-3a-mutB/run_extra.py` — an Inc 3a supplemental mutant driver that reuses `run_mutants.py`'s machinery (imported, never edited) and neither edits nor runs any product/test file. `py_compile` and `--list` verified clean; no mutant was run.
+
+## Coverage — 13 realizable controls
+
+| Mutant | Row | Edit (single guarded replacement) | Discriminating test |
+|---|---|---|---|
+| M-63 | R-A2L-DEF.63 | wall-clock comment appended to `definitions.a2l` (via `__import__('time')`) | `test_b103_synth_definitions.py::…63_1_the_definitions_case_is_deterministic` |
+| M-136-immut | R-A2L-DEF.136 | `_TabForm.ys` becomes a list (mutable read form, E3S3-36) | `…_arrays_coverage.py::…136_arr_4_read_forms_immutable_no_list_dict` |
+| M-5 | R-A2L-DEF.5 | `_find_tag` matches ignoring case | `…_arrays_decode.py::…5_arr_1_case_included` |
+| M-6 | R-A2L-DEF.6 | same case-insensitive edit | `…_arrays_decode.py::…6_arr_1_name_case_for_curve` |
+| M-7.1a | R-A2L-DEF.7.1 (array arm) | array byte length taken as datatype size | `…_arrays_decode.py::…7_1_arr_1_array_length_is_byte_length` |
+| M-7.1b | R-A2L-DEF.7.1 (curve/map arm) | `byte_length is None` dropped from the no-length refusal | `…_arrays_decode.py::…7_1_arr_3_curve_record_passes_1mib` |
+| M-26 | R-A2L-DEF.26 | missing record byte read as 0 (no A2L-DEF-BYTES) | `…_arrays_decode.py::…26_arr_1_missing_record_bytes` |
+| M-58.2a | R-A2L-DEF.58.2 (whole-number) | `_read_count` → `int(word)` (raises on a long word) | `…_arrays_decode.py::…58_2_arr_7_5000_digit_max_axis_points` |
+| M-58.2b | R-A2L-DEF.58.2 (address word) | `_read_address_word` → `int(word)` | `…_arrays_decode.py::…58_2_arr_8_5000_digit_axis_object_address` |
+| M-137 | R-A2L-DEF.137 | `_clean` stops replacing control chars with U+FFFD | `test_b103_a2l_definition.py::…137_2_esc_in_an_enum_text` |
+| M-148-reduce | R-A2L-DEF.148 | `enum_entries` copied per definition (breaks one-tuple identity) | `…_arrays_coverage.py::…148_8_shared_enum_table_same_tuple` |
+| M-150-text | R-A2L-DEF.150 | matched text `_clean`ed per element (breaks one-string identity) | `…_arrays_coverage.py::…150_arr_3_long_matched_entry_text_referenced` |
+| M-150-bisect | R-A2L-DEF.150 | TAB_NOINTP nearest taken as "entry at or above" | `…_arrays_coverage.py::…150_arr_9_bisect_matches_frozen_lookup` |
+
+Every anchor matches exactly once in the target file and the mutated file compiles (verified read-only). All required safeguards are inherited from `run_mutants.py`: fresh isolated `copytree` per mutant, baseline-green-before-mutation, guarded exact-1 replacements, `s19_app.__file__` printed, `HOME`/`XDG_*`/`LOCALAPPDATA` → `zq_iso_user/<label>`, `stdin=DEVNULL`, `KILLED/SURVIVED/CRASH/BAD`, `--no-run`/`B103_SERIAL_TIMING=1` refusal. No timing-only mutant and no test edit.
+
+## Unimplementable — 8 controls
+
+- **M-58.1** — negative control is "an encode that writes bytes into the image" (the 3b arm); the 3a module is read-only with no write path.
+- **M-010, M-011, M-026** — address / ECU_ADDRESS / MOD_COMMON byte-order resolution lives in the engine-frozen reader `a2l.py`; `a2l_definition.py` only consumes the resolved `tag['address']` / `tag['effective_byte_order']`, and mutating those consumers trips the sibling `.7.1`/`.024`/`.027` refusals, not the cited row's own case.
+- **M-019** — non-discriminating fixture: V171's COM_AXIS curve and its axis object both declare max 8, so "count the curve's own points" leaves `point_count == 8`.
+- **M-148-reads** — "read a shared section per object" is timing-only (identical values); the functional `byname` count needs the layout name at the call site, which is resolved once at walk time.
+- **M-148-echo** — "clean a shared word per object" is timing-only; the message-size arm is `_echo`'s 256-char cap (R-A2L-DEF.151), already guarded by `run_mutants.py` M-151.
+- **M-150-lookup** — "one lookup per element" is timing-only; the `byname` count arm requires restructuring `_decode_stored` to rebuild the table form by name per element (no single guarded replacement).
+
+Run with `python -I -B run_extra.py --list` (or `--only <label>`); actual execution is deferred and refuses during the scalar-performance window.

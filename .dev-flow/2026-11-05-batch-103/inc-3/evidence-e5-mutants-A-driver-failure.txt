@@ -1,0 +1,12 @@
+cloning integrated tree -> /tmp/b103-e4-3a-mutA/work/base
+base target sha256=99fd4cc1a2c7435da9e5f22dad80fd192cb1f35f7718dfa391814d9526a03f93
+baseline rc=0 (SURVIVED)
+=== M-64 (R-A2L-DEF.64) ===
+Traceback (most recent call last):
+  File "/tmp/b103-e4-3a-mutA/run_mutants.py", line 748, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/tmp/b103-e4-3a-mutA/run_mutants.py", line 719, in main
+    rc, out = run_pytest(arm["tests"], transcript)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: run_pytest() missing 1 required positional argument: 'out_path'

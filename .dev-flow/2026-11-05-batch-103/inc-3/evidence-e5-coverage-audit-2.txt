@@ -1,0 +1,60 @@
+I have completed the read-only audit. Here are the exact findings.
+
+## Verdict
+
+**The previous "two gaps" are CLOSED; the "nine partials" are CLOSED in the functional/echo/immutability set — but my re-audit finds 3 remaining not-fully-closed cases plus 1 unrun arm that fall outside that closed set.**
+
+---
+
+## Exact counts (280 cases of Inc 3a)
+
+| Classification | Count | Cases |
+|---|---:|---|
+| **Full** — dedicated test asserts the case's exact expected result | **277** | all requirement/cited/acceptance cases with a direct test |
+| **Partial** — covered only via Inc 2's synth tests, not run as a dedicated 3a case | **2** | `R-A2L-DEF.59/arr-1`, `R-A2L-DEF.63/arr-1` |
+| **Gap** — no test function anywhere | **1** | `R-A2L-DEF.136/arr-1` |
+| **Total** | **280** | 223 requirement + 53 cited + 4 acceptance |
+
+**Covered / verified:** 279 covered (277 dedicated + 2 via `test_b103_synth_definitions.py`), 279 green-verified — with one caveat: `R-A2L-DEF.59/arr-1`'s "22 pinned digests" needs both `.59/1` (1 MiB, fast, in the green lane) and `.59/2` (10 MiB, `@pytest.mark.slow`), so its 10-MiB half is not in the fast `green-final` run and needs the slow lane.
+
+The 3 live D-14 cases (`.4/9`, `.24/1`, `AT-B103-I2-3`) are counted apart; all three are covered and green in `tests/test_b103_a2l_definition.py`.
+
+---
+
+## The "two gaps" — CLOSED
+
+The two cap cases `R-A2L-DEF.142/5` and `/6` now have dedicated tests (`tests/test_b103_a2l_definition_arrays_fix_cap.py`) and their own green transcripts:
+
+- `evidence-e5-fix-cap5-green.txt` → `.142/5` **1 passed**, QC-TM 91.0% (0.090 s / 1.0 s), peak 1.2 MiB.
+- `evidence-e5-fix-cap6-green-fixed.txt` → `.142/6` **1 passed**, QC-TM 89.7% (0.514 s / 5.0 s), peak 63.5 MiB.
+
+## The "nine partials" — CLOSED
+
+The cases the first tester left "unexecuted as written" now have functional assertions in `tests/test_b103_a2l_definition_arrays_coverage.py` (the `.136` read-once/immutability controls, `.148/2…/19` per-word echoes, `.150/arr-1…/arr-11` decode results, `.151/arr-3…/arr-5` echo caps), and the timing measure in `test_b103_a2l_definition_arrays_scale.py` is now `LEAST_OF = 15` (the row's "least of ≥ 15 runs"), not the old least-of-3 proxy. Verified by:
+
+- `evidence-e5-green-final.txt` → **471 passed, 35 deselected** (functional lane, 0 failures).
+- `evidence-e5-timing-final.txt` → **33 passed, 1 deselected**, QC-TM **96 bounds, 0 under 20 % margin**.
+
+(The `1 deselected` in the timing run is the non-`serial_timing` helper `test_timed_runs_function_between_clock_reads`.)
+
+---
+
+## Remaining issues found by this re-audit (not closed)
+
+1. **Gap — `R-A2L-DEF.136/arr-1`** (SOFTA `describe_definitions` of all 13,990 tags within 2.0 s, E3A-32). No test function exists in any file. This is the only true gap.
+
+2. **Unrun arm — `R-A2L-DEF.147/9` timing arm.** `test_r_a2l_def_147_9_huge_shift_computes_no_power` (`@pytest.mark.serial_timing`) exists but appears in **none** of the seven provided transcripts: `timing-final` ran only `…_scale.py`; `green-final`'s 35 deselections = scale (33) + fix_cap (2), leaving this arm unaccounted. Its *functional* arm is verified (the `.147` parametrized entry in the green lane), but the "no `2^s` power" performance arm has no green evidence.
+
+3. **Partial — `R-A2L-DEF.59/arr-1` and `R-A2L-DEF.63/arr-1`** are still the E4-note "not run as written" cited cases: covered only through Inc 2's synth pin/determinism tests (`.59/1`, `.59/2`, `.63/1`), not through new dedicated 3a tests, and `.59/arr-1`'s slow 10-MiB half is outside the fast green lane.
+
+(The `evidence-e5-lawguards-laptop-final.txt` 375-passed and `evidence-e5-tc027-laptop.txt` 1-passed transcripts are the markup law-guard runs — they bear on E3S3-04, not on the 280 array cases.)
+
+---
+
+## Bottom line
+
+- `full/partial/gap` = **277 / 2 / 1** (280 total).
+- `covered/verified` = **279 / 279**, with `.59/arr-1`'s 10-MiB slow half unverified in the fast lane.
+- The two cap gaps and the nine functional/timing partials are **closed**; what remains is one gap (`.136/arr-1`), two synth-only cited cases (`.59/arr-1`, `.63/arr-1`), and one unrun timing arm (`.147/9`).
+
+No edits or commits were made.

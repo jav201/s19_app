@@ -1,0 +1,35 @@
+I reviewed both files in full against `graph-inc3.md` (Inc 3a nodes) and the frozen `a2l.py` helpers they reuse. Verdict first, then per-area findings.
+
+## Verdict: PASS-WITH-NOTES
+
+The read-side security properties the graph pins (R-A2L-DEF.7.1/.7.2, .58.2, .136, .141–.143, .147, .148, .150, .151, E3S3-01…-38) are implemented correctly. One LOW-severity design-gap (message bound) and one untested determinism note. No confirmed crash, key-collision, immutability, or fail-open defect was found.
+
+---
+
+## Findings
+
+### F1 — design-gap / LOW — `_dims_text` echoes an unbounded number of words
+`s19_app/tui/a2l_definition.py:453-458` (consumed at `:757`, `:1897`, `:1906`)
+
+`_dims_text` joins `_echo(word)` for **every** word after a `MATRIX_DIM` keyword. Each word is individually capped (256 chars + ellipsis) per R-A2L-DEF.151, but the **number** of words is not capped. A hostile line `MATRIX_DIM 1 1 1 …` (thousands of words) reaches `:1897` (`A2L-DEF-MATRIX`, because `_matrix_shape` returns `None` for >3 words) and produces a message ~257×N chars, growing linearly with the line length — exceeding R-A2L-DEF.148's "every definition's message … at most 1,024 characters" bound (E3S3-32). This is **not a crash** (bounded by file size, 1:1 amplification) and it is inherited from the graph, whose `_read_matrix_dim` returns "the words after it" uncapped and whose `.148/.151` cases only cover single long words, never word-count growth. Recommend capping `_dims_text` to the first 3 words (the only count the model can ever read) or applying an overall 1,024-char ceiling.
+
+### F2 — untested concern / INFO — DEFC draw-count wording vs code
+`tools/synth/make_release_case.py:977` (`build_definition_objects`) vs graph "Draw order continues Inc 2's five draws … (6)…(11)"
+
+The graph pins Inc 2's DEFC as "five draws" and `_definition_array_objects` as "draws 6…11". The code (`build_definition_objects:1018-1022` in Inc 2a's history, unchanged here) consumes exactly **four** planned draws before `_definition_array_objects` (enum_raw, one_bit, field, display_raw). Draw **order** is correctly preserved (Inc 3a's 6 logical draws run after Inc 2's), so `.63/arr-1` holds and Inc 2's pinned values (enum 1, bit 1, field 174, display 287) are safe. But the off-by-one in the graph's draw numbering means the pinned `AXIS_DEF_0001` values (485, 635, 696, 828, 901 at seed 20260001) must be re-verified by the tester against this exact draw sequence — not taken as already-proven.
+
+---
+
+## Areas verified clean (no finding)
+
+- **Exact FIX arithmetic** (`_read_fixed_rule:1511`, `_fixed_points:2696`): PAR/PAR_DIST use `float.as_integer_ratio()`/int ratios over one power-of-two denominator; shift bound (`> _FIX_SHIFT_BOUND`=62) checked before `1<<shift`; magnitude tests are `abs(A) > 2**53*D` and `abs(A+(n−1)·B) > 2**53*D` in integers — matches R-A2L-DEF.147 and .147/1–11 exactly, including the `.147/11` 2^53 read-as-double case and negative/`nan`/`1e400` shift refusal.
+- **Address/count/span bounds**: `_read_address_word` (8 hex / 10 decimal, optional `-`), `_read_count` (1–9 ASCII digits), `_read_axis` max (`_MAX_AXIS_POINTS`=1,048,576), span checks `address + length − 1 > 0xFFFFFFFF` in `_describe_one` and `_describe_array`; `_place_components`→`_walk_record_layout_components` returns `None` past `MAX_A2L_DECODE_BYTES` with no false-green.
+- **Exceptions**: `_read_stored_value`/`decode_values` are only reached with non-`None` address/length (refusals gate them); FIX points never reach `_read_stored_value`; `_current_count` guards non-int count; `_element_offset` COLUMN_DIR 2-index path is unreachable for 3-D (refused as `A2L-DEF-INDEX-MODE`); no `int()`/`float()` runs on an unbounded word.
+- **Read-form key collisions (E3S3-38)**: 3a's forms use tuple keys `("layout", id(entry))` (`_read_record_layout:1359`), `("mod_common", id(mc_section))` (`_module_common:1437`), `("axis_byte_order", id(section))` (`_axis_byte_order:974`); Inc 2a's forms use bare `id()` (`_resolve_datatype:2147`, `_read_method_record:2205`, `_read_enum_table:2383`, `_build_tab_form:2184`). A tuple key never equals an int key, and the three tuple kinds are disjoint. The round-8 collision (VALUE/VAL_BLK sharing a layout) cannot occur.
+- **Immutability (E3S3-14)**: all stored read forms are `MappingProxyType` over tuples + frozen dataclasses; `_check_module_alignment` builds a **new** `merged` layout instead of mutating the stored one (`:1469-1471`); the method record holds no `lines`/`formula` alias.
+- **Closed named-section reads (E3S3-13/33)**: every `a2l_data` section read in `a2l_definition.py` goes through `reads` (RECORD_LAYOUT / MOD_COMMON / AXIS_PTS header / COMPU_METHOD / COMPU_TAB / COMPU_VTAB / COMPU_VTAB_RANGE); AXIS_PTS layout and COMPU_TAB_REF are resolved at reduction (E3S3-31), and the per-object layout lookup by its own word (`_read_record_layout` name branch) is the permitted non-counted own-word lookup (E3S3-35).
+- **Per-object / per-element complexity (.148/.150)**: `_check_module_alignment` is O(≤7 classes × ≤5 components); `_build_record_layout_form` holds ≤5 components (second line of a head is a "part"); `_table_value` is one/two bisects; enum lookup is a dict hit (VTAB) or bisect (VTAB_RANGE); `_resolve_datatype` is not called for array/curve/map.
+- **Fail-closed on image content**: missing bytes → `A2L-DEF-BYTES` / `A2L-DEF-AXIS-BYTES` (never placeholder 0); non-number conversion result → `A2L-DEF-DECODE` (E3S3-28) before `display_text`; NaN-x table → refused at decode.
+- **Markup-sensitive words**: refusal messages use `_name_echo`/stored echoes (`_echo`/`_clean`, U+FFFD + 256 cap). `element_name`/`shape`/`index_mode` carry raw `[`/`]` by design (consumer obligation E3S3-04), not a module defect.
+
+No edits were made; nothing was run.

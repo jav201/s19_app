@@ -61,3 +61,5 @@ docs/requirements/history/** -text
 # Batch-103 transcripts are evidence bytes; preserve mixed line endings verbatim.
 .dev-flow/2026-11-05-batch-103/evidence/** -text
 .dev-flow/2026-11-05-batch-103/inc-*/evidence-*/** -text
+.dev-flow/2026-11-05-batch-103/inc-*/evidence-*.txt -text
+.dev-flow/2026-11-05-batch-103/inc-*/steps.log -text

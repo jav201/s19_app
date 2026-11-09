@@ -1,0 +1,6 @@
+/tmp/b103-e4-3a-int/tree/s19_app/__init__.py
+.                                                                        [100%]
+============================= QC-TM timing margins =============================
+100.0%  0.000 s / 1.000 s  R-A2L-DEF.147/9 describe FE huge shift  tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_147_9_huge_shift_computes_no_power
+QC-TM: 1 bounds, 0 under 20 % margin
+1 passed in 0.17s

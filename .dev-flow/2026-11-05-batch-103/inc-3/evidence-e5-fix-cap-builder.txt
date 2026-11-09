@@ -1,0 +1,39 @@
+Done. Here is the summary.
+
+## File created
+
+**`tests/test_b103_a2l_definition_arrays_fix_cap.py`** (new, untracked)
+
+Two test functions, both `@pytest.mark.serial_timing`:
+
+- `test_r_a2l_def_142_5_describing_fix_axes_at_cap_builds_no_point`
+  - Synthetic INLINE3: 50 FIX_AXIS curves `FC000`…`FC049` (max/count `1048576`, `FIX_AXIS_PAR_DIST 0 1 1048576`, `RL_U8`, at `0x100000 + i·0x200000`) + 50 two-axis FIX maps `FM000`…`FM049`.
+  - `describe_definitions` of all 100 names, median-of-3 ≤ 1.0 s (`timing_bound`), `tracemalloc` on, peak < 50 MiB.
+  - Curves: `refusal is None`, `element_count == byte_length == 1048576`, `fixed_rule == ("PAR_DIST", (0, 1, 1048576))` with `len == 3` (proves no points materialised).
+  - Maps: `refusal == A2L-DEF-ADDRESS "<name>: the object has no address or no length"`, `element_count == 2**40`, `byte_length is None`, both axes at the cap.
+
+- `test_r_a2l_def_142_6_fix_axis_par_list_at_cap_describes_in_linear_time`
+  - Curve `FL` with a `FIX_AXIS_PAR_LIST` of `0…1048575` (16 per line).
+  - median-of-3 ≤ 5.0 s with `tracemalloc` **off**; separate `tracemalloc`-on run asserts peak < 100 MiB.
+  - `refusal is None`, `kind == "curve"`, `element_count == byte_length == 1048576`; `fixed_rule[0] == "PAR_LIST"`, `len == 1048576`, endpoints `0`/`1048575`, plus interior spot-checks.
+
+Uses only public `describe_definitions` / `describe_definition`, the current product, and the shared synthetic builders `tests/support/b103_a2l_arrays.py` + `tests/support/timing.py`. No product edits, no other test edits, no commits, no subprocess spawned and no in-process 60 s timer (the cap is the orchestrator's, enforced externally).
+
+## Verification performed
+
+`py_compile` only (as instructed), isolated `zq_iso_user` + closed stdin:
+
+```
+env -i PATH=/usr/bin:/bin HOME=.../zq_iso_user/home XDG_*=.../zq_iso_user/xdg \
+  LOCALAPPDATA=.../zq_iso_user/local TMPDIR=.../zq_iso_user/tmp \
+  PYTHONDONTWRITEBYTECODE=1 TERM=xterm-256color \
+  /home/<runner>/miniconda3/envs/s19ci/bin/python -I -B -m py_compile \
+    tests/test_b103_a2l_definition_arrays_fix_cap.py < /dev/null
+# exit 0
+```
+
+## Limitations
+
+1. **Long cases not run** — per instruction, only `py_compile` was executed; the timing/memory assertions are verified by code reading, not by an actual run. Expected values were traced against the current `s19_app/tui/a2l_definition.py` (map `byte_length` → `None` past 1 MiB ⇒ `A2L-DEF-ADDRESS` "no address or no length"; FIX `fixed_rule` kept as a parameter tuple, points built only at decode; `_to_int_or_float` yields `int` for the PAR_LIST numbers).
+2. **`py_compile` writes a `.pyc` despite `-B`/`PYTHONDONTWRITEBYTECODE=1`** (the `py_compile` module writes the cache explicitly; the flags only suppress import-time caching). I deleted the generated `tests/__pycache__/test_b103_a2l_definition_arrays_fix_cap.cpython-311.pyc` afterwards, so no artefact remains.
+3. The pre-existing working-tree changes (`s19_app/tui/a2l_definition.py`, `tests/test_b103_a2l_definition.py`, `tools/synth/make_release_case.py`, the other untracked `test_b103_a2l_definition_arrays*` files and `zq_iso_user/`) were left untouched.

@@ -1,0 +1,93 @@
+/tmp/b103-e4-3a-tests/tree/s19_app/__init__.py
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_______ test_r_a2l_def_142_5_describing_fix_axes_at_cap_builds_no_point ________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-fix-cap-red/test_r_a2l_def_142_5_describin0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_142_5_describing_fix_axes_at_cap_builds_no_point(tmp_path):
+        """R-A2L-DEF.142/5 - 50 FIX curves at the cap + 50 two-axis FIX maps: median of 3 <= 1.0 s (tracemalloc on), peak < 50 MiB, exact counts/refusals, no point built."""
+        a2l, names = _cap_fixture(tmp_path)
+        times: list[float] = []
+        result: dict = {}
+        peak = 0
+        gc.collect()
+        tracemalloc.start()
+        try:
+            for _ in range(3):
+                gc.collect()
+                started = time.perf_counter()
+                result = describe_definitions(names, a2l)
+                times.append(time.perf_counter() - started)
+                _current, run_peak = tracemalloc.get_traced_memory()
+                peak = max(peak, run_peak)
+        finally:
+            tracemalloc.stop()
+        median = statistics.median(times)
+        print(f"R-A2L-DEF.142/5 median {median:.3f} s, peak {peak} bytes ({peak / 1048576:.1f} MiB)")
+        assert median <= report_margin(
+            "R-A2L-DEF.142/5 describe 50 fix curves + 50 fix maps",
+            median, timing_bound(BOUND_142_5_S)), times
+        assert peak < PEAK_142_5_B, f"tracemalloc peak {peak} >= {PEAK_142_5_B}"
+    
+        assert list(result) == names and len(result) == N_CURVES + N_MAPS
+        for i in range(N_CURVES):
+            name = f"FC{i:03d}"
+            d = result[name]
+>           assert d.kind == "curve" and d.refusal is None
+E           AssertionError: assert ('' == 'curve'
+E             
+E             - curve)
+
+tests/test_b103_a2l_definition_arrays_fix_cap.py:135: AssertionError
+----------------------------- Captured stdout call -----------------------------
+R-A2L-DEF.142/5 median 0.025 s, peak 191773 bytes (0.2 MiB)
+____ test_r_a2l_def_142_6_fix_axis_par_list_at_cap_describes_in_linear_time ____
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-fix-cap-red/test_r_a2l_def_142_6_fix_axis_0')
+
+    @pytest.mark.serial_timing
+    def test_r_a2l_def_142_6_fix_axis_par_list_at_cap_describes_in_linear_time(tmp_path):
+        """R-A2L-DEF.142/6 - a 1,048,576-number FIX_AXIS_PAR_LIST: median of 3 <= 5.0 s (tracemalloc off), separate peak < 100 MiB, refusal None, fixed_rule length/endpoints."""
+        a2l = _fl_fixture(tmp_path)
+    
+        times: list[float] = []
+        result = None
+        for _ in range(3):
+            started = time.perf_counter()
+            result = describe_definition("FL", a2l)
+            times.append(time.perf_counter() - started)
+        median = statistics.median(times)
+        print(f"R-A2L-DEF.142/6 median {median:.3f} s (tracemalloc off)")
+        assert median <= report_margin(
+            "R-A2L-DEF.142/6 describe FIX_AXIS_PAR_LIST at cap",
+            median, timing_bound(BOUND_142_6_S)), times
+    
+        gc.collect()
+        tracemalloc.start()
+        try:
+            result = describe_definition("FL", a2l)
+            _current, peak = tracemalloc.get_traced_memory()
+        finally:
+            tracemalloc.stop()
+        print(f"R-A2L-DEF.142/6 peak {peak} bytes ({peak / 1048576:.1f} MiB)")
+        assert peak < PEAK_142_6_B, f"tracemalloc peak {peak} >= {PEAK_142_6_B}"
+    
+        assert result is not None
+>       assert result.refusal is None and result.kind == "curve"
+E       AssertionError: assert (Refusal(code='A2L-DEF-KIND', message='FL: the system has no definition for a CURVE object') is None)
+E        +  where Refusal(code='A2L-DEF-KIND', message='FL: the system has no definition for a CURVE object') = Definition(name='FL', section='CHARACTERISTIC', char_type='CURVE', kind='', address=256, byte_length=1048576, datatype...ompu_tab_ref=None, refusal=Refusal(code='A2L-DEF-KIND', message='FL: the system has no definition for a CURVE object')).refusal
+
+tests/test_b103_a2l_definition_arrays_fix_cap.py:186: AssertionError
+----------------------------- Captured stdout call -----------------------------
+R-A2L-DEF.142/6 median 0.000 s (tracemalloc off)
+R-A2L-DEF.142/6 peak 7793 bytes (0.0 MiB)
+============================= QC-TM timing margins =============================
+97.5%  0.025 s / 1.000 s  R-A2L-DEF.142/5 describe 50 fix curves + 50 fix maps  tests/test_b103_a2l_definition_arrays_fix_cap.py::test_r_a2l_def_142_5_describing_fix_axes_at_cap_builds_no_point
+100.0%  0.000 s / 5.000 s  R-A2L-DEF.142/6 describe FIX_AXIS_PAR_LIST at cap  tests/test_b103_a2l_definition_arrays_fix_cap.py::test_r_a2l_def_142_6_fix_axis_par_list_at_cap_describes_in_linear_time
+QC-TM: 2 bounds, 0 under 20 % margin
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_arrays_fix_cap.py::test_r_a2l_def_142_5_describing_fix_axes_at_cap_builds_no_point
+FAILED tests/test_b103_a2l_definition_arrays_fix_cap.py::test_r_a2l_def_142_6_fix_axis_par_list_at_cap_describes_in_linear_time
+2 failed in 0.51s

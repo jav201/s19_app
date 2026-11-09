@@ -1,0 +1,599 @@
+/tmp/b103-e4-3a-int/tree/s19_app/__init__.py
+F....................................................................... [ 19%]
+........................................................................ [ 38%]
+....................................................EEEEEEE.EEEE........ [ 57%]
+........................................................................ [ 76%]
+........................................................................ [ 95%]
+................                                                         [100%]
+==================================== ERRORS ====================================
+______ ERROR at setup of test_tc600_g1_every_named_node_id_is_registered _______
+
+    @pytest.fixture(scope="module")
+    def corpus() -> _Corpus:
+        """The scanned corpus and the parsed registry, built once per module."""
+>       return _Corpus(repo_root(Path(__file__)))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_id_registry.py:374: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+start = PosixPath('/tmp/b103-e4-3a-int/tree/tests/test_id_registry.py')
+
+    def repo_root(start: Optional[Path] = None) -> Path:
+        """
+        Summary:
+            Resolve the repository root — the directory carrying both ``.git`` and
+            ``pyproject.toml`` — by walking up from ``start``.
+    
+        Args:
+            start (Optional[Path]): Where to begin the walk. Defaults to this
+                module's directory, so the answer is independent of the caller's
+                working directory.
+    
+        Returns:
+            Path: The absolute repository-root path.
+    
+        Raises:
+            RuntimeError: When no ancestor carries both markers.
+    
+        Dependencies:
+            Used by:
+                - scanned_test_files
+                - registry_path
+                - requirements_path
+        """
+        here = (start or Path(__file__)).resolve()
+        for candidate in (here, *here.parents):
+            if (candidate / ".git").exists() and (candidate / "pyproject.toml").exists():
+                return candidate
+>       raise RuntimeError(
+            "could not locate the repository root — the id registry needs the "
+            "source checkout, not an installed distribution"
+        )
+E       RuntimeError: could not locate the repository root — the id registry needs the source checkout, not an installed distribution
+
+tools/id_registry.py:289: RuntimeError
+_______ ERROR at setup of test_tc601_g2_live_entries_name_existing_nodes _______
+
+    @pytest.fixture(scope="module")
+    def corpus() -> _Corpus:
+        """The scanned corpus and the parsed registry, built once per module."""
+>       return _Corpus(repo_root(Path(__file__)))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_id_registry.py:374: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+start = PosixPath('/tmp/b103-e4-3a-int/tree/tests/test_id_registry.py')
+
+    def repo_root(start: Optional[Path] = None) -> Path:
+        """
+        Summary:
+            Resolve the repository root — the directory carrying both ``.git`` and
+            ``pyproject.toml`` — by walking up from ``start``.
+    
+        Args:
+            start (Optional[Path]): Where to begin the walk. Defaults to this
+                module's directory, so the answer is independent of the caller's
+                working directory.
+    
+        Returns:
+            Path: The absolute repository-root path.
+    
+        Raises:
+            RuntimeError: When no ancestor carries both markers.
+    
+        Dependencies:
+            Used by:
+                - scanned_test_files
+                - registry_path
+                - requirements_path
+        """
+        here = (start or Path(__file__)).resolve()
+        for candidate in (here, *here.parents):
+            if (candidate / ".git").exists() and (candidate / "pyproject.toml").exists():
+                return candidate
+>       raise RuntimeError(
+            "could not locate the repository root — the id registry needs the "
+            "source checkout, not an installed distribution"
+        )
+E       RuntimeError: could not locate the repository root — the id registry needs the source checkout, not an installed distribution
+
+tools/id_registry.py:289: RuntimeError
+_________ ERROR at setup of test_tc602_g3_every_citation_is_registered _________
+
+    @pytest.fixture(scope="module")
+    def corpus() -> _Corpus:
+        """The scanned corpus and the parsed registry, built once per module."""
+>       return _Corpus(repo_root(Path(__file__)))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_id_registry.py:374: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+start = PosixPath('/tmp/b103-e4-3a-int/tree/tests/test_id_registry.py')
+
+    def repo_root(start: Optional[Path] = None) -> Path:
+        """
+        Summary:
+            Resolve the repository root — the directory carrying both ``.git`` and
+            ``pyproject.toml`` — by walking up from ``start``.
+    
+        Args:
+            start (Optional[Path]): Where to begin the walk. Defaults to this
+                module's directory, so the answer is independent of the caller's
+                working directory.
+    
+        Returns:
+            Path: The absolute repository-root path.
+    
+        Raises:
+            RuntimeError: When no ancestor carries both markers.
+    
+        Dependencies:
+            Used by:
+                - scanned_test_files
+                - registry_path
+                - requirements_path
+        """
+        here = (start or Path(__file__)).resolve()
+        for candidate in (here, *here.parents):
+            if (candidate / ".git").exists() and (candidate / "pyproject.toml").exists():
+                return candidate
+>       raise RuntimeError(
+            "could not locate the repository root — the id registry needs the "
+            "source checkout, not an installed distribution"
+        )
+E       RuntimeError: could not locate the repository root — the id registry needs the source checkout, not an installed distribution
+
+tools/id_registry.py:289: RuntimeError
+____ ERROR at setup of test_tc604_g5_grammar_holds_or_is_registered_legacy _____
+
+    @pytest.fixture(scope="module")
+    def corpus() -> _Corpus:
+        """The scanned corpus and the parsed registry, built once per module."""
+>       return _Corpus(repo_root(Path(__file__)))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_id_registry.py:374: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+start = PosixPath('/tmp/b103-e4-3a-int/tree/tests/test_id_registry.py')
+
+    def repo_root(start: Optional[Path] = None) -> Path:
+        """
+        Summary:
+            Resolve the repository root — the directory carrying both ``.git`` and
+            ``pyproject.toml`` — by walking up from ``start``.
+    
+        Args:
+            start (Optional[Path]): Where to begin the walk. Defaults to this
+                module's directory, so the answer is independent of the caller's
+                working directory.
+    
+        Returns:
+            Path: The absolute repository-root path.
+    
+        Raises:
+            RuntimeError: When no ancestor carries both markers.
+    
+        Dependencies:
+            Used by:
+                - scanned_test_files
+                - registry_path
+                - requirements_path
+        """
+        here = (start or Path(__file__)).resolve()
+        for candidate in (here, *here.parents):
+            if (candidate / ".git").exists() and (candidate / "pyproject.toml").exists():
+                return candidate
+>       raise RuntimeError(
+            "could not locate the repository root — the id registry needs the "
+            "source checkout, not an installed distribution"
+        )
+E       RuntimeError: could not locate the repository root — the id registry needs the source checkout, not an installed distribution
+
+tools/id_registry.py:289: RuntimeError
+__________ ERROR at setup of test_tc605_g6_normalized_keys_are_unique __________
+
+    @pytest.fixture(scope="module")
+    def corpus() -> _Corpus:
+        """The scanned corpus and the parsed registry, built once per module."""
+>       return _Corpus(repo_root(Path(__file__)))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_id_registry.py:374: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+start = PosixPath('/tmp/b103-e4-3a-int/tree/tests/test_id_registry.py')
+
+    def repo_root(start: Optional[Path] = None) -> Path:
+        """
+        Summary:
+            Resolve the repository root — the directory carrying both ``.git`` and
+            ``pyproject.toml`` — by walking up from ``start``.
+    
+        Args:
+            start (Optional[Path]): Where to begin the walk. Defaults to this
+                module's directory, so the answer is independent of the caller's
+                working directory.
+    
+        Returns:
+            Path: The absolute repository-root path.
+    
+        Raises:
+            RuntimeError: When no ancestor carries both markers.
+    
+        Dependencies:
+            Used by:
+                - scanned_test_files
+                - registry_path
+                - requirements_path
+        """
+        here = (start or Path(__file__)).resolve()
+        for candidate in (here, *here.parents):
+            if (candidate / ".git").exists() and (candidate / "pyproject.toml").exists():
+                return candidate
+>       raise RuntimeError(
+            "could not locate the repository root — the id registry needs the "
+            "source checkout, not an installed distribution"
+        )
+E       RuntimeError: could not locate the repository root — the id registry needs the source checkout, not an installed distribution
+
+tools/id_registry.py:289: RuntimeError
+_____ ERROR at setup of test_tc606_g7_no_stem_exceeds_the_high_water_mark ______
+
+    @pytest.fixture(scope="module")
+    def corpus() -> _Corpus:
+        """The scanned corpus and the parsed registry, built once per module."""
+>       return _Corpus(repo_root(Path(__file__)))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_id_registry.py:374: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+start = PosixPath('/tmp/b103-e4-3a-int/tree/tests/test_id_registry.py')
+
+    def repo_root(start: Optional[Path] = None) -> Path:
+        """
+        Summary:
+            Resolve the repository root — the directory carrying both ``.git`` and
+            ``pyproject.toml`` — by walking up from ``start``.
+    
+        Args:
+            start (Optional[Path]): Where to begin the walk. Defaults to this
+                module's directory, so the answer is independent of the caller's
+                working directory.
+    
+        Returns:
+            Path: The absolute repository-root path.
+    
+        Raises:
+            RuntimeError: When no ancestor carries both markers.
+    
+        Dependencies:
+            Used by:
+                - scanned_test_files
+                - registry_path
+                - requirements_path
+        """
+        here = (start or Path(__file__)).resolve()
+        for candidate in (here, *here.parents):
+            if (candidate / ".git").exists() and (candidate / "pyproject.toml").exists():
+                return candidate
+>       raise RuntimeError(
+            "could not locate the repository root — the id registry needs the "
+            "source checkout, not an installed distribution"
+        )
+E       RuntimeError: could not locate the repository root — the id registry needs the source checkout, not an installed distribution
+
+tools/id_registry.py:289: RuntimeError
+____ ERROR at setup of test_tc607_scanned_corpus_matches_the_declared_bound ____
+
+    @pytest.fixture(scope="module")
+    def corpus() -> _Corpus:
+        """The scanned corpus and the parsed registry, built once per module."""
+>       return _Corpus(repo_root(Path(__file__)))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_id_registry.py:374: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+start = PosixPath('/tmp/b103-e4-3a-int/tree/tests/test_id_registry.py')
+
+    def repo_root(start: Optional[Path] = None) -> Path:
+        """
+        Summary:
+            Resolve the repository root — the directory carrying both ``.git`` and
+            ``pyproject.toml`` — by walking up from ``start``.
+    
+        Args:
+            start (Optional[Path]): Where to begin the walk. Defaults to this
+                module's directory, so the answer is independent of the caller's
+                working directory.
+    
+        Returns:
+            Path: The absolute repository-root path.
+    
+        Raises:
+            RuntimeError: When no ancestor carries both markers.
+    
+        Dependencies:
+            Used by:
+                - scanned_test_files
+                - registry_path
+                - requirements_path
+        """
+        here = (start or Path(__file__)).resolve()
+        for candidate in (here, *here.parents):
+            if (candidate / ".git").exists() and (candidate / "pyproject.toml").exists():
+                return candidate
+>       raise RuntimeError(
+            "could not locate the repository root — the id registry needs the "
+            "source checkout, not an installed distribution"
+        )
+E       RuntimeError: could not locate the repository root — the id registry needs the source checkout, not an installed distribution
+
+tools/id_registry.py:289: RuntimeError
+__________ ERROR at setup of test_tc609_registry_file_is_well_formed ___________
+
+    @pytest.fixture(scope="module")
+    def corpus() -> _Corpus:
+        """The scanned corpus and the parsed registry, built once per module."""
+>       return _Corpus(repo_root(Path(__file__)))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_id_registry.py:374: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+start = PosixPath('/tmp/b103-e4-3a-int/tree/tests/test_id_registry.py')
+
+    def repo_root(start: Optional[Path] = None) -> Path:
+        """
+        Summary:
+            Resolve the repository root — the directory carrying both ``.git`` and
+            ``pyproject.toml`` — by walking up from ``start``.
+    
+        Args:
+            start (Optional[Path]): Where to begin the walk. Defaults to this
+                module's directory, so the answer is independent of the caller's
+                working directory.
+    
+        Returns:
+            Path: The absolute repository-root path.
+    
+        Raises:
+            RuntimeError: When no ancestor carries both markers.
+    
+        Dependencies:
+            Used by:
+                - scanned_test_files
+                - registry_path
+                - requirements_path
+        """
+        here = (start or Path(__file__)).resolve()
+        for candidate in (here, *here.parents):
+            if (candidate / ".git").exists() and (candidate / "pyproject.toml").exists():
+                return candidate
+>       raise RuntimeError(
+            "could not locate the repository root — the id registry needs the "
+            "source checkout, not an installed distribution"
+        )
+E       RuntimeError: could not locate the repository root — the id registry needs the source checkout, not an installed distribution
+
+tools/id_registry.py:289: RuntimeError
+_____ ERROR at setup of test_tc610_reservations_are_recorded_and_respected _____
+
+    @pytest.fixture(scope="module")
+    def corpus() -> _Corpus:
+        """The scanned corpus and the parsed registry, built once per module."""
+>       return _Corpus(repo_root(Path(__file__)))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_id_registry.py:374: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+start = PosixPath('/tmp/b103-e4-3a-int/tree/tests/test_id_registry.py')
+
+    def repo_root(start: Optional[Path] = None) -> Path:
+        """
+        Summary:
+            Resolve the repository root — the directory carrying both ``.git`` and
+            ``pyproject.toml`` — by walking up from ``start``.
+    
+        Args:
+            start (Optional[Path]): Where to begin the walk. Defaults to this
+                module's directory, so the answer is independent of the caller's
+                working directory.
+    
+        Returns:
+            Path: The absolute repository-root path.
+    
+        Raises:
+            RuntimeError: When no ancestor carries both markers.
+    
+        Dependencies:
+            Used by:
+                - scanned_test_files
+                - registry_path
+                - requirements_path
+        """
+        here = (start or Path(__file__)).resolve()
+        for candidate in (here, *here.parents):
+            if (candidate / ".git").exists() and (candidate / "pyproject.toml").exists():
+                return candidate
+>       raise RuntimeError(
+            "could not locate the repository root — the id registry needs the "
+            "source checkout, not an installed distribution"
+        )
+E       RuntimeError: could not locate the repository root — the id registry needs the source checkout, not an installed distribution
+
+tools/id_registry.py:289: RuntimeError
+_ ERROR at setup of test_at280_registry_and_repository_agree_in_both_directions _
+
+    @pytest.fixture(scope="module")
+    def corpus() -> _Corpus:
+        """The scanned corpus and the parsed registry, built once per module."""
+>       return _Corpus(repo_root(Path(__file__)))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_id_registry.py:374: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+start = PosixPath('/tmp/b103-e4-3a-int/tree/tests/test_id_registry.py')
+
+    def repo_root(start: Optional[Path] = None) -> Path:
+        """
+        Summary:
+            Resolve the repository root — the directory carrying both ``.git`` and
+            ``pyproject.toml`` — by walking up from ``start``.
+    
+        Args:
+            start (Optional[Path]): Where to begin the walk. Defaults to this
+                module's directory, so the answer is independent of the caller's
+                working directory.
+    
+        Returns:
+            Path: The absolute repository-root path.
+    
+        Raises:
+            RuntimeError: When no ancestor carries both markers.
+    
+        Dependencies:
+            Used by:
+                - scanned_test_files
+                - registry_path
+                - requirements_path
+        """
+        here = (start or Path(__file__)).resolve()
+        for candidate in (here, *here.parents):
+            if (candidate / ".git").exists() and (candidate / "pyproject.toml").exists():
+                return candidate
+>       raise RuntimeError(
+            "could not locate the repository root — the id registry needs the "
+            "source checkout, not an installed distribution"
+        )
+E       RuntimeError: could not locate the repository root — the id registry needs the source checkout, not an installed distribution
+
+tools/id_registry.py:289: RuntimeError
+____________ ERROR at setup of test_at281_every_guard_rule_can_fail ____________
+
+    @pytest.fixture(scope="module")
+    def corpus() -> _Corpus:
+        """The scanned corpus and the parsed registry, built once per module."""
+>       return _Corpus(repo_root(Path(__file__)))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_id_registry.py:374: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+start = PosixPath('/tmp/b103-e4-3a-int/tree/tests/test_id_registry.py')
+
+    def repo_root(start: Optional[Path] = None) -> Path:
+        """
+        Summary:
+            Resolve the repository root — the directory carrying both ``.git`` and
+            ``pyproject.toml`` — by walking up from ``start``.
+    
+        Args:
+            start (Optional[Path]): Where to begin the walk. Defaults to this
+                module's directory, so the answer is independent of the caller's
+                working directory.
+    
+        Returns:
+            Path: The absolute repository-root path.
+    
+        Raises:
+            RuntimeError: When no ancestor carries both markers.
+    
+        Dependencies:
+            Used by:
+                - scanned_test_files
+                - registry_path
+                - requirements_path
+        """
+        here = (start or Path(__file__)).resolve()
+        for candidate in (here, *here.parents):
+            if (candidate / ".git").exists() and (candidate / "pyproject.toml").exists():
+                return candidate
+>       raise RuntimeError(
+            "could not locate the repository root — the id registry needs the "
+            "source checkout, not an installed distribution"
+        )
+E       RuntimeError: could not locate the repository root — the id registry needs the source checkout, not an installed distribution
+
+tools/id_registry.py:289: RuntimeError
+=================================== FAILURES ===================================
+_________________ test_tc027_engine_modules_unchanged_vs_main __________________
+
+    def test_tc027_engine_modules_unchanged_vs_main() -> None:
+        """TC-027 — the parsing / range / validation engine is unchanged vs ``main``.
+    
+        The read-only-engine constraint forbids TUI-side batches from editing the
+        parsing layer (``core.py`` / ``hexfile.py`` / ``tui/mac.py``), the range
+        primitive (``range_index.py``) or the validation engine (``validation/``):
+        they are *consumed* read-only. ``tui/a2l.py`` left the frozen set for
+        batch-95 (contract-pinned ``extract_memory_segments`` hardening, HLR-137 /
+        LLR-137.4 — see the ``_ENGINE_PATHS`` note) and is expected to diff. This
+        runs ``git diff --name-only main`` over exactly those paths and asserts
+        the result is empty — so a single accidental edit to any engine module is
+        caught at the increment boundary, not discovered later. ``git diff`` is
+        line-ending / ``__pycache__`` aware, so the verdict is robust to checkout
+        noise.
+        """
+>       repo_root = _repo_root()
+                    ^^^^^^^^^^^^
+
+tests/test_engine_unchanged.py:153: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _repo_root() -> Path:
+        """
+        Summary:
+            Resolve the repository root — the directory holding ``pyproject.toml``
+            and the ``.git`` directory — by walking up from the installed
+            ``s19_app`` package.
+    
+        Returns:
+            Path: The absolute repository-root path.
+    
+        Raises:
+            RuntimeError: If no ancestor of the ``s19_app`` package carries both a
+                ``.git`` entry and a ``pyproject.toml`` — i.e. the test is running
+                from an installed wheel detached from its source checkout.
+    
+        Data Flow:
+            - Starts at ``s19_app.__file__``'s parent and walks upward until an
+              ancestor has both ``.git`` and ``pyproject.toml``.
+    
+        Dependencies:
+            Used by:
+                - test_tc027_engine_modules_unchanged_vs_main
+        """
+        here = Path(s19_app.__file__).resolve().parent
+        for candidate in (here, *here.parents):
+            if (candidate / ".git").exists() and (
+                candidate / "pyproject.toml"
+            ).exists():
+                return candidate
+>       raise RuntimeError(
+            "could not locate the repository root from the s19_app package — "
+            "TC-027 needs the source checkout, not an installed wheel"
+        )
+E       RuntimeError: could not locate the repository root from the s19_app package — TC-027 needs the source checkout, not an installed wheel
+
+tests/test_engine_unchanged.py:70: RuntimeError
+=========================== short test summary info ============================
+FAILED tests/test_engine_unchanged.py::test_tc027_engine_modules_unchanged_vs_main
+ERROR tests/test_id_registry.py::test_tc600_g1_every_named_node_id_is_registered
+ERROR tests/test_id_registry.py::test_tc601_g2_live_entries_name_existing_nodes
+ERROR tests/test_id_registry.py::test_tc602_g3_every_citation_is_registered
+ERROR tests/test_id_registry.py::test_tc604_g5_grammar_holds_or_is_registered_legacy
+ERROR tests/test_id_registry.py::test_tc605_g6_normalized_keys_are_unique - R...
+ERROR tests/test_id_registry.py::test_tc606_g7_no_stem_exceeds_the_high_water_mark
+ERROR tests/test_id_registry.py::test_tc607_scanned_corpus_matches_the_declared_bound
+ERROR tests/test_id_registry.py::test_tc609_registry_file_is_well_formed - Ru...
+ERROR tests/test_id_registry.py::test_tc610_reservations_are_recorded_and_respected
+ERROR tests/test_id_registry.py::test_at280_registry_and_repository_agree_in_both_directions
+ERROR tests/test_id_registry.py::test_at281_every_guard_rule_can_fail - Runti...
+1 failed, 364 passed, 11 errors in 500.40s (0:08:20)

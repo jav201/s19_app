@@ -1,0 +1,89 @@
+
+=== M-105 · R-A2L-DEF.105 ===
+  verdict: KILLED
+
+=== M-106 · R-A2L-DEF.106 ===
+  verdict: KILLED
+
+=== M-107 · R-A2L-DEF.107 ===
+  verdict: KILLED
+
+=== M-108 · R-A2L-DEF.108 ===
+  verdict: KILLED
+
+=== M-109 · R-A2L-DEF.109 ===
+  verdict: KILLED
+
+=== M-110 · R-A2L-DEF.110 ===
+  verdict: KILLED
+
+=== M-111 · R-A2L-DEF.111 ===
+  verdict: KILLED
+
+=== M-112 · R-A2L-DEF.112 ===
+  verdict: KILLED
+
+=== M-113 · R-A2L-DEF.113 ===
+  verdict: KILLED
+
+=== M-114 · R-A2L-DEF.114 ===
+  verdict: KILLED
+
+=== M-115 · R-A2L-DEF.115 ===
+  verdict: KILLED
+
+=== M-116.1 · R-A2L-DEF.116.1 ===
+  verdict: KILLED
+
+=== M-116.2 · R-A2L-DEF.116.2 ===
+  verdict: KILLED
+
+=== M-117.1 · R-A2L-DEF.117.1 ===
+  verdict: KILLED
+
+=== M-117.2 · R-A2L-DEF.117.2 ===
+  verdict: KILLED
+
+=== M-118 · R-A2L-DEF.118 ===
+  verdict: KILLED
+
+=== M-119 · R-A2L-DEF.119 ===
+  verdict: KILLED
+
+=== M-120 · R-A2L-DEF.120 ===
+  verdict: KILLED
+
+=== M-121 · R-A2L-DEF.121 ===
+  verdict: KILLED
+
+=== M-146 · R-A2L-DEF.146 ===
+  verdict: KILLED
+
+=== M-133 · R-A2L-DEF.133 ===
+  verdict: KILLED
+
+=== M-134 · R-A2L-DEF.134 ===
+  verdict: KILLED
+
+=== M-135 · R-A2L-DEF.135 ===
+  verdict: KILLED
+
+=== M-59 · R-A2L-DEF.59 ===
+  verdict: KILLED
+
+=== M-136 · R-A2L-DEF.136 (keyed read, .136/arr-4 vi) ===
+  verdict: KILLED
+
+=== M-139 · R-A2L-DEF.139 ===
+  verdict: KILLED
+
+=== M-148 · R-A2L-DEF.148 (exact scaling, .148/19) ===
+  verdict: KILLED
+
+=== M-150 · R-A2L-DEF.150 (decode per element, .150/arr-11) ===
+  verdict: KILLED
+
+=== M-151 · R-A2L-DEF.151 ===
+  verdict: KILLED
+
+counts: KILLED=29

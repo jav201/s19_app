@@ -1,0 +1,993 @@
+/tmp/b103-e4-3a-tests/tree/s19_app/__init__.py
+FF..F.FFFFFFFFFFFFFFFFFFFFFFFFFFFFF                                      [100%]
+=================================== FAILURES ===================================
+_______ test_r_a2l_def_136_arr_2_shared_layout_and_mod_common_read_once ________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-coverage-red-2/test_r_a2l_def_136_arr_2_share0')
+
+    def test_r_a2l_def_136_arr_2_shared_layout_and_mod_common_read_once(tmp_path):
+        # 555 KiB: MOD_COMMON with 256 KiB of DEPOSIT ABSOLUTE, one RECORD_LAYOUT
+        # RL_BIG with a 256 KiB block comment, 400 VAL_BLKs sharing it.
+        deposit = "      " + "DEPOSIT ABSOLUTE\n      " * (S // 17)
+        body = _rl("RL_BIG", "FNC_VALUES 1 UBYTE ROW_DIR DIRECT", "/*" + "c" * (S - 4) + "*/")
+        for i in range(400):
+            body += _valblk(f"V{i:05d}", f"0x{0x1000 + 16 * i:X}", "RL_BIG", "NO_COMPU_METHOD", "0", "255", "NUMBER 4")
+        a2l_data = _parse(tmp_path, body, mod_common=(deposit.rstrip(),))
+        names = [f"V{i:05d}" for i in range(400)]
+        defs = a2ldef.describe_definitions(names, a2l_data)
+        for name in names:
+            d = defs[name]
+>           assert d.kind == "array", name
+E           AssertionError: V00000
+E           assert '' == 'array'
+E             
+E             - array
+
+tests/test_b103_a2l_definition_arrays_coverage.py:260: AssertionError
+_______ test_r_a2l_def_136_arr_3_shared_axis_method_enum_range_read_once _______
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-coverage-red-2/test_r_a2l_def_136_arr_3_share0')
+
+    def test_r_a2l_def_136_arr_3_shared_axis_method_enum_range_read_once(tmp_path):
+        # (a) COM_AXIS curves sharing AXO whose body holds 256 KiB of DEPOSIT.
+        axo = _axis_pts("AXO", "0x100", "RL_AXO", "4", "CM_IDENT", "0", "255",
+                        *("DEPOSIT ABSOLUTE",) * (S // 17))
+        blocks_a = IDENT + _rl("RL_AXO", "NO_AXIS_PTS_X 1 UBYTE", "AXIS_PTS_X 2 UBYTE INDEX_INCR DIRECT") + axo
+        for i in range(400):
+            blocks_a += _curve(f"C{i:05d}", f"0x{0x1000 + 16 * i:X}", "RL_U8",
+                               _axis("COM_AXIS", "CM_IDENT", "4", "0", "255", "AXIS_PTS_REF AXO"))
+        a2l_a = _parse(tmp_path, blocks_a)
+    
+        # (b) STD_AXIS curves whose object and axis name CM_L (LINEAR, 256 KiB comment).
+        blocks_b = _cm("CM_L", 'LINEAR "%.3" ""', "COEFFS_LINEAR 0.5 0", "/*" + "c" * (S - 4) + "*/")
+        for i in range(400):
+            blocks_b += _curve(f"C{i:05d}", f"0x{0x1000 + 16 * i:X}", "RL_U8",
+                               _axis("STD_AXIS", "CM_L", "4", "0", "255"), conv="CM_L")
+    
+        # (c) the same naming CM_V -> VT (enum, 256 KiB comment).
+        blocks_c = _cm("CM_V", 'TAB_VERB "%.0" ""', "COMPU_TAB_REF VT", "/*" + "c" * (S - 4) + "*/") + \
+            _vtab("VT", "2", '0 "zero"', '1 "one"')
+        for i in range(400):
+            blocks_c += _curve(f"C{i:05d}", f"0x{0x1000 + 16 * i:X}", "RL_U8",
+                               _axis("STD_AXIS", "CM_V", "4", "0", "255"), conv="CM_V")
+    
+        # (d) the same naming CM_R -> VR (range, 256 KiB comment).
+        blocks_d = _cm("CM_R", 'TAB_VERB "%.0" ""', "COMPU_TAB_REF VR", "/*" + "c" * (S - 4) + "*/") + \
+            _vrange("VR", "2", '0 0 "zero"', '1 255 "other"')
+        for i in range(400):
+            blocks_d += _curve(f"C{i:05d}", f"0x{0x1000 + 16 * i:X}", "RL_U8",
+                               _axis("STD_AXIS", "CM_R", "4", "0", "255"), conv="CM_R")
+    
+        for a2l_data in (_parse(tmp_path, blocks_b), _parse(tmp_path, blocks_c), _parse(tmp_path, blocks_d)):
+            names = [f"C{i:05d}" for i in range(400)]
+            defs = a2ldef.describe_definitions(names, a2l_data)
+            for name in names:
+                d = defs[name]
+>               assert d.kind == "curve", name
+E               AssertionError: C00000
+E               assert '' == 'curve'
+E                 
+E                 - curve
+
+tests/test_b103_a2l_definition_arrays_coverage.py:302: AssertionError
+____________ test_r_a2l_def_148_2_shared_layout_first_line_val_blk _____________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-coverage-red-2/test_r_a2l_def_148_2_shared_la0')
+
+    def test_r_a2l_def_148_2_shared_layout_first_line_val_blk(tmp_path):
+        # The first line holds many X words, datatype word last.
+        a2l_data = _parse(tmp_path,
+                          _rl("RL_LONG", "FNC_VALUES 1 " + "X " * (S // 2) + "UBYTE ROW_DIR DIRECT"),
+                          _n_valblks("NO_COMPU_METHOD", "RL_LONG", ("NUMBER 4",)))
+        names = [f"V{i:05d}" for i in range(400)]
+        defs = a2ldef.describe_definitions(names, a2l_data)
+        for name in names:
+>           is_refused(defs[name], "A2L-DEF-LAYOUT-PART",
+                       f"{name}: the record layout RL_LONG holds X, which the system cannot read")
+
+tests/test_b103_a2l_definition_arrays_coverage.py:434: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='V00000', section='CHARACTERISTIC', char_type='VAL_BLK', kind='', address=4096, byte_length=4, datatyp...ab_ref=None, refusal=Refusal(code='A2L-DEF-KIND', message='V00000: the system has no definition for a VAL_BLK object'))
+code = 'A2L-DEF-LAYOUT-PART'
+message = 'V00000: the record layout RL_LONG holds X, which the system cannot read'
+
+    def is_refused(d, code: str, message: str) -> None:
+        from s19_app.tui.a2l_definition import Refusal
+>       assert d.refusal == Refusal(code, message), d.refusal
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Refusal(code='A2L-DEF-KIND', message='V00000: the system has no definition for a VAL_BLK object')
+
+tests/support/b103_a2l_arrays.py:210: AssertionError
+___________ test_r_a2l_def_148_4_mod_common_alignment_lines_val_blk ____________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-coverage-red-2/test_r_a2l_def_148_4_mod_commo0')
+
+    def test_r_a2l_def_148_4_mod_common_alignment_lines_val_blk(tmp_path):
+        mc = ("ALIGNMENT_BYTE 1",) * (S // 17)
+        a2l_data = _parse(tmp_path, _n_valblks("NO_COMPU_METHOD", "RL_U8", ("NUMBER 4",)), mod_common=mc)
+        names = [f"V{i:05d}" for i in range(400)]
+        defs = a2ldef.describe_definitions(names, a2l_data)
+        for name in names:
+            d = defs[name]
+>           assert d.kind == "array" and d.shape == (4,) and d.refusal is None
+E           AssertionError: assert ('' == 'array'
+E             
+E             - array)
+
+tests/test_b103_a2l_definition_arrays_coverage.py:456: AssertionError
+________________ test_r_a2l_def_148_5_com_path_under_mod_common ________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-coverage-red-2/test_r_a2l_def_148_5_com_path_0')
+
+    def test_r_a2l_def_148_5_com_path_under_mod_common(tmp_path):
+        mc = ("ALIGNMENT_BYTE 1",) * (S // 17)
+        axo = _axis_pts("AXO", "0x100", "RL_AXO", "4")
+        body = IDENT + _rl("RL_AXO", "NO_AXIS_PTS_X 1 UBYTE", "AXIS_PTS_X 2 UBYTE INDEX_INCR DIRECT") + axo
+        for i in range(400):
+            body += _curve(f"C{i:05d}", f"0x{0x1000 + 16 * i:X}", "RL_U8",
+                           _axis("COM_AXIS", "CM_IDENT", "4", "0", "255", "AXIS_PTS_REF AXO"))
+        a2l_data = _parse(tmp_path, body, mod_common=mc)
+        names = [f"C{i:05d}" for i in range(400)]
+        defs = a2ldef.describe_definitions(names, a2l_data)
+        for name in names:
+            d = defs[name]
+>           assert d.kind == "curve" and d.shape == (4,) and d.refusal is None
+E           AssertionError: assert ('' == 'curve'
+E             
+E             - curve)
+
+tests/test_b103_a2l_definition_arrays_coverage.py:471: AssertionError
+___________________ test_r_a2l_def_148_7_shared_method_size ____________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-coverage-red-2/test_r_a2l_def_148_7_shared_me0')
+
+    def test_r_a2l_def_148_7_shared_method_size(tmp_path):
+        a2l_data = _parse(tmp_path,
+                          _cm("CM_L", 'LINEAR "%.3" ""', "COEFFS_LINEAR 0.5 0",
+                              *("DEPOSIT ABSOLUTE",) * (S // 17)),
+                          _std_axis_curves("CM_L"))
+        names = [f"C{i:05d}" for i in range(400)]
+        defs = a2ldef.describe_definitions(names, a2l_data)
+        for name in names:
+            d = defs[name]
+>           assert d.kind == "curve" and d.shape == (4,) and d.refusal is None
+E           AssertionError: assert ('' == 'curve'
+E             
+E             - curve)
+
+tests/test_b103_a2l_definition_arrays_coverage.py:494: AssertionError
+______________ test_r_a2l_def_148_8_shared_enum_table_same_tuple _______________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-coverage-red-2/test_r_a2l_def_148_8_shared_en0')
+
+    def test_r_a2l_def_148_8_shared_enum_table_same_tuple(tmp_path):
+        a2l_data = _parse(tmp_path,
+                          _cm("CM_V", 'TAB_VERB "%.0" ""', "COMPU_TAB_REF VT"),
+                          _vtab("VT", str(S // 9), *[f'{1000 + k} "v{k}"' for k in range(S // 9)]),
+                          _std_axis_curves("CM_V"))
+        names = [f"C{i:05d}" for i in range(400)]
+        defs = a2ldef.describe_definitions(names, a2l_data)
+>       entries = [d.axes[0].points.enum_entries for d in defs.values()]
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition_arrays_coverage.py:504: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+.0 = <dict_valueiterator object at 0x7f21a87839c0>
+
+>   entries = [d.axes[0].points.enum_entries for d in defs.values()]
+               ^^^^^^
+E   AttributeError: 'Definition' object has no attribute 'axes'
+
+tests/test_b103_a2l_definition_arrays_coverage.py:504: AttributeError
+______________ test_r_a2l_def_148_9_shared_range_table_same_tuple ______________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-coverage-red-2/test_r_a2l_def_148_9_shared_ra0')
+
+    def test_r_a2l_def_148_9_shared_range_table_same_tuple(tmp_path):
+        n_entries = S // 18
+        a2l_data = _parse(tmp_path,
+                          _cm("CM_R", 'TAB_VERB "%.0" ""', "COMPU_TAB_REF VR"),
+                          _vrange("VR", str(n_entries),
+                                  *[f'{1000 + 2 * k} {1000 + 2 * k + 1} "r{k}"' for k in range(n_entries)]),
+                          _std_axis_curves("CM_R"))
+        names = [f"C{i:05d}" for i in range(400)]
+        defs = a2ldef.describe_definitions(names, a2l_data)
+>       entries = [d.axes[0].points.enum_entries for d in defs.values()]
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition_arrays_coverage.py:520: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+.0 = <dict_valueiterator object at 0x7f21a7eac040>
+
+>   entries = [d.axes[0].points.enum_entries for d in defs.values()]
+               ^^^^^^
+E   AttributeError: 'Definition' object has no attribute 'axes'
+
+tests/test_b103_a2l_definition_arrays_coverage.py:520: AttributeError
+____________ test_r_a2l_def_148_10_long_part_word_of_shared_layout _____________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-coverage-red-2/test_r_a2l_def_148_10_long_par0')
+
+    def test_r_a2l_def_148_10_long_part_word_of_shared_layout(tmp_path):
+        word = "P" * S
+        a2l_data = _parse(tmp_path,
+                          _rl("RL", "FNC_VALUES 1 UBYTE ROW_DIR DIRECT", word),
+                          _n_valblks("NO_COMPU_METHOD", "RL", ("NUMBER 1",)))
+        names = [f"V{i:05d}" for i in range(400)]
+        defs = a2ldef.describe_definitions(names, a2l_data)
+        for name in names:
+            d = defs[name]
+>           is_refused(d, "A2L-DEF-LAYOUT-PART",
+                       f"{name}: the record layout RL holds {'P' * _ECHO}{_ELLIPSIS}, which the system cannot read")
+
+tests/test_b103_a2l_definition_arrays_coverage.py:536: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='V00000', section='CHARACTERISTIC', char_type='VAL_BLK', kind='', address=4096, byte_length=1, datatyp...ab_ref=None, refusal=Refusal(code='A2L-DEF-KIND', message='V00000: the system has no definition for a VAL_BLK object'))
+code = 'A2L-DEF-LAYOUT-PART'
+message = 'V00000: the record layout RL holds PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP...PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP…, which the system cannot read'
+
+    def is_refused(d, code: str, message: str) -> None:
+        from s19_app.tui.a2l_definition import Refusal
+>       assert d.refusal == Refusal(code, message), d.refusal
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Refusal(code='A2L-DEF-KIND', message='V00000: the system has no definition for a VAL_BLK object')
+
+tests/support/b103_a2l_arrays.py:210: AssertionError
+________ test_r_a2l_def_148_11_long_alignment_word_of_shared_mod_common ________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-coverage-red-2/test_r_a2l_def_148_11_long_ali0')
+
+    def test_r_a2l_def_148_11_long_alignment_word_of_shared_mod_common(tmp_path):
+        word = "9" * S
+        a2l_data = _parse(tmp_path, _n_valblks("NO_COMPU_METHOD", "RL_U8", ("NUMBER 4",)),
+                          mod_common=(f"ALIGNMENT_BYTE {word}",))
+        names = [f"V{i:05d}" for i in range(400)]
+        defs = a2ldef.describe_definitions(names, a2l_data)
+        for name in names:
+            d = defs[name]
+>           is_refused(d, "A2L-DEF-ALIGNMENT",
+                       f"{name}: the MOD_COMMON line ALIGNMENT_BYTE {'9' * _ECHO}{_ELLIPSIS} cannot be read")
+
+tests/test_b103_a2l_definition_arrays_coverage.py:549: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='V00000', section='CHARACTERISTIC', char_type='VAL_BLK', kind='', address=4096, byte_length=4, datatyp...ab_ref=None, refusal=Refusal(code='A2L-DEF-KIND', message='V00000: the system has no definition for a VAL_BLK object'))
+code = 'A2L-DEF-ALIGNMENT'
+message = 'V00000: the MOD_COMMON line ALIGNMENT_BYTE 99999999999999999999999999999999999999999999999999999999999999999999999999...999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999… cannot be read'
+
+    def is_refused(d, code: str, message: str) -> None:
+        from s19_app.tui.a2l_definition import Refusal
+>       assert d.refusal == Refusal(code, message), d.refusal
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Refusal(code='A2L-DEF-KIND', message='V00000: the system has no definition for a VAL_BLK object')
+
+tests/support/b103_a2l_arrays.py:210: AssertionError
+_____________ test_r_a2l_def_148_12_long_format_word_decimals_once _____________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-coverage-red-2/test_r_a2l_def_148_12_long_for0')
+
+    def test_r_a2l_def_148_12_long_format_word_decimals_once(tmp_path):
+        fmt = '"%' + "9" * S + '.2"'
+        a2l_data = _parse(tmp_path,
+                          _cm("CM_F", f'LINEAR {fmt} ""', "COEFFS_LINEAR 0.5 0"),
+                          _std_axis_curves("CM_F"))
+        names = [f"C{i:05d}" for i in range(400)]
+        defs = a2ldef.describe_definitions(names, a2l_data)
+        for name in names:
+            d = defs[name]
+>           assert d.decimals == 2 and d.refusal is None
+E           AssertionError: assert (2 == 2 and Refusal(code='A2L-DEF-KIND', message='C00000: the system has no definition for a CURVE object') is None)
+E            +  where 2 = Definition(name='C00000', section='CHARACTERISTIC', char_type='CURVE', kind='', address=4096, byte_length=8, datatype=..._tab_ref=None, refusal=Refusal(code='A2L-DEF-KIND', message='C00000: the system has no definition for a CURVE object')).decimals
+E            +  and   Refusal(code='A2L-DEF-KIND', message='C00000: the system has no definition for a CURVE object') = Definition(name='C00000', section='CHARACTERISTIC', char_type='CURVE', kind='', address=4096, byte_length=8, datatype=..._tab_ref=None, refusal=Refusal(code='A2L-DEF-KIND', message='C00000: the system has no definition for a CURVE object')).refusal
+
+tests/test_b103_a2l_definition_arrays_coverage.py:563: AssertionError
+_______________ test_r_a2l_def_148_13_long_conversion_type_word ________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-coverage-red-2/test_r_a2l_def_148_13_long_con0')
+
+    def test_r_a2l_def_148_13_long_conversion_type_word(tmp_path):
+        word = "Z" * S
+        a2l_data = _parse(tmp_path,
+                          _cm("CM_T", f'{word} "%.3" ""'),
+                          _std_axis_curves("CM_T"))
+        names = [f"C{i:05d}" for i in range(400)]
+        defs = a2ldef.describe_definitions(names, a2l_data)
+        for name in names:
+            d = defs[name]
+>           is_refused(d, "A2L-DEF-CONVERSION",
+                       f"{name}: the conversion type {'Z' * _ECHO}{_ELLIPSIS} of CM_T is not supported")
+
+tests/test_b103_a2l_definition_arrays_coverage.py:576: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='C00000', section='CHARACTERISTIC', char_type='CURVE', kind='', address=4096, byte_length=8, datatype=..._tab_ref=None, refusal=Refusal(code='A2L-DEF-KIND', message='C00000: the system has no definition for a CURVE object'))
+code = 'A2L-DEF-CONVERSION'
+message = 'C00000: the conversion type ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ...ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ… of CM_T is not supported'
+
+    def is_refused(d, code: str, message: str) -> None:
+        from s19_app.tui.a2l_definition import Refusal
+>       assert d.refusal == Refusal(code, message), d.refusal
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Refusal(code='A2L-DEF-KIND', message='C00000: the system has no definition for a CURVE object')
+
+tests/support/b103_a2l_arrays.py:210: AssertionError
+____________________ test_r_a2l_def_148_14_long_tabref_word ____________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-coverage-red-2/test_r_a2l_def_148_14_long_tab0')
+
+    def test_r_a2l_def_148_14_long_tabref_word(tmp_path):
+        word = "G" * S
+        a2l_data = _parse(tmp_path,
+                          _cm("CM_V", 'TAB_VERB "%.3" ""', f"COMPU_TAB_REF {word}"),
+                          _std_axis_curves("CM_V"))
+        names = [f"C{i:05d}" for i in range(400)]
+        defs = a2ldef.describe_definitions(names, a2l_data)
+        for name in names:
+            d = defs[name]
+>           is_refused(d, "A2L-DEF-TABLE",
+                       f"{name}: the table {'G' * _ECHO}{_ELLIPSIS} of CM_V is not declared in the A2L")
+
+tests/test_b103_a2l_definition_arrays_coverage.py:590: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='C00000', section='CHARACTERISTIC', char_type='CURVE', kind='', address=4096, byte_length=8, datatype=...GGGGGGGGGGGG', refusal=Refusal(code='A2L-DEF-KIND', message='C00000: the system has no definition for a CURVE object'))
+code = 'A2L-DEF-TABLE'
+message = 'C00000: the table GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG...GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG… of CM_V is not declared in the A2L'
+
+    def is_refused(d, code: str, message: str) -> None:
+        from s19_app.tui.a2l_definition import Refusal
+>       assert d.refusal == Refusal(code, message), d.refusal
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Refusal(code='A2L-DEF-KIND', message='C00000: the system has no definition for a CURVE object')
+
+tests/support/b103_a2l_arrays.py:210: AssertionError
+_____________ test_r_a2l_def_148_15_long_part_word_of_axis_layout ______________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-coverage-red-2/test_r_a2l_def_148_15_long_par0')
+
+    def test_r_a2l_def_148_15_long_part_word_of_axis_layout(tmp_path):
+        word = "P" * S
+        axo = _axis_pts("AXO", "0x100", "RL_AXO", "4")
+        body = IDENT + _rl("RL_AXO", "NO_AXIS_PTS_X 1 UBYTE", "AXIS_PTS_X 2 UBYTE INDEX_INCR DIRECT", word) + axo
+        for i in range(400):
+            body += _curve(f"C{i:05d}", f"0x{0x1000 + 16 * i:X}", "RL_U8",
+                           _axis("COM_AXIS", "CM_IDENT", "4", "0", "255", "AXIS_PTS_REF AXO"))
+        a2l_data = _parse(tmp_path, body)
+        names = [f"C{i:05d}" for i in range(400)]
+        defs = a2ldef.describe_definitions(names, a2l_data)
+        for name in names:
+            d = defs[name]
+>           is_refused(d, "A2L-DEF-LAYOUT-PART",
+                       f"{name}.X: the record layout RL_AXO holds {'P' * _ECHO}{_ELLIPSIS}, which the system cannot read")
+
+tests/test_b103_a2l_definition_arrays_coverage.py:607: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='C00000', section='CHARACTERISTIC', char_type='CURVE', kind='', address=4096, byte_length=None, dataty..._tab_ref=None, refusal=Refusal(code='A2L-DEF-KIND', message='C00000: the system has no definition for a CURVE object'))
+code = 'A2L-DEF-LAYOUT-PART'
+message = 'C00000.X: the record layout RL_AXO holds PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP...PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP…, which the system cannot read'
+
+    def is_refused(d, code: str, message: str) -> None:
+        from s19_app.tui.a2l_definition import Refusal
+>       assert d.refusal == Refusal(code, message), d.refusal
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Refusal(code='A2L-DEF-KIND', message='C00000: the system has no definition for a CURVE object')
+
+tests/support/b103_a2l_arrays.py:210: AssertionError
+__________ test_r_a2l_def_148_16_long_layout_name_part_message_count ___________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-coverage-red-2/test_r_a2l_def_148_16_long_lay0')
+
+    def test_r_a2l_def_148_16_long_layout_name_part_message_count(tmp_path):
+        word = "L" * S
+        a2l_data = _long_name_axis_layout_curves(
+            tmp_path, word, "NO_AXIS_PTS_X 1 UBYTE", "AXIS_PTS_X 2 UBYTE INDEX_INCR DIRECT", "P")
+        names = [f"C{i:05d}" for i in range(400)]
+        # The count: 0 lookups by the shared layout word after the first name.
+        counter = _CountingMap(a2l_data["record_layouts_by_name"])
+        a2l_data["record_layouts_by_name"] = counter
+        after, defs = _lookups_after_first(names, a2l_data, {"layouts": counter}, word)
+        assert after["layouts"] == 0, after
+        for name in names:
+            d = defs[name]
+>           is_refused(d, "A2L-DEF-LAYOUT-PART",
+                       f"{name}.X: the record layout {'L' * _ECHO}{_ELLIPSIS} holds P, which the system cannot read")
+
+tests/test_b103_a2l_definition_arrays_coverage.py:635: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='C00000', section='CHARACTERISTIC', char_type='CURVE', kind='', address=4096, byte_length=None, dataty..._tab_ref=None, refusal=Refusal(code='A2L-DEF-KIND', message='C00000: the system has no definition for a CURVE object'))
+code = 'A2L-DEF-LAYOUT-PART'
+message = 'C00000.X: the record layout LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL...LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL… holds P, which the system cannot read'
+
+    def is_refused(d, code: str, message: str) -> None:
+        from s19_app.tui.a2l_definition import Refusal
+>       assert d.refusal == Refusal(code, message), d.refusal
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Refusal(code='A2L-DEF-KIND', message='C00000: the system has no definition for a CURVE object')
+
+tests/support/b103_a2l_arrays.py:210: AssertionError
+________ test_r_a2l_def_148_17_long_layout_name_alignment_message_count ________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-coverage-red-2/test_r_a2l_def_148_17_long_lay0')
+
+    def test_r_a2l_def_148_17_long_layout_name_alignment_message_count(tmp_path):
+        word = "L" * S
+        a2l_data = _long_name_axis_layout_curves(
+            tmp_path, word, "NO_AXIS_PTS_X 1 UBYTE", "AXIS_PTS_X 2 UBYTE INDEX_INCR DIRECT")
+        # MOD_COMMON ALIGNMENT_BYTE 2 moves AXIS_PTS_X from offset 1 to 2.
+        names = [f"C{i:05d}" for i in range(400)]
+        # Rebuild with the MOD_COMMON alignment.
+        axo = _axis_pts("AXO", "0x100", word, "4")
+        body = _rl(word, "NO_AXIS_PTS_X 1 UBYTE", "AXIS_PTS_X 2 UBYTE INDEX_INCR DIRECT") + axo
+        for i in range(400):
+            body += _curve(f"C{i:05d}", f"0x{0x1000 + 16 * i:X}", "RL_U8",
+                           _axis("COM_AXIS", "CM_IDENT", "4", "0", "255", "AXIS_PTS_REF AXO"))
+        a2l_data = _parse(tmp_path, IDENT + body, mod_common=("ALIGNMENT_BYTE 2",))
+        counter = _CountingMap(a2l_data["record_layouts_by_name"])
+        a2l_data["record_layouts_by_name"] = counter
+        after, defs = _lookups_after_first(names, a2l_data, {"layouts": counter}, word)
+        assert after["layouts"] == 0, after
+        for name in names:
+            d = defs[name]
+>           is_refused(d, "A2L-DEF-ALIGNMENT",
+                       f"{name}: AXIS_PTS_X of the record layout {'L' * _ECHO}{_ELLIPSIS} lies at offset 1, "
+                       "or at 2 under the MOD_COMMON alignment")
+
+tests/test_b103_a2l_definition_arrays_coverage.py:659: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='C00000', section='CHARACTERISTIC', char_type='CURVE', kind='', address=4096, byte_length=None, dataty..._tab_ref=None, refusal=Refusal(code='A2L-DEF-KIND', message='C00000: the system has no definition for a CURVE object'))
+code = 'A2L-DEF-ALIGNMENT'
+message = 'C00000: AXIS_PTS_X of the record layout LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL...LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL… lies at offset 1, or at 2 under the MOD_COMMON alignment'
+
+    def is_refused(d, code: str, message: str) -> None:
+        from s19_app.tui.a2l_definition import Refusal
+>       assert d.refusal == Refusal(code, message), d.refusal
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Refusal(code='A2L-DEF-KIND', message='C00000: the system has no definition for a CURVE object')
+
+tests/support/b103_a2l_arrays.py:210: AssertionError
+_____________ test_r_a2l_def_148_18_long_tabref_empty_table_count ______________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-coverage-red-2/test_r_a2l_def_148_18_long_tab0')
+
+    def test_r_a2l_def_148_18_long_tabref_empty_table_count(tmp_path):
+        word = "E" * S
+        a2l_data = _long_tabref_empty_curves(tmp_path, word)
+        names = [f"C{i:05d}" for i in range(400)]
+        # The VTAB lookup runs through the walk's local table map, so count it by
+        # wrapping the resolver the model calls per name (read-once control).
+        counts = {"by_word": 0}
+        orig_read_enum = a2ldef._read_enum_table
+    
+        def counting_read_enum(table_name, compu_tables_by_name, reads):
+            if table_name == word:
+                counts["by_word"] += 1
+            return orig_read_enum(table_name, compu_tables_by_name, reads)
+    
+        a2ldef._read_enum_table = counting_read_enum
+        try:
+            snapshots: list[int] = []
+    
+            def gen():
+                yield names[0]
+                snapshots.append(counts["by_word"])
+                yield from names[1:]
+    
+            defs = a2ldef.describe_definitions(gen(), a2l_data)
+            assert snapshots
+        finally:
+            a2ldef._read_enum_table = orig_read_enum
+        assert counts["by_word"] - snapshots[0] == 0, (counts["by_word"], snapshots[0])
+        for name in names:
+            d = defs[name]
+>           is_refused(d, "A2L-DEF-TABLE-EMPTY",
+                       f"{name}: the table {'E' * _ECHO}{_ELLIPSIS} has no entries")
+
+tests/test_b103_a2l_definition_arrays_coverage.py:702: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='C00000', section='CHARACTERISTIC', char_type='CURVE', kind='', address=4096, byte_length=8, datatype=...EEEEEEEEEEEE', refusal=Refusal(code='A2L-DEF-KIND', message='C00000: the system has no definition for a CURVE object'))
+code = 'A2L-DEF-TABLE-EMPTY'
+message = 'C00000: the table EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE...EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE… has no entries'
+
+    def is_refused(d, code: str, message: str) -> None:
+        from s19_app.tui.a2l_definition import Refusal
+>       assert d.refusal == Refusal(code, message), d.refusal
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Refusal(code='A2L-DEF-KIND', message='C00000: the system has no definition for a CURVE object')
+
+tests/support/b103_a2l_arrays.py:210: AssertionError
+____________ test_r_a2l_def_148_19_tab_through_own_method_one_form _____________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-coverage-red-2/test_r_a2l_def_148_19_tab_thro0')
+
+    def test_r_a2l_def_148_19_tab_through_own_method_one_form(tmp_path):
+        # CT-5: 400 VAL_BLKs, each naming its own TAB_NOINTP method on one CT.
+        blocks: list[str] = []
+        for i in range(400):
+            blocks += _cm(f"CM{i:05d}", 'TAB_NOINTP "%.3" ""', "COMPU_TAB_REF CT")
+        blocks += _ctab("CT", "TAB_NOINTP", "0 0", "10 100", "20 50", "300 999")
+        for i in range(400):
+            blocks += _valblk(f"V{i:05d}", f"0x{0x1000 + 16 * i:X}", "RL_U8", f"CM{i:05d}", "0", "255", "NUMBER 1")
+        a2l_data = _parse(tmp_path, blocks)
+        names = [f"V{i:05d}" for i in range(400)]
+        defs = a2ldef.describe_definitions(names, a2l_data)
+        forms = [d._table_form for d in defs.values()]
+>       assert all(f is not None for f in forms) and len({id(f) for f in forms}) == 1
+E       assert (False)
+E        +  where False = all(<generator object test_r_a2l_def_148_19_tab_through_own_method_one_form.<locals>.<genexpr> at 0x7f21a8226c20>)
+
+tests/test_b103_a2l_definition_arrays_coverage.py:719: AssertionError
+______________ test_r_a2l_def_150_arr_1_shared_enum_table_decode _______________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-coverage-red-2/test_r_a2l_def_150_arr_1_share0')
+
+    def test_r_a2l_def_150_arr_1_shared_enum_table_decode(tmp_path):
+        n_entries = S // 9
+        a2l_data = _parse(tmp_path,
+                          _cm("CM_V", 'TAB_VERB "%.0" ""', "COMPU_TAB_REF VT"),
+                          _vtab("VT", str(n_entries), *[f'{1000 + k} "v{k}"' for k in range(n_entries)]),
+                          _std_axis_curves("CM_V"))
+        d = a2ldef.describe_definition("C00000", a2l_data)
+        image = {0x1000 + i: 250 for i in range(16)}
+>       res = _decode(d, a2l_data, image)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition_arrays_coverage.py:757: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='C00000', section='CHARACTERISTIC', char_type='CURVE', kind='', address=4096, byte_length=8, datatype=..._tab_ref='VT', refusal=Refusal(code='A2L-DEF-KIND', message='C00000: the system has no definition for a CURVE object'))
+a2l_data = {'compu_methods_by_name': {'CM_V': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT', 'conversion_type': '...'1002 "v2"', '1003 "v3"', '1004 "v4"', '1005 "v5"', ...], 'name': 'VT', ...}}, 'declared_spans': [], 'errors': [], ...}
+image = {4096: 250, 4097: 250, 4098: 250, 4099: 250, ...}
+
+    def _decode(d: Definition, a2l_data: dict, image: Mapping[int, int]):
+>       return a2ldef.decode_values(d, a2l_data, image)
+               ^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 's19_app.tui.a2l_definition' has no attribute 'decode_values'
+
+tests/test_b103_a2l_definition_arrays_coverage.py:746: AttributeError
+_________________ test_r_a2l_def_150_arr_2_val_blk_enum_decode _________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-coverage-red-2/test_r_a2l_def_150_arr_2_val_b0')
+
+    def test_r_a2l_def_150_arr_2_val_blk_enum_decode(tmp_path):
+        a2l_data = _parse(tmp_path,
+                          _cm("CM_V", 'TAB_VERB "%.0" ""', "COMPU_TAB_REF VT"),
+                          _vtab("VT", "2", '0 "zero"', '1 "one"'),
+                          _valblk("V00000", "0x1000", "RL_U8", "CM_V", "0", "255", "NUMBER 4"))
+        d = a2ldef.describe_definition("V00000", a2l_data)
+>       res = _decode(d, a2l_data, img(0x1000, bytes([250]) * 4))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition_arrays_coverage.py:771: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='V00000', section='CHARACTERISTIC', char_type='VAL_BLK', kind='', address=4096, byte_length=4, datatyp...ab_ref='VT', refusal=Refusal(code='A2L-DEF-KIND', message='V00000: the system has no definition for a VAL_BLK object'))
+a2l_data = {'compu_methods_by_name': {'CM_V': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT', 'conversion_type': '..., 'one')], 'kind': '0', 'lines': ['0 "zero"', '1 "one"'], 'name': 'VT', ...}}, 'declared_spans': [], 'errors': [], ...}
+image = {4096: 250, 4097: 250, 4098: 250, 4099: 250}
+
+    def _decode(d: Definition, a2l_data: dict, image: Mapping[int, int]):
+>       return a2ldef.decode_values(d, a2l_data, image)
+               ^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 's19_app.tui.a2l_definition' has no attribute 'decode_values'
+
+tests/test_b103_a2l_definition_arrays_coverage.py:746: AttributeError
+_________ test_r_a2l_def_150_arr_3_long_matched_entry_text_referenced __________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-coverage-red-2/test_r_a2l_def_150_arr_3_long_0')
+
+    def test_r_a2l_def_150_arr_3_long_matched_entry_text_referenced(tmp_path):
+        text = "t" * S
+        a2l_data = _parse(tmp_path,
+                          _cm("CM_V", 'TAB_VERB "%.0" ""', "COMPU_TAB_REF VT"),
+                          _vtab("VT", "1", f'0 "{text}"'),
+                          _valblk("V00000", "0x1000", "RL_U8", "CM_V", "0", "255", "NUMBER 4"))
+        d = a2ldef.describe_definition("V00000", a2l_data)
+>       res = _decode(d, a2l_data, img(0x1000, bytes([0]) * 4))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition_arrays_coverage.py:783: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='V00000', section='CHARACTERISTIC', char_type='VAL_BLK', kind='', address=4096, byte_length=4, datatyp...ab_ref='VT', refusal=Refusal(code='A2L-DEF-KIND', message='V00000: the system has no definition for a VAL_BLK object'))
+a2l_data = {'compu_methods_by_name': {'CM_V': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT', 'conversion_type': '...ttttttttttttttttttttttttttttttttttttttttttttttttttttt"'], 'name': 'VT', ...}}, 'declared_spans': [], 'errors': [], ...}
+image = {4096: 0, 4097: 0, 4098: 0, 4099: 0}
+
+    def _decode(d: Definition, a2l_data: dict, image: Mapping[int, int]):
+>       return a2ldef.decode_values(d, a2l_data, image)
+               ^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 's19_app.tui.a2l_definition' has no attribute 'decode_values'
+
+tests/test_b103_a2l_definition_arrays_coverage.py:746: AttributeError
+____________ test_r_a2l_def_150_arr_4_long_default_text_referenced _____________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-coverage-red-2/test_r_a2l_def_150_arr_4_long_0')
+
+    def test_r_a2l_def_150_arr_4_long_default_text_referenced(tmp_path):
+        text = "d" * S
+        a2l_data = _parse(tmp_path,
+                          _cm("CM_V", 'TAB_VERB "%.0" ""', "COMPU_TAB_REF VT"),
+                          _vtab("VT", "1", '1000 "a"', default=text),
+                          _valblk("V00000", "0x1000", "RL_U8", "CM_V", "0", "255", "NUMBER 4"))
+        d = a2ldef.describe_definition("V00000", a2l_data)
+>       res = _decode(d, a2l_data, img(0x1000, bytes([250]) * 4))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition_arrays_coverage.py:796: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='V00000', section='CHARACTERISTIC', char_type='VAL_BLK', kind='', address=4096, byte_length=4, datatyp...ab_ref='VT', refusal=Refusal(code='A2L-DEF-KIND', message='V00000: the system has no definition for a VAL_BLK object'))
+a2l_data = {'compu_methods_by_name': {'CM_V': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VT', 'conversion_type': '...ddddddddddddddddddddddddddddddddddddddddddddddddddddd"'], 'name': 'VT', ...}}, 'declared_spans': [], 'errors': [], ...}
+image = {4096: 250, 4097: 250, 4098: 250, 4099: 250}
+
+    def _decode(d: Definition, a2l_data: dict, image: Mapping[int, int]):
+>       return a2ldef.decode_values(d, a2l_data, image)
+               ^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 's19_app.tui.a2l_definition' has no attribute 'decode_values'
+
+tests/test_b103_a2l_definition_arrays_coverage.py:746: AttributeError
+______________ test_r_a2l_def_150_arr_5_shared_range_table_decode ______________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-coverage-red-2/test_r_a2l_def_150_arr_5_share0')
+
+    def test_r_a2l_def_150_arr_5_shared_range_table_decode(tmp_path):
+        n_entries = S // 18
+        a2l_data = _parse(tmp_path,
+                          _cm("CM_R", 'TAB_VERB "%.0" ""', "COMPU_TAB_REF VR"),
+                          _vrange("VR", str(n_entries),
+                                  *[f'{1000 + 2 * k} {1000 + 2 * k + 1} "r{k}"' for k in range(n_entries)]),
+                          _std_axis_curves("CM_R"))
+        d = a2ldef.describe_definition("C00000", a2l_data)
+>       res = _decode(d, a2l_data, {0x1000 + i: 250 for i in range(16)})
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition_arrays_coverage.py:810: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='C00000', section='CHARACTERISTIC', char_type='CURVE', kind='', address=4096, byte_length=8, datatype=..._tab_ref='VR', refusal=Refusal(code='A2L-DEF-KIND', message='C00000: the system has no definition for a CURVE object'))
+a2l_data = {'compu_methods_by_name': {'CM_R': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VR', 'conversion_type': 'TAB_VERB', ...}}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}
+image = {4096: 250, 4097: 250, 4098: 250, 4099: 250, ...}
+
+    def _decode(d: Definition, a2l_data: dict, image: Mapping[int, int]):
+>       return a2ldef.decode_values(d, a2l_data, image)
+               ^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 's19_app.tui.a2l_definition' has no attribute 'decode_values'
+
+tests/test_b103_a2l_definition_arrays_coverage.py:746: AttributeError
+_________ test_r_a2l_def_150_arr_6_long_matched_range_text_referenced __________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-coverage-red-2/test_r_a2l_def_150_arr_6_long_0')
+
+    def test_r_a2l_def_150_arr_6_long_matched_range_text_referenced(tmp_path):
+        text = "t" * S
+        a2l_data = _parse(tmp_path,
+                          _cm("CM_R", 'TAB_VERB "%.0" ""', "COMPU_TAB_REF VR"),
+                          _vrange("VR", "1", f'0 255 "{text}"'),
+                          _valblk("V00000", "0x1000", "RL_U8", "CM_R", "0", "255", "NUMBER 4"))
+        d = a2ldef.describe_definition("V00000", a2l_data)
+>       res = _decode(d, a2l_data, img(0x1000, bytes([0]) * 4))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition_arrays_coverage.py:824: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='V00000', section='CHARACTERISTIC', char_type='VAL_BLK', kind='', address=4096, byte_length=4, datatyp...ab_ref='VR', refusal=Refusal(code='A2L-DEF-KIND', message='V00000: the system has no definition for a VAL_BLK object'))
+a2l_data = {'compu_methods_by_name': {'CM_R': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VR', 'conversion_type': 'TAB_VERB', ...}}, 'compu_tabs_by_name': {}, 'declared_spans': [], 'errors': [], ...}
+image = {4096: 0, 4097: 0, 4098: 0, 4099: 0}
+
+    def _decode(d: Definition, a2l_data: dict, image: Mapping[int, int]):
+>       return a2ldef.decode_values(d, a2l_data, image)
+               ^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 's19_app.tui.a2l_definition' has no attribute 'decode_values'
+
+tests/test_b103_a2l_definition_arrays_coverage.py:746: AttributeError
+__________ test_r_a2l_def_150_arr_7_tab_intp_frozen_value_one_lookup ___________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-coverage-red-2/test_r_a2l_def_150_arr_7_tab_i0')
+
+    def test_r_a2l_def_150_arr_7_tab_intp_frozen_value_one_lookup(tmp_path):
+        a2l_data = _tab_intp_val_blks(tmp_path, "TAB_INTP")
+        names = [f"V{i:05d}" for i in range(400)]
+        # The count: 0 lookups by CT in the COMPU_TAB side table after the first
+        # name, and none at all during the 399 decodes.
+        counter = _CountingMap(a2l_data["compu_tabs_by_name"])
+        a2l_data["compu_tabs_by_name"] = counter
+        after, defs = _lookups_after_first(names, a2l_data, {"tabs": counter}, "CT")
+        assert after["tabs"] == 0, after
+        method = a2l_data["compu_methods_by_name"]["CM_I"]
+        tables = a2l_data["compu_tabs_by_name"]._inner
+        expected, _, _ = a2l._apply_compu_method(250, method, tables, (0.0, 255.0))
+        before_decode = counter.counts.get("CT", 0)
+        for i, name in enumerate(names):
+>           res = _decode(defs[name], a2l_data, img(0x1000 + 16 * i, bytes([250]) * 4))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition_arrays_coverage.py:853: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='V00000', section='CHARACTERISTIC', char_type='VAL_BLK', kind='', address=4096, byte_length=4, datatyp...ab_ref='CT', refusal=Refusal(code='A2L-DEF-KIND', message='V00000: the system has no definition for a VAL_BLK object'))
+a2l_data = {'compu_methods_by_name': {'CM_I': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'CT', 'conversion_type': '...st_b103_a2l_definition_arrays_coverage._CountingMap object at 0x7f21a8070790>, 'declared_spans': [], 'errors': [], ...}
+image = {4096: 250, 4097: 250, 4098: 250, 4099: 250}
+
+    def _decode(d: Definition, a2l_data: dict, image: Mapping[int, int]):
+>       return a2ldef.decode_values(d, a2l_data, image)
+               ^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 's19_app.tui.a2l_definition' has no attribute 'decode_values'
+
+tests/test_b103_a2l_definition_arrays_coverage.py:746: AttributeError
+_______________ test_r_a2l_def_150_arr_8_tab_nointp_frozen_value _______________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-coverage-red-2/test_r_a2l_def_150_arr_8_tab_n0')
+
+    def test_r_a2l_def_150_arr_8_tab_nointp_frozen_value(tmp_path):
+        a2l_data = _tab_intp_val_blks(tmp_path, "TAB_NOINTP")
+        names = [f"V{i:05d}" for i in range(400)]
+        defs = a2ldef.describe_definitions(names, a2l_data)
+        method = a2l_data["compu_methods_by_name"]["CM_I"]
+        tables = a2l_data["compu_tabs_by_name"]
+        expected, _, _ = a2l._apply_compu_method(250, method, tables, (0.0, 255.0))
+        for i, name in enumerate(names):
+>           res = _decode(defs[name], a2l_data, img(0x1000 + 16 * i, bytes([250]) * 4))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition_arrays_coverage.py:868: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='V00000', section='CHARACTERISTIC', char_type='VAL_BLK', kind='', address=4096, byte_length=4, datatyp...ab_ref='CT', refusal=Refusal(code='A2L-DEF-KIND', message='V00000: the system has no definition for a VAL_BLK object'))
+a2l_data = {'compu_methods_by_name': {'CM_I': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'CT', 'conversion_type': '...': '0', 'lines': ['0 0', '100 100', '200 50', '300 999'], 'name': 'CT', ...}}, 'declared_spans': [], 'errors': [], ...}
+image = {4096: 250, 4097: 250, 4098: 250, 4099: 250}
+
+    def _decode(d: Definition, a2l_data: dict, image: Mapping[int, int]):
+>       return a2ldef.decode_values(d, a2l_data, image)
+               ^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 's19_app.tui.a2l_definition' has no attribute 'decode_values'
+
+tests/test_b103_a2l_definition_arrays_coverage.py:746: AttributeError
+____________ test_r_a2l_def_150_arr_9_bisect_matches_frozen_lookup _____________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-coverage-red-2/test_r_a2l_def_150_arr_9_bisec0')
+
+    def test_r_a2l_def_150_arr_9_bisect_matches_frozen_lookup(tmp_path):
+        """3a's ``_table_value`` (the bisect ``_decode_stored`` runs) gives the
+        frozen ``_table_lookup``'s (value, error) for every case point, on every
+        table with entries the inline and fixture files declare."""
+        # INLINE3 tables first (always present).
+        inline_blocks = _cm("CM_I", 'TAB_INTP "%.3" ""', "COMPU_TAB_REF CTI") + \
+            _cm("CM_N", 'TAB_NOINTP "%.3" ""', "COMPU_TAB_REF CTN") + \
+            _ctab("CTI", "TAB_INTP", "0 0", "10 100", "20 50") + \
+            _ctab("CTN", "TAB_NOINTP", "0 0", "10 100", "20 50")
+        inline_data = _parse(tmp_path, inline_blocks)
+    
+        tables: list[dict] = []
+        for key in ("CTI", "CTN"):
+            tables.append(inline_data["compu_tabs_by_name"][key])
+    
+        # Every COMPU_TAB / COMPU_VTAB with entries in the public fixtures.
+        fixtures = sorted(Path(__file__).resolve().parent.parent.glob("examples/case_00_public/*.a2l"))
+        for fixture in fixtures:
+            data = load(fixture.name)
+            for key in ("compu_tabs_by_name",):
+                for table in (data.get(key) or {}).values():
+                    if table.get("entries"):
+                        tables.append(table)
+    
+        # The 168-file public corpus, read-only (``A2L_CORPUS_FILES``, else
+        # ``~/a2l-corpus/files`` on the runner's real home).
+        import os
+        corpus = Path(os.environ.get("A2L_CORPUS_FILES") or Path.home() / "a2l-corpus" / "files")
+        if corpus.is_dir():
+            for path in sorted(corpus.glob("*.a2l")):
+                data = parse_a2l_file(path)
+                for table in (data.get("compu_tabs_by_name") or {}).values():
+                    if table.get("entries"):
+                        tables.append(table)
+    
+        assert tables
+        checked = 0
+        for table in tables:
+            entries = table.get("entries") or []
+            if not entries or any(isinstance(e[0], float) and math.isnan(e[0]) for e in entries):
+                continue  # the NaN-x table is refused via the verdict, tested below
+            form = _tab_form_from_entries(entries)
+            for interp in (False, True):
+                for value in _probe_values(entries):
+                    got = a2ldef._table_value(form, value, interp)
+                    want = a2l._table_lookup(value, table, interp)
+                    assert got == want, (table.get("name"), interp, value, got, want)
+                    checked += 1
+        assert checked > 0
+    
+        # The CTN table (a NaN x, a legal float word) refuses at decode, not raises.
+        nan_blocks = _cm("CM_XN", 'TAB_NOINTP "%.3" ""', "COMPU_TAB_REF CTN") + \
+            _cm("CM_XI", 'TAB_INTP "%.3" ""', "COMPU_TAB_REF CTN") + \
+            _ctab("CTN", "TAB_NOINTP", "0 0", "nan 7", "10 100", "20 50")
+        for name, conv in (("VA", "CM_XN"), ("VB", "CM_XI")):
+            data = _parse(tmp_path, nan_blocks + _valblk(name, "0x10", "RL_U8", conv, "0", "255", "MATRIX_DIM 3"))
+            d = a2ldef.describe_definition(name, data)
+>           res = _decode(d, data, img(0x10, bytes([5, 10, 15])))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition_arrays_coverage.py:955: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='VA', section='CHARACTERISTIC', char_type='VAL_BLK', kind='', address=16, byte_length=3, datatype='UBY...u_tab_ref='CTN', refusal=Refusal(code='A2L-DEF-KIND', message='VA: the system has no definition for a VAL_BLK object'))
+a2l_data = {'compu_methods_by_name': {'CM_XI': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'CTN', 'conversion_type':...ind': '0', 'lines': ['0 0', 'nan 7', '10 100', '20 50'], 'name': 'CTN', ...}}, 'declared_spans': [], 'errors': [], ...}
+image = {16: 5, 17: 10, 18: 15}
+
+    def _decode(d: Definition, a2l_data: dict, image: Mapping[int, int]):
+>       return a2ldef.decode_values(d, a2l_data, image)
+               ^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 's19_app.tui.a2l_definition' has no attribute 'decode_values'
+
+tests/test_b103_a2l_definition_arrays_coverage.py:746: AttributeError
+_______ test_r_a2l_def_150_arr_10_element_decode_does_not_grow_with_name _______
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-coverage-red-2/test_r_a2l_def_150_arr_10_elem0')
+
+    def test_r_a2l_def_150_arr_10_element_decode_does_not_grow_with_name(tmp_path):
+        # EN-1: one VAL_BLK named V + N's, naming CM_I -> NOT_DECLARED.
+        name = "V" + "N" * S
+        blocks = _cm("CM_I", 'TAB_INTP "%.3" ""', "COMPU_TAB_REF NOT_DECLARED") + \
+            _valblk(name, "0x1000", "RL_U8", "CM_I", "0", "255", "NUMBER 64")
+        a2l_data = _parse(tmp_path, blocks)
+        d = a2ldef.describe_definition(name, a2l_data)
+>       assert d.kind == "array" and d.shape == (64,) and d.refusal is None
+E       AssertionError: assert ('' == 'array'
+E         
+E         - array)
+
+tests/test_b103_a2l_definition_arrays_coverage.py:969: AssertionError
+________ test_r_a2l_def_150_arr_11_table_text_value_refused_not_raised _________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-coverage-red-2/test_r_a2l_def_150_arr_11_tabl0')
+
+    def test_r_a2l_def_150_arr_11_table_text_value_refused_not_raised(tmp_path):
+        for kind, name, conv in (("VAL_BLK", "VA", "CM_XN"), ("VAL_BLK", "VB", "CM_XI"),
+                                 ("VALUE", "SC", "CM_XN"), ("VALUE", "SD", "CM_XI")):
+            blocks = _cm("CM_XN", 'TAB_NOINTP "%.3" ""', "COMPU_TAB_REF VTX") + \
+                _cm("CM_XI", 'TAB_INTP "%.3" ""', "COMPU_TAB_REF VTX") + \
+                _vtab("VTX", "2", '0 "zero"', '1 "one"')
+            if kind == "VAL_BLK":
+                blocks += _valblk(name, "0x10", "RL_U8", conv, "0", "255", "MATRIX_DIM 2")
+                a2l_data = _parse(tmp_path, blocks)
+                d = a2ldef.describe_definition(name, a2l_data)
+>               res = _decode(d, a2l_data, img(0x10, bytes([1, 0])))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition_arrays_coverage.py:995: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='VA', section='CHARACTERISTIC', char_type='VAL_BLK', kind='', address=16, byte_length=2, datatype='UBY...u_tab_ref='VTX', refusal=Refusal(code='A2L-DEF-KIND', message='VA: the system has no definition for a VAL_BLK object'))
+a2l_data = {'compu_methods_by_name': {'CM_XI': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': 'VTX', 'conversion_type':... 'one')], 'kind': '0', 'lines': ['0 "zero"', '1 "one"'], 'name': 'VTX', ...}}, 'declared_spans': [], 'errors': [], ...}
+image = {16: 1, 17: 0}
+
+    def _decode(d: Definition, a2l_data: dict, image: Mapping[int, int]):
+>       return a2ldef.decode_values(d, a2l_data, image)
+               ^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 's19_app.tui.a2l_definition' has no attribute 'decode_values'
+
+tests/test_b103_a2l_definition_arrays_coverage.py:746: AttributeError
+________________ test_r_a2l_def_151_arr_3_echo_cap_layout_mode _________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-coverage-red-2/test_r_a2l_def_151_arr_3_echo_0')
+
+    def test_r_a2l_def_151_arr_3_echo_cap_layout_mode(tmp_path):
+        word = "M" * S
+        blocks = _rl("RL_A", f"FNC_VALUES 1 UWORD {word} DIRECT") + \
+            _valblk("VA", "0x10", "RL_A", "NO_COMPU_METHOD", "0", "65535", "MATRIX_DIM 2")
+        a2l_data = _parse(tmp_path, blocks)
+        d = a2ldef.describe_definition("VA", a2l_data)
+>       is_refused(d, "A2L-DEF-LAYOUT-MODE",
+                   f"VA: the record layout RL_A stores FNC_VALUES as {'M' * _ECHO}{_ELLIPSIS}, "
+                   "which the system cannot read")
+
+tests/test_b103_a2l_definition_arrays_coverage.py:1018: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='VA', section='CHARACTERISTIC', char_type='VAL_BLK', kind='', address=16, byte_length=4, datatype='UWO...pu_tab_ref=None, refusal=Refusal(code='A2L-DEF-KIND', message='VA: the system has no definition for a VAL_BLK object'))
+code = 'A2L-DEF-LAYOUT-MODE'
+message = 'VA: the record layout RL_A stores FNC_VALUES as MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM...MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM…, which the system cannot read'
+
+    def is_refused(d, code: str, message: str) -> None:
+        from s19_app.tui.a2l_definition import Refusal
+>       assert d.refusal == Refusal(code, message), d.refusal
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Refusal(code='A2L-DEF-KIND', message='VA: the system has no definition for a VAL_BLK object')
+
+tests/support/b103_a2l_arrays.py:210: AssertionError
+______________ test_r_a2l_def_151_arr_4_echo_cap_layout_datatype _______________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-coverage-red-2/test_r_a2l_def_151_arr_4_echo_0')
+
+    def test_r_a2l_def_151_arr_4_echo_cap_layout_datatype(tmp_path):
+        word = "T" * S
+        blocks = _rl("RL_D", f"FNC_VALUES 1 {word} ROW_DIR DIRECT") + \
+            _valblk("VD", "0x10", "RL_D", "NO_COMPU_METHOD", "0", "65535", "MATRIX_DIM 2")
+        a2l_data = _parse(tmp_path, blocks)
+        d = a2ldef.describe_definition("VD", a2l_data)
+>       is_refused(d, "A2L-DEF-LAYOUT-DATATYPE",
+                   f"VD: the record layout RL_D gives FNC_VALUES the datatype {'T' * _ECHO}{_ELLIPSIS}, "
+                   "which the system cannot read")
+
+tests/test_b103_a2l_definition_arrays_coverage.py:1029: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='VD', section='CHARACTERISTIC', char_type='VAL_BLK', kind='', address=16, byte_length=None, datatype=N...pu_tab_ref=None, refusal=Refusal(code='A2L-DEF-KIND', message='VD: the system has no definition for a VAL_BLK object'))
+code = 'A2L-DEF-LAYOUT-DATATYPE'
+message = 'VD: the record layout RL_D gives FNC_VALUES the datatype TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT...TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT…, which the system cannot read'
+
+    def is_refused(d, code: str, message: str) -> None:
+        from s19_app.tui.a2l_definition import Refusal
+>       assert d.refusal == Refusal(code, message), d.refusal
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Refusal(code='A2L-DEF-KIND', message='VD: the system has no definition for a VAL_BLK object')
+
+tests/support/b103_a2l_arrays.py:210: AssertionError
+____________ test_r_a2l_def_151_arr_5_echo_cap_mod_common_alignment ____________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-tests/tree/zq_iso_user/pytest-coverage-red-2/test_r_a2l_def_151_arr_5_echo_0')
+
+    def test_r_a2l_def_151_arr_5_echo_cap_mod_common_alignment(tmp_path):
+        word = "9" * S
+        blocks = _rl("RL_CA2", "NO_AXIS_PTS_X 1 UBYTE", "AXIS_PTS_X 2 UBYTE INDEX_INCR DIRECT",
+                     "FNC_VALUES 3 UWORD ROW_DIR DIRECT") + \
+            _curve("CA2", "0x100", "RL_CA2", _axis("STD_AXIS", "CM_IDENT", "2", "0", "255"))
+        a2l_data = _parse(tmp_path, blocks, mod_common=(f"ALIGNMENT_WORD {word}",))
+        d = a2ldef.describe_definition("CA2", a2l_data)
+>       is_refused(d, "A2L-DEF-ALIGNMENT",
+                   f"CA2: the MOD_COMMON line ALIGNMENT_WORD {'9' * _ECHO}{_ELLIPSIS} cannot be read")
+
+tests/test_b103_a2l_definition_arrays_coverage.py:1041: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='CA2', section='CHARACTERISTIC', char_type='CURVE', kind='', address=256, byte_length=7, datatype='UBY...mpu_tab_ref=None, refusal=Refusal(code='A2L-DEF-KIND', message='CA2: the system has no definition for a CURVE object'))
+code = 'A2L-DEF-ALIGNMENT'
+message = 'CA2: the MOD_COMMON line ALIGNMENT_WORD 99999999999999999999999999999999999999999999999999999999999999999999999999999...999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999… cannot be read'
+
+    def is_refused(d, code: str, message: str) -> None:
+        from s19_app.tui.a2l_definition import Refusal
+>       assert d.refusal == Refusal(code, message), d.refusal
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Refusal(code='A2L-DEF-KIND', message='CA2: the system has no definition for a CURVE object')
+
+tests/support/b103_a2l_arrays.py:210: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_136_arr_2_shared_layout_and_mod_common_read_once
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_136_arr_3_shared_axis_method_enum_range_read_once
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_2_shared_layout_first_line_val_blk
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_4_mod_common_alignment_lines_val_blk
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_5_com_path_under_mod_common
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_7_shared_method_size
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_8_shared_enum_table_same_tuple
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_9_shared_range_table_same_tuple
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_10_long_part_word_of_shared_layout
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_11_long_alignment_word_of_shared_mod_common
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_12_long_format_word_decimals_once
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_13_long_conversion_type_word
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_14_long_tabref_word
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_15_long_part_word_of_axis_layout
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_16_long_layout_name_part_message_count
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_17_long_layout_name_alignment_message_count
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_18_long_tabref_empty_table_count
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_148_19_tab_through_own_method_one_form
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_150_arr_1_shared_enum_table_decode
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_150_arr_2_val_blk_enum_decode
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_150_arr_3_long_matched_entry_text_referenced
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_150_arr_4_long_default_text_referenced
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_150_arr_5_shared_range_table_decode
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_150_arr_6_long_matched_range_text_referenced
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_150_arr_7_tab_intp_frozen_value_one_lookup
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_150_arr_8_tab_nointp_frozen_value
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_150_arr_9_bisect_matches_frozen_lookup
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_150_arr_10_element_decode_does_not_grow_with_name
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_150_arr_11_table_text_value_refused_not_raised
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_151_arr_3_echo_cap_layout_mode
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_151_arr_4_echo_cap_layout_datatype
+FAILED tests/test_b103_a2l_definition_arrays_coverage.py::test_r_a2l_def_151_arr_5_echo_cap_mod_common_alignment
+32 failed, 3 passed in 5.33s

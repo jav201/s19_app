@@ -114,6 +114,35 @@ def _run_cli(out: Path, *args: str) -> subprocess.CompletedProcess:
     )
 
 
+def _defc_plan(obj: dict) -> list:
+    """The generator's planned values for one definitions-case object, normalized
+    to a list of ``(stored, text)`` pairs (a scalar gives one pair)."""
+    stored = obj["planned_stored"]
+    text = obj["planned_text"]
+    if isinstance(stored, tuple):
+        return list(zip(stored, text))
+    return [(stored, text)]
+
+
+def _defc_decode(m, obj: dict, a2l: dict, image: dict) -> list | None:
+    """Decode one definitions-case object through the app's loaders, per the Inc 3a
+    I-D contract: AXIS_PTS is an axis record (returns ``None``; its points decode
+    through the curves and maps that reference it), an array/curve/map uses
+    ``decode_values``, a scalar keeps ``decode_definition``.  Returns the decoded
+    ``(stored, text)`` pairs in element order."""
+    if obj.get("section") == "AXIS_PTS":
+        return None
+    d = m.describe_definition(obj["name"], a2l)
+    assert d.refusal is None, (obj["name"], d.refusal)
+    if obj.get("kind") in ("CURVE", "MAP", "VAL_BLK"):
+        res = m.decode_values(d, a2l, image)
+        assert isinstance(res, m.DecodedValues), (obj["name"], res)
+        return [(v.stored, v.text) for v in res.values]
+    res = m.decode_definition(d, a2l, image)
+    assert isinstance(res, m.Decoded), (obj["name"], res)
+    return [(res.stored, res.text)]
+
+
 # ==========================================================================
 # R-A2L-DEF.59 - the case 08 pin
 # ==========================================================================
@@ -157,13 +186,12 @@ def test_r_a2l_def_59_4_every_seed_of_the_definitions_case_builds_and_decodes_to
         image = S19File(str(folder / "definitions.s19")).get_memory_map()
         _regions, objects = gen.build_definition_objects(random.Random(seed))
         for obj in objects:
-            d = m.describe_definition(obj["name"], a2l)
-            assert d.refusal is None, (seed, obj["name"], d.refusal)
-            res = m.decode_definition(d, a2l, image)
-            assert isinstance(res, m.Decoded), (seed, obj["name"], res)
-            assert res.text == obj["planned_text"], (seed, obj["name"], res.text, obj["planned_text"])
+            got = _defc_decode(m, obj, a2l, image)
+            if got is None:
+                continue                                                   # an AXIS_PTS axis record
+            assert got == _defc_plan(obj), (seed, obj["name"], got, _defc_plan(obj))
             if obj["name"] == "ENUM_0001":
-                seen_texts.add(res.text)
+                seen_texts.add(got[0][1])
     assert len(seen_texts) >= 2, seen_texts
 
 
@@ -267,11 +295,10 @@ def test_at_b103_i2_2_the_definitions_case_decodes_to_its_planned_values_through
     image = defc["mem"]
     assert sorted(image) == list(range(0x800000, 0x800100))
     for name, obj in defc["objs"].items():
-        d = describe_definition(name, defc["a2l"])
-        assert d.refusal is None, (name, d.refusal)
-        res = decode_definition(d, defc["a2l"], image)
-        assert isinstance(res, Decoded), (name, res)
-        assert res.text == obj["planned_text"], name
+        got = _defc_decode(m, obj, defc["a2l"], image)
+        if got is None:
+            continue                                                       # an AXIS_PTS axis record
+        assert got == _defc_plan(obj), (name, got, _defc_plan(obj))
     display = decode_definition(describe_definition("DISPLAY_0001", defc["a2l"]), defc["a2l"], image)
     assert display.value == pytest.approx(143.5) and display.text == "143.5"
     assert (image[0x800020], image[0x800021]) == (0x01, 0x1F)
