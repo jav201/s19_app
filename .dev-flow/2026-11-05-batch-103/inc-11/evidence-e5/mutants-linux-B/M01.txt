@@ -1,0 +1,31 @@
+s19_app.__file__ = /tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
+== M01 apply ==
+file: s19_app/tui/a2l.py
+anchor: '        if not quoted and word in _TAG_KEYWORD_ARITY:'
+applied_count: 1 (expected 1 )
+sha256_before: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
+sha256_after:  81617ba298b482f4ebb728f068773ff611ae66537d0510f7020e67271179bae4
+== M01 test ==
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________________ test_r_a2l_read_27_keyword_ends_header ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-2/test_r_a2l_read_27_keyword_end0')
+
+    def test_r_a2l_read_27_keyword_ends_header(tmp_path: Path) -> None:
+        """R-A2L-READ.27/2..5: a keyword in header position ends the header."""
+        text = _body(meas("SX", " ECU_ADDRESS 0x10", hdr=" UWORD CM_ID 0 0 0 BIT_MASK 0x0FF0"))
+        t = _tag(_parse(tmp_path, text), "SX")
+>       assert t["datatype"] == "UWORD" and t["bit_org"] == "0x0FF0" and t["upper_limit"] is None
+E       AssertionError: assert ('UWORD' == 'UWORD'
+E         
+E           UWORD and None == '0x0FF0')
+
+tests/test_b103_a2l_reader.py:1009: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_27_keyword_ends_header
+1 failed in 0.63s
+== M01 pytest exit code: 1 ==
+== M01 restore ==
+restore_hash_ok: True
+sha256_restored: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131

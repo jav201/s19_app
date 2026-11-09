@@ -1,0 +1,45 @@
+s19_app.__file__ = /tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
+== M09 apply ==
+file: s19_app/tui/a2l.py
+anchor: '    if kind in _CURVE_MAP_FAMILY:\r\n        values = list(byte_sizes)\r\n        if span is not None:\r\n            values.append(span)'
+applied_count: 1 (expected 1 )
+sha256_before: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
+sha256_after:  9b419613e511d39cb304b48b44b39305e09556fb52c0427b42ade4ac1ccb35b5
+== M09 test ==
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______________ test_e5_p15_length_zero_inline_axis_refusal_final _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-18/test_e5_p15_length_zero_inline0')
+
+    def test_e5_p15_length_zero_inline_axis_refusal_final(tmp_path: Path) -> None:
+        """R-A2L-READ.61 (E3S-23): a MAP with ``LENGTH 0`` and an inline STD_AXIS keeps
+        ``length=None`` and the size-disagreement error; the inline span (13) is never
+        re-derived."""
+        text = (
+            "ASAP2_VERSION 1 71\n/project P\n"
+            '/begin MODULE M ""\n'
+            '/begin MOD_COMMON ""\nBYTE_ORDER MSB_FIRST\n/end MOD_COMMON\n'
+            '/begin COMPU_METHOD CM_ID "" IDENTICAL "%.0" ""\n/end COMPU_METHOD\n'
+            "/begin RECORD_LAYOUT RL_MAP\nNO_AXIS_PTS_X 1 UBYTE\nFNC_VALUES 2 UWORD ROW_DIR DIRECT\n/end RECORD_LAYOUT\n"
+            '/begin CHARACTERISTIC C ""\n'
+            " MAP 0x820000 RL_MAP 0 CM_ID 0 65535\n"
+            " LENGTH 0\n"
+            " /begin AXIS_DESCR\n"
+            " STD_AXIS NO_INPUT_QUANTITY CM_ID 6 0 255\n"
+            " /end AXIS_DESCR\n"
+            "/end CHARACTERISTIC\n"
+            "/end MODULE\n/end PROJECT\n"
+        )
+        data = _parse(tmp_path, text)
+>       assert _tag(data, "C", "CHARACTERISTIC")["length"] is None
+E       assert 13 is None
+
+tests/test_b103_a2l_reader_e5.py:421: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader_e5.py::test_e5_p15_length_zero_inline_axis_refusal_final
+1 failed in 0.60s
+== M09 pytest exit code: 1 ==
+== M09 restore ==
+restore_hash_ok: True
+sha256_restored: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131

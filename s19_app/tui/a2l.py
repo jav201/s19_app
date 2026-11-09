@@ -514,13 +514,13 @@ def _tag_keyword_lines(
             item_words = args[:_MATRIX_DIM_MAX + 1]
         elif len(args) < arity:
             _errors.append(f"Line {line}: {kw} has {len(args)} of its {arity} arguments")
-            item_words = list(args)
+            item_words = args
         elif surplus_count:
             total = len(args) + surplus_count
             _errors.append(f"Line {line}: {kw} has {total} of its {arity} arguments")
             item_words = args + [first_surplus if first_surplus is not None else ("", line)]
         else:
-            item_words = list(args)
+            item_words = args
         text = " ".join([kw] + [word for word, _line in item_words])
         items.append((text, line, item_words))
     return items
@@ -2053,14 +2053,10 @@ def _infer_length_characteristic(
     return el
 
 
-def _resolve_record_layout(layout_name: Optional[str], record_layouts_by_name: dict[str, dict]) -> Optional[dict]:
-    """Resolve record layout into decode metadata."""
-    if not layout_name:
-        return None
-    layout = record_layouts_by_name.get(layout_name)
-    if not layout:
-        return None
-    tokens = layout.get("tokens") or []
+@lru_cache(maxsize=256)
+def _record_layout_decode_metadata(
+    layout_name: str, tokens: tuple[str, ...], byte_order: Optional[str]
+) -> Optional[dict]:
     decode_token = None
     for token in tokens:
         if token in DATATYPE_SIZES:
@@ -2085,8 +2081,20 @@ def _resolve_record_layout(layout_name: Optional[str], record_layouts_by_name: d
         "decode_type": decode_token,
         "element_count": max(1, element_count),
         "byte_size": byte_size if byte_size > 0 else None,
-        "decode_endian": layout.get("byte_order"),
+        "decode_endian": byte_order,
     }
+
+
+def _resolve_record_layout(layout_name: Optional[str], record_layouts_by_name: dict[str, dict]) -> Optional[dict]:
+    """Resolve record layout into decode metadata."""
+    if not layout_name:
+        return None
+    layout = record_layouts_by_name.get(layout_name)
+    if not layout:
+        return None
+    return _record_layout_decode_metadata(
+        layout_name, tuple(layout.get("tokens") or []), layout.get("byte_order")
+    )
 
 
 def _inline_axis_counts(axis_meta: list[dict]) -> Optional[list[int]]:
@@ -3423,6 +3431,32 @@ def extract_a2l_tags(
     refused_length_ids: set[int] = set()
     standing_size_ids: set[int] = set()
     post_info: dict[int, tuple] = {}
+    tag_template = {
+        "address": None,
+        "length": None,
+        "source": "assigned",
+        "unit": None,
+        "lower_limit": None,
+        "upper_limit": None,
+        "bit_org": None,
+        "datatype": None,
+        "deposit": None,
+        "conversion": None,
+        "matrix_dim": None,
+        "symbol_link": None,
+        "display_identifier": None,
+        "link_map": None,
+        "memory_region": "unknown",
+        "endian": None,
+        "virtual": False,
+        "function_group": None,
+        "access": None,
+        "record_layout_name": None,
+        "compu_method_name": None,
+        "effective_byte_order": None,
+        "char_type": None,
+        "max_diff": None,
+    }
 
     def _module_byte_order_source(section: dict) -> tuple[Optional[str], Optional[str], Optional[int]]:
         for child in section.get("children") or []:
@@ -3471,36 +3505,11 @@ def extract_a2l_tags(
                 f"{len(header)} of its {header_m} header words"
             )
 
-        tag: dict = {
-            "section": section_name,
-            "name": name,
-            "description": long_id,
-            "address": None,
-            "length": None,
-            "source": "assigned",
-            "unit": None,
-            "lower_limit": None,
-            "upper_limit": None,
-            "bit_org": None,
-            "datatype": None,
-            "deposit": None,
-            "conversion": None,
-            "matrix_dim": None,
-            "symbol_link": None,
-            "display_identifier": None,
-            "link_map": None,
-            "memory_region": "unknown",
-            "endian": None,
-            "virtual": False,
-            "function_group": None,
-            "access": None,
-            "record_layout_name": None,
-            "compu_method_name": None,
-            "effective_byte_order": None,
-            "axis_meta": [],
-            "char_type": None,
-            "max_diff": None,
-        }
+        tag = tag_template.copy()
+        tag["section"] = section_name
+        tag["name"] = name
+        tag["description"] = long_id
+        tag["axis_meta"] = []
 
         header_meas: Optional[dict] = None
         header_char: Optional[dict] = None
@@ -3555,8 +3564,6 @@ def extract_a2l_tags(
             _apply_conversion_source(tag, tag.get("conversion"))
 
         keyword_lines = _tag_keyword_lines(itertools.chain(head[rest:], stream), errors=_errors)
-        keyword_texts = [text for text, _line, _args in keyword_lines]
-
         address_words: list[tuple[int, int]] = []
         address_invalid = False
         bit_mask_words: list[tuple[str, int]] = []
@@ -3730,7 +3737,7 @@ def extract_a2l_tags(
         elif address_words:
             tag["address"] = address_words[0][0]
 
-        lm = collect_link_maps(section)
+        lm = collect_link_maps(section) if section.get("children") else []
         if lm:
             tag["link_map"] = lm
 
@@ -3776,13 +3783,13 @@ def extract_a2l_tags(
                 if seen.isdisjoint(("DATA_SIZE", "LENGTH", "ARRAY_SIZE", "MATRIX_DIM")):
                     tag["length"] = DATATYPE_SIZES.get(tag.get("datatype"))
                 else:
-                    tag["length"] = _infer_length_measurement(keyword_texts, header_meas)
+                    tag["length"] = _infer_length_measurement([text for text, _line, _args in keyword_lines], header_meas)
             elif section_name == "CHARACTERISTIC" and kind in _CURVE_MAP_FAMILY:
                 if span is not None:
                     tag["length"] = span
                 elif has_standing_size:
                     tag["length"] = _infer_length_characteristic(
-                        keyword_texts, header_char, record_layouts_by_name, element_size
+                        [text for text, _line, _args in keyword_lines], header_char, record_layouts_by_name, element_size
                     )
                 else:
                     tag["length"] = None
@@ -3791,7 +3798,7 @@ def extract_a2l_tags(
                     tag["length"] = element_size
                 else:
                     tag["length"] = _infer_length_characteristic(
-                        keyword_texts, header_char, record_layouts_by_name, element_size
+                        [text for text, _line, _args in keyword_lines], header_char, record_layouts_by_name, element_size
                     )
             if tag["length"] is not None:
                 bounded = _bounded_length(tag["length"])

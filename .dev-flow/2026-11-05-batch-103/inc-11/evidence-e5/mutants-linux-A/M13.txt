@@ -1,0 +1,29 @@
+=== M13 (R-A2L-READ.55) ===
+anchor: '        if "\\x00" in body:'
+mutation: '        if False:'
+applied count: 1
+mutated hash: 1056bfa4656720290edb5596cb09f6b53881dd18d2f93d9b08a71017fc17f04f
+restored hash: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
+
+s19_app.__file__ = /tmp/b103-e5-11-mutA-laptop/tree/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________________ test_r_a2l_read_55_nul_after_address_refused _________________
+
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-13/test_r_a2l_read_55_nul_after_a0')
+
+    def test_r_a2l_read_55_nul_after_address_refused(tmp_path: Path) -> None:
+        """R-A2L-READ.55/3: a NUL after an address word refuses the file."""
+        text = _body(meas("X", " ECU_ADDRESS 0x1234\x00"))
+        data = _parse(tmp_path, text)
+>       assert data["errors"] == ["File is not UTF-8 text; save it as UTF-8 and load it again."]
+E       AssertionError: assert ['Line 22: un...not a number'] == ['File is not...ad it again.']
+E         
+E         At index 0 diff: 'Line 22: unexpected character U+0000' != 'File is not UTF-8 text; save it as UTF-8 and load it again.'
+E         Left contains one more item: 'Line 22: ECU_ADDRESS 0x1234� is not a number'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_reader.py:391: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_55_nul_after_address_refused
+1 failed in 0.83s

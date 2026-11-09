@@ -1,0 +1,28 @@
+=== M11 (R-A2L-READ.5) ===
+anchor: '    utf8_bom = head[:3] == b"\\xef\\xbb\\xbf"'
+mutation: '    utf8_bom = False'
+applied count: 1
+mutated hash: ab2fbabd05d32ca13013e678f6dda03d9958a0d6f995d716a9155d447853e36a
+restored hash: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
+
+s19_app.__file__ = /tmp/b103-e5-11-mutA-laptop/tree/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________________ test_r_a2l_read_5_bom_before_project_dropped _________________
+
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-11/test_r_a2l_read_5_bom_before_p0')
+
+    def test_r_a2l_read_5_bom_before_project_dropped(tmp_path: Path) -> None:
+        """R-A2L-READ.5/2: a BOM before /begin PROJECT is dropped (RP-A9)."""
+        text = _body(meas("X", " ECU_ADDRESS 0x1234")).split("\n", 1)[1]
+        data = _parse(tmp_path, "\ufeff" + text)
+>       assert data["errors"] == []
+E       AssertionError: assert ['Line 1: une...thout /begin'] == []
+E         
+E         Left contains 2 more items, first extra item: 'Line 1: unexpected character U+FEFF'
+E         Use -v to get more diff
+
+tests/test_b103_a2l_reader.py:352: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_5_bom_before_project_dropped
+1 failed in 0.84s

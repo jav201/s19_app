@@ -1,0 +1,32 @@
+=== M17 (R-A2L-READ.56) ===
+anchor: '        if len(self._texts) < self._cap:'
+mutation: '        if True:'
+applied count: 1
+mutated hash: 25762b57fb763eb28ec9ed59fafb6746b8851ce856e0ed5362e66972fd8a9496
+restored hash: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
+
+s19_app.__file__ = /tmp/b103-e5-11-mutA-laptop/tree/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________________________ test_r_a2l_read_56_cap_at_edge ________________________
+
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-17/test_r_a2l_read_56_cap_at_edge0')
+
+    def test_r_a2l_read_56_cap_at_edge(tmp_path: Path) -> None:
+        """R-A2L-READ.56/1: 100 errors and no marker; then 101."""
+        def body(n: int) -> str:
+            return _body("") + ("/end X\n" * n)
+        data = _parse(tmp_path, body(100))
+        assert len(data["errors"]) == 100
+        data = _parse(tmp_path, body(101))
+        assert len(data["errors"]) == 101
+>       assert data["errors"][-1] == "\u2026 1 more parse errors"
+E       AssertionError: assert 'Line 123: /e...ithout /begin' == '… 1 more parse errors'
+E         
+E         - … 1 more parse errors
+E         + Line 123: /end without /begin
+
+tests/test_b103_a2l_reader.py:422: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_56_cap_at_edge - Assert...
+1 failed in 0.84s

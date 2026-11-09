@@ -1,0 +1,9 @@
+/tmp/b103-e5-11-trace-99bdbbe8/s19_app/__init__.py
+US     US-103-02 is named by no active requirement
+US     US-103-05 is named by no active requirement
+US     US-103-07 is named by no active requirement
+TEST   R-TUI-042a.2 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-TUI-042a.3 is named by no file under tests, and neither is a TC/AT id it lists
+SLICE  s19_app/tui/services/label_match.py changed since e07fb00 and no requirement file names it
+EVID   no 04-validation.md beside .dev-flow/2026-11-05-batch-103/inc-11/01-requirements.md
+trace_check: 3 US, 83 active requirements (0 withdrawn), 7 gap(s)

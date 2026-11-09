@@ -1,0 +1,28 @@
+s19_app.__file__ = /tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
+== M05 apply ==
+file: s19_app/tui/a2l.py
+anchor: '_NUMBER_WORD_RE = re.compile(r"0[xX][0-9A-Fa-f]{1,16}|[0-9]{1,20}")'
+applied_count: 1 (expected 1 )
+sha256_before: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
+sha256_after:  bbeb757b8495a74c8a311894226caaab02bf649c45d5d88baca6536a30255c04
+== M05 test ==
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________________________ test_r_a2l_read_34_hex_words _________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-6/test_r_a2l_read_34_hex_words0')
+
+    def test_r_a2l_read_34_hex_words(tmp_path: Path) -> None:
+        """R-A2L-READ.34/1: 0x, 0X and 16-digit hex."""
+        for w in ("0x1234", "0X1234", "0x0000000000001234"):
+>           assert _tag(_parse(tmp_path, _body(meas("X", f" ECU_ADDRESS {w}"))), "X")["address"] == 0x1234
+E           assert None == 4660
+
+tests/test_b103_a2l_reader.py:1295: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_34_hex_words - assert N...
+1 failed in 0.63s
+== M05 pytest exit code: 1 ==
+== M05 restore ==
+restore_hash_ok: True
+sha256_restored: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131

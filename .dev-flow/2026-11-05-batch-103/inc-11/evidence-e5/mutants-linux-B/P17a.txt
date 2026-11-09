@@ -1,0 +1,31 @@
+s19_app.__file__ = /tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
+== P17a apply ==
+file: s19_app/tui/a2l_definition.py
+anchor: '        if char_type == "VALUE":\r\n            kind = "enum" if conversion_type == "TAB_VERB" else "number"'
+applied_count: 1 (expected 1 )
+sha256_before: c14ddc31f1183790c9c848c36a82aadcb59fcaecb918df0b1b60cc04ff600a69
+sha256_after:  9b934779d8107cd8708e164c9660daf4b6d39d52c934930e7e69bb6ce0c71d92
+== P17a test ==
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_r_a2l_def_2_1_tab_verb_with_long_identifier_on_its_own_line_is_an_enum __
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_2_1_tab_verb_with_long_identifier_on_its_own_line_is_an_enum(v171):
+        """R-A2L-DEF.2/1 - the method's long identifier on its own line (base: type None)."""
+        d = describe_definition(V171_ENUM, v171)
+>       assert d.kind == "enum" and d.conversion_type == "TAB_VERB"
+E       AssertionError: assert ('number' == 'enum'
+E         
+E         - enum
+E         + number)
+
+tests/test_b103_a2l_definition.py:284: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_2_1_tab_verb_with_long_identifier_on_its_own_line_is_an_enum
+1 failed in 0.75s
+== P17a pytest exit code: 1 ==
+== P17a restore ==
+restore_hash_ok: True
+sha256_restored: c14ddc31f1183790c9c848c36a82aadcb59fcaecb918df0b1b60cc04ff600a69

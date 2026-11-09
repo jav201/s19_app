@@ -1,0 +1,41 @@
+s19_app.__file__ = /tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
+== P17b apply ==
+file: s19_app/tui/a2l_definition.py
+anchor: '    if refusal is None and kind == "enum":'
+applied_count: 1 (expected 1 )
+sha256_before: c14ddc31f1183790c9c848c36a82aadcb59fcaecb918df0b1b60cc04ff600a69
+sha256_after:  076017410224408214087bc46ea2f5c3d93a9af3f111eb9ea4d5581062a62284
+== P17b test ==
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______________ test_r_a2l_def_13_1_enum_with_no_table_is_refused _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-13/test_r_a2l_def_13_1_enum_with_0')
+
+    def test_r_a2l_def_13_1_enum_with_no_table_is_refused(tmp_path):
+        """R-A2L-DEF.13/1 - TAB_VERB with no COMPU_TAB_REF."""
+        a2l = _inline(tmp_path, _cm("CM_V", "TAB_VERB", fmt='"%.0"'), _val("EN", "0x10", "RL_U8", "CM_V"))
+>       _is_refused(describe_definition("EN", a2l), "A2L-DEF-TABLE", "EN: the table (none) of CM_V is not declared in the A2L")
+
+tests/test_b103_a2l_definition.py:588: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='EN', section='CHARACTERISTIC', char_type='VALUE', kind='enum', address=16, byte_length=1, datatype='U...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None)
+code = 'A2L-DEF-TABLE'
+message = 'EN: the table (none) of CM_V is not declared in the A2L'
+
+    def _is_refused(d: Definition, code: str, message: str) -> None:
+>       assert d.refusal == Refusal(code, message), d.refusal
+E       AssertionError: None
+E       assert None == Refusal(code='A2L-DEF-TABLE', message='EN: the table (none) of CM_V is not declared in the A2L')
+E        +  where None = Definition(name='EN', section='CHARACTERISTIC', char_type='VALUE', kind='enum', address=16, byte_length=1, datatype='U...enum_table=None, enum_entries=(), default_text=None, coeffs_linear=None, coeffs=None, compu_tab_ref=None, refusal=None).refusal
+E        +  and   Refusal(code='A2L-DEF-TABLE', message='EN: the table (none) of CM_V is not declared in the A2L') = Refusal('A2L-DEF-TABLE', 'EN: the table (none) of CM_V is not declared in the A2L')
+
+tests/test_b103_a2l_definition.py:165: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_13_1_enum_with_no_table_is_refused
+1 failed in 0.73s
+== P17b pytest exit code: 1 ==
+== P17b restore ==
+restore_hash_ok: True
+sha256_restored: c14ddc31f1183790c9c848c36a82aadcb59fcaecb918df0b1b60cc04ff600a69

@@ -142,3 +142,16 @@ The next session continues the corrective E5 of Inc 11. Reply to the operator in
 - `cachyos-rtx` is online again. Mutant **A runs on the laptop**, resumed from its complete green baseline (**331 passed**), and mutant **B runs on RTX** in a fresh current-tree scratch.
 - During the split the orchestrator initially stopped A by a PID-mapping error. No mutant arms had run and no product/test file was damaged. The baseline was recovered and the actual B process was identified by cwd and stopped before relaunch. The incident and recovery are logged in `steps.log`.
 - Current driver outputs are `deepseek-mutants-A-driver-2.txt` and `deepseek-mutants-B-driver-rtx.txt`. Wait for process completion before recovering remote `out/` tables.
+
+## Recovery checkpoint — 2026-11-09 08:47 (Kimi)
+
+- Checkpoint commit **`99bdbbe8`** contains product, tests, records, reviews and canonical evidence through P19. Mutant outputs and `04-validation.md` are not in it yet.
+- Mutant A: **19 KILLED + M10 NOT_REALISABLE**, final baseline 331 passed. Mutant B: **23 KILLED, 0 survivors**, final baseline 522 passed. P17e closes the near-name exactness gap with a mutation/restoration transcript.
+- Final group A on RTX: **332 passed** (`int-green12-a.txt`). READ.52 is now running on the original RTX reference host. The laptop run was already green with a narrow 0.2 % case_06 margin.
+- `trace_check` precheck on a committed Linux clone is down to only the missing `04-validation.md`; US/CASE/TEST/SLICE are clean. Final validation and trace are next after perf.
+
+## Recovery checkpoint — 2026-11-09 09:12 (Kimi)
+
+- READ.52 is finally GREEN on the original RTX host: **7 passed, 1 deselected**, case_06 **8.411 / 8.843 s (4.9 % margin)**, software_a 11.6 %, all memory arms green (`coverage-perf-rtx-final.txt`). The earlier 0.2 % laptop margin is historical, not the final reference-host result.
+- The last optimization avoids no-op copies and caches immutable layout metadata; each tag copies a default-field template and receives a fresh `axis_meta`. The graph is now **39/40 nodes** with `_record_layout_decode_metadata`.
+- Integration run 13 and bounded final code/security reviews are running. Final mutants must rerun on this exact tree; earlier mutant results are rehearsals, not the final verdict.

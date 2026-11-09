@@ -1,0 +1,38 @@
+s19_app.__file__ = /tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
+== M07 apply ==
+file: s19_app/tui/a2l.py
+anchor: '    return smallest == largest, smallest, largest, no_number'
+applied_count: 1 (expected 1 )
+sha256_before: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
+sha256_after:  104c09c795552bcd9483512b712b34c939059c24f921de4231469161775a85ba
+== M07 test ==
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________________ test_r_a2l_read_61_no_length_when_disagree __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-8/test_r_a2l_read_61_no_length_w0')
+
+    def test_r_a2l_read_61_no_length_when_disagree(tmp_path: Path) -> None:
+        """R-A2L-READ.61/1..7: no length when sizes disagree."""
+        cases = [
+            meas("X", " ECU_ADDRESS 0x10", " LENGTH 4", " LENGTH 8"),
+            meas("X", " ECU_ADDRESS 0x10", " DATA_SIZE 2", " LENGTH 8"),
+            '/begin CHARACTERISTIC X ""\n VALUE 0x10 RL_U16 0 CM_ID 0 65535\n LENGTH 4\n/end CHARACTERISTIC',
+            '/begin CHARACTERISTIC X ""\n VAL_BLK 0x10 RL_U16 0 CM_ID 0 65535\n MATRIX_DIM 4\n NUMBER 5\n/end CHARACTERISTIC',
+            meas("X", " ECU_ADDRESS 0x10", " ARRAY_SIZE 4", " MATRIX_DIM 3"),
+            '/begin CHARACTERISTIC X ""\n ASCII 0x10 RL_U8 0 CM_ID 0 65535\n NUMBER 8\n MATRIX_DIM 4\n/end CHARACTERISTIC',
+            meas("X", " ECU_ADDRESS 0x10", " LENGTH 2 4"),
+        ]
+        for body in cases:
+            data = _parse(tmp_path, _body(body))
+>           assert _tag(data, "X", _section_of(data, "X"))["length"] is None
+E           assert 8 is None
+
+tests/test_b103_a2l_reader.py:1431: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_61_no_length_when_disagree
+1 failed in 0.62s
+== M07 pytest exit code: 1 ==
+== M07 restore ==
+restore_hash_ok: True
+sha256_restored: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131

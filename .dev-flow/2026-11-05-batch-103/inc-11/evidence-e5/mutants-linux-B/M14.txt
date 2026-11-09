@@ -1,0 +1,26 @@
+s19_app.__file__ = /tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
+== M14 apply ==
+file: s19_app/tui/a2l_extract.py
+anchor: 'from .a2l import enrich_a2l_tags_with_values, extract_a2l_tags, extract_declared_spans'
+applied_count: 1 (expected 1 )
+sha256_before: 02fd0ba3e4c7a584a973207b2300c1e4401788fc043a1ae8866e7276e0c5c8b7
+sha256_after:  af08ac7485c3306508abc895ef3498bcc556d7d30d40c139f72549478a1eef7f
+== M14 test ==
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________________ test_extract_declared_spans_is_public _____________________
+
+    def test_extract_declared_spans_is_public() -> None:
+        """The public name ``extract_declared_spans`` exists on s19_app.tui.a2l_extract."""
+>       assert _extract_declared_spans is not None, "extract_declared_spans missing (base)"
+E       AssertionError: extract_declared_spans missing (base)
+E       assert None is not None
+
+tests/test_b103_a2l_reader.py:1603: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader.py::test_extract_declared_spans_is_public
+1 failed in 0.62s
+== M14 pytest exit code: 1 ==
+== M14 restore ==
+restore_hash_ok: True
+sha256_restored: 02fd0ba3e4c7a584a973207b2300c1e4401788fc043a1ae8866e7276e0c5c8b7

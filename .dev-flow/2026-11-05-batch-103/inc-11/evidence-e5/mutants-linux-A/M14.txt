@@ -1,0 +1,30 @@
+=== M14 (R-A2L-001.1) ===
+anchor: '            or "/" in text'
+mutation: '            or text.startswith("/")'
+applied count: 1
+mutated hash: a354589901ab52b4c38bbc5d19913efb22988e9c5692ec8671c3024a01d45b55
+restored hash: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
+
+s19_app.__file__ = /tmp/b103-e5-11-mutA-laptop/tree/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______________________ test_r_a2l_001_1_begin_end_words _______________________
+
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-14/test_r_a2l_001_1_begin_end_wor0')
+
+    def test_r_a2l_001_1_begin_end_words(tmp_path: Path) -> None:
+        """R-A2L-001.1/1..3: /begin and /end are words wherever they stand."""
+        data = _parse(
+            tmp_path,
+            _body(
+                meas("SX", " ECU_ADDRESS 0x10 /begin IF_DATA XCP", "  KP_BLOB 0x10", " /end IF_DATA", " BIT_MASK 0x0FF0")
+            ),
+        )
+        sx = _tag(data, "SX")
+>       assert sx["bit_org"] == "0x0FF0"
+E       AssertionError: assert None == '0x0FF0'
+
+tests/test_b103_a2l_reader.py:711: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_001_1_begin_end_words - Asse...
+1 failed in 0.84s

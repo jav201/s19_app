@@ -1,0 +1,29 @@
+=== M1 (R-A2L-READ.7) ===
+anchor: '_SLOW_WORD_RE = re.compile(r\'(?:[^ \\t\\x0b\\x0c"/\\r\\n]|/(?![/*]))+\')'
+mutation: '_SLOW_WORD_RE = re.compile(r\'(?:[^ \\t\\x0b\\x0c"/\\r\\n]|/)+\')'
+applied count: 1
+mutated hash: f0b9e4fbf7540e6bced63be68e9e305f2d7b689bba5cf0ace43831d0a63d1fc5
+restored hash: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
+
+s19_app.__file__ = /tmp/b103-e5-11-mutA-laptop/tree/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______________ test_r_a2l_read_7_comment_between_digits_splits ________________
+
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-1/test_r_a2l_read_7_comment_betw0')
+
+    def test_r_a2l_read_7_comment_between_digits_splits(tmp_path: Path) -> None:
+        """R-A2L-READ.7/1 (name = first word, R-A2L-READ.23): MAP 0x1C2D3E00/*c*/4026 -> address 0x1C2D3E00."""
+        text = _body(
+            '/begin CHARACTERISTIC Synthetic ""\n MAP 0x1C2D3E00/*c*/4026 RL_SYN_U16 0 CM_ID 0 65535\n/end CHARACTERISTIC\n'
+            "/begin RECORD_LAYOUT RL_SYN_U16\nFNC_VALUES 1 UWORD ROW_DIR DIRECT\n/end RECORD_LAYOUT\n"
+        )
+        data = _parse(tmp_path, text)
+        tag = _tag(data, "Synthetic", "CHARACTERISTIC")
+>       assert tag["address"] == 0x1C2D3E00
+E       assert None == 472727040
+
+tests/test_b103_a2l_reader.py:525: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_7_comment_between_digits_splits
+1 failed in 0.84s

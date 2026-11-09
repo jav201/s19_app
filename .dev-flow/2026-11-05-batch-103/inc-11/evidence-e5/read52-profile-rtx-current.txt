@@ -1,0 +1,49 @@
+/tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
+         57300684 function calls (54868650 primitive calls) in 24.519 seconds
+
+   Ordered by: cumulative time
+   List reduced from 126 to 40 due to restriction <40>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.006    0.006   24.519   24.519 /tmp/b103-e5-11-mutB-rtx/tree/s19_app/tui/a2l.py:4005(parse_a2l_file)
+        1    0.158    0.158   12.388   12.388 /tmp/b103-e5-11-mutB-rtx/tree/s19_app/tui/a2l.py:3403(extract_a2l_tags)
+  11005/1    0.364    0.000   11.749   11.749 /tmp/b103-e5-11-mutB-rtx/tree/s19_app/tui/a2l.py:3825(walk)
+   220040    4.598    0.000   11.343    0.000 /tmp/b103-e5-11-mutB-rtx/tree/s19_app/tui/a2l.py:3445(_process_tag)
+        1    0.513    0.513   10.697   10.697 /tmp/b103-e5-11-mutB-rtx/tree/s19_app/tui/a2l.py:899(_build_section_tree_into)
+  1034369    4.030    0.000    6.625    0.000 /tmp/b103-e5-11-mutB-rtx/tree/s19_app/tui/a2l.py:700(_lex_a2l_lines)
+  1034368    2.356    0.000    3.340    0.000 /tmp/b103-e5-11-mutB-rtx/tree/s19_app/tui/a2l.py:945(_process_text)
+   220040    1.537    0.000    2.056    0.000 /tmp/b103-e5-11-mutB-rtx/tree/s19_app/tui/a2l.py:423(_tag_header)
+  2310445    0.744    0.000    1.394    0.000 /tmp/b103-e5-11-mutB-rtx/tree/s19_app/tui/a2l.py:403(_section_words)
+  1034314    0.368    0.000    1.065    0.000 /tmp/b103-e5-11-mutB-rtx/tree/s19_app/tui/a2l.py:387(_line_words)
+ 12708799    0.999    0.000    0.999    0.000 {method 'get' of 'dict' objects}
+   220040    0.661    0.000    0.957    0.000 /tmp/b103-e5-11-mutB-rtx/tree/s19_app/tui/a2l.py:466(_tag_keyword_lines)
+        4    0.000    0.000    0.668    0.167 /tmp/b103-e5-11-mutB-rtx/tree/s19_app/tui/a2l.py:1554(_collect_sections_by_name)
+ 968416/4    0.533    0.000    0.667    0.167 /tmp/b103-e5-11-mutB-rtx/tree/s19_app/tui/a2l.py:1557(walk)
+   451138    0.571    0.000    0.571    0.000 {method 'findall' of 're.Pattern' objects}
+   693342    0.496    0.000    0.496    0.000 {method 'match' of 're.Pattern' objects}
+   693342    0.330    0.000    0.451    0.000 /tmp/b103-e5-11-mutB-rtx/tree/s19_app/tui/a2l.py:689(_lex_word_diagnostics)
+        1    0.000    0.000    0.444    0.444 /tmp/b103-e5-11-mutB-rtx/tree/s19_app/tui/a2l.py:3887(extract_declared_spans)
+  6354538    0.435    0.000    0.435    0.000 {built-in method builtins.len}
+   220040    0.206    0.000    0.419    0.000 {built-in method builtins.any}
+   110020    0.105    0.000    0.416    0.000 /tmp/b103-e5-11-mutB-rtx/tree/s19_app/tui/a2l.py:597(_characteristic_element_size)
+  5546376    0.403    0.000    0.403    0.000 {method 'append' of 'list' objects}
+   220040    0.297    0.000    0.344    0.000 /tmp/b103-e5-11-mutB-rtx/tree/s19_app/tui/a2l.py:529(_tag_sizes)
+        2    0.000    0.000    0.343    0.171 /tmp/b103-e5-11-mutB-rtx/tree/s19_app/tui/a2l.py:1855(extract_memory_segments)
+ 484208/2    0.271    0.000    0.343    0.171 /tmp/b103-e5-11-mutB-rtx/tree/s19_app/tui/a2l.py:1870(walk)
+        1    0.000    0.000    0.336    0.336 /tmp/b103-e5-11-mutB-rtx/tree/s19_app/tui/a2l.py:1754(extract_compu_tables)
+  2552523    0.308    0.000    0.308    0.000 {method 'startswith' of 'str' objects}
+  2299892    0.306    0.000    0.306    0.000 {method 'endswith' of 'str' objects}
+   110020    0.219    0.000    0.296    0.000 /tmp/b103-e5-11-mutB-rtx/tree/s19_app/tui/a2l.py:2056(_resolve_record_layout)
+  1392004    0.273    0.000    0.273    0.000 {method 'split' of 'str' objects}
+  1039927    0.262    0.000    0.271    0.000 /tmp/b103-e5-11-mutB-rtx/tree/s19_app/tui/a2l.py:1024(_elements)
+   231405    0.190    0.000    0.248    0.000 /tmp/b103-e5-11-mutB-rtx/tree/s19_app/tui/a2l.py:669(_find_string_end)
+ 242104/1    0.183    0.000    0.247    0.247 /tmp/b103-e5-11-mutB-rtx/tree/s19_app/tui/a2l.py:3895(_collect_typedefs)
+   220040    0.124    0.000    0.226    0.000 /tmp/b103-e5-11-mutB-rtx/tree/s19_app/tui/a2l.py:1536(collect_link_maps)
+   462348    0.221    0.000    0.221    0.000 /tmp/b103-e5-11-mutB-rtx/tree/s19_app/tui/a2l.py:929(_add_own_word)
+ 242104/1    0.174    0.000    0.219    0.219 /tmp/b103-e5-11-mutB-rtx/tree/s19_app/tui/a2l.py:1075(_apply_named_kind_meta)
+ 242104/1    0.158    0.000    0.196    0.196 /tmp/b103-e5-11-mutB-rtx/tree/s19_app/tui/a2l.py:3960(walk)
+  1381148    0.192    0.000    0.192    0.000 {method 'join' of 'str' objects}
+ 242104/1    0.134    0.000    0.169    0.169 /tmp/b103-e5-11-mutB-rtx/tree/s19_app/tui/a2l.py:3436(_collect_layout_sources)
+        1    0.000    0.000    0.167    0.167 /tmp/b103-e5-11-mutB-rtx/tree/s19_app/tui/a2l.py:1567(extract_record_layouts)
+
+

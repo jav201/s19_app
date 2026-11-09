@@ -1,0 +1,27 @@
+=== M20 (R-A2L-001.4) ===
+anchor: '                    errors.append(f"Line {pending_end_line}: /end without /begin")'
+mutation: '                    pass'
+applied count: 1
+mutated hash: f38bd2b434118b39f224e264590d041589e90a1f98711a7048019324cd4e4143
+restored hash: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
+
+s19_app.__file__ = /tmp/b103-e5-11-mutA-laptop/tree/s19_app/__init__.py
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________________________ test_r_a2l_001_4_stray_end __________________________
+
+tmp_path = PosixPath('/tmp/b103-e5-11-mutA-laptop/zq_iso_user/tmp/pytest-of-javierg/pytest-20/test_r_a2l_001_4_stray_end0')
+
+    def test_r_a2l_001_4_stray_end(tmp_path: Path) -> None:
+        """R-A2L-001.4/1, /2: a stray /end at or after other words."""
+        for line in ("/end X", "junk /end X"):
+            text = _body("") + line + "\n"
+            data = _parse(tmp_path, text)
+>           assert any("/end without /begin" in e for e in data["errors"])
+E           assert False
+E            +  where False = any(<generator object test_r_a2l_001_4_stray_end.<locals>.<genexpr> at 0x7f2ccb198520>)
+
+tests/test_b103_a2l_reader.py:825: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_001_4_stray_end - assert False
+1 failed in 0.84s

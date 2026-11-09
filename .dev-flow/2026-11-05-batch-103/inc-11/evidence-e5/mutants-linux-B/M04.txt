@@ -1,0 +1,61 @@
+s19_app.__file__ = /tmp/b103-e5-11-mutB-rtx/tree/s19_app/__init__.py
+== M04 apply ==
+file: s19_app/tui/a2l.py
+anchor: '    return int(word, 10)'
+applied_count: 1 (expected 1 )
+sha256_before: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131
+sha256_after:  a36a2b3943d9bd56c5d64528fb6e4bff632370e7cdc96de16a6112927645006e
+== M04 test ==
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______________________ test_r_a2l_read_35_decimal_words _______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-javiergr/pytest-5/test_r_a2l_read_35_decimal_wor0')
+
+    def test_r_a2l_read_35_decimal_words(tmp_path: Path) -> None:
+        """R-A2L-READ.35/1, /2: decimal words with leading zero / plain."""
+>       assert _tag(_parse(tmp_path, _body(meas("X", " ECU_ADDRESS 010"))), "X")["address"] == 10
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_reader.py:1300: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_b103_a2l_reader.py:107: in _parse
+    return parse_a2l_file(_file(text, tmp_path, name=name, raw=raw))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+s19_app/tui/a2l.py:4043: in parse_a2l_file
+    tags = extract_a2l_tags(
+s19_app/tui/a2l.py:3847: in extract_a2l_tags
+    walk(sections, None, (None, None, None))
+s19_app/tui/a2l.py:3845: in walk
+    walk(section["children"], current_module_byte_order, current_module_source)
+s19_app/tui/a2l.py:3845: in walk
+    walk(section["children"], current_module_byte_order, current_module_source)
+s19_app/tui/a2l.py:3843: in walk
+    _process_tag(section, current_module_byte_order, current_module_source)
+s19_app/tui/a2l.py:3594: in _process_tag
+    value = _number_word(args[0])
+            ^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+word = '010'
+
+    @lru_cache(maxsize=4096)
+    def _number_word(word: str) -> Optional[int]:
+        """Parse a number word (``0x``/``0X`` + 1..16 hex digits, or 1..20 decimal
+        digits), else ``None`` (R-A2L-READ.34 … .36)."""
+        if not _NUMBER_WORD_RE.fullmatch(word):
+            return None
+        if word[:2] in ("0x", "0X"):
+            return int(word[2:], 16)
+>       return int(word, 0)
+               ^^^^^^^^^^^^
+E       ValueError: invalid literal for int() with base 0: '010'
+
+s19_app/tui/a2l.py:351: ValueError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_reader.py::test_r_a2l_read_35_decimal_words - Valu...
+1 failed in 0.83s
+== M04 pytest exit code: 1 ==
+== M04 restore ==
+restore_hash_ok: True
+sha256_restored: 9aaf7037cf96a343300b00c5dadceab24f4fa93bcd9c6ed6dc40c3f5f96ad131

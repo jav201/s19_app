@@ -1996,6 +1996,31 @@ def test_cov_read_54_compu_vtab_named_later(tmp_path: Path) -> None:
     assert missing["conversion_status"] == "error"
 
 
+def test_cov_read_54_tab_verb_near_keyword_is_not_enum(tmp_path: Path) -> None:
+    """R-A2L-READ.54/4 negative exactness: a near TAB_VERB name is not an enum."""
+    hdr = (
+        "ASAP2_VERSION 1 71\n/project P\n/begin MODULE M \"\"\n/begin MOD_COMMON \"\"\nBYTE_ORDER MSB_FIRST\n/end MOD_COMMON\n"
+        "/begin COMPU_VTAB\nVT_K1 \"\"\nTAB_VERB 2\n0 \"off\"\n1 \"on\"\n/end COMPU_VTAB\n"
+        "/begin COMPU_METHOD CM_VT \"\" TAB_VERB_RANGE \"%.0\" \"\"\nCOMPU_TAB_REF VT_K1\n/end COMPU_METHOD\n"
+        "/begin RECORD_LAYOUT RL_U16\nFNC_VALUES 1 UWORD ROW_DIR DIRECT\n/end RECORD_LAYOUT\n"
+        "/begin TYPEDEF_MEASUREMENT T_U16 \"\" UWORD CM_ID 0 0 0 65535\n/end TYPEDEF_MEASUREMENT\n"
+        '/begin MEASUREMENT XVT ""\nUWORD\nCM_VT\n0\n0\n0\n65535\nECU_ADDRESS\n0x1238\n/end MEASUREMENT\n'
+        "/end MODULE\n/end PROJECT\n"
+    )
+    data = _parse(tmp_path, hdr)
+    method = data["compu_methods_by_name"]["CM_VT"]
+    assert method["conversion_type"] is None
+    row = enrich_a2l_tags_with_values(data, {0x1238: 0x00, 0x1239: 0x01})[0]
+    assert row["raw_value"] == 1 and row["physical_value"] == 1
+    assert row["conversion_status"] == "unknown_method"
+
+    method["conversion_type"] = "TAB_VERB_RANGE"
+    assert describe_definition("XVT", data).kind == "number"
+    row = enrich_a2l_tags_with_values(data, {0x1238: 0x00, 0x1239: 0x01})[0]
+    assert row["raw_value"] == 1 and row["physical_value"] == 1
+    assert row["conversion_status"] == "unknown_method"
+
+
 def test_cov_read_54_compu_method_long_id(tmp_path: Path) -> None:
     """R-A2L-READ.24/3: a later-named COMPU_METHOD keeps its long identifier and
     conversion type."""
