@@ -952,8 +952,8 @@ def derive_v2(regions: dict[str, tuple[int, bytearray]], rng: random.Random) -> 
 
 
 # ---------------------------------------------------------------------------
-# Definitions case (D6): a small calibration region whose four objects
-# exercise the enum, bit-mask and display-format model behaviour.
+# Definitions case (D6): a small calibration region whose nine objects
+# exercise scalar, array, curve, map and axis model behaviour.
 # ---------------------------------------------------------------------------
 
 #: Long identifier per definitions-case CHARACTERISTIC (the /begin line's text).
@@ -962,7 +962,15 @@ DEFINITIONS_LONG_IDS = {
     "MASK_BIT_0001": "synthetic one-bit field",
     "MASK_FIELD_0001": "synthetic multi-bit field",
     "DISPLAY_0001": "synthetic display object",
+    "CURVE_DEF_0001": "synthetic curve on the common axis",
+    "CURVE_DEF_0002": "synthetic second curve on the common axis",
+    "MAP_DEF_0001": "synthetic map",
+    "VAL_BLK_DEF_0001": "synthetic 2-D value block",
 }
+
+#: Common-axis record address. The five Inc 3 records occupy 0x800040 …
+#: 0x80009B inside the 256-byte ``cal`` region at CAL_BASE.
+DEFC_AXIS_ADDR = CAL_BASE + 0x40
 
 #: Display text per COMPU_VTAB raw value (also the enum's planned text).
 DEFINITIONS_ENUM_TEXTS = ("OFF", "IDLE", "RUN", "FAULT")
@@ -980,8 +988,9 @@ DEFINITIONS_EXTRA_LINES = {
 def build_definition_objects(rng: random.Random) -> tuple[dict[str, tuple[int, bytearray]], list[dict]]:
     """
     Summary:
-        Build the definitions case's one calibration region and its four-object
-        inventory (an enum, two masked fields of one word, and a display object).
+        Build the definitions case's one calibration region and its nine-object
+        inventory (four scalars, one AXIS_PTS record, two curves, one map and
+        one VAL_BLK).
 
     Args:
         rng (random.Random): Seeded generator; draws the fill bytes and the
@@ -992,23 +1001,20 @@ def build_definition_objects(rng: random.Random) -> tuple[dict[str, tuple[int, b
             ``(regions, objects)``. ``regions`` maps ``boot`` / ``app`` /
             ``cal`` / ``config`` to ``(base, bytearray)`` — ``cal`` is the
             256-byte region at ``CAL_BASE``, the other three are empty so
-            :func:`emit_s19` writes the case unchanged. ``objects`` is the
-            four-object list carrying the I-D keys (``name``, ``section``,
-            ``kind``, ``datatype``, ``conversion``, ``address``, ``length``,
-            ``big_endian``, ``raw_bytes``, ``physical``, ``low``, ``high``,
-            ``bit_mask``, ``planned_stored``, ``planned_text``).
+            :func:`emit_s19` writes the case unchanged. ``objects`` carries the
+            scalar I-D keys plus each array's ``shape`` and ``axes``.
 
     Data Flow:
         - Fill the 256-byte calibration region with seeded random bytes.
-        - Draw the four planned values (enum raw, one-bit field, multi-bit
-          field, display raw) in the pinned order.
-        - Overlay the enum byte, the two masked fields of the word at +0x10,
-          and the display SWORD at +0x20 into the region.
-        - Emit the four object dicts with the I-D keys and the planned texts.
+        - Draw the four scalar values, then the axis, curve, map and VAL_BLK
+          values, in the pinned order.
+        - Overlay the scalar and array records into the region.
+        - Emit the nine object dicts with the I-D keys and planned texts.
 
     Dependencies:
         Uses:
             - _pack_scalar
+            - _definition_array_objects
         Used by:
             - generate_definitions_case
 
@@ -1042,6 +1048,10 @@ def build_definition_objects(rng: random.Random) -> tuple[dict[str, tuple[int, b
         "config": (CONFIG_BASE, bytearray()),
     }
     word_bytes = bytes((cal[0x10], cal[0x11]))
+    inc3_objects = _definition_array_objects(rng, DEFC_AXIS_ADDR)
+    for obj in inc3_objects:
+        offset = obj["address"] - CAL_BASE
+        cal[offset:offset + obj["length"]] = obj["raw_bytes"]
     objects = [
         {
             "name": "ENUM_0001",
@@ -1112,19 +1122,287 @@ def build_definition_objects(rng: random.Random) -> tuple[dict[str, tuple[int, b
             "planned_text": f"{display_raw * 0.5:.1f}",
         },
     ]
+    objects.extend(inc3_objects)
     return regions, objects
+
+
+def _definition_array_objects(rng: random.Random, cursor: int) -> list[dict]:
+    """
+    Summary:
+        Plan the five Inc 3 definitions-case objects (R-A2L-DEF.133 … .135),
+        drawing the pinned random values in order (draws 6 … 11) and packing
+        the records big-endian into their fixed addresses from ``cursor``.
+
+    Args:
+        rng (random.Random): Seeded generator, already past Inc 2's draws.
+        cursor (int): The AXIS_PTS object's address (0x800040); the other four
+            objects follow at +0x10, +0x20, +0x30 and +0x50.
+
+    Returns:
+        list[dict]: The five object dicts with the I-D keys (``name``,
+            ``section``, ``kind``, ``datatype``, ``conversion``, ``address``,
+            ``length``, ``big_endian``, ``raw_bytes``, ``physical``, ``low``,
+            ``high``, ``bit_mask``, ``shape``, ``planned_stored``,
+            ``planned_text``, ``axes``).
+
+    Data Flow:
+        - Draw 6: the axis object's strictly increasing points
+          (``sorted(rng.sample(range(1, 2000), 5))``).
+        - Draw 7 / 8: the two curves' five UWORD values each
+          (``rng.randrange(65536)``).
+        - Draw 9: the MAP's four STD_AXIS points
+          (``sorted(rng.sample(range(0, 1000), 4))``).
+        - Draw 10: the MAP's twelve SWORD values in element order
+          (``rng.randint(-1000, 1000)``).
+        - Draw 11: the VAL_BLK's six SWORD values in element order
+          (``rng.randint(-800, 800)``).
+        - Pack each record big-endian: the axis object's UWORD count and
+          points; the curves' UWORDs; the MAP's UWORD X points at offset 0 and
+          its COLUMN_DIR SWORD values at 8 + 2·(y + 3·x); the VAL_BLK's ROW_DIR
+          SWORDs.
+
+    Dependencies:
+        Uses:
+            - struct
+        Used by:
+            - build_definition_objects
+    """
+    axis_points = sorted(rng.sample(range(1, 2000), 5))
+    curve1_values = [rng.randrange(65536) for _ in range(5)]
+    curve2_values = [rng.randrange(65536) for _ in range(5)]
+    map_x = sorted(rng.sample(range(0, 1000), 4))
+    map_values = [rng.randint(-1000, 1000) for _ in range(12)]
+    valblk_values = [rng.randint(-800, 800) for _ in range(6)]
+
+    def _u16(value: int) -> bytes:
+        return struct.pack(">H", value & 0xFFFF)
+
+    def _s16(value: int) -> bytes:
+        return struct.pack(">h", value)
+
+    axis_raw = _u16(len(axis_points)) + b"".join(_u16(v) for v in axis_points)
+    curve1_raw = b"".join(_u16(v) for v in curve1_values)
+    curve2_raw = b"".join(_u16(v) for v in curve2_values)
+
+    map_raw = bytearray(32)
+    map_raw[0:8] = b"".join(_u16(v) for v in map_x)
+    for y in range(3):
+        for x in range(4):
+            value = map_values[x + 4 * y]
+            offset = 8 + 2 * (y + 3 * x)
+            map_raw[offset:offset + 2] = _s16(value)
+    valblk_raw = b"".join(_s16(v) for v in valblk_values)
+
+    axis_texts = tuple(f"{v * 0.5:.3f}" for v in axis_points)
+    curve1_texts = tuple(str(v) for v in curve1_values)
+    curve2_texts = tuple(str(v) for v in curve2_values)
+    map_texts = tuple(str(v) for v in map_values)
+    valblk_texts = tuple(f"{v * 0.05:.1f}" for v in valblk_values)
+
+    return [
+        {
+            "name": "AXIS_DEF_0001",
+            "section": "AXIS_PTS",
+            "kind": "AXIS_PTS",
+            "datatype": None,
+            "conversion": "CM_DEF_LIN",
+            "address": cursor,
+            "length": len(axis_raw),
+            "big_endian": True,
+            "raw_bytes": axis_raw,
+            "physical": None,
+            "low": "0",
+            "high": "1000",
+            "bit_mask": None,
+            "shape": (len(axis_points),),
+            "planned_stored": tuple(axis_points),
+            "planned_text": axis_texts,
+            "axes": (),
+        },
+        {
+            "name": "CURVE_DEF_0001",
+            "section": "CHARACTERISTIC",
+            "kind": "CURVE",
+            "datatype": "UWORD",
+            "conversion": "CM_DEF_IDENT",
+            "address": cursor + 0x10,
+            "length": len(curve1_raw),
+            "big_endian": True,
+            "raw_bytes": curve1_raw,
+            "physical": None,
+            "low": "0",
+            "high": "65535",
+            "bit_mask": None,
+            "shape": (5,),
+            "planned_stored": tuple(curve1_values),
+            "planned_text": curve1_texts,
+            "axes": (
+                {
+                    "letter": "X",
+                    "axis_kind": "COM_AXIS",
+                    "planned_stored": tuple(axis_points),
+                    "planned_text": axis_texts,
+                    "axis_object": "AXIS_DEF_0001",
+                },
+            ),
+        },
+        {
+            "name": "CURVE_DEF_0002",
+            "section": "CHARACTERISTIC",
+            "kind": "CURVE",
+            "datatype": "UWORD",
+            "conversion": "CM_DEF_IDENT",
+            "address": cursor + 0x20,
+            "length": len(curve2_raw),
+            "big_endian": True,
+            "raw_bytes": curve2_raw,
+            "physical": None,
+            "low": "0",
+            "high": "65535",
+            "bit_mask": None,
+            "shape": (5,),
+            "planned_stored": tuple(curve2_values),
+            "planned_text": curve2_texts,
+            "axes": (
+                {
+                    "letter": "X",
+                    "axis_kind": "COM_AXIS",
+                    "planned_stored": tuple(axis_points),
+                    "planned_text": axis_texts,
+                    "axis_object": "AXIS_DEF_0001",
+                },
+            ),
+        },
+        {
+            "name": "MAP_DEF_0001",
+            "section": "CHARACTERISTIC",
+            "kind": "MAP",
+            "datatype": "SWORD",
+            "conversion": "CM_DEF_IDENT",
+            "address": cursor + 0x30,
+            "length": len(map_raw),
+            "big_endian": True,
+            "raw_bytes": bytes(map_raw),
+            "physical": None,
+            "low": "-1000",
+            "high": "1000",
+            "bit_mask": None,
+            "shape": (4, 3),
+            "planned_stored": tuple(map_values),
+            "planned_text": map_texts,
+            "axes": (
+                {
+                    "letter": "X",
+                    "axis_kind": "STD_AXIS",
+                    "planned_stored": tuple(map_x),
+                    "planned_text": tuple(str(v) for v in map_x),
+                    "axis_object": None,
+                },
+                {
+                    "letter": "Y",
+                    "axis_kind": "FIX_AXIS",
+                    "planned_stored": (10, 15, 20),
+                    "planned_text": ("10", "15", "20"),
+                    "axis_object": None,
+                },
+            ),
+        },
+        {
+            "name": "VAL_BLK_DEF_0001",
+            "section": "CHARACTERISTIC",
+            "kind": "VAL_BLK",
+            "datatype": "SWORD",
+            "conversion": "CM_DEF_FINE",
+            "address": cursor + 0x50,
+            "length": len(valblk_raw),
+            "big_endian": True,
+            "raw_bytes": valblk_raw,
+            "physical": None,
+            "low": "-50",
+            "high": "50",
+            "bit_mask": None,
+            "shape": (3, 2),
+            "planned_stored": tuple(valblk_values),
+            "planned_text": valblk_texts,
+            "axes": (),
+        },
+    ]
+
+
+def _definition_array_a2l(objects: list[dict]) -> list[str]:
+    """The A2L text of the five Inc 3 definitions-case objects, one keyword /
+    component / header per line (the AXIS_PTS header and each AXIS_DESCR header
+    on its own ``/begin`` line)."""
+    lines: list[str] = []
+    for obj in objects:
+        if obj["section"] == "AXIS_PTS":
+            lines.append(f'    /begin AXIS_PTS {obj["name"]} "synthetic common axis"')
+            lines.append(
+                f"      {_fmt_addr(obj['address'])} NO_INPUT_QUANTITY RL_DEF_AXIS 0 "
+                f"{obj['conversion']} 5 0 1000"
+            )
+            lines.append("    /end AXIS_PTS")
+            continue
+        if obj["kind"] == "CURVE":
+            lines.append(
+                f'    /begin CHARACTERISTIC {obj["name"]} '
+                f'"{DEFINITIONS_LONG_IDS[obj["name"]]}"'
+            )
+            lines.append(
+                f"      CURVE {_fmt_addr(obj['address'])} RL_U16 0 "
+                f"{obj['conversion']} {obj['low']} {obj['high']}"
+            )
+            lines.append("      /begin AXIS_DESCR")
+            lines.append("        COM_AXIS NO_INPUT_QUANTITY CM_DEF_LIN 5 0 1000")
+            lines.append("        AXIS_PTS_REF AXIS_DEF_0001")
+            lines.append("      /end AXIS_DESCR")
+            lines.append("    /end CHARACTERISTIC")
+            continue
+        if obj["kind"] == "MAP":
+            lines.append(
+                f'    /begin CHARACTERISTIC {obj["name"]} '
+                f'"{DEFINITIONS_LONG_IDS[obj["name"]]}"'
+            )
+            lines.append(
+                f"      MAP {_fmt_addr(obj['address'])} RL_DEF_MAP 0 "
+                f"{obj['conversion']} {obj['low']} {obj['high']}"
+            )
+            lines.append("      /begin AXIS_DESCR")
+            lines.append("        STD_AXIS NO_INPUT_QUANTITY CM_DEF_IDENT 4 0 1000")
+            lines.append("        MONOTONY STRICT_INCREASE")
+            lines.append("      /end AXIS_DESCR")
+            lines.append("      /begin AXIS_DESCR")
+            lines.append("        FIX_AXIS NO_INPUT_QUANTITY CM_DEF_IDENT 3 0 100")
+            lines.append("        FIX_AXIS_PAR_DIST 10 5 3")
+            lines.append("      /end AXIS_DESCR")
+            lines.append("    /end CHARACTERISTIC")
+            continue
+        if obj["kind"] == "VAL_BLK":
+            lines.append(
+                f'    /begin CHARACTERISTIC {obj["name"]} '
+                f'"{DEFINITIONS_LONG_IDS[obj["name"]]}"'
+            )
+            lines.append(
+                f"      VAL_BLK {_fmt_addr(obj['address'])} RL_DEF_S16_ROW 0 "
+                f"{obj['conversion']} {obj['low']} {obj['high']}"
+            )
+            lines.append("      MATRIX_DIM 3 2")
+            lines.append('      FORMAT "%.1"')
+            lines.append("    /end CHARACTERISTIC")
+            continue
+    return lines
 
 
 def emit_definitions_a2l(regions: dict[str, tuple[int, bytearray]], objects: list[dict]) -> str:
     """
     Summary:
         Emit the definitions case's A2L text (own PROJECT, MODULE, MOD_COMMON,
-        RECORD_LAYOUTs, COMPU_METHODs, one COMPU_VTAB and the four objects).
+        RECORD_LAYOUTs, COMPU_METHODs, one COMPU_VTAB and nine objects).
 
     Args:
         regions (dict[str, tuple[int, bytearray]]): Region map whose ``cal``
             entry gives the MEMORY_SEGMENT address and byte length.
-        objects (list[dict]): The four-object list from
+        objects (list[dict]): The nine-object list from
             :func:`build_definition_objects`, in file order.
 
     Returns:
@@ -1138,8 +1416,8 @@ def emit_definitions_a2l(regions: dict[str, tuple[int, bytearray]], objects: lis
         - Write the RECORD_LAYOUTs RL_U8 / RL_U16 / RL_S16.
         - Write the COMPU_METHODs and the COMPU_VTAB with its four pairs and
           DEFAULT_VALUE.
-        - Write the four CHARACTERISTICs from the object list, with the
-          BIT_MASK line and the DISPLAY_0001 extra lines.
+        - Write the scalar and array records from the object list, with the
+          BIT_MASK line, DISPLAY_0001 extras and each object axes.
 
     Dependencies:
         Uses:
@@ -1168,6 +1446,19 @@ def emit_definitions_a2l(regions: dict[str, tuple[int, bytearray]], objects: lis
         out.append(f"      FNC_VALUES 1 {datatype} COLUMN_DIR DIRECT")
         out.append("    /end RECORD_LAYOUT")
     out += [
+        "    /begin RECORD_LAYOUT RL_DEF_AXIS",
+        "      NO_AXIS_PTS_X 1 UWORD",
+        "      AXIS_PTS_X 2 UWORD INDEX_INCR DIRECT",
+        "    /end RECORD_LAYOUT",
+        "    /begin RECORD_LAYOUT RL_DEF_MAP",
+        "      AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT",
+        "      FNC_VALUES 2 SWORD COLUMN_DIR DIRECT",
+        "    /end RECORD_LAYOUT",
+        "    /begin RECORD_LAYOUT RL_DEF_S16_ROW",
+        "      FNC_VALUES 1 SWORD ROW_DIR DIRECT",
+        "    /end RECORD_LAYOUT",
+    ]
+    out += [
         '    /begin COMPU_METHOD CM_DEF_ENUM "synthetic verbal conversion"',
         '      TAB_VERB "%.0" ""',
         "      COMPU_TAB_REF VT_DEF_STATE",
@@ -1187,8 +1478,14 @@ def emit_definitions_a2l(regions: dict[str, tuple[int, bytearray]], objects: lis
         '      LINEAR "%.3" "units"',
         "      COEFFS_LINEAR 0.5 0",
         "    /end COMPU_METHOD",
+        '    /begin COMPU_METHOD CM_DEF_FINE "synthetic fine LINEAR conversion"',
+        '      LINEAR "%.3" "units"',
+        "      COEFFS_LINEAR 0.05 0",
+        "    /end COMPU_METHOD",
     ]
     for obj in objects:
+        if obj["section"] != "CHARACTERISTIC" or obj["kind"] != "VALUE":
+            continue
         long_id = DEFINITIONS_LONG_IDS[obj["name"]]
         deposit = RECORD_LAYOUT_NAMES[obj["datatype"]]
         out.append(f'    /begin CHARACTERISTIC {obj["name"]} "{long_id}"')
@@ -1202,6 +1499,7 @@ def emit_definitions_a2l(regions: dict[str, tuple[int, bytearray]], objects: lis
         for line in DEFINITIONS_EXTRA_LINES.get(obj["name"], ()):
             out.append(f"      {line}")
         out.append("    /end CHARACTERISTIC")
+    out += _definition_array_a2l(objects)
     out += ["  /end MODULE", "/end PROJECT"]
     return "\n".join(out) + "\n"
 

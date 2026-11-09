@@ -1,0 +1,43 @@
+Done. The timing arm is now complete and `py_compile` passes.
+
+## What I changed
+
+Only `tests/test_b103_a2l_definition_arrays_scale.py` (already untracked; no other file touched, nothing committed). The file already carried the required measure (fresh-walk generator, GC off via `_timed`, S/2S/8S interleaving, `LEAST_OF = 15`, real public `describe_definitions`/`decode_values`) — the gap was three timing cases of `.150`. I added:
+
+- `test_r_a2l_def_150_arr_3_long_matched_entry_text_referenced` (shared entry text `"t"*size`, image byte 0, one string object `is` across all 400 decodes)
+- `test_r_a2l_def_150_arr_4_long_default_text_referenced` (`DEFAULT_VALUE "d"*size`, image byte 250)
+- `test_r_a2l_def_150_arr_6_long_matched_range_text_referenced` (range `0 255 "t"*size`, image byte 0)
+- helper `_decode_image_valblk_byte(byte)` (and re-pointed `_decode_image_valblk` at `byte=250`), plus builders `_b150_arr3/4/6` and `_check_text_shared(char, byte)`, reusing `_cm`/`_vtab`/`_vrange`/`_valblk`/`_parse`/`_names`/`_measure`.
+
+Verification: `py_compile` only, as required:
+
+```
+cd /tmp/b103-e4-3a-coverage/tree && env HOME=…/zq_iso_user/home TMPDIR=…/zq_iso_user/tmp \
+  XDG_CACHE_HOME=…/zq_iso_user/xdg XDG_CONFIG_HOME=…/zq_iso_user/xdg XDG_DATA_HOME=…/zq_iso_user/xdg \
+  /home/<runner>/miniconda3/envs/s19ci/bin/python -I -B -m py_compile \
+  tests/test_b103_a2l_definition_arrays_scale.py </dev/null
+# → PY_COMPILE_OK
+```
+
+(No `.pyc` left behind; the timing suite was not run, and the functional coverage file was not edited.)
+
+## Exact cases in the timing arm
+
+**R-A2L-DEF.148** (`/1 … /19`, full measure — least of 15, interleaved, fresh walk): `148_1`, `148_2` (VAL_BLK), `148_3` (VALUE), `148_4`, `148_5`, `148_6`, `148_7`, `148_8`, `148_9`, `148_10`, `148_11`, `148_12`, `148_13`, `148_14`, `148_15`, `148_16`, `148_17`, `148_18` (curves + VALUEs), `148_19` (VAL_BLKs + VALUEs).
+
+**R-A2L-DEF.150** (decode per element): `arr_1`, `arr_2`, `arr_3`, `arr_4`, `arr_5`, `arr_6`, `arr_7`, `arr_8`, `arr_10[enum]`, `arr_10[number]`.
+
+**R-A2L-DEF.136** (read-once budget, median-of-3 — preserved): `arr_2`, `arr_3`.
+
+## Orchestrator command (reference — not run)
+
+```
+/home/<runner>/miniconda3/envs/s19ci/bin/python -I -B -c "import sys; \
+sys.path.insert(0, '/tmp/b103-e4-3a-coverage/tree'); import pytest; \
+sys.exit(pytest.main(['-p','no:cacheprovider','-m','serial_timing', \
+'tests/test_b103_a2l_definition_arrays_scale.py']))" </dev/null
+```
+
+## Unimplemented cases (intentional)
+
+`.150/arr-9` (bisect matches the frozen `_table_lookup`) and `.150/arr-11` (table text value refused, not raised) are **functional-only rows with no timing bound**, so they do not belong in the `serial_timing` arm. Both are already implemented in `tests/test_b103_a2l_definition_arrays_coverage.py` (`test_r_a2l_def_150_arr_9_bisect_matches_frozen_lookup`, `test_r_a2l_def_150_arr_11_table_text_value_refused_not_raised`). `.136/arr-4` (immutability) is likewise functional-only and lives in the coverage file.

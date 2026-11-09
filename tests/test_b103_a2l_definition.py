@@ -317,24 +317,10 @@ def _kind_msg(name: str, kind: str) -> tuple[str, str]:
     return "A2L-DEF-KIND", f"{name}: the system has no definition for a {kind} object"
 
 
-def test_r_a2l_def_4_1_val_blk_is_refused(c08):
-    """R-A2L-DEF.4/1 - VAL_BLK refused; address still given, byte length None (R-A2L-READ.61)."""
-    d = describe_definition("VAL_BLK_0001", c08["a2l"])
-    _is_refused(d, *_kind_msg("VAL_BLK_0001", "VAL_BLK"))
-    assert d.byte_length is None
-    assert d.address == c08["by_name"]["VAL_BLK_0001"]["address"]
-
-
-def test_r_a2l_def_4_2_curve_is_refused(c08):
-    """R-A2L-DEF.4/2 - CURVE."""
-    d = describe_definition("CURVE_0001", c08["a2l"])
-    _is_refused(d, *_kind_msg("CURVE_0001", "CURVE"))
-
-
-def test_r_a2l_def_4_3_map_is_refused(c08):
-    """R-A2L-DEF.4/3 - MAP."""
-    d = describe_definition("MAP_0001", c08["a2l"])
-    _is_refused(d, *_kind_msg("MAP_0001", "MAP"))
+# R-A2L-DEF.4/1, /2, /3 and /7 are WITHDRAWN by the D-14 ruling (Inc 3):
+# VAL_BLK_0001, CURVE_0001, MAP_0001 and the MATRIX_DIM 16 MEASUREMENT are now
+# defined objects - kind array (R-A2L-DEF.64/5), curve (.65/3), map (.66/2) and
+# array of shape 16 (.67/4), covered in tests/test_b103_a2l_definition_arrays.py.
 
 
 def test_r_a2l_def_4_4_cuboid_is_refused(v171):
@@ -358,18 +344,20 @@ def test_r_a2l_def_4_6_vendor_kind_is_refused_and_keeps_its_address(tmp_path):
     assert d.address == 0x10
 
 
-def test_r_a2l_def_4_7_array_measurement_is_refused(v171):
-    """R-A2L-DEF.4/7 - MATRIX_DIM 16 MEASUREMENT."""
-    n = "ASAM.M.MATRIX_DIM_16_1.UBYTE.IDENTICAL"
-    d = describe_definition(n, v171)
-    _is_refused(d, *_kind_msg(n, "MATRIX_DIM 16 MEASUREMENT"))
-
-
 def test_r_a2l_def_4_8_header_with_no_kind_is_refused(case07):
     """R-A2L-DEF.4/8 - case 07 CHAR_000000: the kind text is (none)."""
     d = describe_definition("CHAR_000000", case07)
     _is_refused(d, *_kind_msg("CHAR_000000", "(none)"))
     assert d.address == 0x08011400 and d.byte_length == 4
+
+
+def test_r_a2l_def_4_9_cube_4_is_refused(v171):
+    """R-A2L-DEF.4/9 (new, D-14) - V171 CUBE_4; address still given, no element count (E3A-03)."""
+    d = describe_definition("ASAM.C.CUBE_4.ROW_DIR", v171)
+    _is_refused(d, *_kind_msg("ASAM.C.CUBE_4.ROW_DIR", "CUBE_4"))
+    assert d.kind == ""
+    assert d.address == 0x810590
+    assert d.element_count is None
 
 
 # ==========================================================================
@@ -807,9 +795,15 @@ def test_r_a2l_def_23_2_format_of_a_commented_header(tube):
 
 
 def test_r_a2l_def_24_1_kind_comes_before_address(tmp_path):
-    """R-A2L-DEF.24/1."""
-    a2l = _inline(tmp_path, _meas("MA", "UBYTE", "NO_COMPU_METHOD", "0", "255", "MATRIX_DIM 4"))
-    assert describe_definition("MA", a2l).refusal.code == "A2L-DEF-KIND"
+    """R-A2L-DEF.24/1 (changed, D-14) - a CUBOID whose address word is 0xZZ.
+
+    Inc 2's input, MEASUREMENT ``MA`` with ``MATRIX_DIM 4`` and no ECU_ADDRESS,
+    is an array now and gives ``A2L-DEF-ADDRESS`` (R-A2L-DEF.7.1/arr-2).
+    """
+    a2l = _inline(tmp_path, _char("CB", "CUBOID", "0xZZ", "RL_U16"))
+    d = describe_definition("CB", a2l)
+    _is_refused(d, *_kind_msg("CB", "CUBOID"))
+    assert d.refusal.code == "A2L-DEF-KIND"
 
 
 def test_r_a2l_def_24_2_address_comes_before_method(tmp_path):
@@ -1618,7 +1612,11 @@ def test_at_b103_i2_3_case08_builds_and_decodes_with_the_model(c08):
 
     issues = c08["issues"]
     refused = []
-    undefined_kinds = ("VAL_BLK", "CURVE", "MAP")        # outside the defined objects (R-A2L-DEF.4)
+    # VAL_BLK / CURVE / MAP are defined objects now (Inc 3's kinds); AT-B103-I2-3
+    # is scoped to the scalar kinds, so the issues arm scans only those.  The
+    # arrays, curves and maps of both A2Ls give A2L-DEF-ELEMENTS on a single
+    # decode and are AT-B103-I3-3's (tests/test_b103_a2l_definition_arrays_decode.py).
+    undefined_kinds = ("VAL_BLK", "CURVE", "MAP")        # scalar scope only, per D-14
     for n in sorted({t["name"] for t in issues["tags"] if t.get("char_type") not in undefined_kinds}):
         d = describe_definition(n, issues)
         res = decode_definition(d, issues, mem)
@@ -2308,11 +2306,11 @@ def test_r_a2l_def_58_2_22_a_number_of_5000_hex_digits_is_a_refusal_not_an_excep
 
 
 def test_r_a2l_def_58_2_23_a_matrix_dim_of_5000_hex_digits_is_a_refusal_not_an_exception(tmp_path):
-    """R-A2L-DEF.58.2/23 (E5S-01, CR-2) - MATRIX_DIM 0x + 5,000 F on a UBYTE MEASUREMENT: A2L-DEF-KIND, bounded."""
+    """R-A2L-DEF.58.2/23 (E5S-01, CR-2) - MATRIX_DIM 0x + 5,000 F on a UBYTE MEASUREMENT: A2L-DEF-MATRIX, bounded (Inc 3a)."""
     a2l = _inline(tmp_path, _meas("MD", "UBYTE", "NO_COMPU_METHOD", "0", "255", "MATRIX_DIM 0x" + "F" * 5000,
                                   addr="0x10"))
     d = describe_definition("MD", a2l)                                         # 0 exceptions
-    want = Refusal("A2L-DEF-ADDRESS", "MD: the object has no address or no length")  # R-A2L-READ.34/.63
+    want = Refusal("A2L-DEF-MATRIX", f"MD: MATRIX_DIM {HEX256} is not 1 to 3 whole numbers of at least 1")
     assert d.refusal == want, d.refusal
     assert len(d.refusal.message) <= 1024
     assert describe_definitions(["MD"], a2l)["MD"] == d
@@ -2364,15 +2362,19 @@ def test_r_a2l_def_58_2_24_deep_nesting_is_refused_and_the_walk_keeps_file_order
 
 
 def test_r_a2l_def_151_4_a_matrix_dim_number_is_written_by_the_number_rule(tmp_path):
-    """R-A2L-DEF.151/4 - an oversized MATRIX_DIM number gives no length (R-A2L-READ.34/.63)."""
+    """R-A2L-DEF.151/4 - an oversized MATRIX_DIM number is refused A2L-DEF-MATRIX (Inc 3a: not a whole number)."""
     a2l = _inline(
         tmp_path,
         _meas("MD4", "UBYTE", "NO_COMPU_METHOD", "0", "255", "MATRIX_DIM " + "9" * 4000, addr="0x10"),
         _meas("MD5", "UBYTE", "NO_COMPU_METHOD", "0", "255", "MATRIX_DIM 0x" + "F" * 1000, addr="0x11"),
     )
     got = describe_definitions(["MD4", "MD5"], a2l)
+    wants = {
+        "MD4": f"MD4: MATRIX_DIM {_echo256('9' * 4000)} is not 1 to 3 whole numbers of at least 1",
+        "MD5": f"MD5: MATRIX_DIM {HEX256} is not 1 to 3 whole numbers of at least 1",
+    }
     for name in ("MD4", "MD5"):
-        assert got[name].refusal == Refusal("A2L-DEF-ADDRESS", f"{name}: the object has no address or no length"), got[name].refusal
+        assert got[name].refusal == Refusal("A2L-DEF-MATRIX", wants[name]), got[name].refusal
         assert len(got[name].refusal.message) <= 1024, (name, len(got[name].refusal.message))
 
 

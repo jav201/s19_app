@@ -199,7 +199,14 @@ from tools.id_registry import (
 # tests/test_b103_a2l_reader_perf.py, tests/support/b103_a2l_ref.py); 283 -> 286.
 # batch-103 Inc 11 E5 (tester): +1 (tests/test_b103_a2l_reader_e5.py); 286 -> 287.
 # batch-103 Inc 11 E5 coverage: +1 (tests/test_b103_a2l_reader_coverage.py); 287 -> 288.
-EXPECTED_SCANNED_TEST_FILES = 288
+# batch-103 Inc 3a (E4): 288 -> 292, measured — three new test modules
+# (test_b103_a2l_definition_arrays{,_decode,_scale}.py) plus the shared builder
+# tests/support/b103_a2l_arrays.py.
+# batch-103 Inc 3a E4 supplemental coverage: +1
+# (tests/test_b103_a2l_definition_arrays_coverage.py); 292 -> 293.
+# batch-103 Inc 3a E5 FIX cap coverage: +1
+# (tests/test_b103_a2l_definition_arrays_fix_cap.py); 293 -> 294.
+EXPECTED_SCANNED_TEST_FILES = 294
 """Test modules scanned, including this one.
 
 batch-101 Inc 11: 250 -> 253. ``tests/test_b101_a2l_blocks_and_segments.py``,

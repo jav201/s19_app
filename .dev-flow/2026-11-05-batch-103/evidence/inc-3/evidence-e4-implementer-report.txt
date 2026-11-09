@@ -1,0 +1,45 @@
+Implementation complete. Here is the final report.
+
+## Changed files (exactly my two owned files)
+
+1. `s19_app/tui/a2l_definition.py`
+2. `tools/synth/make_release_case.py`
+
+No tests, records, requirements, graphs, or other files touched; nothing committed. The untracked `E4-brief-common.md` pre-existed the session.
+
+## py_compile result
+
+`OK` — both files compile with the exact prescribed environment:
+
+```
+s19_app.__file__: /tmp/b103-e4-3a-impl/tree/s19_app/__init__.py
+py_compile: OK (both files)
+```
+
+Run with `/home/<runner>/miniconda3/envs/s19ci/bin/python -I -B`, `sys.path.insert(0, tree)`, isolated HOME/XDG/LOCALAPPDATA under a fresh `zq_iso_user`, closed stdin, `PYTHONDONTWRITEBYTECODE=1`.
+
+## What was implemented (3a read side)
+
+**Module nodes** — 4 changed + 19 new:
+- Changed: `describe_definitions` (one walk builds `axis_pts_by_name`, `mod_common_of`, and the `reads` map with namespaced keys `("layout", id)` / `("mod_common", id)` / `("axis_byte_order", id)` per E3S3-38), `_describe_one` (routes array/curve/map to `_describe_array`; VALUE `.145`; skips `_resolve_datatype` for array kinds), `_object_kind` (gains `matrix_words`; VAL_BLK/CURVE/MAP/MEASUREMENT-array kinds), `decode_definition` (`A2L-DEF-ELEMENTS` for array kinds; conversion half factored into `_decode_stored` with `suffix`).
+- New: `_conversion_fields`, `_describe_array`, `_read_matrix_dim`, `_array_shape`, `_read_record_layout`, `_place_components`, `_check_module_alignment`, `_module_common`, `_read_axis`, `_find_axis_object`, `_fixed_points`, `_element_definition`, `element_name`, `decode_values`, `_element_offset`, `_point_offset`, `_current_count`, `_decode_axis`, `_decode_stored`.
+- I-2: `AxisDefinition`, `DecodedAxis`, `DecodedValues`, `Definition` gains `shape`/`element_count`/`index_mode`/`values_offset`/`record_layout`/`axes` (all defaulted after `refusal`).
+
+**Synth nodes** — `build_definition_objects` (draws 6–11, overlays the five Inc 3 records), `emit_definitions_a2l` (RL_DEF_AXIS/RL_DEF_MAP/RL_DEF_S16_ROW, CM_DEF_FINE, AXIS_DEF_0001 + 4 characteristics), `_definition_array_objects` (new).
+
+## Verified (black-box smoke, real fixtures)
+
+- DEFC pinned table reproduces byte-for-byte (AXIS_DEF_0001 `00 05 01 e5 …`, both curves, MAP COLUMN_DIR record, VAL_BLK `02 e1 …` with texts `36.9 …`); all five decode to their planned values/axes.
+- V171: exact AT-B103-I3-1 tally (11 arrays / 6 curves / 3 maps no-refusal; 13 ALIGNMENT; 2 AXIS-KIND; 5 KIND; the 3 CONVERSION are Inc 2a scalars) and the exact `.89` message.
+- software_a: 13,990 names in 0.974 s (bound 2.0 s); 101 VAL_BLK / 158 CURVE / 11 MAP with 0 refusals, no `AXIS-REF`/`LAYOUT-PART`.
+- All 11 `.147` FIX cases exact (2^53 boundary, shift ≤62, `/11` `9007199254740993`→int `9007199254740992`; `/9` refuses with no power computed).
+- `.118`, `.116.2/.117.2`, `.142`, `.86`, `.84/.85/.87/.88`, `.92/5` (axes hold X), `.145`, `.80`, `.76`, `.70`, `.69`, `.81`, `.101`, `.143`, K1 key-namespacing — all match the row messages.
+
+## Graph deviations
+
+1. `_read_axis` takes two extra parameters beyond the pinned `(name, letter, axis_section, layout, a2l_data, maps)`: `name_echo` and `byte_order`. The node's own text requires the points `Definition` to carry the object's name echo (computed once at describe, E3S3-25/-27) and the object's byte order (R-A2L-DEF.114), which the pinned signature cannot supply. Private function; no public change.
+2. `_array_shape` returns `Refusal` on the LENGTH path but `_describe_array` recovers the shape from the MATRIX_DIM so `.76`'s message still reports the correct element count (the pinned out type loses the shape when the LENGTH line differs).
+
+## Unimplemented contract (intentional — out of 3a scope)
+
+The 3b write side: `encode_values`, `_breaking_point`, and the encode changes to `encode_definition` (rows `.120/2`, `.121/1-.2`, `.122`–`.132`, `.140`), plus `decode_values`'s edit arm. Per the amendment A2 split these wait for Inc 2b/Inc 11 and are not part of Inc 3a's read side. No UI changes were made.

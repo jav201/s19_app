@@ -1,0 +1,1711 @@
+/tmp/b103-e4-3a-int/tree/s19_app/__init__.py
+........................................................................ [ 16%]
+........................................................................ [ 33%]
+.......................................F.F.......F...........F.FFFFFFF.. [ 50%]
+.........F........FF..FFF.FFFFF.FFFF.FFFFFFFFFFFFFFFFFFFFFF....FF.F...FF [ 67%]
+...F...F..FF.F......FF..FFFF.FF.....FFFFFFFFFF..F..F....F...FF...F..F.FF [ 84%]
+F.....FF.F..FF..F......FF..FFFFFF.F.F.F.........FFFFFFF.FFF......F.      [100%]
+=================================== FAILURES ===================================
+_ test_r_a2l_def_58_2_23_a_matrix_dim_of_5000_hex_digits_is_a_refusal_not_an_exception _
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_58_2_23_a_matri0')
+
+    def test_r_a2l_def_58_2_23_a_matrix_dim_of_5000_hex_digits_is_a_refusal_not_an_exception(tmp_path):
+        """R-A2L-DEF.58.2/23 (E5S-01, CR-2) - MATRIX_DIM 0x + 5,000 F on a UBYTE MEASUREMENT: A2L-DEF-KIND, bounded."""
+        a2l = _inline(tmp_path, _meas("MD", "UBYTE", "NO_COMPU_METHOD", "0", "255", "MATRIX_DIM 0x" + "F" * 5000,
+                                      addr="0x10"))
+        d = describe_definition("MD", a2l)                                         # 0 exceptions
+        want = Refusal("A2L-DEF-ADDRESS", "MD: the object has no address or no length")  # R-A2L-READ.34/.63
+>       assert d.refusal == want, d.refusal
+E       AssertionError: Refusal(code='A2L-DEF-MATRIX', message='MD: MATRIX_DIM 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF...FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF… is not 1 to 3 whole numbers of at least 1')
+E       assert Refusal(code=...f at least 1') == Refusal(code=...or no length')
+E         
+E         Differing attributes:
+E         ['code', 'message']
+E         
+E         Drill down into differing attribute code:
+E           code: 'A2L-DEF-MATRIX' != 'A2L-DEF-ADDRESS'
+E           - A2L-DEF-ADDRESS...
+E         
+E         ...Full output truncated, use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2314: AssertionError
+____ test_r_a2l_def_151_4_a_matrix_dim_number_is_written_by_the_number_rule ____
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_151_4_a_matrix_0')
+
+    def test_r_a2l_def_151_4_a_matrix_dim_number_is_written_by_the_number_rule(tmp_path):
+        """R-A2L-DEF.151/4 - an oversized MATRIX_DIM number gives no length (R-A2L-READ.34/.63)."""
+        a2l = _inline(
+            tmp_path,
+            _meas("MD4", "UBYTE", "NO_COMPU_METHOD", "0", "255", "MATRIX_DIM " + "9" * 4000, addr="0x10"),
+            _meas("MD5", "UBYTE", "NO_COMPU_METHOD", "0", "255", "MATRIX_DIM 0x" + "F" * 1000, addr="0x11"),
+        )
+        got = describe_definitions(["MD4", "MD5"], a2l)
+        for name in ("MD4", "MD5"):
+>           assert got[name].refusal == Refusal("A2L-DEF-ADDRESS", f"{name}: the object has no address or no length"), got[name].refusal
+E           AssertionError: Refusal(code='A2L-DEF-MATRIX', message='MD4: MATRIX_DIM 99999999999999999999999999999999999999999999999999999999999999...99999999999999999999999999999999999999999999999999999999999999999999999999… is not 1 to 3 whole numbers of at least 1')
+E           assert Refusal(code=...f at least 1') == Refusal(code=...or no length')
+E             
+E             Differing attributes:
+E             ['code', 'message']
+E             
+E             Drill down into differing attribute code:
+E               code: 'A2L-DEF-MATRIX' != 'A2L-DEF-ADDRESS'
+E               - A2L-DEF-ADDRESS...
+E             
+E             ...Full output truncated, use '-vv' to show
+
+tests/test_b103_a2l_definition.py:2373: AssertionError
+___________________ test_r_a2l_def_64_6_leading_1_matrix_dim ___________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_64_6_leading_1_0')
+
+    def test_r_a2l_def_64_6_leading_1_matrix_dim(tmp_path):
+>       a2l = inline(tmp_path, meas("MD161", "UBYTE", addr="0x10", extras=("MATRIX_DIM 1 6 1",)))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: meas() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:175: TypeError
+________________________ test_r_a2l_def_68_2_number_10 _________________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_68_2_number_100')
+
+    def test_r_a2l_def_68_2_number_10(tmp_path):
+>       a2l = inline(tmp_path, valblk("VB10", "0x10", "RL_U16", extras=("NUMBER 10",)))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: valblk() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:232: TypeError
+________________ test_r_a2l_def_69_2_small_length_only_val_blk _________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_69_2_small_leng0')
+
+    def test_r_a2l_def_69_2_small_length_only_val_blk(tmp_path):
+>       a2l = inline(tmp_path, valblk("VS6", "0x10", "RL_S16", extras=("LENGTH 6",)))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: valblk() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:242: TypeError
+_________________ test_r_a2l_def_70_1_length_not_whole_values __________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_70_1_length_not0')
+
+    def test_r_a2l_def_70_1_length_not_whole_values(tmp_path):
+>       a2l = inline(tmp_path, valblk("VS", "0x10", "RL_U16", extras=("LENGTH 5",)))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: valblk() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:247: TypeError
+________________ test_r_a2l_def_71_matrix_dim_refused[3 0-3 0] _________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_71_matrix_dim_r0')
+dims = '3 0', text = '3 0'
+
+    @pytest.mark.parametrize("dims,text", [
+        ("3 0", "3 0"),
+        ("2 2 2 2", "2 2 2 2"),
+        ("x", "x"),
+        ("", "(none)"),
+    ])
+    def test_r_a2l_def_71_matrix_dim_refused(tmp_path, dims, text):
+>       a2l = inline(tmp_path, valblk("VX", "0x10", "RL_U16", extras=(f"MATRIX_DIM {dims}".rstrip(),)))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: valblk() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:259: TypeError
+____________ test_r_a2l_def_71_matrix_dim_refused[2 2 2 2-2 2 2 2] _____________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_71_matrix_dim_r1')
+dims = '2 2 2 2', text = '2 2 2 2'
+
+    @pytest.mark.parametrize("dims,text", [
+        ("3 0", "3 0"),
+        ("2 2 2 2", "2 2 2 2"),
+        ("x", "x"),
+        ("", "(none)"),
+    ])
+    def test_r_a2l_def_71_matrix_dim_refused(tmp_path, dims, text):
+>       a2l = inline(tmp_path, valblk("VX", "0x10", "RL_U16", extras=(f"MATRIX_DIM {dims}".rstrip(),)))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: valblk() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:259: TypeError
+__________________ test_r_a2l_def_71_matrix_dim_refused[x-x] ___________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_71_matrix_dim_r2')
+dims = 'x', text = 'x'
+
+    @pytest.mark.parametrize("dims,text", [
+        ("3 0", "3 0"),
+        ("2 2 2 2", "2 2 2 2"),
+        ("x", "x"),
+        ("", "(none)"),
+    ])
+    def test_r_a2l_def_71_matrix_dim_refused(tmp_path, dims, text):
+>       a2l = inline(tmp_path, valblk("VX", "0x10", "RL_U16", extras=(f"MATRIX_DIM {dims}".rstrip(),)))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: valblk() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:259: TypeError
+________________ test_r_a2l_def_71_matrix_dim_refused[-(none)] _________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_71_matrix_dim_r3')
+dims = '', text = '(none)'
+
+    @pytest.mark.parametrize("dims,text", [
+        ("3 0", "3 0"),
+        ("2 2 2 2", "2 2 2 2"),
+        ("x", "x"),
+        ("", "(none)"),
+    ])
+    def test_r_a2l_def_71_matrix_dim_refused(tmp_path, dims, text):
+>       a2l = inline(tmp_path, valblk("VX", "0x10", "RL_U16", extras=(f"MATRIX_DIM {dims}".rstrip(),)))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: valblk() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:259: TypeError
+_____________ test_r_a2l_def_71_5_malformed_measurement_not_scalar _____________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_71_5_malformed_0')
+
+    def test_r_a2l_def_71_5_malformed_measurement_not_scalar(tmp_path):
+>       a2l = inline(tmp_path, meas("MX4", "UBYTE", addr="0x10", extras=("MATRIX_DIM 4 x",)))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: meas() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:265: TypeError
+______________ test_r_a2l_def_73_9_unreadable_shape_has_no_count _______________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_73_9_unreadable0')
+
+    def test_r_a2l_def_73_9_unreadable_shape_has_no_count(tmp_path):
+>       a2l = inline(tmp_path, valblk("VX", "0x10", "RL_U16", extras=("MATRIX_DIM 3 0",)))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: valblk() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:317: TypeError
+______________________ test_r_a2l_def_76_1_length_differs ______________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_76_1_length_dif0')
+
+    def test_r_a2l_def_76_1_length_differs(tmp_path):
+>       a2l = inline(tmp_path, valblk("VL", "0x10", "RL_U16", extras=("MATRIX_DIM 4", "LENGTH 6")))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: valblk() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:369: TypeError
+____________________ test_r_a2l_def_76_2_data_size_differs _____________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_76_2_data_size_0')
+
+    def test_r_a2l_def_76_2_data_size_differs(tmp_path):
+>       a2l = inline(tmp_path, meas("ML", "UBYTE", addr="0x10", extras=("MATRIX_DIM 4 2", "DATA_SIZE 4")))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: meas() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:375: TypeError
+______________ test_r_a2l_def_77_3_curve_layout_starts_with_count ______________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_77_3_curve_layo0')
+
+    def test_r_a2l_def_77_3_curve_layout_starts_with_count(tmp_path):
+>       block = curve("CS", "0x100", "RL_CS",
+                      axis("STD_AXIS", "CM_IDENT", "4", "0", "255"),
+                      extras=(rl("RL_CS", "NO_AXIS_PTS_X 1 UBYTE",
+                                 "AXIS_PTS_X 2 UBYTE INDEX_INCR DIRECT",
+                                 "FNC_VALUES 3 SWORD ROW_DIR DIRECT"),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:391: TypeError
+____________________ test_r_a2l_def_78_1_layout_column_dir _____________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_78_1_layout_col0')
+
+    def test_r_a2l_def_78_1_layout_column_dir(tmp_path):
+>       a2l = inline(tmp_path, meas("MC", "UBYTE", addr="0x10", extras=("MATRIX_DIM 3 2", "LAYOUT COLUMN_DIR")))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: meas() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:402: TypeError
+______________________ test_r_a2l_def_78_2_layout_row_dir ______________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_78_2_layout_row0')
+
+    def test_r_a2l_def_78_2_layout_row_dir(tmp_path):
+>       a2l = inline(tmp_path, meas("MC", "UBYTE", addr="0x10", extras=("MATRIX_DIM 3 2", "LAYOUT ROW_DIR")))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: meas() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:407: TypeError
+________________ test_r_a2l_def_80_1_3d_column_dir_measurement _________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_80_1_3d_column_0')
+
+    def test_r_a2l_def_80_1_3d_column_dir_measurement(tmp_path):
+>       a2l = inline(tmp_path, meas("M3", "UBYTE", addr="0x10", extras=("MATRIX_DIM 2 2 2", "LAYOUT COLUMN_DIR")))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: meas() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:416: TypeError
+__________________ test_r_a2l_def_80_2_3d_column_dir_val_blk ___________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_80_2_3d_column_0')
+
+    def test_r_a2l_def_80_2_3d_column_dir_val_blk(tmp_path):
+>       block = valblk("V3", "0x10", "RL_V3", extras=("MATRIX_DIM 2 2 2",),
+                       )
+E       TypeError: valblk() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:422: TypeError
+________________ test_r_a2l_def_81_1_undeclared_method_on_array ________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_81_1_undeclared0')
+
+    def test_r_a2l_def_81_1_undeclared_method_on_array(tmp_path):
+>       a2l = inline(tmp_path, valblk("VC", "0x10", "RL_U16", "CM_GONE", extras=("MATRIX_DIM 3",)))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: valblk() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:430: TypeError
+___________________ test_r_a2l_def_81_2_dangling_enum_table ____________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_81_2_dangling_e0')
+
+    def test_r_a2l_def_81_2_dangling_enum_table(tmp_path):
+        blocks = [cm("CM_V", "TAB_VERB", fmt='"%.0"', ref="VT_GONE"),
+>                 valblk("VT", "0x10", "RL_U8", "CM_V", extras=("MATRIX_DIM 2",))]
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: valblk() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:437: TypeError
+_____________________ test_r_a2l_def_81_3_zero_mask_on_map _____________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_81_3_zero_mask_0')
+
+    def test_r_a2l_def_81_3_zero_mask_on_map(tmp_path):
+        ax = axis("STD_AXIS", "CM_IDENT", "2", "0", "255")
+        block = mapchar("MZ", "0x100", "RL_MZ", ax, ax, extras=("BIT_MASK 0",))
+        a2l = inline(tmp_path, block, rl("RL_MZ", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT",
+                                         "AXIS_PTS_Y 2 UWORD INDEX_INCR DIRECT",
+                                         "FNC_VALUES 3 UWORD ROW_DIR DIRECT"))
+>       is_refused(_describe("MZ", a2l), "A2L-DEF-MASK",
+                   "MZ: the bit mask 0 cannot be applied to UWORD")
+
+tests/test_b103_a2l_definition_arrays.py:449: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='MZ', section='CHARACTERISTIC', char_type='MAP', kind='map', address=256, byte_length=16, datatype='UW...None, axis_object_address=None, axis_object_record=None, monotony='STRICT_MON', has_points=True, count_datatype=None)))
+code = 'A2L-DEF-MASK', message = 'MZ: the bit mask 0 cannot be applied to UWORD'
+
+    def is_refused(d, code: str, message: str) -> None:
+        from s19_app.tui.a2l_definition import Refusal
+>       assert d.refusal == Refusal(code, message), d.refusal
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Refusal(code='A2L-DEF-METHOD', message='MZ: the conversion method CM_IDENT is not declared in the A2L')
+
+tests/support/b103_a2l_arrays.py:188: AssertionError
+___________________ test_r_a2l_def_81_5_unreadable_mask_word ___________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_81_5_unreadable0')
+
+    def test_r_a2l_def_81_5_unreadable_mask_word(tmp_path):
+>       a2l = inline(tmp_path, valblk("VZ", "0x10", "RL_U16", extras=("MATRIX_DIM 2", "BIT_MASK 0xZZ")))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: valblk() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:460: TypeError
+___________________ test_r_a2l_def_145_1_matrix_dim_on_curve ___________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_145_1_matrix_di0')
+
+    def test_r_a2l_def_145_1_matrix_dim_on_curve(tmp_path):
+>       block = curve("CMD", "0x100", "RL_U16", axis("STD_AXIS", "CM_IDENT", "2", "0", "255"),
+                      extras=("MATRIX_DIM 4",))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:466: TypeError
+___________________ test_r_a2l_def_145_2_matrix_dim_on_value ___________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_145_2_matrix_di0')
+
+    def test_r_a2l_def_145_2_matrix_dim_on_value(tmp_path):
+>       a2l = inline(tmp_path, valblk("VMD", "0x10", "RL_U16", "CM_IDENT", extras=("MATRIX_DIM 2 2",)))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: valblk() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:475: TypeError
+__________________ test_r_a2l_def_145_3_matrix_dim_1_on_curve __________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_145_3_matrix_di0')
+
+    def test_r_a2l_def_145_3_matrix_dim_1_on_curve(tmp_path):
+>       block = curve("CMD", "0x100", "RL_U16", axis("STD_AXIS", "CM_IDENT", "2", "0", "255"),
+                      extras=("MATRIX_DIM 1",))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:482: TypeError
+_______________ test_r_a2l_def_82_2_undeclared_layout_on_val_blk _______________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_82_2_undeclared0')
+
+    def test_r_a2l_def_82_2_undeclared_layout_on_val_blk(tmp_path):
+>       a2l = inline(tmp_path, valblk("VG", "0x10", "RL_GONE", extras=("MATRIX_DIM 2",)))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: valblk() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:500: TypeError
+________________ test_r_a2l_def_83_1_layout_with_no_fnc_values _________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_83_1_layout_wit0')
+
+    def test_r_a2l_def_83_1_layout_with_no_fnc_values(tmp_path):
+>       block = curve("CF", "0x100", "RL_AX", axis("STD_AXIS", "CM_IDENT", "4", "0", "255"),
+                      extras=(rl("RL_AX", "AXIS_PTS_X 1 UBYTE INDEX_INCR DIRECT"),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:506: TypeError
+___________ test_r_a2l_def_84_layout_part[RESERVED 3 BYTE-RESERVED] ____________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_84_layout_part_0')
+line = 'RESERVED 3 BYTE', word = 'RESERVED'
+
+    @pytest.mark.parametrize("line,word", [
+        ("RESERVED 3 BYTE", "RESERVED"),
+        ("AXIS_RESCALE_X 3 UBYTE 5 INDEX_INCR DIRECT", "AXIS_RESCALE_X"),
+        ("IDENTIFICATION 3 UWORD", "IDENTIFICATION"),
+        ("AXIS_PTS_Z 3 UBYTE INDEX_INCR DIRECT", "AXIS_PTS_Z"),
+        ("SRC_ADDR_X 3", "SRC_ADDR_X"),
+        ("STATIC_RECORD_LAYOUT", "STATIC_RECORD_LAYOUT"),
+    ])
+    def test_r_a2l_def_84_layout_part(tmp_path, line, word):
+>       block = curve("CP", "0x100", "RL_P", axis("STD_AXIS", "CM_IDENT", "2", "0", "255"),
+                      extras=(rl("RL_P", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT",
+                                 "FNC_VALUES 2 UWORD ROW_DIR DIRECT", line),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:522: TypeError
+_ test_r_a2l_def_84_layout_part[AXIS_RESCALE_X 3 UBYTE 5 INDEX_INCR DIRECT-AXIS_RESCALE_X] _
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_84_layout_part_1')
+line = 'AXIS_RESCALE_X 3 UBYTE 5 INDEX_INCR DIRECT', word = 'AXIS_RESCALE_X'
+
+    @pytest.mark.parametrize("line,word", [
+        ("RESERVED 3 BYTE", "RESERVED"),
+        ("AXIS_RESCALE_X 3 UBYTE 5 INDEX_INCR DIRECT", "AXIS_RESCALE_X"),
+        ("IDENTIFICATION 3 UWORD", "IDENTIFICATION"),
+        ("AXIS_PTS_Z 3 UBYTE INDEX_INCR DIRECT", "AXIS_PTS_Z"),
+        ("SRC_ADDR_X 3", "SRC_ADDR_X"),
+        ("STATIC_RECORD_LAYOUT", "STATIC_RECORD_LAYOUT"),
+    ])
+    def test_r_a2l_def_84_layout_part(tmp_path, line, word):
+>       block = curve("CP", "0x100", "RL_P", axis("STD_AXIS", "CM_IDENT", "2", "0", "255"),
+                      extras=(rl("RL_P", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT",
+                                 "FNC_VALUES 2 UWORD ROW_DIR DIRECT", line),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:522: TypeError
+_____ test_r_a2l_def_84_layout_part[IDENTIFICATION 3 UWORD-IDENTIFICATION] _____
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_84_layout_part_2')
+line = 'IDENTIFICATION 3 UWORD', word = 'IDENTIFICATION'
+
+    @pytest.mark.parametrize("line,word", [
+        ("RESERVED 3 BYTE", "RESERVED"),
+        ("AXIS_RESCALE_X 3 UBYTE 5 INDEX_INCR DIRECT", "AXIS_RESCALE_X"),
+        ("IDENTIFICATION 3 UWORD", "IDENTIFICATION"),
+        ("AXIS_PTS_Z 3 UBYTE INDEX_INCR DIRECT", "AXIS_PTS_Z"),
+        ("SRC_ADDR_X 3", "SRC_ADDR_X"),
+        ("STATIC_RECORD_LAYOUT", "STATIC_RECORD_LAYOUT"),
+    ])
+    def test_r_a2l_def_84_layout_part(tmp_path, line, word):
+>       block = curve("CP", "0x100", "RL_P", axis("STD_AXIS", "CM_IDENT", "2", "0", "255"),
+                      extras=(rl("RL_P", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT",
+                                 "FNC_VALUES 2 UWORD ROW_DIR DIRECT", line),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:522: TypeError
+_ test_r_a2l_def_84_layout_part[AXIS_PTS_Z 3 UBYTE INDEX_INCR DIRECT-AXIS_PTS_Z] _
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_84_layout_part_3')
+line = 'AXIS_PTS_Z 3 UBYTE INDEX_INCR DIRECT', word = 'AXIS_PTS_Z'
+
+    @pytest.mark.parametrize("line,word", [
+        ("RESERVED 3 BYTE", "RESERVED"),
+        ("AXIS_RESCALE_X 3 UBYTE 5 INDEX_INCR DIRECT", "AXIS_RESCALE_X"),
+        ("IDENTIFICATION 3 UWORD", "IDENTIFICATION"),
+        ("AXIS_PTS_Z 3 UBYTE INDEX_INCR DIRECT", "AXIS_PTS_Z"),
+        ("SRC_ADDR_X 3", "SRC_ADDR_X"),
+        ("STATIC_RECORD_LAYOUT", "STATIC_RECORD_LAYOUT"),
+    ])
+    def test_r_a2l_def_84_layout_part(tmp_path, line, word):
+>       block = curve("CP", "0x100", "RL_P", axis("STD_AXIS", "CM_IDENT", "2", "0", "255"),
+                      extras=(rl("RL_P", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT",
+                                 "FNC_VALUES 2 UWORD ROW_DIR DIRECT", line),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:522: TypeError
+____________ test_r_a2l_def_84_layout_part[SRC_ADDR_X 3-SRC_ADDR_X] ____________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_84_layout_part_4')
+line = 'SRC_ADDR_X 3', word = 'SRC_ADDR_X'
+
+    @pytest.mark.parametrize("line,word", [
+        ("RESERVED 3 BYTE", "RESERVED"),
+        ("AXIS_RESCALE_X 3 UBYTE 5 INDEX_INCR DIRECT", "AXIS_RESCALE_X"),
+        ("IDENTIFICATION 3 UWORD", "IDENTIFICATION"),
+        ("AXIS_PTS_Z 3 UBYTE INDEX_INCR DIRECT", "AXIS_PTS_Z"),
+        ("SRC_ADDR_X 3", "SRC_ADDR_X"),
+        ("STATIC_RECORD_LAYOUT", "STATIC_RECORD_LAYOUT"),
+    ])
+    def test_r_a2l_def_84_layout_part(tmp_path, line, word):
+>       block = curve("CP", "0x100", "RL_P", axis("STD_AXIS", "CM_IDENT", "2", "0", "255"),
+                      extras=(rl("RL_P", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT",
+                                 "FNC_VALUES 2 UWORD ROW_DIR DIRECT", line),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:522: TypeError
+___ test_r_a2l_def_84_layout_part[STATIC_RECORD_LAYOUT-STATIC_RECORD_LAYOUT] ___
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_84_layout_part_5')
+line = 'STATIC_RECORD_LAYOUT', word = 'STATIC_RECORD_LAYOUT'
+
+    @pytest.mark.parametrize("line,word", [
+        ("RESERVED 3 BYTE", "RESERVED"),
+        ("AXIS_RESCALE_X 3 UBYTE 5 INDEX_INCR DIRECT", "AXIS_RESCALE_X"),
+        ("IDENTIFICATION 3 UWORD", "IDENTIFICATION"),
+        ("AXIS_PTS_Z 3 UBYTE INDEX_INCR DIRECT", "AXIS_PTS_Z"),
+        ("SRC_ADDR_X 3", "SRC_ADDR_X"),
+        ("STATIC_RECORD_LAYOUT", "STATIC_RECORD_LAYOUT"),
+    ])
+    def test_r_a2l_def_84_layout_part(tmp_path, line, word):
+>       block = curve("CP", "0x100", "RL_P", axis("STD_AXIS", "CM_IDENT", "2", "0", "255"),
+                      extras=(rl("RL_P", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT",
+                                 "FNC_VALUES 2 UWORD ROW_DIR DIRECT", line),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:522: TypeError
+________________ test_r_a2l_def_84_7_component_with_extra_words ________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_84_7_component_0')
+
+    def test_r_a2l_def_84_7_component_with_extra_words(tmp_path):
+>       block = curve("CP2", "0x100", "RL_P2", axis("STD_AXIS", "CM_IDENT", "4", "0", "255"),
+                      extras=(rl("RL_P2", "NO_AXIS_PTS_X 1 UBYTE AXIS_PTS_X 2 UBYTE INDEX_INCR DIRECT",
+                                 "FNC_VALUES 3 UWORD ROW_DIR DIRECT"),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:531: TypeError
+______________________ test_r_a2l_def_85_1_alternate_mode ______________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_85_1_alternate_0')
+
+    def test_r_a2l_def_85_1_alternate_mode(tmp_path):
+>       a2l = inline(tmp_path, valblk("VA", "0x10", "RL_A", extras=("MATRIX_DIM 2",)),
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     rl("RL_A", "FNC_VALUES 1 UWORD ALTERNATE_WITH_X DIRECT"))
+E       TypeError: valblk() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:540: TypeError
+___________________ test_r_a2l_def_85_2_unknown_point_order ____________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_85_2_unknown_po0')
+
+    def test_r_a2l_def_85_2_unknown_point_order(tmp_path):
+>       block = curve("C", "0x100", "RL_B", axis("STD_AXIS", "CM_IDENT", "2", "0", "255"),
+                      extras=(rl("RL_B", "AXIS_PTS_X 1 UBYTE INDEX_X DIRECT",
+                                 "FNC_VALUES 2 UWORD ROW_DIR DIRECT"),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:547: TypeError
+___________________ test_r_a2l_def_85_3_pointer_address_type ___________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_85_3_pointer_ad0')
+
+    def test_r_a2l_def_85_3_pointer_address_type(tmp_path):
+>       a2l = inline(tmp_path, valblk("VA", "0x10", "RL_A", extras=("MATRIX_DIM 2",)),
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     rl("RL_A", "FNC_VALUES 1 UWORD ROW_DIR PBYTE"))
+E       TypeError: valblk() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:556: TypeError
+_______________________ test_r_a2l_def_85_4_missing_mode _______________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_85_4_missing_mo0')
+
+    def test_r_a2l_def_85_4_missing_mode(tmp_path):
+>       a2l = inline(tmp_path, valblk("VA", "0x10", "RL_A", extras=("MATRIX_DIM 2",)),
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     rl("RL_A", "FNC_VALUES 1 UWORD"))
+E       TypeError: valblk() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:563: TypeError
+_________________ test_r_a2l_def_86_1_unknown_values_datatype __________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_86_1_unknown_va0')
+
+    def test_r_a2l_def_86_1_unknown_values_datatype(tmp_path):
+>       a2l = inline(tmp_path, valblk("VD", "0x10", "RL_D", extras=("MATRIX_DIM 2",)),
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     rl("RL_D", "FNC_VALUES 1 FOO ROW_DIR DIRECT"))
+E       TypeError: valblk() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:570: TypeError
+__________________ test_r_a2l_def_86_2_byte_on_axis_component __________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_86_2_byte_on_ax0')
+
+    def test_r_a2l_def_86_2_byte_on_axis_component(tmp_path):
+>       block = curve("C", "0x100", "RL_B", axis("STD_AXIS", "CM_IDENT", "2", "0", "255"),
+                      extras=(rl("RL_B", "AXIS_PTS_X 1 BYTE INDEX_INCR DIRECT",
+                                 "FNC_VALUES 2 UWORD ROW_DIR DIRECT"),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:577: TypeError
+__________________ test_r_a2l_def_86_3_float_count_component ___________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_86_3_float_coun0')
+
+    def test_r_a2l_def_86_3_float_count_component(tmp_path):
+>       block = curve("CQ", "0x100", "RL_CQ", axis("STD_AXIS", "CM_IDENT", "4", "0", "255"),
+                      extras=(rl("RL_CQ", "NO_AXIS_PTS_X 1 FLOAT16_IEEE",
+                                 "AXIS_PTS_X 2 UBYTE INDEX_INCR DIRECT",
+                                 "FNC_VALUES 3 UWORD ROW_DIR DIRECT"),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:586: TypeError
+_______________ test_r_a2l_def_86_4_count_component_no_datatype ________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_86_4_count_comp0')
+
+    def test_r_a2l_def_86_4_count_component_no_datatype(tmp_path):
+>       block = curve("CQ", "0x100", "RL_CQ", axis("STD_AXIS", "CM_IDENT", "4", "0", "255"),
+                      extras=(rl("RL_CQ", "NO_AXIS_PTS_X 1",
+                                 "AXIS_PTS_X 2 UBYTE INDEX_INCR DIRECT",
+                                 "FNC_VALUES 3 UWORD ROW_DIR DIRECT"),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:597: TypeError
+_______________ test_r_a2l_def_87_1_two_components_one_position ________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_87_1_two_compon0')
+
+    def test_r_a2l_def_87_1_two_components_one_position(tmp_path):
+>       block = curve("C", "0x100", "RL_Q", axis("STD_AXIS", "CM_IDENT", "2", "0", "255"),
+                      extras=(rl("RL_Q", "AXIS_PTS_X 2 UWORD INDEX_INCR DIRECT",
+                                 "FNC_VALUES 2 UWORD ROW_DIR DIRECT"),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:608: TypeError
+__________________ test_r_a2l_def_87_2_position_not_a_number ___________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_87_2_position_n0')
+
+    def test_r_a2l_def_87_2_position_not_a_number(tmp_path):
+>       block = curve("C", "0x100", "RL_Q", axis("STD_AXIS", "CM_IDENT", "2", "0", "255"),
+                      extras=(rl("RL_Q", "AXIS_PTS_X x UWORD INDEX_INCR DIRECT",
+                                 "FNC_VALUES 2 UWORD ROW_DIR DIRECT"),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:617: TypeError
+____________________ test_r_a2l_def_88_1_declared_alignment ____________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_88_1_declared_a0')
+
+    def test_r_a2l_def_88_1_declared_alignment(tmp_path):
+>       d = _describe("CA2", _ca2(tmp_path, True))
+                             ^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition_arrays.py:636: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_88_1_declared_a0')
+with_alignment = True
+
+    def _ca2(tmp_path, with_alignment: bool):
+        lines = ["NO_AXIS_PTS_X 1 UBYTE", "AXIS_PTS_X 2 UBYTE INDEX_INCR DIRECT"]
+        if with_alignment:
+            lines.append("ALIGNMENT_WORD 2")
+        lines.append("FNC_VALUES 3 UWORD ROW_DIR DIRECT")
+>       block = curve("CA2", "0x100", "RL_CA2", axis("STD_AXIS", "CM_IDENT", "2", "0", "255"),
+                      extras=(rl("RL_CA2", *lines),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:630: TypeError
+______________________ test_r_a2l_def_88_2_packed_layout _______________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_88_2_packed_lay0')
+
+    def test_r_a2l_def_88_2_packed_layout(tmp_path):
+>       d = _describe("CA2", _ca2(tmp_path, False))
+                             ^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition_arrays.py:641: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_88_2_packed_lay0')
+with_alignment = False
+
+    def _ca2(tmp_path, with_alignment: bool):
+        lines = ["NO_AXIS_PTS_X 1 UBYTE", "AXIS_PTS_X 2 UBYTE INDEX_INCR DIRECT"]
+        if with_alignment:
+            lines.append("ALIGNMENT_WORD 2")
+        lines.append("FNC_VALUES 3 UWORD ROW_DIR DIRECT")
+>       block = curve("CA2", "0x100", "RL_CA2", axis("STD_AXIS", "CM_IDENT", "2", "0", "255"),
+                      extras=(rl("RL_CA2", *lines),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:630: TypeError
+______________________ test_r_a2l_def_88_3_position_order ______________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_88_3_position_o0')
+
+    def test_r_a2l_def_88_3_position_order(tmp_path):
+>       block = curve("C", "0x100", "RL_R", axis("STD_AXIS", "CM_IDENT", "2", "0", "255"),
+                      extras=(rl("RL_R", "FNC_VALUES 2 UWORD ROW_DIR DIRECT",
+                                 "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT"),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:646: TypeError
+____________________ test_r_a2l_def_90_2_fix_no_axis_pts_y _____________________
+
+upd1 = {'path': '/tmp/b103-e4-3a-int/tree/examples/case_00_public/update_test1.a2l', 'sections': [{'name': 'PROJECT', 'meta':...source': 'formula', 'unit': None, ...}, {'address': 0, 'length': 4, 'source': 'formula', 'unit': None, ...}, ...], ...}
+
+    def test_r_a2l_def_90_2_fix_no_axis_pts_y(upd1):
+>       name = next(t["name"] for t in upd1["tags"]
+                    if t.get("char_type") == "MAP"
+                    and "FIX_NO_AXIS_PTS_Y" in (t.get("record_layout_name") or ""))
+E       StopIteration
+
+tests/test_b103_a2l_definition_arrays.py:684: StopIteration
+___________________ test_r_a2l_def_91_1_curve_with_two_axes ____________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_91_1_curve_with0')
+
+    def test_r_a2l_def_91_1_curve_with_two_axes(tmp_path):
+        ax = axis("STD_AXIS", "CM_IDENT", "2", "0", "255")
+>       block = curve("C2", "0x100", "RL_U16", ax, extras=(rl("RL_C2", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT",
+                                                              "AXIS_PTS_Y 2 UWORD INDEX_INCR DIRECT",
+                                                              "FNC_VALUES 3 UWORD ROW_DIR DIRECT"),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:696: TypeError
+_____________________ test_r_a2l_def_91_3_curve_with_none ______________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_91_3_curve_with0')
+
+    def test_r_a2l_def_91_3_curve_with_none(tmp_path):
+>       a2l = inline(tmp_path, characteristic("C0", "CURVE", "0x100", "RL_U16", "CM_IDENT", "0", "65535"))
+                               ^^^^^^^^^^^^^^
+E       NameError: name 'characteristic' is not defined
+
+tests/test_b103_a2l_definition_arrays.py:719: NameError
+______________ test_r_a2l_def_92_4_axis_header_on_begin_line_h3e _______________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_92_4_axis_heade0')
+
+    def test_r_a2l_def_92_4_axis_header_on_begin_line_h3e(tmp_path):
+>       block = curve("CB1", "0x100", "RL_CB1", axis("STD_AXIS", "CM_IDENT", "4", "0", "255", on_begin=True),
+                      extras=(rl("RL_CB1", "AXIS_PTS_X 1 UBYTE INDEX_INCR DIRECT",
+                                 "FNC_VALUES 2 UWORD ROW_DIR DIRECT"),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:743: TypeError
+___________ test_r_a2l_def_92_5_map_with_one_axis_read_has_no_count ____________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_92_5_map_with_o0')
+
+    def test_r_a2l_def_92_5_map_with_one_axis_read_has_no_count(tmp_path):
+        ax_x = axis("STD_AXIS", "CM_IDENT", "2", "0", "255")
+        ax_y = axis("FOO_AXIS", "CM_IDENT", "3", "0", "255")
+        block = mapchar("MK", "0x100", "RL_U16", ax_x, ax_y)
+        a2l = inline(tmp_path, block)
+        d = _describe("MK", a2l)
+        is_refused(d, "A2L-DEF-AXIS-KIND", "MK.Y: the system cannot read an axis of the kind FOO_AXIS")
+        assert d.shape == () and d.element_count is None and d.byte_length is None
+>       assert len(d.axes) == 2 and d.axes[0].axis_kind == "STD_AXIS"
+E       AssertionError: assert (1 == 2)
+E        +  where 1 = len((AxisDefinition(letter='X', axis_kind='STD_AXIS', point_count=2, points=Definition(name='MK.X', section='AXIS_DESCR', ...one, axis_object_address=None, axis_object_record=None, monotony='STRICT_MON', has_points=False, count_datatype=None),))
+E        +    where (AxisDefinition(letter='X', axis_kind='STD_AXIS', point_count=2, points=Definition(name='MK.X', section='AXIS_DESCR', ...one, axis_object_address=None, axis_object_record=None, monotony='STRICT_MON', has_points=False, count_datatype=None),) = Definition(name='MK', section='CHARACTERISTIC', char_type='MAP', kind='map', address=256, byte_length=None, datatype='...ne, axis_object_address=None, axis_object_record=None, monotony='STRICT_MON', has_points=False, count_datatype=None),)).axes
+
+tests/test_b103_a2l_definition_arrays.py:762: AssertionError
+__________________ test_r_a2l_def_94_2_axis_object_count_wins __________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_94_2_axis_objec0')
+
+    def test_r_a2l_def_94_2_axis_object_count_wins(tmp_path):
+>       d = _describe("CR", _com_curve(tmp_path))
+                            ^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition_arrays.py:787: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_94_2_axis_objec0')
+axo_max = '5'
+
+    def _com_curve(tmp_path, axo_max="5"):
+        """The COM_AXIS curve of R-A2L-DEF.94/2: AXO max ``axo_max``."""
+>       axo = axis_pts("AXO", "0x40", "RL_AXO", axo_max,
+                       extras=rl("RL_AXO", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT"))
+E       TypeError: axis_pts() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:779: TypeError
+_________________ test_r_a2l_def_95_3_axis_object_max_minus_3 __________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_95_3_axis_objec0')
+
+    def test_r_a2l_def_95_3_axis_object_max_minus_3(tmp_path):
+>       d = _describe("CR", _com_curve(tmp_path, axo_max="-3"))
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition_arrays.py:830: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_95_3_axis_objec0')
+axo_max = '-3'
+
+    def _com_curve(tmp_path, axo_max="5"):
+        """The COM_AXIS curve of R-A2L-DEF.94/2: AXO max ``axo_max``."""
+>       axo = axis_pts("AXO", "0x40", "RL_AXO", axo_max,
+                       extras=rl("RL_AXO", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT"))
+E       TypeError: axis_pts() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:779: TypeError
+__________________ test_r_a2l_def_96_3_axis_object_no_address __________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_96_3_axis_objec0')
+
+    def test_r_a2l_def_96_3_axis_object_no_address(tmp_path):
+>       axo = axis_pts("AXO", "0xZZ", "RL_AXO", "5",
+                       extras=rl("RL_AXO", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT"))
+E       TypeError: axis_pts() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:850: TypeError
+___________________ test_r_a2l_def_96_4_address_word_not_one ___________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_96_4_address_wo0')
+
+    def test_r_a2l_def_96_4_address_word_not_one(tmp_path):
+>       axo = axis_pts("AXO", "0x81_0340", "RL_AXO", "5",
+                       extras=rl("RL_AXO", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT"))
+E       TypeError: axis_pts() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:860: TypeError
+________________ test_r_a2l_def_97_2_axis_layout_no_axis_pts_x _________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_97_2_axis_layou0')
+
+    def test_r_a2l_def_97_2_axis_layout_no_axis_pts_x(tmp_path):
+>       axo = axis_pts("AXO", "0x40", "RL_FNC", "5",
+                       extras=rl("RL_FNC", "FNC_VALUES 1 UWORD ROW_DIR DIRECT"))
+E       TypeError: axis_pts() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:879: TypeError
+______________ test_r_a2l_def_101_1_in_record_points_for_fix_axis ______________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_101_1_in_record0')
+
+    def test_r_a2l_def_101_1_in_record_points_for_fix_axis(tmp_path):
+>       block = curve("F", "0x100", "RL_FX", axis("FIX_AXIS", "CM_IDENT", "2", "0", "255",
+                                                   "FIX_AXIS_PAR_DIST 0 1 2"),
+                      extras=(rl("RL_FX", "AXIS_PTS_X 1 UBYTE INDEX_INCR DIRECT",
+                                 "FNC_VALUES 2 UWORD ROW_DIR DIRECT"),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:927: TypeError
+______________ test_r_a2l_def_101_2_in_record_points_for_com_axis ______________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_101_2_in_record0')
+
+    def test_r_a2l_def_101_2_in_record_points_for_com_axis(tmp_path):
+>       axo = axis_pts("AXO", "0x40", "RL_AXO", "5",
+                       extras=rl("RL_AXO", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT"))
+E       TypeError: axis_pts() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:937: TypeError
+_____________ test_r_a2l_def_102_3_axis_own_conversion_and_format ______________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_102_3_axis_own_0')
+
+    def test_r_a2l_def_102_3_axis_own_conversion_and_format(tmp_path):
+        blocks = [cm("CM_HALF", "LINEAR", "0.5", "0", fmt='"%.1"'),
+>                 curve("CL", "0x100", "RL_CL",
+                        axis("STD_AXIS", "CM_HALF", "4", "0", "100", 'FORMAT "%.1"'),
+                        extras=(rl("RL_CL", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT",
+                                   "FNC_VALUES 2 UWORD ROW_DIR DIRECT"),))]
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:965: TypeError
+___________ test_r_a2l_def_102_4_axis_desc_method_used_for_com_axis ____________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_102_4_axis_desc0')
+
+    def test_r_a2l_def_102_4_axis_desc_method_used_for_com_axis(tmp_path):
+        blocks = [cm("CM_A", "LINEAR", "2", "0"), cm("CM_B", "LINEAR", "3", "0"),
+>                 axis_pts("AXO", "0x40", "RL_AXO", "5", "CM_B",
+                           extras=rl("RL_AXO", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT")),
+                  curve("CR", "0x100", "RL_U16", axis("COM_AXIS", "CM_A", "8", "0", "255",
+                                                      "AXIS_PTS_REF AXO"))]
+E       TypeError: axis_pts() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:977: TypeError
+________________ test_r_a2l_def_103_1_axis_method_not_declared _________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_103_1_axis_meth0')
+
+    def test_r_a2l_def_103_1_axis_method_not_declared(tmp_path):
+>       block = curve("CA", "0x100", "RL_CA", axis("STD_AXIS", "CM_GONE", "2", "0", "255"),
+                      extras=(rl("RL_CA", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT",
+                                 "FNC_VALUES 2 UWORD ROW_DIR DIRECT"),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:986: TypeError
+___________________ test_r_a2l_def_103_2_enum_axis_no_table ____________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_103_2_enum_axis0')
+
+    def test_r_a2l_def_103_2_enum_axis_no_table(tmp_path):
+        ax_y = axis("STD_AXIS", "CM_V", "2", "0", "255")
+        ax_x = axis("STD_AXIS", "CM_IDENT", "2", "0", "255")
+        blocks = [cm("CM_V", "TAB_VERB", fmt='"%.0"'),
+                  mapchar("MA", "0x100", "RL_U16", ax_x, ax_y)]
+        a2l = inline(tmp_path, *blocks)
+>       is_refused(_describe("MA", a2l), "A2L-DEF-TABLE",
+                   "MA.Y: the table (none) of CM_V is not declared in the A2L")
+
+tests/test_b103_a2l_definition_arrays.py:1000: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+d = Definition(name='MA', section='CHARACTERISTIC', char_type='MAP', kind='map', address=256, byte_length=8, datatype='UWO...one, axis_object_address=None, axis_object_record=None, monotony='STRICT_MON', has_points=False, count_datatype=None)))
+code = 'A2L-DEF-TABLE'
+message = 'MA.Y: the table (none) of CM_V is not declared in the A2L'
+
+    def is_refused(d, code: str, message: str) -> None:
+        from s19_app.tui.a2l_definition import Refusal
+>       assert d.refusal == Refusal(code, message), d.refusal
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Refusal(code='A2L-DEF-METHOD', message='MA: the conversion method CM_IDENT is not declared in the A2L')
+
+tests/support/b103_a2l_arrays.py:188: AssertionError
+________________ test_r_a2l_def_104_2_matrix_dim_before_layout _________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_104_2_matrix_di0')
+
+    def test_r_a2l_def_104_2_matrix_dim_before_layout(tmp_path):
+>       a2l = inline(tmp_path, valblk("VQ", "0x10", "RL_GONE", extras=("MATRIX_DIM 0",)))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: valblk() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:1009: TypeError
+______________ test_r_a2l_def_104_3_layout_parts_before_axis_kind ______________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_104_3_layout_pa0')
+
+    def test_r_a2l_def_104_3_layout_parts_before_axis_kind(tmp_path):
+        ax = axis("RES_AXIS", "CM_IDENT", "2", "0", "255", "AXIS_PTS_REF AXO")
+>       block = curve("C", "0x100", "RL_P", ax,
+                      extras=(rl("RL_P", "RESERVED 2 BYTE", "FNC_VALUES 2 UWORD ROW_DIR DIRECT"),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:1015: TypeError
+_________________ test_r_a2l_def_142_2_9_digit_std_axis_count __________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_142_2_9_digit_s0')
+
+    def test_r_a2l_def_142_2_9_digit_std_axis_count(tmp_path):
+>       block = curve("CW", "0x100", "RL_CW", axis("STD_AXIS", "CM_IDENT", "999999999", "0", "255"),
+                      extras=(rl("RL_CW", "AXIS_PTS_X 1 UBYTE INDEX_INCR DIRECT",
+                                 "FNC_VALUES 2 UBYTE ROW_DIR DIRECT"),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:1064: TypeError
+_______________ test_r_a2l_def_142_3_axis_object_count_over_cap ________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_142_3_axis_obje0')
+
+    def test_r_a2l_def_142_3_axis_object_count_over_cap(tmp_path):
+>       d = _describe("CR", _com_curve(tmp_path, axo_max="1048577"))
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition_arrays.py:1073: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_142_3_axis_obje0')
+axo_max = '1048577'
+
+    def _com_curve(tmp_path, axo_max="5"):
+        """The COM_AXIS curve of R-A2L-DEF.94/2: AXO max ``axo_max``."""
+>       axo = axis_pts("AXO", "0x40", "RL_AXO", axo_max,
+                       extras=rl("RL_AXO", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT"))
+E       TypeError: axis_pts() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:779: TypeError
+________________ test_r_a2l_def_142_4_largest_point_count_read _________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_142_4_largest_p0')
+
+    def test_r_a2l_def_142_4_largest_point_count_read(tmp_path):
+        block = curve("CU", "0x100", "RL_U8", axis("STD_AXIS", "CM_IDENT", "1048576", "0", "255"))
+        a2l = inline(tmp_path, block)
+        d = _describe("CU", a2l)
+>       assert d.refusal is None
+E       AssertionError: assert Refusal(code='A2L-DEF-METHOD', message='CU: the conversion method CM_IDENT is not declared in the A2L') is None
+E        +  where Refusal(code='A2L-DEF-METHOD', message='CU: the conversion method CM_IDENT is not declared in the A2L') = Definition(name='CU', section='CHARACTERISTIC', char_type='CURVE', kind='curve', address=256, byte_length=1048576, dat...ne, axis_object_address=None, axis_object_record=None, monotony='STRICT_MON', has_points=False, count_datatype=None),)).refusal
+
+tests/test_b103_a2l_definition_arrays.py:1082: AssertionError
+______________ test_r_a2l_def_143_1_axis_object_negative_address _______________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_143_1_axis_obje0')
+
+    def test_r_a2l_def_143_1_axis_object_negative_address(tmp_path):
+>       axo = axis_pts("AXO", "-0x10", "RL_AXO", "5",
+                       extras=rl("RL_AXO", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT"))
+E       TypeError: axis_pts() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:1089: TypeError
+________________ test_r_a2l_def_143_2_last_byte_above_ffffffff _________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_143_2_last_byte0')
+
+    def test_r_a2l_def_143_2_last_byte_above_ffffffff(tmp_path):
+>       axo = axis_pts("AXO", "0xFFFFFFF7", "RL_AXO", "5",
+                       extras=rl("RL_AXO", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT"))
+E       TypeError: axis_pts() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:1099: TypeError
+______________ test_r_a2l_def_143_3_axis_object_record_above_1mib ______________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_143_3_axis_obje0')
+
+    def test_r_a2l_def_143_3_axis_object_record_above_1mib(tmp_path):
+>       axo = axis_pts("AXO", "0x40", "RL_AXO", "600000",
+                       extras=rl("RL_AXO", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT"))
+E       TypeError: axis_pts() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:1109: TypeError
+___________________ test_r_a2l_def_143_4_last_byte_ffffffff ____________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_143_4_last_byte0')
+
+    def test_r_a2l_def_143_4_last_byte_ffffffff(tmp_path):
+>       axo = axis_pts("AXO", "0xFFFFFFF6", "RL_AXO", "5",
+                       extras=rl("RL_AXO", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT"))
+E       TypeError: axis_pts() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:1119: TypeError
+_____________ test_r_a2l_def_144_1_unreadable_mod_common_alignment _____________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_144_1_unreadabl0')
+
+    def test_r_a2l_def_144_1_unreadable_mod_common_alignment(tmp_path):
+>       a2l = inline(tmp_path, curve("CA2", "0x100", "RL_CA2", axis("STD_AXIS", "CM_IDENT", "2", "0", "255"),
+                                     extras=(rl("RL_CA2", "NO_AXIS_PTS_X 1 UBYTE",
+                                                "AXIS_PTS_X 2 UBYTE INDEX_INCR DIRECT",
+                                                "FNC_VALUES 3 UWORD ROW_DIR DIRECT"),)),
+                     mod_common=("ALIGNMENT_WORD x",))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:1130: TypeError
+_________ test_r_a2l_def_144_2_layout_own_alignment_no_mod_common_read _________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_144_2_layout_ow0')
+
+    def test_r_a2l_def_144_2_layout_own_alignment_no_mod_common_read(tmp_path):
+>       a2l = inline(tmp_path, curve("CA2", "0x100", "RL_CA2", axis("STD_AXIS", "CM_IDENT", "2", "0", "255"),
+                                     extras=(rl("RL_CA2", "NO_AXIS_PTS_X 1 UBYTE",
+                                                "AXIS_PTS_X 2 UBYTE INDEX_INCR DIRECT",
+                                                "ALIGNMENT_WORD 2",
+                                                "FNC_VALUES 3 UWORD ROW_DIR DIRECT"),)),
+                     mod_common=("ALIGNMENT_WORD x",))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:1140: TypeError
+____________ test_r_a2l_def_144_3_unreadable_alignment_unused_class ____________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_144_3_unreadabl0')
+
+    def test_r_a2l_def_144_3_unreadable_alignment_unused_class(tmp_path):
+>       a2l = inline(tmp_path, curve("CA2", "0x100", "RL_CA2", axis("STD_AXIS", "CM_IDENT", "2", "0", "255"),
+                                     extras=(rl("RL_CA2", "NO_AXIS_PTS_X 1 UBYTE",
+                                                "AXIS_PTS_X 2 UBYTE INDEX_INCR DIRECT",
+                                                "FNC_VALUES 3 UWORD ROW_DIR DIRECT"),)),
+                     mod_common=("ALIGNMENT_LONG x",))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays.py:1151: TypeError
+_ test_r_a2l_def_147_fix_point_bound[3-FIX_AXIS_PAR_DIST 0 4503599627370496 3-ok] _
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_147_fix_point_b2')
+maxpts = '3', par = 'FIX_AXIS_PAR_DIST 0 4503599627370496 3', expected = 'ok'
+
+    @pytest.mark.parametrize("maxpts,par,expected", [
+        ("1", "FIX_AXIS_PAR 0 1024 1", "refuse"),
+        ("6", "FIX_AXIS_PAR_DIST 7.484401160755199e+291 3.5953862697246315e+307 6", "refuse"),
+        ("3", "FIX_AXIS_PAR_DIST 0 4503599627370496 3", "ok"),
+        ("3", "FIX_AXIS_PAR_DIST 1 4503599627370496 3", "refuse"),
+        ("3", "FIX_AXIS_PAR 1 52 3", "refuse"),
+        ("1", "FIX_AXIS_PAR 0 62 1", "ok"),
+        ("1", "FIX_AXIS_PAR 0 63 1", "refuse"),
+        ("4", "FIX_AXIS_PAR 0 -1 4", "refuse"),
+        ("4", "FIX_AXIS_PAR 0 1000000000 4", "refuse"),
+        ("2", "FIX_AXIS_PAR 0 1023 2", "refuse"),
+        ("1", "FIX_AXIS_PAR 9007199254740993 0 1", "ok"),
+    ])
+    def test_r_a2l_def_147_fix_point_bound(tmp_path, maxpts, par, expected):
+        block = curve("FE", "0x100", "RL_U16", axis("FIX_AXIS", "CM_IDENT", maxpts, "0", "255", par))
+        a2l = inline(tmp_path, block)
+        d = _describe("FE", a2l)
+        if expected == "refuse":
+            is_refused(d, "A2L-DEF-AXIS-FIX",
+                       "FE.X: the fixed axis gives a point the system cannot compute exactly")
+        else:
+>           assert d.refusal is None
+E           AssertionError: assert Refusal(code='A2L-DEF-METHOD', message='FE: the conversion method CM_IDENT is not declared in the A2L') is None
+E            +  where Refusal(code='A2L-DEF-METHOD', message='FE: the conversion method CM_IDENT is not declared in the A2L') = Definition(name='FE', section='CHARACTERISTIC', char_type='CURVE', kind='curve', address=256, byte_length=6, datatype=...one, axis_object_address=None, axis_object_record=None, monotony='STRICT_MON', has_points=True, count_datatype=None),)).refusal
+
+tests/test_b103_a2l_definition_arrays.py:1181: AssertionError
+_________ test_r_a2l_def_147_fix_point_bound[1-FIX_AXIS_PAR 0 62 1-ok] _________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_147_fix_point_b5')
+maxpts = '1', par = 'FIX_AXIS_PAR 0 62 1', expected = 'ok'
+
+    @pytest.mark.parametrize("maxpts,par,expected", [
+        ("1", "FIX_AXIS_PAR 0 1024 1", "refuse"),
+        ("6", "FIX_AXIS_PAR_DIST 7.484401160755199e+291 3.5953862697246315e+307 6", "refuse"),
+        ("3", "FIX_AXIS_PAR_DIST 0 4503599627370496 3", "ok"),
+        ("3", "FIX_AXIS_PAR_DIST 1 4503599627370496 3", "refuse"),
+        ("3", "FIX_AXIS_PAR 1 52 3", "refuse"),
+        ("1", "FIX_AXIS_PAR 0 62 1", "ok"),
+        ("1", "FIX_AXIS_PAR 0 63 1", "refuse"),
+        ("4", "FIX_AXIS_PAR 0 -1 4", "refuse"),
+        ("4", "FIX_AXIS_PAR 0 1000000000 4", "refuse"),
+        ("2", "FIX_AXIS_PAR 0 1023 2", "refuse"),
+        ("1", "FIX_AXIS_PAR 9007199254740993 0 1", "ok"),
+    ])
+    def test_r_a2l_def_147_fix_point_bound(tmp_path, maxpts, par, expected):
+        block = curve("FE", "0x100", "RL_U16", axis("FIX_AXIS", "CM_IDENT", maxpts, "0", "255", par))
+        a2l = inline(tmp_path, block)
+        d = _describe("FE", a2l)
+        if expected == "refuse":
+            is_refused(d, "A2L-DEF-AXIS-FIX",
+                       "FE.X: the fixed axis gives a point the system cannot compute exactly")
+        else:
+>           assert d.refusal is None
+E           AssertionError: assert Refusal(code='A2L-DEF-METHOD', message='FE: the conversion method CM_IDENT is not declared in the A2L') is None
+E            +  where Refusal(code='A2L-DEF-METHOD', message='FE: the conversion method CM_IDENT is not declared in the A2L') = Definition(name='FE', section='CHARACTERISTIC', char_type='CURVE', kind='curve', address=256, byte_length=2, datatype=...one, axis_object_address=None, axis_object_record=None, monotony='STRICT_MON', has_points=True, count_datatype=None),)).refusal
+
+tests/test_b103_a2l_definition_arrays.py:1181: AssertionError
+__ test_r_a2l_def_147_fix_point_bound[1-FIX_AXIS_PAR 9007199254740993 0 1-ok] __
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_147_fix_point_b10')
+maxpts = '1', par = 'FIX_AXIS_PAR 9007199254740993 0 1', expected = 'ok'
+
+    @pytest.mark.parametrize("maxpts,par,expected", [
+        ("1", "FIX_AXIS_PAR 0 1024 1", "refuse"),
+        ("6", "FIX_AXIS_PAR_DIST 7.484401160755199e+291 3.5953862697246315e+307 6", "refuse"),
+        ("3", "FIX_AXIS_PAR_DIST 0 4503599627370496 3", "ok"),
+        ("3", "FIX_AXIS_PAR_DIST 1 4503599627370496 3", "refuse"),
+        ("3", "FIX_AXIS_PAR 1 52 3", "refuse"),
+        ("1", "FIX_AXIS_PAR 0 62 1", "ok"),
+        ("1", "FIX_AXIS_PAR 0 63 1", "refuse"),
+        ("4", "FIX_AXIS_PAR 0 -1 4", "refuse"),
+        ("4", "FIX_AXIS_PAR 0 1000000000 4", "refuse"),
+        ("2", "FIX_AXIS_PAR 0 1023 2", "refuse"),
+        ("1", "FIX_AXIS_PAR 9007199254740993 0 1", "ok"),
+    ])
+    def test_r_a2l_def_147_fix_point_bound(tmp_path, maxpts, par, expected):
+        block = curve("FE", "0x100", "RL_U16", axis("FIX_AXIS", "CM_IDENT", maxpts, "0", "255", par))
+        a2l = inline(tmp_path, block)
+        d = _describe("FE", a2l)
+        if expected == "refuse":
+            is_refused(d, "A2L-DEF-AXIS-FIX",
+                       "FE.X: the fixed axis gives a point the system cannot compute exactly")
+        else:
+>           assert d.refusal is None
+E           AssertionError: assert Refusal(code='A2L-DEF-METHOD', message='FE: the conversion method CM_IDENT is not declared in the A2L') is None
+E            +  where Refusal(code='A2L-DEF-METHOD', message='FE: the conversion method CM_IDENT is not declared in the A2L') = Definition(name='FE', section='CHARACTERISTIC', char_type='CURVE', kind='curve', address=256, byte_length=2, datatype=...one, axis_object_address=None, axis_object_record=None, monotony='STRICT_MON', has_points=True, count_datatype=None),)).refusal
+
+tests/test_b103_a2l_definition_arrays.py:1181: AssertionError
+_____________________ test_r_a2l_def_105_4_masked_elements _____________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_105_4_masked_el0')
+
+    def test_r_a2l_def_105_4_masked_elements(tmp_path):
+        a2l = inline(tmp_path, valblk("VM", "0x10", "RL_U16", "CM_IDENT", "0", "65535",
+                                      "MATRIX_DIM 2", "BIT_MASK 0x0F00"))
+        d = a2ldef.describe_definition("VM", a2l)
+        res = _decode(d, a2l, img(0x10, bytes([0x12, 0x34, 0x0A, 0x00])))
+>       assert _stored(res) == [2, 10]
+               ^^^^^^^^^^^^
+
+tests/test_b103_a2l_definition_arrays_decode.py:164: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = Refusal(code='A2L-DEF-METHOD', message='VM: the conversion method CM_IDENT is not declared in the A2L')
+
+    def _stored(res) -> list:
+>       return [v.stored for v in res.values]
+                                  ^^^^^^^^^^
+E       AttributeError: 'Refusal' object has no attribute 'values'
+
+tests/test_b103_a2l_definition_arrays_decode.py:78: AttributeError
+________________ test_r_a2l_def_105_5_unmatched_enum_axis_point ________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_105_5_unmatched0')
+
+    def test_r_a2l_def_105_5_unmatched_enum_axis_point(tmp_path):
+        ax_x = axis("STD_AXIS", "CM_IDENT", "2", "0", "255")
+        ax_y = axis("STD_AXIS", "CM_E", "2", "0", "255")
+        blocks = [cm("CM_E", "TAB_VERB", fmt='"%.0"', ref="VT_E"),
+                  vtab("VT_E", "2", '0 "OFF"', '1 "ON"'),
+                  mapchar("M", "0x100", "RL_M", ax_x, ax_y,
+                          extras=(rl("RL_M", "AXIS_PTS_X 1 UBYTE INDEX_INCR DIRECT",
+                                     "AXIS_PTS_Y 2 UBYTE INDEX_INCR DIRECT",
+                                     "FNC_VALUES 3 UWORD ROW_DIR DIRECT"),))]
+        a2l = inline(tmp_path, *blocks)
+        d = a2ldef.describe_definition("M", a2l)
+        # image: point bytes X 0A 14, Y 01 07, then 4 UWORD value bytes
+        image = img(0x100, bytes([0x0A, 0x14, 0x01, 0x07, 0, 0, 0, 0]))
+        res = _decode(d, a2l, image)
+>       y_points = res.axes[1].points
+                   ^^^^^^^^
+E       AttributeError: 'Refusal' object has no attribute 'axes'
+
+tests/test_b103_a2l_definition_arrays_decode.py:181: AttributeError
+______________________ test_r_a2l_def_107_1_column_dir_2d ______________________
+
+v171 = {'path': '/tmp/b103-e4-3a-int/tree/examples/case_00_public/ASAP2_Demo_V171.a2l', 'sections': [{'name': 'PROJECT', 'met...ce': 'formula', 'unit': None, ...}, {'address': 80384, 'length': 1, 'source': 'formula', 'unit': None, ...}, ...], ...}
+
+    def test_r_a2l_def_107_1_column_dir_2d(v171):
+        d = a2ldef.describe_definition("ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.COLUMN_DIR", v171)
+        image = img(0x810120, _swords(*range(1, 13)))
+        res = _decode(d, v171, image)
+>       assert res.values[4].stored == 5  # (1,0)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert 6 == 5
+E        +  where 6 = Decoded(stored=6, value=6, text='6').stored
+
+tests/test_b103_a2l_definition_arrays_decode.py:217: AssertionError
+____________________ test_r_a2l_def_108_1_index_incr_points ____________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_108_1_index_inc0')
+
+    def test_r_a2l_def_108_1_index_incr_points(tmp_path):
+>       block = curve("CI", "0x100", "RL_CI", axis("STD_AXIS", "CM_IDENT", "4", "0", "255"),
+                      extras=(rl("RL_CI", "NO_AXIS_PTS_X 1 UBYTE",
+                                 "AXIS_PTS_X 2 UBYTE INDEX_INCR DIRECT",
+                                 "FNC_VALUES 3 UWORD ROW_DIR DIRECT"),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays_decode.py:246: TypeError
+__________________ test_r_a2l_def_109_2_index_decr_in_record ___________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_109_2_index_dec0')
+
+    def test_r_a2l_def_109_2_index_decr_in_record(tmp_path):
+>       block = curve("CD", "0x100", "RL_CD", axis("STD_AXIS", "CM_IDENT", "4", "0", "255"),
+                      extras=(rl("RL_CD", "NO_AXIS_PTS_X 1 UBYTE",
+                                 "AXIS_PTS_X 2 UBYTE INDEX_DECR DIRECT",
+                                 "FNC_VALUES 3 UWORD ROW_DIR DIRECT"),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays_decode.py:266: TypeError
+______________________ test_r_a2l_def_110_1_fix_axis_par _______________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_110_1_fix_axis_0')
+
+    def test_r_a2l_def_110_1_fix_axis_par(tmp_path):
+        block = curve("F", "0x100", "RL_U16", axis("FIX_AXIS", "CM_IDENT", "4", "0", "255",
+                                                   "FIX_AXIS_PAR 0 2 4"))
+        a2l = inline(tmp_path, block)
+        d = a2ldef.describe_definition("F", a2l)
+        res = _decode(d, a2l, img(0x100, bytes(8)))
+>       assert [p.stored for p in res.axes[0].points] == [0, 4, 8, 12]
+                                  ^^^^^^^^
+E       AttributeError: 'Refusal' object has no attribute 'axes'
+
+tests/test_b103_a2l_definition_arrays_decode.py:283: AttributeError
+__________________ test_r_a2l_def_110_2_fix_axis_par_shift_0 ___________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_110_2_fix_axis_0')
+
+    def test_r_a2l_def_110_2_fix_axis_par_shift_0(tmp_path):
+        block = curve("F", "0x100", "RL_U16", axis("FIX_AXIS", "CM_IDENT", "4", "0", "255",
+                                                   "FIX_AXIS_PAR 0 0 4"))
+        a2l = inline(tmp_path, block)
+        d = a2ldef.describe_definition("F", a2l)
+        res = _decode(d, a2l, img(0x100, bytes(8)))
+>       assert [p.stored for p in res.axes[0].points] == [0, 1, 2, 3]
+                                  ^^^^^^^^
+E       AttributeError: 'Refusal' object has no attribute 'axes'
+
+tests/test_b103_a2l_definition_arrays_decode.py:292: AttributeError
+_______________ test_r_a2l_def_114_1_axis_object_own_byte_order ________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_114_1_axis_obje0')
+
+    def test_r_a2l_def_114_1_axis_object_own_byte_order(tmp_path):
+>       axo = axis_pts("AXO", "0x40", "RL_AXO", "5", "CM_IDENT", "0", "255",
+                       "BYTE_ORDER MSB_LAST", extras=rl("RL_AXO", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT"))
+E       TypeError: axis_pts() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays_decode.py:333: TypeError
+____________ test_r_a2l_def_114_2_module_byte_order_for_axis_object ____________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_114_2_module_by0')
+
+    def test_r_a2l_def_114_2_module_byte_order_for_axis_object(tmp_path):
+>       axo = axis_pts("AXO", "0x40", "RL_AXO", "5",
+                       extras=rl("RL_AXO", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT"))
+E       TypeError: axis_pts() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays_decode.py:345: TypeError
+__________________ test_r_a2l_def_115_2_two_count_components ___________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_115_2_two_count0')
+
+    def test_r_a2l_def_115_2_two_count_components(tmp_path):
+        block = mapchar("MN", "0x100", "RL_MN", axis("STD_AXIS", "CM_IDENT", "3", "0", "255"),
+                        axis("STD_AXIS", "CM_IDENT", "2", "0", "255"),
+                        extras=(rl("RL_MN", "NO_AXIS_PTS_X 1 UBYTE", "NO_AXIS_PTS_Y 2 UBYTE",
+                                   "AXIS_PTS_X 3 UBYTE INDEX_INCR DIRECT",
+                                   "AXIS_PTS_Y 4 UBYTE INDEX_INCR DIRECT",
+                                   "FNC_VALUES 5 UWORD ROW_DIR DIRECT"),))
+        a2l = inline(tmp_path, block)
+        d = a2ldef.describe_definition("MN", a2l)
+        # count bytes 03 02, 3 + 2 point bytes, 12 value bytes
+        image = img(0x100, bytes([0x03, 0x02, 0x0A, 0x14, 0x1E, 0x0B, 0x15]) + bytes(12))
+        res = _decode(d, a2l, image)
+>       assert len(res.axes[0].points) == 3 and len(res.axes[1].points) == 2
+                   ^^^^^^^^
+E       AttributeError: 'Refusal' object has no attribute 'axes'
+
+tests/test_b103_a2l_definition_arrays_decode.py:375: AttributeError
+________________ test_r_a2l_def_116_2_4_negative_current_count _________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_116_2_4_negativ0')
+
+    def test_r_a2l_def_116_2_4_negative_current_count(tmp_path):
+>       block = curve("CN", "0x100", "RL_CN", axis("STD_AXIS", "CM_IDENT", "4", "0", "255"),
+                      extras=(rl("RL_CN", "NO_AXIS_PTS_X 1 SBYTE",
+                                 "AXIS_PTS_X 2 UBYTE INDEX_INCR DIRECT",
+                                 "FNC_VALUES 3 UWORD ROW_DIR DIRECT"),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays_decode.py:399: TypeError
+__________________ test_r_a2l_def_116_1_3_fix_no_axis_pts_x_0 __________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_116_1_3_fix_no_0')
+
+    def test_r_a2l_def_116_1_3_fix_no_axis_pts_x_0(tmp_path):
+>       block = curve("CZ", "0x100", "RL_CZ", axis("STD_AXIS", "CM_IDENT", "4", "0", "255"),
+                      extras=(rl("RL_CZ", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT",
+                                 "FNC_VALUES 2 UWORD ROW_DIR DIRECT", "FIX_NO_AXIS_PTS_X 0"),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays_decode.py:413: TypeError
+__________________ test_r_a2l_def_117_2_3_map_x_axis_partial ___________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_117_2_3_map_x_a0')
+
+    def test_r_a2l_def_117_2_3_map_x_axis_partial(tmp_path):
+        block = mapchar("MN", "0x100", "RL_MN", axis("STD_AXIS", "CM_IDENT", "3", "0", "255"),
+                        axis("STD_AXIS", "CM_IDENT", "2", "0", "255"),
+                        extras=(rl("RL_MN", "NO_AXIS_PTS_X 1 UBYTE", "NO_AXIS_PTS_Y 2 UBYTE",
+                                   "AXIS_PTS_X 3 UBYTE INDEX_INCR DIRECT",
+                                   "AXIS_PTS_Y 4 UBYTE INDEX_INCR DIRECT",
+                                   "FNC_VALUES 5 UWORD ROW_DIR DIRECT"),))
+        a2l = inline(tmp_path, block)
+        d = a2ldef.describe_definition("MN", a2l)
+        image = img(0x100, bytes([0x02, 0x02, 0x0A, 0x14, 0x1E, 0x0B, 0x15]) + bytes(12))
+        res = _decode(d, a2l, image)
+        assert isinstance(res, a2ldef.Refusal)
+>       assert res == Refusal("A2L-DEF-AXIS-PARTIAL",
+                              "MN.X: the record holds 2 of its 3 points — "
+                              "a record with fewer points than its maximum is not supported")
+E       AssertionError: assert Refusal(code=...d in the A2L') == Refusal(code=...ot supported')
+E         
+E         Differing attributes:
+E         ['code', 'message']
+E         
+E         Drill down into differing attribute code:
+E           code: 'A2L-DEF-METHOD' != 'A2L-DEF-AXIS-PARTIAL'
+E           - A2L-DEF-AXIS-PARTIAL...
+E         
+E         ...Full output truncated, use '-vv' to show
+
+tests/test_b103_a2l_definition_arrays_decode.py:451: AssertionError
+_____________________ test_r_a2l_def_5_arr_1_case_included _____________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_5_arr_1_case_in0')
+
+    def test_r_a2l_def_5_arr_1_case_included(tmp_path):
+        a2l = inline(tmp_path,
+>                    valblk("DUPA", "0x20", "RL_U16", extras=("MATRIX_DIM 2",)),
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     valblk("dupa", "0x10", "RL_U16", extras=("MATRIX_DIM 2",)))
+E       TypeError: valblk() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays_decode.py:522: TypeError
+_________________ test_r_a2l_def_139_arr_1_name_declared_twice _________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_139_arr_1_name_0')
+
+    def test_r_a2l_def_139_arr_1_name_declared_twice(tmp_path):
+        a2l = inline(tmp_path,
+>                    valblk("DUPA", "0x10", "RL_U16", extras=("MATRIX_DIM 2",)),
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     valblk("DUPA", "0x20", "RL_U16", extras=("MATRIX_DIM 2",)))
+E       TypeError: valblk() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays_decode.py:530: TypeError
+________________ test_r_a2l_def_7_1_arr_2_array_with_no_address ________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_7_1_arr_2_array0')
+
+    def test_r_a2l_def_7_1_arr_2_array_with_no_address(tmp_path):
+>       a2l = inline(tmp_path, meas("MA0", "UBYTE", extras=("MATRIX_DIM 4",)))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: meas() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays_decode.py:547: TypeError
+______________ test_r_a2l_def_7_1_arr_3_curve_record_passes_1mib _______________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_7_1_arr_3_curve0')
+
+    def test_r_a2l_def_7_1_arr_3_curve_record_passes_1mib(tmp_path):
+        block = curve("CBIG", "0x100", "RL_U16", axis("STD_AXIS", "CM_IDENT", "600000", "0", "65535",
+                                                       "FNC_VALUES 1 UWORD INDEX_INCR DIRECT"))
+        # The axis block above is wrong; build the curve with an in-record layout instead.
+>       block = curve("CBIG", "0x100", "RL_CBIG", axis("STD_AXIS", "CM_IDENT", "600000", "0", "65535"),
+                      extras=(rl("RL_CBIG", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT",
+                                 "FNC_VALUES 2 UWORD ROW_DIR DIRECT"),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays_decode.py:556: TypeError
+____________ test_r_a2l_def_7_2_arr_1_span_bound_on_computed_length ____________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_7_2_arr_1_span_0')
+
+    def test_r_a2l_def_7_2_arr_1_span_bound_on_computed_length(tmp_path):
+>       a2l = inline(tmp_path, valblk("VH", "0x10", "RL_U8", extras=("MATRIX_DIM 1048577",)))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: valblk() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays_decode.py:566: TypeError
+______________ test_r_a2l_def_7_2_arr_2_last_byte_above_ffffffff _______________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_7_2_arr_2_last_0')
+
+    def test_r_a2l_def_7_2_arr_2_last_byte_above_ffffffff(tmp_path):
+>       a2l = inline(tmp_path, valblk("VW", "0xFFFFFFF0", "RL_U16", extras=("MATRIX_DIM 3 4",)))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: valblk() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays_decode.py:573: TypeError
+____________________ test_r_a2l_def_7_2_arr_3_exactly_1_mib ____________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_7_2_arr_3_exact0')
+
+    def test_r_a2l_def_7_2_arr_3_exactly_1_mib(tmp_path):
+>       a2l = inline(tmp_path, meas("MH", "UBYTE", addr="0x10", extras=("MATRIX_DIM 1024 1024",)))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: meas() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays_decode.py:579: TypeError
+_________________ test_r_a2l_def_26_arr_1_missing_record_bytes _________________
+
+v171 = {'path': '/tmp/b103-e4-3a-int/tree/examples/case_00_public/ASAP2_Demo_V171.a2l', 'sections': [{'name': 'PROJECT', 'met...ce': 'formula', 'unit': None, ...}, {'address': 80384, 'length': 1, 'source': 'formula', 'unit': None, ...}, ...], ...}
+
+    def test_r_a2l_def_26_arr_1_missing_record_bytes(v171):
+        d = a2ldef.describe_definition("ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR", v171)
+        image = img(0x810100, _swords(*range(1, 13))[:-2])
+        res = _decode(d, v171, image)
+        assert isinstance(res, a2ldef.Refusal)
+>       assert res == Refusal("A2L-DEF-BYTES",
+                              "ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR: 1 of its 24 bytes are not in the image")
+E       AssertionError: assert Refusal(code=...in the image') == Refusal(code=...in the image')
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing attributes:
+E         ['message']
+E         
+E         Drill down into differing attribute message:
+E           message: 'ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR: 2 of its 24 bytes are not in the image' != 'ASAM.C.ARRAY.SWORD.MATRIX_DIM_3_4.ROW_DIR: 1 of its 24 bytes are not in the image'...
+E         
+E         ...Full output truncated, use '-vv' to show
+
+tests/test_b103_a2l_definition_arrays_decode.py:589: AssertionError
+_______________ test_r_a2l_def_58_2_arr_1_5000_digit_matrix_dim ________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_58_2_arr_1_50000')
+
+    def test_r_a2l_def_58_2_arr_1_5000_digit_matrix_dim(tmp_path):
+        big = "9" * 5000
+>       a2l = inline(tmp_path, valblk("VX", "0x10", "RL_U16", extras=(f"MATRIX_DIM {big}",)))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: valblk() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays_decode.py:606: TypeError
+__________ test_r_a2l_def_137_arr_1_control_character_in_layout_word ___________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_137_arr_1_contr0')
+
+    def test_r_a2l_def_137_arr_1_control_character_in_layout_word(tmp_path):
+>       a2l = inline(tmp_path, valblk("VG", "0x10", "RL\x1bX", extras=("MATRIX_DIM 2",)))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: valblk() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays_decode.py:621: TypeError
+___________ test_r_a2l_def_137_arr_4_control_character_in_matrix_dim ___________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_137_arr_4_contr0')
+
+    def test_r_a2l_def_137_arr_4_control_character_in_matrix_dim(tmp_path):
+>       a2l = inline(tmp_path, valblk("VX", "0x10", "RL_U16", extras=("MATRIX_DIM 3 \x1b",)))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: valblk() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays_decode.py:635: TypeError
+_________________ test_r_a2l_def_58_2_arr_2_5000_digit_number __________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_58_2_arr_2_50000')
+
+    def test_r_a2l_def_58_2_arr_2_5000_digit_number(tmp_path):
+>       a2l = inline(tmp_path, valblk("VN5", "0x10", "RL_U16", extras=(f"NUMBER {_BIG}",)))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: valblk() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays_decode.py:768: TypeError
+________________ test_r_a2l_def_58_2_arr_3_5000_digit_position _________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_58_2_arr_3_50000')
+
+    def test_r_a2l_def_58_2_arr_3_5000_digit_position(tmp_path):
+>       block = curve("C", "0x100", "RL_Q", axis("STD_AXIS", "CM_IDENT", "2", "0", "255"),
+                      extras=(rl("RL_Q", f"AXIS_PTS_X {_BIG} UWORD INDEX_INCR DIRECT",
+                                 "FNC_VALUES 2 UWORD ROW_DIR DIRECT"),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays_decode.py:774: TypeError
+____________ test_r_a2l_def_58_2_arr_4_5000_digit_fix_no_axis_pts_x ____________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_58_2_arr_4_50000')
+
+    def test_r_a2l_def_58_2_arr_4_5000_digit_fix_no_axis_pts_x(tmp_path):
+>       block = curve("CZ", "0x100", "RL_Z", axis("STD_AXIS", "CM_IDENT", "4", "0", "255"),
+                      extras=(rl("RL_Z", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT",
+                                 "FNC_VALUES 2 UWORD ROW_DIR DIRECT", f"FIX_NO_AXIS_PTS_X {_BIG}"),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays_decode.py:783: TypeError
+___________ test_r_a2l_def_58_2_arr_5_5000_digit_alignment_in_layout ___________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_58_2_arr_5_50000')
+
+    def test_r_a2l_def_58_2_arr_5_5000_digit_alignment_in_layout(tmp_path):
+>       block = curve("CA2", "0x100", "RL_CA2", axis("STD_AXIS", "CM_IDENT", "2", "0", "255"),
+                      extras=(rl("RL_CA2", "NO_AXIS_PTS_X 1 UBYTE",
+                                 "AXIS_PTS_X 2 UBYTE INDEX_INCR DIRECT",
+                                 f"ALIGNMENT_WORD {_BIG}", "FNC_VALUES 3 UWORD ROW_DIR DIRECT"),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays_decode.py:792: TypeError
+_________ test_r_a2l_def_58_2_arr_6_5000_digit_alignment_in_mod_common _________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_58_2_arr_6_50000')
+
+    def test_r_a2l_def_58_2_arr_6_5000_digit_alignment_in_mod_common(tmp_path):
+>       block = curve("CA2", "0x100", "RL_CA2", axis("STD_AXIS", "CM_IDENT", "2", "0", "255"),
+                      extras=(rl("RL_CA2", "NO_AXIS_PTS_X 1 UBYTE",
+                                 "AXIS_PTS_X 2 UBYTE INDEX_INCR DIRECT",
+                                 "FNC_VALUES 3 UWORD ROW_DIR DIRECT"),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays_decode.py:802: TypeError
+___________ test_r_a2l_def_58_2_arr_8_5000_digit_axis_object_address ___________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_58_2_arr_8_50000')
+
+    def test_r_a2l_def_58_2_arr_8_5000_digit_axis_object_address(tmp_path):
+>       axo = axis_pts("AXO", _BIG, "RL_AXO", "5",
+                       extras=rl("RL_AXO", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT"))
+E       TypeError: axis_pts() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays_decode.py:814: TypeError
+_________________ test_r_a2l_def_58_2_arr_9_float32_nan_count __________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_58_2_arr_9_floa0')
+
+    def test_r_a2l_def_58_2_arr_9_float32_nan_count(tmp_path):
+>       block = curve("CQ", "0x100", "RL_CQ", axis("STD_AXIS", "CM_IDENT", "4", "0", "255"),
+                      extras=(rl("RL_CQ", "NO_AXIS_PTS_X 1 FLOAT32_IEEE",
+                                 "AXIS_PTS_X 2 UBYTE INDEX_INCR DIRECT",
+                                 "FNC_VALUES 3 UWORD ROW_DIR DIRECT"),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays_decode.py:824: TypeError
+_______________ test_r_a2l_def_151_arr_1_echo_cap_in_layout_part _______________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_151_arr_1_echo_0')
+
+    def test_r_a2l_def_151_arr_1_echo_cap_in_layout_part(tmp_path):
+        word = "P" * 1000000
+>       block = curve("CP", "0x100", "RL_P", axis("STD_AXIS", "CM_IDENT", "2", "0", "255"),
+                      extras=(rl("RL_P", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT",
+                                 "FNC_VALUES 2 UWORD ROW_DIR DIRECT", word),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays_decode.py:845: TypeError
+__________________ test_r_a2l_def_151_arr_2_256_character_cut __________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_151_arr_2_256_c0')
+
+    def test_r_a2l_def_151_arr_2_256_character_cut(tmp_path):
+        for n, suffix in ((256, ""), (257, "…")):
+            word = "P" * n
+>           block = curve("CP", "0x100", "RL_P", axis("STD_AXIS", "CM_IDENT", "2", "0", "255"),
+                          extras=(rl("RL_P", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT",
+                                     "FNC_VALUES 2 UWORD ROW_DIR DIRECT", word),))
+E           TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays_decode.py:857: TypeError
+_______ test_r_a2l_def_151_arr_6_ufffd_for_each_character_outside_21_7e ________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_151_arr_6_ufffd0')
+
+    def test_r_a2l_def_151_arr_6_ufffd_for_each_character_outside_21_7e(tmp_path):
+>       block = curve("CP", "0x100", "RL_P", axis("STD_AXIS", "CM_IDENT", "2", "0", "255"),
+                      extras=(rl("RL_P", "AXIS_PTS_X 1 UWORD INDEX_INCR DIRECT",
+                                 "FNC_VALUES 2 UWORD ROW_DIR DIRECT", "R\x1bÉ\x7fX"),))
+E       TypeError: curve() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays_decode.py:867: TypeError
+________________ test_r_a2l_def_148_6_shared_axis_object_scales ________________
+
+tmp_path = PosixPath('/tmp/b103-e4-3a-int/tree/zq_iso_user/pytest-main/test_r_a2l_def_148_6_shared_ax0')
+
+    def test_r_a2l_def_148_6_shared_axis_object_scales(tmp_path):
+>       axo = axis_pts("AXO", "0x100", "RL_AXO", "4",
+                       extras=rl("RL_AXO", "NO_AXIS_PTS_X 1 UBYTE",
+                                 "AXIS_PTS_X 2 UBYTE INDEX_INCR DIRECT",
+                                 *("DEPOSIT ABSOLUTE",) * 100))
+E       TypeError: axis_pts() got an unexpected keyword argument 'extras'
+
+tests/test_b103_a2l_definition_arrays_scale.py:153: TypeError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_58_2_23_a_matrix_dim_of_5000_hex_digits_is_a_refusal_not_an_exception
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_151_4_a_matrix_dim_number_is_written_by_the_number_rule
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_64_6_leading_1_matrix_dim
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_68_2_number_10
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_69_2_small_length_only_val_blk
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_70_1_length_not_whole_values
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_71_matrix_dim_refused[3 0-3 0]
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_71_matrix_dim_refused[2 2 2 2-2 2 2 2]
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_71_matrix_dim_refused[x-x]
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_71_matrix_dim_refused[-(none)]
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_71_5_malformed_measurement_not_scalar
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_73_9_unreadable_shape_has_no_count
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_76_1_length_differs
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_76_2_data_size_differs
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_77_3_curve_layout_starts_with_count
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_78_1_layout_column_dir
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_78_2_layout_row_dir
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_80_1_3d_column_dir_measurement
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_80_2_3d_column_dir_val_blk
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_81_1_undeclared_method_on_array
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_81_2_dangling_enum_table
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_81_3_zero_mask_on_map
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_81_5_unreadable_mask_word
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_145_1_matrix_dim_on_curve
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_145_2_matrix_dim_on_value
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_145_3_matrix_dim_1_on_curve
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_82_2_undeclared_layout_on_val_blk
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_83_1_layout_with_no_fnc_values
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_84_layout_part[RESERVED 3 BYTE-RESERVED]
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_84_layout_part[AXIS_RESCALE_X 3 UBYTE 5 INDEX_INCR DIRECT-AXIS_RESCALE_X]
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_84_layout_part[IDENTIFICATION 3 UWORD-IDENTIFICATION]
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_84_layout_part[AXIS_PTS_Z 3 UBYTE INDEX_INCR DIRECT-AXIS_PTS_Z]
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_84_layout_part[SRC_ADDR_X 3-SRC_ADDR_X]
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_84_layout_part[STATIC_RECORD_LAYOUT-STATIC_RECORD_LAYOUT]
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_84_7_component_with_extra_words
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_85_1_alternate_mode
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_85_2_unknown_point_order
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_85_3_pointer_address_type
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_85_4_missing_mode
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_86_1_unknown_values_datatype
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_86_2_byte_on_axis_component
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_86_3_float_count_component
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_86_4_count_component_no_datatype
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_87_1_two_components_one_position
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_87_2_position_not_a_number
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_88_1_declared_alignment
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_88_2_packed_layout
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_88_3_position_order
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_90_2_fix_no_axis_pts_y
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_91_1_curve_with_two_axes
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_91_3_curve_with_none
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_92_4_axis_header_on_begin_line_h3e
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_92_5_map_with_one_axis_read_has_no_count
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_94_2_axis_object_count_wins
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_95_3_axis_object_max_minus_3
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_96_3_axis_object_no_address
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_96_4_address_word_not_one
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_97_2_axis_layout_no_axis_pts_x
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_101_1_in_record_points_for_fix_axis
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_101_2_in_record_points_for_com_axis
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_102_3_axis_own_conversion_and_format
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_102_4_axis_desc_method_used_for_com_axis
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_103_1_axis_method_not_declared
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_103_2_enum_axis_no_table
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_104_2_matrix_dim_before_layout
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_104_3_layout_parts_before_axis_kind
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_142_2_9_digit_std_axis_count
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_142_3_axis_object_count_over_cap
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_142_4_largest_point_count_read
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_143_1_axis_object_negative_address
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_143_2_last_byte_above_ffffffff
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_143_3_axis_object_record_above_1mib
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_143_4_last_byte_ffffffff
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_144_1_unreadable_mod_common_alignment
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_144_2_layout_own_alignment_no_mod_common_read
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_144_3_unreadable_alignment_unused_class
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_147_fix_point_bound[3-FIX_AXIS_PAR_DIST 0 4503599627370496 3-ok]
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_147_fix_point_bound[1-FIX_AXIS_PAR 0 62 1-ok]
+FAILED tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_147_fix_point_bound[1-FIX_AXIS_PAR 9007199254740993 0 1-ok]
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_105_4_masked_elements
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_105_5_unmatched_enum_axis_point
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_107_1_column_dir_2d
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_108_1_index_incr_points
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_109_2_index_decr_in_record
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_110_1_fix_axis_par
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_110_2_fix_axis_par_shift_0
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_114_1_axis_object_own_byte_order
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_114_2_module_byte_order_for_axis_object
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_115_2_two_count_components
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_116_2_4_negative_current_count
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_116_1_3_fix_no_axis_pts_x_0
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_117_2_3_map_x_axis_partial
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_5_arr_1_case_included
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_139_arr_1_name_declared_twice
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_7_1_arr_2_array_with_no_address
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_7_1_arr_3_curve_record_passes_1mib
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_7_2_arr_1_span_bound_on_computed_length
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_7_2_arr_2_last_byte_above_ffffffff
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_7_2_arr_3_exactly_1_mib
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_26_arr_1_missing_record_bytes
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_58_2_arr_1_5000_digit_matrix_dim
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_137_arr_1_control_character_in_layout_word
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_137_arr_4_control_character_in_matrix_dim
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_58_2_arr_2_5000_digit_number
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_58_2_arr_3_5000_digit_position
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_58_2_arr_4_5000_digit_fix_no_axis_pts_x
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_58_2_arr_5_5000_digit_alignment_in_layout
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_58_2_arr_6_5000_digit_alignment_in_mod_common
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_58_2_arr_8_5000_digit_axis_object_address
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_58_2_arr_9_float32_nan_count
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_151_arr_1_echo_cap_in_layout_part
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_151_arr_2_256_character_cut
+FAILED tests/test_b103_a2l_definition_arrays_decode.py::test_r_a2l_def_151_arr_6_ufffd_for_each_character_outside_21_7e
+FAILED tests/test_b103_a2l_definition_arrays_scale.py::test_r_a2l_def_148_6_shared_axis_object_scales
+114 failed, 313 passed in 23.26s

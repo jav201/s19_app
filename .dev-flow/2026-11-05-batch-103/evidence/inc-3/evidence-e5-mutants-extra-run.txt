@@ -1,0 +1,42 @@
+
+=== M-63 · R-A2L-DEF.63 ===
+  verdict: KILLED
+
+=== M-136-immut · R-A2L-DEF.136 (immutability arm) ===
+  verdict: KILLED
+
+=== M-5 · R-A2L-DEF.5 ===
+  verdict: KILLED
+
+=== M-6 · R-A2L-DEF.6 ===
+  verdict: KILLED
+
+=== M-7.1a · R-A2L-DEF.7.1 (array arm) ===
+  verdict: KILLED
+
+=== M-7.1b · R-A2L-DEF.7.1 (curve/map arm) ===
+  verdict: KILLED
+
+=== M-26 · R-A2L-DEF.26 ===
+  verdict: KILLED
+
+=== M-58.2a · R-A2L-DEF.58.2 (whole-number word) ===
+  verdict: KILLED
+
+=== M-58.2b · R-A2L-DEF.58.2 (axis object address word) ===
+  verdict: KILLED
+
+=== M-137 · R-A2L-DEF.137 ===
+  verdict: KILLED
+
+=== M-148-reduce · R-A2L-DEF.148 (reduce once per walk) ===
+  verdict: SURVIVED
+
+=== M-150-text · R-A2L-DEF.150 (text cleaned once) ===
+  verdict: KILLED
+
+=== M-150-bisect · R-A2L-DEF.150 (bisect v2) ===
+  verdict: KILLED
+
+counts: KILLED=12, SURVIVED=1
+unimplemented (not run): M-58.1, M-010, M-011, M-019, M-026, M-148-reads, M-148-echo, M-150-lookup

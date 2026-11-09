@@ -1,0 +1,44 @@
+Done. The fix is a single targeted restructure of `_describe_array`'s CHARACTERISTIC byte-length block, verified with `py_compile` (passed, no output).
+
+## Exact diff (my change only)
+
+```diff
+--- a/s19_app/tui/a2l_definition.py
++++ b/s19_app/tui/a2l_definition.py
+@@
+     byte_length: Optional[int] = None
+     if base.section == "CHARACTERISTIC" and layout is not None and not isinstance(layout, Refusal) and shape:
++        if kind == "array":
++            size = DATATYPE_SIZES.get(datatype) if datatype else None
++            byte_length = element_count * size if (size is not None and element_count is not None) else None
+         placed = _place_components(layout, shape)
+         if placed is None:
+-            byte_length = None
++            if kind != "array":
++                byte_length = None
+         else:
+             offsets, end = placed
+             values_offset = offsets.get("FNC_VALUES", 0)
+-            if kind == "array":
+-                size = DATATYPE_SIZES.get(datatype) if datatype else None
+-                byte_length = element_count * size if (size is not None and element_count is not None) else None
+-            else:
++            if kind != "array":
+                 byte_length = end
+             new_axes: list[AxisDefinition] = []
+```
+
+## What changed and why
+
+- **Array byte_length** is now computed from `element_count * DATATYPE_SIZES[datatype]` **before** `_place_components` and no longer clobbered to `None` when the walker returns `None` past `MAX_A2L_DECODE_BYTES`. For `arr-1` this yields `1048577`, which then trips the existing span check (`byte_length > MAX_A2L_DECODE_BYTES`) → `A2L-DEF-ADDRESS` span refusal, never the no-length refusal.
+- **`values_offset`** is still only taken from component placement when `placed` is available (unchanged path).
+- **curve/map** byte_length remains tied to the walk `end` when `placed` is available, and stays `None` (no-length) when `placed is None` (the `kind != "array"` guard preserves that).
+- **Refusal order, all other fields, APIs, and the `new_axes`/`axes_list` loop** are untouched; no tests, records, or commits were modified.
+
+Verification run (isolated env, `-I -B`, closed stdin):
+
+```
+/home/<runner>/miniconda3/envs/s19ci/bin/python -I -B -m py_compile s19_app/tui/a2l_definition.py
+```
+
+Exit 0, no output.

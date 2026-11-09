@@ -1,0 +1,103 @@
+# Inc 3a coverage audit — read-only
+
+## 1. Scope & evidence status
+
+**Audited:** `.dev-flow/2026-11-05-batch-103/inc-3/02-test-cases.md` (280 3a cases), `01-requirements.md` (expected values), all `tests/test_b103_a2l_definition_arrays*.py` (5 files), `tests/support/b103_a2l_arrays.py`, and the modified `test_b103_a2l_definition.py` / `test_b103_synth_definitions.py` + `tools/synth/make_release_case.py` + `s19_app/tui/a2l_definition.py`. No files edited, no tests run.
+
+**Evidence files named in the brief do not exist.** There is no `inc-3/evidence-e4/` directory (only `evidence-e1` and `evidence-e3`), and no `evidence-e4-green-all-functional.txt` / `evidence-e4-coverage-functional.txt` anywhere in the tree. The only run artifacts are pytest `tmp_path` leftovers under `zq_iso_user/`:
+
+| Dir | Last touched | Contents imply |
+|---|---|---|
+| `zq_iso_user/pytest-green-all-functional` | 11:56 | functional lane (arrays.py + decode.py + coverage.py) executed |
+| `zq_iso_user/pytest-coverage-green` | 11:54 | coverage.py executed |
+| `zq_iso_user/pytest-serial` | 12:04 | scale.py `serial_timing` executed |
+| `zq_iso_user/pytest-serial-fixed` | 12:10 | scale.py re-run after the 12:06 fix |
+| `zq_iso_user/pytest-existing` | 10:52 | synth `.59/1` etc. executed |
+
+These are tmpdir fixtures only (e.g. `covN.a2l`, `firmware.a2l`, `b103_i3a_c08*`); **no captured pass/fail terminal report is committed.** `.pytest_cache/v/cache/lastfailed` is stale (lists only the four since-withdrawn Inc 2 tests `.4/1,.2,.3,.7`). "Green" is therefore **implied by directory naming, not proven by a committed report.**
+
+---
+
+## 2. Coverage counts
+
+| Group | Cases | Full | Partial | Gap |
+|---|---|---|---|---|
+| S2.7e (requirement) | 65 | 64 | 0 | **1** |
+| S2.7f (requirement) | 115 | 110 | **4** | **1** |
+| S2.7g (requirement) | 40 | 38 | 2 | 0 |
+| S2.7i (requirement) | 3 | 3 | 0 | 0 |
+| **Requirement total** | **223** | **215** | **6** | **2** |
+| Cited rows | 53 | 52 | 1 | 0 |
+| Acceptance | 4 | 2 | 2 | 0 |
+| **3a total** | **280** | **269** | **9** | **2** |
+
+**Verification (run) status:** 271 of 280 cases have a test in the new arrays files or an existing test they map to. 7 cases are not run / not proven: `.142/5`, `.142/6` (fix_cap.py written but **never executed** — no tmpdir evidence in any `zq_iso_user/pytest-*`), plus the 2 gaps and the timing arm of `.147/9`.
+
+---
+
+## 3. Exact gaps
+
+### Gaps (no test asserts the expected result)
+
+1. **`.66/3` — "definitions case's map → kind map"** (S2.7e). No test. `test_r_a2l_def_134_1_definitions_case_map` (`tests/test_b103_a2l_definition_arrays_decode.py:686-693`) describes `MAP_DEF_0001` but asserts only `d.refusal is None`, never `d.kind == "map"`.
+
+2. **`.93/3` — "definitions case's MAP axis X → its planned point count"** (S2.7f). No test. `.134/1` (`decode.py:690`) asserts the decoded points `[224, 577, 648, 909]` but never `d.axes[0].point_count`.
+
+### Partial (covered implicitly or half-verified)
+
+3. **`.147/3`, `.147/6`, `.147/11`** (S2.7f) — decode side missing. `test_r_a2l_def_147_fix_point_bound` (`tests/test_b103_a2l_definition_arrays.py:1161-1182`) only runs `_describe`; the "ok" branch asserts `d.refusal is None` and `rule[0] == par.split()[0].replace("FIX_AXIS_", "")`. It does **not** assert the case's decode expectations: `/3` stored points `0, 4503599627370496, 9007199254740992` as `int`; `/6` stored point `0`; `/11` stored point `9007199254740992` — nor the full `fixed_rule` tuples (`("PAR",(0,62,1))`, `("PAR",(9007199254740992,0,1))`). The `rule[0]` check is effectively a self-echo of the input keyword.
+
+4. **`.147/9`** (S2.7f) — "refused **within 1.0 s**, no power computed" timing arm not asserted. Same parametrize (`.147/9` is the `("4","FIX_AXIS_PAR 0 1000000000 4","refuse")` param) checks only the refusal; the case is not in the `serial_timing` lane and installs no clock.
+
+5. **`.108/2`** (S2.7g, DEFC map axis X INDEX_INCR) — no dedicated test; covered only implicitly by `.134/1`'s decoded-points assertion (`decode.py:690`).
+
+6. **`.113/2`** (S2.7g, DEFC two COM curves share one axis object) — no dedicated test; covered only implicitly by `.133/1` (`decode.py:672-680`) which decodes both `CURVE_DEF_0001`/`_0002` to the same axis points.
+
+7. **`R-A2L-024/arr-1`** (cited; case 08 array byte order) — no dedicated `d.byte_order` assertion. Covered only implicitly by `.107/2`, `.107/3`, `AT-B103-I3-3` which reconstruct expected values with `endian = ">" if o["big_endian"] else "<"` (`decode.py:226,239,751`).
+
+8. **`AT-B103-I3-1` 3a arm** (`decode.py:706-738`) — decodes the two COM curves, the three FIX curves, and asserts refusal codes; but per the split table the 3a arm must also "decode those without a refusal (**the twins**, the shared axis, the three FIX forms, the refusals by code)". The 3×4 ROW_DIR/COLUMN_DIR twins, the COM/FIX map, and the MATRIX_DIM MEASUREMENT arrays are **not decoded** in the acceptance test (they are covered by the individual `.105/.106/.107` tests, so the arm is thin, not vacuous).
+
+9. **`AT-B103-I3-3` 3a arm** (`decode.py:741-759`) — covers **clean only**. The `c08` fixture (`decode.py:103-110`) loads `firmware.a2l` and never `firmware_issues.a2l`, though the acceptance case says "build and decode every VAL_BLK, CURVE and MAP of **both A2Ls**". The "issues" A2L arm is unexercised.
+
+### Covered by existing (non-arrays) tests — cited rows
+
+- `.136/arr-1` → `tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_136_1` (SOFTA 13,990 names ≤ 2.0 s; now exercises the array path since `a2l_definition.py` was rewritten).
+- `.59/arr-1` → `test_b103_synth_definitions.py::test_r_a2l_def_59_1` + `_59_2` (22 digests).
+- `.63/arr-1` → `test_b103_synth_definitions.py::test_r_a2l_def_63_1` (two folders byte-identical).
+
+---
+
+## 4. The specific findings requested
+
+### 4.1 Stale E4 reconciliation note (documentation defect)
+`02-test-cases.md` "E4 reconciliation" (added in the working-tree diff, lines ~5–32) claims: *"The `.148` full measure … is reduced to a **least-of-3 proxy**"* and lists `.148/2–.148/5`, `.148/7–.148/19`, `.150/arr-1–.150/arr-7`, `.150/arr-9–.150/arr-11`, `.151/arr-3–.151/arr-5`, `.136/arr-2`, `.136/arr-3`, `.59/arr-1`, `.63/arr-1` as *"not run as written."* This is **false against the current tree**: `tests/test_b103_a2l_definition_arrays_scale.py:44` sets `LEAST_OF = 15` and `_measure` (`scale.py:135-171`) runs the full least-of-15 interleaved measure for every `.148` case and `.150/arr-1..8,arr-10`; the coverage file provides functional arms for `.148/2..19`, `.150/arr-1..11`, `.151/arr-3..5`, `.136/arr-2..4`. The note predates the supplemental coverage/fix_cap files (note mtime 11:17 vs coverage 11:53, scale 12:06, fix_cap 12:08) and was never re-reconciled.
+
+### 4.2 Missing `.142/5–6` → present but not run
+`.142/5` and `.142/6` are **not missing**; they live in `tests/test_b103_a2l_definition_arrays_fix_cap.py:106` and `:159` (the fix-cap file). The original `test_b103_a2l_definition_arrays.py` stops at `.142/4` (`arrays.py:1077`), which is what the "missing" concern points at. However:
+- They are marked `serial_timing` but are **not in `scale.py`**; they are a separate untracked file.
+- **No execution evidence exists**: neither `zq_iso_user/pytest-serial` nor `pytest-serial-fixed` contains a `test_r_a2l_def_142_*` tmpdir, and `pytest-green-all-functional` only shows `.142/1..4`. So `.142/5–6` are **covered, not_run** — the "pending timing/fix-cap status."
+
+### 4.3 Vacuous / weak assertions
+- **`.147/3/6/11` "ok" branch** (`arrays.py:1180-1182`): the only positive assertion is `rule[0] == <keyword>` — a keyword the test itself wrote into the fixture line. This verifies almost nothing about the fixed-point computation.
+- **`_messages_bounded`** (`scale.py:177-186`) is defined but never called — dead code; the 1,024-char bound is instead checked inline per case (e.g. `scale.py:451, 465`), so the bound is still enforced, but the helper is misleading.
+- `.150/arr-9` corpus half is conditional: `coverage.py:927-935` skips the 168-file corpus when `A2L_CORPUS_FILES`/`~/a2l-corpus/files` is absent; only the inline tables are always verified (`assert checked > 0`). On a runner without the corpus the "119,684 pairs" verification degenerates to a handful of inline pairs.
+
+### 4.4 Fixture-derived expectations
+Most expected values are genuinely independent (file bytes via `struct`, the generator's `build_objects` plan, hard-coded pins). Two soft spots:
+- The **DEFC tests** `.133/1/.134/1/.135/1` (`decode.py:672-703`) hard-code the plan (`[485,635,696,828,901]`, `[37818,…]`, `[472,132,…]`, `[737,219,…]`) instead of reading `build_definition_objects(rng)`'s `planned_stored`/`planned_text` the way the C08 acceptance test does. They are valid pins (they match the generator's deterministic draws), but they do not cross-check the generator's plan against its own output, and they'd silently pass a model/generator pair that both regressed.
+- `test_r_a2l_def_94_3_a2ltool_com_axis` (`arrays.py:791`) and `AT-B103-I3-4` (`decode.py:904`) derive the COM_AXIS expected count from the file's section text (`_axis_pts_max`), which is independent of the model — acceptable.
+
+### 4.5 Timing-harness defects
+- **`_measure` absolute bound uses wall clock** (`_timed` default `time.perf_counter`, `scale.py:150`) while E3S3-24 specifies `time.process_time()` for the measure; only the ratio uses `process_time` (`_steady_describe`, `scale.py:98-110`). On a shared host this can false-RED the 0.5 s absolute bound (the exact failure mode E3S3-24 was written to avoid). The ratio part is correct: it times `names[1:]` inside one fresh walk via a lazy generator, and `describe_definitions` does consume `names` lazily (`a2l_definition.py:616-643`), so `_steady_describe` is **not** vacuous.
+- **`.142/5` `tracemalloc` peak** (`fix_cap.py:118-127`) takes `max(run_peak)` across three back-to-back `describe_definitions` calls with the same `tracemalloc.start()` — the peak is cumulative, not per-call, which over-estimates (stricter, so not a false-GREEN) but diverges from "peak < 50 MiB" as written.
+- **`.142/5`/`6` install no 60 s cap** (acknowledged in `fix_cap.py:24-26`): a regression that re-materializes points would hang rather than time out, leaving "0 timeouts" unenforced by the harness.
+- The `.148/1` check never bounds messages, but `.148/1` has no refusal/axes to bound — not a defect.
+
+---
+
+## 5. Bottom line
+
+- **269 / 280 cases** have a concrete test; **9 partial**, **2 gaps** (`.66/3`, `.93/3`).
+- The two named evidence files are **absent**; verification rests on uncommitted `zq_iso_user/` tmpdir artifacts whose directory names imply green but whose terminal reports are not committed.
+- `.142/5–6` exist (fix_cap.py) but are **not run**.
+- The biggest process defects are the **stale "least-of-3 / not run as written" reconciliation note** (now contradicted by a least-of-15 scale harness + supplemental coverage file), and the **`.147/3/6/11` decode-side under-verification** (describe-only, self-echoing `rule[0]` assertion).

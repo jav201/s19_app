@@ -1,0 +1,7 @@
+/tmp/b103-e4-3a-int/tree/s19_app/__init__.py
+R-A2L-DEF.142/5 median 0.090 s, peak 1220860 bytes (1.2 MiB)
+.
+============================= QC-TM timing margins =============================
+91.0%  0.090 s / 1.000 s  R-A2L-DEF.142/5 describe 50 fix curves + 50 fix maps  tests/test_b103_a2l_definition_arrays_fix_cap.py::test_r_a2l_def_142_5_describing_fix_axes_at_cap_builds_no_point
+QC-TM: 1 bounds, 0 under 20 % margin
+1 passed in 0.43s

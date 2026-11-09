@@ -1,0 +1,8 @@
+cloning integrated tree -> /tmp/b103-e4-3a-mutA/work/base
+base target sha256=99fd4cc1a2c7435da9e5f22dad80fd192cb1f35f7718dfa391814d9526a03f93
+=== M-141 (R-A2L-DEF.141) ===
+M-141: applied=1 KILLED rc=1
+---- summary ----
+M-141: applied=1 KILLED rc=1
+counts: {'KILLED': 1}
+DONE

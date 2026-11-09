@@ -1,0 +1,6 @@
+
+=== M-148-reduce · R-A2L-DEF.148 (reduce once per walk) ===
+  verdict: KILLED
+
+counts: KILLED=1
+unimplemented (not run): M-58.1, M-010, M-011, M-019, M-026, M-148-reads, M-148-echo, M-150-lookup

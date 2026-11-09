@@ -1,0 +1,8 @@
+/tmp/b103-e4-3a-int/tree/s19_app/__init__.py
+R-A2L-DEF.142/6 median 0.514 s (tracemalloc off)
+R-A2L-DEF.142/6 peak 66594285 bytes (63.5 MiB)
+.
+============================= QC-TM timing margins =============================
+89.7%  0.514 s / 5.000 s  R-A2L-DEF.142/6 describe FIX_AXIS_PAR_LIST at cap  tests/test_b103_a2l_definition_arrays_fix_cap.py::test_r_a2l_def_142_6_fix_axis_par_list_at_cap_describes_in_linear_time
+QC-TM: 1 bounds, 0 under 20 % margin
+1 passed in 8.95s

@@ -1,0 +1,26 @@
+I've inspected all the evidence and test files. Here are the verdicts and the tally.
+
+## Verdicts
+
+**`.136/arr-1` — FULL (covered).**
+`tests/test_b103_a2l_definition_perf.py::test_r_a2l_def_136_1_describing_every_object_is_fast` asserts exactly what the case requires: `len(set(names)) == 13990` (all SOFTA names), 3 timed runs of `describe_definitions(names, a2l)`, `len(result) == 13990` with every value a `Definition`, a non-vacuity guard (`any(d.kind == "number")` and `any(d.kind == "enum")` among non-refused — so a constant refusal can't pass), and `median ≤ report_margin(..., timing_bound(2.0))`. Evidence `evidence-e5-scalar-perf.txt` shows `50.1% 0.999 s / 2.000 s` for the `.136 describe 13990` bound, `22 passed`, `52 bounds`, `0 under 20% margin`. Fully covers "13,990 SOFTA names ≤ 2 s" with ~50% headroom.
+
+**`.59/arr-1` — FULL.**
+The case = "Inc 2's .59/1 and /2 → the 22 pinned digests". `evidence-e5-synth-cited.txt` ("3 passed") corresponds, per the `zq_iso_user/pytest-synth-cited/` artifacts, to `test_r_a2l_def_59_1_case08_at_1_mib_equals_its_pin`, `test_r_a2l_def_59_2_case08_at_10_mib_equals_its_pin` (the `@pytest.mark.slow` 10 MiB pin), and `test_r_a2l_def_63_1_the_definitions_case_is_deterministic`. Both pin tests go through the **product path** — `_run_cli` runs `subprocess.run([sys.executable, make_release_case.py, "--out", ...])`, not the in-process `gen.*` — and each asserts the 11 hardcoded base-tree digests, so 1 MiB + 10 MiB = 22 digests. Full.
+
+**`.63/arr-1` — FULL.**
+`test_r_a2l_def_63_1_the_definitions_case_is_deterministic` runs the shipped CLI `--case definitions` twice into `run_a`/`run_b` and asserts `names == ["definitions.a2l", "definitions.s19"]` with byte-identity per file. This is the product-path determinism check the case asks for ("definitions case twice into two folders → every file byte-identical"), against the current (extended) generator. Full.
+
+**`.147/9` — FULL.**
+`tests/test_b103_a2l_definition_arrays.py::test_r_a2l_def_147_9_huge_shift_computes_no_power` builds `FE` with `FIX_AXIS_PAR 0 1000000000 4`, times `_describe("FE", a2l)`, and asserts both the timing bound (`timing_bound(1.0)`) **and** the explicit refusal via `is_refused(d, "A2L-DEF-AXIS-FIX", "FE.X: the fixed axis gives a point the system cannot compute exactly")` — where `is_refused` asserts `d.refusal == Refusal(code, message)` (exact code + message). Evidence `evidence-e5-fix147-9.txt`: `100.0% 0.000 s / 1.000 s`, `1 passed`. The 1.0 s bound is exactly the "no power computed" guard (computing `2**1e9` would blow the bound). Full.
+
+## Tally
+
+These three points comprise **4 case-ids** (`.136/arr-1`, `.59/arr-1`, `.63/arr-1`, `.147/9`). All four close as **full**:
+
+- **Full: +4**
+- **Partial: +0**
+- **Gap: +0**
+- **Remaining unrun arm: none** — every arm in these points is run and green (`.59/arr-1`'s two arms `/1` and `/2` both run; no arm among these is in the "waits for 3b" set, which is only `.58.1/arr-1`, `.58.1/arr-2`, `AT-B103-I3-1/-2/-3`).
+
+One caveat on the absolute "out of 280" number: this tree contains **no committed coverage-audit ledger** with the running full/partial/gap split for the other 276 cases (the `inc-3/02-test-cases.md` Coverage/Result columns still read `gap`/`not_run`, and no `inc-3/E5-coverage-audit.md` exists). So I can report the delta these three points contribute with certainty — **4 full, 0 partial, 0 gap, 0 unrun arms** — but the absolute 280-wide full/partial/gap split must be assembled from your running tally plus this delta, not reconstructed here.

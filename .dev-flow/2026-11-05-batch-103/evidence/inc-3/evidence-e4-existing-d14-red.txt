@@ -1,0 +1,24 @@
+=== modified Inc 2a test file (D-14) vs base ===
+s19_app.__file__ = /tmp/b103-e4-3a-tests/tree/s19_app/__init__.py
+.............F.......................................................... [ 38%]
+........................................................................ [ 76%]
+............................................                             [100%]
+=================================== FAILURES ===================================
+_____________________ test_r_a2l_def_4_9_cube_4_is_refused _____________________
+
+v171 = {'compu_methods_by_name': {'CM.FORM.X_PLUS_4': {'coeffs': None, 'coeffs_linear': None, 'compu_tab_ref': None, 'convers...MPLE'}, {'address': 8462336, 'kind': 'BLOB', 'length': 16, 'name': 'ASAM.C.BLOB.TRANSFORMER_TEST'}], 'errors': [], ...}
+
+    def test_r_a2l_def_4_9_cube_4_is_refused(v171):
+        """R-A2L-DEF.4/9 (new, D-14) - V171 CUBE_4; address still given, no element count (E3A-03)."""
+        d = describe_definition("ASAM.C.CUBE_4.ROW_DIR", v171)
+        _is_refused(d, *_kind_msg("ASAM.C.CUBE_4.ROW_DIR", "CUBE_4"))
+        assert d.kind == ""
+        assert d.address == 0x810590
+>       assert d.element_count is None
+               ^^^^^^^^^^^^^^^
+E       AttributeError: 'Definition' object has no attribute 'element_count'
+
+tests/test_b103_a2l_definition.py:360: AttributeError
+=========================== short test summary info ============================
+FAILED tests/test_b103_a2l_definition.py::test_r_a2l_def_4_9_cube_4_is_refused
+1 failed, 187 passed in 7.82s

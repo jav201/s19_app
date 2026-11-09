@@ -1,0 +1,36 @@
+## Inc 3a targeted re-review — read-only verdict
+
+**PASS-WITH-NOTES** (nothing blocking).
+
+### 1. PAR_LIST in-place conversion — safe
+`_read_fixed_rule` mutates the local list at `s19_app/tui/a2l_definition.py:1586-1596`:
+
+```python
+elif list_numbers is not None:
+    for i, word in enumerate(list_numbers):
+        number = _finite_number(word)
+        if number is None:
+            return Refusal("A2L-DEF-AXIS-FIX", f"{axis_name}: …cannot read")
+        list_numbers[i] = _to_int_or_float(number)
+    n = len(list_numbers)
+    rule = ("PAR_LIST", tuple(list_numbers))
+```
+
+- **No alias to parser payload.** `list_numbers` comes from `_flatten_body_tokens([child.get("meta","") or ""] + (child.get("lines") or []))` (`a2l_definition.py:1528-1531`). The `+` concatenation builds a *new* list, and `_flatten_body_tokens` (`s19_app/tui/a2l.py:1290-1323`) builds a fresh `tokens: list[str]` from `_line_words`/`_unquote` — it never returns the parse payload's `lines`/`meta`. The in-place writes replace slots of that fresh list only.
+- **No behavior change.** `enumerate` iterates by index and the list length never changes, so each original word is visited exactly once; `tuple()` of the mutated list equals a non-in-place build. `_finite_number` guarantees finite before `_to_int_or_float` (no `inf/nan` reaches `.is_integer()`).
+- **Prior fixed_rule values/refusals match.** `("PAR_LIST", (int|float, …))`, each `int` where integral, matches the approved graph (`codewire/graph-inc3.md:594,639,665-667`); the `.141` ("cannot read"), `.147` ("cannot compute exactly"), `.98` ("gives no points") and `.99` (FIX-COUNT) refusals match. PAR > PAR_DIST > PAR_LIST precedence (`:1519-1596`) matches the graph's "the first of".
+
+### 2. R-A2L-DEF.142/6 — confirmed
+- Cap `_MAX_AXIS_POINTS = 1_048_576` (`a2l_definition.py:278`) is checked at `:1700-1702` *before* the FIX parameters are read, so no fixed point is built for an over-cap axis.
+- Evidence `/tmp/b103-e4-3a-int/tree/.dev-flow/2026-11-05-batch-103/inc-3/evidence-e5-fix-cap6-green-fixed.txt` shows **peak 66594285 bytes (63.5 MiB)** and median **0.514 s** (tracemalloc off) — within the 100 MiB / 5.0 s bounds.
+- Both changed files are byte-identical between `/tmp/b103-e4-3a-impl/tree` and `/tmp/b103-e4-3a-int/tree`, so the evidence corresponds to the code under review.
+
+### 3. Remaining LOW notes — all non-blocking
+| Note | Assessment |
+|---|---|
+| multi-FIX selection | Precedence PAR > PAR_DIST > PAR_LIST (`a2l_definition.py:1519-1596`) matches the graph; no corpus case declares more than one. LOW, non-blocking. |
+| aggregate MATRIX_DIM message length | `_dims_text` (`:454-461`) joins per-word echoes with no aggregate cap; `_read_matrix_dim` (`:1091-1101`) takes `words[1:]` unbounded. A hostile many-word MATRIX_DIM line could exceed the 1,024-char bound (R-A2L-DEF.148/E3S3-32). Each word is still echo-capped (R-A2L-DEF.151); message finite, no exception/security impact. LOW, non-blocking. |
+| truncated FIX form | FIX params stored read-as-double via `_to_int_or_float` (`:1584`, `:1594`) — e.g. `9007199254740993` → `2^53`. This is the *ruled* CTX "fixed point" behavior (E3S3-15, `.147/11`), so correct. LOW, non-blocking. |
+| synth draw wording | `build_definition_objects` docstring still says "four-object inventory"/"four-object list"/"Emit the four object dicts" (`tools/synth/make_release_case.py:991,1004,1015`; also `:1402,1407`) though it now emits 9 objects (`objects.extend(inc3_objects)` at `:1127`). Docstring staleness only. LOW, non-blocking. |
+
+No file was edited; no tests run.

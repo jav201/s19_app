@@ -1,0 +1,183 @@
+I've read the Inc 3a requirements (all negative controls, E3/E5 rulings, split), the full `s19_app/tui/a2l_definition.py`, `tools/synth/make_release_case.py`, and the five integrated test files. Below is the mechanical mutant plan. **No files were edited, no mutants run, nothing committed.**
+
+Legend: **AD** = `s19_app/tui/a2l_definition.py` · **MRC** = `tools/synth/make_release_case.py` · tests: **A**=`test_b103_a2l_definition_arrays.py`, **D**=`..._decode.py`, **C**=`..._coverage.py`, **S**=`..._scale.py` (`serial_timing`), **SYN**=`test_b103_synth_definitions.py`, **P**=`test_b103_a2l_definition_perf.py` (`serial_timing`).
+
+---
+
+## 1. Practical source mutants
+
+### S2.7e — kind, shape, length
+
+| ID | Row/case | Exact source mutation | Discriminating test | Expected RED |
+|---|---|---|---|---|
+| M-64 | .64/1..5 | AD `_object_kind`: `if char_type == "VAL_BLK": return "array","VAL_BLK"` → `return None,"VAL_BLK"` | A`test_r_a2l_def_64_1_2d_val_blk_is_an_array` | `d.kind == "array"` fails (kind `""` + A2L-DEF-KIND) |
+| M-64b | .64/6 | AD `_object_kind` MEASUREMENT branch: replace `_is_multi_value_matrix(matrix_words)` test with `int(matrix_words[0]) > 1` | A`test_r_a2l_def_64_6_leading_1_matrix_dim` | `MATRIX_DIM 1 6 1` read as scalar (shape/kind wrong) |
+| M-65 | .65/1..3 | AD `_object_kind`: `if char_type == "CURVE"` → `return None,"CURVE"` | A`test_r_a2l_def_65_1_com_axis_curve` | `kind == "curve"` fails |
+| M-66 | .66/1,2 | AD `_object_kind`: `if char_type == "MAP": return "map","MAP"` → `return "curve","MAP"` | A`test_r_a2l_def_66_1_com_fix_map` | `kind == "map"` fails |
+| M-67 | .67/4,5 | AD `_matrix_shape`: delete `while len(numbers)>1 and numbers[-1]==1: numbers.pop()` | A`test_r_a2l_def_67_4_trailing_1` | `shape == (16,)` fails → `(16,1)` |
+| M-68 | .68/1,2 | AD `_array_shape`: delete the `elif … VAL_BLK: number=_read_count(number_word)` block | A`test_r_a2l_def_68_1_a2ltool_number` | `shape == (4,)` fails (no length → A2L-DEF-ADDRESS) |
+| M-69 | .69/1,2 | AD `_array_shape`: `shape = (length // size,)` → `shape = (length,)` | A`test_r_a2l_def_69_1_case08_length_only_val_blk` | `shape == (128,)` fails → `(256,)` |
+| M-70 | .70/1 | AD `_array_shape`: delete `if length % size != 0: return Refusal(A2L-DEF-SHAPE…)` | A`test_r_a2l_def_70_1_length_not_whole_values` | A2L-DEF-SHAPE refusal missing |
+| M-71 | .71/1..4 | AD `_matrix_shape`: drop `or number < 1` (accept `0`) | A`test_r_a2l_def_71_matrix_dim_refused[3 0]` | A2L-DEF-MATRIX refusal missing, count `0` |
+| M-71b | .71/5 | AD `_object_kind` MEASUREMENT branch: return scalar kind unconditionally (ignore `matrix_words`) | A`test_r_a2l_def_71_5_malformed_measurement_not_scalar` | `MATRIX_DIM 4 x` decoded as scalar, no refusal |
+| M-72 | .72/2 | AD `_describe_array`: `shape = tuple(axis.point_count for axis in axes_list)` → `tuple(reversed(...))` | A`test_r_a2l_def_72_2_map_shape_x_first` | `shape == (8,3)` fails → `(3,8)` |
+| M-73 | .73/1,2,4 | AD `_describe_array`: `element_count *= number` loop → `element_count = shape[0]` | A`test_r_a2l_def_73_1_element_count_2d` | `element_count == 12` fails → `3` |
+| **F1** | .73/9, .91/2, .92/5, .145/1,2 (E3A-03/E3A-24) | AD `_describe_array`: `element_count: Optional[int] = None` → `= 1` (or AD `_empty_definition`: `element_count=None` → `1`) — **empty/refused definition keeps count 1** | A`test_r_a2l_def_73_9_unreadable_shape_has_no_count` (also A`.145_1/.2`, `.91_2`, `.92_5`) | `element_count is None` fails |
+| M-74 | .74/1..3 | AD `_describe_array` array branch: `byte_length = element_count * size` → `byte_length = tag.get("length")` | A`test_r_a2l_def_74_1_byte_length_2d` | `byte_length == 24` fails → tag length `8` |
+| M-75 | .75/1 | AD `_describe_array` curve/map: `byte_length = end` → add COM axis object's record length | A`test_r_a2l_def_75_1_com_axis_curve_byte_length` | `byte_length == 16` fails → `25` |
+| M-76 | .76/1,2 | AD `_array_shape`: delete `if length != element_count*size: return Refusal(A2L-DEF-LENGTH…)` | A`test_r_a2l_def_76_1_length_differs` | A2L-DEF-LENGTH refusal missing |
+| M-77 | .77/3 | AD `_describe_array`: `datatype = fnc[2]` → `datatype = layout["components"][0][2]` | A`test_r_a2l_def_77_3_curve_layout_starts_with_count` | `datatype == "SWORD"` fails → UBYTE |
+| M-78 | .78/1 | AD `_describe_array` MEASUREMENT: delete the LAYOUT read (keep default ROW_DIR) | A`test_r_a2l_def_78_1_layout_column_dir` | `index_mode == "COLUMN_DIR"` fails |
+| M-79 | .79/1 | AD `_describe_array`: `index_mode = "ROW_DIR"` → `"COLUMN_DIR"` (no-LAYOUT default) | A`test_r_a2l_def_79_1_default_index_mode` | `index_mode == "ROW_DIR"` fails |
+| M-80 | .80/1,2 | AD `_describe_array`: delete `if len(shape)==3 and index_mode=="COLUMN_DIR": refusal = A2L-DEF-INDEX-MODE` | A`test_r_a2l_def_80_1_3d_column_dir_measurement` | A2L-DEF-INDEX-MODE refusal missing |
+| M-81 | .81/1 | AD `_describe_array`: delete the trailing `conv_fields, conv_refusal = _conversion_fields(...); if conv_refusal: refusal = conv_refusal` | A`test_r_a2l_def_81_1_undeclared_method_on_array` | A2L-DEF-METHOD refusal missing |
+| M-81b | .81/5 | AD `_describe_array`: delete `if bit_mask is None or not _check_bit_mask(...)` mask refusal | A`test_r_a2l_def_81_5_unreadable_mask_word` | A2L-DEF-MASK refusal missing |
+| M-145 | .145/1,2 | AD `_describe_array`: delete `elif kind in ("curve","map") and … _is_multi_value_matrix(…): refusal = A2L-DEF-MATRIX`; AD `_describe_one`: delete the `value_145` VALUE block | A`test_r_a2l_def_145_1_matrix_dim_on_curve` | A2L-DEF-MATRIX refusal missing; shape `()/count None/length None` asserts fail |
+
+### S2.7f — record layouts and axes
+
+| ID | Row/case | Exact source mutation | Discriminating test | Expected RED |
+|---|---|---|---|---|
+| M-82 | .82/1,2 | AD `_describe_array`: when `layout is None`, delete the A2L-DEF-LAYOUT refusal (fall through to deposit datatype + ROW_DIR) | A`test_r_a2l_def_82_1_undeclared_layout_real_file` | A2L-DEF-LAYOUT refusal missing |
+| M-83 | .83/1 | AD `_describe_array`: delete `if fnc is None: refusal = A2L-DEF-LAYOUT-VALUES` | A`test_r_a2l_def_83_1_layout_with_no_fnc_values` | A2L-DEF-LAYOUT-VALUES refusal missing |
+| M-84 | .84/1..6 | AD `_build_record_layout_form`: `else: parts.append(head)` → `continue` | A`test_r_a2l_def_84_layout_part[RESERVED 3 BYTE]` | A2L-DEF-LAYOUT-PART refusal missing |
+| M-84b | .84/7 | AD `_build_record_layout_form`: delete `if len(words)>5: parts.append(words[5])` (extra-word capture) | A`test_r_a2l_def_84_7_component_with_extra_words` | refusal names wrong part / FNC_VALUES offset shifts |
+| M-85 | .85/1..4 | AD `_build_record_layout_form`: delete the FNC_VALUES `mode not in ("ROW_DIR","COLUMN_DIR")` and `address != "DIRECT"` checks | A`test_r_a2l_def_85_1_alternate_mode` | A2L-DEF-LAYOUT-MODE refusal missing |
+| **M-86** | .86/3, .58.2/arr-9 (**count datatype**) | AD `_COUNT_DATATYPES`: add `"FLOAT16_IEEE"` (or set `= _COMPONENT_DATATYPES`) | A`test_r_a2l_def_86_3_float_count_component` (also D`..._arr_9`) | A2L-DEF-LAYOUT-DATATYPE refusal missing; float count admitted (decode would raise) |
+| M-86b | .86/2 | AD `_COMPONENT_DATATYPES`: add `"BYTE"` | A`test_r_a2l_def_86_2_byte_on_axis_component` | refusal missing |
+| M-87 | .87/1,2 | AD `_build_record_layout_form`: delete the `positions` distinctness check | A`test_r_a2l_def_87_1_two_components_one_position` | A2L-DEF-LAYOUT-POSITION refusal missing |
+| M-88 | .88/1 | AD `_place_components`: `lines = [f"{cls} {n}" … layout["alignment"]]` → `lines = []` | A`test_r_a2l_def_88_1_declared_alignment` | `values_offset == 4` fails → `3` |
+| M-89 | .89/1,2 | AD `_describe_array`: delete `mod_common = _module_common(...); moved = _alignment_refusal(...)` block | A`test_r_a2l_def_89_1_alignment_refusal_asam_curve` | A2L-DEF-ALIGNMENT refusal missing |
+| M-90 | .90/1,2 | AD `_build_record_layout_form`: route `FIX_NO_AXIS_PTS_*` to `parts.append(head)` (unknown) | A`test_r_a2l_def_90_1_fix_no_axis_pts_x` | `fixed_count == 5` fails |
+| M-91 | .91/2 | AD `_describe_array`: delete `if len(axis_sections) != needed: refusal = A2L-DEF-AXES` | A`test_r_a2l_def_91_2_map_with_one_axis` | A2L-DEF-AXES refusal missing; shape/count kept |
+| M-92 | .92/1,2,3 | AD `_read_axis`: accept `RES_AXIS`/`CURVE_AXIS` as COM_AXIS (add to `_AXIS_KINDS` or special-case) | A`test_r_a2l_def_92_2_res_axis` | A2L-DEF-AXIS-KIND refusal missing |
+| M-92b | .92/4 (**H3e**) | AD `_read_axis`: `tokens = _flatten_body_tokens([meta]+lines)` → drop `meta` (read `lines` only) | A`test_r_a2l_def_92_4_axis_header_on_begin_line_h3e` | axis header not read → refusal / wrong count |
+| M-93 | .93 (→.99/1) | AD `_read_axis` FIX_AXIS: take `point_count` from the FIX parameter count word instead of `header[3]` | A`test_r_a2l_def_99_1_fix_axis_par_dist_count_differs` | A2L-DEF-AXIS-FIX-COUNT refusal missing |
+| M-94 | .94/2 | AD `_read_axis` COM_AXIS: `max_word = axis_object_header[7]` → use `header[3]` | A`test_r_a2l_def_94_2_axis_object_count_wins` | `point_count == 5` fails → `8` |
+| M-95 | .95/2 | AD `_read_axis`: `if point_count is None or point_count < 1` → drop `or point_count < 1` | A`test_r_a2l_def_95_2_fix_axis_max_0` | A2L-DEF-AXIS-MAX refusal missing |
+| M-96 | .96/1,2,3 | AD `_read_axis`: delete the `ref is None` / `found is None` A2L-DEF-AXIS-REF refusals | A`test_r_a2l_def_96_2_dangling_reference` | A2L-DEF-AXIS-REF refusal missing |
+| M-96b | .96/4 | AD `_read_address_word`: replace guarded read with `int(word, 0)` | A`test_r_a2l_def_96_4_address_word_not_one` | `0x81_0340` accepted → no refusal |
+| M-97 | .97/2 | AD `_read_axis`: delete `if _find_component(axis_object_layout,"AXIS_PTS_X") is None: A2L-DEF-AXIS-LAYOUT` | A`test_r_a2l_def_97_2_axis_layout_no_axis_pts_x` | A2L-DEF-AXIS-LAYOUT refusal missing |
+| M-98 | .98/1 | AD `_read_fixed_rule`: `else: return Refusal(A2L-DEF-AXIS-FIX …)` → return `("PAR",(0,0,point_count))` (index points) | A`test_r_a2l_def_98_1_fix_axis_no_parameters` | A2L-DEF-AXIS-FIX refusal missing |
+| M-99 | .99/1,2 | AD `_read_fixed_rule`: delete `if n != point_count: return Refusal(A2L-DEF-AXIS-FIX-COUNT…)` | A`test_r_a2l_def_99_1_fix_axis_par_dist_count_differs` | A2L-DEF-AXIS-FIX-COUNT refusal missing |
+| M-100 | .100/1..3 | AD `_read_axis`: give a STD_AXIS without AXIS_PTS a refusal or index points instead of `has_points=False` | A`test_r_a2l_def_100_1_case08_curve_axis_no_points` | `has_points is False` fails |
+| M-101 | .101/1,2 | AD `_read_axis`: delete `if axis_kind != "STD_AXIS" and object_axis_component is not None: A2L-DEF-LAYOUT-AXIS` | A`test_r_a2l_def_101_1_in_record_points_for_fix_axis` | A2L-DEF-LAYOUT-AXIS refusal missing |
+| M-102 | .102/4 | AD `_read_axis`: pass the object's method name (not `header[2]`) into `_conversion_fields` | A`test_r_a2l_def_102_4_axis_desc_method_used_for_com_axis` | `points.method_name == "CM_A"` fails → CM_B |
+| M-103 | .103/1 | AD `_read_axis`: call `_conversion_fields` with object name instead of `axis_name` | A`test_r_a2l_def_103_1_axis_method_not_declared` | message `CA.X:` vs `CA:` fails |
+| M-104 | .104/1 | AD `_describe_array`: move axis reads before the layout read (reorder) | A`test_r_a2l_def_104_1_layout_before_axis_object` | `refusal.code == "A2L-DEF-LAYOUT"` fails → A2L-DEF-AXIS-REF |
+| M-141 | .141/3..5 | AD `_read_fixed_rule`: replace `_finite_number` with `_to_float` (admit nan/inf) | A`test_r_a2l_def_141_3_infinite_offset` | A2L-DEF-AXIS-FIX refusal missing |
+| M-141b | .141/6 | AD `_read_fixed_rule`: `n = _read_count(n_word)` → `n = int(n_word)` | A`test_r_a2l_def_141_6_5000_digit_count` | `ValueError` on 5000-digit count (hostile-content raise) |
+| M-142 | .142/1..3 | AD `_read_axis`: delete `if point_count > _MAX_AXIS_POINTS` | A`test_r_a2l_def_142_1_fix_axis_1048577_points` | A2L-DEF-AXIS-MAX refusal missing |
+| M-142b | .142/4 | AD `_MAX_AXIS_POINTS = 1_048_576` → `1_048_575` | A`test_r_a2l_def_142_4_largest_point_count_read` | `refusal is None` fails (wrongly refused) |
+| M-143 | .143/1..3 | AD `_read_axis`: delete `if placed is None or axis_object_address < 0 or (… > 0xFFFFFFFF): A2L-DEF-AXIS-REF` | A`test_r_a2l_def_143_2_last_byte_above_ffffffff` | A2L-DEF-AXIS-REF refusal missing |
+| M-144 | .144/1 | AD `_check_module_alignment`: delete the `unreadable` (`.144`) branch | A`test_r_a2l_def_144_1_unreadable_mod_common_alignment` | A2L-DEF-ALIGNMENT refusal missing |
+| **M-147** | .147/1..11 (**exact FIX bounds**) | see below (all in `_read_fixed_rule` / constants) | A`test_r_a2l_def_147_fix_point_bound[…]` | see below |
+
+**M-147 exact-bound sub-mutants** (all → the parametrized `A.test_r_a2l_def_147_fix_point_bound`):
+- **147a** `_FIX_SHIFT_BOUND = 62` → `63` → case `("1","FIX_AXIS_PAR 0 63 1")` expected `refuse` passes instead → RED.
+- **147b** `_FIX_SHIFT_BOUND = 62` → `61` → case `("1","FIX_AXIS_PAR 0 62 1")` expected `ok` wrongly refused → RED.
+- **147c** `_FIX_MAGNITUDE_BOUND = 1 << 53` → `(1 << 53) + 1` → case `/3` (`0 4503599627370496 3`) wrongly refused → RED.
+- **147d** replace the exact `_ratio`/integer bound check with an IEEE-double first/last check (`float(a+b*(n-1))`) → `/2`, `/4`, `/5` wrongly accepted (and `/2` decode raises `OverflowError`) → RED.
+- **147e** move `(1 << shift)` before the shift bound check → `/9` (`0 1000000000 4`) past 1 s → RED (timing).
+- **147f** read words as exact decimals (not doubles) in `_read_fixed_rule` → `/11` (`9007199254740993 0 1`) first point read as `2^53+1` → wrongly refused → RED.
+
+### S2.7g — decoding
+
+| ID | Row/case | Exact source mutation | Discriminating test | Expected RED |
+|---|---|---|---|---|
+| M-105 | .105/3 | AD `_decode_stored`: force IDENTICAL (skip `_apply_compu_method`) | D`test_r_a2l_def_105_3_converted_elements` | texts `["1.5","2.0"]` fail → raw ints |
+| M-106 | .106/1,3 | AD `_element_offset`: swap the ROW_DIR formula with the COLUMN_DIR one | D`test_r_a2l_def_106_1_row_dir_2d` | `(1,0)==2` fails → `5` |
+| M-107 | .107/1 | AD `_element_offset`: COLUMN_DIR branch → ROW_DIR formula | D`test_r_a2l_def_107_1_column_dir_2d` | `(1,0)==5` fails → `2` |
+| M-108 | .108/1 | AD `_point_offset`: always use the INDEX_DECR formula | D`test_r_a2l_def_108_1_index_incr_points` | `[10,20,30,40]` fails |
+| M-109 | .109/1,2 | AD `_point_offset`: always use the INDEX_INCR formula | D`test_r_a2l_def_109_1_index_decr_asam_axis_object` | `[0,10,…70]` fails |
+| M-110 | .110/1 | AD `_fixed_points` PAR: `b = (1 << s) * den` → `b = s * den` | D`test_r_a2l_def_110_1_fix_axis_par` | `[0,4,8,12]` fails → `[0,2,4,6]` |
+| M-111 | .111/1,2 | AD `_fixed_points` PAR_DIST: return `tuple(range(n))` | D`test_r_a2l_def_111_1_par_dist_1_1_6` | `[1..6]` fails → `[0..5]` |
+| M-112 | .112/1 | AD `_read_fixed_rule` PAR_LIST: return index points `tuple(range(len(numbers)))` | D`test_r_a2l_def_112_1_fix_axis_par_list` | `[-1,4,6,8,9,10]` fails |
+| M-113 | .113/1 | AD `_decode_axis` COM_AXIS: read points from the object's `record`, not `axis_object_record` | D`test_r_a2l_def_113_1_two_curves_one_axis_object` | shared axis points differ |
+| M-114 | .114/1 | AD `_read_axis`: `points_byte_order = _axis_byte_order(…)` (COM) → use object `byte_order` | D`test_r_a2l_def_114_1_axis_object_own_byte_order` | `stored == 258` fails → `513` |
+| M-115 | .115 (→.116.2/2) | AD `_current_count`: always return `axis.point_count` (ignore count component) | D`test_r_a2l_def_116_2_2_count_above_max` | count `9` ignored → 8 points, no refusal |
+| M-116.1 | .116.1/3 | AD `_read_axis`: delete the `fixed_count` bounds check | D`test_r_a2l_def_116_1_3_fix_no_axis_pts_x_0` | A2L-DEF-AXIS-CURRENT refusal missing |
+| M-116.2 | .116.2/1,2 | AD `_current_count`: delete the `count` bounds checks (return count / point_count blindly) | D`test_r_a2l_def_116_2_1_count_0` | refusal missing |
+| M-116.2b | .116.2/4 | AD `_current_count`: treat `count < 0` as PARTIAL (reorder `1 <= count < point_count` before the `< 1` guard) | D`test_r_a2l_def_116_2_4_negative_current_count` | A2L-DEF-AXIS-PARTIAL instead of A2L-DEF-AXIS-CURRENT |
+| M-117.1 | .117.1/2 | AD `_read_axis`: delete `if fixed_count < point_count: A2L-DEF-AXIS-PARTIAL` | D`test_r_a2l_def_117_1_2_partial_record_by_fix_no` | refusal missing |
+| M-117.2 | .117.2/1,3 | AD `_current_count`: delete the `1 <= count < point_count → PARTIAL` branch | D`test_r_a2l_def_117_2_1_partial_record_in_image` | refusal missing |
+| M-118 | .118/1,2 | AD `_decode_axis` COM_AXIS: delete `if missing: A2L-DEF-AXIS-BYTES` (pad `0`) | D`test_r_a2l_def_118_1_axis_object_outside_image` | refusal missing |
+| M-119 | .119/1 | AD `decode_values`: abort whole decode on the first failing element (return the refusal) | D`test_r_a2l_def_119_1_one_failing_element` | `values[1] is Refusal` with `[0]/[2]` decoded fails |
+| M-120 | .120/1 | AD `decode_definition`: delete `if kind in ("array","curve","map"): return A2L-DEF-ELEMENTS` | D`test_r_a2l_def_120_1_single_decode_refusal` | A2L-DEF-ELEMENTS refusal missing |
+| M-121 | .121/3 | AD `_decode_stored`: drop the `[<i>]`/`[<k>]` suffix (use object name) | D`test_r_a2l_def_121_3_name_in_decode_refusal` | message `VR[1]: …` fails |
+| M-146 | .146/1 | AD `decode_values`: scalar branch → return empty / A2L-DEF-ELEMENTS | D`test_r_a2l_def_146_1_scalar_decode_values` | `res.values == (Decoded(4660,4660,"4660"),)` fails |
+
+### S2.7i — synth (MRC)
+
+| ID | Row/case | Exact source mutation | Discriminating test | Expected RED |
+|---|---|---|---|---|
+| M-133 | .133/1 | MRC `_definition_array_objects`: give each CURVE its own AXIS_PTS (duplicate the section/ref) | D`test_r_a2l_def_133_1_definitions_case_common_axis` | both curves decode the same `[485,635,696,828,901]` fails |
+| M-133b | .133/1 (count=0) | MRC `_definition_array_objects`: `axis_raw = _u16(len(axis_points))+…` → `_u16(0)+…` | D`test_r_a2l_def_133_1_…` | decode gives A2L-DEF-AXIS-CURRENT |
+| M-134 | .134/1 | MRC `_definition_array_objects`: MAP `offset = 8 + 2*(y + 3*x)` → `8 + 2*(x + 4*y)` (ROW_DIR under COLUMN_DIR) | D`test_r_a2l_def_134_1_definitions_case_map` | `_stored(res) == [472,…]` fails |
+| M-135 | .135/1 | MRC `_definition_array_a2l`: `MATRIX_DIM 3 2` → `MATRIX_DIM 3 3` | D`test_r_a2l_def_135_1_definitions_case_val_blk` (also SYN AT-I2-2) | 9 values ≠ 6 planned |
+| M-63 | .63/1 | MRC `generate_definitions_case`: unseeded `random.Random()` | SYN`test_r_a2l_def_63_1_the_definitions_case_is_deterministic` | files differ across runs |
+| M-59 | .59/1..3 (case08 pin) | MRC `build_objects`: leak the 5 inc3 objects into the case08 object list (or edit `emit_definitions_a2l` to write them into `firmware.a2l`) | SYN`test_r_a2l_def_59_1/3` | case08 digests ≠ pins |
+
+### Cited rows (regression guards; code is Inc 2a, unchanged by 3a — listed for completeness)
+
+| ID | Row/case | Exact source mutation | Discriminating test | Expected RED |
+|---|---|---|---|---|
+| M-139 | .139/arr-1 | AD `_find_tag`: delete the `len(tags)>1 or len(sections)>1` refusal | D`test_r_a2l_def_139_arr_1_name_declared_twice` | A2L-DEF-NAME refusal missing |
+| M-5 | .5/arr-1 | AD `_find_tag`: case-insensitive name match | D`test_r_a2l_def_5_arr_1_case_included` | `DUPA` resolves the wrong tag |
+| M-6 | .6/arr-1 | AD `_find_tag`: case-insensitive match | D`test_r_a2l_def_6_arr_1_name_case_for_curve` | `curve_0001` finds `CURVE_0001` |
+| M-7.1a | .7.1/arr-2 | AD `_describe_array`: delete `if base.address is None or byte_length is None: A2L-DEF-ADDRESS` | D`test_r_a2l_def_7_1_arr_2_array_with_no_address` | refusal missing |
+| M-7.1b | .7.1/arr-3 | AD `_describe_array`: `byte_length` for curve → fall through to a value ≠ None past 1 MiB | D`test_r_a2l_def_7_1_arr_3_curve_record_passes_1mib` | no A2L-DEF-ADDRESS refusal |
+| **M-7.2a** | .7.2/arr-1 (**span**) | AD `_describe_array`: delete `byte_length > MAX_A2L_DECODE_BYTES` | D`test_r_a2l_def_7_2_arr_1_span_bound_on_computed_length` | A2L-DEF-ADDRESS `span of 1048577…` missing |
+| **M-7.2b** | .7.2/arr-2 | AD `_describe_array`: delete `base.address + byte_length - 1 > 0xFFFFFFFF` | D`test_r_a2l_def_7_2_arr_2_last_byte_above_ffffffff` | refusal missing |
+| **M-7.2c** | .7.2/arr-3 | AD `_describe_array`: `byte_length > MAX_A2L_DECODE_BYTES` → `>=` | D`test_r_a2l_def_7_2_arr_3_exactly_1_mib` | `refusal is None` fails (wrongly refused) |
+| M-26 | .26/arr-1 | AD `decode_values`: delete the `if missing: A2L-DEF-BYTES` record check | D`test_r_a2l_def_26_arr_1_missing_record_bytes` | A2L-DEF-BYTES refusal missing |
+| M-58.1 | .58.1/arr-1,2 | AD `_describe_one`: mutate `tag` in place (drop `tag = dict(tag)`) | D`test_r_a2l_def_58_1_arr_1/2_unchanged_inputs` | `a2l == a2l_before` fails |
+| M-58.2a | .58.2/arr-1 | AD `_read_count`: `len(word) > 9` → `int(word)` | D`test_r_a2l_def_58_2_arr_1_5000_digit_matrix_dim` | `ValueError` |
+| M-58.2b | .58.2/arr-2..8 | AD `_read_count`/`_read_address_word`: accept long words via `int()` | D`…_arr_2/3/4/5/6/8` | raise instead of refusal |
+| M-137 | .137/arr-1..4 | AD `_echo`: delete the `U+FFFD` mapping (keep raw control chars) | D`test_r_a2l_def_137_arr_1_control_character_in_layout_word` | message shows raw `\x1b` |
+| M-151 | .151/arr-1..6 | AD `_echo`: delete the 256-char cut / `…` | D`test_r_a2l_def_151_arr_1_echo_cap_in_layout_part` | message exceeds cap / no `…` |
+| M-010/011/026 | .010/.011/.026 | AD `_describe_array`: overwrite `address`/`byte_order` (e.g. ignore tag) | D`test_r_a2l_010_arr_1_val_blk_address` etc. | address/byte_order mismatch |
+| M-019 | .019/arr-1 | AD `_read_axis` COM_AXIS: use AXIS_DESCR max instead of axis object's | D`test_r_a2l_019_arr_1_axis_object_points_counted` | `point_count == 8` fails |
+
+### Keyed reads / immutability / scaling (the `.136`/`.148`/`.150` guard class)
+
+| ID | Row/case | Exact source mutation | Discriminating test | Expected RED |
+|---|---|---|---|---|
+| **M-136-keys** | .136/arr-4 (K1–K3, E3S3-38) | AD `_read_record_layout` / `_module_common` / `_axis_byte_order`: key `reads` by bare `id(entry)` instead of `("layout", id(entry))` etc. | C`test_r_a2l_def_136_arr_4_k1_k3_and_poison_shapes_equal_fresh` | K1 `TypeError` / K2 wrong A2L-DEF-LAYOUT → one-walk ≠ fresh |
+| **M-136-immut** | .136/arr-4 (E3S3-36) | AD `_layout_form`/`_build_mod_common_form`: return plain `dict`/`list` instead of `MappingProxyType`/`tuple` | C`test_r_a2l_def_136_arr_4_read_forms_immutable_no_list_dict` | mutation raises fails / field holds list-or-dict |
+| M-148-reads | .148/16–18 (E3S3-35) | AD `_read_record_layout`: bypass `reads` cache (look up by name per call) | C`test_r_a2l_def_148_16_long_layout_name_part_message_count` | `after["layouts"] != 0` (N lookups by shared word) |
+| M-148-reduce | .148/1,4,5 | AD `_build_mod_common_form`: keep every ALIGNMENT pair (no one-per-class reduction) and walk them per object | C/S `.148_4` / `.148_1` | per-object walk → timing RED |
+| M-148-echo | .148/10..15 | AD `_build_record_layout_form`/`_module_common`: move `_echo`/`_clean` out of reduction (per call) | C`test_r_a2l_def_148_10_long_part_word_of_shared_layout` (exact) + S `.148_10` (timing) | message > 1024 / per-object scaling RED |
+| M-150-text | .150/arr-3,4,6 | AD `_enum_text`/`_enum_entry_text`: `_clean` the entry text per element instead of referencing the stored string | C`test_r_a2l_def_150_arr_3_long_matched_entry_text_referenced` | `len({id(t)}) != 1` |
+| M-150-lookup | .150/arr-7 | AD `_build_tab_form`: rebuild the tab form per object (drop `reads` cache) | C`test_r_a2l_def_150_arr_7_tab_intp_frozen_value_one_lookup` | `counter.counts["CT"]` grows past `before_decode` |
+| M-150-bisect | .150/arr-9 | AD `_table_value`: replace the bisect with a linear scan that breaks the frozen rules | C`test_r_a2l_def_150_arr_9_bisect_matches_frozen_lookup` | `got != want` on ≥1 probe |
+
+---
+
+## 2. NOT_REALISABLE / timing-only controls
+
+| ID | Row | Why it is not a practical source mutant |
+|---|---|---|
+| N-142-eager | .142/5 (E3S3-02 [F1]/[F2]) | "Build FIX points at describe" is real code, but its discriminating test `.142/5` is **`not_run`** in `02-test-cases.md` (no integrated test); the only FIX fixtures in the suite have ≤6 points, so nothing times out. Timing-only, no integrated kill. |
+| N-142-list | .142/6 (E3A-25) | PAR_LIST-at-cap linear-time case: **`not_run`**, no integrated test. |
+| N-112-sort | .112/1 (sort arm) | The V171 `PAR_LIST` `−1,4,6,8,9,10` is already in file order == sorted order, so a "sort the list" mutant changes nothing → survives; the *index-points* arm (M-112) is the real discriminating mutant. |
+| N-86-index | .86/4 (IndexError arm) | "Read the datatype as the line's third word → raises IndexError" describes a naive impl; the current code already guards `if len(component) > 2 else None`, so the negative control does not exist as a reachable source mutation without first deleting the guard (which is itself a weakening — excluded by the no-weakening rule). |
+| N-148-timing | .148/1..19 timing arm | The per-object-walk negative controls (`S.test_r_a2l_def_148_*`, `S.test_r_a2l_def_136_arr_2/3`, `S.test_r_a2l_def_150_arr_*`) are `serial_timing`; they are timing-only controls, realisable but only kill on the runner with the E3S3-24 measure (least-of-15, fresh walk, GC off). Their *exact-value/counting* arms are the practical mutants M-148-*, M-136-keys, M-150-* above. |
+| N-148-fresh | .148/1 (E3S3-34 measure) | "Pass over already-described names in the same walk" is a *harness*-side measure correction, not a product mutation — cannot be realised by editing `a2l_definition.py`. |
+| N-58.2-arr-6 | .58.2/arr-6 | Already covered by the `.151` echo path (M-151); the 5000-digit MOD_COMMON ALIGNMENT refusal is the same `_echo` guard. |
+| N-136-arr-1 | .136/arr-1 | `software_a` describe-all 2.0 s is a pure timing bound (`P.test_r_a2l_def_136_1_describing_every_object_is_fast`); a per-name-walk mutant is real but only kills as a timing RED. |
+
+---
+
+## 3. Category index (as requested)
+
+- **F1 empty-kind element_count** → **M-F1** (`.73/9`, `.91/2`, `.92/5`, `.145/1,2`): `element_count: Optional[int] = None → = 1` in `_describe_array` (or `_empty_definition`). RED: `element_count is None` fails. This is the E3A-03/E3A-24 "a refused/empty definition must not carry an unread count" regression.
+- **`.7.2` array span regressions** → **M-7.2a/b/c** (`byte_length > MAX_A2L_DECODE_BYTES`, `address + byte_length - 1 > 0xFFFFFFFF`, `>`→`>=`).
+- **Exact FIX bounds** → **M-142/M-142b** (`_MAX_AXIS_POINTS`), **M-147a–f** (`_FIX_SHIFT_BOUND = 62`, `_FIX_MAGNITUDE_BOUND = 2^53`, the `_ratio` integer check, `2**s` ordering, double-vs-decimal read).
+- **Count datatype** → **M-86** (`_COUNT_DATATYPES` must stay the 8 integer types; admitting FLOAT16/FLOAT32 → `.86/3`, `.58.2/arr-9`).
+- **Keyed reads** → **M-136-keys** (bare `id()` vs `(kind, id(section))` tuple keys), **M-148-reads** (shared-word by-name lookup per object).
+- **Immutability** → **M-136-immut** (`MappingProxyType`/`tuple` vs `dict`/`list`), **M-150-text** (text referenced, not copied).
+- **Scaling** → **M-148-reduce / M-148-echo / M-150-lookup** (exact arms) plus the `serial_timing` arms in Table 2.
+- **Synth** → **M-133 / M-133b / M-134 / M-135 / M-63 / M-59**.
+
+**Counts (plan, not executed):** ~76 practical source mutants (all expected *killed* by the named discriminating test) + ~9 NOT_REALISABLE/timing-only. No assertion weakening is proposed anywhere; every mutant inverts the product toward the requirement's negative control, never the test.

@@ -1,0 +1,14 @@
+TEST   R-A2L-DEF.122 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.123 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.124 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.125 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.126 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.127 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.128 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.129 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.130 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.131 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.132 is named by no file under tests, and neither is a TC/AT id it lists
+TEST   R-A2L-DEF.140 is named by no file under tests, and neither is a TC/AT id it lists
+EVID   .dev-flow/2026-11-05-batch-103/inc-3/04-validation.md cites no evidence path
+trace_check: 1 US, 85 active requirements (0 withdrawn), 13 gap(s)

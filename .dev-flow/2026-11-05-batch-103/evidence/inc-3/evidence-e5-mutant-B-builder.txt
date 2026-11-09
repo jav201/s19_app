@@ -1,0 +1,25 @@
+Both files are written and verified. Summary of what I prepared:
+
+## Deliverables
+- `/tmp/b103-e4-3a-mutB/run_mutants.py` — the mutant-B driver (29 mutants, `py_compile` clean, all anchors match exactly once, all target test functions exist).
+- `/tmp/b103-e4-3a-mutB/README.txt` — exact coverage + not-realisable controls.
+
+## What the driver does
+- Locates the integrated tree (`/tmp/b103-e4-3a-int/tree`, overridable via `B103_INT_TREE`).
+- For each mutant: `copytree` to `OUT/<label>/tree`, **baseline on the pristine copy** (must be green), then a **guarded replacement** (anchor must match exactly once, else `BAD`), then runs **only its discriminating non-timing test** with `/home/<runner>/miniconda3/envs/s19ci/bin/python -I -B`.
+- Isolation: `HOME`/`XDG_*`/`LOCALAPPDATA` → `OUT/zq_iso_user/<label>`. The real worktree is only ever read.
+- Classifies `KILLED` / `SURVIVED` / `CRASH` / `BAD`, writes a per-mutant transcript, and refuses to run while `B103_SERIAL_TIMING=1`.
+
+## Coverage (29 mutants)
+- **S2.7g decoding (20)**: M-105…M-121 (with `.116.1/.116.2/.117.1/.117.2`), M-146.
+- **S2.7i synth (4)**: M-133, M-134, M-135, M-59 (case-08 pin).
+- **cited + keyed-read/scaling (5)**: M-136 (keyed read), M-139 (duplicate name), M-148 (exact scaling via `.148/19` one-form identity), M-150 (decode-per-element via `.150/arr-11` not-a-number), M-151 (file-word echo).
+
+## Not-realisable controls (documented in README)
+- Timing-only arms of `.136`/`.148`/`.150` (`serial_timing` ratios) — excluded by the "no timing-only mutants" rule; functional arms used instead.
+- Immutability control (`.136/arr-4` E3S3-19/-36) — realisable but is the *second* negative control of the single listed `M-136`; the keyed-read arm is the one realised.
+- M-137 (`_clean`/control chars) — not in the id list; 3a's `/arr` cases flow through `.151`'s `_echo` (guarded by M-151).
+- M-63 (determinism) — not in the id list.
+- 3b rows (`.122–.132`, `.140`) and the encode arms of `.120/2`/`.121/1,2` — out of 3a scope.
+
+Nothing was executed (no tests, no mutants, no serial-timing runs) — only read-only verification (py_compile, anchor-uniqueness, test-selector existence, `--list`).
