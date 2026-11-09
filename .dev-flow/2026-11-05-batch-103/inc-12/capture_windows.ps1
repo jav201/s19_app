@@ -134,6 +134,7 @@ $title = "b103-i12-$Scenario-$Cols-$stamp"
 $driver = Join-Path $PSScriptRoot "capture_driver.py"
 $outPath = [IO.Path]::GetFullPath($OutPng)
 $report = $outPath + ".txt"
+Remove-Item -LiteralPath $report, $outPath -Force -ErrorAction SilentlyContinue
 New-Item -ItemType Directory -Force (Split-Path -Parent $outPath) | Out-Null
 
 # Scratch launcher: the launched command removes/sets the isolated environment
@@ -260,6 +261,9 @@ try {
     throw "driver reported surface=error for '$title' (diagnosis capture: $diagMethod)"
   }
   $method = Save-WindowPng $hwnd $rect $outPath
+  $check = [System.Drawing.Bitmap]::FromFile($outPath)
+  try { $isBlack = Test-NearlyBlack $check } finally { $check.Dispose() }
+  if ($isBlack) { throw "captured '$title' is nearly black despite surface=ready" }
   Write-Output ("CAPTURED {0}  {1}x{2}px  grid={3}x{4}  method={5}  bytes={6}" -f `
     $outPath, ($rect.Right - $rect.Left), ($rect.Bottom - $rect.Top), $Cols, $Rows, $method, (Get-Item $outPath).Length)
   if (Test-Path -LiteralPath $report) {
