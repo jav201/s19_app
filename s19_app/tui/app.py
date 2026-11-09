@@ -1548,6 +1548,10 @@ class A2LDetailCard(RichLog):
         """Paint the placeholder before the first highlighted row."""
         self.show_tag(None)
 
+    def render(self) -> Text:
+        """Return the card's current text for the existing Static-era callers."""
+        return getattr(self, "_card_text", _a2l_detail_card_text(None))
+
     def show_tag(self, tag: Optional[dict]) -> None:
         """
         Summary:
@@ -1570,8 +1574,10 @@ class A2LDetailCard(RichLog):
             Used by:
                 - on_data_table_row_highlighted
         """
+        content = _a2l_detail_card_text(tag)
+        self._card_text = content
         self.clear()
-        self.write(_a2l_detail_card_text(tag))
+        self.write(content)
 
 #: Filled / empty glyphs for the range-magnitude micro-bar. Neither is a Rich
 #: markup metacharacter, but the bar is composed into a ``rich.text.Text`` (never
